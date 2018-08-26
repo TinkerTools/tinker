@@ -17,7 +17,6 @@ c     to an external disk file
 c
 c
       subroutine prtxyz (ixyz)
-      use sizes
       use atomid
       use atoms
       use bound

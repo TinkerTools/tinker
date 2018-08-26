@@ -17,7 +17,6 @@ c     and also partitions the energy among the atoms
 c
 c
       subroutine elj3
-      use sizes
       use analyz
       use atoms
       use energi
@@ -76,7 +75,6 @@ c     a pairwise double loop
 c
 c
       subroutine elj3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -454,7 +452,6 @@ c     the method of lights
 c
 c
       subroutine elj3b
-      use sizes
       use action
       use analyz
       use atomid
@@ -773,7 +770,6 @@ c     pairwise neighbor list
 c
 c
       subroutine elj3c
-      use sizes
       use action
       use analyz
       use atomid
@@ -1055,7 +1051,6 @@ c     stophat potential energy smoothing
 c
 c
       subroutine elj3e
-      use sizes
       use action
       use analyz
       use atomid

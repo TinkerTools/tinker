@@ -18,26 +18,38 @@ c     user requested termination of an optimization
 c
 c
       subroutine optsave (ncycle,f,xx)
-      use sizes
+      use atomid
       use atoms
       use bound
+      use deriv
       use files
       use iounit
       use math
+      use mpole
       use omega
       use output
+      use polar
+      use potent
       use scales
       use socket
+      use titles
+      use units
       use usage
       use zcoord
       implicit none
-      integer i,iopt,iend
+      integer i,j,k,lext
+      integer iopt,ifrc
+      integer iind,iend
       integer ncycle,nvar
-      integer lext,freeunit
-      real*8 f,xx(*)
+      integer freeunit
+      integer trimtext
+      real*8 f,wt
+      real*8 xx(*)
       logical exist
       character*7 ext
       character*240 optfile
+      character*240 frcfile
+      character*240 indfile
       character*240 endfile
 c
 c
@@ -119,6 +131,68 @@ c
          call prtxyz (iopt)
       end if
       close (unit=iopt)
+c
+c     save the force vector components for the current step
+c
+      if (frcsave .and. coordtype.eq.'CARTESIAN') then
+         ifrc = freeunit ()
+         if (archive) then
+            frcfile = filename(1:leng)
+            call suffix (frcfile,'frc','old')
+            inquire (file=frcfile,exist=exist)
+            if (exist) then
+               call openend (ifrc,frcfile)
+            else
+               open (unit=ifrc,file=frcfile,status='new')
+            end if
+         else
+            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
+            call version (frcfile,'new')
+            open (unit=ifrc,file=frcfile,status='new')
+         end if
+         write (ifrc,250)  n,title(1:ltitle)
+  250    format (i6,2x,a)
+         do i = 1, n
+            wt = mass(i) / convert
+            write (ifrc,260)  i,name(i),(-desum(j,i),j=1,3)
+  260       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
+         end do
+         close (unit=ifrc)
+         write (iout,270)  frcfile(1:trimtext(frcfile))
+  270    format (' Force Vector File',11x,a)
+      end if
+c
+c     save the current induced dipole moment at each site
+c
+      if (uindsave .and. use_polar .and. coordtype.eq.'CARTESIAN') then
+         iind = freeunit ()
+         if (archive) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'uind','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               call openend (iind,indfile)
+            else
+               open (unit=iind,file=indfile,status='new')
+            end if
+         else
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+         end if
+         write (iind,280)  n,title(1:ltitle)
+  280    format (i6,2x,a)
+         do i = 1, npole
+            if (polarity(i) .ne. 0.0d0) then
+               k = ipole(i)
+               write (iind,290)  k,name(k),(debye*uind(j,i),j=1,3)
+  290          format (i6,2x,a3,3f12.6)
+            end if
+         end do
+         close (unit=iind)
+         write (iout,300)  indfile(1:trimtext(indfile))
+  300    format (' Induced Dipole File',10x,a)
+      end if
 c
 c     send data via external socket communication if desired
 c

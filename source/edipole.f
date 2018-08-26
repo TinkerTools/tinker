@@ -16,7 +16,6 @@ c     "edipole" calculates the dipole-dipole interaction energy
 c
 c
       subroutine edipole
-      use sizes
       use atoms
       use bound
       use cell

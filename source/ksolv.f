@@ -18,7 +18,6 @@ c     Poisson-Boltzmann, cavity-dispersion and HPMF models
 c
 c
       subroutine ksolv
-      use sizes
       use gkstuf
       use inform
       use iounit
@@ -205,7 +204,6 @@ c     Hydration of Peptides", PNAS, 84, 3086-3090 (1987)  (SASA)
 c
 c
       subroutine ksa
-      use sizes
       use atomid
       use atoms
       use couple
@@ -346,7 +344,6 @@ c     Computational Chemistry, 22, 1857-1879 (2001)  (ACE)
 c
 c
       subroutine kgb
-      use sizes
       use angbnd
       use atmlst
       use atomid
@@ -816,7 +813,6 @@ c     Kirkwood implicit solvation model
 c
 c
       subroutine kgk
-      use sizes
       use atomid
       use atoms
       use couple
@@ -824,6 +820,7 @@ c
       use keys
       use kvdws
       use polar
+      use polopt
       use ptable
       use solute
       implicit none
@@ -1133,7 +1130,6 @@ c     implicit solvation model implemented via APBS
 c
 c
       subroutine kpb
-      use sizes
       use atomid
       use atoms
       use bath
@@ -1147,6 +1143,7 @@ c
       use nonpol
       use pbstuf
       use polar
+      use polopt
       use potent
       use ptable
       use solute
@@ -1676,7 +1673,6 @@ c     dispersion nonpolar implicit solvation model
 c
 c
       subroutine knp
-      use sizes
       use atomid
       use atoms
       use couple
@@ -1819,7 +1815,6 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine khpmf
-      use sizes
       use atomid
       use atoms
       use couple

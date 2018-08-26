@@ -16,7 +16,6 @@ c     "eimptor" calculates the improper torsion potential energy
 c
 c
       subroutine eimptor
-      use sizes
       use atoms
       use bound
       use energi

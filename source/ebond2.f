@@ -17,7 +17,6 @@ c     stretching energy for a single atom at a time
 c
 c
       subroutine ebond2 (i)
-      use sizes
       use atmlst
       use atoms
       use bndpot

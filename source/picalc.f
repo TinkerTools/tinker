@@ -17,7 +17,6 @@ c     orbital calculation for each conjugated pisystem
 c
 c
       subroutine picalc
-      use sizes
       use bndstr
       use couple
       use inform
@@ -134,7 +133,6 @@ c     pisystem to determine bond orders used in parameter scaling
 c
 c
       subroutine piscf
-      use sizes
       use atomid
       use atoms
       use bndstr
@@ -565,7 +563,6 @@ c     if the same orbitals were perfectly parallel
 c
 c
       subroutine pitilt (povlap)
-      use sizes
       use atomid
       use atoms
       use couple
@@ -681,7 +678,6 @@ c     also moved and their bond lengths normalized
 c
 c
       subroutine pimove (list,xr,yr,zr)
-      use sizes
       use atoms
       implicit none
       integer i,j,list(8)
@@ -770,7 +766,6 @@ c     torsional parameters based on the "nonplanar" bond orders
 c
 c
       subroutine pialter
-      use sizes
       use atomid
       use bndstr
       use inform

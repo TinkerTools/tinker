@@ -18,7 +18,6 @@ c     droplet restraints; also partitions energy among the atoms
 c
 c
       subroutine egeom3
-      use sizes
       use action
       use analyz
       use atomid

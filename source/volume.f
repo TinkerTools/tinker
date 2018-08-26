@@ -17,7 +17,6 @@ c     analytical volume and surface area algorithm
 c
 c
       subroutine volume (volume_tot,radius,exclude)
-      use sizes
       implicit none
       real*8 exclude,probe
       real*8 volume_tot,area_tot
@@ -51,10 +50,10 @@ c     Journal of Computational Chemistry, 12, 402-409 (1991)
 c
 c
       subroutine volume1 (radius,probe,dex)
-      use sizes
       use atoms
       use iounit
       use math
+      use sizes
       implicit none
       integer maxcube,maxarc
       parameter (maxcube=15)
@@ -519,7 +518,6 @@ c     Journal of Computational Chemistry, 12, 402-409 (1991)
 c
 c
       subroutine volume2 (iatom,radius,probe,xhess,yhess,zhess)
-      use sizes
       use atoms
       use iounit
       use math

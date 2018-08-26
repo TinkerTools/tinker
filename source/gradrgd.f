@@ -17,7 +17,6 @@ c     and first derivatives with respect to rigid body coordinates
 c
 c
       subroutine gradrgd (energy,derivs)
-      use sizes
       use atoms
       use group
       use rigid

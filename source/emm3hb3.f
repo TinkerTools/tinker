@@ -28,7 +28,6 @@ c     19, 1001-1016 (1998)
 c
 c
       subroutine emm3hb3
-      use sizes
       use analyz
       use atoms
       use energi
@@ -82,7 +81,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine emm3hb3a
-      use sizes
       use action
       use analyz
       use atmlst
@@ -578,7 +576,6 @@ c     the method of lights
 c
 c
       subroutine emm3hb3b
-      use sizes
       use action
       use analyz
       use atmlst
@@ -980,7 +977,6 @@ c     a pairwise neighbor list
 c
 c
       subroutine emm3hb3c
-      use sizes
       use action
       use analyz
       use atmlst

@@ -16,7 +16,6 @@ c     "eurey" calculates the Urey-Bradley 1-3 interaction energy
 c
 c
       subroutine eurey
-      use sizes
       use atoms
       use bound
       use energi

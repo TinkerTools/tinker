@@ -17,7 +17,6 @@ c     the internal coordinates and computes Cartesian coordinates
 c
 c
       subroutine getint
-      use sizes
       use atoms
       use inform
       use iounit

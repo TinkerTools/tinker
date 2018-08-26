@@ -18,7 +18,6 @@ c     via a one-sided or two-sided numerical differentiation
 c
 c
       subroutine numgrad (fvalue,g,eps)
-      use sizes
       use atoms
       implicit none
       integer i

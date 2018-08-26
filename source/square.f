@@ -45,7 +45,6 @@ c
 c
       subroutine square (n,m,xlo,xhi,xc,fc,gc,fjac,grdmin,
      &                          rsdvalue,lsqwrite)
-      use sizes
       use inform
       use iounit
       use keys

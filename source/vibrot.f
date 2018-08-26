@@ -23,7 +23,6 @@ c     Journal of Molecular Biology, 181, 423-447 (1985)
 c
 c
       program vibrot
-      use sizes
       use iounit
       use omega
       implicit none

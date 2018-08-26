@@ -17,7 +17,6 @@ c     energy; also partitions the energy terms among the atoms
 c
 c
       subroutine eimprop3
-      use sizes
       use action
       use analyz
       use atomid

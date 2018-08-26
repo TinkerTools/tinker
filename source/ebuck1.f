@@ -17,7 +17,6 @@ c     and its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine ebuck1
-      use sizes
       use energi
       use iounit
       use limits
@@ -70,7 +69,6 @@ c     and its first derivatives using a pairwise double loop
 c
 c
       subroutine ebuck1a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -536,7 +534,6 @@ c     and its first derivatives using the method of lights
 c
 c
       subroutine ebuck1b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -891,7 +888,6 @@ c     and its first derivatives using a pairwise neighbor list
 c
 c
       subroutine ebuck1c
-      use sizes
       use atomid
       use atoms
       use bound

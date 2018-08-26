@@ -26,7 +26,6 @@ c     Ohio Supercomputer Center, Columbus, OH
 c
 c
       subroutine quatfit (n1,x1,y1,z1,n2,x2,y2,z2)
-      use sizes
       use align
       implicit none
       integer i,i1,i2,n1,n2

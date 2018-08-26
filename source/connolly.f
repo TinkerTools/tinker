@@ -95,7 +95,6 @@ c     fpcy    convex face cycle numbers
 c
 c
       subroutine connolly (volume,area,radius,probe,exclude)
-      use sizes
       use atoms
       use faces
       implicit none
@@ -653,7 +652,6 @@ c     tangent to each triple of neighboring atoms
 c
 c
       subroutine place
-      use sizes
       use faces
       implicit none
       integer maxmnb
@@ -1024,7 +1022,6 @@ c     linked list for its temporary torus
 c
 c
       subroutine inedge (ien,itt)
-      use sizes
       use faces
       implicit none
       integer ien,itt,iepen
@@ -1063,7 +1060,6 @@ c     the temporary tori arrays to the final tori arrays
 c
 c
       subroutine compress
-      use sizes
       use faces
       implicit none
       integer itt,ia,ja
@@ -1133,7 +1129,6 @@ c     "saddles" constructs circles, convex edges and saddle faces
 c
 c
       subroutine saddles
-      use sizes
       use faces
       use math
       implicit none
@@ -1530,7 +1525,6 @@ c     between two atoms, and finds the torus radius, center and axis
 c
 c
       subroutine gettor (ia,ja,ttok,torcen,torad,torax)
-      use sizes
       use faces
       implicit none
       integer k,ia,ja
@@ -1601,7 +1595,6 @@ c     between three neighboring atoms
 c
 c
       subroutine getprb (ia,ja,ka,prbok,tb,bijk,hijk,uijk)
-      use sizes
       use faces
       implicit none
       integer k,ia,ja,ka
@@ -1687,7 +1680,6 @@ c     "ipedge" inserts convex edge into linked list for atom
 c
 c
       subroutine ipedge (iep,ia)
-      use sizes
       use faces
       implicit none
       integer iep,ia,iepen
@@ -1725,7 +1717,6 @@ c     "contact" constructs the contact surface, cycles and convex faces
 c
 c
       subroutine contact
-      use sizes
       use faces
       implicit none
       integer maxepa,maxcypa
@@ -2168,7 +2159,6 @@ c     and uses it to compute the volume and surface area
 c
 c
       subroutine vam (volume,area)
-      use sizes
       use faces
       use inform
       use iounit

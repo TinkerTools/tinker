@@ -16,7 +16,6 @@ c     "egauss" calculates the Gaussian expansion van der Waals energy
 c
 c
       subroutine egauss
-      use sizes
       use limits
       use warp
       implicit none
@@ -49,7 +48,6 @@ c     energy using a pairwise double loop
 c
 c
       subroutine egauss0a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -359,7 +357,6 @@ c     using the method of lights
 c
 c
       subroutine egauss0b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -625,7 +622,6 @@ c     energy using a pairwise neighbor list
 c
 c
       subroutine egauss0c
-      use sizes
       use atomid
       use atoms
       use bound
@@ -816,7 +812,6 @@ c     energy for use with potential energy smoothing
 c
 c
       subroutine egauss0d
-      use sizes
       use atomid
       use atoms
       use couple

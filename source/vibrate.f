@@ -20,7 +20,6 @@ c     well as the vibrational frequencies and displacements
 c
 c
       program vibrate
-      use sizes
       use atomid
       use atoms
       use files

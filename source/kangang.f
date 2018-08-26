@@ -17,7 +17,6 @@ c     interactions and processes new or changed parameter values
 c
 c
       subroutine kangang
-      use sizes
       use angang
       use angbnd
       use atmlst

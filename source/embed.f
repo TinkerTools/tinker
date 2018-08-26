@@ -32,7 +32,6 @@ c     in Biophysics and Molecular Biology, 56, 43-78 (1991)
 c
 c
       subroutine embed
-      use sizes
       use atoms
       use disgeo
       use files
@@ -325,7 +324,6 @@ c     each of three other atoms
 c
 c
       subroutine kchiral
-      use sizes
       use atoms
       use inform
       use iounit
@@ -405,7 +403,6 @@ c     129-144 (1988)
 c
 c
       subroutine triangle
-      use sizes
       use atoms
       use disgeo
       use iounit
@@ -485,7 +482,6 @@ c     John Wiley and Sons, U.S. distributor, see section 6-2
 c
 c
       subroutine geodesic
-      use sizes
       use atoms
       use disgeo
       use restrn
@@ -585,7 +581,6 @@ c     for Shortest Paths", Networks, 23, 703-709 (1993)
 c
 c
       subroutine minpath (root,upper,lower,start,stop,list)
-      use sizes
       use atoms
       use couple
       use disgeo
@@ -735,7 +730,6 @@ c     Infor, 16, 132-146 (1978)
 c
 c
       subroutine trifix (p,q)
-      use sizes
       use atoms
       use disgeo
       use inform
@@ -1062,7 +1056,6 @@ c     correlated fashion, or using random partial metrization
 c
 c
       subroutine dstmat (dmx)
-      use sizes
       use atoms
       use disgeo
       use inform
@@ -1497,7 +1490,6 @@ c     from Distance Information", Acta Cryst., A34, 282-284 (1978)
 c
 c
       subroutine metric (gmx,nneg)
-      use sizes
       use atoms
       use disgeo
       use inform
@@ -1587,7 +1579,6 @@ c     first three eigenvalues are positive
 c
 c
       subroutine eigen (evl,evc,gmx,valid)
-      use sizes
       use atoms
       use inform
       use iounit
@@ -1658,7 +1649,6 @@ c     to compute the rms deviation from the bounds
 c
 c
       subroutine coords (evl,evc)
-      use sizes
       use atoms
       use disgeo
       use inform
@@ -1717,7 +1707,6 @@ c     or lower bounds matrix violations
 c
 c
       subroutine chksize
-      use sizes
       use atoms
       use couple
       use disgeo
@@ -1815,7 +1804,6 @@ c     in Biophysics and Molecular Biology, 56, 43-78 (1991)
 c
 c
       subroutine majorize (dmx)
-      use sizes
       use atoms
       use inform
       use iounit
@@ -2015,7 +2003,6 @@ c     the bound, chirality, planarity and torsional error functions
 c
 c
       subroutine refine (mode,fctval,grdmin)
-      use sizes
       use atoms
       use disgeo
       use inform
@@ -2103,7 +2090,6 @@ c     bound, chirality, planarity and torsional error functions
 c
 c
       subroutine explore (mode,nstep,dt,mass,temp_start,temp_stop,v,a)
-      use sizes
       use atoms
       use inform
       use iounit
@@ -2321,7 +2307,6 @@ c     Biopolymers, 31, 1049-1064 (1991)
 c
 c
       subroutine fracdist (title)
-      use sizes
       use atoms
       use disgeo
       use iounit
@@ -2410,7 +2395,6 @@ c     rms value of the distance restraint violations
 c
 c
       subroutine rmserror (title)
-      use sizes
       use atoms
       use disgeo
       use iounit
@@ -2545,7 +2529,6 @@ c     of the bounds errors into the lower half of the matrix
 c
 c
       subroutine dmdump (dmd)
-      use sizes
       use atoms
       use disgeo
       use iounit
@@ -2609,7 +2592,6 @@ c     the local geometry and torsional restraint errors
 c
 c
       function initerr (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i,j,nvar
@@ -2685,7 +2667,6 @@ c     torsional restraint errors
 c
 c
       function miderr (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i,j,nvar
@@ -2765,7 +2746,6 @@ c     torsional restraint errors
 c
 c
       function toterr (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i,j,nvar
@@ -2848,7 +2828,6 @@ c     original penalty is needed if large lower bounds are present
 c
 c
       function bnderr (derivs)
-      use sizes
       use atoms
       use restrn
       implicit none
@@ -2944,7 +2923,6 @@ c     pairwise neighbors are generated via the method of lights
 c
 c
       function vdwerr (derivs)
-      use sizes
       use atoms
       use couple
       use disgeo
@@ -3067,7 +3045,6 @@ c     including the 1-2, 1-3 and 1-4 distance bound restraints
 c
 c
       function locerr (derivs)
-      use sizes
       use angbnd
       use atoms
       use bndstr
@@ -3229,7 +3206,6 @@ c     squares of deviations of chiral volumes from target values
 c
 c
       function chirer (derivs)
-      use sizes
       use atoms
       use restrn
       implicit none
@@ -3326,7 +3302,6 @@ c     to avoid a numerical instability
 c
 c
       function torser (derivs)
-      use sizes
       use atoms
       use couple
       use disgeo

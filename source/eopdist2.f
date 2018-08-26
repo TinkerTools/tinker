@@ -17,7 +17,6 @@ c     distance energy for a single atom via the central atom height
 c
 c
       subroutine eopdist2 (i)
-      use sizes
       use angpot
       use atoms
       use bound

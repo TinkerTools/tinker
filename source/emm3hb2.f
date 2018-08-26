@@ -31,7 +31,6 @@ c     19, 1001-1016 (1998)
 c
 c
       subroutine emm3hb2 (iatom)
-      use sizes
       use atmlst
       use atomid
       use atoms

@@ -18,7 +18,6 @@ c     spherical droplet restraints
 c
 c
       subroutine egeom
-      use sizes
       use atomid
       use atoms
       use bound

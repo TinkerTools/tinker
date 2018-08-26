@@ -17,7 +17,6 @@ c     starting from a set of internal coordinates
 c
 c
       subroutine connect
-      use sizes
       use atoms
       use couple
       use zcoord

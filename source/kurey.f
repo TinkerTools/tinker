@@ -18,7 +18,6 @@ c     new or changed parameter values
 c
 c
       subroutine kurey
-      use sizes
       use angbnd
       use atomid
       use atoms

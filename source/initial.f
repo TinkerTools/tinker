@@ -16,13 +16,12 @@ c     "initial" sets up original values for some parameters and
 c     variables that might not otherwise get initialized
 c
 c     note calls below to the "kmp_set" routines are for use with
-c     the Intel compiler, but must be commented for other compilers;
+c     the Intel compiler, and must be commented for other compilers;
 c     alternatively, these values can be set via the KMP_STACKSIZE
 c     and KMP_BLOCKTIME environment variables
 c
 c
       subroutine initial
-      use sizes
       use align
       use atoms
       use bath
@@ -161,7 +160,7 @@ c     flag for use of internal virial
 c
       use_virial = .true.
 c
-c     default values for unitcell dimensions
+c     default values for unit cell dimensions
 c
       xbox = 0.0d0
       ybox = 0.0d0

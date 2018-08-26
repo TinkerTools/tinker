@@ -21,7 +21,6 @@ c     note that internal coordinates must already be setup
 c
 c
       subroutine initrot
-      use sizes
       use atoms
       use couple
       use group
@@ -298,7 +297,6 @@ c     sides of the candidate bond
 c
 c
       function rotcheck (base,partner)
-      use sizes
       use atoms
       use rotbnd
       use usage

@@ -33,7 +33,6 @@ c     radius   radii of each of the individual atoms
 c
 c
       subroutine surfatom (ir,area,radius)
-      use sizes
       use atoms
       use iounit
       use math
@@ -505,7 +504,6 @@ c     of a specified atom
 c
 c
       subroutine surfatom1 (ir,area,darea,radius)
-      use sizes
       use atoms
       use iounit
       use math

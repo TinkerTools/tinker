@@ -61,6 +61,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testhe
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testpair.x testpair.o libtinker.a libjvm.so ; strip testpair.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testpol.x testpol.o libtinker.a libjvm.so ; strip testpol.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testrot.x testrot.o libtinker.a libjvm.so ; strip testrot.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o testvir.x testvir.o libtinker.a libjvm.so ; strip testvir.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o timer.x timer.o libtinker.a libjvm.so ; strip timer.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o timerot.x timerot.o libtinker.a libjvm.so ; strip timerot.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o torsfit.x torsfit.o libtinker.a libjvm.so ; strip torsfit.x

@@ -16,7 +16,6 @@ c     "elj" calculates the Lennard-Jones 6-12 van der Waals energy
 c
 c
       subroutine elj
-      use sizes
       use energi
       use limits
       use vdwpot
@@ -61,7 +60,6 @@ c     using a pairwise double loop
 c
 c
       subroutine elj0a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -353,7 +351,6 @@ c     using the method of lights
 c
 c
       subroutine elj0b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -608,7 +605,6 @@ c     using a pairwise neighbor list
 c
 c
       subroutine elj0c
-      use sizes
       use atomid
       use atoms
       use bound
@@ -835,7 +831,6 @@ c     for use with stophat potential energy smoothing
 c
 c
       subroutine elj0e
-      use sizes
       use atomid
       use atoms
       use couple

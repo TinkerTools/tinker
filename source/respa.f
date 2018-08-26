@@ -30,7 +30,6 @@ c     115, 4019-4029 (2001)
 c
 c
       subroutine respa (istep,dt)
-      use sizes
       use atomid
       use atoms
       use freeze

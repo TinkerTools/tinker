@@ -17,7 +17,6 @@ c     kinetic energy of the overall system center of mass
 c
 c
       subroutine mdrest (istep)
-      use sizes
       use atomid
       use atoms
       use bound

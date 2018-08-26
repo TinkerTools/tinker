@@ -17,7 +17,6 @@ c     from Tinker modules to the corresponding OpenMM structures
 c
 c
       subroutine ommdata ()
-      use sizes
       use angbnd
       use angpot
       use angtor
@@ -56,9 +55,11 @@ c
       use pme
       use polar
       use polgrp
+      use polopt
       use polpot
       use potent
       use restrn
+      use sizes
       use solute
       use stodyn
       use strbnd
@@ -125,8 +126,7 @@ c
      &                      chgtaper,dpltaper,mpoletaper,ewaldcut,
      &                      usolvcut,use_ewald,use_lights,use_list,
      &                      use_vlist,use_clist,use_mlist,use_ulist)
-      call set_mdstuf_data (nfree,irest,bmnmix,arespa,dorest,velsave,
-     &                      frcsave,uindsave,integrate)
+      call set_mdstuf_data (nfree,irest,bmnmix,arespa,dorest,integrate)
       call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)
       call set_mplpot_data (m2scale,m3scale,m4scale,m5scale)
@@ -145,12 +145,12 @@ c
       call set_pme_data (nfft1,nfft2,nfft3,bsorder,igrid,bsmod1,
      &                   bsmod2,bsmod3,bsbuild,thetai1,thetai2,
      &                   thetai3,qgrid,qfac)
-      call set_polar_data (maxopt,npolar,coptmax,optlevel,copt,copm,
-     &                     polarity,thole,pdamp,udir,udirp,udirs,
-     &                     udirps,uind,uinp,uinds,uinps,uopt,uoptp,
-     &                     uopts,uoptps,fopt,foptp,uexact,douind)
+      call set_polar_data (npolar,polarity,thole,pdamp,udir,udirp,udirs,
+     &                     udirps,uind,uinp,uinds,uinps,uexact,douind)
       call set_polgrp_data (maxp11,maxp12,maxp13,maxp14,np11,
      &                      np12,np13,np14,ip11,ip12,ip13,ip14)
+      call set_polopt_data (maxopt,coptmax,optlevel,copt,copm,
+     &                      uopt,uoptp,uopts,uoptps,fopt,foptp)
       call set_polpot_data (politer,poleps,p2scale,p3scale,p4scale,
      &                      p5scale,p41scale,d1scale,d2scale,d3scale,
      &                      d4scale,u1scale,u2scale,u3scale,u4scale,

@@ -18,7 +18,6 @@ c     (Halgren-Lipscomb) and quadratic path (Bell-Crighton) methods
 c
 c
       program saddle
-      use sizes
       use atoms
       use iounit
       use keys
@@ -695,7 +694,6 @@ c     the specified structure
 c
 c
       subroutine pathval (nvar,xx)
-      use sizes
       use atoms
       use syntrn
       implicit none
@@ -786,7 +784,6 @@ c     computing structures and energies for specific path values
 c
 c
       subroutine pathscan (nvar,x0,x1,ncalls)
-      use sizes
       use iounit
       use syntrn
       implicit none
@@ -847,7 +844,6 @@ c     with the specified path value "tpath"
 c
 c
       subroutine pathpnt (nvar,tpath,xx,x0,x1)
-      use sizes
       use inform
       use minima
       implicit none
@@ -900,7 +896,6 @@ c     transit path for a point along the transit pathway
 c
 c
       subroutine tangent (nvar,xx,g,g_rms,tan,g_tan,gamma,dgdt)
-      use sizes
       use atoms
       use syntrn
       implicit none
@@ -997,7 +992,6 @@ c     gradient; linear and quadratic transit paths are available
 c
 c
       function transit (xx,g)
-      use sizes
       use atoms
       use syntrn
       implicit none
@@ -1140,7 +1134,6 @@ c     gradient for transition state optimization
 c
 c
       function saddle1 (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i

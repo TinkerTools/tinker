@@ -30,7 +30,6 @@ c     Optimization, 5, 871-891 (1995)
 c
 c
       program sniffer
-      use sizes
       use atoms
       use files
       use inform
@@ -421,7 +420,6 @@ c     and gradient for the Sniffer global optimization method
 c
 c
       function sniffer1 (xx,g)
-      use sizes
       use atoms
       use scales
       use usage

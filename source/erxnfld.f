@@ -22,7 +22,6 @@ c     Multipoles", Journal of Chemical Physics, 107, 481-492 (1997)
 c
 c
       subroutine erxnfld
-      use sizes
       use atoms
       use chgpot
       use energi
@@ -111,7 +110,6 @@ c     of atomic multipoles
 c
 c
       subroutine erfik (ii,kk,i,k,rpi,rpk,eik)
-      use sizes
       use atoms
       use chgpot
       use mpole

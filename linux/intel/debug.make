@@ -119,7 +119,9 @@ ifort -c -g -warn all -check all pitors.f
 ifort -c -g -warn all -check all pme.f
 ifort -c -g -warn all -check all polar.f
 ifort -c -g -warn all -check all polgrp.f
+ifort -c -g -warn all -check all polopt.f
 ifort -c -g -warn all -check all polpot.f
+ifort -c -g -warn all -check all poltcg.f
 ifort -c -g -warn all -check all potent.f
 ifort -c -g -warn all -check all potfit.f
 ifort -c -g -warn all -check all precis.f
@@ -451,7 +453,7 @@ ifort -c -g -warn all -check all overlap.f
 ifort -c -g -warn all -check all path.f
 ifort -c -g -warn all -check all pdbxyz.f
 ifort -c -g -warn all -check all picalc.f
-ifort -c -g -warn all -check all pmestuff.f
+ifort -c -g -warn all -check all pmestuf.f
 ifort -c -g -warn all -check all pmpb.f
 ifort -c -g -warn all -check all polarize.f
 ifort -c -g -warn all -check all poledit.f
@@ -504,7 +506,7 @@ ifort -c -g -warn all -check all server.f
 ifort -c -g -warn all -check all shakeup.f
 ifort -c -g -warn all -check all sigmoid.f
 ifort -c -g -warn all -check all simplex.f
-ifort -c -g -warn all -check all sktstuff.f
+ifort -c -g -warn all -check all sktstuf.f
 ifort -c -g -warn all -check all sniffer.f
 ifort -c -g -warn all -check all sort.f
 ifort -c -g -warn all -check all spacefill.f
@@ -515,12 +517,14 @@ ifort -c -g -warn all -check all superpose.f
 ifort -c -g -warn all -check all surface.f
 ifort -c -g -warn all -check all surfatom.f
 ifort -c -g -warn all -check all switch.f
+ifort -c -g -warn all -check all tcgstuf.f
 ifort -c -g -warn all -check all temper.f
 ifort -c -g -warn all -check all testgrad.f
 ifort -c -g -warn all -check all testhess.f
 ifort -c -g -warn all -check all testpair.f
 ifort -c -g -warn all -check all testpol.f
 ifort -c -g -warn all -check all testrot.f
+ifort -c -g -warn all -check all testvir.f
 ifort -c -g -warn all -check all timer.f
 ifort -c -g -warn all -check all timerot.f
 ifort -c -g -warn all -check all tncg.f

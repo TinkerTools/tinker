@@ -45,7 +45,6 @@ c     van der Waals neighbor list
 c
 c
       subroutine vlist
-      use sizes
       use atoms
       use bound
       use boxes
@@ -222,7 +221,6 @@ c     pair neighbor list for all sites
 c
 c
       subroutine vbuild
-      use sizes
       use bound
       use iounit
       use neigh
@@ -293,7 +291,6 @@ c     pair neighbor list for all sites using the method of lights
 c
 c
       subroutine vlight
-      use sizes
       use atoms
       use bound
       use cell
@@ -429,7 +426,6 @@ c     electrostatic neighbor lists for partial charges
 c
 c
       subroutine clist
-      use sizes
       use atoms
       use bound
       use boxes
@@ -595,7 +591,6 @@ c     electrostatic neighbor list for all sites
 c
 c
       subroutine cbuild
-      use sizes
       use atoms
       use bound
       use charge
@@ -670,7 +665,6 @@ c     pair neighbor list for all sites using the method of lights
 c
 c
       subroutine clight
-      use sizes
       use atoms
       use bound
       use cell
@@ -810,7 +804,6 @@ c     electrostatic neighbor lists for atomic multipoles
 c
 c
       subroutine mlist
-      use sizes
       use atoms
       use bound
       use boxes
@@ -976,7 +969,6 @@ c     electrostatic neighbor list for all sites
 c
 c
       subroutine mbuild
-      use sizes
       use atoms
       use bound
       use iounit
@@ -1051,7 +1043,6 @@ c     pair neighbor list for all sites using the method of lights
 c
 c
       subroutine mlight
-      use sizes
       use atoms
       use bound
       use cell
@@ -1191,7 +1182,6 @@ c     neighbor lists for the polarization preconditioner
 c
 c
       subroutine ulist
-      use sizes
       use atoms
       use bound
       use boxes
@@ -1357,7 +1347,6 @@ c     preconditioner neighbor list for all sites
 c
 c
       subroutine ubuild
-      use sizes
       use atoms
       use bound
       use iounit
@@ -1433,7 +1422,6 @@ c     method of lights
 c
 c
       subroutine ulight
-      use sizes
       use atoms
       use bound
       use cell

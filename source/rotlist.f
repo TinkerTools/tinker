@@ -18,7 +18,6 @@ c     finds the minimal list by choosing the side with fewer atoms
 c
 c
       subroutine rotlist (base,partner)
-      use sizes
       use atoms
       use couple
       use iounit
@@ -28,7 +27,8 @@ c
       implicit none
       integer i,k,ia,ib,swap
       integer base,partner
-      integer mark,test,nattach
+      integer mark,test
+      integer nattach
       integer, allocatable :: list(:)
       logical bonded
 c

@@ -18,7 +18,6 @@ c     from a molecular dynamics or other trajectory
 c
 c
       program correlate
-      use sizes
       use ascii
       use atoms
       use files
@@ -275,7 +274,6 @@ c     of time correlation functions
 c
 c
       subroutine readblk (mode,start,stop,step,nb,tb,xb,yb,zb)
-      use sizes
       use atomid
       use atoms
       use files
@@ -383,7 +381,6 @@ c     function to compute other properties to be correlated
 c
 c
       function property (mode,i,xi,yi,zi,k,xk,yk,zk)
-      use sizes
       use atoms
       implicit none
       integer maxsite

@@ -358,11 +358,13 @@ piorbs.obj
 pistuf.obj
 pitors.obj
 pme.obj
-pmestuff.obj
+pmestuf.obj
 pmpb.obj
 polar.obj
 polgrp.obj
+polopt.obj
 polpot.obj
+poltcg.obj
 polymer.obj
 potent.obj
 potfit.obj
@@ -421,7 +423,7 @@ shunt.obj
 sigmoid.obj
 simplex.obj
 sizes.obj
-sktstuff.obj
+sktstuf.obj
 socket.obj
 solute.obj
 sort.obj
@@ -435,6 +437,7 @@ surfatom.obj
 switch.obj
 syntrn.obj
 tarray.obj
+tcgstuf.obj
 temper.obj
 titles.obj
 tncg.obj

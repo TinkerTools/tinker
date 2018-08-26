@@ -17,7 +17,6 @@ c     each potential energy function calculation
 c
 c
       subroutine active
-      use sizes
       use atoms
       use inform
       use iounit

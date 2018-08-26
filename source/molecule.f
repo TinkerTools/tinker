@@ -17,7 +17,6 @@ c     its molecule and computes the mass of each molecule
 c
 c
       subroutine molecule
-      use sizes
       use atomid
       use atoms
       use couple

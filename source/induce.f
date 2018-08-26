@@ -21,12 +21,12 @@ c     on full system, use of active or inactive atoms is ignored
 c
 c
       subroutine induce
-      use sizes
       use inform
       use iounit
       use limits
       use mpole
       use polar
+      use polpot
       use potent
       use solute
       use units
@@ -43,6 +43,9 @@ c
          call induce0e
       else if (solvtyp(1:2) .eq. 'GK') then
          call induce0d
+      else if (poltyp .eq. 'TCG') then
+         call tcg_induce1a
+         return
       else
          call induce0a
       end if
@@ -173,7 +176,6 @@ c     sites using a preconditioned conjugate gradient solver
 c
 c
       subroutine induce0a
-      use sizes
       use atoms
       use ielscf
       use inform
@@ -181,6 +183,7 @@ c
       use limits
       use mpole
       use polar
+      use polopt
       use polpot
       use potent
       use units
@@ -570,7 +573,6 @@ c     permanent multipole moments via a double loop
 c
 c
       subroutine dfield0a (field,fieldp)
-      use sizes
       use atoms
       use bound
       use cell
@@ -954,7 +956,6 @@ c     induced dipole moments via a double loop
 c
 c
       subroutine ufield0a (field,fieldp)
-      use sizes
       use atoms
       use bound
       use cell
@@ -1243,7 +1244,6 @@ c     permanent multipole moments via a pair list
 c
 c
       subroutine dfield0b (field,fieldp)
-      use sizes
       use atoms
       use bound
       use couple
@@ -1473,7 +1473,6 @@ c     induced dipole moments via a pair list
 c
 c
       subroutine ufield0b (field,fieldp)
-      use sizes
       use atoms
       use bound
       use group
@@ -1649,7 +1648,6 @@ c     permanent multipole moments via Ewald summation
 c
 c
       subroutine dfield0c (field,fieldp)
-      use sizes
       use atoms
       use boxes
       use ewald
@@ -1737,7 +1735,6 @@ c     induced dipole moments via Ewald summation
 c
 c
       subroutine ufield0c (field,fieldp)
-      use sizes
       use atoms
       use boxes
       use ewald
@@ -1822,7 +1819,6 @@ c     permanent atomic multipole moments to the field
 c
 c
       subroutine udirect1 (field)
-      use sizes
       use bound
       use boxes
       use ewald
@@ -1987,7 +1983,6 @@ c     atomic multipole moments to the field via a double loop
 c
 c
       subroutine udirect2a (field,fieldp)
-      use sizes
       use atoms
       use boxes
       use bound
@@ -2457,7 +2452,6 @@ c     atomic multipole moments to the field via a neighbor list
 c
 c
       subroutine udirect2b (field,fieldp)
-      use sizes
       use atoms
       use boxes
       use bound
@@ -2844,13 +2838,13 @@ c     induced atomic dipole moments to the field
 c
 c
       subroutine umutual1 (field,fieldp)
-      use sizes
       use boxes
       use ewald
       use math
       use mpole
       use pme
       use polar
+      use polopt
       use polpot
       implicit none
       integer i,j,k
@@ -2982,7 +2976,6 @@ c     atomic dipole moments to the field via a double loop
 c
 c
       subroutine umutual2a (field,fieldp)
-      use sizes
       use atoms
       use boxes
       use bound
@@ -3311,7 +3304,6 @@ c     atomic dipole moments to the field via a neighbor list
 c
 c
       subroutine umutual2b (field,fieldp)
-      use sizes
       use mpole
       use polar
       use tarray
@@ -3422,12 +3414,12 @@ c     sites for generalized Kirkwood SCRF and vacuum environments
 c
 c
       subroutine induce0d
-      use sizes
       use atoms
       use inform
       use iounit
       use mpole
       use polar
+      use polopt
       use polpot
       use potent
       use units
@@ -3877,7 +3869,6 @@ c     Kirkwood implicit solvation
 c
 c
       subroutine dfield0d (field,fieldp,fields,fieldps)
-      use sizes
       use atoms
       use couple
       use gkstuf
@@ -4364,7 +4355,6 @@ c     implicit solvation
 c
 c
       subroutine ufield0d (field,fieldp,fields,fieldps)
-      use sizes
       use atoms
       use gkstuf
       use group
@@ -4697,12 +4687,12 @@ c     sites for Poisson-Boltzmann SCRF and vacuum environments
 c
 c
       subroutine induce0e
-      use sizes
       use atoms
       use inform
       use iounit
       use mpole
       use polar
+      use polopt
       use polpot
       use potent
       use units
@@ -5151,7 +5141,6 @@ c     permanent multipole moments for use with in Poisson-Boltzmann
 c
 c
       subroutine dfield0e (field,fieldp,fields,fieldps)
-      use sizes
       use atoms
       use couple
       use group
@@ -5394,7 +5383,6 @@ c     induced dipole moments via a Poisson-Boltzmann solver
 c
 c
       subroutine ufield0e (field,fieldp,fields,fieldps)
-      use sizes
       use atoms
       use group
       use mpole
@@ -5669,7 +5657,6 @@ c     Journal of Chemical Physics, 123, 164107 (2005)
 c
 c
       subroutine ulspred
-      use sizes
       use mpole
       use uprior
       implicit none
@@ -5781,7 +5768,6 @@ c     gradient induced dipole solver using a double loop
 c
 c
       subroutine uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
-      use sizes
       use atoms
       use limits
       use mpole
@@ -5986,7 +5972,6 @@ c     gradient induced dipole solver using a neighbor pair list
 c
 c
       subroutine uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
-      use sizes
       use atoms
       use mpole
       use neigh

@@ -17,11 +17,9 @@ c     space using a truncated Newton conjugate gradient method
 c
 c
       program newtrot
-      use sizes
       use files
       use inform
       use iounit
-      use keys
       use math
       use omega
       use zcoord
@@ -35,7 +33,6 @@ c
       logical exist
       character*1 answer
       character*6 mode,method
-      character*20 keyword
       character*240 minfile
       character*240 record
       character*240 string
@@ -49,23 +46,11 @@ c
       call initial
       call getint
       call mechanic
+c
+c     perform the setup functions needed for optimization
+c
+      call optinit
       call initrot
-c
-c     search the keywords for output frequency parameters
-c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         string = record(next:240)
-         if (keyword(1:9) .eq. 'PRINTOUT ') then
-            read (string,*,err=10,end=10)  iprint
-         else if (keyword(1:9) .eq. 'WRITEOUT ') then
-            read (string,*,err=10,end=10)  iwrite
-         end if
-   10    continue
-      end do
 c
 c     get the type of optimization algorithm to use
 c
@@ -73,11 +58,11 @@ c
       call nextarg (answer,exist)
       if (.not. exist) then
          answer = 'A'
-         write (iout,20)  answer
-   20    format (/,' Choose Automatic, Newton, TNCG or DTNCG',
+         write (iout,10)  answer
+   10    format (/,' Choose Automatic, Newton, TNCG or DTNCG',
      &              ' Method [',a1,'] :  ',$)
-         read (input,30)  record
-   30    format (a240)
+         read (input,20)  record
+   20    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -93,11 +78,11 @@ c
       call nextarg (answer,exist)
       if (.not. exist) then
          answer = 'D'
-         write (iout,40)  answer
-   40    format (/,' Precondition via Auto/None/Diag/',
+         write (iout,30)  answer
+   30    format (/,' Precondition via Auto/None/Diag/',
      &              'SSOR/ICCG [',a1,'] :  ',$)
-         read (input,50)  record
-   50    format (a240)
+         read (input,40)  record
+   40    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
@@ -112,14 +97,14 @@ c     get termination criterion as RMS torsional gradient
 c
       grdmin = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=60,end=60)  grdmin
-   60 continue
+      if (exist)  read (string,*,err=50,end=50)  grdmin
+   50 continue
       if (grdmin .le. 0.0d0) then
-         write (iout,70)
-   70    format (/,' Enter RMS Gradient per Torsion Criterion',
+         write (iout,60)
+   60    format (/,' Enter RMS Gradient per Torsion Criterion',
      &              ' [0.01] :  ',$)
-         read (input,80)  grdmin
-   80    format (f20.0)
+         read (input,70)  grdmin
+   70    format (f20.0)
       end if
       if (grdmin .le. 0.0d0)  grdmin = 0.01d0
 c
@@ -181,37 +166,37 @@ c     write out the final function and gradient values
 c
       if (digits .ge. 8) then
          if (grms .gt. 1.0d-8) then
-            write (iout,90)  minimum,grms,gnorm
-   90       format (/,' Final Function Value :',2x,f20.8,
+            write (iout,80)  minimum,grms,gnorm
+   80       format (/,' Final Function Value :',2x,f20.8,
      &              /,' Final RMS Gradient :',4x,f20.8,
      &              /,' Final Gradient Norm :',3x,f20.8)
          else
-            write (iout,100)  minimum,grms,gnorm
-  100       format (/,' Final Function Value :',2x,f20.8,
+            write (iout,90)  minimum,grms,gnorm
+   90       format (/,' Final Function Value :',2x,f20.8,
      &              /,' Final RMS Gradient :',4x,d20.8,
      &              /,' Final Gradient Norm :',3x,d20.8)
          end if
       else if (digits .ge. 6) then
          if (grms .gt. 1.0d-6) then
-            write (iout,110)  minimum,grms,gnorm
-  110       format (/,' Final Function Value :',2x,f18.6,
+            write (iout,100)  minimum,grms,gnorm
+  100       format (/,' Final Function Value :',2x,f18.6,
      &              /,' Final RMS Gradient :',4x,f18.6,
      &              /,' Final Gradient Norm :',3x,f18.6)
          else
-            write (iout,120)  minimum,grms,gnorm
-  120       format (/,' Final Function Value :',2x,f18.6,
+            write (iout,110)  minimum,grms,gnorm
+  110       format (/,' Final Function Value :',2x,f18.6,
      &              /,' Final RMS Gradient :',4x,d18.6,
      &              /,' Final Gradient Norm :',3x,d18.6)
          end if
       else
          if (grms .gt. 1.0d-4) then
-            write (iout,130)  minimum,grms,gnorm
-  130       format (/,' Final Function Value :',2x,f16.4,
+            write (iout,120)  minimum,grms,gnorm
+  120       format (/,' Final Function Value :',2x,f16.4,
      &              /,' Final RMS Gradient :',4x,f16.4,
      &              /,' Final Gradient Norm :',3x,f16.4)
          else
-            write (iout,140)  minimum,grms,gnorm
-  140       format (/,' Final Function Value :',2x,f16.4,
+            write (iout,130)  minimum,grms,gnorm
+  130       format (/,' Final Function Value :',2x,f16.4,
      &              /,' Final RMS Gradient :',4x,d16.4,
      &              /,' Final Gradient Norm :',3x,d16.4)
          end if
@@ -244,7 +229,6 @@ c     optimization in torsional angle space
 c
 c
       function newtrot1 (xx,g)
-      use sizes
       use math
       use omega
       use zcoord
@@ -299,7 +283,6 @@ c     in torsional angle space
 c
 c
       subroutine newtrot2 (mode,xx,h,hinit,hstop,hindex,hdiag)
-      use sizes
       use hescut
       use math
       use omega

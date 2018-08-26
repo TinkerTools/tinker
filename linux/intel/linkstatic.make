@@ -56,6 +56,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static -o testhess.x testhess.o libti
 ifort -O3 -no-prec-div -recursive -openmp -static -o testpair.x testpair.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testpair.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o testpol.x testpol.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testpol.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o testrot.x testrot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testrot.x
+ifort -O3 -no-prec-div -recursive -openmp -static -o testvir.x testvir.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testvir.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o timer.x timer.o libtinker.a libfftw3_threads.a libfftw3.a ; strip timer.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o timerot.x timerot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip timerot.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o torsfit.x torsfit.o libtinker.a libfftw3_threads.a libfftw3.a ; strip torsfit.x

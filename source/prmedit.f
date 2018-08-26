@@ -83,7 +83,7 @@ c
          open (unit=iprm,file=prmfile,status='new')
          call prmform (iprm)
          write (iout,60)  prmfile(1:trimtext(prmfile))
-   60    format (/,' Reformated Parameter File Written To:  ',a)
+   60    format (/,' Reformated Parameter File Written To :  ',a)
          close (unit=iprm)
       end if
 c
@@ -96,7 +96,7 @@ c
          open (unit=iprm,file=prmfile,status='new')
          call prmorder (iprm,dotype,doclass)
          write (iout,70)  prmfile(1:trimtext(prmfile))
-   70    format (/,' Renumbered Parameter File Written To:  ',a)
+   70    format (/,' Renumbered Parameter File Written To :  ',a)
          close (unit=iprm)
       end if
 c
@@ -109,7 +109,7 @@ c
          open (unit=iprm,file=prmfile,status='new')
          call polesort (iprm)
          write (iout,80)  prmfile(1:trimtext(prmfile))
-   80    format (/,' Sorted Multipole Values Written To:  ',a)
+   80    format (/,' Sorted Multipole Values Written To :  ',a)
          close (unit=iprm)
       end if
 c
@@ -122,7 +122,7 @@ c
          open (unit=iprm,file=prmfile,status='new')
          call biosort (iprm)
          write (iout,90)  prmfile(1:trimtext(prmfile))
-   90    format (/,' Renumbered Biotype Values Written To:  ',a)
+   90    format (/,' Renumbered Biotype Values Written To :  ',a)
          close (unit=iprm)
       end if
       call final
@@ -141,11 +141,11 @@ c     to a consistent text layout
 c
 c
       subroutine prmform (iprm)
-      use sizes
       use angpot
       use bndpot
       use math
       use params
+      use sizes
       use urypot
       implicit none
       integer i,j,iprm
@@ -903,9 +903,9 @@ c     canonical order for potential energy parameter definitions
 c
 c
       subroutine prmorder (iprm,dotype,doclass)
-      use sizes
       use iounit
       use params
+      use sizes
       use vdwpot
       implicit none
       integer i,j,iprm
@@ -1603,7 +1603,6 @@ c     on the atom types of centers involved
 c
 c
       subroutine polesort (iprm)
-      use sizes
       use params
       implicit none
       integer i,j,n,iprm
@@ -1726,7 +1725,6 @@ c     convert biomolecular structure into force field atom types
 c
 c
       subroutine biosort (iprm)
-      use sizes
       use params
       implicit none
       integer i,n,iprm

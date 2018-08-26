@@ -56,6 +56,7 @@ ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o testhe
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o testpair.x testpair.o libtinker.a ; strip testpair.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o testpol.x testpol.o libtinker.a ; strip testpol.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o testrot.x testrot.o libtinker.a ; strip testrot.x
+ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o testvir.x testvir.o libtinker.a ; strip testvir.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o timer.x timer.o libtinker.a ; strip timer.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o timerot.x timerot.o libtinker.a ; strip timerot.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o torsfit.x torsfit.o libtinker.a ; strip torsfit.x

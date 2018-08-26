@@ -17,7 +17,6 @@ c     systems and processes any new or changed parameters
 c
 c
       subroutine korbit
-      use sizes
       use atomid
       use atoms
       use bndstr

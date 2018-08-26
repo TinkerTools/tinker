@@ -20,7 +20,6 @@ c     the final root mean square fit is returned in "rmsvalue"
 c
 c
       subroutine impose (n1,x1,y1,z1,n2,x2,y2,z2,rmsvalue)
-      use sizes
       use align
       use inform
       use iounit

@@ -18,7 +18,6 @@ c     lattice lengths and angles
 c
 c
       program xtalmin
-      use sizes
       use atoms
       use boxes
       use files
@@ -307,7 +306,6 @@ c     dimensions for a crystal energy minimization
 c
 c
       function xtalmin1 (xx,g)
-      use sizes
       use atoms
       use boxes
       use math

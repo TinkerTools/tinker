@@ -17,7 +17,6 @@ c     energy and its torsional first derivatives
 c
 c
       subroutine gradrot (energy,derivs)
-      use sizes
       use atoms
       use deriv
       use domega

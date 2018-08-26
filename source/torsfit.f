@@ -17,7 +17,6 @@ c     a quantum mechanical potential surface and analytical gradient
 c
 c
       program torsfit
-      use sizes
       use files
       use inform
       use iounit
@@ -105,7 +104,6 @@ c     mechanical optimized energy surface
 c
 c
       subroutine fittors (torbnd)
-      use sizes
       use atoms
       use atomid
       use files
@@ -1089,7 +1087,6 @@ c     coordinate space
 c
 c
       function torfit1 (xx,g)
-      use sizes
       use atoms
       use scales
       use usage

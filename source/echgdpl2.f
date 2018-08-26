@@ -17,7 +17,6 @@ c     charge-dipole interaction energy for a single atom
 c
 c
       subroutine echgdpl2 (i)
-      use sizes
       use atoms
       use bound
       use cell

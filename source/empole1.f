@@ -52,7 +52,6 @@ c     respect to Cartesian coordinates using a pairwise double loop
 c
 c
       subroutine empole1a
-      use sizes
       use atoms
       use bound
       use cell
@@ -770,7 +769,6 @@ c     with respect to Cartesian coordinates using a neighbor list
 c
 c
       subroutine empole1b
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -1213,7 +1211,6 @@ c     Ewald summation and a double loop
 c
 c
       subroutine empole1c
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -1372,7 +1369,6 @@ c     via a double loop
 c
 c
       subroutine emreal1c
-      use sizes
       use atoms
       use bound
       use cell
@@ -2095,7 +2091,6 @@ c     summation and a neighbor list
 c
 c
       subroutine empole1d
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -2254,7 +2249,6 @@ c     via a neighbor list
 c
 c
       subroutine emreal1d
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -2710,7 +2704,6 @@ c     during May 2007
 c
 c
       subroutine emrecip1
-      use sizes
       use atoms
       use bound
       use boxes

@@ -17,7 +17,6 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine gradient (energy,derivs)
-      use sizes
       use atoms
       use couple
       use deriv

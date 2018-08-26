@@ -19,7 +19,6 @@ c     or Fourier angle bending terms are optionally used
 c
 c
       subroutine eangle1
-      use sizes
       use angbnd
       use angpot
       use atoms

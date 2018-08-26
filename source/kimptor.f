@@ -17,7 +17,6 @@ c     torsion in the structure and processes any changed values
 c
 c
       subroutine kimptor
-      use sizes
       use atomid
       use atoms
       use couple

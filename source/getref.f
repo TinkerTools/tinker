@@ -17,7 +17,6 @@ c     into the standard variables for the current system structure
 c
 c
       subroutine getref (iref)
-      use sizes
       use atomid
       use atoms
       use boxes
@@ -51,7 +50,7 @@ c
          end do
       end do
 c
-c     retrieve any unitcell parameters defining a periodic box
+c     retrieve any unit cell parameters defining a periodic box
 c
       xbox = xboxref(iref)
       ybox = yboxref(iref)

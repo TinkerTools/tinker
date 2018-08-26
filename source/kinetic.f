@@ -17,7 +17,6 @@ c     contributions to the pressure tensor by summing over velocities
 c
 c
       subroutine kinetic (eksum,ekin,temp)
-      use sizes
       use atomid
       use atoms
       use bath

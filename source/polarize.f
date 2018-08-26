@@ -18,7 +18,6 @@ c     of the resulting polarizability tensor
 c
 c
       program polarize
-      use sizes
       use atoms
       use inform
       use iounit
@@ -174,7 +173,6 @@ c     in the presence of an external electric field
 c
 c
       subroutine moluind (exfield,umol)
-      use sizes
       use atoms
       use inform
       use iounit
@@ -343,7 +341,6 @@ c     damp the field at close range
 c
 c
       subroutine ufield (field)
-      use sizes
       use atoms
       use mpole
       use polar

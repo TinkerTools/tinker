@@ -52,7 +52,6 @@ c     using a double loop
 c
 c
       subroutine empole0a
-      use sizes
       use atoms
       use bound
       use cell
@@ -407,7 +406,6 @@ c     using a neighbor list
 c
 c
       subroutine empole0b
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -639,7 +637,6 @@ c     using particle mesh Ewald summation and a double loop
 c
 c
       subroutine empole0c
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -746,7 +743,6 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine emreal0c
-      use sizes
       use atoms
       use bound
       use cell
@@ -1113,7 +1109,6 @@ c     using particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine empole0d
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -1220,7 +1215,6 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine emreal0d
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -1462,7 +1456,6 @@ c     during May 2007
 c
 c
       subroutine emrecip
-      use sizes
       use bound
       use boxes
       use chgpot

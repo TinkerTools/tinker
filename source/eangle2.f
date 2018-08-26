@@ -20,7 +20,6 @@ c     optionally used
 c
 c
       subroutine eangle2 (i)
-      use sizes
       use angbnd
       use angpot
       use atoms
@@ -172,7 +171,6 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangle2a (iatom)
-      use sizes
       use angbnd
       use angpot
       use atoms
@@ -620,7 +618,6 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine eangle2b (i,de)
-      use sizes
       use angbnd
       use angpot
       use atoms

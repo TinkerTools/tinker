@@ -17,7 +17,6 @@ c     energy terms and sums up to form the total energy
 c
 c
       function energy ()
-      use sizes
       use energi
       use iounit
       use limits

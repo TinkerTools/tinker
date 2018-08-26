@@ -17,7 +17,6 @@ c     torsion energy for a single atom
 c
 c
       subroutine eimptor2 (i)
-      use sizes
       use atoms
       use bound
       use group

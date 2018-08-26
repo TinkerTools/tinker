@@ -83,7 +83,6 @@ c     consisting of biopolymer chains, ligands and water molecules
 c
 c
       subroutine makepdb
-      use sizes
       use atomid
       use atoms
       use couple
@@ -703,7 +702,6 @@ c     "pdbatom" adds an atom to the Protein Data Bank file
 c
 c
       subroutine pdbatom (atmname,resname,ires,icoord)
-      use sizes
       use atoms
       use pdb
       implicit none
@@ -744,7 +742,6 @@ c     Data Bank file
 c
 c
       subroutine getside (resname,ires,ci,cai,cbi)
-      use sizes
       use atomid
       use atoms
       use couple
@@ -1037,7 +1034,6 @@ c     Data Bank file
 c
 c
       subroutine getproh (resname,ires,jchain,ni,cai,cbi)
-      use sizes
       use atomid
       use atoms
       use couple
@@ -1790,7 +1786,6 @@ c
 c
       subroutine getnuch (resname,ires,ni,c1i,c2i,
      &                    o2i,c3i,o3i,c4i,c5i,o5i)
-      use sizes
       use atomid
       use couple
       implicit none

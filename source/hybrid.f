@@ -17,7 +17,6 @@ c     initial state, final state and mutation parameter "lambda"
 c
 c
       subroutine hybrid
-      use sizes
       use iounit
       use mutant
       implicit none
@@ -54,7 +53,6 @@ c     "hatom" assigns a new atom type to each hybrid site
 c
 c
       subroutine hatom
-      use sizes
       use atomid
       use atoms
       use inform
@@ -121,7 +119,6 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hbond
-      use sizes
       use atomid
       use atoms
       use bndstr
@@ -237,7 +234,6 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hangle
-      use sizes
       use angbnd
       use atomid
       use atoms
@@ -358,7 +354,6 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hstrbnd
-      use sizes
       use angbnd
       use atmlst
       use atomid
@@ -509,7 +504,6 @@ c     a single trigonal site
 c
 c
       subroutine himptor
-      use sizes
       use atomid
       use atoms
       use couple
@@ -760,7 +754,6 @@ c     initial state, final state and "lambda" value
 c
 c
       subroutine htors
-      use sizes
       use atomid
       use atoms
       use inform
@@ -1026,7 +1019,6 @@ c     given an initial state, final state and "lambda" value
 c
 c
       subroutine hstrtor
-      use sizes
       use atmlst
       use atomid
       use atoms
@@ -1206,7 +1198,6 @@ c     an initial state, final state and "lambda" value
 c
 c
       subroutine hvdw
-      use sizes
       use atomid
       use atoms
       use inform
@@ -1333,7 +1324,6 @@ c     given an initial state, final state and "lambda" value
 c
 c
       subroutine hcharge
-      use sizes
       use atoms
       use charge
       use inform
@@ -1402,7 +1392,6 @@ c     given an initial state, final state and "lambda" value
 c
 c
       subroutine hdipole
-      use sizes
       use atoms
       use bndstr
       use dipole

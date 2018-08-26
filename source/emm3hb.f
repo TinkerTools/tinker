@@ -67,7 +67,6 @@ c     a pairwise double loop
 c
 c
       subroutine emm3hb0a
-      use sizes
       use atmlst
       use atomid
       use atoms
@@ -478,7 +477,6 @@ c     the method of lights
 c
 c
       subroutine emm3hb0b
-      use sizes
       use atmlst
       use atomid
       use atoms
@@ -817,7 +815,6 @@ c     a pairwise neighbor list
 c
 c
       subroutine emm3hb0c
-      use sizes
       use atmlst
       use atomid
       use atoms

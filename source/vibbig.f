@@ -35,7 +35,6 @@ c     and Computation, 2, 166-174 (2006)
 c
 c
       program vibbig
-      use sizes
       use atomid
       use atoms
       use files
@@ -1078,7 +1077,6 @@ c     use during sliding block iterative matrix diagonalization
 c
 c
       subroutine trigger (nvar,nbasis,np,ifactor,nblk,iblk,u,uu,p)
-      use sizes
       implicit none
       integer i,j,k,m
       integer k0,k1,k2
@@ -1178,7 +1176,6 @@ c     during vibrational analysis via block iterative diagonalization
 c
 c
       subroutine trbasis (nvar,np,xe,u,ur)
-      use sizes
       use atomid
       use atoms
       implicit none
@@ -1323,7 +1320,6 @@ c     of the Hessian matrix
 c
 c
       subroutine preconblk (nvar,nblk,iblk,uku,uu,h,hmin,pk)
-      use sizes
       implicit none
       integer i,j,k,l
       integer nvar,nblk
@@ -1424,7 +1420,6 @@ c     vectors for sliding block interative matrix diagonalization
 c
 c
       subroutine gsort (nvar,nb,p0)
-      use sizes
       use vibs
       implicit none
       integer i,j
@@ -1501,7 +1496,6 @@ c     block iterative matrix diagonalization
 c
 c
       subroutine qonvec (nvar,np,u,pk,p)
-      use sizes
       implicit none
       integer i,j,nvar,np
       real*8 pku(6)
@@ -1550,7 +1544,6 @@ c     using the relation Y = X - U * U^T * X
 c
 c
       subroutine project (nvar,nconv,ivb1,ns,m)
-      use sizes
       use vibs
       implicit none
       integer i,j,k
@@ -1620,7 +1613,6 @@ c     using the relation Y = X - U * U^T * X
 c
 c
       subroutine projectk (nvar,nconv,ivb1,ns,m)
-      use sizes
       use vibs
       implicit none
       integer i,j,k
@@ -1689,7 +1681,6 @@ c     evaluation of the gradient based on atomic displacements
 c
 c
       subroutine konvec (nvar,xm,qe,uvec,kuvec)
-      use sizes
       use atomid
       use atoms
       use units
@@ -1837,7 +1828,6 @@ c     block of atoms within a larger system
 c
 c
       subroutine diagblk (k0,k1,n,vector,wres)
-      use sizes
       implicit none
       integer i,j,k,m
       integer n,k0,k1
@@ -1904,7 +1894,6 @@ c     normal mode
 c
 c
       subroutine prtvib (ivib,p)
-      use sizes
       use atoms
       use files
       implicit none
@@ -1988,7 +1977,6 @@ c     for each atom in turn with respect to Cartesian coordinates
 c
 c
       subroutine hessblk (amass,k0,i1,i2,vector)
-      use sizes
       use atoms
       use bound
       use couple

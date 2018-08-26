@@ -16,7 +16,6 @@ c     "etors" calculates the torsional potential energy
 c
 c
       subroutine etors
-      use sizes
       use warp
       implicit none
 c
@@ -44,7 +43,6 @@ c     using a standard sum of Fourier terms
 c
 c
       subroutine etors0a
-      use sizes
       use atoms
       use bound
       use energi
@@ -226,7 +224,6 @@ c     for use with potential energy smoothing methods
 c
 c
       subroutine etors0b
-      use sizes
       use atoms
       use energi
       use group

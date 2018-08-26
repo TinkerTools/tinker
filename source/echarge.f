@@ -16,7 +16,6 @@ c     "echarge" calculates the charge-charge interaction energy
 c
 c
       subroutine echarge
-      use sizes
       use limits
       use warp
       implicit none
@@ -57,7 +56,6 @@ c     using a pairwise double loop
 c
 c
       subroutine echarge0a
-      use sizes
       use atoms
       use bound
       use cell
@@ -338,7 +336,6 @@ c     using the method of lights
 c
 c
       subroutine echarge0b
-      use sizes
       use atoms
       use bound
       use boxes
@@ -588,7 +585,6 @@ c     using a pairwise neighbor list
 c
 c
       subroutine echarge0c
-      use sizes
       use atoms
       use bound
       use charge
@@ -773,7 +769,6 @@ c     using a particle mesh Ewald summation
 c
 c
       subroutine echarge0d
-      use sizes
       use atoms
       use bound
       use boxes
@@ -1039,7 +1034,6 @@ c     using a particle mesh Ewald summation and the method of lights
 c
 c
       subroutine echarge0e
-      use sizes
       use atoms
       use bound
       use boxes
@@ -1294,7 +1288,6 @@ c     using a particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine echarge0f
-      use sizes
       use atoms
       use bound
       use boxes
@@ -1484,7 +1477,6 @@ c     for use with potential smoothing methods
 c
 c
       subroutine echarge0g
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -1657,7 +1649,6 @@ c     during May 2007
 c
 c
       subroutine ecrecip
-      use sizes
       use bound
       use boxes
       use chgpot

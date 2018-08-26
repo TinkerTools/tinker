@@ -17,7 +17,6 @@ c     reads the DMA output from Psi4 as it calls the GDMA code
 c
 c
       subroutine readgdma (idma)
-      use sizes
       use atomid
       use atoms
       use dma
@@ -284,7 +283,6 @@ c     on a line of output from Stone's GDMA program
 c
 c
       subroutine match1 (i,record)
-      use sizes
       use dma
       implicit none
       integer i
@@ -339,7 +337,6 @@ c     on a line of output from Stone's GDMA program
 c
 c
       subroutine match2 (i,record)
-      use sizes
       use dma
       implicit none
       integer i
@@ -386,7 +383,6 @@ c     on a line of output from Stone's GDMA program
 c
 c
       subroutine match3 (i,record)
-      use sizes
       use dma
       implicit none
       integer i

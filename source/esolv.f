@@ -19,7 +19,6 @@ c     solvation models
 c
 c
       subroutine esolv
-      use sizes
       use atoms
       use energi
       use limits
@@ -133,7 +132,6 @@ c     for the GB/SA solvation models using a pairwise double loop
 c
 c
       subroutine egb0a
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -259,7 +257,6 @@ c     for the GB/SA solvation models using a pairwise neighbor list
 c
 c
       subroutine egb0b
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -401,7 +398,6 @@ c     methods via analogy to the smoothing of Coulomb's law
 c
 c
       subroutine egb0c
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -533,7 +529,6 @@ c     solvation energy via the generalized Kirkwood model
 c
 c
       subroutine egk0a
-      use sizes
       use atoms
       use chgpot
       use energi
@@ -962,7 +957,6 @@ c     dipoles to their SCRF polarized values
 c
 c
       subroutine ediff
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -1227,7 +1221,6 @@ c     Poisson-Boltzmann plus nonpolar implicit solvation
 c
 c
       subroutine epb
-      use sizes
       use chgpot
       use energi
       use mpole
@@ -1277,7 +1270,6 @@ c     field, forces and torques
 c
 c
       subroutine pbempole
-      use sizes
       use atoms
       use mpole
       use pbstuf
@@ -1348,7 +1340,6 @@ c     as a sum of cavity and dispersion terms
 c
 c
       subroutine enp (ecav,edisp)
-      use sizes
       use atomid
       use atoms
       use energi
@@ -1463,7 +1454,6 @@ c     of a solute using an HCT-like method
 c
 c
       subroutine ewca (edisp)
-      use sizes
       use atoms
       use atomid
       use deriv
@@ -1649,7 +1639,6 @@ c     of a solute using a numerical "onion shell" method
 c
 c
       subroutine ewcax (edisp)
-      use sizes
       use atoms
       use atomid
       use couple
@@ -1860,7 +1849,6 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine ehpmf (ehp)
-      use sizes
       use atomid
       use atoms
       use couple

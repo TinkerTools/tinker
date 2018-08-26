@@ -53,7 +53,6 @@ c     pairwise double loop
 c
 c
       subroutine epolar1a
-      use sizes
       use atoms
       use bound
       use cell
@@ -66,6 +65,7 @@ c
       use mpole
       use polar
       use polgrp
+      use polopt
       use polpot
       use potent
       use shunt
@@ -1213,7 +1213,7 @@ c
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
@@ -1253,7 +1253,6 @@ c     neighbor list
 c
 c
       subroutine epolar1b
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -1266,6 +1265,7 @@ c
       use neigh
       use polar
       use polgrp
+      use polopt
       use polpot
       use potent
       use shunt
@@ -1925,7 +1925,7 @@ c
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
@@ -1970,7 +1970,6 @@ c     particle mesh Ewald summation and a double loop
 c
 c
       subroutine epolar1c
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -2055,7 +2054,7 @@ c
          ep = ep + e
       end do
 c
-c     compute the self-energy torque term due to induced dipole
+c     compute the Ewald self-energy torque and virial terms
 c
       term = (4.0d0/3.0d0) * f * aewald**3 / sqrtpi
       do i = 1, npole
@@ -2076,23 +2075,23 @@ c
          if (iaz .eq. 0)  iaz = ii
          if (iax .eq. 0)  iax = ii
          if (iay .eq. 0)  iay = ii
-         xiz = x(iaz) - x(ii)
-         yiz = y(iaz) - y(ii)
-         ziz = z(iaz) - z(ii)
          xix = x(iax) - x(ii)
          yix = y(iax) - y(ii)
          zix = z(iax) - z(ii)
          xiy = x(iay) - x(ii)
          yiy = y(iay) - y(ii)
          ziy = z(iay) - z(ii)
+         xiz = x(iaz) - x(ii)
+         yiz = y(iaz) - y(ii)
+         ziz = z(iaz) - z(ii)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+     &                     + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
+     &                     + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+     &                     + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
@@ -2186,6 +2185,7 @@ c
             vir(3,3) = vir(3,3) + vterm
          end if
       end if
+      call epolar1d0
       return
       end
 c
@@ -2203,7 +2203,6 @@ c     via a double loop
 c
 c
       subroutine epreal1c
-      use sizes
       use atoms
       use bound
       use cell
@@ -2218,6 +2217,7 @@ c
       use mpole
       use polar
       use polgrp
+      use polopt
       use polpot
       use potent
       use shunt
@@ -2856,8 +2856,8 @@ c
                txk5 = 2.0d0 * (psr5*uix+dsr5*uixp)
                tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
                tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
-               turi = -psr7*urk - dsr7*urkp 
-               turk = -psr7*uri - dsr7*urip 
+               turi = -psr7*urk - dsr7*urkp
+               turk = -psr7*uri - dsr7*urip
                dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
                dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
      &                         + 2.0d0*xr*yr*turi
@@ -3571,7 +3571,7 @@ c
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
@@ -3611,12 +3611,10 @@ c     particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine epolar1d
-      use sizes
       use atoms
       use boxes
       use chgpot
       use deriv
-      use energi
       use ewald
       use math
       use mpole
@@ -3627,9 +3625,9 @@ c
       implicit none
       integer i,j,ii
       integer iax,iay,iaz
-      real*8 e,f,term,fterm
+      real*8 f,term
       real*8 dix,diy,diz
-      real*8 uix,uiy,uiz,uii
+      real*8 uix,uiy,uiz
       real*8 xd,yd,zd
       real*8 xq,yq,zq
       real*8 xu,yu,zu
@@ -3646,9 +3644,8 @@ c
       real*8 tep(3)
 c
 c
-c     zero out the polarization energy and derivatives
+c     zero out the polarization derivatives
 c
-      ep = 0.0d0
       do i = 1, n
          do j = 1, 3
             dep(j,i) = 0.0d0
@@ -3680,23 +3677,7 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call eprecip1
 c
-c     compute the Ewald self-energy term over all the atoms
-c
-      term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
-      do i = 1, npole
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
-         uii = dix*uix + diy*uiy + diz*uiz
-         e = fterm * term * uii / 3.0d0
-         ep = ep + e
-      end do
-c
-c     compute the self-energy torque term due to induced dipole
+c     compute the Ewald self-energy torque and virial terms
 c
       term = (4.0d0/3.0d0) * f * aewald**3 / sqrtpi
       do i = 1, npole
@@ -3717,23 +3698,23 @@ c
          if (iaz .eq. 0)  iaz = ii
          if (iax .eq. 0)  iax = ii
          if (iay .eq. 0)  iay = ii
-         xiz = x(iaz) - x(ii)
-         yiz = y(iaz) - y(ii)
-         ziz = z(iaz) - z(ii)
          xix = x(iax) - x(ii)
          yix = y(iax) - y(ii)
          zix = z(iax) - z(ii)
          xiy = x(iay) - x(ii)
          yiy = y(iay) - y(ii)
          ziy = z(iay) - z(ii)
+         xiz = x(iaz) - x(ii)
+         yiz = y(iaz) - y(ii)
+         ziz = z(iaz) - z(ii)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+     &                     + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
+     &                     + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+     &                     + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
@@ -3771,7 +3752,6 @@ c
             zup = zup + uinp(3,i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         ep = ep + term*(xd*xu+yd*yu+zd*zu)
          do i = 1, npole
             ii = ipole(i)
             dep(1,ii) = dep(1,ii) + term*rpole(1,i)*(xu+xup)
@@ -3827,6 +3807,7 @@ c
             vir(3,3) = vir(3,3) + vterm
          end if
       end if
+      call epolar1d0
       return
       end
 c
@@ -3844,22 +3825,20 @@ c     via a neighbor list
 c
 c
       subroutine epreal1d
-      use sizes
       use atoms
       use bound
       use chgpot
       use couple
       use deriv
-      use energi
       use ewald
-      use inter
       use math
-      use molcul
       use mpole
       use neigh
       use polar
       use polgrp
+      use polopt
       use polpot
+      use poltcg
       use potent
       use shunt
       use virial
@@ -3867,8 +3846,7 @@ c
       integer i,j,k,m
       integer ii,kk,kkk
       integer iax,iay,iaz
-      real*8 e,efull,f
-      real*8 erfc,bfac
+      real*8 f,erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 damp,expdamp
@@ -3899,7 +3877,6 @@ c
       real*8 qrix,qriy,qriz
       real*8 qrkx,qrky,qrkz
       real*8 qrri,qrrk
-      real*8 duik,quik
       real*8 txxi,tyyi,tzzi
       real*8 txyi,txzi,tyzi
       real*8 txxk,tyyk,tzzk
@@ -3933,6 +3910,18 @@ c
       real*8, allocatable :: uscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
+      real*8, allocatable :: uax(:)
+      real*8, allocatable :: uay(:)
+      real*8, allocatable :: uaz(:)
+      real*8, allocatable :: uaxp(:)
+      real*8, allocatable :: uayp(:)
+      real*8, allocatable :: uazp(:)
+      real*8, allocatable :: ubx(:)
+      real*8, allocatable :: uby(:)
+      real*8, allocatable :: ubz(:)
+      real*8, allocatable :: ubxp(:)
+      real*8, allocatable :: ubyp(:)
+      real*8, allocatable :: ubzp(:)
       character*6 mode
       external erfc
 c
@@ -3944,6 +3933,18 @@ c
       allocate (uscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (uax(tcgnab))
+      allocate (uay(tcgnab))
+      allocate (uaz(tcgnab))
+      allocate (uaxp(tcgnab))
+      allocate (uayp(tcgnab))
+      allocate (uazp(tcgnab))
+      allocate (ubx(tcgnab))
+      allocate (uby(tcgnab))
+      allocate (ubz(tcgnab))
+      allocate (ubxp(tcgnab))
+      allocate (ubyp(tcgnab))
+      allocate (ubzp(tcgnab))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -3971,11 +3972,12 @@ c
 !$OMP& x,y,z,xaxis,yaxis,zaxis,rpole,uind,uinp,n12,i12,n13,i13,n14,
 !$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
 !$OMP& p3scale,p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,
-!$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,use_bounds,
-!$OMP& off2,f,aewald,molcule,coptmax,copm,uopt,uoptp,poltyp)
-!$OMP& shared (ep,einter,dep,vir,ufld,dufld)
+!$OMP& d4scale,u1scale,u2scale,u3scale,u4scale,nelst,elst,
+!$OMP& use_bounds,off2,f,aewald,coptmax,copm,uopt,uoptp,poltyp,
+!$OMP& tcgnab,uad,uap,ubd,ubp)
+!$OMP& shared (dep,vir,ufld,dufld)
 !$OMP& firstprivate(pscale,dscale,uscale)
-!$OMP DO reduction(+:ep,einter,dep,vir,ufld,dufld) schedule(guided)
+!$OMP DO reduction(+:dep,vir,ufld,dufld) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -4002,6 +4004,20 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         do j = 1, tcgnab
+            uax(j) = uad(1,i,j)
+            uay(j) = uad(2,i,j)
+            uaz(j) = uad(3,i,j)
+            uaxp(j) = uap(1,i,j)
+            uayp(j) = uap(2,i,j)
+            uazp(j) = uap(3,i,j)
+            ubx(j) = ubd(1,i,j)
+            uby(j) = ubd(2,i,j)
+            ubz(j) = ubd(3,i,j)
+            ubxp(j) = ubp(1,i,j)
+            ubyp(j) = ubp(2,i,j)
+            ubzp(j) = ubp(3,i,j)
+         end do
          do j = 1, n12(ii)
             pscale(i12(j,ii)) = p2scale
          end do
@@ -4140,28 +4156,6 @@ c
                urk = ukx*xr + uky*yr + ukz*zr
                urip = uixp*xr + uiyp*yr + uizp*zr
                urkp = ukxp*xr + ukyp*yr + ukzp*zr
-               duik = dix*ukx + diy*uky + diz*ukz
-     &                   + dkx*uix + dky*uiy + dkz*uiz
-               quik = qrix*ukx + qriy*uky + qriz*ukz
-     &                   - qrkx*uix - qrky*uiy - qrkz*uiz
-c
-c     calculate intermediate terms for polarization interaction
-c
-               term1 = ck*uri - ci*urk + duik
-               term2 = 2.0d0*quik - uri*drk - dri*urk
-               term3 = uri*qrrk - urk*qrri
-c
-c     intermediates involving Thole damping and scale factors
-c
-               psr3 = rr3 * sc3 * pscale(kk)
-               psr5 = rr5 * sc5 * pscale(kk)
-               psr7 = rr7 * sc7 * pscale(kk)
-c
-c     compute the full undamped energy for this interaction
-c
-               efull = term1*psr3 + term2*psr5 + term3*psr7
-               if (molcule(ii) .ne. molcule(kk))
-     &            einter = einter + efull
 c
 c     intermediates involving Thole damping and scale factors
 c
@@ -4192,10 +4186,51 @@ c
                   urc5(j) = rc5(j) * uscale(kk)
                end do
 c
-c     compute the energy contribution for this interaction
+c     get the induced dipole field used for dipole torques
 c
-               e = term1*psr3 + term2*psr5 + term3*psr7
-               ep = ep + e
+               txi3 = psr3*ukx + dsr3*ukxp
+               tyi3 = psr3*uky + dsr3*ukyp
+               tzi3 = psr3*ukz + dsr3*ukzp
+               txk3 = psr3*uix + dsr3*uixp
+               tyk3 = psr3*uiy + dsr3*uiyp
+               tzk3 = psr3*uiz + dsr3*uizp
+               turi = -psr5*urk - dsr5*urkp
+               turk = -psr5*uri - dsr5*urip
+               ufld(1,i) = ufld(1,i) + txi3 + xr*turi
+               ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
+               ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
+               ufld(1,k) = ufld(1,k) + txk3 + xr*turk
+               ufld(2,k) = ufld(2,k) + tyk3 + yr*turk
+               ufld(3,k) = ufld(3,k) + tzk3 + zr*turk
+c
+c     get induced dipole field gradient used for quadrupole torques
+c
+               txi5 = 2.0d0 * (psr5*ukx+dsr5*ukxp)
+               tyi5 = 2.0d0 * (psr5*uky+dsr5*ukyp)
+               tzi5 = 2.0d0 * (psr5*ukz+dsr5*ukzp)
+               txk5 = 2.0d0 * (psr5*uix+dsr5*uixp)
+               tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
+               tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
+               turi = -psr7*urk - dsr7*urkp
+               turk = -psr7*uri - dsr7*urip
+               dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
+               dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
+     &                         + 2.0d0*xr*yr*turi
+               dufld(3,i) = dufld(3,i) + yr*tyi5 + yr*yr*turi
+               dufld(4,i) = dufld(4,i) + xr*tzi5 + zr*txi5
+     &                         + 2.0d0*xr*zr*turi
+               dufld(5,i) = dufld(5,i) + yr*tzi5 + zr*tyi5
+     &                         + 2.0d0*yr*zr*turi
+               dufld(6,i) = dufld(6,i) + zr*tzi5 + zr*zr*turi
+               dufld(1,k) = dufld(1,k) - xr*txk5 - xr*xr*turk
+               dufld(2,k) = dufld(2,k) - xr*tyk5 - yr*txk5
+     &                         - 2.0d0*xr*yr*turk
+               dufld(3,k) = dufld(3,k) - yr*tyk5 - yr*yr*turk
+               dufld(4,k) = dufld(4,k) - xr*tzk5 - zr*txk5
+     &                         - 2.0d0*xr*zr*turk
+               dufld(5,k) = dufld(5,k) - yr*tzk5 - zr*tyk5
+     &                         - 2.0d0*yr*zr*turk
+               dufld(6,k) = dufld(6,k) - zr*tzk5 - zr*zr*turk
 c
 c     get the dEd/dR terms used for direct polarization force
 c
@@ -4459,6 +4494,114 @@ c
                         frcz = frcz + copm(j+m+1)*depz
                      end do
                   end do
+c
+c     get the dtau/dr terms used for TCG polarization force
+c
+               else if (poltyp .eq. 'TCG') then
+                  do j = 1, tcgnab
+                     ukx = ubd(1,k,j)
+                     uky = ubd(2,k,j)
+                     ukz = ubd(3,k,j)
+                     ukxp = ubp(1,k,j)
+                     ukyp = ubp(2,k,j)
+                     ukzp = ubp(3,k,j)
+                     uri = uax(j)*xr + uay(j)*yr + uaz(j)*zr
+                     urk = ukx*xr + uky*yr + ukz*zr
+                     urip = uaxp(j)*xr + uayp(j)*yr + uazp(j)*zr
+                     urkp = ukxp*xr + ukyp*yr + ukzp*zr
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = uax(j)*term5 + uri*term6
+                     txxk = ukx*term5 + urk*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = uay(j)*term5 + uri*term6
+                     tyyk = uky*term5 + urk*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = uaz(j)*term5 + uri*term6
+                     tzzk = ukz*term5 + urk*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = uax(j)*term4 + uay(j)*term5 + uri*term6
+                     txyk = ukx*term4 + uky*term5 + urk*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = uax(j)*term4 + uaz(j)*term5 + uri*term6
+                     txzk = ukx*term4 + ukz*term5 + urk*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = uay(j)*term4 + uaz(j)*term5 + uri*term6
+                     tyzk = uky*term4 + ukz*term5 + urk*term6
+                     depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+     &                         + txxk*uaxp(j) + txyk*uayp(j)
+     &                         + txzk*uazp(j)
+                     depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+     &                         + txyk*uaxp(j) + tyyk*uayp(j)
+     &                         + tyzk*uazp(j)
+                     depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+     &                         + txzk*uaxp(j) + tyzk*uayp(j)
+     &                         + tzzk*uazp(j)
+                     frcx = frcx + depx
+                     frcy = frcy + depy
+                     frcz = frcz + depz
+                     ukx = uad(1,k,j)
+                     uky = uad(2,k,j)
+                     ukz = uad(3,k,j)
+                     ukxp = uap(1,k,j)
+                     ukyp = uap(2,k,j)
+                     ukzp = uap(3,k,j)
+                     uri = ubx(j)*xr + uby(j)*yr + ubz(j)*zr
+                     urk = ukx*xr + uky*yr + ukz*zr
+                     urip = ubxp(j)*xr + ubyp(j)*yr + ubzp(j)*zr
+                     urkp = ukxp*xr + ukyp*yr + ukzp*zr
+                     term1 = bn(2) - usc3*rr5
+                     term2 = bn(3) - usc5*rr7
+                     term3 = usr5 + term1
+                     term4 = rr3 * uscale(kk)
+                     term5 = -xr*term3 + rc3(1)*term4
+                     term6 = -usr5 + xr*xr*term2 - rr5*xr*urc5(1)
+                     txxi = ubx(j)*term5 + uri*term6
+                     txxk = ukx*term5 + urk*term6
+                     term5 = -yr*term3 + rc3(2)*term4
+                     term6 = -usr5 + yr*yr*term2 - rr5*yr*urc5(2)
+                     tyyi = uby(j)*term5 + uri*term6
+                     tyyk = uky*term5 + urk*term6
+                     term5 = -zr*term3 + rc3(3)*term4
+                     term6 = -usr5 + zr*zr*term2 - rr5*zr*urc5(3)
+                     tzzi = ubz(j)*term5 + uri*term6
+                     tzzk = ukz*term5 + urk*term6
+                     term4 = -usr5 * yr
+                     term5 = -xr*term1 + rr3*urc3(1)
+                     term6 = xr*yr*term2 - rr5*yr*urc5(1)
+                     txyi = ubx(j)*term4 + uby(j)*term5 + uri*term6
+                     txyk = ukx*term4 + uky*term5 + urk*term6
+                     term4 = -usr5 * zr
+                     term6 = xr*zr*term2 - rr5*zr*urc5(1)
+                     txzi = ubx(j)*term4 + ubz(j)*term5 + uri*term6
+                     txzk = ukx*term4 + ukz*term5 + urk*term6
+                     term5 = -yr*term1 + rr3*urc3(2)
+                     term6 = yr*zr*term2 - rr5*zr*urc5(2)
+                     tyzi = uby(j)*term4 + ubz(j)*term5 + uri*term6
+                     tyzk = uky*term4 + ukz*term5 + urk*term6
+                     depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+     &                         + txxk*ubxp(j) + txyk*ubyp(j)
+     &                         + txzk*ubzp(j)
+                     depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+     &                         + txyk*ubxp(j) + tyyk*ubyp(j)
+     &                         + tyzk*ubzp(j)
+                     depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+     &                         + txzk*ubxp(j) + tyzk*ubyp(j)
+     &                         + tzzk*ubzp(j)
+                     frcx = frcx + depx
+                     frcy = frcy + depy
+                     frcz = frcz + depz
+                  end do
                end if
 c
 c     increment gradient and virial due to Cartesian forces
@@ -4484,52 +4627,6 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
-c
-c     get the induced dipole field used for dipole torques
-c
-               txi3 = psr3*ukx + dsr3*ukxp
-               tyi3 = psr3*uky + dsr3*ukyp
-               tzi3 = psr3*ukz + dsr3*ukzp
-               txk3 = psr3*uix + dsr3*uixp
-               tyk3 = psr3*uiy + dsr3*uiyp
-               tzk3 = psr3*uiz + dsr3*uizp
-               turi = -psr5*urk - dsr5*urkp
-               turk = -psr5*uri - dsr5*urip
-               ufld(1,i) = ufld(1,i) + txi3 + xr*turi
-               ufld(2,i) = ufld(2,i) + tyi3 + yr*turi
-               ufld(3,i) = ufld(3,i) + tzi3 + zr*turi
-               ufld(1,k) = ufld(1,k) + txk3 + xr*turk
-               ufld(2,k) = ufld(2,k) + tyk3 + yr*turk
-               ufld(3,k) = ufld(3,k) + tzk3 + zr*turk
-c
-c     get induced dipole field gradient used for quadrupole torques
-c
-               txi5 = 2.0d0 * (psr5*ukx+dsr5*ukxp)
-               tyi5 = 2.0d0 * (psr5*uky+dsr5*ukyp)
-               tzi5 = 2.0d0 * (psr5*ukz+dsr5*ukzp)
-               txk5 = 2.0d0 * (psr5*uix+dsr5*uixp)
-               tyk5 = 2.0d0 * (psr5*uiy+dsr5*uiyp)
-               tzk5 = 2.0d0 * (psr5*uiz+dsr5*uizp)
-               turi = -psr7*urk - dsr7*urkp
-               turk = -psr7*uri - dsr7*urip
-               dufld(1,i) = dufld(1,i) + xr*txi5 + xr*xr*turi
-               dufld(2,i) = dufld(2,i) + xr*tyi5 + yr*txi5
-     &                         + 2.0d0*xr*yr*turi
-               dufld(3,i) = dufld(3,i) + yr*tyi5 + yr*yr*turi
-               dufld(4,i) = dufld(4,i) + xr*tzi5 + zr*txi5
-     &                         + 2.0d0*xr*zr*turi
-               dufld(5,i) = dufld(5,i) + yr*tzi5 + zr*tyi5
-     &                         + 2.0d0*yr*zr*turi
-               dufld(6,i) = dufld(6,i) + zr*tzi5 + zr*zr*turi
-               dufld(1,k) = dufld(1,k) - xr*txk5 - xr*xr*turk
-               dufld(2,k) = dufld(2,k) - xr*tyk5 - yr*txk5
-     &                         - 2.0d0*xr*yr*turk
-               dufld(3,k) = dufld(3,k) - yr*tyk5 - yr*yr*turk
-               dufld(4,k) = dufld(4,k) - xr*tzk5 - zr*txk5
-     &                         - 2.0d0*xr*zr*turk
-               dufld(5,k) = dufld(5,k) - yr*tzk5 - zr*tyk5
-     &                         - 2.0d0*yr*zr*turk
-               dufld(6,k) = dufld(6,k) - zr*tzk5 - zr*zr*turk
             end if
          end do
 c
@@ -4615,7 +4712,7 @@ c
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
@@ -4643,6 +4740,18 @@ c
       deallocate (uscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (uax)
+      deallocate (uay)
+      deallocate (uaz)
+      deallocate (uaxp)
+      deallocate (uayp)
+      deallocate (uazp)
+      deallocate (ubx)
+      deallocate (uby)
+      deallocate (ubz)
+      deallocate (ubxp)
+      deallocate (ubyp)
+      deallocate (ubzp)
       return
       end
 c
@@ -4670,24 +4779,25 @@ c     during May 2007
 c
 c
       subroutine eprecip1
-      use sizes
       use atoms
       use bound
       use boxes
       use chgpot
       use deriv
-      use energi
       use ewald
       use math
       use mpole
       use mrecip
       use pme
       use polar
+      use polopt
       use polpot
+      use poltcg
       use potent
       use virial
       implicit none
       integer i,j,k,m,ii
+      integer iab
       integer j1,j2,j3
       integer k1,k2,k3
       integer m1,m2,m3
@@ -4697,7 +4807,7 @@ c
       integer deriv1(10)
       integer deriv2(10)
       integer deriv3(10)
-      real*8 e,eterm,f
+      real*8 eterm,f
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
@@ -4854,8 +4964,6 @@ c
          qfac(1,1,1) = 0.0d0
          if (.not. use_bounds) then
             expterm = 0.5d0 * pi / xbox
-            struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-            e = f * expterm * struc2
             qfac(1,1,1) = expterm
          end if
 c
@@ -4913,15 +5021,6 @@ c
       call grid_uind (fuind,fuinp)
       call fftfront
 c
-c     account for zeroth grid point for nonperiodic system
-c
-      if (.not. use_bounds) then
-         expterm = 0.5d0 * pi / xbox
-         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = f * expterm * struc2
-         ep = ep + e
-      end if
-c
 c     complete the transformation of the PME grid
 c
       do k = 1, nfft3
@@ -4939,7 +5038,7 @@ c
       call fftback
       call fphi_uind (fphid,fphip,fphidp)
       do i = 1, npole
-         do j = 1, 10
+         do j = 2, 10
             fphid(j,i) = f * fphid(j,i)
             fphip(j,i) = f * fphip(j,i)
          end do
@@ -4950,7 +5049,6 @@ c
 c
 c     increment the dipole polarization energy and gradient
 c
-      e = 0.0d0
       do i = 1, npole
          ii = ipole(i)
          f1 = 0.0d0
@@ -4960,7 +5058,6 @@ c
             j1 = deriv1(k+1)
             j2 = deriv2(k+1)
             j3 = deriv3(k+1)
-            e = e + fuind(k,i)*fphi(k+1,i)
             f1 = f1 + (fuind(k,i)+fuinp(k,i))*fphi(j1,i)
             f2 = f2 + (fuind(k,i)+fuinp(k,i))*fphi(j2,i)
             f3 = f3 + (fuind(k,i)+fuinp(k,i))*fphi(j3,i)
@@ -4985,8 +5082,6 @@ c
          dep(2,ii) = dep(2,ii) + h2
          dep(3,ii) = dep(3,ii) + h3
       end do
-      e = 0.5d0 * e
-      ep = ep + e
 c
 c     set the potential to be the induced dipole average
 c
@@ -5087,7 +5182,7 @@ c
          vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
          vxz = vxz + 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3))
          vyy = vyy + yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
          vyz = vyz + 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
@@ -5100,7 +5195,7 @@ c
          do i = 1, npole
             ii = ipole(i)
             do k = 0, coptmax-1
-               do j = 1, 10
+               do j = 2, 10
                   fphid(j,i) = f * fopt(k,j,i)
                   fphip(j,i) = f * foptp(k,j,i)
                end do
@@ -5163,6 +5258,166 @@ c
                   vzz = vzz - 0.5d0*copm(k+m+1)*(cphid(4)*uoptp(m,3,i)
      &                                          +cphip(4)*uopt(m,3,i))
                end do
+            end do
+         end do
+      end if
+c
+c     account for dipole response terms in the TCG method
+c
+      if (poltyp .eq. 'TCG') then
+         do iab = 1, tcgnab
+            do i = 1, npole
+               do j = 1, 3
+                  fuind(j,i) = a(j,1)*uad(1,i,iab) + a(j,2)*uad(2,i,iab)
+     &                         + a(j,3)*uad(3,i,iab)
+                  fuinp(j,i) = a(j,1)*ubp(1,i,iab) + a(j,2)*ubp(2,i,iab)
+     &                         + a(j,3)*ubp(3,i,iab)
+               end do
+            end do
+            call grid_uind (fuind,fuinp)
+            call fftfront
+            do k = 1, nfft3
+               do j = 1, nfft2
+                  do i = 1, nfft1
+                     term = qfac(i,j,k)
+                     qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+                     qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+                  end do
+               end do
+            end do
+            call fftback
+            call fphi_uind (fphid,fphip,fphidp)
+            do i = 1, npole
+               do j = 2, 10
+                  fphid(j,i) = f * fphid(j,i)
+                  fphip(j,i) = f * fphip(j,i)
+               end do
+            end do
+            do i = 1, npole
+               ii = ipole(i)
+               f1 = 0.0d0
+               f2 = 0.0d0
+               f3 = 0.0d0
+               do k = 1, 3
+                  j1 = deriv1(k+1)
+                  j2 = deriv2(k+1)
+                  j3 = deriv3(k+1)
+                  f1 = f1+fuind(k,i)*fphip(j1,i)+fuinp(k,i)*fphid(j1,i)
+                  f2 = f2+fuind(k,i)*fphip(j2,i)+fuinp(k,i)*fphid(j2,i)
+                  f3 = f3+fuind(k,i)*fphip(j3,i)+fuinp(k,i)*fphid(j3,i)
+               end do
+               f1 = 0.5d0 * dble(nfft1) * f1
+               f2 = 0.5d0 * dble(nfft2) * f2
+               f3 = 0.5d0 * dble(nfft3) * f3
+               h1 = recip(1,1)*f1 + recip(1,2)*f2 + recip(1,3)*f3
+               h2 = recip(2,1)*f1 + recip(2,2)*f2 + recip(2,3)*f3
+               h3 = recip(3,1)*f1 + recip(3,2)*f2 + recip(3,3)*f3
+               dep(1,ii) = dep(1,ii) + h1
+               dep(2,ii) = dep(2,ii) + h2
+               dep(3,ii) = dep(3,ii) + h3
+               do j = 2, 4
+                  cphid(j) = 0.0d0
+                  cphip(j) = 0.0d0
+                  do k = 2, 4
+                     cphid(j) = cphid(j) + ftc(j,k)*fphid(k,i)
+                     cphip(j) = cphip(j) + ftc(j,k)*fphip(k,i)
+                  end do
+               end do
+               vxx = vxx - 0.5d0*(cphid(2)*ubp(1,i,iab)
+     &                              +cphip(2)*uad(1,i,iab))
+               vxy = vxy - 0.25d0*(cphid(2)*ubp(2,i,iab)
+     &                               +cphip(2)*uad(2,i,iab)
+     &                               +cphid(3)*ubp(1,i,iab)
+     &                               +cphip(3)*uad(1,i,iab))
+               vxz = vxz - 0.25d0*(cphid(2)*ubp(3,i,iab)
+     &                               +cphip(2)*uad(3,i,iab)
+     &                               +cphid(4)*ubp(1,i,iab)
+     &                               +cphip(4)*uad(1,i,iab))
+               vyy = vyy - 0.5d0*(cphid(3)*ubp(2,i,iab)
+     &                              +cphip(3)*uad(2,i,iab))
+               vyz = vyz - 0.25d0*(cphid(3)*ubp(3,i,iab)
+     &                               +cphip(3)*uad(3,i,iab)
+     &                               +cphid(4)*ubp(2,i,iab)
+     &                               +cphip(4)*uad(2,i,iab))
+               vzz = vzz - 0.5d0*(cphid(4)*ubp(3,i,iab)
+     &                              +cphip(4)*uad(3,i,iab))
+            end do
+c
+            do i = 1, npole
+               do j = 1, 3
+                  fuind(j,i) = a(j,1)*ubd(1,i,iab) + a(j,2)*ubd(2,i,iab)
+     &                            + a(j,3)*ubd(3,i,iab)
+                  fuinp(j,i) = a(j,1)*uap(1,i,iab) + a(j,2)*uap(2,i,iab)
+     &                            + a(j,3)*uap(3,i,iab)
+               end do
+            end do
+            call grid_uind (fuind,fuinp)
+            call fftfront
+            do k = 1, nfft3
+               do j = 1, nfft2
+                  do i = 1, nfft1
+                     term = qfac(i,j,k)
+                     qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+                     qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+                  end do
+               end do
+            end do
+            call fftback
+            call fphi_uind (fphid,fphip,fphidp)
+            do i = 1, npole
+               do j = 2, 10
+                  fphid(j,i) = f * fphid(j,i)
+                  fphip(j,i) = f * fphip(j,i)
+               end do
+            end do
+            do i = 1, npole
+               ii = ipole(i)
+               f1 = 0.0d0
+               f2 = 0.0d0
+               f3 = 0.0d0
+               do k = 1, 3
+                  j1 = deriv1(k+1)
+                  j2 = deriv2(k+1)
+                  j3 = deriv3(k+1)
+                  f1 = f1+fuind(k,i)*fphip(j1,i)+fuinp(k,i)*fphid(j1,i)
+                  f2 = f2+fuind(k,i)*fphip(j2,i)+fuinp(k,i)*fphid(j2,i)
+                  f3 = f3+fuind(k,i)*fphip(j3,i)+fuinp(k,i)*fphid(j3,i)
+               end do
+               f1 = 0.5d0 * dble(nfft1) * f1
+               f2 = 0.5d0 * dble(nfft2) * f2
+               f3 = 0.5d0 * dble(nfft3) * f3
+               h1 = recip(1,1)*f1 + recip(1,2)*f2 + recip(1,3)*f3
+               h2 = recip(2,1)*f1 + recip(2,2)*f2 + recip(2,3)*f3
+               h3 = recip(3,1)*f1 + recip(3,2)*f2 + recip(3,3)*f3
+               dep(1,ii) = dep(1,ii) + h1
+               dep(2,ii) = dep(2,ii) + h2
+               dep(3,ii) = dep(3,ii) + h3
+               do j = 2, 4
+                  cphid(j) = 0.0d0
+                  cphip(j) = 0.0d0
+                  do k = 2, 4
+                     cphid(j) = cphid(j) + ftc(j,k)*fphid(k,i)
+                     cphip(j) = cphip(j) + ftc(j,k)*fphip(k,i)
+                  end do
+               end do
+               vxx = vxx - 0.5d0*(cphid(2)*uap(1,i,iab)
+     &                              +cphip(2)*ubd(1,i,iab))
+               vxy = vxy - 0.25d0*(cphid(2)*uap(2,i,iab)
+     &                               +cphip(2)*ubd(2,i,iab)
+     &                               +cphid(3)*uap(1,i,iab)
+     &                               +cphip(3)*ubd(1,i,iab))
+               vxz = vxz - 0.25d0*(cphid(2)*uap(3,i,iab)
+     &                               +cphip(2)*ubd(3,i,iab)
+     &                               +cphid(4)*uap(1,i,iab)
+     &                               +cphip(4)*ubd(1,i,iab))
+               vyy = vyy - 0.5d0*(cphid(3)*uap(2,i,iab)
+     &                              +cphip(3)*ubd(2,i,iab))
+               vyz = vyz - 0.25d0*(cphid(3)*uap(3,i,iab)
+     &                               +cphip(3)*ubd(3,i,iab)
+     &                               +cphid(4)*uap(2,i,iab)
+     &                               +cphip(4)*ubd(2,i,iab))
+               vzz = vzz - 0.5d0*(cphid(4)*uap(3,i,iab)
+     &                              +cphip(4)*ubd(3,i,iab))
             end do
          end do
       end if

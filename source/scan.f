@@ -25,7 +25,6 @@ c     Chemistry, 20, 1671-1684 (1999)
 c
 c
       program scan
-      use sizes
       use files
       use inform
       use iounit
@@ -174,7 +173,6 @@ c     for possible addition to the master list of local minima
 c
 c
       subroutine mapcheck (nmap,emap,range,minimum,grdmin)
-      use sizes
       use files
       use inform
       use iounit
@@ -258,7 +256,6 @@ c     via iterative local search
 c
 c
       function scan1 (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i,nvar
@@ -321,7 +318,6 @@ c     surface via iterative local search
 c
 c
       subroutine scan2 (mode,xx,h,hinit,hstop,hindex,hdiag)
-      use sizes
       use atoms
       implicit none
       integer i,nvar
@@ -362,7 +358,6 @@ c     #########################################################
 c
 c
       subroutine modesrch (nmap,emap,range,neigen,grdmin)
-      use sizes
       use iounit
       use omega
       implicit none
@@ -425,7 +420,6 @@ c     ###############################################################
 c
 c
       subroutine eigenrot (eigen,vects)
-      use sizes
       use atoms
       use omega
       implicit none
@@ -489,7 +483,6 @@ c     ###############################################################
 c
 c
       subroutine climber (nsearch,minimum,step,grdmin)
-      use sizes
       use inform
       use iounit
       use math
@@ -591,7 +584,6 @@ c     perform a Cartesian coordinate energy minimization
 c
 c
       subroutine localmin (minimum,grdmin)
-      use sizes
       use atoms
       use inform
       use minima

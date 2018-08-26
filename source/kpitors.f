@@ -17,7 +17,6 @@ c     needing them, and processes any new or changed values
 c
 c
       subroutine kpitors
-      use sizes
       use atomid
       use atoms
       use bndstr

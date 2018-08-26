@@ -17,7 +17,6 @@ c     and its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine emetal1
-      use sizes
       use atomid
       use atoms
       use couple

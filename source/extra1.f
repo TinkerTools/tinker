@@ -17,7 +17,6 @@ c     energy contribution and its first derivatives
 c
 c
       subroutine extra1
-      use sizes
       use atoms
       use deriv
       use energi

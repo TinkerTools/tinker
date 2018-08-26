@@ -17,7 +17,6 @@ c     for a molecular dynamics trajectory, including restarts
 c
 c
       subroutine mdinit
-      use sizes
       use atomid
       use atoms
       use bath
@@ -34,6 +33,7 @@ c
       use molcul
       use moldyn
       use mpole
+      use output
       use rgddyn
       use rigid
       use stodyn

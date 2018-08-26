@@ -18,7 +18,6 @@ c     atoms are both pisystem atoms
 c
 c
       subroutine orbital
-      use sizes
       use atoms
       use bndstr
       use couple
@@ -257,7 +256,6 @@ c     and isolated or adjacent triple bonds
 c
 c
       subroutine piplane
-      use sizes
       use atomid
       use atoms
       use couple

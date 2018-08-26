@@ -16,7 +16,6 @@ c     "epitors" calculates the pi-system torsion potential energy
 c
 c
       subroutine epitors
-      use sizes
       use atoms
       use bound
       use energi

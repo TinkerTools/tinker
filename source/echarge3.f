@@ -17,7 +17,6 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine echarge3
-      use sizes
       use limits
       use warp
       implicit none
@@ -59,7 +58,6 @@ c     double loop
 c
 c
       subroutine echarge3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -419,7 +417,6 @@ c     of lights
 c
 c
       subroutine echarge3b
-      use sizes
       use action
       use analyz
       use atomid
@@ -732,7 +729,6 @@ c     neighbor list
 c
 c
       subroutine echarge3c
-      use sizes
       use action
       use analyz
       use atomid
@@ -971,7 +967,6 @@ c     mesh Ewald summation
 c
 c
       subroutine echarge3d
-      use sizes
       use action
       use analyz
       use atomid
@@ -1331,7 +1326,6 @@ c     mesh Ewald summation and the method of lights
 c
 c
       subroutine echarge3e
-      use sizes
       use action
       use analyz
       use atomid
@@ -1660,7 +1654,6 @@ c     mesh Ewald summation and a pairwise neighbor list
 c
 c
       subroutine echarge3f
-      use sizes
       use action
       use analyz
       use atomid
@@ -1917,7 +1910,6 @@ c     potential smoothing methods
 c
 c
       subroutine echarge3g
-      use sizes
       use action
       use analyz
       use atomid

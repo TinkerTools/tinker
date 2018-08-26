@@ -17,7 +17,6 @@ c     an external disk file
 c
 c
       subroutine readxyz (ixyz)
-      use sizes
       use atomid
       use atoms
       use bound

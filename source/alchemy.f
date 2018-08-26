@@ -37,7 +37,6 @@ c     se_ap,se_am  standard error of free energy changes
 c
 c
       program alchemy
-      use sizes
       use analyz
       use atoms
       use energi

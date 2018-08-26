@@ -19,7 +19,6 @@ c     bending terms are optionally used
 c
 c
       subroutine eangle3
-      use sizes
       use action
       use analyz
       use angbnd

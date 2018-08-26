@@ -25,7 +25,6 @@ c     due to the small amount of data
 c
 c
       program diffuse
-      use sizes
       use atomid
       use atoms
       use bound

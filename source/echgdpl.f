@@ -16,7 +16,6 @@ c     "echgdpl" calculates the charge-dipole interaction energy
 c
 c
       subroutine echgdpl
-      use sizes
       use atoms
       use bound
       use cell

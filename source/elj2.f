@@ -17,7 +17,6 @@ c     derivatives for a single atom at a time
 c
 c
       subroutine elj2 (i)
-      use sizes
       use warp
       implicit none
       integer i
@@ -48,7 +47,6 @@ c     derivatives using a double loop over relevant atom pairs
 c
 c
       subroutine elj2a (iatom)
-      use sizes
       use atomid
       use atoms
       use bound
@@ -635,7 +633,6 @@ c     energy smoothing
 c
 c
       subroutine elj2b (i)
-      use sizes
       use math
       use vdwpot
       implicit none
@@ -669,7 +666,6 @@ c     derivatives for use with stophat potential energy smoothing
 c
 c
       subroutine elj2c (iatom)
-      use sizes
       use atomid
       use atoms
       use couple

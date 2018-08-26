@@ -18,7 +18,6 @@ c     and allocates pairwise neighbor lists
 c
 c
       subroutine cutoffs
-      use sizes
       use atoms
       use bound
       use hescut

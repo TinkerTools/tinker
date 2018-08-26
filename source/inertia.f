@@ -28,7 +28,6 @@ c     xyz convention in Appendix B
 c
 c
       subroutine inertia (mode)
-      use sizes
       use atoms
       use atomid
       use iounit

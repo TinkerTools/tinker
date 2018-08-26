@@ -119,7 +119,9 @@ gfortran -c -Wall pitors.f
 gfortran -c -Wall pme.f
 gfortran -c -Wall polar.f
 gfortran -c -Wall polgrp.f
+gfortran -c -Wall polopt.f
 gfortran -c -Wall polpot.f
+gfortran -c -Wall poltcg.f
 gfortran -c -Wall potent.f
 gfortran -c -Wall potfit.f
 gfortran -c -Wall precis.f
@@ -451,7 +453,7 @@ gfortran -c -Wall overlap.f
 gfortran -c -Wall path.f
 gfortran -c -Wall pdbxyz.f
 gfortran -c -Wall picalc.f
-gfortran -c -Wall pmestuff.f
+gfortran -c -Wall pmestuf.f
 gfortran -c -Wall pmpb.f
 gfortran -c -Wall polarize.f
 gfortran -c -Wall poledit.f
@@ -504,7 +506,7 @@ gfortran -c -Wall server.f
 gfortran -c -Wall shakeup.f
 gfortran -c -Wall sigmoid.f
 gfortran -c -Wall simplex.f
-gfortran -c -Wall sktstuff.f
+gfortran -c -Wall sktstuf.f
 gfortran -c -Wall sniffer.f
 gfortran -c -Wall sort.f
 gfortran -c -Wall spacefill.f
@@ -515,6 +517,7 @@ gfortran -c -Wall superpose.f
 gfortran -c -Wall surface.f
 gfortran -c -Wall surfatom.f
 gfortran -c -Wall switch.f
+gfortran -c -Wall tcgstuf.f
 gfortran -c -Wall temper.f
 gfortran -c -Wall testgrad.f
 gfortran -c -Wall testhess.f

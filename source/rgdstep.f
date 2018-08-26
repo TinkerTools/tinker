@@ -27,7 +27,6 @@ c     Center, Chelyabinsk, Russia, February 2001
 c
 c
       subroutine rgdstep (istep,dt)
-      use sizes
       use atomid
       use atoms
       use bound
@@ -365,7 +364,6 @@ c     given the inertia tensor and angular momentum
 c
 c
       subroutine linbody (i,inert,wcp)
-      use sizes
       use atoms
       use group
       implicit none

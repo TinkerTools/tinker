@@ -18,7 +18,6 @@ c     or Allinger angle
 c
 c
       subroutine eopbend1
-      use sizes
       use angbnd
       use angpot
       use atoms

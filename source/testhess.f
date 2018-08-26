@@ -18,7 +18,6 @@ c     to Cartesian coordinates
 c
 c
       program testhess
-      use sizes
       use atoms
       use files
       use hescut
@@ -64,9 +63,9 @@ c
 c
 c     set difference threshhold via the energy precision
 c
-      delta = 1.0d-4
-      if (digits .ge. 6)  delta = 1.0d-6
-      if (digits .ge. 8)  delta = 1.0d-8
+      delta = 0.0001d0
+      if (digits .ge. 6)  delta = 0.000001d0
+      if (digits .ge. 8)  delta = 0.00000001d0
 c
 c     decide whether to do an analytical Hessian calculation
 c
@@ -122,8 +121,8 @@ c
 c     get the stepsize for numerical Hessian calculation
 c
          eps = -1.0d0
-         eps0 = 1.0d-3
-         if (dograd)  eps0 = 1.0d-5
+         eps0 = 0.001d0
+         if (dograd)  eps0 = 0.00001d0
          query = .true.
          call nextarg (string,exist)
          if (exist) then

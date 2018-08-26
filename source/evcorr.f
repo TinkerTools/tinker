@@ -22,7 +22,6 @@ c     Liquids", Oxford University Press, 1987, Section 2.8
 c
 c
       subroutine evcorr (elrc)
-      use sizes
       use atoms
       use bound
       use boxes
@@ -185,7 +184,6 @@ c     Liquids", Oxford University Press, 1987, Section 2.8
 c
 c
       subroutine evcorr1 (elrc,vlrc)
-      use sizes
       use atoms
       use bound
       use boxes

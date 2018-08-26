@@ -17,7 +17,6 @@ c     in order to define the default force field parameters
 c
 c
       subroutine readprm
-      use sizes
       use fields
       use iounit
       use kanang

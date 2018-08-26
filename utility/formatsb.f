@@ -31,13 +31,13 @@ c     source tree that implements the old stretch-bend format
 c
 c
       program formatsb
+      use fields
+      use iounit
+      use kangs
+      use katoms
+      use kstbnd
+      use sizes
       implicit none
-      include 'sizes.i'
-      include 'fields.i'
-      include 'iounit.i'
-      include 'kangs.i'
-      include 'katoms.i'
-      include 'kstbnd.i'
       integer i,j,size
       integer ia,ib,ic
       integer ja,jc

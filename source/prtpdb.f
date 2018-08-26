@@ -17,7 +17,6 @@ c     to an external disk file
 c
 c
       subroutine prtpdb (ipdb)
-      use sizes
       use files
       use pdb
       use sequen

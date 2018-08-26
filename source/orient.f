@@ -17,7 +17,6 @@ c     in standard orientation for each rigid body atom group
 c
 c
       subroutine orient
-      use sizes
       use atoms
       use group
       use rigid
@@ -115,7 +114,6 @@ c     xyz convention in Appendix B
 c
 c
       subroutine xyzrigid
-      use sizes
       use atoms
       use atomid
       use group
@@ -364,7 +362,6 @@ c     xyz convention in Appendix B
 c
 c
       subroutine rigidxyz
-      use sizes
       use atoms
       use group
       use rigid

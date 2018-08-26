@@ -18,7 +18,6 @@ c     a single atom using finite difference methods
 c
 c
       subroutine eopbend2 (i)
-      use sizes
       use angbnd
       use atoms
       use group
@@ -169,7 +168,6 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine eopbend2a (i,de)
-      use sizes
       use angbnd
       use angpot
       use atoms

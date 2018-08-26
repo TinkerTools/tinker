@@ -72,7 +72,6 @@ c     coordinates using a pairwise double loop
 c
 c
       subroutine emm3hb1a
-      use sizes
       use atmlst
       use atomid
       use atoms
@@ -759,7 +758,6 @@ c     coordinates using the method of lights
 c
 c
       subroutine emm3hb1b
-      use sizes
       use atmlst
       use atomid
       use atoms
@@ -1250,7 +1248,6 @@ c     coordinates using a pairwise neighbor list
 c
 c
       subroutine emm3hb1c
-      use sizes
       use atmlst
       use atomid
       use atoms

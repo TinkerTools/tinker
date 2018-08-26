@@ -17,7 +17,6 @@ c     for a molecular dynamics restart from an external disk file
 c
 c
       subroutine readdyn (idyn)
-      use sizes
       use atoms
       use boxes
       use files

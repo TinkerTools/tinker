@@ -17,7 +17,6 @@ c     or dihedral angle defined by two to four input atoms
 c
 c
       function geometry (ia,ib,ic,id)
-      use sizes
       use atoms
       use math
       implicit none

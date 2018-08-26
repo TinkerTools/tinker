@@ -18,7 +18,6 @@ c     values for these parameters
 c
 c
       subroutine kvdw
-      use sizes
       use atomid
       use atoms
       use couple

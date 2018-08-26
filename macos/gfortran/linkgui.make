@@ -55,6 +55,7 @@ gfortran -Ofast -fopenmp -static-libgcc -o testhess.x testhess.o -L. libtinker.a
 gfortran -Ofast -fopenmp -static-libgcc -o testpair.x testpair.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o testpol.x testpol.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o testrot.x testrot.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
+gfortran -Ofast -fopenmp -static-libgcc -o testvir.x testvir.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o timer.x timer.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o timerot.x timerot.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o torsfit.x torsfit.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation

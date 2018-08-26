@@ -17,7 +17,6 @@ c     on a quantum mechanical optimized structure and frequencies
 c
 c
       program valence
-      use sizes
       use atoms
       use files
       use inform
@@ -231,7 +230,6 @@ c     quantum mechanical structure and frequency data
 c
 c
       subroutine valguess
-      use sizes
       use angbnd
       use atomid
       use atoms
@@ -274,7 +272,8 @@ c
       real*8 uryguess
       real*8 opbguess
       logical done
-      character*4 pa,pb,pc,pd
+      character*4 pa,pb
+      character*4 pc,pd
       character*8 ptb
       character*12 pta
       character*16 ptt
@@ -800,7 +799,6 @@ c     and connected atoms
 c
 c
       subroutine vdwguess (ia,rad,eps,reduce)
-      use sizes
       use atomid
       use couple
       use math
@@ -1014,7 +1012,6 @@ c     on atom type and connected atoms
 c
 c
       function bndguess (ia,ib)
-      use sizes
       use atomid
       use bndpot
       implicit none
@@ -1195,7 +1192,6 @@ c     on atom type and connected atoms
 c
 c
       function angguess (ia,ib,ic)
-      use sizes
       use atomid
       use angpot
       use math
@@ -1399,7 +1395,6 @@ c     on atom type and connected atoms
 c
 c
       subroutine sbguess (ia,ib,ic,sb1,sb2)
-      use sizes
       use angpot
       use atomid
       use math
@@ -1550,7 +1545,6 @@ c     based on atom type and connected atoms
 c
 c
       function uryguess (ia,ib,ic)
-      use sizes
       use atomid
       use urypot
       implicit none
@@ -1592,7 +1586,6 @@ c     based on atom type and connected atoms
 c
 c
       function opbguess (ia,ib,ic,id)
-      use sizes
       use angpot
       use atomid
       use math
@@ -1633,7 +1626,6 @@ c     on atom type and connected atoms
 c
 c
       subroutine torguess (ia,ib,ic,id,tf1,tf2,tf3)
-      use sizes
       use atomid
       use torpot
       implicit none
@@ -1850,7 +1842,6 @@ c     lengths and angles to QM results
 c
 c
       function valrms (prtflg)
-      use sizes
       use angbnd
       use atoms
       use atomid
@@ -2366,7 +2357,6 @@ c     coordinate space
 c
 c
       function minimiz1 (xx,g)
-      use sizes
       use atoms
       use scales
       use usage
@@ -2447,7 +2437,6 @@ c     corresponding valence potential energy parameters
 c
 c
       subroutine prmvar (nvar,xx)
-      use sizes
       use angbnd
       use atomid
       use atoms
@@ -2895,7 +2884,6 @@ c     corresponding valence potential energy parameters
 c
 c
       subroutine varprm (nvar,xx,ivar,eps)
-      use sizes
       use angbnd
       use atoms
       use atomid
@@ -3404,7 +3392,6 @@ c     and gradient for valence parameters fit to QM results
 c
 c
       function valfit1 (xx,g)
-      use sizes
       use atoms
       use potent
       use valfit
@@ -3469,7 +3456,6 @@ c     standard output and appends the values to a key file
 c
 c
       subroutine prtval
-      use sizes
       use angbnd
       use atomid
       use atoms

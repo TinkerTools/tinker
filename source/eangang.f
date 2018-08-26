@@ -15,7 +15,6 @@ c     "eangang" calculates the angle-angle potential energy
 c
 c
       subroutine eangang
-      use sizes
       use angang
       use angbnd
       use angpot

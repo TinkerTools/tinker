@@ -17,7 +17,6 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine estrbnd2 (iatom)
-      use sizes
       use angbnd
       use angpot
       use atoms

@@ -17,7 +17,6 @@ c     also partitions the energy among the atoms
 c
 c
       subroutine eangang3
-      use sizes
       use action
       use analyz
       use angang

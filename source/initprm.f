@@ -17,7 +17,6 @@ c     parameters to zero and using defaults for control values
 c
 c
       subroutine initprm
-      use sizes
       use angpot
       use bndpot
       use chgpot

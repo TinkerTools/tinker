@@ -41,7 +41,6 @@ c                offending atom is shifted by this small amount
 c
 c
       subroutine surface (total,area,radius,weight,probe)
-      use sizes
       use atoms
       use inform
       use iounit
@@ -618,7 +617,6 @@ c                offending atom is shifted by this small amount
 c
 c
       subroutine surface1 (total,area,darea,radius,weight,probe)
-      use sizes
       use atoms
       use inform
       use iounit

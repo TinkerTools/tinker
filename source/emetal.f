@@ -22,7 +22,6 @@ c     Journal, 81, 1-10 (2001)
 c
 c
       subroutine emetal
-      use sizes
       use atomid
       use atoms
       use couple

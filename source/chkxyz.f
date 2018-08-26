@@ -17,7 +17,6 @@ c     coordinates, and prints a warning message
 c
 c
       subroutine chkxyz (clash)
-      use sizes
       use atoms
       use iounit
       implicit none

@@ -16,7 +16,6 @@ c     "estrtor" calculates the stretch-torsion potential energy
 c
 c
       subroutine estrtor
-      use sizes
       use atoms
       use bndstr
       use bound

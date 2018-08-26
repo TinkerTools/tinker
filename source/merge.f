@@ -18,7 +18,6 @@ c     atoms followed by the atoms of the current structure
 c
 c
       subroutine merge (iref)
-      use sizes
       use atomid
       use atoms
       use couple

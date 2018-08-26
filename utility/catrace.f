@@ -17,7 +17,6 @@ c     alpha-carbon atoms of a protein structure
 c
 c
       program catrace
-      use sizes
       use atomid
       use atoms
       use couple

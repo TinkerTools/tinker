@@ -46,7 +46,6 @@ c
 c
       subroutine search (nvar,f,g,x,p,f_move,angle,ncalls,
      &                          fgvalue,status)
-      use sizes
       use linmin
       use math
       implicit none

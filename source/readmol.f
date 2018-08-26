@@ -17,7 +17,6 @@ c     an external disk file
 c
 c
       subroutine readmol (imdl)
-      use sizes
       use atomid
       use atoms
       use couple

@@ -18,7 +18,6 @@ c     target potential or optimizes electrostatic parameters
 c
 c
       program potential
-      use sizes
       use atoms
       use charge
       use files
@@ -689,7 +688,6 @@ c     potential values from an external disk file
 c
 c
       subroutine readpot (ipot,iconf)
-      use sizes
       use atoms
       use katoms
       use potfit
@@ -789,7 +787,6 @@ c     radially distributed shells based on the molecular surface
 c
 c
       subroutine potgrid (iconf)
-      use sizes
       use atoms
       use iounit
       use katoms
@@ -994,7 +991,6 @@ c     the system with a positive charge located at the grid point
 c
 c
       subroutine potpoint (xi,yi,zi,pot)
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -1143,7 +1139,6 @@ c     and gradient for electrostatic parameters fit to a potential
 c
 c
       function potfit1 (xx,g)
-      use sizes
       use atoms
       use moment
       use neigh
@@ -1359,7 +1354,6 @@ c     corresponding electrostatic potential energy parameters
 c
 c
       subroutine prmvar (nvar,xx)
-      use sizes
       use atomid
       use atoms
       use charge
@@ -1668,7 +1662,6 @@ c     corresponding electrostatic potential energy parameters
 c
 c
       subroutine varprm (nvar,xx,ivar,eps)
-      use sizes
       use atoms
       use charge
       use mpole
@@ -1828,7 +1821,6 @@ c     potential over a set of grid points
 c
 c
       subroutine potstat (dofull,domodel,dopair,dotarget)
-      use sizes
       use atoms
       use files
       use iounit
@@ -2049,7 +2041,6 @@ c     charge or multipole model to an electrostatic potential grid
 c
 c
       subroutine prtfit
-      use sizes
       use atoms
       use charge
       use files

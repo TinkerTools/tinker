@@ -17,7 +17,6 @@ c     charge-charge interaction energy for a single atom
 c
 c
       subroutine echarge2 (i)
-      use sizes
       use limits
       use warp
       implicit none
@@ -49,7 +48,6 @@ c     interaction energy for a single atom using a pairwise double loop
 c
 c
       subroutine echarge2a (i)
-      use sizes
       use atoms
       use bound
       use cell
@@ -346,7 +344,6 @@ c     contribution to the Hessian calculation
 c
 c
       subroutine echarge2b (i)
-      use sizes
       use atoms
       use bound
       use cell
@@ -584,7 +581,6 @@ c     smoothing methods
 c
 c
       subroutine echarge2c (i)
-      use sizes
       use atoms
       use charge
       use chgpot

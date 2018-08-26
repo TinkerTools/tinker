@@ -18,7 +18,6 @@ c     angle values for the peptide backbone and side chains
 c
 c
       program protein
-      use sizes
       use atoms
       use files
       use iounit
@@ -342,7 +341,6 @@ c     acid sequence from the phi, psi, omega and chi values
 c
 c
       subroutine prochain
-      use sizes
       use atoms
       use iounit
       use phipsi
@@ -824,7 +822,6 @@ c     are set as absolute values, not relative to the CB atom
 c
 c
       subroutine proside (resname,i,cai,ni,ci)
-      use sizes
       use atoms
       use phipsi
       use resdue
@@ -1332,7 +1329,6 @@ c     pack multiple polypeptide chains
 c
 c
       subroutine pauling
-      use sizes
       use atomid
       use atoms
       use couple
@@ -1532,7 +1528,6 @@ c     optimization of rigid bodies
 c
 c
       function pauling1 (xx,g)
-      use sizes
       use group
       use math
       use rigid

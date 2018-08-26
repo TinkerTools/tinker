@@ -18,7 +18,6 @@ c     atoms (ie, 1-2 connectivity)
 c
 c
       subroutine attach
-      use sizes
       use atoms
       use couple
       use iounit

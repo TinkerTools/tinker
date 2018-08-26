@@ -13,13 +13,12 @@ c     #############################################################
 c
 c
       program fakenoe
-      use sizes
       use atoms
       use iounit
       use pdb
       implicit none
       integer i,j,k
-      integer map(maxatm)
+      integer, allocatable :: map(:)
       real*8 dist2,xi,yi,zi
       real*8 random,fraction,trial
       real*8 noemax,noemax2
@@ -59,6 +58,10 @@ c
    40 format (f10.0)
       fraction = fraction / 100.0d0
       if (fraction .eq. 0.0d0)  fraction = 1.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (map(npdb))
 c
 c     map the PDB atoms onto the corresponding Tinker atoms
 c
@@ -124,6 +127,10 @@ c  80                   format ('intraresidue',2x,3i7)
             end do
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (map)
 c
 c     perform any final tasks before program exit
 c

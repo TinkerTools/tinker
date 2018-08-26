@@ -24,7 +24,6 @@ c     Computational Physics, 52, 24-34 (1983)
 c
 c
       subroutine rattle (dt,xold,yold,zold)
-      use sizes
       use atomid
       use atoms
       use freeze
@@ -204,7 +203,6 @@ c     interatomic distance constraints
 c
 c
       subroutine rattle2 (dt)
-      use sizes
       use atomid
       use atoms
       use freeze
@@ -393,7 +391,6 @@ c     Computational Physics, 23, 327-341 (1977)
 c
 c
       subroutine shake (xold,yold,zold)
-      use sizes
       use atomid
       use atoms
       use freeze
@@ -560,7 +557,6 @@ c     16, 1351-1356 (1995)
 c
 c
       subroutine shakef (derivs)
-      use sizes
       use atoms
       use freeze
       use inform

@@ -18,7 +18,6 @@ c     necessary to avoid closing the execution window
 c
 c
       subroutine final
-      use sizes
       use align
       use analyz
       use angang
@@ -72,6 +71,8 @@ c
       use pme
       use polar
       use polgrp
+      use polopt
+      use poltcg
       use potfit
       use qmstuf
       use refer
@@ -627,8 +628,6 @@ c
 c
 c     deallocation of global arrays from module polar
 c
-      if (allocated(copt))  deallocate (copt)
-      if (allocated(copm))  deallocate (copm)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
@@ -640,10 +639,6 @@ c
       if (allocated(uinp))  deallocate (uinp)
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
-      if (allocated(uopt))  deallocate (uopt)
-      if (allocated(uoptp))  deallocate (uoptp)
-      if (allocated(uopts))  deallocate (uopts)
-      if (allocated(uoptps))  deallocate (uoptps)
       if (allocated(uexact))  deallocate (uexact)
       if (allocated(douind))  deallocate (douind)
 c
@@ -653,6 +648,24 @@ c
       if (allocated(ip12))  deallocate (ip12)
       if (allocated(ip13))  deallocate (ip13)
       if (allocated(ip14))  deallocate (ip14)
+c
+c     deallocation of global arrays from module polopt
+c
+      if (allocated(copt))  deallocate (copt)
+      if (allocated(copm))  deallocate (copm)
+      if (allocated(uopt))  deallocate (uopt)
+      if (allocated(uoptp))  deallocate (uoptp)
+      if (allocated(uopts))  deallocate (uopts)
+      if (allocated(uoptps))  deallocate (uoptps)
+c
+c     deallocation of global arrays from module poltcg
+c
+      if (allocated(uindt))  deallocate (uindt)
+      if (allocated(uinpt))  deallocate (uinpt)
+      if (allocated(uad))  deallocate (uad)
+      if (allocated(uap))  deallocate (uap)
+      if (allocated(ubd))  deallocate (ubd)
+      if (allocated(ubp))  deallocate (ubp)
 c
 c     deallocation of global arrays from module potfit
 c

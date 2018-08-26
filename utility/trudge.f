@@ -17,13 +17,13 @@ c     space using a derivative-free Nelder-Mead simplex optimization
 c
 c
       program trudge
-      use sizes
       use atoms
       use files
       use inform
       use iounit
       use keys
       use scales
+      use sizes
       use usage
       implicit none
       integer i,j,imin,nvar
@@ -191,13 +191,12 @@ c     coordinate space
 c
 c
       function trudge0 (xx)
-      use sizes
       use atoms
       use usage
       implicit none
       integer i,nvar
       real*8 trudge0,e
-      real*8 xx(maxvar)
+      real*8 xx(*)
 c
 c
 c     translate optimization parameters to atomic coordinates

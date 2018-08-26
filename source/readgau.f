@@ -17,7 +17,6 @@ c     Hessian and frequencies from a Gaussian 09 output file
 c
 c
       subroutine readgau
-      use sizes
       use ascii
       use iounit
       use qmstuf

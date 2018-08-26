@@ -18,7 +18,6 @@ c     and contact-reentrant definitions are available
 c
 c
       program spacefill
-      use sizes
       use atomid
       use atoms
       use files

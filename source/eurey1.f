@@ -17,7 +17,6 @@ c     its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eurey1
-      use sizes
       use atoms
       use bound
       use deriv

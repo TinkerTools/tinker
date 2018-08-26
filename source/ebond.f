@@ -16,7 +16,6 @@ c     "ebond" calculates the bond stretching energy
 c
 c
       subroutine ebond
-      use sizes
       use atoms
       use bndpot
       use bndstr

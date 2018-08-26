@@ -19,21 +19,25 @@ c     the special characters "+" and "*" in PDB atom names
 c
 c
       program noesetup
+      use atmtyp
+      use atoms
+      use files
+      use iounit
+      use pdb
       implicit none
-      include 'sizes.i'
-      include 'atmtyp.i'
-      include 'atoms.i'
-      include 'files.i'
-      include 'iounit.i'
-      include 'pdb.i'
-      integer i,j,inoe,ikey,ires,next
+      integer i,j
+      integer inoe,ikey
+      integer ires,next
       integer bound1,bound2
       integer nlist1,list1(20)
       integer nlist2,list2(20)
       integer res1,res2,freeunit
       integer mult1,mult2
-      integer ni(maxres),cai(maxres),ci(maxres)
-      real*8 xx,yy,zz,distsq,dummy
+      integer ni(maxres)
+      integer cai(maxres)
+      integer ci(maxres)
+      real*8 xx,yy,zz
+      real*8 distsq,dummy
       real*8 factor,upper,lower
       character*1 letter
       character*3 resnam1,resnam2

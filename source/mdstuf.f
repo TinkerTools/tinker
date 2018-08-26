@@ -17,9 +17,6 @@ c     irest       steps between removal of COM motion (0=no removal)
 c     bmnmix      mixing coefficient for use with Beeman integrator
 c     arespa      inner time step for use with RESPA integrator
 c     dorest      logical flag to remove center of mass motion
-c     velsave     logical flag to save velocity vector components
-c     frcsave     logical flag to save force vector components
-c     uindsave    logical flag to save induced atomic dipoles
 c     integrate   type of molecular dynamics integration algorithm
 c
 c
@@ -30,9 +27,6 @@ c
       integer bmnmix
       real*8 arespa
       logical dorest
-      logical velsave
-      logical frcsave
-      logical uindsave
       character*11 integrate
       save
       end

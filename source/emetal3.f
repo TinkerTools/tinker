@@ -17,7 +17,6 @@ c     and also partitions the energy among the atoms
 c
 c
       subroutine emetal3
-      use sizes
       use action
       use analyz
       use atomid

@@ -18,7 +18,6 @@ c     also processes any new or changed parameter values
 c
 c
       subroutine kopdist
-      use sizes
       use angbnd
       use angpot
       use atmlst

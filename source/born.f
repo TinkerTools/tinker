@@ -49,7 +49,6 @@ c     284, 835-848 (1998)  (ACE Method)
 c
 c
       subroutine born
-      use sizes
       use atomid
       use atoms
       use bath
@@ -434,7 +433,6 @@ c     and virial components for potentials involving Born radii
 c
 c
       subroutine born1
-      use sizes
       use atomid
       use atoms
       use chgpot

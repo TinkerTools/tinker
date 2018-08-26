@@ -27,7 +27,6 @@ c     Chemistry, 99, 8374-8378 (1995)
 c
 c
       program pssrot
-      use sizes
       use atoms
       use files
       use inform
@@ -236,7 +235,6 @@ c     gradient during PSS global optimization in torsional space
 c
 c
       function pssrot1 (xx,g)
-      use sizes
       use math
       use omega
       use zcoord
@@ -286,7 +284,6 @@ c     ##############################################################
 c
 c
       subroutine moderot (neigen,minimum,grdmin)
-      use sizes
       use iounit
       use math
       use omega
@@ -400,7 +397,6 @@ c     ###############################################################
 c
 c
       subroutine eigenrot (eigen,vects)
-      use sizes
       use atoms
       use omega
       implicit none
@@ -450,7 +446,6 @@ c     ################################################################
 c
 c
       subroutine climbrot (nsearch,minimum,step,grdmin)
-      use sizes
       use iounit
       use math
       use omega
@@ -534,7 +529,6 @@ c     to perform a torsional space energy minimization
 c
 c
       subroutine localrot (minimum,grdmin)
-      use sizes
       use inform
       use minima
       use math

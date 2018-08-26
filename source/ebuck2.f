@@ -17,7 +17,6 @@ c     second derivatives for a single atom at a time
 c
 c
       subroutine ebuck2 (i)
-      use sizes
       use iounit
       use warp
       implicit none
@@ -52,7 +51,6 @@ c     derivatives using a double loop over relevant atom pairs
 c
 c
       subroutine ebuck2a (iatom)
-      use sizes
       use atomid
       use atoms
       use bound
@@ -670,7 +668,6 @@ c     energy smoothing
 c
 c
       subroutine ebuck2b (i)
-      use sizes
       use math
       use vdwpot
       implicit none

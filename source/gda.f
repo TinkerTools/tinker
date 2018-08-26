@@ -23,7 +23,6 @@ c     101, 533-541 (1994)
 c
 c
       program gda
-      use sizes
       use atoms
       use files
       use iounit
@@ -263,7 +262,6 @@ c     ################################################################
 c
 c
       subroutine gda1 (beta,xx,g)
-      use sizes
       use atoms
       use iounit
       use warp
@@ -365,7 +363,6 @@ c     ################################################################
 c
 c
       function gda2 (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i,nvar
@@ -423,7 +420,6 @@ c     #################################################################
 c
 c
       subroutine gda3 (mode,xx,h,hinit,hstop,hindex,hdiag)
-      use sizes
       use atoms
       implicit none
       integer i,nvar

@@ -17,7 +17,6 @@ c     at sites with chiral local reference frame definitions
 c
 c
       subroutine chkpole
-      use sizes
       use atoms
       use mpole
       implicit none

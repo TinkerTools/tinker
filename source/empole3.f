@@ -52,7 +52,6 @@ c     using a double loop, and partitions the energy among atoms
 c
 c
       subroutine empole3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -487,7 +486,6 @@ c     using a neighbor list, and partitions the energy among the atoms
 c
 c
       subroutine empole3b
-      use sizes
       use action
       use analyz
       use atomid
@@ -773,7 +771,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine empole3c
-      use sizes
       use action
       use analyz
       use atoms
@@ -894,7 +891,6 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine emreal3c
-      use sizes
       use action
       use analyz
       use atomid
@@ -1345,7 +1341,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine empole3d
-      use sizes
       use action
       use analyz
       use atoms
@@ -1466,7 +1461,6 @@ c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
 c
 c
       subroutine emreal3d
-      use sizes
       use action
       use analyz
       use atomid

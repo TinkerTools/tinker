@@ -18,7 +18,6 @@ c     via a barostat method
 c
 c
       subroutine pressure (dt,epot,ekin,temp,pres,stress)
-      use sizes
       use bath
       use boxes
       use bound
@@ -72,7 +71,6 @@ c     the half time step as needed for the Monte Carlo barostat
 c
 c
       subroutine pressure2 (epot,temp)
-      use sizes
       use bath
       use bound
       implicit none
@@ -114,7 +112,6 @@ c     University, March 2013
 c
 c
       subroutine pmonte (epot,temp)
-      use sizes
       use atomid
       use atoms
       use bath
@@ -584,7 +581,6 @@ c     Raos, Dipartimento di Chimica, Politecnico di Milano, Italy
 c
 c
       subroutine pscale (dt,pres,stress)
-      use sizes
       use atomid
       use atoms
       use bath
@@ -771,211 +767,5 @@ c
             end do
          end if
       end if
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ptest  --  find pressure via finite differences  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "ptest" determines the numerical virial tensor, and compares
-c     analytical to numerical values for dE/dV and isotropic pressure
-c
-c     original version written by John D. Chodera, University of
-c     California, Berkeley, December 2010
-c
-c
-      subroutine ptest
-      use sizes
-      use atoms
-      use bath
-      use bound
-      use boxes
-      use iounit
-      use units
-      use virial
-      implicit none
-      integer i
-      real*8 energy,third
-      real*8 delta,step,scale
-      real*8 volold,xboxold
-      real*8 yboxold,zboxold
-      real*8 epos,eneg,temp
-      real*8 vnxx,vnyy,vnzz
-      real*8 dedv_vir,dedv_num
-      real*8 pres_vir,pres_num
-      real*8, allocatable :: xold(:)
-      real*8, allocatable :: yold(:)
-      real*8, allocatable :: zold(:)
-c
-c
-c     set relative volume change for finite-differences
-c
-      if (.not. use_bounds)  return
-      third = 1.0d0 / 3.0d0
-      delta = 0.000001d0
-      step = 0.5d0 * delta * volbox
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (xold(n))
-      allocate (yold(n))
-      allocate (zold(n))
-c
-c     store original box dimensions and coordinate values
-c
-      xboxold = xbox
-      yboxold = ybox
-      zboxold = zbox
-      volold = volbox
-      do i = 1, n
-         xold(i) = x(i)
-         yold(i) = y(i)
-         zold(i) = z(i)
-      end do
-c
-c     get the xx-component of the numerical virial tensor
-c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
-      call lattice
-      do i = 1, n
-         x(i) = xold(i) * scale
-      end do
-      eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
-      call lattice
-      do i = 1, n
-         x(i) = xold(i) * scale
-      end do
-      epos = energy ()
-      xbox = xboxold
-      call lattice
-      do i = 1, n
-         x(i) = xold(i)
-      end do
-      vnxx = 3.0d0 * (epos-eneg) / delta
-c
-c     get the yy-component of the numerical virial tensor
-c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      ybox = yboxold * scale
-      call lattice
-      do i = 1, n
-         y(i) = yold(i) * scale
-      end do
-      eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      ybox = yboxold * scale
-      call lattice
-      do i = 1, n
-         y(i) = yold(i) * scale
-      end do
-      epos = energy ()
-      ybox = yboxold
-      call lattice
-      do i = 1, n
-         y(i) = yold(i)
-      end do
-      vnyy = 3.0d0 * (epos-eneg) / delta
-c
-c     get the zz-component of the numerical virial tensor
-c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      zbox = zboxold * scale
-      call lattice
-      do i = 1, n
-         z(i) = zold(i) * scale
-      end do
-      eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      zbox = zboxold * scale
-      call lattice
-      do i = 1, n
-         z(i) = zold(i) * scale
-      end do
-      epos = energy ()
-      zbox = zboxold
-      call lattice
-      do i = 1, n
-         z(i) = zold(i)
-      end do
-      vnzz = 3.0d0 * (epos-eneg) / delta
-c
-c     print numerical values for the virial diagonal elements
-c
-      write (iout,10)  vnxx,vnyy,vnzz
-   10 format (/,' Numerical Virial Diagonal :',9x,3f12.3)
-c
-c     compute the numerical change in energy with box volume
-c
-      volbox = volold - step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
-      ybox = yboxold * scale
-      zbox = zboxold * scale
-      call lattice
-      do i = 1, n
-         x(i) = xold(i) * scale
-         y(i) = yold(i) * scale
-         z(i) = zold(i) * scale
-      end do
-      eneg = energy ()
-      volbox = volold + step
-      scale = (volbox/volold)**third
-      xbox = xboxold * scale
-      ybox = yboxold * scale
-      zbox = zboxold * scale
-      call lattice
-      do i = 1, n
-         x(i) = xold(i) * scale
-         y(i) = yold(i) * scale
-         z(i) = zold(i) * scale
-      end do
-      epos = energy ()
-      xbox = xboxold
-      ybox = yboxold
-      zbox = zboxold
-      call lattice
-      do i = 1, n
-         x(i) = xold(i)
-         y(i) = yold(i)
-         z(i) = zold(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (xold)
-      deallocate (yold)
-      deallocate (zold)
-c
-c     find virial-based and finite difference values of dE/dV
-c
-      dedv_vir = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
-      dedv_num = (epos-eneg) / (delta*volbox)
-c
-c     get virial-based and finite difference isotropic pressure
-c
-      temp = kelvin
-      if (temp .eq. 0.0d0)  temp = 298.0d0
-      pres_vir = prescon * (dble(n)*gasconst*temp/volbox-dedv_vir)
-      pres_num = prescon * (dble(n)*gasconst*temp/volbox-dedv_num)
-      write (iout,20)  nint(temp),pres_vir
-   20 format (/,' Pressure (Analytical,',i4,' K) :',3x,f15.3,
-     &           ' Atmospheres')
-      write (iout,30)  nint(temp),pres_num
-   30 format (' Pressure (Numerical,',i4,' K) :',4x,f15.3,
-     &           ' Atmospheres')
       return
       end

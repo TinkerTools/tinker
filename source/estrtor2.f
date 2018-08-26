@@ -17,7 +17,6 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine estrtor2 (i)
-      use sizes
       use atoms
       use bndstr
       use bound

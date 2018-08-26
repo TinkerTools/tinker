@@ -17,7 +17,6 @@ c     the SHAKE and RATTLE algorithms
 c
 c
       subroutine shakeup
-      use sizes
       use angbnd
       use atmlst
       use atomid

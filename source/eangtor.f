@@ -16,7 +16,6 @@ c     "eangtor" calculates the angle-torsion potential energy
 c
 c
       subroutine eangtor
-      use sizes
       use angtor
       use atoms
       use angbnd

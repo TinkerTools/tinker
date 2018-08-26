@@ -17,7 +17,6 @@ c     torsion pairs and processes any new or changed values
 c
 c
       subroutine ktortor
-      use sizes
       use atomid
       use atoms
       use bitor

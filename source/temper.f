@@ -34,7 +34,6 @@ c     72, 2384-2393 (1980)
 c
 c
       subroutine temper (dt,eksum,ekin,temp)
-      use sizes
       use atomid
       use atoms
       use bath
@@ -259,7 +258,6 @@ c     Molecular Physics, 87, 1117-1157 (1996)
 c
 c
       subroutine temper2 (dt,temp)
-      use sizes
       use atoms
       use bath
       use group

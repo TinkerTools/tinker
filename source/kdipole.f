@@ -17,7 +17,6 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kdipole
-      use sizes
       use atmlst
       use atoms
       use bndstr

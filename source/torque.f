@@ -34,7 +34,6 @@ c     73-87 (2004)
 c
 c
       subroutine torque (i,trq,frcx,frcy,frcz,de)
-      use sizes
       use atoms
       use deriv
       use mpole

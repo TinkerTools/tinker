@@ -18,7 +18,6 @@ c     and gradient computation, and Hessian matrix evaluation
 c
 c
       program timer
-      use sizes
       use atoms
       use hescut
       use inform

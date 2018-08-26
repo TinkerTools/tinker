@@ -36,7 +36,7 @@ c
       zbox2 = 0.5d0 * zbox
       if (octahedron)  box34 = 0.75d0 * xbox
 c
-c     set replicated cell dimensions equal to the unitcell
+c     set replicated cell dimensions equal to the unit cell
 c
       xcell = xbox
       ycell = ybox

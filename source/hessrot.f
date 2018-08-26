@@ -19,7 +19,6 @@ c     evaluations while the diagonal needs just two evaluations
 c
 c
       subroutine hessrot (mode,hrot)
-      use sizes
       use omega
       use math
       use zcoord

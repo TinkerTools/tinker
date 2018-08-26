@@ -61,7 +61,6 @@ c     using a pairwise double loop
 c
 c
       subroutine ehal1a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -580,7 +579,6 @@ c     using the method of lights
 c
 c
       subroutine ehal1b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -962,7 +960,6 @@ c     using a pairwise neighbor list
 c
 c
       subroutine ehal1c
-      use sizes
       use atomid
       use atoms
       use bound

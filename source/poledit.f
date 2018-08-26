@@ -104,7 +104,6 @@ c     from a GDMA output file
 c
 c
       subroutine molsetup
-      use sizes
       use atomid
       use atoms
       use couple
@@ -310,7 +309,6 @@ c     multipole site using high priority connected atoms along axes
 c
 c
       subroutine setframe
-      use sizes
       use atomid
       use atoms
       use couple
@@ -638,7 +636,6 @@ c     priority then a zero is returned
 c
 c
       function priority (i,ia,ib)
-      use sizes
       use atomid
       use couple
       implicit none
@@ -719,7 +716,6 @@ c     into the local coordinate frame defined at each atomic site
 c
 c
       subroutine rotframe
-      use sizes
       use atomid
       use atoms
       use iounit
@@ -827,7 +823,6 @@ c     definition for specified atoms
 c
 c
       subroutine fixframe
-      use sizes
       use atomid
       use atoms
       use couple
@@ -1069,7 +1064,6 @@ c     parameters and allows user alteration of these values
 c
 c
       subroutine setpolar
-      use sizes
       use atomid
       use atoms
       use couple
@@ -1256,7 +1250,6 @@ c     in the presence of intergroup (intramolecular) polarization
 c
 c
       subroutine alterpol
-      use sizes
       use atomid
       use atoms
       use iounit
@@ -1371,7 +1364,6 @@ c     removal of intergroup polarization
 c
 c
       subroutine interpol
-      use sizes
       use atoms
       use iounit
       use mpole
@@ -1555,7 +1547,6 @@ c     multipole moments
 c
 c
       subroutine dfieldi (field,pscale)
-      use sizes
       use atoms
       use mpole
       use polar
@@ -1700,7 +1691,6 @@ c     induced dipole moments
 c
 c
       subroutine ufieldi (field,pscale)
-      use sizes
       use atoms
       use mpole
       use polar
@@ -1806,7 +1796,6 @@ c     an integer net charge and traceless quadrupoles
 c
 c
       subroutine fixpolar
-      use sizes
       use atomid
       use atoms
       use couple
@@ -2061,7 +2050,6 @@ c     multipole analysis or removal of intramolecular polarization
 c
 c
       subroutine prtpolar
-      use sizes
       use atoms
       use atomid
       use files

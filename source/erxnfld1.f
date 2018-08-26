@@ -17,7 +17,6 @@ c     and derivatives with respect to Cartesian coordinates
 c
 c
       subroutine erxnfld1
-      use sizes
       use atoms
       use deriv
       use energi

@@ -26,7 +26,6 @@ c     for PME atomic sites along the fractional coordinate axes
 c
 c
       subroutine bspline_fill
-      use sizes
       use atoms
       use boxes
       use pme
@@ -198,7 +197,6 @@ c     from each electrostatic site
 c
 c
       subroutine table_fill
-      use sizes
       use atoms
       use chunks
       use pme
@@ -347,7 +345,6 @@ c     overlapped by the B-splines for an electrostatic site
 c
 c
       subroutine setchunk (i,cid,off1,off2,off3)
-      use sizes
       use chunks
       use pme
       implicit none
@@ -385,7 +382,6 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine grid_pchg
-      use sizes
       use atoms
       use charge
       use chunks
@@ -501,7 +497,6 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine grid_mpole (fmp)
-      use sizes
       use atoms
       use chunks
       use mpole
@@ -632,7 +627,6 @@ c     particle mesh Ewald grid
 c
 c
       subroutine grid_uind (fuind,fuinp)
-      use sizes
       use atoms
       use chunks
       use mpole
@@ -810,7 +804,6 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine fphi_mpole (fphi)
-      use sizes
       use mpole
       use pme
       implicit none
@@ -979,7 +972,6 @@ c     the particle mesh Ewald grid
 c
 c
       subroutine fphi_uind (fdip_phi1,fdip_phi2,fdip_sum_phi)
-      use sizes
       use mpole
       use pme
       implicit none
@@ -1253,7 +1245,6 @@ c     to fractional coordinates
 c
 c
       subroutine cmp_to_fmp (cmp,fmp)
-      use sizes
       use mpole
       implicit none
       integer i,j,k
@@ -1302,7 +1293,6 @@ c     order (m,dx,dy,dz,qxx,qyy,qzz,qxy,qxz,qyz)
 c
 c
       subroutine cart_to_frac (ctf)
-      use sizes
       use boxes
       use pme
       implicit none
@@ -1370,7 +1360,6 @@ c     fractional to Cartesian coordinates
 c
 c
       subroutine fphi_to_cphi (fphi,cphi)
-      use sizes
       use mpole
       implicit none
       integer i,j,k
@@ -1419,7 +1408,6 @@ c     order (m,dx,dy,dz,qxx,qyy,qzz,qxy,qxz,qyz)
 c
 c
       subroutine frac_to_cart (ftc)
-      use sizes
       use boxes
       use pme
       implicit none

@@ -17,7 +17,6 @@ c     translates any stray molecules back into the periodic box
 c
 c
       subroutine bounds
-      use sizes
       use atomid
       use atoms
       use boxes

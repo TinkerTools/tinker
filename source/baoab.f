@@ -23,7 +23,6 @@ c     Proceedings of the Royal Society A, 472, 20160138 (2016)
 c
 c
       subroutine baoab (istep,dt)
-      use sizes
       use atomid
       use atoms
       use freeze
@@ -196,7 +195,6 @@ c     update positions and velocities for the BAOAB integrator
 c
 c
       subroutine oprep (istep,dt,vfric,vrand)
-      use sizes
       use atoms
       use atomid
       use bath

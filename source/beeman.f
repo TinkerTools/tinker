@@ -27,7 +27,6 @@ c     Temperature and Pressure", DCRT Report, NIH, April 1988
 c
 c
       subroutine beeman (istep,dt)
-      use sizes
       use atomid
       use atoms
       use freeze

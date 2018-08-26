@@ -25,7 +25,6 @@ c     original version written by Teresa Head-Gordon, October 2010
 c
 c
       subroutine bussi (istep,dt)
-      use sizes
       use atomid
       use atoms
       use bath

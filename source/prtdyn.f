@@ -17,7 +17,6 @@ c     molecular dynamics trajectory to an external disk file
 c
 c
       subroutine prtdyn
-      use sizes
       use atoms
       use boxes
       use files

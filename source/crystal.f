@@ -18,7 +18,6 @@ c     asymmetric units
 c
 c
       program crystal
-      use sizes
       use atoms
       use bound
       use boxes
@@ -64,7 +63,7 @@ c
       call initial
       call getxyz
 c
-c     find out which unitcell manipulation is to be performed
+c     find out which unit cell manipulation to perform
 c
       mode = 0
       query = .true.
@@ -368,7 +367,6 @@ c     during generation of a unit cell from an asymmetric unit
 c
 c
       subroutine molmerge
-      use sizes
       use atoms
       use couple
       use molcul
@@ -534,7 +532,6 @@ c     to a unit cell by updating the atom type and attachment arrays
 c
 c
       subroutine cellatom (jj,j)
-      use sizes
       use atomid
       use atoms
       use couple
@@ -567,7 +564,6 @@ c     to give a larger unit cell as a block of repeated units
 c
 c
       subroutine bigblock (na,nb,nc)
-      use sizes
       use atoms
       use boxes
       implicit none
@@ -656,7 +652,6 @@ c     the symmetry related atoms of the full unit cell
 c
 c
       subroutine symmetry (spacegrp)
-      use sizes
       use atoms
       implicit none
       integer i,j,ii,jj
@@ -2797,7 +2792,7 @@ c
          end do
       end if
 c
-c     set the total number of atoms in the full unitcell
+c     set the total number of atoms in the full unit cell
 c
       n = nsym * n
       return

@@ -18,7 +18,6 @@ c     any of several possible integration methods
 c
 c
       program dynamic
-      use sizes
       use atoms
       use bath
       use bndstr

@@ -13,7 +13,6 @@ c     #############################################################
 c
 c
       program extent
-      use sizes
       use atoms
       use iounit
       implicit none

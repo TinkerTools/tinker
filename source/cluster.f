@@ -17,7 +17,6 @@ c     and stores a list of the group to which each atom belongs
 c
 c
       subroutine cluster
-      use sizes
       use atomid
       use atoms
       use bound

@@ -31,7 +31,6 @@ c     California, Berkeley, November 2010
 c
 c
       subroutine ghmcstep (istep,dt)
-      use sizes
       use atoms
       use atomid
       use bath
@@ -231,7 +230,6 @@ c     to update velocities during GHMC stochastic dynamics
 c
 c
       subroutine ghmcterm (istep,dt,alpha,beta)
-      use sizes
       use atoms
       use atomid
       use bath

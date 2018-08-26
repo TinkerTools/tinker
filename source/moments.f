@@ -18,7 +18,6 @@ c     partial charges, bond dipoles and atomic multipole moments
 c
 c
       subroutine moments
-      use sizes
       use atomid
       use atoms
       use bound
@@ -285,7 +284,6 @@ c     multipole moments
 c
 c
       subroutine momfull
-      use sizes
       use atoms
       use usage
       implicit none

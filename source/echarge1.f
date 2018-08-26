@@ -17,7 +17,6 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine echarge1
-      use sizes
       use limits
       use warp
       implicit none
@@ -59,7 +58,6 @@ c     using a pairwise double loop
 c
 c
       subroutine echarge1a
-      use sizes
       use atoms
       use bound
       use cell
@@ -475,7 +473,6 @@ c     using the method of lights
 c
 c
       subroutine echarge1b
-      use sizes
       use atoms
       use bound
       use boxes
@@ -799,7 +796,6 @@ c     using a pairwise neighbor list
 c
 c
       subroutine echarge1c
-      use sizes
       use atoms
       use bound
       use charge
@@ -1060,7 +1056,6 @@ c     using a particle mesh Ewald summation
 c
 c
       subroutine echarge1d
-      use sizes
       use atoms
       use bound
       use boxes
@@ -1437,7 +1432,6 @@ c     using a particle mesh Ewald summation and the method of lights
 c
 c
       subroutine echarge1e
-      use sizes
       use atoms
       use bound
       use boxes
@@ -1762,7 +1756,6 @@ c     using a particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine echarge1f
-      use sizes
       use atoms
       use bound
       use boxes
@@ -2022,7 +2015,6 @@ c     for use with potential smoothing methods
 c
 c
       subroutine echarge1g
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -2256,7 +2248,6 @@ c     during May 2007
 c
 c
       subroutine ecrecip1
-      use sizes
       use atoms
       use bound
       use boxes

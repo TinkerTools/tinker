@@ -17,7 +17,6 @@ c     atom from its defining internal coordinate values
 c
 c
       subroutine xyzatm (i,ia,bond,ib,angle1,ic,angle2,chiral)
-      use sizes
       use atoms
       use inform
       use iounit

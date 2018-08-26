@@ -17,7 +17,6 @@ c     also partitions the energy terms among the atoms
 c
 c
       subroutine eangtor3
-      use sizes
       use action
       use analyz
       use angbnd

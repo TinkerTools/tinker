@@ -18,7 +18,6 @@ c     generalized Kirkwood and Poisson-Boltzmann solvation models
 c
 c
       subroutine esolv2 (i)
-      use sizes
       use potent
       use solute
       use warp
@@ -87,7 +86,6 @@ c     potential energy by finite differences
 c
 c
       subroutine esolv2a (i)
-      use sizes
       use atoms
       use charge
       use deriv
@@ -304,7 +302,6 @@ c     for derivatives of Born radii with respect to coordinates
 c
 c
       subroutine egb2a (i)
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -463,7 +460,6 @@ c     for derivatives of Born radii with respect to coordinates
 c
 c
       subroutine egb2b (i)
-      use sizes
       use atoms
       use charge
       use chgpot

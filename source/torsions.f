@@ -17,7 +17,6 @@ c     the numbers of the four atoms defining each torsional angle
 c
 c
       subroutine torsions
-      use sizes
       use atoms
       use bndstr
       use couple

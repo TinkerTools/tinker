@@ -16,7 +16,6 @@ c     "sktdyn" sends the current dynamics info via a socket
 c
 c
       subroutine sktdyn (istep,dt,epot)
-      use sizes
       use atoms
       use moldyn
       use mpole
@@ -135,7 +134,6 @@ c     "sktopt" sends the current optimization info via a socket
 c
 c
       subroutine sktopt (ncycle,eopt)
-      use sizes
       use atoms
       use deriv
       use mpole
@@ -241,7 +239,6 @@ c     a server, and loading an object with system information
 c
 c
       subroutine sktinit
-      use sizes
       use atomid
       use atoms
       use charge
@@ -371,7 +368,6 @@ c     "sktkill" closes the server and Java virtual machine
 c
 c
       subroutine sktkill
-      use sizes
       use socket
       implicit none
 c

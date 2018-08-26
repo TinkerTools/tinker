@@ -22,7 +22,6 @@ c     Multipoles", Journal of Chemical Physics, 107, 481-492 (1997)
 c
 c
       subroutine erxnfld3
-      use sizes
       use action
       use analyz
       use atomid

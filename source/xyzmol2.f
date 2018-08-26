@@ -17,7 +17,6 @@ c     converts to and then writes out a Tripos MOL2 file
 c
 c
       program xyzmol2
-      use sizes
       use files
       use iounit
       use titles

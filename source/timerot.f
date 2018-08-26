@@ -19,7 +19,6 @@ c     Hessian matrix evaluation
 c
 c
       program timerot
-      use sizes
       use iounit
       use limits
       use omega

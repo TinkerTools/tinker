@@ -21,7 +21,6 @@ c     lower bound range is used instead of a single distance
 c
 c
       subroutine egeom2 (i)
-      use sizes
       use atomid
       use atoms
       use bound

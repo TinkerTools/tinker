@@ -17,7 +17,6 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kmpole
-      use sizes
       use atoms
       use couple
       use inform

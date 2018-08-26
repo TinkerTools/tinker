@@ -17,7 +17,6 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine etortor1
-      use sizes
       use atoms
       use bitor
       use bound

@@ -17,7 +17,6 @@ c     from its atomic coordinates; only active atoms are included
 c
 c
       subroutine gyrate (rg)
-      use sizes
       use atoms
       use usage
       implicit none

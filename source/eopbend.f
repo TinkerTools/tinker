@@ -17,7 +17,6 @@ c     trigonal centers via a Wilson-Decius-Cross or Allinger angle
 c
 c
       subroutine eopbend
-      use sizes
       use angbnd
       use angpot
       use atoms

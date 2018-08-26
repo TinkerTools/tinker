@@ -31,7 +31,6 @@ c     accuracy of vibrational frequencies, etc.
 c
 c
       subroutine epolar2 (i)
-      use sizes
       use atoms
       use deriv
       use hessn
@@ -282,7 +281,6 @@ c     difference second derivatives
 c
 c
       subroutine epolar2a (nlist,list,reinduce)
-      use sizes
       use atoms
       use bound
       use cell
@@ -292,6 +290,7 @@ c
       use mpole
       use polar
       use polgrp
+      use polopt
       use polpot
       use potent
       use shunt
@@ -1378,7 +1377,6 @@ c     difference second derivatives
 c
 c
       subroutine epolar2b (nlist,list,reinduce)
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -1389,6 +1387,7 @@ c
       use neigh
       use polar
       use polgrp
+      use polopt
       use polpot
       use potent
       use shunt

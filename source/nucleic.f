@@ -19,7 +19,6 @@ c     angle values for the nucleic acid backbone and side chains
 c
 c
       program nucleic
-      use sizes
       use atoms
       use couple
       use files
@@ -433,7 +432,6 @@ c     torsional values
 c
 c
       subroutine nucchain
-      use sizes
       use atoms
       use nucleo
       use resdue
@@ -918,7 +916,6 @@ c     Verlag, 1984, page 52
 c
 c
       subroutine nucbase (resname,i,c1i,o4i,c2i)
-      use sizes
       use atoms
       use nucleo
       implicit none
@@ -1097,7 +1094,6 @@ c     align the paired strands of a nucleic acid double helix
 c
 c
       subroutine watson
-      use sizes
       use atoms
       use couple
       use group
@@ -1394,7 +1390,6 @@ c     optimization of rigid bodies
 c
 c
       function watson1 (xx,g)
-      use sizes
       use group
       use math
       use rigid

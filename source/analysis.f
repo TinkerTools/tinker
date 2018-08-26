@@ -18,7 +18,6 @@ c     in terms of type of interaction or atom number
 c
 c
       subroutine analysis (energy)
-      use sizes
       use analyz
       use atoms
       use energi

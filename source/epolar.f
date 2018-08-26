@@ -24,7 +24,7 @@ c
 c
 c     choose the method for summing over polarization interactions
 c
-      pairwise = .true.
+      pairwise = .false.
       if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
@@ -58,7 +58,6 @@ c     using a double loop, and partitions the energy among atoms
 c
 c
       subroutine epolar0a
-      use sizes
       use atoms
       use bound
       use cell
@@ -456,7 +455,6 @@ c     using a neighbor list
 c
 c
       subroutine epolar0b
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -713,7 +711,6 @@ c     a double loop
 c
 c
       subroutine epolar0c
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -815,7 +812,6 @@ c     using particle mesh Ewald summation and a double loop
 c
 c
       subroutine epreal0c
-      use sizes
       use atoms
       use bound
       use cell
@@ -1246,7 +1242,6 @@ c     a neighbor list
 c
 c
       subroutine epolar0d
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -1348,7 +1343,6 @@ c     using particle mesh Ewald summation and a neighbor list
 c
 c
       subroutine epreal0d
-      use sizes
       use atoms
       use bound
       use chgpot
@@ -1615,7 +1609,6 @@ c     from the induced dipoles times the electric field
 c
 c
       subroutine epolar0e
-      use sizes
       use atoms
       use boxes
       use chgpot
@@ -1625,8 +1618,9 @@ c
       use math
       use mpole
       use polar
+      use polpot
+      use poltcg
       use potent
-      use units
       implicit none
       integer i,j,ii
       real*8 e,f,fi,term
@@ -1653,26 +1647,40 @@ c     compute the induced dipoles at each polarizable atom
 c
       call induce
 c
+c     restore the induced dipoles if using the TCG method
+c
+      if (poltyp .eq. 'TCG') then
+!$OMP    PARALLEL default(shared) private(i,j)
+!$OMP    DO schedule(guided)
+         do i = 1, npole
+            do j = 1, 3
+               uind(j,i) = uindt(j,i)
+               uinp(j,i) = uinpt(j,i)
+            end do
+         end do
+!$OMP    END DO
+!$OMP    END PARALLEL
+      end if
+c
 c     set the energy conversion factor
 c
       f = -0.5d0 * electric / dielec
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private)
-!$OMP& shared(npole,polarity,f,uind,udirp,ep)
+!$OMP PARALLEL default(shared) private(i,j,fi,e)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
 c     get polarization energy via induced dipoles times field
 c
       do i = 1, npole
-         if (polarity(i) .ne. 0.0d0) then
-            fi = f / polarity(i)
+         if (douind(i)) then
+            fi = 0.5d0 * f / polarity(i)
             e = 0.0d0
             do j = 1, 3
-               e = fi * uind(j,i) * udirp(j,i)
-               ep = ep + e
+               e = e + fi*(uind(j,i)*udirp(j,i)+uinp(j,i)*udir(j,i))
             end do
+            ep = ep + e
          end if
       end do
 c
@@ -1739,7 +1747,6 @@ c     during May 2007
 c
 c
       subroutine eprecip
-      use sizes
       use atoms
       use bound
       use boxes

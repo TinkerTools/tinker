@@ -17,7 +17,6 @@ c     extending across periodic boundaries
 c
 c
       subroutine polymer
-      use sizes
       use atoms
       use bndstr
       use bound

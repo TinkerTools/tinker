@@ -17,7 +17,6 @@ c     second derivatives for a single atom at a time
 c
 c
       subroutine egauss2 (i)
-      use sizes
       use warp
       implicit none
       integer i
@@ -46,7 +45,6 @@ c     second derivatives using a pairwise double loop
 c
 c
       subroutine egauss2a (iatom)
-      use sizes
       use atomid
       use atoms
       use bound
@@ -619,7 +617,6 @@ c     second derivatives for use with potential energy smoothing
 c
 c
       subroutine egauss2b (iatom)
-      use sizes
       use atomid
       use atoms
       use couple

@@ -28,7 +28,6 @@ c     Chemistry, 99, 8374-8378 (1995)
 c
 c
       program pss
-      use sizes
       use atoms
       use inform
       use iounit
@@ -282,7 +281,6 @@ c     coordinate space
 c
 c
       function pss1 (xx,g)
-      use sizes
       use atoms
       implicit none
       integer i,nvar
@@ -345,7 +343,6 @@ c     in Cartesian coordinate space
 c
 c
       subroutine pss2 (mode,xx,h,hinit,hstop,hindex,hdiag)
-      use sizes
       use atoms
       implicit none
       integer i,nvar
@@ -386,7 +383,6 @@ c     ###############################################################
 c
 c
       subroutine modecart (start,stop,minimum,grdmin,check)
-      use sizes
       use atoms
       use iounit
       use omega
@@ -517,7 +513,6 @@ c     ###############################################################
 c
 c
       subroutine modetors (start,stop,minimum,grdmin,check)
-      use sizes
       use atoms
       use iounit
       use omega
@@ -640,7 +635,6 @@ c     ###############################################################
 c
 c
       subroutine eigenxyz (eigen,vects)
-      use sizes
       use atoms
       use hescut
       implicit none
@@ -708,7 +702,6 @@ c     ###############################################################
 c
 c
       subroutine eigentor (eigen,vects)
-      use sizes
       use atoms
       use omega
       implicit none
@@ -758,7 +751,6 @@ c     #################################################################
 c
 c
       subroutine climbxyz (nsearch,minimum,step,grdmin,check)
-      use sizes
       use atoms
       use inform
       use iounit
@@ -850,7 +842,6 @@ c     #################################################################
 c
 c
       subroutine climbtor (nsearch,minimum,step,grdmin,check)
-      use sizes
       use inform
       use iounit
       use math
@@ -951,7 +942,6 @@ c     smoothing level
 c
 c
       subroutine localxyz (minimum,grdmin)
-      use sizes
       use atoms
       use inform
       implicit none
@@ -1024,7 +1014,6 @@ c     belongs to the correct progenitor in the existing map
 c
 c
       subroutine chktree (parent,grdmin,keep)
-      use sizes
       use atoms
       use tree
       use warp

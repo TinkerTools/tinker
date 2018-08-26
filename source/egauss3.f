@@ -17,7 +17,6 @@ c     interaction energy and partitions the energy among the atoms
 c
 c
       subroutine egauss3
-      use sizes
       use limits
       use warp
       implicit none
@@ -51,7 +50,6 @@ c     pairwise double loop
 c
 c
       subroutine egauss3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -446,7 +444,6 @@ c     method of lights
 c
 c
       subroutine egauss3b
-      use sizes
       use action
       use analyz
       use atomid
@@ -777,7 +774,6 @@ c     pairwise neighbor list
 c
 c
       subroutine egauss3c
-      use sizes
       use action
       use analyz
       use atomid
@@ -1020,7 +1016,6 @@ c     for use with potential energy smoothing
 c
 c
       subroutine egauss3d
-      use sizes
       use action
       use analyz
       use atomid

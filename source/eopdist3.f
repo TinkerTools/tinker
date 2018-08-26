@@ -18,7 +18,6 @@ c     the energy among the atoms
 c
 c
       subroutine eopdist3
-      use sizes
       use action
       use analyz
       use angpot

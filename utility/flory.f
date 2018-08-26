@@ -18,12 +18,12 @@ c     angle coordinates, end-to-end distance and radius of gyration
 c
 c
       program flory
-      use sizes
       use atomid
       use atoms
       use files
       use inform
       use iounit
+      use sizes
       use zcoord
       implicit none
       integer maxset

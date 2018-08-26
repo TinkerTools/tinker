@@ -17,7 +17,6 @@ c     and processes new or changed parameter values
 c
 c
       subroutine kangtor
-      use sizes
       use angtor
       use atmlst
       use atomid

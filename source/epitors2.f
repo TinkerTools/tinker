@@ -17,7 +17,6 @@ c     torsion energy for a single atom using finite difference methods
 c
 c
       subroutine epitors2 (i)
-      use sizes
       use angbnd
       use atoms
       use group
@@ -183,7 +182,6 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine epitors2a (i,de)
-      use sizes
       use atoms
       use bound
       use deriv

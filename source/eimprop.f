@@ -16,7 +16,6 @@ c     "eimprop" calculates the improper dihedral potential energy
 c
 c
       subroutine eimprop
-      use sizes
       use atoms
       use bound
       use energi

@@ -62,6 +62,7 @@ ifort /libs:static testhess.obj tinker.lib %javalib%
 ifort /libs:static testpair.obj tinker.lib %javalib%
 ifort /libs:static testpol.obj tinker.lib %javalib%
 ifort /libs:static testrot.obj tinker.lib %javalib%
+ifort /libs:static testvir.obj tinker.lib %javalib%
 ifort /libs:static timer.obj tinker.lib %javalib%
 ifort /libs:static timerot.obj tinker.lib %javalib%
 ifort /libs:static torsfit.obj tinker.lib %javalib%

@@ -17,7 +17,6 @@ c     initial state, final state and mutation parameter "lambda"
 c
 c
       subroutine mutate
-      use sizes
       use atomid
       use atoms
       use bndstr
@@ -207,7 +206,6 @@ c     on the lambda mutation parameter "tlambda"
 c
 c
       subroutine alttors (ntbnd,itbnd)
-      use sizes
       use mutant
       use potent
       use tors
@@ -260,7 +258,6 @@ c     on the lambda mutation parameter "elambda"
 c
 c
       subroutine altelec
-      use sizes
       use atoms
       use charge
       use mpole

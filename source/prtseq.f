@@ -18,7 +18,6 @@ c     separated by blank lines
 c
 c
       subroutine prtseq (iseq)
-      use sizes
       use files
       use sequen
       implicit none

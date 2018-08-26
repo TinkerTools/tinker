@@ -17,7 +17,6 @@ c     first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eimptor1
-      use sizes
       use atoms
       use bound
       use deriv

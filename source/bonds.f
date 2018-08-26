@@ -17,7 +17,6 @@ c     stores the atom numbers of the atoms defining each bond
 c
 c
       subroutine bonds
-      use sizes
       use atmlst
       use atoms
       use bndstr

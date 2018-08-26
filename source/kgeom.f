@@ -17,7 +17,6 @@ c     to be included in the potential energy calculation
 c
 c
       subroutine kgeom
-      use sizes
       use atomid
       use atoms
       use bound

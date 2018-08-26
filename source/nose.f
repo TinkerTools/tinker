@@ -25,7 +25,6 @@ c     original version written by Teresa Head-Gordon, November 2011
 c
 c
       subroutine nose (istep,dt)
-      use sizes
       use atomid
       use atoms
       use bath
@@ -179,7 +178,6 @@ c     Nose-Hoover chain algorithm
 c
 c
       subroutine hoover (dt,press)
-      use sizes
       use atoms
       use bath
       use boxes

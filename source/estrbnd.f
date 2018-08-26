@@ -16,7 +16,6 @@ c     "estrbnd" calculates the stretch-bend potential energy
 c
 c
       subroutine estrbnd
-      use sizes
       use angbnd
       use angpot
       use atoms

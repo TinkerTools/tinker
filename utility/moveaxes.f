@@ -22,7 +22,6 @@ c     then perpendicular to the z-axis and in the plane
 c
 c
       program moveaxes
-      use sizes
       use atoms
       use iounit
       use mpole
@@ -89,7 +88,6 @@ c     system to the "Bisector" system
 c
 c
       subroutine rotmatx (i,a)
-      use sizes
       use atoms
       use mpole
       implicit none

@@ -95,7 +95,6 @@ c
 c
       subroutine tncg (mode,method,nvar,x0,minimum,grdmin,
      &                       fgvalue,hmatrix,optsave)
-      use sizes
       use atoms
       use hescut
       use inform
@@ -521,7 +520,6 @@ c
       subroutine tnsolve (mode,method,negtest,nvar,p,x0,g,h,
      &                    h_init,h_stop,h_index,h_diag,cycle,
      &                    iter_cg,fg_call,fgvalue,status)
-      use sizes
       use output
       implicit none
       integer i,j,k,nvar,cycle
@@ -759,7 +757,6 @@ c
 c
       subroutine precond (method,iter,nvar,s,r,h,h_init,
      &                       h_stop,h_index,h_diag)
-      use sizes
       use inform
       use iounit
       implicit none

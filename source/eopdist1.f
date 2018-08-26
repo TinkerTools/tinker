@@ -18,7 +18,6 @@ c     the central atom height
 c
 c
       subroutine eopdist1
-      use sizes
       use angpot
       use atoms
       use bound

@@ -17,7 +17,6 @@ c     derivatives for a single atom at a time
 c
 c
       subroutine ehal2 (iatom)
-      use sizes
       use atomid
       use atoms
       use bound

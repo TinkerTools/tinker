@@ -19,7 +19,6 @@ c     and Poisson-Boltzmann solvation models
 c
 c
       subroutine esolv1
-      use sizes
       use atoms
       use deriv
       use energi
@@ -151,7 +150,6 @@ c     the Born radii chain rule term "derb" is an approximation
 c
 c
       subroutine egb1a
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -354,7 +352,6 @@ c     the Born radii chain rule term "derb" is an approximation
 c
 c
       subroutine egb1b
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -564,7 +561,6 @@ c     potential smoothing methods
 c
 c
       subroutine egb1c
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -737,7 +733,6 @@ c     via the generalized Kirkwood plus nonpolar implicit solvation
 c
 c
       subroutine egk1
-      use sizes
       use energi
       use limits
       use potent
@@ -780,7 +775,6 @@ c     model
 c
 c
       subroutine egk1a
-      use sizes
       use atoms
       use charge
       use chgpot
@@ -2347,7 +2341,6 @@ c     a double loop
 c
 c
       subroutine ediff1a
-      use sizes
       use atoms
       use bound
       use boxes
@@ -3282,7 +3275,6 @@ c     a neighbor list
 c
 c
       subroutine ediff1b
-      use sizes
       use atoms
       use bound
       use boxes
@@ -4244,7 +4236,6 @@ c     PB/NP solvation model
 c
 c
       subroutine epb1a
-      use sizes
       use atoms
       use chgpot
       use deriv
@@ -4431,7 +4422,6 @@ c     and derivatives as a sum of cavity and dispersion terms
 c
 c
       subroutine enp1 (ecav,edisp)
-      use sizes
       use atoms
       use atomid
       use deriv
@@ -4606,7 +4596,6 @@ c     and derivatives of a solute
 c
 c
       subroutine ewca1 (edisp)
-      use sizes
       use atoms
       use atomid
       use deriv
@@ -4905,7 +4894,6 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine ehpmf1 (ehp)
-      use sizes
       use atomid
       use atoms
       use couple

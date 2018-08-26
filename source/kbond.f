@@ -18,7 +18,6 @@ c     changed parameter values
 c
 c
       subroutine kbond
-      use sizes
       use atomid
       use atoms
       use bndstr
@@ -319,7 +318,6 @@ c     same bond by increasing powers of 0.62 as in MM3
 c
 c
       subroutine keneg
-      use sizes
       use angbnd
       use atmlst
       use atomid
@@ -516,7 +514,6 @@ c     Molecular Structure, 128, 21-27 (1985)
 c
 c
       subroutine kbondm
-      use sizes
       use atomid
       use bndstr
       use keys

@@ -18,7 +18,6 @@ c     exponential or sigmoidal cooling schedules
 c
 c
       program anneal
-      use sizes
       use atomid
       use atoms
       use bath

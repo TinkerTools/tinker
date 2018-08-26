@@ -18,7 +18,6 @@ c     for SCF iterations in order to monitor convergence
 c
 c
       program testpol
-      use sizes
       use atoms
       use bound
       use inform
@@ -26,21 +25,23 @@ c
       use limits
       use minima
       use polar
+      use polopt
       use polpot
+      use poltcg
       use potent
       use rigid
       use units
       use usage
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer next,kpcg
       integer nvar,iter
       integer itercut
       integer miny
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
-      real*8 rdirect
-      real*8 rpcg,rxpt
+      real*8 rdirect,rpcg
+      real*8 rxpt,rtcg
       real*8 eps,delta
       real*8 optfit
       real*8, allocatable :: var(:)
@@ -51,12 +52,15 @@ c
       real*8, allocatable :: tdirect(:)
       real*8, allocatable :: tpcg(:)
       real*8, allocatable :: txpt(:)
+      real*8, allocatable :: ttcg(:)
       real*8, allocatable :: ddirect(:,:)
       real*8, allocatable :: dpcg(:,:)
       real*8, allocatable :: dxpt(:,:)
+      real*8, allocatable :: dtcg(:,:)
       real*8, allocatable :: udirect(:,:)
       real*8, allocatable :: upcg(:,:)
       real*8, allocatable :: uxpt(:,:)
+      real*8, allocatable :: utcg(:,:)
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull,done
       character*1 answer
@@ -127,46 +131,20 @@ c
       allocate (tdirect(n))
       allocate (tpcg(n))
       allocate (txpt(n))
+      allocate (ttcg(n))
       allocate (ddirect(3,n))
       allocate (dpcg(3,n))
       allocate (dxpt(3,n))
+      allocate (dtcg(3,n))
       allocate (udirect(3,n))
       allocate (upcg(3,n))
       allocate (uxpt(3,n))
+      allocate (utcg(3,n))
       allocate (ustore(3,n,0:maxiter))
 c
 c     perform dynamic allocation of some global arrays
 c
       allocate (uexact(3,n))
-c
-c     get induced dipoles for direct polarization only
-c
-      poltyp = 'DIRECT'
-      call induce
-      do i = 1, n
-         do j = 1, 3
-            udirect(j,i) = debye * uind(j,i)
-            ustore(j,i,0) = udirect(j,i)
-         end do
-      end do
-c
-c     print the direct polarization induced dipole moments
-c
-      if (dofull) then
-         write (iout,40)
-   40    format (/,' Direct Induced Dipole Moments :',
-     &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
-         do i = 1, n
-            if (use(i)) then
-               ux = udirect(1,i)
-               uy = udirect(2,i)
-               uz = udirect(3,i)
-               u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,50)  i,ux,uy,uz,u2
-   50          format (i8,4x,4f14.6)
-            end if
-         end do
-      end if
 c
 c     find PCG induced dipoles for increasing iteration counts
 c
@@ -198,9 +176,9 @@ c
                end do
             end if
          end if
-         if (drms(k) .lt. 0.5d0*poleps)  goto 60
+         if (drms(k) .lt. 0.5d0*poleps)  goto 40
       end do
-   60 continue
+   40 continue
       maxiter = politer
       do i = 1, n
          do j = 1, 3
@@ -208,7 +186,25 @@ c
          end do
       end do
 c
-c     print the iterative PCG and exact SCF induced dipoles
+c     print the fully converged SCF induced dipole moments
+c
+      if (dofull) then
+         write (iout,50)
+   50    format (/,' Exact SCF Induced Dipole Moments :',
+     &           //,4x,'Atom',14x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
+         do i = 1, n
+            if (use(i) .and. douind(i)) then
+               ux = uexact(1,i)
+               uy = uexact(2,i)
+               uz = uexact(3,i)
+               u2 = sqrt(ux*ux+uy*uy+uz*uz)
+               write (iout,60)  i,ux,uy,uz,u2
+   60          format (i8,4x,4f14.6)
+            end if
+         end do
+      end if
+c
+c     print the iterative PCG induced dipole moments
 c
       if (dofull) then
          write (iout,70)  kpcg
@@ -216,7 +212,7 @@ c
      &              4x,'(',i3,' Iterations)',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
-            if (use(i)) then
+            if (use(i) .and. douind(i)) then
                ux = upcg(1,i)
                uy = upcg(2,i)
                uz = upcg(3,i)
@@ -225,14 +221,30 @@ c
    80          format (i8,4x,4f14.6)
             end if
          end do
+      end if
+c
+c     get induced dipoles for direct polarization only
+c
+      poltyp = 'DIRECT'
+      call induce
+      do i = 1, n
+         do j = 1, 3
+            udirect(j,i) = debye * uind(j,i)
+            ustore(j,i,0) = udirect(j,i)
+         end do
+      end do
+c
+c     print the direct polarization induced dipole moments
+c
+      if (dofull) then
          write (iout,90)
-   90    format (/,' Exact SCF Induced Dipole Moments :',
-     &           //,4x,'Atom',14x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
+   90    format (/,' Direct Induced Dipole Moments :',
+     &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
-            if (use(i)) then
-               ux = uexact(1,i)
-               uy = uexact(2,i)
-               uz = uexact(3,i)
+            if (use(i) .and. douind(i)) then
+               ux = udirect(1,i)
+               uy = udirect(2,i)
+               uz = udirect(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
                write (iout,100)  i,ux,uy,uz,u2
   100          format (i8,4x,4f14.6)
@@ -243,10 +255,8 @@ c
 c     get induced dipoles from OPT extrapolation method
 c
       poltyp = savetyp
-      if (poltyp(1:3) .ne. 'OPT') then
-         poltyp = 'OPT4'
-         call kpolar
-      end if
+      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT'
+      call kpolar
       call induce
       do i = 1, n
          do j = 1, 3
@@ -258,10 +268,10 @@ c     print the OPT extrapolation induced dipole moments
 c
       if (dofull) then
          write (iout,110)  coptmax
-  110    format (/,' Extrapolated OPT',i1,' Induced Dipole Moments :',
+  110    format (/,' Analytical OPT',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
-            if (use(i)) then
+            if (use(i) .and. douind(i)) then
                ux = uxpt(1,i)
                uy = uxpt(2,i)
                uz = uxpt(3,i)
@@ -272,80 +282,127 @@ c
          end do
       end if
 c
+c     get induced dipoles from TCG analytical dipole method
+c
+      poltyp = savetyp
+      if (poltyp(1:3) .ne. 'TCG')  poltyp = 'TCG'
+      call kpolar
+      call induce
+      do i = 1, n
+         do j = 1, 3
+            utcg(j,i) = debye * uind(j,i)
+         end do
+      end do
+c
+c     print the TCG analytical induced dipole moments
+c
+      if (dofull) then
+         write (iout,130)  tcgorder
+  130    format (/,' Analytical TCG',i1,' Induced Dipole Moments :',
+     &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
+         do i = 1, n
+            if (use(i) .and. douind(i)) then
+               ux = utcg(1,i)
+               uy = utcg(2,i)
+               uz = utcg(3,i)
+               u2 = sqrt(ux*ux+uy*uy+uz*uz)
+               write (iout,140)  i,ux,uy,uz,u2
+  140          format (i8,4x,4f14.6)
+            end if
+         end do
+      end if
+c
 c     find differences between approximate and exact dipoles
 c
       rdirect = 0.0d0
       rpcg = 0.0d0
       rxpt = 0.0d0
+      rtcg = 0.0d0
+      m = 0
       do i = 1, n
-         do j = 1, 3
-            ddirect(j,i) = udirect(j,i) - uexact(j,i)
-            dpcg(j,i) = upcg(j,i) - uexact(j,i)
-            dxpt(j,i) = uxpt(j,i) - uexact(j,i)
-         end do
-         tdirect(i) = sqrt(ddirect(1,i)**2+ddirect(2,i)**2
-     &                           +ddirect(3,i)**2)
-         tpcg(i) = sqrt(dpcg(1,i)**2+dpcg(2,i)**2+dpcg(3,i)**2)
-         txpt(i) = sqrt(dxpt(1,i)**2+dxpt(2,i)**2+dxpt(3,i)**2)
-         rdirect = rdirect + tdirect(i)**2
-         rpcg = rpcg + tpcg(i)**2
-         rxpt = rxpt + txpt(i)**2
+         if (use(i) .and. douind(i)) then
+            m = m + 1
+            do j = 1, 3
+               ddirect(j,i) = udirect(j,i) - uexact(j,i)
+               dpcg(j,i) = upcg(j,i) - uexact(j,i)
+               dxpt(j,i) = uxpt(j,i) - uexact(j,i)
+               dtcg(j,i) = utcg(j,i) - uexact(j,i)
+            end do
+            tdirect(i) = sqrt(ddirect(1,i)**2+ddirect(2,i)**2
+     &                              +ddirect(3,i)**2)
+            tpcg(i) = sqrt(dpcg(1,i)**2+dpcg(2,i)**2+dpcg(3,i)**2)
+            txpt(i) = sqrt(dxpt(1,i)**2+dxpt(2,i)**2+dxpt(3,i)**2)
+            ttcg(i) = sqrt(dtcg(1,i)**2+dtcg(2,i)**2+dtcg(3,i)**2)
+            rdirect = rdirect + tdirect(i)**2
+            rpcg = rpcg + tpcg(i)**2
+            rxpt = rxpt + txpt(i)**2
+            rtcg = rtcg + ttcg(i)**2
+         end if
       end do
-      rdirect = sqrt(rdirect/dble(n))
-      rpcg = sqrt(rpcg/dble(n))
-      rxpt = sqrt(rxpt/dble(n))
+      rdirect = sqrt(rdirect/dble(m))
+      rpcg = sqrt(rpcg/dble(m))
+      rxpt = sqrt(rxpt/dble(m))
+      rtcg = sqrt(rtcg/dble(m))
 c
 c     print the RMS between approximate and exact dipoles
 c
-      write (iout,130)  coptmax
-  130 format (/,' Approximate vs. Exact Induced Dipoles :',
-     &        //,4x,'Atom',14x,'Direct',14x,'PCG',14x,'OPT',i1)
+      write (iout,150)  coptmax,tcgorder
+  150 format (/,' Approximate vs. Exact Induced Dipoles :',
+     &        //,4x,'Atom',14x,'Direct',12x,'PCG',12x,'OPT',i1,
+     &           12x,'TCG',i1)
       if (dofull) then
-         write (iout,140)
-  140    format ()
+         write (iout,160)
+  160    format ()
          do i = 1, n
-            if (use(i)) then
-               write (iout,150)  i,tdirect(i),tpcg(i),txpt(i)
-  150          format (i8,4x,3f18.10)
+            if (use(i) .and. douind(i)) then
+               write (iout,170)  i,tdirect(i),tpcg(i),txpt(i),ttcg(i)
+  170          format (i8,6x,4f16.10)
             end if
          end do
       end if
-      write (iout,160)  rdirect,rpcg,rxpt
-  160 format (/,5x,'RMS',4x,3f18.10)
+      write (iout,180)  rdirect,rpcg,rxpt,rtcg
+  180 format (/,5x,'RMS',6x,4f16.10)
 c
 c     find the RMS of each iteration from the exact dipoles
 c
       do k = 0, maxiter
          sum = 0.0d0
+         m = 0
          do i = 1, n
-            do j = 1, 3
-               sum = sum + (ustore(j,i,k)-uexact(j,i))**2
-            end do
+            if (use(i) .and. douind(i)) then
+               m = m + 1
+               do j = 1, 3
+                  sum = sum + (ustore(j,i,k)-uexact(j,i))**2
+               end do
+            end if
          end do
-         rms(k) = sqrt(sum/dble(npolar))
+         rms(k) = sqrt(sum/dble(m))
       end do
 c
 c     print the RMS between iterations and versus exact dipoles
 c
-      write (iout,170)
-  170 format (/,' Iterative PCG Induced Dipole Convergence :',
+      write (iout,190)
+  190 format (/,' Iterative PCG Induced Dipole Convergence :',
      &        //,4x,'Iter',12x,'RMS Change',11x,'RMS vs Exact')
-      write (iout,180)  0,rms(0)
-  180 format (/,i8,15x,'----',6x,f20.10)
+      write (iout,200)  0,rms(0)
+  200 format (/,i8,15x,'----',6x,f20.10)
       do k = 1, maxiter
-         write (iout,190)  k,drms(k),rms(k)
-  190    format (i8,2x,f20.10,3x,f20.10)
-         if (rms(k) .lt. 0.5d0*poleps)  goto 200
+         write (iout,210)  k,drms(k),rms(k)
+  210    format (i8,2x,f20.10,3x,f20.10)
+         if (rms(k) .lt. 0.5d0*poleps)  goto 220
       end do
-  200 continue
+  220 continue
 c
 c     refine the extrapolated OPT coefficients via optimization
 c
-      maxiter = 10000
+      poltyp = savetyp
+      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT'
+      call kpolar
+      maxiter = 1000
       eps = 0.033d0
       delta = 0.0001d0
-      write (iout,210)  coptmax
-  210 format (/,' Extrapolated OPT',i1,' Coefficient Refinement :',
+      write (iout,230)  coptmax
+  230 format (/,' Analytical OPT',i1,' Coefficient Refinement :',
      &        //,4x,'Iter',8x,'C0',8x,'C1',8x,'C2',8x,'C3',
      &           8x,'C4',6x,'RMS vs Exact',/)
 c
@@ -396,8 +453,8 @@ c
             copt(i) = p(miny,nvar)
          end if
       end do
-      write (iout,220)  iter,(copt(i),i=0,maxopt),rxpt
-  220 format (i8,1x,5f10.3,f17.10)
+      write (iout,240)  iter,(copt(i),i=0,maxopt),rxpt
+  240 format (i8,1x,5f10.3,f17.10)
 c
 c     perform deallocation of some local arrays
 c
@@ -431,14 +488,15 @@ c     ##############################################################
 c
 c
       function optfit (var)
-      use sizes
       use atoms
       use iounit
       use polar
+      use polopt
       use polpot
       use units
+      use usage
       implicit none
-      integer i,j
+      integer i,j,k
       integer iter,nvar
       real*8 optfit
       real*8 rxpt
@@ -475,19 +533,19 @@ c     compute RMS error between OPT and exact SCF dipoles
 c
       poltyp = 'OPT'
       call induce
-      do i = 1, n
-         do j = 1, 3
-            uxpt(j,i) = debye * uind(j,i)
-         end do
-      end do
       rxpt = 0.0d0
+      k = 0
       do i = 1, n
-         do j = 1, 3
-            rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**2
-c           rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**6
-         end do
+         if (use(i) .and. douind(i)) then
+            k = k + 1
+            do j = 1, 3
+               uxpt(j,i) = debye * uind(j,i)
+               rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**2
+c              rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**6
+            end do
+         end if
       end do
-      rxpt = sqrt(rxpt/dble(n))
+      rxpt = sqrt(rxpt/dble(k))
       if (mod(iter,100) .eq. 0) then
          write (iout,10)  iter,(copt(i),i=0,maxopt),rxpt
    10    format (i8,1x,5f10.3,f17.10)

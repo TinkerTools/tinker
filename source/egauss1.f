@@ -18,7 +18,6 @@ c     to Cartesian coordinates
 c
 c
       subroutine egauss1
-      use sizes
       use limits
       use warp
       implicit none
@@ -52,7 +51,6 @@ c     double loop
 c
 c
       subroutine egauss1a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -515,7 +513,6 @@ c     coordinates using the method of lights
 c
 c
       subroutine egauss1b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -867,7 +864,6 @@ c     coordinates using a pairwise neighbor list
 c
 c
       subroutine egauss1c
-      use sizes
       use atomid
       use atoms
       use bound
@@ -1143,7 +1139,6 @@ c     potential energy smoothing
 c
 c
       subroutine egauss1d
-      use sizes
       use atomid
       use atoms
       use couple

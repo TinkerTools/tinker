@@ -18,7 +18,6 @@ c     also partitions the energy among the atoms
 c
 c
       subroutine eopbend3
-      use sizes
       use action
       use analyz
       use angbnd

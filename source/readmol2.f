@@ -17,7 +17,6 @@ c     external disk file
 c
 c
       subroutine readmol2 (imol2)
-      use sizes
       use atomid
       use atoms
       use couple

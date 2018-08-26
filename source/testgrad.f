@@ -18,7 +18,6 @@ c     to Cartesian coordinates
 c
 c
       program testgrad
-      use sizes
       use atoms
       use deriv
       use energi
@@ -117,7 +116,7 @@ c     get the stepsize for numerical gradient calculation
 c
       if (donumer) then
          eps = -1.0d0
-         eps0 = 1.0d-5
+         eps0 = 0.00001d0
          query = .true.
          call nextarg (string,exist)
          if (exist) then

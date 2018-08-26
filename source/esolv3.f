@@ -19,7 +19,6 @@ c     the energy among the atoms
 c
 c
       subroutine esolv3
-      use sizes
       use action
       use analyz
       use atomid
@@ -217,7 +216,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine egb3a
-      use sizes
       use action
       use analyz
       use atoms
@@ -363,7 +361,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine egb3b
-      use sizes
       use action
       use analyz
       use atoms
@@ -521,7 +518,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine egb3c
-      use sizes
       use action
       use analyz
       use atoms
@@ -676,7 +672,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine egk3a
-      use sizes
       use action
       use analyz
       use atoms
@@ -1160,7 +1155,6 @@ c     dipoles to their generalized Kirkwood values with energy analysis
 c
 c
       subroutine ediff3
-      use sizes
       use action
       use analyz
       use atoms
@@ -1426,7 +1420,6 @@ c     the atoms
 c
 c
       subroutine epb3
-      use sizes
       use analyz
       use atoms
       use chgpot
@@ -1482,7 +1475,6 @@ c     energy among the atoms
 c
 c
       subroutine enp3 (ecav,aecav,edisp,aedisp)
-      use sizes
       use atomid
       use atoms
       use kvdws
@@ -1619,7 +1611,6 @@ c     of a solute; also partitions the energy among the atoms
 c
 c
       subroutine ewca3 (edisp,aedisp)
-      use sizes
       use atoms
       use atomid
       use deriv
@@ -1843,7 +1834,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine ewca3x (edisp,aedisp)
-      use sizes
       use atoms
       use atomid
       use couple
@@ -2089,7 +2079,6 @@ c     Structure Prediction", Structure, 15, 727-740 (2007)
 c
 c
       subroutine ehpmf3 (ehp,nehp,aehp)
-      use sizes
       use atomid
       use atoms
       use couple

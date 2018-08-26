@@ -17,7 +17,6 @@ c     surface deformation for use with potential energy smoothing
 c
 c
       subroutine flatten
-      use sizes
       use atoms
       use fields
       use inform

@@ -18,7 +18,6 @@ c     all atom pairs or only those specified by the user
 c
 c
       program superpose
-      use sizes
       use align
       use atomid
       use atoms

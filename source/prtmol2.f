@@ -17,7 +17,6 @@ c     format to an external disk file
 c
 c
       subroutine prtmol2 (imol2)
-      use sizes
       use atomid
       use atoms
       use bndstr

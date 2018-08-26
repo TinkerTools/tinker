@@ -17,7 +17,6 @@ c     coordinates list and shifts the remaining atoms
 c
 c
       subroutine delete (iatom)
-      use sizes
       use atomid
       use atoms
       use couple

@@ -22,7 +22,6 @@ c        mode = 3     use dihedral angles in all cases
 c
 c
       subroutine makeint (mode)
-      use sizes
       use atoms
       use couple
       use iounit

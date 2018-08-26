@@ -17,7 +17,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine ebond3
-      use sizes
       use action
       use analyz
       use atomid

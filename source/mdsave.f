@@ -18,7 +18,6 @@ c     also checks for user requested termination of a simulation
 c
 c
       subroutine mdsave (istep,dt,epot,eksum)
-      use sizes
       use atomid
       use atoms
       use bound

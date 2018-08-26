@@ -17,7 +17,6 @@ c     dihedral angle energy for a single atom
 c
 c
       subroutine eimprop2 (i)
-      use sizes
       use atoms
       use bound
       use group

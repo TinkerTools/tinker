@@ -18,7 +18,6 @@ c     different methods for finding pairwise neighbors
 c
 c
       program testpair
-      use sizes
       use atoms
       use deriv
       use energi
@@ -563,7 +562,6 @@ c     and allocates arrays used by different pairwise neighbor methods
 c
 c
       subroutine setpair (mode)
-      use sizes
       use atoms
       use limits
       use neigh

@@ -18,7 +18,6 @@ c     atom at a time
 c
 c
       subroutine extra2 (i)
-      use sizes
       use atoms
       use hessn
       implicit none

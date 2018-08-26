@@ -19,7 +19,6 @@ c     Gaussian basin and spherical droplet restraints
 c
 c
       subroutine egeom1
-      use sizes
       use atomid
       use atoms
       use bound

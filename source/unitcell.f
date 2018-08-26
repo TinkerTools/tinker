@@ -35,7 +35,7 @@ c
       use_bounds = .false.
       use_replica = .false.
 c
-c     set the default values for the unitcell variables
+c     set the default values for the unit cell variables
 c
       orthogonal = .false.
       monoclinic = .false.

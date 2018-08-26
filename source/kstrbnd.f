@@ -17,7 +17,6 @@ c     and processes new or changed parameter values
 c
 c
       subroutine kstrbnd
-      use sizes
       use angbnd
       use angpot
       use atmlst
@@ -214,7 +213,6 @@ c     616-641 (1995)
 c
 c
       subroutine kstrbndm
-      use sizes
       use angbnd
       use atmlst
       use atomid

@@ -18,7 +18,6 @@ c     for biopolymers, a sequence file
 c
 c
       program pdbxyz
-      use sizes
       use atomid
       use atoms
       use couple
@@ -270,7 +269,6 @@ c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
       subroutine ribosome (ichn)
-      use sizes
       use atoms
       use fields
       use files
@@ -695,7 +693,6 @@ c     set as absolute values, not relative to the CB atom
 c
 c
       subroutine addside (resname,ires,start,stop,cai,ni,ci,si)
-      use sizes
       use atoms
       use resdue
       use sequen
@@ -1507,7 +1504,6 @@ c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
       subroutine ligase (ichn)
-      use sizes
       use atoms
       use files
       use iounit
@@ -1737,7 +1733,6 @@ c     and connectivity data generated
 c
 c
       subroutine addbase (resname,ires,start,stop,c1i)
-      use sizes
       use atoms
       implicit none
       integer i,ires
@@ -2020,7 +2015,6 @@ c     Bank format to a Cartesian coordinate file and sequence file
 c
 c
       subroutine hetatom
-      use sizes
       use atoms
       use pdb
       implicit none
@@ -2080,7 +2074,6 @@ c     and atomic connectivities
 c
 c
       subroutine oldatm (i,bionum,i1,ires)
-      use sizes
       use atomid
       use atoms
       use fields
@@ -2133,7 +2126,6 @@ c     in the original Protein Data Bank file
 c
 c
       subroutine newatm (i,bionum,ia,bond,ib,angle1,ic,angle2,chiral)
-      use sizes
       use atomid
       use atoms
       use fields
@@ -2185,7 +2177,6 @@ c     order to generate a direct connection between two atoms
 c
 c
       subroutine addbond (i,j)
-      use sizes
       use couple
       implicit none
       integer i,j
@@ -2216,7 +2207,6 @@ c     type was not found
 c
 c
       subroutine findatm (name,start,stop,ipdb)
-      use sizes
       use pdb
       implicit none
       integer i,ipdb

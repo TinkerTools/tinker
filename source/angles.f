@@ -19,7 +19,6 @@ c     atom is stored for use in out-of-plane bending
 c
 c
       subroutine angles
-      use sizes
       use angbnd
       use atmlst
       use atoms

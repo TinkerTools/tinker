@@ -28,7 +28,6 @@ c     Section 6.7.4
 c
 c
       program monte
-      use sizes
       use atoms
       use files
       use inform
@@ -524,7 +523,6 @@ c     via Cartesian minimization following a Monte Carlo step
 c
 c
       subroutine mcmstep (minimum,grdmin)
-      use sizes
       use atoms
       use bound
       use files
@@ -609,7 +607,6 @@ c     coordinate space
 c
 c
       function mcm1 (xx,g)
-      use sizes
       use atoms
       use usage
       implicit none
@@ -677,7 +674,6 @@ c     coordinate space
 c
 c
       subroutine mcm2 (mode,xx,h,hinit,hstop,hindex,hdiag)
-      use sizes
       use atoms
       use usage
       implicit none

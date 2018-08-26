@@ -26,7 +26,6 @@ c     Computational Chemistry, 15, 1302-1310 (1994)
 c
 c
       subroutine sdstep (istep,dt)
-      use sizes
       use atoms
       use atomid
       use freeze
@@ -177,7 +176,6 @@ c     update positions and velocities during stochastic dynamics
 c
 c
       subroutine sdterm (istep,dt,pfric,vfric,afric,prand,vrand)
-      use sizes
       use atoms
       use atomid
       use bath
@@ -326,7 +324,6 @@ c     Molecular Simulation, 1, 369-383 (1988)
 c
 c
       subroutine sdarea (istep)
-      use sizes
       use atoms
       use atomid
       use couple

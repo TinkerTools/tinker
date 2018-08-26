@@ -24,7 +24,6 @@ c     8, 786-798 (1999)  [heavy hydrogen reweighting]
 c
 c
       subroutine katom
-      use sizes
       use atomid
       use atoms
       use couple

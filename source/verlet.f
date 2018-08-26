@@ -17,7 +17,6 @@ c     via the velocity Verlet multistep recursion formula
 c
 c
       subroutine verlet (istep,dt)
-      use sizes
       use atomid
       use atoms
       use freeze

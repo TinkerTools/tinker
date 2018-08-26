@@ -469,7 +469,6 @@ c     for a GDA integration step; also saves the coordinates
 c
 c
       subroutine gdastat (nstep,beta,xx,status)
-      use sizes
       use atoms
       use iounit
       use math

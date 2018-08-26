@@ -15,16 +15,21 @@ c
 c     "kpolar" assigns atomic dipole polarizabilities to the atoms
 c     within the structure and processes any new or changed values
 c
-c     literature reference:
+c     literature references:
 c
 c     A. C. Simmonett, F. C. Pickard IV, J. W. Ponder and B. R. Brooks,
 c     "An Empirical Extrapolation Scheme for Efficient Treatment of
 c     Induced Dipoles", Journal of Chemical Physics, 145, 164101 (2016)
 c     [OPT coefficients]
 c
+c     F. Aviat, L. Lagardere and J.-P. Piquemal, "The Truncated
+c     Conjugate Gradient (TCG), a Non-Iterative/Fixed-Cost Strategy for
+c     Computing Polarization in Molecular Dynamics: Fast Evaluation of
+c     Analytical Forces", Journal of Chemical Physics, 147, 161724
+c     (2018)  [TCG method]
+c
 c
       subroutine kpolar
-      use sizes
       use atoms
       use inform
       use iounit
@@ -33,7 +38,9 @@ c
       use mpole
       use neigh
       use polar
+      use polopt
       use polpot
+      use poltcg
       use potent
       use usolve
       implicit none
@@ -69,11 +76,11 @@ c
 c
 c     set defaults for OPT induced dipole coefficients
 c
-      if (poltyp .eq. 'OPT')  poltyp = 'OPT3'
       do i = 0, maxopt
          copt(i) = 0.0d0
          copm(i) = 0.0d0
       end do
+      if (poltyp .eq. 'OPT')  poltyp = 'OPT4  '
       if (poltyp .eq. 'OPT1') then
          copt(0) = 0.412d0
          copt(1) = 0.784d0
@@ -95,6 +102,24 @@ c
       end if
       if (poltyp(1:3) .eq. 'OPT')  poltyp = 'OPT   '
 c
+c     set defaults for TCG induced dipole parameters
+c
+      tcgorder = 0
+      tcgprec = .false.
+      tcgpeek = .false.
+      tcgomega = 1.0d0
+      if (poltyp .eq. 'TCG')  poltyp = 'TCG2  '
+      if (poltyp .eq. 'TCG0') then
+         poltyp = 'DIRECT'
+      else if (poltyp .eq. 'TCG1') then
+         poltyp = 'TCG   '
+         tcgorder = 1
+      else if (poltyp .eq. 'TCG2') then
+         poltyp = 'TCG   '
+         tcgorder = 2
+      end if
+      if (poltyp(1:3) .eq. 'TCG')  poltyp = 'TCG   '
+c
 c     get keywords containing polarization-related options
 c
       do j = 1, nkey
@@ -109,26 +134,34 @@ c
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
-         else if (keyword(1:10) .eq. 'POLAR-OPT ') then
+         else if (keyword(1:10) .eq. 'OPT-COEFF ') then
             do i = 0, maxopt
                copt(i) = 0.0d0
             end do
             read (string,*,err=20,end=20)  (copt(i),i=0,maxopt)
+         else if (keyword(1:12) .eq. 'TCG-PRECOND ') then
+            tcgprec = .true.
+         else if (keyword(1:9) .eq. 'TCG-PEEK ') then
+            tcgpeek = .true.
+         else if (keyword(1:10) .eq. 'TCG-OMEGA ') then
+            read (string,*,err=20,end=20)  tcgomega
          end if
    20    continue
       end do
 c
 c     get maximum coefficient order for OPT induced dipoles
 c
-      coptmax = 0
-      do i = 1, maxopt
-         if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
-      end do
-      do i = 0, coptmax
-         do j = coptmax, i, -1
-            copm(i) = copm(i) + copt(j)
+      if (poltyp .eq. 'OPT') then
+         coptmax = 0
+         do i = 1, maxopt
+            if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
          end do
-      end do
+         do i = 0, coptmax
+            do j = coptmax, i, -1
+               copm(i) = copm(i) + copt(j)
+            end do
+         end do
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -292,6 +325,7 @@ c
       if (use_polar .or. use_solv) then
          npole = 0
          do i = 1, n
+            if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
             if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
                npole = npole + 1
                ipole(npole) = i
@@ -359,7 +393,6 @@ c     connectivities
 c
 c
       subroutine polargrp
-      use sizes
       use atoms
       use couple
       use inform

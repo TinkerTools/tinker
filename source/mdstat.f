@@ -18,7 +18,6 @@ c     and to periodically save the state of the trajectory
 c
 c
       subroutine mdstat (istep,dt,etot,epot,ekin,temp,pres)
-      use sizes
       use atoms
       use bath
       use bound

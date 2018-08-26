@@ -17,7 +17,6 @@ c     energy at trigonal centers via the central atom height
 c
 c
       subroutine eopdist
-      use sizes
       use angpot
       use atoms
       use bound

@@ -18,13 +18,13 @@ c     and dimer structures and interaction energies
 c
 c
       program xtalfit
-      use sizes
       use bound
       use boxes
       use files
       use iounit
       use molcul
       use potent
+      use sizes
       use vdwpot
       use xtals
       implicit none
@@ -349,7 +349,6 @@ c     energy terms
 c
 c
       subroutine xtalprm (mode,ixtal,xx)
-      use sizes
       use atoms
       use atomid
       use bound
@@ -582,7 +581,6 @@ c     gradient with respect to structural parameters
 c
 c
       subroutine xtalerr (nvaried,nresid,xx,resid)
-      use sizes
       use atoms
       use boxes
       use bound
@@ -813,7 +811,6 @@ c     rigid molecules during optimization of force field parameters
 c
 c
       subroutine xtalmove
-      use sizes
       use atoms
       use atomid
       use boxes

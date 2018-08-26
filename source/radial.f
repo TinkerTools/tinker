@@ -17,7 +17,6 @@ c     pair of atom types via analysis of a set of coordinate frames
 c
 c
       program radial
-      use sizes
       use argue
       use atomid
       use atoms

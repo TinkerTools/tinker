@@ -17,7 +17,6 @@ c     coordinates to an external disk file
 c
 c
       subroutine prtint (izmt)
-      use sizes
       use atomid
       use atoms
       use files

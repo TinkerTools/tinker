@@ -18,7 +18,6 @@ c     evaluations
 c
 c
       subroutine hessrgd (hrigid)
-      use sizes
       use atoms
       use group
       use rigid

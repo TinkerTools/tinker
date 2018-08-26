@@ -26,7 +26,6 @@ c     accurate Hessian at the expense of increased computation time
 c
 c
       subroutine empole2 (i)
-      use sizes
       use atoms
       use deriv
       use hessn
@@ -209,7 +208,6 @@ c     derivatives
 c
 c
       subroutine empole2a (nlist,list)
-      use sizes
       use atoms
       use bound
       use boxes
@@ -836,7 +834,6 @@ c     derivatives
 c
 c
       subroutine empole2b (nlist,list)
-      use sizes
       use atoms
       use bound
       use chgpot

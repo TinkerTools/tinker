@@ -17,7 +17,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine eurey3
-      use sizes
       use action
       use analyz
       use atomid

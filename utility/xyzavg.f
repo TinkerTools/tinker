@@ -18,7 +18,6 @@ c     been superimposed
 c
 c
       program xyzavg
-      use sizes
       use atoms
       use inform
       use iounit

@@ -119,7 +119,9 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pitors.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pme.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polar.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polgrp.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polopt.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polpot.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp poltcg.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp potent.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp potfit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp precis.f
@@ -451,7 +453,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp overlap.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp path.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pdbxyz.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp picalc.f
-ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pmestuff.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pmestuf.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pmpb.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polarize.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp poledit.f
@@ -504,7 +506,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp server.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp shakeup.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sigmoid.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp simplex.f
-ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sktstuff.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sktstuf.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sniffer.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sort.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp spacefill.f
@@ -515,12 +517,14 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp superpose.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp surface.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp surfatom.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp switch.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp tcgstuf.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp temper.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp testgrad.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp testhess.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp testpair.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp testpol.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp testrot.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp testvir.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp timer.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp timerot.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp tncg.f

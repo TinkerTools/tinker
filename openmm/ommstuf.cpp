@@ -416,9 +416,6 @@ struct {
    int bmnmix;
    double arespa;
    int dorest;
-   int velsave;
-   int frcsave;
-   int uindsave;
    char integrate[MAX_STRING];
 } mdstuf__;
 
@@ -530,12 +527,7 @@ struct {
 } pme__;
 
 struct {
-   int maxopt;
    int npolar;
-   int coptmax;
-   int optlevel;
-   double* copt;
-   double* copm;
    double* polarity;
    double* thole;
    double* pdamp;
@@ -547,12 +539,6 @@ struct {
    double* uinp;
    double* uinds;
    double* uinps;
-   double* uopt;
-   double* uoptp;
-   double* uopts;
-   double* uoptps;
-   double* fopt;
-   double* foptp;
    double* uexact;
    int* douind;
 } polar__;
@@ -571,6 +557,20 @@ struct {
    int* ip13;
    int* ip14;
 } polgrp__;
+
+struct {
+   int maxopt;
+   int coptmax;
+   int optlevel;
+   double* copt;
+   double* copm;
+   double* uopt;
+   double* uoptp;
+   double* uopts;
+   double* uoptps;
+   double* fopt;
+   double* foptp;
+} polopt__;
 
 struct {
    int politer;
@@ -1269,18 +1269,14 @@ void set_limits_data_ (double* vdwcut, double* chgcut, double* dplcut,
    limits__.use_ulist = *use_ulist;
 }
 
-void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix, double* arespa,
-                       int* dorest, int* velsave, int* frcsave, int* uindsave,
-                       char* integrate) {
+void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix,
+                       double* arespa, int* dorest, char* integrate) {
 
    mdstuf__.nfree = *nfree;
    mdstuf__.irest = *irest;
    mdstuf__.bmnmix = *bmnmix;
    mdstuf__.arespa = *arespa;
    mdstuf__.dorest = *dorest;
-   mdstuf__.velsave = *velsave;
-   mdstuf__.frcsave = *frcsave;
-   mdstuf__.uindsave = *uindsave;
    setNullTerminator (integrate, 11, mdstuf__.integrate);
 }
 
@@ -1417,21 +1413,13 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* bsorder,
    pme__.qfac = qfac;
 }
 
-void set_polar_data_ (int* maxopt, int* npolar, int* coptmax, int*optlevel,
-                      double* copt, double* copm, double* polarity,
-                      double* thole, double* pdamp, double* udir,
-                      double* udirp, double* udirs, double* udirps,
-                      double* uind, double* uinp, double* uinds,
-                      double* uinps, double* uopt, double* uoptp,
-                      double* uopts, double* uoptps, double* fopt,
-                      double* foptp, double* uexact, int* douind) {
+void set_polar_data_ (int* npolar, double* polarity, double* thole,
+                      double* pdamp, double* udir, double* udirp,
+                      double* udirs, double* udirps, double* uind,
+                      double* uinp, double* uinds, double* uinps,
+                      double* uexact, int* douind) {
 
-   polar__.maxopt = *maxopt;
    polar__.npolar = *npolar;
-   polar__.coptmax = *coptmax;
-   polar__.optlevel = *optlevel;
-   polar__.copt = copt;
-   polar__.copm = copm;
    polar__.polarity = polarity;
    polar__.thole = thole;
    polar__.pdamp = pdamp;
@@ -1443,12 +1431,6 @@ void set_polar_data_ (int* maxopt, int* npolar, int* coptmax, int*optlevel,
    polar__.uinp = uinp;
    polar__.uinds = uinds;
    polar__.uinps = uinps;
-   polar__.uopt = uopt;
-   polar__.uoptp = uoptp;
-   polar__.uopts = uopts;
-   polar__.uoptps = uoptps;
-   polar__.fopt = fopt;
-   polar__.foptp = foptp;
    polar__.uexact = uexact;
    polar__.douind = douind;
 }
@@ -1469,6 +1451,24 @@ void set_polgrp_data_ (int* maxp11, int* maxp12, int* maxp13, int* maxp14,
    polgrp__.ip12 = ip12;
    polgrp__.ip13 = ip13;
    polgrp__.ip14 = ip14;
+}
+
+void set_polopt_data_ (int* maxopt, int* coptmax, int*optlevel,
+                       double* copt, double* copm, double* uopt,
+                       double* uoptp, double* uopts, double* uoptps,
+                       double* fopt, double* foptp) {
+
+   polopt__.maxopt = *maxopt;
+   polopt__.coptmax = *coptmax;
+   polopt__.optlevel = *optlevel;
+   polopt__.copt = copt;
+   polopt__.copm = copm;
+   polopt__.uopt = uopt;
+   polopt__.uoptp = uoptp;
+   polopt__.uopts = uopts;
+   polopt__.uoptps = uoptps;
+   polopt__.fopt = fopt;
+   polopt__.foptp = foptp;
 }
 
 void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
@@ -3068,28 +3068,28 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
       OpenMM_AmoebaMultipoleForce_setPolarizationType (amoebaMultipoleForce,
                                    OpenMM_AmoebaMultipoleForce_Direct);
    } else if (strncasecmp (polpot__.poltyp, "OPT", 3) == 0) {
-      if (polar__.copt[4] != 0.0) {
+      if (polopt__.copt[4] != 0.0) {
          exptCoefficients = OpenMM_DoubleArray_create (5);
-         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
-         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
-         OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
-         OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.copt[3]);
-         OpenMM_DoubleArray_set (exptCoefficients, 4, polar__.copt[4]);
-      } else if (polar__.copt[3] != 0.0) {
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polopt__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polopt__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 2, polopt__.copt[2]);
+         OpenMM_DoubleArray_set (exptCoefficients, 3, polopt__.copt[3]);
+         OpenMM_DoubleArray_set (exptCoefficients, 4, polopt__.copt[4]);
+      } else if (polopt__.copt[3] != 0.0) {
          exptCoefficients = OpenMM_DoubleArray_create (4);
-         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
-         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
-         OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
-         OpenMM_DoubleArray_set (exptCoefficients, 3, polar__.copt[3]);
-      } else if (polar__.copt[2] != 0.0) {
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polopt__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polopt__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 2, polopt__.copt[2]);
+         OpenMM_DoubleArray_set (exptCoefficients, 3, polopt__.copt[3]);
+      } else if (polopt__.copt[2] != 0.0) {
          exptCoefficients = OpenMM_DoubleArray_create (3);
-         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
-         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
-         OpenMM_DoubleArray_set (exptCoefficients, 2, polar__.copt[2]);
-      } else if (polar__.copt[1] != 0.0) {
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polopt__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polopt__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 2, polopt__.copt[2]);
+      } else if (polopt__.copt[1] != 0.0) {
          exptCoefficients = OpenMM_DoubleArray_create (2);
-         OpenMM_DoubleArray_set (exptCoefficients, 0, polar__.copt[0]);
-         OpenMM_DoubleArray_set (exptCoefficients, 1, polar__.copt[1]);
+         OpenMM_DoubleArray_set (exptCoefficients, 0, polopt__.copt[0]);
+         OpenMM_DoubleArray_set (exptCoefficients, 1, polopt__.copt[1]);
       }
       OpenMM_AmoebaMultipoleForce_setExtrapolationCoefficients
                                   (amoebaMultipoleForce,exptCoefficients);
@@ -3446,16 +3446,16 @@ static void setupDistanceRestraints (OpenMM_System* system, FILE* log) {
          use_bounds = 1.0;
       }
       OpenMM_IntArray* particles = OpenMM_IntArray_create(0);
-      OpenMM_IntArray_append(particles, restrn__.idfix[i*2]-1);
-      OpenMM_IntArray_append(particles, restrn__.idfix[i*2+1]-1);
+      OpenMM_IntArray_append (particles, restrn__.idfix[i*2]-1);
+      OpenMM_IntArray_append (particles, restrn__.idfix[i*2+1]-1);
       OpenMM_DoubleArray* distanceParameters = OpenMM_DoubleArray_create(0);
-      OpenMM_DoubleArray_append(distanceParameters, restrn__.dfix[i*3]*convert);
-      OpenMM_DoubleArray_append(distanceParameters, restrn__.dfix[i*3 + 1]*nmPerAng);
-      OpenMM_DoubleArray_append(distanceParameters, restrn__.dfix[i*3 + 2]*nmPerAng);
-      OpenMM_DoubleArray_append(distanceParameters, use_bounds);
-      OpenMM_CustomCompoundBondForce_addBond(force, particles, distanceParameters);
-      OpenMM_IntArray_destroy(particles);
-      OpenMM_DoubleArray_destroy(distanceParameters);
+      OpenMM_DoubleArray_append (distanceParameters, restrn__.dfix[i*3]*convert);
+      OpenMM_DoubleArray_append (distanceParameters, restrn__.dfix[i*3 + 1]*nmPerAng);
+      OpenMM_DoubleArray_append (distanceParameters, restrn__.dfix[i*3 + 2]*nmPerAng);
+      OpenMM_DoubleArray_append (distanceParameters, use_bounds);
+      OpenMM_CustomCompoundBondForce_addBond (force, particles, distanceParameters);
+      OpenMM_IntArray_destroy (particles);
+      OpenMM_DoubleArray_destroy (distanceParameters);
    }
    OpenMM_CustomCompoundBondForce_setUsesPeriodicBoundaryConditions (force, OpenMM_True);
    OpenMM_System_addForce (system, (OpenMM_Force*) force);
@@ -3474,14 +3474,14 @@ static void setupAngleRestraints (OpenMM_System* system, FILE* log) {
 
    for (int i = 0; i < restrn__.nafix; ++i) {
       OpenMM_DoubleArray* AngleParameters = OpenMM_DoubleArray_create(0);
-      OpenMM_DoubleArray_append(AngleParameters, restrn__.afix[i*2]*convert);
-      OpenMM_DoubleArray_append(AngleParameters, restrn__.afix[i*2 + 1]*RADIANS_PER_DEGREE);
-      OpenMM_DoubleArray_append(AngleParameters, restrn__.afix[i*2 + 2]*RADIANS_PER_DEGREE);
-      OpenMM_CustomAngleForce_addAngle(force, restrn__.iafix[i*3]-1, restrn__.iafix[i*3+1]-1,
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2]*convert);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2 + 1]*RADIANS_PER_DEGREE);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2 + 2]*RADIANS_PER_DEGREE);
+      OpenMM_CustomAngleForce_addAngle (force, restrn__.iafix[i*3]-1, restrn__.iafix[i*3+1]-1,
                                        restrn__.iafix[i*3+2]-1, AngleParameters);
-      OpenMM_DoubleArray_destroy(AngleParameters);
+      OpenMM_DoubleArray_destroy (AngleParameters);
    }
-   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+   OpenMM_System_addForce (system, (OpenMM_Force*) force);
 }
 
 static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
@@ -3490,7 +3490,7 @@ static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
    convert = OpenMM_KJPerKcal / RADIANS_PER_DEGREE / RADIANS_PER_DEGREE;
 
    OpenMM_CustomTorsionForce* force =
-         OpenMM_CustomTorsionForce_create("k*max(\
+         OpenMM_CustomTorsionForce_create ("k*max(\
             (step(thetaMin-theta)*(min(min(abs(theta-thetaMin),abs(theta-thetaMin-6.28318530718)), abs(theta-thetaMin+6.28318530718)))),\
             (step(theta-thetaMax)*(min(min(abs(theta-thetaMax),abs(theta-thetaMax-6.28318530718)), abs(theta-thetaMax+6.28318530718))))\
                )^2");
@@ -3520,9 +3520,9 @@ static void setupTorsionRestraints (OpenMM_System* system, FILE* log) {
                                             restrn__.itfix[i*4+2]-1,
                                             restrn__.itfix[i*4+3]-1,
                                             lowerTorsionParameters);
-      OpenMM_DoubleArray_destroy(lowerTorsionParameters);
+      OpenMM_DoubleArray_destroy (lowerTorsionParameters);
    }
-   OpenMM_System_addForce(system, (OpenMM_Force*) force);
+   OpenMM_System_addForce (system, (OpenMM_Force*) force);
 }
 
 static OpenMM_IntArray* getGroup (int* kgrp, int* igrp, int idx) {

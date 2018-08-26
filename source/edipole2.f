@@ -17,7 +17,6 @@ c     dipole-dipole interaction energy for a single atom
 c
 c
       subroutine edipole2 (i)
-      use sizes
       use atoms
       use bound
       use cell

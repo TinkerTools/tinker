@@ -17,7 +17,6 @@ c     for a full structure from the internal coordinate values
 c
 c
       subroutine makexyz
-      use sizes
       use atoms
       use zcoord
       implicit none

@@ -16,7 +16,6 @@ c     "etortor" calculates the torsion-torsion potential energy
 c
 c
       subroutine etortor
-      use sizes
       use atoms
       use bitor
       use bound
@@ -260,7 +259,6 @@ c     correctly handle enantiomeric sugar rings in nucleic acids
 c
 c
       subroutine chkttor (ib,ic,id,sign,value1,value2)
-      use sizes
       use atomid
       use atoms
       use couple

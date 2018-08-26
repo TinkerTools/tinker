@@ -17,7 +17,6 @@ c     energy for a single atom
 c
 c
       subroutine etors2 (i)
-      use sizes
       use warp
       implicit none
       integer i
@@ -46,7 +45,6 @@ c     energy for a single atom using a standard sum of Fourier terms
 c
 c
       subroutine etors2a (i)
-      use sizes
       use atoms
       use bound
       use group
@@ -751,7 +749,6 @@ c     smoothing methods
 c
 c
       subroutine etors2b (i)
-      use sizes
       use atoms
       use group
       use hessn

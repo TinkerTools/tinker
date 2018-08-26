@@ -17,7 +17,6 @@ c     needing them, and processes any new or changed values
 c
 c
       subroutine kstrtor
-      use sizes
       use atmlst
       use atomid
       use atoms

@@ -25,7 +25,6 @@ c     to Peptides", Journal of Chemical Physics, 92, 5580-5601 (1990)
 c
 c
       program path
-      use sizes
       use align
       use atomid
       use atoms
@@ -318,7 +317,6 @@ c     #################################################################
 c
 c
       function path1 (p,gt)
-      use sizes
       use atomid
       use atoms
       use paths
@@ -416,7 +414,6 @@ c     ##########################################################
 c
 c
       function potnrg (xx,g)
-      use sizes
       use atoms
       use paths
       implicit none

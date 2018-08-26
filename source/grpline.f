@@ -17,7 +17,6 @@ c     contained in the group
 c
 c
       subroutine grpline
-      use sizes
       use atomid
       use atoms
       use group

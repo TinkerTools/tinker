@@ -18,7 +18,6 @@ c     performs any of several manipulations on an existing archive
 c
 c
       program archive
-      use sizes
       use atoms
       use bound
       use files
@@ -437,7 +436,6 @@ c     all active atoms in the Tinker XYZ archive format
 c
 c
       subroutine prtarc (iarc)
-      use sizes
       use atomid
       use atoms
       use bound

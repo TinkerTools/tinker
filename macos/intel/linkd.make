@@ -56,6 +56,7 @@ ifort -g -Wl,-no_pie -o testhess.x testhess.o libtinker.a
 ifort -g -Wl,-no_pie -o testpair.x testpair.o libtinker.a
 ifort -g -Wl,-no_pie -o testpol.x testpol.o libtinker.a
 ifort -g -Wl,-no_pie -o testrot.x testrot.o libtinker.a
+ifort -g -Wl,-no_pie -o testvir.x testvir.o libtinker.a
 ifort -g -Wl,-no_pie -o timer.x timer.o libtinker.a
 ifort -g -Wl,-no_pie -o timerot.x timerot.o libtinker.a
 ifort -g -Wl,-no_pie -o torsfit.x torsfit.o libtinker.a

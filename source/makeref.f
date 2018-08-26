@@ -17,7 +17,6 @@ c     of the current structure into corresponding reference areas
 c
 c
       subroutine makeref (iref)
-      use sizes
       use atomid
       use atoms
       use boxes
@@ -68,7 +67,7 @@ c
          end do
       end do
 c
-c     copy any unitcell parameters from the coordinates file
+c     copy any unit cell parameters from the coordinates file
 c
       xboxref(iref) = xbox
       yboxref(iref) = ybox

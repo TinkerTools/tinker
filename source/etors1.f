@@ -17,7 +17,6 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine etors1
-      use sizes
       use warp
       implicit none
 c
@@ -46,7 +45,6 @@ c     standard sum of Fourier terms
 c
 c
       subroutine etors1a
-      use sizes
       use atoms
       use bound
       use deriv
@@ -325,7 +323,6 @@ c     potential energy smoothing methods
 c
 c
       subroutine etors1b
-      use sizes
       use atoms
       use deriv
       use energi

@@ -17,7 +17,6 @@ c     partitions the energy among the atoms
 c
 c
       subroutine etors3
-      use sizes
       use warp
       implicit none
 c
@@ -46,7 +45,6 @@ c     among the atoms
 c
 c
       subroutine etors3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -276,7 +274,6 @@ c     energy among the atoms
 c
 c
       subroutine etors3b
-      use sizes
       use action
       use analyz
       use atomid

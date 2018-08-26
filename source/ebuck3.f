@@ -17,7 +17,6 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine ebuck3
-      use sizes
       use analyz
       use atoms
       use energi
@@ -79,7 +78,6 @@ c     a pairwise double loop
 c
 c
       subroutine ebuck3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -481,7 +479,6 @@ c     the method of lights
 c
 c
       subroutine ebuck3b
-      use sizes
       use action
       use analyz
       use atomid
@@ -817,7 +814,6 @@ c     neighbor list
 c
 c
       subroutine ebuck3c
-      use sizes
       use action
       use analyz
       use atomid

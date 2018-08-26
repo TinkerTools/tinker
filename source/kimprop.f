@@ -17,7 +17,6 @@ c     dihedral in the structure and processes any changed values
 c
 c
       subroutine kimprop
-      use sizes
       use atomid
       use atoms
       use couple

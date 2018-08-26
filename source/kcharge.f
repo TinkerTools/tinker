@@ -17,7 +17,6 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kcharge
-      use sizes
       use atomid
       use atoms
       use charge
@@ -203,7 +202,6 @@ c     the Merck Molecular Force Field (MMFF)
 c
 c
       subroutine kchargem
-      use sizes
       use atomid
       use atoms
       use charge

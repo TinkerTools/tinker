@@ -27,7 +27,6 @@ c     Chemistry, 99, 8374-8378 (1995)
 c
 c
       program pssrigid
-      use sizes
       use atoms
       use files
       use group
@@ -250,7 +249,6 @@ c     gradient during PSS global optimization over rigid bodies
 c
 c
       function pssrgd1 (xx,g)
-      use sizes
       use group
       use math
       use rigid
@@ -307,10 +305,10 @@ c     ###############################################################
 c
 c
       subroutine modergd (neigen,minimum,grdmin)
-      use sizes
       use group
       use iounit
       use rigid
+      use sizes
       implicit none
       integer maxrgd
       parameter (maxrgd=6*maxgrp)
@@ -441,7 +439,6 @@ c     ################################################################
 c
 c
       subroutine eigenrgd (eigen,vects)
-      use sizes
       use atoms
       use group
       implicit none
@@ -509,7 +506,6 @@ c     ################################################################
 c
 c
       subroutine climbrgd (nsearch,minimum,step,grdmin)
-      use sizes
       use group
       use iounit
       use math
@@ -601,7 +597,6 @@ c     to perform a rigid body energy minimization
 c
 c
       subroutine localrgd (minimum,grdmin)
-      use sizes
       use inform
       use group
       use minima

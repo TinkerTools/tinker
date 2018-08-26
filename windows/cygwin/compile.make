@@ -119,7 +119,9 @@ gfortran -c -O3 -ffast-math -fopenmp pitors.f
 gfortran -c -O3 -ffast-math -fopenmp pme.f
 gfortran -c -O3 -ffast-math -fopenmp polar.f
 gfortran -c -O3 -ffast-math -fopenmp polgrp.f
+gfortran -c -O3 -ffast-math -fopenmp polopt.f
 gfortran -c -O3 -ffast-math -fopenmp polpot.f
+gfortran -c -O3 -ffast-math -fopenmp poltcg.f
 gfortran -c -O3 -ffast-math -fopenmp potent.f
 gfortran -c -O3 -ffast-math -fopenmp potfit.f
 gfortran -c -O3 -ffast-math -fopenmp precis.f
@@ -451,7 +453,7 @@ gfortran -c -O3 -ffast-math -fopenmp overlap.f
 gfortran -c -O3 -ffast-math -fopenmp path.f
 gfortran -c -O3 -ffast-math -fopenmp pdbxyz.f
 gfortran -c -O3 -ffast-math -fopenmp picalc.f
-gfortran -c -O3 -ffast-math -fopenmp pmestuff.f
+gfortran -c -O3 -ffast-math -fopenmp pmestuf.f
 gfortran -c -O3 -ffast-math -fopenmp pmpb.f
 gfortran -c -O3 -ffast-math -fopenmp polarize.f
 gfortran -c -O3 -ffast-math -fopenmp poledit.f
@@ -504,7 +506,7 @@ gfortran -c -O3 -ffast-math -fopenmp server.f
 gfortran -c -O3 -ffast-math -fopenmp shakeup.f
 gfortran -c -O3 -ffast-math -fopenmp sigmoid.f
 gfortran -c -O3 -ffast-math -fopenmp simplex.f
-gfortran -c -O3 -ffast-math -fopenmp sktstuff.f
+gfortran -c -O3 -ffast-math -fopenmp sktstuf.f
 gfortran -c -O3 -ffast-math -fopenmp sniffer.f
 gfortran -c -O3 -ffast-math -fopenmp sort.f
 gfortran -c -O3 -ffast-math -fopenmp spacefill.f
@@ -515,12 +517,14 @@ gfortran -c -O3 -ffast-math -fopenmp superpose.f
 gfortran -c -O3 -ffast-math -fopenmp surface.f
 gfortran -c -O3 -ffast-math -fopenmp surfatom.f
 gfortran -c -O3 -ffast-math -fopenmp switch.f
+gfortran -c -O3 -ffast-math -fopenmp tcgstuf.f
 gfortran -c -O3 -ffast-math -fopenmp temper.f
 gfortran -c -O3 -ffast-math -fopenmp testgrad.f
 gfortran -c -O3 -ffast-math -fopenmp testhess.f
 gfortran -c -O3 -ffast-math -fopenmp testpair.f
 gfortran -c -O3 -ffast-math -fopenmp testpol.f
 gfortran -c -O3 -ffast-math -fopenmp testrot.f
+gfortran -c -O3 -ffast-math -fopenmp testvir.f
 gfortran -c -O3 -ffast-math -fopenmp timer.f
 gfortran -c -O3 -ffast-math -fopenmp timerot.f
 gfortran -c -O3 -ffast-math -fopenmp tncg.f

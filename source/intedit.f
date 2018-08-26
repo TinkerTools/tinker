@@ -17,7 +17,6 @@ c     or alter the values within an internal coordinates file
 c
 c
       program intedit
-      use sizes
       use atomid
       use atoms
       use files

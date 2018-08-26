@@ -17,7 +17,6 @@ c     also partitions the energy terms among the atoms
 c
 c
       subroutine etortor3
-      use sizes
       use action
       use analyz
       use atoms

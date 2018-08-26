@@ -17,7 +17,6 @@ c     the bond angles; also processes new or changed parameters
 c
 c
       subroutine kangle
-      use sizes
       use angbnd
       use angpot
       use atomid
@@ -486,7 +485,6 @@ c     616-641 (1995)
 c
 c
       subroutine kanglem
-      use sizes
       use angbnd
       use angpot
       use atomid

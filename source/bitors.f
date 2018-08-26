@@ -18,7 +18,6 @@ c     atoms defining each bitorsion
 c
 c
       subroutine bitors
-      use sizes
       use angbnd
       use atoms
       use bitor

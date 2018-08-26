@@ -18,7 +18,6 @@ c     to rotatable torsional angles
 c
 c
       program testrot
-      use sizes
       use domega
       use energi
       use inform

@@ -17,7 +17,6 @@ c     contribution and also partitions the energy among the atoms
 c
 c
       subroutine extra3
-      use sizes
       use action
       use analyz
       use atoms

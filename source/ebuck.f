@@ -16,7 +16,6 @@ c     "ebuck" calculates the Buckingham exp-6 van der Waals energy
 c
 c
       subroutine ebuck
-      use sizes
       use energi
       use iounit
       use limits
@@ -64,7 +63,6 @@ c     using a pairwise double loop
 c
 c
       subroutine ebuck0a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -380,7 +378,6 @@ c     using the method of lights
 c
 c
       subroutine ebuck0b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -652,7 +649,6 @@ c     using a pairwise neighbor list
 c
 c
       subroutine ebuck0c
-      use sizes
       use atomid
       use atoms
       use bound

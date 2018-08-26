@@ -19,7 +19,6 @@ c     computation of forces and dynamics integration steps
 c
 c
       program dynamic_omm
-      use sizes
       use atoms
       use bath
       use bndstr

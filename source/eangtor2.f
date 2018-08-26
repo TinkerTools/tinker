@@ -17,7 +17,6 @@ c     second derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangtor2 (i)
-      use sizes
       use angbnd
       use angtor
       use atoms

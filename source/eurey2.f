@@ -17,7 +17,6 @@ c     interaction energy for a single atom at a time
 c
 c
       subroutine eurey2 (i)
-      use sizes
       use atoms
       use bound
       use couple

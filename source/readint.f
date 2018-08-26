@@ -17,7 +17,6 @@ c     from an external file
 c
 c
       subroutine readint (izmt)
-      use sizes
       use atomid
       use atoms
       use files

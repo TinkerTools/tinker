@@ -28,7 +28,6 @@ c     Physics, 61, 138-153 (1985)
 c
 c
       subroutine lights (cutoff,nsite,xsort,ysort,zsort,unique)
-      use sizes
       use bound
       use boxes
       use cell
@@ -98,7 +97,7 @@ c
       allocate (yfrac(nsite))
       allocate (zfrac(nsite))
 c
-c     find fractional coordinates for the unitcell atoms
+c     find fractional coordinates for the unit cell atoms
 c
       if (use_bounds) then
          if (orthogonal) then

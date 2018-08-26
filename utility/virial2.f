@@ -21,7 +21,6 @@ c     generalized to other molecules
 c
 c
       program virial2
-      use sizes
       use atomid
       use atoms
       use boxes

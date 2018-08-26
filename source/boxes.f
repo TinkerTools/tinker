@@ -35,7 +35,7 @@ c     orthogonal  flag to mark periodic box as orthogonal
 c     monoclinic  flag to mark periodic box as monoclinic
 c     triclinic   flag to mark periodic box as triclinic
 c     octahedron  flag to mark box as truncated octahedron
-c     spacegrp    space group symbol for the unitcell type
+c     spacegrp    space group symbol for the unit cell type
 c
 c
       module boxes

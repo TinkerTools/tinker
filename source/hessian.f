@@ -17,7 +17,6 @@ c     for each atom in turn with respect to Cartesian coordinates
 c
 c
       subroutine hessian (h,hinit,hstop,hindex,hdiag)
-      use sizes
       use atoms
       use couple
       use hescut

@@ -17,7 +17,6 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine ehal3
-      use sizes
       use analyz
       use atoms
       use energi
@@ -71,7 +70,6 @@ c     double loop
 c
 c
       subroutine ehal3a
-      use sizes
       use action
       use analyz
       use atomid
@@ -507,7 +505,6 @@ c     method of lights
 c
 c
       subroutine ehal3b
-      use sizes
       use action
       use analyz
       use atomid
@@ -856,7 +853,6 @@ c     pairwise neighbor list
 c
 c
       subroutine ehal3c
-      use sizes
       use action
       use analyz
       use atomid

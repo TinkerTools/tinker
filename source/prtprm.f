@@ -17,7 +17,6 @@ c     set of potential energy parameters for a force field
 c
 c
       subroutine prtprm (itxt)
-      use sizes
       use angpot
       use bndpot
       use chgpot

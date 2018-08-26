@@ -17,7 +17,6 @@ c     of the contents of Cartesian coordinates files
 c
 c
       program xyzedit
-      use sizes
       use atomid
       use atoms
       use bound
@@ -992,7 +991,7 @@ c
       if (opened) then
          close (unit=imod)
          write (iout,430)  modfile(1:trimtext(modfile))
-  430    format (/,' New Coordinates File Written To :  ',a)
+  430    format (/,' New Coordinates Written To :  ',a)
       end if
       close (unit=ixyz)
 c
@@ -1014,7 +1013,6 @@ c     with an optional atom number offset to an external disk file
 c
 c
       subroutine prtmod (imod,offset)
-      use sizes
       use atomid
       use atoms
       use bound
@@ -1102,7 +1100,6 @@ c     followed by optional excluded volume refinement
 c
 c
       subroutine makebox
-      use sizes
       use atomid
       use atoms
       use boxes
@@ -1292,7 +1289,6 @@ c     periodic box
 c
 c
       subroutine boxmin
-      use sizes
       use atoms
       use boxes
       use inform
@@ -1426,7 +1422,6 @@ c     gradient during refinement of a periodic box
 c
 c
       function boxmin1 (xx,g)
-      use sizes
       use atoms
       use scales
       implicit none
@@ -1490,7 +1485,6 @@ c     that overlap the solute
 c
 c
       subroutine soak
-      use sizes
       use atomid
       use atoms
       use bound
@@ -1694,7 +1688,6 @@ c     places ions, with removal of solvent molecules
 c
 c
       subroutine addions
-      use sizes
       use atomid
       use atoms
       use couple

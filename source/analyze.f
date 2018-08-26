@@ -20,22 +20,24 @@ c     interactions and find electrostatic and inertial properties
 c
 c
       program analyze
-      use sizes
       use atoms
       use files
       use inform
       use iounit
+      use output
       implicit none
       integer i,j,ixyz
       integer frame,nold
       integer freeunit
       integer trimtext
       integer list(20)
+      real*8 energy
+      real*8, allocatable :: derivs(:,:)
       logical dosystem,doparam
       logical doenergy,doatom
       logical dolarge,dodetail
       logical domoment,dovirial
-      logical doconect
+      logical doconect,dosave
       logical exist
       logical, allocatable :: active(:)
       character*1 letter
@@ -97,6 +99,12 @@ c
          if (letter .eq. 'V')  dovirial = .true.
          if (letter .eq. 'C')  doconect = .true.
       end do
+c
+c     set option control flag to save forces or induced dipoles
+c
+      dosave = .false.
+      call optinit
+      if (frcsave .or. uindsave)  dosave = .true.
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -176,10 +184,6 @@ c
       rewind (unit=ixyz)
       call readxyz (ixyz)
 c
-c     get info on the molecular system and force field
-c
-      if (dosystem)  call systyze
-c
 c     get parameters used for molecular mechanics potentials
 c
       if (doparam .and. doconect) then
@@ -191,6 +195,12 @@ c
 c     provide connectivity lists for the individual atoms
 c
       if (doconect)  call connyze (active)
+c
+c     decide whether to perform analysis of individual frames
+c
+      abort = .true.
+      if (dosystem .or. doenergy .or. doatom .or. dolarge .or.
+     &       domoment .or. dovirial .or. dosave)  abort = .false.
 c
 c     perform analysis for each successive coordinate structure
 c
@@ -222,6 +232,18 @@ c
             if (dodetail)  debug = .true.
          end if
 c
+c     energy partitioning over the individual atoms
+c
+         if (doatom)  call atomyze (active)
+c
+c     compute the gradient if force or virial is requested
+c
+         if (dovirial .or. frcsave) then
+            allocate (derivs(3,n))
+            call gradient (energy,derivs)
+            deallocate (derivs)
+         end if  
+c
 c     get and test the internal virial and pressure values
 c
          if (dovirial) then
@@ -230,9 +252,9 @@ c
             if (dodetail)  debug = .true.
          end if
 c
-c     energy partitioning over the individual atoms
+c     save output files with forces or induced dipoles
 c
-         if (doatom)  call atomyze (active)
+         if (dosave)  call saveyze (frame)
 c
 c     attempt to read next structure from the coordinate file
 c
@@ -265,7 +287,6 @@ c     and the force field model
 c
 c
       subroutine systyze
-      use sizes
       use atoms
       use bound
       use boxes
@@ -405,6 +426,637 @@ c
       end
 c
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine enrgyze  --  compute & report energy analysis  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "enrgyze" is an auxiliary routine for the analyze program
+c     that performs the energy analysis and prints the total and
+c     intermolecular energies
+c
+c
+      subroutine enrgyze
+      use atoms
+      use inform
+      use inter
+      use iounit
+      use limits
+      use molcul
+      implicit none
+      real*8 energy
+      character*240 fstr
+c
+c
+c     perform the energy analysis by atom and component
+c
+      call analysis (energy)
+c
+c     intermolecular energy for systems with multiple molecules
+c
+      fstr = '(/,'' Intermolecular Energy :'',9x,f16.4,'' Kcal/mole'')'
+      if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
+      if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
+      if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
+      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald)
+     &   write (iout,fstr)  einter
+c
+c     print out the total potential energy of the system
+c
+      fstr = '(/,'' Total Potential Energy :'',8x,f16.4,'' Kcal/mole'')'
+      if (digits .ge. 6)  fstr(32:39) = '6x,f18.6'
+      if (digits .ge. 8)  fstr(32:39) = '4x,f20.8'
+      if (abs(energy) .ge. 1.0d10)  fstr(35:35) = 'd'
+      write (iout,fstr)  energy
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine partyze  --  energy component decomposition  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "partyze" prints the energy component and number of
+c     interactions for each of the potential energy terms
+c
+c
+      subroutine partyze
+      use action
+      use energi
+      use inform
+      use iounit
+      use limits
+      use potent
+      implicit none
+      character*12 form1
+      character*12 form2
+      character*240 fstr
+c
+c
+c     write out each energy component to the desired precision
+c
+      form1 = '5x,f16.4,i17'
+      if (digits .ge. 6)  form1 = '3x,f18.6,i17'
+      if (digits .ge. 8)  form1 = '1x,f20.8,i17'
+      form2 = form1(1:3)//'d'//form1(5:12)
+      fstr = '(/,'' Energy Component Breakdown :'',
+     &          11x,''Kcal/mole'',8x,''Interactions''/)'
+      write (iout,fstr)
+      if (use_bond .and. (neb.ne.0.or.eb.ne.0.0d0)) then
+         fstr = '('' Bond Stretching'',12x,'//form1//')'
+         write (iout,fstr)  eb,neb
+      end if
+      if (use_angle .and. (nea.ne.0.or.ea.ne.0.0d0)) then
+         fstr = '('' Angle Bending'',14x,'//form1//')'
+         write (iout,fstr)  ea,nea
+      end if
+      if (use_strbnd .and. (neba.ne.0.or.eba.ne.0.0d0)) then
+         fstr = '('' Stretch-Bend'',15x,'//form1//')'
+         write (iout,fstr)  eba,neba
+      end if
+      if (use_urey .and. (neub.ne.0.or.eub.ne.0.0d0)) then
+         fstr = '('' Urey-Bradley'',15x,'//form1//')'
+         write (iout,fstr)  eub,neub
+      end if
+      if (use_angang .and. (neaa.ne.0.or.eaa.ne.0.0d0)) then
+         fstr = '('' Angle-Angle'',16x,'//form1//')'
+         write (iout,fstr)  eaa,neaa
+      end if
+      if (use_opbend .and. (neopb.ne.0.or.eopb.ne.0.0d0)) then
+         fstr = '('' Out-of-Plane Bend'',10x,'//form1//')'
+         write (iout,fstr)  eopb,neopb
+      end if
+      if (use_opdist .and. (neopd.ne.0.or.eopd.ne.0.0d0)) then
+         fstr = '('' Out-of-Plane Distance'',6x,'//form1//')'
+         write (iout,fstr)  eopd,neopd
+      end if
+      if (use_improp .and. (neid.ne.0.or.eid.ne.0.0d0)) then
+         fstr = '('' Improper Dihedral'',10x,'//form1//')'
+         write (iout,fstr)  eid,neid
+      end if
+      if (use_imptor .and. (neit.ne.0.or.eit.ne.0.0d0)) then
+         fstr = '('' Improper Torsion'',11x,'//form1//')'
+         write (iout,fstr)  eit,neit
+      end if
+      if (use_tors .and. (net.ne.0.or.et.ne.0.0d0)) then
+         fstr = '('' Torsional Angle'',12x,'//form1//')'
+         write (iout,fstr)  et,net
+      end if
+      if (use_pitors .and. (nept.ne.0.or.ept.ne.0.0d0)) then
+         fstr = '('' Pi-Orbital Torsion'',9x,'//form1//')'
+         write (iout,fstr)  ept,nept
+      end if
+      if (use_strtor .and. (nebt.ne.0.or.ebt.ne.0.0d0)) then
+         fstr = '('' Stretch-Torsion'',12x,'//form1//')'
+         write (iout,fstr)  ebt,nebt
+      end if
+      if (use_angtor .and. (neat.ne.0.or.eat.ne.0.0d0)) then
+         fstr = '('' Angle-Torsion'',14x,'//form1//')'
+         write (iout,fstr)  eat,neat
+      end if
+      if (use_tortor .and. (nett.ne.0.or.ett.ne.0.0d0)) then
+         fstr = '('' Torsion-Torsion'',12x,'//form1//')'
+         write (iout,fstr)  ett,nett
+      end if
+      if (use_vdw .and. (nev.ne.0.or.ev.ne.0.0d0)) then
+         if (abs(ev) .lt. 1.0d10) then
+            fstr = '('' Van der Waals'',14x,'//form1//')'
+         else
+            fstr = '('' Van der Waals'',14x,'//form2//')'
+         end if
+         write (iout,fstr)  ev,nev
+      end if
+      if (use_charge .and. (nec.ne.0.or.ec.ne.0.0d0)) then
+         if (abs(ec) .lt. 1.0d10) then
+            fstr = '('' Charge-Charge'',14x,'//form1//')'
+         else
+            fstr = '('' Charge-Charge'',14x,'//form2//')'
+         end if
+         write (iout,fstr)  ec,nec
+      end if
+      if (use_chgdpl .and. (necd.ne.0.or.ecd.ne.0.0d0)) then
+         if (abs(ecd) .lt. 1.0d10) then
+            fstr = '('' Charge-Dipole'',14x,'//form1//')'
+         else
+            fstr = '('' Charge-Dipole'',14x,'//form2//')'
+         end if
+         write (iout,fstr)  ecd,necd
+      end if
+      if (use_dipole .and. (ned.ne.0.or.ed.ne.0.0d0)) then
+         if (abs(ed) .lt. 1.0d10) then
+            fstr = '('' Dipole-Dipole'',14x,'//form1//')'
+         else
+            fstr = '('' Dipole-Dipole'',14x,'//form2//')'
+         end if
+         write (iout,fstr)  ed,ned
+      end if
+      if (use_mpole .and. (nem.ne.0.or.em.ne.0.0d0)) then
+         if (abs(em) .lt. 1.0d10) then
+            fstr = '('' Atomic Multipoles'',10x,'//form1//')'
+         else
+            fstr = '('' Atomic Multipoles'',10x,'//form2//')'
+         end if
+         write (iout,fstr)  em,nem
+      end if
+      if (use_polar .and. (nep.ne.0.or.ep.ne.0.0d0)) then
+         if (abs(ep) .lt. 1.0d10) then
+            fstr = '('' Polarization'',15x,'//form1//')'
+         else
+            fstr = '('' Polarization'',15x,'//form2//')'
+         end if
+         write (iout,fstr)  ep,nep
+      end if
+      if (use_rxnfld .and. (ner.ne.0.or.er.ne.0.0d0)) then
+         fstr = '('' Reaction Field'',13x,'//form1//')'
+         write (iout,fstr)  er,ner
+      end if
+      if (use_solv .and. (nes.ne.0.or.es.ne.0.0d0)) then
+         fstr = '('' Implicit Solvation'',9x,'//form1//')'
+         write (iout,fstr)  es,nes
+      end if
+      if (use_metal .and. (nelf.ne.0.or.elf.ne.0.0d0)) then
+         fstr = '('' Metal Ligand Field'',9x,'//form1//')'
+         write (iout,fstr)  elf,nelf
+      end if
+      if (use_geom .and. (neg.ne.0.or.eg.ne.0.0d0)) then
+         fstr = '('' Geometric Restraints'',7x,'//form1//')'
+         write (iout,fstr)  eg,neg
+      end if
+      if (use_extra .and. (nex.ne.0.or.ex.ne.0.0d0)) then
+         fstr = '('' Extra Energy Terms'',9x,'//form1//')'
+         write (iout,fstr)  ex,nex
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine momyze  --  electrostatic & inertial analysis  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "momyze" finds and prints the total charge, dipole moment
+c     components, radius of gyration and moments of inertia
+c
+c
+      subroutine momyze
+      use chgpot
+      use iounit
+      use moment
+      implicit none
+      real*8 rg
+c
+c
+c     get the total charge, dipole and quadrupole moments
+c
+      call moments
+      write (iout,10)  netchg
+   10 format (/,' Total Electric Charge :',12x,f13.5,' Electrons')
+      write (iout,20)  netdpl,xdpl,ydpl,zdpl
+   20 format (/,' Dipole Moment Magnitude :',10x,f13.3,' Debyes',
+     &        //,' Dipole X,Y,Z-Components :',10x,3f13.3)
+      write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
+     &                 yzqdp,zxqdp,zyqdp,zzqdp
+   30 format (/,' Quadrupole Moment Tensor :',9x,3f13.3,
+     &        /,6x,'(Buckinghams)',17x,3f13.3,
+     &        /,36x,3f13.3)
+      write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
+   40 format (/,' Principal Axes Quadrupole :',8x,3f13.3)
+      if (dielec .ne. 1.0d0) then
+         write (iout,50)  dielec
+   50    format (/,' Dielectric Constant :',14x,f13.3)
+         write (iout,60)  netchg/sqrt(dielec)
+   60    format (' Effective Total Charge :',11x,f13.5,' Electrons')
+         write (iout,70)  netdpl/sqrt(dielec)
+   70    format (' Effective Dipole Moment :',10x,f13.3,' Debyes')
+      end if
+c
+c     get the radius of gyration and moments of inertia
+c
+      call gyrate (rg)
+      write (iout,80)  rg
+   80 format (/,' Radius of Gyration :',15x,f13.3,' Angstroms')
+      call inertia (1)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine atomyze  --  individual atom energy analysis  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "atomyze" prints the potential energy components broken
+c     down by atom and to a choice of precision
+c
+c
+      subroutine atomyze (active)
+      use analyz
+      use atoms
+      use inform
+      use iounit
+      implicit none
+      integer i
+      logical active(*)
+      character*240 fstr
+c
+c
+c     energy partitioning over the individual atoms
+c
+      fstr = '(/,'' Potential Energy Breakdown over Atoms :'')'
+      write (iout,fstr)
+      if (digits .ge. 8) then
+         write (iout,10)
+   10    format (/,'  Atom',9x,'EB',14x,'EA',14x,'EBA',13x,'EUB',
+     &           /,15x,'EAA',13x,'EOPB',12x,'EOPD',12x,'EID',
+     &           /,15x,'EIT',13x,'ET',14x,'EPT',13x,'EBT',
+     &           /,15x,'EAT',13x,'ETT',13x,'EV',14x,'EC',
+     &           /,15x,'ECD',13x,'ED',14x,'EM',14x,'EP',
+     &           /,15x,'ER',14x,'ES',14x,'ELF',13x,'EG',
+     &           /,15x,'EX')
+      else if (digits .ge. 6) then
+         write (iout,20)
+   20    format (/,'  Atom',8x,'EB',12x,'EA',12x,'EBA',11x,'EUB',
+     &              11x,'EAA',
+     &           /,14x,'EOPB',10x,'EOPD',10x,'EID',11x,'EIT',
+     &              11x,'ET',
+     &           /,14x,'EPT',11x,'EBT',11x,'EAT',11x,'ETT',11x,'EV',
+     &           /,14x,'EC',12x,'ECD',11x,'ED',12x,'EM',12x,'EP',
+     &           /,14x,'ER',12x,'ES',12x,'ELF',11x,'EG',12x,'EX')
+      else
+         write (iout,30)
+   30    format (/,'  Atom',8x,'EB',10x,'EA',10x,'EBA',9x,'EUB',
+     &              9x,'EAA',9x,'EOPB',
+     &           /,14x,'EOPD',8x,'EID',9x,'EIT',9x,'ET',10x,'EPT',
+     &              9x,'EBT',
+     &           /,14x,'EAT',9x,'ETT',9x,'EV',10x,'EC',10x,'ECD',
+     &              9x,'ED',
+     &           /,14x,'EM',10x,'EP',10x,'ER',10x,'ES',10x,'ELF',
+     &              9x,'EG',
+     &           /,14x,'EX')
+      end if
+      if (digits .ge. 8) then
+         fstr = '(/,i6,4f16.8,/,6x,4f16.8,/,6x,4f16.8,'//
+     &             '/,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,'//
+     &             '/,6x,f16.8)'
+      else if (digits .ge. 6) then
+         fstr = '(/,i6,5f14.6,/,6x,5f14.6,/,6x,5f14.6,'//
+     &             '/,6x,5f14.6,/,6x,5f14.6)'
+      else
+         fstr = '(/,i6,6f12.4,/,6x,6f12.4,/,6x,6f12.4,'//
+     &             '/,6x,6f12.4,/,6x,f12.4)'
+      end if
+      do i = 1, n
+         if (active(i)) then
+            write (iout,fstr)  i,aeb(i),aea(i),aeba(i),aeub(i),aeaa(i),
+     &                         aeopb(i),aeopd(i),aeid(i),aeit(i),aet(i),
+     &                         aept(i),aebt(i),aeat(i),aett(i),aev(i),
+     &                         aec(i),aecd(i),aed(i),aem(i),aep(i),
+     &                         aer(i),aes(i),aelf(i),aeg(i),aex(i)
+         end if
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine viriyze  --  inertial virial & pressure values  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "propyze" finds and prints the internal virial, the dE/dV value
+c     and an estimate of the pressure
+c
+c
+      subroutine viriyze
+      use atoms
+      use bath
+      use boxes
+      use iounit
+      use units
+      use virial
+      implicit none
+      integer i
+      real*8 temp,pres,dedv
+c
+c
+c     print out the components of the internal virial
+c
+      write (iout,10)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
+   10 format (/,' Internal Virial Tensor :',11x,3f13.3,
+     &        /,36x,3f13.3,/,36x,3f13.3)
+c
+c     compute the dE/dV value and construct isotropic pressure
+c
+      temp = kelvin
+      if (temp .eq. 0.0d0)  temp = 298.0d0
+      dedv = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
+      pres = prescon * (dble(n)*gasconst*temp/volbox-dedv)
+      write (iout,20)  nint(temp),pres
+   20 format (/,' Pressure (Temp',i4,' K) :',12x,f13.3,
+     &           ' Atmospheres')
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine saveyze  --  save forces or induced dipoles  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "saveyze" prints the atomic forces and/or the induced dipoles
+c     to separate external disk files
+c
+c
+      subroutine saveyze (frame)
+      use atomid
+      use atoms
+      use deriv
+      use files
+      use iounit
+      use output
+      use mpole
+      use polar
+      use potent
+      use units
+      use titles
+      implicit none
+      integer i,j,k
+      integer frame,lext
+      integer ifrc,iind
+      integer freeunit
+      integer trimtext
+      logical exist
+      character*7 ext
+      character*240 frcfile
+      character*240 indfile
+c
+c
+c     save the force vector components for the current frame
+c
+      if (frcsave) then
+         ifrc = freeunit ()
+         if (archive) then
+            frcfile = filename(1:leng)
+            call suffix (frcfile,'frc','old')
+            inquire (file=frcfile,exist=exist)
+            if (exist) then
+               call openend (ifrc,frcfile)
+            else
+               open (unit=ifrc,file=frcfile,status='new')
+            end if
+         else
+            lext = 3
+            call numeral (frame,ext,lext)
+            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
+            call version (frcfile,'new')
+            open (unit=ifrc,file=frcfile,status='new')
+         end if
+         write (ifrc,10)  n,title(1:ltitle)
+   10    format (i6,2x,a)
+         do i = 1, n
+            write (ifrc,20)  i,name(i),(-desum(j,i),j=1,3)
+   20       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
+         end do
+         close (unit=ifrc)
+         write (iout,30)  frcfile(1:trimtext(frcfile))
+   30    format (/,' Force Components Written To :  ',a)
+      end if
+c
+c     save the induced dipole moments for the current frame
+c
+      if (uindsave .and. use_polar) then
+         iind = freeunit ()
+         if (archive) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'uind','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               call openend (iind,indfile)
+            else
+               open (unit=iind,file=indfile,status='new')
+            end if
+         else
+            lext = 3
+            call numeral (frame,ext,lext)
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+         end if
+         write (iind,40)  n,title(1:ltitle)
+   40    format (i6,2x,a)
+         do i = 1, npole
+            if (polarity(i) .ne. 0.0d0) then
+               k = ipole(i)
+               write (iind,50)  k,name(k),(debye*uind(j,i),j=1,3)
+   50          format (i6,2x,a3,3f12.6)
+            end if
+         end do
+         close (unit=iind)
+         write (iout,60)  indfile(1:trimtext(indfile))
+   60    format (/,' Induced Dipoles Written To :  ',a)
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine connyze  --  connected atom list analysis  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "connyze" prints information onconnected atoms as lists
+c     of all atom pairs that are 1-2 through 1-5 interactions
+c
+c
+      subroutine connyze (active)
+      use atoms
+      use couple
+      use iounit
+      implicit none
+      integer i,j,k
+      integer ntot
+      integer ntot2,ntot3
+      integer ntot4,ntot5
+      logical active(*)
+c
+c
+c     count the number of 1-2 through 1-5 interatomic pairs
+c
+      ntot2 = 0
+      ntot3 = 0
+      ntot4 = 0
+      ntot5 = 0
+      do i = 1, n
+         ntot2 = ntot2 + n12(i)
+         ntot3 = ntot3 + n13(i)
+         ntot4 = ntot4 + n14(i)
+         ntot5 = ntot5 + n15(i)
+      end do
+      ntot2 = ntot2 / 2
+      ntot3 = ntot3 / 2
+      ntot4 = ntot4 / 2
+      ntot5 = ntot5 / 2
+      ntot = ntot2 + ntot3 + ntot4 + ntot5
+      if (ntot .ne. 0) then
+         write (iout,10)
+   10    format (/,' Total Number of Pairwise Atomic Interactions :',/)
+      end if
+      if (ntot2 .ne. 0) then
+         write (iout,20)  ntot2
+   20    format (' Number of 1-2 Pairs',7x,i15)
+      end if
+      if (ntot3 .ne. 0) then
+         write (iout,30)  ntot3
+   30    format (' Number of 1-3 Pairs',7x,i15)
+      end if
+      if (ntot4 .ne. 0) then
+         write (iout,40)  ntot4
+   40    format (' Number of 1-4 Pairs',7x,i15)
+      end if
+      if (ntot5 .ne. 0) then
+         write (iout,50)  ntot5
+   50    format (' Number of 1-5 Pairs',7x,i15)
+      end if
+c
+c     generate and print the 1-2 connected atomic interactions
+c
+      if (ntot2 .ne. 0) then
+         write (iout,60)
+   60    format (/,' List of 1-2 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,70)  i,k
+   70                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     generate and print the 1-3 connected atomic interactions
+c
+      if (ntot3 .ne. 0) then
+         write (iout,80)
+   80    format (/,' List of 1-3 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n13(i)
+                  k = i13(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,90)  i,k
+   90                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     generate and print the 1-4 connected atomic interactions
+c
+      if (ntot4 .ne. 0) then
+         write (iout,100)
+  100    format (/,' List of 1-4 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n14(i)
+                  k = i14(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,110)  i,k
+  110                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     generate and print the 1-5 connected atomic interactions
+c
+      if (ntot5 .ne. 0) then
+         write (iout,120)
+  120    format (/,' List of 1-5 Connected Atomic Interactions :',/)
+         do i = 1, n
+            if (active(i)) then
+               do j = 1, n15(i)
+                  k = i15(j,i)
+                  if (active(k)) then
+                     if (i .lt. k) then
+                        write (iout,130)  i,k
+  130                   format (2i8)
+                     end if
+                  end if
+               end do
+            end if
+         end do
+      end if
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine paramyze  --  force field parameter analysis  ##
@@ -417,7 +1069,6 @@ c     computation of each of the potential energy terms
 c
 c
       subroutine paramyze (active)
-      use sizes
       use angang
       use angbnd
       use angpot
@@ -1259,392 +1910,6 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine enrgyze  --  compute & report energy analysis  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "enrgyze" is an auxiliary routine for the analyze program
-c     that performs the energy analysis and prints the total and
-c     intermolecular energies
-c
-c
-      subroutine enrgyze
-      use sizes
-      use atoms
-      use inform
-      use inter
-      use iounit
-      use limits
-      use molcul
-      implicit none
-      real*8 energy
-      character*240 fstr
-c
-c
-c     perform the energy analysis by atom and component
-c
-      call analysis (energy)
-c
-c     intermolecular energy for systems with multiple molecules
-c
-      fstr = '(/,'' Intermolecular Energy :'',9x,f16.4,'' Kcal/mole'')'
-      if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
-      if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
-      if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
-      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald)
-     &   write (iout,fstr)  einter
-c
-c     print out the total potential energy of the system
-c
-      fstr = '(/,'' Total Potential Energy :'',8x,f16.4,'' Kcal/mole'')'
-      if (digits .ge. 6)  fstr(32:39) = '6x,f18.6'
-      if (digits .ge. 8)  fstr(32:39) = '4x,f20.8'
-      if (abs(energy) .ge. 1.0d10)  fstr(35:35) = 'd'
-      write (iout,fstr)  energy
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine partyze  --  energy component decomposition  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "partyze" prints the energy component and number of
-c     interactions for each of the potential energy terms
-c
-c
-      subroutine partyze
-      use action
-      use energi
-      use inform
-      use iounit
-      use limits
-      use potent
-      implicit none
-      character*12 form1
-      character*12 form2
-      character*240 fstr
-c
-c
-c     write out each energy component to the desired precision
-c
-      form1 = '5x,f16.4,i17'
-      if (digits .ge. 6)  form1 = '3x,f18.6,i17'
-      if (digits .ge. 8)  form1 = '1x,f20.8,i17'
-      form2 = form1(1:3)//'d'//form1(5:12)
-      fstr = '(/,'' Energy Component Breakdown :'',
-     &          11x,''Kcal/mole'',8x,''Interactions''/)'
-      write (iout,fstr)
-      if (use_bond .and. (neb.ne.0.or.eb.ne.0.0d0)) then
-         fstr = '('' Bond Stretching'',12x,'//form1//')'
-         write (iout,fstr)  eb,neb
-      end if
-      if (use_angle .and. (nea.ne.0.or.ea.ne.0.0d0)) then
-         fstr = '('' Angle Bending'',14x,'//form1//')'
-         write (iout,fstr)  ea,nea
-      end if
-      if (use_strbnd .and. (neba.ne.0.or.eba.ne.0.0d0)) then
-         fstr = '('' Stretch-Bend'',15x,'//form1//')'
-         write (iout,fstr)  eba,neba
-      end if
-      if (use_urey .and. (neub.ne.0.or.eub.ne.0.0d0)) then
-         fstr = '('' Urey-Bradley'',15x,'//form1//')'
-         write (iout,fstr)  eub,neub
-      end if
-      if (use_angang .and. (neaa.ne.0.or.eaa.ne.0.0d0)) then
-         fstr = '('' Angle-Angle'',16x,'//form1//')'
-         write (iout,fstr)  eaa,neaa
-      end if
-      if (use_opbend .and. (neopb.ne.0.or.eopb.ne.0.0d0)) then
-         fstr = '('' Out-of-Plane Bend'',10x,'//form1//')'
-         write (iout,fstr)  eopb,neopb
-      end if
-      if (use_opdist .and. (neopd.ne.0.or.eopd.ne.0.0d0)) then
-         fstr = '('' Out-of-Plane Distance'',6x,'//form1//')'
-         write (iout,fstr)  eopd,neopd
-      end if
-      if (use_improp .and. (neid.ne.0.or.eid.ne.0.0d0)) then
-         fstr = '('' Improper Dihedral'',10x,'//form1//')'
-         write (iout,fstr)  eid,neid
-      end if
-      if (use_imptor .and. (neit.ne.0.or.eit.ne.0.0d0)) then
-         fstr = '('' Improper Torsion'',11x,'//form1//')'
-         write (iout,fstr)  eit,neit
-      end if
-      if (use_tors .and. (net.ne.0.or.et.ne.0.0d0)) then
-         fstr = '('' Torsional Angle'',12x,'//form1//')'
-         write (iout,fstr)  et,net
-      end if
-      if (use_pitors .and. (nept.ne.0.or.ept.ne.0.0d0)) then
-         fstr = '('' Pi-Orbital Torsion'',9x,'//form1//')'
-         write (iout,fstr)  ept,nept
-      end if
-      if (use_strtor .and. (nebt.ne.0.or.ebt.ne.0.0d0)) then
-         fstr = '('' Stretch-Torsion'',12x,'//form1//')'
-         write (iout,fstr)  ebt,nebt
-      end if
-      if (use_angtor .and. (neat.ne.0.or.eat.ne.0.0d0)) then
-         fstr = '('' Angle-Torsion'',14x,'//form1//')'
-         write (iout,fstr)  eat,neat
-      end if
-      if (use_tortor .and. (nett.ne.0.or.ett.ne.0.0d0)) then
-         fstr = '('' Torsion-Torsion'',12x,'//form1//')'
-         write (iout,fstr)  ett,nett
-      end if
-      if (use_vdw .and. (nev.ne.0.or.ev.ne.0.0d0)) then
-         if (abs(ev) .lt. 1.0d10) then
-            fstr = '('' Van der Waals'',14x,'//form1//')'
-         else
-            fstr = '('' Van der Waals'',14x,'//form2//')'
-         end if
-         write (iout,fstr)  ev,nev
-      end if
-      if (use_charge .and. (nec.ne.0.or.ec.ne.0.0d0)) then
-         if (abs(ec) .lt. 1.0d10) then
-            fstr = '('' Charge-Charge'',14x,'//form1//')'
-         else
-            fstr = '('' Charge-Charge'',14x,'//form2//')'
-         end if
-         write (iout,fstr)  ec,nec
-      end if
-      if (use_chgdpl .and. (necd.ne.0.or.ecd.ne.0.0d0)) then
-         if (abs(ecd) .lt. 1.0d10) then
-            fstr = '('' Charge-Dipole'',14x,'//form1//')'
-         else
-            fstr = '('' Charge-Dipole'',14x,'//form2//')'
-         end if
-         write (iout,fstr)  ecd,necd
-      end if
-      if (use_dipole .and. (ned.ne.0.or.ed.ne.0.0d0)) then
-         if (abs(ed) .lt. 1.0d10) then
-            fstr = '('' Dipole-Dipole'',14x,'//form1//')'
-         else
-            fstr = '('' Dipole-Dipole'',14x,'//form2//')'
-         end if
-         write (iout,fstr)  ed,ned
-      end if
-      if (use_mpole .and. (nem.ne.0.or.em.ne.0.0d0)) then
-         if (abs(em) .lt. 1.0d10) then
-            fstr = '('' Atomic Multipoles'',10x,'//form1//')'
-         else
-            fstr = '('' Atomic Multipoles'',10x,'//form2//')'
-         end if
-         write (iout,fstr)  em,nem
-      end if
-      if (use_polar .and. (nep.ne.0.or.ep.ne.0.0d0)) then
-         if (abs(ep) .lt. 1.0d10) then
-            fstr = '('' Polarization'',15x,'//form1//')'
-         else
-            fstr = '('' Polarization'',15x,'//form2//')'
-         end if
-         write (iout,fstr)  ep,nep
-      end if
-      if (use_rxnfld .and. (ner.ne.0.or.er.ne.0.0d0)) then
-         fstr = '('' Reaction Field'',13x,'//form1//')'
-         write (iout,fstr)  er,ner
-      end if
-      if (use_solv .and. (nes.ne.0.or.es.ne.0.0d0)) then
-         fstr = '('' Implicit Solvation'',9x,'//form1//')'
-         write (iout,fstr)  es,nes
-      end if
-      if (use_metal .and. (nelf.ne.0.or.elf.ne.0.0d0)) then
-         fstr = '('' Metal Ligand Field'',9x,'//form1//')'
-         write (iout,fstr)  elf,nelf
-      end if
-      if (use_geom .and. (neg.ne.0.or.eg.ne.0.0d0)) then
-         fstr = '('' Geometric Restraints'',7x,'//form1//')'
-         write (iout,fstr)  eg,neg
-      end if
-      if (use_extra .and. (nex.ne.0.or.ex.ne.0.0d0)) then
-         fstr = '('' Extra Energy Terms'',9x,'//form1//')'
-         write (iout,fstr)  ex,nex
-      end if
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine momyze  --  electrostatic & inertial analysis  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "momyze" finds and prints the total charge, dipole moment
-c     components, radius of gyration and moments of inertia
-c
-c
-      subroutine momyze
-      use sizes
-      use chgpot
-      use iounit
-      use moment
-      implicit none
-      real*8 rg
-c
-c
-c     get the total charge, dipole and quadrupole moments
-c
-      call moments
-      write (iout,10)  netchg
-   10 format (/,' Total Electric Charge :',12x,f13.5,' Electrons')
-      write (iout,20)  netdpl,xdpl,ydpl,zdpl
-   20 format (/,' Dipole Moment Magnitude :',10x,f13.3,' Debyes',
-     &        //,' Dipole X,Y,Z-Components :',10x,3f13.3)
-      write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
-     &                 yzqdp,zxqdp,zyqdp,zzqdp
-   30 format (/,' Quadrupole Moment Tensor :',9x,3f13.3,
-     &        /,6x,'(Buckinghams)',17x,3f13.3,
-     &        /,36x,3f13.3)
-      write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
-   40 format (/,' Principal Axes Quadrupole :',8x,3f13.3)
-      if (dielec .ne. 1.0d0) then
-         write (iout,50)  dielec
-   50    format (/,' Dielectric Constant :',14x,f13.3)
-         write (iout,60)  netchg/sqrt(dielec)
-   60    format (' Effective Total Charge :',11x,f13.5,' Electrons')
-         write (iout,70)  netdpl/sqrt(dielec)
-   70    format (' Effective Dipole Moment :',10x,f13.3,' Debyes')
-      end if
-c
-c     get the radius of gyration and moments of inertia
-c
-      call gyrate (rg)
-      write (iout,80)  rg
-   80 format (/,' Radius of Gyration :',15x,f13.3,' Angstroms')
-      call inertia (1)
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine viriyze  --  inertial virial & pressure values  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "propyze" finds and prints the internal virial, analytical and
-c     numerical dE/dV values, and the pressure
-c
-c
-      subroutine viriyze
-      use sizes
-      use atoms
-      use iounit
-      use virial
-      implicit none
-      integer i
-      real*8 energy
-      real*8, allocatable :: derivs(:,:)
-c
-c
-c     perform a gradient calculation in order to find virial
-c
-      allocate (derivs(3,n))
-      call gradient (energy,derivs)
-      deallocate (derivs)
-c
-c     print out the components of the internal virial
-c
-      write (iout,10)  (vir(1,i),vir(2,i),vir(3,i),i=1,3)
-   10 format (/,' Internal Virial Tensor :',12x,3f12.3,
-     &        /,37x,3f12.3,/,37x,3f12.3)
-c
-c     get two alternative dE/dV values and a pressure estimate
-c
-      call ptest
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine atomyze  --  individual atom energy analysis  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "atomyze" prints the potential energy components broken
-c     down by atom and to a choice of precision
-c
-c
-      subroutine atomyze (active)
-      use sizes
-      use analyz
-      use atoms
-      use inform
-      use iounit
-      implicit none
-      integer i
-      logical active(*)
-      character*240 fstr
-c
-c
-c     energy partitioning over the individual atoms
-c
-      fstr = '(/,'' Potential Energy Breakdown over Atoms :'')'
-      write (iout,fstr)
-      if (digits .ge. 8) then
-         write (iout,10)
-   10    format (/,'  Atom',9x,'EB',14x,'EA',14x,'EBA',13x,'EUB',
-     &           /,15x,'EAA',13x,'EOPB',12x,'EOPD',12x,'EID',
-     &           /,15x,'EIT',13x,'ET',14x,'EPT',13x,'EBT',
-     &           /,15x,'EAT',13x,'ETT',13x,'EV',14x,'EC',
-     &           /,15x,'ECD',13x,'ED',14x,'EM',14x,'EP',
-     &           /,15x,'ER',14x,'ES',14x,'ELF',13x,'EG',
-     &           /,15x,'EX')
-      else if (digits .ge. 6) then
-         write (iout,20)
-   20    format (/,'  Atom',8x,'EB',12x,'EA',12x,'EBA',11x,'EUB',
-     &              11x,'EAA',
-     &           /,14x,'EOPB',10x,'EOPD',10x,'EID',11x,'EIT',
-     &              11x,'ET',
-     &           /,14x,'EPT',11x,'EBT',11x,'EAT',11x,'ETT',11x,'EV',
-     &           /,14x,'EC',12x,'ECD',11x,'ED',12x,'EM',12x,'EP',
-     &           /,14x,'ER',12x,'ES',12x,'ELF',11x,'EG',12x,'EX')
-      else
-         write (iout,30)
-   30    format (/,'  Atom',8x,'EB',10x,'EA',10x,'EBA',9x,'EUB',
-     &              9x,'EAA',9x,'EOPB',
-     &           /,14x,'EOPD',8x,'EID',9x,'EIT',9x,'ET',10x,'EPT',
-     &              9x,'EBT',
-     &           /,14x,'EAT',9x,'ETT',9x,'EV',10x,'EC',10x,'ECD',
-     &              9x,'ED',
-     &           /,14x,'EM',10x,'EP',10x,'ER',10x,'ES',10x,'ELF',
-     &              9x,'EG',
-     &           /,14x,'EX')
-      end if
-      if (digits .ge. 8) then
-         fstr = '(/,i6,4f16.8,/,6x,4f16.8,/,6x,4f16.8,'//
-     &             '/,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,'//
-     &             '/,6x,f16.8)'
-      else if (digits .ge. 6) then
-         fstr = '(/,i6,5f14.6,/,6x,5f14.6,/,6x,5f14.6,'//
-     &             '/,6x,5f14.6,/,6x,5f14.6)'
-      else
-         fstr = '(/,i6,6f12.4,/,6x,6f12.4,/,6x,6f12.4,'//
-     &             '/,6x,6f12.4,/,6x,f12.4)'
-      end if
-      do i = 1, n
-         if (active(i)) then
-            write (iout,fstr)  i,aeb(i),aea(i),aeba(i),aeub(i),aeaa(i),
-     &                         aeopb(i),aeopd(i),aeid(i),aeit(i),aet(i),
-     &                         aept(i),aebt(i),aeat(i),aett(i),aev(i),
-     &                         aec(i),aecd(i),aed(i),aem(i),aep(i),
-     &                         aer(i),aes(i),aelf(i),aeg(i),aex(i)
-         end if
-      end do
-      return
-      end
-c
-c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine amberyze  --  parameter format for Amber setup  ##
@@ -1657,7 +1922,6 @@ c     by the Amber setup protocol for using AMOEBA within Amber
 c
 c
       subroutine amberyze (active)
-      use sizes
       use angang
       use angbnd
       use angpot
@@ -2472,151 +2736,6 @@ c
             end if
             write (iout,800)  i,ia,ib,kslope(i),lslope(i)
   800       format (i6,3x,2i6,19x,2f10.4)
-         end do
-      end if
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine connyze  --  connected atom list analysis  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "connyze" prints information onconnected atoms as lists
-c     of all atom pairs that are 1-2 through 1-5 interactions
-c
-c
-      subroutine connyze (active)
-      use sizes
-      use atoms
-      use couple
-      use iounit
-      implicit none
-      integer i,j,k
-      integer ntot
-      integer ntot2,ntot3
-      integer ntot4,ntot5
-      logical active(*)
-c
-c
-c     count the number of 1-2 through 1-5 interatomic pairs
-c
-      ntot2 = 0
-      ntot3 = 0
-      ntot4 = 0
-      ntot5 = 0
-      do i = 1, n
-         ntot2 = ntot2 + n12(i)
-         ntot3 = ntot3 + n13(i)
-         ntot4 = ntot4 + n14(i)
-         ntot5 = ntot5 + n15(i)
-      end do
-      ntot2 = ntot2 / 2
-      ntot3 = ntot3 / 2
-      ntot4 = ntot4 / 2
-      ntot5 = ntot5 / 2
-      ntot = ntot2 + ntot3 + ntot4 + ntot5
-      if (ntot .ne. 0) then
-         write (iout,10)
-   10    format (/,' Total Number of Pairwise Atomic Interactions :',/)
-      end if
-      if (ntot2 .ne. 0) then
-         write (iout,20)  ntot2
-   20    format (' Number of 1-2 Pairs',7x,i15)
-      end if
-      if (ntot3 .ne. 0) then
-         write (iout,30)  ntot3
-   30    format (' Number of 1-3 Pairs',7x,i15)
-      end if
-      if (ntot4 .ne. 0) then
-         write (iout,40)  ntot4
-   40    format (' Number of 1-4 Pairs',7x,i15)
-      end if
-      if (ntot5 .ne. 0) then
-         write (iout,50)  ntot5
-   50    format (' Number of 1-5 Pairs',7x,i15)
-      end if
-c
-c     generate and print the 1-2 connected atomic interactions
-c
-      if (ntot2 .ne. 0) then
-         write (iout,60)
-   60    format (/,' List of 1-2 Connected Atomic Interactions :',/)
-         do i = 1, n
-            if (active(i)) then
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (active(k)) then
-                     if (i .lt. k) then
-                        write (iout,70)  i,k
-   70                   format (2i8)
-                     end if
-                  end if
-               end do
-            end if
-         end do
-      end if
-c
-c     generate and print the 1-3 connected atomic interactions
-c
-      if (ntot3 .ne. 0) then
-         write (iout,80)
-   80    format (/,' List of 1-3 Connected Atomic Interactions :',/)
-         do i = 1, n
-            if (active(i)) then
-               do j = 1, n13(i)
-                  k = i13(j,i)
-                  if (active(k)) then
-                     if (i .lt. k) then
-                        write (iout,90)  i,k
-   90                   format (2i8)
-                     end if
-                  end if
-               end do
-            end if
-         end do
-      end if
-c
-c     generate and print the 1-4 connected atomic interactions
-c
-      if (ntot4 .ne. 0) then
-         write (iout,100)
-  100    format (/,' List of 1-4 Connected Atomic Interactions :',/)
-         do i = 1, n
-            if (active(i)) then
-               do j = 1, n14(i)
-                  k = i14(j,i)
-                  if (active(k)) then
-                     if (i .lt. k) then
-                        write (iout,110)  i,k
-  110                   format (2i8)
-                     end if
-                  end if
-               end do
-            end if
-         end do
-      end if
-c
-c     generate and print the 1-5 connected atomic interactions
-c
-      if (ntot5 .ne. 0) then
-         write (iout,120)
-  120    format (/,' List of 1-5 Connected Atomic Interactions :',/)
-         do i = 1, n
-            if (active(i)) then
-               do j = 1, n15(i)
-                  k = i15(j,i)
-                  if (active(k)) then
-                     if (i .lt. k) then
-                        write (iout,130)  i,k
-  130                   format (2i8)
-                     end if
-                  end if
-               end do
-            end if
          end do
       end if
       return

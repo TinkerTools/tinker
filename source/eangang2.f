@@ -18,7 +18,6 @@ c     using finite difference methods
 c
 c
       subroutine eangang2 (i)
-      use sizes
       use angang
       use angbnd
       use atoms
@@ -190,7 +189,6 @@ c     used in computation of finite difference second derivatives
 c
 c
       subroutine eangang2a (i,de)
-      use sizes
       use angang
       use angbnd
       use angpot

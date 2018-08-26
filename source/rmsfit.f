@@ -16,7 +16,6 @@ c     "rmsfit" computes the rms fit of two coordinate sets
 c
 c
       function rmsfit (x1,y1,z1,x2,y2,z2)
-      use sizes
       use align
       implicit none
       integer i,i1,i2

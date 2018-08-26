@@ -18,7 +18,6 @@ c     also processes any new or changed parameter values
 c
 c
       subroutine kopbend
-      use sizes
       use angbnd
       use angpot
       use atomid
@@ -253,7 +252,6 @@ c     according to the Merck Molecular Force Field (MMFF)
 c
 c
       subroutine kopbendm
-      use sizes
       use angbnd
       use atomid
       use atoms

@@ -17,7 +17,6 @@ c     and its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine elj1
-      use sizes
       use energi
       use limits
       use vdwpot
@@ -66,7 +65,6 @@ c     and its first derivatives using a pairwise double loop
 c
 c
       subroutine elj1a
-      use sizes
       use atomid
       use atoms
       use bound
@@ -504,7 +502,6 @@ c     and its first derivatives using the method of lights
 c
 c
       subroutine elj1b
-      use sizes
       use atomid
       use atoms
       use bound
@@ -840,7 +837,6 @@ c     and its first derivatives using a pairwise neighbor list
 c
 c
       subroutine elj1c
-      use sizes
       use atomid
       use atoms
       use bound
@@ -1149,7 +1145,6 @@ c     first derivatives for use with stophat potential energy smoothing
 c
 c
       subroutine elj1e
-      use sizes
       use atomid
       use atoms
       use couple

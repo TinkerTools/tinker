@@ -219,7 +219,7 @@ c
          end do
          close (unit=idoc)
          write (iout,160)  docfile(1:trimtext(docfile))
-  160    format (/,' Source Documentation Written To:  ',a)
+  160    format (/,' Source Documentation Written To :  ',a)
       end if
 c
 c     get a list of the calls made by each source code routine
@@ -295,7 +295,7 @@ c
          end do
          close (unit=idoc)
          write (iout,220)  docfile(1:trimtext(docfile))
-  220    format (/,' Source Documentation Written To:  ',a)
+  220    format (/,' Source Documentation Written To :  ',a)
       end if
 c
 c     get a list of common block contents from source code
@@ -383,7 +383,7 @@ c
          end do
          close (unit=idoc)
          write (iout,320)  docfile(1:trimtext(docfile))
-  320    format (/,' Source Documentation Written To:  ',a)
+  320    format (/,' Source Documentation Written To :  ',a)
       end if
 c
 c     get the keyword values from the source code listing
@@ -427,7 +427,7 @@ c
          end do
          close (unit=idoc)
          write (iout,360)  docfile(1:trimtext(docfile))
-  360    format (/,' Keyword Listing Written To:  ',a)
+  360    format (/,' Keyword Listing Written To :  ',a)
       end if
 c
 c     get the used modules from the source code listing
@@ -479,7 +479,7 @@ c
          call prtprm (idoc)
          close (unit=idoc)
          write (iout,410)  docfile(1:trimtext(docfile))
-  410    format (/,' Parameter Listing Written To:  ',a)
+  410    format (/,' Parameter Listing Written To :  ',a)
       end if
 c
 c     perform any final tasks before program exit

@@ -17,7 +17,6 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine ktors
-      use sizes
       use atomid
       use atoms
       use couple
@@ -575,7 +574,6 @@ c     616-641 (1995)
 c
 c
       subroutine ktorsm
-      use sizes
       use atomid
       use atoms
       use ktorsn

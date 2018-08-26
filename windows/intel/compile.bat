@@ -120,7 +120,9 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pitors.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pme.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polar.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polgrp.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polopt.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polpot.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp poltcg.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp potent.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp potfit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp precis.f
@@ -452,7 +454,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp overlap.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp path.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pdbxyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp picalc.f
-ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pmestuff.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pmestuf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pmpb.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polarize.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp poledit.f
@@ -505,7 +507,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp server.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp shakeup.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sigmoid.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp simplex.f
-ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sktstuff.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sktstuf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sniffer.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sort.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp spacefill.f
@@ -516,12 +518,14 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp superpose.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp surface.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp surfatom.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp switch.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tcgstuf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp temper.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testgrad.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testhess.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testpair.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testpol.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testrot.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testvir.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp timer.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp timerot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tncg.f

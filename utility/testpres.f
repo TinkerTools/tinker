@@ -17,7 +17,6 @@ c     and compares it to a numerical evaluation of dU/dV
 c
 c
       program testpres
-      use sizes
       use atoms
       use boxes
       use bound
@@ -140,7 +139,6 @@ c     of the periodic box volume
 c
 c
       subroutine vscale (epot,mode,eps)
-      use sizes
       use atomid
       use atoms
       use boxes

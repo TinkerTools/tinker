@@ -17,7 +17,6 @@ c     first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine eangang1
-      use sizes
       use angang
       use angbnd
       use angpot

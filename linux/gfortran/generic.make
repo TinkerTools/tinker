@@ -119,7 +119,9 @@ gfortran -c -Ofast -msse3 -fopenmp pitors.f
 gfortran -c -Ofast -msse3 -fopenmp pme.f
 gfortran -c -Ofast -msse3 -fopenmp polar.f
 gfortran -c -Ofast -msse3 -fopenmp polgrp.f
+gfortran -c -Ofast -msse3 -fopenmp polopt.f
 gfortran -c -Ofast -msse3 -fopenmp polpot.f
+gfortran -c -Ofast -msse3 -fopenmp poltcg.f
 gfortran -c -Ofast -msse3 -fopenmp potent.f
 gfortran -c -Ofast -msse3 -fopenmp potfit.f
 gfortran -c -Ofast -msse3 -fopenmp precis.f
@@ -451,7 +453,7 @@ gfortran -c -Ofast -msse3 -fopenmp overlap.f
 gfortran -c -Ofast -msse3 -fopenmp path.f
 gfortran -c -Ofast -msse3 -fopenmp pdbxyz.f
 gfortran -c -Ofast -msse3 -fopenmp picalc.f
-gfortran -c -Ofast -msse3 -fopenmp pmestuff.f
+gfortran -c -Ofast -msse3 -fopenmp pmestuf.f
 gfortran -c -Ofast -msse3 -fopenmp pmpb.f
 gfortran -c -Ofast -msse3 -fopenmp polarize.f
 gfortran -c -Ofast -msse3 -fopenmp poledit.f
@@ -504,7 +506,7 @@ gfortran -c -Ofast -msse3 -fopenmp server.f
 gfortran -c -Ofast -msse3 -fopenmp shakeup.f
 gfortran -c -Ofast -msse3 -fopenmp sigmoid.f
 gfortran -c -Ofast -msse3 -fopenmp simplex.f
-gfortran -c -Ofast -msse3 -fopenmp sktstuff.f
+gfortran -c -Ofast -msse3 -fopenmp sktstuf.f
 gfortran -c -Ofast -msse3 -fopenmp sniffer.f
 gfortran -c -Ofast -msse3 -fopenmp sort.f
 gfortran -c -Ofast -msse3 -fopenmp spacefill.f
@@ -515,12 +517,14 @@ gfortran -c -Ofast -msse3 -fopenmp superpose.f
 gfortran -c -Ofast -msse3 -fopenmp surface.f
 gfortran -c -Ofast -msse3 -fopenmp surfatom.f
 gfortran -c -Ofast -msse3 -fopenmp switch.f
+gfortran -c -Ofast -msse3 -fopenmp tcgstuf.f
 gfortran -c -Ofast -msse3 -fopenmp temper.f
 gfortran -c -Ofast -msse3 -fopenmp testgrad.f
 gfortran -c -Ofast -msse3 -fopenmp testhess.f
 gfortran -c -Ofast -msse3 -fopenmp testpair.f
 gfortran -c -Ofast -msse3 -fopenmp testpol.f
 gfortran -c -Ofast -msse3 -fopenmp testrot.f
+gfortran -c -Ofast -msse3 -fopenmp testvir.f
 gfortran -c -Ofast -msse3 -fopenmp timer.f
 gfortran -c -Ofast -msse3 -fopenmp timerot.f
 gfortran -c -Ofast -msse3 -fopenmp tncg.f

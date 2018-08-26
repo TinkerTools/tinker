@@ -21,7 +21,6 @@ c     the triangle smoothed bounds matrix prior to embedding
 c
 c
       program distgeom
-      use sizes
       use angbnd
       use atomid
       use atoms
