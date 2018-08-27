@@ -190,9 +190,15 @@ c
             virn(i,j) = virn(j,i)
          end do
       end do
-      write (iout,30)  (virn(1,i),virn(2,i),virn(3,i),i=1,3)
-   30 format (/,' Numerical Virial Tensor :',10x,3f13.3,
-     &           /,36x,3f13.3,/,36x,3f13.3)
+      if (octahedron) then
+         write (iout,30)  virn(1,1),virn(2,2),virn(3,3)
+   30    format (/,' Numerical Virial Diagonal :',8x,3f13.3)
+
+      else
+         write (iout,40)  (virn(1,i),virn(2,i),virn(3,i),i=1,3)
+   40    format (/,' Numerical Virial Tensor :',10x,3f13.3,
+     &              /,36x,3f13.3,/,36x,3f13.3)
+      end if
 c
 c     find the analytical and numerical values of dE/dV
 c
@@ -205,11 +211,11 @@ c
       if (temp .eq. 0.0d0)  temp = 298.0d0
       pres_vir = prescon * (dble(n)*gasconst*temp/volbox-dedv_vir)
       pres_num = prescon * (dble(n)*gasconst*temp/volbox-dedv_num)
-      write (iout,40)  nint(temp),pres_vir
-   40 format (/,' Pressure (Analytical,',i4,' K) :',5x,f13.3,
+      write (iout,50)  nint(temp),pres_vir
+   50 format (/,' Pressure (Analytical,',i4,' K) :',5x,f13.3,
      &           ' Atmospheres')
-      write (iout,50)  nint(temp),pres_num
-   50 format (' Pressure (Numerical,',i4,' K) :',6x,f13.3,
+      write (iout,60)  nint(temp),pres_num
+   60 format (' Pressure (Numerical,',i4,' K) :',6x,f13.3,
      &           ' Atmospheres')
       return
       end
