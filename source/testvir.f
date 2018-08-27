@@ -99,11 +99,13 @@ c
       if (.not. use_bounds)  return
       eps = 0.00001d0
 c
-c     set lattice type and store the lattice vectors
+c     set the lattice type and store the lattice vectors
 c
-      orthogonal = .false.
-      monoclinic = .false.
-      triclinic = .true.
+      if (.not. octahedron) then
+         orthogonal = .false.
+         monoclinic = .false.
+         triclinic = .true.
+      end if
       do i = 1, 3
          do j = 1, 3
             lold(j,i) = lvec(j,i)
