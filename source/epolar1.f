@@ -4797,7 +4797,6 @@ c
       use virial
       implicit none
       integer i,j,k,m,ii
-      integer iab
       integer j1,j2,j3
       integer k1,k2,k3
       integer m1,m2,m3
@@ -5265,13 +5264,13 @@ c
 c     account for dipole response terms in the TCG method
 c
       if (poltyp .eq. 'TCG') then
-         do iab = 1, tcgnab
+         do m = 1, tcgnab
             do i = 1, npole
                do j = 1, 3
-                  fuind(j,i) = a(j,1)*uad(1,i,iab) + a(j,2)*uad(2,i,iab)
-     &                         + a(j,3)*uad(3,i,iab)
-                  fuinp(j,i) = a(j,1)*ubp(1,i,iab) + a(j,2)*ubp(2,i,iab)
-     &                         + a(j,3)*ubp(3,i,iab)
+                  fuind(j,i) = a(j,1)*uad(1,i,m) + a(j,2)*uad(2,i,m)
+     &                            + a(j,3)*uad(3,i,m)
+                  fuinp(j,i) = a(j,1)*ubp(1,i,m) + a(j,2)*ubp(2,i,m)
+     &                            + a(j,3)*ubp(3,i,m)
                end do
             end do
             call grid_uind (fuind,fuinp)
@@ -5323,32 +5322,32 @@ c
                      cphip(j) = cphip(j) + ftc(j,k)*fphip(k,i)
                   end do
                end do
-               vxx = vxx - 0.5d0*(cphid(2)*ubp(1,i,iab)
-     &                              +cphip(2)*uad(1,i,iab))
-               vxy = vxy - 0.25d0*(cphid(2)*ubp(2,i,iab)
-     &                               +cphip(2)*uad(2,i,iab)
-     &                               +cphid(3)*ubp(1,i,iab)
-     &                               +cphip(3)*uad(1,i,iab))
-               vxz = vxz - 0.25d0*(cphid(2)*ubp(3,i,iab)
-     &                               +cphip(2)*uad(3,i,iab)
-     &                               +cphid(4)*ubp(1,i,iab)
-     &                               +cphip(4)*uad(1,i,iab))
-               vyy = vyy - 0.5d0*(cphid(3)*ubp(2,i,iab)
-     &                              +cphip(3)*uad(2,i,iab))
-               vyz = vyz - 0.25d0*(cphid(3)*ubp(3,i,iab)
-     &                               +cphip(3)*uad(3,i,iab)
-     &                               +cphid(4)*ubp(2,i,iab)
-     &                               +cphip(4)*uad(2,i,iab))
-               vzz = vzz - 0.5d0*(cphid(4)*ubp(3,i,iab)
-     &                              +cphip(4)*uad(3,i,iab))
+               vxx = vxx - 0.5d0*(cphid(2)*ubp(1,i,m)
+     &                              +cphip(2)*uad(1,i,m))
+               vxy = vxy - 0.25d0*(cphid(2)*ubp(2,i,m)
+     &                               +cphip(2)*uad(2,i,m)
+     &                               +cphid(3)*ubp(1,i,m)
+     &                               +cphip(3)*uad(1,i,m))
+               vxz = vxz - 0.25d0*(cphid(2)*ubp(3,i,m)
+     &                               +cphip(2)*uad(3,i,m)
+     &                               +cphid(4)*ubp(1,i,m)
+     &                               +cphip(4)*uad(1,i,m))
+               vyy = vyy - 0.5d0*(cphid(3)*ubp(2,i,m)
+     &                              +cphip(3)*uad(2,i,m))
+               vyz = vyz - 0.25d0*(cphid(3)*ubp(3,i,m)
+     &                               +cphip(3)*uad(3,i,m)
+     &                               +cphid(4)*ubp(2,i,m)
+     &                               +cphip(4)*uad(2,i,m))
+               vzz = vzz - 0.5d0*(cphid(4)*ubp(3,i,m)
+     &                              +cphip(4)*uad(3,i,m))
             end do
 c
             do i = 1, npole
                do j = 1, 3
-                  fuind(j,i) = a(j,1)*ubd(1,i,iab) + a(j,2)*ubd(2,i,iab)
-     &                            + a(j,3)*ubd(3,i,iab)
-                  fuinp(j,i) = a(j,1)*uap(1,i,iab) + a(j,2)*uap(2,i,iab)
-     &                            + a(j,3)*uap(3,i,iab)
+                  fuind(j,i) = a(j,1)*ubd(1,i,m) + a(j,2)*ubd(2,i,m)
+     &                            + a(j,3)*ubd(3,i,m)
+                  fuinp(j,i) = a(j,1)*uap(1,i,m) + a(j,2)*uap(2,i,m)
+     &                            + a(j,3)*uap(3,i,m)
                end do
             end do
             call grid_uind (fuind,fuinp)
@@ -5400,24 +5399,24 @@ c
                      cphip(j) = cphip(j) + ftc(j,k)*fphip(k,i)
                   end do
                end do
-               vxx = vxx - 0.5d0*(cphid(2)*uap(1,i,iab)
-     &                              +cphip(2)*ubd(1,i,iab))
-               vxy = vxy - 0.25d0*(cphid(2)*uap(2,i,iab)
-     &                               +cphip(2)*ubd(2,i,iab)
-     &                               +cphid(3)*uap(1,i,iab)
-     &                               +cphip(3)*ubd(1,i,iab))
-               vxz = vxz - 0.25d0*(cphid(2)*uap(3,i,iab)
-     &                               +cphip(2)*ubd(3,i,iab)
-     &                               +cphid(4)*uap(1,i,iab)
-     &                               +cphip(4)*ubd(1,i,iab))
-               vyy = vyy - 0.5d0*(cphid(3)*uap(2,i,iab)
-     &                              +cphip(3)*ubd(2,i,iab))
-               vyz = vyz - 0.25d0*(cphid(3)*uap(3,i,iab)
-     &                               +cphip(3)*ubd(3,i,iab)
-     &                               +cphid(4)*uap(2,i,iab)
-     &                               +cphip(4)*ubd(2,i,iab))
-               vzz = vzz - 0.5d0*(cphid(4)*uap(3,i,iab)
-     &                              +cphip(4)*ubd(3,i,iab))
+               vxx = vxx - 0.5d0*(cphid(2)*uap(1,i,m)
+     &                              +cphip(2)*ubd(1,i,m))
+               vxy = vxy - 0.25d0*(cphid(2)*uap(2,i,m)
+     &                               +cphip(2)*ubd(2,i,m)
+     &                               +cphid(3)*uap(1,i,m)
+     &                               +cphip(3)*ubd(1,i,m))
+               vxz = vxz - 0.25d0*(cphid(2)*uap(3,i,m)
+     &                               +cphip(2)*ubd(3,i,m)
+     &                               +cphid(4)*uap(1,i,m)
+     &                               +cphip(4)*ubd(1,i,m))
+               vyy = vyy - 0.5d0*(cphid(3)*uap(2,i,m)
+     &                              +cphip(3)*ubd(2,i,m))
+               vyz = vyz - 0.25d0*(cphid(3)*uap(3,i,m)
+     &                               +cphip(3)*ubd(3,i,m)
+     &                               +cphid(4)*uap(2,i,m)
+     &                               +cphip(4)*ubd(2,i,m))
+               vzz = vzz - 0.5d0*(cphid(4)*uap(3,i,m)
+     &                              +cphip(4)*ubd(3,i,m))
             end do
          end do
       end if
@@ -5510,7 +5509,7 @@ c
 c     assign only the induced dipoles to the PME grid
 c     and perform the 3-D FFT forward transformation
 c
-      if (poltyp .eq. 'DIRECT') then
+      if (poltyp.eq.'DIRECT' .or. poltyp.eq.'TCG') then
          do i = 1, npole
             do j = 1, 10
                cmp(j,i) = 0.0d0
@@ -5580,6 +5579,157 @@ c
                vyz = vyz - h2*h3*vterm
                vzz = vzz - h3*h3*vterm + eterm
             end if
+         end do
+      end if
+c
+c     add back missing terms for the TCG polarization method;
+c     first do the term for "UAD" dotted with "UBP"
+c
+      if (poltyp .eq. 'TCG') then
+         do m = 1, tcgnab
+            do i = 1, npole
+               do j = 1, 10
+                  cmp(j,i) = 0.0d0
+               end do
+               do j = 2, 4
+                  cmp(j,i) = ubp(j-1,i,m)
+               end do
+            end do
+            call cmp_to_fmp (cmp,fmp)
+            call grid_mpole (fmp)
+            call fftfront
+            do k = 1, nfft3
+               do j = 1, nfft2
+                  do i = 1, nfft1
+                     qgrip(1,i,j,k) = qgrid(1,i,j,k)
+                     qgrip(2,i,j,k) = qgrid(2,i,j,k)
+                  end do
+               end do
+            end do
+            do i = 1, npole
+               do j = 2, 4
+                  cmp(j,i) = uad(j-1,i,m)
+               end do
+            end do
+            call cmp_to_fmp (cmp,fmp)
+            call grid_mpole (fmp)
+            call fftfront
+c
+c     make the scalar summation over reciprocal lattice
+c
+            do i = 1, ntot-1
+               k3 = i/nff + 1
+               j = i - (k3-1)*nff
+               k2 = j/nfft1 + 1
+               k1 = j - (k2-1)*nfft1 + 1
+               m1 = k1 - 1
+               m2 = k2 - 1
+               m3 = k3 - 1
+               if (k1 .gt. nf1)  m1 = m1 - nfft1
+               if (k2 .gt. nf2)  m2 = m2 - nfft2
+               if (k3 .gt. nf3)  m3 = m3 - nfft3
+               r1 = dble(m1)
+               r2 = dble(m2)
+               r3 = dble(m3)
+               h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+               h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+               h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+               hsq = h1*h1 + h2*h2 + h3*h3
+               term = -pterm * hsq
+               expterm = 0.0d0
+               if (term .gt. -50.0d0) then
+                  denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+                  expterm = exp(term) / denom
+                  if (.not. use_bounds) then
+                     expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+                  else if (octahedron) then
+                     if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+                  end if
+                  struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
+     &                        + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
+                  eterm = 0.5d0 * f * expterm * struc2
+                  vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
+                  vxx = vxx + h1*h1*vterm - eterm
+                  vxy = vxy + h1*h2*vterm
+                  vxz = vxz + h1*h3*vterm
+                  vyy = vyy + h2*h2*vterm - eterm
+                  vyz = vyz + h2*h3*vterm
+                  vzz = vzz + h3*h3*vterm - eterm
+               end if
+            end do
+c
+c     now do the TCG terms with "UBD" dotted with "UAP"
+c
+            do i = 1, npole
+               do j = 1, 10
+                  cmp(j,i) = 0.0d0
+               end do
+               do j = 2, 4
+                  cmp(j,i) = uap(j-1,i,m)
+               end do
+            end do
+            call cmp_to_fmp (cmp,fmp)
+            call grid_mpole (fmp)
+            call fftfront
+            do k = 1, nfft3
+               do j = 1, nfft2
+                  do i = 1, nfft1
+                     qgrip(1,i,j,k) = qgrid(1,i,j,k)
+                     qgrip(2,i,j,k) = qgrid(2,i,j,k)
+                  end do
+               end do
+            end do
+            do i = 1, npole
+               do j = 2, 4
+                  cmp(j,i) = ubd(j-1,i,m)
+               end do
+            end do
+            call cmp_to_fmp (cmp,fmp)
+            call grid_mpole (fmp)
+            call fftfront
+c
+c     make the scalar summation over reciprocal lattice
+c
+            do i = 1, ntot-1
+               k3 = i/nff + 1
+               j = i - (k3-1)*nff
+               k2 = j/nfft1 + 1
+               k1 = j - (k2-1)*nfft1 + 1
+               m1 = k1 - 1
+               m2 = k2 - 1
+               m3 = k3 - 1
+               if (k1 .gt. nf1)  m1 = m1 - nfft1
+               if (k2 .gt. nf2)  m2 = m2 - nfft2
+               if (k3 .gt. nf3)  m3 = m3 - nfft3
+               r1 = dble(m1)
+               r2 = dble(m2)
+               r3 = dble(m3)
+               h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+               h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+               h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+               hsq = h1*h1 + h2*h2 + h3*h3
+               term = -pterm * hsq
+               expterm = 0.0d0
+               if (term .gt. -50.0d0) then
+                  denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+                  expterm = exp(term) / denom
+                  if (.not. use_bounds) then
+                     expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+                  else if (octahedron) then
+                     if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+                  end if
+                  struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
+     &                        + qgrid(2,k1,k2,k3)*qgrip(2,k1,k2,k3)
+                  eterm = 0.5d0 * f * expterm * struc2
+                  vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
+                  vxx = vxx + h1*h1*vterm - eterm
+                  vxy = vxy + h1*h2*vterm
+                  vxz = vxz + h1*h3*vterm
+                  vyy = vyy + h2*h2*vterm - eterm
+                  vyz = vyz + h2*h3*vterm
+                  vzz = vzz + h3*h3*vterm - eterm
+               end if
+            end do
          end do
       end if
 c
