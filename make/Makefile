@@ -1864,6 +1864,7 @@ opdist.o:
 openend.o:
 openmp.o:
 optimize.o: atoms.o files.o inform.o iounit.o scales.o usage.o
+optinit.o: inform.o keys.o output.o
 optirot.o: files.o inform.o iounit.o math.o omega.o scales.o zcoord.o
 optrigid.o: files.o group.o inform.o iounit.o math.o output.o rigid.o
 optsave.o: atomid.o atoms.o bound.o deriv.o files.o iounit.o math.o mpole.o omega.o output.o polar.o potent.o scales.o socket.o titles.o units.o usage.o zcoord.o

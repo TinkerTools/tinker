@@ -443,6 +443,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp numgrad.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp ocvm.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp openend.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp optimize.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp optinit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp optirot.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp optrigid.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp optsave.f

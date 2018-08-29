@@ -341,6 +341,7 @@ opbend.obj
 opdist.obj
 openend.obj
 openmp.obj
+optinit.obj
 optsave.obj
 orbital.obj
 orbits.obj

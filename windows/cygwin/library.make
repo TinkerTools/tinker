@@ -352,6 +352,7 @@ opbend.o \
 opdist.o \
 openend.o \
 openmp.o \
+optinit.o \
 optsave.o \
 orbital.o \
 orbits.o \

@@ -443,6 +443,7 @@ ifort -c -g -warn all -check all numgrad.f
 ifort -c -g -warn all -check all ocvm.f
 ifort -c -g -warn all -check all openend.f
 ifort -c -g -warn all -check all optimize.f
+ifort -c -g -warn all -check all optinit.f
 ifort -c -g -warn all -check all optirot.f
 ifort -c -g -warn all -check all optrigid.f
 ifort -c -g -warn all -check all optsave.f

@@ -443,6 +443,7 @@ gfortran -c -O3 -ffast-math -fopenmp numgrad.f
 gfortran -c -O3 -ffast-math -fopenmp ocvm.f
 gfortran -c -O3 -ffast-math -fopenmp openend.f
 gfortran -c -O3 -ffast-math -fopenmp optimize.f
+gfortran -c -O3 -ffast-math -fopenmp optinit.f
 gfortran -c -O3 -ffast-math -fopenmp optirot.f
 gfortran -c -O3 -ffast-math -fopenmp optrigid.f
 gfortran -c -O3 -ffast-math -fopenmp optsave.f

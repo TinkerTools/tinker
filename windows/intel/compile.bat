@@ -444,6 +444,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp numgrad.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ocvm.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp openend.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp optimize.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp optinit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp optirot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp optrigid.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp optsave.f

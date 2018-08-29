@@ -443,6 +443,7 @@ gfortran -c -Wall numgrad.f
 gfortran -c -Wall ocvm.f
 gfortran -c -Wall openend.f
 gfortran -c -Wall optimize.f
+gfortran -c -Wall optinit.f
 gfortran -c -Wall optirot.f
 gfortran -c -Wall optrigid.f
 gfortran -c -Wall optsave.f
