@@ -70,6 +70,9 @@ c
 c     original version written by John D. Chodera, University of
 c     California, Berkeley, December 2010
 c
+c     modified for off-diagonal numerical virial by Jay W. Ponder,
+c     Saint Louis, August 2018
+c
 c
       subroutine ptest
       use atoms
@@ -116,7 +119,7 @@ c
 c     print out the lattice vectors as matrix rows
 c
       write (iout,10)  (lvec(1,i),lvec(2,i),lvec(3,i),i=1,3)
-   10 format (/,' Lattice Vectors :',18x,3f13.3,
+   10 format (/,' Lattice Vectors (Lvec) :',11x,3f13.3,
      &           /,36x,3f13.3,/,36x,3f13.3)
 c
 c     perform dynamic allocation of some local arrays

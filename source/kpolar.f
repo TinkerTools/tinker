@@ -250,7 +250,7 @@ c
    40             format (/,' Additional Atomic Dipole',
      &                       ' Polarizability Parameters :',
      &                    //,5x,'Atom Type',11x,'Alpha',8x,
-     &                       'Damp',5x,'Group Atom Types'/)
+     &                       'Damp',5x,'Group Atom Types',/)
                end if
                if (k .le. maxtyp) then
                   polr(k) = pol

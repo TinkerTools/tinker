@@ -114,7 +114,7 @@ c
       real*8 term1,term2,term3
       real*8 term4,term5,term6
       real*8 term7,term8
-      real*8 depx,depy,depz
+      real*8 derx,dery,derz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -440,27 +440,27 @@ c
 c
 c     get the dEd/dR terms used for direct polarization force
 c
-               depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+               derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                   - txxk*uixp - txyk*uiyp - txzk*uizp
-               depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+               dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
-               depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+               derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
-               frcx = dscale(kk) * depx
-               frcy = dscale(kk) * depy
-               frcz = dscale(kk) * depz
+               frcx = dscale(kk) * derx
+               frcy = dscale(kk) * dery
+               frcz = dscale(kk) * derz
 c
 c     get the dEp/dR terms used for direct polarization force
 c
-               depx = txxi*ukx + txyi*uky + txzi*ukz
+               derx = txxi*ukx + txyi*uky + txzi*ukz
      &                   - txxk*uix - txyk*uiy - txzk*uiz
-               depy = txyi*ukx + tyyi*uky + tyzi*ukz
+               dery = txyi*ukx + tyyi*uky + tyzi*ukz
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
-               depz = txzi*ukx + tyzi*uky + tzzi*ukz
+               derz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
-               frcx = frcx + pscale(kk)*depx
-               frcy = frcy + pscale(kk)*depy
-               frcz = frcz + pscale(kk)*depz
+               frcx = frcx + pscale(kk)*derx
+               frcy = frcy + pscale(kk)*dery
+               frcz = frcz + pscale(kk)*derz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -491,15 +491,15 @@ c
                   term3 = zr * (sc5*rr7*yr-rc5(2))
                   tyzi = uiy*term1 + uiz*term2 - uri*term3
                   tyzk = uky*term1 + ukz*term2 - urk*term3
-                  depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                  derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
-                  depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                  dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
-                  depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                  derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
-                  frcx = frcx + uscale(kk)*depx
-                  frcy = frcy + uscale(kk)*depy
-                  frcz = frcz + uscale(kk)*depz
+                  frcx = frcx + uscale(kk)*derx
+                  frcy = frcy + uscale(kk)*dery
+                  frcz = frcz + uscale(kk)*derz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -542,18 +542,18 @@ c
      &                            - urim*term3
                         tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                            - urkm*term3
-                        depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+                        derx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
-                        depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+                        dery = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
      &                       + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
      &                       + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
-                        depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+                        derz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
      &                       + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
      &                       + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
-                        frcx = frcx + copm(j+m+1)*uscale(kk)*depx
-                        frcy = frcy + copm(j+m+1)*uscale(kk)*depy
-                        frcz = frcz + copm(j+m+1)*uscale(kk)*depz
+                        frcx = frcx + copm(j+m+1)*uscale(kk)*derx
+                        frcy = frcy + copm(j+m+1)*uscale(kk)*dery
+                        frcz = frcz + copm(j+m+1)*uscale(kk)*derz
                      end do
                   end do
                end if
@@ -930,27 +930,27 @@ c
 c
 c     get the dEd/dR terms used for direct polarization force
 c
-               depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+               derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                   - txxk*uixp - txyk*uiyp - txzk*uizp
-               depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+               dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
-               depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+               derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
-               frcx = dscale(kk) * depx
-               frcy = dscale(kk) * depy
-               frcz = dscale(kk) * depz
+               frcx = dscale(kk) * derx
+               frcy = dscale(kk) * dery
+               frcz = dscale(kk) * derz
 c
 c     get the dEp/dR terms used for direct polarization force
 c
-               depx = txxi*ukx + txyi*uky + txzi*ukz
+               derx = txxi*ukx + txyi*uky + txzi*ukz
      &                   - txxk*uix - txyk*uiy - txzk*uiz
-               depy = txyi*ukx + tyyi*uky + tyzi*ukz
+               dery = txyi*ukx + tyyi*uky + tyzi*ukz
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
-               depz = txzi*ukx + tyzi*uky + tzzi*ukz
+               derz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
-               frcx = frcx + pscale(kk)*depx
-               frcy = frcy + pscale(kk)*depy
-               frcz = frcz + pscale(kk)*depz
+               frcx = frcx + pscale(kk)*derx
+               frcy = frcy + pscale(kk)*dery
+               frcz = frcz + pscale(kk)*derz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -981,15 +981,15 @@ c
                   term3 = zr * (sc5*rr7*yr-rc5(2))
                   tyzi = uiy*term1 + uiz*term2 - uri*term3
                   tyzk = uky*term1 + ukz*term2 - urk*term3
-                  depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                  derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
-                  depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                  dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
-                  depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                  derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
-                  frcx = frcx + uscale(kk)*depx
-                  frcy = frcy + uscale(kk)*depy
-                  frcz = frcz + uscale(kk)*depz
+                  frcx = frcx + uscale(kk)*derx
+                  frcy = frcy + uscale(kk)*dery
+                  frcz = frcz + uscale(kk)*derz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -1032,18 +1032,18 @@ c
      &                            - urim*term3
                         tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                            - urkm*term3
-                        depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+                        derx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
-                        depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+                        dery = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
      &                       + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
      &                       + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
-                        depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+                        derz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
      &                       + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
      &                       + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
-                        frcx = frcx + copm(j+m+1)*uscale(kk)*depx
-                        frcy = frcy + copm(j+m+1)*uscale(kk)*depy
-                        frcz = frcz + copm(j+m+1)*uscale(kk)*depz
+                        frcx = frcx + copm(j+m+1)*uscale(kk)*derx
+                        frcy = frcy + copm(j+m+1)*uscale(kk)*dery
+                        frcz = frcz + copm(j+m+1)*uscale(kk)*derz
                      end do
                   end do
                end if
@@ -1314,7 +1314,7 @@ c
       real*8 term1,term2,term3
       real*8 term4,term5,term6
       real*8 term7,term8
-      real*8 depx,depy,depz
+      real*8 derx,dery,derz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -1653,27 +1653,27 @@ c
 c
 c     get the dEd/dR terms used for direct polarization force
 c
-               depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+               derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                   - txxk*uixp - txyk*uiyp - txzk*uizp
-               depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+               dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
-               depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+               derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
-               frcx = dscale(kk) * depx
-               frcy = dscale(kk) * depy
-               frcz = dscale(kk) * depz
+               frcx = dscale(kk) * derx
+               frcy = dscale(kk) * dery
+               frcz = dscale(kk) * derz
 c
 c     get the dEp/dR terms used for direct polarization force
 c
-               depx = txxi*ukx + txyi*uky + txzi*ukz
+               derx = txxi*ukx + txyi*uky + txzi*ukz
      &                   - txxk*uix - txyk*uiy - txzk*uiz
-               depy = txyi*ukx + tyyi*uky + tyzi*ukz
+               dery = txyi*ukx + tyyi*uky + tyzi*ukz
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
-               depz = txzi*ukx + tyzi*uky + tzzi*ukz
+               derz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
-               frcx = frcx + pscale(kk)*depx
-               frcy = frcy + pscale(kk)*depy
-               frcz = frcz + pscale(kk)*depz
+               frcx = frcx + pscale(kk)*derx
+               frcy = frcy + pscale(kk)*dery
+               frcz = frcz + pscale(kk)*derz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -1704,15 +1704,15 @@ c
                   term3 = zr * (sc5*rr7*yr-rc5(2))
                   tyzi = uiy*term1 + uiz*term2 - uri*term3
                   tyzk = uky*term1 + ukz*term2 - urk*term3
-                  depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                  derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
-                  depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                  dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
-                  depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                  derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
-                  frcx = frcx + uscale(kk)*depx
-                  frcy = frcy + uscale(kk)*depy
-                  frcz = frcz + uscale(kk)*depz
+                  frcx = frcx + uscale(kk)*derx
+                  frcy = frcy + uscale(kk)*dery
+                  frcz = frcz + uscale(kk)*derz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -1755,18 +1755,18 @@ c
      &                            - urim*term3
                         tyzk = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                            - urkm*term3
-                        depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+                        derx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
-                        depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+                        dery = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
      &                       + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
      &                       + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
-                        depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+                        derz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
      &                       + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
      &                       + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
-                        frcx = frcx + copm(j+m+1)*uscale(kk)*depx
-                        frcy = frcy + copm(j+m+1)*uscale(kk)*depy
-                        frcz = frcz + copm(j+m+1)*uscale(kk)*depz
+                        frcx = frcx + copm(j+m+1)*uscale(kk)*derx
+                        frcy = frcy + copm(j+m+1)*uscale(kk)*dery
+                        frcz = frcz + copm(j+m+1)*uscale(kk)*derz
                      end do
                   end do
                end if
@@ -2273,7 +2273,7 @@ c
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 term6,term7
-      real*8 depx,depy,depz
+      real*8 derx,dery,derz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -2614,15 +2614,15 @@ c
                tyzk = ck*term3 + dsr5*dky*zr - dkz*term4 - drk*term5
      &                   + 2.0d0*dsr5*qkyz - 2.0d0*dsr7*zr*qrky
      &                   + 2.0d0*qrkz*term7 + qrrk*term6
-               depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+               derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                   - txxk*uixp - txyk*uiyp - txzk*uizp
-               depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+               dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
-               depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+               derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
-               frcx = depx
-               frcy = depy
-               frcz = depz
+               frcx = derx
+               frcy = dery
+               frcz = derz
 c
 c     get the dEp/dR terms used for direct polarization force
 c
@@ -2695,15 +2695,15 @@ c
                tyzk = ck*term3 + psr5*dky*zr - dkz*term4 - drk*term5
      &                   + 2.0d0*psr5*qkyz - 2.0d0*psr7*zr*qrky
      &                   + 2.0d0*qrkz*term7 + qrrk*term6
-               depx = txxi*ukx + txyi*uky + txzi*ukz
+               derx = txxi*ukx + txyi*uky + txzi*ukz
      &                   - txxk*uix - txyk*uiy - txzk*uiz
-               depy = txyi*ukx + tyyi*uky + tyzi*ukz
+               dery = txyi*ukx + tyyi*uky + tyzi*ukz
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
-               depz = txzi*ukx + tyzi*uky + tzzi*ukz
+               derz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
-               frcx = frcx + depx
-               frcy = frcy + depy
-               frcz = frcz + depz
+               frcx = frcx + derx
+               frcy = frcy + dery
+               frcz = frcz + derz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -2737,15 +2737,15 @@ c
                   term6 = yr*zr*term2 - rr5*zr*urc5(2)
                   tyzi = uiy*term4 + uiz*term5 + uri*term6
                   tyzk = uky*term4 + ukz*term5 + urk*term6
-                  depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                  derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
-                  depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                  dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
-                  depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                  derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
-                  frcx = frcx + depx
-                  frcy = frcy + depy
-                  frcz = frcz + depz
+                  frcx = frcx + derx
+                  frcy = frcy + dery
+                  frcz = frcz + derz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -2791,18 +2791,18 @@ c
      &                            + urim*term6
                         tyzk = uopt(m,2,k)*term4 + uopt(m,3,k)*term5
      &                            + urkm*term6
-                        depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+                        derx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
-                        depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+                        dery = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
      &                       + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
      &                       + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
-                        depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+                        derz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
      &                       + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
      &                       + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
-                        frcx = frcx + copm(j+m+1)*depx
-                        frcy = frcy + copm(j+m+1)*depy
-                        frcz = frcz + copm(j+m+1)*depz
+                        frcx = frcx + copm(j+m+1)*derx
+                        frcy = frcy + copm(j+m+1)*dery
+                        frcz = frcz + copm(j+m+1)*derz
                      end do
                   end do
                end if
@@ -3211,15 +3211,15 @@ c
                tyzk = ck*term3 + dsr5*dky*zr - dkz*term4 - drk*term5
      &                   + 2.0d0*dsr5*qkyz - 2.0d0*dsr7*zr*qrky
      &                   + 2.0d0*qrkz*term7 + qrrk*term6
-               depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+               derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                   - txxk*uixp - txyk*uiyp - txzk*uizp
-               depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+               dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
-               depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+               derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
-               frcx = depx
-               frcy = depy
-               frcz = depz
+               frcx = derx
+               frcy = dery
+               frcz = derz
 c
 c     get the dEp/dR terms used for direct polarization force
 c
@@ -3292,15 +3292,15 @@ c
                tyzk = ck*term3 + psr5*dky*zr - dkz*term4 - drk*term5
      &                   + 2.0d0*psr5*qkyz - 2.0d0*psr7*zr*qrky
      &                   + 2.0d0*qrkz*term7 + qrrk*term6
-               depx = txxi*ukx + txyi*uky + txzi*ukz
+               derx = txxi*ukx + txyi*uky + txzi*ukz
      &                   - txxk*uix - txyk*uiy - txzk*uiz
-               depy = txyi*ukx + tyyi*uky + tyzi*ukz
+               dery = txyi*ukx + tyyi*uky + tyzi*ukz
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
-               depz = txzi*ukx + tyzi*uky + tzzi*ukz
+               derz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
-               frcx = frcx + depx
-               frcy = frcy + depy
-               frcz = frcz + depz
+               frcx = frcx + derx
+               frcy = frcy + dery
+               frcz = frcz + derz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -3334,15 +3334,15 @@ c
                   term6 = yr*zr*term2 - rr5*zr*urc5(2)
                   tyzi = uiy*term4 + uiz*term5 + uri*term6
                   tyzk = uky*term4 + ukz*term5 + urk*term6
-                  depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                  derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
-                  depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                  dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
-                  depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                  derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
-                  frcx = frcx + depx
-                  frcy = frcy + depy
-                  frcz = frcz + depz
+                  frcx = frcx + derx
+                  frcy = frcy + dery
+                  frcz = frcz + derz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -3388,18 +3388,18 @@ c
      &                            + urim*term6
                         tyzk = uopt(m,2,k)*term4 + uopt(m,3,k)*term5
      &                            + urkm*term6
-                        depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+                        derx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
-                        depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+                        dery = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
      &                       + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
      &                       + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
-                        depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+                        derz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
      &                       + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
      &                       + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
-                        frcx = frcx + copm(j+m+1)*depx
-                        frcy = frcy + copm(j+m+1)*depy
-                        frcz = frcz + copm(j+m+1)*depz
+                        frcx = frcx + copm(j+m+1)*derx
+                        frcy = frcy + copm(j+m+1)*dery
+                        frcz = frcz + copm(j+m+1)*derz
                      end do
                   end do
                end if
@@ -3891,7 +3891,7 @@ c
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 term6,term7
-      real*8 depx,depy,depz
+      real*8 derx,dery,derz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -4303,15 +4303,15 @@ c
                tyzk = ck*term3 + dsr5*dky*zr - dkz*term4 - drk*term5
      &                   + 2.0d0*dsr5*qkyz - 2.0d0*dsr7*zr*qrky
      &                   + 2.0d0*qrkz*term7 + qrrk*term6
-               depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+               derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                   - txxk*uixp - txyk*uiyp - txzk*uizp
-               depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+               dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                   - txyk*uixp - tyyk*uiyp - tyzk*uizp
-               depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+               derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                   - txzk*uixp - tyzk*uiyp - tzzk*uizp
-               frcx = depx
-               frcy = depy
-               frcz = depz
+               frcx = derx
+               frcy = dery
+               frcz = derz
 c
 c     get the dEp/dR terms used for direct polarization force
 c
@@ -4384,15 +4384,15 @@ c
                tyzk = ck*term3 + psr5*dky*zr - dkz*term4 - drk*term5
      &                   + 2.0d0*psr5*qkyz - 2.0d0*psr7*zr*qrky
      &                   + 2.0d0*qrkz*term7 + qrrk*term6
-               depx = txxi*ukx + txyi*uky + txzi*ukz
+               derx = txxi*ukx + txyi*uky + txzi*ukz
      &                   - txxk*uix - txyk*uiy - txzk*uiz
-               depy = txyi*ukx + tyyi*uky + tyzi*ukz
+               dery = txyi*ukx + tyyi*uky + tyzi*ukz
      &                   - txyk*uix - tyyk*uiy - tyzk*uiz
-               depz = txzi*ukx + tyzi*uky + tzzi*ukz
+               derz = txzi*ukx + tyzi*uky + tzzi*ukz
      &                   - txzk*uix - tyzk*uiy - tzzk*uiz
-               frcx = frcx + depx
-               frcy = frcy + depy
-               frcz = frcz + depz
+               frcx = frcx + derx
+               frcy = frcy + dery
+               frcz = frcz + derz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -4426,15 +4426,15 @@ c
                   term6 = yr*zr*term2 - rr5*zr*urc5(2)
                   tyzi = uiy*term4 + uiz*term5 + uri*term6
                   tyzk = uky*term4 + ukz*term5 + urk*term6
-                  depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                  derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                      + txxk*uixp + txyk*uiyp + txzk*uizp
-                  depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                  dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                      + txyk*uixp + tyyk*uiyp + tyzk*uizp
-                  depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                  derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                      + txzk*uixp + tyzk*uiyp + tzzk*uizp
-                  frcx = frcx + depx
-                  frcy = frcy + depy
-                  frcz = frcz + depz
+                  frcx = frcx + derx
+                  frcy = frcy + dery
+                  frcz = frcz + derz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -4480,18 +4480,18 @@ c
      &                            + urim*term6
                         tyzk = uopt(m,2,k)*term4 + uopt(m,3,k)*term5
      &                            + urkm*term6
-                        depx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
+                        derx = txxi*uoptp(m,1,k) + txxk*uoptp(j,1,i)
      &                       + txyi*uoptp(m,2,k) + txyk*uoptp(j,2,i)
      &                       + txzi*uoptp(m,3,k) + txzk*uoptp(j,3,i)
-                        depy = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
+                        dery = txyi*uoptp(m,1,k) + txyk*uoptp(j,1,i)
      &                       + tyyi*uoptp(m,2,k) + tyyk*uoptp(j,2,i)
      &                       + tyzi*uoptp(m,3,k) + tyzk*uoptp(j,3,i)
-                        depz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
+                        derz = txzi*uoptp(m,1,k) + txzk*uoptp(j,1,i)
      &                       + tyzi*uoptp(m,2,k) + tyzk*uoptp(j,2,i)
      &                       + tzzi*uoptp(m,3,k) + tzzk*uoptp(j,3,i)
-                        frcx = frcx + copm(j+m+1)*depx
-                        frcy = frcy + copm(j+m+1)*depy
-                        frcz = frcz + copm(j+m+1)*depz
+                        frcx = frcx + copm(j+m+1)*derx
+                        frcy = frcy + copm(j+m+1)*dery
+                        frcz = frcz + copm(j+m+1)*derz
                      end do
                   end do
 c
@@ -4538,18 +4538,18 @@ c
                      term6 = yr*zr*term2 - rr5*zr*urc5(2)
                      tyzi = uay(j)*term4 + uaz(j)*term5 + uri*term6
                      tyzk = uky*term4 + ukz*term5 + urk*term6
-                     depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                     derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                         + txxk*uaxp(j) + txyk*uayp(j)
      &                         + txzk*uazp(j)
-                     depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                     dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                         + txyk*uaxp(j) + tyyk*uayp(j)
      &                         + tyzk*uazp(j)
-                     depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                     derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                         + txzk*uaxp(j) + tyzk*uayp(j)
      &                         + tzzk*uazp(j)
-                     frcx = frcx + depx
-                     frcy = frcy + depy
-                     frcz = frcz + depz
+                     frcx = frcx + derx
+                     frcy = frcy + dery
+                     frcz = frcz + derz
                      ukx = uad(1,k,j)
                      uky = uad(2,k,j)
                      ukz = uad(3,k,j)
@@ -4589,18 +4589,18 @@ c
                      term6 = yr*zr*term2 - rr5*zr*urc5(2)
                      tyzi = uby(j)*term4 + ubz(j)*term5 + uri*term6
                      tyzk = uky*term4 + ukz*term5 + urk*term6
-                     depx = txxi*ukxp + txyi*ukyp + txzi*ukzp
+                     derx = txxi*ukxp + txyi*ukyp + txzi*ukzp
      &                         + txxk*ubxp(j) + txyk*ubyp(j)
      &                         + txzk*ubzp(j)
-                     depy = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
+                     dery = txyi*ukxp + tyyi*ukyp + tyzi*ukzp
      &                         + txyk*ubxp(j) + tyyk*ubyp(j)
      &                         + tyzk*ubzp(j)
-                     depz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
+                     derz = txzi*ukxp + tyzi*ukyp + tzzi*ukzp
      &                         + txzk*ubxp(j) + tyzk*ubyp(j)
      &                         + tzzk*ubzp(j)
-                     frcx = frcx + depx
-                     frcy = frcy + depy
-                     frcz = frcz + depz
+                     frcx = frcx + derx
+                     frcy = frcy + dery
+                     frcz = frcz + derz
                   end do
                end if
 c
