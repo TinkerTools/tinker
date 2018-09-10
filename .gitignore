@@ -1,6 +1,7 @@
 *.swp
 apbs
 bin
+doc/license.pdf
 doc/announce
 doc/mechanic
 doc/word
