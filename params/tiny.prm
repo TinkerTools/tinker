@@ -1427,8 +1427,16 @@ biotype    1252    P       "3'-Monophosphate P DNA"          154
 biotype    1253    OP      "3'-Monophosphate OP DNA"          82
 biotype    2001    O       "Water"                            82
 biotype    2002    H       "Water"                            11
-biotype    2003    NA      "Sodium Ion"                      110
-biotype    2004    K       "Potassium Ion"                   190
-biotype    2005    MG      "Magnesium Ion"                   120
-biotype    2006    CA      "Calcium Ion"                     200
-biotype    2007    CL      "Chloride Ion"                    170
+biotype    2003    LI      "Lithium Ion"                      30
+biotype    2004    NA      "Sodium Ion"                      110
+biotype    2005    K       "Potassium Ion"                   190
+biotype    2006    RB      "Rubidium Ion"                    370
+biotype    2007    CS      "Cesium Ion"                      550
+biotype    2008    MG      "Magnesium Ion"                   120
+biotype    2009    CA      "Calcium Ion"                     200
+biotype    2010    SR      "Strontium Ion"                   380
+biotype    2011    BA      "Barium Ion"                      560
+biotype    2012    F       "Fluoride Ion"                     90
+biotype    2013    CL      "Chloride Ion"                    170
+biotype    2014    BR      "Bromide Ion"                     350
+biotype    2015    I       "Iodide Ion"                      530

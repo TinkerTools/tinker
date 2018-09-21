@@ -80,6 +80,10 @@ Simulation with a Polarizable Force Field", J. Am. Chem. Soc., 125,
 P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Water Model for
 Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947 (2003)
 
+Monovalent ion parameters taken from Zhi Wang, Ph.D. thesis, Department
+of Chemistry, Washington University in St. Louis, May 2018; available
+from https://dasher.wustl.edu/ponder/
+
 
    ###############################################
    ##                                           ##
@@ -550,7 +554,10 @@ atom        409   80    Be+   "Beryllium Ion Be+2"           4     9.012    0
 atom        410   81    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
 atom        411   82    Ca+   "Calcium Ion Ca+2"            20    40.078    0
 atom        412   83    Zn+   "Zinc Ion Zn+2"               30    65.380    0
-atom        413   84    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        413   84    F-    "Fluoride Ion F-"              9    18.998    0
+atom        414   85    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        415   86    Br-   "Bromide Ion Br-"             35    79.904    0
+atom        416   87    I-    "Iodide Ion I-"               53   126.904    0
 
 
       ################################
@@ -634,16 +641,37 @@ vdw          71               3.3600     0.1120
 vdw          72               2.6550     0.0135      0.910
 vdw          73               3.4050     0.1100
 vdw          74               2.6550     0.0135      0.910
-vdw          75               2.3800     0.0800
-vdw          76               3.0200     0.2600
-vdw          77               3.7100     0.3500
-vdw          78               4.1400     0.4400
-vdw          79               4.3700     0.5300
+vdw          75               2.2000     0.0660
+vdw          76               2.9550     0.2800
+vdw          77               3.6800     0.3500
+vdw          78               3.9000     0.3800
+vdw          79               4.1400     0.4200
 vdw          80               1.8800     0.0910
 vdw          81               2.9400     0.3000
 vdw          82               3.6300     0.3500
 vdw          83               2.6800     0.2220
-vdw          84               4.1300     0.3400
+vdw          84               3.4300     0.2500
+vdw          85               4.1200     0.3400
+vdw          86               4.3200     0.4300
+vdw          87               4.6100     0.5200
+
+
+      #####################################
+      ##                                 ##
+      ##  Van der Waals Pair Parameters  ##
+      ##                                 ##
+      #####################################
+
+
+vdwpr        77   85          4.2360     0.1512
+vdwpr        77   86          4.3790     0.1664
+vdwpr        77   87          4.6360     0.1720
+vdwpr        78   85          4.3150     0.1859
+vdwpr        78   86          4.4480     0.2068
+vdwpr        78   87          4.6900     0.2145
+vdwpr        79   85          4.3450     0.2894
+vdwpr        79   86          4.4750     0.3307
+vdwpr        79   87          4.7110     0.3466
 
 
       ##################################
@@ -10055,6 +10083,21 @@ multipole   413    0    0              -1.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
+multipole   414    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   415    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   416    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
 
 
       ########################################
@@ -10476,7 +10519,10 @@ polarize    409          0.0100     0.0650
 polarize    410          0.0800     0.0952
 polarize    411          0.5500     0.1585
 polarize    412          0.2600     0.2096
-polarize    413          4.0000     0.3900
+polarize    413          1.3500     0.3900
+polarize    414          4.0000     0.3900
+polarize    415          5.6500     0.3900
+polarize    416          7.2500     0.3900
 
 
       ########################################
@@ -11521,8 +11567,14 @@ biotype    1252    P       "3'-Monophosphate P DNA"          400
 biotype    1253    OP      "3'-Monophosphate OP DNA"         401
 biotype    2001    O       "Water"                           402
 biotype    2002    H       "Water"                           403
-biotype    2003    NA      "Sodium Ion"                      405
-biotype    2004    K       "Potassium Ion"                   406
-biotype    2005    MG      "Magnesium Ion"                   410
-biotype    2006    CA      "Calcium Ion"                     411
-biotype    2007    CL      "Chloride Ion"                    412
+biotype    2003    LI      "Lithium Ion"                     404
+biotype    2004    NA      "Sodium Ion"                      405
+biotype    2005    K       "Potassium Ion"                   406
+biotype    2006    RB      "Rubidium Ion"                    407
+biotype    2007    CS      "Cesium Ion"                      408
+biotype    2008    MG      "Magnesium Ion"                   410
+biotype    2009    CA      "Calcium Ion"                     411
+biotype    2012    F       "Fluoride Ion"                    413
+biotype    2013    CL      "Chloride Ion"                    414
+biotype    2014    BR      "Bromide Ion"                     415
+biotype    2015    I       "Iodide Ion"                      416

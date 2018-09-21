@@ -63,6 +63,10 @@ C. Zhang, C. Lu, Z. Jing, C. Wu, J.-P. Piquemal, J. W. Ponder and P. Ren,
 "AMOEBA Polarizable Atomic Multipole Force Field for Nucleic Acids",
 J. Chem. Theory Comput., 14, 2084-2108 (2018)
 
+Monovalent ion parameters taken from Zhi Wang, Ph.D. thesis, Department
+of Chemistry, Washington University in St. Louis, May 2018; available
+from https://dasher.wustl.edu/ponder/
+
 
       #############################
       ##                         ##
@@ -175,10 +179,19 @@ atom        101   46    O     "D-3'-Hydroxyl O3'T"           8    15.999    2
 atom        102   47    O     "D-5'-Hydroxyl O5'T"           8    15.999    2
 atom        103   48    O     "AMOEBA Water O"               8    15.999    2
 atom        104   49    H     "AMOEBA Water H"               1     1.008    1
-atom        105   50    Na+   "Sodium Ion Na+"              11    22.990    0
-atom        106   51    K+    "Potassium Ion K+"            19    39.098    0
-atom        107   52    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
-atom        108   53    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        105   50    Li+   "Lithium Ion Li+"              3     6.941    0
+atom        106   51    Na+   "Sodium Ion Na+"              11    22.990    0
+atom        107   52    K+    "Potassium Ion K+"            19    39.098    0
+atom        108   53    Rb+   "Rubidium Ion Rb+"            37    85.468    0
+atom        109   54    Cs+   "Cesium Ion Cs+"              55   132.905    0
+atom        110   55    Be+   "Beryllium Ion Be+2"           4     9.012    0
+atom        111   56    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
+atom        112   57    Ca+   "Calcium Ion Ca+2"            20    40.078    0
+atom        113   58    Zn+   "Zinc Ion Zn+2"               30    65.380    0
+atom        114   59    F-    "Fluoride Ion F-"              9    18.998    0
+atom        115   60    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        116   61    Br-   "Bromide Ion Br-"             35    79.904    0
+atom        117   62    I-    "Iodide Ion I-"               53   126.904    0
 
 
       ################################
@@ -237,10 +250,19 @@ vdw          46               3.4050     0.1120
 vdw          47               3.4050     0.1120
 vdw          48               3.4050     0.1100
 vdw          49               2.6550     0.0135      0.910
-vdw          50               3.0200     0.2600
-vdw          51               3.7100     0.3500
-vdw          52               2.9000     0.2800
-vdw          53               4.1300     0.3400
+vdw          50               2.2000     0.0660
+vdw          51               2.9550     0.2800
+vdw          52               3.6800     0.3500
+vdw          53               3.9000     0.3800
+vdw          54               4.1400     0.4200
+vdw          55               1.8800     0.0910
+vdw          56               2.9400     0.3000
+vdw          57               3.6300     0.3500
+vdw          58               2.6800     0.2220
+vdw          59               3.4300     0.2500
+vdw          60               4.1200     0.3400
+vdw          61               4.3200     0.4300
+vdw          62               4.6100     0.5200
 
 
       #####################################
@@ -257,6 +279,15 @@ vdwpr         8   50          3.3870     0.2400
 vdwpr         8   51          3.6760     0.2900
 vdwpr         8   52          3.3640     0.2150
 vdwpr        16   52          3.1720     0.1820
+vdwpr        52   60          4.2360     0.1512
+vdwpr        52   61          4.3790     0.1664
+vdwpr        52   62          4.6360     0.1720
+vdwpr        53   60          4.3150     0.1859
+vdwpr        53   61          4.4480     0.2068
+vdwpr        53   62          4.6900     0.2145
+vdwpr        54   60          4.3450     0.2894
+vdwpr        54   61          4.4750     0.3307
+vdwpr        54   62          4.7110     0.3466
 
 
       ##################################
@@ -1924,12 +1955,57 @@ multipole   106    0    0               1.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole   107    0    0               2.00000
+multipole   107    0    0               1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
-multipole   108    0    0              -1.00000
+multipole   108    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   109    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   110    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   111    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   112    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   113    0    0               2.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   114    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   115    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   116    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   117    0    0              -1.00000
                                         0.00000    0.00000    0.00000
                                         0.00000
                                         0.00000    0.00000
@@ -2047,10 +2123,19 @@ polarize    101          0.8370     0.3900     83   93
 polarize    102          0.8370     0.3900     91   96
 polarize    103          0.8370     0.3900    104
 polarize    104          0.4960     0.3900    103
-polarize    105          0.1200     0.3900
-polarize    106          0.7800     0.3900
-polarize    107          0.0800     0.1150
-polarize    108          4.0000     0.3900
+polarize    105          0.0280     0.3900
+polarize    106          0.1200     0.3900
+polarize    107          0.7800     0.3900
+polarize    108          1.3500     0.3900
+polarize    109          2.2600     0.3900
+polarize    110          0.0100     0.0650
+polarize    111          0.0800     0.1150
+polarize    112          0.5500     0.1800
+polarize    113          0.2600     0.2096
+polarize    114          1.3500     0.3900
+polarize    115          4.0000     0.3900
+polarize    116          5.6500     0.3900
+polarize    117          7.2500     0.3900
 
 
       ########################################
@@ -2315,7 +2400,14 @@ biotype    1252    P       "3'-Monophosphate P DNA"           -1
 biotype    1253    OP      "3'-Monophosphate OP DNA"          -1
 biotype    2001    O       "Water"                           103
 biotype    2002    H       "Water"                           104
-biotype    2003    NA      "Sodium Ion"                      105
-biotype    2004    K       "Potassium Ion"                   106
-biotype    2005    MG      "Magnesium Ion"                   107
-biotype    2007    CL      "Chloride Ion"                    108
+biotype    2003    LI      "Lithium Ion"                     105
+biotype    2004    NA      "Sodium Ion"                      106
+biotype    2005    K       "Potassium Ion"                   107
+biotype    2006    RB      "Rubidium Ion"                    108
+biotype    2007    CS      "Cesium Ion"                      109
+biotype    2008    MG      "Magnesium Ion"                   111
+biotype    2009    CA      "Calcium Ion"                     112
+biotype    2012    F       "Fluoride Ion"                    114
+biotype    2013    CL      "Chloride Ion"                    115
+biotype    2014    BR      "Bromide Ion"                     116
+biotype    2015    I       "Iodide Ion"                      117

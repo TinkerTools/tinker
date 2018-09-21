@@ -5945,8 +5945,8 @@ biotype     779    CH3     "N-MeAmide C-Terminus"            181
 biotype     780    H       "N-MeAmide C-Terminus"             82
 biotype    2001    O       "Water"                            53
 biotype    2002    H       "Water"                            54
-biotype    2003    NA      "Sodium Ion"                       -1
-biotype    2004    K       "Potassium Ion"                    -1
-biotype    2005    MG      "Magnesium Ion"                    -1
-biotype    2006    CA      "Calcium Ion"                      -1
-biotype    2007    CL      "Chloride Ion"                     -1
+biotype    2004    NA      "Sodium Ion"                      346
+biotype    2005    K       "Potassium Ion"                   347
+biotype    2008    MG      "Magnesium Ion"                   350
+biotype    2009    CA      "Calcium Ion"                     351
+biotype    2013    CL      "Chloride Ion"                    341

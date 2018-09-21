@@ -2043,16 +2043,32 @@ c
      &                               n-3,120.0d0,0)
                   end if
                end if
-            else if (pdbres(i) .eq. ' NA') then
+            else if (pdbres(i) .eq. ' LI') then
                call oldatm (i,2003,0,0)
-            else if (pdbres(i) .eq. '  K') then
+            else if (pdbres(i) .eq. ' NA') then
                call oldatm (i,2004,0,0)
-            else if (pdbres(i) .eq. ' MG') then
+            else if (pdbres(i) .eq. '  K') then
                call oldatm (i,2005,0,0)
-            else if (pdbres(i) .eq. ' CA') then
+            else if (pdbres(i) .eq. ' RB') then
                call oldatm (i,2006,0,0)
-            else if (pdbres(i) .eq. ' CL') then
+            else if (pdbres(i) .eq. ' CS') then
                call oldatm (i,2007,0,0)
+            else if (pdbres(i) .eq. ' MG') then
+               call oldatm (i,2008,0,0)
+            else if (pdbres(i) .eq. ' CA') then
+               call oldatm (i,2009,0,0)
+            else if (pdbres(i) .eq. ' SR') then
+               call oldatm (i,2010,0,0)
+            else if (pdbres(i) .eq. ' BA') then
+               call oldatm (i,2011,0,0)
+            else if (pdbres(i) .eq. '  F') then
+               call oldatm (i,2012,0,0)
+            else if (pdbres(i) .eq. ' CL') then
+               call oldatm (i,2013,0,0)
+            else if (pdbres(i) .eq. ' BR') then
+               call oldatm (i,2014,0,0)
+            else if (pdbres(i) .eq. '  I') then
+               call oldatm (i,2015,0,0)
             end if
          end if
       end do

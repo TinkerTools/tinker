@@ -70,6 +70,10 @@ P. Ren and J. W. Ponder, "A Consistent Treatment of Inter- and
 Intramolecular Polarization in Molecular Mechanics Calculations",
 J. Comput. Chem., 23, 1497-1506 (2002)
 
+Monovalent ion parameters taken from Zhi Wang, Ph.D. thesis, Department
+of Chemistry, Washington University in St. Louis, May 2018; available
+from https://dasher.wustl.edu/ponder/
+
 
       #############################
       ##                         ##
@@ -442,18 +446,18 @@ vdw           2               3.1500     0.0730
 vdw           3               3.8200     0.2600
 vdw           4               4.0900     0.3590
 vdw           5               4.3700     0.4980
-vdw           6               2.3800     0.0800
-vdw           7               3.0200     0.2600
-vdw           8               3.7100     0.3500
-vdw           9               4.1400     0.4400
-vdw          10               4.3700     0.5300
+vdw           6               2.2000     0.0660
+vdw           7               2.9550     0.2800
+vdw           8               3.6800     0.3500
+vdw           9               3.9000     0.3800
+vdw          10               4.1400     0.4200
 vdw          11               2.9400     0.3000
 vdw          12               3.6300     0.3500
 vdw          13               2.6800     0.2220
-vdw          14               3.4000     0.2500
-vdw          15               4.1300     0.3400
-vdw          16               4.3800     0.4300
-vdw          17               4.6600     0.5200
+vdw          14               3.4300     0.2500
+vdw          15               4.1200     0.3400
+vdw          16               4.3200     0.4300
+vdw          17               4.6100     0.5200
 vdw          18               4.1200     0.1010
 vdw          19               3.7100     0.1100
 vdw          20               3.9000     0.1000
@@ -538,6 +542,24 @@ vdw          98               2.5900     0.0220      0.900
 vdw          99               3.6500     0.1010
 vdw         100               3.7100     0.1050
 vdw         101               2.7000     0.0200      0.910
+
+
+      #####################################
+      ##                                 ##
+      ##  Van der Waals Pair Parameters  ##
+      ##                                 ##
+      #####################################
+
+
+vdwpr         8   15          4.2360     0.1512
+vdwpr         8   16          4.3790     0.1664
+vdwpr         8   17          4.6360     0.1720
+vdwpr         9   15          4.3150     0.1859
+vdwpr         9   16          4.4480     0.2068
+vdwpr         9   17          4.6900     0.2145
+vdwpr        10   15          4.3450     0.2894
+vdwpr        10   16          4.4750     0.3307
+vdwpr        10   17          4.7110     0.3466
 
 
       ##################################

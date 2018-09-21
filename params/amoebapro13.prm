@@ -79,6 +79,10 @@ Simulation with a Polarizable Force Field", J. Am. Chem. Soc., 125,
 P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Water Model for
 Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947 (2003)
 
+Monovalent ion parameters taken from Zhi Wang, Ph.D. thesis, Department
+of Chemistry, Washington University in St. Louis, May 2018; available
+from https://dasher.wustl.edu/ponder/
+
 
    ###############################################
    ##                                           ##
@@ -393,8 +397,11 @@ atom        253   49    Cs+   "Cesium Ion Cs+"              55   132.905    0
 atom        254   50    Be+   "Beryllium Ion Be+2"           4     9.012    0
 atom        255   51    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
 atom        256   52    Ca+   "Calcium Ion Ca+2"            20    40.078    0
-atom        257   53    Zn+   "Zinc Ion Zn+2"               30    65.390    0
-atom        258   54    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        257   53    Zn+   "Zinc Ion Zn+2"               30    65.380    0
+atom        258   54    F-    "Fluoride Ion F-"              9    18.998    0
+atom        259   55    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom        260   56    Br-   "Bromide Ion Br-"             35    79.904    0
+atom        261   57    I-    "Iodide Ion I-"               53   126.904    0
 
 
       ################################
@@ -448,16 +455,19 @@ vdw          41               3.7600     0.1050
 vdw          42               2.7000     0.0200      0.910
 vdw          43               3.4050     0.1100
 vdw          44               2.6550     0.0135      0.910
-vdw          45               2.3800     0.0800
-vdw          46               3.0200     0.2600
-vdw          47               3.7100     0.3500
-vdw          48               4.1400     0.4400
-vdw          49               4.3700     0.5300
+vdw          45               2.2000     0.0660
+vdw          46               2.9550     0.2800
+vdw          47               3.6800     0.3500
+vdw          48               3.9000     0.3800
+vdw          49               4.1400     0.4200
 vdw          50               1.8800     0.0910
-vdw          51               2.9000     0.2800
-vdw          52               3.5900     0.3500
+vdw          51               2.9400     0.3000
+vdw          52               3.6300     0.3500
 vdw          53               2.6800     0.2220
-vdw          54               4.1300     0.3400
+vdw          54               3.4300     0.2500
+vdw          55               4.1200     0.3400
+vdw          56               4.3200     0.4300
+vdw          57               4.6100     0.5200
 
 
       #####################################
@@ -471,6 +481,15 @@ vdwpr         4   31          3.1000     0.0400
 vdwpr         5   51          3.0000     0.1530
 vdwpr         5   52          3.2700     0.1750
 vdwpr         5   53          2.8900     0.1750
+vdwpr        47   55          4.2360     0.1512
+vdwpr        47   56          4.3790     0.1664
+vdwpr        47   57          4.6360     0.1720
+vdwpr        48   55          4.3150     0.1859
+vdwpr        48   56          4.4480     0.2068
+vdwpr        48   57          4.6900     0.2145
+vdwpr        49   55          4.3450     0.2894
+vdwpr        49   56          4.4750     0.3307
+vdwpr        49   57          4.7110     0.3466
 
 
       ##################################
@@ -4816,6 +4835,21 @@ multipole   258    0    0              -1.00000
                                         0.00000
                                         0.00000    0.00000
                                         0.00000    0.00000    0.00000
+multipole   259    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   260    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+multipole   261    0    0              -1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
 
 
       ########################################
@@ -5082,7 +5116,10 @@ polarize    254          0.0100     0.0650
 polarize    255          0.0800     0.1150
 polarize    256          0.5500     0.1800
 polarize    257          0.2600     0.2096
-polarize    258          4.0000     0.3900
+polarize    258          1.3500     0.3900
+polarize    259          4.0000     0.3900
+polarize    260          5.6500     0.3900
+polarize    261          7.2500     0.3900
 
 
       ########################################
@@ -5874,8 +5911,14 @@ biotype     779    CH3     "N-MeAmide C-Terminus"            229
 biotype     780    H       "N-MeAmide C-Terminus"            230
 biotype    2001    O       "Water"                           247
 biotype    2002    H       "Water"                           248
-biotype    2003    NA      "Sodium Ion"                      250
-biotype    2004    K       "Potassium Ion"                   251
-biotype    2005    MG      "Magnesium Ion"                   255
-biotype    2006    CA      "Calcium Ion"                     256
-biotype    2007    CL      "Chloride Ion"                    258
+biotype    2003    LI      "Lithium Ion"                     249
+biotype    2004    NA      "Sodium Ion"                      250
+biotype    2005    K       "Potassium Ion"                   251
+biotype    2006    RB      "Rubidium Ion"                    252
+biotype    2007    CS      "Cesium Ion"                      253
+biotype    2008    MG      "Magnesium Ion"                   255
+biotype    2009    CA      "Calcium Ion"                     256
+biotype    2012    F       "Fluoride Ion"                    258
+biotype    2013    CL      "Chloride Ion"                    259
+biotype    2014    BR      "Bromide Ion"                     260
+biotype    2015    I       "Iodide Ion"                      261
