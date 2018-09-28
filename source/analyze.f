@@ -242,7 +242,7 @@ c
             allocate (derivs(3,n))
             call gradient (energy,derivs)
             deallocate (derivs)
-         end if  
+         end if
 c
 c     get and test the internal virial and pressure values
 c
@@ -1408,7 +1408,7 @@ c
      &                    //,17x,'Atom Numbers',19x,'KOPB',/)
                end if
                write (iout,430)  i,id,ib,ia,ic,opbk(i)
-  430          format (i6,3x,4i6,9x,f10.3)
+  430          format (i6,3x,4i6,9x,f10.4)
             end if
          end do
       end if
@@ -1431,7 +1431,7 @@ c
      &                    //,17x,'Atom Numbers',19x,'KOPD',/)
                end if
                write (iout,450)  i,ia,ib,ic,id,opdk(i)
-  450          format (i6,3x,4i6,9x,f10.3)
+  450          format (i6,3x,4i6,9x,f10.4)
             end if
          end do
       end if

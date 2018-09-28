@@ -311,7 +311,7 @@ atom        226   40    C     "Ethylbenzene CH2"             6    12.011    4
 atom        227   41    H     "Ethylbenzene H2C"             1     1.008    1
 atom        228   40    C     "Ethylbenzene CH3"             6    12.011    4
 atom        229   41    H     "Ethylbenzene H3C"             1     1.008    1
-atom        230   36    O     "Phenol HO"                    8    15.999    2
+atom        230   36    O     "Phenol OH"                    8    15.999    2
 atom        231   37    H     "Phenol HO"                    1     1.008    1
 atom        232   89    C     "Phenol C1-OH"                 6    12.011    3
 atom        233   89    C     "Phenol C2"                    6    12.011    3

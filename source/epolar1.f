@@ -503,7 +503,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -993,7 +993,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -1716,7 +1716,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -2749,7 +2749,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -3346,7 +3346,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -4438,7 +4438,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -4497,7 +4497,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp(1:3) .eq. 'TCG') then
                   do j = 1, tcgnab
                      ukx = ubd(1,k,j)
                      uky = ubd(2,k,j)
@@ -5190,7 +5190,7 @@ c
 c
 c     account for dipole response terms in the OPT method
 c
-      if (poltyp .eq. 'OPT') then
+      if (poltyp(1:3) .eq. 'OPT') then
          do i = 1, npole
             ii = ipole(i)
             do k = 0, coptmax-1
@@ -5263,7 +5263,7 @@ c
 c
 c     account for dipole response terms in the TCG method
 c
-      if (poltyp .eq. 'TCG') then
+      if (poltyp(1:3) .eq. 'TCG') then
          do m = 1, tcgnab
             do i = 1, npole
                do j = 1, 3
@@ -5509,7 +5509,7 @@ c
 c     assign only the induced dipoles to the PME grid
 c     and perform the 3-D FFT forward transformation
 c
-      if (poltyp.eq.'DIRECT' .or. poltyp.eq.'TCG') then
+      if (poltyp.eq.'DIRECT' .or. poltyp(1:3).eq.'TCG') then
          do i = 1, npole
             do j = 1, 10
                cmp(j,i) = 0.0d0
@@ -5585,7 +5585,7 @@ c
 c     add back missing terms for the TCG polarization method;
 c     first do the term for "UAD" dotted with "UBP"
 c
-      if (poltyp .eq. 'TCG') then
+      if (poltyp(1:3) .eq. 'TCG') then
          do m = 1, tcgnab
             do i = 1, npole
                do j = 1, 10

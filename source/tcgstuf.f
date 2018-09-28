@@ -1470,7 +1470,7 @@ c
 c
 c     restore the induced dipoles if using the TCG method
 c
-      if (poltyp .eq. 'TCG') then
+      if (poltyp(1:3) .eq. 'TCG') then
 !$OMP    PARALLEL default(shared) private(i,j)
 !$OMP    DO schedule(guided)
          do i = 1, npole

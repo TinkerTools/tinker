@@ -821,6 +821,7 @@ c
       use kvdws
       use polar
       use polopt
+      use polpot
       use ptable
       use solute
       implicit none
@@ -859,8 +860,10 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      allocate (uopts(0:coptmax,3,n))
-      allocate (uoptps(0:coptmax,3,n))
+      if (poltyp(1:3) .eq. 'OPT') then
+         allocate (uopts(0:coptmax,3,n))
+         allocate (uoptps(0:coptmax,3,n))
+      end if
 c
 c     set default value for exponent in the GB/GK function
 c
@@ -1144,6 +1147,7 @@ c
       use pbstuf
       use polar
       use polopt
+      use polpot
       use potent
       use ptable
       use solute
@@ -1187,8 +1191,10 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      allocate (uopts(0:coptmax,3,n))
-      allocate (uoptps(0:coptmax,3,n))
+      if (poltyp(1:3) .eq. 'OPT') then
+         allocate (uopts(0:coptmax,3,n))
+         allocate (uoptps(0:coptmax,3,n))
+      end if
 c
 c     assign some default APBS configuration parameters
 c

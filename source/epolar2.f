@@ -706,7 +706,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -1166,7 +1166,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -1816,7 +1816,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp .eq. 'OPT') then
+               else if (poltyp(1:3) .eq. 'OPT') then
                   do j = 0, coptmax-1
                      urim = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr

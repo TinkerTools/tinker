@@ -230,7 +230,9 @@ c     mark angles at trigonal sites to use projected in-plane values
 c
       do i = 1, nopbend
          j = iopb(i)
-         if (angtyp(j) .eq. 'HARMONIC')  angtyp(j) = 'IN-PLANE'
+         if (opbk(i) .ne. 0.0d0) then
+            if (angtyp(j) .eq. 'HARMONIC')  angtyp(j) = 'IN-PLANE'
+         end if
       end do
 c
 c     turn off the out-of-plane bending term if it is not used

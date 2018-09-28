@@ -255,7 +255,7 @@ c
 c     get induced dipoles from OPT extrapolation method
 c
       poltyp = savetyp
-      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT'
+      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT   '
       call kpolar
       call induce
       do i = 1, n
@@ -285,7 +285,7 @@ c
 c     get induced dipoles from TCG analytical dipole method
 c
       poltyp = savetyp
-      if (poltyp(1:3) .ne. 'TCG')  poltyp = 'TCG'
+      if (poltyp(1:3) .ne. 'TCG')  poltyp = 'TCG   '
       call kpolar
       call induce
       do i = 1, n
@@ -524,6 +524,10 @@ c
             copt(i) = var(nvar)
          end if
       end do
+      if (coptmax .eq. 1)  poltyp = 'OPT1  '
+      if (coptmax .eq. 2)  poltyp = 'OPT2  '
+      if (coptmax .eq. 3)  poltyp = 'OPT3  '
+      if (coptmax .eq. 4)  poltyp = 'OPT4  '
 c
 c     perform dynamic allocation of some local arrays
 c

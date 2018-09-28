@@ -203,10 +203,12 @@ c     mark angles at trigonal sites to use projected in-plane values
 c
       do i = 1, nopdist
          ia = iopd(1,i)
-         do j = 1, 3
-            k = anglist(j,ia)
-            if (angtyp(k) .eq. 'HARMONIC')  angtyp(k) = 'IN-PLANE'
-         end do
+         if (opdk(i) .ne. 0.0d0) then
+            do j = 1, 3
+               k = anglist(j,ia)
+               if (angtyp(k) .eq. 'HARMONIC')  angtyp(k) = 'IN-PLANE'
+            end do
+         end if
       end do
 c
 c     turn off out-of-plane distance potential if it is not used

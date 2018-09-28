@@ -80,27 +80,26 @@ c
          copt(i) = 0.0d0
          copm(i) = 0.0d0
       end do
-      if (poltyp .eq. 'OPT')  poltyp = 'OPT4  '
-      if (poltyp .eq. 'OPT1') then
+      if (poltyp .eq. 'OPT   ')  poltyp = 'OPT4  '
+      if (poltyp .eq. 'OPT1  ') then
          copt(0) = 0.412d0
          copt(1) = 0.784d0
-      else if (poltyp .eq. 'OPT2') then
+      else if (poltyp .eq. 'OPT2  ') then
          copt(0) = -0.115d0
          copt(1) = 0.568d0
          copt(2) = 0.608d0
-      else if (poltyp .eq. 'OPT3') then
+      else if (poltyp .eq. 'OPT3  ') then
          copt(0) = -0.154d0
          copt(1) = 0.017d0
          copt(2) = 0.657d0
          copt(3) = 0.475d0
-      else if (poltyp .eq. 'OPT4') then
+      else if (poltyp .eq. 'OPT4  ') then
          copt(0) = -0.041d0
          copt(1) = -0.176d0
          copt(2) = 0.169d0
          copt(3) = 0.663d0
          copt(4) = 0.374d0
       end if
-      if (poltyp(1:3) .eq. 'OPT')  poltyp = 'OPT   '
 c
 c     set defaults for TCG induced dipole parameters
 c
@@ -108,17 +107,14 @@ c
       tcgprec = .false.
       tcgpeek = .false.
       tcgomega = 1.0d0
-      if (poltyp .eq. 'TCG')  poltyp = 'TCG2  '
-      if (poltyp .eq. 'TCG0') then
+      if (poltyp .eq. 'TCG   ')  poltyp = 'TCG2  '
+      if (poltyp .eq. 'TCG0  ') then
          poltyp = 'DIRECT'
-      else if (poltyp .eq. 'TCG1') then
-         poltyp = 'TCG   '
+      else if (poltyp .eq. 'TCG1  ') then
          tcgorder = 1
-      else if (poltyp .eq. 'TCG2') then
-         poltyp = 'TCG   '
+      else if (poltyp .eq. 'TCG2  ') then
          tcgorder = 2
       end if
-      if (poltyp(1:3) .eq. 'TCG')  poltyp = 'TCG   '
 c
 c     get keywords containing polarization-related options
 c
@@ -151,11 +147,15 @@ c
 c
 c     get maximum coefficient order for OPT induced dipoles
 c
-      if (poltyp .eq. 'OPT') then
+      if (poltyp(1:3) .eq. 'OPT') then
          coptmax = 0
          do i = 1, maxopt
             if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
          end do
+         if (coptmax .eq. 1)  poltyp = 'OPT1  '
+         if (coptmax .eq. 2)  poltyp = 'OPT2  '
+         if (coptmax .eq. 3)  poltyp = 'OPT3  '
+         if (coptmax .eq. 4)  poltyp = 'OPT4  '
          do i = 0, coptmax
             do j = coptmax, i, -1
                copm(i) = copm(i) + copt(j)
@@ -185,7 +185,7 @@ c
       if (allocated(uoptp))  deallocate (uoptp)
       if (allocated(fopt))  deallocate (fopt)
       if (allocated(foptp))  deallocate (foptp)
-      if (poltyp .eq. 'OPT') then
+      if (poltyp(1:3) .eq. 'OPT') then
          allocate (uopt(0:coptmax,3,n))
          allocate (uoptp(0:coptmax,3,n))
          allocate (fopt(0:coptmax,10,n))
