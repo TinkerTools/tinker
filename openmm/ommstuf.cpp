@@ -103,6 +103,7 @@ struct {
    double qopd;
    double popd;
    double sopd;
+   char angtrig[MAX_STRING];
    char opbtyp[MAX_STRING];
    char* angtyp;
 } angpot__;
@@ -855,8 +856,8 @@ void set_angpot_data_ (double* angunit, double* stbnunit, double* aaunit,
                        double* opbunit, double* opdunit, double* cang,
                        double* qang, double* pang, double* sang, double* copb,
                        double* qopb, double* popb, double* sopb, double* copd,
-                       double* qopd, double* popd, double* sopd, char* opbtyp,
-                       char* angtyp) {
+                       double* qopd, double* popd, double* sopd, char* angtrig,
+                       char* opbtyp, char* angtyp) {
 
    angpot__.angunit = *angunit;
    angpot__.stbnunit = *stbnunit;
@@ -875,6 +876,7 @@ void set_angpot_data_ (double* angunit, double* stbnunit, double* aaunit,
    angpot__.qopd = *qopd;
    angpot__.popd = *popd;
    angpot__.sopd = *sopd;
+   setNullTerminator (angtrig, 8, angpot__.angtrig);
    setNullTerminator (opbtyp, 8, angpot__.opbtyp);
    angpot__.angtyp = angtyp;
 }

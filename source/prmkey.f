@@ -192,6 +192,8 @@ c
 c
 c     set control parameters for bond angle bending potentials
 c
+      else if (keyword(1:15) .eq. 'ANGLE-TRIGONAL ') then
+         call getword (record,angtrig,next)
       else if (keyword(1:10) .eq. 'ANGLEUNIT ') then
          read (string,*,err=10,end=10)  angunit
       else if (keyword(1:12) .eq. 'ANGLE-CUBIC ') then
