@@ -44,7 +44,7 @@ c
       else if (solvtyp(1:2) .eq. 'GK') then
          call induce0d
       else if (poltyp(1:3) .eq. 'TCG') then
-         call tcg_induce1a
+         call tcg_induce1
          return
       else
          call induce0a

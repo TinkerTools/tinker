@@ -139,6 +139,8 @@ c
             tcgprec = .true.
          else if (keyword(1:9) .eq. 'TCG-PEEK ') then
             tcgpeek = .true.
+         else if (keyword(1:10) .eq. 'TCG-GUESS ') then
+            tcgguess = .true.
          else if (keyword(1:10) .eq. 'TCG-OMEGA ') then
             read (string,*,err=20,end=20)  tcgomega
          end if

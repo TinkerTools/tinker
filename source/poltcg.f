@@ -12,29 +12,27 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     maxtcg    maximum order for TCG induced dipole iterations
-c
-c     tcgorder  total number of TCG iterations to be used
-c     tcgnab
-c     tcgprec   flag to allow conjugate gradient preconditioner
-c     tcgpeek   flag to allow use of a final TCG peek step
-c     tcgomega  value of acceleration factor for TCG peek step
-c     uindt
-c     uinpt
-c     uad
-c     uap
-c     ubd
-c     ubp
+c     tcgorder   total number of TCG iterations to be used
+c     tcgnab     number of mutual induced dipole components
+c     tcgprec    flag to allow use of a diagonal preconditioner
+c     tcgpeek    flag to allow use of a final TCG peek step
+c     tcgguess   flag to use initial TCG based on direct field
+c     tcgomega   value of acceleration factor for TCG peek step
+c     uindt      induced d-dipole components for the TCG method
+c     uinpt      induced p-dipole components for the TCG method
+c     uad        left-hand side mutual induced d-dipoles
+c     uap        left-hand side mutual induced p-dipoles
+c     ubd        right-hand side mutual induced d-dipoles
+c     ubp        right-hand side mutual induced p-dipoles
 c
 c
       module poltcg
       implicit none
-      integer maxtcg
-      parameter (maxtcg=2)
       integer tcgorder
       integer tcgnab
       logical tcgprec
       logical tcgpeek
+      logical tcgguess
       real*8 tcgomega
       real*8, allocatable :: uindt(:,:)
       real*8, allocatable :: uinpt(:,:)

@@ -495,12 +495,12 @@ c
 c           dkin = dble(nuse) * kt * log(volold/volbox)
          end if
 c
-c     compute the kinetic energy change from the actual velocities
+c     alternatively get the kinetic energy change from velocities
 c
          dkin = 0.0d0
          do i = 1, n
             if (use(i)) then
-               term = 0.5d0 * mass(i) / convert
+               term = 1.5d0 * mass(i) / convert
                do j = 1, 3
                   dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
                end do
@@ -510,6 +510,9 @@ c
             dkin = dkin * dble(ngrp)/dble(nuse)
          else if (volscale .eq. 'MOLECULAR') then
             dkin = dkin * dble(nmol)/dble(nuse)
+         else
+            dkin = dkin * dble(nmol)/dble(nuse)
+c           dkin = dkin * dble(nuse)/dble(nuse)
          end if
 c
 c     acceptance ratio from Epot change, Ekin change and PV work
