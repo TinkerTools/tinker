@@ -98,6 +98,8 @@ c
       use sizes
       use atoms
       use faces
+      use atomid
+      use kvdws
       implicit none
       integer i
       real*8 volume,area
@@ -181,7 +183,7 @@ c
          axyz(1,i) = x(i)
          axyz(2,i) = y(i)
          axyz(3,i) = z(i)
-         ar(i) = radius(i)
+         ar(i) = rad(class(i))
          if (ar(i) .eq. 0.0d0) then
             skip(i) = .true.
          else
@@ -687,6 +689,7 @@ c
       nen = 0
       nv = 0
       if (ntt .le. 0)  return
+
 c
 c     consider each torus in turn
 c

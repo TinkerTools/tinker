@@ -45,6 +45,7 @@ c
       use kvdwpr
       use merck
       use params
+      use solute
       implicit none
       integer i,j,iprm
       integer ia,ib,ic,id
@@ -220,6 +221,15 @@ c
                rad(ia) = rd
                eps(ia) = ep
                reduct(ia) = rdn
+            end if
+         else if (keyword(1:10) .eq. 'SOLUTE-VDW') then
+            ia = 0
+            rd = 0.0d0
+            string = record(next:240)
+            read (string,*,err=75,end=75)  ia,rd
+   75       continue
+            if (ia .ne. 0) then
+               svdw(ia) = rd/2
             end if
 c
 c     van der Waals 1-4 parameters for individual atom types

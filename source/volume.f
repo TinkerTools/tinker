@@ -18,6 +18,7 @@ c
 c
       subroutine volume (volume_tot,radius,exclude)
       use sizes
+      use atoms
       implicit none
       real*8 exclude,probe
       real*8 volume_tot,area_tot

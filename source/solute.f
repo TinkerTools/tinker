@@ -35,9 +35,11 @@ c     s2ace     "sigma^2" values for atom class pairs for use with ACE
 c     uace      "mu" values for atom class pairs for use with ACE
 c     solvtyp   type of continuum solvation energy model in use
 c     borntyp   method to be used for the Born radius computation
+c     svdw      atom class solute van Der Waals parameter
 c
 c
       module solute
+      use sizes
       implicit none
       real*8 doffset
       real*8 p1,p2,p3,p4,p5
@@ -56,6 +58,7 @@ c
       real*8, allocatable :: wace(:,:)
       real*8, allocatable :: s2ace(:,:)
       real*8, allocatable :: uace(:,:)
+      real*8 svdw(maxclass)
       character*8 solvtyp
       character*8 borntyp
       save

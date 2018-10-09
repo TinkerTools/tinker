@@ -829,9 +829,12 @@ c
       implicit none
       integer i,j,k,l,m
       integer atmnum,next
+      integer atmcls
+      real*8 solvdw
       real*8 rscale
       real*8 offset
       character*10 radtyp
+      character*10 soltyp
       character*20 keyword
       character*20 value
       character*240 record
@@ -880,6 +883,7 @@ c
          string = record(next:240)
          if (keyword(1:4) .eq. 'GKC ') then
             read (string,*,err=10,end=10)  gkc
+   10       continue
          else if (keyword(1:10) .eq. 'GK-RADIUS ') then
             call getword (record,value,next)
             call upcase (value)
@@ -894,209 +898,28 @@ c
             else if (value(1:6) .eq. 'TOMASI') then
                radtyp = 'TOMASI'
             end if
+c
+c
+c
+c     specify whether fitted vdw radii should be used
+c
+c
+c
+         else if (keyword(1:10) .eq. 'SOLUTE-VDW') then
+            soltyp = 'SOLUTE-VDW'
          end if
-   10    continue
       end do
 c
-c     assign base atomic radii from the van der Waals values
+c     assign radii
 c
-      if (radtyp .eq. 'VDW') then
-         do i = 1, n
-            rsolv(i) = 2.0d0
-            if (class(i) .ne. 0)  rsolv(i) = rad(class(i))
-            rsolv(i) = rsolv(i) - 0.10d0
-         end do
 c
-c     assign standard solvation radii adapted from Macromodel
 c
-      else if (radtyp .eq. 'MACROMODEL') then
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-            if (atmnum .eq. 1) then
-               rsolv(i) = 1.25d0
-               k = i12(1,i)
-               if (atomic(k) .eq. 7)  rsolv(i) = 1.15d0
-               if (atomic(k) .eq. 8)  rsolv(i) = 1.05d0
-            else if (atmnum .eq. 3) then
-               rsolv(i) = 1.432d0
-            else if (atmnum .eq. 6) then
-               rsolv(i) = 1.90d0
-               if (n12(i) .eq. 3)  rsolv(i) = 1.875d0
-               if (n12(i) .eq. 2)  rsolv(i) = 1.825d0
-            else if (atmnum .eq. 7) then
-               rsolv(i) = 1.7063d0
-               if (n12(i) .eq. 4)  rsolv(i) = 1.625d0
-               if (n12(i) .eq. 1)  rsolv(i) = 1.60d0
-            else if (atmnum .eq. 8) then
-               rsolv(i) = 1.535d0
-               if (n12(i) .eq. 1)  rsolv(i) = 1.48d0
-            else if (atmnum .eq. 9) then
-               rsolv(i) = 1.47d0
-            else if (atmnum .eq. 10) then
-               rsolv(i) = 1.39d0
-            else if (atmnum .eq. 11) then
-               rsolv(i) = 1.992d0
-            else if (atmnum .eq. 12) then
-               rsolv(i) = 1.70d0
-            else if (atmnum .eq. 14) then
-               rsolv(i) = 1.80d0
-            else if (atmnum .eq. 15) then
-               rsolv(i) = 1.87d0
-            else if (atmnum .eq. 16) then
-               rsolv(i) = 1.775d0
-            else if (atmnum .eq. 17) then
-               rsolv(i) = 1.735d0
-            else if (atmnum .eq. 18) then
-               rsolv(i) = 1.70d0
-            else if (atmnum .eq. 19) then
-               rsolv(i) = 2.123d0
-            else if (atmnum .eq. 20) then
-               rsolv(i) = 1.817d0
-            else if (atmnum .eq. 35) then
-               rsolv(i) = 1.90d0
-            else if (atmnum .eq. 36) then
-               rsolv(i) = 1.812d0
-            else if (atmnum .eq. 37) then
-               rsolv(i) = 2.26d0
-            else if (atmnum .eq. 53) then
-               rsolv(i) = 2.10d0
-            else if (atmnum .eq. 54) then
-               rsolv(i) = 1.967d0
-            else if (atmnum .eq. 55) then
-               rsolv(i) = 2.507d0
-            else if (atmnum .eq. 56) then
-               rsolv(i) = 2.188d0
-            end if
-         end do
 c
-c     assign base atomic radii as modified Bondi values
+c     call setrad subroutine to maintain consistent radii assignment between gk and pb
 c
-      else if (radtyp .eq. 'AMOEBA') then
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-            if (atmnum .eq. 1) then
-               rsolv(i) = 1.32d0
-               k = i12(1,i)
-               if (atomic(k) .eq. 7)  rsolv(i) = 1.10d0
-               if (atomic(k) .eq. 8)  rsolv(i) = 1.05d0
-            end if
-            if (atmnum .eq. 3)  rsolv(i) = 1.50d0
-            if (atmnum .eq. 6) then
-               rsolv(i) = 2.00d0
-               if (n12(i) .eq. 3)  rsolv(i) = 2.05d0
-               if (n12(i) .eq. 4) then
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 7)  rsolv(i) = 1.75d0
-                     if (atomic(k) .eq. 8)  rsolv(i) = 1.75d0
-                  end do
-               end if
-            end if
-            if (atmnum .eq. 7) then
-               rsolv(i) = 1.60d0
-            end if
-            if (atmnum .eq. 8) then
-               rsolv(i) = 1.55d0
-               if (n12(i) .eq. 2)  rsolv(i) = 1.45d0
-            end if
-         end do
 c
-c     assign base atomic radii as consensus Bondi values
 c
-      else
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-         end do
-      end if
-c
-c     make Tomasi-style modifications to the base atomic radii
-c
-      if (radtyp .eq. 'TOMASI') then
-         do i = 1, n
-            offset = 0.0d0
-            atmnum = atomic(i)
-            if (atomic(i) .eq. 1) then
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6) then
-                     do l = 1, n12(k)
-                        m = i12(l,k)
-                        if (atomic(m) .eq. 7)  offset = -0.05d0
-                        if (atomic(m) .eq. 8)  offset = -0.10d0
-                     end do
-                  end if
-                  if (atomic(k) .eq. 7)  offset = -0.25d0
-                  if (atomic(k) .eq. 8)  offset = -0.40d0
-                  if (atomic(k) .eq. 16)  offset = -0.10d0
-               end do
-            else if (atomic(i) .eq. 6) then
-               if (n12(i) .eq. 4)  offset = 0.05d0
-               if (n12(i) .eq. 3)  offset = 0.02d0
-               if (n12(i) .eq. 2)  offset = -0.03d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6)  offset = offset - 0.07d0
-               end do
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k).eq.7 .and. n12(k).eq.4)
-     &               offset = -0.20d0
-                  if (atomic(k).eq.7 .and. n12(k).eq.3)
-     &               offset = -0.25d0
-                  if (atomic(k) .eq. 8)  offset = -0.20d0
-               end do
-            else if (atomic(i) .eq. 7) then
-               if (n12(i) .eq. 3) then
-                  offset = -0.10d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = offset - 0.24d0
-                  end do
-               else
-                  offset = -0.20d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = offset - 0.16d0
-                  end do
-               end if
-            else if (atomic(i) .eq. 8) then
-               if (n12(i) .eq. 2) then
-                  offset = -0.21d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = -0.36d0
-                  end do
-               else
-                  offset = -0.25d0
-               end if
-            else if (atomic(i) .eq. 16) then
-               offset = -0.03d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6)  offset = offset - 0.10d0
-               end do
-            end if
-            rsolv(i) = rsolv(i) + offset
-         end do
-      end if
-c
-c     apply an overall scale factor to the solvation radii
-c
-      rscale = 1.0d0
-      if (radtyp .eq. 'VDW')  rscale = 1.0d0
-      if (radtyp .eq. 'MACROMODEL')  rscale = 1.0d0
-      if (radtyp .eq. 'AMOEBA')  rscale = 1.0d0
-      if (radtyp .eq. 'BONDI')  rscale = 1.03d0
-      if (radtyp .eq. 'TOMASI')  rscale = 1.24d0
-      do i = 1, n
-         rsolv(i) = rsolv(i) * rscale
-      end do
+      call setrad (radtyp,soltyp)
 c
 c     assign generic value for the HCT overlap scale factor
 c
@@ -1158,6 +981,8 @@ c
       integer pbtyplen,pbsolnlen
       integer bcfllen,chgmlen
       integer srfmlen,pbionq
+      integer atmcls
+      real*8 solvdw
       real*8 ri,rscale
       real*8 spacing,offset
       real*8 gx,gy,gz
@@ -1165,9 +990,10 @@ c
       real*8 total,weigh
       real*8 xmin,xmax,ymin
       real*8 ymax,zmin,zmax
-      real*8 xlen,ylen,zlen
+      real*8 xlen,ylen,zlen,minlen
       real*8 pbionc,pbionr
       character*10 radtyp
+      character*10 soltyp
       character*20 keyword
       character*20 value
       character*240 record
@@ -1273,16 +1099,16 @@ c
             pbsoln = 'MG-AUTO'
          else if (keyword(1:10) .eq. 'MG-MANUAL ') then
             pbsoln = 'MG-MANUAL'
-         else if (keyword(1:10) .eq. 'APBS-GRID ') then
+         else if (keyword(1:9) .eq. 'APBS-GRID') then
             nx = dime(1)
             ny = dime(2)
             nz = dime(3)
-            read (string,*,err=10,end=10)  nx,ny,nz
+            read (string,*,err=10,end=10)  nx, ny, nz
    10       continue
             if (nx .ge. 33)  dime(1) = nx
             if (ny .ge. 33)  dime(2) = ny
             if (nz .ge. 33)  dime(3) = nz
-         else if (keyword(1:10) .eq. 'PB-RADIUS ') then
+         else if (keyword(1:9) .eq. 'PB-RADIUS') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:3) .eq. 'VDW') then
@@ -1345,6 +1171,15 @@ c
                ionq(ionn) = pbionq
                ionr(ionn) = pbionr
             end if
+c
+c
+c
+c     specify whether fitted vdw radii should be used
+c
+c
+c
+         else if (keyword(1:10) .eq. 'SOLUTE-VDW') then
+            soltyp = 'SOLUTE-VDW'
          end if
       end do
 c
@@ -1356,6 +1191,7 @@ c
       grid(1) = xlen / dime(1)
       grid(2) = ylen / dime(2)
       grid(3) = zlen / dime(3)
+      write(*,*) xlen,ylen,zlen
 c
 c     grid spacing must be equal to maintain traceless quadrupoles
 c
@@ -1368,13 +1204,21 @@ c
       dime(1) = 33
       dime(2) = 33
       dime(3) = 33
-      do while (grid(1)*dime(1) .lt. xlen)
+c
+c
+c
+c     use minimum side length to maintain equal grid spacing
+c
+c
+c
+      minlen = min(xlen,ylen,zlen)
+      do while (grid(1)*dime(1) .lt. minlen)
          dime(1) = dime(1) + 32
       end do
-      do while (grid(2)*dime(2) .lt. ylen)
+      do while (grid(2)*dime(2) .lt. minlen)
          dime(2) = dime(2) + 32
       end do
-      do while (grid(3)*dime(3) .lt. zlen)
+      do while (grid(3)*dime(3) .lt. minlen)
          dime(3) = dime(3) + 32
       end do
 c
@@ -1468,169 +1312,16 @@ c
          end if
       end do
 c
-c     assign base atomic radii from consensus vdw values
+c     assign radii
 c
-      if (radtyp .eq. 'VDW') then
-         do i = 1, n
-            rsolv(i) = 2.0d0
-            if (class(i) .ne. 0)  rsolv(i) = rad(class(i))
-         end do
 c
-c     assign standard solvation radii adapted from Macromodel
 c
-      else if (radtyp .eq. 'MACROMODEL') then
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-            if (atmnum .eq. 1) then
-               rsolv(i) = 1.25d0
-               k = i12(1,i)
-               if (atomic(k) .eq. 7)  rsolv(i) = 1.15d0
-               if (atomic(k) .eq. 8)  rsolv(i) = 1.05d0
-            else if (atmnum .eq. 3) then
-               rsolv(i) = 1.432d0
-            else if (atmnum .eq. 6) then
-               rsolv(i) = 1.90d0
-               if (n12(i) .eq. 3)  rsolv(i) = 1.875d0
-               if (n12(i) .eq. 2)  rsolv(i) = 1.825d0
-            else if (atmnum .eq. 7) then
-               rsolv(i) = 1.7063d0
-               if (n12(i) .eq. 4)  rsolv(i) = 1.625d0
-               if (n12(i) .eq. 1)  rsolv(i) = 1.60d0
-            else if (atmnum .eq. 8) then
-               rsolv(i) = 1.535d0
-               if (n12(i) .eq. 1)  rsolv(i) = 1.48d0
-            else if (atmnum .eq. 9) then
-               rsolv(i) = 1.47d0
-            else if (atmnum .eq. 10) then
-               rsolv(i) = 1.39d0
-            else if (atmnum .eq. 11) then
-               rsolv(i) = 1.992d0
-            else if (atmnum .eq. 12) then
-               rsolv(i) = 1.70d0
-            else if (atmnum .eq. 14) then
-               rsolv(i) = 1.80d0
-            else if (atmnum .eq. 15) then
-               rsolv(i) = 1.87d0
-            else if (atmnum .eq. 16) then
-               rsolv(i) = 1.775d0
-            else if (atmnum .eq. 17) then
-               rsolv(i) = 1.735d0
-            else if (atmnum .eq. 18) then
-               rsolv(i) = 1.70d0
-            else if (atmnum .eq. 19) then
-               rsolv(i) = 2.123d0
-            else if (atmnum .eq. 20) then
-               rsolv(i) = 1.817d0
-            else if (atmnum .eq. 35) then
-               rsolv(i) = 1.90d0
-            else if (atmnum .eq. 36) then
-               rsolv(i) = 1.812d0
-            else if (atmnum .eq. 37) then
-               rsolv(i) = 2.26d0
-            else if (atmnum .eq. 53) then
-               rsolv(i) = 2.10d0
-            else if (atmnum .eq. 54) then
-               rsolv(i) = 1.967d0
-            else if (atmnum .eq. 55) then
-               rsolv(i) = 2.507d0
-            else if (atmnum .eq. 56) then
-               rsolv(i) = 2.188d0
-            end if
-         end do
 c
-c     assign base atomic radii from consensus vdw values
+c     call setrad subroutine to maintain consistent radii assignment between gk and pb
 c
-      else
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-         end do
-      end if
 c
-c     make Tomasi-style modifications to the base atomic radii
 c
-      if (radtyp .eq. 'TOMASI') then
-         do i = 1, n
-            offset = 0.0d0
-            atmnum = atomic(i)
-            if (atomic(i) .eq. 1) then
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6) then
-                     do l = 1, n12(k)
-                        m = i12(l,k)
-                        if (atomic(m) .eq. 7)  offset = -0.05d0
-                        if (atomic(m) .eq. 8)  offset = -0.10d0
-                     end do
-                  end if
-                  if (atomic(k) .eq. 7)  offset = -0.25d0
-                  if (atomic(k) .eq. 8)  offset = -0.40d0
-                  if (atomic(k) .eq. 16)  offset = -0.10d0
-               end do
-            else if (atomic(i) .eq. 6) then
-               if (n12(i) .eq. 4)  offset = 0.05d0
-               if (n12(i) .eq. 3)  offset = 0.02d0
-               if (n12(i) .eq. 2)  offset = -0.03d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6)  offset = offset - 0.07d0
-               end do
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k).eq.7 .and. n12(k).eq.4)
-     &               offset = -0.20d0
-                  if (atomic(k).eq.7 .and. n12(k).eq.3)
-     &               offset = -0.25d0
-                  if (atomic(k) .eq. 8)  offset = -0.20d0
-               end do
-            else if (atomic(i) .eq. 7) then
-               if (n12(i) .eq. 3) then
-                  offset = -0.10d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = offset - 0.24d0
-                  end do
-               else
-                  offset = -0.20d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = offset - 0.16d0
-                  end do
-               end if
-            else if (atomic(i) .eq. 8) then
-               if (n12(i) .eq. 2) then
-                  offset = -0.21d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = -0.36d0
-                  end do
-               else
-                  offset = -0.25d0
-               end if
-            else if (atomic(i) .eq. 16) then
-               offset = -0.03d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6)  offset = offset - 0.10d0
-               end do
-            end if
-            rsolv(i) = rsolv(i) + offset
-         end do
-      end if
-c
-c     apply an overall scale factor to the solvation radii
-c
-      rscale = 1.0d0
-c     if (radtyp .eq. 'VDW')  rscale = 1.1d0
-      if (radtyp .eq. 'MACROMODEL')  rscale = 1.15d0
-      if (radtyp .eq. 'BONDI')  rscale = 1.21d0
-      if (radtyp .eq. 'TOMASI')  rscale = 1.47d0
-      do i = 1, n
-         rsolv(i) = rsolv(i) * rscale
-      end do
+      call setrad (radtyp,soltyp)
 c
 c     assign generic value for the HCT overlap scale factor
 c
@@ -1880,6 +1571,253 @@ c
          if (atn .eq. 5)  rpmf(i) = 1.80d0
          if (atn .eq. 8)  rpmf(i) = 1.50d0
          if (atn .eq. 35)  rpmf(i) = 1.85d0
+      end do
+      return
+      end
+
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine setrad  --  assign Van der Waals radii        ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine setrad (radtyp,soltyp)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use couple
+      use gkstuf
+      use inform
+      use iounit
+      use keys
+      use kvdws
+      use math
+      use nonpol
+      use pbstuf
+      use polar
+      use potent
+      use ptable
+      use solute
+      implicit none
+      integer i,j,k,l,m
+      integer atmnum
+      real*8 rscale
+      real*8 offset
+      character*10 radtyp
+      character*10 soltyp
+c
+c     assign base atomic radii from consensus vdw values
+c
+      if (radtyp .eq. 'VDW') then
+         do i = 1, n
+            rsolv(i) = 2.0d0
+            if (class(i) .ne. 0)  rsolv(i) = rad(class(i))
+         end do
+c
+c     assign standard solvation radii adapted from Macromodel
+c
+      else if (radtyp .eq. 'MACROMODEL') then
+         do i = 1, n
+            atmnum = atomic(i)
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
+            if (atmnum .eq. 1) then
+               rsolv(i) = 1.25d0
+               k = i12(1,i)
+               if (atomic(k) .eq. 7)  rsolv(i) = 1.15d0
+               if (atomic(k) .eq. 8)  rsolv(i) = 1.05d0
+            else if (atmnum .eq. 3) then
+               rsolv(i) = 1.432d0
+            else if (atmnum .eq. 6) then
+               rsolv(i) = 1.90d0
+               if (n12(i) .eq. 3)  rsolv(i) = 1.875d0
+               if (n12(i) .eq. 2)  rsolv(i) = 1.825d0
+            else if (atmnum .eq. 7) then
+               rsolv(i) = 1.7063d0
+               if (n12(i) .eq. 4)  rsolv(i) = 1.625d0
+               if (n12(i) .eq. 1)  rsolv(i) = 1.60d0
+            else if (atmnum .eq. 8) then
+               rsolv(i) = 1.535d0
+               if (n12(i) .eq. 1)  rsolv(i) = 1.48d0
+            else if (atmnum .eq. 9) then
+               rsolv(i) = 1.47d0
+            else if (atmnum .eq. 10) then
+               rsolv(i) = 1.39d0
+            else if (atmnum .eq. 11) then
+               rsolv(i) = 1.992d0
+            else if (atmnum .eq. 12) then
+               rsolv(i) = 1.70d0
+            else if (atmnum .eq. 14) then
+               rsolv(i) = 1.80d0
+            else if (atmnum .eq. 15) then
+               rsolv(i) = 1.87d0
+            else if (atmnum .eq. 16) then
+               rsolv(i) = 1.775d0
+            else if (atmnum .eq. 17) then
+               rsolv(i) = 1.735d0
+            else if (atmnum .eq. 18) then
+               rsolv(i) = 1.70d0
+            else if (atmnum .eq. 19) then
+               rsolv(i) = 2.123d0
+            else if (atmnum .eq. 20) then
+               rsolv(i) = 1.817d0
+            else if (atmnum .eq. 35) then
+               rsolv(i) = 1.90d0
+            else if (atmnum .eq. 36) then
+               rsolv(i) = 1.812d0
+            else if (atmnum .eq. 37) then
+               rsolv(i) = 2.26d0
+            else if (atmnum .eq. 53) then
+               rsolv(i) = 2.10d0
+            else if (atmnum .eq. 54) then
+               rsolv(i) = 1.967d0
+            else if (atmnum .eq. 55) then
+               rsolv(i) = 2.507d0
+            else if (atmnum .eq. 56) then
+               rsolv(i) = 2.188d0
+            end if
+         end do
+c
+c     assign base atomic radii as modified Bondi values
+c
+      else if (radtyp .eq. 'AMOEBA') then
+         do i = 1, n
+            atmnum = atomic(i)
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
+            if (atmnum .eq. 1) then
+               rsolv(i) = 1.32d0
+               k = i12(1,i)
+               if (atomic(k) .eq. 7)  rsolv(i) = 1.10d0
+               if (atomic(k) .eq. 8)  rsolv(i) = 1.05d0
+            end if
+            if (atmnum .eq. 3)  rsolv(i) = 1.50d0
+            if (atmnum .eq. 6) then
+               rsolv(i) = 2.00d0
+               if (n12(i) .eq. 3)  rsolv(i) = 2.05d0
+               if (n12(i) .eq. 4) then
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k) .eq. 7)  rsolv(i) = 1.75d0
+                     if (atomic(k) .eq. 8)  rsolv(i) = 1.75d0
+                  end do
+               end if
+            end if
+            if (atmnum .eq. 7) then
+               rsolv(i) = 1.60d0
+            end if
+            if (atmnum .eq. 8) then
+               rsolv(i) = 1.55d0
+               if (n12(i) .eq. 2)  rsolv(i) = 1.45d0
+            end if
+         end do
+c
+c     assign base atomic radii from consensus vdw values
+c
+      else
+         do i = 1, n
+            atmnum = atomic(i)
+            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+            rsolv(i) = vdwrad(atmnum)
+         end do
+      end if
+c
+c
+c     assign base atomic radii from parametrized vdw values
+c     if no parametrized radii exists, base vdw radii is used
+c
+c
+      if (soltyp .eq. 'SOLUTE-VDW') then
+         do i = 1, n
+            if (class(i) .ne. 0) then
+               if (svdw(class(i)) .ne. 0.0d0) rsolv(i) = svdw(class(i))
+            end if
+         end do
+      end if
+c
+c     make Tomasi-style modifications to the base atomic radii
+c
+      if (radtyp .eq. 'TOMASI') then
+         do i = 1, n
+            offset = 0.0d0
+            atmnum = atomic(i)
+            if (atomic(i) .eq. 1) then
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (atomic(k) .eq. 6) then
+                     do l = 1, n12(k)
+                        m = i12(l,k)
+                        if (atomic(m) .eq. 7)  offset = -0.05d0
+                        if (atomic(m) .eq. 8)  offset = -0.10d0
+                     end do
+                  end if
+                  if (atomic(k) .eq. 7)  offset = -0.25d0
+                  if (atomic(k) .eq. 8)  offset = -0.40d0
+                  if (atomic(k) .eq. 16)  offset = -0.10d0
+               end do
+            else if (atomic(i) .eq. 6) then
+               if (n12(i) .eq. 4)  offset = 0.05d0
+               if (n12(i) .eq. 3)  offset = 0.02d0
+               if (n12(i) .eq. 2)  offset = -0.03d0
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (atomic(k) .eq. 6)  offset = offset - 0.07d0
+               end do
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (atomic(k).eq.7 .and. n12(k).eq.4)
+     &               offset = -0.20d0
+                  if (atomic(k).eq.7 .and. n12(k).eq.3)
+     &               offset = -0.25d0
+                  if (atomic(k) .eq. 8)  offset = -0.20d0
+               end do
+            else if (atomic(i) .eq. 7) then
+               if (n12(i) .eq. 3) then
+                  offset = -0.10d0
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k) .eq. 6)  offset = offset - 0.24d0
+                  end do
+               else
+                  offset = -0.20d0
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k) .eq. 6)  offset = offset - 0.16d0
+                  end do
+               end if
+            else if (atomic(i) .eq. 8) then
+               if (n12(i) .eq. 2) then
+                  offset = -0.21d0
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k) .eq. 6)  offset = -0.36d0
+                  end do
+               else
+                  offset = -0.25d0
+               end if
+            else if (atomic(i) .eq. 16) then
+               offset = -0.03d0
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if (atomic(k) .eq. 6)  offset = offset - 0.10d0
+               end do
+            end if
+            rsolv(i) = rsolv(i) + offset
+         end do
+      end if
+c
+c     apply an overall scale factor to the solvation radii
+c
+      rscale = 1.0d0
+      if (radtyp .eq. 'MACROMODEL')  rscale = 1.15d0
+      if (radtyp .eq. 'BONDI')  rscale = 1.21d0
+      if (radtyp .eq. 'TOMASI')  rscale = 1.47d0
+      do i = 1, n
+         rsolv(i) = rsolv(i) * rscale
       end do
       return
       end
