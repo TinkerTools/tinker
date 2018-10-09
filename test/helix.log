@@ -2,9 +2,9 @@
      ######################################################################
    ##########################################################################
   ###                                                                      ###
- ###            TINKER  ---  Software Tools for Molecular Design            ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.4  February 2018                        ##
+ ##                          Version 8.5  June 2018                          ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
@@ -35,8 +35,6 @@
 
            Groups               Type              Weight
 
-          0     1            InterGroup           1.0000
-          0     2            InterGroup           1.0000
           1     2            InterGroup           1.0000
 
  Optimally Conditioned Variable Metric Optimization :
@@ -98,5 +96,5 @@
  Final RMS Gradient :          0.4816D-04
  Final Gradient Norm :         0.6811D-04
 
- TINKER is Exiting following Normal Termination
+ Tinker is Exiting following Normal Termination
 
