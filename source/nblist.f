@@ -22,6 +22,10 @@ c
       implicit none
 c
 c
+c     enforce periodic boundaries before finding neighbors
+c
+      call bounds
+c
 c     update the vdw and electrostatic neighbor lists
 c
       if (use_vdw .and. use_vlist)  call vlist

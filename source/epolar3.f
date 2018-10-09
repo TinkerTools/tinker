@@ -1985,7 +1985,7 @@ c
 c     get polarization energy via induced dipoles times field
 c
       do i = 1, npole
-         if (douind(i)) then
+         if (douind(ipole(i))) then
             ii = ipole(i)
             fi = 0.5d0 * f / polarity(i)
             e = 0.0d0

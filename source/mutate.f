@@ -272,7 +272,8 @@ c     set electrostatic parameters for partial charge models
 c
       if (use_charge) then
          do i = 1, nion
-            if (mut(i)) then
+            k = iion(i)
+            if (mut(k)) then
                pchg(i) = pchg(i) * elambda
             end if
          end do
@@ -289,9 +290,13 @@ c
                end do
             end if
          end do
-         do i = 1, npolar
-            if (mut(i)) then
+      end if
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            if (mut(k)) then
                polarity(i) = polarity(i) * elambda
+               if (elambda .eq. 0.0d0)  douind(k) = .false.
             end if
          end do
       end if

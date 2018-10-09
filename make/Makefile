@@ -1980,7 +1980,7 @@ surfatom.o: atoms.o iounit.o math.o
 switch.o: limits.o nonpol.o shunt.o
 syntrn.o:
 tarray.o:
-tcgstuf.o: atoms.o boxes.o chgpot.o deriv.o energi.o ewald.o inform.o iounit.o limits.o math.o mpole.o polar.o polpot.o poltcg.o potent.o units.o
+tcgstuf.o: atoms.o boxes.o chgpot.o energi.o ewald.o iounit.o limits.o math.o mpole.o polar.o polpot.o poltcg.o potent.o units.o
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o units.o usage.o
 testgrad.o: atoms.o deriv.o energi.o files.o inform.o inter.o iounit.o solute.o usage.o
 testhess.o: atoms.o files.o hescut.o inform.o iounit.o usage.o

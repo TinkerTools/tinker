@@ -1,37 +1,27 @@
 c
 c
-c     ##############################
-c     ##                          ##
-c     ##  subroutine tcg_induce1  ##
-c     ##                          ##
-c     ##############################
+c     #############################################################
+c     ##  COPYRIGHT (C) 2018 by Zhi Wang and Jay William Ponder  ##
+c     ##                   All Rights Reserved                   ##
+c     #############################################################
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine induce0b  --  truncated CG dipole solver  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
-c     "tcg_induce1" computes and stores the induced dipoles and
-c     the derivatives of the induced dipoles used in polarization
-c     force calculation for TCG method
+c     "induce0b" computes and stores the induced dipoles via
+c     the truncated conjugate gradient (TCG) method
 c
 c
-      subroutine tcg_induce1
-      use mpole
-      use polar
+      subroutine induce0b
       use poltcg
-      use potent
       implicit none
-      integer i,j
 c
 c
-c     zero out the induced dipoles at each site
-c
-      if (.not. use_polar .or. npole .eq. 0)  return
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
-         end do
-      end do
-c
-c     select from alternative versions of the TCG algorithm
+c     choose the options for computation of TCG induced dipoles
 c
       if (tcgguess) then
          if (tcgprec) then
@@ -50,11 +40,11 @@ c
       end
 c
 c
-c     ###############################
-c     ##                           ##
-c     ##  subroutine tcg_induce1a  ##
-c     ##                           ##
-c     ###############################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine tcg_induce1a  -- TCG direct guess and precond  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "tcg_induce1a" computes the induced dipoles and intermediates
@@ -68,6 +58,7 @@ c
       use mpole
       use polar
       use poltcg
+      use potent
       implicit none
       integer i,j
       integer order
@@ -101,6 +92,16 @@ c
       real*8, allocatable :: t3m0(:,:,:)
       logical converge
 c
+c
+c     zero out the induced dipoles at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
 c
 c     set up nab based on tcgorder
 c
@@ -528,11 +529,11 @@ c
       end
 c
 c
-c     ###############################
-c     ##                           ##
-c     ##  subroutine tcg_induce1b  ##
-c     ##                           ##
-c     ###############################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine tcg_induce1b  -- TCG direct guess & no precond  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "tcg_induce1b" computes the induced dipoles and intermediates
@@ -546,8 +547,10 @@ c
       use mpole
       use polar
       use poltcg
+      use potent
       implicit none
-      integer i,order
+      integer i,j
+      integer order
       real*8 n0(2),t1(2),t4(2),n1(2)
       real*8 sp0(2),spp1(2)
       real*8 a110(2),a111(2),a112(2),a121(2)
@@ -577,6 +580,16 @@ c
       real*8, allocatable :: te(:,:,:)
       logical converge
 c
+c
+c     zero out the induced dipoles at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
 c
 c     set up nab based on tcgorder
 c
@@ -979,11 +992,11 @@ c
       end
 c
 c
-c     ###############################
-c     ##                           ##
-c     ##  subroutine tcg_induce1c  ##
-c     ##                           ##
-c     ###############################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine tcg_induce1c  -- TCG zero guess and precond  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "tcg_induce1c" computes the induced dipoles and intermediates
@@ -997,6 +1010,7 @@ c
       use mpole
       use polar
       use poltcg
+      use potent
       implicit none
       integer i,j
       integer order
@@ -1026,6 +1040,16 @@ c
       real*8, allocatable :: t3m0(:,:,:)
       logical converge
 c
+c
+c     zero out the induced dipoles at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
 c
 c     set up nab based on tcgorder
 c
@@ -1397,11 +1421,11 @@ c
       end
 c
 c
-c     ###############################
-c     ##                           ##
-c     ##  subroutine tcg_induce1d  ##
-c     ##                           ##
-c     ###############################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine tcg_induce1d  -- TCG zero guess and no precond  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "tcg_induce1d" computes the induced dipoles and intermediates
@@ -1415,8 +1439,10 @@ c
       use mpole
       use polar
       use poltcg
+      use potent
       implicit none
-      integer i,order
+      integer i,j
+      integer order
       real*8 n0(2),t1(2),t4(2),n1(2)
       real*8 sp0,spp1(2)
       real*8 a110(2),a111(2),a112(2),a121(2)
@@ -1445,6 +1471,16 @@ c
       real*8, allocatable :: t2ae(:,:,:)
       logical converge
 c
+c
+c     zero out the induced dipoles at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+         end do
+      end do
+      if (.not. use_polar)  return
 c
 c     set up nab based on tcgorder
 c
@@ -2272,7 +2308,7 @@ c
 c     get polarization energy via induced dipoles times field
 c
       do i = 1, npole
-         if (douind(i)) then
+         if (douind(ipole(i))) then
             fi = 0.5d0 * f / polarity(i)
             e = 0.0d0
             do j = 1, 3

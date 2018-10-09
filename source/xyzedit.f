@@ -106,6 +106,7 @@ c
 c
 c     get the force field definition and assign atom types
 c
+      call attach
       call field
       call katom
 c
