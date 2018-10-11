@@ -72,6 +72,7 @@ c
       use polar
       use polgrp
       use polopt
+      use polpcg
       use poltcg
       use potfit
       use qmstuf
@@ -93,7 +94,6 @@ c
       use uprior
       use urey
       use usage
-      use usolve
       use vdw
       use vibs
       use warp
@@ -658,6 +658,11 @@ c
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
 c
+c     deallocation of global arrays from module polpcg
+c
+      if (allocated(mindex))  deallocate (mindex)
+      if (allocated(minv))  deallocate (minv)
+c
 c     deallocation of global arrays from module poltcg
 c
       if (allocated(uindt))  deallocate (uindt)
@@ -821,11 +826,6 @@ c     deallocation of global arrays from module usage
 c
       if (allocated(iuse))  deallocate (iuse)
       if (allocated(use))  deallocate (use)
-c
-c     deallocation of global arrays from module usolve
-c
-      if (allocated(mindex))  deallocate (mindex)
-      if (allocated(minv))  deallocate (minv)
 c
 c     deallocation of global arrays from module vdw
 c

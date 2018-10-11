@@ -40,9 +40,9 @@ c
       use polar
       use polopt
       use polpot
+      use polpcg
       use poltcg
       use potent
-      use usolve
       implicit none
       integer i,j,k,next
       integer nlist,npg
@@ -66,6 +66,27 @@ c
       do i = 1, n
          list(i) = 0
       end do
+c
+c     set defaults for PCG induced dipole parameters
+c
+      pcgprec = .true.
+      pcgguess = .true.
+      pcgpeek = 1.0d0
+c
+c     set defaults for TCG induced dipole parameters
+c
+      tcgorder = 0
+      tcgprec = .true.
+      tcgguess = .true.
+      tcgpeek = 1.0d0
+      if (poltyp .eq. 'TCG   ')  poltyp = 'TCG2  '
+      if (poltyp .eq. 'TCG0  ') then
+         poltyp = 'DIRECT'
+      else if (poltyp .eq. 'TCG1  ') then
+         tcgorder = 1
+      else if (poltyp .eq. 'TCG2  ') then
+         tcgorder = 2
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -101,21 +122,6 @@ c
          copt(4) = 0.374d0
       end if
 c
-c     set defaults for TCG induced dipole parameters
-c
-      tcgorder = 0
-      tcgprec = .false.
-      tcgpeek = .false.
-      tcgomega = 1.0d0
-      if (poltyp .eq. 'TCG   ')  poltyp = 'TCG2  '
-      if (poltyp .eq. 'TCG0  ') then
-         poltyp = 'DIRECT'
-      else if (poltyp .eq. 'TCG1  ') then
-         tcgorder = 1
-      else if (poltyp .eq. 'TCG2  ') then
-         tcgorder = 2
-      end if
-c
 c     get keywords containing polarization-related options
 c
       do j = 1, nkey
@@ -130,19 +136,31 @@ c
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
+         else if (keyword(1:12) .eq. 'PCG-PRECOND ') then
+            pcgprec = .true.
+         else if (keyword(1:14) .eq. 'PCG-NOPRECOND ') then
+            pcgprec = .false.
+         else if (keyword(1:10) .eq. 'PCG-GUESS ') then
+            pcgguess = .true.
+         else if (keyword(1:12) .eq. 'PCG-NOGUESS ') then
+            pcgguess = .false.
+         else if (keyword(1:9) .eq. 'PCG-PEEK ') then
+            read (string,*,err=20,end=20)  pcgpeek
+         else if (keyword(1:12) .eq. 'TCG-PRECOND ') then
+            tcgprec = .true.
+         else if (keyword(1:14) .eq. 'TCG-NOPRECOND ') then
+            tcgprec = .false.
+         else if (keyword(1:10) .eq. 'TCG-GUESS ') then
+            tcgguess = .true.
+         else if (keyword(1:12) .eq. 'TCG-NOGUESS ') then
+            tcgguess = .false.
+         else if (keyword(1:9) .eq. 'TCG-PEEK ') then
+            read (string,*,err=20,end=20)  tcgpeek
          else if (keyword(1:10) .eq. 'OPT-COEFF ') then
             do i = 0, maxopt
                copt(i) = 0.0d0
             end do
             read (string,*,err=20,end=20)  (copt(i),i=0,maxopt)
-         else if (keyword(1:12) .eq. 'TCG-PRECOND ') then
-            tcgprec = .true.
-         else if (keyword(1:9) .eq. 'TCG-PEEK ') then
-            tcgpeek = .true.
-         else if (keyword(1:10) .eq. 'TCG-GUESS ') then
-            tcgguess = .true.
-         else if (keyword(1:10) .eq. 'TCG-OMEGA ') then
-            read (string,*,err=20,end=20)  tcgomega
          end if
    20    continue
       end do

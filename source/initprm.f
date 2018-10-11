@@ -196,11 +196,11 @@ c     initialize values of some force field parameters
 c
       forcefield = blank20
       do i = 1, maxtyp
-         symbol(i) = blank3
          atmcls(i) = 0
          atmnum(i) = 0
-         weight(i) = 0.0d0
          ligand(i) = 0
+         weight(i) = 0.0d0
+         symbol(i) = blank3
          describe(i) = blank24
          rad(i) = 0.0d0
          eps(i) = 0.0d0

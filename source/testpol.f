@@ -290,7 +290,7 @@ c
       call induce
       do i = 1, n
          do j = 1, 3
-            utcg(j,i) = debye * uind(j,i)
+            utcg(j,i) = debye * uindt(j,i)
          end do
       end do
 c

@@ -542,6 +542,7 @@ OBJS =	action.o \
 	polgrp.o \
 	polopt.o \
 	polpot.o \
+	polpcg.o \
 	poltcg.o \
 	polymer.o \
 	potent.o \
@@ -655,7 +656,6 @@ OBJS =	action.o \
 	urey.o \
 	urypot.o \
 	usage.o \
-	usolve.o \
 	valence.o \
 	valfit.o \
 	vdw.o \
@@ -1385,6 +1385,7 @@ libtinker.a: ${OBJS}
 	polgrp.o \
 	polopt.o \
 	polpot.o \
+	polpcg.o \
 	poltcg.o \
 	polymer.o \
 	potent.o \
@@ -1476,7 +1477,6 @@ libtinker.a: ${OBJS}
 	urey.o \
 	urypot.o \
 	usage.o \
-	usolve.o \
 	valfit.o \
 	vdw.o \
 	vdwpot.o \
@@ -1699,7 +1699,7 @@ fftpack.o: math.o
 field.o: keys.o potent.o
 fields.o:
 files.o:
-final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o charge.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o katoms.o kchrge.o kpolr.o kvdws.o light.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o poltcg.o potfit.o qmstuf.o refer.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o usolve.o vdw.o vibs.o warp.o
+final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o charge.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o katoms.o kchrge.o kpolr.o kvdws.o light.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o warp.o
 fracs.o:
 freeunit.o: iounit.o
@@ -1740,7 +1740,7 @@ image.o: boxes.o cell.o
 impose.o: align.o inform.o iounit.o
 improp.o:
 imptor.o:
-induce.o: atoms.o bound.o boxes.o cell.o couple.o ewald.o gkstuf.o group.o ielscf.o inform.o iounit.o limits.o math.o mpole.o neigh.o openmp.o pbstuf.o pme.o polar.o polgrp.o polopt.o polpot.o potent.o shunt.o solute.o tarray.o units.o uprior.o usolve.o
+induce.o: atoms.o bound.o boxes.o cell.o couple.o ewald.o gkstuf.o group.o ielscf.o inform.o iounit.o limits.o math.o mpole.o neigh.o openmp.o pbstuf.o pme.o polar.o polgrp.o polopt.o polpcg.o polpot.o potent.o shunt.o solute.o tarray.o units.o uprior.o
 inertia.o: atomid.o atoms.o iounit.o math.o
 inform.o:
 initatom.o: ptable.o
@@ -1791,7 +1791,7 @@ korbit.o: atomid.o atoms.o bndstr.o inform.o iounit.o keys.o korbs.o orbits.o pi
 korbs.o: sizes.o
 kpitor.o:
 kpitors.o: atomid.o atoms.o bndstr.o couple.o inform.o iounit.o keys.o kpitor.o pitors.o potent.o tors.o
-kpolar.o: atoms.o couple.o inform.o iounit.o keys.o kpolr.o mpole.o neigh.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o usolve.o
+kpolar.o: atoms.o couple.o inform.o iounit.o keys.o kpolr.o mpole.o neigh.o polar.o polgrp.o polopt.o polpcg.o polpot.o poltcg.o potent.o
 kpolr.o:
 ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o kvdws.o math.o nonpol.o pbstuf.o polar.o polopt.o polpot.o potent.o ptable.o solute.o
 kstbnd.o:
@@ -1893,6 +1893,7 @@ polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polgrp.o polpot.o
 poledit.o: atomid.o atoms.o couple.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
 polgrp.o:
 polopt.o:
+polpcg.o:
 polpot.o:
 poltcg.o:
 polymer.o: atoms.o bndstr.o bound.o boxes.o iounit.o keys.o
@@ -2007,7 +2008,6 @@ uprior.o:
 urey.o:
 urypot.o:
 usage.o:
-usolve.o:
 valence.o: angbnd.o angpot.o atomid.o atoms.o bndpot.o bndstr.o couple.o files.o hescut.o inform.o iounit.o kangs.o kbonds.o keys.o kopbnd.o kstbnd.o ktorsn.o kurybr.o kvdws.o linmin.o math.o minima.o opbend.o output.o potent.o qmstuf.o scales.o strbnd.o torpot.o tors.o units.o urey.o urypot.o usage.o valfit.o vdwpot.o
 valfit.o:
 vdw.o:

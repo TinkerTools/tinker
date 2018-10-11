@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  module polopt  --  induced dipoles for OPT extrapolation  ##        
+c     ##  module polopt  --  induced dipoles via OPT extrapolation  ##        
 c     ##                                                            ##
 c     ################################################################
 c

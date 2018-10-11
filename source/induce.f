@@ -183,6 +183,7 @@ c
       use mpole
       use polar
       use polopt
+      use polpcg
       use polpot
       use potent
       use units
@@ -195,7 +196,7 @@ c
       real*8 epsd,epsp
       real*8 udsum,upsum
       real*8 a,ap,b,bp
-      real*8 sum,sump
+      real*8 sum,sump,term
       real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
@@ -245,8 +246,10 @@ c
             do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
-               uind(j,i) = udir(j,i)
-               uinp(j,i) = udirp(j,i)
+               if (pcgguess) then
+                  uind(j,i) = udir(j,i)
+                  uinp(j,i) = udirp(j,i)
+               end if
             end do
          end if
       end do
@@ -370,27 +373,38 @@ c
             if (douind(ipole(i))) then
                poli(i) = max(polmin,polarity(i))
                do j = 1, 3
-                  rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                          + field(j,i)
-                  rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                          + fieldp(j,i)
+                  if (pcgguess) then
+                     rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                             + field(j,i)
+                     rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                             + fieldp(j,i)
+                  else
+                     rsd(j,i) = udir(j,i) / poli(i)
+                     rsdp(j,i) = udirp(j,i) / poli(i)
+                  end if
+                  zrsd(j,i) = rsd(j,i)
+                  zrsdp(j,i) = rsdp(j,i)
                end do
             else
                do j = 1, 3
                   rsd(j,i) = 0.0d0
                   rsdp(j,i) = 0.0d0
+                  zrsd(j,i) = 0.0d0
+                  zrsdp(j,i) = 0.0d0
                end do
             end if
          end do
-         mode = 'BUILD'
-         if (use_mlist) then
-            call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
-            mode = 'APPLY'
-            call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
-         else
-            call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
-            mode = 'APPLY'
-            call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+         if (pcgprec) then
+            mode = 'BUILD'
+            if (use_mlist) then
+               call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+               mode = 'APPLY'
+               call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+            else
+               call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+               mode = 'APPLY'
+               call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+            end if
          end if
          do i = 1, npole
             if (douind(ipole(i))) then
@@ -455,13 +469,17 @@ c
                      uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
                      rsd(j,i) = rsd(j,i) - a*vec(j,i)
                      rsdp(j,i) = rsdp(j,i) - ap*vecp(j,i)
+                     zrsd(j,i) = rsd(j,i)
+                     zrsdp(j,i) = rsdp(j,i)
                   end do
                end if
             end do
-            if (use_mlist) then
-               call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
-            else
-               call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+            if (pcgprec) then
+               if (use_mlist) then
+                  call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
+               else
+                  call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
+               end if
             end if
             b = 0.0d0
             bp = 0.0d0
@@ -512,9 +530,10 @@ c
             if (done) then
                do i = 1, npole
                   if (douind(ipole(i))) then
+                     term = pcgpeek * poli(i)
                      do j = 1, 3
-                        uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
-                        uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
+                        uind(j,i) = uind(j,i) + term*rsd(j,i)
+                        uinp(j,i) = uinp(j,i) + term*rsdp(j,i)
                      end do
                   end if
                end do
@@ -5772,8 +5791,8 @@ c
       use mpole
       use polar
       use polgrp
+      use polpcg
       use polpot
-      use usolve
       implicit none
       integer i,j,k,m
       integer ii,kk
@@ -5976,8 +5995,8 @@ c
       use neigh
       use polar
       use polgrp
+      use polpcg
       use polpot
-      use usolve
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk

@@ -174,28 +174,26 @@ c     mu1 = mu0 + gamma0 * p0 (or m0)
 c
       uind = uind + t4(1) * m0(:,:,1)
       uinp = uinp + t4(2) * m0(:,:,2)
-      if (order .gt. 1 .or. tcgpeek) then
 c
 c     r1 = r0 - gamma0 * T.p0 (or T.m0)
 c
-         r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
-         r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
+      r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
+      r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
 c
 c     check convergence, stop at tcg1 level if n1 is small enough
 c
-         call tcg_dotprod (nrsd1(1),3*npole,r1(:,:,1),r1(:,:,1))
-         call tcg_dotprod (nrsd1(2),3*npole,r1(:,:,2),r1(:,:,2))
-         call tcg_converge (converge,nrsd1(1),nrsd1(2))
-         if (converge) then
-            order = 1
-            call tcg_resource (order)
-         end if
+      call tcg_dotprod (nrsd1(1),3*npole,r1(:,:,1),r1(:,:,1))
+      call tcg_dotprod (nrsd1(2),3*npole,r1(:,:,2),r1(:,:,2))
+      call tcg_converge (converge,nrsd1(1),nrsd1(2))
+      if (converge) then
+         order = 1
+         call tcg_resource (order)
+      end if
 c
 c     n1 = r1.M.r1
 c
-         call tcg_alphaquad (n1(1),r1(:,:,1),r1(:,:,1))
-         call tcg_alphaquad (n1(2),r1(:,:,2),r1(:,:,2))
-      end if
+      call tcg_alphaquad (n1(1),r1(:,:,1),r1(:,:,1))
+      call tcg_alphaquad (n1(2),r1(:,:,2),r1(:,:,2))
 c
 c     cross terms
 c     sp0 = m0.E
@@ -203,10 +201,8 @@ c     spp1 = m0.T.alpha.E = m0.T.mu0
 c
       call tcg_dotprod (sp0(1),3*npole,m0(:,:,1),field(:,:,2))
       call tcg_dotprod (sp0(2),3*npole,m0(:,:,2),field(:,:,1))
-      if (tcgpeek) then
-         call tcg_dotprod (spp1(1),3*npole,P1(:,:,1),udirp)
-         call tcg_dotprod (spp1(2),3*npole,P1(:,:,2),udir)
-      end if
+      call tcg_dotprod (spp1(1),3*npole,P1(:,:,1),udirp)
+      call tcg_dotprod (spp1(2),3*npole,P1(:,:,2),udir)
 c
 c     tcg1 force and energy
 c
@@ -220,44 +216,33 @@ c
             a111(i) = 2.0d0 * sp0(i) / t1(i)
             a112(i) = -t4(i) * a111(i)
             a121(i) = 0.5d0 * a112(i)
+            a1k10a(i) = tcgpeek
+            a1k11a(i) = -tcgpeek * t4(i)
+            a1k11(i) = -2.0d0 * spp1(i) * tcgpeek / t1(i)
+            a1k12(i) = -t4(i) * a1k11(i)
+            a1k20a(i) = a1k11a(i)
+            a1k21(i) = 0.5d0 * a1k12(i)
          end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a1k10a(i) = tcgomega
-               a1k11a(i) = -tcgomega * t4(i)
-               a1k11(i) = -2.0d0 * spp1(i) * tcgomega / t1(i)
-               a1k12(i) = -t4(i) * a1k11(i)
-               a1k20a(i) = a1k11a(i)
-               a1k21(i) = 0.5d0 * a1k12(i)
-            end do
 c
 c     mu1(peek) = mu1 + omega * alpha.r1
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = 0.5d0 * (-(a121(1)+a1k21(1))*m0(:,:,1)
-     &                               - a1k20a(1)*udirp)
-            ubd(:,:,1) = 0.5d0 * (-(a121(2)+a1k21(2))*m0(:,:,2)
-     &                               - a1k20a(2)*udir)
-            xdr0(:,:,1) = (a110(2)+a1k11a(2)+a1k10a(2))*field(:,:,1)
+         ubp(:,:,1) = 0.5d0 * (-(a121(1)+a1k21(1))*m0(:,:,1)
+     &                            - a1k20a(1)*udirp)
+         ubd(:,:,1) = 0.5d0 * (-(a121(2)+a1k21(2))*m0(:,:,2)
+     &                            - a1k20a(2)*udir)
+         xdr0(:,:,1) = (a110(2)+a1k11a(2)+a1k10a(2))*field(:,:,1)
      &                  - a1k11a(2)*r0(:,:,1)
      &                  + (a111(2)+a1k11(2))*r0(:,:,2)
      &                  + (a112(2)+a1k12(2))*P1(:,:,2)
-            xdr0(:,:,2) = (a110(1)+a1k11a(1)+a1k10a(1))*field(:,:,2)
+         xdr0(:,:,2) = (a110(1)+a1k11a(1)+a1k10a(1))*field(:,:,2)
      &                  - a1k11a(1)*r0(:,:,2)
      &                  + (a111(1)+a1k11(1))*r0(:,:,1)
      &                  + (a112(1)+a1k12(1))*P1(:,:,1)
-         else
-            ubp(:,:,1) = 0.5d0 * (-a121(1)*m0(:,:,1))
-            ubd(:,:,1) = 0.5d0 * (-a121(2)*m0(:,:,2))
-            xdr0(:,:,1) = a110(2)*field(:,:,1) + a111(2)*r0(:,:,2)
-     &                  + a112(2)*P1(:,:,2)
-            xdr0(:,:,2) = a110(1)*field(:,:,2) + a111(1)*r0(:,:,1)
-     &                  + a112(1)*P1(:,:,1)
-         end if
          call tcg_alpha12 (xdr0(:,:,1),xdr0(:,:,2))
 c
 c     xde: rhs array in <E' xde>
@@ -326,18 +311,16 @@ c
      &                     * gamma1(2) * polarity(i)
          end do
       end do
-      if (order .gt. 2 .or. tcgpeek) then
 c
 c     r2 = r1 - gamma1 * T.p1 = r1 - gamma1 * P2
 c        = r1 - gamma1 * (t2*T.M.r0 - t4*T.M.T.M.r0)
 c        = r1 - gamma1 * (t2*P1 - t4*t2m0)
 c     reuse r1 as r2
 c
-         r1(:,:,1) = r1(:,:,1)
-     &                  - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2m0(:,:,1))
-         r1(:,:,2) = r1(:,:,2)
-     &                  - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2m0(:,:,2))
-      end if
+      r1(:,:,1) = r1(:,:,1)
+     &               - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2m0(:,:,1))
+      r1(:,:,2) = r1(:,:,2)
+     &               - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2m0(:,:,2))
 c
 c     cross terms
 c     sp1 = m0.T.M.E = P1.M.E
@@ -352,12 +335,10 @@ c
       b1(2) = sp0(2) - gamma1(2)*sp1(2)
       b2(1) = sp0(1)*t2(1) - t4(1)*sp1(1)
       b2(2) = sp0(2)*t2(2) - t4(2)*sp1(2)
-      if (tcgpeek) then
-         call tcg_alphaquad (spp2(1),P1(:,:,1),r0(:,:,2))
-         call tcg_alphaquad (spp2(2),P1(:,:,2),r0(:,:,1))
-         spp2(1) = sp1(1) - spp2(1)
-         spp2(2) = sp1(2) - spp2(2)
-      end if
+      call tcg_alphaquad (spp2(1),P1(:,:,1),r0(:,:,2))
+      call tcg_alphaquad (spp2(2),P1(:,:,2),r0(:,:,1))
+      spp2(1) = sp1(1) - spp2(1)
+      spp2(2) = sp1(2) - spp2(2)
 c
 c     tcg2 force and energy
 c
@@ -389,104 +370,81 @@ c
      &                   +np1(i)*sp0(i)*gamma1(i)/(t1(i)**2))
             a21n1(i) = a220(i)
             a210(i) = t4(i) + gamma1(i)*t2(i)
-         end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a2kwt2(i) = tcgomega*(t2(i)*spp1(i)-t4(i)*spp2(i))
-               a2kwg1(i) = tcgomega*(spp1(i)-gamma1(i)*spp2(i))
-               a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
-               a2k32(i) = a2k41(i)
-               a2k31(i) = -tcgomega*t4(i)*gamma1(i)*spp1(i)/t1(i)
+            a2kwt2(i) = tcgpeek*(t2(i)*spp1(i)-t4(i)*spp2(i))
+            a2kwg1(i) = tcgpeek*(spp1(i)-gamma1(i)*spp2(i))
+            a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
+            a2k32(i) = a2k41(i)
+            a2k31(i) = -tcgpeek*t4(i)*gamma1(i)*spp1(i)/t1(i)
      &                    +a2kwt2(i)*(n0(i)/t3(i)
-     &                       +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
-               a2k30a(i) = tcgomega*gamma1(i)*t4(i)
-               a2k23(i) = a2k41(i)
-               a2k22(i) = a2k31(i)
-               a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
-     &                       tcgomega*gamma1(i)*spp1(i)
+     &                    +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
+            a2k30a(i) = tcgpeek*gamma1(i)*t4(i)
+            a2k23(i) = a2k41(i)
+            a2k22(i) = a2k31(i)
+            a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
+     &                       tcgpeek*gamma1(i)*spp1(i)
      &                    +a2kwt2(i)*(-2.0d0*t1(i)+
      &                       (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
      &                       gamma1(i))/t3(i)
      &                    +t4(i)*a2kwg1(i)/t1(i)
-               a2k21a(i) = a2k30a(i)
-               a2k20a(i) = -tcgomega*(gamma1(i)*t2(i)+t4(i))
-               a2k14(i) = 2.0d0*a2k41(i)
-               a2k13(i) = 2.0d0*a2k22(i)
-               a2k12(i) = 2.0d0*a2k21(i)
-               a2k11(i) = -np1(i)/(t1(i)**2)*tcgomega*gamma1(i)*spp1(i)
+            a2k21a(i) = a2k30a(i)
+            a2k20a(i) = -tcgpeek*(gamma1(i)*t2(i)+t4(i))
+            a2k14(i) = 2.0d0*a2k41(i)
+            a2k13(i) = 2.0d0*a2k22(i)
+            a2k12(i) = 2.0d0*a2k21(i)
+            a2k11(i) = -np1(i)/(t1(i)**2)*tcgpeek*gamma1(i)*spp1(i)
      &                    +a2kwt2(i)*(np1(i)
      &                       +(np1(i)**2)*gamma1(i)/t1(i)
      &                       -t9(i)*gamma1(i))/t3(i)
      &                    -a2kwg1(i)/t1(i)
-               a2k11(i) = 2.0d0*a2k11(i)
-               a2k12a(i) = a2k30a(i)
-               a2k11a(i) = a2k20a(i)
-               a2k10a(i) = tcgomega
-            end do
+            a2k11(i) = 2.0d0*a2k11(i)
+            a2k12a(i) = a2k30a(i)
+            a2k11a(i) = a2k20a(i)
+            a2k10a(i) = tcgpeek
+         end do
 c
 c     mu2(peek) = mu2 + omega * alpha.r2
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = 0.5d0 * (-(a220(1)+a2k20a(1)
-     &                               +a2k21a(1))*field(:,:,2)
-     &                               +a2k21a(1)*r0(:,:,2)
-     &                               -(a221(1)+a2k21(1))*r0(:,:,1)
-     &                               -(a222(1)+a231(1)+a2k22(1)
-     &                                    +a2k31(1))*P1(:,:,1)
-     &                               -(a223(1)+a241(1)+a2k23(1)
-     &                                    +a2k41(1))*t2m0(:,:,1))
-            ubd(:,:,1) = 0.5d0 * (-(a220(2)+a2k20a(2)
-     &                               +a2k21a(2))*field(:,:,1)
-     &                               +a2k21a(2)*r0(:,:,1)
-     &                               -(a221(2)+a2k21(2))*r0(:,:,2)
-     &                               -(a222(2)+a231(2)+a2k22(2)
-     &                                    +a2k31(2))*P1(:,:,2)
-     &                               -(a223(2)+a241(2)+a2k23(2)
-     &                                    +a2k41(2))*t2m0(:,:,2))
-            ubp(:,:,2) = 0.5d0 * (-(a232(1)+a2k32(1))*P1(:,:,1)
-     &                               -a2k30a(1)*field(:,:,2))
-            ubd(:,:,2) = 0.5d0 * (-(a232(2)+a2k32(2))*P1(:,:,2)
-     &                               -a2k30a(2)*field(:,:,1))
-            xdr0(:,:,1) = (a210(2)+a21n1(2)+a2k10a(2)
-     &                        +a2k11a(2)+a2k12a(2))*field(:,:,1)
-     &                  - (a21n1(2)+a2k11a(2)+a2k12a(2))*r0(:,:,1)
-     &                  + (a211(2)+a2k11(2))*r0(:,:,2)
-     &                  - a2k12a(2)*P1(:,:,1)
-     &                  + (a212(2)+a2k12(2))*P1(:,:,2)
-     &                  + (a213(2)+a2k13(2))*t2m0(:,:,2)
-     &                  + (a214(2)+a2k14(2))*t3m0(:,:,2)
-            xdr0(:,:,2) = (a210(1)+a21n1(1)+a2k10a(1)
-     &                        +a2k11a(1)+a2k12a(1))*field(:,:,2)
-     &                  - (a21n1(1)+a2k11a(1)+a2k12a(1))*r0(:,:,2)
-     &                  + (a211(1)+a2k11(1))*r0(:,:,1)
-     &                  - a2k12a(1)*P1(:,:,2)
-     &                  + a212(1)*P1(:,:,1)+a2k12(1)*P1(:,:,1)
-     &                  + (a213(1)+a2k13(1))*t2m0(:,:,1)
-     &                  + (a214(1)+a2k14(1))*t3m0(:,:,1)
-         else
-            ubp(:,:,1) = 0.5d0 * (-a220(1)*field(:,:,2)
-     &                               -a221(1)*r0(:,:,1)
-     &                               -(a222(1)+a231(1))*P1(:,:,1)
-     &                               -(a223(1)+a241(1))*t2m0(:,:,1))
-            ubd(:,:,1) = 0.5d0 * (-a220(2)*field(:,:,1)
-     &                               -a221(2)*r0(:,:,2)
-     &                               -(a222(2)+a231(2))*P1(:,:,2)
-     &                               -(a223(2)+a241(2))*t2m0(:,:,2))
-            ubp(:,:,2) = 0.5d0 * (-a232(1)*P1(:,:,1))
-            ubd(:,:,2) = 0.5d0 * (-a232(2)*P1(:,:,2))
-            xdr0(:,:,1) = (a210(2)+a21n1(2))*field(:,:,1)
-     &                  - a21n1(2)*r0(:,:,1)
-     &                  + a211(2)*r0(:,:,2) + a212(2)*P1(:,:,2)
-     &                  + a213(2)*t2m0(:,:,2) + a214(2)*t3m0(:,:,2)
-            xdr0(:,:,2) = (a210(1)+a21n1(1))*field(:,:,2)
-     &                  - a21n1(1)*r0(:,:,2)
-     &                  + a211(1)*r0(:,:,1) + a212(1)*P1(:,:,1)
-     &                  + a213(1)*t2m0(:,:,1) + a214(1)*t3m0(:,:,1)
-         end if
+         ubp(:,:,1) = 0.5d0 * (-(a220(1)+a2k20a(1)
+     &                            +a2k21a(1))*field(:,:,2)
+     &                            +a2k21a(1)*r0(:,:,2)
+     &                            -(a221(1)+a2k21(1))*r0(:,:,1)
+     &                            -(a222(1)+a231(1)+a2k22(1)
+     &                                 +a2k31(1))*P1(:,:,1)
+     &                            -(a223(1)+a241(1)+a2k23(1)
+     &                                 +a2k41(1))*t2m0(:,:,1))
+         ubd(:,:,1) = 0.5d0 * (-(a220(2)+a2k20a(2)
+     &                            +a2k21a(2))*field(:,:,1)
+     &                            +a2k21a(2)*r0(:,:,1)
+     &                            -(a221(2)+a2k21(2))*r0(:,:,2)
+     &                            -(a222(2)+a231(2)+a2k22(2)
+     &                                 +a2k31(2))*P1(:,:,2)
+     &                            -(a223(2)+a241(2)+a2k23(2)
+     &                                 +a2k41(2))*t2m0(:,:,2))
+         ubp(:,:,2) = 0.5d0 * (-(a232(1)+a2k32(1))*P1(:,:,1)
+     &                            -a2k30a(1)*field(:,:,2))
+         ubd(:,:,2) = 0.5d0 * (-(a232(2)+a2k32(2))*P1(:,:,2)
+     &                            -a2k30a(2)*field(:,:,1))
+         xdr0(:,:,1) = (a210(2)+a21n1(2)+a2k10a(2)
+     &                     +a2k11a(2)+a2k12a(2))*field(:,:,1)
+     &               - (a21n1(2)+a2k11a(2)+a2k12a(2))*r0(:,:,1)
+     &               + (a211(2)+a2k11(2))*r0(:,:,2)
+     &               - a2k12a(2)*P1(:,:,1)
+     &               + (a212(2)+a2k12(2))*P1(:,:,2)
+     &               + (a213(2)+a2k13(2))*t2m0(:,:,2)
+     &               + (a214(2)+a2k14(2))*t3m0(:,:,2)
+         xdr0(:,:,2) = (a210(1)+a21n1(1)+a2k10a(1)
+     &                     +a2k11a(1)+a2k12a(1))*field(:,:,2)
+     &               - (a21n1(1)+a2k11a(1)+a2k12a(1))*r0(:,:,2)
+     &               + (a211(1)+a2k11(1))*r0(:,:,1)
+     &               - a2k12a(1)*P1(:,:,2)
+     &               + a212(1)*P1(:,:,1)+a2k12(1)*P1(:,:,1)
+     &               + (a213(1)+a2k13(1))*t2m0(:,:,1)
+     &               + (a214(1)+a2k14(1))*t3m0(:,:,1)
          call tcg_alpha12 (xdr0(:,:,1),xdr0(:,:,2))
 c
 c     xde = mu + mu0 + alpha.(-Tu.x)
@@ -662,23 +620,21 @@ c     mu1 = mu0 + gamma0 * p0 (or r0)
 c
       uind = uind + t4(1) * r0(:,:,1)
       uinp = uinp + t4(2) * r0(:,:,2)
-      if (order .gt. 1 .or. tcgpeek) then
 c
 c     r1 = r0 - gamma0 * T.p0 (or T.r0)
 c
-         r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
-         r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
+      r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
+      r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
 c
 c     n1 = r1.r1
 c     check convergence, stop at tcg1 level if n1 is small enough
 c
-         call tcg_dotprod (n1(1),3*npole,r1(:,:,1),r1(:,:,1))
-         call tcg_dotprod (n1(2),3*npole,r1(:,:,2),r1(:,:,2))
-         call tcg_converge (converge,n1(1),n1(2))
-         if (converge) then
-            order = 1
-            call tcg_resource (order)
-         end if
+      call tcg_dotprod (n1(1),3*npole,r1(:,:,1),r1(:,:,1))
+      call tcg_dotprod (n1(2),3*npole,r1(:,:,2),r1(:,:,2))
+      call tcg_converge (converge,n1(1),n1(2))
+      if (converge) then
+         order = 1
+         call tcg_resource (order)
       end if
 c
 c     cross terms
@@ -687,10 +643,8 @@ c     spp1 = r0.T.alpha.E = r0.T.mu0
 c
       call tcg_dotprod (sp0(1),3*npole,r0(:,:,1),field(:,:,2))
       call tcg_dotprod (sp0(2),3*npole,r0(:,:,2),field(:,:,1))
-      if (tcgpeek) then
-         call tcg_dotprod (spp1(1),3*npole,P1(:,:,1),udirp)
-         call tcg_dotprod (spp1(2),3*npole,P1(:,:,2),udir)
-      end if
+      call tcg_dotprod (spp1(1),3*npole,P1(:,:,1),udirp)
+      call tcg_dotprod (spp1(2),3*npole,P1(:,:,2),udir)
 c
 c     tcg1 force and energy
 c
@@ -704,44 +658,33 @@ c
             a111(i) = 2.0d0 * sp0(i) / t1(i)
             a112(i) = -t4(i) * a111(i)
             a121(i) = 0.5d0 * a112(i)
+            a1k10a(i) = tcgpeek
+            a1k11a(i) = -tcgpeek * t4(i)
+            a1k11(i) = -2.0d0 * spp1(i) * tcgpeek / t1(i)
+            a1k12(i) = -t4(i) * a1k11(i)
+            a1k20a(i) = a1k11a(i)
+            a1k21(i) = 0.5d0 * a1k12(i)
          end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a1k10a(i) = tcgomega
-               a1k11a(i) = -tcgomega * t4(i)
-               a1k11(i) = -2.0d0 * spp1(i) * tcgomega / t1(i)
-               a1k12(i) = -t4(i) * a1k11(i)
-               a1k20a(i) = a1k11a(i)
-               a1k21(i) = 0.5d0 * a1k12(i)
-            end do
 c
 c     mu1(peek) = mu1 + omega * alpha.r1
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = 0.5d0 * (-(a121(1)+a1k21(1))*r0(:,:,1)
-     &                               - a1k20a(1)*udirp)
-            ubd(:,:,1) = 0.5d0 * (-(a121(2)+a1k21(2))*r0(:,:,2)
-     &                               - a1k20a(2)*udir)
-            xdr0(:,:,1) = (a110(2)+a1k11a(2))*field(:,:,1)
+         ubp(:,:,1) = 0.5d0 * (-(a121(1)+a1k21(1))*r0(:,:,1)
+     &                            - a1k20a(1)*udirp)
+         ubd(:,:,1) = 0.5d0 * (-(a121(2)+a1k21(2))*r0(:,:,2)
+     &                            - a1k20a(2)*udir)
+         xdr0(:,:,1) = (a110(2)+a1k11a(2))*field(:,:,1)
      &                  + a1k10a(2)*udir - a1k11a(2)*r0(:,:,1)
      &                  + (a111(2)+a1k11(2))*r0(:,:,2)
      &                  + (a112(2)+a1k12(2))*P1(:,:,2)
-            xdr0(:,:,2) = (a110(1)+a1k11a(1))*field(:,:,2)
+         xdr0(:,:,2) = (a110(1)+a1k11a(1))*field(:,:,2)
      &                  + a1k10a(1)*udirp - a1k11a(1)*r0(:,:,2)
      &                  + (a111(1)+a1k11(1))*r0(:,:,1)
      &                  + (a112(1)+a1k12(1))*P1(:,:,1)
-         else
-            ubp(:,:,1) = 0.5d0 * (-a121(1)*r0(:,:,1))
-            ubd(:,:,1) = 0.5d0 * (-a121(2)*r0(:,:,2))
-            xdr0(:,:,1) = a110(2)*field(:,:,1) + a111(2)*r0(:,:,2)
-     &                  + a112(2)*P1(:,:,2)
-            xdr0(:,:,2) = a110(1)*field(:,:,2) + a111(1)*r0(:,:,1)
-     &                  + a112(1)*P1(:,:,1)
-         end if
 c
 c     xde: rhs array in <E' xde>
 c     xde = mu + mu0 + alpha.(-Tu.x)
@@ -801,17 +744,15 @@ c         = mu1 + gamma1*(r1 + beta1*r0)
 c
       uind = uind + gamma1(1)*(r1(:,:,1) + beta1(1)*r0(:,:,1))
       uinp = uinp + gamma1(2)*(r1(:,:,2) + beta1(2)*r0(:,:,2))
-      if (order .gt. 2 .or. tcgpeek) then
 c
 c     r2 = r1 - gamma1 * T.p1 = r1 - gamma1 * P2
 c        = r1 - gamma1 * (t2*P1 - t4*t2r0)
 c     reuse r1 as r2
 c
-         r1(:,:,1) = r1(:,:,1)
-     &                  - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2r0(:,:,1))
-         r1(:,:,2) = r1(:,:,2)
-     &                  - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2r0(:,:,2))
-      end if
+      r1(:,:,1) = r1(:,:,1)
+     &               - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2r0(:,:,1))
+      r1(:,:,2) = r1(:,:,2)
+     &               - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2r0(:,:,2))
 c
 c     cross terms
 c     sp1 = r0.T.E = P1.E
@@ -825,10 +766,8 @@ c
       b1(2) = sp0(2) - gamma1(2)*sp1(2)
       b2(1) = sp0(1)*t2(1) - t4(1)*sp1(1)
       b2(2) = sp0(2)*t2(2) - t4(2)*sp1(2)
-      if (tcgpeek) then
-         call tcg_dotprod (spp2(1),3*npole,t2r0(:,:,1),udirp)
-         call tcg_dotprod (spp2(2),3*npole,t2r0(:,:,2),udir)
-      end if
+      call tcg_dotprod (spp2(1),3*npole,t2r0(:,:,1),udirp)
+      call tcg_dotprod (spp2(2),3*npole,t2r0(:,:,2),udir)
 c
 c     tcg2 force and energy
 c
@@ -860,65 +799,62 @@ c
      &                   +np1(i)*sp0(i)*gamma1(i)/(t1(i)**2))
             a21n1(i) = a220(i)
             a210(i) = t4(i) + gamma1(i)*t2(i)
-         end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a2kwt2(i) = tcgomega*(t2(i)*spp1(i)-t4(i)*spp2(i))
-               a2kwg1(i) = tcgomega*(spp1(i)-gamma1(i)*spp2(i))
-               a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
-               a2k32(i) = a2k41(i)
-               a2k31(i) = -tcgomega*t4(i)*gamma1(i)*spp1(i)/t1(i)
+            a2kwt2(i) = tcgpeek*(t2(i)*spp1(i)-t4(i)*spp2(i))
+            a2kwg1(i) = tcgpeek*(spp1(i)-gamma1(i)*spp2(i))
+            a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
+            a2k32(i) = a2k41(i)
+            a2k31(i) = -tcgpeek*t4(i)*gamma1(i)*spp1(i)/t1(i)
      &                    +a2kwt2(i)*(n0(i)/t3(i)
      &                       +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
-               a2k30a(i) = tcgomega*gamma1(i)*t4(i)
-               a2k23(i) = a2k41(i)
-               a2k22(i) = a2k31(i)
-               a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
-     &                       tcgomega*gamma1(i)*spp1(i)
-     &                    +a2kwt2(i)*(-2.0d0*t1(i)+
-     &                       (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
-     &                       gamma1(i))/t3(i)
-     &                    +t4(i)*a2kwg1(i)/t1(i)
-               a2k21a(i) = a2k30a(i)
-               a2k20a(i) = -tcgomega*(gamma1(i)*t2(i)+t4(i))
-               a2k14(i) = 2.0d0*a2k41(i)
-               a2k13(i) = 2.0d0*a2k22(i)
-               a2k12(i) = 2.0d0*a2k21(i)
-               a2k11(i) = -np1(i)/(t1(i)**2)*tcgomega*gamma1(i)*spp1(i)
-     &                    +a2kwt2(i)*(np1(i)
-     &                       +(np1(i)**2)*gamma1(i)/t1(i)
-     &                       -t9(i)*gamma1(i))/t3(i)
-     &                    -a2kwg1(i)/t1(i)
-               a2k11(i) = 2.0d0*a2k11(i)
-               a2k12a(i) = a2k30a(i)
-               a2k11a(i) = a2k20a(i)
-               a2k10a(i) = tcgomega
-            end do
+            a2k30a(i) = tcgpeek*gamma1(i)*t4(i)
+            a2k23(i) = a2k41(i)
+            a2k22(i) = a2k31(i)
+            a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
+     &                    tcgpeek*gamma1(i)*spp1(i)
+     &                 +a2kwt2(i)*(-2.0d0*t1(i)+
+     &                    (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
+     &                    gamma1(i))/t3(i)
+     &                 +t4(i)*a2kwg1(i)/t1(i)
+            a2k21a(i) = a2k30a(i)
+            a2k20a(i) = -tcgpeek*(gamma1(i)*t2(i)+t4(i))
+            a2k14(i) = 2.0d0*a2k41(i)
+            a2k13(i) = 2.0d0*a2k22(i)
+            a2k12(i) = 2.0d0*a2k21(i)
+            a2k11(i) = -np1(i)/(t1(i)**2)*tcgpeek*gamma1(i)*spp1(i)
+     &                 +a2kwt2(i)*(np1(i)
+     &                    +(np1(i)**2)*gamma1(i)/t1(i)
+     &                    -t9(i)*gamma1(i))/t3(i)
+     &                 -a2kwg1(i)/t1(i)
+            a2k11(i) = 2.0d0*a2k11(i)
+            a2k12a(i) = a2k30a(i)
+            a2k11a(i) = a2k20a(i)
+            a2k10a(i) = tcgpeek
+         end do
 c
 c     mu2(peek) = mu2 + omega * alpha.r2
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = 0.5d0 * (-(a220(1)+a2k21a(1))*field(:,:,2)
-     &                   -(a221(1)+a2k21(1))*r0(:,:,1)
-     &                   +a2k21a(1)*r0(:,:,2) -a2k20a(1)*udirp
-     &                   -(a222(1)+a231(1)+a2k22(1)+a2k31(1))*P1(:,:,1)
-     &                   -(a223(1)+a241(1)
-     &                        +a2k23(1)+a2k41(1))*t2r0(:,:,1))
-            ubp(:,:,2) = 0.5d0 * (-(a232(1)+a2k32(1))*P1(:,:,1)
-     &                               -a2k30a(1)*udirp)
-            ubd(:,:,1) = 0.5d0 * (-(a220(2)+a2k21a(2))*field(:,:,1)
-     &                   -(a221(2)+a2k21(2))*r0(:,:,2)
-     &                   +a2k21a(2)*r0(:,:,1) -a2k20a(2)*udir
-     &                   -(a222(2)+a231(2)+a2k22(2)+a2k31(2))*P1(:,:,2)
-     &                   -(a223(2)+a241(2)
-     &                        +a2k23(2)+a2k41(2))*t2r0(:,:,2))
-            ubd(:,:,2) = 0.5d0 * (-(a232(2)+a2k32(2))*P1(:,:,2)
-     &                               -a2k30a(2)*udir)
-            xdr0(:,:,1) = (a210(2)+a2k11a(2))*field(:,:,1)
+         ubp(:,:,1) = 0.5d0 * (-(a220(1)+a2k21a(1))*field(:,:,2)
+     &                -(a221(1)+a2k21(1))*r0(:,:,1)
+     &                +a2k21a(1)*r0(:,:,2) -a2k20a(1)*udirp
+     &                -(a222(1)+a231(1)+a2k22(1)+a2k31(1))*P1(:,:,1)
+     &                -(a223(1)+a241(1)
+     &                     +a2k23(1)+a2k41(1))*t2r0(:,:,1))
+         ubp(:,:,2) = 0.5d0 * (-(a232(1)+a2k32(1))*P1(:,:,1)
+     &                            -a2k30a(1)*udirp)
+         ubd(:,:,1) = 0.5d0 * (-(a220(2)+a2k21a(2))*field(:,:,1)
+     &                -(a221(2)+a2k21(2))*r0(:,:,2)
+     &                +a2k21a(2)*r0(:,:,1) -a2k20a(2)*udir
+     &                -(a222(2)+a231(2)+a2k22(2)+a2k31(2))*P1(:,:,2)
+     &                -(a223(2)+a241(2)
+     &                     +a2k23(2)+a2k41(2))*t2r0(:,:,2))
+         ubd(:,:,2) = 0.5d0 * (-(a232(2)+a2k32(2))*P1(:,:,2)
+     &                            -a2k30a(2)*udir)
+         xdr0(:,:,1) = (a210(2)+a2k11a(2))*field(:,:,1)
      &                  + (a21n1(2)+a2k12a(2))*te(:,:,1)
      &                  + a2k10a(2)*udir - a2k11a(2)*r0(:,:,1)
      &                  - a2k12a(2)*P1(:,:,1)
@@ -926,7 +862,7 @@ c
      &                  + (a212(2)+a2k12(2))*P1(:,:,2)
      &                  + (a213(2)+a2k13(2))*t2r0(:,:,2)
      &                  + (a214(2)+a2k14(2))*t3r0(:,:,2)
-            xdr0(:,:,2) = (a210(1)+a2k11a(1))*field(:,:,2)
+         xdr0(:,:,2) = (a210(1)+a2k11a(1))*field(:,:,2)
      &                  + (a21n1(1)+a2k12a(1))*te(:,:,2)
      &                  + a2k10a(1)*udirp - a2k11a(1)*r0(:,:,2)
      &                  - a2k12a(1)*P1(:,:,2)
@@ -934,24 +870,6 @@ c
      &                  + (a212(1)+a2k12(1))*P1(:,:,1)
      &                  + (a213(1)+a2k13(1))*t2r0(:,:,1)
      &                  + (a214(1)+a2k14(1))*t3r0(:,:,1)
-         else
-            ubp(:,:,1) = 0.5d0 * (-a220(1)*field(:,:,2)
-     &                               -a221(1)*r0(:,:,1)
-     &                               -(a222(1)+a231(1))*P1(:,:,1)
-     &                               -(a223(1)+a241(1))*t2r0(:,:,1))
-            ubp(:,:,2) = 0.5d0 * (-a232(1)*P1(:,:,1))
-            ubd(:,:,1) = 0.5d0 * (-a220(2)*field(:,:,1)
-     &                               -a221(2)*r0(:,:,2)
-     &                               -(a222(2)+a231(2))*P1(:,:,2)
-     &                               -(a223(2)+a241(2))*t2r0(:,:,2))
-            ubd(:,:,2) = 0.5d0 * (-a232(2)*P1(:,:,2))
-            xdr0(:,:,1) = a210(2)*field(:,:,1) + a21n1(2)*te(:,:,1)
-     &                  + a211(2)*r0(:,:,2) + a212(2)*P1(:,:,2)
-     &                  + a213(2)*t2r0(:,:,2) + a214(2)*t3r0(:,:,2)
-            xdr0(:,:,2) = a210(1)*field(:,:,2) + a21n1(1)*te(:,:,2)
-     &                  + a211(1)*r0(:,:,1) + a212(1)*P1(:,:,1)
-     &                  + a213(1)*t2r0(:,:,1) + a214(1)*t3r0(:,:,1)
-         end if
 c
 c     xde = mu + mu0 + alpha.(-Tu.x)
 c
@@ -1106,33 +1024,30 @@ c     mu1 = mu0 + gamma0 * p0 (or m0)
 c
       uind = uind + t4(1) * udir
       uinp = uinp + t4(2) * udirp
-      if (order .gt. 1 .or. tcgpeek) then
 c
 c     r1 = r0 - gamma0 * T.p0 (or T.m0)
 c
-         r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
-         r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
+      r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
+      r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
 c
 c     check convergence, stop at tcg1 level if n1 is small enough
 c
-         call tcg_dotprod (nrsd1(1),3*npole,r1(:,:,1),r1(:,:,1))
-         call tcg_dotprod (nrsd1(2),3*npole,r1(:,:,2),r1(:,:,2))
-         call tcg_converge (converge,nrsd1(1),nrsd1(2))
-         if (converge) then
-            order = 1
-            call tcg_resource (order)
-         end if
+      call tcg_dotprod (nrsd1(1),3*npole,r1(:,:,1),r1(:,:,1))
+      call tcg_dotprod (nrsd1(2),3*npole,r1(:,:,2),r1(:,:,2))
+      call tcg_converge (converge,nrsd1(1),nrsd1(2))
+      if (converge) then
+         order = 1
+         call tcg_resource (order)
+      end if
 c
 c     n1 = r1.M.r1
 c
-         call tcg_alphaquad (n1(1),r1(:,:,1),r1(:,:,1))
-         call tcg_alphaquad (n1(2),r1(:,:,2),r1(:,:,2))
-      end if
+      call tcg_alphaquad (n1(1),r1(:,:,1),r1(:,:,1))
+      call tcg_alphaquad (n1(2),r1(:,:,2),r1(:,:,2))
 c
 c     cross terms
 c     sp0 = r0.M.E = r0.udir
-c     spp1 = m0.T.alpha.E = sp1, so spp1 is calculated
-c     outside of if (tcgpeek) block
+c     spp1 = m0.T.alpha.E = sp1
 c
       call tcg_dotprod (sp0,3*npole,r0(:,:,1),udirp)
       call tcg_dotprod (spp1,3*npole,P1(:,:,1),udirp)
@@ -1149,44 +1064,33 @@ c
             a111(i) = 2.0d0 * sp0 / t1(i)
             a112(i) = -t4(i) * a111(i)
             a121(i) = 0.5d0 * a112(i)
+            a1k10a(i) = tcgpeek
+            a1k11a(i) = -tcgpeek * t4(i)
+            a1k11(i) = -2.0d0 * spp1 * tcgpeek / t1(i)
+            a1k12(i) = -t4(i) * a1k11(i)
+            a1k20a(i) = a1k11a(i)
+            a1k21(i) = 0.5d0 * a1k12(i)
          end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a1k10a(i) = tcgomega
-               a1k11a(i) = -tcgomega * t4(i)
-               a1k11(i) = -2.0d0 * spp1 * tcgomega / t1(i)
-               a1k12(i) = -t4(i) * a1k11(i)
-               a1k20a(i) = a1k11a(i)
-               a1k21(i) = 0.5d0 * a1k12(i)
-            end do
 c
 c     mu1(peek) = mu1 + omega * alpha.r1
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = -0.5d0*((a121(1)+a1k21(1))*udir
-     &                              + a1k20a(1)*udirp)
-            ubd(:,:,1) = -0.5d0*((a121(2)+a1k21(2))*udirp
-     &                              + a1k20a(2)*udir)
-            xde(:,:,1) = (a110(2)+a1k10a(2))*r0(:,:,1)
+         ubp(:,:,1) = -0.5d0*((a121(1)+a1k21(1))*udir
+     &                           + a1k20a(1)*udirp)
+         ubd(:,:,1) = -0.5d0*((a121(2)+a1k21(2))*udirp
+     &                           + a1k20a(2)*udir)
+         xde(:,:,1) = (a110(2)+a1k10a(2))*r0(:,:,1)
      &                 + (a111(2)+a1k11(2))*r0(:,:,2)
      &                 + (a112(2)+a1k12(2))*P1(:,:,2)
      &                 + a1k11a(2)*P1(:,:,1)
-            xde(:,:,2) = (a110(1)+a1k10a(1))*r0(:,:,2)
+         xde(:,:,2) = (a110(1)+a1k10a(1))*r0(:,:,2)
      &                 + (a111(1)+a1k11(1))*r0(:,:,1)
      &                 + (a112(1)+a1k12(1))*P1(:,:,1)
      &                 + a1k11a(1)*P1(:,:,2)
-         else
-            ubp(:,:,1) = -0.5d0*a121(1)*udir
-            ubd(:,:,1) = -0.5d0*a121(2)*udirp
-            xde(:,:,1) = a110(2)*r0(:,:,1) + a111(2)*r0(:,:,2)
-     &                      + a112(2)*P1(:,:,2)
-            xde(:,:,2) = a110(1)*r0(:,:,2) + a111(1)*r0(:,:,1)
-     &                      + a112(1)*P1(:,:,1)
-         end if
          call tcg_alpha12 (xde(:,:,1),xde(:,:,2))
          xde(:,:,1) = 0.5d0 * (xde(:,:,1) + uind)
          xde(:,:,2) = 0.5d0 * (xde(:,:,2) + uinp)
@@ -1245,18 +1149,16 @@ c
      &                     * gamma1(2) * polarity(i)
          end do
       end do
-      if (order .gt. 2 .or. tcgpeek) then
 c
 c     r2 = r1 - gamma1 * T.p1 = r1 - gamma1 * P2
 c        = r1 - gamma1 * (t2*T.M.r0 - t4*T.M.T.M.r0)
 c        = r1 - gamma1 * (t2*P1 - t4*t2m0)
 c     reuse r1 as r2
 c
-         r1(:,:,1) = r1(:,:,1)
-     &                  - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2m0(:,:,1))
-         r1(:,:,2) = r1(:,:,2)
-     &                  - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2m0(:,:,2))
-      end if
+      r1(:,:,1) = r1(:,:,1)
+     &               - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2m0(:,:,1))
+      r1(:,:,2) = r1(:,:,2)
+     &               - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2m0(:,:,2))
 c
 c     cross terms
 c     sp1 = P1.M.E = P1.udir = spp1
@@ -1269,9 +1171,7 @@ c
       b1(2) = sp0 - gamma1(2)*sp1
       b2(1) = sp0*t2(1) - t4(1)*sp1
       b2(2) = sp0*t2(2) - t4(2)*sp1
-      if (tcgpeek) then
-         call tcg_alphaquad (spp2,P1(:,:,1),P1(:,:,2))
-      end if
+      call tcg_alphaquad (spp2,P1(:,:,1),P1(:,:,2))
 c
 c     tcg2 force and energy
 c
@@ -1303,94 +1203,75 @@ c
      &                   +np1(i)*sp0*gamma1(i)/(t1(i)**2))
             a21n1(i) = a220(i)
             a210(i) = t4(i) + gamma1(i)*t2(i)
+            a2kwt2(i) = tcgpeek*(t2(i)*spp1-t4(i)*spp2)
+            a2kwg1(i) = tcgpeek*(spp1-gamma1(i)*spp2)
+            a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
+            a2k32(i) = a2k41(i)
+            a2k31(i) = -tcgpeek*t4(i)*gamma1(i)*spp1/t1(i)
+     &                 +a2kwt2(i)*(n0(i)/t3(i)
+     &                    +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
+            a2k30a(i) = tcgpeek*gamma1(i)*t4(i)
+            a2k23(i) = a2k41(i)
+            a2k22(i) = a2k31(i)
+            a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
+     &                    tcgpeek*gamma1(i)*spp1
+     &                 +a2kwt2(i)*(-2.0d0*t1(i)+
+     &                    (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
+     &                    gamma1(i))/t3(i)
+     &                 +t4(i)*a2kwg1(i)/t1(i)
+            a2k21a(i) = a2k30a(i)
+            a2k20a(i) = -tcgpeek*(gamma1(i)*t2(i)+t4(i))
+            a2k14(i) = 2.0d0*a2k41(i)
+            a2k13(i) = 2.0d0*a2k22(i)
+            a2k12(i) = 2.0d0*a2k21(i)
+            a2k11(i) = -np1(i)/(t1(i)**2)*tcgpeek*gamma1(i)*spp1
+     &                 +a2kwt2(i)*(np1(i)
+     &                    +(np1(i)**2)*gamma1(i)/t1(i)
+     &                    -t9(i)*gamma1(i))/t3(i)
+     &                 -a2kwg1(i)/t1(i)
+            a2k11(i) = 2.0d0*a2k11(i)
+            a2k12a(i) = a2k30a(i)
+            a2k11a(i) = a2k20a(i)
+            a2k10a(i) = tcgpeek
          end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a2kwt2(i) = tcgomega*(t2(i)*spp1-t4(i)*spp2)
-               a2kwg1(i) = tcgomega*(spp1-gamma1(i)*spp2)
-               a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
-               a2k32(i) = a2k41(i)
-               a2k31(i) = -tcgomega*t4(i)*gamma1(i)*spp1/t1(i)
-     &                    +a2kwt2(i)*(n0(i)/t3(i)
-     &                       +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
-               a2k30a(i) = tcgomega*gamma1(i)*t4(i)
-               a2k23(i) = a2k41(i)
-               a2k22(i) = a2k31(i)
-               a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
-     &                       tcgomega*gamma1(i)*spp1
-     &                    +a2kwt2(i)*(-2.0d0*t1(i)+
-     &                       (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
-     &                       gamma1(i))/t3(i)
-     &                    +t4(i)*a2kwg1(i)/t1(i)
-               a2k21a(i) = a2k30a(i)
-               a2k20a(i) = -tcgomega*(gamma1(i)*t2(i)+t4(i))
-               a2k14(i) = 2.0d0*a2k41(i)
-               a2k13(i) = 2.0d0*a2k22(i)
-               a2k12(i) = 2.0d0*a2k21(i)
-               a2k11(i) = -np1(i)/(t1(i)**2)*tcgomega*gamma1(i)*spp1
-     &                    +a2kwt2(i)*(np1(i)
-     &                       +(np1(i)**2)*gamma1(i)/t1(i)
-     &                       -t9(i)*gamma1(i))/t3(i)
-     &                    -a2kwg1(i)/t1(i)
-               a2k11(i) = 2.0d0*a2k11(i)
-               a2k12a(i) = a2k30a(i)
-               a2k11a(i) = a2k20a(i)
-               a2k10a(i) = tcgomega
-            end do
 c
 c     mu2(peek) = mu2 + omega * alpha.r2
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = -0.5d0*((a220(1)+a2k20a(1))*r0(:,:,2)
+         ubp(:,:,1) = -0.5d0*((a220(1)+a2k20a(1))*r0(:,:,2)
      &                 + (a221(1)+a2k21(1))*r0(:,:,1)
      &                 + (a222(1)+a231(1)+a2k22(1)+a2k31(1))*P1(:,:,1)
      &                 + a2k21a(1)*P1(:,:,2)
      &                 + (a223(1)+a241(1)+a2k23(1)
      &                       +a2k41(1))*t2m0(:,:,1))
-            ubd(:,:,1) = -0.5d0*((a220(2)+a2k20a(2))*r0(:,:,1)
+         ubd(:,:,1) = -0.5d0*((a220(2)+a2k20a(2))*r0(:,:,1)
      &                 + (a221(2)+a2k21(2))*r0(:,:,2)
      &                 + (a222(2)+a231(2)+a2k22(2)+a2k31(2))*P1(:,:,2)
      &                 + a2k21a(2)*P1(:,:,1)
      &                 + (a223(2)+a241(2)+a2k23(2)
      &                       +a2k41(2))*t2m0(:,:,2))
-            ubp(:,:,2) = -0.5d0*((a232(1)+a2k32(1))*P1(:,:,1)
+         ubp(:,:,2) = -0.5d0*((a232(1)+a2k32(1))*P1(:,:,1)
      &                              + a2k30a(1)*r0(:,:,2))
-            ubd(:,:,2) = -0.5d0*((a232(2)+a2k32(2))*P1(:,:,2)
+         ubd(:,:,2) = -0.5d0*((a232(2)+a2k32(2))*P1(:,:,2)
      &                              + a2k30a(2)*r0(:,:,1))
-            xde(:,:,1) = (a210(2)+a2k10a(2))*r0(:,:,1)
+         xde(:,:,1) = (a210(2)+a2k10a(2))*r0(:,:,1)
      &                 + (a211(2)+a2k11(2))*r0(:,:,2)
      &                 + (a21n1(2)+a2k11a(2))*P1(:,:,1)
      &                 + (a212(2)+a2k12(2))*P1(:,:,2)
      &                 + a2k12a(2)*t2m0(:,:,1)
      &                 + (a213(2)+a2k13(2))*t2m0(:,:,2)
      &                 + (a214(2)+a2k14(2))*t3m0(:,:,2)
-            xde(:,:,2) = (a210(1)+a2k10a(1))*r0(:,:,2)
+         xde(:,:,2) = (a210(1)+a2k10a(1))*r0(:,:,2)
      &                 + (a211(1)+a2k11(1))*r0(:,:,1)
      &                 + (a21n1(1)+a2k11a(1))*P1(:,:,2)
      &                 + (a212(1)+a2k12(1))*P1(:,:,1)
      &                 + a2k12a(1)*t2m0(:,:,2)
      &                 + (a213(1)+a2k13(1))*t2m0(:,:,1)
      &                 + (a214(1)+a2k14(1))*t3m0(:,:,1)
-         else
-            ubp(:,:,1) = -0.5d0*(a220(1)*r0(:,:,2) + a221(1)*r0(:,:,1)
-     &                 + (a222(1)+a231(1))*P1(:,:,1)
-     &                 + (a223(1)+a241(1))*t2m0(:,:,1))
-            ubd(:,:,1) = -0.5d0*(a220(2)*r0(:,:,1) + a221(2)*r0(:,:,2)
-     &                 + (a222(2)+a231(2))*P1(:,:,2)
-     &                 + (a223(2)+a241(2))*t2m0(:,:,2))
-            ubp(:,:,2) = -0.5d0*a232(1)*P1(:,:,1)
-            ubd(:,:,2) = -0.5d0*a232(2)*P1(:,:,2)
-            xde(:,:,1) = a210(2)*r0(:,:,1) + a211(2)*r0(:,:,2)
-     &                 + a21n1(2)*P1(:,:,1) + a212(2)*P1(:,:,2)
-     &                 + a213(2)*t2m0(:,:,2) + a214(2)*t3m0(:,:,2)
-            xde(:,:,2) = a210(1)*r0(:,:,2) + a211(1)*r0(:,:,1)
-     &                 + a21n1(1)*P1(:,:,2) + a212(1)*P1(:,:,1)
-     &                 + a213(1)*t2m0(:,:,1) + a214(1)*t3m0(:,:,1)
-         end if
          call tcg_alpha12 (xde(:,:,1),xde(:,:,2))
          xde(:,:,1) = 0.5d0 * (xde(:,:,1) + uind)
          xde(:,:,2) = 0.5d0 * (xde(:,:,2) + uinp)
@@ -1539,27 +1420,25 @@ c     mu1 = mu0 + gamma0 * p0 (or r0)
 c
       uind = uind + t4(1) * r0(:,:,1)
       uinp = uinp + t4(2) * r0(:,:,2)
-      if (order .gt. 1 .or. tcgpeek) then
 c
 c     tae = T.alpha.E = T.udir
 c
-         call tcg_t0 (udir,udirp,tae(:,:,1),tae(:,:,2))
+      call tcg_t0 (udir,udirp,tae(:,:,1),tae(:,:,2))
 c
 c     r1 = r0 - gamma0 * T.p0 (or T.r0, or P1)
 c
-         r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
-         r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
+      r1(:,:,1) = r0(:,:,1) - t4(1)*P1(:,:,1)
+      r1(:,:,2) = r0(:,:,2) - t4(2)*P1(:,:,2)
 c
 c     n1 = r1.r1
 c     check convergence, stop at tcg1 level if n1 is small enough
 c
-         call tcg_dotprod (n1(1),3*npole,r1(:,:,1),r1(:,:,1))
-         call tcg_dotprod (n1(2),3*npole,r1(:,:,2),r1(:,:,2))
-         call tcg_converge (converge,n1(1),n1(2))
-         if (converge) then
-            order = 1
-            call tcg_resource (order)
-         end if
+      call tcg_dotprod (n1(1),3*npole,r1(:,:,1),r1(:,:,1))
+      call tcg_dotprod (n1(2),3*npole,r1(:,:,2),r1(:,:,2))
+      call tcg_converge (converge,n1(1),n1(2))
+      if (converge) then
+         order = 1
+         call tcg_resource (order)
       end if
 c
 c     cross terms
@@ -1567,10 +1446,8 @@ c     sp0 = r0.E
 c     spp1 = r0.T.alpha.E = r0.T.mu0
 c
       call tcg_dotprod (sp0,3*npole,r0(:,:,1),r0(:,:,2))
-      if (tcgpeek) then
-         call tcg_dotprod (spp1(1),3*npole,P1(:,:,1),udirp)
-         call tcg_dotprod (spp1(2),3*npole,P1(:,:,2),udir)
-      end if
+      call tcg_dotprod (spp1(1),3*npole,P1(:,:,1),udirp)
+      call tcg_dotprod (spp1(2),3*npole,P1(:,:,2),udir)
 c
 c     tcg1 force and energy
 c
@@ -1584,44 +1461,33 @@ c
             a111(i) = 2.0d0 * sp0 / t1(i)
             a112(i) = -t4(i) * a111(i)
             a121(i) = 0.5d0 * a112(i)
+            a1k10a(i) = tcgpeek
+            a1k11a(i) = -tcgpeek * t4(i)
+            a1k11(i) = -2.0d0 * spp1(i) * tcgpeek / t1(i)
+            a1k12(i) = -t4(i) * a1k11(i)
+            a1k20a(i) = a1k11a(i)
+            a1k21(i) = 0.5d0 * a1k12(i)
          end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a1k10a(i) = tcgomega
-               a1k11a(i) = -tcgomega * t4(i)
-               a1k11(i) = -2.0d0 * spp1(i) * tcgomega / t1(i)
-               a1k12(i) = -t4(i) * a1k11(i)
-               a1k20a(i) = a1k11a(i)
-               a1k21(i) = 0.5d0 * a1k12(i)
-            end do
 c
 c     mu1(peek) = mu1 + omega * alpha.r1
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
-     &                                    r1(:,:,1),r1(:,:,2))
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
+     &                                 r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = -0.5d0 * ((a121(1)+a1k21(1))*r0(:,:,1)
-     &                                + a1k20a(1)*udirp)
-            ubd(:,:,1) = -0.5d0 * ((a121(2)+a1k21(2))*r0(:,:,2)
-     &                                + a1k20a(2)*udir)
-            xde(:,:,1) = 0.5d0 * (uind + a110(2)*r0(:,:,1)
+         ubp(:,:,1) = -0.5d0 * ((a121(1)+a1k21(1))*r0(:,:,1)
+     &                             + a1k20a(1)*udirp)
+         ubd(:,:,1) = -0.5d0 * ((a121(2)+a1k21(2))*r0(:,:,2)
+     &                             + a1k20a(2)*udir)
+         xde(:,:,1) = 0.5d0 * (uind + a110(2)*r0(:,:,1)
      &                 + (a111(2)+a1k11(2))*r0(:,:,2)
      &                 + (a112(2)+a1k12(2))*P1(:,:,2)
      &                 + a1k10a(2)*udir + a1k11a(2)*tae(:,:,1))
-            xde(:,:,2) = 0.5d0 * (uinp + a110(1)*r0(:,:,2)
+         xde(:,:,2) = 0.5d0 * (uinp + a110(1)*r0(:,:,2)
      &                 + (a111(1)+a1k11(1))*r0(:,:,1)
      &                 + (a112(1)+a1k12(1))*P1(:,:,1)
      &                 + a1k10a(1)*udirp + a1k11a(1)*tae(:,:,2))
-         else
-            ubp(:,:,1) = -0.5d0 * a121(1) * r0(:,:,1)
-            ubd(:,:,1) = -0.5d0 * a121(2) * r0(:,:,2)
-            xde(:,:,1) = ((t4(1)+a110(2))*r0(:,:,1) + a111(2)*r0(:,:,2)
-     &                       + a112(2)*P1(:,:,2)) * 0.5d0
-            xde(:,:,2) = ((t4(2)+a110(1))*r0(:,:,2) + a111(1)*r0(:,:,1)
-     &                       + a112(1)*P1(:,:,1)) * 0.5d0
-         end if
          uad(:,:,1) = r0(:,:,1)
          uap(:,:,1) = r0(:,:,2)
          goto 10
@@ -1668,21 +1534,19 @@ c         = mu1 + gamma1*(r1 + beta1*r0)
 c
       uind = uind + gamma1(1)*(r1(:,:,1) + beta1(1)*r0(:,:,1))
       uinp = uinp + gamma1(2)*(r1(:,:,2) + beta1(2)*r0(:,:,2))
-      if (order .gt. 2 .or. tcgpeek) then
 c
 c     t2ae = T^2.alpha.E = T.tae
 c
-         call tcg_t0 (tae(:,:,1),tae(:,:,2),t2ae(:,:,1),t2ae(:,:,2))
+      call tcg_t0 (tae(:,:,1),tae(:,:,2),t2ae(:,:,1),t2ae(:,:,2))
 c
 c     r2 = r1 - gamma1 * T.p1 = r1 - gamma1 * P2
 c        = r1 - gamma1 * (t2*P1 - t4*t2r0)
 c     reuse r1 as r2
 c
-         r1(:,:,1) = r1(:,:,1)
-     &                  - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2r0(:,:,1))
-         r1(:,:,2) = r1(:,:,2)
-     &                  - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2r0(:,:,2))
-      end if
+      r1(:,:,1) = r1(:,:,1)
+     &               - gamma1(1)*(t2(1)*P1(:,:,1)-t4(1)*t2r0(:,:,1))
+      r1(:,:,2) = r1(:,:,2)
+     &               - gamma1(2)*(t2(2)*P1(:,:,2)-t4(2)*t2r0(:,:,2))
 c
 c     cross terms
 c     sp1 = r0.T.E = P1.E
@@ -1695,16 +1559,12 @@ c
       b1(2) = sp0 - gamma1(2)*sp1
       b2(1) = sp0*t2(1) - t4(1)*sp1
       b2(2) = sp0*t2(2) - t4(2)*sp1
-      if (tcgpeek) then
-         call tcg_dotprod (spp2(1),3*npole,t2r0(:,:,1),udirp)
-         call tcg_dotprod (spp2(2),3*npole,t2r0(:,:,2),udir)
-      end if
+      call tcg_dotprod (spp2(1),3*npole,t2r0(:,:,1),udirp)
+      call tcg_dotprod (spp2(2),3*npole,t2r0(:,:,2),udir)
 c
 c     tcg2 force and energy
 c
       if (order .eq. 2) then
-         if (tcgpeek) then
-         end if
 c
 c     compute a(2) coefficients: a2...
 c     and a(2k) coefficients: a2k...
@@ -1732,96 +1592,73 @@ c
      &                   +np1(i)*sp0*gamma1(i)/(t1(i)**2))
             a21n1(i) = a220(i)
             a210(i) = t4(i) + gamma1(i)*t2(i)
+            a2kwt2(i) = tcgpeek*(t2(i)*spp1(i)-t4(i)*spp2(i))
+            a2kwg1(i) = tcgpeek*(spp1(i)-gamma1(i)*spp2(i))
+            a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
+            a2k32(i) = a2k41(i)
+            a2k31(i) = -tcgpeek*t4(i)*gamma1(i)*spp1(i)/t1(i)
+     &                 +a2kwt2(i)*(n0(i)/t3(i)
+     &                    +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
+            a2k30a(i) = tcgpeek*gamma1(i)*t4(i)
+            a2k23(i) = a2k41(i)
+            a2k22(i) = a2k31(i)
+            a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
+     &                    tcgpeek*gamma1(i)*spp1(i)
+     &                 +a2kwt2(i)*(-2.0d0*t1(i)+
+     &                    (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
+     &                    gamma1(i))/t3(i)
+     &                 +t4(i)*a2kwg1(i)/t1(i)
+            a2k21a(i) = a2k30a(i)
+            a2k20a(i) = -tcgpeek*(gamma1(i)*t2(i)+t4(i))
+            a2k14(i) = 2.0d0*a2k41(i)
+            a2k13(i) = 2.0d0*a2k22(i)
+            a2k12(i) = 2.0d0*a2k21(i)
+            a2k11(i) = -np1(i)/(t1(i)**2)*tcgpeek*gamma1(i)*spp1(i)
+     &                 +a2kwt2(i)*(np1(i)
+     &                    +(np1(i)**2)*gamma1(i)/t1(i)
+     &                    -t9(i)*gamma1(i))/t3(i)
+     &                 -a2kwg1(i)/t1(i)
+            a2k11(i) = 2.0d0*a2k11(i)
+            a2k12a(i) = a2k30a(i)
+            a2k11a(i) = a2k20a(i)
+            a2k10a(i) = tcgpeek
          end do
-         if (tcgpeek) then
-            do i = 1, 2
-               a2kwt2(i) = tcgomega*(t2(i)*spp1(i)-t4(i)*spp2(i))
-               a2kwg1(i) = tcgomega*(spp1(i)-gamma1(i)*spp2(i))
-               a2k41(i) = -a2kwt2(i)*t1(i)*t4(i)*gamma1(i)/t3(i)
-               a2k32(i) = a2k41(i)
-               a2k31(i) = -tcgomega*t4(i)*gamma1(i)*spp1(i)/t1(i)
-     &                    +a2kwt2(i)*(n0(i)/t3(i)
-     &                       +2.0d0*t1(i)*t2(i)*gamma1(i)/t3(i))
-               a2k30a(i) = tcgomega*gamma1(i)*t4(i)
-               a2k23(i) = a2k41(i)
-               a2k22(i) = a2k31(i)
-               a2k21(i) = 2.0d0*t4(i)*np1(i)/(t1(i)**2)*
-     &                       tcgomega*gamma1(i)*spp1(i)
-     &                    +a2kwt2(i)*(-2.0d0*t1(i)+
-     &                       (t4(i)*t9(i)-2.0d0*np1(i)*t2(i)+t8(i))*
-     &                       gamma1(i))/t3(i)
-     &                    +t4(i)*a2kwg1(i)/t1(i)
-               a2k21a(i) = a2k30a(i)
-               a2k20a(i) = -tcgomega*(gamma1(i)*t2(i)+t4(i))
-               a2k14(i) = 2.0d0*a2k41(i)
-               a2k13(i) = 2.0d0*a2k22(i)
-               a2k12(i) = 2.0d0*a2k21(i)
-               a2k11(i) = -np1(i)/(t1(i)**2)*tcgomega*gamma1(i)*spp1(i)
-     &                    +a2kwt2(i)*(np1(i)
-     &                       +(np1(i)**2)*gamma1(i)/t1(i)
-     &                       -t9(i)*gamma1(i))/t3(i)
-     &                    -a2kwg1(i)/t1(i)
-               a2k11(i) = 2.0d0*a2k11(i)
-               a2k12a(i) = a2k30a(i)
-               a2k11a(i) = a2k20a(i)
-               a2k10a(i) = tcgomega
-            end do
 c
 c     mu2(peek) = mu2 + omega * alpha.r2
 c
-            call tcg_add_omega_alpha2 (tcgomega,uind,uinp,
+         call tcg_add_omega_alpha2 (tcgpeek,uind,uinp,
      &                                    r1(:,:,1),r1(:,:,2))
 c
 c     mutual and direct induced dipole components
 c
-            ubp(:,:,1) = -0.5d0*(a220(1)*r0(:,:,2)
+         ubp(:,:,1) = -0.5d0*(a220(1)*r0(:,:,2)
      &                 + (a221(1)+a2k21(1))*r0(:,:,1)
      &                 + (a222(1)+a231(1)+a2k22(1)+a2k31(1))*P1(:,:,1)
      &                 + (a223(1)+a241(1)+a2k23(1)+a2k41(1))*t2r0(:,:,1)
      &                 + a2k21a(1)*tae(:,:,2) + a2k20a(1)*udirp)
-            ubp(:,:,2) = -0.5d0*((a232(1)+a2k32(1))*P1(:,:,1)
-     &                               + a2k30a(1)*udirp)
-            ubd(:,:,1) = -0.5d0*(a220(2)*r0(:,:,1)
+         ubp(:,:,2) = -0.5d0*((a232(1)+a2k32(1))*P1(:,:,1)
+     &                            + a2k30a(1)*udirp)
+         ubd(:,:,1) = -0.5d0*(a220(2)*r0(:,:,1)
      &                 + (a221(2)+a2k21(2))*r0(:,:,2)
      &                 + (a222(2)+a231(2)+a2k22(2)+a2k31(2))*P1(:,:,2)
      &                 + (a223(2)+a241(2)+a2k23(2)+a2k41(2))*t2r0(:,:,2)
      &                 + a2k21a(2)*tae(:,:,1) + a2k20a(2)*udir)
-            ubd(:,:,2) = -0.5d0*((a232(2)+a2k32(2))*P1(:,:,2)
-     &                              + a2k30a(2)*udir)
-            xde(:,:,1) = (a210(2)*r0(:,:,1) + a21n1(2)*P1(:,:,1)
+         ubd(:,:,2) = -0.5d0*((a232(2)+a2k32(2))*P1(:,:,2)
+     &                           + a2k30a(2)*udir)
+         xde(:,:,1) = (a210(2)*r0(:,:,1) + a21n1(2)*P1(:,:,1)
      &                 + (a211(2)+a2k11(2))*r0(:,:,2)
      &                 + (a212(2)+a2k12(2))*P1(:,:,2)
      &                 + (a213(2)+a2k13(2))*t2r0(:,:,2)
      &                 + (a214(2)+a2k14(2))*t3r0(:,:,2)
      &                 + a2k11a(2)*tae(:,:,1) + a2k12a(2)*t2ae(:,:,1)
      &                 + a2k10a(2)*udir + uind) * 0.5d0
-            xde(:,:,2) = (a210(1)*r0(:,:,2) + a21n1(1)*P1(:,:,2)
+         xde(:,:,2) = (a210(1)*r0(:,:,2) + a21n1(1)*P1(:,:,2)
      &                 + (a211(1)+a2k11(1))*r0(:,:,1)
      &                 + (a212(1)+a2k12(1))*P1(:,:,1)
      &                 + (a213(1)+a2k13(1))*t2r0(:,:,1)
      &                 + (a214(1)+a2k14(1))*t3r0(:,:,1)
      &                 + a2k11a(1)*tae(:,:,2) + a2k12a(1)*t2ae(:,:,2)
      &                 + a2k10a(1)*udirp + uinp) * 0.5d0
-         else
-            ubp(:,:,1) = -0.5d0*(a220(1)*r0(:,:,2)
-     &                              + a221(1)*r0(:,:,1)
-     &                              + (a222(1)+a231(1))*P1(:,:,1)
-     &                              + (a223(1)+a241(1))*t2r0(:,:,1))
-            ubp(:,:,2) = -0.5d0*a232(1)*P1(:,:,1)
-            ubd(:,:,1) = -0.5d0*(a220(2)*r0(:,:,1)
-     &                              + a221(2)*r0(:,:,2)
-     &                              + (a222(2)+a231(2))*P1(:,:,2)
-     &                              + (a223(2)+a241(2))*t2r0(:,:,2))
-            ubd(:,:,2) = -0.5d0*a232(2)*P1(:,:,2)
-            xde(:,:,1) = (a210(2)*r0(:,:,1) + a21n1(2)*P1(:,:,1)
-     &                 + a211(2)*r0(:,:,2) + a212(2)*P1(:,:,2)
-     &                 + a213(2)*t2r0(:,:,2) + a214(2)*t3r0(:,:,2)
-     &                 + uind) * 0.5d0
-            xde(:,:,2) = (a210(1)*r0(:,:,2) + a21n1(1)*P1(:,:,2)
-     &                 + a211(1)*r0(:,:,1) + a212(1)*P1(:,:,1)
-     &                 + a213(1)*t2r0(:,:,1) + a214(1)*t3r0(:,:,1)
-     &                 + uinp) * 0.5d0
-         end if
          uad(:,:,1) = r0(:,:,1)
          uad(:,:,2) = P1(:,:,1)
          uap(:,:,1) = r0(:,:,2)
