@@ -14,7 +14,7 @@ c
 c
 c     ndipole   total number of dipoles in the system
 c     idpl      numbers of atoms that define each dipole
-c     bdpl      magnitude of each of the dipoles (Debyes)
+c     bdpl      magnitude of each of the dipoles (Debye)
 c     sdpl      position of each dipole between defining atoms
 c
 c

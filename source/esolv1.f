@@ -156,8 +156,6 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use shunt
       use solute
       use usage
@@ -199,9 +197,9 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
-!$OMP% f0,f1,f2,f3,f4,f5,f6,f7,molcule)
-!$OMP& shared(es,einter,des,drb,vir)
-!$OMP DO reduction(+:es,einter,des,drb,vir) schedule(guided)
+!$OMP% f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& shared(es,des,drb,vir)
+!$OMP DO reduction(+:es,des,drb,vir) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -317,12 +315,6 @@ c
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
                   end if
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
                end if
             end if
          end do
@@ -358,8 +350,6 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use neigh
       use shunt
       use solute
@@ -403,9 +393,9 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
-!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,molcule)
-!$OMP& shared(es,einter,des,drb,vir)
-!$OMP DO reduction(+:es,einter,des,drb,vir) schedule(guided)
+!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& shared(es,des,drb,vir)
+!$OMP DO reduction(+:es,des,drb,vir) schedule(guided)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -529,12 +519,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
                end if
             end if
          end do
@@ -567,9 +551,7 @@ c
       use deriv
       use energi
       use group
-      use inter
       use math
-      use molcul
       use solute
       use usage
       use virial
@@ -708,12 +690,6 @@ c
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
                end if
-c
-c     increment the total intermolecular energy
-c
-               if (molcule(i) .ne. molcule(k)) then
-                  einter = einter + e
-               end if
             end if
          end do
       end do
@@ -782,8 +758,6 @@ c
       use energi
       use gkstuf
       use group
-      use inter
-      use molcul
       use mpole
       use polar
       use polpot
@@ -885,9 +859,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,rborn,
-!$OMP& rpole,uinds,uinps,use_group,off2,gkc,fc,fd,fq,poltyp,molcule)
-!$OMP& shared(es,einter,des,drb,drbp,trq,trqi,vir)
-!$OMP DO reduction(+:es,einter,des,drb,drbp,trq,trqi,vir)
+!$OMP& rpole,uinds,uinps,use_group,off2,gkc,fc,fd,fq,poltyp)
+!$OMP& shared(es,des,drb,drbp,trq,trqi,vir)
+!$OMP DO reduction(+:es,des,drb,drbp,trq,trqi,vir)
 !$OMP& schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
@@ -2297,12 +2271,6 @@ c
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
                   end if
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e + ei
-                  end if
                end if
             end if
          end do
@@ -2349,9 +2317,7 @@ c
       use deriv
       use energi
       use group
-      use inter
       use limits
-      use molcul
       use mplpot
       use mpole
       use polar
@@ -3283,9 +3249,7 @@ c
       use deriv
       use energi
       use group
-      use inter
       use limits
-      use molcul
       use mplpot
       use mpole
       use neigh
@@ -4899,7 +4863,6 @@ c
       use couple
       use deriv
       use hpmf
-      use iounit
       use math
       implicit none
       integer i,j,k,m

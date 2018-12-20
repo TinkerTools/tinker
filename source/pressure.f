@@ -500,7 +500,7 @@ c
          dkin = 0.0d0
          do i = 1, n
             if (use(i)) then
-               term = 1.5d0 * mass(i) / convert
+               term = 1.5d0 * mass(i) / ekcal
                do j = 1, 3
                   dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
                end do

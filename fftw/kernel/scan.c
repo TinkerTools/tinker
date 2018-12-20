@@ -19,7 +19,7 @@
  */
 
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 #include <string.h>
 #include <stddef.h>
 #include <stdarg.h>
@@ -72,7 +72,7 @@ static void eat_blanks(scanner *sc)
      UNGETCHR(sc, ch);
 }
 
-static void mygets(scanner *sc, char *s, size_t maxlen)
+static void mygets(scanner *sc, char *s, int maxlen)
 {
      char *s0 = s;
      int ch;
@@ -80,7 +80,7 @@ static void mygets(scanner *sc, char *s, size_t maxlen)
      A(maxlen > 0);
      while ((ch = GETCHR(sc)) != EOF && !isspace(ch)
 	    && ch != ')' && ch != '(' && s < s0 + maxlen)
-	  *s++ = ch;
+	  *s++ = (char)(ch & 0xFF);
      *s = 0;
      UNGETCHR(sc, ch);
 }
@@ -124,7 +124,7 @@ static int vscan(scanner *sc, const char *format, va_list ap)
      const char *s = format;
      char c;
      int ch = 0;
-     size_t fmt_len;
+     int fmt_len;
 
      while ((c = *s++)) {
 	  fmt_len = 0;
@@ -152,7 +152,7 @@ static int vscan(scanner *sc, const char *format, va_list ap)
 		       case 'M': {
 			    md5uint *x = va_arg(ap, md5uint *);
 			    *x = (md5uint)
-				    (0xffffffffUL & getlong(sc, 16, &ch));
+				    (0xFFFFFFFF & getlong(sc, 16, &ch));
 			    if (!ch) return 0;
 			    break;
 		       }

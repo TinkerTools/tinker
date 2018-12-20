@@ -21,9 +21,9 @@
 #ifndef __THREADS_H__
 #define __THREADS_H__
 
-#include "ifftw.h"
-#include "ct.h"
-#include "hc2hc.h"
+#include "kernel/ifftw.h"
+#include "dft/ct.h"
+#include "rdft/hc2hc.h"
 
 typedef struct {
      int min, max, thr_num;
@@ -51,4 +51,6 @@ hc2hc_solver *X(mksolver_hc2hc_threads)(size_t size, INT r, hc2hc_mkinferior mkc
 void X(threads_conf_standard)(planner *p);
 void X(threads_register_hooks)(void);
 void X(threads_unregister_hooks)(void);
+void X(threads_register_planner_hooks)(void);
+                                      
 #endif /* __THREADS_H__ */

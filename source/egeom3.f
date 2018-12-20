@@ -234,7 +234,8 @@ c
                neg = neg + 1
                eg = eg + e
                aeg(ib) = aeg(ib) + e
-               if (intermol) then
+               if (molcule(ia).ne.molcule(ib) .or.
+     &             molcule(ia).ne.molcule(ic)) then
                   einter = einter + e
                end if
                huge = (e .gt. 10.0d0)

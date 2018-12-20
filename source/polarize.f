@@ -45,6 +45,7 @@ c
       call attach
       call field
       call molecule
+      call katom
       call kmpole
       call kpolar
       call mutate
@@ -286,7 +287,7 @@ c
                   write (iout,10)
    10             format (/,' Determination of Induced Dipole',
      &                       ' Moments :',
-     &                    //,4x,'Iter',8x,'RMS Change (Debyes)',/)
+     &                    //,4x,'Iter',8x,'RMS Change (Debye)',/)
                end if
                write (iout,20)  iter,eps
    20          format (i8,7x,f16.10)
@@ -336,12 +337,14 @@ c     ##################################################################
 c
 c
 c     "ufield" finds the field at each polarizable site due to the
-c     induced dipoles at the other sites using Thole's method to
-c     damp the field at close range
+c     induced dipoles at the other polarizable sites
 c
 c
       subroutine ufield (field)
       use atoms
+      use chgpen
+      use couple
+      use mplpot
       use mpole
       use polar
       use polgrp
@@ -351,83 +354,116 @@ c
       integer ii,kk
       real*8 r,r2,rr3,rr5
       real*8 xr,yr,zr
-      real*8 uir,ukr
       real*8 uix,uiy,uiz
       real*8 ukx,uky,ukz
+      real*8 uir,ukr
       real*8 pdi,pti
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 pgamma,damp
       real*8 expdamp
       real*8 scale3,scale5
       real*8 fi(3),fk(3)
-      real*8, allocatable :: dscale(:)
+      real*8 dmpik(5)
+      real*8, allocatable :: uscale(:)
+      real*8, allocatable :: wscale(:)
       real*8 field(3,*)
 c
 c
 c     zero out the value of the electric field at each site
 c
-      do i = 1, npole
+      do ii = 1, npole
          do j = 1, 3
-            field(j,i) = 0.0d0
+            field(j,ii) = 0.0d0
          end do
       end do
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dscale(n))
+      allocate (uscale(n))
+      allocate (wscale(n))
 c
 c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
-         dscale(i) = 1.0d0
+         uscale(i) = 1.0d0
+         wscale(i) = 1.0d0
       end do
 c
 c     loop over pairs of sites incrementing the electric field
 c
-      do i = 1, npole-1
-         ii = ipole(i)
-         pdi = pdamp(i)
-         pti = thole(i)
-         uix = uind(1,i)
-         uiy = uind(2,i)
-         uiz = uind(3,i)
-         do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = u1scale
+      do ii = 1, npole-1
+         i = ipole(ii)
+         pdi = pdamp(ii)
+         pti = thole(ii)
+         uix = uind(1,ii)
+         uiy = uind(2,ii)
+         uiz = uind(3,ii)
+         if (use_chgpen) then
+            corei = pcore(ii)
+            vali = pval(ii)
+            alphai = palpha(ii)
+         end if
+         do j = 1, np11(i)
+            uscale(ip11(j,i)) = u1scale
          end do
-         do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = u2scale
+         do j = 1, np12(i)
+            uscale(ip12(j,i)) = u2scale
          end do
-         do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = u3scale
+         do j = 1, np13(i)
+            uscale(ip13(j,i)) = u3scale
          end do
-         do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = u4scale
+         do j = 1, np14(i)
+            uscale(ip14(j,i)) = u4scale
          end do
-         do k = i+1, npole
-            kk = ipole(k)
-            xr = x(kk) - x(ii)
-            yr = y(kk) - y(ii)
-            zr = z(kk) - z(ii)
+         do j = 1, n12(i)
+            wscale(i12(j,i)) = w2scale
+         end do
+         do j = 1, n13(i)
+            wscale(i13(j,i)) = w3scale
+         end do
+         do j = 1, n14(i)
+            wscale(i14(j,i)) = w4scale
+         end do
+         do j = 1, n15(i)
+            wscale(i15(j,i)) = w5scale
+         end do
+         do kk = ii+1, npole
+            k = ipole(kk)
+            xr = x(k) - x(i)
+            yr = y(k) - y(i)
+            zr = z(k) - z(i)
             r2 = xr*xr + yr* yr + zr*zr
-            ukx = uind(1,k)
-            uky = uind(2,k)
-            ukz = uind(3,k)
+            ukx = uind(1,kk)
+            uky = uind(2,kk)
+            ukz = uind(3,kk)
             r = sqrt(r2)
-            uir = xr*uix + yr*uiy + zr*uiz
-            ukr = xr*ukx + yr*uky + zr*ukz
+            uir = uix*xr + uiy*yr + uiz*zr
+            ukr = ukx*xr + uky*yr + ukz*zr
 c
 c     adjust the field to account for polarization damping
 c
-            scale3 = dscale(kk)
-            scale5 = dscale(kk)
-            damp = pdi * pdamp(k)
-            if (damp .ne. 0.0d0) then
-               pgamma = min(pti,thole(k))
-               damp = -pgamma * (r/damp)**3
-               if (damp .gt. -50.0d0) then
-                  expdamp = exp(damp)
-                  scale3 = scale3 * (1.0d0-expdamp)
-                  scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+            if (use_thole) then
+               scale3 = uscale(k)
+               scale5 = uscale(k)
+               damp = pdi * pdamp(kk)
+               if (damp .ne. 0.0d0) then
+                  pgamma = min(pti,thole(kk))
+                  damp = -pgamma * (r/damp)**3
+                  if (damp .gt. -50.0d0) then
+                     expdamp = exp(damp)
+                     scale3 = scale3 * (1.0d0-expdamp)
+                     scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+                  end if
                end if
+            else if (use_chgpen) then
+               corek = pcore(kk)
+               valk = pval(kk)
+               alphak = palpha(kk)
+               call dampmut (r,alphai,alphak,dmpik)
+               scale3 = wscale(k) * dmpik(3)
+               scale5 = wscale(k) * dmpik(5)
             end if
             rr3 = scale3 / (r*r2)
             rr5 = 3.0d0 * scale5 / (r*r2*r2)
@@ -441,29 +477,42 @@ c
 c     increment the field at each site due to this interaction
 c
             do j = 1, 3
-               field(j,i) = field(j,i) + fi(j)
-               field(j,k) = field(j,k) + fk(j)
+               field(j,ii) = field(j,ii) + fi(j)
+               field(j,kk) = field(j,kk) + fk(j)
             end do
          end do
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = 1.0d0
+         do j = 1, np11(i)
+            uscale(ip11(j,i)) = 1.0d0
          end do
-         do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = 1.0d0
+         do j = 1, np12(i)
+            uscale(ip12(j,i)) = 1.0d0
          end do
-         do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = 1.0d0
+         do j = 1, np13(i)
+            uscale(ip13(j,i)) = 1.0d0
          end do
-         do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = 1.0d0
+         do j = 1, np14(i)
+            uscale(ip14(j,i)) = 1.0d0
+         end do
+         do j = 1, n12(i)
+            wscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            wscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            wscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            wscale(i15(j,i)) = 1.0d0
          end do
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dscale)
+      deallocate (uscale)
+      deallocate (wscale)
       return
       end

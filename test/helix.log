@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.5  June 2018                          ##
+ ##                        Version 8.5   October 2018                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
@@ -97,4 +97,3 @@
  Final Gradient Norm :         0.6811D-04
 
  Tinker is Exiting following Normal Termination
-

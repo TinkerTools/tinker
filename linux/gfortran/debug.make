@@ -33,15 +33,19 @@ gfortran -c -Wall bound.f
 gfortran -c -Wall boxes.f
 gfortran -c -Wall cell.f
 gfortran -c -Wall charge.f
+gfortran -c -Wall chgpen.f
 gfortran -c -Wall chgpot.f
+gfortran -c -Wall chgtrn.f
 gfortran -c -Wall chrono.f
 gfortran -c -Wall chunks.f
 gfortran -c -Wall couple.f
 gfortran -c -Wall deriv.f
 gfortran -c -Wall dipole.f
 gfortran -c -Wall disgeo.f
+gfortran -c -Wall disp.f
 gfortran -c -Wall dma.f
 gfortran -c -Wall domega.f
+gfortran -c -Wall dsppot.f
 gfortran -c -Wall energi.f
 gfortran -c -Wall ewald.f
 gfortran -c -Wall faces.f
@@ -67,7 +71,10 @@ gfortran -c -Wall kantor.f
 gfortran -c -Wall katoms.f
 gfortran -c -Wall kbonds.f
 gfortran -c -Wall kchrge.f
+gfortran -c -Wall kcpen.f
+gfortran -c -Wall kctrn.f
 gfortran -c -Wall kdipol.f
+gfortran -c -Wall kdsp.f
 gfortran -c -Wall keys.f
 gfortran -c -Wall khbond.f
 gfortran -c -Wall kiprop.f
@@ -78,6 +85,7 @@ gfortran -c -Wall kopdst.f
 gfortran -c -Wall korbs.f
 gfortran -c -Wall kpitor.f
 gfortran -c -Wall kpolr.f
+gfortran -c -Wall krepl.f
 gfortran -c -Wall kstbnd.f
 gfortran -c -Wall ksttor.f
 gfortran -c -Wall ktorsn.f
@@ -120,6 +128,7 @@ gfortran -c -Wall pme.f
 gfortran -c -Wall polar.f
 gfortran -c -Wall polgrp.f
 gfortran -c -Wall polopt.f
+gfortran -c -Wall polpcg.f
 gfortran -c -Wall polpot.f
 gfortran -c -Wall poltcg.f
 gfortran -c -Wall potent.f
@@ -128,6 +137,8 @@ gfortran -c -Wall precis.f
 gfortran -c -Wall ptable.f
 gfortran -c -Wall qmstuf.f
 gfortran -c -Wall refer.f
+gfortran -c -Wall repel.f
+gfortran -c -Wall reppot.f
 gfortran -c -Wall resdue.f
 gfortran -c -Wall restrn.f
 gfortran -c -Wall rgddyn.f
@@ -156,7 +167,6 @@ gfortran -c -Wall uprior.f
 gfortran -c -Wall urey.f
 gfortran -c -Wall urypot.f
 gfortran -c -Wall usage.f
-gfortran -c -Wall usolve.f
 gfortran -c -Wall valfit.f
 gfortran -c -Wall vdw.f
 gfortran -c -Wall vdwpot.f
@@ -204,6 +214,7 @@ gfortran -c -Wall correlate.f
 gfortran -c -Wall crystal.f
 gfortran -c -Wall cspline.f
 gfortran -c -Wall cutoffs.f
+gfortran -c -Wall damping.f
 gfortran -c -Wall deflate.f
 gfortran -c -Wall delete.f
 gfortran -c -Wall diagq.f
@@ -240,10 +251,18 @@ gfortran -c -Wall echgdpl.f
 gfortran -c -Wall echgdpl1.f
 gfortran -c -Wall echgdpl2.f
 gfortran -c -Wall echgdpl3.f
+gfortran -c -Wall echgtrn.f
+gfortran -c -Wall echgtrn1.f
+gfortran -c -Wall echgtrn2.f
+gfortran -c -Wall echgtrn3.f
 gfortran -c -Wall edipole.f
 gfortran -c -Wall edipole1.f
 gfortran -c -Wall edipole2.f
 gfortran -c -Wall edipole3.f
+gfortran -c -Wall edisp.f
+gfortran -c -Wall edisp1.f
+gfortran -c -Wall edisp2.f
+gfortran -c -Wall edisp3.f
 gfortran -c -Wall egauss.f
 gfortran -c -Wall egauss1.f
 gfortran -c -Wall egauss2.f
@@ -298,6 +317,10 @@ gfortran -c -Wall epolar.f
 gfortran -c -Wall epolar1.f
 gfortran -c -Wall epolar2.f
 gfortran -c -Wall epolar3.f
+gfortran -c -Wall erepel.f
+gfortran -c -Wall erepel1.f
+gfortran -c -Wall erepel2.f
+gfortran -c -Wall erepel3.f
 gfortran -c -Wall erf.f
 gfortran -c -Wall erxnfld.f
 gfortran -c -Wall erxnfld1.f
@@ -386,7 +409,9 @@ gfortran -c -Wall kangtor.f
 gfortran -c -Wall katom.f
 gfortran -c -Wall kbond.f
 gfortran -c -Wall kcharge.f
+gfortran -c -Wall kchgtrn.f
 gfortran -c -Wall kdipole.f
+gfortran -c -Wall kdisp.f
 gfortran -c -Wall kewald.f
 gfortran -c -Wall kextra.f
 gfortran -c -Wall kgeom.f
@@ -400,6 +425,7 @@ gfortran -c -Wall kopdist.f
 gfortran -c -Wall korbit.f
 gfortran -c -Wall kpitors.f
 gfortran -c -Wall kpolar.f
+gfortran -c -Wall krepel.f
 gfortran -c -Wall ksolv.f
 gfortran -c -Wall kstrbnd.f
 gfortran -c -Wall kstrtor.f
@@ -525,6 +551,7 @@ gfortran -c -Wall testhess.f
 gfortran -c -Wall testpair.f
 gfortran -c -Wall testpol.f
 gfortran -c -Wall testrot.f
+gfortran -c -Wall testvir.f
 gfortran -c -Wall timer.f
 gfortran -c -Wall timerot.f
 gfortran -c -Wall tncg.f

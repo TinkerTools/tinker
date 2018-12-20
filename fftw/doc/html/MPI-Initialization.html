@@ -1,83 +1,114 @@
-<html lang="en">
-<head>
-<title>MPI Initialization - FFTW 3.3.4</title>
-<meta http-equiv="Content-Type" content="text/html">
-<meta name="description" content="FFTW 3.3.4">
-<meta name="generator" content="makeinfo 4.13">
-<link title="Top" rel="start" href="index.html#Top">
-<link rel="up" href="FFTW-MPI-Reference.html#FFTW-MPI-Reference" title="FFTW MPI Reference">
-<link rel="prev" href="MPI-Files-and-Data-Types.html#MPI-Files-and-Data-Types" title="MPI Files and Data Types">
-<link rel="next" href="Using-MPI-Plans.html#Using-MPI-Plans" title="Using MPI Plans">
-<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
-<!--
-This manual is for FFTW
-(version 3.3.4, 20 September 2013).
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<!-- This manual is for FFTW
+(version 3.3.8, 24 May 2018).
 
 Copyright (C) 2003 Matteo Frigo.
 
 Copyright (C) 2003 Massachusetts Institute of Technology.
 
-     Permission is granted to make and distribute verbatim copies of
-     this manual provided the copyright notice and this permission
-     notice are preserved on all copies.
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
 
-     Permission is granted to copy and distribute modified versions of
-     this manual under the conditions for verbatim copying, provided
-     that the entire resulting derived work is distributed under the
-     terms of a permission notice identical to this one.
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
 
-     Permission is granted to copy and distribute translations of this
-     manual into another language, under the above conditions for
-     modified versions, except that this permission notice may be
-     stated in a translation approved by the Free Software Foundation.
-   -->
-<meta http-equiv="Content-Style-Type" content="text/css">
-<style type="text/css"><!--
-  pre.display { font-family:inherit }
-  pre.format  { font-family:inherit }
-  pre.smalldisplay { font-family:inherit; font-size:smaller }
-  pre.smallformat  { font-family:inherit; font-size:smaller }
-  pre.smallexample { font-size:smaller }
-  pre.smalllisp    { font-size:smaller }
-  span.sc    { font-variant:small-caps }
-  span.roman { font-family:serif; font-weight:normal; } 
-  span.sansserif { font-family:sans-serif; font-weight:normal; } 
---></style>
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation. -->
+<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<head>
+<title>FFTW 3.3.8: MPI Initialization</title>
+
+<meta name="description" content="FFTW 3.3.8: MPI Initialization">
+<meta name="keywords" content="FFTW 3.3.8: MPI Initialization">
+<meta name="resource-type" content="document">
+<meta name="distribution" content="global">
+<meta name="Generator" content="makeinfo">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link href="index.html#Top" rel="start" title="Top">
+<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
+<link href="FFTW-MPI-Reference.html#FFTW-MPI-Reference" rel="up" title="FFTW MPI Reference">
+<link href="Using-MPI-Plans.html#Using-MPI-Plans" rel="next" title="Using MPI Plans">
+<link href="MPI-Files-and-Data-Types.html#MPI-Files-and-Data-Types" rel="prev" title="MPI Files and Data Types">
+<style type="text/css">
+<!--
+a.summary-letter {text-decoration: none}
+blockquote.indentedblock {margin-right: 0em}
+blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
+blockquote.smallquotation {font-size: smaller}
+div.display {margin-left: 3.2em}
+div.example {margin-left: 3.2em}
+div.lisp {margin-left: 3.2em}
+div.smalldisplay {margin-left: 3.2em}
+div.smallexample {margin-left: 3.2em}
+div.smalllisp {margin-left: 3.2em}
+kbd {font-style: oblique}
+pre.display {font-family: inherit}
+pre.format {font-family: inherit}
+pre.menu-comment {font-family: serif}
+pre.menu-preformatted {font-family: serif}
+pre.smalldisplay {font-family: inherit; font-size: smaller}
+pre.smallexample {font-size: smaller}
+pre.smallformat {font-family: inherit; font-size: smaller}
+pre.smalllisp {font-size: smaller}
+span.nolinebreak {white-space: nowrap}
+span.roman {font-family: initial; font-weight: normal}
+span.sansserif {font-family: sans-serif; font-weight: normal}
+ul.no-bullet {list-style: none}
+-->
+</style>
+
+
 </head>
-<body>
-<div class="node">
-<a name="MPI-Initialization"></a>
-<p>
-Next:&nbsp;<a rel="next" accesskey="n" href="Using-MPI-Plans.html#Using-MPI-Plans">Using MPI Plans</a>,
-Previous:&nbsp;<a rel="previous" accesskey="p" href="MPI-Files-and-Data-Types.html#MPI-Files-and-Data-Types">MPI Files and Data Types</a>,
-Up:&nbsp;<a rel="up" accesskey="u" href="FFTW-MPI-Reference.html#FFTW-MPI-Reference">FFTW MPI Reference</a>
-<hr>
-</div>
 
+<body lang="en">
+<a name="MPI-Initialization"></a>
+<div class="header">
+<p>
+Next: <a href="Using-MPI-Plans.html#Using-MPI-Plans" accesskey="n" rel="next">Using MPI Plans</a>, Previous: <a href="MPI-Files-and-Data-Types.html#MPI-Files-and-Data-Types" accesskey="p" rel="prev">MPI Files and Data Types</a>, Up: <a href="FFTW-MPI-Reference.html#FFTW-MPI-Reference" accesskey="u" rel="up">FFTW MPI Reference</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+</div>
+<hr>
+<a name="MPI-Initialization-1"></a>
 <h4 class="subsection">6.12.2 MPI Initialization</h4>
 
-<p>Before calling any other FFTW MPI (&lsquo;<samp><span class="samp">fftw_mpi_</span></samp>&rsquo;) function, and
+<p>Before calling any other FFTW MPI (&lsquo;<samp>fftw_mpi_</samp>&rsquo;) function, and
 before importing any wisdom for MPI problems, you must call:
+</p>
+<a name="index-fftw_005fmpi_005finit-4"></a>
+<div class="example">
+<pre class="example">void fftw_mpi_init(void);
+</pre></div>
 
-   <p><a name="index-fftw_005fmpi_005finit-437"></a>
-<pre class="example">     void fftw_mpi_init(void);
-</pre>
-   <p><a name="index-fftw_005finit_005fthreads-438"></a>If FFTW threads support is used, however, <code>fftw_mpi_init</code> should
+<a name="index-fftw_005finit_005fthreads-3"></a>
+<p>If FFTW threads support is used, however, <code>fftw_mpi_init</code> should
 be called <em>after</em> <code>fftw_init_threads</code> (see <a href="Combining-MPI-and-Threads.html#Combining-MPI-and-Threads">Combining MPI and Threads</a>).  Calling <code>fftw_mpi_init</code> additional times (before
 <code>fftw_mpi_cleanup</code>) has no effect.
+</p>
 
-   <p>If you want to deallocate all persistent data and reset FFTW to the
+<p>If you want to deallocate all persistent data and reset FFTW to the
 pristine state it was in when you started your program, you can call:
+</p>
+<a name="index-fftw_005fmpi_005fcleanup-1"></a>
+<div class="example">
+<pre class="example">void fftw_mpi_cleanup(void);
+</pre></div>
 
-   <p><a name="index-fftw_005fmpi_005fcleanup-439"></a>
-<pre class="example">     void fftw_mpi_cleanup(void);
-</pre>
-   <p><a name="index-fftw_005fcleanup-440"></a>(This calls <code>fftw_cleanup</code>, so you need not call the serial
+<a name="index-fftw_005fcleanup-1"></a>
+<p>(This calls <code>fftw_cleanup</code>, so you need not call the serial
 cleanup routine too, although it is safe to do so.)  After calling
 <code>fftw_mpi_cleanup</code>, all existing plans become undefined, and you
 should not attempt to execute or destroy them.  You must call
 <code>fftw_mpi_init</code> again after <code>fftw_mpi_cleanup</code> if you want
 to resume using the MPI FFTW routines.
+</p>
 
-   </body></html>
 
+
+</body>
+</html>

@@ -68,47 +68,52 @@ c
 c
 c     assign bond, angle and cross term potential parameters
 c
-      if (use_bond .or. use_strbnd .or. use_strtor .or.
-     &    (use_vdw .and. vdwtyp.eq.'MM3-HBOND'))  call kbond
-      if (use_angle .or. use_strbnd .or.use_angang .or. 
-     &    use_angtor .or. use_opbend .or. use_opdist)  call kangle
-      if (use_strbnd)  call kstrbnd
-      if (use_urey)  call kurey
-      if (use_angang)  call kangang
+      call kbond
+      call kangle
+      call kstrbnd
+      call kurey
+      call kangang
 c
 c     assign out-of-plane deformation potential parameters
 c
-      if (use_angle .or. use_opbend)  call kopbend
-      if (use_angle .or. use_opdist)  call kopdist
-      if (use_improp)  call kimprop
-      if (use_imptor)  call kimptor
+      call kopbend
+      call kopdist
+      call kimprop
+      call kimptor
 c
 c     assign torsion and torsion cross term potential parameters
 c
-      if (use_tors .or. use_strtor .or.
-     &    use_angtor .or. use_tortor)  call ktors
-      if (use_pitors)  call kpitors
-      if (use_strtor)  call kstrtor
-      if (use_angtor)  call kangtor
-      if (use_tortor)  call ktortor
+      call ktors
+      call kpitors
+      call kstrtor
+      call kangtor
+      call ktortor
 c
-c     assign van der Waals and electrostatic potential parameters
+c     assign van der Waals, repulsion and dispersion parameters
 c
-      if (use_vdw .or. use_solv)  call kvdw
-      if (use_charge .or. use_chgdpl .or. use_solv)  call kcharge
-      if (use_dipole .or. use_chgdpl)  call kdipole
-      if (use_mpole .or. use_polar .or.
-     &    use_solv .or. use_rxnfld)  call kmpole
-      if (use_mpole .or. use_polar .or. use_solv)  call kpolar
-      if (use_ewald)  call kewald
+      call kvdw
+      call krepel
+      call kdisp
+c
+c     assign electrostatic interaction potential parameters
+c
+      call kcharge
+      call kdipole
+      call kmpole
+      call kpolar
+      call kchgtrn
 c
 c     assign solvation, metal, pisystem and restraint parameters
 c
-      if (use_solv)  call ksolv
-      if (use_metal)  call kmetal
-      if (use_orbit)  call korbit
-      if (use_geom)  call kgeom
-      if (use_extra)  call kextra
+      call ksolv
+      call kmetal
+      call korbit
+      call kgeom
+      call kextra
+c
+c     assign electrostatic and dispersion Ewald sum parameters
+c
+      call kewald
 c
 c     set any holonomic interatomic distance constraints
 c

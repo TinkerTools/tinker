@@ -145,7 +145,7 @@ c
       do i = 1, n
          if (use(i)) then
             do j = 1, 3
-               a(j,i) = -convert * derivs(j,i) / mass(i)
+               a(j,i) = -ekcal * derivs(j,i) / mass(i)
                v(j,i) = v(j,i) + a(j,i)*dt_2
             end do
          end if

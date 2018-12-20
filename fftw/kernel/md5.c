@@ -26,7 +26,7 @@
    sizeof(md5uint) >= 4.
 */
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 /* sintab[i] = 4294967296.0 * abs(sin((double)(i + 1))) */
 static const md5uint sintab[64] = {
@@ -82,7 +82,7 @@ static void doblock(md5sig state, const unsigned char *data)
      /* encode input bytes into md5uint */
      for (i = 0; i < 16; ++i) {
 	  const unsigned char *p = data + 4 * i;
-	  x[i] = p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+	  x[i] = (unsigned)p[0] | ((unsigned)p[1] << 8) | ((unsigned)p[2] << 16) | ((unsigned)p[3] << 24);
      }
 
      a = state[0]; b = state[1]; c = state[2]; d = state[3];
@@ -134,7 +134,7 @@ void X(md5end)(md5 *p)
 
      /* rfc 1321 section 3.2: length (little endian) */
      for (i = 0; i < 8; ++i) {
-	  X(md5putc)(p, l & 0xFF);
+	  X(md5putc)(p, (unsigned char)(l & 0xFF));
 	  l = l >> 8;
      }
 

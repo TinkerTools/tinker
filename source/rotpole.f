@@ -33,7 +33,7 @@ c
       end do
 c
 c     set QI dipole rotation matrix by permuting the Cartesian
-c     rotation matrix for spherical harmonic ordering
+c     rotation matrix to adhere to spherical harmonic ordering
 c
       do i = 1, npole
          d1(1,1) = a(3,3)
@@ -97,7 +97,7 @@ c
       a(2,3) = 0.0d0
       a(3,3) = 1.0d0
 c
-c     Z-Only method rotation matrix elements for z-axis only
+c     z-only frame rotation matrix elements for z-axis only
 c
       if (polaxe(i) .eq. 'Z-Only') then
          dx = x(iz) - xi
@@ -124,7 +124,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     Z-then-X method rotation matrix elements for z- and x-axes
+c     z-then-x frame rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Z-then-X') then
          dx = x(iz) - xi
@@ -146,7 +146,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     Bisector method rotation matrix elements for z- and x-axes
+c     bisector frame rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Bisector') then
          dx = x(iz) - xi
@@ -179,7 +179,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     Z-Bisect method rotation matrix elements for z- and x-axes
+c     z-bisect frame rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Z-Bisect') then
          dx = x(iz) - xi
@@ -219,7 +219,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     3-Fold method rotation matrix elements for z- and x-axes
+c     3-fold frame rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. '3-Fold') then
          dx = x(iz) - xi

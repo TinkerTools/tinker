@@ -160,6 +160,8 @@ c
       integer ig(20)
       real*8 wght
       real*8 rd,ep,rdn
+      real*8 spr,apr,epr
+      real*8 cdp,adp
       real*8 dl,fc,bd
       real*8 an1,an2,an3
       real*8 an,pr
@@ -174,7 +176,9 @@ c
       real*8 tx,ty,tf
       real*8 cg,dp,ps,pl
       real*8 pl1,pl2,pl3
+      real*8 pel,pal
       real*8 pol,thl
+      real*8 ctrn,atrn
       real*8 el,iz,rp
       real*8 ss,ts
       real*8 vt(6),st(6)
@@ -265,71 +269,88 @@ c
   120       continue
             write (iprm,130)  ia,ib,rd,ep
   130       format ('hbond',5x,2i5,5x,2f11.4)
+         else if (keyword(1:10) .eq. 'REPULSION ') then
+            ia = 0
+            spr = 0.0d0
+            apr = 0.0d0
+            epr = 0.0d0
+            read (string,*,err=140,end=140)  ia,spr,apr,epr
+  140       continue
+            write (iprm,150)  ia,spr,apr,epr
+  150       format ('repulsion',1x,i5,5x,2f11.4,f11.3)
+         else if (keyword(1:11) .eq. 'DISPERSION ') then
+            ia = 0
+            cdp = 0.0d0
+            adp = 0.0d0
+            read (string,*,err=160,end=160)  ia,cdp,adp
+  160       continue
+            write (iprm,170)  ia,cdp,adp
+  170       format ('dispersion',i5,5x,2f11.4)
          else if (keyword(1:5) .eq. 'BOND ') then
             ia = 0
             ib = 0
             fc = 0.0d0
             bd = 0.0d0
-            read (string,*,err=140,end=140)  ia,ib,fc,bd
-  140       continue
+            read (string,*,err=180,end=180)  ia,ib,fc,bd
+  180       continue
             if (bndunit .lt. 10.0d0) then
-               write (iprm,150)  ia,ib,fc,bd
-  150          format ('bond',6x,2i5,5x,f11.2,f11.4)
+               write (iprm,190)  ia,ib,fc,bd
+  190          format ('bond',6x,2i5,5x,f11.2,f11.4)
             else
-               write (iprm,160)  ia,ib,fc,bd
-  160          format ('bond',6x,2i5,5x,f11.3,f11.4)
+               write (iprm,200)  ia,ib,fc,bd
+  200          format ('bond',6x,2i5,5x,f11.3,f11.4)
             end if
          else if (keyword(1:6) .eq. 'BOND5 ') then
             ia = 0
             ib = 0
             fc = 0.0d0
             bd = 0.0d0
-            read (string,*,err=170,end=170)  ia,ib,fc,bd
-  170       continue
+            read (string,*,err=210,end=210)  ia,ib,fc,bd
+  210       continue
             if (bndunit .lt. 10.0d0) then
-               write (iprm,180)  ia,ib,fc,bd
-  180          format ('bond5',5x,2i5,5x,f11.2,f11.4)
+               write (iprm,220)  ia,ib,fc,bd
+  220          format ('bond5',5x,2i5,5x,f11.2,f11.4)
             else
-               write (iprm,190)  ia,ib,fc,bd
-  190          format ('bond5',5x,2i5,5x,f11.3,f11.4)
+               write (iprm,230)  ia,ib,fc,bd
+  230          format ('bond5',5x,2i5,5x,f11.3,f11.4)
             end if
          else if (keyword(1:6) .eq. 'BOND4 ') then
             ia = 0
             ib = 0
             fc = 0.0d0
             bd = 0.0d0
-            read (string,*,err=200,end=200)  ia,ib,fc,bd
-  200       continue
+            read (string,*,err=240,end=240)  ia,ib,fc,bd
+  240       continue
             if (bndunit .lt. 10.0d0) then
-               write (iprm,210)  ia,ib,fc,bd
-  210          format ('bond4',5x,2i5,5x,f11.2,f11.4)
+               write (iprm,250)  ia,ib,fc,bd
+  250          format ('bond4',5x,2i5,5x,f11.2,f11.4)
             else
-               write (iprm,220)  ia,ib,fc,bd
-  220          format ('bond4',5x,2i5,5x,f11.3,f11.4)
+               write (iprm,260)  ia,ib,fc,bd
+  260          format ('bond4',5x,2i5,5x,f11.3,f11.4)
             end if
          else if (keyword(1:6) .eq. 'BOND3 ') then
             ia = 0
             ib = 0
             fc = 0.0d0
             bd = 0.0d0
-            read (string,*,err=230,end=230)  ia,ib,fc,bd
-  230       continue
+            read (string,*,err=270,end=270)  ia,ib,fc,bd
+  270       continue
             if (bndunit .lt. 10.0d0) then
-               write (iprm,240)  ia,ib,fc,bd
-  240          format ('bond3',5x,2i5,5x,f11.2,f11.4)
+               write (iprm,280)  ia,ib,fc,bd
+  280          format ('bond3',5x,2i5,5x,f11.2,f11.4)
             else
-               write (iprm,250)  ia,ib,fc,bd
-  250          format ('bond3',5x,2i5,5x,f11.3,f11.4)
+               write (iprm,290)  ia,ib,fc,bd
+  290          format ('bond3',5x,2i5,5x,f11.3,f11.4)
             end if
          else if (keyword(1:9) .eq. 'ELECTNEG ') then
             ia = 0
             ib = 0
             ic = 0
             dl = 0.0d0
-            read (string,*,err=260,end=260)  ia,ib,ic,dl
-  260       continue
-            write (iprm,270)  ia,ib,ic,dl
-  270       format ('electneg',2x,3i5,11x,f11.4)
+            read (string,*,err=300,end=300)  ia,ib,ic,dl
+  300       continue
+            write (iprm,310)  ia,ib,ic,dl
+  310       format ('electneg',2x,3i5,11x,f11.4)
          else if (keyword(1:6) .eq. 'ANGLE ') then
             ia = 0
             ib = 0
@@ -338,23 +359,23 @@ c
             an1 = 0.0d0
             an2 = 0.0d0
             an3 = 0.0d0
-            read (string,*,err=280,end=280)  ia,ib,ic,fc,an1,an2,an3
-  280       continue
+            read (string,*,err=320,end=320)  ia,ib,ic,fc,an1,an2,an3
+  320       continue
             if (an2.eq.0.0d0 .and. an3.eq.0.0d0) then
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,290)  ia,ib,ic,fc,an1
-  290             format ('angle',5x,3i5,f11.2,f11.2)
+                  write (iprm,330)  ia,ib,ic,fc,an1
+  330             format ('angle',5x,3i5,f11.2,f11.2)
                else
-                  write (iprm,300)  ia,ib,ic,fc,an1
-  300             format ('angle',5x,3i5,f11.3,f11.2)
+                  write (iprm,340)  ia,ib,ic,fc,an1
+  340             format ('angle',5x,3i5,f11.3,f11.2)
                end if
             else
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,310)  ia,ib,ic,fc,an1,an2,an3
-  310             format ('angle',5x,3i5,f11.2,3f11.2)
+                  write (iprm,350)  ia,ib,ic,fc,an1,an2,an3
+  350             format ('angle',5x,3i5,f11.2,3f11.2)
                else
-                  write (iprm,320)  ia,ib,ic,fc,an1,an2,an3
-  320             format ('angle',5x,3i5,f11.3,3f11.2)
+                  write (iprm,360)  ia,ib,ic,fc,an1,an2,an3
+  360             format ('angle',5x,3i5,f11.3,3f11.2)
                end if
             end if
          else if (keyword(1:7) .eq. 'ANGLE5 ') then
@@ -365,23 +386,23 @@ c
             an1 = 0.0d0
             an2 = 0.0d0
             an3 = 0.0d0
-            read (string,*,err=330,end=330)  ia,ib,ic,fc,an1,an2,an3
-  330       continue
+            read (string,*,err=370,end=370)  ia,ib,ic,fc,an1,an2,an3
+  370       continue
             if (an2.eq.0.0d0 .and. an3.eq.0.0d0) then
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,340)  ia,ib,ic,fc,an1
-  340             format ('angle5',4x,3i5,f11.2,f11.2)
+                  write (iprm,380)  ia,ib,ic,fc,an1
+  380             format ('angle5',4x,3i5,f11.2,f11.2)
                else
-                  write (iprm,350)  ia,ib,ic,fc,an1
-  350             format ('angle5',4x,3i5,f11.3,f11.2)
+                  write (iprm,390)  ia,ib,ic,fc,an1
+  390             format ('angle5',4x,3i5,f11.3,f11.2)
                end if
             else
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,360)  ia,ib,ic,fc,an1,an2,an3
-  360             format ('angle5',4x,3i5,f11.2,3f11.2)
+                  write (iprm,400)  ia,ib,ic,fc,an1,an2,an3
+  400             format ('angle5',4x,3i5,f11.2,3f11.2)
                else
-                  write (iprm,370)  ia,ib,ic,fc,an1,an2,an3
-  370             format ('angle5',4x,3i5,f11.3,3f11.2)
+                  write (iprm,410)  ia,ib,ic,fc,an1,an2,an3
+  410             format ('angle5',4x,3i5,f11.3,3f11.2)
                end if
             end if
          else if (keyword(1:7) .eq. 'ANGLE4 ') then
@@ -392,23 +413,23 @@ c
             an1 = 0.0d0
             an2 = 0.0d0
             an3 = 0.0d0
-            read (string,*,err=380,end=380)  ia,ib,ic,fc,an1,an2,an3
-  380       continue
+            read (string,*,err=420,end=420)  ia,ib,ic,fc,an1,an2,an3
+  420       continue
             if (an2.eq.0.0d0 .and. an3.eq.0.0d0) then
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,390)  ia,ib,ic,fc,an1
-  390             format ('angle4',4x,3i5,f11.2,f11.2)
+                  write (iprm,430)  ia,ib,ic,fc,an1
+  430             format ('angle4',4x,3i5,f11.2,f11.2)
                else
-                  write (iprm,400)  ia,ib,ic,fc,an1
-  400             format ('angle4',4x,3i5,f11.3,f11.2)
+                  write (iprm,440)  ia,ib,ic,fc,an1
+  440             format ('angle4',4x,3i5,f11.3,f11.2)
                end if
             else
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,410)  ia,ib,ic,fc,an1,an2,an3
-  410             format ('angle4',4x,3i5,f11.2,3f11.2)
+                  write (iprm,450)  ia,ib,ic,fc,an1,an2,an3
+  450             format ('angle4',4x,3i5,f11.2,3f11.2)
                else
-                  write (iprm,420)  ia,ib,ic,fc,an1,an2,an3
-  420             format ('angle4',4x,3i5,f11.3,3f11.2)
+                  write (iprm,460)  ia,ib,ic,fc,an1,an2,an3
+  460             format ('angle4',4x,3i5,f11.3,3f11.2)
                end if
             end if
          else if (keyword(1:7) .eq. 'ANGLE3 ') then
@@ -419,23 +440,23 @@ c
             an1 = 0.0d0
             an2 = 0.0d0
             an3 = 0.0d0
-            read (string,*,err=430,end=430)  ia,ib,ic,fc,an1,an2,an3
-  430       continue
+            read (string,*,err=470,end=470)  ia,ib,ic,fc,an1,an2,an3
+  470       continue
             if (an2.eq.0.0d0 .and. an3.eq.0.0d0) then
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,440)  ia,ib,ic,fc,an1
-  440             format ('angle3',4x,3i5,f11.2,f11.2)
+                  write (iprm,480)  ia,ib,ic,fc,an1
+  480             format ('angle3',4x,3i5,f11.2,f11.2)
                else
-                  write (iprm,450)  ia,ib,ic,fc,an1
-  450             format ('angle3',4x,3i5,f11.3,f11.2)
+                  write (iprm,490)  ia,ib,ic,fc,an1
+  490             format ('angle3',4x,3i5,f11.3,f11.2)
                end if
             else
                if (angunit .lt. 10.0d0/radian**2) then
-                  write (iprm,460)  ia,ib,ic,fc,an1,an2,an3
-  460             format ('angle3',4x,3i5,f11.2,3f11.2)
+                  write (iprm,500)  ia,ib,ic,fc,an1,an2,an3
+  500             format ('angle3',4x,3i5,f11.2,3f11.2)
                else
-                  write (iprm,470)  ia,ib,ic,fc,an1,an2,an3
-  470             format ('angle3',4x,3i5,f11.3,3f11.2)
+                  write (iprm,510)  ia,ib,ic,fc,an1,an2,an3
+  510             format ('angle3',4x,3i5,f11.3,3f11.2)
                end if
             end if
          else if (keyword(1:7) .eq. 'ANGLEF ') then
@@ -445,14 +466,14 @@ c
             fc = 0.0d0
             an = 0.0d0
             pr = 0.0d0
-            read (string,*,err=480,end=480)  ia,ib,ic,fc,an,pr
-  480       continue
+            read (string,*,err=520,end=520)  ia,ib,ic,fc,an,pr
+  520       continue
             if (angunit .lt. 10.0d0/radian**2) then
-               write (iprm,490)  ia,ib,ic,fc,an,pr
-  490          format ('anglef',4x,3i5,f11.2,f11.2,f11.1)
+               write (iprm,530)  ia,ib,ic,fc,an,pr
+  530          format ('anglef',4x,3i5,f11.2,f11.2,f11.1)
             else
-               write (iprm,500)  ia,ib,ic,fc,an,pr
-  500          format ('anglef',4x,3i5,f11.3,f11.2,f11.1)
+               write (iprm,540)  ia,ib,ic,fc,an,pr
+  540          format ('anglef',4x,3i5,f11.3,f11.2,f11.1)
             end if
          else if (keyword(1:7) .eq. 'STRBND ') then
             ia = 0
@@ -460,14 +481,14 @@ c
             ic = 0
             ba1 = 0.0d0
             ba2 = 0.0d0
-            read (string,*,err=510,end=510)  ia,ib,ic,ba1,ba2
-  510       continue
+            read (string,*,err=550,end=550)  ia,ib,ic,ba1,ba2
+  550       continue
             if (stbnunit .lt. 10.0d0/radian) then
-               write (iprm,520)  ia,ib,ic,ba1,ba2
-  520          format ('strbnd',4x,3i5,2f11.2)
+               write (iprm,560)  ia,ib,ic,ba1,ba2
+  560          format ('strbnd',4x,3i5,2f11.2)
             else
-               write (iprm,530)  ia,ib,ic,ba1,ba2
-  530          format ('strbnd',4x,3i5,2f11.3)
+               write (iprm,570)  ia,ib,ic,ba1,ba2
+  570          format ('strbnd',4x,3i5,2f11.3)
             end if
          else if (keyword(1:9) .eq. 'UREYBRAD ') then
             ia = 0
@@ -475,28 +496,28 @@ c
             ic = 0
             fc = 0.0d0
             ds = 0.0d0
-            read (string,*,err=540,end=540)  ia,ib,ic,fc,ds
-  540       continue
+            read (string,*,err=580,end=580)  ia,ib,ic,fc,ds
+  580       continue
             if (ureyunit .lt. 10.0d0) then
-               write (iprm,550)  ia,ib,ic,fc,ds
-  550          format ('ureybrad',2x,3i5,f11.2,f11.4)
+               write (iprm,590)  ia,ib,ic,fc,ds
+  590          format ('ureybrad',2x,3i5,f11.2,f11.4)
             else
-               write (iprm,560)  ia,ib,ic,fc,ds
-  560          format ('ureybrad',2x,3i5,f11.3,f11.4)
+               write (iprm,600)  ia,ib,ic,fc,ds
+  600          format ('ureybrad',2x,3i5,f11.3,f11.4)
             end if
          else if (keyword(1:7) .eq. 'ANGANG ') then
             ia = 0
             aa1 = 0.0d0
             aa2 = 0.0d0
             aa3 = 0.0d0
-            read (string,*,err=570,end=570)  ia,aa1,aa2,aa3
-  570       continue
+            read (string,*,err=610,end=610)  ia,aa1,aa2,aa3
+  610       continue
             if (abs(aaunit) .lt. 10.0d0/radian**2) then
-               write (iprm,580)  ia,aa1,aa2,aa3
-  580          format ('angang',4x,i5,10x,3f11.2)
+               write (iprm,620)  ia,aa1,aa2,aa3
+  620          format ('angang',4x,i5,10x,3f11.2)
             else
-               write (iprm,590)  ia,aa1,aa2,aa3
-  590          format ('angang',4x,i5,10x,3f11.3)
+               write (iprm,630)  ia,aa1,aa2,aa3
+  630          format ('angang',4x,i5,10x,3f11.3)
             end if
          else if (keyword(1:7) .eq. 'OPBEND ') then
             ia = 0
@@ -504,14 +525,14 @@ c
             ic = 0
             id = 0
             fc = 0.0d0
-            read (string,*,err=600,end=600)  ia,ib,ic,id,fc
-  600       continue
+            read (string,*,err=640,end=640)  ia,ib,ic,id,fc
+  640       continue
             if (opbunit .lt. 10.0d0/radian**2) then
-               write (iprm,610)  ia,ib,ic,id,fc
-  610          format ('opbend',4x,4i5,6x,f11.2)
+               write (iprm,650)  ia,ib,ic,id,fc
+  650          format ('opbend',4x,4i5,6x,f11.2)
             else
-               write (iprm,620)  ia,ib,ic,id,fc
-  620          format ('opbend',4x,4i5,6x,f11.3)
+               write (iprm,660)  ia,ib,ic,id,fc
+  660          format ('opbend',4x,4i5,6x,f11.3)
             end if
          else if (keyword(1:7) .eq. 'OPDIST ') then
             ia = 0
@@ -519,14 +540,14 @@ c
             ic = 0
             id = 0
             fc = 0.0d0
-            read (string,*,err=630,end=630)  ia,ib,ic,id,fc
-  630       continue
+            read (string,*,err=670,end=670)  ia,ib,ic,id,fc
+  670       continue
             if (opdunit .lt. 10.0d0) then
-               write (iprm,640)  ia,ib,ic,id,fc
-  640          format ('opdist',4x,4i5,6x,f11.2)
+               write (iprm,680)  ia,ib,ic,id,fc
+  680          format ('opdist',4x,4i5,6x,f11.2)
             else
-               write (iprm,650)  ia,ib,ic,id,fc
-  650          format ('opdist',4x,4i5,6x,f11.3)
+               write (iprm,690)  ia,ib,ic,id,fc
+  690          format ('opdist',4x,4i5,6x,f11.3)
             end if
          else if (keyword(1:9) .eq. 'IMPROPER ') then
             ia = 0
@@ -535,10 +556,10 @@ c
             id = 0
             dk = 0.0d0
             vd = 0.0d0
-            read (string,*,err=660,end=660)  ia,ib,ic,id,dk,vd
-  660       continue
-            write (iprm,670)  ia,ib,ic,id,dk,vd
-  670       format ('improper',2x,4i5,6x,2f11.2)
+            read (string,*,err=700,end=700)  ia,ib,ic,id,dk,vd
+  700       continue
+            write (iprm,710)  ia,ib,ic,id,dk,vd
+  710       format ('improper',2x,4i5,6x,2f11.2)
          else if (keyword(1:8) .eq. 'IMPTORS ') then
             ia = 0
             ib = 0
@@ -549,49 +570,18 @@ c
                st(j) = 0.0d0
                ft(j) = 0
             end do
-            read (string,*,err=680,end=680)  ia,ib,ic,id,
+            read (string,*,err=720,end=720)  ia,ib,ic,id,
      &                                       (vt(j),st(j),ft(j),j=1,6)
-  680       continue
+  720       continue
             kt = 0
             do j = 1, 6
                if (ft(j) .ne. 0) then
                   kt = j
                end if
             end do
-            write (iprm,690)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  690       format ('imptors',3x,4i5,6x,6(f11.3,f7.1,i3))
+            write (iprm,730)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
+  730       format ('imptors',3x,4i5,6x,6(f11.3,f7.1,i3))
          else if (keyword(1:8) .eq. 'TORSION ') then
-            ia = 0
-            ib = 0
-            ic = 0
-            id = 0
-            do j = 1, 6
-               vt(j) = 0.0d0
-               st(j) = 0.0d0
-               ft(j) = 0
-            end do
-            read (string,*,err=700,end=700)  ia,ib,ic,id,
-     &                                       (vt(j),st(j),ft(j),j=1,6)
-  700       continue
-            kt = 0
-            do j = 1, 6
-               if (ft(j) .ne. 0) then
-                  kt = j
-               end if
-            end do
-            if (kt.eq.3 .and. st(1).eq.0.0d0 .and. st(2).eq.180.0d0
-     &                  .and. st(3).eq.0.0d0) then
-               write (iprm,710)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  710          format ('torsion',3x,4i5,3x,f8.3,f4.1,i2,
-     &                    f8.3,f6.1,i2,f8.3,f4.1,i2)
-            else if (kt .le. 2) then
-               write (iprm,720)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  720          format ('torsion',3x,4i5,6x,2(f11.3,f7.1,i3))
-            else
-               write (iprm,730)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  730          format ('torsion',3x,4i5,3x,6(f8.3,f6.1,i2))
-            end if
-         else if (keyword(1:9) .eq. 'TORSION5 ') then
             ia = 0
             ib = 0
             ic = 0
@@ -613,16 +603,16 @@ c
             if (kt.eq.3 .and. st(1).eq.0.0d0 .and. st(2).eq.180.0d0
      &                  .and. st(3).eq.0.0d0) then
                write (iprm,750)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  750          format ('torsion5',2x,4i5,3x,f8.3,f4.1,i2,
+  750          format ('torsion',3x,4i5,3x,f8.3,f4.1,i2,
      &                    f8.3,f6.1,i2,f8.3,f4.1,i2)
             else if (kt .le. 2) then
                write (iprm,760)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  760          format ('torsion5',2x,4i5,6x,2(f11.3,f7.1,i3))
+  760          format ('torsion',3x,4i5,6x,2(f11.3,f7.1,i3))
             else
                write (iprm,770)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  770          format ('torsion5',2x,4i5,3x,6(f8.3,f6.1,i2))
+  770          format ('torsion',3x,4i5,3x,6(f8.3,f6.1,i2))
             end if
-         else if (keyword(1:9) .eq. 'TORSION4 ') then
+         else if (keyword(1:9) .eq. 'TORSION5 ') then
             ia = 0
             ib = 0
             ic = 0
@@ -644,23 +634,54 @@ c
             if (kt.eq.3 .and. st(1).eq.0.0d0 .and. st(2).eq.180.0d0
      &                  .and. st(3).eq.0.0d0) then
                write (iprm,790)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  790          format ('torsion4',2x,4i5,3x,f8.3,f4.1,i2,
+  790          format ('torsion5',2x,4i5,3x,f8.3,f4.1,i2,
      &                    f8.3,f6.1,i2,f8.3,f4.1,i2)
             else if (kt .le. 2) then
                write (iprm,800)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  800          format ('torsion4',2x,4i5,6x,2(f11.3,f7.1,i3))
+  800          format ('torsion5',2x,4i5,6x,2(f11.3,f7.1,i3))
             else
                write (iprm,810)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
-  810          format ('torsion4',2x,4i5,3x,6(f8.3,f6.1,i2))
+  810          format ('torsion5',2x,4i5,3x,6(f8.3,f6.1,i2))
+            end if
+         else if (keyword(1:9) .eq. 'TORSION4 ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            do j = 1, 6
+               vt(j) = 0.0d0
+               st(j) = 0.0d0
+               ft(j) = 0
+            end do
+            read (string,*,err=820,end=820)  ia,ib,ic,id,
+     &                                       (vt(j),st(j),ft(j),j=1,6)
+  820       continue
+            kt = 0
+            do j = 1, 6
+               if (ft(j) .ne. 0) then
+                  kt = j
+               end if
+            end do
+            if (kt.eq.3 .and. st(1).eq.0.0d0 .and. st(2).eq.180.0d0
+     &                  .and. st(3).eq.0.0d0) then
+               write (iprm,830)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
+  830          format ('torsion4',2x,4i5,3x,f8.3,f4.1,i2,
+     &                    f8.3,f6.1,i2,f8.3,f4.1,i2)
+            else if (kt .le. 2) then
+               write (iprm,840)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
+  840          format ('torsion4',2x,4i5,6x,2(f11.3,f7.1,i3))
+            else
+               write (iprm,850)  ia,ib,ic,id,(vt(j),st(j),ft(j),j=1,kt)
+  850          format ('torsion4',2x,4i5,3x,6(f8.3,f6.1,i2))
             end if
          else if (keyword(1:7) .eq. 'PITORS ') then
             ia = 0
             ib = 0
             pt = 0.0d0
-            read (string,*,err=820,end=820)  ia,ib,pt
-  820       continue
-            write (iprm,830)  ia,ib,pt
-  830       format ('pitors',4x,2i5,5x,f11.2)
+            read (string,*,err=860,end=860)  ia,ib,pt
+  860       continue
+            write (iprm,870)  ia,ib,pt
+  870       format ('pitors',4x,2i5,5x,f11.2)
          else if (keyword(1:8) .eq. 'STRTORS ') then
             ia = 0
             ib = 0
@@ -675,12 +696,12 @@ c
             bt7 = 0.0d0
             bt8 = 0.0d0
             bt9 = 0.0d0
-            read (string,*,err=840,end=840)  ia,ib,ic,id,bt1,bt2,bt3,
+            read (string,*,err=880,end=880)  ia,ib,ic,id,bt1,bt2,bt3,
      &                                       bt4,bt5,bt6,bt7,bt8,bt9
-  840       continue
-            write (iprm,850)  ia,ib,ic,id,bt1,bt2,bt3,
+  880       continue
+            write (iprm,890)  ia,ib,ic,id,bt1,bt2,bt3,
      &                        bt4,bt5,bt6,bt7,bt8,bt9
-  850       format ('strtors',3x,4i5,1x,9f8.3)
+  890       format ('strtors',3x,4i5,1x,9f8.3)
          else if (keyword(1:8) .eq. 'ANGTORS ') then
             ia = 0
             ib = 0
@@ -692,11 +713,11 @@ c
             at4 = 0.0d0
             at5 = 0.0d0
             at6 = 0.0d0
-            read (string,*,err=860,end=860)  ia,ib,ic,id,at1,at2,
+            read (string,*,err=900,end=900)  ia,ib,ic,id,at1,at2,
      &                                       at3,at4,at5,at6
-  860       continue
-            write (iprm,870)  ia,ib,ic,id,at1,at2,at3,at4,at5,at6
-  870       format ('angtors',3x,4i5,1x,6f8.3)
+  900       continue
+            write (iprm,910)  ia,ib,ic,id,at1,at2,at3,at4,at5,at6
+  910       format ('angtors',3x,4i5,1x,6f8.3)
          else if (keyword(1:8) .eq. 'TORTORS ') then
             ia = 0
             ib = 0
@@ -705,45 +726,27 @@ c
             ie = 0
             nx = 0
             ny = 0
-            read (string,*,err=880,end=880)  ia,ib,ic,id,ie,nx,ny
-  880       continue
-            write (iprm,890)  ia,ib,ic,id,ie,nx,ny
-  890       format ('tortors',3x,5i5,5x,2i5)
+            read (string,*,err=920,end=920)  ia,ib,ic,id,ie,nx,ny
+  920       continue
+            write (iprm,930)  ia,ib,ic,id,ie,nx,ny
+  930       format ('tortors',3x,5i5,5x,2i5)
             nxy = nx * ny
             do j = 1, nxy
                i = i + 1
                record = prmline(i)
-               read (record,*,err=900,end=900)  tx,ty,tf
-  900          continue
-               write (iprm,910)  tx,ty,tf
-  910          format (f8.1,1x,f8.1,1x,f11.5)
+               read (record,*,err=940,end=940)  tx,ty,tf
+  940          continue
+               write (iprm,950)  tx,ty,tf
+  950          format (f8.1,1x,f8.1,1x,f11.5)
             end do
          else if (keyword(1:7) .eq. 'CHARGE ') then
             ia = 0
             cg = 0.0d0
-            read (string,*,err=920,end=920)  ia,cg
-  920       continue
-            write (iprm,930)  ia,cg
-  930       format ('charge',4x,i5,10x,f11.4)
-         else if (keyword(1:7) .eq. 'DIPOLE ') then
-            ia = 0
-            ib = 0
-            dp = 0.0d0
-            ps = 0.5d0
-            read (string,*,err=940,end=940)  ia,ib,dp,ps
-  940       continue
-            write (iprm,950)  ia,ib,dp,ps
-  950       format ('dipole',4x,2i5,5x,f11.4,f11.3)
-         else if (keyword(1:8) .eq. 'DIPOLE5 ') then
-            ia = 0
-            ib = 0
-            dp = 0.0d0
-            ps = 0.5d0
-            read (string,*,err=960,end=960)  ia,ib,dp,ps
+            read (string,*,err=960,end=960)  ia,cg
   960       continue
-            write (iprm,970)  ia,ib,dp,ps
-  970       format ('dipole5',3x,2i5,5x,f11.4,f11.3)
-         else if (keyword(1:8) .eq. 'DIPOLE4 ') then
+            write (iprm,970)  ia,cg
+  970       format ('charge',4x,i5,10x,f11.4)
+         else if (keyword(1:7) .eq. 'DIPOLE ') then
             ia = 0
             ib = 0
             dp = 0.0d0
@@ -751,8 +754,8 @@ c
             read (string,*,err=980,end=980)  ia,ib,dp,ps
   980       continue
             write (iprm,990)  ia,ib,dp,ps
-  990       format ('dipole4',3x,2i5,5x,f11.4,f11.3)
-         else if (keyword(1:8) .eq. 'DIPOLE3 ') then
+  990       format ('dipole',4x,2i5,5x,f11.4,f11.3)
+         else if (keyword(1:8) .eq. 'DIPOLE5 ') then
             ia = 0
             ib = 0
             dp = 0.0d0
@@ -760,50 +763,76 @@ c
             read (string,*,err=1000,end=1000)  ia,ib,dp,ps
  1000       continue
             write (iprm,1010)  ia,ib,dp,ps
- 1010       format ('dipole3',3x,2i5,5x,f11.4,f11.3)
+ 1010       format ('dipole5',3x,2i5,5x,f11.4,f11.3)
+         else if (keyword(1:8) .eq. 'DIPOLE4 ') then
+            ia = 0
+            ib = 0
+            dp = 0.0d0
+            ps = 0.5d0
+            read (string,*,err=1020,end=1020)  ia,ib,dp,ps
+ 1020       continue
+            write (iprm,1030)  ia,ib,dp,ps
+ 1030       format ('dipole4',3x,2i5,5x,f11.4,f11.3)
+         else if (keyword(1:8) .eq. 'DIPOLE3 ') then
+            ia = 0
+            ib = 0
+            dp = 0.0d0
+            ps = 0.5d0
+            read (string,*,err=1040,end=1040)  ia,ib,dp,ps
+ 1040       continue
+            write (iprm,1050)  ia,ib,dp,ps
+ 1050       format ('dipole3',3x,2i5,5x,f11.4,f11.3)
          else if (keyword(1:10) .eq. 'MULTIPOLE ') then
             ia = 0
             ib = 0
             ic = 0
             id = 0
             pl = 0.0d0
-            read (string,*,err=1020,end=1020)  ia,ib,ic,id,pl
-            goto 1030
- 1020       continue
+            read (string,*,err=1060,end=1060)  ia,ib,ic,id,pl
+            goto 1070
+ 1060       continue
             id = 0
-            read (string,*,err=1030,end=1030)  ia,ib,ic,pl
- 1030       continue
+            read (string,*,err=1070,end=1070)  ia,ib,ic,pl
+ 1070       continue
             if (id .eq. 0) then
-               write (iprm,1040)  ia,ib,ic,pl
- 1040          format ('multipole',1x,3i5,11x,f11.5)
+               write (iprm,1080)  ia,ib,ic,pl
+ 1080          format ('multipole',1x,3i5,11x,f11.5)
             else
-               write (iprm,1050)  ia,ib,ic,id,pl
- 1050          format ('multipole',1x,4i5,6x,f11.5)
+               write (iprm,1090)  ia,ib,ic,id,pl
+ 1090          format ('multipole',1x,4i5,6x,f11.5)
             end if
             i = i + 1
             record = prmline(i)
-            read (record,*,err=1060,end=1060)  pl1,pl2,pl3
- 1060       continue
-            write (iprm,1070)  pl1,pl2,pl3
- 1070       format (36x,3f11.5)
-            i = i + 1
-            record = prmline(i)
-            read (record,*,err=1080,end=1080)  pl1
- 1080       continue
-            write (iprm,1090)  pl1
- 1090       format (36x,f11.5)
-            i = i + 1
-            record = prmline(i)
-            read (record,*,err=1100,end=1100)  pl1,pl2
+            read (record,*,err=1100,end=1100)  pl1,pl2,pl3
  1100       continue
-            write (iprm,1110)  pl1,pl2
- 1110       format (36x,2f11.5)
+            write (iprm,1110)  pl1,pl2,pl3
+ 1110       format (36x,3f11.5)
             i = i + 1
             record = prmline(i)
-            read (record,*,err=1120,end=1120)  pl1,pl2,pl3
+            read (record,*,err=1120,end=1120)  pl1
  1120       continue
-            write (iprm,1130)  pl1,pl2,pl3
- 1130       format (36x,3f11.5)
+            write (iprm,1130)  pl1
+ 1130       format (36x,f11.5)
+            i = i + 1
+            record = prmline(i)
+            read (record,*,err=1140,end=1140)  pl1,pl2
+ 1140       continue
+            write (iprm,1150)  pl1,pl2
+ 1150       format (36x,2f11.5)
+            i = i + 1
+            record = prmline(i)
+            read (record,*,err=1160,end=1160)  pl1,pl2,pl3
+ 1160       continue
+            write (iprm,1170)  pl1,pl2,pl3
+ 1170       format (36x,3f11.5)
+         else if (keyword(1:7) .eq. 'CHGPEN ') then
+            ia = 0
+            pel = 0.0d0
+            pal = 0.0d0
+            read (string,*,err=1180,end=1180)  ia,pel,pal
+ 1180       continue
+            write (iprm,1190)  ia,pel,pal
+ 1190       format ('chgpen',4x,i5,5x,2f11.4)
          else if (keyword(1:9) .eq. 'POLARIZE ') then
             ia = 0
             pol = 0.0d0
@@ -811,9 +840,9 @@ c
             do j = 1, 20
                ig(j) = 0
             end do
-            read (string,*,err=1140,end=1140)  ia,pol,thl,
+            read (string,*,err=1200,end=1200)  ia,pol,thl,
      &                                         (ig(j),j=1,20)
- 1140       continue
+ 1200       continue
             kg = 0
             do j = 1, maxval
                if (ig(j) .ne. 0) then
@@ -821,70 +850,78 @@ c
                end if
             end do
             call sort (kg,ig)
-            write (iprm,1150)  ia,pol,thl,(ig(j),j=1,kg)
- 1150       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
+            write (iprm,1210)  ia,pol,thl,(ig(j),j=1,kg)
+ 1210       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
+         else if (keyword(1:7) .eq. 'CHGTRN ') then
+            ia = 0
+            ctrn = 0.0d0
+            atrn = 0.0d0
+            read (string,*,err=1220,end=1220)  ia,ctrn,atrn
+ 1220       continue
+            write (iprm,1230)  ia,ctrn,atrn
+ 1230       format ('chgtrn',4x,i5,5x,2f11.4)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             el = 0.0d0
             iz = 0.0d0
             rp = 0.0d0
-            read (string,*,err=1160,end=1160)  ia,el,iz,rp
- 1160       continue
-            write (iprm,1170)  ia,el,iz,rp
- 1170       format ('piatom',4x,i5,10x,f11.1,2f11.3)
+            read (string,*,err=1240,end=1240)  ia,el,iz,rp
+ 1240       continue
+            write (iprm,1250)  ia,el,iz,rp
+ 1250       format ('piatom',4x,i5,10x,f11.1,2f11.3)
          else if (keyword(1:7) .eq. 'PIBOND ') then
             ia = 0
             ib = 0
             ss = 0.0d0
             ts = 0.0d0
-            read (string,*,err=1180,end=1180)  ia,ib,ss,ts
- 1180       continue
-            write (iprm,1190)  ia,ib,ss,ts
- 1190       format ('pibond',4x,2i5,5x,f11.3,f11.4)
+            read (string,*,err=1260,end=1260)  ia,ib,ss,ts
+ 1260       continue
+            write (iprm,1270)  ia,ib,ss,ts
+ 1270       format ('pibond',4x,2i5,5x,f11.3,f11.4)
          else if (keyword(1:8) .eq. 'PIBOND5 ') then
             ia = 0
             ib = 0
             ss = 0.0d0
             ts = 0.0d0
-            read (string,*,err=1200,end=1200)  ia,ib,ss,ts
- 1200       continue
-            write (iprm,1210)  ia,ib,ss,ts
- 1210       format ('pibond5',3x,2i5,5x,f11.3,f11.4)
+            read (string,*,err=1280,end=1280)  ia,ib,ss,ts
+ 1280       continue
+            write (iprm,1290)  ia,ib,ss,ts
+ 1290       format ('pibond5',3x,2i5,5x,f11.3,f11.4)
          else if (keyword(1:8) .eq. 'PIBOND4 ') then
             ia = 0
             ib = 0
             ss = 0.0d0
             ts = 0.0d0
-            read (string,*,err=1220,end=1220)  ia,ib,ss,ts
- 1220       continue
-            write (iprm,1230)  ia,ib,ss,ts
- 1230       format ('pibond4',3x,2i5,5x,f11.3,f11.4)
+            read (string,*,err=1300,end=1300)  ia,ib,ss,ts
+ 1300       continue
+            write (iprm,1310)  ia,ib,ss,ts
+ 1310       format ('pibond4',3x,2i5,5x,f11.3,f11.4)
          else if (keyword(1:6) .eq. 'METAL ') then
             ia = 0
             call getnumb (record,ia,next)
-            write (iprm,1240)  ia,record(next:length)
- 1240       format ('metal',5x,i5,a)
+            write (iprm,1320)  ia,record(next:length)
+ 1320       format ('metal',5x,i5,a)
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
             sym = '   '
             note = '                        '
-            read (string,*,err=1250,end=1250)  ia
+            read (string,*,err=1330,end=1330)  ia
             call getword (record,sym,next)
             call getstring (record,note,next)
             string = record(next:240)
-            read (string,*,err=1250,end=1250)  ib
- 1250       continue
+            read (string,*,err=1330,end=1330)  ib
+ 1330       continue
             length = trimtext(note)
             string = '"'//note(1:length)//'"'//blank
-            write (iprm,1260)  ia,sym,string(1:30),ib
- 1260       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
+            write (iprm,1340)  ia,sym,string(1:30),ib
+ 1340       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
          else if (length .eq. 0) then
-            write (iprm,1270)
- 1270       format ()
+            write (iprm,1350)
+ 1350       format ()
          else
-            write (iprm,1280)  record(1:length)
- 1280       format (a)
+            write (iprm,1360)  record(1:length)
+ 1360       format (a)
          end if
       end do
       return
@@ -1067,6 +1104,18 @@ c
             call prmsort (2,ia,ib,0,0,0)
             write (iprm,100)  ia,ib,record(next:length)
   100       format ('hbond',5x,2i5,a)
+         else if (keyword(1:10) .eq. 'REPULSION ') then
+            ia = 0
+            call getnumb (record,ia,next)
+            ia = iclass(ia)
+            write (iprm,110)  ia,record(next:length)
+  110       format ('repulsion',1x,i5,a)
+         else if (keyword(1:11) .eq. 'DISPERSION ') then
+            ia = 0
+            call getnumb (record,ia,next)
+            ia = iclass(ia)
+            write (iprm,120)  ia,record(next:length)
+  120       format ('dispersion',i5,a)
          else if (keyword(1:5) .eq. 'BOND ') then
             ia = 0
             ib = 0
@@ -1075,8 +1124,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,110)  ia,ib,record(next:length)
-  110       format ('bond',6x,2i5,a)
+            write (iprm,130)  ia,ib,record(next:length)
+  130       format ('bond',6x,2i5,a)
          else if (keyword(1:6) .eq. 'BOND5 ') then
             ia = 0
             ib = 0
@@ -1085,8 +1134,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,120)  ia,ib,record(next:length)
-  120       format ('bond5',5x,2i5,a)
+            write (iprm,140)  ia,ib,record(next:length)
+  140       format ('bond5',5x,2i5,a)
          else if (keyword(1:6) .eq. 'BOND4 ') then
             ia = 0
             ib = 0
@@ -1095,8 +1144,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,130)  ia,ib,record(next:length)
-  130       format ('bond4',5x,2i5,a)
+            write (iprm,150)  ia,ib,record(next:length)
+  150       format ('bond4',5x,2i5,a)
          else if (keyword(1:6) .eq. 'BOND3 ') then
             ia = 0
             ib = 0
@@ -1105,8 +1154,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,140)  ia,ib,record(next:length)
-  140       format ('bond3',5x,2i5,a)
+            write (iprm,160)  ia,ib,record(next:length)
+  160       format ('bond3',5x,2i5,a)
          else if (keyword(1:9) .eq. 'ELECTNEG ') then
             ia = 0
             ib = 0
@@ -1117,8 +1166,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             ic = iclass(ic)
-            write (iprm,150)  ia,ib,ic,record(next:length)
-  150       format ('electneg',2x,3i5,a)
+            write (iprm,170)  ia,ib,ic,record(next:length)
+  170       format ('electneg',2x,3i5,a)
          else if (keyword(1:6) .eq. 'ANGLE ') then
             ia = 0
             ib = 0
@@ -1130,8 +1179,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,160)  ia,ib,ic,record(next:length)
-  160       format ('angle',5x,3i5,a)
+            write (iprm,180)  ia,ib,ic,record(next:length)
+  180       format ('angle',5x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLE5 ') then
             ia = 0
             ib = 0
@@ -1143,8 +1192,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,170)  ia,ib,ic,record(next:length)
-  170       format ('angle5',4x,3i5,a)
+            write (iprm,190)  ia,ib,ic,record(next:length)
+  190       format ('angle5',4x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLE4 ') then
             ia = 0
             ib = 0
@@ -1156,8 +1205,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,180)  ia,ib,ic,record(next:length)
-  180       format ('angle4',4x,3i5,a)
+            write (iprm,200)  ia,ib,ic,record(next:length)
+  200       format ('angle4',4x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLE3 ') then
             ia = 0
             ib = 0
@@ -1169,8 +1218,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,190)  ia,ib,ic,record(next:length)
-  190       format ('angle3',4x,3i5,a)
+            write (iprm,210)  ia,ib,ic,record(next:length)
+  210       format ('angle3',4x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGLEF ') then
             ia = 0
             ib = 0
@@ -1182,8 +1231,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,200)  ia,ib,ic,record(next:length)
-  200       format ('anglef',4x,3i5,a)
+            write (iprm,220)  ia,ib,ic,record(next:length)
+  220       format ('anglef',4x,3i5,a)
          else if (keyword(1:7) .eq. 'STRBND ') then
             ia = 0
             ib = 0
@@ -1194,8 +1243,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             ic = iclass(ic)
-            write (iprm,210)  ia,ib,ic,record(next:length)
-  210       format ('strbnd',4x,3i5,a)
+            write (iprm,230)  ia,ib,ic,record(next:length)
+  230       format ('strbnd',4x,3i5,a)
          else if (keyword(1:9) .eq. 'UREYBRAD ') then
             ia = 0
             ib = 0
@@ -1207,14 +1256,14 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,220)  ia,ib,ic,record(next:length)
-  220       format ('ureybrad',2x,3i5,a)
+            write (iprm,240)  ia,ib,ic,record(next:length)
+  240       format ('ureybrad',2x,3i5,a)
          else if (keyword(1:7) .eq. 'ANGANG ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,230)  ia,record(next:length)
-  230       format ('angang',4x,i5,a)
+            write (iprm,250)  ia,record(next:length)
+  250       format ('angang',4x,i5,a)
          else if (keyword(1:7) .eq. 'OPBEND ') then
             ia = 0
             ib = 0
@@ -1229,8 +1278,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (2,ic,id,0,0,0)
-            write (iprm,240)  ia,ib,ic,id,record(next:length)
-  240       format ('opbend',4x,4i5,a)
+            write (iprm,260)  ia,ib,ic,id,record(next:length)
+  260       format ('opbend',4x,4i5,a)
          else if (keyword(1:7) .eq. 'OPDIST ') then
             ia = 0
             ib = 0
@@ -1247,8 +1296,8 @@ c
             call prmsort (2,ib,ic,0,0,0)
             call prmsort (2,ib,id,0,0,0)
             call prmsort (2,ic,id,0,0,0)
-            write (iprm,250)  ia,ib,ic,id,record(next:length)
-  250       format ('opdist',4x,4i5,a)
+            write (iprm,270)  ia,ib,ic,id,record(next:length)
+  270       format ('opdist',4x,4i5,a)
          else if (keyword(1:9) .eq. 'IMPROPER ') then
             ia = 0
             ib = 0
@@ -1262,8 +1311,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            write (iprm,260)  ia,ib,ic,id,record(next:length)
-  260       format ('improper',2x,4i5,a)
+            write (iprm,280)  ia,ib,ic,id,record(next:length)
+  280       format ('improper',2x,4i5,a)
          else if (keyword(1:8) .eq. 'IMPTORS ') then
             ia = 0
             ib = 0
@@ -1277,8 +1326,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            write (iprm,270)  ia,ib,ic,id,record(next:length)
-  270       format ('imptors',3x,4i5,a)
+            write (iprm,290)  ia,ib,ic,id,record(next:length)
+  290       format ('imptors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'TORSION ') then
             ia = 0
             ib = 0
@@ -1293,8 +1342,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,280)  ia,ib,ic,id,record(next:length)
-  280       format ('torsion',3x,4i5,a)
+            write (iprm,300)  ia,ib,ic,id,record(next:length)
+  300       format ('torsion',3x,4i5,a)
          else if (keyword(1:9) .eq. 'TORSION5 ') then
             ia = 0
             ib = 0
@@ -1309,8 +1358,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,290)  ia,ib,ic,id,record(next:length)
-  290       format ('torsion5',2x,4i5,a)
+            write (iprm,310)  ia,ib,ic,id,record(next:length)
+  310       format ('torsion5',2x,4i5,a)
          else if (keyword(1:9) .eq. 'TORSION4 ') then
             ia = 0
             ib = 0
@@ -1325,8 +1374,8 @@ c
             ic = iclass(ic)
             id = iclass(id)
             call prmsort (4,ia,ib,ic,id,0)
-            write (iprm,300)  ia,ib,ic,id,record(next:length)
-  300       format ('torsion4',2x,4i5,a)
+            write (iprm,320)  ia,ib,ic,id,record(next:length)
+  320       format ('torsion4',2x,4i5,a)
          else if (keyword(1:7) .eq. 'PITORS ') then
             ia = 0
             ib = 0
@@ -1335,8 +1384,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,310)  ia,ib,record(next:length)
-  310       format ('pitors',4x,2i5,a)
+            write (iprm,330)  ia,ib,record(next:length)
+  330       format ('pitors',4x,2i5,a)
          else if (keyword(1:8) .eq. 'STRTORS ') then
             ia = 0
             ib = 0
@@ -1350,8 +1399,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            write (iprm,320)  ia,ib,ic,id,record(next:length)
-  320       format ('strtors',3x,4i5,a)
+            write (iprm,340)  ia,ib,ic,id,record(next:length)
+  340       format ('strtors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'ANGTORS ') then
             ia = 0
             ib = 0
@@ -1365,8 +1414,8 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             id = iclass(id)
-            write (iprm,330)  ia,ib,ic,id,record(next:length)
-  330       format ('angtors',3x,4i5,a)
+            write (iprm,350)  ia,ib,ic,id,record(next:length)
+  350       format ('angtors',3x,4i5,a)
          else if (keyword(1:8) .eq. 'TORTORS ') then
             ia = 0
             ib = 0
@@ -1383,14 +1432,14 @@ c
             ic = iclass(ic)
             id = iclass(id)
             ie = iclass(ie)
-            write (iprm,340)  ia,ib,ic,id,ie,record(next:length)
-  340       format ('tortors',3x,5i5,a)
+            write (iprm,360)  ia,ib,ic,id,ie,record(next:length)
+  360       format ('tortors',3x,5i5,a)
          else if (keyword(1:7) .eq. 'CHARGE ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = itype(ia)
-            write (iprm,350)  ia,record(next:length)
-  350       format ('charge',4x,i5,a)
+            write (iprm,370)  ia,record(next:length)
+  370       format ('charge',4x,i5,a)
          else if (keyword(1:7) .eq. 'DIPOLE ') then
             ia = 0
             ib = 0
@@ -1398,8 +1447,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,360)  ia,ib,record(next:length)
-  360       format ('dipole',4x,2i5,a)
+            write (iprm,380)  ia,ib,record(next:length)
+  380       format ('dipole',4x,2i5,a)
          else if (keyword(1:8) .eq. 'DIPOLE5 ') then
             ia = 0
             ib = 0
@@ -1407,8 +1456,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,370)  ia,ib,record(next:length)
-  370       format ('dipole5',3x,2i5,a)
+            write (iprm,390)  ia,ib,record(next:length)
+  390       format ('dipole5',3x,2i5,a)
          else if (keyword(1:8) .eq. 'DIPOLE4 ') then
             ia = 0
             ib = 0
@@ -1416,8 +1465,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,380)  ia,ib,record(next:length)
-  380       format ('dipole4',3x,2i5,a)
+            write (iprm,400)  ia,ib,record(next:length)
+  400       format ('dipole4',3x,2i5,a)
          else if (keyword(1:8) .eq. 'DIPOLE3 ') then
             ia = 0
             ib = 0
@@ -1425,8 +1474,8 @@ c
             call getnumb (record,ib,next)
             ia = itype(ia)
             ib = itype(ib)
-            write (iprm,390)  ia,ib,record(next:length)
-  390       format ('dipole3',3x,2i5,a)
+            write (iprm,410)  ia,ib,record(next:length)
+  410       format ('dipole3',3x,2i5,a)
          else if (keyword(1:10) .eq. 'MULTIPOLE ') then
             ia = 0
             ib = 0
@@ -1441,12 +1490,18 @@ c
             ic = isign(1,ic) * itype(abs(ic))
             id = isign(1,id) * itype(abs(id))
             if (id .eq. 0) then
-               write (iprm,400)  ia,ib,ic,record(next:length)
-  400          format ('multipole',1x,3i5,a)
+               write (iprm,420)  ia,ib,ic,record(next:length)
+  420          format ('multipole',1x,3i5,a)
             else
-               write (iprm,410)  ia,ib,ic,id,record(next:length)
-  410          format ('multipole',1x,4i5,a)
+               write (iprm,430)  ia,ib,ic,id,record(next:length)
+  430          format ('multipole',1x,4i5,a)
             end if
+         else if (keyword(1:7) .eq. 'CHGPEN ') then
+            ia = 0
+            call getnumb (record,ia,next)
+            ia = iclass(ia)
+            write (iprm,440)  ia,record(next:length)
+  440       format ('chgpen',4x,i5,a)
          else if (keyword(1:9) .eq. 'POLARIZE ') then
             ia = 0
             pol = 0.0d0
@@ -1456,9 +1511,9 @@ c
                ig(j) = 0
             end do
             string = record(next:240)
-            read (string,*,err=420,end=420)  ia,pol,thl,
+            read (string,*,err=450,end=450)  ia,pol,thl,
      &                                       (ig(j),j=1,20)
-  420       continue
+  450       continue
             ia = itype(ia)
             do j = 1, maxval
                if (ig(j) .ne. 0) then
@@ -1467,14 +1522,20 @@ c
                end if
             end do
             call sort (kg,ig)
-            write (iprm,430)  ia,pol,thl,(ig(j),j=1,kg)
-  430       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
+            write (iprm,460)  ia,pol,thl,(ig(j),j=1,kg)
+  460       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
+         else if (keyword(1:7) .eq. 'CHGTRN ') then
+            ia = 0
+            call getnumb (record,ia,next)
+            ia = iclass(ia)
+            write (iprm,470)  ia,record(next:length)
+  470       format ('chgtrn',4x,i5,a)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,440)  ia,record(next:length)
-  440       format ('piatom',4x,i5,a)
+            write (iprm,480)  ia,record(next:length)
+  480       format ('piatom',4x,i5,a)
          else if (keyword(1:7) .eq. 'PIBOND ') then
             ia = 0
             ib = 0
@@ -1483,8 +1544,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,450)  ia,ib,record(next:length)
-  450       format ('pibond',4x,2i5,a)
+            write (iprm,490)  ia,ib,record(next:length)
+  490       format ('pibond',4x,2i5,a)
          else if (keyword(1:8) .eq. 'PIBOND5 ') then
             ia = 0
             ib = 0
@@ -1493,8 +1554,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,460)  ia,ib,record(next:length)
-  460       format ('pibond5',3x,2i5,a)
+            write (iprm,500)  ia,ib,record(next:length)
+  500       format ('pibond5',3x,2i5,a)
          else if (keyword(1:8) .eq. 'PIBOND4 ') then
             ia = 0
             ib = 0
@@ -1503,34 +1564,34 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,470)  ia,ib,record(next:length)
-  470       format ('pibond4',3x,2i5,a)
+            write (iprm,510)  ia,ib,record(next:length)
+  510       format ('pibond4',3x,2i5,a)
          else if (keyword(1:6) .eq. 'METAL ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,480)  ia,record(next:length)
-  480       format ('metal',5x,i5,a)
+            write (iprm,520)  ia,record(next:length)
+  520       format ('metal',5x,i5,a)
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
             string = record(next:240)
-            read (string,*,err=490,end=490)  ia
+            read (string,*,err=530,end=530)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:240)
-            read (string,*,err=490,end=490)  ib
-  490       continue
+            read (string,*,err=530,end=530)  ib
+  530       continue
             if (ib .gt. 0)  ib = itype(ib)
             length = min(30,max(1,59-next))
-            write (iprm,500)  record(8:next)//blank(1:length),ib
-  500       format ('biotype',a,i5)
+            write (iprm,540)  record(8:next)//blank(1:length),ib
+  540       format ('biotype',a,i5)
          else if (length .eq. 0) then
-            write (iprm,510)
-  510       format ()
+            write (iprm,550)
+  550       format ()
          else
-            write (iprm,520)  record(1:length)
-  520       format (a)
+            write (iprm,560)  record(1:length)
+  560       format (a)
          end if
       end do
       return

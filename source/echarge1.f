@@ -67,15 +67,13 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use shunt
       use usage
       use virial
       implicit none
       integer i,j,k
-      integer ii,in,ic,im
-      integer kk,kn,kc,km
+      integer ii,in,ic
+      integer kk,kn,kc
       real*8 e,fgrp,de,dc
       real*8 f,fi,fik
       real*8 r,r2,rb,rb2
@@ -128,7 +126,6 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
-         im = molcule(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
@@ -159,7 +156,6 @@ c
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
-            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -231,7 +227,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
-                  if (im .ne. km)  einter = einter + e
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -399,7 +394,6 @@ c     increment the energy and gradient values
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ec = ec + e
-                     einter = einter + e
                      dec(1,i) = dec(1,i) + dedx
                      dec(2,i) = dec(2,i) + dedy
                      dec(3,i) = dec(3,i) + dedz
@@ -483,16 +477,14 @@ c
       use deriv
       use energi
       use group
-      use inter
       use light
-      use molcul
       use shunt
       use usage
       use virial
       implicit none
       integer i,j,k
-      integer ii,in,ic,im
-      integer kk,kn,kc,km
+      integer ii,in,ic
+      integer kk,kn,kc
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,fgrp,de,dc
@@ -568,7 +560,6 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
-         im = molcule(i)
          xic = xsort(rgx(ii))
          yic = ysort(rgy(ii))
          zic = zsort(rgz(ii))
@@ -623,7 +614,6 @@ c
             k = iion(kmap)
             kn = jion(kmap)
             kc = kion(kmap)
-            km = molcule(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -715,7 +705,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
-                  if (.not.prime .or. im.ne.km)  einter = einter + e
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -804,16 +793,14 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use neigh
       use shunt
       use usage
       use virial
       implicit none
       integer i,j,k,kkk
-      integer ii,in,ic,im
-      integer kk,kn,kc,km
+      integer ii,in,ic
+      integer kk,kn,kc
       real*8 e,fgrp,de,dc
       real*8 f,fi,fik
       real*8 r,r2,rb,rb2
@@ -865,10 +852,10 @@ c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
-!$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
-!$OMP& molcule,ebuffer)
-!$OMP& firstprivate(cscale) shared (ec,einter,dec,vir)
-!$OMP DO reduction(+:ec,einter,dec,vir) schedule(guided)
+!$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,
+!$OMP& f6,f7,ebuffer)
+!$OMP& firstprivate(cscale) shared (ec,dec,vir)
+!$OMP DO reduction(+:ec,dec,vir) schedule(guided)
 c
 c     compute the charge interaction energy and first derivatives
 c
@@ -876,7 +863,6 @@ c
          i = iion(ii)
          in = jion(ii)
          ic = kion(ii)
-         im = molcule(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
@@ -908,7 +894,6 @@ c
             k = iion(kk)
             kn = jion(kk)
             kc = kion(kk)
-            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -980,7 +965,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
-                  if (im .ne. km)  einter = einter + e
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1067,18 +1051,17 @@ c
       use energi
       use ewald
       use group
-      use inter
       use math
-      use molcul
+      use pme
       use shunt
       use usage
       use virial
       implicit none
       integer i,j,k
-      integer ii,in,im
-      integer kk,kn,km
-      real*8 e,de,efull
-      real*8 f,fi,fik,fs
+      integer ii,in
+      integer kk,kn
+      real*8 e,de,f
+      real*8 fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
       real*8 fgrp,term
@@ -1086,7 +1069,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -1105,6 +1088,14 @@ c
          dec(3,i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1166,7 +1157,6 @@ c
       do ii = 1, nion-1
          i = iion(ii)
          in = jion(ii)
-         im = molcule(i)
          usei = use(i)
          xi = x(i)
          yi = y(i)
@@ -1193,7 +1183,6 @@ c
          do kk = ii+1, nion
             k = iion(kk)
             kn = jion(kk)
-            km = molcule(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1218,9 +1207,9 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
-                  de = -fik * ((erfterm+scaleterm)/rb2
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
+                  de = -fik * ((erfterm+scale)/rb2
      &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
 c
 c     form the chain rule terms for derivative expressions
@@ -1233,10 +1222,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
-                  if (im .ne. km) then
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
-                  end if
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1347,9 +1332,9 @@ c
                            scale = scale * cscale(kn)
                         end if
                      end if
-                     scaleterm = scale - 1.0d0
-                     e = (fik/rb) * (erfterm+scaleterm)
-                     de = -fik * ((erfterm+scaleterm)/rb2
+                     scale = scale - 1.0d0
+                     e = (fik/rb) * (erfterm+scale)
+                     de = -fik * ((erfterm+scale)/rb2
      &                       + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
 c
 c     form the chain rule terms for derivative expressions
@@ -1363,8 +1348,6 @@ c     increment the energy and gradient values
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ec = ec + e
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
                      dec(1,i) = dec(1,i) + dedx
                      dec(2,i) = dec(2,i) + dedy
                      dec(3,i) = dec(3,i) + dedz
@@ -1443,21 +1426,20 @@ c
       use energi
       use ewald
       use group
-      use inter
       use light
       use math
-      use molcul
+      use pme
       use shunt
       use usage
       use virial
       implicit none
       integer i,j,k
-      integer ii,in,im
-      integer kk,kn,km
+      integer ii,in
+      integer kk,kn
       integer kgy,kgz,kmap
       integer start,stop
-      real*8 e,de,efull
-      real*8 f,fi,fik,fs
+      real*8 e,de,f
+      real*8 fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
       real*8 fgrp,term
@@ -1465,7 +1447,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -1488,6 +1470,14 @@ c
          dec(3,i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1567,7 +1557,6 @@ c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
-         im = molcule(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
@@ -1618,7 +1607,6 @@ c
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
             kn = jion(kmap)
-            km = molcule(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -1663,9 +1651,9 @@ c
                   if (use_polymer) then
                      if (r2 .gt. polycut2)  fik = fi * pchg(kmap)
                   end if
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
-                  de = -fik * ((erfterm+scaleterm)/rb2
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
+                  de = -fik * ((erfterm+scale)/rb2
      &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
 c
 c     form the chain rule terms for derivative expressions
@@ -1678,10 +1666,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
-                  if (.not.prime .or. im.ne.km) then
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
-                  end if
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -1766,19 +1750,18 @@ c
       use energi
       use ewald
       use group
-      use inter
       use math
-      use molcul
       use neigh
+      use pme
       use shunt
       use usage
       use virial
       implicit none
       integer i,j,k,kkk
-      integer ii,in,im
-      integer kk,kn,km
-      real*8 e,de,efull
-      real*8 f,fi,fik,fs
+      integer ii,in
+      integer kk,kn
+      real*8 e,de,f
+      real*8 fi,fik,fs
       real*8 r,r2,rew
       real*8 rb,rb2
       real*8 fgrp,term
@@ -1786,7 +1769,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -1805,6 +1788,14 @@ c
          dec(3,i) = 0.0d0
       end do
       if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1865,16 +1856,15 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
 !$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c2scale,
-!$OMP& c3scale,c4scale,c5scale,use_group,off2,aewald,molcule,ebuffer)
-!$OMP& firstprivate(cscale) shared (ec,einter,dec,vir)
-!$OMP DO reduction(+:ec,einter,dec,vir) schedule(guided)
+!$OMP& c3scale,c4scale,c5scale,use_group,off2,aewald,ebuffer)
+!$OMP& firstprivate(cscale) shared (ec,dec,vir)
+!$OMP DO reduction(+:ec,dec,vir) schedule(guided)
 c
 c     compute the real space Ewald energy and first derivatives
 c
       do ii = 1, nion
          i = iion(ii)
          in = jion(ii)
-         im = molcule(i)
          usei = use(i)
          xi = x(i)
          yi = y(i)
@@ -1902,7 +1892,6 @@ c
             kk = elst(kkk,ii)
             k = iion(kk)
             kn = jion(kk)
-            km = molcule(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1927,9 +1916,9 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
-                  de = -fik * ((erfterm+scaleterm)/rb2
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
+                  de = -fik * ((erfterm+scale)/rb2
      &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
 c
 c     form the chain rule terms for derivative expressions
@@ -1942,10 +1931,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                   ec = ec + e
-                  if (im .ne. km) then
-                     efull = (fik/rb) * scale
-                     einter = einter + efull
-                  end if
                   dec(1,i) = dec(1,i) + dedx
                   dec(2,i) = dec(2,i) + dedy
                   dec(3,i) = dec(3,i) + dedz
@@ -2022,15 +2007,13 @@ c
       use deriv
       use energi
       use group
-      use inter
       use math
-      use molcul
       use usage
       use warp
       implicit none
       integer i,j,k
-      integer ii,in,im
-      integer kk,kn,km
+      integer ii,in
+      integer kk,kn
       real*8 e,de,fgrp
       real*8 r,r2,rb,rb2
       real*8 f,fi,fik
@@ -2087,7 +2070,6 @@ c
       do ii = 1, nion-1
          i = iion(ii)
          in = jion(ii)
-         im = molcule(i)
          usei = (use(i))
          xi = x(i)
          yi = y(i)
@@ -2114,7 +2096,6 @@ c
          do kk = ii+1, nion
             k = iion(kk)
             kn = jion(kk)
-            km = molcule(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -2191,7 +2172,6 @@ c
 c     increment the overall energy and derivative expressions
 c
                ec = ec + e
-               if (im .ne. km)  einter = einter + e
                dec(1,i) = dec(1,i) + dedx
                dec(2,i) = dec(2,i) + dedy
                dec(3,i) = dec(3,i) + dedz
@@ -2267,7 +2247,7 @@ c
       integer k1,k2,k3
       integer m1,m2,m3
       integer nf1,nf2,nf3
-      integer nff,npoint
+      integer nff,ntot
       integer igrd0,jgrd0,kgrd0
       real*8 e,term,expterm
       real*8 vterm,pterm
@@ -2282,16 +2262,24 @@ c
       real*8 r1,r2,r3
 c
 c
-c     zero out the particle mesh Ewald charge grid
+c     return if the Ewald coefficient is zero
 c
-      do k = 1, nfft3
-         do j = 1, nfft2
-            do i = 1, nfft1
-               qgrid(1,i,j,k) = 0.0d0
-               qgrid(2,i,j,k) = 0.0d0
-            end do
-         end do
-      end do
+      if (aewald .lt. 1.0d-6)  return
+      f = 0.5d0 * electric / dielec
+c
+c     perform dynamic allocation of some global arrays
+c
+      ntot = nfft1 * nfft2 * nfft3
+      if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
+     &   deallocate(qgrid)
+      if (.not. allocated(qgrid))
+     &   allocate (qgrid(2,nfft1,nfft2,nfft3))
+c
+c     setup spatial decomposition, B-splines and PME arrays
+c
+      call getchunk
+      call moduli
+      call fftsetup
 c
 c     get B-spline coefficients and put charges onto grid
 c
@@ -2305,15 +2293,14 @@ c
 c
 c     use scalar sum to get reciprocal space energy and virial
 c
-      f = 0.5d0 * electric / dielec
-      npoint = nfft1 * nfft2 * nfft3
       pterm = (pi/aewald)**2
       volterm = pi * volbox
-      nff = nfft1 * nfft2
       nf1 = (nfft1+1) / 2
       nf2 = (nfft2+1) / 2
       nf3 = (nfft3+1) / 2
-      do i = 1, npoint-1
+      nff = nfft1 * nfft2
+      ntot = nff * nfft3
+      do i = 1, ntot-1
          k3 = i/nff + 1
          j = i - (k3-1)*nff
          k2 = j/nfft1 + 1

@@ -12,9 +12,9 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "testpol" computes the induced dipole moments for direct
-c     polarization, perturbation theory extrapolation (OPT), and
-c     for SCF iterations in order to monitor convergence
+c     "testpol" compares the induced dipoles from direct polarization,
+c     mutual SCF iterations, perturbation theory extrapolation (OPT),
+c     and truncated conjugate gradient (TCG) solvers
 c
 c
       program testpol
@@ -290,7 +290,7 @@ c
       call induce
       do i = 1, n
          do j = 1, 3
-            utcg(j,i) = debye * uindt(j,i)
+            utcg(j,i) = debye * uind(j,i)
          end do
       end do
 c
@@ -403,8 +403,8 @@ c
       delta = 0.0001d0
       write (iout,230)  coptmax
   230 format (/,' Analytical OPT',i1,' Coefficient Refinement :',
-     &        //,4x,'Iter',8x,'C0',8x,'C1',8x,'C2',8x,'C3',
-     &           8x,'C4',6x,'RMS vs Exact',/)
+     &        //,4x,'Iter',7x,'C0',5x,'C1',5x,'C2',5x,'C3',
+     &           5x,'C4',5x,'C5',5x,'C6',5x,'RMS vs Exact',/)
 c
 c     count number of variables and define the initial simplex
 c
@@ -453,8 +453,8 @@ c
             copt(i) = p(miny,nvar)
          end if
       end do
-      write (iout,240)  iter,(copt(i),i=0,maxopt),rxpt
-  240 format (i8,1x,5f10.3,f17.10)
+      write (iout,240)  iter,(copt(i),i=0,6),rxpt
+  240 format (i8,3x,7f7.3,f16.10)
 c
 c     perform deallocation of some local arrays
 c
@@ -496,13 +496,14 @@ c
       use units
       use usage
       implicit none
-      integer i,j,k
-      integer iter,nvar
+      integer i,j,k,iter
+      integer nvar,size
       real*8 optfit
       real*8 rxpt
       real*8 var(*)
       real*8, allocatable :: uxpt(:,:)
       logical first
+      character*1 digit
       save first,iter
       data first  / .true. /
 c
@@ -524,10 +525,9 @@ c
             copt(i) = var(nvar)
          end if
       end do
-      if (coptmax .eq. 1)  poltyp = 'OPT1  '
-      if (coptmax .eq. 2)  poltyp = 'OPT2  '
-      if (coptmax .eq. 3)  poltyp = 'OPT3  '
-      if (coptmax .eq. 4)  poltyp = 'OPT4  '
+      size = 1
+      call numeral (coptmax,digit,size)
+      poltyp = 'OPT'//digit//'  '
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -551,8 +551,8 @@ c              rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**6
       end do
       rxpt = sqrt(rxpt/dble(k))
       if (mod(iter,100) .eq. 0) then
-         write (iout,10)  iter,(copt(i),i=0,maxopt),rxpt
-   10    format (i8,1x,5f10.3,f17.10)
+         write (iout,10)  iter,(copt(i),i=0,6),rxpt
+   10    format (i8,3x,7f7.3,f16.10)
       end if
 c
 c     set the return value equal to the RMS error

@@ -80,7 +80,7 @@ c
          vtot(j) = vtot(j) / totmass
          etrans = etrans + vtot(j)**2
       end do
-      etrans = 0.5d0 * etrans * totmass / convert
+      etrans = 0.5d0 * etrans * totmass / ekcal
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -232,7 +232,7 @@ c
             end do
             erot = erot + vang(i)*mang(i)
          end do
-         erot = 0.5d0 * erot / convert
+         erot = 0.5d0 * erot / ekcal
       end if
 c
 c     eliminate any translation of the overall system

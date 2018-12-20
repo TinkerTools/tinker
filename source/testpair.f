@@ -42,9 +42,9 @@ c
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
-      real*8, allocatable :: dloop(:,:)
-      real*8, allocatable :: dlight(:,:)
-      real*8, allocatable :: dlist(:,:)
+      real*8, allocatable :: gloop(:,:)
+      real*8, allocatable :: glight(:,:)
+      real*8, allocatable :: glist(:,:)
       logical exist,query
       logical header,match
       logical unique,repeat
@@ -89,11 +89,14 @@ c
       npair = 0
       nterm = 0
       if (use_vdw)  nterm = nterm + 1
+      if (use_repuls)  nterm = nterm + 1
+      if (use_disp)  nterm = nterm + 1
       if (use_charge)  nterm = nterm + 1
       if (use_chgdpl)  nterm = nterm + 1
       if (use_dipole)  nterm = nterm + 1
       if (use_mpole)  nterm = nterm + 1
       if (use_polar)  nterm = nterm + 1
+      if (use_chgtrn)  nterm = nterm + 1
       nterm = nterm * ncalls
       off = 5.0d0
       off2 = off * off
@@ -104,9 +107,9 @@ c
       allocate (xsort(lmax))
       allocate (ysort(lmax))
       allocate (zsort(lmax))
-      allocate (dloop(3,n))
-      allocate (dlight(3,n))
-      allocate (dlist(3,n))
+      allocate (gloop(3,n))
+      allocate (glight(3,n))
+      allocate (glist(3,n))
 c
 c     get the timing for setup of double nested loop
 c
@@ -206,6 +209,7 @@ c
       call settime
       do m = 1, ncalls
          dovlst = .true.
+         dodlst = .true.
          doclst = .true.
          domlst = .true.
          doulst = .true.
@@ -218,28 +222,37 @@ c
 c     perform dynamic allocation of some global arrays
 c
       allocate (dev(3,n))
+      allocate (der(3,n))
+      allocate (dedsp(3,n))
       allocate (dec(3,n))
       allocate (decd(3,n))
       allocate (ded(3,n))
       allocate (dem(3,n))
       allocate (dep(3,n))
+      allocate (dect(3,n))
 c
 c     zero out each of the energy and gradient components
 c
       ev = 0.0d0
+      er = 0.0d0
+      edsp = 0.0d0
       ec = 0.0d0
       ecd = 0.0d0
       ed = 0.0d0
       em = 0.0d0
       ep = 0.0d0
+      ect = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
+            der(j,i) = 0.0d0
+            dedsp(j,i) = 0.0d0
             dec(j,i) = 0.0d0
             decd(j,i) = 0.0d0
             ded(j,i) = 0.0d0
             dem(j,i) = 0.0d0
             dep(j,i) = 0.0d0
+            dect(j,i) = 0.0d0
          end do
       end do
 c
@@ -256,25 +269,28 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
+         if (use_repuls)  call erepel
+         if (use_disp)  call edisp
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
          if (use_dipole)  call edipole
          if (use_mpole)  call empole
          if (use_polar)  call epolar
+         if (use_chgtrn)  call echgtrn
       end do
       call gettime (wall,cpu)
       write (iout,110)
   110 format (/,' Potential Energy Only',7x,'Wall',8x,'CPU',
      &           13x,'Evdw',11x,'Eelect')
-      eloop = ev + ec + ecd + ed + em + ep
+      eloop = ev + er + edsp + ec + ecd + ed + em + ep + ect
       if (digits .ge. 8) then
-         write (iout,120)  wall,cpu,ev,eloop-ev
+         write (iout,120)  wall,cpu,ev+er+edsp,eloop-ev-er-edsp
   120    format (/,' Double Nested Loop',3x,2f11.3,2f17.8)
       else if (digits .ge. 6) then
-         write (iout,130)  wall,cpu,ev,eloop-ev
+         write (iout,130)  wall,cpu,ev+er+edsp,eloop-ev-er-edsp
   130    format (/,' Double Nested Loop',3x,2f11.3,2f17.6)
       else
-         write (iout,140)  wall,cpu,ev,eloop-ev
+         write (iout,140)  wall,cpu,ev+er+edsp,eloop-ev-er-edsp
   140    format (/,' Double Nested Loop',3x,2f11.3,2f17.4)
       end if
 c
@@ -291,22 +307,25 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
+         if (use_repuls)  call erepel
+         if (use_disp)  call edisp
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
          if (use_dipole)  call edipole
          if (use_mpole)  call empole
          if (use_polar)  call epolar
+         if (use_chgtrn)  call echgtrn
       end do
       call gettime (wall,cpu)
-      elight = ev + ec + ecd + ed + em + ep
+      elight = ev + er + edsp + ec + ecd + ed + em + ep + ect
       if (digits .ge. 8) then
-         write (iout,150)  wall,cpu,ev,elight-ev
+         write (iout,150)  wall,cpu,ev+er+edsp,elight-ev-er-edsp
   150    format (' Method of Lights',5x,2f11.3,2f17.8)
       else if (digits .ge. 6) then
-         write (iout,160)  wall,cpu,ev,elight-ev
+         write (iout,160)  wall,cpu,ev+er+edsp,elight-ev-er-edsp
   160    format (' Method of Lights',5x,2f11.3,2f17.6)
       else
-         write (iout,170)  wall,cpu,ev,elight-ev
+         write (iout,170)  wall,cpu,ev+er+edsp,elight-ev-er-edsp
   170    format (' Method of Lights',5x,2f11.3,2f17.4)
       end if
 c
@@ -323,22 +342,25 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
+         if (use_repuls)  call erepel
+         if (use_disp)  call edisp
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
          if (use_dipole)  call edipole
          if (use_mpole)  call empole
          if (use_polar)  call epolar
+         if (use_chgtrn)  call echgtrn
       end do
       call gettime (wall,cpu)
-      elist = ev + ec + ecd + ed + em + ep
+      elist = ev + er + edsp + ec + ecd + ed + em + ep + ect
       if (digits .ge. 8) then
-         write (iout,180)  wall,cpu,ev,elist-ev
+         write (iout,180)  wall,cpu,ev+er+edsp,elist-ev-er-edsp
   180    format (' Pair Neighbor List',3x,2f11.3,2f17.8)
       else if (digits .ge. 6) then
-         write (iout,190)  wall,cpu,ev,elist-ev
+         write (iout,190)  wall,cpu,ev+er+edsp,elist-ev-er-edsp
   190    format (' Pair Neighbor List',3x,2f11.3,2f17.6)
       else
-         write (iout,200)  wall,cpu,ev,elist-ev
+         write (iout,200)  wall,cpu,ev+er+edsp,elist-ev-er-edsp
   200    format (' Pair Neighbor List',3x,2f11.3,2f17.4)
       end if
 c
@@ -366,11 +388,14 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
+         if (use_repuls)  call erepel1
+         if (use_disp)  call edisp1
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
          if (use_dipole)  call edipole1
          if (use_mpole)  call empole1
          if (use_polar)  call epolar1
+         if (use_chgtrn)  call echgtrn1
       end do
       call gettime (wall,cpu)
 c
@@ -380,11 +405,12 @@ c
       erms = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dloop(j,i) = dev(j,i) + dec(j,i) + decd(j,i)
-     &                      + ded(j,i) + dem(j,i) + dep(j,i)
-            vrms = vrms + dev(j,i)**2
-            erms = erms + dec(j,i)**2 + decd(j,i)**2
-     &                + ded(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
+            gloop(j,i) = dev(j,i) + der(j,i) + dedsp(j,i)
+     &                      + dec(j,i) + decd(j,i) + ded(j,i)
+     &                      + dem(j,i) + dep(j,i) + dect(j,i)
+            vrms = vrms + dev(j,i)**2 + der(j,i)**2 + dedsp(j,i)**2
+            erms = erms + dec(j,i)**2 + decd(j,i)**2 + ded(j,i)**2
+     &                + dem(j,i)**2 + dep(j,i)**2 + dect(j,i)**2
          end do
       end do
       vrms = sqrt(vrms/dble(n))
@@ -416,11 +442,14 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
+         if (use_repuls)  call erepel1
+         if (use_disp)  call edisp1
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
          if (use_dipole)  call edipole1
          if (use_mpole)  call empole1
          if (use_polar)  call epolar1
+         if (use_chgtrn)  call echgtrn1
       end do
       call gettime (wall,cpu)
 c
@@ -430,11 +459,12 @@ c
       erms = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dlight(j,i) = dev(j,i) + dec(j,i) + decd(j,i)
-     &                       + ded(j,i) + dem(j,i) + dep(j,i)
-            vrms = vrms + dev(j,i)**2
-            erms = erms + dec(j,i)**2 + decd(j,i)**2
-     &                + ded(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
+            glight(j,i) = dev(j,i) + der(j,i) + dedsp(j,i)
+     &                       + dec(j,i) + decd(j,i) + ded(j,i)
+     &                       + dem(j,i) + dep(j,i) + dect(j,i)
+            vrms = vrms + dev(j,i)**2 + der(j,i)**2 + dedsp(j,i)**2
+            erms = erms + dec(j,i)**2 + decd(j,i)**2 + ded(j,i)**2
+     &                + dem(j,i)**2 + dep(j,i)**2 + dect(j,i)**2
          end do
       end do
       vrms = sqrt(vrms/dble(n))
@@ -463,11 +493,14 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
+         if (use_repuls)  call erepel1
+         if (use_disp)  call edisp1
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
          if (use_dipole)  call edipole1
          if (use_mpole)  call empole1
          if (use_polar)  call epolar1
+         if (use_chgtrn)  call echgtrn1
       end do
       call gettime (wall,cpu)
 c
@@ -477,11 +510,12 @@ c
       erms = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dlist(j,i) = dev(j,i) + dec(j,i) + decd(j,i)
-     &                      + ded(j,i) + dem(j,i) + dep(j,i)
-            vrms = vrms + dev(j,i)**2
-            erms = erms + dec(j,i)**2 + decd(j,i)**2
-     &                + ded(j,i)**2 + dem(j,i)**2 + dep(j,i)**2
+            glist(j,i) = dev(j,i) + der(j,i) + dedsp(j,i)
+     &                      + dec(j,i) + decd(j,i) + ded(j,i)
+     &                      + dem(j,i) + dep(j,i) + dect(j,i)
+            vrms = vrms + dev(j,i)**2 + der(j,i)**2 + dedsp(j,i)**2
+            erms = erms + dec(j,i)**2 + decd(j,i)**2 + ded(j,i)**2
+     &                + dem(j,i)**2 + dep(j,i)**2 + dect(j,i)**2
          end do
       end do
       vrms = sqrt(vrms/dble(n))
@@ -503,8 +537,8 @@ c
       header = .true.
       do i = 1, n
          do j = 1, 3
-            if (abs(dlight(j,i)-dloop(j,i)).gt.delta .or.
-     &          abs(dlist(j,i)-dloop(j,i)).gt.delta) then
+            if (abs(glight(j,i)-gloop(j,i)).gt.delta .or.
+     &          abs(glist(j,i)-gloop(j,i)).gt.delta) then
                if (header) then
                   match = .false.
                   header = .false.
@@ -515,16 +549,16 @@ c
      &                       14x,'List',/)
                end if
                if (digits .ge. 8) then
-                  write (iout,330)  i,axis(j),dloop(j,i),dlight(j,i),
-     &                              dlist(j,i)
+                  write (iout,330)  i,axis(j),gloop(j,i),glight(j,i),
+     &                              glist(j,i)
   330             format (10x,i6,' (',a1,')',3f18.8)
                else if (digits .ge. 6) then
-                  write (iout,340)  i,axis(j),dloop(j,i),dlight(j,i),
-     &                              dlist(j,i)
+                  write (iout,340)  i,axis(j),gloop(j,i),glight(j,i),
+     &                              glist(j,i)
   340             format (10x,i6,' (',a1,')',3f18.6)
                else
-                  write (iout,350)  i,axis(j),dloop(j,i),dlight(j,i),
-     &                              dlist(j,i)
+                  write (iout,350)  i,axis(j),gloop(j,i),glight(j,i),
+     &                              glist(j,i)
   350             format (10x,i6,' (',a1,')',3f18.4)
                end if
             end if
@@ -540,9 +574,9 @@ c
       deallocate (xsort)
       deallocate (ysort)
       deallocate (zsort)
-      deallocate (dloop)
-      deallocate (dlight)
-      deallocate (dlist)
+      deallocate (gloop)
+      deallocate (glight)
+      deallocate (glist)
 c
 c     perform any final tasks before program exit
 c
@@ -576,20 +610,24 @@ c
       if (mode .eq. 'LIST') then
          use_list = .true.
          use_vlist = .true.
+         use_dlist = .true.
          use_clist = .true.
          use_mlist = .true.
          use_ulist = .true.
          dovlst = .true.
+         dodlst = .true.
          doclst = .true.
          domlst = .true.
          doulst = .true.
       else
          use_list = .false.
          use_vlist = .false.
+         use_dlist = .false.
          use_clist = .false.
          use_mlist = .false.
          use_ulist = .false.
          dovlst = .false.
+         dodlst = .false.
          doclst = .false.
          domlst = .false.
          doulst = .false.
@@ -620,22 +658,19 @@ c
          if (.not.allocated(zvold))  allocate (zvold(n))
          if (.not.allocated(nelst))  allocate (nelst(n))
          if (.not.allocated(elst))  allocate (elst(maxelst,n))
-         if (.not.allocated(xcold))  allocate (xcold(n))
-         if (.not.allocated(ycold))  allocate (ycold(n))
-         if (.not.allocated(zcold))  allocate (zcold(n))
-         if (.not.allocated(xmold))  allocate (xmold(n))
-         if (.not.allocated(ymold))  allocate (ymold(n))
-         if (.not.allocated(zmold))  allocate (zmold(n))
-         if (poltyp .eq. 'MUTUAL') then
-            if (.not.allocated(tindex))  allocate (tindex(2,n*maxelst))
-            if (.not.allocated(tdipdip))
-     &         allocate (tdipdip(6,n*maxelst))
-         end if
+         if (.not.allocated(xeold))  allocate (xeold(n))
+         if (.not.allocated(yeold))  allocate (yeold(n))
+         if (.not.allocated(zeold))  allocate (zeold(n))
          if (.not.allocated(nulst))  allocate (nulst(n))
          if (.not.allocated(ulst))  allocate (ulst(maxulst,n))
          if (.not.allocated(xuold))  allocate (xuold(n))
          if (.not.allocated(yuold))  allocate (yuold(n))
          if (.not.allocated(zuold))  allocate (zuold(n))
+         if (poltyp .eq. 'MUTUAL') then
+            if (.not.allocated(tindex))  allocate (tindex(2,n*maxelst))
+            if (.not.allocated(tdipdip))
+     &         allocate (tdipdip(6,n*maxelst))
+         end if
       end if
 c
 c     generate the pair neighbor lists if they are in use

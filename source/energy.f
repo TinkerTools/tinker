@@ -45,12 +45,15 @@ c
       eat = 0.0d0
       ett = 0.0d0
       ev = 0.0d0
+      er = 0.0d0
+      edsp = 0.0d0
       ec = 0.0d0
       ecd = 0.0d0
       ed = 0.0d0
       em = 0.0d0
       ep = 0.0d0
-      er = 0.0d0
+      ect = 0.0d0
+      erxf = 0.0d0
       es = 0.0d0
       elf = 0.0d0
       eg = 0.0d0
@@ -99,6 +102,8 @@ c
          if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss
       end if
+      if (use_repuls)  call erepel
+      if (use_disp)  call edisp
 c
 c     call the electrostatic energy component routines
 c
@@ -107,6 +112,7 @@ c
       if (use_dipole)  call edipole
       if (use_mpole)  call empole
       if (use_polar)  call epolar
+      if (use_chgtrn)  call echgtrn
       if (use_rxnfld)  call erxnfld
 c
 c     call any miscellaneous energy component routines
@@ -119,8 +125,9 @@ c
 c     sum up to give the total potential energy
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
-     &          + et + ept + ebt + eat + ett + ev + ec + ecd + ed
-     &          + em + ep + er + es + elf + eg + ex
+     &          + et + ept + ebt + eat + ett + ev + er + edsp
+     &          + ec + ecd + ed + em + ep + ect + erxf + es + elf
+     &          + eg + ex
       energy = esum
 c
 c     check for an illegal value for the total energy

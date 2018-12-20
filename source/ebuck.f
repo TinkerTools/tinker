@@ -23,6 +23,7 @@ c
       use warp
       implicit none
       real*8 elrc
+      character*6 mode
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -45,7 +46,8 @@ c
 c     apply long range van der Waals correction if desired
 c
       if (use_vcorr) then
-         call evcorr (elrc)
+         mode = 'VDW'
+         call evcorr (mode,elrc)
          ev = ev + elrc
       end if
       return
@@ -719,6 +721,16 @@ c
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
+!$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,abuck,
+!$OMP& bbuck,cbuck,expcut2,expmerge,cut2,c0,c1,c2,c3,c4,c5)
+!$OMP& firstprivate(vscale,iv14) shared(ev)
+!$OMP DO reduction(+:ev) schedule(guided)
+c
 c     find the van der Waals energy via neighbor list search
 c
       do ii = 1, nvdw
@@ -824,6 +836,11 @@ c
             vscale(i15(j,i)) = 1.0d0
          end do
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c

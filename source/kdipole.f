@@ -72,18 +72,18 @@ c
                      write (iout,20)
    20                format (/,' Additional Bond Dipole Moment ',
      &                          'Parameters :',
-     &                       //,5x,'Atom Types',9x,'Moment',
-     &                          5x,'Position',/)
+     &                       //,5x,'Atom Types',13x,'Moment',
+     &                          8x,'Position',/)
                   end if
                   if (iring .eq. 0) then
                      write (iout,30)  ia,ib,dp,ps
-   30                format (6x,2i4,4x,2f12.3)
+   30                format (6x,2i4,5x,2f15.3)
                   else
                      if (iring .eq. 5)  label = '5-Ring'
                      if (iring .eq. 4)  label = '4-Ring'
                      if (iring .eq. 3)  label = '3-Ring'
                      write (iout,40)  ia,ib,dp,ps,label
-   40                format (6x,2i4,4x,2f12.3,3x,a6)
+   40                format (6x,2i4,5x,2f15.3,3x,a6)
                   end if
                end if
                size = 4
@@ -320,8 +320,8 @@ c
                   write (iout,120)
   120             format (/,' Additional Bond Dipoles for',
      &                       ' Specific Bonds :',
-     &                    //,5x,'Bonded Atoms',7x,'Moment',
-     &                          5x,'Position',/)
+     &                    //,5x,'Bonded Atoms',11x,'Moment',
+     &                          8x,'Position',/)
                end if
                do j = 1, n12(ia)
                   if (i12(j,ia) .eq. ib) then
@@ -336,7 +336,7 @@ c
                      end if
                      if (.not. silent) then
                         write (iout,130)  ia,ib,dp,ps
-  130                   format (4x,i5,' -',i5,2x,2f12.3)
+  130                   format (4x,i5,' -',i5,3x,2f15.3)
                      end if
                      goto 140
                   end if

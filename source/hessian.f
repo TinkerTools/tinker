@@ -145,15 +145,18 @@ c
                if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal2 (i)
                if (vdwtyp .eq. 'GAUSSIAN')  call egauss2 (i)
             end if
+            if (use_repuls)  call erepel2 (i)
+            if (use_disp)  call edisp2 (i)
 c
 c     call the electrostatic Hessian component routines
 c
             if (use_charge)  call echarge2 (i)
             if (use_chgdpl)  call echgdpl2 (i)
             if (use_dipole)  call edipole2 (i)
-            if (use_mpole)   call empole2 (i)
+            if (use_mpole)  call empole2 (i)
             if (use_polar)  call epolar2 (i)
-            if (use_rxnfld)   call erxnfld2 (i)
+            if (use_chgtrn)  call echgtrn2 (i)
+            if (use_rxnfld)  call erxnfld2 (i)
 c
 c     call any miscellaneous Hessian component routines
 c

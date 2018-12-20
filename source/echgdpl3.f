@@ -62,17 +62,6 @@ c
       end do
       if (nion.eq.0 .or. ndipole.eq.0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nion.ne.0 .and. ndipole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Dipole Interactions :',
-     &           //,' Type',11x,'Charge',10x,'Dipole',
-     &              20x,'Distance',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (skip(n))
@@ -88,6 +77,17 @@ c
       f = electric / (debye * dielec)
       mode = 'CHGDPL'
       call switch (mode)
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0 .and. ndipole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Dipole Interactions :',
+     &           //,' Type',11x,'Charge',10x,'Dipole',
+     &              20x,'Distance',6x,'Energy',/)
+      end if
 c
 c     get the total energy by looping over each charge-dipole pair
 c

@@ -14,6 +14,229 @@ c     ##  PME code by Thomas Darden, NIEHS, Research Triangle, NC   ##
 c     ##                                                            ##
 c     ################################################################
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine getchunk  --  find number of chunks per axis  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "getchunk" determines the number of grid point "chunks" used
+c     along each axis of the PME grid for parallelization
+c
+c
+      subroutine getchunk
+      use chunks
+      use openmp
+      use pme
+      implicit none
+      integer i
+c
+c
+c     initialize total chunks and number along each axis
+c
+      nchunk = 1
+      nchk1 = 1
+      nchk2 = 1
+      nchk3 = 1
+c
+c     evaluate use of two to six chunks along each axis
+c
+      do i = 2, 6
+         if (nthread.gt.nchunk .and. mod(nfft1,i).eq.0) then
+            nchk1 = i
+            nchunk = nchk1 * nchk2 * nchk3
+         end if
+         if (nthread.gt.nchunk .and. mod(nfft2,i).eq.0) then
+            nchk2 = i
+            nchunk = nchk1 * nchk2 * nchk3
+         end if
+         if (nthread.gt.nchunk .and. mod(nfft3,i).eq.0) then
+            nchk3 = i
+            nchunk = nchk1 * nchk2 * nchk3
+         end if
+      end do
+c
+c     set number of grid points per chunk along each axis
+c
+      ngrd1 = nfft1 / nchk1
+      ngrd2 = nfft2 / nchk2
+      ngrd3 = nfft3 / nchk3
+c
+c     set grid points to left and right, and B-spline offset
+c
+      nlpts = (bsorder-1) / 2
+      nrpts = bsorder - nlpts - 1
+      grdoff = (bsorder+1)/2 + 1
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine moduli  --  store the inverse DFT moduli  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "moduli" sets the moduli of the inverse discrete Fourier
+c     transform of the B-splines
+c
+c
+      subroutine moduli
+      use pme
+      implicit none
+      integer i,maxfft
+      real*8 x
+      real*8, allocatable :: array(:)
+      real*8, allocatable :: bsarray(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      maxfft = max(nfft1,nfft2,nfft3)
+      allocate (array(bsorder))
+      allocate (bsarray(maxfft))
+c
+c     compute and load the moduli values
+c
+      x = 0.0d0
+      call bspline (x,bsorder,array)
+      do i = 1, maxfft
+         bsarray(i) = 0.0d0
+      end do
+      do i = 1, bsorder
+         bsarray(i+1) = array(i)
+      end do
+      call dftmod (bsmod1,bsarray,nfft1,bsorder)
+      call dftmod (bsmod2,bsarray,nfft2,bsorder)
+      call dftmod (bsmod3,bsarray,nfft3,bsorder)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (array)
+      deallocate (bsarray)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine bspline  --  determine B-spline coefficients  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "bspline" calculates the coefficients for an n-th order
+c     B-spline approximation
+c
+c
+      subroutine bspline (x,n,c)
+      implicit none
+      integer i,k,n
+      real*8 x,denom
+      real*8 c(*)
+c
+c
+c     initialize the B-spline as the linear case
+c
+      c(1) = 1.0d0 - x
+      c(2) = x
+c
+c     compute standard B-spline recursion to n-th order
+c
+      do k = 3, n
+         denom = 1.0d0 / dble(k-1)
+         c(k) = x * c(k-1) * denom
+         do i = 1, k-2
+            c(k-i) = ((x+dble(i))*c(k-i-1)
+     &                  + (dble(k-i)-x)*c(k-i)) * denom
+         end do
+         c(1) = (1.0d0-x) * c(1) * denom
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine dftmod  --  discrete Fourier transform modulus  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "dftmod" computes the modulus of the discrete Fourier transform
+c     of "bsarray" and stores it in "bsmod"
+c
+c
+      subroutine dftmod (bsmod,bsarray,nfft,order)
+      use math
+      implicit none
+      integer i,j,k
+      integer nfft,jcut
+      integer order,order2
+      real*8 eps,zeta
+      real*8 arg,factor
+      real*8 sum1,sum2
+      real*8 bsmod(*)
+      real*8 bsarray(*)
+c
+c
+c     get the modulus of the discrete Fourier transform
+c
+      factor = 2.0d0 * pi / dble(nfft)
+      do i = 1, nfft
+         sum1 = 0.0d0
+         sum2 = 0.0d0
+         do j = 1, nfft
+            arg = factor * dble((i-1)*(j-1))
+            sum1 = sum1 + bsarray(j)*cos(arg)
+            sum2 = sum2 + bsarray(j)*sin(arg)
+         end do
+         bsmod(i) = sum1**2 + sum2**2
+      end do
+c
+c     fix for exponential Euler spline interpolation failure
+c
+      eps = 1.0d-7
+      if (bsmod(1) .lt. eps)  bsmod(1) = 0.5d0 * bsmod(2)
+      do i = 2, nfft-1
+         if (bsmod(i) .lt. eps)
+     &      bsmod(i) = 0.5d0 * (bsmod(i-1)+bsmod(i+1))
+      end do
+      if (bsmod(nfft) .lt. eps)  bsmod(nfft) = 0.5d0 * bsmod(nfft-1)
+c
+c     compute and apply the optimal zeta coefficient
+c
+      jcut = 50
+      order2 = 2 * order
+      do i = 1, nfft
+         k = i - 1
+         if (i .gt. nfft/2)  k = k - nfft
+         if (k .eq. 0) then
+            zeta = 1.0d0
+         else
+            sum1 = 1.0d0
+            sum2 = 1.0d0
+            factor = pi * dble(k) / dble(nfft)
+            do j = 1, jcut
+               arg = factor / (factor+pi*dble(j))
+               sum1 = sum1 + arg**order
+               sum2 = sum2 + arg**order2
+            end do
+            do j = 1, jcut
+               arg = factor / (factor-pi*dble(j))
+               sum1 = sum1 + arg**order
+               sum2 = sum2 + arg**order2
+            end do
+            zeta = sum2 / sum1
+         end if
+         bsmod(i) = bsmod(i) * zeta**2
+      end do
+      return
+      end
+c
+c
 c     ##################################################################
 c     ##                                                              ##
 c     ##  subroutine bspline_fill  --  get PME B-spline coefficients  ##
@@ -193,7 +416,7 @@ c
 c
 c     "table_fill" constructs an array which stores the spatial
 c     regions of the particle mesh Ewald grid with contributions
-c     from each electrostatic site
+c     from each site
 c
 c
       subroutine table_fill
@@ -341,7 +564,7 @@ c     ################################################################
 c
 c
 c     "setchunk" marks a chunk in the PME spatial table which is
-c     overlapped by the B-splines for an electrostatic site
+c     overlapped by the B-splines for a site
 c
 c
       subroutine setchunk (i,cid,off1,off2,off3)
@@ -407,7 +630,7 @@ c
 !$OMP& offsetz,v0,u0,term,t0)
 !$OMP DO
 c
-c     zero out the particle mesh Ewald charge grid
+c     zero out the particle mesh Ewald grid
 c
       do k = 1, nfft3
          do j = 1, nfft2
@@ -525,7 +748,7 @@ c
 !$OMP& offsetz,v0,v1,v2,u0,u1,u2,term0,term1,term2,t0,t1,t2)
 !$OMP DO
 c
-c     zero out the particle mesh Ewald charge grid
+c     zero out the particle mesh Ewald grid
 c
       do k = 1, nfft3
          do j = 1, nfft2
@@ -656,7 +879,7 @@ c
 !$OMP& offsetz,v0,v1,u0,u1,term01,term11,term02,term12,t0,t1)
 !$OMP DO
 c
-c     zero out the particle mesh Ewald charge grid
+c     zero out the particle mesh Ewald grid
 c
       do k = 1, nfft3
          do j = 1, nfft2
@@ -730,6 +953,121 @@ c
      &                                      + term11*t1
                         qgrid(2,i,j,k) = qgrid(2,i,j,k) + term02*t0
      &                                      + term12*t1
+                     end do
+                  end do
+               end do
+            end if
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine grid_csix  --  put dispersion sites on PME grid  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "grid_csix" places the damped dispersion coefficients onto
+c     the particle mesh Ewald grid
+c
+c
+      subroutine grid_csix
+      use atoms
+      use disp
+      use chunks
+      use pme
+      implicit none
+      integer i,j,k,m
+      integer ii,jj,kk
+      integer ichk,isite,iatm
+      integer offsetx,offsety
+      integer offsetz
+      integer cid(3)
+      integer nearpt(3)
+      integer abound(6)
+      integer cbound(6)
+      real*8 v0,u0,t0
+      real*8 term
+c
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
+!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
+!$OMP& offsetz,v0,u0,term,t0)
+!$OMP DO
+c
+c     zero out the particle mesh Ewald grid
+c
+      do k = 1, nfft3
+         do j = 1, nfft2
+            do i = 1, nfft1
+               qgrid(1,i,j,k) = 0.0d0
+               qgrid(2,i,j,k) = 0.0d0
+            end do
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP DO
+c
+c     put the dispersion sites onto the grid
+c
+      do ichk = 1, nchunk
+         cid(1) = mod(ichk-1,nchk1)
+         cid(2) = mod(((ichk-1-cid(1))/nchk1),nchk2)
+         cid(3) = mod((ichk-1)/(nchk1*nchk2),nchk3)
+         cbound(1) = cid(1)*ngrd1 + 1
+         cbound(2) = cbound(1) + ngrd1 - 1
+         cbound(3) = cid(2)*ngrd2 + 1
+         cbound(4) = cbound(3) + ngrd2 - 1
+         cbound(5) = cid(3)*ngrd3 + 1
+         cbound(6) = cbound(5) + ngrd3 - 1
+         do isite = 1, ndisp
+            iatm = idisp(isite)
+            if (pmetable(iatm,ichk) .eq. 1) then
+               nearpt(1) = igrid(1,iatm) + grdoff
+               nearpt(2) = igrid(2,iatm) + grdoff
+               nearpt(3) = igrid(3,iatm) + grdoff
+               abound(1) = nearpt(1) - nlpts
+               abound(2) = nearpt(1) + nrpts
+               abound(3) = nearpt(2) - nlpts
+               abound(4) = nearpt(2) + nrpts
+               abound(5) = nearpt(3) - nlpts
+               abound(6) = nearpt(3) + nrpts
+               call adjust (offsetx,nfft1,nchk1,abound(1),
+     &                        abound(2),cbound(1),cbound(2))
+               call adjust (offsety,nfft2,nchk2,abound(3),
+     &                        abound(4),cbound(3),cbound(4))
+               call adjust (offsetz,nfft3,nchk3,abound(5),
+     &                        abound(6),cbound(5),cbound(6))
+               do kk = abound(5), abound(6)
+                  k = kk
+                  m = k + offsetz
+                  if (k .lt. 1)  k = k + nfft3
+                  v0 = thetai3(1,m,iatm) * csix(isite)
+                  do jj = abound(3), abound(4)
+                     j = jj
+                     m = j + offsety
+                     if (j .lt. 1)  j = j + nfft2
+                     u0 = thetai2(1,m,iatm)
+                     term = v0 * u0
+                     do ii = abound(1), abound(2)
+                        i = ii
+                        m = i + offsetx
+                        if (i .lt. 1)  i = i + nfft1
+                        t0 = thetai1(1,m,iatm)
+                        qgrid(1,i,j,k) = qgrid(1,i,j,k) + term*t0
                      end do
                   end do
                end do
@@ -828,7 +1166,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
-!$OMP& nfft3,thetai3,nfft2,thetai2,nfft1,thetai1,qgrid,fphi)
+!$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
 !$OMP DO
 c
 c     extract the permanent multipole field at each site
@@ -1010,8 +1348,8 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,
-!$OMP& igrid,bsorder,nfft3,thetai3,nfft2,thetai2,nfft1,
-!$OMP& thetai1,qgrid,fdip_phi1,fdip_phi2,fdip_sum_phi)
+!$OMP& igrid,bsorder,nfft1,nfft2,nfft3,thetai1,thetai2,
+!$OMP& thetai3,qgrid,fdip_phi1,fdip_phi2,fdip_sum_phi)
 !$OMP DO
 c
 c     extract the induced dipole field at each site

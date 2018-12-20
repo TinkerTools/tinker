@@ -223,7 +223,7 @@ typedef unsigned long long ticks;
 static __inline__ ticks getticks(void)
 {
      unsigned a, d; 
-     asm volatile("rdtsc" : "=a" (a), "=d" (d)); 
+     __asm__ __volatile__ ("rdtsc" : "=a" (a), "=d" (d)); 
      return ((ticks)a) | (((ticks)d) << 32); 
 }
 
@@ -341,7 +341,7 @@ INLINE_ELAPSED(inline)
 /*
  * PA-RISC cycle counter 
  */
-#if defined(__hppa__) || defined(__hppa) && !defined(HAVE_TICK_COUNTER)
+#if (defined(__hppa__) || defined(__hppa)) && !defined(HAVE_TICK_COUNTER)
 typedef unsigned long ticks;
 
 #  ifdef __GNUC__
@@ -438,7 +438,7 @@ INLINE_ELAPSED(__inline)
 #endif
 /*----------------------------------------------------------------*/
 /* SGI/Irix */
-#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_SGI_CYCLE) && !defined(HAVE_TICK_COUNTER)
+#if defined(HAVE_CLOCK_GETTIME) && defined(CLOCK_SGI_CYCLE) && !defined(HAVE_TICK_COUNTER) && !defined(__ANDROID__)
 typedef struct timespec ticks;
 
 static inline ticks getticks(void)
@@ -515,3 +515,50 @@ INLINE_ELAPSED(inline)
 #endif
 #endif /* HAVE_MIPS_ZBUS_TIMER */
 
+#if defined(HAVE_ARMV7A_CNTVCT)
+typedef uint64_t ticks;
+static inline ticks getticks(void)
+{
+  uint32_t Rt, Rt2 = 0;
+  asm volatile("mrrc p15, 1, %0, %1, c14" : "=r"(Rt), "=r"(Rt2));
+  return ((uint64_t)Rt) | (((uint64_t)Rt2) << 32);
+}
+INLINE_ELAPSED(inline)
+#define HAVE_TICK_COUNTER
+#endif
+
+#if defined(HAVE_ARMV7A_PMCCNTR)
+typedef uint64_t ticks;
+static inline ticks getticks(void)
+{
+  uint32_t r;
+  asm volatile("mrc p15, 0, %0, c9, c13, 0" : "=r"(r) );
+  return r;
+}
+INLINE_ELAPSED(inline)
+#define HAVE_TICK_COUNTER
+#endif
+
+#if defined(__aarch64__) && defined(HAVE_ARMV8_CNTVCT_EL0) && !defined(HAVE_ARMV8_PMCCNTR_EL0)
+typedef uint64_t ticks;
+static inline ticks getticks(void)
+{
+  uint64_t Rt;
+  asm volatile("mrs %0,  CNTVCT_EL0" : "=r" (Rt));
+  return Rt;
+}
+INLINE_ELAPSED(inline)
+#define HAVE_TICK_COUNTER
+#endif
+
+#if defined(__aarch64__) && defined(HAVE_ARMV8_PMCCNTR_EL0)
+typedef uint64_t ticks;
+static inline ticks getticks(void)
+{
+        uint64_t cc = 0;
+        asm volatile("mrs %0, PMCCNTR_EL0" : "=r"(cc));
+        return cc;
+}
+INLINE_ELAPSED(inline)
+#define HAVE_TICK_COUNTER
+#endif

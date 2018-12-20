@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1999  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine kewald  --  Ewald sum parameter assignment  ##
-c     ##                                                         ##
-c     #############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine kewald  --  setup for particle mesh Ewald sum  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "kewald" assigns particle mesh Ewald parameters and options
@@ -34,10 +34,14 @@ c
       integer maxfft
       parameter (maxpower=63)
       parameter (maxfft=864)
-      integer i,k,next,minfft
-      integer ifft1,ifft2,ifft3
+      integer i,k,next
+      integer nbig,minfft
+      integer iefft1,idfft1
+      integer iefft2,idfft2
+      integer iefft3,idfft3
       integer multi(maxpower)
-      real*8 delta,rmax,dens
+      real*8 delta,rmax
+      real*8 edens,ddens
       character*20 keyword
       character*240 record
       character*240 string
@@ -53,23 +57,33 @@ c
      &              600, 640, 648, 720, 750, 768, 800, 810, 864 /
 c
 c
-c     default boundary treatment, B-spline order and grid density
+c     return if Ewald summation is not being used
+c
+      if (.not.use_ewald .and. .not.use_dewald)  return
+c
+c     set default values for Ewald options and parameters
 c
       ffttyp = 'FFTPACK'
       if (nthread .gt. 1)  ffttyp = 'FFTW'
       boundary = 'TINFOIL'
-      bsorder = 5
-      dens = 1.2d0
+      bseorder = 5
+      bsdorder = 4
+      edens = 1.2d0
+      ddens = 0.8d0
+      aeewald = 0.4d0
+      adewald = 0.4d0
+      minfft = 16
 c
 c     estimate an optimal value for the Ewald coefficient
 c
-      call ewaldcof (aewald,ewaldcut)
+      if (use_ewald)  call ewaldcof (aeewald,ewaldcut)
+      if (use_dewald)  call ewaldcof (adewald,dewaldcut)
 c
 c     set the system extent for nonperiodic Ewald summation
 c
       if (.not. use_bounds) then
          call extent (rmax)
-         xbox = 2.0d0 * (rmax+ewaldcut)
+         xbox = 2.0d0 * (rmax+max(ewaldcut,dewaldcut))
          ybox = xbox
          zbox = xbox
          alpha = 90.0d0
@@ -78,15 +92,28 @@ c
          orthogonal = .true.
          call lattice
          boundary = 'NONE'
-         dens = 0.75d0
+         edens = 0.7d0
+         ddens = 0.7d0
       end if
 c
-c     get default grid size from periodic system dimensions
+c     set defaults for electrostatic and dispersion grid sizes
+c
+      nefft1 = 0
+      nefft2 = 0
+      nefft3 = 0
+      ndfft1 = 0
+      ndfft2 = 0
+      ndfft3 = 0
+c
+c     get default grid counts from periodic system dimensions
 c
       delta = 1.0d-8
-      ifft1 = int(xbox*dens-delta) + 1
-      ifft2 = int(ybox*dens-delta) + 1
-      ifft3 = int(zbox*dens-delta) + 1
+      iefft1 = int(xbox*edens-delta) + 1
+      iefft2 = int(ybox*edens-delta) + 1
+      iefft3 = int(zbox*edens-delta) + 1
+      idfft1 = int(xbox*ddens-delta) + 1
+      idfft2 = int(ybox*ddens-delta) + 1
+      idfft3 = int(zbox*ddens-delta) + 1
 c
 c     search keywords for Ewald summation commands
 c
@@ -99,58 +126,115 @@ c
          if (keyword(1:12) .eq. 'FFT-PACKAGE ') then
             call getword (record,ffttyp,next)
          else if (keyword(1:12) .eq. 'EWALD-ALPHA ') then
-            read (string,*,err=20,end=20)  aewald
+            read (string,*,err=20,end=20)  aeewald
+         else if (keyword(1:13) .eq. 'DEWALD-ALPHA ') then
+            read (string,*,err=20,end=20)  adewald
          else if (keyword(1:15) .eq. 'EWALD-BOUNDARY ') then
             boundary = 'VACUUM'
          else if (keyword(1:9) .eq. 'PME-GRID ') then
-            ifft1 = 0
-            ifft2 = 0
-            ifft3 = 0
-            read (string,*,err=10,end=10)  ifft1,ifft2,ifft3
+            iefft1 = 0
+            iefft2 = 0
+            iefft3 = 0
+            read (string,*,err=10,end=10)  iefft1,iefft2,iefft3
    10       continue
-            if (ifft2 .eq. 0)  ifft2 = ifft1
-            if (ifft3 .eq. 0)  ifft3 = ifft1
+            if (iefft2 .eq. 0)  iefft2 = iefft1
+            if (iefft3 .eq. 0)  iefft3 = iefft1
+         else if (keyword(1:10) .eq. 'DPME-GRID ') then
+            idfft1 = 0
+            idfft2 = 0
+            idfft3 = 0
+            read (string,*,err=15,end=15)  idfft1,idfft2,idfft3
+   15       continue
+            if (idfft2 .eq. 0)  idfft2 = idfft1
+            if (idfft3 .eq. 0)  idfft3 = idfft1
          else if (keyword(1:10) .eq. 'PME-ORDER ') then
-            read (string,*,err=20,end=20)  bsorder
+            read (string,*,err=20,end=20)  bseorder
+         else if (keyword(1:11) .eq. 'DPME-ORDER ') then
+            read (string,*,err=20,end=20)  bsdorder
          end if
    20    continue
       end do
 c
-c     grid size must be even, with prime factors of 2, 3 and 5
+c     determine electrostatic grid size from allowed values
 c
-      nfft1 = maxfft
-      nfft2 = maxfft
-      nfft3 = maxfft
-      do i = maxpower, 1, -1
-         k = multi(i)
-         if (k .le. maxfft) then
-            if (k .ge. ifft1)  nfft1 = k
-            if (k .ge. ifft2)  nfft2 = k
-            if (k .ge. ifft3)  nfft3 = k
+      if (use_ewald) then
+         nefft1 = maxfft
+         nefft2 = maxfft
+         nefft3 = maxfft
+         do i = maxpower, 1, -1
+            k = multi(i)
+            if (k .le. maxfft) then
+               if (k .ge. iefft1)  nefft1 = k
+               if (k .ge. iefft2)  nefft2 = k
+               if (k .ge. iefft3)  nefft3 = k
+            end if
+         end do
+         if (nefft1 .lt. minfft)  nefft1 = minfft
+         if (nefft2 .lt. minfft)  nefft2 = minfft
+         if (nefft3 .lt. minfft)  nefft3 = minfft
+      end if
+c
+c     determine dispersion grid size from allowed values
+c
+      if (use_dewald) then
+         ndfft1 = maxfft
+         ndfft2 = maxfft
+         ndfft3 = maxfft
+         do i = maxpower, 1, -1
+            k = multi(i)
+            if (k .le. maxfft) then
+               if (k .ge. idfft1)  ndfft1 = k
+               if (k .ge. idfft2)  ndfft2 = k
+               if (k .ge. idfft3)  ndfft3 = k
+            end if
+         end do
+         if (ndfft1 .lt. minfft)  ndfft1 = minfft
+         if (ndfft2 .lt. minfft)  ndfft2 = minfft
+         if (ndfft3 .lt. minfft)  ndfft3 = minfft
+      end if
+c
+c     increase electrostatic grid to match dispersion grid
+c
+      if (use_ewald .and. use_dewald) then
+         if (nefft1.lt.ndfft1 .or. nefft2.lt.ndfft2
+     &          .or. nefft3.lt.ndfft3) then
+            nefft1 = max(nefft1,ndfft1)
+            nefft2 = max(nefft2,ndfft2)
+            nefft3 = max(nefft3,ndfft3)
+            write (iout,30)
+   30       format (/,' KEWALD  --  Setting Electrostatic PME',
+     &                 ' Grid to Match Dispersion Grid')
          end if
-      end do
-      minfft = 16
-      if (nfft1 .lt. minfft)  nfft1 = minfft
-      if (nfft2 .lt. minfft)  nfft2 = minfft
-      if (nfft3 .lt. minfft)  nfft3 = minfft
+      end if
 c
-c     set the number of chunks and grid points per chunk
+c     check the particle mesh Ewald grid dimensions
 c
-      call getchunk
-c
-c     check the particle mesh Ewald charge grid dimensions
-c
-      if (max(nfft1,nfft2,nfft3) .gt. maxfft) then
-         write (iout,30)
-   30    format (/,' KEWALD  --  FFT Charge Grid Too Large;',
+      nbig = max(nefft1,nefft2,nefft3,ndfft1,ndfft2,ndfft3)
+      if (nbig .gt. maxfft) then
+         write (iout,40)
+   40    format (/,' KEWALD  --  PME Grid Size Too Large;',
      &              ' Increase MAXFFT')
          call fatal
-      else if (nfft1.lt.ifft1 .or. nfft2.lt.ifft2
-     &             .or. nfft3.lt.ifft3) then
-         write (iout,40)
-   40    format (/,' KEWALD  --  Warning, Small Charge Grid',
-     &              ' may give Poor Accuracy')
       end if
+      if (use_ewald .and. (nefft1.lt.iefft1.or.
+     &       nefft2.lt.iefft2.or.nefft3.lt.iefft3)) then
+         write (iout,50)
+   50    format (/,' KEWALD  --  Warning, Small Electrostatic',
+     &              'PME Grid Size')
+      end if
+      if (use_dewald .and. (ndfft1.lt.idfft1.or.
+     &       ndfft2.lt.idfft2.or.ndfft3.lt.idfft3)) then
+         write (iout,60)
+   60    format (/,' KEWALD  --  Warning, Small Dispersion',
+     &              'PME Grid Size')
+      end if
+c
+c     set maximum sizes for PME grid and B-spline order
+c
+      nfft1 = max(nefft1,ndfft1)
+      nfft2 = max(nefft2,ndfft2)
+      nfft3 = max(nefft3,ndfft3)
+      bsorder = max(bseorder,bsdorder)
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -173,21 +257,23 @@ c
       allocate (thetai3(4,bsorder,n))
       allocate (qgrid(2,nfft1,nfft2,nfft3))
       allocate (qfac(nfft1,nfft2,nfft3))
-      allocate (pmetable(n,nchunk))
-c
-c     initialize the PME arrays that can be precomputed
-c
-      call moduli
-      call fftsetup
+      allocate (pmetable(n,6*nthread))
 c
 c     print a message listing some of the Ewald parameters
 c
       if (verbose) then
-         write (iout,50)  aewald,nfft1,nfft2,nfft3,bsorder
-   50    format (/,' Smooth Particle Mesh Ewald Parameters :',
-     &           //,4x,'Ewald Coefficient',7x,'PME Grid',
-     &              ' Dimensions',7x,'B-Spline Order',
-     &           //,8x,f8.4,11x,3i6,11x,i6)
+         write (iout,70)
+   70    format (/,' Particle Mesh Ewald Parameters :',
+     &           //,5x,'Type',16x,'Ewald Alpha',4x,'Grid',
+     &              ' Dimensions',4x,'Spline Order',/)
+         if (use_ewald) then
+            write (iout,80)  aeewald,nefft1,nefft2,nefft3,bseorder
+   80       format (3x,'Electrostatics',9x,f8.4,5x,3i5,7x,i5)
+         end if
+         if (use_dewald) then
+            write (iout,90)  adewald,ndfft1,ndfft2,ndfft3,bsdorder
+   90       format (3x,'Dispersion',13x,f8.4,5x,3i5,7x,i5)
+         end if
       end if
       return
       end
@@ -286,228 +372,5 @@ c
          end do
       end do
       rmax = sqrt(rmax)
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine getchunk  --  find number of chunks per axis  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "getchunk" determines the number of grid point "chunks" used
-c     along each axis of the PME grid for parallelization
-c
-c
-      subroutine getchunk
-      use chunks
-      use openmp
-      use pme
-      implicit none
-      integer i
-c
-c
-c     initialize total chunks and number along each axis
-c
-      nchunk = 1
-      nchk1 = 1
-      nchk2 = 1
-      nchk3 = 1
-c
-c     evaluate use of two to six chunks along each axis
-c
-      do i = 2, 6
-         if (nthread.gt.nchunk .and. mod(nfft1,i).eq.0) then
-            nchk1 = i
-            nchunk = nchk1 * nchk2 * nchk3
-         end if
-         if (nthread.gt.nchunk .and. mod(nfft2,i).eq.0) then
-            nchk2 = i
-            nchunk = nchk1 * nchk2 * nchk3
-         end if
-         if (nthread.gt.nchunk .and. mod(nfft3,i).eq.0) then
-            nchk3 = i
-            nchunk = nchk1 * nchk2 * nchk3
-         end if
-      end do
-c
-c     set number of grid points per chunk along each axis
-c
-      ngrd1 = nfft1 / nchk1
-      ngrd2 = nfft2 / nchk2
-      ngrd3 = nfft3 / nchk3
-c
-c     set grid points to left and right, and B-spline offset
-c
-      nlpts = (bsorder-1) / 2
-      nrpts = bsorder - nlpts - 1
-      grdoff = (bsorder+1)/2 + 1
-      return
-      end
-c
-c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine moduli  --  store the inverse DFT moduli  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "moduli" sets the moduli of the inverse discrete Fourier
-c     transform of the B-splines
-c
-c
-      subroutine moduli
-      use pme
-      implicit none
-      integer i,maxfft
-      real*8 x
-      real*8, allocatable :: array(:)
-      real*8, allocatable :: bsarray(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      maxfft = max(nfft1,nfft2,nfft3)
-      allocate (array(bsorder))
-      allocate (bsarray(maxfft))
-c
-c     compute and load the moduli values
-c
-      x = 0.0d0
-      call bspline (x,bsorder,array)
-      do i = 1, maxfft
-         bsarray(i) = 0.0d0
-      end do
-      do i = 1, bsorder
-         bsarray(i+1) = array(i)
-      end do
-      call dftmod (bsmod1,bsarray,nfft1,bsorder)
-      call dftmod (bsmod2,bsarray,nfft2,bsorder)
-      call dftmod (bsmod3,bsarray,nfft3,bsorder)
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (array)
-      deallocate (bsarray)
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine bspline  --  determine B-spline coefficients  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "bspline" calculates the coefficients for an n-th order
-c     B-spline approximation
-c
-c
-      subroutine bspline (x,n,c)
-      implicit none
-      integer i,k,n
-      real*8 x,denom
-      real*8 c(*)
-c
-c
-c     initialize the B-spline as the linear case
-c
-      c(1) = 1.0d0 - x
-      c(2) = x
-c
-c     compute standard B-spline recursion to n-th order
-c
-      do k = 3, n
-         denom = 1.0d0 / dble(k-1)
-         c(k) = x * c(k-1) * denom
-         do i = 1, k-2
-            c(k-i) = ((x+dble(i))*c(k-i-1)
-     &                  + (dble(k-i)-x)*c(k-i)) * denom
-         end do
-         c(1) = (1.0d0-x) * c(1) * denom
-      end do
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine dftmod  --  discrete Fourier transform modulus  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "dftmod" computes the modulus of the discrete Fourier transform
-c     of "bsarray" and stores it in "bsmod"
-c
-c
-      subroutine dftmod (bsmod,bsarray,nfft,order)
-      use math
-      implicit none
-      integer i,j,k
-      integer nfft,jcut
-      integer order,order2
-      real*8 eps,zeta
-      real*8 arg,factor
-      real*8 sum1,sum2
-      real*8 bsmod(*)
-      real*8 bsarray(*)
-c
-c
-c     get the modulus of the discrete Fourier transform
-c
-      factor = 2.0d0 * pi / dble(nfft)
-      do i = 1, nfft
-         sum1 = 0.0d0
-         sum2 = 0.0d0
-         do j = 1, nfft
-            arg = factor * dble((i-1)*(j-1))
-            sum1 = sum1 + bsarray(j)*cos(arg)
-            sum2 = sum2 + bsarray(j)*sin(arg)
-         end do
-         bsmod(i) = sum1**2 + sum2**2
-      end do
-c
-c     fix for exponential Euler spline interpolation failure
-c
-      eps = 1.0d-7
-      if (bsmod(1) .lt. eps)  bsmod(1) = 0.5d0 * bsmod(2)
-      do i = 2, nfft-1
-         if (bsmod(i) .lt. eps)
-     &      bsmod(i) = 0.5d0 * (bsmod(i-1)+bsmod(i+1))
-      end do
-      if (bsmod(nfft) .lt. eps)  bsmod(nfft) = 0.5d0 * bsmod(nfft-1)
-c
-c     compute and apply the optimal zeta coefficient
-c
-      jcut = 50
-      order2 = 2 * order
-      do i = 1, nfft
-         k = i - 1
-         if (i .gt. nfft/2)  k = k - nfft
-         if (k .eq. 0) then
-            zeta = 1.0d0
-         else
-            sum1 = 1.0d0
-            sum2 = 1.0d0
-            factor = pi * dble(k) / dble(nfft)
-            do j = 1, jcut
-               arg = factor / (factor+pi*dble(j))
-               sum1 = sum1 + arg**order
-               sum2 = sum2 + arg**order2
-            end do
-            do j = 1, jcut
-               arg = factor / (factor-pi*dble(j))
-               sum1 = sum1 + arg**order
-               sum2 = sum2 + arg**order2
-            end do
-            zeta = sum2 / sum1
-         end if
-         bsmod(i) = bsmod(i) * zeta**2
-      end do
       return
       end

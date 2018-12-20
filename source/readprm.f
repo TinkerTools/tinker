@@ -25,7 +25,10 @@ c
       use katoms
       use kbonds
       use kchrge
+      use kcpen
+      use kctrn
       use kdipol
+      use kdsp
       use khbond
       use kiprop
       use kitors
@@ -35,6 +38,7 @@ c
       use korbs
       use kpitor
       use kpolr
+      use krepl
       use kstbnd
       use ksttor
       use ktorsn
@@ -55,14 +59,16 @@ c
       integer na,na5,na4,na3,naf
       integer nsb,nu,nopb,nopd
       integer ndi,nti,nt,nt5,nt4
-      integer npt,nbt,nat,ntt,nd
-      integer nd5,nd4,nd3,nvp,nhb
+      integer npt,nbt,nat,ntt,nvp
+      integer nhb,nd,nd5,nd4,nd3
       integer nmp,npi,npi5,npi4
       integer cls,atn,lig
       integer nx,ny,nxy
       integer bt,at,sbt,tt
       integer ft(6),pg(maxval)
       real*8 wght,rd,ep,rdn
+      real*8 spr,apr,epr
+      real*8 cdp,adp
       real*8 an1,an2,an3
       real*8 ba1,ba2
       real*8 aa1,aa2,aa3
@@ -74,7 +80,9 @@ c
       real*8 an,pr,ds,dk
       real*8 vd,cg,dp,ps
       real*8 fc,bd,dl,el
-      real*8 pt,pol,thl
+      real*8 pt,pel,pal
+      real*8 pol,thl
+      real*8 ctrn,atrn
       real*8 iz,rp,ss,ts
       real*8 abc,cba
       real*8 gi,alphi
@@ -96,8 +104,6 @@ c
 c
 c     initialize the counters for some parameter types
 c
-      nvp = 0
-      nhb = 0
       nb = 0
       nb5 = 0
       nb4 = 0
@@ -121,6 +127,8 @@ c
       nbt = 0
       nat = 0
       ntt = 0
+      nvp = 0
+      nhb = 0
       nd = 0
       nd5 = 0
       nd4 = 0
@@ -205,78 +213,6 @@ c
                ligand(ia) = lig
             end if
 c
-c     van der Waals parameters for individual atom types
-c
-         else if (keyword(1:4) .eq. 'VDW ') then
-            ia = 0
-            rd = 0.0d0
-            ep = 0.0d0
-            rdn = 0.0d0
-            string = record(next:240)
-            read (string,*,err=70,end=70)  ia,rd,ep,rdn
-   70       continue
-            if (ia .ne. 0) then
-               rad(ia) = rd
-               eps(ia) = ep
-               reduct(ia) = rdn
-            end if
-c
-c     van der Waals 1-4 parameters for individual atom types
-c
-         else if (keyword(1:6) .eq. 'VDW14 ') then
-            ia = 0
-            rd = 0.0d0
-            ep = 0.0d0
-            string = record(next:240)
-            read (string,*,err=80,end=80)  ia,rd,ep
-   80       continue
-            if (ia .ne. 0) then
-               rad4(ia) = rd
-               eps4(ia) = ep
-            end if
-c
-c     van der Waals parameters for specific atom pairs
-c
-         else if (keyword(1:6) .eq. 'VDWPR ') then
-            ia = 0
-            ib = 0
-            rd = 0.0d0
-            ep = 0.0d0
-            string = record(next:240)
-            read (string,*,err=90,end=90)  ia,ib,rd,ep
-   90       continue
-            call numeral (ia,pa,size)
-            call numeral (ib,pb,size)
-            nvp = nvp + 1
-            if (ia .le. ib) then
-               kvpr(nvp) = pa//pb
-            else
-               kvpr(nvp) = pb//pa
-            end if
-            radpr(nvp) = rd
-            epspr(nvp) = ep
-c
-c     van der Waals parameters for hydrogen bonding pairs
-c
-         else if (keyword(1:6) .eq. 'HBOND ') then
-            ia = 0
-            ib = 0
-            rd = 0.0d0
-            ep = 0.0d0
-            string = record(next:240)
-            read (string,*,err=100,end=100)  ia,ib,rd,ep
-  100       continue
-            call numeral (ia,pa,size)
-            call numeral (ib,pb,size)
-            nhb = nhb + 1
-            if (ia .le. ib) then
-               khb(nhb) = pa//pb
-            else
-               khb(nhb) = pb//pa
-            end if
-            radhb(nhb) = rd
-            epshb(nhb) = ep
-c
 c     bond stretching parameters
 c
          else if (keyword(1:5) .eq. 'BOND ') then
@@ -285,8 +221,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=110,end=110)  ia,ib,fc,bd
-  110       continue
+            read (string,*,err=70,end=70)  ia,ib,fc,bd
+   70       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nb = nb + 1
@@ -306,8 +242,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=120,end=120)  ia,ib,fc,bd
-  120       continue
+            read (string,*,err=80,end=80)  ia,ib,fc,bd
+   80       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nb5 = nb5 + 1
@@ -327,8 +263,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=130,end=130)  ia,ib,fc,bd
-  130       continue
+            read (string,*,err=90,end=90)  ia,ib,fc,bd
+   90       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nb4 = nb4 + 1
@@ -348,8 +284,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=140,end=140)  ia,ib,fc,bd
-  140       continue
+            read (string,*,err=100,end=100)  ia,ib,fc,bd
+  100       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nb3 = nb3 + 1
@@ -369,8 +305,8 @@ c
             ic = 0
             dl = 0.0d0
             string = record(next:240)
-            read (string,*,err=150,end=150)  ia,ib,ic,dl
-  150       continue
+            read (string,*,err=110,end=110)  ia,ib,ic,dl
+  110       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -393,8 +329,8 @@ c
             an2 = 0.0d0
             an3 = 0.0d0
             string = record(next:240)
-            read (string,*,err=160,end=160)  ia,ib,ic,fc,an1,an2,an3
-  160       continue
+            read (string,*,err=120,end=120)  ia,ib,ic,fc,an1,an2,an3
+  120       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -420,8 +356,8 @@ c
             an2 = 0.0d0
             an3 = 0.0d0
             string = record(next:240)
-            read (string,*,err=170,end=170)  ia,ib,ic,fc,an1,an2,an3
-  170       continue
+            read (string,*,err=130,end=130)  ia,ib,ic,fc,an1,an2,an3
+  130       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -447,8 +383,8 @@ c
             an2 = 0.0d0
             an3 = 0.0d0
             string = record(next:240)
-            read (string,*,err=180,end=180)  ia,ib,ic,fc,an1,an2,an3
-  180       continue
+            read (string,*,err=140,end=140)  ia,ib,ic,fc,an1,an2,an3
+  140       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -474,8 +410,8 @@ c
             an2 = 0.0d0
             an3 = 0.0d0
             string = record(next:240)
-            read (string,*,err=190,end=190)  ia,ib,ic,fc,an1,an2,an3
-  190       continue
+            read (string,*,err=150,end=150)  ia,ib,ic,fc,an1,an2,an3
+  150       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -500,8 +436,8 @@ c
             an = 0.0d0
             pr = 0.0d0
             string = record(next:240)
-            read (string,*,err=200,end=200)  ia,ib,ic,fc,an,pr
-  200       continue
+            read (string,*,err=160,end=160)  ia,ib,ic,fc,an,pr
+  160       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -524,8 +460,8 @@ c
             ba1 = 0.0d0
             ba2 = 0.0d0
             string = record(next:240)
-            read (string,*,err=210,end=210)  ia,ib,ic,ba1,ba2
-  210       continue
+            read (string,*,err=170,end=170)  ia,ib,ic,ba1,ba2
+  170       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -549,8 +485,8 @@ c
             fc = 0.0d0
             ds = 0.0d0
             string = record(next:240)
-            read (string,*,err=220,end=220)  ia,ib,ic,fc,ds
-  220       continue
+            read (string,*,err=180,end=180)  ia,ib,ic,fc,ds
+  180       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -571,8 +507,8 @@ c
             aa2 = 0.0d0
             aa3 = 0.0d0
             string = record(next:240)
-            read (string,*,err=230,end=230)  ia,aa1,aa2,aa3
-  230       continue
+            read (string,*,err=190,end=190)  ia,aa1,aa2,aa3
+  190       continue
             if (ia .ne. 0) then
                anan(1,ia) = aa1
                anan(2,ia) = aa2
@@ -588,8 +524,8 @@ c
             id = 0
             fc = 0.0d0
             string = record(next:240)
-            read (string,*,err=240,end=240)  ia,ib,ic,id,fc
-  240       continue
+            read (string,*,err=200,end=200)  ia,ib,ic,id,fc
+  200       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -611,8 +547,8 @@ c
             id = 0
             fc = 0.0d0
             string = record(next:240)
-            read (string,*,err=250,end=250)  ia,ib,ic,id,fc
-  250       continue
+            read (string,*,err=210,end=210)  ia,ib,ic,id,fc
+  210       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -650,8 +586,8 @@ c
             dk = 0.0d0
             vd = 0.0d0
             string = record(next:240)
-            read (string,*,err=260,end=260)  ia,ib,ic,id,dk,vd
-  260       continue
+            read (string,*,err=220,end=220)  ia,ib,ic,id,dk,vd
+  220       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -674,9 +610,9 @@ c
                ft(i) = 0
             end do
             string = record(next:240)
-            read (string,*,err=270,end=270)  ia,ib,ic,id,
+            read (string,*,err=230,end=230)  ia,ib,ic,id,
      &                                       (vt(j),st(j),ft(j),j=1,6)
-  270       continue
+  230       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -704,9 +640,9 @@ c
                ft(i) = 0
             end do
             string = record(next:240)
-            read (string,*,err=280,end=280)  ia,ib,ic,id,
+            read (string,*,err=240,end=240)  ia,ib,ic,id,
      &                                       (vt(j),st(j),ft(j),j=1,6)
-  280       continue
+  240       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -748,9 +684,9 @@ c
                ft(i) = 0
             end do
             string = record(next:240)
-            read (string,*,err=290,end=290)  ia,ib,ic,id,
+            read (string,*,err=250,end=250)  ia,ib,ic,id,
      &                                       (vt(j),st(j),ft(j),j=1,6)
-  290       continue
+  250       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -792,9 +728,9 @@ c
                ft(i) = 0
             end do
             string = record(next:240)
-            read (string,*,err=300,end=300)  ia,ib,ic,id,
+            read (string,*,err=260,end=260)  ia,ib,ic,id,
      &                                       (vt(i),st(i),ft(i),i=1,6)
-  300       continue
+  260       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -830,8 +766,8 @@ c
             ib = 0
             pt = 0.0d0
             string = record(next:240)
-            read (string,*,err=310,end=310)  ia,ib,pt
-  310       continue
+            read (string,*,err=270,end=270)  ia,ib,pt
+  270       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npt = npt + 1
@@ -859,9 +795,9 @@ c
             bt8 = 0.0d0
             bt9 = 0.0d0
             string = record(next:240)
-            read (string,*,err=320,end=320)  ia,ib,ic,id,bt1,bt2,bt3,
+            read (string,*,err=280,end=280)  ia,ib,ic,id,bt1,bt2,bt3,
      &                                       bt4,bt5,bt6,bt7,bt8,bt9
-  320       continue
+  280       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -913,9 +849,9 @@ c
             at5 = 0.0d0
             at6 = 0.0d0
             string = record(next:240)
-            read (string,*,err=330,end=330)  ia,ib,ic,id,at1,at2,
+            read (string,*,err=290,end=290)  ia,ib,ic,id,at1,at2,
      &                                       at3,at4,at5,at6
-  330       continue
+  290       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -967,14 +903,14 @@ c
                tf(i) = 0.0d0
             end do
             string = record(next:240)
-            read (string,*,err=340,end=340)  ia,ib,ic,id,ie,nx,ny
+            read (string,*,err=300,end=300)  ia,ib,ic,id,ie,nx,ny
             nxy = nx * ny
             do i = 1, nxy
                iprm = iprm + 1
                record = prmline(iprm)
-               read (record,*,err=340,end=340)  tx(i),ty(i),tf(i)
+               read (record,*,err=300,end=300)  tx(i),ty(i),tf(i)
             end do
-  340       continue
+  300       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -998,14 +934,116 @@ c
                tbf(i,ntt) = tf(i)
             end do
 c
+c     van der Waals parameters for individual atom types
+c
+         else if (keyword(1:4) .eq. 'VDW ') then
+            ia = 0
+            rd = 0.0d0
+            ep = 0.0d0
+            rdn = 0.0d0
+            string = record(next:240)
+            read (string,*,err=310,end=310)  ia,rd,ep,rdn
+  310       continue
+            if (ia .ne. 0) then
+               rad(ia) = rd
+               eps(ia) = ep
+               reduct(ia) = rdn
+            end if
+c
+c     van der Waals 1-4 parameters for individual atom types
+c
+         else if (keyword(1:6) .eq. 'VDW14 ') then
+            ia = 0
+            rd = 0.0d0
+            ep = 0.0d0
+            string = record(next:240)
+            read (string,*,err=320,end=320)  ia,rd,ep
+  320       continue
+            if (ia .ne. 0) then
+               rad4(ia) = rd
+               eps4(ia) = ep
+            end if
+c
+c     van der Waals parameters for specific atom pairs
+c
+         else if (keyword(1:6) .eq. 'VDWPR ') then
+            ia = 0
+            ib = 0
+            rd = 0.0d0
+            ep = 0.0d0
+            string = record(next:240)
+            read (string,*,err=330,end=330)  ia,ib,rd,ep
+  330       continue
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            nvp = nvp + 1
+            if (ia .le. ib) then
+               kvpr(nvp) = pa//pb
+            else
+               kvpr(nvp) = pb//pa
+            end if
+            radpr(nvp) = rd
+            epspr(nvp) = ep
+c
+c     van der Waals parameters for hydrogen bonding pairs
+c
+         else if (keyword(1:6) .eq. 'HBOND ') then
+            ia = 0
+            ib = 0
+            rd = 0.0d0
+            ep = 0.0d0
+            string = record(next:240)
+            read (string,*,err=340,end=340)  ia,ib,rd,ep
+  340       continue
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            nhb = nhb + 1
+            if (ia .le. ib) then
+               khb(nhb) = pa//pb
+            else
+               khb(nhb) = pb//pa
+            end if
+            radhb(nhb) = rd
+            epshb(nhb) = ep
+c
+c     Pauli repulsion parameters
+c
+         else if (keyword(1:10) .eq. 'REPULSION ') then
+            ia = 0
+            spr = 0.0d0
+            apr = 0.0d0
+            epr = 0.0d0
+            string = record(next:240)
+            read (string,*,err=350,end=350)  ia,spr,apr,epr
+  350       continue
+            if (ia .ne. 0) then
+               prsiz(ia) = spr
+               prdmp(ia) = apr
+               prele(ia) = -abs(epr)
+            end if
+c
+c     damped dispersion parameters
+c
+         else if (keyword(1:11) .eq. 'DISPERSION ') then
+            ia = 0
+            cdp = 0.0d0
+            adp = 0.0d0
+            string = record(next:240)
+            read (string,*,err=360,end=360)  ia,cdp,adp
+  360       continue
+            if (ia .ne. 0) then
+               dspsix(ia) = cdp
+               dspdmp(ia) = adp
+            end if
+c
 c     atomic partial charge parameters
 c
          else if (keyword(1:7) .eq. 'CHARGE ') then
             ia = 0
             cg = 0.0d0
             string = record(next:240)
-            read (string,*,err=350,end=350)  ia,cg
-  350       continue
+            read (string,*,err=370,end=370)  ia,cg
+  370       continue
             if (ia .ne. 0)  chg(ia) = cg
 c
 c     bond dipole moment parameters
@@ -1016,8 +1054,8 @@ c
             dp = 0.0d0
             ps = 0.5d0
             string = record(next:240)
-            read (string,*,err=360,end=360)  ia,ib,dp,ps
-  360       continue
+            read (string,*,err=380,end=380)  ia,ib,dp,ps
+  380       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nd = nd + 1
@@ -1037,8 +1075,8 @@ c
             dp = 0.0d0
             ps = 0.5d0
             string = record(next:240)
-            read (string,*,err=370,end=370)  ia,ib,dp,ps
-  370       continue
+            read (string,*,err=390,end=390)  ia,ib,dp,ps
+  390       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nd5 = nd5 + 1
@@ -1058,8 +1096,8 @@ c
             dp = 0.0d0
             ps = 0.5d0
             string = record(next:240)
-            read (string,*,err=380,end=380)  ia,ib,dp,ps
-  380       continue
+            read (string,*,err=400,end=400)  ia,ib,dp,ps
+  400       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nd4 = nd4 + 1
@@ -1079,8 +1117,8 @@ c
             dp = 0.0d0
             ps = 0.5d0
             string = record(next:240)
-            read (string,*,err=390,end=390)  ia,ib,dp,ps
-  390       continue
+            read (string,*,err=410,end=410)  ia,ib,dp,ps
+  410       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             nd3 = nd3 + 1
@@ -1104,33 +1142,33 @@ c
                pl(i) = 0.0d0
             end do
             string = record(next:240)
-            read (string,*,err=400,end=400)  ia,ib,ic,id,pl(1)
-            goto 430
-  400       continue
-            id = 0
-            read (string,*,err=410,end=410)  ia,ib,ic,pl(1)
-            goto 430
-  410       continue
-            ic = 0
-            read (string,*,err=420,end=420)  ia,ib,pl(1)
-            goto 430
+            read (string,*,err=420,end=420)  ia,ib,ic,id,pl(1)
+            goto 450
   420       continue
-            ib = 0
-            read (string,*,err=440,end=440)  ia,pl(1)
+            id = 0
+            read (string,*,err=430,end=430)  ia,ib,ic,pl(1)
+            goto 450
   430       continue
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=440,end=440)  pl(2),pl(3),pl(4)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=440,end=440)  pl(5)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=440,end=440)  pl(8),pl(9)
-            iprm = iprm + 1
-            record = prmline(iprm)
-            read (record,*,err=440,end=440)  pl(11),pl(12),pl(13)
+            ic = 0
+            read (string,*,err=440,end=440)  ia,ib,pl(1)
+            goto 450
   440       continue
+            ib = 0
+            read (string,*,err=460,end=460)  ia,pl(1)
+  450       continue
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=460,end=460)  pl(2),pl(3),pl(4)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=460,end=460)  pl(5)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=460,end=460)  pl(8),pl(9)
+            iprm = iprm + 1
+            record = prmline(iprm)
+            read (record,*,err=460,end=460)  pl(11),pl(12),pl(13)
+  460       continue
             if (ib .eq. 0)  axt = 'None'
             if (ib.ne.0 .and. ic.eq.0)  axt = 'Z-Only'
             if (ib.lt.0 .or. ic.lt.0)  axt = 'Bisector'
@@ -1160,6 +1198,20 @@ c
             multip(12,nmp) = pl(12)
             multip(13,nmp) = pl(13)
 c
+c     charge penetration parameters
+c
+         else if (keyword(1:7) .eq. 'CHGPEN ') then
+            ia = 0
+            pel = 0.0d0
+            pal = 0.0d0
+            string = record(next:240)
+            read (string,*,err=470,end=470)  ia,pel,pal
+  470       continue
+            if (ia .ne. 0) then
+               cpele(ia) = abs(pel)
+               cpalp(ia) = pal
+            end if
+c
 c     atomic dipole polarizability parameters
 c
          else if (keyword(1:9) .eq. 'POLARIZE ') then
@@ -1170,15 +1222,33 @@ c
                pg(i) = 0
             end do
             string = record(next:240)
-            read (string,*,err=450,end=450)  ia,pol,thl,
+            read (string,*,err=480,end=490)  ia,pol,
      &                                       (pg(i),i=1,maxval)
-  450       continue
+            goto 490
+  480       continue
+            read (string,*,err=490,end=490)  ia,pol,thl,
+     &                                       (pg(i),i=1,maxval)
+  490       continue
             if (ia .ne. 0) then
                polr(ia) = pol
                athl(ia) = thl
                do i = 1, maxval
                   pgrp(i,ia) = pg(i)
                end do
+            end if
+c
+c     charge transfer parameters
+c
+         else if (keyword(1:7) .eq. 'CHGTRN ') then
+            ia = 0
+            ctrn = 0.0d0
+            atrn = 0.0d0
+            string = record(next:240)
+            read (string,*,err=500,end=500)  ia,ctrn,atrn
+  500       continue
+            if (ia .ne. 0) then
+               ctchg(ia) = ctrn
+               ctdmp(ia) = atrn
             end if
 c
 c     conjugated pisystem atom parameters
@@ -1189,8 +1259,8 @@ c
             iz = 0.0d0
             rp = 0.0d0
             string = record(next:240)
-            read (string,*,err=460,end=460)  ia,el,iz,rp
-  460       continue
+            read (string,*,err=510,end=510)  ia,el,iz,rp
+  510       continue
             if (ia .ne. 0) then
                electron(ia) = el
                ionize(ia) = iz
@@ -1205,8 +1275,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:240)
-            read (string,*,err=470,end=470)  ia,ib,ss,ts
-  470       continue
+            read (string,*,err=520,end=520)  ia,ib,ss,ts
+  520       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi = npi + 1
@@ -1226,8 +1296,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:240)
-            read (string,*,err=480,end=480)  ia,ib,ss,ts
-  480       continue
+            read (string,*,err=530,end=530)  ia,ib,ss,ts
+  530       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi5 = npi5 + 1
@@ -1247,8 +1317,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:240)
-            read (string,*,err=490,end=490)  ia,ib,ss,ts
-  490       continue
+            read (string,*,err=540,end=540)  ia,ib,ss,ts
+  540       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi4 = npi4 + 1
@@ -1264,8 +1334,8 @@ c     metal ligand field splitting parameters
 c
          else if (keyword(1:6) .eq. 'METAL ') then
             string = record(next:240)
-            read (string,*,err=500,end=500)  ia
-  500       continue
+            read (string,*,err=550,end=550)  ia
+  550       continue
 c
 c     biopolymer atom type conversion definitions
 c
@@ -1273,15 +1343,15 @@ c
             ia = 0
             ib = 0
             string = record(next:240)
-            read (string,*,err=510,end=510)  ia
+            read (string,*,err=560,end=560)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:240)
-            read (string,*,err=510,end=510)  ib
-  510       continue
+            read (string,*,err=560,end=560)  ib
+  560       continue
             if (ia .ge. maxbio) then
-               write (iout,520)
-  520          format (/,' READPRM  --  Too many Biopolymer Types;',
+               write (iout,570)
+  570          format (/,' READPRM  --  Too many Biopolymer Types;',
      &                    ' Increase MAXBIO')
                call fatal
             end if
@@ -1297,8 +1367,8 @@ c
             id = 1000
             ie = 1000
             if = 0
-            read (string,*,err=530,end=530)  ia,ib,ic,id,ie,if
-  530       continue
+            read (string,*,err=580,end=580)  ia,ib,ic,id,ie,if
+  580       continue
             eqclass(if,1) = ia
             eqclass(if,2) = ib
             eqclass(if,3) = ic
@@ -1312,8 +1382,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=540,end=540)  ia,fc,bd
-  540       continue
+            read (string,*,err=590,end=590)  ia,fc,bd
+  590       continue
             rad0(ia) = fc
             paulel(ia) = bd
 c
@@ -1330,9 +1400,9 @@ c
             ig = 1000
             ih = 1000
             ii = 1000
-            read (string,*,err=550,end=550)  ia,ib,ic,id,ie,
+            read (string,*,err=600,end=600)  ia,ib,ic,id,ie,
      &                                       if,ig,ih,ii
-  550       continue
+  600       continue
             crd(ia) = ic
             val(ia) = id
             pilp(ia) = ie
@@ -1340,25 +1410,6 @@ c
             arom(ia) = ig
             lin(ia) = ih
             sbmb(ia) = ii
-c
-c     MMFF van der Waals parameters
-c
-         else if (keyword(1:8) .eq. 'MMFFVDW ') then
-            ia = 0
-            rd = 0.0d0
-            ep = 0.0d0
-            rdn = 0.0d0
-            da1 = 'C'
-            string = record(next:240)
-            read (string,*,err=560,end=560)  ia,rd,alphi,nni,gi,da1
-  560       continue
-            if (ia .ne. 0) then
-               rad(ia) = rd
-               g(ia) = gi
-               alph(ia) = alphi
-               nn(ia) = nni
-               da(ia) = da1
-            end if
 c
 c     MMFF bond stretching parameters
 c
@@ -1369,8 +1420,8 @@ c
             bd = 0.0d0
             bt = 2
             string = record(next:240)
-            read (string,*,err=570,end=570)  ia,ib,fc,bd,bt
-  570       continue
+            read (string,*,err=610,end=610)  ia,ib,fc,bd,bt
+  610       continue
             nb = nb + 1
             if (bt .eq. 0) then
                mmff_kb(ia,ib) = fc
@@ -1392,8 +1443,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=580,end=580)  ia,ib,fc,bd
-  580       continue
+            read (string,*,err=620,end=620)  ia,ib,fc,bd
+  620       continue
             r0ref(ia,ib) = fc
             r0ref(ib,ia) = fc
             kbref(ia,ib) = bd
@@ -1409,8 +1460,8 @@ c
             an1 = 0.0d0
             at = 3
             string = record(next:240)
-            read (string,*,err=590,end=590)  ia,ib,ic,fc,an1,at
-  590       continue
+            read (string,*,err=630,end=630)  ia,ib,ic,fc,an1,at
+  630       continue
             na = na + 1
             if (an1 .ne. 0.0d0) then
                if (at .eq. 0) then
@@ -1471,8 +1522,8 @@ c
             cba = 0.0d0
             sbt = 4
             string = record(next:240)
-            read (string,*,err=600,end=600)  ia,ib,ic,abc,cba,sbt
-  600       continue
+            read (string,*,err=640,end=640)  ia,ib,ic,abc,cba,sbt
+  640       continue
             if (ia .ne. 0) then
                if (sbt .eq. 0) then
                   stbn_abc(ia,ib,ic) = abc
@@ -1546,8 +1597,8 @@ c
             ic = 1000
             abc = 0.0d0
             cba = 0.0d0
-            read (string,*,err=610,end=610)  ia,ib,ic,abc,cba
-  610       continue
+            read (string,*,err=650,end=650)  ia,ib,ic,abc,cba
+  650       continue
             defstbn_abc(ia,ib,ic) = abc
             defstbn_cba(ia,ib,ic) = cba
             defstbn_abc(ic,ib,ia) = cba
@@ -1562,8 +1613,8 @@ c
             id = 0
             fc = 0.0d0
             string = record(next:240)
-            read (string,*,err=620,end=620)  ia,ib,ic,id,fc
-  620       continue
+            read (string,*,err=660,end=660)  ia,ib,ic,id,fc
+  660       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1606,9 +1657,9 @@ c
             end do
             tt = 3
             string = record(next:240)
-            read (string,*,err=630,end=630)  ia,ib,ic,id,(vt(j),
+            read (string,*,err=670,end=670)  ia,ib,ic,id,(vt(j),
      &                                       st(j),ft(j),j=1,3),tt
-  630       continue
+  670       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1703,6 +1754,25 @@ c
                t35(2,nt5) = st(3)
             end if
 c
+c     MMFF van der Waals parameters
+c
+         else if (keyword(1:8) .eq. 'MMFFVDW ') then
+            ia = 0
+            rd = 0.0d0
+            ep = 0.0d0
+            rdn = 0.0d0
+            da1 = 'C'
+            string = record(next:240)
+            read (string,*,err=680,end=680)  ia,rd,alphi,nni,gi,da1
+  680       continue
+            if (ia .ne. 0) then
+               rad(ia) = rd
+               g(ia) = gi
+               alph(ia) = alphi
+               nn(ia) = nni
+               da(ia) = da1
+            end if
+c
 c     MMFF bond charge increment parameters
 c
          else if (keyword(1:8) .eq. 'MMFFBCI ') then
@@ -1711,8 +1781,8 @@ c
             cg = 1000.0d0
             bt = 2
             string = record(next:240)
-            read (string,*,err=640,end=640)  ia,ib,cg,bt
-  640       continue
+            read (string,*,err=690,end=690)  ia,ib,cg,bt
+  690       continue
             if (ia .ne. 0) then
                if (bt .eq. 0) then
                   bci(ia,ib) = cg
@@ -1728,8 +1798,8 @@ c
          else if (keyword(1:9) .eq. 'MMFFPBCI ') then
             ia = 0
             string = record(next:240)
-            read (string,*,err=650,end=650)  ia,cg,factor
-  650       continue
+            read (string,*,err=700,end=700)  ia,cg,factor
+  700       continue
             if (ia .ne. 0) then
                pbci(ia) = cg
                fcadj(ia) = factor
@@ -1739,8 +1809,8 @@ c     MMFF aromatic ion parameters
 c
          else if (keyword(1:9) .eq. 'MMFFAROM ') then
             string = record(next:240)
-            read (string,*,err=660,end=660)  ia,ib,ic,id,ie,if
-  660       continue
+            read (string,*,err=710,end=710)  ia,ib,ic,id,ie,if
+  710       continue
             if (ie.eq.0 .and. id.eq.0) then
                mmffarom(ia,if) = ic
             else if (id .eq. 1) then

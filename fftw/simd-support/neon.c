@@ -19,7 +19,7 @@
  */
 
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 #if HAVE_NEON
 
@@ -52,8 +52,6 @@
 	    return 1;
        }
   }
-
-  extern void X(check_alignment_of_sse2_pm)(void);
 
   int X(have_simd_neon)(void)
   {

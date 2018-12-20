@@ -73,13 +73,13 @@ c
                   if (vdwindex .eq. 'CLASS') then
                      write (iout,20)
    20                format (/,' Additional van der Waals Parameters :',
-     &                       //,5x,'Atom Class',10x,'Size',6x,
-     &                          'Epsilon',5x,'Reduction',/)
+     &                       //,5x,'Atom Class',15x,'Size',
+     &                          8x,'Epsilon',8x,'Reduction',/)
                   else
                      write (iout,30)
    30                format (/,' Additional van der Waals Parameters :',
-     &                       //,5x,'Atom Type',11x,'Size',6x,
-     &                          'Epsilon',5x,'Reduction',/)
+     &                       //,5x,'Atom Type',16x,'Size',
+     &                          8x,'Epsilon',8x,'Reduction',/)
                   end if
                end if
                rad(k) = rd
@@ -87,7 +87,7 @@ c
                reduct(k) = rdn
                if (.not. silent) then
                   write (iout,40)  k,rd,ep,rdn
-   40             format (4x,i6,8x,2f12.4,f12.3)
+   40             format (6x,i6,7x,2f15.4,f15.3)
                end if
             else if (k .gt. maxclass) then
                write (iout,50)  maxclass
@@ -120,21 +120,21 @@ c
                      write (iout,70)
    70                format (/,' Additional 1-4 van der Waals',
      &                          ' Parameters :',
-     &                       //,5x,'Atom Class',10x,'Size',6x,
-     &                          'Epsilon',/)
+     &                       //,5x,'Atom Class',15x,'Size',
+     &                          8x,'Epsilon',/)
                   else
                      write (iout,80)
    80                format (/,' Additional 1-4 van der Waals',
      &                          ' Parameters :',
-     &                       //,5x,'Atom Type',11x,'Size',6x,
-     &                          'Epsilon',/)
+     &                       //,5x,'Atom Type',16x,'Size',
+     &                          8x,'Epsilon',/)
                   end if
                end if
                rad4(k) = rd
                eps4(k) = ep
                if (.not. silent) then
                   write (iout,90)  k,rd,ep
-   90             format (4x,i6,8x,2f12.4)
+   90             format (6x,i6,7x,2f15.4)
                end if
             else if (k .gt. maxclass) then
                write (iout,100)  maxclass
@@ -166,19 +166,19 @@ c
                   write (iout,110)
   110             format (/,' Additional van der Waals Parameters',
      &                       ' for Specific Pairs :',
-     &                    //,5x,'Atom Classes',6x,'Size Sum',
-     &                       4x,'Epsilon',/)
+     &                    //,5x,'Atom Classes',9x,'Size Sum',
+     &                       8x,'Epsilon',/)
                else
                   write (iout,120)
   120             format (/,' Additional van der Waals Parameters',
      &                       ' for Specific Pairs :',
-     &                    //,5x,'Atom Types',8x,'Size Sum',
-     &                       4x,'Epsilon',/)
+     &                    //,5x,'Atom Types',11x,'Size Sum',
+     &                       8x,'Epsilon',/)
                end if
             end if
             if (.not. silent) then
                write (iout,130)  ia,ib,rd,ep
-  130          format (6x,2i4,4x,2f12.4)
+  130          format (6x,2i4,5x,2f15.4)
             end if
             size = 4
             call numeral (ia,pa,size)
@@ -225,19 +225,19 @@ c
                   write (iout,160)
   160             format (/,' Additional van der Waals Hydrogen',
      &                       ' Bonding Parameters :',
-     &                    //,5x,'Atom Classes',6x,'Size Sum',
-     &                       4x,'Epsilon',/)
+     &                    //,5x,'Atom Classes',9x,'Size Sum',
+     &                       8x,'Epsilon',/)
                else
                   write (iout,170)
   170             format (/,' Additional van der Waals Hydrogen',
      &                       ' Bonding Parameters :',
-     &                    //,5x,'Atom Types',8x,'Size Sum',
-     &                       4x,'Epsilon',/)
+     &                    //,5x,'Atom Types',11x,'Size Sum',
+     &                       8x,'Epsilon',/)
                end if
             end if
             if (.not. silent) then
                write (iout,180)  ia,ib,rd,ep
-  180          format (6x,2i4,4x,2f12.4)
+  180          format (6x,2i4,5x,2f15.4)
             end if
             size = 4
             call numeral (ia,pa,size)

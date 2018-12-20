@@ -177,6 +177,7 @@ c
 c     flags for rebuilding of neighbor lists
 c
       dovlst = .true.
+      dodlst = .true.
       doclst = .true.
       domlst = .true.
       doulst = .true.

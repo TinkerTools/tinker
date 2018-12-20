@@ -17,13 +17,17 @@ c     the structure and processes any new or changed values
 c
 c
       subroutine kmpole
+      use atomid
       use atoms
+      use chgpen
       use couple
       use inform
       use iounit
+      use kcpen
       use keys
       use kmulti
       use math
+      use mplpot
       use mpole
       use polar
       use polgrp
@@ -33,7 +37,7 @@ c
       integer i,j,k,l,m
       integer ji,ki,li
       integer it,jt,kt,lt
-      integer imp,nmp
+      integer ic,imp,nmp
       integer size,next
       integer number
       integer kz,kx,ky
@@ -42,6 +46,7 @@ c
       integer, allocatable :: mpz(:)
       integer, allocatable :: mpx(:)
       integer, allocatable :: mpy(:)
+      real*8 pel,pal
       real*8 mpl(13)
       logical header,path
       character*4 pa,pb,pc,pd
@@ -178,14 +183,14 @@ c
                   write (iout,110)
   110             format (/,' Additional Atomic Multipole Parameters :',
      &                    //,5x,'Atom Type',5x,'Coordinate Frame',
-     &                       ' Definition',8x,'Multipole Moments')
+     &                       ' Definition',9x,'Multipole Moments')
                end if
                if (.not. silent) then
                   write (iout,120)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
      &                             mpl(8),mpl(9),(mpl(j),j=11,13)
-  120             format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
-     &                       /,48x,3f9.5,/,48x,f9.5,
-     &                       /,48x,2f9.5,/,48x,3f9.5)
+  120             format (/,6x,i6,3x,i6,1x,i6,1x,i6,3x,a8,3x,f9.5,
+     &                       /,49x,3f9.5,/,49x,f9.5,
+     &                       /,49x,2f9.5,/,49x,3f9.5)
                end if
                size = 4
                call numeral (k,pa,size)
@@ -239,7 +244,6 @@ c
 c
 c     zero out local axes, multipoles and polarization attachments
 c
-      npole = n
       do i = 1, n
          ipole(i) = 0
          polsiz(i) = 0
@@ -484,14 +488,14 @@ c
   190             format (/,' Additional Atomic Multipoles',
      &                       ' for Specific Atoms :',
      &                    //,6x,'Atom',9x,'Coordinate Frame',
-     &                       ' Definition',8x,'Multipole Moments')
+     &                       ' Definition',9x,'Multipole Moments')
                end if
                if (.not. silent) then
                   write (iout,200)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
      &                              mpl(8),mpl(9),(mpl(j),j=11,13)
-  200             format (/,4x,i6,5x,i6,1x,i6,1x,i6,3x,a8,2x,f9.5,
-     &                       /,48x,3f9.5,/,48x,f9.5,
-     &                       /,48x,2f9.5,/,48x,3f9.5)
+  200             format (/,6x,i6,3x,i6,1x,i6,1x,i6,3x,a8,3x,f9.5,
+     &                       /,49x,3f9.5,/,49x,f9.5,
+     &                       /,49x,2f9.5,/,49x,3f9.5)
                end if
                zaxis(k) = kz
                xaxis(k) = kx
@@ -535,6 +539,7 @@ c
 c
 c     get the order of the multipole expansion at each site
 c
+      npole = 0
       do i = 1, n
          size = 0
          do k = 1, maxpole
@@ -546,6 +551,7 @@ c
             size = 4
          end if
          polsiz(i) = size
+         if (polsiz(i) .ne. 0)  npole = npole + 1
       end do
 c
 c     perform dynamic allocation of some global arrays
@@ -572,10 +578,94 @@ c
          end do
       end if
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(pcore))  deallocate (pcore)
+      if (allocated(pval))  deallocate (pval)
+      if (allocated(palpha))  deallocate (palpha)
+      allocate (pcore(n))
+      allocate (pval(n))
+      allocate (palpha(n))
+c
+c     find new charge penetration parameters in the keyfile
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'CHGPEN ') then
+            k = 0
+            pel = 0.0d0
+            pal = 0.0d0
+            string = record(next:240)
+            read (string,*,err=240,end=240)  k,pel,pal
+            cpele(k) = abs(pel)
+            cpalp(k) = pal
+            if (header .and. .not.silent) then
+               header = .false.
+               write (iout,220)
+  220          format (/,' Additional Charge Penetration Parameters :',
+     &                 //,5x,'Atom Class',11x,'Core Chg',11x,'Damp',/)
+            end if
+            if (.not. silent) then
+               write (iout,230)  k,pel,pal
+  230          format (6x,i6,7x,f15.3,f15.4)
+            end if
+  240       continue
+         end if
+      end do
+c
+c     assign the charge penetration charge and alpha parameters 
+c     
+      do i = 1, n
+         ic = class(i)
+         pcore(i) = cpele(ic)
+         pval(i) = pole(1,i) - cpele(ic)
+         palpha(i) = cpalp(ic)
+      end do
+c
+c     process keywords with charge penetration for specific atoms
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'CHGPEN ') then
+            k = 0
+            pel = 0.0d0
+            pal = 0.0d0
+            string = record(next:240)
+            read (string,*,err=270,end=270)  k,pel,pal
+            if (k.lt.0 .and. k.ge.-n) then
+               k = -k
+               pcore(i) = pole(1,i) + abs(pel)
+               pval(i) = -abs(pel)
+               palpha(i) = pal
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,250)
+  250             format (/,' Additional Charge Penetration',
+     &                       ' for Specific Atoms :',
+     &                    //,5x,'Atom',17x,'Core Chg',11x,'Damp',/)
+               end if
+               if (.not. silent) then
+                  write (iout,260)  k,pel,pal
+  260             format (6x,i6,7x,f15.3,f15.4)
+               end if
+            end if
+  270       continue
+         end if
+      end do
+c
 c     remove any zero or undefined atomic multipoles
 c
-      if (.not. use_polar) then
+      if (.not.use_polar .and. .not.use_chgtrn) then
          npole = 0
+         ncp = 0
          do i = 1, n
             if (polsiz(i) .ne. 0) then
                npole = npole + 1
@@ -588,16 +678,21 @@ c
                do j = 1, maxpole
                   pole(j,npole) = pole(j,i)
                end do
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               palpha(npole) = palpha(i)
             end if
          end do
 c
 c     test multipoles at chiral sites and invert if necessary
 c
          call chkpole
-c
-c     turn off the atomic multipole potential if it is not used
-c
-         if (npole .eq. 0)  use_mpole = .false.
       end if
+c
+c     turn off atomic multipole potentials if not used
+c
+      if (npole .eq. 0)  use_mpole = .false.
+      if (ncp .ne. 0)  use_chgpen = .true.
       return
       end

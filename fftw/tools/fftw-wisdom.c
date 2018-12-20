@@ -1,12 +1,12 @@
 /* Re-use libbench2 and the test program, but override bench_main so that
    we can have different command-line syntax. */
-#include "my-getopt.h"
-#include "bench.h"
+#include "libbench2/my-getopt.h"
+#include "libbench2/bench.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#include <fftw3.h>
+#include "api/fftw3.h"
 #include <string.h>
 #include <time.h>
 
@@ -40,7 +40,7 @@ int verbose;
 static void do_problem(bench_problem *p)
 {
      if (verbose)
-	  printf("PLANNING PROBLEM: %s\n", p->pstring);
+	  printf("Planning transform: %s\n", p->pstring);
      /* BENCH_ASSERT(can_do(p)); */
      problem_alloc(p);
      setup(p);

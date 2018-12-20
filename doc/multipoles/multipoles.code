@@ -1,0 +1,82 @@
+c
+c     intermediates involving moments and separation distance
+c
+                  dir = dix*xr + diy*yr + diz*zr
+                  qix = qixx*xr + qixy*yr + qixz*zr
+                  qiy = qixy*xr + qiyy*yr + qiyz*zr
+                  qiz = qixz*xr + qiyz*yr + qizz*zr
+                  qir = qix*xr + qiy*yr + qiz*zr
+                  dkr = dkx*xr + dky*yr + dkz*zr
+                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qky = qkxy*xr + qkyy*yr + qkyz*zr
+                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                  qkr = qkx*xr + qky*yr + qkz*zr
+                  dik = dix*dkx + diy*dky + diz*dkz
+                  qik = qix*qkx + qiy*qky + qiz*qkz
+                  diqk = dix*qkx + diy*qky + diz*qkz
+                  dkqi = dkx*qix + dky*qiy + dkz*qiz
+                  qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                      + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+c
+c     extra intermediates needed for polarization energy
+c
+                  diu = dix*ukx + diy*uky + diz*ukz
+                  qiu = qix*ukx + qiy*uky + qiz*ukz
+                  uir = uix*xr + uiy*yr + uiz*zr
+                  dku = dkx*uix + dky*uiy + dkz*uiz
+                  qku = qkx*uix + qky*uiy + qkz*uiz
+                  ukr = ukx*xr + uky*yr + ukz*zr
+c
+c     additional intermediates involving moments and distance
+c
+                  dirx = diy*zr - diz*yr
+                  diry = diz*xr - dix*zr
+                  dirz = dix*yr - diy*xr
+                  dkrx = dky*zr - dkz*yr
+                  dkry = dkz*xr - dkx*zr
+                  dkrz = dkx*yr - dky*xr
+                  dikx = diy*dkz - diz*dky
+                  diky = diz*dkx - dix*dkz
+                  dikz = dix*dky - diy*dkx
+                  qirx = qiz*yr - qiy*zr
+                  qiry = qix*zr - qiz*xr
+                  qirz = qiy*xr - qix*yr
+                  qkrx = qkz*yr - qky*zr
+                  qkry = qkx*zr - qkz*xr
+                  qkrz = qky*xr - qkx*yr
+                  qikx = qky*qiz - qkz*qiy
+                  qiky = qkz*qix - qkx*qiz
+                  qikz = qkx*qiy - qky*qix
+                  qixk = qixx*qkx + qixy*qky + qixz*qkz
+                  qiyk = qixy*qkx + qiyy*qky + qiyz*qkz
+                  qizk = qixz*qkx + qiyz*qky + qizz*qkz
+                  qkxi = qkxx*qix + qkxy*qiy + qkxz*qiz
+                  qkyi = qkxy*qix + qkyy*qiy + qkyz*qiz
+                  qkzi = qkxz*qix + qkyz*qiy + qkzz*qiz
+                  qikrx = qizk*yr - qiyk*zr
+                  qikry = qixk*zr - qizk*xr
+                  qikrz = qiyk*xr - qixk*yr
+                  qkirx = qkzi*yr - qkyi*zr
+                  qkiry = qkxi*zr - qkzi*xr
+                  qkirz = qkyi*xr - qkxi*yr
+                  diqkx = dix*qkxx + diy*qkxy + diz*qkxz
+                  diqky = dix*qkxy + diy*qkyy + diz*qkyz
+                  diqkz = dix*qkxz + diy*qkyz + diz*qkzz
+                  dkqix = dkx*qixx + dky*qixy + dkz*qixz
+                  dkqiy = dkx*qixy + dky*qiyy + dkz*qiyz
+                  dkqiz = dkx*qixz + dky*qiyz + dkz*qizz
+                  diqkrx = diqkz*yr - diqky*zr
+                  diqkry = diqkx*zr - diqkz*xr
+                  diqkrz = diqky*xr - diqkx*yr
+                  dkqirx = dkqiz*yr - dkqiy*zr
+                  dkqiry = dkqix*zr - dkqiz*xr
+                  dkqirz = dkqiy*xr - dkqix*yr
+                  dqikx = diy*qkz - diz*qky + dky*qiz - dkz*qiy
+                             - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
+                                     -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
+                  dqiky = diz*qkx - dix*qkz + dkz*qix - dkx*qiz
+                             - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
+                                     -qixx*qkxz-qixy*qkyz-qixz*qkzz)
+                  dqikz = dix*qky - diy*qkx + dkx*qiy - dky*qix
+                             - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
+                                     -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)

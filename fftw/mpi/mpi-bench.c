@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "fftw3-mpi.h"
-#include "fftw-bench.h"
+#include "tests/fftw-bench.h"
 
 #if defined(BENCHFFT_SINGLE)
 #  define BENCH_MPI_TYPE MPI_FLOAT
@@ -340,7 +340,7 @@ static int tensor_rowmajor_transposedp(bench_tensor *t)
      bench_iodim *d;
      int i;
 
-     BENCH_ASSERT(FINITE_RNK(t->rnk));
+     BENCH_ASSERT(BENCH_FINITE_RNK(t->rnk));
      if (t->rnk < 2)
 	  return 0;
 

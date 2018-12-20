@@ -28,6 +28,8 @@ c
       use bndstr
       use cell
       use charge
+      use chgpen
+      use chgtrn
       use chunks
       use couple
       use deriv
@@ -45,9 +47,15 @@ c
       use imptor
       use inform
       use iounit
+      use kanang
       use katoms
       use kchrge
+      use kcpen
+      use kctrn
+      use kdsp
+      use korbs
       use kpolr
+      use krepl
       use kvdws
       use light
       use merck
@@ -77,6 +85,7 @@ c
       use potfit
       use qmstuf
       use refer
+      use repel
       use restrn
       use rgddyn
       use rigid
@@ -116,7 +125,7 @@ c     print a final status message before exiting Tinker
 c
       if (debug) then
          write (iout,10)
-   10    format (/,' Tinker is Exiting following Normal Termination',/)
+   10    format (/,' Tinker is Exiting following Normal Termination')
       end if
 c
 c     ensure any output is written to the storage device
@@ -199,6 +208,17 @@ c
       if (allocated(jion))  deallocate (jion)
       if (allocated(kion))  deallocate (kion)
       if (allocated(pchg))  deallocate (pchg)
+c
+c     deallocation of global arrays from module chgpen
+c
+      if (allocated(pcore))  deallocate (pcore)
+      if (allocated(pval))  deallocate (pval)
+      if (allocated(palpha))  deallocate (palpha)
+c
+c     deallocation of global arrays from module chgtrn
+c
+      if (allocated(chgct))  deallocate (chgct)
+      if (allocated(dmpct))  deallocate (dmpct)
 c
 c     deallocation of global arrays from module chunks
 c
@@ -385,6 +405,10 @@ c
       if (allocated(itors2))  deallocate (itors2)
       if (allocated(itors3))  deallocate (itors3)
 c
+c     deallocation of global arrays from module kanang
+c
+      if (allocated(anan))  deallocate (anan)
+c
 c     deallocation of global arrays from module katoms
 c
       if (allocated(atmcls))  deallocate (atmcls)
@@ -398,11 +422,36 @@ c     deallocation of global arrays from module kchrge
 c
       if (allocated(chg))  deallocate (chg)
 c
+c     deallocation of global arrays from module kcpen
+c
+      if (allocated(cpele))  deallocate (cpele)
+      if (allocated(cpalp))  deallocate (cpalp)
+c
+c     deallocation of global arrays from module kctrn
+c
+      if (allocated(ctchg))  deallocate (ctchg)
+      if (allocated(ctdmp))  deallocate (ctdmp)
+c
+c     deallocation of global arrays from module kdsp
+c
+      if (allocated(dspsix))  deallocate (dspsix)
+      if (allocated(dspdmp))  deallocate (dspdmp)
+c
+c     deallocation of global arrays from module korbs
+c
+      if (allocated(electron))  deallocate (electron)
+      if (allocated(ionize))  deallocate (ionize)
+      if (allocated(repulse))  deallocate (repulse)
+c
 c     deallocation of global arrays from module kpolr
 c
+      if (allocated(prsiz))  deallocate (prsiz)
+      if (allocated(prdmp))  deallocate (prdmp)
+      if (allocated(prele))  deallocate (prele)
+c
+c     deallocation of global arrays from module krepl
+c
       if (allocated(polr))  deallocate (polr)
-      if (allocated(athl))  deallocate (athl)
-      if (allocated(pgrp))  deallocate (pgrp)
 c
 c     deallocation of global arrays from module kvdws
 c
@@ -515,21 +564,21 @@ c
 c
 c     deallocation of global arrays from module neigh
 c
-      if (allocated(xvold))  deallocate (xvold)
-      if (allocated(yvold))  deallocate (yvold)
-      if (allocated(zvold))  deallocate (zvold)
-      if (allocated(xcold))  deallocate (xcold)
-      if (allocated(ycold))  deallocate (ycold)
-      if (allocated(zcold))  deallocate (zcold)
-      if (allocated(xmold))  deallocate (xmold)
-      if (allocated(ymold))  deallocate (ymold)
-      if (allocated(zmold))  deallocate (zmold)
       if (allocated(nvlst))  deallocate (nvlst)
       if (allocated(vlst))  deallocate (vlst)
       if (allocated(nelst))  deallocate (nelst)
       if (allocated(elst))  deallocate (elst)
       if (allocated(nulst))  deallocate (nulst)
       if (allocated(ulst))  deallocate (ulst)
+      if (allocated(xvold))  deallocate (xvold)
+      if (allocated(yvold))  deallocate (yvold)
+      if (allocated(zvold))  deallocate (zvold)
+      if (allocated(xeold))  deallocate (xeold)
+      if (allocated(yeold))  deallocate (yeold)
+      if (allocated(zeold))  deallocate (zeold)
+      if (allocated(xuold))  deallocate (xuold)
+      if (allocated(yuold))  deallocate (yuold)
+      if (allocated(zuold))  deallocate (zuold)
 c
 c     deallocation of global arrays from module nonpol
 c
@@ -628,6 +677,7 @@ c
 c
 c     deallocation of global arrays from module polar
 c
+      if (allocated(ipolar))  deallocate (ipolar)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
@@ -665,8 +715,6 @@ c
 c
 c     deallocation of global arrays from module poltcg
 c
-      if (allocated(uindt))  deallocate (uindt)
-      if (allocated(uinpt))  deallocate (uinpt)
       if (allocated(uad))  deallocate (uad)
       if (allocated(uap))  deallocate (uap)
       if (allocated(ubd))  deallocate (ubd)
@@ -675,6 +723,7 @@ c
 c     deallocation of global arrays from module potfit
 c
       if (allocated(ipgrid))  deallocate (ipgrid)
+      if (allocated(fit0))  deallocate (fit0)
       if (allocated(fchg))  deallocate (fchg)
       if (allocated(fpol))  deallocate (fpol)
       if (allocated(pgrid))  deallocate (pgrid)
@@ -702,6 +751,12 @@ c
       if (allocated(yref))  deallocate (yref)
       if (allocated(zref))  deallocate (zref)
       if (allocated(refnam))  deallocate (refnam)
+c
+c     deallocation of global arrays from module repel
+c
+      if (allocated(sizpr))  deallocate (sizpr)
+      if (allocated(dmppr))  deallocate (dmppr)
+      if (allocated(elepr))  deallocate (elepr)
 c
 c     deallocation of global arrays from module restrn
 c

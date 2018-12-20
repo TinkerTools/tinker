@@ -28,6 +28,7 @@
 #include <stdlib.h>		/* size_t */
 #include <stdarg.h>		/* va_list */
 #include <stddef.h>             /* ptrdiff_t */
+#include <limits.h>             /* INT_MAX */
 
 #if HAVE_SYS_TYPES_H
 # include <sys/types.h>
@@ -85,7 +86,7 @@ typedef ptrdiff_t INT;
 /* dummy use of unused parameters to silence compiler warnings */
 #define UNUSED(x) (void)x
 
-#define NELEM(array) ((int) (sizeof(array) / sizeof((array)[0])))
+#define NELEM(array) ((sizeof(array) / sizeof((array)[0])))
 
 #define FFT_SIGN (-1)  /* sign convention for forward transforms */
 extern void X(extract_reim)(int sign, R *c, R **r, R **i);
@@ -97,8 +98,13 @@ extern void X(extract_reim)(int sign, R *c, R **r, R **i);
 #define CIMPLIES(ante, post) (!(ante) || (post))
 
 /* define HAVE_SIMD if any simd extensions are supported */
-#if defined(HAVE_SSE) || defined(HAVE_SSE2) || defined(HAVE_ALTIVEC) || \
-     defined(HAVE_MIPS_PS) || defined(HAVE_AVX)
+#if defined(HAVE_SSE) || defined(HAVE_SSE2) || \
+      defined(HAVE_AVX) || defined(HAVE_AVX_128_FMA) || \
+      defined(HAVE_AVX2) || defined(HAVE_AVX512) || \
+      defined(HAVE_KCVI) || \
+      defined(HAVE_ALTIVEC) || defined(HAVE_VSX) || \
+      defined(HAVE_MIPS_PS) || \
+      defined(HAVE_GENERIC_SIMD128) || defined(HAVE_GENERIC_SIMD256)
 #define HAVE_SIMD 1
 #else
 #define HAVE_SIMD 0
@@ -106,7 +112,12 @@ extern void X(extract_reim)(int sign, R *c, R **r, R **i);
 
 extern int X(have_simd_sse2)(void);
 extern int X(have_simd_avx)(void);
+extern int X(have_simd_avx_128_fma)(void);
+extern int X(have_simd_avx2)(void);
+extern int X(have_simd_avx2_128)(void);
+extern int X(have_simd_avx512)(void);
 extern int X(have_simd_altivec)(void);
+extern int X(have_simd_vsx)(void);
 extern int X(have_simd_neon)(void);
 
 /* forward declarations */
@@ -120,7 +131,9 @@ typedef struct scanner_s scanner;
 /*-----------------------------------------------------------------------*/
 /* alloca: */
 #if HAVE_SIMD
-#  ifdef HAVE_AVX
+#  if defined(HAVE_KCVI) || defined(HAVE_AVX512)
+#    define MIN_ALIGNMENT 64
+#  elif defined(HAVE_AVX) || defined(HAVE_AVX2) || defined(HAVE_GENERIC_SIMD256)
 #    define MIN_ALIGNMENT 32  /* best alignment for AVX, conservative for
 			       * everything else */
 #  else
@@ -275,30 +288,8 @@ enum malloc_tag {
 IFFTW_EXTERN void X(ifree)(void *ptr);
 extern void X(ifree0)(void *ptr);
 
-#ifdef FFTW_DEBUG_MALLOC
-
-IFFTW_EXTERN void *X(malloc_debug)(size_t n, enum malloc_tag what,
-			     const char *file, int line);
-#define MALLOC(n, what) X(malloc_debug)(n, what, __FILE__, __LINE__)
-IFFTW_EXTERN void X(malloc_print_minfo)(int vrbose);
-
-#else /* ! FFTW_DEBUG_MALLOC */
-
 IFFTW_EXTERN void *X(malloc_plain)(size_t sz);
 #define MALLOC(n, what)  X(malloc_plain)(n)
-
-#endif
-
-#if defined(FFTW_DEBUG) && defined(FFTW_DEBUG_MALLOC) && (defined(HAVE_THREADS) || defined(HAVE_OPENMP))
-extern int X(in_thread);
-#  define IN_THREAD X(in_thread)
-#  define THREAD_ON { int in_thread_save = X(in_thread); X(in_thread) = 1
-#  define THREAD_OFF X(in_thread) = in_thread_save; }
-#else
-#  define IN_THREAD 0
-#  define THREAD_ON 
-#  define THREAD_OFF 
-#endif
 
 /*-----------------------------------------------------------------------*/
 /* low-resolution clock */
@@ -433,7 +424,7 @@ typedef struct {
  
   A tensor of rank -infinity has size 0.
 */
-#define RNK_MINFTY  ((int)(((unsigned) -1) >> 1))
+#define RNK_MINFTY  INT_MAX
 #define FINITE_RNK(rnk) ((rnk) != RNK_MINFTY)
 
 typedef enum { INPLACE_IS, INPLACE_OS } inplace_kind;
@@ -661,9 +652,9 @@ enum {
 
 /* hashtable information */
 enum {
-     BLESSING = 0x1,   /* save this entry */
-     H_VALID = 0x2,    /* valid hastable entry */
-     H_LIVE = 0x4      /* entry is nonempty, implies H_VALID */
+     BLESSING = 0x1u,   /* save this entry */
+     H_VALID = 0x2u,    /* valid hastable entry */
+     H_LIVE = 0x4u      /* entry is nonempty, implies H_VALID */
 };
 
 #define PLNR_L(plnr) ((plnr)->flags.l)
@@ -874,7 +865,7 @@ void X(solvtab_exec)(const solvtab tbl, planner *p);
 
 /*-----------------------------------------------------------------------*/
 /* pickdim.c */
-int X(pickdim)(int which_dim, const int *buddies, int nbuddies,
+int X(pickdim)(int which_dim, const int *buddies, size_t nbuddies,
 	       const tensor *sz, int oop, int *dp);
 
 /*-----------------------------------------------------------------------*/
@@ -975,6 +966,7 @@ void X(tile2d)(INT n0l, INT n0u, INT n1l, INT n1u, INT tilesz,
 	       void (*f)(INT n0l, INT n0u, INT n1l, INT n1u, void *args),
 	       void *args);
 void X(cpy1d)(R *I, R *O, INT n0, INT is0, INT os0, INT vl);
+void X(zero1d_pair)(R *O0, R *O1, INT n0, INT os0);
 void X(cpy2d)(R *I, R *O,
 	      INT n0, INT is0, INT os0,
 	      INT n1, INT is1, INT os1,
@@ -1026,11 +1018,11 @@ extern unsigned X(random_estimate_seed);
 
 double X(measure_execution_time)(const planner *plnr, 
 				 plan *pln, const problem *p);
-IFFTW_EXTERN int X(alignment_of)(R *p);
+IFFTW_EXTERN int X(ialignment_of)(R *p);
 unsigned X(hash)(const char *s);
 INT X(nbuf)(INT n, INT vl, INT maxnbuf);
-int X(nbuf_redundant)(INT n, INT vl, int which, 
-		      const INT *maxnbuf, int nmaxnbuf);
+int X(nbuf_redundant)(INT n, INT vl, size_t which, 
+		      const INT *maxnbuf, size_t nmaxnbuf);
 INT X(bufdist)(INT n, INT vl);
 int X(toobig)(INT n);
 int X(ct_uglyp)(INT min_n, INT v, INT n, INT r);
@@ -1049,16 +1041,7 @@ R *X(join_taint)(R *p1, R *p2);
 #define JOIN_TAINT(p1, p2) p1
 #endif
 
-#ifdef FFTW_DEBUG_ALIGNMENT
-#  define ASSERT_ALIGNED_DOUBLE {		\
-     double __foo;				\
-     CK(!(((uintptr_t) &__foo) & 0x7));		\
-}
-#else
-#  define ASSERT_ALIGNED_DOUBLE 
-#endif /* FFTW_DEBUG_ALIGNMENT */
-
-
+#define ASSERT_ALIGNED_DOUBLE  /*unused, legacy*/
 
 /*-----------------------------------------------------------------------*/
 /* macros used in codelets to reduce source code size */

@@ -2,7 +2,7 @@
 #
 #  ##################################################################
 #  ##                                                              ##
-#  ##  listing.make  --  create source library of Tinker routines  ##
+#  ##  listing.make  --  create source listing of Tinker routines  ##
 #  ##                    (Generic Unix Version)                    ##
 #  ##                                                              ##
 #  ##################################################################

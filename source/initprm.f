@@ -20,6 +20,7 @@ c
       use angpot
       use bndpot
       use chgpot
+      use dsppot
       use fields
       use kanang
       use kangs
@@ -27,7 +28,10 @@ c
       use katoms
       use kbonds
       use kchrge
+      use kcpen
+      use kctrn
       use kdipol
+      use kdsp
       use khbond
       use kiprop
       use kitors
@@ -37,6 +41,7 @@ c
       use korbs
       use kpitor
       use kpolr
+      use krepl
       use kstbnd
       use ksttor
       use ktorsn
@@ -47,6 +52,7 @@ c
       use math
       use mplpot
       use polpot
+      use reppot
       use rxnpot
       use solute
       use urypot
@@ -182,15 +188,28 @@ c
       if (.not. allocated(weight))  allocate (weight(maxtyp))
       if (.not. allocated(symbol))  allocate (symbol(maxtyp))
       if (.not. allocated(describe))  allocate (describe(maxtyp))
+      if (.not. allocated(anan))  allocate (anan(3,maxclass))
       if (.not. allocated(rad))  allocate (rad(maxtyp))
       if (.not. allocated(eps))  allocate (eps(maxtyp))
       if (.not. allocated(rad4))  allocate (rad4(maxtyp))
       if (.not. allocated(eps4))  allocate (eps4(maxtyp))
       if (.not. allocated(reduct))  allocate (reduct(maxtyp))
+      if (.not. allocated(prsiz))  allocate (prsiz(maxclass))
+      if (.not. allocated(prdmp))  allocate (prdmp(maxclass))
+      if (.not. allocated(prele))  allocate (prele(maxclass))
+      if (.not. allocated(dspsix))  allocate (dspsix(maxclass))
+      if (.not. allocated(dspdmp))  allocate (dspdmp(maxclass))
       if (.not. allocated(chg))  allocate (chg(maxtyp))
+      if (.not. allocated(cpele))  allocate (cpele(maxclass))
+      if (.not. allocated(cpalp))  allocate (cpalp(maxclass))
       if (.not. allocated(polr))  allocate (polr(maxtyp))
       if (.not. allocated(athl))  allocate (athl(maxtyp))
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
+      if (.not. allocated(ctchg))  allocate (ctchg(maxclass))
+      if (.not. allocated(ctdmp))  allocate (ctdmp(maxclass))
+      if (.not. allocated(electron))  allocate (electron(maxclass))
+      if (.not. allocated(ionize))  allocate (ionize(maxclass))
+      if (.not. allocated(repulse))  allocate (repulse(maxclass))
 c
 c     initialize values of some force field parameters
 c
@@ -221,6 +240,15 @@ c
          do j = 1, 3
             anan(j,i) = 0.0d0
          end do
+         prsiz(i) = 0.0d0
+         prdmp(i) = 0.0d0
+         prele(i) = 0.0d0
+         dspsix(i) = 0.0d0
+         dspdmp(i) = 0.0d0
+         cpele(i) = 0.0d0
+         cpalp(i) = 0.0d0
+         ctchg(i) = 0.0d0
+         ctdmp(i) = 0.0d0
          electron(i) = 0.0d0
          ionize(i) = 0.0d0
          repulse(i) = 0.0d0
@@ -286,6 +314,21 @@ c
       v5scale = 1.0d0
       use_vcorr = .false.
 c
+c     set default control parameters for repulsion terms
+c
+      r2scale = 0.0d0
+      r3scale = 0.0d0
+      r4scale = 1.0d0
+      r5scale = 1.0d0
+c
+c     set default control parameters for dispersion terms
+c
+      dsp2scale = 0.0d0
+      dsp3scale = 0.0d0
+      dsp4scale = 1.0d0
+      dsp5scale = 1.0d0
+      use_dcorr = .false.
+c
 c     set default control parameters for charge-charge terms
 c
       electric = coulomb
@@ -298,32 +341,38 @@ c
       neutnbr = .false.
       neutcut = .false.
 c
-c     set default control parameters for polarizable multipoles
+c     set default control parameters for atomic multipole terms
 c
       m2scale = 0.0d0
       m3scale = 0.0d0
       m4scale = 1.0d0
       m5scale = 1.0d0
-      p2scale = 0.0d0
-      p3scale = 0.0d0
-      p4scale = 1.0d0
-      p5scale = 1.0d0
-      p41scale = 0.5d0
+      d1scale = 0.0d0
+      d2scale = 1.0d0
+      d3scale = 1.0d0
+      d4scale = 1.0d0
+      use_chgpen = .false.
 c
-c     set default control parameters for induced dipoles
+c     set default control parameters for induced dipole terms
 c
       poltyp = 'MUTUAL'
       politer = 100
       poleps = 0.000001d0
       udiag = 2.0d0
-      d1scale = 0.0d0
-      d2scale = 1.0d0
-      d3scale = 1.0d0
-      d4scale = 1.0d0
+      p2scale = 0.0d0
+      p3scale = 0.0d0
+      p4scale = 1.0d0
+      p5scale = 1.0d0
+      p41scale = 0.5d0
       u1scale = 1.0d0
       u2scale = 1.0d0
       u3scale = 1.0d0
       u4scale = 1.0d0
+      w2scale = 1.0d0
+      w3scale = 1.0d0
+      w4scale = 1.0d0
+      w5scale = 1.0d0
+      use_thole = .false.
 c
 c     set default control parameters for implicit solvation
 c

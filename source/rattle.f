@@ -254,7 +254,7 @@ c
       done = .false.
       sor = 1.25d0
       eps = rateps / dt
-      vterm = 2.0d0 / (dt*convert)
+      vterm = 2.0d0 / (dt*ekcal)
 c
 c     apply the RATTLE algorithm to correct the velocities
 c
@@ -563,8 +563,7 @@ c
       use iounit
       use usage
       implicit none
-      integer i,j,k
-      integer ia,ib
+      integer i,ia,ib
       integer niter,maxiter
       real*8 eps,sor
       real*8 xr,yr,zr

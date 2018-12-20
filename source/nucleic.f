@@ -28,7 +28,8 @@ c
       implicit none
       integer i,natom,mode
       integer izmt,ixyz,iseq
-      integer freeunit,trimtext
+      integer freeunit
+      integer trimtext
       logical exist
       character*240 seqfile
       character*240 intfile
@@ -137,7 +138,7 @@ c
       implicit none
       integer i,j,k,next
       integer start,stop
-      integer length,trimtext
+      integer length
       logical done
       logical, allocatable :: purine(:)
       character*1 answer

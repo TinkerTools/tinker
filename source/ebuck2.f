@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine ebuck2  --  atom-by-atom Buckingham Hessian  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ebuck2  --  atom-by-atom Buckingham vdw Hessian  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "ebuck2" calculates the Buckingham exp-6 van der Waals
@@ -39,11 +39,11 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine ebuck2a  --  double loop Buckingham Hessian  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ebuck2a  --  double loop Buckingham vdw Hessian  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "ebuck2a" calculates the Buckingham exp-6 van der Waals second

@@ -20,7 +20,7 @@
 
 /* routines shared by the various buffered solvers */
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 #define DEFAULT_MAXNBUF ((INT)256)
 
@@ -70,10 +70,10 @@ int X(toobig)(INT n)
 /* TRUE if there exists i < which such that maxnbuf[i] and
    maxnbuf[which] yield the same value, in which case we canonicalize
    on the minimum value */
-int X(nbuf_redundant)(INT n, INT vl, int which, 
-		      const INT *maxnbuf, int nmaxnbuf)
+int X(nbuf_redundant)(INT n, INT vl, size_t which, 
+		      const INT *maxnbuf, size_t nmaxnbuf)
 {
-     int i;
+     size_t i;
      (void)nmaxnbuf; /* UNUSED */
      for (i = 0; i < which; ++i)
 	  if (X(nbuf)(n, vl, maxnbuf[i]) == X(nbuf)(n, vl, maxnbuf[which]))

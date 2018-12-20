@@ -106,11 +106,6 @@ typedef DS(__m128d,__m128) V;
 #  define LDK(x) DS(_mm_set1_pd,_mm_set_ps1)(x)
 #endif
 
-union uvec {
-     unsigned u[4];
-     V v;
-};
-
 static inline V LDA(const R *x, INT ivs, const R *aligned_like)
 {
      (void)aligned_like; /* UNUSED */
@@ -132,8 +127,13 @@ static inline void STA(R *x, V v, INT ovs, const R *aligned_like)
 	'name' used" and runtime checks for using a variable before it is
 	defined which is erroneously triggered by the LOADL0 / LOADH macros
 	as they only modify VAL partly each. */
-#    pragma warning(disable : 4700)
-#    pragma runtime_checks("u", off)
+#    ifndef __INTEL_COMPILER
+#      pragma warning(disable : 4700)
+#      pragma runtime_checks("u", off)
+#    endif
+#  endif
+#  ifdef __INTEL_COMPILER
+#    pragma warning(disable : 592)
 #  endif
 
 static inline V LD(const R *x, INT ivs, const R *aligned_like)
@@ -158,8 +158,13 @@ static inline V LD(const R *x, INT ivs, const R *aligned_like)
 }
 
 #  ifdef _MSC_VER
-#    pragma warning(default : 4700)
-#    pragma runtime_checks("u", restore)
+#    ifndef __INTEL_COMPILER
+#      pragma warning(default : 4700)
+#      pragma runtime_checks("u", restore)
+#    endif
+#  endif
+#  ifdef __INTEL_COMPILER
+#    pragma warning(default : 592)
 #  endif
 
 static inline void ST(R *x, V v, INT ovs, const R *aligned_like)
@@ -212,10 +217,25 @@ static inline V FLIP_RI(V x)
      return SHUF(x, x, DS(1, SHUFVALS(1, 0, 3, 2)));
 }
 
-extern const union uvec X(sse2_pm);
 static inline V VCONJ(V x)
 {
-     return VXOR(X(sse2_pm).v, x);
+     /* This will produce -0.0f (or -0.0d) even on broken
+        compilers that do not distinguish +0.0 from -0.0.
+        I bet some are still around. */
+     union uvec {
+          unsigned u[4];
+          V v;
+     };
+     /* it looks like gcc-3.3.5 produces slow code unless PM is
+        declared static. */
+     static const union uvec pm = {
+#ifdef FFTW_SINGLE
+          { 0x00000000, 0x80000000, 0x00000000, 0x80000000 }
+#else
+          { 0x00000000, 0x00000000, 0x00000000, 0x80000000 }
+#endif
+     };
+     return VXOR(pm.v, x);
 }
 
 static inline V VBYI(V x)

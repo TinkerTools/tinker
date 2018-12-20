@@ -366,7 +366,7 @@ c
       real*8 xr,yr,zr
       real*8 rew,erfc,cut2
       real*8 erfterm,expterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8 term(3,3)
       real*8, allocatable :: cscale(:)
       logical proceed
@@ -391,6 +391,10 @@ c
       xi = x(i)
       yi = y(i)
       zi = z(i)
+c
+c     set Ewald coefficient for electrostatic interactions
+c
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -441,15 +445,15 @@ c
                expterm = exp(-rew**2)
                scale = cscale(kn)
                if (use_group)  scale = scale * fgrp
-               scaleterm = scale - 1.0d0
+               scale = scale - 1.0d0
 c
 c     compute chain rule terms for Hessian matrix elements
 c
-               de = -fik * ((erfterm+scaleterm)/rb2
+               de = -fik * ((erfterm+scale)/rb2
      &                        + (2.0d0*aewald/sqrtpi)*expterm/r)
-               d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scaleterm
+               d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scale
      &                  + (4.0d0*fik*aewald**3/sqrtpi)*expterm
-     &                  + 2.0d0*(fik/(rb*rb2))*scaleterm
+     &                  + 2.0d0*(fik/(rb*rb2))*scale
 c
 c     form the individual Hessian element components
 c
@@ -519,15 +523,15 @@ c
                         scale = scale * cscale(kn)
                      end if
                   end if
-                  scaleterm = scale - 1.0d0
+                  scale = scale - 1.0d0
 c
 c     compute chain rule terms for Hessian matrix elements
 c
-                  de = -fik * ((erfterm+scaleterm)/rb2
+                  de = -fik * ((erfterm+scale)/rb2
      &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
-                  d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scaleterm
+                  d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scale
      &                     + (4.0d0*fik*aewald**3/sqrtpi)*expterm
-     &                     + 2.0d0*(fik/(rb*rb2))*scaleterm
+     &                     + 2.0d0*(fik/(rb*rb2))*scale
 c
 c     form the individual Hessian element components
 c

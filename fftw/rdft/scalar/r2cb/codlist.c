@@ -1,4 +1,4 @@
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 
 extern void X(codelet_r2cb_2)(planner *);

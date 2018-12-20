@@ -19,7 +19,7 @@
  */
 
 
-#include "rdft.h"
+#include "rdft/rdft.h"
 
 static const solvtab s =
 {
@@ -66,12 +66,40 @@ void X(rdft_conf_standard)(planner *p)
      if (X(have_simd_avx)())
 	  X(solvtab_exec)(X(solvtab_rdft_avx), p);
 #endif
+#if HAVE_AVX_128_FMA
+     if (X(have_simd_avx_128_fma)())
+          X(solvtab_exec)(X(solvtab_rdft_avx_128_fma), p);
+#endif
+#if HAVE_AVX2
+     if (X(have_simd_avx2)())
+         X(solvtab_exec)(X(solvtab_rdft_avx2), p);
+     if (X(have_simd_avx2_128)())
+         X(solvtab_exec)(X(solvtab_rdft_avx2_128), p);
+#endif
+#if HAVE_AVX512
+     if (X(have_simd_avx512)())
+	  X(solvtab_exec)(X(solvtab_rdft_avx512), p);
+#endif
+#if HAVE_KCVI
+     if (X(have_simd_kcvi)())
+	  X(solvtab_exec)(X(solvtab_rdft_kcvi), p);
+#endif
 #if HAVE_ALTIVEC
      if (X(have_simd_altivec)())
 	  X(solvtab_exec)(X(solvtab_rdft_altivec), p);
 #endif
+#if HAVE_VSX
+     if (X(have_simd_vsx)())
+       X(solvtab_exec)(X(solvtab_rdft_vsx), p);
+#endif
 #if HAVE_NEON
      if (X(have_simd_neon)())
 	  X(solvtab_exec)(X(solvtab_rdft_neon), p);
+#endif
+#if HAVE_GENERIC_SIMD128
+     X(solvtab_exec)(X(solvtab_rdft_generic_simd128), p);
+#endif
+#if HAVE_GENERIC_SIMD256
+     X(solvtab_exec)(X(solvtab_rdft_generic_simd256), p);
 #endif
 }

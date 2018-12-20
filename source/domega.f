@@ -28,12 +28,15 @@ c     tebt    stretch-torsion derivatives over torsions
 c     teat    angle-torsion derivatives over torsions
 c     tett    torsion-torsion derivatives over torsions
 c     tev     van der Waals derivatives over torsions
+c     ter     Pauli repulsion derivatives over torsions
+c     tedsp   dampled dispersion derivatives over torsions
 c     tec     charge-charge derivatives over torsions
 c     tecd    charge-dipole derivatives over torsions
 c     ted     dipole-dipole derivatives over torsions
 c     tem     atomic multipole derivatives over torsions
 c     tep     polarization derivatives over torsions
-c     ter     reaction field derivatives over torsions
+c     tect    charge transfer derivatives over torsions
+c     terxf   reaction field derivatives over torsions
 c     tes     solvation derivatives over torsions
 c     telf    metal ligand field derivatives over torsions
 c     teg     geometric restraint derivatives over torsions
@@ -58,12 +61,15 @@ c
       real*8, allocatable :: teat(:)
       real*8, allocatable :: tett(:)
       real*8, allocatable :: tev(:)
+      real*8, allocatable :: ter(:)
+      real*8, allocatable :: tedsp(:)
       real*8, allocatable :: tec(:)
       real*8, allocatable :: tecd(:)
       real*8, allocatable :: ted(:)
       real*8, allocatable :: tem(:)
       real*8, allocatable :: tep(:)
-      real*8, allocatable :: ter(:)
+      real*8, allocatable :: tect(:)
+      real*8, allocatable :: terxf(:)
       real*8, allocatable :: tes(:)
       real*8, allocatable :: telf(:)
       real*8, allocatable :: teg(:)

@@ -51,12 +51,15 @@ c
       eat = 0.0d0
       ett = 0.0d0
       ev = 0.0d0
+      er = 0.0d0
+      edsp = 0.0d0
       ec = 0.0d0
       ecd = 0.0d0
       ed = 0.0d0
       em = 0.0d0
       ep = 0.0d0
-      er = 0.0d0
+      ect = 0.0d0
+      erxf = 0.0d0
       es = 0.0d0
       elf = 0.0d0
       eg = 0.0d0
@@ -82,12 +85,15 @@ c
             deallocate (deat)
             deallocate (dett)
             deallocate (dev)
+            deallocate (der)
+            deallocate (dedsp)
             deallocate (dec)
             deallocate (decd)
             deallocate (ded)
             deallocate (dem)
             deallocate (dep)
-            deallocate (der)
+            deallocate (dect)
+            deallocate (derxf)
             deallocate (des)
             deallocate (delf)
             deallocate (deg)
@@ -111,12 +117,15 @@ c
          allocate (deat(3,n))
          allocate (dett(3,n))
          allocate (dev(3,n))
+         allocate (der(3,n))
+         allocate (dedsp(3,n))
          allocate (dec(3,n))
          allocate (decd(3,n))
          allocate (ded(3,n))
          allocate (dem(3,n))
          allocate (dep(3,n))
-         allocate (der(3,n))
+         allocate (dect(3,n))
+         allocate (derxf(3,n))
          allocate (des(3,n))
          allocate (delf(3,n))
          allocate (deg(3,n))
@@ -142,12 +151,15 @@ c
             deat(j,i) = 0.0d0
             dett(j,i) = 0.0d0
             dev(j,i) = 0.0d0
+            der(j,i) = 0.0d0
+            dedsp(j,i) = 0.0d0
             dec(j,i) = 0.0d0
             decd(j,i) = 0.0d0
             ded(j,i) = 0.0d0
             dem(j,i) = 0.0d0
             dep(j,i) = 0.0d0
-            der(j,i) = 0.0d0
+            dect(j,i) = 0.0d0
+            derxf(j,i) = 0.0d0
             des(j,i) = 0.0d0
             delf(j,i) = 0.0d0
             deg(j,i) = 0.0d0
@@ -207,6 +219,8 @@ c
          if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
       end if
+      if (use_repuls)  call erepel1
+      if (use_disp)  call edisp1
 c
 c     call the electrostatic energy and gradient routines
 c
@@ -215,6 +229,7 @@ c
       if (use_dipole)  call edipole1
       if (use_mpole)  call empole1
       if (use_polar)  call epolar1
+      if (use_chgtrn)  call echgtrn1
       if (use_rxnfld)  call erxnfld1
 c
 c     call any miscellaneous energy and gradient routines
@@ -227,8 +242,9 @@ c
 c     sum up to get the total energy and first derivatives
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
-     &          + et + ept + ebt + eat + ett + ev + ec + ecd + ed
-     &          + em + ep + er + es + elf + eg + ex
+     &          + et + ept + ebt + eat + ett + ev + er + edsp
+     &          + ec+ ecd + ed + em + ep + ect + erxf + es + elf
+     &          + eg + ex
       energy = esum
       do i = 1, n
          do j = 1, 3
@@ -237,10 +253,11 @@ c
      &                      + deopd(j,i) + deid(j,i) + deit(j,i)
      &                      + det(j,i) + dept(j,i) + debt(j,i)
      &                      + deat(j,i) + dett(j,i) + dev(j,i)
-     &                      + dec(j,i) + decd(j,i) + ded(j,i)
-     &                      + dem(j,i) + dep(j,i) + der(j,i)
-     &                      + des(j,i) + delf(j,i) + deg(j,i)
-     &                      + dex(j,i)
+     &                      + der(j,i) + dedsp(j,i) + dec(j,i)
+     &                      + decd(j,i) + ded(j,i) + dem(j,i)
+     &                      + dep(j,i) + dect(j,i) + derxf(j,i)
+     &                      + des(j,i) + delf(j,i)
+     &                      + deg(j,i) + dex(j,i)
             derivs(j,i) = desum(j,i)
          end do
       end do

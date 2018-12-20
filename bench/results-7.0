@@ -1,58 +1,58 @@
 
-                  #############################################
-                  Benchmark Results for Tinker 7.0  (June 2014)            
-                  #############################################
+                 #############################################
+                 Benchmark Results for Tinker 7.0  (June 2014)            
+                 #############################################
 
  Benchmark #1: Calmodulin Energy Evaluation (Serial)
 
  Gas-Phase Calmodulin Molecule, 2264 Atoms, Amber ff94 Force Field,
  No Nonbonded Cutoffs, 100 Evaluations
 
- MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
- ---------------------------                  ---    ------  --------  -------
+ MACHINE TYPE (OS, Compiler)                   GHz    ENERGY  GRADIENT  HESSIAN
+ ---------------------------                   ---    ------  --------  -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66      30.4      50.7    143.4
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80      19.7      31.7     96.1
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66      18.7      34.5    102.9
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66      13.5      34.1     99.7
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60       9.0      19.4     57.7
- iMac 13.2 (OSX 10.9, Intel 14)              3.40       9.6      19.7     61.8
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40      13.4      34.5    107.9
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40      12.3      36.2    131.7
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66      30.4      50.7    143.4
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80      19.7      31.7     96.1
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66      18.7      34.5    102.9
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66      13.5      34.1     99.7
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60       9.0      19.4     57.7
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40       9.6      19.7     61.8
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40      13.4      34.5    107.9
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40      12.3      36.2    131.7
 
  Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
 
  Crambin Unit Cell, 1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
  with PME Electrostatics, 9.0 Ang vdw Cutoff, 1000 Evaluations
 
- MACHINE TYPE (OS, Compiler)                  GHz    ENERGY  GRADIENT  HESSIAN
- ---------------------------                  ---    ------  --------  -------
+ MACHINE TYPE (OS, Compiler)                   GHz    ENERGY  GRADIENT  HESSIAN
+ ---------------------------                   ---    ------  --------  -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66      45.8      60.4    236.9
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80      36.8      45.3    180.0
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66      34.2      47.5    185.5
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66      28.6      42.7    172.8
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60      21.2      27.7    110.5
- iMac 13.2 (OSX 10.9, Intel 14)              3.40      21.6      29.0    117.4
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40      30.4      44.4    189.8
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40      33.3      51.0    233.3
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66      45.8      60.4    236.9
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80      36.8      45.3    180.0
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66      34.2      47.5    185.5
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66      28.6      42.7    172.8
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60      21.2      27.7    110.5
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40      21.6      29.0    117.4
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40      30.4      44.4    189.8
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40      33.3      51.0    233.3
 
  Benchmark #3: Peptide Normal Mode Calculation (Serial)
 
  Hessian Eigenvalues, Normal Modes and Vibrational Freqencies for a
  20-Amino Acid, 328-Atom Peptide, OPLS-AA Force Field without Cutoffs
 
- MACHINE TYPE (OS, Compiler)                  GHz             Seconds
- ---------------------------                  ---             -------
+ MACHINE TYPE (OS, Compiler)                   GHz             SECONDS
+ ---------------------------                   ---             -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66                4.09
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80                3.02
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66                2.96
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66                3.90
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60                1.76
- iMac 13.2 (OSX 10.9, Intel 14)              3.40                1.86
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40                2.79
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40                4.70
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66                4.09
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80                3.02
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66                2.96
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66                3.90
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60                1.76
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40                1.86
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40                2.79
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40                4.70
 
  Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
 
@@ -60,17 +60,17 @@
  9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
  Step with Modified Beeman Integration
 
- MACHINE TYPE (OS, Compiler)                  GHz             Seconds
- ---------------------------                  ---             -------
+ MACHINE TYPE (OS, Compiler)                   GHz             SECONDS
+ ---------------------------                   ---             -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66                23.2
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80                15.4
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66                16.9
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66                16.0         
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60                 8.8
- iMac 13.2 (OSX 10.9, Intel 14)              3.40                 9.0
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40                15.3
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40                15.8
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66                23.2
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80                15.4
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66                16.9
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66                16.0         
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60                 8.8
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40                 9.0
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40                15.3
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40                15.8
 
  Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
 
@@ -79,17 +79,17 @@
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration,
  and 0.00001 RMS Induced Dipole Convergence
 
- MACHINE TYPE (OS, Compiler)                  GHz             Seconds
- ---------------------------                  ---             -------
+ MACHINE TYPE (OS, Compiler)                   GHz             SECONDS
+ ---------------------------                   ---             -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66               137.8
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80               104.2
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66                99.6
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66                99.3
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60                60.0
- iMac 13.2 (OSX 10.9, Intel 14)              3.40                61.9
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40                99.3
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40               149.8
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66               137.8
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80               104.2
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66                99.6
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66                99.3
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60                60.0
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40                61.9
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40                99.3
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40               149.8
 
  Benchmark #6: MD on DHFR in Water using CHARMM (Parallel, OpenMP)
 
@@ -98,51 +98,51 @@
  9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integration;
  OpenMP timings reported as "wall clock" time for benchmark
 
- MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
- ---------------------------                  ---    -------------     -------
+ MACHINE TYPE (OS, Compiler)                   GHz    CORES/THREADS     SECONDS
+ ---------------------------                   ---    -------------     -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1     105.9 (1.00)
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/2      62.2 (1.70)
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4      40.0 (2.65)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1      78.2 (1.00)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/2      47.5 (1.65)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/4      31.6 (2.47)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/6      27.3 (2.86)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8      24.8 (3.15)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1      82.4 (1.00)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/2      47.4 (1.74)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/4      29.3 (2.81)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/6      23.5 (3.51)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/8      20.2 (4.08)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/10     19.0 (4.34)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/12     18.2 (4.53)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/24     18.3 (4.50)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/1      76.2 (1.00)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/2      51.1 (1.49)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/4      34.0 (2.24)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/6      27.2 (2.80)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/8      22.9 (3.33)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/10     21.2 (3.59)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/12     20.3 (3.75)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/24     20.2 (3.77)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/1      48.3 (1.00)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/2      28.7 (1.68)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/4      17.8 (2.71)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/8      15.3 (3.16)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/1      49.3 (1.00)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/2      27.9 (1.77)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/4      18.1 (2.72)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8      15.2 (3.24)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/1      79.9 (1.00)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/2      55.8 (1.43)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/4      34.9 (2.29)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/6      28.7 (2.78)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/8      35.3 (2.28)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/1      92.7 (1.00)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/2      63.7 (1.46)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/4      41.1 (2.26)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/6      32.6 (2.84)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/8      27.4 (3.38)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/1     105.9 (1.00)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/2      62.2 (1.70)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/4      40.0 (2.65)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/1      78.2 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/2      47.5 (1.65)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/4      31.6 (2.47)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/6      27.3 (2.86)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/8      24.8 (3.15)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/1      82.4 (1.00)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/2      47.4 (1.74)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/4      29.3 (2.81)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/6      23.5 (3.51)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/8      20.2 (4.08)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/10     19.0 (4.34)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/12     18.2 (4.53)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/24     18.3 (4.50)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/1      76.2 (1.00)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/2      51.1 (1.49)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/4      34.0 (2.24)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/6      27.2 (2.80)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/8      22.9 (3.33)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/10     21.2 (3.59)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/12     20.3 (3.75)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/24     20.2 (3.77)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/1      48.3 (1.00)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/2      28.7 (1.68)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/4      17.8 (2.71)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/8      15.3 (3.16)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/1      49.3 (1.00)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/2      27.9 (1.77)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/4      18.1 (2.72)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/8      15.2 (3.24)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/1      79.9 (1.00)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/2      55.8 (1.43)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/4      34.9 (2.29)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/6      28.7 (2.78)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/8      35.3 (2.28)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/1      92.7 (1.00)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/2      63.7 (1.46)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/4      41.1 (2.26)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/6      32.6 (2.84)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/8      27.4 (3.38)
 
  Benchmark #7: MD on DHFR in Water using AMOEBA (Parallel, OpenMP)
 
@@ -152,51 +152,51 @@
  and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
  "wall clock" time for benchmark
 
- MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
- ---------------------------                  ---    -------------     -------
+ MACHINE TYPE (OS, Compiler)                   GHz    CORES/THREADS     SECONDS
+ ---------------------------                   ---    -------------     -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1     661.9 (1.00)
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/2     375.2 (1.76)
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4     226.1 (2.93)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1     484.9 (1.00)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/2     274.2 (1.76)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/4     166.6 (2.90)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/6     134.2 (3.66)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8     118.0 (4.17)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1     472.6 (1.00)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/2     249.8 (1.89)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/4     141.7 (3.34)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/6     106.6 (4.43)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/8      86.4 (5.47)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/10     76.9 (6.15)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/12     73.0 (6.47)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/24     73.7 (6.41)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/1     471.7 (1.00)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/2     334.4 (1.41)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/4     196.6 (2.40)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/6     141.0 (3.35)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/8     112.6 (4.19)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/10    101.4 (4.65)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/12     95.8 (4.92)
- Mac Pro 5.1 (OSX 10.9, GNU 4.9)             2.66        12/24     99.4 (4.75)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/1     288.8 (1.00)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/2     170.8 (1.69)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/4      99.8 (2.89)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/8      82.6 (3.50)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/1     287.0 (1.00)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/2     154.1 (1.86)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/4     100.2 (2.86)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8      82.5 (3.48)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/1     461.2 (1.00)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/2     263.6 (1.75)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/4     151.3 (3.05)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/6     132.3 (3.49)
- Dell PowerEdge R720 (CentOS 6, Intel 14)    2.40         8/8     118.0 (3.91)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/1     646.0 (1.00)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/2     481.6 (1.34)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/4     275.2 (2.35)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/6     203.8 (3.17)
- Dell PowerEdge R720 (CentOS 6, GNU 4.8)     2.40         8/8     151.7 (4.26)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/1     661.9 (1.00)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/2     375.2 (1.76)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/4     226.1 (2.93)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/1     484.9 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/2     274.2 (1.76)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/4     166.6 (2.90)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/6     134.2 (3.66)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/8     118.0 (4.17)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/1     472.6 (1.00)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/2     249.8 (1.89)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/4     141.7 (3.34)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/6     106.6 (4.43)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/8      86.4 (5.47)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/10     76.9 (6.15)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/12     73.0 (6.47)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/24     73.7 (6.41)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/1     471.7 (1.00)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/2     334.4 (1.41)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/4     196.6 (2.40)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/6     141.0 (3.35)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/8     112.6 (4.19)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/10    101.4 (4.65)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/12     95.8 (4.92)
+ Mac Pro 5.1 (OSX 10.9, GNU 4.9)              2.66        12/24     99.4 (4.75)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/1     288.8 (1.00)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/2     170.8 (1.69)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/4      99.8 (2.89)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/8      82.6 (3.50)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/1     287.0 (1.00)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/2     154.1 (1.86)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/4     100.2 (2.86)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/8      82.5 (3.48)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/1     461.2 (1.00)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/2     263.6 (1.75)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/4     151.3 (3.05)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/6     132.3 (3.49)
+ Dell PowerEdge R720 (CentOS 6, Intel 14)     2.40         8/8     118.0 (3.91)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/1     646.0 (1.00)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/2     481.6 (1.34)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/4     275.2 (2.35)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/6     203.8 (3.17)
+ Dell PowerEdge R720 (CentOS 6, GNU 4.8)      2.40         8/8     151.7 (4.26)
 
  Benchmark #8: MD on COX-2 in Water using OPLS-AA (Parallel, OpenMP)
 
@@ -206,23 +206,23 @@
  RATTLE for all X-H bonds and rigid TIP3P Water;  OpenMP timings reported as
  "wall clock" time for benchmark
 
- MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
- ---------------------------                  ---    -------------     -------
+ MACHINE TYPE (OS, Compiler)                   GHz    CORES/THREADS     SECONDS
+ ---------------------------                   ---    -------------     -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1     942.1 (1.00)
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4     463.6 (2.03)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1     675.8 (1.00)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8     314.6 (2.15)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1     608.4 (1.00)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/24    194.7 (3.12)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/1     368.0 (1.00)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/2     241.5 (1.53)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/4     162.6 (2.26)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/8     144.5 (2.55)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/1     404.1 (1.00)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/2     253.9 (1.59)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/4     187.5 (2.16)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8     163.4 (2.47)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/1     942.1 (1.00)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/4     463.6 (2.03)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/1     675.8 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/8     314.6 (2.15)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/1     608.4 (1.00)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/24    194.7 (3.12)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/1     368.0 (1.00)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/2     241.5 (1.53)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/4     162.6 (2.26)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/8     144.5 (2.55)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/1     404.1 (1.00)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/2     253.9 (1.59)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/4     187.5 (2.16)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/8     163.4 (2.47)
 
  Benchmark #9: MD on COX-2 in Water using AMOEBA (Parallel, OpenMP)
 
@@ -232,27 +232,27 @@
  and 0.00001 RMS Induced Dipole Convergence; OpenMP timings reported as
  "wall clock" time for benchmark
 
- MACHINE TYPE (OS, Compiler)                  GHz    Cores/Threads     Seconds
- ---------------------------                  ---    -------------     -------
+ MACHINE TYPE (OS, Compiler)                   GHz    CORES/THREADS     SECONDS
+ ---------------------------                   ---    -------------     -------
 
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/1    6958.7 (1.00)
- Mac Pro 1.1 (OSX 10.6, Intel 14)            2.66         4/4    2329.3 (2.99)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/1    5133.3 (1.00)
- Mac Pro 3.1 (OSX 10.9, Intel 14)            2.80         8/8    1210.0 (4.24)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/1    4700.8 (1.00)
- Mac Pro 5.1 (OSX 10.9, Intel 14)            2.66        12/24    645.4 (7.28)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/1    2792.9 (1.00)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/2    1598.1 (1.75)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/4     910.0 (3.07)
- MacBook Pro 11.3 (OSX 10.9, Intel 14)       2.60         4/8     763.5 (3.66)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/1    3197.8 (1.00)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/2    1688.4 (1.89)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/4    1049.2 (3.05)
- iMac 13.2 (OSX 10.9, Intel 14)              3.40         4/8     823.9 (3.88)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/1    6958.7 (1.00)
+ Mac Pro 1.1 (OSX 10.6, Intel 14)             2.66         4/4    2329.3 (2.99)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/1    5133.3 (1.00)
+ Mac Pro 3.1 (OSX 10.9, Intel 14)             2.80         8/8    1210.0 (4.24)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/1    4700.8 (1.00)
+ Mac Pro 5.1 (OSX 10.9, Intel 14)             2.66        12/24    645.4 (7.28)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/1    2792.9 (1.00)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/2    1598.1 (1.75)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/4     910.0 (3.07)
+ MacBook Pro 11.3 (OSX 10.9, Intel 14)        2.60         4/8     763.5 (3.66)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/1    3197.8 (1.00)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/2    1688.4 (1.89)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/4    1049.2 (3.05)
+ iMac 13.2 (OSX 10.9, Intel 14)               3.40         4/8     823.9 (3.88)
 
  ----------------------
- Times are reported in seconds and are measured with Tinker Version 7.0,
- dimensioned to MAXATM=1000000. Each benchmark ran twice in rapid succession
- on an unloaded machine, and times shown are the best from the two runs. The
- first five benchmarks are run in serial with a single thread, while the last
- four benchmarks test OpenMP parallel performance.
+ Times are reported in total seconds and are measured with Tinker Version 7.0,
+ dimensioned to MAXATM=10000000. Each benchmark was run on an unloaded machine
+ and is the fastest time reported for that particular machine. The first five
+ benchmarks are run serial on a single thread, while the last four benchmarks
+ reflect OpenMP parallel performance.

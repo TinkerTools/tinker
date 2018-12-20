@@ -50,10 +50,10 @@ c
 c
 c     zero out the reaction field energy and partitioning
 c
-      ner = 0
-      er = 0.0d0
+      nerxf = 0
+      erxf = 0.0d0
       do i = 1, n
-         aer(i) = 0.0d0
+         aerxf(i) = 0.0d0
       end do
 c
 c     print header information if debug output was requested
@@ -111,10 +111,10 @@ c
                      rpk(j) = rpole(j,kk)
                   end do
                   call erfik (ii,kk,i,k,rpi,rpk,eik)
-                  ner = ner + 1
-                  er = er + eik
-                  aer(i) = aer(i) + 0.5d0*eik
-                  aer(k) = aer(k) + 0.5d0*eik
+                  nerxf = nerxf + 1
+                  erxf = erxf + eik
+                  aerxf(i) = aerxf(i) + 0.5d0*eik
+                  aerxf(k) = aerxf(k) + 0.5d0*eik
 c
 c     print a message if the energy of this interaction is large
 c

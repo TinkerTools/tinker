@@ -1,0 +1,182 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              HIPPO-WATER-2018
+
+bond-cubic              -2.55
+bond-quartic            3.793125
+angle-trigonal          NATURAL
+angle-cubic             -0.014
+angle-quartic           0.000056
+angle-pentic            -0.0000007
+angle-sextic            0.000000022
+opbendtype              W-D-C
+opbend-cubic            -0.014
+opbend-quartic          0.000056
+opbend-pentic           -0.0000007
+opbend-sextic           0.000000022
+torsionunit             0.5
+dielectric              1.0
+polarization            MUTUAL
+rep-12-scale            0.0
+rep-13-scale            0.0
+rep-14-scale            1.0
+rep-15-scale            1.0
+disp-12-scale           0.0
+disp-13-scale           0.0
+disp-14-scale           1.0
+disp-15-scale           1.0
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.0
+polar-14-scale          1.0
+polar-15-scale          1.0
+polar-14-intra          0.5
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
+induce-12-scale         0.2
+induce-13-scale         1.0
+induce-14-scale         1.0
+induce-15-scale         1.0
+
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+preliminary HIPPO parameters determined by Josh Rackers and
+Roseane Dos Reis Silva in November 2018 using the ForceBalance
+parameter optimization package
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom          1    1    O     "HIPPO Water O"                8    15.995    2
+atom          2    2    H     "HIPPO Water H"                1     1.008    1
+
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond          1    2          556.82     0.9565
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle         2    1    2      48.98     107.91
+
+
+      ###############################
+      ##                           ##
+      ##  Stretch-Bend Parameters  ##
+      ##                           ##
+      ###############################
+
+
+strbnd        2    1    2      30.23      30.23
+
+
+      ##################################
+      ##                              ##
+      ##  Pauli Repulsion Parameters  ##
+      ##                              ##
+      ##################################
+
+
+repulsion          1          2.7104     4.3097     2.4233
+repulsion          2          2.0037     4.6450     0.8086
+
+
+      #############################
+      ##                         ##
+      ##  Dispersion Parameters  ##
+      ##                         ##
+      #############################
+
+
+dispersion         1         18.7737     4.7075
+dispersion         2          4.5670     4.7909
+
+
+      ###################################
+      ##                               ##
+      ##  Atomic Multipole Parameters  ##
+      ##                               ##
+      ###################################
+
+
+multipole     1   -2   -2              -0.38280
+                                        0.00000    0.00000    0.05477
+                                        0.69866
+                                        0.00000   -0.60471
+                                        0.00000    0.00000   -0.09395
+
+multipole     2    1    2               0.19140
+                                        0.00000    0.00000   -0.20097
+                                        0.03881
+                                        0.00000    0.02214
+                                        0.00000    0.00000   -0.06095
+
+
+      #####################################
+      ##                                 ##
+      ##  Charge Penetration Parameters  ##
+      ##                                 ##
+      #####################################
+
+
+chgpen             1          6.0000     4.7075
+chgpen             2          1.0000     4.7909
+
+
+      ########################################
+      ##                                    ##
+      ##  Dipole Polarizability Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+polarize           1           0.795          2
+polarize           2           0.341          1
+
+
+      ##################################
+      ##                              ##
+      ##  Charge Transfer Parameters  ##
+      ##                              ##
+      ##################################
+
+
+chgtrn             1          1326.0       40.0
+chgtrn             2             0.0     3.5582

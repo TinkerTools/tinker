@@ -1,10 +1,7 @@
-AM_CPPFLAGS = -I$(top_srcdir)/kernel -I$(top_srcdir)/dft
+AM_CPPFLAGS = -I $(top_srcdir)
 SUBDIRS = scalar simd
 
 noinst_LTLIBRARIES = librdft.la
-
-# pkgincludedir = $(includedir)/fftw3@PREC_SUFFIX@
-# pkginclude_HEADERS = codelet-rdft.h rdft.h
 
 RDFT2 = buffered2.c direct2.c nop2.c rank0-rdft2.c rank-geq2-rdft2.c	\
 plan2.c problem2.c solve2.c vrank-geq1-rdft2.c rdft2-rdft.c		\

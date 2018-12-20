@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/kernel -I$(top_srcdir)/dft
+AM_CPPFLAGS = -I $(top_srcdir)
 SUBDIRS=codelets
 noinst_LTLIBRARIES = libdft_scalar.la
 

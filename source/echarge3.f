@@ -104,17 +104,6 @@ c
       end do
       if (nion .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nion.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Charge Interactions :',
-     &           //,' Type',14x,'Atom Names',17x,'Charges',
-     &              5x,'Distance',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
@@ -130,6 +119,17 @@ c
       f = electric / dielec
       mode = 'CHARGE'
       call switch (mode)
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     compute and partition the charge interaction energy
 c
@@ -223,7 +223,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 50.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -359,7 +359,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(e) .gt. 100.0d0)
+                     huge = (abs(e) .gt. 50.0d0)
                      if ((debug.and.e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -472,17 +472,6 @@ c
       end do
       if (nion .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nion.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Charge Interactions :',
-     &           //,' Type',14x,'Atom Names',17x,'Charges',
-     &              5x,'Distance',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
@@ -501,6 +490,17 @@ c
       f = electric / dielec
       mode = 'CHARGE'
       call switch (mode)
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     transfer the interaction site coordinates to sorting arrays
 c
@@ -651,7 +651,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 50.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -775,17 +775,6 @@ c
       end do
       if (nion .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nion.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Charge Interactions :',
-     &           //,' Type',14x,'Atom Names',17x,'Charges',
-     &              5x,'Distance',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
@@ -802,6 +791,17 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
@@ -809,8 +809,8 @@ c
 !$OMP& c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,off,
 !$OMP& off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
-!$OMP& firstprivate(cscale) shared (ec,einter,nec,aec)
-!$OMP DO reduction(+:ec,einter,nec,aec) schedule(guided)
+!$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
+!$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
 c
 c     compute and partition the charge interaction energy
 c
@@ -905,7 +905,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 50.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -985,6 +985,7 @@ c
       use iounit
       use math
       use molcul
+      use pme
       use shunt
       use usage
       implicit none
@@ -999,7 +1000,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
@@ -1016,16 +1017,13 @@ c
       end do
       if (nion .eq. 0)  return
 c
-c     print header information if debug output was requested
+c     set grid size, spline order and Ewald coefficient
 c
-      header = .true.
-      if (debug .and. nion.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Charge Interactions :',
-     &           //,' Type',14x,'Atom Names',17x,'Charges',
-     &              5x,'Distance',6x,'Energy',/)
-      end if
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1042,6 +1040,17 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1135,8 +1144,8 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy components
 c
@@ -1151,7 +1160,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efull) .gt. 100.0d0)
+                  huge = (abs(efull) .gt. 50.0d0)
                   if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1250,8 +1259,8 @@ c
                            scale = scale * cscale(kn)
                         end if
                      end if
-                     scaleterm = scale - 1.0d0
-                     e = (fik/rb) * (erfterm+scaleterm)
+                     scale = scale - 1.0d0
+                     e = (fik/rb) * (erfterm+scale)
                      if (i .eq. k)  e = 0.5d0 * e
 c
 c     increment the overall charge-charge energy component
@@ -1268,7 +1277,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(efull) .gt. 100.0d0)
+                     huge = (abs(efull) .gt. 50.0d0)
                      if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -1345,6 +1354,7 @@ c
       use light
       use math
       use molcul
+      use pme
       use shunt
       use usage
       implicit none
@@ -1361,7 +1371,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8, allocatable :: cscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -1382,16 +1392,13 @@ c
       end do
       if (nion .eq. 0)  return
 c
-c     print header information if debug output was requested
+c     set grid size, spline order and Ewald coefficient
 c
-      header = .true.
-      if (debug .and. nion.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Charge Interactions :',
-     &           //,' Type',14x,'Atom Names',17x,'Charges',
-     &              5x,'Distance',6x,'Energy',/)
-      end if
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1411,6 +1418,17 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1563,8 +1581,8 @@ c
                   if (use_polymer) then
                      if (r2 .gt. polycut2)  fik = fi * pchg(kmap)
                   end if
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1580,7 +1598,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efull) .gt. 100.0d0)
+                  huge = (abs(efull) .gt. 50.0d0)
                   if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1672,6 +1690,7 @@ c
       use math
       use molcul
       use neigh
+      use pme
       use shunt
       use usage
       implicit none
@@ -1686,7 +1705,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
@@ -1703,16 +1722,13 @@ c
       end do
       if (nion .eq. 0)  return
 c
-c     print header information if debug output was requested
+c     set grid size, spline order and Ewald coefficient
 c
-      header = .true.
-      if (debug .and. nion.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Charge-Charge Interactions :',
-     &           //,' Type',14x,'Atom Names',17x,'Charges',
-     &              5x,'Distance',6x,'Energy',/)
-      end if
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1729,6 +1745,17 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nion.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Charge-Charge Interactions :',
+     &           //,' Type',14x,'Atom Names',17x,'Charges',
+     &              5x,'Distance',6x,'Energy',/)
+      end if
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1772,8 +1799,8 @@ c
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
-!$OMP& firstprivate(cscale) shared (ec,einter,nec,aec)
-!$OMP DO reduction(+:ec,einter,nec,aec) schedule(guided)
+!$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
+!$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1832,8 +1859,8 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1848,7 +1875,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efull) .gt. 100.0d0)
+                  huge = (abs(efull) .gt. 50.0d0)
                   if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1951,6 +1978,16 @@ c
       end do
       if (nion .eq. 0)  return
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+c
+c     initialize connected atom exclusion coefficients
+c
+      do i = 1, n
+         cscale(i) = 1.0d0
+      end do
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -1961,16 +1998,6 @@ c
      &           //,' Type',14x,'Atom Names',17x,'Charges',
      &              5x,'Distance',6x,'Energy',/)
       end if
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (cscale(n))
-c
-c     initialize connected atom exclusion coefficients
-c
-      do i = 1, n
-         cscale(i) = 1.0d0
-      end do
 c
 c     set the energy units conversion factor
 c
@@ -2071,7 +2098,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(e) .gt. 100.0d0)
+               huge = (abs(e) .gt. 50.0d0)
                if ((debug.and.e.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then

@@ -239,7 +239,7 @@ c
          end if
       end do
 c
-c     convert dipole to Debyes and quadrupole to Buckinghams
+c     convert dipole to Debye and quadrupole to Buckingham
 c
       xdpl = xdpl * debye
       ydpl = ydpl * debye

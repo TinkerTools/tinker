@@ -18,10 +18,18 @@
  *
  */
 
-#include "api.h"
+#include "api/api.h"
 
-static plan *mkplan0(planner *plnr, unsigned flags, 
-		     const problem *prb, int hash_info, 
+static planner_hook_t before_planner_hook = 0, after_planner_hook = 0;
+
+void X(set_planner_hooks)(planner_hook_t before, planner_hook_t after)
+{
+     before_planner_hook = before;
+     after_planner_hook = after;
+}
+
+static plan *mkplan0(planner *plnr, unsigned flags,
+		     const problem *prb, unsigned hash_info,
 		     wisdom_state_t wisdom_state)
 {
      /* map API flags into FFTW flags */
@@ -40,17 +48,17 @@ static unsigned force_estimator(unsigned flags)
      return (flags | FFTW_ESTIMATE);
 }
 
-static plan *mkplan(planner *plnr, unsigned flags, 
-		    const problem *prb, int hash_info)
+static plan *mkplan(planner *plnr, unsigned flags,
+		    const problem *prb, unsigned hash_info)
 {
      plan *pln;
-
+     
      pln = mkplan0(plnr, flags, prb, hash_info, WISDOM_NORMAL);
 
      if (plnr->wisdom_state == WISDOM_NORMAL && !pln) {
 	  /* maybe the planner failed because of inconsistent wisdom;
 	     plan again ignoring infeasible wisdom */
-	  pln = mkplan0(plnr, force_estimator(flags), prb, 
+	  pln = mkplan0(plnr, force_estimator(flags), prb,
 			hash_info, WISDOM_IGNORE_INFEASIBLE);
      }
 
@@ -67,7 +75,7 @@ static plan *mkplan(planner *plnr, unsigned flags,
 	       plnr->adt->forget(plnr, FORGET_EVERYTHING);
 
 	       A(!pln);
-	       pln = mkplan0(plnr, force_estimator(flags), 
+	       pln = mkplan0(plnr, force_estimator(flags),
 			     prb, hash_info, WISDOM_IGNORE_ALL);
 	  }
      }
@@ -80,11 +88,16 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
      apiplan *p = 0;
      plan *pln;
      unsigned flags_used_for_planning;
-     planner *plnr = X(the_planner)();
-     unsigned int pats[] = {FFTW_ESTIMATE, FFTW_MEASURE,
-			    FFTW_PATIENT, FFTW_EXHAUSTIVE};
+     planner *plnr;
+     static const unsigned int pats[] = {FFTW_ESTIMATE, FFTW_MEASURE,
+                                         FFTW_PATIENT, FFTW_EXHAUSTIVE};
      int pat, pat_max;
      double pcost = 0;
+     
+     if (before_planner_hook)
+          before_planner_hook();
+     
+     plnr = X(the_planner)();
 
      if (flags & FFTW_WISDOM_ONLY) {
 	  /* Special mode that returns a plan only if wisdom is present,
@@ -98,17 +111,17 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
 		(flags & FFTW_PATIENT ? 2 : 1));
 	  pat = plnr->timelimit >= 0 ? 0 : pat_max;
 
-	  flags &= ~(FFTW_ESTIMATE | FFTW_MEASURE | 
+	  flags &= ~(FFTW_ESTIMATE | FFTW_MEASURE |
 		     FFTW_PATIENT | FFTW_EXHAUSTIVE);
 
 	  plnr->start_time = X(get_crude_time)();
-	  
+
 	  /* plan at incrementally increasing patience until we run
 	     out of time */
 	  for (pln = 0, flags_used_for_planning = 0; pat <= pat_max; ++pat) {
 	       plan *pln1;
 	       unsigned tmpflags = flags | pats[pat];
-	       pln1 = mkplan(plnr, tmpflags, prb, 0);
+	       pln1 = mkplan(plnr, tmpflags, prb, 0u);
 
 	       if (!pln1) {
 		    /* don't bother continuing if planner failed or timed out */
@@ -128,7 +141,7 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
 	  p = (apiplan *) MALLOC(sizeof(apiplan), PLANS);
 	  p->prb = prb;
 	  p->sign = sign; /* cache for execute_dft */
-	  
+
 	  /* re-create plan from wisdom, adding blessing */
 	  p->pln = mkplan(plnr, flags_used_for_planning, prb, BLESSING);
 
@@ -143,19 +156,22 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
 	       /* more accurate */
 	       X(plan_awake)(p->pln, AWAKE_SINCOS);
 	  }
-	  
+
 	  /* we don't use pln for p->pln, above, since by re-creating the
 	     plan we might use more patient wisdom from a timed-out mkplan */
 	  X(plan_destroy_internal)(pln);
      } else
 	  X(problem_destroy)(prb);
-     
+
      /* discard all information not necessary to reconstruct the plan */
      plnr->adt->forget(plnr, FORGET_ACCURSED);
 
 #ifdef FFTW_RANDOM_ESTIMATOR
      X(random_estimate_seed)++; /* subsequent "random" plans are distinct */
 #endif
+
+     if (after_planner_hook)
+          after_planner_hook();
      
      return p;
 }
@@ -163,9 +179,20 @@ apiplan *X(mkapiplan)(int sign, unsigned flags, problem *prb)
 void X(destroy_plan)(X(plan) p)
 {
      if (p) {
+          if (before_planner_hook)
+               before_planner_hook();
+     
           X(plan_awake)(p->pln, SLEEPY);
           X(plan_destroy_internal)(p->pln);
           X(problem_destroy)(p->prb);
           X(ifree)(p);
+
+          if (after_planner_hook)
+               after_planner_hook();
      }
+}
+
+int X(alignment_of)(R *p)
+{
+     return X(ialignment_of(p));
 }

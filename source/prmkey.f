@@ -20,10 +20,12 @@ c
       use angpot
       use bndpot
       use chgpot
+      use dsppot
       use fields
       use mplpot
       use polpot
       use potent
+      use reppot
       use rxnpot
       use torpot
       use urypot
@@ -122,6 +124,16 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_vdw = .true.
          if (value .eq. 'NONE')  use_vdw = .false.
+      else if (keyword(1:14) .eq. 'REPULSIONTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call potoff
+         use_repuls = .true.
+         if (value .eq. 'NONE')  use_repuls = .false.
+      else if (keyword(1:15) .eq. 'DISPERSIONTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call potoff
+         use_disp = .true.
+         if (value .eq. 'NONE')  use_disp = .false.
       else if (keyword(1:11) .eq. 'CHARGETERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -137,7 +149,7 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_dipole = .true.
          if (value .eq. 'NONE')  use_dipole = .false.
-      else if (keyword(1:10) .eq. 'MPOLETERM ') then
+      else if (keyword(1:14) .eq. 'MULTIPOLETERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
          use_mpole = .true.
@@ -147,6 +159,11 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_polar = .true.
          if (value .eq. 'NONE')  use_polar = .false.
+      else if (keyword(1:11) .eq. 'CHGTRNTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call potoff
+         use_chgtrn = .true.
+         if (value .eq. 'NONE')  use_chgtrn = .false.
       else if (keyword(1:13) .eq. 'RXNFIELDTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -307,6 +324,38 @@ c
       else if (keyword(1:15) .eq. 'VDW-CORRECTION ') then
          use_vcorr = .true.
 c
+c     set control parameters for Pauli repulsion potential
+c
+      else if (keyword(1:13) .eq. 'REP-12-SCALE ') then
+         read (string,*,err=10,end=10)  r2scale
+         if (r2scale .gt. 1.0d0)  r2scale = 1.0d0 / r2scale
+      else if (keyword(1:13) .eq. 'REP-13-SCALE ') then
+         read (string,*,err=10,end=10)  r3scale
+         if (r3scale .gt. 1.0d0)  r3scale = 1.0d0 / r3scale
+      else if (keyword(1:13) .eq. 'REP-14-SCALE ') then
+         read (string,*,err=10,end=10)  r4scale
+         if (r4scale .gt. 1.0d0)  r4scale = 1.0d0 / r4scale
+      else if (keyword(1:13) .eq. 'REP-15-SCALE ') then
+         read (string,*,err=10,end=10)  r5scale
+         if (r5scale .gt. 1.0d0)  r5scale = 1.0d0 / r5scale
+c
+c     set control parameters for dispersion potential
+c
+      else if (keyword(1:14) .eq. 'DISP-12-SCALE ') then
+         read (string,*,err=10,end=10)  dsp2scale
+         if (dsp2scale .gt. 1.0d0)  dsp2scale = 1.0d0 / dsp2scale
+      else if (keyword(1:14) .eq. 'DISP-13-SCALE ') then
+         read (string,*,err=10,end=10)  dsp3scale
+         if (dsp3scale .gt. 1.0d0)  dsp3scale = 1.0d0 / dsp3scale
+      else if (keyword(1:14) .eq. 'DISP-14-SCALE ') then
+         read (string,*,err=10,end=10)  dsp4scale
+         if (dsp4scale .gt. 1.0d0)  dsp4scale = 1.0d0 / dsp4scale
+      else if (keyword(1:14) .eq. 'DISP-15-SCALE ') then
+         read (string,*,err=10,end=10)  dsp5scale
+         if (dsp5scale .gt. 1.0d0)  dsp5scale = 1.0d0 / dsp5scale
+      else if (keyword(1:16) .eq. 'DISP-CORRECTION ') then
+         use_dcorr = .true.
+c
 c     set control parameters for charge-charge potentials
 c
       else if (keyword(1:9) .eq. 'ELECTRIC ') then
@@ -346,6 +395,18 @@ c
       else if (keyword(1:15) .eq. 'MPOLE-15-SCALE ') then
          read (string,*,err=10,end=10)  m5scale
          if (m5scale .gt. 1.0d0)  m5scale = 1.0d0 / m5scale
+      else if (keyword(1:16) .eq. 'DIRECT-11-SCALE ') then
+         read (string,*,err=10,end=10)  d1scale
+         if (d1scale .gt. 1.0d0)  d1scale = 1.0d0 / d1scale
+      else if (keyword(1:16) .eq. 'DIRECT-12-SCALE ') then
+         read (string,*,err=10,end=10)  d2scale
+         if (d2scale .gt. 1.0d0)  d2scale = 1.0d0 / d2scale
+      else if (keyword(1:16) .eq. 'DIRECT-13-SCALE ') then
+         read (string,*,err=10,end=10)  d3scale
+         if (d3scale .gt. 1.0d0)  d3scale = 1.0d0 / d3scale
+      else if (keyword(1:16) .eq. 'DIRECT-14-SCALE ') then
+         read (string,*,err=10,end=10)  d4scale
+         if (d4scale .gt. 1.0d0)  d4scale = 1.0d0 / d4scale
 c
 c     set control parameters for polarization potentials
 c
@@ -372,18 +433,6 @@ c
       else if (keyword(1:15) .eq. 'POLAR-14-INTRA ') then
          read (string,*,err=10,end=10)  p41scale
          if (p41scale .gt. 1.0d0)  p41scale = 1.0d0 / p41scale
-      else if (keyword(1:16) .eq. 'DIRECT-11-SCALE ') then
-         read (string,*,err=10,end=10)  d1scale
-         if (d1scale .gt. 1.0d0)  d1scale = 1.0d0 / d1scale
-      else if (keyword(1:16) .eq. 'DIRECT-12-SCALE ') then
-         read (string,*,err=10,end=10)  d2scale
-         if (d2scale .gt. 1.0d0)  d2scale = 1.0d0 / d2scale
-      else if (keyword(1:16) .eq. 'DIRECT-13-SCALE ') then
-         read (string,*,err=10,end=10)  d3scale
-         if (d3scale .gt. 1.0d0)  d3scale = 1.0d0 / d3scale
-      else if (keyword(1:16) .eq. 'DIRECT-14-SCALE ') then
-         read (string,*,err=10,end=10)  d4scale
-         if (d4scale .gt. 1.0d0)  d4scale = 1.0d0 / d4scale
       else if (keyword(1:16) .eq. 'MUTUAL-11-SCALE ') then
          read (string,*,err=10,end=10)  u1scale
          if (u1scale .gt. 1.0d0)  u1scale = 1.0d0 / u1scale
@@ -396,6 +445,18 @@ c
       else if (keyword(1:16) .eq. 'MUTUAL-14-SCALE ') then
          read (string,*,err=10,end=10)  u4scale
          if (u4scale .gt. 1.0d0)  u4scale = 1.0d0 / u4scale
+      else if (keyword(1:16) .eq. 'INDUCE-12-SCALE ') then
+         read (string,*,err=10,end=10)  w2scale
+         if (w2scale .gt. 1.0d0)  w2scale = 1.0d0 / w2scale
+      else if (keyword(1:16) .eq. 'INDUCE-13-SCALE ') then
+         read (string,*,err=10,end=10)  w3scale
+         if (w3scale .gt. 1.0d0)  w3scale = 1.0d0 / w3scale
+      else if (keyword(1:16) .eq. 'INDUCE-14-SCALE ') then
+         read (string,*,err=10,end=10)  w4scale
+         if (w4scale .gt. 1.0d0)  w4scale = 1.0d0 / w4scale
+      else if (keyword(1:16) .eq. 'INDUCE-15-SCALE ') then
+         read (string,*,err=10,end=10)  w5scale
+         if (w5scale .gt. 1.0d0)  w5scale = 1.0d0 / w5scale
 c
 c     set control parameters for reaction field potentials
 c
@@ -443,11 +504,14 @@ c
       use_angtor = .false.
       use_tortor = .false.
       use_vdw = .false.
+      use_repuls = .false.
+      use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
       use_dipole = .false.
       use_mpole = .false.
       use_polar = .false.
+      use_chgtrn = .false.
       use_rxnfld = .false.
       use_solv = .false.
       use_metal = .false.

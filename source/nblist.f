@@ -12,26 +12,38 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "nblist" constructs and maintains nonbonded pair neighbor lists
-c     for vdw, electrostatic and polarization interactions
+c     "nblist" builds and maintains nonbonded pair neighbor lists
+c     for vdw, dispersion, electrostatic and polarization terms
 c
 c
       subroutine nblist
       use limits
+      use neigh
       use potent
       implicit none
 c
 c
-c     enforce periodic boundaries before finding neighbors
+c     rebuild list if using both vdw and dispersion terms
 c
-      call bounds
+      if (use_vdw .and. use_disp) then
+         dovlst = .true.
+         dodlst = .true.
+      end if
 c
-c     update the vdw and electrostatic neighbor lists
+c     rebuild list if using both charge and multipole terms
+c
+      if (use_charge .and. use_mpole) then
+         doclst = .true.
+         domlst = .true.
+      end if
+c
+c     update the appropriate nonbonded neighbor lists
 c
       if (use_vdw .and. use_vlist)  call vlist
+      if (use_disp .and. use_dlist)  call dlist
       if ((use_charge.or.use_solv) .and. use_clist)  call clist
-      if ((use_mpole.or.use_polar.or.use_solv) .and. use_mlist)
-     &      call mlist
+      if ((use_mpole.or.use_polar.or.use_chgtrn.or.use_solv)
+     &      .and. use_mlist)  call mlist
       if (use_polar .and. use_ulist)  call ulist
       return
       end
@@ -45,7 +57,7 @@ c     ##############################################################
 c
 c
 c     "vlist" performs an update or a complete rebuild of the
-c     van der Waals neighbor list
+c     nonbonded neighbor lists for vdw sites
 c
 c
       subroutine vlist
@@ -418,6 +430,382 @@ c
       end
 c
 c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine dlist  --  get damped dispersion neighbor lists  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "dlist" performs an update or a complete rebuild of the
+c     nonbonded neighbor lists for damped dispersion sites
+c
+c
+      subroutine dlist
+      use atoms
+      use bound
+      use boxes
+      use disp
+      use iounit
+      use neigh
+      implicit none
+      integer i,j,k,ii
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 radius,r2
+      logical, allocatable :: update(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
+c
+c     neighbor list cannot be used with the replicates method
+c
+      radius = sqrt(dbuf2)
+      call replica (radius)
+      if (use_replica) then
+         write (iout,10)
+   10    format (/,' DLIST  --  Pairwise Neighbor List cannot',
+     &              ' be used with Replicas')
+         call fatal
+      end if
+c
+c     perform a complete list build instead of an update
+c
+      if (doclst) then
+         dodlst = .false.
+         if (octahedron) then
+            call dbuild
+         else
+            call dlight
+         end if
+         return
+      end if
+c
+c     test sites for displacement exceeding half the buffer
+c
+!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
+!$OMP DO schedule(guided)
+      do i = 1, ndisp
+         ii = idisp(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         xr = xi - xvold(i)
+         yr = yi - yvold(i)
+         zr = zi - zvold(i)
+         call imagen (xr,yr,zr)
+         r2 = xr*xr + yr*yr + zr*zr
+         update(i) = .false.
+         if (r2 .ge. lbuf2) then
+            update(i) = .true.
+            xvold(i) = xi
+            yvold(i) = yi
+            zvold(i) = zi
+         end if
+      end do
+!$OMP END DO
+c
+c     rebuild the higher numbered neighbors for updated sites
+c
+!$OMP DO schedule(guided)
+      do i = 1, ndisp
+         if (update(i)) then
+            xi = xvold(i)
+            yi = yvold(i)
+            zi = zvold(i)
+            nvlst(i) = 0
+            do k = i+1, ndisp
+               xr = xi - xvold(k)
+               yr = yi - yvold(k)
+               zr = zi - zvold(k)
+               call imagen (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               if (r2 .le. vbuf2) then
+                  nvlst(i) = nvlst(i) + 1
+                  vlst(nvlst(i),i) = k
+               end if
+            end do
+         end if
+      end do
+!$OMP END DO
+c
+c     adjust lists of lower numbered neighbors of updated sites
+c
+!$OMP DO schedule(guided)
+      do i = 1, ndisp
+         if (update(i)) then
+            xi = xvold(i)
+            yi = yvold(i)
+            zi = zvold(i)
+            do k = 1, i-1
+               if (.not. update(k)) then
+                  xr = xi - xvold(k)
+                  yr = yi - yvold(k)
+                  zr = zi - zvold(k)
+                  call imagen (xr,yr,zr)
+                  r2 = xr*xr + yr*yr + zr*zr
+                  if (r2 .le. dbuf2) then
+!$OMP CRITICAL
+                     do j = 1, nvlst(k)
+                        if (vlst(j,k) .eq. i)  goto 20
+                     end do
+                     nvlst(k) = nvlst(k) + 1
+                     vlst(nvlst(k),k) = i
+   20                continue
+!$OMP END CRITICAL
+                  else if (r2 .le. dbufx) then
+!$OMP CRITICAL
+                     do j = 1, nvlst(k)
+                        if (vlst(j,k) .eq. i) then
+                           vlst(j,k) = vlst(nvlst(k),k)
+                           nvlst(k) = nvlst(k) - 1
+                           goto 30
+                        end if
+                     end do
+   30                continue
+!$OMP END CRITICAL
+                  end if
+               end if
+            end do
+         end if
+      end do
+!$OMP END DO
+c
+c     check to see if any neighbor lists are too long
+c
+!$OMP DO schedule(guided)
+      do i = 1, ndisp
+         if (nvlst(i) .ge. maxvlst) then
+            write (iout,40)
+   40       format (/,' DLIST  --  Too many Neighbors;',
+     &                 ' Increase MAXVLST')
+            call fatal
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (update)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine dbuild  --  build dispersion list for all sites  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "dbuild" performs a complete rebuild of the damped dispersion
+c     neighbor list for all sites
+c
+c
+      subroutine dbuild
+      use atoms
+      use bound
+      use disp
+      use iounit
+      use neigh
+      implicit none
+      integer i,k,ii,kk
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr,r2
+c
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP DO schedule(guided)
+c
+c     store new coordinates to reflect update of the site
+c
+      do i = 1, ndisp
+         ii = idisp(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         xvold(i) = xi
+         yvold(i) = yi
+         zvold(i) = zi
+c
+c     generate all neighbors for the site being rebuilt
+c
+         nvlst(i) = 0
+         do k = i+1, ndisp
+            kk = idisp(k)
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. dbuf2) then
+               nvlst(i) = nvlst(i) + 1
+               vlst(nvlst(i),i) = k
+            end if
+         end do
+c
+c     check to see if the neighbor list is too long
+c
+         if (nvlst(i) .ge. maxvlst) then
+            write (iout,10)
+   10       format (/,' DBUILD  --  Too many Neighbors;',
+     &                 ' Increase MAXVLST')
+            call fatal
+         end if
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine dlight  --  get damp dispersion list via lights  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "dlight" performs a complete rebuild of the damped dispersion
+c     pair neighbor list for all sites using the method of lights
+c
+c
+      subroutine dlight
+      use atoms
+      use bound
+      use cell
+      use disp
+      use iounit
+      use light
+      use neigh
+      implicit none
+      integer i,j,k
+      integer ii,kk
+      integer kgy,kgz
+      integer start,stop
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 r2,off
+      real*8, allocatable :: xsort(:)
+      real*8, allocatable :: ysort(:)
+      real*8, allocatable :: zsort(:)
+      logical unique,repeat
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xsort(ndisp))
+      allocate (ysort(ndisp))
+      allocate (zsort(ndisp))
+c
+c     transfer interaction site coordinates to sorting arrays
+c
+      do i = 1, ndisp
+         nvlst(i) = 0
+         ii = idisp(i)
+         xvold(i) = x(ii)
+         yvold(i) = y(ii)
+         zvold(i) = z(ii)
+         xsort(i) = x(ii)
+         ysort(i) = y(ii)
+         zsort(i) = z(ii)
+      end do
+c
+c     use the method of lights to generate neighbors
+c
+      unique = .false.
+      off = sqrt(dbuf2)
+      call lights (off,ndisp,xsort,ysort,zsort,unique)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xsort)
+      deallocate (ysort)
+      deallocate (zsort)
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
+!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP DO schedule(guided)
+c
+c     loop over all atoms computing the neighbor lists
+c
+      do i = 1, ndisp
+         ii = idisp(i)
+         xi = x(ii)
+         yi = y(ii)
+         zi = z(ii)
+         if (kbx(i) .le. kex(i)) then
+            repeat = .false.
+            start = kbx(i)
+            stop = kex(i)
+         else
+            repeat = .true.
+            start = 1
+            stop = kex(i)
+         end if
+   10    continue
+         do j = start, stop
+            k = locx(j)
+            if (k .le. i)  goto 20
+            kk = idisp(k)
+            kgy = rgy(k)
+            if (kby(i) .le. key(i)) then
+               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            else
+               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+            end if
+            kgz = rgz(k)
+            if (kbz(i) .le. kez(i)) then
+               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            else
+               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+            end if
+            xr = xi - x(kk)
+            yr = yi - y(kk)
+            zr = zi - z(kk)
+            call imagen (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. dbuf2) then
+               nvlst(i) = nvlst(i) + 1
+               vlst(nvlst(i),i) = k
+            end if
+   20       continue
+         end do
+         if (repeat) then
+            repeat = .false.
+            start = kbx(i)
+            stop = ndisp
+            goto 10
+         end if
+c
+c     check to see if the neighbor list is too long
+c
+         if (nvlst(i) .ge. maxvlst) then
+            write (iout,30)
+   30       format (/,' DLIGHT  --  Too many Neighbors;',
+     &                 ' Increase MAXVLST')
+            call fatal
+         end if
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine clist  --  get partial charge neighbor lists  ##
@@ -426,7 +814,7 @@ c     ###############################################################
 c
 c
 c     "clist" performs an update or a complete rebuild of the
-c     electrostatic neighbor lists for partial charges
+c     nonbonded neighbor lists for partial charges
 c
 c
       subroutine clist
@@ -437,8 +825,7 @@ c
       use iounit
       use neigh
       implicit none
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -474,24 +861,24 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, nion
          ii = kion(i)
          xi = x(ii)
          yi = y(ii)
          zi = z(ii)
-         xr = xi - xcold(i)
-         yr = yi - ycold(i)
-         zr = zi - zcold(i)
+         xr = xi - xeold(i)
+         yr = yi - yeold(i)
+         zr = zi - zeold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          update(i) = .false.
          if (r2 .ge. lbuf2) then
             update(i) = .true.
-            xcold(i) = xi
-            ycold(i) = yi
-            zcold(i) = zi
+            xeold(i) = xi
+            yeold(i) = yi
+            zeold(i) = zi
          end if
       end do
 !$OMP END DO
@@ -501,14 +888,14 @@ c
 !$OMP DO schedule(guided)
       do i = 1, nion
          if (update(i)) then
-            xi = xcold(i)
-            yi = ycold(i)
-            zi = zcold(i)
+            xi = xeold(i)
+            yi = yeold(i)
+            zi = zeold(i)
             nelst(i) = 0
             do k = i+1, nion
-               xr = xi - xcold(k)
-               yr = yi - ycold(k)
-               zr = zi - zcold(k)
+               xr = xi - xeold(k)
+               yr = yi - yeold(k)
+               zr = zi - zeold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. cbuf2) then
@@ -525,14 +912,14 @@ c
 !$OMP DO schedule(guided)
       do i = 1, nion
          if (update(i)) then
-            xi = xcold(i)
-            yi = ycold(i)
-            zi = zcold(i)
+            xi = xeold(i)
+            yi = yeold(i)
+            zi = zeold(i)
             do k = 1, i-1
                if (.not. update(k)) then
-                  xr = xi - xcold(k)
-                  yr = yi - ycold(k)
-                  zr = zi - zcold(k)
+                  xr = xi - xeold(k)
+                  yr = yi - yeold(k)
+                  zr = zi - zeold(k)
                   call imagen (xr,yr,zr)
                   r2 = xr*xr + yr*yr + zr*zr
                   if (r2 .le. cbuf2) then
@@ -601,8 +988,7 @@ c
       use iounit
       use neigh
       implicit none
-      integer i,k
-      integer ii,kk
+      integer i,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
@@ -619,9 +1005,9 @@ c
          xi = x(ii)
          yi = y(ii)
          zi = z(ii)
-         xcold(i) = xi
-         ycold(i) = yi
-         zcold(i) = zi
+         xeold(i) = xi
+         yeold(i) = yi
+         zeold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -701,9 +1087,9 @@ c
       do i = 1, nion
          nelst(i) = 0
          ii = kion(i)
-         xcold(i) = x(ii)
-         ycold(i) = y(ii)
-         zcold(i) = z(ii)
+         xeold(i) = x(ii)
+         yeold(i) = y(ii)
+         zeold(i) = z(ii)
          xsort(i) = x(ii)
          ysort(i) = y(ii)
          zsort(i) = z(ii)
@@ -804,7 +1190,7 @@ c     #################################################################
 c
 c
 c     "mlist" performs an update or a complete rebuild of the
-c     electrostatic neighbor lists for atomic multipoles
+c     nonbonded neighbor lists for atomic multipoles
 c
 c
       subroutine mlist
@@ -815,8 +1201,7 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -852,24 +1237,24 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
          xi = x(ii)
          yi = y(ii)
          zi = z(ii)
-         xr = xi - xmold(i)
-         yr = yi - ymold(i)
-         zr = zi - zmold(i)
+         xr = xi - xeold(i)
+         yr = yi - yeold(i)
+         zr = zi - zeold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          update(i) = .false.
          if (r2 .ge. lbuf2) then
             update(i) = .true.
-            xmold(i) = xi
-            ymold(i) = yi
-            zmold(i) = zi
+            xeold(i) = xi
+            yeold(i) = yi
+            zeold(i) = zi
          end if
       end do
 !$OMP END DO
@@ -879,14 +1264,14 @@ c
 !$OMP DO schedule (guided)
       do i = 1, npole
          if (update(i)) then
-            xi = xmold(i)
-            yi = ymold(i)
-            zi = zmold(i)
+            xi = xeold(i)
+            yi = yeold(i)
+            zi = zeold(i)
             nelst(i) = 0
             do k = i+1, npole
-               xr = xi - xmold(k)
-               yr = yi - ymold(k)
-               zr = zi - zmold(k)
+               xr = xi - xeold(k)
+               yr = yi - yeold(k)
+               zr = zi - zeold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. mbuf2) then
@@ -903,14 +1288,14 @@ c
 !$OMP DO schedule (guided)
       do i = 1, npole
          if (update(i)) then
-            xi = xmold(i)
-            yi = ymold(i)
-            zi = zmold(i)
+            xi = xeold(i)
+            yi = yeold(i)
+            zi = zeold(i)
             do k = 1, i-1
                if (.not. update(k)) then
-                  xr = xi - xmold(k)
-                  yr = yi - ymold(k)
-                  zr = zi - zmold(k)
+                  xr = xi - xeold(k)
+                  yr = yi - yeold(k)
+                  zr = zi - zeold(k)
                   call imagen (xr,yr,zr)
                   r2 = xr*xr + yr*yr + zr*zr
                   if (r2 .le. mbuf2) then
@@ -979,8 +1364,7 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,k
-      integer ii,kk
+      integer i,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
@@ -997,9 +1381,9 @@ c
          xi = x(ii)
          yi = y(ii)
          zi = z(ii)
-         xmold(i) = xi
-         ymold(i) = yi
-         zmold(i) = zi
+         xeold(i) = xi
+         yeold(i) = yi
+         zeold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
@@ -1079,9 +1463,9 @@ c
       do i = 1, npole
          nelst(i) = 0
          ii = ipole(i)
-         xmold(i) = x(ii)
-         ymold(i) = y(ii)
-         zmold(i) = z(ii)
+         xeold(i) = x(ii)
+         yeold(i) = y(ii)
+         zeold(i) = z(ii)
          xsort(i) = x(ii)
          ysort(i) = y(ii)
          zsort(i) = z(ii)
@@ -1193,8 +1577,7 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,j,k
-      integer ii,kk
+      integer i,j,k,ii
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -1230,7 +1613,7 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
       do i = 1, npole
          ii = ipole(i)
@@ -1357,8 +1740,7 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,k
-      integer ii,kk
+      integer i,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c

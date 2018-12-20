@@ -18,6 +18,6 @@ c
       module kanang
       use sizes
       implicit none
-      real*8 anan(3,maxclass)
+      real*8, allocatable :: anan(:,:)
       save
       end

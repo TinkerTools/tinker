@@ -27,13 +27,16 @@ c     use_strtor  logical flag governing use of stretch-torsion term
 c     use_angtor  logical flag governing use of angle-torsion term
 c     use_tortor  logical flag governing use of torsion-torsion term
 c     use_vdw     logical flag governing use of vdw der Waals potential
+c     use_repuls  logical flag governing use of Pauli repulsion term
+c     use_disp    logical flag governing use of dispersion potential
 c     use_charge  logical flag governing use of charge-charge potential
 c     use_chgdpl  logical flag governing use of charge-dipole potential
 c     use_dipole  logical flag governing use of dipole-dipole potential
 c     use_mpole   logical flag governing use of multipole potential
 c     use_polar   logical flag governing use of polarization term
+c     use_chgtrn  logical flag governing use of charge transfer term
 c     use_rxnfld  logical flag governing use of reaction field term
-c     use_solv    logical flag governing use of continuum solvation
+c     use_solv    logical flag governing use of continuum solvation term
 c     use_metal   logical flag governing use of ligand field term
 c     use_geom    logical flag governing use of geometric restraints
 c     use_extra   logical flag governing use of extra potential term
@@ -50,12 +53,13 @@ c
       logical use_imptor,use_tors
       logical use_pitors,use_strtor
       logical use_angtor,use_tortor
-      logical use_vdw,use_charge
+      logical use_vdw,use_repuls
+      logical use_disp,use_charge
       logical use_chgdpl,use_dipole
       logical use_mpole,use_polar
-      logical use_rxnfld,use_solv
-      logical use_metal,use_geom
-      logical use_extra,use_born
-      logical use_orbit
+      logical use_chgtrn,use_rxnfld
+      logical use_solv,use_metal
+      logical use_geom,use_extra
+      logical use_born,use_orbit
       save
       end

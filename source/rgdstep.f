@@ -119,9 +119,9 @@ c
             xr = x(k) - rc(1)
             yr = y(k) - rc(2)
             zr = z(k) - rc(3)
-            fx = -convert * derivs(1,k)
-            fy = -convert * derivs(2,k)
-            fz = -convert * derivs(3,k)
+            fx = -ekcal * derivs(1,k)
+            fy = -ekcal * derivs(2,k)
+            fz = -ekcal * derivs(3,k)
             fc(1) = fc(1) + fx
             fc(2) = fc(2) + fy
             fc(3) = fc(3) + fz

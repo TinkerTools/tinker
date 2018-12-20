@@ -23,7 +23,6 @@ c
       use bound
       use boxes
       use inform
-      use inter
       use iounit
       use limits
       use mdstuf
@@ -37,18 +36,15 @@ c
       real*8 etot,epot,ekin
       real*8 pico,dens
       real*8 fluctuate,fluctuate2
-      real*8 intfluct,intfluct2
       real*8 potfluct,potfluct2
       real*8 kinfluct,kinfluct2
       real*8 tfluct,pfluct,dfluct
       real*8 tfluct2,pfluct2,dfluct2
       real*8 etot_sum,etot2_sum
-      real*8 eint_sum,eint2_sum
       real*8 etot_ave,etot2_ave
-      real*8 eint_ave,eint2_ave
       real*8 epot_sum,epot2_sum
-      real*8 ekin_sum,ekin2_sum
       real*8 epot_ave,epot2_ave
+      real*8 ekin_sum,ekin2_sum
       real*8 ekin_ave,ekin2_ave
       real*8 temp_sum,temp2_sum
       real*8 temp_ave,temp2_ave
@@ -57,7 +53,6 @@ c
       real*8 dens_sum,dens2_sum
       real*8 dens_ave,dens2_ave
       save etot_sum,etot2_sum
-      save eint_sum,eint2_sum
       save epot_sum,epot2_sum
       save ekin_sum,ekin2_sum
       save temp_sum,temp2_sum
@@ -78,8 +73,6 @@ c
          epot2_sum = 0.0d0
          ekin_sum = 0.0d0
          ekin2_sum = 0.0d0
-         eint_sum = 0.0d0
-         eint2_sum = 0.0d0
          temp_sum = 0.0d0
          temp2_sum = 0.0d0
          pres_sum = 0.0d0
@@ -212,36 +205,6 @@ c
             write (iout,170)  ekin_ave,kinfluct
   170       format (' Kinetic Energy',6x,f15.4,' Kcal/mole',3x,
      &                 '(+/-',f9.4,')')
-         end if
-      end if
-c
-c     compute average intermolecular energy and its fluctuation
-c
-      if (nmol.ne.1 .and. nmol.ne.n .and. .not.use_ewald) then
-         eint_sum = eint_sum + einter
-         eint2_sum = eint2_sum + einter**2
-         if (modstep .eq. 0) then
-            eint_ave = eint_sum / dble(iprint)
-            eint2_ave = eint2_sum / dble(iprint)
-            intfluct2 = eint2_ave - eint_ave**2
-            if (intfluct2 .gt. 0.0d0) then
-               intfluct = sqrt(intfluct2)
-            else
-               intfluct = 0.0d0
-            end if
-            if (digits .ge. 8) then
-               write (iout,180)  eint_ave,intfluct
-  180          format (' Intermolecular',6x,f19.8,' Kcal/mole',3x,
-     &                    '(+/-',f13.8,')')
-            else if (digits .ge. 6) then
-               write (iout,190)  eint_ave,intfluct
-  190          format (' Intermolecular',6x,f17.6,' Kcal/mole',3x,
-     &                    '(+/-',f11.6,')')
-            else
-               write (iout,200)  eint_ave,intfluct
-  200          format (' Intermolecular',6x,f15.4,' Kcal/mole',3x,
-     &                    '(+/-',f9.4,')')
-            end if
          end if
       end if
 c

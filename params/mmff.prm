@@ -16,6 +16,7 @@ angle-trigonal          NATURAL
 angle-cubic             -0.006981317
 strbndunit              2.51210
 opbendunit              0.021922
+opbendtype              W-D-C
 torsionunit             0.5
 vdwtype                 BUFFERED-14-7
 radiusrule              MMFF94

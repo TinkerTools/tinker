@@ -18,8 +18,8 @@
  *
  */
 
-#include "api.h"
-#include "threads.h"
+#include "api/api.h"
+#include "threads/threads.h"
 
 static int threads_inited = 0;
 
@@ -78,4 +78,9 @@ void X(plan_with_nthreads)(int nthreads)
      A(threads_inited);
      plnr = X(the_planner)();
      plnr->nthr = X(imax)(1, nthreads);
+}
+
+void X(make_planner_thread_safe)(void)
+{
+     X(threads_register_planner_hooks)();
 }

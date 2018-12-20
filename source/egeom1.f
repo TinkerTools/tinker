@@ -25,7 +25,6 @@ c
       use deriv
       use energi
       use group
-      use inter
       use molcul
       use math
       use restrn
@@ -223,12 +222,6 @@ c
             vir(1,3) = vir(1,3) + vzx
             vir(2,3) = vir(2,3) + vzy
             vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-            if (intermol) then
-               einter = einter + e
-            end if
          end if
       end do
 c
@@ -331,12 +324,6 @@ c
                vir(1,3) = vir(1,3) + vzx
                vir(2,3) = vir(2,3) + vzy
                vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-               if (intermol) then
-                  einter = einter + e
-               end if
             end if
          end if
       end do
@@ -501,14 +488,6 @@ c
                vir(1,3) = vir(1,3) + vzx
                vir(2,3) = vir(2,3) + vzy
                vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-               if (molcule(ia).ne.molcule(ib) .or.
-     &             molcule(ia).ne.molcule(ic) .or.
-     &             molcule(ia).ne.molcule(id)) then
-                  einter = einter + e
-               end if
             end if
          end if
       end do
@@ -603,12 +582,6 @@ c
          vir(1,3) = vir(1,3) + vzx
          vir(2,3) = vir(2,3) + vzy
          vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-         if (intermol) then
-            einter = einter + e
-         end if
       end do
 c
 c     get energy and derivatives for chirality restraint terms
@@ -702,14 +675,6 @@ c
             vir(1,3) = vir(1,3) + vzx
             vir(2,3) = vir(2,3) + vzy
             vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-            if (molcule(ia).ne.molcule(ib) .or.
-     &          molcule(ia).ne.molcule(ic) .or.
-     &          molcule(ia).ne.molcule(id)) then
-               einter = einter + e
-            end if
          end if
       end do
 c

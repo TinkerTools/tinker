@@ -18,13 +18,13 @@
  *
  */
 
-#include "api.h"
+#include "api/api.h"
 
 char *X(export_wisdom_to_string)(void)
 {
      printer *p;
      planner *plnr = X(the_planner)();
-     int cnt;
+     size_t cnt;
      char *s;
 
      p = X(mkprinter_cnt)(&cnt);

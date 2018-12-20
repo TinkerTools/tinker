@@ -58,6 +58,7 @@ c
       use atoms
       use bound
       use cell
+      use chgpen
       use chgpot
       use couple
       use energi
@@ -82,20 +83,31 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
+      real*8 rr1i,rr3i,rr5i
+      real*8 rr1k,rr3k,rr5k
+      real*8 rr1ik,rr3ik,rr5ik
+      real*8 rr7ik,rr9ik
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qrix,qriy,qriz
-      real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,dik
-      real*8 qrri,qrrk
-      real*8 qrrik,qik
-      real*8 diqrk,dkqri
+      real*8 dir,dkr,dik,qik
+      real*8 qix,qiy,qiz,qir
+      real*8 qkx,qky,qkz,qkr
+      real*8 diqk,dkqi,qiqk
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 term4,term5
+      real*8 term1i,term2i,term3i
+      real*8 term1k,term2k,term3k
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
+      real*8 dmpi(9),dmpk(9)
+      real*8 dmpik(9)
       real*8, allocatable :: mscale(:)
       logical proceed
       logical header,huge
@@ -120,17 +132,6 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. npole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Atomic Multipole Interactions :',
-     &           //,' Type',14x,'Atom Names',15x,'Distance',
-     &              8x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
@@ -147,127 +148,185 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
+c
 c     calculate the multipole interaction energy term
 c
-      do i = 1, npole-1
-         ii = ipole(i)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = yaxis(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = m2scale
+      do ii = 1, npole-1
+         i = ipole(ii)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = yaxis(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
+         if (use_chgpen) then
+            corei = pcore(ii)
+            vali = pval(ii)
+            alphai = palpha(ii)
+         end if
+         usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
+c
+c     set exclusion coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = m2scale
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = m3scale
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = m3scale
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = m4scale
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = m4scale
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = m5scale
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = m5scale
          end do
 c
 c     evaluate all sites within the cutoff distance
 c
-         do k = i+1, npole
-            kk = ipole(k)
-            kz = zaxis(k)
-            kx = xaxis(k)
-            ky = yaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
+         do kk = i+1, npole
+            k = ipole(kk)
+            kz = zaxis(kk)
+            kx = xaxis(kk)
+            ky = yaxis(kk)
+            usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (proceed) then
-               xr = x(kk) - xi
-               yr = y(kk) - yi
-               zr = z(kk) - zi
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,k)
-                  dkx = rpole(2,k)
-                  dky = rpole(3,k)
-                  dkz = rpole(4,k)
-                  qkxx = rpole(5,k)
-                  qkxy = rpole(6,k)
-                  qkxz = rpole(7,k)
-                  qkyy = rpole(9,k)
-                  qkyz = rpole(10,k)
-                  qkzz = rpole(13,k)
+                  ck = rpole(1,kk)
+                  dkx = rpole(2,kk)
+                  dky = rpole(3,kk)
+                  dkz = rpole(4,kk)
+                  qkxx = rpole(5,kk)
+                  qkxy = rpole(6,kk)
+                  qkxz = rpole(7,kk)
+                  qkyy = rpole(9,kk)
+                  qkyz = rpole(10,kk)
+                  qkzz = rpole(13,kk)
+c
+c     intermediates involving moments and separation distance
+c
+                  dir = dix*xr + diy*yr + diz*zr
+                  qix = qixx*xr + qixy*yr + qixz*zr
+                  qiy = qixy*xr + qiyy*yr + qiyz*zr
+                  qiz = qixz*xr + qiyz*yr + qizz*zr
+                  qir = qix*xr + qiy*yr + qiz*zr
+                  dkr = dkx*xr + dky*yr + dkz*zr
+                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qky = qkxy*xr + qkyy*yr + qkyz*zr
+                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                  qkr = qkx*xr + qky*yr + qkz*zr
+                  dik = dix*dkx + diy*dky + diz*dkz
+                  qik = qix*qkx + qiy*qky + qiz*qkz
+                  diqk = dix*qkx + diy*qky + diz*qkz
+                  dkqi = dkx*qix + dky*qiy + dkz*qiz
+                  qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                      + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     get reciprocal distance terms for this interaction
 c
-                  rr1 = f * mscale(kk) / r
+                  rr1 = f * mscale(k) / r
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
 c
-c     intermediates involving moments and distance separation
+c     find damped multipole intermediates and energy value
 c
-                  dri = dix*xr + diy*yr + diz*zr
-                  drk = dkx*xr + dky*yr + dkz*zr
-                  dik = dix*dkx + diy*dky + diz*dkz
-                  qrix = qixx*xr + qixy*yr + qixz*zr
-                  qriy = qixy*xr + qiyy*yr + qiyz*zr
-                  qriz = qixz*xr + qiyz*yr + qizz*zr
-                  qrkx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qrky = qkxy*xr + qkyy*yr + qkyz*zr
-                  qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-                  qrri = qrix*xr + qriy*yr + qriz*zr
-                  qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                  qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                  qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                  if (use_chgpen) then
+                     corek = pcore(kk)
+                     valk = pval(kk)
+                     alphak = palpha(kk)
+                     term1 = corei*corek
+                     term1i = corek*vali
+                     term2i = corek*dir
+                     term3i = corek*qir
+                     term1k = corei*valk
+                     term2k = -corei*dkr
+                     term3k = corei*qkr
+                     term1ik = vali*valk
+                     term2ik = valk*dir - vali*dkr + dik
+                     term3ik = vali*qkr + valk*qir - dir*dkr
+     &                            + 2.0d0*(dkqi-diqk+qiqk)
+                     term4ik = dir*qkr - dkr*qir - 4.0d0*qik
+                     term5ik = qir*qkr
+                     call damppole (r,9,alphai,alphak,
+     &                               dmpi,dmpk,dmpik)
+                     rr1i = dmpi(1)*rr1
+                     rr3i = dmpi(3)*rr3
+                     rr5i = dmpi(5)*rr5
+                     rr1k = dmpk(1)*rr1
+                     rr3k = dmpk(3)*rr3
+                     rr5k = dmpk(5)*rr5
+                     rr1ik = dmpik(1)*rr1
+                     rr3ik = dmpik(3)*rr3
+                     rr5ik = dmpik(5)*rr5
+                     rr7ik = dmpik(7)*rr7
+                     rr9ik = dmpik(9)*rr9
+                     e = term1*rr1 + term1i*rr1i
+     &                      + term1k*rr1k + term1ik*rr1ik
+     &                      + term2i*rr3i + term2k*rr3k
+     &                      + term2ik*rr3ik + term3i*rr5i
+     &                      + term3k*rr5k + term3ik*rr5ik
+     &                      + term4ik*rr7ik + term5ik*rr9ik
 c
-c     calculate intermediate terms for multipole interaction
+c     find standard multipole intermediates and energy value
 c
-                  term1 = ci*ck
-                  term2 = ck*dri - ci*drk + dik
-                  term3 = ci*qrrk + ck*qrri - dri*drk
-     &                       + 2.0d0*(dkqri-diqrk+qik)
-                  term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
-                  term5 = qrri*qrrk
-c
-c     compute the energy contribution for this interaction
-c
-                  e = term1*rr1 + term2*rr3 + term3*rr5
-     &                   + term4*rr7 + term5*rr9
-                  if (use_group)  e = e * fgrp
+                  else
+                     term1 = ci*ck
+                     term2 = ck*dir - ci*dkr + dik
+                     term3 = ci*qkr + ck*qir - dir*dkr
+     &                          + 2.0d0*(dkqi-diqk+qiqk)
+                     term4 = dir*qkr - dkr*qir - 4.0d0*qik
+                     term5 = qir*qkr
+                     e = term1*rr1 + term2*rr3 + term3*rr5
+     &                      + term4*rr7 + term5*rr9
+                  end if
 c
 c     increment the overall multipole energy components
 c
+                  if (use_group)  e = e * fgrp
                   if (e .ne. 0.0d0) then
                      nem = nem + 1
                      em = em + e
-                     aem(ii) = aem(ii) + 0.5d0*e
-                     aem(kk) = aem(kk) + 0.5d0*e
-                     if (molcule(ii) .ne. molcule(kk))
-     &                  einter = einter + e
+                     aem(i) = aem(i) + 0.5d0*e
+                     aem(k) = aem(k) + 0.5d0*e
+                     if (molcule(i) .ne. molcule(k)) then
+                        einter = einter + e
+                     end if
                   end if
 c
 c     print message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 80.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -278,8 +337,8 @@ c
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,30)  ii,name(ii),kk,name(kk),r,e
-   30                format (' M-Pole',4x,2(i7,'-',a3),9x,
+                     write (iout,30)  i,name(i),k,name(k),r,e
+   30                format (' Mpole',5x,2(i7,'-',a3),9x,
      &                          f10.4,2x,f12.4)
                   end if
                end if
@@ -288,17 +347,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = 1.0d0
          end do
       end do
 c
@@ -309,128 +368,173 @@ c
 c
 c     calculate interaction energy with other unit cells
 c
-         do i = 1, npole
-            ii = ipole(i)
-            iz = zaxis(i)
-            ix = xaxis(i)
-            iy = yaxis(k)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
-            ci = rpole(1,i)
-            dix = rpole(2,i)
-            diy = rpole(3,i)
-            diz = rpole(4,i)
-            qixx = rpole(5,i)
-            qixy = rpole(6,i)
-            qixz = rpole(7,i)
-            qiyy = rpole(9,i)
-            qiyz = rpole(10,i)
-            qizz = rpole(13,i)
-            usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-            do j = 1, n12(ii)
-               mscale(i12(j,ii)) = m2scale
+         do ii = 1, npole
+            i = ipole(ii)
+            iz = zaxis(ii)
+            ix = xaxis(ii)
+            iy = yaxis(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            ci = rpole(1,ii)
+            dix = rpole(2,ii)
+            diy = rpole(3,ii)
+            diz = rpole(4,ii)
+            qixx = rpole(5,ii)
+            qixy = rpole(6,ii)
+            qixz = rpole(7,ii)
+            qiyy = rpole(9,ii)
+            qiyz = rpole(10,ii)
+            qizz = rpole(13,ii)
+            if (use_chgpen) then
+               corei = pcore(ii)
+               vali = pval(ii)
+               alphai = palpha(ii)
+            end if
+            usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
+c
+c     set exclusion coefficients for connected atoms
+c
+            do j = 1, n12(i)
+               mscale(i12(j,i)) = m2scale
             end do
-            do j = 1, n13(ii)
-               mscale(i13(j,ii)) = m3scale
+            do j = 1, n13(i)
+               mscale(i13(j,i)) = m3scale
             end do
-            do j = 1, n14(ii)
-               mscale(i14(j,ii)) = m4scale
+            do j = 1, n14(i)
+               mscale(i14(j,i)) = m4scale
             end do
-            do j = 1, n15(ii)
-               mscale(i15(j,ii)) = m5scale
+            do j = 1, n15(i)
+               mscale(i15(j,i)) = m5scale
             end do
 c
 c     evaluate all sites within the cutoff distance
 c
-            do k = i, npole
-               kk = ipole(k)
-               kz = zaxis(k)
-               kx = xaxis(k)
-               ky = yaxis(k)
-               usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
-               if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            do kk = i, npole
+               k = ipole(kk)
+               kz = zaxis(kk)
+               kx = xaxis(kk)
+               ky = yaxis(kk)
+               usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
+               if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                proceed = .true.
                if (proceed)  proceed = (usei .or. usek)
                if (proceed) then
                   do j = 2, ncell
-                     xr = x(kk) - xi
-                     yr = y(kk) - yi
-                     zr = z(kk) - zi
+                     xr = x(k) - xi
+                     yr = y(k) - yi
+                     zr = z(k) - zi
                      call imager (xr,yr,zr,j)
                      r2 = xr*xr + yr* yr + zr*zr
                      if (.not. (use_polymer .and. r2.le.polycut2))
-     &                  mscale(kk) = 1.0d0
+     &                  mscale(k) = 1.0d0
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        ck = rpole(1,k)
-                        dkx = rpole(2,k)
-                        dky = rpole(3,k)
-                        dkz = rpole(4,k)
-                        qkxx = rpole(5,k)
-                        qkxy = rpole(6,k)
-                        qkxz = rpole(7,k)
-                        qkyy = rpole(9,k)
-                        qkyz = rpole(10,k)
-                        qkzz = rpole(13,k)
+                        ck = rpole(1,kk)
+                        dkx = rpole(2,kk)
+                        dky = rpole(3,kk)
+                        dkz = rpole(4,kk)
+                        qkxx = rpole(5,kk)
+                        qkxy = rpole(6,kk)
+                        qkxz = rpole(7,kk)
+                        qkyy = rpole(9,kk)
+                        qkyz = rpole(10,kk)
+                        qkzz = rpole(13,kk)
+c
+c     intermediates involving moments and separation distance
+c
+                        dir = dix*xr + diy*yr + diz*zr
+                        qix = qixx*xr + qixy*yr + qixz*zr
+                        qiy = qixy*xr + qiyy*yr + qiyz*zr
+                        qiz = qixz*xr + qiyz*yr + qizz*zr
+                        qir = qix*xr + qiy*yr + qiz*zr
+                        dkr = dkx*xr + dky*yr + dkz*zr
+                        qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                        qky = qkxy*xr + qkyy*yr + qkyz*zr
+                        qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                        qkr = qkx*xr + qky*yr + qkz*zr
+                        dik = dix*dkx + diy*dky + diz*dkz
+                        qik = qix*qkx + qiy*qky + qiz*qkz
+                        diqk = dix*qkx + diy*qky + diz*qkz
+                        dkqi = dkx*qix + dky*qiy + dkz*qiz
+                        qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                            + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     get reciprocal distance terms for this interaction
 c
-                        rr1 = f / r
+                        rr1 = f * mscale(k) / r
                         rr3 = rr1 / r2
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
                         rr9 = 7.0d0 * rr7 / r2
 c
-c     intermediates involving moments and distance separation
+c     find damped multipole intermediates and energy value
 c
-                        dri = dix*xr + diy*yr + diz*zr
-                        drk = dkx*xr + dky*yr + dkz*zr
-                        dik = dix*dkx + diy*dky + diz*dkz
-                        qrix = qixx*xr + qixy*yr + qixz*zr
-                        qriy = qixy*xr + qiyy*yr + qiyz*zr
-                        qriz = qixz*xr + qiyz*yr + qizz*zr
-                        qrkx = qkxx*xr + qkxy*yr + qkxz*zr
-                        qrky = qkxy*xr + qkyy*yr + qkyz*zr
-                        qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-                        qrri = qrix*xr + qriy*yr + qriz*zr
-                        qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                        qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                        qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                           + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-                        diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                        dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                        if (use_chgpen) then
+                           corek = pcore(kk)
+                           valk = pval(kk)
+                           alphak = palpha(kk)
+                           term1 = corei*corek
+                           term1i = corek*vali
+                           term2i = corek*dir
+                           term3i = corek*qir
+                           term1k = corei*valk
+                           term2k = -corei*dkr
+                           term3k = corei*qkr
+                           term1ik = vali*valk
+                           term2ik = valk*dir - vali*dkr + dik
+                           term3ik = vali*qkr + valk*qir - dir*dkr
+     &                                  + 2.0d0*(dkqi-diqk+qiqk)
+                           term4ik = dir*qkr - dkr*qir - 4.0d0*qik
+                           term5ik = qir*qkr
+                           call damppole (r,9,alphai,alphak,
+     &                                     dmpi,dmpk,dmpik)
+                           rr1i = dmpi(1)*rr1
+                           rr3i = dmpi(3)*rr3
+                           rr5i = dmpi(5)*rr5
+                           rr1k = dmpk(1)*rr1
+                           rr3k = dmpk(3)*rr3
+                           rr5k = dmpk(5)*rr5
+                           rr1ik = dmpik(1)*rr1
+                           rr3ik = dmpik(3)*rr3
+                           rr5ik = dmpik(5)*rr5
+                           rr7ik = dmpik(7)*rr7
+                           rr9ik = dmpik(9)*rr9
+                           e = term1*rr1 + term1i*rr1i
+     &                            + term1k*rr1k + term1ik*rr1ik
+     &                            + term2i*rr3i + term2k*rr3k
+     &                            + term2ik*rr3ik + term3i*rr5i
+     &                            + term3k*rr5k + term3ik*rr5ik
+     &                            + term4ik*rr7ik + term5ik*rr9ik
 c
-c     calculate intermediate terms for multipole interaction
+c     find standard multipole intermediates and energy value
 c
-                        term1 = ci*ck
-                        term2 = ck*dri - ci*drk + dik
-                        term3 = ci*qrrk + ck*qrri - dri*drk
-     &                             + 2.0d0*(dkqri-diqrk+qik)
-                        term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
-                        term5 = qrri*qrrk
-c
-c     compute the energy contribution for this interaction
-c
-                        e = term1*rr1 + term2*rr3 + term3*rr5
-     &                         + term4*rr7 + term5*rr9
-                        e = e * mscale(kk)
-                        if (use_group)  e = e * fgrp
-                        if (ii .eq. kk)  e = 0.5d0 * e
+                        else
+                           term1 = ci*ck
+                           term2 = ck*dir - ci*dkr + dik
+                           term3 = ci*qkr + ck*qir - dir*dkr
+     &                                + 2.0d0*(dkqi-diqk+qiqk)
+                           term4 = dir*qkr - dkr*qir - 4.0d0*qik
+                           term5 = qir*qkr
+                           e = term1*rr1 + term2*rr3 + term3*rr5
+     &                            + term4*rr7 + term5*rr9
+                        end if
 c
 c     increment the overall multipole energy components
 c
+                        if (use_group)  e = e * fgrp
+                        if (i .eq. k)  e = 0.5d0 * e
                         if (e .ne. 0.0d0) then
                            nem = nem + 1
                            em = em + e
-                           aem(ii) = aem(ii) + 0.5d0*e
-                           aem(kk) = aem(kk) + 0.5d0*e
+                           aem(i) = aem(i) + 0.5d0*e
+                           aem(k) = aem(k) + 0.5d0*e
                            einter = einter + e
                         end if
 c
 c     print message if the energy of this interaction is large
 c
-                        huge = (abs(e) .gt. 100.0d0)
+                        huge = (abs(e) .gt. 80.0d0)
                         if ((debug.and.e.ne.0.0d0)
      &                        .or. (verbose.and.huge)) then
                            if (header) then
@@ -441,8 +545,8 @@ c
      &                                //,' Type',14x,'Atom Names',
      &                                   15x,'Distance',8x,'Energy',/)
                            end if
-                           write (iout,50)  ii,name(ii),kk,name(kk),r,e
-   50                      format (' M-Pole',4x,2(i7,'-',a3),1x,
+                           write (iout,50)  i,name(i),k,name(k),r,e
+   50                      format (' Mpole',5x,2(i7,'-',a3),1x,
      &                                '(XTAL)',2x,f10.4,2x,f12.4)
                         end if
                      end if
@@ -452,17 +556,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-            do j = 1, n12(ii)
-               mscale(i12(j,ii)) = 1.0d0
+            do j = 1, n12(i)
+               mscale(i12(j,i)) = 1.0d0
             end do
-            do j = 1, n13(ii)
-               mscale(i13(j,ii)) = 1.0d0
+            do j = 1, n13(i)
+               mscale(i13(j,i)) = 1.0d0
             end do
-            do j = 1, n14(ii)
-               mscale(i14(j,ii)) = 1.0d0
+            do j = 1, n14(i)
+               mscale(i14(j,i)) = 1.0d0
             end do
-            do j = 1, n15(ii)
-               mscale(i15(j,ii)) = 1.0d0
+            do j = 1, n15(i)
+               mscale(i15(j,i)) = 1.0d0
             end do
          end do
       end if
@@ -491,6 +595,7 @@ c
       use atomid
       use atoms
       use bound
+      use chgpen
       use chgpot
       use couple
       use energi
@@ -516,20 +621,31 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
+      real*8 rr1i,rr3i,rr5i
+      real*8 rr1k,rr3k,rr5k
+      real*8 rr1ik,rr3ik,rr5ik
+      real*8 rr7ik,rr9ik
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qrix,qriy,qriz
-      real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,dik
-      real*8 qrri,qrrk
-      real*8 qrrik,qik
-      real*8 diqrk,dkqri
+      real*8 dir,dkr,dik,qik
+      real*8 qix,qiy,qiz,qir
+      real*8 qkx,qky,qkz,qkr
+      real*8 diqk,dkqi,qiqk
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 term4,term5
+      real*8 term1i,term2i,term3i
+      real*8 term1k,term2k,term3k
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
+      real*8 dmpi(9),dmpk(9)
+      real*8 dmpik(9)
       real*8, allocatable :: mscale(:)
       logical proceed
       logical header,huge
@@ -553,17 +669,6 @@ c     rotate the multipole components into the global frame
 c
       call rotpole
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. npole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Atomic Multipole Interactions :',
-     &           //,' Type',14x,'Atom Names',15x,'Distance',
-     &              8x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
@@ -580,138 +685,196 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,use,
-!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,
-!$OMP& m5scale,nelst,elst,use_group,use_intra,use_bounds,off2,
-!$OMP& f,molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(mscale) shared (em,einter,nem,aem)
-!$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,pval,
+!$OMP& palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,
+!$OMP& m4scale,m5scale,f,nelst,elst,use_chgpen,use_group,use_intra,
+!$OMP& use_bounds,off2,molcule,name,verbose,debug,header,iout)
+!$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
+!$OMP DO reduction(+:em,nem,aem,einter) schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
-      do i = 1, npole
-         ii = ipole(i)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = yaxis(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = m2scale
+      do ii = 1, npole
+         i = ipole(ii)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = yaxis(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
+         if (use_chgpen) then
+            corei = pcore(ii)
+            vali = pval(ii)
+            alphai = palpha(ii)
+         end if
+         usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
+c
+c     set exclusion coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = m2scale
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = m3scale
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = m3scale
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = m4scale
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = m4scale
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = m5scale
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = m5scale
          end do
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(i)
-            k = elst(kkk,i)
-            kk = ipole(k)
-            kz = zaxis(k)
-            kx = xaxis(k)
-            ky = yaxis(k)
-            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
+         do kkk = 1, nelst(ii)
+            kk = elst(kkk,ii)
+            k = ipole(kk)
+            kz = zaxis(kk)
+            kx = xaxis(kk)
+            ky = yaxis(kk)
+            usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (proceed) then
-               xr = x(kk) - xi
-               yr = y(kk) - yi
-               zr = z(kk) - zi
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,k)
-                  dkx = rpole(2,k)
-                  dky = rpole(3,k)
-                  dkz = rpole(4,k)
-                  qkxx = rpole(5,k)
-                  qkxy = rpole(6,k)
-                  qkxz = rpole(7,k)
-                  qkyy = rpole(9,k)
-                  qkyz = rpole(10,k)
-                  qkzz = rpole(13,k)
+                  ck = rpole(1,kk)
+                  dkx = rpole(2,kk)
+                  dky = rpole(3,kk)
+                  dkz = rpole(4,kk)
+                  qkxx = rpole(5,kk)
+                  qkxy = rpole(6,kk)
+                  qkxz = rpole(7,kk)
+                  qkyy = rpole(9,kk)
+                  qkyz = rpole(10,kk)
+                  qkzz = rpole(13,kk)
+c
+c     intermediates involving moments and separation distance
+c
+                  dir = dix*xr + diy*yr + diz*zr
+                  qix = qixx*xr + qixy*yr + qixz*zr
+                  qiy = qixy*xr + qiyy*yr + qiyz*zr
+                  qiz = qixz*xr + qiyz*yr + qizz*zr
+                  qir = qix*xr + qiy*yr + qiz*zr
+                  dkr = dkx*xr + dky*yr + dkz*zr
+                  qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                  qky = qkxy*xr + qkyy*yr + qkyz*zr
+                  qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                  qkr = qkx*xr + qky*yr + qkz*zr
+                  dik = dix*dkx + diy*dky + diz*dkz
+                  qik = qix*qkx + qiy*qky + qiz*qkz
+                  diqk = dix*qkx + diy*qky + diz*qkz
+                  dkqi = dkx*qix + dky*qiy + dkz*qiz
+                  qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                      + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     get reciprocal distance terms for this interaction
 c
-                  rr1 = f * mscale(kk) / r
+                  rr1 = f * mscale(k) / r
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
                   rr9 = 7.0d0 * rr7 / r2
 c
-c     intermediates involving moments and distance separation
+c     find damped multipole intermediates and energy value
 c
-                  dri = dix*xr + diy*yr + diz*zr
-                  drk = dkx*xr + dky*yr + dkz*zr
-                  dik = dix*dkx + diy*dky + diz*dkz
-                  qrix = qixx*xr + qixy*yr + qixz*zr
-                  qriy = qixy*xr + qiyy*yr + qiyz*zr
-                  qriz = qixz*xr + qiyz*yr + qizz*zr
-                  qrkx = qkxx*xr + qkxy*yr + qkxz*zr
-                  qrky = qkxy*xr + qkyy*yr + qkyz*zr
-                  qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-                  qrri = qrix*xr + qriy*yr + qriz*zr
-                  qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                  qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                  qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                     + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-                  diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                  dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                  if (use_chgpen) then
+                     corek = pcore(kk)
+                     valk = pval(kk)
+                     alphak = palpha(kk)
+                     term1 = corei*corek
+                     term1i = corek*vali
+                     term2i = corek*dir
+                     term3i = corek*qir
+                     term1k = corei*valk
+                     term2k = -corei*dkr
+                     term3k = corei*qkr
+                     term1ik = vali*valk
+                     term2ik = valk*dir - vali*dkr + dik
+                     term3ik = vali*qkr + valk*qir - dir*dkr
+     &                            + 2.0d0*(dkqi-diqk+qiqk)
+                     term4ik = dir*qkr - dkr*qir - 4.0d0*qik
+                     term5ik = qir*qkr
+                     call damppole (r,9,alphai,alphak,
+     &                               dmpi,dmpk,dmpik)
+                     rr1i = dmpi(1)*rr1
+                     rr3i = dmpi(3)*rr3
+                     rr5i = dmpi(5)*rr5
+                     rr1k = dmpk(1)*rr1
+                     rr3k = dmpk(3)*rr3
+                     rr5k = dmpk(5)*rr5
+                     rr1ik = dmpik(1)*rr1
+                     rr3ik = dmpik(3)*rr3
+                     rr5ik = dmpik(5)*rr5
+                     rr7ik = dmpik(7)*rr7
+                     rr9ik = dmpik(9)*rr9
+                     e = term1*rr1 + term1i*rr1i
+     &                      + term1k*rr1k + term1ik*rr1ik
+     &                      + term2i*rr3i + term2k*rr3k
+     &                      + term2ik*rr3ik + term3i*rr5i
+     &                      + term3k*rr5k + term3ik*rr5ik
+     &                      + term4ik*rr7ik + term5ik*rr9ik
 c
-c     calculate intermediate terms for multipole interaction
+c     find standard multipole intermediates and energy value
 c
-                  term1 = ci*ck
-                  term2 = ck*dri - ci*drk + dik
-                  term3 = ci*qrrk + ck*qrri - dri*drk
-     &                       + 2.0d0*(dkqri-diqrk+qik)
-                  term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
-                  term5 = qrri*qrrk
-c
-c     compute the energy contribution for this interaction
-c
-                  e = term1*rr1 + term2*rr3 + term3*rr5
-     &                   + term4*rr7 + term5*rr9
-                  if (use_group)  e = e * fgrp
+                  else
+                     term1 = ci*ck
+                     term2 = ck*dir - ci*dkr + dik
+                     term3 = ci*qkr + ck*qir - dir*dkr
+     &                          + 2.0d0*(dkqi-diqk+qiqk)
+                     term4 = dir*qkr - dkr*qir - 4.0d0*qik
+                     term5 = qir*qkr
+                     e = term1*rr1 + term2*rr3 + term3*rr5
+     &                      + term4*rr7 + term5*rr9
+                  end if
 c
 c     increment the overall multipole energy components
 c
+                  if (use_group)  e = e * fgrp
                   if (e .ne. 0.0d0) then
                      nem = nem + 1
                      em = em + e
-                     aem(ii) = aem(ii) + 0.5d0*e
-                     aem(kk) = aem(kk) + 0.5d0*e
-                     if (molcule(ii) .ne. molcule(kk))
-     &                  einter = einter + e
+                     aem(i) = aem(i) + 0.5d0*e
+                     aem(k) = aem(k) + 0.5d0*e
+                     if (molcule(i) .ne. molcule(k)) then
+                        einter = einter + e
+                     end if
                   end if
 c
 c     print message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 100.0d0)
+                  huge = (abs(e) .gt. 80.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -722,8 +885,8 @@ c
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,30)  ii,name(ii),kk,name(kk),r,e
-   30                format (' M-Pole',4x,2(i7,'-',a3),9x,
+                     write (iout,30)  i,name(i),k,name(k),r,e
+   30                format (' Mpole',5x,2(i7,'-',a3),9x,
      &                          f10.4,2x,f12.4)
                   end if
                end if
@@ -732,17 +895,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = 1.0d0
          end do
       end do
 c
@@ -780,6 +943,7 @@ c
       use ewald
       use math
       use mpole
+      use pme
       implicit none
       integer i,ii
       real*8 e,f
@@ -799,6 +963,14 @@ c
          aem(i) = 0.0d0
       end do
       if (npole .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     set the energy unit conversion factor
 c
@@ -824,17 +996,18 @@ c     compute the self-energy part of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
       fterm = -f * aewald / sqrtpi
-      do i = 1, npole
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
+      do ii = 1, npole
+         i = ipole(ii)
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
@@ -851,22 +1024,22 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            dix = rpole(2,i)
-            diy = rpole(3,i)
-            diz = rpole(4,i)
-            xd = xd + dix + rpole(1,i)*x(ii)
-            yd = yd + diy + rpole(1,i)*y(ii)
-            zd = zd + diz + rpole(1,i)*z(ii)
+         do ii = 1, npole
+            i = ipole(ii)
+            dix = rpole(2,ii)
+            diy = rpole(3,ii)
+            diz = rpole(4,ii)
+            xd = xd + dix + rpole(1,ii)*x(i)
+            yd = yd + diy + rpole(1,ii)*y(i)
+            zd = zd + diz + rpole(1,ii)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
          nem = nem + 1
-         do i = 1, npole
-            ii = ipole(i)
-            aem(ii) = aem(ii) + e/dble(npole)
+         do ii = 1, npole
+            i = ipole(ii)
+            aem(i) = aem(i) + e/dble(npole)
          end do
       end if
       return
@@ -897,6 +1070,7 @@ c
       use atoms
       use bound
       use cell
+      use chgpen
       use chgpot
       use couple
       use energi
@@ -918,42 +1092,42 @@ c
       real*8 bfac,erfc
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
-      real*8 scalekk
+      real*8 scalek
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
+      real*8 rr1i,rr3i,rr5i
+      real*8 rr1k,rr3k,rr5k
+      real*8 rr1ik,rr3ik,rr5ik
+      real*8 rr7ik,rr9ik
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qrix,qriy,qriz
-      real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,dik
-      real*8 qrri,qrrk
-      real*8 qrrik,qik
-      real*8 diqrk,dkqri
+      real*8 dir,dkr,dik,qik
+      real*8 qix,qiy,qiz,qir
+      real*8 qkx,qky,qkz,qkr
+      real*8 diqk,dkqi,qiqk
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 term4,term5
+      real*8 term1i,term2i,term3i
+      real*8 term1k,term2k,term3k
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
+      real*8 dmpi(9),dmpk(9)
+      real*8 dmpik(9)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       logical header,huge
       character*6 mode
       external erfc
 c
-c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. npole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Atomic Multipole Interactions :',
-     &           //,' Type',14x,'Atom Names',15x,'Distance',
-     &              8x,'Energy',/)
-      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -971,57 +1145,95 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
+c
 c     compute the real space portion of the Ewald summation
 c
-      do i = 1, npole-1
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = m2scale
+      do ii = 1, npole-1
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
+         if (use_chgpen) then
+            corei = pcore(ii)
+            vali = pval(ii)
+            alphai = palpha(ii)
+         end if
+c
+c     set exclusion coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = m2scale
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = m3scale
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = m3scale
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = m4scale
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = m4scale
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = m5scale
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = m5scale
          end do
 c
 c     evaluate all sites within the cutoff distance
 c
-         do k = i+1, npole
-            kk = ipole(k)
-            xr = x(kk) - xi
-            yr = y(kk) - yi
-            zr = z(kk) - zi
+         do kk = i+1, npole
+            k = ipole(kk)
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,k)
-               dkx = rpole(2,k)
-               dky = rpole(3,k)
-               dkz = rpole(4,k)
-               qkxx = rpole(5,k)
-               qkxy = rpole(6,k)
-               qkxz = rpole(7,k)
-               qkyy = rpole(9,k)
-               qkyz = rpole(10,k)
-               qkzz = rpole(13,k)
+               ck = rpole(1,kk)
+               dkx = rpole(2,kk)
+               dky = rpole(3,kk)
+               dkz = rpole(4,kk)
+               qkxx = rpole(5,kk)
+               qkxy = rpole(6,kk)
+               qkxz = rpole(7,kk)
+               qkyy = rpole(9,kk)
+               qkyz = rpole(10,kk)
+               qkzz = rpole(13,kk)
+c
+c     intermediates involving moments and separation distance
+c
+               dir = dix*xr + diy*yr + diz*zr
+               qix = qixx*xr + qixy*yr + qixz*zr
+               qiy = qixy*xr + qiyy*yr + qiyz*zr
+               qiz = qixz*xr + qiyz*yr + qizz*zr
+               qir = qix*xr + qiy*yr + qiz*zr
+               dkr = dkx*xr + dky*yr + dkz*zr
+               qkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qky = qkxy*xr + qkyy*yr + qkyz*zr
+               qkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qkr = qkx*xr + qky*yr + qkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qik = qix*qkx + qiy*qky + qiz*qkz
+               diqk = dix*qkx + diy*qky + diz*qkz
+               dkqi = dkx*qix + dky*qiy + dkz*qiz
+               qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                   + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -1047,66 +1259,107 @@ c
                do j = 0, 4
                   bn(j) = f * bn(j)
                end do
+
+c     find damped multipole intermediates and energy value
 c
-c     intermediates involving moments and distance separation
+               if (use_chgpen) then
+                  corek = pcore(kk)
+                  valk = pval(kk)
+                  alphak = palpha(kk)
+                  term1 = corei*corek
+                  term1i = corek*vali
+                  term2i = corek*dir
+                  term3i = corek*qir
+                  term1k = corei*valk
+                  term2k = -corei*dkr
+                  term3k = corei*qkr
+                  term1ik = vali*valk
+                  term2ik = valk*dir - vali*dkr + dik
+                  term3ik = vali*qkr + valk*qir - dir*dkr
+     &                         + 2.0d0*(dkqi-diqk+qiqk)
+                  term4ik = dir*qkr - dkr*qir - 4.0d0*qik
+                  term5ik = qir*qkr
+                  call damppole (r,9,alphai,alphak,
+     &                            dmpi,dmpk,dmpik)
+                  rr1i = dmpi(1)*rr1
+                  rr3i = dmpi(3)*rr3
+                  rr5i = dmpi(5)*rr5
+                  rr1k = dmpk(1)*rr1
+                  rr3k = dmpk(3)*rr3
+                  rr5k = dmpk(5)*rr5
+                  rr1ik = dmpik(1)*rr1
+                  rr3ik = dmpik(3)*rr3
+                  rr5ik = dmpik(5)*rr5
+                  rr7ik = dmpik(7)*rr7
+                  rr9ik = dmpik(9)*rr9
+                  e = term1*rr1 + term4ik*rr7ik + term5ik*rr9ik
+     &                   + term1i*rr1i + term1k*rr1k + term1ik*rr1ik
+     &                   + term2i*rr3i + term2k*rr3k + term2ik*rr3ik
+     &                   + term3i*rr5i + term3k*rr5k + term3ik*rr5ik
 c
-               dri = dix*xr + diy*yr + diz*zr
-               drk = dkx*xr + dky*yr + dkz*zr
-               dik = dix*dkx + diy*dky + diz*dkz
-               qrix = qixx*xr + qixy*yr + qixz*zr
-               qriy = qixy*xr + qiyy*yr + qiyz*zr
-               qriz = qixz*xr + qiyz*yr + qizz*zr
-               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
-               qrky = qkxy*xr + qkyy*yr + qkyz*zr
-               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = qrix*xr + qriy*yr + qriz*zr
-               qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-               diqrk = dix*qrkx + diy*qrky + diz*qrkz
-               dkqri = dkx*qrix + dky*qriy + dkz*qriz
+c     find standard multipole intermediates and energy value
 c
-c     calculate intermediate terms for multipole interaction
-c
-               term1 = ci*ck
-               term2 = ck*dri - ci*drk + dik
-               term3 = ci*qrrk + ck*qrri - dri*drk
-     &                    + 2.0d0*(dkqri-diqrk+qik)
-               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
-               term5 = qrri*qrrk
+               else
+                  term1 = ci*ck
+                  term2 = ck*dir - ci*dkr + dik
+                  term3 = ci*qkr + ck*qir - dir*dkr
+     &                       + 2.0d0*(dkqi-diqk+qiqk)
+                  term4 = dir*qkr - dkr*qir - 4.0d0*qik
+                  term5 = qir*qkr
+                  e = term1*rr1 + term2*rr3 + term3*rr5
+     &                   + term4*rr7 + term5*rr9
+               end if
 c
 c     compute the full undamped energy for this interaction
 c
-               efull = term1*rr1 + term2*rr3 + term3*rr5
-     &                    + term4*rr7 + term5*rr9
-               efull = mscale(kk) * efull
+               efull = mscale(k) * e
                if (efull .ne. 0.0d0) then
                   nem = nem + 1
-                  aem(ii) = aem(ii) + 0.5d0*efull
-                  aem(kk) = aem(kk) + 0.5d0*efull
-                  if (molcule(ii) .ne. molcule(kk))
-     &               einter = einter + efull
+                  aem(i) = aem(i) + 0.5d0*efull
+                  aem(k) = aem(k) + 0.5d0*efull
+                  if (molcule(i) .ne. molcule(k)) then
+                     einter = einter + efull
+                  end if
                end if
-c
-c     modify error function terms to account for scaling
-c
-               scalekk = 1.0d0 - mscale(kk)
-               rr1 = bn(0) - scalekk*rr1
-               rr3 = bn(1) - scalekk*rr3
-               rr5 = bn(2) - scalekk*rr5
-               rr7 = bn(3) - scalekk*rr7
-               rr9 = bn(4) - scalekk*rr9
 c
 c     compute the energy contribution for this interaction
 c
-               e = term1*rr1 + term2*rr3 + term3*rr5
-     &                + term4*rr7 + term5*rr9
+               if (use_chgpen) then
+                  scalek = mscale(k)
+                  rr1i = bn(0) - (1.0d0-scalek*dmpi(1))*rr1
+                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr1k = bn(0) - (1.0d0-scalek*dmpk(1))*rr1
+                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr1ik = bn(0) - (1.0d0-scalek*dmpik(1))*rr1
+                  rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
+                  rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
+                  rr7ik = bn(3) - (1.0d0-scalek*dmpik(7))*rr7
+                  rr9ik = bn(4) - (1.0d0-scalek*dmpik(9))*rr9
+                  rr1 = bn(0) - (1.0d0-scalek)*rr1
+                  e = term1*rr1 + term4ik*rr7ik + term5ik*rr9ik
+     &                   + term1i*rr1i + term1k*rr1k + term1ik*rr1ik
+     &                   + term2i*rr3i + term2k*rr3k + term2ik*rr3ik
+     &                   + term3i*rr5i + term3k*rr5k + term3ik*rr5ik
+               else
+                  scalek = 1.0d0 - mscale(k)
+                  rr1 = bn(0) - scalek*rr1
+                  rr3 = bn(1) - scalek*rr3
+                  rr5 = bn(2) - scalek*rr5
+                  rr7 = bn(3) - scalek*rr7
+                  rr9 = bn(4) - scalek*rr9
+                  e = term1*rr1 + term2*rr3 + term3*rr5
+     &                   + term4*rr7 + term5*rr9
+               end if
+c
+c     increment the overall multipole energy component
+c
                em = em + e
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(efull) .gt. 100.0d0)
+               huge = (abs(efull) .gt. 80.0d0)
                if ((debug.and.efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
@@ -1117,8 +1370,8 @@ c
      &                       //,' Type',14x,'Atom Names',
      &                          15x,'Distance',8x,'Energy',/)
                   end if
-                  write (iout,30)  ii,name(ii),kk,name(kk),r,efull
-   30             format (' M-Pole',4x,2(i7,'-',a3),9x,
+                  write (iout,30)  i,name(i),k,name(k),r,efull
+   30             format (' Mpole',5x,2(i7,'-',a3),9x,
      &                       f10.4,2x,f12.4)
                end if
             end if
@@ -1126,17 +1379,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = 1.0d0
          end do
       end do
 c
@@ -1147,58 +1400,85 @@ c
 c
 c     calculate interaction energy with other unit cells
 c
-         do i = 1, npole
-            ii = ipole(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
-            ci = rpole(1,i)
-            dix = rpole(2,i)
-            diy = rpole(3,i)
-            diz = rpole(4,i)
-            qixx = rpole(5,i)
-            qixy = rpole(6,i)
-            qixz = rpole(7,i)
-            qiyy = rpole(9,i)
-            qiyz = rpole(10,i)
-            qizz = rpole(13,i)
-            do j = 1, n12(ii)
-               mscale(i12(j,ii)) = m2scale
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            ci = rpole(1,ii)
+            dix = rpole(2,ii)
+            diy = rpole(3,ii)
+            diz = rpole(4,ii)
+            qixx = rpole(5,ii)
+            qixy = rpole(6,ii)
+            qixz = rpole(7,ii)
+            qiyy = rpole(9,ii)
+            qiyz = rpole(10,ii)
+            qizz = rpole(13,ii)
+            if (use_chgpen) then
+               corei = pcore(ii)
+               vali = pval(ii)
+               alphai = palpha(ii)
+            end if
+c
+c     set exclusion coefficients for connected atoms
+c
+            do j = 1, n12(i)
+               mscale(i12(j,i)) = m2scale
             end do
-            do j = 1, n13(ii)
-               mscale(i13(j,ii)) = m3scale
+            do j = 1, n13(i)
+               mscale(i13(j,i)) = m3scale
             end do
-            do j = 1, n14(ii)
-               mscale(i14(j,ii)) = m4scale
+            do j = 1, n14(i)
+               mscale(i14(j,i)) = m4scale
             end do
-            do j = 1, n15(ii)
-               mscale(i15(j,ii)) = m5scale
+            do j = 1, n15(i)
+               mscale(i15(j,i)) = m5scale
             end do
 c
 c     evaluate all sites within the cutoff distance
 c
-            do k = i, npole
-               kk = ipole(k)
+            do kk = i, npole
+               k = ipole(kk)
                do jcell = 2, ncell
-                  xr = x(kk) - xi
-                  yr = y(kk) - yi
-                  zr = z(kk) - zi
+                  xr = x(k) - xi
+                  yr = y(k) - yi
+                  zr = z(k) - zi
                   call imager (xr,yr,zr,jcell)
                   r2 = xr*xr + yr* yr + zr*zr
                   if (.not. (use_polymer .and. r2.le.polycut2))
-     &               mscale(kk) = 1.0d0
+     &               mscale(k) = 1.0d0
                   if (r2 .le. off2) then
                      r = sqrt(r2)
-                     ck = rpole(1,k)
-                     dkx = rpole(2,k)
-                     dky = rpole(3,k)
-                     dkz = rpole(4,k)
-                     qkxx = rpole(5,k)
-                     qkxy = rpole(6,k)
-                     qkxz = rpole(7,k)
-                     qkyy = rpole(9,k)
-                     qkyz = rpole(10,k)
-                     qkzz = rpole(13,k)
+                     ck = rpole(1,kk)
+                     dkx = rpole(2,kk)
+                     dky = rpole(3,kk)
+                     dkz = rpole(4,kk)
+                     qkxx = rpole(5,kk)
+                     qkxy = rpole(6,kk)
+                     qkxz = rpole(7,kk)
+                     qkyy = rpole(9,kk)
+                     qkyz = rpole(10,kk)
+                     qkzz = rpole(13,kk)
+c
+c     intermediates involving moments and separation distance
+c
+                     dir = dix*xr + diy*yr + diz*zr
+                     qix = qixx*xr + qixy*yr + qixz*zr
+                     qiy = qixy*xr + qiyy*yr + qiyz*zr
+                     qiz = qixz*xr + qiyz*yr + qizz*zr
+                     qir = qix*xr + qiy*yr + qiz*zr
+                     dkr = dkx*xr + dky*yr + dkz*zr
+                     qkx = qkxx*xr + qkxy*yr + qkxz*zr
+                     qky = qkxy*xr + qkyy*yr + qkyz*zr
+                     qkz = qkxz*xr + qkyz*yr + qkzz*zr
+                     qkr = qkx*xr + qky*yr + qkz*zr
+                     dik = dix*dkx + diy*dky + diz*dkz
+                     qik = qix*qkx + qiy*qky + qiz*qkz
+                     diqk = dix*qkx + diy*qky + diz*qkz
+                     dkqi = dkx*qix + dky*qiy + dkz*qiz
+                     qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                         + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -1226,66 +1506,110 @@ c
                         bn(j) = f * bn(j)
                      end do
 c
-c     intermediates involving moments and distance separation
+c     find damped multipole intermediates and energy value
 c
-                     dri = dix*xr + diy*yr + diz*zr
-                     drk = dkx*xr + dky*yr + dkz*zr
-                     dik = dix*dkx + diy*dky + diz*dkz
-                     qrix = qixx*xr + qixy*yr + qixz*zr
-                     qriy = qixy*xr + qiyy*yr + qiyz*zr
-                     qriz = qixz*xr + qiyz*yr + qizz*zr
-                     qrkx = qkxx*xr + qkxy*yr + qkxz*zr
-                     qrky = qkxy*xr + qkyy*yr + qkyz*zr
-                     qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-                     qrri = qrix*xr + qriy*yr + qriz*zr
-                     qrrk = qrkx*xr + qrky*yr + qrkz*zr
-                     qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-                     qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                        + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-                     diqrk = dix*qrkx + diy*qrky + diz*qrkz
-                     dkqri = dkx*qrix + dky*qriy + dkz*qriz
+                     if (use_chgpen) then
+                        corek = pcore(kk)
+                        valk = pval(kk)
+                        alphak = palpha(kk)
+                        term1 = corei*corek
+                        term1i = corek*vali
+                        term2i = corek*dir
+                        term3i = corek*qir
+                        term1k = corei*valk
+                        term2k = -corei*dkr
+                        term3k = corei*qkr
+                        term1ik = vali*valk
+                        term2ik = valk*dir - vali*dkr + dik
+                        term3ik = vali*qkr + valk*qir - dir*dkr
+     &                               + 2.0d0*(dkqi-diqk+qiqk)
+                        term4ik = dir*qkr - dkr*qir - 4.0d0*qik
+                        term5ik = qir*qkr
+                        call damppole (r,9,alphai,alphak,
+     &                                  dmpi,dmpk,dmpik)
+                        rr1i = dmpi(1)*rr1
+                        rr3i = dmpi(3)*rr3
+                        rr5i = dmpi(5)*rr5
+                        rr1k = dmpk(1)*rr1
+                        rr3k = dmpk(3)*rr3
+                        rr5k = dmpk(5)*rr5
+                        rr1ik = dmpik(1)*rr1
+                        rr3ik = dmpik(3)*rr3
+                        rr5ik = dmpik(5)*rr5
+                        rr7ik = dmpik(7)*rr7
+                        rr9ik = dmpik(9)*rr9
+                        e = term1*rr1 + term1i*rr1i
+     &                         + term1k*rr1k + term1ik*rr1ik
+     &                         + term2i*rr3i + term2k*rr3k
+     &                         + term2ik*rr3ik + term3i*rr5i
+     &                         + term3k*rr5k + term3ik*rr5ik
+     &                         + term4ik*rr7ik + term5ik*rr9ik
 c
-c     calculate intermediate terms for multipole interaction
+c     find standard multipole intermediates and energy value
 c
-                     term1 = ci*ck
-                     term2 = ck*dri - ci*drk + dik
-                     term3 = ci*qrrk + ck*qrri - dri*drk
-     &                          + 2.0d0*(dkqri-diqrk+qik)
-                     term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
-                     term5 = qrri*qrrk
+                     else
+                        term1 = ci*ck
+                        term2 = ck*dir - ci*dkr + dik
+                        term3 = ci*qkr + ck*qir - dir*dkr
+     &                             + 2.0d0*(dkqi-diqk+qiqk)
+                        term4 = dir*qkr - dkr*qir - 4.0d0*qik
+                        term5 = qir*qkr
+                        e = term1*rr1 + term2*rr3 + term3*rr5
+     &                         + term4*rr7 + term5*rr9
+                     end if
 c
 c     compute the full undamped energy for this interaction
 c
-                     efull = term1*rr1 + term2*rr3 + term3*rr5
-     &                          + term4*rr7 + term5*rr9
-                     efull = mscale(kk) * efull
-                     if (ii .eq. kk)  efull = 0.5d0 * efull
+                     efull = mscale(k) * e
+                     if (i .eq. k)  efull = 0.5d0 * efull
                      if (efull .ne. 0.0d0) then
                         nem = nem + 1
-                        aem(ii) = aem(ii) + 0.5d0*efull
-                        aem(kk) = aem(kk) + 0.5d0*efull
+                        aem(i) = aem(i) + 0.5d0*efull
+                        aem(k) = aem(k) + 0.5d0*efull
                         einter = einter + efull
                      end if
 c
-c     modify distances to account for Ewald and exclusions
-c
-                     scalekk = 1.0d0 - mscale(kk)
-                     rr1 = bn(0) - scalekk*rr1
-                     rr3 = bn(1) - scalekk*rr3
-                     rr5 = bn(2) - scalekk*rr5
-                     rr7 = bn(3) - scalekk*rr7
-                     rr9 = bn(4) - scalekk*rr9
-c
 c     compute the energy contribution for this interaction
 c
-                     e = term1*rr1 + term2*rr3 + term3*rr5
-     &                      + term4*rr7 + term5*rr9
-                     if (ii .eq. kk)  e = 0.5d0 * e
+                     if (use_chgpen) then
+                        scalek = mscale(k)
+                        rr1i = bn(0) - (1.0d0-scalek*dmpi(1))*rr1
+                        rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
+                        rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
+                        rr1k = bn(0) - (1.0d0-scalek*dmpk(1))*rr1
+                        rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
+                        rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
+                        rr1ik = bn(0) - (1.0d0-scalek*dmpik(1))*rr1
+                        rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
+                        rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
+                        rr7ik = bn(3) - (1.0d0-scalek*dmpik(7))*rr7
+                        rr9ik = bn(4) - (1.0d0-scalek*dmpik(9))*rr9
+                        rr1 = bn(0) - (1.0d0-scalek)*rr1
+                        e = term1*rr1 + term1i*rr1i
+     &                         + term1k*rr1k + term1ik*rr1ik
+     &                         + term2i*rr3i + term2k*rr3k
+     &                         + term2ik*rr3ik + term3i*rr5i
+     &                         + term3k*rr5k + term3ik*rr5ik
+     &                         + term4ik*rr7ik + term5ik*rr9ik
+                     else
+                        scalek = 1.0d0 - mscale(k)
+                        rr1 = bn(0) - scalek*rr1
+                        rr3 = bn(1) - scalek*rr3
+                        rr5 = bn(2) - scalek*rr5
+                        rr7 = bn(3) - scalek*rr7
+                        rr9 = bn(4) - scalek*rr9
+                        e = term1*rr1 + term2*rr3 + term3*rr5
+     &                               + term4*rr7 + term5*rr9
+                     end if
+c
+c     increment the overall multipole energy component
+c
+                     if (i .eq. k)  e = 0.5d0 * e
                      em = em + e
 c
 c     print message if the energy of this interaction is large
 c
-                     huge = (abs(efull) .gt. 100.0d0)
+                     huge = (abs(efull) .gt. 80.0d0)
                      if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -1296,8 +1620,8 @@ c
      &                             //,' Type',14x,'Atom Names',
      &                                15x,'Distance',8x,'Energy',/)
                         end if
-                        write (iout,50)  ii,name(ii),kk,name(kk),r,efull
-   50                   format (' M-Pole',4x,2(i7,'-',a3),1x,
+                        write (iout,50)  i,name(i),k,name(k),r,efull
+   50                   format (' Mpole',5x,2(i7,'-',a3),1x,
      &                             '(XTAL)',2x,f10.4,2x,f12.4)
                      end if
                   end if
@@ -1306,17 +1630,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-            do j = 1, n12(ii)
-               mscale(i12(j,ii)) = 1.0d0
+            do j = 1, n12(i)
+               mscale(i12(j,i)) = 1.0d0
             end do
-            do j = 1, n13(ii)
-               mscale(i13(j,ii)) = 1.0d0
+            do j = 1, n13(i)
+               mscale(i13(j,i)) = 1.0d0
             end do
-            do j = 1, n14(ii)
-               mscale(i14(j,ii)) = 1.0d0
+            do j = 1, n14(i)
+               mscale(i14(j,i)) = 1.0d0
             end do
-            do j = 1, n15(ii)
-               mscale(i15(j,ii)) = 1.0d0
+            do j = 1, n15(i)
+               mscale(i15(j,i)) = 1.0d0
             end do
          end do
       end if
@@ -1350,6 +1674,7 @@ c
       use ewald
       use math
       use mpole
+      use pme
       implicit none
       integer i,ii
       real*8 e,f
@@ -1369,6 +1694,14 @@ c
          aem(i) = 0.0d0
       end do
       if (npole .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     set the energy unit conversion factor
 c
@@ -1394,17 +1727,18 @@ c     compute the self-energy part of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
       fterm = -f * aewald / sqrtpi
-      do i = 1, npole
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
+      do ii = 1, npole
+         i = ipole(ii)
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
@@ -1421,22 +1755,22 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            dix = rpole(2,i)
-            diy = rpole(3,i)
-            diz = rpole(4,i)
-            xd = xd + dix + rpole(1,i)*x(ii)
-            yd = yd + diy + rpole(1,i)*y(ii)
-            zd = zd + diz + rpole(1,i)*z(ii)
+         do ii = 1, npole
+            i = ipole(ii)
+            dix = rpole(2,ii)
+            diy = rpole(3,ii)
+            diz = rpole(4,ii)
+            xd = xd + dix + rpole(1,ii)*x(i)
+            yd = yd + diy + rpole(1,ii)*y(i)
+            zd = zd + diz + rpole(1,ii)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
          nem = nem + 1
-         do i = 1, npole
-            ii = ipole(i)
-            aem(ii) = aem(ii) + e/dble(npole)
+         do ii = 1, npole
+            i = ipole(ii)
+            aem(i) = aem(i) + e/dble(npole)
          end do
       end if
       return
@@ -1466,6 +1800,7 @@ c
       use atomid
       use atoms
       use bound
+      use chgpen
       use chgpot
       use couple
       use energi
@@ -1487,42 +1822,42 @@ c
       real*8 bfac,erfc
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
-      real*8 scalekk
+      real*8 scalek
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
+      real*8 rr1i,rr3i,rr5i
+      real*8 rr1k,rr3k,rr5k
+      real*8 rr1ik,rr3ik,rr5ik
+      real*8 rr7ik,rr9ik
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
       real*8 ck,dkx,dky,dkz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
-      real*8 qrix,qriy,qriz
-      real*8 qrkx,qrky,qrkz
-      real*8 dri,drk,dik
-      real*8 qrri,qrrk
-      real*8 qrrik,qik
-      real*8 diqrk,dkqri
+      real*8 dir,dkr,dik,qik
+      real*8 qix,qiy,qiz,qir
+      real*8 qkx,qky,qkz,qkr
+      real*8 diqk,dkqi,qiqk
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 term4,term5
+      real*8 term1i,term2i,term3i
+      real*8 term1k,term2k,term3k
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
+      real*8 dmpi(9),dmpk(9)
+      real*8 dmpik(9)
       real*8 bn(0:4)
       real*8, allocatable :: mscale(:)
       logical header,huge
       character*6 mode
       external erfc
 c
-c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. npole.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual Atomic Multipole Interactions :',
-     &           //,' Type',14x,'Atom Names',15x,'Distance',
-     &              8x,'Energy',/)
-      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1540,67 +1875,106 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. npole.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual Atomic Multipole Interactions :',
+     &           //,' Type',14x,'Atom Names',15x,'Distance',
+     &              8x,'Energy',/)
+      end if
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,n12,i12,n13,i13,n14,i14,n15,
-!$OMP& i15,m2scale,m3scale,m4scale,m5scale,nelst,elst,use_bounds,
-!$OMP& f,off2,aewald,molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(mscale) shared (em,einter,nem,aem)
-!$OMP DO reduction(+:em,einter,nem,aem) schedule(guided)
+!$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
+!$OMP& f,nelst,elst,use_chgpen,use_bounds,off2,aewald,molcule,
+!$OMP& name,verbose,debug,header,iout)
+!$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
+!$OMP DO reduction(+:em,nem,aem,einter) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = m2scale
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
+         if (use_chgpen) then
+            corei = pcore(ii)
+            vali = pval(ii)
+            alphai = palpha(ii)
+         end if
+c
+c     set exclusion coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = m2scale
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = m3scale
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = m3scale
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = m4scale
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = m4scale
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = m5scale
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = m5scale
          end do
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(i)
-            k = elst(kkk,i)
-            kk = ipole(k)
-            xr = x(kk) - xi
-            yr = y(kk) - yi
-            zr = z(kk) - zi
+         do kkk = 1, nelst(ii)
+            kk = elst(kkk,ii)
+            k = ipole(kk)
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,k)
-               dkx = rpole(2,k)
-               dky = rpole(3,k)
-               dkz = rpole(4,k)
-               qkxx = rpole(5,k)
-               qkxy = rpole(6,k)
-               qkxz = rpole(7,k)
-               qkyy = rpole(9,k)
-               qkyz = rpole(10,k)
-               qkzz = rpole(13,k)
+               ck = rpole(1,kk)
+               dkx = rpole(2,kk)
+               dky = rpole(3,kk)
+               dkz = rpole(4,kk)
+               qkxx = rpole(5,kk)
+               qkxy = rpole(6,kk)
+               qkxz = rpole(7,kk)
+               qkyy = rpole(9,kk)
+               qkyz = rpole(10,kk)
+               qkzz = rpole(13,kk)
+c
+c     intermediates involving moments and separation distance
+c
+               dir = dix*xr + diy*yr + diz*zr
+               qix = qixx*xr + qixy*yr + qixz*zr
+               qiy = qixy*xr + qiyy*yr + qiyz*zr
+               qiz = qixz*xr + qiyz*yr + qizz*zr
+               qir = qix*xr + qiy*yr + qiz*zr
+               dkr = dkx*xr + dky*yr + dkz*zr
+               qkx = qkxx*xr + qkxy*yr + qkxz*zr
+               qky = qkxy*xr + qkyy*yr + qkyz*zr
+               qkz = qkxz*xr + qkyz*yr + qkzz*zr
+               qkr = qkx*xr + qky*yr + qkz*zr
+               dik = dix*dkx + diy*dky + diz*dkz
+               qik = qix*qkx + qiy*qky + qiz*qkz
+               diqk = dix*qkx + diy*qky + diz*qkz
+               dkqi = dkx*qix + dky*qiy + dkz*qiz
+               qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
+     &                   + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
 c     get reciprocal distance terms for this interaction
 c
@@ -1627,65 +2001,106 @@ c
                   bn(j) = f * bn(j)
                end do
 c
-c     intermediates involving moments and distance separation
+c     find damped multipole intermediates and energy value
 c
-               dri = dix*xr + diy*yr + diz*zr
-               drk = dkx*xr + dky*yr + dkz*zr
-               dik = dix*dkx + diy*dky + diz*dkz
-               qrix = qixx*xr + qixy*yr + qixz*zr
-               qriy = qixy*xr + qiyy*yr + qiyz*zr
-               qriz = qixz*xr + qiyz*yr + qizz*zr
-               qrkx = qkxx*xr + qkxy*yr + qkxz*zr
-               qrky = qkxy*xr + qkyy*yr + qkyz*zr
-               qrkz = qkxz*xr + qkyz*yr + qkzz*zr
-               qrri = qrix*xr + qriy*yr + qriz*zr
-               qrrk = qrkx*xr + qrky*yr + qrkz*zr
-               qrrik = qrix*qrkx + qriy*qrky + qriz*qrkz
-               qik = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
-     &                  + qixx*qkxx + qiyy*qkyy + qizz*qkzz
-               diqrk = dix*qrkx + diy*qrky + diz*qrkz
-               dkqri = dkx*qrix + dky*qriy + dkz*qriz
+               if (use_chgpen) then
+                  corek = pcore(kk)
+                  valk = pval(kk)
+                  alphak = palpha(kk)
+                  term1 = corei*corek
+                  term1i = corek*vali
+                  term2i = corek*dir
+                  term3i = corek*qir
+                  term1k = corei*valk
+                  term2k = -corei*dkr
+                  term3k = corei*qkr
+                  term1ik = vali*valk
+                  term2ik = valk*dir - vali*dkr + dik
+                  term3ik = vali*qkr + valk*qir - dir*dkr
+     &                         + 2.0d0*(dkqi-diqk+qiqk)
+                  term4ik = dir*qkr - dkr*qir - 4.0d0*qik
+                  term5ik = qir*qkr
+                  call damppole (r,9,alphai,alphak,
+     &                            dmpi,dmpk,dmpik)
+                  rr1i = dmpi(1)*rr1
+                  rr3i = dmpi(3)*rr3
+                  rr5i = dmpi(5)*rr5
+                  rr1k = dmpk(1)*rr1
+                  rr3k = dmpk(3)*rr3
+                  rr5k = dmpk(5)*rr5
+                  rr1ik = dmpik(1)*rr1
+                  rr3ik = dmpik(3)*rr3
+                  rr5ik = dmpik(5)*rr5
+                  rr7ik = dmpik(7)*rr7
+                  rr9ik = dmpik(9)*rr9
+                  e = term1*rr1 + term4ik*rr7ik + term5ik*rr9ik
+     &                   + term1i*rr1i + term1k*rr1k + term1ik*rr1ik
+     &                   + term2i*rr3i + term2k*rr3k + term2ik*rr3ik
+     &                   + term3i*rr5i + term3k*rr5k + term3ik*rr5ik
 c
-c     calculate intermediate terms for multipole interaction
+c     find standard multipole intermediates and energy value
 c
-               term1 = ci*ck
-               term2 = ck*dri - ci*drk + dik
-               term3 = ci*qrrk + ck*qrri - dri*drk
-     &                    + 2.0d0*(dkqri-diqrk+qik)
-               term4 = dri*qrrk - drk*qrri - 4.0d0*qrrik
-               term5 = qrri*qrrk
+               else
+                  term1 = ci*ck
+                  term2 = ck*dir - ci*dkr + dik
+                  term3 = ci*qkr + ck*qir - dir*dkr
+     &                       + 2.0d0*(dkqi-diqk+qiqk)
+                  term4 = dir*qkr - dkr*qir - 4.0d0*qik
+                  term5 = qir*qkr
+                  e = term1*rr1 + term2*rr3 + term3*rr5
+     &                   + term4*rr7 + term5*rr9
+               end if
 c
 c     compute the full undamped energy for this interaction
 c
-               efull = term1*rr1 + term2*rr3 + term3*rr5
-     &                    + term4*rr7 + term5*rr9
-               efull = mscale(kk) * efull
+               efull = mscale(k) * e
                if (efull .ne. 0.0d0) then
                   nem = nem + 1
-                  aem(ii) = aem(ii) + 0.5d0*efull
-                  aem(kk) = aem(kk) + 0.5d0*efull
-                  if (molcule(ii) .ne. molcule(kk))
-     &               einter = einter + efull
+                  aem(i) = aem(i) + 0.5d0*efull
+                  aem(k) = aem(k) + 0.5d0*efull
+                  if (molcule(i) .ne. molcule(k)) then
+                     einter = einter + efull
+                  end if
                end if
-c
-c     modify error function terms to account for scaling
-c
-               scalekk = 1.0d0 - mscale(kk)
-               rr1 = bn(0) - scalekk*rr1
-               rr3 = bn(1) - scalekk*rr3
-               rr5 = bn(2) - scalekk*rr5
-               rr7 = bn(3) - scalekk*rr7
-               rr9 = bn(4) - scalekk*rr9
 c
 c     compute the energy contribution for this interaction
 c
-               e = term1*rr1 + term2*rr3 + term3*rr5
-     &                + term4*rr7 + term5*rr9
+               if (use_chgpen) then
+                  scalek = mscale(k)
+                  rr1i = bn(0) - (1.0d0-scalek*dmpi(1))*rr1
+                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr1k = bn(0) - (1.0d0-scalek*dmpk(1))*rr1
+                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr1ik = bn(0) - (1.0d0-scalek*dmpik(1))*rr1
+                  rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
+                  rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
+                  rr7ik = bn(3) - (1.0d0-scalek*dmpik(7))*rr7
+                  rr9ik = bn(4) - (1.0d0-scalek*dmpik(9))*rr9
+                  rr1 = bn(0) - (1.0d0-scalek)*rr1
+                  e = term1*rr1 + term4ik*rr7ik + term5ik*rr9ik
+     &                   + term1i*rr1i + term1k*rr1k + term1ik*rr1ik
+     &                   + term2i*rr3i + term2k*rr3k + term2ik*rr3ik
+     &                   + term3i*rr5i + term3k*rr5k + term3ik*rr5ik
+               else
+                  scalek = 1.0d0 - mscale(k)
+                  rr1 = bn(0) - scalek*rr1
+                  rr3 = bn(1) - scalek*rr3
+                  rr5 = bn(2) - scalek*rr5
+                  rr7 = bn(3) - scalek*rr7
+                  rr9 = bn(4) - scalek*rr9
+                  e = term1*rr1 + term2*rr3 + term3*rr5
+     &                   + term4*rr7 + term5*rr9
+               end if
+c
+c     compute the energy contribution for this interaction
+c
                em = em + e
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(efull) .gt. 100.0d0)
+               huge = (abs(efull) .gt. 80.0d0)
                if ((debug.and.efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
@@ -1696,8 +2111,8 @@ c
      &                       //,' Type',14x,'Atom Names',
      &                          15x,'Distance',8x,'Energy',/)
                   end if
-                  write (iout,30)  ii,name(ii),kk,name(kk),r,efull
-   30             format (' M-Pole',4x,2(i7,'-',a3),9x,
+                  write (iout,30)  i,name(i),k,name(k),r,efull
+   30             format (' Mpole',5x,2(i7,'-',a3),9x,
      &                       f10.4,2x,f12.4)
                end if
             end if
@@ -1705,17 +2120,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            mscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            mscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            mscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            mscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            mscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            mscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            mscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            mscale(i15(j,i)) = 1.0d0
          end do
       end do
 c

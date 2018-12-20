@@ -157,7 +157,7 @@ c
          else if (use(i)) then
             do j = 1, 3
                aalt(j,i) = a(j,i)
-               a(j,i) = -convert * derivs(j,i) / mass(i)
+               a(j,i) = -ekcal * derivs(j,i) / mass(i)
                v(j,i) = v(j,i) + (part2*a(j,i)+aalt(j,i))*dt_x
             end do
          end if

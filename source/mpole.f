@@ -21,8 +21,8 @@ c     pollist   multipole site for each atom (0=no multipole)
 c     zaxis     number of the z-axis defining atom for each site
 c     xaxis     number of the x-axis defining atom for each site
 c     yaxis     number of the y-axis defining atom for each site
-c     pole      multipole values for each site in the local frame
-c     rpole     multipoles rotated to the global coordinate system
+c     pole      traceless Cartesian multipoles in the local frame
+c     rpole     traceless Cartesian multipoles in the global frame
 c     spole     spherical harmonic multipoles in the local frame
 c     srpole    spherical harmonic multipoles in the global frame
 c     polaxe    local axis type for each multipole site

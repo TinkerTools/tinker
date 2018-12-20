@@ -54,12 +54,15 @@ c
             deallocate (teat)
             deallocate (tett)
             deallocate (tev)
+            deallocate (ter)
+            deallocate (tedsp)
             deallocate (tec)
             deallocate (tecd)
             deallocate (ted)
             deallocate (tem)
             deallocate (tep)
-            deallocate (ter)
+            deallocate (tect)
+            deallocate (terxf)
             deallocate (tes)
             deallocate (telf)
             deallocate (teg)
@@ -83,12 +86,15 @@ c
          allocate (teat(nomega))
          allocate (tett(nomega))
          allocate (tev(nomega))
+         allocate (ter(nomega))
+         allocate (tedsp(nomega))
          allocate (tec(nomega))
          allocate (tecd(nomega))
          allocate (ted(nomega))
          allocate (tem(nomega))
          allocate (tep(nomega))
-         allocate (ter(nomega))
+         allocate (tect(nomega))
+         allocate (terxf(nomega))
          allocate (tes(nomega))
          allocate (telf(nomega))
          allocate (teg(nomega))
@@ -113,12 +119,15 @@ c
          teat(i) = 0.0d0
          tett(i) = 0.0d0
          tev(i) = 0.0d0
+         ter(i) = 0.0d0
+         tedsp(i) = 0.0d0
          tec(i) = 0.0d0
          tecd(i) = 0.0d0
          ted(i) = 0.0d0
          tem(i) = 0.0d0
          tep(i) = 0.0d0
-         ter(i) = 0.0d0
+         tect(i) = 0.0d0
+         terxf(i) = 0.0d0
          tes(i) = 0.0d0
          telf(i) = 0.0d0
          teg(i) = 0.0d0
@@ -188,6 +197,10 @@ c
      &                              + dett(3,k)*zterm
             tev(i) = tev(i) + dev(1,k)*xterm + dev(2,k)*yterm
      &                              + dev(3,k)*zterm
+            ter(i) = ter(i) + der(1,k)*xterm + der(2,k)*yterm
+     &                              + der(3,k)*zterm
+            tedsp(i) = tedsp(i) + dedsp(1,k)*xterm + dedsp(2,k)*yterm
+     &                              + dedsp(3,k)*zterm
             tec(i) = tec(i) + dec(1,k)*xterm + dec(2,k)*yterm
      &                              + dec(3,k)*zterm
             tecd(i) = tecd(i) + decd(1,k)*xterm + decd(2,k)*yterm
@@ -198,8 +211,10 @@ c
      &                              + dem(3,k)*zterm
             tep(i) = tep(i) + dep(1,k)*xterm + dep(2,k)*yterm
      &                              + dep(3,k)*zterm
-            ter(i) = ter(i) + der(1,k)*xterm + der(2,k)*yterm
-     &                              + der(3,k)*zterm
+            tect(i) = tect(i) + dect(1,k)*xterm + dect(2,k)*yterm
+     &                              + dect(3,k)*zterm
+            terxf(i) = terxf(i) + derxf(1,k)*xterm + derxf(2,k)*yterm
+     &                              + derxf(3,k)*zterm
             tes(i) = tes(i) + des(1,k)*xterm + des(2,k)*yterm
      &                              + des(3,k)*zterm
             telf(i) = telf(i) + delf(1,k)*xterm + delf(2,k)*yterm
@@ -217,9 +232,9 @@ c
          tesum(i) = teb(i) + tea(i) + teba(i) + teub(i) + teaa(i)
      &                 + teopb(i) + teopd(i) + teid(i) + teit(i)
      &                 + tet(i) + tept(i) + tebt(i) + teat(i) + tett(i)
-     &                 + tev(i) + tec(i) + tecd(i) + ted(i) + tem(i)
-     &                 + tep(i) + ter(i) + tes(i) + telf(i) + teg(i)
-     &                 + tex(i)
+     &                 + tev(i) + ter(i) + tedsp(i) + tec(i) + tecd(i)
+     &                 + ted(i) + tem(i) + tep(i) + tect(i) + terxf(i)
+     &                 + tes(i) + telf(i) + teg(i) + tex(i)
          derivs(i) = tesum(i)
       end do
       return

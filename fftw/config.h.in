@@ -1,5 +1,9 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define if the machine architecture "naturally" prefers fused multiply-add
+   instructions */
+#undef ARCH_PREFERS_FMA
+
 /* Define to compile in long-double precision. */
 #undef BENCHFFT_LDOUBLE
 
@@ -43,12 +47,6 @@
 /* Define to enable extra FFTW debugging code. */
 #undef FFTW_DEBUG
 
-/* Define to enable alignment debugging hacks. */
-#undef FFTW_DEBUG_ALIGNMENT
-
-/* Define to enable debugging malloc. */
-#undef FFTW_DEBUG_MALLOC
-
 /* Define to enable the use of alloca(). */
 #undef FFTW_ENABLE_ALLOCA
 
@@ -80,8 +78,29 @@
 /* Define to 1 if you have the <altivec.h> header file. */
 #undef HAVE_ALTIVEC_H
 
+/* Define if you have enabled the CNTVCT cycle counter on ARMv7a */
+#undef HAVE_ARMV7A_CNTVCT
+
+/* Define if you have enabled the PMCCNTR cycle counter on ARMv7a */
+#undef HAVE_ARMV7A_PMCCNTR
+
+/* Define if you have enabled the CNTVCT_EL0 cycle counter on ARMv8 */
+#undef HAVE_ARMV8_CNTVCT_EL0
+
+/* Define if you have enabled the PMCCNTR_EL0 cycle counter on ARMv8 */
+#undef HAVE_ARMV8_PMCCNTR_EL0
+
 /* Define to enable AVX optimizations. */
 #undef HAVE_AVX
+
+/* Define to enable AVX2 optimizations. */
+#undef HAVE_AVX2
+
+/* Define to enable AVX512 optimizations. */
+#undef HAVE_AVX512
+
+/* Define to enable 128-bit FMA AVX optimization */
+#undef HAVE_AVX_128_FMA
 
 /* Define to 1 if you have the `BSDgettimeofday' function. */
 #undef HAVE_BSDGETTIMEOFDAY
@@ -91,9 +110,6 @@
 
 /* Define to 1 if you have the `cosl' function. */
 #undef HAVE_COSL
-
-/* Define to 1 if you have the <c_asm.h> header file. */
-#undef HAVE_C_ASM_H
 
 /* Define to 1 if you have the declaration of `cosl', and to 0 if you don't.
    */
@@ -136,11 +152,23 @@
 /* Define to 1 if you have the `drand48' function. */
 #undef HAVE_DRAND48
 
-/* Define if you have a machine with fused multiply-add */
-#undef HAVE_FMA
+/* Define to 1 if you have the <fcntl.h> header file. */
+#undef HAVE_FCNTL_H
+
+/* Define to 1 if you have the <fenv.h> header file. */
+#undef HAVE_FENV_H
+
+/* Define to enable generic (gcc) 128-bit SIMD optimizations. */
+#undef HAVE_GENERIC_SIMD128
+
+/* Define to enable generic (gcc) 256-bit SIMD optimizations. */
+#undef HAVE_GENERIC_SIMD256
 
 /* Define to 1 if you have the `gethrtime' function. */
 #undef HAVE_GETHRTIME
+
+/* Define to 1 if you have the `getpagesize' function. */
+#undef HAVE_GETPAGESIZE
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
@@ -148,17 +176,14 @@
 /* Define to 1 if hrtime_t is defined in <sys/time.h> */
 #undef HAVE_HRTIME_T
 
-/* Define to 1 if you have the <intrinsics.h> header file. */
-#undef HAVE_INTRINSICS_H
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
 /* Define if the isnan() function/macro is available. */
 #undef HAVE_ISNAN
 
-/* Define to 1 if you have the <libintl.h> header file. */
-#undef HAVE_LIBINTL_H
+/* Define to enable KCVI optimizations. */
+#undef HAVE_KCVI
 
 /* Define to 1 if you have the `m' library (-lm). */
 #undef HAVE_LIBM
@@ -175,14 +200,14 @@
 /* Define to 1 if you have the `mach_absolute_time' function. */
 #undef HAVE_MACH_ABSOLUTE_TIME
 
-/* Define to 1 if you have the <mach/mach_time.h> header file. */
-#undef HAVE_MACH_MACH_TIME_H
-
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
 
 /* Define to 1 if you have the `memalign' function. */
 #undef HAVE_MEMALIGN
+
+/* Define to 1 if you have the `memmove' function. */
+#undef HAVE_MEMMOVE
 
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
@@ -208,6 +233,9 @@
 /* Define if you have POSIX threads libraries and header files. */
 #undef HAVE_PTHREAD
 
+/* Define to 1 if the system has the type `ptrdiff_t'. */
+#undef HAVE_PTRDIFF_T
+
 /* Define to 1 if you have the `read_real_time' function. */
 #undef HAVE_READ_REAL_TIME
 
@@ -232,6 +260,9 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
+/* Define to 1 if you have the `strchr' function. */
+#undef HAVE_STRCHR
+
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
@@ -243,9 +274,6 @@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
-
-/* Define to 1 if you have the <sys/sysctl.h> header file. */
-#undef HAVE_SYS_SYSCTL_H
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #undef HAVE_SYS_TIME_H
@@ -271,6 +299,9 @@
 /* Define to 1 if you have the `vprintf' function. */
 #undef HAVE_VPRINTF
 
+/* Define to enable IBM VSX optimizations. */
+#undef HAVE_VSX
+
 /* Define to 1 if you have the `_mm_free' function. */
 #undef HAVE__MM_FREE
 
@@ -280,8 +311,7 @@
 /* Define if you have the UNICOS _rtc() intrinsic. */
 #undef HAVE__RTC
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
 /* Name of package */
@@ -382,6 +412,16 @@
 /* Use low-precision timers, making planner very slow */
 #undef WITH_SLOW_TIMER
 
+/* Define for Solaris 2.5.1 so the uint32_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT32_T
+
+/* Define for Solaris 2.5.1 so the uint64_t typedef from <sys/synch.h>,
+   <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
+   #define below would cause a syntax error. */
+#undef _UINT64_T
+
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const
 
@@ -393,3 +433,11 @@
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
+
+/* Define to the type of an unsigned integer type of width exactly 32 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint32_t
+
+/* Define to the type of an unsigned integer type of width exactly 64 bits if
+   such a type exists and the standard includes do not define it. */
+#undef uint64_t

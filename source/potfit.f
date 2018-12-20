@@ -18,6 +18,7 @@ c     ngatm     total number of atoms with active potential grid points
 c     nfatm     total number of atoms in electrostatic potential fit
 c     npgrid    total number of electrostatic potential grid points
 c     ipgrid    atom associated with each potential grid point
+c     resp      weight used to restrain parameters to original values
 c     xdpl0     target x-component of the molecular dipole moment
 c     ydpl0     target y-component of the molecular dipole moment
 c     zdpl0     target z-component of the molecular dipole moment
@@ -27,6 +28,7 @@ c     xzqdp0    target xz-component of the molecular quadrupole moment
 c     yyqdp0    target yy-component of the molecular quadrupole moment
 c     yzqdp0    target yz-component of the molecular quadrupole moment
 c     zzqdp0    target zz-component of the molecular quadrupole moment
+c     fit0      initial value of each parameter used in potential fit      
 c     fchg      partial charges by atom type during potential fit
 c     fpol      atomic multipoles by atom type during potential fit
 c     pgrid     Cartesian coordinates of potential grid points
@@ -49,6 +51,7 @@ c
       integer ngatm,nfatm
       integer npgrid(maxref)
       integer, allocatable :: ipgrid(:,:)
+      real*8 resp
       real*8 xdpl0(maxref)
       real*8 ydpl0(maxref)
       real*8 zdpl0(maxref)
@@ -58,6 +61,7 @@ c
       real*8 yyqdp0(maxref)
       real*8 yzqdp0(maxref)
       real*8 zzqdp0(maxref)
+      real*8, allocatable :: fit0(:)
       real*8, allocatable :: fchg(:)
       real*8, allocatable :: fpol(:,:)
       real*8, allocatable :: pgrid(:,:,:)

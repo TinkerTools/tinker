@@ -18,13 +18,13 @@
  *
  */
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 unsigned X(hash)(const char *s)
 {
      unsigned h = 0xDEADBEEFu;
      do {
-	  h = h * 17 + (int)*s;
+	  h = h * 17 + (unsigned)(*s & 0xFF);
      } while (*s++);
      return h;
 }

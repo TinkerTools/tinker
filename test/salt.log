@@ -4,7 +4,51 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.5  June 2018                          ##
+ ##                        Version 8.5   October 2018                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Unit Cell Dimensions :      a    =    5.6280
+                             b    =    5.6280
+                             c    =    5.6280
+                            Alpha =   90.0000
+                            Beta  =   90.0000
+                            Gamma =   90.0000
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                        Version 8.5   October 2018                        ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Unit Cell Dimensions :      a    =    5.6280
+                             b    =    5.6280
+                             c    =    5.6280
+                            Alpha =   90.0000
+                            Beta  =   90.0000
+                            Gamma =   90.0000
+
+ Space Group Symbol :            Fm3(-)m   
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                        Version 8.5   October 2018                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
@@ -22,17 +66,17 @@
 
  Additional van der Waals Parameters :
 
-     Atom Class          Size      Epsilon     Reduction
+     Atom Class               Size        Epsilon        Reduction
 
-         1              3.3304      0.0028       0.000
-         2              4.4172      0.1180       0.000
+           1                3.3304         0.0028          0.000
+           2                4.4172         0.1180          0.000
 
  Additional Atomic Partial Charge Parameters :
 
-     Atom Type          Charge
+     Atom Type              Charge
 
-         1              1.0000
-         2             -1.0000
+           1                1.0000
+           2               -1.0000
 
  Initial Lattice Dimensions :    a         5.6280
                                  b         5.6280
@@ -55,10 +99,10 @@
  OCVM  --  Normal Termination due to SmallGrad
 
  Final Potential Function Value :       -754.4065
- Final RMS Coordinate Gradient :       0.3246D-12
- Final Coordinate Gradient Norm :      0.9181D-12
- Final RMS Lattice Gradient :          0.2064D-04
- Final Lattice Gradient Norm :         0.5056D-04
+ Final RMS Coordinate Gradient :       0.2361D-12
+ Final Coordinate Gradient Norm :      0.6677D-12
+ Final RMS Lattice Gradient :          0.2063D-04
+ Final Lattice Gradient Norm :         0.5053D-04
 
  Final Lattice Dimensions :      a         5.7660
                                  b         5.7660

@@ -18,7 +18,7 @@
  *
  */
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 
 void X(md5putb)(md5 *p, const void *d_, size_t len)
@@ -33,7 +33,7 @@ void X(md5puts)(md5 *p, const char *s)
 {
      /* also hash final '\0' */
      do {
-	  X(md5putc)(p, *s);
+	  X(md5putc)(p, (unsigned)(*s & 0xFF));
      } while(*s++);
 }
 

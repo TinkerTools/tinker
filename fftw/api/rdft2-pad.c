@@ -19,7 +19,7 @@
  */
 
 #include <string.h>
-#include "api.h"
+#include "api/api.h"
 
 const int *X(rdft2_pad)(int rnk, const int *n, const int *nembed,
 			int inplace, int cmplx, int **nfree)
@@ -28,8 +28,8 @@ const int *X(rdft2_pad)(int rnk, const int *n, const int *nembed,
      *nfree = 0;
      if (!nembed && rnk > 0) {
           if (inplace || cmplx) {
-               int *np = (int *) MALLOC(sizeof(int) * rnk, PROBLEMS);
-               memcpy(np, n, sizeof(int) * rnk);
+               int *np = (int *) MALLOC(sizeof(int) * (unsigned)rnk, PROBLEMS);
+               memcpy(np, n, sizeof(int) * (unsigned)rnk);
                np[rnk - 1] = (n[rnk - 1] / 2 + 1) * (1 + !cmplx);
                nembed = *nfree = np;
           } else

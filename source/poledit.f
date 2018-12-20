@@ -1488,7 +1488,7 @@ c
             write (iout,10)
    10       format (/,' Determination of Intergroup Induced',
      &                 ' Dipoles :',
-     &              //,4x,'Iter',8x,'RMS Change (Debyes)',/)
+     &              //,4x,'Iter',8x,'RMS Change (Debye)',/)
          end if
          write (iout,20)  iter,eps
    20    format (i8,7x,f16.10)
@@ -1521,7 +1521,7 @@ c     print out a list of the final induced dipole moments
 c
       write (iout,40)
    40 format (/,' Intergroup Induced Dipoles to be Removed',
-     &           ' (Debyes) :')
+     &           ' (Debye) :')
       write (iout,50)
    50 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
      &           9x,'Total'/)

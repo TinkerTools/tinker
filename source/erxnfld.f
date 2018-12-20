@@ -43,7 +43,7 @@ c
 c
 c     zero out the macroscopic reaction field energy
 c
-      er = 0.0d0
+      erxf = 0.0d0
 c
 c     set the switching function coefficients
 c
@@ -89,7 +89,7 @@ c
                      rpk(j) = rpole(j,kk)
                   end do
                   call erfik (ii,kk,i,k,rpi,rpk,eik)
-                  er = er + eik
+                  erxf = erxf + eik
                end if
             end if
          end do

@@ -91,11 +91,11 @@ c
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Torsion-Torsion Parameters :',
-     &                    //,5x,'Atom Classes',12x,'GridSize1',
-     &                       5x,'GridSize2',/)
+     &                    //,5x,'Atom Classes',11x,'Grid-1',
+     &                       9x,'Grid-2',/)
                end if
                write (iout,30)  ia,ib,ic,id,ie,nx,ny
-   30          format (1x,5i4,6x,i8,6x,i8)
+   30          format (1x,5i4,5x,i8,7x,i8)
             end if
             size = 4
             call numeral (ia,pa,size)

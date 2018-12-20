@@ -75,13 +75,13 @@ c
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Angle-Torsion Parameters :',
-     &                    //,31x,'1st Angle',18x,'2nd Angle',
+     &                    //,32x,'1st Angle',20x,'2nd Angle',
      &                    /,5x,'Atom Classes',7x,'1-Fold',3x,'2-Fold',
-     &                      3x,'3-Fold',3x,'1-Fold',3x,'2-Fold',
+     &                      3x,'3-Fold',5x,'1-Fold',3x,'2-Fold',
      &                      3x,'3-Fold'/)
                end if
                write (iout,30)  ia,ib,ic,id,at1,at2,at3,at4,at5,at6
-   30          format (1x,4i4,4x,6f9.3)
+   30          format (2x,4i4,3x,3f9.3,2x,3f9.3)
             end if
             size = 4
             call numeral (ia,pa,size)

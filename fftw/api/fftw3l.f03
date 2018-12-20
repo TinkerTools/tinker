@@ -498,6 +498,10 @@
       import
     end subroutine fftwl_cleanup_threads
     
+    subroutine fftwl_make_planner_thread_safe() bind(C, name='fftwl_make_planner_thread_safe')
+      import
+    end subroutine fftwl_make_planner_thread_safe
+    
     integer(C_INT) function fftwl_export_wisdom_to_filename(filename) bind(C, name='fftwl_export_wisdom_to_filename')
       import
       character(C_CHAR), dimension(*), intent(in) :: filename

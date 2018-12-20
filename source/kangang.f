@@ -62,11 +62,11 @@ c
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Angle-Angle Parameters :',
-     &                    //,5x,'Atom Class',8x,'K(AA) 1',4x,'K(AA) 2',
-     &                       4x,'K(AA) 3',/)
+     &                    //,5x,'Atom Class',12x,'K(AA)-1',8x,'K(AA)-2',
+     &                       8x,'K(AA)-3',/)
                end if
                write (iout,30)  it,(aak(j),j=1,3)
-   30          format (9x,i3,7x,3f11.3)
+   30          format (9x,i3,7x,3f15.3)
             end if
             do j = 1, 3
                anan(j,it) = aak(j)

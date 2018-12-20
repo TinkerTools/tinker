@@ -18,11 +18,11 @@
  *
  */
 
-#include "api.h"
+#include "api/api.h"
 
 typedef struct {
      printer super;
-     int *cnt;
+     size_t *cnt;
 } P_cnt;
 
 static void putchr_cnt(printer * p_, char c)
@@ -32,7 +32,7 @@ static void putchr_cnt(printer * p_, char c)
      ++*p->cnt;
 }
 
-printer *X(mkprinter_cnt)(int *cnt)
+printer *X(mkprinter_cnt)(size_t *cnt)
 {
      P_cnt *p = (P_cnt *) X(mkprinter)(sizeof(P_cnt), putchr_cnt, 0);
      p->cnt = cnt;

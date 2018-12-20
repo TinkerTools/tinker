@@ -50,12 +50,15 @@ c
       eat = 0.0d0
       ett = 0.0d0
       ev = 0.0d0
+      er = 0.0d0
+      edsp = 0.0d0
       ec = 0.0d0
       ecd = 0.0d0
       ed = 0.0d0
       em = 0.0d0
       ep = 0.0d0
-      er = 0.0d0
+      ect = 0.0d0
+      erxf = 0.0d0
       es = 0.0d0
       elf = 0.0d0
       eg = 0.0d0
@@ -81,12 +84,15 @@ c
             deallocate (aeat)
             deallocate (aett)
             deallocate (aev)
+            deallocate (aer)
+            deallocate (aedsp)
             deallocate (aec)
             deallocate (aecd)
             deallocate (aed)
             deallocate (aem)
             deallocate (aep)
-            deallocate (aer)
+            deallocate (aect)
+            deallocate (aerxf)
             deallocate (aes)
             deallocate (aelf)
             deallocate (aeg)
@@ -110,12 +116,15 @@ c
          allocate (aeat(n))
          allocate (aett(n))
          allocate (aev(n))
+         allocate (aer(n))
+         allocate (aedsp(n))
          allocate (aec(n))
          allocate (aecd(n))
          allocate (aed(n))
          allocate (aem(n))
          allocate (aep(n))
-         allocate (aer(n))
+         allocate (aect(n))
+         allocate (aerxf(n))
          allocate (aes(n))
          allocate (aelf(n))
          allocate (aeg(n))
@@ -140,12 +149,15 @@ c
          aeat(i) = 0.0d0
          aett(i) = 0.0d0
          aev(i) = 0.0d0
+         aer(i) = 0.0d0
+         aedsp(i) = 0.0d0
          aec(i) = 0.0d0
          aecd(i) = 0.0d0
          aed(i) = 0.0d0
          aem(i) = 0.0d0
          aep(i) = 0.0d0
-         aer(i) = 0.0d0
+         aect(i) = 0.0d0
+         aerxf(i) = 0.0d0
          aes(i) = 0.0d0
          aelf(i) = 0.0d0
          aeg(i) = 0.0d0
@@ -199,6 +211,8 @@ c
          if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal3
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss3
       end if
+      if (use_repuls)  call erepel3
+      if (use_disp)  call edisp3
 c
 c     call the electrostatic energy component routines
 c
@@ -207,6 +221,7 @@ c
       if (use_dipole)  call edipole3
       if (use_mpole)  call empole3
       if (use_polar)  call epolar3
+      if (use_chgtrn)  call echgtrn3
       if (use_rxnfld)  call erxnfld3
 c
 c     call any miscellaneous energy component routines
@@ -219,8 +234,9 @@ c
 c     sum up to give the total potential energy
 c
       esum = eb + ea + eba + eub + eaa + eopb + eopd + eid + eit
-     &          + et + ept + ebt + eat + ett + ev + ec + ecd + ed
-     &          + em + ep + er + es + elf + eg + ex
+     &          + et + ept + ebt + eat + ett + ev + er + edsp
+     &          + ec + ecd + ed + em + ep + ect + erxf + es + elf
+     &          + eg + ex
       energy = esum
 c
 c     sum up to give the total potential energy per atom
@@ -229,9 +245,9 @@ c
          aesum(i) = aeb(i) + aea(i) + aeba(i) + aeub(i) + aeaa(i)
      &                 + aeopb(i) + aeopd(i) + aeid(i) + aeit(i)
      &                 + aet(i) + aept(i) + aebt(i) + aeat(i) + aett(i)
-     &                 + aev(i) + aec(i) + aecd(i) + aed(i) + aem(i)
-     &                 + aep(i) + aer(i) + aes(i) + aelf(i) + aeg(i)
-     &                 + aex(i)
+     &                 + aev(i) + aer(i) + aedsp(i) + aec(i) + aecd(i)
+     &                 + aed(i) + aem(i) + aep(i) + aect(i) + aerxf(i)
+     &                 + aes(i) + aelf(i) + aeg(i) + aex(i)
       end do
 c
 c     check for an illegal value for the total energy

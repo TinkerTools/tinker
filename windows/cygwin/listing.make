@@ -2,10 +2,10 @@
 #
 #  ##################################################################
 #  ##                                                              ##
-#  ##  listing.make  --  create source library of Tinker routines  ##
+#  ##  listing.make  --  create source listing of Tinker routines  ##
 #  ##                    (Generic Unix Version)                    ##
 #  ##                                                              ##
 #  ##################################################################
 #
 #
-cat *.i *.f *.c > tinker.txt
+cat *.f *.c > tinker.txt

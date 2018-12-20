@@ -31,11 +31,12 @@ c
       real*8 delta,delta0,eps
       real*8 eb0,ea0,eba0,eub0
       real*8 eaa0,eopb0,eopd0
-      real*8 eid0,eit0,et0
-      real*8 ept0,ebt0,eat0
-      real*8 ett0,ev0,ec0,ecd0
-      real*8 ed0,em0,ep0,er0
-      real*8 es0,elf0,eg0,ex0
+      real*8 eid0,eit0,et0,ept0
+      real*8 ebt0,eat0,ett0,ev0
+      real*8 er0,edsp0,ec0,ecd0
+      real*8 ed0,em0,ep0,ect0
+      real*8 erxf0,es0,elf0
+      real*8 eg0,ex0
       real*8, allocatable :: derivs(:)
       real*8, allocatable :: nderiv(:)
       logical exist,query
@@ -101,15 +102,15 @@ c
    80    format (/,'  Energy',7x,'EB',14x,'EA',14x,'EBA',13x,'EUB',
      &           /,'  Terms',8x,'EAA',13x,'EOPB',12x,'EOPD',12x,'EID',
      &           /,15x,'EIT',13x,'ET',14x,'EPT',13x,'EBT',
-     &           /,15x,'EAT',13x,'ETT',13x,'EV',14x,'EC',
-     &           /,15x,'ECD',13x,'ED',14x,'EM',14x,'EP',
-     &           /,15x,'ER',14x,'ES',14x,'ELF',13x,'EG',
-     &           /,15x,'EX')
-         write (iout,90)  eb,ea,eba,eub,eaa,eopb,eopd,eid,
-     &                    eit,et,ept,ebt,eat,ett,ev,ec,ecd,
-     &                    ed,em,ep,er,es,elf,eg,ex
+     &           /,15x,'EAT',13x,'ETT',13x,'EV',14x,'ER',
+     &           /,15x,'EDSP',12x,'EC',14x,'ECD',13x,'ED',
+     &           /,15x,'EM',14x,'EP',14x,'ECT',13x,'ERXF',
+     &           /,15x,'ES',14x,'ELF',13x,'EG',14x,'EX')
+         write (iout,90)  eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,
+     &                    et,ept,ebt,eat,ett,ev,er,edsp,ec,ecd,
+     &                    ed,em,ep,ect,erxf,es,elf,eg,ex
    90    format (/,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,
-     &              /,6x,4f16.8,/,6x,4f16.8,/,6x,f16.8)
+     &              /,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8)
       else if (digits .ge. 6) then
          write (iout,100)
   100    format (/,'  Energy',6x,'EB',12x,'EA',12x,'EBA',11x,'EUB',
@@ -117,29 +118,30 @@ c
      &           /,'  Terms',7x,'EOPB',10x,'EOPD',10x,'EID',
      &              11x,'EIT',11x,'ET',
      &           /,14x,'EPT',11x,'EBT',11x,'EAT',11x,'ETT',11x,'EV',
-     &           /,14x,'EC',12x,'ECD',11x,'ED',12x,'EM',12x,'EP',
-     &           /,14x,'ER',12x,'ES',12x,'ELF',11x,'EG',12x,'EX')
-         write (iout,110)  eb,ea,eba,eub,eaa,eopb,eopd,eid,
-     &                     eit,et,ept,ebt,eat,ett,ev,ec,ecd,
-     &                     ed,em,ep,er,es,elf,eg,ex
+     &           /,14x,'ER',12x,'EDSP',10x,'EC',12x,'ECD',11x,'ED',
+     &           /,14x,'EM',12x,'EP',12x,'ECT',11x,'ERXF',10x,'ES',
+     &           /,14x,'ELF',11x,'EG',12x,'EX')
+         write (iout,110)  eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,
+     &                     et,ept,ebt,eat,ett,ev,er,edsp,ec,ecd,
+     &                     ed,em,ep,ect,erxf,es,elf,eg,ex
   110    format (/,6x,5f14.6,/,6x,5f14.6,/,6x,5f14.6,/,6x,5f14.6,
-     &              /,6x,5f14.6)
+     &              /,6x,5f14.6,/,6x,3f14.6)
       else
          write (iout,120)
   120    format (/,'  Energy',6x,'EB',10x,'EA',10x,'EBA',9x,'EUB',
      &              9x,'EAA',9x,'EOPB',
      &           /,'  Terms',7x,'EOPD',8x,'EID',9x,'EIT',9x,'ET',
      &              10x,'EPT',9x,'EBT',
-     &           /,14x,'EAT',9x,'ETT',9x,'EV',10x,'EC',10x,'ECD',
-     &              9x,'ED',
-     &           /,14x,'EM',10x,'EP',10x,'ER',10x,'ES',10x,'ELF',
-     &              9x,'EG',
-     &           /,14x,'EX')
-         write (iout,130)  eb,ea,eba,eub,eaa,eopb,eopd,eid,
-     &                     eit,et,ept,ebt,eat,ett,ev,ec,ecd,
-     &                     ed,em,ep,er,es,elf,eg,ex
+     &           /,14x,'EAT',9x,'ETT',9x,'EV',10x,'ER',10x,'EDSP',
+     &              8x,'EC',
+     &           /,14x,'ECD',9x,'ED',10x,'EM',10x,'EP',10x,'ECT',
+     &              9x,'ERXF',
+     &           /,14x,'ES',10x,'ELF',9x,'EG',10x,'EX')
+         write (iout,130)  eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,
+     &                     et,ept,ebt,eat,ett,ev,er,edsp,ec,ecd,
+     &                     ed,em,ep,ect,erxf,es,elf,eg,ex
   130    format (/,6x,6f12.4,/,6x,6f12.4,/,6x,6f12.4,/,6x,6f12.4,
-     &               /,6x,f12.4)
+     &               /,6x,4f12.4)
       end if
 c
 c     print a header for the gradients of individual potentials
@@ -155,10 +157,10 @@ c
      &              10x,'d EID',
      &           /,2x,'Type',9x,'d EIT',11x,'d ET',12x,'d EPT',
      &              11x,'d EBT',
-     &           /,15x,'d EAT',11x,'d ETT',11x,'d EV',12x,'d EC',
-     &           /,15x,'d ECD',11x,'d ED',12x,'d EM',12x,'d EP',
-     &           /,15x,'d ER',12x,'d ES',12x,'d ELF',11x,'d EG',
-     &           /,15x,'d EX')
+     &           /,15x,'d EAT',10x,'d ETT',10x,'d EV',12x,'d ER',
+     &           /,15x,'d EDSP',10x,'d EC',12x,'d ECD',11x,'d ED',
+     &           /,15x,'d EM',12x,'d EP',12x,'d ECT',11x,'d ERXF',
+     &           /,15x,'d ES',12x,'d ELF',11x,'d EG',12x,'d EX')
       else if (digits .ge. 6) then
          write (iout,160)
   160    format (/,2x,'Atom',8x,'d EB',10x,'d EA',10x,'d EBA',
@@ -167,10 +169,11 @@ c
      &              9x,'d EIT',9x,'d ET',
      &           /,2x,'Type',8x,'d EPT',9x,'d EBT',9x,'d EAT',
      &              9x,'d ETT',9x,'d EV',
-     &           /,14x,'d EC',10x,'d ECD',9x,'d ED',10x,'d EM',
-     &              10x,'d EP',
-     &           /,14x,'d ER',10x,'d ES',10x,'d ELF',9x,'d EG',
-     &              10x,'d EX')
+     &           /,14x,'d ER',10x,'d EDSP',8x,'d EC',10x,'d ECD',
+     &              9x,'d ED',
+     &           /,14x,'d EM',10x,'d EP',10x,'d ECT',9x,'d ERXF',
+     &              8x,'d ES',
+     &           /,14x,'d ELF',9x,'d EG',10x,'d EX')
       else
          write (iout,170)
   170    format (/,2x,'Atom',6x,'d EB',8x,'d EA',8x,'d EBA',
@@ -178,10 +181,10 @@ c
      &           /,2x,'Axis',6x,'d EOPD',6x,'d EID',7x,'d EIT',
      &              7x,'d ET',8x,'d EPT',7x,'d EBT',
      &           /,2x,'Type',6x,'d EAT',7x,'d ETT',7x,'d EV',
-     &              8x,'d EC',8x,'d ECD',7x,'d ED',
-     &           /,12x,'d EM',8x,'d EP',8x,'d ER',8x,'d ES',
-     &              8x,'d ELF',7x,'d EG',
-     &           /,12x,'d EX')
+     &              8x,'d ER',8x,'d EDSP',6x,'d EC',
+     &           /,12x,'d ECD',7x,'d ED',8x,'d EM',8x,'d EP',
+     &              8x,'d ECT',7x,'d ERXF',
+     &           /,12x,'d ES',8x,'d ELF',7x,'d EG',8x,'d EX')
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -209,12 +212,15 @@ c
          eat0 = eat
          ett0 = ett
          ev0 = ev
+         er0 = er
+         edsp0 = edsp
          ec0 = ec
          ecd0 = ecd
          ed0 = ed
          em0 = em
          ep0 = ep
-         er0 = er
+         ect0 = ect
+         erxf0 = erxf
          es0 = es
          elf0 = elf
          eg0 = eg
@@ -231,29 +237,33 @@ c
             write (iout,180)  iomega(2,i),teb(i),tea(i),teba(i),teub(i),
      &                        iomega(1,i),teaa(i),teopb(i),teopd(i),
      &                        teid(i),teit(i),tet(i),tept(i),tebt(i),
-     &                        teat(i),tett(i),tev(i),tec(i),tecd(i),
-     &                        ted(i),tem(i),tep(i),ter(i),tes(i),
-     &                        telf(i),teg(i),tex(i)
+     &                        teat(i),tett(i),tev(i),ter(i),tedsp(i),
+     &                        tec(i),tecd(i),ted(i),tem(i),tep(i),
+     &                        tect(i),terxf(i),tes(i),telf(i),teg(i),
+     &                        tex(i)
   180       format (/,i6,4f16.8,/,i6,4f16.8,/,' Anlyt',4f16.8,
-     &                 /,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,/,6x,f16.8)
+     &                 /,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,
+     &                 /,6x,4f16.8)
          else if (digits .ge. 6) then
             write (iout,190)  iomega(2,i),teb(i),tea(i),teba(i),teub(i),
      &                        teaa(i),iomega(1,i),teopb(i),teopd(i),
      &                        teid(i),teit(i),tet(i),tept(i),tebt(i),
-     &                        teat(i),tett(i),tev(i),tec(i),tecd(i),
-     &                        ted(i),tem(i),tep(i),ter(i),tes(i),
-     &                        telf(i),teg(i),tex(i)
+     &                        teat(i),tett(i),tev(i),ter(i),tedsp(i),
+     &                        tec(i),tecd(i),ted(i),tem(i),tep(i),
+     &                        tect(i),terxf(i),tes(i),telf(i),teg(i),
+     &                        tex(i)
   190       format (/,i6,5f14.6,/,i6,5f14.6,/,' Anlyt',5f14.6,
-     &                 /,6x,5f14.6,/,6x,5f14.6)
+     &                 /,6x,5f14.6,/,6x,5f14.6,/,6x,3f14.6)
          else
             write (iout,200)  iomega(2,i),teb(i),tea(i),teba(i),teub(i),
      &                        teaa(i),teopb(i),iomega(1,i),teopd(i),
      &                        teid(i),teit(i),tet(i),tept(i),tebt(i),
-     &                        teat(i),tett(i),tev(i),tec(i),tecd(i),
-     &                        ted(i),tem(i),tep(i),ter(i),tes(i),
-     &                        telf(i),teg(i),tex(i)
+     &                        teat(i),tett(i),tev(i),ter(i),tedsp(i),
+     &                        tec(i),tecd(i),ted(i),tem(i),tep(i),
+     &                        tect(i),terxf(i),tes(i),telf(i),teg(i),
+     &                        tex(i)
   200       format (/,i6,6f12.4,/,i6,6f12.4,/,' Anlyt',6f12.4,
-     &                 /,6x,6f12.4,/,6x,f12.4)
+     &                 /,6x,6f12.4,/,6x,4f12.4)
          end if
 c
 c     print numerical gradients of each energy term for each atom
@@ -266,12 +276,15 @@ c
      &                        (eid-eid0)/eps,(eit-eit0)/eps,
      &                        (et-et0)/eps,(ept-ept0)/eps,
      &                        (ebt-ebt0)/eps,(eat-eat0)/eps,
-     &                        (ett-ett0)/eps,(ev-ev0)/eps,(ec-ec0)/eps,
+     &                        (ett-ett0)/eps,(ev-ev0)/eps,(er-er0)/eps,
+     &                        (edsp-edsp0)/eps,(ec-ec0)/eps,
      &                        (ecd-ecd0)/eps,(ed-ed0)/eps,(em-em0)/eps,
-     &                        (ep-ep0)/eps,(er-er0)/eps,(es-es0)/eps,
+     &                        (ep-ep0)/eps,(ect-ect0)/eps,
+     &                        (erxf-erxf0)/eps,(es-es0)/eps,
      &                        (elf-elf0)/eps,(eg-eg0)/eps,(ex-ex0)/eps
   210       format (/,i6,4f16.8,/,i6,4f16.8,/,' Numer',4f16.8,
-     &                 /,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,/,6x,f14.8)
+     &                 /,6x,4f16.8,/,6x,4f16.8,/,6x,4f16.8,
+     &                 /,6x,4f14.8)
          else if (digits .ge. 6) then
             write (iout,220)  iomega(2,i),(eb-eb0)/eps,(ea-ea0)/eps,
      &                        (eba-eba0)/eps,(eub-eub0)/eps,
@@ -280,12 +293,14 @@ c
      &                        (eid-eid0)/eps,(eit-eit0)/eps,
      &                        (et-et0)/eps,(ept-ept0)/eps,
      &                        (ebt-ebt0)/eps,(eat-eat0)/eps,
-     &                        (ett-ett0)/eps,(ev-ev0)/eps,(ec-ec0)/eps,
+     &                        (ett-ett0)/eps,(ev-ev0)/eps,(er-er0)/eps,
+     &                        (edsp-edsp0)/eps,(ec-ec0)/eps,
      &                        (ecd-ecd0)/eps,(ed-ed0)/eps,(em-em0)/eps,
-     &                        (ep-ep0)/eps,(er-er0)/eps,(es-es0)/eps,
+     &                        (ep-ep0)/eps,(ect-ect0)/eps,
+     &                        (erxf-erxf0)/eps,(es-es0)/eps,
      &                        (elf-elf0)/eps,(eg-eg0)/eps,(ex-ex0)/eps
   220       format (/,i6,5f14.6,/,i6,5f14.6,/,' Numer',5f14.6,
-     &                 /,6x,5f14.6,/,6x,5f14.6)
+     &                 /,6x,5f14.6,/,6x,5f14.6,/,6x,3f14.6)
          else
             write (iout,230)  iomega(2,i),(eb-eb0)/eps,(ea-ea0)/eps,
      &                        (eba-eba0)/eps,(eub-eub0)/eps,
@@ -294,47 +309,52 @@ c
      &                        (eid-eid0)/eps,(eit-eit0)/eps,
      &                        (et-et0)/eps,(ept-ept0)/eps,
      &                        (ebt-ebt0)/eps,(eat-eat0)/eps,
-     &                        (ett-ett0)/eps,(ev-ev0)/eps,(ec-ec0)/eps,
+     &                        (ett-ett0)/eps,(ev-ev0)/eps,(er-er0)/eps,
+     &                        (edsp-edsp0)/eps,(ec-ec0)/eps,
      &                        (ecd-ecd0)/eps,(ed-ed0)/eps,(em-em0)/eps,
-     &                        (ep-ep0)/eps,(er-er0)/eps,(es-es0)/eps,
+     &                        (ep-ep0)/eps,(ect-ect0)/eps,
+     &                        (erxf-erxf0)/eps,(es-es0)/eps,
      &                        (elf-elf0)/eps,(eg-eg0)/eps,(ex-ex0)/eps
   230       format (/,i6,6f12.4,/,i6,6f12.4,/,' Numer',6f12.4,
-     &                 /,6x,6f12.4,/,6x,f12.4)
+     &                 /,6x,6f12.4,/,6x,4f12.4)
          end if
       end do
 c
 c     print a header for the analytical vs. numerical comparison
 c
+      write (iout,240)
+  240 format (/,' Total Torsional Gradient Norm over Rotatable',
+     &           ' Bonds :')
       if (digits .ge. 8) then
-         write (iout,240)
-  240    format (//,5x,'Torsion',19x,'Anlyt Deriv',9x,'Numer Deriv',/)
-      else if (digits .ge. 6) then
          write (iout,250)
-  250    format (//,5x,'Torsion',18x,'Anlyt Deriv',7x,'Numer Deriv',/)
-      else
+  250    format (/,5x,'Torsion',19x,'Anlyt Deriv',9x,'Numer Deriv',/)
+      else if (digits .ge. 6) then
          write (iout,260)
-  260    format (//,5x,'Torsion',17x,'Anlyt Deriv',5x,'Numer Deriv',/)
+  260    format (/,5x,'Torsion',18x,'Anlyt Deriv',7x,'Numer Deriv',/)
+      else
+         write (iout,270)
+  270    format (/,5x,'Torsion',17x,'Anlyt Deriv',5x,'Numer Deriv',/)
       end if
 c
 c     print comparison of analytical and numerical derivatives
 c
       if (digits .ge. 8) then
          do i = 1, nomega
-            write (iout,270)  iomega(2,i),iomega(1,i),derivs(i),
+            write (iout,280)  iomega(2,i),iomega(1,i),derivs(i),
      &                        nderiv(i)
-  270       format (1x,i5,'-',i5,10x,2f20.8)
+  280       format (1x,i5,'-',i5,10x,2f20.8)
          end do
       else if (digits .ge. 6) then
          do i = 1, nomega
-            write (iout,280)  iomega(2,i),iomega(1,i),derivs(i),
+            write (iout,290)  iomega(2,i),iomega(1,i),derivs(i),
      &                        nderiv(i)
-  280       format (1x,i5,'-',i5,10x,2f18.6)
+  290       format (1x,i5,'-',i5,10x,2f18.6)
          end do
       else
          do i = 1, nomega
-            write (iout,290)  iomega(2,i),iomega(1,i),derivs(i),
+            write (iout,300)  iomega(2,i),iomega(1,i),derivs(i),
      &                        nderiv(i)
-  290       format (1x,i5,'-',i5,10x,2f16.4)
+  300       format (1x,i5,'-',i5,10x,2f16.4)
          end do
       end if
 c

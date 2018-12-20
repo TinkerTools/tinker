@@ -22,7 +22,8 @@
    function.  The first portion of this file is a set of macros to
    spawn and join threads on various systems. */
 
-#include "threads.h"
+#include "threads/threads.h"
+#include "api/api.h"
 
 #if defined(USING_POSIX_THREADS)
 
@@ -149,6 +150,12 @@ static void os_destroy_thread(void)
      pthread_exit((void *)0);
 }
 
+/* support for static mutexes */
+typedef pthread_mutex_t os_static_mutex_t;
+#define OS_STATIC_MUTEX_INITIALIZER PTHREAD_MUTEX_INITIALIZER
+static void os_static_mutex_lock(os_static_mutex_t *s) { pthread_mutex_lock(s); }
+static void os_static_mutex_unlock(os_static_mutex_t *s) { pthread_mutex_unlock(s); }
+
 #elif defined(__WIN32__) || defined(_WIN32) || defined(_WINDOWS)
 /* hack: windef.h defines INT for its own purposes and this causes
    a conflict with our own INT in ifftw.h.  Divert the windows
@@ -156,6 +163,7 @@ static void os_destroy_thread(void)
 #define INT magnus_ab_INTegro_seclorum_nascitur_ordo
 #include <windows.h>
 #include <process.h>
+#include <intrin.h>
 #undef INT
 
 typedef HANDLE os_mutex_t;
@@ -221,7 +229,22 @@ static void os_destroy_thread(void)
      _endthreadex(0);
 }
 
-
+/* windows does not have statically-initialized mutexes---fake a
+   spinlock */
+typedef volatile LONG os_static_mutex_t;
+#define OS_STATIC_MUTEX_INITIALIZER 0
+static void os_static_mutex_lock(os_static_mutex_t *s)
+{
+     while (InterlockedExchange(s, 1) == 1) {
+          YieldProcessor();
+          Sleep(0);
+     }
+}
+static void os_static_mutex_unlock(os_static_mutex_t *s)
+{
+     LONG old = InterlockedExchange(s, 0);
+     A(old == 1);
+}
 #else
 #error "No threading layer defined"
 #endif
@@ -331,9 +354,6 @@ static void kill_workforce(void)
 
      w.proc = 0;
 
-     THREAD_ON; /* needed for debugging mode: since make_worker
-		   is called from dequeue which is only called in
-		   thread_on mode, we need to unmake_worker in thread_on. */
      WITH_QUEUE_LOCK({
 	  /* tell all workers that they must terminate.  
 
@@ -351,17 +371,20 @@ static void kill_workforce(void)
 	       unmake_worker(q);
 	  }
      });
-     THREAD_OFF;
 }
+
+static os_static_mutex_t initialization_mutex = OS_STATIC_MUTEX_INITIALIZER;
 
 int X(ithreads_init)(void)
 {
-     os_mutex_init(&queue_lock);
-     os_sem_init(&termination_semaphore);
+     os_static_mutex_lock(&initialization_mutex); {
+          os_mutex_init(&queue_lock);
+          os_sem_init(&termination_semaphore);
 
-     WITH_QUEUE_LOCK({
-	  worker_queue = 0;
-     })
+          WITH_QUEUE_LOCK({
+               worker_queue = 0;
+          });
+     } os_static_mutex_unlock(&initialization_mutex);
 
      return 0; /* no error */
 }
@@ -393,7 +416,6 @@ void X(spawn_loop)(int loopmax, int nthr, spawn_function proc, void *data)
      block_size = (loopmax + nthr - 1) / nthr;
      nthr = (loopmax + block_size - 1) / block_size;
 
-     THREAD_ON; /* prevent debugging mode from failing under threads */
      STACK_MALLOC(struct work *, r, sizeof(struct work) * nthr);
 	  
      /* distribute work: */
@@ -428,7 +450,6 @@ void X(spawn_loop)(int loopmax, int nthr, spawn_function proc, void *data)
      }
 
      STACK_FREE(r);
-     THREAD_OFF; /* prevent debugging mode from failing under threads */
 }
 
 void X(threads_cleanup)(void)
@@ -436,4 +457,29 @@ void X(threads_cleanup)(void)
      kill_workforce();
      os_mutex_destroy(&queue_lock);
      os_sem_destroy(&termination_semaphore);
+}
+
+static os_static_mutex_t install_planner_hooks_mutex = OS_STATIC_MUTEX_INITIALIZER;
+static os_mutex_t planner_mutex;
+static int planner_hooks_installed = 0;
+
+static void lock_planner_mutex(void)
+{
+     os_mutex_lock(&planner_mutex);
+}
+
+static void unlock_planner_mutex(void)
+{
+     os_mutex_unlock(&planner_mutex);
+}
+
+void X(threads_register_planner_hooks)(void)
+{
+     os_static_mutex_lock(&install_planner_hooks_mutex); {
+          if (!planner_hooks_installed) {
+               os_mutex_init(&planner_mutex);
+               X(set_planner_hooks)(lock_planner_mutex, unlock_planner_mutex);
+               planner_hooks_installed = 1;
+          }
+     } os_static_mutex_unlock(&install_planner_hooks_mutex);
 }

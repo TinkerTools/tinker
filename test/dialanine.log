@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.5  June 2018                          ##
+ ##                        Version 8.5   October 2018                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
@@ -162,7 +162,7 @@
     Search Direction   4           Step     16              -13.5942
     Search Direction   5           Step     12               -8.0793
     Search Direction   6           Step     12               -8.0793
-    Search Direction   7           Step     31               -8.0793
+    Search Direction   7           Step     31               -8.1034
     Search Direction   8           Step     15               -8.0793
     Search Direction   9           Step     17               -1.1992
 

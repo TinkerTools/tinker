@@ -96,17 +96,6 @@ c
       end do
       if (nvdw .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nvdw.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual van der Waals Interactions :',
-     &           //,' Type',14x,'Atom Names',20x,'Minimum',
-     &              4x,'Actual',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
@@ -124,6 +113,17 @@ c
       mode = 'VDW'
       call switch (mode)
       expcut = -50.0d0
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -499,17 +499,6 @@ c
       end do
       if (nvdw .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nvdw.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual van der Waals Interactions :',
-     &           //,' Type',14x,'Atom Names',20x,'Minimum',
-     &              4x,'Actual',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
@@ -530,6 +519,17 @@ c
       mode = 'VDW'
       call switch (mode)
       expcut = -50.0d0
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -820,17 +820,6 @@ c
       end do
       if (nvdw .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nvdw.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual van der Waals Interactions :',
-     &           //,' Type',14x,'Atom Names',20x,'Minimum',
-     &              4x,'Actual',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
@@ -849,6 +838,17 @@ c
       call switch (mode)
       expcut = -50.0d0
 c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
+c
 c     apply any reduction factor to the atomic coordinates
 c
       do k = 1, nvdw
@@ -859,6 +859,16 @@ c
          yred(i) = rdn*(y(i)-y(iv)) + y(iv)
          zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
+!$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
+!$OMP& off2,radmin,epsilon,radmin4,epsilon4,ngauss,igauss,cut2,
+!$OMP& c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
+!$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
+!$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c
 c     find the van der Waals energy via neighbor list search
 c
@@ -995,6 +1005,11 @@ c
          end do
       end do
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
@@ -1062,17 +1077,6 @@ c
       end do
       if (nvdw .eq. 0)  return
 c
-c     print header information if debug output was requested
-c
-      header = .true.
-      if (debug .and. nvdw.ne.0) then
-         header = .false.
-         write (iout,10)
-   10    format (/,' Individual van der Waals Interactions :',
-     &           //,' Type',14x,'Atom Names',20x,'Minimum',
-     &              4x,'Actual',6x,'Energy',/)
-      end if
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (iv14(n))
@@ -1084,6 +1088,17 @@ c
          iv14(i) = 0
          vscale(i) = 1.0d0
       end do
+c
+c     print header information if debug output was requested
+c
+      header = .true.
+      if (debug .and. nvdw.ne.0) then
+         header = .false.
+         write (iout,10)
+   10    format (/,' Individual van der Waals Interactions :',
+     &           //,' Type',14x,'Atom Names',20x,'Minimum',
+     &              4x,'Actual',6x,'Energy',/)
+      end if
 c
 c     set the extent of smoothing to be performed
 c

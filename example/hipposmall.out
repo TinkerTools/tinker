@@ -1,0 +1,70 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.5  June 2018                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2018               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha        Damp     Group Atom Types
+
+       441               0.795       0.390         442
+       442               0.341       0.390         441
+
+ Additional CT-Charge Parameters :
+
+     Atom Class           C6
+        34           1326.0000
+        35              0.0000
+
+ Additional CT Damping Parameters: 
+
+     Atom Class          Alpha
+        34             40.0000
+        35              3.5582
+
+ Additional C6 Dispersion Parameters :
+
+     Atom Class           C6
+        34             18.7737
+        35              4.5670
+
+ Additional Pauli Size Parameters :
+
+     Atom Class           C6
+        34              2.7104
+        35              2.0037
+
+ Additional Pauli Damping Parameters: 
+
+     Atom Class          Alpha
+        34              4.3097
+        35              4.6450
+
+ Additional Pauli Valence Electron Parameters: 
+
+     Atom Class          Val
+        34              2.4233
+ WARNING! This is Einter only valid for 1 group molecules
+
+ Total Potential Energy :          -1808.70516844 Kcal/mole
+
+ Energy Component Breakdown :           Kcal/mole        Interactions
+
+ Bond Stretching                     166.82637417              432
+ Angle Bending                        88.38712585              216
+ Urey-Bradley                         -4.65865317              216
+ Atomic Multipoles                 -3202.24596604            46159
+ Dispersion                        -1394.17566449                0
+ Pauli Repulsion                    4082.87585483                0
+ Polarization                       -919.32054571              648
+ Extra Energy Terms                 -626.39369388                0

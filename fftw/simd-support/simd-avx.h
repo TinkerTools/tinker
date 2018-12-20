@@ -82,6 +82,20 @@ static inline void STA(R *x, V v, INT ovs, const R *aligned_like)
 
 #if FFTW_SINGLE
 
+#  ifdef _MSC_VER
+     /* Temporarily disable the warning "uninitialized local variable
+	'name' used" and runtime checks for using a variable before it is
+	defined which is erroneously triggered by the LOADL0 / LOADH macros
+	as they only modify VAL partly each. */
+#    ifndef __INTEL_COMPILER
+#      pragma warning(disable : 4700)
+#      pragma runtime_checks("u", off)
+#    endif
+#  endif
+#  ifdef __INTEL_COMPILER
+#    pragma warning(disable : 592)
+#  endif
+
 #define LOADH(addr, val) _mm_loadh_pi(val, (const __m64 *)(addr))
 #define LOADL(addr, val) _mm_loadl_pi(val, (const __m64 *)(addr))
 #define STOREH(addr, val) _mm_storeh_pi((__m64 *)(addr), val)
@@ -107,6 +121,16 @@ static inline V LD(const R *x, INT ivs, const R *aligned_like)
      return v;
 }
 
+#  ifdef _MSC_VER
+#    ifndef __INTEL_COMPILER
+#      pragma warning(default : 4700)
+#      pragma runtime_checks("u", restore)
+#    endif
+#  endif
+#  ifdef __INTEL_COMPILER
+#    pragma warning(default : 592)
+#  endif
+
 static inline void ST(R *x, V v, INT ovs, const R *aligned_like)
 {
      __m128 h = _mm256_extractf128_ps(v, 1);
@@ -129,6 +153,7 @@ static inline void STN2(R *x, V v0, V v1, INT ovs)
     __m128 l0 = _mm256_castps256_ps128(x0);
     __m128 h1 = _mm256_extractf128_ps(x1, 1);
     __m128 l1 = _mm256_castps256_ps128(x1);
+
     *(__m128 *)(x + 3*ovs) = h1;
     *(__m128 *)(x + 2*ovs) = h0;
     *(__m128 *)(x + 1*ovs) = l1;
@@ -227,8 +252,30 @@ static inline V FLIP_RI(V x)
 
 static inline V VCONJ(V x)
 {
-     V pmpm = VLIT(-0.0, 0.0);
-     return VXOR(pmpm, x);
+     /* Produce a SIMD vector[VL] of (0 + -0i). 
+
+        We really want to write this:
+
+           V pmpm = VLIT(-0.0, 0.0);
+
+        but historically some compilers have ignored the distiction
+        between +0 and -0.  It looks like 'gcc-8 -fast-math' treats -0
+        as 0 too.
+      */
+     union uvec {
+          unsigned u[8];
+          V v;
+     };
+     static const union uvec pmpm = {
+#ifdef FFTW_SINGLE
+          { 0x00000000, 0x80000000, 0x00000000, 0x80000000,
+            0x00000000, 0x80000000, 0x00000000, 0x80000000 }
+#else
+          { 0x00000000, 0x00000000, 0x00000000, 0x80000000,
+            0x00000000, 0x00000000, 0x00000000, 0x80000000 }
+#endif
+     };
+     return VXOR(pmpm.v, x);
 }
 
 static inline V VBYI(V x)

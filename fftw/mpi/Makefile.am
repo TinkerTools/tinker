@@ -1,6 +1,7 @@
-AM_CPPFLAGS = -I$(top_srcdir)/kernel -I$(top_srcdir)/dft	\
--I$(top_srcdir)/rdft -I$(top_srcdir)/api -I$(top_srcdir)/tests	\
--I$(top_srcdir)/libbench2
+# -I $(top_srcdir)/api is necessary because fftw3-mpi.h includes
+# "fftw3.h", and we cannot change the latter to "api/fftw3.h" because
+# fftw3-mpi.h is installed in /usr/include.
+AM_CPPFLAGS = -I $(top_srcdir) -I $(top_srcdir)/api
 
 if MPI
 lib_LTLIBRARIES = libfftw3@PREC_SUFFIX@_mpi.la
@@ -80,10 +81,10 @@ smallcheck: mpi-bench$(EXEEXT)
 
 endif
 
-fftw3-mpi.f03: fftw3-mpi.f03.in
+fftw3-mpi.f03: fftw3-mpi.f03.in Makefile
 	sed 's/C_MPI_FINT/@C_MPI_FINT@/' $(srcdir)/fftw3-mpi.f03.in > $@
 
-fftw3l-mpi.f03: fftw3l-mpi.f03.in
+fftw3l-mpi.f03: fftw3l-mpi.f03.in Makefile
 	sed 's/C_MPI_FINT/@C_MPI_FINT@/' $(srcdir)/fftw3l-mpi.f03.in > $@
 
 if MAINTAINER_MODE

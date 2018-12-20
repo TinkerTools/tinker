@@ -28,12 +28,15 @@ c     aebt    stretch-torsion energy partitioned over atoms
 c     aeat    angle-torsion energy partitioned over atoms
 c     aett    torsion-torsion energy partitioned over atoms
 c     aev     van der Waals energy partitioned over atoms
+c     aer     Pauli repulsion energy partitioned over atoms
+c     aedsp   damped dispersion energy partitioned over atoms
 c     aec     charge-charge energy partitioned over atoms
 c     aecd    charge-dipole energy partitioned over atoms
 c     aed     dipole-dipole energy partitioned over atoms
 c     aem     multipole energy partitioned over atoms
 c     aep     polarization energy partitioned over atoms
-c     aer     reaction field energy partitioned over atoms
+c     aect    charge transfer energy partitioned over atoms
+c     aerxf   reaction field energy partitioned over atoms
 c     aes     solvation energy partitioned over atoms
 c     aelf    metal ligand field energy partitioned over atoms
 c     aeg     geometric restraint energy partitioned over atoms
@@ -58,12 +61,15 @@ c
       real*8, allocatable :: aeat(:)
       real*8, allocatable :: aett(:)
       real*8, allocatable :: aev(:)
+      real*8, allocatable :: aer(:)
+      real*8, allocatable :: aedsp(:)
       real*8, allocatable :: aec(:)
       real*8, allocatable :: aecd(:)
       real*8, allocatable :: aed(:)
       real*8, allocatable :: aem(:)
       real*8, allocatable :: aep(:)
-      real*8, allocatable :: aer(:)
+      real*8, allocatable :: aect(:)
+      real*8, allocatable :: aerxf(:)
       real*8, allocatable :: aes(:)
       real*8, allocatable :: aelf(:)
       real*8, allocatable :: aeg(:)

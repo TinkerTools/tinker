@@ -24,6 +24,7 @@ c
       use warp
       implicit none
       real*8 elrc,vlrc
+      character*6 mode
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -43,7 +44,8 @@ c
 c     apply long range van der Waals correction if desired
 c
       if (use_vcorr) then
-         call evcorr1 (elrc,vlrc)
+         mode = 'VDW'
+         call evcorr1 (mode,elrc,vlrc)
          ev = ev + elrc
          vir(1,1) = vir(1,1) + vlrc
          vir(2,2) = vir(2,2) + vlrc
@@ -73,8 +75,6 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use shunt
       use usage
       use vdw
@@ -279,12 +279,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
                end if
             end if
          end do
@@ -457,10 +451,6 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                     einter = einter + e
                   end if
                end do
             end if
@@ -511,9 +501,7 @@ c
       use deriv
       use energi
       use group
-      use inter
       use light
-      use molcul
       use shunt
       use usage
       use vdw
@@ -781,12 +769,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (.not.prime .or. molcule(i).ne.molcule(k)) then
-                     einter = einter + e
-                  end if
                end if
             end if
    20       continue
@@ -844,8 +826,6 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use neigh
       use shunt
       use usage
@@ -918,9 +898,9 @@ c
 !$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
-!$OMP& cut2,c0,c1,c2,c3,c4,c5,molcule) firstprivate(vscale,iv14)
-!$OMP& shared(ev,dev,vir,einter)
-!$OMP DO reduction(+:ev,dev,vir,einter) schedule(guided)
+!$OMP& cut2,c0,c1,c2,c3,c4,c5) firstprivate(vscale,iv14)
+!$OMP& shared(ev,dev,vir)
+!$OMP DO reduction(+:ev,dev,vir) schedule(guided)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1061,12 +1041,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
                end if
             end if
          end do
@@ -1151,8 +1125,6 @@ c
       use deriv
       use energi
       use group
-      use inter
-      use molcul
       use usage
       use vdw
       use vdwpot
@@ -1352,12 +1324,6 @@ c
                   dev(1,kv) = dev(1,kv) - dedx*redkv
                   dev(2,kv) = dev(2,kv) - dedy*redkv
                   dev(3,kv) = dev(3,kv) - dedz*redkv
-               end if
-c
-c     increment the total intermolecular energy
-c
-               if (molcule(i) .ne. molcule(k)) then
-                  einter = einter + e
                end if
             end if
          end do

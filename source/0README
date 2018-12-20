@@ -23,6 +23,5 @@
 
          In addition, if your system does not support the iargc/getarg
          mechanism for command line arguments, then comment out the
-         call to the subroutine "command" at the bottom of the source
-         file "initial.f".
+         call to the subroutine "command" at the bottom of "initial.f".
 

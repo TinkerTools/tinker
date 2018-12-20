@@ -34,6 +34,12 @@ c
       if (mode(1:3) .eq. 'VDW') then
          off = vdwcut
          cut = vdwtaper
+      else if (mode(1:6) .eq. 'REPULS') then
+         off = repcut
+         cut = reptaper
+      else if (mode(1:4) .eq. 'DISP') then
+         off = dispcut
+         cut = disptaper
       else if (mode(1:6) .eq. 'CHARGE') then
          off = chgcut
          cut = chgtaper
@@ -46,9 +52,15 @@ c
       else if (mode(1:5) .eq. 'MPOLE') then
          off = mpolecut
          cut = mpoletaper
+      else if (mode(1:6) .eq. 'CHGTRN') then
+         off = ctrncut
+         cut = ctrntaper
       else if (mode(1:5) .eq. 'EWALD') then
          off = ewaldcut
          cut = ewaldcut
+      else if (mode(1:6) .eq. 'DEWALD') then
+         off = dewaldcut
+         cut = dewaldcut
       else if (mode(1:6) .eq. 'USOLVE') then
          off = usolvcut
          cut = usolvcut
@@ -59,8 +71,10 @@ c
          off = stcut
          cut = stoff
       else
-         off = min(vdwcut,chgcut,dplcut,mpolecut)
-         cut = min(vdwtaper,chgtaper,dpltaper,mpoletaper)
+         off = min(vdwcut,repcut,dispcut,chgcut,
+     &                dplcut,mpolecut,ctrncut)
+         cut = min(vdwtaper,reptaper,disptaper,chgtaper,
+     &                dpltaper,mpoletaper,ctrntaper)
       end if
 c
 c     test for replicate periodic boundaries at this cutoff

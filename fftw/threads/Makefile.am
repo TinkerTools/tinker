@@ -1,5 +1,4 @@
-AM_CPPFLAGS = -I$(top_srcdir)/kernel -I$(top_srcdir)/dft	\
--I$(top_srcdir)/rdft -I$(top_srcdir)/api
+AM_CPPFLAGS = -I $(top_srcdir)
 AM_CFLAGS = $(STACK_ALIGN_CFLAGS)
 
 if OPENMP
@@ -17,9 +16,6 @@ endif
 else
 lib_LTLIBRARIES = $(FFTWOMPLIB)
 endif
-
-# pkgincludedir = $(includedir)/fftw3@PREC_SUFFIX@
-# pkginclude_HEADERS = threads.h
 
 libfftw3@PREC_SUFFIX@_threads_la_SOURCES = api.c conf.c threads.c	\
 threads.h dft-vrank-geq1.c ct.c rdft-vrank-geq1.c hc2hc.c		\

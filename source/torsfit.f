@@ -457,17 +457,17 @@ c     print torsion flags (check duplicated torsion types)
 c
       do i = 1, ntorfit
          write (iout,160)  i,tflg(i)
-  160    format (/,' Fitting Torsion Number',i5,5x,'Flag',i5,/)
+  160    format (/,' Fitting Torsion Number',i5,5x,'Flag',i5)
          do j = 1, 6
             write (iout,170)  i,j,vflg(j,i)
-  170       format (' Variable',2i5,5x,'Variable Flag',l5)
+  170       format (' Variable',2i4,5x,'Variable Flag',l5)
          end do
       end do
 c
 c     print torsion flags for all the torsions across the bond
 c
       write (iout,180)
-  180 format (/,' All the Torsions Across the Bond :',/)
+  180 format (/,' All the Torsions Across the Bond :')
       do i = 1, ntorcrs
          k = ctorid(i)
          if (cflg(i) .gt. 0) then
@@ -500,7 +500,7 @@ c
             id = torcrs(4,k)
             ftv(i,j) = geometry (ia,ib,ic,id)
             write (iout,200)  i,j,ftv(i,j)
-  200       format (/,' Fitting Torsion Value',1x,2i5,f12.4)
+  200       format (' Fitting Torsion Value',2i5,f12.4)
             if (tflg(j) .eq. 0) then
                kk = kk+1
                tfix(2,otfix+kk) = ftv(i,j)
@@ -539,7 +539,7 @@ c
 c     make the call to the optimization routine
 c
          write (iout,210)  i
-  210    format (' Minimizing Structure',2x,i5)
+  210    format (/,' Minimizing Structure',i6)
          coordtype = 'CARTESIAN'
          use_geom = .true.
          grdmin = 0.01d0
@@ -650,7 +650,7 @@ c     end do
   250 format ()
       do i = 1, nconf
          write (iout,260)  i,fwt(i)
-  260    format (' Conformation',2x,i5,6x,'Weight',f8.4)
+  260    format (' Conformation',i5,5x,'Weight',f8.4)
       end do
 c
 c     set initial values for torsions to be fitted
@@ -741,7 +741,7 @@ c
                         end if
                      end do
                      write (iout,280)  i,ivxx,coeff(i,ivxx)
-  280                format (' Derivative :',5x,2i5,f12.4)
+  280                format (' Derivative :',5x,2i4,f8.4)
                   end if
                end do
             end do
@@ -749,7 +749,7 @@ c
             ivxx = ivxx + 1
             coeff(i,ivxx) = 1.0d0
             write (iout,290)  i,torf(i)
-  290       format (/,' Energy Difference :',i8,f12.4,/)
+  290       format (' Energy Difference :',i8,f12.4)
          end do
 c
 c     set matrix elements for matrix A
@@ -766,9 +766,9 @@ c
 c     print the matrix A elements
 c
          write (iout,300)  nvxx
-  300    format (/,' Number of Variables :',i6)
+  300    format (/,' Total Variable Number ',i8)
          write (iout,310)
-  310    format (/,' Matrix A Elements :',/)
+  310    format (/,' Matrix A Elements :')
          do i = 1, nvxx
             do j = 1, nvxx
                mata(i,j) = tord(i,j)
@@ -935,8 +935,8 @@ c
       end do
       rms = sqrt(rms/dble(nconf))
       write (iout,370)  rms
-  370 format (/,' Energy RMS With Optimized Parmeters :',6x,f12.4)
-      if (rms .gt. zrms) then
+  370 format (/,' Energy RMS With Fitting Parmeters :',8x,f12.4)
+      if (rms .gt. zrms ) then
          write (iout,380)  zrms
   380    format (/,' Annihilating the Torsions is Preferable',
      &           /,' Final RMS :',f12.6,' Kcal/mole',/)
@@ -974,7 +974,7 @@ c
 c     list the valence parameters
 c
       write (ikey,400)
-  400 format (/,'#',/,'# Results of Torsional Parameter Fitting',
+  400 format (/,'#',/,'# Results of Valence Parameter Fitting',
      &        /,'#',/)
       write (iout,410)
   410 format (/,' Optimized Torsional Parameters:',/)
@@ -994,34 +994,15 @@ c
                tors1(1,k) = 0.0d0
                tors2(1,k) = 0.0d0
                tors3(1,k) = 0.0d0
-               tors4(1,k) = 0.0d0
-               tors5(1,k) = 0.0d0
-               tors6(1,k) = 0.0d0
             end if
-            if (tors4(1,k).eq.0.0d0 .and. tors5(1,k).eq.0.0d0
-     &             .and. tors6(1,k).eq.0.0d0) then
-               write (iout,420)  ita,itb,itc,itd,tors1(1,k),
-     &                           tors2(1,k),tors3(1,k)
-  420          format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
-     &                   ' 180.0 2 ', f8.3,' 0.0 3')
-               write (ikey,430)  ita,itb,itc,itd,tors1(1,k),
-     &                           tors2(1,k),tors3(1,k)
-  430          format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
-     &                   ' 180.0 2 ', f8.3,' 0.0 3')
-            else
-               write (iout,440)  ita,itb,itc,itd,tors1(1,k),
-     &                           tors2(1,k),tors3(1,k),tors4(1,k),
-     &                           tors5(1,k),tors6(1,k)
-  440          format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
-     &                   ' 180.0 2 ',f8.3,' 0.0 3',f8.3,' 180.0 4 ',
-     &                   f8.3,' 0.0 5 ',f8.3,' 180.0 6')
-               write (ikey,450)  ita,itb,itc,itd,tors1(1,k),
-     &                           tors2(1,k),tors3(1,k),tors4(1,k),
-     &                           tors5(1,k),tors6(1,k)
-  450          format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
-     &                   ' 180.0 2 ',f8.3,' 0.0 3',f8.3,' 180.0 4 ',
-     &                   f8.3,' 0.0 5 ',f8.3,' 180.0 6')
-            end if
+            write (iout,420)  ita,itb,itc,itd,tors1(1,k),
+     &                        tors2(1,k),tors3(1,k)
+  420       format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
+     &                 ' 180.0 2 ',f8.3,' 0.0 3')
+            write (ikey,430)  ita,itb,itc,itd,tors1(1,k),
+     &                        tors2(1,k),tors3(1,k)
+  430       format (' torsion ',4i4,f8.3,' 0.0 1 ',f8.3,
+     &                 ' 180.0 2 ',f8.3,' 0.0 3')
          end if
       end do
       close (unit=ikey)

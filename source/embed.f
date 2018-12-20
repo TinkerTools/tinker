@@ -2173,7 +2173,7 @@ c
       do i = 1, nvar
          kinetic = kinetic + mass*v(i)**2
       end do
-      kinetic = 0.5d0 * kinetic / convert
+      kinetic = 0.5d0 * kinetic / ekcal
       temp = 2.0d0 * kinetic / (dble(nvar) * gasconst)
       total = error + kinetic
       prior = total
@@ -2213,7 +2213,7 @@ c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
          do i = 1, nvar
-            a(i) = -convert * g(i) / mass
+            a(i) = -ekcal * g(i) / mass
             v(i) = v(i) + a(i)*dt_2
          end do
 c
@@ -2223,7 +2223,7 @@ c
          do i = 1, nvar
             kinetic = kinetic + mass*v(i)**2
          end do
-         kinetic = 0.5d0 * kinetic / convert
+         kinetic = 0.5d0 * kinetic / ekcal
          temp = 2.0d0 * kinetic / (dble(nvar) * gasconst)
          if (temp .eq. 0.0d0)  temp = 0.1d0
 c

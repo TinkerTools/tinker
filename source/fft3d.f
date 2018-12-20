@@ -46,7 +46,10 @@ c
 c     perform dynamic allocation of some global arrays
 c
          maxtable = 4 * max(nfft1,nfft2,nfft3)
-         if (.not. allocated(ffttable))  allocate (ffttable(maxtable,3))
+         if (allocated(ffttable) .and. size(ffttable).ne.maxtable)
+     &      deallocate (ffttable)
+         if (.not. allocated(ffttable))
+     &      allocate (ffttable(maxtable,3))
 c
 c     initialization of Fast Fourier transform using FFTPACK
 c

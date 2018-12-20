@@ -18,7 +18,7 @@
  *
  */
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 const INT X(an_INT_guaranteed_to_be_zero) = 0;
 
@@ -26,7 +26,10 @@ const INT X(an_INT_guaranteed_to_be_zero) = 0;
 stride X(mkstride)(INT n, INT s)
 {
      int i;
-     INT *p = (INT *) MALLOC(n * sizeof(INT), STRIDES);
+     INT *p;
+
+     A(n >= 0);
+     p = (INT *) MALLOC((size_t)n * sizeof(INT), STRIDES);
 
      for (i = 0; i < n; ++i)
           p[i] = s * i;

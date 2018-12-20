@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  module polopt  --  induced dipoles via OPT extrapolation  ##        
+c     ##  module polopt  --  induced dipoles for OPT extrapolation  ##        
 c     ##                                                            ##
 c     ################################################################
 c
@@ -29,7 +29,7 @@ c
       module polopt
       implicit none
       integer maxopt
-      parameter (maxopt=4)
+      parameter (maxopt=6)
       integer coptmax
       integer optlevel
       real*8, allocatable :: copt(:)

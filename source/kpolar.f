@@ -20,7 +20,7 @@ c
 c     A. C. Simmonett, F. C. Pickard IV, J. W. Ponder and B. R. Brooks,
 c     "An Empirical Extrapolation Scheme for Efficient Treatment of
 c     Induced Dipoles", Journal of Chemical Physics, 145, 164101 (2016)
-c     [OPT coefficients]
+c     [OPT method]
 c
 c     F. Aviat, L. Lagardere and J.-P. Piquemal, "The Truncated
 c     Conjugate Gradient (TCG), a Non-Iterative/Fixed-Cost Strategy for
@@ -31,10 +31,12 @@ c
 c
       subroutine kpolar
       use atoms
+      use chgpen
       use inform
       use iounit
       use keys
       use kpolr
+      use mplpot
       use mpole
       use neigh
       use polar
@@ -44,13 +46,15 @@ c
       use poltcg
       use potent
       implicit none
-      integer i,j,k,next
+      integer i,j,k
+      integer next,size
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
       real*8 pol,thl
       real*8 sixth
       logical header
+      character*1 digit
       character*20 keyword
       character*240 record
       character*240 string
@@ -103,23 +107,38 @@ c
       end do
       if (poltyp .eq. 'OPT   ')  poltyp = 'OPT4  '
       if (poltyp .eq. 'OPT1  ') then
-         copt(0) = 0.412d0
-         copt(1) = 0.784d0
+         copt(0) = 0.530d0
+         copt(1) = 0.604d0
       else if (poltyp .eq. 'OPT2  ') then
-         copt(0) = -0.115d0
-         copt(1) = 0.568d0
-         copt(2) = 0.608d0
+         copt(0) = 0.042d0
+         copt(1) = 0.635d0
+         copt(2) = 0.414d0
       else if (poltyp .eq. 'OPT3  ') then
-         copt(0) = -0.154d0
-         copt(1) = 0.017d0
-         copt(2) = 0.657d0
-         copt(3) = 0.475d0
+         copt(0) = -0.132d0
+         copt(1) = 0.218d0
+         copt(2) = 0.637d0
+         copt(3) = 0.293d0
       else if (poltyp .eq. 'OPT4  ') then
-         copt(0) = -0.041d0
-         copt(1) = -0.176d0
-         copt(2) = 0.169d0
-         copt(3) = 0.663d0
-         copt(4) = 0.374d0
+         copt(0) = -0.071d0
+         copt(1) = -0.096d0
+         copt(2) = 0.358d0
+         copt(3) = 0.587d0
+         copt(4) = 0.216d0
+      else if (poltyp .eq. 'OPT5  ') then
+         copt(0) = -0.005d0
+         copt(1) = -0.129d0
+         copt(2) = -0.026d0
+         copt(3) = 0.465d0
+         copt(4) = 0.528d0
+         copt(5) = 0.161d0
+      else if (poltyp .eq. 'OPT6  ') then
+         copt(0) = 0.014d0
+         copt(1) = -0.041d0
+         copt(2) = -0.172d0
+         copt(3) = 0.073d0
+         copt(4) = 0.535d0
+         copt(5) = 0.467d0
+         copt(6) = 0.122d0
       end if
 c
 c     get keywords containing polarization-related options
@@ -172,10 +191,9 @@ c
          do i = 1, maxopt
             if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
          end do
-         if (coptmax .eq. 1)  poltyp = 'OPT1  '
-         if (coptmax .eq. 2)  poltyp = 'OPT2  '
-         if (coptmax .eq. 3)  poltyp = 'OPT3  '
-         if (coptmax .eq. 4)  poltyp = 'OPT4  '
+         size = 1
+         call numeral (coptmax,digit,size)
+         poltyp = 'OPT'//digit//'  '
          do i = 0, coptmax
             do j = coptmax, i, -1
                copm(i) = copm(i) + copt(j)
@@ -185,6 +203,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
+      if (allocated(ipolar))  deallocate (ipolar)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
       if (allocated(pdamp))  deallocate (pdamp)
@@ -193,6 +212,7 @@ c
       if (allocated(uind))  deallocate (uind)
       if (allocated(uinp))  deallocate (uinp)
       if (allocated(douind))  deallocate (douind)
+      allocate (ipolar(n))
       allocate (polarity(n))
       allocate (thole(n))
       allocate (pdamp(n))
@@ -261,35 +281,50 @@ c
             end do
             call getnumb (record,k,next)
             string = record(next:240)
-            read (string,*,err=30,end=30)  pol,thl,(pg(j),j=1,maxval)
+            read (string,*,err=30,end=40)  pol,(pg(j),j=1,maxval)
+            goto 40
    30       continue
+            read (string,*,err=40,end=40)  pol,thl,(pg(j),j=1,maxval)
+   40       continue
             if (k .gt. 0) then
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,40)
-   40             format (/,' Additional Atomic Dipole',
-     &                       ' Polarizability Parameters :',
-     &                    //,5x,'Atom Type',11x,'Alpha',8x,
-     &                       'Damp',5x,'Group Atom Types',/)
+                  write (iout,50)
+   50             format (/,' Additional Atomic Dipole',
+     &                       ' Polarizability Parameters :')
+                  if (thl .ge. 0.0d0) then
+                     write (iout,60)
+   60                format (/,5x,'Atom Type',11x,'Alpha',7x,
+     &                          'Thole',5x,'Group Atom Types',/)
+                  else
+                     write (iout,70)
+   70                format (/,5x,'Atom Type',11x,'Alpha',5x,
+     &                          'Group Atom Types',/)
+                  end if
                end if
                if (k .le. maxtyp) then
                   polr(k) = pol
-                  athl(k) = thl
+                  athl(k) = max(0.0d0,thl)
                   do j = 1, maxval
                      pgrp(j,k) = pg(j)
                      if (pg(j) .eq. 0) then
                         npg = j - 1
-                        goto 50
+                        goto 80
                      end if
                   end do
-   50             continue
+   80             continue
                   if (.not. silent) then
-                     write (iout,60)  k,pol,thl,(pg(j),j=1,npg)
-   60                format (4x,i6,10x,f10.3,2x,f10.3,7x,20i5)
+                     if (thl .ge. 0.0d0) then
+                        write (iout,90)  k,pol,thl,(pg(j),j=1,npg)
+   90                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
+                     else
+                        write (iout,100)  k,pol,(pg(j),j=1,npg)
+  100                   format (6x,i6,8x,f10.3,7x,20i5)
+                     end if
                   end if
                else
-                  write (iout,70)
-   70             format (/,' KPOLAR  --  Too many Dipole',
+                  write (iout,110)
+  110             format (/,' KPOLAR  --  Too many Dipole',
      &                       ' Polarizability Parameters')
                   abort = .true.
                end if
@@ -315,26 +350,37 @@ c
          if (keyword(1:9) .eq. 'POLARIZE ') then
             k = 0
             pol = 0.0d0
-            thl = 0.0d0
+            thl = -1.0d0
             call getnumb (record,k,next)
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
                string = record(next:240)
-               read (string,*,err=80,end=80)  pol,thl
-   80          continue
+               read (string,*,err=120,end=120)  pol,thl
+  120          continue
                if (header) then
                   header = .false.
-                  write (iout,90)
-   90             format (/,' Additional Dipole Polarizabilities',
-     &                       ' for Specific Atoms :',
-     &                    //,6x,'Atom',15x,'Alpha',8x,'Damp',/)
+                  write (iout,130)
+  130             format (/,' Additional Dipole Polarizabilities',
+     &                       ' for Specific Atoms :')
+                  if (thl .ge. 0.0d0) then
+                     write (iout,140)
+  140                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
+                  else
+                     write (iout,150)
+  150                format (/,6x,'Atom',15x,'Alpha',/)
+                  end if
                end if
                if (.not. silent) then
-                  write (iout,100)  k,pol,thl
-  100             format (4x,i6,10x,f10.3,2x,f10.3)
+                  if (thl .ge. 0.0d0) then
+                     write (iout,160)  k,pol,thl
+  160                format (6x,i6,8x,f10.3,2x,f10.3)
+                  else
+                     write (iout,170)  k,pol
+  170                format (6x,i6,8x,f10.3)
+                  end if
                end if
                polarity(k) = pol
-               thole(k) = thl
+               thole(k) = max(0.0d0,thl)
             end if
          end if
       end do
@@ -357,7 +403,14 @@ c
                do k = 1, maxpole
                   pole(k,npole) = pole(k,i)
                end do
-               if (polarity(i) .ne. 0.0d0)  npolar = npolar + 1
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               palpha(npole) = palpha(i)
+               if (polarity(i) .ne. 0.0d0) then
+                  npolar = npolar + 1
+                  ipolar(npolar) = npole
+               end if
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
             end if
@@ -383,10 +436,12 @@ c     test multipoles at chiral sites and invert if necessary
 c
       call chkpole
 c
-c     turn off polarizable multipole potential if it is not used
+c     turn off polarizable multipole potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
+      if (ncp .ne. 0)  use_chgpen = .true.
       if (npolar .eq. 0)  use_polar = .false.
+      if (use_polar .and. ncp.eq.0)  use_thole = .true.
 c
 c     perform dynamic allocation of some global arrays
 c

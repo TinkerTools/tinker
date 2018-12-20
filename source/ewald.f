@@ -12,13 +12,17 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     aewald     Ewald convergence coefficient value (Ang-1)
+c     aewald     current value of Ewald convergence coefficient
+c     aeewald    Ewald convergence coefficient for electrostatics
+c     adewald    Ewald convergence coefficient for dispersion
 c     boundary   Ewald boundary condition; none, tinfoil or vacuum
 c
 c
       module ewald
       implicit none
       real*8 aewald
+      real*8 aeewald
+      real*8 adewald
       character*7 boundary
       save
       end

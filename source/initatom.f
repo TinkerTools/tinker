@@ -18,15 +18,11 @@ c
 c     literature references:
 c
 c     A. Bondi, van der Waals Volumes and Radii, Journal of Physical
-c     Chemistry, 68, 441-451 (1964)
+c     Chemistry, 68, 441-451 (1964)  [original vdw radii; not used]
 c
-c     M. Mantina. A. C. Chamberlin, R. Valero, C. J. Cramer and
-c     D. J. Truhlar, "Consistent van der Waals Radii for the Whole
-c     Main Group", Journal of Physical Chemistry A, 113, 5806-5812
-c     (2009)  [extension of Bondi vdw radii to full main group]
-c
-c     S. S. Batsonov, "Van der Waals Radii of Elements", Inorganic
-c     Materials, 37, 1031-1047 (2001)  [vdw radii for metals]
+c     S. Alvarez, "A Cartography of the van der Waals Territories",
+c     Dalton Transactions, 42, 8617-8636 (2013)  [vdw radii for most
+c     elements 1-99]
 c
 c     B. Cordero, V. Gomez. A. E. Platero-Prats, M. Reves,
 c     J. Echeverria, E. Cremades, F. Barragan and S. Alverez,
@@ -67,23 +63,23 @@ c
 c
 c     van der Waals radii for the elements (Angstroms)
 c
-      data vrad  / 1.20d0, 1.40d0, 1.81d0, 1.53d0, 1.92d0, 1.70d0,
-     &             1.55d0, 1.52d0, 1.47d0, 1.54d0, 2.27d0, 1.73d0,
-     &             1.84d0, 2.10d0, 1.80d0, 1.80d0, 1.75d0, 1.88d0,
-     &             2.75d0, 2.31d0, 1.98d0, 1.80d0, 1.72d0, 1.67d0,
-     &             1.66d0, 1.65d0, 1.64d0, 1.63d0, 1.73d0, 1.77d0,
-     &             1.87d0, 2.11d0, 1.85d0, 1.90d0, 1.83d0, 2.02d0,
-     &             3.03d0, 2.49d0, 2.02d0, 1.96d0, 1.86d0, 1.76d0,
-     &             1.73d0, 1.81d0, 1.75d0, 1.86d0, 1.77d0, 1.98d0,
-     &             1.93d0, 2.17d0, 2.06d0, 2.06d0, 1.98d0, 2.16d0,
-     &             3.43d0, 2.68d0, 2.29d0, 0.00d0, 0.00d0, 0.00d0,
-     &             0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0,
-     &             0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0, 1.94d0,
-     &             1.87d0, 1.77d0, 1.75d0, 1.83d0, 1.77d0, 1.87d0,
-     &             1.86d0, 1.98d0, 1.96d0, 2.02d0, 2.07d0, 1.97d0,
-     &             2.02d0, 2.20d0, 3.48d0, 2.83d0, 0.00d0, 2.20d0,
-     &             0.00d0, 2.14d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0,
-     &             0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0,
+      data vrad  / 1.20d0, 1.43d0, 2.12d0, 1.98d0, 1.91d0, 1.77d0,
+     &             1.66d0, 1.50d0, 1.46d0, 1.58d0, 2.50d0, 2.51d0,
+     &             2.25d0, 2.19d0, 1.90d0, 1.89d0, 1.82d0, 1.83d0,
+     &             2.73d0, 2.62d0, 2.58d0, 2.46d0, 2.42d0, 2.45d0,
+     &             2.45d0, 2.44d0, 2.40d0, 2.40d0, 2.38d0, 2.39d0,
+     &             2.32d0, 2.29d0, 1.88d0, 1.82d0, 1.86d0, 2.25d0,
+     &             3.21d0, 2.84d0, 2.75d0, 2.52d0, 2.56d0, 2.45d0,
+     &             2.44d0, 2.46d0, 2.44d0, 2.15d0, 2.53d0, 2.49d0,
+     &             2.43d0, 2.42d0, 2.47d0, 1.99d0, 2.04d0, 2.06d0,
+     &             3.48d0, 3.03d0, 2.98d0, 2.88d0, 2.92d0, 2.95d0,
+     &             0.00d0, 2.90d0, 2.87d0, 2.83d0, 2.79d0, 2.87d0,
+     &             2.81d0, 2.83d0, 2.79d0, 2.80d0, 2.74d0, 2.63d0,
+     &             2.53d0, 2.57d0, 2.49d0, 2.48d0, 2.41d0, 2.29d0,
+     &             2.32d0, 2.45d0, 2.47d0, 2.60d0, 2.54d0, 0.00d0,
+     &             0.00d0, 0.00d0, 0.00d0, 0.00d0, 2.80d0, 2.93d0,
+     &             2.88d0, 2.71d0, 2.82d0, 2.81d0, 2.83d0, 3.05d0,
+     &             3.40d0, 3.05d0, 2.70d0, 0.00d0, 0.00d0, 0.00d0,
      &             0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0,
      &             0.00d0, 0.00d0, 0.00d0, 0.00d0 /
 c

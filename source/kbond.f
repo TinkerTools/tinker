@@ -73,17 +73,17 @@ c
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Bond Stretching Parameters :',
-     &                    //,5x,'Atom Classes',9x,'K(S)',6x,'Length',/)
+     &                    //,5x,'Atom Classes',13x,'K(S)',9x,'Length',/)
                end if
                if (iring .eq. 0) then
                   write (iout,30)  ia,ib,fc,bd
-   30             format (6x,2i4,4x,f12.3,f12.4)
+   30             format (6x,2i4,5x,f15.3,f15.4)
                else
                   if (iring .eq. 5)  label = '5-Ring'
                   if (iring .eq. 4)  label = '4-Ring'
                   if (iring .eq. 3)  label = '3-Ring'
                   write (iout,40)  ia,ib,fc,bd,label
-   40             format (6x,2i4,4x,f12.3,f12.4,3x,a6)
+   40             format (6x,2i4,5x,f15.3,f15.4,3x,a6)
                end if
             end if
             size = 4

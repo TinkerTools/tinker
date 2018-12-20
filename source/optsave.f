@@ -43,8 +43,7 @@ c
       integer ncycle,nvar
       integer freeunit
       integer trimtext
-      real*8 f,wt
-      real*8 xx(*)
+      real*8 f,xx(*)
       logical exist
       character*7 ext
       character*240 optfile
@@ -153,7 +152,6 @@ c
          write (ifrc,250)  n,title(1:ltitle)
   250    format (i6,2x,a)
          do i = 1, n
-            wt = mass(i) / convert
             write (ifrc,260)  i,name(i),(-desum(j,i),j=1,3)
   260       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
          end do

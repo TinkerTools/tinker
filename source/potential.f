@@ -81,6 +81,7 @@ c
       dopair = .false.
       dotarget = .false.
       dofit = .false.
+      resp = 0.0d0
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -290,6 +291,10 @@ c
                nflist = nflist + 1
                flist(nflist) = max(-namax,min(namax,flist(nflist)))
             end do
+         else if (keyword(1:12) .eq. 'RESP-WEIGHT ') then
+            resp = 10.0d0
+            read (string,*,err=195,end=195)  resp
+  195       continue
          else if (keyword(1:13) .eq. 'FIX-MONOPOLE ') then
             fit_mpl = .false.
          else if (keyword(1:11) .eq. 'FIX-DIPOLE ') then
@@ -578,6 +583,7 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (dofit) then
+         allocate (fit0(12*nconf*namax))
          allocate (fchg(maxtyp))
          allocate (fpol(13,maxtyp))
          allocate (fitchg(maxtyp))
@@ -604,6 +610,9 @@ c
             call getref (j)
             call setelect
             call prmvar (nvar,xx)
+         end do
+         do j = 1, nvar
+            fit0(j) = xx(j)
          end do
          hguess = 1.0d-4
          coordtype = 'NONE'
@@ -1134,8 +1143,10 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "potfit1" is a service routine that computes the RMS error
-c     and gradient for electrostatic parameters fit to a potential
+c     "potfit1" computes the RMS error and gradient for electrostatic
+c     parameters fit to a potential including restraints to integer
+c     charge values, targets for dipole and quadrupole moments, and
+c     to minimize change from initial parameter values
 c
 c
       function potfit1 (xx,g)
@@ -1147,12 +1158,12 @@ c
       implicit none
       integer i,j,k,m
       integer nvar,npoint
-      real*8 potfit1
-      real*8 pot,eps
-      real*8 e,e0
-      real*8 er,ec,et
+      real*8 potfit1,pot
+      real*8 e,e0,eps
+      real*8 ep,er,ec,et
       real*8 xi,yi,zi
-      real*8 cscale,tscale
+      real*8 rscale,cscale
+      real*8 tscale
       real*8 xx(*)
       real*8 g(*)
 c
@@ -1163,16 +1174,21 @@ c
       do j = 1, nconf
          npoint = npoint + npgrid(j)
       end do
+      rscale = resp
       cscale = 100000000.0d0 / dble(nconf)
       tscale = 10000.0d0 / dble(nconf)
       eps = 0.000001d0
 c
-c     find total error by cycling over all conformations
+c     set number of parameters and objective function components
 c
+      nvar = 0
+      ep = 0.0d0
       er = 0.0d0
       ec = 0.0d0
       et = 0.0d0
-      nvar = 0
+c
+c     find total objective value by cycling over conformations
+c
       do j = 1, maxtyp
          fitchg(j) = .false.
          fitpol(j) = .false.
@@ -1191,10 +1207,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP    PARALLEL default(private) shared(j,npgrid,pgrid,epot,er)
-!$OMP    DO reduction(+:er) schedule(guided)
+!$OMP    PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
+!$OMP    DO reduction(+:ep) schedule(guided)
 c
-c     get the RMS potential error summed over grid points
+c     get the summed potential error over grid points
 c
          do i = 1, npgrid(j)
             xi = pgrid(1,i,j)
@@ -1202,7 +1218,7 @@ c
             zi = pgrid(3,i,j)
             call potpoint (xi,yi,zi,pot)
             epot(1,i,j) = pot
-            er = er + (epot(1,i,j)-epot(2,i,j))**2
+            ep = ep + (epot(1,i,j)-epot(2,i,j))**2
          end do
 c
 c     OpenMP directives for the major loop structure
@@ -1213,35 +1229,51 @@ c
 c     get deviation from integral net molecular charge
 c
          call momfull
-         ec = ec + cscale*(netchg-dble(nint(netchg)))**2
+         ec = ec + (netchg-dble(nint(netchg)))**2
 c
 c     get deviation from dipole and quadrupole targets
 c
          if (use_dpl) then
-            et = et + tscale*(xdpl-xdpl0(j))**2
-            et = et + tscale*(ydpl-ydpl0(j))**2
-            et = et + tscale*(zdpl-zdpl0(j))**2
+            et = et + (xdpl-xdpl0(j))**2
+            et = et + (ydpl-ydpl0(j))**2
+            et = et + (zdpl-zdpl0(j))**2
          end if
          if (use_qdp) then
-            et = et + tscale*(xxqdp-xxqdp0(j))**2
-            et = et + tscale*(xyqdp-xyqdp0(j))**2
-            et = et + tscale*(xzqdp-xzqdp0(j))**2
-            et = et + tscale*(yyqdp-yyqdp0(j))**2
-            et = et + tscale*(yzqdp-yzqdp0(j))**2
-            et = et + tscale*(zzqdp-zzqdp0(j))**2
+            et = et + (xxqdp-xxqdp0(j))**2
+            et = et + (xyqdp-xyqdp0(j))**2
+            et = et + (xzqdp-xzqdp0(j))**2
+            et = et + (yyqdp-yyqdp0(j))**2
+            et = et + (yzqdp-yzqdp0(j))**2
+            et = et + (zzqdp-zzqdp0(j))**2
          end if
       end do
-      er = sqrt(er/dble(npoint))
-      potfit1 = er + ec + et
+c
+c     get the error due to change from initial parameters
+c
+      do i = 1, nvar
+         er = er + (xx(i)-fit0(i))**2
+      end do
+c
+c     get the components of the overall objective function
+c
+      ep = sqrt(ep/dble(npoint))
+      er = rscale * er
+      ec = cscale * ec
+      et = tscale * et
+c
+c     find value of the total objective function for fitting
+c
+      potfit1 = ep + er + ec + et
 c
 c     compute numerical gradient for electrostatic parameters
 c
       m = nvar
       do k = 1, m
+         nvar = 0
+         ep = 0.0d0
          er = 0.0d0
          ec = 0.0d0
          et = 0.0d0
-         nvar = 0
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
@@ -1257,40 +1289,48 @@ c
                call nblist
                call induce
             end if
-!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,er)
-!$OMP       DO reduction(+:er) schedule(guided)
+!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
+!$OMP       DO reduction(+:ep) schedule(guided)
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
                zi = pgrid(3,i,j)
                call potpoint (xi,yi,zi,pot)
                epot(1,i,j) = pot
-               er = er + (epot(1,i,j)-epot(2,i,j))**2
+               ep = ep + (epot(1,i,j)-epot(2,i,j))**2
             end do
 !$OMP       END DO
 !$OMP       END PARALLEL
             call momfull
-            ec = ec + cscale*(netchg-dble(nint(netchg)))**2
+            ec = ec + (netchg-dble(nint(netchg)))**2
             if (use_dpl) then
-               et = et + tscale*(xdpl-xdpl0(j))**2
-               et = et + tscale*(ydpl-ydpl0(j))**2
-               et = et + tscale*(zdpl-zdpl0(j))**2
+               et = et + (xdpl-xdpl0(j))**2
+               et = et + (ydpl-ydpl0(j))**2
+               et = et + (zdpl-zdpl0(j))**2
             end if
             if (use_qdp) then
-               et = et + tscale*(xxqdp-xxqdp0(j))**2
-               et = et + tscale*(xyqdp-xyqdp0(j))**2
-               et = et + tscale*(xzqdp-xzqdp0(j))**2
-               et = et + tscale*(yyqdp-yyqdp0(j))**2
-               et = et + tscale*(yzqdp-yzqdp0(j))**2
-               et = et + tscale*(zzqdp-zzqdp0(j))**2
+               et = et + (xxqdp-xxqdp0(j))**2
+               et = et + (xyqdp-xyqdp0(j))**2
+               et = et + (xzqdp-xzqdp0(j))**2
+               et = et + (yyqdp-yyqdp0(j))**2
+               et = et + (yzqdp-yzqdp0(j))**2
+               et = et + (zzqdp-zzqdp0(j))**2
             end if
          end do
-         er = sqrt(er/dble(npoint))
-         e0 = er + ec + et
+         er = er + (xx(k)-0.5d0*eps-fit0(k))**2
+         ep = sqrt(ep/dble(npoint))
+         er = rscale * er
+         ec = cscale * ec
+         et = tscale * et
+         e0 = ep + er + ec + et
+c
+c     second half of numerical gradient for the parameters
+c
+         nvar = 0
+         ep = 0.0d0
          er = 0.0d0
          ec = 0.0d0
          et = 0.0d0
-         nvar = 0
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
@@ -1306,36 +1346,40 @@ c
                call nblist
                call induce
             end if
-!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,er)
-!$OMP       DO reduction(+:er) schedule(guided)
+!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
+!$OMP       DO reduction(+:ep) schedule(guided)
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
                zi = pgrid(3,i,j)
                call potpoint (xi,yi,zi,pot)
                epot(1,i,j) = pot
-               er = er + (epot(1,i,j)-epot(2,i,j))**2
+               ep = ep + (epot(1,i,j)-epot(2,i,j))**2
             end do
 !$OMP       END DO
 !$OMP       END PARALLEL
             call momfull
-            ec = ec + cscale*(netchg-dble(nint(netchg)))**2
+            ec = ec + (netchg-dble(nint(netchg)))**2
             if (use_dpl) then
-               et = et + tscale*(xdpl-xdpl0(j))**2
-               et = et + tscale*(ydpl-ydpl0(j))**2
-               et = et + tscale*(zdpl-zdpl0(j))**2
+               et = et + (xdpl-xdpl0(j))**2
+               et = et + (ydpl-ydpl0(j))**2
+               et = et + (zdpl-zdpl0(j))**2
             end if
             if (use_qdp) then
-               et = et + tscale*(xxqdp-xxqdp0(j))**2
-               et = et + tscale*(xyqdp-xyqdp0(j))**2
-               et = et + tscale*(xzqdp-xzqdp0(j))**2
-               et = et + tscale*(yyqdp-yyqdp0(j))**2
-               et = et + tscale*(yzqdp-yzqdp0(j))**2
-               et = et + tscale*(zzqdp-zzqdp0(j))**2
+               et = et + (xxqdp-xxqdp0(j))**2
+               et = et + (xyqdp-xyqdp0(j))**2
+               et = et + (xzqdp-xzqdp0(j))**2
+               et = et + (yyqdp-yyqdp0(j))**2
+               et = et + (yzqdp-yzqdp0(j))**2
+               et = et + (zzqdp-zzqdp0(j))**2
             end if
          end do
-         er = sqrt(er/dble(npoint))
-         e = er + ec + et
+         er = er + (xx(k)+0.5d0*eps-fit0(k))**2
+         ep = sqrt(ep/dble(npoint))
+         er = rscale * er
+         ec = cscale * ec
+         et = tscale * et
+         e = ep + er + ec + et
          g(k) = (e-e0) / eps
       end do
       return

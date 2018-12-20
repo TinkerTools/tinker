@@ -534,6 +534,10 @@
       import
     end subroutine fftw_cleanup_threads
     
+    subroutine fftw_make_planner_thread_safe() bind(C, name='fftw_make_planner_thread_safe')
+      import
+    end subroutine fftw_make_planner_thread_safe
+    
     integer(C_INT) function fftw_export_wisdom_to_filename(filename) bind(C, name='fftw_export_wisdom_to_filename')
       import
       character(C_CHAR), dimension(*), intent(in) :: filename
@@ -1136,6 +1140,10 @@
     subroutine fftwf_cleanup_threads() bind(C, name='fftwf_cleanup_threads')
       import
     end subroutine fftwf_cleanup_threads
+    
+    subroutine fftwf_make_planner_thread_safe() bind(C, name='fftwf_make_planner_thread_safe')
+      import
+    end subroutine fftwf_make_planner_thread_safe
     
     integer(C_INT) function fftwf_export_wisdom_to_filename(filename) bind(C, name='fftwf_export_wisdom_to_filename')
       import

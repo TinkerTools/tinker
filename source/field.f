@@ -41,11 +41,14 @@ c
       use_angtor = .true.
       use_tortor = .true.
       use_vdw = .true.
+      use_repuls = .true.
+      use_disp = .true.
       use_charge = .true.
       use_chgdpl = .true.
       use_dipole = .true.
       use_mpole = .true.
       use_polar = .true.
+      use_chgtrn = .true.
       use_rxnfld = .false.
       use_solv = .true.
       use_metal = .false.

@@ -18,6 +18,7 @@ c
 c
       program optimize
       use atoms
+      use bound
       use files
       use inform
       use iounit
@@ -197,6 +198,7 @@ c
 c
 c     write the final coordinates into a file
 c
+      if (use_bounds)  call bounds
       imin = freeunit ()
       open (unit=imin,file=minfile,status='old')
       rewind (unit=imin)

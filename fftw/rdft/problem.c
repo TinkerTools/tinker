@@ -19,7 +19,7 @@
  */
 
 
-#include "rdft.h"
+#include "rdft/rdft.h"
 #include <stddef.h>
 
 static void destroy(problem *ego_)
@@ -45,8 +45,8 @@ static void hash(const problem *p_, md5 *m)
      X(md5puts)(m, "rdft");
      X(md5int)(m, p->I == p->O);
      kind_hash(m, p->kind, p->sz->rnk);
-     X(md5int)(m, X(alignment_of)(p->I));
-     X(md5int)(m, X(alignment_of)(p->O));
+     X(md5int)(m, X(ialignment_of)(p->I));
+     X(md5int)(m, X(ialignment_of)(p->O));
      X(tensor_md5)(m, p->sz);
      X(tensor_md5)(m, p->vecsz);
 }
@@ -96,7 +96,7 @@ static void print(const problem *ego_, printer *p)
      const problem_rdft *ego = (const problem_rdft *) ego_;
      int i;
      p->print(p, "(rdft %d %D %T %T", 
-	      X(alignment_of)(ego->I),
+	      X(ialignment_of)(ego->I),
 	      (INT)(ego->O - ego->I), 
 	      ego->sz,
 	      ego->vecsz);
@@ -158,13 +158,13 @@ problem *X(mkproblem_rdft)(const tensor *sz, const tensor *vecsz,
 #if defined(STRUCT_HACK_KR)
      ego = (problem_rdft *) X(mkproblem)(sizeof(problem_rdft)
 					 + sizeof(rdft_kind)
-					 * (rnk > 0 ? rnk - 1 : 0), &padt);
+					 * (rnk > 0 ? rnk - 1u : 0u), &padt);
 #elif defined(STRUCT_HACK_C99)
      ego = (problem_rdft *) X(mkproblem)(sizeof(problem_rdft)
-					 + sizeof(rdft_kind) * rnk, &padt);
+					 + sizeof(rdft_kind) * (unsigned)rnk, &padt);
 #else
      ego = (problem_rdft *) X(mkproblem)(sizeof(problem_rdft), &padt);
-     ego->kind = (rdft_kind *) MALLOC(sizeof(rdft_kind) * rnk, PROBLEMS);
+     ego->kind = (rdft_kind *) MALLOC(sizeof(rdft_kind) * (unsigned)rnk, PROBLEMS);
 #endif
 
      /* do compression and sorting as in X(tensor_compress), but take

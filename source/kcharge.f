@@ -30,7 +30,7 @@ c
       use potent
       implicit none
       integer i,j,k,m
-      integer ia,next
+      integer ia,it,next
       integer, allocatable :: list(:)
       integer, allocatable :: nc12(:)
       real*8 cg
@@ -59,13 +59,13 @@ c
                   write (iout,10)
    10             format (/,' Additional Atomic Partial Charge',
      &                       ' Parameters :',
-     &                    //,5x,'Atom Type',10x,'Charge',/)
+     &                    //,5x,'Atom Type',14x,'Charge',/)
                end if
                if (ia .le. maxtyp) then
                   chg(ia) = cg
                   if (.not. silent) then
                      write (iout,20)  ia,cg
-   20                format (4x,i6,8x,f12.4)
+   20                format (6x,i6,7x,f15.4)
                   end if
                else
                   write (iout,30)
@@ -92,7 +92,8 @@ c
 c     find and store all the atomic partial charges
 c
       do i = 1, n
-         pchg(i) = chg(type(i))
+         it = type(i)
+         pchg(i) = chg(it)
       end do
 c
 c     use special charge parameter assignment method for MMFF
@@ -119,11 +120,11 @@ c
                   write (iout,50)
    50             format (/,' Additional Partial Charges for',
      &                       ' Specific Atoms :',
-     &                    //,6x,'Atom',14x,'Charge',/)
+     &                    //,8x,'Atom',16x,'Charge',/)
                end if
                if (.not. silent) then
                   write (iout,60)  ia,cg
-   60             format (4x,i6,8x,f12.4)
+   60             format (6x,i6,7x,f15.4)
                end if
                pchg(ia) = cg
             end if

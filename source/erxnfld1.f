@@ -26,10 +26,10 @@ c
 c
 c     zero out macroscopic reaction field energy and derivatives
 c
-      er = 0.0d0
+      erxf = 0.0d0
       do i = 1, n
          do j = 1, 3
-            der(j,i) = 0.0d0
+            derxf(j,i) = 0.0d0
          end do
       end do
       return

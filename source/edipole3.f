@@ -61,6 +61,12 @@ c
       end do
       if (ndipole .eq. 0)  return
 c
+c     set conversion factor and switching function coefficients
+c
+      f = electric / (debye**2 * dielec)
+      mode = 'DIPOLE'
+      call switch (mode)
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -71,12 +77,6 @@ c
      &           //,' Type',15x,'Dipole 1',14x,'Dipole 2',
      &              8x,'Distance',6x,'Energy',/)
       end if
-c
-c     set conversion factor and switching function coefficients
-c
-      f = electric / (debye**2 * dielec)
-      mode = 'DIPOLE'
-      call switch (mode)
 c
 c     compute and partition the dipole interaction energy
 c

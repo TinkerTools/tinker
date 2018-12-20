@@ -403,7 +403,7 @@ c
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
-                  a(j,i) = -convert * derivs(j,i) / mass(i)
+                  a(j,i) = -ekcal * derivs(j,i) / mass(i)
                end do
             else
                do j = 1, 3
@@ -417,7 +417,7 @@ c
             amass = mass(i)
             if (use(i) .and. amass.ne.0.0d0) then
                do j = 1, 3
-                  aalt(j,i) = -convert * derivs(j,i) / amass
+                  aalt(j,i) = -ekcal * derivs(j,i) / amass
                end do
             else
                do j = 1, 3
@@ -440,7 +440,7 @@ c
                call ranvec (vec)
                do j = 1, 3
                   v(j,i) = speed * vec(j)
-                  a(j,i) = -convert * derivs(j,i) / amass
+                  a(j,i) = -ekcal * derivs(j,i) / amass
                   aalt(j,i) = a(j,i)
                end do
             else

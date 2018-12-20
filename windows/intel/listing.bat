@@ -9,4 +9,4 @@ rem  ##                                                             ##
 rem  #################################################################
 rem
 rem
-type *.i *.f *.c > tinker.txt
+type *.f *.c > tinker.txt

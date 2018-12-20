@@ -103,8 +103,8 @@ c
 c
 c     get numerical Hessian from either gradient or energy
 c
+      dograd = .true.
       if (donumer) then
-         dograd = .true.
          call nextarg (answer,exist)
          if (.not. exist) then
             write (iout,50)
@@ -407,13 +407,13 @@ c
             end do
             if (digits .ge. 8) then
                write (iout,290)  sum
-  290          format (/,' Sum of Diagonal Hessian Elements :',6x,f20.8)
+  290          format (/,' Sum of Diagonal Hessian Elements :',8x,f20.8)
             else if (digits .ge. 6) then
                write (iout,300)  sum
-  300          format (/,' Sum of Diagonal Hessian Elements :',6x,f18.6)
+  300          format (/,' Sum of Diagonal Hessian Elements :',8x,f18.6)
             else
                write (iout,310)  sum
-  310          format (/,' Sum of Diagonal Hessian Elements :',6x,f16.4)
+  310          format (/,' Sum of Diagonal Hessian Elements :',8x,f16.4)
             end if
          end if
 c

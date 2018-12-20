@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.5  June 2018                          ##
+ ##                        Version 8.5   October 2018                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2018               ##
  ###                           All Rights Reserved                          ###
@@ -23,15 +23,15 @@
 
  Additional van der Waals Parameters :
 
-     Atom Class          Size      Epsilon     Reduction
+     Atom Class               Size        Epsilon        Reduction
 
-       175              3.3610      0.2824       0.000
+         175                3.3610         0.2824          0.000
 
  Additional Atomic Partial Charge Parameters :
 
-     Atom Type          Charge
+     Atom Type              Charge
 
-       175              0.0000
+         175                0.0000
 
  Enter Number of Annealing Trials [1] :  
  Enter Initial and Final Beta [0.01, 10**10] :  

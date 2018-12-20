@@ -28,12 +28,15 @@ c     ebt    stretch-torsion potential energy of the system
 c     eat    angle-torsion potential energy of the system
 c     ett    torsion-torsion potential energy of the system
 c     ev     van der Waals potential energy of the system
+c     er     Pauli repulsion potential energy of the system
+c     edsp   dampled dispersion potential energy of the system
 c     ec     charge-charge potential energy of the system
 c     ecd    charge-dipole potential energy of the system
 c     ed     dipole-dipole potential energy of the system
 c     em     atomic multipole potential energy of the system
 c     ep     polarization potential energy of the system
-c     er     reaction field potential energy of the system
+c     ect    charge transfer potential energy of the system
+c     erxf   reaction field potential energy of the system
 c     es     solvation potential energy of the system
 c     elf    metal ligand field potential energy of the system
 c     eg     geometric restraint potential energy of the system
@@ -47,9 +50,10 @@ c
       real*8 eopb,eopd,eid
       real*8 eit,et,ept
       real*8 ebt,eat,ett
-      real*8 ev,ec,ecd
-      real*8 ed,em,ep
-      real*8 er,es,elf
+      real*8 ev,er,edsp
+      real*8 ec,ecd,ed
+      real*8 em,ep,ect
+      real*8 erxf,es,elf
       real*8 eg,ex
       save
       end

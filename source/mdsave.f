@@ -212,7 +212,7 @@ c
          write (ifrc,250)  n,title(1:ltitle)
   250    format (i6,2x,a)
          do i = 1, n
-            wt = mass(i) / convert
+            wt = mass(i) / ekcal
             write (ifrc,260)  i,name(i),(wt*a(j,i),j=1,3)
   260       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
          end do

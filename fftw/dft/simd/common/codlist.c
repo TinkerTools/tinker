@@ -1,4 +1,4 @@
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 #include SIMD_HEADER
 
 extern void XSIMD(codelet_n1fv_2)(planner *);

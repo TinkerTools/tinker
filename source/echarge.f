@@ -780,6 +780,7 @@ c
       use ewald
       use group
       use math
+      use pme
       use shunt
       use usage
       implicit none
@@ -792,7 +793,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       character*6 mode
@@ -803,6 +804,14 @@ c     zero out the Ewald charge interaction energy
 c
       ec = 0.0d0
       if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -899,8 +908,8 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy component
 c
@@ -987,8 +996,8 @@ c
                            scale = scale * cscale(kn)
                         end if
                      end if
-                     scaleterm = scale - 1.0d0
-                     e = (fik/rb) * (erfterm+scaleterm)
+                     scale = scale - 1.0d0
+                     e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1046,6 +1055,7 @@ c
       use group
       use light
       use math
+      use pme
       use shunt
       use usage
       implicit none
@@ -1060,7 +1070,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8, allocatable :: cscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -1075,6 +1085,14 @@ c     zero out the Ewald charge interaction energy
 c
       ec = 0.0d0
       if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1233,8 +1251,8 @@ c
                   if (use_polymer) then
                      if (r2 .gt. polycut2)  fik = fi * pchg(kmap)
                   end if
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1299,6 +1317,7 @@ c
       use group
       use math
       use neigh
+      use pme
       use shunt
       use usage
       implicit none
@@ -1311,7 +1330,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale,scaleterm
+      real*8 scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       character*6 mode
@@ -1322,6 +1341,14 @@ c     zero out the Ewald charge interaction energy
 c
       ec = 0.0d0
       if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1427,8 +1454,8 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scaleterm = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scaleterm)
+                  scale = scale - 1.0d0
+                  e = (fik/rb) * (erfterm+scale)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1657,11 +1684,11 @@ c
       use math
       use pme
       implicit none
-      integer i,j,k
+      integer i,j
       integer k1,k2,k3
       integer m1,m2,m3
       integer nf1,nf2,nf3
-      integer nff,npoint
+      integer nff,ntot
       real*8 e,f,denom
       real*8 term,expterm
       real*8 pterm,volterm
@@ -1670,16 +1697,24 @@ c
       real*8 r1,r2,r3
 c
 c
-c     zero out the particle mesh Ewald grid values
+c     return if the Ewald coefficient is zero
 c
-      do k = 1, nfft3
-         do j = 1, nfft2
-            do i = 1, nfft1
-               qgrid(1,i,j,k) = 0.0d0
-               qgrid(2,i,j,k) = 0.0d0
-            end do
-         end do
-      end do
+      if (aewald .lt. 1.0d-6)  return
+      f = 0.5d0 * electric / dielec
+c
+c     perform dynamic allocation of some global arrays
+c
+      ntot = nfft1 * nfft2 * nfft3
+      if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
+     &   deallocate(qgrid)
+      if (.not. allocated(qgrid))
+     &   allocate (qgrid(2,nfft1,nfft2,nfft3))
+c
+c     setup spatial decomposition, B-splines and PME arrays
+c
+      call getchunk
+      call moduli
+      call fftsetup
 c
 c     get B-spline coefficients and put charges onto grid
 c
@@ -1693,15 +1728,14 @@ c
 c
 c     use scalar sum to get the reciprocal space energy
 c
-      f = 0.5d0 * electric / dielec
-      npoint = nfft1 * nfft2 * nfft3
       pterm = (pi/aewald)**2
       volterm = pi * volbox
-      nff = nfft1 * nfft2
       nf1 = (nfft1+1) / 2
       nf2 = (nfft2+1) / 2
       nf3 = (nfft3+1) / 2
-      do i = 1, npoint-1
+      nff = nfft1 * nfft2
+      ntot = nff * nfft3
+      do i = 1, ntot-1
          k3 = i/nff + 1
          j = i - (k3-1)*nff
          k2 = j/nfft1 + 1

@@ -244,12 +244,12 @@ struct {
 
 struct {
    int* n12;
-   int* i12;
    int* n13;
-   int* i13;
    int* n14;
-   int* i14;
    int* n15;
+   int* i12;
+   int* i13;
+   int* i14;
    int* i15;
 } couple__;
 
@@ -270,12 +270,15 @@ struct {
    double* deat;
    double* dett;
    double* dev;
+   double* der;
+   double* dedsp;
    double* dec;
    double* decd;
    double* ded;
    double* dem;
    double* dep;
-   double* der;
+   double* dect;
+   double* derxf;
    double* des;
    double* delf;
    double* deg;
@@ -299,12 +302,15 @@ struct {
    double* eat;
    double* ett;
    double* ev;
+   double* er;
+   double* edsp;
    double* ec;
    double* ecd;
    double* ed;
    double* em;
    double* ep;
-   double* er;
+   double* ect;
+   double* erxf;
    double* es;
    double* elf;
    double* eg;
@@ -313,6 +319,8 @@ struct {
 
 struct {
    double aewald;
+   double aeewald;
+   double adewald;
    char boundary[MAX_STRING];
 } ewald__;
 
@@ -393,19 +401,28 @@ struct {
 
 struct {
    double vdwcut;
+   double repcut;
+   double dispcut;
    double chgcut;
    double dplcut;
    double mpolecut;
+   double ctrncut;
    double vdwtaper;
+   double reptaper;
+   double disptaper;
    double chgtaper;
    double dpltaper;
    double mpoletaper;
+   double ctrntaper;
    double ewaldcut;
+   double dewaldcut;
    double usolvcut;
    int use_ewald;
+   int use_dewald;
    int use_lights;
    int use_list;
    int use_vlist;
+   int use_dlist;
    int use_clist;
    int use_mlist;
    int use_ulist;
@@ -421,12 +438,6 @@ struct {
 } mdstuf__;
 
 struct {
-   double* v;
-   double* a;
-   double* aalt;
-} moldyn__;
-
-struct {
    int nmol;
    int* imol;
    int* kmol;
@@ -436,10 +447,17 @@ struct {
 } molcul__;
 
 struct {
+   double* v;
+   double* a;
+   double* aalt;
+} moldyn__;
+
+struct {
    double m2scale;
    double m3scale;
    double m4scale;
    double m5scale;
+   int use_chgpen;
 } mplpot__;
 
 struct {
@@ -453,6 +471,8 @@ struct {
    int* yaxis;
    double* pole;
    double* rpole;
+   double* spole;
+   double* srpole;
    char* polaxe;
 } mpole__;
 
@@ -514,7 +534,15 @@ struct {
    int nfft1;
    int nfft2;
    int nfft3;
+   int nefft1;
+   int nefft2;
+   int nefft3;
+   int ndfft1;
+   int ndfft2;
+   int ndfft3;
    int bsorder;
+   int bseorder;
+   int bsdorder;
    int* igrid;
    double* bsmod1;
    double* bsmod2;
@@ -589,7 +617,12 @@ struct {
    double u2scale;
    double u3scale;
    double u4scale;
+   double w2scale;
+   double w3scale;
+   double w4scale;
+   double w5scale;
    double udiag;
+   int use_thole;
    char poltyp[MAX_STRING];
 } polpot__;
 
@@ -609,11 +642,14 @@ struct {
    int use_angtor;
    int use_tortor;
    int use_vdw;
+   int use_repuls;
+   int use_disp;
    int use_charge;
    int use_chgdpl;
    int use_dipole;
    int use_mpole;
    int use_polar;
+   int use_chgtrn;
    int use_rxnfld;
    int use_solv;
    int use_metal;
@@ -739,10 +775,12 @@ struct {
    double lightspd;
    double boltzmann;
    double gasconst;
+   double elemchg;
+   double vacperm;
    double emass;
    double planck;
    double joule;
-   double convert;
+   double ekcal;
    double bohr;
    double hartree;
    double evolt;
@@ -902,7 +940,6 @@ void set_atomid_data_ (int* tag, int* classs, int* atomic, int* valence,
 
 void set_atoms_data_ (int* n, int* type, double* x, double* y, double* z) {
 
-   int ii;
    atoms__.n = *n;
    atoms__.type = type;
    atoms__.x = x;
@@ -1065,16 +1102,16 @@ void set_chgpot_data_ (double* electric, double* dielec, double* ebuffer,
    chgpot__.neutcut = *neutcut;
 }
 
-void set_couple_data_ (int* n12, int* i12, int* n13, int* i13,
-                       int* n14, int* i14, int* n15, int* i15) {
+void set_couple_data_ (int* n12, int* n13, int* n14, int* n15,
+                       int* i12, int* i13, int* i14, int* i15) {
 
    couple__.n12 = n12;
-   couple__.i12 = i12;
    couple__.n13 = n13;
-   couple__.i13 = i13;
    couple__.n14 = n14;
-   couple__.i14 = i14;
    couple__.n15 = n15;
+   couple__.i12 = i12;
+   couple__.i13 = i13;
+   couple__.i14 = i14;
    couple__.i15 = i15;
 }
 
@@ -1083,9 +1120,10 @@ void set_deriv_data_ (double* desum, double* deb, double* dea,
                       double* deopb, double* deopd, double* deid,
                       double* deit, double* det, double* dept,
                       double* debt, double* deat, double* dett,
-                      double* dev, double* dec, double* decd,
-                      double* ded, double* dem, double* dep,
-                      double* der, double* des, double* delf,
+                      double* dev, double* der, double* dedsp,
+                      double* dec, double* decd, double* ded,
+                      double* dem, double* dep, double* dect,
+                      double* derxf, double* des, double* delf,
                       double* deg, double* dex) {
 
    deriv__.desum = desum;
@@ -1104,12 +1142,15 @@ void set_deriv_data_ (double* desum, double* deb, double* dea,
    deriv__.deat = deat;
    deriv__.dett = dett;
    deriv__.dev = dev;
+   deriv__.der = der;
+   deriv__.dedsp = dedsp;
    deriv__.dec = dec;
    deriv__.decd = decd;
    deriv__.ded = ded;
    deriv__.dem = dem;
    deriv__.dep = dep;
-   deriv__.der = der;
+   deriv__.dect = dect;
+   deriv__.derxf = derxf;
    deriv__.des = des;
    deriv__.delf = delf;
    deriv__.deg = deg;
@@ -1121,9 +1162,10 @@ void set_energi_data_ (double* esum, double* eb, double* ea,
                        double* eopb, double* eopd, double* eid,
                        double* eit, double* et, double* ept,
                        double* ebt, double* eat, double* ett,
-                       double* ev, double* ec, double* ecd,
-                       double* ed, double* em, double* ep,
-                       double* er, double* es, double* elf,
+                       double* ev, double* er, double* edsp,
+                       double* ec, double* ecd, double* ed,
+                       double* em, double* ep, double* ect,
+                       double* erxf, double* es, double* elf,
                        double* eg, double* ex) {
 
    energi__.esum = esum;
@@ -1142,21 +1184,27 @@ void set_energi_data_ (double* esum, double* eb, double* ea,
    energi__.eat = eat;
    energi__.ett = ett;
    energi__.ev = ev;
+   energi__.er = er;
+   energi__.edsp = edsp;
    energi__.ec = ec;
    energi__.ecd = ecd;
    energi__.ed = ed;
    energi__.em = em;
    energi__.ep = ep;
-   energi__.er = er;
+   energi__.ect = ect;
+   energi__.erxf = erxf;
    energi__.es = es;
    energi__.elf = elf;
    energi__.eg = eg;
    energi__.ex = ex;
 }
 
-void set_ewald_data_ (double* aewald, char* boundary) {
+void set_ewald_data_ (double* aewald, double* aeewald, double* adewald,
+                      char* boundary) {
 
    ewald__.aewald = *aewald;
+   ewald__.aeewald = *aeewald;
+   ewald__.adewald = *adewald;
    setNullTerminator (boundary, 7, ewald__.boundary);
 }
 
@@ -1235,6 +1283,15 @@ void set_ktrtor_data_ (int* maxntt, int* maxtgrd, int* maxtgrd2,
    ktrtor__.ktt = ktt;
 }
 
+void set_kvdwpr_data_ (int* maxnvp, double* radpr, double* epspr,
+                       char* kvpr) {
+
+   kvdwpr__.maxnvp = *maxnvp;
+   kvdwpr__.radpr = radpr;
+   kvdwpr__.epspr = epspr;
+   kvdwpr__.kvpr = kvpr;
+}
+
 void set_kvdws_data_ (double* rad, double* eps, double* rad4,
                       double* eps4, double* reduct) {
 
@@ -1245,27 +1302,39 @@ void set_kvdws_data_ (double* rad, double* eps, double* rad4,
    kvdws__.reduct = reduct;
 }
 
-void set_limits_data_ (double* vdwcut, double* chgcut, double* dplcut,
-                       double* mpolecut, double* vdwtaper, double* chgtaper,
-                       double* dpltaper, double* mpoletaper, double* ewaldcut,
-                       double* usolvcut, int* use_ewald, int* use_lights,
-                       int* use_list, int* use_vlist, int* use_clist,
+void set_limits_data_ (double* vdwcut, double* repcut, double* dispcut,
+                       double* chgcut, double* dplcut, double* mpolecut,
+                       double* ctrncut, double* vdwtaper, double* reptaper,
+                       double* disptaper, double* chgtaper, double* dpltaper,
+                       double* mpoletaper, double* ctrntaper, double* ewaldcut,
+                       double* dewaldcut, double* usolvcut, int* use_ewald,
+                       int* use_dewald, int* use_lights, int* use_list,
+                       int* use_vlist, int* use_dlist, int* use_clist,
                        int* use_mlist, int* use_ulist) {
 
    limits__.vdwcut = *vdwcut;
+   limits__.repcut = *repcut;
+   limits__.dispcut = *dispcut;
    limits__.chgcut = *chgcut;
    limits__.dplcut = *dplcut;
    limits__.mpolecut = *mpolecut;
+   limits__.ctrncut = *ctrncut;
    limits__.vdwtaper = *vdwtaper;
+   limits__.reptaper = *reptaper;
+   limits__.disptaper = *disptaper;
    limits__.chgtaper = *chgtaper;
    limits__.dpltaper = *dpltaper;
    limits__.mpoletaper = *mpoletaper;
+   limits__.ctrntaper = *ctrntaper;
    limits__.ewaldcut = *ewaldcut;
+   limits__.dewaldcut = *dewaldcut;
    limits__.usolvcut = *usolvcut;
    limits__.use_ewald = *use_ewald;
+   limits__.use_dewald = *use_dewald;
    limits__.use_lights = *use_lights;
    limits__.use_list = *use_list;
    limits__.use_vlist = *use_vlist;
+   limits__.use_dlist = *use_dlist;
    limits__.use_clist = *use_clist;
    limits__.use_mlist = *use_mlist;
    limits__.use_ulist = *use_ulist;
@@ -1282,13 +1351,6 @@ void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix,
    setNullTerminator (integrate, 11, mdstuf__.integrate);
 }
 
-void set_moldyn_data_ (double* v, double* a, double* aalt) {
-
-   moldyn__.v = v;
-   moldyn__.a = a;
-   moldyn__.aalt = aalt;
-}
-
 void set_molcul_data_ (int* nmol, int* imol, int* kmol, int* molcule,
                        double* totmass, double* molmass) {
 
@@ -1300,18 +1362,27 @@ void set_molcul_data_ (int* nmol, int* imol, int* kmol, int* molcule,
    molcul__.molmass = molmass;
 }
 
-void set_mplpot_data_ (double* m2scale, double* m3scale,
-                       double* m4scale, double* m5scale) {
+void set_moldyn_data_ (double* v, double* a, double* aalt) {
+
+   moldyn__.v = v;
+   moldyn__.a = a;
+   moldyn__.aalt = aalt;
+}
+
+void set_mplpot_data_ (double* m2scale, double* m3scale, double* m4scale,
+                       double* m5scale, int* use_chgpen) {
 
    mplpot__.m2scale = *m2scale;
    mplpot__.m3scale = *m3scale;
    mplpot__.m4scale = *m4scale;
    mplpot__.m5scale = *m5scale;
+   mplpot__.use_chgpen = *use_chgpen;
 }
 
 void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
                       int* pollist, int* zaxis, int* xaxis, int* yaxis,
-                      double* pole, double* rpole, char* polaxe ) {
+                      double* pole, double* rpole, double* spole,
+                      double* srpole, char* polaxe ) {
 
    mpole__.maxpole = *maxpole;
    mpole__.npole = *npole;
@@ -1323,6 +1394,8 @@ void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
    mpole__.yaxis = yaxis;
    mpole__.pole = pole;
    mpole__.rpole = rpole;
+   mpole__.spole = spole;
+   mpole__.srpole = srpole;
    mpole__.polaxe = polaxe;
 }
 
@@ -1393,7 +1466,9 @@ void set_pitors_data_ (int* npitors, int* ipit, double* kpit) {
    pitors__.kpit = kpit;
 }
 
-void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* bsorder,
+void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
+                    int* nefft2, int* nefft3,int* ndfft1, int* ndfft2,
+                    int* ndfft3, int* bsorder, int* bseorder, int* bsdorder,
                     int* igrid, double* bsmod1, double* bsmod2,
                     double* bsmod3, double* bsbuild, double*** thetai1,
                     double*** thetai2, double*** thetai3, double**** qgrid,
@@ -1402,7 +1477,15 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* bsorder,
    pme__.nfft1 = *nfft1;
    pme__.nfft2 = *nfft2;
    pme__.nfft3 = *nfft3;
+   pme__.nefft1 = *nefft1;
+   pme__.nefft2 = *nefft2;
+   pme__.nefft3 = *nefft3;
+   pme__.ndfft1 = *ndfft1;
+   pme__.ndfft2 = *ndfft2;
+   pme__.ndfft3 = *ndfft3;
    pme__.bsorder = *bsorder;
+   pme__.bseorder = *bseorder;
+   pme__.bsdorder = *bsdorder;
    pme__.igrid = igrid;
    pme__.bsmod1 = bsmod1;
    pme__.bsmod2 = bsmod2;
@@ -1478,7 +1561,9 @@ void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
                        double* p41scale, double* d1scale, double* d2scale,
                        double* d3scale, double* d4scale, double* u1scale,
                        double* u2scale, double* u3scale, double* u4scale,
-                       double* udiag, char* poltyp) {
+                       double* w2scale, double* w3scale, double* w4scale,
+                       double* w5scale, double* udiag, int* use_thole,
+                       char* poltyp) {
 
    polpot__.politer = *politer;
    polpot__.poleps = *poleps;
@@ -1495,6 +1580,11 @@ void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
    polpot__.u2scale = *u2scale;
    polpot__.u3scale = *u3scale;
    polpot__.u4scale = *u4scale;
+   polpot__.w2scale = *w2scale;
+   polpot__.w3scale = *w3scale;
+   polpot__.w4scale = *w4scale;
+   polpot__.w5scale = *w5scale;
+   polpot__.use_thole = *use_thole;
    polpot__.udiag = *udiag;
    setNullTerminator (poltyp, 6, polpot__.poltyp);
 }
@@ -1504,8 +1594,9 @@ void set_potent_data_ (int* use_bond, int* use_angle, int* use_strbnd,
                        int* use_opdist, int* use_improp, int* use_imptor,
                        int* use_tors, int* use_pitors, int* use_strtor,
                        int* use_angtor, int* use_tortor, int* use_vdw,
-                       int* use_charge, int* use_chgdpl, int* use_dipole,
-                       int* use_mpole, int* use_polar, int* use_rxnfld,
+                       int* use_repuls, int* use_disp, int* use_charge,
+                       int* use_chgdpl, int* use_dipole, int* use_mpole,
+                       int* use_polar, int* use_chgtrn, int* use_rxnfld,
                        int* use_solv, int* use_metal, int* use_geom,
                        int* use_extra, int* use_born, int* use_orbit) {
 
@@ -1524,11 +1615,14 @@ void set_potent_data_ (int* use_bond, int* use_angle, int* use_strbnd,
    potent__.use_angtor = *use_angtor;
    potent__.use_tortor = *use_tortor;
    potent__.use_vdw = *use_vdw;
+   potent__.use_repuls = *use_repuls;
+   potent__.use_disp = *use_disp;
    potent__.use_charge = *use_charge;
    potent__.use_chgdpl = *use_chgdpl;
    potent__.use_dipole = *use_dipole;
    potent__.use_mpole = *use_mpole;
    potent__.use_polar = *use_polar;
+   potent__.use_chgtrn = *use_chgtrn;
    potent__.use_rxnfld = *use_rxnfld;
    potent__.use_solv = *use_solv;
    potent__.use_metal = *use_metal;
@@ -1677,19 +1771,22 @@ void set_tortor_data_ (int* ntortor, int* itt) {
 }
 
 void set_units_data_ (double* avogadro, double* lightspd, double* boltzmann,
-                      double* gasconst, double* emass, double* planck,
-                      double* joule, double* convert, double* bohr,
-                      double* hartree, double* evolt, double* efreq,
-                      double* coulomb, double* debye, double* prescon) {
+                      double* gasconst, double* elemchg, double* vacperm,
+                      double* emass, double* planck, double* joule,
+                      double* ekcal, double* bohr, double* hartree,
+                      double* evolt, double* efreq, double* coulomb,
+                      double* debye, double* prescon) {
 
    units__.avogadro = *avogadro;
    units__.lightspd = *lightspd;
    units__.boltzmann = *boltzmann;
    units__.gasconst = *gasconst;
+   units__.elemchg = *elemchg;
+   units__.vacperm = *vacperm;
    units__.emass = *emass;
    units__.planck = *planck;
    units__.joule = *joule;
-   units__.convert = *convert;
+   units__.ekcal = *ekcal;
    units__.bohr = *bohr;
    units__.hartree = *hartree;
    units__.evolt = *evolt;

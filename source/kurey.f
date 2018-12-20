@@ -64,11 +64,11 @@ c
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Urey-Bradley Parameters :',
-     &                    //,5x,'Atom Classes',8x,'K(UB)',5x,
-     &                       'Distance',/)
+     &                    //,5x,'Atom Classes',12x,'K(UB)',
+     &                       7x,'Distance',/)
                end if
                write (iout,30)  ia,ib,ic,bb,tt
-   30          format (4x,3i4,2x,f12.3,f12.4)
+   30          format (4x,3i4,3x,f15.3,f15.4)
             end if
             size = 4
             call numeral (ia,pa,size)

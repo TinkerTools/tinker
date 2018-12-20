@@ -54,7 +54,7 @@ c
       if (integrate .ne. 'RIGIDBODY') then
          do i = 1, n
             if (use(i)) then
-               term = 0.5d0 * mass(i) / convert
+               term = 0.5d0 * mass(i) / ekcal
                do j = 1, 3
                   do k = 1, 3
                      value = term * v(j,i) * v(k,i)
@@ -114,7 +114,7 @@ c
 c
 c     increment the kinetic energy due to translational motion
 c
-            term = 0.5d0 * grpmass(i) / convert
+            term = 0.5d0 * grpmass(i) / ekcal
             do j = 1, 3
                do k = 1, 3
                   value = term * vc(j,i) * vc(k,i)
@@ -125,7 +125,7 @@ c
 c
 c     increment the kinetic energy due to rotational motion
 c
-            term = 0.5d0 / convert
+            term = 0.5d0 / ekcal
             do j = 1, 3
                do k = 1, 3
                   value = term * inert(k,j) * wc(j,i) * wc(k,i)

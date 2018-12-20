@@ -148,7 +148,7 @@ c
 c     diagonalize to get vibrational frequencies and normal modes
 c
       call diagq (nfreq,nfreq,matrix,eigen,vects)
-      factor = sqrt(convert) / (2.0d0*pi*lightspd)
+      factor = sqrt(ekcal) / (2.0d0*pi*lightspd)
       do i = 1, nvib
          eigen(i) = factor * sign(1.0d0,eigen(i)) * sqrt(abs(eigen(i)))
       end do

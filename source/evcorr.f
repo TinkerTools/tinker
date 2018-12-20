@@ -21,13 +21,16 @@ c     M. P. Allen and D. J. Tildesley, "Computer Simulation of
 c     Liquids", Oxford University Press, 1987, Section 2.8
 c
 c
-      subroutine evcorr (elrc)
+      subroutine evcorr (mode,elrc)
+      use atomid
       use atoms
       use bound
       use boxes
+      use kdsp
       use limits
       use math
       use mutant
+      use potent
       use shunt
       use vdw
       use vdwpot
@@ -45,7 +48,7 @@ c
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
       real*8 r5,r6,r7
-      real*8 p,p6,p12
+      real*8 cik,p,p6,p12
       real*8 rho,tau,tau7
       real*8 expterm
       character*6 mode
@@ -61,7 +64,6 @@ c
 c
 c     set the coefficients for the switching function
 c
-      mode = 'VDW'
       call switch (mode)
 c
 c     set number of steps and range for numerical integration
@@ -79,11 +81,12 @@ c
       allocate (jvt(n))
       allocate (mvt(n))
 c
-c     count the number of vdw types and their frequencies
+c     count the number of types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         it = jvdw(i)
+         if (use_vdw)  it = jvdw(i)
+         if (use_disp)  it = class(i)
          do k = 1, nvt
             if (ivt(k) .eq. it) then
                jvt(k) = jvt(k) + 1
@@ -99,7 +102,7 @@ c
    10    continue
       end do
 c
-c     find the van der Waals energy via double loop search
+c     find the correction energy via double loop search
 c
       do i = 1, nvt
          it = ivt(i)
@@ -110,17 +113,23 @@ c
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
 c
-c     first line below uses full vdw between ligand atoms, second line
-c     scales intraligand vdw interactions by the lambda value
+c     set decoupling or annihilation for intraligand interactions
 c
-c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
-            fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
+            if (vcouple .eq. 0) then
+               fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+            else
+               fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
+            end if
             if (k .eq. i)  fik = 0.5d0 * fik
-            rv = radmin(kt,it)
-            eps = epsilon(kt,it)
-            rv2 = rv * rv
-            rv6 = rv2 * rv2 * rv2
-            rv7 = rv6 * rv
+            if (use_disp) then
+               cik = dspsix(it) * dspsix(kt)
+            else
+               rv = radmin(kt,it)
+               eps = epsilon(kt,it)
+               rv2 = rv * rv
+               rv6 = rv2 * rv2 * rv2
+               rv7 = rv6 * rv
+            end if
             etot = 0.0d0
             do j = 1, ndelta
                r = offset + dble(j)*rdelta
@@ -129,7 +138,9 @@ c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
                r6 = r3 * r3
                r7 = r6 * r
                e = 0.0d0
-               if (vdwtyp .eq. 'LENNARD-JONES') then
+               if (use_disp) then
+                  e = -cik / r6
+               else if (vdwtyp .eq. 'LENNARD-JONES') then
                   p6 = rv6 / r6
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)
@@ -137,7 +148,8 @@ c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
                   rho = r7 + ghal*rv7
                   tau = (dhal+1.0d0) / (r+dhal*rv)
                   tau7 = tau**7
-                  e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  e = eps * rv7 * tau7
+     &                   * ((ghal+1.0d0)*rv7/rho-2.0d0)
                else if (vdwtyp.eq.'BUCKINGHAM' .or.
      &                  vdwtyp.eq.'MM3-HBOND') then
                   p = sqrt(rv2/r2)
@@ -183,13 +195,16 @@ c     M. P. Allen and D. J. Tildesley, "Computer Simulation of
 c     Liquids", Oxford University Press, 1987, Section 2.8
 c
 c
-      subroutine evcorr1 (elrc,vlrc)
+      subroutine evcorr1 (mode,elrc,vlrc)
+      use atomid
       use atoms
       use bound
       use boxes
+      use kdsp
       use limits
       use math
       use mutant
+      use potent
       use shunt
       use vdw
       use vdwpot
@@ -209,7 +224,7 @@ c
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
       real*8 r5,r6,r7
-      real*8 p,p6,p12
+      real*8 cik,p,p6,p12
       real*8 rho,tau,tau7
       real*8 dtau,gtau
       real*8 rvterm,expterm
@@ -227,7 +242,6 @@ c
 c
 c     set the coefficients for the switching function
 c
-      mode = 'VDW'
       call switch (mode)
 c
 c     set number of steps and range for numerical integration
@@ -249,7 +263,8 @@ c     count the number of vdw types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         it = jvdw(i)
+         if (use_vdw)  it = jvdw(i)
+         if (use_disp)  it = class(i)
          do k = 1, nvt
             if (ivt(k) .eq. it) then
                jvt(k) = jvt(k) + 1
@@ -276,17 +291,23 @@ c
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
 c
-c     first line below uses full vdw between ligand atoms, second line
-c     scales intraligand vdw interactions by the lambda value
+c     set decoupling or annihilation for intraligand interactions
 c
-c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
-            fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
+            if (vcouple .eq. 0) then
+               fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+            else
+               fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
+            end if
             if (k .eq. i)  fik = 0.5d0 * fik
-            rv = radmin(kt,it)
-            eps = epsilon(kt,it)
-            rv2 = rv * rv
-            rv6 = rv2 * rv2 * rv2
-            rv7 = rv6 * rv
+            if (use_disp) then
+               cik = dspsix(it) * dspsix(kt)
+            else
+               rv = radmin(kt,it)
+               eps = epsilon(kt,it)
+               rv2 = rv * rv
+               rv6 = rv2 * rv2 * rv2
+               rv7 = rv6 * rv
+            end if
             etot = 0.0d0
             vtot = 0.0d0
             do j = 1, ndelta
@@ -297,7 +318,10 @@ c           fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
                r7 = r6 * r
                e = 0.0d0
                de = 0.0d0
-               if (vdwtyp .eq. 'LENNARD-JONES') then
+               if (use_disp) then
+                  e = -cik / r6
+                  de = 6.0d0 * cik / r7
+               else if (vdwtyp .eq. 'LENNARD-JONES') then
                   p6 = rv6 / r6
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)

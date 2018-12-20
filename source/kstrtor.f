@@ -97,14 +97,14 @@ c
                   header = .false.
                   write (iout,20)
    20             format (/,' Additional Stretch-Torsion Parameters :',
-     &                    //,5x,'Atom Classes',9x,'Stretch',7x,'1-Fold',
-     &                       6x,'2-Fold',6x,'3-Fold',/)
+     &                    //,5x,'Atom Classes',10x,'Stretch',
+     &                       9x,'1-Fold',6x,'2-Fold',6x,'3-Fold',/)
                end if
                write (iout,30)  ia,ib,ic,id,bt1,bt2,bt3,
      &                          bt4,bt5,bt6,bt7,bt8,bt9
-   30          format (1x,4i4,8x,'1st Bond',1x,3f12.3,
-     &                 /,25x,'2nd Bond',1x,3f12.3,
-     &                 /,25x,'3rd Bond',1x,3f12.3)
+   30          format (2x,4i4,8x,'1st Bond',3x,3f12.3,
+     &                 /,26x,'2nd Bond',3x,3f12.3,
+     &                 /,26x,'3rd Bond',3x,3f12.3)
             end if
             do j = 1, maxnbt
                if (kbt(j).eq.blank .or. kbt(j).eq.pt) then

@@ -25,8 +25,6 @@ c
       use dipole
       use energi
       use group
-      use inter
-      use molcul
       use shunt
       use units
       use usage
@@ -251,12 +249,6 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                  if (molcule(i1) .ne. molcule(k1)) then
-                     einter = einter + e
-                  end if
                end if
             end if
          end do
@@ -447,10 +439,6 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
-c
-c     increment the total intermolecular energy
-c
-                     einter = einter + e
                   end if
                end do
             end if

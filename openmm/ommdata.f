@@ -40,6 +40,7 @@ c
       use imptor
       use inform
       use ktrtor
+      use kvdwpr
       use kvdws
       use limits
       use mdstuf
@@ -104,34 +105,40 @@ c
       call set_charge_data (nion,iion,jion,kion,pchg)
       call set_chgpot_data (electric,dielec,ebuffer,c2scale,c3scale,
      &                      c4scale,c5scale,neutnbr,neutcut)
-      call set_couple_data (n12,i12,n13,i13,n14,i14,n15,i15)
+      call set_couple_data (n12,n13,n14,n15,i12,i13,i14,i15)
       call set_deriv_data (desum,deb,dea,deba,deub,deaa,deopb,deopd,
-     &                     deid,deit,det,dept,debt,deat,dett,dev,dec,
-     &                     decd,ded,dem,dep,der,des,delf,deg,dex)
+     &                     deid,deit,det,dept,debt,deat,dett,dev,der,
+     &                     dedsp,dec,decd,ded,dem,dep,dect,derxf,
+     &                     des,delf,deg,dex)
       call set_energi_data (esum,eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,
-     &                      et,ept,ebt,eat,ett,ev,ec,ecd,ed,em,ep,er,
-     &                      es,elf,eg,ex)
-      call set_ewald_data (aewald,boundary)
+     &                      et,ept,ebt,eat,ett,ev,er,edsp,ec,ecd,ed,
+     &                      em,ep,ect,erxf,es,elf,eg,ex)
+      call set_ewald_data (aewald,aeewald,adewald,boundary)
       call set_freeze_data (nrat,nratx,iratx,kratx,irat,rateps,
      &                      krat,use_rattle,ratimage)
       call set_group_data (ngrp,kgrp,grplist,igrp,grpmass,wgrp,
      &                     use_group,use_intra,use_inter)
-      call set_imptor_data (nitors,iitors,itors,itors2,itors3)
+      call set_imptor_data (nitors,iitors,itors1,itors2,itors3)
       call set_inform_data (maxask,digits,iprint,iwrite,isend,
      &                      silent,verbose,debug,holdup,abort)
       call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
      &                      ttx,tty,tbf,tbx,tby,tbxy,ktt)
+      call set_kvdwpr_data (maxnvp,radpr,epspr,kvpr)
       call set_kvdws_data (rad,eps,rad4,eps4,reduct)
-      call set_limits_data (vdwcut,chgcut,dplcut,mpolecut,vdwtaper,
-     &                      chgtaper,dpltaper,mpoletaper,ewaldcut,
-     &                      usolvcut,use_ewald,use_lights,use_list,
-     &                      use_vlist,use_clist,use_mlist,use_ulist)
+      call set_limits_data (vdwcut,repcut,dispcut,chgcut,dplcut,
+     &                      mpolecut,ctrncut,vdwtaper,reptaper,
+     &                      disptaper,chgtaper,dpltaper,mpoletaper,
+     &                      ctrntaper,ewaldcut,dewaldcut,usolvcut,
+     &                      use_ewald,use_dewald,use_lights,use_list,
+     &                      use_vlist,use_dlist,use_clist,use_mlist,
+     &                      use_ulist)
       call set_mdstuf_data (nfree,irest,bmnmix,arespa,dorest,integrate)
       call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)
-      call set_mplpot_data (m2scale,m3scale,m4scale,m5scale)
+      call set_mplpot_data (m2scale,m3scale,m4scale,m5scale,use_chgpen)
       call set_mpole_data (maxpole,npole,ipole,polsiz,pollist,
-     &                     zaxis,xaxis,yaxis,pole,rpole,polaxe)
+     &                     zaxis,xaxis,yaxis,pole,rpole,spole,
+     &                     srpole,polaxe)
       call set_mutant_data (nmut,vcouple,imut,type0,class0,type1,
      &                      class1,lambda,tlambda,vlambda,elambda,
      &                      scexp,scalpha,mut)
@@ -142,8 +149,9 @@ c
       call set_openmm_data (ommHandle,cudaPrecision,
      &                      ommPlatform,cudaDevice)
       call set_pitors_data (npitors,ipit,kpit)
-      call set_pme_data (nfft1,nfft2,nfft3,bsorder,igrid,bsmod1,
-     &                   bsmod2,bsmod3,bsbuild,thetai1,thetai2,
+      call set_pme_data (nfft1,nfft2,nfft3,nefft1,nefft2,nefft3,ndfft1,
+     &                   ndfft2,ndfft3,bsorder,bseorder,bsdorder,igrid,
+     &                   bsmod1,bsmod2,bsmod3,bsbuild,thetai1,thetai2,
      &                   thetai3,qgrid,qfac)
       call set_polar_data (npolar,polarity,thole,pdamp,udir,udirp,udirs,
      &                     udirps,uind,uinp,uinds,uinps,uexact,douind)
@@ -154,14 +162,16 @@ c
       call set_polpot_data (politer,poleps,p2scale,p3scale,p4scale,
      &                      p5scale,p41scale,d1scale,d2scale,d3scale,
      &                      d4scale,u1scale,u2scale,u3scale,u4scale,
-     &                      udiag,poltyp)
+     &                      w2scale,w3scale,w4scale,w5scale,udiag,
+     &                      use_thole,poltyp)
       call set_potent_data (use_bond,use_angle,use_strbnd,use_urey,
      &                      use_angang,use_opbend,use_opdist,use_improp,
      &                      use_imptor,use_tors,use_pitors,use_strtor,
-     &                      use_angtor,use_tortor,use_vdw,use_charge,
-     &                      use_chgdpl,use_dipole,use_mpole,use_polar,
-     &                      use_rxnfld,use_solv,use_metal,use_geom,
-     &                      use_extra,use_born,use_orbit)
+     &                      use_angtor,use_tortor,use_vdw,use_repuls,
+     &                      use_disp,use_charge,use_chgdpl,use_dipole,
+     &                      use_mpole,use_polar,use_chgtrn,use_rxnfld,
+     &                      use_solv,use_metal,use_geom,use_extra,
+     &                      use_born,use_orbit)
       call set_restrn_data (npfix,ndfix,nafix,ntfix,ngfix,nchir,ipfix,
      &                      kpfix,idfix,iafix,itfix,igfix,ichir,depth,
      &                      width,rwall,xpfix,ypfix,zpfix,pfix,dfix,
@@ -179,9 +189,9 @@ c
       call set_tors_data (ntors,itors,tors1,tors2,tors3,
      &                    tors4,tors5,tors6)
       call set_tortor_data (ntortor,itt)
-      call set_units_data (avogadro,lightspd,boltzmann,gasconst,emass,
-     &                     planck,joule,convert,bohr,hartree,evolt,
-     &                     efreq,coulomb,debye,prescon)
+      call set_units_data (avogadro,lightspd,boltzmann,gasconst,elemchg,
+     &                     vacperm,emass,planck,joule,ekcal,bohr,
+     &                     hartree,evolt,efreq,coulomb,debye,prescon)
       call set_urey_data (nurey,iury,uk,ul)
       call set_urypot_data (cury,qury,ureyunit)
       call set_usage_data (nuse,iuse,use)

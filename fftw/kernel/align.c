@@ -19,7 +19,7 @@
  */
 
 
-#include "ifftw.h"
+#include "kernel/ifftw.h"
 
 #if HAVE_SIMD
 #  define ALGN 16
@@ -30,7 +30,7 @@
 #endif
 
 /* NONPORTABLE */
-int X(alignment_of)(R *p)
+int X(ialignment_of)(R *p)
 {
 #if ALGN == 0
      UNUSED(p);

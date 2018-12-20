@@ -13,6 +13,7 @@ c     #################################################################
 c
 c
 c     npolar    total number of polarizable sites in the system
+c     ipolar    number of the multipole for each polarizable site
 c     polarity  dipole polarizability for each multipole site (Ang**3)
 c     thole     Thole polarizability damping value for each site
 c     pdamp     value of polarizability scale factor for each site
@@ -31,6 +32,7 @@ c
       module polar
       implicit none
       integer npolar
+      integer, allocatable :: ipolar(:)
       real*8, allocatable :: polarity(:)
       real*8, allocatable :: thole(:)
       real*8, allocatable :: pdamp(:)

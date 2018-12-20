@@ -75,7 +75,7 @@ c
 c
 c     get half-step Beeman velocities and update barostat velocity
 c
-      eta = eta + 3.0d0*(volbox*(pres-atmsph)*convert/prescon
+      eta = eta + 3.0d0*(volbox*(pres-atmsph)*ekcal/prescon
      &                         + 2.0*kt)*dt_2/w
       do i = 1, n
          if (use(i)) then
@@ -152,7 +152,7 @@ c
          if (use(i)) then
             do j = 1, 3
                aalt(j,i) = a(j,i)
-               a(j,i) = -convert * derivs(j,i) / mass(i)
+               a(j,i) = -ekcal * derivs(j,i) / mass(i)
             end do
          end if
       end do
@@ -166,7 +166,7 @@ c
 c
 c     get full-step Beeman velocities and update barostat velocity
 c
-      eta = eta + 3.0d0*(volbox*(pres-atmsph)*convert/prescon
+      eta = eta + 3.0d0*(volbox*(pres-atmsph)*ekcal/prescon
      &                         + 2.0*kt)*dt_2/w
       do i = 1, n
          if (use(i)) then

@@ -1,3 +1,76 @@
+FFTW 3.3.8:
+
+* Fixed AVX, AVX2 for gcc-8.
+
+  By default, FFTW 3.3.7 was broken with gcc-8.  AVX and AVX2 code
+  assumed that the compiler honors the distinction between +0 and -0,
+  but gcc-8 -ffast-math does not.  The default CFLAGS included -ffast-math.
+  This release ensures that FFTW works with gcc-8 -ffast-math, and
+  removes -ffast-math from the default CFLAGS for good measure.
+
+FFTW 3.3.7:
+
+* Experimental support for CMake.
+
+  The primary build mechanism for FFTW remains GNU autoconf/automake.
+  CMake support is meant to offer an easy way to compile FFTW on
+  Windows, and as such it does not cover all the features of the
+  automake build system, such as exotic cycle counters,
+  cross-compiling, or build of binaries for a mixture of ISA's
+  (e.g., amd64 vs amd64+avx vs amd64+avx2).  Patches are welcome.
+
+* Fixes for armv7a cycle counter.
+* Official support for aarch64, now that we have hardware to test it.
+* Tweak usage of FMA instructions in a way that favors newer processors
+  (Skylake and Ryzen) over older processors (Haswell).
+* tests/bench: use 64-bit precision to compute mflops.
+
+FFTW 3.3.6-pl2:
+
+* Bugfix: MPI Fortran-03 headers were missing in FFTW 3.3.6-pl1.
+
+FFTW 3.3.6-pl1:
+
+* Bugfix: FFTW 3.3.6 had the wrong libtool version number, and generated
+  shared libraries of the form libfftw3.so.2.6.6 instead of
+  libfftw3.so.3.*.  
+
+FFTW 3.3.6:
+
+* The fftw_make_planner_thread_safe() API introduced in 3.3.5 didn't
+  work, and this 3.3.6 fixes it.  Sorry about that.
+* compilation fixes for IBM XLC
+* compilation fixes for threads on Windows
+* fix SIMD autodetection on amd64 when (_MSC_VER > 1500)
+
+FFTW 3.3.5:
+
+* New SIMD support:
+  - Power8 VSX instructions in single and double precision.
+    To use, add --enable-vsx to configure.
+  - Support for AVX2 (256-bit FMA instructions).
+    To use, add --enable-avx2 to configure.
+  - Experimental support for AVX512 and KCVI. (--enable-avx512, --enable-kcvi)
+    This code is expected to work but the FFTW maintainers do not have
+    hardware to test it.
+  - Support for AVX128/FMA (for some AMD machines) (--enable-avx128-fma)
+  - Double precision Neon SIMD for aarch64.
+    This code is expected to work but the FFTW maintainers do not have
+    hardware to test it.
+  - generic SIMD support using gcc vector intrinsics
+* Add fftw_make_planner_thread_safe() API    
+* fix #18 (disable float128 for CUDACC)
+* fix #19: missing Fortran interface for fftwq_alloc_real
+* fix #21 (don't use float128 on Portland compilers, which pretend to be gcc)
+* fix: Avoid segfaults due to double free in MPI transpose
+
+* Special note for distribution maintainers: Although FFTW supports a
+  zillion SIMD instruction sets, enabling them all at the same time is
+  a bad idea, because it increases the planning time for minimal gain.
+  We recommend that general-purpose x86 distributions only enable SSE2
+  and perhaps AVX.  Users who care about the last ounce of performance
+  should recompile FFTW themselves.
+
 FFTW 3.3.4
 
 * New functions fftw_alignment_of (to check whether two arrays are

@@ -21,6 +21,7 @@ c
       use vdwpot
       implicit none
       real*8 elrc
+      character*6 mode
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -36,7 +37,8 @@ c
 c     apply long range van der Waals correction if desired
 c
       if (use_vcorr) then
-         call evcorr (elrc)
+         mode = 'VDW'
+         call evcorr (mode,elrc)
          ev = ev + elrc
       end if
       return

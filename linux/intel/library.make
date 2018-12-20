@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  library.make  --  create object library of Tinker routines  ##
-#  ##               (Intel Fortran for Intel Version)              ##
+#  ##               (Intel Fortran for Linux Version)              ##
 #  ##                                                              ##
 #  ##################################################################
 #
@@ -44,7 +44,9 @@ calendar.o \
 cell.o \
 center.o \
 charge.o \
+chgpen.o \
 chgpot.o \
+chgtrn.o \
 chkpole.o \
 chkring.o \
 chkxyz.o \
@@ -61,6 +63,7 @@ control.o \
 couple.o \
 cspline.o \
 cutoffs.o \
+damping.o \
 deflate.o \
 delete.o \
 deriv.o \
@@ -68,8 +71,10 @@ diagq.o \
 diffeq.o \
 dipole.o \
 disgeo.o \
+disp.o \
 dma.o \
 domega.o \
+dsppot.o \
 eangang.o \
 eangang1.o \
 eangang2.o \
@@ -98,10 +103,18 @@ echgdpl.o \
 echgdpl1.o \
 echgdpl2.o \
 echgdpl3.o \
+echgtrn.o \
+echgtrn1.o \
+echgtrn2.o \
+echgtrn3.o \
 edipole.o \
 edipole1.o \
 edipole2.o \
 edipole3.o \
+edisp.o \
+edisp1.o \
+edisp2.o \
+edisp3.o \
 egauss.o \
 egauss1.o \
 egauss2.o \
@@ -157,6 +170,10 @@ epolar.o \
 epolar1.o \
 epolar2.o \
 epolar3.o \
+erepel.o \
+erepel1.o \
+erepel2.o \
+erepel3.o \
 erf.o \
 erxnfld.o \
 erxnfld1.o \
@@ -265,9 +282,14 @@ katoms.o \
 kbond.o \
 kbonds.o \
 kcharge.o \
+kchgtrn.o \
 kchrge.o \
+kcpen.o \
+kctrn.o \
 kdipol.o \
 kdipole.o \
+kdisp.o \
+kdsp.o \
 kewald.o \
 kextra.o \
 keys.o \
@@ -291,6 +313,8 @@ kpitor.o \
 kpitors.o \
 kpolar.o \
 kpolr.o \
+krepel.o \
+krepl.o \
 ksolv.o \
 kstbnd.o \
 kstrbnd.o \
@@ -339,8 +363,8 @@ nblist.o \
 neigh.o \
 nextarg.o \
 nexttext.o \
-nose.o \
 nonpol.o \
+nose.o \
 nspline.o \
 nucleo.o \
 number.o \
@@ -375,6 +399,7 @@ pmpb.o \
 polar.o \
 polgrp.o \
 polopt.o \
+polpcg.o \
 polpot.o \
 poltcg.o \
 polymer.o \
@@ -410,7 +435,9 @@ readprm.o \
 readseq.o \
 readxyz.o \
 refer.o \
+repel.o \
 replica.o \
+reppot.o \
 resdue.o \
 respa.o \
 restrn.o \
@@ -467,7 +494,6 @@ uprior.o \
 urey.o \
 urypot.o \
 usage.o \
-usolve.o \
 valfit.o \
 vdw.o \
 vdwpot.o \

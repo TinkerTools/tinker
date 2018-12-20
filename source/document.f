@@ -161,7 +161,7 @@ c
                         done = .true.
                      else
                         k = k + 1
-                        info(k,nunit) = record(7:leng)
+                        info(k,nunit) = record(7:leng)//'      '
                      end if
                   end do
                   nline(nunit) = k

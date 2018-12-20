@@ -184,7 +184,7 @@ c
       do i = 1, n
          if (use(i)) then
             do j = 1, 3
-               a(j,i) = -convert * derivs(j,i) / mass(i)
+               a(j,i) = -ekcal * derivs(j,i) / mass(i)
                v(j,i) = v(j,i) + a(j,i)*dt_2
             end do
          end if
@@ -200,7 +200,7 @@ c
             end do
          end if
       end do
-      e_kin = 0.5d0 * e_kin / convert
+      e_kin = 0.5d0 * e_kin / ekcal
 c
 c     determine system temperature and total energy
 c

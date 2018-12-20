@@ -1,0 +1,166 @@
+
+################################################################
+Summary of Multipole Component Variables & Expressions in Tinker
+################################################################
+
+###################################
+Math Operations & Symbolic Notation
+###################################
+
+dot           vector dot/inner product (scalar, sum of 3 pair products)
+crx           vector cross/outer product (vector)
+ddot          "tensor double dot product" (scalar, sum of 9 pair products)
+[]            significance of variable
+{}            variable name of older versions of Tinker
+
+#####         ###################
+Sites         Equivalence in Code
+#####         ###################
+
+ii            first multipole        [site number]
+i             ipole(i)               [atom number]
+xi            x(i)                  [x-coordinate]
+yi            y(i)                  [y-coordinate]
+zi            z(i)                  [z-coordinate]
+
+kk            second multipole       [site number]
+k             ipole(k)               [atom number]
+xk            x(k)                  [x-coordinate]
+yk            y(k)                  [y-coordinate]
+zk            z(k)                  [z-coordinate]
+
+xr            xk - xi                 [x-distance]
+yr            yk - yi                 [y-distance]
+zr            zk - zi                 [z-distance]
+
+######        ###################
+Mpoles        Equivalence in Code
+######        ###################
+
+ci            rpole(1,ii)               [monopole]
+dix           rpole(2,ii)               [x-dipole]
+diy           rpole(3,ii)               [y-dipole]
+diz           rpole(4,ii)               [z-dipole]
+qixx          rpole(5,ii)          [xx-quadrupole]
+qixy          rpole(6,ii)          [xy-quadrupole]
+qixz          rpole(7,ii)          [xz-quadrupole]
+qiyy          rpole(8,ii)          [yy-quadrupole]
+qiyz          rpole(9,ii)          [yz-quadrupole]
+qizz          rpole(10,ii)         [zz-quadrupole]
+uix           uind(1,ii)               [x-induced]
+uiy           uind(2,ii)               [y-induced]
+uiz           uind(3,ii)               [z-induced]
+
+ck            rpole(1,kk)               [monopole]
+dkx           rpole(2,kk)               [x-dipole]
+dky           rpole(3,kk)               [y-dipole]
+dkz           rpole(4,kk)               [z-dipole]
+qkxx          rpole(5,kk)          [xx-quadrupole]
+qkxy          rpole(6,kk)          [xy-quadrupole]
+qkxz          rpole(7,kk)          [xz-quadrupole]
+qkyy          rpole(8,kk)          [yy-quadrupole]
+qkyz          rpole(9,kk)          [yz-quadrupole]
+qkzz          rpole(10,kk)         [zz-quadrupole]
+ukx           uind(1,kk)               [x-induced]
+uky           uind(2,kk)               [y-induced]
+ukz           uind(3,kk)               [z-induced]
+
+######        ###################
+Energy        Equivalence in Code
+######        ###################
+
+dir           dix*xr + diy*yr + diz*zr                   [di-dot-r]  {dri}
+qix           qixx*xr + qixy*yr + qixz*zr               [qix-dot-r]  {qrix}
+qiy           qixy*xr + qiyy*yr + qiyz*zr               [qiy-dot-r]  {qriy}
+qiz           qixz*xr + qiyz*yr + qizz*zr               [qiz-dot-r]  {qriz}
+qir           qix*xr + qiy*yr + qiz*zr                   [qi-dot-r]  {qrri}
+
+dkr           dkx*xr + dky*yr + dkz*zr                   [dk-dot-r]  {drk}
+qkx           qkxx*xr + qkxy*yr + qkxz*zr               [qkx-dot-r]  {qrkx}
+qky           qkxy*xr + qkyy*yr + qkyz*zr               [qky-dot-r]  {qrky}
+qkz           qkxz*xr + qkyz*yr + qkzz*zr               [qkz-dot-r]  {qrkz}
+qkr           qkx*xr + qky*yr + qkz*zr                   [qk-dot-r]  {qrrk}
+
+dik           dix*dkx + diy*dky + diz*dkz               [di-dot-dk]  {dik}
+qik           qix*qkx + qiy*qky + qiz*qkz               [qi-dot-qk]  {qrrik}
+diqk          dix*qkx + diy*qky + diz*qkz               [di-dot-qk]  {diqrk}
+dkqi          dkx*qix + dky*qiy + dkz*qiz               [dk-dot-qi]  {dkqri}
+qiqk          2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)    [qi-ddot-qk]  {qik}
+               + qixx*qkxx + qiyy*qkyy + qizz*qkzz
+
+diu           dix*ukx + diy*uky + diz*ukz               [di-dot-uk]  {duik}*
+qiu           qix*ukx + qiy*uky + qiz*ukz               [qi-dot-uk]  {quik}*
+uir           uix*xr + uiy*yr + uiz*zr                   [ui-dot-r]  {uri}
+dku           dkx*uix + dky*uiy + dkz*uiz               [dk-dot-ui]  {duik}*
+qku           qkx*uix + qky*uiy + qkz*uiz               [qk-dot-ui]  {quik}*
+ukr           ukx*xr + uky*yr + ukz*zr                   [uk-dot-r]  {urk}
+
+########      ###################
+Gradient      Equivalence in Code
+########      ###################
+
+dirx          diy*zr - diz*yr                       [x of di-crs-r]  {dirx}
+diry          diz*xr - dix*zr                       [y of di-crs-r]  {diry}
+dirz          dix*yr - diy*xr                       [z of di-crs-r]  {dirz}
+
+dkrx          dky*zr - dkz*yr                       [x of dk-crs-r]  {dkrx}
+dkry          dkz*xr - dkx*zr                       [y of dk-crs-r]  {dkry}
+dkrz          dkx*yr - dky*xr                       [z of dk-crs-r]  {dkrz}
+
+dikx          diy*dkz - diz*dky                    [x of di-crs-dk]  {dikx}
+diky          diz*dkx - dix*dkz                    [y of di-crs-dk]  {diky}
+dikz          dix*dky - diy*dkx                    [z of di-crs-dk]  {dikz}
+
+qirx          qiz*yr - qiy*zr                       [x of qi-crs-r]  {qrixr}
+qiry          qix*zr - qiz*xr                       [y of qi-crs-r]  {qriyr}
+qirz          qiy*xr - qix*yr                       [z of qi-crs-r]  {qrizr}
+
+qkrx          qkz*yr - qky*zr                       [x of qk-crs-r]  {qrkxr}
+qkry          qkx*zr - qkz*xr                       [y of qk-crs-r]  {qrkyr}
+qkrz          qky*xr - qkx*yr                       [z of qk-crs-r]  {qrkzr}
+
+qikx          qky*qiz - qkz*qiy                    [x of qi-crs-qk]  {qrrx}
+qiky          qkz*qix - qkx*qiz                    [y of qi-crs-qk]  {qrry}
+qikz          qkx*qiy - qky*qix                    [z of qi-crs-qk]  {qrrz}
+
+qixk          qixx*qkx + qixy*qky + qixz*qkz         [qix's-dot-qk]  {qikrx}
+qiyk          qixy*qkx + qiyy*qky + qiyz*qkz         [qiy's-dot-qk]  {qikry}
+qizk          qixz*qkx + qiyz*qky + qizz*qkz         [qiz's-dot-qk]  {qikrz}
+
+qkxi          qkxx*qix + qkxy*qiy + qkxz*qiz         [qkx's-dot-qi]  {qkirx}
+qkyi          qkxy*qix + qkyy*qiy + qkyz*qiz         [qiy's-dot-qk]  {qikry}
+qkzi          qkxz*qix + qkyz*qiy + qkzz*qiz         [qiz's-dot-qk]  {qikrz}
+
+qikrx         qizk*yr - qiyk*zr                    [x of qik-crs-r]  {qikrxr}
+qikry         qixk*zr - qizk*xr                    [y of qik-crs-r]  {qikryr}
+qikrz         qiyk*xr - qixk*yr                    [z of qik-crs-r]  {qikrzr}
+
+qkirx         qkzi*yr - qkyi*zr                    [x of qki-crs-r]  {qkirxr}
+qkiry         qkxi*zr - qkzi*xr                    [y of qki-crs-r]  {qkiryr}
+qkirz         qkyi*xr - qkxi*yr                    [z of qki-crs-r]  {qkirzr}
+
+diqkx         dix*qkxx + diy*qkxy + diz*qkxz         [di-dot-qkx's]  {diqkx}
+diqky         dix*qkxy + diy*qkyy + diz*qkyz         [di-dot-qky's]  {diqky}
+diqkz         dix*qkxz + diy*qkyz + diz*qkzz         [di-dot-qkz's]  {diqkz}
+
+dkqix         dkx*qixx + dky*qixy + dkz*qixz         [dk-dot-qix's]  {dkqix}
+dkqiy         dkx*qixy + dky*qiyy + dkz*qiyz         [dk-dot-qiy's]  {dkqiy}
+dkqiz         dkx*qixz + dky*qiyz + dkz*qizz         [dk-dot-qiz's]  {dkqiz}
+
+diqkrx        diqkz*yr - diqky*zr                 [x of diqk-crs-r]  {diqkxr}
+diqkry        diqkx*zr - diqkz*xr                 [x of diqk-crs-r]  {diqkyr}
+diqkrz        diqky*xr - diqkx*yr                 [x of diqk-crs-r]  {diqkzr}
+
+dkqirx        dkqiz*yr - dkqiy*zr                 [x of dkqi-crs-r]  {dkqixr}
+dkqiry        dkqix*zr - dkqiz*xr                 [y of dkqi-crs-r]  {dkqiyr}
+dkqirz        dkqiy*xr - dkqix*yr                 [z of dkqi-crs-r]  {dkqizr}
+
+dqikx         diy*qkz - diz*qky + dky*qiz - dkz*qiy       [complex]  {dqiqkx}
+               - 2.0d0*(qixy*qkxz+qiyy*qkyz+qiyz*qkzz
+                       -qixz*qkxy-qiyz*qkyy-qizz*qkyz)
+dqiky         diz*qkx - dix*qkz + dkz*qix - dkx*qiz       [complex]  {dqiqky}
+               - 2.0d0*(qixz*qkxx+qiyz*qkxy+qizz*qkxz
+                       -qixx*qkxz-qixy*qkyz-qixz*qkzz)
+dqikz         dix*qky - diy*qkx + dkx*qiy - dky*qix       [complex]  {dqiqkz}
+               - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
+                       -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)

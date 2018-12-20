@@ -1,12 +1,12 @@
 /* not worth copyrighting */
 
-#include "bench.h"
+#include "libbench2/bench.h"
 #include <math.h>
 
 double mflops(const bench_problem *p, double t)
 {
-     int size = tensor_sz(p->sz);
-     int vsize = tensor_sz(p->vecsz);
+     size_t size = tensor_sz(p->sz);
+     size_t vsize = tensor_sz(p->vecsz);
 
      if (size <= 1) /* a copy: just return reals copied / time */
 	  switch (p->kind) {

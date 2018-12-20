@@ -23,7 +23,7 @@ c     v2scale     factor by which 1-2 vdw interactions are scaled
 c     v3scale     factor by which 1-3 vdw interactions are scaled
 c     v4scale     factor by which 1-4 vdw interactions are scaled
 c     v5scale     factor by which 1-5 vdw interactions are scaled
-c     use_vcorr   flag to use long range vdw der Waals correction
+c     use_vcorr   flag to use long range van der Waals correction
 c     vdwindex    indexing mode (atom type or class) for vdw parameters
 c     vdwtyp      type of van der Waals potential energy function
 c     radtyp      type of parameter (sigma or R-min) for atomic size
