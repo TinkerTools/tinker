@@ -329,7 +329,7 @@ c
          else
             call ufield0a (field,fieldp)
          end if
-c
+
 c     set initial conjugate gradient residual and conjugate vector
 c
          do i = 1, npole
@@ -6899,8 +6899,9 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,polarity,
 !$OMP& pdamp,thole,pcore,pval,palpha,u1scale,u2scale,u3scale,u4scale,
-!$OMP& w2scale,w3scale,w4scale,w5scale,np11,ip11,np12,ip12,np13,ip13,
-!$OMP& np14,ip14,use_thole,use_chgpen,nulst,ulst,mindex,minv)
+!$OMP& w2scale,w3scale,w4scale,w5scale,n12,i12,n13,i13,n14,i14,n15,i15,
+!$OMP& np11,ip11,np12,ip12,np13,ip13,np14,ip14,use_thole,use_chgpen,
+!$OMP& nulst,ulst,mindex,minv)
 !$OMP& firstprivate (uscale,wscale)
 c
 c     determine the off-diagonal elements of the preconditioner
