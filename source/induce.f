@@ -1212,8 +1212,8 @@ c
                   fieldp(j,ii) = fieldp(j,ii) + fip(j)
                   fieldp(j,kk) = fieldp(j,kk) + fkp(j)
                   if (use_chgpen) then
-                     fieldp(j,ii) = field(j,ii)
-                     fieldp(j,kk) = field(j,kk)
+c                    fieldp(j,ii) = field(j,ii)
+c                    fieldp(j,kk) = field(j,kk)
                   end if
                end do
             end if
@@ -6502,7 +6502,10 @@ c
 c
       subroutine uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
       use atoms
+      use chgpen
+      use couple
       use limits
+      use mplpot
       use mpole
       use polar
       use polgrp
@@ -6517,12 +6520,17 @@ c
       real*8 pdi,pti
       real*8 polmin
       real*8 poli,polik
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 damp,expdamp
       real*8 pgamma,off2
       real*8 scale3,scale5
       real*8 m1,m2,m3
       real*8 m4,m5,m6
+      real*8 dmpik(5)
       real*8, allocatable :: uscale(:)
+      real*8, allocatable :: wscale(:)
       real*8 rsd(3,*)
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
@@ -6601,11 +6609,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
          allocate (uscale(n))
+         allocate (wscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
          do i = 1, n
             uscale(i) = 1.0d0
+            wscale(i) = 1.0d0
          end do
 c
 c     determine the off-diagonal elements of the preconditioner
@@ -6617,9 +6627,14 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
+            poli = polarity(ii)
             pdi = pdamp(ii)
             pti = thole(ii)
-            poli = polarity(ii)
+            if (use_chgpen) then
+               corei = pcore(ii)
+               vali = pval(ii)
+               alphai = palpha(ii)
+            end if
             do j = 1, np11(i)
                uscale(ip11(j,i)) = u1scale
             end do
@@ -6632,6 +6647,18 @@ c
             do j = 1, np14(i)
                uscale(ip14(j,i)) = u4scale
             end do
+            do j = 1, n12(i)
+               wscale(i12(j,i)) = w2scale
+            end do
+            do j = 1, n13(i)
+               wscale(i13(j,i)) = w3scale
+            end do
+            do j = 1, n14(i)
+               wscale(i14(j,i)) = w4scale
+            end do
+            do j = 1, n15(i)
+               wscale(i15(j,i)) = w5scale
+            end do
             do kk = ii+1, npole
                k = ipole(kk)
                xr = x(k) - xi
@@ -6641,17 +6668,27 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  scale3 = uscale(k)
-                  scale5 = uscale(k)
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = scale3 * (1.0d0-expdamp)
-                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+                  if (use_thole) then
+                     scale3 = uscale(k)
+                     scale5 = uscale(k)
+                     damp = pdi * pdamp(kk)
+                     if (damp .ne. 0.0d0) then
+                        pgamma = min(pti,thole(kk))
+                        damp = -pgamma * (r/damp)**3
+                        if (damp .gt. -50.0d0) then
+                           expdamp = exp(damp)
+                           scale3 = scale3 * (1.0d0-expdamp)
+                           scale5 = scale5 * (1.0d0-expdamp
+     &                                           *(1.0d0-damp))
+                        end if
                      end if
+                  else if (use_chgpen) then
+                     corek = pcore(kk)
+                     valk = pval(kk)
+                     alphak = palpha(kk)
+                     call dampmut (r,alphai,alphak,dmpik)
+                     scale3 = wscale(k) * dmpik(3)
+                     scale5 = wscale(k) * dmpik(5)
                   end if
                   polik = poli * polarity(kk)
                   rr3 = scale3 * polik / (r*r2)
@@ -6680,11 +6717,24 @@ c
             do j = 1, np14(i)
                uscale(ip14(j,i)) = 1.0d0
             end do
+            do j = 1, n12(i)
+               wscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               wscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               wscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               wscale(i15(j,i)) = 1.0d0
+            end do
          end do
 c
 c     perform deallocation of some local arrays
 c
          deallocate (uscale)
+         deallocate (wscale)
       end if
       return
       end
@@ -6703,6 +6753,9 @@ c
 c
       subroutine uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
       use atoms
+      use chgpen
+      use couple
+      use mplpot
       use mpole
       use neigh
       use polar
@@ -6718,12 +6771,17 @@ c
       real*8 pdi,pti
       real*8 polmin
       real*8 poli,polik
+      real*8 corei,corek
+      real*8 vali,valk
+      real*8 alphai,alphak
       real*8 damp,expdamp
       real*8 pgamma
       real*8 scale3,scale5
       real*8 m1,m2,m3
       real*8 m4,m5,m6
+      real*8 dmpik(5)
       real*8, allocatable :: uscale(:)
+      real*8, allocatable :: wscale(:)
       real*8 rsd(3,*)
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
@@ -6828,19 +6886,22 @@ c
 c     perform dynamic allocation of some local arrays
 c
          allocate (uscale(n))
+         allocate (wscale(n))
 c
 c     set array needed to scale connected atom interactions
 c
          do i = 1, n
             uscale(i) = 1.0d0
+            wscale(i) = 1.0d0
          end do
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,pdamp,
-!$OMP& thole,polarity,u1scale,u2scale,u3scale,u4scale,np11,ip11,
-!$OMP& np12,ip12,np13,ip13,np14,ip14,nulst,ulst,mindex,minv)
-!$OMP& firstprivate (uscale)
+!$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,polarity,
+!$OMP& pdamp,thole,pcore,pval,palpha,u1scale,u2scale,u3scale,u4scale,
+!$OMP& w2scale,w3scale,w4scale,w5scale,np11,ip11,np12,ip12,np13,ip13,
+!$OMP& np14,ip14,use_thole,use_chgpen,nulst,ulst,mindex,minv)
+!$OMP& firstprivate (uscale,wscale)
 c
 c     determine the off-diagonal elements of the preconditioner
 c
@@ -6850,9 +6911,14 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
+            poli = polarity(ii)
             pdi = pdamp(ii)
             pti = thole(ii)
-            poli = polarity(ii)
+            if (use_chgpen) then
+               corei = pcore(ii)
+               vali = pval(ii)
+               alphai = palpha(ii)
+            end if
             do j = 1, np11(i)
                uscale(ip11(j,i)) = u1scale
             end do
@@ -6865,6 +6931,18 @@ c
             do j = 1, np14(i)
                uscale(ip14(j,i)) = u4scale
             end do
+            do j = 1, n12(i)
+               wscale(i12(j,i)) = w2scale
+            end do
+            do j = 1, n13(i)
+               wscale(i13(j,i)) = w3scale
+            end do
+            do j = 1, n14(i)
+               wscale(i14(j,i)) = w4scale
+            end do
+            do j = 1, n15(i)
+               wscale(i15(j,i)) = w5scale
+            end do
             m = mindex(ii)
             do kkk = 1, nulst(ii)
                kk = ulst(kkk,ii)
@@ -6875,17 +6953,27 @@ c
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                r = sqrt(r2)
-               scale3 = uscale(k)
-               scale5 = uscale(k)
-               damp = pdi * pdamp(kk)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(kk))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     expdamp = exp(damp)
-                     scale3 = scale3 * (1.0d0-expdamp)
-                     scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
+               if (use_thole) then
+                  scale3 = uscale(k)
+                  scale5 = uscale(k)
+                  damp = pdi * pdamp(kk)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = -pgamma * (r/damp)**3
+                     if (damp .gt. -50.0d0) then
+                        expdamp = exp(damp)
+                        scale3 = scale3 * (1.0d0-expdamp)
+                        scale5 = scale5 * (1.0d0-expdamp
+     &                                        *(1.0d0-damp))
+                     end if
                   end if
+               else if (use_chgpen) then
+                  corek = pcore(kk)
+                  valk = pval(kk)
+                  alphak = palpha(kk)
+                  call dampmut (r,alphai,alphak,dmpik)
+                  scale3 = wscale(k) * dmpik(3)
+                  scale5 = wscale(k) * dmpik(5)
                end if
                polik = poli * polarity(kk)
                rr3 = scale3 * polik / (r*r2)
@@ -6913,6 +7001,18 @@ c
             do j = 1, np14(i)
                uscale(ip14(j,i)) = 1.0d0
             end do
+            do j = 1, n12(i)
+               wscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               wscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               wscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               wscale(i15(j,i)) = 1.0d0
+            end do
          end do
 !$OMP END DO
 !$OMP END PARALLEL
@@ -6920,6 +7020,7 @@ c
 c     perform deallocation of some local arrays
 c
          deallocate (uscale)
+         deallocate (wscale)
       end if
       return
       end

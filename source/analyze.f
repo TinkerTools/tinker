@@ -437,21 +437,33 @@ c
          write (iout,160)  value
   160    format (' Electrostatics',14x,a20)
       end if
-      if (use_polar) then
-         value = 'INDUCED DIPOLE'
-         call justify (value)
-         write (iout,170)  value
-  170    format (' Electrostatics',14x,a20)
-         value = poltyp
-         call justify (value)
-         write (iout,180)  value
-  180    format (' Polarization',16x,a20)
-      end if
       if (use_chgtrn) then
          value = 'CHARGE TRANSFER'
          call justify (value)
+         write (iout,170)  value
+  170    format (' Induction',19x,a20)
+      end if
+      if (use_polar) then
+         value = 'INDUCED DIPOLE'
+         call justify (value)
+         write (iout,180)  value
+  180    format (' Induction',19x,a20)
+         value = poltyp
+         call justify (value)
          write (iout,190)  value
-  190    format (' Electrostatics',14x,a20)
+  190    format (' Polarization',16x,a20)
+         if (use_thole) then
+            value = 'THOLE DAMPING'
+            call justify (value)
+            write (iout,200)  value
+  200       format (' Polarization',16x,a20)
+         end if
+         if (use_chgpen) then
+            value = 'CHGPEN DAMPING'
+            call justify (value)
+            write (iout,210)  value
+  210       format (' Polarization',16x,a20)
+         end if
       end if
 c
 c     details of electrostatic particle mesh Ewald calculation
@@ -459,9 +471,9 @@ c
       if (use_ewald) then
          value = boundary
          call justify (value)
-         write (iout,200)  aeewald,ewaldcut,nefft1,nefft2,
+         write (iout,220)  aeewald,ewaldcut,nefft1,nefft2,
      &                     nefft3,bseorder,value
-  200    format (/,' PME for Electrostatics :',
+  220    format (/,' PME for Electrostatics :',
      &           //,' Ewald Coefficient',19x,f12.4,
      &           /,' Real-Space Cutoff',19x,f12.4,
      &           /,' Grid Dimensions',21x,3i4,

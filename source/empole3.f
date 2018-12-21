@@ -1060,7 +1060,8 @@ c
 c     literature reference:
 c
 c     W. Smith, "Point Multipoles in the Ewald Summation (Revisited)",
-c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
+c     CCP5 Newsletter, 46, 18-30, 1998  [newsletters are available at
+c     https://www.ccp5.ac.uk/infoweb/newsletters]
 c
 c
       subroutine emreal3c
@@ -1791,7 +1792,8 @@ c
 c     literature reference:
 c
 c     W. Smith, "Point Multipoles in the Ewald Summation (Revisited)",
-c     CCP5 Newsletter, 46, 18-30, 1998  (see http://www.ccp5.org/)
+c     CCP5 Newsletter, 46, 18-30, 1998  [newsletters are available at
+c     https://www.ccp5.ac.uk/infoweb/newsletters]
 c
 c
       subroutine emreal3d
