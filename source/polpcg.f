@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     #############################################################
 c     ##                                                         ##
-c     ##  module poltcg  --  induced dipoles via the PCG solver  ##
+c     ##  module polpcg  --  induced dipoles via the PCG solver  ##
 c     ##                                                         ##
 c     #############################################################
 c
