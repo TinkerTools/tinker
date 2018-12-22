@@ -1446,8 +1446,8 @@ epitors1.o: atoms.o bound.o deriv.o energi.o group.o pitors.o torpot.o usage.o v
 epitors2.o: angbnd.o atoms.o bound.o deriv.o group.o hessn.o pitors.o torpot.o usage.o
 epitors3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o iounit.o math.o pitors.o torpot.o usage.o
 epolar.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o
-epolar1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o limits.o math.o molcul.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o virial.o
-epolar2.o: atoms.o bound.o cell.o chgpot.o couple.o deriv.o hessn.o limits.o mpole.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o
+epolar1.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o energi.o ewald.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o virial.o
+epolar2.o: atoms.o bound.o cell.o chgpen.o chgpot.o couple.o deriv.o hessn.o limits.o mplpot.o mpole.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o
 epolar3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o units.o
 erepel.o: atoms.o bound.o cell.o couple.o energi.o group.o inform.o inter.o limits.o mpole.o neigh.o potent.o repel.o reppot.o shunt.o usage.o
 erepel1.o: atoms.o bound.o cell.o couple.o deriv.o energi.o group.o inform.o limits.o mpole.o neigh.o potent.o repel.o reppot.o shunt.o usage.o virial.o
@@ -1693,7 +1693,7 @@ pme.o:
 pmestuf.o: atoms.o boxes.o charge.o chunks.o disp.o math.o mpole.o openmp.o pme.o potent.o
 pmpb.o: iounit.o
 polar.o:
-polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
+polarize.o: atoms.o chgpen.o couple.o inform.o iounit.o molcul.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
 poledit.o: atomid.o atoms.o couple.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
 polgrp.o:
 polopt.o:
