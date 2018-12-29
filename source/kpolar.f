@@ -410,6 +410,7 @@ c
                if (polarity(i) .ne. 0.0d0) then
                   npolar = npolar + 1
                   ipolar(npolar) = npole
+                  douind(i) = .true.
                end if
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)

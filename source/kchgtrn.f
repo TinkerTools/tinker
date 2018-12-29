@@ -135,6 +135,7 @@ c
       npolar = 0
       nct = 0
       do i = 1, n
+         if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
          if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0 .or.
      &          chgct(i).ne. 0.0d0 .or. dmpct(i).ne.0.0d0) then
             npole = npole + 1
@@ -147,9 +148,9 @@ c
             do k = 1, maxpole
                pole(k,npole) = pole(k,i)
             end do
-            douind(i) = .false.
             if (polarity(i) .ne. 0.0d0) then
                npolar = npolar + 1
+               ipolar(npolar) = npole
                douind(i) = .true.
             end if
             polarity(npole) = polarity(i)
