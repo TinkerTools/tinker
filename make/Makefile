@@ -79,7 +79,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Build:     TINKER
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 7.1
+##  Compiler:  GNU gfortran 8.1
 ##  Parallel:  OpenMP
 
 F77 = gfortran
@@ -96,7 +96,7 @@ RENAME = rename_bin
 ##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 6.4
+##  Compiler:  MinGW GNU gfortran 7.4
 ##  Parallel:  OpenMP
 
 #F77 = gfortran

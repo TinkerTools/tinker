@@ -86,7 +86,7 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
-##  Compiler: GNU gfortran 7.1, clang, nvcc
+##  Compiler: GNU gfortran 8.1, clang, nvcc
 ##  Parallel: OpenMP, OpenMM
 
 CC = clang

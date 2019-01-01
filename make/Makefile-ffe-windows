@@ -117,7 +117,7 @@ JAVA_LIBS = -ljvm
 ##  Build:    TINKER
 ##  OS Type:  Apple MacOS
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 7.1
+##  Compiler: GNU gfortran 8.1
 ##  Parallel: OpenMP
 
 #CC = gcc
@@ -137,7 +137,7 @@ JAVA_LIBS = -ljvm
 ##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 6.4
+##  Compiler:  MinGW GNU gfortran 7.4
 ##  Parallel:  OpenMP
 
 CC = gcc
