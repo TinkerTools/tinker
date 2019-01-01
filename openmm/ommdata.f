@@ -153,8 +153,9 @@ c
      &                   ndfft2,ndfft3,bsorder,bseorder,bsdorder,igrid,
      &                   bsmod1,bsmod2,bsmod3,bsbuild,thetai1,thetai2,
      &                   thetai3,qgrid,qfac)
-      call set_polar_data (npolar,polarity,thole,pdamp,udir,udirp,udirs,
-     &                     udirps,uind,uinp,uinds,uinps,uexact,douind)
+      call set_polar_data (npolar,ipolar,polarity,thole,pdamp,udir,
+     &                     udirp,udirs,udirps,uind,uinp,uinds,uinps,
+     &                     uexact,douind)
       call set_polgrp_data (maxp11,maxp12,maxp13,maxp14,np11,
      &                      np12,np13,np14,ip11,ip12,ip13,ip14)
       call set_polopt_data (maxopt,coptmax,optlevel,copt,copm,

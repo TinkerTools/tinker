@@ -557,6 +557,7 @@ struct {
 
 struct {
    int npolar;
+   int* ipolar;
    double* polarity;
    double* thole;
    double* pdamp;
@@ -1012,19 +1013,6 @@ void set_bound_data_ (double* polycut, double* polycut2, int* use_bounds,
    bound__.use_polymer = *use_polymer;
 }
 
-void set_cell_data_ (int* ncell, int* icell, double* xcell, double* ycell,
-                     double* zcell, double* xcell2, double* ycell2,
-                     double* zcell2) {
-   cell__.ncell = *ncell;
-   cell__.icell = icell;
-   cell__.xcell = *xcell;
-   cell__.ycell = *ycell;
-   cell__.zcell = *zcell;
-   cell__.xcell2 = *xcell2;
-   cell__.ycell2 = *ycell2;
-   cell__.zcell2 = *zcell2;
-}
-
 void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
                       double* alpha, double* beta, double* gamma,
                       double* xbox2, double* ybox2, double* zbox2,
@@ -1075,6 +1063,19 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
    boxes__.triclinic = *triclinic;
    boxes__.octahedron = *octahedron;
    setNullTerminator (spacegrp, 10, boxes__.spacegrp);
+}
+
+void set_cell_data_ (int* ncell, int* icell, double* xcell, double* ycell,
+                     double* zcell, double* xcell2, double* ycell2,
+                     double* zcell2) {
+   cell__.ncell = *ncell;
+   cell__.icell = icell;
+   cell__.xcell = *xcell;
+   cell__.ycell = *ycell;
+   cell__.zcell = *zcell;
+   cell__.xcell2 = *xcell2;
+   cell__.ycell2 = *ycell2;
+   cell__.zcell2 = *zcell2;
 }
 
 void set_charge_data_ (int* nion, int* iion, int* jion,
@@ -1467,7 +1468,7 @@ void set_pitors_data_ (int* npitors, int* ipit, double* kpit) {
 }
 
 void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
-                    int* nefft2, int* nefft3,int* ndfft1, int* ndfft2,
+                    int* nefft2, int* nefft3, int* ndfft1, int* ndfft2,
                     int* ndfft3, int* bsorder, int* bseorder, int* bsdorder,
                     int* igrid, double* bsmod1, double* bsmod2,
                     double* bsmod3, double* bsbuild, double*** thetai1,
@@ -1498,13 +1499,14 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
    pme__.qfac = qfac;
 }
 
-void set_polar_data_ (int* npolar, double* polarity, double* thole,
-                      double* pdamp, double* udir, double* udirp,
-                      double* udirs, double* udirps, double* uind,
-                      double* uinp, double* uinds, double* uinps,
-                      double* uexact, int* douind) {
+void set_polar_data_ (int* npolar, int* ipolar, double* polarity,
+                      double* thole, double* pdamp, double* udir,
+                      double* udirp, double* udirs, double* udirps,
+                      double* uind, double* uinp, double* uinds,
+                      double* uinps, double* uexact, int* douind) {
 
    polar__.npolar = *npolar;
+   polar__.ipolar = ipolar;
    polar__.polarity = polarity;
    polar__.thole = thole;
    polar__.pdamp = pdamp;
@@ -1538,7 +1540,7 @@ void set_polgrp_data_ (int* maxp11, int* maxp12, int* maxp13, int* maxp14,
    polgrp__.ip14 = ip14;
 }
 
-void set_polopt_data_ (int* maxopt, int* coptmax, int*optlevel,
+void set_polopt_data_ (int* maxopt, int* coptmax, int* optlevel,
                        double* copt, double* copm, double* uopt,
                        double* uoptp, double* uopts, double* uoptps,
                        double* fopt, double* foptp) {
@@ -1986,7 +1988,7 @@ static void mapConstraints (struct ConstraintMap* map, FILE* log) {
 static int checkForConstraint (struct ConstraintMap* map,
                                int p1, int p2, FILE* log) {
 
-   int ii, jj;
+   int ii;
    int offset;
    int match = 0;
 
@@ -1997,8 +1999,8 @@ static int checkForConstraint (struct ConstraintMap* map,
    }
 
    offset = map->constraintOffset[p1];
-   for (jj = 0; jj < map->constraintCount[p1] && match == 0; jj++) {
-      if (map->constraintList[offset+jj] == p2) {
+   for (ii = 0; ii < map->constraintCount[p1] && match == 0; ii++) {
+      if (map->constraintList[offset+ii] == p2) {
          match = 1;
       }
    }
@@ -2014,7 +2016,7 @@ static int checkForConstraint (struct ConstraintMap* map,
 static void setupAmoebaBondForce (OpenMM_System* system,
                                   int removeConstrainedBonds, FILE* log) {
 
-   int ii, jj;
+   int ii;
    int match;
    int* bondPtr;
    double kParameterConversion;
@@ -2058,7 +2060,7 @@ static void setupAmoebaBondForce (OpenMM_System* system,
 static void setupAmoebaAngleForce (OpenMM_System* system,
                                    int removeConstrainedAngles, FILE* log) {
 
-   int ii, jj;
+   int ii;
    int* angleIndexPtr;
    int match;
    char* angleTypPtr;
@@ -2108,7 +2110,7 @@ static void setupAmoebaAngleForce (OpenMM_System* system,
 static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
                                   int removeConstrainedBonds, FILE* log) {
 
-   int ii, jj;
+   int ii;
    int* angleIndexPtr;
    char* angleTypPtr;
    int match;
@@ -2159,7 +2161,7 @@ static void setupAmoebaInPlaneAngleForce (OpenMM_System* system,
 static void setupAmoebaStretchBendForce (OpenMM_System* system,
                                  int removeConstrainedBonds, FILE* log) {
 
-   int ii, jj, index, abIndex, cbIndex;
+   int ii, index, abIndex, cbIndex;
    int* angleIndexPtr;
    double bondLengthAB;
    double bondLengthCB;
@@ -2221,7 +2223,7 @@ static void setupAmoebaStretchBendForce (OpenMM_System* system,
 static void setupAmoebaUreyBradleyForce (OpenMM_System* system,
                                  int removeConstrainedBonds, FILE* log) {
 
-   int ii, jj;
+   int ii;
    int* angleIndexPtr;
    double kParameterConversion;
    int match;
@@ -2474,7 +2476,7 @@ static void setupAmoebaPiTorsionForce (OpenMM_System* system, FILE* log) {
 
 static void setupAmoebaStretchTorsionForce (OpenMM_System* system, FILE* log) {
 
-   int ii, jj, index, baIndex, cbIndex, dcIndex;
+   int ii, index, baIndex, cbIndex, dcIndex;
    double bondLengthBA, bondLengthCB, bondLengthDC;
    double* bondLengthPtr;
    int* torsionIndexPtr;
@@ -2539,7 +2541,7 @@ static void setupAmoebaStretchTorsionForce (OpenMM_System* system, FILE* log) {
 
 static void setupAmoebaAngleTorsionForce (OpenMM_System* system, FILE* log) {
 
-   int ii, jj, index, cbaIndex, dcbIndex;
+   int ii, index, cbaIndex, dcbIndex;
    double angleCBA, angleDCB;
    double* anglePtr;
    int* torsionIndexPtr;
@@ -2618,7 +2620,7 @@ static int getChiralIndex (int atomB, int atomC, int atomD) {
 
 static void setupAmoebaTorsionTorsionForce (OpenMM_System* system, FILE* log) {
 
-   int ii, jj, kk, index, count;
+   int ii, jj, index, count;
    int ia, ib, ic, id, ie, ichiral;
    int gridIndex;
    int xIndex, yIndex;
@@ -3051,8 +3053,8 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
 
    char buffer[128];
    char* axisPtr;
-   int ii, jj, index;
-   int invalidAxis, errorReport;
+   int ii, jj;
+   int errorReport;
    double* polePtr;
 
    OpenMM_AmoebaMultipoleForce_MultipoleAxisTypes axisType;
@@ -4521,10 +4523,10 @@ int openmm_test_ (void) {
    const OpenMM_Vec3Array* openMMForces;
 
    int infoMask;
-   int ii, jj;
+   int ii;
    int countActiveForces;
    char const* testName;
-   double conversion, delta, dot;
+   double conversion, delta;
    double tinkerNorm, openMMNorm;
    double openMMPotentialEnergy;
    OpenMM_Vec3Array* tinkerForce;
@@ -4975,7 +4977,6 @@ int openmm_test_ (void) {
 
       maxFDelta = 0.0;
       for (ii = 0; ii < atoms__.n; ii++) {
-         double relxNrm;
          double dot;
          OpenMM_Vec3 force;
          const OpenMM_Vec3* tinkerF;
@@ -5037,9 +5038,12 @@ int openmm_test_ (void) {
    OpenMM_Context_destroy (context);
    OpenMM_Integrator_destroy (integrator);
    OpenMM_System_destroy (system);
+
+   return 1;
 }
 
 void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
+
    OpenMMData_s* omm = (OpenMMData_s*) (*ommHandle);
 
    // copy periodic box from Tinker to OpenMM
@@ -5067,6 +5071,7 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
       r.z = atoms__.z[ii] * OpenMM_NmPerAngstrom;
       OpenMM_Vec3Array_set (posInNm, ii, r);
    }
+
    OpenMM_Context_setPositions (omm->context, posInNm);
 
    // get OpenMM state
