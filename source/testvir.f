@@ -265,9 +265,9 @@ c
      &           + lvec(1,3)*lvec(3,3)
       bcdot = lvec(2,1)*lvec(3,1) + lvec(2,2)*lvec(3,2)
      &           + lvec(2,3)*lvec(3,3)
-      xbox = lvec(1,1)
-      ybox = lvec(2,2)
-      zbox = lvec(3,3)
+      xbox = amag
+      ybox = bmag
+      zbox = cmag
       alpha = radian * acos(bcdot/(bmag*cmag))
       beta = radian * acos(acdot/(amag*cmag))
       gamma = radian * acos(abdot/(amag*bmag))
