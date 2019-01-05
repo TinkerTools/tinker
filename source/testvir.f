@@ -84,12 +84,11 @@ c
       use units
       use virial
       implicit none
-      integer i,j,k,m
-      real*8 energy,eps
-      real*8 epos,eneg,temp
+      integer i,j,k
+      real*8 energy,eps,temp
+      real*8 epos,eneg,lorig
       real*8 dedv_vir,dedv_num
       real*8 pres_vir,pres_num
-      real*8 lold(3,3)
       real*8 dedl(3,3)
       real*8 virn(3,3)
       real*8, allocatable :: xf(:)
@@ -102,19 +101,13 @@ c
       if (.not. use_bounds)  return
       eps = 0.00001d0
 c
-c     set the lattice type and store the lattice vectors
+c     set the lattice type to the general triclinic case
 c
       if (.not. octahedron) then
          orthogonal = .false.
          monoclinic = .false.
          triclinic = .true.
       end if
-      do i = 1, 3
-         do j = 1, 3
-            lold(j,i) = lvec(j,i)
-            dedl(j,i) = 0.0d0
-         end do
-      end do
 c
 c     print out the lattice vectors as matrix rows
 c
@@ -140,23 +133,16 @@ c     get energy derivatives with respect to lattice vectors
 c
       do i = 1, 3
          do j = i, 3
-            do k = 1, 3
-               do m = 1, 3
-                  lvec(m,k) = lold(m,k)
-               end do
-            end do
-            lvec(j,i) = lold(j,i) - eps
+            lorig = lvec(j,i)
+            lvec(j,i) = lorig - eps
             call cellang (xf,yf,zf)
             eneg = energy ()
-            do k = 1, 3
-               do m = 1, 3
-                  lvec(m,k) = lold(m,k)
-               end do
-            end do
-            lvec(j,i) = lold(j,i) + eps
+            lvec(j,i) = lorig + eps
             call cellang (xf,yf,zf)
             epos = energy ()
-            dedl(i,j) = 0.5d0 * (epos-eneg) / eps
+            lvec(j,i) = lorig
+            dedl(j,i) = 0.5d0 * (epos-eneg) / eps
+            call cellang (xf,yf,zf)
          end do
       end do
 c
@@ -165,16 +151,6 @@ c
       write (iout,20)  (dedl(1,i),dedl(2,i),dedl(3,i),i=1,3)
    20 format (/,' dE/dLvec Derivatives :',13x,3f13.3,
      &           /,36x,3f13.3,/,36x,3f13.3)
-c
-c     reset lattice vectors, coordinates and cell parameters
-c
-      do i = 1, 3
-         do j = 1, 3
-            lvec(j,i) = lold(j,i)
-         end do
-      end do
-      call cellang (xf,yf,zf)
-      call unitcell
 c
 c     perform deallocation of some local arrays
 c
@@ -188,7 +164,7 @@ c
          do j = 1, i
             virn(j,i) = 0.0d0
             do k = 1, 3
-               virn(j,i) = virn(j,i) + dedl(j,k)*lvec(k,i)
+               virn(j,i) = virn(j,i) + dedl(k,j)*lvec(k,i)
             end do
             virn(i,j) = virn(j,i)
          end do
