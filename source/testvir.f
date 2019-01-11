@@ -85,8 +85,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      real*8 energy,eps,temp
-      real*8 epos,eneg,lorig
+      real*8 energy,epos,eneg
+      real*8 eps,temp,lorig
       real*8 dedv_vir,dedv_num
       real*8 pres_vir,pres_num
       real*8 dedl(3,3)
@@ -99,7 +99,7 @@ c
 c     set relative volume change for finite-differences
 c
       if (.not. use_bounds)  return
-      eps = 0.00001d0
+      eps = 0.000001d0
 c
 c     set the lattice type to the general triclinic case
 c

@@ -2081,7 +2081,7 @@ rxnfld.o:
 rxnpot.o:
 saddle.o: atoms.o inform.o iounit.o keys.o linmin.o minima.o syntrn.o titles.o zcoord.o
 scales.o: sizes.o
-scan.o: atoms.o files.o inform.o iounit.o math.o minima.o omega.o output.o zcoord.o
+scan.o: atoms.o files.o inform.o iounit.o math.o minima.o omega.o output.o potent.o zcoord.o
 sdstep.o: atomid.o atoms.o bath.o couple.o freeze.o kvdws.o math.o mdstuf.o moldyn.o stodyn.o units.o usage.o virial.o
 search.o: linmin.o math.o
 sequen.o: sizes.o

@@ -487,6 +487,7 @@ c
       use iounit
       use math
       use omega
+      use potent
       use zcoord
       implicit none
       integer maxstep
@@ -498,6 +499,7 @@ c
       real*8 estep(0:maxstep)
       real*8 step(*)
       logical done
+      logical oldpolar
 c
 c
 c     convert current reference coordinates to a Z-matrix
@@ -526,7 +528,10 @@ c
             end do
          end if
          call makexyz
+         oldpolar = use_polar
+         use_polar = .false.
          estep(kstep) = energy ()
+         use_polar = oldpolar
          if (kstep .ge. 2) then
             if (estep(kstep) .lt. estep(kstep-2) .and.
      &          estep(kstep-1) .lt. estep(kstep-2)) then
@@ -587,25 +592,25 @@ c
       use atoms
       use inform
       use minima
+      use output
+      use potent
       implicit none
       integer i,j,nvar
       real*8 minimum,scan1
-      real*8 grdmin,big
-      real*8 gnorm,grms
+      real*8 grdmin,oldgrd
+      real*8 gnorm,grms,big
       real*8, allocatable :: xx(:)
       real*8, allocatable :: derivs(:,:)
-      logical oldverb
+      logical oldverb,oldpolar
       character*6 mode,method
       external scan1,scan2
       external optsave
 c
 c
-c     initialize optimization parameters and output level
+c     initialize optimization output and maximum energy
 c
       iwrite = 0
       iprint = 0
-      oldverb = verbose
-      verbose = .false.
       big = 100000.0d0
 c
 c     perform dynamic allocation of some local arrays
@@ -624,13 +629,27 @@ c
          xx(nvar) = z(i)
       end do
 c
-c     use optimization to reach the nearest local minimum
+c     adjust polarization and set initial optimization values
 c
+      oldverb = verbose
+      oldpolar = use_polar
+      oldgrd = grdmin
+      verbose = .false.
+      use_polar = .false.
+      grdmin = 3.0
+c
+c     initial optimizaton to get close to approximate minimum
+c
+      call lbfgs (nvar,xx,minimum,grdmin,scan1,optsave)
+c
+c     secondary optimization to reach the exact local minimum
+c
+      use_polar = oldpolar
+      grdmin = oldgrd
       mode = 'AUTO'
       method = 'AUTO'
       call tncg (mode,method,nvar,xx,minimum,
      &           grdmin,scan1,scan2,optsave)
-c     call lbfgs (nvar,xx,minimum,grdmin,scan1,optsave)
       verbose = oldverb
 c
 c     convert optimization parameters to atomic coordinates
