@@ -731,7 +731,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(pole))  allocate (pole(maxpole,npole))
+      if (.not. allocated(pole))  allocate (pole(maxpole,n))
+      if (.not. allocated(rpole))  allocate (rpole(maxpole,n))
+      if (.not. allocated(spole))  allocate (spole(maxpole,n))
+      if (.not. allocated(srpole))  allocate (srpole(maxpole,n))
 c
 c     store the global multipoles in the local frame array
 c
@@ -1266,9 +1269,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      do i = 1, npole
-         call rotpole
-      end do
+      call rotpole
 c
 c     compute induced dipoles to be removed from QM multipoles
 c

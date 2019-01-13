@@ -23,6 +23,7 @@ c
       real*8 a(3,3)
       real*8 d1(3,3)
       real*8 d2(5,5)
+      logical use_qi
 c
 c
 c     rotate the atomic multipoles at each site in turn
@@ -35,19 +36,19 @@ c
 c     set QI dipole rotation matrix by permuting the Cartesian
 c     rotation matrix to adhere to spherical harmonic ordering
 c
-      do i = 1, npole
-         d1(1,1) = a(3,3)
-         d1(2,1) = a(3,1)
-         d1(3,1) = a(3,2)
-         d1(1,2) = a(1,3)
-         d1(2,2) = a(1,1)
-         d1(3,2) = a(1,2)
-         d1(1,3) = a(2,3)
-         d1(2,3) = a(2,1)
-         d1(3,3) = a(2,2)
-         call shrotmat (d1,d2)
-         call shrotsite (i,d1,d2)
-      end do
+c     do i = 1, npole
+c        d1(1,1) = a(3,3)
+c        d1(2,1) = a(3,1)
+c        d1(3,1) = a(3,2)
+c        d1(1,2) = a(1,3)
+c        d1(2,2) = a(1,1)
+c        d1(3,2) = a(1,2)
+c        d1(1,3) = a(2,3)
+c        d1(2,3) = a(2,1)
+c        d1(3,3) = a(2,2)
+c        call shrotmat (d1,d2)
+c        call shrotsite (i,d1,d2)
+c     end do
       return
       end
 c

@@ -544,6 +544,8 @@ c
       if (allocated(yaxis))  deallocate (yaxis)
       if (allocated(pole))  deallocate (pole)
       if (allocated(rpole))  deallocate (rpole)
+      if (allocated(spole))  deallocate (spole)
+      if (allocated(srpole))  deallocate (srpole)
       if (allocated(polaxe))  deallocate (polaxe)
 c
 c     deallocation of global arrays from module mrecip
