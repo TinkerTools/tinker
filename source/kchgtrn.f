@@ -21,13 +21,16 @@ c
       use sizes
       use atomid
       use atoms
+      use chgpen
       use chgtrn
       use inform
       use iounit
       use kctrn
       use keys
+      use mplpot
       use mpole
       use polar
+      use polpot
       use potent
       implicit none
       integer i,k
@@ -132,6 +135,7 @@ c
 c     remove zero and undefined electrostatic sites from the list
 c
       npole = 0
+      ncp = 0
       npolar = 0
       nct = 0
       do i = 1, n
@@ -148,6 +152,10 @@ c
             do k = 1, maxpole
                pole(k,npole) = pole(k,i)
             end do
+            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+            pcore(npole) = pcore(i)
+            pval(npole) = pval(i)
+            palpha(npole) = palpha(i)
             if (polarity(i) .ne. 0.0d0) then
                npolar = npolar + 1
                ipolar(npolar) = npole
@@ -166,7 +174,9 @@ c
 c     turn off individual electrostatic potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
+      if (ncp .ne. 0)  use_chgpen = .true.
       if (npolar .eq. 0)  use_polar = .false.
+      if (use_polar .and. ncp.eq.0)  use_thole = .true.
       if (nct .eq. 0)  use_chgtrn = .false.
       return
       end

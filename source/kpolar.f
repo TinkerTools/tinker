@@ -390,6 +390,7 @@ c
       npolar = 0
       if (use_polar .or. use_solv) then
          npole = 0
+         ncp = 0
          do i = 1, n
             if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
             if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
