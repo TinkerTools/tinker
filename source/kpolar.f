@@ -385,39 +385,41 @@ c
          end if
       end do
 c
-c     remove zero and undefined polarizable sites from the list
+c     remove zero and or undefined polarizable sites from the list
 c
+      npole = 0
+      ncp = 0
       npolar = 0
-      if (use_polar .or. use_solv) then
-         npole = 0
-         ncp = 0
-         do i = 1, n
-            if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
-            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
-               npole = npole + 1
-               ipole(npole) = i
-               pollist(i) = npole
-               zaxis(npole) = zaxis(i)
-               xaxis(npole) = xaxis(i)
-               yaxis(npole) = yaxis(i)
-               polaxe(npole) = polaxe(i)
-               do k = 1, maxpole
-                  pole(k,npole) = pole(k,i)
-               end do
-               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-               pcore(npole) = pcore(i)
-               pval(npole) = pval(i)
-               palpha(npole) = palpha(i)
-               if (polarity(i) .ne. 0.0d0) then
-                  npolar = npolar + 1
-                  ipolar(npolar) = npole
-                  douind(i) = .true.
-               end if
-               polarity(npole) = polarity(i)
-               thole(npole) = thole(i)
+      do i = 1, n
+         if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
+         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
+            npole = npole + 1
+            ipole(npole) = i
+            pollist(i) = npole
+            zaxis(npole) = zaxis(i)
+            xaxis(npole) = xaxis(i)
+            yaxis(npole) = yaxis(i)
+            polaxe(npole) = polaxe(i)
+            do k = 1, maxpole
+               pole(k,npole) = pole(k,i)
+            end do
+            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+            pcore(npole) = pcore(i)
+            pval(npole) = pval(i)
+            palpha(npole) = palpha(i)
+            if (polarity(i) .ne. 0.0d0) then
+               npolar = npolar + 1
+               ipolar(npolar) = npole
+               douind(i) = .true.
             end if
-         end do
-      end if
+            polarity(npole) = polarity(i)
+            thole(npole) = thole(i)
+         end if
+      end do
+c
+c     test multipoles at chiral sites and invert if necessary
+c
+      call chkpole
 c
 c     set the values used in the scaling of the polarizability
 c
@@ -433,10 +435,6 @@ c
 c     assign polarization group connectivity of each atom
 c
       call polargrp
-c
-c     test multipoles at chiral sites and invert if necessary
-c
-      call chkpole
 c
 c     turn off polarizable multipole potentials if not used
 c

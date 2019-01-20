@@ -132,7 +132,7 @@ c
          end if
       end do
 c
-c     remove zero and undefined electrostatic sites from the list
+c     remove zero or undefined electrostatic sites from the list
 c
       npole = 0
       ncp = 0
@@ -170,6 +170,10 @@ c
             dmpct(npole) = dmpct(i)
          end if
       end do
+c
+c     test multipoles at chiral sites and invert if necessary
+c
+      call chkpole
 c
 c     turn off individual electrostatic potentials if not used
 c
