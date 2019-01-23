@@ -1453,7 +1453,7 @@ c
          sum = sum + pchg(i)
          ci = abs(pchg(i))
          if (ci .gt. big) then
-            do j = 1, n
+            do j = 1, nion
                cj = abs(pchg(j))
                if (i.ne.j .and. ci.eq.cj)  goto 10
             end do
@@ -1474,7 +1474,7 @@ c
          sum = sum + pole(1,i)
          ci = abs(pole(1,i))
          if (ci .gt. big) then
-            do j = 1, n
+            do j = 1, npole
                cj = abs(pole(1,j))
                if (i.ne.j .and. ci.eq.cj)  goto 20
             end do
@@ -1495,6 +1495,9 @@ c
          if (big .eq. abs(pole(5,i)))  k = 5
          if (big .eq. abs(pole(9,i)))  k = 9
          if (big .eq. abs(pole(13,i)))  k = 13
+         if (pole(9,i) .eq. pole(13,i))  k = 5
+         if (pole(5,i) .eq. pole(13,i))  k = 9
+         if (pole(5,i) .eq. pole(9,i))  k = 13
          if (k .ne. 0)  pole(k,i) = pole(k,i) - sum
       end do
 c

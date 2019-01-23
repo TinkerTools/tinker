@@ -57,9 +57,10 @@ CUDA_DIR = /usr/local/cuda
 CUDA_LIB = $(CUDA_DIR)/lib
 CUDA_INCLUDE = $(CUDA_DIR)/include
 
-# Linux only
+# Uncomment following for 64-bit Linux machines
+#CUDA_LIB = $(CUDA_DIR)/lib64
 #NVML_INCLUDE = /usr/include/nvidia/gdk
-#NVML_LIB = /libs64/nvidia
+#NVML_LIB = /usr/local/cuda/lib64/stubs
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##

@@ -200,11 +200,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine cellang  --  lattice vectors to other values  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine cellang  --  lattice vectors to cell parameters  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "cellang" computes atomic coordinates and unit cell parameters
