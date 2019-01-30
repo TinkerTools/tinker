@@ -80,7 +80,6 @@ c
 c     set defaults for TCG induced dipole parameters
 c
       tcgorder = 0
-      tcgprec = .true.
       tcgguess = .true.
       tcgpeek = 1.0d0
       if (poltyp .eq. 'TCG   ')  poltyp = 'TCG2  '
@@ -165,10 +164,6 @@ c
             pcgguess = .false.
          else if (keyword(1:9) .eq. 'PCG-PEEK ') then
             read (string,*,err=20,end=20)  pcgpeek
-         else if (keyword(1:12) .eq. 'TCG-PRECOND ') then
-            tcgprec = .true.
-         else if (keyword(1:14) .eq. 'TCG-NOPRECOND ') then
-            tcgprec = .false.
          else if (keyword(1:10) .eq. 'TCG-GUESS ') then
             tcgguess = .true.
          else if (keyword(1:12) .eq. 'TCG-NOGUESS ') then

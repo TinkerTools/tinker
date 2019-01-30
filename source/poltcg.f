@@ -19,7 +19,6 @@ c     uad        left-hand side mutual induced d-dipoles
 c     uap        left-hand side mutual induced p-dipoles
 c     ubd        right-hand side mutual induced d-dipoles
 c     ubp        right-hand side mutual induced p-dipoles
-c     tcgprec    flag to allow use of a diagonal preconditioner
 c     tcgguess   flag to use initial TCG based on direct field
 c
 c
@@ -32,7 +31,6 @@ c
       real*8, allocatable :: uap(:,:,:)
       real*8, allocatable :: ubd(:,:,:)
       real*8, allocatable :: ubp(:,:,:)
-      logical tcgprec
       logical tcgguess
       save
       end

@@ -835,8 +835,7 @@ c
 !$OMP PARALLEL default(shared) private(i,j,alpha)
 !$OMP DO schedule(guided)
       do i = 1, npole
-         alpha = 1.0d0
-         if (tcgprec)  alpha = polarity(i)
+         alpha = polarity(i)
          do j = 1, 3
             pvec(j,i) = alpha*rvec(j,i) + beta*pvec(j,i)
          end do
