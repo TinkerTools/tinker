@@ -650,6 +650,7 @@ c
             call getref (j)
             call setelect
             call varprm (nvar,xx,0,0.0d0)
+            call prmvar (nvar,xx)
             if (use_mpole) then
                call chkpole
                call rotpole
@@ -1408,6 +1409,7 @@ c
       implicit none
       integer i,j,k
       integer ii,it
+      integer kk,kt
       integer nvar
       real*8 dterm,qterm
       real*8 ci,cj
@@ -1444,7 +1446,7 @@ c
          end do
       end do
 c
-c     maintain integer net charge over partial charges
+c     enforce integer net charge over partial charges
 c
       k = 0
       big = 0.0d0
@@ -1463,9 +1465,14 @@ c
          end if
       end do
       sum = sum - dble(nint(sum))
-      if (k .ne. 0)  pchg(k) = pchg(k) - sum
+      if (k .ne. 0) then
+         kk = iion(k)
+         kt = type(kk)
+         pchg(k) = pchg(k) - sum
+         fchg(kt) = pchg(k)
+      end if
 c
-c     maintain integer net charge over atomic multipoles
+c     enforce integer net charge over atomic multipoles
 c
       k = 0
       big = 0.0d0
@@ -1484,9 +1491,14 @@ c
          end if
       end do
       sum = sum - dble(nint(sum))
-      if (k .ne. 0)  pole(1,k) = pole(1,k) - sum
+      if (k .ne. 0) then
+         kk = ipole(k)
+         kt = type(kk)
+         pole(1,k) = pole(1,k) - sum
+         fpol(1,kt) = pole(1,k)
+      end if
 c
-c     maintain traceless quadrupole at each multipole site
+c     enforce traceless quadrupole at each multipole site
 c
       do i = 1, npole
          sum = pole(5,i) + pole(9,i) + pole(13,i)
@@ -1498,7 +1510,12 @@ c
          if (pole(9,i) .eq. pole(13,i))  k = 5
          if (pole(5,i) .eq. pole(13,i))  k = 9
          if (pole(5,i) .eq. pole(9,i))  k = 13
-         if (k .ne. 0)  pole(k,i) = pole(k,i) - sum
+         if (k .ne. 0) then
+            ii = ipole(i)
+            it = type(ii)
+            pole(k,i) = pole(k,i) - sum
+            fpol(k,it) = pole(k,i)
+         end if
       end do
 c
 c     list active atoms when not all are used in optimization
