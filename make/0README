@@ -7,9 +7,17 @@
         to build the Tinker modeling package. The provided file will need
         modification to point to the local Tinker directory, and for use
         with machine and compiler combinations not described near the top
-        of the Makefile. A list of the dependencies of source files on
-        each other is generated via the Tinker "document" program by
-        running the "depend.make" script from within the source directory.
+        of the Makefile.
+
+        A list of the dependencies of source files on each other, to be
+        added at the bottom of the Makefile, is generated via the Tinker
+        "document" program by running the "depend.make" script from within
+        the source directory.
+
+        A python script that will build a new Makefile with the correct
+        dependencies included is provided as "buildmake.py". The script
+        should be run with the location of the Tinker source directory as
+        an argument, e.g., "./buildmake.py ../source".
 
         Alternatively, Tinker can be built by running the compile.make,
         library.make and link.make scripts provided in machine specific

@@ -79,7 +79,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Build:     TINKER
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 7.1
+##  Compiler:  GNU gfortran 8.1
 ##  Parallel:  OpenMP
 
 F77 = gfortran
@@ -96,7 +96,7 @@ RENAME = rename_bin
 ##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 6.4
+##  Compiler:  MinGW GNU gfortran 7.4
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
@@ -1716,8 +1716,8 @@ epitors1.o: atoms.o bound.o deriv.o energi.o group.o pitors.o torpot.o usage.o v
 epitors2.o: angbnd.o atoms.o bound.o deriv.o group.o hessn.o pitors.o torpot.o usage.o
 epitors3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o iounit.o math.o pitors.o torpot.o usage.o
 epolar.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o
-epolar1.o: atoms.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o ewald.o limits.o math.o molcul.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o virial.o
-epolar2.o: atoms.o bound.o cell.o chgpot.o couple.o deriv.o hessn.o limits.o mpole.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o
+epolar1.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o energi.o ewald.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o virial.o
+epolar2.o: atoms.o bound.o cell.o chgpen.o chgpot.o couple.o deriv.o hessn.o limits.o mplpot.o mpole.o polar.o polgrp.o polopt.o polpot.o poltcg.o potent.o shunt.o
 epolar3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o neigh.o pme.o polar.o polgrp.o polpot.o potent.o shunt.o units.o
 erepel.o: atoms.o bound.o cell.o couple.o energi.o group.o inform.o inter.o limits.o mpole.o neigh.o potent.o repel.o reppot.o shunt.o usage.o
 erepel1.o: atoms.o bound.o cell.o couple.o deriv.o energi.o group.o inform.o limits.o mpole.o neigh.o potent.o repel.o reppot.o shunt.o usage.o virial.o
@@ -1963,7 +1963,7 @@ pme.o:
 pmestuf.o: atoms.o boxes.o charge.o chunks.o disp.o math.o mpole.o openmp.o pme.o potent.o
 pmpb.o: iounit.o
 polar.o:
-polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
+polarize.o: atoms.o chgpen.o couple.o inform.o iounit.o molcul.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
 poledit.o: atomid.o atoms.o couple.o files.o iounit.o keys.o kpolr.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
 polgrp.o:
 polopt.o:
@@ -2029,7 +2029,7 @@ rxnfld.o:
 rxnpot.o:
 saddle.o: atoms.o inform.o iounit.o keys.o linmin.o minima.o syntrn.o titles.o zcoord.o
 scales.o: sizes.o
-scan.o: atoms.o files.o inform.o iounit.o math.o minima.o omega.o output.o zcoord.o
+scan.o: atoms.o files.o inform.o iounit.o math.o minima.o omega.o output.o potent.o zcoord.o
 sdstep.o: atomid.o atoms.o bath.o couple.o freeze.o kvdws.o math.o mdstuf.o moldyn.o stodyn.o units.o usage.o virial.o
 search.o: linmin.o math.o
 sequen.o: sizes.o
