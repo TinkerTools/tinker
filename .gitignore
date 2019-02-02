@@ -4,9 +4,9 @@ doc/announce
 doc/mechanic
 doc/word
 fftw
-lib/linux/*
-lib/macos/*
-lib/windows/*
+lib/linux/lib*
+lib/macos/lib*
+lib/windows/lib*
 listing
 mscale
 osrw

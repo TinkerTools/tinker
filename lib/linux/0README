@@ -1,0 +1,9 @@
+
+                    ########################################
+                    Extra Link Libraries for Tinker on Linux
+                    ########################################
+
+       This directory contains any extra object libraries to be included
+       when linking Tinker under Linux. For example, they could be static
+       compiler libraries, static version of FFTW libraries, etc.
+
