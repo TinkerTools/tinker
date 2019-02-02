@@ -1,11 +1,12 @@
-*.swp
 apbs
 bin
 doc/announce
 doc/mechanic
 doc/word
 fftw
-lib
+lib/linux/*
+lib/macos/*
+lib/windows/*
 listing
 mscale
 osrw
