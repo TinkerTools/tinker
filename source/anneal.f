@@ -35,7 +35,7 @@ c
       integer nstep,istep
       real*8 logmass,factor
       real*8 ratio,sigmoid
-      real*8 dt,dtdump
+      real*8 dt,dtsave
       real*8 hot,cold
       real*8 fuzzy,sharp
       real*8 loose,tight
@@ -140,22 +140,22 @@ c
       end do
       dt = 0.001d0 * dt
 c
-c     set the time between trajectory snapshot coordinate dumps
+c     set the time between trajectory snapshot coordinate saves
 c
-      dtdump = -1.0d0
+      dtsave = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=190,end=190)  dtdump
+      if (exist)  read (string,*,err=190,end=190)  dtsave
   190 continue
-      do while (dtdump .lt. 0.0d0)
+      do while (dtsave .lt. 0.0d0)
          write (iout,200)
-  200    format (/,' Enter Time between Dumps in Picoseconds',
+  200    format (/,' Enter Time between Saves in Picoseconds',
      &              ' [0.1] :  ',$)
-         read (input,210,err=220)  dtdump
+         read (input,210,err=220)  dtsave
   210    format (f20.0)
-         if (dtdump .le. 0.0d0)  dtdump = 0.1d0
+         if (dtsave .le. 0.0d0)  dtsave = 0.1d0
   220    continue
       end do
-      iwrite = nint(dtdump/dt)
+      iwrite = nint(dtsave/dt)
 c
 c     get factor by which atomic weights are to be increased
 c

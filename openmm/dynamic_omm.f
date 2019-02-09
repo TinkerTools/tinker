@@ -43,7 +43,7 @@ c
       integer callMdStat
       integer callMdSave
       real*8 e,dt
-      real*8 dtdump,speed
+      real*8 dtsave,speed
       real*8 elapsed,cpu
       real*8, allocatable :: derivs(:,:)
       logical exist
@@ -132,22 +132,22 @@ c
       tautemp = max(tautemp,dt)
       taupres = max(taupres,dt)
 c
-c     set the time between trajectory snapshot coordinate dumps
+c     set the time between trajectory snapshot coordinate saves
 c
-      dtdump = -1.0d0
+      dtsave = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=90,end=90)  dtdump
+      if (exist)  read (string,*,err=90,end=90)  dtsave
    90 continue
-      do while (dtdump .lt. 0.0d0)
+      do while (dtsave .lt. 0.0d0)
          write (iout,100)
-  100    format (/,' Enter Time between Dumps in Picoseconds',
+  100    format (/,' Enter Time between saves in Picoseconds',
      &              ' [0.1] :  ',$)
-         read (input,110,err=120)  dtdump
+         read (input,110,err=120)  dtsave
   110    format (f20.0)
-         if (dtdump .le. 0.0d0)  dtdump = 0.1d0
+         if (dtsave .le. 0.0d0)  dtsave = 0.1d0
   120    continue
       end do
-      iwrite = nint(dtdump/dt)
+      iwrite = nint(dtsave/dt)
 c
 c     get choice of statistical ensemble for periodic system
 c

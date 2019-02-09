@@ -16,7 +16,7 @@ c     maxask    maximum number of queries for interactive input
 c
 c     digits    decimal places output for energy and coordinates
 c     iprint    steps between status printing (0=no printing)
-c     iwrite    steps between coordinate dumps (0=no dumps)
+c     iwrite    steps between coordinate saves (0=no saves)
 c     isend     steps between socket communication (0=no sockets)
 c     silent    logical flag to turn off all information printing
 c     verbose   logical flag to turn on extra information printing

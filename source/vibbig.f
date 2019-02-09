@@ -48,7 +48,7 @@ c
       integer i1,i2,k0,k1,k2
       integer ivib,ivb1,ivb2
       integer iblock,iconv
-      integer iter,idump
+      integer iter,isave
       integer nvar,nblk
       integer nroot,nbasis
       integer np,npair
@@ -103,7 +103,7 @@ c
       maxroot = 50
       np = 6
       iter = 0
-      idump = 10
+      isave = 10
       maxhess = nvar * (nvar-1) / 2
       maxiter = 100000
       wtol = 0.00001d0
@@ -120,8 +120,8 @@ c
          string = record(next:240)
          if (keyword(1:8) .eq. 'MAXITER ') then
             read (string,*,err=10,end=10)  maxiter
-         else if (keyword(1:6) .eq. 'IDUMP ') then
-            read (string,*,err=10,end=10)  idump
+         else if (keyword(1:11) .eq. 'SAVE-VECTS ') then
+            read (string,*,err=10,end=10)  isave
          else if (keyword(1:10) .eq. 'VIB-ROOTS ') then
             read (string,*,err=10,end=10)  nroot
             nroot = min(nroot,maxroot)
@@ -934,9 +934,9 @@ c
          end if
       end do
 c
-c     save vectors for restart
+c     save vectors needed to restart a calculation
 c
-      if (mod(iter,idump) .eq. 0) then
+      if (mod(iter,isave) .eq. 0) then
          rewind (unit=ivb2)
          do i = 1, npair
             write (ivb2)  (phi(k,i),k=1,nvar)

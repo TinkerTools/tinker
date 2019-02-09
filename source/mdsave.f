@@ -40,9 +40,9 @@ c
       integer i,j,k,istep
       integer ixyz,iind
       integer ivel,ifrc
-      integer iend,idump,lext
+      integer iend,isave,lext
       integer freeunit,trimtext
-      integer moddump
+      integer modsave
       real*8 dt,epot,eksum
       real*8 pico,wt
       logical exist
@@ -58,16 +58,16 @@ c     send data via external socket communication if desired
 c
       if (.not.sktstart .or. use_socket)  call sktdyn (istep,dt,epot)
 c
-c     check number of steps between trajectory file dumps
+c     check number of steps between trajectory file saves
 c
-      moddump = mod(istep,iwrite)
-      if (moddump .ne. 0)  return
+      modsave = mod(istep,iwrite)
+      if (modsave .ne. 0)  return
 c
 c     get the sequence number of the current trajectory frame
 c
-      idump = nprior + istep/iwrite
+      isave = nprior + istep/iwrite
       lext = 3
-      call numeral (idump,ext,lext)
+      call numeral (isave,ext,lext)
 c
 c     print header for the instantaneous values at current step
 c
@@ -142,7 +142,7 @@ c
       if (use_bounds)  call bounds
       call prtxyz (ixyz)
       close (unit=ixyz)
-      write (iout,170)  idump
+      write (iout,170)  isave
   170 format (' Frame Number',13x,i10)
       write (iout,180)  xyzfile(1:trimtext(xyzfile))
   180 format (' Coordinate File',12x,a)
@@ -275,8 +275,8 @@ c
 c
 c     skip an extra line to keep the output formating neat
 c
-      moddump = mod(istep,iprint)
-      if (verbose .and. moddump.ne.0) then
+      modsave = mod(istep,iprint)
+      if (verbose .and. modsave.ne.0) then
          write (iout,320)
   320    format ()
       end if

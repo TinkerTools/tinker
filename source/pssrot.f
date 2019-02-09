@@ -71,7 +71,7 @@ c
       call makexyz
       call makeref (1)
 c
-c     set maximum deformation value and disable coordinate dumps
+c     set maximum deformation value and disable coordinate saves
 c
       deform0 = deform
       iwrite = 0
