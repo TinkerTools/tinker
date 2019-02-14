@@ -1507,14 +1507,11 @@ c
          if (big .eq. abs(pole(5,i)))  k = 5
          if (big .eq. abs(pole(9,i)))  k = 9
          if (big .eq. abs(pole(13,i)))  k = 13
-         if (pole(9,i) .eq. pole(13,i))  k = 5
-         if (pole(5,i) .eq. pole(13,i))  k = 9
-         if (pole(5,i) .eq. pole(9,i))  k = 13
          if (k .ne. 0) then
             ii = ipole(i)
             it = type(ii)
             pole(k,i) = pole(k,i) - sum
-            fpol(k,it) = pole(k,i)
+            fpol(k,it) = qterm * pole(k,i)
          end if
       end do
 c
