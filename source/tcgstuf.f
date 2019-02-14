@@ -123,7 +123,6 @@ c     p0 = alpha*r0 = udir
 c     n0 = r0*a*r0
 c     np0 = p0*T*p0
 c
-      call tcg_alpha22 (r0(:,:,1),r0(:,:,2),udir,udirp)
       call tcg_alphaquad (n0,r0(:,:,1),r0(:,:,2))
       call tcg_t0 (udir,udirp,tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np0,3*npole,tp(:,:,1),udirp)

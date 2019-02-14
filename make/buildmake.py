@@ -68,6 +68,7 @@ os__ := $(shell uname -s)
 
 ifeq ($(os__), Darwin)
 else ifeq ($(os__), Linux)
+else ifeq ($(shell echo $(os__) | cut -c 1-9), CYGWIN_NT)
 else
 $(error Unknown OS -- $(os__); Please help with us)
 endif
@@ -81,13 +82,13 @@ found__ := false
 
 f77__ := $(shell echo $(F77) | cut -c 1-8)
 ifeq ($(f77__), gfortran)
-    use_gfortran__ := true
-    found__ := true
+  use_gfortran__ := true
+  found__ := true
 endif
 f77__ := $(shell echo $(F77) | cut -c 1-5)
 ifeq ($(f77__), ifort)
-    use_ifort__ := true
-    found__ := true
+  use_ifort__ := true
+  found__ := true
 endif
 ifneq ($(found__), true)
 $(error Unknown fortran compiler -- $(F77); Please help with us)
@@ -228,7 +229,7 @@ def determine_module_subroutine_program(fortran_filename):
     use_list = []
     file_type = UNKNOWN_TYPE
     def type_must_be_unknown(t):
-        if file_type != UNKNOWN_TYPE:
+        if t != UNKNOWN_TYPE:
             raise BaseException('Cannot parse file: %s' % fortran_filename)
 
     for line in content:
@@ -280,13 +281,11 @@ def categorize_fortran_files(fortran_files):
     SUBROUTINE_FILES.sort()
     DEPENDENCY = [temp_dict[k] for k in sorted_keys]
 
-def obj_list():
-    temp_list = MODULE_FILES+SUBROUTINE_FILES+PROGRAM_FILES
-    temp_list.sort()
-    return [word+'.o' for word in temp_list]
-
 def x_list():
     return [word+'.x' for word in PROGRAM_FILES]
+
+def xobj_list():
+    return [word+'.o' for word in PROGRAM_FILES]
 
 def lib_list():
     temp_list = MODULE_FILES+SUBROUTINE_FILES
@@ -299,7 +298,7 @@ def print_list(init_string, list, end_string=''):
     if length > 0:
         for i in range(length-1):
             buff = buff+' '+list[i]
-            if len(buff) > 70:
+            if len(buff) > 60:
                 buff = buff+' \\'
                 print(buff)
                 buff = ''
@@ -315,20 +314,21 @@ def print_dependency():
     for d in DEPENDENCY:
         print(d)
 
-def o_x():
-    print('%.o: ${src}/%.f')
-    print('\t${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@')
+def target_o():
+    print('%.o: $(src)/%.f')
+    print('\t$(F77) $(F77FLAGS) $(OPTFLAGS) $< -o $@')
     print('')
 
+def target_x():
     print('%.x: %.o libtinker.a')
-    print('\t${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${LIBS} ${FFTW_LIBS}; strip $@')
+    print('\t$(F77) $(LINKFLAGS) -o $@ $(LIBDIR) $(FFTW_LIBDIR) $^ $(LIBS) $(FFTW_LIBS); strip $@')
     print('')
 
 def all_install_clean_listing():
-    print('all: ${EXEFILES}')
+    print('all: $(EXEFILES)')
     print('')
 
-    print('install: ${RENAME}')
+    print('install: $(RENAME)')
     print('')
 
     print('clean:')
@@ -365,14 +365,16 @@ if __name__ == '__main__':
 
     print(MAKEFILE_CONFIG)
 
-    print_list('OBJS =', obj_list())
-    print_list('EXEFILES =', x_list())
+    print_list('LIBOBJS :=', lib_list())
+    print_list('EXEOBJS :=', xobj_list())
+    print('OBJS := $(LIBOBJS) $(EXEOBJS)')
+    print('')
+    print_list('EXEFILES :=', x_list())
 
-    o_x()
+    target_o()
+    target_x()
     all_install_clean_listing()
     rename_bin_rename_exe_remove_links_create_links()
 
-    print_list('LIBOBJS =',lib_list())
-    print_list('libtinker.a: ${LIBOBJS}\n\tar ${LIBFLAGS} libtinker.a ${LIBOBJS}', [], '\t${RANLIB} libtinker.a\n')
+    print_list('libtinker.a: $(LIBOBJS)\n\tar $(LIBFLAGS) libtinker.a $(LIBOBJS)', [], '\t$(RANLIB) libtinker.a\n')
     print_dependency()
-
