@@ -14,6 +14,7 @@ c
 c
 c     aewald     current value of Ewald convergence coefficient
 c     aeewald    Ewald convergence coefficient for electrostatics
+c     apewald    Ewald convergence coefficient for polarization
 c     adewald    Ewald convergence coefficient for dispersion
 c     boundary   Ewald boundary condition; none, tinfoil or vacuum
 c
@@ -22,6 +23,7 @@ c
       implicit none
       real*8 aewald
       real*8 aeewald
+      real*8 apewald
       real*8 adewald
       character*7 boundary
       save

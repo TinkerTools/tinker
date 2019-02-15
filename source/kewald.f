@@ -29,6 +29,7 @@ c
       use limits
       use openmp
       use pme
+      use potent
       implicit none
       integer maxpower
       integer maxfft
@@ -42,6 +43,7 @@ c
       integer multi(maxpower)
       real*8 delta,rmax
       real*8 edens,ddens
+      real*8 size,slope
       character*20 keyword
       character*240 record
       character*240 string
@@ -67,17 +69,36 @@ c
       if (nthread .gt. 1)  ffttyp = 'FFTW'
       boundary = 'TINFOIL'
       bseorder = 5
+      bsporder = 5
       bsdorder = 4
       edens = 1.2d0
       ddens = 0.8d0
       aeewald = 0.4d0
+      apewald = 0.4d0
       adewald = 0.4d0
       minfft = 16
 c
-c     estimate an optimal value for the Ewald coefficient
+c     estimate optimal values for the Ewald coefficient
 c
       if (use_ewald)  call ewaldcof (aeewald,ewaldcut)
       if (use_dewald)  call ewaldcof (adewald,dewaldcut)
+c
+c     modify Ewald coefficient for small unitcell dimensions
+c
+      if (use_polar) then
+         apewald = aeewald
+         size = min(xbox,ybox,zbox)
+         if (size .lt. 7.0d0) then
+            slope = (1.0d0-apewald) / (7.0d0-4.0d0)
+            apewald = apewald + slope*(7.0d0-size)
+            minfft = 64
+            if (verbose) then
+               write (iout,10)
+   10          format (/,' KEWALD  --  Warning, PME Grid Expanded',
+     &                    ' due to Small Cell Size')
+            end if
+         end if
+      end if
 c
 c     set the system extent for nonperiodic Ewald summation
 c
@@ -126,33 +147,37 @@ c
          if (keyword(1:12) .eq. 'FFT-PACKAGE ') then
             call getword (record,ffttyp,next)
          else if (keyword(1:12) .eq. 'EWALD-ALPHA ') then
-            read (string,*,err=20,end=20)  aeewald
+            read (string,*,err=40,end=40)  aeewald
+         else if (keyword(1:13) .eq. 'PEWALD-ALPHA ') then
+            read (string,*,err=40,end=40)  apewald
          else if (keyword(1:13) .eq. 'DEWALD-ALPHA ') then
-            read (string,*,err=20,end=20)  adewald
+            read (string,*,err=40,end=40)  adewald
          else if (keyword(1:15) .eq. 'EWALD-BOUNDARY ') then
             boundary = 'VACUUM'
          else if (keyword(1:9) .eq. 'PME-GRID ') then
             iefft1 = 0
             iefft2 = 0
             iefft3 = 0
-            read (string,*,err=10,end=10)  iefft1,iefft2,iefft3
-   10       continue
+            read (string,*,err=20,end=20)  iefft1,iefft2,iefft3
+   20       continue
             if (iefft2 .eq. 0)  iefft2 = iefft1
             if (iefft3 .eq. 0)  iefft3 = iefft1
          else if (keyword(1:10) .eq. 'DPME-GRID ') then
             idfft1 = 0
             idfft2 = 0
             idfft3 = 0
-            read (string,*,err=15,end=15)  idfft1,idfft2,idfft3
-   15       continue
+            read (string,*,err=30,end=30)  idfft1,idfft2,idfft3
+   30       continue
             if (idfft2 .eq. 0)  idfft2 = idfft1
             if (idfft3 .eq. 0)  idfft3 = idfft1
          else if (keyword(1:10) .eq. 'PME-ORDER ') then
-            read (string,*,err=20,end=20)  bseorder
+            read (string,*,err=40,end=40)  bseorder
+         else if (keyword(1:11) .eq. 'PPME-ORDER ') then
+            read (string,*,err=40,end=40)  bsporder
          else if (keyword(1:11) .eq. 'DPME-ORDER ') then
-            read (string,*,err=20,end=20)  bsdorder
+            read (string,*,err=40,end=40)  bsdorder
          end if
-   20    continue
+   40    continue
       end do
 c
 c     determine electrostatic grid size from allowed values
@@ -193,7 +218,7 @@ c
          if (ndfft3 .lt. minfft)  ndfft3 = minfft
       end if
 c
-c     increase electrostatic grid to match dispersion grid
+c     set electrostatic grid to at least dispersion grid size
 c
       if (use_ewald .and. use_dewald) then
          if (nefft1.lt.ndfft1 .or. nefft2.lt.ndfft2
@@ -201,8 +226,8 @@ c
             nefft1 = max(nefft1,ndfft1)
             nefft2 = max(nefft2,ndfft2)
             nefft3 = max(nefft3,ndfft3)
-            write (iout,30)
-   30       format (/,' KEWALD  --  Setting Electrostatic PME',
+            write (iout,50)
+   50       format (/,' KEWALD  --  Setting Electrostatic PME',
      &                 ' Grid to Match Dispersion Grid')
          end if
       end if
@@ -211,21 +236,21 @@ c     check the particle mesh Ewald grid dimensions
 c
       nbig = max(nefft1,nefft2,nefft3,ndfft1,ndfft2,ndfft3)
       if (nbig .gt. maxfft) then
-         write (iout,40)
-   40    format (/,' KEWALD  --  PME Grid Size Too Large;',
+         write (iout,60)
+   60    format (/,' KEWALD  --  PME Grid Size Too Large;',
      &              ' Increase MAXFFT')
          call fatal
       end if
       if (use_ewald .and. (nefft1.lt.iefft1.or.
      &       nefft2.lt.iefft2.or.nefft3.lt.iefft3)) then
-         write (iout,50)
-   50    format (/,' KEWALD  --  Warning, Small Electrostatic',
+         write (iout,70)
+   70    format (/,' KEWALD  --  Warning, Small Electrostatic',
      &              'PME Grid Size')
       end if
       if (use_dewald .and. (ndfft1.lt.idfft1.or.
      &       ndfft2.lt.idfft2.or.ndfft3.lt.idfft3)) then
-         write (iout,60)
-   60    format (/,' KEWALD  --  Warning, Small Dispersion',
+         write (iout,80)
+   80    format (/,' KEWALD  --  Warning, Small Dispersion',
      &              'PME Grid Size')
       end if
 c
@@ -234,7 +259,7 @@ c
       nfft1 = max(nefft1,ndfft1)
       nfft2 = max(nefft2,ndfft2)
       nfft3 = max(nefft3,ndfft3)
-      bsorder = max(bseorder,bsdorder)
+      bsorder = max(bseorder,bsporder,bsdorder)
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -262,17 +287,21 @@ c
 c     print a message listing some of the Ewald parameters
 c
       if (verbose) then
-         write (iout,70)
-   70    format (/,' Particle Mesh Ewald Parameters :',
+         write (iout,90)
+   90    format (/,' Particle Mesh Ewald Parameters :',
      &           //,5x,'Type',16x,'Ewald Alpha',4x,'Grid',
      &              ' Dimensions',4x,'Spline Order',/)
          if (use_ewald) then
-            write (iout,80)  aeewald,nefft1,nefft2,nefft3,bseorder
-   80       format (3x,'Electrostatics',9x,f8.4,5x,3i5,7x,i5)
+            write (iout,100)  aeewald,nefft1,nefft2,nefft3,bseorder
+  100       format (3x,'Electrostatics',9x,f8.4,5x,3i5,7x,i5)
+            if (use_polar) then
+               write (iout,110)  apewald,nefft1,nefft2,nefft3,bsporder
+  110          format (3x,'Polarization',11x,f8.4,5x,3i5,7x,i5)
+            end if
          end if
          if (use_dewald) then
-            write (iout,90)  adewald,ndfft1,ndfft2,ndfft3,bsdorder
-   90       format (3x,'Dispersion',13x,f8.4,5x,3i5,7x,i5)
+            write (iout,120)  adewald,ndfft1,ndfft2,ndfft3,bsdorder
+  120       format (3x,'Dispersion',13x,f8.4,5x,3i5,7x,i5)
          end if
       end if
       return

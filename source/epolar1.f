@@ -3299,8 +3299,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     set the energy unit conversion factor
 c
@@ -5778,8 +5778,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     set the energy unit conversion factor
 c
@@ -7409,7 +7409,7 @@ c
 c
 c     remove scalar sum virial from prior multipole FFT
 c
-      if (use_mpole) then
+      if (use_mpole .and. aewald.eq.aeewald) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz

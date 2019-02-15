@@ -113,7 +113,7 @@ c
       call set_energi_data (esum,eb,ea,eba,eub,eaa,eopb,eopd,eid,eit,
      &                      et,ept,ebt,eat,ett,ev,er,edsp,ec,ecd,ed,
      &                      em,ep,ect,erxf,es,elf,eg,ex)
-      call set_ewald_data (aewald,aeewald,adewald,boundary)
+      call set_ewald_data (aewald,aeewald,apewald,adewald,boundary)
       call set_freeze_data (nrat,nratx,iratx,kratx,irat,rateps,
      &                      krat,use_rattle,ratimage)
       call set_group_data (ngrp,kgrp,grplist,igrp,grpmass,wgrp,
@@ -150,9 +150,9 @@ c
      &                      ommPlatform,cudaDevice)
       call set_pitors_data (npitors,ipit,kpit)
       call set_pme_data (nfft1,nfft2,nfft3,nefft1,nefft2,nefft3,ndfft1,
-     &                   ndfft2,ndfft3,bsorder,bseorder,bsdorder,igrid,
-     &                   bsmod1,bsmod2,bsmod3,bsbuild,thetai1,thetai2,
-     &                   thetai3,qgrid,qfac)
+     &                   ndfft2,ndfft3,bsorder,bseorder,bsporder,
+     7                   bsdorder,igrid,bsmod1,bsmod2,bsmod3,bsbuild,
+     &                   thetai1,thetai2,thetai3,qgrid,qfac)
       call set_polar_data (npolar,ipolar,polarity,thole,pdamp,udir,
      &                     udirp,udirs,udirps,uind,uinp,uinds,uinps,
      &                     uexact,douind)

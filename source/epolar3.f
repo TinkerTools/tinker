@@ -1029,8 +1029,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     set the energy unit conversion factor
 c
@@ -1797,8 +1797,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     set the energy unit conversion factor
 c

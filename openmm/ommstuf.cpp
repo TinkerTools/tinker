@@ -320,6 +320,7 @@ struct {
 struct {
    double aewald;
    double aeewald;
+   double apewald;
    double adewald;
    char boundary[MAX_STRING];
 } ewald__;
@@ -542,6 +543,7 @@ struct {
    int ndfft3;
    int bsorder;
    int bseorder;
+   int bsporder;
    int bsdorder;
    int* igrid;
    double* bsmod1;
@@ -1200,11 +1202,12 @@ void set_energi_data_ (double* esum, double* eb, double* ea,
    energi__.ex = ex;
 }
 
-void set_ewald_data_ (double* aewald, double* aeewald, double* adewald,
-                      char* boundary) {
+void set_ewald_data_ (double* aewald, double* aeewald, double* apewald,
+                      double* adewald, char* boundary) {
 
    ewald__.aewald = *aewald;
    ewald__.aeewald = *aeewald;
+   ewald__.apewald = *apewald;
    ewald__.adewald = *adewald;
    setNullTerminator (boundary, 7, ewald__.boundary);
 }
@@ -1469,8 +1472,8 @@ void set_pitors_data_ (int* npitors, int* ipit, double* kpit) {
 
 void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
                     int* nefft2, int* nefft3, int* ndfft1, int* ndfft2,
-                    int* ndfft3, int* bsorder, int* bseorder, int* bsdorder,
-                    int* igrid, double* bsmod1, double* bsmod2,
+                    int* ndfft3, int* bsorder, int* bseorder, int* bsporder,
+                    int* bsdorder, int* igrid, double* bsmod1, double* bsmod2,
                     double* bsmod3, double* bsbuild, double*** thetai1,
                     double*** thetai2, double*** thetai3, double**** qgrid,
                     double*** qfac) {
@@ -1486,6 +1489,7 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
    pme__.ndfft3 = *ndfft3;
    pme__.bsorder = *bsorder;
    pme__.bseorder = *bseorder;
+   pme__.bsporder = *bsporder;
    pme__.bsdorder = *bsdorder;
    pme__.igrid = igrid;
    pme__.bsmod1 = bsmod1;

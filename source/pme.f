@@ -23,6 +23,7 @@ c     ndfft2     number of grid points along dispersion b-axis
 c     ndfft3     number of grid points along dispersion c-axis
 c     bsorder    current order of the PME B-spline values
 c     bseorder   order of the electrostatic PME B-spline values
+c     bsporder   order of the polarization PME B-spline values
 c     bsdorder   order of the dispersion PME B-spline values
 c     igrid      initial Ewald grid values for B-spline
 c     bsmod1     B-spline moduli along the a-axis direction
@@ -41,7 +42,8 @@ c
       integer nfft1,nfft2,nfft3
       integer nefft1,nefft2,nefft3
       integer ndfft1,ndfft2,ndfft3
-      integer bsorder,bseorder,bsdorder
+      integer bsorder,bseorder
+      integer bsporder,bsdorder
       integer, allocatable :: igrid(:,:)
       real*8, allocatable :: bsmod1(:)
       real*8, allocatable :: bsmod2(:)

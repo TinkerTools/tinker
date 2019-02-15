@@ -900,8 +900,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     set the energy unit conversion factor
 c
@@ -1565,8 +1565,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     set the energy unit conversion factor
 c
@@ -2154,7 +2154,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. use_mpole) then
+      if (.not.use_mpole .or. aewald.ne.aeewald) then
          ntot = nfft1 * nfft2 * nfft3
          if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
      &      deallocate(qgrid)

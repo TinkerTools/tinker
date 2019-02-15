@@ -1,2 +1,2 @@
-../bin/potential 6 water water n 0.5
+../bin/potential 6 water water n 0.01
 rm water.key_*

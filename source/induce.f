@@ -2019,8 +2019,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     get the reciprocal space part of the permanent field
 c
@@ -3412,8 +3412,8 @@ c
       nfft1 = nefft1
       nfft2 = nefft2
       nfft3 = nefft3
-      bsorder = bseorder
-      aewald = aeewald
+      bsorder = bsporder
+      aewald = apewald
 c
 c     get the reciprocal space part of the mutual field
 c
