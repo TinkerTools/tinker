@@ -88,9 +88,9 @@ c
       if (use_polar) then
          apewald = aeewald
          size = min(xbox,ybox,zbox)
-         if (size .lt. 7.0d0) then
-            slope = (1.0d0-apewald) / (7.0d0-4.0d0)
-            apewald = apewald + slope*(7.0d0-size)
+         if (size .lt. 6.0d0) then
+            slope = (1.0d0-apewald) / 2.0d0
+            apewald = apewald + slope*(6.0d0-size)
             minfft = 64
             if (verbose) then
                write (iout,10)

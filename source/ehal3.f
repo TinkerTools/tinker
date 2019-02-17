@@ -51,8 +51,16 @@ c
             aev(i) = aev(i) + aelrc
          end do
          if (verbose .and. elrc.ne.0.0d0) then
-            write (iout,10)  elrc
-   10       format (/,' Long Range vdw Correction :',9x,f12.4)
+            if (digits .ge. 8) then
+               write (iout,10)  elrc
+   10          format (/,' Long Range vdw Correction :',5x,f16.8)
+            else if (digits .ge. 6) then
+               write (iout,20)  elrc
+   20          format (/,' Long Range vdw Correction :',5x,f16.6)
+            else
+               write (iout,30)  elrc
+   30          format (/,' Long Range vdw Correction :',5x,f16.4)
+            end if
          end if
       end if
       return

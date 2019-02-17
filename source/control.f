@@ -36,7 +36,7 @@ c
       verbose = .false.
       debug = .false.
       holdup = .false.
-      archive = .false.
+      archive = .true.
       noversion = .false.
       overwrite = .false.
       cyclesave = .false.
@@ -72,8 +72,8 @@ c
             verbose = .true.
          else if (keyword(1:11) .eq. 'EXIT-PAUSE ') then
             holdup = .true.
-         else if (keyword(1:8) .eq. 'ARCHIVE ') then
-            archive = .true.
+         else if (keyword(1:10) .eq. 'NOARCHIVE ') then
+            archive = .false.
          else if (keyword(1:10) .eq. 'NOVERSION ') then
             noversion = .true.
          else if (keyword(1:10) .eq. 'OVERWRITE ') then
