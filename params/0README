@@ -93,6 +93,9 @@
       encad      ENCAD parameters for proteins and nucleic acids
                  (in preparation).
 
+      hippo      Preliminary parameters from 2018 for the HIPPO model
+                 covering the monomer molecules in the S101 database.
+
       hoch       Simple NMR-NOE force field of Hoch and Stern.
 
       iwater     The current AMOEBA water parameters for a polarizable
