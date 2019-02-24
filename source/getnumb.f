@@ -33,7 +33,9 @@ c
       integer first,last,code
       integer initial,final
       integer place(10)
-      logical negate,numeral
+      logical positive
+      logical negative
+      logical numeral
       character*1 letter
       character*(*) string
       data place  / 1, 10, 100, 1000, 10000, 100000, 1000000,
@@ -43,7 +45,8 @@ c
 c     initialize number and get the input text string length
 c
       number = 0
-      negate = .false.
+      positive = .false.
+      negative = .false.
       numeral = .false.
       length = trimtext(string(next:))
 c
@@ -65,8 +68,10 @@ c
                last = final
                next = i + 1
             end if
-         else if (code.eq.minus .and. .not.negate) then
-            negate = .true.
+         else if (code.eq.plus .and. .not.positive) then
+            positive = .true.
+         else if (code.eq.minus .and. .not.negative) then
+            negative = .true.
          else if (numeral) then
             if (code.eq.space .or. code.eq.tab .or.
      &          code.eq.comma .or. code.eq.semicolon .or.
@@ -77,7 +82,7 @@ c
                numeral = .false.
             end if
             goto 10
-         else if (negate) then
+         else if (positive .or. negative) then
             numeral = .false.
             goto 10
          else if (code.ne.space .and. code.ne.tab) then
@@ -120,6 +125,6 @@ c
          end if
          number = number + digit * place(j)
       end do
-      if (negate)  number = -number
+      if (negative)  number = -number
       return
       end

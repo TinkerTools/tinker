@@ -1016,7 +1016,7 @@ c
  1380    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1390)
  1390    format (//,15x,'Dipole Polarizability Parameters',
-     &           ///,23x,'Type',7x,'Alpha',6x,'Damp',
+     &           ///,23x,'Type',7x,'Alpha',5x,'Thole',
      &              6x,'Group Atom Types',/)
          k = 0
          do i = 1, maxtyp

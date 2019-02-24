@@ -247,21 +247,25 @@ c
       implicit none
       real*8 energy
       real*8 derivs(3,*)
-      logical save_vdw,save_charge
+      logical save_vdw,save_repuls
+      logical save_disp,save_charge
       logical save_chgdpl,save_dipole
       logical save_mpole,save_polar
-      logical save_rxnfld,save_solv
-      logical save_list
+      logical save_chgtrn,save_rxnfld
+      logical save_solv,save_list
 c
 c
 c     save the original state of slow-evolving potentials
 c
       save_vdw = use_vdw
+      save_repuls = use_repuls
+      save_disp = use_disp
       save_charge = use_charge
       save_chgdpl = use_chgdpl
       save_dipole = use_dipole
       save_mpole = use_mpole
       save_polar = use_polar
+      save_chgtrn = use_chgtrn
       save_rxnfld = use_rxnfld
       save_solv = use_solv
       save_list = use_list
@@ -269,11 +273,14 @@ c
 c     turn off slow-evolving nonbonded potential energy terms
 c
       use_vdw = .false.
+      use_repuls = .false.
+      use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
       use_dipole = .false.
       use_mpole = .false.
       use_polar = .false.
+      use_chgtrn = .false.
       use_rxnfld = .false.
       use_solv = .false.
       use_list = .false.
@@ -285,11 +292,14 @@ c
 c     restore the original state of slow-evolving potentials
 c
       use_vdw = save_vdw
+      use_repuls = save_repuls
+      use_disp = save_disp
       use_charge = save_charge
       use_chgdpl = save_chgdpl
       use_dipole = save_dipole
       use_mpole = save_mpole
       use_polar = save_polar
+      use_chgtrn = save_chgtrn
       use_rxnfld = save_rxnfld
       use_solv = save_solv
       use_list = save_list

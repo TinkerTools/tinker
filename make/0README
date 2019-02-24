@@ -15,7 +15,7 @@
         the source directory.
 
         A python script that will build a new Makefile with the correct
-        dependencies included is provided as "buildmake.py". The script
+        source dependencies is provided as "buildmake.py". This script
         should be run with the location of the Tinker source directory as
         an argument, e.g., "./buildmake.py ../source".
 

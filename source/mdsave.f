@@ -145,7 +145,7 @@ c
       write (iout,170)  isave
   170 format (' Frame Number',13x,i10)
       write (iout,180)  xyzfile(1:trimtext(xyzfile))
-  180 format (' Coordinate File',12x,a)
+  180 format (' Coordinate File',13x,a)
 c
 c     update the information needed to restart the trajectory
 c
@@ -250,7 +250,7 @@ c
          end do
          close (unit=iind)
          write (iout,300)  indfile(1:trimtext(indfile))
-  300    format (' Induced Dipole File',10x,a)
+  300    format (' Induced Dipole File',9x,a)
       end if
 c
 c     test for requested termination of the dynamics calculation

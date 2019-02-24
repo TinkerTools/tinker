@@ -5,8 +5,8 @@
 
           This directory contains a full distribution of the Tinker
           Molecular Modeling package. Source code, additional utility
-          programs & scripts, examples, test cases and benchmark cases
+          programs & script, examples, test cases and benchmark cases
           are provided. Interfaces to many external packages, such as
-          Force Field Explorer (FFE), Tinker-OpenMM, FFTW, APBS, and
-          CHARMM (via MSCALE) are also available.
+          Force Field Explorer, Tinker-OpenMM, FFTW, APBS, and CHARMM
+          via MSCALE are also available.
 

@@ -72,6 +72,7 @@ c
       use_sdarea = .false.
       use_pred = .false.
       polpred = 'LSQR'
+      maxualt = 7
       use_ielscf = .false.
       iprint = 100
 c
@@ -130,10 +131,11 @@ c
          else if (keyword(1:14) .eq. 'POLAR-PREDICT ') then
             call getword (record,polpred,next)
             call upcase (polpred)
+            use_pred = .true.
+            if (polpred .eq. '    ')  polpred = 'LSQR'
             if (polpred .eq. 'IEL') then
+               use_pred = .false.
                use_ielscf = .true.
-            else
-               use_pred = .true.
             end if
          else if (keyword(1:8) .eq. 'IEL-SCF ') then
             use_ielscf = .true.
@@ -195,12 +197,15 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (use_pred) then
+         if (polpred .eq. 'GEAR')  maxualt = 7
+         if (polpred .eq. 'ASPC')  maxualt = 17
+         if (polpred .eq. 'LSQR')  maxualt = 7
          if (.not. allocated(udalt))  allocate (udalt(maxualt,3,n))
          if (.not. allocated(upalt))  allocate (upalt(maxualt,3,n))
          if (.not. allocated(usalt))  allocate (usalt(maxualt,3,n))
          if (.not. allocated(upsalt))  allocate (upsalt(maxualt,3,n))
 c
-c     set the Gear predictor binomial coefficients
+c     set the 6th-order Gear predictor binomial coefficients
 c
          gear(1) = 6.0d0
          gear(2) = -15.0d0
@@ -210,15 +215,25 @@ c
          gear(6) = -1.0d0
          gear(7) = 0.0d0
 c
-c     set always stable predictor-corrector (ASPC) coefficients
+c     set 16-step always stable predictor-corrector (ASPC) coefficients
 c
-         aspc(1) = 22.0d0 / 7.0d0
-         aspc(2) = -55.0d0 / 14.0d0
-         aspc(3) = 55.0d0 / 21.0d0
-         aspc(4) = -22.0d0 / 21.0d0
-         aspc(5) = 5.0d0 / 21.0d0
-         aspc(6) = -1.0d0 / 42.0d0
-         aspc(7) = 0.0d0
+         aspc(1) = 62.0d0 / 17.0d0
+         aspc(2) = -310.0d0 / 51.0d0
+         aspc(3) = 2170.0d0 / 323.0d0
+         aspc(4) = -2329.0d0 / 400.0d0
+         aspc(5) = 1701.0d0 / 409.0d0
+         aspc(6) = -806.0d0 / 323.0d0
+         aspc(7) = 1024.0d0 / 809.0d0
+         aspc(8) = -479.0d0 / 883.0d0
+         aspc(9) = 257.0d0 / 1316.0d0
+         aspc(10) = -434.0d0 / 7429.0d0
+         aspc(11) = 191.0d0 / 13375.0d0
+         aspc(12) = -62.0d0 / 22287.0d0
+         aspc(13) = 3.0d0 / 7217.0d0
+         aspc(14) = -3.0d0 / 67015.0d0
+         aspc(15) = 2.0d0 / 646323.0d0
+         aspc(16) = -1.0d0 / 9694845.0d0
+         aspc(17) = 0.0d0
 c
 c    initialize prior values of induced dipole moments
 c

@@ -1646,7 +1646,7 @@ ebuck2.o: atomid.o atoms.o bound.o cell.o couple.o group.o hessn.o iounit.o math
 ebuck3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o couple.o energi.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o shunt.o usage.o vdw.o vdwpot.o warp.o
 echarge.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o group.o iounit.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o warp.o
 echarge1.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o group.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o virial.o warp.o
-echarge2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o ewald.o group.o hessn.o limits.o math.o shunt.o warp.o
+echarge2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o ewald.o group.o hessn.o limits.o math.o neigh.o shunt.o warp.o
 echarge3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o pme.o shunt.o usage.o warp.o
 echgdpl.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o group.o shunt.o units.o usage.o
 echgdpl1.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
@@ -1834,7 +1834,7 @@ katoms.o:
 kbond.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o couple.o fields.o inform.o iounit.o kbonds.o keys.o merck.o potent.o tors.o usage.o
 kbonds.o:
 kcharge.o: atomid.o atoms.o charge.o chgpot.o couple.o fields.o inform.o iounit.o kchrge.o keys.o merck.o potent.o
-kchgtrn.o: atomid.o atoms.o chgtrn.o inform.o iounit.o kctrn.o keys.o mpole.o polar.o potent.o sizes.o
+kchgtrn.o: atomid.o atoms.o chgpen.o chgtrn.o inform.o iounit.o kctrn.o keys.o mplpot.o mpole.o polar.o polpot.o potent.o sizes.o
 kchrge.o:
 kcpen.o:
 kctrn.o:
@@ -1842,7 +1842,7 @@ kdipol.o:
 kdipole.o: atmlst.o atoms.o bndstr.o couple.o dipole.o inform.o iounit.o kdipol.o keys.o potent.o
 kdisp.o: atomid.o atoms.o disp.o dsppot.o inform.o iounit.o kdsp.o keys.o potent.o sizes.o
 kdsp.o:
-kewald.o: atoms.o bound.o boxes.o chunks.o ewald.o fft.o inform.o iounit.o keys.o limits.o openmp.o pme.o
+kewald.o: atoms.o bound.o boxes.o chunks.o ewald.o fft.o inform.o iounit.o keys.o limits.o openmp.o pme.o potent.o
 kextra.o:
 keys.o:
 kgeom.o: atomid.o atoms.o bound.o couple.o group.o iounit.o keys.o molcul.o potent.o restrn.o
@@ -2057,7 +2057,7 @@ surfatom.o: atoms.o iounit.o math.o
 switch.o: limits.o nonpol.o shunt.o
 syntrn.o:
 tarray.o:
-tcgstuf.o: atoms.o iounit.o limits.o mpole.o polar.o polpot.o poltcg.o potent.o units.o
+tcgstuf.o: atoms.o iounit.o limits.o mpole.o polar.o poltcg.o potent.o
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o units.o usage.o
 testgrad.o: atoms.o deriv.o energi.o files.o inform.o inter.o iounit.o solute.o usage.o
 testhess.o: atoms.o files.o hescut.o inform.o iounit.o usage.o

@@ -473,7 +473,7 @@ c
 c
 c     perform a complete list build instead of an update
 c
-      if (doclst) then
+      if (dodlst) then
          dodlst = .false.
          if (octahedron) then
             call dbuild
@@ -522,7 +522,7 @@ c
                zr = zi - zvold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
-               if (r2 .le. vbuf2) then
+               if (r2 .le. dbuf2) then
                   nvlst(i) = nvlst(i) + 1
                   vlst(nvlst(i),i) = k
                end if

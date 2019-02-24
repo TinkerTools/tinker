@@ -56,6 +56,7 @@ c
       logical header
       character*1 digit
       character*20 keyword
+      character*20 text
       character*240 record
       character*240 string
 c
@@ -275,25 +276,32 @@ c
                pg(j) = 0
             end do
             call getnumb (record,k,next)
+            call gettext (record,text,next)
+            read (text,*,err=30,end=30)  pol
+            call gettext (record,text,next)
+            j = 1
+            call getnumb (text,pg(1),j)
             string = record(next:240)
-            read (string,*,err=30,end=40)  pol,(pg(j),j=1,maxval)
-            goto 40
+            if (pg(1) .eq. 0) then
+               read (text,*,err=30,end=30)  thl
+               read (string,*,err=30,end=30)  (pg(j),j=1,maxval)
+            else
+               read (string,*,err=30,end=30)  (pg(j),j=2,maxval)
+            end if
    30       continue
-            read (string,*,err=40,end=40)  pol,thl,(pg(j),j=1,maxval)
-   40       continue
             if (k .gt. 0) then
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,50)
-   50             format (/,' Additional Atomic Dipole',
+                  write (iout,40)
+   40             format (/,' Additional Atomic Dipole',
      &                       ' Polarizability Parameters :')
                   if (thl .ge. 0.0d0) then
-                     write (iout,60)
-   60                format (/,5x,'Atom Type',11x,'Alpha',7x,
+                     write (iout,50)
+   50                format (/,5x,'Atom Type',11x,'Alpha',7x,
      &                          'Thole',5x,'Group Atom Types',/)
                   else
-                     write (iout,70)
-   70                format (/,5x,'Atom Type',11x,'Alpha',5x,
+                     write (iout,60)
+   60                format (/,5x,'Atom Type',11x,'Alpha',5x,
      &                          'Group Atom Types',/)
                   end if
                end if
@@ -304,22 +312,22 @@ c
                      pgrp(j,k) = pg(j)
                      if (pg(j) .eq. 0) then
                         npg = j - 1
-                        goto 80
+                        goto 70
                      end if
                   end do
-   80             continue
+   70             continue
                   if (.not. silent) then
                      if (thl .ge. 0.0d0) then
-                        write (iout,90)  k,pol,thl,(pg(j),j=1,npg)
-   90                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
+                        write (iout,80)  k,pol,thl,(pg(j),j=1,npg)
+   80                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
                      else
-                        write (iout,100)  k,pol,(pg(j),j=1,npg)
-  100                   format (6x,i6,8x,f10.3,7x,20i5)
+                        write (iout,90)  k,pol,(pg(j),j=1,npg)
+   90                   format (6x,i6,8x,f10.3,7x,20i5)
                      end if
                   end if
                else
-                  write (iout,110)
-  110             format (/,' KPOLAR  --  Too many Dipole',
+                  write (iout,100)
+  100             format (/,' KPOLAR  --  Too many Dipole',
      &                       ' Polarizability Parameters')
                   abort = .true.
                end if
@@ -350,28 +358,28 @@ c
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
                string = record(next:240)
-               read (string,*,err=120,end=120)  pol,thl
-  120          continue
+               read (string,*,err=110,end=110)  pol,thl
+  110          continue
                if (header) then
                   header = .false.
-                  write (iout,130)
-  130             format (/,' Additional Dipole Polarizabilities',
+                  write (iout,120)
+  120             format (/,' Additional Dipole Polarizabilities',
      &                       ' for Specific Atoms :')
                   if (thl .ge. 0.0d0) then
-                     write (iout,140)
-  140                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
+                     write (iout,130)
+  130                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
                   else
-                     write (iout,150)
-  150                format (/,6x,'Atom',15x,'Alpha',/)
+                     write (iout,140)
+  140                format (/,6x,'Atom',15x,'Alpha',/)
                   end if
                end if
                if (.not. silent) then
                   if (thl .ge. 0.0d0) then
-                     write (iout,160)  k,pol,thl
-  160                format (6x,i6,8x,f10.3,2x,f10.3)
+                     write (iout,150)  k,pol,thl
+  150                format (6x,i6,8x,f10.3,2x,f10.3)
                   else
-                     write (iout,170)  k,pol
-  170                format (6x,i6,8x,f10.3)
+                     write (iout,160)  k,pol
+  160                format (6x,i6,8x,f10.3)
                   end if
                end if
                polarity(k) = pol
