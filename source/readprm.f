@@ -1222,7 +1222,7 @@ c
             do i = 1, maxval
                pg(i) = 0
             end do
-            string = record(next:240)
+            string = record(1:240)
             call getnumb (string,ia,next)
             call gettext (string,text,next)
             read (text,*,err=480,end=480)  pol
