@@ -119,18 +119,14 @@ c
       call tcg_alpha22 (r0(:,:,1),r0(:,:,2),udir,udirp)
 c
 c     compute the following tcg1 intermediates:
-c     p0 = alpha*r0 = udir
-c     n0 = r0*a*r0
-c     np0 = p0*T*p0
+c     p0 = alpha*r0 = udir, n0 = r0*a*r0, and np0 = p0*T*p0
 c
       call tcg_alphaquad (n0,r0(:,:,1),r0(:,:,2))
       call tcg_t0 (udir,udirp,tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np0,3*npole,tp(:,:,1),udirp)
       g0 = n0 / np0
 c
-c     r1 = r0 - gamma0 * T*p0
-c     n1 = r1*a*r1
-c     p1 <- r1, p0
+c     set r1 = r0 - gamma0*T*p0, n1 = r1*a*r1, and p1 <- r1, p0
 c
       rsd = r0 - g0 * tp
       call tcg_alphaquad (n1,rsd(:,:,1),rsd(:,:,2))
@@ -140,9 +136,7 @@ c
       call tcg_update (p1(:,:,1),rsd(:,:,1),beta1)
       call tcg_update (p1(:,:,2),rsd(:,:,2),beta1)
 c
-c     ua(1) = mu1 = g0 * p0
-c     ub(1) <- p0
-c     xde <- p0, p1
+c     set ua(1) = mu1 = g0 * p0, ub(1) <- p0, and xde <- p0, p1
 c
       uad(:,:,1) = g0*udir
       uap(:,:,1) = g0*udirp
@@ -183,7 +177,7 @@ c     r3 = r2 - g2 * T*p2
 c     n3 = r3*a*r3
 c     beta3 = n3 / n2
 c
-      rsd = rsd - g2 * tp
+      rsd = rsd - g2*tp
       call tcg_alphaquad (n3,rsd(:,:,1),rsd(:,:,2))
       beta3 = n3 / n2
 c
@@ -199,11 +193,11 @@ c     ub(2) <- p1
 c     xde <- p0, p1
 c
       b111 = (1.0d0-beta2) * g1
-      a103 = g0*g1/g2
+      a103 = g0 * g1 / g2
       a102 = (1.0d0-beta2)*g0 + (1.0d0+beta1)*g1 - (1.0d0+beta3)*a103
       a101 = (beta2**2-1.0d0)*g0 + (1.0d0-beta2-beta1*beta2)*g1
      &          + beta2*a103
-      a100 = (1.0d0-beta2)*g0*beta1
+      a100 = (1.0d0-beta2) * g0 * beta1
       uad(:,:,2) = g1*p1(:,:,1)
       uap(:,:,2) = g1*p1(:,:,2)
       ubd(:,:,1) = ubd(:,:,1) + b111*p1(:,:,1) + g1*p2(:,:,1)
@@ -341,14 +335,13 @@ c
       call tcg_dotprod (np0,3*npole,tp(:,:,1),p0(:,:,2))
       g0 = n0 / np0
 c
-c     r1 = r0 - g0 T*p0
-c     n1, beta1
+c     set r1 = r0 - g0*T*p0, n1 and beta1
 c
-      rsd = rsd - g0 * tp
+      rsd = rsd - g0*tp
       call tcg_alphaquad (n1,rsd(:,:,1),rsd(:,:,2))
       beta1 = n1 / n0
 c
-c     p1 <- r1, p0
+c     set p1 <- r1, p0
 c
       p1 = p0
       call tcg_update (p1(:,:,1),rsd(:,:,1),beta1)
@@ -388,26 +381,26 @@ c
          call tcg_ufield (xdr0(:,:,1),xdr0(:,:,2),tp(:,:,1),tp(:,:,2))
          call tcg_alpha12 (tp(:,:,1),tp(:,:,2))
          tp(:,:,1) = tp(:,:,1) + chi*0.5d0*p1(:,:,1)
-     &             + (1.0d0-chi*beta1*0.5d0)*p0(:,:,1) + udir
+     &                  + (1.0d0-chi*beta1*0.5d0)*p0(:,:,1) + udir
          tp(:,:,2) = tp(:,:,2) + chi*0.5d0*p1(:,:,2)
-     &             + (1.0d0-chi*beta1*0.5d0)*p0(:,:,2) + udirp
+     &                  + (1.0d0-chi*beta1*0.5d0)*p0(:,:,2) + udirp
          goto 10
       end if
 c
 c     compute the tcg2 intermediates: xi1, np1 and g1
 c
       call tcg_dotprod (xi1,3*npole,rsd(:,:,1),udirp)
-      xi1 = xi1 / n1 + xi0
+      xi1 = xi1/n1 + xi0
       call tcg_t0 (p1(:,:,1),p1(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np1,3*npole,tp(:,:,1),p1(:,:,2))
       g1 = n1 / np1
 c
-c     r2 = r1 - g1 * T*p1
+c     r2 = r1 - g1*T*p1
 c     n2, beta2
 c     p2 <- r2, p1
 c     np2, g2
 c
-      rsd = rsd - g1 * tp
+      rsd = rsd - g1*tp
       call tcg_alphaquad (n2,rsd(:,:,1),rsd(:,:,2))
       beta2 = n2 / n1
       p2 = p1
@@ -415,13 +408,13 @@ c
       call tcg_update (p2(:,:,2),rsd(:,:,2),beta2)
       call tcg_t0 (p2(:,:,1),p2(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np2,3*npole,tp(:,:,1),p2(:,:,2))
-      g2 = n2/np2
+      g2 = n2 / np2
 c
-c     r3 = r2 - g2 * T*p2
+c     r3 = r2 - g2*T*p2
 c     n3, beta3
 c     p3 <- r3, p2
 c
-      rsd = rsd - g2 * tp
+      rsd = rsd - g2*tp
       call tcg_alphaquad (n3,rsd(:,:,1),rsd(:,:,2))
       beta3 = n3 / n2
       p3 = p2
@@ -435,11 +428,11 @@ c     ub(3) <- p1
 c     xdr0 <- p0, p1, p2, p3
 c
       b111 = (1.0d0-beta2) * g1
-      a103 = g0*g1/g2
+      a103 = g0 * g1 / g2
       a102 = (1.0d0-beta2)*g0 + (1.0d0+beta1)*g1 - (1.0d0+beta3)*a103
       a101 = (beta2**2-1.0d0)*g0 + (1.0d0-beta2-beta1*beta2)*g1
      &          + beta2*a103
-      a100 = (1.0d0-beta2)*g0*beta1
+      a100 = (1.0d0-beta2) * g0 * beta1
       ubd(:,:,2) = ubd(:,:,2)+ b111*p1(:,:,1) + g1*p2(:,:,1)
       ubp(:,:,2) = ubp(:,:,2)+ b111*p1(:,:,2) + g1*p2(:,:,2)
       uad(:,:,3) = g1*p1(:,:,1)
@@ -460,32 +453,32 @@ c
      &             + (xi0*g0-xi0-g0)*g1 + (beta2*g0-beta1*g1)*(xi0-xi1)
          c203 = (xi1-1.0d0)*(1.0d0+beta3)*g0*g1/g2
      &             + (g1+beta1*g1-beta2*g0)*(1.0d0-xi1) + (1.0d0-xi0)*g0
-         c204 = (1.0d0-xi1)*g0*g1/g2
-         d210 = 0.5d0*(1.0d0-g1)
-         d211 = 0.5d0*(1.0d0-xi0)*(1.0d0-g1)*g0
-         d212 = ((1.0d0-xi0)-(1.0d0-xi1)*beta2)*g1
-         d213 = (1.0d0-xi1)*g1
-         d222 = 0.5d0*d213
+         c204 = (1.0d0-xi1) * g0 * g1 / g2
+         d210 = 0.5d0 * (1.0d0-g1)
+         d211 = 0.5d0 * (1.0d0-xi0)*(1.0d0-g1)*g0
+         d212 = ((1.0d0-xi0)-(1.0d0-xi1)*beta2) * g1
+         d213 = (1.0d0-xi1) * g1
+         d222 = 0.5d0 * d213
          xdr0(:,:,1) = xdr0(:,:,1) + chi*(c204*p3(:,:,1)
-     &               + c203*p2(:,:,1) + c202*p1(:,:,1)
-     &               + c201*p0(:,:,1) + c200*udir)
+     &                    + c203*p2(:,:,1) + c202*p1(:,:,1)
+     &                    + c201*p0(:,:,1) + c200*udir)
          xdr0(:,:,2) = xdr0(:,:,2) + chi*(c204*p3(:,:,2)
-     &               + c203*p2(:,:,2) + c202*p1(:,:,2)
-     &               + c201*p0(:,:,2) + c200*udirp)
+     &                    + c203*p2(:,:,2) + c202*p1(:,:,2)
+     &                    + c201*p0(:,:,2) + c200*udirp)
          ubd(:,:,1) = ubd(:,:,1) + xdr0(:,:,1)
          ubp(:,:,1) = ubp(:,:,1) + xdr0(:,:,2)
          ubd(:,:,2) = ubd(:,:,2) + chi*(d213*p2(:,:,1) + d212*p1(:,:,1)
-     &              + d211*p0(:,:,1) + d210*udir)
+     &                   + d211*p0(:,:,1) + d210*udir)
          ubp(:,:,2) = ubp(:,:,2) + chi*(d213*p2(:,:,2) + d212*p1(:,:,2)
-     &              + d211*p0(:,:,2) + d210*udirp)
+     &                   + d211*p0(:,:,2) + d210*udirp)
          ubd(:,:,3) = ubd(:,:,3) + chi*(d222*p1(:,:,1) + 0.5d0*udir)
          ubp(:,:,3) = ubp(:,:,3) + chi*(d222*p1(:,:,2) + 0.5d0*udirp)
          call tcg_ufield (xdr0(:,:,1),xdr0(:,:,2),tp(:,:,1),tp(:,:,2))
          call tcg_alpha12 (tp(:,:,1),tp(:,:,2))
          tp(:,:,1) = tp(:,:,1) + p0(:,:,1) + udir
-     &             + chi*0.5d0*(p2(:,:,1)-beta2*p1(:,:,1))
+     &                  + chi*0.5d0*(p2(:,:,1)-beta2*p1(:,:,1))
          tp(:,:,2) = tp(:,:,2) + p0(:,:,2) + udirp
-     &             + chi*0.5d0*(p2(:,:,2)-beta2*p1(:,:,2))
+     &                  + chi*0.5d0*(p2(:,:,2)-beta2*p1(:,:,2))
          goto 10
       end if
 c
