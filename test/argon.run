@@ -1,4 +1,4 @@
 cp argon.1st argon.xyz
 ../bin/minimize argon 1.0
-../bin/dynamic argon 3000 2.0 1.0 4 150.87 49.0
-rm argon.xyz* argon.dyn* argon.0*
+../bin/dynamic argon 5000 5.0 1.0 4 150.87 49.0
+rm argon.xyz* argon.dyn* argon.arc*

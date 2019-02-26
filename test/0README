@@ -19,8 +19,8 @@
                           simulation on a "hybrid" anion in a box of
                           water, followed by free energy perturbation
 
-         (02) ARGON       minimization followed by 6 picoseconds
-                          of a molecular dynamics run on a periodic
+         (02) ARGON       minimization, followed by 25 picoseconds of
+                          molecular dynamics trajectory, on a periodic
                           box containing 150 argon atoms
 
          (03) CLUSTER     perform a set of 10 Gaussian density
