@@ -41,6 +41,7 @@
 ##  OPENMMDIR    OpenMM Distribution Directory
 
 TINKERDIR = $(HOME)/tinker
+TINKER_LIBDIR = $(TINKERDIR)/lib
 BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
 
@@ -76,7 +77,8 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 #CXX = g++
 #NVCC = nvcc
 #F77 = gfortran
-#LIBS = -lstdc++ -L. -L$(NVML_LIB) -lnvidia-ml -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -L$(NVML_LIB) -L$(CUDA_LIB)
+#LIBS = -lstdc++ -lnvidia-ml -lfftw3_threads -lfftw3 -lcudart -lcuda
 #CFLAGS = -c
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -msse3 -fopenmp
@@ -96,7 +98,8 @@ NVCC = nvcc
 OBJECTIVE_CC = clang
 OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
 F77 = gfortran
-LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
+LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -L$(CUDA_LIB)
+LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
 CFLAGS = -c
 F77FLAGS = -c
 OPTFLAGS = -Ofast -mssse3 -fopenmp
@@ -107,23 +110,6 @@ RANLIB = ranlib -c
 OBJS = gpu_usage.o
 GPU_USAGE_OBJS = gpu_usage.o
 LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
-
-##  Machine:  Generic Linux
-##  (Warning! NOT YET IMPLEMENTED/TESTED)
-##  CPU Type: Intel x86 Compatible (also AMD)
-##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 15.0
-##  Parallel: OpenMP
-#CC = icc
-#CXX = icpc
-#F77 = ifort
-#LIBS = -L. -lfftw3_threads -lfftw3
-#CFLAGS = -c -xHost
-#F77FLAGS = -c -xHost
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -qopenmp
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
@@ -137,7 +123,8 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoun
 #OBJECTIVE_CC = clang
 #OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
 #F77 = ifort
-#LIBS = -lstdc++ -L. -lfftw3_threads -lfftw3 -L$(CUDA_LIB) -lcudart -lcuda
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -L$(CUDA_LIB)
+#LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
 #CFLAGS = -c
 #F77FLAGS = -c
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
@@ -748,10 +735,10 @@ ommstuf.o: ommstuf.cpp
 	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuf.cpp
 
 bar_omm.x: bar_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
 
 dynamic_omm.x: dynamic_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} -o $@ $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
 
 rename:
 	mv dynamic_omm.x $(BINDIR)/dynamic_omm
@@ -1377,7 +1364,7 @@ ebuck2.o: atomid.o atoms.o bound.o cell.o couple.o group.o hessn.o iounit.o math
 ebuck3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o couple.o energi.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o shunt.o usage.o vdw.o vdwpot.o warp.o
 echarge.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o group.o iounit.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o warp.o
 echarge1.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o group.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o virial.o warp.o
-echarge2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o ewald.o group.o hessn.o limits.o math.o shunt.o warp.o
+echarge2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o ewald.o group.o hessn.o limits.o math.o neigh.o shunt.o warp.o
 echarge3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o pme.o shunt.o usage.o warp.o
 echgdpl.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o group.o shunt.o units.o usage.o
 echgdpl1.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
@@ -1565,7 +1552,7 @@ katoms.o:
 kbond.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o couple.o fields.o inform.o iounit.o kbonds.o keys.o merck.o potent.o tors.o usage.o
 kbonds.o:
 kcharge.o: atomid.o atoms.o charge.o chgpot.o couple.o fields.o inform.o iounit.o kchrge.o keys.o merck.o potent.o
-kchgtrn.o: atomid.o atoms.o chgtrn.o inform.o iounit.o kctrn.o keys.o mpole.o polar.o potent.o sizes.o
+kchgtrn.o: atomid.o atoms.o chgpen.o chgtrn.o inform.o iounit.o kctrn.o keys.o mplpot.o mpole.o polar.o polpot.o potent.o sizes.o
 kchrge.o:
 kcpen.o:
 kctrn.o:
@@ -1788,7 +1775,7 @@ surfatom.o: atoms.o iounit.o math.o
 switch.o: limits.o nonpol.o shunt.o
 syntrn.o:
 tarray.o:
-tcgstuf.o: atoms.o iounit.o limits.o mpole.o polar.o polpot.o poltcg.o potent.o units.o
+tcgstuf.o: atoms.o iounit.o limits.o mpole.o polar.o poltcg.o potent.o
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o units.o usage.o
 testgrad.o: atoms.o deriv.o energi.o files.o inform.o inter.o iounit.o solute.o usage.o
 testhess.o: atoms.o files.o hescut.o inform.o iounit.o usage.o
