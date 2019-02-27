@@ -46,8 +46,7 @@ c
       use poltcg
       use potent
       implicit none
-      integer i,j,k
-      integer next,size
+      integer i,j,k,next
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
@@ -87,8 +86,10 @@ c
       if (poltyp .eq. 'TCG0  ') then
          poltyp = 'DIRECT'
       else if (poltyp .eq. 'TCG1  ') then
+         poltyp = 'TCG   '
          tcgorder = 1
-      else if (poltyp .eq. 'TCG2  ') then
+      else if (poltyp(1:3) .eq. 'TCG') then
+         poltyp = 'TCG   '
          tcgorder = 2
       end if
 c
@@ -101,6 +102,7 @@ c
 c
 c     set defaults for OPT induced dipole coefficients
 c
+      coptmax = 0
       do i = 0, maxopt
          copt(i) = 0.0d0
          copm(i) = 0.0d0
@@ -183,13 +185,10 @@ c
 c     get maximum coefficient order for OPT induced dipoles
 c
       if (poltyp(1:3) .eq. 'OPT') then
-         coptmax = 0
+         poltyp = 'OPT   '
          do i = 1, maxopt
             if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
          end do
-         size = 1
-         call numeral (coptmax,digit,size)
-         poltyp = 'OPT'//digit//'  '
          do i = 0, coptmax
             do j = coptmax, i, -1
                copm(i) = copm(i) + copt(j)
@@ -221,7 +220,7 @@ c
       if (allocated(uoptp))  deallocate (uoptp)
       if (allocated(fopt))  deallocate (fopt)
       if (allocated(foptp))  deallocate (foptp)
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          allocate (uopt(0:coptmax,3,n))
          allocate (uoptp(0:coptmax,3,n))
          allocate (fopt(0:coptmax,10,n))

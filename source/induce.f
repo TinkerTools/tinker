@@ -43,7 +43,7 @@ c
          call induce0d
       else if (solvtyp(1:2) .eq. 'GK') then
          call induce0c
-      else if (poltyp(1:3) .eq. 'TCG') then
+      else if (poltyp .eq. 'TCG') then
          call induce0b
       else
          call induce0a
@@ -219,7 +219,7 @@ c
 c
 c     get induced dipoles via the OPT extrapolation method
 c
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3
@@ -3551,7 +3551,7 @@ c
 c
 c     store fractional reciprocal potentials for OPT method
 c
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          do ii = 1, npole
             do j = 1, 10
                fopt(optlevel,j,ii) = fdip_phi1(j,ii)
@@ -4246,7 +4246,7 @@ c
 c
 c     get induced dipoles via the OPT extrapolation method
 c
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3
@@ -5521,7 +5521,7 @@ c
 c
 c     get induced dipoles via the OPT extrapolation method
 c
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3

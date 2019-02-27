@@ -198,7 +198,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
-                  e = -ci * ck * dspscale(k)/r6
+                  e = -ci * ck / r6
 c
 c     find the damping factor for the dispersion interaction
 c

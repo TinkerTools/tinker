@@ -37,7 +37,9 @@ c
       integer next,kpcg
       integer nvar,iter
       integer itercut
-      integer miny
+      integer saveopt
+      integer savetcg
+      integer size,miny
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
       real*8 rdirect,rpcg
@@ -64,6 +66,7 @@ c
       real*8, allocatable :: ustore(:,:,:)
       logical exist,dofull,done
       character*1 answer
+      character*1 digit
       character*6 savetyp
       character*240 record
       external optfit
@@ -107,9 +110,25 @@ c     maintain any periodic boundary conditions
 c
       if (use_bounds .and. .not.use_rigid)  call bounds
 c
+c     store the original polarization type for the system
+c
+      if (coptmax .eq. 0)  coptmax = 4
+      if (tcgorder .eq. 0)  tcgorder = 2
+      if (poltyp .eq. 'OPT') then
+         size = 1
+         call numeral (coptmax,digit,size)
+         poltyp = 'OPT'//digit//'  '
+      else if (poltyp .eq. 'TCG') then
+         size = 1
+         call numeral (tcgorder,digit,size)
+         poltyp = 'TCG'//digit//'  '
+      end if
+      saveopt = coptmax
+      savetcg = tcgorder
+      savetyp = poltyp
+c
 c     generate neighbor lists for iterative SCF solver
 c
-      savetyp = poltyp
       poltyp = 'MUTUAL'
       call cutoffs
       if (use_list)  call nblist
@@ -346,7 +365,7 @@ c
 c
 c     print the RMS between approximate and exact dipoles
 c
-      write (iout,150)  coptmax,tcgorder
+      write (iout,150)  saveopt,savetcg
   150 format (/,' Approximate vs. Exact Induced Dipoles :',
      &        //,4x,'Atom',14x,'Direct',12x,'PCG',12x,'OPT',i1,
      &           12x,'TCG',i1)
@@ -396,7 +415,7 @@ c
 c     refine the extrapolated OPT coefficients via optimization
 c
       poltyp = savetyp
-      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT'
+      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT   '
       call kpolar
       maxiter = 1000
       eps = 0.033d0
@@ -496,14 +515,13 @@ c
       use units
       use usage
       implicit none
-      integer i,j,k,iter
-      integer nvar,size
+      integer i,j,k
+      integer nvar,iter
       real*8 optfit
       real*8 rxpt
       real*8 var(*)
       real*8, allocatable :: uxpt(:,:)
       logical first
-      character*1 digit
       save first,iter
       data first  / .true. /
 c
@@ -525,9 +543,6 @@ c
             copt(i) = var(nvar)
          end if
       end do
-      size = 1
-      call numeral (coptmax,digit,size)
-      poltyp = 'OPT'//digit//'  '
 c
 c     perform dynamic allocation of some local arrays
 c

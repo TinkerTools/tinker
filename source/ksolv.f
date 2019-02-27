@@ -860,7 +860,7 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          allocate (uopts(0:coptmax,3,n))
          allocate (uoptps(0:coptmax,3,n))
       end if
@@ -1191,7 +1191,7 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      if (poltyp(1:3) .eq. 'OPT') then
+      if (poltyp .eq. 'OPT') then
          allocate (uopts(0:coptmax,3,n))
          allocate (uoptps(0:coptmax,3,n))
       end if

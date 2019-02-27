@@ -1013,7 +1013,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp(1:3).eq.'OPT' .and. use_thole) then
+               else if (poltyp.eq.'OPT' .and. use_thole) then
                   do j = 0, coptmax-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
@@ -1069,7 +1069,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp(1:3).eq.'OPT' .and. use_chgpen) then
+               else if (poltyp.eq.'OPT' .and. use_chgpen) then
                   do j = 0, coptmax-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -1125,7 +1125,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp(1:3) .eq. 'TCG') then
+               else if (poltyp .eq. 'TCG') then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -1894,7 +1894,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp(1:3).eq.'OPT' .and. use_thole) then
+               else if (poltyp.eq.'OPT' .and. use_thole) then
                   do j = 0, coptmax-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
@@ -1950,7 +1950,7 @@ c
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
-               else if (poltyp(1:3).eq.'OPT' .and. use_chgpen) then
+               else if (poltyp.eq.'OPT' .and. use_chgpen) then
                   do j = 0, coptmax-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
@@ -2006,7 +2006,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp(1:3) .eq. 'TCG') then
+               else if (poltyp .eq. 'TCG') then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
