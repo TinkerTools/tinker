@@ -228,7 +228,7 @@ c
                end do
             end if
          end do
-         do k = 1, coptmax
+         do k = 1, optorder
             optlevel = k - 1
             if (use_ewald) then
                call ufield0c (field,fieldp)
@@ -257,7 +257,7 @@ c
                   uinp(j,i) = 0.0d0
                   usum(j,i) = 0.0d0
                   usump(j,i) = 0.0d0
-                  do k = 0, coptmax
+                  do k = 0, optorder
                      usum(j,i) = usum(j,i) + uopt(k,j,i)
                      usump(j,i) = usump(j,i) + uoptp(k,j,i)
                      uind(j,i) = uind(j,i) + copt(k)*usum(j,i)
@@ -4257,7 +4257,7 @@ c
                end do
             end if
          end do
-         do k = 1, coptmax
+         do k = 1, optorder
             call ufield0d (field,fieldp,fields,fieldps)
             do i = 1, npole
                if (douind(ipole(i))) then
@@ -4289,7 +4289,7 @@ c
                   usump(j,i) = 0.0d0
                   usums(j,i) = 0.0d0
                   usumps(j,i) = 0.0d0
-                  do k = 0, coptmax
+                  do k = 0, optorder
                      usum(j,i) = usum(j,i) + uopt(k,j,i)
                      usump(j,i) = usump(j,i) + uoptp(k,j,i)
                      usums(j,i) = usums(j,i) + uopts(k,j,i)
@@ -5532,7 +5532,7 @@ c
                end do
             end if
          end do
-         do k = 1, coptmax
+         do k = 1, optorder
             call ufield0e (field,fieldp,fields,fieldps)
             do i = 1, npole
                if (douind(ipole(i))) then
@@ -5564,7 +5564,7 @@ c
                   usump(j,i) = 0.0d0
                   usums(j,i) = 0.0d0
                   usumps(j,i) = 0.0d0
-                  do k = 0, coptmax
+                  do k = 0, optorder
                      usum(j,i) = usum(j,i) + uopt(k,j,i)
                      usump(j,i) = usump(j,i) + uoptp(k,j,i)
                      usums(j,i) = usums(j,i) + uopts(k,j,i)

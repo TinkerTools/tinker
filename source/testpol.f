@@ -112,18 +112,18 @@ c
 c
 c     store the original polarization type for the system
 c
-      if (coptmax .eq. 0)  coptmax = 4
+      if (optorder .eq. 0)  optorder = 4
       if (tcgorder .eq. 0)  tcgorder = 2
       if (poltyp .eq. 'OPT') then
          size = 1
-         call numeral (coptmax,digit,size)
+         call numeral (optorder,digit,size)
          poltyp = 'OPT'//digit//'  '
       else if (poltyp .eq. 'TCG') then
          size = 1
          call numeral (tcgorder,digit,size)
          poltyp = 'TCG'//digit//'  '
       end if
-      saveopt = coptmax
+      saveopt = optorder
       savetcg = tcgorder
       savetyp = poltyp
 c
@@ -286,7 +286,7 @@ c
 c     print the OPT extrapolation induced dipole moments
 c
       if (dofull) then
-         write (iout,110)  coptmax
+         write (iout,110)  optorder
   110    format (/,' Analytical OPT',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
@@ -420,7 +420,7 @@ c
       maxiter = 1000
       eps = 0.033d0
       delta = 0.0001d0
-      write (iout,230)  coptmax
+      write (iout,230)  optorder
   230 format (/,' Analytical OPT',i1,' Coefficient Refinement :',
      &        //,4x,'Iter',7x,'C0',5x,'C1',5x,'C2',5x,'C3',
      &           5x,'C4',5x,'C5',5x,'C6',5x,'RMS vs Exact',/)
@@ -428,14 +428,14 @@ c
 c     count number of variables and define the initial simplex
 c
       nvar = 0
-      do i = 0, coptmax
+      do i = 0, optorder
          if (copt(i) .ne. 0.0d0)  nvar = nvar + 1
       end do
       allocate (var(nvar))
       allocate (yval(nvar+1))
       allocate (p(nvar+1,nvar))
       nvar = 0
-      do i = 0, coptmax
+      do i = 0, optorder
          if (copt(i) .ne. 0.0d0) then
             nvar = nvar + 1
             var(nvar) = copt(i)
@@ -466,7 +466,7 @@ c
          end if
       end do
       nvar = 0
-      do i = 0, coptmax
+      do i = 0, optorder
          if (copt(i) .ne. 0.0d0) then
             nvar = nvar + 1
             copt(i) = p(miny,nvar)

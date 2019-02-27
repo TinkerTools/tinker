@@ -102,7 +102,7 @@ c
 c
 c     set defaults for OPT induced dipole coefficients
 c
-      coptmax = 0
+      optorder = 0
       do i = 0, maxopt
          copt(i) = 0.0d0
          copm(i) = 0.0d0
@@ -187,10 +187,10 @@ c
       if (poltyp(1:3) .eq. 'OPT') then
          poltyp = 'OPT   '
          do i = 1, maxopt
-            if (copt(i) .ne. 0.0d0)  coptmax = max(i,coptmax)
+            if (copt(i) .ne. 0.0d0)  optorder = max(i,optorder)
          end do
-         do i = 0, coptmax
-            do j = coptmax, i, -1
+         do i = 0, optorder
+            do j = optorder, i, -1
                copm(i) = copm(i) + copt(j)
             end do
          end do
@@ -221,10 +221,10 @@ c
       if (allocated(fopt))  deallocate (fopt)
       if (allocated(foptp))  deallocate (foptp)
       if (poltyp .eq. 'OPT') then
-         allocate (uopt(0:coptmax,3,n))
-         allocate (uoptp(0:coptmax,3,n))
-         allocate (fopt(0:coptmax,10,n))
-         allocate (foptp(0:coptmax,10,n))
+         allocate (uopt(0:optorder,3,n))
+         allocate (uoptp(0:optorder,3,n))
+         allocate (fopt(0:optorder,10,n))
+         allocate (foptp(0:optorder,10,n))
       end if
 c
 c     set the atoms allowed to have nonzero induced dipoles

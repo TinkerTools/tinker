@@ -861,8 +861,8 @@ c
       allocate (uinds(3,n))
       allocate (uinps(3,n))
       if (poltyp .eq. 'OPT') then
-         allocate (uopts(0:coptmax,3,n))
-         allocate (uoptps(0:coptmax,3,n))
+         allocate (uopts(0:optorder,3,n))
+         allocate (uoptps(0:optorder,3,n))
       end if
 c
 c     set default value for exponent in the GB/GK function
@@ -1192,8 +1192,8 @@ c
       allocate (uinds(3,n))
       allocate (uinps(3,n))
       if (poltyp .eq. 'OPT') then
-         allocate (uopts(0:coptmax,3,n))
-         allocate (uoptps(0:coptmax,3,n))
+         allocate (uopts(0:optorder,3,n))
+         allocate (uoptps(0:optorder,3,n))
       end if
 c
 c     assign some default APBS configuration parameters

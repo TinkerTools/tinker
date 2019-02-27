@@ -14,7 +14,7 @@ c
 c
 c     maxopt    maximum order for OPT induced dipole extrapolation
 c
-c     coptmax   maximum coefficient order for OPT dipole extrapolation
+c     optorder  highest coefficient order for OPT dipole extrapolation
 c     optlevel  current OPT order for reciprocal potential and field
 c     copt      coefficients for OPT total induced dipole moments
 c     copm      coefficients for OPT incremental induced dipole moments
@@ -30,7 +30,7 @@ c
       implicit none
       integer maxopt
       parameter (maxopt=6)
-      integer coptmax
+      integer optorder
       integer optlevel
       real*8, allocatable :: copt(:)
       real*8, allocatable :: copm(:)

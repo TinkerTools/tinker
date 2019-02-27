@@ -592,7 +592,7 @@ struct {
 
 struct {
    int maxopt;
-   int coptmax;
+   int optorder;
    int optlevel;
    double* copt;
    double* copm;
@@ -1544,13 +1544,13 @@ void set_polgrp_data_ (int* maxp11, int* maxp12, int* maxp13, int* maxp14,
    polgrp__.ip14 = ip14;
 }
 
-void set_polopt_data_ (int* maxopt, int* coptmax, int* optlevel,
+void set_polopt_data_ (int* maxopt, int* optorder, int* optlevel,
                        double* copt, double* copm, double* uopt,
                        double* uoptp, double* uopts, double* uoptps,
                        double* fopt, double* foptp) {
 
    polopt__.maxopt = *maxopt;
-   polopt__.coptmax = *coptmax;
+   polopt__.optorder = *optorder;
    polopt__.optlevel = *optlevel;
    polopt__.copt = copt;
    polopt__.copm = copm;

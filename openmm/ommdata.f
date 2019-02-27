@@ -158,7 +158,7 @@ c
      &                     uexact,douind)
       call set_polgrp_data (maxp11,maxp12,maxp13,maxp14,np11,
      &                      np12,np13,np14,ip11,ip12,ip13,ip14)
-      call set_polopt_data (maxopt,coptmax,optlevel,copt,copm,
+      call set_polopt_data (maxopt,optorder,optlevel,copt,copm,
      &                      uopt,uoptp,uopts,uoptps,fopt,foptp)
       call set_polpot_data (politer,poleps,p2scale,p3scale,p4scale,
      &                      p5scale,p41scale,d1scale,d2scale,d3scale,

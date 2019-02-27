@@ -823,10 +823,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
      &                             + uopt(m,3,kk)*zr
                         term1 = (sc3+sc5) * rr5
@@ -879,10 +879,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_chgpen) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = 2.0d0 * dmpik(5) * rr5
@@ -1720,10 +1720,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
      &                             + uopt(m,3,kk)*zr
                         term1 = (sc3+sc5) * rr5
@@ -1776,10 +1776,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_chgpen) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = 2.0d0 * dmpik(5) * rr5
@@ -2259,7 +2259,7 @@ c
 !$OMP& n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,p3scale,
 !$OMP& p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,d4scale,u1scale,
 !$OMP& u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,nelst,
-!$OMP& elst,use_thole,use_chgpen,use_bounds,off2,f,molcule,coptmax,
+!$OMP& elst,use_thole,use_chgpen,use_bounds,off2,f,molcule,optorder,
 !$OMP& copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
@@ -2879,10 +2879,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
      &                             + uopt(m,3,kk)*zr
                         term1 = (sc3+sc5) * rr5
@@ -2935,10 +2935,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_chgpen) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = 2.0d0 * dmpik(5) * rr5
@@ -4335,10 +4335,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
      &                             + uopt(m,3,kk)*zr
                         term1 = bn(2) - usc3*rr5
@@ -4394,10 +4394,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_chgpen) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = 2.0d0 * rr5ik
@@ -5341,10 +5341,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
      &                             + uopt(m,3,kk)*zr
                         term1 = bn(2) - usc3*rr5
@@ -5400,10 +5400,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_chgpen) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = 2.0d0 * rr5ik
@@ -6106,7 +6106,7 @@ c
 !$OMP& n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,p3scale,
 !$OMP& p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,d4scale,u1scale,
 !$OMP& u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,nelst,
-!$OMP& elst,use_thole,use_chgpen,use_bounds,off2,f,aewald,coptmax,
+!$OMP& elst,use_thole,use_chgpen,use_bounds,off2,f,aewald,optorder,
 !$OMP& copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
@@ -6833,10 +6833,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
      &                          + uopt(j,3,ii)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
      &                             + uopt(m,3,kk)*zr
                         term1 = bn(2) - usc3*rr5
@@ -6892,10 +6892,10 @@ c
 c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_chgpen) then
-                  do j = 0, coptmax-1
+                  do j = 0, optorder-1
                      uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
      &                          + uopt(j,3,i)*zr
-                     do m = 0, coptmax-j-1
+                     do m = 0, optorder-j-1
                         ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
      &                             + uopt(m,3,k)*zr
                         term1 = 2.0d0 * rr5ik
@@ -7745,12 +7745,12 @@ c
       if (poltyp .eq. 'OPT') then
          do i = 1, npole
             ii = ipole(i)
-            do k = 0, coptmax-1
+            do k = 0, optorder-1
                do j = 2, 10
                   fphid(j,i) = f * fopt(k,j,i)
                   fphip(j,i) = f * foptp(k,j,i)
                end do
-               do m = 0, coptmax-k-1
+               do m = 0, optorder-k-1
                   do j = 1, 3
                      fuind(j,i) = a(j,1)*uopt(m,1,i)
      &                               + a(j,2)*uopt(m,2,i)
