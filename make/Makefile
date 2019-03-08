@@ -141,6 +141,22 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
 #RENAME = rename_bin
 
+##  Build:     TINKER
+##  OS Type:   Apple MacOS
+##  CPU Type:  Intel Xeon
+##  Compiler:  PGI Fortran for MacOS 18.10
+##  Parallel:  OpenMP
+
+#F77 = pgfortran
+#F77FLAGS = -c
+#OPTFLAGS = -fast -O3 -mp
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+#LIBS = 
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS)
+#RENAME = rename_bin
+
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
 #################################################################

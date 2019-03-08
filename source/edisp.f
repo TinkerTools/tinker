@@ -1269,8 +1269,9 @@ c
 c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
-      if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
-     &   deallocate(qgrid)
+      if (allocated(qgrid)) then
+         if (size(qgrid) .ne. 2*ntot) deallocate(qgrid)
+      end if
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))
 c
@@ -1350,5 +1351,10 @@ c
             edsp = edsp - csix(i)*csix(j)*aewald**3/denom0
          end do
       end do
+      return
+c
+c     cleanup following the use of FFT routines
+c
+      call fftexit
       return
       end

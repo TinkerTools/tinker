@@ -1,9 +1,9 @@
 ##
-######################################################################
-##                                                                  ##
-##  Makefile for Building an OpenMM-Enabled Tinker DYNAMIC Program  ##
-##                                                                  ##
-######################################################################
+###################################################################
+##                                                               ##
+##  Makefile for Building OpenMM-Enabled Tinker GPU Executables  ##
+##                                                               ##
+###################################################################
 ##
 ##  Invocation Options:
 ##
@@ -742,12 +742,15 @@ dynamic_omm.x: dynamic_omm.o ommstuf.o libtinker.a
 
 rename:
 	mv dynamic_omm.x $(BINDIR)/dynamic_omm
+	mv bar_omm.x $(BINDIR)/bar_omm
 
 remove_links:
 	rm -f $(LINKDIR)/dynamic_omm
+	rm -f $(LINKDIR)/bar_omm
 
 create_links:
 	ln -s $(BINDIR)/dynamic_omm $(LINKDIR)/dynamic_omm
+	ln -s $(BINDIR)/bar_omm $(LINKDIR)/bar_omm
 
 libtinker.a: ${OBJS} 
 	ar ${LIBFLAGS} libtinker.a \

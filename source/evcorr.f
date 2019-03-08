@@ -18,7 +18,7 @@ c
 c     literature reference:
 c
 c     M. P. Allen and D. J. Tildesley, "Computer Simulation of
-c     Liquids", Oxford University Press, 1987, Section 2.8
+c     Liquids, 2nd Ed.", Oxford University Press, 2017, Section 2.8
 c
 c
       subroutine evcorr (mode,elrc)
@@ -192,7 +192,7 @@ c
 c     literature reference:
 c
 c     M. P. Allen and D. J. Tildesley, "Computer Simulation of
-c     Liquids", Oxford University Press, 1987, Section 2.8
+c     Liquids, 2nd Ed.", Oxford University Press, 2017, Section 2.8
 c
 c
       subroutine evcorr1 (mode,elrc,vlrc)

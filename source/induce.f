@@ -534,6 +534,10 @@ c
          end if
       end if
 c
+c     cleanup following the use of FFT routines
+c
+      if (use_ewald)  call fftexit
+c
 c     perform deallocation of some local arrays
 c
       deallocate (field)
@@ -2094,6 +2098,7 @@ c
       use math
       use mpole
       use pme
+      use polpot
       implicit none
       integer i,j,k
       integer ii,ntot

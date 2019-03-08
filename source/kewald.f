@@ -218,39 +218,25 @@ c
          if (ndfft3 .lt. minfft)  ndfft3 = minfft
       end if
 c
-c     set electrostatic grid to at least dispersion grid size
-c
-      if (use_ewald .and. use_dewald) then
-         if (nefft1.lt.ndfft1 .or. nefft2.lt.ndfft2
-     &          .or. nefft3.lt.ndfft3) then
-            nefft1 = max(nefft1,ndfft1)
-            nefft2 = max(nefft2,ndfft2)
-            nefft3 = max(nefft3,ndfft3)
-            write (iout,50)
-   50       format (/,' KEWALD  --  Setting Electrostatic PME',
-     &                 ' Grid to Match Dispersion Grid')
-         end if
-      end if
-c
 c     check the particle mesh Ewald grid dimensions
 c
       nbig = max(nefft1,nefft2,nefft3,ndfft1,ndfft2,ndfft3)
       if (nbig .gt. maxfft) then
-         write (iout,60)
-   60    format (/,' KEWALD  --  PME Grid Size Too Large;',
+         write (iout,50)
+   50    format (/,' KEWALD  --  PME Grid Size Too Large;',
      &              ' Increase MAXFFT')
          call fatal
       end if
       if (use_ewald .and. (nefft1.lt.iefft1.or.
      &       nefft2.lt.iefft2.or.nefft3.lt.iefft3)) then
-         write (iout,70)
-   70    format (/,' KEWALD  --  Warning, Small Electrostatic',
+         write (iout,60)
+   60    format (/,' KEWALD  --  Warning, Small Electrostatic',
      &              'PME Grid Size')
       end if
       if (use_dewald .and. (ndfft1.lt.idfft1.or.
      &       ndfft2.lt.idfft2.or.ndfft3.lt.idfft3)) then
-         write (iout,80)
-   80    format (/,' KEWALD  --  Warning, Small Dispersion',
+         write (iout,70)
+   70    format (/,' KEWALD  --  Warning, Small Dispersion',
      &              'PME Grid Size')
       end if
 c
@@ -287,21 +273,21 @@ c
 c     print a message listing some of the Ewald parameters
 c
       if (verbose) then
-         write (iout,90)
-   90    format (/,' Particle Mesh Ewald Parameters :',
+         write (iout,80)
+   80    format (/,' Particle Mesh Ewald Parameters :',
      &           //,5x,'Type',16x,'Ewald Alpha',4x,'Grid',
      &              ' Dimensions',4x,'Spline Order',/)
          if (use_ewald) then
-            write (iout,100)  aeewald,nefft1,nefft2,nefft3,bseorder
-  100       format (3x,'Electrostatics',9x,f8.4,5x,3i5,7x,i5)
+            write (iout,90)  aeewald,nefft1,nefft2,nefft3,bseorder
+   90       format (3x,'Electrostatics',9x,f8.4,5x,3i5,7x,i5)
             if (use_polar) then
-               write (iout,110)  apewald,nefft1,nefft2,nefft3,bsporder
-  110          format (3x,'Polarization',11x,f8.4,5x,3i5,7x,i5)
+               write (iout,100)  apewald,nefft1,nefft2,nefft3,bsporder
+  100          format (3x,'Polarization',11x,f8.4,5x,3i5,7x,i5)
             end if
          end if
          if (use_dewald) then
-            write (iout,120)  adewald,ndfft1,ndfft2,ndfft3,bsdorder
-  120       format (3x,'Dispersion',13x,f8.4,5x,3i5,7x,i5)
+            write (iout,110)  adewald,ndfft1,ndfft2,ndfft3,bsdorder
+  110       format (3x,'Dispersion',13x,f8.4,5x,3i5,7x,i5)
          end if
       end if
       return

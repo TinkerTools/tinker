@@ -1777,5 +1777,9 @@ c
          e = f * expterm * struc2
          ec = ec + e
       end if
+c
+c     cleanup following the use of FFT routines
+c
+      call fftexit
       return
       end

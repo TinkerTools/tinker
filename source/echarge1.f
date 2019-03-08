@@ -2408,5 +2408,9 @@ c
          dec(3,iatm) = dec(3,iatm) + fi*(recip(3,1)*de1+recip(3,2)*de2
      &                                      +recip(3,3)*de3)
       end do
+c
+c     cleanup following the use of FFT routines
+c
+      call fftexit
       return
       end

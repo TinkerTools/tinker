@@ -46,10 +46,10 @@ c
 c     perform dynamic allocation of some global arrays
 c
          maxtable = 4 * max(nfft1,nfft2,nfft3)
-         if (allocated(ffttable) .and. size(ffttable).ne.maxtable)
-     &      deallocate (ffttable)
-         if (.not. allocated(ffttable))
-     &      allocate (ffttable(maxtable,3))
+         if (allocated(ffttable)) then
+            if (size(ffttable) .ne. maxtable)  deallocate (ffttable)
+         end if
+         if (.not. allocated(ffttable))  allocate (ffttable(maxtable,3))
 c
 c     initialization of Fast Fourier transform using FFTPACK
 c
@@ -202,6 +202,32 @@ c
             end do
          end do
          deallocate (work)
+!$    end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine fftexit  --  cleanup 3-D Fast Fourier transform  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "fftexit" does cleanup after performing a 3-D FFT by destroying
+c     the FFTW plans for the forward and backwards transforms
+c
+c
+      subroutine fftexit
+      use fft
+      implicit none
+c
+c
+c     remove the FFTW plans to avoid a cumulative memory leak
+c
+!$    if (ffttyp .eq. 'FFTW') then
+!$       call dfftw_destroy_plan (planf)
+!$       call dfftw_destroy_plan (planb)
 !$    end if
       return
       end

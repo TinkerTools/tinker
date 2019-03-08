@@ -33,7 +33,7 @@ c     w4scale    scale factor for 1-4 induced dipole interactions
 c     w5scale    scale factor for 1-5 induced dipole interactions
 c     udiag      acceleration factor for induced dipole SCF iterations
 c     use_thole  flag to use Thole damped polarization interactions
-c     poltyp     type of polarization potential (direct or mutual)
+c     poltyp     type of polarization (MUTUAL, DIRECT, OPT or TCG)
 c
 c
       module polpot

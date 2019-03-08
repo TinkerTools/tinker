@@ -3270,14 +3270,18 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(cmp) .and. size(cmp).lt.10*npole)
-     &   deallocate (cmp)
-      if (allocated(fmp) .and. size(fmp).lt.10*npole)
-     &   deallocate (fmp)
-      if (allocated(cphi) .and. size(cphi).lt.10*npole)
-     &   deallocate (cphi)
-      if (allocated(fphi) .and. size(fphi).lt.20*npole)
-     &   deallocate (fphi)
+      if (allocated(cmp)) then
+         if (size(cmp) .lt. 10*npole)  deallocate (cmp)
+      end if
+      if (allocated(fmp)) then
+         if (size(fmp) .lt. 10*npole)  deallocate (fmp)
+      end if
+      if (allocated(cphi)) then
+         if (size(cphi) .lt. 10*npole)  deallocate (cphi)
+      end if
+      if (allocated(fphi)) then
+         if (size(fphi) .lt. 20*npole)  deallocate (fphi)
+      end if
       if (.not. allocated(cmp))  allocate (cmp(10,npole))
       if (.not. allocated(fmp))  allocate (fmp(10,npole))
       if (.not. allocated(cphi))  allocate (cphi(10,npole))
@@ -3286,23 +3290,27 @@ c
 c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
-      if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
-     &   deallocate(qgrid)
-      if (allocated(qfac) .and. size(qfac).ne.ntot)
-     &   deallocate(qfac)
+      if (allocated(qgrid)) then
+         if (size(qgrid) .ne. 2*ntot)  deallocate(qgrid)
+      end if
+      if (allocated(qfac)) then
+         if (size(qfac) .ne. ntot)  deallocate(qfac)
+      end if
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))
       if (.not. allocated(qfac))
      &   allocate (qfac(nfft1,nfft2,nfft3))
 c
-c     zero out the temporary virial accumulation variables
+c     setup spatial decomposition, B-splines and PME arrays
 c
-      vxx = 0.0d0
-      vxy = 0.0d0
-      vxz = 0.0d0
-      vyy = 0.0d0
-      vyz = 0.0d0
-      vzz = 0.0d0
+      call getchunk
+      call moduli
+      call fftsetup
+c
+c     compute B-spline coefficients and spatial decomposition
+c
+      call bspline_fill
+      call table_fill
 c
 c     copy multipole moments and coordinates to local storage
 c
@@ -3319,23 +3327,21 @@ c
          cmp(10,i) = 2.0d0 * rpole(10,i)
       end do
 c
-c     setup spatial decomposition, B-splines and PME arrays
-c
-      call getchunk
-      call moduli
-      call fftsetup
-c
-c     compute B-spline coefficients and spatial decomposition
-c
-      call bspline_fill
-      call table_fill
-c
 c     assign permanent multipoles to PME grid and perform
 c     the 3-D FFT forward transformation
 c
       call cmp_to_fmp (cmp,fmp)
       call grid_mpole (fmp)
       call fftfront
+c
+c     zero out the temporary virial accumulation variables
+c
+      vxx = 0.0d0
+      vxy = 0.0d0
+      vxz = 0.0d0
+      vyy = 0.0d0
+      vyz = 0.0d0
+      vzz = 0.0d0
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -3534,5 +3540,9 @@ c
       vir(1,3) = vir(1,3) + vxz
       vir(2,3) = vir(2,3) + vyz
       vir(3,3) = vir(3,3) + vzz
+c
+c     cleanup following the use of FFT routines
+c
+      call fftexit
       return
       end

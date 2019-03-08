@@ -2138,47 +2138,52 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(cmp) .and. size(cmp).lt.10*npole)
-     &   deallocate (cmp)
-      if (allocated(fmp) .and. size(fmp).lt.10*npole)
-     &   deallocate (fmp)
-      if (allocated(fphi) .and. size(fphi).lt.20*npole)
-     &   deallocate (fphi)
+      if (allocated(cmp)) then
+         if (size(cmp) .lt. 10*npole)  deallocate (cmp)
+      end if
+      if (allocated(fmp)) then
+         if (size(fmp) .lt. 10*npole)  deallocate (fmp)
+      end if
+      if (allocated(fphi)) then
+         if (size(fphi) .lt. 20*npole)  deallocate (fphi)
+      end if
       if (.not. allocated(cmp))  allocate (cmp(10,npole))
       if (.not. allocated(fmp))  allocate (fmp(10,npole))
       if (.not. allocated(fphi))  allocate (fphi(20,npole))
+c
+c     perform dynamic allocation of some global arrays
+c
+      ntot = nfft1 * nfft2 * nfft3
+      if (allocated(qgrid)) then
+         if (size(qgrid) .ne. 2*ntot)  deallocate(qgrid)
+      end if
+      if (allocated(qfac)) then
+         if (size(qfac) .ne. ntot)  deallocate(qfac)
+      end if
+      if (.not. allocated(qgrid))
+     &   allocate (qgrid(2,nfft1,nfft2,nfft3))
+      if (.not. allocated(qfac))
+     &   allocate (qfac(nfft1,nfft2,nfft3))
 c
 c     get the fractional to Cartesian transformation matrix
 c
       call frac_to_cart (ftc)
 c
-c     perform dynamic allocation of some global arrays
-c
-      if (.not.use_mpole .or. aewald.ne.aeewald) then
-         ntot = nfft1 * nfft2 * nfft3
-         if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
-     &      deallocate(qgrid)
-         if (allocated(qfac) .and. size(qfac).ne.ntot)
-     &      deallocate(qfac)
-         if (.not. allocated(qgrid))
-     &      allocate (qgrid(2,nfft1,nfft2,nfft3))
-         if (.not. allocated(qfac))
-     &      allocate (qfac(nfft1,nfft2,nfft3))
-c
 c     setup spatial decomposition, B-splines and PME arrays
 c
-         call getchunk
-         call moduli
-         call fftsetup
-
+      call getchunk
+      call moduli
+      call fftsetup
+c
 c     compute B-spline coefficients and spatial decomposition
 c
-         call bspline_fill
-         call table_fill
+      call bspline_fill
+      call table_fill
 c
 c     assign only the permanent multipoles to the PME grid
 c     and perform the 3-D FFT forward transformation
 c
+      if (.not.use_mpole .or. aewald.ne.aeewald) then
          do i = 1, npole
             cmp(1,i) = rpole(1,i)
             cmp(2,i) = rpole(2,i)
@@ -2304,6 +2309,10 @@ c
       end do
       e = 0.5d0 * f * e
       ep = ep + e
+c
+c     cleanup following the use of FFT routines
+c
+      call fftexit
 c
 c     perform deallocation of some local arrays
 c
