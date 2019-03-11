@@ -611,7 +611,10 @@ struct {
    double p3scale;
    double p4scale;
    double p5scale;
-   double p41scale;
+   double p2iscale;
+   double p3iscale;
+   double p4iscale;
+   double p5iscale;
    double d1scale;
    double d2scale;
    double d3scale;
@@ -1564,7 +1567,8 @@ void set_polopt_data_ (int* maxopt, int* optorder, int* optlevel,
 
 void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
                        double* p3scale, double* p4scale, double* p5scale,
-                       double* p41scale, double* d1scale, double* d2scale,
+                       double* p2iscale, double* p3iscale, double* p4iscale,
+                       double* p5iscale, double* d1scale, double* d2scale,
                        double* d3scale, double* d4scale, double* u1scale,
                        double* u2scale, double* u3scale, double* u4scale,
                        double* w2scale, double* w3scale, double* w4scale,
@@ -1576,7 +1580,10 @@ void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
    polpot__.p2scale = *p2scale;
    polpot__.p3scale = *p3scale;
    polpot__.p4scale = *p4scale;
-   polpot__.p41scale = *p41scale;
+   polpot__.p2iscale = *p2iscale;
+   polpot__.p3iscale = *p3iscale;
+   polpot__.p4iscale = *p4iscale;
+   polpot__.p5iscale = *p5iscale;
    polpot__.p5scale = *p5scale;
    polpot__.d1scale = *d1scale;
    polpot__.d2scale = *d2scale;

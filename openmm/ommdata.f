@@ -161,10 +161,10 @@ c
       call set_polopt_data (maxopt,optorder,optlevel,copt,copm,
      &                      uopt,uoptp,uopts,uoptps,fopt,foptp)
       call set_polpot_data (politer,poleps,p2scale,p3scale,p4scale,
-     &                      p5scale,p41scale,d1scale,d2scale,d3scale,
-     &                      d4scale,u1scale,u2scale,u3scale,u4scale,
-     &                      w2scale,w3scale,w4scale,w5scale,udiag,
-     &                      use_thole,poltyp)
+     &                      p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
+     &                      d1scale,d2scale,d3scale,d4scale,u1scale,
+     &                      u2scale,u3scale,u4scale,w2scale,w3scale,
+     &                      w4scale,w5scale,udiag,use_thole,poltyp)
       call set_potent_data (use_bond,use_angle,use_strbnd,use_urey,
      &                      use_angang,use_opbend,use_opdist,use_improp,
      &                      use_imptor,use_tors,use_pitors,use_strtor,
