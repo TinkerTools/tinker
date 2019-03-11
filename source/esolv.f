@@ -169,7 +169,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,f,
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
-!$OMP% f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es)
 !$OMP DO reduction(+:es) schedule(guided)
 c
@@ -297,7 +297,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,use,x,y,z,
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
-!$OMP% c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
+!$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es)
 !$OMP DO reduction(+:es) schedule(guided)
 c
@@ -1022,8 +1022,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
 !$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
-!$OMP% i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p41scale,p5scale,
-!$OMP% use_group,use_intra,off2,f)
+!$OMP& i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,
+!$OMP& p3iscale,p4iscale,p5iscale,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale) shared(es)
 !$OMP DO reduction(+:es) schedule(guided)
 c
@@ -1053,21 +1053,36 @@ c
          uiy = uinds(2,i) - uind(2,i)
          uiz = uinds(3,i) - uind(3,i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
-         do j = 1, n12(ii)
-            pscale(i12(j,ii)) = p2scale
-         end do
-         do j = 1, n13(ii)
-            pscale(i13(j,ii)) = p3scale
-         end do
-         do j = 1, n14(ii)
-            pscale(i14(j,ii)) = p4scale
-            do k = 1, np11(ii)
-                if (i14(j,ii) .eq. ip11(k,ii))
-     &            pscale(i14(j,ii)) = p4scale * p41scale
+c
+c     set exclusion coefficients for connected atoms
+c
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
             end do
          end do
-         do j = 1, n15(ii)
-            pscale(i15(j,ii)) = p5scale
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = p4scale
+            do k = 1, np11(i)
+               if (i14(j,i) .eq. ip11(k,i))
+     &            pscale(i14(j,i)) = p4iscale
+            end do
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
          end do
 c
 c     decide whether to compute the current interaction

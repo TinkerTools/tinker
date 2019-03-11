@@ -651,19 +651,31 @@ c
          end if
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
          end do
          do j = 1, np11(i)
             dscale(ip11(j,i)) = d1scale
@@ -1507,9 +1519,9 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,rpole,x,y,z,pdamp,thole,pcore,pval,palpha,
 !$OMP& n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
-!$OMP& np14,ip14,p2scale,p3scale,p4scale,p41scale,p5scale,d1scale,
-!$OMP& d2scale,d3scale,d4scale,nelst,elst,use_thole,use_chgpen,
-!$OMP& use_bounds,off2,field,fieldp)
+!$OMP& np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
+!$OMP& p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,
+!$OMP& use_thole,use_chgpen,use_bounds,off2,field,fieldp)
 !$OMP& firstprivate(dscale,pscale) shared (fieldt,fieldtp)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
 c
@@ -1536,19 +1548,31 @@ c
          end if
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
          end do
          do j = 1, np11(i)
             dscale(ip11(j,i)) = d1scale
@@ -2363,19 +2387,31 @@ c
          end if
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
          end do
          do j = 1, np11(i)
             dscale(ip11(j,i)) = d1scale
@@ -3010,12 +3046,13 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,rpole,x,y,z,pdamp,
-!$OMP& thole,pcore,pval,palpha,p2scale,p3scale,p4scale,p41scale,p5scale,
-!$OMP& w2scale,w3scale,w4scale,w5scale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& u1scale,u2scale,u3scale,u4scale,n12,i12,n13,i13,n14,i14,n15,i15,
-!$OMP& np11,ip11,np12,ip12,np13,ip13,np14,ip14,nelst,elst,use_thole,
-!$OMP& use_chgpen,use_bounds,off2,aewald,aesq2,aesq2n,poltyp,nchunk,
-!$OMP& ntpair,tindex,tdipdip,toffset,field,fieldp,fieldt,fieldtp)
+!$OMP& thole,pcore,pval,palpha,p2scale,p3scale,p4scale,p5scale,p2iscale,
+!$OMP& p3iscale,p4iscale,p5iscale,w2scale,w3scale,w4scale,w5scale,
+!$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
+!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
+!$OMP& np14,ip14,nelst,elst,use_thole,use_chgpen,use_bounds,off2,aewald,
+!$OMP& aesq2,aesq2n,poltyp,nchunk,ntpair,tindex,tdipdip,toffset,field,
+!$OMP& fieldp,fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nchunk)
 c
@@ -3042,22 +3079,34 @@ c
          end if
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -4710,11 +4759,11 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,rpole,pdamp,thole,
 !$OMP& rborn,n12,n13,n14,n15,np11,np12,np13,np14,i12,i13,i14,i15,
-!$OMP% ip11,ip12,ip13,ip14,p2scale,p3scale,p4scale,p41scale,p5scale,
-!$OMP& d1scale,d2scale,d3scale,d4scale,use_intra,x,y,z,off2,fc,fd,fq,
-!$OMP& gkc,field,fieldp,fields,fieldps)
+!$OMP& ip11,ip12,ip13,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
+!$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
+!$OMP& use_intra,x,y,z,off2,fc,fd,fq,gkc,field,fieldp,fields,fieldps)
 !$OMP& firstprivate(dscale,pscale)
-!$OMP% shared(fieldt,fieldtp,fieldts,fieldtps)
+!$OMP& shared(fieldt,fieldtp,fieldts,fieldtps)
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
 c
 c     find the field terms for each pairwise interaction
@@ -4736,19 +4785,31 @@ c
          rbi = rborn(i)
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
          end do
          do j = 1, np11(i)
             dscale(ip11(j,i)) = d1scale
@@ -5958,19 +6019,31 @@ c
          pti = thole(ii)
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
          end do
          do j = 1, np11(i)
             dscale(ip11(j,i)) = d1scale

@@ -363,7 +363,10 @@ c
       p3scale = 0.0d0
       p4scale = 1.0d0
       p5scale = 1.0d0
-      p41scale = 0.5d0
+      p2iscale = 0.0d0
+      p3iscale = 0.0d0
+      p4iscale = 0.5d0
+      p5iscale = 1.0d0
       u1scale = 1.0d0
       u2scale = 1.0d0
       u3scale = 1.0d0

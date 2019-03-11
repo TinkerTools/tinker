@@ -449,22 +449,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -1325,10 +1337,18 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
@@ -1336,11 +1356,15 @@ c
             wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)

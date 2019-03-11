@@ -430,9 +430,18 @@ c
       else if (keyword(1:15) .eq. 'POLAR-15-SCALE ') then
          read (string,*,err=10,end=10)  p5scale
          if (p5scale .gt. 1.0d0)  p5scale = 1.0d0 / p5scale
+      else if (keyword(1:15) .eq. 'POLAR-12-INTRA ') then
+         read (string,*,err=10,end=10)  p2iscale
+         if (p2iscale .gt. 1.0d0)  p2iscale = 1.0d0 / p2iscale
+      else if (keyword(1:15) .eq. 'POLAR-13-INTRA ') then
+         read (string,*,err=10,end=10)  p3iscale
+         if (p3iscale .gt. 1.0d0)  p3iscale = 1.0d0 / p3iscale
       else if (keyword(1:15) .eq. 'POLAR-14-INTRA ') then
-         read (string,*,err=10,end=10)  p41scale
-         if (p41scale .gt. 1.0d0)  p41scale = 1.0d0 / p41scale
+         read (string,*,err=10,end=10)  p4iscale
+         if (p4iscale .gt. 1.0d0)  p4iscale = 1.0d0 / p4iscale
+      else if (keyword(1:15) .eq. 'POLAR-15-INTRA ') then
+         read (string,*,err=10,end=10)  p5iscale
+         if (p5iscale .gt. 1.0d0)  p5iscale = 1.0d0 / p5iscale
       else if (keyword(1:16) .eq. 'MUTUAL-11-SCALE ') then
          read (string,*,err=10,end=10)  u1scale
          if (u1scale .gt. 1.0d0)  u1scale = 1.0d0 / u1scale

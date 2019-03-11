@@ -259,22 +259,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -1150,22 +1162,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
-                if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+               if (i14(j,i) .eq. ip11(k,i))
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -2257,10 +2281,11 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
 !$OMP& uinp,pdamp,thole,pcore,pval,palpha,n12,i12,n13,i13,n14,i14,
 !$OMP& n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,p3scale,
-!$OMP& p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,d4scale,u1scale,
-!$OMP& u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,nelst,
-!$OMP& elst,use_thole,use_chgpen,use_bounds,off2,f,molcule,optorder,
-!$OMP& copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
+!$OMP& p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,d1scale,
+!$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
+!$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,use_thole,use_chgpen,
+!$OMP& use_bounds,off2,f,molcule,optorder,copm,uopt,uoptp,poltyp,
+!$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
 !$OMP DO reduction(+:dep,ufld,dufld,vir) schedule(guided)
@@ -2314,22 +2339,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -3671,22 +3708,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -4671,22 +4720,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
@@ -6104,10 +6165,11 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
 !$OMP& uinp,pdamp,thole,pcore,pval,palpha,n12,i12,n13,i13,n14,i14,
 !$OMP& n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,p3scale,
-!$OMP& p4scale,p41scale,p5scale,d1scale,d2scale,d3scale,d4scale,u1scale,
-!$OMP& u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,nelst,
-!$OMP& elst,use_thole,use_chgpen,use_bounds,off2,f,aewald,optorder,
-!$OMP& copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
+!$OMP& p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,d1scale,
+!$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
+!$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,use_thole,use_chgpen,
+!$OMP& use_bounds,off2,f,aewald,optorder,copm,uopt,uoptp,poltyp,
+!$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
 !$OMP DO reduction(+:dep,ufld,dufld,vir) schedule(guided)
@@ -6168,22 +6230,34 @@ c     set exclusion coefficients for connected atoms
 c
          do j = 1, n12(i)
             pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
+            end do
             wscale(i12(j,i)) = w2scale
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
+            end do
             wscale(i13(j,i)) = w3scale
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
-            wscale(i14(j,i)) = w4scale
             do k = 1, np11(i)
                 if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4scale * p41scale
+     &            pscale(i14(j,i)) = p4iscale
             end do
+            wscale(i14(j,i)) = w4scale
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
+            end do
             wscale(i15(j,i)) = w5scale
          end do
          do j = 1, np11(i)
