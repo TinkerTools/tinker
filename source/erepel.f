@@ -14,6 +14,12 @@ c
 c
 c     "erepel" calculates the Pauli exchange repulsion energy
 c
+c     literature reference:
+c
+c     J. A. Rackers and J. W. Ponder, "Classical Pauli Repulsion:
+c     An Anisotropic, Atomic Multipole Model", Journal of Chemical
+c     Physics, 150, 084104 (2019)
+c
 c
       subroutine erepel
       use limits

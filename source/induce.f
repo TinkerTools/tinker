@@ -2124,11 +2124,11 @@ c
       use pme
       use polpot
       implicit none
-      integer i,j,k
-      integer ii,ntot
+      integer i,j,k,ii
       integer k1,k2,k3
       integer m1,m2,m3
-      integer nff,nf1,nf2,nf3
+      integer ntot,nff
+      integer nf1,nf2,nf3
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 volterm,denom
@@ -2152,6 +2152,31 @@ c
       allocate (cphi(10,npole))
       allocate (fphi(20,npole))
 c
+c     perform dynamic allocation of some global arrays
+c
+      ntot = nfft1 * nfft2 * nfft3
+      if (allocated(qgrid)) then
+         if (size(qgrid) .ne. 2*ntot)  deallocate (qgrid)
+      end if
+      if (allocated(qfac)) then
+         if (size(qfac) .ne. ntot)  deallocate (qfac)
+      end if
+      if (.not. allocated(qgrid))
+     &   allocate (qgrid(2,nfft1,nfft2,nfft3))
+      if (.not. allocated(qfac))
+     &   allocate (qfac(nfft1,nfft2,nfft3))
+c
+c     setup of FFT, spatial decomposition and B-splines
+c
+      call fftsetup
+      call getchunk
+      call moduli
+c
+c     compute B-spline coefficients and spatial decomposition
+c
+      call bspline_fill
+      call table_fill
+c
 c     copy the multipole moments into local storage areas
 c
       do ii = 1, npole
@@ -2166,17 +2191,6 @@ c
          cmp(9,ii) = 2.0d0 * rpole(7,ii)
          cmp(10,ii) = 2.0d0 * rpole(10,ii)
       end do
-c
-c     setup spatial decomposition, B-splines and PME arrays
-c
-      call getchunk
-      call moduli
-      call fftsetup
-c
-c     compute B-spline coefficients and spatial decomposition
-c
-      call bspline_fill
-      call table_fill
 c
 c     convert Cartesian multipoles to fractional coordinates
 c

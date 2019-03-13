@@ -15,6 +15,12 @@ c
 c     "erepel1" calculates the Pauli repulsion energy and first
 c     derivatives with respect to Cartesian coordinates
 c
+c     literature reference:
+c
+c     J. A. Rackers and J. W. Ponder, "Classical Pauli Repulsion:
+c     An Anisotropic, Atomic Multipole Model", Journal of Chemical
+c     Physics, 150, 084104 (2019)
+c
 c
       subroutine erepel1
       use limits

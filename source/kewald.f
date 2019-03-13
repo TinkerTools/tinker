@@ -256,8 +256,6 @@ c
       if (allocated(thetai1))  deallocate (thetai1)
       if (allocated(thetai2))  deallocate (thetai2)
       if (allocated(thetai3))  deallocate (thetai3)
-      if (allocated(qgrid))  deallocate (qgrid)
-      if (allocated(qfac))  deallocate (qfac)
       if (allocated(pmetable))  deallocate (pmetable)
       allocate (bsmod1(nfft1))
       allocate (bsmod2(nfft2))
@@ -266,8 +264,6 @@ c
       allocate (thetai1(4,bsorder,n))
       allocate (thetai2(4,bsorder,n))
       allocate (thetai3(4,bsorder,n))
-      allocate (qgrid(2,nfft1,nfft2,nfft3))
-      allocate (qfac(nfft1,nfft2,nfft3))
       allocate (pmetable(n,6*nthread))
 c
 c     print a message listing some of the Ewald parameters

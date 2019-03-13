@@ -1094,8 +1094,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,off2,aewald)
-!$OMP& firstprivate(dspscale)
-!$OMP& shared(edsp)
+!$OMP& firstprivate(dspscale) shared(edsp)
 !$OMP DO reduction(+:edsp) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
@@ -1243,6 +1242,7 @@ c
       use disp
       use energi
       use ewald
+      use fft
       use math
       use pme
       implicit none
@@ -1260,6 +1260,7 @@ c
       real*8 term1,denom0
       real*8 fac1,fac2,fac3
       real*8 erfcterm
+      character*7 fftold
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1275,20 +1276,23 @@ c
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))
 c
-c     setup spatial decomposition, B-splines and PME arrays
+c     setup of FFT, spatial decomposition and B-splines;
+c     enforce use of FFTPACK to avoid unknown memory leak
 c
+      fftold = ffttyp
+      ffttyp = 'FFTPACK'
+      call fftsetup
       call getchunk
       call moduli
-      call fftsetup
 c
-c     get B-spline coefficients and put charges onto grid
+c     compute B-spline coefficients and spatial decomposition
 c
       call bspline_fill
       call table_fill
-      call grid_csix
 c
-c     perform the 3-D FFT forward transformation
+c     assign PME grid and perform 3-D FFT forward transform
 c
+      call grid_disp
       call fftfront
 c
 c     use scalar sum to get the reciprocal space energy
@@ -1355,6 +1359,7 @@ c
 c
 c     cleanup following the use of FFT routines
 c
+      ffttyp = fftold
       call fftexit
       return
       end

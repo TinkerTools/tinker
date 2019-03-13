@@ -1870,11 +1870,11 @@ c
       if (.not. allocated(qfac))
      &   allocate (qfac(nfft1,nfft2,nfft3))
 c
-c     setup spatial decomposition, B-splines and PME arrays
+c     setup of FFT, spatial decomposition and B-splines
 c
+      call fftsetup
       call getchunk
       call moduli
-      call fftsetup
 c
 c     compute B-spline coefficients and spatial decomposition
 c

@@ -7489,11 +7489,11 @@ c     get the fractional to Cartesian transformation matrix
 c
       call frac_to_cart (ftc)
 c
-c     setup spatial decomposition, B-splines and PME arrays
+c     setup of FFT, spatial decomposition and B-splines
 c
+      call fftsetup
       call getchunk
       call moduli
-      call fftsetup
 c
 c     compute B-spline coefficients and spatial decomposition
 c

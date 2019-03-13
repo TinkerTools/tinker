@@ -15,6 +15,12 @@ c
 c     "erepel3" calculates the Pauli repulsion energy and partitions
 c     the energy among the atoms
 c
+c     literature reference:
+c
+c     J. A. Rackers and J. W. Ponder, "Classical Pauli Repulsion:
+c     An Anisotropic, Atomic Multipole Model", Journal of Chemical
+c     Physics, 150, 084104 (2019)
+c
 c
       subroutine erepel3
       use limits

@@ -1625,20 +1625,20 @@ c
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))
 c
-c     setup spatial decomposition, B-splines and PME arrays
+c     setup of FFT, spatial decomposition and B-splines
 c
+      call fftsetup
       call getchunk
       call moduli
-      call fftsetup
 c
-c     get B-spline coefficients and place sites onto grid
+c     compute B-spline coefficients and spatial decomposition
 c
       call bspline_fill
       call table_fill
-      call grid_csix
 c
-c     perform the 3-D FFT forward transformation
+c     assign PME grid and perform 3-D FFT forward transform
 c
+      call grid_disp
       call fftfront
 c
 c     use scalar sum to get the reciprocal space energy

@@ -12,8 +12,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "fftsetup" does initialization for a 3-D FFT via a single 3-D
-c     transform (FFTW) or three separate 1-D transforms (FFTPACK)
+c     "fftsetup" does initialization for a 3-D FFT to be computed
+c     via either the FFTPACK or FFTW libraries
 c
 c
       subroutine fftsetup

@@ -1705,25 +1705,26 @@ c
 c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
-      if (allocated(qgrid) .and. size(qgrid).ne.2*ntot)
-     &   deallocate(qgrid)
+      if (allocated(qgrid)) then
+         if (size(qgrid) .ne. 2*ntot)  deallocate(qgrid)
+      end if
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))
 c
-c     setup spatial decomposition, B-splines and PME arrays
+c     setup of FFT, spatial decomposition and B-splines
 c
+      call fftsetup
       call getchunk
       call moduli
-      call fftsetup
 c
 c     get B-spline coefficients and put charges onto grid
 c
       call bspline_fill
       call table_fill
+c
+c     assign PME grid and perform 3-D FFT forward transform
+c
       call grid_pchg
-c
-c     perform the 3-D FFT forward transformation
-c
       call fftfront
 c
 c     use scalar sum to get the reciprocal space energy

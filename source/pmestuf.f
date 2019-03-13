@@ -970,16 +970,16 @@ c
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine grid_csix  --  put dispersion sites on PME grid  ##
+c     ##  subroutine grid_disp  --  put dispersion sites on PME grid  ##
 c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "grid_csix" places the damped dispersion coefficients onto
+c     "grid_disp" places the damped dispersion coefficients onto
 c     the particle mesh Ewald grid
 c
 c
-      subroutine grid_csix
+      subroutine grid_disp
       use atoms
       use disp
       use chunks

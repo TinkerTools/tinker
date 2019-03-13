@@ -3301,11 +3301,11 @@ c
       if (.not. allocated(qfac))
      &   allocate (qfac(nfft1,nfft2,nfft3))
 c
-c     setup spatial decomposition, B-splines and PME arrays
+c     setup of FFT, spatial decomposition and B-splines
 c
+      call fftsetup
       call getchunk
       call moduli
-      call fftsetup
 c
 c     compute B-spline coefficients and spatial decomposition
 c
@@ -3327,10 +3327,12 @@ c
          cmp(10,i) = 2.0d0 * rpole(10,i)
       end do
 c
-c     assign permanent multipoles to PME grid and perform
-c     the 3-D FFT forward transformation
+c     convert Cartesian multipoles to fractional coordinates
 c
       call cmp_to_fmp (cmp,fmp)
+c
+c     assign PME grid and perform 3-D FFT forward transform
+c
       call grid_mpole (fmp)
       call fftfront
 c
