@@ -1359,7 +1359,7 @@ c
 c
 c     cleanup following the use of FFT routines
 c
-      ffttyp = fftold
       call fftexit
+      ffttyp = fftold
       return
       end

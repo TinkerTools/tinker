@@ -1381,7 +1381,7 @@ edipole.o: atoms.o bound.o cell.o chgpot.o dipole.o energi.o group.o shunt.o uni
 edipole1.o: atoms.o bound.o cell.o chgpot.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
 edipole2.o: atoms.o bound.o cell.o chgpot.o dipole.o group.o hessn.o shunt.o units.o
 edipole3.o: action.o analyz.o atomid.o atoms.o bound.o cell.o chgpot.o dipole.o energi.o group.o inform.o inter.o iounit.o molcul.o shunt.o units.o usage.o
-edisp.o: atoms.o bound.o boxes.o cell.o couple.o disp.o dsppot.o energi.o ewald.o group.o limits.o math.o neigh.o pme.o shunt.o usage.o
+edisp.o: atoms.o bound.o boxes.o cell.o couple.o disp.o dsppot.o energi.o ewald.o fft.o group.o limits.o math.o neigh.o pme.o shunt.o usage.o
 edisp1.o: atoms.o bound.o boxes.o cell.o couple.o deriv.o disp.o dsppot.o energi.o ewald.o group.o limits.o math.o neigh.o pme.o shunt.o sizes.o usage.o virial.o
 edisp2.o: atoms.o bound.o cell.o couple.o disp.o dsppot.o group.o hessn.o shunt.o usage.o
 edisp3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o couple.o disp.o dsppot.o energi.o ewald.o group.o inform.o inter.o iounit.o limits.o molcul.o neigh.o pme.o shunt.o usage.o
@@ -1707,7 +1707,7 @@ prterr.o: files.o output.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
 prtmol2.o: atomid.o atoms.o bndstr.o couple.o files.o iounit.o titles.o
 prtpdb.o: files.o pdb.o sequen.o titles.o
-prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o urypot.o vdwpot.o
+prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o urypot.o vdwpot.o
 prtseq.o: files.o sequen.o
 prtxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o titles.o
 pss.o: atoms.o files.o hescut.o inform.o iounit.o math.o omega.o refer.o tree.o warp.o zcoord.o

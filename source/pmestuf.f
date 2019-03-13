@@ -436,8 +436,9 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,k,cid,nearpt,abound,
-!$OMP& cbound,negx,negy,negz,posx,posy,posz,midx,midy,midz)
+!$OMP PARALLEL default(private) shared(n,nchunk,pmetable,igrid,
+!$OMP& nfft1,nfft2,nfft3,nchk1,nchk2,nchk3,ngrd1,ngrd2,ngrd3,
+!$OMP& nlpts,nrpts,grdoff)
 !$OMP DO
 c
 c     zero out the PME table marking chunks per site
@@ -625,9 +626,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,u0,term,t0)
+!$OMP PARALLEL default(private) shared(nion,iion,pchg,pmetable,
+!$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
+!$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& shared(qgrid)
 !$OMP DO
 c
 c     zero out the particle mesh Ewald grid
@@ -644,7 +646,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid)
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -743,9 +745,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,v1,v2,u0,u1,u2,term0,term1,term2,t0,t1,t2)
+!$OMP PARALLEL default(private) shared(npole,ipole,fmp,pmetable,
+!$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
+!$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& shared(qgrid)
 !$OMP DO
 c
 c     zero out the particle mesh Ewald grid
@@ -762,7 +765,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid)
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -874,9 +877,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,v1,u0,u1,term01,term11,term02,term12,t0,t1)
+!$OMP PARALLEL default(private) shared(npole,ipole,fuind,fuinp,
+!$OMP& pmetable,nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,
+!$OMP& ngrd2,ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& shared(qgrid)
 !$OMP DO
 c
 c     zero out the particle mesh Ewald grid
@@ -893,7 +897,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid)
 c
 c     put the induced dipole moments onto the grid
 c
@@ -1000,9 +1004,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,m,ii,jj,kk,ichk,
-!$OMP& isite,iatm,cid,nearpt,cbound,abound,offsetx,offsety,
-!$OMP& offsetz,v0,u0,term,t0)
+!$OMP PARALLEL default(private) shared(ndisp,idisp,csix,pmetable,
+!$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
+!$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& shared(qgrid)
 !$OMP DO
 c
 c     zero out the particle mesh Ewald grid
@@ -1019,7 +1024,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid)
 c
 c     put the dispersion sites onto the grid
 c
@@ -1347,9 +1352,9 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,
-!$OMP& igrid,bsorder,nfft1,nfft2,nfft3,thetai1,thetai2,
-!$OMP& thetai3,qgrid,fdip_phi1,fdip_phi2,fdip_sum_phi)
+!$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
+!$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fdip_phi1,
+!$OMP& fdip_phi2,fdip_sum_phi)
 !$OMP DO
 c
 c     extract the induced dipole field at each site
