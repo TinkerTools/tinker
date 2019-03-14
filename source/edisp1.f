@@ -1599,13 +1599,13 @@ c
       real*8 e,fi,denom
       real*8 r1,r2,r3
       real*8 h1,h2,h3
-      real*8 term,expterm
+      real*8 term,vterm
+      real*8 expterm
+      real*8 erfcterm
       real*8 hsq,struc2
       real*8 h,hhh,b,bfac
       real*8 term1,denom0
       real*8 fac1,fac2,fac3
-      real*8 erfcterm
-      real*8 vterm,pre
       real*8 de1,de2,de3
       real*8 dn1,dn2,dn3
       real*8 dt1,dt2,dt3
@@ -1709,19 +1709,6 @@ c
          qgrid(2,k1,k2,k3) = -(term1/denom) * qgrid(2,k1,k2,k3)
       end do
 c
-c     increment energy and virial terms
-c
-      pre = (aewald**3)/denom0
-      do i = 1, ndisp
-         do j = 1, ndisp
-            term = pre * csix(i) * csix(j)
-            edsp = edsp - term
-            vir(1,1) = vir(1,1) + term
-            vir(2,2) = vir(2,2) + term
-            vir(3,3) = vir(3,3) + term
-         end do
-      end do
-c
 c     perform the 3-D FFT backward transformation
 c
       call fftback
@@ -1772,6 +1759,14 @@ c
          dedsp(3,iatm) = dedsp(3,iatm) + fi*(recip(3,1)*de1
      &                            +recip(3,2)*de2+recip(3,3)*de3)
       end do
+c
+c     account for the energy and virial correction terms
+c
+      term = csixpr * (aewald**3) / denom0
+      edsp = edsp - term
+      vir(1,1) = vir(1,1) + term
+      vir(2,2) = vir(2,2) + term
+      vir(3,3) = vir(3,3) + term
 c
 c     cleanup following the use of FFT routines
 c

@@ -1343,13 +1343,9 @@ c
          end if
       end do
 c
-c     account for the zero point term
+c     account for the total energy correction term
 c
-      do i = 1, ndisp
-         do j = 1, ndisp
-            edsp = edsp - csix(i)*csix(j)*aewald**3/denom0
-         end do
-      end do
+      edsp = edsp - csixpr*aewald**3/denom0
 c
 c     cleanup following the use of FFT routines
 c

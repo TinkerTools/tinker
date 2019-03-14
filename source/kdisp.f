@@ -27,11 +27,13 @@ c
       use iounit
       use kdsp
       use keys
+      use limits
       use potent
       implicit none
       integer i,k
       integer ia,ic,next
       real*8 cs,adsp
+      real*8 csixi
       logical header
       character*20 keyword
       character*240 record
@@ -141,6 +143,18 @@ c
             adisp(ndisp) = adisp(i)
          end if
       end do
+c
+c     compute pairwise sum of C6 coefficients needed for PME
+c
+      csixpr = 0.0d0
+      if (use_dewald) then
+         do i = 1, ndisp
+            csixi = csix(i)
+            do k = 1, ndisp
+               csixpr = csixpr + csixi*csix(k)
+            end do
+         end do
+      end if
 c
 c     turn off the dispersion potential if not used
 c
