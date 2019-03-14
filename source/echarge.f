@@ -1706,7 +1706,7 @@ c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
       if (allocated(qgrid)) then
-         if (size(qgrid) .ne. 2*ntot)  deallocate(qgrid)
+         if (size(qgrid) .ne. 2*ntot)  deallocate (qgrid)
       end if
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))

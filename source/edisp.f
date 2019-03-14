@@ -1242,7 +1242,6 @@ c
       use disp
       use energi
       use ewald
-      use fft
       use math
       use pme
       implicit none
@@ -1260,7 +1259,6 @@ c
       real*8 term1,denom0
       real*8 fac1,fac2,fac3
       real*8 erfcterm
-      character*7 fftold
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1271,16 +1269,13 @@ c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
       if (allocated(qgrid)) then
-         if (size(qgrid) .ne. 2*ntot) deallocate(qgrid)
+         if (size(qgrid) .ne. 2*ntot) deallocate (qgrid)
       end if
       if (.not. allocated(qgrid))
      &   allocate (qgrid(2,nfft1,nfft2,nfft3))
 c
-c     setup of FFT, spatial decomposition and B-splines;
-c     enforce use of FFTPACK to avoid unknown memory leak
+c     setup of FFT, spatial decomposition and B-splines
 c
-      fftold = ffttyp
-      ffttyp = 'FFTPACK'
       call fftsetup
       call getchunk
       call moduli
@@ -1349,17 +1344,15 @@ c
       end do
 c
 c     account for the zero point term
-c        
+c
       do i = 1, ndisp
          do j = 1, ndisp
             edsp = edsp - csix(i)*csix(j)*aewald**3/denom0
          end do
       end do
-      return
 c
 c     cleanup following the use of FFT routines
 c
       call fftexit
-      ffttyp = fftold
       return
       end

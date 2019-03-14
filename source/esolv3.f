@@ -1220,8 +1220,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
 !$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
-!$OMP% i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP% p3iscale,p4iscale,p5iscale,use_group,use_intra,off2,f)
+!$OMP& i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,
+!$OMP& p3iscale,p4iscale,p5iscale,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale) shared(es,nes,aes)
 !$OMP DO reduction(+:es,nes,aes) schedule(guided)
 c
