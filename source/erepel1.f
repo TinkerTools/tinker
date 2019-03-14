@@ -1297,10 +1297,10 @@ c
 c     increment the virial due to pairwise Cartesian forces
 c
                   vxx = -xr * frcx
-                  vxy = -yr * frcx
-                  vxz = -zr * frcx
+                  vxy = -0.5d0 * (yr*frcx+xr*frcy)
+                  vxz = -0.5d0 * (zr*frcx+xr*frcz)
                   vyy = -yr * frcy
-                  vyz = -zr * frcy
+                  vyz = -0.5d0 * (zr*frcy+yr*frcz)
                   vzz = -zr * frcz
                   vir(1,1) = vir(1,1) + vxx
                   vir(2,1) = vir(2,1) + vxy

@@ -646,7 +646,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid)
+!$OMP DO
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -765,7 +765,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid)
+!$OMP DO
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -897,7 +897,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid)
+!$OMP DO
 c
 c     put the induced dipole moments onto the grid
 c
@@ -1024,7 +1024,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid)
+!$OMP DO
 c
 c     put the dispersion sites onto the grid
 c
