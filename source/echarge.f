@@ -1706,15 +1706,9 @@ c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
       if (allocated(qgrid)) then
-         if (size(qgrid) .ne. 2*ntot) then
-            call fftclose
-            deallocate (qgrid)
-         end if
+         if (size(qgrid) .ne. 2*ntot)  call fftclose
       end if
-      if (.not. allocated(qgrid)) then
-         allocate (qgrid(2,nfft1,nfft2,nfft3))
-         call fftsetup
-      end if
+      if (.not. allocated(qgrid))  call fftsetup
 c
 c     setup spatial decomposition and B-spline coefficients
 c

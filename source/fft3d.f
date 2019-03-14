@@ -26,6 +26,10 @@ c
 !$    integer error,iguess
 c
 c
+c     perform dynamic allocation of some global arrays
+c
+      allocate (qgrid(2,nfft1,nfft2,nfft3))
+c
 c     initialization of Fast Fourier transform using FFTW;
 c     comment "dfftw_init_threads" and "dfftw_plan_with_threads"
 c     calls if serial FFTW is used in place of OpenMP FFTW
@@ -41,18 +45,15 @@ c
 !$   &                              qgrid,ifront,iguess)
 !$       call dfftw_plan_dft_3d (planb,nfft1,nfft2,nfft3,qgrid,
 !$   &                              qgrid,iback,iguess)
+c
+c     initialization of Fast Fourier transform using FFTPACK
+c
 !$    else
-c
-c     perform dynamic allocation of some global arrays
-c
          maxtable = 4 * max(nfft1,nfft2,nfft3)
          if (allocated(ffttable)) then
             if (size(ffttable) .ne. maxtable)  deallocate (ffttable)
          end if
          if (.not. allocated(ffttable))  allocate (ffttable(maxtable,3))
-c
-c     initialization of Fast Fourier transform using FFTPACK
-c
          call cffti (nfft1,ffttable(1,1),iprime(1,1))
          call cffti (nfft2,ffttable(1,2),iprime(1,2))
          call cffti (nfft3,ffttable(1,3),iprime(1,3))
@@ -220,6 +221,7 @@ c
 c
       subroutine fftclose
       use fft
+      use pme
       implicit none
 c
 c
@@ -229,5 +231,9 @@ c
 !$       call dfftw_destroy_plan (planf)
 !$       call dfftw_destroy_plan (planb)
 !$    end if
+c
+c     perform deallocation of some global arrays
+c
+      deallocate (qgrid)
       return
       end
