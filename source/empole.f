@@ -1860,24 +1860,24 @@ c     perform dynamic allocation of some global arrays
 c
       ntot = nfft1 * nfft2 * nfft3
       if (allocated(qgrid)) then
-         if (size(qgrid) .ne. 2*ntot)  deallocate (qgrid)
+         if (size(qgrid) .ne. 2*ntot) then
+            call fftclose
+            deallocate (qgrid)
+         end if
       end if
       if (allocated(qfac)) then
          if (size(qfac) .ne. ntot)  deallocate (qfac)
       end if
-      if (.not. allocated(qgrid))
-     &   allocate (qgrid(2,nfft1,nfft2,nfft3))
-      if (.not. allocated(qfac))
-     &   allocate (qfac(nfft1,nfft2,nfft3))
+      if (.not. allocated(qgrid)) then
+         allocate (qgrid(2,nfft1,nfft2,nfft3))
+         call fftsetup
+      end if
+      if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
 c
-c     setup of FFT, spatial decomposition and B-splines
+c     setup spatial decomposition and B-spline coefficients
 c
-      call fftsetup
       call getchunk
       call moduli
-c
-c     compute B-spline coefficients and spatial decomposition
-c
       call bspline_fill
       call table_fill
 c
@@ -1984,9 +1984,5 @@ c
       end do
       e = 0.5d0 * f * e
       em = em + e
-c
-c     cleanup following the use of FFT routines
-c
-      call fftexit
       return
       end

@@ -207,18 +207,18 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine fftexit  --  cleanup 3-D Fast Fourier transform  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine fftclose  --  close 3-D Fast Fourier transform  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "fftexit" does cleanup after performing a 3-D FFT by destroying
-c     the FFTW plans for the forward and backwards transforms
+c     "fftclose" does cleanup after performing a 3-D FFT by destroying
+c     the FFTW plans for the forward and backward transforms
 c
 c
-      subroutine fftexit
+      subroutine fftclose
       use fft
       implicit none
 c
