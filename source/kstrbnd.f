@@ -184,7 +184,7 @@ c
 c     "kstrbndm" assigns parameters for stretch-bend interactions
 c     according to the Merck Molecular Force Field (MMFF)
 c
-c     Note: "stbnt" is the MMFF Stretch-Bend Type for angle "a-b-c",
+c     note "stbnt" is the MMFF stretch-bend type for angle "a-b-c",
 c     where atom "a" has a smaller class number than atom "c"
 c
 c     if the BT of a-b = 1, then stbnt = 1

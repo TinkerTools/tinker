@@ -76,12 +76,12 @@ FFEDIR = $(BUILDDIR)/ffe
 #JAVA_LIBS = -ljvm
 
 ##  For Linux Only (RHEL & CentOS)
-JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-		-I/usr/java/default/include \
-		-I/usr/java/default/include/linux \
-		-I/usr/java/default/lib/amd64/server
-JAVA_LIBDIR = -L/usr/java/default/jre/lib/amd64/server
-JAVA_LIBS = -ljvm
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
+#		-I/usr/java/default/include \
+#		-I/usr/java/default/include/linux \
+#		-I/usr/java/default/lib/amd64/server
+#JAVA_LIBDIR = -L/usr/java/default/jre/lib/amd64/server
+#JAVA_LIBS = -ljvm
 
 ##  For Windows Only (Windows 10, JDK 1.8.0_112)
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
@@ -146,7 +146,7 @@ CCFLAGS = -c
 F77FLAGS = -c
 OPTFLAGS = -Ofast -msse3 -fopenmp
 LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
-LIBS = -lstdc++
+LIBS = -lstdc++ -lwsock32
 LIBFLAGS = -crusv
 RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static
@@ -835,7 +835,7 @@ tncg.o:
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
 
 all: ${EXEFILES}
 

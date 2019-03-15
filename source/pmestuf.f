@@ -604,6 +604,9 @@ c
 c     "grid_pchg" places the fractional atomic partial charges onto
 c     the particle mesh Ewald grid
 c
+c     note the main loop does not need to be an OpenMP reduction
+c     since a given qgrid element is always part of the same chunk
+c
 c
       subroutine grid_pchg
       use atoms
@@ -719,6 +722,9 @@ c
 c
 c     "grid_mpole" places the fractional atomic multipoles onto
 c     the particle mesh Ewald grid
+c
+c     note the main loop does not need to be an OpenMP reduction
+c     since a given qgrid element is always part of the same chunk
 c
 c
       subroutine grid_mpole (fmp)
@@ -851,6 +857,9 @@ c
 c     "grid_uind" places the fractional induced dipoles onto the
 c     particle mesh Ewald grid
 c
+c     note the main loop does not need to be an OpenMP reduction
+c     since a given qgrid element is always part of the same chunk
+c
 c
       subroutine grid_uind (fuind,fuinp)
       use atoms
@@ -981,6 +990,9 @@ c
 c
 c     "grid_disp" places the damped dispersion coefficients onto
 c     the particle mesh Ewald grid
+c
+c     note the main loop does not need to be an OpenMP reduction
+c     since a given qgrid element is always part of the same chunk
 c
 c
       subroutine grid_disp

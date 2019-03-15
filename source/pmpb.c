@@ -13,16 +13,18 @@
 
 /*
  * Note: Use the -Qlowercase flag to deal with Intel
- * Fortran Compiler name mangling on Windows.
+ * compiler's name mangling on Windows; underscores are
+ * used by default on Linux and MacOS, but not Windows 
  *
- * Underscores are used by default on Linux and MacOS,
- * but not on Windows.
+ * Replace __ICL with _WIN32 or _WIN64 to cause these
+ * definitions to always be used on Windows machines
  *
- * We define aliases below to allow Tinker's Fortran code to
- * call the C routines in this file when linking on Windows.
+ * Below we define aliases to allow Tinker Fortran code
+ * to call the C routines in this file when linking on 
+ * Windows under the Intel compiler
  */
 
-#ifdef _WIN32
+#ifdef __ICL
 #define apbsinitial_ apbsinitial
 #define apbsempole_ apbsempole
 #define apbsinduce_ apbsinduce

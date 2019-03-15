@@ -146,7 +146,7 @@ RENAME = rename_bin
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
-#LIBS = -lstdc++
+#LIBS = -lstdc++ -lwsock32
 #LIBFLAGS = -crusv
 #RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static
@@ -826,7 +826,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${LIBS} ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
 
 all: ${EXEFILES}
 

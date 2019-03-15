@@ -735,10 +735,10 @@ ommstuf.o: ommstuf.cpp
 	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuf.cpp
 
 bar_omm.x: bar_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
 dynamic_omm.x: dynamic_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${LIBS} ${FFTW_LIBS} ${OPENMM_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
 rename:
 	mv dynamic_omm.x $(BINDIR)/dynamic_omm
