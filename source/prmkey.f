@@ -395,18 +395,6 @@ c
       else if (keyword(1:15) .eq. 'MPOLE-15-SCALE ') then
          read (string,*,err=10,end=10)  m5scale
          if (m5scale .gt. 1.0d0)  m5scale = 1.0d0 / m5scale
-      else if (keyword(1:16) .eq. 'DIRECT-11-SCALE ') then
-         read (string,*,err=10,end=10)  d1scale
-         if (d1scale .gt. 1.0d0)  d1scale = 1.0d0 / d1scale
-      else if (keyword(1:16) .eq. 'DIRECT-12-SCALE ') then
-         read (string,*,err=10,end=10)  d2scale
-         if (d2scale .gt. 1.0d0)  d2scale = 1.0d0 / d2scale
-      else if (keyword(1:16) .eq. 'DIRECT-13-SCALE ') then
-         read (string,*,err=10,end=10)  d3scale
-         if (d3scale .gt. 1.0d0)  d3scale = 1.0d0 / d3scale
-      else if (keyword(1:16) .eq. 'DIRECT-14-SCALE ') then
-         read (string,*,err=10,end=10)  d4scale
-         if (d4scale .gt. 1.0d0)  d4scale = 1.0d0 / d4scale
 c
 c     set control parameters for polarization potentials
 c
@@ -442,6 +430,18 @@ c
       else if (keyword(1:15) .eq. 'POLAR-15-INTRA ') then
          read (string,*,err=10,end=10)  p5iscale
          if (p5iscale .gt. 1.0d0)  p5iscale = 1.0d0 / p5iscale
+      else if (keyword(1:16) .eq. 'DIRECT-11-SCALE ') then
+         read (string,*,err=10,end=10)  d1scale
+         if (d1scale .gt. 1.0d0)  d1scale = 1.0d0 / d1scale
+      else if (keyword(1:16) .eq. 'DIRECT-12-SCALE ') then
+         read (string,*,err=10,end=10)  d2scale
+         if (d2scale .gt. 1.0d0)  d2scale = 1.0d0 / d2scale
+      else if (keyword(1:16) .eq. 'DIRECT-13-SCALE ') then
+         read (string,*,err=10,end=10)  d3scale
+         if (d3scale .gt. 1.0d0)  d3scale = 1.0d0 / d3scale
+      else if (keyword(1:16) .eq. 'DIRECT-14-SCALE ') then
+         read (string,*,err=10,end=10)  d4scale
+         if (d4scale .gt. 1.0d0)  d4scale = 1.0d0 / d4scale
       else if (keyword(1:16) .eq. 'MUTUAL-11-SCALE ') then
          read (string,*,err=10,end=10)  u1scale
          if (u1scale .gt. 1.0d0)  u1scale = 1.0d0 / u1scale

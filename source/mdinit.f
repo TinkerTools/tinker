@@ -176,20 +176,24 @@ c
                grpmass(i) = 1.0d0
                if (igrp(1,i) .le. igrp(2,i)) then
                   totmass = totmass + 1.0d0
-                  write (iout,20)  i
-   20             format (/,' MDINIT  --  Warning, Mass of Group',i6,
-     &                       ' Set to 1.0 for Dynamics')
+                  if (verbose) then
+                     write (iout,20)  i
+   20                format (/,' MDINIT  --  Warning, Mass of Group',
+     &                          i6,' Set to 1.0 for Dynamics')
+                  end if
                end if
             end if
          end do
       else
          do i = 1, n
-            if (use(i) .and. mass(i).le.0.0d0 .and. atomic(i).ne.0) then
+            if (use(i) .and. mass(i).le.0.0d0) then
                mass(i) = 1.0d0
                totmass = totmass + 1.0d0
-               write (iout,30)  i
-   30          format (/,' MDINIT  --  Warning, Mass of Atom',i6,
-     &                    ' Set to 1.0 for Dynamics')
+               if (verbose) then
+                  write (iout,30)  i
+   30             format (/,' MDINIT  --  Warning, Mass of Atom',
+     &                       i6,' Set to 1.0 for Dynamics')
+               end if
             end if
          end do
       end if
