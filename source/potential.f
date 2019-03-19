@@ -568,6 +568,8 @@ c
                   call nblist
                   call induce
                end if
+!$OMP          PARALLEL default(private) shared(j,k,npgrid,pgrid,epot)
+!$OMP          DO
                do i = 1, npgrid(j)
                   xi = pgrid(1,i,j)
                   yi = pgrid(2,i,j)
@@ -575,6 +577,8 @@ c
                   call potpoint (xi,yi,zi,pot)
                   epot(k,i,j) = pot
                end do
+!$OMP          END DO
+!$OMP          END PARALLEL
             end do
          end do
          call potstat (dofull,domodel,dopair,dotarget)
@@ -661,6 +665,8 @@ c
                call nblist
                call induce
             end if
+!$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot)
+!$OMP       DO
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
@@ -668,6 +674,8 @@ c
                call potpoint (xi,yi,zi,pot)
                epot(1,i,j) = pot
             end do
+!$OMP       END DO
+!$OMP       END PARALLEL
          end do
          call prtfit
          call potstat (dofull,domodel,dopair,dotarget)
@@ -1003,8 +1011,10 @@ c
       subroutine potpoint (xi,yi,zi,pot)
       use atoms
       use charge
+      use chgpen
       use chgpot
       use dipole
+      use mplpot
       use mpole
       use polar
       use potent
@@ -1019,13 +1029,17 @@ c
       real*8 r,r2,dotk
       real*8 rk2,rkr3
       real*8 rr1,rr3,rr5
+      real*8 rr1k,rr3k,rr5k
+      real*8 corek,valk
+      real*8 alphak
       real*8 f,fi,ci,ck
       real*8 dkx,dky,dkz
       real*8 ukx,uky,ukz
       real*8 qkxx,qkxy,qkxz
       real*8 qkyy,qkyz,qkzz
       real*8 qkx,qky,qkz
-      real*8 scd,scq,scu
+      real*8 dkr,qkr,ukr
+      real*8 dmpk(5)
 c
 c
 c     zero out charge, dipole and multipole potential terms
@@ -1102,25 +1116,34 @@ c
             ukz = 0.0d0
          end if
 c
-c     construct some intermediate quadrupole values
+c     construct some common multipole and distance values
 c
          qkx = qkxx*xr + qkxy*yr + qkxz*zr
          qky = qkxy*xr + qkyy*yr + qkyz*zr
          qkz = qkxz*xr + qkyz*yr + qkzz*zr
-c
-c     calculate scalar products for permanent and induced
-c
-         scd = dkx*xr + dky*yr + dkz*zr
-         scq = qkx*xr + qky*yr + qkz*zr
-         scu = ukx*xr + uky*yr + ukz*zr
-c
-c     compute the potential contributions for this interaction
-c
+         dkr = dkx*xr + dky*yr + dkz*zr
+         qkr = qkx*xr + qky*yr + qkz*zr
+         ukr = ukx*xr + uky*yr + ukz*zr
          rr1 = 1.0d0 / r
          rr3 = rr1 / r2
          rr5 = 3.0d0 * rr3 / r2
-         e = ck*rr1 - scd*rr3 + scq*rr5
-         ei = -scu * rr3
+c
+c     compute the potential contributions for this site
+c
+         if (use_chgpen) then
+            corek = pcore(kk)
+            valk = pval(kk)
+            alphak = palpha(kk)
+            call damppot (r,alphak,dmpk)
+            rr1k = dmpk(1) * rr1
+            rr3k = dmpk(3) * rr3
+            rr5k = dmpk(5) * rr5
+            e = corek*rr1 + valk*rr1k - dkr*rr3k + qkr*rr5k
+            ei = -ukr * rr3k
+         else
+            e = ck*rr1 - dkr*rr3 + qkr*rr5
+            ei = -ukr * rr3
+         end if
 c
 c     increment the overall multipole and polarization terms
 c
@@ -1206,13 +1229,10 @@ c
             call induce
          end if
 c
-c     OpenMP directives for the major loop structure
-c
-!$OMP    PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
-!$OMP    DO reduction(+:ep) schedule(guided)
-c
 c     get the summed potential error over grid points
 c
+!$OMP    PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
+!$OMP    DO reduction(+:ep)
          do i = 1, npgrid(j)
             xi = pgrid(1,i,j)
             yi = pgrid(2,i,j)
@@ -1221,9 +1241,6 @@ c
             epot(1,i,j) = pot
             ep = ep + (epot(1,i,j)-epot(2,i,j))**2
          end do
-c
-c     OpenMP directives for the major loop structure
-c
 !$OMP    END DO
 !$OMP    END PARALLEL
 c
@@ -1291,7 +1308,7 @@ c
                call induce
             end if
 !$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
-!$OMP       DO reduction(+:ep) schedule(guided)
+!$OMP       DO reduction(+:ep)
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
@@ -1348,7 +1365,7 @@ c
                call induce
             end if
 !$OMP       PARALLEL default(private) shared(j,npgrid,pgrid,epot,ep)
-!$OMP       DO reduction(+:ep) schedule(guided)
+!$OMP       DO reduction(+:ep)
             do i = 1, npgrid(j)
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)

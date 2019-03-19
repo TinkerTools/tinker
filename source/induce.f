@@ -6807,6 +6807,9 @@ c
                vali = pval(ii)
                alphai = palpha(ii)
             end if
+c
+c     set exclusion coefficients for connected atoms
+c
             do j = 1, np11(i)
                uscale(ip11(j,i)) = u1scale
             end do
@@ -6831,6 +6834,9 @@ c
             do j = 1, n15(i)
                wscale(i15(j,i)) = w5scale
             end do
+c
+c     evaluate all sites within the cutoff distance
+c
             do kk = ii+1, npole
                k = ipole(kk)
                xr = x(k) - xi
@@ -7092,6 +7098,9 @@ c
                vali = pval(ii)
                alphai = palpha(ii)
             end if
+c
+c     set exclusion coefficients for connected atoms
+c
             do j = 1, np11(i)
                uscale(ip11(j,i)) = u1scale
             end do
@@ -7116,6 +7125,9 @@ c
             do j = 1, n15(i)
                wscale(i15(j,i)) = w5scale
             end do
+c
+c     evaluate all sites within the cutoff distance
+c
             m = mindex(ii)
             do kkk = 1, nulst(ii)
                kk = ulst(kkk,ii)

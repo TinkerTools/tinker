@@ -494,6 +494,39 @@ c
       end
 c
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine damppot  --  electrostatic potential damping  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "damppot" generates coefficients for the damping of multipole
+c     and induced dipole contributions to the electrostatic potential
+c
+c
+      subroutine damppot (r,alphak,dmpk)
+      implicit none
+      real*8 r,alphak
+      real*8 expk,dampk
+      real*8 dmpk(*)
+c
+c
+c     compute common exponential factors for damping
+c
+      dampk = alphak * r
+      expk = exp(-dampk)
+c
+c     charge penetration damping for core-valence terms
+c
+      dmpk(1) = 1.0d0 - (1.0d0 + 0.5d0*dampk)*expk
+      dmpk(3) = 1.0d0 - (1.0d0 + dampk + 0.5d0*dampk**2)*expk
+      dmpk(5) = 1.0d0 - (1.0d0 + dampk + 0.5d0*dampk**2
+     &             + dampk**3/6.0d0)*expk
+      return
+      end
+c
+c
 c     ##################################################################
 c     ##                                                              ##
 c     ##  subroutine damprep  --  find repulsion damping coefficents  ##

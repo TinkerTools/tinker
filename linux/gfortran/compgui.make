@@ -3,7 +3,7 @@
 #  ################################################################
 #  ##                                                            ##
 #  ##  compgui.make  --  compile Tinker routines needed for FFE  ##
-#  ##              (Intel Fortran for Linux Version)             ##
+#  ##              (GNU gfortran for Linux Version)              ##
 #  ##                                                            ##
 #  ################################################################
 #
@@ -12,4 +12,4 @@
 #  which is /usr/lib/jvm/default-java on many Linux systems
 #
 #
-icc -c -O3 -no-prec-div -static -w server.c -I $JAVA_HOME/include -I $JAVA_HOME/include/linux
+gcc -c -O2 server.c -I $JAVA_HOME/include -I $JAVA_HOME/include/linux

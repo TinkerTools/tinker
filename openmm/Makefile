@@ -1693,7 +1693,7 @@ polpot.o:
 poltcg.o:
 polymer.o: atoms.o bndstr.o bound.o boxes.o iounit.o keys.o
 potent.o:
-potential.o: atomid.o atoms.o charge.o chgpot.o dipole.o files.o inform.o iounit.o katoms.o keys.o math.o minima.o moment.o mpole.o neigh.o output.o polar.o potent.o potfit.o ptable.o refer.o titles.o units.o
+potential.o: atomid.o atoms.o charge.o chgpen.o chgpot.o dipole.o files.o inform.o iounit.o katoms.o keys.o math.o minima.o moment.o mplpot.o mpole.o neigh.o output.o polar.o potent.o potfit.o ptable.o refer.o titles.o units.o
 potfit.o: sizes.o
 precis.o:
 precise.o:

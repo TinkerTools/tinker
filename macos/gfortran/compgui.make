@@ -8,4 +8,8 @@
 #  ################################################################
 #
 #
-gcc -c -O2 server.c -I /Library/Java/Home/include
+#  This assumes $JAVA_HOME is set to the JAVA install directory,
+#  found under /Library/Java/JavaVirtualMachines on MacOS systems
+#
+#
+gcc -c -O2 server.c -I $JAVA_HOME/include -I $JAVA_HOME/include/linux
