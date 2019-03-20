@@ -1139,11 +1139,10 @@ c
             rr3k = dmpk(3) * rr3
             rr5k = dmpk(5) * rr5
             e = corek*rr1 + valk*rr1k - dkr*rr3k + qkr*rr5k
-            ei = -ukr * rr3k
          else
             e = ck*rr1 - dkr*rr3 + qkr*rr5
-            ei = -ukr * rr3
          end if
+         ei = -ukr * rr3
 c
 c     increment the overall multipole and polarization terms
 c
