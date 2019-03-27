@@ -14,6 +14,7 @@ c
 c
 c     maxele   maximum number of elements from periodic table
 c
+c     atmass   standard atomic weight for each chemical element
 c     vdwrad   van der Waals radius for each chemical element
 c     covrad   covalent radius for each chemical element
 c     elemnt   atomic symbol for each chemical element
@@ -23,6 +24,7 @@ c
       implicit none
       integer maxele
       parameter (maxele=112)
+      real*8 atmass(maxele)
       real*8 vdwrad(maxele)
       real*8 covrad(maxele)
       character*3 elemnt(maxele)

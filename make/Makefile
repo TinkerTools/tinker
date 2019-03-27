@@ -1980,7 +1980,7 @@ pmestuf.o: atoms.o boxes.o charge.o chunks.o disp.o math.o mpole.o openmp.o pme.
 pmpb.o: iounit.o
 polar.o:
 polarize.o: atoms.o chgpen.o couple.o inform.o iounit.o molcul.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
-poledit.o: atomid.o atoms.o chgpen.o couple.o files.o iounit.o keys.o kpolr.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o units.o
+poledit.o: atomid.o atoms.o chgpen.o couple.o files.o iounit.o keys.o kpolr.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o ptable.o units.o
 polgrp.o:
 polopt.o:
 polpcg.o:

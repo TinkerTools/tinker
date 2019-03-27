@@ -2419,7 +2419,7 @@ c
 !$OMP& n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,
-!$OMP& u3scale,u4scale,use_group,use_intra,off2,f)
+!$OMP& u3scale,u4scale,dpequal,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP& shared(es,des,trqi)
 !$OMP DO reduction(+:es,des,trqi) schedule(guided)
@@ -2453,50 +2453,100 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         do j = 1, n12(i)
-            pscale(i12(j,i)) = p2scale
-            do k = 1, np11(i)
-               if (i12(j,i) .eq. ip11(k,i))
-     &            pscale(i12(j,i)) = p2iscale
+         if (dpequal) then
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               pscale(i12(j,i)) = p2iscale
+               end do
+               dscale(i12(j,i)) = pscale(i12(j,i))
             end do
-         end do
-         do j = 1, n13(i)
-            pscale(i13(j,i)) = p3scale
-            do k = 1, np11(i)
-               if (i13(j,i) .eq. ip11(k,i))
-     &            pscale(i13(j,i)) = p3iscale
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               pscale(i13(j,i)) = p3iscale
+               end do
+               dscale(i13(j,i)) = pscale(i13(j,i))
             end do
-         end do
-         do j = 1, n14(i)
-            pscale(i14(j,i)) = p4scale
-            do k = 1, np11(i)
-               if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4iscale
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                   if (i14(j,i) .eq. ip11(k,i))
+     &               pscale(i14(j,i)) = p4iscale
+               end do
+               dscale(i14(j,i)) = pscale(i14(j,i))
             end do
-         end do
-         do j = 1, n15(i)
-            pscale(i15(j,i)) = p5scale
-            do k = 1, np11(i)
-               if (i15(j,i) .eq. ip11(k,i))
-     &            pscale(i15(j,i)) = p5iscale
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               pscale(i15(j,i)) = p5iscale
+               end do
+               dscale(i15(j,i)) = pscale(i15(j,i))
             end do
-         end do
-         do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = d1scale
-            uscale(ip11(j,ii)) = u1scale
-         end do
-         do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = d2scale
-            uscale(ip12(j,ii)) = u2scale
-         end do
-         do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = d3scale
-            uscale(ip13(j,ii)) = u3scale
-         end do
-         do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = d4scale
-            uscale(ip14(j,ii)) = u4scale
-         end do
+            do j = 1, np11(i)
+               uscale(ip11(j,i)) = u1scale
+            end do
+            do j = 1, np12(i)
+               uscale(ip12(j,i)) = u2scale
+            end do
+            do j = 1, np13(i)
+               uscale(ip13(j,i)) = u3scale
+            end do
+            do j = 1, np14(i)
+               uscale(ip14(j,i)) = u4scale
+            end do
+         else
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               pscale(i12(j,i)) = p2iscale
+               end do
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               pscale(i13(j,i)) = p3iscale
+               end do
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                   if (i14(j,i) .eq. ip11(k,i))
+     &               pscale(i14(j,i)) = p4iscale
+               end do
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               pscale(i15(j,i)) = p5iscale
+               end do
+            end do
+            do j = 1, np11(i)
+               dscale(ip11(j,i)) = d1scale
+               uscale(ip11(j,i)) = u1scale
+            end do
+            do j = 1, np12(i)
+               dscale(ip12(j,i)) = d2scale
+               uscale(ip12(j,i)) = u2scale
+            end do
+            do j = 1, np13(i)
+               dscale(ip13(j,i)) = d3scale
+               uscale(ip13(j,i)) = u3scale
+            end do
+            do j = 1, np14(i)
+               dscale(ip14(j,i)) = d4scale
+               uscale(ip14(j,i)) = u4scale
+            end do
+         end if
+c
+c     evaluate all sites within the cutoff distance
+c
          do k = i+1, npole
             kk = ipole(k)
             kz = zaxis(k)
@@ -3192,34 +3242,65 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            pscale(i12(j,ii)) = 1.0d0
-         end do
-         do j = 1, n13(ii)
-            pscale(i13(j,ii)) = 1.0d0
-         end do
-         do j = 1, n14(ii)
-            pscale(i14(j,ii)) = 1.0d0
-         end do
-         do j = 1, n15(ii)
-            pscale(i15(j,ii)) = 1.0d0
-         end do
-         do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = 1.0d0
-            uscale(ip11(j,ii)) = 1.0d0
-         end do
-         do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = 1.0d0
-            uscale(ip12(j,ii)) = 1.0d0
-         end do
-         do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = 1.0d0
-            uscale(ip13(j,ii)) = 1.0d0
-         end do
-         do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = 1.0d0
-            uscale(ip14(j,ii)) = 1.0d0
-         end do
+         if (dpequal) then
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = 1.0d0
+               dscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = 1.0d0
+               dscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = 1.0d0
+               dscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = 1.0d0
+               dscale(i15(j,i)) = 1.0d0
+            end do
+            do j = 1, np11(i)
+               uscale(ip11(j,i)) = 1.0d0
+            end do
+            do j = 1, np12(i)
+               uscale(ip12(j,i)) = 1.0d0
+            end do
+            do j = 1, np13(i)
+               uscale(ip13(j,i)) = 1.0d0
+            end do
+            do j = 1, np14(i)
+               uscale(ip14(j,i)) = 1.0d0
+            end do
+         else
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = 1.0d0
+            end do
+            do j = 1, np11(i)
+               dscale(ip11(j,i)) = 1.0d0
+               uscale(ip11(j,i)) = 1.0d0
+            end do
+            do j = 1, np12(i)
+               dscale(ip12(j,i)) = 1.0d0
+               uscale(ip12(j,i)) = 1.0d0
+            end do
+            do j = 1, np13(i)
+               dscale(ip13(j,i)) = 1.0d0
+               uscale(ip13(j,i)) = 1.0d0
+            end do
+            do j = 1, np14(i)
+               dscale(ip14(j,i)) = 1.0d0
+               uscale(ip14(j,i)) = 1.0d0
+            end do
+         end if
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -3367,7 +3448,8 @@ c
 !$OMP& use,n12,n13,n14,n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,
 !$OMP& ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
 !$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& u1scale,u2scale,u3scale,u4scale,use_group,use_intra,off2,f)
+!$OMP& u1scale,u2scale,u3scale,u4scale,dpequal,use_group,use_intra,
+!$OMP& off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP& shared(es,des,trqi)
 !$OMP DO reduction(+:es,des,trqi) schedule(guided)
@@ -3401,50 +3483,100 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         do j = 1, n12(i)
-            pscale(i12(j,i)) = p2scale
-            do k = 1, np11(i)
-               if (i12(j,i) .eq. ip11(k,i))
-     &            pscale(i12(j,i)) = p2iscale
+         if (dpequal) then
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               pscale(i12(j,i)) = p2iscale
+               end do
+               dscale(i12(j,i)) = pscale(i12(j,i))
             end do
-         end do
-         do j = 1, n13(i)
-            pscale(i13(j,i)) = p3scale
-            do k = 1, np11(i)
-               if (i13(j,i) .eq. ip11(k,i))
-     &            pscale(i13(j,i)) = p3iscale
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               pscale(i13(j,i)) = p3iscale
+               end do
+               dscale(i13(j,i)) = pscale(i13(j,i))
             end do
-         end do
-         do j = 1, n14(i)
-            pscale(i14(j,i)) = p4scale
-            do k = 1, np11(i)
-               if (i14(j,i) .eq. ip11(k,i))
-     &            pscale(i14(j,i)) = p4iscale
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                   if (i14(j,i) .eq. ip11(k,i))
+     &               pscale(i14(j,i)) = p4iscale
+               end do
+               dscale(i14(j,i)) = pscale(i14(j,i))
             end do
-         end do
-         do j = 1, n15(i)
-            pscale(i15(j,i)) = p5scale
-            do k = 1, np11(i)
-               if (i15(j,i) .eq. ip11(k,i))
-     &            pscale(i15(j,i)) = p5iscale
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               pscale(i15(j,i)) = p5iscale
+               end do
+               dscale(i15(j,i)) = pscale(i15(j,i))
             end do
-         end do
-         do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = d1scale
-            uscale(ip11(j,ii)) = u1scale
-         end do
-         do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = d2scale
-            uscale(ip12(j,ii)) = u2scale
-         end do
-         do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = d3scale
-            uscale(ip13(j,ii)) = u3scale
-         end do
-         do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = d4scale
-            uscale(ip14(j,ii)) = u4scale
-         end do
+            do j = 1, np11(i)
+               uscale(ip11(j,i)) = u1scale
+            end do
+            do j = 1, np12(i)
+               uscale(ip12(j,i)) = u2scale
+            end do
+            do j = 1, np13(i)
+               uscale(ip13(j,i)) = u3scale
+            end do
+            do j = 1, np14(i)
+               uscale(ip14(j,i)) = u4scale
+            end do
+         else
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               pscale(i12(j,i)) = p2iscale
+               end do
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               pscale(i13(j,i)) = p3iscale
+               end do
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                   if (i14(j,i) .eq. ip11(k,i))
+     &               pscale(i14(j,i)) = p4iscale
+               end do
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               pscale(i15(j,i)) = p5iscale
+               end do
+            end do
+            do j = 1, np11(i)
+               dscale(ip11(j,i)) = d1scale
+               uscale(ip11(j,i)) = u1scale
+            end do
+            do j = 1, np12(i)
+               dscale(ip12(j,i)) = d2scale
+               uscale(ip12(j,i)) = u2scale
+            end do
+            do j = 1, np13(i)
+               dscale(ip13(j,i)) = d3scale
+               uscale(ip13(j,i)) = u3scale
+            end do
+            do j = 1, np14(i)
+               dscale(ip14(j,i)) = d4scale
+               uscale(ip14(j,i)) = u4scale
+            end do
+         end if
+c
+c     evaluate all sites within the cutoff distance
+c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
             kk = ipole(k)
@@ -4141,34 +4273,65 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            pscale(i12(j,ii)) = 1.0d0
-         end do
-         do j = 1, n13(ii)
-            pscale(i13(j,ii)) = 1.0d0
-         end do
-         do j = 1, n14(ii)
-            pscale(i14(j,ii)) = 1.0d0
-         end do
-         do j = 1, n15(ii)
-            pscale(i15(j,ii)) = 1.0d0
-         end do
-         do j = 1, np11(ii)
-            dscale(ip11(j,ii)) = 1.0d0
-            uscale(ip11(j,ii)) = 1.0d0
-         end do
-         do j = 1, np12(ii)
-            dscale(ip12(j,ii)) = 1.0d0
-            uscale(ip12(j,ii)) = 1.0d0
-         end do
-         do j = 1, np13(ii)
-            dscale(ip13(j,ii)) = 1.0d0
-            uscale(ip13(j,ii)) = 1.0d0
-         end do
-         do j = 1, np14(ii)
-            dscale(ip14(j,ii)) = 1.0d0
-            uscale(ip14(j,ii)) = 1.0d0
-         end do
+         if (dpequal) then
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = 1.0d0
+               dscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = 1.0d0
+               dscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = 1.0d0
+               dscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = 1.0d0
+               dscale(i15(j,i)) = 1.0d0
+            end do
+            do j = 1, np11(i)
+               uscale(ip11(j,i)) = 1.0d0
+            end do
+            do j = 1, np12(i)
+               uscale(ip12(j,i)) = 1.0d0
+            end do
+            do j = 1, np13(i)
+               uscale(ip13(j,i)) = 1.0d0
+            end do
+            do j = 1, np14(i)
+               uscale(ip14(j,i)) = 1.0d0
+            end do
+         else
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = 1.0d0
+            end do
+            do j = 1, np11(i)
+               dscale(ip11(j,i)) = 1.0d0
+               uscale(ip11(j,i)) = 1.0d0
+            end do
+            do j = 1, np12(i)
+               dscale(ip12(j,i)) = 1.0d0
+               uscale(ip12(j,i)) = 1.0d0
+            end do
+            do j = 1, np13(i)
+               dscale(ip13(j,i)) = 1.0d0
+               uscale(ip13(j,i)) = 1.0d0
+            end do
+            do j = 1, np14(i)
+               dscale(ip14(j,i)) = 1.0d0
+               uscale(ip14(j,i)) = 1.0d0
+            end do
+         end if
       end do
 c
 c     OpenMP directives for the major loop structure

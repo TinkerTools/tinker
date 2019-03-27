@@ -747,8 +747,9 @@ c
 c     set base atomic radii from consensus vdw values
 c
       do i = 1, n
+         rad(i) = 0.0d0
          atn = atmnum(type(i))
-         rad(i) = vdwrad(atn)
+         if (atn .ne. 0)  rad(i) = vdwrad(atn)
          if (rad(i) .eq. 0.0d0)  rad(i) = 1.7d0
       end do
 c
@@ -776,19 +777,18 @@ c
 c
 c     use potential grid points only for active grid atoms
 c
-      k = npoint
-      npoint = 0
-      do i = 1, k
+      k = 0
+      do i = 1, npoint
          if (gatm(ipgrid(i,iconf))) then
-            npoint = npoint + 1
-            ipgrid(npoint,iconf) = ipgrid(i,iconf)
-            pgrid(1,npoint,iconf) = pgrid(1,i,iconf)
-            pgrid(2,npoint,iconf) = pgrid(2,i,iconf)
-            pgrid(3,npoint,iconf) = pgrid(3,i,iconf)
-            epot(2,npoint,iconf) = epot(2,i,iconf)
+            k = k + 1
+            ipgrid(k,iconf) = ipgrid(i,iconf)
+            pgrid(1,k,iconf) = pgrid(1,i,iconf)
+            pgrid(2,k,iconf) = pgrid(2,i,iconf)
+            pgrid(3,k,iconf) = pgrid(3,i,iconf)
+            epot(2,k,iconf) = epot(2,i,iconf)
          end if
       end do
-      npgrid(iconf) = npoint
+      npgrid(iconf) = k
       return
       end
 c

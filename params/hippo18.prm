@@ -21,11 +21,6 @@ opbend-quartic          0.000056
 opbend-pentic           -0.0000007
 opbend-sextic           0.000000022
 torsionunit             0.5
-vdwtype                 BUFFERED-14-7
-radiusrule              CUBIC-MEAN
-radiustype              R-MIN
-radiussize              DIAMETER
-epsilonrule             HHG
 dielectric              1.0
 polarization            MUTUAL
 rep-12-scale            0.0

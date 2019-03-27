@@ -375,6 +375,7 @@ c
       w3scale = 1.0d0
       w4scale = 1.0d0
       w5scale = 1.0d0
+      dpequal = .false.
       use_thole = .false.
 c
 c     set default control parameters for implicit solvation

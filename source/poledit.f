@@ -100,7 +100,7 @@ c
 c
 c     "molsetup" generates trial parameters needed to perform
 c     polarizable multipole calculations on a structure read
-c     from a GDMA output file
+c     from distributed multipole analysis output
 c
 c
       subroutine molsetup
@@ -110,9 +110,10 @@ c
       use files
       use mpole
       use polar
+      use ptable
       implicit none
       integer i,j,k,m,ixyz
-      integer atmnum,size
+      integer atn,size
       integer freeunit
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -128,25 +129,9 @@ c
 c     set base atomic radii from covalent radius values
 c
       do i = 1, n
-         rad(i) = 0.77d0
-         atmnum = atomic(i)
-         if (atmnum .eq. 0)  rad(i) = 0.00d0
-         if (atmnum .eq. 1)  rad(i) = 0.37d0
-         if (atmnum .eq. 2)  rad(i) = 0.32d0
-         if (atmnum .eq. 6)  rad(i) = 0.77d0
-         if (atmnum .eq. 7)  rad(i) = 0.75d0
-         if (atmnum .eq. 8)  rad(i) = 0.73d0
-         if (atmnum .eq. 9)  rad(i) = 0.71d0
-         if (atmnum .eq. 10)  rad(i) = 0.69d0
-         if (atmnum .eq. 14)  rad(i) = 1.11d0
-         if (atmnum .eq. 15)  rad(i) = 1.06d0
-         if (atmnum .eq. 16)  rad(i) = 1.02d0
-         if (atmnum .eq. 17)  rad(i) = 0.99d0
-         if (atmnum .eq. 18)  rad(i) = 0.97d0
-         if (atmnum .eq. 35)  rad(i) = 1.14d0
-         if (atmnum .eq. 36)  rad(i) = 1.10d0
-         if (atmnum .eq. 53)  rad(i) = 1.33d0
-         if (atmnum .eq. 54)  rad(i) = 1.30d0
+         rad(i) = 0.76d0
+         atn = atomic(i)
+         if (atn .ne. 0)  rad(i) = covrad(atn)
          rad(i) = 1.1d0 * rad(i)
       end do
 c
@@ -191,6 +176,14 @@ c
          story(i) = filename(1:size)
       end do
 c
+c     assign the standard atomic weight by atomic number
+c
+      do i = 1, n
+         mass(i) = 1.0d0
+         atn = atomic(i)
+         if (atn .ne. 0)  mass(i) = atmass(atn)
+      end do
+c
 c     create a file with coordinates and connectivities
 c
       ixyz = freeunit ()
@@ -205,56 +198,42 @@ c
       if (.not. allocated(polsiz))  allocate (polsiz(n))
       if (.not. allocated(pollist))  allocate (pollist(n))
 c
-c     assign atomic mass and polarizability by atomic number
+c     assign atomic polarizabilities for Thole polarization
 c
       do i = 1, n
-         atmnum = atomic(i)
-         mass(i) = 1.0d0
          polarity(i) = 0.0d0
          thole(i) = 0.39d0
-         if (atmnum .eq. 1) then
-            mass(i) = 1.008d0
+         atn = atomic(i)
+         if (atn .eq. 1) then
             polarity(i) = 0.496d0
-         else if (atmnum .eq. 5) then
-            mass(i) = 10.810d0
+         else if (atn .eq. 5) then
             polarity(i) = 1.600d0
-         else if (atmnum .eq. 6) then
-            mass(i) = 12.011d0
+         else if (atn .eq. 6) then
             polarity(i) = 1.334d0
-         else if (atmnum .eq. 7) then
-            mass(i) = 14.007d0
+         else if (atn .eq. 7) then
             polarity(i) = 1.073d0
-         else if (atmnum .eq. 8) then
-            mass(i) = 15.999d0
+         else if (atn .eq. 8) then
             polarity(i) = 0.837d0
-         else if (atmnum .eq. 9) then
-            mass(i) = 18.998d0
+         else if (atn .eq. 9) then
             polarity(i) = 0.507d0
-         else if (atmnum .eq. 14) then
-            mass(i) = 28.086d0
-         else if (atmnum .eq. 15) then
-            mass(i) = 30.974d0
+         else if (atn .eq. 15) then
             polarity(i) = 1.828d0
-         else if (atmnum .eq. 16) then
-            mass(i) = 32.066d0
+         else if (atn .eq. 16) then
             polarity(i) = 3.300d0
-         else if (atmnum .eq. 17) then
-            mass(i) = 35.453d0
+         else if (atn .eq. 17) then
             polarity(i) = 2.500d0
-         else if (atmnum .eq. 35) then
-            mass(i) = 79.904d0
+         else if (atn .eq. 35) then
             polarity(i) = 3.595d0
-         else if (atmnum .eq. 53) then
-            mass(i) = 126.904d0
+         else if (atn .eq. 53) then
             polarity(i) = 5.705d0
          end if
       end do
 c
-c     alter polarizabilities for aromatic carbon and hydrogen
+c     alter Thole values for aromatic carbon and hydrogen
 c
       do i = 1, n
-         atmnum = atomic(i)
-         if (atmnum .eq. 1) then
+         atn = atomic(i)
+         if (atn .eq. 1) then
             j = i12(1,i)
             if (atomic(j).eq.6 .and. n12(j).eq.3) then
                polarity(i) = 0.696d0
@@ -265,7 +244,7 @@ c
                   end if
                end do
             end if
-         else if (atmnum .eq. 6) then
+         else if (atn .eq. 6) then
             if (n12(i) .eq. 3) then
                polarity(i) = 1.75d0
                do j = 1, n12(i)
@@ -1550,6 +1529,7 @@ c
       subroutine dfieldi (field)
       use atoms
       use chgpen
+      use couple
       use mplpot
       use mpole
       use polar
@@ -1627,18 +1607,49 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         do j = 1, np11(i)
-            dscale(ip11(j,i)) = d1scale
-         end do
-         do j = 1, np12(i)
-            dscale(ip12(j,i)) = d2scale
-         end do
-         do j = 1, np13(i)
-            dscale(ip13(j,i)) = d3scale
-         end do
-         do j = 1, np14(i)
-            dscale(ip14(j,i)) = d4scale
-         end do
+         if (dpequal) then
+            do j = 1, n12(i)
+               dscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               dscale(i12(j,i)) = p2iscale
+               end do
+            end do
+            do j = 1, n13(i)
+               dscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               dscale(i13(j,i)) = p3iscale
+               end do
+            end do
+            do j = 1, n14(i)
+               dscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                  if (i14(j,i) .eq. ip11(k,i))
+     &               dscale(i14(j,i)) = p4iscale
+               end do
+            end do
+            do j = 1, n15(i)
+               dscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               dscale(i15(j,i)) = p5iscale
+               end do
+            end do
+         else
+            do j = 1, np11(i)
+               dscale(ip11(j,i)) = d1scale
+            end do
+            do j = 1, np12(i)
+               dscale(ip12(j,i)) = d2scale
+            end do
+            do j = 1, np13(i)
+               dscale(ip13(j,i)) = d3scale
+            end do
+            do j = 1, np14(i)
+               dscale(ip14(j,i)) = d4scale
+            end do
+         end if
 c
 c     evaluate higher-numbered sites with the original site
 c
@@ -1750,18 +1761,33 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, np11(i)
-            dscale(ip11(j,i)) = 1.0d0
-         end do
-         do j = 1, np12(i)
-            dscale(ip12(j,i)) = 1.0d0
-         end do
-         do j = 1, np13(i)
-            dscale(ip13(j,i)) = 1.0d0
-         end do
-         do j = 1, np14(i)
-            dscale(ip14(j,i)) = 1.0d0
-         end do
+         if (dpequal) then
+            do j = 1, n12(i)
+               dscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               dscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               dscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               dscale(i15(j,i)) = 1.0d0
+            end do
+         else
+            do j = 1, np11(i)
+               dscale(ip11(j,i)) = 1.0d0
+            end do
+            do j = 1, np12(i)
+               dscale(ip12(j,i)) = 1.0d0
+            end do
+            do j = 1, np13(i)
+               dscale(ip13(j,i)) = 1.0d0
+            end do
+            do j = 1, np14(i)
+               dscale(ip14(j,i)) = 1.0d0
+            end do
+         end if
       end do
 c
 c     perform deallocation of some local arrays
@@ -1814,6 +1840,8 @@ c
       real*8 fiu(3),fku(3)
       real*8 dmpik(5)
       real*8, allocatable :: dscale(:)
+      real*8, allocatable :: pscale(:)
+      real*8, allocatable :: uscale(:)
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: gscale(:)
       real*8 field(3,*)
@@ -1830,6 +1858,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (dscale(n))
+      allocate (pscale(n))
+      allocate (uscale(n))
       allocate (wscale(n))
       allocate (gscale(n))
 c
@@ -1837,6 +1867,8 @@ c     set arrays needed to scale atom and group interactions
 c
       do i = 1, n
          dscale(i) = 1.0d0
+         pscale(i) = 1.0d0
+         uscale(i) = 1.0d0
          wscale(i) = 1.0d0
          gscale(i) = 0.0d0
       end do
@@ -1858,48 +1890,126 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         if (use_chgpen) then
-            do j = 1, n12(i)
-               wscale(i12(j,i)) = w2scale
-            end do
-            do j = 1, n13(i)
-               wscale(i13(j,i)) = w3scale
-            end do
-            do j = 1, n14(i)
-               wscale(i14(j,i)) = w4scale
-            end do
-            do j = 1, n15(i)
-               wscale(i15(j,i)) = w5scale
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = d1scale
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = d2scale
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = d3scale
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = d4scale
-            end do
-            do j = ii+1, npole
-               k = ipole(j)
-               gscale(k) = wscale(k) - dscale(k)
-            end do
+         if (dpequal) then
+            if (use_chgpen) then
+               do j = 1, n12(i)
+                  gscale(i12(j,i)) = w2scale - p2scale
+                  do k = 1, np11(i)
+                     if (i12(j,i) .eq. ip11(k,i))
+     &                  gscale(i12(j,i)) = w2scale - p2iscale
+                  end do
+               end do
+               do j = 1, n13(i)
+                  gscale(i13(j,i)) = w3scale - p3scale
+                  do k = 1, np11(i)
+                     if (i13(j,i) .eq. ip11(k,i))
+     &                  gscale(i13(j,i)) = w3scale - p3iscale
+                  end do
+               end do
+               do j = 1, n14(i)
+                  gscale(i14(j,i)) = w4scale - p4scale
+                  do k = 1, np11(i)
+                     if (i14(j,i) .eq. ip11(k,i))
+     &                  gscale(i14(j,i)) = w4scale - p4iscale
+                  end do
+               end do
+               do j = 1, n15(i)
+                  gscale(i15(j,i)) = w5scale - p5scale
+                  do k = 1, np11(i)
+                     if (i15(j,i) .eq. ip11(k,i))
+     &                  gscale(i15(j,i)) = w5scale - p5iscale
+                  end do
+               end do
+            else
+               do j = 1, n12(i)
+                  pscale(i12(j,i)) = p2scale
+                  do k = 1, np11(i)
+                     if (i12(j,i) .eq. ip11(k,i))
+     &                  pscale(i12(j,i)) = p2iscale
+                  end do
+               end do
+               do j = 1, n13(i)
+                  pscale(i13(j,i)) = p3scale
+                  do k = 1, np11(i)
+                     if (i13(j,i) .eq. ip11(k,i))
+     &                  pscale(i13(j,i)) = p3iscale
+                  end do
+               end do
+               do j = 1, n14(i)
+                  pscale(i14(j,i)) = w4scale
+                  do k = 1, np11(i)
+                     if (i14(j,i) .eq. ip11(k,i))
+     &                  pscale(i14(j,i)) = p4iscale
+                  end do
+               end do
+               do j = 1, n15(i)
+                  pscale(i15(j,i)) = p5scale
+                  do k = 1, np11(i)
+                     if (i15(j,i) .eq. ip11(k,i))
+     &                  pscale(i15(j,i)) = p5iscale
+                  end do
+               end do
+               do j = 1, np11(i)
+                  uscale(ip11(j,i)) = u1scale
+               end do
+               do j = 1, np12(i)
+                  uscale(ip12(j,i)) = u2scale
+               end do
+               do j = 1, np13(i)
+                  uscale(ip13(j,i)) = u3scale
+               end do
+               do j = 1, np14(i)
+                  uscale(ip14(j,i)) = u4scale
+               end do
+               do j = ii+1, npole
+                  k = ipole(j)
+                  gscale(k) = uscale(k) - pscale(k)
+               end do
+            end if
          else
-            do j = 1, np11(i)
-               gscale(ip11(j,i)) = u1scale - d1scale
-            end do
-            do j = 1, np12(i)
-               gscale(ip12(j,i)) = u2scale - d2scale
-            end do
-            do j = 1, np13(i)
-               gscale(ip13(j,i)) = u3scale - d3scale
-            end do
-            do j = 1, np14(i)
-               gscale(ip14(j,i)) = u4scale - d4scale
-            end do
+            if (use_chgpen) then
+               do j = 1, n12(i)
+                  wscale(i12(j,i)) = w2scale
+               end do
+               do j = 1, n13(i)
+                  wscale(i13(j,i)) = w3scale
+               end do
+               do j = 1, n14(i)
+                  wscale(i14(j,i)) = w4scale
+               end do
+               do j = 1, n15(i)
+                  wscale(i15(j,i)) = w5scale
+               end do
+               do j = 1, np11(i)
+                  dscale(ip11(j,i)) = d1scale
+               end do
+               do j = 1, np12(i)
+                  dscale(ip12(j,i)) = d2scale
+               end do
+               do j = 1, np13(i)
+                  dscale(ip13(j,i)) = d3scale
+               end do
+               do j = 1, np14(i)
+                  dscale(ip14(j,i)) = d4scale
+               end do
+               do j = ii+1, npole
+                  k = ipole(j)
+                  gscale(k) = wscale(k) - dscale(k)
+               end do
+            else
+               do j = 1, np11(i)
+                  gscale(ip11(j,i)) = u1scale - d1scale
+               end do
+               do j = 1, np12(i)
+                  gscale(ip12(j,i)) = u2scale - d2scale
+              end do
+                do j = 1, np13(i)
+                  gscale(ip13(j,i)) = u3scale - d3scale
+               end do
+               do j = 1, np14(i)
+                  gscale(ip14(j,i)) = u4scale - d4scale
+               end do
+            end if
          end if
 c
 c     evaluate higher-numbered sites with the original site
@@ -1962,58 +2072,110 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         if (use_chgpen) then
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = 1.0d0
-               gscale(ip11(j,i)) = 0.0d0
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = 1.0d0
-               gscale(ip12(j,i)) = 0.0d0
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = 1.0d0
-               gscale(ip13(j,i)) = 0.0d0
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = 1.0d0
-               gscale(ip14(j,i)) = 0.0d0
-            end do
-            do j = 1, n12(i)
-               wscale(i12(j,i)) = 1.0d0
-               gscale(i12(j,i)) = 0.0d0
-            end do
-            do j = 1, n13(i)
-               wscale(i13(j,i)) = 1.0d0
-               gscale(i13(j,i)) = 0.0d0
-            end do
-            do j = 1, n14(i)
-               wscale(i14(j,i)) = 1.0d0
-               gscale(i14(j,i)) = 0.0d0
-            end do
-            do j = 1, n15(i)
-               wscale(i15(j,i)) = 1.0d0
-               gscale(i15(j,i)) = 0.0d0
-            end do
+         if (dpequal) then
+            if (use_chgpen) then
+               do j = 1, n12(i)
+                  gscale(i12(j,i)) = 0.0d0
+               end do
+               do j = 1, n13(i)
+                  gscale(i13(j,i)) = 0.0d0
+               end do
+               do j = 1, n14(i)
+                  gscale(i14(j,i)) = 0.0d0
+               end do
+               do j = 1, n15(i)
+                  gscale(i15(j,i)) = 0.0d0
+               end do
+            else
+               do j = 1, np11(i)
+                  uscale(ip11(j,i)) = 1.0d0
+                  gscale(ip11(j,i)) = 0.0d0
+               end do
+               do j = 1, np12(i)
+                  uscale(ip12(j,i)) = 1.0d0
+                  gscale(ip12(j,i)) = 0.0d0
+               end do
+               do j = 1, np13(i)
+                  uscale(ip13(j,i)) = 1.0d0
+                  gscale(ip13(j,i)) = 0.0d0
+               end do
+               do j = 1, np14(i)
+                  uscale(ip14(j,i)) = 1.0d0
+                  gscale(ip14(j,i)) = 0.0d0
+               end do
+               do j = 1, n12(i)
+                  pscale(i12(j,i)) = 1.0d0
+                  gscale(i12(j,i)) = 0.0d0
+               end do
+               do j = 1, n13(i)
+                  pscale(i13(j,i)) = 1.0d0
+                  gscale(i13(j,i)) = 0.0d0
+               end do
+               do j = 1, n14(i)
+                  pscale(i14(j,i)) = 1.0d0
+                  gscale(i14(j,i)) = 0.0d0
+               end do
+               do j = 1, n15(i)
+                  pscale(i15(j,i)) = 1.0d0
+                  gscale(i15(j,i)) = 0.0d0
+               end do
+            end if
          else
-            do j = 1, np11(i)
-               gscale(ip11(j,i)) = 0.0d0
-            end do
-            do j = 1, np12(i)
-               gscale(ip12(j,i)) = 0.0d0
-            end do
-            do j = 1, np13(i)
-               gscale(ip13(j,i)) = 0.0d0
-            end do
-            do j = 1, np14(i)
-               gscale(ip14(j,i)) = 0.0d0
-            end do
+            if (use_chgpen) then
+               do j = 1, np11(i)
+                  dscale(ip11(j,i)) = 1.0d0
+                  gscale(ip11(j,i)) = 0.0d0
+               end do
+               do j = 1, np12(i)
+                  dscale(ip12(j,i)) = 1.0d0
+                  gscale(ip12(j,i)) = 0.0d0
+               end do
+               do j = 1, np13(i)
+                  dscale(ip13(j,i)) = 1.0d0
+                  gscale(ip13(j,i)) = 0.0d0
+               end do
+               do j = 1, np14(i)
+                  dscale(ip14(j,i)) = 1.0d0
+                  gscale(ip14(j,i)) = 0.0d0
+               end do
+               do j = 1, n12(i)
+                  wscale(i12(j,i)) = 1.0d0
+                  gscale(i12(j,i)) = 0.0d0
+               end do
+               do j = 1, n13(i)
+                  wscale(i13(j,i)) = 1.0d0
+                  gscale(i13(j,i)) = 0.0d0
+               end do
+               do j = 1, n14(i)
+                  wscale(i14(j,i)) = 1.0d0
+                  gscale(i14(j,i)) = 0.0d0
+               end do
+               do j = 1, n15(i)
+                  wscale(i15(j,i)) = 1.0d0
+                  gscale(i15(j,i)) = 0.0d0
+               end do
+            else
+               do j = 1, np11(i)
+                  gscale(ip11(j,i)) = 0.0d0
+               end do
+               do j = 1, np12(i)
+                  gscale(ip12(j,i)) = 0.0d0
+               end do
+               do j = 1, np13(i)
+                  gscale(ip13(j,i)) = 0.0d0
+               end do
+               do j = 1, np14(i)
+                  gscale(ip14(j,i)) = 0.0d0
+               end do
+            end if
          end if
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (dscale)
+      deallocate (pscale)
+      deallocate (uscale)
       deallocate (wscale)
       deallocate (gscale)
       return
