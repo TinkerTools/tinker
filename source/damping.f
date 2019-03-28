@@ -140,6 +140,7 @@ c
       real*8 r,termi,termk
       real*8 termi2,termk2
       real*8 alphai,alphak
+      real*8 eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dampi2,dampk2
@@ -149,8 +150,10 @@ c
       real*8 dmpk(*)
 c
 c
-c     compute common exponential factors for damping
+c     compute tolerance and exponential damping factors
 c
+      eps = 0.001d0
+      diff = abs(alphai-alphak)
       dampi = alphai * r
       dampk = alphak * r
       expi = exp(-dampi)
@@ -166,7 +169,7 @@ c
      &                     + dampi3/6.0d0)*expi
       dmpi(7) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
      &             + dampi3/6.0d0 + dampi4/30.0d0)*expi
-      if (alphai .eq. alphak) then
+      if (diff .lt. eps) then
          dmpk(3) = dmpi(3)
          dmpk(5) = dmpi(5)
          dmpk(7) = dmpi(7)
@@ -201,6 +204,7 @@ c
       real*8 termi2,termk2
       real*8 alphai,alphak
       real*8 alphai2,alphak2
+      real*8 eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dampi2,dampi3
@@ -209,8 +213,10 @@ c
       real*8 dmpik(*)
 c
 c
-c     compute common exponential factors for damping
+c     compute tolerance and exponential damping factors
 c
+      eps = 0.001d0
+      diff = abs(alphai-alphak)
       dampi = alphai * r
       dampk = alphak * r
       expi = exp(-dampi)
@@ -218,7 +224,7 @@ c
 c
 c     polarization damping terms for valence-valence terms
 c
-      if (alphai .eq. alphak) then
+      if (diff .lt. eps) then
          dampi2 = dampi * dampi
          dampi3 = dampi * dampi2
          dampi4 = dampi2 * dampi2
@@ -275,6 +281,7 @@ c
       real*8 r,termi,termk
       real*8 termi2,termk2
       real*8 alphai,alphak
+      real*8 eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dmpi(*)
@@ -282,8 +289,10 @@ c
       real*8 dmpik(*)
 c
 c
-c     compute common exponential factors for damping
+c     compute tolerance and exponential damping factors
 c
+      eps = 0.001d0
+      diff = abs(alphai-alphak)
       dampi = alphai * r
       dampk = alphak * r
       expi = exp(-dampi)
@@ -300,7 +309,7 @@ c
       dmpi(9) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi**2
      &             + dampi**3/6.0d0 + 4.0d0*dampi**4/105.0d0
      &             + dampi**5/210.0d0)*expi
-      if (alphai .eq. alphak) then
+      if (diff .lt. eps) then
          dmpk(1) = dmpi(1)
          dmpk(3) = dmpi(3)
          dmpk(5) = dmpi(5)
@@ -320,7 +329,7 @@ c
 c
 c     charge penetration damping for valence-valence terms
 c
-      if (alphai .eq. alphak) then
+      if (diff .lt. eps) then
          dmpik(1) = 1.0d0 - (1.0d0 + 11.0d0*dampi/16.0d0
      &                         + 3.0d0*dampi**2/16.0d0
      &                         + dampi**3/48.0d0)*expi
@@ -433,6 +442,7 @@ c
       real*8 r,termi,termk
       real*8 termi2,termk2
       real*8 alphai,alphak
+      real*8 eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dmpi(*)
@@ -440,8 +450,10 @@ c
       real*8 dmpik(*)
 c
 c
-c     compute common exponential factors for damping
+c     compute tolerance and exponential damping factors
 c
+      eps = 0.001d0
+      diff = abs(alphai-alphak)
       dampi = alphai * r
       dampk = alphak * r
       expi = exp(-dampi)
@@ -452,7 +464,7 @@ c
       dmpi(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi**2)*expi
       dmpi(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi**2 
      &                     + dampi**3/6.0d0)*expi
-      if (alphai .eq. alphak) then
+      if (diff .lt. eps) then
          dmpk(3) = dmpi(3)
          dmpk(5) = dmpi(5)
       else
@@ -463,7 +475,7 @@ c
 c
 c     polarization damping terms for valence-valence terms
 c
-      if (alphai .eq. alphak) then
+      if (diff .lt. eps) then
          dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi**2
      &                         + 7.0d0*dampi**3/48.0d0
      &                         + dampi**4/48.0d0)*expi
@@ -556,15 +568,21 @@ c
       real*8 dmpk22,dmpk23
       real*8 dmpk24,dmpk25
       real*8 dmpk26
+      real*8 eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 pre,term,tmp
       real*8 dmpik(*)
 c
-
+c
+c     compute tolerance value for damping exponents
+c
+      eps = 0.001d0
+      diff = abs(dmpi-dmpk)
+c
 c     treat the case where alpha damping exponents are equal
 c
-      if (dmpi .eq. dmpk) then
+      if (diff .lt. eps) then
          r3 = r2 * r
          r4 = r3 * r
          r5 = r4 * r

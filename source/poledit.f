@@ -112,13 +112,12 @@ c
       use polar
       use ptable
       implicit none
-      integer i,j,k,m,ixyz
+      integer i,j,ixyz
       integer atn,size
       integer freeunit
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 ri,rij,dij
-      real*8 sixth
       real*8, allocatable :: rad(:)
 c
 c
@@ -163,6 +162,15 @@ c
          call sort (n12(i),i12(1,i))
       end do
 c
+c     find the bonds, angles, torsions and small rings
+c
+      call attach
+      call bonds
+      call angles
+      call torsions
+      call bitors
+      call rings
+c
 c     perform deallocation of some local arrays
 c
       deallocate (rad)
@@ -184,94 +192,26 @@ c
          if (atn .ne. 0)  mass(i) = atmass(atn)
       end do
 c
-c     create a file with coordinates and connectivities
-c
-      ixyz = freeunit ()
-      call prtxyz (ixyz)
-c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(polarity))  allocate (polarity(n))
-      if (.not. allocated(thole))  allocate (thole(n))
-      if (.not. allocated(pdamp))  allocate (pdamp(n))
       if (.not. allocated(ipole))  allocate (ipole(n))
       if (.not. allocated(polsiz))  allocate (polsiz(n))
       if (.not. allocated(pollist))  allocate (pollist(n))
 c
-c     assign atomic polarizabilities for Thole polarization
-c
-      do i = 1, n
-         polarity(i) = 0.0d0
-         thole(i) = 0.39d0
-         atn = atomic(i)
-         if (atn .eq. 1) then
-            polarity(i) = 0.496d0
-         else if (atn .eq. 5) then
-            polarity(i) = 1.600d0
-         else if (atn .eq. 6) then
-            polarity(i) = 1.334d0
-         else if (atn .eq. 7) then
-            polarity(i) = 1.073d0
-         else if (atn .eq. 8) then
-            polarity(i) = 0.837d0
-         else if (atn .eq. 9) then
-            polarity(i) = 0.507d0
-         else if (atn .eq. 15) then
-            polarity(i) = 1.828d0
-         else if (atn .eq. 16) then
-            polarity(i) = 3.300d0
-         else if (atn .eq. 17) then
-            polarity(i) = 2.500d0
-         else if (atn .eq. 35) then
-            polarity(i) = 3.595d0
-         else if (atn .eq. 53) then
-            polarity(i) = 5.705d0
-         end if
-      end do
-c
-c     alter Thole values for aromatic carbon and hydrogen
-c
-      do i = 1, n
-         atn = atomic(i)
-         if (atn .eq. 1) then
-            j = i12(1,i)
-            if (atomic(j).eq.6 .and. n12(j).eq.3) then
-               polarity(i) = 0.696d0
-               do k = 1, n12(j)
-                  m = i12(k,j)
-                  if (atomic(m).eq.8 .and. n12(m).eq.1) then
-                     polarity(i) = 0.494d0
-                  end if
-               end do
-            end if
-         else if (atn .eq. 6) then
-            if (n12(i) .eq. 3) then
-               polarity(i) = 1.75d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k).eq.8 .and. n12(k).eq.1) then
-                     polarity(i) = 1.334d0
-                  end if
-               end do
-            end if
-         end if
-      end do
-c
-c     set atomic multipole and polarizability scaling values
+c     set atomic multipole sites and polarizability indices
 c
       npole = n
       npolar = n
-      sixth = 1.0d0 / 6.0d0
       do i = 1, n
          ipole(i) = i
          polsiz(i) = 13
          pollist(i) = i
-         if (thole(i) .eq. 0.0d0) then
-            pdamp(i) = 0.0d0
-         else
-            pdamp(i) = polarity(i)**sixth
-         end if
       end do
+c
+c     create a file with coordinates and connectivities
+c
+      ixyz = freeunit ()
+      call prtxyz (ixyz)
       return
       end
 c
@@ -701,7 +641,7 @@ c
       use mpole
       use units
       implicit none
-      integer i,j,ii
+      integer i,j,k
       integer ixaxe
       integer iyaxe
       integer izaxe
@@ -759,10 +699,10 @@ c     print the local frame Cartesian atomic multipoles
 c
       write (iout,10)
    10 format (/,' Local Frame Cartesian Multipole Moments :')
-      do ii = 1, npole
-         i = pollist(ii)
+      do k = 1, npole
+         i = pollist(k)
          if (i .eq. 0) then
-            write (iout,20)  ii,name(ii),atomic(ii)
+            write (iout,20)  k,name(k),atomic(k)
    20       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
      &                 'Atomic Number:',i8)
             write (iout,30)
@@ -772,7 +712,7 @@ c
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,40)  ii,name(ii),atomic(ii)
+            write (iout,40)  k,name(k),atomic(k)
    40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,50)  polaxe(i),izaxe,ixaxe,iyaxe
@@ -816,7 +756,7 @@ c
       use polar
       use units
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
       integer ia,ib,ic
       integer ixaxe
       integer iyaxe
@@ -839,17 +779,17 @@ c
       write (iout,20)
    20 format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
      &          'X Axis',2x,'Y Axis',/)
-      do ii = 1, n
-         i = pollist(ii)
+      do k = 1, n
+         i = pollist(k)
          if (i .eq. 0) then
-            write (iout,30)  ii,name(ii)
+            write (iout,30)  k,name(k)
    30       format (i8,6x,a3,10x,'--',11x,'--',6x,'--',6x,'--')
          else
             izaxe = zaxis(i)
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,40)  ii,name(ii),polaxe(i),izaxe,ixaxe,iyaxe
+            write (iout,40)  k,name(k),polaxe(i),izaxe,ixaxe,iyaxe
    40       format (i8,6x,a3,7x,a8,2x,3i8)
          end if
       end do
@@ -860,7 +800,7 @@ c
       change = .false.
       do while (query)
          i = 0
-         ii = 0
+         k = 0
          ia = 0
          ib = 0
          ic = 0
@@ -869,12 +809,12 @@ c
      &              ' [<CR>=Exit] :  ',$)
          read (input,60)  record
    60    format (a240)
-         read (record,*,err=70,end=70)  ii,ia,ib,ic
+         read (record,*,err=70,end=70)  k,ia,ib,ic
    70    continue
-         if (ii .eq. 0) then
+         if (k .eq. 0) then
             query = .false.
          else
-            i = pollist(ii)
+            i = pollist(k)
          end if
          if (i .ne. 0) then
             change = .true.
@@ -898,17 +838,17 @@ c
          write (iout,90)
    90    format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
      &             'X Axis',2x,'Y Axis',/)
-         do ii = 1, npole
-            i = pollist(ii)
+         do k = 1, npole
+            i = pollist(k)
             if (i .eq. 0) then
-               write (iout,100)  ii,name(ii)
+               write (iout,100)  k,name(k)
   100          format (i8,6x,a3,10x,'--',11x,'--',6x,'--',6x,'--')
             else
                izaxe = zaxis(i)
                ixaxe = xaxis(i)
                iyaxe = yaxis(i)
                if (iyaxe .lt. 0)  iyaxe = -iyaxe
-               write (iout,110)  ii,name(ii),polaxe(i),izaxe,ixaxe,iyaxe
+               write (iout,110)  k,name(k),polaxe(i),izaxe,ixaxe,iyaxe
   110          format (i8,6x,a3,7x,a8,2x,3i8)
             end if
          end do
@@ -1003,10 +943,10 @@ c     print the altered local frame atomic multipole values
 c
       write (iout,130)
   130 format (/,' Multipoles With Altered Local Frame Definition :')
-      do ii = 1, n
-         i = pollist(ii)
+      do k = 1, n
+         i = pollist(k)
          if (i .eq. 0) then
-            write (iout,140)  ii,name(ii),atomic(ii)
+            write (iout,140)  k,name(k),atomic(k)
   140       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
      &                 'Atomic Number:',i8)
             write (iout,150)
@@ -1016,7 +956,7 @@ c
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,160)  ii,name(ii),atomic(ii)
+            write (iout,160)  k,name(k),atomic(k)
   160       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,170)  polaxe(i),izaxe,ixaxe,iyaxe
@@ -1044,8 +984,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "setpolar" assigns atomic polarizability and Thole damping
-c     parameters and allows user alteration of these values
+c     "setpolar" assigns atomic polarizabilities, damping parameters
+c     and polarization groups with user modification of these values
 c
 c
       subroutine setpolar
@@ -1058,29 +998,268 @@ c
       use polar
       use polgrp
       implicit none
-      integer i,j,k,ii
-      integer ia,ib
+      integer i,j,k,m
+      integer jj,ia,ib
+      integer atn,next
       real*8 pol,thl
+      real*8 sixth
       logical exist,query
       logical change
+      logical aromatic
+      logical chkarom
+      character*1 answer
+      character*6 pmodel
       character*240 record
       character*240 string
+      external chkarom
 c
+c
+c     allow the user to select the polarization model
+c
+      pmodel = 'AMOEBA'
+      query = .true.
+      answer = ' '
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=10,end=10)  answer
+         call upcase (answer)
+         if (answer.eq.'A' .or. answer.eq.'H')  query = .false.
+      end if
+   10 continue
+      if (query) then
+         answer = 'A'
+         write (iout,20)
+   20    format (/,' Choose Either the AMOEBA or HIPPO Polarization',
+     &              ' Model [A] :  ',$)
+         read (input,30)  record
+   30    format (a240)
+         next = 1
+         call gettext (record,answer,next)
+         call upcase (answer)
+      end if
+      if (answer .eq. 'H')  pmodel = 'HIPPO '
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(polarity))  allocate (polarity(n))
+      if (.not. allocated(thole))  allocate (thole(n))
+      if (.not. allocated(pdamp))  allocate (pdamp(n))
+c
+c     assign default atomic polarizabilities for Thole model
+c
+      if (pmodel .eq. 'AMOEBA') then
+         do i = 1, n
+            polarity(i) = 0.0d0
+            thole(i) = 0.39d0
+            atn = atomic(i)
+            if (atn .eq. 1) then
+               polarity(i) = 0.496d0
+            else if (atn .eq. 5) then
+               polarity(i) = 1.600d0
+            else if (atn .eq. 6) then
+               polarity(i) = 1.334d0
+            else if (atn .eq. 7) then
+               polarity(i) = 1.073d0
+            else if (atn .eq. 8) then
+               polarity(i) = 0.837d0
+            else if (atn .eq. 9) then
+               polarity(i) = 0.507d0
+            else if (atn .eq. 15) then
+               polarity(i) = 1.828d0
+            else if (atn .eq. 16) then
+               polarity(i) = 3.300d0
+            else if (atn .eq. 17) then
+               polarity(i) = 2.500d0
+            else if (atn .eq. 35) then
+               polarity(i) = 3.595d0
+            else if (atn .eq. 53) then
+               polarity(i) = 5.705d0
+            end if
+         end do
+c
+c     alter Thole values for alkene/aromatic carbon and hydrogen
+c
+         do i = 1, n
+            atn = atomic(i)
+            if (atn .eq. 1) then
+               j = i12(1,i)
+               if (atomic(j).eq.6 .and. n12(j).eq.3) then
+                  polarity(i) = 0.696d0
+                  do k = 1, n12(j)
+                     m = i12(k,j)
+                     if (atomic(m).eq.8 .and. n12(m).eq.1) then
+                        polarity(i) = 0.494d0
+                     end if
+                  end do
+               end if
+            else if (atn .eq. 6) then
+               if (n12(i) .eq. 3) then
+                  polarity(i) = 1.75d0
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k).eq.8 .and. n12(k).eq.1) then
+                        polarity(i) = 1.334d0
+                     end if
+                  end do
+               end if
+            end if
+         end do
+c
+c     assign default atomic polarizabilities for HIPPO model
+c
+      else
+         do i = 1, n
+            polarity(i) = 0.0d0
+            thole(i) = 0.0d0
+            atn = atomic(i)
+            if (atn .eq. 1) then
+               polarity(i) = 0.373d0
+               k = atomic(i12(1,i))
+               if (k .eq. 6) then
+                  do j = 1, n13(i)
+                     m = atomic(i13(j,i))
+                     if ((atomic(m).ne.6.or.n12(m).ne.4)
+     &                     .and. atomic(m).ne.1)  goto 40
+                  end do
+                  do j = 1, n14(i)
+                     m = i14(j,i)
+                     if ((atomic(m).ne.6.or.n12(m).ne.4)
+     &                     .and. atomic(m).ne.1)  goto 40
+                  end do
+                  polarity(i) = 0.504d0
+   40             continue
+                  aromatic = chkarom (k)
+                  if (aromatic)  polarity(i) = 0.1106d0
+               end if
+               if (k .eq. 7)  polarity(i) = 0.005d0
+               if (k .eq. 8)  polarity(i) = 0.3698d0
+               if (k .eq. 16)  polarity(i) = 0.2093d0
+            else if (atn .eq. 5) then
+               polarity(i) = 1.6d0
+            else if (atn .eq. 6) then
+               polarity(i) = 0.755d0
+               do j = 1, n12(i)
+                  k = i12(j,i)
+                  if ((atomic(k).ne.6.or.n12(k).ne.4)
+     &                  .and. atomic(k).ne.1)  goto 50
+               end do
+               do j = 1, n13(i)
+                  k = atomic(i13(j,i))
+                  if ((atomic(k).ne.6.or.n12(k).ne.4)
+     &                  .and. atomic(k).ne.1)  goto 50
+               end do
+               polarity(i) = 0.9354d0
+   50          continue
+               if (n12(i) .eq. 3) then
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k).eq.6 .and. n12(k).eq.3) then
+                        polarity(i) = 1.9384d0
+                     end if
+                  end do
+                  do j = 1, n12(i)
+                     k = i12(j,i)
+                     if (atomic(k).eq.8 .and. n12(k).eq.1) then
+                        polarity(i) = 0.6577d0
+                     end if
+                  end do
+               end if
+               if (chkarom(i)) then
+                  polarity(i) = 1.5624d0
+                  do j = 1, n12(i)
+                     k = atomic(i12(j,i))
+                     if (k.ne.6 .and. k.ne.1)  polarity(i) = 1.2811d0
+                  end do
+               end if
+               if (n12(i) .eq. 2)  polarity(i) = 1.0d0
+            else if (atn .eq. 7) then
+               polarity(i) = 1.4289d0
+               if (n12(i) .eq. 3)  polarity(i) = 1.4545d0
+               if (chkarom(i))  polarity(i) = 1.3037d0
+            else if (atn .eq. 8) then
+               polarity(i) = 0.6645d0
+               if (n12(i) .eq. 1) then
+                  k = i12(1,i)
+                  if (atomic(k).eq.6 .and. n12(k).eq.3) then
+                     polarity(i) = 1.4266d0
+                     do j = 1, n13(i)
+                        m = i13(j,i)
+                        if (atomic(m).eq.8 .and. n12(m).eq.1) then
+                           polarity(i) = 1.8809d0
+                        end if
+                     end do
+                  end if
+                  if (atomic(k) .eq. 15) then
+                     jj = 0
+                     do j = 1, n12(k)
+                        m = i12(j,k)
+                        if (atomic(m).eq.8 .and. n12(m).eq.1) then
+                           jj = jj + 1
+                        end if
+                     end do
+                     if (jj .eq. 1)  polarity(i) = 1.0d0
+                     if (jj .eq. 2)  polarity(i) = 1.0d0
+                     if (jj .eq. 3)  polarity(i) = 1.0d0
+                     if (jj .eq. 4)  polarity(i) = 1.0d0
+                  end if
+               end if
+            else if (atn .eq. 9) then
+               polarity(i) = 0.5d0
+            else if (atn .eq. 15) then
+               polarity(i) = 1.8d0
+            else if (atn .eq. 16) then
+               polarity(i) = 3.1967d0
+               if (n12(i) .eq. 4)  polarity(i) = 2.458d0
+            else if (atn .eq. 17) then
+               polarity(i) = 2.366d0
+            else if (atn .eq. 35) then
+               polarity(i) = 3.4458d0
+            else if (atn .eq. 35) then
+               polarity(i) = 5.5d0
+            end if
+         end do
+      end if
+c
+c     compute the Thole polarizability damping values
+c
+      sixth = 1.0d0 / 6.0d0
+      do i = 1, npole
+         if (thole(i) .eq. 0.0d0) then
+            pdamp(i) = 0.0d0
+         else
+            pdamp(i) = polarity(i)**sixth
+         end if
+      end do
 c
 c     list the polariability values for each multipole site
 c
-      write (iout,10)
-   10 format (/,' Atomic Polarizabilities for Multipole Sites :')
-      write (iout,20)
-   20 format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-      do ii = 1, n
-         i = pollist(ii)
-         if (i .eq. 0) then
-            write (iout,30)  ii,name(ii)
-   30       format (i8,6x,a3,12x,'--',13x,'--')
+      write (iout,60)
+   60 format (/,' Atomic Polarizabilities for Multipole Sites :')
+      if (pmodel .eq. 'AMOEBA') then
+         write (iout,70)
+   70    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+      else
+         write (iout,80)
+   80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',/)
+      end if
+      do k = 1, n
+         i = pollist(k)
+         if (pmodel .eq. 'AMOEBA') then
+            if (i .eq. 0) then
+               write (iout,90)  k,name(k)
+   90          format (i8,6x,a3,12x,'--',13x,'--')
+            else
+               write (iout,100)  k,name(k),polarity(i),thole(i)
+  100          format (i8,6x,a3,4x,f12.4,3x,f12.4)
+            end if
          else
-            write (iout,40)  ii,name(ii),polarity(i),thole(i)
-   40       format (i8,6x,a3,4x,f12.4,3x,f12.4)
+            if (i .eq. 0) then
+               write (iout,110)  k,name(k)
+  110          format (i8,6x,a3,12x,'--')
+            else
+               write (iout,120)  k,name(k),polarity(i)
+  120          format (i8,6x,a3,4x,f12.4)
+            end if
          end if
       end do
 c
@@ -1091,26 +1270,26 @@ c
       i = -1
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=50,end=50)  i
+         read (string,*,err=130,end=130)  i
          if (i .eq. 0)  query = .false.
       end if
-   50 continue
+  130 continue
       do while (query)
          i = 0
-         ii = 0
+         k = 0
          pol = 0.0d0
          thl = 0.39d0
-         write (iout,60)
-   60    format (/,' Enter Atom Number & Polarizability Values',
+         write (iout,140)
+  140    format (/,' Enter Atom Number & Polarizability Values',
      &              ' [<CR>=Exit] :  ',$)
-         read (input,70)  record
-   70    format (a240)
-         read (record,*,err=80,end=80)  ii,pol,thl
-   80    continue
-         if (ii .eq. 0) then
+         read (input,150)  record
+  150    format (a240)
+         read (record,*,err=160,end=160)  k,pol,thl
+  160    continue
+         if (k .eq. 0) then
             query = .false.
          else
-            i = pollist(ii)
+            i = pollist(k)
          end if
          if (i .ne. 0) then
             change = .true.
@@ -1122,31 +1301,46 @@ c
 c     repeat polarizability values if parameters were altered
 c
       if (change) then
-         write (iout,90)
-   90    format (/,' Atomic Polarizabilities for Multipole Sites :')
-         write (iout,100)
-  100    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-         do ii = 1, n
-            i = pollist(ii)
-            if (i .eq. 0) then
-               write (iout,110)  ii,name(ii)
-  110          format (i8,6x,a3,12x,'--',13x,'--')
+         write (iout,170)
+  170    format (/,' Atomic Polarizabilities for Multipole Sites :')
+         if (pmodel .eq. 'AMOEBA') then
+            write (iout,180)
+  180       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+         else
+            write (iout,190)
+  190       format (/,5x,'Atom',5x,'Name',7x,'Polarize',/)
+         end if
+         do k = 1, n
+            i = pollist(k)
+            if (pmodel .eq. 'AMOEBA') then
+               if (i .eq. 0) then
+                  write (iout,200)  k,name(k)
+  200             format (i8,6x,a3,12x,'--',13x,'--')
+               else
+                  write (iout,210)  k,name(k),polarity(i),thole(i)
+  210             format (i8,6x,a3,4x,f12.4,3x,f12.4)
+               end if
             else
-               write (iout,120)  ii,name(ii),polarity(i),thole(i)
-  120          format (i8,6x,a3,4x,f12.4,3x,f12.4)
+               if (i .eq. 0) then
+                  write (iout,220)  k,name(k)
+  220             format (i8,6x,a3,12x,'--')
+               else
+                  write (iout,230)  k,name(k),polarity(i)
+  230             format (i8,6x,a3,4x,f12.4)
+               end if
             end if
          end do
       end if
 c
 c     use bonded atoms as initial guess at polarization groups
 c
-      write (iout,130)
-  130 format (/,' The default is to place all Atoms into one',
-     &           ' Polarization Group;',
+      write (iout,240)
+  240 format (/,' The default is to place all atoms into one',
+     &           ' polarization group;',
      &        /,' This can be altered by entering a series of',
-     &           ' Bonded Atom Pairs',
-     &        /,' that separate the Molecule into distinct',
-     &           ' Polarization Groups')
+     &           ' bonded atom pairs',
+     &        /,' that separate the molecule into distinct',
+     &           ' polarization groups')
       do i = 1, n
          do j = 1, n12(i)
             pgrp(j,i) = i12(j,i)
@@ -1159,20 +1353,20 @@ c
       i = -1
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=140,end=140)  i
+         read (string,*,err=250,end=250)  i
          if (i .eq. 0)  query = .false.
       end if
-  140 continue
+  250 continue
       do while (query)
          ia = 0
          ib = 0
-         write (iout,150)
-  150    format (/,' Enter a Bond between Polarization Groups',
+         write (iout,260)
+  260    format (/,' Enter a Bond between Polarization Groups',
      &              ' [<CR>=Exit] :  ',$)
-         read (input,160)  record
-  160    format (a240)
-         read (record,*,err=170,end=170)  ia,ib
-  170    continue
+         read (input,270)  record
+  270    format (a240)
+         read (record,*,err=280,end=280)  ia,ib
+  280    continue
          if (ia.eq.0 .or. ib.eq.0) then
             query = .false.
          else
@@ -1198,18 +1392,73 @@ c
 c
 c     list the polarization group for each multipole site
 c
-      write (iout,180)
-  180 format (/,' Polarization Groups for Multipole Sites :')
-      write (iout,190)
-  190 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
+      write (iout,290)
+  290 format (/,' Polarization Groups for Multipole Sites :')
+      write (iout,300)
+  300 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
      &           ' Definition',/)
       do i = 1, n
          k = 0
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0)  k = j
          end do
-         write (iout,200)  i,name(i),(pgrp(j,i),j=1,k)
-  200    format (i8,6x,a3,8x,20i6)
+         write (iout,310)  i,name(i),(pgrp(j,i),j=1,k)
+  310    format (i8,6x,a3,8x,20i6)
+      end do
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  function chkarom  --  check for atom in aromatic ring  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "chkatom" tests for the presence of a specified atom as a
+c     member of an aromatic ring
+c
+c
+      function chkarom (iatom)
+      use atomid
+      use couple
+      use ring
+      implicit none
+      integer i,j,k
+      integer iatom
+      logical chkarom
+      logical member
+      logical trigonal
+c
+c
+c     determine membership in 5-membered aromatic ring
+c
+      chkarom = .false.
+      do i = 1, nring5
+         trigonal = .true.
+         member = .false.
+         do j = 1, 5
+            k = iring5(j,i)
+            if (k .eq. iatom)  member = .true.
+            if (atomic(k).eq.6 .and. n12(k).ne.3)  trigonal = .false.
+            if (atomic(k).eq.7 .and. n12(k).eq.4)  trigonal = .false.
+         end do
+         if (member .and. trigonal)  chkarom = .true.
+      end do
+c
+c     determine membership in 6-membered aromatic ring
+c
+      do i = 1, nring6
+         trigonal = .true.
+         member = .false.
+         do j = 1, 6
+            k = iring6(j,i)
+            if (k .eq. iatom)  member = .true.
+            if (atomic(k).eq.6 .and. n12(k).ne.3)  trigonal = .false.
+            if (atomic(k).eq.7 .and. n12(k).eq.4)  trigonal = .false.
+         end do
+         if (member .and. trigonal)  chkarom = .true.
       end do
       return
       end
@@ -1736,7 +1985,7 @@ c
                rr7k = dmpk(7) * rr7
                fid(1) = -xr*(rr3*corek + rr3k*valk
      &                     - rr5k*dkr + rr7k*qkr)
-     &                     - rr3k*dkx + 2.0d0*rr5k*qkx        
+     &                     - rr3k*dkx + 2.0d0*rr5k*qkx
                fid(2) = -yr*(rr3*corek + rr3k*valk
      &                     - rr5k*dkr + rr7k*qkr)
      &                     - rr3k*dky + 2.0d0*rr5k*qky
@@ -2002,8 +2251,8 @@ c
                end do
                do j = 1, np12(i)
                   gscale(ip12(j,i)) = u2scale - d2scale
-              end do
-                do j = 1, np13(i)
+               end do
+               do j = 1, np13(i)
                   gscale(ip13(j,i)) = u3scale - d3scale
                end do
                do j = 1, np14(i)
