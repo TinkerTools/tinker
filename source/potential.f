@@ -526,11 +526,11 @@ c
          if (grdmin .le. 0.0d0) then
             write (iout,360)
   360       format (/,' Enter RMS Gradient Termination Criterion',
-     &                 ' [0.1] :  ',$)
+     &                 ' [0.01] :  ',$)
             read (input,370)  grdmin
   370       format (f20.0)
          end if
-         if (grdmin .le. 0.0d0)  grdmin = 0.1d0
+         if (grdmin .le. 0.0d0)  grdmin = 0.01d0
       end if
 c
 c     setup the potential computation for alternative models
@@ -1273,8 +1273,8 @@ c
 c
 c     get the components of the overall objective function
 c
-      ep = sqrt(ep/dble(npoint))
-      er = rscale * er
+      ep = ep/dble(npoint)
+      er = rscale * er / dble(nvar)
       ec = cscale * ec
       et = tscale * et
 c
@@ -1335,8 +1335,8 @@ c
             end if
          end do
          er = er + (xx(k)-0.5d0*eps-fit0(k))**2
-         ep = sqrt(ep/dble(npoint))
-         er = rscale * er
+         ep = ep/dble(npoint)
+         er = rscale * er / dble(m)
          ec = cscale * ec
          et = tscale * et
          e0 = ep + er + ec + et
@@ -1392,8 +1392,8 @@ c
             end if
          end do
          er = er + (xx(k)+0.5d0*eps-fit0(k))**2
-         ep = sqrt(ep/dble(npoint))
-         er = rscale * er
+         ep = ep/dble(npoint)
+         er = rscale * er / dble(m)
          ec = cscale * ec
          et = tscale * et
          e = ep + er + ec + et

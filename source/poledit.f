@@ -1491,7 +1491,7 @@ c
       use polar
       use units
       implicit none
-      integer i,j,ii
+      integer i,j,k
       integer ixaxe
       integer iyaxe
       integer izaxe
@@ -1550,10 +1550,10 @@ c
       write (iout,10)
    10 format (/,' Multipoles after Removal of Intergroup',
      &           ' Polarization :')
-      do ii = 1, n
-         i = pollist(ii)
+      do k = 1, n
+         i = pollist(k)
          if (i .eq. 0) then
-            write (iout,20)  ii,name(ii),atomic(ii)
+            write (iout,20)  k,name(k),atomic(k)
    20       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,30)
@@ -1563,7 +1563,7 @@ c
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,40)  ii,name(ii),atomic(ii)
+            write (iout,40)  k,name(k),atomic(k)
    40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,50)  polaxe(i),izaxe,ixaxe,iyaxe
@@ -2652,10 +2652,10 @@ c
       write (iout,90)
    90 format (/,' Final Multipole Moments for the AMOEBA Force',
      &           ' Field :')
-      do ii = 1, n
-         i = pollist(ii)
+      do k = 1, n
+         i = pollist(k)
          if (i .eq. 0) then
-            write (iout,100)  ii,name(ii),atomic(ii)
+            write (iout,100)  k,name(k),atomic(k)
   100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,110)
@@ -2665,7 +2665,7 @@ c
             ixaxe = xaxis(i)
             iyaxe = yaxis(i)
             if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,120)  ii,name(ii),atomic(ii)
+            write (iout,120)  k,name(k),atomic(k)
   120       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,130)  polaxe(i),izaxe,ixaxe,iyaxe
