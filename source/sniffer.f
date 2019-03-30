@@ -129,6 +129,10 @@ c
       outfile = minfile
       coordtype = 'CARTESIAN'
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(3*n))
+c
 c     set scaling parameter for function and derivative values;
 c     use square root of median eigenvalue of a typical Hessian
 c

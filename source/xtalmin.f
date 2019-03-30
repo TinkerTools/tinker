@@ -104,6 +104,10 @@ c
      &        /,'                                Beta ',f12.4,
      &        /,'                                Gamma',f12.4)
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(3*n+6))
+c
 c     set scale factors to apply to optimization variables
 c
       set_scale = .true.

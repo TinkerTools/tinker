@@ -487,6 +487,10 @@ c
       nvxx = nvxx + 1
       vxx(nvxx) = vcon
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(3*n))
+c
 c     get initial energy difference
 c
       do i = 1, nconf

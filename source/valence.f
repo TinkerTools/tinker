@@ -1912,6 +1912,10 @@ c
       data axis  / 'X','Y','Z' /
 c
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(3*n))
+c
 c     scale the coordinates of each active atom; use the
 c     square root of median eigenvalue of typical Hessian
 c

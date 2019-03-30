@@ -61,10 +61,12 @@ c
       if (.not. set_scale) then
          set_scale = .true.
          if (coordtype .eq. 'CARTESIAN') then
+            if (.not. allocated(scale))  allocate (scale(3*n))
             do i = 1, 3*n
                scale(i) = 1.0d0
             end do
          else if (coordtype .eq. 'INTERNAL') then
+            if (.not. allocated(scale))  allocate (scale(nomega))
             do i = 1, nomega
                scale(i) = 1.0d0
             end do

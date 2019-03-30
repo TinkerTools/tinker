@@ -74,6 +74,10 @@ c
       close (unit=imin)
       outfile = minfile
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(nomega))
+c
 c     set scaling parameter for function and derivative values;
 c     use square root of median eigenvalue of typical Hessian
 c

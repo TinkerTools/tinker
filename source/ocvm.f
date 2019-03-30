@@ -111,6 +111,10 @@ c
       restart = .true.
       done = .false.
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(nvar))
+c
 c     set default values for variable scale factors
 c
       if (.not. set_scale) then

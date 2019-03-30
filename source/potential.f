@@ -89,8 +89,6 @@ c
       allocate (ipgrid(maxpgrd,maxref))
       allocate (pgrid(3,maxpgrd,maxref))
       allocate (epot(2,maxpgrd,maxref))
-      allocate (gatm(maxatm))
-      allocate (fatm(maxatm))
 c
 c     initialize target molecular dipole and quadrupole values
 c
@@ -250,6 +248,11 @@ c
          write (iout,170)  nconf
   170    format (/,' Structures Used for Potential Analysis :',i6)
       end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      allocate (gatm(namax))
+      allocate (fatm(namax))
 c
 c     perform dynamic allocation of some local arrays
 c

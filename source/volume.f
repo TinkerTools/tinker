@@ -66,8 +66,8 @@ c
       integer kstart,kstop
       integer mstart,mstop
       integer isum,icube,itemp
-      integer itab(maxatm)
       integer inov(maxarc)
+      integer, allocatable :: itab(:)
       integer cube(2,maxcube,maxcube,maxcube)
       real*8 xmin,ymin,zmin
       real*8 xmax,ymax,zmax
@@ -121,6 +121,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (itab(n))
       allocate (volrad(n))
       allocate (skip(n))
 c
@@ -493,6 +494,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (itab)
       deallocate (volrad)
       deallocate (skip)
       return

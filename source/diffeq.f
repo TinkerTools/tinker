@@ -398,8 +398,7 @@ c
       subroutine pzextr (iest,nvar,xest,yest,yz,dy)
       use sizes
       implicit none
-      integer maxgda,imax
-      parameter (maxgda=4*maxatm)
+      integer imax
       parameter (imax=13)
       integer i,j,iest,nvar
       real*8 xest,delta

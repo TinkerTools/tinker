@@ -1357,6 +1357,10 @@ c
          allocate (zvold(n))
       end if
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. allocated(scale))  allocate (scale(3*n))
+c
 c     mark for use of all atoms, and set scale factors
 c
       nvar = 0
