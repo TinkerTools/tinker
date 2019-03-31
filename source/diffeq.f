@@ -17,7 +17,7 @@ c     differential equation using an adaptive stepsize method to
 c     solve the corresponding coupled first-order equations of the
 c     general form dyi/dx = f(x,y1,...,yn) for yi = y1,...,yn
 c
-c     variables and parameters :
+c     variables and parameters:
 c
 c     nvar      number of coupled first-order differential equations
 c     y         contains the values of the dependent variables

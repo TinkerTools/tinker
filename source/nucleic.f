@@ -61,10 +61,13 @@ c
       call getkey
       call field
 c
-c     get the sequence, build a Z-matrix, convert to Cartesians
+c     get the sequence and build Z-matrix for the structure
 c
       call getseqn
       call nucchain
+c
+c     find connectivities and generate Cartesian coordinates
+c
       call connect
       call molecule
       call makexyz

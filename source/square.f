@@ -12,12 +12,22 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "square" is a nonlinear least squares routine derived from
-c     the IMSL routine BCLSF and More's Minpack routine LMDER; the
-c     Jacobian is estimated by finite differences and bounds can
-c     be specified for the variables to be refined
+c     "square" is a nonlinear least squares routine derived from the
+c     IMSL BCLSF routine and the MINPACK LMDER routine; the Jacobian
+c     is estimated by finite differences and bounds can be specified
+c     for the variables to be refined
 c
-c     arguments and variables :
+c     literature references:
+c
+c     B. S. Garbow, K. E. Hillstrom and J. J. More, "MINPACK Subroutine
+c     LMDER", Argonne National Laboratory, March 1980
+c
+c     "BCLSF: Solve Nonlinear Least Squares Problems Subject to Bounds
+c     on the Variables Using a Modified Levenberg-Marquardt Algorithm
+c     and a Finite-Difference Jacobian", IMSL Fortran Library V7.0,
+c     Rogue Wave Software, October 2010
+c
+c     arguments and variables:
 c
 c     n         number of least squares variables
 c     m         number of residual functions
@@ -37,7 +47,7 @@ c                 of the Jacobian at the approximate solution
 c     stpmax    scalar containing maximum allowed step size
 c     delta     scalar containing the trust region radius
 c
-c     required external routines :
+c     required external routines:
 c
 c     rsdvalue   subroutine to evaluate residual function values
 c     lsqwrite   subroutine to write out info about current status
@@ -565,12 +575,16 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "lmstep" computes the Levenberg-Marquardt step during a
-c     nonlinear least squares calculation; based on ideas from
-c     the Minpack routine LMPAR together with the internal doubling
-c     strategy of Dennis and Schnabel
+c     "lmstep" computes a Levenberg-Marquardt step during a nonlinear
+c     least squares calculation using ideas from the MINPACK routine
+c     LMPAR and the internal doubling strategy of Dennis and Schnabel
 c
-c     arguments and variables :
+c     literature reference:
+c
+c     J. E. Dennis, Jr. and R. B. Schnabel, "Numerical Methods for
+c     Unconstrained Optimization and Nonlinear Equations", SIAM, 1987
+c
+c     arguments and variables:
 c
 c     n        number of least squares variables
 c     m        number of residual functions
@@ -641,9 +655,8 @@ c
       allocate (work1(n))
       allocate (work2(n))
 c
-c     if initial trust region is not provided by the user,
-c     compute and use the length of the Cauchy step given
-c     by beta = norm2(r*trans(p)*d**(-2)*g)**2
+c     if initial trust region is not provided, compute the Cauchy
+c     step length given by beta = norm2(r*trans(p)*d**(-2)*g)**2
 c
       if (delta .eq. 0.0d0) then
          amu = 0.0d0
@@ -671,11 +684,10 @@ c
          delta = min(delta,stpmax)
       end if
 c
-c     the following is done only on the first time through
-c     this iteration: (1) compute the Gauss-Newton step;
-c     if the Jacobian is rank-deficient, obtain a least
-c     squares solution, (2) compute the length of the scaled
-c     Gauss-Newton step, (3) compute the norm of the scaled
+c     the below is only done the first time through this iteration:
+c     (1) compute a Gauss-Newton step; if Jacobian is rank-deficient,
+c     obtain a least squares solution, (2) compute the length of the
+c     scaled Gauss-Newton step, (3) compute the norm of the scaled
 c     gradient used in computing an upper bound for "amu"
 c
       if (first) then
@@ -755,8 +767,8 @@ c
                   work1(j) = gnstep(k) * xscale(k)**2
                end do
 c
-c     obtain trans(r**-1)*(trans(p)*s) by solving the
-c     system of equations trans(r)*work1 = work1
+c     obtain trans(r**-1)*(trans(p)*s) by solving the system of
+c     equations trans(r)*work1 = work1
 c
                work1(n) = work1(n) / a(n,n)
                do j = n-1, 1, -1
@@ -792,7 +804,7 @@ c
             end do
 c
 c     solve the damped least squares system for the value of the
-c     Levenberg-Marquardt step using More's Minpack technique
+c     Levenberg-Marquardt step using the MINPACK LMPAR method
 c
             call qrsolve (n,m,a,ipvt,work1,qtf,sa,diag,work2)
             do j = 1, n
@@ -852,18 +864,23 @@ c
       end
 c
 c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine trust  --  update the model trust region  ##
-c     ##                                                       ##
-c     ###########################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine trust  --  update of the model trust region  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "trust" updates the model trust region for a nonlinear
-c     least squares calculation; based on ideas found in NL2SOL
-c     and in Dennis and Schnabel's book
+c     "trust" updates the model trust region for a nonlinear least
+c     squares calculation based on ideas found in NL2SOL and Dennis
+c     and Schnabel's book
 c
-c     arguments and variables :
+c     literature reference:
+c
+c     J. E. Dennis, Jr. and R. B. Schnabel, "Numerical Methods for
+c     Unconstrained Optimization and Nonlinear Equations", SIAM, 1987
+c
+c     arguments and variables:
 c
 c     n         number of least squares variables
 c     m         number of residual functions
@@ -907,7 +924,7 @@ c     xlo       vector of length n containing the lower bounds
 c     xhi       vector of length n containing the upper bounds
 c     nactive   number of columns in the active Jacobian
 c
-c     required external routines :
+c     required external routines:
 c
 c     rsdvalue   subroutine to evaluate residual function values
 c

@@ -24,7 +24,7 @@ c               i - (1/u(k))*u*u(transpose)
 c
 c     where u has zeros in the first k-1 positions
 c
-c     arguments and variables :
+c     arguments and variables:
 c
 c     n        number of columns in the "a" matrix
 c     m        number of rows in the "a" matrix
@@ -155,7 +155,7 @@ c
 c     "qrsolve" solves a*x = b and d*x = 0 in the least squares sense;
 c     used with routine "qrfact" to solve least squares problems
 c
-c     arguments and variables :
+c     arguments and variables:
 c
 c     n        number of rows and columns in the matrix r
 c     np       leading physical dimension of r in the calling program
