@@ -658,7 +658,7 @@ c
                tmpchg(k) = fitchg(k)
                tmppol(k) = fitpol(k)
             end do
-            call varprm (nvar,xx,0,0.0d0)
+            call varprm (nvar,xx)
             nvar = next
             do k = 1, maxtyp
                fitchg(k) = tmpchg(k)
@@ -677,7 +677,7 @@ c
          do j = 1, nconf
             call getref (j)
             call setelect
-            call varprm (nvar,xx,0,0.0d0)
+            call varprm (nvar,xx)
             call prmvar (nvar,xx)
             if (use_mpole) then
                call chkpole
@@ -1230,7 +1230,7 @@ c
       end do
       tscale = 300.0d0
       cscale = 10000.0d0
-      rscale = 0.3d0 * sqrt(resp) * dble(npoint)/dble(nvar)
+      rscale = 0.1d0 * sqrt(resp) * dble(npoint)/dble(nvar)
 c
 c     initialize counters for parameters and residual components
 c
@@ -1246,7 +1246,7 @@ c
       do j = 1, nconf
          call getref (j)
          call setelect
-         call varprm (nvar,xx,0,0.0d0)
+         call varprm (nvar,xx)
          if (use_mpole)  call rotpole
          if (use_polar) then
             domlst = .true.
@@ -1308,6 +1308,157 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
+c     ##  subroutine varprm  --  optimization to electrostatics  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "varprm" copies the current optimization values into the
+c     corresponding electrostatic potential energy parameters
+c
+c
+      subroutine varprm (nvar,xx)
+      use atoms
+      use charge
+      use mpole
+      use potent
+      use potfit
+      use units
+      implicit none
+      integer i,j
+      integer ii,it
+      integer nvar
+      real*8 dterm,qterm
+      real*8 xx(*)
+      logical done
+c
+c
+c     translate optimization values back to partial charges
+c
+      do i = 1, nion
+         done = .true.
+         ii = iion(i)
+         it = type(ii)
+         if (fatm(ii))  done = .false.
+         if (.not. done) then
+            if (fitchg(it)) then
+               done = .true.
+               pchg(i) = fchg(it)
+            end if
+         end if
+         if (.not. done) then
+            if (pchg(i) .ne. 0.0d0) then
+               nvar = nvar + 1
+               pchg(i) = xx(nvar)
+            end if
+            fitchg(it) = .true.
+            fchg(it) = pchg(i)
+         end if
+      end do
+c
+c     conversion factors for dipole and quadrupole moments
+c
+      dterm = bohr
+      qterm = bohr**2 / 3.0d0
+c
+c     translate optimization values back to atomic multipoles
+c
+      do i = 1, npole
+         done = .true.
+         ii = ipole(i)
+         it = type(ii)
+         if (fatm(ii))  done = .false.
+         if (.not. done) then
+            if (fitpol(it)) then
+               done = .true.
+               do j = 1, 13
+                  pole(j,i) = fpol(j,it)
+               end do
+            end if
+         end if
+         if (.not. done) then
+            if (fit_mpl .and. pole(1,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(1,i) = xx(nvar)
+            end if
+            if (fit_dpl .and. pole(2,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(2,i) = dterm * xx(nvar)
+            end if
+            if (fit_dpl .and. pole(3,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(3,i) = dterm * xx(nvar)
+            end if
+            if (fit_dpl .and. pole(4,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(4,i) = dterm * xx(nvar)
+            end if
+            if (fit_qdp .and. pole(5,i).ne.0.0d0) then
+               if (pole(5,i).ne.pole(9,i) .and.
+     &             pole(5,i).ne.pole(13,i)) then
+                  nvar = nvar + 1
+                  pole(5,i) = qterm * xx(nvar)
+                  if (pole(9,i) .eq. pole(13,i)) then
+                     pole(9,i) = -0.5d0 * pole(5,i)
+                     pole(13,i) = pole(9,i)
+                  end if
+               end if
+            end if
+            if (fit_qdp .and. pole(6,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(6,i) = qterm * xx(nvar)
+               pole(8,i) = qterm * xx(nvar)
+            end if
+            if (fit_qdp .and. pole(7,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(7,i) = qterm * xx(nvar)
+               pole(11,i) = qterm * xx(nvar)
+            end if
+            if (fit_qdp .and. pole(9,i).ne.0.0d0) then
+               if (pole(9,i).ne.pole(5,i) .and.
+     &             pole(9,i).ne.pole(13,i)) then
+                  nvar = nvar + 1
+                  pole(9,i) = qterm * xx(nvar)
+                  if (pole(5,i) .eq. pole(13,i)) then
+                     pole(5,i) = -0.5d0 * pole(9,i)
+                     pole(13,i) = pole(5,i)
+                  end if
+               end if
+            end if
+            if (fit_qdp .and. pole(10,i).ne.0.0d0) then
+               nvar = nvar + 1
+               pole(10,i) = qterm * xx(nvar)
+               pole(12,i) = qterm * xx(nvar)
+            end if
+            if (fit_qdp .and. pole(13,i).ne.0.0d0) then
+               if (pole(5,i) .eq. pole(9,i)) then
+                  nvar = nvar + 1
+                  pole(13,i) = qterm * xx(nvar)
+                  pole(5,i) = -0.5d0 * pole(13,i)
+                  pole(9,i) = pole(5,i)
+               else
+                  pole(13,i) = -pole(5,i) - pole(9,i)
+               end if
+            end if
+            fitpol(it) = .true.
+            do j = 1, 13
+               fpol(j,it) = pole(j,i)
+            end do
+         end if
+      end do
+c
+c     check chiral multipoles and rotate into global frame
+c
+      if (use_mpole) then
+         call chkpole
+         call rotpole
+      end if
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
 c     ##  subroutine prmvar  --  electrostatics to optimization  ##
 c     ##                                                         ##
 c     #############################################################
@@ -1337,11 +1488,6 @@ c
       logical done
       character*17 prmtyp
 c
-c
-c     conversion factors for dipole and quadrupole moments
-c
-      dterm = 1.0d0 / bohr
-      qterm = 3.0d0 / bohr**2
 c
 c     regularize charges and multipoles to desired precision
 c
@@ -1475,7 +1621,7 @@ c
             if (pchg(i) .ne. 0.0d0) then
                nvar = nvar + 1
                xx(nvar) = pchg(i)
-               write (iout,70)  nvar,it,'Charge  ',pchg(i)
+               write (iout,70)  nvar,it,'Charge  ',xx(nvar)
    70          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,80)  it,'Charge  ',pchg(i)
@@ -1483,6 +1629,11 @@ c
             end if
          end if
       end do
+c
+c     conversion factors for dipole and quadrupole moments
+c
+      dterm = 1.0d0 / bohr
+      qterm = 3.0d0 / bohr**2
 c
 c     get optimization parameters from atomic multipole values
 c
@@ -1499,7 +1650,7 @@ c
             if (fit_mpl .and. pole(1,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = pole(1,i)
-               write (iout,90)  nvar,it,'Monopole',pole(1,i)
+               write (iout,90)  nvar,it,'Monopole',xx(nvar)
    90          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,100)  it,'Monopole',pole(1,i)
@@ -1507,17 +1658,17 @@ c
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
-               xx(nvar) = pole(2,i)
-               write (iout,110)  nvar,it,'X-Dipole',dterm*pole(2,i)
+               xx(nvar) = dterm * pole(2,i)
+               write (iout,110)  nvar,it,'X-Dipole',xx(nvar)
   110          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
-               write (iout,120)  it,'X-Dipole',pole(2,i)
+               write (iout,120)  it,'X-Dipole',dterm*pole(2,i)
   120          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(3,i).ne.0.0d0) then
                nvar = nvar + 1
-               xx(nvar) = pole(3,i)
-               write (iout,130)  nvar,it,'Y-Dipole',dterm*pole(3,i)
+               xx(nvar) = dterm * pole(3,i)
+               write (iout,130)  nvar,it,'Y-Dipole',xx(nvar)
   130          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,140)  it,'Y-Dipole',dterm*pole(3,i)
@@ -1525,8 +1676,8 @@ c
             end if
             if (fit_dpl .and. pole(4,i).ne.0.0d0) then
                nvar = nvar + 1
-               xx(nvar) = pole(4,i)
-               write (iout,150)  nvar,it,'Z-Dipole',dterm*pole(4,i)
+               xx(nvar) = dterm * pole(4,i)
+               write (iout,150)  nvar,it,'Z-Dipole',xx(nvar)
   150          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,160)  it,'Z-Dipole',dterm*pole(4,i)
@@ -1536,8 +1687,8 @@ c
                if (pole(5,i).ne.pole(9,i) .and.
      &             pole(5,i).ne.pole(13,i)) then
                   nvar = nvar + 1
-                  xx(nvar) = pole(5,i)
-                  write (iout,170)  nvar,it,'XX-Quad ',qterm*pole(5,i)
+                  xx(nvar) = qterm * pole(5,i)
+                  write (iout,170)  nvar,it,'XX-Quad ',xx(nvar)
   170             format (i6,7x,i8,13x,a8,5x,f12.5)
                else
                   write (iout,180)    it,'XX-Quad ',qterm*pole(5,i)
@@ -1549,8 +1700,8 @@ c
             end if
             if (fit_qdp .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
-               xx(nvar) = pole(6,i)
-               write (iout,200)  nvar,it,'XY-Quad ',qterm*pole(6,i)
+               xx(nvar) = qterm * pole(6,i)
+               write (iout,200)  nvar,it,'XY-Quad ',xx(nvar)
   200          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,210)  it,'XY-Quad ',qterm*pole(6,i)
@@ -1558,8 +1709,8 @@ c
             end if
             if (fit_qdp .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
-               xx(nvar) = pole(7,i)
-               write (iout,220)  nvar,it,'XZ-Quad ',qterm*pole(7,i)
+               xx(nvar) = qterm * pole(7,i)
+               write (iout,220)  nvar,it,'XZ-Quad ',xx(nvar)
   220          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,230)  it,'XZ-Quad ',qterm*pole(7,i)
@@ -1569,8 +1720,8 @@ c
                if (pole(9,i).ne.pole(5,i) .and.
      &             pole(9,i).ne.pole(13,i)) then
                   nvar = nvar + 1
-                  xx(nvar) = pole(9,i)
-                  write (iout,240)  nvar,it,'YY-Quad ',qterm*pole(9,i)
+                  xx(nvar) = qterm * pole(9,i)
+                  write (iout,240)  nvar,it,'YY-Quad ',xx(nvar)
   240             format (i6,7x,i8,13x,a8,5x,f12.5)
                else
                   write (iout,250)  it,'YY-Quad ',qterm*pole(9,i)
@@ -1582,8 +1733,8 @@ c
             end if
             if (fit_qdp .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
-               xx(nvar) = pole(10,i)
-               write (iout,270)  nvar,it,'YZ-Quad ',qterm*pole(10,i)
+               xx(nvar) = qterm * pole(10,i)
+               write (iout,270)  nvar,it,'YZ-Quad ',xx(nvar)
   270          format (i6,7x,i8,13x,a8,5x,f12.5)
             else
                write (iout,280)  it,'YZ-Quad ',qterm*pole(10,i)
@@ -1592,8 +1743,8 @@ c
             if (fit_qdp .and. pole(13,i).ne.0.0d0) then
                if (pole(5,i) .eq. pole(9,i)) then
                   nvar = nvar + 1
-                  xx(nvar) = pole(13,i)
-                  write (iout,290)  nvar,it,'ZZ-Quad ',qterm*pole(13,i)
+                  xx(nvar) = qterm * pole(13,i)
+                  write (iout,290)  nvar,it,'ZZ-Quad ',xx(nvar)
   290             format (i6,7x,i8,13x,a8,5x,f12.5)
                else
                   write (iout,300)  it,'ZZ-Quad ',qterm*pole(13,i)
@@ -1605,165 +1756,6 @@ c
             end if
          end if
       end do
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine varprm  --  optimization to electrostatics  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "varprm" copies the current optimization values into the
-c     corresponding electrostatic potential energy parameters
-c
-c
-      subroutine varprm (nvar,xx,ivar,eps)
-      use atoms
-      use charge
-      use mpole
-      use potent
-      use potfit
-      implicit none
-      integer i,j
-      integer ii,it
-      integer nvar,ivar
-      real*8 eps
-      real*8 xx(*)
-      logical done
-c
-c
-c     translate optimization values back to partial charges
-c
-      do i = 1, nion
-         done = .true.
-         ii = iion(i)
-         it = type(ii)
-         if (fatm(ii))  done = .false.
-         if (.not. done) then
-            if (fitchg(it)) then
-               done = .true.
-               pchg(i) = fchg(it)
-            end if
-         end if
-         if (.not. done) then
-            if (pchg(i) .ne. 0.0d0) then
-               nvar = nvar + 1
-               pchg(i) = xx(nvar)
-               if (ivar .eq. nvar)  pchg(i) = pchg(i) + eps
-            end if
-            fitchg(it) = .true.
-            fchg(it) = pchg(i)
-         end if
-      end do
-c
-c     translate optimization values back to atomic multipoles
-c
-      do i = 1, npole
-         done = .true.
-         ii = ipole(i)
-         it = type(ii)
-         if (fatm(ii))  done = .false.
-         if (.not. done) then
-            if (fitpol(it)) then
-               done = .true.
-               do j = 1, 13
-                  pole(j,i) = fpol(j,it)
-               end do
-            end if
-         end if
-         if (.not. done) then
-            if (fit_mpl .and. pole(1,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(1,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(1,i) = pole(1,i) + eps
-            end if
-            if (fit_dpl .and. pole(2,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(2,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(2,i) = pole(2,i) + eps
-            end if
-            if (fit_dpl .and. pole(3,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(3,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(3,i) = pole(3,i) + eps
-            end if
-            if (fit_dpl .and. pole(4,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(4,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(4,i) = pole(4,i) + eps
-            end if
-            if (fit_qdp .and. pole(5,i).ne.0.0d0) then
-               if (pole(5,i).ne.pole(9,i) .and.
-     &             pole(5,i).ne.pole(13,i)) then
-                  nvar = nvar + 1
-                  pole(5,i) = xx(nvar)
-                  if (ivar .eq. nvar)  pole(5,i) = pole(5,i) + eps
-                  if (pole(9,i) .eq. pole(13,i)) then
-                     pole(9,i) = -0.5d0 * pole(5,i)
-                     pole(13,i) = pole(9,i)
-                  end if
-               end if
-            end if
-            if (fit_qdp .and. pole(6,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(6,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(6,i) = pole(6,i) + eps
-               pole(8,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(8,i) = pole(8,i) + eps
-            end if
-            if (fit_qdp .and. pole(7,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(7,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(7,i) = pole(7,i) + eps
-               pole(11,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(11,i) = pole(11,i) + eps
-            end if
-            if (fit_qdp .and. pole(9,i).ne.0.0d0) then
-               if (pole(9,i).ne.pole(5,i) .and.
-     &             pole(9,i).ne.pole(13,i)) then
-                  nvar = nvar + 1
-                  pole(9,i) = xx(nvar)
-                  if (ivar .eq. nvar)  pole(9,i) = pole(9,i) + eps
-                  if (pole(5,i) .eq. pole(13,i)) then
-                     pole(5,i) = -0.5d0 * pole(9,i)
-                     pole(13,i) = pole(5,i)
-                  end if
-               end if
-            end if
-            if (fit_qdp .and. pole(10,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(10,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(10,i) = pole(10,i) + eps
-               pole(12,i) = xx(nvar)
-               if (ivar .eq. nvar)  pole(12,i) = pole(12,i) + eps
-            end if
-            if (fit_qdp .and. pole(13,i).ne.0.0d0) then
-               if (pole(5,i) .eq. pole(9,i)) then
-                  nvar = nvar + 1
-                  pole(13,i) = xx(nvar)
-                  if (ivar .eq. nvar)  pole(13,i) = pole(13,i) + eps
-                  pole(5,i) = -0.5d0 * pole(13,i)
-                  pole(9,i) = pole(5,i)
-               else
-                  pole(13,i) = -pole(5,i) - pole(9,i)
-               end if
-            end if
-            fitpol(it) = .true.
-            do j = 1, 13
-               fpol(j,it) = pole(j,i)
-            end do
-         end if
-      end do
-c
-c     check chiral multipoles and rotate into global frame
-c
-      if (use_mpole) then
-         call chkpole
-         call rotpole
-      end if
       return
       end
 c
