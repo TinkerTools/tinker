@@ -1489,6 +1489,11 @@ c
       character*17 prmtyp
 c
 c
+c     conversion factors for dipole and quadrupole moments
+c
+      dterm = 1.0d0 / bohr
+      qterm = 3.0d0 / bohr**2
+c
 c     regularize charges and multipoles to desired precision
 c
       eps = 0.00001d0
@@ -1496,8 +1501,12 @@ c
          pchg(i) = dble(nint(pchg(i)/eps)) * eps
       end do
       do i = 1, npole
-         do j = 1, 13
-            pole(j,i) = dble(nint(pole(j,i)/eps)) * eps
+         pole(1,i) = dble(nint(pole(1,i)/eps)) * eps
+         do j = 2, 4
+            pole(j,i) = dble(nint(dterm*pole(j,i)/eps)) * eps/dterm
+         end do
+         do j = 5, 13
+            pole(j,i) = dble(nint(qterm*pole(j,i)/eps)) * eps/qterm
          end do
       end do
 c
@@ -1629,11 +1638,6 @@ c
             end if
          end if
       end do
-c
-c     conversion factors for dipole and quadrupole moments
-c
-      dterm = 1.0d0 / bohr
-      qterm = 3.0d0 / bohr**2
 c
 c     get optimization parameters from atomic multipole values
 c
