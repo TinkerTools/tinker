@@ -581,8 +581,8 @@ c     ################################################################
 c
 c
 c     "lmstep" computes a Levenberg-Marquardt step during a nonlinear
-c     least squares calculation using ideas from the MINPACK routine
-c     LMPAR and the internal doubling strategy of Dennis and Schnabel
+c     least squares calculation using ideas from the MINPACK LMPAR
+c     routine and the internal doubling strategy of Dennis and Schnabel
 c
 c     literature reference:
 c
@@ -620,17 +620,18 @@ c
       subroutine lmstep (n,m,ga,a,ipvt,xscale,qtf,stpmax,
      &                      delta,amu,first,sa,gauss)
       implicit none
-      integer i,j,k,m,n
-      integer nsing,niter
+      integer i,j,k
+      integer m,n,nsing
+      integer maxtry,ntry
       integer ipvt(*)
-      real*8 stpmax,delta,amu
-      real*8 alow,alpha
+      real*8 stpmax,delta
+      real*8 amu,alow,alpha
       real*8 amulow,amuhi
-      real*8 beta,small,sum
+      real*8 beta,high,sum
       real*8 deltap,gnleng
       real*8 phi,phip,phipi
       real*8 sgnorm,precise
-      real*8 high,tiny
+      real*8 tiny,eps
       real*8 stplen,temp
       real*8 ga(*)
       real*8 xscale(*)
@@ -649,10 +650,10 @@ c
       integer kiter
 c
 c
-c     set smallest floating point magnitude and spacing
+c     set minima for floating point magnitude and spacing
 c
-      tiny = precise (1)
-      small = precise (2)
+      tiny = 0.00000001d0
+      eps = 0.00000001d0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -737,8 +738,9 @@ c
          sgnorm = sqrt(sgnorm)
       end if
 c
-c     set the bounds on the computed step
+c     set bounds on number of iterations and computed step
 c
+      maxtry = 100
       high = 1.5d0
       alow = 0.75d0
 c
@@ -799,7 +801,7 @@ c
 c
 c     iterate until a satisfactory "amu" is generated
 c
-         niter = 0
+         ntry = 0
          done = .false.
          do while (.not. done)
             if (amu.lt.amulow .or. amu.gt.amuhi) then
@@ -810,8 +812,8 @@ c
                work1(j) = temp * xscale(j)
             end do
 c
-c     solve the damped least squares system for the value of the
-c     Levenberg-Marquardt step using the MINPACK LMPAR method
+c     solve the damped least squares system using the Levenberg-
+c     Marquardt step from the MINPACK LMPAR method
 c
             call qrsolve (n,m,a,ipvt,work1,qtf,sa,diag,work2)
             do j = 1, n
@@ -849,12 +851,12 @@ c
 c     check for an acceptable step or for too many iterations;
 c     otherwise update amulow, amuhi and amu for next iteration
 c
-            niter = niter + 1
+            ntry = ntry + 1
             if (stplen.ge.alow*delta .and. stplen.le.high*delta) then
                done = .true.
-            else if (amuhi-amulow .le. small) then
+            else if (amuhi-amulow .le. eps) then
                done = .true.
-            else if (niter .ge. 10) then
+            else if (ntry .ge. maxtry) then
                done = .true.
             else
                amulow = max(amulow,amu-(phi/phip))
