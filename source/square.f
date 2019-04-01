@@ -49,8 +49,8 @@ c     delta     scalar containing the trust region radius
 c
 c     required external routines:
 c
-c     rsdvalue   subroutine to evaluate residual function values
-c     lsqwrite   subroutine to write out info about current status
+c     rsdvalue  subroutine to evaluate residual function values
+c     lsqwrite  subroutine to write out info about current status
 c
 c
       subroutine square (n,m,xlo,xhi,xc,fc,gc,fjac,grdmin,
@@ -82,6 +82,7 @@ c
       real*8 fc(*)
       real*8 gc(*)
       real*8, allocatable :: xp(:)
+      real*8, allocatable :: xpprev(:)
       real*8, allocatable :: ga(:)
       real*8, allocatable :: gs(:)
       real*8, allocatable :: sc(:)
@@ -90,6 +91,7 @@ c
       real*8, allocatable :: xscale(:)
       real*8, allocatable :: rdiag(:)
       real*8, allocatable :: fp(:)
+      real*8, allocatable :: fpprev(:)
       real*8, allocatable :: ftemp(:)
       real*8, allocatable :: qtf(:)
       real*8 fjac(m,*)
@@ -153,6 +155,7 @@ c
       allocate (iactive(n))
       allocate (ipvt(n))
       allocate (xp(n))
+      allocate (xpprev(m))
       allocate (ga(n))
       allocate (gs(n))
       allocate (sc(n))
@@ -161,6 +164,7 @@ c
       allocate (xscale(n))
       allocate (rdiag(n))
       allocate (fp(m))
+      allocate (fpprev(m))
       allocate (ftemp(m))
       allocate (qtf(m))
 c
@@ -350,8 +354,9 @@ c
 c     check new point and update the trust region
 c
          call trust (n,m,xc,fcnorm,gc,fjac,ipvt,sc,sa,xscale,gauss,
-     &               stpmax,delta,icode,xp,fc,fp,fpnorm,bigstp,ncalls,
-     &               xlo,xhi,nactive,stpmin,rftol,faketol,rsdvalue)
+     &               stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,fpprev,
+     &               bigstp,ncalls,xlo,xhi,nactive,stpmin,rftol,
+     &               faketol,rsdvalue)
       end do
       if (icode .eq. 1)  done = .true.
 c
@@ -912,12 +917,12 @@ c                 5  means fpnorm is sufficiently small, but the
 c                      chance of taking a longer successful step
 c                      seems good that the current iteration is to
 c                      be continued with a new, doubled trust region
+c     xp        vector of length n containing the new iterate
 c     xpprev    vector with the value of xp at the  previous call
 c                 within this iteration
-c     fpprev    vector of length m containing f(xpprev)
-c     xp        vector of length n containing the new iterate
 c     fp        vector of length m containing the functions at xp
 c     fpnorm    scalar containing the norm of f(xp)
+c     fpprev    vector of length m containing f(xpprev)
 c     bigstp    flag set to true if maximum step length was taken
 c     ncalls    number of function evaluations used
 c     xlo       vector of length n containing the lower bounds
@@ -926,17 +931,14 @@ c     nactive   number of columns in the active Jacobian
 c
 c     required external routines:
 c
-c     rsdvalue   subroutine to evaluate residual function values
+c     rsdvalue  subroutine to evaluate residual function values
 c
 c
       subroutine trust (n,m,xc,fcnorm,gc,a,ipvt,sc,sa,xscale,gauss,
-     &                  stpmax,delta,icode,xp,fc,fp,fpnorm,bigstp,
-     &                  ncalls,xlo,xhi,nactive,stpmin,rftol,faketol,
-     &                  rsdvalue)
+     &                  stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,
+     &                  fpprev,bigstp,ncalls,xlo,xhi,nactive,stpmin,
+     &                  rftol,faketol,rsdvalue)
       implicit none
-      integer maxlsq,maxrsd
-      parameter (maxlsq=1000)
-      parameter (maxrsd=1000)
       integer i,j,k
       integer m,n,icode
       integer ncalls,nactive
@@ -948,22 +950,21 @@ c
       real*8 stplen,stpmin
       real*8 rftol,faketol
       real*8 alpha,temp,precise
-      real*8 xpprev(maxlsq)
-      real*8 fpprev(maxrsd)
       real*8 xc(*)
       real*8 gc(*)
       real*8 sc(*)
       real*8 sa(*)
       real*8 xp(*)
+      real*8 xpprev(*)
       real*8 fc(*)
       real*8 fp(*)
+      real*8 fpprev(*)
       real*8 xlo(*)
       real*8 xhi(*)
       real*8 xscale(*)
       real*8 a(m,*)
       logical gauss,bigstp
       logical feas,ltemp
-      save xpprev,fpprev
       save fpnrmp
       external rsdvalue
       external precise
