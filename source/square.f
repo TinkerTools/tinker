@@ -354,9 +354,9 @@ c
 c     check new point and update the trust region
 c
          call trust (n,m,xc,fcnorm,gc,fjac,ipvt,sc,sa,xscale,gauss,
-     &               stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,fpprev,
-     &               bigstp,ncalls,xlo,xhi,nactive,stpmin,rftol,
-     &               faketol,rsdvalue)
+     &               stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,
+     &               fpprev,bigstp,ncalls,xlo,xhi,nactive,stpmin,
+     &               rftol,faketol,rsdvalue)
       end do
       if (icode .eq. 1)  done = .true.
 c
@@ -371,8 +371,8 @@ c
       fcnorm = fpnorm
 c
 c     update the active vs inactive status of the variables;
-c     in a true active set strategy, at most one constraint
-c     is added to the active set per iteration
+c     in a true active set strategy, at most one constraint is
+c     added to the active set per iteration (via goto's below)
 c
       do j = 1, n
          if (iactive(j) .eq. 0) then
@@ -405,7 +405,7 @@ c
          end do
       end do
 c
-c     compute More's adaptive variable scale factors
+c     compute the LMDER adaptive variable scale factors
 c
       do j = 1, n
          temp = 0.0d0
@@ -464,9 +464,9 @@ c
       stpnorm = sqrt(stpnorm/n)
       if (stpnorm .le. stpmin)  done = .true.
 c
-c     check for inactive variables that can be made active;
-c     in a true active set strategy, variables are released
-c     one at a time at a minimum of the current active set
+c     check for inactive variables that can be made active; in a
+c     true active set strategy, variables are released one at a time
+c     at a minimum of the current active set (via goto's below)
 c
 c     if (done) then
          if (nactive .ne. n) then
@@ -620,8 +620,8 @@ c
       subroutine lmstep (n,m,ga,a,ipvt,xscale,qtf,stpmax,
      &                      delta,amu,first,sa,gauss)
       implicit none
-      integer i,j,k
-      integer m,n,nsing
+      integer i,j,k,m,n
+      integer nsing,niter
       integer ipvt(*)
       real*8 stpmax,delta,amu
       real*8 alow,alpha
@@ -646,6 +646,7 @@ c
       save deltap,nsing
       save phi,phip
       external precise
+      integer kiter
 c
 c
 c     set smallest floating point magnitude and spacing
@@ -798,6 +799,7 @@ c
 c
 c     iterate until a satisfactory "amu" is generated
 c
+         niter = 0
          done = .false.
          do while (.not. done)
             if (amu.lt.amulow .or. amu.gt.amuhi) then
@@ -844,11 +846,15 @@ c
             end do
             phip = phip / stplen
 c
-c     check to see if the step is acceptable; if not,
-c     update amulow, amuhi and amu for next iteration
+c     check for an acceptable step or for too many iterations;
+c     otherwise update amulow, amuhi and amu for next iteration
 c
-            if ((stplen.ge.alow*delta.and.stplen.le.high*delta)
-     &            .or. (amuhi-amulow).le.small) then
+            niter = niter + 1
+            if (stplen.ge.alow*delta .and. stplen.le.high*delta) then
+               done = .true.
+            else if (amuhi-amulow .le. small) then
+               done = .true.
+            else if (niter .ge. 10) then
                done = .true.
             else
                amulow = max(amulow,amu-(phi/phip))

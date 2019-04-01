@@ -1230,7 +1230,7 @@ c
       end do
       tscale = 300.0d0
       cscale = 10000.0d0
-      rscale = 0.1d0 * sqrt(resp) * dble(npoint)/dble(nvar)
+      rscale = 0.1d0 * sqrt(resp) * (dble(npoint)/dble(nvar))
 c
 c     initialize counters for parameters and residual components
 c
