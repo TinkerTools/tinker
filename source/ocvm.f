@@ -60,10 +60,9 @@ c
       integer nbig,nstep
       integer maxbig,maxstep
       real*8 fgvalue,eps
-      real*8 grdmin,precise
       real*8 f,f0,f0old
       real*8 fprime,f0prime
-      real*8 srchnorm
+      real*8 grdmin,srchnorm
       real*8 sgangle,sg,snorm
       real*8 zeta,cosang
       real*8 fmove,xmove
@@ -107,7 +106,7 @@ c
       end if
       maxbig = 2
       maxstep = 10
-      eps = precise (2)
+      eps = 1.0d-16
       restart = .true.
       done = .false.
 c

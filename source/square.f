@@ -63,19 +63,17 @@ c
       integer i,j,k,m,n
       integer icode,next
       integer niter,ncalls
-      integer nactive
-      integer nbigstp,ndigit
+      integer nactive,nbigstp
       integer, allocatable :: iactive(:)
       integer, allocatable :: ipvt(:)
-      real*8 amu,delta,epsfcn
+      real*8 eps,epsq,delta
       real*8 fcnorm,fpnorm
       real*8 gcnorm,ganorm
-      real*8 precise,eps
       real*8 grdmin,stpnorm
       real*8 stpmax,stpmin
       real*8 rftol,faketol
       real*8 xtemp,stepsz
-      real*8 sum,temp
+      real*8 amu,sum,temp
       real*8 xc(*)
       real*8 xlo(*)
       real*8 xhi(*)
@@ -103,7 +101,6 @@ c
       character*240 string
       external rsdvalue
       external lsqwrite
-      external precise
 c
 c
 c     initialize various counters and status code
@@ -115,15 +112,13 @@ c
 c
 c     setup the default tolerances and parameter values
 c
-      ndigit = 10
-      eps = precise (2)
-      eps = max(eps,10.0d0**(-ndigit))
+      eps = 0.00000001d0
       if (maxiter .eq. 0)  maxiter = 100
       if (iprint .lt. 0)  iprint = 1
       if (iwrite .lt. 0)  iwrite = 1
       if (fctmin .eq. 0.0d0)  fctmin = eps
       if (grdmin .eq. 0.0d0)  grdmin = eps**(1.0d0/3.0d0)
-      epsfcn = sqrt(eps)
+      epsq = sqrt(eps)
       delta = 0.0d0
       stpmax = 1000.0d0 * sqrt(dble(n))
       stpmin = eps**(2.0d0/3.0d0)
@@ -198,8 +193,8 @@ c     evaluate the Jacobian at the initial point by finite
 c     differences; replace loop with user routine if desired
 c
       do j = 1, n
-         stepsz = epsfcn * abs(xc(j))
-         if (stepsz .lt. epsfcn)  stepsz = epsfcn
+         stepsz = epsq * abs(xc(j))
+         if (stepsz .lt. epsq)  stepsz = epsq
          if (xc(j) .lt. 0.0d0)  stepsz = -stepsz
          xtemp = xc(j)
          xc(j) = xtemp + stepsz
@@ -393,7 +388,7 @@ c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
 c
       do j = 1, n
-         stepsz = epsfcn * max(abs(xc(j)),1.0d0/xscale(j))
+         stepsz = epsq * max(abs(xc(j)),1.0d0/xscale(j))
          if (xc(j) .lt. 0.0d0)  stepsz = -stepsz
          xtemp = xc(j)
          xc(j) = xtemp + stepsz
@@ -630,9 +625,8 @@ c
       real*8 beta,high,sum
       real*8 deltap,gnleng
       real*8 phi,phip,phipi
-      real*8 sgnorm,precise
-      real*8 tiny,eps
-      real*8 stplen,temp
+      real*8 stplen,sgnorm
+      real*8 gamma,eps,temp
       real*8 ga(*)
       real*8 xscale(*)
       real*8 qtf(*)
@@ -646,13 +640,12 @@ c
       logical done
       save deltap,nsing
       save phi,phip
-      external precise
       integer kiter
 c
 c
 c     set minima for floating point magnitude and spacing
 c
-      tiny = 0.00000001d0
+      gamma = 0.00000001d0
       eps = 0.00000001d0
 c
 c     perform dynamic allocation of some local arrays
@@ -683,7 +676,7 @@ c
             end do
             beta = beta + temp**2
          end do
-         if (beta .le. tiny) then
+         if (beta .le. gamma) then
             delta = alpha * sqrt(alpha)
          else
             delta = alpha * sqrt(alpha)/beta
@@ -833,7 +826,7 @@ c
                work1(j) = xscale(k) * work2(k)
             end do
             do j = 1, n
-               if (abs(diag(j)) .ge. tiny) then
+               if (abs(diag(j)) .ge. gamma) then
                   work1(j) = work1(j) / diag(j)
                end if
                if (j .lt. n) then
@@ -952,12 +945,12 @@ c
       integer ncalls,nactive
       integer ipvt(*)
       real*8 fcnorm,stpmax
-      real*8 delta,fpnorm,fpnrmp
+      real*8 fpnorm,fpnrmp
       real*8 reduce,predict
-      real*8 rellen,slope,tiny
+      real*8 rellen,slope,eps
       real*8 stplen,stpmin
       real*8 rftol,faketol
-      real*8 alpha,temp,precise
+      real*8 alpha,delta,temp
       real*8 xc(*)
       real*8 gc(*)
       real*8 sc(*)
@@ -975,11 +968,11 @@ c
       logical feas,ltemp
       save fpnrmp
       external rsdvalue
-      external precise
 c
 c
-c     set value of alpha, logicals and step length
+c     set value of alpha, logical flags and step length
 c
+      eps = 0.00000001d0
       alpha = 0.0001d0
       bigstp = .false.
       feas = .true.
@@ -1055,8 +1048,7 @@ c     quadratic interpolation step; reduce delta and continue
 c
          else
             icode = 4
-            tiny = precise (1)
-            if (abs(reduce-slope) .gt. tiny) then
+            if (abs(reduce-slope) .gt. eps) then
                temp = -slope*stplen / (2.0d0*(reduce-slope))
             else
                temp = -slope*stplen / 2.0d0
