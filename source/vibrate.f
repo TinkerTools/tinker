@@ -43,9 +43,9 @@ c
       integer, allocatable :: hstop(:,:)
       real*8 factor,vnorm
       real*8 sum,scale,ratio
-      real*8, allocatable :: xref(:)
-      real*8, allocatable :: yref(:)
-      real*8, allocatable :: zref(:)
+      real*8, allocatable :: xorig(:)
+      real*8, allocatable :: yorig(:)
+      real*8, allocatable :: zorig(:)
       real*8, allocatable :: mass2(:)
       real*8, allocatable :: h(:)
       real*8, allocatable :: eigen(:)
@@ -184,9 +184,9 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (list(nfreq))
       allocate (iv(nfreq))
-      allocate (xref(n))
-      allocate (yref(n))
-      allocate (zref(n))
+      allocate (xorig(n))
+      allocate (yorig(n))
+      allocate (zorig(n))
 c
 c     try to get output vibrational modes from command line
 c
@@ -297,9 +297,9 @@ c
 c     store the original atomic coordinates
 c
          do i = 1, n
-            xref(i) = x(i)
-            yref(i) = y(i)
-            zref(i) = z(i)
+            xorig(i) = x(i)
+            yorig(i) = y(i)
+            zorig(i) = z(i)
          end do
 c
 c     scale based on the maximum displacement along the mode
@@ -323,9 +323,9 @@ c
             do k = 1, nuse
                j = 3 * (k-1)
                m = iuse(k)
-               x(m) = xref(m) + ratio*vects(j+1,ivib)
-               y(m) = yref(m) + ratio*vects(j+2,ivib)
-               z(m) = zref(m) + ratio*vects(j+3,ivib)
+               x(m) = xorig(m) + ratio*vects(j+1,ivib)
+               y(m) = yorig(m) + ratio*vects(j+2,ivib)
+               z(m) = zorig(m) + ratio*vects(j+3,ivib)
             end do
             call prtxyz (ixyz)
          end do
@@ -334,9 +334,9 @@ c
 c     restore the original atomic coordinates
 c
          do i = 1, n
-            x(i) = xref(i)
-            y(i) = yref(i)
-            z(i) = zref(i)
+            x(i) = xorig(i)
+            y(i) = yorig(i)
+            z(i) = zorig(i)
          end do
       end do
 c
@@ -345,9 +345,9 @@ c
       deallocate (list)
       deallocate (iv)
       deallocate (mass2)
-      deallocate (xref)
-      deallocate (yref)
-      deallocate (zref)
+      deallocate (xorig)
+      deallocate (yorig)
+      deallocate (zorig)
       deallocate (eigen)
       deallocate (vects)
 c

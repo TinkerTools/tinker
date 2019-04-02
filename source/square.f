@@ -103,12 +103,11 @@ c
       external lsqwrite
 c
 c
-c     initialize various counters and status code
+c     initialize various counters for calls and iterations
 c
       niter = 0
       ncalls = 0
       nbigstp = 0
-      done = .false.
 c
 c     setup the default tolerances and parameter values
 c
@@ -268,286 +267,288 @@ c
       if (fcnorm .le. fctmin)  return
       if (ganorm .le. grdmin)  return
 c
-c     start of the main body of least squares iteration
+c     beginning of the main least squares iteration loop
 c
-   60 continue
-      niter = niter + 1
+      done = .false.
+      dowhile (.not. done)
+         niter = niter + 1
 c
 c     repack the Jacobian to include only active variables
 c
-      if (nactive .ne. n) then
-         k = 0
-         do j = 1, n
-            if (iactive(j) .ne. 0) then
-               if (k .eq. 0)  k = j
-            else
-               if (k .ne. 0) then
-                  do i = 1, m
-                     fjac(i,k) = fjac(i,j)
-                  end do
-                  k = k + 1
+         if (nactive .ne. n) then
+            k = 0
+            do j = 1, n
+               if (iactive(j) .ne. 0) then
+                  if (k .eq. 0)  k = j
+               else
+                  if (k .ne. 0) then
+                     do i = 1, m
+                        fjac(i,k) = fjac(i,j)
+                     end do
+                     k = k + 1
+                  end if
                end if
-            end if
-         end do
-      end if
+            end do
+         end if
 c
 c     repack scale factors and gradient for active variables
 c
-      k = 0
-      do j = 1, n
-         if (iactive(j) .eq. 0) then
-            k = k + 1
-            xsa(k) = xscale(j)
-            ga(k) = gc(j)
-         end if
-      end do
-c
-c     compute the QR factorization of the Jacobian
-c
-      pivot = .true.
-      call qrfact (nactive,m,fjac,pivot,ipvt,rdiag)
-c
-c     compute the vector Q(transpose) * residuals
-c
-      do i = 1, m
-         qtf(i) = fc(i)
-      end do
-      do j = 1, nactive
-         if (fjac(j,j) .ne. 0.0d0) then
-            sum = 0.0d0
-            do i = j, m
-               sum = sum + fjac(i,j)*qtf(i)
-            end do
-            temp = -sum / fjac(j,j)
-            do i = j, m
-               qtf(i) = qtf(i) + fjac(i,j)*temp
-            end do
-         end if
-         fjac(j,j) = rdiag(j)
-      end do
-c
-c     compute the Levenberg-Marquardt step
-c
-      icode = 6
-      first = .true.
-      do while (icode .ge. 4)
-         call lmstep (nactive,m,ga,fjac,ipvt,xsa,qtf,stpmax,
-     &                      delta,amu,first,sa,gauss)
-c
-c     unpack the step vector to include all variables
-c
          k = 0
-         do i = 1, n
-            if (iactive(i) .ne. 0) then
-               sc(i) = 0.0d0
-            else
+         do j = 1, n
+            if (iactive(j) .eq. 0) then
                k = k + 1
-               sc(i) = sa(k)
+               xsa(k) = xscale(j)
+               ga(k) = gc(j)
             end if
          end do
 c
+c     compute the QR factorization of the Jacobian
+c
+         pivot = .true.
+         call qrfact (nactive,m,fjac,pivot,ipvt,rdiag)
+c
+c     compute the vector Q(transpose) * residuals
+c
+         do i = 1, m
+            qtf(i) = fc(i)
+         end do
+         do j = 1, nactive
+            if (fjac(j,j) .ne. 0.0d0) then
+               sum = 0.0d0
+               do i = j, m
+                  sum = sum + fjac(i,j)*qtf(i)
+               end do
+               temp = -sum / fjac(j,j)
+               do i = j, m
+                  qtf(i) = qtf(i) + fjac(i,j)*temp
+               end do
+            end if
+            fjac(j,j) = rdiag(j)
+         end do
+c
+c     compute the Levenberg-Marquardt step
+c
+         icode = 6
+         first = .true.
+         do while (icode .ge. 4)
+            call lmstep (nactive,m,ga,fjac,ipvt,xsa,qtf,stpmax,
+     &                         delta,amu,first,sa,gauss)
+c
+c     unpack the step vector to include all variables
+c
+            k = 0
+            do i = 1, n
+               if (iactive(i) .ne. 0) then
+                  sc(i) = 0.0d0
+               else
+                  k = k + 1
+                  sc(i) = sa(k)
+               end if
+            end do
+c
 c     check new point and update the trust region
 c
-         call trust (n,m,xc,fcnorm,gc,fjac,ipvt,sc,sa,xscale,gauss,
-     &               stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,
-     &               fpprev,bigstp,ncalls,xlo,xhi,nactive,stpmin,
-     &               rftol,faketol,rsdvalue)
-      end do
-      if (icode .eq. 1)  done = .true.
+            call trust (n,m,xc,fcnorm,gc,fjac,ipvt,sc,sa,xscale,gauss,
+     &                  stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,
+     &                  fpprev,bigstp,ncalls,xlo,xhi,nactive,stpmin,
+     &                  rftol,faketol,rsdvalue)
+         end do
+         if (icode .eq. 1)  done = .true.
 c
 c     update to the new variables and residuals
 c
-      do j = 1, n
-         xc(j) = xp(j)
-      end do
-      do i = 1, m
-         fc(i) = fp(i)
-      end do
-      fcnorm = fpnorm
+         do j = 1, n
+            xc(j) = xp(j)
+         end do
+         do i = 1, m
+            fc(i) = fp(i)
+         end do
+         fcnorm = fpnorm
 c
 c     update the active vs inactive status of the variables;
 c     in a true active set strategy, at most one constraint is
 c     added to the active set per iteration (via goto's below)
 c
-      do j = 1, n
-         if (iactive(j) .eq. 0) then
-            if (abs(xc(j)-xlo(j)) .le. eps) then
-               nactive = nactive - 1
-               iactive(j) = -1
-c              goto 70
-            else if (abs(xc(j)-xhi(j)) .le. eps) then
-               nactive = nactive - 1
-               iactive(j) = 1
-c              goto 70
+         do j = 1, n
+            if (iactive(j) .eq. 0) then
+               if (abs(xc(j)-xlo(j)) .le. eps) then
+                  nactive = nactive - 1
+                  iactive(j) = -1
+c                 goto 60
+               else if (abs(xc(j)-xhi(j)) .le. eps) then
+                  nactive = nactive - 1
+                  iactive(j) = 1
+c                 goto 60
+               end if
             end if
-         end if
-      end do
-   70 continue
+         end do
+   60    continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
 c
-      do j = 1, n
-         stepsz = epsq * max(abs(xc(j)),1.0d0/xscale(j))
-         if (xc(j) .lt. 0.0d0)  stepsz = -stepsz
-         xtemp = xc(j)
-         xc(j) = xtemp + stepsz
-         ncalls = ncalls + 1
-         call rsdvalue (n,m,xc,ftemp)
-         xc(j) = xtemp
-         do i = 1, m
-            fjac(i,j) = (ftemp(i)-fc(i)) / stepsz
+         do j = 1, n
+            stepsz = epsq * max(abs(xc(j)),1.0d0/xscale(j))
+            if (xc(j) .lt. 0.0d0)  stepsz = -stepsz
+            xtemp = xc(j)
+            xc(j) = xtemp + stepsz
+            ncalls = ncalls + 1
+            call rsdvalue (n,m,xc,ftemp)
+            xc(j) = xtemp
+            do i = 1, m
+               fjac(i,j) = (ftemp(i)-fc(i)) / stepsz
+            end do
          end do
-      end do
 c
 c     compute the LMDER adaptive variable scale factors
 c
-      do j = 1, n
-         temp = 0.0d0
-         do i = 1, m
-            temp = temp + fjac(i,j)**2
+         do j = 1, n
+            temp = 0.0d0
+            do i = 1, m
+               temp = temp + fjac(i,j)**2
+            end do
+            xscale(j) = max(xscale(j),sqrt(temp))
          end do
-         xscale(j) = max(xscale(j),sqrt(temp))
-      end do
 c
 c     compute the total gradient vector for all variables
 c
-      do j = 1, n
-         gc(j) = 0.0d0
-         do i = 1, m
-            gc(j) = gc(j) + fjac(i,j)*fc(i)
+         do j = 1, n
+            gc(j) = 0.0d0
+            do i = 1, m
+               gc(j) = gc(j) + fjac(i,j)*fc(i)
+            end do
          end do
-      end do
 c
 c     compute the norm of the scaled total gradient
 c     and the scaled gradient for active variables
 c
-      gcnorm = 0.0d0
-      ganorm = 0.0d0
-      do j = 1, n
-         gs(j) = gc(j) * max(abs(xc(j)),1.0d0/xscale(j))
-         gcnorm = gcnorm + gs(j)**2
-         if (iactive(j) .eq. 0) then
-            ganorm = ganorm + gs(j)**2
-         end if
-      end do
-      gcnorm = sqrt(gcnorm/dble(n))
-      if (nactive .ne. 0)  ganorm = sqrt(ganorm/dble(nactive))
+         gcnorm = 0.0d0
+         ganorm = 0.0d0
+         do j = 1, n
+            gs(j) = gc(j) * max(abs(xc(j)),1.0d0/xscale(j))
+            gcnorm = gcnorm + gs(j)**2
+            if (iactive(j) .eq. 0) then
+               ganorm = ganorm + gs(j)**2
+            end if
+         end do
+         gcnorm = sqrt(gcnorm/dble(n))
+         if (nactive .ne. 0)  ganorm = sqrt(ganorm/dble(nactive))
 c
 c     print out information about current iteration
 c
-      if (iprint.ne.0 .and. mod(niter,iprint).eq.0) then
-         if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
-            write (iout,80)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   80       format (i6,f14.4,2f13.4,2i10)
-         else
-            write (iout,90)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   90       format (i6,f14.4,2d13.4,2i10)
+         if (iprint.ne.0 .and. mod(niter,iprint).eq.0) then
+            if (max(fcnorm,gcnorm) .lt. 10000000.0d0) then
+               write (iout,70)  niter,fcnorm,gcnorm,ganorm,
+     &                          nactive,ncalls
+   70          format (i6,f14.4,2f13.4,2i10)
+            else
+               write (iout,80)  niter,fcnorm,gcnorm,ganorm,
+     &                          nactive,ncalls
+   80          format (i6,f14.4,2d13.4,2i10)
+            end if
          end if
-      end if
 c
 c     check stopping criteria at the new point; test the absolute
 c     function value, the gradient norm and step for termination
 c
-      if (fcnorm .le. fctmin)  done = .true.
-      if (ganorm .le. grdmin)  done = .true.
-      stpnorm = 0.0d0
-      do j = 1, n
-         temp = max(abs(xc(j)),1.0d0/xscale(j))
-         stpnorm = stpnorm + (sc(j)/temp)**2
-      end do
-      stpnorm = sqrt(stpnorm/n)
-      if (stpnorm .le. stpmin)  done = .true.
+         if (fcnorm .le. fctmin)  done = .true.
+         if (ganorm .le. grdmin)  done = .true.
+         stpnorm = 0.0d0
+         do j = 1, n
+            temp = max(abs(xc(j)),1.0d0/xscale(j))
+            stpnorm = stpnorm + (sc(j)/temp)**2
+         end do
+         stpnorm = sqrt(stpnorm/n)
+         if (stpnorm .le. stpmin)  done = .true.
 c
-c     check for inactive variables that can be made active; in a
-c     true active set strategy, variables are released one at a time
-c     at a minimum of the current active set (via goto's below)
+c     check for inactive variables that can be made active; in a true
+c     active set strategy, variables are released one at a time at a
+c     minimum of the current active set (via if done and goto's below)
 c
-c     if (done) then
-         if (nactive .ne. n) then
-            do j = 1, n
-               if (iactive(j).eq.-1 .and. gc(j).lt.0.0d0) then
-                  nactive = nactive + 1
-                  iactive(j) = 0
-                  done = .false.
-c                 goto 100
-               else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
-                  nactive = nactive + 1
-                  iactive(j) = 0
-                  done = .false.
-c                 goto 100
-               end if
-            end do
-  100       continue
-         end if
-c     end if
+c        if (done) then
+            if (nactive .ne. n) then
+               do j = 1, n
+                  if (iactive(j).eq.-1 .and. gc(j).lt.0.0d0) then
+                     nactive = nactive + 1
+                     iactive(j) = 0
+                     done = .false.
+c                    goto 90
+                  else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
+                     nactive = nactive + 1
+                     iactive(j) = 0
+                     done = .false.
+c                    goto 90
+                  end if
+               end do
+   90          continue
+            end if
+c        end if
 c
 c     if still done, then normal termination has been achieved
 c
-      if (done) then
-         write (iout,110)
-  110    format (/,' SQUARE  --  Normal Termination of Least Squares')
+         if (done) then
+            write (iout,100)
+  100       format (/,' SQUARE  --  Normal Termination of Least Squares'
+     &)
 c
 c     check the limit on the number of iterations
 c
-      else if (niter .ge. maxiter) then
-         done = .true.
-         write (iout,120)
-  120    format (/,' SQUARE  --  Maximum Number of Allowed Iterations')
+         else if (niter .ge. maxiter) then
+            done = .true.
+            write (iout,110)
+  110       format (/,' SQUARE  --  Incomplete Convergence due to',
+     &                 ' IterLimit')
 c
 c     check for termination due to relative function convergence
 c
-      else if (icode .eq. 2) then
-         done = .true.
-         write (iout,130)
-  130    format (/,' SQUARE  --  Relative Function Convergence',
-     &           //,' Both the scaled actual and predicted',
-     &              ' reductions in the function',
-     &           /,' are less than or equal to the relative',
-     &              ' convergence tolerance')
+         else if (icode .eq. 2) then
+            done = .true.
+            write (iout,120)
+  120       format (/,' SQUARE  --  Relative Function Convergence',
+     &              //,' Both the scaled actual and predicted',
+     &                 ' reductions in the function',
+     &              /,' are less than or equal to the relative',
+     &                 ' convergence tolerance')
 c
 c     check for termination due to false convergence
 c
-      else if (icode .eq. 3) then
-         done = .true.
-         write (iout,140)
-  140    format (/,' SQUARE  --  Possible False Convergence',
-     &           //,' The iterates appear to be converging to',
-     &              ' a noncritical point due',
-     &           /,' to bad gradient information, discontinuous',
-     &              ' function, or stopping',
-     &           /,' tolerances being too tight')
+         else if (icode .eq. 3) then
+            done = .true.
+            write (iout,130)
+  130       format (/,' SQUARE  --  Possible False Convergence',
+     &              //,' The iterates appear to be converging to',
+     &                 ' a noncritical point due',
+     &              /,' to bad gradient information, discontinuous',
+     &                 ' function, or stopping',
+     &              /,' tolerances being too tight')
 c
 c     check for several consecutive maximum steps taken
 c
-      else if (bigstp) then
-         nbigstp = nbigstp + 1
-         if (nbigstp .eq. 5) then
-            done = .true.
-            write (iout,150)
-  150       format (/,' SQUARE  --  Five Consecutive Maximum',
-     &                 ' Length Steps',
-     &              //,' Either the function is unbounded below,',
-     &                 ' or has a finite',
-     &              /,' asymptote in some direction, or STEPMAX',
-     &                 ' is too small')
-         end if
+         else if (bigstp) then
+            nbigstp = nbigstp + 1
+            if (nbigstp .eq. 5) then
+               done = .true.
+               write (iout,140)
+  140          format (/,' SQUARE  --  Five Consecutive Maximum',
+     &                    ' Length Steps',
+     &                 //,' Either the function is unbounded below,',
+     &                    ' or has a finite',
+     &                 /,' asymptote in some direction, or STEPMAX',
+     &                    ' is too small')
+            end if
 c
 c     no reason to quit, so prepare to take another step
 c
-      else
-         nbigstp = 0
-      end if
+         else
+            nbigstp = 0
+         end if
 c
 c     write out the parameters, derivatives and residuals
 c
-      if (iwrite.ne.0 .and. mod(niter,iwrite).eq.0) then
-         if (.not. done)  call lsqwrite (niter,m,xc,gs,fc)
-      end if
-c
-c     continue with the next iteration if not finished
-c
-      if (.not. done)  goto 60
+         if (iwrite.ne.0 .and. mod(niter,iwrite).eq.0) then
+            if (.not. done)  call lsqwrite (niter,m,xc,gs,fc)
+         end if
+      end do
 c
 c     perform deallocation of some local arrays
 c

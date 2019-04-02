@@ -1903,9 +1903,9 @@ c
       integer freeunit
       real*8 ratio
       real*8 p(*)
-      real*8, allocatable :: xref(:)
-      real*8, allocatable :: yref(:)
-      real*8, allocatable :: zref(:)
+      real*8, allocatable :: xorig(:)
+      real*8, allocatable :: yorig(:)
+      real*8, allocatable :: zorig(:)
       character*7 ext
       character*240 xyzfile
 c
@@ -1921,16 +1921,16 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (xref(n))
-      allocate (yref(n))
-      allocate (zref(n))
+      allocate (xorig(n))
+      allocate (yorig(n))
+      allocate (zorig(n))
 c
 c     store the original atomic coordinates
 c
       do i = 1, n
-         xref(i) = x(i)
-         yref(i) = y(i)
-         zref(i) = z(i)
+         xorig(i) = x(i)
+         yorig(i) = y(i)
+         zorig(i) = z(i)
       end do
 c
 c     make file with plus and minus the current vibration
@@ -1940,9 +1940,9 @@ c
          ratio = dble(i) / dble(nview)
          do k = 1, n
             j = 3 * (k-1)
-            x(k) = xref(k) + ratio*p(j+1)
-            y(k) = yref(k) + ratio*p(j+2)
-            z(k) = zref(k) + ratio*p(j+3)
+            x(k) = xorig(k) + ratio*p(j+1)
+            y(k) = yorig(k) + ratio*p(j+2)
+            z(k) = zorig(k) + ratio*p(j+3)
          end do
          call prtxyz (ixyz)
       end do
@@ -1951,16 +1951,16 @@ c
 c     restore the original atomic coordinates
 c
       do i = 1, n
-         x(i) = xref(i)
-         y(i) = yref(i)
-         z(i) = zref(i)
+         x(i) = xorig(i)
+         y(i) = yorig(i)
+         z(i) = zorig(i)
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xref)
-      deallocate (yref)
-      deallocate (zref)
+      deallocate (xorig)
+      deallocate (yorig)
+      deallocate (zorig)
       return
       end
 c
