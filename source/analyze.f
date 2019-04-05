@@ -1320,7 +1320,7 @@ c
             if (header) then
                header = .false.
                write (iout,270)
-  270          format (/,' Atom Type Definition Parameters :',
+  270          format (/,' Atom Definition Parameters :',
      &                 //,3x,'Atom',2x,'Symbol',2x,'Type',
      &                    2x,'Class',2x,'Atomic',3x,'Mass',
      &                    2x,'Valence',2x,'Description',/)
@@ -2222,7 +2222,7 @@ c
             if (header) then
                header = .false.
                write (iout,150)
-  150          format (/,' Atom Type Definition Parameters :',
+  150          format (/,' Atom Definition Parameters :',
      &                 //,3x,'Atom',2x,'Symbol',2x,'Type',
      &                    2x,'Class',2x,'Atomic',3x,'Mass',
      &                    2x,'Valence',2x,'Description',/)

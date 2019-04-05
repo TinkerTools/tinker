@@ -28,7 +28,7 @@ c
       integer i,j,k
       integer iarc,ixyz
       integer start,stop
-      integer step,now,next
+      integer step,now
       integer lext,lengb
       integer nmode,mode
       integer leng1,leng2
@@ -39,7 +39,6 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       logical exist,query
-      character*1 answer
       character*7 ext,modtyp
       character*240 arcfile
       character*240 basename
@@ -48,36 +47,38 @@ c
       character*240 string
 c
 c
-c     present a list of possible archive modifications
+c     find out which archive modification to perform
 c
       call initial
-      write (iout,10)
-   10 format (/,' The Tinker Archive File Utility Can :',
-     &        //,4x,'(1) Create an Archive from Individual Frames',
-     &        /,4x,'(2) Extract Individual Frames from an Archive',
-     &        /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
-     &        /,4x,'(4) Enforce Periodic Boundaries for a Trajectory',
-     &        /,4x,'(5) Unfold Periodic Boundaries for a Trajectory',
-     &        /,4x,'(6) Remove Periodic Box Size from a Trajectory')
-c
-c     get the desired type of archive file modification
-c
-      next = 1
-      nmode = 6
       mode = 0
-      call nextarg (answer,exist)
-      call getnumb (answer,mode,next)
-   20 continue
-      if (mode .eq. 0)  mode = -1
-      do while (mode.lt.0 .or. mode.gt.nmode)
-         mode = 0
-         write (iout,30)
-   30    format (/,' Number of the Desired Choice [<CR>=Exit] :  ',$)
-         read (input,40,err=20,end=50)  mode
-   40    format (i10)
-   50    continue
-      end do
-      if (mode .eq. 0)  modtyp = 'EXIT'
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=10,end=10)  mode
+         if (mode.ge.1 .and. mode.le.6)  query = .false.
+      end if
+   10 continue
+      if (query) then
+         write (iout,20)
+   20    format (/,' The Tinker Archive File Utility Can :',
+     &           //,4x,'(1) Create an Archive from Individual Frames',
+     &           /,4x,'(2) Extract Individual Frames from an Archive',
+     &           /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
+     &           /,4x,'(4) Enforce Periodic Boundaries for a Trajectory',
+     &           /,4x,'(5) Unfold Periodic Boundaries for a Trajectory',
+     &           /,4x,'(6) Remove Periodic Box Size from a Trajectory')
+         do while (mode.lt.1 .or. mode.gt.6)
+            mode = 0
+            write (iout,30)
+   30       format (/,' Enter the Number of the Desired Choice :  ',$)
+            read (input,40,err=50,end=50)  mode
+   40       format (i10)
+   50       continue
+         end do
+      end if
+c
+c     set code for the type of procedure to be performed
+c
       if (mode .eq. 1)  modtyp = 'CREATE'
       if (mode .eq. 2)  modtyp = 'EXTRACT'
       if (mode .eq. 3)  modtyp = 'TRIM'
@@ -109,7 +110,7 @@ c
       if (modtyp .eq. 'CREATE') then
          call suffix (arcfile,'arc','new')
          open (unit=iarc,file=arcfile,status='new')
-      else if (modtyp .ne. 'EXIT') then
+      else
          call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
@@ -288,7 +289,7 @@ c
          if (query) then
             write (iout,190)
   190       format (/,' Numbers of First & Last File and Step',
-     &                 ' [<CR>=Exit] :  ',$)
+     &                 ' [<Enter>=Exit] :  ',$)
             read (input,200)  record
   200       format (a240)
             read (record,*,err=210,end=210)  start,stop,step
@@ -400,7 +401,7 @@ c
             if (query) then
                write (iout,240)
   240          format (/,' Numbers of First & Last File and Step',
-     &                    ' [<CR>=Exit] :  ',$)
+     &                    ' [<Enter>=Exit] :  ',$)
                read (input,250)  record
   250          format (a240)
                read (record,*,err=260,end=260)  start,stop,step

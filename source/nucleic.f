@@ -172,11 +172,11 @@ c     provide a header to explain the method of sequence input
 c
       write (iout,30)
    30 format (/,' Enter One Nucleotide per Line, 5'' to 3'': ',
-     &           ' Give PDB Residue Code,',
-     &        /,' followed by Backbone Torsions (6F) and',
-     &           ' Glycosidic Torsion (1F)',
-     &        //,' Use Residue=MOL to Begin a New Strand,',
-     &           ' Residue=<CR> to End Input')
+     &           ' Give PDB Residue Code, and',
+     &        /,' optionally, six Backbone Torsions (6F) and',
+     &           ' the Glycosidic Torsion (1F)',
+     &        //,' Use Residue=MOL to Start a New Strand,',
+     &           ' and Use <Enter> to End Input')
 c
 c     initially, assume that only a single strand is present
 c

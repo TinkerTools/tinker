@@ -152,7 +152,8 @@ c
          do while (mode.lt.0 .or. mode.gt.nmode)
             mode = 0
             write (iout,60)
-   60       format (/,' Number of the Desired Choice [<CR>=Exit] :  ',$)
+   60       format (/,' Number of the Desired Choice [<Enter>=Exit]',
+     &                 ' :  ',$)
             read (input,70,err=40,end=80)  mode
    70       format (i10)
    80       continue

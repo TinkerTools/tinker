@@ -164,27 +164,27 @@ c     provide a header to explain the method of sequence input
 c
       write (iout,10)
    10 format (/,' Enter One Residue Name per Line as the Standard',
-     &           ' Three-Letter Code, then',
-     &        /,' Phi Psi Omega (3F), Chi Angles (4F), then',
-     &           ' Disulfide Partner if CYX (I),',
-     &        /,' and D/L Chirality as Desired (A1)',
+     &           ' Three-Letter Code, and',
+     &        /,' optionally, Phi-Psi-Omega Angles (3F), Chi Angles'
+     &           ' (4F), Disulfide Partner',
+     &        /,' if CYX Residue (I), and D/L Chirality (A1)',
      &        //,' If Only Residue Names are Entered, the Default',
      &           ' is to Build an Extended',
      &        /,' Conformation Using L-Amino Acids and Zwitterionic',
      &           ' Termini',
-     &        //,' Regular Amino Acids:  GLY, ALA, VAL, LEU,',
-     &           ' ILE, SER, THR, CYS, CYX, PRO,',
-     &        /,' PHE, TYR, TRP, HIS, ASP, ASN, GLU, GLN, MET,',
-     &           ' LYS, ARG, ORN, AIB',
-     &        //,' Alternative Protonation States:  CYD, TYD,',
-     &           ' HID, HIE, ASH, GLH, LYD',
+     &        //,' Standard Amino Acids:  GLY, ALA, VAL, LEU, ILE,',
+     &           ' SER, THR, CYS, CYX, PRO,',
+     &        /,' PHE, TYR, TRP, HIS, ASP, ASN, GLU, GLN, MET, LYS,',
+     &           ' ARG, ORN, AIB',
+     &        //,' Alternative Protonation States:  CYD, TYD, HID,',
+     &           ' HIE, HIP, ASH, GLH, LYD',
      &        //,' N-Terminal Cap Residues:  H2N=Deprotonated,',
      &           ' FOR=Formyl, ACE=Acetyl,',
      &        /,27x,'PCA=Pyroglutamic Acid',
-     &        /,' C-Terminal Cap Residues:  COH=Protonated,',
-     &           ' NH2=Amide, NME=N-MethylAmide',
-     &        //,' Use Residue Name=MOL to Start a New Chain,',
-     &           ' and Use <CR> to End Input')
+     &        /,' C-Terminal Cap Residues:  COH=Protonated, NH2=Amide,',
+     &           ' NME=N-MethylAmide',
+     &        //,' Use Residue Name=MOL to Start a New Chain, and',
+     &           ' Use <Enter> to End Input')
 c
 c     initially, assume that only a single strand is present
 c

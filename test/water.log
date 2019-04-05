@@ -13,7 +13,9 @@
      ######################################################################
 
 
- Electrostatic Potential Grid Points :            4357
+ Electrostatic Potential Grid Points :                  4357
+
+ Electrostatic Parameter Restraint Value :            1.0000
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
@@ -30,6 +32,7 @@
  Average Potential Magnitude for Model :              8.0334
  Average Potential Value for Target :                 0.0143
  Average Potential Magnitude for Target :             8.1777
+
  Average Signed Potential Difference :               -0.1164
  Average Unsigned Potential Difference :              0.3799
  Root Mean Square Potential Difference :              0.5340
@@ -38,26 +41,26 @@
 
  Parameter      Atom Type         Category            Value        Fixed
 
-    --              1             Monopole         -0.51966          X
-    --              1             X-Dipole          0.00000          X
-    --              1             Y-Dipole          0.00000          X
-     1              1             Z-Dipole          0.14279
-     2              1             XX-Quad           0.37928
-    --              1             XY-Quad           0.00000          X
-    --              1             XZ-Quad           0.00000          X
-     3              1             YY-Quad          -0.41809
-    --              1             YZ-Quad           0.00000          X
-    --              1             ZZ-Quad           0.03881
-    --              2             Monopole          0.25983          X
-     4              2             X-Dipole         -0.03859
-    --              2             Y-Dipole          0.00000          X
-     5              2             Z-Dipole         -0.05818
-     6              2             XX-Quad          -0.03673
-    --              2             XY-Quad           0.00000          X
-     7              2             XZ-Quad          -0.00203
-     8              2             YY-Quad          -0.10739
-    --              2             YZ-Quad           0.00000          X
-    --              2             ZZ-Quad           0.14412
+    --              1             Monopole          -0.51966          X
+    --              1             X-Dipole           0.00000          X
+    --              1             Y-Dipole           0.00000          X
+     1              1             Z-Dipole           0.14279
+     2              1             XX-Quad            0.37928
+    --              1             XY-Quad            0.00000          X
+    --              1             XZ-Quad            0.00000          X
+     3              1             YY-Quad           -0.41809
+    --              1             YZ-Quad            0.00000          X
+    --              1             ZZ-Quad            0.03881
+    --              2             Monopole           0.25983          X
+     4              2             X-Dipole          -0.03859
+    --              2             Y-Dipole           0.00000          X
+     5              2             Z-Dipole          -0.05818
+     6              2             XX-Quad           -0.03673
+    --              2             XY-Quad            0.00000          X
+     7              2             XZ-Quad           -0.00203
+     8              2             YY-Quad           -0.10739
+    --              2             YZ-Quad            0.00000          X
+    --              2             ZZ-Quad            0.14412
 
  Levenberg-Marquardt Nonlinear Least Squares :
 
@@ -74,26 +77,26 @@
 
  Parameter      Atom Type         Category            Value        Fixed
 
-    --              1             Monopole         -0.51966          X
-    --              1             X-Dipole          0.00000          X
-    --              1             Y-Dipole          0.00000          X
-     1              1             Z-Dipole          0.12673
-     2              1             XX-Quad           0.38780
-    --              1             XY-Quad           0.00000          X
-    --              1             XZ-Quad           0.00000          X
-     3              1             YY-Quad          -0.51270
-    --              1             YZ-Quad           0.00000          X
-    --              1             ZZ-Quad           0.12490
-    --              2             Monopole          0.25983          X
-     4              2             X-Dipole         -0.06207
-    --              2             Y-Dipole          0.00000          X
-     5              2             Z-Dipole         -0.10070
-     6              2             XX-Quad           0.03703
-    --              2             XY-Quad           0.00000          X
-     7              2             XZ-Quad          -0.02264
-     8              2             YY-Quad          -0.06674
-    --              2             YZ-Quad           0.00000          X
-    --              2             ZZ-Quad           0.02971
+    --              1             Monopole          -0.51966          X
+    --              1             X-Dipole           0.00000          X
+    --              1             Y-Dipole           0.00000          X
+     1              1             Z-Dipole           0.12673
+     2              1             XX-Quad            0.38780
+    --              1             XY-Quad            0.00000          X
+    --              1             XZ-Quad            0.00000          X
+     3              1             YY-Quad           -0.51270
+    --              1             YZ-Quad            0.00000          X
+    --              1             ZZ-Quad            0.12490
+    --              2             Monopole           0.25983          X
+     4              2             X-Dipole          -0.06207
+    --              2             Y-Dipole           0.00000          X
+     5              2             Z-Dipole          -0.10070
+     6              2             XX-Quad            0.03703
+    --              2             XY-Quad            0.00000          X
+     7              2             XZ-Quad           -0.02264
+     8              2             YY-Quad           -0.06674
+    --              2             YZ-Quad            0.00000          X
+    --              2             ZZ-Quad            0.02971
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
@@ -110,6 +113,7 @@
  Average Potential Magnitude for Model :              8.1461
  Average Potential Value for Target :                 0.0143
  Average Potential Magnitude for Target :             8.1777
+
  Average Signed Potential Difference :               -0.1190
  Average Unsigned Potential Difference :              0.1628
  Root Mean Square Potential Difference :              0.2725

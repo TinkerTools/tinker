@@ -161,7 +161,7 @@ c
      &           /,' to be used in the fitting procedure.')
          write (iout,30)
    30    format (/,' Enter an Option (either 1,M,N or 2',
-     &              ' [<CR>=1,0,0]) :  ',$)
+     &              ' [<Enter>=1,0,0]) :  ',$)
          read (input,40)  record
    40    format (a240)
          read (record,*,err=50,end=50)  option,start,stop

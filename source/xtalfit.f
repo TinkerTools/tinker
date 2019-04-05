@@ -152,7 +152,7 @@ c
          call getxyz
          call mechanic
 c
-c     get ideal value for intermolecular or lattice energy
+c     get ideal value for lattice or intermolecular energy
 c
          e0_lattice = 0.0d0
          query = .true.
@@ -164,8 +164,8 @@ c
   130    continue
          if (query) then
             write (iout,140)
-  140       format (/,' Enter Target Elat/Einter Value and Weight',
-     &                 ' [<CR> to omit] :  ',$)
+  140       format (/,' Target for E-Lattice or E-Inter Value',
+     &                 ' [<Enter>=None] :  ',$)
             read (input,150)  e0_lattice
   150       format (f20.0)
          end if

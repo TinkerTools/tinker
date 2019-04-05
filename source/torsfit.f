@@ -57,7 +57,7 @@ c
       if (query) then
          do while (torbnd(1).eq.0 .or. torbnd(2).eq.0)
             write (iout,20)
-   20       format (/,' Enter Central Atoms of the 1st Torsion : ',$)
+   20       format (/,' Enter Central Atoms for 1st Torsion : ',$)
             read (input,*,err=30,end=30)  torbnd(1),torbnd(2)
    30       continue
          end do
@@ -74,8 +74,8 @@ c
    40 continue
       if (query) then
          write(iout,50)
-   50    format (/,' Enter Central Atoms of the 2nd Torsion',
-     &              ' [Optional, <CR>=None] : ',$)
+   50    format (/,' Enter Central Atoms for 2nd Torsion',
+     &              ' [Optional, <Enter>=None] : ',$)
          read (input,60,err=70,end=70)  record
    60    format (a240)
          read (record,*,err=70,end=70)  torbnd(3),torbnd(4)

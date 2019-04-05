@@ -21,7 +21,7 @@
  Impose Torsional Planarity on Adjacent Trigonal Atoms [Y] :  
  Do You Wish to Examine or Alter the Bounds Matrix [N] :  
  Select the Enantiomer Closest to the Input Structure [N] :  
- Refinement via Minimization or Annealing [M or A, <CR>=A] :  
+ Refinement via Minimization or Annealing [M or A, <Enter>=A] :  
  Bounds Smoothing via Triangle and Inverse Triangle Inequality :
 
  Largest Upper Bound Distance :                       65.3886

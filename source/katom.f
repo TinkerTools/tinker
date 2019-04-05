@@ -74,7 +74,7 @@ c
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,10)
-   10             format (/,' Additional Atom Type Parameters :',
+   10             format (/,' Additional Atom Definition Parameters :',
      &                    //,5x,'Type  Class  Symbol  Description',
      &                       15x,'Atomic',4x,'Mass',3x,'Valence',/)
                end if
@@ -201,7 +201,7 @@ c
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,60)
-   60             format (/,' Additional Atom Types for',
+   60             format (/,' Additional Atom Definitions for',
      &                       ' Specific Atoms :',
      &                    //,5x,'Atom  Class  Symbol  Description',
      &                       15x,'Atomic',4x,'Mass',3x,'Valence',/)

@@ -304,7 +304,7 @@ c
       if (.not. exist) then
          write (iout,160)
   160    format (/,' Refinement via Minimization or Annealing',
-     &              ' [M or A, <CR>=A] :  ',$)
+     &              ' [M or A, <Enter>=A] :  ',$)
          read (input,170)  record
   170    format (a240)
          next = 1
@@ -589,7 +589,7 @@ c
          done = .true.
          write (iout,260)
   260    format (/,' Enter an Atom Pair to Display Bounds',
-     &              ' [<CR> When Done] :  ',$)
+     &              ' [<Enter>=Done] :  ',$)
          read (input,270)  record
   270    format (a240)
          read (record,*,err=320,end=320)  b1,b2
@@ -604,7 +604,7 @@ c
   280    format (/,' Lower Bound :',f8.3,8x,'Upper Bound :',f8.3)
   290    continue
          write (iout,300)
-  300    format (/,' Enter New Bounds or <CR> to Leave Unchanged :  ',$)
+  300    format (/,' Enter New Bound Values [<Enter>=Unchanged] :  ',$)
          read (input,310)  record
   310    format (a240)
          read (record,*,err=320,end=320)  bndmin,bndmax

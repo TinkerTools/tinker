@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "promo" writes a short message containing information
-c     about the Tinker version number and the copyright notice
+c     "promo" writes a banner message containing information
+c     about the Tinker version, release date and copyright notice
 c
 c
       subroutine promo

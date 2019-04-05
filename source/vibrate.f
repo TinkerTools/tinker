@@ -229,7 +229,7 @@ c
       if (query) then
          write (iout,60)
    60    format (/,' Enter Vibrations to Output [List, A=All',
-     &              ' or <CR>=Exit] :  ',$)
+     &              ' or <Enter>=Exit] :  ',$)
          read (input,70)  record
    70    format (a240)
          letter = ' '

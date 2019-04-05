@@ -84,7 +84,7 @@ c
       dopair = .false.
       dotarget = .false.
       dofit = .false.
-      resp = 0.0d0
+      resp = 1.0d0
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -221,7 +221,7 @@ c
          close (unit=ipot)
          write (iout,160)  potfile(1:trimtext(potfile))
   160    format (/,' Electrostatic Potential Written To :  ',a)
-         goto 390
+         goto 400
       end if
 c
 c     read first structure and get electrostatic parameters
@@ -249,7 +249,7 @@ c
       close (unit=ixyz)
       if (nconf .gt. 1) then
          write (iout,170)  nconf
-  170    format (/,' Structures Used for Potential Analysis :',i6)
+  170    format (/,' Structures Used for Potential Analysis :',3x,i16)
       end if
 c
 c     perform dynamic allocation of some global arrays
@@ -298,7 +298,6 @@ c
                flist(nflist) = max(-namax,min(namax,flist(nflist)))
             end do
          else if (keyword(1:12) .eq. 'RESP-WEIGHT ') then
-            resp = 1.0d0
             read (string,*,err=200,end=200)  resp
   200       continue
          else if (keyword(1:13) .eq. 'FIX-MONOPOLE ') then
@@ -484,11 +483,11 @@ c
             call fatal
          else if (nconf .eq. 1) then
             write (iout,310)  npgrid(1)
-  310       format (' Electrostatic Potential Grid Points :',6x,i10)
+  310       format (' Electrostatic Potential Grid Points :',6x,i16)
          else
             write (iout,320)  i,npgrid(i)
   320       format (' Potential Grid Points for Structure',i4,' :',
-     &                 2x,i10)
+     &                 2x,i16)
          end if
       end do
 c
@@ -537,6 +536,13 @@ c
   380       format (f20.0)
          end if
          if (grdmin .le. 0.0d0)  grdmin = 0.001d0
+      end if
+c
+c     print the parameter restraint value to be used in fitting
+c
+      if (dofit) then
+         write (iout,390)  resp
+  390    format (/,' Electrostatic Parameter Restraint Value :',f18.4)
       end if
 c
 c     setup the potential computation for alternative models
@@ -718,7 +724,7 @@ c
 c
 c     perform any final tasks before program exit
 c
-  390 continue
+  400 continue
       call final
       end
 c
@@ -1631,10 +1637,10 @@ c
                nvar = nvar + 1
                xx(nvar) = pchg(i)
                write (iout,70)  nvar,it,'Charge  ',xx(nvar)
-   70          format (i6,7x,i8,13x,a8,5x,f12.5)
+   70          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,80)  it,'Charge  ',pchg(i)
-   80          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+   80          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
          end if
       end do
@@ -1655,37 +1661,37 @@ c
                nvar = nvar + 1
                xx(nvar) = pole(1,i)
                write (iout,90)  nvar,it,'Monopole',xx(nvar)
-   90          format (i6,7x,i8,13x,a8,5x,f12.5)
+   90          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,100)  it,'Monopole',pole(1,i)
-  100          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  100          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = dterm * pole(2,i)
                write (iout,110)  nvar,it,'X-Dipole',xx(nvar)
-  110          format (i6,7x,i8,13x,a8,5x,f12.5)
+  110          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,120)  it,'X-Dipole',dterm*pole(2,i)
-  120          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  120          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(3,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = dterm * pole(3,i)
                write (iout,130)  nvar,it,'Y-Dipole',xx(nvar)
-  130          format (i6,7x,i8,13x,a8,5x,f12.5)
+  130          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,140)  it,'Y-Dipole',dterm*pole(3,i)
-  140          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  140          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(4,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = dterm * pole(4,i)
                write (iout,150)  nvar,it,'Z-Dipole',xx(nvar)
-  150          format (i6,7x,i8,13x,a8,5x,f12.5)
+  150          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,160)  it,'Z-Dipole',dterm*pole(4,i)
-  160          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  160          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qdp .and. pole(5,i).ne.0.0d0) then
                if (pole(5,i).ne.pole(9,i) .and.
@@ -1693,32 +1699,32 @@ c
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(5,i)
                   write (iout,170)  nvar,it,'XX-Quad ',xx(nvar)
-  170             format (i6,7x,i8,13x,a8,5x,f12.5)
+  170             format (i6,7x,i8,13x,a8,6x,f12.5)
                else
                   write (iout,180)    it,'XX-Quad ',qterm*pole(5,i)
-  180             format (4x,'--',7x,i8,13x,a8,5x,f12.5)
+  180             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
                end if
             else
                write (iout,190)  it,'XX-Quad ',qterm*pole(5,i)
-  190          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  190          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qdp .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = qterm * pole(6,i)
                write (iout,200)  nvar,it,'XY-Quad ',xx(nvar)
-  200          format (i6,7x,i8,13x,a8,5x,f12.5)
+  200          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,210)  it,'XY-Quad ',qterm*pole(6,i)
-  210          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  210          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qdp .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = qterm * pole(7,i)
                write (iout,220)  nvar,it,'XZ-Quad ',xx(nvar)
-  220          format (i6,7x,i8,13x,a8,5x,f12.5)
+  220          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,230)  it,'XZ-Quad ',qterm*pole(7,i)
-  230          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  230          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qdp .and. pole(9,i).ne.0.0d0) then
                if (pole(9,i).ne.pole(5,i) .and.
@@ -1726,37 +1732,37 @@ c
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(9,i)
                   write (iout,240)  nvar,it,'YY-Quad ',xx(nvar)
-  240             format (i6,7x,i8,13x,a8,5x,f12.5)
+  240             format (i6,7x,i8,13x,a8,6x,f12.5)
                else
                   write (iout,250)  it,'YY-Quad ',qterm*pole(9,i)
-  250             format (4x,'--',7x,i8,13x,a8,5x,f12.5)
+  250             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
                end if
             else
                write (iout,260)  it,'YY-Quad ',qterm*pole(9,i)
-  260          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  260          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qdp .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = qterm * pole(10,i)
                write (iout,270)  nvar,it,'YZ-Quad ',xx(nvar)
-  270          format (i6,7x,i8,13x,a8,5x,f12.5)
+  270          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
                write (iout,280)  it,'YZ-Quad ',qterm*pole(10,i)
-  280          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  280          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qdp .and. pole(13,i).ne.0.0d0) then
                if (pole(5,i) .eq. pole(9,i)) then
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(13,i)
                   write (iout,290)  nvar,it,'ZZ-Quad ',xx(nvar)
-  290             format (i6,7x,i8,13x,a8,5x,f12.5)
+  290             format (i6,7x,i8,13x,a8,6x,f12.5)
                else
                   write (iout,300)  it,'ZZ-Quad ',qterm*pole(13,i)
-  300             format (4x,'--',7x,i8,13x,a8,5x,f12.5)
+  300             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
                end if
             else
                write (iout,310)  it,'ZZ-Quad ',qterm*pole(13,i)
-  310          format (4x,'--',7x,i8,13x,a8,5x,f12.5,10x,'X')
+  310          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
          end if
       end do
@@ -1969,14 +1975,14 @@ c
          write (iout,190)  pave2,mave2,tave,uave,rmsd
   190    format (' Average Potential Value for Target :',11x,f12.4,
      &           /,' Average Potential Magnitude for Target :',7x,f12.4,
-     &           /,' Average Signed Potential Difference :',10x,f12.4,
+     &           //,' Average Signed Potential Difference :',10x,f12.4,
      &           /,' Average Unsigned Potential Difference :',8x,f12.4,
      &           /,' Root Mean Square Potential Difference :',8x,f12.4)
       else if (dopair) then
          write (iout,200)  pave2,mave2,tave,uave,rmsd
   200    format (' Average Potential Value for Model2 :',10x,f12.4,
      &           /,' Average Potential Magnitude for Model2 :',6x,f12.4,
-     &           /,' Average Signed Potential Difference :',10x,f12.4,
+     &           //,' Average Signed Potential Difference :',10x,f12.4,
      &           /,' Average Unsigned Potential Difference :',8x,f12.4,
      &           /,' Root Mean Square Potential Difference :',8x,f12.4)
       end if
