@@ -39,7 +39,7 @@
 
  Potential Fitting of Electrostatic Parameters :
 
- Parameter      Atom Type         Category            Value        Fixed
+ Parameter      Atom Type         Category            Value         Fixed
 
     --              1             Monopole          -0.51966          X
     --              1             X-Dipole           0.00000          X
@@ -75,7 +75,7 @@
 
  Potential Fitting of Electrostatic Parameters :
 
- Parameter      Atom Type         Category            Value        Fixed
+ Parameter      Atom Type         Category            Value         Fixed
 
     --              1             Monopole          -0.51966          X
     --              1             X-Dipole           0.00000          X

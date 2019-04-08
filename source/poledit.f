@@ -66,8 +66,9 @@ c
          call rotframe
          call setpolar
          call alterpol
-         call fixpolar
-         call prtpolar
+         call avgpole
+         call packpole
+         call prtpole
       else if (mode .eq. 2) then
          call getxyz
          call attach
@@ -76,7 +77,7 @@ c
          call kmpole
          call kpolar
          call fixframe
-         call prtpolar
+         call prtpole
       else if (mode .eq. 3) then
          call getxyz
          call attach
@@ -85,8 +86,8 @@ c
          call kmpole
          call kpolar
          call alterpol
-         call fixpolar
-         call prtpolar
+         call avgpole
+         call prtpole
       end if
       end
 c
@@ -112,9 +113,8 @@ c
       use polar
       use ptable
       implicit none
-      integer i,j,ixyz
+      integer i,j
       integer atn,size
-      integer freeunit
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 ri,rij,dij
@@ -207,11 +207,6 @@ c
          polsiz(i) = 13
          pollist(i) = i
       end do
-c
-c     create a file with coordinates and connectivities
-c
-      ixyz = freeunit ()
-      call prtxyz (ixyz)
       return
       end
 c
@@ -502,7 +497,7 @@ c
          ic = 0
          write (iout,50)
    50    format (/,' Enter Altered Local Frame Definition',
-     &              ' [<CR>=Exit] :  ',$)
+     &              ' [<Enter>=Exit] :  ',$)
          read (input,60)  record
    60    format (a240)
          read (record,*,err=70,end=70)  i,ia,ib,ic
@@ -806,7 +801,7 @@ c
          ic = 0
          write (iout,50)
    50    format (/,' Enter Altered Local Frame Definition',
-     &              ' [<CR>=Exit] :  ',$)
+     &              ' [<Enter>=Exit] :  ',$)
          read (input,60)  record
    60    format (a240)
          read (record,*,err=70,end=70)  k,ia,ib,ic
@@ -1281,7 +1276,7 @@ c
          thl = 0.39d0
          write (iout,140)
   140    format (/,' Enter Atom Number & Polarizability Values',
-     &              ' [<CR>=Exit] :  ',$)
+     &              ' [<Enter>=Exit] :  ',$)
          read (input,150)  record
   150    format (a240)
          read (record,*,err=160,end=160)  k,pol,thl
@@ -1362,7 +1357,7 @@ c
          ib = 0
          write (iout,260)
   260    format (/,' Enter a Bond between Polarization Groups',
-     &              ' [<CR>=Exit] :  ',$)
+     &              ' [<Enter>=Exit] :  ',$)
          read (input,270)  record
   270    format (a240)
          read (record,*,err=280,end=280)  ia,ib
@@ -2431,19 +2426,19 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine fixpolar  --  postprocess multipole moments  ##
-c     ##                                                          ##
-c     ##############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine avgpole  --  postprocess the multipole moments  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "fixpolar" averages multipoles over equivalent sites, sets
-c     symmetric components at achiral atoms to zero, and maintains
+c     "avgpole" sets symmetric components at achiral atoms to zero,
+c     finds average multipoles over equivalent sites, and maintains
 c     an integer net charge and traceless quadrupoles
 c
 c
-      subroutine fixpolar
+      subroutine avgpole
       use atomid
       use atoms
       use couple
@@ -2459,8 +2454,6 @@ c
       integer next,nx
       integer nlist
       integer list(maxval)
-      real*8 eps,ci,cj
-      real*8 big,sum
       real*8 pave(13)
       logical exist,query
       logical yzero
@@ -2469,7 +2462,7 @@ c
       character*240 string
 c
 c
-c     optionally average multipoles for equivalent atoms
+c     optionally set symmetric multipole components to zero
 c
       query = .true.
       answer = ' '
@@ -2482,10 +2475,60 @@ c
    10 continue
       if (query) then
          write (iout,20)
-   20    format (/,' Average the Multipole Moments of Equivalent',
-     &              ' Atoms [N] :  ',$)
+   20    format (/,' Remove Multipole Components Zeroed by',
+     &              ' Symmetry [N] :  ',$)
          read (input,30)  record
    30    format (a240)
+         next = 1
+         call gettext (record,answer,next)
+         call upcase (answer)
+      end if
+c
+c     remove multipole components that are zero by symmetry
+c
+      if (answer .eq. 'Y') then
+         do i = 1, npole
+            yzero = .false.
+            if (yaxis(i) .eq. 0)  yzero = .true.
+            if (polaxe(i) .eq. 'Bisector')  yzero = .true.
+            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
+            if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
+               pole(13,i) = 0.0d0
+            end if
+            if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
+               pole(2,i) = 0.0d0
+               pole(5,i) = -0.5d0 * pole(13,i)
+               pole(7,i) = 0.0d0
+               pole(9,i) = pole(5,i)
+               pole(11,i) = 0.0d0
+            end if
+            if (yzero) then
+               pole(3,i) = 0.0d0
+               pole(6,i) = 0.0d0
+               pole(8,i) = 0.0d0
+               pole(10,i) = 0.0d0
+               pole(12,i) = 0.0d0
+            end if
+         end do
+      end if
+c
+c     optionally average multipoles for equivalent atoms
+c
+      query = .true.
+      answer = ' '
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=40,end=40)  answer
+         call upcase (answer)
+         if (answer.eq.'N' .or. answer.eq.'Y')  query = .false.
+      end if
+   40 continue
+      if (query) then
+         write (iout,50)
+   50    format (/,' Average Multipoles of Equivalent Monovalent',
+     &              ' Atoms [N] :  ',$)
+         read (input,60)  record
+   60    format (a240)
          next = 1
          call gettext (record,answer,next)
          call upcase (answer)
@@ -2500,11 +2543,11 @@ c
                k = i12(j,i)
                if (n12(k) .eq. 1) then
                   do m = 1, nlist
-                     if (list(m) .eq. atomic(k))  goto 40
+                     if (list(m) .eq. atomic(k))  goto 70
                   end do
                   nlist = nlist + 1
                   list(nlist) = atomic(k)
-   40             continue
+   70             continue
                end if
             end do
             do ii = 1, nlist
@@ -2543,56 +2586,6 @@ c
          end do
       end if
 c
-c     optionally set symmetric multipole components to zero
-c
-      query = .true.
-      answer = ' '
-      call nextarg (string,exist)
-      if (exist) then
-         read (string,*,err=50,end=50)  answer
-         call upcase (answer)
-         if (answer.eq.'N' .or. answer.eq.'Y')  query = .false.
-      end if
-   50 continue
-      if (query) then
-         write (iout,60)
-   60    format (/,' Remove Multipole Components Zeroed by',
-     &              ' Symmetry [N] :  ',$)
-         read (input,70)  record
-   70    format (a240)
-         next = 1
-         call gettext (record,answer,next)
-         call upcase (answer)
-      end if
-c
-c     remove multipole components that are zero by symmetry
-c
-      if (answer .eq. 'Y') then
-         do i = 1, npole
-            yzero = .false.
-            if (yaxis(i) .eq. 0)  yzero = .true.
-            if (polaxe(i) .eq. 'Bisector')  yzero = .true.
-            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
-            if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
-               pole(13,i) = 0.0d0
-            end if
-            if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
-               pole(2,i) = 0.0d0
-               pole(5,i) = -0.5d0 * pole(13,i)
-               pole(7,i) = 0.0d0
-               pole(9,i) = pole(5,i)
-               pole(11,i) = 0.0d0
-            end if
-            if (yzero) then
-               pole(3,i) = 0.0d0
-               pole(6,i) = 0.0d0
-               pole(8,i) = 0.0d0
-               pole(10,i) = 0.0d0
-               pole(12,i) = 0.0d0
-            end if
-         end do
-      end if
-c
 c     convert dipole and quadrupole moments back to atomic units
 c
       do i = 1, npole
@@ -2605,7 +2598,69 @@ c
          end do
       end do
 c
-c     regularize the multipole moments to desired precision
+c     regularize the multipole moments to standarized values
+c
+      call fixpole
+c
+c     print the final post-processed multipoles for AMOEBA
+c
+      write (iout,80)
+   80 format (/,' Multipole Moments for the AMOEBA Force Field :')
+      do k = 1, n
+         i = pollist(k)
+         if (i .eq. 0) then
+            write (iout,90)  k,name(k),atomic(k)
+   90       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+     &                 7x,'Atomic Number:',i8)
+            write (iout,100)
+  100       format (/,' No Atomic Multipole Moments for this Site')
+         else
+            izaxe = zaxis(i)
+            ixaxe = xaxis(i)
+            iyaxe = yaxis(i)
+            if (iyaxe .lt. 0)  iyaxe = -iyaxe
+            write (iout,110)  k,name(k),atomic(k)
+  110       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+     &                 7x,'Atomic Number:',i8)
+            write (iout,120)  polaxe(i),izaxe,ixaxe,iyaxe
+  120       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,130)  pole(1,i)
+  130       format (/,' Charge:',10x,f15.5)
+            write (iout,140)  pole(2,i),pole(3,i),pole(4,i)
+  140       format (' Dipole:',10x,3f15.5)
+            write (iout,150)  pole(5,i)
+  150       format (' Quadrupole:',6x,f15.5)
+            write (iout,160)  pole(8,i),pole(9,i)
+  160       format (18x,2f15.5)
+            write (iout,170)  pole(11,i),pole(12,i),pole(13,i)
+  170       format (18x,3f15.5)
+         end if
+      end do
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine fixpole  --  regularize the multipole moments  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "fixpole" rounds the multipole moments to desired precision,
+c     and enforces integer net charge and traceless quadrupoles
+c
+c
+      subroutine fixpole
+      use atoms
+      use mpole
+      implicit none
+      integer i,j,k
+      real*8 eps,big,sum
+      real*8 ci,cj
+c
+c
+c     regularize multipole moments to desired precision
 c
       eps = 0.00001d0
       do i = 1, npole
@@ -2625,11 +2680,11 @@ c
          if (ci .gt. big) then
             do j = 1, n
                cj = abs(pole(1,j))
-               if (i.ne.j .and. ci.eq.cj)  goto 80
+               if (i.ne.j .and. ci.eq.cj)  goto 10
             end do
             k = i
             big = ci
-   80       continue
+   10       continue
          end if
       end do
       sum = sum - dble(nint(sum))
@@ -2646,58 +2701,150 @@ c
          if (big .eq. abs(pole(13,i)))  k = 13
          if (k .ne. 0)  pole(k,i) = pole(k,i) - sum
       end do
-c
-c     print the final post-processed multipoles for AMOEBA
-c
-      write (iout,90)
-   90 format (/,' Final Multipole Moments for the AMOEBA Force',
-     &           ' Field :')
-      do k = 1, n
-         i = pollist(k)
-         if (i .eq. 0) then
-            write (iout,100)  k,name(k),atomic(k)
-  100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
-     &                 7x,'Atomic Number:',i8)
-            write (iout,110)
-  110       format (/,' No Atomic Multipole Moments for this Site')
-         else
-            izaxe = zaxis(i)
-            ixaxe = xaxis(i)
-            iyaxe = yaxis(i)
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,120)  k,name(k),atomic(k)
-  120       format (/,' Atom:',i8,9x,'Name:',3x,a3,
-     &                 7x,'Atomic Number:',i8)
-            write (iout,130)  polaxe(i),izaxe,ixaxe,iyaxe
-  130       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,140)  pole(1,i)
-  140       format (/,' Charge:',10x,f15.5)
-            write (iout,150)  pole(2,i),pole(3,i),pole(4,i)
-  150       format (' Dipole:',10x,3f15.5)
-            write (iout,160)  pole(5,i)
-  160       format (' Quadrupole:',6x,f15.5)
-            write (iout,170)  pole(8,i),pole(9,i)
-  170       format (18x,2f15.5)
-            write (iout,180)  pole(11,i),pole(12,i),pole(13,i)
-  180       format (18x,3f15.5)
-         end if
-      end do
       return
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine prtpolar  --  create file with final multipoles  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine packpole  --  condense multipole atom types  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "prtpolar" creates a key file with the distributed multipole
-c     analysis after correction for intergroup polarization
+c     "packpole" condenses the number of multipole atom types based
+c     on specified sets of equivalent atoms
 c
 c
-      subroutine prtpolar
+      subroutine packpole
+      use atoms
+      use iounit
+      use mpole
+      implicit none
+      integer i,j,k,m
+      integer it,nsame
+      integer list(20)
+      integer, allocatable :: isame(:)
+      real*8 avg
+      logical done
+      character*240 record
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (isame(n))
+c
+c     query for groups of atoms to condense to a single type
+c
+      done = .false.
+      dowhile (.not. done)
+         do i = 1, 20
+            list(i) = 0
+         end do
+         write (iout,10)
+   10    format (/,' Atoms to Condense to Same Atom Type',
+     &              ' [<Enter>=Exit] :  ',$)
+         read (input,20)  record
+   20    format (a240)
+         read (record,*,err=30,end=30)  (list(i),i=1,20)
+   30    continue
+c
+c     process the input groups to a list of equivalent atoms
+c
+         nsame = 0
+         do i = 1, n
+            isame(i) = 0
+         end do
+         i = 1
+         do while (list(i) .ne. 0)
+            list(i) = max(-n,min(n,list(i)))
+            if (list(i) .gt. 0) then
+               k = list(i)
+               nsame = nsame + 1
+               isame(nsame) = k
+               i = i + 1
+            else
+               list(i+1) = max(-n,min(n,list(i+1)))
+               do k = abs(list(i)), abs(list(i+1))
+                  nsame = nsame + 1
+                  isame(nsame) = k
+               end do
+               i = i + 2
+            end if
+         end do
+         if (nsame .eq. 0)  done = .true.
+c
+c     sort the equivalent atoms to remove any duplicates
+c
+         if (nsame .ne. 0) then
+            call sort8 (nsame,isame)
+c
+c     move equivalent atoms to the lowest atom type number
+c
+            it = isame(1)
+            do i = 1, nsame
+               k = isame(i)
+               do j = 1, npole
+                  m = ipole(j)
+                  if (m .eq. k)  type(m) = it
+                  if (zaxis(j) .eq. k)  zaxis(m) = it
+                  if (xaxis(j) .eq. k)  xaxis(m) = it
+                  if (yaxis(j) .eq. k)  yaxis(m) = it
+               end do        
+            end do
+c
+c     average the charges at equivalent multipole sites
+c
+            avg = 0.0d0
+            do i = 1, nsame
+               k = isame(i)
+               avg = avg + pole(1,pollist(k))
+            end do
+            avg = avg / dble(nsame)
+            do i = 1, nsame
+               k = isame(i)
+               pole(1,pollist(k)) = avg
+            end do
+         end if
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (isame)
+c
+c     renumber the atom types to remove deleted type numbers
+c
+      m = 0
+      do i = 1, npole
+         k = ipole(i)
+         j = type(k)
+         if (k .eq. j) then
+            m = m + 1
+         else
+            m = type(j)
+         end if
+         type(k) = m
+      end do
+c
+c     regularize the multipole moments to standardized values
+c
+      call fixpole
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine prtpole  --  create file with final multipoles  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "prtpole" creates a coordinates file, and a key file with
+c     atomic multipoles corrected for intergroup polarization
+c
+c
+      subroutine prtpole
       use atoms
       use atomid
       use files
@@ -2707,17 +2854,23 @@ c
       use polar
       use units
       implicit none
-      integer i,j,k,it
-      integer ikey,size
+      integer i,j,k
+      integer it,tmax
+      integer ixyz,ikey
+      integer size
       integer ixaxe
       integer iyaxe
       integer izaxe
       integer freeunit
       integer trimtext
-      logical dofull
       character*240 keyfile
       character*240 record
 c
+c
+c     create a file with coordinates and connectivities
+c
+      ixyz = freeunit ()
+      call prtxyz (ixyz)
 c
 c     output some definitions and parameters to a keyfile
 c
@@ -2741,87 +2894,94 @@ c
 c
 c     output the atom definitions to the keyfile as appropriate
 c
-      dofull = .true.
+      tmax = 0
       do i = 1, n
-         if (type(i) .ne. i)  dofull = .false.
-      end do
-      if (dofull) then
-         do i = 1, n
-            write (ikey,30)  i,i,name(i),story(i),atomic(i),
-     &                       mass(i),valence(i)
+         it = type(ipole(i))
+         if (it .gt. tmax) then
+            write (ikey,30)  type(i),type(i),name(i),story(i),
+     &                       atomic(i),mass(i),valence(i)
    30       format ('atom',6x,2i5,4x,a3,3x,'"',a20,'"',i10,f10.3,i5)
-         end do
-         if (n .ne. 0) then
-            write (ikey,40)
-   40       format ()
          end if
+         tmax = max(it,tmax)
+      end do
+      if (n .ne. 0) then
+         write (ikey,40)
+   40    format ()
       end if
 c
 c     output the local frame multipole values to the keyfile
 c
+      tmax = 0
       do i = 1, npole
-         it = ipole(i)
-         if (.not. dofull)  it = -it
-         izaxe = zaxis(i)
-         ixaxe = xaxis(i)
-         iyaxe = yaxis(i)
-         if (iyaxe .lt. 0)  iyaxe = -iyaxe
-         if (polaxe(i) .eq. 'None') then
-            write (ikey,50)  it,pole(1,i)
-   50       format ('multipole',1x,i5,21x,f11.5)
-         else if (polaxe(i) .eq. 'Z-Only') then
-            write (ikey,60)  it,izaxe,pole(1,i)
-   60       format ('multipole',1x,2i5,16x,f11.5)
-         else if (polaxe(i) .eq. 'Z-then-X') then
-            if (yaxis(i) .eq. 0) then
-               write (ikey,70)  it,izaxe,ixaxe,pole(1,i)
-   70          format ('multipole',1x,3i5,11x,f11.5)
-            else
-               write (ikey,80)  it,izaxe,ixaxe,iyaxe,pole(1,i)
-   80          format ('multipole',1x,4i5,6x,f11.5)
+         it = type(ipole(i))
+         if (it .gt. tmax) then
+            izaxe = type(zaxis(i))
+            ixaxe = type(xaxis(i))
+            iyaxe = type(yaxis(i))
+            if (iyaxe .lt. 0)  iyaxe = -iyaxe
+            if (polaxe(i) .eq. 'None') then
+               write (ikey,50)  it,pole(1,i)
+   50          format ('multipole',1x,i5,21x,f11.5)
+            else if (polaxe(i) .eq. 'Z-Only') then
+               write (ikey,60)  it,izaxe,pole(1,i)
+   60          format ('multipole',1x,2i5,16x,f11.5)
+            else if (polaxe(i) .eq. 'Z-then-X') then
+               if (yaxis(i) .eq. 0) then
+                  write (ikey,70)  it,izaxe,ixaxe,pole(1,i)
+   70             format ('multipole',1x,3i5,11x,f11.5)
+               else
+                  write (ikey,80)  it,izaxe,ixaxe,iyaxe,pole(1,i)
+   80             format ('multipole',1x,4i5,6x,f11.5)
+               end if
+            else if (polaxe(i) .eq. 'Bisector') then
+               if (yaxis(i) .eq. 0) then
+                  write (ikey,90)  it,-izaxe,-ixaxe,pole(1,i)
+   90             format ('multipole',1x,3i5,11x,f11.5)
+               else
+                  write (ikey,100)  it,-izaxe,-ixaxe,iyaxe,pole(1,i)
+  100             format ('multipole',1x,4i5,6x,f11.5)
+               end if
+            else if (polaxe(i) .eq. 'Z-Bisect') then
+               write (ikey,110)  it,izaxe,-ixaxe,-iyaxe,pole(1,i)
+  110          format ('multipole',1x,4i5,6x,f11.5)
+            else if (polaxe(i) .eq. '3-Fold') then
+               write (ikey,120)  it,-izaxe,-ixaxe,-iyaxe,pole(1,i)
+  120          format ('multipole',1x,4i5,6x,f11.5)
             end if
-         else if (polaxe(i) .eq. 'Bisector') then
-            if (yaxis(i) .eq. 0) then
-               write (ikey,90)  it,-izaxe,-ixaxe,pole(1,i)
-   90          format ('multipole',1x,3i5,11x,f11.5)
-            else
-               write (ikey,100)  it,-izaxe,-ixaxe,iyaxe,pole(1,i)
-  100          format ('multipole',1x,4i5,6x,f11.5)
-            end if
-         else if (polaxe(i) .eq. 'Z-Bisect') then
-            write (ikey,110)  it,izaxe,-ixaxe,-iyaxe,pole(1,i)
-  110       format ('multipole',1x,4i5,6x,f11.5)
-         else if (polaxe(i) .eq. '3-Fold') then
-            write (ikey,120)  it,-izaxe,-ixaxe,-iyaxe,pole(1,i)
-  120       format ('multipole',1x,4i5,6x,f11.5)
+            write (ikey,130)  pole(2,i),pole(3,i),pole(4,i)
+  130       format (36x,3f11.5)
+            write (ikey,140)  pole(5,i)
+  140       format (36x,f11.5)
+            write (ikey,150)  pole(8,i),pole(9,i)
+  150       format (36x,2f11.5)
+            write (ikey,160)  pole(11,i),pole(12,i),pole(13,i)
+  160       format (36x,3f11.5)
          end if
-         write (ikey,130)  pole(2,i),pole(3,i),pole(4,i)
-  130    format (36x,3f11.5)
-         write (ikey,140)  pole(5,i)
-  140    format (36x,f11.5)
-         write (ikey,150)  pole(8,i),pole(9,i)
-  150    format (36x,2f11.5)
-         write (ikey,160)  pole(11,i),pole(12,i),pole(13,i)
-  160    format (36x,3f11.5)
+         tmax = max(it,tmax)
       end do
 c
 c     output the polarizability parameters to the keyfile
 c
-      if (dofull) then
-         if (n .ne. 0) then
-            write (ikey,170)
-  170       format ()
-         end if
-         do i = 1, npole
+      if (n .ne. 0) then
+         write (ikey,170)
+  170    format ()
+      end if
+      tmax = 0
+      do i = 1, npole
+         it = type(ipole(i))
+         if (it .gt. tmax) then
             k = 0
             do j = 1, maxval
                if (pgrp(j,i) .ne. 0)  k = j
+               pgrp(j,i) = type(pgrp(j,i))
             end do
-            write (ikey,180)  ipole(i),polarity(i),thole(i),
+            call sort8 (k,pgrp(1,i))
+            write (ikey,180)  it,polarity(i),thole(i),
      &                        (pgrp(j,i),j=1,k)
   180       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
-         end do
-      end if
+         end if
+         tmax = max(it,tmax)
+      end do
       close (unit=ikey)
       return
       end

@@ -1618,7 +1618,7 @@ c
          write (iout,60)
    60    format (/,' Potential Fitting of Electrostatic Parameters :',
      &           //,1x,'Parameter',6x,'Atom Type',9x,'Category',
-     &              12x,'Value',8x,'Fixed',/)
+     &              12x,'Value',9x,'Fixed',/)
       end if
 c
 c     get optimization parameters from partial charge values
