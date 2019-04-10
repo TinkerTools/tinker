@@ -67,7 +67,6 @@ c
          call setpolar
          call alterpol
          call avgpole
-         call packpole
          call prtpole
       else if (mode .eq. 2) then
          call getxyz
@@ -637,9 +636,9 @@ c
       use units
       implicit none
       integer i,j,k
-      integer ixaxe
-      integer iyaxe
-      integer izaxe
+      integer xaxe
+      integer yaxe
+      integer zaxe
       real*8 a(3,3)
 c
 c
@@ -694,33 +693,33 @@ c     print the local frame Cartesian atomic multipoles
 c
       write (iout,10)
    10 format (/,' Local Frame Cartesian Multipole Moments :')
-      do k = 1, npole
-         i = pollist(k)
-         if (i .eq. 0) then
-            write (iout,20)  k,name(k),atomic(k)
+      do i = 1, n
+         k = pollist(i)
+         if (k .eq. 0) then
+            write (iout,20)  i,name(i),atomic(i)
    20       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
      &                 'Atomic Number:',i8)
             write (iout,30)
    30       format (/,' No Atomic Multipole Moments for this Site')
          else
-            izaxe = zaxis(i)
-            ixaxe = xaxis(i)
-            iyaxe = yaxis(i)
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,40)  k,name(k),atomic(k)
+            zaxe = zaxis(k)
+            xaxe = xaxis(k)
+            yaxe = yaxis(k)
+            if (yaxe .lt. 0)  yaxe = -yaxe
+            write (iout,40)  i,name(i),atomic(i)
    40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,50)  polaxe(i),izaxe,ixaxe,iyaxe
+            write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
    50       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,60)  rpole(1,i)
+            write (iout,60)  rpole(1,k)
    60       format (/,' Charge:',10x,f15.5)
-            write (iout,70)  rpole(2,i),rpole(3,i),rpole(4,i)
+            write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
    70       format (' Dipole:',10x,3f15.5)
-            write (iout,80)  rpole(5,i)
+            write (iout,80)  rpole(5,k)
    80       format (' Quadrupole:',6x,f15.5)
-            write (iout,90)  rpole(8,i),rpole(9,i)
+            write (iout,90)  rpole(8,k),rpole(9,k)
    90       format (18x,2f15.5)
-            write (iout,100)  rpole(11,i),rpole(12,i),rpole(13,i)
+            write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
   100       format (18x,3f15.5)
          end if
       end do
@@ -753,9 +752,9 @@ c
       implicit none
       integer i,j,k
       integer ia,ib,ic
-      integer ixaxe
-      integer iyaxe
-      integer izaxe
+      integer xaxe
+      integer yaxe
+      integer zaxe
       real*8 eps,ci,cj
       real*8 big,sum
       real*8 a(3,3)
@@ -774,17 +773,17 @@ c
       write (iout,20)
    20 format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
      &          'X Axis',2x,'Y Axis',/)
-      do k = 1, n
-         i = pollist(k)
-         if (i .eq. 0) then
-            write (iout,30)  k,name(k)
+      do i = 1, n
+         k = pollist(i)
+         if (k .eq. 0) then
+            write (iout,30)  i,name(i)
    30       format (i8,6x,a3,10x,'--',11x,'--',6x,'--',6x,'--')
          else
-            izaxe = zaxis(i)
-            ixaxe = xaxis(i)
-            iyaxe = yaxis(i)
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,40)  k,name(k),polaxe(i),izaxe,ixaxe,iyaxe
+            zaxe = zaxis(k)
+            xaxe = xaxis(k)
+            yaxe = yaxis(k)
+            if (yaxe .lt. 0)  yaxe = -yaxe
+            write (iout,40)  i,name(i),polaxe(k),zaxe,xaxe,yaxe
    40       format (i8,6x,a3,7x,a8,2x,3i8)
          end if
       end do
@@ -839,11 +838,11 @@ c
                write (iout,100)  k,name(k)
   100          format (i8,6x,a3,10x,'--',11x,'--',6x,'--',6x,'--')
             else
-               izaxe = zaxis(i)
-               ixaxe = xaxis(i)
-               iyaxe = yaxis(i)
-               if (iyaxe .lt. 0)  iyaxe = -iyaxe
-               write (iout,110)  k,name(k),polaxe(i),izaxe,ixaxe,iyaxe
+               zaxe = zaxis(i)
+               xaxe = xaxis(i)
+               yaxe = yaxis(i)
+               if (yaxe .lt. 0)  yaxe = -yaxe
+               write (iout,110)  k,name(k),polaxe(i),zaxe,xaxe,yaxe
   110          format (i8,6x,a3,7x,a8,2x,3i8)
             end if
          end do
@@ -938,33 +937,33 @@ c     print the altered local frame atomic multipole values
 c
       write (iout,130)
   130 format (/,' Multipoles With Altered Local Frame Definition :')
-      do k = 1, n
-         i = pollist(k)
+      do i = 1, n
+         k = pollist(i)
          if (i .eq. 0) then
-            write (iout,140)  k,name(k),atomic(k)
+            write (iout,140)  i,name(i),atomic(i)
   140       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
      &                 'Atomic Number:',i8)
             write (iout,150)
   150       format (/,' No Atomic Multipole Moments for this Site')
          else
-            izaxe = zaxis(i)
-            ixaxe = xaxis(i)
-            iyaxe = yaxis(i)
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,160)  k,name(k),atomic(k)
+            zaxe = zaxis(k)
+            xaxe = xaxis(k)
+            yaxe = yaxis(k)
+            if (yaxe .lt. 0)  yaxe = -yaxe
+            write (iout,160)  i,name(i),atomic(i)
   160       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,170)  polaxe(i),izaxe,ixaxe,iyaxe
+            write (iout,170)  polaxe(k),zaxe,xaxe,yaxe
   170       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,180)  pole(1,i)
+            write (iout,180)  pole(1,k)
   180       format (/,' Charge:',10x,f15.5)
-            write (iout,190)  pole(2,i),pole(3,i),pole(4,i)
+            write (iout,190)  pole(2,k),pole(3,k),pole(4,k)
   190       format (' Dipole:',10x,3f15.5)
-            write (iout,200)  pole(5,i)
+            write (iout,200)  pole(5,k)
   200       format (' Quadrupole:',6x,f15.5)
-            write (iout,210)  pole(8,i),pole(9,i)
+            write (iout,210)  pole(8,k),pole(9,k)
   210       format (18x,2f15.5)
-            write (iout,220)  pole(11,i),pole(12,i),pole(13,i)
+            write (iout,220)  pole(11,k),pole(12,k),pole(13,k)
   220       format (18x,3f15.5)
          end if
       end do
@@ -1487,9 +1486,9 @@ c
       use units
       implicit none
       integer i,j,k
-      integer ixaxe
-      integer iyaxe
-      integer izaxe
+      integer xaxe
+      integer yaxe
+      integer zaxe
       real*8 a(3,3)
 c
 c
@@ -1545,33 +1544,33 @@ c
       write (iout,10)
    10 format (/,' Multipoles after Removal of Intergroup',
      &           ' Polarization :')
-      do k = 1, n
-         i = pollist(k)
+      do i = 1, n
+         k = pollist(i)
          if (i .eq. 0) then
-            write (iout,20)  k,name(k),atomic(k)
+            write (iout,20)  i,name(i),atomic(i)
    20       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,30)
    30       format (/,' No Atomic Multipole Moments for this Site')
          else
-            izaxe = zaxis(i)
-            ixaxe = xaxis(i)
-            iyaxe = yaxis(i)
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,40)  k,name(k),atomic(k)
+            zaxe = zaxis(k)
+            xaxe = xaxis(k)
+            yaxe = yaxis(k)
+            if (yaxe .lt. 0)  yaxe = -yaxe
+            write (iout,40)  i,name(i),atomic(i)
    40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,50)  polaxe(i),izaxe,ixaxe,iyaxe
+            write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
    50       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,60)  rpole(1,i)
+            write (iout,60)  rpole(1,k)
    60       format (/,' Charge:',10x,f15.5)
-            write (iout,70)  rpole(2,i),rpole(3,i),rpole(4,i)
+            write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
    70       format (' Dipole:',10x,3f15.5)
-            write (iout,80)  rpole(5,i)
+            write (iout,80)  rpole(5,k)
    80       format (' Quadrupole:',6x,f15.5)
-            write (iout,90)  rpole(8,i),rpole(9,i)
+            write (iout,90)  rpole(8,k),rpole(9,k)
    90       format (18x,2f15.5)
-            write (iout,100)  rpole(11,i),rpole(12,i),rpole(13,i)
+            write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
   100       format (18x,3f15.5)
          end if
       end do
@@ -2426,16 +2425,16 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine avgpole  --  postprocess the multipole moments  ##
-c     ##                                                             ##
-c     #################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine avgpole  --  condense multipole atom types  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
-c     "avgpole" sets symmetric components at achiral atoms to zero,
-c     finds average multipoles over equivalent sites, and maintains
-c     an integer net charge and traceless quadrupoles
+c     "avgpole" condenses the number of multipole atom types based
+c     on equivalent monovalent atoms and additional user specified
+c     sets of equivalent atoms
 c
 c
       subroutine avgpole
@@ -2447,144 +2446,200 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer ii,kk
-      integer ixaxe
-      integer iyaxe
-      integer izaxe
-      integer next,nx
-      integer nlist
-      integer list(maxval)
+      integer ja,ka
+      integer it,ik,mk
+      integer size
+      integer nsame,nave
+      integer xaxe,yaxe
+      integer zaxe
+      integer list(20)
+      integer, allocatable :: isame(:)
+      integer, allocatable :: pkey(:)
       real*8 pave(13)
-      logical exist,query
-      logical yzero
-      character*1 answer
+      logical done,mequiv
+      character*4 pa,pb,pc,pd
+      character*16 ptlast
+      character*16, allocatable :: pt(:)
       character*240 record
-      character*240 string
 c
 c
-c     optionally set symmetric multipole components to zero
+c     perform dynamic allocation of some local arrays
 c
-      query = .true.
-      answer = ' '
-      call nextarg (string,exist)
-      if (exist) then
-         read (string,*,err=10,end=10)  answer
-         call upcase (answer)
-         if (answer.eq.'N' .or. answer.eq.'Y')  query = .false.
-      end if
-   10 continue
-      if (query) then
-         write (iout,20)
-   20    format (/,' Remove Multipole Components Zeroed by',
-     &              ' Symmetry [N] :  ',$)
-         read (input,30)  record
-   30    format (a240)
-         next = 1
-         call gettext (record,answer,next)
-         call upcase (answer)
-      end if
+      allocate (isame(n))
+      allocate (pt(npole))
+      allocate (pkey(npole))
 c
-c     remove multipole components that are zero by symmetry
+c     condense equivalent monovalent atoms to the same type
 c
-      if (answer .eq. 'Y') then
-         do i = 1, npole
-            yzero = .false.
-            if (yaxis(i) .eq. 0)  yzero = .true.
-            if (polaxe(i) .eq. 'Bisector')  yzero = .true.
-            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
-            if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
-               pole(13,i) = 0.0d0
-            end if
-            if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
-               pole(2,i) = 0.0d0
-               pole(5,i) = -0.5d0 * pole(13,i)
-               pole(7,i) = 0.0d0
-               pole(9,i) = pole(5,i)
-               pole(11,i) = 0.0d0
-            end if
-            if (yzero) then
-               pole(3,i) = 0.0d0
-               pole(6,i) = 0.0d0
-               pole(8,i) = 0.0d0
-               pole(10,i) = 0.0d0
-               pole(12,i) = 0.0d0
-            end if
-         end do
-      end if
-c
-c     optionally average multipoles for equivalent atoms
-c
-      query = .true.
-      answer = ' '
-      call nextarg (string,exist)
-      if (exist) then
-         read (string,*,err=40,end=40)  answer
-         call upcase (answer)
-         if (answer.eq.'N' .or. answer.eq.'Y')  query = .false.
-      end if
-   40 continue
-      if (query) then
-         write (iout,50)
-   50    format (/,' Average Multipoles of Equivalent Monovalent',
-     &              ' Atoms [N] :  ',$)
-         read (input,60)  record
-   60    format (a240)
-         next = 1
-         call gettext (record,answer,next)
-         call upcase (answer)
-      end if
-c
-c     perform averaging for equivalent monovalent atoms
-c
-      if (answer .eq. 'Y') then
-         do i = 1, n
-            nlist = 0
-            do j = 1, n12(i)
-               k = i12(j,i)
-               if (n12(k) .eq. 1) then
-                  do m = 1, nlist
-                     if (list(m) .eq. atomic(k))  goto 70
-                  end do
-                  nlist = nlist + 1
-                  list(nlist) = atomic(k)
-   70             continue
-               end if
-            end do
-            do ii = 1, nlist
-               kk = list(ii)
-               do j = 1, 13
-                  pave(j) = 0.0d0
-               end do
-               nx = 0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (pollist(k) .ne. 0) then
-                     if (atomic(k).eq.kk .and. n12(k).eq.1) then
-                        nx = nx + 1
-                        do m = 1, 13
-                           pave(m) = pave(m) + pole(m,k)
-                        end do
+      mequiv = .false.
+      do i = 1, n
+         do j = 1, n12(i)-1
+            ja = i12(j,i)
+            if (n12(ja) .eq. 1) then
+               do k = j+1, n12(i)
+                  ka = i12(k,i)
+                  if (n12(ka) .eq. 1) then
+                     if (atomic(ja) .eq. atomic(ka)) then
+                        mequiv = .true.
+                        type(ka) = type(ja)
                      end if
                   end if
                end do
-               if (nx .ge. 2) then
-                  do j = 1, 13
-                     pave(j) = pave(j) / dble(nx)
-                  end do
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (pollist(k) .ne. 0) then
-                        if (atomic(k).eq.kk .and. n12(k).eq.1) then
-                           do m = 1, 13
-                              pole(m,k) = pave(m)
-                           end do
-                        end if
-                     end if
-                  end do
-               end if
-            end do
+            end if
          end do
+      end do
+      if (mequiv) then
+         write (iout,10)
+   10    format (/,' Equivalent Groups of Monovalent Atoms Set to',
+     &              ' the Same Atom Type')
+      else
+         write (iout,20)
+   20    format (/,' No Groups of Equivalent Monovalent Atoms were',
+     &              ' Found')
       end if
+c
+c     query for sets of atoms to condense to a single type
+c
+      done = .false.
+      dowhile (.not. done)
+         do i = 1, 20
+            list(i) = 0
+         end do
+         write (iout,30)
+   30    format (/,' Enter Further Sets of Equivalent Atoms',
+     &              ' [<Enter>=Exit] :  ',$)
+         read (input,40)  record
+   40    format (a240)
+         read (record,*,err=50,end=50)  (list(i),i=1,20)
+   50    continue
+c
+c     process the input groups to a list of equivalent atoms
+c
+         nsame = 0
+         do i = 1, n
+            isame(i) = 0
+         end do
+         i = 1
+         do while (list(i) .ne. 0)
+            list(i) = max(-n,min(n,list(i)))
+            if (list(i) .gt. 0) then
+               k = list(i)
+               nsame = nsame + 1
+               isame(nsame) = k
+               i = i + 1
+            else
+               list(i+1) = max(-n,min(n,list(i+1)))
+               do k = abs(list(i)), abs(list(i+1))
+                  nsame = nsame + 1
+                  isame(nsame) = k
+               end do
+               i = i + 2
+            end if
+         end do
+         if (nsame .eq. 0)  done = .true.
+c
+c     sort the equivalent atoms to remove any duplicates
+c
+         if (nsame .ne. 0) then
+            call sort8 (nsame,isame)
+c
+c     move equivalent atoms to the lowest atom type number
+c
+            it = isame(1)
+            do i = 1, nsame
+               k = isame(i)
+               do j = 1, npole
+                  m = ipole(j)
+                  if (m .eq. k)  type(m) = it
+                  if (zaxis(j) .eq. k)  zaxis(m) = it
+                  if (xaxis(j) .eq. k)  xaxis(m) = it
+                  if (yaxis(j) .eq. k)  yaxis(m) = it
+               end do        
+            end do
+         end if
+      end do
+c
+c     renumber the atom types to remove deleted type numbers
+c
+      m = 0
+      do i = 1, npole
+         k = ipole(i)
+         j = type(k)
+         if (k .eq. j) then
+            m = m + 1
+            type(k) = m
+         else
+            type(k) = type(j)
+         end if
+      end do
+c
+c     locate the equivalently defined multipole sites
+c
+      do i = 1, npole
+         k = ipole(i)
+         it = type(k)
+         zaxe = 0
+         xaxe = 0
+         yaxe = 0
+         if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
+         if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
+         if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+         size = 4
+         call numeral (it,pa,size)
+         call numeral (zaxe,pb,size)
+         call numeral (xaxe,pc,size)
+         call numeral (yaxe,pd,size)
+         pt(i) = pa//pb//pc//pd
+      end do
+      call sort7 (npole,pt,pkey)
+c
+c     average the multipole values at equivalent atom sites
+c
+      nave = 1
+      ptlast = '                '
+      do i = 1, npole
+         ik = pkey(i)
+         if (pt(i) .eq. ptlast) then
+            nave = nave + 1
+            do j = 1, 13
+               pave(j) = pave(j) + pole(j,ik)
+            end do
+            if (i .eq. npole) then
+               do j = 1, 13
+                  pave(j) = pave(j) / dble(nave)
+               end do
+               do m = 1, nave
+                  mk = pkey(i-m+1)
+                  do j = 1, 13
+                     pole(j,mk) = pave(j)
+                  end do
+               end do
+            end if
+         else
+            if (nave .ne. 1) then
+               do j = 1, 13
+                  pave(j) = pave(j) / dble(nave)
+               end do
+               do m = 1, nave
+                  mk = pkey(i-m)
+                  do j = 1, 13
+                     pole(j,mk) = pave(j)
+                  end do
+               end do
+            end if
+            nave = 1
+            do j = 1, 13
+               pave(j) = pole(j,ik)
+            end do
+            ptlast = pt(i)
+         end if
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (isame)
+      deallocate (pt)
+      deallocate (pkey)
 c
 c     convert dipole and quadrupole moments back to atomic units
 c
@@ -2598,42 +2653,42 @@ c
          end do
       end do
 c
-c     regularize the multipole moments to standarized values
+c     regularize the multipole moments to standardized values
 c
       call fixpole
 c
-c     print the final post-processed multipoles for AMOEBA
+c     print the final multipole values for force field use
 c
-      write (iout,80)
-   80 format (/,' Multipole Moments for the AMOEBA Force Field :')
-      do k = 1, n
-         i = pollist(k)
-         if (i .eq. 0) then
-            write (iout,90)  k,name(k),atomic(k)
+      write (iout,60)
+   60 format (/,' Multipole Moments for Polarizable Force Field :')
+      do i = 1, n
+         k = pollist(i)
+         if (k .eq. 0) then
+            write (iout,70)  i,name(i),atomic(i)
+   70       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+     &                 7x,'Atomic Number:',i8)
+            write (iout,80)
+   80       format (/,' No Atomic Multipole Moments for this Site')
+         else
+            zaxe = zaxis(k)
+            xaxe = xaxis(k)
+            yaxe = yaxis(k)
+            if (yaxe .lt. 0)  yaxe = -yaxe
+            write (iout,90)  i,name(i),atomic(i)
    90       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,100)
-  100       format (/,' No Atomic Multipole Moments for this Site')
-         else
-            izaxe = zaxis(i)
-            ixaxe = xaxis(i)
-            iyaxe = yaxis(i)
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
-            write (iout,110)  k,name(k),atomic(k)
-  110       format (/,' Atom:',i8,9x,'Name:',3x,a3,
-     &                 7x,'Atomic Number:',i8)
-            write (iout,120)  polaxe(i),izaxe,ixaxe,iyaxe
-  120       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,130)  pole(1,i)
-  130       format (/,' Charge:',10x,f15.5)
-            write (iout,140)  pole(2,i),pole(3,i),pole(4,i)
-  140       format (' Dipole:',10x,3f15.5)
-            write (iout,150)  pole(5,i)
-  150       format (' Quadrupole:',6x,f15.5)
-            write (iout,160)  pole(8,i),pole(9,i)
-  160       format (18x,2f15.5)
-            write (iout,170)  pole(11,i),pole(12,i),pole(13,i)
-  170       format (18x,3f15.5)
+            write (iout,100)  polaxe(k),zaxe,xaxe,yaxe
+  100       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,110)  pole(1,k)
+  110       format (/,' Charge:',10x,f15.5)
+            write (iout,120)  pole(2,k),pole(3,k),pole(4,k)
+  120       format (' Dipole:',10x,3f15.5)
+            write (iout,130)  pole(5,k)
+  130       format (' Quadrupole:',6x,f15.5)
+            write (iout,140)  pole(8,k),pole(9,k)
+  140       format (18x,2f15.5)
+            write (iout,150)  pole(11,k),pole(12,k),pole(13,k)
+  150       format (18x,3f15.5)
          end if
       end do
       return
@@ -2647,8 +2702,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "fixpole" rounds the multipole moments to desired precision,
-c     and enforces integer net charge and traceless quadrupoles
+c     "fixpole" removes multipole values that are zero by symmetry,
+c     rounds moments to desired precision, and enforces integer net
+c     charge and traceless quadrupoles
 c
 c
       subroutine fixpole
@@ -2658,7 +2714,34 @@ c
       integer i,j,k
       real*8 eps,big,sum
       real*8 ci,cj
+      logical yzero
 c
+c
+c     remove multipole components that are zero by symmetry
+c
+      do i = 1, npole
+         yzero = .false.
+         if (yaxis(i) .eq. 0)  yzero = .true.
+         if (polaxe(i) .eq. 'Bisector')  yzero = .true.
+         if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
+         if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
+            pole(13,i) = 0.0d0
+         end if
+         if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
+            pole(2,i) = 0.0d0
+            pole(5,i) = -0.5d0 * pole(13,i)
+            pole(7,i) = 0.0d0
+            pole(9,i) = pole(5,i)
+            pole(11,i) = 0.0d0
+         end if
+         if (yzero) then
+            pole(3,i) = 0.0d0
+            pole(6,i) = 0.0d0
+            pole(8,i) = 0.0d0
+            pole(10,i) = 0.0d0
+            pole(12,i) = 0.0d0
+         end if
+      end do
 c
 c     regularize multipole moments to desired precision
 c
@@ -2705,134 +2788,6 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine packpole  --  condense multipole atom types  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "packpole" condenses the number of multipole atom types based
-c     on specified sets of equivalent atoms
-c
-c
-      subroutine packpole
-      use atoms
-      use iounit
-      use mpole
-      implicit none
-      integer i,j,k,m
-      integer it,nsame
-      integer list(20)
-      integer, allocatable :: isame(:)
-      real*8 avg
-      logical done
-      character*240 record
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (isame(n))
-c
-c     query for groups of atoms to condense to a single type
-c
-      done = .false.
-      dowhile (.not. done)
-         do i = 1, 20
-            list(i) = 0
-         end do
-         write (iout,10)
-   10    format (/,' Atoms to Condense to Same Atom Type',
-     &              ' [<Enter>=Exit] :  ',$)
-         read (input,20)  record
-   20    format (a240)
-         read (record,*,err=30,end=30)  (list(i),i=1,20)
-   30    continue
-c
-c     process the input groups to a list of equivalent atoms
-c
-         nsame = 0
-         do i = 1, n
-            isame(i) = 0
-         end do
-         i = 1
-         do while (list(i) .ne. 0)
-            list(i) = max(-n,min(n,list(i)))
-            if (list(i) .gt. 0) then
-               k = list(i)
-               nsame = nsame + 1
-               isame(nsame) = k
-               i = i + 1
-            else
-               list(i+1) = max(-n,min(n,list(i+1)))
-               do k = abs(list(i)), abs(list(i+1))
-                  nsame = nsame + 1
-                  isame(nsame) = k
-               end do
-               i = i + 2
-            end if
-         end do
-         if (nsame .eq. 0)  done = .true.
-c
-c     sort the equivalent atoms to remove any duplicates
-c
-         if (nsame .ne. 0) then
-            call sort8 (nsame,isame)
-c
-c     move equivalent atoms to the lowest atom type number
-c
-            it = isame(1)
-            do i = 1, nsame
-               k = isame(i)
-               do j = 1, npole
-                  m = ipole(j)
-                  if (m .eq. k)  type(m) = it
-                  if (zaxis(j) .eq. k)  zaxis(m) = it
-                  if (xaxis(j) .eq. k)  xaxis(m) = it
-                  if (yaxis(j) .eq. k)  yaxis(m) = it
-               end do        
-            end do
-c
-c     average the charges at equivalent multipole sites
-c
-            avg = 0.0d0
-            do i = 1, nsame
-               k = isame(i)
-               avg = avg + pole(1,pollist(k))
-            end do
-            avg = avg / dble(nsame)
-            do i = 1, nsame
-               k = isame(i)
-               pole(1,pollist(k)) = avg
-            end do
-         end if
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (isame)
-c
-c     renumber the atom types to remove deleted type numbers
-c
-      m = 0
-      do i = 1, npole
-         k = ipole(i)
-         j = type(k)
-         if (k .eq. j) then
-            m = m + 1
-         else
-            m = type(j)
-         end if
-         type(k) = m
-      end do
-c
-c     regularize the multipole moments to standardized values
-c
-      call fixpole
-      return
-      end
-c
-c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine prtpole  --  create file with final multipoles  ##
@@ -2858,9 +2813,9 @@ c
       integer it,tmax
       integer ixyz,ikey
       integer size
-      integer ixaxe
-      integer iyaxe
-      integer izaxe
+      integer xaxe
+      integer yaxe
+      integer zaxe
       integer freeunit
       integer trimtext
       character*240 keyfile
@@ -2915,37 +2870,37 @@ c
       do i = 1, npole
          it = type(ipole(i))
          if (it .gt. tmax) then
-            izaxe = type(zaxis(i))
-            ixaxe = type(xaxis(i))
-            iyaxe = type(yaxis(i))
-            if (iyaxe .lt. 0)  iyaxe = -iyaxe
+            zaxe = type(zaxis(i))
+            xaxe = type(xaxis(i))
+            yaxe = type(yaxis(i))
+            if (yaxe .lt. 0)  yaxe = -yaxe
             if (polaxe(i) .eq. 'None') then
                write (ikey,50)  it,pole(1,i)
    50          format ('multipole',1x,i5,21x,f11.5)
             else if (polaxe(i) .eq. 'Z-Only') then
-               write (ikey,60)  it,izaxe,pole(1,i)
+               write (ikey,60)  it,zaxe,pole(1,i)
    60          format ('multipole',1x,2i5,16x,f11.5)
             else if (polaxe(i) .eq. 'Z-then-X') then
                if (yaxis(i) .eq. 0) then
-                  write (ikey,70)  it,izaxe,ixaxe,pole(1,i)
+                  write (ikey,70)  it,zaxe,xaxe,pole(1,i)
    70             format ('multipole',1x,3i5,11x,f11.5)
                else
-                  write (ikey,80)  it,izaxe,ixaxe,iyaxe,pole(1,i)
+                  write (ikey,80)  it,zaxe,xaxe,yaxe,pole(1,i)
    80             format ('multipole',1x,4i5,6x,f11.5)
                end if
             else if (polaxe(i) .eq. 'Bisector') then
                if (yaxis(i) .eq. 0) then
-                  write (ikey,90)  it,-izaxe,-ixaxe,pole(1,i)
+                  write (ikey,90)  it,-zaxe,-xaxe,pole(1,i)
    90             format ('multipole',1x,3i5,11x,f11.5)
                else
-                  write (ikey,100)  it,-izaxe,-ixaxe,iyaxe,pole(1,i)
+                  write (ikey,100)  it,-zaxe,-xaxe,yaxe,pole(1,i)
   100             format ('multipole',1x,4i5,6x,f11.5)
                end if
             else if (polaxe(i) .eq. 'Z-Bisect') then
-               write (ikey,110)  it,izaxe,-ixaxe,-iyaxe,pole(1,i)
+               write (ikey,110)  it,zaxe,-xaxe,-yaxe,pole(1,i)
   110          format ('multipole',1x,4i5,6x,f11.5)
             else if (polaxe(i) .eq. '3-Fold') then
-               write (ikey,120)  it,-izaxe,-ixaxe,-iyaxe,pole(1,i)
+               write (ikey,120)  it,-zaxe,-xaxe,-yaxe,pole(1,i)
   120          format ('multipole',1x,4i5,6x,f11.5)
             end if
             write (ikey,130)  pole(2,i),pole(3,i),pole(4,i)
