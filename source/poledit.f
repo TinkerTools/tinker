@@ -1465,7 +1465,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "alterpol" finds an output set of Tinker multipole parameters
+c     "alterpol" finds an output set of atomic multipole parameters
 c     which when used with an intergroup polarization model will
 c     give the same electrostatic potential around the molecule as
 c     the input set of multipole parameters with all atoms in one
@@ -2442,12 +2442,14 @@ c
       use atoms
       use couple
       use iounit
+      use kpolr
       use mpole
+      use sizes
       use units
       implicit none
       integer i,j,k,m
-      integer ja,ka
-      integer it,ik,mk
+      integer it,jt,kt,mt
+      integer ja,ka,ik,mk
       integer size
       integer nsame,nave
       integer xaxe,yaxe
@@ -2462,12 +2464,6 @@ c
       character*16, allocatable :: pt(:)
       character*240 record
 c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (isame(n))
-      allocate (pt(npole))
-      allocate (pkey(npole))
 c
 c     condense equivalent monovalent atoms to the same type
 c
@@ -2497,6 +2493,12 @@ c
    20    format (/,' No Groups of Equivalent Monovalent Atoms were',
      &              ' Found')
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (isame(n))
+      allocate (pt(npole))
+      allocate (pkey(npole))
 c
 c     query for sets of atoms to condense to a single type
 c
@@ -2641,6 +2643,47 @@ c
       deallocate (pt)
       deallocate (pkey)
 c
+c     reconstruct polarization groups over the new atom types
+c
+      do i = 1, npole
+         it = type(ipole(i))
+         do j = 1, maxval
+            if (pgrp(j,i) .ne. 0)  k = j
+            pgrp(j,i) = type(pgrp(j,i))
+         end do
+         call sort8 (k,pgrp(1,i))
+      end do
+      do i = 1, npole
+         it = type(ipole(i))
+         do k = 1, npole
+            kt = type(ipole(k))
+            if (i.ne.k .and. it.eq.kt) then
+               do j = 1, maxval
+                  jt = pgrp(j,k)
+                  if (jt .ne. 0) then
+                     do m = 1, maxval
+                        mt = pgrp(m,i)
+                        if (jt .eq. mt) then
+                           goto 60
+                        else if (mt .eq. 0) then
+                           pgrp(m,i) = jt
+                           goto 60
+                        end if
+                     end do
+   60                continue
+                  end if
+               end do
+            end if
+         end do
+      end do
+      do i = 1, npole
+         it = type(ipole(i))
+         do j = 1, maxval
+            if (pgrp(j,i) .ne. 0)  k = j
+         end do
+         call sort8 (k,pgrp(1,i))
+      end do
+c
 c     convert dipole and quadrupole moments back to atomic units
 c
       do i = 1, npole
@@ -2659,36 +2702,36 @@ c
 c
 c     print the final multipole values for force field use
 c
-      write (iout,60)
-   60 format (/,' Multipole Moments for Polarizable Force Field :')
+      write (iout,70)
+   70 format (/,' Multipole Moments for Polarizable Force Field :')
       do i = 1, n
          k = pollist(i)
          if (k .eq. 0) then
-            write (iout,70)  i,name(i),atomic(i)
-   70       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,80)  i,name(i),atomic(i)
+   80       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,80)
-   80       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,90)
+   90       format (/,' No Atomic Multipole Moments for this Site')
          else
             zaxe = zaxis(k)
             xaxe = xaxis(k)
             yaxe = yaxis(k)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,90)  i,name(i),atomic(i)
-   90       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,100)  i,name(i),atomic(i)
+  100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,100)  polaxe(k),zaxe,xaxe,yaxe
-  100       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,110)  pole(1,k)
-  110       format (/,' Charge:',10x,f15.5)
-            write (iout,120)  pole(2,k),pole(3,k),pole(4,k)
-  120       format (' Dipole:',10x,3f15.5)
-            write (iout,130)  pole(5,k)
-  130       format (' Quadrupole:',6x,f15.5)
-            write (iout,140)  pole(8,k),pole(9,k)
-  140       format (18x,2f15.5)
-            write (iout,150)  pole(11,k),pole(12,k),pole(13,k)
-  150       format (18x,3f15.5)
+            write (iout,110)  polaxe(k),zaxe,xaxe,yaxe
+  110       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,120)  pole(1,k)
+  120       format (/,' Charge:',10x,f15.5)
+            write (iout,130)  pole(2,k),pole(3,k),pole(4,k)
+  130       format (' Dipole:',10x,3f15.5)
+            write (iout,140)  pole(5,k)
+  140       format (' Quadrupole:',6x,f15.5)
+            write (iout,150)  pole(8,k),pole(9,k)
+  150       format (18x,2f15.5)
+            write (iout,160)  pole(11,k),pole(12,k),pole(13,k)
+  160       format (18x,3f15.5)
          end if
       end do
       return
@@ -2818,6 +2861,10 @@ c
       integer zaxe
       integer freeunit
       integer trimtext
+      integer, allocatable :: pkey(:)
+      character*4 pa,pb,pc,pd
+      character*16 ptlast
+      character*16, allocatable :: pt(:)
       character*240 keyfile
       character*240 record
 c
@@ -2864,12 +2911,39 @@ c
    40    format ()
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pt(npole))
+      allocate (pkey(npole))
+c
+c     locate the equivalently defined multipole sites
+c
+      do i = 1, npole
+         k = ipole(i)
+         it = type(k)
+         zaxe = 0
+         xaxe = 0
+         yaxe = 0
+         if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
+         if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
+         if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+         size = 4
+         call numeral (it,pa,size)
+         call numeral (zaxe,pb,size)
+         call numeral (xaxe,pc,size)
+         call numeral (yaxe,pd,size)
+         pt(i) = pa//pb//pc//pd
+      end do
+      call sort7 (npole,pt,pkey)
+c
 c     output the local frame multipole values to the keyfile
 c
-      tmax = 0
-      do i = 1, npole
+      ptlast = '                '
+      do k = 1, npole
+         i = pkey(k)
          it = type(ipole(i))
-         if (it .gt. tmax) then
+         if (pt(k) .ne. ptlast) then
+            ptlast = pt(k)
             zaxe = type(zaxis(i))
             xaxe = type(xaxis(i))
             yaxe = type(yaxis(i))
@@ -2912,8 +2986,12 @@ c
             write (ikey,160)  pole(11,i),pole(12,i),pole(13,i)
   160       format (36x,3f11.5)
          end if
-         tmax = max(it,tmax)
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pt)
+      deallocate (pkey)
 c
 c     output the polarizability parameters to the keyfile
 c
@@ -2928,7 +3006,6 @@ c
             k = 0
             do j = 1, maxval
                if (pgrp(j,i) .ne. 0)  k = j
-               pgrp(j,i) = type(pgrp(j,i))
             end do
             call sort8 (k,pgrp(1,i))
             write (ikey,180)  it,polarity(i),thole(i),

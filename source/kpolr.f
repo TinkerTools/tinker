@@ -12,9 +12,9 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
+c     pgrp   connected types in polarization group of each atom type
 c     polr   dipole polarizability parameters for each atom type
 c     athl   Thole polarizability damping value for each atom type
-c     pgrp   connected types in polarization group of each atom type
 c
 c
       module kpolr
