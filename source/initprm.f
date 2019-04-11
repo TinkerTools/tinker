@@ -54,6 +54,7 @@ c
       use polpot
       use reppot
       use rxnpot
+      use sizes
       use solute
       use urypot
       use torpot

@@ -1533,7 +1533,7 @@ inertia.o: atomid.o atoms.o iounit.o math.o
 inform.o:
 initatom.o: ptable.o
 initial.o: align.o atoms.o bath.o bound.o boxes.o cell.o files.o group.o inform.o iounit.o keys.o linmin.o minima.o molcul.o mutant.o neigh.o openmp.o output.o params.o pdb.o precis.o rigid.o scales.o sequen.o socket.o virial.o warp.o zclose.o
-initprm.o: angpot.o bndpot.o chgpot.o dsppot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o reppot.o rxnpot.o solute.o torpot.o units.o urypot.o vdwpot.o
+initprm.o: angpot.o bndpot.o chgpot.o dsppot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o reppot.o rxnpot.o sizes.o solute.o torpot.o units.o urypot.o vdwpot.o
 initres.o: resdue.o
 initrot.o: atoms.o couple.o group.o inform.o iounit.o math.o omega.o potent.o restrn.o rotbnd.o usage.o zcoord.o
 insert.o: atomid.o atoms.o couple.o inform.o iounit.o
@@ -1544,7 +1544,7 @@ invbeta.o:
 invert.o: iounit.o
 iounit.o:
 jacobi.o: iounit.o
-kanang.o: sizes.o
+kanang.o:
 kangang.o: angang.o angbnd.o atmlst.o atomid.o atoms.o couple.o inform.o iounit.o kanang.o keys.o potent.o tors.o
 kangle.o: angbnd.o angpot.o atomid.o atoms.o bndstr.o couple.o fields.o inform.o iounit.o kangs.o keys.o merck.o potent.o ring.o usage.o
 kangs.o:
@@ -1581,7 +1581,7 @@ kopbnd.o:
 kopdist.o: angbnd.o angpot.o atmlst.o atomid.o atoms.o couple.o inform.o iounit.o keys.o kopdst.o opdist.o potent.o
 kopdst.o:
 korbit.o: atomid.o atoms.o bndstr.o inform.o iounit.o keys.o korbs.o orbits.o piorbs.o pistuf.o tors.o units.o
-korbs.o: sizes.o
+korbs.o:
 kpitor.o:
 kpitors.o: atomid.o atoms.o bndstr.o couple.o inform.o iounit.o keys.o kpitor.o pitors.o potent.o tors.o
 kpolar.o: atoms.o chgpen.o couple.o inform.o iounit.o keys.o kpolr.o mplpot.o mpole.o neigh.o polar.o polgrp.o polopt.o polpcg.o polpot.o poltcg.o potent.o
@@ -1707,7 +1707,7 @@ prterr.o: files.o output.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
 prtmol2.o: atomid.o atoms.o bndstr.o couple.o files.o iounit.o titles.o
 prtpdb.o: files.o pdb.o sequen.o titles.o
-prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o urypot.o vdwpot.o
+prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o sizes.o urypot.o vdwpot.o
 prtseq.o: files.o sequen.o
 prtxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o titles.o
 pss.o: atoms.o files.o hescut.o inform.o iounit.o math.o omega.o refer.o tree.o warp.o zcoord.o

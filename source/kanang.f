@@ -16,7 +16,6 @@ c     anan   angle-angle cross term parameters for each atom class
 c
 c
       module kanang
-      use sizes
       implicit none
       real*8, allocatable :: anan(:,:)
       save

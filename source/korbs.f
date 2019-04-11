@@ -31,7 +31,6 @@ c     kpi4       string of atom classes for 4-ring pisystem bonds
 c
 c
       module korbs
-      use sizes
       implicit none
       integer maxnpi
       integer maxnpi5

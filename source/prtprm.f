@@ -49,6 +49,7 @@ c
       use kvdwpr
       use mplpot
       use polpot
+      use sizes
       use urypot
       use vdwpot
       implicit none
