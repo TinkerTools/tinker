@@ -224,13 +224,13 @@ c
          goto 400
       end if
 c
-c     read first structure and get electrostatic parameters
+c     read the first structure and setup atom definitions
 c
       call getxyz
       call field
-      call setelect
+      call katom
 c
-c     reopen the structure file and read all the structures
+c     reopen the structure file and get all the structures
 c
       ixyz = freeunit ()
       xyzfile = filename
@@ -1980,8 +1980,9 @@ c
      &           /,' Root Mean Square Potential Difference :',8x,f12.4)
       else if (dopair) then
          write (iout,200)  pave2,mave2,tave,uave,rmsd
-  200    format (' Average Potential Value for Model2 :',10x,f12.4,
-     &           /,' Average Potential Magnitude for Model2 :',6x,f12.4,
+  200    format (' Average Potential Value for Model 2 :',10x,f12.4,
+     &           /,' Average Potential Magnitude for Model 2 :',
+     &              6x,f12.4,
      &           //,' Average Signed Potential Difference :',10x,f12.4,
      &           /,' Average Unsigned Potential Difference :',8x,f12.4,
      &           /,' Root Mean Square Potential Difference :',8x,f12.4)
