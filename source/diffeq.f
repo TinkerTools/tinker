@@ -396,7 +396,6 @@ c     Bulirsch-Stoer integration of ordinary differential equations
 c
 c
       subroutine pzextr (iest,nvar,xest,yest,yz,dy)
-      use sizes
       implicit none
       integer imax
       parameter (imax=13)

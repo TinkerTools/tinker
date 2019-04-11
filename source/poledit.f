@@ -2438,13 +2438,13 @@ c     sets of equivalent atoms
 c
 c
       subroutine avgpole
-      use sizes
       use atomid
       use atoms
       use couple
       use iounit
       use kpolr
       use mpole
+      use sizes
       use units
       implicit none
       integer i,j,k,m
@@ -2843,7 +2843,6 @@ c     atomic multipoles corrected for intergroup polarization
 c
 c
       subroutine prtpole
-      use sizes
       use atoms
       use atomid
       use files
@@ -2851,6 +2850,7 @@ c
       use kpolr
       use mpole
       use polar
+      use sizes
       use units
       implicit none
       integer i,j,k

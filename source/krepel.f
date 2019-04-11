@@ -18,7 +18,6 @@ c     and processes any new or changed values for these parameters
 c
 c
       subroutine krepel
-      use sizes
       use atomid
       use atoms
       use inform
@@ -27,6 +26,7 @@ c
       use keys
       use potent
       use repel
+      use sizes
       implicit none
       integer i,k
       integer ia,ic,next

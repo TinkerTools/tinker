@@ -259,11 +259,11 @@ c              defining the bond length to a given atom is defined
 c
 c
       function adjacent (i1,i2,mode,more,iz0,iz1)
-      use sizes
       use atoms
       use couple
       use inform
       use iounit
+      use sizes
       use zclose
       implicit none
       integer i,j,k,i1,i2

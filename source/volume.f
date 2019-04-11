@@ -19,7 +19,8 @@ c
       subroutine volume (volume_tot,radius,exclude)
       implicit none
       real*8 exclude,probe
-      real*8 volume_tot,area_tot
+      real*8 volume_tot
+      real*8 area_tot
       real*8 radius(*)
 c
 c

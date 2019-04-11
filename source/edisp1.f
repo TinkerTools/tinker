@@ -1576,7 +1576,6 @@ c     mesh Ewald energy and gradient due to damped dispersion
 c
 c
       subroutine edrecip1
-      use sizes
       use boxes
       use bound
       use disp

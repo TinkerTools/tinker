@@ -18,7 +18,6 @@ c     atoms and internal coordinates are passed as arguments
 c
 c
       subroutine zatom (bionum,bond,angle,dihed,iz1,iz2,iz3,iz4)
-      use sizes
       use angbnd
       use atomid
       use atoms
@@ -28,6 +27,7 @@ c
       use kangs
       use katoms
       use kbonds
+      use sizes
       use zclose
       use zcoord
       implicit none

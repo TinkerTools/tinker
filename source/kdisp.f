@@ -18,7 +18,6 @@ c     values for these parameters
 c
 c
       subroutine kdisp
-      use sizes
       use atomid
       use atoms
       use disp
@@ -29,6 +28,7 @@ c
       use keys
       use limits
       use potent
+      use sizes
       implicit none
       integer i,k
       integer ia,ic,next

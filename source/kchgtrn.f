@@ -18,7 +18,6 @@ c     values for these parameters
 c
 c
       subroutine kchgtrn
-      use sizes
       use atomid
       use atoms
       use chgpen
@@ -32,6 +31,7 @@ c
       use polar
       use polpot
       use potent
+      use sizes
       implicit none
       integer i,k
       integer ia,ic,next
