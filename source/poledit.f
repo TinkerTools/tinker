@@ -2449,7 +2449,7 @@ c
       implicit none
       integer i,j,k,m
       integer it,jt,kt,mt
-      integer ja,ka,ik,mk
+      integer ik,ja,ka,mk
       integer size
       integer nsame,nave
       integer xaxe,yaxe
@@ -2457,6 +2457,7 @@ c
       integer list(20)
       integer, allocatable :: isame(:)
       integer, allocatable :: pkey(:)
+      integer, allocatable :: pgrt(:,:)
       real*8 pave(13)
       logical done,mequiv
       character*4 pa,pb,pc,pd
@@ -2643,46 +2644,46 @@ c
       deallocate (pt)
       deallocate (pkey)
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pgrt(maxval,n))
+c
 c     reconstruct polarization groups over the new atom types
 c
-      do i = 1, npole
-         it = type(ipole(i))
+      do i = 1, n
          do j = 1, maxval
-            if (pgrp(j,i) .ne. 0)  k = j
-            pgrp(j,i) = type(pgrp(j,i))
-         end do
-         call sort8 (k,pgrp(1,i))
-      end do
-      do i = 1, npole
-         it = type(ipole(i))
-         do k = 1, npole
-            kt = type(ipole(k))
-            if (i.ne.k .and. it.eq.kt) then
-               do j = 1, maxval
-                  jt = pgrp(j,k)
-                  if (jt .ne. 0) then
-                     do m = 1, maxval
-                        mt = pgrp(m,i)
-                        if (jt .eq. mt) then
-                           goto 60
-                        else if (mt .eq. 0) then
-                           pgrp(m,i) = jt
-                           goto 60
-                        end if
-                     end do
-   60                continue
-                  end if
-               end do
-            end if
+            pgrt(j,i) = 0
          end do
       end do
       do i = 1, npole
          it = type(ipole(i))
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0)  k = j
+            pgrp(j,it) = type(pgrp(j,i))
          end do
-         call sort8 (k,pgrp(1,i))
+         call sort8 (k,pgrp(1,it))
+         do j = 1, k
+            do m = 1, maxval
+               if (pgrt(m,it) .eq. 0) then
+                  pgrt(m,it) = pgrp(j,it)
+                  goto 60
+               end if
+            end do
+   60       continue
+         end do
       end do
+      do i = 1, npole
+         it = type(ipole(i))
+         do j = 1, maxval
+            pgrp(j,it) = pgrt(j,it)
+            if (pgrp(j,it) .ne. 0)  k = j
+         end do
+         call sort8 (k,pgrp(1,it))
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pgrt)
 c
 c     convert dipole and quadrupole moments back to atomic units
 c
@@ -2853,10 +2854,10 @@ c
       use sizes
       use units
       implicit none
-      integer i,j,k
-      integer it,tmax
+      integer i,j,k,m
+      integer it,jt,kt,mt
       integer ixyz,ikey
-      integer size
+      integer size,tmax
       integer xaxe
       integer yaxe
       integer zaxe
@@ -3006,11 +3007,11 @@ c
          if (it .gt. tmax) then
             k = 0
             do j = 1, maxval
-               if (pgrp(j,i) .ne. 0)  k = j
+               if (pgrp(j,it) .ne. 0)  k = j
             end do
-            call sort8 (k,pgrp(1,i))
+            call sort8 (k,pgrp(1,it))
             write (ikey,180)  it,polarity(i),thole(i),
-     &                        (pgrp(j,i),j=1,k)
+     &                        (pgrp(j,it),j=1,k)
   180       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
          end if
          tmax = max(it,tmax)
