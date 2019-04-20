@@ -2433,7 +2433,7 @@ c     #############################################################
 c
 c
 c     "avgpole" condenses the number of multipole atom types based
-c     on equivalent monovalent atoms and additional user specified
+c     on equivalent attached atoms and additional user specified
 c     sets of equivalent atoms
 c
 c
@@ -2449,57 +2449,128 @@ c
       implicit none
       integer i,j,k,m
       integer it,jt,kt,mt
-      integer ik,ja,ka,mk
-      integer size
+      integer ia,ja,ka,ma
+      integer mintyp
+      integer size,nsing
       integer nsame,nave
       integer xaxe,yaxe
       integer zaxe
       integer list(20)
+      integer, allocatable :: ising(:)
+      integer, allocatable :: jsing(:)
       integer, allocatable :: isame(:)
+      integer, allocatable :: tsort(:)
+      integer, allocatable :: tkey(:)
       integer, allocatable :: pkey(:)
       integer, allocatable :: pgrt(:,:)
       real*8 pave(13)
-      logical done,mequiv
+      logical done,header
       character*4 pa,pb,pc,pd
       character*16 ptlast
       character*16, allocatable :: pt(:)
       character*240 record
 c
 c
-c     condense equivalent monovalent atoms to the same type
+c     perform dynamic allocation of some local arrays
 c
-      mequiv = .false.
+      allocate (ising(n))
+      allocate (jsing(n))
+      allocate (isame(n))
+      allocate (tsort(n))
+      allocate (tkey(n))
+      allocate (pt(n))
+      allocate (pkey(n))
+c
+c     store the atomic numbers of atoms attached to each atom
+c
       do i = 1, n
-         do j = 1, n12(i)-1
-            ja = i12(j,i)
-            if (n12(ja) .eq. 1) then
-               do k = j+1, n12(i)
-                  ka = i12(k,i)
-                  if (n12(ka) .eq. 1) then
-                     if (atomic(ja) .eq. atomic(ka)) then
-                        mequiv = .true.
-                        type(ka) = type(ja)
-                     end if
+         do j = 1, 4
+            list(j) = 0
+         end do
+         do j = 1, n12(i)
+            list(j) = atomic(i12(j,i))
+         end do
+         call sort (n12(i),list)
+         size = 4
+         call numeral (list(1),pa,size)
+         call numeral (list(2),pb,size)
+         call numeral (list(3),pc,size)
+         call numeral (list(4),pd,size)
+         pt(i) = pa//pb//pc//pd
+      end do
+c
+c     find the monovalent and single attached atom groups
+c
+      nsing = 0
+      do i = 1, n
+         ising(i) = 0
+         jsing(i) = 0
+         k = 0
+         m = 0
+         do j = 1, n12(i)
+            if (n12(i12(j,i)) .gt. 1) then
+               k = k + 1
+               m = i12(j,i)
+            end if
+         end do
+         if (k .eq. 1) then
+            nsing = nsing + 1
+            ising(nsing) = i
+            jsing(nsing) = m
+         end if
+      end do
+c
+c     condense equivalent attached atom groups to same type
+c
+      header = .true.
+      do i = 1, nsing-1
+         ia = ising(i)
+         it = atomic(ia)
+         do j = i+1, nsing
+            ja = ising(j)
+            jt = atomic(ja)
+            if (it.eq.jt .and. jsing(i).eq.jsing(j)
+     &             .and. pt(ia).eq.pt(ja)) then
+               if (type(ia) .ne. type(ja)) then
+                  mintyp = min(type(ia),type(ja))
+                  type(ia) = mintyp
+                  type(ja) = mintyp
+                  if (header) then
+                     header = .false.
+                     write (iout,10)
+   10                format (/,' Equivalent Atoms to be Set',
+     &                          ' to the Same Atom Type :',/)
                   end if
+                  write (iout,20)  ia,ja
+   20             format (' Atoms',i6,2x,'and',i6,2x,'are Equivalent')
+               end if
+               do k = 1, n12(ia)
+                  ka = i12(k,ia)
+                  kt = atomic(ka)
+                  do m = 1, n12(ja)
+                     ma = i12(m,ja)
+                     mt = atomic(ma)
+                     if (kt .eq. mt) then
+                        if (type(ka) .ne. type(ma)) then
+                           mintyp = min(type(ka),type(ma))
+                           type(ka) = mintyp
+                           type(ma) = mintyp
+                           if (header) then
+                              header = .false.
+                              write (iout,30)
+   30                         format (/,' Equivalent Atoms to be Set',
+     &                                   ' to the Same Atom Type :',/)
+                           end if
+                           write (iout,40)  ka,ma
+   40                      format (' Atoms',i6,2x,'and',i6,2x,'are',
+     &                                ' Equivalent')
+                        end if
+                     end if
+                  end do
                end do
             end if
          end do
       end do
-      if (mequiv) then
-         write (iout,10)
-   10    format (/,' Equivalent Groups of Monovalent Atoms Set to',
-     &              ' the Same Atom Type')
-      else
-         write (iout,20)
-   20    format (/,' No Groups of Equivalent Monovalent Atoms were',
-     &              ' Found')
-      end if
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (isame(n))
-      allocate (pt(npole))
-      allocate (pkey(npole))
 c
 c     query for sets of atoms to condense to a single type
 c
@@ -2508,13 +2579,13 @@ c
          do i = 1, 20
             list(i) = 0
          end do
-         write (iout,30)
-   30    format (/,' Enter Further Sets of Equivalent Atoms',
+         write (iout,50)
+   50    format (/,' Enter Further Sets of Equivalent Atoms',
      &              ' [<Enter>=Exit] :  ',$)
-         read (input,40)  record
-   40    format (a240)
-         read (record,*,err=50,end=50)  (list(i),i=1,20)
-   50    continue
+         read (input,60)  record
+   60    format (a240)
+         read (record,*,err=70,end=70)  (list(i),i=1,20)
+   70    continue
 c
 c     process the input groups to a list of equivalent atoms
 c
@@ -2541,39 +2612,45 @@ c
          end do
          if (nsame .eq. 0)  done = .true.
 c
-c     sort the equivalent atoms to remove any duplicates
+c     assign equivalent atoms to a common atom type number
 c
          if (nsame .ne. 0) then
             call sort8 (nsame,isame)
-c
-c     move equivalent atoms to the lowest atom type number
-c
-            it = isame(1)
+            k = type(isame(1))
             do i = 1, nsame
-               k = isame(i)
-               do j = 1, npole
-                  m = ipole(j)
-                  if (m .eq. k)  type(m) = it
-                  if (zaxis(j) .eq. k)  zaxis(m) = it
-                  if (xaxis(j) .eq. k)  xaxis(m) = it
-                  if (yaxis(j) .eq. k)  yaxis(m) = it
-               end do        
+               type(isame(i)) = k
             end do
          end if
       end do
 c
 c     renumber the atom types to remove deleted type numbers
 c
+      do i = 1, n
+         tsort(i) = type(i)
+      end do
+      call sort3 (n,tsort,tkey)
+      k = 0
       m = 0
-      do i = 1, npole
-         k = ipole(i)
-         j = type(k)
-         if (k .eq. j) then
+      do i = 1, n
+         if (tsort(i) .ne. k) then
             m = m + 1
-            type(k) = m
-         else
-            type(k) = type(j)
+            k = tsort(i)
          end if
+         type(tkey(i)) = m
+      end do
+c
+c     print the atoms, atom types and local frame definitions
+c
+      write (iout,80)
+   80 format (/,' Atom Type and Local Frame Definition',
+     &           ' for Each Atom :',
+     &        //,5x,'Atom',4x,'Type',6x,'Local Frame',10x,
+     &           'Frame Defining Atoms',/)
+      do i = 1, n
+         k = pollist(i)
+         write (iout,90)  i,type(i),polaxe(k),zaxis(k),
+     &                    xaxis(k),yaxis(k)
+   90    format (2i8,9x,a8,6x,3i8)
       end do
 c
 c     locate the equivalently defined multipole sites
@@ -2601,20 +2678,20 @@ c
       nave = 1
       ptlast = '                '
       do i = 1, npole
-         ik = pkey(i)
+         it = pkey(i)
          if (pt(i) .eq. ptlast) then
             nave = nave + 1
             do j = 1, 13
-               pave(j) = pave(j) + pole(j,ik)
+               pave(j) = pave(j) + pole(j,it)
             end do
             if (i .eq. npole) then
                do j = 1, 13
                   pave(j) = pave(j) / dble(nave)
                end do
                do m = 1, nave
-                  mk = pkey(i-m+1)
+                  mt = pkey(i-m+1)
                   do j = 1, 13
-                     pole(j,mk) = pave(j)
+                     pole(j,mt) = pave(j)
                   end do
                end do
             end if
@@ -2624,15 +2701,15 @@ c
                   pave(j) = pave(j) / dble(nave)
                end do
                do m = 1, nave
-                  mk = pkey(i-m)
+                  mt = pkey(i-m)
                   do j = 1, 13
-                     pole(j,mk) = pave(j)
+                     pole(j,mt) = pave(j)
                   end do
                end do
             end if
             nave = 1
             do j = 1, 13
-               pave(j) = pole(j,ik)
+               pave(j) = pole(j,it)
             end do
             ptlast = pt(i)
          end if
@@ -2640,7 +2717,11 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (ising)
+      deallocate (jsing)
       deallocate (isame)
+      deallocate (tsort)
+      deallocate (tkey)
       deallocate (pt)
       deallocate (pkey)
 c
@@ -2648,7 +2729,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pgrt(maxval,n))
 c
-c     reconstruct polarization groups over the new atom types
+c     set polarization groups over the condensed atom types
 c
       do i = 1, n
          do j = 1, maxval
@@ -2666,10 +2747,10 @@ c
             do m = 1, maxval
                if (pgrt(m,it) .eq. 0) then
                   pgrt(m,it) = pgrp(j,it)
-                  goto 60
+                  goto 100
                end if
             end do
-   60       continue
+  100       continue
          end do
       end do
       do i = 1, npole
@@ -2703,36 +2784,36 @@ c
 c
 c     print the final multipole values for force field use
 c
-      write (iout,70)
-   70 format (/,' Multipole Moments for Polarizable Force Field :')
+      write (iout,110)
+  110 format (/,' Multipole Moments for Polarizable Force Field :')
       do i = 1, n
          k = pollist(i)
          if (k .eq. 0) then
-            write (iout,80)  i,name(i),atomic(i)
-   80       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,120)  i,name(i),atomic(i)
+  120       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,90)
-   90       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,130)
+  130       format (/,' No Atomic Multipole Moments for this Site')
          else
             zaxe = zaxis(k)
             xaxe = xaxis(k)
             yaxe = yaxis(k)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,100)  i,name(i),atomic(i)
-  100       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,140)  i,name(i),atomic(i)
+  140       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,110)  polaxe(k),zaxe,xaxe,yaxe
-  110       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,120)  pole(1,k)
-  120       format (/,' Charge:',10x,f15.5)
-            write (iout,130)  pole(2,k),pole(3,k),pole(4,k)
-  130       format (' Dipole:',10x,3f15.5)
-            write (iout,140)  pole(5,k)
-  140       format (' Quadrupole:',6x,f15.5)
-            write (iout,150)  pole(8,k),pole(9,k)
-  150       format (18x,2f15.5)
-            write (iout,160)  pole(11,k),pole(12,k),pole(13,k)
-  160       format (18x,3f15.5)
+            write (iout,150)  polaxe(k),zaxe,xaxe,yaxe
+  150       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,160)  pole(1,k)
+  160       format (/,' Charge:',10x,f15.5)
+            write (iout,170)  pole(2,k),pole(3,k),pole(4,k)
+  170       format (' Dipole:',10x,3f15.5)
+            write (iout,180)  pole(5,k)
+  180       format (' Quadrupole:',6x,f15.5)
+            write (iout,190)  pole(8,k),pole(9,k)
+  190       format (18x,2f15.5)
+            write (iout,200)  pole(11,k),pole(12,k),pole(13,k)
+  200       format (18x,3f15.5)
          end if
       end do
       return
