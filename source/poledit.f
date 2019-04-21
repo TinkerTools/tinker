@@ -988,9 +988,11 @@ c
       use couple
       use iounit
       use kpolr
+      use mplpot
       use mpole
       use polar
       use polgrp
+      use polpot
       implicit none
       integer i,j,k,m
       integer jj,ia,ib
@@ -1032,6 +1034,16 @@ c
          call upcase (answer)
       end if
       if (answer .eq. 'H')  pmodel = 'HIPPO '
+c
+c     set polarization damping scheme based on model selected
+c
+      if (pmodel .eq. 'AMOEBA') then
+         use_thole = .true.
+         use_chgpen = .false.
+      else if (pmodel .eq. 'HIPPO ') then
+         use_thole = .false.
+         use_chgpen = .true.
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1101,7 +1113,7 @@ c
 c
 c     assign default atomic polarizabilities for HIPPO model
 c
-      else
+      else if (pmodel .eq. 'HIPPO ') then
          do i = 1, n
             polarity(i) = 0.0d0
             thole(i) = 0.0d0
@@ -1500,7 +1512,7 @@ c     compute induced dipoles to be removed from QM multipoles
 c
       call interpol
 c
-c     remove induced dipole from global frame multipoles
+c     remove induced dipoles from global frame multipoles
 c
       do i = 1, npole
          rpole(2,i) = rpole(2,i) - uind(1,i)
@@ -2480,8 +2492,8 @@ c
       allocate (isame(n))
       allocate (tsort(n))
       allocate (tkey(n))
-      allocate (pt(n))
       allocate (pkey(n))
+      allocate (pt(n))
 c
 c     store the atomic numbers of atoms attached to each atom
 c
@@ -2548,12 +2560,12 @@ c
                      if (header) then
                         header = .false.
                         write (iout,10)
-   10                   format (/,' Equivalent Atoms to Set',
-     &                             ' to Same Atom Type :',/)
+   10                   format (/,' Equivalent Atom Pairs Condensed',
+     &                             ' to the Same Atom Type :',/)
                      end if
                      write (iout,20)  ia,ja
-   20                format (' Atoms',i6,2x,'and',i6,2x,
-     &                          'are Equivalent')
+   20                format (' Atoms',i6,2x,'and',i6,2x,'Set to',
+     &                          ' Equivalent Types')
                   end if
                   do k = 1, n12(ia)
                      ka = i12(k,ia)
@@ -2735,8 +2747,8 @@ c
       deallocate (isame)
       deallocate (tsort)
       deallocate (tkey)
-      deallocate (pt)
       deallocate (pkey)
+      deallocate (pt)
 c
 c     perform dynamic allocation of some local arrays
 c
