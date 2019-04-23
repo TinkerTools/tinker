@@ -2513,32 +2513,32 @@ c
          pt(i) = pa//pb//pc//pd
       end do
 c
+c     find the monovalent and singly attached atom groups
+c
+      nsing = 0
+      do i = 1, n
+         ising(i) = 0
+         jsing(i) = 0
+         k = 0
+         m = 0
+         do j = 1, n12(i)
+            if (n12(i12(j,i)) .gt. 1) then
+               k = k + 1
+               m = i12(j,i)
+            end if
+         end do
+         if (k .eq. 1) then
+            nsing = nsing + 1
+            ising(nsing) = i
+            jsing(nsing) = m
+         end if
+      end do
+c
 c     partially automated determination of equivalent atoms
 c
       repeat = .true.
       dowhile (repeat)
          repeat = .false.
-c
-c     find the monovalent and singly attached atom groups
-c
-         nsing = 0
-         do i = 1, n
-            ising(i) = 0
-            jsing(i) = 0
-            k = 0
-            m = 0
-            do j = 1, n12(i)
-               if (n12(i12(j,i)) .gt. 1) then
-                  k = k + 1
-                  m = i12(j,i)
-               end if
-            end do
-            if (k .eq. 1) then
-               nsing = nsing + 1
-               ising(nsing) = i
-               jsing(nsing) = m
-            end if
-         end do
 c
 c     condense equivalent attached atom groups to same type
 c
