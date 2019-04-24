@@ -188,9 +188,9 @@ struct {
    double* xbox;
    double* ybox;
    double* zbox;
-   double alpha;
-   double beta;
-   double gamma;
+   double* alpha;
+   double* beta;
+   double* gamma;
    double* xbox2;
    double* ybox2;
    double* zbox2;
@@ -202,8 +202,8 @@ struct {
    double gamma_cos;
    double beta_term;
    double gamma_term;
-   double lvec[3][3];
-   double recip[3][3];
+   double* lvec;
+   double* recip;
    int orthogonal;
    int monoclinic;
    int triclinic;
@@ -1027,15 +1027,12 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
                       double* recip, int* orthogonal, int* monoclinic,
                       int* triclinic, int* octahedron, char* spacegrp) {
 
-   int ii, jj;
-   double* ptr_d;
-
    boxes__.xbox = xbox;
    boxes__.ybox = ybox;
    boxes__.zbox = zbox;
-   boxes__.alpha = *alpha;
-   boxes__.beta = *beta;
-   boxes__.gamma = *gamma;
+   boxes__.alpha = alpha;
+   boxes__.beta = beta;
+   boxes__.gamma = gamma;
    boxes__.xbox2 = xbox2;
    boxes__.ybox2 = ybox2;
    boxes__.zbox2 = zbox2;
@@ -1047,22 +1044,8 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
    boxes__.gamma_cos = *gamma_cos;
    boxes__.beta_term = *beta_term;
    boxes__.gamma_term = *gamma_term;
-
-   ptr_d = lvec;
-   for (ii = 0; ii < 3; ii++) {
-      for (jj = 0; jj < 3; jj++) {
-         boxes__.lvec[ii][jj] = *ptr_d;
-         ptr_d++;
-      }
-   }
-   ptr_d = recip;
-   for (ii = 0; ii < 3; ii++) {
-      for (jj = 0; jj < 3; jj++) {
-         boxes__.recip[ii][jj] = *ptr_d;
-         ptr_d++;
-      }
-   }
-
+   boxes__.lvec = lvec;
+   boxes__.recip = recip;
    boxes__.orthogonal = *orthogonal;
    boxes__.monoclinic = *monoclinic;
    boxes__.triclinic = *triclinic;
@@ -1073,6 +1056,7 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
 void set_cell_data_ (int* ncell, int* icell, double* xcell, double* ycell,
                      double* zcell, double* xcell2, double* ycell2,
                      double* zcell2) {
+
    cell__.ncell = *ncell;
    cell__.icell = icell;
    cell__.xcell = *xcell;
@@ -2744,15 +2728,15 @@ static void setDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    OpenMM_Vec3 c;
 
    if (bound__.use_bounds) {
-      a.x = boxes__.lvec[0][0] * OpenMM_NmPerAngstrom;
-      a.y = boxes__.lvec[1][0] * OpenMM_NmPerAngstrom;
-      a.z = boxes__.lvec[2][0] * OpenMM_NmPerAngstrom;
-      b.x = boxes__.lvec[0][1] * OpenMM_NmPerAngstrom;
-      b.y = boxes__.lvec[1][1] * OpenMM_NmPerAngstrom;
-      b.z = boxes__.lvec[2][1] * OpenMM_NmPerAngstrom;
-      c.x = boxes__.lvec[0][2] * OpenMM_NmPerAngstrom;
-      c.y = boxes__.lvec[1][2] * OpenMM_NmPerAngstrom;
-      c.z = boxes__.lvec[2][2] * OpenMM_NmPerAngstrom;
+      a.x = boxes__.lvec[0] * OpenMM_NmPerAngstrom;
+      a.y = boxes__.lvec[3] * OpenMM_NmPerAngstrom;
+      a.z = boxes__.lvec[6] * OpenMM_NmPerAngstrom;
+      b.x = boxes__.lvec[1] * OpenMM_NmPerAngstrom;
+      b.y = boxes__.lvec[4] * OpenMM_NmPerAngstrom;
+      b.z = boxes__.lvec[7] * OpenMM_NmPerAngstrom;
+      c.x = boxes__.lvec[2] * OpenMM_NmPerAngstrom;
+      c.y = boxes__.lvec[5] * OpenMM_NmPerAngstrom;
+      c.z = boxes__.lvec[8] * OpenMM_NmPerAngstrom;
       OpenMM_System_setDefaultPeriodicBoxVectors (system, &a, &b, &c);
    }
 }
@@ -2775,11 +2759,11 @@ static void printDefaultPeriodicBoxVectors (OpenMM_System* system, FILE* log) {
    c.z = c.z / OpenMM_NmPerAngstrom;
 
    if (bound__.use_bounds) {
-      (void) fprintf (log, "\n Box Vectors:  %12.4f %12.4f %12.4f",
+      (void) fprintf (log, "\n Box Vectors:   %17.8e %17.8e %17.8e",
                          a.x, a.y, a.z);
-      (void) fprintf (log, "\n    (Ang)      %12.4f %12.4f %12.4f",
+      (void) fprintf (log, "\n    (Ang)       %17.8e %17.8e %17.8e",
                          b.x, b.y, b.z);
-      (void) fprintf (log, "\n               %12.4f %12.4f %12.4f\n",
+      (void) fprintf (log, "\n                %17.8e %17.8e %17.8e\n",
                          c.x, c.y, c.z);
    }
 }
@@ -4287,16 +4271,28 @@ void openmm_update_ (void** omm, double* dt, int* istep,
    state = OpenMM_Context_getState (openMMDataHandle->context, infoMask, 0);
    OpenMM_State_getPeriodicBoxVectors (state, &aBox, &bBox, &cBox);
 
-   *(boxes__.xbox) = aBox.x / OpenMM_NmPerAngstrom;
-   *(boxes__.ybox) = bBox.y / OpenMM_NmPerAngstrom;
-   *(boxes__.zbox) = cBox.z / OpenMM_NmPerAngstrom;
+   *(boxes__.xbox) = sqrt(aBox.x*aBox.x+aBox.y*aBox.y+aBox.z*aBox.z);
+   *(boxes__.ybox) = sqrt(bBox.x*bBox.x+bBox.y*bBox.y+bBox.z*bBox.z);
+   *(boxes__.zbox) = sqrt(cBox.x*cBox.x+cBox.y*cBox.y+cBox.z*cBox.z);
+   *(boxes__.alpha) = acos((bBox.x*cBox.x+bBox.y*cBox.y+bBox.z*cBox.z)
+                             / ((*(boxes__.ybox))*(*(boxes__.zbox))));
+   *(boxes__.beta) = acos((aBox.x*cBox.x+aBox.y*cBox.y+aBox.z*cBox.z)
+                             / ((*(boxes__.xbox))*(*(boxes__.zbox))));
+   *(boxes__.gamma) = acos((aBox.x*bBox.x+aBox.y*bBox.y+aBox.z*bBox.z)
+                             / ((*(boxes__.xbox))*(*(boxes__.ybox))));
+   *(boxes__.xbox) = *(boxes__.xbox) / OpenMM_NmPerAngstrom;
+   *(boxes__.ybox) = *(boxes__.ybox) / OpenMM_NmPerAngstrom;
+   *(boxes__.zbox) = *(boxes__.zbox) / OpenMM_NmPerAngstrom;
+   *(boxes__.alpha) = *(boxes__.alpha) / OpenMM_RadiansPerDegree;
+   *(boxes__.beta) = *(boxes__.beta) / OpenMM_RadiansPerDegree;
+   *(boxes__.gamma) = *(boxes__.gamma) / OpenMM_RadiansPerDegree;
    *(boxes__.xbox2) = 0.5 * (*(boxes__.xbox));
    *(boxes__.ybox2) = 0.5 * (*(boxes__.ybox));
    *(boxes__.zbox2) = 0.5 * (*(boxes__.zbox));
 
    // fprintf (stderr, "openmm_update_ %15.7e %15.7e %15.7e %15.7e %15.7e %15.7e \n",
    // *(boxes__.xbox), *(boxes__.ybox), *(boxes__.zbox),
-   // aBox.x, bBox.y, cBox.z );
+   // *(boxes__.alpha), *(boxes__.beta), *(boxes__.gamma);
 
    // load positions/velocities and energies
 
@@ -5061,15 +5057,15 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
    OpenMM_Vec3 a;
    OpenMM_Vec3 b;
    OpenMM_Vec3 c;
-   a.x = boxes__.lvec[0][0] * OpenMM_NmPerAngstrom;
-   a.y = boxes__.lvec[1][0] * OpenMM_NmPerAngstrom;
-   a.z = boxes__.lvec[2][0] * OpenMM_NmPerAngstrom;
-   b.x = boxes__.lvec[0][1] * OpenMM_NmPerAngstrom;
-   b.y = boxes__.lvec[1][1] * OpenMM_NmPerAngstrom;
-   b.z = boxes__.lvec[2][1] * OpenMM_NmPerAngstrom;
-   c.x = boxes__.lvec[0][2] * OpenMM_NmPerAngstrom;
-   c.y = boxes__.lvec[1][2] * OpenMM_NmPerAngstrom;
-   c.z = boxes__.lvec[2][2] * OpenMM_NmPerAngstrom;
+   a.x = boxes__.lvec[0] * OpenMM_NmPerAngstrom;
+   a.y = boxes__.lvec[3] * OpenMM_NmPerAngstrom;
+   a.z = boxes__.lvec[6] * OpenMM_NmPerAngstrom;
+   b.x = boxes__.lvec[1] * OpenMM_NmPerAngstrom;
+   b.y = boxes__.lvec[4] * OpenMM_NmPerAngstrom;
+   b.z = boxes__.lvec[7] * OpenMM_NmPerAngstrom;
+   c.x = boxes__.lvec[2] * OpenMM_NmPerAngstrom;
+   c.y = boxes__.lvec[5] * OpenMM_NmPerAngstrom;
+   c.z = boxes__.lvec[8] * OpenMM_NmPerAngstrom;
    OpenMM_Context_setPeriodicBoxVectors (omm->context, &a, &b, &c);
 
    // copy coordinates from Tinker to OpenMM
