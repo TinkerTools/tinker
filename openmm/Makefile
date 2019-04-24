@@ -146,6 +146,7 @@ OBJS =	action.o \
 	analysis.o \
 	analyz.o \
 	analyze.o \
+	analyze_omm.o \
 	angang.o \
 	angbnd.o \
 	angles.o \
@@ -706,7 +707,7 @@ OBJS =	action.o \
 	zclose.o \
 	zcoord.o
 
-EXEFILES = dynamic_omm.x bar_omm.x
+EXEFILES = analyze_omm.x bar_omm.x dynamic_omm.x
 
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
@@ -734,6 +735,9 @@ listing:
 ommstuf.o: ommstuf.cpp
 	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuf.cpp
 
+analyze_omm.x: analyze_omm.o ommstuf.o libtinker.a
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+
 bar_omm.x: bar_omm.o ommstuf.o libtinker.a
 	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
@@ -741,16 +745,19 @@ dynamic_omm.x: dynamic_omm.o ommstuf.o libtinker.a
 	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
 rename:
-	mv dynamic_omm.x $(BINDIR)/dynamic_omm
+	mv analyze_omm.x $(BINDIR)/analyze_omm
 	mv bar_omm.x $(BINDIR)/bar_omm
+	mv dynamic_omm.x $(BINDIR)/dynamic_omm
 
 remove_links:
-	rm -f $(LINKDIR)/dynamic_omm
+	rm -f $(LINKDIR)/analyze_omm
 	rm -f $(LINKDIR)/bar_omm
+	rm -f $(LINKDIR)/dynamic_omm
 
 create_links:
-	ln -s $(BINDIR)/dynamic_omm $(LINKDIR)/dynamic_omm
+	ln -s $(BINDIR)/analyze_omm $(LINKDIR)/analyze_omm
 	ln -s $(BINDIR)/bar_omm $(LINKDIR)/bar_omm
+	ln -s $(BINDIR)/dynamic_omm $(LINKDIR)/dynamic_omm
 
 libtinker.a: ${OBJS} 
 	ar ${LIBFLAGS} libtinker.a \
@@ -1263,6 +1270,7 @@ libtinker.a: ${OBJS}
 ##  Next Section has Explicit Dependencies on Include Files  ##
 ###############################################################
 
+analyze_omm.o: files.o inform.o iounit.o mdstuf.o openmm.o
 bar_omm.o: boxes.o files.o inform.o iounit.o keys.o mdstuf.o openmm.o titles.o units.o
 dynamic_omm.o: atoms.o bath.o bndstr.o bound.o boxes.o inform.o iounit.o keys.o mdstuf.o openmm.o openmp.o potent.o solute.o stodyn.o usage.o
 gpu_cards.o: $(GPU_USAGE_OBJS)

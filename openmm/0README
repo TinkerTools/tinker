@@ -1,25 +1,26 @@
 
-                    #######################################
-                    Files for OpenMM-Enabled Tinker DYNAMIC
-                    #######################################
+                  ###########################################
+                  Files for OpenMM-Enabled Tinker Executables
+                  ###########################################
 
-         This directory contains the files needed to build a Tinker
-         DYNAMIC program using the GPU-capable OpenMM libraries. The
-         files in this directory should be copied into the /source
-         directory of a clean distribution of Tinker, and the program
-         can be compiled and linked in that modified /source directory.
+       This directory contains the files needed to build Tinker versions
+       of the ANALYZE, BAR and DYNAMIC programs using the GPU-capable
+       OpenMM libraries. The files in this directory should be copied
+       into the /source directory of a clean distribution of Tinker, and
+       the programs can be compiled and linked in that modified /source
+       directory.
 
-         Building an OpenMM-enabled DYNAMIC requires a special version
-         of OpenMM, call OpenMM-Tinker that is available in a separate
-         GitHub branch, currently https://github.com/pren/tinker-openmm
-         This version contains changes to the canonical Stanford OpenMM
-         that are needed for the Tinker interface, beyond implementation
-         of the basic AMOEBA force field.
+       Building OpenMM-enabled executables requires a special version of
+       OpenMM, called Tinker-OpenMM, and available via a separate GitHub
+       branch, currently https://github.com/TinkerTools/Tinker-OpenMM.
+       This version has changes from the canonical Stanford OpenMM that
+       are needed for the Tinker interface, beyond implementation of the
+       AMOEBA force field.
 
-         The provided Makefile can then be used, after minor editing, to
-         build a dynamic_omm.x executable. Either the GNU compilers or
-         the Intel compilers can be used. The Makefile assumes OpenMM
-         is found in its default location, /usr/local/openmm. NVIDIA
-         CUDA V7.5 or later must be installed on the target machine, as
-         well as a CUDA-capable graphics card.
+       The provided Makefile can be used, after minor edits, to build
+       GPU-enabled executables. Either the GNU compilers or the Intel
+       compilers can be used. The Makefile assumes OpenMM is found in
+       its default location, /usr/local/openmm. NVIDIA CUDA V9 or later
+       must be installed on the target machine, as well as a CUDA-capable
+       graphics card.
 
