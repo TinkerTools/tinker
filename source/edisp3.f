@@ -23,12 +23,17 @@ c     Summation", Journal of Chemical Physics, 149, 084115 (2018)
 c
 c
       subroutine edisp3
+      use analyz
+      use atoms
       use dsppot
       use energi
       use ewald
+      use inform
+      use iounit
       use limits
       implicit none
-      real*8 elrc
+      integer i
+      real*8 elrc,aelrc
       character*6 mode
 c
 c
@@ -54,6 +59,22 @@ c
          mode = 'DISP'
          call evcorr (mode,elrc)
          edsp = edsp + elrc
+         aelrc = elrc / dble(n)
+         do i = 1, n
+            aedsp(i) = aedsp(i) + aelrc
+         end do
+         if (verbose .and. elrc.ne.0.0d0) then
+            if (digits .ge. 8) then
+               write (iout,10)  elrc
+   10          format (/,' Long-Range Dispersion :',9x,f16.8)
+            else if (digits .ge. 6) then
+               write (iout,20)  elrc
+   20          format (/,' Long-Range Dispersion :',9x,f16.6)
+            else
+               write (iout,30)  elrc
+   30          format (/,' Long-Range Dispersion :',9x,f16.4)
+            end if
+         end if
       end if
       return
       end

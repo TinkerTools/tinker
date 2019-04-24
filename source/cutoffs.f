@@ -267,20 +267,24 @@ c
 c     specify maximum size for each of the neighbor lists
 c
       maxvlst = 2500
-      if (vdwcut .ne. big) then
+      if (vdwcut.ne.big .and. dispcut.ne.big) then
+         limit = int(sqrt(max(vbuf2,dbuf2))**3) + 100
+         maxvlst = min(limit,maxvlst)
+      else if (vdwcut .ne. big) then
          limit = int(sqrt(vbuf2)**3) + 100
          maxvlst = min(limit,maxvlst)
-      end if
-      if (dispcut .ne. big) then
+      else if (dispcut .ne. big) then
          limit = int(sqrt(dbuf2)**3) + 100
          maxvlst = min(limit,maxvlst)
       end if
       maxelst = 2500
-      if (chgcut .ne. big) then
+      if (chgcut.ne.big .and. mpolecut.ne.big) then
+         limit = int(sqrt(max(cbuf2,mbuf2))**3) + 100
+         maxelst = min(limit,maxelst)
+      else if (chgcut .ne. big) then
          limit = int(sqrt(cbuf2)**3) + 100
          maxelst = min(limit,maxelst)
-      end if
-      if (mpolecut .ne. big) then
+      else if (mpolecut .ne. big) then
          limit = int(sqrt(mbuf2)**3) + 100
          maxelst = min(limit,maxelst)
       end if
