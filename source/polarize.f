@@ -395,12 +395,13 @@ c     loop over pairs of sites incrementing the electric field
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
          uix = uind(1,ii)
          uiy = uind(2,ii)
          uiz = uind(3,ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)

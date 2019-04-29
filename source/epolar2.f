@@ -437,9 +437,10 @@ c
             ubyp(j) = ubp(2,ii,j)
             ubzp(j) = ubp(3,ii,j)
          end do
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -1411,9 +1412,10 @@ c
             ubyp(j) = ubp(2,ii,j)
             ubzp(j) = ubp(3,ii,j)
          end do
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)

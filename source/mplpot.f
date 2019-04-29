@@ -16,7 +16,8 @@ c     m2scale      scale factor for 1-2 multipole energy interactions
 c     m3scale      scale factor for 1-3 multipole energy interactions
 c     m4scale      scale factor for 1-4 multipole energy interactions
 c     m5scale      scale factor for 1-5 multipole energy interactions
-c     use_chgpen   flag to use charge penetration damped potentials
+c     use_chgpen   flag to use charge penetration damped potential
+c     pentyp       type of penetration damping (NONE, GORDON1, GORDON2)
 c
 c
       module mplpot
@@ -26,5 +27,6 @@ c
       real*8 m4scale
       real*8 m5scale
       logical use_chgpen
+      character*7 pentyp
       save
       end

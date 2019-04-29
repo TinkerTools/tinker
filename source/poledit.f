@@ -2495,14 +2495,15 @@ c
       allocate (pkey(n))
       allocate (pt(n))
 c
-c     store the atomic numbers of atoms attached to each atom
+c     store atomic numbers and atoms attached for each atom
 c
       do i = 1, n
          do j = 1, 4
             list(j) = 0
          end do
          do j = 1, n12(i)
-            list(j) = atomic(i12(j,i))
+            k = i12(j,i)
+            list(j) = 10*atomic(k) + n12(k)
          end do
          call sort (n12(i),list)
          size = 4
@@ -2523,14 +2524,14 @@ c
          m = 0
          do j = 1, n12(i)
             if (n12(i12(j,i)) .gt. 1) then
-               k = k + 1
-               m = i12(j,i)
+               m = m + 1
+               k = i12(j,i)
             end if
          end do
-         if (k .eq. 1) then
+         if (m .eq. 1) then
             nsing = nsing + 1
             ising(nsing) = i
-            jsing(nsing) = m
+            jsing(nsing) = k
          end if
       end do
 c

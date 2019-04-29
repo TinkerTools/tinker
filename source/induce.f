@@ -638,9 +638,10 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -903,9 +904,10 @@ c
             qiyy = rpole(9,ii)
             qiyz = rpole(10,ii)
             qizz = rpole(13,ii)
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            if (use_chgpen) then
+            if (use_thole) then
+               pdi = pdamp(ii)
+               pti = thole(ii)
+            else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -1260,9 +1262,10 @@ c
          pix = uinp(1,ii)
          piy = uinp(2,ii)
          piz = uinp(3,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -1412,9 +1415,10 @@ c
             pix = uinp(1,ii)
             piy = uinp(2,ii)
             piz = uinp(3,ii)
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            if (use_chgpen) then
+            if (use_thole) then
+               pdi = pdamp(ii)
+               pti = thole(ii)
+            else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -1683,9 +1687,10 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -2054,9 +2059,10 @@ c
          pix = uinp(1,ii)
          piy = uinp(2,ii)
          piz = uinp(3,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -2596,9 +2602,10 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -2920,9 +2927,10 @@ c
             qiyy = rpole(9,ii)
             qiyz = rpole(10,ii)
             qizz = rpole(13,ii)
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            if (use_chgpen) then
+            if (use_thole) then
+               pdi = pdamp(ii)
+               pti = thole(ii)
+            else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -3424,9 +3432,10 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -4190,9 +4199,10 @@ c
          pix = uinp(1,ii)
          piy = uinp(2,ii)
          piz = uinp(3,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         if (use_chgpen) then
+         if (use_thole) then
+            pdi = pdamp(ii)
+            pti = thole(ii)
+         else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -4360,9 +4370,10 @@ c
             pix = uinp(1,ii)
             piy = uinp(2,ii)
             piz = uinp(3,ii)
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            if (use_chgpen) then
+            if (use_thole) then
+               pdi = pdamp(ii)
+               pti = thole(ii)
+            else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -7297,9 +7308,10 @@ c
             yi = y(i)
             zi = z(i)
             poli = polarity(ii)
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            if (use_chgpen) then
+            if (use_thole) then
+               pdi = pdamp(ii)
+               pti = thole(ii)
+            else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -7588,9 +7600,10 @@ c
             yi = y(i)
             zi = z(i)
             poli = polarity(ii)
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            if (use_chgpen) then
+            if (use_thole) then
+               pdi = pdamp(ii)
+               pti = thole(ii)
+            else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
