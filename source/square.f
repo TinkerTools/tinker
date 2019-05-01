@@ -119,7 +119,7 @@ c
       if (grdmin .eq. 0.0d0)  grdmin = eps**(1.0d0/3.0d0)
       epsq = sqrt(eps)
       delta = 0.0d0
-      stpmax = 1000.0d0 * sqrt(dble(n))
+      stpmax = 10000.0d0 * sqrt(dble(n))
       stpmin = eps**(2.0d0/3.0d0)
       rftol = eps**(2.0d0/3.0d0)
       faketol = 100.0d0 * eps

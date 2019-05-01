@@ -982,6 +982,10 @@ c     "setpolar" assigns atomic polarizabilities, Thole damping or
 c     charge penetration parameters, and polarization groups with
 c     user modification of these values
 c
+c     note this routine contains directly coded Thole and charge
+c     penetration values for elements and atom classes that should
+c     be updated if the default force field values are modified
+c
 c
       subroutine setpolar
       use atomid
@@ -1007,7 +1011,6 @@ c
       logical aromatic
       logical chkarom
       character*1 answer
-      character*6 pmodel
       character*240 record
       character*240 string
       external chkarom
@@ -1015,7 +1018,8 @@ c
 c
 c     allow the user to select the polarization model
 c
-      pmodel = 'AMOEBA'
+      use_thole = .true.
+      use_chgpen = .false.
       query = .true.
       answer = ' '
       call nextarg (string,exist)
@@ -1036,14 +1040,7 @@ c
          call gettext (record,answer,next)
          call upcase (answer)
       end if
-      if (answer .eq. 'H')  pmodel = 'HIPPO '
-c
-c     set polarization damping scheme based on model selected
-c
-      if (pmodel .eq. 'AMOEBA') then
-         use_thole = .true.
-         use_chgpen = .false.
-      else if (pmodel .eq. 'HIPPO ') then
+      if (answer .eq. 'H') then
          use_thole = .false.
          use_chgpen = .true.
       end if
@@ -1070,7 +1067,7 @@ c
 c
 c     assign default atomic polarizabilities for Thole model
 c
-      if (pmodel .eq. 'AMOEBA') then
+      if (use_thole) then
          do i = 1, n
             thole(i) = 0.39d0
             atn = atomic(i)
@@ -1129,7 +1126,7 @@ c
 c
 c     assign default atomic polarizabilities for HIPPO model
 c
-      else if (pmodel .eq. 'HIPPO ') then
+      else if (use_chgpen) then
          do i = 1, n
             atn = atomic(i)
             if (atn .eq. 1) then
@@ -1322,17 +1319,17 @@ c     list the polariability and charge penetration values
 c
       write (iout,60)
    60 format (/,' Polarizability Parameters for Multipole Sites :')
-      if (pmodel .eq. 'AMOEBA') then
+      if (use_thole) then
          write (iout,70)
    70    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-      else
+      else if (use_chgpen) then
          write (iout,80)
    80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Core',
      &              5x,'Valence',8x,'Damp',/)
       end if
       do k = 1, n
          i = pollist(k)
-         if (pmodel .eq. 'AMOEBA') then
+         if (use_thole) then
             if (i .eq. 0) then
                write (iout,90)  k,name(k)
    90          format (i8,6x,a3,12x,'--',13x,'--')
@@ -1340,7 +1337,7 @@ c
                write (iout,100)  k,name(k),polarity(i),thole(i)
   100          format (i8,6x,a3,4x,f12.4,3x,f12.4)
             end if
-         else
+         else if (use_chgpen) then
             if (i .eq. 0) then
                write (iout,110)  k,name(k)
   110          format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
@@ -1368,14 +1365,14 @@ c
          k = 0
          pol = 0.0d0
          thl = 0.39d0
-         if (pmodel .eq. 'AMOEBA') then
+         if (use_thole) then
             write (iout,140)
   140       format (/,' Enter Atom Number, Polarizability & Thole',
      &                 ' Values :  ',$)
             read (input,150)  record
   150       format (a240)
             read (record,*,err=180,end=180)  k,pol,thl
-         else
+         else if (use_chgpen) then
             write (iout,160)
   160       format (/,' Enter Atom Number, Polarize, Core & Damp',
      &                 ' Values :  ',$)
@@ -1401,16 +1398,16 @@ c
       if (change) then
          write (iout,190)
   190    format (/,' Atomic Polarizabilities for Multipole Sites :')
-         if (pmodel .eq. 'AMOEBA') then
+         if (use_thole) then
             write (iout,200)
   200       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-         else
+         else if (use_chgpen) then
             write (iout,210)
   210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',/)
          end if
          do k = 1, n
             i = pollist(k)
-            if (pmodel .eq. 'AMOEBA') then
+            if (use_thole) then
                if (i .eq. 0) then
                   write (iout,220)  k,name(k)
   220             format (i8,6x,a3,12x,'--',13x,'--')
@@ -1418,7 +1415,7 @@ c
                   write (iout,230)  k,name(k),polarity(i),thole(i)
   230             format (i8,6x,a3,4x,f12.4,3x,f12.4)
                end if
-            else
+            else if (use_chgpen) then
                if (i .eq. 0) then
                   write (iout,240)  k,name(k)
   240             format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
@@ -3052,11 +3049,14 @@ c
       subroutine prtpole
       use atoms
       use atomid
+      use chgpen
       use files
       use keys
       use kpolr
+      use mplpot
       use mpole
       use polar
+      use polpot
       use sizes
       use units
       implicit none
@@ -3204,11 +3204,29 @@ c
       deallocate (pt)
       deallocate (pkey)
 c
+c     output any charge penetration parameters to the keyfile
+c
+      if (use_chgpen) then
+         if (n .ne. 0) then
+            write (ikey,170)
+  170       format ()
+         end if
+         tmax = 0
+         do i = 1, npole
+            it = type(ipole(i))
+            if (it .gt. tmax) then
+               write (ikey,180)  it,pcore(i),palpha(i)
+  180          format ('chgpen',9x,i5,5x,2f11.4)
+            end if
+            tmax = max(it,tmax)
+         end do
+      end if
+c
 c     output the polarizability parameters to the keyfile
 c
       if (n .ne. 0) then
-         write (ikey,170)
-  170    format ()
+         write (ikey,190)
+  190    format ()
       end if
       tmax = 0
       do i = 1, npole
@@ -3219,9 +3237,14 @@ c
                if (pgrp(j,it) .ne. 0)  k = j
             end do
             call sort8 (k,pgrp(1,it))
-            write (ikey,180)  it,polarity(i),thole(i),
-     &                        (pgrp(j,it),j=1,k)
-  180       format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
+            if (use_thole) then
+               write (ikey,200)  it,polarity(i),thole(i),
+     &                           (pgrp(j,it),j=1,k)
+  200          format ('polarize',7x,i5,5x,2f11.4,2x,20i5)
+            else if (use_chgpen) then
+               write (ikey,210)  it,polarity(i),(pgrp(j,it),j=1,k)
+  210          format ('polarize',7x,i5,5x,f11.4,6x,20i7)
+            end if
          end if
          tmax = max(it,tmax)
       end do
