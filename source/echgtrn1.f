@@ -46,6 +46,7 @@ c
       subroutine echgtrn1a
       use atoms
       use bound
+      use chgpot
       use chgtrn
       use cell
       use couple
@@ -61,7 +62,7 @@ c
       integer i,j,k
       integer ii,kk
       integer jcell
-      real*8 e,de,fgrp
+      real*8 e,de,f,fgrp
       real*8 rr1,r,r2
       real*8 r3,r4,r5
       real*8 xi,yi,zi
@@ -98,8 +99,9 @@ c
          mscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set conversion factor, cutoff and switching coefficients
 c
+      f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
 c
@@ -112,6 +114,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
+         if (alphai .eq. 0.0d0)  alphai = 100.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -148,12 +151,13 @@ c
                   rr1 = 1.0d0 / r
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
+                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
                   expi = exp(-alphai*r)
                   expk = exp(-alphak*r)
                   e = -chgi*expk - chgk*expi
                   de = chgi*expk*alphak + chgk*expi*alphai
-                  e = e * mscale(k)
-                  de = de * mscale(k)
+                  e = f * e * mscale(k)
+                  de = f * de * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -243,6 +247,7 @@ c
             zi = z(i)
             chgi = chgct(ii)
             alphai = dmpct(ii)
+            if (alphai .eq. 0.0d0)  alphai = 100.0d0
             usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -280,6 +285,7 @@ c
                         rr1 = 1.0d0 / r
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
+                        if (alphak .eq. 0.0d0)  alphak = 100.0d0
                         expi = exp(-alphai*r)
                         expk = exp(-alphak*r)
                         e = -chgi*expk - chgk*expi
@@ -288,8 +294,8 @@ c
                            e = e * fgrp
                            de = de * fgrp
                         end if
-                        e = e * mscale(k)
-                        de = de * mscale(k)
+                        e = f * e * mscale(k)
+                        de = f * de * mscale(k)
                         if (i .eq. k) then
                            e = 0.5d0 * e
                            de = 0.5d0 * de
@@ -392,6 +398,7 @@ c
       subroutine echgtrn1b
       use atoms
       use bound
+      use chgpot
       use chgtrn
       use cell
       use couple
@@ -407,7 +414,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      real*8 e,de,fgrp
+      real*8 e,de,f,fgrp
       real*8 rr1,r,r2
       real*8 r3,r4,r5
       real*8 xi,yi,zi
@@ -444,8 +451,9 @@ c
          mscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set conversion factor, cutoff and switching coefficients
 c
+      f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
 c
@@ -454,7 +462,7 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use,use_group,use_intra,use_bounds,off2,cut2,
+!$OMP& elst,use,use_group,use_intra,use_bounds,f,off2,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(mscale) shared(ect,dect,vir)
 !$OMP DO reduction(+:ect,dect,vir) schedule(guided)
@@ -468,6 +476,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
+         if (alphai .eq. 0.0d0)  alphai = 100.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -505,12 +514,13 @@ c
                   rr1 = 1.0d0 / r
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
+                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
                   expi = exp(-alphai*r)
                   expk = exp(-alphak*r)
                   e = -chgi*expk - chgk*expi
                   de = chgi*expk*alphak + chgk*expi*alphai
-                  e = e * mscale(k)
-                  de = de * mscale(k)
+                  e = f * e * mscale(k)
+                  de = f * de * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c

@@ -52,6 +52,7 @@ c
       use atomid
       use atoms
       use bound
+      use chgpot
       use chgtrn
       use cell
       use couple
@@ -69,7 +70,7 @@ c
       integer i,j,k
       integer ii,kk
       integer jcell
-      real*8 e,fgrp
+      real*8 e,f,fgrp
       real*8 r,r2,r3
       real*8 r4,r5
       real*8 xi,yi,zi
@@ -103,8 +104,9 @@ c
          mscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set conversion factor, cutoff and switching coefficients
 c
+      f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
 c
@@ -128,6 +130,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
+         if (alphai .eq. 0.0d0)  alphai = 100.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -163,10 +166,11 @@ c
                   r = sqrt(r2)
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
+                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
                   expi = exp(-alphai*r)
                   expk = exp(-alphak*r)
                   e = -chgi*expk - chgk*expi
-                  e = e * mscale(k)
+                  e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -249,6 +253,7 @@ c
             zi = z(i)
             chgi = chgct(ii)
             alphai = dmpct(ii)
+            if (alphai .eq. 0.0d0)  alphai = 100.0d0
             usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -285,10 +290,11 @@ c
                         r = sqrt(r2)
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
+                        if (alphak .eq. 0.0d0)  alphak = 100.0d0
                         expi = exp(-alphai*r)
                         expk = exp(-alphak*r)
                         e = -chgi*expk - chgk*expi
-                        e = e * mscale(k)
+                        e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -390,6 +396,7 @@ c
       use atoms
       use bound
       use boxes
+      use chgpot
       use chgtrn
       use cell
       use couple
@@ -409,7 +416,7 @@ c
       integer ii,kk
       integer kgy,kgz
       integer start,stop
-      real*8 e,fgrp
+      real*8 e,f,fgrp
       real*8 r,r2,r3
       real*8 r4,r5
       real*8 xi,yi,zi
@@ -450,8 +457,9 @@ c
          mscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set conversion factor, cutoff and switching coefficients
 c
+      f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
 c
@@ -489,6 +497,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
+         if (alphai .eq. 0.0d0)  alphai = 100.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -562,10 +571,11 @@ c
                   r = sqrt(r2)
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
+                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
                   expi = exp(-alphai*r)
                   expk = exp(-alphak*r)
                   e = -chgi*expk - chgk*expi
-                  e = e * mscale(k)
+                  e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -669,6 +679,7 @@ c
       use atomid
       use atoms
       use bound
+      use chgpot
       use chgtrn
       use cell
       use couple
@@ -686,7 +697,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      real*8 e,fgrp
+      real*8 e,f,fgrp
       real*8 r,r2,r3
       real*8 r4,r5
       real*8 xi,yi,zi
@@ -719,8 +730,9 @@ c
          mscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set conversion factor, cutoff and switching coefficients
 c
+      f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
 c
@@ -740,8 +752,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use,use_group,use_intra,use_bounds,off2,cut2,molcule,
-!$OMP& c0,c1,c2,c3,c4,c5,name,verbose,debug,header,iout)
+!$OMP& elst,use,use_group,use_intra,use_bounds,f,off2,cut2,
+!$OMP& molcule,c0,c1,c2,c3,c4,c5,name,verbose,debug,header,iout)
 !$OMP& firstprivate(mscale) shared(ect,nect,aect,einter)
 !$OMP DO reduction(+:ect,nect,aect,einter) schedule(guided)
 c
@@ -754,6 +766,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
+         if (alphai .eq. 0.0d0)  alphai = 100.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -790,10 +803,11 @@ c
                   r = sqrt(r2)
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
+                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
                   expi = exp(-alphai*r)
                   expk = exp(-alphak*r)
                   e = -chgi*expk - chgk*expi
-                  e = e * mscale(k)
+                  e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c

@@ -20,6 +20,7 @@ c
       use atoms
       use bound
       use cell
+      use chgpot
       use chgtrn
       use couple
       use group
@@ -34,7 +35,7 @@ c
       integer iatom,jcell
       integer nlist,list(5)
       real*8 e,dedr,d2edr2
-      real*8 term,fgrp
+      real*8 term,f,fgrp
       real*8 termx,termy,termz
       real*8 rr1,r,r2
       real*8 r3,r4,r5
@@ -62,8 +63,9 @@ c
          mscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set conversion factor, cutoff and switching coefficients
 c
+      f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
 c
@@ -90,6 +92,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
+         if (alphai .eq. 0.0d0)  alphai = 100.0d0
          alphai2 = alphai * alphai
          usei = use(i)
 c
@@ -127,15 +130,16 @@ c
                   rr1 = 1.0d0 / r
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
+                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
                   alphak2 = alphak * alphak
                   expi = exp(-alphai*r)
                   expk = exp(-alphak*r)
                   e = -chgi*expk - chgk*expi
                   dedr = chgi*expk*alphak + chgk*expi*alphai
                   d2edr2 = -chgi*expk*alphak2 - chgk*expi*alphai2
-                  e = e * mscale(k)
-                  dedr = dedr * mscale(k)
-                  d2edr2 = d2edr2 * mscale(k)
+                  e = f * e * mscale(k)
+                  dedr = f * dedr * mscale(k)
+                  d2edr2 = f * d2edr2 * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -227,6 +231,7 @@ c
             zi = z(i)
             chgi = chgct(ii)
             alphai = dmpct(ii)
+            if (alphai .eq. 0.0d0)  alphai = 100.0d0
             alphai2 = alphai * alphai
             usei = use(i)
 c
@@ -265,15 +270,16 @@ c
                         rr1 = 1.0d0 / r
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
+                        if (alphak .eq. 0.0d0)  alphak = 100.0d0
                         alphak2 = alphak * alphak
                         expi = exp(-alphai*r)
                         expk = exp(-alphak*r)
                         e = -chgi*expk - chgk*expi
                         dedr = chgi*expk*alphak + chgk*expi*alphai
                         d2edr2 = -chgi*expk*alphak2 - chgk*expi*alphai2
-                        e = e * mscale(k)
-                        dedr = dedr * mscale(k)
-                        d2edr2 = d2edr2 * mscale(k)
+                        e = f * e * mscale(k)
+                        dedr = f * dedr * mscale(k)
+                        d2edr2 = f * d2edr2 * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c
