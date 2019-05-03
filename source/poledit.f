@@ -60,7 +60,7 @@ c
          use_polar = .true.
          idma = freeunit ()
          call readgdma (idma)
-         call initprm
+         call field
          call molsetup
          call setframe
          call rotframe
@@ -1694,6 +1694,7 @@ c
       subroutine interpol
       use atoms
       use iounit
+      use mplpot
       use mpole
       use polar
       use polpot
@@ -1701,6 +1702,7 @@ c
       implicit none
       integer i,j,k,iter
       integer maxiter
+      integer trimtext
       real*8 eps,epsold
       real*8 polmin,norm
       real*8 a,b,sum
@@ -1711,6 +1713,7 @@ c
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
       logical done
+      character*5 truth
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -1743,6 +1746,38 @@ c
          u3scale = 0.0d0
          u4scale = 0.0d0
       end if
+c
+c     print the electrostatic and polarization scale factors
+c
+      write (iout,10)
+   10 format (/,' Electrostatic and Polarization Scale Factors :',
+     &        //,20x,'1-2',9x,'1-3',9x,'1-4',9x,'1-5',/)
+      write (iout,20)  m2scale,m3scale,m4scale,m5scale
+   20 format (' M-Scale:',3x,4f12.4)
+      write (iout,30)  p2scale,p3scale,p4scale,p5scale
+   30 format (' P-Inter:',3x,4f12.4)
+      write (iout,40)  p2iscale,p3iscale,p4iscale,p5iscale
+   40 format (' P-Intra:',3x,4f12.4)
+      write (iout,50)  w2scale,w3scale,w4scale,w5scale
+   50 format (' W-Scale:',3x,4f12.4)
+      write (iout,60)
+   60 format (/,20x,'1-1',9x,'1-2',9x,'1-3',9x,'1-4',/)
+      write (iout,70)  d1scale,d2scale,d3scale,d4scale
+   70 format (' D-Scale:',3x,4f12.4)
+      write (iout,80)  u1scale,u2scale,u3scale,u4scale
+   80 format (' U-Scale:',3x,4f12.4)
+      truth = 'False'
+      if (use_thole)  truth = 'True'
+      write (iout,90)  truth(1:trimtext(truth))
+   90 format (/,' Use Thole Damping:',11x,a)
+      truth = 'False'
+      if (use_chgpen)  truth = 'True'
+      write (iout,100)  truth(1:trimtext(truth))
+  100 format (' Charge Penetration:',10x,a)
+      truth = 'False'
+      if (dpequal)  truth = 'True'
+      write (iout,110)  truth(1:trimtext(truth))
+  110 format (' Set D Equal to P:',12x,a)
 c
 c     compute intergroup induced dipole moments via CG algorithm
 c
@@ -1811,13 +1846,13 @@ c
          eps = debye * sqrt(eps/dble(npolar))
          epsold = eps
          if (iter .eq. 1) then
-            write (iout,10)
-   10       format (/,' Determination of Intergroup Induced',
+            write (iout,120)
+  120       format (/,' Determination of Intergroup Induced',
      &                 ' Dipoles :',
      &              //,4x,'Iter',8x,'RMS Change (Debye)',/)
          end if
-         write (iout,20)  iter,eps
-   20    format (i8,7x,f16.10)
+         write (iout,130)  iter,eps
+  130    format (i8,7x,f16.10)
          if (eps .lt. poleps)  done = .true.
          if (eps .gt. epsold)  done = .true.
          if (iter .ge. maxiter)  done = .true.
@@ -1835,8 +1870,8 @@ c
 c     terminate the calculation if dipoles failed to converge
 c
       if (eps .gt. poleps) then
-         write (iout,30)
-   30    format (/,' INTERPOL  --  Warning, Induced Dipoles',
+         write (iout,140)
+  140    format (/,' INTERPOL  --  Warning, Induced Dipoles',
      &              ' are not Converged')
          call prterr
          call fatal
@@ -1844,17 +1879,17 @@ c
 c
 c     print out a list of the final induced dipole moments
 c
-      write (iout,40)
-   40 format (/,' Intergroup Induced Dipoles to be Removed',
+      write (iout,150)
+  150 format (/,' Intergroup Induced Dipoles to be Removed',
      &           ' (Debye) :')
-      write (iout,50)
-   50 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
+      write (iout,160)
+  160 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
      &           9x,'Total'/)
       do i = 1, npole
          k = ipole(i)
          norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
-         write (iout,60)  k,(debye*uind(j,i),j=1,3),debye*norm
-   60    format (i8,5x,4f12.4)
+         write (iout,170)  k,(debye*uind(j,i),j=1,3),debye*norm
+  170    format (i8,5x,4f12.4)
       end do
       return
       end

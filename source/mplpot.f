@@ -22,10 +22,8 @@ c
 c
       module mplpot
       implicit none
-      real*8 m2scale
-      real*8 m3scale
-      real*8 m4scale
-      real*8 m5scale
+      real*8 m2scale,m3scale
+      real*8 m4scale,m5scale
       logical use_chgpen
       character*7 pentyp
       save
