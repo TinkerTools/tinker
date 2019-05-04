@@ -156,8 +156,7 @@ c     the AMOEBA Force Field", Physical Chemistry Chemical Physics, 19,
 c     276-291 (2017)
 c
 c
-      subroutine damppole (r,rorder,alphai,alphak,
-     &                        dmpi,dmpk,dmpik)
+      subroutine damppole (r,rorder,alphai,alphak,dmpi,dmpk,dmpik)
       implicit none
       integer rorder
       real*8 r,termi,termk
@@ -764,77 +763,77 @@ c
          tmp = 4.0d0 * dmpi2 * dmpk2 / term
          s = (dampi-tmp)*expk + (dampk+tmp)*expi
          ds = (dmpi2*dmpk2*r2 - 4.0d0*dmpi2*dmpk22*r/term
-     &          - 4.0d0*dmpi2*dmpk2/term) * expk
+     &            - 4.0d0*dmpi2*dmpk2/term) * expk
      &      + (dmpi2*dmpk2*r2 + 4.0d0*dmpi22*dmpk2*r/term
-     &          + 4.0d0*dmpi2*dmpk2/term) * expi
+     &            + 4.0d0*dmpi2*dmpk2/term) * expi
          d2s = (dmpi2*dmpk2*r2/3.0d0
-     &           + dmpi2*dmpk22*r3/3.0d0
-     &           - 4.0d0/3.0d0*dmpi2*dmpk23*r2/term
-     &           - 4.0d0*dmpi2*dmpk22*r/term
-     &           - 4.0d0*dmpi2*dmpk2/term) * expk
+     &             + dmpi2*dmpk22*r3/3.0d0
+     &             - (4.0d0/3.0d0)*dmpi2*dmpk23*r2/term
+     &             - 4.0d0*dmpi2*dmpk22*r/term
+     &             - 4.0d0*dmpi2*dmpk2/term) * expk
      &       + (dmpi2*dmpk2*r2/3.0d0
-     &           + dmpi22*dmpk2*r3/3.0d0
-     &           + 4.0d0/3.0d0*dmpi23*dmpk2*r2/term
-     &           + 4.0d0*dmpi22*dmpk2*r/term
-     &           + 4.0d0*dmpi2*dmpk2/term) * expi
+     &             + dmpi22*dmpk2*r3/3.0d0
+     &             + (4.0d0/3.0d0)*dmpi23*dmpk2*r2/term
+     &             + 4.0d0*dmpi22*dmpk2*r/term
+     &             + 4.0d0*dmpi2*dmpk2/term) * expi
          d3s = (dmpi2*dmpk23*r4/15.0d0
-     &           + dmpi2*dmpk22*r3/5.0d0
-     &           + dmpi2*dmpk2*r2/5.0d0
-     &           - 4.0d0/15.0d0*dmpi2*dmpk24*r3/term
-     &           - 8.0d0/5.0d0*dmpi2*dmpk23*r2/term
-     &           - 4.0d0*dmpi2*dmpk22*r/term
-     &           - 4.0d0/term*dmpi2*dmpk2) * expk
+     &             + dmpi2*dmpk22*r3/5.0d0
+     &             + dmpi2*dmpk2*r2/5.0d0
+     &             - (4.0d0/15.0d0)*dmpi2*dmpk24*r3/term
+     &             - (8.0d0/5.0d0)*dmpi2*dmpk23*r2/term
+     &             - 4.0d0*dmpi2*dmpk22*r/term
+     &             - 4.0d0/term*dmpi2*dmpk2) * expk
      &       + (dmpi23*dmpk2*r4/15.0d0 
-     &           + dmpi22*dmpk2*r3/5.0d0
-     &           + dmpi2*dmpk2*r2/5.0d0 
-     &           + 4.0d0/15.0d0*dmpi24*dmpk2*r3/term
-     &           + 8.0d0/5.0d0*dmpi23*dmpk2*r2/term
-     &           + 4.0d0*dmpi22*dmpk2*r/term
-     &           + 4.0d0/term*dmpi2*dmpk2) * expi
+     &             + dmpi22*dmpk2*r3/5.0d0
+     &             + dmpi2*dmpk2*r2/5.0d0 
+     &             + (4.0d0/15.0d0)*dmpi24*dmpk2*r3/term
+     &             + (8.0d0/5.0d0)*dmpi23*dmpk2*r2/term
+     &             + 4.0d0*dmpi22*dmpk2*r/term
+     &             + 4.0d0/term*dmpi2*dmpk2) * expi
          d4s = (dmpi2*dmpk24*r5/105.0d0
-     &           + 2.0d0/35.0d0*dmpi2*dmpk23*r4
-     &           + dmpi2*dmpk22*r3/7.0d0
-     &           + dmpi2*dmpk2*r2/7.0d0
-     &           - 4.0d0/105.0d0*dmpi2*dmpk25*r4/term
-     &           - 8.0d0/21.0d0*dmpi2*dmpk24*r3/term
-     &           - 12.0d0/7.0d0*dmpi2*dmpk23*r2/term
-     &           - 4.0d0*dmpi2*dmpk22*r/term
-     &           - 4.0d0*dmpi2*dmpk2/term) * expk
+     &             + (2.0d0/35.0d0)*dmpi2*dmpk23*r4
+     &             + dmpi2*dmpk22*r3/7.0d0
+     &             + dmpi2*dmpk2*r2/7.0d0
+     &             - (4.0d0/105.0d0)*dmpi2*dmpk25*r4/term
+     &             - (8.0d0/21.0d0)*dmpi2*dmpk24*r3/term
+     &             - (12.0d0/7.0d0)*dmpi2*dmpk23*r2/term
+     &             - 4.0d0*dmpi2*dmpk22*r/term
+     &             - 4.0d0*dmpi2*dmpk2/term) * expk
      &       + (dmpi24*dmpk2*r5/105.0d0
-     &           + 2.0d0/35.0d0*dmpi23*dmpk2*r4
-     &           + dmpi22*dmpk2*r3/7.0d0
-     &           + dmpi2*dmpk2*r2/7.0d0
-     &           + 4.0d0/105.0d0*dmpi25*dmpk2*r4/term
-     &           + 8.0d0/21.0d0*dmpi24*dmpk2*r3/term
-     &           + 12.0d0/7.0d0*dmpi23*dmpk2*r2/term
-     &           + 4.0d0*dmpi22*dmpk2*r/term
-     &           + 4.0d0*dmpi2*dmpk2/term) * expi
+     &             + (2.0d0/35.0d0)*dmpi23*dmpk2*r4
+     &             + dmpi22*dmpk2*r3/7.0d0
+     &             + dmpi2*dmpk2*r2/7.0d0
+     &             + (4.0d0/105.0d0)*dmpi25*dmpk2*r4/term
+     &             + (8.0d0/21.0d0)*dmpi24*dmpk2*r3/term
+     &             + (12.0d0/7.0d0)*dmpi23*dmpk2*r2/term
+     &             + 4.0d0*dmpi22*dmpk2*r/term
+     &             + 4.0d0*dmpi2*dmpk2/term) * expi
          if (rorder .ge. 11) then
             r6 = r5 * r
             dmpi26 = dmpi25 * dmpi2
             dmpk26 = dmpk25 * dmpk2
             d5s = (dmpi2*dmpk25*r6/945.0d0
-     &              + 2.0d0/189.0d0*dmpi2*dmpk24*r5
-     &              + dmpi2*dmpk23*r4/21.0d0
-     &              + dmpi2*dmpk22*r3/9.0d0
-     &              + dmpi2*dmpk2*r2/9.0d0
-     &              - 4.0d0/945.0d0*dmpi2*dmpk26*r5/term
-     &              - 4.0d0/63.0d0*dmpi2*dmpk25*r4/term
-     &              - 4.0d0/9.0d0*dmpi2*dmpk24*r3/term
-     &              - 16.0d0/9.0d0*dmpi2*dmpk23*r2/term
-     &              - 4.0d0*dmpi2*dmpk22*r/term
-     &              - 4.0d0*dmpi2*dmpk2/term) * expk
+     &                + (2.0d0/189.0d0)*dmpi2*dmpk24*r5
+     &                + dmpi2*dmpk23*r4/21.0d0
+     &                + dmpi2*dmpk22*r3/9.0d0
+     &                + dmpi2*dmpk2*r2/9.0d0
+     &                - (4.0d0/945.0d0)*dmpi2*dmpk26*r5/term
+     &                - (4.0d0/63.0d0)*dmpi2*dmpk25*r4/term
+     &                - (4.0d0/9.0d0)*dmpi2*dmpk24*r3/term
+     &                - (16.0d0/9.0d0)*dmpi2*dmpk23*r2/term
+     &                - 4.0d0*dmpi2*dmpk22*r/term
+     &                - 4.0d0*dmpi2*dmpk2/term) * expk
      &          + (dmpi25*dmpk2*r6/945.0d0
-     &              + 2.0d0/189.0d0*dmpi24*dmpk2*r5
-     &              + dmpi23*dmpk2*r4/21.0d0
-     &              + dmpi22*dmpk2*r3/9.0d0
-     &              + dmpi2*dmpk2*r2/9.0d0
-     &              + 4.0d0/945.0d0*dmpi26*dmpk2*r5/term
-     &              + 4.0d0/63.0d0*dmpi25*dmpk2*r4/term
-     &              + 4.0d0/9.0d0*dmpi24*dmpk2*r3/term
-     &              + 16.0d0/9.0d0*dmpi23*dmpk2*r2/term
-     &              + 4.0d0*dmpi22*dmpk2*r/term
-     &              + 4.0d0*dmpi2*dmpk2/term) * expi
+     &                + (2.0d0/189.0d0)*dmpi24*dmpk2*r5
+     &                + dmpi23*dmpk2*r4/21.0d0
+     &                + dmpi22*dmpk2*r3/9.0d0
+     &                + dmpi2*dmpk2*r2/9.0d0
+     &                + (4.0d0/945.0d0)*dmpi26*dmpk2*r5/term
+     &                + (4.0d0/63.0d0)*dmpi25*dmpk2*r4/term
+     &                + (4.0d0/9.0d0)*dmpi24*dmpk2*r3/term
+     &                + (16.0d0/9.0d0)*dmpi23*dmpk2*r2/term
+     &                + 4.0d0*dmpi22*dmpk2*r/term
+     &                + 4.0d0*dmpi2*dmpk2/term) * expi
          end if
       end if
 c

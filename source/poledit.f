@@ -1894,8 +1894,7 @@ c
   150 format (/,' Local Frame Intergroup Induced Dipole Moments',
      &           ' (Debye) :')
       write (iout,160)
-  160 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
-     &           9x,'Total'/)
+  160 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',9x,'Total',/)
       do i = 1, npole
          k = ipole(i)
          norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
