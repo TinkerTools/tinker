@@ -60,8 +60,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "rotmat" finds the rotation matrix that converts from the local
-c     coordinate system to the global frame at a multipole site
+c     "rotmat" finds the rotation matrix that rotates the local
+c     coordinate system into the global frame at a multipole site
 c
 c
       subroutine rotmat (i,a)
@@ -277,8 +277,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "rotsite" computes the atomic multipoles at a specified site
-c     in the global coordinate frame by applying a rotation matrix
+c     "rotsite" rotates the local frame atomic multipoles at a
+c     specified site into the global coordinate frame by applying
+c     a rotation matrix
 c
 c
       subroutine rotsite (isite,a)

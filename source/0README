@@ -3,8 +3,8 @@
                     SOURCE Directory for the Tinker Package
                     #######################################
 
-         This directory contains the Fortran 95 source code for the
-         current version of the Tinker program package.
+         This directory contains Fortran source code for the current
+         version of the Tinker program package.
 
          The code is in a standard Fortran dialect that should compile
          unchanged on most machines. Script files to build the package

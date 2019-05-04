@@ -631,6 +631,7 @@ c
       subroutine rotframe
       use atomid
       use atoms
+      use inform
       use iounit
       use mpole
       use units
@@ -691,38 +692,40 @@ c
 c
 c     print the local frame Cartesian atomic multipoles
 c
-      write (iout,10)
-   10 format (/,' Local Frame Cartesian Multipole Moments :')
-      do i = 1, n
-         k = pollist(i)
-         if (k .eq. 0) then
-            write (iout,20)  i,name(i),atomic(i)
-   20       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
-     &                 'Atomic Number:',i8)
-            write (iout,30)
-   30       format (/,' No Atomic Multipole Moments for this Site')
-         else
-            zaxe = zaxis(k)
-            xaxe = xaxis(k)
-            yaxe = yaxis(k)
-            if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,40)  i,name(i),atomic(i)
-   40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
-     &                 7x,'Atomic Number:',i8)
-            write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
-   50       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,60)  rpole(1,k)
-   60       format (/,' Charge:',10x,f15.5)
-            write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
-   70       format (' Dipole:',10x,3f15.5)
-            write (iout,80)  rpole(5,k)
-   80       format (' Quadrupole:',6x,f15.5)
-            write (iout,90)  rpole(8,k),rpole(9,k)
-   90       format (18x,2f15.5)
-            write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
-  100       format (18x,3f15.5)
-         end if
-      end do
+      if (verbose) then
+         write (iout,10)
+   10    format (/,' Local Frame Cartesian Multipole Moments :')
+         do i = 1, n
+            k = pollist(i)
+            if (k .eq. 0) then
+               write (iout,20)  i,name(i),atomic(i)
+   20          format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
+     &                    'Atomic Number:',i8)
+               write (iout,30)
+   30          format (/,' No Atomic Multipole Moments for this Site')
+            else
+               zaxe = zaxis(k)
+               xaxe = xaxis(k)
+               yaxe = yaxis(k)
+               if (yaxe .lt. 0)  yaxe = -yaxe
+               write (iout,40)  i,name(i),atomic(i)
+   40          format (/,' Atom:',i8,9x,'Name:',3x,a3,
+     &                    7x,'Atomic Number:',i8)
+               write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
+   50          format (/,' Local Frame:',12x,a8,6x,3i8)
+               write (iout,60)  rpole(1,k)
+   60          format (/,' Charge:',10x,f15.5)
+               write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
+   70          format (' Dipole:',10x,3f15.5)
+               write (iout,80)  rpole(5,k)
+   80          format (' Quadrupole:',6x,f15.5)
+               write (iout,90)  rpole(8,k),rpole(9,k)
+   90          format (18x,2f15.5)
+               write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
+  100          format (18x,3f15.5)
+            end if
+         end do
+      end if
       return
       end
 c
@@ -1575,13 +1578,14 @@ c     polarization group
 c
 c     for example, the input parameters could be from a distributed
 c     multipole analysis of a molecular wavefunction and the output
-c     will be the parameter values that achieve the same potential
+c     will be the multipole moments that achieve the same potential
 c     in the presence of intergroup (intramolecular) polarization
 c
 c
       subroutine alterpol
       use atomid
       use atoms
+      use inform
       use iounit
       use mpole
       use polar
@@ -1591,42 +1595,18 @@ c
       integer xaxe
       integer yaxe
       integer zaxe
-      real*8 a(3,3)
 c
-c
-c     rotate the multipole components into the global frame
-c
-      call rotpole
 c
 c     compute induced dipoles to be removed from QM multipoles
 c
       call interpol
 c
-c     remove induced dipoles from global frame multipoles
+c     remove intergroup induced dipoles from atomic multipoles
 c
       do i = 1, npole
-         rpole(2,i) = rpole(2,i) - uind(1,i)
-         rpole(3,i) = rpole(3,i) - uind(2,i)
-         rpole(4,i) = rpole(4,i) - uind(3,i)
-         do j = 1, 13
-            pole(j,i) = rpole(j,i)
-         end do
-      end do
-c
-c     rotate the multipoles from global frame to local frame
-c
-      do i = 1, npole
-         call rotmat (i,a)
-         call invert (3,a)
-         call rotsite (i,a)
-      end do
-c
-c     copy the rotated multipoles back to local frame array
-c
-      do i = 1, npole
-         do j = 1, 13
-            pole(j,i) = rpole(j,i)
-         end do
+         pole(2,i) = pole(2,i) - uind(1,i)
+         pole(3,i) = pole(3,i) - uind(2,i)
+         pole(4,i) = pole(4,i) - uind(3,i)
       end do
 c
 c     convert dipole and quadrupole moments back to atomic units
@@ -1643,39 +1623,41 @@ c
 c
 c     print multipoles with intergroup polarization removed
 c
-      write (iout,10)
-   10 format (/,' Multipoles after Removal of Intergroup',
-     &           ' Polarization :')
-      do i = 1, n
-         k = pollist(i)
-         if (i .eq. 0) then
-            write (iout,20)  i,name(i),atomic(i)
-   20       format (/,' Atom:',i8,9x,'Name:',3x,a3,
-     &                 7x,'Atomic Number:',i8)
-            write (iout,30)
-   30       format (/,' No Atomic Multipole Moments for this Site')
-         else
-            zaxe = zaxis(k)
-            xaxe = xaxis(k)
-            yaxe = yaxis(k)
-            if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,40)  i,name(i),atomic(i)
-   40       format (/,' Atom:',i8,9x,'Name:',3x,a3,
-     &                 7x,'Atomic Number:',i8)
-            write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
-   50       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,60)  rpole(1,k)
-   60       format (/,' Charge:',10x,f15.5)
-            write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
-   70       format (' Dipole:',10x,3f15.5)
-            write (iout,80)  rpole(5,k)
-   80       format (' Quadrupole:',6x,f15.5)
-            write (iout,90)  rpole(8,k),rpole(9,k)
-   90       format (18x,2f15.5)
-            write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
-  100       format (18x,3f15.5)
-         end if
-      end do
+      if (verbose) then
+         write (iout,10)
+   10    format (/,' Multipoles after Removal of Intergroup',
+     &              ' Polarization :')
+         do i = 1, n
+            k = pollist(i)
+            if (i .eq. 0) then
+               write (iout,20)  i,name(i),atomic(i)
+   20          format (/,' Atom:',i8,9x,'Name:',3x,a3,
+     &                    7x,'Atomic Number:',i8)
+               write (iout,30)
+   30          format (/,' No Atomic Multipole Moments for this Site')
+            else
+               zaxe = zaxis(k)
+               xaxe = xaxis(k)
+               yaxe = yaxis(k)
+               if (yaxe .lt. 0)  yaxe = -yaxe
+               write (iout,40)  i,name(i),atomic(i)
+   40          format (/,' Atom:',i8,9x,'Name:',3x,a3,
+     &                    7x,'Atomic Number:',i8)
+               write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
+   50          format (/,' Local Frame:',12x,a8,6x,3i8)
+               write (iout,60)  rpole(1,k)
+   60          format (/,' Charge:',10x,f15.5)
+               write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
+   70          format (' Dipole:',10x,3f15.5)
+               write (iout,80)  rpole(5,k)
+   80          format (' Quadrupole:',6x,f15.5)
+               write (iout,90)  rpole(8,k),rpole(9,k)
+   90          format (18x,2f15.5)
+               write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
+  100          format (18x,3f15.5)
+            end if
+         end do
+      end if
       return
       end
 c
@@ -1687,8 +1669,11 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "interpol" is computes induced dipole moments for use during
-c     removal of intergroup polarization
+c     "interpol" computes intergroup induced dipole moments for use
+c     during removal of intergroup polarization
+c
+c     note only DIRECT and MUTUAL polarization models are available;
+c     the analytical OPT and TCG methods are treated as MUTUAL
 c
 c
       subroutine interpol
@@ -1706,6 +1691,8 @@ c
       real*8 eps,epsold
       real*8 polmin,norm
       real*8 a,b,sum
+      real*8 utmp(3)
+      real*8 rmt(3,3)
       real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: rsd(:,:)
@@ -1728,6 +1715,14 @@ c
       allocate (zrsd(3,npole))
       allocate (conj(3,npole))
       allocate (vec(3,npole))
+c
+c     check the sign of multipole components at chiral sites
+c
+      call chkpole
+c
+c     rotate the multipole components into the global frame
+c
+      call rotpole
 c
 c     compute induced dipoles as polarizability times field
 c
@@ -1877,10 +1872,26 @@ c
          call fatal
       end if
 c
+c     rotate the induced dipoles into local coordinate frame
+c
+      do i = 1, npole
+         call rotmat (i,rmt)
+         call invert (3,rmt)
+         do j = 1, 3
+            utmp(j) = 0.0d0
+            do k = 1, 3
+               utmp(j) = utmp(j) + uind(k,i)*rmt(j,k)
+            end do
+         end do
+         do j = 1, 3
+            uind(j,i) = utmp(j)
+         end do
+      end do
+c
 c     print out a list of the final induced dipole moments
 c
       write (iout,150)
-  150 format (/,' Intergroup Induced Dipoles to be Removed',
+  150 format (/,' Local Frame Intergroup Induced Dipole Moments',
      &           ' (Debye) :')
       write (iout,160)
   160 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',
@@ -2942,7 +2953,8 @@ c
 c     print the final multipole values for force field use
 c
       write (iout,110)
-  110 format (/,' Multipole Moments for Polarizable Force Field :')
+  110 format (/,' Final Atomic Multipole Moments after',
+     &           ' Regularization :')
       do i = 1, n
          k = pollist(i)
          if (k .eq. 0) then
