@@ -637,10 +637,14 @@ c
       use units
       implicit none
       integer i,j,k
-      integer xaxe
-      integer yaxe
-      integer zaxe
+      integer ia,ib,ic,id
+      integer xaxe,yaxe,zaxe
+      real*8 xad,yad,zad
+      real*8 xbd,ybd,zbd
+      real*8 xcd,ycd,zcd
+      real*8 c1,c2,c3,vol
       real*8 a(3,3)
+      logical check
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -674,9 +678,40 @@ c
          end do
       end do
 c
-c     check the sign of multipole components at chiral sites
+c     check the sign of multipole components at chiral sites;
+c     note "yaxis" sign is not flipped based on signed volume
 c
-      call chkpole
+      do i = 1, npole
+         check = .true.
+         if (polaxe(i) .ne. 'Z-then-X')  check = .false.
+         if (yaxis(i) .eq. 0)  check = .false.
+         if (check) then
+            ia = ipole(i)
+            ib = zaxis(i)
+            ic = xaxis(i)
+            id = yaxis(i)
+            xad = x(ia) - x(id)
+            yad = y(ia) - y(id)
+            zad = z(ia) - z(id)
+            xbd = x(ib) - x(id)
+            ybd = y(ib) - y(id)
+            zbd = z(ib) - z(id)
+            xcd = x(ic) - x(id)
+            ycd = y(ic) - y(id)
+            zcd = z(ic) - z(id)
+            c1 = ybd*zcd - zbd*ycd
+            c2 = ycd*zad - zcd*yad
+            c3 = yad*zbd - zad*ybd
+            vol = xad*c1 + xbd*c2 + xcd*c3
+            if (vol .lt. 0.0d0) then
+               pole(3,i) = -pole(3,i)
+               pole(6,i) = -pole(6,i)
+               pole(8,i) = -pole(8,i)
+               pole(10,i) = -pole(10,i)
+               pole(12,i) = -pole(12,i)
+            end if
+         end if
+      end do
 c
 c     convert dipole and quadrupole moments back to atomic units
 c
@@ -1715,10 +1750,6 @@ c
       allocate (zrsd(3,npole))
       allocate (conj(3,npole))
       allocate (vec(3,npole))
-c
-c     check the sign of multipole components at chiral sites
-c
-      call chkpole
 c
 c     rotate the multipole components into the global frame
 c
@@ -3204,7 +3235,6 @@ c
             if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
             if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
             if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
-            if (yaxe .lt. 0)  yaxe = -yaxe
             if (polaxe(i) .eq. 'None') then
                write (ikey,50)  it,pole(1,i)
    50          format ('multipole',1x,i5,21x,f11.5)

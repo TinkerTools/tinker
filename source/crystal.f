@@ -365,6 +365,7 @@ c     during generation of a unit cell from an asymmetric unit
 c
 c
       subroutine molmerge
+      use atomid
       use atoms
       use couple
       use molcul
@@ -374,8 +375,10 @@ c
       real*8 r,eps
       real*8 xi,yi,zi
       real*8 xr,yr,zr
+      logical ih,kh
       logical merge,join
       logical, allocatable :: omit(:)
+      logical, allocatable :: hydro(:)
 c
 c
 c     parse the system to find molecules and fragments
@@ -463,17 +466,31 @@ c     parse the system to find molecules and fragments
 c
       call molecule
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (hydro(n))
+c
+c     find hydrogen atoms for use in connectivity assignment
+c
+      do i = 1, n
+         hydro(i) = .false.
+         if (atomic(i) .eq. 1)  hydro(i) = .true.
+         if (name(i)(1:1) .eq. 'H')  hydro(i) = .true.
+      end do
+c
 c     second pass tests all pairs for atoms to be bonded
 c
       do i = 1, n-1
          im = molcule(i)
          in = n12(i)
+         ih = hydro(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
          do k = i+1, n
             km = molcule(k)
             kn = n12(k)
+            kh = hydro(k)
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
@@ -481,8 +498,9 @@ c
             r = sqrt(xr*xr + yr*yr + zr*zr)
             merge = .false.
             if (im .ne. km) then
-               eps = 1.6d0
-               if (in.gt.1 .and. kn.gt.1)  eps = 2.0d0
+               eps = 2.0d0
+               if (ih .or. kh)  eps = 1.6d0
+               if (ih .and. kh)  eps = 0.0d0
                if (r .lt. eps)  merge = .true.
             end if
 c
@@ -501,13 +519,17 @@ c
 c
 c     connection between bonded atoms in different fragments
 c
-               n12(i) = in + 1
+               n12(i) = n12(i) + 1
                i12(n12(i),i) = k
-               n12(k) = kn + 1
+               n12(k) = n12(k) + 1
                i12(n12(k),k) = i
             end if
          end do
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (hydro)
 c
 c     sort the connected atom lists into ascending order
 c
@@ -2462,7 +2484,7 @@ c
                   z(jj) = 0.5d0 - z(j)
                else if (i .eq. 23) then
                   x(jj) = 0.75d0 + y(j)
-                  y(jj) = 0.75d0 + x(j)
+                  y(jj) = 1.25d0 + x(j)
                   z(jj) = 0.75d0 - z(j)
                else if (i .eq. 24) then
                   x(jj) = 0.75d0 - y(j)
