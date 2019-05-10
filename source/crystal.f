@@ -2535,7 +2535,7 @@ c
             end do
          end do
 c
-c     I41/amd space group  (International Tables 141, origin at center)
+c     I41/amd space group  (Intl. Tables 141, origin at center)
 c
       else if (spacegrp .eq. 'I41/amd ') then
          nsym = 16
@@ -4121,7 +4121,7 @@ c
             end do
          end do
 c
-c     Fd3(-)m space group  (International Tables 227)
+c     Fd3(-)m space group  (Intl. Tables 227, origin at center)
 c
       else if (spacegrp .eq. 'Fd3(-)m ') then
          nsym = 48
@@ -4154,189 +4154,189 @@ c
                      y(jj) = y(j) + yoff
                      z(jj) = z(j) + zoff
                   else if (i .eq. 2) then
-                     x(jj) = -x(j) + xoff
-                     y(jj) = 0.5d0 - y(j) + yoff
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
                      z(jj) = 0.5d0 + z(j) + zoff
                   else if (i .eq. 3) then
-                     x(jj) = 0.5d0 - x(j) + xoff
+                     x(jj) = 0.25d0 - x(j) + xoff
                      y(jj) = 0.5d0 + y(j) + yoff
-                     z(jj) = -z(j) + zoff
+                     z(jj) = 0.75d0 - z(j) + zoff
                   else if (i .eq. 4) then
                      x(jj) = 0.5d0 + x(j) + xoff
-                     y(jj) = -y(j) + yoff
-                     z(jj) = 0.5d0 - z(j) + zoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
                   else if (i .eq. 5) then
                      x(jj) = z(j) + xoff
                      y(jj) = x(j) + yoff
                      z(jj) = y(j) + zoff
                   else if (i .eq. 6) then
                      x(jj) = 0.5d0 + z(j) + xoff
-                     y(jj) = -x(j) + yoff
-                     z(jj) = 0.5d0 - y(j) + zoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
                   else if (i .eq. 7) then
-                     x(jj) = -z(j) + xoff
-                     y(jj) = 0.5d0 - x(j) + yoff
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
                      z(jj) = 0.5d0 + y(j) + zoff
                   else if (i .eq. 8) then
-                     x(jj) = 0.5d0 - z(j) + xoff
+                     x(jj) = 0.25d0 - z(j) + xoff
                      y(jj) = 0.5d0 + x(j) + yoff
-                     z(jj) = -y(j)
+                     z(jj) = 0.75d0 - y(j) + zoff
                   else if (i .eq. 9) then
                      x(jj) = y(j) + xoff
                      y(jj) = z(j) + yoff
                      z(jj) = x(j) + zoff
                   else if (i .eq. 10) then
-                     x(jj) = 0.5d0 - y(j) + xoff
+                     x(jj) = 0.25d0 - y(j) + xoff
                      y(jj) = 0.5d0 + z(j) + yoff
-                     z(jj) = -x(j) + zoff
+                     z(jj) = 0.75d0 - x(j) + zoff
                   else if (i .eq. 11) then
                      x(jj) = 0.5d0 + y(j) + xoff
-                     y(jj) = -z(j) + yoff
-                    z(jj) = 0.5d0 - x(j) + zoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
                   else if (i .eq. 12) then
-                     x(jj) = -y(j) + xoff
-                     y(jj) = 0.5d0 - z(j) + yoff
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
                      z(jj) = 0.5d0 + x(j) + zoff
                   else if (i .eq. 13) then
                      x(jj) = 0.75d0 + y(j) + xoff
                      y(jj) = 0.25d0 + x(j) + yoff
-                     z(jj) = 0.75d0 - z(j) + zoff
+                     z(jj) = 0.5d0 - z(j) + zoff
                   else if (i .eq. 14) then
-                     x(jj) = 0.25d0 - y(j) + xoff
-                     y(jj) = 0.25d0 - x(j) + yoff
-                     z(jj) = 0.25d0 - z(j) + zoff
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
                   else if (i .eq. 15) then
                      x(jj) = 0.25d0 + y(j) + xoff
-                     y(jj) = 0.75d0 - x(j) + yoff
+                     y(jj) = 0.5d0 - x(j) + yoff
                      z(jj) = 0.75d0 + z(j) + zoff
                   else if (i .eq. 16) then
-                     x(jj) = 0.75d0 - y(j) + xoff
+                     x(jj) = 0.5d0 - y(j) + xoff
                      y(jj) = 0.75d0 + x(j) + yoff
                      z(jj) = 0.25d0 + z(j) + zoff
                   else if (i .eq. 17) then
                      x(jj) = 0.75d0 + x(j) + xoff
                      y(jj) = 0.25d0 + z(j) + yoff
-                     z(jj) = 0.75d0 - y(j) + zoff
+                     z(jj) = 0.5d0 - y(j) + zoff
                   else if (i .eq. 18) then
-                     x(jj) = 0.75d0 - x(j) + xoff
+                     x(jj) = 0.5d0 - x(j) + xoff
                      y(jj) = 0.75d0 + z(j) + yoff
                      z(jj) = 0.25d0 + y(j) + zoff
                   else if (i .eq. 19) then
-                     x(jj) = 0.25d0 - x(j) + xoff
-                     y(jj) = 0.25d0 - z(j) + yoff
-                     z(jj) = 0.25d0 - y(j) + zoff
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -y(j) + zoff
                   else if (i .eq. 20) then
                      x(jj) = 0.25d0 + x(j) + xoff
-                     y(jj) = 0.75d0 - z(j) + yoff
+                     y(jj) = 0.5d0 - z(j) + yoff
                      z(jj) = 0.75d0 + y(j) + zoff
                   else if (i .eq. 21) then
                      x(jj) = 0.75d0 + z(j) + xoff
                      y(jj) = 0.25d0 + y(j) + yoff
-                     z(jj) = 0.75d0 - x(j) + zoff
+                     z(jj) = 0.5d0 - x(j) + zoff
                   else if (i .eq. 22) then
                      x(jj) = 0.25d0 + z(j) + xoff
-                     y(jj) = 0.75d0 - y(j) + yoff
+                     y(jj) = 0.5d0 - y(j) + yoff
                      z(jj) = 0.75d0 + x(j) + zoff
                   else if (i .eq. 23) then
-                     x(jj) = 0.75d0 - z(j) + xoff
+                     x(jj) = 0.5d0 - z(j) + xoff
                      y(jj) = 0.75d0 + y(j) + yoff
                      z(jj) = 0.25d0 + x(j) + zoff
                   else if (i .eq. 24) then
-                     x(jj) = 0.25d0 - z(j) + xoff
-                     y(jj) = 0.25d0 - y(j) + yoff
-                     z(jj) = 0.25d0 - x(j) + zoff
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -x(j) + zoff
                   else if (i .eq. 25) then
-                     x(jj) = 0.25d0 - x(j) + xoff
-                     y(jj) = 0.25d0 - y(j) + yoff
-                     z(jj) = 0.25d0 - z(j) + zoff
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
                   else if (i .eq. 26) then
                      x(jj) = 0.25d0 + x(j) + xoff
                      y(jj) = 0.75d0 + y(j) + yoff
-                     z(jj) = 0.75d0 - z(j) + zoff
+                     z(jj) = 0.5d0 - z(j) + zoff
                   else if (i .eq. 27) then
                      x(jj) = 0.75d0 + x(j) + xoff
-                     y(jj) = 0.75d0 - y(j) + yoff
+                     y(jj) = 0.5d0 - y(j) + yoff
                      z(jj) = 0.25d0 + z(j) + zoff
                   else if (i .eq. 28) then
-                     x(jj) = 0.75d0 - x(j) + xoff
+                     x(jj) = 0.5d0 - x(j) + xoff
                      y(jj) = 0.25d0 + y(j) + yoff
                      z(jj) = 0.75d0 + z(j) + zoff
                   else if (i .eq. 29) then
-                     x(jj) = 0.25d0 - z(j) + xoff
-                     y(jj) = 0.25d0 - x(j) + yoff
-                     z(jj) = 0.25d0 - y(j) + zoff
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
                   else if (i .eq. 30) then
-                     x(jj) = 0.75d0 - z(j) + xoff
+                     x(jj) = 0.5d0 - z(j) + xoff
                      y(jj) = 0.25d0 + x(j) + yoff
                      z(jj) = 0.75d0 + y(j) + zoff
                   else if (i .eq. 31) then
                      x(jj) = 0.25d0 + z(j) + xoff
                      y(jj) = 0.75d0 + x(j) + yoff
-                     z(jj) = 0.75d0 - y(j) + zoff
+                     z(jj) = 0.5d0 - y(j) + zoff
                   else if (i .eq. 32) then
                      x(jj) = 0.75d0 + z(j) + xoff
-                     y(jj) = 0.75d0 - x(j) + yoff
+                     y(jj) = 0.5d0 - x(j) + yoff
                      z(jj) = 0.25d0 + y(j) + zoff
                   else if (i .eq. 33) then
-                     x(jj) = 0.25d0 - y(j) + xoff
-                     y(jj) = 0.25d0 - z(j) + yoff
-                     z(jj) = 0.25d0 - x(j) + zoff
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
                   else if (i .eq. 34) then
                      x(jj) = 0.75d0 + y(j) + xoff
-                     y(jj) = 0.75d0 - z(j) + yoff
+                     y(jj) = 0.5d0 - z(j) + yoff
                      z(jj) = 0.25d0 + x(j) + zoff
                   else if (i .eq. 35) then
-                     x(jj) = 0.75d0 - y(j) + xoff
+                     x(jj) = 0.5d0 - y(j) + xoff
                      y(jj) = 0.25d0 + z(j) + yoff
                      z(jj) = 0.75d0 + x(j) + zoff
                   else if (i .eq. 36) then
                      x(jj) = 0.25d0 + y(j) + xoff
                      y(jj) = 0.75d0 + z(j) + yoff
-                     z(jj) = 0.75d0 - x(j) + zoff
+                     z(jj) = 0.5d0 - x(j) + zoff
                   else if (i .eq. 37) then
-                     x(jj) = 0.5d0 - y(j) + xoff
-                     y(jj) = -x(j) + yoff
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
                      z(jj) = 0.5d0 + z(j) + zoff
                   else if (i .eq. 38) then
                      x(jj) = y(j) + xoff
                      y(jj) = x(j) + yoff
                      z(jj) = z(j) + zoff
                   else if (i .eq. 39) then
-                     x(jj) = -y(j) + xoff
+                     x(jj) = 0.75d0 - y(j) + xoff
                      y(jj) = 0.5d0 + x(j) + yoff
-                     z(jj) = 0.5d0 - z(j) + zoff
+                     z(jj) = 0.25d0 - z(j) + zoff
                   else if (i .eq. 40) then
                      x(jj) = 0.5d0 + y(j) + xoff
-                     y(jj) = 0.5d0 - x(j) + yoff
-                     z(jj) = -z(j) + zoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
                   else if (i .eq. 41) then
-                     x(jj) = 0.5d0 - x(j) + xoff
-                     y(jj) = -z(j) + yoff
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
                      z(jj) = 0.5d0 + y(j) + zoff
                   else if (i .eq. 42) then
                      x(jj) = 0.5d0 + x(j) + xoff
-                     y(jj) = 0.5d0 - z(j) + yoff
-                     z(jj) = -y(j) + zoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
                   else if (i .eq. 43) then
                      x(jj) = x(j) + xoff
                      y(jj) = z(j) + yoff
                      z(jj) = y(j) + zoff
                   else if (i .eq. 44) then
-                     x(jj) = -x(j) + xoff
+                     x(jj) = 0.75d0 - x(j) + xoff
                      y(jj) = 0.5d0 + z(j) + yoff
-                     z(jj) = 0.5d0 - y(j) + zoff
+                     z(jj) = 0.25d0 - y(j) + zoff
                   else if (i .eq. 45) then
-                     x(jj) = 0.5d0 - z(j) + xoff
-                     y(jj) = -y(j) + yoff
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
                      z(jj) = 0.5d0 + x(j) + zoff
                   else if (i .eq. 46) then
-                     x(jj) = -z(j) + xoff
+                     x(jj) = 0.75d0 - z(j) + xoff
                      y(jj) = 0.5d0 + y(j) + yoff
-                     z(jj) = 0.5d0 - x(j) + zoff
+                     z(jj) = 0.25d0 - x(j) + zoff
                   else if (i .eq. 47) then
                      x(jj) = 0.5d0 + z(j) + xoff
-                     y(jj) = 0.5d0 - y(j) + yoff
-                     z(jj) = -x(j) + zoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
                   else if (i .eq. 48) then
                      x(jj) = z(j) + xoff
                      y(jj) = y(j) + yoff
@@ -4347,7 +4347,7 @@ c
             end do
          end do
 c
-c     Fd3(-)c space group  (International Tables 228)
+c     Fd3(-)c space group  (Intl. Tables 228, origin at center)
 c
       else if (spacegrp .eq. 'Fd3(-)c ') then
          nsym = 48
@@ -4380,189 +4380,189 @@ c
                      y(jj) = y(j) + yoff
                      z(jj) = z(j) + zoff
                   else if (i .eq. 2) then
-                     x(jj) = -x(j) + xoff
-                     y(jj) = 0.5d0 - y(j) + yoff
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
                      z(jj) = 0.5d0 + z(j) + zoff
                   else if (i .eq. 3) then
-                     x(jj) = 0.5d0 - x(j) + xoff
+                     x(jj) = 0.75d0 - x(j) + xoff
                      y(jj) = 0.5d0 + y(j) + yoff
-                     z(jj) = -z(j) + zoff
+                     z(jj) = 0.25d0 - z(j) + zoff
                   else if (i .eq. 4) then
                      x(jj) = 0.5d0 + x(j) + xoff
-                     y(jj) = -y(j) + yoff
-                     z(jj) = 0.5d0 - z(j) + zoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
                   else if (i .eq. 5) then
                      x(jj) = z(j) + xoff
                      y(jj) = x(j) + yoff
                      z(jj) = y(j) + zoff
                   else if (i .eq. 6) then
                      x(jj) = 0.5d0 + z(j) + xoff
-                     y(jj) = -x(j) + yoff
-                     z(jj) = 0.5d0 - y(j) + zoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
                   else if (i .eq. 7) then
-                     x(jj) = -z(j) + xoff
-                     y(jj) = 0.5d0 - x(j) + yoff
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
                      z(jj) = 0.5d0 + y(j) + zoff
                   else if (i .eq. 8) then
-                     x(jj) = 0.5d0 - z(j) + xoff
+                     x(jj) = 0.75d0 - z(j) + xoff
                      y(jj) = 0.5d0 + x(j) + yoff
-                     z(jj) = -y(j)
+                     z(jj) = 0.25d0 - y(j) + zoff
                   else if (i .eq. 9) then
                      x(jj) = y(j) + xoff
                      y(jj) = z(j) + yoff
                      z(jj) = x(j) + zoff
                   else if (i .eq. 10) then
-                     x(jj) = 0.5d0 - y(j) + xoff
+                     x(jj) = 0.75d0 - y(j) + xoff
                      y(jj) = 0.5d0 + z(j) + yoff
-                     z(jj) = -x(j) + zoff
+                     z(jj) = 0.25d0 - x(j) + zoff
                   else if (i .eq. 11) then
                      x(jj) = 0.5d0 + y(j) + xoff
-                     y(jj) = -z(j) + yoff
-                    z(jj) = 0.5d0 - x(j) + zoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
                   else if (i .eq. 12) then
-                     x(jj) = -y(j) + xoff
-                     y(jj) = 0.5d0 - z(j) + yoff
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
                      z(jj) = 0.5d0 + x(j) + zoff
                   else if (i .eq. 13) then
                      x(jj) = 0.75d0 + y(j) + xoff
                      y(jj) = 0.25d0 + x(j) + yoff
-                     z(jj) = 0.75d0 - z(j) + zoff
+                     z(jj) = -z(j) + zoff
                   else if (i .eq. 14) then
-                     x(jj) = 0.25d0 - y(j) + xoff
-                     y(jj) = 0.25d0 - x(j) + yoff
-                     z(jj) = 0.25d0 - z(j) + zoff
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
                   else if (i .eq. 15) then
                      x(jj) = 0.25d0 + y(j) + xoff
-                     y(jj) = 0.75d0 - x(j) + yoff
+                     y(jj) = -x(j) + yoff
                      z(jj) = 0.75d0 + z(j) + zoff
                   else if (i .eq. 16) then
-                     x(jj) = 0.75d0 - y(j) + xoff
+                     x(jj) = -y(j) + xoff
                      y(jj) = 0.75d0 + x(j) + yoff
                      z(jj) = 0.25d0 + z(j) + zoff
                   else if (i .eq. 17) then
                      x(jj) = 0.75d0 + x(j) + xoff
                      y(jj) = 0.25d0 + z(j) + yoff
-                     z(jj) = 0.75d0 - y(j) + zoff
+                     z(jj) = -y(j) + zoff
                   else if (i .eq. 18) then
-                     x(jj) = 0.75d0 - x(j) + xoff
+                     x(jj) = -x(j) + xoff
                      y(jj) = 0.75d0 + z(j) + yoff
                      z(jj) = 0.25d0 + y(j) + zoff
                   else if (i .eq. 19) then
-                     x(jj) = 0.25d0 - x(j) + xoff
-                     y(jj) = 0.25d0 - z(j) + yoff
-                     z(jj) = 0.25d0 - y(j) + zoff
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
                   else if (i .eq. 20) then
                      x(jj) = 0.25d0 + x(j) + xoff
-                     y(jj) = 0.75d0 - z(j) + yoff
+                     y(jj) = -z(j) + yoff
                      z(jj) = 0.75d0 + y(j) + zoff
                   else if (i .eq. 21) then
                      x(jj) = 0.75d0 + z(j) + xoff
                      y(jj) = 0.25d0 + y(j) + yoff
-                     z(jj) = 0.75d0 - x(j) + zoff
+                     z(jj) = -x(j) + zoff
                   else if (i .eq. 22) then
                      x(jj) = 0.25d0 + z(j) + xoff
-                     y(jj) = 0.75d0 - y(j) + yoff
+                     y(jj) = -y(j) + yoff
                      z(jj) = 0.75d0 + x(j) + zoff
                   else if (i .eq. 23) then
-                     x(jj) = 0.75d0 - z(j) + xoff
+                     x(jj) = -z(j) + xoff
                      y(jj) = 0.75d0 + y(j) + yoff
                      z(jj) = 0.25d0 + x(j) + zoff
                   else if (i .eq. 24) then
-                     x(jj) = 0.25d0 - z(j) + xoff
-                     y(jj) = 0.25d0 - y(j) + yoff
-                     z(jj) = 0.25d0 - x(j) + zoff
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 - x(j) + zoff
                   else if (i .eq. 25) then
-                     x(jj) = 0.75d0 - x(j) + xoff
-                     y(jj) = 0.75d0 - y(j) + yoff
-                     z(jj) = 0.75d0 - z(j) + zoff
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
                   else if (i .eq. 26) then
                      x(jj) = 0.75d0 + x(j) + xoff
                      y(jj) = 0.25d0 + y(j) + yoff
-                     z(jj) = 0.25d0 - z(j) + zoff
+                     z(jj) = 0.5d0 - z(j) + zoff
                   else if (i .eq. 27) then
                      x(jj) = 0.25d0 + x(j) + xoff
-                     y(jj) = 0.25d0 - y(j) + yoff
+                     y(jj) = 0.5d0 - y(j) + yoff
                      z(jj) = 0.75d0 + z(j) + zoff
                   else if (i .eq. 28) then
-                     x(jj) = 0.25d0 - x(j) + xoff
+                     x(jj) = 0.5d0 - x(j) + xoff
                      y(jj) = 0.75d0 + y(j) + yoff
                      z(jj) = 0.25d0 + z(j) + zoff
                   else if (i .eq. 29) then
-                     x(jj) = 0.75d0 - z(j) + xoff
-                     y(jj) = 0.75d0 - x(j) + yoff
-                     z(jj) = 0.75d0 - y(j) + zoff
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
                   else if (i .eq. 30) then
-                     x(jj) = 0.25d0 - z(j) + xoff
+                     x(jj) = 0.5d0 - z(j) + xoff
                      y(jj) = 0.75d0 + x(j) + yoff
                      z(jj) = 0.25d0 + y(j) + zoff
                   else if (i .eq. 31) then
                      x(jj) = 0.75d0 + z(j) + xoff
                      y(jj) = 0.25d0 + x(j) + yoff
-                     z(jj) = 0.25d0 - y(j) + zoff
+                     z(jj) = 0.5d0 - y(j) + zoff
                   else if (i .eq. 32) then
                      x(jj) = 0.25d0 + z(j) + xoff
-                     y(jj) = 0.25d0 - x(j) + yoff
+                     y(jj) = 0.5d0 - x(j) + yoff
                      z(jj) = 0.75d0 + y(j) + zoff
                   else if (i .eq. 33) then
-                     x(jj) = 0.75d0 - y(j) + xoff
-                     y(jj) = 0.75d0 - z(j) + yoff
-                     z(jj) = 0.75d0 - x(j) + zoff
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
                   else if (i .eq. 34) then
                      x(jj) = 0.25d0 + y(j) + xoff
-                     y(jj) = 0.25d0 - z(j) + yoff
+                     y(jj) = 0.5d0 - z(j) + yoff
                      z(jj) = 0.75d0 + x(j) + zoff
                   else if (i .eq. 35) then
-                     x(jj) = 0.25d0 - y(j) + xoff
+                     x(jj) = 0.5d0 - y(j) + xoff
                      y(jj) = 0.75d0 + z(j) + yoff
                      z(jj) = 0.25d0 + x(j) + zoff
                   else if (i .eq. 36) then
                      x(jj) = 0.75d0 + y(j) + xoff
                      y(jj) = 0.25d0 + z(j) + yoff
-                     z(jj) = 0.25d0 - x(j) + zoff
+                     z(jj) = 0.5d0 - x(j) + zoff
                   else if (i .eq. 37) then
-                     x(jj) = -y(j) + xoff
-                     y(jj) = 0.5d0 - x(j) + yoff
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
                      z(jj) = z(j) + zoff
                   else if (i .eq. 38) then
                      x(jj) = 0.5d0 + y(j) + xoff
                      y(jj) = 0.5d0 + x(j) + yoff
                      z(jj) = 0.5d0 + z(j) + zoff
                   else if (i .eq. 39) then
-                     x(jj) = 0.5d0 - y(j) + xoff
+                     x(jj) = 0.75d0 - y(j) + xoff
                      y(jj) = x(j) + yoff
-                     z(jj) = -z(j) + zoff
+                     z(jj) = 0.25d0 - z(j) + zoff
                   else if (i .eq. 40) then
                      x(jj) = y(j) + xoff
-                     y(jj) = -x(j) + yoff
-                     z(jj) = 0.5d0 - z(j) + zoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
                   else if (i .eq. 41) then
-                     x(jj) = -x(j) + xoff
-                     y(jj) = 0.5d0 - z(j) + yoff
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
                      z(jj) = y(j) + zoff
                   else if (i .eq. 42) then
                      x(jj) = x(j) + xoff
-                     y(jj) = -z(j) + yoff
-                     z(jj) = 0.5d0 - y(j) + zoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
                   else if (i .eq. 43) then
                      x(jj) = 0.5d0 + x(j) + xoff
                      y(jj) = 0.5d0 + z(j) + yoff
                      z(jj) = 0.5d0 + y(j) + zoff
                   else if (i .eq. 44) then
-                     x(jj) = 0.5d0 - x(j) + xoff
+                     x(jj) = 0.75d0 - x(j) + xoff
                      y(jj) = z(j) + yoff
-                     z(jj) = -y(j) + zoff
+                     z(jj) = 0.25d0 - y(j) + zoff
                   else if (i .eq. 45) then
-                     x(jj) = -z(j) + xoff
-                     y(jj) = 0.5d0 - y(j) + yoff
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
                      z(jj) = x(j) + zoff
                   else if (i .eq. 46) then
-                     x(jj) = 0.5d0 - z(j) + xoff
+                     x(jj) = 0.75d0 - z(j) + xoff
                      y(jj) = y(j) + yoff
-                     z(jj) = -x(j) + zoff
+                     z(jj) = 0.25d0 - x(j) + zoff
                   else if (i .eq. 47) then
                      x(jj) = z(j) + xoff
-                     y(jj) = -y(j) + yoff
-                     z(jj) = 0.5d0 - x(j) + zoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
                   else if (i .eq. 48) then
                      x(jj) = 0.5d0 + z(j) + xoff
                      y(jj) = 0.5d0 + y(j) + yoff
@@ -5013,9 +5013,5 @@ c
 c     set the total number of atoms in the full unit cell
 c
       n = nsym * noff * n
-cccccccccccccccccccccccccccccccccccccccccc
-      write (*,99)  n
-   99 format (' Total Atoms :  ',i10)
-cccccccccccccccccccccccccccccccccccccccccc
       return
       end

@@ -133,7 +133,6 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polpot.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp poltcg.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potent.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp precis.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ptable.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qmstuf.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp refer.f
@@ -486,7 +485,6 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polarize.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp poledit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polymer.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potential.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp precise.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pressure.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmedit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmkey.f

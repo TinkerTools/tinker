@@ -133,7 +133,6 @@ gfortran -c -Ofast -mavx -fopenmp polpot.f
 gfortran -c -Ofast -mavx -fopenmp poltcg.f
 gfortran -c -Ofast -mavx -fopenmp potent.f
 gfortran -c -Ofast -mavx -fopenmp potfit.f
-gfortran -c -Ofast -mavx -fopenmp precis.f
 gfortran -c -Ofast -mavx -fopenmp ptable.f
 gfortran -c -Ofast -mavx -fopenmp qmstuf.f
 gfortran -c -Ofast -mavx -fopenmp refer.f
@@ -486,7 +485,6 @@ gfortran -c -Ofast -mavx -fopenmp polarize.f
 gfortran -c -Ofast -mavx -fopenmp poledit.f
 gfortran -c -Ofast -mavx -fopenmp polymer.f
 gfortran -c -Ofast -mavx -fopenmp potential.f
-gfortran -c -Ofast -mavx -fopenmp precise.f
 gfortran -c -Ofast -mavx -fopenmp pressure.f
 gfortran -c -Ofast -mavx -fopenmp prmedit.f
 gfortran -c -Ofast -mavx -fopenmp prmkey.f

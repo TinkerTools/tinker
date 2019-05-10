@@ -133,7 +133,6 @@ gfortran -c -Wall polpot.f
 gfortran -c -Wall poltcg.f
 gfortran -c -Wall potent.f
 gfortran -c -Wall potfit.f
-gfortran -c -Wall precis.f
 gfortran -c -Wall ptable.f
 gfortran -c -Wall qmstuf.f
 gfortran -c -Wall refer.f
@@ -486,7 +485,6 @@ gfortran -c -Wall polarize.f
 gfortran -c -Wall poledit.f
 gfortran -c -Wall polymer.f
 gfortran -c -Wall potential.f
-gfortran -c -Wall precise.f
 gfortran -c -Wall pressure.f
 gfortran -c -Wall prmedit.f
 gfortran -c -Wall prmkey.f

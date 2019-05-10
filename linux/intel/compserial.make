@@ -133,7 +133,6 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 polpot.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 poltcg.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 potent.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 potfit.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 precis.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 ptable.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 qmstuf.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 refer.f
@@ -486,7 +485,6 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 polarize.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 poledit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 polymer.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 potential.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 precise.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 pressure.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prmedit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prmkey.f

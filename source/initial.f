@@ -42,7 +42,6 @@ c
       use output
       use params
       use pdb
-      use precis
       use rigid
       use scales
       use sequen
@@ -86,12 +85,6 @@ c     2**28 bytes, or 256 MB; comment these lines for other compilers
 c
 c!$   call kmp_set_stacksize_s (268435456)
 c!$   call kmp_set_blocktime (0)
-c
-c     values of machine precision constants
-c
-      tiny = precise (1)
-      small = precise (2)
-      huge = precise (3)
 c
 c     number of lines in the keyfile
 c

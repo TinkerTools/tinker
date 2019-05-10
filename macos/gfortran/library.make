@@ -405,8 +405,6 @@ poltcg.o \
 polymer.o \
 potent.o \
 potfit.o \
-precis.o \
-precise.o \
 pressure.o \
 prmkey.o \
 promo.o \
