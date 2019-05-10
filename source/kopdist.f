@@ -208,6 +208,11 @@ c
                k = anglist(j,ia)
                if (angtyp(k) .eq. 'HARMONIC')  angtyp(k) = 'IN-PLANE'
             end do
+         else if (angtrig.eq.'NATURAL' .and. opdk(i).ne.0.0d0) then
+            do j = 1, 3
+               k = anglist(j,ia)
+               if (angtyp(k) .eq. 'IN-PLANE')  angtyp(k) = 'HARMONIC'
+            end do
          end if
       end do
 c

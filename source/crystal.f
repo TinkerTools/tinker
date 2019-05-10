@@ -32,27 +32,27 @@ c
       integer next,freeunit
       logical exist,query
       character*1 answer
-      character*9 sgroup(maxspace)
+      character*8 sgroup(maxspace)
       character*240 xyzfile
       character*240 record
       character*240 string
-      data sgroup / 'P1       ', 'P2       ', 'P1(-)    ', 'P21      ',
-     &              'C2       ', 'Pm       ', 'Pc       ', 'Cm       ',
-     &              'Cc       ', 'P2/m     ', 'P21/m    ', 'C2/m     ',
-     &              'P2/c     ', 'P21/c    ', 'P21/n    ', 'P21/a    ',
-     &              'C2/c     ', 'P21212   ', 'P212121  ', 'C2221    ',
-     &              'Pca21    ', 'Pmn21    ', 'Pna21    ', 'Pn21a    ',
-     &              'Cmc21    ', 'Aba2     ', 'Fdd2     ', 'Pnna     ',
-     &              'Pmna     ', 'Pcca     ', 'Pbam     ', 'Pccn     ',
-     &              'Pbcm     ', 'Pnnm     ', 'Pbcn     ', 'Pbca     ',
-     &              'Pnma     ', 'Cmcm     ', 'Cmca     ', 'P41      ',
-     &              'P43      ', 'I4(-)    ', 'P42/n    ', 'I41/a    ',
-     &              'P41212   ', 'P43212   ', 'P4(-)21m ', 'P4(-)21c ',
-     &              'P4(-)m2  ', 'I41/amd  ', 'R3       ', 'R3(-)    ',
-     &              'P3121    ', 'R3c      ', 'P63      ', 'P63/m    ',
-     &              'P6(3)/mmc', 'Pa3(-)   ', 'P43m     ', 'I4(-)3m  ',
-     &              'P4(-)3n  ', 'Pm3(-)m  ', 'Pm3(-)n  ', 'Fm3(-)m  ',
-     &              'Fd3(-)m  ', 'Fm3(-)c  ', 'Im3(-)m  ', 'Im3(-)d  '/
+      data sgroup / 'P1      ', 'P2      ', 'P1(-)   ', 'P21     ',
+     &              'C2      ', 'Pm      ', 'Pc      ', 'Cm      ',
+     &              'Cc      ', 'P2/m    ', 'P21/m   ', 'C2/m    ',
+     &              'P2/c    ', 'P21/c   ', 'P21/n   ', 'P21/a   ',
+     &              'C2/c    ', 'P21212  ', 'P212121 ', 'C2221   ',
+     &              'Pca21   ', 'Pmn21   ', 'Pna21   ', 'Pn21a   ',
+     &              'Cmc21   ', 'Aba2    ', 'Fdd2    ', 'Pnna    ',
+     &              'Pmna    ', 'Pcca    ', 'Pbam    ', 'Pccn    ',
+     &              'Pbcm    ', 'Pnnm    ', 'Pbcn    ', 'Pbca    ',
+     &              'Pnma    ', 'Cmcm    ', 'Cmca    ', 'P41     ',
+     &              'P43     ', 'I4(-)   ', 'P42/n   ', 'I41/a   ',
+     &              'P41212  ', 'P43212  ', 'P4(-)21m', 'P4(-)21c',
+     &              'P4(-)m2 ', 'I41/amd ', 'R3      ', 'R3(-)   ',
+     &              'P3121   ', 'R3c     ', 'P63     ', 'P63/m   ',
+     &              'P63/mmc ', 'Pa3(-)  ', 'P43m    ', 'I4(-)3m ',
+     &              'P4(-)3n ', 'Pm3(-)m ', 'Pm3(-)n ', 'Fm3(-)m ',
+     &              'Fd3(-)m ', 'Fm3(-)c ', 'Im3(-)m ', 'Im3(-)d '/
 c
 c
 c     get and read the Cartesian coordinates file
@@ -101,40 +101,40 @@ c
    60    continue
          write (iout,70)  (sgroup(i),i=1,maxspace)
    70    format (/,' Available Crystallographic Space Groups :',/,
-     &           /,3x,'(1) ',a9,4x,'(2) ',a9,4x,'(3) ',a9,
-     &              4x,'(4) ',a9,
-     &           /,3x,'(5) ',a9,4x,'(6) ',a9,4x,'(7) ',a9,
-     &              4x,'(8) ',a9,
-     &           /,3x,'(9) ',a9,3x,'(10) ',a9,3x,'(11) ',a9,
-     &              3x,'(12) ',a9,
-     &           /,2x,'(13) ',a9,3x,'(14) ',a9,3x,'(15) ',a9,
-     &              3x,'(16) ',a9,
-     &           /,2x,'(17) ',a9,3x,'(18) ',a9,3x,'(19) ',a9,
-     &              3x,'(20) ',a9,
-     &           /,2x,'(21) ',a9,3x,'(22) ',a9,3x,'(23) ',a9,
-     &              3x,'(24) ',a9,
-     &           /,2x,'(25) ',a9,3x,'(26) ',a9,3x,'(27) ',a9,
-     &              3x,'(28) ',a9,
-     &           /,2x,'(29) ',a9,3x,'(30) ',a9,3x,'(31) ',a9,
-     &              3x,'(32) ',a9,
-     &           /,2x,'(33) ',a9,3x,'(34) ',a9,3x,'(35) ',a9,
-     &              3x,'(36) ',a9,
-     &           /,2x,'(37) ',a9,3x,'(38) ',a9,3x,'(39) ',a9,
-     &              3x,'(40) ',a9,
-     &           /,2x,'(41) ',a9,3x,'(42) ',a9,3x,'(43) ',a9,
-     &              3x,'(44) ',a9,
-     &           /,2x,'(45) ',a9,3x,'(46) ',a9,3x,'(47) ',a9,
-     &              3x,'(48) ',a9,
-     &           /,2x,'(49) ',a9,3x,'(50) ',a9,3x,'(51) ',a9,
-     &              3x,'(52) ',a9,
-     &           /,2x,'(53) ',a9,3x,'(54) ',a9,3x,'(55) ',a9,
-     &              3x,'(56) ',a9,
-     &           /,2x,'(57) ',a9,3x,'(58) ',a9,3x,'(59) ',a9,
-     &              3x,'(60) ',a9,
-     &           /,2x,'(61) ',a9,3x,'(62) ',a9,3x,'(63) ',a9,
-     &              3x,'(64) ',a9,
-     &           /,2x,'(65) ',a9,3x,'(66) ',a9,3x,'(67) ',a9,
-     &              3x,'(68) ',a9)
+     &           /,3x,'(1) ',a8,5x,'(2) ',a8,5x,'(3) ',a8,
+     &              5x,'(4) ',a8,
+     &           /,3x,'(5) ',a8,5x,'(6) ',a8,5x,'(7) ',a8,
+     &              5x,'(8) ',a8,
+     &           /,3x,'(9) ',a8,4x,'(10) ',a8,4x,'(11) ',a8,
+     &              4x,'(12) ',a8,
+     &           /,2x,'(13) ',a8,4x,'(14) ',a8,4x,'(15) ',a8,
+     &              4x,'(16) ',a8,
+     &           /,2x,'(17) ',a8,4x,'(18) ',a8,4x,'(19) ',a8,
+     &              4x,'(20) ',a8,
+     &           /,2x,'(21) ',a8,4x,'(22) ',a8,4x,'(23) ',a8,
+     &              4x,'(24) ',a8,
+     &           /,2x,'(25) ',a8,4x,'(26) ',a8,4x,'(27) ',a8,
+     &              4x,'(28) ',a8,
+     &           /,2x,'(29) ',a8,4x,'(30) ',a8,4x,'(31) ',a8,
+     &              4x,'(32) ',a8,
+     &           /,2x,'(33) ',a8,4x,'(34) ',a8,4x,'(35) ',a8,
+     &              4x,'(36) ',a8,
+     &           /,2x,'(37) ',a8,4x,'(38) ',a8,4x,'(39) ',a8,
+     &              4x,'(40) ',a8,
+     &           /,2x,'(41) ',a8,4x,'(42) ',a8,4x,'(43) ',a8,
+     &              4x,'(44) ',a8,
+     &           /,2x,'(45) ',a8,4x,'(46) ',a8,4x,'(47) ',a8,
+     &              4x,'(48) ',a8,
+     &           /,2x,'(49) ',a8,4x,'(50) ',a8,4x,'(51) ',a8,
+     &              4x,'(52) ',a8,
+     &           /,2x,'(53) ',a8,4x,'(54) ',a8,4x,'(55) ',a8,
+     &              4x,'(56) ',a8,
+     &           /,2x,'(57) ',a8,4x,'(58) ',a8,4x,'(59) ',a8,
+     &              4x,'(60) ',a8,
+     &           /,2x,'(61) ',a8,4x,'(62) ',a8,4x,'(63) ',a8,
+     &              4x,'(64) ',a8,
+     &           /,2x,'(65) ',a8,4x,'(66) ',a8,4x,'(67) ',a8,
+     &              4x,'(68) ',a8)
          write (iout,80)
    80    format (/,' Enter the Number of the Desired Choice :  ',$)
          read (input,90)  i
@@ -208,7 +208,7 @@ c     apply the appropriate space group symmetry operators
 c
       if (mode .eq. 4) then
          write (iout,180)  spacegrp
-  180    format (/,' Space Group Symbol :',12x,a9)
+  180    format (/,' Space Group Symbol :',12x,a8)
          call symmetry (spacegrp)
       end if
 c
@@ -677,10 +677,11 @@ c
       subroutine symmetry (spacegrp)
       use atoms
       implicit none
-      integer i,j,ii,jj
-      integer nsym
+      integer i,j,k
+      integer ii,jj,kk
+      integer nsym,noff
       real*8 one3,two3
-      real*8 one6,fiv6
+      real*8 xoff,yoff,zoff
       character*10 spacegrp
 c
 c
@@ -688,16 +689,22 @@ c     P1 space group  (International Tables 1)
 c
       if (spacegrp .eq. 'P1       ') then
          nsym = 1
+         noff = 1
 c
 c     P1(-) space group  (International Tables 2)
 c
-      else if (spacegrp .eq. 'P1(-)    ') then
+      else if (spacegrp .eq. 'P1(-)   ') then
          nsym = 2
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = -z(j)
@@ -708,13 +715,18 @@ c
 c
 c     P2 space group  (International Tables 3)
 c
-      else if (spacegrp .eq. 'P2       ') then
+      else if (spacegrp .eq. 'P2      ') then
          nsym = 2
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = y(j)
                   z(jj) = -z(j)
@@ -725,13 +737,18 @@ c
 c
 c     P21 space group  (International Tables 4)
 c
-      else if (spacegrp .eq. 'P21      ') then
+      else if (spacegrp .eq. 'P21     ') then
          nsym = 2
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = 0.5d0 + y(j)
                   z(jj) = -z(j)
@@ -742,38 +759,52 @@ c
 c
 c     C2 space group  (International Tables 5)
 c
-      else if (spacegrp .eq. 'C2       ') then
-         nsym = 4
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = -z(j)
+      else if (spacegrp .eq. 'C2      ') then
+         nsym = 2
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Pm space group  (International Tables 6)
 c
-      else if (spacegrp .eq. 'Pm       ') then
+      else if (spacegrp .eq. 'Pm      ') then
          nsym = 2
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -784,13 +815,18 @@ c
 c
 c     Pc space group  (International Tables 7)
 c
-      else if (spacegrp .eq. 'Pc       ') then
+      else if (spacegrp .eq. 'Pc      ') then
          nsym = 2
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -801,63 +837,86 @@ c
 c
 c     Cm space group  (International Tables 8)
 c
-      else if (spacegrp .eq. 'Cm       ') then
-         nsym = 4
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Cm      ') then
+         nsym = 2
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Cc space group  (International Tables 9)
 c
-      else if (spacegrp .eq. 'Cc       ') then
-         nsym = 4
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
+      else if (spacegrp .eq. 'Cc      ') then
+         nsym = 2
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + 0.5d0 + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P2/m space group  (International Tables 10)
 c
-      else if (spacegrp .eq. 'P2/m     ') then
+      else if (spacegrp .eq. 'P2/m    ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = y(j)
                   z(jj) = -z(j)
@@ -876,13 +935,18 @@ c
 c
 c     P21/m space group  (International Tables 11)
 c
-      else if (spacegrp .eq. 'P21/m    ') then
+      else if (spacegrp .eq. 'P21/m   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = 0.5d0 + y(j)
                   z(jj) = -z(j)
@@ -901,54 +965,60 @@ c
 c
 c     C2/m space group  (International Tables 12)
 c
-      else if (spacegrp .eq. 'C2/m     ') then
-         nsym = 8
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 3) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 4) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 6) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'C2/m    ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P2/c space group  (International Tables 13)
 c
-      else if (spacegrp .eq. 'P2/c     ') then
+      else if (spacegrp .eq. 'P2/c    ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = y(j)
                   z(jj) = 0.5d0 - z(j)
@@ -967,13 +1037,18 @@ c
 c
 c     P21/c space group  (International Tables 14)
 c
-      else if (spacegrp .eq. 'P21/c    ') then
+      else if (spacegrp .eq. 'P21/c   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = -z(j)
@@ -992,13 +1067,18 @@ c
 c
 c     P21/n space group  (International Tables 14)
 c
-      else if (spacegrp .eq. 'P21/n    ') then
+      else if (spacegrp .eq. 'P21/n   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = 0.5d0 + y(j)
                   z(jj) = 0.5d0 - z(j)
@@ -1017,13 +1097,18 @@ c
 c
 c     P21/a space group  (International Tables 14)
 c
-      else if (spacegrp .eq. 'P21/a    ') then
+      else if (spacegrp .eq. 'P21/a   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = 0.5d0 + y(j)
                   z(jj) = -z(j)
@@ -1042,54 +1127,60 @@ c
 c
 c     C2/c space group  (International Tables 15)
 c
-      else if (spacegrp .eq. 'C2/c     ') then
-         nsym = 8
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 3) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 4) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 6) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
+      else if (spacegrp .eq. 'C2/c    ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P21212 space group  (International Tables 18)
 c
-      else if (spacegrp .eq. 'P21212   ') then
+      else if (spacegrp .eq. 'P21212  ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -1108,13 +1199,18 @@ c
 c
 c     P212121 space group  (International Tables 19)
 c
-      else if (spacegrp .eq. 'P212121  ') then
+      else if (spacegrp .eq. 'P212121 ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1133,54 +1229,60 @@ c
 c
 c     C2221 space group  (International Tables 20)
 c
-      else if (spacegrp .eq. 'C2221    ') then
-         nsym = 8
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 4) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 6) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
+      else if (spacegrp .eq. 'C2221   ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Pca21 space group  (International Tables 29)
 c
-      else if (spacegrp .eq. 'Pca21    ') then
+      else if (spacegrp .eq. 'Pca21   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1199,13 +1301,18 @@ c
 c
 c     Pmn21 space group  (International Tables 31)
 c
-      else if (spacegrp .eq. 'Pmn21    ') then
+      else if (spacegrp .eq. 'Pmn21   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1224,13 +1331,18 @@ c
 c
 c     Pna21 space group  (International Tables 33)
 c
-      else if (spacegrp .eq. 'Pna21    ') then
+      else if (spacegrp .eq. 'Pna21   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1249,13 +1361,18 @@ c
 c
 c     Pn21a space group  (International Tables 33)
 c
-      else if (spacegrp .eq. 'Pn21a    ') then
+      else if (spacegrp .eq. 'Pn21a   ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = 0.5d0 + y(j)
                   z(jj) = -z(j)
@@ -1274,168 +1391,152 @@ c
 c
 c     Cmc21 space group  (International Tables 36)
 c
-      else if (spacegrp .eq. 'Cmc21    ') then
-         nsym = 8
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 6) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Cmc21   ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Aba2 space group  (International Tables 41)
 c
-      else if (spacegrp .eq. 'Aba2     ') then
-         nsym = 8
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 5) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 6) then
-                  x(jj) = -x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 + z(j)
+      else if (spacegrp .eq. 'Aba2    ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.0d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Fdd2 space group  (International Tables 43)
 c
-      else if (spacegrp .eq. 'Fdd2     ') then
-         nsym = 16
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.25d0 + x(j)
-                  y(jj) = 0.25d0 - y(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.25d0 - x(j)
-                  y(jj) = 0.25d0 + y(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 5) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 6) then
-                  x(jj) = -x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.25d0 + x(j)
-                  y(jj) = 0.75d0 - y(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.25d0 - x(j)
-                  y(jj) = 0.75d0 + y(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 9) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 10) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 11) then
-                  x(jj) = 0.75d0 + x(j)
-                  y(jj) = 0.25d0 - y(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 12) then
-                  x(jj) = 0.75d0 - x(j)
-                  y(jj) = 0.25d0 + y(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 13) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 14) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 15) then
-                  x(jj) = 0.75d0 + x(j)
-                  y(jj) = 0.75d0 - y(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 16) then
-                  x(jj) = 0.75d0 - x(j)
-                  y(jj) = 0.75d0 + y(j)
-                  z(jj) = 0.25d0 + z(j)
+      else if (spacegrp .eq. 'Fdd2    ') then
+         nsym = 4
+         noff = 4
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.0d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               else if (k .eq. 3) then
+                  xoff = 0.5d0
+                  yoff = 0.0d0
+                  zoff = 0.5d0
+               else if (k .eq. 4) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                    x(jj) = 0.25d0 + x(j) + xoff
+                      y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Pnna space group  (International Tables 52)
 c
-      else if (spacegrp .eq. 'Pnna     ') then
+      else if (spacegrp .eq. 'Pnna    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -1470,13 +1571,18 @@ c
 c
 c     Pmna space group  (International Tables 53)
 c
-      else if (spacegrp .eq. 'Pmna     ') then
+      else if (spacegrp .eq. 'Pmna    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1511,13 +1617,18 @@ c
 c
 c     Pcca space group  (International Tables 54)
 c
-      else if (spacegrp .eq. 'Pcca     ') then
+      else if (spacegrp .eq. 'Pcca    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -1552,13 +1663,18 @@ c
 c
 c     Pbam space group  (International Tables 55)
 c
-      else if (spacegrp .eq. 'Pbam     ') then
+      else if (spacegrp .eq. 'Pbam    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -1593,13 +1709,18 @@ c
 c
 c     Pccn space group  (International Tables 56)
 c
-      else if (spacegrp .eq. 'Pccn     ') then
+      else if (spacegrp .eq. 'Pccn    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = 0.5d0 - y(j)
                   z(jj) = z(j)
@@ -1634,13 +1755,18 @@ c
 c
 c     Pbcm space group  (International Tables 57)
 c
-      else if (spacegrp .eq. 'Pbcm     ') then
+      else if (spacegrp .eq. 'Pbcm    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1675,13 +1801,18 @@ c
 c
 c     Pnnm space group  (International Tables 58)
 c
-      else if (spacegrp .eq. 'Pnnm     ') then
+      else if (spacegrp .eq. 'Pnnm    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -1716,13 +1847,18 @@ c
 c
 c     Pbcn space group  (International Tables 60)
 c
-      else if (spacegrp .eq. 'Pbcn     ') then
+      else if (spacegrp .eq. 'Pbcn    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = 0.5d0 - y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1757,13 +1893,18 @@ c
 c
 c     Pbca space group  (International Tables 61)
 c
-      else if (spacegrp .eq. 'Pbca     ') then
+      else if (spacegrp .eq. 'Pbca    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1798,13 +1939,18 @@ c
 c
 c     Pnma space group  (International Tables 62)
 c
-      else if (spacegrp .eq. 'Pnma     ') then
+      else if (spacegrp .eq. 'Pnma    ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -1839,159 +1985,134 @@ c
 c
 c     Cmcm space group  (International Tables 63)
 c
-      else if (spacegrp .eq. 'Cmcm     ') then
-         nsym = 16
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 4) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 5) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 6) then
-                  x(jj) = x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 7) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 9) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 10) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 11) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 12) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 13) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 14) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 15) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 16) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Cmcm    ') then
+         nsym = 8
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Cmca space group  (International Tables 64)
 c
-      else if (spacegrp .eq. 'Cmca     ') then
-         nsym = 16
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = -x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 4) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 5) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 6) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 7) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 9) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 10) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 11) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 12) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 13) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 14) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 15) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 16) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Cmca    ') then
+         nsym = 8
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P41 space group  (International Tables 76)
 c
-      else if (spacegrp .eq. 'P41      ') then
+      else if (spacegrp .eq. 'P41     ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -2010,13 +2131,18 @@ c
 c
 c     P43 space group  (International Tables 78)
 c
-      else if (spacegrp .eq. 'P43      ') then
+      else if (spacegrp .eq. 'P43     ') then
          nsym = 4
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -2035,54 +2161,60 @@ c
 c
 c     I4(-) space group  (International Tables 82)
 c
-      else if (spacegrp .eq. 'I4(-)    ') then
-         nsym = 8
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = y(j)
-                  y(jj) = -x(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 4) then
-                  x(jj) = -y(j)
-                  y(jj) = x(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 6) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.5d0 + y(j)
-                  y(jj) = 0.5d0 - x(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.5d0 - y(j)
-                  y(jj) = 0.5d0 + x(j)
-                  z(jj) = 0.5d0 - z(j)
+      else if (spacegrp .eq. 'I4(-)   ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P42/n space group  (International Tables 86)
 c
-      else if (spacegrp .eq. 'P42/n    ') then
+      else if (spacegrp .eq. 'P42/n   ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -2117,86 +2249,76 @@ c
 c
 c     I41/a space group  (International Tables 88)
 c
-      else if (spacegrp .eq. 'I41/a    ') then
-         nsym = 16
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = -x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.75d0 - y(j)
-                  y(jj) = 0.25d0 + x(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 6) then
-                  x(jj) = 0.25d0 - y(j)
-                  y(jj) = 0.75d0 + x(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.75d0 + y(j)
-                  y(jj) = 0.75d0 - x(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.25d0 + y(j)
-                  y(jj) = 0.25d0 - x(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 9) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 10) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 11) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 12) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 13) then
-                  x(jj) = 0.25d0 + y(j)
-                  y(jj) = 0.75d0 - x(j)
-                  z(jj) = 0.75d0 - z(j)
-               else if (i .eq. 14) then
-                  x(jj) = 0.75d0 + y(j)
-                  y(jj) = 0.25d0 - x(j)
-                  z(jj) = 0.25d0 - z(j)
-               else if (i .eq. 15) then
-                  x(jj) = 0.25d0 - y(j)
-                  y(jj) = 0.25d0 + x(j)
-                  z(jj) = 0.25d0 - z(j)
-               else if (i .eq. 16) then
-                  x(jj) = 0.75d0 - y(j)
-                  y(jj) = 0.75d0 + x(j)
-                  z(jj) = 0.75d0 - z(j)
+      else if (spacegrp .eq. 'I41/a   ') then
+         nsym = 8
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P41212 space group  (International Tables 92)
 c
-      else if (spacegrp .eq. 'P41212   ') then
+      else if (spacegrp .eq. 'P41212  ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -2231,13 +2353,18 @@ c
 c
 c     P43212 space group  (International Tables 96)
 c
-      else if (spacegrp .eq. 'P43212   ') then
+      else if (spacegrp .eq. 'P43212  ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -2272,13 +2399,18 @@ c
 c
 c     P4(-)21m space group  (International Tables 113)
 c
-      else if (spacegrp .eq. 'P4(-)21m ') then
+      else if (spacegrp .eq. 'P4(-)21m') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -2313,13 +2445,18 @@ c
 c
 c     P4(-)21c space group  (International Tables 114)
 c
-      else if (spacegrp .eq. 'P4(-)21c ') then
+      else if (spacegrp .eq. 'P4(-)21c') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -2354,13 +2491,18 @@ c
 c
 c     P4(-)m2 space group  (International Tables 115)
 c
-      else if (spacegrp .eq. 'P4(-)m2  ') then
+      else if (spacegrp .eq. 'P4(-)m2 ') then
          nsym = 8
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -2395,282 +2537,210 @@ c
 c
 c     I41/amd space group  (International Tables 141, origin at center)
 c
-      else if (spacegrp .eq. 'I41/amd  ') then
-         nsym = 32
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.25d0 - y(j)
-                  y(jj) = 0.75d0 + x(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.25d0 + y(j)
-                  y(jj) = 0.25d0 - x(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 5) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 6) then
-                  x(jj) = x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 7) then
-                  x(jj) = 0.25d0 + y(j)
-                  y(jj) = 0.25d0 + x(j)
-                  z(jj) = 0.25d0 - z(j)
-               else if (i .eq. 8) then
-                  x(jj) = 0.25d0 - y(j)
-                  y(jj) = 0.25d0 - x(j)
-                  z(jj) = 0.75d0 - z(j)
-               else if (i .eq. 9) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 10) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 11) then
-                  x(jj) = 0.75d0 + y(j)
-                  y(jj) = 0.25d0 - x(j)
-                  z(jj) = 0.75d0 - z(j)
-               else if (i .eq. 12) then
-                  x(jj) = 0.75d0 - y(j)
-                  y(jj) = 0.75d0 + x(j)
-                  z(jj) = 0.25d0 - z(j)
-               else if (i .eq. 13) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = -y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 14) then
-                  x(jj) = -x(j)
-                  y(jj) = y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 15) then
-                  x(jj) = 0.75d0 - y(j)
-                  y(jj) = 0.25d0 - x(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 16) then
-                  x(jj) = 0.75d0 + y(j)
-                  y(jj) = 0.75d0 + x(j)
-                  z(jj) = 0.25d0 + z(j)
-               else if (i .eq. 17) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 18) then
-                  x(jj) = 1.0d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 1.0d0 + z(j)
-               else if (i .eq. 19) then
-                  x(jj) = 0.75d0 - y(j)
-                  y(jj) = 1.25d0 + x(j)
-                  z(jj) = 0.75d0 + z(j)
-               else if (i .eq. 20) then
-                  x(jj) = 0.75d0 + y(j)
-                  y(jj) = 0.75d0 - x(j)
-                  z(jj) = 1.25d0 + z(j)
-               else if (i .eq. 21) then
-                  x(jj) = 1.0d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 1.0d0 - z(j)
-               else if (i .eq. 22) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 23) then
-                  x(jj) = 0.75d0 + y(j)
-                  y(jj) = 1.25d0 + x(j)
-                  z(jj) = 0.75d0 - z(j)
-               else if (i .eq. 24) then
-                  x(jj) = 0.75d0 - y(j)
-                  y(jj) = 0.75d0 - x(j)
-                  z(jj) = 1.25d0 - z(j)
-               else if (i .eq. 25) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 0.5d0 - z(j)
-               else if (i .eq. 26) then
-                  x(jj) = 1.0d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 1.0d0 - z(j)
-               else if (i .eq. 27) then
-                  x(jj) = 1.25d0 + y(j)
-                  y(jj) = 0.75d0 - x(j)
-                  z(jj) = 1.25d0 - z(j)
-               else if (i .eq. 28) then
-                  x(jj) = 1.25d0 - y(j)
-                  y(jj) = 1.25d0 + x(j)
-                  z(jj) = 0.75d0 - z(j)
-               else if (i .eq. 29) then
-                  x(jj) = 1.0d0 + x(j)
-                  y(jj) = 0.5d0 - y(j)
-                  z(jj) = 1.0d0 + z(j)
-               else if (i .eq. 30) then
-                  x(jj) = 0.5d0 - x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 31) then
-                  x(jj) = 1.25d0 - y(j)
-                  y(jj) = 0.75d0 - x(j)
-                  z(jj) = 1.25d0 + z(j)
-               else if (i .eq. 32) then
-                  x(jj) = 1.25d0 + y(j)
-                  y(jj) = 1.25d0 + x(j)
-                  z(jj) = 0.75d0 + z(j)
+      else if (spacegrp .eq. 'I41/amd ') then
+         nsym = 16
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 9) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     R3 space group  (International Tables 146)
 c
-      else if (spacegrp .eq. 'R3       ') then
-         nsym = 9
+      else if (spacegrp .eq. 'R3      ') then
+         nsym = 3
+         noff = 3
          one3 = 1.0d0 / 3.0d0
          two3 = 2.0d0 / 3.0d0
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -y(j)
-                  y(jj) = x(j) - y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = y(j) - x(j)
-                  y(jj) = -x(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = two3 + x(j)
-                  y(jj) = one3 + y(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 5) then
-                  x(jj) = two3 - y(j)
-                  y(jj) = one3 + x(j) - y(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 6) then
-                  x(jj) = two3 + y(j) - x(j)
-                  y(jj) = one3 - x(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = one3 + x(j)
-                  y(jj) = two3 + y(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = one3 - y(j)
-                  y(jj) = two3 + x(j) - y(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 9) then
-                  x(jj) = one3 + y(j)- x(j)
-                  y(jj) = two3 - x(j)
-                  z(jj) = two3 + z(j)
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = two3
+                  yoff = one3
+                  zoff = one3
+               else if (k .eq. 3) then
+                  xoff = one3
+                  yoff = two3
+                  zoff = two3
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     R3(-) space group  (International Tables 148)
 c
-      else if (spacegrp .eq. 'R3(-)    ') then
-         nsym = 18
+      else if (spacegrp .eq. 'R3(-)   ') then
+         nsym = 6
+         noff = 3
          one3 = 1.0d0 / 3.0d0
          two3 = 2.0d0 / 3.0d0
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -y(j)
-                  y(jj) = x(j) - y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = y(j) - x(j)
-                  y(jj) = -x(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = -x(j)
-                  y(jj) = -y(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 5) then
-                  x(jj) = y(j)
-                  y(jj) = y(j) - x(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 6) then
-                  x(jj) = x(j) - y(j)
-                  y(jj) = x(j)
-                  z(jj) = -z(j)
-               else if (i .eq. 7) then
-                  x(jj) = two3 + x(j)
-                  y(jj) = one3 + y(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = two3 - y(j)
-                  y(jj) = one3 + x(j) - y(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 9) then
-                  x(jj) = two3 + y(j) - x(j)
-                  y(jj) = one3 - x(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 10) then
-                  x(jj) = two3 - x(j)
-                  y(jj) = one3 - y(j)
-                  z(jj) = one3 - z(j)
-               else if (i .eq. 11) then
-                  x(jj) = two3 + y(j)
-                  y(jj) = one3 + y(j) - x(j)
-                  z(jj) = one3 - z(j)
-               else if (i .eq. 12) then
-                  x(jj) = two3 + x(j) - y(j)
-                  y(jj) = one3 + x(j)
-                  z(jj) = one3 - z(j)
-               else if (i .eq. 13) then
-                  x(jj) = one3 + x(j)
-                  y(jj) = two3 + y(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 14) then
-                  x(jj) = one3 - y(j)
-                  y(jj) = two3 + x(j) - y(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 15) then
-                  x(jj) = one3 + y(j) - x(j)
-                  y(jj) = two3 - x(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 16) then
-                  x(jj) = one3 - x(j)
-                  y(jj) = two3 - y(j)
-                  z(jj) = two3 - z(j)
-               else if (i .eq. 17) then
-                  x(jj) = one3 + y(j)
-                  y(jj) = two3 + y(j) - x(j)
-                  z(jj) = two3 - z(j)
-               else if (i .eq. 18) then
-                  x(jj) = one3 + x(j) - y(j)
-                  y(jj) = two3 + x(j)
-                  z(jj) = two3 - z(j)
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = two3
+                  yoff = one3
+                  zoff = one3
+               else if (k .eq. 3) then
+                  xoff = one3
+                  yoff = two3
+                  zoff = two3
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = y(j) - x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) - y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P3121 space group  (International Tables 152)
 c
-      else if (spacegrp .eq. 'P3121    ') then
+      else if (spacegrp .eq. 'P3121   ') then
          nsym = 6
+         noff = 1
          one3 = 1.0d0 / 3.0d0
          two3 = 2.0d0 / 3.0d0
-         do i = 2, nsym
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
                   z(jj) = one3 + z(j)
@@ -2697,98 +2767,74 @@ c
 c
 c     R3c space group  (International Tables 161)
 c
-      else if (spacegrp .eq. 'R3c      ') then
-         nsym = 18
+      else if (spacegrp .eq. 'R3c     ') then
+         nsym = 6
+         noff = 3
          one3 = 1.0d0 / 3.0d0
          two3 = 2.0d0 / 3.0d0
-         one6 = 1.0d0 / 6.0d0
-         fiv6 = 5.0d0 / 6.0d0
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = -y(j)
-                  y(jj) = x(j) - y(j)
-                  z(jj) = z(j)
-               else if (i .eq. 3) then
-                  x(jj) = y(j) - x(j)
-                  y(jj) = -x(j)
-                  z(jj) = z(j)
-               else if (i .eq. 4) then
-                  x(jj) = -y(j)
-                  y(jj) = -x(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 5) then
-                  x(jj) = y(j) - x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 6) then
-                  x(jj) = x(j)
-                  y(jj) = x(j) - y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 7) then
-                  x(jj) = two3 + x(j)
-                  y(jj) = one3 + y(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 8) then
-                  x(jj) = two3 - y(j)
-                  y(jj) = one3 + x(j) - y(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 9) then
-                  x(jj) = two3 + y(j) - x(j)
-                  y(jj) = one3 - x(j)
-                  z(jj) = one3 + z(j)
-               else if (i .eq. 10) then
-                  x(jj) = two3 - y(j)
-                  y(jj) = one3 - x(j)
-                  z(jj) = fiv6 + z(j)
-               else if (i .eq. 11) then
-                  x(jj) = two3 + y(j) - x(j)
-                  y(jj) = one3 + y(j)
-                  z(jj) = fiv6 + z(j)
-               else if (i .eq. 12) then
-                  x(jj) = two3 + x(j)
-                  y(jj) = one3 + x(j) - y(j)
-                  z(jj) = fiv6 + z(j)
-               else if (i .eq. 13) then
-                  x(jj) = one3 + x(j)
-                  y(jj) = two3 + y(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 14) then
-                  x(jj) = one3 - y(j)
-                  y(jj) = two3 + x(j) - y(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 15) then
-                  x(jj) = one3 + y(j) - x(j)
-                  y(jj) = two3 - x(j)
-                  z(jj) = two3 + z(j)
-               else if (i .eq. 16) then
-                  x(jj) = one3 - y(j)
-                  y(jj) = two3 - x(j)
-                  z(jj) = one6 + z(j)
-               else if (i .eq. 17) then
-                  x(jj) = one3 + y(j) - x(j)
-                  y(jj) = two3 + y(j)
-                  z(jj) = one6 + z(j)
-               else if (i .eq. 18) then
-                  x(jj) = one3 + x(j)
-                  y(jj) = two3 + x(j) - y(j)
-                  z(jj) = one6 + z(j)
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = two3
+                  yoff = one3
+                  zoff = one3
+               else if (k .eq. 3) then
+                  xoff = one3
+                  yoff = two3
+                  zoff = two3
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     P63 space group  (International Tables 173)
 c
-      else if (spacegrp .eq. 'P63      ') then
+      else if (spacegrp .eq. 'P63     ') then
          nsym = 6
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
                   z(jj) = z(j)
@@ -2815,13 +2861,18 @@ c
 c
 c     P63/m space group  (International Tables 176)
 c
-      else if (spacegrp .eq. 'P63/m    ') then
+      else if (spacegrp .eq. 'P63/m   ') then
          nsym = 12
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
                   z(jj) = z(j)
@@ -2872,16 +2923,109 @@ c
 c
 c     P6(3)/mmc space group  (Intl. Tables 194, Hexagonal Close Packed)
 c
-      else if (spacegrp .eq. 'P6(3)/mmc') then
-         nsym = 2
-         do i = 2, nsym
+      else if (spacegrp .eq. 'P63/mmc ') then
+         nsym = 24
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = 0.5d0 + x(j)
+               if (i .eq. 1) then
+                  x(jj) = x(j)
                   y(jj) = y(j)
                   z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 3) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = -x(j)
+                  z(jj) = z(j)
+               else if (i .eq. 4) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = 0.5d0 + z(j)
+               else if (i .eq. 5) then
+                  x(jj) = y(j)
+                  y(jj) = y(j) - x(j)
+                  z(jj) = 0.5d0 + z(j)
+               else if (i .eq. 6) then
+                  x(jj) = x(j) - y(j)
+                  y(jj) = x(j)
+                  z(jj) = 0.5d0 + z(j)
+               else if (i .eq. 7) then
+                  x(jj) = y(j)
+                  y(jj) = x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 8) then
+                  x(jj) = x(j) - y(j)
+                  y(jj) = -y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 9) then
+                  x(jj) = -x(j)
+                  y(jj) = y(j) - x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 10) then
+                  x(jj) = -y(j)
+                  y(jj) = -x(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 11) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = y(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 12) then
+                  x(jj) = x(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 13) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 14) then
+                  x(jj) = y(j)
+                  y(jj) = y(j) - x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 15) then
+                  x(jj) = x(j) - y(j)
+                  y(jj) = x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 16) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 17) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 18) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = -x(j)
+                  z(jj) = 0.5d0 - z(j)
+               else if (i .eq. 19) then
+                  x(jj) = -y(j)
+                  y(jj) = -x(j)
+                  z(jj) = z(j)
+               else if (i .eq. 20) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 21) then
+                  x(jj) = x(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 22) then
+                  x(jj) = y(j)
+                  y(jj) = x(j)
+                  z(jj) = 0.5d0 + z(j)
+               else if (i .eq. 23) then
+                  x(jj) = x(j) - y(j)
+                  y(jj) = -y(j)
+                  z(jj) = 0.5d0 + z(j)
+               else if (i .eq. 24) then
+                  x(jj) = -x(j)
+                  y(jj) = y(j) - x(j)
+                  z(jj) = 0.5d0 + z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -2889,13 +3033,18 @@ c
 c
 c     Pa3(-) space group  (International Tables 205)
 c
-      else if (spacegrp .eq. 'Pa3(-)   ') then
+      else if (spacegrp .eq. 'Pa3(-)  ') then
          nsym = 24
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = 0.5d0 - x(j)
                   y(jj) = -y(j)
                   z(jj) = 0.5d0 + z(j)
@@ -2992,15 +3141,20 @@ c
             end do
          end do
 c
-c     P4(-)3m space group  (Intl. Tables 215)
+c     P4(-)3m space group  (International Tables 215)
 c
-      else if (spacegrp .eq. 'P4(-)3m  ') then
+      else if (spacegrp .eq. 'P4(-)3m ') then
          nsym = 24
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -3099,30 +3253,140 @@ c
 c
 c     I4(-)3m space group  (Intl. Tables 217, Body Centered Cubic)
 c
-      else if (spacegrp .eq. 'I4(-)3m  ') then
-         nsym = 2
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
+      else if (spacegrp .eq. 'I4(-)3m ') then
+         nsym = 24
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 9) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 17) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 18) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 19) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 20) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 21) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 22) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 23) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 24) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
-c     P4(-)3n space group  (Intl. Tables 218)
+c     P4(-)3n space group  (International Tables 218)
 c
-      else if (spacegrp .eq. 'P4(-)3n  ') then
+      else if (spacegrp .eq. 'P4(-)3n ') then
          nsym = 24
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -3219,15 +3483,20 @@ c
             end do
          end do
 c
-c     Pm3(-)m space group  (Intl. Tables 221)
+c     Pm3(-)m space group  (International Tables 221)
 c
-      else if (spacegrp .eq. 'Pm3(-)m  ') then
+      else if (spacegrp .eq. 'Pm3(-)m ') then
          nsym = 48
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -3420,15 +3689,20 @@ c
             end do
          end do
 c
-c     Pm3(-)n space group  (Intl. Tables 223)
+c     Pm3(-)n space group  (International Tables 223)
 c
-      else if (spacegrp .eq. 'Pm3(-)n  ') then
+      else if (spacegrp .eq. 'Pm3(-)n ') then
          nsym = 48
-         do i = 2, nsym
+         noff = 1
+         do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
                jj = j + ii
-               if (i .eq. 2) then
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
                   z(jj) = z(j)
@@ -3623,116 +3897,1125 @@ c
 c
 c     Fm3(-)m space group  (Intl. Tables 225, Face Centered Cubic)
 c
-      else if (spacegrp .eq. 'Fm3(-)m  ') then
-         nsym = 4
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Fm3(-)m ') then
+         nsym = 48
+         noff = 4
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.0d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               else if (k .eq. 3) then
+                  xoff = 0.5d0
+                  yoff = 0.0d0
+                  zoff = 0.5d0
+               else if (k .eq. 4) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 9) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 17) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 18) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 19) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 20) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 21) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 22) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 23) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 24) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 25) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 26) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 27) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 28) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 29) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 30) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 31) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 32) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 33) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 34) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 35) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 36) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 37) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 38) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 39) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 40) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 41) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 42) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 43) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 44) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 45) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 46) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 47) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 48) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
-c     Fd3(-)m space group  (Intl. Tables 227)
+c     Fd3(-)m space group  (International Tables 227)
 c
-      else if (spacegrp .eq. 'Fd3(-)m  ') then
-         nsym = 4
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Fd3(-)m ') then
+         nsym = 48
+         noff = 4
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.0d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               else if (k .eq. 3) then
+                  xoff = 0.5d0
+                  yoff = 0.0d0
+                  zoff = 0.5d0
+               else if (k .eq. 4) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = 0.5d0 + z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = 0.5d0 + y(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = -y(j)
+                  else if (i .eq. 9) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = 0.5d0 + z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                    z(jj) = 0.5d0 - x(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = 0.5d0 + x(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 17) then
+                     x(jj) = 0.75d0 + x(j) + xoff
+                     y(jj) = 0.25d0 + z(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
+                  else if (i .eq. 18) then
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.75d0 + z(j) + yoff
+                     z(jj) = 0.25d0 + y(j) + zoff
+                  else if (i .eq. 19) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
+                  else if (i .eq. 20) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.75d0 + y(j) + zoff
+                  else if (i .eq. 21) then
+                     x(jj) = 0.75d0 + z(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
+                  else if (i .eq. 22) then
+                     x(jj) = 0.25d0 + z(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.75d0 + x(j) + zoff
+                  else if (i .eq. 23) then
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.75d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + x(j) + zoff
+                  else if (i .eq. 24) then
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
+                  else if (i .eq. 25) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 26) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.75d0 + y(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 27) then
+                     x(jj) = 0.75d0 + x(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 28) then
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 29) then
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
+                  else if (i .eq. 30) then
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.75d0 + y(j) + zoff
+                  else if (i .eq. 31) then
+                     x(jj) = 0.25d0 + z(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
+                  else if (i .eq. 32) then
+                     x(jj) = 0.75d0 + z(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.25d0 + y(j) + zoff
+                  else if (i .eq. 33) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
+                  else if (i .eq. 34) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.25d0 + x(j) + zoff
+                  else if (i .eq. 35) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.25d0 + z(j) + yoff
+                     z(jj) = 0.75d0 + x(j) + zoff
+                  else if (i .eq. 36) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.75d0 + z(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
+                  else if (i .eq. 37) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 38) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 39) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 40) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 41) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = 0.5d0 + y(j) + zoff
+                  else if (i .eq. 42) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 43) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 44) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 + z(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
+                  else if (i .eq. 45) then
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + x(j) + zoff
+                  else if (i .eq. 46) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = 0.5d0 - x(j) + zoff
+                  else if (i .eq. 47) then
+                     x(jj) = 0.5d0 + z(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 48) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
-c     Fd3(-)c space group  (Intl. Tables 228)
+c     Fd3(-)c space group  (International Tables 228)
 c
-      else if (spacegrp .eq. 'Fd3(-)c  ') then
-         nsym = 4
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 3) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = y(j)
-                  z(jj) = 0.5d0 + z(j)
-               else if (i .eq. 4) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = z(j)
+      else if (spacegrp .eq. 'Fd3(-)c ') then
+         nsym = 48
+         noff = 4
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.0d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               else if (k .eq. 3) then
+                  xoff = 0.5d0
+                  yoff = 0.0d0
+                  zoff = 0.5d0
+               else if (k .eq. 4) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = 0.5d0 + z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = 0.5d0 + y(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = -y(j)
+                  else if (i .eq. 9) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = 0.5d0 + z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                    z(jj) = 0.5d0 - x(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = 0.5d0 + x(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 17) then
+                     x(jj) = 0.75d0 + x(j) + xoff
+                     y(jj) = 0.25d0 + z(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
+                  else if (i .eq. 18) then
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.75d0 + z(j) + yoff
+                     z(jj) = 0.25d0 + y(j) + zoff
+                  else if (i .eq. 19) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
+                  else if (i .eq. 20) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.75d0 + y(j) + zoff
+                  else if (i .eq. 21) then
+                     x(jj) = 0.75d0 + z(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
+                  else if (i .eq. 22) then
+                     x(jj) = 0.25d0 + z(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.75d0 + x(j) + zoff
+                  else if (i .eq. 23) then
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.75d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + x(j) + zoff
+                  else if (i .eq. 24) then
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
+                  else if (i .eq. 25) then
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 26) then
+                     x(jj) = 0.75d0 + x(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 27) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 28) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.75d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 29) then
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
+                  else if (i .eq. 30) then
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + y(j) + zoff
+                  else if (i .eq. 31) then
+                     x(jj) = 0.75d0 + z(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
+                  else if (i .eq. 32) then
+                     x(jj) = 0.25d0 + z(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + y(j) + zoff
+                  else if (i .eq. 33) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
+                  else if (i .eq. 34) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.75d0 + x(j) + zoff
+                  else if (i .eq. 35) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + z(j) + yoff
+                     z(jj) = 0.25d0 + x(j) + zoff
+                  else if (i .eq. 36) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.25d0 + z(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
+                  else if (i .eq. 37) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 38) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 39) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 40) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 41) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 42) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
+                  else if (i .eq. 43) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 + z(j) + yoff
+                     z(jj) = 0.5d0 + y(j) + zoff
+                  else if (i .eq. 44) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 45) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 46) then
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 47) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 - x(j) + zoff
+                  else if (i .eq. 48) then
+                     x(jj) = 0.5d0 + z(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = 0.5d0 + x(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
 c     Im3(-)m space group  (Intl. Tables 229, Body Centered Cubic)
 c
-      else if (spacegrp .eq. 'Im3(-)m  ') then
-         nsym = 2
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
+      else if (spacegrp .eq. 'Im3(-)m ') then
+         nsym = 48
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 9) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 17) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 18) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 19) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 20) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 21) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 22) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 23) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 24) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 25) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 26) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 27) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 28) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 29) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 30) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 31) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 32) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 33) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 34) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 35) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 36) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 37) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 38) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 39) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 40) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 41) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 42) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 43) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 44) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 45) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 46) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 47) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 48) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = x(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
-c     Ia3(-)d space group  (Intl. Tables 230)
+c     Ia3(-)d space group  (International Tables 230)
 c
-      else if (spacegrp .eq. 'Ia3(-)d  ') then
-         nsym = 2
-         do i = 2, nsym
-            ii = (i-1) * n
-            do j = 1, n
-               jj = j + ii
-               if (i .eq. 2) then
-                  x(jj) = 0.5d0 + x(j)
-                  y(jj) = 0.5d0 + y(j)
-                  z(jj) = 0.5d0 + z(j)
+      else if (spacegrp .eq. 'Ia3(-)d ') then
+         nsym = 48
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
                end if
-               call cellatom (jj,j)
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = 0.5d0 + z(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 + y(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
+                  else if (i .eq. 9) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = 0.5d0 + z(j) + yoff
+                     z(jj) = 0.5d0 - x(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 12) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = 0.5d0 + x(j) + zoff
+                  else if (i .eq. 13) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 14) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 15) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 16) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 17) then
+                     x(jj) = 0.75d0 + x(j) + xoff
+                     y(jj) = 0.25d0 + z(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
+                  else if (i .eq. 18) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.75d0 + z(j) + yoff
+                     z(jj) = 0.25d0 + y(j) + zoff
+                  else if (i .eq. 19) then
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
+                  else if (i .eq. 20) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.75d0 + y(j) + zoff
+                  else if (i .eq. 21) then
+                     x(jj) = 0.75d0 + z(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
+                  else if (i .eq. 22) then
+                     x(jj) = 0.25d0 + z(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.75d0 + x(j) + zoff
+                  else if (i .eq. 23) then
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.75d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + x(j) + zoff
+                  else if (i .eq. 24) then
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
+                  else if (i .eq. 25) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 26) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 27) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 28) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 29) then
+                     x(jj) = -z(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -y(j) + zoff
+                  else if (i .eq. 30) then
+                     x(jj) = 0.5d0 - z(j) + xoff
+                     y(jj) = 0.5d0 + x(j) + yoff
+                     z(jj) = y(j) + zoff
+                  else if (i .eq. 31) then
+                     x(jj) = 0.5d0 + z(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = 0.5d0 - y(j) + zoff
+                  else if (i .eq. 32) then
+                     x(jj) = z(j) + xoff
+                     y(jj) = 0.5d0 - x(j) + yoff
+                     z(jj) = 0.5d0 + y(j) + zoff
+                  else if (i .eq. 33) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -z(j) + yoff
+                     z(jj) = -x(j) + zoff
+                  else if (i .eq. 34) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = 0.5d0 - z(j) + yoff
+                     z(jj) = 0.5d0 + x(j) + zoff
+                  else if (i .eq. 35) then
+                     x(jj) = 0.5d0 - y(j) + xoff
+                     y(jj) = 0.5d0 + z(j) + yoff
+                     z(jj) = x(j) + zoff
+                  else if (i .eq. 36) then
+                     x(jj) = 0.5d0 + y(j) + xoff
+                     y(jj) = z(j) + yoff
+                     z(jj) = 0.5d0 - x(j) + zoff
+                  else if (i .eq. 37) then
+                     x(jj) = 0.25d0 - y(j) + xoff
+                     y(jj) = 0.75d0 - x(j) + yoff
+                     z(jj) = 0.75d0 + z(j) + zoff
+                  else if (i .eq. 38) then
+                     x(jj) = 0.25d0 + y(j) + xoff
+                     y(jj) = 0.25d0 + x(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 39) then
+                     x(jj) = 0.75d0 - y(j) + xoff
+                     y(jj) = 0.75d0 + x(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 40) then
+                     x(jj) = 0.75d0 + y(j) + xoff
+                     y(jj) = 0.25d0 - x(j) + yoff
+                     z(jj) = 0.75d0 - z(j) + zoff
+                  else if (i .eq. 41) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.75d0 - z(j) + yoff
+                     z(jj) = 0.75d0 + y(j) + zoff
+                  else if (i .eq. 42) then
+                     x(jj) = 0.75d0 + x(j) + xoff
+                     y(jj) = 0.25d0 - z(j) + yoff
+                     z(jj) = 0.75d0 - y(j) + zoff
+                  else if (i .eq. 43) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.25d0 + z(j) + yoff
+                     z(jj) = 0.25d0 + y(j) + zoff
+                  else if (i .eq. 44) then
+                     x(jj) = 0.75d0 - x(j) + xoff
+                     y(jj) = 0.75d0 + z(j) + yoff
+                     z(jj) = 0.25d0 - y(j) + zoff
+                  else if (i .eq. 45) then
+                     x(jj) = 0.25d0 - z(j) + xoff
+                     y(jj) = 0.75d0 - y(j) + yoff
+                     z(jj) = 0.75d0 + x(j) + zoff
+                  else if (i .eq. 46) then
+                     x(jj) = 0.75d0 - z(j) + xoff
+                     y(jj) = 0.75d0 + y(j) + yoff
+                     z(jj) = 0.25d0 - x(j) + zoff
+                  else if (i .eq. 47) then
+                     x(jj) = 0.75d0 + z(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.75d0 - x(j) + zoff
+                  else if (i .eq. 48) then
+                     x(jj) = 0.25d0 + z(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + x(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
       end if
 c
 c     set the total number of atoms in the full unit cell
 c
-      n = nsym * n
+      n = nsym * noff * n
+cccccccccccccccccccccccccccccccccccccccccc
+      write (*,99)  n
+   99 format (' Total Atoms :  ',i10)
+cccccccccccccccccccccccccccccccccccccccccc
       return
       end

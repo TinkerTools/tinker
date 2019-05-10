@@ -232,6 +232,8 @@ c
          j = iopb(i)
          if (angtrig.eq.'IN-PLANE' .and. opbk(i).ne.0.0d0) then
             if (angtyp(j) .eq. 'HARMONIC')  angtyp(j) = 'IN-PLANE'
+         else if (angtrig.eq.'NATURAL' .and. opbk(i).ne.0.0d0) then
+            if (angtyp(j) .eq. 'IN-PLANE')  angtyp(j) = 'HARMONIC'
          end if
       end do
 c

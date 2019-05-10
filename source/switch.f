@@ -111,7 +111,6 @@ c
       cut4 = cut2 * cut2
       cut5 = cut2 * cut3
       cut6 = cut3 * cut3
-      cut6 = cut3 * cut3
       cut7 = cut3 * cut4
 c
 c     get 5th degree multiplicative switching function coefficients
