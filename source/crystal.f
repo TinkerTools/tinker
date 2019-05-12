@@ -26,7 +26,7 @@ c
       use math
       implicit none
       integer maxspace
-      parameter (maxspace=72)
+      parameter (maxspace=80)
       integer i,ixyz,mode
       integer na,nb,nc
       integer next,freeunit
@@ -42,14 +42,16 @@ c
      &              'P2/c    ', 'P21/c   ', 'P21/n   ', 'P21/a   ',
      &              'C2/c    ', 'P21212  ', 'P212121 ', 'C2221   ',
      &              'Pca21   ', 'Pmn21   ', 'Pna21   ', 'Pn21a   ',
-     &              'Cmc21   ', 'Aba2    ', 'Fdd2    ', 'Pnna    ',
-     &              'Pmna    ', 'Pcca    ', 'Pbam    ', 'Pccn    ',
-     &              'Pbcm    ', 'Pnnm    ', 'Pbcn    ', 'Pbca    ',
-     &              'Pnma    ', 'Cmcm    ', 'Cmca    ', 'P41     ',
-     &              'P43     ', 'I4(-)   ', 'P42/n   ', 'I41/a   ',
-     &              'P41212  ', 'P43212  ', 'P4(-)21m', 'P4(-)21c',
-     &              'P4(-)m2 ', 'I41/amd ', 'R3      ', 'R3(-)   ',
-     &              'P3121   ', 'R3c     ', 'P63     ', 'P63/m   ',
+     &              'Cmc21   ', 'Aba2    ', 'Fdd2    ', 'Iba2    ',
+     &              'Pnna    ', 'Pmna    ', 'Pcca    ', 'Pbam    ',
+     &              'Pccn    ', 'Pbcm    ', 'Pnnm    ', 'Pmmn    ',
+     &              'Pbcn    ', 'Pbca    ', 'Pnma    ', 'Cmcm    ',
+     &              'Cmca    ', 'Fddd    ', 'Ibam    ', 'P41     ',
+     &              'P43     ', 'I4(-)   ', 'P4/n    ', 'P42/n   ',
+     &              'I4/m    ', 'I41/a   ', 'P41212  ', 'P43212  ',
+     &              'P4(-)21m', 'P4(-)21c', 'P4(-)m2 ', 'I41/amd ',
+     &              'R3      ', 'R3(-)   ', 'P3121   ', 'R3m     ',
+     &              'R3c     ', 'R3(-)c  ', 'P63     ', 'P63/m   ',
      &              'P63/mmc ', 'Pa3(-)  ', 'P43m    ', 'I4(-)3m ',
      &              'P4(-)3n ', 'I4(-)3d ', 'Pm3(-)m ', 'Pn3(-)n ',
      &              'Pm3(-)n ', 'Pn3(-)m ', 'Fm3(-)m ', 'Fm3(-)c ',
@@ -77,8 +79,8 @@ c
      &           //,4x,'(1) Convert Fractional to Cartesian Coords',
      &           /,4x,'(2) Convert Cartesian to Fractional Coords',
      &           /,4x,'(3) Move Any Stray Molecules into Unit Cell',
-     &           /,4x,'(4) Make a Unit Cell from Asymmetric Unit',
-     &           /,4x,'(5) Make a Big Block from Single Unit Cell')
+     &           /,4x,'(4) Make a Unit Cell from an Asymmetric Unit',
+     &           /,4x,'(5) Make a Big Block from a Single Unit Cell')
          do while (mode.lt.1 .or. mode.gt.5)
             mode = 0
             write (iout,30)
@@ -139,7 +141,11 @@ c
    90    format (2x,'(76) ',a8,4x,'(66) ',a8,4x,'(67) ',a8,
      &              4x,'(68) ',a8,
      &           /,2x,'(69) ',a8,4x,'(70) ',a8,4x,'(71) ',a8,
-     &              4x,'(72) ',a8)
+     &              4x,'(72) ',a8,
+     &           /,2x,'(73) ',a8,4x,'(74) ',a8,4x,'(75) ',a8,
+     &              4x,'(76) ',a8,
+     &           /,2x,'(77) ',a8,4x,'(78) ',a8,4x,'(79) ',a8,
+     &              4x,'(80) ',a8)
          write (iout,100)
   100    format (/,' Enter the Number of the Desired Choice :  ',$)
          read (input,110)  i
@@ -192,12 +198,12 @@ c
 c     print out the initial cell dimensions to be used
 c
       write (iout,190)  xbox,ybox,zbox,alpha,beta,gamma
-  190 format (/,' Unit Cell Dimensions :      a    =',f10.4,
-     &        /,'                             b    =',f10.4,
-     &        /,'                             c    =',f10.4,
-     &        /,'                            Alpha =',f10.4,
-     &        /,'                            Beta  =',f10.4,
-     &        /,'                            Gamma =',f10.4)
+  190 format (/,' Unit Cell Dimensions :       a     =',f12.4,
+     &        /,'                              b     =',f12.4,
+     &        /,'                              c     =',f12.4,
+     &        /,'                             Alpha  =',f12.4,
+     &        /,'                             Beta   =',f12.4,
+     &        /,'                             Gamma  =',f12.4)
 c
 c     convert Cartesian to fractional coordinates
 c
@@ -213,7 +219,7 @@ c     apply the appropriate space group symmetry operators
 c
       if (mode .eq. 4) then
          write (iout,200)  spacegrp
-  200    format (/,' Space Group Symbol :',12x,a8)
+  200    format (/,' Space Group Symbol :',8x,a8)
          call symmetry (spacegrp)
       end if
 c
@@ -1540,6 +1546,48 @@ c
             end do
          end do
 c
+c     Iba2 space group  (International Tables 45)
+c
+      else if (spacegrp .eq. 'Iba2    ') then
+         nsym = 4
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               end if
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
+            end do
+         end do
+c
 c     Pnna space group  (International Tables 52)
 c
       else if (spacegrp .eq. 'Pnna    ') then
@@ -1862,6 +1910,52 @@ c
             end do
          end do
 c
+c     Pmmn space group  (International Tables 59)
+c
+      else if (spacegrp .eq. 'Pmmn    ') then
+         nsym = 8
+         noff = 1
+         do i = 1, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 3) then
+                  x(jj) = 0.5d0 - x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 4) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 - y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 5) then
+                  x(jj) = 0.5d0 - x(j)
+                  y(jj) = 0.5d0 - y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 6) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 7) then
+                  x(jj) = x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 8) then
+                  x(jj) = -x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
 c     Pbcn space group  (International Tables 60)
 c
       else if (spacegrp .eq. 'Pbcn    ') then
@@ -2116,6 +2210,130 @@ c
             end do
          end do
 c
+c     Fddd space group  (International Tables 70)
+c
+      else if (spacegrp .eq. 'Fddd    ') then
+         nsym = 8
+         noff = 4
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.0d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               else if (k .eq. 3) then
+                  xoff = 0.5d0
+                  yoff = 0.0d0
+                  zoff = 0.5d0
+               else if (k .eq. 4) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.0d0
+               end if
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.25d0 - z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = 0.25d0 + x(j) + xoff
+                     y(jj) = 0.25d0 - y(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = 0.25d0 - x(j) + xoff
+                     y(jj) = 0.25d0 + y(j) + yoff
+                     z(jj) = 0.25d0 + z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
+            end do
+         end do
+c
+c     Ibam space group  (International Tables 72)
+c
+      else if (spacegrp .eq. 'Ibam    ') then
+         nsym = 8
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               end if
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = 0.5d0 + x(j) + xoff
+                     y(jj) = 0.5d0 - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = 0.5d0 - x(j) + xoff
+                     y(jj) = 0.5d0 + y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
+            end do
+         end do
+c
 c     P41 space group  (International Tables 76)
 c
       else if (spacegrp .eq. 'P41     ') then
@@ -2218,6 +2436,52 @@ c
             end do
          end do
 c
+c     P4/n space group  (International Tables 85)
+c
+      else if (spacegrp .eq. 'P4/n    ') then
+         nsym = 8
+         noff = 1
+         do i = 1, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 3) then
+                  x(jj) = 0.5d0 - y(j)
+                  y(jj) = 0.5d0 + x(j)
+                  z(jj) = z(j)
+               else if (i .eq. 4) then
+                  x(jj) = 0.5d0 + y(j)
+                  y(jj) = 0.5d0 - x(j)
+                  z(jj) = z(j)
+               else if (i .eq. 5) then
+                  x(jj) = 0.5d0 - x(j)
+                  y(jj) = 0.5d0 - y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 6) then
+                  x(jj) = 0.5d0 + x(j)
+                  y(jj) = 0.5d0 + y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 7) then
+                  x(jj) = y(j)
+                  y(jj) = -x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 8) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j)
+                  z(jj) = -z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
 c     P42/n space group  (International Tables 86)
 c
       else if (spacegrp .eq. 'P42/n   ') then
@@ -2261,6 +2525,64 @@ c
                   z(jj) = -z(j)
                end if
                call cellatom (jj,j)
+            end do
+         end do
+c
+c     I4/m space group  (International Tables 87)
+c
+      else if (spacegrp .eq. 'I4/m    ') then
+         nsym = 8
+         noff = 2
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = 0.5d0
+                  yoff = 0.5d0
+                  zoff = 0.5d0
+               end if
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
             end do
          end do
 c
@@ -2782,6 +3104,62 @@ c
             end do
          end do
 c
+c     R3m space group  (International Tables 160)
+c
+      else if (spacegrp .eq. 'R3m     ') then
+         nsym = 6
+         noff = 3
+         one3 = 1.0d0 / 3.0d0
+         two3 = 2.0d0 / 3.0d0
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = two3
+                  yoff = one3
+                  zoff = one3
+               else if (k .eq. 3) then
+                  xoff = one3
+                  yoff = two3
+                  zoff = two3
+               end if
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
+            end do
+         end do
+c
 c     R3c space group  (International Tables 161)
 c
       else if (spacegrp .eq. 'R3c     ') then
@@ -2829,6 +3207,86 @@ c
                      y(jj) = y(j) + yoff
                      z(jj) = 0.5d0 + z(j) + zoff
                   else if (i .eq. 6) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  end if
+                  call cellatom (jj,j)
+               end do
+            end do
+         end do
+c
+c     R3(-)c space group  (International Tables 167)
+c
+      else if (spacegrp .eq. 'R3(-)c  ') then
+         nsym = 12
+         noff = 3
+         one3 = 1.0d0 / 3.0d0
+         two3 = 2.0d0 / 3.0d0
+         do i = 1, nsym
+            ii = (i-1) * noff * n
+            do k = 1, noff
+               kk = ii + (k-1)*n
+               if (k .eq. 1) then
+                  xoff = 0.0d0
+                  yoff = 0.0d0
+                  zoff = 0.0d0
+               else if (k .eq. 2) then
+                  xoff = two3
+                  yoff = one3
+                  zoff = one3
+               else if (k .eq. 3) then
+                  xoff = one3
+                  yoff = two3
+                  zoff = two3
+               end if
+               do j = 1, n
+                  jj = j + kk
+                  if (i .eq. 1) then
+                     x(jj) = x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 2) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = x(j) - y(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 3) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = z(j) + zoff
+                  else if (i .eq. 4) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 5) then
+                     x(jj) = x(j) - y(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 6) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = y(j) - x(j) + yoff
+                     z(jj) = 0.5d0 - z(j) + zoff
+                  else if (i .eq. 7) then
+                     x(jj) = -x(j) + xoff
+                     y(jj) = -y(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 8) then
+                     x(jj) = y(j) + xoff
+                     y(jj) = y(j) - x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 9) then
+                     x(jj) = x(j) - y(j) + xoff
+                     y(jj) = x(j) + yoff
+                     z(jj) = -z(j) + zoff
+                  else if (i .eq. 10) then
+                     x(jj) = -y(j) + xoff
+                     y(jj) = -x(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 11) then
+                     x(jj) = y(j) - x(j) + xoff
+                     y(jj) = y(j) + yoff
+                     z(jj) = 0.5d0 + z(j) + zoff
+                  else if (i .eq. 12) then
                      x(jj) = x(j) + xoff
                      y(jj) = x(j) - y(j) + yoff
                      z(jj) = 0.5d0 + z(j) + zoff
