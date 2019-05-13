@@ -383,6 +383,8 @@ c
 c
 c     set control parameters for atomic multipole potentials
 c
+      else if (keyword(1:12) .eq. 'PENETRATION ') then
+         call getword (record,pentyp,next)
       else if (keyword(1:15) .eq. 'MPOLE-12-SCALE ') then
          read (string,*,err=10,end=10)  m2scale
          if (m2scale .gt. 1.0d0)  m2scale = 1.0d0 / m2scale

@@ -26,7 +26,7 @@ c
       use math
       implicit none
       integer maxspace
-      parameter (maxspace=80)
+      parameter (maxspace=84)
       integer i,ixyz,mode
       integer na,nb,nc
       integer next,freeunit
@@ -50,7 +50,8 @@ c
      &              'P43     ', 'I4(-)   ', 'P4/n    ', 'P42/n   ',
      &              'I4/m    ', 'I41/a   ', 'P41212  ', 'P43212  ',
      &              'P4(-)21m', 'P4(-)21c', 'P4(-)m2 ', 'I41/amd ',
-     &              'R3      ', 'R3(-)   ', 'P3121   ', 'R3m     ',
+     &              'P31     ', 'P32     ', 'R3      ', 'P3(-)   ',
+     &              'R3(-)   ', 'P3121   ', 'P3221   ', 'R3m     ',
      &              'R3c     ', 'R3(-)c  ', 'P63     ', 'P63/m   ',
      &              'P63/mmc ', 'Pa3(-)  ', 'P43m    ', 'I4(-)3m ',
      &              'P4(-)3n ', 'I4(-)3d ', 'Pm3(-)m ', 'Pn3(-)n ',
@@ -145,7 +146,9 @@ c
      &           /,2x,'(73) ',a8,4x,'(74) ',a8,4x,'(75) ',a8,
      &              4x,'(76) ',a8,
      &           /,2x,'(77) ',a8,4x,'(78) ',a8,4x,'(79) ',a8,
-     &              4x,'(80) ',a8)
+     &              4x,'(80) ',a8,
+     &           /,2x,'(81) ',a8,4x,'(82) ',a8,4x,'(83) ',a8,
+     &              4x,'(84) ',a8)
          write (iout,100)
   100    format (/,' Enter the Number of the Desired Choice :  ',$)
          read (input,110)  i
@@ -2964,6 +2967,62 @@ c
             end do
          end do
 c
+c     P31 space group  (International Tables 144)
+c
+      else if (spacegrp .eq. 'P31     ') then
+         nsym = 3
+         noff = 1
+         one3 = 1.0d0 / 3.0d0
+         two3 = 2.0d0 / 3.0d0
+         do i = 1, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = one3 + z(j)
+               else if (i .eq. 3) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = -x(j)
+                  z(jj) = two3 + z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
+c     P32 space group  (International Tables 145)
+c
+      else if (spacegrp .eq. 'P32     ') then
+         nsym = 3
+         noff = 1
+         one3 = 1.0d0 / 3.0d0
+         two3 = 2.0d0 / 3.0d0
+         do i = 1, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = two3 + z(j)
+               else if (i .eq. 3) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = -x(j)
+                  z(jj) = one3 + z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
 c     R3 space group  (International Tables 146)
 c
       else if (spacegrp .eq. 'R3      ') then
@@ -3005,6 +3064,44 @@ c
                   end if
                   call cellatom (jj,j)
                end do
+            end do
+         end do
+c
+c     P3(-) space group  (International Tables 147)
+c
+      else if (spacegrp .eq. 'P3(-)   ') then
+         nsym = 6
+         noff = 1
+         do i = 1, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 3) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = -x(j)
+                  z(jj) = z(j)
+               else if (i .eq. 4) then
+                  x(jj) = -x(j)
+                  y(jj) = -y(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 5) then
+                  x(jj) = y(j)
+                  y(jj) = y(j) - x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 6) then
+                  x(jj) = x(j) - y(j)
+                  y(jj) = x(j)
+                  z(jj) = -z(j)
+               end if
+               call cellatom (jj,j)
             end do
          end do
 c
@@ -3099,6 +3196,46 @@ c
                   x(jj) = -x(j)
                   y(jj) = y(j) - x(j)
                   z(jj) = one3 - z(j)
+               end if
+               call cellatom (jj,j)
+            end do
+         end do
+c
+c     P3221 space group  (International Tables 154)
+c
+      else if (spacegrp .eq. 'P3221   ') then
+         nsym = 6
+         noff = 1
+         one3 = 1.0d0 / 3.0d0
+         two3 = 2.0d0 / 3.0d0
+         do i = 1, nsym
+            ii = (i-1) * n
+            do j = 1, n
+               jj = j + ii
+               if (i .eq. 1) then
+                  x(jj) = x(j)
+                  y(jj) = y(j)
+                  z(jj) = z(j)
+               else if (i .eq. 2) then
+                  x(jj) = -y(j)
+                  y(jj) = x(j) - y(j)
+                  z(jj) = two3 + z(j)
+               else if (i .eq. 3) then
+                  x(jj) = y(j) - x(j)
+                  y(jj) = -x(j)
+                  z(jj) = one3 + z(j)
+               else if (i .eq. 4) then
+                  x(jj) = y(j)
+                  y(jj) = x(j)
+                  z(jj) = -z(j)
+               else if (i .eq. 5) then
+                  x(jj) = x(j) - y(j)
+                  y(jj) = -y(j)
+                  z(jj) = one3 - z(j)
+               else if (i .eq. 6) then
+                  x(jj) = -x(j)
+                  y(jj) = y(j) - x(j)
+                  z(jj) = two3 - z(j)
                end if
                call cellatom (jj,j)
             end do

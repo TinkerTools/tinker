@@ -344,6 +344,7 @@ c
 c
 c     set default control parameters for atomic multipole terms
 c
+      pentyp = 'GORDON1'
       m2scale = 0.0d0
       m3scale = 0.0d0
       m4scale = 1.0d0
