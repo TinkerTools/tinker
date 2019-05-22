@@ -885,7 +885,7 @@ angle3       22   49   22      0.620      61.40
    ##   strbnd        Ge      0.000     0.000     0.000   ##
    ##                                                     ##
    ##   these force constants are used to couple both     ##
-   ##   bond lengths deviations to the angle deviation;   ##
+   ##   bond length deviations to the angle deviation;    ##
    ##   for R-X-H cases, the X-H deviation is set to 0    ##
    ##                                                     ##
    #########################################################

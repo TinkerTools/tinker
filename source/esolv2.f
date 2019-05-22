@@ -156,7 +156,7 @@ c
          else if (solvtyp(1:2) .eq. 'GK') then
             do k = 1, npole
                if (ipole(k).eq.i .or. zaxis(k).eq.i .or.
-     &             xaxis(k).eq.i .or. yaxis(k).eq.i) then
+     &             xaxis(k).eq.i .or. abs(yaxis(k)).eq.i) then
                   nlist = nlist + 1
                   list(nlist) = k
                end if

@@ -64,7 +64,7 @@ c
       nlist = 0
       do k = 1, npole
          if (ipole(k).eq.i .or. zaxis(k).eq.i
-     &          .or. xaxis(k).eq.i .or. yaxis(k).eq.i) then
+     &          .or. xaxis(k).eq.i .or. abs(yaxis(k)).eq.i) then
             nlist = nlist + 1
             list(nlist) = k
          end if

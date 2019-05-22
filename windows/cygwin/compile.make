@@ -39,6 +39,7 @@ gfortran -c -O3 -ffast-math -fopenmp chgtrn.f
 gfortran -c -O3 -ffast-math -fopenmp chrono.f
 gfortran -c -O3 -ffast-math -fopenmp chunks.f
 gfortran -c -O3 -ffast-math -fopenmp couple.f
+gfortran -c -O3 -ffast-math -fopenmp ctrpot.f
 gfortran -c -O3 -ffast-math -fopenmp deriv.f
 gfortran -c -O3 -ffast-math -fopenmp dipole.f
 gfortran -c -O3 -ffast-math -fopenmp disgeo.f

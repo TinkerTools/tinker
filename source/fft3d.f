@@ -234,6 +234,6 @@ c
 c
 c     perform deallocation of some global arrays
 c
-      deallocate (qgrid)
+      if (allocated(qgrid))  deallocate (qgrid)
       return
       end

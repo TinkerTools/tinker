@@ -254,6 +254,7 @@ OBJS =	action.o \
 	couple.o \
 	crystal.o \
 	cspline.o \
+	ctrpot.o \
 	cutoffs.o \
 	damping.o \
 	deflate.o \
@@ -1147,6 +1148,7 @@ libtinker.a: ${OBJS}
 	control.o \
 	couple.o \
 	cspline.o \
+	ctrpot.o \
 	cutoffs.o \
 	damping.o \
 	deflate.o \
@@ -1700,10 +1702,10 @@ echgdpl.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o g
 echgdpl1.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
 echgdpl2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o group.o hessn.o shunt.o units.o
 echgdpl3.o: action.o analyz.o atomid.o atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o group.o inform.o inter.o iounit.o molcul.o shunt.o units.o usage.o
-echgtrn.o: atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o energi.o group.o light.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o
-echgtrn1.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o deriv.o energi.o group.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o virial.o
-echgtrn2.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o group.o hessn.o mplpot.o mpole.o shunt.o usage.o
-echgtrn3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o energi.o group.o inform.o inter.o iounit.o light.o limits.o molcul.o mplpot.o mpole.o neigh.o shunt.o usage.o
+echgtrn.o: atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o energi.o group.o light.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o
+echgtrn1.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o deriv.o energi.o group.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o virial.o
+echgtrn2.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o group.o hessn.o mplpot.o mpole.o shunt.o usage.o
+echgtrn3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o energi.o group.o inform.o inter.o iounit.o light.o limits.o molcul.o mplpot.o mpole.o neigh.o shunt.o usage.o
 edipole.o: atoms.o bound.o cell.o chgpot.o dipole.o energi.o group.o shunt.o units.o usage.o
 edipole1.o: atoms.o bound.o cell.o chgpot.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
 edipole2.o: atoms.o bound.o cell.o chgpot.o dipole.o group.o hessn.o shunt.o units.o
@@ -1814,7 +1816,7 @@ fftpack.o: math.o
 field.o: keys.o potent.o
 fields.o:
 files.o:
-final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o katoms.o kchrge.o kcpen.o kctrn.o kdsp.o korbs.o kpolr.o krepl.o kvdws.o light.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
+final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fft.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o katoms.o kchrge.o kcpen.o kctrn.o kdsp.o korbs.o kpolr.o krepl.o kvdws.o light.o limits.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o warp.o
 fracs.o:
 freeunit.o: iounit.o
@@ -1860,7 +1862,7 @@ inertia.o: atomid.o atoms.o iounit.o math.o
 inform.o:
 initatom.o: ptable.o
 initial.o: align.o atoms.o bath.o bound.o boxes.o cell.o files.o group.o inform.o iounit.o keys.o linmin.o minima.o molcul.o mutant.o neigh.o openmp.o output.o params.o pdb.o rigid.o scales.o sequen.o socket.o virial.o warp.o zclose.o
-initprm.o: angpot.o bndpot.o chgpot.o dsppot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o reppot.o rxnpot.o sizes.o solute.o torpot.o units.o urypot.o vdwpot.o
+initprm.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o reppot.o rxnpot.o sizes.o solute.o torpot.o units.o urypot.o vdwpot.o
 initres.o: resdue.o
 initrot.o: atoms.o couple.o group.o inform.o iounit.o math.o omega.o potent.o restrn.o rotbnd.o usage.o zcoord.o
 insert.o: atomid.o atoms.o couple.o inform.o iounit.o
@@ -2024,7 +2026,7 @@ potential.o: atomid.o atoms.o charge.o chgpen.o chgpot.o dipole.o files.o inform
 potfit.o: sizes.o
 pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o math.o mdstuf.o molcul.o moldyn.o units.o usage.o virial.o
 prmedit.o: angpot.o bndpot.o iounit.o math.o params.o sizes.o urypot.o vdwpot.o
-prmkey.o: angpot.o bndpot.o chgpot.o dsppot.o fields.o mplpot.o polpot.o potent.o reppot.o rxnpot.o torpot.o urypot.o vdwpot.o
+prmkey.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o fields.o mplpot.o polpot.o potent.o reppot.o rxnpot.o torpot.o urypot.o vdwpot.o
 promo.o: iounit.o
 protein.o: atomid.o atoms.o couple.o files.o group.o inform.o iounit.o katoms.o math.o molcul.o output.o phipsi.o potent.o resdue.o restrn.o rigid.o sequen.o titles.o usage.o
 prtdyn.o: atoms.o boxes.o files.o group.o mdstuf.o moldyn.o rgddyn.o titles.o

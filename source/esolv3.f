@@ -1231,7 +1231,7 @@ c
          ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
-         iy = yaxis(i)
+         iy = abs(yaxis(i))
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
@@ -1286,7 +1286,7 @@ c
             kk = ipole(k)
             kz = zaxis(k)
             kx = xaxis(k)
-            ky = yaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)

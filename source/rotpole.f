@@ -85,9 +85,9 @@ c
       xi = x(ii)
       yi = y(ii)
       zi = z(ii)
-      ix = xaxis(i)
-      iy = yaxis(i)
       iz = zaxis(i)
+      ix = xaxis(i)
+      iy = abs(yaxis(i))
 c
 c     use the identity matrix as the default rotation matrix
 c
@@ -349,7 +349,7 @@ c
 c
 c     "shrotmat" finds the rotation matrix that converts spherical
 c     harmonic quadrupoles from the local to the global frame given
-c     as input the corresponding dipole rotation matrix
+c     the required dipole rotation matrix
 c
 c
       subroutine shrotmat (d1,d2)

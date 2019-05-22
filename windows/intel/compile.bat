@@ -40,6 +40,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chgtrn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chrono.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chunks.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp couple.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ctrpot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp deriv.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp dipole.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp disgeo.f

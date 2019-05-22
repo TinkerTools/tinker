@@ -57,7 +57,7 @@ c
       nlist = 0
       do k = 1, npole
          if (ipole(k).eq.i .or. zaxis(k).eq.i
-     &          .or. xaxis(k).eq.i .or. yaxis(k).eq.i) then
+     &          .or. xaxis(k).eq.i .or. abs(yaxis(k)).eq.i) then
             nlist = nlist + 1
             list(nlist) = k
          end if
@@ -284,7 +284,7 @@ c
          i = ipole(ii)
          iz = zaxis(ii)
          ix = xaxis(ii)
-         iy = yaxis(ii)
+         iy = abs(yaxis(ii))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -327,7 +327,7 @@ c
             k = ipole(kk)
             kz = zaxis(kk)
             kx = xaxis(kk)
-            ky = yaxis(kk)
+            ky = abs(yaxis(kk))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -595,7 +595,7 @@ c
          i = ipole(ii)
          iz = zaxis(ii)
          ix = xaxis(ii)
-         iy = yaxis(ii)
+         iy = abs(yaxis(ii))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -637,7 +637,7 @@ c
             k = ipole(kk)
             kz = zaxis(kk)
             kx = xaxis(kk)
-            ky = yaxis(kk)
+            ky = abs(yaxis(kk))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.

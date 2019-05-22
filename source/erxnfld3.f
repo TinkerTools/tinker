@@ -90,7 +90,7 @@ c
          i = ipole(ii)
          iz = zaxis(ii)
          ix = xaxis(ii)
-         iy = yaxis(ii)
+         iy = abs(yaxis(ii))
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
          do j = 1, polsiz(ii)
             rpi(j) = rpole(j,ii)
@@ -99,7 +99,7 @@ c
             k = ipole(kk)
             kz = zaxis(kk)
             kx = xaxis(kk)
-            ky = yaxis(kk)
+            ky = abs(yaxis(kk))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             if (usei .or. usek) then
                xr = x(k) - x(i)

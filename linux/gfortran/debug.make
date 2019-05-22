@@ -39,6 +39,7 @@ gfortran -c -Wall chgtrn.f
 gfortran -c -Wall chrono.f
 gfortran -c -Wall chunks.f
 gfortran -c -Wall couple.f
+gfortran -c -Wall ctrpot.f
 gfortran -c -Wall deriv.f
 gfortran -c -Wall dipole.f
 gfortran -c -Wall disgeo.f

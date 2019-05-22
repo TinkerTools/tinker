@@ -39,6 +39,7 @@ ifort -c -g -warn all -check all chgtrn.f
 ifort -c -g -warn all -check all chrono.f
 ifort -c -g -warn all -check all chunks.f
 ifort -c -g -warn all -check all couple.f
+ifort -c -g -warn all -check all ctrpot.f
 ifort -c -g -warn all -check all deriv.f
 ifort -c -g -warn all -check all dipole.f
 ifort -c -g -warn all -check all disgeo.f

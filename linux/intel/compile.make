@@ -39,6 +39,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgtrn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chrono.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chunks.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp couple.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ctrpot.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp deriv.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dipole.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp disgeo.f

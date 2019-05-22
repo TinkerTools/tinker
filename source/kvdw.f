@@ -393,7 +393,7 @@ c
                ep = 4.0d0 * (eps(i)*eps(k)) / (seps(i)+seps(k))**2
             else if (epsrule(1:3) .eq. 'W-H') then
                ep = 2.0d0 * (seps(i)*seps(k)) * (rad(i)*rad(k))**3
-     &                 / (rad(i)+rad(k))**6
+     &                 / (rad(i)**6+rad(k)**6)
             else
                ep = seps(i) * seps(k)
             end if
@@ -456,7 +456,7 @@ c
                ep = 4.0d0 * (eps4(i)*eps4(k)) / (seps4(i)+seps4(k))**2
             else if (epsrule(1:3) .eq. 'W-H') then
                ep = 2.0d0 * (seps4(i)*seps4(k)) * (rad4(i)*rad4(k))**3
-     &                 / (rad4(i)+rad4(k))**6
+     &                 / (rad4(i)**6+rad4(k)**6)
             else
                ep = seps4(i) * seps4(k)
             end if

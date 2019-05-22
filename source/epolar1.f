@@ -75,7 +75,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,jcell
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 f,damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
@@ -2233,21 +2233,21 @@ c
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
          call torque (ii,tep,fix,fiy,fiz,dep)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -2315,7 +2315,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 f,damp,expdamp
       real*8 pdi,pti,pgamma
       real*8 temp3,temp5,temp7
@@ -3481,21 +3481,21 @@ c
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
          call torque (ii,tep,fix,fiy,fiz,dep)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -3562,7 +3562,7 @@ c
       use virial
       implicit none
       integer i,j,ii
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 f,term
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz
@@ -3643,21 +3643,21 @@ c
          tep(2) = term * (diz*uix-dix*uiz)
          tep(3) = term * (dix*uiy-diy*uix)
          call torque (ii,tep,fix,fiy,fiz,dep)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                     + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -3799,7 +3799,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,jcell
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 f,erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
@@ -6163,21 +6163,21 @@ c
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
          call torque (ii,tep,fix,fiy,fiz,dep)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -6239,7 +6239,7 @@ c
       use virial
       implicit none
       integer i,j,ii
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 f,term
       real*8 dix,diy,diz
       real*8 uix,uiy,uiz
@@ -6320,21 +6320,21 @@ c
          tep(2) = term * (diz*uix-dix*uiz)
          tep(3) = term * (dix*uiy-diy*uix)
          call torque (ii,tep,fix,fiy,fiz,dep)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                     + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -6474,7 +6474,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 f,erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
@@ -7735,21 +7735,21 @@ c
      &               + 2.0d0*qixy*(dufld(1,i)-dufld(3,i))
      &               + (qiyy-qixx)*dufld(2,i)
          call torque (ii,tep,fix,fiy,fiz,dep)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -7924,7 +7924,7 @@ c
       integer j1,j2,j3
       integer k1,k2,k3
       integer m1,m2,m3
-      integer iax,iay,iaz
+      integer ix,iy,iz
       integer ntot,nff
       integer nf1,nf2,nf3
       integer deriv1(10)
@@ -8304,21 +8304,21 @@ c
      &               - cmp(8,i)*cphidp(6,i) - cmp(9,i)*cphidp(10,i)
          call torque (i,tep,fix,fiy,fiz,dep)
          ii = ipole(i)
-         iaz = zaxis(i)
-         iax = xaxis(i)
-         iay = yaxis(i)
-         if (iaz .eq. 0)  iaz = ii
-         if (iax .eq. 0)  iax = ii
-         if (iay .eq. 0)  iay = ii
-         xiz = x(iaz) - x(ii)
-         yiz = y(iaz) - y(ii)
-         ziz = z(iaz) - z(ii)
-         xix = x(iax) - x(ii)
-         yix = y(iax) - y(ii)
-         zix = z(iax) - z(ii)
-         xiy = x(iay) - x(ii)
-         yiy = y(iay) - y(ii)
-         ziy = z(iay) - z(ii)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         if (iz .eq. 0)  iz = ii
+         if (ix .eq. 0)  ix = ii
+         if (iy .eq. 0)  iy = ii
+         xiz = x(iz) - x(ii)
+         yiz = y(iz) - y(ii)
+         ziz = z(iz) - z(ii)
+         xix = x(ix) - x(ii)
+         yix = y(ix) - y(ii)
+         zix = z(ix) - z(ii)
+         xiy = x(iy) - x(ii)
+         yiy = y(iy) - y(ii)
+         ziy = z(iy) - z(ii)
          vxx = vxx + xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))

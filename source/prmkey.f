@@ -20,6 +20,7 @@ c
       use angpot
       use bndpot
       use chgpot
+      use ctrpot
       use dsppot
       use fields
       use mplpot
@@ -470,6 +471,11 @@ c
       else if (keyword(1:16) .eq. 'INDUCE-15-SCALE ') then
          read (string,*,err=10,end=10)  w5scale
          if (w5scale .gt. 1.0d0)  w5scale = 1.0d0 / w5scale
+c
+c     set control parameters for charge transfer potentials
+c
+      else if (keyword(1:15) .eq. 'CHARGETRANSFER ') then
+         call getword (record,ctrntyp,next)
 c
 c     set control parameters for reaction field potentials
 c

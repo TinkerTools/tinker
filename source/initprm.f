@@ -20,6 +20,7 @@ c
       use angpot
       use bndpot
       use chgpot
+      use ctrpot
       use dsppot
       use fields
       use kanang
@@ -379,6 +380,10 @@ c
       w5scale = 1.0d0
       dpequal = .false.
       use_thole = .false.
+c
+c     set default control parameters for charge transfer terms
+c
+      ctrntyp = 'SEPARATE'
 c
 c     set default control parameters for implicit solvation
 c

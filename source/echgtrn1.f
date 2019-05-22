@@ -50,6 +50,7 @@ c
       use chgtrn
       use cell
       use couple
+      use ctrpot
       use deriv
       use energi
       use group
@@ -70,6 +71,7 @@ c
       real*8 chgi,chgk
       real*8 alphai,alphak
       real*8 expi,expk
+      real*8 expik
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -152,10 +154,17 @@ c
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
                   if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                  expi = exp(-alphai*r)
-                  expk = exp(-alphak*r)
-                  e = -chgi*expk - chgk*expi
-                  de = chgi*expk*alphak + chgk*expi*alphai
+
+                  if (ctrntyp .eq. 'SEPARATE') then
+                     expi = exp(-alphai*r)
+                     expk = exp(-alphak*r)
+                     e = -chgi*expk - chgk*expi
+                     de = chgi*expk*alphak + chgk*expi*alphai
+                  else
+                     expik = exp(sqrt(alphai*alphak)*r)
+                     e = -0.5d0 * (chgi+chgk) * expik
+                  end if
+
                   e = f * e * mscale(k)
                   de = f * de * mscale(k)
 c

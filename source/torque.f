@@ -48,19 +48,14 @@ c
       real*8 ursiz,ussiz
       real*8 vssiz,wssiz
       real*8 delsiz,dphiddel
-      real*8 uvcos,uwcos,vwcos
-      real*8 urcos,uscos
-      real*8 vscos,wscos
-      real*8 rwcos,wpcos
-      real*8 upcos,vpcos
-      real*8 rucos,rvcos
+      real*8 uvcos,uwcos,urcos
+      real*8 vwcos,vscos,wscos
+      real*8 upcos,vpcos,wpcos
+      real*8 rwcos,rucos,rvcos
       real*8 ut1cos,ut2cos
-      real*8 uvsin,uwsin,vwsin
-      real*8 ursin,ussin
-      real*8 vssin,wssin
-      real*8 rwsin,wpsin
-      real*8 upsin,vpsin
-      real*8 rusin,rvsin
+      real*8 uvsin,uwsin,ursin
+      real*8 vwsin,vssin,wssin
+      real*8 rwsin,rusin,rvsin
       real*8 ut1sin,ut2sin
       real*8 dphidu,dphidv,dphidw
       real*8 dphidr,dphids
@@ -92,7 +87,7 @@ c
       ia = zaxis(i)
       ib = ipole(i)
       ic = xaxis(i)
-      id = yaxis(i)
+      id = abs(yaxis(i))
 c
 c     construct the three rotation axes for the local frame
 c
@@ -204,8 +199,6 @@ c
       if (axetyp .eq. 'Z-Bisect') then
          urcos = u(1)*r(1) + u(2)*r(2) + u(3)*r(3)
          ursin = sqrt(1.0d0 - urcos*urcos)
-         uscos = u(1)*s(1) + u(2)*s(2) + u(3)*s(3)
-         ussin = sqrt(1.0d0 - uscos*uscos)
          vscos = v(1)*s(1) + v(2)*s(2) + v(3)*s(3)
          vssin = sqrt(1.0d0 - vscos*vscos)
          wscos = w(1)*s(1) + w(2)*s(2) + w(3)*s(3)
@@ -309,9 +302,6 @@ c
          wpcos = w(1)*p(1) + w(2)*p(2) + w(3)*p(3)
          upcos = u(1)*p(1) + u(2)*p(2) + u(3)*p(3)
          vpcos = v(1)*p(1) + v(2)*p(2) + v(3)*p(3)
-         wpsin = sqrt(1.0d0 - wpcos*wpcos)
-         upsin = sqrt(1.0d0 - upcos*upcos)
-         vpsin = sqrt(1.0d0 - vpcos*vpcos)
          r(1) = u(1) + v(1)
          r(2) = u(2) + v(2)
          r(3) = u(3) + v(3)

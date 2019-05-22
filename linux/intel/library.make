@@ -62,6 +62,7 @@ connolly.o \
 control.o \
 couple.o \
 cspline.o \
+ctrpot.o \
 cutoffs.o \
 damping.o \
 deflate.o \

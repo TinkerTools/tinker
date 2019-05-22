@@ -2646,278 +2646,304 @@ c
       integer, allocatable :: pgrt(:,:)
       real*8 pave(13)
       logical done,repeat
-      logical header
+      logical header,exist
+      logical query,condense
+      character*1 answer
       character*4 pa,pb,pc,pd
       character*16 ptlast
       character*16, allocatable :: pt(:)
       character*240 record
+      character*240 string
 c
+c
+c
+c
+      condense = .true.
+      answer = 'Y'
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=10,end=10)  answer
+         query = .false.
+      end if
+   10 continue
+      if (query) then
+         write (iout,20)
+   20    format (/,' Condense Symmetric Atoms to Equivalent Types',
+     &              ' [Y] :  ',$)
+         read (input,30)  answer
+   30    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'N')  condense = .false.
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (ising(n))
-      allocate (jsing(n))
-      allocate (isame(n))
-      allocate (tsort(n))
-      allocate (tkey(n))
-      allocate (pkey(n))
-      allocate (pt(n))
+      if (condense) then
+         allocate (ising(n))
+         allocate (jsing(n))
+         allocate (isame(n))
+         allocate (tsort(n))
+         allocate (tkey(n))
+         allocate (pkey(n))
+         allocate (pt(n))
 c
 c     store atomic numbers and atoms attached for each atom
 c
-      do i = 1, n
-         do j = 1, 4
-            list(j) = 0
+         do i = 1, n
+            do j = 1, 4
+               list(j) = 0
+            end do
+            do j = 1, n12(i)
+               k = i12(j,i)
+               list(j) = 10*atomic(k) + n12(k)
+            end do
+            call sort (n12(i),list)
+            size = 4
+            call numeral (list(1),pa,size)
+            call numeral (list(2),pb,size)
+            call numeral (list(3),pc,size)
+            call numeral (list(4),pd,size)
+            pt(i) = pa//pb//pc//pd
          end do
-         do j = 1, n12(i)
-            k = i12(j,i)
-            list(j) = 10*atomic(k) + n12(k)
-         end do
-         call sort (n12(i),list)
-         size = 4
-         call numeral (list(1),pa,size)
-         call numeral (list(2),pb,size)
-         call numeral (list(3),pc,size)
-         call numeral (list(4),pd,size)
-         pt(i) = pa//pb//pc//pd
-      end do
 c
 c     find the monovalent and singly attached atom groups
 c
-      nsing = 0
-      do i = 1, n
-         ising(i) = 0
-         jsing(i) = 0
-         k = 0
-         m = 0
-         do j = 1, n12(i)
-            if (n12(i12(j,i)) .gt. 1) then
-               m = m + 1
-               k = i12(j,i)
+         nsing = 0
+         do i = 1, n
+            ising(i) = 0
+            jsing(i) = 0
+            k = 0
+            m = 0
+            do j = 1, n12(i)
+               if (n12(i12(j,i)) .gt. 1) then
+                  m = m + 1
+                  k = i12(j,i)
+               end if
+            end do
+            if (m .eq. 1) then
+               nsing = nsing + 1
+               ising(nsing) = i
+               jsing(nsing) = k
             end if
          end do
-         if (m .eq. 1) then
-            nsing = nsing + 1
-            ising(nsing) = i
-            jsing(nsing) = k
-         end if
-      end do
 c
 c     partially automated determination of equivalent atoms
 c
-      repeat = .true.
-      dowhile (repeat)
-         repeat = .false.
+         repeat = .true.
+         dowhile (repeat)
+            repeat = .false.
 c
 c     condense equivalent attached atom groups to same type
 c
-         header = .true.
-         do i = 1, nsing-1
-            ia = ising(i)
-            it = atomic(ia)
-            in = type(jsing(i))
-            do j = i+1, nsing
-               ja = ising(j)
-               jt = atomic(ja)
-               jn = type(jsing(j))
-               if (it.eq.jt .and. in.eq.jn
-     &                .and. pt(ia).eq.pt(ja)) then
-                  if (type(ia) .ne. type(ja)) then
-                     mintyp = min(type(ia),type(ja))
-                     type(ia) = mintyp
-                     type(ja) = mintyp
-                     if (header) then
-                        header = .false.
-                        write (iout,10)
-   10                   format (/,' Equivalent Atom Pairs Condensed',
-     &                             ' to the Same Atom Type :',/)
-                     end if
-                     write (iout,20)  ia,ja
-   20                format (' Atoms',i6,2x,'and',i6,2x,'Set to',
-     &                          ' Equivalent Types')
-                  end if
-                  do k = 1, n12(ia)
-                     ka = i12(k,ia)
-                     kt = atomic(ka)
-                     do m = 1, n12(ja)
-                        ma = i12(m,ja)
-                        mt = atomic(ma)
-                        if (kt .eq. mt) then
-                           if (type(ka) .ne. type(ma)) then
-                              mintyp = min(type(ka),type(ma))
-                              type(ka) = mintyp
-                              type(ma) = mintyp
-                              if (header) then
-                                 header = .false.
-                                 write (iout,30)
-   30                            format (/,' Equivalent Atoms to Set',
-     &                                      ' to Same Atom Type :',/)
-                              end if
-                              write (iout,40)  ka,ma
-   40                         format (' Atoms',i6,2x,'and',i6,2x,
-     &                                   'are Equivalent')
-                           end if
+            header = .true.
+            do i = 1, nsing-1
+               ia = ising(i)
+               it = atomic(ia)
+               in = type(jsing(i))
+               do j = i+1, nsing
+                  ja = ising(j)
+                  jt = atomic(ja)
+                  jn = type(jsing(j))
+                  if (it.eq.jt .and. in.eq.jn
+     &                   .and. pt(ia).eq.pt(ja)) then
+                     if (type(ia) .ne. type(ja)) then
+                        mintyp = min(type(ia),type(ja))
+                        type(ia) = mintyp
+                        type(ja) = mintyp
+                        if (header) then
+                           header = .false.
+                           write (iout,40)
+   40                      format (/,' Equivalent Atoms Set',
+     &                                ' to Same Atom Type :',/)
                         end if
+                        write (iout,50)  ia,ja
+   50                   format (' Atoms',i6,2x,'and',i6,2x,
+     &                             ' are Equivalent')
+                     end if
+                     do k = 1, n12(ia)
+                        ka = i12(k,ia)
+                        kt = atomic(ka)
+                        do m = 1, n12(ja)
+                           ma = i12(m,ja)
+                           mt = atomic(ma)
+                           if (kt .eq. mt) then
+                              if (type(ka) .ne. type(ma)) then
+                                 mintyp = min(type(ka),type(ma))
+                                 type(ka) = mintyp
+                                 type(ma) = mintyp
+                                 if (header) then
+                                    header = .false.
+                                    write (iout,60)
+   60                               format (/,' Equivalent Atoms Set',
+     &                                         ' to Same Atom Type :',/)
+                                 end if
+                                 write (iout,70)  ka,ma
+   70                            format (' Atoms',i6,2x,'and',i6,2x,
+     &                                      'are Equivalent')
+                              end if
+                           end if
+                        end do
                      end do
-                  end do
-               end if
+                  end if
+               end do
             end do
-         end do
 c
 c     query for sets of atoms to condense to a single type
 c
-         done = .false.
-         dowhile (.not. done)
-            do i = 1, 20
-               list(i) = 0
-            end do
-            write (iout,50)
-   50       format (/,' Enter Further Sets of Equivalent Atoms',
-     &                 ' [<Enter>=Exit] :  ',$)
-            read (input,60)  record
-   60       format (a240)
-            read (record,*,err=70,end=70)  (list(i),i=1,20)
-   70       continue
+            done = .false.
+            dowhile (.not. done)
+               do i = 1, 20
+                  list(i) = 0
+               end do
+               write (iout,80)
+   80          format (/,' Enter Further Sets of Equivalent Atoms',
+     &                    ' [<Enter>=Exit] :  ',$)
+               read (input,90)  record
+   90          format (a240)
+               read (record,*,err=100,end=100)  (list(i),i=1,20)
+  100          continue
 c
 c     process the input groups to a list of equivalent atoms
 c
-            nsame = 0
-            do i = 1, n
-               isame(i) = 0
-            end do
-            i = 1
-            do while (list(i) .ne. 0)
-               list(i) = max(-n,min(n,list(i)))
-               if (list(i) .gt. 0) then
-                  k = list(i)
-                  nsame = nsame + 1
-                  isame(nsame) = k
-                  i = i + 1
-               else
-                  list(i+1) = max(-n,min(n,list(i+1)))
-                  do k = abs(list(i)), abs(list(i+1))
+               nsame = 0
+               do i = 1, n
+                  isame(i) = 0
+               end do
+               i = 1
+               do while (list(i) .ne. 0)
+                  list(i) = max(-n,min(n,list(i)))
+                  if (list(i) .gt. 0) then
+                     k = list(i)
                      nsame = nsame + 1
                      isame(nsame) = k
-                  end do
-                  i = i + 2
-               end if
-            end do
-            if (nsame .eq. 0)  done = .true.
+                     i = i + 1
+                  else
+                     list(i+1) = max(-n,min(n,list(i+1)))
+                     do k = abs(list(i)), abs(list(i+1))
+                        nsame = nsame + 1
+                        isame(nsame) = k
+                     end do
+                     i = i + 2
+                  end if
+               end do
+               if (nsame .eq. 0)  done = .true.
 c
 c     assign equivalent atoms to a common atom type number
 c
-            if (nsame .ne. 0) then
-               repeat = .true.
-               call sort8 (nsame,isame)
-               k = type(isame(1))
-               do i = 1, nsame
-                  type(isame(i)) = k
-               end do
-            end if
-         end do
+               if (nsame .ne. 0) then
+                  repeat = .true.
+                  call sort8 (nsame,isame)
+                  k = type(isame(1))
+                  do i = 1, nsame
+                     type(isame(i)) = k
+                  end do
+               end if
+            end do
 c
 c     renumber the atom types to remove deleted type numbers
 c
-         do i = 1, n
-            tsort(i) = type(i)
-         end do
-         call sort3 (n,tsort,tkey)
-         k = 0
-         m = 0
-         do i = 1, n
-            if (tsort(i) .ne. k) then
-               m = m + 1
-               k = tsort(i)
-            end if
-            type(tkey(i)) = m
-         end do
+            do i = 1, n
+               tsort(i) = type(i)
+            end do
+            call sort3 (n,tsort,tkey)
+            k = 0
+            m = 0
+            do i = 1, n
+               if (tsort(i) .ne. k) then
+                  m = m + 1
+                  k = tsort(i)
+               end if
+               type(tkey(i)) = m
+            end do
 c
 c     print the atoms, atom types and local frame definitions
 c
-         write (iout,80)
-   80    format (/,' Atom Type and Local Frame Definition',
-     &              ' for Each Atom :',
-     &           //,5x,'Atom',4x,'Type',6x,'Local Frame',10x,
-     &              'Frame Defining Atoms',/)
-         do i = 1, n
-            k = pollist(i)
-            write (iout,90)  i,type(i),polaxe(k),zaxis(k),
-     &                       xaxis(k),yaxis(k)
-   90       format (2i8,9x,a8,6x,3i8)
+            write (iout,110)
+  110       format (/,' Atom Type and Local Frame Definition',
+     &                 ' for Each Atom :',
+     &              //,5x,'Atom',4x,'Type',6x,'Local Frame',10x,
+     &                 'Frame Defining Atoms',/)
+            do i = 1, n
+               k = pollist(i)
+               write (iout,120)  i,type(i),polaxe(k),zaxis(k),
+     &                          xaxis(k),yaxis(k)
+  120          format (2i8,9x,a8,6x,3i8)
+            end do
          end do
-      end do
 c
 c     locate the equivalently defined multipole sites
 c
-      do i = 1, npole
-         k = ipole(i)
-         it = type(k)
-         zaxe = 0
-         xaxe = 0
-         yaxe = 0
-         if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
-         if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
-         if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
-         size = 4
-         call numeral (it,pa,size)
-         call numeral (zaxe,pb,size)
-         call numeral (xaxe,pc,size)
-         call numeral (yaxe,pd,size)
-         pt(i) = pa//pb//pc//pd
-      end do
-      call sort7 (npole,pt,pkey)
+         do i = 1, npole
+            k = ipole(i)
+            it = type(k)
+            zaxe = 0
+            xaxe = 0
+            yaxe = 0
+            if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
+            if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
+            if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+            size = 4
+            call numeral (it,pa,size)
+            call numeral (zaxe,pb,size)
+            call numeral (xaxe,pc,size)
+            call numeral (yaxe,pd,size)
+            pt(i) = pa//pb//pc//pd
+         end do
+         call sort7 (npole,pt,pkey)
 c
 c     average the multipole values at equivalent atom sites
 c
-      nave = 1
-      ptlast = '                '
-      do i = 1, npole
-         it = pkey(i)
-         if (pt(i) .eq. ptlast) then
-            nave = nave + 1
-            do j = 1, 13
-               pave(j) = pave(j) + pole(j,it)
-            end do
-            if (i .eq. npole) then
+         nave = 1
+         ptlast = '                '
+         do i = 1, npole
+            it = pkey(i)
+            if (pt(i) .eq. ptlast) then
+               nave = nave + 1
                do j = 1, 13
-                  pave(j) = pave(j) / dble(nave)
+                  pave(j) = pave(j) + pole(j,it)
                end do
-               do m = 1, nave
-                  mt = pkey(i-m+1)
+               if (i .eq. npole) then
                   do j = 1, 13
-                     pole(j,mt) = pave(j)
+                     pave(j) = pave(j) / dble(nave)
                   end do
-               end do
-            end if
-         else
-            if (nave .ne. 1) then
+                  do m = 1, nave
+                     mt = pkey(i-m+1)
+                     do j = 1, 13
+                        pole(j,mt) = pave(j)
+                     end do
+                  end do
+               end if
+            else
+               if (nave .ne. 1) then
+                  do j = 1, 13
+                     pave(j) = pave(j) / dble(nave)
+                  end do
+                  do m = 1, nave
+                     mt = pkey(i-m)
+                     do j = 1, 13
+                        pole(j,mt) = pave(j)
+                     end do
+                  end do
+               end if
+               nave = 1
                do j = 1, 13
-                  pave(j) = pave(j) / dble(nave)
+                  pave(j) = pole(j,it)
                end do
-               do m = 1, nave
-                  mt = pkey(i-m)
-                  do j = 1, 13
-                     pole(j,mt) = pave(j)
-                  end do
-               end do
+               ptlast = pt(i)
             end if
-            nave = 1
-            do j = 1, 13
-               pave(j) = pole(j,it)
-            end do
-            ptlast = pt(i)
-         end if
-      end do
+         end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (ising)
-      deallocate (jsing)
-      deallocate (isame)
-      deallocate (tsort)
-      deallocate (tkey)
-      deallocate (pkey)
-      deallocate (pt)
+         deallocate (ising)
+         deallocate (jsing)
+         deallocate (isame)
+         deallocate (tsort)
+         deallocate (tkey)
+         deallocate (pkey)
+         deallocate (pt)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2945,10 +2971,10 @@ c
             do m = 1, maxval
                if (pgrt(m,it) .eq. 0) then
                   pgrt(m,it) = pgrp(j,it)
-                  goto 100
+                  goto 130
                end if
             end do
-  100       continue
+  130       continue
          end do
       end do
       do i = 1, npole
@@ -2982,37 +3008,37 @@ c
 c
 c     print the final multipole values for force field use
 c
-      write (iout,110)
-  110 format (/,' Final Atomic Multipole Moments after',
+      write (iout,140)
+  140 format (/,' Final Atomic Multipole Moments after',
      &           ' Regularization :')
       do i = 1, n
          k = pollist(i)
          if (k .eq. 0) then
-            write (iout,120)  i,name(i),atomic(i)
-  120       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,150)  i,name(i),atomic(i)
+  150       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,130)
-  130       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,160)
+  160       format (/,' No Atomic Multipole Moments for this Site')
          else
             zaxe = zaxis(k)
             xaxe = xaxis(k)
             yaxe = yaxis(k)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,140)  i,name(i),atomic(i)
-  140       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,170)  i,name(i),atomic(i)
+  170       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,150)  polaxe(k),zaxe,xaxe,yaxe
-  150       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,160)  pole(1,k)
-  160       format (/,' Charge:',10x,f15.5)
-            write (iout,170)  pole(2,k),pole(3,k),pole(4,k)
-  170       format (' Dipole:',10x,3f15.5)
-            write (iout,180)  pole(5,k)
-  180       format (' Quadrupole:',6x,f15.5)
-            write (iout,190)  pole(8,k),pole(9,k)
-  190       format (18x,2f15.5)
-            write (iout,200)  pole(11,k),pole(12,k),pole(13,k)
-  200       format (18x,3f15.5)
+            write (iout,180)  polaxe(k),zaxe,xaxe,yaxe
+  180       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,190)  pole(1,k)
+  190       format (/,' Charge:',10x,f15.5)
+            write (iout,200)  pole(2,k),pole(3,k),pole(4,k)
+  200       format (' Dipole:',10x,3f15.5)
+            write (iout,210)  pole(5,k)
+  210       format (' Quadrupole:',6x,f15.5)
+            write (iout,220)  pole(8,k),pole(9,k)
+  220       format (18x,2f15.5)
+            write (iout,230)  pole(11,k),pole(12,k),pole(13,k)
+  230       format (18x,3f15.5)
          end if
       end do
       return

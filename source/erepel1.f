@@ -68,7 +68,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,jcell
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 e,fgrp
       real*8 eterm,de
       real*8 xi,yi,zi
@@ -832,21 +832,21 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (ii,ter(1,i),fix,fiy,fiz,der)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -905,7 +905,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      integer iax,iay,iaz
+      integer ix,iy,iz
       real*8 e,fgrp
       real*8 eterm,de
       real*8 xi,yi,zi
@@ -1341,21 +1341,21 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (ii,ter(1,i),fix,fiy,fiz,der)
-         iaz = zaxis(ii)
-         iax = xaxis(ii)
-         iay = yaxis(ii)
-         if (iaz .eq. 0)  iaz = i
-         if (iax .eq. 0)  iax = i
-         if (iay .eq. 0)  iay = i
-         xiz = x(iaz) - x(i)
-         yiz = y(iaz) - y(i)
-         ziz = z(iaz) - z(i)
-         xix = x(iax) - x(i)
-         yix = y(iax) - y(i)
-         zix = z(iax) - z(i)
-         xiy = x(iay) - x(i)
-         yiy = y(iay) - y(i)
-         ziy = z(iay) - z(i)
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))

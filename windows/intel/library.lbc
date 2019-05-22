@@ -51,6 +51,7 @@ connolly.obj
 control.obj
 couple.obj
 cspline.obj
+ctrpot.obj
 cutoffs.obj
 damping.obj
 deflate.obj

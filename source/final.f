@@ -37,6 +37,7 @@ c
       use disgeo
       use domega
       use faces
+      use fft
       use fracs
       use freeze
       use group
@@ -58,6 +59,7 @@ c
       use krepl
       use kvdws
       use light
+      use limits
       use merck
       use molcul
       use moldyn
@@ -113,6 +115,12 @@ c     free memory used by the APBS Poisson-Boltzmann solver
 c
       if (solvtyp .eq. 'PB') then
          call apbsfinal
+      end if
+c
+c     free memory used by the Fourier transform routines
+c
+      if (use_ewald .or. use_dewald) then
+         call fftclose
       end if
 c
 c     close any open socket used for external communication
@@ -357,6 +365,10 @@ c
       if (allocated(fpa))  deallocate (fpa)
       if (allocated(fpncy))  deallocate (fpncy)
       if (allocated(fpcy))  deallocate (fpcy)
+c
+c     deallocation of global arrays from module fft
+c
+      if (allocated(ffttable))  deallocate (ffttable)
 c
 c     deallocation of global arrays from module fracs
 c

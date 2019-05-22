@@ -49,6 +49,7 @@ c
       use bound
       use chgpot
       use chgtrn
+      use ctrpot
       use cell
       use couple
       use energi
@@ -69,6 +70,7 @@ c
       real*8 chgi,chgk
       real*8 alphai,alphak
       real*8 expi,expk
+      real*8 expik
       real*8 taper
       real*8, allocatable :: mscale(:)
       logical proceed,usei
@@ -142,9 +144,14 @@ c
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
                   if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                  expi = exp(-alphai*r)
-                  expk = exp(-alphak*r)
-                  e = -chgi*expk - chgk*expi
+                  if (ctrntyp .eq. 'SEPARATE') then
+                     expi = exp(-alphai*r)
+                     expk = exp(-alphak*r)
+                     e = -chgi*expk - chgk*expi
+                  else
+                     expik = exp(sqrt(alphai*alphak)*r)
+                     e = -0.5d0 * (chgi+chgk) * expik
+                  end if
                   e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
@@ -237,9 +244,14 @@ c
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
                         if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                        expi = exp(-alphai*r)
-                        expk = exp(-alphak*r)
-                        e = -chgi*expk - chgk*expi
+                        if (ctrntyp .eq. 'SEPARATE') then
+                           expi = exp(-alphai*r)
+                           expk = exp(-alphak*r)
+                           e = -chgi*expk - chgk*expi
+                        else
+                           expik = exp(sqrt(alphai*alphak)*r)
+                           e = -0.5d0 * (chgi+chgk) * expik
+                        end if
                         e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
@@ -309,6 +321,7 @@ c
       use chgtrn
       use cell
       use couple
+      use ctrpot
       use energi
       use group
       use light
@@ -329,6 +342,7 @@ c
       real*8 chgi,chgk
       real*8 alphai,alphak
       real*8 expi,expk
+      real*8 expik
       real*8 taper
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: xsort(:)
@@ -461,9 +475,14 @@ c
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
                   if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                  expi = exp(-alphai*r)
-                  expk = exp(-alphak*r)
-                  e = -chgi*expk - chgk*expi
+                  if (ctrntyp .eq. 'SEPARATE') then
+                     expi = exp(-alphai*r)
+                     expk = exp(-alphak*r)
+                     e = -chgi*expk - chgk*expi
+                  else
+                     expik = exp(sqrt(alphai*alphak)*r)
+                     e = -0.5d0 * (chgi+chgk) * expik
+                  end if
                   e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
@@ -538,6 +557,7 @@ c
       use chgpot
       use chgtrn
       use couple
+      use ctrpot
       use energi
       use group
       use mplpot
@@ -556,6 +576,7 @@ c
       real*8 chgi,chgk
       real*8 alphai,alphak
       real*8 expi,expk
+      real*8 expik
       real*8 taper
       real*8, allocatable :: mscale(:)
       logical proceed,usei
@@ -587,8 +608,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use,use_group,use_intra,use_bounds,f,cut2,off2,
-!$OMP& c0,c1,c2,c3,c4,c5)
+!$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,cut2,
+!$OMP& off2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(mscale) shared(ect)
 !$OMP DO reduction(+:ect) schedule(guided)
 c
@@ -639,9 +660,14 @@ c
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
                   if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                  expi = exp(-alphai*r)
-                  expk = exp(-alphak*r)
-                  e = -chgi*expk - chgk*expi
+                  if (ctrntyp .eq. 'SEPARATE') then
+                     expi = exp(-alphai*r)
+                     expk = exp(-alphak*r)
+                     e = -chgi*expk - chgk*expi
+                  else
+                     expik = exp(sqrt(alphai*alphak)*r)
+                     e = -0.5d0 * (chgi+chgk) * expik
+                  end if
                   e = f * e * mscale(kk)
 c
 c     use energy switching if near the cutoff distance
