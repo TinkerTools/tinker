@@ -82,7 +82,7 @@ c
       call set_angbnd_data (nangle,iang,ak,anat,afld)
       call set_angpot_data (angunit,stbnunit,aaunit,opbunit,opdunit,
      &                      cang,qang,pang,sang,copb,qopb,popb,sopb,
-     &                      copd,qopd,popd,sopd,angtrig,opbtyp,angtyp)
+     &                      copd,qopd,popd,sopd,opbtyp,angtyp)
       call set_angtor_data (nangtor,iat,kant)
       call set_atomid_data (tag,class,atomic,valence,mass,name,story)
       call set_atoms_data (n,type,x,y,z)
