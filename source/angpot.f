@@ -29,7 +29,6 @@ c     copd       cubic coefficient in out-of-plane distance potential
 c     qopd       quartic coefficient in out-of-plane distance potential
 c     popd       quintic coefficient in out-of-plane distance potential
 c     sopd       sextic coefficient in out-of-plane distance potential
-c     angtrig    type of out-of-plane angle, NATURAL or IN-PLANE
 c     opbtyp     type of out-of-plane bend potential energy function
 c     angtyp     type of angle bending function for each bond angle
 c
@@ -45,7 +44,6 @@ c
       real*8 popb,sopb
       real*8 copd,qopd
       real*8 popd,sopd
-      character*8 angtrig
       character*8 opbtyp
       character*8, allocatable :: angtyp(:)
       save

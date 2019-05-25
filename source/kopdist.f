@@ -19,7 +19,6 @@ c
 c
       subroutine kopdist
       use angbnd
-      use angpot
       use atmlst
       use atomid
       use atoms
@@ -126,7 +125,6 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
       if (allocated(iopd))  deallocate (iopd)
       if (allocated(opdk))  deallocate (opdk)
       allocate (iopd(4,n))
@@ -198,23 +196,6 @@ c
             end if
          end do
       end if
-c
-c     mark angles at trigonal sites to use projected in-plane values
-c
-      do i = 1, nopdist
-         ia = iopd(1,i)
-         if (angtrig.eq.'IN-PLANE' .and. opdk(i).ne.0.0d0) then
-            do j = 1, 3
-               k = anglist(j,ia)
-               if (angtyp(k) .eq. 'HARMONIC')  angtyp(k) = 'IN-PLANE'
-            end do
-         else if (angtrig.eq.'NATURAL' .and. opdk(i).ne.0.0d0) then
-            do j = 1, 3
-               k = anglist(j,ia)
-               if (angtyp(k) .eq. 'IN-PLANE')  angtyp(k) = 'HARMONIC'
-            end do
-         end if
-      end do
 c
 c     turn off out-of-plane distance potential if it is not used
 c

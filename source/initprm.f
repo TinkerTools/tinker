@@ -265,7 +265,6 @@ c
       bndunit = 1.0d0
       cbnd = 0.0d0
       qbnd = 0.0d0
-      angtrig = 'IN-PLANE'
       angunit = 1.0d0 / radian**2
       cang = 0.0d0
       qang = 0.0d0

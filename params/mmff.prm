@@ -12,7 +12,6 @@ bondunit                71.96625
 bond-cubic              -2.0
 bond-quartic            2.333333     !! (7/12)*bond-cubic^2
 angleunit               0.021922
-angle-trigonal          NATURAL
 angle-cubic             -0.006981317
 strbndunit              2.51210
 opbendunit              0.021922

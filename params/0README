@@ -151,6 +151,6 @@
       water      The current AMOEBA water parameters for a polarizable
                  multipole electrostatics model. This model is equal to
                  or better than the best available water models for many
-                 bulk and cluster properties. The 2003 and 2014 water
-                 models are provided.
+                 bulk and cluster properties. The AMOEBA 2003 and 2014
+                 water models and the HIPPO 2019 model are provided.
 

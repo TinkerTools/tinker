@@ -10,7 +10,6 @@ forcefield              HIPPO-2018
 
 bond-cubic              -2.55
 bond-quartic            3.793125
-angle-trigonal          NATURAL
 angle-cubic             -0.014
 angle-quartic           0.000056
 angle-pentic            -0.0000007

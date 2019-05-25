@@ -19,7 +19,6 @@ c
 c
       subroutine kopbend
       use angbnd
-      use angpot
       use atomid
       use atoms
       use couple
@@ -109,7 +108,6 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(angtyp))  allocate (angtyp(nangle))
       if (allocated(iopb))  deallocate (iopb)
       if (allocated(opbk))  deallocate (opbk)
       allocate (iopb(nangle))
@@ -225,17 +223,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (jopb)
-c
-c     mark angles at trigonal sites to use projected in-plane values
-c
-      do i = 1, nopbend
-         j = iopb(i)
-         if (angtrig.eq.'IN-PLANE' .and. opbk(i).ne.0.0d0) then
-            if (angtyp(j) .eq. 'HARMONIC')  angtyp(j) = 'IN-PLANE'
-         else if (angtrig.eq.'NATURAL' .and. opbk(i).ne.0.0d0) then
-            if (angtyp(j) .eq. 'IN-PLANE')  angtyp(j) = 'HARMONIC'
-         end if
-      end do
 c
 c     turn off the out-of-plane bending term if it is not used
 c

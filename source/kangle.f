@@ -33,8 +33,8 @@ c
       integer i,j
       integer ia,ib,ic
       integer ita,itb,itc
-      integer na,na5,na4
-      integer na3,naf
+      integer na,nap,naf
+      integer na3,na4,na5
       integer jen,ih,nh
       integer next,size
       integer minat,iring
@@ -195,6 +195,78 @@ c
          end if
       end do
 c
+c     process keywords containing in-plane angle bending parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'ANGLEP ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            fc = 0.0d0
+            an1 = 0.0d0
+            an2 = 0.0d0
+            an3 = 0.0d0
+            jen = 0
+            string = record(next:240)
+            read (string,*,err=160,end=160)  ia,ib,ic,fc,an1,an2,an3
+  160       continue
+            if (an2.ne.0.0d0 .or. an3.ne.0.0d0)  jen = 1
+            if (.not. silent) then
+               if (header) then
+                  header = .false.
+                  write (iout,170)
+  170             format (/,' Additional In-Plane Angle Bending',
+     &                       ' Parameters :',
+     &                    //,5x,'Atom Classes',13x,'K(B)',10x,'Angle',/)
+               end if
+               if (jen .eq. 0) then
+                  write (iout,180)  ia,ib,ic,fc,an1
+  180             format (4x,3i4,3x,2f15.3)
+               else if (an1 .ne. 0.0d0) then
+                  write (iout,190)  ia,ib,ic,fc,an1
+  190             format (4x,3i4,3x,2f15.3,3x,'0-H''s')
+               end if
+               if (an2 .ne. 0.0d0) then
+                  write (iout,200)  ia,ib,ic,fc,an2
+  200             format (4x,3i4,3x,2f15.3,3x,'1-H''s')
+               end if
+               if (an3 .ne. 0.0d0) then
+                  write (iout,210)  ia,ib,ic,fc,an3
+  210             format (4x,3i4,3x,2f15.3,3x,'2-H''s')
+               end if
+            end if
+            size = 4
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            call numeral (ic,pc,size)
+            if (ia .le. ic) then
+               pt = pa//pb//pc
+            else
+               pt = pc//pb//pa
+            end if
+            do j = 1, maxnap
+               if (kap(j).eq.blank .or. kap(j).eq.pt) then
+                  kap(j) = pt
+                  aconp(j) = fc
+                  angp(1,j) = an1
+                  angp(2,j) = an2
+                  angp(3,j) = an3
+                  goto 230
+               end if
+            end do
+            write (iout,220)
+  220       format (/,' KANGLE  --  Too many In-Plane Angle',
+     &                    ' Bending Parameters')
+            abort = .true.
+  230       continue
+         end if
+      end do
+c
 c     process keywords containing Fourier angle bending parameters
 c
       header = .true.
@@ -203,7 +275,6 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         iring = -1
          if (keyword(1:7) .eq. 'ANGLEF ') then
             ia = 0
             ib = 0
@@ -212,19 +283,19 @@ c
             an = 0.0d0
             pr = 0.0d0
             string = record(next:240)
-            read (string,*,err=160,end=160)  ia,ib,ic,fc,an,pr
-  160       continue
+            read (string,*,err=240,end=240)  ia,ib,ic,fc,an,pr
+  240       continue
             if (.not. silent) then
                if (header) then
                   header = .false.
-                  write (iout,170)
-  170             format (/,' Additional Fourier Angle Bending',
+                  write (iout,250)
+  250             format (/,' Additional Fourier Angle Bending',
      &                       ' Parameters :',
      &                    //,5x,'Atom Classes',13x,'K(B)',10x,'Shift',
      &                       9x,'Period',/)
                end if
-               write (iout,180)  ia,ib,ic,fc,an,pr
-  180          format (4x,3i4,3x,3f15.3)
+               write (iout,260)  ia,ib,ic,fc,an,pr
+  260          format (4x,3i4,3x,3f15.3)
             end if
             size = 4
             call numeral (ia,pa,size)
@@ -241,14 +312,14 @@ c
                   aconf(j) = fc
                   angf(1,j) = an
                   angf(2,j) = pr
-                  goto 200
+                  goto 280
                end if
             end do
-            write (iout,190)
-  190       format (/,' KANGLE  --  Too many Fourier Angle',
+            write (iout,270)
+  270       format (/,' KANGLE  --  Too many Fourier Angle',
      &                    ' Bending Parameters')
             abort = .true.
-  200       continue
+  280       continue
          end if
       end do
 c
@@ -258,6 +329,7 @@ c
       na5 = maxna5
       na4 = maxna4
       na3 = maxna3
+      nap = maxnap
       naf = maxnaf
       do i = maxna, 1, -1
          if (ka(i) .eq. blank)  na = i - 1
@@ -270,6 +342,9 @@ c
       end do
       do i = maxna3, 1, -1
          if (ka3(i) .eq. blank)  na3 = i - 1
+      end do
+      do i = maxnap, 1, -1
+         if (kap(i) .eq. blank)  nap = i - 1
       end do
       do i = maxnaf, 1, -1
          if (kaf(i) .eq. blank)  naf = i - 1
@@ -301,6 +376,12 @@ c
          if (ang3(2,i).eq.0.0d0 .and. ang3(3,i).eq.0.0d0) then
             ang3(2,i) = ang3(1,i)
             ang3(3,i) = ang3(1,i)
+         end if
+      end do
+      do i = 1, nap
+         if (angp(2,i).eq.0.0d0 .and. angp(3,i).eq.0.0d0) then
+            angp(2,i) = angp(1,i)
+            angp(3,i) = angp(1,i)
          end if
       end do
 c
@@ -375,7 +456,7 @@ c
                   ak(i) = acon(j)
                   anat(i) = ang(nh,j)
                   done = .true.
-                  goto 210
+                  goto 290
                end if
             end do
 c
@@ -387,7 +468,7 @@ c
                   ak(i) = acon5(j)
                   anat(i) = ang5(nh,j)
                   done = .true.
-                  goto 210
+                  goto 290
                end if
             end do
 c
@@ -399,7 +480,7 @@ c
                   ak(i) = acon4(j)
                   anat(i) = ang4(nh,j)
                   done = .true.
-                  goto 210
+                  goto 290
                end if
             end do
 c
@@ -411,7 +492,21 @@ c
                   ak(i) = acon3(j)
                   anat(i) = ang3(nh,j)
                   done = .true.
-                  goto 210
+                  goto 290
+               end if
+            end do
+         end if
+c
+c     assign in-plane angle bending parameters for bond angles
+c
+         if (.not.done .and. n12(ib).eq.3) then
+            do j = 1, nap
+               if (kap(j).eq.pt .and. angp(nh,j).ne.0.0d0) then
+                  ak(i) = aconp(j)
+                  anat(i) = angp(nh,j)
+                  angtyp(i) = 'IN-PLANE'
+                  done = .true.
+                  goto 290
                end if
             end do
          end if
@@ -426,22 +521,22 @@ c
                   afld(i) = angf(2,j)
                   angtyp(i) = 'FOURIER'
                   done = .true.
-                  goto 210
+                  goto 290
                end if
             end do
          end if
 c
 c     warning if suitable angle bending parameter not found
 c
-  210    continue
+  290    continue
          minat = min(atomic(ia),atomic(ib),atomic(ic))
          if (minat .eq. 0)  done = .true.
          if (use_angle .and. .not.done) then
             if (use(ia) .or. use(ib) .or. use(ic))  abort = .true.
             if (header) then
                header = .false.
-               write (iout,220)
-  220          format (/,' Undefined Angle Bending Parameters :',
+               write (iout,300)
+  300          format (/,' Undefined Angle Bending Parameters :',
      &                 //,' Type',18x,'Atom Names',19x,
      &                    'Atom Classes',/)
             end if
@@ -449,9 +544,9 @@ c
             if (iring .eq. 5)  label = '5-Ring'
             if (iring .eq. 4)  label = '4-Ring'
             if (iring .eq. 3)  label = '3-Ring'
-            write (iout,230)  label,ia,name(ia),ib,name(ib),
+            write (iout,310)  label,ia,name(ia),ib,name(ib),
      &                        ic,name(ic),ita,itb,itc
-  230       format (1x,a6,5x,3(i6,'-',a3),7x,3i5)
+  310       format (1x,a6,5x,3(i6,'-',a3),7x,3i5)
          end if
       end do
 c

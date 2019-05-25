@@ -332,7 +332,7 @@ c
          if (octahedron)  value = 'TRUNCATED OCTAHEDRON'
          call justify (value)
          write (iout,30)  xbox,ybox,zbox,alpha,beta,gamma,volbox,value
-   30    format (/,' Periodic Boundary Conditions :',
+   30    format (/,' Periodic Boundary Box :',
      &           //,' a-Axis Length',23x,f12.4,
      &           /,' b-Axis Length',23x,f12.4,
      &           /,' c-Axis Length',23x,f12.4,
@@ -341,11 +341,17 @@ c
      &           /,' Gamma Angle',25x,f12.4,
      &           /,' Cell Volume',21x,f16.4,
      &           /,' Lattice Type',16x,a20)
+         write (iout,40)  (lvec(1,i),i=1,3),(lvec(2,i),i=1,3),
+     &                    (lvec(3,i),i=1,3)
+   40    format (/,' Lattice Vectors :',
+     &           //,3x,'a',3x,3f14.4,
+     &           /,3x,'b',3x,3f14.4,
+     &           /,3x,'c',3x,3f14.4,/)
          if (spacegrp .ne. '          ') then
             value = spacegrp
             call justify (value)
-            write (iout,40)  value
-   40       format (' Space Group',17x,a20)
+            write (iout,50)  value
+   50       format (' Space Group',17x,a20)
          end if
       end if
 c
@@ -353,14 +359,14 @@ c     info on force field potential energy function
 c
       value = forcefield
       call justify (value)
-      write (iout,50)  value
-   50 format (/,' Force Field Name :',10x,a20)
+      write (iout,60)  value
+   60 format (/,' Force Field Name :',10x,a20)
 c
 c     details of vdw potential energy functional form
 c
       if (use_vdw .or. use_repuls .or. use_disp) then
-         write (iout,60)
-   60    format ()
+         write (iout,70)
+   70    format ()
       end if
       if (use_vdw) then
          label(1) = vdwtyp
@@ -371,36 +377,36 @@ c
          do i = 1, 5
             call justify (label(i))
          end do
-         write (iout,70)  (label(i),i=1,5)
-   70    format (' VDW Function',16x,a20,
+         write (iout,80)  (label(i),i=1,5)
+   80    format (' VDW Function',16x,a20,
      &              /,' Size Descriptor',13x,a20,
      &              /,' Size Unit Type',14x,a20,
      &              /,' Size Combining Rule',9x,a20,
      &              /,' Well Depth Rule',13x,a20)
          if (vdwcut .le. 1000.0d0) then
-            write (iout,80)  vdwcut
-   80       format (' VDW Cutoff',26x,f12.4)
+            write (iout,90)  vdwcut
+   90       format (' VDW Cutoff',26x,f12.4)
          end if
       end if
       if (use_repuls) then
          value = 'PAULI REPULSION'
          call justify (value)
-         write (iout,90)  value
-   90    format (' VDW Function',16x,a20)
+         write (iout,100)  value
+  100    format (' VDW Function',16x,a20)
       end if
       if (use_disp) then
          value = 'DAMPED DISPERSION'
          call justify (value)
-         write (iout,100)  value
-  100    format (' VDW Function',16x,a20)
+         write (iout,110)  value
+  110    format (' VDW Function',16x,a20)
       end if
 c
 c     details of dispersion particle mesh Ewald calculation
 c
       if (use_dewald) then
-         write (iout,110)  adewald,dewaldcut,ndfft1,
+         write (iout,120)  adewald,dewaldcut,ndfft1,
      &                     ndfft2,ndfft3,bsdorder
-  110    format (/,' PME for Dispersion :',
+  120    format (/,' PME for Dispersion :',
      &           //,' Ewald Coefficient',19x,f12.4,
      &           /,' Real-Space Cutoff',19x,f12.4,
      &           /,' Grid Dimensions',21x,3i4,
@@ -410,59 +416,59 @@ c
 c     details of electrostatic energy functional form
 c
       if (use_charge .or. use_dipole .or. use_mpole .or. use_polar) then
-         write (iout,120)
-  120    format ()
+         write (iout,130)
+  130    format ()
       end if
       if (use_charge) then
          value = 'PARTIAL CHARGE'
          call justify (value)
-         write (iout,130)  value
-  130    format (' Electrostatics',14x,a20)
+         write (iout,140)  value
+  140    format (' Electrostatics',14x,a20)
       end if
       if (use_dipole) then
          value = 'BOND DIPOLE'
          call justify (value)
-         write (iout,140)  value
-  140    format (' Electrostatics',14x,a20)
+         write (iout,150)  value
+  150    format (' Electrostatics',14x,a20)
       end if
       if (use_mpole) then
          value = 'ATOMIC MULTIPOLE'
          call justify (value)
-         write (iout,150)  value
-  150    format (' Electrostatics',14x,a20)
+         write (iout,160)  value
+  160    format (' Electrostatics',14x,a20)
       end if
       if (use_chgpen) then
          value = 'CHARGE PENETRATION'
          call justify (value)
-         write (iout,160)  value
-  160    format (' Electrostatics',14x,a20)
+         write (iout,170)  value
+  170    format (' Electrostatics',14x,a20)
       end if
       if (use_chgtrn) then
          value = 'CHARGE TRANSFER'
          call justify (value)
-         write (iout,170)  value
-  170    format (' Induction',19x,a20)
+         write (iout,180)  value
+  180    format (' Induction',19x,a20)
       end if
       if (use_polar) then
          value = 'INDUCED DIPOLE'
          call justify (value)
-         write (iout,180)  value
-  180    format (' Induction',19x,a20)
+         write (iout,190)  value
+  190    format (' Induction',19x,a20)
          value = poltyp
          call justify (value)
-         write (iout,190)  value
-  190    format (' Polarization',16x,a20)
+         write (iout,200)  value
+  200    format (' Polarization',16x,a20)
          if (use_thole) then
             value = 'THOLE DAMPING'
             call justify (value)
-            write (iout,200)  value
-  200       format (' Polarization',16x,a20)
+            write (iout,210)  value
+  210       format (' Polarization',16x,a20)
          end if
          if (use_chgpen) then
             value = 'CHGPEN DAMPING'
             call justify (value)
-            write (iout,210)  value
-  210       format (' Polarization',16x,a20)
+            write (iout,220)  value
+  220       format (' Polarization',16x,a20)
          end if
       end if
 c
@@ -471,9 +477,9 @@ c
       if (use_ewald) then
          value = boundary
          call justify (value)
-         write (iout,220)  aeewald,ewaldcut,nefft1,nefft2,
+         write (iout,230)  aeewald,ewaldcut,nefft1,nefft2,
      &                     nefft3,bseorder,value
-  220    format (/,' PME for Electrostatics :',
+  230    format (/,' PME for Electrostatics :',
      &           //,' Ewald Coefficient',19x,f12.4,
      &           /,' Real-Space Cutoff',19x,f12.4,
      &           /,' Grid Dimensions',21x,3i4,
