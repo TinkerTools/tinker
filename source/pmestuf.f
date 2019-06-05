@@ -256,17 +256,11 @@ c
       integer i,ifr
       real*8 xi,yi,zi
       real*8 w,fr,eps
-      logical first
-      save first
-      data first  / .true. /
 c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (first) then
-         first = .false.
-         if (.not. allocated(igrid))  allocate (igrid(3,n))
-      end if
+      if (.not. allocated(igrid))  allocate (igrid(3,n))
 c
 c     offset used to shift sites off exact lattice bounds
 c
