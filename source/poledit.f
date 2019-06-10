@@ -2656,7 +2656,7 @@ c
       character*240 string
 c
 c
-c
+c     check for user requested reduction of equivalent types
 c
       condense = .true.
       answer = 'Y'
@@ -2958,6 +2958,7 @@ c
       end do
       do i = 1, npole
          it = type(ipole(i))
+         k = 0
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0) then
                k = j
