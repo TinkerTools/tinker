@@ -1207,8 +1207,8 @@ c
                palpha(i) = 0.0d0      !! missing parameter
             else if (atn .eq. 6) then
                pcore(i) = 4.0d0
-               polarity(i) = 0.755d0
-               palpha(i) = 4.2998d0
+               polarity(i) = 0.9354d0
+               palpha(i) = 4.5439d0
                do j = 1, n12(i)
                   k = i12(j,i)
                   if ((atomic(k).ne.6.or.n12(k).ne.4)
@@ -1219,8 +1219,8 @@ c
                   if ((atomic(k).ne.6.or.n12(k).ne.4)
      &                  .and. atomic(k).ne.1)  goto 50
                end do
-               polarity(i) = 0.9354d0
-               palpha(i) = 4.5439d0
+               polarity(i) = 0.755d0
+               palpha(i) = 4.2998d0
    50          continue
                if (n12(i) .eq. 3) then
                   do j = 1, n12(i)
