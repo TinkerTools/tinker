@@ -689,7 +689,7 @@ c
          write (iout,fstr)  ep,nep
       end if
       if (use_chgtrn .and. (nect.ne.0.or.ect.ne.0.0d0)) then
-         if (abs(ep) .lt. 1.0d10) then
+         if (abs(ect) .lt. 1.0d10) then
             fstr = '('' Charge Transfer'',12x,'//form1//')'
          else
             fstr = '('' Charge Transfer'',12x,'//form2//')'
@@ -1999,7 +1999,12 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  if (use_thole) then
+                  if (use_dirdamp) then
+                     write (iout,825)
+  825                format (/,' Dipole Polarizability Parameters :',
+     &                       //,10x,'Atom Number',5x,'Alpha',4x,'Thole',
+     &                          5x,'Damp',6x,'Polarization Group',/)
+                  else if (use_thole) then
                      write (iout,830)
   830                format (/,' Dipole Polarizability Parameters :',
      &                       //,10x,'Atom Number',5x,'Alpha',4x,'Thole',
@@ -2011,7 +2016,11 @@ c
      &                          6x,'Polarization Group',/)
                   end if
                end if
-               if (use_thole) then
+               if (use_dirdamp) then
+                  write (iout,845)  i,ia,polarity(i),thole(i),
+     &                              dirdamp(i),(ip11(j,ia),j=1,np11(ia))
+  845             format (i6,3x,i6,6x,f10.4,2f9.3,3x,120i6)
+               else if (use_thole) then
                   write (iout,850)  i,ia,polarity(i),thole(i),
      &                              (ip11(j,ia),j=1,np11(ia))
   850             format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)

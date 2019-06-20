@@ -326,7 +326,7 @@ c
       else if (pentyp .eq. 'GORDON2') then
          dampi2 = dampi * dampi
          dampi3 = dampi * dampi2
-         dmpi(1) = 1.0d0 - dampi
+         dmpi(1) = 1.0d0 - expi
          dmpi(3) = 1.0d0 - (1.0d0 + dampi)*expi
          dmpi(5) = 1.0d0 - (1.0d0 + dampi + dampi2/3.0d0)*expi
          dmpi(7) = 1.0d0 - (1.0d0 + dampi + 0.4d0*dampi2
@@ -339,7 +339,7 @@ c
          else
             dampk2 = dampk * dampk
             dampk3 = dampk * dampk2
-            dmpk(1) = 1.0d0 - dampk
+            dmpk(1) = 1.0d0 - expk
             dmpk(3) = 1.0d0 - (1.0d0 + dampk)*expk
             dmpk(5) = 1.0d0 - (1.0d0 + dampk + dampk2/3.0d0)*expk
             dmpk(7) = 1.0d0 - (1.0d0 + dampk + 0.4d0*dampk2
@@ -351,7 +351,7 @@ c
          dampi4 = dampi2 * dampi2
          dampi5 = dampi2 * dampi3
          if (diff .lt. eps) then
-            dampk6 = dampk3 * dampk3
+            dampi6 = dampi3 * dampi3
             dmpik(1) = 1.0d0 - (1.0d0 + 0.5d0*dampi)*expi
             dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2)*expi
             dmpik(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
@@ -496,16 +496,13 @@ c     core-valence charge penetration damping for Gordon f2
 c
       else if (pentyp .eq. 'GORDON2') then
          dampi2 = dampi * dampi
-         dmpi(1) = 1.0d0 - dampi
          dmpi(3) = 1.0d0 - (1.0d0 + dampi)*expi
          dmpi(5) = 1.0d0 - (1.0d0 + dampi + dampi2/3.0d0)*expi
          if (diff .lt. eps) then
-            dmpk(1) = dmpi(1)
             dmpk(3) = dmpi(3)
             dmpk(5) = dmpi(5)
          else
             dampk2 = dampk * dampk
-            dmpk(1) = 1.0d0 - dampk
             dmpk(3) = 1.0d0 - (1.0d0 + dampk)*expk
             dmpk(5) = 1.0d0 - (1.0d0 + dampk + dampk2/3.0d0)*expk
          end if
@@ -513,7 +510,6 @@ c
 c     valence-valence charge penetration damping for Gordon f2
 c
          if (diff .lt. eps) then
-            dmpik(1) = 1.0d0 - (1.0d0 + 0.5d0*dampi)*expi
             dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2)*expi
             dmpik(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
      &                    + dampi3/6.0d0)*expi
@@ -522,7 +518,6 @@ c
             alphak2 = alphak * alphak
             termi = alphak2 / (alphak2-alphai2)
             termk = alphai2 / (alphai2-alphak2)
-            dmpik(1) = 1.0d0 - termi*expi - termk*expk
             dmpik(3) = 1.0d0 - termi*(1.0d0 + dampi)*expi
      &                    - termk*(1.0d0 + dampk)*expk
             dmpik(5) = 1.0d0 - termi*(1.0d0 + dampi + dampi2/3.0d0)*expi
@@ -758,7 +753,7 @@ c     core-valence charge penetration damping for Gordon f2
 c
       else if (pentyp .eq. 'GORDON2') then
          dampk2 = dampk * dampk
-         dmpk(1) = 1.0d0 - dampk
+         dmpk(1) = 1.0d0 - expk
          dmpk(3) = 1.0d0 - (1.0d0 + dampk)*expk
          dmpk(5) = 1.0d0 - (1.0d0 + dampk + dampk2/3.0d0)*expk
       end if

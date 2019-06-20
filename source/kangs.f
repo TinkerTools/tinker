@@ -63,7 +63,7 @@ c
       real*8 ang5(3,maxna5)
       real*8 ang4(3,maxna4)
       real*8 ang3(3,maxna3)
-      real*8 angp(3,maxnap)
+      real*8 angp(2,maxnap)
       real*8 angf(2,maxnaf)
       character*12 ka(maxna)
       character*12 ka5(maxna5)

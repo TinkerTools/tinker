@@ -82,7 +82,7 @@ c
       real*8 vd,cg,dp,ps
       real*8 fc,bd,dl,el
       real*8 pt,pel,pal
-      real*8 pol,thl
+      real*8 pol,thl,ddp
       real*8 ctrn,atrn
       real*8 iz,rp,ss,ts
       real*8 abc,cba
@@ -115,6 +115,7 @@ c
       na5 = 0
       na4 = 0
       na3 = 0
+      nap = 0
       naf = 0
       nsb = 0
       nu = 0
@@ -437,9 +438,8 @@ c
             fc = 0.0d0
             an1 = 0.0d0
             an2 = 0.0d0
-            an3 = 0.0d0
             string = record(next:240)
-            read (string,*,err=160,end=160)  ia,ib,ic,fc,an1,an2,an3
+            read (string,*,err=160,end=160)  ia,ib,ic,fc,an1,an2
   160       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -453,7 +453,6 @@ c
             aconp(nap) = fc
             angp(1,nap) = an1
             angp(2,nap) = an2
-            angp(3,nap) = an3
 c
 c     Fourier bond angle bending parameters
 c
@@ -1247,6 +1246,7 @@ c
             ia = 0
             pol = 0.0d0
             thl = 0.0d0
+            ddp = 0.0d0
             do i = 1, maxval
                pg(i) = 0
             end do
@@ -1257,10 +1257,18 @@ c
             call gettext (string,text,next)
             i = 1
             call getnumb (text,pg(1),i)
-            string = string(next:240)
             if (pg(1) .eq. 0) then
                read (text,*,err=490,end=490)  thl
-               read (string,*,err=490,end=490)  (pg(i),i=1,maxval)
+               call gettext (string,text,next)
+               i = 1
+               call getnumb (text,pg(1),i)
+               string = string(next:240)
+               if (pg(1) .eq. 0) then
+                  read (text,*,err=490,end=490)  ddp
+                  read (string,*,err=490,end=490)  (pg(i),i=1,maxval)
+               else
+                  read (string,*,err=490,end=490)  (pg(i),i=2,maxval)
+               end if
             else
                read (string,*,err=490,end=490)  (pg(i),i=2,maxval)
             end if
@@ -1268,6 +1276,7 @@ c
             if (ia .ne. 0) then
                polr(ia) = pol
                athl(ia) = thl
+               ddir(ia) = ddp
                do i = 1, maxval
                   pgrp(i,ia) = pg(i)
                end do

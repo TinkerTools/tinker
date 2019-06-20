@@ -210,12 +210,11 @@ c
             fc = 0.0d0
             an1 = 0.0d0
             an2 = 0.0d0
-            an3 = 0.0d0
             jen = 0
             string = record(next:240)
-            read (string,*,err=160,end=160)  ia,ib,ic,fc,an1,an2,an3
+            read (string,*,err=160,end=160)  ia,ib,ic,fc,an1,an2
   160       continue
-            if (an2.ne.0.0d0 .or. an3.ne.0.0d0)  jen = 1
+            if (an2 .ne. 0.0d0)  jen = 1
             if (.not. silent) then
                if (header) then
                   header = .false.
@@ -235,10 +234,6 @@ c
                   write (iout,200)  ia,ib,ic,fc,an2
   200             format (4x,3i4,3x,2f15.3,3x,'1-H''s')
                end if
-               if (an3 .ne. 0.0d0) then
-                  write (iout,210)  ia,ib,ic,fc,an3
-  210             format (4x,3i4,3x,2f15.3,3x,'2-H''s')
-               end if
             end if
             size = 4
             call numeral (ia,pa,size)
@@ -255,7 +250,6 @@ c
                   aconp(j) = fc
                   angp(1,j) = an1
                   angp(2,j) = an2
-                  angp(3,j) = an3
                   goto 230
                end if
             end do
@@ -379,9 +373,8 @@ c
          end if
       end do
       do i = 1, nap
-         if (angp(2,i).eq.0.0d0 .and. angp(3,i).eq.0.0d0) then
+         if (angp(2,i) .eq. 0.0d0) then
             angp(2,i) = angp(1,i)
-            angp(3,i) = angp(1,i)
          end if
       end do
 c

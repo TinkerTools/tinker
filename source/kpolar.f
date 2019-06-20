@@ -50,7 +50,7 @@ c
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
-      real*8 pol,thl
+      real*8 pol,thl,ddp
       real*8 sixth
       logical header
       character*1 digit
@@ -201,6 +201,7 @@ c
       if (allocated(ipolar))  deallocate (ipolar)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
+      if (allocated(dirdamp))  deallocate (dirdamp)
       if (allocated(pdamp))  deallocate (pdamp)
       if (allocated(udir))  deallocate (udir)
       if (allocated(udirp))  deallocate (udirp)
@@ -210,6 +211,7 @@ c
       allocate (ipolar(n))
       allocate (polarity(n))
       allocate (thole(n))
+      allocate (dirdamp(n))
       allocate (pdamp(n))
       allocate (udir(3,n))
       allocate (udirp(3,n))
@@ -271,6 +273,7 @@ c
             k = 0
             pol = 0.0d0
             thl = -1.0d0
+            ddp = -1.0d0
             do j = 1, maxval
                pg(j) = 0
             end do
@@ -280,10 +283,18 @@ c
             call gettext (record,text,next)
             j = 1
             call getnumb (text,pg(1),j)
-            string = record(next:240)
             if (pg(1) .eq. 0) then
                read (text,*,err=30,end=30)  thl
-               read (string,*,err=30,end=30)  (pg(j),j=1,maxval)
+               call gettext (record,text,next)
+               j = 1
+               call getnumb (text,pg(1),j)
+               string = record(next:240)
+               if (pg(1) .eq. 0) then
+                  read (text,*,err=30,end=30) ddp
+                  read (string,*,err=30,end=30)  (pg(j),j=1,maxval)
+               else
+                  read (string,*,err=30,end=30)  (pg(j),j=2,maxval)
+               end if
             else
                read (string,*,err=30,end=30)  (pg(j),j=2,maxval)
             end if
@@ -294,39 +305,49 @@ c
                   write (iout,40)
    40             format (/,' Additional Atomic Dipole',
      &                       ' Polarizability Parameters :')
-                  if (thl .ge. 0.0d0) then
+                  if (ddp .ge. 0.0d0) then
                      write (iout,50)
    50                format (/,5x,'Atom Type',11x,'Alpha',7x,
+     &                          'Thole',8x,'Damp',5x,
+     &                          'Group Atom Types',/)
+                  else if (thl .ge. 0.0d0) then
+                     write (iout,60)
+   60                format (/,5x,'Atom Type',11x,'Alpha',7x,
      &                          'Thole',5x,'Group Atom Types',/)
                   else
-                     write (iout,60)
-   60                format (/,5x,'Atom Type',11x,'Alpha',5x,
+                     write (iout,70)
+   70                format (/,5x,'Atom Type',11x,'Alpha',5x,
      &                          'Group Atom Types',/)
                   end if
                end if
                if (k .le. maxtyp) then
                   polr(k) = pol
                   athl(k) = max(0.0d0,thl)
+                  ddir(k) = max(0.0d0,ddp)
                   do j = 1, maxval
                      pgrp(j,k) = pg(j)
                      if (pg(j) .eq. 0) then
                         npg = j - 1
-                        goto 70
+                        goto 80
                      end if
                   end do
-   70             continue
+   80             continue
                   if (.not. silent) then
-                     if (thl .ge. 0.0d0) then
-                        write (iout,80)  k,pol,thl,(pg(j),j=1,npg)
-   80                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
+                     if (ddp .ge. 0.0d0) then
+                        write (iout,90)  k,pol,thl,ddp,(pg(j),j=1,npg)
+   90                   format (6x,i6,8x,f10.3,2x,f10.3,2x,f10.3,
+     &                             7x,20i5)
+                     else if (thl .ge. 0.0d0) then
+                        write (iout,100)  k,pol,thl,(pg(j),j=1,npg)
+  100                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
                      else
-                        write (iout,90)  k,pol,(pg(j),j=1,npg)
-   90                   format (6x,i6,8x,f10.3,7x,20i5)
+                        write (iout,110)  k,pol,(pg(j),j=1,npg)
+  110                   format (6x,i6,8x,f10.3,7x,20i5)
                      end if
                   end if
                else
-                  write (iout,100)
-  100             format (/,' KPOLAR  --  Too many Dipole',
+                  write (iout,120)
+  120             format (/,' KPOLAR  --  Too many Dipole',
      &                       ' Polarizability Parameters')
                   abort = .true.
                end if
@@ -339,6 +360,7 @@ c
       do i = 1, n
          polarity(i) = polr(type(i))
          thole(i) = athl(type(i))
+         dirdamp(i) = ddir(type(i))
       end do
 c
 c     process keywords containing atom specific polarizabilities
@@ -353,36 +375,45 @@ c
             k = 0
             pol = 0.0d0
             thl = -1.0d0
+            ddp = -1.0d0
             call getnumb (record,k,next)
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
                string = record(next:240)
-               read (string,*,err=110,end=110)  pol,thl
-  110          continue
+               read (string,*,err=130,end=130)  pol,thl,ddp
+  130          continue
                if (header) then
                   header = .false.
-                  write (iout,120)
-  120             format (/,' Additional Dipole Polarizabilities',
+                  write (iout,140)
+  140             format (/,' Additional Dipole Polarizabilities',
      &                       ' for Specific Atoms :')
-                  if (thl .ge. 0.0d0) then
-                     write (iout,130)
-  130                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
+                  if (ddp .ge. 0.0d0) then
+                     write (iout,150)
+  150                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',
+     &                          8x,'Damp',/)
+                  else if (thl .ge. 0.0d0) then
+                     write (iout,160)
+  160                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
                   else
-                     write (iout,140)
-  140                format (/,6x,'Atom',15x,'Alpha',/)
+                     write (iout,170)
+  170                format (/,6x,'Atom',15x,'Alpha',/)
                   end if
                end if
                if (.not. silent) then
-                  if (thl .ge. 0.0d0) then
-                     write (iout,150)  k,pol,thl
-  150                format (6x,i6,8x,f10.3,2x,f10.3)
+                  if (ddp .ge. 0.0d0) then
+                     write (iout,180)  k,pol,thl,ddp
+  180                format (6x,i6,8x,f10.3,2x,f10.3,2x,f10.3)
+                  else if (thl .ge. 0.0d0) then
+                     write (iout,190)  k,pol,thl
+  190                format (6x,i6,8x,f10.3,2x,f10.3)
                   else
-                     write (iout,160)  k,pol
-  160                format (6x,i6,8x,f10.3)
+                     write (iout,200)  k,pol
+  200                format (6x,i6,8x,f10.3)
                   end if
                end if
                polarity(k) = pol
                thole(k) = max(0.0d0,thl)
+               dirdamp(k) = max(0.0d0,ddp)
             end if
          end if
       end do
@@ -416,6 +447,7 @@ c
             end if
             polarity(npole) = polarity(i)
             thole(npole) = thole(i)
+            dirdamp(npole) = dirdamp(i)
          end if
       end do
 c
@@ -443,7 +475,22 @@ c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .ne. 0)  use_chgpen = .true.
       if (npolar .eq. 0)  use_polar = .false.
-      if (use_polar .and. ncp.eq.0)  use_thole = .true.
+      if (use_polar) then
+         do i = 1, npole
+            if (thole(i) .ne. 0.0d0) then
+               use_thole = .true.
+               goto 210
+            end if
+         end do
+  210    continue
+         do i = 1, npole
+            if (dirdamp(i) .ne. 0.0d0) then
+               use_dirdamp = .true.
+               goto 220
+            end if
+         end do
+  220    continue
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c

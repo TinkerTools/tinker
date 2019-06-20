@@ -1057,6 +1057,7 @@ c
 c     allow the user to select the polarization model
 c
       use_thole = .true.
+      use_dirdamp = .false.
       use_chgpen = .false.
       query = .true.
       answer = ' '
@@ -1087,6 +1088,7 @@ c     perform dynamic allocation of some global arrays
 c
       if (.not. allocated(polarity))  allocate (polarity(n))
       if (.not. allocated(thole))  allocate (thole(n))
+      if (.not. allocated(dirdamp))  allocate (dirdamp(n))
       if (.not. allocated(pdamp))  allocate (pdamp(n))
       if (.not. allocated(pcore))  allocate (pcore(n))
       if (.not. allocated(pval))  allocate (pval(n))
@@ -1097,6 +1099,7 @@ c
       do i = 1, n
          polarity(i) = 0.0d0
          thole(i) = 0.0d0
+         dirdamp(i) = 0.0d0
          pdamp(i) = 0.0d0
          pcore(i) = 0.0d0
          pval(i) = 0.0d0
@@ -2115,13 +2118,13 @@ c
                scale7 = 1.0d0
                if (damp .ne. 0.0d0) then
                   pgamma = min(pti,thole(kk))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     expdamp = exp(damp)
+                  damp = pgamma * (r/damp)**3
+                  if (damp .lt. 50.0d0) then
+                     expdamp = exp(-damp)
                      scale3 = 1.0d0 - expdamp
-                     scale5 = 1.0d0 - expdamp*(1.0d0-damp)
-                     scale7 = 1.0d0 - expdamp
-     &                           *(1.0d0-damp+0.6d0*damp**2)
+                     scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                     scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
                   end if
                end if
                rr3 = scale3 / (r*r2)
@@ -2461,11 +2464,11 @@ c
                damp = pdi * pdamp(kk)
                if (damp .ne. 0.0d0) then
                   pgamma = min(pti,thole(kk))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     expdamp = exp(damp)
+                  damp = pgamma * (r/damp)**3
+                  if (damp .lt. 50.0d0) then
+                     expdamp = exp(-damp)
                      scale3 = 1.0d0 - expdamp
-                     scale5 = 1.0d0 - (1.0d0-damp)*expdamp
+                     scale5 = 1.0d0 - expdamp*(1.0d0+damp)
                   end if
                end if
 c

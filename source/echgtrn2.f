@@ -23,6 +23,7 @@ c
       use chgpot
       use chgtrn
       use couple
+      use ctrpot
       use group
       use hessn
       use mplpot
@@ -42,9 +43,12 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
+      real*8 alphaik
       real*8 alphai2,alphak2
       real*8 expi,expk
+      real*8 expik
       real*8 taper,dtaper
       real*8 d2taper
       real*8 d2e(3,3)
@@ -131,12 +135,21 @@ c
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
                   if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                  alphak2 = alphak * alphak
-                  expi = exp(-alphai*r)
-                  expk = exp(-alphak*r)
-                  e = -chgi*expk - chgk*expi
-                  dedr = chgi*expk*alphak + chgk*expi*alphai
-                  d2edr2 = -chgi*expk*alphak2 - chgk*expi*alphai2
+                  if (ctrntyp .eq. 'SEPARATE') then
+                     alphak2 = alphak * alphak
+                     expi = exp(-alphai*r)
+                     expk = exp(-alphak*r)
+                     e = -chgi*expk - chgk*expi
+                     dedr = chgi*expk*alphak + chgk*expi*alphai
+                     d2edr2 = -chgi*expk*alphak2 - chgk*expi*alphai2
+                  else
+                     chgik = sqrt(abs(chgi*chgk))
+                     alphaik = 0.5d0 * (alphai+alphak)
+                     expik = exp(-alphaik*r)
+                     e = -chgik * expik
+                     dedr = -e * alphaik
+                     d2edr2 = -dedr * alphaik
+                  end if
                   e = f * e * mscale(k)
                   dedr = f * dedr * mscale(k)
                   d2edr2 = f * d2edr2 * mscale(k)
@@ -271,12 +284,22 @@ c
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
                         if (alphak .eq. 0.0d0)  alphak = 100.0d0
-                        alphak2 = alphak * alphak
-                        expi = exp(-alphai*r)
-                        expk = exp(-alphak*r)
-                        e = -chgi*expk - chgk*expi
-                        dedr = chgi*expk*alphak + chgk*expi*alphai
-                        d2edr2 = -chgi*expk*alphak2 - chgk*expi*alphai2
+                        if (ctrntyp .eq. 'SEPARATE') then
+                           alphak2 = alphak * alphak
+                           expi = exp(-alphai*r)
+                           expk = exp(-alphak*r)
+                           e = -chgi*expk - chgk*expi
+                           dedr = chgi*expk*alphak + chgk*expi*alphai
+                           d2edr2 = -chgi*expk*alphak2
+     &                                 - chgk*expi*alphai2
+                        else
+                           chgik = sqrt(abs(chgi*chgk))
+                           alphaik = 0.5d0 * (alphai+alphak)
+                           expik = exp(-alphaik*r)
+                           e = -chgik * expik
+                           dedr = -e * alphaik
+                           d2edr2 = -dedr * alphaik
+                        end if
                         e = f * e * mscale(k)
                         dedr = f * dedr * mscale(k)
                         d2edr2 = f * d2edr2 * mscale(k)

@@ -163,6 +163,7 @@ c
             end if
             polarity(npole) = polarity(i)
             thole(npole) = thole(i)
+            dirdamp(npole) = dirdamp(i)
             if (chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
                nct = nct + 1
             end if
@@ -180,7 +181,22 @@ c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .ne. 0)  use_chgpen = .true.
       if (npolar .eq. 0)  use_polar = .false.
-      if (use_polar .and. ncp.eq.0)  use_thole = .true.
+      if (use_polar) then
+         do i = 1, npole
+            if (thole(i) .ne. 0.0d0) then
+               use_thole = .true.
+               goto 80
+            end if
+         end do
+   80    continue
+         do i = 1, npole
+            if (dirdamp(i) .ne. 0.0d0) then
+               use_dirdamp = .true.
+               goto 90
+            end if
+         end do
+   90    continue
+      end if
       if (nct .eq. 0)  use_chgtrn = .false.
       return
       end

@@ -561,6 +561,7 @@ struct {
    int* ipolar;
    double* polarity;
    double* thole;
+   double* dirdamp;
    double* pdamp;
    double* udir;
    double* udirp;
@@ -1489,15 +1490,17 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
 }
 
 void set_polar_data_ (int* npolar, int* ipolar, double* polarity,
-                      double* thole, double* pdamp, double* udir,
-                      double* udirp, double* udirs, double* udirps,
-                      double* uind, double* uinp, double* uinds,
-                      double* uinps, double* uexact, int* douind) {
+                      double* thole, double* dirdamp, double* pdamp,
+                      double* udir,double* udirp, double* udirs,
+                      double* udirps,double* uind, double* uinp,
+                      double* uinds,double* uinps, double* uexact,
+                      int* douind) {
 
    polar__.npolar = *npolar;
    polar__.ipolar = ipolar;
    polar__.polarity = polarity;
    polar__.thole = thole;
+   polar__.dirdamp = dirdamp;
    polar__.pdamp = pdamp;
    polar__.udir = udir;
    polar__.udirp = udirp;

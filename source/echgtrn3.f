@@ -34,11 +34,11 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine echgtrn3a  --  double loop chg trans analysis  ##
-c     ##                                                            ##
-c     ################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine echgtrn3a  --  double loop chgtrn analysis  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "echgtrn3a" calculates the charge transfer interaction energy
@@ -77,6 +77,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
       real*8 expi,expk
       real*8 expik
@@ -174,8 +175,9 @@ c
                      expk = exp(-alphak*r)
                      e = -chgi*expk - chgk*expi
                   else
-                     expik = exp(sqrt(alphai*alphak)*r)
-                     e = -0.5d0 * (chgi+chgk) * expik
+                     chgik = sqrt(abs(chgi*chgk))
+                     expik = exp(-0.5d0*(alphai+alphak)*r)
+                     e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
 c
@@ -303,8 +305,9 @@ c
                            expk = exp(-alphak*r)
                            e = -chgi*expk - chgk*expi
                         else
-                           expik = exp(sqrt(alphai*alphak)*r)
-                           e = -0.5d0 * (chgi+chgk) * expik
+                           chgik = sqrt(abs(chgi*chgk))
+                           expik = exp(-0.5d0*(alphai+alphak)*r)
+                           e = -chgik * expik
                         end if
                         e = f * e * mscale(k)
 c
@@ -389,11 +392,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine echgtrn3b  --  method lights chg trans analysis  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine echgtrn3b  --  method lights chgtrn analysis  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "echgtrn3b" calculates the charge transfer interaction energy
@@ -435,6 +438,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
       real*8 expi,expk
       real*8 expik
@@ -591,8 +595,9 @@ c
                      expk = exp(-alphak*r)
                      e = -chgi*expk - chgk*expi
                   else
-                     expik = exp(sqrt(alphai*alphak)*r)
-                     e = -0.5d0 * (chgi+chgk) * expik
+                     chgik = sqrt(abs(chgi*chgk))
+                     expik = exp(-0.5d0*(alphai+alphak)*r)
+                     e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
 c
@@ -680,11 +685,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine echgtrn3c  --  neighbor list chg trans analysis  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine echgtrn3c  --  neighbor list chgtrn analysis  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "echgtrn3c" calculates the charge transfer interaction energy
@@ -723,6 +728,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
       real*8 expi,expk
       real*8 expik
@@ -831,8 +837,9 @@ c
                      expk = exp(-alphak*r)
                      e = -chgi*expk - chgk*expi
                   else
-                     expik = exp(sqrt(alphai*alphak)*r)
-                     e = -0.5d0 * (chgi+chgk) * expik
+                     chgik = sqrt(abs(chgi*chgk))
+                     expik = exp(-0.5d0*(alphai+alphak)*r)
+                     e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
 c

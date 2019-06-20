@@ -115,6 +115,9 @@ c
       do i = 1, maxna3
          ka3(i) = blank12
       end do
+      do i = 1, maxnap
+         kap(i) = blank12
+      end do
       do i = 1, maxnaf
          kaf(i) = blank12
       end do
@@ -206,6 +209,7 @@ c
       if (.not. allocated(cpalp))  allocate (cpalp(maxclass))
       if (.not. allocated(polr))  allocate (polr(maxtyp))
       if (.not. allocated(athl))  allocate (athl(maxtyp))
+      if (.not. allocated(ddir))  allocate (ddir(maxtyp))
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
       if (.not. allocated(ctchg))  allocate (ctchg(maxclass))
       if (.not. allocated(ctdmp))  allocate (ctdmp(maxclass))
@@ -231,6 +235,7 @@ c
          chg(i) = 0.0d0
          polr(i) = 0.0d0
          athl(i) = 0.0d0
+         ddir(i) = 0.0d0
          do j = 1, maxval
             pgrp(j,i) = 0
          end do
@@ -379,6 +384,7 @@ c
       w5scale = 1.0d0
       dpequal = .false.
       use_thole = .false.
+      use_dirdamp = .false.
 c
 c     set default control parameters for charge transfer terms
 c

@@ -16,6 +16,7 @@ c     npolar    total number of polarizable sites in the system
 c     ipolar    number of the multipole for each polarizable site
 c     polarity  dipole polarizability for each multipole site (Ang**3)
 c     thole     Thole polarizability damping value for each site
+c     dirdamp   direct polarization damping value for each site
 c     pdamp     value of polarizability scale factor for each site
 c     udir      direct induced dipole components at each multipole site
 c     udirp     direct induced dipoles in field used for energy terms
@@ -35,6 +36,7 @@ c
       integer, allocatable :: ipolar(:)
       real*8, allocatable :: polarity(:)
       real*8, allocatable :: thole(:)
+      real*8, allocatable :: dirdamp(:)
       real*8, allocatable :: pdamp(:)
       real*8, allocatable :: udir(:,:)
       real*8, allocatable :: udirp(:,:)

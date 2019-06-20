@@ -15,6 +15,7 @@ c
 c     pgrp   connected types in polarization group of each atom type
 c     polr   dipole polarizability parameters for each atom type
 c     athl   Thole polarizability damping value for each atom type
+c     ddir   direct polarization damping value for each atom type
 c
 c
       module kpolr
@@ -22,5 +23,6 @@ c
       integer, allocatable :: pgrp(:,:)
       real*8, allocatable :: polr(:)
       real*8, allocatable :: athl(:)
+      real*8, allocatable :: ddir(:)
       save
       end

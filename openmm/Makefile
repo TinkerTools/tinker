@@ -1382,7 +1382,7 @@ echgdpl2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o group.o h
 echgdpl3.o: action.o analyz.o atomid.o atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o group.o inform.o inter.o iounit.o molcul.o shunt.o units.o usage.o
 echgtrn.o: atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o energi.o group.o light.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o
 echgtrn1.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o deriv.o energi.o group.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o virial.o
-echgtrn2.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o group.o hessn.o mplpot.o mpole.o shunt.o usage.o
+echgtrn2.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o group.o hessn.o mplpot.o mpole.o shunt.o usage.o
 echgtrn3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o energi.o group.o inform.o inter.o iounit.o light.o limits.o molcul.o mplpot.o mpole.o neigh.o shunt.o usage.o
 edipole.o: atoms.o bound.o cell.o chgpot.o dipole.o energi.o group.o shunt.o units.o usage.o
 edipole1.o: atoms.o bound.o cell.o chgpot.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o

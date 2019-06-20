@@ -77,7 +77,8 @@ c
       integer ii,kk,jcell
       integer ix,iy,iz
       real*8 f,damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 sr3,sr5,sr7
@@ -250,6 +251,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -427,26 +429,55 @@ c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        sc3 = 1.0d0 - expdamp
-                        sc5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        sc7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
-                        temp3 = -damp * expdamp * rr5
-                        temp5 = -3.0d0 * damp / r2
-                        temp7 = -(1.0d0+3.0d0*damp) / r2
-                        rc3(1) = xr * temp3
-                        rc3(2) = yr * temp3
-                        rc3(3) = zr * temp3
-                        rc5(1) = rc3(1) * temp5
-                        rc5(2) = rc3(2) * temp5
-                        rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           sc3 = 1.0d0 - expdamp 
+                           sc5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                      +0.15d0*damp**2)
+                           temp3 = 0.5d0 * damp * expdamp 
+                           temp5 = 1.5d0 * (1.0d0+damp)
+                           temp7 = 5.0d0*(1.5d0*damp*expdamp
+     &                                *(0.35d0+0.35d0*damp
+     &                                   +0.15d0*damp**2))/(temp3*temp5)
+                           temp3 = temp3 * rr5
+                           temp5 = temp5 / r2
+                           temp7 = temp7 / r2
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           sc3 = 1.0d0 - expdamp
+                           sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                      +0.6d0*damp**2)
+                           temp3 = damp * expdamp * rr5
+                           temp5 = 3.0d0 * damp / r2
+                           temp7 = (-1.0d0+3.0d0*damp) / r2
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
                      end if
                   end if
                   sr3 = rr3 * sc3
@@ -804,6 +835,43 @@ c
                   frcx = 2.0d0*dscale(k)*depx
                   frcy = 2.0d0*dscale(k)*depy
                   frcz = 2.0d0*dscale(k)*depz
+               end if
+c
+c     reset Thole values when alternate direct damping is used
+c
+               if (use_dirdamp) then
+                  sc3 = 1.0d0
+                  sc5 = 1.0d0
+                  sc7 = 1.0d0
+                  do j = 1, 3
+                     rc3(j) = 0.0d0
+                     rc5(j) = 0.0d0
+                     rc7(j) = 0.0d0
+                  end do
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = pgamma * (r/damp)**3
+                     if (damp .lt. 50.0d0) then
+                        expdamp = exp(-damp)
+                        sc3 = 1.0d0 - expdamp
+                        sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
+                        temp3 = damp * expdamp * rr5
+                        temp5 = 3.0d0 * damp / r2
+                        temp7 = (-1.0d0+3.0d0*damp) / r2
+                        rc3(1) = xr * temp3
+                        rc3(2) = yr * temp3
+                        rc3(3) = zr * temp3
+                        rc5(1) = rc3(1) * temp5
+                        rc5(2) = rc3(2) * temp5
+                        rc5(3) = rc3(3) * temp5
+                        rc7(1) = rc5(1) * temp7
+                        rc7(2) = rc5(2) * temp7
+                        rc7(3) = rc5(3) * temp7
+                     end if
+                  end if
                end if
 c
 c     get the dtau/dr terms used for mutual polarization force
@@ -1240,6 +1308,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -1423,26 +1492,55 @@ c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        sc3 = 1.0d0 - expdamp
-                        sc5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        sc7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
-                        temp3 = -damp * expdamp * rr5
-                        temp5 = -3.0d0 * damp / r2
-                        temp7 = -(1.0d0+3.0d0*damp) / r2
-                        rc3(1) = xr * temp3
-                        rc3(2) = yr * temp3
-                        rc3(3) = zr * temp3
-                        rc5(1) = rc3(1) * temp5
-                        rc5(2) = rc3(2) * temp5
-                        rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           sc3 = 1.0d0 - expdamp 
+                           sc5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                      +0.15d0*damp**2)
+                           temp3 = 0.5d0 * damp * expdamp 
+                           temp5 = 1.5d0 * (1.0d0+damp)
+                           temp7 = 5.0d0*(1.5d0*damp*expdamp
+     &                                *(0.35d0+0.35d0*damp
+     &                                   +0.15d0*damp**2))/(temp3*temp5)
+                           temp3 = temp3 * rr5
+                           temp5 = temp5 / r2
+                           temp7 = temp7 / r2
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           sc3 = 1.0d0 - expdamp
+                           sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                      +0.6d0*damp**2)
+                           temp3 = damp * expdamp * rr5
+                           temp5 = 3.0d0 * damp / r2
+                           temp7 = (-1.0d0+3.0d0*damp) / r2
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
                      end if
                   end if
                   sr3 = rr3 * sc3
@@ -1800,6 +1898,43 @@ c
                   frcx = 2.0d0*dscale(k)*depx
                   frcy = 2.0d0*dscale(k)*depy
                   frcz = 2.0d0*dscale(k)*depz
+               end if
+c
+c     reset Thole values when alternate direct damping is used
+c
+               if (use_dirdamp) then
+                  sc3 = 1.0d0
+                  sc5 = 1.0d0
+                  sc7 = 1.0d0
+                  do j = 1, 3
+                     rc3(j) = 0.0d0
+                     rc5(j) = 0.0d0
+                     rc7(j) = 0.0d0
+                  end do
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = pgamma * (r/damp)**3
+                     if (damp .lt. 50.0d0) then
+                        expdamp = exp(-damp)
+                        sc3 = 1.0d0 - expdamp
+                        sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
+                        temp3 = damp * expdamp * rr5
+                        temp5 = 3.0d0 * damp / r2
+                        temp7 = (-1.0d0+3.0d0*damp) / r2
+                        rc3(1) = xr * temp3
+                        rc3(2) = yr * temp3
+                        rc3(3) = zr * temp3
+                        rc5(1) = rc3(1) * temp5
+                        rc5(2) = rc3(2) * temp5
+                        rc5(3) = rc3(3) * temp5
+                        rc7(1) = rc5(1) * temp7
+                        rc7(2) = rc5(2) * temp7
+                        rc7(3) = rc5(3) * temp7
+                     end if
+                  end if
                end if
 c
 c     get the dtau/dr terms used for mutual polarization force
@@ -2317,7 +2452,8 @@ c
       integer ii,kk,kkk
       integer ix,iy,iz
       real*8 f,damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 sr3,sr5,sr7
@@ -2453,13 +2589,13 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,pdamp,thole,pcore,pval,palpha,n12,i12,n13,i13,n14,i14,
-!$OMP& n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,p3scale,
-!$OMP& p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,d1scale,
-!$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
+!$OMP& uinp,pdamp,thole,dirdamp,pcore,pval,palpha,n12,i12,n13,i13,n14,
+!$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
+!$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
+!$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_chgpen,use_bounds,off2,f,molcule,optorder,copm,uopt,uoptp,
-!$OMP& poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
+!$OMP& use_dirdamp,use_chgpen,use_bounds,off2,f,molcule,optorder,copm,
+!$OMP& uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
 !$OMP DO reduction(+:dep,ufld,dufld,vir) schedule(guided)
@@ -2504,6 +2640,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -2682,26 +2819,55 @@ c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        sc3 = 1.0d0 - expdamp
-                        sc5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        sc7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
-                        temp3 = -damp * expdamp * rr5
-                        temp5 = -3.0d0 * damp / r2
-                        temp7 = -(1.0d0+3.0d0*damp) / r2
-                        rc3(1) = xr * temp3
-                        rc3(2) = yr * temp3
-                        rc3(3) = zr * temp3
-                        rc5(1) = rc3(1) * temp5
-                        rc5(2) = rc3(2) * temp5
-                        rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           sc3 = 1.0d0 - expdamp 
+                           sc5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                      +0.15d0*damp**2)
+                           temp3 = 0.5d0 * damp * expdamp 
+                           temp5 = 1.5d0 * (1.0d0+damp)
+                           temp7 = 5.0d0*(1.5d0*damp*expdamp
+     &                                *(0.35d0+0.35d0*damp
+     &                                   +0.15d0*damp**2))/(temp3*temp5)
+                           temp3 = temp3 * rr5
+                           temp5 = temp5 / r2
+                           temp7 = temp7 / r2
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           sc3 = 1.0d0 - expdamp
+                           sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                      +0.6d0*damp**2)
+                           temp3 = damp * expdamp * rr5
+                           temp5 = 3.0d0 * damp / r2
+                           temp7 = (-1.0d0+3.0d0*damp) / r2
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
                      end if
                   end if
                   sr3 = rr3 * sc3
@@ -3059,6 +3225,43 @@ c
                   frcx = 2.0d0*dscale(k)*depx
                   frcy = 2.0d0*dscale(k)*depy
                   frcz = 2.0d0*dscale(k)*depz
+               end if
+c
+c     reset Thole values when alternate direct damping is used
+c
+               if (use_dirdamp) then
+                  sc3 = 1.0d0
+                  sc5 = 1.0d0
+                  sc7 = 1.0d0
+                  do j = 1, 3
+                     rc3(j) = 0.0d0
+                     rc5(j) = 0.0d0
+                     rc7(j) = 0.0d0
+                  end do
+                  damp = pdi * pdamp(k)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = pgamma * (r/damp)**3
+                     if (damp .lt. 50.0d0) then
+                        expdamp = exp(-damp)
+                        sc3 = 1.0d0 - expdamp
+                        sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
+                        temp3 = damp * expdamp * rr5
+                        temp5 = 3.0d0 * damp / r2
+                        temp7 = (-1.0d0+3.0d0*damp) / r2
+                        rc3(1) = xr * temp3
+                        rc3(2) = yr * temp3
+                        rc3(3) = zr * temp3
+                        rc5(1) = rc3(1) * temp5
+                        rc5(2) = rc3(2) * temp5
+                        rc5(3) = rc3(3) * temp5
+                        rc7(1) = rc5(1) * temp7
+                        rc7(2) = rc5(2) * temp7
+                        rc7(3) = rc5(3) * temp7
+                     end if
+                  end if
                end if
 c
 c     get the dtau/dr terms used for mutual polarization force
@@ -3804,7 +4007,8 @@ c
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 psc3,psc5,psc7
@@ -3960,6 +4164,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -4154,54 +4359,78 @@ c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        sc3 = 1.0d0 - expdamp
-                        sc5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        sc7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
-                        temp3 = -3.0d0 * damp * expdamp / r2
-                        temp5 = -damp
-                        temp7 = -0.2d0 - 0.6d0*damp
-                        rc3(1) = xr * temp3
-                        rc3(2) = yr * temp3
-                        rc3(3) = zr * temp3
-                        rc5(1) = rc3(1) * temp5
-                        rc5(2) = rc3(2) * temp5
-                        rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           sc3 = 1.0d0 - expdamp 
+                           sc5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                      +0.15d0*damp**2)
+                           temp3 = 1.5d0 * damp * expdamp / r2
+                           temp5 = 0.5d0 * (1.0d0+damp)
+                           temp7 = 0.7d0 + 0.15d0*damp**2/temp5
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           sc3 = 1.0d0 - expdamp
+                           sc5 = 1.0d0 - (1.0d0+damp)*expdamp
+                           sc7 = 1.0d0 - (1.0d0+damp+0.6d0*damp**2)
+     &                                          *expdamp
+                           temp3 = 3.0d0 * damp * expdamp / r2
+                           temp5 = damp
+                           temp7 = -0.2d0 + 0.6d0*damp
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
                      end if
+                     psc3 = 1.0d0 - sc3*pscale(k)
+                     psc5 = 1.0d0 - sc5*pscale(k)
+                     psc7 = 1.0d0 - sc7*pscale(k)
+                     dsc3 = 1.0d0 - sc3*dscale(k)
+                     dsc5 = 1.0d0 - sc5*dscale(k)
+                     dsc7 = 1.0d0 - sc7*dscale(k)
+                     usc3 = 1.0d0 - sc3*uscale(k)
+                     usc5 = 1.0d0 - sc5*uscale(k)
+                     psr3 = bn(1) - psc3*rr3
+                     psr5 = bn(2) - psc5*rr5
+                     psr7 = bn(3) - psc7*rr7
+                     dsr3 = bn(1) - dsc3*rr3
+                     dsr5 = bn(2) - dsc5*rr5
+                     dsr7 = bn(3) - dsc7*rr7
+                     usr3 = bn(1) - usc3*rr3
+                     usr5 = bn(2) - usc5*rr5
+                     do j = 1, 3
+                        prc3(j) = rc3(j) * pscale(k)
+                        prc5(j) = rc5(j) * pscale(k)
+                        prc7(j) = rc7(j) * pscale(k)
+                        drc3(j) = rc3(j) * dscale(k)
+                        drc5(j) = rc5(j) * dscale(k)
+                        drc7(j) = rc7(j) * dscale(k)
+                        urc3(j) = rc3(j) * uscale(k)
+                        urc5(j) = rc5(j) * uscale(k)
+                     end do
                   end if
-                  psc3 = 1.0d0 - sc3*pscale(k)
-                  psc5 = 1.0d0 - sc5*pscale(k)
-                  psc7 = 1.0d0 - sc7*pscale(k)
-                  dsc3 = 1.0d0 - sc3*dscale(k)
-                  dsc5 = 1.0d0 - sc5*dscale(k)
-                  dsc7 = 1.0d0 - sc7*dscale(k)
-                  usc3 = 1.0d0 - sc3*uscale(k)
-                  usc5 = 1.0d0 - sc5*uscale(k)
-                  psr3 = bn(1) - psc3*rr3
-                  psr5 = bn(2) - psc5*rr5
-                  psr7 = bn(3) - psc7*rr7
-                  dsr3 = bn(1) - dsc3*rr3
-                  dsr5 = bn(2) - dsc5*rr5
-                  dsr7 = bn(3) - dsc7*rr7
-                  usr3 = bn(1) - usc3*rr3
-                  usr5 = bn(2) - usc5*rr5
-                  do j = 1, 3
-                     prc3(j) = rc3(j) * pscale(k)
-                     prc5(j) = rc5(j) * pscale(k)
-                     prc7(j) = rc7(j) * pscale(k)
-                     drc3(j) = rc3(j) * dscale(k)
-                     drc5(j) = rc5(j) * dscale(k)
-                     drc7(j) = rc7(j) * dscale(k)
-                     urc3(j) = rc3(j) * uscale(k)
-                     urc5(j) = rc5(j) * uscale(k)
-                  end do
 c
 c     apply charge penetration damping to scale factors
 c
@@ -4611,6 +4840,51 @@ c
                   frcx = -2.0d0 * depx
                   frcy = -2.0d0 * depy
                   frcz = -2.0d0 * depz
+               end if
+c
+c     reset Thole values when alternate direct damping is used
+c
+               if (use_dirdamp) then
+                  sc3 = 1.0d0
+                  sc5 = 1.0d0
+                  sc7 = 1.0d0
+                  do j = 1, 3
+                     rc3(j) = 0.0d0
+                     rc5(j) = 0.0d0
+                     rc7(j) = 0.0d0
+                  end do
+                  damp = pdi * pdamp(kk)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = pgamma * (r/damp)**3
+                     if (damp .lt. 50.0d0) then
+                        expdamp = exp(-damp)
+                        sc3 = 1.0d0 - expdamp
+                        sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
+                        temp3 = 3.0d0 * damp * expdamp / r2
+                        temp5 = damp
+                        temp7 = -0.2d0 + 0.6d0*damp
+                        rc3(1) = xr * temp3
+                        rc3(2) = yr * temp3
+                        rc3(3) = zr * temp3
+                        rc5(1) = rc3(1) * temp5
+                        rc5(2) = rc3(2) * temp5
+                        rc5(3) = rc3(3) * temp5
+                        rc7(1) = rc5(1) * temp7
+                        rc7(2) = rc5(2) * temp7
+                        rc7(3) = rc5(3) * temp7
+                     end if
+                  end if
+                  usc3 = 1.0d0 - sc3*uscale(kk)
+                  usc5 = 1.0d0 - sc5*uscale(kk)
+                  usr3 = bn(1) - usc3*rr3
+                  usr5 = bn(2) - usc5*rr5
+                  do j = 1, 3
+                     urc3(j) = rc3(j) * uscale(kk)
+                     urc5(j) = rc5(j) * uscale(kk)
+                  end do
                end if
 c
 c     get the dtau/dr terms used for mutual polarization force
@@ -5059,6 +5333,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -5259,54 +5534,78 @@ c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        sc3 = 1.0d0 - expdamp
-                        sc5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        sc7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
-                        temp3 = -3.0d0 * damp * expdamp / r2
-                        temp5 = -damp
-                        temp7 = -0.2d0 - 0.6d0*damp
-                        rc3(1) = xr * temp3
-                        rc3(2) = yr * temp3
-                        rc3(3) = zr * temp3
-                        rc5(1) = rc3(1) * temp5
-                        rc5(2) = rc3(2) * temp5
-                        rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           sc3 = 1.0d0 - expdamp 
+                           sc5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                      +0.15d0*damp**2)
+                           temp3 = 1.5d0 * damp * expdamp / r2
+                           temp5 = 0.5d0 * (1.0d0+damp)
+                           temp7 = 0.7d0 + 0.15d0*damp**2/temp5
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           sc3 = 1.0d0 - expdamp
+                           sc5 = 1.0d0 - (1.0d0+damp)*expdamp
+                           sc7 = 1.0d0 - (1.0d0+damp+0.6d0*damp**2)
+     &                                          *expdamp
+                           temp3 = 3.0d0 * damp * expdamp / r2
+                           temp5 = damp
+                           temp7 = -0.2d0 + 0.6d0*damp
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
                      end if
+                     psc3 = 1.0d0 - sc3*pscale(k)
+                     psc5 = 1.0d0 - sc5*pscale(k)
+                     psc7 = 1.0d0 - sc7*pscale(k)
+                     dsc3 = 1.0d0 - sc3*dscale(k)
+                     dsc5 = 1.0d0 - sc5*dscale(k)
+                     dsc7 = 1.0d0 - sc7*dscale(k)
+                     usc3 = 1.0d0 - sc3*uscale(k)
+                     usc5 = 1.0d0 - sc5*uscale(k)
+                     psr3 = bn(1) - psc3*rr3
+                     psr5 = bn(2) - psc5*rr5
+                     psr7 = bn(3) - psc7*rr7
+                     dsr3 = bn(1) - dsc3*rr3
+                     dsr5 = bn(2) - dsc5*rr5
+                     dsr7 = bn(3) - dsc7*rr7
+                     usr3 = bn(1) - usc3*rr3
+                     usr5 = bn(2) - usc5*rr5
+                     do j = 1, 3
+                        prc3(j) = rc3(j) * pscale(k)
+                        prc5(j) = rc5(j) * pscale(k)
+                        prc7(j) = rc7(j) * pscale(k)
+                        drc3(j) = rc3(j) * dscale(k)
+                        drc5(j) = rc5(j) * dscale(k)
+                        drc7(j) = rc7(j) * dscale(k)
+                        urc3(j) = rc3(j) * uscale(k)
+                        urc5(j) = rc5(j) * uscale(k)
+                     end do
                   end if
-                  psc3 = 1.0d0 - sc3*pscale(k)
-                  psc5 = 1.0d0 - sc5*pscale(k)
-                  psc7 = 1.0d0 - sc7*pscale(k)
-                  dsc3 = 1.0d0 - sc3*dscale(k)
-                  dsc5 = 1.0d0 - sc5*dscale(k)
-                  dsc7 = 1.0d0 - sc7*dscale(k)
-                  usc3 = 1.0d0 - sc3*uscale(k)
-                  usc5 = 1.0d0 - sc5*uscale(k)
-                  psr3 = bn(1) - psc3*rr3
-                  psr5 = bn(2) - psc5*rr5
-                  psr7 = bn(3) - psc7*rr7
-                  dsr3 = bn(1) - dsc3*rr3
-                  dsr5 = bn(2) - dsc5*rr5
-                  dsr7 = bn(3) - dsc7*rr7
-                  usr3 = bn(1) - usc3*rr3
-                  usr5 = bn(2) - usc5*rr5
-                  do j = 1, 3
-                     prc3(j) = rc3(j) * pscale(k)
-                     prc5(j) = rc5(j) * pscale(k)
-                     prc7(j) = rc7(j) * pscale(k)
-                     drc3(j) = rc3(j) * dscale(k)
-                     drc5(j) = rc5(j) * dscale(k)
-                     drc7(j) = rc7(j) * dscale(k)
-                     urc3(j) = rc3(j) * uscale(k)
-                     urc5(j) = rc5(j) * uscale(k)
-                  end do
 c
 c     apply charge penetration damping to scale factors
 c
@@ -5716,6 +6015,51 @@ c
                   frcx = -2.0d0 * depx
                   frcy = -2.0d0 * depy
                   frcz = -2.0d0 * depz
+               end if
+c
+c     reset Thole values when alternate direct damping is used
+c
+               if (use_dirdamp) then
+                  sc3 = 1.0d0
+                  sc5 = 1.0d0
+                  sc7 = 1.0d0
+                  do j = 1, 3
+                     rc3(j) = 0.0d0
+                     rc5(j) = 0.0d0
+                     rc7(j) = 0.0d0
+                  end do
+                  damp = pdi * pdamp(kk)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = pgamma * (r/damp)**3
+                     if (damp .lt. 50.0d0) then
+                        expdamp = exp(-damp)
+                        sc3 = 1.0d0 - expdamp
+                        sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
+                        temp3 = 3.0d0 * damp * expdamp / r2
+                        temp5 = damp
+                        temp7 = -0.2d0 + 0.6d0*damp
+                        rc3(1) = xr * temp3
+                        rc3(2) = yr * temp3
+                        rc3(3) = zr * temp3
+                        rc5(1) = rc3(1) * temp5
+                        rc5(2) = rc3(2) * temp5
+                        rc5(3) = rc3(3) * temp5
+                        rc7(1) = rc5(1) * temp7
+                        rc7(2) = rc5(2) * temp7
+                        rc7(3) = rc5(3) * temp7
+                     end if
+                  end if
+                  usc3 = 1.0d0 - sc3*uscale(kk)
+                  usc5 = 1.0d0 - sc5*uscale(kk)
+                  usr3 = bn(1) - usc3*rr3
+                  usr5 = bn(2) - usc5*rr5
+                  do j = 1, 3
+                     urc3(j) = rc3(j) * uscale(kk)
+                     urc5(j) = rc5(j) * uscale(kk)
+                  end do
                end if
 c
 c     get the dtau/dr terms used for mutual polarization force
@@ -6479,7 +6823,8 @@ c
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
       real*8 damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 psc3,psc5,psc7
@@ -6598,10 +6943,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,pdamp,thole,pcore,pval,palpha,n12,i12,n13,i13,n14,i14,
-!$OMP& n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,p3scale,
-!$OMP& p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,d1scale,
-!$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
+!$OMP& uinp,pdamp,thole,dirdamp,pcore,pval,palpha,n12,i12,n13,i13,n14,
+!$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
+!$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
+!$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
 !$OMP& use_chgpen,use_bounds,off2,f,aewald,optorder,copm,uopt,uoptp,
 !$OMP& poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
@@ -6649,6 +6994,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -6844,54 +7190,78 @@ c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        sc3 = 1.0d0 - expdamp
-                        sc5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        sc7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
-                        temp3 = -3.0d0 * damp * expdamp / r2
-                        temp5 = -damp
-                        temp7 = -0.2d0 - 0.6d0*damp
-                        rc3(1) = xr * temp3
-                        rc3(2) = yr * temp3
-                        rc3(3) = zr * temp3
-                        rc5(1) = rc3(1) * temp5
-                        rc5(2) = rc3(2) * temp5
-                        rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           sc3 = 1.0d0 - expdamp 
+                           sc5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                      +0.15d0*damp**2)
+                           temp3 = 1.5d0 * damp * expdamp / r2
+                           temp5 = 0.5d0 * (1.0d0+damp)
+                           temp7 = 0.7d0 + 0.15d0*damp**2/temp5
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           sc3 = 1.0d0 - expdamp
+                           sc5 = 1.0d0 - (1.0d0+damp)*expdamp
+                           sc7 = 1.0d0 - (1.0d0+damp+0.6d0*damp**2)
+     &                                          *expdamp
+                           temp3 = 3.0d0 * damp * expdamp / r2
+                           temp5 = damp
+                           temp7 = -0.2d0 + 0.6d0*damp
+                           rc3(1) = xr * temp3
+                           rc3(2) = yr * temp3
+                           rc3(3) = zr * temp3
+                           rc5(1) = rc3(1) * temp5
+                           rc5(2) = rc3(2) * temp5
+                           rc5(3) = rc3(3) * temp5
+                           rc7(1) = rc5(1) * temp7
+                           rc7(2) = rc5(2) * temp7
+                           rc7(3) = rc5(3) * temp7
+                        end if
                      end if
+                     psc3 = 1.0d0 - sc3*pscale(k)
+                     psc5 = 1.0d0 - sc5*pscale(k)
+                     psc7 = 1.0d0 - sc7*pscale(k)
+                     dsc3 = 1.0d0 - sc3*dscale(k)
+                     dsc5 = 1.0d0 - sc5*dscale(k)
+                     dsc7 = 1.0d0 - sc7*dscale(k)
+                     usc3 = 1.0d0 - sc3*uscale(k)
+                     usc5 = 1.0d0 - sc5*uscale(k)
+                     psr3 = bn(1) - psc3*rr3
+                     psr5 = bn(2) - psc5*rr5
+                     psr7 = bn(3) - psc7*rr7
+                     dsr3 = bn(1) - dsc3*rr3
+                     dsr5 = bn(2) - dsc5*rr5
+                     dsr7 = bn(3) - dsc7*rr7
+                     usr3 = bn(1) - usc3*rr3
+                     usr5 = bn(2) - usc5*rr5
+                     do j = 1, 3
+                        prc3(j) = rc3(j) * pscale(k)
+                        prc5(j) = rc5(j) * pscale(k)
+                        prc7(j) = rc7(j) * pscale(k)
+                        drc3(j) = rc3(j) * dscale(k)
+                        drc5(j) = rc5(j) * dscale(k)
+                        drc7(j) = rc7(j) * dscale(k)
+                        urc3(j) = rc3(j) * uscale(k)
+                        urc5(j) = rc5(j) * uscale(k)
+                     end do
                   end if
-                  psc3 = 1.0d0 - sc3*pscale(k)
-                  psc5 = 1.0d0 - sc5*pscale(k)
-                  psc7 = 1.0d0 - sc7*pscale(k)
-                  dsc3 = 1.0d0 - sc3*dscale(k)
-                  dsc5 = 1.0d0 - sc5*dscale(k)
-                  dsc7 = 1.0d0 - sc7*dscale(k)
-                  usc3 = 1.0d0 - sc3*uscale(k)
-                  usc5 = 1.0d0 - sc5*uscale(k)
-                  psr3 = bn(1) - psc3*rr3
-                  psr5 = bn(2) - psc5*rr5
-                  psr7 = bn(3) - psc7*rr7
-                  dsr3 = bn(1) - dsc3*rr3
-                  dsr5 = bn(2) - dsc5*rr5
-                  dsr7 = bn(3) - dsc7*rr7
-                  usr3 = bn(1) - usc3*rr3
-                  usr5 = bn(2) - usc5*rr5
-                  do j = 1, 3
-                     prc3(j) = rc3(j) * pscale(k)
-                     prc5(j) = rc5(j) * pscale(k)
-                     prc7(j) = rc7(j) * pscale(k)
-                     drc3(j) = rc3(j) * dscale(k)
-                     drc5(j) = rc5(j) * dscale(k)
-                     drc7(j) = rc7(j) * dscale(k)
-                     urc3(j) = rc3(j) * uscale(k)
-                     urc5(j) = rc5(j) * uscale(k)
-                  end do
 c
 c     apply charge penetration damping to scale factors
 c
@@ -7301,6 +7671,51 @@ c
                   frcx = -2.0d0 * depx
                   frcy = -2.0d0 * depy
                   frcz = -2.0d0 * depz
+               end if
+c
+c     reset Thole values when alternate direct damping is used
+c
+               if (use_dirdamp) then
+                  sc3 = 1.0d0
+                  sc5 = 1.0d0
+                  sc7 = 1.0d0
+                  do j = 1, 3
+                     rc3(j) = 0.0d0
+                     rc5(j) = 0.0d0
+                     rc7(j) = 0.0d0
+                  end do
+                  damp = pdi * pdamp(kk)
+                  if (damp .ne. 0.0d0) then
+                     pgamma = min(pti,thole(kk))
+                     damp = pgamma * (r/damp)**3
+                     if (damp .lt. 50.0d0) then
+                        expdamp = exp(-damp)
+                        sc3 = 1.0d0 - expdamp
+                        sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                   +0.6d0*damp**2)
+                        temp3 = 3.0d0 * damp * expdamp / r2
+                        temp5 = damp
+                        temp7 = -0.2d0 + 0.6d0*damp
+                        rc3(1) = xr * temp3
+                        rc3(2) = yr * temp3
+                        rc3(3) = zr * temp3
+                        rc5(1) = rc3(1) * temp5
+                        rc5(2) = rc3(2) * temp5
+                        rc5(3) = rc3(3) * temp5
+                        rc7(1) = rc5(1) * temp7
+                        rc7(2) = rc5(2) * temp7
+                        rc7(3) = rc5(3) * temp7
+                     end if
+                  end if
+                  usc3 = 1.0d0 - sc3*uscale(kk)
+                  usc5 = 1.0d0 - sc5*uscale(kk)
+                  usr3 = bn(1) - usc3*rr3
+                  usr5 = bn(2) - usc5*rr5
+                  do j = 1, 3
+                     urc3(j) = rc3(j) * uscale(kk)
+                     urc5(j) = rc5(j) * uscale(kk)
+                  end do
                end if
 c
 c     get the dtau/dr terms used for mutual polarization force

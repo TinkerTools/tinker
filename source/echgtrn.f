@@ -68,6 +68,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
       real*8 expi,expk
       real*8 expik
@@ -149,8 +150,9 @@ c
                      expk = exp(-alphak*r)
                      e = -chgi*expk - chgk*expi
                   else
-                     expik = exp(sqrt(alphai*alphak)*r)
-                     e = -0.5d0 * (chgi+chgk) * expik
+                     chgik = sqrt(abs(chgi*chgk))
+                     expik = exp(-0.5d0*(alphai+alphak)*r)
+                     e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
 c
@@ -249,8 +251,9 @@ c
                            expk = exp(-alphak*r)
                            e = -chgi*expk - chgk*expi
                         else
-                           expik = exp(sqrt(alphai*alphak)*r)
-                           e = -0.5d0 * (chgi+chgk) * expik
+                           chgik = sqrt(abs(chgi*chgk))
+                           expik = exp(-0.5d0*(alphai+alphak)*r)
+                           e = -chgik * expik
                         end if
                         e = f * e * mscale(k)
 c
@@ -340,6 +343,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
       real*8 expi,expk
       real*8 expik
@@ -480,8 +484,9 @@ c
                      expk = exp(-alphak*r)
                      e = -chgi*expk - chgk*expi
                   else
-                     expik = exp(sqrt(alphai*alphak)*r)
-                     e = -0.5d0 * (chgi+chgk) * expik
+                     chgik = sqrt(abs(chgi*chgk))
+                     expik = exp(-0.5d0*(alphai+alphak)*r)
+                     e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
 c
@@ -574,6 +579,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 chgi,chgk
+      real*8 chgik
       real*8 alphai,alphak
       real*8 expi,expk
       real*8 expik
@@ -665,8 +671,9 @@ c
                      expk = exp(-alphak*r)
                      e = -chgi*expk - chgk*expi
                   else
-                     expik = exp(sqrt(alphai*alphak)*r)
-                     e = -0.5d0 * (chgi+chgk) * expik
+                     chgik = sqrt(abs(chgi*chgk))
+                     expik = exp(-0.5d0*(alphai+alphak)*r)
+                     e = -chgik * expik
                   end if
                   e = f * e * mscale(kk)
 c

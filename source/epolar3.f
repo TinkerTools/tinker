@@ -83,7 +83,8 @@ c
       integer i,j,k
       integer ii,kk,jcell
       real*8 e,f,damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 xi,yi,zi
@@ -187,6 +188,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -323,14 +325,26 @@ c
                   scale7 = 1.0d0
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           scale3 = 1.0d0 - expdamp 
+                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                         +0.15d0*damp**2)
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           scale3 = 1.0d0 - expdamp
+                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                         +0.6d0*damp**2)
+                        end if
                      end if
                   end if
                   scalek = pscale(k)
@@ -477,6 +491,7 @@ c
             if (use_thole) then
                pdi = pdamp(ii)
                pti = thole(ii)
+               ddi = dirdamp(ii)
             else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
@@ -618,14 +633,28 @@ c
                         scale7 = 1.0d0
                         damp = pdi * pdamp(kk)
                         if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(kk))
-                           damp = -pgamma * (r/damp)**3
-                           if (damp .gt. -50.0d0) then
-                              expdamp = exp(damp)
-                              scale3 = 1.0d0 - expdamp
-                              scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                              scale7 = 1.0d0 - (1.0d0-damp
-     &                                    +0.6d0*damp**2)*expdamp
+                           if (use_dirdamp) then
+                              pgamma = min(ddi,dirdamp(kk))
+                              damp = pgamma * (r/damp)**(1.5d0)
+                              if (damp .lt. 50.0d0) then
+                                 expdamp = exp(-damp) 
+                                 scale3 = 1.0d0 - expdamp 
+                                 scale5 = 1.0d0 - expdamp
+     &                                               *(1.0d0+0.5d0*damp)
+                                 scale7 = 1.0d0 - expdamp
+     &                                               *(1.0d0+0.65d0*damp
+     &                                                  +0.15d0*damp**2)
+                              end if
+                           else
+                              pgamma = min(pti,thole(kk))
+                              damp = pgamma * (r/damp)**3
+                              if (damp .lt. 50.0d0) then
+                                 expdamp = exp(-damp)
+                                 scale3 = 1.0d0 - expdamp
+                                 scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                                 scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                               +0.6d0*damp**2)
+                              end if
                            end if
                         end if
                         scalek = pscale(k)
@@ -790,7 +819,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       real*8 e,f,damp,expdamp
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 xi,yi,zi
@@ -874,12 +904,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,rpole,x,y,z,pdamp,thole,pcore,pval,palpha,
-!$OMP& uind,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
+!$OMP& shared(npole,ipole,rpole,x,y,z,pdamp,thole,dirdamp,pcore,pval,
+!$OMP& palpha,uind,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
 !$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& nelst,elst,dpequal,use_thole,use_chgpen,use_bounds,off2,f,
-!$OMP& molcule,name,verbose,debug,header,iout)
+!$OMP& nelst,elst,dpequal,use_thole,use_dirdamp,use_chgpen,use_bounds,
+!$OMP& off2,f,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale,dscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
@@ -906,6 +936,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -1043,14 +1074,26 @@ c
                   scale7 = 1.0d0
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           scale3 = 1.0d0 - expdamp 
+                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                         +0.15d0*damp**2)
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           scale3 = 1.0d0 - expdamp
+                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                         +0.6d0*damp**2)
+                        end if
                      end if
                   end if
                   scalek = pscale(k)
@@ -1350,7 +1393,8 @@ c
       real*8 erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 sr3,sr5,sr7
@@ -1436,6 +1480,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -1589,14 +1634,26 @@ c
                   scale7 = 1.0d0
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           scale3 = 1.0d0 - expdamp 
+                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                         +0.15d0*damp**2)
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           scale3 = 1.0d0 - expdamp
+                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                         +0.6d0*damp**2)
+                        end if
                      end if
                   end if
                   rr3 = f / (r*r2)
@@ -1763,6 +1820,7 @@ c
             if (use_thole) then
                pdi = pdamp(ii)
                pti = thole(ii)
+               ddi = dirdamp(ii)
             else if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
@@ -1923,14 +1981,28 @@ c
                         scale7 = 1.0d0
                         damp = pdi * pdamp(kk)
                         if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(kk))
-                           damp = -pgamma * (r/damp)**3
-                           if (damp .gt. -50.0d0) then
-                              expdamp = exp(damp)
-                              scale3 = 1.0d0 - expdamp
-                              scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                              scale7 = 1.0d0 - (1.0d0-damp
-     &                                    +0.6d0*damp**2)*expdamp
+                           if (use_dirdamp) then
+                              pgamma = min(ddi,dirdamp(kk))
+                              damp = pgamma * (r/damp)**(1.5d0)
+                              if (damp .lt. 50.0d0) then
+                                 expdamp = exp(-damp) 
+                                 scale3 = 1.0d0 - expdamp 
+                                 scale5 = 1.0d0 - expdamp
+     &                                               *(1.0d0+0.5d0*damp)
+                                 scale7 = 1.0d0 - expdamp
+     &                                               *(1.0d0+0.65d0*damp
+     &                                                  +0.15d0*damp**2)
+                              end if
+                           else
+                              pgamma = min(pti,thole(kk))
+                              damp = pgamma * (r/damp)**3
+                              if (damp .lt. 50.0d0) then
+                                 expdamp = exp(damp)
+                                 scale3 = 1.0d0 - expdamp
+                                 scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                                 scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                               +0.6d0*damp**2)
+                              end if
                            end if
                         end if
                         rr3 = f / (r*r2)
@@ -2252,7 +2324,8 @@ c
       real*8 erfc,bfac
       real*8 alsq2,alsq2n
       real*8 exp2a,ralpha
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ddi
+      real*8 pgamma
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 sr3,sr5,sr7
@@ -2318,12 +2391,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,rpole,uind,x,y,z,pdamp,thole,pcore,pval,
-!$OMP& palpha,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
+!$OMP& shared(npole,ipole,rpole,uind,x,y,z,pdamp,thole,dirdamp,pcore,
+!$OMP& pval,palpha,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
 !$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& nelst,elst,dpequal,use_thole,use_chgpen,use_bounds,off2,f,
-!$OMP& aewald,molcule,name,verbose,debug,header,iout)
+!$OMP& nelst,elst,dpequal,use_thole,use_dirdamp,use_chgpen,use_bounds,
+!$OMP& off2,f,aewald,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale,dscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
@@ -2350,6 +2423,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
+            ddi = dirdamp(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -2504,14 +2578,26 @@ c
                   scale7 = 1.0d0
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = 1.0d0 - expdamp
-                        scale5 = 1.0d0 - (1.0d0-damp)*expdamp
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                       *expdamp
+                     if (use_dirdamp) then
+                        pgamma = min(ddi,dirdamp(kk))
+                        damp = pgamma * (r/damp)**(1.5d0)
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp) 
+                           scale3 = 1.0d0 - expdamp 
+                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                         +0.15d0*damp**2)
+                        end if
+                     else
+                        pgamma = min(pti,thole(kk))
+                        damp = pgamma * (r/damp)**3
+                        if (damp .lt. 50.0d0) then
+                           expdamp = exp(-damp)
+                           scale3 = 1.0d0 - expdamp
+                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                         +0.6d0*damp**2)
+                        end if
                      end if
                   end if
                   rr3 = f / (r*r2)

@@ -466,13 +466,16 @@ c
 c
 c     deallocation of global arrays from module kpolr
 c
-      if (allocated(prsiz))  deallocate (prsiz)
-      if (allocated(prdmp))  deallocate (prdmp)
-      if (allocated(prele))  deallocate (prele)
+      if (allocated(pgrp))  deallocate (pgrp)
+      if (allocated(polr))  deallocate (polr)
+      if (allocated(athl))  deallocate (athl)
+      if (allocated(ddir))  deallocate (ddir)
 c
 c     deallocation of global arrays from module krepl
 c
-      if (allocated(polr))  deallocate (polr)
+      if (allocated(prsiz))  deallocate (prsiz)
+      if (allocated(prdmp))  deallocate (prdmp)
+      if (allocated(prele))  deallocate (prele)
 c
 c     deallocation of global arrays from module kvdws
 c
@@ -703,6 +706,7 @@ c
       if (allocated(ipolar))  deallocate (ipolar)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
+      if (allocated(dirdamp))  deallocate (dirdamp)
       if (allocated(pdamp))  deallocate (pdamp)
       if (allocated(udir))  deallocate (udir)
       if (allocated(udirp))  deallocate (udirp)
