@@ -5274,9 +5274,9 @@ biotype      45    O       "Isoleucine"                      178
 biotype      46    HA      "Isoleucine"                       85
 biotype      47    CB      "Isoleucine"                       82
 biotype      48    HB      "Isoleucine"                       85
-biotype      49    CG1     "Isoleucine"                       80
+biotype      49    CG1     "Isoleucine"                       81
 biotype      50    HG1     "Isoleucine"                       85
-biotype      51    CG2     "Isoleucine"                       81
+biotype      51    CG2     "Isoleucine"                       80
 biotype      52    HG2     "Isoleucine"                       85
 biotype      53    CD      "Isoleucine"                       80
 biotype      54    HD      "Isoleucine"                       85
