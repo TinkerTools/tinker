@@ -6948,8 +6948,8 @@ c
 !$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
 !$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_chgpen,use_bounds,off2,f,aewald,optorder,copm,uopt,uoptp,
-!$OMP& poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
+!$OMP& use_chgpen,use_dirdamp,use_bounds,off2,f,aewald,optorder,copm,
+!$OMP& uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
 !$OMP DO reduction(+:dep,ufld,dufld,vir) schedule(guided)

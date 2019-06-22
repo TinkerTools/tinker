@@ -887,7 +887,7 @@ c
  1160    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,1170)
  1170    format (//,15x,'Pauli Repulsion Parameters',
-     &           ///,24x,'Class',15x,'Size',8x,'Damp',5x,'Valence'/)
+     &           ///,24x,'Class',14x,'Size',8x,'Damp',5x,'Valence'/)
          k = 0
          do i = 1, maxclass
             if (dspsix(i) .ne. 0.0d0) then
@@ -1155,6 +1155,10 @@ c
  1600    format (//,15x,'Intra-Group Polarizability Scale Factors',
      &           ///,20x,'1-2 Atoms',f16.3,/,20x,'1-3 Atoms',f16.3,
      &           /,20x,'1-4 Atoms',f16.3,/,20x,'1-5 Atoms',f16.3)
+         write (itxt,1610)  w2scale,w3scale,w4scale,w5scale
+ 1610    format (//,15x,'Induced Dipole Interaction Scale Factors',
+     &           ///,20x,'1-2 Atoms',f16.3,/,20x,'1-3 Atoms',f16.3,
+     &           /,20x,'1-4 Atoms',f16.3,/,20x,'1-5 Atoms',f16.3)
       end if
 c
 c     charge transfer parameters
@@ -1165,17 +1169,17 @@ c
      &.
       end do
       if (exist) then
-         write (itxt,1610)  formfeed,forcefield
- 1610    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
-         write (itxt,1620)
- 1620    format (//,15x,'Charge Transfer Parameters',
+         write (itxt,1620)  formfeed,forcefield
+ 1620    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
+         write (itxt,1630)
+ 1630    format (//,15x,'Charge Transfer Parameters',
      &           ///,24x,'Class',12x,'Charge',7x,'Alpha',/)
          k = 0
          do i = 1, maxclass
             if (ctchg(i).ne.0.0d0 .or. ctdmp(i).ne.0.0d0) then
                k = k + 1
-               write (itxt,1630)  k,i,ctchg(i),ctdmp(i)
- 1630          format (12x,i5,6x,i4,8x,2f12.4)
+               write (itxt,1640)  k,i,ctchg(i),ctdmp(i)
+ 1640          format (12x,i5,6x,i4,8x,2f12.4)
             end if
          end do
       end if
@@ -1187,20 +1191,20 @@ c
          if (ionize(i) .ne. 0.0d0)  exist = .true.
       end do
       if (exist) then
-         write (itxt,1640)  formfeed,forcefield
- 1640    format (a1,//,15x,'Tinker Force Field Parameters for ',a2
+         write (itxt,1650)  formfeed,forcefield
+ 1650    format (a1,//,15x,'Tinker Force Field Parameters for ',a2
      &0)
-         write (itxt,1650)
- 1650    format (//,15x,'Conjugated Pisystem Atom Parameters',
+         write (itxt,1660)
+ 1660    format (//,15x,'Conjugated Pisystem Atom Parameters',
      &           ///,20x,'Class',3x,'Electron',
      &              3x,'Ionization',3x,'Repulsion',/)
          k = 0
          do i = 1, maxclass
             if (ionize(i) .ne. 0.0d0) then
                k = k + 1
-               write (itxt,1660)  k,i,electron(i),ionize(i),repuls
+               write (itxt,1670)  k,i,electron(i),ionize(i),repuls
      &e(i)
- 1660          format (8x,i5,7x,i4,f10.1,2x,2f12.3)
+ 1670          format (8x,i5,7x,i4,f10.1,2x,2f12.3)
             end if
          end do
       end if
@@ -1208,49 +1212,49 @@ c
 c     conjugated pisystem bond parameters
 c
       if (kpi(1) .ne. blank8) then
-         write (itxt,1670)
- 1670    format (//,15x,'Conjugated Pisystem Bond Parameters',
+         write (itxt,1680)
+ 1680    format (//,15x,'Conjugated Pisystem Bond Parameters',
      &           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi
-            if (kpi(i) .eq. blank8)  goto 1690
+            if (kpi(i) .eq. blank8)  goto 1700
             k1 = number(kpi(i)(1:4))
             k2 = number(kpi(i)(5:8))
-            write (itxt,1680)  i,k1,k2,sslope(i),tslope(i)
- 1680       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1690)  i,k1,k2,sslope(i),tslope(i)
+ 1690       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
          end do
- 1690    continue
+ 1700    continue
       end if
 c
 c     conjugated pisystem bond parameters for 5-membered rings
 c
       if (kpi5(1) .ne. blank8) then
-         write (itxt,1700)
- 1700    format (//,15x,'5-Membered Ring Pisystem Bond Parameters'
+         write (itxt,1710)
+ 1710    format (//,15x,'5-Membered Ring Pisystem Bond Parameters'
      &,           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi5
-            if (kpi5(i) .eq. blank8)  goto 1720
+            if (kpi5(i) .eq. blank8)  goto 1730
             k1 = number(kpi5(i)(1:4))
             k2 = number(kpi5(i)(5:8))
-            write (itxt,1710)  i,k1,k2,sslope5(i),tslope5(i)
- 1710       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1720)  i,k1,k2,sslope5(i),tslope5(i)
+ 1720       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
          end do
- 1720    continue
+ 1730    continue
       end if
 c
 c     conjugated pisystem bond parameters for 4-membered rings
 c
       if (kpi4(1) .ne. blank8) then
-         write (itxt,1730)
- 1730    format (//,15x,'4-Membered Ring Pisystem Bond Parameters'
+         write (itxt,1740)
+ 1740    format (//,15x,'4-Membered Ring Pisystem Bond Parameters'
      &,           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi4
-            if (kpi4(i) .eq. blank8)  goto 1750
+            if (kpi4(i) .eq. blank8)  goto 1760
             k1 = number(kpi4(i)(1:4))
             k2 = number(kpi4(i)(5:8))
-            write (itxt,1740)  i,k1,k2,sslope4(i),tslope4(i)
- 1740       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1750)  i,k1,k2,sslope4(i),tslope4(i)
+ 1750       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
          end do
- 1750    continue
+ 1760    continue
       end if
       return
       end
