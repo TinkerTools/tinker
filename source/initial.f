@@ -28,6 +28,7 @@ c
       use bound
       use boxes
       use cell
+      use fft
       use files
       use group
       use inform
@@ -86,6 +87,14 @@ c
 c!$   call kmp_set_stacksize_s (268435456)
 c!$   call kmp_set_blocktime (0)
 c
+c     atomic symbols for elements
+c
+      call initatom
+c
+c     names of biopolymer residue types
+c
+      call initres
+c
 c     number of lines in the keyfile
 c
       nkey = 0
@@ -132,6 +141,11 @@ c     highest numbered previous cycle file
 c
       nprior = 0
 c
+c     pointer initialization for FFTW plans
+c
+      planf = 0
+      planb = 0
+c
 c     flags for information levels within the program
 c
       silent = .false.
@@ -149,24 +163,6 @@ c
       use_replica = .false.
       use_polymer = .false.
 c
-c     flag for use of internal virial
-c
-      use_virial = .true.
-c
-c     default values for unit cell dimensions
-c
-      xbox = 0.0d0
-      ybox = 0.0d0
-      zbox = 0.0d0
-      alpha = 0.0d0
-      beta = 0.0d0
-      gamma = 0.0d0
-c
-c     flags for temperature and pressure baths
-c
-      isothermal = .false.
-      isobaric = .false.
-c
 c     flags for rebuilding of neighbor lists
 c
       dovlst = .true.
@@ -174,6 +170,15 @@ c
       doclst = .true.
       domlst = .true.
       doulst = .true.
+c
+c     flags for temperature and pressure baths
+c
+      isothermal = .false.
+      isobaric = .false.
+c
+c     flag for use of internal virial
+c
+      use_virial = .true.
 c
 c     flag for use of rigid bodies
 c
@@ -200,13 +205,14 @@ c     type of coordinates file
 c
       coordtype = 'NONE'
 c
-c     atomic symbols for elements
+c     default values for unit cell dimensions
 c
-      call initatom
-c
-c     names of biopolymer residue types
-c
-      call initres
+      xbox = 0.0d0
+      ybox = 0.0d0
+      zbox = 0.0d0
+      alpha = 0.0d0
+      beta = 0.0d0
+      gamma = 0.0d0
 c
 c     default values used by optimizations
 c
