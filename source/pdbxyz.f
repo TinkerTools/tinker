@@ -896,7 +896,7 @@ c
          call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
          if (ires .eq. 1) then
-            call oldatm (i,482,n-1,ires)
+            call oldatm (i,469,n-1,ires)
          else
             call oldatm (i,k+4,n-1,ires)
          end if
@@ -911,9 +911,9 @@ c
          call newatm (i,k+3,n-5,1.10d0,n-6,111.2d0,n-4,111.2d0,-1)
          if (ires .eq. 1) then
             call findatm (' HD2',start,stop,i)
-            call newatm (i,483,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
+            call newatm (i,470,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
             call findatm (' HD3',start,stop,i)
-            call newatm (i,483,n-6,1.10d0,n-7,111.2d0,ni,111.2d0,-1)
+            call newatm (i,470,n-6,1.10d0,n-7,111.2d0,ni,111.2d0,-1)
          else
             call findatm (' HD2',start,stop,i)
             call newatm (i,k+5,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
