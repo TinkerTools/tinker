@@ -28,7 +28,8 @@ c
       if (use_smooth) then
          call echarge2d (i)
       else if (use_ewald) then
-         call echarge2c (i)
+         call num_echarge2c (i)
+c         call echarge2c (i)
       else if (use_clist) then
          call echarge2b (i)
       else
@@ -1020,3 +1021,168 @@ c
       deallocate (cscale)
       return
       end
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  program num_echarge2c - numerical Ewald Hessian summation ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "num_echarge2c" computes the numerical Hessian matrices of the
+c     ewald energy summation with respect to Cartesian coordinates using
+c     a finite difference approach
+c
+c     This subroutine is modfied after the testhess.f file. It uses the
+c     part to run finite differences, and outputs a matrix that contains
+c     ewald hessian elements to be added in.
+      subroutine num_echarge2c (i)
+      use atoms
+      use inform
+      use hessn
+      implicit none
+      integer i,j,k
+      integer ii,jj
+      integer index
+      real*8 old,eps
+      real*8 delta
+      real*8, allocatable :: g(:,:)
+      real*8, allocatable :: g0(:,:)
+      character*120 xyzfile
+c
+c     set difference threshhold via the energy precision
+c
+      delta = 1.0d-5
+      if (digits .ge. 6)  delta = 1.0d-6
+      if (digits .ge. 8)  delta = 1.0d-8
+c
+c     setting the stepsize for numerical Hessian calculation
+c
+      eps = 1.0d-5
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (g(3,n))
+      allocate (g0(3,n))
+c
+c     get the two-sided numerical Hessian matrix elements
+c
+      old = x(i)
+      x(i) = x(i) - 0.5d0*eps
+      call gradient_echarge (g)
+      do k = 1, n
+         do j = 1, 3
+            g0(j,k) = g(j,k)
+         end do
+      end do
+      x(i) = x(i) + eps
+      call gradient_echarge (g)
+      x(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessx(j,k) = hessx(j,k) + (g(j,k) - g0(j,k)) / eps
+         end do
+      end do
+      old = y(i)
+      y(i) = y(i) - 0.5d0*eps
+      call gradient_echarge (g)
+      do k = 1, n
+         do j = 1, 3
+            g0(j,k) = g(j,k)
+         end do
+      end do
+      y(i) = y(i) + eps
+      call gradient_echarge (g)
+      y(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessy(j,k) = hessy(j,k) + (g(j,k) - g0(j,k)) / eps
+         end do
+      end do
+      old = z(i)
+      z(i) = z(i) - 0.5d0*eps
+      call gradient_echarge (g)
+      do k = 1, n
+         do j = 1, 3
+            g0(j,k) = g(j,k)
+         end do
+      end do
+      z(i) = z(i) + eps
+      call gradient_echarge (g)
+      z(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessz(j,k) = hessz(j,k) + (g(j,k) - g0(j,k)) / eps
+         end do
+      end do
+      deallocate (g)
+      deallocate (g0)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine gradient_echarge -- find gradient components     ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "gradient_echarge" calls subroutines to calculate the potential energy
+c     and first derivatives with respect to Cartesian coordinates
+c
+c     Modeled after the gradient.f file to return the gradient of the
+c     first derivative of the ewald summation. Helps to support the
+c     num_echarge2c subroutine above.
+c
+      subroutine gradient_echarge (derivs)
+      use atoms
+      use deriv
+      use energi
+      use potent
+      implicit none
+      integer l,m
+      real*8 energy,cutoff
+      real*8 derivs(3,*)
+      logical prior
+c
+c
+c     perform dynamic allocation of some global arrays
+c
+      prior = .false.
+      if (allocated(dec)) then
+         prior = .true.
+         if (size(dec) .lt. 3*n)  deallocate (dec)
+      end if
+      if (.not. allocated(dec))  allocate (dec(3,n))
+c
+c     zero out each of the first derivative components
+c
+      do l = 1, n
+         do m = 1, 3
+            dec(m,l) = 0.0d0
+         end do
+      end do
+c
+c     call the electrostatic energy and gradient routines
+c
+      if (use_charge)  call echarge1
+c
+c     sum up to get the total energy and first derivatives
+c
+      esum = ec
+      energy = esum
+      do l = 1, n
+         do m = 1, 3
+            derivs(m,l) = dec(m,l)
+         end do
+      end do
+c
+c     deallocate some of the global arrays
+c
+      if (.not. prior) then
+         deallocate (dec)
+      end if
+      return
+      end
+
