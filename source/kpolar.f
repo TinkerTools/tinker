@@ -53,7 +53,6 @@ c
       real*8 pol,thl,ddp
       real*8 sixth
       logical header
-      character*1 digit
       character*20 keyword
       character*20 text
       character*240 record

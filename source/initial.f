@@ -52,7 +52,6 @@ c
       use zclose
       implicit none
 !$    integer omp_get_num_procs
-      real*8 precise
       logical first
       save first
       data first  / .true. /

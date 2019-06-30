@@ -282,9 +282,7 @@ c
       real*8 sr3,sr5,sr7
       real*8 psr3,psr5,psr7
       real*8 dsr3,dsr5,dsr7
-      real*8 psr3i,psr5i,psr7i
       real*8 dsr3i,dsr5i,dsr7i
-      real*8 psr3k,psr5k,psr7k
       real*8 dsr3k,dsr5k,dsr7k
       real*8 xi,yi,zi
       real*8 xr,yr,zr

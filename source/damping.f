@@ -160,11 +160,11 @@ c
       use mplpot
       implicit none
       integer rorder
-      real*8 r,termi,termk
+      real*8 termi,termk
       real*8 termi2,termk2
       real*8 alphai,alphak
       real*8 alphai2,alphak2
-      real*8 eps,diff
+      real*8 r,eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dampi2,dampi3
@@ -415,11 +415,11 @@ c
       subroutine damppolar (r,alphai,alphak,dmpi,dmpk,dmpik)
       use mplpot
       implicit none
-      real*8 r,termi,termk
+      real*8 termi,termk
       real*8 termi2,termk2
       real*8 alphai,alphak
       real*8 alphai2,alphak2
-      real*8 eps,diff
+      real*8 r,eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dampi2,dampi3
@@ -542,10 +542,8 @@ c
       subroutine dampdir (r,alphai,alphak,dmpi,dmpk)
       use mplpot
       implicit none
-      real*8 r,termi,termk
-      real*8 termi2,termk2
       real*8 alphai,alphak
-      real*8 eps,diff
+      real*8 r,eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dampi2,dampk2
@@ -630,11 +628,11 @@ c
       subroutine dampmut (r,alphai,alphak,dmpik)
       use mplpot
       implicit none
-      real*8 r,termi,termk
+      real*8 termi,termk
       real*8 termi2,termk2
       real*8 alphai,alphak
       real*8 alphai2,alphak2
-      real*8 eps,diff
+      real*8 r,eps,diff
       real*8 expi,expk
       real*8 dampi,dampk
       real*8 dampi2,dampi3

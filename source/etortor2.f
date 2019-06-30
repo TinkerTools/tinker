@@ -54,9 +54,7 @@ c
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xv,yv,zv
-      real*8 xtu,ytu,ztu
-      real*8 xuv,yuv,zuv
-      real*8 xh,yh,x1l,x1u,y1l,y1u
+      real*8 x1l,x1u,y1l,y1u
       real*8 rt2,ru2,rv2
       real*8 rtru,rcb,rurv,rdc
       real*8 da1dxt,da1dyt,da1dzt
@@ -210,18 +208,12 @@ c
             xu = ycb*zdc - ydc*zcb
             yu = zcb*xdc - zdc*xcb
             zu = xcb*ydc - xdc*ycb
-            xtu = yt*zu - yu*zt
-            ytu = zt*xu - zu*xt
-            ztu = xt*yu - xu*yt
             rt2 = xt*xt + yt*yt + zt*zt
             ru2 = xu*xu + yu*yu + zu*zu
             rtru = sqrt(rt2 * ru2)
             xv = ydc*zed - yed*zdc
             yv = zdc*xed - zed*xdc
             zv = xdc*yed - xed*ydc
-            xuv = yu*zv - yv*zu
-            yuv = zu*xv - zv*xu
-            zuv = xu*yv - xv*yu
             rv2 = xv*xv + yv*yv + zv*zv
             rurv = sqrt(ru2 * rv2)
             if (rtru .ne. 0.0d0 .and. rurv.ne.0.0d0) then
@@ -268,8 +260,6 @@ c
                   end if
                end do
                ylo = nlo
-               xh = ttx(xlo+1,k) - ttx(xlo,k)
-               yh = tty(ylo+1,k) - tty(ylo,k)
                x1l = ttx(xlo,k)
                x1u = ttx(xlo+1,k)
                y1l = tty(ylo,k)

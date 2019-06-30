@@ -189,10 +189,10 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9,rr11
-      real*8 rr1i,rr3i,rr5i,rr7i
-      real*8 rr1k,rr3k,rr5k,rr7k
-      real*8 rr1ik,rr3ik,rr5ik
-      real*8 rr7ik,rr9ik,rr11ik
+      real*8 rr3i,rr5i,rr7i
+      real*8 rr3k,rr5k,rr7k
+      real*8 rr3ik,rr5ik,rr7ik
+      real*8 rr9ik,rr11ik
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -225,9 +225,8 @@ c
       real*8 term4,term5,term6
       real*8 term1i,term2i,term3i
       real*8 term1k,term2k,term3k
-      real*8 term1ik,term2ik
-      real*8 term3ik,term4ik
-      real*8 term5ik,term6ik
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
       real*8 frcx,frcy,frcz
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)

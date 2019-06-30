@@ -36,7 +36,7 @@ c
       integer i,iopbend
       integer ia,ib,ic,id
       real*8 e,angle,force
-      real*8 cosine,fgrp
+      real*8 sine,fgrp
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
       real*8 xib,yib,zib
@@ -49,7 +49,7 @@ c
       real*8 xcd,ycd,zcd
       real*8 rdb2,rad2,rcd2
       real*8 rab2,rcb2
-      real*8 cc,ee,bkk2
+      real*8 cc,ee
       logical proceed
       logical header,huge
 c
@@ -161,10 +161,9 @@ c
      &              + zdb*(xab*ycb-yab*xcb)
             rdb2 = xdb*xdb + ydb*ydb + zdb*zdb
             if (rdb2.ne.0.0d0 .and. cc.ne.0.0d0) then
-               bkk2 = rdb2 - ee*ee/cc
-               cosine = sqrt(bkk2/rdb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
+               sine = abs(ee) / sqrt(cc*rdb2)
+               sine = min(1.0d0,sine)
+               angle = radian * asin(sine)
                dt = angle
                dt2 = dt * dt
                dt3 = dt2 * dt

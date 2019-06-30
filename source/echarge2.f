@@ -377,7 +377,6 @@ c
       integer i,j,k
       integer ii,kk,kkk
       integer in,ic,kn,kc
-      integer jcell
       real*8 e,de,d2e
       real*8 fi,fik,fgrp
       real*8 r,r2,rb,rb2

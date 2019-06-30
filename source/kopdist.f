@@ -30,7 +30,7 @@ c
       use opdist
       use potent
       implicit none
-      integer i,j,k,nopd
+      integer i,j,nopd
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
       integer imin,itmin

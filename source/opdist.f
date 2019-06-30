@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     nopdist   total number of out-of-plane distances in the system
-c     iopb      numbers of the atoms in each out-of-plane distance
+c     iopd      numbers of the atoms in each out-of-plane distance
 c     opdk      force constant values for out-of-plane distance
 c
 c

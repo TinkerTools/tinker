@@ -3167,8 +3167,7 @@ c
       use sizes
       use units
       implicit none
-      integer i,j,k,m
-      integer it,jt,kt,mt
+      integer i,j,k,it
       integer ixyz,ikey
       integer size,tmax
       integer xaxe

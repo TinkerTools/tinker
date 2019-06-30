@@ -178,8 +178,8 @@ c
       integer i,k
       integer ia,ib,ic,id
       real*8 angle,force
-      real*8 dot,cosine
-      real*8 cc,ee,bkk2,term
+      real*8 dot,sine
+      real*8 cc,ee,term
       real*8 deddt,dedcos
       real*8 dt,dt2,dt3,dt4
       real*8 xia,yia,zia
@@ -293,10 +293,9 @@ c
      &        + zdb*(xab*ycb-yab*xcb)
       rdb2 = xdb*xdb + ydb*ydb + zdb*zdb
       if (rdb2.ne.0.0d0 .and. cc.ne.0.0d0) then
-         bkk2 = rdb2 - ee*ee/cc
-         cosine = sqrt(bkk2/rdb2)
-         cosine = min(1.0d0,max(-1.0d0,cosine))
-         angle = radian * acos(cosine)
+         sine = abs(ee) / sqrt(cc*rdb2)
+         sine = min(1.0d0,sine)
+         angle = radian * asin(sine)
          dt = angle
          dt2 = dt * dt
          dt3 = dt2 * dt
@@ -304,7 +303,7 @@ c
          deddt = opbunit * force * dt * radian
      &              * (2.0d0 + 3.0d0*copb*dt + 4.0d0*qopb*dt2
      &                  + 5.0d0*popb*dt3 + 6.0d0*sopb*dt4)
-         dedcos = -deddt * sign(1.0d0,ee) / sqrt(cc*bkk2)
+         dedcos = -deddt * sign(1.0d0,ee) / sqrt(cc*rdb2-ee*ee)
 c
 c     chain rule terms for first derivative components
 c

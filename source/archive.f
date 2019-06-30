@@ -28,9 +28,8 @@ c
       integer i,j,k
       integer iarc,ixyz
       integer start,stop
-      integer step,now
+      integer step,now,mode
       integer lext,lengb
-      integer nmode,mode
       integer leng1,leng2
       integer freeunit
       integer list(20)

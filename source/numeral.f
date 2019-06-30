@@ -34,7 +34,7 @@ c
       integer million,hunthou
       integer tenthou,thousand
       integer hundred,tens,ones
-      logical done,right,negative
+      logical right,negative
       character*1 digit(0:9)
       character*(*) string
       data digit  / '0','1','2','3','4','5','6','7','8','9' /

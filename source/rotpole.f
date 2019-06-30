@@ -21,9 +21,9 @@ c
       implicit none
       integer i
       real*8 a(3,3)
-      real*8 d1(3,3)
-      real*8 d2(5,5)
-      logical use_qi
+c     real*8 d1(3,3)
+c     real*8 d2(5,5)
+c     logical use_qi
 c
 c
 c     rotate the atomic multipoles at each site in turn

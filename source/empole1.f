@@ -115,9 +115,8 @@ c
       real*8 term4,term5,term6
       real*8 term1i,term2i,term3i
       real*8 term1k,term2k,term3k
-      real*8 term1ik,term2ik
-      real*8 term3ik,term4ik
-      real*8 term5ik,term6ik
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -996,9 +995,8 @@ c
       real*8 term4,term5,term6
       real*8 term1i,term2i,term3i
       real*8 term1k,term2k,term3k
-      real*8 term1ik,term2ik
-      real*8 term3ik,term4ik
-      real*8 term5ik,term6ik
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -1707,9 +1705,8 @@ c
       real*8 term4,term5,term6
       real*8 term1i,term2i,term3i
       real*8 term1k,term2k,term3k
-      real*8 term1ik,term2ik
-      real*8 term3ik,term4ik
-      real*8 term5ik,term6ik
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -2746,9 +2743,8 @@ c
       real*8 term4,term5,term6
       real*8 term1i,term2i,term3i
       real*8 term1k,term2k,term3k
-      real*8 term1ik,term2ik
-      real*8 term3ik,term4ik
-      real*8 term5ik,term6ik
+      real*8 term1ik,term2ik,term3ik
+      real*8 term4ik,term5ik
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
