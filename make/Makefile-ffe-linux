@@ -1705,7 +1705,7 @@ echgdpl2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o group.o h
 echgdpl3.o: action.o analyz.o atomid.o atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o group.o inform.o inter.o iounit.o molcul.o shunt.o units.o usage.o
 echgtrn.o: atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o energi.o group.o light.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o
 echgtrn1.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o deriv.o energi.o group.o limits.o mplpot.o mpole.o neigh.o shunt.o usage.o virial.o
-echgtrn2.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o group.o hessn.o mplpot.o mpole.o shunt.o usage.o
+echgtrn2.o: atoms.o bound.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o group.o hessn.o mplpot.o mpole.o shunt.o usage.o
 echgtrn3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpot.o chgtrn.o couple.o ctrpot.o energi.o group.o inform.o inter.o iounit.o light.o limits.o molcul.o mplpot.o mpole.o neigh.o shunt.o usage.o
 edipole.o: atoms.o bound.o cell.o chgpot.o dipole.o energi.o group.o shunt.o units.o usage.o
 edipole1.o: atoms.o bound.o cell.o chgpot.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
@@ -2034,7 +2034,7 @@ prtdyn.o: atoms.o boxes.o files.o group.o mdstuf.o moldyn.o rgddyn.o titles.o
 prterr.o: files.o output.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
 prtmol2.o: atomid.o atoms.o bndstr.o couple.o files.o iounit.o titles.o
-prtpdb.o: files.o pdb.o sequen.o titles.o
+prtpdb.o: bound.o boxes.o files.o pdb.o sequen.o titles.o
 prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o sizes.o urypot.o vdwpot.o
 prtseq.o: files.o sequen.o
 prtxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o titles.o

@@ -1711,7 +1711,7 @@ prtdyn.o: atoms.o boxes.o files.o group.o mdstuf.o moldyn.o rgddyn.o titles.o
 prterr.o: files.o output.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
 prtmol2.o: atomid.o atoms.o bndstr.o couple.o files.o iounit.o titles.o
-prtpdb.o: files.o pdb.o sequen.o titles.o
+prtpdb.o: bound.o boxes.o files.o pdb.o sequen.o titles.o
 prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o sizes.o urypot.o vdwpot.o
 prtseq.o: files.o sequen.o
 prtxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o titles.o

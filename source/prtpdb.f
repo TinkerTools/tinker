@@ -17,6 +17,8 @@ c     to an external disk file
 c
 c
       subroutine prtpdb (ipdb)
+      use bound
+      use boxes
       use files
       use pdb
       use sequen
@@ -61,6 +63,13 @@ c
       else
          fstr = '(''HEADER'',4x,a,/,''COMPND'',/,''SOURCE'')'
          write (ipdb,fstr(1:37))  title(1:ltitle)
+      end if
+c
+c     include any lattice parameters in the header
+c
+      if (use_bounds) then
+         fstr = '(''CRYST1'',3f9.3,3f7.2)'
+         write (ipdb,fstr(1:22)) xbox,ybox,zbox,alpha,beta,gamma
       end if
 c
 c     perform dynamic allocation of some local arrays

@@ -4,7 +4,7 @@ import os
 import sys
 
 '''
-This script only works with the fixed-from fortran source code in Tinker.
+This script only works with the fixed-form fortran source code in Tinker.
 If the fortran file contains either a module or a program, their names are
 expected to be the same.
 '''
