@@ -21,6 +21,7 @@ c
       use pdb
       use sequen
       use titles
+      use boxes
       implicit none
       integer i,k,ipdb
       integer start,stop
@@ -61,6 +62,13 @@ c
       else
          fstr = '(''HEADER'',4x,a,/,''COMPND'',/,''SOURCE'')'
          write (ipdb,fstr(1:37))  title(1:ltitle)
+      end if
+c
+c     adding in lattice parameters to the file
+c
+      if (xbox .gt. 0) then
+         fstr = '(a6,3f9.3,3f7.2)'
+         write (ipdb,fstr) 'CRYST1',xbox,ybox,zbox,alpha,beta,gamma
       end if
 c
 c     perform dynamic allocation of some local arrays
