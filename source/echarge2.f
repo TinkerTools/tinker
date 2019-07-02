@@ -28,8 +28,8 @@ c
       if (use_smooth) then
          call echarge2d (i)
       else if (use_ewald) then
-         call num_echarge2c (i)
-c         call echarge2c (i)
+c         call num_echarge2c (i)
+         call echarge2c (i)
       else if (use_clist) then
          call echarge2b (i)
       else
