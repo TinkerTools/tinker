@@ -224,7 +224,7 @@ c
                x(i) = old
                do k = 1, n
                   do j = 1, 3
-                     nhess(j,k,1,i) = (g(j,k) - g0(j,k)) / eps
+                     nhess(j,k,1,i) = (g(j,k)-g0(j,k)) / eps
                   end do
                end do
                old = y(i)
@@ -248,7 +248,7 @@ c
                y(i) = old
                do k = 1, n
                   do j = 1, 3
-                     nhess(j,k,2,i) = (g(j,k) - g0(j,k)) / eps
+                     nhess(j,k,2,i) = (g(j,k)-g0(j,k)) / eps
                   end do
                end do
                old = z(i)
@@ -272,7 +272,7 @@ c
                z(i) = old
                do k = 1, n
                   do j = 1, 3
-                     nhess(j,k,3,i) = (g(j,k) - g0(j,k)) / eps
+                     nhess(j,k,3,i) = (g(j,k)-g0(j,k)) / eps
                   end do
                end do
             end if

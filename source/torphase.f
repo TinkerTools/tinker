@@ -49,13 +49,10 @@ c     convert input torsional parameters to storage format
 c
       do i = 1, 6
          k = ft(i)
-         if (k .eq. 0) then
-            goto 10
-         else if (k .le. 6) then
+         if (k.ge.1 .and. k.le.6) then
             vt(k) = ampli(i)
             st(k) = phase(i)
          end if
       end do
-   10 continue
       return
       end

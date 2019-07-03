@@ -149,11 +149,11 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine empole2a  --  numerical multipole Hessian  ##
-c     ##                                                        ##
-c     ############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine empole2a  --  multipole derivatives utility  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "empole2a" computes multipole first derivatives for a single

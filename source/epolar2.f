@@ -240,11 +240,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine epolar2a  --  numerical polarization Hessian  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epolar2a  --  polarization derivatives utility  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "epolar2a" computes polarization first derivatives for a single

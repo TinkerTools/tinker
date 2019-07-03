@@ -26,9 +26,14 @@ c
 c     choose the method for summing over pairwise interactions
 c
       if (use_smooth) then
-         call echarge2d (i)
+         call echarge2f (i)
       else if (use_ewald) then
          call echarge2c (i)
+         if (use_clist) then
+            call echarge2e (i)
+         else
+            call echarge2d (i)
+         end if
       else if (use_clist) then
          call echarge2b (i)
       else
@@ -570,22 +575,225 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine echarge2c  --  loop Ewald sum charge Hessian  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine echarge2c  --  reciprocal Ewald charge Hessian  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "echarge2c" calculates second derivatives of the charge-charge
-c     interaction energy for a single atom using a particle mesh
-c     Ewald summation and pairwise loop
-c
-c     note this version does not incorporate the reciprocal space
-c     contribution to the Hessian calculation
+c     "echarge2c" calculates second derivatives of the reciprocal
+c     space charge-charge interaction energy for a single atom using
+c     a particle mesh Ewald summation via numerical differentiation
 c
 c
       subroutine echarge2c (i)
+      use atoms
+      use deriv
+      use hessn
+      implicit none
+      integer i,j,k
+      real*8 eps,old
+      real*8, allocatable :: d0(:,:)
+      logical prior
+      logical twosided
+c
+c
+c     set the default stepsize and accuracy control flags
+c
+      eps = 1.0d-5
+      twosided = .false.
+      if (n .le. 300)  twosided = .true.
+      if (n .gt. 600)  return
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (d0(3,n))
+c
+c     perform dynamic allocation of some global arrays
+c
+      prior = .false.
+      if (allocated(dec)) then
+         prior = .true.
+         if (size(dec) .lt. 3*n)  deallocate (dec)
+      end if
+      if (.not. allocated(dec))  allocate (dec(3,n))
+c
+c     get charge first derivatives for the base structure
+c
+      if (.not. twosided) then
+         call echarge2r
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = dec(j,k)
+            end do
+         end do
+      end if
+c
+c     find numerical x-components via perturbed structures
+c
+      old = x(i)
+      if (twosided) then
+         x(i) = x(i) - 0.5d0*eps
+         call echarge2r
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = dec(j,k)
+            end do
+         end do
+      end if
+      x(i) = x(i) + eps
+      call echarge2r
+      x(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessx(j,k) = hessx(j,k) + (dec(j,k)-d0(j,k))/eps
+         end do
+      end do
+c
+c     find numerical y-components via perturbed structures
+c
+      old = y(i)
+      if (twosided) then
+         y(i) = y(i) - 0.5d0*eps
+         call echarge2r
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = dec(j,k)
+            end do
+         end do
+      end if
+      y(i) = y(i) + eps
+      call echarge2r
+      y(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessy(j,k) = hessy(j,k) + (dec(j,k)-d0(j,k))/eps
+         end do
+      end do
+c
+c     find numerical z-components via perturbed structures
+c
+      old = z(i)
+      if (twosided) then
+         z(i) = z(i) - 0.5d0*eps
+         call echarge2r
+         do k = 1, n
+            do j = 1, 3
+               d0(j,k) = dec(j,k)
+            end do
+         end do
+      end if
+      z(i) = z(i) + eps
+      call echarge2r
+      z(i) = old
+      do k = 1, n
+         do j = 1, 3
+            hessz(j,k) = hessz(j,k) + (dec(j,k)-d0(j,k))/eps
+         end do
+      end do
+c
+c     perform deallocation of some global arrays
+c
+      if (.not. prior)  deallocate (dec)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (d0)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine echarge2r  --  recip charge derivs utility  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "echarge2r" computes reciprocal space charge-charge first
+c     derivatives; used to get finite difference second derivatives
+c
+c
+      subroutine echarge2r
+      use atoms
+      use boxes
+      use charge
+      use chgpot
+      use deriv
+      use ewald
+      use math
+      use pme
+      implicit none
+      integer i,ii
+      real*8 de,f,term
+      real*8 xd,yd,zd
+      real*8 dedx,dedy,dedz
+c
+c
+c     zero out the Ewald summation derivative values
+c
+      do i = 1, n
+         dec(1,i) = 0.0d0
+         dec(2,i) = 0.0d0
+         dec(3,i) = 0.0d0
+      end do
+      if (nion .eq. 0)  return
+c
+c     set grid size, spline order and Ewald coefficient
+c
+      nfft1 = nefft1
+      nfft2 = nefft2
+      nfft3 = nefft3
+      bsorder = bseorder
+      aewald = aeewald
+      f = electric / dielec
+c
+c     compute the cell dipole boundary correction term
+c
+      if (boundary .eq. 'VACUUM') then
+         xd = 0.0d0
+         yd = 0.0d0
+         zd = 0.0d0
+         do ii = 1, nion
+            i = iion(ii)
+            xd = xd + pchg(ii)*x(i)
+            yd = yd + pchg(ii)*y(i)
+            zd = zd + pchg(ii)*z(i)
+         end do
+         term = (2.0d0/3.0d0) * f * (pi/volbox)
+         do ii = 1, nion
+            i = iion(ii)
+            de = 2.0d0 * term * pchg(ii)
+            dedx = de * xd
+            dedy = de * yd
+            dedz = de * zd
+            dec(1,i) = dec(1,i) + dedx
+            dec(2,i) = dec(2,i) + dedy
+            dec(3,i) = dec(3,i) + dedz
+         end do
+      end if
+c
+c     compute reciprocal space Ewald first derivative values
+c
+      call ecrecip1
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine echarge2d  --  real Ewald charge Hessian; loop  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "echarge2d" calculates second derivatives of the real space
+c     charge-charge interaction energy for a single atom using a
+c     pairwise loop
+c
+c
+      subroutine echarge2d (i)
       use atoms
       use bound
       use cell
@@ -597,6 +805,7 @@ c
       use hessn
       use limits
       use math
+      use shunt
       implicit none
       integer i,j,k,kk
       integer in,kn,jcell
@@ -606,12 +815,13 @@ c
       real*8 d2edx,d2edy,d2edz
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 rew,erfc,cut2
+      real*8 rew,erfc
       real*8 erfterm,expterm
       real*8 scale
       real*8 term(3,3)
       real*8, allocatable :: cscale(:)
       logical proceed
+      character*6 mode
       external erfc
 c
 c
@@ -621,7 +831,6 @@ c
          if (iion(k) .eq. i) then
             fi = electric * pchg(k) / dielec
             in = jion(k)
-            cut2 = ewaldcut * ewaldcut
             goto 10
          end if
       end do
@@ -634,13 +843,14 @@ c
       yi = y(i)
       zi = z(i)
 c
-c     set Ewald coefficient for electrostatic interactions
-c
-      aewald = aeewald
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (cscale(n))
+c
+c     set cutoff distances and switching function coefficients
+c
+      mode = 'EWALD'
+      call switch (mode)
 c
 c     initialize connected atom exclusion coefficients
 c
@@ -677,7 +887,7 @@ c
             zr = zi - z(k)
             call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. cut2) then
+            if (r2 .le. off2) then
                r = sqrt(r2)
                rb = r + ebuffer
                rb2 = rb * rb
@@ -750,7 +960,7 @@ c
                zr = zi - z(k)
                call imager (xr,yr,zr,jcell)
                r2 = xr*xr + yr*yr + zr*zr
-               if (r2 .le. cut2) then
+               if (r2 .le. off2) then
                   r = sqrt(r2)
                   rb = r + ebuffer
                   rb2 = rb * rb
@@ -814,19 +1024,197 @@ c
       end
 c
 c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine echarge2e  --  real Ewald charge Hessian; list  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "echarge2e" calculates second derivatives of the real space
+c     charge-charge interaction energy for a single atom using a
+c     pairwise neighbor list
+c
+c
+      subroutine echarge2e (i)
+      use atoms
+      use bound
+      use charge
+      use chgpot
+      use couple
+      use ewald
+      use group
+      use hessn
+      use limits
+      use math
+      use neigh
+      use shunt
+      implicit none
+      integer i,j,k,kk,kkk
+      integer ii,in,kn
+      real*8 fi,fik,fgrp
+      real*8 r,r2,rb,rb2
+      real*8 de,d2e
+      real*8 d2edx,d2edy,d2edz
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr
+      real*8 rew,erfc
+      real*8 erfterm,expterm
+      real*8 scale
+      real*8 term(3,3)
+      real*8, allocatable :: cscale(:)
+      logical proceed
+      character*6 mode
+      external erfc
+c
+c
+c     first see if the atom of interest carries a charge
+c
+      do k = 1, nion
+         if (iion(k) .eq. i) then
+            fi = electric * pchg(k) / dielec
+            ii = k
+            in = jion(k)
+            goto 10
+         end if
+      end do
+      return
+   10 continue
+c
+c     store the coordinates of the atom of interest
+c
+      xi = x(i)
+      yi = y(i)
+      zi = z(i)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (cscale(n))
+c
+c     set cutoff distances and switching function coefficients
+c
+      mode = 'EWALD'
+      call switch (mode)
+c
+c     initialize connected atom exclusion coefficients
+c
+      do j = 1, nion
+         cscale(iion(j)) = 1.0d0
+      end do
+      do j = 1, n12(in)
+         cscale(i12(j,in)) = c2scale
+      end do
+      do j = 1, n13(in)
+         cscale(i13(j,in)) = c3scale
+      end do
+      do j = 1, n14(in)
+         cscale(i14(j,in)) = c4scale
+      end do
+      do j = 1, n15(in)
+         cscale(i15(j,in)) = c5scale
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(i,ii,iion,jion,x,y,z,fi,
+!$OMP& pchg,nelst,elst,cscale,use_group,off2,aewald,ebuffer)
+!$OMP& shared (hessx,hessy,hessz)
+!$OMP DO reduction(+:hessx,hessy,hessz) schedule(guided)
+c
+c     calculate the real space Ewald interaction Hessian elements
+c
+      do kkk = 1, nelst(ii)
+         kk = elst(kkk,ii)
+         k = iion(kk)
+         kn = jion(kk)
+         if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+         proceed = .true.
+         if (proceed)  proceed = (kn .ne. i)
+c
+c     compute the energy contribution for this interaction
+c
+         if (proceed) then
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
+            call image (xr,yr,zr)
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. off2) then
+               r = sqrt(r2)
+               rb = r + ebuffer
+               rb2 = rb * rb
+               fik = fi * pchg(kk) * cscale(kn)
+               rew = aewald * r
+               erfterm = erfc (rew)
+               expterm = exp(-rew**2)
+               scale = cscale(kn)
+               if (use_group)  scale = scale * fgrp
+               scale = scale - 1.0d0
+c
+c     compute chain rule terms for Hessian matrix elements
+c
+               de = -fik * ((erfterm+scale)/rb2
+     &                        + (2.0d0*aewald/sqrtpi)*expterm/r)
+               d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scale
+     &                  + (4.0d0*fik*aewald**3/sqrtpi)*expterm
+     &                  + 2.0d0*(fik/(rb*rb2))*scale
+c
+c     form the individual Hessian element components
+c
+               de = de / r
+               d2e = (d2e-de) / r2
+               d2edx = d2e * xr
+               d2edy = d2e * yr
+               d2edz = d2e * zr
+               term(1,1) = d2edx*xr + de
+               term(1,2) = d2edx*yr
+               term(1,3) = d2edx*zr
+               term(2,1) = term(1,2)
+               term(2,2) = d2edy*yr + de
+               term(2,3) = d2edy*zr
+               term(3,1) = term(1,3)
+               term(3,2) = term(2,3)
+               term(3,3) = d2edz*zr + de
+c
+c     increment diagonal and non-diagonal Hessian elements
+c
+               do j = 1, 3
+                  hessx(j,i) = hessx(j,i) + term(1,j)
+                  hessy(j,i) = hessy(j,i) + term(2,j)
+                  hessz(j,i) = hessz(j,i) + term(3,j)
+                  hessx(j,k) = hessx(j,k) - term(1,j)
+                  hessy(j,k) = hessy(j,k) - term(2,j)
+                  hessz(j,k) = hessz(j,k) - term(3,j)
+               end do
+            end if
+         end if
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (cscale)
+      return
+      end
+c
+c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine echarge2d  --  charge Hessian for smoothing  ##
+c     ##  subroutine echarge2f  --  charge Hessian for smoothing  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "echarge2d" calculates second derivatives of the charge-charge
+c     "echarge2f" calculates second derivatives of the charge-charge
 c     interaction energy for a single atom for use with potential
 c     smoothing methods
 c
 c
-      subroutine echarge2d (i)
+      subroutine echarge2f (i)
       use atoms
       use charge
       use chgpot
