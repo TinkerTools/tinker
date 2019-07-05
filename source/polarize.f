@@ -32,6 +32,7 @@ c
       real*8 external
       real*8 exfield(3)
       real*8 umol(3)
+      real*8 umol0(3)
       real*8 dalpha(3)
       real*8 alpha(3,3)
       real*8 valpha(3,3)
@@ -44,8 +45,9 @@ c
       call getxyz
       call attach
       call field
-      call molecule
+      call cutoffs
       call katom
+      call molecule
       call kmpole
       call kpolar
       call mutate
@@ -75,6 +77,13 @@ c
    40    format (/,a36,f16.4)
       end if
 c
+c     find induced dipoles in absence of an external field
+c
+      do i = 1, 3
+         exfield(i) = 0.0d0
+      end do
+      call moluind (exfield,umol0)
+c
 c     compute each column of the polarizability tensor
 c
       external = 0.01d0
@@ -83,25 +92,25 @@ c
       end do
       exfield(1) = external
       call moluind (exfield,umol)
-      alpha(1,1) = umol(1) / exfield(1)
-      alpha(2,1) = umol(2) / exfield(1)
-      alpha(3,1) = umol(3) / exfield(1)
+      alpha(1,1) = (umol(1)-umol0(1)) / exfield(1)
+      alpha(2,1) = (umol(2)-umol0(2)) / exfield(1)
+      alpha(3,1) = (umol(3)-umol0(3)) / exfield(1)
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
       exfield(2) = external
       call moluind (exfield,umol)
-      alpha(1,2) = umol(1) / exfield(2)
-      alpha(2,2) = umol(2) / exfield(2)
-      alpha(3,2) = umol(3) / exfield(2)
+      alpha(1,2) = (umol(1)-umol0(1)) / exfield(2)
+      alpha(2,2) = (umol(2)-umol0(2)) / exfield(2)
+      alpha(3,2) = (umol(3)-umol0(3)) / exfield(2)
       do i = 1, 3
          exfield(i) = 0.0d0
       end do
       exfield(3) = external
       call moluind (exfield,umol)
-      alpha(1,3) = umol(1) / exfield(3)
-      alpha(2,3) = umol(2) / exfield(3)
-      alpha(3,3) = umol(3) / exfield(3)
+      alpha(1,3) = (umol(1)-umol0(1)) / exfield(3)
+      alpha(2,3) = (umol(2)-umol0(2)) / exfield(3)
+      alpha(3,3) = (umol(3)-umol0(3)) / exfield(3)
 c
 c     print out the full polarizability tensor
 c
@@ -129,7 +138,7 @@ c
 c     diagonalize the tensor and get molecular polarizability
 c
       call jacobi (3,alpha,dalpha,valpha)
-      if (nmol .eq. 1)  fstr = ' Polarizability Tensor Eigenvalues :'
+      fstr = ' Polarizability Tensor Eigenvalues :'
       write (iout,90)  fstr(1:36)
    90 format (/,a36,/)
       if (digits .ge. 8) then
@@ -187,33 +196,66 @@ c
       real*8 eps,epsold
       real*8 polmin
       real*8 a,b,sum
+      real*8 norm,exmax
       real*8 umol(3)
       real*8 exfield(3)
       real*8, allocatable :: poli(:)
       real*8, allocatable :: field(:,:)
+      real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: rsd(:,:)
       real*8, allocatable :: zrsd(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
-      logical done
+      logical header,done
+      logical dodfield
 c
-c
-c     set induced dipoles to polarizability times external field
-c
-      do i = 1, npole
-         do j = 1, 3
-            uind(j,i) = polarity(i) * exfield(j)
-         end do
-      end do
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (poli(npole))
       allocate (field(3,npole))
+      allocate (fieldp(3,npole))
       allocate (rsd(3,npole))
       allocate (zrsd(3,npole))
       allocate (conj(3,npole))
       allocate (vec(3,npole))
+c
+c     check for chiral multipoles and rotate to global frame
+c
+      call chkpole
+      call rotpole
+c
+c     zero out the field and induced dipoles at each site
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = 0.0d0
+            uinp(j,i) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+         end do
+      end do
+c
+c     get the electrostatic field due to permanent multipoles
+c
+      dodfield = .true.
+      if (dodfield)  call dfield0a (field,fieldp)
+c
+c     set induced dipoles to polarizability times direct field
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = polarity(i) * field(j,i)
+         end do
+      end do
+c
+c     increment induced dipoles to account for external field
+c
+      do i = 1, npole
+         do j = 1, 3
+            uind(j,i) = uind(j,i) + polarity(i)*exfield(j)
+         end do
+      end do
 c
 c     compute mutual induced dipole moments via CG algorithm
 c
@@ -223,7 +265,7 @@ c
          iter = 0
          eps = 100.0d0
          polmin = 0.00000001d0
-         call ufield (field)
+         call ufield0a (field,fieldp)
          do i = 1, npole
             poli(i) = max(polmin,polarity(i))
             do j = 1, 3
@@ -243,7 +285,7 @@ c
                   uind(j,i) = conj(j,i)
                end do
             end do
-            call ufield (field)
+            call ufield0a (field,fieldp)
             do i = 1, npole
                do j = 1, 3
                   uind(j,i) = vec(j,i)
@@ -317,203 +359,41 @@ c
          umol(3) = umol(3) + uind(3,i)
       end do
 c
+c     print out a list of the final induced dipole moments
+c
+      if (verbose) then
+         exmax = max(exfield(1),exfield(2),exfield(3))
+         if (dodfield .or. exmax.ne.0.0d0) then
+            write (iout,40)  (exfield(j),j=1,3)
+   40       format (/,' Applied External Field :',//,13x,3f13.4)
+            header = .true.
+            do i = 1, npole
+               if (polarity(i) .ne. 0.0d0) then
+                  if (header) then
+                     header = .false.
+                     write (iout,50)
+   50                format (/,' Induced Dipole Moments (Debye) :')
+                     write (iout,60)
+   60                format (/,4x,'Atom',15x,'X',12x,'Y',12x,'Z',
+     &                          11x,'Total',/)
+                  end if
+                  norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
+                  write (iout,70)  ipole(i),(debye*uind(j,i),j=1,3),
+     &                             debye*norm
+   70             format (i8,5x,3f13.4,1x,f13.4)
+               end if
+            end do
+         end if
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (poli)
       deallocate (field)
+      deallocate (fieldp)
       deallocate (rsd)
       deallocate (zrsd)
       deallocate (conj)
       deallocate (vec)
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ufield  --  electric field from induced dipoles  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "ufield" finds the field at each polarizable site due to the
-c     induced dipoles at the other polarizable sites
-c
-c
-      subroutine ufield (field)
-      use atoms
-      use chgpen
-      use couple
-      use mplpot
-      use mpole
-      use polar
-      use polgrp
-      use polpot
-      implicit none
-      integer i,j,k
-      integer ii,kk
-      real*8 r,r2,rr3,rr5
-      real*8 xr,yr,zr
-      real*8 uix,uiy,uiz
-      real*8 ukx,uky,ukz
-      real*8 uir,ukr
-      real*8 pdi,pti
-      real*8 corei,corek
-      real*8 vali,valk
-      real*8 alphai,alphak
-      real*8 pgamma,damp
-      real*8 expdamp
-      real*8 scale3,scale5
-      real*8 fi(3),fk(3)
-      real*8 dmpik(5)
-      real*8, allocatable :: uscale(:)
-      real*8, allocatable :: wscale(:)
-      real*8 field(3,*)
-c
-c
-c     zero out the value of the electric field at each site
-c
-      do ii = 1, npole
-         do j = 1, 3
-            field(j,ii) = 0.0d0
-         end do
-      end do
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (uscale(n))
-      allocate (wscale(n))
-c
-c     initialize connected atom exclusion coefficients
-c
-      do i = 1, n
-         uscale(i) = 1.0d0
-         wscale(i) = 1.0d0
-      end do
-c
-c     loop over pairs of sites incrementing the electric field
-c
-      do ii = 1, npole-1
-         i = ipole(ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-         else if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
-         end if
-         do j = 1, np11(i)
-            uscale(ip11(j,i)) = u1scale
-         end do
-         do j = 1, np12(i)
-            uscale(ip12(j,i)) = u2scale
-         end do
-         do j = 1, np13(i)
-            uscale(ip13(j,i)) = u3scale
-         end do
-         do j = 1, np14(i)
-            uscale(ip14(j,i)) = u4scale
-         end do
-         do j = 1, n12(i)
-            wscale(i12(j,i)) = w2scale
-         end do
-         do j = 1, n13(i)
-            wscale(i13(j,i)) = w3scale
-         end do
-         do j = 1, n14(i)
-            wscale(i14(j,i)) = w4scale
-         end do
-         do j = 1, n15(i)
-            wscale(i15(j,i)) = w5scale
-         end do
-         do kk = ii+1, npole
-            k = ipole(kk)
-            xr = x(k) - x(i)
-            yr = y(k) - y(i)
-            zr = z(k) - z(i)
-            r2 = xr*xr + yr* yr + zr*zr
-            ukx = uind(1,kk)
-            uky = uind(2,kk)
-            ukz = uind(3,kk)
-            r = sqrt(r2)
-            uir = uix*xr + uiy*yr + uiz*zr
-            ukr = ukx*xr + uky*yr + ukz*zr
-c
-c     adjust the field to account for polarization damping
-c
-            if (use_thole) then
-               scale3 = uscale(k)
-               scale5 = uscale(k)
-               damp = pdi * pdamp(kk)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(kk))
-                  damp = -pgamma * (r/damp)**3
-                  if (damp .gt. -50.0d0) then
-                     expdamp = exp(damp)
-                     scale3 = scale3 * (1.0d0-expdamp)
-                     scale5 = scale5 * (1.0d0-expdamp*(1.0d0-damp))
-                  end if
-               end if
-            else if (use_chgpen) then
-               corek = pcore(kk)
-               valk = pval(kk)
-               alphak = palpha(kk)
-               call dampmut (r,alphai,alphak,dmpik)
-               scale3 = wscale(k) * dmpik(3)
-               scale5 = wscale(k) * dmpik(5)
-            end if
-            rr3 = scale3 / (r*r2)
-            rr5 = 3.0d0 * scale5 / (r*r2*r2)
-            fi(1) = -rr3*ukx + rr5*ukr*xr
-            fi(2) = -rr3*uky + rr5*ukr*yr
-            fi(3) = -rr3*ukz + rr5*ukr*zr
-            fk(1) = -rr3*uix + rr5*uir*xr
-            fk(2) = -rr3*uiy + rr5*uir*yr
-            fk(3) = -rr3*uiz + rr5*uir*zr
-c
-c     increment the field at each site due to this interaction
-c
-            do j = 1, 3
-               field(j,ii) = field(j,ii) + fi(j)
-               field(j,kk) = field(j,kk) + fk(j)
-            end do
-         end do
-c
-c     reset exclusion coefficients for connected atoms
-c
-         do j = 1, np11(i)
-            uscale(ip11(j,i)) = 1.0d0
-         end do
-         do j = 1, np12(i)
-            uscale(ip12(j,i)) = 1.0d0
-         end do
-         do j = 1, np13(i)
-            uscale(ip13(j,i)) = 1.0d0
-         end do
-         do j = 1, np14(i)
-            uscale(ip14(j,i)) = 1.0d0
-         end do
-         do j = 1, n12(i)
-            wscale(i12(j,i)) = 1.0d0
-         end do
-         do j = 1, n13(i)
-            wscale(i13(j,i)) = 1.0d0
-         end do
-         do j = 1, n14(i)
-            wscale(i14(j,i)) = 1.0d0
-         end do
-         do j = 1, n15(i)
-            wscale(i15(j,i)) = 1.0d0
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (uscale)
-      deallocate (wscale)
       return
       end
