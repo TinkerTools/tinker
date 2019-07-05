@@ -1270,6 +1270,7 @@ c
                   read (string,*,err=490,end=490)  (pg(i),i=2,maxval)
                end if
             else
+               string = string(next:240)
                read (string,*,err=490,end=490)  (pg(i),i=2,maxval)
             end if
   490       continue

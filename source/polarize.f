@@ -66,13 +66,13 @@ c
       if (nmol .eq. 1)  fstr = ' Additive Molecular Polarizability :'
       if (digits .ge. 8) then
          write (iout,20)  fstr(1:36),addu
-   20    format (/,a36,f19.8)
+   20    format (/,a36,f20.8)
       else if (digits .ge. 6) then
          write (iout,30)  fstr(1:36),addu
-   30    format (/,a36,f17.6)
+   30    format (/,a36,f18.6)
       else
          write (iout,40)  fstr(1:36),addu
-   40    format (/,a36,f15.4)
+   40    format (/,a36,f16.4)
       end if
 c
 c     compute each column of the polarizability tensor
@@ -113,17 +113,17 @@ c
          write (iout,60)  alpha(1,1),alpha(1,2),alpha(1,3),
      &                    alpha(2,1),alpha(2,2),alpha(2,3),
      &                    alpha(3,1),alpha(3,2),alpha(3,3)
-   60    format (15x,3f16.8,/,15x,3f16.8,/,15x,3f16.8)
+   60    format (13x,3f17.8,/,13x,3f17.8,/,13x,3f17.8)
       else if (digits .ge. 6) then
          write (iout,70)  alpha(1,1),alpha(1,2),alpha(1,3),
      &                    alpha(2,1),alpha(2,2),alpha(2,3),
      &                    alpha(3,1),alpha(3,2),alpha(3,3)
-   70    format (15x,3f14.6,/,15x,3f14.6,/,15x,3f14.6)
+   70    format (13x,3f15.6,/,13x,3f15.6,/,13x,3f15.6)
       else
          write (iout,80)  alpha(1,1),alpha(1,2),alpha(1,3),
      &                    alpha(2,1),alpha(2,2),alpha(2,3),
      &                    alpha(3,1),alpha(3,2),alpha(3,3)
-   80    format (15x,3f12.4,/,15x,3f12.4,/,15x,3f12.4)
+   80    format (13x,3f13.4,/,13x,3f13.4,/,13x,3f13.4)
       end if
 c
 c     diagonalize the tensor and get molecular polarizability
@@ -134,26 +134,26 @@ c
    90 format (/,a36,/)
       if (digits .ge. 8) then
          write (iout,100)  dalpha(1),dalpha(2),dalpha(3)
-  100    format (15x,3f16.8)
+  100    format (13x,3f17.8)
       else if (digits .ge. 6) then
          write (iout,110)  dalpha(1),dalpha(2),dalpha(3)
-  110    format (15x,3f14.6)
+  110    format (13x,3f15.6)
       else
          write (iout,120)  dalpha(1),dalpha(2),dalpha(3)
-  120    format (15x,3f12.4)
+  120    format (13x,3f13.4)
       end if
       malpha = (dalpha(1)+dalpha(2)+dalpha(3)) / 3.0d0
       fstr = ' Interactive Total Polarizability :    '
       if (nmol .eq. 1)  fstr = ' Interactive Molecular Polarizability :'
       if (digits .ge. 8) then
          write (iout,130)  fstr(1:39),malpha
-  130    format (/,a39,f16.8)
+  130    format (/,a39,f17.8)
       else if (digits .ge. 6) then
          write (iout,140)  fstr(1:39),malpha
-  140    format (/,a39,f14.6)
+  140    format (/,a39,f15.6)
       else
          write (iout,150)  fstr(1:39),malpha
-  150    format (/,a39,f12.4)
+  150    format (/,a39,f13.4)
       end if
 c
 c     perform any final tasks before program exit

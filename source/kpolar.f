@@ -295,6 +295,7 @@ c
                   read (string,*,err=30,end=30)  (pg(j),j=2,maxval)
                end if
             else
+               string = record(next:240)
                read (string,*,err=30,end=30)  (pg(j),j=2,maxval)
             end if
    30       continue
