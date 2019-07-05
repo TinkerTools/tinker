@@ -223,7 +223,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 50.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -359,7 +359,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(e) .gt. 50.0d0)
+                     huge = (abs(e) .gt. 100.0d0)
                      if ((debug.and.e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -651,7 +651,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 50.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -905,7 +905,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 50.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1144,8 +1144,7 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scale)
+                  e = (fik/rb) * (erfterm+scale-1.0d0)
 c
 c     increment the overall charge-charge energy components
 c
@@ -1160,7 +1159,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efull) .gt. 50.0d0)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1259,8 +1258,7 @@ c
                            scale = scale * cscale(kn)
                         end if
                      end if
-                     scale = scale - 1.0d0
-                     e = (fik/rb) * (erfterm+scale)
+                     e = (fik/rb) * (erfterm+scale-1.0d0)
                      if (i .eq. k)  e = 0.5d0 * e
 c
 c     increment the overall charge-charge energy component
@@ -1277,7 +1275,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(efull) .gt. 50.0d0)
+                     huge = (abs(efull) .gt. 100.0d0)
                      if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -1581,8 +1579,7 @@ c
                   if (use_polymer) then
                      if (r2 .gt. polycut2)  fik = fi * pchg(kmap)
                   end if
-                  scale = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scale)
+                  e = (fik/rb) * (erfterm+scale-1.0d0)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1598,7 +1595,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efull) .gt. 50.0d0)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1859,8 +1856,7 @@ c
                   erfterm = erfc (rew)
                   scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = (fik/rb) * (erfterm+scale)
+                  e = (fik/rb) * (erfterm+scale-1.0d0)
 c
 c     increment the overall charge-charge energy component
 c
@@ -1875,7 +1871,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(efull) .gt. 50.0d0)
+                  huge = (abs(efull) .gt. 100.0d0)
                   if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -2098,7 +2094,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(e) .gt. 50.0d0)
+               huge = (abs(e) .gt. 100.0d0)
                if ((debug.and.e.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then

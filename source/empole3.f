@@ -326,7 +326,7 @@ c
 c
 c     print message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 80.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -534,7 +534,7 @@ c
 c
 c     print message if the energy of this interaction is large
 c
-                        huge = (abs(e) .gt. 80.0d0)
+                        huge = (abs(e) .gt. 100.0d0)
                         if ((debug.and.e.ne.0.0d0)
      &                        .or. (verbose.and.huge)) then
                            if (header) then
@@ -874,7 +874,7 @@ c
 c
 c     print message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 80.0d0)
+                  huge = (abs(e) .gt. 100.0d0)
                   if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
@@ -1360,7 +1360,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(efull) .gt. 80.0d0)
+               huge = (abs(efull) .gt. 100.0d0)
                if ((debug.and.efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
@@ -1610,7 +1610,7 @@ c
 c
 c     print message if the energy of this interaction is large
 c
-                     huge = (abs(efull) .gt. 80.0d0)
+                     huge = (abs(efull) .gt. 100.0d0)
                      if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
@@ -2102,7 +2102,7 @@ c
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (abs(efull) .gt. 80.0d0)
+               huge = (abs(efull) .gt. 100.0d0)
                if ((debug.and.efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
