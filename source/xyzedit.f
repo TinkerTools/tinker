@@ -1324,13 +1324,17 @@ c
       use_imptor = .true.
       use_tors = .true.
       use_vdw = .true.
+      use_repuls = .true.
+      use_disp = .true.
 c
 c     cutoff values and neighbor lists for vdw interactions
 c
       use_list = .false.
       use_vlist = .false.
       vdwcut = 5.0d0
+      dispcut = 5.0d0
       vdwtaper = 4.5d0
+      disptaper = 4.5d0
       lbuffer = 1.0d0
       boxsiz = min(xbox,ybox,zbox)
       if (boxsiz .gt. 2.0d0*(vdwcut+lbuffer)) then
@@ -1340,6 +1344,8 @@ c
          lbuf2 = (0.5d0*lbuffer)**2
          vbuf2 = (vdwcut+lbuffer)**2
          vbufx = (vdwcut+2.0d0*lbuffer)**2
+         dbuf2 = (dispcut+lbuffer)**2
+         dbufx = (dispcut+2.0d0*lbuffer)**2
          maxvlst = int(sqrt(vbuf2)**3) + 100
       end if
 c
