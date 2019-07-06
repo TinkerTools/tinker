@@ -188,14 +188,16 @@ c
       use iounit
       use mpole
       use polar
+      use polopt
+      use polpcg
       use polpot
       use units
       implicit none
-      integer i,j,iter
+      integer i,j,k,iter
       integer maxiter
       real*8 eps,epsold
       real*8 polmin
-      real*8 a,b,sum
+      real*8 a,b,sum,term
       real*8 norm,exmax
       real*8 umol(3)
       real*8 exfield(3)
@@ -206,6 +208,7 @@ c
       real*8, allocatable :: zrsd(:,:)
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
+      real*8, allocatable :: usum(:,:)
       logical header,done
       logical dodfield
 c
@@ -225,12 +228,10 @@ c
       call chkpole
       call rotpole
 c
-c     zero out the field and induced dipoles at each site
+c     zero out the value of the field at each site
 c
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = 0.0d0
-            uinp(j,i) = 0.0d0
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
          end do
@@ -245,7 +246,7 @@ c     set induced dipoles to polarizability times direct field
 c
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = polarity(i) * field(j,i)
+            udir(j,i) = polarity(i) * field(j,i)
          end do
       end do
 c
@@ -253,9 +254,48 @@ c     increment induced dipoles to account for external field
 c
       do i = 1, npole
          do j = 1, 3
-            uind(j,i) = uind(j,i) + polarity(i)*exfield(j)
+            udir(j,i) = udir(j,i) + polarity(i)*exfield(j)
+            uind(j,i) = udir(j,i)
          end do
       end do
+c
+c     get induced dipoles via the OPT extrapolation method
+c
+      if (poltyp .eq. 'OPT') then
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uopt(0,j,i) = udir(j,i)
+               end do
+            end if
+         end do
+         do k = 1, optorder
+            optlevel = k - 1
+            call ufield0a (field,fieldp)
+            do i = 1, npole
+               if (douind(ipole(i))) then
+                  do j = 1, 3
+                     uopt(k,j,i) = polarity(i) * field(j,i)
+                     uind(j,i) = uopt(k,j,i)
+                  end do
+               end if
+            end do
+         end do
+         allocate (usum(3,n))
+         do i = 1, npole
+            if (douind(ipole(i))) then
+               do j = 1, 3
+                  uind(j,i) = 0.0d0
+                  usum(j,i) = 0.0d0
+                  do k = 0, optorder
+                     usum(j,i) = usum(j,i) + uopt(k,j,i)
+                     uind(j,i) = uind(j,i) + copt(k)*usum(j,i)
+                  end do
+               end do
+            end if
+         end do
+         deallocate (usum)
+      end if
 c
 c     compute mutual induced dipole moments via CG algorithm
 c
@@ -263,8 +303,8 @@ c
          done = .false.
          maxiter = 500
          iter = 0
-         eps = 100.0d0
          polmin = 0.00000001d0
+         eps = 100.0d0
          call ufield0a (field,fieldp)
          do i = 1, npole
             poli(i) = max(polmin,polarity(i))
@@ -336,15 +376,29 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
+c
+c     apply a "peek" iteration to the mutual induced dipoles
+c
+            if (done) then
+               do i = 1, npole
+                  if (douind(ipole(i))) then
+                     term = pcgpeek * poli(i)
+                     do j = 1, 3
+                        uind(j,i) = uind(j,i) + term*rsd(j,i)
+                     end do
+                  end if
+               end do
+            end if
          end do
 c
 c     print a warning if induced dipoles failed to converge
 c
-         if (eps .gt. poleps) then
+         if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,30)
    30       format (/,' MOLUIND  --  Warning, Induced Dipoles',
      &                 ' are not Converged')
+            call fatal
          end if
       end if
 c

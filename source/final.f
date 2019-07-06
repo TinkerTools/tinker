@@ -829,6 +829,7 @@ c
       if (allocated(iring4))  deallocate (iring4)
       if (allocated(iring5))  deallocate (iring5)
       if (allocated(iring6))  deallocate (iring6)
+      if (allocated(iring7))  deallocate (iring7)
 c
 c     deallocation of global arrays from module rotbnd
 c

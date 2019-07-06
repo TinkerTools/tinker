@@ -31,9 +31,10 @@ c
       use ring
       use tors
       implicit none
-      integer i,j,k,m,imax
-      integer ia,ib,ic
-      integer id,ie,ig
+      integer i,j,k,m
+      integer kk,imax
+      integer ia,ib,ic,id
+      integer ie,ig,ih
       integer list1,list2
       integer list3,list4
       integer maxring
@@ -48,6 +49,7 @@ c
       nring4 = 0
       nring5 = 0
       nring6 = 0
+      nring7 = 0
 c
 c     parse to find bonds, angles, torsions and bitorsions
 c
@@ -63,6 +65,7 @@ c
       if (.not. allocated(iring4))  allocate (iring4(4,maxring))
       if (.not. allocated(iring5))  allocate (iring5(5,maxring))
       if (.not. allocated(iring6))  allocate (iring6(6,maxring))
+      if (.not. allocated(iring7))  allocate (iring7(7,maxring))
 c
 c     search for and store all of the 3-membered rings
 c
@@ -130,8 +133,9 @@ c
                         list1 = list(iring3(1,m))
                         list2 = list(iring3(2,m))
                         list3 = list(iring3(3,m))
-                        if (list1.eq.nring4 .and. list2.eq.nring4
-     &                          .and. list3.eq.nring4) then
+                        if (list1.eq.nring4 .and.
+     &                      list2.eq.nring4 .and.
+     &                      list3.eq.nring4) then
                            nring4 = nring4 - 1
                            list(ia) = 0
                            list(ib) = 0
@@ -187,8 +191,9 @@ c
                         list1 = list(iring3(1,m))
                         list2 = list(iring3(2,m))
                         list3 = list(iring3(3,m))
-                        if (list1.eq.nring5 .and. list2.eq.nring5
-     &                          .and. list3.eq.nring5) then
+                        if (list1.eq.nring5 .and.
+     &                      list2.eq.nring5 .and.
+     &                      list3.eq.nring5) then
                            nring5 = nring5 - 1
                            list(ia) = 0
                            list(ib) = 0
@@ -250,8 +255,9 @@ c
                            list1 = list(iring3(1,m))
                            list2 = list(iring3(2,m))
                            list3 = list(iring3(3,m))
-                           if (list1.eq.nring6 .and. list2.eq.nring6
-     &                             .and. list3.eq.nring6) then
+                           if (list1.eq.nring6 .and.
+     &                         list2.eq.nring6 .and.
+     &                         list3.eq.nring6) then
                               nring6 = nring6 - 1
                               list(ia) = 0
                               list(ib) = 0
@@ -289,6 +295,98 @@ c
          end do
       end do
 c
+c     search for and store all of the 7-membered rings
+c
+      do i = 1, n
+         list(i) = 0
+      end do
+      do i = 1, nbitor
+         ia = ibitor(1,i)
+         ib = ibitor(2,i)
+         ic = ibitor(3,i)
+         id = ibitor(4,i)
+         ie = ibitor(5,i)
+         imax = max(ia,ib,ic,id,ie)
+         do j = 1, n12(ia)
+            ih = i12(j,ia)
+            do k = 1, n12(ie)
+               ig = i12(k,ie)
+               if ((ig.gt.imax.and.ih.gt.ie) .or.
+     &             (ih.gt.imax.and.ig.gt.ia)) then
+                  do kk = 1, n12(ig)
+                     if (i12(kk,ig) .eq. ih) then
+                        nring7 = nring7 + 1
+                        if (nring7 .gt. maxring) then
+                           write (iout,90)
+   90                      format (/,' RINGS  --  Too many 7-Membered',
+     &                                ' Rings; Increase MAXRING')
+                           call fatal
+                        end if
+                        iring7(1,nring7) = ia
+                        iring7(2,nring7) = ib
+                        iring7(3,nring7) = ic
+                        iring7(4,nring7) = id
+                        iring7(5,nring7) = ie
+                        iring7(6,nring7) = ig
+                        iring7(7,nring7) = ih
+c
+c     remove the ring if it is reducible into smaller rings
+c
+                        if (reduce) then
+                           list(ia) = nring7
+                           list(ib) = nring7
+                           list(ic) = nring7
+                           list(id) = nring7
+                           list(ie) = nring7
+                           list(ig) = nring7
+                           list(ih) = nring7
+                           do m = 1, nring3
+                              list1 = list(iring3(1,m))
+                              list2 = list(iring3(2,m))
+                              list3 = list(iring3(3,m))
+                              if (list1.eq.nring7 .and.
+     &                            list2.eq.nring7 .and.
+     &                            list3.eq.nring7) then
+                                 nring7 = nring7 - 1
+                                 list(ia) = 0
+                                 list(ib) = 0
+                                 list(ic) = 0
+                                 list(id) = 0
+                                 list(ie) = 0
+                                 list(ig) = 0
+                                 list(ih) = 0
+                                 goto 100
+                              end if
+                           end do
+                           do m = 1, nring4
+                              list1 = list(iring4(1,m))
+                              list2 = list(iring4(2,m))
+                              list3 = list(iring4(3,m))
+                              list4 = list(iring4(4,m))
+                              if (list1.eq.nring7 .and.
+     &                            list2.eq.nring7 .and.
+     &                            list3.eq.nring7 .and.
+     &                            list4.eq.nring7) then
+                                 nring7 = nring7 - 1
+                                 list(ia) = 0
+                                 list(ib) = 0
+                                 list(ic) = 0
+                                 list(id) = 0
+                                 list(ie) = 0
+                                 list(ig) = 0
+                                 list(ih) = 0
+                                 goto 100
+                              end if
+                           end do
+                        end if
+  100                   continue
+                     end if
+                  end do
+               end if
+            end do
+         end do
+      end do
+c
 c     perform deallocation of some local arrays
 c
       deallocate (list)
@@ -297,39 +395,48 @@ c     print out lists of the small rings in the structure
 c
       if (debug) then
          if (nring3 .gt. 0) then
-            write (iout,90)
-   90       format (/,' Three-Membered Rings in the Structure :',
-     &              //,11x,'Ring',17x,'Atoms in Ring',/)
+            write (iout,110)
+  110       format (/,' Three-Membered Rings in the Structure :',
+     &              //,3x,'Ring',14x,'Atoms in Ring',/)
             do i = 1, nring3
-               write (iout,100)  i,(iring3(j,i),j=1,3)
-  100          format (9x,i5,10x,3i8)
+               write (iout,120)  i,(iring3(j,i),j=1,3)
+  120          format (i6,7x,3i7)
             end do
          end if
          if (nring4 .gt. 0) then
-            write (iout,110)
-  110       format (/,' Four-Membered Rings in the Structure :',
-     &              //,11x,'Ring',21x,'Atoms in Ring',/)
+            write (iout,130)
+  130       format (/,' Four-Membered Rings in the Structure :',
+     &              //,3x,'Ring',17x,'Atoms in Ring',/)
             do i = 1, nring4
-               write (iout,120)  i,(iring4(j,i),j=1,4)
-  120          format (9x,i5,10x,4i8)
+               write (iout,140)  i,(iring4(j,i),j=1,4)
+  140          format (i6,7x,4i7)
             end do
          end if
          if (nring5 .gt. 0) then
-            write (iout,130)
-  130       format (/,' Five-Membered Rings in the Structure :',
-     &              //,11x,'Ring',25x,'Atoms in Ring',/)
+            write (iout,150)
+  150       format (/,' Five-Membered Rings in the Structure :',
+     &              //,3x,'Ring',20x,'Atoms in Ring',/)
             do i = 1, nring5
-               write (iout,140)  i,(iring5(j,i),j=1,5)
-  140          format (9x,i5,10x,5i8)
+               write (iout,160)  i,(iring5(j,i),j=1,5)
+  160          format (i6,7x,5i7)
             end do
          end if
          if (nring6 .gt. 0) then
-            write (iout,150)
-  150       format (/,' Six-Membered Rings in the Structure :',
-     &              //,11x,'Ring',29x,'Atoms in Ring',/)
+            write (iout,170)
+  170       format (/,' Six-Membered Rings in the Structure :',
+     &              //,3x,'Ring',23x,'Atoms in Ring',/)
             do i = 1, nring6
-               write (iout,160)  i,(iring6(j,i),j=1,6)
-  160          format (9x,i5,10x,6i8)
+               write (iout,180)  i,(iring6(j,i),j=1,6)
+  180          format (i6,7x,6i7)
+            end do
+         end if
+         if (nring7 .gt. 0) then
+            write (iout,190)
+  190       format (/,' Seven-Membered Rings in the Structure :',
+     &              //,3x,'Ring',26x,'Atoms in Ring',/)
+            do i = 1, nring7
+               write (iout,200)  i,(iring7(j,i),j=1,7)
+  200          format (i6,7x,7i7)
             end do
          end if
       end if
