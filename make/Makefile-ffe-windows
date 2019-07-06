@@ -2158,7 +2158,7 @@ xtalfit.o: atomid.o atoms.o bound.o boxes.o charge.o dipole.o energi.o files.o f
 xtalmin.o: atoms.o boxes.o files.o inform.o iounit.o keys.o math.o scales.o
 xtals.o:
 xyzatm.o: atoms.o inform.o iounit.o math.o
-xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o katoms.o limits.o linmin.o math.o minima.o molcul.o neigh.o output.o potent.o ptable.o refer.o scales.o titles.o units.o usage.o
+xyzedit.o: atomid.o atoms.o bound.o boxes.o couple.o energi.o files.o inform.o iounit.o katoms.o limits.o linmin.o math.o minima.o molcul.o neigh.o output.o potent.o ptable.o refer.o repel.o scales.o titles.o units.o usage.o vdw.o vdwpot.o
 xyzint.o: files.o iounit.o titles.o
 xyzmol2.o: files.o iounit.o titles.o
 xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o resdue.o sequen.o

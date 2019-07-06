@@ -1269,6 +1269,7 @@ c     optionally perform excluded volume coordinate refinement
 c
       if (refine) then
          call boxmin
+         call bounds
       else
          call lattice
          call molecule
@@ -1291,6 +1292,7 @@ c     periodic box
 c
 c
       subroutine boxmin
+      use atomid
       use atoms
       use boxes
       use inform
@@ -1301,8 +1303,11 @@ c
       use output
       use potent
       use scales
+      use vdw
+      use vdwpot
       implicit none
-      integer i,j,nvar
+      integer i,j,k,nvar
+      integer ii,kk
       real*8 minimum
       real*8 boxmin1
       real*8 grdmin
@@ -1324,17 +1329,45 @@ c
       use_imptor = .true.
       use_tors = .true.
       use_vdw = .true.
-      use_repuls = .true.
-      use_disp = .true.
+c
+c     set artificial Lennard-Jones vdw values for the system
+c
+      vdwtyp = 'LENNARD-JONES'
+      nvdw = n
+      do i = 1, n
+         ivdw(i) = i
+         jvdw(i) = class(i)
+         ired(i) = i
+      end do
+      do i = 1, n-1
+         ii = jvdw(i)
+         do k = i+1, n
+            kk = jvdw(k)
+            if (atomic(i).eq.1 .and. atomic(k).eq.1) then
+               radmin(ii,kk) = 2.90d0
+               epsilon(ii,kk) = 0.016d0
+               radmin4(ii,kk) = 2.90d0
+               epsilon4(ii,kk) = 0.016d0
+            else if (atomic(i).eq.1 .or. atomic(k).eq.1) then
+               radmin(ii,kk) = 3.35d0
+               epsilon(ii,kk) = 0.040d0
+               radmin4(ii,kk) = 3.35d0
+               epsilon4(ii,kk) = 0.040d0
+            else
+               radmin(ii,kk) = 3.80d0
+               epsilon(ii,kk) = 0.100d0
+               radmin4(ii,kk) = 3.80d0
+               epsilon4(ii,kk) = 0.100d0
+            end if
+         end do
+      end do
 c
 c     cutoff values and neighbor lists for vdw interactions
 c
       use_list = .false.
       use_vlist = .false.
       vdwcut = 5.0d0
-      dispcut = 5.0d0
       vdwtaper = 4.5d0
-      disptaper = 4.5d0
       lbuffer = 1.0d0
       boxsiz = min(xbox,ybox,zbox)
       if (boxsiz .gt. 2.0d0*(vdwcut+lbuffer)) then
@@ -1344,8 +1377,6 @@ c
          lbuf2 = (0.5d0*lbuffer)**2
          vbuf2 = (vdwcut+lbuffer)**2
          vbufx = (vdwcut+2.0d0*lbuffer)**2
-         dbuf2 = (dispcut+lbuffer)**2
-         dbufx = (dispcut+2.0d0*lbuffer)**2
          maxvlst = int(sqrt(vbuf2)**3) + 100
       end if
 c
@@ -1435,6 +1466,11 @@ c
 c
       function boxmin1 (xx,g)
       use atoms
+
+      use energi
+      use potent
+      use repel
+
       use scales
       implicit none
       integer i,nvar
