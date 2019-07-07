@@ -311,8 +311,9 @@ c
             ih = i12(j,ia)
             do k = 1, n12(ie)
                ig = i12(k,ie)
-               if ((ig.gt.imax.and.ih.gt.ie) .or.
-     &             (ih.gt.imax.and.ig.gt.ia)) then
+               if (ig.ne.id .and. ih.ne.ib .and.
+     &             ((ig.gt.imax.and.ih.gt.ie) .or.
+     &              (ih.gt.imax.and.ig.gt.ia))) then
                   do kk = 1, n12(ig)
                      if (i12(kk,ig) .eq. ih) then
                         nring7 = nring7 + 1
