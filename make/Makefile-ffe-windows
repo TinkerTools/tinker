@@ -2022,7 +2022,7 @@ pme.o:
 pmestuf.o: atoms.o boxes.o charge.o chunks.o disp.o math.o mpole.o openmp.o pme.o potent.o
 pmpb.o: iounit.o
 polar.o:
-polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polpot.o potent.o units.o
+polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polopt.o polpcg.o polpot.o potent.o units.o
 poledit.o: atomid.o atoms.o chgpen.o couple.o files.o inform.o iounit.o keys.o kpolr.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o ptable.o ring.o sizes.o units.o
 polgrp.o:
 polopt.o:
@@ -2041,7 +2041,7 @@ protein.o: atomid.o atoms.o couple.o files.o group.o inform.o iounit.o katoms.o 
 prtdyn.o: atoms.o boxes.o files.o group.o mdstuf.o moldyn.o rgddyn.o titles.o
 prterr.o: files.o output.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
-prtmol2.o: atomid.o atoms.o bndstr.o couple.o files.o iounit.o titles.o
+prtmol2.o: angbnd.o atomid.o atoms.o bndstr.o couple.o files.o iounit.o ring.o titles.o
 prtpdb.o: bound.o boxes.o files.o pdb.o sequen.o titles.o
 prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o sizes.o urypot.o vdwpot.o
 prtseq.o: files.o sequen.o

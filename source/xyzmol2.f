@@ -32,9 +32,14 @@ c
       write (iout,10)  title(1:ltitle)
    10 format (' Title :  ',a)
 c
-c     get a list of the bonds in the structure
+c     find the connectivity and rings in the structure
 c
+      call attach
       call bonds
+      call angles
+      call torsions
+      call bitors
+      call rings
 c
 c     open a new version of the Tripos MOL2 file
 c

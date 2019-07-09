@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1995  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  program prtmol2  --  output Tripos MOL2 coordinate file  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  program prtmol2  --  output Tripos MOL2 structure file  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "prtmol2" writes out a set of coordinates in Tripos MOL2
@@ -17,23 +17,20 @@ c     format to an external disk file
 c
 c
       subroutine prtmol2 (imol2)
-      use atomid
       use atoms
       use bndstr
-      use couple
       use files
       use iounit
       use titles
       implicit none
-      integer i,j,k,imol2
-      integer thousand,hundred
-      integer tens,ones
+      integer i,j,imol2
+      integer subnum
       logical opened
-      character*1 digit(0:9)
-      character*4 atmtyp,number
-      character*7 atmnam
+      character*2, allocatable :: bndtyp(:)
+      character*3 subnam
+      character*5, allocatable :: atmtyp(:)
+      character*8, allocatable :: atmnam(:)
       character*240 mol2file
-      data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
 c
 c     open output unit if not already done
@@ -45,7 +42,13 @@ c
          open (unit=imol2,file=mol2file,status='new')
       end if
 c
-c     write the molecule record type indicator
+c     perform dynamic allocation of some local arrays
+c
+      allocate (atmnam(n))
+      allocate (atmtyp(n))
+      allocate (bndtyp(nbond))
+c
+c     write the MOLECULE record type indicator
 c
       write (imol2,10)
    10 format ('@<TRIPOS>MOLECULE')
@@ -57,28 +60,105 @@ c
    30    format (a)
       end if
       write (imol2,40)  n,nbond,1
-   40 format (3i8)
+   40 format (3i7)
       write (imol2,50)
    50 format ('SMALL')
       write (imol2,60)
    60 format ('NO_CHARGES')
 c
-c     write the atom record type indicator
+c     determine MOL2 atom names/types and bond types
+c
+      call setmol2 (atmnam,atmtyp,bndtyp)
+c
+c     write the ATOM record type indicator
 c
       write (imol2,70)
    70 format (/,'@<TRIPOS>ATOM')
       do i = 1, n
+         subnum = 1
+         subnam = '<1>'
+         write (imol2,80)  i,atmnam(i),x(i),y(i),z(i),atmtyp(i),
+     &                     subnum,subnam
+   80    format (i7,2x,a8,1x,3f12.6,2x,a5,i7,2x,a3)
+      end do
 c
-c     set the Tripos MOL2 atom_name for the atom
+c     write the BOND record type indicator
 c
-         thousand = i / 1000
-         hundred = (i - 1000*thousand) / 100
-         tens = (i - 1000*thousand - 100*hundred) / 10
-         ones = i - 1000*thousand - 100*hundred - 10*tens
-         number(1:1) = digit(thousand)
-         number(2:2) = digit(hundred)
-         number(3:3) = digit(tens)
-         number(4:4) = digit(ones)
+      write (imol2,90)
+   90 format (/,'@<TRIPOS>BOND')
+      do i = 1, nbond
+         write (imol2,100)  i,(ibnd(j,i),j=1,2),bndtyp(i)
+  100    format (3i7,2x,a2)
+      end do
+c
+c     write the SUBSTRUCTURE record type indicator
+c
+      write (imol2,110)
+  110 format (/,'@<TRIPOS>SUBSTRUCTURE')
+      write (imol2,120)  1,'****',1,'TEMP',0,'****','****',0,'ROOT'
+  120 format (i7,2x,a4,i7,2x,a4,i7,2x,a4,2x,a4,i7,2x,a4)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (atmnam)
+      deallocate (atmtyp)
+      deallocate (bndtyp)
+c
+c     close the output unit if opened by this routine
+c
+      if (.not. opened)  close (unit=imol2)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  program setmol2  --  set atom & bond values for MOL2 file  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "setmol2" assigns MOL2 atom names/types and bond types for a
+c     molecular system starting from atomic numbers and connectivity
+c
+c
+      subroutine setmol2 (atmnam,atmtyp,bndtyp)
+      use angbnd
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use ring
+      implicit none
+      integer i,j,k,m
+      integer ia,ib,ic,kc
+      integer tenthou,thousand
+      integer hundred,tens,ones
+      integer nlist
+      integer list(12)
+      logical aromat
+      character*1 digit(0:9)
+      character*2 bndtyp(*)
+      character*5 number
+      character*5 atmtyp(*)
+      character*8 atmnam(*)
+      data digit  / '0','1','2','3','4','5','6','7','8','9' /
+c
+c
+c     set the Tripos MOL2 atom_name for each atom
+c
+      do i = 1, n
+         tenthou = 1 / 10000
+         thousand = (i - 10000*tenthou) / 1000
+         hundred = (i - 10000*tenthou - 1000*thousand) / 100
+         tens = (i - 10000*tenthou - 1000*thousand - 100*hundred) / 10
+         ones = i - 10000*tenthou - 1000*thousand
+     &             - 100*hundred - 10*tens
+         number(1:1) = digit(tenthou)
+         number(2:2) = digit(thousand)
+         number(3:3) = digit(hundred)
+         number(4:4) = digit(tens)
+         number(5:5) = digit(ones)
          if (number(1:1) .eq. '0')  number(1:1) = ' '
          if (number(2:2).eq.'0' .and. number(1:1).eq.' ') then
             number(2:2) = ' '
@@ -86,64 +166,320 @@ c
          if (number(3:3).eq.'0' .and. number(2:2).eq.' ') then
             number(3:3) = ' '
          end if
-         atmnam = name(i)//number
-         do j = 1, 6
-            do while (atmnam(j:j) .eq. ' ')
-               do k = j, 6
-                  atmnam(k:k) = atmnam(k+1:k+1)
+         if (number(4:4).eq.'0' .and. number(3:3).eq.' ') then
+            number(4:4) = ' '
+         end if
+         atmnam(i) = name(i)//number
+         do j = 1, 7
+            do while (atmnam(i)(j:j) .eq. ' ')
+               do k = j, 7
+                  atmnam(i)(k:k) = atmnam(i)(k+1:k+1)
                end do
-               atmnam(7:7) = '*'
+               atmnam(i)(8:8) = '*'
             end do
          end do
-         do j = 1, 7
-            if (atmnam(j:j) .eq. '*')  atmnam(j:j) = ' '
+         do j = 1, 8
+            if (atmnam(i)(j:j) .eq. '*')  atmnam(i)(j:j) = ' '
          end do
+      end do
 c
-c     set the Tripos MOL2 atom_type for the atom
+c     determine the element types based upon atom names
 c
-         atmtyp = name(i)//' '
-         if (atmtyp .eq. 'C  ') then
-            if (n12(i) .eq. 4)  atmtyp = 'C.3 '
-            if (n12(i) .eq. 3)  atmtyp = 'C.2 '
-            if (n12(i) .eq. 2)  atmtyp = 'C.1 '
-         else if (atmtyp .eq. 'N  ') then
-            if (n12(i) .ge. 3)  atmtyp = 'N.3 '
-            if (n12(i) .eq. 2)  atmtyp = 'N.2 '
-            if (n12(i) .eq. 1)  atmtyp = 'N.1 '
-         else if (atmtyp .eq. 'N+ ') then
-            atmtyp = 'N.4 '
-         else if (atmtyp .eq. 'O  ') then
-            if (n12(i) .ge. 2)  atmtyp = 'O.3 '
-            if (n12(i) .le. 1)  atmtyp = 'O.2 '
-         else if (atmtyp .eq. 'O- ') then
-            atmtyp = 'O.2 '
-         else if (atmtyp .eq. 'S  ') then
-            if (n12(i) .ge. 2)  atmtyp = 'S.3 '
-            if (n12(i) .le. 1)  atmtyp = 'S.2 '
-         else if (atmtyp .eq. 'P  ') then
-            atmtyp = 'P.3 '
-         else if (atmtyp .eq. 'Lp ') then
-            atmtyp = 'LP  '
+      do i = 1, n
+         ic = n12(i)
+         atomic(i) = 0
+         call upcase (name)
+         if (name(i)(1:1) .eq. 'H')  atomic(i) = 1
+         if (name(i)(1:2).eq.'LI' .and. ic.eq.0)  atomic(i) = 3
+         if (name(i).eq.'F  ' .or. name(i).eq.'F- ')  atomic(i) = 9
+         if (name(i)(1:2).eq.'NA' .and. ic.eq.0)  atomic(i) = 11
+         if (name(i)(1:2).eq.'MG' .and. ic.eq.0)  atomic(i) = 12
+         if (name(i)(1:2).eq.'AL' .and. ic.eq.0)  atomic(i) = 13
+         if (name(i)(1:2) .eq. 'SI')  atomic(i) = 14
+         if (name(i).eq.'CL ' .or. name(i).eq.'CL-')  atomic(i) = 17
+         if (name(i)(1:1).eq.'K' .and. ic.eq.0)  atomic(i) = 19
+         if (name(i)(1:2).eq.'CA' .and. ic.eq.0)  atomic(i) = 20
+         if (name(i)(1:2).eq.'CR' .and. ic.eq.0)  atomic(i) = 24
+         if (name(i)(1:2) .eq. 'MN')  atomic(i) = 25
+         if (name(i)(1:2) .eq. 'FE')  atomic(i) = 26
+         if (name(i)(1:2).eq.'CO' .and. ic.eq.0)  atomic(i) = 27
+         if (name(i)(1:2) .eq. 'CU')  atomic(i) = 29
+         if (name(i)(1:2) .eq. 'ZN')  atomic(i) = 30
+         if (name(i)(1:2) .eq. 'SE')  atomic(i) = 34
+         if (name(i).eq.'BR ' .or. name(i).eq.'BR-')  atomic(i) = 35
+         if (name(i)(1:2) .eq. 'MO')  atomic(i) = 42
+         if (name(i)(1:2) .eq. 'SN')  atomic(i) = 50
+         if (name(i).eq.'I  ' .or. name(i).eq.'I- ')  atomic(i) = 53
+         if (atomic(i) .eq. 0) then
+            if (name(i)(1:1) .eq. 'C')  atomic(i) = 6
+            if (name(i)(1:1) .eq. 'N')  atomic(i) = 7
+            if (name(i)(1:1) .eq. 'O')  atomic(i) = 8
+            if (name(i)(1:1) .eq. 'S')  atomic(i) = 16
          end if
-         write (imol2,80)  i,atmnam,x(i),y(i),z(i),atmtyp
-   80    format (i8,3x,a7,2x,3f12.6,3x,a4)
       end do
 c
-c     write the bond record type indicator
+c     set the generic Tripos MOL2 atom_type for each atom
 c
-      write (imol2,90)
-   90 format (/,'@<TRIPOS>BOND')
+      do i = 1, n
+         atmtyp(i) = '     '
+         if (atomic(i) .eq. 1) then
+            atmtyp(i) = 'H    '
+         else if (atomic(i) .eq. 3) then
+            atmtyp(i) = 'Li   '
+         else if (atomic(i) .eq. 6) then
+            if (n12(i) .eq. 4)  atmtyp(i) = 'C.3  '
+            if (n12(i) .eq. 3)  atmtyp(i) = 'C.2  '
+            if (n12(i) .eq. 2)  atmtyp(i) = 'C.1  '
+         else if (atomic(i) .eq. 7) then
+            if (n12(i) .eq. 4)  atmtyp(i) = 'N.4  '
+            if (n12(i) .eq. 3)  atmtyp(i) = 'N.3  '
+            if (n12(i) .eq. 2)  atmtyp(i) = 'N.2  '
+            if (n12(i) .eq. 1)  atmtyp(i) = 'N.1  '
+         else if (atomic(i) .eq. 8) then
+            if (n12(i) .ge. 2)  atmtyp(i) = 'O.3  '
+            if (n12(i) .eq. 1)  atmtyp(i) = 'O.2  '
+         else if (atomic(i) .eq. 9) then
+            atmtyp(i) = 'F    '
+         else if (atomic(i) .eq. 11) then
+            atmtyp(i) = 'Na   '
+         else if (atomic(i) .eq. 12) then
+            atmtyp(i) = 'Mg   '
+         else if (atomic(i) .eq. 13) then
+            atmtyp(i) = 'Al   '
+         else if (atomic(i) .eq. 14) then
+            atmtyp(i) = 'Si   '
+         else if (atomic(i) .eq. 15) then
+            atmtyp(i) = 'P.3  '
+         else if (atomic(i) .eq. 16) then
+            if (n12(i) .ge. 2)  atmtyp(i) = 'S.3  '
+            if (n12(i) .le. 1)  atmtyp(i) = 'S.2  '
+         else if (atomic(i) .eq. 17) then
+            atmtyp(i) = 'Cl   '
+         else if (atomic(i) .eq. 19) then
+            atmtyp(i) = 'K    '
+         else if (atomic(i) .eq. 20) then
+            atmtyp(i) = 'Ca   '
+         else if (atomic(i) .eq. 24) then
+            atmtyp(i) = 'Cr.oh'
+         else if (atomic(i) .eq. 25) then
+            atmtyp(i) = 'Mn   '
+         else if (atomic(i) .eq. 26) then
+            atmtyp(i) = 'Fe   '
+         else if (atomic(i) .eq. 27) then
+            atmtyp(i) = 'Co.oh'
+         else if (atomic(i) .eq. 29) then
+            atmtyp(i) = 'Cu   '
+         else if (atomic(i) .eq. 30) then
+            atmtyp(i) = 'Zn   '
+         else if (atomic(i) .eq. 35) then
+            atmtyp(i) = 'Br   '
+         else if (atomic(i) .eq. 42) then
+            atmtyp(i) = 'Mo   '
+         else if (atomic(i) .eq. 50) then
+            atmtyp(i) = 'Sn   '
+         else if (atomic(i) .eq. 53) then
+            atmtyp(i) = 'I    '
+         end if
+      end do
+c
+c     handle 5-membered rings for MOL2 atom_type assignment
+c
+      do i = 1, nring5
+         aromat = .true.
+         do j = 1, 5
+            k = iring5(j,i)
+            if (atomic(k).ne.6 .and. atomic(k).ne.7)  aromat = .false.
+            if (atomic(k).eq.6 .and. n12(k).ne.3)  aromat = .false.
+            if (atomic(k).eq.7 .and. n12(k).eq.4)  aromat = .false.
+            if (atomic(k).eq.6 .and. n12(i).eq.3) then
+               do m = 1, n12(k)
+                  kc = i12(m,k)
+                  if (atomic(kc).eq.8 .and. n12(kc).eq.1) then
+                     aromat = .false.
+                  end if
+               end do
+            end if
+         end do
+         if (aromat) then
+            do j = 1, 5
+               k = iring5(j,i)
+c              atmtyp(k) = atmtyp(k)(1:1)//'.ar '
+               if (atomic(k).eq.7 .and. n12(k).eq.3)
+     &            atmtyp(k) = 'N.pl3'
+            end do
+         end if
+      end do
+c
+c     handle 6-membered rings for MOL2 atom_type assignment
+c
+      do i = 1, nring6
+         aromat = .true.
+         do j = 1, 6
+            k = iring6(j,i)
+            if (atomic(k).ne.6 .and. atomic(k).ne.7)  aromat = .false.
+            if (atomic(k).eq.6 .and. n12(k).ne.3)  aromat = .false.
+            if (atomic(k).eq.7 .and. n12(k).eq.4)  aromat = .false.
+            if (atomic(k).eq.6 .and. n12(i).eq.3) then
+               do m = 1, n12(k)
+                  kc = i12(m,k)
+                  if (atomic(kc).eq.8 .and. n12(kc).eq.1) then
+                     aromat = .false.
+                  end if
+               end do
+            end if
+         end do
+         if (aromat) then
+            do j = 1, 6
+               k = iring6(j,i)
+               atmtyp(k) = atmtyp(k)(1:1)//'.ar '
+            end do
+         end if
+      end do
+c
+c     handle 7-membered rings for MOL2 atom_type assignment
+c
+      do i = 1, nring7
+         aromat = .true.
+         do j = 1, 7
+            m = iring7(j,i)
+            if (atomic(m).ne.6 .or. n12(m).ne.3)  aromat = .false.
+         end do
+         if (aromat) then
+            do j = 1, 7
+               list(j) = iring7(j,i)
+            end do
+            do k = 1, nring5
+               do j = 1, 5
+                  list(j+7) = iring5(j,k)
+               end do
+               nlist = 12
+               call sort8 (nlist,list)
+               if (nlist .eq. 10) then
+                  aromat = .true.
+                  do j = 1, 5
+                     m = iring5(j,i)
+                     if (atomic(m).ne.6 .or. n12(m).ne.3)
+     &                  aromat = .false.
+                  end do
+                  if (aromat) then
+                     do j = 1, 7
+                        atmtyp(iring7(j,i)) = 'C.ar '
+                     end do
+                     do j = 1, 5
+                        atmtyp(iring5(j,k)) = 'C.ar '
+                     end do
+                  end if
+               end if
+            end do
+         end if
+      end do
+c
+c     handle amide nitrogens for MOL2 atom_type assignment
+c
+      do i = 1, nangle
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         if (atomic(ib).eq.6 .and. n12(ib).eq.3) then
+            if (atomic(ia).eq.8 .and. n12(ia).eq.1 .and.
+     &          atomic(ic).eq.7 .and. n12(ic).eq.3) then
+               atmtyp(ic) = 'N.am '
+            end if
+            if (atomic(ic).eq.8 .and. n12(ic).eq.1 .and.
+     &          atomic(ia).eq.7 .and. n12(ia).eq.3) then
+               atmtyp(ia) = 'N.am '
+            end if
+         end if
+      end do
+c
+c     handle guanidinium carbons for MOL2 atom_type assignment
+c
+      do i = 1, n
+         if (atomic(i).eq.6 .and. n12(i).eq.3) then
+            k = 0
+            do m = 1, n12(i)
+               kc = i12(m,i)
+               if (atomic(kc).eq.7 .and. n12(kc).eq.3)  k = k + 1
+            end do
+            if (k .eq. 3)  atmtyp(i) = 'C.cat'
+         end if
+      end do
+c
+c     handle carboxylate oxygens for MOL2 atom_type assignment
+c
+      do i = 1, nangle
+         ia = iang(1,i)
+         ib = iang(2,i)
+         ic = iang(3,i)
+         if ((atomic(ia).eq.8.and.n12(ia).eq.1) .and.
+     &       (atomic(ic).eq.8.and.n12(ic).eq.1)) then
+            if (atomic(ib).eq.6.and.n12(ib).eq.3) then
+               atmtyp(ia) = 'C.co2'
+               atmtyp(ic) = 'C.co2'
+            end if
+         end if
+      end do
+c
+c     handle phosphate oxygens for MOL2 atom_type assignment
+c
+      do i = 1, n
+         if (atomic(i).eq.8 .and. n12(i).eq.1) then
+            if (atomic(i12(1,i)) .eq. 15)  atmtyp(i) = 'O.co2'
+         end if
+      end do
+c
+c     handle sulfoxide sulfurs for MOL2 atom_type assignment
+c
+      do i = 1, n
+         if (atomic(i).eq.16 .and. n12(i).eq.3) then
+            k = 0
+            do m = 1, n12(i)
+               kc = i12(m,i)
+               if (atomic(kc).eq.8 .and. n12(kc).eq.1)  k = k + 1
+            end do
+            if (k .eq. 1)  atmtyp(i) = 'S.o  '
+         end if
+      end do
+c
+c     handle sulfone sulfurs for MOL2 atom_type assignment
+c
+      do i = 1, n
+         if (atomic(i).eq.16 .and. n12(i).eq.4) then
+            k = 0
+            do m = 1, n12(i)
+               kc = i12(m,i)
+               if (atomic(kc).eq.8 .and. n12(kc).eq.1)  k = k + 1
+            end do
+            if (k .ge. 2)  atmtyp(i) = 'S.o2 '
+         end if
+      end do
+c
+c     handle lone pairs for MOL2 atom_type assignment
+c
+      do i = 1, n
+         if (name(i) .eq. 'LP ') then
+            atmtyp(i) = 'LP   '
+         end if
+      end do
+c
+c     set the Tripos MOL2 bond_type for each bond
+c
       do i = 1, nbond
-         write (imol2,100)  i,(ibnd(j,i),j=1,2),1
-  100    format (4i8)
+         ia = ibnd(1,i)
+         ib = ibnd(2,i)
+         bndtyp(i) = '1 '
+         if (atmtyp(ia)(3:3).eq.'2' .and.
+     &       atmtyp(ib)(3:3).eq.'2') then
+            bndtyp(i) = '2 '
+         end if
+         if (atmtyp(ia)(3:3).eq.'1' .and.
+     &       atmtyp(ib)(3:3).eq.'1') then
+            bndtyp(i) = '3 '
+         end if
+         if (atmtyp(ia)(3:4).eq.'ar' .and.
+     &       atmtyp(ib)(3:4).eq.'ar') then
+            bndtyp(i) = 'ar'
+         end if
       end do
-c
-c     write the substructure record type indicator
-c
-      write (imol2,110)
-  110 format (/,'@<TRIPOS>SUBSTRUCTURE')
-      write (imol2,120)  1,'****',1
-  120 format (i8,12x,a4,i8)
-      if (.not. opened)  close (unit=imol2)
       return
       end

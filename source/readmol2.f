@@ -30,7 +30,7 @@ c
       integer nbond,number
       integer next,trimtext
       logical exist,opened
-      character*10 atmnam
+      character*8 atmnam
       character*240 mol2file
       character*240 record
       character*240 string
