@@ -124,19 +124,25 @@ c
 c
       subroutine setmol2 (atmnam,atmtyp,bndtyp)
       use angbnd
+      use atmlst
       use atomid
       use atoms
       use bndstr
       use couple
       use ring
+      use tors
       implicit none
       integer i,j,k,m
-      integer ia,ib,ic,kc
+      integer ia,ib,ic,id
+      integer ka,kb,kc
       integer tenthou,thousand
       integer hundred,tens,ones
       integer nlist
       integer list(12)
       logical aromat
+      logical done,proceed
+      logical terma,termd
+      character*1 ta,tb,tc,td
       character*1 digit(0:9)
       character*2 bndtyp(*)
       character*5 number
@@ -218,11 +224,14 @@ c
          end if
       end do
 c
-c     set the generic Tripos MOL2 atom_type for each atom
+c     assign the generic MOL2 atom_type for each atom
 c
       do i = 1, n
          atmtyp(i) = '     '
-         if (atomic(i) .eq. 1) then
+         if (atomic(i) .eq. 0) then
+            if (name(i) .eq. 'LP ')  atmtyp(i) = 'LP   '
+            if (name(i) .eq. 'DU ')  atmtyp(i) = 'Du   '
+         else if (atomic(i) .eq. 1) then
             atmtyp(i) = 'H    '
          else if (atomic(i) .eq. 3) then
             atmtyp(i) = 'Li   '
@@ -454,21 +463,21 @@ c
          end if
       end do
 c
-c     handle lone pairs for MOL2 atom_type assignment
-c
-      do i = 1, n
-         if (name(i) .eq. 'LP ') then
-            atmtyp(i) = 'LP   '
-         end if
-      end do
-c
-c     set the Tripos MOL2 bond_type for each bond
+c     assign the generic MOL2 bond_type for each bond
 c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
          bndtyp(i) = '1 '
          if (atmtyp(ia)(3:3).eq.'2' .and.
+     &       atmtyp(ib)(3:3).eq.'2') then
+            bndtyp(i) = '2 '
+         end if
+         if (atmtyp(ia)(3:3).eq.'2' .and.
+     &       atmtyp(ib)(3:3).eq.'1') then
+            bndtyp(i) = '2 '
+         end if
+         if (atmtyp(ia)(3:3).eq.'1' .and.
      &       atmtyp(ib)(3:3).eq.'2') then
             bndtyp(i) = '2 '
          end if
@@ -480,6 +489,71 @@ c
      &       atmtyp(ib)(3:4).eq.'ar') then
             bndtyp(i) = 'ar'
          end if
+      end do
+c
+c     handle conjugation for MOL2 bond_type assignment
+c
+      done = .false.
+      dowhile (.not. done)
+         done = .true.
+         do i = 1, ntors
+            ia = itors(1,i)
+            ib = itors(2,i)
+            ic = itors(3,i)
+            id = itors(4,i)
+            proceed = .false.
+            do k = 1, n12(ib)
+               j = bndlist(k,ib)
+               ka = ibnd(1,j)
+               kb = ibnd(2,j)
+               if (ka.eq.ic .or. kb.eq.ic) then
+                  if (bndtyp(j).eq.'2 ' .or.
+     &                bndtyp(j).eq.'3 ') then
+                     m = j
+                     proceed = .true.
+                  end if
+               end if
+            end do
+            if (proceed) then
+               ta = atmtyp(ia)(3:3)
+               tb = atmtyp(ib)(3:3)
+               tc = atmtyp(ic)(3:3)
+               td = atmtyp(id)(3:3)
+               if ((ta.eq.'2' .or. ta.eq.'1') .and.
+     &             (tb.eq.'2' .or. tb.eq.'1') .and.
+     &             (tc.eq.'2' .or. tc.eq.'1') .and.
+     &             (td.eq.'2' .or. td.eq.'1')) then
+                  terma = .true.
+                  do k = 1, n12(ia)
+                     j = bndlist(k,ia)
+                     ka = ibnd(1,j)
+                     kb = ibnd(2,j)
+                     if (ka.ne.ib .and. kb.ne.ib) then
+                        if (bndtyp(j).eq.'2 ' .or.
+     &                      bndtyp(j).eq.'3 ') then
+                           terma = .false.
+                        end if
+                     end if
+                  end do
+                  termd = .true.
+                  do k = 1, n12(id)
+                     j = bndlist(k,id)
+                     ka = ibnd(1,j)
+                     kb = ibnd(2,j)
+                     if (ka.ne.ic .and. kb.ne.ic) then
+                        if (bndtyp(j).eq.'2 ' .or.
+     &                      bndtyp(j).eq.'3 ') then
+                           termd = .false.
+                        end if
+                     end if
+                  end do
+                  if (terma .or. termd) then
+                     bndtyp(m) = '1 '
+                     done = .false.
+                  end if
+               end if
+            end if
+         end do
       end do
       return
       end
