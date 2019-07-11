@@ -485,9 +485,39 @@ c
      &       atmtyp(ib)(3:3).eq.'1') then
             bndtyp(i) = '3 '
          end if
+      end do
+c
+c     handle aromaticity for MOL2 bond_type assignment
+c
+      do i = 1, nbond
+         ia = ibnd(1,i)
+         ib = ibnd(2,i)
          if (atmtyp(ia)(3:4).eq.'ar' .and.
      &       atmtyp(ib)(3:4).eq.'ar') then
-            bndtyp(i) = 'ar'
+            do k = 1, nring5
+               m = 0
+               do j = 1, 5
+                  kc = iring5(j,k)
+                  if (kc.eq.ia .or. kc.eq.ib)  m = m + 1
+               end do
+               if (m .eq. 2)  bndtyp(i) = 'ar'
+            end do
+            do k = 1, nring6
+               m = 0
+               do j = 1, 6
+                  kc = iring6(j,k)
+                  if (kc.eq.ia .or. kc.eq.ib)  m = m + 1
+               end do
+               if (m .eq. 2)  bndtyp(i) = 'ar'
+            end do
+            do k = 1, nring7
+               m = 0
+               do j = 1, 7
+                  kc = iring7(j,k)
+                  if (kc.eq.ia .or. kc.eq.ib)  m = m + 1
+               end do
+               if (m .eq. 2)  bndtyp(i) = 'ar'
+            end do
          end if
       end do
 c
