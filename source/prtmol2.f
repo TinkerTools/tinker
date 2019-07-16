@@ -25,6 +25,7 @@ c
       implicit none
       integer i,j,imol2
       integer subnum
+      real*8, allocatable :: atmchg(:)
       logical opened
       character*2, allocatable :: bndtyp(:)
       character*3 subnam
@@ -46,6 +47,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (atmnam(n))
       allocate (atmtyp(n))
+      allocate (atmchg(n))
       allocate (bndtyp(nbond))
 c
 c     write the MOLECULE record type indicator
@@ -64,11 +66,11 @@ c
       write (imol2,50)
    50 format ('SMALL')
       write (imol2,60)
-   60 format ('NO_CHARGES')
+   60 format ('USER_CHARGES')
 c
 c     determine MOL2 atom names/types and bond types
 c
-      call setmol2 (atmnam,atmtyp,bndtyp)
+      call setmol2 (atmnam,atmtyp,atmchg,bndtyp)
 c
 c     write the ATOM record type indicator
 c
@@ -78,8 +80,8 @@ c
          subnum = 1
          subnam = '<1>'
          write (imol2,80)  i,atmnam(i),x(i),y(i),z(i),atmtyp(i),
-     &                     subnum,subnam
-   80    format (i7,2x,a8,1x,3f12.6,2x,a5,i7,2x,a3)
+     &                     subnum,subnam,atmchg(i)
+   80    format (i7,2x,a8,3f12.6,2x,a5,i4,2x,a3,f7.2)
       end do
 c
 c     write the BOND record type indicator
@@ -111,18 +113,18 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  program setmol2  --  set atom & bond values for MOL2 file  ##
-c     ##                                                             ##
-c     #################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  program setmol2  --  set MOL2 atom, charge & bond values  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "setmol2" assigns MOL2 atom names/types and bond types for a
-c     molecular system starting from atomic numbers and connectivity
+c     "setmol2" assigns MOL2 atom names/types/charges and bond types
+c     based upon atomic numbers and connectivity
 c
 c
-      subroutine setmol2 (atmnam,atmtyp,bndtyp)
+      subroutine setmol2 (atmnam,atmtyp,atmchg,bndtyp)
       use angbnd
       use atmlst
       use atomid
@@ -137,8 +139,9 @@ c
       integer ka,kb,kc
       integer tenthou,thousand
       integer hundred,tens,ones
-      integer nlist
+      integer atmnum,it,nlist
       integer list(12)
+      real*8 atmchg(*)
       logical aromat
       logical done,proceed
       logical terma,termd
@@ -151,7 +154,16 @@ c
       data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
 c
-c     set the Tripos MOL2 atom_name for each atom
+c     initialize atom_names, atom_types, charges and bond_types
+c
+      do i = 1, n
+         atmnam(i) = '        '
+         atmtyp(i) = '     '
+         atmchg(i) = 0.0d0
+         bndtyp(i) = '  '
+      end do
+c
+c     construct the generic MOL2 atom_name for each atom
 c
       do i = 1, n
          tenthou = 1 / 10000
@@ -192,20 +204,20 @@ c
 c     determine the element types based upon atom names
 c
       do i = 1, n
-         ic = n12(i)
+         it = n12(i)
          atomic(i) = 0
          call upcase (name)
          if (name(i)(1:1) .eq. 'H')  atomic(i) = 1
-         if (name(i)(1:2).eq.'LI' .and. ic.eq.0)  atomic(i) = 3
+         if (name(i)(1:2).eq.'LI' .and. it.eq.0)  atomic(i) = 3
          if (name(i).eq.'F  ' .or. name(i).eq.'F- ')  atomic(i) = 9
-         if (name(i)(1:2).eq.'NA' .and. ic.eq.0)  atomic(i) = 11
-         if (name(i)(1:2).eq.'MG' .and. ic.eq.0)  atomic(i) = 12
-         if (name(i)(1:2).eq.'AL' .and. ic.eq.0)  atomic(i) = 13
+         if (name(i)(1:2).eq.'NA' .and. it.eq.0)  atomic(i) = 11
+         if (name(i)(1:2).eq.'MG' .and. it.eq.0)  atomic(i) = 12
+         if (name(i)(1:2).eq.'AL' .and. it.eq.0)  atomic(i) = 13
          if (name(i)(1:2) .eq. 'SI')  atomic(i) = 14
          if (name(i).eq.'CL ' .or. name(i).eq.'CL-')  atomic(i) = 17
-         if (name(i)(1:1).eq.'K' .and. ic.eq.0)  atomic(i) = 19
-         if (name(i)(1:2).eq.'CA' .and. ic.eq.0)  atomic(i) = 20
-         if (name(i)(1:2).eq.'CR' .and. ic.eq.0)  atomic(i) = 24
+         if (name(i)(1:1).eq.'K' .and. it.eq.0)  atomic(i) = 19
+         if (name(i)(1:2).eq.'CA' .and. it.eq.0)  atomic(i) = 20
+         if (name(i)(1:2).eq.'CR' .and. it.eq.0)  atomic(i) = 24
          if (name(i)(1:2) .eq. 'MN')  atomic(i) = 25
          if (name(i)(1:2) .eq. 'FE')  atomic(i) = 26
          if (name(i)(1:2).eq.'CO' .and. ic.eq.0)  atomic(i) = 27
@@ -227,66 +239,70 @@ c
 c     assign the generic MOL2 atom_type for each atom
 c
       do i = 1, n
-         atmtyp(i) = '     '
-         if (atomic(i) .eq. 0) then
+         it = 0
+         do k = 1, n12(i)
+            if (atomic(i12(k,i)) .ne. 0)  it = it + 1
+         end do
+         atmnum = atomic(i)
+         if (atmnum .eq. 0) then
             if (name(i) .eq. 'LP ')  atmtyp(i) = 'LP   '
             if (name(i) .eq. 'DU ')  atmtyp(i) = 'Du   '
-         else if (atomic(i) .eq. 1) then
+         else if (atmnum .eq. 1) then
             atmtyp(i) = 'H    '
-         else if (atomic(i) .eq. 3) then
+         else if (atmnum .eq. 3) then
             atmtyp(i) = 'Li   '
-         else if (atomic(i) .eq. 6) then
-            if (n12(i) .eq. 4)  atmtyp(i) = 'C.3  '
-            if (n12(i) .eq. 3)  atmtyp(i) = 'C.2  '
-            if (n12(i) .eq. 2)  atmtyp(i) = 'C.1  '
-         else if (atomic(i) .eq. 7) then
-            if (n12(i) .eq. 4)  atmtyp(i) = 'N.4  '
-            if (n12(i) .eq. 3)  atmtyp(i) = 'N.3  '
-            if (n12(i) .eq. 2)  atmtyp(i) = 'N.2  '
-            if (n12(i) .eq. 1)  atmtyp(i) = 'N.1  '
-         else if (atomic(i) .eq. 8) then
-            if (n12(i) .ge. 2)  atmtyp(i) = 'O.3  '
-            if (n12(i) .eq. 1)  atmtyp(i) = 'O.2  '
-         else if (atomic(i) .eq. 9) then
+         else if (atmnum .eq. 6) then
+            if (it .eq. 4)  atmtyp(i) = 'C.3  '
+            if (it .eq. 3)  atmtyp(i) = 'C.2  '
+            if (it .eq. 2)  atmtyp(i) = 'C.1  '
+         else if (atmnum .eq. 7) then
+            if (it .eq. 4)  atmtyp(i) = 'N.4  '
+            if (it .eq. 3)  atmtyp(i) = 'N.3  '
+            if (it .eq. 2)  atmtyp(i) = 'N.2  '
+            if (it .eq. 1)  atmtyp(i) = 'N.1  '
+         else if (atmnum .eq. 8) then
+            if (it .ge. 2)  atmtyp(i) = 'O.3  '
+            if (it .eq. 1)  atmtyp(i) = 'O.2  '
+         else if (atmnum .eq. 9) then
             atmtyp(i) = 'F    '
-         else if (atomic(i) .eq. 11) then
+         else if (atmnum .eq. 11) then
             atmtyp(i) = 'Na   '
-         else if (atomic(i) .eq. 12) then
+         else if (atmnum .eq. 12) then
             atmtyp(i) = 'Mg   '
-         else if (atomic(i) .eq. 13) then
+         else if (atmnum .eq. 13) then
             atmtyp(i) = 'Al   '
-         else if (atomic(i) .eq. 14) then
+         else if (atmnum .eq. 14) then
             atmtyp(i) = 'Si   '
-         else if (atomic(i) .eq. 15) then
+         else if (atmnum .eq. 15) then
             atmtyp(i) = 'P.3  '
-         else if (atomic(i) .eq. 16) then
-            if (n12(i) .ge. 2)  atmtyp(i) = 'S.3  '
-            if (n12(i) .le. 1)  atmtyp(i) = 'S.2  '
-         else if (atomic(i) .eq. 17) then
+         else if (atmnum .eq. 16) then
+            if (it .ge. 2)  atmtyp(i) = 'S.3  '
+            if (it .le. 1)  atmtyp(i) = 'S.2  '
+         else if (atmnum .eq. 17) then
             atmtyp(i) = 'Cl   '
-         else if (atomic(i) .eq. 19) then
+         else if (atmnum .eq. 19) then
             atmtyp(i) = 'K    '
-         else if (atomic(i) .eq. 20) then
+         else if (atmnum .eq. 20) then
             atmtyp(i) = 'Ca   '
-         else if (atomic(i) .eq. 24) then
+         else if (atmnum .eq. 24) then
             atmtyp(i) = 'Cr.oh'
-         else if (atomic(i) .eq. 25) then
+         else if (atmnum .eq. 25) then
             atmtyp(i) = 'Mn   '
-         else if (atomic(i) .eq. 26) then
+         else if (atmnum .eq. 26) then
             atmtyp(i) = 'Fe   '
-         else if (atomic(i) .eq. 27) then
+         else if (atmnum .eq. 27) then
             atmtyp(i) = 'Co.oh'
-         else if (atomic(i) .eq. 29) then
+         else if (atmnum .eq. 29) then
             atmtyp(i) = 'Cu   '
-         else if (atomic(i) .eq. 30) then
+         else if (atmnum .eq. 30) then
             atmtyp(i) = 'Zn   '
-         else if (atomic(i) .eq. 35) then
+         else if (atmnum .eq. 35) then
             atmtyp(i) = 'Br   '
-         else if (atomic(i) .eq. 42) then
+         else if (atmnum .eq. 42) then
             atmtyp(i) = 'Mo   '
-         else if (atomic(i) .eq. 50) then
+         else if (atmnum .eq. 50) then
             atmtyp(i) = 'Sn   '
-         else if (atomic(i) .eq. 53) then
+         else if (atmnum .eq. 53) then
             atmtyp(i) = 'I    '
          end if
       end do
@@ -423,8 +439,8 @@ c
          if ((atomic(ia).eq.8.and.n12(ia).eq.1) .and.
      &       (atomic(ic).eq.8.and.n12(ic).eq.1)) then
             if (atomic(ib).eq.6.and.n12(ib).eq.3) then
-               atmtyp(ia) = 'C.co2'
-               atmtyp(ic) = 'C.co2'
+               atmtyp(ia) = 'O.co2'
+               atmtyp(ic) = 'O.co2'
             end if
          end if
       end do
@@ -584,6 +600,86 @@ c
                end if
             end if
          end do
+      end do
+c
+c     assign the generic MOL2 charge for each atom
+c
+      do i = 1, n
+         it = 0
+         do k = 1, n12(i)
+            if (atomic(i12(k,i)) .ne. 0)  it = it + 1
+         end do
+         atmnum = atomic(i)
+         if (atmnum.eq.3 .and. it.eq.0)  atmchg(i) = 1.0d0
+         if (atmnum.eq.9 .and. it.eq.0)  atmchg(i) = -1.0d0
+         if (atmnum.eq.11 .and. it.eq.0)  atmchg(i) = 1.0d0
+         if (atmnum.eq.12 .and. it.eq.0)  atmchg(i) = 2.0d0
+         if (atmnum.eq.13 .and. it.eq.0)  atmchg(i) = 3.0d0
+         if (atmnum.eq.17 .and. it.eq.0)  atmchg(i) = -1.0d0
+         if (atmnum.eq.19 .and. it.eq.0)  atmchg(i) = 1.0d0
+         if (atmnum.eq.20 .and. it.eq.0)  atmchg(i) = 2.0d0
+         if (atmnum.eq.24 .and. it.eq.0)  atmchg(i) = 3.0d0
+         if (atmnum.eq.25 .and. it.eq.0)  atmchg(i) = 2.0d0
+         if (atmnum.eq.26 .and. it.eq.0)  atmchg(i) = 3.0d0
+         if (atmnum.eq.27 .and. it.eq.0)  atmchg(i) = 2.0d0
+         if (atmnum.eq.29 .and. it.eq.0)  atmchg(i) = 2.0d0
+         if (atmnum.eq.30 .and. it.eq.0)  atmchg(i) = 2.0d0
+         if (atmnum.eq.35 .and. it.eq.0)  atmchg(i) = -1.0d0
+         if (atmnum.eq.42 .and. it.eq.0)  atmchg(i) = 4.0d0
+         if (atmnum.eq.53 .and. it.eq.0)  atmchg(i) = -1.0d0
+c
+c     handle ammonium nitrogens for MOL2 charge assignment
+c
+         if (atmtyp(i) .eq. 'N.4  ') then
+            atmchg(i) = 1.0d0
+         end if
+c
+c     handle pyridinium nitrogens for MOL2 charge assignment
+c
+         if (atmtyp(i).eq.'N.ar ' .and. it.eq.3) then
+            atmchg(i) = 1.0d0
+         end if
+c
+c     handle carboxylate oxygens for MOL2 charge assignment
+c
+         if (atmtyp(i) .eq. 'O.co2') then
+            kc = i12(1,i)
+            if (atomic(kc) .eq. 6) then
+               atmchg(i) = -1.0d0
+               atmchg(kc) = 1.0d0
+            end if
+         end if
+c
+c     handle phosphate groups for MOL2 charge assignment
+c
+         if (atmtyp(i) .eq. 'P.3  ') then
+            atmchg(i) = 1.0d0
+            do m = 1, n12(i)
+               kc = i12(m,i)
+               if (atmtyp(kc) .eq. 'O.co2') then
+                  atmchg(kc) = -1.0d0
+               end if
+            end do
+         end if
+c
+c     handle sulfonate groups for MOL2 charge assignment
+c
+         if (atmtyp(i) .eq. 'S.o2 ') then
+            k = 0
+            do m = 1, n12(i)
+               kc = i12(m,i)
+               if (atmtyp(kc) .eq. 'O.2  ')  k = k + 1
+            end do
+            if (k .ge. 3) then
+               if (k .eq. 3)  atmchg(i) = 0.5d0
+               do m = 1, n12(i)
+                  kc = i12(m,i)
+                  if (atmtyp(kc) .eq. 'O.2  ') then
+                     atmchg(kc) = -0.5d0
+                  end if
+               end do
+            end if
+         end if
       end do
       return
       end

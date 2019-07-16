@@ -28,11 +28,12 @@ c
       integer i,j,k
       integer iarc,ixyz
       integer start,stop
-      integer step,now,mode
+      integer step,size
+      integer now,mode
       integer lext,lengb
       integer leng1,leng2
       integer freeunit
-      integer list(20)
+      integer, allocatable :: list(:)
       real*8 xr,yr,zr
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
@@ -200,19 +201,24 @@ c
          end do
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      size = 40
+      allocate (list(size))
+c
 c     decide whether atoms are to be removed from each frame
 c
       if (modtyp .eq. 'TRIM') then
          call active
          if (nuse .eq. n) then
-            do i = 1, 20
+            do i = 1, size
                list(i) = 0
             end do
             write (iout,150)
   150       format (/,' Numbers of the Atoms to be Removed :  ',$)
             read (input,160)  record
   160       format (a240)
-            read (record,*,err=170,end=170)  (list(i),i=1,20)
+            read (record,*,err=170,end=170)  (list(i),i=1,size)
   170       continue
             i = 1
             do while (list(i) .ne. 0)

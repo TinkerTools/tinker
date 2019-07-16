@@ -36,8 +36,8 @@ c
       integer i,j,k,m
       integer nframe,iframe
       integer iarc,start,stop
-      integer step,skip
-      integer list(20)
+      integer step,skip,size
+      integer, allocatable :: list(:)
       integer, allocatable :: ntime(:)
       real*8 xmid,ymid,zmid
       real*8 xold,yold,zold
@@ -114,11 +114,16 @@ c
       call katom
       call molecule
 c
+c     perform dynamic allocation of some local arrays
+c
+      size = 40
+      allocate (list(size))
+c
 c     find atoms and molecules to be excluded from consideration
 c
       call active
       if (nuse .eq. n) then
-         do i = 1, 20
+         do i = 1, size
             list(i) = 0
          end do
          i = 0
@@ -135,7 +140,7 @@ c
    90       format (/,' Numbers of any Atoms to be Excluded :  ',$)
             read (input,100)  record
   100       format (a240)
-            read (record,*,err=110,end=110)  (list(i),i=1,20)
+            read (record,*,err=110,end=110)  (list(i),i=1,size)
   110       continue
          end if
          i = 1
@@ -160,6 +165,10 @@ c
             end if
          end do
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     alter the molecule list to include only active molecules
 c

@@ -521,9 +521,11 @@ c
       use potent
       implicit none
       integer i,j
-      integer ia,ib,ita,itb
-      integer next,minat
-      integer list(20)
+      integer ia,ib
+      integer ita,itb
+      integer next,size
+      integer minat
+      integer, allocatable :: list(:)
       real*8 khia,khib,cst
       real*8 rad0a,rad0b
       logical header,done
@@ -531,6 +533,11 @@ c
       character*240 record
       character*240 string
 c
+c
+c     perform dynamic allocation of some local arrays
+c
+      size = 40
+      allocate (list(size))
 c
 c     get single bonds that could be double (MMFF bond type=1)
 c
@@ -541,13 +548,13 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:12) .eq. 'MMFF-PIBOND ') then
-            do j = 1, 20
+            do j = 1, size
                list(j) = 0
             end do
             string = record(next:240)
-            read (string,*,err=10,end=10)  (list(j),j=1,20)
+            read (string,*,err=10,end=10)  (list(j),j=1,size)
    10       continue
-            do j = 1, 20, 2
+            do j = 1, size, 2
                if (list(j).ne.0 .and. list(j+1).ne.0) then
                   nlignes = nlignes + 1
                   bt_1(nlignes,1) = list(j)
@@ -559,6 +566,10 @@ c
    20       continue
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
 c
 c     assign MMFF bond length and force constant values
 c

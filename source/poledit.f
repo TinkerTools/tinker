@@ -176,7 +176,7 @@ c
 c
 c     assign unique atom types and set the valence values
 c
-      size = min(20,leng)
+      size = min(24,leng)
       do i = 1, n
          type(i) = i
          valence(i) = n12(i)
@@ -2639,7 +2639,7 @@ c
       integer nsame,nave
       integer xaxe,yaxe
       integer zaxe
-      integer list(20)
+      integer, allocatable :: list(:)
       integer, allocatable :: ising(:)
       integer, allocatable :: jsing(:)
       integer, allocatable :: isame(:)
@@ -2731,6 +2731,11 @@ c
             end if
          end do
 c
+c     perform dynamic allocation of some local arrays
+c
+         size = 40
+         allocate (list(size))
+c
 c     partially automated determination of equivalent atoms
 c
          repeat = .true.
@@ -2796,7 +2801,7 @@ c     query for sets of atoms to condense to a single type
 c
             done = .false.
             dowhile (.not. done)
-               do i = 1, 20
+               do i = 1, size
                   list(i) = 0
                end do
                write (iout,80)
@@ -2804,7 +2809,7 @@ c
      &                    ' [<Enter>=Exit] :  ',$)
                read (input,90)  record
    90          format (a240)
-               read (record,*,err=100,end=100)  (list(i),i=1,20)
+               read (record,*,err=100,end=100)  (list(i),i=1,size)
   100          continue
 c
 c     process the input groups to a list of equivalent atoms
@@ -2939,6 +2944,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+         deallocate (list)
          deallocate (ising)
          deallocate (jsing)
          deallocate (isame)

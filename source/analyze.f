@@ -28,9 +28,10 @@ c
       implicit none
       integer i,j,ixyz
       integer frame,nold
+      integer size
       integer freeunit
       integer trimtext
-      integer list(20)
+      integer, allocatable :: list(:)
       real*8 energy
       real*8, allocatable :: derivs(:,:)
       logical dosystem,doparam
@@ -108,16 +109,18 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      size = 40
+      allocate (list(size))
       allocate (active(n))
 c
 c     get the list of atoms for which output is desired
 c
       if (doatom .or. doparam .or. doconect) then
-         do i = 1, 20
+         do i = 1, size
             list(i) = 0
          end do
          if (exist) then
-            do i = 1, 20
+            do i = 1, size
                call nextarg (string,exist)
                if (.not. exist)  goto 50
                read (string,*,err=50,end=50)  list(i)
@@ -133,7 +136,7 @@ c
      &                 ' [ALL] :  '/,'    >  ',$)
             read (input,70)  record
    70       format (a240)
-            read (record,*,err=80,end=80)  (list(i),i=1,20)
+            read (record,*,err=80,end=80)  (list(i),i=1,size)
    80       continue
          end if
          do i = 1, n
@@ -264,6 +267,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (list)
       deallocate (active)
 c
 c     perform any final tasks before program exit

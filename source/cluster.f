@@ -70,7 +70,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      size = max(20,n)
+      size = 40
       allocate (list(size))
 c
 c     get any keywords containing atom group definitions
@@ -83,7 +83,7 @@ c
          if (keyword(1:6) .eq. 'GROUP ') then
             use_group = .true.
             gnum = 0
-            do i = 1, 20
+            do i = 1, size
                list(i) = 0
             end do
             call getnumb (record,gnum,next)
@@ -94,7 +94,7 @@ c
                call fatal
             end if
             string = record(next:240)
-            read (string,*,err=20,end=20)  (list(i),i=1,20)
+            read (string,*,err=20,end=20)  (list(i),i=1,size)
    20       continue
             i = 1
             do while (list(i) .ne. 0)

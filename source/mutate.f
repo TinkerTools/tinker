@@ -28,8 +28,9 @@ c
       implicit none
       integer i,j,k,ihyb
       integer it0,it1
-      integer ntbnd,next
-      integer list(20)
+      integer next,size
+      integer ntbnd
+      integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
       character*20 keyword
       character*240 record
@@ -53,6 +54,8 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      size = 40
+      allocate (list(size))
       allocate (itbnd(2,nbond))
 c
 c     set defaults for lambda perturbation scaling values
@@ -112,11 +115,11 @@ c
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
          else if (keyword(1:7) .eq. 'LIGAND ') then
-            do k = 1, 20
+            do k = 1, size
                list(k) = 0
             end do
             string = record(next:240)
-            read (string,*,err=10,end=10)  (list(k),k=1,20)
+            read (string,*,err=10,end=10)  (list(k),k=1,size)
    10       continue
             k = 1
             do while (list(k) .ne. 0)
@@ -144,11 +147,11 @@ c
                end if
             end do
          else if (keyword(1:15) .eq. 'ROTATABLE-BOND ') then
-            do k = 1, 20
+            do k = 1, size
                list(k) = 0
             end do
             string = record(next:240)
-            read (string,*,err=20,end=20)  (list(k),k=1,20)
+            read (string,*,err=20,end=20)  (list(k),k=1,size)
    20       continue
             k = 1
             do while (list(k) .ne. 0)
@@ -189,6 +192,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (list)
       deallocate (itbnd)
       return
       end
