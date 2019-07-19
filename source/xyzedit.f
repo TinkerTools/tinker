@@ -1901,7 +1901,7 @@ c
                   xmid = 0.0d0
                   ymid = 0.0d0
                   zmid = 0.0d0
-                  do k = start, stop
+                  do k = stop, start, -1
                      weigh = mass(k)
                      xmid = xmid + x(k)*weigh
                      ymid = ymid + y(k)*weigh
