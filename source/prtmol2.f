@@ -25,6 +25,7 @@ c
       implicit none
       integer i,j,imol2
       integer subnum
+      integer trimtext
       real*8, allocatable :: atmchg(:)
       logical opened
       character*2, allocatable :: bndtyp(:)
@@ -89,8 +90,9 @@ c
       write (imol2,90)
    90 format (/,'@<TRIPOS>BOND')
       do i = 1, nbond
-         write (imol2,100)  i,(ibnd(j,i),j=1,2),bndtyp(i)
-  100    format (3i7,2x,a2)
+         write (imol2,100)  i,(ibnd(j,i),j=1,2),
+     &                      bndtyp(i)(1:trimtext(bndtyp(i)))
+  100    format (3i7,2x,a)
       end do
 c
 c     write the SUBSTRUCTURE record type indicator
@@ -206,7 +208,7 @@ c
       do i = 1, n
          it = n12(i)
          atomic(i) = 0
-         call upcase (name)
+         call upcase (name(i))
          if (name(i)(1:1) .eq. 'H')  atomic(i) = 1
          if (name(i)(1:2).eq.'LI' .and. it.eq.0)  atomic(i) = 3
          if (name(i).eq.'F  ' .or. name(i).eq.'F- ')  atomic(i) = 9
@@ -565,6 +567,8 @@ c
                tb = atmtyp(ib)(3:3)
                tc = atmtyp(ic)(3:3)
                td = atmtyp(id)(3:3)
+               if (atmtyp(ia) .eq. 'O.co2')  ta = '2'
+               if (atmtyp(id) .eq. 'O.co2')  td = '2'
                if ((ta.eq.'2' .or. ta.eq.'1') .and.
      &             (tb.eq.'2' .or. tb.eq.'1') .and.
      &             (tc.eq.'2' .or. tc.eq.'1') .and.
