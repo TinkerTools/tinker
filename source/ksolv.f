@@ -1072,7 +1072,7 @@ c
       ymax = ycm
       zmax = zcm
       do i = 1, n
-         ri = rsolv(i)
+         ri = 1.0
          xmin = min(xmin,x(i)-ri)
          ymin = min(ymin,y(i)-ri)
          zmin = min(zmin,z(i)-ri)
@@ -1191,7 +1191,6 @@ c
       grid(1) = xlen / dime(1)
       grid(2) = ylen / dime(2)
       grid(3) = zlen / dime(3)
-      write(*,*) xlen,ylen,zlen
 c
 c     grid spacing must be equal to maintain traceless quadrupoles
 c
@@ -1379,7 +1378,7 @@ c
       use solute
       implicit none
       integer i,next
-      real*8 cavoff,dispoff
+      real*8 cavoff
       real*8 cross,ah,ao
       real*8 rmini,epsi
       real*8 rmixh,rmixh3
@@ -1400,7 +1399,6 @@ c
 c     set default values for cavity and dispersion radius offsets
 c
       cavoff = 0.0d0
-      dispoff = 0.26d0
 c
 c     get any altered surface tension value from keyfile
 c
@@ -1447,7 +1445,7 @@ c     set cavity and dispersion radii for nonpolar solvation
 c
       do i = 1, n
          rcav(i) = rad(class(i)) + cavoff
-         rdisp(i) = rad(class(i)) + dispoff
+         rdisp(i) = rad(class(i))
       end do
 c
 c     compute maximum dispersion energies for each atom
@@ -1466,7 +1464,7 @@ c
             rmixh3 = rmixh**3
             rmixh7 = rmixh**7
             ah = emixh * rmixh7
-            ri = rdisp(i)
+            ri = rdisp(i) + dispoff
             ri3 = ri**3
             ri7 = ri**7
             ri11 = ri**11

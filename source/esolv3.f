@@ -1698,7 +1698,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ri = rdisp(i)
+         ri = rdisp(i) + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c

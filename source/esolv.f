@@ -1499,7 +1499,7 @@ c
       shctd = 0.81d0
       offset = 0.0d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
+         rdisp(i) = rad(class(i))
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1525,7 +1525,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ri = rdisp(i)
+         ri = rdisp(i) + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
