@@ -115,11 +115,14 @@ c
          else if (keyword(1:18) .eq. 'DIELECTRIC-OFFSET ') then
             read (string,*,err=50,end=50)  doffset
             if (doffset .lt. 0.0d0)  doffset = -doffset
-         else if (keyword(1:4) .eq. 'GKR ') then
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
             k = 0
             rd = 0.0d0
-            read (string,*,err=10,end=10)  k,rd
-   10       continue
+            call getnumb (record,k,next)
+            call gettext (record,keyword,next)
+            string = record(next:240)
+            read (string,*,err=15,end=15)  rd
+   15       continue
             if (k.ge.1 .and. k.le.maxclass) then
                if (header .and. .not.silent) then
                   header = .false.
@@ -129,12 +132,13 @@ c
      &                    //,5x,'Atom Type',10x,'Radius',/)
                end if
                if (rd .lt. 0.0d0)  rd = 0.0d0
+               rd = 0.5 * rd
                gkr(k) = rd
                if (.not. silent) then
                   write (iout,30)  k,rd
    30             format (4x,i6,8x,f12.4)
                end if
-            else if (k .gt. maxtyp) then
+            else if (k .gt. maxclass) then
                write (iout,40)  maxtyp
    40          format (/,' KSOLV  --  Only Atom Types Through',i4,
      &                    ' are Allowed')
@@ -834,7 +838,6 @@ c
       real*8 rscale
       real*8 offset
       character*10 radtyp
-      character*10 soltyp
       character*20 keyword
       character*20 value
       character*240 record
@@ -871,7 +874,7 @@ c
 c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
-      radtyp = 'BONDI'
+      radtyp = 'SOLUTE'
 c
 c     get any altered generalized Kirkwood values from keyfile
 c
@@ -897,29 +900,15 @@ c
                radtyp = 'BONDI'
             else if (value(1:6) .eq. 'TOMASI') then
                radtyp = 'TOMASI'
+            else if (value(1:6) .eq. 'SOLUTE') then
+               radtyp = 'SOLUTE'
             end if
-c
-c
-c
-c     specify whether fitted vdw radii should be used
-c
-c
-c
-         else if (keyword(1:10) .eq. 'SOLUTE-VDW') then
-            soltyp = 'SOLUTE-VDW'
          end if
       end do
 c
-c     assign radii
-c
-c
-c
-c
 c     call setrad subroutine to maintain consistent radii assignment between gk and pb
 c
-c
-c
-      call setrad (radtyp,soltyp)
+      call setrad (radtyp)
 c
 c     assign generic value for the HCT overlap scale factor
 c
@@ -993,7 +982,6 @@ c
       real*8 xlen,ylen,zlen,minlen
       real*8 pbionc,pbionr
       character*10 radtyp
-      character*10 soltyp
       character*20 keyword
       character*20 value
       character*240 record
@@ -1023,7 +1011,7 @@ c     assign some default APBS configuration parameters
 c
       pbtyp = 'LPBE'
       pbsoln = 'MG-MANUAL'
-      radtyp = 'BONDI'
+      radtyp = 'SOLUTE'
       bcfl = 'MDH'
       chgm = 'SPL4'
       srfm = 'SPL4'
@@ -1119,6 +1107,8 @@ c
                radtyp = 'BONDI'
             else if (value(1:6) .eq. 'TOMASI') then
                radtyp = 'TOMASI'
+            else if (value(1:6) .eq. 'SOLUTE') then
+               radtyp = 'SOLUTE'
             end if
          else if (keyword(1:6) .eq. 'SDENS ') then
             read (string,*,err=20,end=20)  sdens
@@ -1171,15 +1161,6 @@ c
                ionq(ionn) = pbionq
                ionr(ionn) = pbionr
             end if
-c
-c
-c
-c     specify whether fitted vdw radii should be used
-c
-c
-c
-         else if (keyword(1:10) .eq. 'SOLUTE-VDW') then
-            soltyp = 'SOLUTE-VDW'
          end if
       end do
 c
@@ -1311,16 +1292,9 @@ c
          end if
       end do
 c
-c     assign radii
-c
-c
-c
-c
 c     call setrad subroutine to maintain consistent radii assignment between gk and pb
 c
-c
-c
-      call setrad (radtyp,soltyp)
+      call setrad (radtyp)
 c
 c     assign generic value for the HCT overlap scale factor
 c
@@ -1577,12 +1551,12 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine setrad  --  assign Van der Waals radii        ##
+c     ##  subroutine setrad  --  assign Solute radii               ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-      subroutine setrad (radtyp,soltyp)
+      subroutine setrad (radtyp)
       use sizes
       use atomid
       use atoms
@@ -1606,7 +1580,14 @@ c
       real*8 rscale
       real*8 offset
       character*10 radtyp
-      character*10 soltyp
+c
+c     assign default solute radii from consensus vdw values
+c
+      do i = 1, n
+         atmnum = atomic(i)
+         if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+         rsolv(i) = vdwrad(atmnum)
+      end do
 c
 c     assign base atomic radii from consensus vdw values
 c
@@ -1714,32 +1695,21 @@ c
             end if
          end do
 c
-c     assign base atomic radii from consensus vdw values
-c
-      else
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-         end do
-      end if
-c
-c
 c     assign base atomic radii from parametrized vdw values
 c     if no parametrized radii exists, base vdw radii is used
 c
-c
-      if (soltyp .eq. 'SOLUTE-VDW') then
+      else if (radtyp .eq. 'SOLUTE') then
          do i = 1, n
             if (class(i) .ne. 0) then
-               if (svdw(class(i)) .ne. 0.0d0) rsolv(i) = svdw(class(i))
+               if (gkr(class(i)) .ne. 0.0d0) then
+                  rsolv(i) = gkr(class(i))
+               end if
             end if
          end do
-      end if
 c
 c     make Tomasi-style modifications to the base atomic radii
 c
-      if (radtyp .eq. 'TOMASI') then
+      else if (radtyp .eq. 'TOMASI') then
          do i = 1, n
             offset = 0.0d0
             atmnum = atomic(i)

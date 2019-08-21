@@ -19,6 +19,7 @@ c
       subroutine readprm
       use sizes
       use fields
+      use gkstuf
       use iounit
       use kanang
       use kangs
@@ -222,14 +223,16 @@ c
                eps(ia) = ep
                reduct(ia) = rdn
             end if
-         else if (keyword(1:10) .eq. 'SOLUTE-VDW') then
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
             ia = 0
             rd = 0.0d0
+            call getnumb (record,ia,next)
+            call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=75,end=75)  ia,rd
+            read (string,*,err=75,end=75)  rd
    75       continue
             if (ia .ne. 0) then
-               svdw(ia) = rd/2
+               gkr(ia) = rd * 0.5
             end if
 c
 c     van der Waals 1-4 parameters for individual atom types
