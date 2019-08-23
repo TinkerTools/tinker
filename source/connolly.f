@@ -183,7 +183,10 @@ c
          axyz(1,i) = x(i)
          axyz(2,i) = y(i)
          axyz(3,i) = z(i)
-         ar(i) = rad(class(i))
+c        This is probably a bug to ignore the passed in radius array.
+c        ar(i) = rad(class(i))
+c        This uses the passed values.
+         ar(i) = radius(i)
          if (ar(i) .eq. 0.0d0) then
             skip(i) = .true.
          else
