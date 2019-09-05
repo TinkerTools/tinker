@@ -4150,11 +4150,11 @@ void openmm_init_ (void** ommHandle, double* dt) {
       if (log) {
          (void) fprintf (log, "\n Stochastic Integrator:\n");
          (void) fprintf (log, "\n Temperature          %15.4f K",
-                             bath__.kelvin );
+                             bath__.kelvin);
          (void) fprintf (log, "\n Friction             %15.4f ps^(-1)",
-                             stodyn__.friction );
+                             stodyn__.friction);
          (void) fprintf (log, "\n TimeStep             %15.4f ps\n",
-                             *dt );
+                             *dt);
          (void) fflush (log);
       }
       omm->integrator = (OpenMM_Integrator*)OpenMM_LangevinIntegrator_create
@@ -4420,6 +4420,7 @@ void openmm_cleanup_ (void** omm) {
    OpenMM_Integrator_destroy (openMMDataHandle->integrator);
    OpenMM_System_destroy (openMMDataHandle->system);
    free (openMMDataHandle);
+   *omm = NULL;
 }
 
 }
@@ -5070,8 +5071,7 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
    OpenMM_Context_setPeriodicBoxVectors (omm->context, &a, &b, &c);
 
    // copy coordinates from Tinker to OpenMM
-   // never call OpenMM_Vec3Array_destroy (posInMNm);
-   static OpenMM_Vec3Array* posInNm = OpenMM_Vec3Array_create (atoms__.n);
+   OpenMM_Vec3Array* posInNm = OpenMM_Vec3Array_create (atoms__.n);
    for (int ii = 0; ii < atoms__.n; ++ii) {
       OpenMM_Vec3 r;
       r.x = atoms__.x[ii] * OpenMM_NmPerAngstrom;
@@ -5081,6 +5081,7 @@ void openmm_bar_energy_ (void** ommHandle, double* energyInKcal) {
    }
 
    OpenMM_Context_setPositions (omm->context, posInNm);
+   OpenMM_Vec3Array_destroy (posInNm);
 
    // get OpenMM state
    int infoMask = 0;
