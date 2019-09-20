@@ -17,7 +17,9 @@ c     in order to define the default force field parameters
 c
 c
       subroutine readprm
+      use sizes
       use fields
+      use gkstuf
       use iounit
       use kanang
       use kangs
@@ -48,6 +50,7 @@ c
       use kvdwpr
       use merck
       use params
+      use solute
       implicit none
       integer i,j,iprm
       integer ia,ib,ic,id
@@ -976,6 +979,18 @@ c
                rad(ia) = rd
                eps(ia) = ep
                reduct(ia) = rdn
+            end if
+
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
+            ia = 0
+            rd = 0.0d0
+            call getnumb (record,ia,next)
+            call gettext (record,keyword,next)
+            string = record(next:240)
+            read (string,*,err=325,end=325)  rd
+  325       continue
+            if (ia .ne. 0) then
+               gkr(ia) = rd * 0.5
             end if
 c
 c     van der Waals 1-4 parameters for individual atom types

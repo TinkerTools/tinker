@@ -4815,7 +4815,7 @@ c
          rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
          rmixh7 = rmixh**7
          ah = emixh * rmixh7
-         ri = rdisp(i)
+         ri = rdisp(i) + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c

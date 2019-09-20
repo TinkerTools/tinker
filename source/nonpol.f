@@ -18,6 +18,7 @@ c     rmino     water oxygen Rmin for implicit dispersion term
 c     rminh     water hydrogen Rmin for implicit dispersion term
 c     awater    water number density at standard temp & pressure
 c     slevy     enthalpy-to-free energy scale factor for dispersion
+c     dispoff   radius plus dispoff is the beginning of the dispersion integral
 c
 c     solvprs   limiting microscopic solvent pressure value
 c     surften   limiting macroscopic surface tension value
@@ -34,13 +35,14 @@ c
       implicit none
       real*8 epso,epsh
       real*8 rmino,rminh
-      real*8 awater,slevy
+      real*8 awater,slevy,dispoff
       parameter (epso=0.1100d0)
       parameter (epsh=0.0135d0)
       parameter (rmino=1.7025d0)
       parameter (rminh=1.3275d0)
       parameter (awater=0.033428d0)
       parameter (slevy=1.0d0)
+      parameter (dispoff=0.838d0)
       real*8 solvprs,surften
       real*8 spcut,spoff
       real*8 stcut,stoff

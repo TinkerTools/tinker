@@ -38,6 +38,7 @@ c     borntyp   method to be used for the Born radius computation
 c
 c
       module solute
+      use sizes
       implicit none
       real*8 doffset
       real*8 p1,p2,p3,p4,p5

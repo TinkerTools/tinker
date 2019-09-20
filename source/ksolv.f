@@ -18,6 +18,7 @@ c     Poisson-Boltzmann, cavity-dispersion and HPMF models
 c
 c
       subroutine ksolv
+      use sizes
       use gkstuf
       use inform
       use iounit
@@ -114,11 +115,14 @@ c
          else if (keyword(1:18) .eq. 'DIELECTRIC-OFFSET ') then
             read (string,*,err=50,end=50)  doffset
             if (doffset .lt. 0.0d0)  doffset = -doffset
-         else if (keyword(1:4) .eq. 'GKR ') then
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
             k = 0
             rd = 0.0d0
-            read (string,*,err=10,end=10)  k,rd
-   10       continue
+            call getnumb (record,k,next)
+            call gettext (record,keyword,next)
+            string = record(next:240)
+            read (string,*,err=15,end=15)  rd
+   15       continue
             if (k.ge.1 .and. k.le.maxclass) then
                if (header .and. .not.silent) then
                   header = .false.
@@ -128,12 +132,13 @@ c
      &                    //,5x,'Atom Type',10x,'Radius',/)
                end if
                if (rd .lt. 0.0d0)  rd = 0.0d0
+               rd = 0.5 * rd
                gkr(k) = rd
                if (.not. silent) then
                   write (iout,30)  k,rd
    30             format (4x,i6,8x,f12.4)
                end if
-            else if (k .gt. maxtyp) then
+            else if (k .gt. maxclass) then
                write (iout,40)  maxtyp
    40          format (/,' KSOLV  --  Only Atom Types Through',i4,
      &                    ' are Allowed')
@@ -204,6 +209,7 @@ c     Hydration of Peptides", PNAS, 84, 3086-3090 (1987)  (SASA)
 c
 c
       subroutine ksa
+      use sizes
       use atomid
       use atoms
       use couple
@@ -344,6 +350,7 @@ c     Computational Chemistry, 22, 1857-1879 (2001)  (ACE)
 c
 c
       subroutine kgb
+      use sizes
       use angbnd
       use atmlst
       use atomid
@@ -813,6 +820,7 @@ c     Kirkwood implicit solvation model
 c
 c
       subroutine kgk
+      use sizes
       use atomid
       use atoms
       use couple
@@ -860,15 +868,15 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      if (poltyp .eq. 'OPT') then
-         allocate (uopts(0:optorder,3,n))
-         allocate (uoptps(0:optorder,3,n))
+      if(poltyp .eq. 'OPT') then
+        allocate (uopts(0:optorder,3,n))
+        allocate (uoptps(0:optorder,3,n))
       end if
 c
 c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
-      radtyp = 'BONDI'
+      radtyp = 'SOLUTE'
 c
 c     get any altered generalized Kirkwood values from keyfile
 c
@@ -880,6 +888,7 @@ c
          string = record(next:240)
          if (keyword(1:4) .eq. 'GKC ') then
             read (string,*,err=10,end=10)  gkc
+   10       continue
          else if (keyword(1:10) .eq. 'GK-RADIUS ') then
             call getword (record,value,next)
             call upcase (value)
@@ -893,18 +902,705 @@ c
                radtyp = 'BONDI'
             else if (value(1:6) .eq. 'TOMASI') then
                radtyp = 'TOMASI'
+            else if (value(1:6) .eq. 'SOLUTE') then
+               radtyp = 'SOLUTE'
             end if
+         end if
+      end do
+c
+c     call setrad subroutine to maintain consistent radii assignment between gk and pb
+c
+      call setrad (radtyp)
+c
+c     assign generic value for the HCT overlap scale factor
+c
+      do i = 1, n
+         shct(i) = 0.69d0
+      end do
+      if (radtyp .eq. 'MACROMODEL') then
+         do i = 1, n
+            shct(i) = 0.80d0
+            atmnum = atomic(i)
+            if (atmnum .eq. 1)  shct(i) = 0.85d0
+            if (atmnum .eq. 6)  shct(i) = 0.72d0
+            if (atmnum .eq. 7)  shct(i) = 0.79d0
+            if (atmnum .eq. 8)  shct(i) = 0.85d0
+            if (atmnum .eq. 9)  shct(i) = 0.88d0
+            if (atmnum .eq. 15)  shct(i) = 0.86d0
+            if (atmnum .eq. 16)  shct(i) = 0.96d0
+            if (atmnum .eq. 26)  shct(i) = 0.88d0
+         end do
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine kpb  --  assign Poisson-Boltzmann parameters  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "kpb" assigns parameters needed for the Poisson-Boltzmann
+c     implicit solvation model implemented via APBS
+c
+c
+      subroutine kpb
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use couple
+      use gkstuf
+      use inform
+      use iounit
+      use keys
+      use kvdws
+      use math
+      use nonpol
+      use pbstuf
+      use polar
+      use polopt
+      use polpot
+      use potent
+      use ptable
+      use solute
+      implicit none
+      integer i,j,k,l,m
+      integer nx,ny,nz
+      integer maxgrd,next
+      integer atmnum,trimtext
+      integer pbtyplen,pbsolnlen
+      integer bcfllen,chgmlen
+      integer srfmlen,pbionq
+      real*8 ri,rscale
+      real*8 spacing,offset
+      real*8 gx,gy,gz
+      real*8 xcm,ycm,zcm
+      real*8 total,weigh
+      real*8 xmin,xmax,ymin
+      real*8 ymax,zmin,zmax
+      real*8 xlen,ylen,zlen,minlen
+      real*8 pbionc,pbionr
+      character*10 radtyp
+      character*20 keyword
+      character*20 value
+      character*240 record
+      character*240 string
+c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(rsolv))  deallocate (rsolv)
+      if (allocated(shct))  deallocate (shct)
+      if (allocated(udirs))  deallocate (udirs)
+      if (allocated(udirps))  deallocate (udirps)
+      if (allocated(uinds))  deallocate (uinds)
+      if (allocated(uinps))  deallocate (uinps)
+      if (allocated(uopts))  deallocate (uopts)
+      if (allocated(uoptps))  deallocate (uoptps)
+      allocate (rsolv(n))
+      allocate (shct(n))
+      allocate (udirs(3,n))
+      allocate (udirps(3,n))
+      allocate (uinds(3,n))
+      allocate (uinps(3,n))
+      if (poltyp .eq. 'OPT') then
+        allocate (uopts(0:optorder,3,n))
+        allocate (uoptps(0:optorder,3,n))
+      end if
+c
+c     assign some default APBS configuration parameters
+c
+      pbtyp = 'LPBE'
+      pbsoln = 'MG-MANUAL'
+      radtyp = 'SOLUTE'
+      bcfl = 'MDH'
+      chgm = 'SPL4'
+      srfm = 'SPL4'
+      kelvin = 298.0d0
+      pdie = 1.0d0
+      sdie = 78.3d0
+      srad = 1.4d0
+      swin = 0.3d0
+      sdens = 10.0d0
+      smin = 3.0d0
+      ionn = 0
+      do i = 1, maxion
+         ionc(i) = 0.0d0
+         ionq(i) = 1
+         ionr(i) = 2.0d0
+      end do
+      spacing = 0.5d0
+      maxgrd = 225
+c
+c     compute the position of the center of mass
+c
+      total = 0.0d0
+      xcm = 0.0d0
+      ycm = 0.0d0
+      zcm = 0.0d0
+      do i = 1, n
+         weigh = mass(i)
+         total = total + weigh
+         xcm = xcm + x(i)*weigh
+         ycm = ycm + y(i)*weigh
+         zcm = zcm + z(i)*weigh
+      end do
+      xcm = xcm / total
+      ycm = ycm / total
+      zcm = zcm / total
+      gcent(1) = xcm
+      gcent(2) = ycm
+      gcent(3) = zcm
+c
+c     set default APBS grid dimension based on system extent
+c
+      xmin = xcm
+      ymin = ycm
+      zmin = zcm
+      xmax = xcm
+      ymax = ycm
+      zmax = zcm
+      do i = 1, n
+         ri = 1.0
+         xmin = min(xmin,x(i)-ri)
+         ymin = min(ymin,y(i)-ri)
+         zmin = min(zmin,z(i)-ri)
+         xmax = max(xmax,x(i)+ri)
+         ymax = max(ymax,y(i)+ri)
+         zmax = max(zmax,z(i)+ri)
+      end do
+      xlen = 2.0d0 * (max(xcm-xmin,xmax-xcm)+smin)
+      ylen = 2.0d0 * (max(ycm-ymin,ymax-ycm)+smin)
+      zlen = 2.0d0 * (max(zcm-zmin,zmax-zcm)+smin)
+      dime(1) = int(xlen/spacing) + 1
+      dime(2) = int(ylen/spacing) + 1
+      dime(3) = int(zlen/spacing) + 1
+c
+c     get any altered APBS parameters from the keyfile
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:8) .eq. 'MG-AUTO ') then
+            pbsoln = 'MG-AUTO'
+         else if (keyword(1:10) .eq. 'MG-MANUAL ') then
+            pbsoln = 'MG-MANUAL'
+         else if (keyword(1:10) .eq. 'APBS-GRID ') then
+            nx = dime(1)
+            ny = dime(2)
+            nz = dime(3)
+            read (string,*,err=10,end=10)  nx, ny, nz
+   10       continue
+            if (nx .ge. 33)  dime(1) = nx
+            if (ny .ge. 33)  dime(2) = ny
+            if (nz .ge. 33)  dime(3) = nz
+         else if (keyword(1:10) .eq. 'PB-RADIUS ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:3) .eq. 'VDW') then
+               radtyp = 'VDW'
+            else if (value(1:10) .eq. 'MACROMODEL') then
+               radtyp = 'MACROMODEL'
+            else if (value(1:5) .eq. 'BONDI') then
+               radtyp = 'BONDI'
+            else if (value(1:6) .eq. 'TOMASI') then
+               radtyp = 'TOMASI'
+            else if (value(1:6) .eq. 'SOLUTE') then
+               radtyp = 'SOLUTE'
+            end if
+         else if (keyword(1:6) .eq. 'SDENS ') then
+            read (string,*,err=20,end=20)  sdens
+   20       continue
+         else if (keyword(1:5) .eq. 'PDIE ') then
+            read (string,*,err=30,end=30)  pdie
+   30       continue
+         else if (keyword(1:5) .eq. 'SDIE ') then
+            read (string,*,err=40,end=40)  sdie
+   40       continue
+         else if (keyword(1:5) .eq. 'SRAD ') then
+            read (string,*,err=50,end=50)  srad
+   50       continue
+         else if (keyword(1:5) .eq. 'SWIN ') then
+            read (string,*,err=60,end=60)  swin
+   60       continue
+         else if (keyword(1:5) .eq. 'SMIN ') then
+            read (string,*,err=70,end=70)  smin
+   70       continue
+         else if (keyword(1:5) .eq. 'SRFM ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:3) .eq. 'MOL') then
+               srfm = 'MOL'
+            else if (value(1:4) .eq. 'SMOL') then
+               srfm = 'SMOL'
+            else if (value(1:4) .eq. 'SPL2') then
+               srfm = 'SPL2'
+            end if
+         else if (keyword(1:5) .eq. 'BCFL ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:3) .eq. 'ZERO') then
+               bcfl = 'ZERO'
+            else if (value(1:3) .eq. 'MDH') then
+               bcfl = 'MDH'
+            else if (value(1:3) .eq. 'SDH') then
+               bcfl = 'SDH'
+            end if
+         else if (keyword(1:4) .eq. 'ION ') then
+            pbionc = 0.0d0
+            pbionq = 1
+            pbionr = 2.0d0
+            read (string,*,err=80,end=80)  pbionq,pbionc,pbionr
+   80       continue
+            if (pbionq.ne.0 .and. pbionc.ge.0.0d0
+     &             .and. pbionr.ge.0.0d0) then
+               ionn = ionn + 1
+               ionc(ionn) = pbionc
+               ionq(ionn) = pbionq
+               ionr(ionn) = pbionr
+            end if
+         end if
+      end do
+c
+c     set APBS grid spacing for the chosen grid dimension
+c
+      xlen = 2.0d0 * (max(xcm-xmin,xmax-xcm)+smin)
+      ylen = 2.0d0 * (max(ycm-ymin,ymax-ycm)+smin)
+      zlen = 2.0d0 * (max(zcm-zmin,zmax-zcm)+smin)
+      grid(1) = xlen / dime(1)
+      grid(2) = ylen / dime(2)
+      grid(3) = zlen / dime(3)
+c
+c     grid spacing must be equal to maintain traceless quadrupoles
+c
+      grid(1) = min(grid(1),grid(2),grid(3))
+      grid(2) = grid(1)
+      grid(3) = grid(1)
+c
+c     set the grid dimensions to the smallest multiples of 32
+c
+      dime(1) = 33
+      dime(2) = 33
+      dime(3) = 33
+c
+c
+c
+c     use minimum side length to maintain equal grid spacing
+c
+c
+c
+      minlen = min(xlen,ylen,zlen)
+      do while (grid(1)*dime(1) .lt. minlen)
+         dime(1) = dime(1) + 32
+      end do
+      do while (grid(2)*dime(2) .lt. minlen)
+         dime(2) = dime(2) + 32
+      end do
+      do while (grid(3)*dime(3) .lt. minlen)
+         dime(3) = dime(3) + 32
+      end do
+c
+c     limit the grid dimensions and recompute the grid spacing
+c
+      dime(1) = min(dime(1),maxgrd)
+      dime(2) = min(dime(2),maxgrd)
+      dime(3) = min(dime(3),maxgrd)
+      grid(1) = xlen / dime(1)
+      grid(2) = ylen / dime(2)
+      grid(3) = zlen / dime(3)
+c
+c     grid spacing must be equal to maintain traceless quadrupoles
+c
+      grid(1) = max(grid(1),grid(2),grid(3))
+      grid(2) = grid(1)
+      grid(3) = grid(1)
+c
+c     if this is an "mg-auto" (focusing) calculation, set the
+c     fine grid to the default size, and the coarse grid to
+c     twice its original size. Currently, all energies and
+c     forces need to be evaluated at the same resolution
+c
+      if (pbsoln .eq. 'MG-AUTO') then
+         fgrid(1) = grid(1)
+         fgrid(2) = grid(2)
+         fgrid(3) = grid(3)
+         fgcent(1) = gcent(1)
+         fgcent(2) = gcent(2)
+         fgcent(3) = gcent(3)
+         cgrid(1) = 2.0d0 * grid(1)
+         cgrid(2) = 2.0d0 * grid(2)
+         cgrid(3) = 2.0d0 * grid(3)
+      end if
+c
+c     get any custom APBS grid parameters from the keyfile
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:5) .eq. 'DIME ') then
+            read (string,*,err=90,end=90)  nx,ny,nz
+            dime(1) = nx
+            dime(2) = ny
+            dime(3) = nz
+   90       continue
+            do j = 1, 3
+               if (mod(dime(j),32) .ne. 1) then
+                  dime(j) = 32*(1+(dime(j)-1)/32) + 1
+               end if
+            end do
+         else if (keyword(1:6) .eq. 'AGRID ') then
+            read (string,*,err=100,end=100)  gx,gy,gz
+            grid(1) = gx
+            grid(2) = gy
+            grid(3) = gz
+  100       continue
+         else if (keyword(1:6) .eq. 'CGRID ') then
+            read (string,*,err=110,end=110)  gx,gy,gz
+            cgrid(1) = gx
+            cgrid(2) = gy
+            cgrid(3) = gz
+  110       continue
+         else if (keyword(1:6) .eq. 'FGRID ') then
+            read (string,*,err=120,end=120)  gx,gy,gz
+            fgrid(1) = gx
+            fgrid(2) = gy
+            fgrid(3) = gz
+  120       continue
+         else if (keyword(1:6) .eq. 'GCENT ') then
+            read (string,*,err=130,end=130)  gx,gy,gz
+            gcent(1) = gx
+            gcent(2) = gy
+            gcent(3) = gz
+  130       continue
+         else if (keyword(1:7) .eq. 'CGCENT ') then
+            read (string,*,err=140,end=140)  gx,gy,gz
+            cgcent(1) = gx
+            cgcent(2) = gy
+            cgcent(3) = gz
+  140       continue
+         else if (keyword(1:7) .eq. 'FGCENT ') then
+            read (string,*,err=150,end=150)  gx,gy,gz
+            fgcent(1) = gx
+            fgcent(2) = gy
+            fgcent(3) = gz
+  150       continue
+         end if
+      end do
+c
+c     call setrad subroutine to maintain consistent radii assignment between gk and pb
+c
+      call setrad (radtyp)
+c
+c     assign generic value for the HCT overlap scale factor
+c
+      do i = 1, n
+         shct(i) = 0.69d0
+      end do
+c
+c     determine the length of the character arguments
+c
+      pbtyplen = trimtext (pbtyp)
+      pbsolnlen = trimtext (pbsoln)
+      bcfllen = trimtext (bcfl)
+      chgmlen = trimtext (chgm)
+      srfmlen = trimtext (srfm)
+c
+c     make call needed to initialize the APBS calculation
+c
+      call apbsinitial (dime,grid,gcent,cgrid,cgcent,fgrid,fgcent,
+     &                  pdie,sdie,srad,swin,sdens,kelvin,ionn,ionc,
+     &                  ionq,ionr,pbtyp,pbtyplen,pbsoln,pbsolnlen,
+     &                  bcfl,bcfllen,chgm,chgmlen,srfm,srfmlen)
+c
+c     print out the APBS grid dimensions and spacing
+c
+      if (verbose) then
+         write (iout,160)  (dime(i),i=1,3),grid(1)
+  160    format (/,' APBS Grid Dimensions and Spacing :',
+     &           //,10x,3i8,10x,f10.4)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine knp  --  assign cavity-dispersion parameters  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "knp" initializes parameters needed for the cavity-plus-
+c     dispersion nonpolar implicit solvation model
+c
+c
+      subroutine knp
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use keys
+      use kvdws
+      use math
+      use nonpol
+      use potent
+      use solute
+      implicit none
+      integer i,next
+      real*8 cavoff
+      real*8 cross,ah,ao
+      real*8 rmini,epsi
+      real*8 rmixh,rmixh3
+      real*8 rmixh7,emixh
+      real*8 rmixo,rmixo3
+      real*8 rmixo7,emixo
+      real*8 ri,ri3,ri7,ri11
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set default values for solvent pressure and surface tension
+c
+c     solvprs = 0.0327d0
+      solvprs = 0.0335d0
+      surften = 0.080d0
+c
+c     set default values for cavity and dispersion radius offsets
+c
+      cavoff = 0.0d0
+c
+c     get any altered surface tension value from keyfile
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
+            read (string,*,err=10,end=10)  solvprs
+         else if (keyword(1:16) .eq. 'SURFACE-TENSION ') then
+            read (string,*,err=10,end=10)  surften
          end if
    10    continue
       end do
 c
-c     assign base atomic radii from the van der Waals values
+c     set switching function values for pressure and tension
+c
+c     cross = 3.0d0 * surften / solvprs
+      cross = 9.0d0
+      spcut = cross - 3.5d0
+      spoff = cross + 3.5d0
+      stcut = cross + 3.9d0
+      stoff = cross - 3.5d0
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(asolv))  deallocate (asolv)
+      if (allocated(rcav))  deallocate (rcav)
+      if (allocated(rdisp))  deallocate (rdisp)
+      if (allocated(cdisp))  deallocate (cdisp)
+      allocate (asolv(n))
+      allocate (rcav(n))
+      allocate (rdisp(n))
+      allocate (cdisp(n))
+c
+c     assign surface area factors for nonpolar solvation
+c
+      do i = 1, n
+         asolv(i) = surften
+      end do
+c
+c     set cavity and dispersion radii for nonpolar solvation
+c
+      do i = 1, n
+         rcav(i) = rad(class(i)) + cavoff
+         rdisp(i) = rad(class(i))
+      end do
+c
+c     compute maximum dispersion energies for each atom
+c
+      do i = 1, n
+         epsi = eps(class(i))
+         if (rdisp(i).gt.0.0d0 .and. epsi.gt.0.0d0) then
+            rmini = rad(class(i))
+            emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
+            rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
+            rmixo3 = rmixo**3
+            rmixo7 = rmixo**7
+            ao = emixo * rmixo7
+            emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
+            rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
+            rmixh3 = rmixh**3
+            rmixh7 = rmixh**7
+            ah = emixh * rmixh7
+            ri = rdisp(i) + dispoff
+            ri3 = ri**3
+            ri7 = ri**7
+            ri11 = ri**11
+            if (ri .lt. rmixh) then
+               cdisp(i) = -4.0d0*pi*emixh*(rmixh3-ri3)/3.0d0
+               cdisp(i) = cdisp(i) - emixh*18.0d0/11.0d0*rmixh3*pi
+            else
+               cdisp(i) = 2.0d0*pi*(2.0d0*rmixh7-11.0d0*ri7)*ah
+               cdisp(i) = cdisp(i) / (11.0d0*ri11)
+            end if
+            cdisp(i) = 2.0d0 * cdisp(i)
+            if (ri .lt. rmixo) then
+               cdisp(i) = cdisp(i) - 4.0d0*pi*emixo*(rmixo3-ri3)/3.0d0
+               cdisp(i) = cdisp(i) - emixo*18.0d0/11.0d0*rmixo3*pi
+            else
+               cdisp(i) = cdisp(i) + 2.0d0*pi*(2.0d0*rmixo7-11.0d0*ri7)
+     &                                  * ao/(11.0d0*ri11)
+            end if
+         end if
+         cdisp(i) = slevy * awater * cdisp(i)
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine khpmf  --  assign hydrophobic PMF parameters  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "khpmf" initializes parameters needed for the hydrophobic
+c     potential of mean force nonpolar implicit solvation model
+c
+c     literature reference:
+c
+c     M. S. Lin, N. L. Fawzi and T. Head-Gordon, "Hydrophobic
+c     Potential of Mean Force as a Solvation Function for Protein
+c     Structure Prediction", Structure, 15, 727-740 (2007)
+c
+c
+      subroutine khpmf
+      use sizes
+      use atomid
+      use atoms
+      use couple
+      use hpmf
+      use ptable
+      implicit none
+      integer i,j,k
+      integer nh,atn
+      logical keep
+c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(ipmf))  deallocate (ipmf)
+      if (allocated(rpmf))  deallocate (rpmf)
+      if (allocated(acsa))  deallocate (acsa)
+      allocate (ipmf(n))
+      allocate (rpmf(n))
+      allocate (acsa(n))
+c
+c     get carbons for PMF and set surface area screening values
+c
+      npmf = 0
+      do i = 1, n
+         if (atomic(i) .eq. 6) then
+            keep = .true.
+            nh = 0
+            if (n12(i) .le. 2)  keep = .false.
+            do j = 1, n12(i)
+               k = i12(j,i)
+               if (atomic(k) .eq. 1)  nh = nh + 1
+               if (n12(i).eq.3 .and. atomic(k).eq.8)  keep = .false.
+            end do
+            if (keep) then
+               npmf = npmf + 1
+               ipmf(npmf) = i
+               acsa(i) = 1.0d0
+               if (n12(i).eq.3 .and. nh.eq.0)  acsa(i) = 1.554d0
+               if (n12(i).eq.3 .and. nh.eq.1)  acsa(i) = 1.073d0
+               if (n12(i).eq.4 .and. nh.eq.1)  acsa(i) = 1.276d0
+               if (n12(i).eq.4 .and. nh.eq.2)  acsa(i) = 1.045d0
+               if (n12(i).eq.4 .and. nh.eq.3)  acsa(i) = 0.880d0
+               acsa(i) = acsa(i) * safact/acsurf
+            end if
+         end if
+      end do
+c
+c     assign HPMF atomic radii from consensus vdw values
+c
+      do i = 1, n
+         rpmf(i) = 1.0d0
+         atn = atomic(i)
+         if (atn .eq. 0) then 
+            rpmf(i) = 0.00d0
+         else
+            rpmf(i) = vdwrad(atn)
+         end if
+         if (atn .eq. 5)  rpmf(i) = 1.80d0
+         if (atn .eq. 8)  rpmf(i) = 1.50d0
+         if (atn .eq. 35)  rpmf(i) = 1.85d0
+      end do
+      return
+      end
+
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine setrad  --  assign Solute radii               ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine setrad (radtyp)
+      use sizes
+      use atomid
+      use atoms
+      use bath
+      use couple
+      use gkstuf
+      use inform
+      use iounit
+      use keys
+      use kvdws
+      use math
+      use nonpol
+      use pbstuf
+      use polar
+      use potent
+      use ptable
+      use solute
+      implicit none
+      integer i,j,k,l,m
+      integer atmnum
+      real*8 rscale
+      real*8 offset
+      character*10 radtyp
+c
+c     assign default solute radii from consensus vdw values
+c
+      do i = 1, n
+         atmnum = atomic(i)
+         if (atmnum .eq. 0)  rsolv(i) = 0.0d0
+         rsolv(i) = vdwrad(atmnum)
+      end do
+c
+c     assign base atomic radii from consensus vdw values
 c
       if (radtyp .eq. 'VDW') then
          do i = 1, n
             rsolv(i) = 2.0d0
             if (class(i) .ne. 0)  rsolv(i) = rad(class(i))
-            rsolv(i) = rsolv(i) - 0.10d0
          end do
 c
 c     assign standard solvation radii adapted from Macromodel
@@ -1005,19 +1701,21 @@ c
             end if
          end do
 c
-c     assign base atomic radii as consensus Bondi values
+c     assign base atomic radii from parametrized vdw values
+c     if no parametrized radii exists, base vdw radii is used
 c
-      else
+      else if (radtyp .eq. 'SOLUTE') then
          do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
+            if (class(i) .ne. 0) then
+               if (gkr(class(i)) .ne. 0.0d0) then
+                  rsolv(i) = gkr(class(i))
+               end if
+            end if
          end do
-      end if
 c
 c     make Tomasi-style modifications to the base atomic radii
 c
-      if (radtyp .eq. 'TOMASI') then
+      else if (radtyp .eq. 'TOMASI') then
          do i = 1, n
             offset = 0.0d0
             atmnum = atomic(i)
@@ -1089,798 +1787,11 @@ c
 c     apply an overall scale factor to the solvation radii
 c
       rscale = 1.0d0
-      if (radtyp .eq. 'VDW')  rscale = 1.0d0
-      if (radtyp .eq. 'MACROMODEL')  rscale = 1.0d0
-      if (radtyp .eq. 'AMOEBA')  rscale = 1.0d0
-      if (radtyp .eq. 'BONDI')  rscale = 1.03d0
-      if (radtyp .eq. 'TOMASI')  rscale = 1.24d0
-      do i = 1, n
-         rsolv(i) = rsolv(i) * rscale
-      end do
-c
-c     assign generic value for the HCT overlap scale factor
-c
-      do i = 1, n
-         shct(i) = 0.69d0
-      end do
-      if (radtyp .eq. 'MACROMODEL') then
-         do i = 1, n
-            shct(i) = 0.80d0
-            atmnum = atomic(i)
-            if (atmnum .eq. 1)  shct(i) = 0.85d0
-            if (atmnum .eq. 6)  shct(i) = 0.72d0
-            if (atmnum .eq. 7)  shct(i) = 0.79d0
-            if (atmnum .eq. 8)  shct(i) = 0.85d0
-            if (atmnum .eq. 9)  shct(i) = 0.88d0
-            if (atmnum .eq. 15)  shct(i) = 0.86d0
-            if (atmnum .eq. 16)  shct(i) = 0.96d0
-            if (atmnum .eq. 26)  shct(i) = 0.88d0
-         end do
-      end if
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine kpb  --  assign Poisson-Boltzmann parameters  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "kpb" assigns parameters needed for the Poisson-Boltzmann
-c     implicit solvation model implemented via APBS
-c
-c
-      subroutine kpb
-      use atomid
-      use atoms
-      use bath
-      use couple
-      use gkstuf
-      use inform
-      use iounit
-      use keys
-      use kvdws
-      use math
-      use nonpol
-      use pbstuf
-      use polar
-      use polopt
-      use polpot
-      use potent
-      use ptable
-      use solute
-      implicit none
-      integer i,j,k,l,m
-      integer nx,ny,nz
-      integer maxgrd,next
-      integer atmnum,trimtext
-      integer pbtyplen,pbsolnlen
-      integer bcfllen,chgmlen
-      integer srfmlen,pbionq
-      real*8 ri,rscale
-      real*8 spacing,offset
-      real*8 gx,gy,gz
-      real*8 xcm,ycm,zcm
-      real*8 total,weigh
-      real*8 xmin,xmax,ymin
-      real*8 ymax,zmin,zmax
-      real*8 xlen,ylen,zlen
-      real*8 pbionc,pbionr
-      character*10 radtyp
-      character*20 keyword
-      character*20 value
-      character*240 record
-      character*240 string
-c
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (allocated(rsolv))  deallocate (rsolv)
-      if (allocated(shct))  deallocate (shct)
-      if (allocated(udirs))  deallocate (udirs)
-      if (allocated(udirps))  deallocate (udirps)
-      if (allocated(uinds))  deallocate (uinds)
-      if (allocated(uinps))  deallocate (uinps)
-      if (allocated(uopts))  deallocate (uopts)
-      if (allocated(uoptps))  deallocate (uoptps)
-      allocate (rsolv(n))
-      allocate (shct(n))
-      allocate (udirs(3,n))
-      allocate (udirps(3,n))
-      allocate (uinds(3,n))
-      allocate (uinps(3,n))
-      if (poltyp .eq. 'OPT') then
-         allocate (uopts(0:optorder,3,n))
-         allocate (uoptps(0:optorder,3,n))
-      end if
-c
-c     assign some default APBS configuration parameters
-c
-      pbtyp = 'LPBE'
-      pbsoln = 'MG-MANUAL'
-      radtyp = 'BONDI'
-      bcfl = 'MDH'
-      chgm = 'SPL4'
-      srfm = 'SPL4'
-      kelvin = 298.0d0
-      pdie = 1.0d0
-      sdie = 78.3d0
-      srad = 1.4d0
-      swin = 0.3d0
-      sdens = 10.0d0
-      smin = 3.0d0
-      ionn = 0
-      do i = 1, maxion
-         ionc(i) = 0.0d0
-         ionq(i) = 1
-         ionr(i) = 2.0d0
-      end do
-      spacing = 0.5d0
-      maxgrd = 225
-c
-c     compute the position of the center of mass
-c
-      total = 0.0d0
-      xcm = 0.0d0
-      ycm = 0.0d0
-      zcm = 0.0d0
-      do i = 1, n
-         weigh = mass(i)
-         total = total + weigh
-         xcm = xcm + x(i)*weigh
-         ycm = ycm + y(i)*weigh
-         zcm = zcm + z(i)*weigh
-      end do
-      xcm = xcm / total
-      ycm = ycm / total
-      zcm = zcm / total
-      gcent(1) = xcm
-      gcent(2) = ycm
-      gcent(3) = zcm
-c
-c     set default APBS grid dimension based on system extent
-c
-      xmin = xcm
-      ymin = ycm
-      zmin = zcm
-      xmax = xcm
-      ymax = ycm
-      zmax = zcm
-      do i = 1, n
-         ri = rsolv(i)
-         xmin = min(xmin,x(i)-ri)
-         ymin = min(ymin,y(i)-ri)
-         zmin = min(zmin,z(i)-ri)
-         xmax = max(xmax,x(i)+ri)
-         ymax = max(ymax,y(i)+ri)
-         zmax = max(zmax,z(i)+ri)
-      end do
-      xlen = 2.0d0 * (max(xcm-xmin,xmax-xcm)+smin)
-      ylen = 2.0d0 * (max(ycm-ymin,ymax-ycm)+smin)
-      zlen = 2.0d0 * (max(zcm-zmin,zmax-zcm)+smin)
-      dime(1) = int(xlen/spacing) + 1
-      dime(2) = int(ylen/spacing) + 1
-      dime(3) = int(zlen/spacing) + 1
-c
-c     get any altered APBS parameters from the keyfile
-c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         string = record(next:240)
-         if (keyword(1:8) .eq. 'MG-AUTO ') then
-            pbsoln = 'MG-AUTO'
-         else if (keyword(1:10) .eq. 'MG-MANUAL ') then
-            pbsoln = 'MG-MANUAL'
-         else if (keyword(1:10) .eq. 'APBS-GRID ') then
-            nx = dime(1)
-            ny = dime(2)
-            nz = dime(3)
-            read (string,*,err=10,end=10)  nx,ny,nz
-   10       continue
-            if (nx .ge. 33)  dime(1) = nx
-            if (ny .ge. 33)  dime(2) = ny
-            if (nz .ge. 33)  dime(3) = nz
-         else if (keyword(1:10) .eq. 'PB-RADIUS ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:3) .eq. 'VDW') then
-               radtyp = 'VDW'
-            else if (value(1:10) .eq. 'MACROMODEL') then
-               radtyp = 'MACROMODEL'
-            else if (value(1:5) .eq. 'BONDI') then
-               radtyp = 'BONDI'
-            else if (value(1:6) .eq. 'TOMASI') then
-               radtyp = 'TOMASI'
-            end if
-         else if (keyword(1:6) .eq. 'SDENS ') then
-            read (string,*,err=20,end=20)  sdens
-   20       continue
-         else if (keyword(1:5) .eq. 'PDIE ') then
-            read (string,*,err=30,end=30)  pdie
-   30       continue
-         else if (keyword(1:5) .eq. 'SDIE ') then
-            read (string,*,err=40,end=40)  sdie
-   40       continue
-         else if (keyword(1:5) .eq. 'SRAD ') then
-            read (string,*,err=50,end=50)  srad
-   50       continue
-         else if (keyword(1:5) .eq. 'SWIN ') then
-            read (string,*,err=60,end=60)  swin
-   60       continue
-         else if (keyword(1:5) .eq. 'SMIN ') then
-            read (string,*,err=70,end=70)  smin
-   70       continue
-         else if (keyword(1:5) .eq. 'SRFM ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:3) .eq. 'MOL') then
-               srfm = 'MOL'
-            else if (value(1:4) .eq. 'SMOL') then
-               srfm = 'SMOL'
-            else if (value(1:4) .eq. 'SPL2') then
-               srfm = 'SPL2'
-            end if
-         else if (keyword(1:5) .eq. 'BCFL ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:3) .eq. 'ZERO') then
-               bcfl = 'ZERO'
-            else if (value(1:3) .eq. 'MDH') then
-               bcfl = 'MDH'
-            else if (value(1:3) .eq. 'SDH') then
-               bcfl = 'SDH'
-            end if
-         else if (keyword(1:4) .eq. 'ION ') then
-            pbionc = 0.0d0
-            pbionq = 1
-            pbionr = 2.0d0
-            read (string,*,err=80,end=80)  pbionq,pbionc,pbionr
-   80       continue
-            if (pbionq.ne.0 .and. pbionc.ge.0.0d0
-     &             .and. pbionr.ge.0.0d0) then
-               ionn = ionn + 1
-               ionc(ionn) = pbionc
-               ionq(ionn) = pbionq
-               ionr(ionn) = pbionr
-            end if
-         end if
-      end do
-c
-c     set APBS grid spacing for the chosen grid dimension
-c
-      xlen = 2.0d0 * (max(xcm-xmin,xmax-xcm)+smin)
-      ylen = 2.0d0 * (max(ycm-ymin,ymax-ycm)+smin)
-      zlen = 2.0d0 * (max(zcm-zmin,zmax-zcm)+smin)
-      grid(1) = xlen / dime(1)
-      grid(2) = ylen / dime(2)
-      grid(3) = zlen / dime(3)
-c
-c     grid spacing must be equal to maintain traceless quadrupoles
-c
-      grid(1) = min(grid(1),grid(2),grid(3))
-      grid(2) = grid(1)
-      grid(3) = grid(1)
-c
-c     set the grid dimensions to the smallest multiples of 32
-c
-      dime(1) = 33
-      dime(2) = 33
-      dime(3) = 33
-      do while (grid(1)*dime(1) .lt. xlen)
-         dime(1) = dime(1) + 32
-      end do
-      do while (grid(2)*dime(2) .lt. ylen)
-         dime(2) = dime(2) + 32
-      end do
-      do while (grid(3)*dime(3) .lt. zlen)
-         dime(3) = dime(3) + 32
-      end do
-c
-c     limit the grid dimensions and recompute the grid spacing
-c
-      dime(1) = min(dime(1),maxgrd)
-      dime(2) = min(dime(2),maxgrd)
-      dime(3) = min(dime(3),maxgrd)
-      grid(1) = xlen / dime(1)
-      grid(2) = ylen / dime(2)
-      grid(3) = zlen / dime(3)
-c
-c     grid spacing must be equal to maintain traceless quadrupoles
-c
-      grid(1) = max(grid(1),grid(2),grid(3))
-      grid(2) = grid(1)
-      grid(3) = grid(1)
-c
-c     if this is an "mg-auto" (focusing) calculation, set the
-c     fine grid to the default size, and the coarse grid to
-c     twice its original size. Currently, all energies and
-c     forces need to be evaluated at the same resolution
-c
-      if (pbsoln .eq. 'MG-AUTO') then
-         fgrid(1) = grid(1)
-         fgrid(2) = grid(2)
-         fgrid(3) = grid(3)
-         fgcent(1) = gcent(1)
-         fgcent(2) = gcent(2)
-         fgcent(3) = gcent(3)
-         cgrid(1) = 2.0d0 * grid(1)
-         cgrid(2) = 2.0d0 * grid(2)
-         cgrid(3) = 2.0d0 * grid(3)
-      end if
-c
-c     get any custom APBS grid parameters from the keyfile
-c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         string = record(next:240)
-         if (keyword(1:5) .eq. 'DIME ') then
-            read (string,*,err=90,end=90)  nx,ny,nz
-            dime(1) = nx
-            dime(2) = ny
-            dime(3) = nz
-   90       continue
-            do j = 1, 3
-               if (mod(dime(j),32) .ne. 1) then
-                  dime(j) = 32*(1+(dime(j)-1)/32) + 1
-               end if
-            end do
-         else if (keyword(1:6) .eq. 'AGRID ') then
-            read (string,*,err=100,end=100)  gx,gy,gz
-            grid(1) = gx
-            grid(2) = gy
-            grid(3) = gz
-  100       continue
-         else if (keyword(1:6) .eq. 'CGRID ') then
-            read (string,*,err=110,end=110)  gx,gy,gz
-            cgrid(1) = gx
-            cgrid(2) = gy
-            cgrid(3) = gz
-  110       continue
-         else if (keyword(1:6) .eq. 'FGRID ') then
-            read (string,*,err=120,end=120)  gx,gy,gz
-            fgrid(1) = gx
-            fgrid(2) = gy
-            fgrid(3) = gz
-  120       continue
-         else if (keyword(1:6) .eq. 'GCENT ') then
-            read (string,*,err=130,end=130)  gx,gy,gz
-            gcent(1) = gx
-            gcent(2) = gy
-            gcent(3) = gz
-  130       continue
-         else if (keyword(1:7) .eq. 'CGCENT ') then
-            read (string,*,err=140,end=140)  gx,gy,gz
-            cgcent(1) = gx
-            cgcent(2) = gy
-            cgcent(3) = gz
-  140       continue
-         else if (keyword(1:7) .eq. 'FGCENT ') then
-            read (string,*,err=150,end=150)  gx,gy,gz
-            fgcent(1) = gx
-            fgcent(2) = gy
-            fgcent(3) = gz
-  150       continue
-         end if
-      end do
-c
-c     assign base atomic radii from consensus vdw values
-c
-      if (radtyp .eq. 'VDW') then
-         do i = 1, n
-            rsolv(i) = 2.0d0
-            if (class(i) .ne. 0)  rsolv(i) = rad(class(i))
-         end do
-c
-c     assign standard solvation radii adapted from Macromodel
-c
-      else if (radtyp .eq. 'MACROMODEL') then
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-            if (atmnum .eq. 1) then
-               rsolv(i) = 1.25d0
-               k = i12(1,i)
-               if (atomic(k) .eq. 7)  rsolv(i) = 1.15d0
-               if (atomic(k) .eq. 8)  rsolv(i) = 1.05d0
-            else if (atmnum .eq. 3) then
-               rsolv(i) = 1.432d0
-            else if (atmnum .eq. 6) then
-               rsolv(i) = 1.90d0
-               if (n12(i) .eq. 3)  rsolv(i) = 1.875d0
-               if (n12(i) .eq. 2)  rsolv(i) = 1.825d0
-            else if (atmnum .eq. 7) then
-               rsolv(i) = 1.7063d0
-               if (n12(i) .eq. 4)  rsolv(i) = 1.625d0
-               if (n12(i) .eq. 1)  rsolv(i) = 1.60d0
-            else if (atmnum .eq. 8) then
-               rsolv(i) = 1.535d0
-               if (n12(i) .eq. 1)  rsolv(i) = 1.48d0
-            else if (atmnum .eq. 9) then
-               rsolv(i) = 1.47d0
-            else if (atmnum .eq. 10) then
-               rsolv(i) = 1.39d0
-            else if (atmnum .eq. 11) then
-               rsolv(i) = 1.992d0
-            else if (atmnum .eq. 12) then
-               rsolv(i) = 1.70d0
-            else if (atmnum .eq. 14) then
-               rsolv(i) = 1.80d0
-            else if (atmnum .eq. 15) then
-               rsolv(i) = 1.87d0
-            else if (atmnum .eq. 16) then
-               rsolv(i) = 1.775d0
-            else if (atmnum .eq. 17) then
-               rsolv(i) = 1.735d0
-            else if (atmnum .eq. 18) then
-               rsolv(i) = 1.70d0
-            else if (atmnum .eq. 19) then
-               rsolv(i) = 2.123d0
-            else if (atmnum .eq. 20) then
-               rsolv(i) = 1.817d0
-            else if (atmnum .eq. 35) then
-               rsolv(i) = 1.90d0
-            else if (atmnum .eq. 36) then
-               rsolv(i) = 1.812d0
-            else if (atmnum .eq. 37) then
-               rsolv(i) = 2.26d0
-            else if (atmnum .eq. 53) then
-               rsolv(i) = 2.10d0
-            else if (atmnum .eq. 54) then
-               rsolv(i) = 1.967d0
-            else if (atmnum .eq. 55) then
-               rsolv(i) = 2.507d0
-            else if (atmnum .eq. 56) then
-               rsolv(i) = 2.188d0
-            end if
-         end do
-c
-c     assign base atomic radii from consensus vdw values
-c
-      else
-         do i = 1, n
-            atmnum = atomic(i)
-            if (atmnum .eq. 0)  rsolv(i) = 0.0d0
-            rsolv(i) = vdwrad(atmnum)
-         end do
-      end if
-c
-c     make Tomasi-style modifications to the base atomic radii
-c
-      if (radtyp .eq. 'TOMASI') then
-         do i = 1, n
-            offset = 0.0d0
-            atmnum = atomic(i)
-            if (atomic(i) .eq. 1) then
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6) then
-                     do l = 1, n12(k)
-                        m = i12(l,k)
-                        if (atomic(m) .eq. 7)  offset = -0.05d0
-                        if (atomic(m) .eq. 8)  offset = -0.10d0
-                     end do
-                  end if
-                  if (atomic(k) .eq. 7)  offset = -0.25d0
-                  if (atomic(k) .eq. 8)  offset = -0.40d0
-                  if (atomic(k) .eq. 16)  offset = -0.10d0
-               end do
-            else if (atomic(i) .eq. 6) then
-               if (n12(i) .eq. 4)  offset = 0.05d0
-               if (n12(i) .eq. 3)  offset = 0.02d0
-               if (n12(i) .eq. 2)  offset = -0.03d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6)  offset = offset - 0.07d0
-               end do
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k).eq.7 .and. n12(k).eq.4)
-     &               offset = -0.20d0
-                  if (atomic(k).eq.7 .and. n12(k).eq.3)
-     &               offset = -0.25d0
-                  if (atomic(k) .eq. 8)  offset = -0.20d0
-               end do
-            else if (atomic(i) .eq. 7) then
-               if (n12(i) .eq. 3) then
-                  offset = -0.10d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = offset - 0.24d0
-                  end do
-               else
-                  offset = -0.20d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = offset - 0.16d0
-                  end do
-               end if
-            else if (atomic(i) .eq. 8) then
-               if (n12(i) .eq. 2) then
-                  offset = -0.21d0
-                  do j = 1, n12(i)
-                     k = i12(j,i)
-                     if (atomic(k) .eq. 6)  offset = -0.36d0
-                  end do
-               else
-                  offset = -0.25d0
-               end if
-            else if (atomic(i) .eq. 16) then
-               offset = -0.03d0
-               do j = 1, n12(i)
-                  k = i12(j,i)
-                  if (atomic(k) .eq. 6)  offset = offset - 0.10d0
-               end do
-            end if
-            rsolv(i) = rsolv(i) + offset
-         end do
-      end if
-c
-c     apply an overall scale factor to the solvation radii
-c
-      rscale = 1.0d0
-c     if (radtyp .eq. 'VDW')  rscale = 1.1d0
       if (radtyp .eq. 'MACROMODEL')  rscale = 1.15d0
       if (radtyp .eq. 'BONDI')  rscale = 1.21d0
       if (radtyp .eq. 'TOMASI')  rscale = 1.47d0
       do i = 1, n
          rsolv(i) = rsolv(i) * rscale
-      end do
-c
-c     assign generic value for the HCT overlap scale factor
-c
-      do i = 1, n
-         shct(i) = 0.69d0
-      end do
-c
-c     determine the length of the character arguments
-c
-      pbtyplen = trimtext (pbtyp)
-      pbsolnlen = trimtext (pbsoln)
-      bcfllen = trimtext (bcfl)
-      chgmlen = trimtext (chgm)
-      srfmlen = trimtext (srfm)
-c
-c     make call needed to initialize the APBS calculation
-c
-      call apbsinitial (dime,grid,gcent,cgrid,cgcent,fgrid,fgcent,
-     &                  pdie,sdie,srad,swin,sdens,kelvin,ionn,ionc,
-     &                  ionq,ionr,pbtyp,pbtyplen,pbsoln,pbsolnlen,
-     &                  bcfl,bcfllen,chgm,chgmlen,srfm,srfmlen)
-c
-c     print out the APBS grid dimensions and spacing
-c
-      if (verbose) then
-         write (iout,160)  (dime(i),i=1,3),grid(1)
-  160    format (/,' APBS Grid Dimensions and Spacing :',
-     &           //,10x,3i8,10x,f10.4)
-      end if
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine knp  --  assign cavity-dispersion parameters  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "knp" initializes parameters needed for the cavity-plus-
-c     dispersion nonpolar implicit solvation model
-c
-c
-      subroutine knp
-      use atomid
-      use atoms
-      use couple
-      use keys
-      use kvdws
-      use math
-      use nonpol
-      use potent
-      use solute
-      implicit none
-      integer i,next
-      real*8 cavoff,dispoff
-      real*8 cross,ah,ao
-      real*8 rmini,epsi
-      real*8 rmixh,rmixh3
-      real*8 rmixh7,emixh
-      real*8 rmixo,rmixo3
-      real*8 rmixo7,emixo
-      real*8 ri,ri3,ri7,ri11
-      character*20 keyword
-      character*240 record
-      character*240 string
-c
-c
-c     set default values for solvent pressure and surface tension
-c
-      solvprs = 0.0327d0
-      surften = 0.080d0
-c
-c     set default values for cavity and dispersion radius offsets
-c
-      cavoff = 0.0d0
-      dispoff = 0.26d0
-c
-c     get any altered surface tension value from keyfile
-c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         string = record(next:240)
-         if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
-            read (string,*,err=10,end=10)  solvprs
-         else if (keyword(1:16) .eq. 'SURFACE-TENSION ') then
-            read (string,*,err=10,end=10)  surften
-         end if
-   10    continue
-      end do
-c
-c     set switching function values for pressure and tension
-c
-      cross = 3.0d0 * surften / solvprs
-      spcut = cross - 3.5d0
-      spoff = cross + 3.5d0
-      stcut = cross + 3.9d0
-      stoff = cross - 3.5d0
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (allocated(asolv))  deallocate (asolv)
-      if (allocated(rcav))  deallocate (rcav)
-      if (allocated(rdisp))  deallocate (rdisp)
-      if (allocated(cdisp))  deallocate (cdisp)
-      allocate (asolv(n))
-      allocate (rcav(n))
-      allocate (rdisp(n))
-      allocate (cdisp(n))
-c
-c     assign surface area factors for nonpolar solvation
-c
-      do i = 1, n
-         asolv(i) = surften
-      end do
-c
-c     set cavity and dispersion radii for nonpolar solvation
-c
-      do i = 1, n
-         rcav(i) = rad(class(i)) + cavoff
-         rdisp(i) = rad(class(i)) + dispoff
-      end do
-c
-c     compute maximum dispersion energies for each atom
-c
-      do i = 1, n
-         epsi = eps(class(i))
-         if (rdisp(i).gt.0.0d0 .and. epsi.gt.0.0d0) then
-            rmini = rad(class(i))
-            emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
-            rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
-            rmixo3 = rmixo**3
-            rmixo7 = rmixo**7
-            ao = emixo * rmixo7
-            emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
-            rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
-            rmixh3 = rmixh**3
-            rmixh7 = rmixh**7
-            ah = emixh * rmixh7
-            ri = rdisp(i)
-            ri3 = ri**3
-            ri7 = ri**7
-            ri11 = ri**11
-            if (ri .lt. rmixh) then
-               cdisp(i) = -4.0d0*pi*emixh*(rmixh3-ri3)/3.0d0
-               cdisp(i) = cdisp(i) - emixh*18.0d0/11.0d0*rmixh3*pi
-            else
-               cdisp(i) = 2.0d0*pi*(2.0d0*rmixh7-11.0d0*ri7)*ah
-               cdisp(i) = cdisp(i) / (11.0d0*ri11)
-            end if
-            cdisp(i) = 2.0d0 * cdisp(i)
-            if (ri .lt. rmixo) then
-               cdisp(i) = cdisp(i) - 4.0d0*pi*emixo*(rmixo3-ri3)/3.0d0
-               cdisp(i) = cdisp(i) - emixo*18.0d0/11.0d0*rmixo3*pi
-            else
-               cdisp(i) = cdisp(i) + 2.0d0*pi*(2.0d0*rmixo7-11.0d0*ri7)
-     &                                  * ao/(11.0d0*ri11)
-            end if
-         end if
-         cdisp(i) = slevy * awater * cdisp(i)
-      end do
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine khpmf  --  assign hydrophobic PMF parameters  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "khpmf" initializes parameters needed for the hydrophobic
-c     potential of mean force nonpolar implicit solvation model
-c
-c     literature reference:
-c
-c     M. S. Lin, N. L. Fawzi and T. Head-Gordon, "Hydrophobic
-c     Potential of Mean Force as a Solvation Function for Protein
-c     Structure Prediction", Structure, 15, 727-740 (2007)
-c
-c
-      subroutine khpmf
-      use atomid
-      use atoms
-      use couple
-      use hpmf
-      use ptable
-      implicit none
-      integer i,j,k
-      integer nh,atn
-      logical keep
-c
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (allocated(ipmf))  deallocate (ipmf)
-      if (allocated(rpmf))  deallocate (rpmf)
-      if (allocated(acsa))  deallocate (acsa)
-      allocate (ipmf(n))
-      allocate (rpmf(n))
-      allocate (acsa(n))
-c
-c     get carbons for PMF and set surface area screening values
-c
-      npmf = 0
-      do i = 1, n
-         if (atomic(i) .eq. 6) then
-            keep = .true.
-            nh = 0
-            if (n12(i) .le. 2)  keep = .false.
-            do j = 1, n12(i)
-               k = i12(j,i)
-               if (atomic(k) .eq. 1)  nh = nh + 1
-               if (n12(i).eq.3 .and. atomic(k).eq.8)  keep = .false.
-            end do
-            if (keep) then
-               npmf = npmf + 1
-               ipmf(npmf) = i
-               acsa(i) = 1.0d0
-               if (n12(i).eq.3 .and. nh.eq.0)  acsa(i) = 1.554d0
-               if (n12(i).eq.3 .and. nh.eq.1)  acsa(i) = 1.073d0
-               if (n12(i).eq.4 .and. nh.eq.1)  acsa(i) = 1.276d0
-               if (n12(i).eq.4 .and. nh.eq.2)  acsa(i) = 1.045d0
-               if (n12(i).eq.4 .and. nh.eq.3)  acsa(i) = 0.880d0
-               acsa(i) = acsa(i) * safact/acsurf
-            end if
-         end if
-      end do
-c
-c     assign HPMF atomic radii from consensus vdw values
-c
-      do i = 1, n
-         rpmf(i) = 1.0d0
-         atn = atomic(i)
-         if (atn .eq. 0) then 
-            rpmf(i) = 0.00d0
-         else
-            rpmf(i) = vdwrad(atn)
-         end if
-         if (atn .eq. 5)  rpmf(i) = 1.80d0
-         if (atn .eq. 8)  rpmf(i) = 1.50d0
-         if (atn .eq. 35)  rpmf(i) = 1.85d0
       end do
       return
       end
