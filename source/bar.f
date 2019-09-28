@@ -286,13 +286,13 @@ c
             ua0(i) = energy ()
             call readxyz (iarc)
          end if
-         if (i .ge. maxframe)  abort = .true.
          imod = mod(i,100)
-         if (imod.eq.0 .or. (abort.and.imod.ne.0)) then
+         if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
             write (iout,130)  i
   130       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
          end if
+         if (i .ge. maxframe)  abort = .true.
       end do
 c
 c     reset trajectory A using the parameters for state 1
@@ -402,13 +402,13 @@ c
             ub1(i) = energy ()
             call readxyz (iarc)
          end if
-         if (i .ge. maxframe)  abort = .true.
          imod = mod(i,100)
-         if (imod.eq.0 .or. (abort.and.imod.ne.0)) then
+         if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
             write (iout,230)  i
   230       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
          end if
+         if (i .ge. maxframe)  abort = .true.
       end do
 c
 c     reset trajectory B using the parameters for state 0
