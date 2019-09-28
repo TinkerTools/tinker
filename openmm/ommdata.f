@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  2017  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ommdata  --  copy data from Tinker to OpenMM  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ommdata  --  transfer Tinker data to OpenMM  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "ommdata" uses calls to the OpenMM interface to copy data

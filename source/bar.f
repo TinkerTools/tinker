@@ -105,8 +105,8 @@ c
       use keys
       use titles
       implicit none
-      integer i,ibar
-      integer iarc,ilog
+      integer i,ibar,iarc
+      integer ilog,imod
       integer lenga,lengb
       integer ltitlea,ltitleb
       integer nkey0,nkey1
@@ -287,7 +287,8 @@ c
             call readxyz (iarc)
          end if
          if (i .ge. maxframe)  abort = .true.
-         if (mod(i,100).eq.0 .or. abort) then
+         imod = mod(i,100)
+         if (imod.eq.0 .or. (abort.and.imod.ne.0)) then
             write (iout,130)  i
   130       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
@@ -402,7 +403,8 @@ c
             call readxyz (iarc)
          end if
          if (i .ge. maxframe)  abort = .true.
-         if (mod(i,100).eq.0 .or. abort) then
+         imod = mod(i,100)
+         if (imod.eq.0 .or. (abort.and.imod.ne.0)) then
             write (iout,230)  i
   230       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)

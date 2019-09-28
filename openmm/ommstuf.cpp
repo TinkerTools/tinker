@@ -549,11 +549,11 @@ struct {
    double* bsmod2;
    double* bsmod3;
    double* bsbuild;
-   double*** thetai1;
-   double*** thetai2;
-   double*** thetai3;
-   double**** qgrid;
-   double*** qfac;
+   double* thetai1;
+   double* thetai2;
+   double* thetai3;
+   double* qgrid;
+   double* qfac;
 } pme__;
 
 struct {
@@ -1460,9 +1460,9 @@ void set_pme_data_ (int* nfft1, int* nfft2, int* nfft3, int* nefft1,
                     int* nefft2, int* nefft3, int* ndfft1, int* ndfft2,
                     int* ndfft3, int* bsorder, int* bseorder, int* bsporder,
                     int* bsdorder, int* igrid, double* bsmod1, double* bsmod2,
-                    double* bsmod3, double* bsbuild, double*** thetai1,
-                    double*** thetai2, double*** thetai3, double**** qgrid,
-                    double*** qfac) {
+                    double* bsmod3, double* bsbuild, double* thetai1,
+                    double* thetai2, double* thetai3, double* qgrid,
+                    double* qfac) {
 
    pme__.nfft1 = *nfft1;
    pme__.nfft2 = *nfft2;
@@ -1600,8 +1600,8 @@ void set_potent_data_ (int* use_bond, int* use_angle, int* use_strbnd,
 
    potent__.use_bond = *use_bond;
    potent__.use_angle = *use_angle;
-   potent__.use_urey = *use_urey;
    potent__.use_strbnd = *use_strbnd;
+   potent__.use_urey = *use_urey;
    potent__.use_angang = *use_angang;
    potent__.use_opbend = *use_opbend;
    potent__.use_opdist = *use_opdist;
@@ -2802,8 +2802,8 @@ static void setupAmoebaChargeForce (OpenMM_System* system, FILE* log) {
       if (limits__.use_ewald) {
          OpenMM_NonbondedForce_setNonbondedMethod (coulombForce, OpenMM_NonbondedForce_PME);
          cutoffdistance = limits__.ewaldcut;
-         OpenMM_NonbondedForce_setPMEParameters (coulombForce, 10*ewald__.aewald,
-                                                 pme__.nfft1, pme__.nfft2, pme__.nfft3);
+         OpenMM_NonbondedForce_setPMEParameters (coulombForce, 10*ewald__.aeewald,
+                                                 pme__.nefft1, pme__.nefft2, pme__.nefft3);
       } else {
          // OpenMM_NonbondedForce_setReactionFieldDielectric (coulombForce, chgpot__.dielec);
          // OpenMM_NonbondedForce_setNonbondedMethod (coulombForce, OpenMM_NonbondedForce_CutoffPeriodic);
@@ -3139,15 +3139,15 @@ static void setupAmoebaMultipoleForce (OpenMM_System* system, FILE* log) {
       OpenMM_AmoebaMultipoleForce_setCutoffDistance (amoebaMultipoleForce,
                                    limits__.ewaldcut*OpenMM_NmPerAngstrom);
       OpenMM_AmoebaMultipoleForce_setAEwald (amoebaMultipoleForce,
-                                   ewald__.aewald/OpenMM_NmPerAngstrom);
+                                   ewald__.aeewald/OpenMM_NmPerAngstrom);
       // OpenMM_AmoebaMultipoleForce_setPmeBSplineOrder (amoebaMultipoleForce,
-      //                           pme__.bsorder);
+      //                           pme__.bseorder);
 
       gridDimensions = OpenMM_IntArray_create (3);
 
-      OpenMM_IntArray_set (gridDimensions, 0, pme__.nfft1);
-      OpenMM_IntArray_set (gridDimensions, 1, pme__.nfft2);
-      OpenMM_IntArray_set (gridDimensions, 2, pme__.nfft3);
+      OpenMM_IntArray_set (gridDimensions, 0, pme__.nefft1);
+      OpenMM_IntArray_set (gridDimensions, 1, pme__.nefft2);
+      OpenMM_IntArray_set (gridDimensions, 2, pme__.nefft3);
 
       OpenMM_AmoebaMultipoleForce_setPmeGridDimensions (amoebaMultipoleForce,
                                                         gridDimensions);
@@ -3938,7 +3938,7 @@ void openmm_init_ (void** ommHandle, double* dt) {
    (void) fflush (NULL);
 
    // create System and Force objects within the System; retain a reference
-   // to each force object so we can fill in the forces; mote the OpenMM
+   // to each force object so we can fill in the forces; note the OpenMM
    // System takes ownership of the force objects, don't delete them yourself
 
    omm->system = OpenMM_System_create ();
