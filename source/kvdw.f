@@ -62,9 +62,9 @@ c
          if (keyword(1:4) .eq. 'VDW ') then
             call getnumb (record,k,next)
             if (k.ge.1 .and. k.le.maxclass) then
-               rd = rad(k)
-               ep = eps(k)
-               rdn = reduct(k)
+               rd = 0.0d0
+               ep = 0.0d0
+               rdn = 0.0d0
                string = record(next:240)
                read (string,*,err=10,end=10)  rd,ep,rdn
    10          continue
@@ -109,8 +109,8 @@ c
          if (keyword(1:6) .eq. 'VDW14 ') then
             call getnumb (record,k,next)
             if (k.ge.1 .and. k.le.maxclass) then
-               rd = rad4(k)
-               ep = eps4(k)
+               rd = 0.0d0
+               ep = 0.0d0
                string = record(next:240)
                read (string,*,err=60,end=60)  rd,ep
    60          continue
