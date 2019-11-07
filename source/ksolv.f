@@ -23,11 +23,12 @@ c
       use inform
       use iounit
       use keys
+      use pbstuf
       use potent
       use solute
       implicit none
       integer i,k,next
-      real*8 rd
+      real*8 rd,pbrd
       logical header
       character*20 keyword
       character*20 value
@@ -118,10 +119,11 @@ c
          else if (keyword(1:7) .eq. 'SOLUTE ') then
             k = 0
             rd = 0.0d0
+            pbrd = 0.0d0
             call getnumb (record,k,next)
             call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=15,end=15)  rd
+            read (string,*,err=15,end=15)  rd, pbrd
    15       continue
             if (k.ge.1 .and. k.le.maxclass) then
                if (header .and. .not.silent) then
@@ -133,10 +135,12 @@ c
                end if
                if (rd .lt. 0.0d0)  rd = 0.0d0
                rd = 0.5 * rd
+               pbrd = 0.5 * pbrd
                gkr(k) = rd
+               pbr(k) = pbrd
                if (.not. silent) then
-                  write (iout,30)  k,rd
-   30             format (4x,i6,8x,f12.4)
+                  write (iout,30)  k,rd,pbrd
+   30             format (4x,i6,8x,f12.4,f12.4)
                end if
             else if (k .gt. maxclass) then
                write (iout,40)  maxtyp
@@ -1705,13 +1709,23 @@ c     assign base atomic radii from parametrized vdw values
 c     if no parametrized radii exists, base vdw radii is used
 c
       else if (radtyp .eq. 'SOLUTE') then
-         do i = 1, n
-            if (class(i) .ne. 0) then
-               if (gkr(class(i)) .ne. 0.0d0) then
-                  rsolv(i) = gkr(class(i))
+         if(solvtyp(1:2) .eq. 'GK') then     
+            do i = 1, n
+               if (class(i) .ne. 0) then
+                  if (gkr(class(i)) .ne. 0.0d0) then
+                     rsolv(i) = gkr(class(i))
+                  end if
                end if
-            end if
-         end do
+            end do
+        else if(solvtyp(1:2) .eq. 'PB') then
+            do i = 1, n
+               if (class(i) .ne. 0) then
+                  if (pbr(class(i)) .ne. 0.0d0) then
+                     rsolv(i) = pbr(class(i))
+                  end if
+               end if
+            end do
+         end if
 c
 c     make Tomasi-style modifications to the base atomic radii
 c
