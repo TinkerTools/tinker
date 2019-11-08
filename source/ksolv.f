@@ -137,7 +137,7 @@ c
                rd = 0.5 * rd
                pbrd = 0.5 * pbrd
                gkr(k) = rd
-               pbr(k) = pbrd
+               pbrclass(k) = pbrd
                if (.not. silent) then
                   write (iout,30)  k,rd,pbrd
    30             format (4x,i6,8x,f12.4,f12.4)
@@ -1720,8 +1720,8 @@ c
         else if(solvtyp(1:2) .eq. 'PB') then
             do i = 1, n
                if (class(i) .ne. 0) then
-                  if (pbr(class(i)) .ne. 0.0d0) then
-                     rsolv(i) = pbr(class(i))
+                  if (pbrclass(class(i)) .ne. 0.0d0) then
+                     rsolv(i) = pbrclass(class(i))
                   end if
                end if
             end do

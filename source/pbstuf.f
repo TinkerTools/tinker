@@ -66,7 +66,7 @@ c              atom and the grid boundary (A)
 c
 c     pbe      Poisson-Boltzmann permanent multipole solvation energy
 c     apbe     Poisson-Boltzmann permanent multipole energy over atoms
-c     pbr      Poisson-Boltzmann cavity radii for atom types
+c     pbr      Poisson-Boltzmann cavity radii for each atom 
 c     pbep     Poisson-Boltzmann energies on permanent multipoles
 c     pbfp     Poisson-Boltzmann forces on permanent multipoles
 c     pbtp     Poisson-Boltzmann torques on permanent multipoles
@@ -75,6 +75,7 @@ c     pbeuinp  Poisson-Boltzmann field due to non-local induced dipoles
 c
 c
       module pbstuf
+      use sizes
       implicit none
       integer maxion
       parameter (maxion=10)
@@ -93,6 +94,7 @@ c
       real*8 fgcent(3)
       real*8 ionr(maxion)
       real*8 ionc(maxion)
+      real*8 pbrclass(maxtyp)
       real*8, allocatable :: apbe(:)
       real*8, allocatable :: pbr(:)
       real*8, allocatable :: pbep(:,:)

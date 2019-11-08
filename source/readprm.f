@@ -989,11 +989,12 @@ c
             call getnumb (record,ia,next)
             call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=325,end=325)  rd, pbrd
+            read (string,*,err=325,end=325)  rd,pbrd
   325       continue
+            write(*,*) ia," ",rd," ",pbrd
             if (ia .ne. 0) then
                gkr(ia) = rd * 0.5
-               pbr(ia) = pbrd*0.5
+               pbrclass(ia) = pbrd * 0.5
             end if
 c
 c     van der Waals 1-4 parameters for individual atom types
