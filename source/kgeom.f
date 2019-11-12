@@ -50,8 +50,6 @@ c
       character*20 keyword
       character*240 record
       character*240 string
-      save first
-      data first  / .true. /
 c
 c
 c     set the default values for the restraint variables
@@ -70,25 +68,22 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (first) then
-         first = .false.
-         if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
-         if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
-         if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
-         if (.not. allocated(iafix))  allocate (iafix(3,maxfix))
-         if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
-         if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
-         if (.not. allocated(ichir))  allocate (ichir(4,maxfix))
-         if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
-         if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
-         if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
-         if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
-         if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
-         if (.not. allocated(afix))  allocate (afix(3,maxfix))
-         if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
-         if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
-         if (.not. allocated(chir))  allocate (chir(3,maxfix))
-      end if
+      if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
+      if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
+      if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
+      if (.not. allocated(iafix))  allocate (iafix(3,maxfix))
+      if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
+      if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
+      if (.not. allocated(ichir))  allocate (ichir(4,maxfix))
+      if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
+      if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
+      if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
+      if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
+      if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
+      if (.not. allocated(afix))  allocate (afix(3,maxfix))
+      if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
+      if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
+      if (.not. allocated(chir))  allocate (chir(3,maxfix))
 c
 c     search the keywords for restraint parameters
 c
@@ -433,16 +428,9 @@ c
          end if
       end do
 c
-c     turn on the geometric restraint potential if it is used
+c     turn off the geometric restraint potential if it is not used
 c
-      use_geom = .false.
-      if (npfix .ne. 0)  use_geom = .true.
-      if (ndfix .ne. 0)  use_geom = .true.
-      if (nafix .ne. 0)  use_geom = .true.
-      if (ntfix .ne. 0)  use_geom = .true.
-      if (ngfix .ne. 0)  use_geom = .true.
-      if (nchir .ne. 0)  use_geom = .true.
-      if (use_basin)  use_geom = .true.
-      if (use_wall)  use_geom = .true.
+      if (max(npfix,ndfix,nafix,ntfix,ngfix,nchir).eq.0 .and.
+     &       .not.use_basin .and. .not.use_wall)  use_geom = .false.
       return
       end
