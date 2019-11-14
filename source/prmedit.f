@@ -19,7 +19,8 @@ c
       program prmedit
       use iounit
       implicit none
-      integer iprm,mode
+      integer iprm
+      integer nmode,mode
       integer freeunit
       integer trimtext
       logical dotype,doclass
@@ -32,6 +33,7 @@ c     read and store the original force field parameter file
 c
       call initial
       call getprm
+      nmode = 7
 c
 c     get the desired type of parameter file modification
 c
@@ -53,7 +55,7 @@ c
      &           /,4x,'(5) Renumber Types and Classes, and Reorder',
      &           /,4x,'(6) Sort and Format Multipole Parameters',
      &           /,4x,'(7) Renumber and Format Biotype Parameters')
-         do while (mode.lt.1 .or. mode.gt.7)
+         do while (mode.lt.1 .or. mode.gt.nmode)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)

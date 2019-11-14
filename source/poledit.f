@@ -1030,6 +1030,7 @@ c
       use atoms
       use chgpen
       use couple
+      use fields
       use iounit
       use kpolr
       use mplpot
@@ -1056,6 +1057,7 @@ c
 c
 c     allow the user to select the polarization model
 c
+      forcefield = 'AMOEBA'
       use_thole = .true.
       use_dirdamp = .false.
       use_chgpen = .false.
@@ -1080,6 +1082,7 @@ c
          call upcase (answer)
       end if
       if (answer .eq. 'H') then
+         forcefield = 'HIPPO'
          use_thole = .false.
          use_chgpen = .true.
       end if
@@ -1106,9 +1109,9 @@ c
          palpha(i) = 0.0d0
       end do
 c
-c     assign default atomic polarizabilities for Thole model
+c     assign default atomic polarizabilities for AMOEBA model
 c
-      if (use_thole) then
+      if (forcefield .eq. 'AMOEBA') then
          do i = 1, n
             thole(i) = 0.39d0
             atn = atomic(i)
@@ -1137,7 +1140,7 @@ c
             end if
          end do
 c
-c     alter Thole values for alkene/aromatic carbon and hydrogen
+c     alter polarizabilities for alkene/aromatic carbon and hydrogen
 c
          do i = 1, n
             atn = atomic(i)
@@ -1165,9 +1168,9 @@ c
             end if
          end do
 c
-c     assign default atomic polarizabilities for HIPPO model
+c     assign default atom-based parameters for HIPPO model
 c
-      else if (use_chgpen) then
+      else if (forcefield .eq. 'HIPPO') then
          do i = 1, n
             atn = atomic(i)
             if (atn .eq. 1) then

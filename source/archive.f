@@ -29,10 +29,10 @@ c
       integer iarc,ixyz
       integer start,stop
       integer step,size
-      integer now,mode
+      integer nmode,mode
       integer lext,lengb
       integer leng1,leng2
-      integer freeunit
+      integer now,freeunit
       integer, allocatable :: list(:)
       real*8 xr,yr,zr
       real*8, allocatable :: xold(:)
@@ -47,33 +47,47 @@ c
       character*240 string
 c
 c
-c     find out which archive modification to perform
+c     initialization and set number of archive modifications
 c
       call initial
+      nmode = 6
+c
+c     get the name to use for the coordinate archive file
+c
+      call nextarg (arcfile,exist)
+      if (.not. exist) then
+         write (iout,10)
+   10    format (/,' Enter the Coordinate Archive File Name :  ',$)
+         read (input,20)  arcfile
+   20    format (a240)
+      end if
+c
+c     find out which archive modification to perform
+c
       mode = 0
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=10,end=10)  mode
+         read (string,*,err=30,end=30)  mode
          if (mode.ge.1 .and. mode.le.6)  query = .false.
       end if
-   10 continue
+   30 continue
       if (query) then
-         write (iout,20)
-   20    format (/,' The Tinker Archive File Utility Can :',
+         write (iout,40)
+   40    format (/,' The Tinker Archive File Utility Can :',
      &           //,4x,'(1) Create an Archive from Individual Frames',
      &           /,4x,'(2) Extract Individual Frames from an Archive',
      &           /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
-     &           /,4x,'(4) Enforce Periodic Boundaries for a Trajectory',
+     &           /,4x,'(4) Enforce Periodic Boundaries for a Trajectory'
      &           /,4x,'(5) Unfold Periodic Boundaries for a Trajectory',
      &           /,4x,'(6) Remove Periodic Box Size from a Trajectory')
-         do while (mode.lt.1 .or. mode.gt.6)
+         do while (mode.lt.1 .or. mode.gt.nmode)
             mode = 0
-            write (iout,30)
-   30       format (/,' Enter the Number of the Desired Choice :  ',$)
-            read (input,40,err=50,end=50)  mode
-   40       format (i10)
-   50       continue
+            write (iout,50)
+   50       format (/,' Enter the Number of the Desired Choice :  ',$)
+            read (input,60,err=70,end=70)  mode
+   60       format (i10)
+   70       continue
          end do
       end if
 c
@@ -85,21 +99,6 @@ c
       if (mode .eq. 4)  modtyp = 'FOLD'
       if (mode .eq. 5)  modtyp = 'UNFOLD'
       if (mode .eq. 6)  modtyp = 'UNBOUND'
-c
-c     get the name to use for the coordinate archive file
-c
-      call nextarg (arcfile,exist)
-      if (.not. exist) then
-         if (mode .eq. 1) then
-            write (iout,60)
-   60       format (/,' Enter Base Name of the Individual Frames :  ',$)
-         else
-            write (iout,70)
-   70       format (/,' Enter the Coordinate Archive File Name :  ',$)
-         end if
-         read (input,80)  arcfile
-   80    format (a240)
-      end if
 c
 c     create a new archive file or open an existing one
 c
@@ -114,10 +113,10 @@ c
          call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
-            write (iout,90)
-   90       format (/,' Enter the Coordinate Archive File Name :  ',$)
-            read (input,100)  arcfile
-  100       format (a240)
+            write (iout,80)
+   80       format (/,' Enter the Coordinate Archive File Name :  ',$)
+            read (input,90)  arcfile
+   90       format (a240)
             call basefile (arcfile)
             basename = arcfile
             lengb = leng
@@ -141,22 +140,22 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=110,end=110)  start
+            read (string,*,err=100,end=100)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=110,end=110)  stop
+         if (exist)  read (string,*,err=100,end=100)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=110,end=110)  step
-  110    continue
+         if (exist)  read (string,*,err=100,end=100)  step
+  100    continue
          if (query) then
-            write (iout,120)
-  120       format (/,' Numbers of First & Last File and Step',
+            write (iout,110)
+  110       format (/,' Numbers of First & Last File and Step',
      &                 ' Increment :  ',$)
-            read (input,130)  record
-  130       format (a240)
-            read (record,*,err=140,end=140)  start,stop,step
-  140       continue
+            read (input,120)  record
+  120       format (a240)
+            read (record,*,err=130,end=130)  start,stop,step
+  130       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -214,12 +213,12 @@ c
             do i = 1, size
                list(i) = 0
             end do
-            write (iout,150)
-  150       format (/,' Numbers of the Atoms to be Removed :  ',$)
-            read (input,160)  record
-  160       format (a240)
-            read (record,*,err=170,end=170)  (list(i),i=1,size)
-  170       continue
+            write (iout,140)
+  140       format (/,' Numbers of the Atoms to be Removed :  ',$)
+            read (input,150)  record
+  150       format (a240)
+            read (record,*,err=160,end=160)  (list(i),i=1,size)
+  160       continue
             i = 1
             do while (list(i) .ne. 0)
                list(i) = max(-n,min(n,list(i)))
@@ -283,22 +282,22 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=180,end=180)  start
+            read (string,*,err=170,end=170)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=180,end=180)  stop
+         if (exist)  read (string,*,err=170,end=170)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=180,end=180)  step
-  180    continue
+         if (exist)  read (string,*,err=170,end=170)  step
+  170    continue
          if (query) then
-            write (iout,190)
-  190       format (/,' Numbers of First & Last File and Step',
+            write (iout,180)
+  180       format (/,' Numbers of First & Last File and Step',
      &                 ' [<Enter>=Exit] :  ',$)
-            read (input,200)  record
-  200       format (a240)
-            read (record,*,err=210,end=210)  start,stop,step
-  210       continue
+            read (input,190)  record
+  190       format (a240)
+            read (record,*,err=200,end=200)  start,stop,step
+  200       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -319,7 +318,7 @@ c
                   lext = 3
                   call numeral (i,ext,lext)
                   call readxyz (iarc)
-                  if (abort)  goto 220
+                  if (abort)  goto 210
                   nuse = n
                   do j = 1, n
                      use(j) = .true.
@@ -342,7 +341,7 @@ c
                open (unit=ixyz,file=xyzfile,status='new')
                do while (i.ge.start .and. i.le.stop)
                   call readxyz (iarc)
-                  if (abort)  goto 220
+                  if (abort)  goto 210
                   if (modtyp .eq. 'FOLD') then
                      call unitcell
                      if (use_bounds) then
@@ -387,7 +386,7 @@ c
                end do
                close (unit=ixyz)
             end if
-  220       continue
+  210       continue
             now = stop
             start = 0
             stop = 0
@@ -395,22 +394,22 @@ c
             query = .true.
             call nextarg (string,exist)
             if (exist) then
-               read (string,*,err=230,end=230)  start
+               read (string,*,err=220,end=220)  start
                query = .false.
             end if
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=230,end=230)  stop
+            if (exist)  read (string,*,err=220,end=220)  stop
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=230,end=230)  step
-  230       continue
+            if (exist)  read (string,*,err=220,end=220)  step
+  220       continue
             if (query) then
-               write (iout,240)
-  240          format (/,' Numbers of First & Last File and Step',
+               write (iout,230)
+  230          format (/,' Numbers of First & Last File and Step',
      &                    ' [<Enter>=Exit] :  ',$)
-               read (input,250)  record
-  250          format (a240)
-               read (record,*,err=260,end=260)  start,stop,step
-  260          continue
+               read (input,240)  record
+  240          format (a240)
+               read (record,*,err=250,end=250)  start,stop,step
+  250          continue
             end if
             if (stop .eq. 0)  stop = start
             if (step .eq. 0)  step = 1
