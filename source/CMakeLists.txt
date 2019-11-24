@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.6)
 
 project(tinker VERSION 8.7.1 LANGUAGES Fortran)
 
