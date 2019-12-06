@@ -17,3 +17,5 @@ source/*.x
 source/*.make
 source/*-*
 usage
+fftw-3.3.8
+fftw
