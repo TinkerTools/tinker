@@ -3,7 +3,7 @@ bin
 doc/announce
 doc/mechanic
 doc/word
-fftw
+#fftw
 lib/linux/lib*
 lib/macos/lib*
 lib/windows/lib*

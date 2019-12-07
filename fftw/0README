@@ -1,0 +1,74 @@
+
+                     #####################################
+                     FFTW Directory for the Tinker Package
+                     #####################################
+
+      This directory contains FFTW-3.3.8 which is the preferred FFT
+      package for use with the OpenMP version of Tinker. The FFTPACK
+      code provided by Tinker can be used instead (via modifications
+      to fft3d.f), but FFTPACK is a serial only code.
+
+      ###################################
+      Building FFTW on Linux and on MacOS
+      ###################################
+
+      Under MacOS and Linux, Tinker requires the two FFTW static object
+      libraries, libfftw3.a and libfftw3_threads.a. To build FFTW using
+      the GNU compilers, issue each of the commands indicated below.
+      Note that the "setenv" syntax is for csh/tcsh shells, and should
+      be modified for other shells. The --prefix flag in the "configure"
+      command below should be changed to the correct path on your local
+      machine (ie, the current /fftw area under the Tinker tree).
+
+      setenv CC gcc          (or use "export CC=gcc" for bash)
+      setenv F77 gfortran    (or use "export F77=gfortran" for bash)
+      make distclean
+      ./configure --prefix=/Users/ponder/tinker/fftw --enable-threads \
+                     --enable-openmp
+      make
+      make install
+
+      The above "setenv" commands are for use of the GNU compilers. To
+      use the Intel or PGI compilers, substitute "icc" or "pgcc" for
+      "gcc", and "ifort" or "pgf95" for "gfortran".
+
+      After completion of the above commands, the library files needed
+      by Tinker will be in the /lib subdirectory.
+
+      Modified versions of the configure script are used to enforce
+      processor-specific compiler flags. In particular, there are MacOS
+      and Linux versions for the Intel compiler that use -axssse3 and
+      -msse3, respectively, along with other optimization flags. The
+      original file is available as "configure-orig".
+
+      The configure script options --enable-threads and --enable-openmp
+      create libfftw3_threads.a and libfftw3_omp.a, respectively. One or
+      the other is needed for OpenMP versions of Tinker. Under MacOS and
+      recent versions of the Intel compilers, the threads library seems
+      to give better OpenMP performance on large numbers of cores.
+
+      The additional configure script option --enable-mpi causes the
+      libfftw3_mpi.a library to build. This MPI library is needed for
+      Tinker-HP, but is not required, and can be omitted, when building
+      standard OpenMP Tinker. In order to build the FFTW MPI library,
+      you must already have OpenMPI or MPICH installed.
+
+      ########################
+      Building FFTW on Windows
+      ########################
+
+      It is recommended to build FFTW under Cygwin on Windows via the
+      procedure given above for Linux and using the MinGW GNU compilers.
+      Once this is done, then build Tinker with the same compilers.
+
+      Alternatively, the Intel compilers can build FFTW on Windows via
+      Visual Studio and the add-on /fftw-3.3-libs subdirectory obtained
+      from the FFTW web site. This has been tested on 64-bit Windows 7
+      with Visual Studio 2010. In Visual Studio, open the project file
+      /fftw-3.3-libs/fftw-3.3-libs.sln. Then under the Build menu, use
+      the Configuration Manager to select x64 and build the Static-
+      Release version of only the libfftw library. The resulting .lib
+      file can be copied to the Tinker /source area for linking. Note
+      the config.h file in /fftw-3.3-libs/libfftw-3.3 has been modified
+      to enable use of threads and the calling interface with Fortran. 
+

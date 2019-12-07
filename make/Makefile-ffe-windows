@@ -99,7 +99,7 @@ JAVA_LIBS = -ljvm
 ##  Build:    TINKER
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 6.3
+##  Compiler: GNU gfortran 8.3
 ##  Parallel: OpenMP
 
 #CC = gcc

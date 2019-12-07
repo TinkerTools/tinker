@@ -63,7 +63,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Build:     TINKER
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 6.3
+##  Compiler:  GNU gfortran 8.3
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
