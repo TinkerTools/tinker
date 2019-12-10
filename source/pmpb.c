@@ -7,7 +7,6 @@
  * needs to be before "apbs.h" to avoid implicit function definitons
  */
 
-#include "apbs/apbscfg.h"
 #include "apbs/routines.h"
 #include "apbs/apbs.h"
 

@@ -1037,7 +1037,7 @@ c
          ionr(i) = 2.0d0
       end do
       spacing = 0.5d0
-      maxgrd = 225
+      maxgrd = 513
 c
 c     compute the position of the center of mass
 c
