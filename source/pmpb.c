@@ -708,7 +708,7 @@ void apbsinduce_ (double uind[maxatm][3], double fld[maxatm][3]){
    }
 
    /* load results into the return arrays in electron**2/Ang
-   /* kT in kcal/mol */
+      kT in kcal/mol */
    kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 / 4.184;
    // electric: conversion from electron**2/Ang to Kcal/mol
    electric = 332.063713;
@@ -843,7 +843,7 @@ void apbsnlinduce_ (double uinp[maxatm][3], double fld[maxatm][3]){
    }
 
    /* load results into the return arrays in electron**2/Angstrom
-   /* kT in kcal/mol */
+      kT in kcal/mol */
    kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 / 4.184;
    // electric: conversion from electron**2/Angstrom to Kcal/mol
    electric = 332.063713;
