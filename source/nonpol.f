@@ -42,7 +42,7 @@ c
       parameter (rminh=1.3275d0)
       parameter (awater=0.033428d0)
       parameter (slevy=1.0d0)
-      parameter (dispoff=0.838d0)
+      parameter (dispoff=0.874d0)
       real*8 solvprs,surften
       real*8 spcut,spoff
       real*8 stcut,stoff
