@@ -51,7 +51,7 @@ c
       integer iter,isave
       integer nvar,nblk
       integer nroot,nbasis
-      integer np,npair
+      integer nr,npair
       integer nlock,nconv
       integer irange,ifactor
       integer maxroot,maxiter
@@ -67,8 +67,8 @@ c
       real*8 uku_min,uku_max
       real*8, allocatable :: xe(:)
       real*8, allocatable :: xm(:)
-      real*8, allocatable :: p(:)
-      real*8, allocatable :: pk(:)
+      real*8, allocatable :: r(:)
+      real*8, allocatable :: rk(:)
       real*8, allocatable :: hmin(:)
       real*8, allocatable :: uku(:)
       real*8, allocatable :: uku0(:)
@@ -101,7 +101,7 @@ c     set default parameters for the normal mode computation
 c
       nvar = 3 * n
       maxroot = 50
-      np = 6
+      nr = 6
       iter = 0
       isave = 10
       maxhess = nvar * (nvar-1) / 2
@@ -167,7 +167,7 @@ c     set default values for some additional parameters
 c
       funit = factor * efreq * emass
       ifactor = int(factor)
-      irange = (nvar-np+1) * max((1-ifactor)/2,0)
+      irange = (nvar-nr+1) * max((1-ifactor)/2,0)
       npair = 2 * nroot
       nbasis = 3 * nroot
 c
@@ -202,8 +202,8 @@ c
       allocate (iblk(n))
       allocate (xe(nvar))
       allocate (xm(nvar))
-      allocate (p(nvar))
-      allocate (pk(nvar))
+      allocate (r(nvar))
+      allocate (rk(nvar))
       allocate (hmin(nvar))
       allocate (uku(nvar))
       allocate (uku0(nvar))
@@ -213,9 +213,9 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      allocate (phi(nvar,nbasis))
-      allocate (phik(nvar,nbasis))
-      allocate (pwork(nvar,nbasis))
+      allocate (rho(nvar,nbasis))
+      allocate (rhok(nvar,nbasis))
+      allocate (rwork(nvar,nbasis))
 c
 c     store a coordinate vector for each atom
 c
@@ -238,7 +238,7 @@ c
 c
 c     remove pure translational and rotational modes
 c
-      call trbasis (nvar,np,xe,u,ur)
+      call trbasis (nvar,nr,xe,u,ur)
 c
 c     set number and size of blocks based on storage space
 c
@@ -300,7 +300,7 @@ c     determine number of prior modes available at restart
 c
       nlock = 0
       do while (.true.)
-         read (ivb1,err=120,end=120)  (p(k),k=1,nvar)
+         read (ivb1,err=120,end=120)  (r(k),k=1,nvar)
          nlock = nlock + 1
       end do
   120 continue
@@ -353,13 +353,13 @@ c     if restarting, read trial vectors and estimate eigenvalues
 c
       if (restart) then
          do i = 1, npair
-            read (ivb2)  (phi(k,i),k=1,nvar)
-            read (ivb2)  (phik(k,i),k=1,nvar)
+            read (ivb2)  (rho(k,i),k=1,nvar)
+            read (ivb2)  (rhok(k,i),k=1,nvar)
          end do
          do i = 1, nroot
             h(i,i) = 0.0d0
             do k = 1, nvar
-               h(i,i) = h(i,i) + phik(k,i)*phi(k,i)
+               h(i,i) = h(i,i) + rhok(k,i)*rho(k,i)
             end do
             freqold(i) = sign(1.0d0,h(i,i)) * sqrt(abs(h(i,i)))
          end do
@@ -369,13 +369,13 @@ c
 c     if not restarting, generate initial guess eigenvectors
 c
       do i = 1, nroot
-         call trigger (nvar,nbasis,np,ifactor,nblk,iblk,u,uu,p)
+         call trigger (nvar,nbasis,nr,ifactor,nblk,iblk,u,uu,r)
          do k = 1, nvar
-            phi(k,i) = p(k)
+            rho(k,i) = r(k)
          end do
       end do
 c
-c     project out locked roots from components of phi
+c     project out locked roots from components of rho
 c
       call project (nvar,nconv,ivb1,nroot,0)
       call projectk (nvar,nconv,ivb1,nroot,0)
@@ -384,34 +384,34 @@ c     reload and make vector orthonormal to existing basis
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i)
+            r(k) = rho(k,i)
          end do
          if (i .eq. 1) then
             sum = 0.0d0
             do k = 1, nvar
-               sum = sum + p(k)*p(k)
+               sum = sum + r(k)*r(k)
             end do
             sum = sqrt(sum)
             do k = 1, nvar
-               p(k) = p(k) / sum
+               r(k) = r(k) / sum
             end do
          else
-            call gsort (nvar,i-1,p)
+            call gsort (nvar,i-1,r)
          end if
          do k = 1, nvar
-            phi(k,i) = p(k)
+            rho(k,i) = r(k)
          end do
       end do
 c
-c     store K on phi
+c     store K on rho
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i)
+            r(k) = rho(k,i)
          end do
-         call konvec (nvar,xm,xe,p,pk)
+         call konvec (nvar,xm,xe,r,rk)
          do k = 1, nvar
-            phik(k,i) = factor * pk(k)
+            rhok(k,i) = factor * rk(k)
          end do
       end do
 c
@@ -421,7 +421,7 @@ c
          do j = i, nroot
             h(i,j) = 0.0d0
             do k = 1, nvar
-               h(i,j) = h(i,j) + phik(k,i)*phi(k,j)
+               h(i,j) = h(i,j) + rhok(k,i)*rho(k,j)
             end do
             h(j,i) = h(i,j)
          end do
@@ -438,13 +438,13 @@ c
             tmp1(j) = 0.0d0
             tmp2(j) = 0.0d0
             do i = 1, nroot
-               tmp1(j) = tmp1(j) + c(i,j)*phi(k,i)
-               tmp2(j) = tmp2(j) + c(i,j)*phik(k,i)
+               tmp1(j) = tmp1(j) + c(i,j)*rho(k,i)
+               tmp2(j) = tmp2(j) + c(i,j)*rhok(k,i)
             end do
          end do
          do j = 1, nroot
-            phi(k,j) = tmp1(j)
-            phik(k,j) = tmp2(j)
+            rho(k,j) = tmp1(j)
+            rhok(k,j) = tmp2(j)
          end do
       end do
 c
@@ -454,24 +454,24 @@ c
          freq(i) = funit * sign(1.0d0,h(i,i)) * sqrt(abs(h(i,i)))
          freqold(i) = freq(i)
          do k = 1, nvar
-            pk(k) = phik(k,i) - h(i,i)*phi(k,i)
+            rk(k) = rhok(k,i) - h(i,i)*rho(k,i)
          end do
 c
 c     use Davidson preconditioner if finding low frequencies
 c
          if (factor .gt. 0.0d0) then
-            call preconblk (nvar,nblk,iblk,uku,uu,h(i,i),hmin(i),pk)
+            call preconblk (nvar,nblk,iblk,uku,uu,h(i,i),hmin(i),rk)
          end if
 c
 c     project residual onto P-space
 c
-         call qonvec (nvar,np,u,pk,p)
+         call qonvec (nvar,nr,u,rk,r)
          do k = 1, nvar
-            phi(k,i+nroot) = p(k)
+            rho(k,i+nroot) = r(k)
          end do
       end do
 c
-c     project out locked roots from components of phi
+c     project out locked roots from components of rho
 c
       call project (nvar,nconv,ivb1,nroot,nroot)
       call projectk (nvar,nconv,ivb1,nroot,nroot)
@@ -480,23 +480,23 @@ c     reload and make vector orthonormal to existing basis
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i+nroot)
+            r(k) = rho(k,i+nroot)
          end do
-         call gsort (nvar,nroot+i-1,p)
+         call gsort (nvar,nroot+i-1,r)
          do k = 1, nvar
-            phi(k,i+nroot) = p(k)
+            rho(k,i+nroot) = r(k)
          end do
       end do
 c
-c     store K on phi
+c     store K on rho
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i+nroot)
+            r(k) = rho(k,i+nroot)
          end do
-         call konvec (nvar,xm,xe,p,pk)
+         call konvec (nvar,xm,xe,r,rk)
          do k = 1, nvar
-            phik(k,i+nroot) = factor * pk(k)
+            rhok(k,i+nroot) = factor * rk(k)
          end do
       end do
 c
@@ -506,7 +506,7 @@ c
          do j = i, npair
             h(i,j) = 0.0d0
             do k = 1, nvar
-               h(i,j) = h(i,j) + phik(k,i)*phi(k,j)
+               h(i,j) = h(i,j) + rhok(k,i)*rho(k,j)
             end do
             h(j,i) = h(i,j)
          end do
@@ -520,31 +520,31 @@ c
             tmp1(j) = 0.0d0
             tmp2(j) = 0.0d0
             do i = 1, npair
-               tmp1(j) = tmp1(j) + c(i,j)*phi(k,i)
-               tmp2(j) = tmp2(j) + c(i,j)*phik(k,i)
+               tmp1(j) = tmp1(j) + c(i,j)*rho(k,i)
+               tmp2(j) = tmp2(j) + c(i,j)*rhok(k,i)
             end do
          end do
 c
 c     old solution fills up 2nd block
 c
          do j = 1, nroot
-            phi(k,j+nroot) = phi(k,j)
-            phik(k,j+nroot) = phik(k,j)
+            rho(k,j+nroot) = rho(k,j)
+            rhok(k,j+nroot) = rhok(k,j)
          end do
 c
 c     new solution fills up 1st block
 c
          do j = 1, nroot
-            phi(k,j) = tmp1(j)
-            phik(k,j) = tmp2(j)
+            rho(k,j) = tmp1(j)
+            rhok(k,j) = tmp2(j)
          end do
 c
 c     orthogonalize 2nd block to 1st
 c
          do j = 1, nroot
             do i = 1, nroot
-               phi(k,j+nroot) = phi(k,j+nroot) - c(j,i)*phi(k,i)
-               phik(k,j+nroot) = phik(k,j+nroot) - c(j,i)*phik(k,i)
+               rho(k,j+nroot) = rho(k,j+nroot) - c(j,i)*rho(k,i)
+               rhok(k,j+nroot) = rhok(k,j+nroot) - c(j,i)*rhok(k,i)
             end do
          end do
       end do
@@ -553,15 +553,15 @@ c     orthogonalize 2nd block on itself
 c
       sum = 0.0d0
       do k = 1, nvar
-         sum = sum + phi(k,nroot+1)*phi(k,nroot+1)
+         sum = sum + rho(k,nroot+1)*rho(k,nroot+1)
       end do
       sum = sqrt(sum)
 c
 c     normalize leading vector
 c
       do k = 1, nvar
-         phi(k,nroot+1) = phi(k,nroot+1) / sum
-         phik(k,nroot+1) = phik(k,nroot+1) / sum
+         rho(k,nroot+1) = rho(k,nroot+1) / sum
+         rhok(k,nroot+1) = rhok(k,nroot+1) / sum
       end do
 c
 c     orthogonalize the rest one-by-one
@@ -571,21 +571,21 @@ c
             do j = 1, i-1
                sum = 0.0d0
                do k = 1, nvar
-                  sum = sum + phi(k,i+nroot)*phi(k,j+nroot)
+                  sum = sum + rho(k,i+nroot)*rho(k,j+nroot)
                end do
                do k = 1, nvar
-                  phi(k,i+nroot) = phi(k,i+nroot)-sum*phi(k,j+nroot)
-                  phik(k,i+nroot) = phik(k,i+nroot)-sum*phik(k,j+nroot)
+                  rho(k,i+nroot) = rho(k,i+nroot)-sum*rho(k,j+nroot)
+                  rhok(k,i+nroot) = rhok(k,i+nroot)-sum*rhok(k,j+nroot)
                end do
             end do
             sum = 0.0d0
             do k = 1, nvar
-               sum = sum + phi(k,i+nroot)*phi(k,i+nroot)
+               sum = sum + rho(k,i+nroot)*rho(k,i+nroot)
             end do
             sum = sqrt(sum)
             do k = 1, nvar
-               phi(k,i+nroot) = phi(k,i+nroot) / sum
-               phik(k,i+nroot) = phik(k,i+nroot) / sum
+               rho(k,i+nroot) = rho(k,i+nroot) / sum
+               rhok(k,i+nroot) = rhok(k,i+nroot) / sum
             end do
          end do
       end if
@@ -600,24 +600,24 @@ c
          freq(i+npair) = funit * sign(1.0d0,h(i+npair,i+npair))
      &                        * sqrt(abs(h(i+npair,i+npair)))
          do k = 1, nvar
-            pk(k) = phik(k,i) - h(i,i)*phi(k,i)
+            rk(k) = rhok(k,i) - h(i,i)*rho(k,i)
          end do
 c
 c     use Davidson preconditioner if finding low frequencies
 c
          if (factor .gt. 0.0d0) then
-            call preconblk (nvar,nblk,iblk,uku,uu,h(i,i),hmin(i),pk)
+            call preconblk (nvar,nblk,iblk,uku,uu,h(i,i),hmin(i),rk)
          end if
 c
 c     project onto P-space
 c
-         call qonvec (nvar,np,u,pk,p)
+         call qonvec (nvar,nr,u,rk,r)
          do k = 1, nvar
-            phi(k,i+npair) = p(k)
+            rho(k,i+npair) = r(k)
          end do
       end do
 c
-c     project out locked roots from components of phi
+c     project out locked roots from components of rho
 c
       call project (nvar,nconv,ivb1,nroot,npair)
       call projectk (nvar,nconv,ivb1,nroot,npair)
@@ -626,23 +626,23 @@ c     reload and orthogonalize to 1st + 2nd
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i+npair)
+            r(k) = rho(k,i+npair)
          end do
-         call gsort (nvar,npair+i-1,p)
+         call gsort (nvar,npair+i-1,r)
          do k = 1, nvar
-            phi(k,i+npair) = p(k)
+            rho(k,i+npair) = r(k)
          end do
       end do
 c
-c     store K on phi
+c     store K on rho
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i+npair)
+            r(k) = rho(k,i+npair)
          end do
-         call konvec (nvar,xm,xe,p,pk)
+         call konvec (nvar,xm,xe,r,rk)
          do k = 1, nvar
-            phik(k,i+npair) = factor * pk(k)
+            rhok(k,i+npair) = factor * rk(k)
          end do
       end do
 c
@@ -659,7 +659,7 @@ c
          do j = i, nbasis
             h(i,j) = 0.0d0
             do k = 1, nvar
-               h(i,j) = h(i,j) + phik(k,i)*phi(k,j)
+               h(i,j) = h(i,j) + rhok(k,i)*rho(k,j)
             end do
             h(j,i) = h(i,j)
          end do
@@ -726,7 +726,7 @@ c
 c     move cursor to end of storage file
 c
          do i = 1, nconv
-            read (ivb1)  (pk(k),k=1,nvar)
+            read (ivb1)  (rk(k),k=1,nvar)
          end do
 c
 c     norm of residual
@@ -734,13 +734,13 @@ c
          do j = 1, iconv
             rnorm = 0.0d0
             do k = 1, nvar
-               p(k) = 0.0d0
-               pk(k) = 0.0d0
+               r(k) = 0.0d0
+               rk(k) = 0.0d0
                do i = 1, nbasis
-                  p(k) = p(k)+c(i,j)*phi(k,i)
-                  pk(k) = pk(k)+c(i,j)*phik(k,i)
+                  r(k) = r(k)+c(i,j)*rho(k,i)
+                  rk(k) = rk(k)+c(i,j)*rhok(k,i)
                end do
-               rnorm = rnorm + (pk(k)-h(j,j)*p(k))**2
+               rnorm = rnorm + (rk(k)-h(j,j)*r(k))**2
             end do
             rnorm = sqrt(rnorm)
 c
@@ -749,7 +749,7 @@ c
             do i = 1, 3
                tmp1(i) = 0.0d0
                do k = 1, nvar
-                  tmp1(i) = tmp1(i) + ur(k,i)*p(k)
+                  tmp1(i) = tmp1(i) + ur(k,i)*r(k)
                end do
             end do
             rcomp = 0.0d0
@@ -781,8 +781,8 @@ c
             dfreq = freqold(j) - freq(j)
             write (iout,220)  ivib,freq(j),dfreq,rnorm,rcomp
   220       format (i8,f15.3,3d16.4)
-            call prtvib (ivib,p)
-            write (ivb1)  (p(k),k=1,nvar)
+            call prtvib (ivib,r)
+            write (ivb1)  (r(k),k=1,nvar)
          end do
          rewind (unit=ivb1)
 c
@@ -806,44 +806,44 @@ c
             tmp1(j) = 0.0d0
             tmp2(j) = 0.0d0
             do i = 1, nbasis
-               tmp1(j) = tmp1(j) + c(i,j)*phi(k,i)
-               tmp2(j) = tmp2(j) + c(i,j)*phik(k,i)
+               tmp1(j) = tmp1(j) + c(i,j)*rho(k,i)
+               tmp2(j) = tmp2(j) + c(i,j)*rhok(k,i)
             end do
          end do
 c
 c     old solution fills up 2nd block
 c
          do j = 1, nroot
-            phi(k,j+nroot+iconv) = phi(k,j+iconv)
-            phik(k,j+nroot+iconv) = phik(k,j+iconv)
+            rho(k,j+nroot+iconv) = rho(k,j+iconv)
+            rhok(k,j+nroot+iconv) = rhok(k,j+iconv)
          end do
 c
 c     new solution fills up 1st block
 c
          do j = 1, nroot
-            phi(k,j+iconv) = tmp1(j+iconv)
-            phik(k,j+iconv) = tmp2(j+iconv)
+            rho(k,j+iconv) = tmp1(j+iconv)
+            rhok(k,j+iconv) = tmp2(j+iconv)
          end do
 c
 c     shift index down by iconv
 c
          do j = 1, npair
-            phi(k,j) = phi(k,j+iconv)
-            phik(k,j) = phik(k,j+iconv)
+            rho(k,j) = rho(k,j+iconv)
+            rhok(k,j) = rhok(k,j+iconv)
          end do
 c
 c     orthogonalize 2nd block to 1st + iconv roots
 c
          do j = 1, nroot
             do i = 1, nroot
-               phi(k,j+nroot) = phi(k,j+nroot)
-     &                             - c(j+iconv,i+iconv)*phi(k,i)
-               phik(k,j+nroot) = phik(k,j+nroot)
-     &                              - c(j+iconv,i+iconv)*phik(k,i)
+               rho(k,j+nroot) = rho(k,j+nroot)
+     &                             - c(j+iconv,i+iconv)*rho(k,i)
+               rhok(k,j+nroot) = rhok(k,j+nroot)
+     &                              - c(j+iconv,i+iconv)*rhok(k,i)
             end do
             do i = 1, iconv
-               phi(k,j+nroot) = phi(k,j+nroot) - c(j+iconv,i)*tmp1(i)
-               phik(k,j+nroot) = phik(k,j+nroot) - c(j+iconv,i)*tmp2(i)
+               rho(k,j+nroot) = rho(k,j+nroot) - c(j+iconv,i)*tmp1(i)
+               rhok(k,j+nroot) = rhok(k,j+nroot) - c(j+iconv,i)*tmp2(i)
             end do
          end do
       end do
@@ -852,15 +852,15 @@ c     orthogonalize 2nd block on itself
 c
       sum = 0.0d0
       do k = 1, nvar
-         sum = sum + phi(k,nroot+1)*phi(k,nroot+1)
+         sum = sum + rho(k,nroot+1)*rho(k,nroot+1)
       end do
       sum = sqrt(sum)
 c
 c     normalize leading vector
 c
       do k = 1, nvar
-         phi(k,nroot+1) = phi(k,nroot+1) / sum
-         phik(k,nroot+1) = phik(k,nroot+1) / sum
+         rho(k,nroot+1) = rho(k,nroot+1) / sum
+         rhok(k,nroot+1) = rhok(k,nroot+1) / sum
       end do
 c
 c     orthogonalize the rest one-by-one
@@ -870,21 +870,21 @@ c
             do j = 1, i-1
                sum = 0.0d0
                do k = 1, nvar
-                  sum = sum + phi(k,i+nroot)*phi(k,j+nroot)
+                  sum = sum + rho(k,i+nroot)*rho(k,j+nroot)
                end do
                do k = 1, nvar
-                  phi(k,i+nroot) = phi(k,i+nroot)-sum*phi(k,j+nroot)
-                  phik(k,i+nroot) = phik(k,i+nroot)-sum*phik(k,j+nroot)
+                  rho(k,i+nroot) = rho(k,i+nroot)-sum*rho(k,j+nroot)
+                  rhok(k,i+nroot) = rhok(k,i+nroot)-sum*rhok(k,j+nroot)
                end do
             end do
             sum = 0.0d0
             do k = 1, nvar
-               sum = sum + phi(k,i+nroot)*phi(k,i+nroot)
+               sum = sum + rho(k,i+nroot)*rho(k,i+nroot)
             end do
             sum = sqrt(sum)
             do k = 1, nvar
-               phi(k,i+nroot) = phi(k,i+nroot) / sum
-               phik(k,i+nroot) = phik(k,i+nroot) / sum
+               rho(k,i+nroot) = rho(k,i+nroot) / sum
+               rhok(k,i+nroot) = rhok(k,i+nroot) / sum
             end do
          end do
       end if
@@ -905,7 +905,7 @@ c
       do i = 1, nroot
          rnorm = 0.0d0
          do k = 1, nvar
-            rnorm = rnorm + (phik(k,i)-h(i+iconv,i+iconv)*phi(k,i))**2
+            rnorm = rnorm + (rhok(k,i)-h(i+iconv,i+iconv)*rho(k,i))**2
          end do
          rnorm = sqrt(rnorm)
 c
@@ -914,7 +914,7 @@ c
          do j = 1, 3
             tmp1(j) = 0.0d0
             do k = 1, nvar
-               tmp1(j) = tmp1(j) + ur(k,j)*phi(k,i)
+               tmp1(j) = tmp1(j) + ur(k,j)*rho(k,i)
             end do
          end do
          rcomp = 0.0d0
@@ -939,8 +939,8 @@ c
       if (mod(iter,isave) .eq. 0) then
          rewind (unit=ivb2)
          do i = 1, npair
-            write (ivb2)  (phi(k,i),k=1,nvar)
-            write (ivb2)  (phik(k,i),k=1,nvar)
+            write (ivb2)  (rho(k,i),k=1,nvar)
+            write (ivb2)  (rhok(k,i),k=1,nvar)
          end do
       end if
 c
@@ -951,8 +951,8 @@ c
   260    format (/,' Number of Converged Normal Modes :',6x,i12)
          rewind (ivb2)
          do i = 1, npair
-            write (ivb2)  (phi(k,i),k=1,nvar)
-            write (ivb2)  (phik(k,i),k=1,nvar)
+            write (ivb2)  (rho(k,i),k=1,nvar)
+            write (ivb2)  (rhok(k,i),k=1,nvar)
          end do
          close (unit=ivb2)
          goto 270
@@ -962,22 +962,22 @@ c     as above, make sure no prior roots are mixed in the basis
 c
       do i = 1, npair
          do k = 1, nvar
-            p(k) = phi(k,i)
+            r(k) = rho(k,i)
          end do
-         call qonvec (nvar,np,u,p,pk)
+         call qonvec (nvar,nr,u,r,rk)
          do k = 1, nvar
-            phi(k,i) = pk(k)
+            rho(k,i) = rk(k)
          end  do
          do k = 1, nvar
-            p(k) = phik(k,i)
+            r(k) = rhok(k,i)
          end do
-         call qonvec (nvar,np,u,p,pk)
+         call qonvec (nvar,nr,u,r,rk)
          do k = 1, nvar
-            phik(k,i) = pk(k)
+            rhok(k,i) = rk(k)
          end do
       end do
 c
-c     project out locked roots from components of phi
+c     project out locked roots from components of rho
 c
       call project (nvar,nconv,ivb1,npair,0)
       call projectk (nvar,nconv,ivb1,npair,0)
@@ -986,25 +986,25 @@ c     setup next iteration; solution residue, Davidson weight
 c
       do i = 1, nroot
          do k = 1, nvar
-            pk(k) = phik(k,i) - h(i+iconv,i+iconv)*phi(k,i)
+            rk(k) = rhok(k,i) - h(i+iconv,i+iconv)*rho(k,i)
          end do
 c
 c     use Davidson preconditioner if finding low frequencies
 c
          ii = i + iconv
          if (factor .gt. 0.0d0) then
-            call preconblk (nvar,nblk,iblk,uku,uu,h(ii,ii),hmin(i),pk)
+            call preconblk (nvar,nblk,iblk,uku,uu,h(ii,ii),hmin(i),rk)
          end if
 c
-c     project residual onto P-space
+c     project residual onto R-space
 c
-         call qonvec (nvar,np,u,pk,p)
+         call qonvec (nvar,nr,u,rk,r)
          do k = 1, nvar
-            phi(k,i+npair) = p(k)
+            rho(k,i+npair) = r(k)
          end do
       end do
 c
-c     project out locked roots from components of phi
+c     project out locked roots from components of rho
 c
       call project (nvar,nconv,ivb1,nroot,npair)
 c
@@ -1012,28 +1012,28 @@ c     reload and orthogonalize to 1st + 2nd
 c
       do i = 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i+npair)
+            r(k) = rho(k,i+npair)
          end do
-         call gsort (nvar,npair+i-1,p)
+         call gsort (nvar,npair+i-1,r)
          do k = 1, nvar
-            phi(k,i+npair) = p(k)
+            rho(k,i+npair) = r(k)
          end do
       end do
 c
-c     store K on phi
+c     store K on rho
 c
       do i= 1, nroot
          do k = 1, nvar
-            p(k) = phi(k,i+npair)
+            r(k) = rho(k,i+npair)
          end do
-         call konvec (nvar,xm,xe,p,pk)
-         call qonvec(nvar,np,u,pk,p)
+         call konvec (nvar,xm,xe,r,rk)
+         call qonvec(nvar,nr,u,rk,r)
          do k = 1, nvar
-            phik(k,i+npair) = factor * p(k)
+            rhok(k,i+npair) = factor * r(k)
          end do
       end do
 c
-c     project out locked roots from components of phik
+c     project out locked roots from components of rhok
 c
       call projectk (nvar,nconv,ivb1,nroot,npair)
       goto 150
@@ -1044,8 +1044,8 @@ c
       deallocate (iblk)
       deallocate (xe)
       deallocate (xm)
-      deallocate (p)
-      deallocate (pk)
+      deallocate (r)
+      deallocate (rk)
       deallocate (hmin)
       deallocate (uku)
       deallocate (uku0)
@@ -1076,17 +1076,17 @@ c     "trigger" constructs a set of initial trial vectors for
 c     use during sliding block iterative matrix diagonalization
 c
 c
-      subroutine trigger (nvar,nbasis,np,ifactor,nblk,iblk,u,uu,p)
+      subroutine trigger (nvar,nbasis,nr,ifactor,nblk,iblk,u,uu,r)
       implicit none
       integer i,j,k,m
       integer k0,k1,k2
       integer nvar,nbasis
-      integer np,ifactor
+      integer nr,ifactor
       integer nblk,nguess
       integer iblk(*)
       real*8 w,sum
       real*8 random
-      real*8 p(*)
+      real*8 r(*)
       real*8 uu(*)
       real*8 u(nvar,*)
       real*8, allocatable :: tmp(:)
@@ -1100,7 +1100,7 @@ c
 c     zero out the trial vector
 c
       do k = 1, nvar
-         p(k) = 0.0d0
+         r(k) = 0.0d0
       end do
 c
 c     create overlap with the entire P-space
@@ -1133,7 +1133,7 @@ c
             end if
             do k = k1, k2
                m = m + 1
-               p(k) = p(k) + w*uu(k0+m)
+               r(k) = r(k) + w*uu(k0+m)
             end do
          end do
       end do
@@ -1144,7 +1144,7 @@ c
 c
 c     project the vector onto P-space
 c
-      call qonvec (nvar,np,u,p,tmp)
+      call qonvec (nvar,nr,u,r,tmp)
 c
 c     perform a normalization
 c
@@ -1154,7 +1154,7 @@ c
       end do
       sum = sqrt(sum)
       do i = 1, nvar
-         p(i) = tmp(i) / sum
+         r(i) = tmp(i) / sum
       end do
 c
 c     perform deallocation of some local arrays
@@ -1175,16 +1175,16 @@ c     "trbasis" forms translation and rotation basis vectors used
 c     during vibrational analysis via block iterative diagonalization
 c
 c
-      subroutine trbasis (nvar,np,xe,u,ur)
+      subroutine trbasis (nvar,nr,xe,u,ur)
       use atomid
       use atoms
       implicit none
       integer i,j,k
-      integer nvar,np
+      integer nvar,nr
       real*8 tmass,sum
       real*8 ra,rha,pr
       real*8 cm(3)
-      real*8 p(3)
+      real*8 r(3)
       real*8 e(3,3)
       real*8 c(3,3)
       real*8 xe(*)
@@ -1273,16 +1273,16 @@ c
                pr = pr + cm(k)*c(k,i)
             end do
             rha = sqrt(ra-pr**2)
-            p(1) = c(2,i)*cm(3) - c(3,i)*cm(2)
-            p(2) = c(3,i)*cm(1) - c(1,i)*cm(3)
-            p(3) = c(1,i)*cm(2) - c(2,i)*cm(1)
+            r(1) = c(2,i)*cm(3) - c(3,i)*cm(2)
+            r(2) = c(3,i)*cm(1) - c(1,i)*cm(3)
+            r(3) = c(1,i)*cm(2) - c(2,i)*cm(1)
             sum = 0.0d0
             do k = 1, 3
-               sum = sum + p(k)**2
+               sum = sum + r(k)**2
             end do
             sum = sqrt(sum)
             do k = 1, 3
-               ur(3*(j-1)+k,i) = sqrt(mass(j)) * rha*p(k)/sum
+               ur(3*(j-1)+k,i) = sqrt(mass(j)) * rha*r(k)/sum
             end do
          end do
          sum = 0.0d0
@@ -1297,7 +1297,7 @@ c
 c
 c     set basis vectors for rotation
 c
-      if (np .eq. 6) then
+      if (nr .eq. 6) then
          do i = 1, 3
             do j = 1, nvar
                u(j,i+3) = ur(j,i)
@@ -1319,7 +1319,7 @@ c     "preconblk" applies a preconditioner to an atom block section
 c     of the Hessian matrix
 c
 c
-      subroutine preconblk (nvar,nblk,iblk,uku,uu,h,hmin,pk)
+      subroutine preconblk (nvar,nblk,iblk,uku,uu,h,hmin,rk)
       implicit none
       integer i,j,k,l
       integer nvar,nblk
@@ -1327,7 +1327,7 @@ c
       integer iblk(*)
       real*8 h,hmin
       real*8 uku(*)
-      real*8 pk(*)
+      real*8 rk(*)
       real*8 uu(*)
       real*8, allocatable :: d(:)
       real*8, allocatable :: work(:)
@@ -1359,7 +1359,7 @@ c
          d(k) = hmin / d(k)
       end do
 c
-c     create overlap with the entire pk array
+c     create overlap with the entire rk array
 c
       k0 = 0
       k1 = 1
@@ -1378,14 +1378,14 @@ c
             work(l2) = 0.0d0
             do k = k1, k2
                l = l + 1
-               work(l2) = work(l2) + uu(k0+l)*pk(k)
+               work(l2) = work(l2) + uu(k0+l)*rk(k)
             end do
          end do
 c
 c    zero out the segment
 c
          do k = k1, k2
-            pk(k) = 0.0d0
+            rk(k) = 0.0d0
          end do
 c
 c    scan over rows of the Hessian, second part
@@ -1395,7 +1395,7 @@ c
             l2 = k1 + j - 1
             do k = k1, k2
                l = l + 1
-               pk(k) = pk(k) + uu(k0+l)*d(l2)*work(l2)
+               rk(k) = rk(k) + uu(k0+l)*d(l2)*work(l2)
             end do
          end do
       end do
@@ -1419,13 +1419,13 @@ c     "gsort" uses the Gram-Schmidt algorithm to build orthogonal
 c     vectors for sliding block interative matrix diagonalization
 c
 c
-      subroutine gsort (nvar,nb,p0)
+      subroutine gsort (nvar,nb,r0)
       use vibs
       implicit none
       integer i,j
       integer nvar,nb
       real*8 sum
-      real*8 p0(*)
+      real*8 r0(*)
       real*8, allocatable :: s(:)
       real*8, allocatable :: proj(:)
 c
@@ -1440,7 +1440,7 @@ c
       do i = 1, nb
          s(i) = 0.0d0
          do j = 1, nvar
-            s(i) = s(i) + p0(j)*phi(j,i)
+            s(i) = s(i) + r0(j)*rho(j,i)
          end do
       end do
 c
@@ -1454,7 +1454,7 @@ c     construct projector
 c
       do i = 1, nb
          do j = 1, nvar
-            proj(j) = proj(j) + s(i)*phi(j,i)
+            proj(j) = proj(j) + s(i)*rho(j,i)
          end do
       end do
 c
@@ -1462,7 +1462,7 @@ c     apply projector and normalize new vector
 c
       sum = 0.0d0
       do i = 1, nvar
-         proj(i) = p0(i) - proj(i)
+         proj(i) = r0(i) - proj(i)
          sum = sum + proj(i)*proj(i)
       end do
       sum = sqrt(sum)
@@ -1473,7 +1473,7 @@ c
 c     return original array updated
 c
       do i = 1, nvar
-         p0(i) = proj(i)
+         r0(i) = proj(i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -1495,37 +1495,37 @@ c     "qonvec" is a vector utility routine used during sliding
 c     block iterative matrix diagonalization
 c
 c
-      subroutine qonvec (nvar,np,u,pk,p)
+      subroutine qonvec (nvar,nr,u,rk,r)
       implicit none
-      integer i,j,nvar,np
-      real*8 pku(6)
-      real*8 pk(*)
-      real*8 p(*)
+      integer i,j,nvar,nr
+      real*8 rku(6)
+      real*8 rk(*)
+      real*8 r(*)
       real*8 u(nvar,*)
 c
 c
-c     operate on vector pk with u-transpose
+c     operate on vector rk with u-transpose
 c
-      do i = 1, np
-         pku(i) = 0.0d0
+      do i = 1, nr
+         rku(i) = 0.0d0
          do j = 1, nvar
-            pku(i) = pku(i) + u(j,i)*pk(j)
+            rku(i) = rku(i) + u(j,i)*rk(j)
          end do
       end do
 c
 c     operate with u on the resultant
 c
       do i = 1, nvar
-         p(i) = 0.0d0
-         do j = 1, np
-            p(i) = p(i) + u(i,j)*pku(j)
+         r(i) = 0.0d0
+         do j = 1, nr
+            r(i) = r(i) + u(i,j)*rku(j)
          end do
       end do
 c
-c     subtract new product from p
+c     subtract new product from r
 c
       do i = 1, nvar
-         p(i) = pk(i) - p(i)
+         r(i) = rk(i) - r(i)
       end do
       return
       end
@@ -1557,7 +1557,7 @@ c     zero the temporary storage array
 c
       do k = 1, nvar
          do i = 1, ns
-            pwork(k,i+m) = 0.0d0
+            rwork(k,i+m) = 0.0d0
          end do
       end do
 c
@@ -1573,12 +1573,12 @@ c
          do j = 1, ns
             temp(j) = 0.0d0
             do k = 1, nvar
-               temp(j) = temp(j) + u(k)*phi(k,j+m)
+               temp(j) = temp(j) + u(k)*rho(k,j+m)
             end do
          end do
          do j = 1, ns
             do k = 1, nvar
-               pwork(k,j+m) = pwork(k,j+m) + u(k)*temp(j)
+               rwork(k,j+m) = rwork(k,j+m) + u(k)*temp(j)
             end do
          end do
       end do
@@ -1592,7 +1592,7 @@ c     project locked vectors out of the current set
 c
       do k = 1, nvar
          do i = 1, ns
-            phi(k,i+m) = phi(k,i+m) - pwork(k,i+m)
+            rho(k,i+m) = rho(k,i+m) - rwork(k,i+m)
          end do
       end do
       if (nconv .gt. 0)  rewind (unit=ivb1)
@@ -1626,7 +1626,7 @@ c     zero the temporary storage array
 c
       do k = 1, nvar
          do i = 1, ns
-            pwork(k,i+m) = 0.0d0
+            rwork(k,i+m) = 0.0d0
          end do
       end do
 c
@@ -1642,12 +1642,12 @@ c
          do j = 1, ns
             temp(j) = 0.0d0
             do k = 1, nvar
-               temp(j) = temp(j) + u(k)*phik(k,j+m)
+               temp(j) = temp(j) + u(k)*rhok(k,j+m)
             end do
          end do
          do j = 1, ns
             do k = 1, nvar
-               pwork(k,j+m) = pwork(k,j+m) + u(k)*temp(j)
+               rwork(k,j+m) = rwork(k,j+m) + u(k)*temp(j)
             end do
          end do
       end do
@@ -1661,7 +1661,7 @@ c     project locked vectors out of the current set
 c
       do k = 1, nvar
          do i = 1, ns
-            phik(k,i+m) = phik(k,i+m) - pwork(k,i+m)
+            rhok(k,i+m) = rhok(k,i+m) - rwork(k,i+m)
          end do
       end do
       if (nconv .gt. 0)  rewind (unit=ivb1)
@@ -1893,7 +1893,7 @@ c     coordinate sets representing motion along a vibrational
 c     normal mode
 c
 c
-      subroutine prtvib (ivib,p)
+      subroutine prtvib (ivib,r)
       use atoms
       use files
       implicit none
@@ -1902,7 +1902,7 @@ c
       integer lext,nview
       integer freeunit
       real*8 ratio
-      real*8 p(*)
+      real*8 r(*)
       real*8, allocatable :: xorig(:)
       real*8, allocatable :: yorig(:)
       real*8, allocatable :: zorig(:)
@@ -1940,9 +1940,9 @@ c
          ratio = dble(i) / dble(nview)
          do k = 1, n
             j = 3 * (k-1)
-            x(k) = xorig(k) + ratio*p(j+1)
-            y(k) = yorig(k) + ratio*p(j+2)
-            z(k) = zorig(k) + ratio*p(j+3)
+            x(k) = xorig(k) + ratio*r(j+1)
+            y(k) = yorig(k) + ratio*r(j+2)
+            z(k) = zorig(k) + ratio*r(j+3)
          end do
          call prtxyz (ixyz)
       end do

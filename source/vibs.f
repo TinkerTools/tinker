@@ -12,15 +12,15 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     phi        trial vectors for iterative vibrational analysis
-c     phik       alternate vectors for iterative vibrational analysis
-c     pwork      temporary work array for eigenvector transformation
+c     rho        trial vectors for iterative vibrational analysis
+c     rhok       alternate vectors for iterative vibrational analysis
+c     rwork      temporary work array for eigenvector transformation
 c
 c
       module vibs
       implicit none
-      real*8, allocatable :: phi(:,:)
-      real*8, allocatable :: phik(:,:)
-      real*8, allocatable :: pwork(:,:)
+      real*8, allocatable :: rho(:,:)
+      real*8, allocatable :: rhok(:,:)
+      real*8, allocatable :: rwork(:,:)
       save
       end

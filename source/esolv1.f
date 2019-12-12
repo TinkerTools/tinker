@@ -5122,9 +5122,9 @@ c
             end if
          end do
          sasa = acsurf * sasa
-         cutv = tanh(tslope*(sasa-toffset))
+         cutv = tanh(tgrad*(sasa-toffset))
          cutmtx(i) = 0.5d0 * (1.0d0+cutv)
-         dcutmtx(i) = 0.5d0 * tslope * (1.0d0-cutv*cutv)
+         dcutmtx(i) = 0.5d0 * tgrad * (1.0d0-cutv*cutv)
          do k = 1, n
             dacsa(k,ii) = 0.0d0
             if (i .ne. k) then
@@ -5191,24 +5191,24 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. hpmfcut2) then
                   r = sqrt(r2)
-                  arg1 = (r-c1) * w1
+                  arg1 = (r-hc1) * hw1
                   arg12 = arg1 * arg1
-                  arg2 = (r-c2) * w2
+                  arg2 = (r-hc2) * hw2
                   arg22 = arg2 * arg2
-                  arg3 = (r-c3) * w3
+                  arg3 = (r-hc3) * hw3
                   arg32 = arg3 * arg3
-                  e1 = h1 * exp(-arg12)
-                  e2 = h2 * exp(-arg22)
-                  e3 = h3 * exp(-arg32)
+                  e1 = hd1 * exp(-arg12)
+                  e2 = hd2 * exp(-arg22)
+                  e3 = hd3 * exp(-arg32)
                   sum = e1 + e2 + e3
                   e = sum * cutmtx(i) * cutmtx(k)
                   ehp = ehp + e
 c
 c     first part of hydrophobic PMF derivative calculation
 c
-                  de1 = -2.0d0 * e1 * arg1 * w1
-                  de2 = -2.0d0 * e2 * arg2 * w2
-                  de3 = -2.0d0 * e3 * arg3 * w3
+                  de1 = -2.0d0 * e1 * arg1 * hw1
+                  de2 = -2.0d0 * e2 * arg2 * hw2
+                  de3 = -2.0d0 * e3 * arg3 * hw3
                   dsum = (de1+de2+de3) * cutmtx(i) * cutmtx(k) / r
                   dedx = dsum * xr
                   dedy = dsum * yr

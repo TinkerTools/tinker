@@ -353,18 +353,18 @@ c
       if (allocated(ct))  deallocate (ct)
       if (allocated(cr))  deallocate (cr)
       if (allocated(c))  deallocate (c)
-      if (allocated(epc))  deallocate (epc)
-      if (allocated(epv))  deallocate (epv)
+      if (allocated(eqc))  deallocate (eqc)
+      if (allocated(eqv))  deallocate (eqv)
       if (allocated(afe))  deallocate (afe)
       if (allocated(ale))  deallocate (ale)
-      if (allocated(epnext))  deallocate (epnext)
+      if (allocated(eqnext))  deallocate (eqnext)
       if (allocated(fsen))  deallocate (fsen)
-      if (allocated(fsep))  deallocate (fsep)
-      if (allocated(cynep))  deallocate (cynep)
-      if (allocated(cyep))  deallocate (cyep)
-      if (allocated(fpa))  deallocate (fpa)
-      if (allocated(fpncy))  deallocate (fpncy)
-      if (allocated(fpcy))  deallocate (fpcy)
+      if (allocated(fseq))  deallocate (fseq)
+      if (allocated(cyneq))  deallocate (cyneq)
+      if (allocated(cyeq))  deallocate (cyeq)
+      if (allocated(fqa))  deallocate (fqa)
+      if (allocated(fqncy))  deallocate (fqncy)
+      if (allocated(fqcy))  deallocate (fqcy)
 c
 c     deallocation of global arrays from module fft
 c
@@ -925,9 +925,9 @@ c
 c
 c     deallocation of global arrays from module vibs
 c
-      if (allocated(phi))  deallocate (phi)
-      if (allocated(phik))  deallocate (phik)
-      if (allocated(pwork))  deallocate (pwork)
+      if (allocated(rho))  deallocate (rho)
+      if (allocated(rhok))  deallocate (rhok)
+      if (allocated(rwork))  deallocate (rwork)
 c
 c     deallocation of global arrays from module warp
 c
