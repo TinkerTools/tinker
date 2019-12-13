@@ -4174,15 +4174,10 @@ void openmm_init_ (void** ommHandle, double* dt) {
       exit (-1);
    }
 
-   // modification of context creation to avoid bug on large systems
-
-   //omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
-   //                                        platform);
-   OpenMM_PropertyArray* properties = OpenMM_PropertyArray_create ();
-   OpenMM_PropertyArray_add (properties, "DisablePmeStream", "true");
-   omm->context = OpenMM_Context_create_3 (omm->system, omm->integrator,
-                                           platform, properties);
-   OpenMM_PropertyArray_destroy (properties);
+   omm->context = OpenMM_Context_create_2 (omm->system, omm->integrator,
+                                           platform);
+   OpenMM_Platform_setPropertyValue (platform, omm->context,
+                                     "DisablePmeStream", "true");
 
    if (inform__.debug) {
       (void) fprintf (log, "\n OpenMMDataHandle:  %x\n", (void*)(omm));
@@ -4935,14 +4930,9 @@ int openmm_test_ (void) {
       exit (-1);
    }
 
-   // modification of context creation to avoid bug on large systems
-
-   //context = OpenMM_Context_create_2 (system, integrator, platform);
-   OpenMM_PropertyArray* properties = OpenMM_PropertyArray_create ();
-   OpenMM_PropertyArray_add (properties, "DisablePmeStream", "true");
-   context = OpenMM_Context_create_3 (system, integrator, platform,
-                                      properties);
-   OpenMM_PropertyArray_destroy (properties);
+   context = OpenMM_Context_create_2 (system, integrator, platform);
+   OpenMM_Platform_setPropertyValue (platform, context, "DisablePmeStream",
+                                     "true");
 
    OpenMM_Context_setPositions (context, initialPosInNm);
 

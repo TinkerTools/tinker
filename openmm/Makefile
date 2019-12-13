@@ -70,7 +70,7 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible, Nvidia GPU
-##  Compiler: GNU gfortran 6.3, g++, nvcc
+##  Compiler: GNU gfortran 8.3, g++, nvcc
 ##  Parallel: OpenMP, OpenMM
 
 #CC = gcc
