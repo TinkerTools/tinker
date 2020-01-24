@@ -1375,9 +1375,8 @@ c
 c
 c     set default values for solvent pressure and surface tension
 c
-c     solvprs = 0.0327d0
-      solvprs = 0.0335d0
-      surften = 0.080d0
+      solvprs = 0.0334d0
+      surften = 0.103d0
 c
 c     set default values for cavity and dispersion radius offsets
 c
@@ -1400,9 +1399,9 @@ c
       end do
 c
 c     set switching function values for pressure and tension
+c     cross = 9.251 = 3.0 * 0.103 / 0.0334
 c
-c     cross = 3.0d0 * surften / solvprs
-      cross = 9.0d0
+      cross = 3.0d0 * surften / solvprs
       spcut = cross - 3.5d0
       spoff = cross + 3.5d0
       stcut = cross + 3.9d0
