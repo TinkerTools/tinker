@@ -213,12 +213,27 @@ c
             do i = 1, size
                list(i) = 0
             end do
-            write (iout,140)
-  140       format (/,' Numbers of the Atoms to be Removed :  ',$)
-            read (input,150)  record
-  150       format (a240)
-            read (record,*,err=160,end=160)  (list(i),i=1,size)
-  160       continue
+            i = 1
+            query = .true.
+            call nextarg (string,exist)
+            if (exist) then
+               dowhile (i .le. size)
+                  read (string,*,err=140,end=140)  list(i)
+                  if (list(i) .eq. 0)  goto 140
+                  i = i + 1
+                  call nextarg (string,exist)
+               end do
+  140          continue
+               query = .false.
+            end if
+            if (query) then
+               write (iout,150)
+  150          format (/,' Numbers of the Atoms to be Removed :  ',$)
+               read (input,160)  record
+  160          format (a240)
+               read (record,*,err=170,end=170)  (list(i),i=1,size)
+  170          continue
+            end if
             i = 1
             do while (list(i) .ne. 0)
                list(i) = max(-n,min(n,list(i)))
@@ -282,22 +297,22 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=170,end=170)  start
+            read (string,*,err=180,end=180)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=170,end=170)  stop
+         if (exist)  read (string,*,err=180,end=180)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=170,end=170)  step
-  170    continue
+         if (exist)  read (string,*,err=180,end=180)  step
+  180    continue
          if (query) then
-            write (iout,180)
-  180       format (/,' Numbers of First & Last File and Step',
+            write (iout,190)
+  190       format (/,' Numbers of First & Last File and Step',
      &                 ' [<Enter>=Exit] :  ',$)
-            read (input,190)  record
-  190       format (a240)
-            read (record,*,err=200,end=200)  start,stop,step
-  200       continue
+            read (input,200)  record
+  200       format (a240)
+            read (record,*,err=210,end=210)  start,stop,step
+  210       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -318,7 +333,7 @@ c
                   lext = 3
                   call numeral (i,ext,lext)
                   call readxyz (iarc)
-                  if (abort)  goto 210
+                  if (abort)  goto 220
                   nuse = n
                   do j = 1, n
                      use(j) = .true.
@@ -341,7 +356,7 @@ c
                open (unit=ixyz,file=xyzfile,status='new')
                do while (i.ge.start .and. i.le.stop)
                   call readxyz (iarc)
-                  if (abort)  goto 210
+                  if (abort)  goto 220
                   if (modtyp .eq. 'FOLD') then
                      call unitcell
                      if (use_bounds) then
@@ -386,7 +401,7 @@ c
                end do
                close (unit=ixyz)
             end if
-  210       continue
+  220       continue
             now = stop
             start = 0
             stop = 0
@@ -394,22 +409,22 @@ c
             query = .true.
             call nextarg (string,exist)
             if (exist) then
-               read (string,*,err=220,end=220)  start
+               read (string,*,err=230,end=230)  start
                query = .false.
             end if
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=220,end=220)  stop
+            if (exist)  read (string,*,err=230,end=230)  stop
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=220,end=220)  step
-  220       continue
+            if (exist)  read (string,*,err=230,end=230)  step
+  230       continue
             if (query) then
-               write (iout,230)
-  230          format (/,' Numbers of First & Last File and Step',
+               write (iout,240)
+  240          format (/,' Numbers of First & Last File and Step',
      &                    ' [<Enter>=Exit] :  ',$)
-               read (input,240)  record
-  240          format (a240)
-               read (record,*,err=250,end=250)  start,stop,step
-  250          continue
+               read (input,250)  record
+  250          format (a240)
+               read (record,*,err=260,end=260)  start,stop,step
+  260          continue
             end if
             if (stop .eq. 0)  stop = start
             if (step .eq. 0)  step = 1
