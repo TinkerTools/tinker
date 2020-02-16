@@ -273,7 +273,7 @@ c
             j = link(i)
             call sort10 (nline(j),info(1,j))
             if (wiki) then
-               field = string(1:leng)
+               field(1:leng) = string(1:leng)
                do k = 1, nline(j)
                   leng = trimtext (info(k,j))
                   last = trimtext (field)
@@ -311,7 +311,7 @@ c
                   nunit = nunit + 1
                   leng = trimtext (record)
                   call upcase (record(11:next-1))
-                  string = record(11:next-1)
+                  string(1:next-11) = record(11:next-1)
                   start = 20
                   if (wiki)  start = trimtext(string) + 5
                   string(start:240) = record(next+8:leng-4)
