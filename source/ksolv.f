@@ -121,11 +121,11 @@ c
             rd = 0.0d0
             pbrd = 0.0d0
             call getnumb (record,k,next)
-            call gettext (record,keyword,next)
+c           call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=15,end=15)  rd, pbrd
+            read (string,*,err=15,end=15)  keyword, rd, pbrd
    15       continue
-            if (k.ge.1 .and. k.le.maxclass) then
+            if (k.ge.1 .and. k.le.maxtyp) then
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,20)
@@ -133,16 +133,23 @@ c
      &                       ' Parameters:',
      &                    //,5x,'Atom Type',10x,'Radius',/)
                end if
-               if (rd .lt. 0.0d0)  rd = 0.0d0
+c
+c              If there is no text descriptor, then read rd from keyword
+c
+               if (pbrd .le. 0.0d0) then
+                  pbrd = rd
+                  read (keyword,*,err=25,end=25) rd
+   25             continue
+               end if
                rd = 0.5 * rd
                pbrd = 0.5 * pbrd
                gkr(k) = rd
-               pbrclass(k) = pbrd
+               pbrtype(k) = pbrd
                if (.not. silent) then
                   write (iout,30)  k,rd,pbrd
    30             format (4x,i6,8x,f12.4,f12.4)
                end if
-            else if (k .gt. maxclass) then
+            else if (k .gt. maxtyp) then
                write (iout,40)  maxtyp
    40          format (/,' KSOLV  --  Only Atom Types Through',i4,
      &                    ' are Allowed')
@@ -1710,17 +1717,17 @@ c
       else if (radtyp .eq. 'SOLUTE') then
          if(solvtyp(1:2) .eq. 'GK') then     
             do i = 1, n
-               if (class(i) .ne. 0) then
-                  if (gkr(class(i)) .ne. 0.0d0) then
-                     rsolv(i) = gkr(class(i))
+               if (type(i) .ne. 0) then
+                  if (gkr(type(i)) .ne. 0.0d0) then
+                     rsolv(i) = gkr(type(i))
                   end if
                end if
             end do
         else if(solvtyp(1:2) .eq. 'PB') then
             do i = 1, n
-               if (class(i) .ne. 0) then
-                  if (pbrclass(class(i)) .ne. 0.0d0) then
-                     rsolv(i) = pbrclass(class(i))
+               if (type(i) .ne. 0) then
+                  if (pbrtype(type(i)) .ne. 0.0d0) then
+                     rsolv(i) = pbrtype(type(i))
                   end if
                end if
             end do

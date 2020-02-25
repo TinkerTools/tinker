@@ -94,7 +94,7 @@ c
       real*8 fgcent(3)
       real*8 ionr(maxion)
       real*8 ionc(maxion)
-      real*8 pbrclass(maxtyp)
+      real*8 pbrtype(maxtyp)
       real*8, allocatable :: apbe(:)
       real*8, allocatable :: pbr(:)
       real*8, allocatable :: pbep(:,:)

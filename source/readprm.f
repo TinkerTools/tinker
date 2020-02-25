@@ -989,12 +989,22 @@ c
             call getnumb (record,ia,next)
             call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=325,end=325)  rd,pbrd
+            read (string,*,err=325,end=325) rd,pbrd
   325       continue
-            write(*,*) ia," ",rd," ",pbrd
             if (ia .ne. 0) then
+c 
+c              If there is no text descriptor, then read rd from keyword
+c
+               if (pbrd .le. 0.0d0) then
+                  pbrd = rd
+                  read (keyword,*,err=326,end=326) rd
+  326             continue
+                  write(*,*) "SOLUTE",ia," ",rd," ",pbrd
+               else
+                  write(*,*) "SOLUTE",ia," ",keyword," ",rd," ",pbrd
+               end if
                gkr(ia) = rd * 0.5
-               pbrclass(ia) = pbrd * 0.5
+               pbrtype(ia) = pbrd * 0.5
             end if
 c
 c     van der Waals 1-4 parameters for individual atom types
