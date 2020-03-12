@@ -121,7 +121,7 @@ c
       mode = 'REPULS'
       call switch (mode)
 c
-c     calculate the multipole interaction energy term
+c     calculate the Pauli repulsion interaction energy term
 c
       do ii = 1, npole-1
          i = ipole(ii)
@@ -535,7 +535,7 @@ c
 !$OMP& shared (er)
 !$OMP DO reduction(+:er) schedule(guided)
 c
-c     compute the real space portion of the Ewald summation
+c     calculate the Pauli repulsion interaction energy term
 c
       do ii = 1, npole
          i = ipole(ii)

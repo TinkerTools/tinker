@@ -159,7 +159,7 @@ c
       mode = 'REPULS'
       call switch (mode)
 c
-c     calculate the multipole energy and derivatives
+c     calculate the Pauli repulsion energy and derivatives
 c
       do ii = 1, npole-1
          i = ipole(ii)
@@ -1005,7 +1005,7 @@ c
 !$OMP& firstprivate(rscale) shared (er,der,ter,vir)
 !$OMP DO reduction(+:er,der,ter,vir) schedule(guided)
 c
-c     compute the real space portion of the Ewald summation
+c     calculate the Pauli repulsion energy and derivatives
 c
       do ii = 1, npole
          i = ipole(ii)
