@@ -340,6 +340,7 @@ c
       electric = coulomb
       dielec = 1.0d0
       ebuffer = 0.0d0
+      c1scale = 0.0d0
       c2scale = 0.0d0
       c3scale = 0.0d0
       c4scale = 1.0d0

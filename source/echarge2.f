@@ -118,6 +118,7 @@ c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
       end do
+      cscale(in) = c1scale
       do j = 1, n12(in)
          cscale(i12(j,in)) = c2scale
       end do
@@ -433,6 +434,7 @@ c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
       end do
+      cscale(in) = c1scale
       do j = 1, n12(in)
          cscale(i12(j,in)) = c2scale
       end do
@@ -857,6 +859,7 @@ c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
       end do
+      cscale(in) = c1scale
       do j = 1, n12(in)
          cscale(i12(j,in)) = c2scale
       end do
@@ -1101,6 +1104,7 @@ c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
       end do
+      cscale(in) = c1scale
       do j = 1, n12(in)
          cscale(i12(j,in)) = c2scale
       end do
@@ -1269,6 +1273,7 @@ c
       do j = 1, nion
          cscale(iion(j)) = 1.0d0
       end do
+      cscale(in) = c1scale
       do j = 1, n12(in)
          cscale(i12(j,in)) = c2scale
       end do

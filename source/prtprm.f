@@ -943,10 +943,11 @@ c
 c
 c     atomic partial charge scaling parameters
 c
-         write (itxt,1250)  c2scale,c3scale,c4scale,c5scale
+         write (itxt,1250)  c1scale,c2scale,c3scale,c4scale,c5scale
  1250    format (//,15x,'Atomic Partial Charge Scaling Factors',
-     &           ///,20x,'1-2 Atoms',f17.3,/,20x,'1-3 Atoms',f17.3,
-     &           /,20x,'1-4 Atoms',f17.3,/,20x,'1-5 Atoms',f17.3)
+     &           ///,20x,'1-1 Atoms',f17.3,/,20x,'1-2 Atoms',f17.3,
+     &           /,20x,'1-3 Atoms',f17.3,/,20x,'1-4 Atoms',f17.3,
+     &           /,20x,'1-5 Atoms',f17.3)
       end if
 c
 c     bond dipole moment parameters

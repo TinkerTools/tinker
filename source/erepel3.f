@@ -618,10 +618,6 @@ c
       mode = 'REPULS'
       call switch (mode)
 c
-c
-      write (*,99)  npole
-   99 format (' Got to Here :  ',i8)
-c
 c     print header information if debug output was requested
 c
       header = .true.

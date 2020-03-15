@@ -363,6 +363,9 @@ c
          read (string,*,err=10,end=10)  dielec
       else if (keyword(1:11) .eq. 'CHG-BUFFER ') then
          read (string,*,err=10,end=10)  ebuffer
+      else if (keyword(1:13) .eq. 'CHG-11-SCALE ') then
+         read (string,*,err=10,end=10)  c1scale
+         if (c1scale .gt. 1.0d0)  c1scale = 1.0d0 / c1scale
       else if (keyword(1:13) .eq. 'CHG-12-SCALE ') then
          read (string,*,err=10,end=10)  c2scale
          if (c2scale .gt. 1.0d0)  c2scale = 1.0d0 / c2scale
