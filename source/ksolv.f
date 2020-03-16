@@ -1411,8 +1411,12 @@ c
       cross = 3.0d0 * surften / solvprs
       spcut = cross - 3.5d0
       spoff = cross + 3.5d0
-      stcut = cross + 3.9d0
-      stoff = cross - 3.5d0
+c
+c     The SASA term is switched on 0.2 Angtroms after 
+c     the cross-over point to give a smooth transition
+c
+      stcut = cross + 3.5d0 + 0.2d0
+      stoff = cross - 3.5d0 + 0.2d0
 c
 c     perform dynamic allocation of some global arrays
 c

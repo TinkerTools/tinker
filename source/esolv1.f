@@ -4637,7 +4637,7 @@ c
          end do
       end if
 c
-c     find cavity energy from only the solvent excluded volume
+c     include cavity energy from a full SEV term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -4647,9 +4647,9 @@ c
             des(3,i) = des(3,i) + dvol(3,i)
          end do
 c
-c     find cavity energy from only a tapered volume term
+c     include cavity energy from a tapered SEV term
 c
-      else if (reff.gt.spcut .and. reff.le.stoff) then
+      else if (reff .le. spoff) then
          mode = 'GKV'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -4665,25 +4665,21 @@ c
             des(3,i) = des(3,i) + taper*dvol(3,i)
      &                    + evol*dtaper*dsurf(3,i)
          end do
+      end if
 c
-c     find cavity energy using both volume and SASA terms
+c     include a full SASA term
 c
-      else if (reff.gt.stoff .and. reff.le.spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                +2.0d0*c2*reff+c1) * dreff
-         ecav = evol * taper
+      if (reff .gt. stcut) then
+         ecav = ecav + esurf
          do i = 1, n
-            des(1,i) = des(1,i) + taper*dvol(1,i)
-     &                    + evol*dtaper*dsurf(1,i)
-            des(2,i) = des(2,i) + taper*dvol(2,i)
-     &                    + evol*dtaper*dsurf(2,i)
-            des(3,i) = des(3,i) + taper*dvol(3,i)
-     &                    + evol*dtaper*dsurf(3,i)
+            des(1,i) = des(1,i) + dsurf(1,i)
+            des(2,i) = des(2,i) + dsurf(2,i)
+            des(3,i) = des(3,i) + dsurf(3,i)
          end do
+c
+c     include cavity energy from a tapered SASA term
+c
+      else if (reff .gt. stoff) then
          mode = 'GKSA'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -4697,34 +4693,6 @@ c
             des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
             des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
             des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
-         end do
-c
-c     find cavity energy from only a tapered SASA term
-c
-      else if (reff.gt.spoff .and. reff.le.stcut) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                +2.0d0*c2*reff+c1) * dreff
-         dtaper = -dtaper
-         ecav = taper * esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
-            des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
-            des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
-         end do
-c
-c     find cavity energy from only a SASA-based term
-c
-      else
-         ecav = esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + dsurf(1,i)
-            des(2,i) = des(2,i) + dsurf(2,i)
-            des(3,i) = des(3,i) + dsurf(3,i)
          end do
       end if
 c

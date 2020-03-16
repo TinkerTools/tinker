@@ -1542,7 +1542,7 @@ c
          aevol = evol / dble(n)
       end if
 c
-c     find cavity energy from only the solvent excluded volume
+c     include the full SEV term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -1550,9 +1550,9 @@ c
             aecav(i) = aevol
          end do
 c
-c     find cavity energy from only a tapered volume term
+c     include a tapered SEV term
 c
-      else if (reff.gt.spcut .and. reff.le.stoff) then
+      else if (reff .le. spoff) then
          mode = 'GKV'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -1561,15 +1561,19 @@ c
          do i = 1, n
             aecav(i) = taper * aevol
          end do
+      end if
 c
-c     find cavity energy using both volume and SASA terms
+c     include a full SASA term
 c
-      else if (reff .gt. stoff .and. reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
+      if (reff .gt. stcut) then
+         ecav = esurf
+         do i = 1, n
+            aecav(i) = aesurf(i)
+         end do
+c
+c     include a tapered SASA term
+c
+      else if (reff .gt. stoff) then
          mode = 'GKSA'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -1578,27 +1582,6 @@ c
          ecav = ecav + taper*esurf
          do i = 1, n
             aecav(i) = taper * (aevol+aesurf(i))
-         end do
-c
-c     find cavity energy from only a tapered SASA term
-c
-      else if (reff.gt.spoff .and. reff.le.stcut) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = taper * esurf
-         do i = 1, n
-            aecav(i) = taper * aesurf(i)
-         end do
-c
-c     find cavity energy from only a SASA-based term
-c
-      else
-         ecav = esurf
-         do i = 1, n
-            aecav(i) = aesurf(i)
          end do
       end if
 c

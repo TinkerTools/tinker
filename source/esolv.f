@@ -1400,49 +1400,35 @@ c
          evol = evol * solvprs
       end if
 c
-c     find cavity energy from only the solvent excluded volume
+c     include full solvent excluded volume
 c
       if (reff .le. spcut) then
          ecav = evol
 c
-c     find cavity energy from only a tapered volume term
+c     include a tapered volume term
 c
-      else if (reff.gt.spcut .and. reff.le.stoff) then
+      else if (reff .le. spoff) then
          mode = 'GKV'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
          ecav = evol * taper
+      end if
 c
-c     find cavity energy using both volume and SASA terms
+c     include a full SASA-based term
 c
-      else if (reff.gt.stoff .and. reff.le.spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
+      if (reff .gt. stcut) then
+         ecav = esurf
+c
+c     include a tapered SASA term
+c
+      else if (reff .gt. stoff) then
          mode = 'GKSA'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
      &              + c2*reff2 + c1*reff + c0
          taper = 1.0d0 - taper
          ecav = ecav + taper*esurf
-c
-c     find cavity energy from only a tapered SASA term
-c
-      else if (reff.gt.spoff .and. reff.le.stcut) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = taper * esurf
-c
-c     find cavity energy from only a SASA-based term
-c
-      else
-         ecav = esurf
       end if
 c
 c     perform deallocation of some local arrays
