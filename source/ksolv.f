@@ -1446,8 +1446,8 @@ c     compute maximum dispersion energies for each atom
 c
       do i = 1, n
          epsi = eps(class(i))
-         if (rdisp(i).gt.0.0d0 .and. epsi.gt.0.0d0) then
-            rmini = rad(class(i))
+         rmini = rad(class(i))
+         if (rmini.gt.0.0d0 .and. epsi.gt.0.0d0) then
             emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
             rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
             rmixo3 = rmixo**3
@@ -1458,7 +1458,10 @@ c
             rmixh3 = rmixh**3
             rmixh7 = rmixh**7
             ah = emixh * rmixh7
-            ri = rdisp(i) + dispoff
+c
+c           Max dipsersion for atom i with water hydrogen
+c
+            ri = rmixh / 2.0d0 + dispoff
             ri3 = ri**3
             ri7 = ri**7
             ri11 = ri**11
@@ -1470,6 +1473,13 @@ c
                cdisp(i) = cdisp(i) / (11.0d0*ri11)
             end if
             cdisp(i) = 2.0d0 * cdisp(i)
+c
+c           Add max dipsersion for atom i with water oxygen
+c
+            ri = rmixo / 2.0d0 + dispoff
+            ri3 = ri**3
+            ri7 = ri**7
+            ri11 = ri**11
             if (ri .lt. rmixo) then
                cdisp(i) = cdisp(i) - 4.0d0*pi*emixo*(rmixo3-ri3)/3.0d0
                cdisp(i) = cdisp(i) - emixo*18.0d0/11.0d0*rmixo3*pi

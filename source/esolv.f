@@ -1472,7 +1472,7 @@ c
       real*8 xr,yr,zr,r,r2
       real*8 sum,term,shctd
       real*8 iwca,irep,offset
-      real*8 epsi,rmini,ri,rmax
+      real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
       real*8 lik,lik2,lik3,lik4
@@ -1489,14 +1489,11 @@ c     set overlap scale factor for HCT descreening method
 c
       shctd = 0.81d0
       offset = 0.0d0
-      do i = 1, n
-         rdisp(i) = rad(class(i))
-      end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,shctd,cdisp)
 !$OMP& shared(edisp)
 !$OMP DO reduction(+:edisp) schedule(guided)
 c
@@ -1516,7 +1513,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ri = rdisp(i) + dispoff
+         rio = rmixo / 2.0d0 + dispoff
+         rih = rmixh / 2.0d0 + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -1528,17 +1526,19 @@ c
                zr = z(k) - zi
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
-               rk = rdisp(k)
-c              sk = rk * shct(k)
+               rk = rad(class(k))
                sk = rk * shctd
                sk2 = sk * sk
-               if (ri .lt. r+sk) then
-                  rmax = max(ri,r-sk)
+c
+c              Atom i with water oxygen
+c
+               if (rio .lt. r+sk) then
+                  rmax = max(rio,r-sk)
                   lik = rmax
-                  lik2 = lik * lik
-                  lik3 = lik2 * lik
-                  lik4 = lik3 * lik
                   if (lik .lt. rmixo) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixo)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -1549,26 +1549,15 @@ c              sk = rk * shct(k)
                      iwca = -emixo * term
                      sum = sum + iwca
                   end if
-                  if (lik .lt. rmixh) then
-                     uik = min(r+sk,rmixh)
+                  uik = r + sk
+                  if (uik .gt. rmixo) then
                      uik2 = uik * uik
                      uik3 = uik2 * uik
                      uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -2.0d0 * emixh * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  uik2 = uik * uik
-                  uik3 = uik2 * uik
-                  uik4 = uik3 * uik
-                  uik5 = uik4 * uik
-                  uik10 = uik5 * uik5
-                  uik11 = uik10 * uik
-                  uik12 = uik11 * uik
-                  if (uik .gt. rmixo) then
+                     uik5 = uik4 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
                      lik = max(rmax,rmixo)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -1589,7 +1578,36 @@ c              sk = rk * shct(k)
                      irep = ao * rmixo7 * term
                      sum = sum + irep + idisp
                   end if
+               end if
+c
+c              Atom i with water hydrogen
+c
+               if (rih .lt. r+sk) then
+                  rmax = max(rih,r-sk)
+                  lik = rmax
+                  if (lik .lt. rmixh) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
+                     uik = min(r+sk,rmixh)
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     term = 4.0d0 * pi / (48.0d0*r)
+     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
+     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
+                     iwca = -2.0d0 * emixh * term
+                     sum = sum + iwca
+                  end if
+                  uik = r + sk
                   if (uik .gt. rmixh) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
                      lik = max(rmax,rmixh)
                      lik2 = lik * lik
                      lik3 = lik2 * lik

@@ -4738,7 +4738,7 @@ c
       real*8 r,r2,r3
       real*8 sum,term,shctd
       real*8 iwca,irep,offset
-      real*8 epsi,rmini,ri,rmax
+      real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
       real*8 lik,lik2,lik3,lik4
@@ -4758,15 +4758,11 @@ c
 c     set overlap scale factor for HCT descreening method
 c
       shctd = 0.81d0
-      offset = 0.0d0
-      do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
-      end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,shctd,cdisp)
 !$OMP& shared(edisp,des)
 !$OMP DO reduction(+:edisp,des) schedule(guided)
 c
@@ -4783,7 +4779,8 @@ c
          rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
          rmixh7 = rmixh**7
          ah = emixh * rmixh7
-         ri = rdisp(i) + dispoff
+         rio = rmixo / 2.0d0 + dispoff
+         rih = rmixh / 2.0d0 + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -4799,18 +4796,17 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
                r3 = r * r2
-               rk = rdisp(k)
-c              sk = rk * shct(k)
+               rk = rad(class(k))
                sk = rk * shctd
                sk2 = sk * sk
-               if (ri .lt. r+sk) then
-                  de = 0.0d0
-                  rmax = max(ri,r-sk)
+               de = 0.0d0
+               if (rio .lt. r+sk) then
+                  rmax = max(rio,r-sk)
                   lik = rmax
-                  lik2 = lik * lik
-                  lik3 = lik2 * lik
-                  lik4 = lik3 * lik
                   if (lik .lt. rmixo) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixo)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -4818,7 +4814,7 @@ c              sk = rk * shct(k)
                      term = 4.0d0 * pi / (48.0d0*r)
      &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
      &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (ri .gt. r-sk) then
+                     if (rio .gt. r-sk) then
                         dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
                         dl = dl * lik2
                      else
@@ -4838,7 +4834,71 @@ c              sk = rk * shct(k)
                      de = de - emixo*pi*(dl+du)/(4.0d0*r2)
                      sum = sum + iwca
                   end if
+                  uik = r + sk
+                  if (uik .gt. rmixo) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik6 = uik5 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
+                     uik13 = uik12 * uik
+                     lik = max(rmax,rmixo)
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
+                     lik5 = lik4 * lik
+                     lik6 = lik5 * lik
+                     lik10 = lik5 * lik5
+                     lik11 = lik10 * lik
+                     lik12 = lik11 * lik
+                     lik13 = lik12 * lik
+                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
+     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
+     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
+     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
+                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
+                        dl = -dl / lik5
+                     else
+                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
+     &                          + 15.0d0*(lik2*r+r3-r*sk2)
+                        dl = dl / lik6
+                     end if
+                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
+     &                       + 15.0d0*(uik2*r+r3-r*sk2)
+                     du = -du / uik6
+                     idisp = -2.0d0 * ao * term
+                     de = de -2.0d0*ao*pi*(dl + du)/(15.0d0*r2)
+                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
+     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
+     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
+     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
+                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
+                        dl = -dl / lik12
+                     else
+                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
+     &                          + 60.0d0*(lik2*r+r3-r*sk2)
+                        dl = dl / lik13
+                     end if
+                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
+     &                       + 60.0d0*(uik2*r+r3-r*sk2)
+                     du = -du / uik13
+                     irep = ao * rmixo7 * term
+                     de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
+                     sum = sum + irep + idisp
+                  end if
+               end if
+               if (rih .lt. r+sk) then
+                  rmax = max(rih,r-sk)
+                  lik = rmax
                   if (lik .lt. rmixh) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixh)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -4846,7 +4906,7 @@ c              sk = rk * shct(k)
                      term = 4.0d0 * pi / (48.0d0*r)
      &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
      &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (ri .gt. r-sk) then
+                     if (rih .gt. r-sk) then
                         dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
                         dl = dl * lik2
                      else
@@ -4867,63 +4927,16 @@ c              sk = rk * shct(k)
                      sum = sum + iwca
                   end if
                   uik = r + sk
-                  uik2 = uik * uik
-                  uik3 = uik2 * uik
-                  uik4 = uik3 * uik
-                  uik5 = uik4 * uik
-                  uik6 = uik5 * uik
-                  uik10 = uik5 * uik5
-                  uik11 = uik10 * uik
-                  uik12 = uik11 * uik
-                  uik13 = uik12 * uik
-                  if (uik .gt. rmixo) then
-                     lik = max(rmax,rmixo)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik6 = lik5 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     lik13 = lik12 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
-                        dl = -dl / lik5
-                     else
-                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
-     &                          + 15.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik6
-                     end if
-                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
-     &                       + 15.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik6
-                     idisp = -2.0d0 * ao * term
-                     de = de -2.0d0*ao*pi*(dl + du)/(15.0d0*r2)
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
-                        dl = -dl / lik12
-                     else
-                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
-     &                          + 60.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik13
-                     end if
-                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
-     &                       + 60.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik13
-                     irep = ao * rmixo7 * term
-                     de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
-                     sum = sum + irep + idisp
-                  end if
                   if (uik .gt. rmixh) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik6 = uik5 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
+                     uik13 = uik12 * uik
                      lik = max(rmax,rmixh)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -4938,7 +4951,7 @@ c              sk = rk * shct(k)
      &                      * (15.0d0*uik*lik*r*(uik4-lik4)
      &                         - 10.0d0*uik2*lik2*(uik3-lik3)
      &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixh) then
+                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
                         dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
                         dl = -dl / lik5
                      else
@@ -4955,7 +4968,7 @@ c              sk = rk * shct(k)
      &                      * (120.0d0*uik*lik*r*(uik11-lik11)
      &                         - 66.0d0*uik2*lik2*(uik10-lik10)
      &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixh) then
+                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
                         dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
                         dl = -dl / lik12
                      else
@@ -4970,20 +4983,20 @@ c              sk = rk * shct(k)
                      de = de + ah*rmixh7*pi*(dl+du)/(30.0d0*r2)
                      sum = sum + irep + idisp
                   end if
+               end if
 c
 c     increment the individual dispersion gradient components
 c
-                  de = -de/r * slevy * awater
-                  dedx = de * xr
-                  dedy = de * yr
-                  dedz = de * zr
-                  des(1,i) = des(1,i) + dedx
-                  des(2,i) = des(2,i) + dedy
-                  des(3,i) = des(3,i) + dedz
-                  des(1,k) = des(1,k) - dedx
-                  des(2,k) = des(2,k) - dedy
-                  des(3,k) = des(3,k) - dedz
-               end if
+               de = -de/r * slevy * awater
+               dedx = de * xr
+               dedy = de * yr
+               dedz = de * zr
+               des(1,i) = des(1,i) + dedx
+               des(2,i) = des(2,i) + dedy
+               des(3,i) = des(3,i) + dedz
+               des(1,k) = des(1,k) - dedx
+               des(2,k) = des(2,k) - dedy
+               des(3,k) = des(3,k) - dedz
             end if
          end do
 c
