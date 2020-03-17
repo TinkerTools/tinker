@@ -1626,8 +1626,8 @@ c
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
-      real*8 sum,term,shctd
-      real*8 iwca,irep,offset
+      real*8 sum,term
+      real*8 iwca,irep
       real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
@@ -1648,10 +1648,8 @@ c
 c
 c     set overlap scale factor for HCT descreening method
 c
-      shctd = 0.81d0
-      offset = 0.0d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
+         rdisp(i) = rad(class(i))
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -1667,7 +1665,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,cdisp)
 !$OMP& shared(edisp,aedispo)
 !$OMP DO reduction(+:edisp,aedispo) schedule(guided)
 c
@@ -1892,19 +1890,19 @@ c
 c
 c     set parameters for high accuracy numerical shells
 c
-c     tinit = 0.2d0
-c     rinit = 1.0d0
-c     rmult = 1.5d0
-c     rswitch = 7.0d0
-c     rmax = 12.0d0
+      tinit = 0.2d0
+      rinit = 1.0d0
+      rmult = 1.5d0
+      rswitch = 7.0d0
+      rmax = 12.0d0
 c
 c     set parameters for medium accuracy numerical shells
 c
-      tinit = 1.0d0
-      rinit = 1.0d0
-      rmult = 2.0d0
-      rswitch = 5.0d0
-      rmax = 9.0d0
+c     tinit = 1.0d0
+c     rinit = 1.0d0
+c     rmult = 2.0d0
+c     rswitch = 5.0d0
+c     rmax = 9.0d0
 c
 c     set parameters for low accuracy numerical shells
 c
@@ -1920,8 +1918,8 @@ c
 c
 c     set parameters for atomic radii and probe radii
 c
-      delta = 0.55d0
-      offset = 0.27d0
+      delta = 0.00d0
+      offset = 0.00d0
       do i = 1, n
          rdisp(i) = rad(class(i)) + offset
          roff(i) = rdisp(i) + delta
@@ -1950,7 +1948,7 @@ c
 c
 c     alter radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i)
+         roff(i) = rminhi / 2.0 + dispoff
          do j = 1, n12(i)
             k = i12(j,i)
             roff(k) = rdisp(k)
@@ -1980,21 +1978,23 @@ c
             roff(i) = 0.5d0 * (inner+outer)
             call surfatom (i,area,roff)
             fraction = area / (4.0d0*pi*roff(i)**2)
-            if (outer .lt. rminoi) then
-               shell = (outer**3-inner**3)/3.0d0
-               e = e - epsoi*fraction*shell
-            else if (inner .gt. rminoi) then
-               shell = (1.0d0/(inner**4)-1.0d0/(outer**4)) / 4.0d0
-               e = e - 2.0d0*oer7*fraction*shell
-               shell = (1.0d0/(inner**11)-1.0d0/(outer**11)) / 11.0d0
-               e = e + oer14*fraction*shell
-            else
-               shell = (rminoi**3-inner**3)/3.0d0
-               e = e - epsoi*fraction*shell
-               shell = (1.0d0/(rminoi**4)-1.0d0/(outer**4)) / 4.0d0
-               e = e - 2.0d0*oer7*fraction*shell
-               shell = (1.0d0/(rminoi**11)-1.0d0/(outer**11)) / 11.0d0
-               e = e + oer14*fraction*shell
+            if (roff(i) .gt. rminoi / 2.0 + dispoff) then
+               if (outer .lt. rminoi) then
+                  shell = (outer**3-inner**3)/3.0d0
+                  e = e - epsoi*fraction*shell
+               else if (inner .gt. rminoi) then
+                  shell = (1.0d0/(inner**4)-1.0d0/(outer**4))/4.0d0
+                  e = e - 2.0d0*oer7*fraction*shell
+                  shell = (1.0d0/(inner**11)-1.0d0/(outer**11))/11.0d0
+                  e = e + oer14*fraction*shell
+               else
+                  shell = (rminoi**3-inner**3)/3.0d0
+                  e = e - epsoi*fraction*shell
+                  shell = (1.0d0/(rminoi**4)-1.0d0/(outer**4))/4.0d0
+                  e = e - 2.0d0*oer7*fraction*shell
+                  shell = (1.0d0/(rminoi**11)-1.0d0/(outer**11))/11.0d0
+                  e = e + oer14*fraction*shell
+               end if
             end if
             if (outer .lt. rminhi) then
                shell = (outer**3-inner**3)/3.0d0

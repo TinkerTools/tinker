@@ -4736,8 +4736,8 @@ c
       real*8 rk,sk,sk2
       real*8 xr,yr,zr
       real*8 r,r2,r3
-      real*8 sum,term,shctd
-      real*8 iwca,irep,offset
+      real*8 sum,term
+      real*8 iwca,irep
       real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
@@ -4755,14 +4755,10 @@ c     zero out the Weeks-Chandler-Andersen dispersion energy
 c
       edisp = 0.0d0
 c
-c     set overlap scale factor for HCT descreening method
-c
-      shctd = 0.81d0
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,cdisp)
 !$OMP& shared(edisp,des)
 !$OMP DO reduction(+:edisp,des) schedule(guided)
 c
