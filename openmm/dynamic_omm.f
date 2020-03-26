@@ -381,13 +381,13 @@ c
       if (elapsed .ne. 0.0d0)  speed = 86.4d0 * nstep * dt / elapsed
       write (iout,460)  speed,elapsed,nstep,updateCalls,
      &                  1000.0d0*dt,n,nthread
-  460 format (/,' Performance:  ns/day',9x,f12.4,
-     &        /,15x,'Wall Time',6x,f12.4,
-     &        /,15x,'Steps',14x,i8,
-     &        /,15x,'Updates',12x,i8,
-     &        /,15x,'Time Step',6x,f12.4,
-     &        /,15x,'Atoms',14x,i8,
-     &        /,15x,'Threads',12x,i8)
+  460 format (/,' Performance:  ns/day',9x,f14.4,
+     &        /,15x,'Wall Time',6x,f14.4,
+     &        /,15x,'Steps',14x,i10,
+     &        /,15x,'Updates',12x,i10,
+     &        /,15x,'Time Step',6x,f14.4,
+     &        /,15x,'Atoms',14x,i10,
+     &        /,15x,'Threads',12x,i10)
 c
 c     perform any final tasks before program exit
 c
