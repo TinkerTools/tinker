@@ -228,10 +228,12 @@ c
       use iounit
       use mpole
       implicit none
-      integer i,j,k,m,kb
+      integer i,j,k,m
       integer ia,ib,ic,id
-      integer kab,kac,kad
-      integer kbc,kbd,kcd
+      integer ki,mabc
+      integer ka,kb,kc,kd
+      integer mab,mac,mad
+      integer mbc,mbd,mcd
       integer priority
       logical exist,query
       logical change
@@ -268,97 +270,144 @@ c
 c     assign the local frame definition for a monovalent atom
 c
          else if (j .eq. 1) then
+            polaxe(i) = 'Z-Only'
+            zaxis(i) = ia
+            xaxis(i) = 0
+            yaxis(i) = 0
             ia = i12(1,i)
-            if (n12(ia) .eq. 1) then
-               polaxe(i) = 'Z-Only'
-               zaxis(i) = ia
-               xaxis(i) = 0
-               yaxis(i) = 0
-            else
-               polaxe(i) = 'Z-then-X'
-               zaxis(i) = ia
-               m = 0
-               do k = 1, n12(ia)
-                  ib = i12(k,ia)
-                  kb = atomic(ib)
-                  if (kb.gt.m .and. ib.ne.i) then
-                     xaxis(i) = ib
-                     m = kb
-                  end if
-               end do
-               yaxis(i) = 0
+            if (n12(ia) .ne. 1) then
+               call frame13 (i,ia)
             end if
 c
 c     assign the local frame definition for a divalent atom
 c
          else if (j .eq. 2) then
+            ki = atomic(i)
             ia = i12(1,i)
             ib = i12(2,i)
-            kab = priority (i,ia,ib)
-            if (kab .eq. ia) then
+            yaxis(i) = 0
+            m = priority (i,ia,ib,0)
+            if (ki .eq. 6) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = m
+               if (m .eq. 0)  zaxis(i) = ia
+               xaxis(i) = 0
+            else if (m .eq. ia) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
-               yaxis(i) = 0
-            else if (kab .eq. ib) then
+            else if (m .eq. ib) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
                xaxis(i) = ia
-               yaxis(i) = 0
             else
                polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = 0
+               zaxis(i) = -ia
+               xaxis(i) = -ib
             end if
 c
 c     assign the local frame definition for a trivalent atom
 c
          else if (j .eq. 3) then
+            ki = atomic(i)
             ia = i12(1,i)
             ib = i12(2,i)
             ic = i12(3,i)
-            kab = priority (i,ia,ib)
-            kac = priority (i,ia,ic)
-            kbc = priority (i,ib,ic)
-            if (kab.eq.0 .and. kac.eq.0) then
-               polaxe(i) = 'Z-then-X'
-               zaxis(i) = ia
-               xaxis(i) = ib
+            mabc = priority (i,ia,ib,ic)
+            mab = priority (i,ia,ib,0)
+            mac = priority (i,ia,ic,0)
+            mbc = priority (i,ib,ic,0)
+            if (mabc .eq. 0) then
+               polaxe(i) = 'None'
+               zaxis(i) = 0
+               xaxis(i) = 0
                yaxis(i) = 0
-            else if (kab.eq.ia .and. kac.eq.ia) then
-               polaxe(i) = 'Z-then-X'
+               if (ki.eq.7 .or. ki.eq.8) then
+c                 polaxe(i) = '3-Fold'
+c                 zaxis(i) = -ia
+c                 xaxis(i) = -ib
+c                 yaxis(i) = -ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = '3-Fold'
+                  zaxis(i) = -ia
+                  xaxis(i) = -ib
+                  yaxis(i) = -ic
+               end if
+            else if (mabc .eq. ia) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ia
-               xaxis(i) = ib
-               if (kbc .eq. ic)  xaxis(i) = ic
+               xaxis(i) = 0
                yaxis(i) = 0
-            else if (kab.eq.ib .and. kbc.eq.ib) then
-               polaxe(i) = 'Z-then-X'
+               if (mbc .eq. ib) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
+               else if (mbc .eq. ic) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ic
+c              else if (ki .eq. 6) then
+c                 polaxe(i) = 'Z-then-X'
+c                 xaxis(i) = ib
+c              else if (ki.eq.7 .or. ki.eq.8) then
+c                 polaxe(i) = 'Z-Bisect'
+c                 xaxis(i) = -ib
+c                 yaxis(i) = -ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = -ib
+                  yaxis(i) = -ic
+               else
+                  call frame13 (i,ia)
+               end if
+            else if (mabc .eq. ib) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ib
-               xaxis(i) = ia
-               if (kac .eq. ic)  xaxis(i) = ic
+               xaxis(i) = 0
                yaxis(i) = 0
-            else if (kac.eq.ic .and. kbc.eq.ic) then
-               polaxe(i) = 'Z-then-X'
+               if (mac .eq. ia) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
+               else if (mac .eq. ic) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ic
+c              else if (ki .eq. 6) then
+c                 polaxe(i) = 'Z-then-X'
+c                 xaxis(i) = ib
+c              else if (ki.eq.7 .or. ki.eq.8) then
+c                 polaxe(i) = 'Z-Bisect'
+c                 xaxis(i) = -ia
+c                 yaxis(i) = -ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = -ia
+                  yaxis(i) = -ic
+               else
+                  call frame13 (i,ib)
+               end if
+            else if (mabc .eq. ic) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ic
-               xaxis(i) = ia
-               if (kab .eq. ib)  xaxis(i) = ib
+               xaxis(i) = 0
                yaxis(i) = 0
-            else if (kab .eq. 0) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = 0
-            else if (kac .eq. 0) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kbc .eq. 0) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = 0
+               if (mab .eq. ia) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
+               else if (mab .eq. ib) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
+c              else if (ki .eq. 6) then
+c                 polaxe(i) = 'Z-then-X'
+c                 xaxis(i) = ib
+c              else if (ki.eq.7 .or. ki.eq.8) then
+c                 polaxe(i) = 'Z-Bisect'
+c                 xaxis(i) = -ia
+c                 yaxis(i) = -ib
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = -ia
+                  yaxis(i) = -ib
+               else
+                  call frame13 (i,ic)
+               end if
             end if
 c
 c     assign the local frame definition for a tetravalent atom
@@ -368,99 +417,111 @@ c
             ib = i12(2,i)
             ic = i12(3,i)
             id = i12(4,i)
-            kab = priority (i,ia,ib)
-            kac = priority (i,ia,ic)
-            kad = priority (i,ia,id)
-            kbc = priority (i,ib,ic)
-            kbd = priority (i,ib,id)
-            kcd = priority (i,ic,id)
-            if (kab.eq.0 .and. kac.eq.0 .and. kad.eq.0) then
+            mab = priority (i,ia,ib,0)
+            mac = priority (i,ia,ic,0)
+            mad = priority (i,ia,id,0)
+            mbc = priority (i,ib,ic,0)
+            mbd = priority (i,ib,id,0)
+            mcd = priority (i,ic,id,0)
+            if (mab.eq.0 .and. mac.eq.0 .and. mad.eq.0) then
+               polaxe(i) = 'None'
+               zaxis(i) = 0
+               xaxis(i) = 0
+               yaxis(i) = 0
+            else if (mab.eq.ia .and. mac.eq.ia .and. mad.eq.ia) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
-               xaxis(i) = ib
                yaxis(i) = 0
-            else if (kab.eq.ia .and. kac.eq.ia .and. kad.eq.ia) then
-               polaxe(i) = 'Z-then-X'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               if (kbc.eq.ic .and. kcd.eq.ic)  xaxis(i) = ic
-               if (kbd.eq.id .and. kcd.eq.id)  xaxis(i) = id
-               if (kbc.eq.ic .and. kcd.eq.0)  xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kab.eq.ib .and. kbc.eq.ib .and. kbd.eq.ib) then
+               m = priority (i,ib,ic,id)
+               if (m .ne. 0) then
+                  xaxis(i) = m
+               else
+                  call frame13 (i,ia)
+               end if
+            else if (mab.eq.ib .and. mbc.eq.ib .and. mbd.eq.ib) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
-               xaxis(i) = ia
-               if (kac.eq.ic .and. kcd.eq.ic)  xaxis(i) = ic
-               if (kad.eq.id .and. kcd.eq.id)  xaxis(i) = id
-               if (kac.eq.ic .and. kcd.eq.0)  xaxis(i) = ic
                yaxis(i) = 0
-            else if (kac.eq.ic .and. kbc.eq.ic .and. kcd.eq.ic) then
+               m = priority (i,ia,ic,id)
+               if (m .ne. 0) then
+                  xaxis(i) = m
+               else
+                  call frame13 (i,ib)
+               end if
+            else if (mac.eq.ic .and. mbc.eq.ic .and. mcd.eq.ic) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ic
-               xaxis(i) = ia
-               if (kab.eq.ib .and. kbd.eq.ib)  xaxis(i) = ib
-               if (kad.eq.id .and. kbd.eq.id)  xaxis(i) = id
-               if (kab.eq.ib .and. kbd.eq.0)  xaxis(i) = ib
                yaxis(i) = 0
-            else if (kad.eq.id .and. kbd.eq.id .and. kcd.eq.id) then
+               m = priority (i,ia,ib,id)
+               if (m .ne. 0) then
+                  xaxis(i) = m
+               else
+                  call frame13 (i,ic)
+               end if
+            else if (mad.eq.id .and. mbd.eq.id .and. mcd.eq.id) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = id
-               xaxis(i) = ia
-               if (kab.eq.ib .and. kbc.eq.ib)  xaxis(i) = ib
-               if (kac.eq.ic .and. kbc.eq.ic)  xaxis(i) = ic
-               if (kab.eq.ib .and. kbc.eq.0)  xaxis(i) = ib
                yaxis(i) = 0
-            else if (kab.eq.0 .and. kac.eq.0 .and. kbc.eq.0) then
-               polaxe(i) = 'Z-Bisect'
+               m = priority (i,ia,ib,ic)
+               if (m .ne. 0) then
+                  xaxis(i) = m
+               else
+                  call frame13 (i,id)
+               end if
+            else if (mab.eq.0 .and. mac.eq.ia .and. mad.eq.ia) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = -ia
+               xaxis(i) = -ib
+               yaxis(i) = 0
+            else if (mac.eq.0 .and. mab.eq.ia .and. mad.eq.ia) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = -ia
+               xaxis(i) = -ic
+               yaxis(i) = 0
+            else if (mad.eq.0 .and. mab.eq.ia .and. mac.eq.ia) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = -ia
+               xaxis(i) = -id
+               yaxis(i) = 0
+            else if (mbc.eq.0 .and. mab.eq.ib .and. mbd.eq.ib) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = -ib
+               xaxis(i) = -ic
+               yaxis(i) = 0
+            else if (mbd.eq.0 .and. mab.eq.ib .and. mbc.eq.ib) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = -ib
+               xaxis(i) = -id
+               yaxis(i) = 0
+            else if (mcd.eq.0 .and. mac.eq.ic .and. mbc.eq.ic) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = -ic
+               xaxis(i) = -id
+               yaxis(i) = 0
+            else if (mbc.eq.0 .and. mbd.eq.0 .and. mcd.eq.0) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = ic
-            else if (kab.eq.0 .and. kad.eq.0 .and. kbd.eq.0) then
-               polaxe(i) = 'Z-Bisect'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = id
-            else if (kac.eq.0 .and. kad.eq.0 .and. kcd.eq.0) then
-               polaxe(i) = 'Z-Bisect'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = id
-            else if (kbc.eq.0 .and. kbd.eq.0 .and. kcd.eq.0) then
-               polaxe(i) = 'Z-Bisect'
+               xaxis(i) = 0
+               yaxis(i) = 0
+               call frame13 (i,ia)
+            else if (mac.eq.0 .and. mad.eq.0 .and. mcd.eq.0) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = id
-            else if (kab.eq.0 .and. kac.eq.ia .and. kad.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
+               xaxis(i) = 0
                yaxis(i) = 0
-            else if (kac.eq.0 .and. kab.eq.ia .and. kad.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kad.eq.0 .and. kab.eq.ia .and. kac.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = id
-               yaxis(i) = 0
-            else if (kbc.eq.0 .and. kab.eq.ib .and. kbd.eq.ib) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kbd.eq.0 .and. kab.eq.ib .and. kbc.eq.ib) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = id
-               yaxis(i) = 0
-            else if (kcd.eq.0 .and. kac.eq.ic .and. kbc.eq.ic) then
-               polaxe(i) = 'Bisector'
+               call frame13 (i,ib)
+            else if (mab.eq.0 .and. mad.eq.0 .and. mbd.eq.0) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ic
-               xaxis(i) = id
+               xaxis(i) = 0
                yaxis(i) = 0
+               call frame13 (i,ic)
+            else if (mab.eq.0 .and. mac.eq.0 .and. mbc.eq.0) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = id
+               xaxis(i) = 0
+               yaxis(i) = 0
+               call frame13 (i,id)
             end if
          end if
       end do
@@ -535,6 +596,97 @@ c
       end
 c
 c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine frame13  --  set local axis via 1-3 attachments  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "frame13" finds local coordinate frame defining atoms in cases
+c     where the use of 1-3 connected atoms is required
+c
+c
+      subroutine frame13 (i,ia)
+      use atomid
+      use couple
+      use mpole
+      implicit none
+      integer i,ia
+      integer ib,ic,id
+      integer k,ka,ki,m
+      integer priority
+c
+c
+c     get atoms directly adjacent to the primary connected atom
+c
+      ib = 0
+      ic = 0
+      id = 0
+      ki = atomic(ia)
+      do k = 1, n12(ia)
+         m = i12(k,ia)
+         if (m .ne. i) then
+            if (ib .eq. 0) then
+               ib = m
+            else if (ic .eq. 0) then
+               ic = m
+            else if (id .eq. 0) then
+               id = m
+            end if
+         end if
+      end do
+c
+c     only one atom is attached 1-3 through primary connection
+c
+      if (n12(ia) .eq. 2) then
+         polaxe(i) = 'Z-then-X'
+         zaxis(i) = ia
+         xaxis(i) = ib
+         yaxis(i) = 0
+         if (ka .eq. 6) then
+            polaxe(i) = 'Z-Only'
+            xaxis(i) = 0
+         end if
+c
+c     two atoms are attached 1-3 through primary connection
+c
+      else if (n12(ia) .eq. 3) then
+         polaxe(i) = 'Z-Only'
+         zaxis(i) = ia
+         xaxis(i) = 0
+         yaxis(i) = 0
+         m = priority (ia,ib,ic,0)
+         if (m .ne. 0) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = m
+c        else if (ka.eq.7 .or. ka.eq.8) then
+c           polaxe(i) = 'Z-Bisect'
+c           xaxis(i) = -ib
+c           yaxis(i) = -ic
+         else if (ka.eq.15 .or. ka.eq.16) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = -ib
+            yaxis(i) = -ic
+         end if
+c
+c     three atoms are attached 1-3 through primary connection
+c
+      else if (n12(ia) .eq. 4) then
+         polaxe(i) = 'Z-Only'
+         zaxis(i) = ia
+         xaxis(i) = 0
+         yaxis(i) = 0
+         m = priority (ia,ib,ic,id)
+         if (m .ne. 0) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = m
+         end if
+      end if
+      return
+      end
+c
+c
 c     ################################################################
 c     ##                                                            ##
 c     ##  function priority  --  atom priority for axis assignment  ##
@@ -542,75 +694,132 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "priority" decides which of two connected atoms should be
-c     preferred during construction of a local coordinate frame
-c     and returns that atom number; if the two atoms have equal
+c     "priority" decides which of a set of connected atoms should
+c     have highest priority in construction of a local coordinate
+c     frame and returns its atom number; if all atoms are of equal
 c     priority then a zero is returned
 c
 c
-      function priority (i,ia,ib)
+      function priority (i,ia,ib,ic)
       use atomid
       use couple
       implicit none
       integer i,k,m
-      integer ia,ib
-      integer ka,kb
+      integer nlink
+      integer ia,ib,ic
+      integer ka,kb,kc
       integer ka1,kb1
       integer ka2,kb2
       integer priority
 c
 c
-c     get priority based on atomic number and connected atoms
+c     get number of sites to consider for priority assignment
 c
-      ka = atomic(ia)
-      kb = atomic(ib)
-      if (ka .gt. kb) then
+      priority = 0
+      nlink = 0
+      if (ia .gt. 0)  nlink = nlink + 1
+      if (ib .gt. 0)  nlink = nlink + 1
+      if (ic .gt. 0)  nlink = nlink + 1
+c
+c     for only one linked atom, it has the highest priority
+c
+      if (nlink .eq. 1) then
          priority = ia
-      else if (kb .gt. ka) then
-         priority = ib
-      else
-         ka1 = 0
-         ka2 = 0
-         do k = 1, n12(ia)
-            m = i12(k,ia)
-            if (i .ne. m) then
-               m = atomic(m)
-               if (m .ge. ka1) then
-                  ka2 = ka1
-                  ka1 = m
-               else if (m .gt. ka2) then
-                  ka2 = m
-               end if
-            end if
-         end do
-         kb1 = 0
-         kb2 = 0
-         do k = 1, n12(ib)
-            m = i12(k,ib)
-            if (i .ne. m) then
-               m = atomic(m)
-               if (m .gt. kb1) then
-                  kb2 = kb1
-                  kb1 = m
-               else if (m .gt. kb2) then
-                  kb2 = m
-               end if
-            end if
-         end do
-         if (n12(ia) .lt. n12(ib)) then
+      end if
+c
+c     for two linked atoms, find the one with highest priority
+c
+      if (nlink .eq. 2) then
+         ka = atomic(ia)
+         kb = atomic(ib)
+         if (ka .gt. kb) then
             priority = ia
-         else if (n12(ib) .lt. n12(ia)) then
-            priority = ib
-         else if (ka1 .gt. kb1) then
-            priority = ia
-         else if (kb1 .gt. ka1) then
-            priority = ib
-         else if (ka2 .gt. kb2) then
-            priority = ia
-         else if (kb2 .gt. ka2) then
+         else if (kb .gt. ka) then
             priority = ib
          else
-            priority = 0
+            ka1 = 0
+            ka2 = 0
+            do k = 1, n12(ia)
+               m = i12(k,ia)
+               if (i .ne. m) then
+                  m = atomic(m)
+                  if (m .ge. ka1) then
+                     ka2 = ka1
+                     ka1 = m
+                  else if (m .gt. ka2) then
+                     ka2 = m
+                  end if
+               end if
+            end do
+            kb1 = 0
+            kb2 = 0
+            do k = 1, n12(ib)
+               m = i12(k,ib)
+               if (i .ne. m) then
+                  m = atomic(m)
+                  if (m .gt. kb1) then
+                     kb2 = kb1
+                     kb1 = m
+                  else if (m .gt. kb2) then
+                     kb2 = m
+                  end if
+               end if
+            end do
+            if (n12(ia) .lt. n12(ib)) then
+               priority = ia
+            else if (n12(ib) .lt. n12(ia)) then
+               priority = ib
+            else if (ka1 .gt. kb1) then
+               priority = ia
+            else if (kb1 .gt. ka1) then
+               priority = ib
+            else if (ka2 .gt. kb2) then
+               priority = ia
+            else if (kb2 .gt. ka2) then
+               priority = ib
+            else
+               priority = 0
+            end if
+         end if
+      end if
+c
+c     for three linked atoms, find the one with highest priority
+c
+      if (nlink .eq. 3) then
+         ka = atomic(ia)
+         kb = atomic(ib)
+         kc = atomic(ic)
+         if (ka.gt.kb .and. ka.gt.kc) then
+            priority = ia
+         else if (kb.gt.ka .and. kb.gt.kc) then
+            priority = ib
+         else if (kc.gt.ka .and. kc.gt.kb) then
+            priority = ic
+         else if (ka.ne.kb .and. kb.eq.kc) then
+            priority = ia
+         else if (kb.ne.kc .and. ka.eq.kc) then
+            priority = ib
+         else if (kc.ne.ka .and. ka.eq.kb) then
+            priority = ic
+         else
+            ka = n12(ia)
+            kb = n12(ib)
+            kc = n12(ic)
+            if (ka.lt.kb .and. ka.lt.kc) then
+               priority = ia
+            else if (kb.lt.ka .and. kb.lt.kc) then
+               priority = ib
+            else if (kc.lt.ka .and. kc.lt.kb) then
+               priority = ic
+            else if (ka.ne.kb .and. kb.eq.kc) then
+               priority = ia
+            else if (kb.ne.kc .and. ka.eq.kc) then
+               priority = ib
+            else if (kc.ne.ka .and. ka.eq.kb) then
+               priority = ic
+            else
+               priority = 0
+            end if
          end if
       end if
       return
@@ -2631,7 +2840,6 @@ c
       use kpolr
       use mpole
       use sizes
-      use units
       implicit none
       integer i,j,k,m
       integer it,jt,kt,mt
@@ -2654,6 +2862,7 @@ c
       logical done,repeat
       logical header,exist
       logical query,condense
+      logical yzero,symmetry
       character*1 answer
       character*4 pa,pb,pc,pd
       character*16 ptlast
@@ -3003,55 +3212,92 @@ c     perform deallocation of some local arrays
 c
       deallocate (pgrt)
 c
-c     convert dipole and quadrupole moments back to atomic units
-c
-      do i = 1, npole
-         pole(1,i) = pole(1,i)
-         do j = 2, 4
-            pole(j,i) = pole(j,i) / bohr
-         end do
-         do j = 5, 13
-            pole(j,i) = 3.0d0 * pole(j,i) / bohr**2
-         end do
-      end do
-c
 c     regularize the multipole moments to standardized values
 c
       call fixpole
 c
+c     check for user requested zeroing of moments by symmetry
+c
+      symmetry = .true.
+      answer = 'Y'
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=140,end=140)  answer
+         query = .false.
+      end if
+  140 continue
+      if (query) then
+         write (iout,150)
+  150    format (/,' Remove Multipole Components Zeroed by',
+     &              ' Symmetry [Y] :  ',$)
+         read (input,160)  answer
+  160    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'N')  symmetry = .false.
+c
+c     remove multipole components that are zero by symmetry
+c
+      if (symmetry) then
+         do i = 1, npole
+            yzero = .false.
+            if (yaxis(i) .eq. 0)  yzero = .true.
+            if (polaxe(i) .eq. 'Bisector')  yzero = .true.
+            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
+            if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
+               pole(13,i) = 0.0d0
+            end if
+            if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
+               pole(2,i) = 0.0d0
+               pole(5,i) = -0.5d0 * pole(13,i)
+               pole(7,i) = 0.0d0
+               pole(9,i) = pole(5,i)
+               pole(11,i) = 0.0d0
+            end if
+            if (yzero) then
+               pole(3,i) = 0.0d0
+               pole(6,i) = 0.0d0
+               pole(8,i) = 0.0d0
+               pole(10,i) = 0.0d0
+               pole(12,i) = 0.0d0
+            end if
+         end do
+      end if
+c
 c     print the final multipole values for force field use
 c
-      write (iout,140)
-  140 format (/,' Final Atomic Multipole Moments after',
+      write (iout,170)
+  170 format (/,' Final Atomic Multipole Moments after',
      &           ' Regularization :')
       do i = 1, n
          k = pollist(i)
          if (k .eq. 0) then
-            write (iout,150)  i,name(i),atomic(i)
-  150       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,180)  i,name(i),atomic(i)
+  180       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,160)
-  160       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,190)
+  190       format (/,' No Atomic Multipole Moments for this Site')
          else
             zaxe = zaxis(k)
             xaxe = xaxis(k)
             yaxe = yaxis(k)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,170)  i,name(i),atomic(i)
-  170       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,200)  i,name(i),atomic(i)
+  200       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,180)  polaxe(k),zaxe,xaxe,yaxe
-  180       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,190)  pole(1,k)
-  190       format (/,' Charge:',10x,f15.5)
-            write (iout,200)  pole(2,k),pole(3,k),pole(4,k)
-  200       format (' Dipole:',10x,3f15.5)
-            write (iout,210)  pole(5,k)
-  210       format (' Quadrupole:',6x,f15.5)
-            write (iout,220)  pole(8,k),pole(9,k)
-  220       format (18x,2f15.5)
-            write (iout,230)  pole(11,k),pole(12,k),pole(13,k)
-  230       format (18x,3f15.5)
+            write (iout,210)  polaxe(k),zaxe,xaxe,yaxe
+  210       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,220)  pole(1,k)
+  220       format (/,' Charge:',10x,f15.5)
+            write (iout,230)  pole(2,k),pole(3,k),pole(4,k)
+  230       format (' Dipole:',10x,3f15.5)
+            write (iout,240)  pole(5,k)
+  240       format (' Quadrupole:',6x,f15.5)
+            write (iout,250)  pole(8,k),pole(9,k)
+  250       format (18x,2f15.5)
+            write (iout,260)  pole(11,k),pole(12,k),pole(13,k)
+  260       format (18x,3f15.5)
          end if
       end do
       return
@@ -3065,7 +3311,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "fixpole" removes multipole values that are zero by symmetry,
+c     "fixpole" performs unit conversion of the multipole components,
 c     rounds moments to desired precision, and enforces integer net
 c     charge and traceless quadrupoles
 c
@@ -3073,37 +3319,23 @@ c
       subroutine fixpole
       use atoms
       use mpole
+      use units
       implicit none
       integer i,j,k
       real*8 eps,big,sum
       real*8 ci,cj
-      logical yzero
 c
 c
-c     remove multipole components that are zero by symmetry
+c     convert dipole and quadrupole moments to atomic units
 c
       do i = 1, npole
-         yzero = .false.
-         if (yaxis(i) .eq. 0)  yzero = .true.
-         if (polaxe(i) .eq. 'Bisector')  yzero = .true.
-         if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
-         if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
-            pole(13,i) = 0.0d0
-         end if
-         if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
-            pole(2,i) = 0.0d0
-            pole(5,i) = -0.5d0 * pole(13,i)
-            pole(7,i) = 0.0d0
-            pole(9,i) = pole(5,i)
-            pole(11,i) = 0.0d0
-         end if
-         if (yzero) then
-            pole(3,i) = 0.0d0
-            pole(6,i) = 0.0d0
-            pole(8,i) = 0.0d0
-            pole(10,i) = 0.0d0
-            pole(12,i) = 0.0d0
-         end if
+         pole(1,i) = pole(1,i)
+         do j = 2, 4
+            pole(j,i) = pole(j,i) / bohr
+         end do
+         do j = 5, 13
+            pole(j,i) = 3.0d0 * pole(j,i) / bohr**2
+         end do
       end do
 c
 c     regularize multipole moments to desired precision
