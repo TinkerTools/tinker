@@ -300,8 +300,8 @@ c
                xaxis(i) = ia
             else
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ia
-               xaxis(i) = -ib
+               zaxis(i) = ia
+               xaxis(i) = ib
             end if
 c
 c     assign the local frame definition for a trivalent atom
@@ -322,14 +322,14 @@ c
                yaxis(i) = 0
                if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = '3-Fold'
-c                 zaxis(i) = -ia
-c                 xaxis(i) = -ib
-c                 yaxis(i) = -ic
+c                 zaxis(i) = ia
+c                 xaxis(i) = ib
+c                 yaxis(i) = ic
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = '3-Fold'
-                  zaxis(i) = -ia
-                  xaxis(i) = -ib
-                  yaxis(i) = -ic
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
                end if
             else if (mabc .eq. ia) then
                polaxe(i) = 'Z-Only'
@@ -347,12 +347,12 @@ c                 yaxis(i) = -ic
                   xaxis(i) = ib
 c              else if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = 'Z-Bisect'
-c                 xaxis(i) = -ib
-c                 yaxis(i) = -ic
+c                 xaxis(i) = ib
+c                 yaxis(i) = ic
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = -ib
-                  yaxis(i) = -ic
+                  xaxis(i) = ib
+                  yaxis(i) = ic
                else
                   call frame13 (i,ia)
                end if
@@ -372,12 +372,12 @@ c                 yaxis(i) = -ic
                   xaxis(i) = ib
 c              else if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = 'Z-Bisect'
-c                 xaxis(i) = -ia
-c                 yaxis(i) = -ic
+c                 xaxis(i) = ia
+c                 yaxis(i) = ic
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = -ia
-                  yaxis(i) = -ic
+                  xaxis(i) = ia
+                  yaxis(i) = ic
                else
                   call frame13 (i,ib)
                end if
@@ -397,12 +397,12 @@ c                 yaxis(i) = -ic
                   xaxis(i) = ib
 c              else if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = 'Z-Bisect'
-c                 xaxis(i) = -ia
-c                 yaxis(i) = -ib
+c                 xaxis(i) = ia
+c                 yaxis(i) = ib
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = -ia
-                  yaxis(i) = -ib
+                  xaxis(i) = ia
+                  yaxis(i) = ib
                else
                   call frame13 (i,ic)
                end if
@@ -468,33 +468,33 @@ c
                end if
             else if (mab.eq.0 .and. mac.eq.ia .and. mad.eq.ia) then
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ia
-               xaxis(i) = -ib
+               zaxis(i) = ia
+               xaxis(i) = ib
                yaxis(i) = 0
             else if (mac.eq.0 .and. mab.eq.ia .and. mad.eq.ia) then
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ia
-               xaxis(i) = -ic
+               zaxis(i) = ia
+               xaxis(i) = ic
                yaxis(i) = 0
             else if (mad.eq.0 .and. mab.eq.ia .and. mac.eq.ia) then
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ia
-               xaxis(i) = -id
+               zaxis(i) = ia
+               xaxis(i) = id
                yaxis(i) = 0
             else if (mbc.eq.0 .and. mab.eq.ib .and. mbd.eq.ib) then
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ib
-               xaxis(i) = -ic
+               zaxis(i) = ib
+               xaxis(i) = ic
                yaxis(i) = 0
             else if (mbd.eq.0 .and. mab.eq.ib .and. mbc.eq.ib) then
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ib
-               xaxis(i) = -id
+               zaxis(i) = ib
+               xaxis(i) = id
                yaxis(i) = 0
             else if (mcd.eq.0 .and. mac.eq.ic .and. mbc.eq.ic) then
                polaxe(i) = 'Bisector'
-               zaxis(i) = -ic
-               xaxis(i) = -id
+               zaxis(i) = ic
+               xaxis(i) = id
                yaxis(i) = 0
             else if (mbc.eq.0 .and. mbd.eq.0 .and. mcd.eq.0) then
                polaxe(i) = 'Z-Only'
@@ -671,12 +671,12 @@ c
             xaxis(i) = ib
 c        else if (ka.eq.7 .or. ka.eq.8) then
 c           polaxe(i) = 'Z-Bisect'
-c           xaxis(i) = -ib
-c           yaxis(i) = -ic
+c           xaxis(i) = ib
+c           yaxis(i) = ic
          else if (ka.eq.15 .or. ka.eq.16) then
             polaxe(i) = 'Z-Bisect'
-            xaxis(i) = -ib
-            yaxis(i) = -ic
+            xaxis(i) = ib
+            yaxis(i) = ic
          end if
 c
 c     three atoms are attached 1-3 through primary connection
