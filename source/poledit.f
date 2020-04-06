@@ -275,9 +275,7 @@ c
             xaxis(i) = 0
             yaxis(i) = 0
             ia = i12(1,i)
-            if (n12(ia) .ne. 1) then
-               call frame13 (i,ia)
-            end if
+            call frame13 (i,ia)
 c
 c     assign the local frame definition for a divalent atom
 c
@@ -344,9 +342,9 @@ c                 yaxis(i) = -ic
                else if (mbc .eq. ic) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ic
-c              else if (ki .eq. 6) then
-c                 polaxe(i) = 'Z-then-X'
-c                 xaxis(i) = ib
+               else if (ki .eq. 6) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
 c              else if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = 'Z-Bisect'
 c                 xaxis(i) = -ib
@@ -369,9 +367,9 @@ c                 yaxis(i) = -ic
                else if (mac .eq. ic) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ic
-c              else if (ki .eq. 6) then
-c                 polaxe(i) = 'Z-then-X'
-c                 xaxis(i) = ib
+               else if (ki .eq. 6) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
 c              else if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = 'Z-Bisect'
 c                 xaxis(i) = -ia
@@ -394,9 +392,9 @@ c                 yaxis(i) = -ic
                else if (mab .eq. ib) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-c              else if (ki .eq. 6) then
-c                 polaxe(i) = 'Z-then-X'
-c                 xaxis(i) = ib
+               else if (ki .eq. 6) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
 c              else if (ki.eq.7 .or. ki.eq.8) then
 c                 polaxe(i) = 'Z-Bisect'
 c                 xaxis(i) = -ia
@@ -614,7 +612,7 @@ c
       implicit none
       integer i,ia
       integer ib,ic,id
-      integer k,ka,ki,m
+      integer k,ka,m
       integer priority
 c
 c
@@ -623,7 +621,7 @@ c
       ib = 0
       ic = 0
       id = 0
-      ki = atomic(ia)
+      ka = atomic(ia)
       do k = 1, n12(ia)
          m = i12(k,ia)
          if (m .ne. i) then
@@ -637,9 +635,17 @@ c
          end if
       end do
 c
+c     case with no atoms attached 1-3 through primary connection
+c
+      if (n12(ia) .eq. 1) then
+         polaxe(i) = 'Z-Only'
+         zaxis(i) = ia
+         xaxis(i) = 0
+         yaxis(i) = 0
+c
 c     only one atom is attached 1-3 through primary connection
 c
-      if (n12(ia) .eq. 2) then
+      else if (n12(ia) .eq. 2) then
          polaxe(i) = 'Z-then-X'
          zaxis(i) = ia
          xaxis(i) = ib
@@ -660,6 +666,9 @@ c
          if (m .ne. 0) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = m
+         else if (ka .eq. 6) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = ib
 c        else if (ka.eq.7 .or. ka.eq.8) then
 c           polaxe(i) = 'Z-Bisect'
 c           xaxis(i) = -ib
@@ -704,22 +713,27 @@ c
       use atomid
       use couple
       implicit none
-      integer i,k,m
+      integer i,j,m
       integer nlink
       integer ia,ib,ic
+      integer ja,jb,jc
       integer ka,kb,kc
-      integer ka1,kb1
-      integer ka2,kb2
       integer priority
 c
 c
-c     get number of sites to consider for priority assignment
+c     get info on sites to consider for priority assignment
 c
       priority = 0
       nlink = 0
       if (ia .gt. 0)  nlink = nlink + 1
       if (ib .gt. 0)  nlink = nlink + 1
       if (ic .gt. 0)  nlink = nlink + 1
+      ja = n12(ia)
+      jb = n12(ib)
+      jc = n12(ic)
+      ka = atomic(ia)
+      kb = atomic(ib)
+      kc = atomic(ic)
 c
 c     for only one linked atom, it has the highest priority
 c
@@ -730,55 +744,23 @@ c
 c     for two linked atoms, find the one with highest priority
 c
       if (nlink .eq. 2) then
-         ka = atomic(ia)
-         kb = atomic(ib)
          if (ka .gt. kb) then
             priority = ia
          else if (kb .gt. ka) then
             priority = ib
          else
-            ka1 = 0
-            ka2 = 0
-            do k = 1, n12(ia)
-               m = i12(k,ia)
-               if (i .ne. m) then
-                  m = atomic(m)
-                  if (m .ge. ka1) then
-                     ka2 = ka1
-                     ka1 = m
-                  else if (m .gt. ka2) then
-                     ka2 = m
-                  end if
-               end if
-            end do
-            kb1 = 0
-            kb2 = 0
-            do k = 1, n12(ib)
-               m = i12(k,ib)
-               if (i .ne. m) then
-                  m = atomic(m)
-                  if (m .gt. kb1) then
-                     kb2 = kb1
-                     kb1 = m
-                  else if (m .gt. kb2) then
-                     kb2 = m
-                  end if
-               end if
-            end do
-            if (n12(ia) .lt. n12(ib)) then
+            if (ja .lt. jb) then
                priority = ia
-            else if (n12(ib) .lt. n12(ia)) then
-               priority = ib
-            else if (ka1 .gt. kb1) then
-               priority = ia
-            else if (kb1 .gt. ka1) then
-               priority = ib
-            else if (ka2 .gt. kb2) then
-               priority = ia
-            else if (kb2 .gt. ka2) then
+            else if (jb .lt. ja) then
                priority = ib
             else
-               priority = 0
+               m = 0
+               do j = 1, ja
+                  m = m + atomic(i12(j,ia)) - atomic(i12(j,ib))
+               end do
+               if (m .gt. 0)  priority = ia
+               if (m .lt. 0)  priority = ib
+               if (m .eq. 0)  priority = ic
             end if
          end if
       end if
@@ -786,40 +768,68 @@ c
 c     for three linked atoms, find the one with highest priority
 c
       if (nlink .eq. 3) then
-         ka = atomic(ia)
-         kb = atomic(ib)
-         kc = atomic(ic)
          if (ka.gt.kb .and. ka.gt.kc) then
             priority = ia
          else if (kb.gt.ka .and. kb.gt.kc) then
             priority = ib
          else if (kc.gt.ka .and. kc.gt.kb) then
             priority = ic
-         else if (ka.ne.kb .and. kb.eq.kc) then
-            priority = ia
-         else if (kb.ne.kc .and. ka.eq.kc) then
-            priority = ib
-         else if (kc.ne.ka .and. ka.eq.kb) then
-            priority = ic
-         else
-            ka = n12(ia)
-            kb = n12(ib)
-            kc = n12(ic)
-            if (ka.lt.kb .and. ka.lt.kc) then
+         else if (ka.eq.kb .and. kc.ne.ka) then
+            if (ja .lt. jb) then
                priority = ia
-            else if (kb.lt.ka .and. kb.lt.kc) then
+            else if (jb .lt. ja) then
                priority = ib
-            else if (kc.lt.ka .and. kc.lt.kb) then
-               priority = ic
-            else if (ka.ne.kb .and. kb.eq.kc) then
+            else
+               m = 0
+               do j = 1, ja
+                  m = m + atomic(i12(j,ia)) - atomic(i12(j,ib))
+               end do
+               if (m .gt. 0)  priority = ia
+               if (m .lt. 0)  priority = ib
+               if (m .eq. 0)  priority = ic
+            end if
+         else if (ka.eq.kc .and. kb.ne.kc) then
+            if (ja .lt. jc) then
                priority = ia
-            else if (kb.ne.kc .and. ka.eq.kc) then
-               priority = ib
-            else if (kc.ne.ka .and. ka.eq.kb) then
+            else if (jc .lt. ja) then
                priority = ic
             else
-               priority = 0
+               m = 0
+               do j = 1, ja
+                  m = m + atomic(i12(j,ia)) - atomic(i12(j,ic))
+               end do
+               if (m .gt. 0)  priority = ia
+               if (m .lt. 0)  priority = ic
+               if (m .eq. 0)  priority = ib
             end if
+         else if (kb.eq.kc .and. ka.ne.kb) then
+            if (jb .lt. jc) then
+               priority = ib
+            else if (jc .lt. jb) then
+               priority = ic
+            else
+               m = 0
+               do j = 1, jb
+                  m = m + atomic(i12(j,ib)) - atomic(i12(j,ic))
+               end do
+               if (m .gt. 0)  priority = ib
+               if (m .lt. 0)  priority = ic
+               if (m .eq. 0)  priority = ia
+            end if
+         else if (ja.lt.jb .and. ja.lt.jc) then
+            priority = ia
+         else if (jb.lt.ja .and. jb.lt.jc) then
+            priority = ib
+         else if (jc.lt.ja .and. jc.lt.jb) then
+            priority = ic
+         else if (ja.ne.jb .and. jb.eq.jc) then
+            priority = ia
+         else if (jb.ne.jc .and. ja.eq.jc) then
+            priority = ib
+         else if (jc.ne.ja .and. ja.eq.jb) then
+            priority = ic
+         else
+            priority = 0
          end if
       end if
       return
