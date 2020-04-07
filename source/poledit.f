@@ -228,15 +228,16 @@ c
       use iounit
       use mpole
       implicit none
-      integer i,j,k,m
+      integer i,j,m
       integer ia,ib,ic,id
       integer ki,mabc
-      integer ka,kb,kc,kd
       integer mab,mac,mad
       integer mbc,mbd,mcd
       integer priority
+      real*8 geometry
       logical exist,query
       logical change
+      logical pyramid
       character*240 record
       character*240 string
 c
@@ -320,7 +321,13 @@ c
                zaxis(i) = 0
                xaxis(i) = 0
                yaxis(i) = 0
-               if (ki.eq.7 .or. ki.eq.8) then
+               pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = '3-Fold'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki .eq. 8) then
 c                 polaxe(i) = '3-Fold'
 c                 zaxis(i) = ia
 c                 xaxis(i) = ib
@@ -336,6 +343,7 @@ c                 yaxis(i) = ic
                zaxis(i) = ia
                xaxis(i) = 0
                yaxis(i) = 0
+               pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
                if (mbc .eq. ib) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
@@ -345,7 +353,11 @@ c                 yaxis(i) = ic
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-c              else if (ki.eq.7 .or. ki.eq.8) then
+               else if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+c              else if (ki .eq. 8) then
 c                 polaxe(i) = 'Z-Bisect'
 c                 xaxis(i) = ib
 c                 yaxis(i) = ic
@@ -361,6 +373,7 @@ c                 yaxis(i) = ic
                zaxis(i) = ib
                xaxis(i) = 0
                yaxis(i) = 0
+               pyramid = (abs(geometry(ib,i,ia,ic)) .lt. 135.0d0)
                if (mac .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
@@ -370,7 +383,11 @@ c                 yaxis(i) = ic
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-c              else if (ki.eq.7 .or. ki.eq.8) then
+               else if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+c              else if (ki .eq. 8) then
 c                 polaxe(i) = 'Z-Bisect'
 c                 xaxis(i) = ia
 c                 yaxis(i) = ic
@@ -386,6 +403,7 @@ c                 yaxis(i) = ic
                zaxis(i) = ic
                xaxis(i) = 0
                yaxis(i) = 0
+               pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
                if (mab .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
@@ -395,7 +413,11 @@ c                 yaxis(i) = ic
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-c              else if (ki.eq.7 .or. ki.eq.8) then
+               else if (ki .eq. 7) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+c              else if (ki .eq. 8) then
 c                 polaxe(i) = 'Z-Bisect'
 c                 xaxis(i) = ia
 c                 yaxis(i) = ib
@@ -614,6 +636,8 @@ c
       integer ib,ic,id
       integer k,ka,m
       integer priority
+      real*8 geometry
+      logical pyramid
 c
 c
 c     get atoms directly adjacent to the primary connected atom
@@ -662,6 +686,7 @@ c
          zaxis(i) = ia
          xaxis(i) = 0
          yaxis(i) = 0
+         pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
          m = priority (ia,ib,ic,0)
          if (m .ne. 0) then
             polaxe(i) = 'Z-then-X'
@@ -669,7 +694,14 @@ c
          else if (ka .eq. 6) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-c        else if (ka.eq.7 .or. ka.eq.8) then
+         else if (ka.eq.7 .and. pyramid) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
+         else if (ka .eq. 7) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = ib
+         else if (ka .eq. 8) then
 c           polaxe(i) = 'Z-Bisect'
 c           xaxis(i) = ib
 c           yaxis(i) = ic
@@ -718,6 +750,7 @@ c
       integer ia,ib,ic
       integer ja,jb,jc
       integer ka,kb,kc
+      integer ma,mb,mc
       integer priority
 c
 c
@@ -725,15 +758,21 @@ c     get info on sites to consider for priority assignment
 c
       priority = 0
       nlink = 0
-      if (ia .gt. 0)  nlink = nlink + 1
-      if (ib .gt. 0)  nlink = nlink + 1
-      if (ic .gt. 0)  nlink = nlink + 1
-      ja = n12(ia)
-      jb = n12(ib)
-      jc = n12(ic)
-      ka = atomic(ia)
-      kb = atomic(ib)
-      kc = atomic(ic)
+      if (ia .gt. 0) then
+         nlink = nlink + 1
+         ja = n12(ia)
+         ka = atomic(ia)
+      end if
+      if (ib .gt. 0) then
+         nlink = nlink + 1
+         jb = n12(ib)
+         kb = atomic(ib)
+      end if
+      if (ic .gt. 0) then
+         nlink = nlink + 1
+         jc = n12(ic)
+         kc = atomic(ic)
+      end if
 c
 c     for only one linked atom, it has the highest priority
 c
@@ -774,7 +813,7 @@ c
             priority = ib
          else if (kc.gt.ka .and. kc.gt.kb) then
             priority = ic
-         else if (ka.eq.kb .and. kc.ne.ka) then
+         else if (ka.eq.kb .and. kc.lt.ka) then
             if (ja .lt. jb) then
                priority = ia
             else if (jb .lt. ja) then
@@ -788,7 +827,7 @@ c
                if (m .lt. 0)  priority = ib
                if (m .eq. 0)  priority = ic
             end if
-         else if (ka.eq.kc .and. kb.ne.kc) then
+         else if (ka.eq.kc .and. kb.lt.kc) then
             if (ja .lt. jc) then
                priority = ia
             else if (jc .lt. ja) then
@@ -802,7 +841,7 @@ c
                if (m .lt. 0)  priority = ic
                if (m .eq. 0)  priority = ib
             end if
-         else if (kb.eq.kc .and. ka.ne.kb) then
+         else if (kb.eq.kc .and. ka.lt.kb) then
             if (jb .lt. jc) then
                priority = ib
             else if (jc .lt. jb) then
@@ -816,20 +855,38 @@ c
                if (m .lt. 0)  priority = ic
                if (m .eq. 0)  priority = ia
             end if
-         else if (ja.lt.jb .and. ja.lt.jc) then
-            priority = ia
-         else if (jb.lt.ja .and. jb.lt.jc) then
-            priority = ib
-         else if (jc.lt.ja .and. jc.lt.jb) then
-            priority = ic
-         else if (ja.ne.jb .and. jb.eq.jc) then
-            priority = ia
-         else if (jb.ne.jc .and. ja.eq.jc) then
-            priority = ib
-         else if (jc.ne.ja .and. ja.eq.jb) then
-            priority = ic
-         else
-            priority = 0
+         else if (ka.eq.kb .and. ka.eq.kc) then
+            if ((ja.lt.jb.and.ja.lt.jc) .or.
+     &          (ja.gt.jb.and.ja.gt.jc)) then
+               priority = ia
+            else if ((jb.lt.ja.and.jb.lt.jc) .or.
+     &               (jb.gt.ja.and.jb.gt.jc)) then
+               priority = ib
+            else if ((jc.lt.ja.and.jc.lt.jb) .or.
+     &               (jc.gt.ja.and.jc.gt.jb)) then
+               priority = ic
+            else if (ja.eq.jb .and. ja.eq.jc) then
+               ma = 0
+               mb = 0
+               mc = 0
+               do j = 1, ja
+                  ma = ma + atomic(i12(j,ia))
+                  mb = mb + atomic(i12(j,ib))
+                  mc = mc + atomic(i12(j,ic))
+               end do
+               if ((ma.lt.mb .and. ma.lt.mc) .or.
+     &             (ma.gt.mb .and. ma.gt.mc)) then
+                  priority = ia
+               else if ((mb.lt.ma .and. mb.lt.mc) .or.
+     &                  (mb.gt.ma .and. mb.gt.mc)) then
+                  priority = ib
+               else if ((mc.lt.ma .and. mc.lt.mb) .or.
+     &                  (mc.gt.ma .and. mc.gt.mb)) then
+                  priority = ic
+               else
+                  priority = 0
+               end if
+            end if
          end if
       end if
       return
@@ -2855,11 +2912,14 @@ c
       integer it,jt,kt,mt
       integer ia,ja,ka,ma
       integer in,jn
+      integer iz,ix,iy
+      integer priority
       integer mintyp
       integer size,nsing
       integer nsame,nave
       integer xaxe,yaxe
       integer zaxe
+      integer indx(4)
       integer, allocatable :: list(:)
       integer, allocatable :: ising(:)
       integer, allocatable :: jsing(:)
@@ -2872,7 +2932,8 @@ c
       logical done,repeat
       logical header,exist
       logical query,condense
-      logical yzero,symmetry
+      logical yzero,xyzero
+      logical symmetry
       character*1 answer
       character*4 pa,pb,pc,pd
       character*16 ptlast
@@ -2917,18 +2978,18 @@ c     store atomic numbers and atoms attached for each atom
 c
          do i = 1, n
             do j = 1, 4
-               list(j) = 0
+               indx(j) = 0
             end do
             do j = 1, n12(i)
                k = i12(j,i)
-               list(j) = 10*atomic(k) + n12(k)
+               indx(j) = 10*atomic(k) + n12(k)
             end do
-            call sort (n12(i),list)
+            call sort (n12(i),indx)
             size = 4
-            call numeral (list(1),pa,size)
-            call numeral (list(2),pb,size)
-            call numeral (list(3),pc,size)
-            call numeral (list(4),pd,size)
+            call numeral (indx(1),pa,size)
+            call numeral (indx(2),pb,size)
+            call numeral (indx(3),pc,size)
+            call numeral (indx(4),pd,size)
             pt(i) = pa//pb//pc//pd
          end do
 c
@@ -2989,7 +3050,7 @@ c
                         end if
                         write (iout,50)  ia,ja
    50                   format (' Atoms',i6,2x,'and',i6,2x,
-     &                             ' are Equivalent')
+     &                             'are Equivalent')
                      end if
                      do k = 1, n12(ia)
                         ka = i12(k,ia)
@@ -3255,15 +3316,43 @@ c
             if (yaxis(i) .eq. 0)  yzero = .true.
             if (polaxe(i) .eq. 'Bisector')  yzero = .true.
             if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
-            if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
-               pole(13,i) = 0.0d0
+            xyzero = .false.
+            if (polaxe(i) .eq. 'Z-then-X') then
+               iz = zaxis(i)
+               ix = xaxis(i)
+               do j = 1, n12(iz)
+                  iy = i12(j,iz)
+                  if (iy.ne.i .and. iy.ne.ix) then
+                     if (priority(iz,ix,iy,0) .eq. 0)  xyzero = .true.
+                  end if
+               end do
             end if
-            if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
+            if (polaxe(i) .eq. 'None') then
+               do j = 2, 13
+                  pole(13,i) = 0.0d0
+               end do
+            end if
+            if (polaxe(i) .eq. 'Z-Only') then
                pole(2,i) = 0.0d0
+               pole(3,i) = 0.0d0
                pole(5,i) = -0.5d0 * pole(13,i)
+               pole(6,i) = 0.0d0
                pole(7,i) = 0.0d0
+               pole(8,i) = 0.0d0
                pole(9,i) = pole(5,i)
+               pole(10,i) = 0.0d0
                pole(11,i) = 0.0d0
+               pole(12,i) = 0.0d0
+            end if
+            if (xyzero) then
+               pole(2,i) = 0.0d0
+               pole(3,i) = 0.0d0
+               pole(6,i) = 0.0d0
+               pole(7,i) = 0.0d0
+               pole(8,i) = 0.0d0
+               pole(10,i) = 0.0d0
+               pole(11,i) = 0.0d0
+               pole(12,i) = 0.0d0
             end if
             if (yzero) then
                pole(3,i) = 0.0d0
