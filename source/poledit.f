@@ -230,6 +230,7 @@ c
       implicit none
       integer i,j,m
       integer ia,ib,ic,id
+      integer ka,kb,kc
       integer ki,mabc
       integer mab,mac,mad
       integer mbc,mbd,mcd
@@ -281,9 +282,9 @@ c
 c     assign the local frame definition for a divalent atom
 c
          else if (j .eq. 2) then
-            ki = atomic(i)
             ia = i12(1,i)
             ib = i12(2,i)
+            ki = atomic(i)
             yaxis(i) = 0
             m = priority (i,ia,ib,0)
             if (ki .eq. 6) then
@@ -308,10 +309,13 @@ c
 c     assign the local frame definition for a trivalent atom
 c
          else if (j .eq. 3) then
-            ki = atomic(i)
             ia = i12(1,i)
             ib = i12(2,i)
             ic = i12(3,i)
+            ki = atomic(i)
+            ka = atomic(ia)
+            kb = atomic(ib)
+            kc = atomic(ic)
             mabc = priority (i,ia,ib,ic)
             mab = priority (i,ia,ib,0)
             mac = priority (i,ia,ic,0)
@@ -327,17 +331,27 @@ c
                   zaxis(i) = ia
                   xaxis(i) = ib
                   yaxis(i) = ic
-               else if (ki .eq. 8) then
-c                 polaxe(i) = '3-Fold'
-c                 zaxis(i) = ia
-c                 xaxis(i) = ib
-c                 yaxis(i) = ic
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = '3-Fold'
                   zaxis(i) = ia
                   xaxis(i) = ib
                   yaxis(i) = ic
                end if
+            else if (mab.eq.0 .and. kb.ge.kc) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = ia
+               xaxis(i) = ib
+               yaxis(i) = 0
+            else if (mac.eq.0 .and. ka.ge.kb) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = ia
+               xaxis(i) = ic
+               yaxis(i) = 0
+            else if (mbc.eq.0 .and. kc.ge.ka) then
+               polaxe(i) = 'Bisector'
+               zaxis(i) = ib
+               xaxis(i) = ic
+               yaxis(i) = 0
             else if (mabc .eq. ia) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ia
@@ -357,10 +371,6 @@ c                 yaxis(i) = ic
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ib
                   yaxis(i) = ic
-c              else if (ki .eq. 8) then
-c                 polaxe(i) = 'Z-Bisect'
-c                 xaxis(i) = ib
-c                 yaxis(i) = ic
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ib
@@ -387,10 +397,6 @@ c                 yaxis(i) = ic
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
                   yaxis(i) = ic
-c              else if (ki .eq. 8) then
-c                 polaxe(i) = 'Z-Bisect'
-c                 xaxis(i) = ia
-c                 yaxis(i) = ic
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
@@ -417,10 +423,6 @@ c                 yaxis(i) = ic
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
                   yaxis(i) = ib
-c              else if (ki .eq. 8) then
-c                 polaxe(i) = 'Z-Bisect'
-c                 xaxis(i) = ia
-c                 yaxis(i) = ib
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
@@ -701,10 +703,6 @@ c
          else if (ka .eq. 7) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-         else if (ka .eq. 8) then
-c           polaxe(i) = 'Z-Bisect'
-c           xaxis(i) = ib
-c           yaxis(i) = ic
          else if (ka.eq.15 .or. ka.eq.16) then
             polaxe(i) = 'Z-Bisect'
             xaxis(i) = ib
