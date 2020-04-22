@@ -635,6 +635,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
 !$OMP& nelst,elst,use,use_group,use_intra,use_bounds,cut2,off2,
+!$OMP& c0,c1,c2,c3,c4,c5,
 !$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
