@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "poledit" provides for modification and manipulation of
-c     the atomic multipole electrostatic models used in Tinker
+c     "poledit" provides for the modification and manipulation
+c     of polarizable atomic multipole electrostatic models
 c
 c
       program poledit
@@ -791,13 +791,61 @@ c
             else if (jb .lt. ja) then
                priority = ib
             else
-               m = 0
+               ma = 0
+               mb = 0
                do j = 1, ja
-                  m = m + atomic(i12(j,ia)) - atomic(i12(j,ib))
+                  ma = ma + atomic(i12(j,ia))
+                  mb = mb + atomic(i12(j,ib))
                end do
-               if (m .gt. 0)  priority = ia
-               if (m .lt. 0)  priority = ib
-               if (m .eq. 0)  priority = ic
+               if (ma .gt. mb) then
+                  priority = ia
+               else if (mb .gt. ma) then
+                  priority = ib
+               else
+                  ma = 0
+                  mb = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  if (ma .gt. mb) then
+                     priority = ia
+                  else if (mb .gt. ma) then
+                     priority = ib
+                  else
+                     ma = 0
+                     mb = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     if (ma .gt. mb) then
+                        priority = ia
+                     else if (mb .gt. ma) then
+                        priority = ib
+                     else
+                        ma = 0
+                        mb = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        if (ma .gt. mb) then
+                           priority = ia
+                        else if (mb .gt. ma) then
+                           priority = ib
+                        else
+                           priority = 0
+                        end if
+                     end if
+                  end if
+               end if
             end if
          end if
       end if
@@ -817,13 +865,61 @@ c
             else if (jb .lt. ja) then
                priority = ib
             else
-               m = 0
+               ma = 0
+               mb = 0
                do j = 1, ja
-                  m = m + atomic(i12(j,ia)) - atomic(i12(j,ib))
+                  ma = ma + atomic(i12(j,ia))
+                  mb = mb + atomic(i12(j,ib))
                end do
-               if (m .gt. 0)  priority = ia
-               if (m .lt. 0)  priority = ib
-               if (m .eq. 0)  priority = ic
+               if (ma .gt. mb) then
+                  priority = ia
+               else if (mb .gt. ma) then
+                  priority = ib
+               else
+                  ma = 0
+                  mb = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  if (ma .gt. mb) then
+                     priority = ia
+                  else if (mb .gt. ma) then
+                     priority = ib
+                  else
+                     ma = 0
+                     mb = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     if (ma .gt. mb) then
+                        priority = ia
+                     else if (mb .gt. ma) then
+                        priority = ib
+                     else
+                        ma = 0
+                        mb = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        if (ma .gt. mb) then
+                           priority = ia
+                        else if (mb .gt. ma) then
+                           priority = ib
+                        else
+                           priority = ic
+                        end if
+                     end if
+                  end if
+               end if
             end if
          else if (ka.eq.kc .and. kb.lt.kc) then
             if (ja .lt. jc) then
@@ -831,13 +927,61 @@ c
             else if (jc .lt. ja) then
                priority = ic
             else
-               m = 0
+               ma = 0
+               mc = 0
                do j = 1, ja
-                  m = m + atomic(i12(j,ia)) - atomic(i12(j,ic))
+                  ma = ma + atomic(i12(j,ia))
+                  mc = mc + atomic(i12(j,ic))
                end do
-               if (m .gt. 0)  priority = ia
-               if (m .lt. 0)  priority = ic
-               if (m .eq. 0)  priority = ib
+               if (ma .gt. mc) then
+                  priority = ia
+               else if (mc .gt. ma) then
+                  priority = ic
+               else
+                  ma = 0
+                  mc = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ic)
+                     mc = mc + atomic(i13(j,ic))
+                  end do
+                  if (ma .gt. mc) then
+                     priority = ia
+                  else if (mc .gt. ma) then
+                     priority = ic
+                  else
+                     ma = 0
+                     mc = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ic)
+                        mc = mc + atomic(i14(j,ic))
+                     end do
+                     if (ma .gt. mc) then
+                        priority = ia
+                     else if (mc .gt. ma) then
+                        priority = ic
+                     else
+                        ma = 0
+                        mc = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ic)
+                           mc = mc + atomic(i15(j,ic))
+                        end do
+                        if (ma .gt. mc) then
+                           priority = ia
+                        else if (mc .gt. ma) then
+                           priority = ic
+                        else
+                           priority = ib
+                        end if
+                     end if
+                  end if
+               end if
             end if
          else if (kb.eq.kc .and. ka.lt.kb) then
             if (jb .lt. jc) then
@@ -845,23 +989,74 @@ c
             else if (jc .lt. jb) then
                priority = ic
             else
-               m = 0
+               mb = 0
+               mc = 0
                do j = 1, jb
-                  m = m + atomic(i12(j,ib)) - atomic(i12(j,ic))
+                  mb = mb + atomic(i12(j,ib))
+                  mc = mc + atomic(i12(j,ic))
                end do
-               if (m .gt. 0)  priority = ib
-               if (m .lt. 0)  priority = ic
-               if (m .eq. 0)  priority = ia
+               if (mb .gt. mc) then
+                  priority = ib
+               else if (mc .gt. mb) then
+                  priority = ic
+               else
+                  mb = 0
+                  mc = 0
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  do j = 1, n13(ic)
+                     mc = mc + atomic(i13(j,ic))
+                  end do
+                  if (mb .gt. mc) then
+                     priority = ia
+                  else if (mc .gt. mb) then
+                     priority = ic
+                  else
+                     mb = 0
+                     mc = 0
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     do j = 1, n14(ic)
+                        mc = mc + atomic(i14(j,ic))
+                     end do
+                     if (mb .gt. mc) then
+                        priority = ia
+                     else if (mc .gt. mb) then
+                        priority = ic
+                     else
+                        mb = 0
+                        mc = 0
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        do j = 1, n15(ic)
+                           mc = mc + atomic(i15(j,ic))
+                        end do
+                        if (mb .gt. mc) then
+                           priority = ia
+                        else if (mc .gt. mb) then
+                           priority = ic
+                        else
+                           priority = ia
+                        end if
+                     end if
+                  end if
+               end if
             end if
          else if (ka.eq.kb .and. ka.eq.kc) then
-            if ((ja.lt.jb.and.ja.lt.jc) .or.
-     &          (ja.gt.jb.and.ja.gt.jc)) then
+            if (ja.gt.jb.and.ja.gt.jc) then
                priority = ia
-            else if ((jb.lt.ja.and.jb.lt.jc) .or.
-     &               (jb.gt.ja.and.jb.gt.jc)) then
+            else if (jb.gt.ja .and. jb.gt.jc) then
                priority = ib
-            else if ((jc.lt.ja.and.jc.lt.jb) .or.
-     &               (jc.gt.ja.and.jc.gt.jb)) then
+            else if (jc.gt.ja .and. jc.gt.jb) then
+               priority = ic
+            else if (ja.lt.jb .and. ja.lt.jc) then
+               priority = ia
+            else if (jb.lt.ja .and. jb.lt.jc) then
+               priority = ib
+            else if (jc.lt.ja .and. jc.lt.jb) then
                priority = ic
             else if (ja.eq.jb .and. ja.eq.jc) then
                ma = 0
@@ -872,17 +1067,98 @@ c
                   mb = mb + atomic(i12(j,ib))
                   mc = mc + atomic(i12(j,ic))
                end do
-               if ((ma.lt.mb .and. ma.lt.mc) .or.
-     &             (ma.gt.mb .and. ma.gt.mc)) then
+               if (ma.gt.mb .and. ma.gt.mc) then
                   priority = ia
-               else if ((mb.lt.ma .and. mb.lt.mc) .or.
-     &                  (mb.gt.ma .and. mb.gt.mc)) then
+               else if (mb.gt.ma .and. mb.gt.mc) then
                   priority = ib
-               else if ((mc.lt.ma .and. mc.lt.mb) .or.
-     &                  (mc.gt.ma .and. mc.gt.mb)) then
+               else if (mc.gt.ma .and. mc.gt.mb) then
+                  priority = ic
+               else if (ma.lt.mb .and. ma.lt.mc) then
+                  priority = ia
+               else if (mb.lt.ma .and. mb.lt.mc) then
+                  priority = ib
+               else if (mc.lt.ma .and. mc.lt.mb) then
                   priority = ic
                else
-                  priority = 0
+                  ma = 0
+                  mb = 0
+                  mc = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  do j = 1, n13(ic)
+                     mc = mc + atomic(i13(j,ic))
+                  end do
+                  if (ma.gt.mb .and. ma.gt.mc) then
+                     priority = ia
+                  else if (mb.gt.ma .and. mb.gt.mc) then
+                     priority = ib
+                  else if (mc.gt.ma .and. mc.gt.mb) then
+                     priority = ic
+                  else if (ma.lt.mb .and. ma.lt.mc) then
+                     priority = ia
+                  else if (mb.lt.ma .and. mb.lt.mc) then
+                     priority = ib
+                  else if (mc.lt.ma .and. mc.lt.mb) then
+                     priority = ic
+                  else
+                     ma = 0
+                     mb = 0
+                     mc = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     do j = 1, n14(ic)
+                        mc = mc + atomic(i14(j,ic))
+                     end do
+                     if (ma.gt.mb .and. ma.gt.mc) then
+                        priority = ia
+                     else if (mb.gt.ma .and. mb.gt.mc) then
+                        priority = ib
+                     else if (mc.gt.ma .and. mc.gt.mb) then
+                        priority = ic
+                     else if (ma.lt.mb .and. ma.lt.mc) then
+                        priority = ia
+                     else if (mb.lt.ma .and. mb.lt.mc) then
+                        priority = ib
+                     else if (mc.lt.ma .and. mc.lt.mb) then
+                        priority = ic
+                     else
+                        ma = 0
+                        mb = 0
+                        mc = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        do j = 1, n15(ic)
+                           mc = mc + atomic(i15(j,ic))
+                        end do
+                        if (ma.gt.mb .and. ma.gt.mc) then
+                           priority = ia
+                        else if (mb.gt.ma .and. mb.gt.mc) then
+                           priority = ib
+                        else if (mc.gt.ma .and. mc.gt.mb) then
+                           priority = ic
+                        else if (ma.lt.mb .and. ma.lt.mc) then
+                           priority = ia
+                        else if (mb.lt.ma .and. mb.lt.mc) then
+                           priority = ib
+                        else if (mc.lt.ma .and. mc.lt.mb) then
+                           priority = ic
+                        else
+                           priority = 0
+                        end if
+                     end if
+                  end if
                end if
             end if
          end if
@@ -2910,25 +3186,24 @@ c
       integer it,mt
       integer ix,iy,iz
       integer in,jn,ni,nj
-      integer size,priority
-      integer nsame,nave
+      integer size,numtyp
+      integer priority
+      integer nlist,nave
       integer xaxe,yaxe,zaxe
       integer indx(4)
       integer, allocatable :: ci(:)
       integer, allocatable :: cj(:)
       integer, allocatable :: list(:)
-      integer, allocatable :: isame(:)
       integer, allocatable :: tsort(:)
-      integer, allocatable :: tkey(:)
       integer, allocatable :: pkey(:)
       integer, allocatable :: pgrt(:,:)
       real*8 pave(13)
       logical done,repeat
       logical header,exist
       logical query,condense
+      logical match,diff
       logical yzero,xyzero
       logical symmetry
-      logical match
       character*1 answer
       character*4 pa,pb,pc,pd
       character*16 ptlast
@@ -2963,15 +3238,15 @@ c
       if (condense) then
          allocate (ci(n))
          allocate (cj(n))
-         allocate (isame(n))
-         allocate (tsort(n))
-         allocate (tkey(n))
-         allocate (pkey(n))
-         allocate (pt(n))
+         size = 40
+         allocate (list(max(n,size)))
 c
 c     condense groups of equivalent atoms to the same atom type
 c
          header = .true.
+         do i = 1, n
+            list(i) = 0
+         end do
          do i = 1, n-1
             ni = n12(i) + n13(i) + n14(i) + n15(i)
             m = 0
@@ -2997,60 +3272,79 @@ c
             end do
             call sort (ni,ci)
             do j = i+1, n
-               nj = n12(j) + n13(j) + n14(j) + n15(j)
-               if (nj .eq. ni) then
-                  m = 0
-                  do k = 1, n12(j)
-                     m = m + 1
-                     jn = i12(k,j)
-                     cj(m) = 2000 + 10*atomic(jn) + n12(jn)
-                  end do
-                  do k = 1, n13(j)
-                     m = m + 1
-                     jn = i13(k,j)
-                     cj(m) = 3000 + 10*atomic(jn) + n12(jn)
-                  end do
-                  do k = 1, n14(j)
-                     m = m + 1
-                     jn = i14(k,j)
-                     cj(m) = 4000 + 10*atomic(jn) + n12(jn)
-                  end do
-                  do k = 1, n15(j)
-                     m = m + 1
-                     jn = i15(k,j)
-                     cj(m) = 5000 + 10*atomic(jn) + n12(jn)
-                  end do
-                  call sort (nj,cj)
-                  match = .true.
-                  do k = 1, ni
-                     if (ci(k) .ne. cj(k)) then
-                        match = .false.
-                        goto 40
+               if (atomic(i) .eq. atomic(j)) then
+                  nj = n12(j) + n13(j) + n14(j) + n15(j)
+                  if (nj .eq. ni) then
+                     m = 0
+                     do k = 1, n12(j)
+                        m = m + 1
+                        jn = i12(k,j)
+                        cj(m) = 2000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n13(j)
+                        m = m + 1
+                        jn = i13(k,j)
+                        cj(m) = 3000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n14(j)
+                        m = m + 1
+                        jn = i14(k,j)
+                        cj(m) = 4000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n15(j)
+                        m = m + 1
+                        jn = i15(k,j)
+                        cj(m) = 5000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     call sort (nj,cj)
+                     match = .true.
+                     do k = 1, ni
+                        if (ci(k) .ne. cj(k)) then
+                           match = .false.
+                           goto 40
+                        end if
+   40                   continue
+                     end do
+                     if (match) then
+                        type(j) = type(i)
+                        if (list(i).eq.0 .or. list(j).eq.0) then
+                           if (header) then
+                              header = .false.
+                              write (iout,50)
+   50                         format (/,' Equivalent Atoms Assigned',
+     &                                   ' the Same Atom Type :',/)
+                           end if
+                           write (iout,60)  i,j
+   60                      format (' Atoms',i6,2x,'and',i6,2x,
+     &                                'Set to Equivalent Types')
+                           list(i) = 1
+                           list(j) = 1
+                        end if
                      end if
-   40                continue
-                  end do
-                  if (match) then
-                     type(j) = type(i)
-                     if (header) then
-                        header = .false.
-                        write (iout,50)
-   50                   format (/,' Equivalent Atoms Set',
-     &                             ' to Same Atom Type :',/)
-                     end if
-                     write (iout,60)  i,j
-   60                format (' Atoms',i6,2x,'and',i6,2x,
-     &                          'are Equivalent')
                   end if
                end if
             end do
          end do
 c
+c     perform deallocation of some local arrays
+c
+         deallocate (ci)
+         deallocate (cj)
+c
 c     perform dynamic allocation of some local arrays
 c
-         size = 40
-         allocate (list(size))
+         allocate (tsort(n))
+         allocate (pkey(n))
+         allocate (pt(n))
 c
-c     query for sets of atoms to condense to a single type
+c     count the number of distinct atom types in the system
+c
+         numtyp = 0
+         do i = 1, n
+            numtyp = max(numtyp,type(i))
+         end do
+c
+c     query for more atom sets to condense to a single type
 c
          done = .false.
          dowhile (.not. done)
@@ -3058,64 +3352,51 @@ c
                list(i) = 0
             end do
             write (iout,70)
-   70       format (/,' Enter Further Sets of Equivalent Atoms',
-     &                 ' [<Enter>=Exit] :  ',$)
+   70       format (/,' Enter Sets of Equivalent or Different',
+     &                 ' Atoms [<Enter>=Exit] :  ',$)
             read (input,80)  record
    80       format (a240)
             read (record,*,err=90,end=90)  (list(i),i=1,size)
    90       continue
 c
-c     process the input groups to a list of equivalent atoms
+c     add or remove the equivalence of specified sets of atoms
 c
-            nsame = 0
-            do i = 1, n
-               isame(i) = 0
+            diff = .false.
+            nlist = 1
+            dowhile (list(nlist) .ne. 0)
+               if (type(list(nlist)) .ne. type(list(1)))  diff = .true.
+               nlist = nlist + 1
             end do
-            i = 1
-            do while (list(i) .ne. 0)
-               list(i) = max(-n,min(n,list(i)))
-               if (list(i) .gt. 0) then
-                  k = list(i)
-                  nsame = nsame + 1
-                  isame(nsame) = k
-                  i = i + 1
-               else
-                  list(i+1) = max(-n,min(n,list(i+1)))
-                  do k = abs(list(i)), abs(list(i+1))
-                     nsame = nsame + 1
-                     isame(nsame) = k
-                  end do
-                  i = i + 2
-               end if
-            end do
-            if (nsame .eq. 0)  done = .true.
-c
-c     assign equivalent atoms to a common atom type number
-c
-            if (nsame .ne. 0) then
-               repeat = .true.
-               call sort8 (nsame,isame)
-               k = type(isame(1))
-               do i = 1, nsame
-                  type(isame(i)) = k
+            nlist = nlist - 1
+            if (nlist .eq. 0) then
+               done = .true.
+            else if (diff) then
+               do i = 2, nlist
+                  type(list(i)) = type(list(1))
+               end do
+            else
+               do i = 2, nlist
+                  numtyp = numtyp + 1
+                  type(list(i)) = numtyp
                end do
             end if
          end do
 c
-c     renumber the atom types to remove deleted type numbers
+c     renumber the atom types to give consecutive ordering
 c
          do i = 1, n
-            tsort(i) = type(i)
+            tsort(i) = 0
          end do
-         call sort3 (n,tsort,tkey)
-         k = 0
          m = 0
          do i = 1, n
-            if (tsort(i) .ne. k) then
+            k = type(i)
+            if (tsort(k) .eq. 0) then
+               tsort(k) = i
                m = m + 1
-               k = tsort(i)
+               type(i) = m
+            else
+               type(i) = type(tsort(k))
             end if
-            type(tkey(i)) = m
          end do
 c
 c     print the atoms, atom types and local frame definitions
@@ -3197,9 +3478,7 @@ c
 c     perform deallocation of some local arrays
 c
          deallocate (list)
-         deallocate (isame)
          deallocate (tsort)
-         deallocate (tkey)
          deallocate (pkey)
          deallocate (pt)
       end if
@@ -3296,7 +3575,7 @@ c
             end if
             if (polaxe(i) .eq. 'None') then
                do j = 2, 13
-                  pole(13,i) = 0.0d0
+                  pole(j,i) = 0.0d0
                end do
             end if
             if (polaxe(i) .eq. 'Z-Only') then
