@@ -97,7 +97,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 ##  Build:    TINKER
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 8.3
+##  Compiler: GNU gfortran 7.5
 ##  Parallel: OpenMP
 
 #CC = gcc
@@ -124,7 +124,7 @@ CCFLAGS = -c
 F77FLAGS = -c
 OPTFLAGS = -Ofast -mssse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -Wl,--no-as-needed -ldl
 LIBS = -lstdc++
 LIBFLAGS = -crusv
 RANLIB = ranlib -c

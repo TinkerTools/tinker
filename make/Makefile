@@ -63,13 +63,13 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Build:     TINKER
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 8.3
+##  Compiler:  GNU gfortran 7.5
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -msse3 -fopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
 #LIBS = 
 #LIBFLAGS = -crusv
 #RANLIB = ranlib
@@ -144,7 +144,7 @@ RENAME = rename_bin
 ##  Build:     TINKER
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel Xeon
-##  Compiler:  PGI Fortran for MacOS 18.10
+##  Compiler:  PGI Fortran 19.10 for MacOS
 ##  Parallel:  OpenMP
 
 #F77 = pgfortran

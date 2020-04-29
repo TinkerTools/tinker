@@ -1,7 +1,12 @@
 apbs
 bin
+doc/amoeba
 doc/announce
+doc/crambin
+doc/heart
+doc/hippo
 doc/mechanic
+doc/multipoles
 doc/word
 #fftw
 lib/linux/lib*
