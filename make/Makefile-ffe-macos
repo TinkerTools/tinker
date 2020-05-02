@@ -105,7 +105,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 #CCFLAGS = -c
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -msse3 -fopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
 #LIBS = -lstdc++
 #LIBFLAGS = -crusv
 #RANLIB = ranlib
@@ -124,7 +124,7 @@ CCFLAGS = -c
 F77FLAGS = -c
 OPTFLAGS = -Ofast -mssse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -Wl,--no-as-needed -ldl
+LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 LIBS = -lstdc++
 LIBFLAGS = -crusv
 RANLIB = ranlib -c

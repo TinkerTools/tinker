@@ -736,7 +736,7 @@ c
 c     "priority" decides which of a set of connected atoms should
 c     have highest priority in construction of a local coordinate
 c     frame and returns its atom number; if all atoms are of equal
-c     priority then a zero is returned
+c     priority then zero is returned
 c
 c
       function priority (i,ia,ib,ic)
@@ -1045,7 +1045,7 @@ c
                   end if
                end if
             end if
-         else if (ka.eq.kb .and. ka.eq.kc) then
+         else
             if (ja.gt.jb.and.ja.gt.jc) then
                priority = ia
             else if (jb.gt.ja .and. jb.gt.jc) then
@@ -1058,7 +1058,7 @@ c
                priority = ib
             else if (jc.lt.ja .and. jc.lt.jb) then
                priority = ic
-            else if (ja.eq.jb .and. ja.eq.jc) then
+            else
                ma = 0
                mb = 0
                mc = 0
