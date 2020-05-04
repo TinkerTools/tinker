@@ -92,8 +92,9 @@ c
 c     find and store all the atomic partial charges
 c
       do i = 1, n
+         pchg(i) = 0.0d0
          it = type(i)
-         pchg(i) = chg(it)
+         if (it .ne. 0)  pchg(i) = chg(it)
       end do
 c
 c     use special charge parameter assignment method for MMFF

@@ -495,10 +495,10 @@ c
 c     vdw reduction factor information for each individual atom
 c
       do i = 1, n
-         kred(i) = reduct(jvdw(i))
-         if (n12(i).ne.1 .or. kred(i).eq.0.0d0) then
-            ired(i) = i
-         else
+         ired(i) = i
+         kred(i) = 0.0d0
+         if (jvdw(i) .ne. 0)  kred(i) = reduct(jvdw(i))
+         if (n12(i).eq.1 .and. kred(i).ne.0.0d0) then
             ired(i) = i12(1,i)
          end if
       end do
@@ -591,9 +591,11 @@ c     remove zero-sized atoms from the list of vdw sites
 c
       nvdw = 0
       do i = 1, n
-         if (rad(jvdw(i)) .ne. 0.0d0) then
-            nvdw = nvdw + 1
-            ivdw(nvdw) = i
+         if (jvdw(i) .ne. 0) then
+            if (rad(jvdw(i)) .ne. 0.0d0) then
+               nvdw = nvdw + 1
+               ivdw(nvdw) = i
+            end if
          end if
       end do
 c

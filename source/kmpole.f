@@ -620,10 +620,15 @@ c
 c     assign the charge penetration charge and alpha parameters 
 c     
       do i = 1, n
+         pcore(i) = 0.0d0
+         pval(i) = pole(1,i)
+         palpha(i) = 0.0d0
          ic = class(i)
-         pcore(i) = cpele(ic)
-         pval(i) = pole(1,i) - cpele(ic)
-         palpha(i) = cpalp(ic)
+         if (ic .ne. 0) then
+            pcore(i) = cpele(ic)
+            pval(i) = pole(1,i) - cpele(ic)
+            palpha(i) = cpalp(ic)
+         end if
       end do
 c
 c     process keywords with charge penetration for specific atoms

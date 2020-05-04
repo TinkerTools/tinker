@@ -46,7 +46,8 @@ c
       use poltcg
       use potent
       implicit none
-      integer i,j,k,next
+      integer i,j,k
+      integer it,next
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
@@ -358,9 +359,15 @@ c
 c     find and store the atomic dipole polarizability parameters
 c
       do i = 1, n
-         polarity(i) = polr(type(i))
-         thole(i) = athl(type(i))
-         dirdamp(i) = ddir(type(i))
+         polarity(i) = 0.0d0
+         thole(i) = 0.0d0
+         dirdamp(i) = 0.0d0
+         it = type(i)
+         if (it .ne. 0) then
+            polarity(i) = polr(it)
+            thole(i) = athl(it)
+            dirdamp(i) = ddir(it)
+         end if
       end do
 c
 c     process keywords containing atom specific polarizabilities
@@ -562,27 +569,29 @@ c
          np11(i) = 1
          ip11(1,i) = i
          it = type(i)
-         do j = 1, n12(i)
-            jj = i12(j,i)
-            jt = type(jj)
-            do k = 1, maxval
-               kk = pgrp(k,it)
-               if (kk .eq. 0)  goto 20
-               if (pgrp(k,it) .eq. jt) then
-                  np11(i) = np11(i) + 1
-                  if (np11(i) .le. maxp11) then
-                     ip11(np11(i),i) = jj
-                  else
-                     write (iout,10)
-   10                format (/,' POLARGRP  --  Too many Atoms',
-     &                          ' in Polarization Group')
-                     abort = .true.
-                     goto 30
+         if (it .ne. 0) then
+            do j = 1, n12(i)
+               jj = i12(j,i)
+               jt = type(jj)
+               do k = 1, maxval
+                  kk = pgrp(k,it)
+                  if (kk .eq. 0)  goto 20
+                  if (pgrp(k,it) .eq. jt) then
+                     np11(i) = np11(i) + 1
+                     if (np11(i) .le. maxp11) then
+                        ip11(np11(i),i) = jj
+                     else
+                        write (iout,10)
+   10                   format (/,' POLARGRP  --  Too many Atoms',
+     &                             ' in Polarization Group')
+                        abort = .true.
+                        goto 30
+                     end if
                   end if
-               end if
+               end do
+   20          continue
             end do
-   20       continue
-         end do
+         end if
       end do
    30 continue
 c

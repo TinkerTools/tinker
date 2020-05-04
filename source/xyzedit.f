@@ -1629,7 +1629,7 @@ c
       header = .true.
       if (n-nref(1) .ge. 10000) then
          write (iout,30)
-   30    format (/,' Scan for Solvent Molecules to be Removed')
+   30    format (/,' Scan for Solvent Molecules to be Removed :')
       end if
 c
 c     OpenMP directives for the major loop structure
@@ -1743,10 +1743,13 @@ c
       use katoms
       use molcul
       implicit none
-      integer i,k
+      integer i,j,k
+      integer nsolute,size
       integer start,stop
       integer icount,iontyp
       integer ncopy,ranatm
+      integer, allocatable :: list(:)
+      integer, allocatable :: isolute(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr,rik2
       real*8 close,close2
@@ -1757,31 +1760,57 @@ c
       real*8, allocatable :: zion(:)
       logical exist,header,done
       logical, allocatable :: remove(:)
-      logical, allocatable :: solute(:)
       character*240 record
       character*240 string
       external random
 c
 c
+c     perform dynamic allocation of some local arrays
+c
+      size = 40
+      allocate (list(size))
+      allocate (isolute(n))
+c
 c     get the range atoms numbers constituting the solute
 c
+      do i = 1, size
+         list(i) = 0
+      end do
+      i = 0
+      do while (exist)
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=10,end=10)  list(i+1)
+            i = i + 1
+         end if
+      end do
    10 continue
-      start = 0
-      stop = 0
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=20,end=20)  start
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=20,end=20)  stop
-   20 continue
-      if (start.eq.0 .or. stop.eq.0) then
-         write (iout,30)
-   30    format (/,' Enter Start and End Atom Numbers of Solute :  ',$)
-         read (input,40)  record
-   40    format (a240)
+      if (i .eq. 0) then
+         write (iout,20)
+   20    format (/,' Enter Atom Numbers in Solute Molecules :  ',$)
+         read (input,30)  record
+   30    format (a240)
+         read (record,*,err=40,end=40)  (list(i),i=1,size)
+   40    continue
       end if
-      read (record,*,err=10,end=10)  start,stop
-      start = abs(start)
-      stop = abs(stop)
+      i = 1
+      nsolute = 0
+      do while (list(i) .ne. 0)
+         list(i) = max(-n,min(n,list(i)))
+         if (list(i) .gt. 0) then
+            k = list(i)
+            nsolute = nsolute + 1
+            isolute(nsolute) = k
+            i = i + 1
+         else
+            list(i+1) = max(-n,min(n,list(i+1)))
+            do k = abs(list(i)), abs(list(i+1))
+               nsolute = nsolute + 1
+               isolute(nsolute) = k
+            end do
+            i = i + 2
+         end if
+      end do
 c
 c     get the atom type of ion to be added and number of copies
 c
@@ -1795,13 +1824,13 @@ c
    60 continue
       if (iontyp.eq.0 .or. ncopy.eq.0) then
          write (iout,70)
-   70    format (/,' Enter Atom Type to Add and Number of Copies :  ',$)
+   70    format (/,' Enter Ion Atom Type Number & Copies to Add :  ',$)
          read (input,80)  record
    80    format (a240)
       end if
       read (record,*,err=50,end=50)  iontyp,ncopy
 c
-c     set distance cutoff for solute-ion close contacts
+c     set minimum distance cutoff for solute-ion contacts
 c
       close = 5.0d0
       close2 = close * close
@@ -1809,7 +1838,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (remove(nmol))
-      allocate (solute(nmol))
       allocate (xion(ncopy))
       allocate (yion(ncopy))
       allocate (zion(ncopy))
@@ -1818,7 +1846,6 @@ c     initialize the list of solvent molecules to be deleted
 c
       do i = 1, nmol
          remove(i) = .false.
-         solute(i) = .false.
       end do
 c
 c     print header information when processing large systems
@@ -1827,26 +1854,28 @@ c
       header = .true.
       if (n .ge. 10000) then
          write (iout,90)
-   90    format (/,' Scan for Available Locations to Place Ions')
+   90    format (/,' Scan for Available Locations to Place Ions :')
       end if
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(n,x,y,z,molcule,close2,remove,header,start,stop,icount)
+!$OMP& shared(n,x,y,z,molcule,close2,remove,header,nsolute,
+!$OMP& isolute,icount)
 !$OMP DO schedule(guided)
 c
-c     search for close contacts between solute and solvent
+c     search for short distance between solute and solvent
 c
       do i = 1, n
          if (.not. remove(molcule(i))) then
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            do k = start, stop
-               xr = x(k) - xi
-               yr = y(k) - yi
-               zr = z(k) - zi
+            do k = 1, nsolute
+               j = isolute(k)
+               xr = x(j) - xi
+               yr = y(j) - yi
+               zr = z(j) - zi
                call imagen (xr,yr,zr)
                rik2 = xr*xr + yr*yr + zr*zr
                if (rik2 .lt. close2) then
@@ -1873,12 +1902,16 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (isolute)
+c
 c     print final status when processing large systems
 c
-      icount = n
-      if (mod(icount,10000).ne.0 .and. icount.gt.10000) then
-         write (iout,130)  icount
-  130    format (' Atoms Processed',i15)
+      if (mod(n,10000).ne.0 .and. n.gt.10000) then
+         write (iout,130)  n
+  130    format (' Solvent Atoms Processed',i15)
       end if
 c
 c     randomly replace the solvent molecules with ions
@@ -1932,5 +1965,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (remove)
+      deallocate (xion)
+      deallocate (yion)
+      deallocate (zion)
       return
       end

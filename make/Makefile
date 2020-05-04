@@ -69,6 +69,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 #F77 = gfortran
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -msse3 -fopenmp
+#OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
 #LIBS = 
 #LIBFLAGS = -crusv

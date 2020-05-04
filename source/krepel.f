@@ -93,10 +93,15 @@ c
 c     assign the repulsion size, alpha and valence parameters 
 c     
       do i = 1, n
+         sizpr(i) = 0.0d0
+         dmppr(i) = 0.0d0
+         elepr(i) = 0.0d0
          ic = class(i)
-         sizpr(i) = prsiz(ic)
-         dmppr(i) = prdmp(ic)
-         elepr(i) = prele(ic)
+         if (ic .ne. 0) then
+            sizpr(i) = prsiz(ic)
+            dmppr(i) = prdmp(ic)
+            elepr(i) = prele(ic)
+         end if
       end do
 c
 c     process keywords containing atom specific Pauli repulsion
