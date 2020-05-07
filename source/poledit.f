@@ -3202,8 +3202,9 @@ c
       logical header,exist
       logical query,condense
       logical match,diff
-      logical yzero,xyzero
+      logical useframe
       logical symmetry
+      logical yzero,xyzero
       character*1 answer
       character*4 pa,pb,pc,pd
       character*16 ptlast
@@ -3413,25 +3414,27 @@ c
   110       format (2i8,9x,a8,6x,3i8)
          end do
 c
-c     find atoms with equivalent local frame defining atom types,
-c     or simply locate all atoms with the same atom type number
+c     identify atoms with the same atom type number, or find
+c     atoms with equivalent local frame defining atom types
 c
+         useframe = .false.
          do i = 1, npole
             k = ipole(i)
             it = type(k)
             zaxe = 0
             xaxe = 0
             yaxe = 0
-            if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
-            if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
-            if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+            if (useframe) then
+               if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
+               if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
+               if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+            end if
             size = 4
             call numeral (it,pa,size)
             call numeral (zaxe,pb,size)
             call numeral (xaxe,pc,size)
             call numeral (yaxe,pd,size)
-c           pt(i) = pa//pb//pc//pd
-            pt(i) = pa//'000000000000'
+            pt(i) = pa//pb//pc//pd
          end do
          call sort7 (npole,pt,pkey)
 c
