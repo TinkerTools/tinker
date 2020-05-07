@@ -3409,11 +3409,12 @@ c
          do i = 1, n
             k = pollist(i)
             write (iout,110)  i,type(i),polaxe(k),zaxis(k),
-     &                       xaxis(k),yaxis(k)
+     &                        xaxis(k),yaxis(k)
   110       format (2i8,9x,a8,6x,3i8)
          end do
 c
-c     locate the equivalently defined multipole sites
+c     find atoms with equivalent local frame defining atom types,
+c     or simply locate all atoms with the same atom type number
 c
          do i = 1, npole
             k = ipole(i)
@@ -3429,7 +3430,8 @@ c
             call numeral (zaxe,pb,size)
             call numeral (xaxe,pc,size)
             call numeral (yaxe,pd,size)
-            pt(i) = pa//pb//pc//pd
+c           pt(i) = pa//pb//pc//pd
+            pt(i) = pa//'000000000000'
          end do
          call sort7 (npole,pt,pkey)
 c

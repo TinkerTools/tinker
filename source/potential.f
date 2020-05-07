@@ -1298,8 +1298,10 @@ c
 c
 c     get residual due to total molecular charge restraint
 c
-         iresid = iresid + 1
-         resid(iresid) = (netchg-dble(nint(netchg)))*cscale
+         if (fit_mpl) then
+            iresid = iresid + 1
+            resid(iresid) = (netchg-dble(nint(netchg)))*cscale
+         end if
       end do
 c
 c     get residuals due to deviation from initial parameters
