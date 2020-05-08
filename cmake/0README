@@ -1,11 +1,18 @@
-# Building TINKER using CMake
 
-```
-cmake path/to/tinker/source
-make -j
-make install
-```
+                    #######################################
+                    Building the Tinker Package Using CMake
+                    #######################################
 
-`cmake` is the command-line (CLI) utility, `cmake` can be replaced by `ccmake`
-(a text-based ui) or `cmake-gui` (a graphical frontend). CMake works on Linux
-desktop environments, Windows and MacOS X.
+         "cmake" is the command-line utility, and can be replaced by
+         "ccmake" for a text-based UI or "cmake-gui" for a graphical
+         frontend. CMake works on Linux, MacOS and Windows. Requires
+         the pkg-config and cmake-data packages in addition to cmake.
+
+         To build with "cmake" issue the following commands:
+
+               (1) cp CMakeLists.txt path/to/tinker/source
+               (2) cmake path/to/tinker/source
+               (3) cd path/to/tinker/source
+               (4) make -j
+               (5) make install
+
