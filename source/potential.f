@@ -2101,12 +2101,15 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (pt(ntot))
 c
-c     output the optimized atomic multipole values to the keyfile
+c     initialize atom type and local frame defining strings
 c
-      header = .true.
       do i = 1, ntot
          pt(i) = '                '
       end do
+c
+c     output the optimized atomic multipole values to the keyfile
+c
+      header = .true.
       m = 0
       do k = 1, nconf
          call getref (k)
