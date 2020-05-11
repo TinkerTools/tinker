@@ -2013,14 +2013,17 @@ c
       use potfit
       use units
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer ii,it
       integer ix,iy,iz
       integer ikey,size
+      integer ntot
       integer freeunit
       integer trimtext
       real*8 dterm,qterm
       logical done,header
+      character*4 pa,pb,pc,pd
+      character*16, allocatable :: pt(:)
       character*240 keyfile
       character*240 record
 c
@@ -2086,12 +2089,25 @@ c
       dterm = 1.0d0 / bohr
       qterm = 3.0d0 / bohr**2
 c
+c     get total atoms in all structures used in the fitting
+c
+      ntot = 0
+      do k = 1, nconf
+         call getref(k)
+         ntot = ntot + n
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (pt(ntot))
+c
 c     output the optimized atomic multipole values to the keyfile
 c
       header = .true.
-      do i = 1, maxtyp
-         fitpol(i) = .false.
+      do i = 1, ntot
+         pt(i) = '                '
       end do
+      m = 0
       do k = 1, nconf
          call getref (k)
          call setelect
@@ -2101,14 +2117,28 @@ c
             it = type(ii)
             if (fatm(ii))  done = .false.
             if (.not. done) then
-               if (fitpol(it))  done = .true.
-               fitpol(it) = .true.
+               iz = zaxis(i)
+               ix = xaxis(i)
+               iy = yaxis(i)
+               call numeral (it,pa,size)
+               call numeral (iz,pb,size)
+               call numeral (ix,pc,size)
+               call numeral (iy,pd,size)
+               m = m + 1
+               pt(m) = pa//pb//pc//pd
+               do j = 1, m-1
+                  if (pt(m) .eq. pt(j)) then
+                     done = .true.
+                     goto 40
+                  end if
+               end do
+   40          continue
             end if
             if (.not. done) then
                if (header) then
                   header = .false.
-                  write (ikey,40)
-   40             format (/,'#',/,'# Multipoles from Electrostatic',
+                  write (ikey,50)
+   50             format (/,'#',/,'# Multipoles from Electrostatic',
      &                       ' Potential Fitting',/,'#',/)
                end if
                pole(1,i) = fpol(1,it)
@@ -2118,9 +2148,6 @@ c
                do j = 5, 13
                   pole(j,i) = qterm * fpol(j,it)
                end do
-               iz = zaxis(i)
-               ix = xaxis(i)
-               iy = yaxis(i)
                if (iy .lt. 0) then
                   yaxis(i) = -yaxis(i)
                   iy = yaxis(i)
@@ -2134,46 +2161,50 @@ c
                if (ix .ne. 0)  ix = type(ix)
                if (iy .ne. 0)  iy = type(iy)
                if (polaxe(i) .eq. 'None') then
-                  write (ikey,50)  it,pole(1,i)
-   50             format ('multipole',27x,f11.5)
+                  write (ikey,60)  it,pole(1,i)
+   60             format ('multipole',27x,f11.5)
                else if (polaxe(i) .eq. 'Z-Only') then
-                  write (ikey,60)  it,iz,pole(1,i)
-   60             format ('multipole',1x,2i5,16x,f11.5)
+                  write (ikey,70)  it,iz,pole(1,i)
+   70             format ('multipole',1x,2i5,16x,f11.5)
                else if (polaxe(i) .eq. 'Z-then-X') then
                   if (yaxis(i) .eq. 0) then
-                     write (ikey,70)  it,iz,ix,pole(1,i)
-   70                format ('multipole',1x,3i5,11x,f11.5)
+                     write (ikey,80)  it,iz,ix,pole(1,i)
+   80                format ('multipole',1x,3i5,11x,f11.5)
                   else
-                     write (ikey,80)  it,iz,ix,iy,pole(1,i)
-   80                format ('multipole',1x,4i5,6x,f11.5)
+                     write (ikey,90)  it,iz,ix,iy,pole(1,i)
+   90                format ('multipole',1x,4i5,6x,f11.5)
                   end if
                else if (polaxe(i) .eq. 'Bisector') then
                   if (yaxis(i) .eq. 0) then
-                     write (ikey,90)  it,-iz,-ix,pole(1,i)
-   90                format ('multipole',1x,3i5,11x,f11.5)
+                     write (ikey,100)  it,-iz,-ix,pole(1,i)
+  100                format ('multipole',1x,3i5,11x,f11.5)
                   else
-                     write (ikey,100)  it,-iz,-ix,iy,pole(1,i)
-  100                format ('multipole',1x,4i5,6x,f11.5)
+                     write (ikey,110)  it,-iz,-ix,iy,pole(1,i)
+  110                format ('multipole',1x,4i5,6x,f11.5)
                   end if
                else if (polaxe(i) .eq. 'Z-Bisect') then
-                  write (ikey,110)  it,iz,-ix,-iy,pole(1,i)
-  110             format ('multipole',1x,4i5,6x,f11.5)
-               else if (polaxe(i) .eq. '3-Fold') then
-                  write (ikey,120)  it,-iz,-ix,-iy,pole(1,i)
+                  write (ikey,120)  it,iz,-ix,-iy,pole(1,i)
   120             format ('multipole',1x,4i5,6x,f11.5)
+               else if (polaxe(i) .eq. '3-Fold') then
+                  write (ikey,130)  it,-iz,-ix,-iy,pole(1,i)
+  130             format ('multipole',1x,4i5,6x,f11.5)
                end if
-               write (ikey,130)  pole(2,i),pole(3,i),pole(4,i)
-  130          format (36x,3f11.5)
-               write (ikey,140)  pole(5,i)
-  140          format (36x,f11.5)
-               write (ikey,150)  pole(8,i),pole(9,i)
-  150          format (36x,2f11.5)
-               write (ikey,160)  pole(11,i),pole(12,i),pole(13,i)
-  160          format (36x,3f11.5)
+               write (ikey,140)  pole(2,i),pole(3,i),pole(4,i)
+  140          format (36x,3f11.5)
+               write (ikey,150)  pole(5,i)
+  150          format (36x,f11.5)
+               write (ikey,160)  pole(8,i),pole(9,i)
+  160          format (36x,2f11.5)
+               write (ikey,170)  pole(11,i),pole(12,i),pole(13,i)
+  170          format (36x,3f11.5)
             end if
          end do
       end do
       close (unit=ikey)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pt)
       return
       end
 c
