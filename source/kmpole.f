@@ -251,7 +251,7 @@ c
          zaxis(i) = 0
          xaxis(i) = 0
          yaxis(i) = 0
-         polaxe(i) = '        '
+         polaxe(i) = 'None'
          do j = 1, 13
             pole(j,i) = 0.0d0
          end do
@@ -539,7 +539,7 @@ c
 c
 c     get the order of the multipole expansion at each site
 c
-      npole = 0
+      npole = n
       do i = 1, n
          size = 0
          do k = 1, maxpole
@@ -551,7 +551,6 @@ c
             size = 4
          end if
          polsiz(i) = size
-         if (polsiz(i) .ne. 0)  npole = npole + 1
       end do
 c
 c     perform dynamic allocation of some global arrays
@@ -668,26 +667,28 @@ c
 c
 c     remove zero or undefined atomic multipoles from the list
 c
-      npole = 0
-      ncp = 0
-      do i = 1, n
-         if (polsiz(i) .ne. 0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do j = 1, maxpole
-               pole(j,npole) = pole(j,i)
-            end do
-            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-            pcore(npole) = pcore(i)
-            pval(npole) = pval(i)
-            palpha(npole) = palpha(i)
-         end if
-      end do
+      if (.not.use_polar .and. .not.use_chgtrn) then
+         npole = 0
+         ncp = 0
+         do i = 1, n
+            if (polsiz(i) .ne. 0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do j = 1, maxpole
+                  pole(j,npole) = pole(j,i)
+               end do
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               palpha(npole) = palpha(i)
+            end if
+         end do
+      end if
 c
 c     test multipoles at chiral sites and invert if necessary
 c

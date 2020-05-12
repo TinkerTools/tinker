@@ -141,7 +141,7 @@ c
       do i = 1, n
          if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
          if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0 .or.
-     &          chgct(i).ne. 0.0d0 .or. dmpct(i).ne.0.0d0) then
+     &          chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
             npole = npole + 1
             ipole(npole) = i
             pollist(i) = npole

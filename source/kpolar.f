@@ -358,6 +358,7 @@ c
 c
 c     find and store the atomic dipole polarizability parameters
 c
+      npolar = n
       do i = 1, n
          polarity(i) = 0.0d0
          thole(i) = 0.0d0
@@ -427,36 +428,38 @@ c
 c
 c     remove zero and or undefined polarizable sites from the list
 c
-      npole = 0
-      ncp = 0
-      npolar = 0
-      do i = 1, n
-         if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
-         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do k = 1, maxpole
-               pole(k,npole) = pole(k,i)
-            end do
-            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-            pcore(npole) = pcore(i)
-            pval(npole) = pval(i)
-            palpha(npole) = palpha(i)
-            if (polarity(i) .ne. 0.0d0) then
-               npolar = npolar + 1
-               ipolar(npolar) = npole
-               douind(i) = .true.
+      if (.not. use_chgtrn) then
+         npole = 0
+         ncp = 0
+         npolar = 0
+         do i = 1, n
+            if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
+            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do k = 1, maxpole
+                  pole(k,npole) = pole(k,i)
+               end do
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               palpha(npole) = palpha(i)
+               if (polarity(i) .ne. 0.0d0) then
+                  npolar = npolar + 1
+                  ipolar(npolar) = npole
+                  douind(i) = .true.
+               end if
+               polarity(npole) = polarity(i)
+               thole(npole) = thole(i)
+               dirdamp(npole) = dirdamp(i)
             end if
-            polarity(npole) = polarity(i)
-            thole(npole) = thole(i)
-            dirdamp(npole) = dirdamp(i)
-         end if
-      end do
+         end do
+      end if
 c
 c     test multipoles at chiral sites and invert if necessary
 c
