@@ -1,0 +1,260 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                          Version 8.8  June 2020                          ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ The Tinker Multipole Editing Utility Can :
+
+    (1) Multipole Parameters from GDMA Output
+    (2) Alter Local Coordinate Frame Definitions
+    (3) Removal of Intramolecular Polarization
+
+ Enter the Number of the Desired Choice :  
+ Enter GDMA Output File Name :  
+ Global Frame Cartesian Multipole Moments :
+
+ Site:       1         Name:   O         Atomic Number:       8
+
+ Coordinates:           -0.746025       0.126258       0.000000
+
+ Charge:                 -0.56831
+ Dipole:                  0.28491        0.00474        0.00000
+ Quadrupole:              0.59218
+                         -0.04349       -0.19777
+                          0.00000        0.00000       -0.39440
+
+ Site:       2         Name:   H         Atomic Number:       1
+
+ Coordinates:           -1.122396      -0.743366       0.000000
+
+ Charge:                  0.35570
+ Dipole:                 -0.04449       -0.07804        0.00000
+ Quadrupole:              0.00414
+                          0.00408        0.00886
+                          0.00000        0.00000       -0.01300
+
+ Site:       3         Name:   C         Atomic Number:       6
+
+ Coordinates:            0.662021      -0.017866       0.000000
+
+ Charge:                  0.14921
+ Dipole:                 -0.42814        0.03717        0.00000
+ Quadrupole:              0.85723
+                         -0.12341       -0.47044
+                          0.00000        0.00000       -0.38678
+
+ Site:       4         Name:   H         Atomic Number:       1
+
+ Coordinates:            1.139483       0.986564       0.000000
+
+ Charge:                  0.05496
+ Dipole:                  0.05530        0.10631        0.00000
+ Quadrupole:             -0.00675
+                          0.00673        0.01830
+                          0.00000        0.00000       -0.01155
+
+ Site:       5         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.989493      -0.573033       0.907011
+
+ Charge:                  0.00422
+ Dipole:                  0.04277       -0.06066        0.10310
+ Quadrupole:             -0.00489
+                          0.00169       -0.00105
+                         -0.00367       -0.00739        0.00594
+
+ Site:       6         Name:   H         Atomic Number:       1
+
+ Coordinates:            0.989495      -0.573034      -0.907010
+
+ Charge:                  0.00422
+ Dipole:                  0.04278       -0.06066       -0.10310
+ Quadrupole:             -0.00489
+                          0.00169       -0.00105
+                          0.00367        0.00739        0.00594
+
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Z-then-X         3       2       0
+       2      H         Z-then-X         1       3       0
+       3      C         Z-then-X         1       2       0
+       4      H         Z-then-X         3       1       0
+       5      H         Z-then-X         3       1       0
+       6      H         Z-then-X         3       1       0
+
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Enter Altered Local Frame Definition [<Enter>=Exit] :  
+ Local Frame Definition for Multipole Sites :
+
+     Atom     Name      Axis Type     Z Axis  X Axis  Y Axis
+
+       1      O         Z-then-X         2       3       0
+       2      H         Z-then-X         1       3       0
+       3      C         Z-then-X         1       2       0
+       4      H         Z-then-X         3       1       0
+       5      H         Z-then-X         3       1       0
+       6      H         Z-then-X         3       1       0
+
+ Choose Either the AMOEBA or HIPPO Polarization Model [A] :  
+ Polarizability Parameters for Multipole Sites :
+
+     Atom     Name       Polarize          Thole
+
+       1      O            0.8370         0.3900
+       2      H            0.4960         0.3900
+       3      C            1.3340         0.3900
+       4      H            0.4960         0.3900
+       5      H            0.4960         0.3900
+       6      H            0.4960         0.3900
+
+ Enter Atom Number, Polarizability & Thole Values :  
+ The default is to place all atoms into one polarization group;
+ This can be altered by entering a series of bonded atom pairs
+ that separate the molecule into distinct polarization groups
+
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Enter a Bond between Polarization Groups [<Enter>=Exit] :  
+ Polarization Groups for Multipole Sites :
+
+     Atom     Name       Polarization Group Definition
+
+       1      O               2
+       2      H               1
+       3      C               4     5     6
+       4      H               3
+       5      H               3
+       6      H               3
+
+ Electrostatic and Polarization Scale Factors :
+
+                    1-2         1-3         1-4         1-5
+
+ M-Scale:         0.0000      0.0000      0.4000      0.8000
+ P-Inter:         0.0000      0.0000      1.0000      1.0000
+ P-Intra:         0.0000      0.0000      0.5000      1.0000
+ W-Scale:         1.0000      1.0000      1.0000      1.0000
+
+                    1-1         1-2         1-3         1-4
+
+ D-Scale:         0.0000      1.0000      1.0000      1.0000
+ U-Scale:         1.0000      1.0000      1.0000      1.0000
+
+ Use Thole Damping:           True
+ Charge Penetration:          False
+ Set D Equal to P:            False
+
+ Determination of Intergroup Induced Dipoles :
+
+    Iter        RMS Change (Debye)
+
+       1           0.0322249995
+       2           0.0088657713
+       3           0.0007443310
+       4           0.0001716415
+       5           0.0000277247
+       6           0.0000073676
+       7           0.0000008535
+
+ Local Frame Intergroup Induced Dipole Moments (Debye) :
+
+    Atom              X           Y           Z         Total
+
+       1          -0.0483     -0.0000      0.0224      0.0532
+       2          -0.0787      0.0000     -0.2044      0.2190
+       3          -0.2174     -0.0000      0.7751      0.8050
+       4          -0.0097      0.0000      0.0310      0.0325
+       5          -0.0509      0.0195      0.0395      0.0674
+       6          -0.0509     -0.0195      0.0395      0.0674
+
+ Condense Symmetric Atoms to Equivalent Types [Y] :  
+ Equivalent Atoms Assigned the Same Atom Type :
+
+ Atoms     4  and     5  Set to Equivalent Types
+ Atoms     4  and     6  Set to Equivalent Types
+
+ Enter Sets of Equivalent or Different Atoms [<Enter>=Exit] :  
+ Atom Type and Local Frame Definition for Each Atom :
+
+     Atom    Type      Local Frame          Frame Defining Atoms
+
+       1       1         Z-then-X             2       3       0
+       2       2         Z-then-X             1       3       0
+       3       3         Z-then-X             1       2       0
+       4       4         Z-then-X             3       1       0
+       5       4         Z-then-X             3       1       0
+       6       4         Z-then-X             3       1       0
+
+ Remove Multipole Components Zeroed by Symmetry [Y] :  
+ Final Atomic Multipole Moments after Regularization :
+
+ Atom:       1         Name:   O         Atomic Number:       8
+
+ Local Frame:            Z-then-X             2       3       0
+
+ Charge:                 -0.56830
+ Dipole:                  0.27859        0.00000       -0.12634
+ Quadrupole:              0.49925
+                          0.00000       -0.39440
+                         -0.25819        0.00000       -0.10485
+
+ Atom:       2         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             1       3       0
+
+ Charge:                  0.35570
+ Dipole:                  0.02113        0.00000       -0.00888
+ Quadrupole:              0.00191
+                          0.00000       -0.01300
+                          0.00107        0.00000        0.01109
+
+ Atom:       3         Name:   C         Atomic Number:       6
+
+ Local Frame:            Z-then-X             1       2       0
+
+ Charge:                  0.14921
+ Dipole:                  0.09214        0.00000        0.12474
+ Quadrupole:             -0.48168
+                          0.00000       -0.38678
+                          0.01363        0.00000        0.86846
+
+ Atom:       4         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       1       0
+
+ Charge:                  0.02113
+ Dipole:                  0.00956        0.00000       -0.13894
+ Quadrupole:             -0.00329
+                          0.00000       -0.00769
+                         -0.00689        0.00000        0.01098
+
+ Atom:       5         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       1       0
+
+ Charge:                  0.02113
+ Dipole:                  0.00956        0.00000       -0.13894
+ Quadrupole:             -0.00329
+                          0.00000       -0.00769
+                         -0.00689        0.00000        0.01098
+
+ Atom:       6         Name:   H         Atomic Number:       1
+
+ Local Frame:            Z-then-X             3       1       0
+
+ Charge:                  0.02113
+ Dipole:                  0.00956        0.00000       -0.13894
+ Quadrupole:             -0.00329
+                          0.00000       -0.00769
+                         -0.00689        0.00000        0.01098

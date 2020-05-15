@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.7  June 2019                          ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -85,15 +85,15 @@
     41      -12.4036      0.6041      0.0028   0.0926    95.8499       66
     42      -12.4053      0.4306      0.0017   0.0210    82.7777       67
     43      -12.4077      0.0792      0.0024   0.0281    83.7382       68
-    44      -12.4078      0.0275      0.0001   0.0156    78.8322       69
-    45      -12.4078      0.0054      0.0000   0.0026   111.2481       70
-    46      -12.4078      0.0018      0.0000   0.0000    86.7693       71
+    44      -12.4078      0.0275      0.0001   0.0156    78.8320       69
+    45      -12.4078      0.0054      0.0000   0.0026   111.2482       70
+    46      -12.4078      0.0018      0.0000   0.0000    86.7696       71
     47      -12.4078      0.0000      0.0000   0.0000    94.4702       72
 
  OCVM  --  Normal Termination due to SmallGrad
 
  Final Function Value :          -12.4078
  Final RMS Gradient :          0.4851D-04
- Final Gradient Norm :         0.6861D-04
+ Final Gradient Norm :         0.6860D-04
 
  Tinker is Exiting following Normal Termination

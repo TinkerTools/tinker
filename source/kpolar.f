@@ -426,7 +426,7 @@ c
          end if
       end do
 c
-c     remove zero and or undefined polarizable sites from the list
+c     remove zero or undefined electrostatic sites from the list
 c
       if (.not. use_chgtrn) then
          npole = 0

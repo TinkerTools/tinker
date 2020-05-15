@@ -4,16 +4,16 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.7  June 2019                          ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
      ######################################################################
 
 
- Additional Atom Type Parameters :
+ Additional Atom Definition Parameters :
 
      Type  Class  Symbol  Description               Atomic    Mass   Valence
 

@@ -4,60 +4,60 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.7  June 2019                          ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
      ######################################################################
 
 
- Unit Cell Dimensions :      a    =    5.6280
-                             b    =    5.6280
-                             c    =    5.6280
-                            Alpha =   90.0000
-                            Beta  =   90.0000
-                            Gamma =   90.0000
+ Unit Cell Dimensions :       a     =      5.6280
+                              b     =      5.6280
+                              c     =      5.6280
+                             Alpha  =     90.0000
+                             Beta   =     90.0000
+                             Gamma  =     90.0000
 
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.6  February 2019                        ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
      ######################################################################
 
 
- Unit Cell Dimensions :      a    =    5.6280
-                             b    =    5.6280
-                             c    =    5.6280
-                            Alpha =   90.0000
-                            Beta  =   90.0000
-                            Gamma =   90.0000
+ Unit Cell Dimensions :       a     =      5.6280
+                              b     =      5.6280
+                              c     =      5.6280
+                             Alpha  =     90.0000
+                             Beta   =     90.0000
+                             Gamma  =     90.0000
 
- Space Group Symbol :            Fm3(-)m   
+ Space Group Symbol :        Fm3(-)m 
 
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.6  February 2019                        ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
      ######################################################################
 
 
- Additional Atom Type Parameters :
+ Additional Atom Definition Parameters :
 
      Type  Class  Symbol  Description               Atomic    Mass   Valence
 
@@ -99,10 +99,10 @@
  OCVM  --  Normal Termination due to SmallGrad
 
  Final Potential Function Value :       -754.4065
- Final RMS Coordinate Gradient :       0.3693D-12
- Final Coordinate Gradient Norm :      0.1044D-11
- Final RMS Lattice Gradient :          0.2063D-04
- Final Lattice Gradient Norm :         0.5054D-04
+ Final RMS Coordinate Gradient :       0.3413D-12
+ Final Coordinate Gradient Norm :      0.9654D-12
+ Final RMS Lattice Gradient :          0.2064D-04
+ Final Lattice Gradient Norm :         0.5057D-04
 
  Final Lattice Dimensions :      a         5.7660
                                  b         5.7660

@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.7  June 2019                          ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -18,9 +18,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.6  February 2019                        ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -40,7 +40,7 @@
  Atomic Partial Charges                         9
  Bond Dipole Moments                          311
 
- Atom Type Definition Parameters :
+ Atom Definition Parameters :
 
    Atom  Symbol  Type  Class  Atomic   Mass  Valence  Description
 
@@ -48,15 +48,6 @@
    253     H       23     23     1     1.008    1     Guanidinium             
    254     N        8      8     7    14.003    3     Amide                   
    255     C        1      1     6    12.000    4     Alkane (Csp3)           
-
- Van der Waals Parameters :
-
-          Atom Number       Size   Epsilon   Size 1-4   Eps 1-4   Reduction
-
-     1      252           1.6000    0.0150                          0.9230
-     2      253           1.6000    0.0150                          0.9230
-     3      254           1.9300    0.0430
-     4      255           2.0400    0.0270
 
  Bond Stretching Parameters :
 
@@ -245,6 +236,15 @@
                                         2nd     0.000   0  0.000 180  0.059   0
                                         3rd     0.000   0  0.000 180  0.000   0
 
+ Van der Waals Parameters :
+
+          Atom Number       Size   Epsilon   Size 1-4   Eps 1-4   Reduction
+
+     1      252           1.6000    0.0150                          0.9230
+     2      253           1.6000    0.0150                          0.9230
+     3      254           1.9300    0.0430
+     4      255           2.0400    0.0270
+
  Bond Dipole Moment Parameters :
 
           Atom Numbers                      Dipole   Position
@@ -276,9 +276,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.6  February 2019                        ##
+ ##                          Version 8.8  June 2020                          ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################

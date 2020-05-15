@@ -665,7 +665,7 @@ c
          end if
       end do
 c
-c     remove zero or undefined atomic multipoles from the list
+c     remove zero or undefined electrostatic sites from the list
 c
       if (.not.use_polar .and. .not.use_chgtrn) then
          npole = 0
