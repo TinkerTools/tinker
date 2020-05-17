@@ -15,7 +15,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Installation" href="installation.html" />
-    <link rel="prev" title="Tinker User Guide" href="../index.html" />
+    <link rel="prev" title="Force Field Explorer User Guide" href="../index.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -36,17 +36,17 @@
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="what-is-force-field-explorer">
 <h2>What is Force Field Explorer?<a class="headerlink" href="#what-is-force-field-explorer" title="Permalink to this headline">¶</a></h2>
-<p>Force Field Explorer (FFE) is a graphical user interface to the Tinker suite of molecular modeling tools. The goal is to create a robust environment for computational chemistry and molecular engineering applications. Current features include:</p>
+<p>Force Field Explorer (FFE) is a graphical user interface to the Tinker suite of software tools for molecular modeling. The goal is to create a robust environment for computational chemistry, biomolecular modeling and molecular engineering applications. Current features of FFE include:</p>
 <ul class="simple">
-<li><p>Setup and real-time visualization of modeling routines, including local/global optimizations, sampling methods, superposition, etc.</p></li>
-<li><p>Basic 3D molecular visualization (wireframe, tube, spacefilling, ball &amp; stick, etc.) with special features for force field specific parameters such as Lennard-Jones radii and partial charge magnitudes.</p></li>
-<li><p>A comprehensive editor for Tinker keyword files, which contain parameters that control modeling algorithms.</p></li>
-<li><p>Tinker trajectory playback.</p></li>
+<li><p>Setup and real-time visualization of modeling routines, including local/global optimizations, molecular dynamics, sampling methods, superposition, docking, etc.</p></li>
+<li><p>Basic 3D molecular visualization (wireframe, tube, spacefilled, ball &amp; stick, etc., and several coloring schemes) with special features for force field-specific parameters such as Lennard-Jones radii and partial charges, induced dipole vectors, and atomic force and velocity vectors.</p></li>
+<li><p>A comprehensive editor for Tinker keyword files containing parameters and options that control modeling algorithms.</p></li>
+<li><p>Playback of Tinker molecular dynamics trajectories and structure archives.</p></li>
 </ul>
 </div>
 <div class="section" id="current-release">
 <h2>Current Release<a class="headerlink" href="#current-release" title="Permalink to this headline">¶</a></h2>
-<p>The current release of Force Field Explorer is denoted as Version 8.8 and dated July 2020 to mirror the corresponding Tinker version. Dependencies, listed below, are now included in self-extracting installers for Linux, MacOS and Microsoft Windows.</p>
+<p>The current release of Force Field Explorer is denoted as Version 8.8 and dated July 2020 to mirror the corresponding Tinker 8.8 version. FFE is self-contained in that all dependencies, listed below, are included in install packages available for Linux, MacOS and Microsoft Windows operating systems.</p>
 <ul class="simple">
 <li><p>Tinker version 8.8</p></li>
 <li><p>Java Runtime Environment (JRE) 1.8 (Java 8) or later</p></li>
@@ -54,15 +54,16 @@
 </ul>
 <p>Major improvements over the previous releases of FFE include:</p>
 <ul class="simple">
-<li><p>Self-Extracting Installers for Linux, MacOS and Microsoft Windows. These distributions include Tinker binaries, source code, documentation, and example files. Private JRE and Java3D libraries are bundled with all versions of FFE.</p></li>
+<li><p>Self-Extracting Installers for Linux, MacOS and Microsoft Windows. The installer distributions include FFE-enabled Tinker binaries, full source code, FFE and Tinker documentation, and example files. Private JRE and Java3D libraries are bundled with all versions of FFE.</p></li>
 <li><p>An intuitive, consistent selection mechanism.</p></li>
-<li><p>Improved keyword and modeling panels.</p></li>
-<li><p>Support for Tinker internal coordinate, restart and induced dipole file formats, plus loading of Protein Databank files directly from the PDB or from disk. Conversion of PDB files to Tinker format (with automatic atom typing for many biomolecules) is also supported.</p></li>
+<li><p>Improvements to the keyword and modeling panels.</p></li>
+<li><p>Support for Tinker internal coordinate, restart and induced dipole file formats, plus of molecules and biopolymers directly from the PubChem, NCI or PDB databases,  or from disk files.</p></li>
+<li><p>Automatic conversion of downloaded small molecules to Tinker’s “tiny” force field. Also supported is convertion of PDB files to Tinker format with automatic atom typing for many standard biomolecular force fields.</p></li>
 </ul>
 </div>
 <div class="section" id="future-plans">
 <h2>Future Plans<a class="headerlink" href="#future-plans" title="Permalink to this headline">¶</a></h2>
-<p>The most important Force Field Explorer development goal is to add further molecular editing and visualization features. Currently, Java3D is used as the graphics toolkit underlying FFE. Java3D was originally developed by Sun, but is now maintained by an open source consortium and is freely available. Other goals include support for other file types and special capabilities for molecular complexes, docking and binding.</p>
+<p>The most important Force Field Explorer development is to add further molecular editing and visualization features, as well as tighter integration with Tinker. Currently, Java3D is used as the graphics toolkit underlying FFE’s visualization engine. Java3D was originally developed by Sun, but is now maintained by an open source consortium and is freely available. Other planned enhancements include support for additional molecule file types and special capabilities for molecular complexes, docking and binding applications.</p>
 </div>
 </div>
 
@@ -100,7 +101,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="../index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="../index.html" title="previous chapter">Tinker User Guide</a></li>
+      <li>Previous: <a href="../index.html" title="previous chapter">Force Field Explorer User Guide</a></li>
       <li>Next: <a href="installation.html" title="next chapter">Installation</a></li>
   </ul></li>
 </ul>

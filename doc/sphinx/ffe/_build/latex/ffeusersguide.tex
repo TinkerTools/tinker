@@ -98,26 +98,26 @@
 
 \section{What is Force Field Explorer?}
 \label{\detokenize{text/introduction:what-is-force-field-explorer}}
-Force Field Explorer (FFE) is a graphical user interface to the Tinker suite of molecular modeling tools. The goal is to create a robust environment for computational chemistry and molecular engineering applications. Current features include:
+Force Field Explorer (FFE) is a graphical user interface to the Tinker suite of software tools for molecular modeling. The goal is to create a robust environment for computational chemistry, biomolecular modeling and molecular engineering applications. Current features of FFE include:
 \begin{itemize}
 \item {} 
-Setup and real\sphinxhyphen{}time visualization of modeling routines, including local/global optimizations, sampling methods, superposition, etc.
+Setup and real\sphinxhyphen{}time visualization of modeling routines, including local/global optimizations, molecular dynamics, sampling methods, superposition, docking, etc.
 
 \item {} 
-Basic 3D molecular visualization (wireframe, tube, spacefilling, ball \& stick, etc.) with special features for force field specific parameters such as Lennard\sphinxhyphen{}Jones radii and partial charge magnitudes.
+Basic 3D molecular visualization (wireframe, tube, spacefilled, ball \& stick, etc., and several coloring schemes) with special features for force field\sphinxhyphen{}specific parameters such as Lennard\sphinxhyphen{}Jones radii and partial charges, induced dipole vectors, and atomic force and velocity vectors.
 
 \item {} 
-A comprehensive editor for Tinker keyword files, which contain parameters that control modeling algorithms.
+A comprehensive editor for Tinker keyword files containing parameters and options that control modeling algorithms.
 
 \item {} 
-Tinker trajectory playback.
+Playback of Tinker molecular dynamics trajectories and structure archives.
 
 \end{itemize}
 
 
 \section{Current Release}
 \label{\detokenize{text/introduction:current-release}}
-The current release of Force Field Explorer is denoted as Version 8.8 and dated July 2020 to mirror the corresponding Tinker version. Dependencies, listed below, are now included in self\sphinxhyphen{}extracting installers for Linux, MacOS and Microsoft Windows.
+The current release of Force Field Explorer is denoted as Version 8.8 and dated July 2020 to mirror the corresponding Tinker 8.8 version. FFE is self\sphinxhyphen{}contained in that all dependencies, listed below, are included in install packages available for Linux, MacOS and Microsoft Windows operating systems.
 \begin{itemize}
 \item {} 
 Tinker version 8.8
@@ -133,28 +133,34 @@ Java3D version 1.6
 Major improvements over the previous releases of FFE include:
 \begin{itemize}
 \item {} 
-Self\sphinxhyphen{}Extracting Installers for Linux, MacOS and Microsoft Windows. These distributions include Tinker binaries, source code, documentation, and example files. Private JRE and Java3D libraries are bundled with all versions of FFE.
+Self\sphinxhyphen{}Extracting Installers for Linux, MacOS and Microsoft Windows. The installer distributions include FFE\sphinxhyphen{}enabled Tinker binaries, full source code, FFE and Tinker documentation, and example files. Private JRE and Java3D libraries are bundled with all versions of FFE.
 
 \item {} 
 An intuitive, consistent selection mechanism.
 
 \item {} 
-Improved keyword and modeling panels.
+Improvements to the keyword and modeling panels.
 
 \item {} 
-Support for Tinker internal coordinate, restart and induced dipole file formats, plus loading of Protein Databank files directly from the PDB or from disk. Conversion of PDB files to Tinker format (with automatic atom typing for many biomolecules) is also supported.
+Support for Tinker internal coordinate, restart and induced dipole file formats, plus of molecules and biopolymers directly from the PubChem, NCI or PDB databases,  or from disk files.
+
+\item {} 
+Automatic conversion of downloaded small molecules to Tinker’s “tiny” force field. Also supported is convertion of PDB files to Tinker format with automatic atom typing for many standard biomolecular force fields.
 
 \end{itemize}
 
 
 \section{Future Plans}
 \label{\detokenize{text/introduction:future-plans}}
-The most important Force Field Explorer development goal is to add further molecular editing and visualization features. Currently, Java3D is used as the graphics toolkit underlying FFE. Java3D was originally developed by Sun, but is now maintained by an open source consortium and is freely available. Other goals include support for other file types and special capabilities for molecular complexes, docking and binding.
+The most important Force Field Explorer development is to add further molecular editing and visualization features, as well as tighter integration with Tinker. Currently, Java3D is used as the graphics toolkit underlying FFE’s visualization engine. Java3D was originally developed by Sun, but is now maintained by an open source consortium and is freely available. Other planned enhancements include support for additional molecule file types and special capabilities for molecular complexes, docking and binding applications.
 
 
 \chapter{Installation}
 \label{\detokenize{text/installation:installation}}\label{\detokenize{text/installation::doc}}
-Force Field Explorer and Tinker are distributed via self\sphinxhyphen{}extracting installers for Linux, Apple MacOS and Microsoft Windows. Included within the installers are binary Tinker executables, source code, example/test files, documentation and the Java environment needed by Force Field Explorer. FFE contains a private JRE version that will not affect any other JREs installed system wide.
+
+\section{Use of Self\sphinxhyphen{}Extracting Kits}
+\label{\detokenize{text/installation:use-of-self-extracting-kits}}
+Force Field Explorer and Tinker are distributed via self\sphinxhyphen{}extracting installers for Linux, Apple MacOS and Microsoft Windows. These install kits are available from the Tinker web site maintained by the Ponder group at \sphinxurl{https://dasher.wustl.edu/tinker/}. Included within the installers are binary Tinker executables, source code, example/test files, documentation and the Java environment needed by Force Field Explorer. FFE contains a private JRE version that will not affect any other JREs installed system\sphinxhyphen{}wide.
 
 For each platform, a launch script/exe located in the top level installation directory named “ffe” will launch Force Field Explorer.
 
@@ -166,24 +172,37 @@ Specific installation instructions for operating systems are provided below:
 Linux
 \begin{quote}
 
-After downloading the installer, execute it from a shell window. A script to run Force Field Explorer is located in the top\sphinxhyphen{}level installation directory, which defaults to “\$HOME/Tinker\sphinxhyphen{}FFE”. In this case, Tinker binaries would be located in the “\$HOME/Tinker\sphinxhyphen{}FFE/tinker/bin” directory.
+The Tinker\sphinxhyphen{}FFE Installer for Linux is provided as a gzipped shell script. Uncompress the the .gz archive to produce an .sh script, and then run the script. The script must have the “executable” attribute, set via “chmod +x ffe\sphinxhyphen{}linux.sh”, prior to being run.
+
+After installation, the top\sphinxhyphen{}level directory defaults to “\$HOME/Tinker\sphinxhyphen{}FFE”. The FFE\sphinxhyphen{}enabled Tinker binaries are located in the “\$HOME/Tinker\sphinxhyphen{}FFE/tinker/bin” directory.
 \end{quote}
 
 \item {} 
 Apple MacOS
 \begin{quote}
 
-After downloading the installer, double click to start installation. Force Field Explorer can then be launched by double clicking on the Desktop icon.
+The Tinker\sphinxhyphen{}FFE Installer for MacOS is provided as a .dmg disk image file. Double\sphinxhyphen{}click on the file to run the installer. Once installed, Force Field Explorer is launched by double clicking on the Desktop icon.
+
+Recent versions of MacOS contains a security feature called Gatekeeper that keeps applications not obtained via the App Store or Apple\sphinxhyphen{}approved developers from being opened. Gatekeeper is enabled by default, and may result in the (incorrect!) error message: “Tinker\sphinxhyphen{}FFE Installer.app is damaged and can’t be opened.” To turn off Gatekeeper, go to the panel System Preferences \textgreater{} Security \& Privacy \textgreater{} General, and set “Allow apps downloaded from:” to “Anywhere”. This will require an Administrator account, and must be done before invoking the FFE installer. After FFE is installed and launched for the first time, you can return the System Preference to its prior value. On Sierra (MacOS 10.12) and later, the “Anywhere” option has been removed. In most cases the Security \& Privacy panel will open and permit the user to run the installer. Alternatively, the “Anywhere” option can be restored by running the command “sudo spctl \textendash{}master\sphinxhyphen{}disable” in a Terminal window with Administrator privilege.
 \end{quote}
 
 \item {} 
 Microsoft Windows
 \begin{quote}
 
-After downloading the installer, double click to start installation. Force Field Explorer can then be launched from an icon or the Start Menu.
+The Tinker\sphinxhyphen{}FFE Installer for Windows is provided as a zipped executable. First, unzip the .zip file. Then run the resulting executable .exe file by double clicking. Following installation, Force Field Explorer is launched via the FFE desktop icon or from the Start Menu.
+
+In order to perform minimizations or molecular dynamics from within FFE, some environment variables and symbolic links must be set prior to using the program. A batch file named “FFESetupWin.bat” is installed in the main Tinker\sphinxhyphen{}FFE directory, which by default resides in the user’s home directory. To complete the setup of FFE, this batch file should be run from a Command Prompt window following installation. It is only necessary to invoke this batch file once, as the settings should persist between logins.
 \end{quote}
 
 \end{itemize}
+
+
+\section{Building FFE from Source}
+\label{\detokenize{text/installation:building-ffe-from-source}}
+For those wishing to modify the FFE GUI or build installation kits from source, we provide a complete development package for Tinker\sphinxhyphen{}FFE. The full source distribution for Force Field Explorer is available from the TinkerTools organization public repository on Github located at \sphinxurl{https://github/TinkerTools/FFE/}. The 0README file in the top\sphinxhyphen{}level of the distribution has instructions for building installers for Linux, MacOS and Windows.
+
+Additional requirements for building FFE are the GNU compiler suite with gcc, g++ and gfortran and the Install4j Java installer builder. On Windows systems we recommend use of the MinGW\sphinxhyphen{}w64 compilers under Cygwin. Note that Install4j is a commercial product; only the command line “install4jc” compiler is needed, and not the full Install4j GUI interface.
 
 
 \chapter{Description of FFE Components}
@@ -830,14 +849,17 @@ This displays the Tinker logo and contact information.
 
 \chapter{Acknowledgments}
 \label{\detokenize{text/acknowledgements:acknowledgments}}\label{\detokenize{text/acknowledgements::doc}}
+
+\section{Contributors}
+\label{\detokenize{text/acknowledgements:contributors}}
 The original version of Force Field Explorer was written by Michael Schnieders, before and during his graduate school stay in Jay Ponder’s laboratory at Washington University in St. Louis. The code is now being developed and maintained by the Ponder group.
 
-A significant contribution to Force Field Explorer was made by Zhiguang “Frank” Gao over the summer of 2002. The Force Field Explorer logo shows an optimized AMOEBA gas phase water dimer, and was provided by Pengyu Ren. The User’s Guide cover showing the crambin protein with 13\sphinxhyphen{}PHE highlighted was produced by Jay Ponder. Special thanks to Alan Grossfield for offering many helpful suggestions. We would also like to thank Eric Reiss for making available his modified version of some Java3D Behaviors, and Pat Niemeyer for his work in developing the BeanShell scripting framework. Important code modernization and updating of FFE was done over the period from 2013 to 2016 by Jeffrey Bigg, Tyler Ponder and Brendan McMurrow. Modernization and unification of the Linux, Windows and MacOS code bases with done during 2017\sphinxhyphen{}18 by Jay Ponder.
+A significant contribution to Force Field Explorer was made by Zhiguang “Frank” Gao over the summer of 2002. The Force Field Explorer logo shows an optimized AMOEBA gas phase water dimer, and was provided by Pengyu Ren. The User’s Guide cover showing the crambin protein with 13\sphinxhyphen{}PHE highlighted was produced by Jay Ponder. Special thanks to Alan Grossfield for offering many helpful suggestions. We would also like to thank Eric Reiss for making available his modified version of some Java3D Behaviors, and Pat Niemeyer for his work in developing the BeanShell scripting framework. Important code modernization and updating of FFE was done over the period from 2013 to 2016 by Jeffrey Bigg, Tyler Ponder and Brendan McMurrow. Modernization and unification of the Linux, Windows and MacOS code bases with done during 2017 and 2018 by Jay Ponder.
 
 
 \section{Reporting Bugs}
 \label{\detokenize{text/acknowledgements:reporting-bugs}}
-We apologize in advance for any bugs that remain in Force Field Explorer. Should you happen to perform some command that causes a Java stack trace to be dumped to the console, please copy the output and forward to \sphinxhref{mailto:ponder@dasher.wustl.edu}{ponder@dasher.wustl.edu}. Poor video card drivers can sometimes result in unpredictable Force Field Explorer behavior. If this should happen, try to find the latest drivers for your platform/video card combination.
+We apologize in advance for any bugs that remain in Force Field Explorer. Should you happen to perform some command that causes a Java stack trace to be dumped to the console, please copy the output and forward to \sphinxhref{mailto:ponder@dasher.wustl.edu}{ponder@dasher.wustl.edu}. Poor video card drivers can sometimes result in unpredictable behavior from Force Field Explorer. If this should occur, try to find the latest drivers for your computer, operating system and video card combination.
 
 
 
