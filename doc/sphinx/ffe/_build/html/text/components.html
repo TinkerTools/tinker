@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Description of FFE Components &#8212; FFE User&#39;s Guide  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Description of FFE Menus" href="menus.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="description-of-ffe-components">
+<h1>Description of FFE Components<a class="headerlink" href="#description-of-ffe-components" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="molecular-tree">
+<h2>Molecular Tree<a class="headerlink" href="#molecular-tree" title="Permalink to this headline">¶</a></h2>
+<p>The Molecular Tree is a structural hierarchy of each system, used for navigating and making selections. When Force Field Explorer opens a structure file, it attempts to groups atoms into protein/nucleic acid macromolecules and their constituent residues. It also groups ions, water and hetero molecules together. This is done even in the absence of a Tinker sequence file. When a display or color command is chosen, all currently selected groups of atoms are affected.</p>
+<a class="reference internal image-reference" href="../_images/figure1.png"><img alt="../_images/figure1.png" src="../_images/figure1.png" style="width: 625px;" /></a>
+<p>Figure 1. The first residue of the enkephalin peptide is selected in the Tree view and is highlighted in blue on the Graphics Window.</p>
+</div>
+<div class="section" id="d-graphics-and-global-axis">
+<h2>3D Graphics and Global Axis<a class="headerlink" href="#d-graphics-and-global-axis" title="Permalink to this headline">¶</a></h2>
+<p>Left-clicking the Global Axis, then dragging performs a rotation about the origin of the entire scene. This is useful for manual docking of two systems. For example, after positioning each system individually in the X-Y plane by dragging them with the mouse, a rotation about the Y-axis allows orientation in the Y-Z plane. Right-clicking the Global Axis, then dragging performs a translation of the entire scene.</p>
+<a class="reference internal image-reference" href="../_images/figure2.png"><img alt="../_images/figure2.png" src="../_images/figure2.png" style="width: 625px;" /></a>
+<p>Figure 2. Dragging the Graphics Axis causes the entire scene to rotate about the global origin. The scene above is rotated 180 degrees around the Y-axis.</p>
+</div>
+<div class="section" id="keyword-editor">
+<h2>Keyword Editor<a class="headerlink" href="#keyword-editor" title="Permalink to this headline">¶</a></h2>
+<p>The Keyword Editor allows modification of keyword files that control various aspects of Tinker calculations. If a Modeling Command is executed on a system, the corresponding Keyword File is automatically saved. Modifications can also be saved at any time using one of the save buttons. Any text or keywords that Force Field Explorer does not recognize are considered “Comments” and are appended to the end of saved key files. As an example, the enkephalin keyword control file is shown below.</p>
+<a class="reference internal image-reference" href="../_images/figure3.png"><img alt="../_images/figure3.png" src="../_images/figure3.png" style="width: 625px;" /></a>
+<p>Figure 3. The Keyword Editor Panel displaying the enkephalin keyword file.</p>
+</div>
+<div class="section" id="modeling-commands">
+<h2>Modeling Commands<a class="headerlink" href="#modeling-commands" title="Permalink to this headline">¶</a></h2>
+<p>The Modeling Commands panel of Force Field Explorer allows launching of most of the Tinker programs. After selecting a routine and configuring its modifying arguments, selecting the “play” button starts the job running. If Tinker will modify the coordinates of the system, Force Field Explorer will automatically connect to the routine and show progress interactively. If the routine completes before Force Field Explorer is exited, the textual results in the log file are loaded into the Logs panel. If Force Field Explorer exits while one or more routines are running, they continue in the background unless explicitly killed by the user. For example, the “Optimize” command has been selected for enkephalin (Figure 4).</p>
+<a class="reference internal image-reference" href="../_images/figure4.png"><img alt="../_images/figure4.png" src="../_images/figure4.png" style="width: 625px;" /></a>
+<p>Figure 4. The Tinker OPTIMIZE program selected in the Modeling Commands panel and will execute on the active system, in this case the enkephalin peptide.</p>
+</div>
+<div class="section" id="activity-logs">
+<h2>Activity Logs<a class="headerlink" href="#activity-logs" title="Permalink to this headline">¶</a></h2>
+<p>The Logs panel is a simple text editor where output logged from Tinker routines is automatically loaded. It can also be used to edit any text file, for example Tinker coordinate or keyword files.</p>
+<a class="reference internal image-reference" href="../_images/figure5.png"><img alt="../_images/figure5.png" src="../_images/figure5.png" style="width: 625px;" /></a>
+<p>Figure 5. The Log panel showing output logged from running Tinker OPTIMIZE on the enkephalin peptide.</p>
+<p>If a modeling command changes the coordinates of an open structure, the final structure generated is re-loaded onto the open structure used to initiate the command.</p>
+<a class="reference internal image-reference" href="../_images/figure6.png"><img alt="../_images/figure6.png" src="../_images/figure6.png" style="width: 625px;" /></a>
+<p>Figure 6.  The coordinates for the final local minimum of enkephalin (enkephalin.xyz_2) are loaded onto the originally opened structure, enkephalin.xyz, used as input to the Tinker OPTIMIZE command.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FFE User's Guide</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Description of FFE Components</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#molecular-tree">Molecular Tree</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#d-graphics-and-global-axis">3D Graphics and Global Axis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#keyword-editor">Keyword Editor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#modeling-commands">Modeling Commands</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#activity-logs">Activity Logs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="menus.html">Description of FFE Menus</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="menus.html" title="next chapter">Description of FFE Menus</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jay Ponder.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/text/components.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

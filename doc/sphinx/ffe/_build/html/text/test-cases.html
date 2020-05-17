@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Test Cases &amp; Examples &#8212; Tinker User&#39;s Guide  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark Results" href="benchmarks.html" />
+    <link rel="prev" title="Description of Modules &amp; Global Variables" href="modules.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="test-cases-examples">
+<h1>Test Cases &amp; Examples<a class="headerlink" href="#test-cases-examples" title="Permalink to this headline">¶</a></h1>
+<p>This section contains brief descriptions of the sample calculations found in the EXAMPLE subdirectory of the Tinker distribution. These examples exercise several of the current Tinker programs and are intended to provide a flavor of the capabilities of the package.</p>
+<p><strong>ANION Test</strong></p>
+<p>Computes an estimation of the free energy of hydration of Cl- anion vs. Br- anion via a 2 picosecond simulation on a “hybrid” anion in a box of water followed by a free energy perturbation calculation.</p>
+<p><strong>ARGON Test</strong></p>
+<p>Performs an initial energy minimization on a periodic box containing 150 argon atoms followed by 6 picoseconds of a molecular dynamics using a modified Beeman integration algorithm and a Bersedsen thermostat.</p>
+<p><strong>CLUSTER Test</strong></p>
+<p>Performs a set of 10 Gaussian density annealing (GDA) trials on a cluster of 13 argon atoms in an attempt to locate the global minimum energy structure.</p>
+<p><strong>CRAMBIN Test</strong></p>
+<p>Generates a Tinker file from a PDB file, followed by a single point energy computation and determination of the molecular volume and surface area.</p>
+<p><strong>CYCLOHEX Test</strong></p>
+<p>First approximately locates the transition state between chair and boat cyclohexane, followed by subsequent refinement of the transition state and a final vibrational analysis to show that a single negative frequency is associated with the saddle point.</p>
+<p><strong>DHFR Test</strong></p>
+<p>Performs 10 steps of molecular dynamics on a pre-equilibrated system of DHFR protein in a box or water using the AMOEBA force field. Note this test case is the so-called Joint Amber-CHARMM “JAC” benchmark containing 23558 total atoms.</p>
+<p><strong>DIALANINE Test</strong></p>
+<p>Finds all the local minima of alanine dipeptide via a potential energy surface scan using torsional modes to jump between the minima.</p>
+<p><strong>ENKEPHALIN Test</strong></p>
+<p>Produces coordinates from the met-enkephalin amino acid sequence and phi/psi angles, followed by truncated Newton energy minimization and determination of the lowest frequency normal mode.</p>
+<p><strong>ETHANOL Test</strong></p>
+<p>Performs fitting of torsional parameter values for the ethanol C-C-O-H bond based on relative quantum mechanical (G09) energies for rotating the C-O bond.</p>
+<p><strong>FORMAMIDE Test</strong></p>
+<p>Generates a unit cell from fractional coordinates, followed by full crystal energy minimization and determination of optimal carbonyl oxygen energy parameters from a fit to lattice energy and structure.</p>
+<p><strong>GPCR Test</strong></p>
+<p>Finds the lowest-frequency normal mode of bacteriorhodopsin using vibrational analysis via a sliding block iterative matrix diagonalization. Alter the gpcr.run script to save the file gpcr.001 for later viewing of the mode.</p>
+<p><strong>HELIX Test</strong></p>
+<p>Performs a rigid-body optimization of the packing of two idealized polyalanine helices using only van der Waals interactions.</p>
+<p><strong>ICE Test</strong></p>
+<p>Performs a short MD simulation of the monoclinic ice V crystal form using the iAMOEBA water model, pairwise neighbor lists and PME electrostatics.</p>
+<p><strong>IFABP Test</strong></p>
+<p>Generates three distance geometry structures for intestinal fatty acid binding protein from a set of NOE distance restraints and torsional restraints.</p>
+<p><strong>METHANOL Test</strong></p>
+<p>Processes distributed multipole analysis (DMA) output to extract coordinates and permanent multipoles, set local frames and polarization groups, remove intramolecular polarization, detect and average equivalent atomic sites.</p>
+<p><strong>NITROGEN Test</strong></p>
+<p>Calculates the self-diffusion constant and the N-N radial distribution function for liquid nitrogen via analysis of a 50ps MD trajectory.</p>
+<p><strong>SALT Test</strong></p>
+<p>Converts a sodium chloride assymetric unit to the corresponding unit cell, then runs a crystal minimization starting from the initial diffraction structure using Ewald summation to model the long-range electrostatic interactions.</p>
+<p><strong>TETRAALA Test</strong></p>
+<p>Generates capped alanine tetrapeptide in an extended conformation, then use Monte Carlo Minimization with random torsional moves to find the global minimum energy structure.</p>
+<p><strong>WATER Test</strong></p>
+<p>Fits the electrostatic potential around an AMOEBA water molecule to the QM-derived potential (MP2/aug-cc-pVTZ) on a grid of points outside the molecular surface.</p>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Tinker User's Guide</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to the Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation on Your Computer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file-types.html">Types of Input &amp; Output Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="energy-programs.html">Potential Energy Programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis-programs.html">Analysis &amp; Utility Programs &amp; Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Force Field Parameter Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="special-features.html">Special Features &amp; Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keywords.html">Use of the Keyword Control File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">Descriptions of Tinker Routines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Description of Modules &amp; Global Variables</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Test Cases &amp; Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmark Results</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">Description of Modules &amp; Global Variables</a></li>
+      <li>Next: <a href="benchmarks.html" title="next chapter">Benchmark Results</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jay Ponder.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/text/test-cases.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

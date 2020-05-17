@@ -1,10 +1,18 @@
 
                       ####################################
-                      DOC Directory for the Tinker Package
+                      Documentation for the Tinker Package
                       ####################################
 
          This directory contains the licenses and documentation for the
-         Tinker software package. The ".pdf" files are in Adobe Acrobat
-         format, the ".docx" files are Microsoft Word documents and the
-         ".txt" files are ASCII text files.
+         Tinker software package. The top-level directory contain PDF
+         files for the Tinker and FFE User's Guides, a Tinker summary,
+         and the academic and commercial licenses.
+
+         The /sphinx directory contains Sphinx source files needed to
+         build HTML and PDF documentation for Tinker and FFE. The HTML
+         is found in the tinker/_build/html and ffe/_build/html areas.
+
+         The /word directory has ".docx" files in Microsoft Word format.
+         The other subdirectories contain logo images and additional
+         documentation for Tinker and locally developed force fields.
 

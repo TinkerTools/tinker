@@ -1,0 +1,500 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Description of FFE Menus &#8212; FFE User&#39;s Guide  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Acknowledgments" href="acknowledgements.html" />
+    <link rel="prev" title="Description of FFE Components" href="components.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="description-of-ffe-menus">
+<h1>Description of FFE Menus<a class="headerlink" href="#description-of-ffe-menus" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="file-menu">
+<h2>File Menu<a class="headerlink" href="#file-menu" title="Permalink to this headline">¶</a></h2>
+<p>Force Field Explorer currently reads Tinker coordinate files (<em>.xyz, *.int), restart files (</em>.dyn), archive files (<em>.arc), induced dipole files (*u) and Protein Databank files (</em>.pdb). However, file writing has only been implemented for Tinker Cartesian coordinate files.</p>
+<ul class="simple">
+<li><p>Open</p></li>
+</ul>
+<p>An attempt is made to open the selected file. Currently, Tinker coordinate files, Archive files, and Protein Databank files are recognized.</p>
+<ul class="simple">
+<li><p>Save As</p></li>
+</ul>
+<p>Saves the active file under a different name. (This command is currently only supported for Cartesian coordinate Tinker files)</p>
+<ul class="simple">
+<li><p>Close</p></li>
+</ul>
+<p>Close the active file.</p>
+<ul class="simple">
+<li><p>Close All</p></li>
+</ul>
+<p>Close all open files.</p>
+<ul class="simple">
+<li><p>Download from PubChem</p></li>
+</ul>
+<p>Entering a valid molecule name will download the corresponding structure from the NIH PubChem database, convert atom types to the “Tiny” force field, and save the Tinker .xyz file to the NIH Downloads directory, then open it.</p>
+<ul class="simple">
+<li><p>Download from NCI</p></li>
+</ul>
+<p>Entering a valid molecule name will download the corresponding structure from the NCI Cactus database, convert atom types to the “Tiny” force field, and save the Tinker .xyz file to the NIH Downloads directory, then open it.</p>
+<ul class="simple">
+<li><p>Download from PDB</p></li>
+</ul>
+<p>Entering a valid 4 character accession will download the corresponding PDB file, save it to the current Force Field Explorer working directory, then open it.</p>
+<ul class="simple">
+<li><p>Load Restart Data</p></li>
+</ul>
+<p>Tinker Restart files (<a href="#id1"><span class="problematic" id="id2">*</span></a>.dyn) contain atomic positions, velocities and two sets of accelerations (current and previous step), but no connectivity information. Loading a Restart file on top of an open Tinker coordinate file allows visualization of velocities and accelerations.</p>
+<ul class="simple">
+<li><p>Load Induced Data</p></li>
+</ul>
+<p>Tinker Induced Dipole files (<a href="#id3"><span class="problematic" id="id4">*</span></a>.*u) contain induced dipole vectors. They are produced during a molecular dynamics routine using the Tinker “save-induced” keyword. Loading an Induced Dipole file on top of an open Tinker coordinate file allows visualization of induced dipoles.</p>
+<ul class="simple">
+<li><p>Exit</p></li>
+</ul>
+<p>Exit shuts Force Field Explorer down, saving user preferences.</p>
+</div>
+<div class="section" id="selection-menu">
+<h2>Selection Menu<a class="headerlink" href="#selection-menu" title="Permalink to this headline">¶</a></h2>
+<p>The set of nodes currently selected are highlighted in the Molecular Tree. If the shift key his pressed while clicking on two nodes, all nodes in between are selected. Alternatively, by holding down the control key while clicking on a node, either in the Tree or Graphics window, the selection state of a node can be toggled. To use Graphics based picking, the Graphics Picking checkbox under the Picking menu must be checked.</p>
+<ul class="simple">
+<li><p>Select All</p></li>
+</ul>
+<p>All open systems are selected.</p>
+<ul class="simple">
+<li><p>Restrict to Selections</p></li>
+</ul>
+<p>Nodes that are not selected are made invisible.</p>
+<ul class="simple">
+<li><p>Highlight Selections</p></li>
+</ul>
+<p>Selected nodes are highlighted in the Graphics window.</p>
+<ul class="simple">
+<li><p>Set Selection Color</p></li>
+</ul>
+<p>Choose the color for selected atoms.</p>
+<ul class="simple">
+<li><p>Label Selected Atoms</p></li>
+</ul>
+<p>Selected atoms are labeled by number and description.</p>
+<ul class="simple">
+<li><p>Label Selected Residues</p></li>
+</ul>
+<p>Selected residues are labeled by their respective three letter identifiers.</p>
+<ul class="simple">
+<li><p>Set Label Font Size</p></li>
+</ul>
+<p>The default label size is 12 point.</p>
+<ul class="simple">
+<li><p>Set Label Font Color</p></li>
+</ul>
+<p>The default font color is white.</p>
+</div>
+<div class="section" id="display-menu">
+<h2>Display Menu<a class="headerlink" href="#display-menu" title="Permalink to this headline">¶</a></h2>
+<p>We have intentionally maintained a simple, but elegant rendering mechanism. The Force Field Explorer data structure is self-rendering, meaning that each object “knows how to draw itself”. Rendering commands are “Top-Down”, meaning that commands filter down through the molecular tree, with each node responding and/or passing commands to its children. This paradigm positions Force Field Explorer to easily scale up to multi-level molecular engineering/nanotechnology modeling projects. What we want to avoid is a rendering/data architecture built upon “an array of atoms”. In our opinion, “an array of atoms” infrastructure can not achieve our molecular engineering design goals. While a graphics change is being rendered, one additional graphics command will be cached. Other commands are ignored while the 3D view catches up. Changes are applied to all selected nodes in the Molecular Tree View.</p>
+<ul class="simple">
+<li><p>Wireframe</p></li>
+<li><dl class="simple">
+<dt>Tube</dt><dd><p>Slow for large systems (more than a few thousand atoms).</p>
+</dd>
+</dl>
+</li>
+<li><p>Spacefill</p></li>
+<li><p>Ball &amp; Stick</p></li>
+</ul>
+<p>Slow for large systems (more than a few thousand atoms).</p>
+<ul class="simple">
+<li><p>Invisible</p></li>
+<li><p>RMIN</p></li>
+</ul>
+<p>Similar to Spacefill, but the sphere radii are set to the Lennard-Jones minima for the given atom.</p>
+<ul class="simple">
+<li><p>Fill</p></li>
+</ul>
+<p>Fill rendered polygons.</p>
+<ul class="simple">
+<li><p>Points</p></li>
+</ul>
+<p>Render only vertices.</p>
+<ul class="simple">
+<li><p>Lines</p></li>
+</ul>
+<p>Render edges between vertices.</p>
+<ul class="simple">
+<li><p>Preferences – Radius</p></li>
+</ul>
+<p>A scale factor applied to all rendered spheres and cylinders.</p>
+<ul class="simple">
+<li><p>Preferences – Wireframe Thickness</p></li>
+</ul>
+<p>This specifies the thickness of wireframe representations in pixels.</p>
+<ul class="simple">
+<li><p>Preferences – Detail</p></li>
+</ul>
+<p>Changes the number of vertices used in creating spheres and cylinders. More vertices (a higher number on the slider) create a smoother appearance, but slower rotations.</p>
+</div>
+<div class="section" id="color-menu">
+<h2>Color Menu<a class="headerlink" href="#color-menu" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Monochrome</p></li>
+</ul>
+<p>Black &amp; White rendering.</p>
+<ul class="simple">
+<li><p>CPK</p></li>
+</ul>
+<p>Atom based colors.</p>
+<ul class="simple">
+<li><p>Residue</p></li>
+</ul>
+<p>Color based on amino/nucleic acid.</p>
+<ul class="simple">
+<li><p>Structure</p></li>
+</ul>
+<p>Color based on secondary structure specified in PDB files.</p>
+<ul class="simple">
+<li><p>Polymer</p></li>
+</ul>
+<p>A different color is assigned to each polymer.</p>
+<ul class="simple">
+<li><p>Partial Charge</p></li>
+</ul>
+<p>Coloring is based on partial charges that correspond to atom types specified in Tinker coordinate files.</p>
+<ul class="simple">
+<li><p>Vector Magnitude</p></li>
+</ul>
+<p>Coloring is based on vector magnitude, where the vector may represent velocity, acceleration, induced dipole or force depending on user choice.</p>
+<ul class="simple">
+<li><p>User Color</p></li>
+</ul>
+<p>Arbitrary colors can be assigned to selected atoms by choosing the “Apply User Color to Selections” menu item. The “User Color” can then be selected to invoke this scheme.</p>
+<ul class="simple">
+<li><p>Apply User Color to Selections</p></li>
+</ul>
+<p>See Above.</p>
+<ul class="simple">
+<li><p>Set User Color</p></li>
+</ul>
+<p>Specify the color to use when selecting the “Apply User Color to Selections” option.</p>
+</div>
+<div class="section" id="options-menu">
+<h2>Options Menu<a class="headerlink" href="#options-menu" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Active System</p></li>
+</ul>
+<p>Coordinate controls for the active system.
+* Reset Rotation
+Removes any rotations applied to the active system.
+* Reset Translation
+Removes any translation applied to the active system.
+* Reset Rotation and Translation
+Removes any rotation/translation applied to the active system.
+* Rotate About Center of Mass
+Specifies the active system should be rotated about its center of mass.
+* Reset About Pick
+Specifies the active system should be rotated about the node selected by graphics picking.</p>
+<ul class="simple">
+<li><p>Drag</p></li>
+</ul>
+<p>Specify which system is controlled by mouse clicking/dragging within the Graphics window.
+* Active System
+Regardless of mouse position, the Active system is controlled.
+* System Below Mouse
+To move a system, it must be picked by clicking over it with the mouse.</p>
+<ul class="simple">
+<li><p>Reset Global Zoom</p></li>
+</ul>
+<p>Reset the global zoom that has been applied to the entire scene.</p>
+<ul class="simple">
+<li><p>Reset Global Translation</p></li>
+</ul>
+<p>Remove any global translation that has been applied to the entire scene.</p>
+<ul class="simple">
+<li><p>Reset Global Rotation</p></li>
+</ul>
+<p>Remove any global rotation that has been applied to the entire scene.</p>
+<ul class="simple">
+<li><p>Reset Global View</p></li>
+</ul>
+<p>Remove any global rotation and translation, then reset the global zoom.</p>
+<ul class="simple">
+<li><p>Toggle Hydrogens</p></li>
+</ul>
+<p>Show/Hide hydrogen atoms.</p>
+<ul class="simple">
+<li><p>Full Screen</p></li>
+</ul>
+<p>Make the graphics window fill the entire screen.</p>
+<ul class="simple">
+<li><p>Set Background Color</p></li>
+</ul>
+<p>Change the color of the graphics window background. This is useful for switching to a white background before capturing images that might be printed.</p>
+</div>
+<div class="section" id="picking-menu">
+<h2>Picking Menu<a class="headerlink" href="#picking-menu" title="Permalink to this headline">¶</a></h2>
+<p>Graphics picking can be used to select nodes anywhere in the structural hierarchy. By holding the control key while picking, the selection state of the picked node is toggled between selected/not selected. However, holding the shift button down while picking currently has no effect.</p>
+<ul class="simple">
+<li><p>Graphics Picking</p></li>
+</ul>
+<p>Selecting this checkbox turns on Graphics Picking.
+* Atom
+Individual atoms will be picked.
+* Bond
+A Bond will be picked, with consecutive clicks cycling through all Bonds made by the picked atom.
+* Angle
+An Angle will be picked, with consecutive clicks cycling through all Angles made by the picked atom.
+* Dihedral
+A Dihedral will be picked, with consecutive clicks cycling through all Dihedrals made by the picked atom.
+* Residue
+* Polymer
+* Molecule
+* System
+* Measure Distance
+After selecting two atoms the distance between them will be reported in the Force Field Explorer console.
+* Measure Angle
+After selecting three atoms the angle formed between them will be reported in the Force Field Explorer console.
+* Measure Dihedral
+After selecting four atoms the dihedral formed between them will be reported in the Force Field Explorer console.</p>
+<ul class="simple">
+<li><p>Set Graphics Picking Color</p></li>
+</ul>
+<p>Picked nodes will be highlighted in the color selected using this control.</p>
+</div>
+<div class="section" id="trajectory-menu">
+<h2>Trajectory Menu<a class="headerlink" href="#trajectory-menu" title="Permalink to this headline">¶</a></h2>
+<p>Tinker trajectories are stored in Archive files (<em>.arc), which are simply a concatenation of coordinate files (</em>.xyz, <a href="#id5"><span class="problematic" id="id6">*</span></a>.int).</p>
+<ul class="simple">
+<li><p>Oscillate</p></li>
+</ul>
+<p>When the end of a trajectory is reached, it is played in the reverse direction instead of restarting at the beginning.</p>
+<ul class="simple">
+<li><p>Frame</p></li>
+</ul>
+<p>Advance to an arbitrary frame of the active trajectory.</p>
+<ul class="simple">
+<li><p>Speed</p></li>
+</ul>
+<p>Choose a frame rate for trajectory playback. If 20 frames per second is entered, for example, a delay of 50 msec between coordinate changes is enforced. Therefore, the actual frame rate will be slower than what is specified if rendering for the system is slow.</p>
+<ul class="simple">
+<li><p>Skip</p></li>
+</ul>
+<p>Instead of displaying every frame during trajectory playback, only every nth frame will be rendered.</p>
+<ul class="simple">
+<li><p>Play</p></li>
+</ul>
+<p>Play the active trajectory.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Stop</dt><dd><p>Stop the active trajectory.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Step Forward</dt><dd><p>Advance the active trajectory one frame.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Step Back</dt><dd><p>Rewind the active trajectory one frame.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Reset</dt><dd><p>Return the active trajectory to the first frame.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<div class="section" id="simulation-menu">
+<h2>Simulation Menu<a class="headerlink" href="#simulation-menu" title="Permalink to this headline">¶</a></h2>
+<p>Tinker sampling and optimization methods are configured to start a server that listens for Force Field Explorer clients. Once a client – server connection is made, simulation information can be sent between Tinker and Force Field Explorer. Multiple Force Field Explorer clients can connect to the same Tinker simulation.</p>
+<ul class="simple">
+<li><p>Release Job</p></li>
+</ul>
+<p>If Force Field Explorer is connected to a Tinker simulation, the connection will be closed.</p>
+<ul class="simple">
+<li><p>Connect to Local Job</p></li>
+</ul>
+<p>Force Field Explorer will attempt to connect to a Tinker simulation executing on the current computer.</p>
+<ul class="simple">
+<li><p>Connect to Remote Job</p></li>
+</ul>
+<p>Force Field Explorer will attempt to connect to a Tinker simulation executing on a remote computer.</p>
+<ul class="simple">
+<li><p>Set Remote Job Address</p></li>
+</ul>
+<p>Specify the IP address of the remote computer where a Tinker simulation is executing. No domain name server is used, so the address should be of the form: XXX.XXX.XXX.XXX</p>
+</div>
+<div class="section" id="export-menu">
+<h2>Export Menu<a class="headerlink" href="#export-menu" title="Permalink to this headline">¶</a></h2>
+<p>Currently, Force Field Explorer can save screenshots uses JPEG and PNG formats. More formats will be supported when we target Java 1.5 (this release targets Java 1.4.2). In most cases, PNG gives better image quality when using Force Field Explorer than JPEG, probably because the default JPEG configuration we are using chooses small image size over preservation of detail.</p>
+<ul class="simple">
+<li><p>Capture Graphics</p></li>
+</ul>
+<p>Capture the Graphics window to an image file.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>PNG</dt><dd><p>Use the PNG image format.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>JPEG</dt><dd><p>Use the JPEG image format.</p>
+</dd>
+</dl>
+</li>
+</ul>
+<p>&gt; Window
+Force Field Explorer components can be customized to some extent to suit user preferences. Many user configurable choices are saved between sessions.</p>
+<ul class="simple">
+<li><p>Reset Panes</p></li>
+</ul>
+<p>This resets the slider between the Molecular Tree and Graphics Windows to the default position. The Graphics window is a heavy weight component (so hardware graphics acceleration can be used), while most Force Field Explorer components are light weight “Swing” components. Unfortunately, this effect prevents the user from dragging the slider and shrinking the Graphics window.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Show Tree</dt><dd><p>Show/Hide the Tree view.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Show Tool Bar</dt><dd><p>Show/Hide the Tool Bar.</p>
+</dd>
+</dl>
+</li>
+<li><p>Show Global Axes</p></li>
+</ul>
+<p>Show/Hide the Global Axes. The Global Axes are used both as a visual cue and to affect global rotations and translations.</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt>Show Console</dt><dd><p>Show the command line Console.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Java Metal Look &amp; Feel</dt><dd><p>This is the default appearance and should be consistent across platforms.</p>
+</dd>
+</dl>
+</li>
+<li><p>Windows/Macintosh/Motif Look &amp; Feel</p></li>
+</ul>
+<p>This appearance should cause Force Field Explorer to more closely resemble the native platform.</p>
+</div>
+<div class="section" id="help-menu">
+<h2>Help Menu<a class="headerlink" href="#help-menu" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>About</p></li>
+</ul>
+<p>This displays the Tinker logo and contact information.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">FFE User's Guide</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="components.html">Description of FFE Components</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Description of FFE Menus</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#file-menu">File Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#selection-menu">Selection Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#display-menu">Display Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#color-menu">Color Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#options-menu">Options Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#picking-menu">Picking Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trajectory-menu">Trajectory Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-menu">Simulation Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#export-menu">Export Menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#help-menu">Help Menu</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="components.html" title="previous chapter">Description of FFE Components</a></li>
+      <li>Next: <a href="acknowledgements.html" title="next chapter">Acknowledgments</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jay Ponder.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/text/menus.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

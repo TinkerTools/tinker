@@ -1,0 +1,149 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Installation on Your Computer &#8212; Tinker User&#39;s Guide  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Types of Input &amp; Output Files" href="file-types.html" />
+    <link rel="prev" title="Introduction to the Software" href="introduction.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="installation-on-your-computer">
+<h1>Installation on Your Computer<a class="headerlink" href="#installation-on-your-computer" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="how-to-obtain-a-copy-of-tinker">
+<h2>How to Obtain a Copy of Tinker<a class="headerlink" href="#how-to-obtain-a-copy-of-tinker" title="Permalink to this headline">¶</a></h2>
+<p>The Tinker package is distributed on the Internet via either the web site or the anonymous ftp account on dasher.wustl.edu with an IP number of 128.252.208.48. This node is a web and file server located in the Ponder lab at Washington University School of Medicine. The package is available via the web and standard browsers from the Tinker home page at <a class="reference external" href="http://dasher.wustl.edu/Tinker/">http://dasher.wustl.edu/Tinker/</a>. Alternatively Tinker can be downloaded by logging into dasher.wustl.edu via anonymous ftp (Username: anonymous, Password: “your email address”) and downloading the software from the /pub/Tinker subdirectory. The complete Tinker distributions as well as individual files can be downloaded from this site.</p>
+<p>The easiest way to get Tinker running on your machine is to use the self-extracting installation kit for either Linux, Windows, or Macintosh OS X 10.3. The installer will guide you through complete setup of Tinker and the Force Field Explorer (FFE) GUI, and perform all required configuration chores. The installer kits for the three supported systems are Tinker4.2-linux.sh, Tinker4.2-windows.exe and Tinker4.2-macosx.sit. The Linux and Windows kits each contain a private copy of a Java and Java3D run-time environment for use with the package. The Macintosh version requires an OS X 10.3 (Panther) system for installation. The native Java implementation is used on Macs, and the Java3D package must be downloaded from Apple and installed prior to using Tinker with Force Field Explorer.</p>
+</div>
+<div class="section" id="prebuilt-tinker-executables">
+<h2>Prebuilt Tinker Executables<a class="headerlink" href="#prebuilt-tinker-executables" title="Permalink to this headline">¶</a></h2>
+<p>The Tinker package is also available as compressed Unix tar archives, Windows zip files, and as a complete set of uncompressed source and data files. Binaries are provided for machines running Windows 9X/ME/NT/2000/XP, Linux, and Apple MacOS. All of these executables are present in standard compressed formats as individual programs or as complete sets of executables. It is expected that other Unix users and PC users who need specially customized versions, will build binaries for their specific system. Sites with access to the Unix tar, compress and uncompress commands should simply obtain the archive file Tinker.tar.Z. Alternatively, Tinker.tar.gz and Tinker.zip containing identical distributions compressed to GNU gzip and Windows ZIP format are also provided. If you choose to download individual files, you will need at a minimum the contents of the /doc, /source and /params subdirectories. Also required are the compile/build scripts from the subdirectory named for your machine type. Other areas contain test cases and examples, benchmark results, machine-translated C code, and the Force Field Explorer Java GUI for Tinker. The entire Tinker package, after building the executables, will require from about 40 to over 150 megabytes of disk space depending on the components installed and the use of shared libraries in the executables.</p>
+</div>
+<div class="section" id="building-your-own-executables">
+<h2>Building your Own Executables<a class="headerlink" href="#building-your-own-executables" title="Permalink to this headline">¶</a></h2>
+<p>The compilation and building of the Tinker executables should be easy for most of the common workstation and PC class computers. We provide in the /make area a Unix-style Makefile that with some modification can be used to build Tinker on most Unix machines. As a simpler alternative to Makefiles for the Unix versions, we also provide machine-specific directories with three separate shell scripts to compile the source, build an object library, and link binary executables. Three similar command files are provided for Windows, Macintosh and Open VMS systems. Compilation on Unix workstations should use the vendor supplied Fortran compiler, if available. The public domain GNU g77 Fortran compiler available from <a class="reference external" href="http://gcc.gnu.org/">http://gcc.gnu.org/</a> is also capable of building Tinker on Linux and other Unix-based machines. The Linux executables we provide are built with the Intel Fortran for Linux 8.0 compiler. The Portland Group (PGI) and Absoft ProFortran compilers have also been tested under Linux, both of which generate executables roughly comparable in speed to the Intel compiler. On Linux, the g77 executables tend to exhibit degraded performance compared with executables from commercial compilers. Some benchmark results are provided in a later section of this User’s Guide For the Macintosh we distribute executables built under Apple OS X 10.3 with the GNU g77 compiler. Tinker also builds on the Macintosh using the Absoft ProFortran compiler. For PCs running Windows 9X/NT/2000/XP, the distributed Tinker executables are built under the Intel Fortran for Windows 8.0 compiler. Alternative Windows compilers such as Compaq Visual Fortran, Lahey/Fujitsu and The Portland Group compilers, and GNU g77 under Cygwin have been tested and shown to build Tinker correctly. Please see the README files in each of the machine-specific areas for further information.</p>
+<p>The first step in building Tinker using the script files is to run the appropriate compile.make script for your operating system and compiler version. Next you must use a library.make script to create an archive of object code modules. Finally, run a link.make script to produce the complete set of Tinker executables. The executables can be renamed and moved to wherever you like by editing and running the <a href="#id1"><span class="problematic" id="id2">``</span></a>rename’’ script. These steps will produce executables that can run from the command line, but without the capability to interact with the FFE GUI. Building FFE-enabled Tinker executables involves replacing the sockets.f source file with sockets.c, and included the object from the C code in the Tinker object library. Then executables must be linked against Java libraries in addition to the usual resources. Sample compgui.make and linkgui.make scripts are provided for systems capable of building GUI-enabled executables.</p>
+<p>Regardless of your target machine, only a few small pieces of code can possibly require attention prior to building. The first two are the system dependent time and date routines found in clock.f and calendar.f respectively. Next is the openend.f routine that facilitates appending data to the end of an existing disk file. Please uncomment the sections of these routines needed for your computer type. Version of these system dependent routines suitable for each system are also provided in the directory for each machine/OS type. The final set of possible source alterations are to the master array dimensions found in the include file sizes.i. The most basic limit is on the number of atoms allowed, <a href="#id3"><span class="problematic" id="id4">``</span></a>maxatm’’. This parameter can be set to 10000 or more on most workstations. Personal computers with minimal memory may need a lower limit, perhaps 1000 atoms, depending on available memory, swap space and other resources. A description of the other parameter values is contained in the header of the file. Note that in order to keep the code completely transparent, Tinker does not implement any sort of dynamic memory allocation or heap data structure. This requires that sizes.i dimensioning values be set at least as large as the biggest problem you intend to run. Obviously, you should not set the array sizes to unnecessarily large values, since this can tax your compute resources and may result in performance degradation or overt failure of the executables.</p>
+</div>
+<div class="section" id="documentation-and-other-information">
+<h2>Documentation and Other Information<a class="headerlink" href="#documentation-and-other-information" title="Permalink to this headline">¶</a></h2>
+<p>The documentation for the Tinker programs, including the guide you are currently reading, is located in the /pub/Tinker/doc subdirectory. The documentation was prepared using the Applixware Words and Graphics programs. Portable versions of the documentation are provided as ascii text in .txt files and in Adobe Acrobat .pdf file formats. Please read and return by mail the Tinker license. In particular, we note that Tinker is not “Open Source” as users are prohibited from redistribution of original or modified Tinker source code or binaries to other parties. While our intent is to distribute the Tinker code to anyone who wants it, the Ponder Lab would like to remain the sole distribution site and keep track of researchers using the package. The returned license forms also help us justify further development of Tinker. When new modules and capabilities become available, and when the almost inevitable bugs are uncovered, we will attempt to notify those who have returned a license form. Finally, we remind you that this software is copyrighted, and ask that it not be redistributed in any form.</p>
+</div>
+<div class="section" id="where-to-direct-questions">
+<h2>Where to Direct Questions<a class="headerlink" href="#where-to-direct-questions" title="Permalink to this headline">¶</a></h2>
+<p>Specific questions about the building or use of the Tinker package should be directed to <a class="reference external" href="mailto:ponder&#37;&#52;&#48;dasher&#46;wustl&#46;edu">ponder<span>&#64;</span>dasher<span>&#46;</span>wustl<span>&#46;</span>edu</a>. Tinker related questions or comments of more general interest can be sent to the Computational Chemistry List (<a class="reference external" href="http://www.ccl.net/">http://www.ccl.net/</a>). The Tinker developers monitor this list and will respond to the list or the individual poster as appropriate.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Tinker User's Guide</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to the Software</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation on Your Computer</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-obtain-a-copy-of-tinker">How to Obtain a Copy of Tinker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prebuilt-tinker-executables">Prebuilt Tinker Executables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#building-your-own-executables">Building your Own Executables</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#documentation-and-other-information">Documentation and Other Information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#where-to-direct-questions">Where to Direct Questions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="file-types.html">Types of Input &amp; Output Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="energy-programs.html">Potential Energy Programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis-programs.html">Analysis &amp; Utility Programs &amp; Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Force Field Parameter Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="special-features.html">Special Features &amp; Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keywords.html">Use of the Keyword Control File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">Descriptions of Tinker Routines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Description of Modules &amp; Global Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="test-cases.html">Test Cases &amp; Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmark Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="introduction.html" title="previous chapter">Introduction to the Software</a></li>
+      <li>Next: <a href="file-types.html" title="next chapter">Types of Input &amp; Output Files</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jay Ponder.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.0.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/text/installation.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
