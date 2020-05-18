@@ -328,9 +328,6 @@ INPUT ./figure6.png
 INPUT ./figure6.png
 INPUT figure6.png
 INPUT ./figure6.png
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchri8t.tfm
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/vf/bitstrea/charter/bchri8t.vf
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchri8r.tfm
 INPUT ffeusersguide.ind
 INPUT ffeusersguide.ind
 INPUT ffeusersguide.aux
@@ -342,4 +339,3 @@ INPUT /usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/lato/a_cl4kdn.enc
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/type1/typoland/lato/Lato-Bold.pfb
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/type1/bitstrea/charter/bchb8a.pfb
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/type1/bitstrea/charter/bchr8a.pfb
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/type1/bitstrea/charter/bchri8a.pfb

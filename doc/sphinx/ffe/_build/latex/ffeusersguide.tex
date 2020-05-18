@@ -264,134 +264,155 @@ Figure 6.  The coordinates for the final local minimum of enkephalin (enkephalin
 
 \section{File Menu}
 \label{\detokenize{text/menus:file-menu}}
-Force Field Explorer currently reads Tinker coordinate files (\sphinxstyleemphasis{.xyz, *.int), restart files (}.dyn), archive files (\sphinxstyleemphasis{.arc), induced dipole files (*u) and Protein Databank files (}.pdb). However, file writing has only been implemented for Tinker Cartesian coordinate files.
+Force Field Explorer currently reads Tinker coordinate files (XYZ, INT), restart files (DYN), archive files (ARC), induced dipole files (file suffix ending in “u”) and Protein Databank files (PDB). Currently, file writing us only implemented for Tinker XYZ coordinate files.
 \begin{itemize}
 \item {} 
-Open
+\sphinxstylestrong{Open}
 
 \end{itemize}
 
-An attempt is made to open the selected file. Currently, Tinker coordinate files, Archive files, and Protein Databank files are recognized.
+An attempt is made to open the selected file. Currently, Tinker XYZ coordinate files, Tinker archive files, and Protein Databank files are recognized.
 \begin{itemize}
 \item {} 
-Save As
+\sphinxstylestrong{Save As}
 
 \end{itemize}
 
-Saves the active file under a different name. (This command is currently only supported for Cartesian coordinate Tinker files)
+Saves the active file under a different name. Currently, this command is currently only supported for Tinker XYZ coordinate files.
 \begin{itemize}
 \item {} 
-Close
+\sphinxstylestrong{Close}
 
 \end{itemize}
 
 Close the active file.
 \begin{itemize}
 \item {} 
-Close All
+\sphinxstylestrong{Close All}
 
 \end{itemize}
 
 Close all open files.
 \begin{itemize}
 \item {} 
-Download from PubChem
+\sphinxstylestrong{Download from PubChem…}
 
 \end{itemize}
 
-Entering a valid molecule name will download the corresponding structure from the NIH PubChem database, convert atom types to the “Tiny” force field, and save the Tinker .xyz file to the NIH Downloads directory, then open it.
+Entering a valid molecule name downloads the corresponding structure from the NIH PubChem database, convert atom types to the “tiny” force field, and save the Tinker XYZ file to the NIH Downloads directory, then open it.
 \begin{itemize}
 \item {} 
-Download from NCI
+\sphinxstylestrong{Download from NCI…}
 
 \end{itemize}
 
-Entering a valid molecule name will download the corresponding structure from the NCI Cactus database, convert atom types to the “Tiny” force field, and save the Tinker .xyz file to the NIH Downloads directory, then open it.
+Entering a valid molecule name downloads the corresponding structure from the NCI Cactus database, convert atom types to the “tiny” force field, save the Tinker XYZ file to the NIH Downloads directory, then open it.
 \begin{itemize}
 \item {} 
-Download from PDB
+\sphinxstylestrong{Download from PDB…}
 
 \end{itemize}
 
-Entering a valid 4 character accession will download the corresponding PDB file, save it to the current Force Field Explorer working directory, then open it.
+Entering a valid 4 character accession downloads the corresponding PDB file, save it to the current Force Field Explorer working directory, then open it.
 \begin{itemize}
 \item {} 
-Load Restart Data
+\sphinxstylestrong{Choose Key File…}
 
 \end{itemize}
 
-Tinker Restart files ({\color{red}\bfseries{}*}.dyn) contain atomic positions, velocities and two sets of accelerations (current and previous step), but no connectivity information. Loading a Restart file on top of an open Tinker coordinate file allows visualization of velocities and accelerations.
+Allows selecting a specific, non\sphinxhyphen{}default Tinker KEY file containing options for the selected molecular system.
 \begin{itemize}
 \item {} 
-Load Induced Data
+\sphinxstylestrong{Choose Log File…}
 
 \end{itemize}
 
-Tinker Induced Dipole files ({\color{red}\bfseries{}*}.*u) contain induced dipole vectors. They are produced during a molecular dynamics routine using the Tinker “save\sphinxhyphen{}induced” keyword. Loading an Induced Dipole file on top of an open Tinker coordinate file allows visualization of induced dipoles.
+Allows selectiong a specific Tinker LOG file that will be displayed in the FFE Log panel.
 \begin{itemize}
 \item {} 
-Exit
+\sphinxstylestrong{Load Restart Data…}
 
 \end{itemize}
 
-Exit shuts Force Field Explorer down, saving user preferences.
+Tinker Restart files (DYN) contain atomic positions, velocities and two sets of accelerations (current and previous step), but no connectivity information. Loading a Restart file on top of an open Tinker coordinate file allows visualization of velocities and accelerations.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Load Induced Data…}
+
+\end{itemize}
+
+Tinker Induced Dipole files (end in “u”) contain induced dipole vectors. They are produced during a molecular dynamics routine using the Tinker “save\sphinxhyphen{}induced” keyword. Loading an Induced Dipole file on top of an open Tinker coordinate file allows visualization of induced dipoles.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Choose Tinker Location…}
+
+\end{itemize}
+
+Allows specifying a location for the Tinker executables to be used with Force Field Explorer. The default is to use the executables bundled with the install kit and present under \$HOME/Tinker\sphinxhyphen{}FFE.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Exit}
+
+\end{itemize}
+
+Exit shuts down Force Field Explorer, after saving user preferences.
 
 
 \section{Selection Menu}
 \label{\detokenize{text/menus:selection-menu}}
-The set of nodes currently selected are highlighted in the Molecular Tree. If the shift key his pressed while clicking on two nodes, all nodes in between are selected. Alternatively, by holding down the control key while clicking on a node, either in the Tree or Graphics window, the selection state of a node can be toggled. To use Graphics based picking, the Graphics Picking checkbox under the Picking menu must be checked.
+The set of nodes currently selected are highlighted in the Molecular Tree. If the shift key his pressed while clicking on two nodes, all nodes in between are selected. Alternatively, by holding down the control key while clicking on a node, either in the Tree or Graphics window, the selection state of a node can be toggled. To use Graphics based picking, the Graphics Picking checkbox under the Picking menu must be selected.
 \begin{itemize}
 \item {} 
-Select All
+\sphinxstylestrong{Select All}
 
 \end{itemize}
 
 All open systems are selected.
 \begin{itemize}
 \item {} 
-Restrict to Selections
+\sphinxstylestrong{Restrict to Selections}
 
 \end{itemize}
 
 Nodes that are not selected are made invisible.
 \begin{itemize}
 \item {} 
-Highlight Selections
+\sphinxstylestrong{Highlight Selections}
 
 \end{itemize}
 
 Selected nodes are highlighted in the Graphics window.
 \begin{itemize}
 \item {} 
-Set Selection Color
+\sphinxstylestrong{Set Selection Color}
 
 \end{itemize}
 
 Choose the color for selected atoms.
 \begin{itemize}
 \item {} 
-Label Selected Atoms
+\sphinxstylestrong{Label Selected Atoms}
 
 \end{itemize}
 
 Selected atoms are labeled by number and description.
 \begin{itemize}
 \item {} 
-Label Selected Residues
+\sphinxstylestrong{Label Selected Residues}
 
 \end{itemize}
 
 Selected residues are labeled by their respective three letter identifiers.
 \begin{itemize}
 \item {} 
-Set Label Font Size
+\sphinxstylestrong{Set Label Font Size}
 
 \end{itemize}
 
 The default label size is 12 point.
 \begin{itemize}
 \item {} 
-Set Label Font Color
+\sphinxstylestrong{Set Label Font Color}
 
 \end{itemize}
 
@@ -400,74 +421,87 @@ The default font color is white.
 
 \section{Display Menu}
 \label{\detokenize{text/menus:display-menu}}
-We have intentionally maintained a simple, but elegant rendering mechanism. The Force Field Explorer data structure is self\sphinxhyphen{}rendering, meaning that each object “knows how to draw itself”. Rendering commands are “Top\sphinxhyphen{}Down”, meaning that commands filter down through the molecular tree, with each node responding and/or passing commands to its children. This paradigm positions Force Field Explorer to easily scale up to multi\sphinxhyphen{}level molecular engineering/nanotechnology modeling projects. What we want to avoid is a rendering/data architecture built upon “an array of atoms”. In our opinion, “an array of atoms” infrastructure can not achieve our molecular engineering design goals. While a graphics change is being rendered, one additional graphics command will be cached. Other commands are ignored while the 3D view catches up. Changes are applied to all selected nodes in the Molecular Tree View.
+We have intentionally maintained a simple, but elegant rendering mechanism. The Force Field Explorer data structure is self\sphinxhyphen{}rendering, meaning that each object “knows how to draw itself”. Rendering commands are “Top\sphinxhyphen{}Down”, meaning that commands filter down through the molecular tree, with each node responding and/or passing commands to its children. This paradigm positions Force Field Explorer to easily scale up to multi\sphinxhyphen{}level molecular engineering/nanotechnology modeling projects. The intent is to avoid is a rendering/data architecture built upon “an array of atoms”. In our opinion, “an array of atoms” infrastructure does not achieve our molecular engineering design goals. While a graphics change is being rendered, one additional graphics command will be cached. Other commands are ignored while the 3D view catches up. Changes are applied to all selected nodes in the Molecular Tree View.
 \begin{itemize}
 \item {} 
-Wireframe
-
-\item {} \begin{description}
-\item[{Tube}] \leavevmode
-Slow for large systems (more than a few thousand atoms).
-
-\end{description}
-
-\item {} 
-Spacefill
-
-\item {} 
-Ball \& Stick
+\sphinxstylestrong{Wireframe}
 
 \end{itemize}
 
-Slow for large systems (more than a few thousand atoms).
+Represents the selection as a collection of thin lines for bonds.
 \begin{itemize}
 \item {} 
-Invisible
-
-\item {} 
-RMIN
+\sphinxstylestrong{Tube}
 
 \end{itemize}
 
-Similar to Spacefill, but the sphere radii are set to the Lennard\sphinxhyphen{}Jones minima for the given atom.
+Represents the selection as a collection of bond tubes of medium diameter. This option can be slow for systems with more than a few thousand atoms.
 \begin{itemize}
 \item {} 
-Fill
+\sphinxstylestrong{Spacefill}
+
+\end{itemize}
+
+Represnets the selection as a collection of overlapping atoms of large diameter proportional to their vdw radii.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Ball \& Stick}
+
+\end{itemize}
+
+Represents the selection as a collection of atoms of medium diameter and thin tubes for bonds. This options can be slow for large systems with more than a few thousand atoms.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Invisible}
+
+\end{itemize}
+
+Removes any graphical representation of the selected system or subsystem.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{RMIN}
+
+\end{itemize}
+
+Similar to Spacefill, but the sphere sizes are set to the Lennard\sphinxhyphen{}Jones minima for each atom in the system.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Fill}
 
 \end{itemize}
 
 Fill rendered polygons.
 \begin{itemize}
 \item {} 
-Points
+\sphinxstylestrong{Points}
 
 \end{itemize}
 
 Render only vertices.
 \begin{itemize}
 \item {} 
-Lines
+\sphinxstylestrong{Lines}
 
 \end{itemize}
 
 Render edges between vertices.
 \begin{itemize}
 \item {} 
-Preferences \textendash{} Radius
+\sphinxstylestrong{Preferences \textendash{} Radius}
 
 \end{itemize}
 
 A scale factor applied to all rendered spheres and cylinders.
 \begin{itemize}
 \item {} 
-Preferences \textendash{} Wireframe Thickness
+\sphinxstylestrong{Preferences \textendash{} Wireframe Thickness}
 
 \end{itemize}
 
 This specifies the thickness of wireframe representations in pixels.
 \begin{itemize}
 \item {} 
-Preferences \textendash{} Detail
+\sphinxstylestrong{Preferences \textendash{} Detail}
 
 \end{itemize}
 
@@ -477,70 +511,70 @@ Changes the number of vertices used in creating spheres and cylinders. More vert
 \section{Color Menu}
 \label{\detokenize{text/menus:color-menu}}\begin{itemize}
 \item {} 
-Monochrome
+\sphinxstylestrong{Monochrome}
 
 \end{itemize}
 
 Black \& White rendering.
 \begin{itemize}
 \item {} 
-CPK
+\sphinxstylestrong{CPK}
 
 \end{itemize}
 
 Atom based colors.
 \begin{itemize}
 \item {} 
-Residue
+\sphinxstylestrong{Residue}
 
 \end{itemize}
 
 Color based on amino/nucleic acid.
 \begin{itemize}
 \item {} 
-Structure
+\sphinxstylestrong{Structure}
 
 \end{itemize}
 
 Color based on secondary structure specified in PDB files.
 \begin{itemize}
 \item {} 
-Polymer
+\sphinxstylestrong{Polymer}
 
 \end{itemize}
 
 A different color is assigned to each polymer.
 \begin{itemize}
 \item {} 
-Partial Charge
+\sphinxstylestrong{Partial Charge}
 
 \end{itemize}
 
 Coloring is based on partial charges that correspond to atom types specified in Tinker coordinate files.
 \begin{itemize}
 \item {} 
-Vector Magnitude
+\sphinxstylestrong{Vector Magnitude}
 
 \end{itemize}
 
 Coloring is based on vector magnitude, where the vector may represent velocity, acceleration, induced dipole or force depending on user choice.
 \begin{itemize}
 \item {} 
-User Color
+\sphinxstylestrong{User Color}
 
 \end{itemize}
 
 Arbitrary colors can be assigned to selected atoms by choosing the “Apply User Color to Selections” menu item. The “User Color” can then be selected to invoke this scheme.
 \begin{itemize}
 \item {} 
-Apply User Color to Selections
+\sphinxstylestrong{Apply User Color to Selections}
 
 \end{itemize}
 
-See Above.
+Applies the currently active User Color to the selected atoms.
 \begin{itemize}
 \item {} 
-Set User Color
+\sphinxstylestrong{Set User Color}
 
 \end{itemize}
 
@@ -550,77 +584,112 @@ Specify the color to use when selecting the “Apply User Color to Selections”
 \section{Options Menu}
 \label{\detokenize{text/menus:options-menu}}\begin{itemize}
 \item {} 
-Active System
+\sphinxstylestrong{Active System}
 
 \end{itemize}
 
 Coordinate controls for the active system.
-* Reset Rotation
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Reset Rotation}
+
+\end{itemize}
+
 Removes any rotations applied to the active system.
-* Reset Translation
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Reset Translation}
+
+\end{itemize}
+
 Removes any translation applied to the active system.
-* Reset Rotation and Translation
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Reset Rotation and Translation}
+
+\end{itemize}
+
 Removes any rotation/translation applied to the active system.
-* Rotate About Center of Mass
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Rotate About Center of Mass}
+
+\end{itemize}
+
 Specifies the active system should be rotated about its center of mass.
-* Reset About Pick
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Reset About Pick}
+
+\end{itemize}
+
 Specifies the active system should be rotated about the node selected by graphics picking.
 \begin{itemize}
 \item {} 
-Drag
+\sphinxstylestrong{Drag}
 
 \end{itemize}
 
 Specify which system is controlled by mouse clicking/dragging within the Graphics window.
-* Active System
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Active System}
+
+\end{itemize}
+
 Regardless of mouse position, the Active system is controlled.
-* System Below Mouse
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{System Below Mouse}
+
+\end{itemize}
+
 To move a system, it must be picked by clicking over it with the mouse.
 \begin{itemize}
 \item {} 
-Reset Global Zoom
+\sphinxstylestrong{Reset Global Zoom}
 
 \end{itemize}
 
 Reset the global zoom that has been applied to the entire scene.
 \begin{itemize}
 \item {} 
-Reset Global Translation
+\sphinxstylestrong{Reset Global Translation}
 
 \end{itemize}
 
 Remove any global translation that has been applied to the entire scene.
 \begin{itemize}
 \item {} 
-Reset Global Rotation
+\sphinxstylestrong{Reset Global Rotation}
 
 \end{itemize}
 
 Remove any global rotation that has been applied to the entire scene.
 \begin{itemize}
 \item {} 
-Reset Global View
+\sphinxstylestrong{Reset Global View}
 
 \end{itemize}
 
 Remove any global rotation and translation, then reset the global zoom.
 \begin{itemize}
 \item {} 
-Toggle Hydrogens
+\sphinxstylestrong{Toggle Hydrogens}
 
 \end{itemize}
 
 Show/Hide hydrogen atoms.
 \begin{itemize}
 \item {} 
-Full Screen
+\sphinxstylestrong{Full Screen}
 
 \end{itemize}
 
 Make the graphics window fill the entire screen.
 \begin{itemize}
 \item {} 
-Set Background Color
+\sphinxstylestrong{Set Background Color}
 
 \end{itemize}
 
@@ -632,32 +701,91 @@ Change the color of the graphics window background. This is useful for switching
 Graphics picking can be used to select nodes anywhere in the structural hierarchy. By holding the control key while picking, the selection state of the picked node is toggled between selected/not selected. However, holding the shift button down while picking currently has no effect.
 \begin{itemize}
 \item {} 
-Graphics Picking
+\sphinxstylestrong{Graphics Picking}
 
 \end{itemize}
 
 Selecting this checkbox turns on Graphics Picking.
-* Atom
-Individual atoms will be picked.
-* Bond
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Atom}
+
+\end{itemize}
+
+An individual Atom will be picked.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Bond}
+
+\end{itemize}
+
 A Bond will be picked, with consecutive clicks cycling through all Bonds made by the picked atom.
-* Angle
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Angle}
+
+\end{itemize}
+
 An Angle will be picked, with consecutive clicks cycling through all Angles made by the picked atom.
-* Dihedral
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Dihedral}
+
+\end{itemize}
+
 A Dihedral will be picked, with consecutive clicks cycling through all Dihedrals made by the picked atom.
-* Residue
-* Polymer
-* Molecule
-* System
-* Measure Distance
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Residue}
+
+\end{itemize}
+
+An individual Residue from a biopolymer will be picked.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Polymer}
+
+\end{itemize}
+
+An individual Polymer chain will be picked.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick Molecule}
+
+\end{itemize}
+
+An individual Molecule will be picked.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Pick System}
+
+\end{itemize}
+
+An individual System from among those currently loaded will be picked.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Measure Distance}
+
+\end{itemize}
+
 After selecting two atoms the distance between them will be reported in the Force Field Explorer console.
-* Measure Angle
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Measure Angle}
+
+\end{itemize}
+
 After selecting three atoms the angle formed between them will be reported in the Force Field Explorer console.
-* Measure Dihedral
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Measure Dihedral}
+
+\end{itemize}
+
 After selecting four atoms the dihedral formed between them will be reported in the Force Field Explorer console.
 \begin{itemize}
 \item {} 
-Set Graphics Picking Color
+\sphinxstylestrong{Set Graphics Picking Color}
 
 \end{itemize}
 
@@ -666,97 +794,99 @@ Picked nodes will be highlighted in the color selected using this control.
 
 \section{Trajectory Menu}
 \label{\detokenize{text/menus:trajectory-menu}}
-Tinker trajectories are stored in Archive files (\sphinxstyleemphasis{.arc), which are simply a concatenation of coordinate files (}.xyz, {\color{red}\bfseries{}*}.int).
+Tinker trajectories are stored in Archive files (ARC), which are simply a concatenation of Tinker coordinate files (XYZ, INT).
 \begin{itemize}
 \item {} 
-Oscillate
+\sphinxstylestrong{Oscillate}
 
 \end{itemize}
 
 When the end of a trajectory is reached, it is played in the reverse direction instead of restarting at the beginning.
 \begin{itemize}
 \item {} 
-Frame
+\sphinxstylestrong{Frame}
 
 \end{itemize}
 
 Advance to an arbitrary frame of the active trajectory.
 \begin{itemize}
 \item {} 
-Speed
+\sphinxstylestrong{Speed}
 
 \end{itemize}
 
 Choose a frame rate for trajectory playback. If 20 frames per second is entered, for example, a delay of 50 msec between coordinate changes is enforced. Therefore, the actual frame rate will be slower than what is specified if rendering for the system is slow.
 \begin{itemize}
 \item {} 
-Skip
+\sphinxstylestrong{Skip}
 
 \end{itemize}
 
 Instead of displaying every frame during trajectory playback, only every nth frame will be rendered.
 \begin{itemize}
 \item {} 
-Play
+\sphinxstylestrong{Play}
 
 \end{itemize}
 
 Play the active trajectory.
 \begin{itemize}
-\item {} \begin{description}
-\item[{Stop}] \leavevmode
-Stop the active trajectory.
-
-\end{description}
-
-\item {} \begin{description}
-\item[{Step Forward}] \leavevmode
-Advance the active trajectory one frame.
-
-\end{description}
-
-\item {} \begin{description}
-\item[{Step Back}] \leavevmode
-Rewind the active trajectory one frame.
-
-\end{description}
-
-\item {} \begin{description}
-\item[{Reset}] \leavevmode
-Return the active trajectory to the first frame.
-
-\end{description}
+\item {} 
+\sphinxstylestrong{Stop}
 
 \end{itemize}
+
+Stop the active trajectory.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Step Forward}
+
+\end{itemize}
+
+Advance the active trajectory one frame.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Step Back}
+
+\end{itemize}
+
+Rewind the active trajectory one frame.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Reset}
+
+\end{itemize}
+
+Return the active trajectory to the first frame.
 
 
 \section{Simulation Menu}
 \label{\detokenize{text/menus:simulation-menu}}
-Tinker sampling and optimization methods are configured to start a server that listens for Force Field Explorer clients. Once a client \textendash{} server connection is made, simulation information can be sent between Tinker and Force Field Explorer. Multiple Force Field Explorer clients can connect to the same Tinker simulation.
+Tinker molecular dynamics, optimization and sampling methods are configured to start a server that listens for Force Field Explorer clients. Once a client\sphinxhyphen{}to\sphinxhyphen{}server connection is established, simulation information can be sent between Tinker and Force Field Explorer. Multiple Force Field Explorer clients can connect to the same Tinker simulation.
 \begin{itemize}
 \item {} 
-Release Job
+\sphinxstylestrong{Release Job}
 
 \end{itemize}
 
 If Force Field Explorer is connected to a Tinker simulation, the connection will be closed.
 \begin{itemize}
 \item {} 
-Connect to Local Job
+\sphinxstylestrong{Connect to Local Job}
 
 \end{itemize}
 
 Force Field Explorer will attempt to connect to a Tinker simulation executing on the current computer.
 \begin{itemize}
 \item {} 
-Connect to Remote Job
+\sphinxstylestrong{Connect to Remote Job}
 
 \end{itemize}
 
 Force Field Explorer will attempt to connect to a Tinker simulation executing on a remote computer.
 \begin{itemize}
 \item {} 
-Set Remote Job Address
+\sphinxstylestrong{Set Remote Job Address}
 
 \end{itemize}
 
@@ -765,86 +895,96 @@ Specify the IP address of the remote computer where a Tinker simulation is execu
 
 \section{Export Menu}
 \label{\detokenize{text/menus:export-menu}}
-Currently, Force Field Explorer can save screenshots uses JPEG and PNG formats. More formats will be supported when we target Java 1.5 (this release targets Java 1.4.2). In most cases, PNG gives better image quality when using Force Field Explorer than JPEG, probably because the default JPEG configuration we are using chooses small image size over preservation of detail.
+Currently, Force Field Explorer can save screenshots in PNG, JPEG, BMP and GIF formats. In most cases, PNG gives better image quality when using Force Field Explorer than JPEG, likely because the default JPEG configuration use prioritizes small image size over preservation of detail.
 \begin{itemize}
 \item {} 
-Capture Graphics
+\sphinxstylestrong{Capture Graphics}
 
 \end{itemize}
 
 Capture the Graphics window to an image file.
 \begin{itemize}
-\item {} \begin{description}
-\item[{PNG}] \leavevmode
-Use the PNG image format.
-
-\end{description}
-
-\item {} \begin{description}
-\item[{JPEG}] \leavevmode
-Use the JPEG image format.
-
-\end{description}
+\item {} 
+\sphinxstylestrong{PNG}
 
 \end{itemize}
 
-\textgreater{} Window
+Use the PNG image format to render Graphics output.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{JPEG}
+
+\end{itemize}
+
+Use the JPEG image format to render Graphics output.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{BMP}
+
+\end{itemize}
+
+Use the BMP image format to render Graphics output.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{WBMP}
+
+\end{itemize}
+
+Use the WBMP image format to render Graphics output.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{GIF}
+
+\end{itemize}
+
+Use the GIF image format to render Graphics output.
+
+
+\section{Window Menu}
+\label{\detokenize{text/menus:window-menu}}
 Force Field Explorer components can be customized to some extent to suit user preferences. Many user configurable choices are saved between sessions.
 \begin{itemize}
 \item {} 
-Reset Panes
+\sphinxstylestrong{Reset Panes}
 
 \end{itemize}
 
 This resets the slider between the Molecular Tree and Graphics Windows to the default position. The Graphics window is a heavy weight component (so hardware graphics acceleration can be used), while most Force Field Explorer components are light weight “Swing” components. Unfortunately, this effect prevents the user from dragging the slider and shrinking the Graphics window.
 \begin{itemize}
-\item {} \begin{description}
-\item[{Show Tree}] \leavevmode
-Show/Hide the Tree view.
-
-\end{description}
-
-\item {} \begin{description}
-\item[{Show Tool Bar}] \leavevmode
-Show/Hide the Tool Bar.
-
-\end{description}
-
 \item {} 
-Show Global Axes
+\sphinxstylestrong{Show Tree}
+
+\end{itemize}
+
+Show/Hide the Tree view.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Show Tool Bar}
+
+\end{itemize}
+
+Show/Hide the Tool Bar.
+\begin{itemize}
+\item {} 
+\sphinxstylestrong{Show Global Axes}
 
 \end{itemize}
 
 Show/Hide the Global Axes. The Global Axes are used both as a visual cue and to affect global rotations and translations.
 \begin{itemize}
-\item {} \begin{description}
-\item[{Show Console}] \leavevmode
-Show the command line Console.
-
-\end{description}
-
-\item {} \begin{description}
-\item[{Java Metal Look \& Feel}] \leavevmode
-This is the default appearance and should be consistent across platforms.
-
-\end{description}
-
 \item {} 
-Windows/Macintosh/Motif Look \& Feel
+\sphinxstylestrong{Reset Console}
 
 \end{itemize}
 
-This appearance should cause Force Field Explorer to more closely resemble the native platform.
-
-
-\section{Help Menu}
-\label{\detokenize{text/menus:help-menu}}\begin{itemize}
+Resets the FFE command line Console.
+\begin{itemize}
 \item {} 
-About
+\sphinxstylestrong{Ocean Look \& Feel}
 
 \end{itemize}
 
-This displays the Tinker logo and contact information.
+This appearance should cause Force Field Explorer to more closely resemble the native platform. In addtion, top bar menu items will be moved to the main FFE application window. The default appearance is “Java Metal”, which should be consistent across platforms.
 
 
 \chapter{Acknowledgments}
@@ -854,7 +994,7 @@ This displays the Tinker logo and contact information.
 \label{\detokenize{text/acknowledgements:contributors}}
 The original version of Force Field Explorer was written by Michael Schnieders, before and during his graduate school stay in Jay Ponder’s laboratory at Washington University in St. Louis. The code is now being developed and maintained by the Ponder group.
 
-A significant contribution to Force Field Explorer was made by Zhiguang “Frank” Gao over the summer of 2002. The Force Field Explorer logo shows an optimized AMOEBA gas phase water dimer, and was provided by Pengyu Ren. The User’s Guide cover showing the crambin protein with 13\sphinxhyphen{}PHE highlighted was produced by Jay Ponder. Special thanks to Alan Grossfield for offering many helpful suggestions. We would also like to thank Eric Reiss for making available his modified version of some Java3D Behaviors, and Pat Niemeyer for his work in developing the BeanShell scripting framework. Important code modernization and updating of FFE was done over the period from 2013 to 2016 by Jeffrey Bigg, Tyler Ponder and Brendan McMurrow. Modernization and unification of the Linux, Windows and MacOS code bases with done during 2017 and 2018 by Jay Ponder.
+A significant contribution to Force Field Explorer was made by Zhiguang “Frank” Gao over the summer of 2002. The Force Field Explorer logo shows an optimized AMOEBA gas phase water dimer, and was provided by Pengyu Ren. The User’s Guide cover showing the crambin protein with 13\sphinxhyphen{}PHE highlighted was produced by Jay Ponder. Special thanks to Alan Grossfield for offering many helpful suggestions. We would also like to thank Eric Reiss for making available his modified version of some Java3D Behaviors, and Pat Niemeyer for his work in developing the BeanShell scripting framework. Important code modernization, additon of new options and updating of FFE was done over the period from 2013 to 2016 by Jeffrey Bigg, Tyler Ponder and Brendan McMurrow. A major reorganization and unification of the Linux, Windows and MacOS code bases was completed during summer 2017 by Jay Ponder.
 
 
 \section{Reporting Bugs}

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  17 MAY 2020 18:30
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  17 MAY 2020 21:06
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -803,27 +803,28 @@ Package pdftex.def Info: figure6.png  used on input line 257.
 Chapter 4.
 [11
 
-] [12] [13] [14] [15] [16] [17] [18]
-Chapter 5.
-(./ffeusersguide.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 868.
- [19
+] [12] [13] [14] [15] [16] [17] [18] [19] [20
 
 ]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 868.
+Chapter 5.
+(./ffeusersguide.ind)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1008.
+ [21]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1008.
  (./ffeusersguide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 868.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 868.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1008.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1008.
+
 Package rerunfilecheck Info: File `ffeusersguide.out' has not changed.
-(rerunfilecheck)             Checksum: 7676FC60D42BDE266BC2F478C06516B3;3678.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 868.
+(rerunfilecheck)             Checksum: E1DEB3D423562D2A230D2D9C1DE829A8;3688.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1008.
  ) 
 Here is how much of TeX's memory you used:
- 14106 strings out of 480608
- 204305 string characters out of 5903631
- 478042 words of memory out of 5000000
+ 14105 strings out of 480608
+ 204289 string characters out of 5903631
+ 478044 words of memory out of 5000000
  29580 multiletter control sequences out of 15000+600000
- 753763 words of font info for 84 fonts, out of 8000000 for 9000
+ 750716 words of font info for 82 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
  38i,12n,49p,1144b,491s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/t
@@ -831,12 +832,11 @@ exlive/2020/texmf-dist/fonts/enc/dvips/lato/a_rt66h3.enc}{/usr/local/texlive/20
 20/texmf-dist/fonts/enc/dvips/lato/a_cl4kdn.enc}</usr/local/texlive/2020/texmf-
 dist/fonts/type1/typoland/lato/Lato-Bold.pfb></usr/local/texlive/2020/texmf-dis
 t/fonts/type1/bitstrea/charter/bchb8a.pfb></usr/local/texlive/2020/texmf-dist/f
-onts/type1/bitstrea/charter/bchr8a.pfb></usr/local/texlive/2020/texmf-dist/font
-s/type1/bitstrea/charter/bchri8a.pfb>
-Output written on ffeusersguide.pdf (23 pages, 732942 bytes).
+onts/type1/bitstrea/charter/bchr8a.pfb>
+Output written on ffeusersguide.pdf (25 pages, 723389 bytes).
 PDF statistics:
- 296 PDF objects out of 1000 (max. 8388607)
- 247 compressed objects within 3 object streams
- 51 named destinations out of 1000 (max. 500000)
+ 301 PDF objects out of 1000 (max. 8388607)
+ 251 compressed objects within 3 object streams
+ 53 named destinations out of 1000 (max. 500000)
  267 words of extra memory for PDF output out of 10000 (max. 10000000)
 
