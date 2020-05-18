@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  17 MAY 2020 21:06
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  17 MAY 2020 21:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -808,16 +808,16 @@ Chapter 4.
 ]
 Chapter 5.
 (./ffeusersguide.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1008.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1015.
  [21]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1008.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1015.
  (./ffeusersguide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1008.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1008.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1015.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1015.
 
 Package rerunfilecheck Info: File `ffeusersguide.out' has not changed.
 (rerunfilecheck)             Checksum: E1DEB3D423562D2A230D2D9C1DE829A8;3688.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1008.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1015.
  ) 
 Here is how much of TeX's memory you used:
  14105 strings out of 480608
@@ -826,14 +826,14 @@ Here is how much of TeX's memory you used:
  29580 multiletter control sequences out of 15000+600000
  750716 words of font info for 82 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
- 38i,12n,49p,1144b,491s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 38i,12n,49p,1144b,497s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2020/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/t
 exlive/2020/texmf-dist/fonts/enc/dvips/lato/a_rt66h3.enc}{/usr/local/texlive/20
 20/texmf-dist/fonts/enc/dvips/lato/a_cl4kdn.enc}</usr/local/texlive/2020/texmf-
 dist/fonts/type1/typoland/lato/Lato-Bold.pfb></usr/local/texlive/2020/texmf-dis
 t/fonts/type1/bitstrea/charter/bchb8a.pfb></usr/local/texlive/2020/texmf-dist/f
 onts/type1/bitstrea/charter/bchr8a.pfb>
-Output written on ffeusersguide.pdf (25 pages, 723389 bytes).
+Output written on ffeusersguide.pdf (25 pages, 723626 bytes).
 PDF statistics:
  301 PDF objects out of 1000 (max. 8388607)
  251 compressed objects within 3 object streams

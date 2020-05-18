@@ -75,7 +75,7 @@ Nodes that are not selected are made invisible.
 
 Selected nodes are highlighted in the Graphics window.
 
-* **Set Selection Color**
+* **Set Selection Color...**
 
 Choose the color for selected atoms.
 
@@ -91,7 +91,7 @@ Selected residues are labeled by their respective three letter identifiers.
 
 The default label size is 12 point.
 
-* **Set Label Font Color**
+* **Set Label Font Color...**
 
 The default font color is white.
 
@@ -136,15 +136,15 @@ Render only vertices.
 
 Render edges between vertices.
 	
-* **Preferences – Radius**
+* **Preferences... –> Radius**
 
 A scale factor applied to all rendered spheres and cylinders.
 
-* **Preferences – Wireframe Thickness**
+* **Preferences... –> Wireframe Thickness**
 
 This specifies the thickness of wireframe representations in pixels.
 
-* **Preferences – Detail**
+* **Preferences... –> Detail**
 
 Changes the number of vertices used in creating spheres and cylinders. More vertices (a higher number on the slider) create a smoother appearance, but slower rotations.
 
@@ -187,7 +187,7 @@ Arbitrary colors can be assigned to selected atoms by choosing the “Apply User
 
 Applies the currently active User Color to the selected atoms.
 
-* **Set User Color**
+* **Set User Color...**
 
 Specify the color to use when selecting the “Apply User Color to Selections” option.
  
@@ -254,7 +254,7 @@ Show/Hide hydrogen atoms.
 
 Make the graphics window fill the entire screen.
 	
-* **Set Background Color**
+* **Set Background Color...**
 
 Change the color of the graphics window background. This is useful for switching to a white background before capturing images that might be printed.
 
@@ -311,7 +311,7 @@ After selecting three atoms the angle formed between them will be reported in th
 
 After selecting four atoms the dihedral formed between them will be reported in the Force Field Explorer console.
 
-* **Set Graphics Picking Color**
+* **Set Graphics Picking Color...**
 
 Picked nodes will be highlighted in the color selected using this control.
 
@@ -324,15 +324,15 @@ Tinker trajectories are stored in Archive files (ARC), which are simply a concat
 
 When the end of a trajectory is reached, it is played in the reverse direction instead of restarting at the beginning.
 
-* **Frame**
+* **Frame...**
 
 Advance to an arbitrary frame of the active trajectory.
 
-* **Speed**
+* **Speed...**
 
 Choose a frame rate for trajectory playback. If 20 frames per second is entered, for example, a delay of 50 msec between coordinate changes is enforced. Therefore, the actual frame rate will be slower than what is specified if rendering for the system is slow.
 
-* **Skip**
+* **Skip...**
 
 Instead of displaying every frame during trajectory playback, only every nth frame will be rendered.
 
@@ -373,9 +373,13 @@ Force Field Explorer will attempt to connect to a Tinker simulation executing on
 
 Force Field Explorer will attempt to connect to a Tinker simulation executing on a remote computer.
 
-* **Set Remote Job Address**
+* **Set Remote Job Address...**
 
 Specify the IP address of the remote computer where a Tinker simulation is executing. No domain name server is used, so the address should be of the form: XXX.XXX.XXX.XXX
+
+* **Set Port...**
+
+Specify the port number to be used for connection to a Tinker simulation.
 
 Export Menu
 -----------

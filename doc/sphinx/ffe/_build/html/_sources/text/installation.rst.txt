@@ -12,20 +12,20 @@ On some platforms, double clicking the ffe.jar file in the “tinker/jar” dire
 
 Specific installation instructions for operating systems are provided below:
 
-* Linux
+* **Linux**
 
 	The Tinker-FFE Installer for Linux is provided as a gzipped shell script. Uncompress the the .gz archive to produce an .sh script, and then run the script. The script must have the "executable" attribute, set via "chmod +x ffe-linux.sh", prior to being run.
 
 	After installation, the top-level directory defaults to “$HOME/Tinker-FFE”. The FFE-enabled Tinker binaries are located in the “$HOME/Tinker-FFE/tinker/bin” directory.
 
-* Apple MacOS
+* **Apple MacOS**
 
 	The Tinker-FFE Installer for MacOS is provided as a .dmg disk image file. Double-click on the file to run the installer. Once installed, Force Field Explorer is launched by double clicking on the Desktop icon.
 
 	Recent versions of MacOS contains a security feature called Gatekeeper that keeps applications not obtained via the App Store or Apple-approved developers from being opened. Gatekeeper is enabled by default, and may result in the (incorrect!) error message: "Tinker-FFE Installer.app is damaged and can't be opened." To turn off Gatekeeper, go to the panel System Preferences > Security & Privacy > General, and set "Allow apps downloaded from:" to "Anywhere". This will require an Administrator account, and must be done before invoking the FFE installer. After FFE is installed and launched for the first time, you can return the System Preference to its prior value. On Sierra (MacOS 10.12) and later, the "Anywhere" option has been removed. In most cases the Security & Privacy panel will open and permit the user to run the installer. Alternatively, the "Anywhere" option can be restored by running the command "sudo spctl --master-disable" in a Terminal window with Administrator privilege.
 
-* Microsoft Windows
-   
+* **Microsoft Windows**
+
 	The Tinker-FFE Installer for Windows is provided as a zipped executable. First, unzip the .zip file. Then run the resulting executable .exe file by double clicking. Following installation, Force Field Explorer is launched via the FFE desktop icon or from the Start Menu.
 
 	In order to perform minimizations or molecular dynamics from within FFE, some environment variables and symbolic links must be set prior to using the program. A batch file named "FFESetupWin.bat" is installed in the main Tinker-FFE directory, which by default resides in the user's home directory. To complete the setup of FFE, this batch file should be run from a Command Prompt window following installation. It is only necessary to invoke this batch file once, as the settings should persist between logins.

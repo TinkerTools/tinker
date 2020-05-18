@@ -1,5 +1,5 @@
-Descriptions of Tinker Routines
-===============================
+Routines & Functions
+====================
 
 The distribution version of the Tinker package contains over 700 separate programs, subroutines and functions. This section contains a brief description of the purpose of most of these code units. Further information can be found in the comments located at the top of each source code file.
 
