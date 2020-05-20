@@ -309,10 +309,6 @@ INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchr8r.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/public/inconsolata/ts1-zi4r.tfm
-INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/psnfss/ts1bch.fd
-INPUT /usr/local/texlive/2020/texmf-dist/tex/latex/psnfss/ts1bch.fd
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchr8c.tfm
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/vf/bitstrea/charter/bchr8c.vf
 INPUT tinkerusersguide.ind
 INPUT tinkerusersguide.ind
 INPUT tinkerusersguide.aux

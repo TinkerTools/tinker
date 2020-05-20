@@ -6,107 +6,109 @@ This section contains a list of the references to general theory, algorithms and
 Partial List of Molecular Mechanics Software Packages
 -----------------------------------------------------
 
-AMBER	Peter Kollman, University of California, San Francisco
-AMMP	Rob Harrison, Thomas Jefferson University, Philadelphia
-ARGOS	Andy McCammon, University of California, San Diego
-BOSS	William Jorgensen, Yale University
-BRUGEL	Shoshona Wodak, Free University of Brussels
-CFF	Shneior Lifson, Weizmann Institute
-CHARMM	Martin Karplus, Harvard University
-CHARMM/GEMM	Bernard Brooks, National Institutes of Health, Bethesda
-DELPHI	Bastian van de Graaf, Delft University of Technology
-DISCOVER	Molecular Simulations Inc., San Diego
-DL_POLY	W. Smith & T. Forester, CCP5, Daresbury Laboratory
-ECEPP	Harold Scheraga, Cornell University
-ENCAD	Michael Levitt, Stanford University
-FANTOM	Werner Braun, University of Texas, Galveston
-FEDER/2	Nobuhiro Go, Kyoto University
-GROMACS	Herman Berendsen, University of Groningen
-GROMOS	Wilfred van Gunsteren, BIOMOS and ETH, Zurich
-IMPACT	Ronald Levy, Rutgers University
-MACROMODEL	Schodinger, Inc., Jersey City, New Jersey
-MM2/MM3/MM4	N. Lou Allinger, University of Georgia
-MMC	Cliff Dykstra, Indiana University-Purdue University at Indianapolis
-MMFF	Tom Halgren, Merck Research Laboratories, Rahway
-MMTK	Konrad Hinsen, Inst. of Structural Biology, Grenoble
-MOIL	Ron Elber, Cornell University
-MOLARIS	Arieh Warshal, University of Southern California
-MOLDY	Keith Refson, Oxford University
-MOSCITO	Dietmar Paschek & Alfons Geiger, Universit‰t Dortmund
-NAMD	Klaus Schulten, University of Illinois, Urbana
-OOMPAA	Andy McCammon, University of California, San Diego
-ORAL	Karel Zimmerman, INRA, Jouy-en-Josas, France
-ORIENT	Anthony Stone, Cambridge University
-PCMODEL	Kevin Gilbert, Serena Software, Bloomington, Indiana
-PEFF	Jan Dillen, University of Pretoria, South Africa
-Q	Johan Aqvist, Uppsala University
-SIBFA	Nohad Gresh, INSERM, CNRS, Paris
-SIGMA	Jan Hermans, University of North Carolina
-SPASIBA	Gerard Vergoten, UniversitÈ de Lille
-SPASMS	David Spellmeyer and the Kollman Group, UCSF
-TINKER	Jay Ponder, Washington University, St. Louis
-XPLOR/CNS	Axel Br¸nger, Stanford University
-YAMMP	Stephen Harvey, University of Alabama, Birmingham
-YASP	Florian Mueller-Plathe, ETH Zentrum, Zurich
-YETI	Angelo Vedani, Biografik-Labor 3R, Basel
+.. code-block:: text
 
-AMBER     D. A Pearlman, D. A. Case, J. W. Caldwell, W. S. Ross, T. E. Cheatham III, S. DeBolt, D. Ferguson, G. Seibel and P. Kollman, AMBER, a Package of Computer Programs for Applying Molecular Mechanics, Normal Mode Analysis, Molecular Dynamics and Free Energy Calculations to Simulate the Structural and Energetic Properties of Molecules, Comp. Phys. Commun., 91, 1-41 (1995)
+ AMBER          Peter Kollman, University of California, San Francisco
+ AMMP           Rob Harrison, Thomas Jefferson University, Philadelphia
+ ARGOS          Andy McCammon, University of California, San Diego
+ BOSS           William Jorgensen, Yale University
+ BRUGEL         Shoshona Wodak, Free University of Brussels
+ CFF            Shneior Lifson, Weizmann Institute
+ CHARMM         Martin Karplus, Harvard University
+ CHARMM/GEMM    Bernard Brooks, National Institutes of Health, Bethesda
+ DELPHI         Bastian van de Graaf, Delft University of Technology
+ DISCOVER       Molecular Simulations Inc., San Diego
+ DL_POLY        W. Smith & T. Forester, CCP5, Daresbury Laboratory
+ ECEPP          Harold Scheraga, Cornell University
+ ENCAD          Michael Levitt, Stanford University
+ FANTOM         Werner Braun, University of Texas, Galveston
+ FEDER/2        Nobuhiro Go, Kyoto University
+ GROMACS        Herman Berendsen, University of Groningen
+ GROMOS         Wilfred van Gunsteren, BIOMOS and ETH, Zurich
+ IMPACT         Ronald Levy, Rutgers University
+ MACROMODEL     Schodinger, Inc., Jersey City, New Jersey
+ MM2/MM3/MM4    N. Lou Allinger, University of Georgia
+ MMC            Cliff Dykstra, Indiana Univ.-Purdue Univ. at Indianapolis
+ MMFF           Tom Halgren, Merck Research Laboratories, Rahway
+ MMTK           Konrad Hinsen, Inst. of Structural Biology, Grenoble
+ MOIL           Ron Elber, Cornell University
+ MOLARIS        Arieh Warshal, University of Southern California
+ MOLDY          Keith Refson, Oxford University
+ MOSCITO        Dietmar Paschek & Alfons Geiger, Universit‰t Dortmund
+ NAMD           Klaus Schulten, University of Illinois, Urbana
+ OOMPAA         Andy McCammon, University of California, San Diego
+ ORAL           Karel Zimmerman, INRA, Jouy-en-Josas, France
+ ORIENT         Anthony Stone, Cambridge University
+ PCMODEL        Kevin Gilbert, Serena Software, Bloomington, Indiana
+ PEFF           Jan Dillen, University of Pretoria, South Africa
+ Q              Johan Aqvist, Uppsala University
+ SIBFA          Nohad Gresh, INSERM, CNRS, Paris
+ SIGMA          Jan Hermans, University of North Carolina
+ SPASIBA        Gerard Vergoten, UniversitÈ de Lille
+ SPASMS         David Spellmeyer and the Kollman Group, UCSF
+ TINKER         Jay Ponder, Washington University, St. Louis
+ XPLOR/CNS      Axel Brunger, Stanford University
+ YAMMP          Stephen Harvey, University of Alabama, Birmingham
+ YASP           Florian Mueller-Plathe, ETH Zentrum, Zurich
+ YETI           Angelo Vedani, Biografik-Labor 3R, Basel
 
-ARGOS     T. P. Straatsma and J. A. McCammon, ARGOS, a Vectorized General Molecular Dynamics Program, J. Comput. Chem., 11, 943-951 (1990)
+**AMBER**     D. A Pearlman, D. A. Case, J. W. Caldwell, W. S. Ross, T. E. Cheatham III, S. DeBolt, D. Ferguson, G. Seibel and P. Kollman, AMBER, a Package of Computer Programs for Applying Molecular Mechanics, Normal Mode Analysis, Molecular Dynamics and Free Energy Calculations to Simulate the Structural and Energetic Properties of Molecules, Comp. Phys. Commun., 91, 1-41 (1995)
 
-CHARMM     B. R. Brooks, R. E. Bruccoleri, B. D. Olafson, D. J. States, S. Swaminathan and M. Karplus, CHARMM: A Program for Macromolecular Energy, Minimization, and Dynamics Calculations, J. Comput. Chem., 4, 187-217 (1983)
+**ARGOS**     T. P. Straatsma and J. A. McCammon, ARGOS, a Vectorized General Molecular Dynamics Program, J. Comput. Chem., 11, 943-951 (1990)
 
-ENCAD     M. Levitt, M. Hirshberg, R. Sharon and V. Daggett, Potential Energy Function and Parameters for Simulations for the Molecular Dynamics of Proteins and Nucleic Acids in Solution, Comp. Phys. Commun., 91, 215-231 (1995)
+**CHARMM**     B. R. Brooks, R. E. Bruccoleri, B. D. Olafson, D. J. States, S. Swaminathan and M. Karplus, CHARMM: A Program for Macromolecular Energy, Minimization, and Dynamics Calculations, J. Comput. Chem., 4, 187-217 (1983)
 
-FANTOM     T. Schaumann, W. Braun and K. Wurtrich, The Program FANTOM for Energy Refinement of Polypeptides and Proteins Using a Newton-Raphson Minimizer in Torsion Angle Space, Biopolymers, 29, 679-694 (1990)
+**ENCAD**     M. Levitt, M. Hirshberg, R. Sharon and V. Daggett, Potential Energy Function and Parameters for Simulations for the Molecular Dynamics of Proteins and Nucleic Acids in Solution, Comp. Phys. Commun., 91, 215-231 (1995)
 
-FEDER/2     H. Wako, S. Endo, K. Nagayama and N. Go, FEDER/2: Program for Static and Dynamic Conformational Energy Analysis of Macro-molecules in Dihedral Angle Space, Comp. Phys. Commun., 91, 233-251 (1995)
+**FANTOM**     T. Schaumann, W. Braun and K. Wurtrich, The Program FANTOM for Energy Refinement of Polypeptides and Proteins Using a Newton-Raphson Minimizer in Torsion Angle Space, Biopolymers, 29, 679-694 (1990)
 
-GROMACS     E. Lindahl, B. Hess and D. van der Spoel, GROMACS 3.0: A Package for Molecular Simulation and Trajectory Analysis, J. Mol. Mol., 7, 306-317 (2001)
+**FEDER/2**     H. Wako, S. Endo, K. Nagayama and N. Go, FEDER/2: Program for Static and Dynamic Conformational Energy Analysis of Macro-molecules in Dihedral Angle Space, Comp. Phys. Commun., 91, 233-251 (1995)
 
-GROMOS     W. R. P. Scott, P. H. Hunenberger , I. G. Tironi, A. E. Mark, S. R. Billeter, J. Fennen, A. E. Torda, T. Huber, P. Kruger, W. F. van Gunsteren, The GROMOS Biomolecular Simulation Program Package, J. Phys. Chem. A, 103, 3596-3607 (1999)
+**GROMACS**     E. Lindahl, B. Hess and D. van der Spoel, GROMACS 3.0: A Package for Molecular Simulation and Trajectory Analysis, J. Mol. Mol., 7, 306-317 (2001)
 
-IMPACT     D. B. Kitchen, F. Hirata, J. D. Westbrook, R. Levy, D. Kofke and M. Yarmush, Conserving Energy during Molecular Dynamics Simulations of Water, Proteins, and Proteins in Water, J. Comput. Chem., 10, 1169-1180 (1990)
+**GROMOS**     W. R. P. Scott, P. H. Hunenberger , I. G. Tironi, A. E. Mark, S. R. Billeter, J. Fennen, A. E. Torda, T. Huber, P. Kruger, W. F. van Gunsteren, The GROMOS Biomolecular Simulation Program Package, J. Phys. Chem. A, 103, 3596-3607 (1999)
 
-MACROMODEL     F. Mahamadi, N. G. J. Richards, W. C. Guida, R. Liskamp, M. Lipton, C. Caufield, G. Chang, T. Hendrickson and W. C. Still, MacroModel: An Integrated Software System for Modeling Organic and Bioorganic Molecules Using Molecular Mechanics, J. Comput. Chem., 11, 440-467 (1990)
+**IMPACT**     D. B. Kitchen, F. Hirata, J. D. Westbrook, R. Levy, D. Kofke and M. Yarmush, Conserving Energy during Molecular Dynamics Simulations of Water, Proteins, and Proteins in Water, J. Comput. Chem., 10, 1169-1180 (1990)
 
-MM2     N. L. Allinger, Conformational Analysis. 130. MM2. A Hydrocarbon Force Field Utilizing V1 and V2 Torsional Terms, J. Am. Chem. Soc., 99, 8127-8134 (1977)
+**MACROMODEL**     F. Mahamadi, N. G. J. Richards, W. C. Guida, R. Liskamp, M. Lipton, C. Caufield, G. Chang, T. Hendrickson and W. C. Still, MacroModel: An Integrated Software System for Modeling Organic and Bioorganic Molecules Using Molecular Mechanics, J. Comput. Chem., 11, 440-467 (1990)
 
-MM3     N. L. Allinger, Y. H. Yuh and J.-H. Lii, Molecular Mechanics. The MM3 Force Field for Hydrocarbons, J. Am. Chem. Soc., 111, 8551-8566 (1989)
+**MM2**     N. L. Allinger, Conformational Analysis. 130. MM2. A Hydrocarbon Force Field Utilizing V1 and V2 Torsional Terms, J. Am. Chem. Soc., 99, 8127-8134 (1977)
 
-MM4     N. L. Allinger, K. Chen and J.-H. Lii, An Improved Force Field (MM4) for Saturated Hydrocarbons, J. Comput. Chem., 17, 642-668 (1996)
+**MM3**     N. L. Allinger, Y. H. Yuh and J.-H. Lii, Molecular Mechanics. The MM3 Force Field for Hydrocarbons, J. Am. Chem. Soc., 111, 8551-8566 (1989)
 
-MMC     C. E. Dykstra, Molecular Mechanics for Weakly Interacting Assemblies of Rare Gas Atoms and Small Molecules, J. Am. Chem. Soc., 111, 6168-6174 (1989)
+**MM4**     N. L. Allinger, K. Chen and J.-H. Lii, An Improved Force Field (MM4) for Saturated Hydrocarbons, J. Comput. Chem., 17, 642-668 (1996)
 
-MMFF     T. A. Halgren, Merck Molecular Force Field. I. Basis, Form, Scope, Parameterization, and Performance of MMFF94, J. Comput. Chem., 17, 490-516 (1996)
+**MMC**     C. E. Dykstra, Molecular Mechanics for Weakly Interacting Assemblies of Rare Gas Atoms and Small Molecules, J. Am. Chem. Soc., 111, 6168-6174 (1989)
 
-MOIL     R. Elber, A. Roitberg, C. Simmerling, R. Goldstein, H. Li, G. Verkhiver, C. Keasar, J. Zhang and A. Ulitsky, MOIL: A Program for Simulations of Macromolecules, Comp. Phys. Commun., 91, 159-189 (1995)
+**MMFF**     T. A. Halgren, Merck Molecular Force Field. I. Basis, Form, Scope, Parameterization, and Performance of MMFF94, J. Comput. Chem., 17, 490-516 (1996)
 
-MOSCITO     See the web site at http:/ganter.chemie.uni-dortmund.de/~pas/moscito.html
+**MOIL**     R. Elber, A. Roitberg, C. Simmerling, R. Goldstein, H. Li, G. Verkhiver, C. Keasar, J. Zhang and A. Ulitsky, MOIL: A Program for Simulations of Macromolecules, Comp. Phys. Commun., 91, 159-189 (1995)
 
-NAMD     L. KalÈ, R. Skeel, M. Bhandarkar, R. Brunner, A. Gursoy, N. Krawetz, J. Phillips, A. Shinozaki, K. Varadarajan and K. Schulten, NAMD2: Greater Scalability for Parallel Molecular Dynamics, J. Comput. Phys., 151, 283-312 (1999)
+**MOSCITO**     See the web site at http:/ganter.chemie.uni-dortmund.de/~pas/moscito.html
 
-OOMPAA     G. A. Huber and J. A. McCammon, OOMPAA: Object-oriented Model for Probing Assemblages of Atoms, J. Comput. Phys., 151, 264-282 (1999)
+**NAMD**     L. KalÈ, R. Skeel, M. Bhandarkar, R. Brunner, A. Gursoy, N. Krawetz, J. Phillips, A. Shinozaki, K. Varadarajan and K. Schulten, NAMD2: Greater Scalability for Parallel Molecular Dynamics, J. Comput. Phys., 151, 283-312 (1999)
 
-ORAL     K. Zimmermann, ORAL: All Purpose Molecular Mechanics Simulator and Energy Minimizer, J. Comput. Chem., 12, 310-319 (1991)
+**OOMPAA**     G. A. Huber and J. A. McCammon, OOMPAA: Object-oriented Model for Probing Assemblages of Atoms, J. Comput. Phys., 151, 264-282 (1999)
 
-PCMODEL     See the web site at http:/www.serenasoft.com
+**ORAL**     K. Zimmermann, ORAL: All Purpose Molecular Mechanics Simulator and Energy Minimizer, J. Comput. Chem., 12, 310-319 (1991)
 
-PEFF     J. L. M. Dillen, PEFF: A Program for the Development of Empirical Force Fields, J. Comput. Chem., 13, 257-267 (1992)
+**PCMODEL**     See the web site at http:/www.serenasoft.com
 
-Q     See the web site at http://aqvist.bmc.uu.se/Q
+**PEFF**     J. L. M. Dillen, PEFF: A Program for the Development of Empirical Force Fields, J. Comput. Chem., 13, 257-267 (1992)
 
-SIBFA     N. Gresh, Inter- and Intramolecular Interactions. Inception and Refinements of the SIBFA, Molecular Mechanics (SMM) Procedure, a Separable, Polarizable Methodology Grounded on ab Initio SCF/MP2 Computations. Examples of Applications to Molecular Recognition Problems, J. Chim. Phys. PCB, 94, 1365-1416 (1997)
+**Q**     See the web site at http://aqvist.bmc.uu.se/Q
 
-SIGMA     See the web site at http://femto.med.unc.edu/SIGMA
+**SIBFA**     N. Gresh, Inter- and Intramolecular Interactions. Inception and Refinements of the SIBFA, Molecular Mechanics (SMM) Procedure, a Separable, Polarizable Methodology Grounded on ab Initio SCF/MP2 Computations. Examples of Applications to Molecular Recognition Problems, J. Chim. Phys. PCB, 94, 1365-1416 (1997)
 
-SPASIBA     P. Derreumaux and G. Vergoten, A New Spectroscopic Molecular Mechanics Force-Field - Parameters For Proteins, J. Chem. Phys., 102, 8586-8605 (1995)
+**SIGMA**     See the web site at http://femto.med.unc.edu/SIGMA
 
-TINKER     See the web site at http://dasher.wustl.edu/tinker
+**SPASIBA**     P. Derreumaux and G. Vergoten, A New Spectroscopic Molecular Mechanics Force-Field - Parameters For Proteins, J. Chem. Phys., 102, 8586-8605 (1995)
 
-YAMMP     R. K.-Z. Tan and S. C. Harvey, Yammp: Development of a Molecular Mechanics Program Using the Modular Programming Method, J. Comput. Chem., 14, 455-470 (1993)
+**TINKER**     See the web site at http://dasher.wustl.edu/tinker
 
-YETI     A. Vedani, YETI: An Interactive Molecular Mechanics Program for Small-Molecule Protein Complexes, J. Comput. Chem., 9, 269-280 (1988)
+**YAMMP**     R. K.-Z. Tan and S. C. Harvey, Yammp: Development of a Molecular Mechanics Program Using the Modular Programming Method, J. Comput. Chem., 14, 455-470 (1993)
+
+**YETI**     A. Vedani, YETI: An Interactive Molecular Mechanics Program for Small-Molecule Protein Complexes, J. Comput. Chem., 9, 269-280 (1988)
 
 Molecular Mechanics
 -------------------
