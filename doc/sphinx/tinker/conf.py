@@ -39,7 +39,7 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # Globally disable color highlighting in code-blocks
-highlight_language = 'none'
+#highlight_language = 'none'
 
 
 # -- Options for HTML output -------------------------------------------------

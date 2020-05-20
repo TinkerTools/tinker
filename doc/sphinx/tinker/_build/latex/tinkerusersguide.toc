@@ -64,35 +64,44 @@
 \contentsline {chapter}{\numberline {10}Modules \& Global Variables}{129}{chapter.10}%
 \contentsline {chapter}{\numberline {11}Test Cases \& Examples}{157}{chapter.11}%
 \contentsline {chapter}{\numberline {12}Benchmark Results}{161}{chapter.12}%
-\contentsline {chapter}{\numberline {13}Acknowledgments}{165}{chapter.13}%
-\contentsline {chapter}{\numberline {14}References}{167}{chapter.14}%
-\contentsline {section}{\numberline {14.1}Partial List of Molecular Mechanics Software Packages}{167}{section.14.1}%
-\contentsline {section}{\numberline {14.2}Molecular Mechanics}{169}{section.14.2}%
-\contentsline {section}{\numberline {14.3}Computer Simulation Methods}{170}{section.14.3}%
-\contentsline {section}{\numberline {14.4}Modeling of Biological Macromolecules}{170}{section.14.4}%
-\contentsline {section}{\numberline {14.5}Conjugate Gradient and Quasi\sphinxhyphen {}Newton Optimization}{171}{section.14.5}%
-\contentsline {section}{\numberline {14.6}Truncated Newton Optimization}{171}{section.14.6}%
-\contentsline {section}{\numberline {14.7}Potential Energy Smoothing}{172}{section.14.7}%
-\contentsline {section}{\numberline {14.8}“Sniffer” Global Optimization}{172}{section.14.8}%
-\contentsline {section}{\numberline {14.9}Integration Methods for Molecular Dynamics}{173}{section.14.9}%
-\contentsline {section}{\numberline {14.10}Constraint Dynamics}{173}{section.14.10}%
-\contentsline {section}{\numberline {14.11}Langevin, Brownian and Stochastic Dynamics}{174}{section.14.11}%
-\contentsline {section}{\numberline {14.12}Constant Temperature and Pressure Dynamics}{174}{section.14.12}%
-\contentsline {section}{\numberline {14.13}Out\sphinxhyphen {}of\sphinxhyphen {}Plane Deformation Terms}{174}{section.14.13}%
-\contentsline {section}{\numberline {14.14}Analytical Derivatives of Potential Functions}{175}{section.14.14}%
-\contentsline {section}{\numberline {14.15}Torsional Space Derivatives and Normal Modes}{175}{section.14.15}%
-\contentsline {section}{\numberline {14.16}Analytical Surface Area and Volume}{175}{section.14.16}%
-\contentsline {section}{\numberline {14.17}Approximate Surface Area and Volume}{176}{section.14.17}%
-\contentsline {section}{\numberline {14.18}Boundary Conditions and Neighbor Methods}{176}{section.14.18}%
-\contentsline {section}{\numberline {14.19}Cutoff and Truncation Methods}{177}{section.14.19}%
-\contentsline {section}{\numberline {14.20}Ewald Summation Techniques}{177}{section.14.20}%
-\contentsline {section}{\numberline {14.21}Conjugated and Aromatic Systems}{178}{section.14.21}%
-\contentsline {section}{\numberline {14.22}Free Energy Simulation Methods}{178}{section.14.22}%
-\contentsline {section}{\numberline {14.23}Methods for Parameter Determination}{179}{section.14.23}%
-\contentsline {section}{\numberline {14.24}Electrostatic Interactions}{179}{section.14.24}%
-\contentsline {section}{\numberline {14.25}Polarization Effects}{180}{section.14.25}%
-\contentsline {section}{\numberline {14.26}Macroscopic Treatment of Solvent}{181}{section.14.26}%
-\contentsline {section}{\numberline {14.27}Surface Area\sphinxhyphen {}Based Solvation Models}{181}{section.14.27}%
-\contentsline {section}{\numberline {14.28}Generalized Born Solvation Models}{181}{section.14.28}%
-\contentsline {section}{\numberline {14.29}Superposition of Coordinate Sets}{182}{section.14.29}%
-\contentsline {section}{\numberline {14.30}Location of Transition States}{182}{section.14.30}%
+\contentsline {section}{\numberline {12.1}Calmodulin Energy Evaluation (Serial)}{161}{section.12.1}%
+\contentsline {section}{\numberline {12.2}Crambin Crystal Energy Evaluation (Serial)}{161}{section.12.2}%
+\contentsline {section}{\numberline {12.3}Crambin Normal Mode Calculation (Serial)}{162}{section.12.3}%
+\contentsline {section}{\numberline {12.4}Water Box Molecular Dynamics using TIP3P (Serial)}{162}{section.12.4}%
+\contentsline {section}{\numberline {12.5}Water Box Molecular Dynamics using AMOEBA (Serial)}{162}{section.12.5}%
+\contentsline {section}{\numberline {12.6}MD on DHFR in Water using CHARMM (OpenMP Parallel)}{163}{section.12.6}%
+\contentsline {section}{\numberline {12.7}MD on DHFR in Water using AMOEBA (OpenMP Parallel)}{163}{section.12.7}%
+\contentsline {section}{\numberline {12.8}MD on COX\sphinxhyphen {}2 in Water using OPLS\sphinxhyphen {}AA (OpenMP Parallel)}{164}{section.12.8}%
+\contentsline {section}{\numberline {12.9}MD on COX\sphinxhyphen {}2 in Water using AMOEBA (OpenMP Parallel)}{164}{section.12.9}%
+\contentsline {chapter}{\numberline {13}Acknowledgments}{167}{chapter.13}%
+\contentsline {chapter}{\numberline {14}References}{169}{chapter.14}%
+\contentsline {section}{\numberline {14.1}Partial List of Molecular Mechanics Software Packages}{169}{section.14.1}%
+\contentsline {section}{\numberline {14.2}Molecular Mechanics}{171}{section.14.2}%
+\contentsline {section}{\numberline {14.3}Computer Simulation Methods}{172}{section.14.3}%
+\contentsline {section}{\numberline {14.4}Modeling of Biological Macromolecules}{172}{section.14.4}%
+\contentsline {section}{\numberline {14.5}Conjugate Gradient and Quasi\sphinxhyphen {}Newton Optimization}{173}{section.14.5}%
+\contentsline {section}{\numberline {14.6}Truncated Newton Optimization}{173}{section.14.6}%
+\contentsline {section}{\numberline {14.7}Potential Energy Smoothing}{174}{section.14.7}%
+\contentsline {section}{\numberline {14.8}“Sniffer” Global Optimization}{174}{section.14.8}%
+\contentsline {section}{\numberline {14.9}Integration Methods for Molecular Dynamics}{175}{section.14.9}%
+\contentsline {section}{\numberline {14.10}Constraint Dynamics}{175}{section.14.10}%
+\contentsline {section}{\numberline {14.11}Langevin, Brownian and Stochastic Dynamics}{176}{section.14.11}%
+\contentsline {section}{\numberline {14.12}Constant Temperature and Pressure Dynamics}{176}{section.14.12}%
+\contentsline {section}{\numberline {14.13}Out\sphinxhyphen {}of\sphinxhyphen {}Plane Deformation Terms}{176}{section.14.13}%
+\contentsline {section}{\numberline {14.14}Analytical Derivatives of Potential Functions}{177}{section.14.14}%
+\contentsline {section}{\numberline {14.15}Torsional Space Derivatives and Normal Modes}{177}{section.14.15}%
+\contentsline {section}{\numberline {14.16}Analytical Surface Area and Volume}{177}{section.14.16}%
+\contentsline {section}{\numberline {14.17}Approximate Surface Area and Volume}{178}{section.14.17}%
+\contentsline {section}{\numberline {14.18}Boundary Conditions and Neighbor Methods}{178}{section.14.18}%
+\contentsline {section}{\numberline {14.19}Cutoff and Truncation Methods}{179}{section.14.19}%
+\contentsline {section}{\numberline {14.20}Ewald Summation Techniques}{179}{section.14.20}%
+\contentsline {section}{\numberline {14.21}Conjugated and Aromatic Systems}{180}{section.14.21}%
+\contentsline {section}{\numberline {14.22}Free Energy Simulation Methods}{180}{section.14.22}%
+\contentsline {section}{\numberline {14.23}Methods for Parameter Determination}{181}{section.14.23}%
+\contentsline {section}{\numberline {14.24}Electrostatic Interactions}{181}{section.14.24}%
+\contentsline {section}{\numberline {14.25}Polarization Effects}{182}{section.14.25}%
+\contentsline {section}{\numberline {14.26}Macroscopic Treatment of Solvent}{183}{section.14.26}%
+\contentsline {section}{\numberline {14.27}Surface Area\sphinxhyphen {}Based Solvation Models}{183}{section.14.27}%
+\contentsline {section}{\numberline {14.28}Generalized Born Solvation Models}{183}{section.14.28}%
+\contentsline {section}{\numberline {14.29}Superposition of Coordinate Sets}{184}{section.14.29}%
+\contentsline {section}{\numberline {14.30}Location of Transition States}{184}{section.14.30}%
