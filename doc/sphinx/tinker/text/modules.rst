@@ -1995,12 +1995,13 @@ The Fortran modules found in the Tinker package are listed below along with a br
 
 **SIZES Module         parameters to set array dimensions**
 
+"sizes" sets values for critical array dimensions used
+throughout the software; these parameters fix the size of
+the largest systems that can be handled
+
 .. code-block:: text
 
- sizes"          sets values for critical array dimensions used
- throughout      the software; these parameters fix the size of
- the             largest systems that can be handled
- parameter       maximum allowed number of:
+ parameter:      maximum allowed number of:
  maxatm          atoms in the molecular system
  maxtyp          force field atom type definitions
  maxclass        force field atom class definitions
@@ -2142,34 +2143,41 @@ The Fortran modules found in the Tinker package are listed below along with a br
 
 **UNITS Module         physical constants and unit conversions**
 
+D. B. Newell, F. Cabiati, J. Fischer, K. Fujii, S. G. Karshenboim,
+S. Margolis, E. de Mirandes, P. J. Mohr, F. Nez, K. Pachucki,
+T. J. Quinn, N. Taylor, M. Wang, B. M. Wood and Z. Zhang, "The
+CODATA 2017 Values of h, e, k, and Na for the Revision of the SI",
+Metrologia, 55, L13-L16 (2018)
+
+P. J. Mohr, D. B. Newell and B. N. Taylor, "CODATA Recommended
+Values of the Fundamental Physical Constants: 2014", Journal of
+Physical and Chemical Reference Data, 45, 043102 (2016)
+
+Where available, values are from the 2017 CODATA adjustment
+based on exact physical constants for the revised SI
+
+Other values are from the 2014 CODATA reference constants; also
+available online from the National Institute of Standards and
+Technology at http://physics.nist.gov/cuu/Constants/index.html/
+
+The conversion from calorie to Joule is the definition of the
+thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
+
+The "coulomb" energy conversion factor is found by dimensional
+analysis of Coulomb's Law, ie, by dividing the square of the
+elementary charge in Coulombs by 4*pi*eps0*rij, where eps0 is
+the permittivity of vacuum (the "electric constant"); note that
+eps0 is typically given in F/m, equivalent to C**2/(J-m)
+
+The approximate value used for the Debye, 3.33564 x 10-30 C-m,
+is from IUPAC Compendium of Chemical Technology, 2nd Ed. (1997)
+
+The value of "prescon" is based on definition of 1 atmosphere
+as 101325 Pa set by the 10th Conference Generale des Poids et
+Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
+
 .. code-block:: text
 
- literature      references:
- D.              B. Newell, F. Cabiati, J. Fischer, K. Fujii, S. G. Karshenboim,
- S.              Margolis, E. de Mirandes, P. J. Mohr, F. Nez, K. Pachucki,
- T.              J. Quinn, N. Taylor, M. Wang, B. M. Wood and Z. Zhang, "The
- CODATA          2017 Values of h, e, k, and Na for the Revision of the SI",
- Metrologia      55, L13-L16 (2018)
- P.              J. Mohr, D. B. Newell and B. N. Taylor, "CODATA Recommended
- Values          of the Fundamental Physical Constants: 2014", Journal of
- Physical        and Chemical Reference Data, 45, 043102 (2016)
- Where           available, values are from the 2017 CODATA adjustment
- based           on exact physical constants for the revised SI
- Other           values are from the 2014 CODATA reference constants; also
- available       online from the National Institute of Standards and
- Technology      at http://physics.nist.gov/cuu/Constants/index.html/
- The             conversion from calorie to Joule is the definition of the
- thermochemical  calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
- The             "coulomb" energy conversion factor is found by dimensional
- analysis        of Coulomb's Law, ie, by dividing the square of the
- elementary      charge in Coulombs by 4*pi*eps0*rij, where eps0 is
- the             permittivity of vacuum (the "electric constant"); note that
- eps0            is typically given in F/m, equivalent to C**2/(J-m)
- The             approximate value used for the Debye, 3.33564 x 10-30 C-m,
- is              from IUPAC Compendium of Chemical Technology, 2nd Ed. (1997)
- The             value of "prescon" is based on definition of 1 atmosphere
- as              101325 Pa set by the 10th Conference Generale des Poids et
- Mesures         (1954), where a Pascal (Pa) is equal to a J/m**3
  avogadro        Avogadro's number (N) in particles/mole
  lightspd        speed of light in vacuum (c) in cm/ps
  boltzmann       Boltzmann constant (kB) in g*Ang**2/ps**2/mole/K
