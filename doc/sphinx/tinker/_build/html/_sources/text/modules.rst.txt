@@ -3,7 +3,7 @@ Modules & Global Variables
 
 The Fortran modules found in the Tinker package are listed below along with a brief description of the variables associated with each module. Each individual module contains a set of globally allocated variables available to any program unit upon inclusion of that module. A source listing containing each of the Tinker functions and subroutines and its included modules can be produced by running the "listing.make" script found in the distribution.
 
-**ACTION Module        total number of each energy term computed**
+**ACTION Module        total number of each energy term type**
 
 .. code-block:: text
 
@@ -17,31 +17,35 @@ The Fortran modules found in the Tinker package are listed below along with a br
  neid            number of improper dihedral energy terms computed
  neit            number of improper torsion energy terms computed
  net             number of torsional energy terms computed
- nept            number of pi-orbital torsion energy terms computed
+ nept            number of pi-system torsion energy terms computed
  nebt            number of stretch-torsion energy terms computed
+ neat            number of angle-torsion energy terms computed
  nett            number of torsion-torsion energy terms computed
  nev             number of van der Waals energy terms computed
+ ner             number of Pauli repulsion energy terms computed
+ nedsp           number of dispersion energy terms computed
  nec             number of charge-charge energy terms computed
  necd            number of charge-dipole energy terms computed
  ned             number of dipole-dipole energy terms computed
  nem             number of multipole energy terms computed
  nep             number of polarization energy terms computed
+ nect            number of charge transfer energy terms computed
  new             number of Ewald summation energy terms computed
- ner             number of reaction field energy terms computed
+ nerxf           number of reaction field energy terms computed
  nes             number of solvation energy terms computed
  nelf            number of metal ligand field energy terms computed
  neg             number of geometric restraint energy terms computed
  nex             number of extra energy terms computed
 
-**ALIGN Module        information for superposition of structures**
+**ALIGN Module         information for structure superposition**
 
 .. code-block:: text
 
- wfit            weights assigned to atom pairs during superposition
- nfit            number of atoms to use in superimposing two structures
- ifit            atom numbers of pairs of atoms to be superimposed
+ nfit            number of atoms to use in superimposing two structures
+ ifit            atom numbers of pairs of atoms to be superimposed
+ wfit            weights assigned to atom pairs during superposition
 
-**ANALYZ Module        energy components partitioned over atoms**
+**ANALYZ Module        energy components partitioned to atoms**
 
 .. code-block:: text
 
@@ -56,56 +60,76 @@ The Fortran modules found in the Tinker package are listed below along with a br
  aeid            improper dihedral energy partitioned over atoms
  aeit            improper torsion energy partitioned over atoms
  aet             torsional energy partitioned over atoms
- aept            pi-orbital torsion energy partitioned over atoms
+ aept            pi-system torsion energy partitioned over atoms
  aebt            stretch-torsion energy partitioned over atoms
+ aeat            angle-torsion energy partitioned over atoms
  aett            torsion-torsion energy partitioned over atoms
  aev             van der Waals energy partitioned over atoms
+ aer             Pauli repulsion energy partitioned over atoms
+ aedsp           damped dispersion energy partitioned over atoms
  aec             charge-charge energy partitioned over atoms
  aecd            charge-dipole energy partitioned over atoms
  aed             dipole-dipole energy partitioned over atoms
  aem             multipole energy partitioned over atoms
  aep             polarization energy partitioned over atoms
- aer             reaction field energy partitioned over atoms
+ aect            charge transfer energy partitioned over atoms
+ aerxf           reaction field energy partitioned over atoms
  aes             solvation energy partitioned over atoms
  aelf            metal ligand field energy partitioned over atoms
  aeg             geometric restraint energy partitioned over atoms
  aex             extra energy term partitioned over atoms
 
-**ANGANG Module        angle-angle terms in current structure**
+**ANGANG Module        angle-angles in current structure**
 
 .. code-block:: text
 
+ nangang         total number of angle-angle interactions
+ iaa             angle numbers used in each angle-angle term
  kaa             force constant for angle-angle cross terms
- nangang         total number of angle-angle interactions
- iaa             angle numbers used in each angle-angle term
 
-**ANGLE Module        bond angles within the current structure**
+**ANGBND Module        bond angle bends in current structure**
 
 .. code-block:: text
 
- ak              harmonic angle force constant (kcal/mole/rad^2)
+ nangle          total number of angle bends in the system
+ iang            numbers of the atoms in each angle bend
+ ak              harmonic angle force constant (kcal/mole/rad**2)
  anat            ideal bond angle or phase shift angle (degrees)
- afld            periodicity for Fourier bond angle term
- nangle          total number of bond angles in the system
- iang            numbers of the atoms in each bond angle
- angtyp          potential energy function type for each bond angle
+ afld            periodicity for Fourier angle bending term
 
-**ANGPOT Module        specifics of bond angle functional forms**
+**ANGPOT Module        angle bend functional form details**
 
 .. code-block:: text
 
- cang            cubic coefficient in angle bending potential
- qang            quartic coefficient in angle bending potential
- pang            quintic coefficient in angle bending potential
- sang            sextic coefficient in angle bending potential
  angunit         convert angle bending energy to kcal/mole
  stbnunit        convert stretch-bend energy to kcal/mole
  aaunit          convert angle-angle energy to kcal/mole
  opbunit         convert out-of-plane bend energy to kcal/mole
  opdunit         convert out-of-plane distance energy to kcal/mole
- mm2stbn         logical flag governing use of MM2-style stretch-bend
+ cang            cubic coefficient in angle bending potential
+ qang            quartic coefficient in angle bending potential
+ pang            quintic coefficient in angle bending potential
+ sang            sextic coefficient in angle bending potential
+ copb            cubic coefficient in out-of-plane bend potential
+ qopb            quartic coefficient in out-of-plane bend potential
+ popb            quintic coefficient in out-of-plane bend potential
+ sopb            sextic coefficient in out-of-plane bend potential
+ copd            cubic coefficient in out-of-plane distance potential
+ qopd            quartic coefficient in out-of-plane distance potential
+ popd            quintic coefficient in out-of-plane distance potential
+ sopd            sextic coefficient in out-of-plane distance potential
+ opbtyp          type of out-of-plane bend potential energy function
+ angtyp          type of angle bending function for each bond angle
 
-**ARGUE Module        command line arguments at program startup**
+**ANGTOR Module        angle-torsions in current structure**
+
+.. code-block:: text
+
+ nangtor         total number of angle-torsion interactions
+ iat             torsion and angle numbers used in angle-torsion
+ kant            1-, 2- and 3-fold angle-torsion force constants
+
+**ARGUE Module         command line arguments at run time**
 
 .. code-block:: text
 
@@ -114,65 +138,105 @@ The Fortran modules found in the Tinker package are listed below along with a br
  listarg         flag to mark available command line arguments
  arg             strings containing the command line arguments
 
-**ATMLST Module        local geometry terms involving each atom**
+**ASCII Module         selected ASCII character code values**
+
+.. code-block:: text
+
+ null            decimal value of ASCII code for null (0)
+ tab             decimal value of ASCII code for tab (9)
+ linefeed        decimal value of ASCII code for linefeed (10)
+ formfeed        decimal value of ASCII code for formfeed (12)
+ carriage        decimal value of ASCII code for carriage return (13)
+ escape          decimal value of ASCII code for escape (27)
+ space           decimal value of ASCII code for blank space (32)
+ exclamation     decimal value of ASCII code for exclamation (33)
+ quote           decimal value of ASCII code for double quote (34)
+ pound           decimal value of ASCII code for pound sign (35)
+ dollar          decimal value of ASCII code for dollar sign (36)
+ percent         decimal value of ASCII code for percent sign (37)
+ ampersand       decimal value of ASCII code for ampersand (38)
+ apostrophe      decimal value of ASCII code for single quote (39)
+ asterisk        decimal value of ASCII code for asterisk (42)
+ plus            decimal value of ASCII code for plus sign (43)
+ comma           decimal value of ASCII code for comma (44)
+ minus           decimal value of ASCII code for minus sign (45)
+ period          decimal value of ASCII code for period (46)
+ frontslash      decimal value of ASCII codd for frontslash (47)
+ colon           decimal value of ASCII code for colon (58)
+ semicolon       decimal value of ASCII code for semicolon (59)
+ equal           decimal value of ASCII code for equal sign (61)
+ question        decimal value of ASCII code for question mark (63)
+ atsign          decimal value of ASCII code for at sign (64)
+ backslash       decimal value of ASCII code for backslash (92)
+ caret           decimal value of ASCII code for caret (94)
+ underbar        decimal value of ASCII code for underbar (95)
+ vertical        decimal value of ASCII code for vertical bar (124)
+ tilde           decimal value of ASCII code for tilde (126)
+
+**ATMLST Module        local geometry indices for each atom**
 
 .. code-block:: text
 
  bndlist         list of the bond numbers involving each atom
  anglist         list of the angle numbers centered on each atom
 
-**ATMTYP Module        atomic properties for each current atom**
+**ATOMID Module        atomic properties for current atoms**
 
 .. code-block:: text
 
- mass            atomic weight for each atom in the system
  tag             integer atom labels from input coordinates file
  class           atom class number for each atom in the system
  atomic          atomic number for each atom in the system
  valence         valence number for each atom in the system
+ mass            atomic weight for each atom in the system
  name            atom name for each atom in the system
  story           descriptive type for each atom in system
 
-**ATOMS Module        number, position and type of current atoms**
+**ATOMS Module         number, position and type of atoms**
 
 .. code-block:: text
 
+ n               total number of atoms in the current system
+ type            atom type number for each atom in the system
  x               current x-coordinate for each atom in the system
  y               current y-coordinate for each atom in the system
  z               current z-coordinate for each atom in the system
- n               total number of atoms in the current system
- type            atom type number for each atom in the system
 
-**BATH Module        temperature and pressure control parameters**
+**BATH Module          thermostat and barostat control values**
 
 .. code-block:: text
 
- maxnose         maximum length of the Nose-Hoover chain
- kelvin0         target value for the system temperature (K)
- kelvin          variable target temperature for thermostat (K)
+ maxnose         maximum length of Nose-Hoover thermostat chain
+ voltrial        mean number of steps between Monte Carlo moves
+ kelvin          target value for the system temperature (K)
  atmsph          target value for the system pressure (atm)
  tautemp         time constant for Berendsen thermostat (psec)
  taupres         time constant for Berendsen barostat (psec)
  compress        isothermal compressibility of medium (atm-1)
  collide         collision frequency for Andersen thermostat
- xnh             position of each chained Nose-Hoover thermostat
+ eta             velocity value for Bussi-Parrinello barostat
+ volmove         maximum volume move for Monte Carlo barostat (Ang**3)
+ vbar            velocity of log volume for Nose-Hoover barostat
+ qbar            mass of the volume for Nose-Hoover barostat
+ gbar            force for the volume for Nose-Hoover barostat
  vnh             velocity of each chained Nose-Hoover thermostat
  qnh             mass for each chained Nose-Hoover thermostat
- gnh             coupling between chained Nose-Hoover thermostats
+ gnh             force for each chained Nose-Hoover thermostat
  isothermal      logical flag governing use of temperature control
  isobaric        logical flag governing use of pressure control
- tempvary        logical flag to enable variable target thermostat
+ anisotrop       logical flag governing use of anisotropic pressure
  thermostat      choice of temperature control method to be used
  barostat        choice of pressure control method to be used
+ volscale        choice of scaling method for Monte Carlo barostat
 
-**BITOR Module        bitorsions within the current structure**
+**BITOR Module         bitorsions in the current structure**
 
 .. code-block:: text
 
  nbitor          total number of bitorsions in the system
  ibitor          numbers of the atoms in each bitorsion
 
-**BNDPOT Module        specifics of bond stretch functional forms**
+**BNDPOT Module        bond stretch functional form details**
 
 .. code-block:: text
 
@@ -181,48 +245,39 @@ The Fortran modules found in the Tinker package are listed below along with a br
  bndunit         convert bond stretch energy to kcal/mole
  bndtyp          type of bond stretch potential energy function
 
-**BOND Module        covalent bonds in the current structure**
+**BNDSTR Module        bond stretches in the current structure**
 
 .. code-block:: text
 
- bk              bond stretch force constants (kcal/mole/Ang^2)
- bl              ideal bond length values in Angstroms
  nbond           total number of bond stretches in the system
  ibnd            numbers of the atoms in each bond stretch
+ bk              bond stretch force constants (kcal/mole/Ang**2)
+ bl              ideal bond length values in Angstroms
 
-**BORDER Module        bond orders for a conjugated pisystem**
-
-.. code-block:: text
-
- pbpl            pi-bond orders for bonds in "planar" pisystem
- pnpl            pi-bond orders for bonds in "nonplanar" pisystem
-
-**BOUND Module        control of periodic boundary conditions**
+**BOUND Module         periodic boundary condition controls**
 
 .. code-block:: text
 
  polycut         cutoff distance for infinite polymer nonbonds
  polycut2        square of infinite polymer nonbond cutoff
  use_bounds      flag to use periodic boundary conditions
- use_image       flag to use images for periodic system
  use_replica     flag to use replicates for periodic system
  use_polymer     flag to mark presence of infinite polymer
 
-**BOXES Module        parameters for periodic boundary conditions**
+**BOXES Module         periodic boundary condition parameters**
 
 .. code-block:: text
 
- xbox            length in Angs of a-axis of periodic box
- ybox            length in Angs of b-axis of periodic box
- zbox            length in Angs of c-axis of periodic box
- alpha           angle in degrees between b- and c-axes of box
- beta            angle in degrees between a- and c-axes of box
- gamma           angle in degrees between a- and b-axes of box
+ xbox            length of a-axis of periodic box in Angstroms
+ ybox            length of b-axis of periodic box in Angstroms
+ zbox            length of c-axis of periodic box in Angstroms
+ alpha           angle between b- and c-axes of box in degrees
+ beta            angle between a- and c-axes of box in degrees
+ gamma           angle between a- and b-axes of box in degrees
  xbox2           half of the a-axis length of periodic box
  ybox2           half of the b-axis length of periodic box
  zbox2           half of the c-axis length of periodic box
  box34           three-fourths axis length of truncated octahedron
- recip           reciprocal lattice vectors as matrix columns
  volbox          volume in Ang**3 of the periodic box
  beta_sin        sine of the beta periodic box angle
  beta_cos        cosine of the beta periodic box angle
@@ -230,41 +285,54 @@ The Fortran modules found in the Tinker package are listed below along with a br
  gamma_cos       cosine of the gamma periodic box angle
  beta_term       term used in generating triclinic box
  gamma_term      term used in generating triclinic box
+ lvec            real space lattice vectors as matrix rows
+ recip           reciprocal lattice vectors as matrix columns
  orthogonal      flag to mark periodic box as orthogonal
  monoclinic      flag to mark periodic box as monoclinic
  triclinic       flag to mark periodic box as triclinic
  octahedron      flag to mark box as truncated octahedron
- spacegrp        space group symbol for the unitcell type
+ spacegrp        space group symbol for the unit cell type
 
-**CELL Module        periodic boundaries using replicated cells**
+**CELL Module          replicated cell periodic boundaries**
 
 .. code-block:: text
 
+ ncell           total number of cell replicates for periodic boundaries
+ icell           offset along axes for each replicate periodic cell
  xcell           length of the a-axis of the complete replicated cell
  ycell           length of the b-axis of the complete replicated cell
  zcell           length of the c-axis of the complete replicated cell
  xcell2          half the length of the a-axis of the replicated cell
  ycell2          half the length of the b-axis of the replicated cell
  zcell2          half the length of the c-axis of the replicated cell
- ncell           total number of cell replicates for periodic boundaries
- icell           offset along axes for each replicate periodic cell
 
-**CHARGE Module        partial charges for the current structure**
+**CHARGE Module        partial charges in current structure**
 
 .. code-block:: text
 
- pchg            magnitude of the partial charges (e-)
  nion            total number of partial charges in system
  iion            number of the atom site for each partial charge
  jion            neighbor generation site for each partial charge
  kion            cutoff switching site for each partial charge
- chglist         partial charge site for each atom (0=no charge)
+ pchg            magnitude of the partial charges (e-)
 
-**CHGPOT Module        specifics of charge-charge functional form**
+**CHGPEN Module        charge penetration in current structure**
 
 .. code-block:: text
 
+ ncp             total number of charge penetration sites in system
+ pcore           number of core electrons at each multipole site
+ pval            number of valence electrons at each multipole site
+ palpha          charge penetration damping at each multipole site
+
+**CHGPOT Module        charge-charge functional form details**
+
+.. code-block:: text
+
+ electric        energy factor in kcal/mole for current force field
  dielec          dielectric constant for electrostatic interactions
+ ebuffer         electrostatic buffering constant added to distance
+ c1scale         factor by which 1-1 charge interactions are scaled
  c2scale         factor by which 1-2 charge interactions are scaled
  c3scale         factor by which 1-3 charge interactions are scaled
  c4scale         factor by which 1-4 charge interactions are scaled
@@ -272,45 +340,57 @@ The Fortran modules found in the Tinker package are listed below along with a br
  neutnbr         logical flag governing use of neutral group neighbors
  neutcut         logical flag governing use of neutral group cutoffs
 
-**CHRONO Module        timing statistics for the current program**
+**CHGTRN Module        charge transfer for current structure**
 
 .. code-block:: text
 
- cputim          elapsed cpu time in seconds since start of program
+ nct             total number of dispersion sites in the system
+ chgct           charge for charge transfer at each multipole site
+ dmpct           charge transfer damping factor at each multipole site
 
-**COUPLE Module        near-neighbor atom connectivity lists**
+**CHRONO Module        clock time values for current program**
 
 .. code-block:: text
 
- maxn13          maximum number of atoms 1-3 connected to an atom
- maxn14          maximum number of atoms 1-4 connected to an atom
- maxn15          maximum number of atoms 1-5 connected to an atom
+ twall           current processor wall clock time in seconds
+ tcpu            elapsed cpu time from start of program in seconds
+
+**CHUNKS Module        PME grid spatial decomposition values**
+
+.. code-block:: text
+
+ nchunk          total number of spatial regions for PME grid
+ nchk1           number of spatial regions along the a-axis
+ nchk2           number of spatial regions along the b-axis
+ nchk3           number of spatial regions along the c-axis
+ ngrd1           number of grid points per region along a-axis
+ ngrd2           number of grid points per region along b-axis
+ ngrd3           number of grid points per region along c-axis
+ nlpts           PME grid points to the left of center point
+ nrpts           PME grid points to the right of center point
+ grdoff          offset for index into B-spline coefficients
+ pmetable        PME grid spatial regions involved for each site
+
+**COUPLE Module        atom neighbor connectivity lists**
+
+.. code-block:: text
+
  n12             number of atoms directly bonded to each atom
- i12             atom numbers of atoms 1-2 connected to each atom
  n13             number of atoms in a 1-3 relation to each atom
- i13             atom numbers of atoms 1-3 connected to each atom
  n14             number of atoms in a 1-4 relation to each atom
- i14             atom numbers of atoms 1-4 connected to each atom
  n15             number of atoms in a 1-5 relation to each atom
+ i12             atom numbers of atoms 1-2 connected to each atom
+ i13             atom numbers of atoms 1-3 connected to each atom
+ i14             atom numbers of atoms 1-4 connected to each atom
  i15             atom numbers of atoms 1-5 connected to each atom
 
-**CUTOFF Module        cutoff distances for energy interactions**
+**CTRPOT Module        charge transfer functional form details**
 
 .. code-block:: text
 
- vdwcut          cutoff distance for van der Waals interactions
- chgcut          cutoff distance for charge-charge interactions
- dplcut          cutoff distance for dipole-dipole interactions
- mpolecut        cutoff distance for atomic multipole interactions
- vdwtaper        distance at which van der Waals switching begins
- chgtaper        distance at which charge-charge switching begins
- dpltaper        distance at which dipole-dipole switching begins
- mpoletaper      distance at which atomic multipole switching begins
- ewaldcut        cutoff distance for direct space Ewald summation
- use_ewald       logical flag governing use of Ewald summation term
- use_lights      logical flag to use method of lights neighbors
+ ctrntyp         type of charge transfer term (SEPARATE or COMBINED)
 
-**DERIV Module        Cartesian coordinate derivative components**
+**DERIV Module         Cartesian coord derivative components**
 
 .. code-block:: text
 
@@ -325,71 +405,113 @@ The Fortran modules found in the Tinker package are listed below along with a br
  deid            improper dihedral Cartesian coordinate derivatives
  deit            improper torsion Cartesian coordinate derivatives
  det             torsional Cartesian coordinate derivatives
- dept            pi-orbital torsion Cartesian coordinate derivatives
+ dept            pi-system torsion Cartesian coordinate derivatives
  debt            stretch-torsion Cartesian coordinate derivatives
+ deat            angle-torsion Cartesian coordinate derivatives
  dett            torsion-torsion Cartesian coordinate derivatives
  dev             van der Waals Cartesian coordinate derivatives
+ der             Pauli repulsion Cartesian coordinate derivatives
+ dedsp           damped dispersion Cartesian coordinate derivatives
  dec             charge-charge Cartesian coordinate derivatives
  decd            charge-dipole Cartesian coordinate derivatives
  ded             dipole-dipole Cartesian coordinate derivatives
  dem             multipole Cartesian coordinate derivatives
  dep             polarization Cartesian coordinate derivatives
- der             reaction field Cartesian coordinate derivatives
+ dect            charge transfer Cartesian coordinate derivatives
+ derxf           reaction field Cartesian coordinate derivatives
  des             solvation Cartesian coordinate derivatives
  delf            metal ligand field Cartesian coordinate derivatives
  deg             geometric restraint Cartesian coordinate derivatives
  dex             extra energy term Cartesian coordinate derivatives
 
-**DIPOLE Module        atom & bond dipoles for current structure**
+**DIPOLE Module        bond dipoles in current structure**
 
 .. code-block:: text
 
- bdpl            magnitude of each of the dipoles (Debyes)
- sdpl            position of each dipole between defining atoms
  ndipole         total number of dipoles in the system
  idpl            numbers of atoms that define each dipole
+ bdpl            magnitude of each of the dipoles (Debye)
+ sdpl            position of each dipole between defining atoms
 
-**DISGEO Module        distance geometry bounds and parameters**
+**DISGEO Module        distance geometry bounds & parameters**
 
 .. code-block:: text
 
- bnd             distance geometry upper and lower bounds matrix
- vdwrad          hard sphere radii for distance geometry atoms
  vdwmax          maximum value of hard sphere sum for an atom pair
  compact         index of local distance compaction on embedding
  pathmax         maximum value of upper bound after smoothing
+ dbnd            distance geometry upper and lower bounds matrix
+ georad          hard sphere radii for distance geometry atoms
  use_invert      flag to use enantiomer closest to input structure
  use_anneal      flag to use simulated annealing refinement
+
+**DISP Module          damped dispersion for current structure**
+
+.. code-block:: text
+
+ ndisp           total number of dispersion sites in the system
+ idisp           number of the atom for each dispersion site
+ csixpr          pairwise sum of C6 dispersion coefficients
+ csix            C6 dispersion coefficient value at each site
+ adisp           alpha dispersion damping value at each site
+
+**DMA Module           QM spherical harmonic multipole moments**
+
+.. code-block:: text
+
+ mp              atomic monopole charge values from DMA
+ dpx             atomic dipole moment x-component from DMA
+ dpy             atomic dipole moment y-component from DMA
+ dpz             atomic dipole moment z-component from DMA
+ q20             atomic Q20 quadrupole component from DMA (zz)
+ q21c            atomic Q21c quadrupole component from DMA (xz)
+ q21s            atomic Q21s quadrupole component from DMA (yz)
+ q22c            atomic Q22c quadrupole component from DMA (xx-yy)
+ q22s            atomic Q22s quadrupole component from DMA (xy)
 
 **DOMEGA Module        derivative components over torsions**
 
 .. code-block:: text
 
- tesum	         total energy derivatives over torsions
+ tesum           total energy derivatives over torsions
  teb             bond stretch derivatives over torsions
  tea             angle bend derivatives over torsions
  teba            stretch-bend derivatives over torsions
  teub            Urey-Bradley derivatives over torsions
- teaa            angle-angle derivatives over torsions 
+ teaa            angle-angle derivatives over torsions
  teopb           out-of-plane bend derivatives over torsions
  teopd           out-of-plane distance derivatives over torsions
  teid            improper dihedral derivatives over torsions
  teit            improper torsion derivatives over torsions
  tet             torsional derivatives over torsions
- tept            pi-orbital torsion derivatives over torsions
+ tept            pi-system torsion derivatives over torsions
  tebt            stretch-torsion derivatives over torsions
+ teat            angle-torsion derivatives over torsions
  tett            torsion-torsion derivatives over torsions
  tev             van der Waals derivatives over torsions
+ ter             Pauli repulsion derivatives over torsions
+ tedsp           dampled dispersion derivatives over torsions
  tec             charge-charge derivatives over torsions
  tecd            charge-dipole derivatives over torsions
  ted             dipole-dipole derivatives over torsions
  tem             atomic multipole derivatives over torsions
  tep             polarization derivatives over torsions
- ter             reaction field derivatives over torsions
+ tect            charge transfer derivatives over torsions
+ terxf           reaction field derivatives over torsions
  tes             solvation derivatives over torsions
  telf            metal ligand field derivatives over torsions
  teg             geometric restraint derivatives over torsions
  tex             extra energy term derivatives over torsions
+
+**DSPPOT Module        dispersion interaction scale factors**
+
+.. code-block:: text
+
+ dsp2scale       scale factor for 1-2 dispersion energy interactions
+ dsp3scale       scale factor for 1-3 dispersion energy interactions
+ dsp4scale       scale factor for 1-4 dispersion energy interactions
+ dsp5scale       scale factor for 1-5 dispersion energy interactions
+ use_dcorr       flag to use long range dispersion correction
 
 **ENERGI Module        individual potential energy components**
 
@@ -406,46 +528,40 @@ The Fortran modules found in the Tinker package are listed below along with a br
  eid             improper dihedral potential energy of the system
  eit             improper torsion potential energy of the system
  et              torsional potential energy of the system
- ept             pi-orbital torsion potential energy of the system
+ ept             pi-system torsion potential energy of the system
  ebt             stretch-torsion potential energy of the system
+ eat             angle-torsion potential energy of the system
  ett             torsion-torsion potential energy of the system
  ev              van der Waals potential energy of the system
+ er              Pauli repulsion potential energy of the system
+ edsp            dampled dispersion potential energy of the system
  ec              charge-charge potential energy of the system
  ecd             charge-dipole potential energy of the system
  ed              dipole-dipole potential energy of the system
  em              atomic multipole potential energy of the system
  ep              polarization potential energy of the system
- er              reaction field potential energy of the system
+ ect             charge transfer potential energy of the system
+ erxf            reaction field potential energy of the system
  es              solvation potential energy of the system
  elf             metal ligand field potential energy of the system
  eg              geometric restraint potential energy of the system
  ex              extra term potential energy of the system
 
-**EWALD Module        parameters for regular or PM Ewald summation**
+**EWALD Module         Ewald summation parameters and options**
 
 .. code-block:: text
 
- aewald          Ewald convergence coefficient value (Ang-1)
- frecip          fractional cutoff value for reciprocal sphere
- tinfoil         flag governing use of tinfoil boundary conditions
+ aewald          current value of Ewald convergence coefficient
+ aeewald         Ewald convergence coefficient for electrostatics
+ apewald         Ewald convergence coefficient for polarization
+ adewald         Ewald convergence coefficient for dispersion
+ boundary        Ewald boundary condition; none, tinfoil or vacuum
 
-**EWREG Module        exponential factors for regular Ewald sum**
-
-.. code-block:: text
-
- maxvec          maximum number of k-vectors per reciprocal axis
- ejc             exponental factors for cosine along the j-axis
- ejs             exponental factors for sine along the j-axis
- ekc             exponental factors for cosine along the k-axis
- eks             exponental factors for sine along the k-axis
- elc             exponental factors for cosine along the l-axis
- els             exponental factors for sine along the l-axis
-
-**FACES Module        variables for Connolly area and volume**
+**FACES Module         Connolly area and volume variables**
 
 .. code-block:: text
 
- maxnbr          maximum number of neighboring atom pairs
+ maxcls          maximum number of neighboring atom pairs
  maxtt           maximum number of temporary tori
  maxt            maximum number of total tori
  maxp            maximum number of probe positions
@@ -453,21 +569,33 @@ The Fortran modules found in the Tinker package are listed below along with a br
  maxen           maximum number of concave edges
  maxfn           maximum number of concave faces
  maxc            maximum number of circles
- maxep           maximum number of convex edges
+ maxeq           maximum number of convex edges
  maxfs           maximum number of saddle faces
+ maxfq           maximum number of convex faces
  maxcy           maximum number of cycles
- mxcyep          maximum number of cycle convex edges
- maxfp           maximum number of convex faces
- mxfpcy          maximum number of convex face cycles
+ mxcyeq          maximum number of convex edge cycles
+ mxfqcy          maximum number of convex face cycles
 
-**FIELDS Module        molecular mechanics force field description**
+**FFT Module           Fast Fourier transform control values**
 
 .. code-block:: text
 
+ maxprime        maximum number of prime factors of FFT dimension
+ iprime          prime factorization of each FFT dimension (FFTPACK)
+ planf           pointer to forward transform data structure (FFTW)
+ planb           pointer to backward transform data structure (FFTW)
+ ffttable        intermediate array used by the FFT routine (FFTPACK)
+ ffttyp          type of FFT package; currently FFTPACK or FFTW
+
+**FIELDS Module        molecular mechanics force field type**
+
+.. code-block:: text
+
+ maxbio          maximum number of biopolymer atom definitions
  biotyp          force field atom type of each biopolymer type
  forcefield      string used to describe the current forcefield
 
-**FILES Module        name and number of current structure files**
+**FILES Module         name & number of current structure file**
 
 .. code-block:: text
 
@@ -477,7 +605,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  filename        base filename used by default for all files
  outfile         output filename used for intermediate results
 
-**FRACS Module        atom distances to molecular center of mass**
+**FRACS Module         distances to molecular center of mass**
 
 .. code-block:: text
 
@@ -485,27 +613,48 @@ The Fortran modules found in the Tinker package are listed below along with a br
  yfrac           fractional coordinate along b-axis of center of mass
  zfrac           fractional coordinate along c-axis of center of mass
 
-**GROUP Module        partitioning of system into atom groups**
+**FREEZE Module        definition of holonomic constraints**
 
 .. code-block:: text
 
- grpmass         total mass of all the atoms in each group
- wgrp            weight for each set of group-group interactions
+ nrat            number of holonomic distance constraints to apply
+ nratx           number of atom group holonomic constraints to apply
+ iratx           group number of group in a holonomic constraint
+ kratx           spatial constraint type (1=plane, 2=line, 3=point)
+ irat            atom numbers of atoms in a holonomic constraint
+ rateps          convergence tolerance for holonomic constraints
+ krat            ideal distance value for holonomic constraint
+ use_rattle      logical flag to set use of holonomic contraints
+ ratimage        flag to use minimum image for holonomic constraint
+
+**GKSTUF Module        generalized Kirkwood solvation values**
+
+.. code-block:: text
+
+ gkc             tuning parameter exponent in the f(GB) function
+ gkr             generalized Kirkwood cavity radii for atom types
+
+**GROUP Module         partitioning of system into atom groups**
+
+.. code-block:: text
+
  ngrp            total number of atom groups in the system
  kgrp            contiguous list of the atoms in each group
- igrp            first and last atom of each group in the list
  grplist         number of the group to which each atom belongs
+ igrp            first and last atom of each group in the list
+ grpmass         total mass of all the atoms in each group
+ wgrp            weight for each set of group-group interactions
  use_group       flag to use partitioning of system into groups
  use_intra       flag to include only intragroup interactions
  use_inter       flag to include only intergroup interactions
 
-**HESCUT Module        cutoff value for Hessian matrix elements**
+**HESCUT Module        cutoff for Hessian matrix elements**
 
 .. code-block:: text
 
  hesscut         magnitude of smallest allowed Hessian element
 
-**HESSN Module        Cartesian Hessian elements for a single atom**
+**HESSN Module         Cartesian Hessian elements for one atom**
 
 .. code-block:: text
 
@@ -513,58 +662,94 @@ The Fortran modules found in the Tinker package are listed below along with a br
  hessy           Hessian elements for y-component of current atom
  hessz           Hessian elements for z-component of current atom
 
-**IMPROP Module        improper dihedrals in the current structure**
+**HPMF Module          hydrophobic potential of mean force term**
 
 .. code-block:: text
 
- kprop           force constant values for improper dihedral angles
- vprop           ideal improper dihedral angle value in degrees
+ rcarbon         radius of a carbon atom for use with HPMF
+ rwater          radius of a water molecule for use with HPMF
+ acsurf          surface area of a hydrophobic carbon atom
+ safact          constant for calculation of atomic surface area
+ tgrad           tanh slope (set very steep, default=100)
+ toffset         shift the tanh plot along the x-axis (default=6)
+ hpmfcut         cutoff distance for pairwise HPMF interactions
+ hd1             hd2,hd3  hydrophobic PMF well depth parameter
+ hc1             hc2,hc3  hydrophobic PMF well center point
+ hw1             hw2,hw3  reciprocal of the hydrophobic PMF well width
+ npmf            number of hydrophobic carbon atoms in the system
+ ipmf            number of the atom for each HPMF carbon atom site
+ rpmf            radius of each atom for use with hydrophobic PMF
+ acsa            SASA value for each hydrophobic PMF carbon atom
+
+**IELSCF Module        extended Lagrangian induced dipoles**
+
+.. code-block:: text
+
+ nfree_aux       total degrees of freedom for auxiliary dipoles
+ tautemp_aux     time constant for auliliary Berendsen thermostat
+ kelvin_aux      target system temperature for auxiliary dipoles
+ uaux            auxiliary induced dipole value at each site
+ upaux           auxiliary shadow induced dipoles at each site
+ vaux            auxiliary induced dipole velocity at each site
+ vpaux           auxiliary shadow dipole velocity at each site
+ aaux            auxiliary induced dipole acceleration at each site
+ apaux           auxiliary shadow dipole acceleration at each site
+ use_ielscf      flag to use inertial extended Lagrangian method
+
+**IMPROP Module        improper dihedrals in current structure**
+
+.. code-block:: text
+
  niprop          total number of improper dihedral angles in the system
  iiprop          numbers of the atoms in each improper dihedral angle
+ kprop           force constant values for improper dihedral angles
+ vprop           ideal improper dihedral angle value in degrees
 
-**IMPTOR Module        improper torsions in the current structure**
+**IMPTOR Module        improper torsions in current structure**
 
 .. code-block:: text
 
+ nitors          total number of improper torsional angles in the system
+ iitors          numbers of the atoms in each improper torsional angle
  itors1          1-fold amplitude and phase for each improper torsion
  itors2          2-fold amplitude and phase for each improper torsion
  itors3          3-fold amplitude and phase for each improper torsion
- nitors          total number of improper torsional angles in the system
- iitors          numbers of the atoms in each improper torsional angle
 
-**INFORM Module        control values for I/O and program flow**
+**INFORM Module        program I/O and flow control values**
 
 .. code-block:: text
 
+ maxask          maximum number of queries for interactive input
  digits          decimal places output for energy and coordinates
  iprint          steps between status printing (0=no printing)
- iwrite          steps between coordinate dumps (0=no dumps)
+ iwrite          steps between coordinate saves (0=no saves)
  isend           steps between socket communication (0=no sockets)
- verbose         logical flag to turn on extra information
+ silent          logical flag to turn off all information printing
+ verbose         logical flag to turn on extra information printing
  debug           logical flag to turn on full debug printing
  holdup          logical flag to wait for carriage return on exit
  abort           logical flag to stop execution at next chance
 
-**INTER Module        sum of intermolecular energy components**
+**INTER Module         sum of intermolecular energy components**
 
 .. code-block:: text
 
  einter          total intermolecular potential energy
 
-**IOUNIT Module        Fortran input/output (I/O) unit numbers**
+**IOUNIT Module        Fortran input/output unit numbers**
 
 .. code-block:: text
 
- iout            Fortran I/O unit for major output (default=6)
- input           Fortran I/O unit for major input (default=5)
+ input           Fortran I/O unit for main input (default=5)
+ iout            Fortran I/O unit for main output (default=6)
 
-**KANANG Module        forcefield parameters for angle-angle terms**
+**KANANG Module        angle-angle term forcefield parameters**
 
 .. code-block:: text
 
  anan            angle-angle cross term parameters for each atom class
 
-**KANGS Module        forcefield parameters for bond angle bending**
+**KANGS Module         bond angle bend forcefield parameters**
 
 .. code-block:: text
 
@@ -572,35 +757,47 @@ The Fortran modules found in the Tinker package are listed below along with a br
  maxna5          maximum number of 5-membered ring angle bend entries
  maxna4          maximum number of 4-membered ring angle bend entries
  maxna3          maximum number of 3-membered ring angle bend entries
+ maxnap          maximum number of in-plane angle bend parameter entries
  maxnaf          maximum number of Fourier angle bend parameter entries
  acon            force constant parameters for harmonic angle bends
  acon5           force constant parameters for 5-ring angle bends
  acon4           force constant parameters for 4-ring angle bends
  acon3           force constant parameters for 3-ring angle bends
+ aconp           force constant parameters for in-plane angle bends
  aconf           force constant parameters for Fourier angle bends
  ang             bond angle parameters for harmonic angle bends
  ang5            bond angle parameters for 5-ring angle bends
  ang4            bond angle parameters for 4-ring angle bends
  ang3            bond angle parameters for 3-ring angle bends
+ angp            bond angle parameters for in-plane angle bends
  angf            phase shift angle and periodicity for Fourier bends
  ka              string of atom classes for harmonic angle bends
  ka5             string of atom classes for 5-ring angle bends
  ka4             string of atom classes for 4-ring angle bends
  ka3             string of atom classes for 3-ring angle bends
+ kap             string of atom classes for in-plane angle bends
  kaf             string of atom classes for Fourier angle bends
 
-**KATOMS Module        forcefield parameters for the atom types**
+**KANTOR Module        angle-torsion forcefield parameters**
 
 .. code-block:: text
 
- weight          average atomic mass of each atom type
+ maxnat          maximum number of angle-torsion parameter entries
+ atcon           torsional amplitude parameters for angle-torsion
+ kat             string of atom classes for angle-torsion terms
+
+**KATOMS Module        atom definition forcefield parameters**
+
+.. code-block:: text
+
  atmcls          atom class number for each of the atom types
  atmnum          atomic number for each of the atom types
  ligand          number of atoms to be attached to each atom type
+ weight          average atomic mass of each atom type
  symbol          modified atomic symbol for each atom type
- describe        string identifing each of the atom types
+ describe        string identifying each of the atom types
 
-**KBONDS Module        forcefield parameters for bond stretching**
+**KBONDS Module        bond stretching forcefield parameters**
 
 .. code-block:: text
 
@@ -624,13 +821,27 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kb3             string of atom classes for 3-ring bond stretch
  kel             string of atom classes for electronegativity corrections
 
-**KCHRGE Module        forcefield parameters for partial charges**
+**KCHRGE Module        partial charge forcefield parameters**
 
 .. code-block:: text
 
  chg             partial charge parameters for each atom type
 
-**KDIPOL Module        forcefield parameters for bond dipoles**
+**KCPEN Module         charge penetration forcefield parameters**
+
+.. code-block:: text
+
+ cpele           valence electron magnitude for each atom class
+ cpalp           alpha charge penetration parameter for each atom class
+
+**KCTRN Module         charge transfer forcefield parameters**
+
+.. code-block:: text
+
+ ctchg           charge transfer magnitude for each atom class
+ ctdmp           alpha charge transfer parameter for each atom class
+
+**KDIPOL Module        bond dipole forcefield parameters**
 
 .. code-block:: text
 
@@ -651,46 +862,22 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kd4             string of atom classes for 4-ring dipoles
  kd3             string of atom classes for 3-ring dipoles
 
-**KEYS Module        contents of current keyword parameter file**
+**KDSP Module          damped dispersion forcefield parameters**
 
 .. code-block:: text
 
+ dspsix          C6 dispersion coefficient for each atom class
+ dspdmp          alpha dispersion parameter for each atom class
+
+**KEYS Module          contents of the keyword control file**
+
+.. code-block:: text
+
+ maxkey          maximum number of lines in the keyword file
  nkey            number of nonblank lines in the keyword file
  keyline         contents of each individual keyword file line
 
-**KGEOMS Module        parameters for the geometrical restraints**
-
-.. code-block:: text
-
- xpfix           x-coordinate target for each restrained position
- ypfix           y-coordinate target for each restrained position
- zpfix           z-coordinate target for each restrained position
- pfix            force constant and flat-well range for each position
- dfix            force constant and target range for each distance
- afix            force constant and target range for each angle
- tfix            force constant and target range for each torsion
- gfix            force constant and target range for each group distance
- chir            force constant and target range for chiral centers
- depth           depth of shallow Gaussian basin restraint
- width           exponential width coefficient of Gaussian basin
- rwall           radius of spherical droplet boundary restraint
- npfix           number of position restraints to be applied
- ipfix           atom number involved in each position restraint
- kpfix           flags to use x-, y-, z-coordinate position restraints
- ndfix           number of distance restraints to be applied
- idfix           atom numbers defining each distance restraint
- nafix           number of angle restraints to be applied
- iafix           atom numbers defining each angle restraint
- ntfix           number of torsional restraints to be applied
- itfix           atom numbers defining each torsional restraint
- ngfix           number of group distance restraints to be applied
- igfix           group numbers defining each group distance restraint
- nchir           number of chirality restraints to be applied
- ichir           atom numbers defining each chirality restraint
- use_basin       logical flag governing use of Gaussian basin
- use_wall        logical flag governing use of droplet boundary
-
-**KHBOND Module        forcefield parameters for H-bonding terms**
+**KHBOND Module        H-bonding term forcefield parameters**
 
 .. code-block:: text
 
@@ -699,7 +886,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  epshb           well depth parameter for hydrogen bonding pairs
  khb             string of atom types for hydrogen bonding pairs
 
-**KIPROP Module        forcefield parameters for improper dihedral**
+**KIPROP Module        improper dihedral forcefield parameters**
 
 .. code-block:: text
 
@@ -708,7 +895,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  tdi             ideal dihedral angle values for improper dihedrals
  kdi             string of atom classes for improper dihedral angles
 
-**KITORS Module        forcefield parameters for improper torsions**
+**KITORS Module        improper torsion forcefield parameters**
 
 .. code-block:: text
 
@@ -718,7 +905,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ti3             torsional parameters for improper 3-fold rotation
  kti             string of atom classes for improper torsional parameters
 
-**KMULTI Module        forcefield parameters for atomic multipoles**
+**KMULTI Module        atomic multipole forcefield parameters**
 
 .. code-block:: text
 
@@ -727,64 +914,84 @@ The Fortran modules found in the Tinker package are listed below along with a br
  mpaxis          type of local axis definition for atomic multipoles
  kmp             string of atom types for atomic multipoles
 
-**KOPBND Module        forcefield parameters for out-of-plane bend**
+**KOPBND Module        out-of-plane bend forcefield parameters**
 
 .. code-block:: text
 
  maxnopb         maximum number of out-of-plane bending entries
- copb            force constant parameters for out-of-plane bending
- kaopb           string of atom classes for out-of-plane bending
+ opbn            force constant parameters for out-of-plane bending
+ kopb            string of atom classes for out-of-plane bending
 
-**KOPDST Module        forcefield parameters for out-plane distance**
+**KOPDST Module        out-of-plane distance forcefield params**
 
 .. code-block:: text
 
- maxnopb         maximum number of out-of-plane distance entries
- copb            force constant parameters for out-of-plane distance
- kaopb           string of atom classes for out-of-plane distance
+ maxnopd         maximum number of out-of-plane distance entries
+ opds            force constant parameters for out-of-plane distance
+ kopd            string of atom classes for out-of-plane distance
 
-**KORBS Module        forcefield parameters for pisystem orbitals**
+**KORBS Module         pisystem orbital forcefield parameters**
 
 .. code-block:: text
 
  maxnpi          maximum number of pisystem bond parameter entries
+ maxnpi5         maximum number of 5-membered ring pibond entries
+ maxnpi4         maximum number of 4-membered ring pibond entries
+ sslope          slope for bond stretch vs. pi-bond order
+ sslope5         slope for 5-ring bond stretch vs. pi-bond order
+ sslope4         slope for 4-ring bond stretch vs. pi-bond order
+ tslope          slope for 2-fold torsion vs. pi-bond order
+ tslope5         slope for 5-ring 2-fold torsion vs. pi-bond order
+ tslope4         slope for 4-ring 2-fold torsion vs. pi-bond order
  electron        number of pi-electrons for each atom class
  ionize          ionization potential for each atom class
  repulse         repulsion integral value for each atom class
- sslope          slope for bond stretch vs. pi-bond order
- tslope          slope for 2-fold torsion vs. pi-bond order
  kpi             string of atom classes for pisystem bonds
+ kpi5            string of atom classes for 5-ring pisystem bonds
+ kpi4            string of atom classes for 4-ring pisystem bonds
 
-**KPITOR Module        forcefield parameters for pi-orbit torsions**
-
-.. code-block:: text
-
- maxnpt          maximum number of pi-orbital torsion parameter entries
- ptcon           force constant parameters for pi-orbital torsions
- kpt             string of atom classes for pi-orbital torsion terms
-
-**KPOLR Module        forcefield parameters for polarizability**
+**KPITOR Module        pi-system torsion forcefield parameters**
 
 .. code-block:: text
 
- polr            dipole polarizability parameters for each atom type
+ maxnpt          maximum number of pi-system torsion parameter entries
+ ptcon           force constant parameters for pi-system torsions
+ kpt             string of atom classes for pi-system torsion terms
+
+**KPOLR Module         polarizability forcefield parameters**
+
+.. code-block:: text
+
  pgrp            connected types in polarization group of each atom type
+ polr            dipole polarizability parameters for each atom type
+ athl            Thole polarizability damping value for each atom type
+ ddir            direct polarization damping value for each atom type
 
-**KSTBND Module        forcefield parameters for stretch-bending**
+**KREPL Module         Pauli repulsion forcefield parameters**
 
 .. code-block:: text
 
- stbn            stretch-bending parameters for each atom class
+ prsiz           Pauli repulsion size value for each atom class
+ prdmp           alpha Pauli repulsion parameter for each atom class
+ prele           number of valence electrons for each atom class
 
-**KSTTOR Module        forcefield parameters for stretch-torsions**
+**KSTBND Module        stretch-bend forcefield parameters**
+
+.. code-block:: text
+
+ maxnsb          maximum number of stretch-bend parameter entries
+ stbn            force constant parameters for stretch-bend terms
+ ksb             string of atom classes for stretch-bend terms
+
+**KSTTOR Module        stretch-torsion forcefield parameters**
 
 .. code-block:: text
 
  maxnbt          maximum number of stretch-torsion parameter entries
- btcon           force constant parameters for stretch-torsion
- kbt             string of atom classes for bonds in stretch-torsion
+ btcon           torsional amplitude parameters for stretch-torsion
+ kbt             string of atom classes for stretch-torsion terms
 
-**KTORSN Module        forcefield parameters for torsional angles**
+**KTORSN Module        torsional angle forcefield parameters**
 
 .. code-block:: text
 
@@ -813,24 +1020,24 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kt5             string of atom classes for 5-ring torsions
  kt4             string of atom classes for 4-ring torsions
 
-**KTRTOR Module        forcefield parameters for torsion-torsions**
+**KTRTOR Module        torsion-torsion forcefield parameters**
 
 .. code-block:: text
 
  maxntt          maximum number of torsion-torsion parameter entries
  maxtgrd         maximum dimension of torsion-torsion spline grid
  maxtgrd2        maximum number of torsion-torsion spline grid points
+ tnx             number of columns in torsion-torsion spline grid
+ tny             number of rows in torsion-torsion spline grid
  ttx             angle values for first torsion of spline grid
  tty             angle values for second torsion of spline grid
  tbf             function values at points on spline grid
  tbx             gradient over first torsion of spline grid
  tby             gradient over second torsion of spline grid
  tbxy            Hessian cross components over spline grid
- tnx             number of columns in torsion-torsion spline grid
- tny             number of rows in torsion-torsion spline grid
  ktt             string of torsion-torsion atom classes
 
-**KURYBR Module        forcefield parameters for Urey-Bradley terms**
+**KURYBR Module        Urey-Bradley term forcefield parameters**
 
 .. code-block:: text
 
@@ -839,7 +1046,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  dst13           ideal 1-3 distance parameters for Urey-Bradley terms
  ku              string of atom classes for Urey-Bradley terms
 
-**KVDWPR Module        forcefield parameters for special vdw terms**
+**KVDWPR Module        special vdw term forcefield parameters**
 
 .. code-block:: text
 
@@ -848,17 +1055,17 @@ The Fortran modules found in the Tinker package are listed below along with a br
  epspr           well depth parameter for special van der Waals pairs
  kvpr            string of atom classes for special van der Waals pairs
 
-**KVDWS Module        forcefield parameters for van der Waals terms**
+**KVDWS Module         van der Waals term forcefield parameters**
 
 .. code-block:: text
 
- rad             van der Waals radius parameter for each atom class
- eps             van der Waals well depth parameter for each atom class
+ rad             van der Waals radius parameter for each atom type
+ eps             van der Waals well depth parameter for each atom type
  rad4            van der Waals radius parameter in 1-4 interactions
  eps4            van der Waals well depth parameter in 1-4 interactions
- reduct          van der Waals reduction factor for each atom class
+ reduct          van der Waals reduction factor for each atom type
 
-**LIGHT Module        indices for method of lights pair neighbors**
+**LIGHT Module         method of lights pair neighbors indices**
 
 .. code-block:: text
 
@@ -869,14 +1076,45 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kex             high index of neighbors of each site in the x-sorted list
  key             high index of neighbors of each site in the y-sorted list
  kez             high index of neighbors of each site in the z-sorted list
- locx            pointer from x-sorted list into original interaction list
- locy            pointer from y-sorted list into original interaction list
- locz            pointer from z-sorted list into original interaction list
- rgx             pointer from original interaction list into x-sorted list
- rgy             pointer from original interaction list into y-sorted list
- rgz             pointer from original interaction list into z-sorted list
+ locx            maps the x-sorted list into original interaction list
+ locy            maps the y-sorted list into original interaction list
+ locz            maps the z-sorted list into original interaction list
+ rgx             maps the original interaction list into x-sorted list
+ rgy             maps the original interaction list into y-sorted list
+ rgz             maps the original interaction list into z-sorted list
 
-**LINMIN Module        parameters for line search minimization**
+**LIMITS Module        interaction taper & cutoff distances**
+
+.. code-block:: text
+
+ vdwcut          cutoff distance for van der Waals interactions
+ repcut          cutoff distance for Pauli repulsion interactions
+ dispcut         cutoff distance for dispersion interactions
+ chgcut          cutoff distance for charge-charge interactions
+ dplcut          cutoff distance for dipole-dipole interactions
+ mpolecut        cutoff distance for atomic multipole interactions
+ ctrncut         cutoff distance for charge transfer interactions
+ vdwtaper        distance at which van der Waals switching begins
+ reptaper        distance at which Pauli repulsion switching begins
+ disptaper       distance at which dispersion switching begins
+ chgtaper        distance at which charge-charge switching begins
+ dpltaper        distance at which dipole-dipole switching begins
+ mpoletaper      distance at which atomic multipole switching begins
+ ctrntaper       distance at which charge transfer switching begins
+ ewaldcut        cutoff distance for real space Ewald electrostatics
+ dewaldcut       cutoff distance for real space Ewald dispersion
+ usolvcut        cutoff distance for dipole solver preconditioner
+ use_ewald       logical flag governing use of electrostatic Ewald
+ use_dewald      logical flag governing use of dispersion Ewald
+ use_lights      logical flag governing use of method of lights
+ use_list        logical flag governing use of any neighbor lists
+ use_vlist       logical flag governing use of van der Waals list
+ use_dlist       logical flag governing use of dispersion list
+ use_clist       logical flag governing use of charge list
+ use_mlist       logical flag governing use of multipole list
+ use_ulist       logical flag governing use of preconditioner list
+
+**LINMIN Module        line search minimization parameters**
 
 .. code-block:: text
 
@@ -887,26 +1125,50 @@ The Fortran modules found in the Tinker package are listed below along with a br
  angmax          maximum angle between search direction and -gradient
  intmax          maximum number of interpolations during line search
 
-**MATH Module        mathematical and geometrical constants**
+**MATH Module          mathematical and geometrical constants**
 
 .. code-block:: text
 
- radian          conversion factor from radians to degrees
  pi              numerical value of the geometric constant
- sqrtpi          numerical value of the square root of Pi
+ elog            numerical value of the natural logarithm base
+ radian          conversion factor from radians to degrees
  logten          numerical value of the natural log of ten
- sqrttwo         numerical value of the square root of two
  twosix          numerical value of the sixth root of two
+ sqrtpi          numerical value of the square root of Pi
+ sqrttwo         numerical value of the square root of two
+ sqrtthree       numerical value of the square root of three
 
-**MDSTUF Module        control of molecular dynamics trajectory**
+**MDSTUF Module        molecular dynamics trajectory controls**
 
 .. code-block:: text
 
  nfree           total number of degrees of freedom for a system
- velsave         flag to save velocity vector components to a file
- frcsave         flag to save force vector components to a file
- uindsave        flag to save induced atomic dipoles to a file
+ irest           steps between removal of COM motion (0=no removal)
+ bmnmix          mixing coefficient for use with Beeman integrator
+ arespa          inner time step for use with RESPA integrator
+ dorest          logical flag to remove center of mass motion
  integrate       type of molecular dynamics integration algorithm
+
+**MERCK Module         MMFF-specific force field parameters**
+
+.. code-block:: text
+
+ nlignes         number of atom pairs having MMFF Bond Type 1
+ bt_1            atom pairs having MMFF Bond Type 1
+ eqclass         table of atom class equivalencies used to find
+ default         parameters if explicit values are missing
+ see             J. Comput. Chem., 17, 490-519, '95, Table IV)
+ crd             number of attached neighbors    |
+ val             valency value                   |  see T. A. Halgren,
+ pilp            if 0, no lone pair              |  J. Comput. Chem.,
+ if              1, one or more lone pair(s)  |  17, 616-645 (1995)
+ mltb            multibond indicator             |
+ arom            aromaticity indicator           |
+ lin             linearity indicator             |
+ sbmb            single- vs multiple-bond flag   |
+ mmffarom        aromatic rings parameters
+ mmffaromc       cationic aromatic rings parameters
+ mmffaroma       anionic aromatic rings parameters
 
 **MINIMA Module        general parameters for minimizations**
 
@@ -917,26 +1179,26 @@ The Fortran modules found in the Tinker package are listed below along with a br
  maxiter         maximum number of iterations during optimization
  nextiter        iteration number to use for the first iteration
 
-**MOLCUL Module        individual molecules within current system**
+**MOLCUL Module        individual molecules in current system**
 
 .. code-block:: text
 
- molmass         molecular weight for each molecule in the system
- totmass         total weight of all the molecules in the system
  nmol            total number of separate molecules in the system
- kmol            contiguous list of the atoms in each molecule
  imol            first and last atom of each molecule in the list
+ kmol            contiguous list of the atoms in each molecule
  molcule         number of the molecule to which each atom belongs
+ totmass         total weight of all the molecules in the system
+ molmass         molecular weight for each molecule in the system
 
-**MOLDYN Module        velocity and acceleration on MD trajectory**
+**MOLDYN Module        MD trajectory velocity & acceleration**
 
 .. code-block:: text
 
  v               current velocity of each atom along the x,y,z-axes
  a               current acceleration of each atom along x,y,z-axes
- aold            previous acceleration of each atom along x,y,z-axes
+ aalt            alternate acceleration of each atom along x,y,z-axes
 
-**MOMENT Module        components of electric multipole moments**
+**MOMENT Module        electric multipole moment components**
 
 .. code-block:: text
 
@@ -956,89 +1218,183 @@ The Fortran modules found in the Tinker package are listed below along with a br
  zyqdp           quadrupole tensor zy-component in global frame
  zzqdp           quadrupole tensor zz-component in global frame
 
-**MPLPOT Module        specifics of atomic multipole functions**
+**MPLPOT Module        multipole functional form details**
 
 .. code-block:: text
 
- m2scale         factor by which 1-2 multipole interactions are scaled
- m3scale         factor by which 1-3 multipole interactions are scaled
- m4scale         factor by which 1-4 multipole interactions are scaled
- m5scale         factor by which 1-5 multipole interactions are scaled
+ m2scale         scale factor for 1-2 multipole energy interactions
+ m3scale         scale factor for 1-3 multipole energy interactions
+ m4scale         scale factor for 1-4 multipole energy interactions
+ m5scale         scale factor for 1-5 multipole energy interactions
+ use_chgpen      flag to use charge penetration damped potential
+ pentyp          type of penetration damping (NONE, GORDON1, GORDON2)
 
-**MPOLE Module        multipole components for current structure**
+**MPOLE Module         atomic multipoles in current structure**
 
 .. code-block:: text
 
  maxpole         max components (monopole=1,dipole=4,quadrupole=13)
- pole            multipole values for each site in the local frame
- rpole           multipoles rotated to the global coordinate system
  npole           total number of multipole sites in the system
  ipole           number of the atom for each multipole site
- polsiz          number of mutipole components at each multipole site
+ polsiz          number of multipole components at each atom
+ pollist         multipole site for each atom (0=no multipole)
  zaxis           number of the z-axis defining atom for each site
  xaxis           number of the x-axis defining atom for each site
  yaxis           number of the y-axis defining atom for each site
+ pole            traceless Cartesian multipoles in the local frame
+ rpole           traceless Cartesian multipoles in the global frame
+ spole           spherical harmonic multipoles in the local frame
+ srpole          spherical harmonic multipoles in the global frame
  polaxe          local axis type for each multipole site
 
-**MUTANT Module        hybrid atoms for free energy perturbation**
+**MRECIP Module        reciprocal PME for permanent multipoles**
 
 .. code-block:: text
 
- lambda          weighting of initial state in hybrid Hamiltonian
- nhybrid         number of atoms mutated from initial to final state
- ihybrid         atomic sites differing in initial and final state
+ vmxx            scalar sum xx-component of virial due to multipoles
+ vmyy            scalar sum yy-component of virial due to multipoles
+ vmzz            scalar sum zz-component of virial due to multipoles
+ vmxy            scalar sum xy-component of virial due to multipoles
+ vmxz            scalar sum xz-component of virial due to multipoles
+ vmyz            scalar sum yz-component of virial due to multipoles
+ cmp             Cartesian permenent multipoles as polytensor vector
+ fmp             fractional permanent multipoles as polytensor vector
+ cphi            Cartesian permanent multipole potential and field
+ fphi            fractional permanent multipole potential and field
+
+**MUTANT Module        free energy calculation hybrid atoms**
+
+.. code-block:: text
+
+ nmut            number of atoms mutated from initial to final state
+ vcouple         van der Waals lambda type (0=decouple, 1=annihilate)
+ imut            atomic sites differing in initial and final state
  type0           atom type of each atom in the initial state system
  class0          atom class of each atom in the initial state system
  type1           atom type of each atom in the final state system
  class1          atom class of each atom in the final state system
- alter           true if an atom is to be mutated, false otherwise
+ lambda          generic weighting between initial and final states
+ tlambda         state weighting value for torsional potential
+ vlambda         state weighting value for van der Waals potentials
+ elambda         state weighting value for electrostatic potentials
+ scexp           scale factor for soft core buffered 14-7 potential
+ scalpha         scale factor for soft core buffered 14-7 potential
+ mut             true if an atom is to be mutated, false otherwise
+
+**NEIGH Module         pairwise neighbor list indices & storage**
+
+.. code-block:: text
+
+ maxvlst         maximum size of van der Waals pair neighbor lists
+ maxelst         maximum size of electrostatic pair neighbor lists
+ maxulst         maximum size of dipole preconditioner pair lists
+ nvlst           number of sites in list for each vdw site
+ vlst            site numbers in neighbor list of each vdw site
+ nelst           number of sites in list for each electrostatic site
+ elst            site numbers in list of each electrostatic site
+ nulst           number of sites in list for each preconditioner site
+ ulst            site numbers in list of each preconditioner site
+ lbuffer         width of the neighbor list buffer region
+ pbuffer         width of the preconditioner list buffer region
+ lbuf2           square of half the neighbor list buffer width
+ pbuf2           square of half the preconditioner list buffer width
+ vbuf2           square of van der Waals cutoff plus the list buffer
+ vbufx           square of van der Waals cutoff plus 2X list buffer
+ dbuf2           square of dispersion cutoff plus the list buffer
+ dbufx           square of dispersion cutoff plus 2X list buffer
+ cbuf2           square of charge cutoff plus the list buffer
+ cbufx           square of charge cutoff plus 2X list buffer
+ mbuf2           square of multipole cutoff plus the list buffer
+ mbufx           square of multipole cutoff plus 2X list buffer
+ ubuf2           square of preconditioner cutoff plus the list buffer
+ ubufx           square of preconditioner cutoff plus 2X list buffer
+ xvold           x-coordinate at last vdw/dispersion list update
+ yvold           y-coordinate at last vdw/dispersion list update
+ zvold           z-coordinate at last vdw/dispersion list update
+ xeold           x-coordinate at last electrostatic list update
+ yeold           y-coordinate at last electrostatic list update
+ zeold           z-coordinate at last electrostatic list update
+ xuold           x-coordinate at last preconditioner list update
+ yuold           y-coordinate at last preconditioner list update
+ zuold           z-coordinate at last preconditioner list update
+ dovlst          logical flag to rebuild vdw neighbor list
+ dodlst          logical flag to rebuild dispersion neighbor list
+ doclst          logical flag to rebuild charge neighbor list
+ domlst          logical flag to rebuild multipole neighbor list
+ doulst          logical flag to rebuild preconditioner neighbor list
+
+**NONPOL Module        nonpolar cavity & dispersion parameters**
+
+.. code-block:: text
+
+ epso            water oxygen eps for implicit dispersion term
+ epsh            water hydrogen eps for implicit dispersion term
+ rmino           water oxygen Rmin for implicit dispersion term
+ rminh           water hydrogen Rmin for implicit dispersion term
+ awater          water number density at standard temp & pressure
+ slevy           enthalpy-to-free energy scale factor for dispersion
+ solvprs         limiting microscopic solvent pressure value
+ surften         limiting macroscopic surface tension value
+ spcut           starting radius for solvent pressure tapering
+ spoff           cutoff radius for solvent pressure tapering
+ stcut           starting radius for surface tension tapering
+ stoff           cutoff radius for surface tension tapering
+ rcav            atomic radius of each atom for cavitation energy
+ rdisp           atomic radius of each atom for dispersion energy
+ cdisp           maximum dispersion energy for each atom
 
 **NUCLEO Module        parameters for nucleic acid structure**
 
 .. code-block:: text
 
- bkbone          phosphate backbone angles for each nucleotide
- glyco           glycosidic torsional angle for each nucleotide
  pucker          sugar pucker, either 2=2'-endo or 3=3'-endo
+ glyco           glycosidic torsional angle for each nucleotide
+ bkbone          phosphate backbone angles for each nucleotide
  dblhlx          flag to mark system as nucleic acid double helix
  deoxy           flag to mark deoxyribose or ribose sugar units
  hlxform         helix form (A, B or Z) of polynucleotide strands
 
-**OMEGA Module        dihedrals for torsional space computations**
+**OMEGA Module         torsional space dihedral angle values**
 
 .. code-block:: text
 
- dihed           current value in radians of each dihedral angle
  nomega          number of dihedral angles allowed to rotate
  iomega          numbers of two atoms defining rotation axis
  zline           line number in Z-matrix of each dihedral angle
+ dihed           current value in radians of each dihedral angle
 
-**OPBEND Module        out-of-plane bends in the current structure**
+**OPBEND Module        out-of-plane bends in current structure**
 
 .. code-block:: text
 
- kopb            force constant values for out-of-plane bending
  nopbend         total number of out-of-plane bends in the system
  iopb            bond angle numbers used in out-of-plane bending
+ opbk            force constant values for out-of-plane bending
 
-**OPDIST Module        out-of-plane distances in current structure**
+**OPDIST Module        out-of-plane distances in structure**
 
 .. code-block:: text
 
- kopd            force constant values for out-of-plane distance
  nopdist         total number of out-of-plane distances in the system
- iopb            numbers of the atoms in each out-of-plane distance
+ iopd            numbers of the atoms in each out-of-plane distance
+ opdk            force constant values for out-of-plane distance
 
-**ORBITS Module        orbital energies for conjugated pisystem**
+**OPENMP Module        OpenMP processor and thread values**
 
 .. code-block:: text
 
- q               number of pi-electrons contributed by each atom
- w               ionization potential of each pisystem atom
- em              repulsion integral for each pisystem atom
- nfill           number of filled pisystem molecular orbitals
+ nproc           number of processors available to OpenMP
+ nthread         number of threads to be used with OpenMP
 
-**OUTPUT Module        control of coordinate output file format**
+**ORBITS Module        conjugated pisystem orbital energies**
+
+.. code-block:: text
+
+ qorb            number of pi-electrons contributed by each atom
+ worb            ionization potential of each pisystem atom
+ emorb           repulsion integral for each pisystem atom
+
+**OUTPUT Module        output file format control parameters**
 
 .. code-block:: text
 
@@ -1046,71 +1402,135 @@ The Fortran modules found in the Tinker package are listed below along with a br
  noversion       logical flag governing use of filename versions
  overwrite       logical flag to overwrite intermediate files inplace
  cyclesave       logical flag to mark use of numbered cycle files
+ velsave         logical flag to save velocity vector components
+ frcsave         logical flag to save force vector components
+ uindsave        logical flag to save induced atomic dipoles
  coordtype       selects Cartesian, internal, rigid body or none
 
-**PARAMS Module        contents of force field parameter file**
+**PARAMS Module        force field parameter file contents**
 
 .. code-block:: text
 
+ maxprm          maximum number of lines in the parameter file
  nprm            number of nonblank lines in the parameter file
  prmline         contents of each individual parameter file line
 
-**PATHS Module        parameters for Elber reaction path method**
+**PATHS Module         Elber reaction path method parameters**
 
 .. code-block:: text
 
- p0              reactant Cartesian coordinates as variables
- p1              product Cartesian coordinates as variables
- pmid            midpoint between the reactant and product
+ pnorm           length of the reactant-product vector
+ acoeff          transformation matrix 'A' from Elber algorithm
+ pc0             reactant Cartesian coordinates as variables
+ pc1             product Cartesian coordinates as variables
  pvect           vector connecting the reactant and product
  pstep           step per cycle along reactant-product vector
  pzet            current projection on reactant-product vector
- pnorm           length of the reactant-product vector
- acoeff          transformation matrix "A" from Elber method
- gc              gradients of the path constraints
+ gc              gradient of the path constraints
 
-**PDB Module        definition of a Protein Data Bank structure**
+**PBSTUF Module        Poisson-Boltzmann solvation parameters**
 
 .. code-block:: text
 
- xpdb            x-coordinate of each atom stored in PDB format
- ypdb            y-coordinate of each atom stored in PDB format
- zpdb            z-coordinate of each atom stored in PDB format
+ APBS            configuration parameters (see APBS documentation for details)
+ In              the column on the right are possible values for each variable,
+ with            default values given in brackets. Only a subset of the APBS
+ options         are supported and/or are appropriate for use with AMOEBA
+ pbtyp           lpbe
+ At              some point AMOEBA with the non-linear PBE could be supported,
+ but             this is only worked out for energies (no gradients)
+ pbsoln          mg-auto, [mg-manual]
+ Currently       there is only limited support for focusing calculations,
+ which           is a powerful feature of APBS. At present, all energies and
+ forces          must all be calculated using the finest solution
+ bcfl            boundary conditions              zero, sdh, [mdh]
+ chgm            multipole discretization         spl4
+ other           charge discretization methods are not appropriate for AMOEBA
+ srfm            surface method                   mol, smol, [spl4]
+ spl4            is required for forces calculations, although mol is useful
+ for             comparison with generalized Kirkwood
+ dime            number of grid points            [65, 65, 65]
+ grid            grid spacing (mg-manual)         fxn of "dime"
+ cgrid           coarse grid spacing              fxn of "dime"
+ fgrid           fine grid spacing                cgrid / 2
+ stable          results require grid spacing to be fine enough to keep
+ multipoles      inside the dielectric boundary (2.5 * grid < PBR)
+ gcent           grid center (mg-manual)          center of mass
+ cgcent          coarse grid center               center of mass
+ fgcent          fine grid center                 center of mass
+ pdie            solute/homogeneous dieletric     [1.0]
+ sdie            solvent dieletric                [78.3]
+ ionn            number of ion species            [0]
+ ionc            ion concentration (M)            [0.0]
+ ionq            ion charge (electrons)           [1.0]
+ ionr            ion radius (A)                   [2.0]
+ srad            solvent probe radius (A)         [1.4]
+ swin            surface spline window width      [0.3]
+ sdens           density of surface points        [10.0]
+ additional      parameter to facilitate default grid setup
+ smin            minimum distance between an      [10.0]
+ atom            and the grid boundary (A)
+ pbe             Poisson-Boltzmann permanent multipole solvation energy
+ apbe            Poisson-Boltzmann permanent multipole energy over atoms
+ pbr             Poisson-Boltzmann cavity radii for atom types
+ pbep            Poisson-Boltzmann energies on permanent multipoles
+ pbfp            Poisson-Boltzmann forces on permanent multipoles
+ pbtp            Poisson-Boltzmann torques on permanent multipoles
+ pbeuind         Poisson-Boltzmann field due to induced dipoles
+ pbeuinp         Poisson-Boltzmann field due to non-local induced dipoles
+
+**PDB Module           Protein Data Bank structure definition**
+
+.. code-block:: text
+
  npdb            number of atoms stored in Protein Data Bank format
+ nres            number of residues stored in Protein Data Bank format
  resnum          number of the residue to which each atom belongs
+ resatm          number of first and last atom in each residue
  npdb12          number of atoms directly bonded to each CONECT atom
  ipdb12          atom numbers of atoms connected to each CONECT atom
  pdblist         list of the Protein Data Bank atom number of each atom
+ xpdb            x-coordinate of each atom stored in PDB format
+ ypdb            y-coordinate of each atom stored in PDB format
+ zpdb            z-coordinate of each atom stored in PDB format
+ altsym          string with PDB alternate locations to be included
+ pdbres          Protein Data Bank residue name assigned to each atom
+ pdbatm          Protein Data Bank atom name assigned to each atom
  pdbtyp          Protein Data Bank record type assigned to each atom
- atmnam          Protein Data Bank atom name assigned to each atom
- resnam          Protein Data Bank residue name assigned to each atom
+ chnsym          string with PDB chain identifiers to be included
+ instyp          string with PDB insertion records to be included
 
-**PHIPSI Module        phi-psi-omega-chi angles for a protein**
+**PHIPSI Module        phi-psi-omega-chi angles for protein**
 
 .. code-block:: text
 
- phi             value of the phi angle for each amino acid residue
- psi             value of the psi angle for each amino acid residue
- omega           value of the omega angle for each amino acid residue
- chi             values of the chi angles for each amino acid residue
  chiral          chirality of each amino acid residue (1=L, -1=D)
  disulf          residue joined to each residue via a disulfide link
+ phi             value of the phi angle for each amino acid residue
+ psi             value of the psi angle for each amino acid residue
+ omg             value of the omega angle for each amino acid residue
+ chi             values of the chi angles for each amino acid residue
 
-**PIORBS Module        conjugated system in the current structure**
+**PIORBS Module        conjugated system in current structure**
 
 .. code-block:: text
 
  norbit          total number of pisystem orbitals in the system
- iorbit          numbers of the atoms containing pisystem orbitals
+ nconj           total number of separate conjugated piystems
  reorbit         number of evaluations between orbital updates
- piperp          atoms defining a normal plane to each orbital
  nbpi            total number of bonds affected by the pisystem
- bpi             bond and piatom numbers for each pisystem bond
  ntpi            total number of torsions affected by the pisystem
- tpi             torsion and pibond numbers for each pisystem torsion
+ iorbit          numbers of the atoms containing pisystem orbitals
+ iconj           first and last atom of each pisystem in the list
+ kconj           contiguous list of atoms in each pisystem
+ piperp          atoms defining a normal plane to each orbital
+ ibpi            bond and piatom numbers for each pisystem bond
+ itpi            torsion and pibond numbers for each pisystem torsion
+ pbpl            pi-bond orders for bonds in "planar" pisystem
+ pnpl            pi-bond orders for bonds in "nonplanar" pisystem
  listpi          atom list indicating whether each atom has an orbital
 
-**PISTUF Module        bonds and torsions in the current pisystem**
+**PISTUF Module        bond order-related pisystem parameters**
 
 .. code-block:: text
 
@@ -1120,80 +1540,152 @@ The Fortran modules found in the Tinker package are listed below along with a br
  lslope          rate of bond length increase with a bond order decrease
  torsp2          2-fold torsional energy barrier for pi-bond order of 1.0
 
-**PITORS Module        pi-orbital torsions in the current structure**
+**PITORS Module        pi-system torsions in current structure**
 
 .. code-block:: text
 
- kpit            2-fold pi-orbital torsional force constants
- npitors         total number of pi-orbital torsional interactions
- ipit            numbers of the atoms in each pi-orbital torsion
+ npitors         total number of pi-system torsional interactions
+ ipit            numbers of the atoms in each pi-system torsion
+ kpit            2-fold pi-system torsional force constants
 
-**PME Module        parameters for particle mesh Ewald summation**
+**PME Module           values for particle mesh Ewald summation**
 
 .. code-block:: text
 
- maxfft          maximum number of points along each FFT direction
- maxorder        maximum order of the B-spline approximation
- maxtable        maximum size of the FFT table array
- maxgrid         maximum dimension of the PME charge grid array
+ nfft1           current number of PME grid points along a-axis
+ nfft2           current number of PME grid points along b-axis
+ nfft3           current number of PME grid points along c-axis
+ nefft1          number of grid points along electrostatic a-axis
+ nefft2          number of grid points along electrostatic b-axis
+ nefft3          number of grid points along electrostatic c-axis
+ ndfft1          number of grid points along dispersion a-axis
+ ndfft2          number of grid points along dispersion b-axis
+ ndfft3          number of grid points along dispersion c-axis
+ bsorder         current order of the PME B-spline values
+ bseorder        order of the electrostatic PME B-spline values
+ bsporder        order of the polarization PME B-spline values
+ bsdorder        order of the dispersion PME B-spline values
+ igrid           initial Ewald grid values for B-spline
  bsmod1          B-spline moduli along the a-axis direction
  bsmod2          B-spline moduli along the b-axis direction
  bsmod3          B-spline moduli along the c-axis direction
- table           intermediate array used by the FFT calculation
- nfft1           number of grid points along the a-axis direction
- nfft2           number of grid points along the b-axis direction
- nfft3           number of grid points along the c-axis direction
- bsorder         order of the PME B-spline approximation
+ bsbuild         B-spline derivative coefficient temporary storage
+ thetai1         B-spline coefficients along the a-axis
+ thetai2         B-spline coefficients along the b-axis
+ thetai3         B-spline coefficients along the c-axis
+ qgrid           values on the particle mesh Ewald grid
+ qfac            prefactors for the particle mesh Ewald grid
 
-**POLAR Module        polarizabilities and induced dipole moments**
+**POLAR Module         induced dipole moments & polarizability**
 
 .. code-block:: text
 
- polarity        dipole polarizability for each multipole site (Ang**3)
- pdamp           value of polarizability damping factor for each site
- uind            induced dipole components at each multipole site
- uinp            induced dipoles in field used for energy interactions
  npolar          total number of polarizable sites in the system
+ ipolar          number of the multipole for each polarizable site
+ polarity        dipole polarizability for each multipole site (Ang**3)
+ thole           Thole polarizability damping value for each site
+ dirdamp         direct polarization damping value for each site
+ pdamp           value of polarizability scale factor for each site
+ udir            direct induced dipole components at each multipole site
+ udirp           direct induced dipoles in field used for energy terms
+ udirs           direct GK or PB induced dipoles at each multipole site
+ udirps          direct induced dipoles in field used for GK or PB energy
+ uind            mutual induced dipole components at each multipole site
+ uinp            mutual induced dipoles in field used for energy terms
+ uinds           mutual GK or PB induced dipoles at each multipole site
+ uinps           mutual induced dipoles in field used for GK or PB energy
+ uexact          exact SCF induced dipoles to full numerical precision
+ douind          flag to allow induced dipoles at each atomic site
 
-**POLGRP Module        polarizable site group connectivity lists**
+**POLGRP Module        polarization group connectivity lists**
 
 .. code-block:: text
 
- maxp11	         maximum number of atoms in a polarization group
+ maxp11          maximum number of atoms in a polarization group
  maxp12          maximum number of atoms in groups 1-2 to an atom
  maxp13          maximum number of atoms in groups 1-3 to an atom
  maxp14          maximum number of atoms in groups 1-4 to an atom
  np11            number of atoms in polarization group of each atom
- ip11            atom numbers of atoms in same group as each atom
  np12            number of atoms in groups 1-2 to each atom
- ip12            atom numbers of atoms in groups 1-2 to each atom
  np13            number of atoms in groups 1-3 to each atom
- ip13            atom numbers of atoms in groups 1-3 to each atom
  np14            number of atoms in groups 1-4 to each atom
+ ip11            atom numbers of atoms in same group as each atom
+ ip12            atom numbers of atoms in groups 1-2 to each atom
+ ip13            atom numbers of atoms in groups 1-3 to each atom
  ip14            atom numbers of atoms in groups 1-4 to each atom
 
-**POLPOT Module        specifics of polarization functional form**
+**POLOPT Module        induced dipoles for OPT extrapolation**
 
 .. code-block:: text
 
- poleps          induced dipole convergence criterion (rms Debye/atom)
- polsor          induced dipole SOR convergence acceleration factor
- pgamma          prefactor in exponential polarization damping term
- p2scale         field 1-2 scale factor for energy evaluations
- p3scale         field 1-3 scale factor for energy evaluations
- p4scale         field 1-4 scale factor for energy evaluations
- p5scale         field 1-5 scale factor for energy evaluations
- d1scale         field intra-group scale factor for direct induced
- d2scale         field 1-2 group scale factor for direct induced
- d3scale         field 1-3 group scale factor for direct induced
- d4scale         field 1-4 group scale factor for direct induced
- u1scale         field intra-group scale factor for mutual induced
- u2scale         field 1-2 group scale factor for mutual induced
- u3scale         field 1-3 group scale factor for mutual induced
- u4scale         field 1-4 group scale factor for mutual induced
- poltyp          type of polarization potential (direct or mutual)
+ maxopt          maximum order for OPT induced dipole extrapolation
+ optorder        highest coefficient order for OPT dipole extrapolation
+ optlevel        current OPT order for reciprocal potential and field
+ copt            coefficients for OPT total induced dipole moments
+ copm            coefficients for OPT incremental induced dipole moments
+ uopt            OPT induced dipole components at each multipole site
+ uoptp           OPT induced dipoles in field used for energy terms
+ uopts           OPT GK or PB induced dipoles at each multipole site
+ uoptps          OPT induced dipoles in field used for GK or PB energy
+ fopt            OPT fractional reciprocal potentials at multipole sites
+ foptp           OPT fractional reciprocal potentials for energy terms
 
-**POTENT Module        usage of each potential energy component**
+**POLPCG Module        induced dipoles via the PCG solver**
+
+.. code-block:: text
+
+ mindex          index into preconditioner inverse for PCG solver
+ pcgpeek         value of acceleration factor for PCG peek step
+ minv            preconditioner inverse for induced dipole PCG solver
+ pcgprec         flag to allow use of preconditioner with PCG solver
+ pcgguess        flag to use initial PCG based on direct field
+
+**POLPOT Module        polarization functional form details**
+
+.. code-block:: text
+
+ politer         maximum number of induced dipole SCF iterations
+ poleps          induced dipole convergence criterion (rms Debye/atom)
+ p2scale         scale factor for 1-2 polarization energy interactions
+ p3scale         scale factor for 1-3 polarization energy interactions
+ p4scale         scale factor for 1-4 polarization energy interactions
+ p5scale         scale factor for 1-5 polarization energy interactions
+ p2iscale        scale factor for 1-2 intragroup polarization energy
+ p3iscale        scale factor for 1-3 intragroup polarization energy
+ p4iscale        scale factor for 1-4 intragroup polarization energy
+ p5iscale        scale factor for 1-5 intragroup polarization energy
+ d1scale         scale factor for intra-group direct induction
+ d2scale         scale factor for 1-2 group direct induction
+ d3scale         scale factor for 1-3 group direct induction
+ d4scale         scale factor for 1-4 group direct induction
+ u1scale         scale factor for intra-group mutual induction
+ u2scale         scale factor for 1-2 group mutual induction
+ u3scale         scale factor for 1-3 group mutual induction
+ u4scale         scale factor for 1-4 group mutual induction
+ w2scale         scale factor for 1-2 induced dipole interactions
+ w3scale         scale factor for 1-3 induced dipole interactions
+ w4scale         scale factor for 1-4 induced dipole interactions
+ w5scale         scale factor for 1-5 induced dipole interactions
+ udiag           acceleration factor for induced dipole SCF iterations
+ dpequal         flag to set dscale values equal to pscale values
+ use_thole       flag to use Thole damped polarization interactions
+ use_dirdamp     flag to use damped direct polarization interactions
+ poltyp          type of polarization (MUTUAL, DIRECT, OPT or TCG)
+
+**POLTCG Module        induced dipoles via the TCG solver**
+
+.. code-block:: text
+
+ tcgorder        total number of TCG iterations to be used
+ tcgnab          number of mutual induced dipole components
+ tcgpeek         value of acceleration factor for TCG peek step
+ uad             left-hand side mutual induced d-dipoles
+ uap             left-hand side mutual induced p-dipoles
+ ubd             right-hand side mutual induced d-dipoles
+ ubp             right-hand side mutual induced p-dipoles
+ tcgguess        flag to use initial TCG based on direct field
+
+**POTENT Module        usage of potential energy components**
 
 .. code-block:: text
 
@@ -1207,67 +1699,210 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_improp      logical flag governing use of improper dihedral term
  use_imptor      logical flag governing use of improper torsion term
  use_tors        logical flag governing use of torsional potential
- use_pitors      logical flag governing use of pi-orbital torsion term
+ use_pitors      logical flag governing use of pi-system torsion term
  use_strtor      logical flag governing use of stretch-torsion term
+ use_angtor      logical flag governing use of angle-torsion term
  use_tortor      logical flag governing use of torsion-torsion term
  use_vdw         logical flag governing use of vdw der Waals potential
+ use_repuls      logical flag governing use of Pauli repulsion term
+ use_disp        logical flag governing use of dispersion potential
  use_charge      logical flag governing use of charge-charge potential
  use_chgdpl      logical flag governing use of charge-dipole potential
  use_dipole      logical flag governing use of dipole-dipole potential
  use_mpole       logical flag governing use of multipole potential
  use_polar       logical flag governing use of polarization term
+ use_chgtrn      logical flag governing use of charge transfer term
  use_rxnfld      logical flag governing use of reaction field term
- use_solv        logical flag governing use of surface area solvation
- use_gbsa        logical flag governing use of GB/SA solvation term
+ use_solv        logical flag governing use of continuum solvation term
  use_metal       logical flag governing use of ligand field term
  use_geom        logical flag governing use of geometric restraints
  use_extra       logical flag governing use of extra potential term
+ use_born        logical flag governing use of Born radii values
  use_orbit       logical flag governing use of pisystem computation
 
-**PRECIS Module        values of machine precision tolerances**
+**POTFIT Module        values for electrostatic potential fit**
 
 .. code-block:: text
 
- tiny            the smallest positive floating point value
- small           the smallest relative floating point spacing
- huge            the largest relative floating point spacing
+ nconf           total number of configurations to be analyzed
+ namax           maximum number of atoms in the largest configuration
+ ngatm           total number of atoms with active potential grid points
+ nfatm           total number of atoms in electrostatic potential fit
+ npgrid          total number of electrostatic potential grid points
+ ipgrid          atom associated with each potential grid point
+ resp            weight used to restrain parameters to original values
+ xdpl0           target x-component of the molecular dipole moment
+ ydpl0           target y-component of the molecular dipole moment
+ zdpl0           target z-component of the molecular dipole moment
+ xxqdp0          target xx-component of the molecular quadrupole moment
+ xyqdp0          target xy-component of the molecular quadrupole moment
+ xzqdp0          target xz-component of the molecular quadrupole moment
+ yyqdp0          target yy-component of the molecular quadrupole moment
+ yzqdp0          target yz-component of the molecular quadrupole moment
+ zzqdp0          target zz-component of the molecular quadrupole moment
+ fit0            initial value of each parameter used in potential fit
+ fchg            partial charges by atom type during potential fit
+ fpol            atomic multipoles by atom type during potential fit
+ pgrid           Cartesian coordinates of potential grid points
+ epot            values of electrostatic potential at grid points
+ use_dpl         flag to include molecular dipole in potential fit
+ use_qdp         flag to include molecular quadrupole in potential fit
+ fit_mpl         flag for atomic monopoles to vary in potential fit
+ fit_dpl         flag for atomic dipoles to vary in potential fit
+ fit_qdp         flag for atomic quadrupoles to vary in potential fit
+ fitchg          flag marking atom types for use in partial charge fit
+ fitpol          flag marking atom types for use in atomic multipole fit
+ gatm            flag to use potential grid points around each atom
+ fatm            flag to use each atom in electrostatic potential fit
 
-**REFER Module        storage of reference atomic coordinate set**
+**PTABLE Module        symbols and info for chemical elements**
 
 .. code-block:: text
 
- xref            reference x-coordinate for each atom in the system
- yref            reference y-coordinate for each atom in the system
- zref            reference z-coordinate for each atom in the system
- nref            total number of atoms in the reference system
- reftyp          atom type for each atom in the reference system
+ maxele          maximum number of elements from periodic table
+ atmass          standard atomic weight for each chemical element
+ vdwrad          van der Waals radius for each chemical element
+ covrad          covalent radius for each chemical element
+ elemnt          atomic symbol for each chemical element
+
+**REFER Module         reference atomic coordinate storage**
+
+.. code-block:: text
+
+ nref            total number of atoms in each reference system
+ refltitle       length in characters of each reference title line
+ refleng         length in characters of each reference filename
+ reftyp          atom types of the atoms in each reference system
  n12ref          number of atoms bonded to each reference atom
  i12ref          atom numbers of atoms 1-2 connected to each atom
- refleng         length in characters of the reference filename
- refltitle       length in characters of the reference title string
- refnam          atom name for each atom in the reference system
- reffile         base filename for the reference structure
- reftitle        title used to describe the reference structure
+ xboxref         reference a-axis length of periodic box
+ yboxref         reference b-axis length of periodic box
+ zboxref         reference c-axis length of periodic box
+ alpharef        reference angle between b- and c-axes of box
+ betaref         reference angle between a- and c-axes of box
+ gammaref        reference angle between a- and b-axes of box
+ xref            reference x-coordinates for atoms in each system
+ yref            reference y-coordinates for atoms in each system
+ zref            reference z-coordinates for atoms in each system
+ refnam          atom names of the atoms in each reference system
+ reffile         base filename for each reference system
+ reftitle        title used to describe each reference system
 
-**RESDUE Module        standard biopolymer residue abbreviations**
+**REPEL Module         Pauli repulsion for current structure**
 
 .. code-block:: text
 
+ nrep            total number of repulsion sites in the system
+ sizpr           Pauli repulsion size parameter value at each site
+ dmppr           Pauli repulsion alpha damping value at each site
+ elepr           Pauli repulsion valence electrons at each site
+
+**REPPOT Module        repulsion interaction scale factors**
+
+.. code-block:: text
+
+ r2scale         scale factor for 1-2 repulsion energy interactions
+ r3scale         scale factor for 1-3 repulsion energy interactions
+ r4scale         scale factor for 1-4 repulsion energy interactions
+ r5scale         scale factor for 1-5 repulsion energy interactions
+
+**RESDUE Module        amino acid & nucleotide residue names**
+
+.. code-block:: text
+
+ maxamino        maximum number of amino acid residue types
+ maxnuc          maximum number of nucleic acid residue types
+ ntyp            biotypes for mid-chain peptide backbone N atoms
+ catyp           biotypes for mid-chain peptide backbone CA atoms
+ ctyp            biotypes for mid-chain peptide backbone C atoms
+ hntyp           biotypes for mid-chain peptide backbone HN atoms
+ otyp            biotypes for mid-chain peptide backbone O atoms
+ hatyp           biotypes for mid-chain peptide backbone HA atoms
+ cbtyp           biotypes for mid-chain peptide backbone CB atoms
+ nntyp           biotypes for N-terminal peptide backbone N atoms
+ cantyp          biotypes for N-terminal peptide backbone CA atoms
+ cntyp           biotypes for N-terminal peptide backbone C atoms
+ hnntyp          biotypes for N-terminal peptide backbone HN atoms
+ ontyp           biotypes for N-terminal peptide backbone O atoms
+ hantyp          biotypes for N-terminal peptide backbone HA atoms
+ nctyp           biotypes for C-terminal peptide backbone N atoms
+ cactyp          biotypes for C-terminal peptide backbone CA atoms
+ cctyp           biotypes for C-terminal peptide backbone C atoms
+ hnctyp          biotypes for C-terminal peptide backbone HN atoms
+ octyp           biotypes for C-terminal peptide backbone O atoms
+ hactyp          biotypes for C-terminal peptide backbone HA atoms
+ o5typ           biotypes for nucleotide backbone and sugar O5' atoms
+ c5typ           biotypes for nucleotide backbone and sugar C5' atoms
+ h51typ          biotypes for nucleotide backbone and sugar H5' atoms
+ h52typ          biotypes for nucleotide backbone and sugar H5'' atoms
+ c4typ           biotypes for nucleotide backbone and sugar C4' atoms
+ h4typ           biotypes for nucleotide backbone and sugar H4' atoms
+ o4typ           biotypes for nucleotide backbone and sugar O4' atoms
+ c1typ           biotypes for nucleotide backbone and sugar C1' atoms
+ h1typ           biotypes for nucleotide backbone and sugar H1' atoms
+ c3typ           biotypes for nucleotide backbone and sugar C3' atoms
+ h3typ           biotypes for nucleotide backbone and sugar H3' atoms
+ c2typ           biotypes for nucleotide backbone and sugar C2' atoms
+ h21typ          biotypes for nucleotide backbone and sugar H2' atoms
+ o2typ           biotypes for nucleotide backbone and sugar O2' atoms
+ h22typ          biotypes for nucleotide backbone and sugar H2'' atoms
+ o3typ           biotypes for nucleotide backbone and sugar O3' atoms
+ ptyp            biotypes for nucleotide backbone and sugar P atoms
+ optyp           biotypes for nucleotide backbone and sugar OP atoms
+ h5ttyp          biotypes for nucleotide backbone and sugar H5T atoms
+ h3ttyp          biotypes for nucleotide backbone and sugar H3T atoms
  amino           three-letter abbreviations for amino acids types
  nuclz           three-letter abbreviations for nucleic acids types
  amino1          one-letter abbreviations for amino acids types
  nuclz1          one-letter abbreviations for nucleic acids types
 
-**RGDDYN Module        velocities and momenta for rigid body MD**
+**RESTRN Module        parameters for geometrical restraints**
 
 .. code-block:: text
 
+ npfix           number of position restraints to be applied
+ ndfix           number of distance restraints to be applied
+ nafix           number of angle restraints to be applied
+ ntfix           number of torsional restraints to be applied
+ ngfix           number of group distance restraints to be applied
+ nchir           number of chirality restraints to be applied
+ ipfix           atom number involved in each position restraint
+ kpfix           flags to use x-, y-, z-coordinate position restraints
+ idfix           atom numbers defining each distance restraint
+ iafix           atom numbers defining each angle restraint
+ itfix           atom numbers defining each torsional restraint
+ igfix           group numbers defining each group distance restraint
+ ichir           atom numbers defining each chirality restraint
+ depth           depth of shallow Gaussian basin restraint
+ width           exponential width coefficient of Gaussian basin
+ rwall           radius of spherical droplet boundary restraint
+ xpfix           x-coordinate target for each restrained position
+ ypfix           y-coordinate target for each restrained position
+ zpfix           z-coordinate target for each restrained position
+ pfix            force constant and flat-well range for each position
+ dfix            force constant and target range for each distance
+ afix            force constant and target range for each angle
+ tfix            force constant and target range for each torsion
+ gfix            force constant and target range for each group distance
+ chir            force constant and target range for chiral centers
+ use_basin       logical flag governing use of Gaussian basin
+ use_wall        logical flag governing use of droplet boundary
+
+**RGDDYN Module        rigid body MD velocities and momenta**
+
+.. code-block:: text
+
+ xcmo            x-component from each atom to center of rigid body
+ ycmo            y-component from each atom to center of rigid body
+ zcmo            z-component from each atom to center of rigid body
  vcm             current translational velocity of each rigid body
  wcm             current angular velocity of each rigid body
  lm              current angular momentum of each rigid body
+ vc              half-step translational velocity for kinetic energy
+ wc              half-step angular velocity for kinetic energy
  linear          logical flag to mark group as linear or nonlinear
 
-**RIGID Module        rigid body coordinates for atom groups**
+**RIGID Module         rigid body coordinates for atom groups**
 
 .. code-block:: text
 
@@ -1277,20 +1912,22 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rbc             current rigid body coordinates for each group
  use_rigid       flag to mark use of rigid body coordinate system
 
-**RING Module        number and location of small ring structures**
+**RING Module          number and location of ring structures**
 
 .. code-block:: text
 
  nring3          total number of 3-membered rings in the system
- iring3          numbers of the atoms involved in each 3-ring
  nring4          total number of 4-membered rings in the system
- iring4          numbers of the atoms involved in each 4-ring
  nring5          total number of 5-membered rings in the system
- iring5          numbers of the atoms involved in each 5-ring
  nring6          total number of 6-membered rings in the system
+ nring7          total number of 7-membered rings in the system
+ iring3          numbers of the atoms involved in each 3-ring
+ iring4          numbers of the atoms involved in each 4-ring
+ iring5          numbers of the atoms involved in each 5-ring
  iring6          numbers of the atoms involved in each 6-ring
+ iring7          numbers of the atoms involved in each 7-ring
 
-**ROTATE Module        molecule partitions for rotation of a bond**
+**ROTBND Module        molecule partitions for bond rotation**
 
 .. code-block:: text
 
@@ -1298,15 +1935,15 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rot             atom numbers of atoms moving when bond rotates
  use_short       logical flag governing use of shortest atom list
 
-**RXNFLD Module        reaction field matrix elements and indices**
+**RXNFLD Module        reaction field matrix and indices**
 
 .. code-block:: text
 
+ ijk             indices into the reaction field element arrays
  b1              first reaction field matrix element array
  b2              second reaction field matrix element array
- ijk             indices into the reaction field element arrays
 
-**RXNPOT Module        specifics of reaction field functional form**
+**RXNPOT Module        reaction field functional form details**
 
 .. code-block:: text
 
@@ -1314,14 +1951,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rfbulkd         bulk dielectric constant of reaction field continuum
  rfterms         number of terms to use in reaction field summation
 
-**SCALES Module        parameter scale factors for optimization**
+**SCALES Module        optimization parameter scale factors**
 
 .. code-block:: text
 
  scale           multiplicative factor for each optimization parameter
  set_scale       logical flag to show if scale factors have been set
 
-**SEQUEN Module        sequence information for a biopolymer**
+**SEQUEN Module        sequence information for biopolymer**
 
 .. code-block:: text
 
@@ -1331,21 +1968,9 @@ The Fortran modules found in the Tinker package are listed below along with a br
  seqtyp          residue type for each residue in the sequence
  seq             three-letter code for each residue in the sequence
  chnnam          one-letter identifier for each sequence chain
+ chntyp          contents of each chain (GENERIC, PEPTIDE or NUCLEIC)
 
-**SHAKE Module        definition of Shake/Rattle constraints**
-
-.. code-block:: text
-
- krat            ideal distance value for rattle constraint
- nrat            number of rattle distance constraints to apply
- nratx           number of atom group spatial constraints to apply
- irat            atom numbers of atoms in a rattle constraint
- iratx           group number of group in a spatial constraint
- kratx           spatial constraint type (1=plane, 2=line, 3=point)
- ratimage        flag to use minimum image for rattle constraint
- use_rattle      logical flag to set use of rattle contraints
-
-**SHUNT Module        polynomial switching function coefficients**
+**SHUNT Module         polynomial switching function values**
 
 .. code-block:: text
 
@@ -1368,189 +1993,231 @@ The Fortran modules found in the Tinker package are listed below along with a br
  f6              sixth order coefficient of additive switch function
  f7              seventh order coefficient of additive switch function
 
-**SIZES Module        parameter values to set array dimensions**
-
-"sizes.i" sets values for critical array dimensions used throughout the software; these parameters will fix the size of the largest systems that can be handled; values too large for	the computer's memory and/or swap space to accomodate will result in poor performance or outright failure
+**SIZES Module         parameters to set array dimensions**
 
 .. code-block:: text
 
+ sizes"          sets values for critical array dimensions used
+ throughout      the software; these parameters fix the size of
+ the             largest systems that can be handled
  parameter       maximum allowed number of:
-
  maxatm          atoms in the molecular system
- maxval          atoms directly bonded to an atom
- maxgrp          user-defined groups of atoms
  maxtyp          force field atom type definitions
  maxclass        force field atom class definitions
- maxprm          lines in the parameter file
- maxkey          lines in the keyword file
- maxrot          bonds for torsional rotation
- maxvar          optimization variables (vector storage)
- maxopt          optimization variables (matrix storage)
- maxhess         off-diagonal Hessian elements
- maxlight        sites for method of lights neighbors
- maxvib          vibrational frequencies
- maxgeo          distance geometry points
- maxcell         unit cells in replicated crystal
- maxring         3-, 4-, or 5-membered rings
- maxfix          geometric constraints and restraints
- maxbio          biopolymer atom definitions
+ maxval          atoms directly bonded to an atom
+ maxref          stored reference molecular systems
+ maxgrp          user-defined groups of atoms
  maxres          residues in the macromolecule
- maxamino        amino acid residue types
- maxnuc          nucleic acid residue types
- maxbnd          covalent bonds in molecular system
- maxang          bond angles in molecular system
- maxtors         torsional angles in molecular system
- maxbitor        bitorsions in molecular system
- maxpi           atoms in conjugated pisystem
- maxpib          covalent bonds involving pisystem
- maxpit          torsional angles involving pisystem
+ maxfix          geometric constraints and restraints
 
-**SOCKET Module        control parameters for socket communication**
+**SOCKET Module        socket communication control parameters**
 
 .. code-block:: text
 
- runtyp          calculation type for passing socket information
- cstep           current optimization or dynamics step number
+ skttyp          socket information type (1=DYN, 2=OPT)
+ cstep           current dynamics or optimization step number
  cdt             current dynamics cumulative simulation time
  cenergy         current potential energy from simulation
- cdx             current gradient components along the x-axis
- cdy             current gradient components along the y-axis
- cdz             current gradient components along the z-axis
- skt_init        logical flag set to true after socket initialization
+ sktstart        logical flag to indicate socket initialization
+ sktstop         logical flag to indicate socket shutdown
  use_socket      logical flag governing use of external sockets
- use_gui         logical flag to show Tinker was invoked from GUI
- closing         logical flag to indicate JVM and server shutdown
 
-**SOLUTE Module        parameters for continuum solvation models**
+**SOLUTE Module        continuum solvation model parameters**
 
 .. code-block:: text
 
+ doffset         dielectric offset to continuum solvation atomic radii
+ p1              single-atom scale factor for analytical Still radii
+ p2              1-2 interaction scale factor for analytical Still radii
+ p3              1-3 interaction scale factor for analytical Still radii
+ p4              nonbonded scale factor for analytical Still radii
+ p5              soft cutoff parameter for analytical Still radii
  rsolv           atomic radius of each atom for continuum solvation
- vsolv           atomic volume of each atom for continuum solvation
- asolv           atomic solvation parameters (kcal/mole/Ang^2)
+ asolv           atomic surface area solvation parameters
  rborn           Born radius of each atom for GB/SA solvation
  drb             solvation derivatives with respect to Born radii
- doffset         dielectric offset to continuum solvation atomic radii
- p1              single-atom scale factor for analytical Still GB/SA
- p2              1-2 interaction scale factor for analytical Still GB/SA
- p3              1-3 interaction scale factor for analytical Still GB/SA
- p4              nonbonded scale factor for analytical Still GB/SA
- p5              soft cutoff parameter for analytical Still GB/SA
+ drbp            GK polarization derivatives with respect to Born radii
+ drobc           chain rule term for Onufriev-Bashford-Case radii
  gpol            polarization self-energy values for each atom
- shct            overlap scaling factors for Hawkins-Cramer-Truhlar GB/SA
+ shct            overlap scale factors for Hawkins-Cramer-Truhlar radii
+ aobc            alpha values for Onufriev-Bashford-Case radii
+ bobc            beta values for Onufriev-Bashford-Case radii
+ gobc            gamma values for Onufriev-Bashford-Case radii
+ vsolv           atomic volume of each atom for use with ACE
  wace            "omega" values for atom class pairs for use with ACE
  s2ace           "sigma^2" values for atom class pairs for use with ACE
  uace            "mu" values for atom class pairs for use with ACE
- solvtyp         solvation model (ASP, SASA, ONION, STILL, HCT, ACE)
+ solvtyp         type of continuum solvation energy model in use
+ borntyp         method to be used for the Born radius computation
 
-**STODYN Module        frictional coefficients for SD trajectory**
+**STODYN Module        SD trajectory frictional coefficients**
 
 .. code-block:: text
 
  friction        global frictional coefficient for exposed particle
- gamma           atomic frictional coefficients for each atom
+ fgamma          atomic frictional coefficients for each atom
  use_sdarea      logical flag to use surface area friction scaling
 
-**STRBND Module        stretch-bends in the current structure**
+**STRBND Module        stretch-bends in current structure**
 
 .. code-block:: text
 
- ksb             force constant for stretch-bend terms
  nstrbnd         total number of stretch-bend interactions
  isb             angle and bond numbers used in stretch-bend
+ sbk             force constants for stretch-bend terms
 
-**STRTOR Module        stretch-torsions in the current structure**
+**STRTOR Module        stretch-torsions in current structure**
 
 .. code-block:: text
 
- kst             1-, 2- and 3-fold stretch-torsion force constants
  nstrtor         total number of stretch-torsion interactions
  ist             torsion and bond numbers used in stretch-torsion
+ kst             1-, 2- and 3-fold stretch-torsion force constants
 
-**SYNTRN Module        definition of synchronous transit path**
+**SYNTRN Module        synchronous transit path definition**
 
 .. code-block:: text
 
- t               value of the path coordinate (0=reactant, 1=product)
- pm              path coordinate for extra point in quadratic transit
+ tpath           value of the path coordinate (0=reactant, 1=product)
+ ppath           path coordinate for extra point in quadratic transit
  xmin1           reactant coordinates as array of optimization variables
  xmin2           product coordinates as array of optimization variables
  xm              extra coordinate set for quadratic synchronous transit
 
-**TITLES Module        title for the current molecular system**
+**TARRAY Module        store dipole-dipole matrix elements**
+
+.. code-block:: text
+
+ ntpair          number of stored dipole-dipole matrix elements
+ tindex          index into stored dipole-dipole matrix values
+ tdipdip         stored dipole-dipole matrix element values
+
+**TITLES Module        title for current molecular system**
 
 .. code-block:: text
 
  ltitle          length in characters of the nonblank title string
  title           title used to describe the current structure
 
-**TORPOT Module        specifics of torsional functional forms**
+**TORPOT Module        torsional functional form details**
 
 .. code-block:: text
 
  idihunit        convert improper dihedral energy to kcal/mole
  itorunit        convert improper torsion amplitudes to kcal/mole
  torsunit        convert torsional parameter amplitudes to kcal/mole
- ptorunit        convert pi-orbital torsion energy to kcal/mole
+ ptorunit        convert pi-system torsion energy to kcal/mole
  storunit        convert stretch-torsion energy to kcal/mole
- ttorunit        convert stretch-torsion energy to kcal/mole
+ atorunit        convert angle-torsion energy to kcal/mole
+ ttorunit        convert torsion-torsion energy to kcal/mole
 
-**TORS Module        torsional angles within the current structure**
+**TORS Module          torsional angles in current structure**
 
 .. code-block:: text
 
+ ntors           total number of torsional angles in the system
+ itors           numbers of the atoms in each torsional angle
  tors1           1-fold amplitude and phase for each torsional angle
  tors2           2-fold amplitude and phase for each torsional angle
  tors3           3-fold amplitude and phase for each torsional angle
  tors4           4-fold amplitude and phase for each torsional angle
  tors5           5-fold amplitude and phase for each torsional angle
  tors6           6-fold amplitude and phase for each torsional angle
- ntors           total number of torsional angles in the system
- itors           numbers of the atoms in each torsional angle
 
-**TORTOR Module        torsion-torsions in the current structure**
+**TORTOR Module        torsion-torsions in current structure**
 
 .. code-block:: text
 
  ntortor         total number of torsion-torsion interactions
  itt             atoms and parameter indices for torsion-torsion
 
-**TREE Module        potential smoothing & search tree levels**
+**TREE Module          potential smoothing search tree levels**
 
 .. code-block:: text
 
  maxpss          maximum number of potential smoothing levels
+ nlevel          number of levels of potential smoothing used
  etree           energy reference value at the top of the tree
  ilevel          smoothing deformation value at each tree level
- nlevel          number of levels of potential smoothing used
 
-**UNITS Module        physical constants and unit conversions**
+**UNITS Module         physical constants and unit conversions**
 
 .. code-block:: text
 
+ literature      references:
+ D.              B. Newell, F. Cabiati, J. Fischer, K. Fujii, S. G. Karshenboim,
+ S.              Margolis, E. de Mirandes, P. J. Mohr, F. Nez, K. Pachucki,
+ T.              J. Quinn, N. Taylor, M. Wang, B. M. Wood and Z. Zhang, "The
+ CODATA          2017 Values of h, e, k, and Na for the Revision of the SI",
+ Metrologia      55, L13-L16 (2018)
+ P.              J. Mohr, D. B. Newell and B. N. Taylor, "CODATA Recommended
+ Values          of the Fundamental Physical Constants: 2014", Journal of
+ Physical        and Chemical Reference Data, 45, 043102 (2016)
+ Where           available, values are from the 2017 CODATA adjustment
+ based           on exact physical constants for the revised SI
+ Other           values are from the 2014 CODATA reference constants; also
+ available       online from the National Institute of Standards and
+ Technology      at http://physics.nist.gov/cuu/Constants/index.html/
+ The             conversion from calorie to Joule is the definition of the
+ thermochemical  calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
+ The             "coulomb" energy conversion factor is found by dimensional
+ analysis        of Coulomb's Law, ie, by dividing the square of the
+ elementary      charge in Coulombs by 4*pi*eps0*rij, where eps0 is
+ the             permittivity of vacuum (the "electric constant"); note that
+ eps0            is typically given in F/m, equivalent to C**2/(J-m)
+ The             approximate value used for the Debye, 3.33564 x 10-30 C-m,
+ is              from IUPAC Compendium of Chemical Technology, 2nd Ed. (1997)
+ The             value of "prescon" is based on definition of 1 atmosphere
+ as              101325 Pa set by the 10th Conference Generale des Poids et
+ Mesures         (1954), where a Pascal (Pa) is equal to a J/m**3
  avogadro        Avogadro's number (N) in particles/mole
- boltzmann       Boltzmann constant (kB) in g*Ang^2/ps^2/K/mole
- gasconst        ideal gas constant (R) in kcal/mole/K
  lightspd        speed of light in vacuum (c) in cm/ps
- bohr            conversion from Bohrs to Angstroms
- joule           conversion from calories to joules
- evolt           conversion from Hartree to electron-volts
+ boltzmann       Boltzmann constant (kB) in g*Ang**2/ps**2/mole/K
+ gasconst        ideal gas constant (R) in kcal/mole/K
+ elemchg         elementary charge of a proton in Coulombs
+ vacperm         vacuum permittivity (electric constant, eps0) in F/m
+ emass           mass of an electron in atomic mass units
+ planck          Planck's constant (h) in J-s
+ joule           conversion from calorie to joule
+ ekcal           conversion from kcal to g*Ang**2/ps**2
+ bohr            conversion from Bohr to Angstrom
  hartree         conversion from Hartree to kcal/mole
- electric        conversion from electron^2/Ang to kcal/mole
- debye           conversion from electron-Ang to Debyes
- prescon         conversion from kcal/mole/Ang^3 to Atm
- convert         conversion from kcal to g*Ang^2/ps^2
+ evolt           conversion from Hartree to electron-volt
+ efreq           conversion from Hartree to cm-1
+ coulomb         conversion from electron**2/Ang to kcal/mole
+ debye           conversion from electron-Ang to Debye
+ prescon         conversion from kcal/mole/Ang**3 to Atm
 
-**UREY Module        Urey-Bradley interactions in the structure**
+**UPRIOR Module        previous values of induced dipoles**
 
 .. code-block:: text
 
- uk              Urey-Bradley force constants (kcal/mole/Ang^2)
- ul              ideal 1-3 distance values in Angstroms
+ maxpred         maximum number of predictor induced dipoles to save
+ nualt           number of sets of prior induced dipoles in storage
+ maxualt         number of sets of induced dipoles needed for predictor
+ gear            coefficients for Gear predictor binomial method
+ aspc            coefficients for always stable predictor-corrector
+ bpred           coefficients for induced dipole predictor polynomial
+ bpredp          coefficients for predictor polynomial in energy field
+ bpreds          coefficients for predictor for PB/GK solvation
+ bpredps         coefficients for predictor in PB/GK energy field
+ udalt           prior values for induced dipoles at each site
+ upalt           prior values for induced dipoles in energy field
+ usalt           prior values for induced dipoles for PB/GK solvation
+ upsalt          prior values for induced dipoles in PB/GK energy field
+ use_pred        flag to control use of induced dipole prediction
+ polpred         type of predictor polynomial (GEAR, ASPC or LSQR)
+
+**UREY Module          Urey-Bradley interactions in structure**
+
+.. code-block:: text
+
  nurey           total number of Urey-Bradley terms in the system
  iury            numbers of the atoms in each Urey-Bradley interaction
+ uk              Urey-Bradley force constants (kcal/mole/Ang**2)
+ ul              ideal 1-3 distance values in Angstroms
 
-**URYPOT Module        specifics of Urey-Bradley functional form**
+**URYPOT Module        Urey-Bradley functional form details**
 
 .. code-block:: text
 
@@ -1558,32 +2225,52 @@ The Fortran modules found in the Tinker package are listed below along with a br
  qury            quartic coefficient in Urey-Bradley potential
  ureyunit        convert Urey-Bradley energy to kcal/mole
 
-**USAGE Module        atoms active during energy computation**
+**USAGE Module         atoms active during energy computation**
 
 .. code-block:: text
 
- nuse            number of active atoms used in energy calculation
+ nuse            total number of active atoms in energy calculation
+ iuse            numbers of the atoms active in energy calculation
  use             true if an atom is active, false if inactive
 
-**VDW Module        van der Waals parameters for current structure**
+**VALFIT Module        valence term parameter fitting values**
 
 .. code-block:: text
 
+ fit_bond        logical flag to fit bond stretch parameters
+ fit_angle       logical flag to fit angle bend parameters
+ fit_strbnd      logical flag to fit stretch-bend parameters
+ fit_urey        logical flag to fit Urey-Bradley parameters
+ fit_opbend      logical flag to fit out-of-plane bend parameters
+ fit_tors        logical flag to fit torsional parameters
+ fit_struct      logical flag to structure-fit valence parameters
+ fit_force       logical flag to force-fit valence parameters
+
+**VDW Module           van der Waals terms in current structure**
+
+.. code-block:: text
+
+ nvdw            total number van der Waals active sites in the system
+ ivdw            number of the atom for each van der Waals active site
+ jvdw            type or class index into vdw parameters for each atom
+ ired            attached atom from which reduction factor is applied
+ kred            value of reduction factor parameter for each atom
+ xred            reduced x-coordinate for each atom in the system
+ yred            reduced y-coordinate for each atom in the system
+ zred            reduced z-coordinate for each atom in the system
  radmin          minimum energy distance for each atom class pair
  epsilon         well depth parameter for each atom class pair
  radmin4         minimum energy distance for 1-4 interaction pairs
  epsilon4        well depth parameter for 1-4 interaction pairs
  radhbnd         minimum energy distance for hydrogen bonding pairs
  epshbnd         well depth parameter for hydrogen bonding pairs
- kred            value of reduction factor parameter for each atom
- ired            attached atom from which reduction factor is applied
- nvdw            total number van der Waals active sites in the system
- ivdw            number of the atom for each van der Waals active site
 
-**VDWPOT Module        specifics of van der Waals functional form**
+**VDWPOT Module        van der Waals functional form details**
 
 .. code-block:: text
 
+ igauss          coefficients of Gaussian fit to vdw potential
+ ngauss          number of Gaussians used in fit to vdw potential
  abuck           value of "A" constant in Buckingham vdw potential
  bbuck           value of "B" constant in Buckingham vdw potential
  cbuck           value of "C" constant in Buckingham vdw potential
@@ -1593,8 +2280,8 @@ The Fortran modules found in the Tinker package are listed below along with a br
  v3scale         factor by which 1-3 vdw interactions are scaled
  v4scale         factor by which 1-4 vdw interactions are scaled
  v5scale         factor by which 1-5 vdw interactions are scaled
- igauss          coefficients of Gaussian fit to vdw potential
- ngauss          number of Gaussians used in fit to vdw potential
+ use_vcorr       flag to use long range van der Waals correction
+ vdwindex        indexing mode (atom type or class) for vdw parameters
  vdwtyp          type of van der Waals potential energy function
  radtyp          type of parameter (sigma or R-min) for atomic size
  radsiz          atomic size provided as radius or diameter
@@ -1602,55 +2289,65 @@ The Fortran modules found in the Tinker package are listed below along with a br
  epsrule         combining rule for vdw well depth parameters
  gausstyp        type of Gaussian fit to van der Waals potential
 
+**VIBS Module          iterative vibrational analysis components**
+
+.. code-block:: text
+
+ rho             trial vectors for iterative vibrational analysis
+ rhok            alternate vectors for iterative vibrational analysis
+ rwork           temporary work array for eigenvector transformation
+
 **VIRIAL Module        components of internal virial tensor**
 
 .. code-block:: text
 
  vir             total internal virial Cartesian tensor components
+ use_virial      logical flag governing use of virial computation
 
-**WARP Module        parameters for potential surface smoothing**
+**WARP Module          potential surface smoothing parameters**
 
 .. code-block:: text
 
- m2              second moment of the GDA gaussian for each atom
  deform          value of the smoothing deformation parameter
  difft           diffusion coefficient for torsional potential
  diffv           diffusion coefficient for van der Waals potential
  diffc           diffusion coefficient for charge-charge potential
+ m2              second moment of the GDA gaussian for each atom
  use_smooth      flag to use a potential energy smoothing method
  use_dem         flag to use diffusion equation method potential
  use_gda         flag to use gaussian density annealing potential
  use_tophat      flag to use analytical tophat smoothed potential
  use_stophat     flag to use shifted tophat smoothed potential
 
-**XTALS Module        crystal structures for parameter fitting**
+**XTALS Module         structures used for parameter fitting**
 
 .. code-block:: text
 
- e0_lattice      ideal lattice energy for the current crystal
- moment_0        ideal dipole moment for monomer from crystal
- nxtal           number of crystal structures to be stored
+ maxlsq          maximum number of least squares variables
+ maxrsd          maximum number of residual functions
+ nxtal           number of molecular structures to be stored
  nvary           number of potential parameters to optimize
  ivary           index for the types of potential parameters
+ iresid          structure to which each residual function refers
  vary            atom numbers involved in potential parameters
- iresid          crystal structure to which each residual refers
+ e0_lattice      ideal lattice energy for the current crystal
+ vartyp          type of each potential parameter to be optimized
  rsdtyp          experimental variable for each of the residuals
- vartyp          type of potential parameter to be optimized
 
-**ZCLOSE Module        ring openings and closures for Z-matrix**
+**ZCLOSE Module        Z-matrix ring openings and closures**
 
 .. code-block:: text
 
  nadd            number of added bonds between Z-matrix atoms
- iadd            numbers of the atom pairs defining added bonds
  ndel            number of bonds between Z-matrix bonds to delete
+ iadd            numbers of the atom pairs defining added bonds
  idel            numbers of the atom pairs defining deleted bonds
 
-**ZCOORD Module        Z-matrix internal coordinate definitions**
+**ZCOORD Module        Z-matrix internal coordinate values**
 
 .. code-block:: text
 
+ iz              defining atom numbers for each Z-matrix atom
  zbond           bond length used to define each Z-matrix atom
  zang            bond angle used to define each Z-matrix atom
  ztors           angle or torsion used to define Z-matrix atom
- iz              defining atom numbers for each Z-matrix atom
