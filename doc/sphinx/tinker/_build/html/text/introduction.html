@@ -34,8 +34,8 @@
             
   <div class="section" id="introduction-to-the-software">
 <h1>Introduction to the Software<a class="headerlink" href="#introduction-to-the-software" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="what-is-the-tinker-software">
-<h2>What is the Tinker Software?<a class="headerlink" href="#what-is-the-tinker-software" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="what-is-tinker">
+<h2>What is Tinker?<a class="headerlink" href="#what-is-tinker" title="Permalink to this headline">¶</a></h2>
 <p>Welcome to the Tinker molecular modeling package! Tinker is designed to be an easily used and flexible system of programs and routines for molecular mechanics and dynamics as well as other energy-based and structural manipulation calculations. It is intended to be modular enough to enable development of new computational methods and efficient enough to meet most production calculation needs. Rather than incorporating all the functionality in one monolithic program, Tinker provides a set of relatively small programs that interoperate to perform complex computations. New programs can be easily added by modelers with only limited programming experience.</p>
 </div>
 <div class="section" id="features-and-capabilities">
@@ -59,7 +59,7 @@
 </ol>
 </div></blockquote>
 <p>Many of the various energy minimization and molecular dynamics computations can be performed on full or partial structures, over Cartesian, internal or rigid body coordinates, and including a variety of boundary conditions and crystal cell types. Other programs are available to generate timing data and allow checking of potential function derivatives for coding errors. Special features are available to facilitate input and output of protein and nucleic acid structures. However, the basic core routines have no knowledge of biopolymer structure and can be used for general molecular systems.</p>
-<p>Due to its emphasis on ease of modification, Tinker differs from many other currently available molecular modeling packages in that the user is expected to be willing to write simple <a href="#id1"><span class="problematic" id="id2">``</span></a>front-end’’ programs and make some alterations at the source code level. The main programs provided should be considered as templates for the users to change according to their wishes. All subroutines are internally documented and structured programming practices are adhered to throughout. The result, it is hoped, will be a calculational system which can be tailored to local needs and desires.</p>
+<p>Due to its emphasis on ease of modification, Tinker differs from many other currently available molecular modeling packages in that the user is expected to be willing to write simple “front-end” programs and make some alterations at the source code level. The main programs provided should be considered as templates for the users to change according to their wishes. All subroutines are internally documented and structured programming practices are adhered to throughout. The result, it is hoped, will be a calculational system which can be tailored to local needs and desires.</p>
 <p>The core Tinker system consists of over 240,000 lines of source written entirely in a portable Fortran superset. Use is made of only some very common extensions that aid in writing highly structured code. The current version of the package has been ported to a wide range of computers with no or extremely minimal changes. Tested systems include: Ubuntu, CentOS and Red Hat Linux, Microsoft Windows 10 and earlier, Apple MacOS, and various older Unix-based workstations under vendor supplied Unix. At present, our new code is written on various Linux platforms, and occasionally tested for compatibility on various of the other machine and OS combinations listed above. At present, our primary source code development efforts are in Fortran, using a portable subset of Fortran90 with some common extensions. A machine-translated C version of Tinker is currently available, and a hand-translated optimized C version of a previous Tinker release is available for inspection. Conversion to C or C++ is under consideration, but not being actively pursued at this time.</p>
 <p>The basic design of the energy function engine used by the Tinker system allows usage of several different parameter sets. At present we are distributing parameters that implement several Amber and CHARMM potentials, MM2, MM3, OPLS-UA, OPLS-AA, MMFF, Liam Dang’s polarizable potentials, and our own AMOEBA (Atomic Multipole Optimized Energetics for Biomolecular Applications), AMOEBA+, and HIPPO (Hydrogen-like Intermolecular Polarizable Potential) force fields. In most cases, the source code separates the geometric manipulations needed for energy derivatives from the actual form of the energy function itself. Several other literature parameter sets are being considered for possible future development (later versions of CHARMM and Amber, as well as GROMOS, ENCAD, MM4, UFF, etc.), and many of the alternative potential function forms reported in the literature can be implemented directly or after minor code changes.</p>
 <p>Much of the software in the Tinker package has been heavily used and well tested, but some modules are still in a fairly early stage of development. Further work on the Tinker system is planned in three main areas: (1) extension and improvement of the potential energy parameters including additional parameterization and testing of our polarizable multipole AMOEBA force field, (2) coding of new computational algorithms including additional methods for free energy determination, torsional Monte Carlo and molecular dynamics sampling, advanced methods for long range interactions, better transition state location, and further application of the potential smoothing paradigm, and (3) further development of Force Field Explorer, a Java-based GUI front-end to the Tinker programs that provides for calculation setup, launch and control as well as basic molecular visualization.</p>
@@ -101,7 +101,7 @@ email:  <a class="reference external" href="mailto:ponder&#37;&#52;&#48;dasher&#
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction to the Software</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-is-the-tinker-software">What is the Tinker Software?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-tinker">What is Tinker?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#features-and-capabilities">Features and Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contact-information">Contact Information</a></li>
 </ul>
@@ -113,11 +113,12 @@ email:  <a class="reference external" href="mailto:ponder&#37;&#52;&#48;dasher&#
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Force Field Parameter Sets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="special-features.html">Special Features &amp; Methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="keywords.html">Use of the Keyword Control File</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routines.html">Descriptions of Tinker Routines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Description of Modules &amp; Global Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">Routines &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules &amp; Global Variables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test-cases.html">Test Cases &amp; Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmark Results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div class="relations">

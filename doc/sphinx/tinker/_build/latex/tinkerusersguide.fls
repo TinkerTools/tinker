@@ -288,11 +288,11 @@ INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchr8r.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/vf/typoland/lato/Lato-Bold-T1-TLF.vf
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/typoland/lato/Lato-Bold-T1-TLF--base.tfm
 OUTPUT tinkerusersguide.toc
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/jknappen/ec/ecrb1095.tfm
-INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/jknappen/ec/tcrb1095.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/typoland/lato/Lato-Bold-TS1-TLF.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/vf/typoland/lato/Lato-Bold-TS1-TLF.vf
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/typoland/lato/Lato-Bold-TS1-TLF--base.tfm
+INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/jknappen/ec/ecrb1095.tfm
+INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/jknappen/ec/tcrb1095.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/typoland/lato/Lato-Regular-T1-TLF.tfm
 INPUT /usr/local/texlive/2020/texmf-dist/fonts/tfm/bitstrea/charter/bchr8t.tfm
