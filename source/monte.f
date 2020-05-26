@@ -324,14 +324,13 @@ c
 c     generate a random Cartesian move for each atom
 c
          else
-            do i = 1, n
-               if (use(i)) then
-                  call ranvec (vector)
-                  factor = size * random ()
-                  x(i) = x(i) + factor*vector(1)
-                  y(i) = y(i) + factor*vector(2)
-                  z(i) = z(i) + factor*vector(3)
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               call ranvec (vector)
+               factor = size * random ()
+               x(k) = x(k) + factor*vector(1)
+               y(k) = y(k) + factor*vector(2)
+               z(k) = z(k) + factor*vector(3)
             end do
          end if
 c
@@ -530,7 +529,7 @@ c
       use output
       use usage
       implicit none
-      integer i,nvar
+      integer i,k,nvar
       real*8 mcm1,minimum,grdmin
       real*8, allocatable :: xx(:)
       character*6 mode,method
@@ -553,15 +552,14 @@ c
 c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            xx(nvar) = x(i)
-            nvar = nvar + 1
-            xx(nvar) = y(i)
-            nvar = nvar + 1
-            xx(nvar) = z(i)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k)
+         nvar = nvar + 1
+         xx(nvar) = y(k)
+         nvar = nvar + 1
+         xx(nvar) = z(k)
       end do
 c
 c     make the call to the optimization routine
@@ -572,15 +570,14 @@ c
 c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
 c
 c     maintain any periodic boundary conditions
@@ -610,7 +607,7 @@ c
       use atoms
       use usage
       implicit none
-      integer i,nvar
+      integer i,k,nvar
       real*8 mcm1,e
       real*8 xx(*)
       real*8 g(*)
@@ -620,15 +617,14 @@ c
 c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -643,15 +639,14 @@ c
 c     store gradient components to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            g(nvar) = derivs(1,i)
-            nvar = nvar + 1
-            g(nvar) = derivs(2,i)
-            nvar = nvar + 1
-            g(nvar) = derivs(3,i)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         g(nvar) = derivs(1,k)
+         nvar = nvar + 1
+         g(nvar) = derivs(2,k)
+         nvar = nvar + 1
+         g(nvar) = derivs(3,k)
       end do
 c
 c     perform deallocation of some local arrays
@@ -693,15 +688,14 @@ c     convert optimization parameters to atomic coordinates
 c
       if (mode .eq. 'NONE')  return
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
 c
 c     compute and store the Hessian elements
@@ -745,15 +739,14 @@ c
 c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            xx(nvar) = x(i)
-            nvar = nvar + 1
-            xx(nvar) = y(i)
-            nvar = nvar + 1
-            xx(nvar) = z(i)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k)
+         nvar = nvar + 1
+         xx(nvar) = y(k)
+         nvar = nvar + 1
+         xx(nvar) = z(k)
       end do
 c
 c     perform deallocation of some local arrays

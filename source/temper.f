@@ -79,12 +79,11 @@ c
                end do
             end do
          else
-            do i = 1, n
-               if (use(i)) then
-                  do j = 1, 3
-                     v(j,i) = scale * v(j,i)
-                  end do
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               do j = 1, 3
+                  v(j,k) = scale * v(j,k)
+               end do
             end do
          end if
 c
@@ -112,12 +111,11 @@ c
                end do
             end do
          else
-            do i = 1, n
-               if (use(i)) then
-                  do j = 1, 3
-                     v(j,i) = scale * v(j,i)
-                  end do
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               do j = 1, 3
+                  v(j,k) = scale * v(j,k)
+               end do
             end do
          end if
 c
@@ -154,15 +152,14 @@ c
             end do
          else
             rate = rate / dble(nuse)**(2.0d0/3.0d0)
-            do i = 1, n
-               if (use(i)) then
-                  trial = random ()
-                  if (trial .lt. rate) then
-                     speed = sqrt(kt/mass(i))
-                     do j = 1, 3
-                        v(j,i) = speed * normal ()
-                     end do
-                  end if
+            do i = 1, nuse
+               k = iuse(i)
+               trial = random ()
+               if (trial .lt. rate) then
+                  speed = sqrt(kt/mass(k))
+                  do j = 1, 3
+                     v(j,k) = speed * normal ()
+                  end do
                end if
             end do
          end if
@@ -219,12 +216,11 @@ c
                end do
             end do
          else
-            do i = 1, n
-               if (use(i)) then
-                  do j = 1, 3
-                     v(j,i) = scale * v(j,i)
-                  end do
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               do j = 1, 3
+                  v(j,k) = scale * v(j,k)
+               end do
             end do
          end if
       end if
@@ -268,7 +264,8 @@ c
       use units
       use usage
       implicit none
-      integer i,j,nc,ns
+      integer i,j,k
+      integer nc,ns
       real*8 dt,dtc,dts
       real*8 dt2,dt4,dt8
       real*8 eksum,ekt
@@ -337,12 +334,11 @@ c
                end do
             end do
          else
-            do i = 1, n
-               if (use(i)) then
-                  do j = 1, 3
-                     v(j,i) = scale * v(j,i)
-                  end do
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               do j = 1, 3
+                  v(j,k) = scale * v(j,k)
+               end do
             end do
          end if
          call kinetic (eksum,ekin,temp)

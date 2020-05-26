@@ -27,7 +27,7 @@ c
       use units
       use usage
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer start,stop
       real*8 eksum,temp
       real*8 weigh
@@ -52,16 +52,15 @@ c
 c     get the total kinetic energy and tensor for atomic sites
 c
       if (integrate .ne. 'RIGIDBODY') then
-         do i = 1, n
-            if (use(i)) then
-               term = 0.5d0 * mass(i) / ekcal
-               do j = 1, 3
-                  do k = 1, 3
-                     value = term * v(j,i) * v(k,i)
-                     ekin(k,j) = ekin(k,j) + value
-                  end do
+         do i = 1, nuse
+            m = iuse(i)
+            term = 0.5d0 * mass(m) / ekcal
+            do j = 1, 3
+               do k = 1, 3
+                  value = term * v(j,m) * v(k,m)
+                  ekin(k,j) = ekin(k,j) + value
                end do
-            end if
+            end do
          end do
          eksum = ekin(1,1) + ekin(2,2) + ekin(3,3)
 c

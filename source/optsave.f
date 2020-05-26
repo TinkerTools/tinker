@@ -77,15 +77,14 @@ c     convert optimization parameters to atomic coordinates
 c
       if (coordtype .eq. 'CARTESIAN') then
          nvar = 0
-         do i = 1, n
-            if (use(i)) then
-               nvar = nvar + 1
-               x(i) = xx(nvar) / scale(nvar)
-               nvar = nvar + 1
-               y(i) = xx(nvar) / scale(nvar)
-               nvar = nvar + 1
-               z(i) = xx(nvar) / scale(nvar)
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            nvar = nvar + 1
+            x(k) = xx(nvar) / scale(nvar)
+            nvar = nvar + 1
+            y(k) = xx(nvar) / scale(nvar)
+            nvar = nvar + 1
+            z(k) = xx(nvar) / scale(nvar)
          end do
          if (use_bounds)  call bounds
       else if (coordtype .eq. 'INTERNAL') then

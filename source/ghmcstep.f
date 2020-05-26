@@ -42,7 +42,7 @@ c
       use usage
       use virial
       implicit none
-      integer i,j
+      integer i,j,k
       integer istep,nrej
       real*8 dt,dt_2
       real*8 epot,etot
@@ -75,12 +75,11 @@ c
 c     evolve velocities according to midpoint Euler for half-step
 c
       call ghmcterm (istep,dt,alpha,beta)
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i)*alpha(j,i) + beta(j,i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            v(j,k) = v(j,k)*alpha(j,k) + beta(j,k)
+         end do
       end do
 c
 c     accumulate the kinetic energy and store the energy values
@@ -100,20 +99,19 @@ c
 c     store the current positions and velocities, find half-step
 c     velocities and full-step positions via Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               vold(j,i) = v(j,i)
-               aalt(j,i) = a(j,i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            x(i) = x(i) + v(1,i)*dt
-            y(i) = y(i) + v(2,i)*dt
-            z(i) = z(i) + v(3,i)*dt
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            vold(j,k) = v(j,k)
+            aalt(j,k) = a(j,k)
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
+         xold(k) = x(k)
+         yold(k) = y(k)
+         zold(k) = z(k)
+         x(k) = x(k) + v(1,k)*dt
+         y(k) = y(k) + v(2,k)*dt
+         z(k) = z(k) + v(3,k)*dt
       end do
 c
 c     get constraint-corrected positions and half-step velocities
@@ -135,13 +133,12 @@ c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
       end do
 c
 c     find the constraint-corrected full-step velocities
@@ -163,28 +160,26 @@ c
          write (iout,10)  ratio
    10    format (' GHMC Step Rejected',6x,'Acceptance Ratio',f8.3)
          epot = epold
-         do i = 1, n
-            if (use(i)) then
-               x(i) = xold(i)
-               y(i) = yold(i)
-               z(i) = zold(i)
-               do j = 1, 3
-                  v(j,i) = -vold(j,i)
-                  a(j,i) = aalt(j,i)
-               end do
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            x(k) = xold(k)
+            y(k) = yold(k)
+            z(k) = zold(k)
+            do j = 1, 3
+               v(j,k) = -vold(j,k)
+               a(j,k) = aalt(j,k)
+            end do
          end do
       end if
 c
 c     evolve velocities according to midpoint Euler for half-step
 c
       call ghmcterm (istep,dt,alpha,beta)
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i)*alpha(j,i) + beta(j,i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            v(j,k) = v(j,k)*alpha(j,k) + beta(j,k)
+         end do
       end do
 c
 c     perform deallocation of some local arrays
@@ -237,7 +232,8 @@ c
       use units
       use usage
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,dt_2,dt_4
       real*8 gamma,sigma
       real*8 normal
@@ -270,16 +266,15 @@ c     get the viscous friction and fluctuation terms for GHMC
 c
       dt_2 = 0.5d0 * dt
       dt_4 = 0.25d0 * dt
-      do i = 1, n
-         if (use(i)) then
-            gamma = dt_4 * fgamma(i) / mass(i)
-            sigma = sqrt(2.0d0*boltzmann*kelvin*fgamma(i))
-            do j = 1, 3
-               alpha(j,i) = (1.0d0-gamma) / (1.0d0+gamma)
-               beta(j,i) = normal() * sqrt(dt_2) * sigma
-     &                        / ((1.0d0+gamma)*mass(i))
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         gamma = dt_4 * fgamma(k) / mass(k)
+         sigma = sqrt(2.0d0*boltzmann*kelvin*fgamma(k))
+         do j = 1, 3
+            alpha(j,k) = (1.0d0-gamma) / (1.0d0+gamma)
+            beta(j,k) = normal() * sqrt(dt_2) * sigma
+     &                     / ((1.0d0+gamma)*mass(k))
+         end do
       end do
       return
       end

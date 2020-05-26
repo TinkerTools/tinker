@@ -34,7 +34,8 @@ c
       use limits
       use potent
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       integer nrattle
       real*8 dt,dtr
       real*8 dt_2,dt_4
@@ -73,12 +74,11 @@ c
 c
 c     find half-step velocities via the Verlet recursion
 c 
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do 
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do 
       end do
 c
 c     find the constraint-corrected full-step velocities
@@ -88,15 +88,14 @@ c
 c     take an A step
 c
       do j = 1, nrattle
-         do i = 1, n
-            if (use(i)) then 
-               xold(i) = x(i)
-               yold(i) = y(i)
-               zold(i) = z(i)
-               x(i) = x(i) + v(1,i)*dtr
-               y(i) = y(i) + v(2,i)*dtr
-               z(i) = z(i) + v(3,i)*dtr
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+            x(k) = x(k) + v(1,k)*dtr
+            y(k) = y(k) + v(2,k)*dtr
+            z(k) = z(k) + v(3,k)*dtr
          end do
          if (use_rattle)  call rattle (dtr,xold,yold,zold)
          if (use_rattle)  call rattle2 (dtr)   
@@ -109,27 +108,25 @@ c
 c     update velocities with frictional and random components
 c
       call oprep (istep,dt,vfric,vrand)
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3 
-               v(j,i) = v(j,i)*vfric(i) + vrand(j,i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3 
+            v(j,k) = v(j,k)*vfric(k) + vrand(j,k)
+         end do
       end do
       if (use_rattle)  call rattle2 (dt)
 c
 c     take an A step
 c
       do j = 1, nrattle
-         do i = 1, n
-            if (use(i)) then 
-               xold(i) = x(i)
-               yold(i) = y(i)
-               zold(i) = z(i)
-               x(i) = x(i) + v(1,i)*dtr
-               y(i) = y(i) + v(2,i)*dtr
-               z(i) = z(i) + v(3,i)*dtr
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+            x(k) = x(k) + v(1,k)*dtr
+            y(k) = y(k) + v(2,k)*dtr
+            z(k) = z(k) + v(3,k)*dtr
          end do
          if (use_rattle)  call rattle (dtr,xold,yold,zold)
          if (use_rattle)  call rattle2 (dtr)   
@@ -142,13 +139,12 @@ c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
       end do 
 c
 c     perform deallocation of some local arrays
@@ -202,7 +198,8 @@ c
       use units
       use usage
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,ktm
       real*8 egdt,normal
       real*8 vsig,vnorm
@@ -226,16 +223,15 @@ c
 c     get the frictional and random terms for a BAOAB step
 c
       egdt = exp(-(friction * dt))
-      do i = 1, n
-         if (use(i)) then
-            vfric(i) = egdt 
-            ktm = boltzmann * kelvin / mass(i) 
-            vsig = sqrt(ktm*(1.0 - egdt*egdt))
-            do j = 1, 3 
-               vnorm = normal () 
-               vrand(j,i) = vsig * vnorm
-            end do 
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         vfric(k) = egdt 
+         ktm = boltzmann * kelvin / mass(k) 
+         vsig = sqrt(ktm*(1.0-egdt*egdt))
+         do j = 1, 3 
+            vnorm = normal () 
+            vrand(j,k) = vsig * vnorm
+         end do 
       end do
       return
       end

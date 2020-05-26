@@ -275,15 +275,14 @@ c
                   end do
                end do
             else
-               do i = 1, n
-                  if (use(i)) then
-                     x(i) = x(i) * scale
-                     y(i) = y(i) * scale
-                     z(i) = z(i) * scale
-                     v(1,i) = v(1,i) / scale
-                     v(2,i) = v(2,i) / scale
-                     v(3,i) = v(3,i) / scale
-                  end if
+               do i = 1, nuse
+                  k = iuse(i)
+                  x(k) = x(k) * scale
+                  y(k) = y(k) * scale
+                  z(k) = z(k) * scale
+                  v(1,k) = v(1,k) / scale
+                  v(2,k) = v(2,k) / scale
+                  v(3,k) = v(3,k) / scale
                end do
             end if
 c
@@ -459,21 +458,20 @@ c
                   end do
                end do
             else
-               do i = 1, n
-                  if (use(i)) then
-                     x(i) = x(i)*ascale(1,1) + y(i)*ascale(1,2)
-     &                         + z(i)*ascale(1,3)
-                     y(i) = x(i)*ascale(2,1) + y(i)*ascale(2,2)
-     &                         + z(i)*ascale(2,3)
-                     z(i) = x(i)*ascale(3,1) + y(i)*ascale(3,2)
-     &                         + z(i)*ascale(3,3)
-                     v(1,i) = v(1,i)/ascale(1,1) + v(2,i)/ascale(1,2)
-     &                           + v(3,i)/ascale(1,3)
-                     v(2,i) = v(1,i)/ascale(2,1) + v(2,i)/ascale(2,2)
-     &                           + v(3,i)/ascale(2,3)
-                     v(3,i) = v(1,i)/ascale(3,1) + v(2,i)/ascale(3,2)
-     &                           + v(3,i)/ascale(3,3)
-                  end if
+               do i = 1, nuse
+                  k = iuse(i)
+                  x(k) = x(k)*ascale(1,1) + y(k)*ascale(1,2)
+     &                      + z(k)*ascale(1,3)
+                  y(k) = x(k)*ascale(2,1) + y(k)*ascale(2,2)
+     &                      + z(k)*ascale(2,3)
+                  z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
+     &                      + z(k)*ascale(3,3)
+                  v(1,k) = v(1,k)/ascale(1,1) + v(2,k)/ascale(1,2)
+     &                        + v(3,k)/ascale(1,3)
+                  v(2,k) = v(1,k)/ascale(2,1) + v(2,k)/ascale(2,2)
+     &                        + v(3,k)/ascale(2,3)
+                  v(3,k) = v(1,k)/ascale(3,1) + v(2,k)/ascale(3,2)
+     &                        + v(3,k)/ascale(3,3)
                end do
             end if
          end if
@@ -498,13 +496,12 @@ c
 c     alternatively get the kinetic energy change from velocities
 c
          dkin = 0.0d0
-         do i = 1, n
-            if (use(i)) then
-               term = 1.5d0 * mass(i) / ekcal
-               do j = 1, 3
-                  dkin = dkin + term*(v(j,i)**2-vold(j,i)**2)
-               end do
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            term = 1.5d0 * mass(k) / ekcal
+            do j = 1, 3
+               dkin = dkin + term*(v(j,k)**2-vold(j,k)**2)
+            end do
          end do
          if (integrate .eq. 'RIGIDBODY') then
             dkin = dkin * dble(ngrp)/dble(nuse)
@@ -626,12 +623,11 @@ c
 c     couple to pressure bath via atom scaling in Cartesian space
 c
          if (integrate .ne. 'RIGIDBODY') then
-            do i = 1, n
-               if (use(i)) then
-                  x(i) = x(i) * scale
-                  y(i) = y(i) * scale
-                  z(i) = z(i) * scale
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               x(k) = x(k) * scale
+               y(k) = y(k) * scale
+               z(k) = z(k) * scale
             end do
 c
 c     couple to pressure bath via center of mass of rigid bodies
@@ -722,15 +718,14 @@ c
 c     couple to pressure bath via atom scaling in Cartesian space
 c
          if (integrate .ne. 'RIGIDBODY') then
-            do i = 1, n
-               if (use(i)) then
-                  x(i) = ascale(1,1)*x(i) + ascale(1,2)*y(i)
-     &                      + ascale(1,3)*z(i)
-                  y(i) = ascale(2,1)*x(i) + ascale(2,2)*y(i)
-     &                      + ascale(2,3)*z(i)
-                  z(i) = ascale(3,1)*x(i) + ascale(3,2)*y(i)
-     &                      + ascale(3,3)*z(i)
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               x(k) = x(k)*ascale(1,1) + y(k)*ascale(1,2)
+     &                   + z(k)*ascale(1,3)
+               y(k) = x(k)*ascale(2,1) + y(k)*ascale(2,2)
+     &                   + z(k)*ascale(2,3)
+               z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
+     &                   + z(k)*ascale(3,3)
             end do
 c
 c     couple to pressure bath via center of mass of rigid bodies
@@ -755,12 +750,12 @@ c
                xcm = xcm / grpmass(i)
                ycm = ycm / grpmass(i)
                zcm = zcm / grpmass(i)
-               xmove = ascale(1,1)*xcm + ascale(1,2)*ycm
-     &                    + ascale(1,3)*zcm
-               ymove = ascale(2,1)*xcm + ascale(2,2)*ycm
-     &                    + ascale(2,3)*zcm
-               zmove = ascale(3,1)*xcm + ascale(3,2)*ycm
-     &                    + ascale(3,3)*zcm
+               xmove = xcm*ascale(1,1) + ycm*ascale(1,2)
+     &                    + zcm*ascale(1,3)
+               ymove = xcm*ascale(2,1) + ycm*ascale(2,2)
+     &                    + zcm*ascale(2,3)
+               zmove = xcm*ascale(3,1) + ycm*ascale(3,2)
+     &                    + zcm*ascale(3,3)
                do j = start, stop
                   k = kgrp(j)
                   x(k) = x(k) + xmove
