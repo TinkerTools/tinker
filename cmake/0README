@@ -10,9 +10,11 @@
 
          To build with "cmake" issue the following commands:
 
-               (1) cp CMakeLists.txt path/to/tinker/source
-               (2) cmake path/to/tinker/source
-               (3) cd path/to/tinker/source
-               (4) make -j
+         sudo apt-get install libfftw3-dev
+
+               (1) cd Tinker && cp cmake/CMakeLists.txt ./source
+               (2) mkdir build && cd build
+               (3) cmake ../source
+               (4) make -j4
                (5) make install
 
