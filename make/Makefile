@@ -68,6 +68,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 #F77 = gfortran
 #F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
@@ -85,6 +86,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 F77 = gfortran
 F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
 OPTFLAGS = -Ofast -mssse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
@@ -102,6 +104,7 @@ RENAME = rename_bin
 
 #F77 = gfortran
 #F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 #LIBS = 
@@ -790,7 +793,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${FFTW_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${LIBS} ${FFTW_LIBS}; strip $@
 
 all: ${EXEFILES}
 

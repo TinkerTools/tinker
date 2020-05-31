@@ -62,26 +62,18 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 FFEDIR = $(BUILDDIR)/ffe
 
-##  For MacOS Only
+##  For MacOS
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 
-##  For Linux Only (Ubuntu, Java 8)
+##  For Linux (JDK 1.8.0_112 installed in /usr/lib/jvm)
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-#		-I/usr/lib/jvm/java-8-oracle/include \
-#		-I/usr/lib/jvm/java-8-oracle/include/linux \
-#		-I/usr/lib/jvm/java-8-oracle/lib/amd64/server
-#JAVA_LIBDIR = -L/usr/lib/jvm/java-8-oracle/jre/lib/amd64/server
+#		-I/usr/lib/jvm/jdk1.8.0_112/include \
+#		-I/usr/lib/jvm/jdk1.8.0_112/include/linux \
+#		-I/usr/lib/jvm/jdk1.8.0_112/lib/amd64/server
+#JAVA_LIBDIR = -L/usr/lib/jvm/jdk1.8.0_112/jre/lib/amd64/server
 #JAVA_LIBS = -ljvm
 
-##  For Linux Only (RHEL & CentOS)
-#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-#		-I/usr/java/default/include \
-#		-I/usr/java/default/include/linux \
-#		-I/usr/java/default/lib/amd64/server
-#JAVA_LIBDIR = -L/usr/java/default/jre/lib/amd64/server
-#JAVA_LIBS = -ljvm
-
-##  For Windows Only (Windows 10, JDK 1.8.0_112)
+##  For Windows (JDK 1.8.0_112 installed in C:\Program Files\Java)
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
 #		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
@@ -104,6 +96,7 @@ JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
 #F77 = gfortran
 #CCFLAGS = -c
 #F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
@@ -123,6 +116,7 @@ CC = gcc
 F77 = gfortran
 CCFLAGS = -c
 F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
 OPTFLAGS = -Ofast -mssse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
@@ -143,6 +137,7 @@ RENAME = rename_bin
 #F77 = gfortran
 #CCFLAGS = -c
 #F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 #LIBS = -lstdc++ -lwsock32
@@ -824,7 +819,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${FFTW_LIBDIR} ${APBS_LIBDIR} ${LIBDIR} $^ ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
 
 all: ${EXEFILES}
 
