@@ -32,6 +32,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 bnds
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 bound.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 boxes.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 cell.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 cflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 charge.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 chgpen.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 chgpot.f
@@ -71,6 +72,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kang
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kantor.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 katoms.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kbonds.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kcflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kchrge.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kcpen.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kctrn.f
@@ -181,6 +183,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 zcoo
 #
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 active.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 alchemy.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 alterchg.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 analysis.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 analyze.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 angles.f
@@ -215,6 +218,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 crys
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 cspline.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 cutoffs.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 damping.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 dcflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 deflate.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 delete.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 diagq.f
@@ -409,6 +413,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kang
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 katom.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kbond.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kcharge.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kchgflx.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kchgtrn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kdipole.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kdisp.f

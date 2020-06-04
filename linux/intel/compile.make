@@ -32,6 +32,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bndstr.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bound.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp boxes.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cell.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cflux.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp charge.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgpen.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgpot.f
@@ -71,6 +72,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kantor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katoms.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbonds.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcflux.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchrge.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcpen.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kctrn.f
@@ -181,6 +183,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp zcoord.f
 #
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp active.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alchemy.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alterchg.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analysis.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analyze.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angles.f
@@ -215,6 +218,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp crystal.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cspline.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cutoffs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp damping.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dcflux.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp deflate.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp delete.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp diagq.f
@@ -409,6 +413,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangtor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katom.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbond.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcharge.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchgflx.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchgtrn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdipole.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdisp.f

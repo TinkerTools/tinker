@@ -32,6 +32,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp bound.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp boxes.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp cell.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp cflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp charge.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp chgpen.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp chgpot.f
@@ -71,6 +72,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kantor.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp katoms.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kbonds.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kcflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kchrge.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kcpen.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kctrn.f
@@ -181,6 +183,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 #
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp active.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp alchemy.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp alterchg.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp analysis.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp analyze.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp angles.f
@@ -215,6 +218,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp cspline.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp cutoffs.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp damping.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp dcflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp deflate.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp delete.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp diagq.f
@@ -409,6 +413,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp katom.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kbond.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kcharge.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kchgflx.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kchgtrn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kdipole.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp kdisp.f

@@ -520,8 +520,8 @@ c     store the potential at each site for use in charge flux
 c
                if (use_chgflx) then
                   if (use_thole) then
-                     poti = -2.0d0 * ukr * psr3
-                     potk = 2.0d0 * uir * psr3
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
                   else if (use_chgpen) then
                      poti = -ukr * dsr3i
                      potk = uir * dsr3k
@@ -1597,8 +1597,8 @@ c     store the potential at each site for use in charge flux
 c
                if (use_chgflx) then
                   if (use_thole) then
-                     poti = -2.0d0 * ukr * psr3
-                     potk = 2.0d0 * uir * psr3
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
                   else if (use_chgpen) then
                      poti = -ukr * dsr3i
                      potk = uir * dsr3k
@@ -2987,8 +2987,8 @@ c     store the potential at each site for use in charge flux
 c
                if (use_chgflx) then
                   if (use_thole) then
-                     poti = -2.0d0 * ukr * psr3
-                     potk = 2.0d0 * uir * psr3
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
                   else if (use_chgpen) then
                      poti = -ukr * dsr3i
                      potk = uir * dsr3k
@@ -4614,8 +4614,8 @@ c     store the potential at each site for use in charge flux
 c
                if (use_chgflx) then
                   if (use_thole) then
-                     poti = -2.0d0 * ukr * psr3
-                     potk = 2.0d0 * uir * psr3
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
                   else if (use_chgpen) then
                      poti = -2.0d0 * ukr * rr3i
                      potk = 2.0d0 * uir * rr3k
@@ -5803,8 +5803,8 @@ c     store the potential at each site for use in charge flux
 c
                if (use_chgflx) then
                   if (use_thole) then
-                     poti = -2.0d0 * ukr * psr3
-                     potk = 2.0d0 * uir * psr3
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
                   else if (use_chgpen) then
                      poti = -2.0d0 * ukr * rr3i
                      potk = 2.0d0 * uir * rr3k
@@ -7524,8 +7524,8 @@ c     store the potential at each site for use in charge flux
 c
                if (use_chgflx) then
                   if (use_thole) then
-                     poti = -2.0d0 * ukr * psr3
-                     potk = 2.0d0 * uir * psr3
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
                   else if (use_chgpen) then
                      poti = -2.0d0 * ukr * rr3i
                      potk = 2.0d0 * uir * rr3k

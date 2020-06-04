@@ -1,6 +1,7 @@
 action.obj
 active.obj
 align.obj
+alterchg.obj
 analysis.obj
 analyz.obj
 angang.obj
@@ -32,6 +33,7 @@ bussi.obj
 calendar.obj
 cell.obj
 center.obj
+cflux.obj
 charge.obj
 chgpen.obj
 chgpot.obj
@@ -54,6 +56,7 @@ cspline.obj
 ctrpot.obj
 cutoffs.obj
 damping.obj
+dcflux.obj
 deflate.obj
 delete.obj
 deriv.obj
@@ -271,7 +274,9 @@ katom.obj
 katoms.obj
 kbond.obj
 kbonds.obj
+kcflux.obj
 kcharge.obj
+kchgflx.obj
 kchgtrn.obj
 kchrge.obj
 kcpen.obj

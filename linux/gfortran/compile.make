@@ -32,6 +32,7 @@ gfortran -c -Ofast -mavx -fopenmp bndstr.f
 gfortran -c -Ofast -mavx -fopenmp bound.f
 gfortran -c -Ofast -mavx -fopenmp boxes.f
 gfortran -c -Ofast -mavx -fopenmp cell.f
+gfortran -c -Ofast -mavx -fopenmp cflux.f
 gfortran -c -Ofast -mavx -fopenmp charge.f
 gfortran -c -Ofast -mavx -fopenmp chgpen.f
 gfortran -c -Ofast -mavx -fopenmp chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -Ofast -mavx -fopenmp kangs.f
 gfortran -c -Ofast -mavx -fopenmp kantor.f
 gfortran -c -Ofast -mavx -fopenmp katoms.f
 gfortran -c -Ofast -mavx -fopenmp kbonds.f
+gfortran -c -Ofast -mavx -fopenmp kcflux.f
 gfortran -c -Ofast -mavx -fopenmp kchrge.f
 gfortran -c -Ofast -mavx -fopenmp kcpen.f
 gfortran -c -Ofast -mavx -fopenmp kctrn.f
@@ -181,6 +183,7 @@ gfortran -c -Ofast -mavx -fopenmp zcoord.f
 #
 gfortran -c -Ofast -mavx -fopenmp active.f
 gfortran -c -Ofast -mavx -fopenmp alchemy.f
+gfortran -c -Ofast -mavx -fopenmp alterchg.f
 gfortran -c -Ofast -mavx -fopenmp analysis.f
 gfortran -c -Ofast -mavx -fopenmp analyze.f
 gfortran -c -Ofast -mavx -fopenmp angles.f
@@ -215,6 +218,7 @@ gfortran -c -Ofast -mavx -fopenmp crystal.f
 gfortran -c -Ofast -mavx -fopenmp cspline.f
 gfortran -c -Ofast -mavx -fopenmp cutoffs.f
 gfortran -c -Ofast -mavx -fopenmp damping.f
+gfortran -c -Ofast -mavx -fopenmp dcflux.f
 gfortran -c -Ofast -mavx -fopenmp deflate.f
 gfortran -c -Ofast -mavx -fopenmp delete.f
 gfortran -c -Ofast -mavx -fopenmp diagq.f
@@ -409,6 +413,7 @@ gfortran -c -Ofast -mavx -fopenmp kangtor.f
 gfortran -c -Ofast -mavx -fopenmp katom.f
 gfortran -c -Ofast -mavx -fopenmp kbond.f
 gfortran -c -Ofast -mavx -fopenmp kcharge.f
+gfortran -c -Ofast -mavx -fopenmp kchgflx.f
 gfortran -c -Ofast -mavx -fopenmp kchgtrn.f
 gfortran -c -Ofast -mavx -fopenmp kdipole.f
 gfortran -c -Ofast -mavx -fopenmp kdisp.f

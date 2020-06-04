@@ -32,6 +32,7 @@ gfortran -c -Wall bndstr.f
 gfortran -c -Wall bound.f
 gfortran -c -Wall boxes.f
 gfortran -c -Wall cell.f
+gfortran -c -Wall cflux.f
 gfortran -c -Wall charge.f
 gfortran -c -Wall chgpen.f
 gfortran -c -Wall chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -Wall kangs.f
 gfortran -c -Wall kantor.f
 gfortran -c -Wall katoms.f
 gfortran -c -Wall kbonds.f
+gfortran -c -Wall kcflux.f
 gfortran -c -Wall kchrge.f
 gfortran -c -Wall kcpen.f
 gfortran -c -Wall kctrn.f
@@ -181,6 +183,7 @@ gfortran -c -Wall zcoord.f
 #
 gfortran -c -Wall active.f
 gfortran -c -Wall alchemy.f
+gfortran -c -Wall alterchg.f
 gfortran -c -Wall analysis.f
 gfortran -c -Wall analyze.f
 gfortran -c -Wall angles.f
@@ -215,6 +218,7 @@ gfortran -c -Wall crystal.f
 gfortran -c -Wall cspline.f
 gfortran -c -Wall cutoffs.f
 gfortran -c -Wall damping.f
+gfortran -c -Wall dcflux.f
 gfortran -c -Wall deflate.f
 gfortran -c -Wall delete.f
 gfortran -c -Wall diagq.f
@@ -409,6 +413,7 @@ gfortran -c -Wall kangtor.f
 gfortran -c -Wall katom.f
 gfortran -c -Wall kbond.f
 gfortran -c -Wall kcharge.f
+gfortran -c -Wall kchgflx.f
 gfortran -c -Wall kchgtrn.f
 gfortran -c -Wall kdipole.f
 gfortran -c -Wall kdisp.f

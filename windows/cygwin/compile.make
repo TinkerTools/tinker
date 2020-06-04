@@ -32,6 +32,7 @@ gfortran -c -O3 -ffast-math -fopenmp bndstr.f
 gfortran -c -O3 -ffast-math -fopenmp bound.f
 gfortran -c -O3 -ffast-math -fopenmp boxes.f
 gfortran -c -O3 -ffast-math -fopenmp cell.f
+gfortran -c -O3 -ffast-math -fopenmp cflux.f
 gfortran -c -O3 -ffast-math -fopenmp charge.f
 gfortran -c -O3 -ffast-math -fopenmp chgpen.f
 gfortran -c -O3 -ffast-math -fopenmp chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -O3 -ffast-math -fopenmp kangs.f
 gfortran -c -O3 -ffast-math -fopenmp kantor.f
 gfortran -c -O3 -ffast-math -fopenmp katoms.f
 gfortran -c -O3 -ffast-math -fopenmp kbonds.f
+gfortran -c -O3 -ffast-math -fopenmp kcflux.f
 gfortran -c -O3 -ffast-math -fopenmp kchrge.f
 gfortran -c -O3 -ffast-math -fopenmp kcpen.f
 gfortran -c -O3 -ffast-math -fopenmp kctrn.f
@@ -181,6 +183,7 @@ gfortran -c -O3 -ffast-math -fopenmp zcoord.f
 #
 gfortran -c -O3 -ffast-math -fopenmp active.f
 gfortran -c -O3 -ffast-math -fopenmp alchemy.f
+gfortran -c -O3 -ffast-math -fopenmp alterchg.f
 gfortran -c -O3 -ffast-math -fopenmp analysis.f
 gfortran -c -O3 -ffast-math -fopenmp analyze.f
 gfortran -c -O3 -ffast-math -fopenmp angles.f
@@ -215,6 +218,7 @@ gfortran -c -O3 -ffast-math -fopenmp crystal.f
 gfortran -c -O3 -ffast-math -fopenmp cspline.f
 gfortran -c -O3 -ffast-math -fopenmp cutoffs.f
 gfortran -c -O3 -ffast-math -fopenmp damping.f
+gfortran -c -O3 -ffast-math -fopenmp dcflux.f
 gfortran -c -O3 -ffast-math -fopenmp deflate.f
 gfortran -c -O3 -ffast-math -fopenmp delete.f
 gfortran -c -O3 -ffast-math -fopenmp diagq.f
@@ -409,6 +413,7 @@ gfortran -c -O3 -ffast-math -fopenmp kangtor.f
 gfortran -c -O3 -ffast-math -fopenmp katom.f
 gfortran -c -O3 -ffast-math -fopenmp kbond.f
 gfortran -c -O3 -ffast-math -fopenmp kcharge.f
+gfortran -c -O3 -ffast-math -fopenmp kchgflx.f
 gfortran -c -O3 -ffast-math -fopenmp kchgtrn.f
 gfortran -c -O3 -ffast-math -fopenmp kdipole.f
 gfortran -c -O3 -ffast-math -fopenmp kdisp.f

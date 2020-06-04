@@ -33,6 +33,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp bndstr.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp bound.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp boxes.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cell.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cflux.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp charge.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chgpen.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chgpot.f
@@ -72,6 +73,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kangs.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kantor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp katoms.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kbonds.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kcflux.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kchrge.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kcpen.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kctrn.f
@@ -182,6 +184,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp zcoord.f
 #
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp active.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp alchemy.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp alterchg.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp analysis.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp analyze.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp angles.f
@@ -216,6 +219,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp crystal.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cspline.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cutoffs.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp damping.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp dcflux.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp deflate.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp delete.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp diagq.f
@@ -410,6 +414,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kangtor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp katom.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kbond.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kcharge.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kchgflx.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kchgtrn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kdipole.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kdisp.f

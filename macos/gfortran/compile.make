@@ -32,6 +32,7 @@ gfortran -c -Ofast -mssse3 -fopenmp bndstr.f
 gfortran -c -Ofast -mssse3 -fopenmp bound.f
 gfortran -c -Ofast -mssse3 -fopenmp boxes.f
 gfortran -c -Ofast -mssse3 -fopenmp cell.f
+gfortran -c -Ofast -mssse3 -fopenmp cflux.f
 gfortran -c -Ofast -mssse3 -fopenmp charge.f
 gfortran -c -Ofast -mssse3 -fopenmp chgpen.f
 gfortran -c -Ofast -mssse3 -fopenmp chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -Ofast -mssse3 -fopenmp kangs.f
 gfortran -c -Ofast -mssse3 -fopenmp kantor.f
 gfortran -c -Ofast -mssse3 -fopenmp katoms.f
 gfortran -c -Ofast -mssse3 -fopenmp kbonds.f
+gfortran -c -Ofast -mssse3 -fopenmp kcflux.f
 gfortran -c -Ofast -mssse3 -fopenmp kchrge.f
 gfortran -c -Ofast -mssse3 -fopenmp kcpen.f
 gfortran -c -Ofast -mssse3 -fopenmp kctrn.f
@@ -181,6 +183,7 @@ gfortran -c -Ofast -mssse3 -fopenmp zcoord.f
 #
 gfortran -c -Ofast -mssse3 -fopenmp active.f
 gfortran -c -Ofast -mssse3 -fopenmp alchemy.f
+gfortran -c -Ofast -mssse3 -fopenmp alterchg.f
 gfortran -c -Ofast -mssse3 -fopenmp analysis.f
 gfortran -c -Ofast -mssse3 -fopenmp analyze.f
 gfortran -c -Ofast -mssse3 -fopenmp angles.f
@@ -215,6 +218,7 @@ gfortran -c -Ofast -mssse3 -fopenmp crystal.f
 gfortran -c -Ofast -mssse3 -fopenmp cspline.f
 gfortran -c -Ofast -mssse3 -fopenmp cutoffs.f
 gfortran -c -Ofast -mssse3 -fopenmp damping.f
+gfortran -c -Ofast -mssse3 -fopenmp dcflux.f
 gfortran -c -Ofast -mssse3 -fopenmp deflate.f
 gfortran -c -Ofast -mssse3 -fopenmp delete.f
 gfortran -c -Ofast -mssse3 -fopenmp diagq.f
@@ -409,6 +413,7 @@ gfortran -c -Ofast -mssse3 -fopenmp kangtor.f
 gfortran -c -Ofast -mssse3 -fopenmp katom.f
 gfortran -c -Ofast -mssse3 -fopenmp kbond.f
 gfortran -c -Ofast -mssse3 -fopenmp kcharge.f
+gfortran -c -Ofast -mssse3 -fopenmp kchgflx.f
 gfortran -c -Ofast -mssse3 -fopenmp kchgtrn.f
 gfortran -c -Ofast -mssse3 -fopenmp kdipole.f
 gfortran -c -Ofast -mssse3 -fopenmp kdisp.f

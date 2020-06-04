@@ -12,6 +12,7 @@ ar -crusv libtinker.a \
 action.o \
 active.o \
 align.o \
+alterchg.o \
 analysis.o \
 analyz.o \
 angang.o \
@@ -43,6 +44,7 @@ bussi.o \
 calendar.o \
 cell.o \
 center.o \
+cflux.o \
 charge.o \
 chgpen.o \
 chgpot.o \
@@ -65,6 +67,7 @@ cspline.o \
 ctrpot.o \
 cutoffs.o \
 damping.o \
+dcflux.o \
 deflate.o \
 delete.o \
 deriv.o \
@@ -282,7 +285,9 @@ katom.o \
 katoms.o \
 kbond.o \
 kbonds.o \
+kcflux.o \
 kcharge.o \
+kchgflx.o \
 kchgtrn.o \
 kchrge.o \
 kcpen.o \

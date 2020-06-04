@@ -32,6 +32,7 @@ ifort -c -g -warn all -check all bndstr.f
 ifort -c -g -warn all -check all bound.f
 ifort -c -g -warn all -check all boxes.f
 ifort -c -g -warn all -check all cell.f
+ifort -c -g -warn all -check all cflux.f
 ifort -c -g -warn all -check all charge.f
 ifort -c -g -warn all -check all chgpen.f
 ifort -c -g -warn all -check all chgpot.f
@@ -71,6 +72,7 @@ ifort -c -g -warn all -check all kangs.f
 ifort -c -g -warn all -check all kantor.f
 ifort -c -g -warn all -check all katoms.f
 ifort -c -g -warn all -check all kbonds.f
+ifort -c -g -warn all -check all kcflux.f
 ifort -c -g -warn all -check all kchrge.f
 ifort -c -g -warn all -check all kcpen.f
 ifort -c -g -warn all -check all kctrn.f
@@ -181,6 +183,7 @@ ifort -c -g -warn all -check all zcoord.f
 #
 ifort -c -g -warn all -check all active.f
 ifort -c -g -warn all -check all alchemy.f
+ifort -c -g -warn all -check all alterchg.f
 ifort -c -g -warn all -check all analysis.f
 ifort -c -g -warn all -check all analyze.f
 ifort -c -g -warn all -check all angles.f
@@ -215,6 +218,7 @@ ifort -c -g -warn all -check all crystal.f
 ifort -c -g -warn all -check all cspline.f
 ifort -c -g -warn all -check all cutoffs.f
 ifort -c -g -warn all -check all damping.f
+ifort -c -g -warn all -check all dcflux.f
 ifort -c -g -warn all -check all deflate.f
 ifort -c -g -warn all -check all delete.f
 ifort -c -g -warn all -check all diagq.f
@@ -409,6 +413,7 @@ ifort -c -g -warn all -check all kangtor.f
 ifort -c -g -warn all -check all katom.f
 ifort -c -g -warn all -check all kbond.f
 ifort -c -g -warn all -check all kcharge.f
+ifort -c -g -warn all -check all kchgflx.f
 ifort -c -g -warn all -check all kchgtrn.f
 ifort -c -g -warn all -check all kdipole.f
 ifort -c -g -warn all -check all kdisp.f
