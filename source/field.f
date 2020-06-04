@@ -49,6 +49,7 @@ c
       use_mpole = .true.
       use_polar = .true.
       use_chgtrn = .true.
+      use_chgflx = .true.
       use_rxnfld = .false.
       use_solv = .true.
       use_metal = .false.

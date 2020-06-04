@@ -72,7 +72,11 @@ c     many implicit solvation models require Born radii
 c
       if (use_born)  call born
 c
-c     alter bond and torsion constants for pisystem
+c     alter partial charges and multipoles for charge flux
+c
+      if (use_chgflx)  call alterchg
+c
+c     modify bond and torsion constants for pisystem
 c
       if (use_orbit)  call picalc
 c

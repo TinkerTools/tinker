@@ -84,15 +84,18 @@ c
       if (allocated(jion))  deallocate (jion)
       if (allocated(kion))  deallocate (kion)
       if (allocated(pchg))  deallocate (pchg)
+      if (allocated(pchg0))  deallocate (pchg0)
       allocate (iion(n))
       allocate (jion(n))
       allocate (kion(n))
       allocate (pchg(n))
+      allocate (pchg0(n))
 c
 c     find and store all the atomic partial charges
 c
       do i = 1, n
          pchg(i) = 0.0d0
+         pchg0(i) = 0.0d0
          it = type(i)
          if (it .ne. 0)  pchg(i) = chg(it)
       end do
@@ -149,6 +152,7 @@ c
             jion(nion) = i
             kion(nion) = i
             pchg(nion) = pchg(i)
+            pchg0(nion) = pchg(i)
             list(i) = nion
          end if
       end do
@@ -213,7 +217,7 @@ c
       integer i,j,k,m
       integer it,kt,bt
       integer ic,kc
-      real*8, allocatable :: pchg0(:)
+      real*8, allocatable :: pbase(:)
       logical emprule
 c
 c
@@ -285,25 +289,25 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (pchg0(n))
+      allocate (pbase(n))
 c
 c     modify MMFF base charges using a bond increment scheme
 c
       do i = 1, n
-         pchg0(i) = pchg(i)
+         pbase(i) = pchg(i)
       end do
       do i = 1, n
          it = type(i)
          ic = class(i)
-         if (pchg0(i).lt.0.0d0 .or. it.eq.162) then
-            pchg(i) = (1.0d0-crd(ic)*fcadj(ic)) * pchg0(i)
+         if (pbase(i).lt.0.0d0 .or. it.eq.162) then
+            pchg(i) = (1.0d0-crd(ic)*fcadj(ic)) * pbase(i)
          end if
          do j = 1, n12(i)
             k = i12(j,i)
             kt = type(k)
             kc = class(k)
-            if (pchg0(k).lt.0.0d0 .or. kt.eq.162) then
-               pchg(i) = pchg(i) + fcadj(kc)*pchg0(k)
+            if (pbase(k).lt.0.0d0 .or. kt.eq.162) then
+               pchg(i) = pchg(i) + fcadj(kc)*pbase(k)
             end if
             bt = 0
             do m = 1, nlignes
@@ -329,11 +333,11 @@ c
          end do
    10    continue
          if (emprule) then
-            pchg(i) = (1.0d0-crd(ic)*fcadj(ic)) * pchg0(i)
+            pchg(i) = (1.0d0-crd(ic)*fcadj(ic)) * pbase(i)
             do j = 1, n12(i)
                k = i12(j,i)
                kc = class(k)
-               pchg(i) = pchg(i) + fcadj(kc)*pchg0(i12(j,i))
+               pchg(i) = pchg(i) + fcadj(kc)*pbase(i12(j,i))
             end do
             do j = 1, n12(i)
                k = i12(j,i)
@@ -366,6 +370,6 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (pchg0)
+      deallocate (pbase)
       return
       end

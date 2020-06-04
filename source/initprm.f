@@ -28,6 +28,7 @@ c
       use kantor
       use katoms
       use kbonds
+      use kcflux
       use kchrge
       use kcpen
       use kctrn
@@ -174,6 +175,12 @@ c
       end do
       do i = 1, maxnmp
          kmp(i) = blank12
+      end do
+      do i = 1, maxnbcf
+         kcfb(i) = blank8
+      end do
+      do i = 1, maxnacf
+         kcfa(i) = blank12
       end do
       do i = 1, maxnpi
          kpi(i) = blank8

@@ -15,6 +15,7 @@ c
 c     ncp       total number of charge penetration sites in system
 c     pcore     number of core electrons at each multipole site
 c     pval      number of valence electrons at each multipole site
+c     pval0     original number of valence electrons for charge flux
 c     palpha    charge penetration damping at each multipole site
 c
 c
@@ -23,6 +24,7 @@ c
       integer ncp
       real*8, allocatable :: pcore(:)
       real*8, allocatable :: pval(:)
+      real*8, allocatable :: pval0(:)
       real*8, allocatable :: palpha(:)
       save
       end

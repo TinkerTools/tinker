@@ -221,6 +221,7 @@ c
       if (allocated(rpole))  deallocate (rpole)
       if (allocated(spole))  deallocate (spole)
       if (allocated(srpole))  deallocate (srpole)
+      if (allocated(srpole))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
       if (allocated(np11))  deallocate (np11)
       if (allocated(np12))  deallocate (np12)
@@ -236,6 +237,7 @@ c
       allocate (rpole(maxpole,n))
       allocate (spole(maxpole,n))
       allocate (srpole(maxpole,n))
+      allocate (mono0(n))
       allocate (polaxe(n))
       allocate (np11(n))
       allocate (np12(n))
@@ -255,6 +257,7 @@ c
          do j = 1, 13
             pole(j,i) = 0.0d0
          end do
+         mono0(i) = 0.0d0
          np11(i) = 0
          np12(i) = 0
          np13(i) = 0
@@ -581,9 +584,11 @@ c     perform dynamic allocation of some global arrays
 c
       if (allocated(pcore))  deallocate (pcore)
       if (allocated(pval))  deallocate (pval)
+      if (allocated(pval0))  deallocate (pval0)
       if (allocated(palpha))  deallocate (palpha)
       allocate (pcore(n))
       allocate (pval(n))
+      allocate (pval0(n))
       allocate (palpha(n))
 c
 c     find new charge penetration parameters in the keyfile
@@ -621,11 +626,13 @@ c
       do i = 1, n
          pcore(i) = 0.0d0
          pval(i) = pole(1,i)
+         pval0(i) = pval(i)
          palpha(i) = 0.0d0
          ic = class(i)
          if (ic .ne. 0) then
             pcore(i) = cpele(ic)
             pval(i) = pole(1,i) - cpele(ic)
+            pval0(i) = pval(i)
             palpha(i) = cpalp(ic)
          end if
       end do
@@ -682,9 +689,11 @@ c
                do j = 1, maxpole
                   pole(j,npole) = pole(j,i)
                end do
+               mono0(npole) = pole(1,i)
                if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
                pcore(npole) = pcore(i)
                pval(npole) = pval(i)
+               pval0(npole) = pval(i)
                palpha(npole) = palpha(i)
             end if
          end do

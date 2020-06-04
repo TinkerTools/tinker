@@ -128,6 +128,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term4k,term5k,term6k
       real*8 term7k,term8k
+      real*8 poti,potk
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
@@ -150,6 +151,10 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       character*6 mode
 c
 c
@@ -187,6 +192,10 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -201,6 +210,10 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
+         decfx(i) = 0.0d0
+         decfy(i) = 0.0d0
+         decfz(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -501,6 +514,20 @@ c
                   dsr3k = 2.0d0 * rr3 * dmpk(3) * dscale(k)
                   dsr5k = 2.0d0 * rr5 * dmpk(5) * dscale(k)
                   dsr7k = 2.0d0 * rr7 * dmpk(7) * dscale(k)
+               end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -2.0d0 * ukr * psr3
+                     potk = 2.0d0 * uir * psr3
+                  else if (use_chgpen) then
+                     poti = -ukr * dsr3i
+                     potk = uir * dsr3k
+                  end if
+                  dpot(i) = dpot(i) + poti 
+                  dpot(k) = dpot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -1566,6 +1593,20 @@ c
                   dsr7k = 2.0d0 * rr7 * dmpk(7) * dscale(k)
                end if
 c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -2.0d0 * ukr * psr3
+                     potk = 2.0d0 * uir * psr3
+                  else if (use_chgpen) then
+                     poti = -ukr * dsr3i
+                     potk = uir * dsr3k
+                  end if
+                  dpot(i) = dpot(i) + poti 
+                  dpot(k) = dpot(k) + potk 
+               end if
+c
 c     get the induced dipole field used for dipole torques
 c
                if (use_thole) then
@@ -2401,6 +2442,39 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dep(1,i) = dep(1,i) + frcx
+            dep(2,i) = dep(2,i) + frcy
+            dep(3,i) = dep(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
@@ -2409,6 +2483,10 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -2501,6 +2579,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term4k,term5k,term6k
       real*8 term7k,term8k
+      real*8 poti,potk
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
@@ -2523,6 +2602,10 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       character*6 mode
 c
 c
@@ -2560,6 +2643,10 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -2574,6 +2661,10 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
+         decfx(i) = 0.0d0
+         decfy(i) = 0.0d0
+         decfz(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2590,11 +2681,12 @@ c
 !$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
 !$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_dirdamp,use_chgpen,use_bounds,off2,f,molcule,optorder,copm,
-!$OMP& uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
-!$OMP& shared (dep,ufld,dufld,vir)
+!$OMP& use_dirdamp,use_chgpen,use_chgflx,use_bounds,off2,f,molcule,
+!$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,
+!$OMP& xaxis,yaxis,zaxis)
+!$OMP& shared (dep,ufld,dufld,dpot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
-!$OMP DO reduction(+:dep,ufld,dufld,vir) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld,dpot,vir) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -2889,6 +2981,20 @@ c
                   dsr3k = 2.0d0 * rr3 * dmpk(3) * dscale(k)
                   dsr5k = 2.0d0 * rr5 * dmpk(5) * dscale(k)
                   dsr7k = 2.0d0 * rr7 * dmpk(7) * dscale(k)
+               end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -2.0d0 * ukr * psr3
+                     potk = 2.0d0 * uir * psr3
+                  else if (use_chgpen) then
+                     poti = -ukr * dsr3i
+                     potk = uir * dsr3k
+                  end if
+                  dpot(i) = dpot(i) + poti 
+                  dpot(k) = dpot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -3718,6 +3824,44 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+!$OMP    DO reduction(+:dep,vir) schedule(guided)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dep(1,i) = dep(1,i) + frcx
+            dep(2,i) = dep(2,i) + frcy
+            dep(3,i) = dep(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+!$OMP    END DO
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
@@ -3728,6 +3872,10 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -4061,6 +4209,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term4k,term5k,term6k
       real*8 term7k,term8k
+      real*8 poti,potk
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
@@ -4086,6 +4235,10 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       character*6 mode
       external erfc
 c
@@ -4098,6 +4251,10 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -4112,6 +4269,10 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
+         decfx(i) = 0.0d0
+         decfy(i) = 0.0d0
+         decfz(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -4447,6 +4608,20 @@ c
                   rr9k = bn(4) - (1.0d0-dscale(k)*dmpk(9))*rr9
                   rr5ik = bn(2) - (1.0d0-wscale(k)*dmpik(5))*rr5
                   rr7ik = bn(3) - (1.0d0-wscale(k)*dmpik(7))*rr7
+               end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -2.0d0 * ukr * psr3
+                     potk = 2.0d0 * uir * psr3
+                  else if (use_chgpen) then
+                     poti = -2.0d0 * ukr * rr3i
+                     potk = 2.0d0 * uir * rr3k
+                  end if
+                  dpot(i) = dpot(i) + poti 
+                  dpot(k) = dpot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -5624,6 +5799,20 @@ c
                   rr7ik = bn(3) - (1.0d0-wscale(k)*dmpik(7))*rr7
                end if
 c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -2.0d0 * ukr * psr3
+                     potk = 2.0d0 * uir * psr3
+                  else if (use_chgpen) then
+                     poti = -2.0d0 * ukr * rr3i
+                     potk = 2.0d0 * uir * rr3k
+                  end if
+                  dpot(i) = dpot(i) + poti 
+                  dpot(k) = dpot(k) + potk 
+               end if
+c
 c     get the induced dipole field used for dipole torques
 c
                if (use_thole) then
@@ -6538,6 +6727,39 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dep(1,i) = dep(1,i) + frcx
+            dep(2,i) = dep(2,i) + frcy
+            dep(3,i) = dep(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
@@ -6546,6 +6768,10 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -6877,6 +7103,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term4k,term5k,term6k
       real*8 term7k,term8k
+      real*8 poti,potk
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 xix,yix,zix
@@ -6902,6 +7129,10 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       character*6 mode
       external erfc
 c
@@ -6914,6 +7145,10 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -6928,6 +7163,10 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
+         decfx(i) = 0.0d0
+         decfy(i) = 0.0d0
+         decfz(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -6944,11 +7183,12 @@ c
 !$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
 !$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_chgpen,use_dirdamp,use_bounds,off2,f,aewald,optorder,copm,
-!$OMP& uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
-!$OMP& shared (dep,ufld,dufld,vir)
+!$OMP& use_chgpen,use_chgflx,use_dirdamp,use_bounds,off2,f,aewald,
+!$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,
+!$OMP& yaxis,zaxis)
+!$OMP& shared (dep,ufld,dufld,dpot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
-!$OMP DO reduction(+:dep,ufld,dufld,vir) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld,dpot,vir) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -7278,6 +7518,20 @@ c
                   rr9k = bn(4) - (1.0d0-dscale(k)*dmpk(9))*rr9
                   rr5ik = bn(2) - (1.0d0-wscale(k)*dmpik(5))*rr5
                   rr7ik = bn(3) - (1.0d0-wscale(k)*dmpik(7))*rr7
+               end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -2.0d0 * ukr * psr3
+                     potk = 2.0d0 * uir * psr3
+                  else if (use_chgpen) then
+                     poti = -2.0d0 * ukr * rr3i
+                     potk = 2.0d0 * uir * rr3k
+                  end if
+                  dpot(i) = dpot(i) + poti 
+                  dpot(k) = dpot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -8184,6 +8438,44 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+!$OMP    DO reduction(+:dep,vir) schedule(guided)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dep(1,i) = dep(1,i) + frcx
+            dep(2,i) = dep(2,i) + frcy
+            dep(3,i) = dep(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+!$OMP    END DO
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
@@ -8194,6 +8486,10 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -8345,11 +8641,13 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
+      real*8 xi,yi,zi
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 frcx,frcy,frcz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -8365,6 +8663,10 @@ c
       real*8, allocatable :: fphidp(:,:)
       real*8, allocatable :: cphidp(:,:)
       real*8, allocatable :: qgrip(:,:,:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
 c
 c     indices into the electrostatic field array
 c
@@ -8980,7 +9282,6 @@ c
       deallocate (fphid)
       deallocate (fphip)
       deallocate (fphidp)
-      deallocate (cphidp)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -9285,6 +9586,51 @@ c
          end do
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      if (use_chgflx) then
+         allocate (dpot(n))
+         allocate (decfx(n))
+         allocate (decfy(n))
+         allocate (decfz(n))
+c
+c     modify the gradient and virial for charge flux
+c
+         do i = 1, n
+            dpot(i) = 0.0d0
+         end do
+         do i = 1, npole
+            ii = ipole(i)
+            dpot(ii) = cphidp(1,i)
+         end do
+         call dcflux (dpot,decfx,decfy,decfz)
+         do i = 1, npole
+            ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
+            frcx = decfx(ii)
+            frcy = decfy(ii)
+            frcz = decfz(ii)
+            dep(1,ii) = dep(1,ii) + frcx
+            dep(2,ii) = dep(2,ii) + frcy
+            dep(3,ii) = dep(3,ii) + frcz
+            vxx = vxx + xi*frcx
+            vxy = vxy + yi*frcx
+            vxz = vxz + zi*frcx
+            vyy = vyy + yi*frcy
+            vyz = vyz + zi*frcy
+            vzz = vzz + zi*frcz
+         end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (dpot)
+         deallocate (decfx)
+         deallocate (decfy)
+         deallocate (decfz)
+      end if
+c
 c     increment the total internal virial tensor components
 c
       vir(1,1) = vir(1,1) + vxx
@@ -9299,6 +9645,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (cphidp)
       deallocate (qgrip)
       return
       end

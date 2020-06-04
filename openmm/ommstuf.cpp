@@ -656,6 +656,7 @@ struct {
    int use_mpole;
    int use_polar;
    int use_chgtrn;
+   int use_chgflx;
    int use_rxnfld;
    int use_solv;
    int use_metal;
@@ -1594,9 +1595,10 @@ void set_potent_data_ (int* use_bond, int* use_angle, int* use_strbnd,
                        int* use_angtor, int* use_tortor, int* use_vdw,
                        int* use_repuls, int* use_disp, int* use_charge,
                        int* use_chgdpl, int* use_dipole, int* use_mpole,
-                       int* use_polar, int* use_chgtrn, int* use_rxnfld,
-                       int* use_solv, int* use_metal, int* use_geom,
-                       int* use_extra, int* use_born, int* use_orbit) {
+                       int* use_polar, int* use_chgtrn, int* use_chgtrn,
+                       int* use_rxnfld, int* use_solv, int* use_metal,
+                       int* use_geom, int* use_extra, int* use_born,
+                       int* use_orbit) {
 
    potent__.use_bond = *use_bond;
    potent__.use_angle = *use_angle;
@@ -1621,6 +1623,7 @@ void set_potent_data_ (int* use_bond, int* use_angle, int* use_strbnd,
    potent__.use_mpole = *use_mpole;
    potent__.use_polar = *use_polar;
    potent__.use_chgtrn = *use_chgtrn;
+   potent__.use_chgflx = *use_chgflx;
    potent__.use_rxnfld = *use_rxnfld;
    potent__.use_solv = *use_solv;
    potent__.use_metal = *use_metal;

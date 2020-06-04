@@ -102,6 +102,7 @@ c
       call kmpole
       call kpolar
       call kchgtrn
+      call kchgflx
 c
 c     assign solvation, metal, pisystem and restraint parameters
 c

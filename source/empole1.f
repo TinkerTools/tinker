@@ -63,6 +63,7 @@ c
       use group
       use mplpot
       use mpole
+      use potent
       use shunt
       use usage
       use virial
@@ -117,6 +118,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
+      real*8 poti,potk
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -126,6 +128,10 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -152,14 +158,19 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
-c     initialize connected atom scaling and torque arrays
+c     initialize scaling, torque and potential arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -379,7 +390,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates and energy value
 c
@@ -400,10 +410,30 @@ c
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
-                  term4 = 2.0d0 * (-ck*rr5+dkr*rr7-qkr*rr9)
-                  term5 = 2.0d0 * (-ci*rr5-dir*rr7-qir*rr9)
+                  term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
+                  term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
                end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*dmpi(1) + valk*dmpik(1) 
+                     term1k = corei*dmpk(1) + vali*dmpik(1) 
+                     term2i = -dkr * dmpik(3)
+                     term2k = dir * dmpik(3)
+                     term3i = qkr * dmpik(5)
+                     term3k = qir * dmpik(5)
+                     poti = term1i*rr1 + term2i*rr3 + term3i*rr5
+                     potk = term1k*rr1 + term2k*rr3 + term3k*rr5
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  dpot(i) = dpot(i) + poti
+                  dpot(k) = dpot(k) + potk
+               end if 
 c
 c     compute the force components for this interaction
 c
@@ -419,6 +449,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -729,7 +760,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates and energy value
 c
@@ -750,10 +780,30 @@ c
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
-                  term4 = 2.0d0 * (-ck*rr5+dkr*rr7-qkr*rr9)
-                  term5 = 2.0d0 * (-ci*rr5-dir*rr7-qir*rr9)
+                  term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
+                  term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
                end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*dmpi(1) + valk*dmpik(1) 
+                     term1k = corei*dmpk(1) + vali*dmpik(1) 
+                     term2i = -dkr * dmpik(3)
+                     term2k = dir * dmpik(3)
+                     term3i = qkr * dmpik(5)
+                     term3k = qir * dmpik(5)
+                     poti = term1i*rr1 + term2i*rr3 + term3i*rr5
+                     potk = term1k*rr1 + term2k*rr3 + term3k*rr5
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  dpot(i) = dpot(i) + poti
+                  dpot(k) = dpot(k) + potk
+               end if 
 c
 c     compute the force components for this interaction
 c
@@ -769,6 +819,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -912,10 +963,47 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dem(1,i) = dem(1,i) + frcx
+            dem(2,i) = dem(2,i) + frcy
+            dem(3,i) = dem(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -943,6 +1031,7 @@ c
       use mplpot
       use mpole
       use neigh
+      use potent
       use shunt
       use usage
       use virial
@@ -997,6 +1086,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
+      real*8 poti,potk
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -1006,6 +1096,10 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -1032,14 +1126,19 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
-c     initialize connected atom scaling and torque arrays
+c     initialize scaling, torque and potential arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and scaling coefficients
@@ -1053,10 +1152,10 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
-!$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_group,
-!$OMP& use_intra,use_bounds,off2,f)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,vir)
-!$OMP DO reduction(+:em,dem,tem,vir) schedule(guided)
+!$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
+!$OMP& use_group,use_intra,use_bounds,off2,f)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,dpot,vir)
+!$OMP DO reduction(+:em,dem,tem,dpot,vir) schedule(guided)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1270,7 +1369,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates and energy value
 c
@@ -1291,10 +1389,30 @@ c
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
-                  term4 = 2.0d0 * (-ck*rr5+dkr*rr7-qkr*rr9)
-                  term5 = 2.0d0 * (-ci*rr5-dir*rr7-qir*rr9)
+                  term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
+                  term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
                end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*dmpi(1) + valk*dmpik(1) 
+                     term1k = corei*dmpk(1) + vali*dmpik(1) 
+                     term2i = -dkr * dmpik(3)
+                     term2k = dir * dmpik(3)
+                     term3i = qkr * dmpik(5)
+                     term3k = qir * dmpik(5)
+                     poti = term1i*rr1 + term2i*rr3 + term3i*rr5
+                     potk = term1k*rr1 + term2k*rr3 + term3k*rr5
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  dpot(i) = dpot(i) + poti
+                  dpot(k) = dpot(k) + potk
+               end if 
 c
 c     compute the force components for this interaction
 c
@@ -1310,6 +1428,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -1449,12 +1568,54 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+!$OMP    DO reduction(+:dem,vir) schedule(guided)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dem(1,i) = dem(1,i) + frcx
+            dem(2,i) = dem(2,i) + frcy
+            dem(3,i) = dem(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+!$OMP    END DO
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -1481,12 +1642,14 @@ c
       use math
       use mpole
       use pme
+      use potent
       use virial
       implicit none
       integer i,j,ii
       real*8 e,f
       real*8 term,fterm
       real*8 cii,dii,qii
+      real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
       real*8 xv,yv,zv,vterm
@@ -1495,8 +1658,15 @@ c
       real*8 qiyy,qiyz,qizz
       real*8 xdfield,ydfield
       real*8 zdfield
+      real*8 fx,fy,fz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
 c
 c
 c     zero out the atomic multipole energy and derivatives
@@ -1537,11 +1707,25 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call emrecip1
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
+c
+c     initialize Ewald self-energy potential array
+c
+      do i = 1, n
+         dpot(i) = 0.0d0
+      end do
+c
 c     compute the Ewald self-energy term over all the atoms
 c
       term = 2.0d0 * aewald * aewald
       fterm = -f * aewald / sqrtpi
       do ii = 1, npole
+         i = ipole(ii)
          ci = rpole(1,ii)
          dix = rpole(2,ii)
          diy = rpole(3,ii)
@@ -1558,7 +1742,48 @@ c
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
+         dpot(i) = 2.0d0 * fterm * ci
       end do
+c
+c     modify gradient and virial for charge flux self-energy
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            fx = decfx(i)
+            fy = decfy(i)
+            fz = decfz(i)
+            dem(1,i) = dem(1,i) + fx
+            dem(2,i) = dem(2,i) + fy
+            dem(3,i) = dem(3,i) + fz
+            vxx = xi * fx
+            vxy = yi * fx
+            vxz = zi * fx
+            vyy = yi * fy
+            vyz = zi * fy
+            vzz = zi * fz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1612,15 +1837,21 @@ c
          zv = zd * zq
          vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
      &                      + xq*xq + yq*yq + zq*zq)
-         vir(1,1) = vir(1,1) + 2.0d0*term*(xq*xq+xv) + vterm
-         vir(2,1) = vir(2,1) + 2.0d0*term*(xq*yq+xv)
-         vir(3,1) = vir(3,1) + 2.0d0*term*(xq*zq+xv)
-         vir(1,2) = vir(1,2) + 2.0d0*term*(yq*xq+yv)
-         vir(2,2) = vir(2,2) + 2.0d0*term*(yq*yq+yv) + vterm
-         vir(3,2) = vir(3,2) + 2.0d0*term*(yq*zq+yv)
-         vir(1,3) = vir(1,3) + 2.0d0*term*(zq*xq+zv)
-         vir(2,3) = vir(2,3) + 2.0d0*term*(zq*yq+zv)
-         vir(3,3) = vir(3,3) + 2.0d0*term*(zq*zq+zv) + vterm
+         vxx = 2.0d0*term*(xq*xq+xv) + vterm
+         vxy = 2.0d0*term*(xq*yq+xv)
+         vxz = 2.0d0*term*(xq*zq+xv)
+         vyy = 2.0d0*term*(yq*yq+yv) + vterm
+         vyz = 2.0d0*term*(yq*zq+yv)
+         vzz = 2.0d0*term*(zq*zq+zv) + vterm
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end if
       return
       end
@@ -1651,6 +1882,7 @@ c
       use math
       use mplpot
       use mpole
+      use potent
       use shunt
       use virial
       implicit none
@@ -1707,6 +1939,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
+      real*8 poti,potk
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -1717,6 +1950,10 @@ c
       real*8 bn(0:5)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       character*6 mode
       external erfc
 c
@@ -1725,14 +1962,19 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
-c     initialize connected atom scaling and torque arrays
+c     initialize scaling, torque and potential arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -1959,7 +2201,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates and energy value
 c
@@ -1987,10 +2228,30 @@ c
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
-                  term4 = 2.0d0 * (-ck*rr5+dkr*rr7-qkr*rr9)
-                  term5 = 2.0d0 * (-ci*rr5-dir*rr7-qir*rr9)
+                  term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
+                  term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
                end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*rr1i + valk*rr1ik
+                     term1k = corei*rr1k + vali*rr1ik
+                     term2i = -dkr * rr3ik
+                     term2k = dir * rr3ik
+                     term3i = qkr * rr5ik
+                     term3k = qir * rr5ik
+                     poti = term1i + term2i + term3i
+                     potk = term1k + term2k + term3k
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  dpot(i) = dpot(i) + poti
+                  dpot(k) = dpot(k) + potk
+               end if 
 c
 c     compute the force components for this interaction
 c
@@ -2006,6 +2267,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -2310,7 +2572,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates and energy value
 c
@@ -2338,10 +2599,30 @@ c
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
-                  term4 = 2.0d0 * (-ck*rr5+dkr*rr7-qkr*rr9)
-                  term5 = 2.0d0 * (-ci*rr5-dir*rr7-qir*rr9)
+                  term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
+                  term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
                end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*rr1i + valk*rr1ik
+                     term1k = corei*rr1k + vali*rr1ik
+                     term2i = -dkr * rr3ik
+                     term2k = dir * rr3ik
+                     term3i = qkr * rr5ik
+                     term3k = qir * rr5ik
+                     poti = term1i + term2i + term3i
+                     potk = term1k + term2k + term3k
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  dpot(i) = dpot(i) + poti
+                  dpot(k) = dpot(k) + potk
+               end if 
 c
 c     compute the force components for this interaction
 c
@@ -2357,6 +2638,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -2489,10 +2771,47 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dem(1,i) = dem(1,i) + frcx
+            dem(2,i) = dem(2,i) + frcy
+            dem(3,i) = dem(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -2519,12 +2838,14 @@ c
       use math
       use mpole
       use pme
+      use potent
       use virial
       implicit none
       integer i,j,ii
       real*8 e,f
       real*8 term,fterm
       real*8 cii,dii,qii
+      real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
       real*8 xv,yv,zv,vterm
@@ -2533,8 +2854,15 @@ c
       real*8 qiyy,qiyz,qizz
       real*8 xdfield,ydfield
       real*8 zdfield
+      real*8 fx,fy,fz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
 c
 c
 c     zero out the atomic multipole energy and derivatives
@@ -2575,11 +2903,25 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call emrecip1
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
+c
+c     initialize Ewald self-energy potential array
+c
+      do i = 1, n
+         dpot(i) = 0.0d0
+      end do
+c
 c     compute the Ewald self-energy term over all the atoms
 c
       term = 2.0d0 * aewald * aewald
       fterm = -f * aewald / sqrtpi
       do ii = 1, npole
+         i = ipole(ii)
          ci = rpole(1,ii)
          dix = rpole(2,ii)
          diy = rpole(3,ii)
@@ -2596,7 +2938,48 @@ c
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
+         dpot(i) = 2.0d0 * fterm * ci
       end do
+c
+c     modify gradient and virial for charge flux self-energy
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            fx = decfx(i)
+            fy = decfy(i)
+            fz = decfz(i)
+            dem(1,i) = dem(1,i) + fx
+            dem(2,i) = dem(2,i) + fy
+            dem(3,i) = dem(3,i) + fz
+            vxx = xi * fx
+            vxy = yi * fx
+            vxz = zi * fx
+            vyy = yi * fy
+            vyz = zi * fy
+            vzz = zi * fz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2650,15 +3033,21 @@ c
          zv = zd * zq
          vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
      &                      + xq*xq + yq*yq + zq*zq)
-         vir(1,1) = vir(1,1) + 2.0d0*term*(xq*xq+xv) + vterm
-         vir(2,1) = vir(2,1) + 2.0d0*term*(xq*yq+xv)
-         vir(3,1) = vir(3,1) + 2.0d0*term*(xq*zq+xv)
-         vir(1,2) = vir(1,2) + 2.0d0*term*(yq*xq+yv)
-         vir(2,2) = vir(2,2) + 2.0d0*term*(yq*yq+yv) + vterm
-         vir(3,2) = vir(3,2) + 2.0d0*term*(yq*zq+yv)
-         vir(1,3) = vir(1,3) + 2.0d0*term*(zq*xq+zv)
-         vir(2,3) = vir(2,3) + 2.0d0*term*(zq*yq+zv)
-         vir(3,3) = vir(3,3) + 2.0d0*term*(zq*zq+zv) + vterm
+         vxx = 2.0d0*term*(xq*xq+xv) + vterm
+         vxy = 2.0d0*term*(xq*yq+xv)
+         vxz = 2.0d0*term*(xq*zq+xv)
+         vyy = 2.0d0*term*(yq*yq+yv) + vterm
+         vyz = 2.0d0*term*(yq*zq+yv)
+         vzz = 2.0d0*term*(zq*zq+zv) + vterm
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end if
       return
       end
@@ -2689,6 +3078,7 @@ c
       use mplpot
       use mpole
       use neigh
+      use potent
       use shunt
       use virial
       implicit none
@@ -2745,6 +3135,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
+      real*8 poti,potk
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -2755,6 +3146,10 @@ c
       real*8 bn(0:5)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       character*6 mode
       external erfc
 c
@@ -2763,14 +3158,19 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dpot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
-c     initialize connected atom scaling and torque arrays
+c     initialize scaling, torque and potential arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
+         dpot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2782,11 +3182,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,n13,
-!$OMP& i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
-!$OMP& elst,use_chgpen,use_bounds,f,off2,aewald,xaxis,yaxis,zaxis)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,vir)
-!$OMP DO reduction(+:em,dem,tem,vir) schedule(guided)
+!$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
+!$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,aewald,
+!$OMP& xaxis,yaxis,zaxis)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,dpot,vir)
+!$OMP DO reduction(+:em,dem,tem,dpot,vir) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3007,7 +3408,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates and energy value
 c
@@ -3035,10 +3435,30 @@ c
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
-                  term4 = 2.0d0 * (-ck*rr5+dkr*rr7-qkr*rr9)
-                  term5 = 2.0d0 * (-ci*rr5-dir*rr7-qir*rr9)
+                  term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
+                  term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
                end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*rr1i + valk*rr1ik
+                     term1k = corei*rr1k + vali*rr1ik
+                     term2i = -dkr * rr3ik
+                     term2k = dir * rr3ik
+                     term3i = qkr * rr5ik
+                     term3k = qir * rr5ik
+                     poti = term1i + term2i + term3i
+                     potk = term1k + term2k + term3k
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  dpot(i) = dpot(i) + poti
+                  dpot(k) = dpot(k) + potk
+               end if 
 c
 c     compute the force components for this interaction
 c
@@ -3054,6 +3474,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -3179,12 +3600,54 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (dpot,decfx,decfy,decfz)
+!$OMP    DO reduction(+:dem,vir) schedule(guided)
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dem(1,i) = dem(1,i) + frcx
+            dem(2,i) = dem(2,i) + frcy
+            dem(3,i) = dem(3,i) + frcz
+            vxx = xi * frcx
+            vxy = yi * frcx
+            vxz = zi * frcx
+            vyy = yi * frcy
+            vyz = zi * frcy
+            vzz = zi * frcz
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vxy
+            vir(3,1) = vir(3,1) + vxz
+            vir(1,2) = vir(1,2) + vxy
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vyz
+            vir(1,3) = vir(1,3) + vxz
+            vir(2,3) = vir(2,3) + vyz
+            vir(3,3) = vir(3,3) + vzz
+         end do
+!$OMP    END DO
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dpot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
 c
@@ -3223,6 +3686,7 @@ c
       use mpole
       use mrecip
       use pme
+      use potent
       use virial
       implicit none
       integer i,j,k,ii
@@ -3238,17 +3702,23 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
+      real*8 xi,yi,zi
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 frcx,frcy,frcz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
       real*8 vterm,struc2
       real*8 tem(3),fix(3)
       real*8 fiy(3),fiz(3)
+      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
 c
 c     indices into the electrostatic field array
 c
@@ -3518,6 +3988,51 @@ c
      &                        + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = vzz + zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
       end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (use_chgflx) then
+         allocate (dpot(n))
+         allocate (decfx(n))
+         allocate (decfy(n))
+         allocate (decfz(n))
+c
+c     modify the gradient and virial for charge flux
+c
+         do i = 1, n
+            dpot(i) = 0.0d0
+         end do
+         do i = 1, npole
+            ii = ipole(i)
+            dpot(ii) = cphi(1,i)
+         end do
+         call dcflux (dpot,decfx,decfy,decfz)
+         do i = 1, npole
+            ii = ipole(i)
+            xi = x(ii)
+            yi = y(ii)
+            zi = z(ii)
+            frcx = decfx(ii)
+            frcy = decfy(ii)
+            frcz = decfz(ii)
+            dem(1,ii) = dem(1,ii) + frcx
+            dem(2,ii) = dem(2,ii) + frcy
+            dem(3,ii) = dem(3,ii) + frcz
+            vxx = vxx + xi*frcx
+            vxy = vxy + yi*frcx
+            vxz = vxz + zi*frcx
+            vyy = vyy + yi*frcy
+            vyz = vyz + zi*frcy
+            vzz = vzz + zi*frcz
+         end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (dpot)
+         deallocate (decfx)
+         deallocate (decfy)
+         deallocate (decfz)
+      end if
 c
 c     increment the total internal virial tensor components
 c

@@ -170,9 +170,9 @@ c
      &                      use_imptor,use_tors,use_pitors,use_strtor,
      &                      use_angtor,use_tortor,use_vdw,use_repuls,
      &                      use_disp,use_charge,use_chgdpl,use_dipole,
-     &                      use_mpole,use_polar,use_chgtrn,use_rxnfld,
-     &                      use_solv,use_metal,use_geom,use_extra,
-     &                      use_born,use_orbit)
+     &                      use_mpole,use_polar,use_chgtrn,use_chgflx,
+     &                      use_rxnfld,use_solv,use_metal,use_geom,
+     &                      use_extra,use_born,use_orbit)
       call set_restrn_data (npfix,ndfix,nafix,ntfix,ngfix,nchir,ipfix,
      &                      kpfix,idfix,iafix,itfix,igfix,ichir,depth,
      &                      width,rwall,xpfix,ypfix,zpfix,pfix,dfix,

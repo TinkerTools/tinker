@@ -27,6 +27,7 @@ c
       use bitor
       use bndstr
       use cell
+      use cflux
       use charge
       use chgpen
       use chgtrn
@@ -213,17 +214,29 @@ c     deallocation of global arrays from module cell
 c
       if (allocated(icell))  deallocate (icell)
 c
+c     deallocation of global arrays from module cflux
+c
+      if (allocated(jb))  deallocate (jb)
+      if (allocated(b0))  deallocate (b0)
+      if (allocated(theta0))  deallocate (theta0)
+      if (allocated(bp0))  deallocate (bp0)
+      if (allocated(jbp))  deallocate (jbp)
+      if (allocated(jtheta))  deallocate (jtheta)
+      if (allocated(pcflx))  deallocate (pcflx)
+c
 c     deallocation of global arrays from module charge
 c
       if (allocated(iion))  deallocate (iion)
       if (allocated(jion))  deallocate (jion)
       if (allocated(kion))  deallocate (kion)
       if (allocated(pchg))  deallocate (pchg)
+      if (allocated(pchg0))  deallocate (pchg0)
 c
 c     deallocation of global arrays from module chgpen
 c
       if (allocated(pcore))  deallocate (pcore)
       if (allocated(pval))  deallocate (pval)
+      if (allocated(pval0))  deallocate (pval0)
       if (allocated(palpha))  deallocate (palpha)
 c
 c     deallocation of global arrays from module chgtrn
@@ -570,6 +583,7 @@ c
       if (allocated(rpole))  deallocate (rpole)
       if (allocated(spole))  deallocate (spole)
       if (allocated(srpole))  deallocate (srpole)
+      if (allocated(mono0))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
 c
 c     deallocation of global arrays from module mrecip

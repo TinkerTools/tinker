@@ -152,9 +152,11 @@ c
             do k = 1, maxpole
                pole(k,npole) = pole(k,i)
             end do
+            mono0(npole) = pole(1,i)
             if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
             pcore(npole) = pcore(i)
             pval(npole) = pval(i)
+            pval0(npole) = pval(i)
             palpha(npole) = palpha(i)
             if (polarity(i) .ne. 0.0d0) then
                npolar = npolar + 1
