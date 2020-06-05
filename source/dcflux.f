@@ -12,8 +12,9 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "dcflux" calculates force corrections due to bond stretching
-c     and angle bending coupled with charge flux
+c     "dcflux" takes as input the electrostatic potential at each
+c     atomic site and calculates force corrections due to charge
+c     flux coupled with bond stretching and angle bending
 c
 c     literature reference:
 c
@@ -22,7 +23,7 @@ c     Dependent Charge Flux into the Polarizable AMOEBA+ Potential",
 c     Journal of Physical Chemistry Letters, 11, 419-426 (2020)
 c
 c
-      subroutine dcflux (dpot,dcfx,dcfy,dcfz)
+      subroutine dcflux (pot,dcfx,dcfy,dcfz)
       use sizes
       use angbnd
       use atoms
@@ -40,6 +41,7 @@ c
       real*8 xbc,ybc,zbc
       real*8 rba,rba2,rba3
       real*8 rbc,rbc2,rbc3
+      real*8 dpot,dpota,dpotc
       real*8 ddqdx,ddqdy,ddqdz
       real*8 fx,fy,fz
       real*8 fxa1,fya1,fza1
@@ -54,7 +56,7 @@ c
       real*8 termxa,termxc
       real*8 termya,termyc
       real*8 termza,termzc
-      real*8 dpot(*)
+      real*8 pot(*)
       real*8 dcfx(*)
       real*8 dcfy(*)
       real*8 dcfz(*)
@@ -92,12 +94,13 @@ c
          if (use_polymer)  call image (xba,yba,zba)
          rba2 = xba*xba + yba*yba + zba*zba
          pjb = pjb / sqrt(rba2)
+         dpot = pot(ib) - pot(ia)
          ddqdx = (xa-xb) * pjb
          ddqdy = (ya-yb) * pjb
          ddqdz = (za-zb) * pjb
-         fx = (dpot(ib)-dpot(ia)) * ddqdx
-         fy = (dpot(ib)-dpot(ia)) * ddqdy
-         fz = (dpot(ib)-dpot(ia)) * ddqdz
+         fx = dpot * ddqdx
+         fy = dpot * ddqdy
+         fz = dpot * ddqdz
          dcfx(ia) = dcfx(ia) + fx
          dcfy(ia) = dcfy(ia) + fy
          dcfz(ia) = dcfz(ia) + fz
@@ -153,8 +156,10 @@ c
 c
 c     terms due to coupling with bond stretches in the angle
 c
-         pjb1 = (dpot(ia)-dpot(ib)) * pjb1
-         pjb2 = (dpot(ic)-dpot(ib)) * pjb2
+         dpota = pot(ia) - pot(ib)
+         dpotc = pot(ic) - pot(ib)
+         pjb1 = dpota * pjb1
+         pjb2 = dpotc * pjb2
          fxa1 = pjb2 * xba/rba
          fya1 = pjb2 * yba/rba
          fza1 = pjb2 * zba/rba
@@ -169,8 +174,7 @@ c     terms due to coupling with the bond angle bending
 c
          dot = xba*xbc + yba*ybc + zba*zbc
          term = -radian*rba*rbc / sqrt(rba2*rbc2-dot*dot)
-         fterm = term * ((dpot(ia)-dpot(ib))*pja1
-     &                     + (dpot(ic)-dpot(ib))*pja2)
+         fterm = term * (dpota*pja1+dpotc*pja2)
          termxa = xbc/(rba*rbc) - xba*dot/(rba3*rbc)
          termya = ybc/(rba*rbc) - yba*dot/(rba3*rbc)
          termza = zbc/(rba*rbc) - zba*dot/(rba3*rbc)

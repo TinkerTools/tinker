@@ -128,7 +128,7 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -158,7 +158,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -170,7 +170,7 @@ c
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -431,8 +431,8 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  dpot(i) = dpot(i) + poti
-                  dpot(k) = dpot(k) + potk
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
                end if 
 c
 c     compute the force components for this interaction
@@ -801,8 +801,8 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  dpot(i) = dpot(i) + poti
-                  dpot(k) = dpot(k) + potk
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
                end if 
 c
 c     compute the force components for this interaction
@@ -966,7 +966,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -1000,7 +1000,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -1096,7 +1096,7 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -1126,7 +1126,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -1138,7 +1138,7 @@ c
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and scaling coefficients
@@ -1154,8 +1154,8 @@ c
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,dpot,vir)
-!$OMP DO reduction(+:em,dem,tem,dpot,vir) schedule(guided)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
+!$OMP DO reduction(+:em,dem,tem,pot,vir) schedule(guided)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1410,8 +1410,8 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  dpot(i) = dpot(i) + poti
-                  dpot(k) = dpot(k) + potk
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
                end if 
 c
 c     compute the force components for this interaction
@@ -1572,7 +1572,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
 !$OMP    DO reduction(+:dem,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -1612,7 +1612,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -1663,7 +1663,7 @@ c
       real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -1709,7 +1709,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -1717,7 +1717,7 @@ c
 c     initialize Ewald self-energy potential array
 c
       do i = 1, n
-         dpot(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     compute the Ewald self-energy term over all the atoms
@@ -1742,13 +1742,13 @@ c
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
-         dpot(i) = 2.0d0 * fterm * ci
+         pot(i) = 2.0d0 * fterm * ci
       end do
 c
 c     modify gradient and virial for charge flux self-energy
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -1780,7 +1780,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -1950,7 +1950,7 @@ c
       real*8 bn(0:5)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -1962,7 +1962,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -1974,7 +1974,7 @@ c
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2249,8 +2249,8 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  dpot(i) = dpot(i) + poti
-                  dpot(k) = dpot(k) + potk
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
                end if 
 c
 c     compute the force components for this interaction
@@ -2620,8 +2620,8 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  dpot(i) = dpot(i) + poti
-                  dpot(k) = dpot(k) + potk
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
                end if 
 c
 c     compute the force components for this interaction
@@ -2774,7 +2774,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -2808,7 +2808,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -2859,7 +2859,7 @@ c
       real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -2905,7 +2905,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -2913,7 +2913,7 @@ c
 c     initialize Ewald self-energy potential array
 c
       do i = 1, n
-         dpot(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     compute the Ewald self-energy term over all the atoms
@@ -2938,13 +2938,13 @@ c
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          em = em + e
-         dpot(i) = 2.0d0 * fterm * ci
+         pot(i) = 2.0d0 * fterm * ci
       end do
 c
 c     modify gradient and virial for charge flux self-energy
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -2976,7 +2976,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -3146,7 +3146,7 @@ c
       real*8 bn(0:5)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -3158,7 +3158,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -3170,7 +3170,7 @@ c
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -3186,8 +3186,8 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,aewald,
 !$OMP& xaxis,yaxis,zaxis)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,dpot,vir)
-!$OMP DO reduction(+:em,dem,tem,dpot,vir) schedule(guided)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
+!$OMP DO reduction(+:em,dem,tem,pot,vir) schedule(guided)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3456,8 +3456,8 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  dpot(i) = dpot(i) + poti
-                  dpot(k) = dpot(k) + potk
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
                end if 
 c
 c     compute the force components for this interaction
@@ -3604,7 +3604,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
 !$OMP    DO reduction(+:dem,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -3644,7 +3644,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -3715,7 +3715,7 @@ c
       real*8 vterm,struc2
       real*8 tem(3),fix(3)
       real*8 fiy(3),fiz(3)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -3992,7 +3992,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       if (use_chgflx) then
-         allocate (dpot(n))
+         allocate (pot(n))
          allocate (decfx(n))
          allocate (decfy(n))
          allocate (decfz(n))
@@ -4000,13 +4000,13 @@ c
 c     modify the gradient and virial for charge flux
 c
          do i = 1, n
-            dpot(i) = 0.0d0
+            pot(i) = 0.0d0
          end do
          do i = 1, npole
             ii = ipole(i)
-            dpot(ii) = cphi(1,i)
+            pot(ii) = cphi(1,i)
          end do
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do i = 1, npole
             ii = ipole(i)
             xi = x(ii)
@@ -4028,7 +4028,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (dpot)
+         deallocate (pot)
          deallocate (decfx)
          deallocate (decfy)
          deallocate (decfz)

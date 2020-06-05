@@ -50,7 +50,7 @@ c
       if (debug .and. nion.ne.0) then
          write (iout,10)
    10    format (/,' Charge Flux Modification of Partial Charges :',
-     &           //,4x,'Atom',14x,'Base Value',6x,'Current',/)
+     &           //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
       end if
       do i = 1, nion
          k = iion(i)
@@ -67,7 +67,7 @@ c
       if (debug .and. npole.ne.0) then
          write (iout,30)
    30    format (/,' Charge Flux Modification of Atomic Monopoles :',
-     &           //,4x,'Atom',14x,'Base Value',6x,'Current',/)
+     &           //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
       end if
       do i = 1, npole
          k = ipole(i)
@@ -82,11 +82,11 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine bndchg  --  charge change with bond stretch  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine bndchg  --  charge flux bond stretch coupling  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "bndchg" computes modifications to atomic partial charges or
@@ -188,11 +188,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine angchg  --  charge change with angle bending  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine angchg  --  charge flux angle bend coupling  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "angchg" computes modifications to atomic partial charges or

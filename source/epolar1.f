@@ -151,7 +151,7 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -192,7 +192,7 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -210,10 +210,7 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
-         decfx(i) = 0.0d0
-         decfy(i) = 0.0d0
-         decfz(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -526,8 +523,8 @@ c
                      poti = -ukr * dsr3i
                      potk = uir * dsr3k
                   end if
-                  dpot(i) = dpot(i) + poti 
-                  dpot(k) = dpot(k) + potk 
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -1603,8 +1600,8 @@ c
                      poti = -ukr * dsr3i
                      potk = uir * dsr3k
                   end if
-                  dpot(i) = dpot(i) + poti 
-                  dpot(k) = dpot(k) + potk 
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -2445,7 +2442,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -2483,7 +2480,7 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -2602,7 +2599,7 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -2643,7 +2640,7 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -2661,10 +2658,7 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
-         decfx(i) = 0.0d0
-         decfy(i) = 0.0d0
-         decfz(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2684,9 +2678,9 @@ c
 !$OMP& use_dirdamp,use_chgpen,use_chgflx,use_bounds,off2,f,molcule,
 !$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,
 !$OMP& xaxis,yaxis,zaxis)
-!$OMP& shared (dep,ufld,dufld,dpot,vir)
+!$OMP& shared (dep,ufld,dufld,pot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
-!$OMP DO reduction(+:dep,ufld,dufld,dpot,vir) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld,pot,vir) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -2993,8 +2987,8 @@ c
                      poti = -ukr * dsr3i
                      potk = uir * dsr3k
                   end if
-                  dpot(i) = dpot(i) + poti 
-                  dpot(k) = dpot(k) + potk 
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -3828,7 +3822,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
 !$OMP    DO reduction(+:dep,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -3872,7 +3866,7 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -4235,7 +4229,7 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -4251,7 +4245,7 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -4269,10 +4263,7 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
-         decfx(i) = 0.0d0
-         decfy(i) = 0.0d0
-         decfz(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -4620,8 +4611,8 @@ c
                      poti = -2.0d0 * ukr * rr3i
                      potk = 2.0d0 * uir * rr3k
                   end if
-                  dpot(i) = dpot(i) + poti 
-                  dpot(k) = dpot(k) + potk 
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -5809,8 +5800,8 @@ c
                      poti = -2.0d0 * ukr * rr3i
                      potk = 2.0d0 * uir * rr3k
                   end if
-                  dpot(i) = dpot(i) + poti 
-                  dpot(k) = dpot(k) + potk 
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -6730,7 +6721,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -6768,7 +6759,7 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -7129,7 +7120,7 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -7145,7 +7136,7 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
-      allocate (dpot(n))
+      allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -7163,10 +7154,7 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
-         dpot(i) = 0.0d0
-         decfx(i) = 0.0d0
-         decfy(i) = 0.0d0
-         decfz(i) = 0.0d0
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -7186,9 +7174,9 @@ c
 !$OMP& use_chgpen,use_chgflx,use_dirdamp,use_bounds,off2,f,aewald,
 !$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,
 !$OMP& yaxis,zaxis)
-!$OMP& shared (dep,ufld,dufld,dpot,vir)
+!$OMP& shared (dep,ufld,dufld,pot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
-!$OMP DO reduction(+:dep,ufld,dufld,dpot,vir) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld,pot,vir) schedule(guided)
 c
 c     compute the dipole polarization gradient components
 c
@@ -7530,8 +7518,8 @@ c
                      poti = -2.0d0 * ukr * rr3i
                      potk = 2.0d0 * uir * rr3k
                   end if
-                  dpot(i) = dpot(i) + poti 
-                  dpot(k) = dpot(k) + potk 
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -8442,7 +8430,7 @@ c
 c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
 !$OMP    DO reduction(+:dep,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -8486,7 +8474,7 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
-      deallocate (dpot)
+      deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
@@ -8663,7 +8651,7 @@ c
       real*8, allocatable :: fphidp(:,:)
       real*8, allocatable :: cphidp(:,:)
       real*8, allocatable :: qgrip(:,:,:,:)
-      real*8, allocatable :: dpot(:)
+      real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
@@ -9589,7 +9577,7 @@ c
 c     perform dynamic allocation of some local arrays
 c
       if (use_chgflx) then
-         allocate (dpot(n))
+         allocate (pot(n))
          allocate (decfx(n))
          allocate (decfy(n))
          allocate (decfz(n))
@@ -9597,13 +9585,13 @@ c
 c     modify the gradient and virial for charge flux
 c
          do i = 1, n
-            dpot(i) = 0.0d0
+            pot(i) = 0.0d0
          end do
          do i = 1, npole
             ii = ipole(i)
-            dpot(ii) = cphidp(1,i)
+            pot(ii) = cphidp(1,i)
          end do
-         call dcflux (dpot,decfx,decfy,decfz)
+         call dcflux (pot,decfx,decfy,decfz)
          do i = 1, npole
             ii = ipole(i)
             xi = x(ii)
@@ -9625,7 +9613,7 @@ c
 c
 c     perform deallocation of some local arrays
 c
-         deallocate (dpot)
+         deallocate (pot)
          deallocate (decfx)
          deallocate (decfy)
          deallocate (decfz)
