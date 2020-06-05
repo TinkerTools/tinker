@@ -23,7 +23,7 @@
       setenv CC gcc          (or use "export CC=gcc" for bash)
       setenv F77 gfortran    (or use "export F77=gfortran" for bash)
       make distclean
-      ./configure --prefix=/Users/ponder/tinker/fftw --enable-threads \
+      ./configure --prefix=/home/ponder/tinker/fftw --enable-threads \
                      --enable-openmp
       make
       make install
