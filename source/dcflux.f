@@ -50,10 +50,10 @@ c
       real*8 fxc2,fyc2,fzc2
       real*8 pjb,pjb1,pjb2
       real*8 pja1,pja2
-      real*8 term2xa,term2xc
-      real*8 term2ya,term2yc
-      real*8 term2za,term2zc
-      real*8 dot,term1,fterm
+      real*8 dot,term,fterm
+      real*8 termxa,termxc
+      real*8 termya,termyc
+      real*8 termza,termzc
       real*8 dpot(*)
       real*8 dcfx(*)
       real*8 dcfy(*)
@@ -146,10 +146,10 @@ c
          end if
          rba2 = xba*xba + yba*yba + zba*zba
          rba  = sqrt(rba2)
-         rba3 = rba2*rba
+         rba3 = rba2 * rba
          rbc2 = xbc*xbc + ybc*ybc + zbc*zbc
          rbc  = sqrt(rbc2)
-         rbc3 = rbc2*rbc
+         rbc3 = rbc2 * rbc
 c
 c     terms due to coupling with bond stretches in the angle
 c
@@ -168,21 +168,21 @@ c
 c     terms due to coupling with the bond angle bending
 c
          dot = xba*xbc + yba*ybc + zba*zbc
-         term1 = -radian*rba*rbc / sqrt(rba2*rbc2-dot**2)
-         fterm = term1 * ((dpot(ia)-dpot(ib))*pja1
-     &                      + (dpot(ic)-dpot(ib))*pja2)
-         term2xa = xbc/(rba*rbc) - xba*dot/(rba3*rbc)
-         term2ya = ybc/(rba*rbc) - yba*dot/(rba3*rbc)
-         term2za = zbc/(rba*rbc) - zba*dot/(rba3*rbc)
-         term2xc = xba/(rba*rbc) - xbc*dot/(rba*rbc3)
-         term2yc = yba/(rba*rbc) - ybc*dot/(rba*rbc3)
-         term2zc = zba/(rba*rbc) - zbc*dot/(rba*rbc3)
-         fxa2 = fterm * term2xa
-         fya2 = fterm * term2ya
-         fza2 = fterm * term2za
-         fxc2 = fterm * term2xc
-         fyc2 = fterm * term2yc
-         fzc2 = fterm * term2zc
+         term = -radian*rba*rbc / sqrt(rba2*rbc2-dot*dot)
+         fterm = term * ((dpot(ia)-dpot(ib))*pja1
+     &                     + (dpot(ic)-dpot(ib))*pja2)
+         termxa = xbc/(rba*rbc) - xba*dot/(rba3*rbc)
+         termya = ybc/(rba*rbc) - yba*dot/(rba3*rbc)
+         termza = zbc/(rba*rbc) - zba*dot/(rba3*rbc)
+         termxc = xba/(rba*rbc) - xbc*dot/(rba*rbc3)
+         termyc = yba/(rba*rbc) - ybc*dot/(rba*rbc3)
+         termzc = zba/(rba*rbc) - zbc*dot/(rba*rbc3)
+         fxa2 = fterm * termxa
+         fya2 = fterm * termya
+         fza2 = fterm * termza
+         fxc2 = fterm * termxc
+         fyc2 = fterm * termyc
+         fzc2 = fterm * termzc
          fxb2 = -fxa2 - fxc2
          fyb2 = -fya2 - fyc2
          fzb2 = -fza2 - fzc2

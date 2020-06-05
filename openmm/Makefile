@@ -1290,7 +1290,7 @@ action.o:
 active.o: atoms.o inform.o iounit.o keys.o usage.o
 alchemy.o: analyz.o atoms.o energi.o files.o inform.o iounit.o katoms.o mutant.o potent.o units.o usage.o
 align.o:
-alterchg.o: angbnd.o atomid.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o couple.o math.o mplpot.o mpole.o mutant.o sizes.o
+alterchg.o: angbnd.o atomid.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o couple.o inform.o iounit.o math.o mplpot.o mpole.o mutant.o sizes.o
 analysis.o: analyz.o atoms.o energi.o group.o inter.o iounit.o limits.o potent.o vdwpot.o
 analyz.o:
 analyze.o: action.o analyz.o angang.o angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndstr.o bound.o boxes.o charge.o chgpen.o chgpot.o chgtrn.o couple.o deriv.o dipole.o disp.o energi.o ewald.o fields.o files.o improp.o imptor.o inform.o inter.o iounit.o korbs.o ktrtor.o kvdws.o limits.o math.o molcul.o moment.o mplpot.o mpole.o opbend.o opdist.o output.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o repel.o solute.o strbnd.o strtor.o titles.o tors.o tortor.o units.o urey.o vdw.o vdwpot.o virial.o
