@@ -21,6 +21,8 @@ c
       use cflux
       use charge
       use chgpen
+      use inform
+      use iounit
       use mplpot
       use mpole
       implicit none
@@ -45,17 +47,36 @@ c
 c
 c     alter atomic partial charge values for charge flux
 c
+      if (debug .and. nion.ne.0) then
+         write (iout,10)
+   10    format (/,' Charge Flux Modification of Partial Charges :',
+     &           //,4x,'Atom',14x,'Base Value',6x,'Current',/)
+      end if
       do i = 1, nion
          k = iion(i)
          pchg(i) = pchg0(i) + pcflx(k)
+         if (debug) then
+            write (iout,20)  k,pchg0(i),pchg(i)
+   20       format (i8,9x,2f14.5)
+         end if
       end do
+      
 c
 c     alter monopoles and charge penetration for charge flux
 c
+      if (debug .and. npole.ne.0) then
+         write (iout,30)
+   30    format (/,' Charge Flux Modification of Atomic Monopoles :',
+     &           //,4x,'Atom',14x,'Base Value',6x,'Current',/)
+      end if
       do i = 1, npole
          k = ipole(i)
          pole(1,i) = mono0(i) + pcflx(k)
          if (use_chgpen)  pval(i) = pval0(i) + pcflx(k)
+         if (debug) then
+            write (iout,40)  k,mono0(i),pole(1,i)
+   40       format (i8,9x,2f14.5)
+         end if
       end do
       return
       end
