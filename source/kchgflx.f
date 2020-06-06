@@ -26,10 +26,12 @@ c
       subroutine kchgflx
       use sizes
       use angbnd
+      use atmlst
       use atomid
       use atoms
       use bndstr
       use cflux
+      use couple
       use inform
       use iounit
       use kangs
@@ -44,13 +46,14 @@ c
       integer ita,itb,itc
       integer na,nb
       integer size,next
-      real*8 fc,bd,fj
-      real*8 ja1,ja2
-      real*8 jb1,jb2
+      real*8 fc,bd,cfb
+      real*8 cfa1,cfa2
+      real*8 cfb1,cfb2
       logical headerb
       logical headera
       character*4 pa,pb,pc
-      character*8 blank8,pt,pt2
+      character*8 blank8
+      character*8 pt,pt2
       character*8 ptab,ptbc
       character*12 blank12,pt3
       character*20 keyword
@@ -73,9 +76,9 @@ c
          if (keyword(1:9) .eq. 'BNDCFLUX ') then
             ia = 0
             ib = 0
-            fj = 0.0d0
+            cfb = 0.0d0
             string = record(next:240)
-            read (string,*,err=10,end=10) ia,ib,fj
+            read (string,*,err=10,end=10) ia,ib,cfb
    10       continue
             if (headerb .and. .not.silent) then
                headerb = .false.
@@ -84,7 +87,7 @@ c
      &                 //,5x,'Atom Classes',19x,'K(CFB)',/)
             end if
             if (.not. silent) then
-               write (iout,30)  ia,ib,fj
+               write (iout,30)  ia,ib,cfb
    30          format (6x,2i4,13x,f15.6)
             end if
             call numeral (ia,pa,size)
@@ -94,10 +97,10 @@ c
             else
                pt2 = pb//pa
             end if
-            do j = 1, maxnbcf
+            do j = 1, maxncfb
                if (kcfb(j).eq.blank8 .or. kcfb(j).eq.pt2) then
                   kcfb(j) = pt2
-                  jbnd(j) = fj
+                  cflb(j) = cfb
                   goto 40
                end if
             end do
@@ -106,12 +109,12 @@ c
             ia = 0
             ib = 0
             ic = 0
-            ja1 = 0.0d0
-            ja2 = 0.0d0
-            jb1 = 0.0d0
-            jb2 = 0.0d0
+            cfa1 = 0.0d0
+            cfa2 = 0.0d0
+            cfb1 = 0.0d0
+            cfb2 = 0.0d0
             string = record(next:240)
-            read (string,*,err=50,end=50) ia,ib,ic,ja1,ja2,jb1,jb2
+            read (string,*,err=50,end=50) ia,ib,ic,cfa1,cfa2,cfb1,cfb2
    50       continue
             if (headera .and. .not.silent) then
                headera = .false.
@@ -121,7 +124,7 @@ c
      &                    7x,'K(CFA2)',7x,'K(CFB1)',7x,'K(CFB2)',/)
             end if
             if (.not. silent) then
-               write (iout,70)  ia,ib,ic,ja1,ja2,jb1,jb2
+               write (iout,70)  ia,ib,ic,cfa1,cfa2,cfb1,cfb2
    70          format (4x,3i4,4x,4f14.6)
             end if
             call numeral (ia,pa,size)
@@ -132,13 +135,13 @@ c
             else
                pt3 = pc//pb//pa
             end if
-            do j = 1, maxnacf
+            do j = 1, maxncfa
                if (kcfa(j).eq.blank12 .or. kcfa(j).eq.pt3) then
                   kcfa(j) = pt3
-                  jthetal(1,j) = ja1
-                  jthetal(2,j) = ja2
-                  jbpl(1,j) = jb1
-                  jbpl(2,j) = jb2
+                  cfla(1,j) = cfa1
+                  cfla(2,j) = cfa2
+                  cflab(1,j) = cfb1
+                  cflab(2,j) = cfb2
                   goto 80
                end if
             end do
@@ -148,21 +151,23 @@ c
 c
 c     determine the total number of forcefield parameters
 c
-      nb = maxnbcf
-      do i = maxnbcf, 1, -1
+      nb = maxncfb
+      do i = maxncfb, 1, -1
          if (kcfb(i) .eq. blank8)  nb = i - 1
       end do
-      na = maxnacf
-      do i = maxnacf, 1, -1
+      na = maxncfa
+      do i = maxncfa, 1, -1
          if (kcfa(i) .eq. blank12)  na = i - 1
       end do
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(b0))  deallocate (b0)
-      if (allocated(jb))  deallocate (jb)
-      allocate (b0(nbond))
-      allocate (jb(nbond))
+      if (allocated(bflx))  deallocate (bflx)
+      if (allocated(aflx))  deallocate (aflx)
+      if (allocated(abflx))  deallocate (abflx)
+      allocate (bflx(nbond))
+      allocate (aflx(2,nangle))
+      allocate (abflx(2,nangle))
 c
 c     assign bond charge flux parameters for each bond
 c
@@ -179,25 +184,13 @@ c
          else
             pt2 = pb//pa
          end if
-         b0(i) = 0.0d0
-         jb(i) = 0.0d0
+         bflx(i) = 0.0d0
          do j = 1, nb
             if (kcfb(j) .eq. pt2) then
-               jb(i) = jbnd(j)
+               bflx(i) = cflb(j)
             end if
          end do
       end do
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (allocated(theta0))  deallocate (theta0)
-      if (allocated(bp0))  deallocate (bp0)
-      if (allocated(jbp))  deallocate (jbp)
-      if (allocated(jtheta))  deallocate (jtheta)
-      allocate (theta0(nangle))
-      allocate (bp0(2,nangle))
-      allocate (jbp(2,nangle))
-      allocate (jtheta(2,nangle))
 c
 c    assign angle charge flux parameters for each angle
 c
@@ -226,27 +219,17 @@ c
          else
             ptbc = pc//pb
          end if
-         bp0(1,i) = 0.0d0
-         bp0(2,i) = 0.0d0
-         jbp(1,i) = 0.0d0
-         jbp(2,i) = 0.0d0
-         jtheta(1,i) = 0.0d0
-         jtheta(2,i) = 0.0d0
+         aflx(1,i) = 0.0d0
+         aflx(2,i) = 0.0d0
+         abflx(1,i) = 0.0d0
+         abflx(2,i) = 0.0d0
          do j = 1, na
             if (kcfa(j) .eq. pt3) then
-               jtheta(1,i) = jthetal(1,j)
-               jtheta(2,i) = jthetal(2,j)
-               jbp(1,i) = jbpl(1,j)
-               jbp(2,i) = jbpl(2,j)
+               aflx(1,i) = cfla(1,j)
+               aflx(2,i) = cfla(2,j)
+               abflx(1,i) = cflab(1,j)
+               abflx(2,i) = cflab(2,j)
             end if
-            do k = 1, nbond
-               if (kb(k) .eq. ptab) then
-                  bp0(1,i) = blen(k)
-               end if
-               if (kb(k) .eq. ptbc) then
-                  bp0(2,i) = blen(k)
-               end if
-            end do
          end do
       end do
 c

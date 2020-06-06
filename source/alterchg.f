@@ -60,7 +60,6 @@ c
    20       format (i8,9x,2f14.5)
          end if
       end do
-      
 c
 c     alter monopoles and charge penetration for charge flux
 c
@@ -120,7 +119,7 @@ c
          ib = ibnd(2,i)
          atoma = atomic(ia)
          atomb = atomic(ib)
-         pjb = jb(i)
+         pjb = bflx(i)
          pb0 = bl(i)
          muta = mut(ia)
          mutb = mut(ib)
@@ -202,7 +201,9 @@ c
       subroutine angchg
       use sizes
       use angbnd
+      use atmlst
       use atoms
+      use bndstr
       use bound
       use cflux
       use math
@@ -217,11 +218,10 @@ c
       real*8 xab,yab,zab
       real*8 xcb,ycb,zcb
       real*8 dot,cosine
-      real*8 ptheta0
+      real*8 theta0
       real*8 pb10,pb20
-      real*8 pjbp1,pjbp2
-      real*8 pjtheta1
-      real*8 pjtheta2
+      real*8 paflx1,paflx2
+      real*8 pabflx1,pabflx2
       real*8 dq1,dq2
       logical muta,mutb,mutc
 c
@@ -235,21 +235,21 @@ c
 c
 c     assign the charge flux parameters for this angle
 c
-         ptheta0 = anat(i)
-         pb10 = bp0(1,i)
-         pb20 = bp0(2,i)
-         pjbp1 = jbp(1,i)
-         pjbp2 = jbp(2,i)
-         pjtheta1 = jtheta(1,i)
-         pjtheta2 = jtheta(2,i)
+         theta0 = anat(i)
+         pb10 = bl(balist(1,i))
+         pb20 = bl(balist(2,i))
+         paflx1 = aflx(1,i)
+         paflx2 = aflx(2,i)
+         pabflx1 = abflx(1,i)
+         pabflx2 = abflx(2,i)
          muta = mut(ia)
          mutb = mut(ib)
          mutc = mut(ic)
          if ((muta) .or. (mutb) .or. (mutc)) then
-            pjbp1 = pjbp1 * elambda
-            pjbp2 = pjbp2 * elambda
-            pjtheta1 = pjtheta1 * elambda
-            pjtheta2 = pjtheta2 * elambda
+            paflx1 = paflx1 * elambda
+            paflx2 = paflx2 * elambda
+            pabflx1 = pabflx1 * elambda
+            pabflx2 = pabflx2 * elambda
          end if
 c
 c     calculate the angle values and included bond lengths
@@ -284,8 +284,8 @@ c
 c
 c     find the charge flux increment for the current angle
 c
-         dq1 = pjbp1*(rcb-pb20) + pjtheta1*(angle-ptheta0)
-         dq2 = pjbp2*(rab-pb10) + pjtheta2*(angle-ptheta0)
+         dq1 = pabflx1*(rcb-pb20) + paflx1*(angle-theta0)
+         dq2 = pabflx2*(rab-pb10) + paflx2*(angle-theta0)
          pcflx(ia) = pcflx(ia) + dq1
          pcflx(ic) = pcflx(ic) + dq2
          pcflx(ib) = pcflx(ib) - dq1 - dq2

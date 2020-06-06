@@ -64,7 +64,7 @@ c
       integer ndi,nti,nt,nt5,nt4
       integer npt,nbt,nat,ntt,nvp
       integer nhb,nd,nd5,nd4,nd3
-      integer nmp,nbcf,nacf
+      integer nmp,ncfb,ncfa
       integer npi,npi5,npi4
       integer cls,atn,lig
       integer nx,ny,nxy
@@ -82,13 +82,13 @@ c
       real*8 at1,at2,at3
       real*8 at4,at5,at6
       real*8 an,pr,ds,dk
-      real*8 jtt1,jtt2
-      real*8 jb1,jb2
       real*8 vd,cg,dp,ps
-      real*8 fc,bd,dl,cfb
+      real*8 fc,bd,dl
       real*8 pt,pel,pal
       real*8 pol,thl,ddp
       real*8 ctrn,atrn
+      real*8 cfb,cfb1,cfb2
+      real*8 cfa1,cfa2
       real*8 el,iz,rp
       real*8 ss,ts
       real*8 abc,cba
@@ -143,8 +143,8 @@ c
       nd4 = 0
       nd3 = 0
       nmp = 0
-      nbcf = 0
-      nacf = 0
+      ncfb = 0
+      ncfa = 0
       npi = 0
       npi5 = 0
       npi4 = 0
@@ -1316,13 +1316,13 @@ c
   510       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
-            nbcf = nbcf + 1
+            ncfb = ncfb + 1
             if (ia .le. ib) then
-               kcfb(nbcf) = pa//pb
+               kcfb(ncfb) = pa//pb
             else
-               kcfb(nbcf) = pb//pa
+               kcfb(ncfb) = pb//pa
             end if
-            jbnd(nbcf) = cfb
+            cflb(ncfb) = cfb
 c
 c     angle charge flux parameters
 c
@@ -1330,26 +1330,27 @@ c
             ia = 0
             ib = 0
             ic = 0
-            jtt1 = 0.0d0
-            jtt2 = 0.0d0
-            jb1 = 0.0d0
-            jb2 = 0.0d0
+            cfa1 = 0.0d0
+            cfa2 = 0.0d0
+            cfb1 = 0.0d0
+            cfb2 = 0.0d0
             string = record(next:240)
-            read (string,*,err=520,end=520)  ia,ib,ic,jtt1,jtt2,jb1,jb2
+            read (string,*,err=520,end=520)  ia,ib,ic,cfa1,cfa2,
+     &                                       cfb1,cfb2
   520       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
-            nacf = nacf + 1
+            ncfa = ncfa + 1
             if (ia .le. ic) then
-               kcfa(nacf) = pa//pb//pc
+               kcfa(ncfa) = pa//pb//pc
             else
-               kcfa(nacf) = pc//pb//pa
+               kcfa(ncfa) = pc//pb//pa
             end if
-            jthetal(1,nacf) = jtt1
-            jthetal(2,nacf) = jtt2
-            jbpl(1,nacf) = jb1
-            jbpl(2,nacf) = jb2
+            cfla(1,ncfa) = cfa1
+            cfla(2,ncfa) = cfa2
+            cflab(1,ncfa) = cfb1
+            cflab(2,ncfa) = cfb2
 c
 c     conjugated pisystem atom parameters
 c

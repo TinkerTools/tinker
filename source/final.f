@@ -216,12 +216,9 @@ c
 c
 c     deallocation of global arrays from module cflux
 c
-      if (allocated(jb))  deallocate (jb)
-      if (allocated(b0))  deallocate (b0)
-      if (allocated(theta0))  deallocate (theta0)
-      if (allocated(bp0))  deallocate (bp0)
-      if (allocated(jbp))  deallocate (jbp)
-      if (allocated(jtheta))  deallocate (jtheta)
+      if (allocated(bflx))  deallocate (bflx)
+      if (allocated(aflx))  deallocate (aflx)
+      if (allocated(abflx))  deallocate (abflx)
       if (allocated(pcflx))  deallocate (pcflx)
 c
 c     deallocation of global arrays from module charge

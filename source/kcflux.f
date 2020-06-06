@@ -12,29 +12,27 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     maxnbcf   maximum number of charge flux bond entries
-c     maxnacf   maximum number of charge flux angle entries
+c     maxncfb   maximum number of bond stretch charge flux entries
+c     maxncfa   maximum number of angle bend charge flux entries
 c
-c     jb        charge flux over unit bond length
-c     beq       equilibrium bond length in charge flux
-c     ja        charge flux over unit angle
-c     theta0l   equilibrium angle in charge flux
+c     cflb      charge flux over stretching of a bond length
+c     cfla      charge flux over bending of a bond angle
+c     cflab     charge flux over asymmetric bond within an angle
+c     kcfb      string of atom classes for bond stretch charge flux
+c     kcfa      string of atom classes for angle bend charge flux
 c
 c
       module kcflux
       use sizes
       implicit none
-      integer maxnbcf
-      integer maxnacf
-      parameter (maxnbcf=2000)
-      parameter (maxnacf=2000)
-      real*8 jbnd(maxnbcf)
-      real*8 beq(maxnbcf)
-      real*8 theta0l(maxnacf)
-      real*8 bp0l(2,maxnacf)
-      real*8 jbpl(2,maxnacf)
-      real*8 jthetal(2,maxnacf)
-      character*8 kcfb(maxnbcf)
-      character*12 kcfa(maxnacf)
+      integer maxncfb
+      integer maxncfa
+      parameter (maxncfb=2000)
+      parameter (maxncfa=2000)
+      real*8 cflb(maxncfb)
+      real*8 cfla(2,maxncfa)
+      real*8 cflab(2,maxncfa)
+      character*8 kcfb(maxncfb)
+      character*12 kcfa(maxncfa)
       save
       end

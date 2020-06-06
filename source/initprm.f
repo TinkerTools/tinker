@@ -176,10 +176,10 @@ c
       do i = 1, maxnmp
          kmp(i) = blank12
       end do
-      do i = 1, maxnbcf
+      do i = 1, maxncfb
          kcfb(i) = blank8
       end do
-      do i = 1, maxnacf
+      do i = 1, maxncfa
          kcfa(i) = blank12
       end do
       do i = 1, maxnpi

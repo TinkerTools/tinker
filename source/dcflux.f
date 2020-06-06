@@ -76,7 +76,7 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
-         pjb = jb(i)
+         pjb = bflx(i)
          muta = mut(ia)
          mutb = mut(ib)
          if (muta .or. mutb) then
@@ -115,18 +115,18 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
-         pjb1 = jbp(1,i)
-         pjb2 = jbp(2,i)
-         pja1 = jtheta(1,i)
-         pja2 = jtheta(2,i)
+         pja1 = aflx(1,i)
+         pja2 = aflx(2,i)
+         pjb1 = abflx(1,i)
+         pjb2 = abflx(2,i)
          muta = mut(ia)
          mutb = mut(ib)
          mutc = mut(ic)
          if (muta .or. mutb .or. mutc) then
-            pjb1 = pjb1 * elambda
-            pjb2 = pjb2 * elambda
             pja1 = pja1 * elambda
             pja2 = pja2 * elambda
+            pjb1 = pjb1 * elambda
+            pjb2 = pjb2 * elambda
          end if
          xa = x(ia)
          ya = y(ia)
