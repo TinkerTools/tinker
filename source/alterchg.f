@@ -230,8 +230,8 @@ c
       real*8 xab,yab,zab
       real*8 xcb,ycb,zcb
       real*8 dot,cosine
-      real*8 paf1,paf2
-      real*8 pbf1,pbf2
+      real*8 pa1,pa2
+      real*8 pb1,pb2
       real*8 theta0
       real*8 rab0,rcb0
       real*8 dq1,dq2
@@ -248,18 +248,18 @@ c
 c
 c     assign the charge flux parameters for this angle
 c
-         paf1 = aflx(1,i)
-         paf2 = aflx(2,i)
-         pbf1 = abflx(1,i)
-         pbf2 = abflx(2,i)
+         pa1 = aflx(1,i)
+         pa2 = aflx(2,i)
+         pb1 = abflx(1,i)
+         pb2 = abflx(2,i)
          muta = mut(ia)
          mutb = mut(ib)
          mutc = mut(ic)
          if (muta .or. mutb .or. mutc) then
-            paf1 = paf1 * elambda
-            paf2 = paf2 * elambda
-            pbf1 = pbf1 * elambda
-            pbf2 = pbf2 * elambda
+            pa1 = pa1 * elambda
+            pa2 = pa2 * elambda
+            pb1 = pb1 * elambda
+            pb2 = pb2 * elambda
          end if
 c
 c     calculate the angle values and included bond lengths
@@ -297,8 +297,8 @@ c
          theta0 = anat(i)
          rab0 = bl(balist(1,i))
          rcb0 = bl(balist(2,i))
-         dq1 = pbf1*(rcb-rcb0) + paf1*(angle-theta0)/radian
-         dq2 = pbf2*(rab-rab0) + paf2*(angle-theta0)/radian
+         dq1 = pb1*(rcb-rcb0) + pa1*(angle-theta0)/radian
+         dq2 = pb2*(rab-rab0) + pa2*(angle-theta0)/radian
          pdelta(ia) = pdelta(ia) + dq1
          pdelta(ic) = pdelta(ic) + dq2
          pdelta(ib) = pdelta(ib) - dq1 - dq2
