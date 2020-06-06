@@ -30,7 +30,6 @@ c
       use bndstr
       use bound
       use cflux
-      use math
       use mutant
       implicit none
       integer i,ia,ib,ic
@@ -173,7 +172,7 @@ c
 c     get terms corresponding to bond angle bending
 c
          dot = xba*xbc + yba*ybc + zba*zbc
-         term = -radian*rba*rbc / sqrt(rba2*rbc2-dot*dot)
+         term = -rba*rbc / sqrt(rba2*rbc2-dot*dot)
          fterm = term * (dpota*pa1+dpotc*pa2)
          termxa = xbc/(rba*rbc) - xba*dot/(rba3*rbc)
          termya = ybc/(rba*rbc) - yba*dot/(rba3*rbc)
