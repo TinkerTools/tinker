@@ -13,7 +13,7 @@ c     #############################################################
 c
 c
 c     bflx    bond stretching charge flux constant (electrons/Ang)
-c     aflx    angle bending charge flux constant (electrons/degree)
+c     aflx    angle bending charge flux constant (electrons/radian)
 c     abflx   asymmetric stretch charge flux constant (electrons/Ang)
 c
 c

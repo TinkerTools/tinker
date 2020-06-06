@@ -27,6 +27,7 @@ c
       implicit none
       integer i,k
       real*8, allocatable :: pdelta(:)
+      logical header
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -46,15 +47,18 @@ c
 c
 c     alter atomic partial charge values for charge flux
 c
-      if (debug .and. nion.ne.0) then
-         write (iout,10)
-   10    format (/,' Charge Flux Modification of Partial Charges :',
-     &           //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
-      end if
+      header = .true.
       do i = 1, nion
          k = iion(i)
          pchg(i) = pchg0(i) + pdelta(k)
-         if (debug) then
+         if (debug .and. pdelta(k).ne.0.0d0) then
+            if (header) then
+               header = .false.
+               write (iout,10)
+   10          format (/,' Charge Flux Modification of Partial',
+     &                    ' Charges :',
+     &                 //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
+            end if
             write (iout,20)  k,pchg0(i),pchg(i)
    20       format (i8,9x,2f14.5)
          end if
@@ -62,16 +66,19 @@ c
 c
 c     alter monopoles and charge penetration for charge flux
 c
-      if (debug .and. npole.ne.0) then
-         write (iout,30)
-   30    format (/,' Charge Flux Modification of Atomic Monopoles :',
-     &           //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
-      end if
+      header = .true.
       do i = 1, npole
          k = ipole(i)
          pole(1,i) = mono0(i) + pdelta(k)
          if (use_chgpen)  pval(i) = pval0(i) + pdelta(k)
-         if (debug) then
+         if (debug .and. pdelta(k).ne.0.0d0) then
+            if (header) then
+               header = .false.
+               write (iout,30)
+   30          format (/,' Charge Flux Modification of Atomic',
+     &                    ' Monopoles :',
+     &                 //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
+            end if
             write (iout,40)  k,mono0(i),pole(1,i)
    40       format (i8,9x,2f14.5)
          end if
@@ -109,8 +116,9 @@ c
       integer atoma,atomb
       integer nha,nhb
       integer n12a,n12b
-      real*8 xab,yab,zab,rab
-      real*8 pjb,pb0,dq
+      real*8 xab,yab,zab
+      real*8 rab,rab0
+      real*8 pb,dq
       real*8 priority
       real*8 pdelta(*)
       logical muta,mutb
@@ -123,12 +131,11 @@ c
          ib = ibnd(2,i)
          atoma = atomic(ia)
          atomb = atomic(ib)
-         pjb = bflx(i)
-         pb0 = bl(i)
+         pb = bflx(i)
          muta = mut(ia)
          mutb = mut(ib)
-         if ((muta) .or. (mutb)) then
-            pjb = pjb * elambda
+         if (muta .or. mutb) then
+            pb = pb * elambda
          end if
 c
 c     determine the higher priority of the bonded atoms
@@ -183,7 +190,8 @@ c
 c
 c     find the charge flux increment for the current bond
 c
-         dq = pjb * (rab-pb0)
+         rab0 = bl(i)
+         dq = pb * (rab-rab0)
          pdelta(ia) = pdelta(ia) - dq*priority
          pdelta(ib) = pdelta(ib) + dq*priority
       end do
@@ -222,10 +230,10 @@ c
       real*8 xab,yab,zab
       real*8 xcb,ycb,zcb
       real*8 dot,cosine
+      real*8 paf1,paf2
+      real*8 pbf1,pbf2
       real*8 theta0
-      real*8 pb10,pb20
-      real*8 paflx1,paflx2
-      real*8 pabflx1,pabflx2
+      real*8 rab0,rcb0
       real*8 dq1,dq2
       real*8 pdelta(*)
       logical muta,mutb,mutc
@@ -240,21 +248,18 @@ c
 c
 c     assign the charge flux parameters for this angle
 c
-         theta0 = anat(i)
-         pb10 = bl(balist(1,i))
-         pb20 = bl(balist(2,i))
-         paflx1 = aflx(1,i)
-         paflx2 = aflx(2,i)
-         pabflx1 = abflx(1,i)
-         pabflx2 = abflx(2,i)
+         paf1 = aflx(1,i)
+         paf2 = aflx(2,i)
+         pbf1 = abflx(1,i)
+         pbf2 = abflx(2,i)
          muta = mut(ia)
          mutb = mut(ib)
          mutc = mut(ic)
-         if ((muta) .or. (mutb) .or. (mutc)) then
-            paflx1 = paflx1 * elambda
-            paflx2 = paflx2 * elambda
-            pabflx1 = pabflx1 * elambda
-            pabflx2 = pabflx2 * elambda
+         if (muta .or. mutb .or. mutc) then
+            paf1 = paf1 * elambda
+            paf2 = paf2 * elambda
+            pbf1 = pbf1 * elambda
+            pbf2 = pbf2 * elambda
          end if
 c
 c     calculate the angle values and included bond lengths
@@ -289,8 +294,11 @@ c
 c
 c     find the charge flux increment for the current angle
 c
-         dq1 = pabflx1*(rcb-pb20) + paflx1*(angle-theta0)
-         dq2 = pabflx2*(rab-pb10) + paflx2*(angle-theta0)
+         theta0 = anat(i)
+         rab0 = bl(balist(1,i))
+         rcb0 = bl(balist(2,i))
+         dq1 = pbf1*(rcb-rcb0) + paf1*(angle-theta0)/radian
+         dq2 = pbf2*(rab-rab0) + paf2*(angle-theta0)/radian
          pdelta(ia) = pdelta(ia) + dq1
          pdelta(ic) = pdelta(ic) + dq2
          pdelta(ib) = pdelta(ib) - dq1 - dq2
