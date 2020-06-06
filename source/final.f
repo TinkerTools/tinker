@@ -219,7 +219,6 @@ c
       if (allocated(bflx))  deallocate (bflx)
       if (allocated(aflx))  deallocate (aflx)
       if (allocated(abflx))  deallocate (abflx)
-      if (allocated(pcflx))  deallocate (pcflx)
 c
 c     deallocation of global arrays from module charge
 c

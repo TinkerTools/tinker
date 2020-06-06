@@ -23,7 +23,6 @@ c     kcfa      string of atom classes for angle bend charge flux
 c
 c
       module kcflux
-      use sizes
       implicit none
       integer maxncfb
       integer maxncfa

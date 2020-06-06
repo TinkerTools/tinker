@@ -18,7 +18,6 @@ c
 c
       subroutine alterchg
       use atoms
-      use cflux
       use charge
       use chgpen
       use inform
@@ -27,23 +26,23 @@ c
       use mpole
       implicit none
       integer i,k
+      real*8, allocatable :: pdelta(:)
 c
 c
-c     perform dynamic allocation of global array
+c     perform dynamic allocation of some local arrays
 c
-      if (allocated(pcflx)) deallocate (pcflx)
-      allocate (pcflx(n))
+      allocate (pdelta(n))
 c
 c     zero out the change in charge value at each site
 c
       do i = 1, n
-         pcflx(i) = 0.0d0
+         pdelta(i) = 0.0d0
       end do
 c
 c     find charge modifications due to charge flux
 c
-      call bndchg
-      call angchg
+      call bndchg (pdelta)
+      call angchg (pdelta)
 c
 c     alter atomic partial charge values for charge flux
 c
@@ -54,7 +53,7 @@ c
       end if
       do i = 1, nion
          k = iion(i)
-         pchg(i) = pchg0(i) + pcflx(k)
+         pchg(i) = pchg0(i) + pdelta(k)
          if (debug) then
             write (iout,20)  k,pchg0(i),pchg(i)
    20       format (i8,9x,2f14.5)
@@ -70,13 +69,17 @@ c
       end if
       do i = 1, npole
          k = ipole(i)
-         pole(1,i) = mono0(i) + pcflx(k)
-         if (use_chgpen)  pval(i) = pval0(i) + pcflx(k)
+         pole(1,i) = mono0(i) + pdelta(k)
+         if (use_chgpen)  pval(i) = pval0(i) + pdelta(k)
          if (debug) then
             write (iout,40)  k,mono0(i),pole(1,i)
    40       format (i8,9x,2f14.5)
          end if
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pdelta)
       return
       end
 c
@@ -92,7 +95,7 @@ c     "bndchg" computes modifications to atomic partial charges or
 c     monopoles due to bond stretch using a charge flux formulation
 c
 c
-      subroutine bndchg
+      subroutine bndchg (pdelta)
       use sizes
       use atomid
       use atoms
@@ -109,6 +112,7 @@ c
       real*8 xab,yab,zab,rab
       real*8 pjb,pb0,dq
       real*8 priority
+      real*8 pdelta(*)
       logical muta,mutb
 c
 c
@@ -180,8 +184,8 @@ c
 c     find the charge flux increment for the current bond
 c
          dq = pjb * (rab-pb0)
-         pcflx(ia) = pcflx(ia) - dq*priority
-         pcflx(ib) = pcflx(ib) + dq*priority
+         pdelta(ia) = pdelta(ia) - dq*priority
+         pdelta(ib) = pdelta(ib) + dq*priority
       end do
       return
       end
@@ -198,7 +202,7 @@ c     "angchg" computes modifications to atomic partial charges or
 c     monopoles due to angle bending using a charge flux formulation
 c
 c
-      subroutine angchg
+      subroutine angchg (pdelta)
       use sizes
       use angbnd
       use atmlst
@@ -223,6 +227,7 @@ c
       real*8 paflx1,paflx2
       real*8 pabflx1,pabflx2
       real*8 dq1,dq2
+      real*8 pdelta(*)
       logical muta,mutb,mutc
 c
 c
@@ -286,9 +291,9 @@ c     find the charge flux increment for the current angle
 c
          dq1 = pabflx1*(rcb-pb20) + paflx1*(angle-theta0)
          dq2 = pabflx2*(rab-pb10) + paflx2*(angle-theta0)
-         pcflx(ia) = pcflx(ia) + dq1
-         pcflx(ic) = pcflx(ic) + dq2
-         pcflx(ib) = pcflx(ib) - dq1 - dq2
+         pdelta(ia) = pdelta(ia) + dq1
+         pdelta(ic) = pdelta(ic) + dq2
+         pdelta(ib) = pdelta(ib) - dq1 - dq2
       end do
       return
       end
