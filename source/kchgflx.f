@@ -16,12 +16,6 @@ c     "kchgflx" assigns a force constant and ideal bond length
 c     to each bond in the structure and processes any new or
 c     changed parameter values
 c
-c     literature reference:
-c
-c     C. Liu, J.-P. Piquemal and P. Ren, "Implementation of Geometry-
-c     Dependent Charge Flux into the Polarizable AMOEBA+ Potential",
-c     Journal of Physical Chemistry Letters, 11, 419-426 (2020)
-c
 c
       subroutine kchgflx
       use sizes

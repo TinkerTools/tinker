@@ -15,6 +15,12 @@ c
 c     "alterchg" calculates the change in atomic partial charge or
 c     monopole values due to bond and angle charge flux coupling
 c
+c     literature reference:
+c
+c     C. Liu, J.-P. Piquemal and P. Ren, "Implementation of Geometry-
+c     Dependent Charge Flux into the Polarizable AMOEBA+ Potential",
+c     Journal of Physical Chemistry Letters, 11, 419-426 (2020)
+c
 c
       subroutine alterchg
       use atoms

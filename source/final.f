@@ -199,6 +199,7 @@ c     deallocation of global arrays from module atmlst
 c
       if (allocated(bndlist))  deallocate (bndlist)
       if (allocated(anglist))  deallocate (anglist)
+      if (allocated(balist))  deallocate (balist)
 c
 c     deallocation of global arrays from module bitor
 c
