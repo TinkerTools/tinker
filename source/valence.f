@@ -1890,7 +1890,7 @@ c
       real*8 xt,yt,zt,xu,yu,zu
       real*8 xtu,ytu,ztu
       real*8 rt2,ru2,rtru
-      real*8 minimiz1,minimum
+      real*8 valmin1,minimum
       real*8 valrms,energy
       real*8 bave,brms,bfac
       real*8 aave,arms,afac
@@ -1907,7 +1907,7 @@ c
       real*8, allocatable :: hdiag(:,:)
       real*8, allocatable :: vects(:,:)
       character*1 axis(3)
-      external minimiz1
+      external valmin1
       external optsave
       data axis  / 'X','Y','Z' /
 c
@@ -1947,7 +1947,7 @@ c
          iwrite = 0
          grdmin = 0.0001d0
          coordtype = 'CARTESIAN'
-         call lbfgs (nvar,xx,minimum,grdmin,minimiz1,optsave)
+         call lbfgs (nvar,xx,minimum,grdmin,valmin1,optsave)
          coordtype = 'NONE'
          stpmax = oldstep
          maxiter = olditer
@@ -2348,25 +2348,24 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  function minimiz1  --  energy and gradient for minimize  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function valmin1  --  energy and gradient for minimize  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "minimiz1" is a service routine that computes the energy and
-c     gradient for a low storage BFGS optimization in Cartesian
-c     coordinate space
+c     "valmin1" is a service routine that computes the molecular
+c     energy and gradient during valence parameter optimization
 c
 c
-      function minimiz1 (xx,g)
+      function valmin1 (xx,g)
       use atoms
       use scales
       use usage
       implicit none
       integer i,nvar
-      real*8 minimiz1,e
+      real*8 valmin1,e
       real*8 energy,eps
       real*8 xx(*)
       real*8 g(*)
@@ -2406,7 +2405,7 @@ c
          e = energy ()
          call numgrad (energy,derivs,eps)
       end if
-      minimiz1 = e
+      valmin1 = e
 c
 c     convert gradient components to optimization parameters
 c

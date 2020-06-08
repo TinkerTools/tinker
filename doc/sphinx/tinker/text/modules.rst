@@ -3,7 +3,7 @@ Modules & Global Variables
 
 The Fortran modules found in the Tinker package are listed below along with a brief description of the variables associated with each module. Each individual module contains a set of globally allocated variables available to any program unit upon inclusion of that module. A source listing containing each of the Tinker functions and subroutines and its included modules can be produced by running the "listing.make" script found in the distribution.
 
-**ACTION Module        total number of each energy term type**
+**MODULE ACTION        total number of each energy term type
 
 .. code-block:: text
 
@@ -37,7 +37,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  neg             number of geometric restraint energy terms computed
  nex             number of extra energy terms computed
 
-**ALIGN Module         information for structure superposition**
+**MODULE ALIGN         information for structure superposition
 
 .. code-block:: text
 
@@ -45,7 +45,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ifit            atom numbers of pairs of atoms to be superimposed
  wfit            weights assigned to atom pairs during superposition
 
-**ANALYZ Module        energy components partitioned to atoms**
+**MODULE ANALYZ        energy components partitioned to atoms
 
 .. code-block:: text
 
@@ -79,7 +79,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  aeg             geometric restraint energy partitioned over atoms
  aex             extra energy term partitioned over atoms
 
-**ANGANG Module        angle-angles in current structure**
+**MODULE ANGANG        angle-angles in current structure
 
 .. code-block:: text
 
@@ -87,7 +87,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  iaa             angle numbers used in each angle-angle term
  kaa             force constant for angle-angle cross terms
 
-**ANGBND Module        bond angle bends in current structure**
+**MODULE ANGBND        bond angle bends in current structure
 
 .. code-block:: text
 
@@ -97,7 +97,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  anat            ideal bond angle or phase shift angle (degrees)
  afld            periodicity for Fourier angle bending term
 
-**ANGPOT Module        angle bend functional form details**
+**MODULE ANGPOT        angle bend functional form details
 
 .. code-block:: text
 
@@ -121,7 +121,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  opbtyp          type of out-of-plane bend potential energy function
  angtyp          type of angle bending function for each bond angle
 
-**ANGTOR Module        angle-torsions in current structure**
+**MODULE ANGTOR        angle-torsions in current structure
 
 .. code-block:: text
 
@@ -129,7 +129,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  iat             torsion and angle numbers used in angle-torsion
  kant            1-, 2- and 3-fold angle-torsion force constants
 
-**ARGUE Module         command line arguments at run time**
+**MODULE ARGUE         command line arguments at run time
 
 .. code-block:: text
 
@@ -138,7 +138,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  listarg         flag to mark available command line arguments
  arg             strings containing the command line arguments
 
-**ASCII Module         selected ASCII character code values**
+**MODULE ASCII         selected ASCII character code values
 
 .. code-block:: text
 
@@ -173,14 +173,15 @@ The Fortran modules found in the Tinker package are listed below along with a br
  vertical        decimal value of ASCII code for vertical bar (124)
  tilde           decimal value of ASCII code for tilde (126)
 
-**ATMLST Module        local geometry indices for each atom**
+**MODULE ATMLST        bond and angle local geometry indices
 
 .. code-block:: text
 
- bndlist         list of the bond numbers involving each atom
- anglist         list of the angle numbers centered on each atom
+ bndlist         numbers of the bonds involving each atom
+ anglist         numbers of the angles centered on each atom
+ balist          numbers of the bonds comprising each angle
 
-**ATOMID Module        atomic properties for current atoms**
+**MODULE ATOMID        atomic properties for current atoms
 
 .. code-block:: text
 
@@ -192,7 +193,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  name            atom name for each atom in the system
  story           descriptive type for each atom in system
 
-**ATOMS Module         number, position and type of atoms**
+**MODULE ATOMS         number, position and type of atoms
 
 .. code-block:: text
 
@@ -202,7 +203,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  y               current y-coordinate for each atom in the system
  z               current z-coordinate for each atom in the system
 
-**BATH Module          thermostat and barostat control values**
+**MODULE BATH          thermostat and barostat control values
 
 .. code-block:: text
 
@@ -229,14 +230,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  barostat        choice of pressure control method to be used
  volscale        choice of scaling method for Monte Carlo barostat
 
-**BITOR Module         bitorsions in the current structure**
+**MODULE BITOR         bitorsions in the current structure
 
 .. code-block:: text
 
  nbitor          total number of bitorsions in the system
  ibitor          numbers of the atoms in each bitorsion
 
-**BNDPOT Module        bond stretch functional form details**
+**MODULE BNDPOT        bond stretch functional form details
 
 .. code-block:: text
 
@@ -245,7 +246,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  bndunit         convert bond stretch energy to kcal/mole
  bndtyp          type of bond stretch potential energy function
 
-**BNDSTR Module        bond stretches in the current structure**
+**MODULE BNDSTR        bond stretches in the current structure
 
 .. code-block:: text
 
@@ -254,7 +255,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  bk              bond stretch force constants (kcal/mole/Ang**2)
  bl              ideal bond length values in Angstroms
 
-**BOUND Module         periodic boundary condition controls**
+**MODULE BOUND         periodic boundary condition controls
 
 .. code-block:: text
 
@@ -264,7 +265,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_replica     flag to use replicates for periodic system
  use_polymer     flag to mark presence of infinite polymer
 
-**BOXES Module         periodic boundary condition parameters**
+**MODULE BOXES         periodic boundary condition parameters
 
 .. code-block:: text
 
@@ -293,7 +294,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  octahedron      flag to mark box as truncated octahedron
  spacegrp        space group symbol for the unit cell type
 
-**CELL Module          replicated cell periodic boundaries**
+**MODULE CELL          replicated cell periodic boundaries
 
 .. code-block:: text
 
@@ -306,7 +307,15 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ycell2          half the length of the b-axis of the replicated cell
  zcell2          half the length of the c-axis of the replicated cell
 
-**CHARGE Module        partial charges in current structure**
+**MODULE CFLUX         charge flux terms in current system
+
+.. code-block:: text
+
+ bflx            bond stretching charge flux constant (electrons/Ang)
+ aflx            angle bending charge flux constant (electrons/radian)
+ abflx           asymmetric stretch charge flux constant (electrons/Ang)
+
+**MODULE CHARGE        partial charges in current structure
 
 .. code-block:: text
 
@@ -314,18 +323,20 @@ The Fortran modules found in the Tinker package are listed below along with a br
  iion            number of the atom site for each partial charge
  jion            neighbor generation site for each partial charge
  kion            cutoff switching site for each partial charge
- pchg            magnitude of the partial charges (e-)
+ pchg            current atomic partial charge values (e-)
+ pchg0           original partial charge values for charge flux
 
-**CHGPEN Module        charge penetration in current structure**
+**MODULE CHGPEN        charge penetration in current structure
 
 .. code-block:: text
 
  ncp             total number of charge penetration sites in system
  pcore           number of core electrons at each multipole site
  pval            number of valence electrons at each multipole site
+ pval0           original number of valence electrons for charge flux
  palpha          charge penetration damping at each multipole site
 
-**CHGPOT Module        charge-charge functional form details**
+**MODULE CHGPOT        charge-charge functional form details
 
 .. code-block:: text
 
@@ -340,7 +351,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  neutnbr         logical flag governing use of neutral group neighbors
  neutcut         logical flag governing use of neutral group cutoffs
 
-**CHGTRN Module        charge transfer for current structure**
+**MODULE CHGTRN        charge transfer for current structure
 
 .. code-block:: text
 
@@ -348,14 +359,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  chgct           charge for charge transfer at each multipole site
  dmpct           charge transfer damping factor at each multipole site
 
-**CHRONO Module        clock time values for current program**
+**MODULE CHRONO        clock time values for current program
 
 .. code-block:: text
 
  twall           current processor wall clock time in seconds
  tcpu            elapsed cpu time from start of program in seconds
 
-**CHUNKS Module        PME grid spatial decomposition values**
+**MODULE CHUNKS        PME grid spatial decomposition values
 
 .. code-block:: text
 
@@ -371,7 +382,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  grdoff          offset for index into B-spline coefficients
  pmetable        PME grid spatial regions involved for each site
 
-**COUPLE Module        atom neighbor connectivity lists**
+**MODULE COUPLE        atom neighbor connectivity lists
 
 .. code-block:: text
 
@@ -384,13 +395,13 @@ The Fortran modules found in the Tinker package are listed below along with a br
  i14             atom numbers of atoms 1-4 connected to each atom
  i15             atom numbers of atoms 1-5 connected to each atom
 
-**CTRPOT Module        charge transfer functional form details**
+**MODULE CTRPOT        charge transfer functional form details
 
 .. code-block:: text
 
  ctrntyp         type of charge transfer term (SEPARATE or COMBINED)
 
-**DERIV Module         Cartesian coord derivative components**
+**MODULE DERIV         Cartesian coord derivative components
 
 .. code-block:: text
 
@@ -424,7 +435,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  deg             geometric restraint Cartesian coordinate derivatives
  dex             extra energy term Cartesian coordinate derivatives
 
-**DIPOLE Module        bond dipoles in current structure**
+**MODULE DIPOLE        bond dipoles in current structure
 
 .. code-block:: text
 
@@ -433,7 +444,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  bdpl            magnitude of each of the dipoles (Debye)
  sdpl            position of each dipole between defining atoms
 
-**DISGEO Module        distance geometry bounds & parameters**
+**MODULE DISGEO        distance geometry bounds & parameters
 
 .. code-block:: text
 
@@ -445,7 +456,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_invert      flag to use enantiomer closest to input structure
  use_anneal      flag to use simulated annealing refinement
 
-**DISP Module          damped dispersion for current structure**
+**MODULE DISP          damped dispersion for current structure
 
 .. code-block:: text
 
@@ -455,7 +466,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  csix            C6 dispersion coefficient value at each site
  adisp           alpha dispersion damping value at each site
 
-**DMA Module           QM spherical harmonic multipole moments**
+**MODULE DMA           QM spherical harmonic multipole moments
 
 .. code-block:: text
 
@@ -469,7 +480,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  q22c            atomic Q22c quadrupole component from DMA (xx-yy)
  q22s            atomic Q22s quadrupole component from DMA (xy)
 
-**DOMEGA Module        derivative components over torsions**
+**MODULE DOMEGA        derivative components over torsions
 
 .. code-block:: text
 
@@ -503,7 +514,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  teg             geometric restraint derivatives over torsions
  tex             extra energy term derivatives over torsions
 
-**DSPPOT Module        dispersion interaction scale factors**
+**MODULE DSPPOT        dispersion interaction scale factors
 
 .. code-block:: text
 
@@ -513,7 +524,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  dsp5scale       scale factor for 1-5 dispersion energy interactions
  use_dcorr       flag to use long range dispersion correction
 
-**ENERGI Module        individual potential energy components**
+**MODULE ENERGI        individual potential energy components
 
 .. code-block:: text
 
@@ -547,7 +558,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  eg              geometric restraint potential energy of the system
  ex              extra term potential energy of the system
 
-**EWALD Module         Ewald summation parameters and options**
+**MODULE EWALD         Ewald summation parameters and options
 
 .. code-block:: text
 
@@ -557,7 +568,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  adewald         Ewald convergence coefficient for dispersion
  boundary        Ewald boundary condition; none, tinfoil or vacuum
 
-**FACES Module         Connolly area and volume variables**
+**MODULE FACES         Connolly area and volume variables
 
 .. code-block:: text
 
@@ -576,7 +587,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  mxcyeq          maximum number of convex edge cycles
  mxfqcy          maximum number of convex face cycles
 
-**FFT Module           Fast Fourier transform control values**
+**MODULE FFT           Fast Fourier transform control values
 
 .. code-block:: text
 
@@ -587,7 +598,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ffttable        intermediate array used by the FFT routine (FFTPACK)
  ffttyp          type of FFT package; currently FFTPACK or FFTW
 
-**FIELDS Module        molecular mechanics force field type**
+**MODULE FIELDS        molecular mechanics force field type
 
 .. code-block:: text
 
@@ -595,7 +606,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  biotyp          force field atom type of each biopolymer type
  forcefield      string used to describe the current forcefield
 
-**FILES Module         name & number of current structure file**
+**MODULE FILES         name & number of current structure file
 
 .. code-block:: text
 
@@ -605,7 +616,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  filename        base filename used by default for all files
  outfile         output filename used for intermediate results
 
-**FRACS Module         distances to molecular center of mass**
+**MODULE FRACS         distances to molecular center of mass
 
 .. code-block:: text
 
@@ -613,7 +624,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  yfrac           fractional coordinate along b-axis of center of mass
  zfrac           fractional coordinate along c-axis of center of mass
 
-**FREEZE Module        definition of holonomic constraints**
+**MODULE FREEZE        definition of holonomic constraints
 
 .. code-block:: text
 
@@ -627,14 +638,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_rattle      logical flag to set use of holonomic contraints
  ratimage        flag to use minimum image for holonomic constraint
 
-**GKSTUF Module        generalized Kirkwood solvation values**
+**MODULE GKSTUF        generalized Kirkwood solvation values
 
 .. code-block:: text
 
  gkc             tuning parameter exponent in the f(GB) function
  gkr             generalized Kirkwood cavity radii for atom types
 
-**GROUP Module         partitioning of system into atom groups**
+**MODULE GROUP         partitioning of system into atom groups
 
 .. code-block:: text
 
@@ -648,13 +659,13 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_intra       flag to include only intragroup interactions
  use_inter       flag to include only intergroup interactions
 
-**HESCUT Module        cutoff for Hessian matrix elements**
+**MODULE HESCUT        cutoff for Hessian matrix elements
 
 .. code-block:: text
 
  hesscut         magnitude of smallest allowed Hessian element
 
-**HESSN Module         Cartesian Hessian elements for one atom**
+**MODULE HESSN         Cartesian Hessian elements for one atom
 
 .. code-block:: text
 
@@ -662,7 +673,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  hessy           Hessian elements for y-component of current atom
  hessz           Hessian elements for z-component of current atom
 
-**HPMF Module          hydrophobic potential of mean force term**
+**MODULE HPMF          hydrophobic potential of mean force term
 
 .. code-block:: text
 
@@ -681,7 +692,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rpmf            radius of each atom for use with hydrophobic PMF
  acsa            SASA value for each hydrophobic PMF carbon atom
 
-**IELSCF Module        extended Lagrangian induced dipoles**
+**MODULE IELSCF        extended Lagrangian induced dipoles
 
 .. code-block:: text
 
@@ -696,7 +707,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  apaux           auxiliary shadow dipole acceleration at each site
  use_ielscf      flag to use inertial extended Lagrangian method
 
-**IMPROP Module        improper dihedrals in current structure**
+**MODULE IMPROP        improper dihedrals in current structure
 
 .. code-block:: text
 
@@ -705,7 +716,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kprop           force constant values for improper dihedral angles
  vprop           ideal improper dihedral angle value in degrees
 
-**IMPTOR Module        improper torsions in current structure**
+**MODULE IMPTOR        improper torsions in current structure
 
 .. code-block:: text
 
@@ -715,7 +726,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  itors2          2-fold amplitude and phase for each improper torsion
  itors3          3-fold amplitude and phase for each improper torsion
 
-**INFORM Module        program I/O and flow control values**
+**MODULE INFORM        program I/O and flow control values
 
 .. code-block:: text
 
@@ -730,26 +741,26 @@ The Fortran modules found in the Tinker package are listed below along with a br
  holdup          logical flag to wait for carriage return on exit
  abort           logical flag to stop execution at next chance
 
-**INTER Module         sum of intermolecular energy components**
+**MODULE INTER         sum of intermolecular energy components
 
 .. code-block:: text
 
  einter          total intermolecular potential energy
 
-**IOUNIT Module        Fortran input/output unit numbers**
+**MODULE IOUNIT        Fortran input/output unit numbers
 
 .. code-block:: text
 
  input           Fortran I/O unit for main input (default=5)
  iout            Fortran I/O unit for main output (default=6)
 
-**KANANG Module        angle-angle term forcefield parameters**
+**MODULE KANANG        angle-angle term forcefield parameters
 
 .. code-block:: text
 
  anan            angle-angle cross term parameters for each atom class
 
-**KANGS Module         bond angle bend forcefield parameters**
+**MODULE KANGS         bond angle bend forcefield parameters
 
 .. code-block:: text
 
@@ -778,7 +789,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kap             string of atom classes for in-plane angle bends
  kaf             string of atom classes for Fourier angle bends
 
-**KANTOR Module        angle-torsion forcefield parameters**
+**MODULE KANTOR        angle-torsion forcefield parameters
 
 .. code-block:: text
 
@@ -786,7 +797,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  atcon           torsional amplitude parameters for angle-torsion
  kat             string of atom classes for angle-torsion terms
 
-**KATOMS Module        atom definition forcefield parameters**
+**MODULE KATOMS        atom definition forcefield parameters
 
 .. code-block:: text
 
@@ -797,7 +808,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  symbol          modified atomic symbol for each atom type
  describe        string identifying each of the atom types
 
-**KBONDS Module        bond stretching forcefield parameters**
+**MODULE KBONDS        bond stretching forcefield parameters
 
 .. code-block:: text
 
@@ -821,27 +832,27 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kb3             string of atom classes for 3-ring bond stretch
  kel             string of atom classes for electronegativity corrections
 
-**KCHRGE Module        partial charge forcefield parameters**
+**MODULE KCHRGE        partial charge forcefield parameters
 
 .. code-block:: text
 
  chg             partial charge parameters for each atom type
 
-**KCPEN Module         charge penetration forcefield parameters**
+**MODULE KCPEN         charge penetration forcefield parameters
 
 .. code-block:: text
 
  cpele           valence electron magnitude for each atom class
  cpalp           alpha charge penetration parameter for each atom class
 
-**KCTRN Module         charge transfer forcefield parameters**
+**MODULE KCTRN         charge transfer forcefield parameters
 
 .. code-block:: text
 
  ctchg           charge transfer magnitude for each atom class
  ctdmp           alpha charge transfer parameter for each atom class
 
-**KDIPOL Module        bond dipole forcefield parameters**
+**MODULE KDIPOL        bond dipole forcefield parameters
 
 .. code-block:: text
 
@@ -862,14 +873,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kd4             string of atom classes for 4-ring dipoles
  kd3             string of atom classes for 3-ring dipoles
 
-**KDSP Module          damped dispersion forcefield parameters**
+**MODULE KDSP          damped dispersion forcefield parameters
 
 .. code-block:: text
 
  dspsix          C6 dispersion coefficient for each atom class
  dspdmp          alpha dispersion parameter for each atom class
 
-**KEYS Module          contents of the keyword control file**
+**MODULE KEYS          contents of the keyword control file
 
 .. code-block:: text
 
@@ -877,7 +888,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  nkey            number of nonblank lines in the keyword file
  keyline         contents of each individual keyword file line
 
-**KHBOND Module        H-bonding term forcefield parameters**
+**MODULE KHBOND        H-bonding term forcefield parameters
 
 .. code-block:: text
 
@@ -886,7 +897,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  epshb           well depth parameter for hydrogen bonding pairs
  khb             string of atom types for hydrogen bonding pairs
 
-**KIPROP Module        improper dihedral forcefield parameters**
+**MODULE KIPROP        improper dihedral forcefield parameters
 
 .. code-block:: text
 
@@ -895,7 +906,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  tdi             ideal dihedral angle values for improper dihedrals
  kdi             string of atom classes for improper dihedral angles
 
-**KITORS Module        improper torsion forcefield parameters**
+**MODULE KITORS        improper torsion forcefield parameters
 
 .. code-block:: text
 
@@ -905,7 +916,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ti3             torsional parameters for improper 3-fold rotation
  kti             string of atom classes for improper torsional parameters
 
-**KMULTI Module        atomic multipole forcefield parameters**
+**MODULE KMULTI        atomic multipole forcefield parameters
 
 .. code-block:: text
 
@@ -914,7 +925,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  mpaxis          type of local axis definition for atomic multipoles
  kmp             string of atom types for atomic multipoles
 
-**KOPBND Module        out-of-plane bend forcefield parameters**
+**MODULE KOPBND        out-of-plane bend forcefield parameters
 
 .. code-block:: text
 
@@ -922,7 +933,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  opbn            force constant parameters for out-of-plane bending
  kopb            string of atom classes for out-of-plane bending
 
-**KOPDST Module        out-of-plane distance forcefield params**
+**MODULE KOPDST        out-of-plane distance forcefield params
 
 .. code-block:: text
 
@@ -930,7 +941,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  opds            force constant parameters for out-of-plane distance
  kopd            string of atom classes for out-of-plane distance
 
-**KORBS Module         pisystem orbital forcefield parameters**
+**MODULE KORBS         pisystem orbital forcefield parameters
 
 .. code-block:: text
 
@@ -950,7 +961,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kpi5            string of atom classes for 5-ring pisystem bonds
  kpi4            string of atom classes for 4-ring pisystem bonds
 
-**KPITOR Module        pi-system torsion forcefield parameters**
+**MODULE KPITOR        pi-system torsion forcefield parameters
 
 .. code-block:: text
 
@@ -958,7 +969,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ptcon           force constant parameters for pi-system torsions
  kpt             string of atom classes for pi-system torsion terms
 
-**KPOLR Module         polarizability forcefield parameters**
+**MODULE KPOLR         polarizability forcefield parameters
 
 .. code-block:: text
 
@@ -967,7 +978,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  athl            Thole polarizability damping value for each atom type
  ddir            direct polarization damping value for each atom type
 
-**KREPL Module         Pauli repulsion forcefield parameters**
+**MODULE KREPL         Pauli repulsion forcefield parameters
 
 .. code-block:: text
 
@@ -975,7 +986,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  prdmp           alpha Pauli repulsion parameter for each atom class
  prele           number of valence electrons for each atom class
 
-**KSTBND Module        stretch-bend forcefield parameters**
+**MODULE KSTBND        stretch-bend forcefield parameters
 
 .. code-block:: text
 
@@ -983,7 +994,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  stbn            force constant parameters for stretch-bend terms
  ksb             string of atom classes for stretch-bend terms
 
-**KSTTOR Module        stretch-torsion forcefield parameters**
+**MODULE KSTTOR        stretch-torsion forcefield parameters
 
 .. code-block:: text
 
@@ -991,7 +1002,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  btcon           torsional amplitude parameters for stretch-torsion
  kbt             string of atom classes for stretch-torsion terms
 
-**KTORSN Module        torsional angle forcefield parameters**
+**MODULE KTORSN        torsional angle forcefield parameters
 
 .. code-block:: text
 
@@ -1020,7 +1031,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  kt5             string of atom classes for 5-ring torsions
  kt4             string of atom classes for 4-ring torsions
 
-**KTRTOR Module        torsion-torsion forcefield parameters**
+**MODULE KTRTOR        torsion-torsion forcefield parameters
 
 .. code-block:: text
 
@@ -1037,7 +1048,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  tbxy            Hessian cross components over spline grid
  ktt             string of torsion-torsion atom classes
 
-**KURYBR Module        Urey-Bradley term forcefield parameters**
+**MODULE KURYBR        Urey-Bradley term forcefield parameters
 
 .. code-block:: text
 
@@ -1046,7 +1057,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  dst13           ideal 1-3 distance parameters for Urey-Bradley terms
  ku              string of atom classes for Urey-Bradley terms
 
-**KVDWPR Module        special vdw term forcefield parameters**
+**MODULE KVDWPR        special vdw term forcefield parameters
 
 .. code-block:: text
 
@@ -1055,7 +1066,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  epspr           well depth parameter for special van der Waals pairs
  kvpr            string of atom classes for special van der Waals pairs
 
-**KVDWS Module         van der Waals term forcefield parameters**
+**MODULE KVDWS         van der Waals term forcefield parameters
 
 .. code-block:: text
 
@@ -1065,7 +1076,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  eps4            van der Waals well depth parameter in 1-4 interactions
  reduct          van der Waals reduction factor for each atom type
 
-**LIGHT Module         method of lights pair neighbors indices**
+**MODULE LIGHT         method of lights pair neighbors indices
 
 .. code-block:: text
 
@@ -1083,7 +1094,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rgy             maps the original interaction list into y-sorted list
  rgz             maps the original interaction list into z-sorted list
 
-**LIMITS Module        interaction taper & cutoff distances**
+**MODULE LIMITS        interaction taper & cutoff distances
 
 .. code-block:: text
 
@@ -1114,7 +1125,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_mlist       logical flag governing use of multipole list
  use_ulist       logical flag governing use of preconditioner list
 
-**LINMIN Module        line search minimization parameters**
+**MODULE LINMIN        line search minimization parameters
 
 .. code-block:: text
 
@@ -1125,7 +1136,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  angmax          maximum angle between search direction and -gradient
  intmax          maximum number of interpolations during line search
 
-**MATH Module          mathematical and geometrical constants**
+**MODULE MATH          mathematical and geometrical constants
 
 .. code-block:: text
 
@@ -1138,7 +1149,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  sqrttwo         numerical value of the square root of two
  sqrtthree       numerical value of the square root of three
 
-**MDSTUF Module        molecular dynamics trajectory controls**
+**MODULE MDSTUF        molecular dynamics trajectory controls
 
 .. code-block:: text
 
@@ -1149,7 +1160,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  dorest          logical flag to remove center of mass motion
  integrate       type of molecular dynamics integration algorithm
 
-**MERCK Module         MMFF-specific force field parameters**
+**MODULE MERCK         MMFF-specific force field parameters
 
 .. code-block:: text
 
@@ -1170,7 +1181,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  mmffaromc       cationic aromatic rings parameters
  mmffaroma       anionic aromatic rings parameters
 
-**MINIMA Module        general parameters for minimizations**
+**MODULE MINIMA        general parameters for minimizations
 
 .. code-block:: text
 
@@ -1179,7 +1190,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  maxiter         maximum number of iterations during optimization
  nextiter        iteration number to use for the first iteration
 
-**MOLCUL Module        individual molecules in current system**
+**MODULE MOLCUL        individual molecules in current system
 
 .. code-block:: text
 
@@ -1190,7 +1201,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  totmass         total weight of all the molecules in the system
  molmass         molecular weight for each molecule in the system
 
-**MOLDYN Module        MD trajectory velocity & acceleration**
+**MODULE MOLDYN        MD trajectory velocity & acceleration
 
 .. code-block:: text
 
@@ -1198,7 +1209,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  a               current acceleration of each atom along x,y,z-axes
  aalt            alternate acceleration of each atom along x,y,z-axes
 
-**MOMENT Module        electric multipole moment components**
+**MODULE MOMENT        electric multipole moment components
 
 .. code-block:: text
 
@@ -1218,7 +1229,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  zyqdp           quadrupole tensor zy-component in global frame
  zzqdp           quadrupole tensor zz-component in global frame
 
-**MPLPOT Module        multipole functional form details**
+**MODULE MPLPOT        multipole functional form details
 
 .. code-block:: text
 
@@ -1229,7 +1240,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_chgpen      flag to use charge penetration damped potential
  pentyp          type of penetration damping (NONE, GORDON1, GORDON2)
 
-**MPOLE Module         atomic multipoles in current structure**
+**MODULE MPOLE         atomic multipoles in current structure
 
 .. code-block:: text
 
@@ -1245,9 +1256,10 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rpole           traceless Cartesian multipoles in the global frame
  spole           spherical harmonic multipoles in the local frame
  srpole          spherical harmonic multipoles in the global frame
+ mono0           original atomic monopole values for charge flux
  polaxe          local axis type for each multipole site
 
-**MRECIP Module        reciprocal PME for permanent multipoles**
+**MODULE MRECIP        reciprocal PME for permanent multipoles
 
 .. code-block:: text
 
@@ -1262,7 +1274,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  cphi            Cartesian permanent multipole potential and field
  fphi            fractional permanent multipole potential and field
 
-**MUTANT Module        free energy calculation hybrid atoms**
+**MODULE MUTANT        free energy calculation hybrid atoms
 
 .. code-block:: text
 
@@ -1281,7 +1293,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  scalpha         scale factor for soft core buffered 14-7 potential
  mut             true if an atom is to be mutated, false otherwise
 
-**NEIGH Module         pairwise neighbor list indices & storage**
+**MODULE NEIGH         pairwise neighbor list indices & storage
 
 .. code-block:: text
 
@@ -1323,7 +1335,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  domlst          logical flag to rebuild multipole neighbor list
  doulst          logical flag to rebuild preconditioner neighbor list
 
-**NONPOL Module        nonpolar cavity & dispersion parameters**
+**MODULE NONPOL        nonpolar cavity & dispersion parameters
 
 .. code-block:: text
 
@@ -1343,7 +1355,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rdisp           atomic radius of each atom for dispersion energy
  cdisp           maximum dispersion energy for each atom
 
-**NUCLEO Module        parameters for nucleic acid structure**
+**MODULE NUCLEO        parameters for nucleic acid structure
 
 .. code-block:: text
 
@@ -1354,7 +1366,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  deoxy           flag to mark deoxyribose or ribose sugar units
  hlxform         helix form (A, B or Z) of polynucleotide strands
 
-**OMEGA Module         torsional space dihedral angle values**
+**MODULE OMEGA         torsional space dihedral angle values
 
 .. code-block:: text
 
@@ -1363,7 +1375,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  zline           line number in Z-matrix of each dihedral angle
  dihed           current value in radians of each dihedral angle
 
-**OPBEND Module        out-of-plane bends in current structure**
+**MODULE OPBEND        out-of-plane bends in current structure
 
 .. code-block:: text
 
@@ -1371,7 +1383,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  iopb            bond angle numbers used in out-of-plane bending
  opbk            force constant values for out-of-plane bending
 
-**OPDIST Module        out-of-plane distances in structure**
+**MODULE OPDIST        out-of-plane distances in structure
 
 .. code-block:: text
 
@@ -1379,14 +1391,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  iopd            numbers of the atoms in each out-of-plane distance
  opdk            force constant values for out-of-plane distance
 
-**OPENMP Module        OpenMP processor and thread values**
+**MODULE OPENMP        OpenMP processor and thread values
 
 .. code-block:: text
 
  nproc           number of processors available to OpenMP
  nthread         number of threads to be used with OpenMP
 
-**ORBITS Module        conjugated pisystem orbital energies**
+**MODULE ORBITS        conjugated pisystem orbital energies
 
 .. code-block:: text
 
@@ -1394,7 +1406,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  worb            ionization potential of each pisystem atom
  emorb           repulsion integral for each pisystem atom
 
-**OUTPUT Module        output file format control parameters**
+**MODULE OUTPUT        output file format control parameters
 
 .. code-block:: text
 
@@ -1407,7 +1419,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  uindsave        logical flag to save induced atomic dipoles
  coordtype       selects Cartesian, internal, rigid body or none
 
-**PARAMS Module        force field parameter file contents**
+**MODULE PARAMS        force field parameter file contents
 
 .. code-block:: text
 
@@ -1415,7 +1427,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  nprm            number of nonblank lines in the parameter file
  prmline         contents of each individual parameter file line
 
-**PATHS Module         Elber reaction path method parameters**
+**MODULE PATHS         Elber reaction path method parameters
 
 .. code-block:: text
 
@@ -1428,7 +1440,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  pzet            current projection on reactant-product vector
  gc              gradient of the path constraints
 
-**PBSTUF Module        Poisson-Boltzmann solvation parameters**
+**MODULE PBSTUF        Poisson-Boltzmann solvation parameters
 
 .. code-block:: text
 
@@ -1479,7 +1491,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  pbeuind         Poisson-Boltzmann field due to induced dipoles
  pbeuinp         Poisson-Boltzmann field due to non-local induced dipoles
 
-**PDB Module           Protein Data Bank structure definition**
+**MODULE PDB           Protein Data Bank structure definition
 
 .. code-block:: text
 
@@ -1500,7 +1512,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  chnsym          string with PDB chain identifiers to be included
  instyp          string with PDB insertion records to be included
 
-**PHIPSI Module        phi-psi-omega-chi angles for protein**
+**MODULE PHIPSI        phi-psi-omega-chi angles for protein
 
 .. code-block:: text
 
@@ -1511,7 +1523,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  omg             value of the omega angle for each amino acid residue
  chi             values of the chi angles for each amino acid residue
 
-**PIORBS Module        conjugated system in current structure**
+**MODULE PIORBS        conjugated system in current structure
 
 .. code-block:: text
 
@@ -1530,7 +1542,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  pnpl            pi-bond orders for bonds in "nonplanar" pisystem
  listpi          atom list indicating whether each atom has an orbital
 
-**PISTUF Module        bond order-related pisystem parameters**
+**MODULE PISTUF        bond order-related pisystem parameters
 
 .. code-block:: text
 
@@ -1540,7 +1552,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  lslope          rate of bond length increase with a bond order decrease
  torsp2          2-fold torsional energy barrier for pi-bond order of 1.0
 
-**PITORS Module        pi-system torsions in current structure**
+**MODULE PITORS        pi-system torsions in current structure
 
 .. code-block:: text
 
@@ -1548,7 +1560,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ipit            numbers of the atoms in each pi-system torsion
  kpit            2-fold pi-system torsional force constants
 
-**PME Module           values for particle mesh Ewald summation**
+**MODULE PME           values for particle mesh Ewald summation
 
 .. code-block:: text
 
@@ -1576,7 +1588,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  qgrid           values on the particle mesh Ewald grid
  qfac            prefactors for the particle mesh Ewald grid
 
-**POLAR Module         induced dipole moments & polarizability**
+**MODULE POLAR         induced dipole moments & polarizability
 
 .. code-block:: text
 
@@ -1597,7 +1609,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  uexact          exact SCF induced dipoles to full numerical precision
  douind          flag to allow induced dipoles at each atomic site
 
-**POLGRP Module        polarization group connectivity lists**
+**MODULE POLGRP        polarization group connectivity lists
 
 .. code-block:: text
 
@@ -1614,7 +1626,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ip13            atom numbers of atoms in groups 1-3 to each atom
  ip14            atom numbers of atoms in groups 1-4 to each atom
 
-**POLOPT Module        induced dipoles for OPT extrapolation**
+**MODULE POLOPT        induced dipoles for OPT extrapolation
 
 .. code-block:: text
 
@@ -1630,7 +1642,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  fopt            OPT fractional reciprocal potentials at multipole sites
  foptp           OPT fractional reciprocal potentials for energy terms
 
-**POLPCG Module        induced dipoles via the PCG solver**
+**MODULE POLPCG        induced dipoles via the PCG solver
 
 .. code-block:: text
 
@@ -1640,7 +1652,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  pcgprec         flag to allow use of preconditioner with PCG solver
  pcgguess        flag to use initial PCG based on direct field
 
-**POLPOT Module        polarization functional form details**
+**MODULE POLPOT        polarization functional form details
 
 .. code-block:: text
 
@@ -1672,7 +1684,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_dirdamp     flag to use damped direct polarization interactions
  poltyp          type of polarization (MUTUAL, DIRECT, OPT or TCG)
 
-**POLTCG Module        induced dipoles via the TCG solver**
+**MODULE POLTCG        induced dipoles via the TCG solver
 
 .. code-block:: text
 
@@ -1685,7 +1697,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  ubp             right-hand side mutual induced p-dipoles
  tcgguess        flag to use initial TCG based on direct field
 
-**POTENT Module        usage of potential energy components**
+**MODULE POTENT        usage of potential energy components
 
 .. code-block:: text
 
@@ -1712,6 +1724,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_mpole       logical flag governing use of multipole potential
  use_polar       logical flag governing use of polarization term
  use_chgtrn      logical flag governing use of charge transfer term
+ use_chgflx      logical flag governing use of charge flux term
  use_rxnfld      logical flag governing use of reaction field term
  use_solv        logical flag governing use of continuum solvation term
  use_metal       logical flag governing use of ligand field term
@@ -1720,7 +1733,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_born        logical flag governing use of Born radii values
  use_orbit       logical flag governing use of pisystem computation
 
-**POTFIT Module        values for electrostatic potential fit**
+**MODULE POTFIT        values for electrostatic potential fit
 
 .. code-block:: text
 
@@ -1755,7 +1768,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  gatm            flag to use potential grid points around each atom
  fatm            flag to use each atom in electrostatic potential fit
 
-**PTABLE Module        symbols and info for chemical elements**
+**MODULE PTABLE        symbols and info for chemical elements
 
 .. code-block:: text
 
@@ -1765,7 +1778,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  covrad          covalent radius for each chemical element
  elemnt          atomic symbol for each chemical element
 
-**REFER Module         reference atomic coordinate storage**
+**MODULE REFER         reference atomic coordinate storage
 
 .. code-block:: text
 
@@ -1788,7 +1801,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  reffile         base filename for each reference system
  reftitle        title used to describe each reference system
 
-**REPEL Module         Pauli repulsion for current structure**
+**MODULE REPEL         Pauli repulsion for current structure
 
 .. code-block:: text
 
@@ -1797,7 +1810,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  dmppr           Pauli repulsion alpha damping value at each site
  elepr           Pauli repulsion valence electrons at each site
 
-**REPPOT Module        repulsion interaction scale factors**
+**MODULE REPPOT        repulsion interaction scale factors
 
 .. code-block:: text
 
@@ -1806,7 +1819,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  r4scale         scale factor for 1-4 repulsion energy interactions
  r5scale         scale factor for 1-5 repulsion energy interactions
 
-**RESDUE Module        amino acid & nucleotide residue names**
+**MODULE RESDUE        amino acid & nucleotide residue names
 
 .. code-block:: text
 
@@ -1856,7 +1869,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  amino1          one-letter abbreviations for amino acids types
  nuclz1          one-letter abbreviations for nucleic acids types
 
-**RESTRN Module        parameters for geometrical restraints**
+**MODULE RESTRN        parameters for geometrical restraints
 
 .. code-block:: text
 
@@ -1888,7 +1901,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  use_basin       logical flag governing use of Gaussian basin
  use_wall        logical flag governing use of droplet boundary
 
-**RGDDYN Module        rigid body MD velocities and momenta**
+**MODULE RGDDYN        rigid body MD velocities and momenta
 
 .. code-block:: text
 
@@ -1902,7 +1915,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  wc              half-step angular velocity for kinetic energy
  linear          logical flag to mark group as linear or nonlinear
 
-**RIGID Module         rigid body coordinates for atom groups**
+**MODULE RIGID         rigid body coordinates for atom groups
 
 .. code-block:: text
 
@@ -1912,7 +1925,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rbc             current rigid body coordinates for each group
  use_rigid       flag to mark use of rigid body coordinate system
 
-**RING Module          number and location of ring structures**
+**MODULE RING          number and location of ring structures
 
 .. code-block:: text
 
@@ -1927,7 +1940,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  iring6          numbers of the atoms involved in each 6-ring
  iring7          numbers of the atoms involved in each 7-ring
 
-**ROTBND Module        molecule partitions for bond rotation**
+**MODULE ROTBND        molecule partitions for bond rotation
 
 .. code-block:: text
 
@@ -1935,7 +1948,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rot             atom numbers of atoms moving when bond rotates
  use_short       logical flag governing use of shortest atom list
 
-**RXNFLD Module        reaction field matrix and indices**
+**MODULE RXNFLD        reaction field matrix and indices
 
 .. code-block:: text
 
@@ -1943,7 +1956,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  b1              first reaction field matrix element array
  b2              second reaction field matrix element array
 
-**RXNPOT Module        reaction field functional form details**
+**MODULE RXNPOT        reaction field functional form details
 
 .. code-block:: text
 
@@ -1951,14 +1964,14 @@ The Fortran modules found in the Tinker package are listed below along with a br
  rfbulkd         bulk dielectric constant of reaction field continuum
  rfterms         number of terms to use in reaction field summation
 
-**SCALES Module        optimization parameter scale factors**
+**MODULE SCALES        optimization parameter scale factors
 
 .. code-block:: text
 
  scale           multiplicative factor for each optimization parameter
  set_scale       logical flag to show if scale factors have been set
 
-**SEQUEN Module        sequence information for biopolymer**
+**MODULE SEQUEN        sequence information for biopolymer
 
 .. code-block:: text
 
@@ -1970,7 +1983,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  chnnam          one-letter identifier for each sequence chain
  chntyp          contents of each chain (GENERIC, PEPTIDE or NUCLEIC)
 
-**SHUNT Module         polynomial switching function values**
+**MODULE SHUNT         polynomial switching function values
 
 .. code-block:: text
 
@@ -1993,7 +2006,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  f6              sixth order coefficient of additive switch function
  f7              seventh order coefficient of additive switch function
 
-**SIZES Module         parameters to set array dimensions**
+**MODULE SIZES         parameters to set array dimensions
 
 "sizes" sets values for critical array dimensions used
 throughout the software; these parameters fix the size of
@@ -2001,7 +2014,7 @@ the largest systems that can be handled
 
 .. code-block:: text
 
- parameter:      maximum allowed number of:
+ parameter       maximum allowed number of:
  maxatm          atoms in the molecular system
  maxtyp          force field atom type definitions
  maxclass        force field atom class definitions
@@ -2011,7 +2024,7 @@ the largest systems that can be handled
  maxres          residues in the macromolecule
  maxfix          geometric constraints and restraints
 
-**SOCKET Module        socket communication control parameters**
+**MODULE SOCKET        socket communication control parameters
 
 .. code-block:: text
 
@@ -2023,7 +2036,7 @@ the largest systems that can be handled
  sktstop         logical flag to indicate socket shutdown
  use_socket      logical flag governing use of external sockets
 
-**SOLUTE Module        continuum solvation model parameters**
+**MODULE SOLUTE        continuum solvation model parameters
 
 .. code-block:: text
 
@@ -2051,7 +2064,7 @@ the largest systems that can be handled
  solvtyp         type of continuum solvation energy model in use
  borntyp         method to be used for the Born radius computation
 
-**STODYN Module        SD trajectory frictional coefficients**
+**MODULE STODYN        SD trajectory frictional coefficients
 
 .. code-block:: text
 
@@ -2059,7 +2072,7 @@ the largest systems that can be handled
  fgamma          atomic frictional coefficients for each atom
  use_sdarea      logical flag to use surface area friction scaling
 
-**STRBND Module        stretch-bends in current structure**
+**MODULE STRBND        stretch-bends in current structure
 
 .. code-block:: text
 
@@ -2067,7 +2080,7 @@ the largest systems that can be handled
  isb             angle and bond numbers used in stretch-bend
  sbk             force constants for stretch-bend terms
 
-**STRTOR Module        stretch-torsions in current structure**
+**MODULE STRTOR        stretch-torsions in current structure
 
 .. code-block:: text
 
@@ -2075,7 +2088,7 @@ the largest systems that can be handled
  ist             torsion and bond numbers used in stretch-torsion
  kst             1-, 2- and 3-fold stretch-torsion force constants
 
-**SYNTRN Module        synchronous transit path definition**
+**MODULE SYNTRN        synchronous transit path definition
 
 .. code-block:: text
 
@@ -2085,7 +2098,7 @@ the largest systems that can be handled
  xmin2           product coordinates as array of optimization variables
  xm              extra coordinate set for quadratic synchronous transit
 
-**TARRAY Module        store dipole-dipole matrix elements**
+**MODULE TARRAY        store dipole-dipole matrix elements
 
 .. code-block:: text
 
@@ -2093,14 +2106,14 @@ the largest systems that can be handled
  tindex          index into stored dipole-dipole matrix values
  tdipdip         stored dipole-dipole matrix element values
 
-**TITLES Module        title for current molecular system**
+**MODULE TITLES        title for current molecular system
 
 .. code-block:: text
 
  ltitle          length in characters of the nonblank title string
  title           title used to describe the current structure
 
-**TORPOT Module        torsional functional form details**
+**MODULE TORPOT        torsional functional form details
 
 .. code-block:: text
 
@@ -2112,7 +2125,7 @@ the largest systems that can be handled
  atorunit        convert angle-torsion energy to kcal/mole
  ttorunit        convert torsion-torsion energy to kcal/mole
 
-**TORS Module          torsional angles in current structure**
+**MODULE TORS          torsional angles in current structure
 
 .. code-block:: text
 
@@ -2125,14 +2138,14 @@ the largest systems that can be handled
  tors5           5-fold amplitude and phase for each torsional angle
  tors6           6-fold amplitude and phase for each torsional angle
 
-**TORTOR Module        torsion-torsions in current structure**
+**MODULE TORTOR        torsion-torsions in current structure
 
 .. code-block:: text
 
  ntortor         total number of torsion-torsion interactions
  itt             atoms and parameter indices for torsion-torsion
 
-**TREE Module          potential smoothing search tree levels**
+**MODULE TREE          potential smoothing search tree levels
 
 .. code-block:: text
 
@@ -2141,7 +2154,7 @@ the largest systems that can be handled
  etree           energy reference value at the top of the tree
  ilevel          smoothing deformation value at each tree level
 
-**UNITS Module         physical constants and unit conversions**
+**MODULE UNITS         physical constants and unit conversions
 
 D. B. Newell, F. Cabiati, J. Fischer, K. Fujii, S. G. Karshenboim,
 S. Margolis, E. de Mirandes, P. J. Mohr, F. Nez, K. Pachucki,
@@ -2196,7 +2209,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  debye           conversion from electron-Ang to Debye
  prescon         conversion from kcal/mole/Ang**3 to Atm
 
-**UPRIOR Module        previous values of induced dipoles**
+**MODULE UPRIOR        previous values of induced dipoles
 
 .. code-block:: text
 
@@ -2216,7 +2229,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  use_pred        flag to control use of induced dipole prediction
  polpred         type of predictor polynomial (GEAR, ASPC or LSQR)
 
-**UREY Module          Urey-Bradley interactions in structure**
+**MODULE UREY          Urey-Bradley interactions in structure
 
 .. code-block:: text
 
@@ -2225,7 +2238,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  uk              Urey-Bradley force constants (kcal/mole/Ang**2)
  ul              ideal 1-3 distance values in Angstroms
 
-**URYPOT Module        Urey-Bradley functional form details**
+**MODULE URYPOT        Urey-Bradley functional form details
 
 .. code-block:: text
 
@@ -2233,7 +2246,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  qury            quartic coefficient in Urey-Bradley potential
  ureyunit        convert Urey-Bradley energy to kcal/mole
 
-**USAGE Module         atoms active during energy computation**
+**MODULE USAGE         atoms active during energy computation
 
 .. code-block:: text
 
@@ -2241,7 +2254,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  iuse            numbers of the atoms active in energy calculation
  use             true if an atom is active, false if inactive
 
-**VALFIT Module        valence term parameter fitting values**
+**MODULE VALFIT        valence term parameter fitting values
 
 .. code-block:: text
 
@@ -2254,7 +2267,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  fit_struct      logical flag to structure-fit valence parameters
  fit_force       logical flag to force-fit valence parameters
 
-**VDW Module           van der Waals terms in current structure**
+**MODULE VDW           van der Waals terms in current structure
 
 .. code-block:: text
 
@@ -2273,7 +2286,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  radhbnd         minimum energy distance for hydrogen bonding pairs
  epshbnd         well depth parameter for hydrogen bonding pairs
 
-**VDWPOT Module        van der Waals functional form details**
+**MODULE VDWPOT        van der Waals functional form details
 
 .. code-block:: text
 
@@ -2297,7 +2310,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  epsrule         combining rule for vdw well depth parameters
  gausstyp        type of Gaussian fit to van der Waals potential
 
-**VIBS Module          iterative vibrational analysis components**
+**MODULE VIBS          iterative vibrational analysis components
 
 .. code-block:: text
 
@@ -2305,14 +2318,14 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  rhok            alternate vectors for iterative vibrational analysis
  rwork           temporary work array for eigenvector transformation
 
-**VIRIAL Module        components of internal virial tensor**
+**MODULE VIRIAL        components of internal virial tensor
 
 .. code-block:: text
 
  vir             total internal virial Cartesian tensor components
  use_virial      logical flag governing use of virial computation
 
-**WARP Module          potential surface smoothing parameters**
+**MODULE WARP          potential surface smoothing parameters
 
 .. code-block:: text
 
@@ -2327,7 +2340,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  use_tophat      flag to use analytical tophat smoothed potential
  use_stophat     flag to use shifted tophat smoothed potential
 
-**XTALS Module         structures used for parameter fitting**
+**MODULE XTALS         structures used for parameter fitting
 
 .. code-block:: text
 
@@ -2342,7 +2355,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  vartyp          type of each potential parameter to be optimized
  rsdtyp          experimental variable for each of the residuals
 
-**ZCLOSE Module        Z-matrix ring openings and closures**
+**MODULE ZCLOSE        Z-matrix ring openings and closures
 
 .. code-block:: text
 
@@ -2351,7 +2364,7 @@ Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
  iadd            numbers of the atom pairs defining added bonds
  idel            numbers of the atom pairs defining deleted bonds
 
-**ZCOORD Module        Z-matrix internal coordinate values**
+**MODULE ZCOORD        Z-matrix internal coordinate values
 
 .. code-block:: text
 

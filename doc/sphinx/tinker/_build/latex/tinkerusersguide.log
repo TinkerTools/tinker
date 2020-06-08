@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  25 MAY 2020 21:01
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  7 JUN 2020 22:07
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -728,57 +728,57 @@ LaTeX Font Info:    Font shape `T1/lato-TLF/b/n' will be
 
 ]
 Overfull \hbox (1.29202pt too wide) detected at line 68
- []\T1/bch/m/n/10.95 201
+ []\T1/bch/m/n/10.95 203
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 69
- []\T1/bch/m/n/10.95 201
+ []\T1/bch/m/n/10.95 203
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 70
- []\T1/bch/m/n/10.95 202
+ []\T1/bch/m/n/10.95 204
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 71
- []\T1/bch/m/n/10.95 202
+ []\T1/bch/m/n/10.95 204
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 72
- []\T1/bch/m/n/10.95 202
+ []\T1/bch/m/n/10.95 204
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 73
- []\T1/bch/m/n/10.95 203
+ []\T1/bch/m/n/10.95 205
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 74
- []\T1/bch/m/n/10.95 203
+ []\T1/bch/m/n/10.95 205
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 75
- []\T1/bch/m/n/10.95 204
+ []\T1/bch/m/n/10.95 206
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 76
- []\T1/bch/m/n/10.95 204
+ []\T1/bch/m/n/10.95 206
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 79
- []\T1/bch/m/n/10.95 209
+ []\T1/bch/m/n/10.95 211
  []
 
 
 Overfull \hbox (1.29202pt too wide) detected at line 82
- []\T1/bch/m/n/10.95 215
+ []\T1/bch/m/n/10.95 217
  []
 
 )
@@ -880,97 +880,93 @@ Chapter 9.
 [113] [114] [115] [116] [117] [118] [119] [120] [121] [122] [123] [124]
 [125] [126] [127] [128] [129] [130] [131] [132] [133] [134] [135] [136]
 [137] [138] [139] [140] [141] [142] [143] [144] [145] [146] [147] [148]
-[149] [150] [151] [152] [153] [154] [155] [156]
+[149] [150] [151] [152] [153] [154] [155] [156] [157] [158
+
+]
 Chapter 10.
 LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 73
-05.
+32.
 (/usr/local/texlive/2020/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 7305.
+(Font)              scaled to size 10.0pt on input line 7332.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 6.0pt on input line 7305.
- [157
-
-]
-[158] [159] [160] [161] [162] [163] [164] [165] [166] [167] [168] [169]
-[170] [171] [172] [173] [174] [175]
+(Font)              scaled to size 6.0pt on input line 7332.
+ [159]
+[160] [161] [162] [163] [164] [165] [166] [167] [168] [169] [170] [171]
+[172] [173] [174] [175] [176] [177]
 LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 8
-456.
+494.
 
 (/usr/local/texlive/2020/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 8456.
- [176]
-[177]
-Underfull \vbox (badness 1997) detected at line 8621
+(Font)              scaled to size 10.0pt on input line 8494.
+ [178]
+[179] [180] [181] [182]
+Underfull \vbox (badness 1997) detected at line 8837
  []
 
-[178] [179] [180] [181]
-Overfull \vbox (1.45445pt too high) detected at line 8874
+[183] [184] [185] [186] [187] [188] [189]
+Underfull \vbox (badness 4391) detected at line 9226
  []
 
-[182] [183] [184] [185] [186] [187] [188] [189] [190] [191] [192] [193]
-Overfull \vbox (1.45445pt too high) detected at line 9595
- []
-
-[194] [195] [196]
+[190] [191] [192] [193] [194] [195] [196] [197] [198]
 Chapter 11.
-[197
+[199
 
-] [198] [199] [200
+] [200] [201] [202
 
 ]
 Chapter 12.
-[201] [202]
-Overfull \vbox (1.07898pt too high) detected at line 9880
+[203] [204]
+Overfull \vbox (1.07898pt too high) detected at line 9920
  []
 
-[203] [204] [205] [206
+[205] [206] [207] [208
 
 ]
 Chapter 13.
 
-Underfull \hbox (badness 10000) in paragraph at lines 9943--9945
+Underfull \hbox (badness 10000) in paragraph at lines 9983--9985
 []\T1/bch/m/n/10.95 and tor-sional
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9957--9959
+Underfull \hbox (badness 10000) in paragraph at lines 9997--9999
 []\T1/bch/m/n/10.95 treatment;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 9990--9992
+Underfull \hbox (badness 10000) in paragraph at lines 10030--10032
 []\T1/bch/m/n/10.95 for the AMOEBA
  []
 
-[207] [208]
+[209] [210]
 Chapter 14.
-[209
+[211
 
-] [210] [211] [212] [213] [214] [215] [216] [217] [218] [219] [220]
-[221] [222] [223] [224] [225] [226] (./tinkerusersguide.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 10719.
- [227]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 10719.
+] [212] [213] [214] [215] [216] [217] [218] [219] [220] [221] [222]
+[223] [224] [225] [226] [227] [228] (./tinkerusersguide.ind)
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 10759.
+ [229]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 10759.
 
 (./tinkerusersguide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 10719.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 10759.
 
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 10719
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 10759
 .
 Package rerunfilecheck Info: File `tinkerusersguide.out' has not changed.
 (rerunfilecheck)             Checksum: F0DA1E12FA58D142F872FB54C1209935;11413.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 10719.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 10759.
  ) 
 Here is how much of TeX's memory you used:
- 14509 strings out of 480608
- 212242 string characters out of 5903631
- 654524 words of memory out of 5000000
+ 14511 strings out of 480608
+ 212258 string characters out of 5903631
+ 659524 words of memory out of 5000000
  29674 multiletter control sequences out of 15000+600000
  780790 words of font info for 93 fonts, out of 8000000 for 9000
  1142 hyphenation exceptions out of 8191
@@ -986,10 +982,10 @@ ts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/texlive/2020/texmf
 st/fonts/type1/bitstrea/charter/bchb8a.pfb></usr/local/texlive/2020/texmf-dist/
 fonts/type1/bitstrea/charter/bchr8a.pfb></usr/local/texlive/2020/texmf-dist/fon
 ts/type1/public/cm-super/sfrb1095.pfb>
-Output written on tinkerusersguide.pdf (231 pages, 539450 bytes).
+Output written on tinkerusersguide.pdf (233 pages, 542182 bytes).
 PDF statistics:
- 1463 PDF objects out of 1728 (max. 8388607)
- 1207 compressed objects within 13 object streams
- 356 named destinations out of 1000 (max. 500000)
+ 1471 PDF objects out of 1728 (max. 8388607)
+ 1213 compressed objects within 13 object streams
+ 358 named destinations out of 1000 (max. 500000)
  437 words of extra memory for PDF output out of 10000 (max. 10000000)
 

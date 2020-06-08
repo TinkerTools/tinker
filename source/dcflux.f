@@ -7,14 +7,14 @@ c     ##########################################################
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine dcflux  --  charge flux gradient components  ##
+c     ##  subroutine dcflux  --  charge flux gradient chain rule  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
 c     "dcflux" takes as input the electrostatic potential at each
-c     atomic site and calculates force corrections due to charge
-c     flux coupled with bond stretching and angle bending
+c     atomic site and calculates gradient chain rule corrections due
+c     to charge flux coupled with bond stretching and angle bending
 c
 c     literature reference:
 c

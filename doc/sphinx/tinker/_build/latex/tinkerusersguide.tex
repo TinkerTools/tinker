@@ -76,7 +76,7 @@
     
 
 \title{Tinker User\textquotesingle{}s Guide}
-\date{May 25, 2020}
+\date{Jun 07, 2020}
 \release{}
 \author{TinkerTools Organization}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -1642,6 +1642,11 @@ intermolecular in finding the perturbation energies
 “altelec” constructs mutated electrostatic parameters based
 on the lambda mutation parameter “elambda”
 
+\sphinxstylestrong{ALTERCHG Subroutine}
+
+“alterchg” calculates the change in atomic partial charge or
+monopole values due to bond and angle charge flux coupling
+
 \sphinxstylestrong{ALTERPOL Subroutine}
 
 “alterpol” finds an output set of atomic multipole parameters
@@ -1673,6 +1678,11 @@ options are provided to display system and force field info,
 partition the energy by atom or by potential function type,
 show force field parameters by atom; output the large energy
 interactions and find electrostatic and inertial properties
+
+\sphinxstylestrong{ANGCHG Subroutine}
+
+“angchg” computes modifications to atomic partial charges or
+monopoles due to angle bending using a charge flux formulation
 
 \sphinxstylestrong{ANGGUESS Function}
 
@@ -1817,6 +1827,11 @@ atoms defining each bitorsion
 
 “bmax” computes the maximum order of the B functions needed
 for evaluation of Slater\sphinxhyphen{}type (STO) overlap integrals
+
+\sphinxstylestrong{BNDCHG Subroutine}
+
+“bndchg” computes modifications to atomic partial charges or
+monopoles due to bond stretch using a charge flux formulation
 
 \sphinxstylestrong{BNDERR Function}
 
@@ -2191,6 +2206,12 @@ function for powers of the interatomic distance
 “dbuild” performs a complete rebuild of the damped dispersion
 neighbor list for all sites
 
+\sphinxstylestrong{DCFLUX Subroutine}
+
+“dcflux” takes as input the electrostatic potential at each
+atomic site and calculates gradient chain rule corrections due
+to charge flux coupled with bond stretching and angle bending
+
 \sphinxstylestrong{DEFLATE Subroutine}
 
 “deflate” uses the power method with deflation to compute the
@@ -2302,11 +2323,11 @@ of the bounds errors into the lower half of the matrix
 
 \sphinxstylestrong{DOCUMENT Program}
 
-“document” generates a formatted description of all the code
-modules or common blocks, an index of routines called by each
-source code module, a listing of all valid keywords, a list of
-include file dependencies as needed by a Unix\sphinxhyphen{}style Makefile,
-or a formatted force field parameter set summary
+“document” generates a formatted description of all the routines
+and modules, an index of routines called by each source file, a
+list of all valid keywords, a list of include file dependencies
+as needed by a Unix\sphinxhyphen{}style Makefile, or a formatted force field
+parameter summary
 
 \sphinxstylestrong{DOT Function}
 
@@ -4961,6 +4982,12 @@ the structure and processes any new or changed values
 “kchargem” assigns partial charges to the atoms according to
 the Merck Molecular Force Field (MMFF)
 
+\sphinxstylestrong{KCHGFLX Subroutine}
+
+“kchgflx” assigns a force constant and ideal bond length
+to each bond in the structure and processes any new or
+changed parameter values
+
 \sphinxstylestrong{KCHGTRN Subroutine}
 
 “kchgtrn” assigns charge magnitude and damping parameters for
@@ -7061,11 +7088,6 @@ gradient induced dipole solver using a neighbor pair list
 “valence” refines force field parameters for valence terms based
 on a quantum mechanical optimized structure and frequencies
 
-\sphinxstylestrong{VALENCE1 Function}
-
-“valence1” is a service routine that computes the energy and
-gradient for a structure during valence parameter fitting
-
 \sphinxstylestrong{VALFIT1 Function}
 
 “valfit1” is a service routine that computes the RMS error
@@ -7075,6 +7097,11 @@ and gradient for valence parameters fit to QM results
 
 “valguess” sets approximate valence parameter values based on
 quantum mechanical structure and frequency data
+
+\sphinxstylestrong{VALMIN1 Function}
+
+“valmin1” is a service routine that computes the molecular
+energy and gradient during valence parameter optimization
 
 \sphinxstylestrong{VALRMS Function}
 
@@ -7300,7 +7327,7 @@ as needed by the internal coordinate editing program
 \label{\detokenize{text/modules:modules-global-variables}}\label{\detokenize{text/modules::doc}}
 The Fortran modules found in the Tinker package are listed below along with a brief description of the variables associated with each module. Each individual module contains a set of globally allocated variables available to any program unit upon inclusion of that module. A source listing containing each of the Tinker functions and subroutines and its included modules can be produced by running the “listing.make” script found in the distribution.
 
-\sphinxstylestrong{ACTION Module        total number of each energy term type}
+{\color{red}\bfseries{}**}MODULE ACTION        total number of each energy term type
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 neb             number of bond stretch energy terms computed
@@ -7334,7 +7361,7 @@ neg             number of geometric restraint energy terms computed
 nex             number of extra energy terms computed
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ALIGN Module         information for structure superposition}
+{\color{red}\bfseries{}**}MODULE ALIGN         information for structure superposition
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nfit            number of atoms to use in superimposing two structures
@@ -7342,7 +7369,7 @@ ifit            atom numbers of pairs of atoms to be superimposed
 wfit            weights assigned to atom pairs during superposition
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ANALYZ Module        energy components partitioned to atoms}
+{\color{red}\bfseries{}**}MODULE ANALYZ        energy components partitioned to atoms
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 aesum           total potential energy partitioned over atoms
@@ -7376,7 +7403,7 @@ aeg             geometric restraint energy partitioned over atoms
 aex             extra energy term partitioned over atoms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ANGANG Module        angle\sphinxhyphen{}angles in current structure}
+{\color{red}\bfseries{}**}MODULE ANGANG        angle\sphinxhyphen{}angles in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nangang         total number of angle\PYGZhy{}angle interactions
@@ -7384,7 +7411,7 @@ iaa             angle numbers used in each angle\PYGZhy{}angle term
 kaa             force constant for angle\PYGZhy{}angle cross terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ANGBND Module        bond angle bends in current structure}
+{\color{red}\bfseries{}**}MODULE ANGBND        bond angle bends in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nangle          total number of angle bends in the system
@@ -7394,7 +7421,7 @@ anat            ideal bond angle or phase shift angle (degrees)
 afld            periodicity for Fourier angle bending term
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ANGPOT Module        angle bend functional form details}
+{\color{red}\bfseries{}**}MODULE ANGPOT        angle bend functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 angunit         convert angle bending energy to kcal/mole
@@ -7418,7 +7445,7 @@ opbtyp          type of out\PYGZhy{}of\PYGZhy{}plane bend potential energy funct
 angtyp          type of angle bending function for each bond angle
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ANGTOR Module        angle\sphinxhyphen{}torsions in current structure}
+{\color{red}\bfseries{}**}MODULE ANGTOR        angle\sphinxhyphen{}torsions in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nangtor         total number of angle\PYGZhy{}torsion interactions
@@ -7426,7 +7453,7 @@ iat             torsion and angle numbers used in angle\PYGZhy{}torsion
 kant            1\PYGZhy{}, 2\PYGZhy{} and 3\PYGZhy{}fold angle\PYGZhy{}torsion force constants
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ARGUE Module         command line arguments at run time}
+{\color{red}\bfseries{}**}MODULE ARGUE         command line arguments at run time
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxarg          maximum number of command line arguments
@@ -7435,7 +7462,7 @@ listarg         flag to mark available command line arguments
 arg             strings containing the command line arguments
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ASCII Module         selected ASCII character code values}
+{\color{red}\bfseries{}**}MODULE ASCII         selected ASCII character code values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 null            decimal value of ASCII code for null (0)
@@ -7470,14 +7497,15 @@ vertical        decimal value of ASCII code for vertical bar (124)
 tilde           decimal value of ASCII code for tilde (126)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ATMLST Module        local geometry indices for each atom}
+{\color{red}\bfseries{}**}MODULE ATMLST        bond and angle local geometry indices
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-bndlist         list of the bond numbers involving each atom
-anglist         list of the angle numbers centered on each atom
+bndlist         numbers of the bonds involving each atom
+anglist         numbers of the angles centered on each atom
+balist          numbers of the bonds comprising each angle
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ATOMID Module        atomic properties for current atoms}
+{\color{red}\bfseries{}**}MODULE ATOMID        atomic properties for current atoms
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 tag             integer atom labels from input coordinates file
@@ -7489,7 +7517,7 @@ name            atom name for each atom in the system
 story           descriptive type for each atom in system
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ATOMS Module         number, position and type of atoms}
+{\color{red}\bfseries{}**}MODULE ATOMS         number, position and type of atoms
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 n               total number of atoms in the current system
@@ -7499,7 +7527,7 @@ y               current y\PYGZhy{}coordinate for each atom in the system
 z               current z\PYGZhy{}coordinate for each atom in the system
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{BATH Module          thermostat and barostat control values}
+{\color{red}\bfseries{}**}MODULE BATH          thermostat and barostat control values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnose         maximum length of Nose\PYGZhy{}Hoover thermostat chain
@@ -7526,14 +7554,14 @@ barostat        choice of pressure control method to be used
 volscale        choice of scaling method for Monte Carlo barostat
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{BITOR Module         bitorsions in the current structure}
+{\color{red}\bfseries{}**}MODULE BITOR         bitorsions in the current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nbitor          total number of bitorsions in the system
 ibitor          numbers of the atoms in each bitorsion
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{BNDPOT Module        bond stretch functional form details}
+{\color{red}\bfseries{}**}MODULE BNDPOT        bond stretch functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 cbnd            cubic coefficient in bond stretch potential
@@ -7542,7 +7570,7 @@ bndunit         convert bond stretch energy to kcal/mole
 bndtyp          type of bond stretch potential energy function
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{BNDSTR Module        bond stretches in the current structure}
+{\color{red}\bfseries{}**}MODULE BNDSTR        bond stretches in the current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nbond           total number of bond stretches in the system
@@ -7551,7 +7579,7 @@ bk              bond stretch force constants (kcal/mole/Ang**2)
 bl              ideal bond length values in Angstroms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{BOUND Module         periodic boundary condition controls}
+{\color{red}\bfseries{}**}MODULE BOUND         periodic boundary condition controls
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 polycut         cutoff distance for infinite polymer nonbonds
@@ -7561,7 +7589,7 @@ use\PYGZus{}replica     flag to use replicates for periodic system
 use\PYGZus{}polymer     flag to mark presence of infinite polymer
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{BOXES Module         periodic boundary condition parameters}
+{\color{red}\bfseries{}**}MODULE BOXES         periodic boundary condition parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 xbox            length of a\PYGZhy{}axis of periodic box in Angstroms
@@ -7590,7 +7618,7 @@ octahedron      flag to mark box as truncated octahedron
 spacegrp        space group symbol for the unit cell type
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CELL Module          replicated cell periodic boundaries}
+{\color{red}\bfseries{}**}MODULE CELL          replicated cell periodic boundaries
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ncell           total number of cell replicates for periodic boundaries
@@ -7603,26 +7631,36 @@ ycell2          half the length of the b\PYGZhy{}axis of the replicated cell
 zcell2          half the length of the c\PYGZhy{}axis of the replicated cell
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CHARGE Module        partial charges in current structure}
+{\color{red}\bfseries{}**}MODULE CFLUX         charge flux terms in current system
+
+\begin{sphinxVerbatim}[commandchars=\\\{\}]
+bflx            bond stretching charge flux constant (electrons/Ang)
+aflx            angle bending charge flux constant (electrons/radian)
+abflx           asymmetric stretch charge flux constant (electrons/Ang)
+\end{sphinxVerbatim}
+
+{\color{red}\bfseries{}**}MODULE CHARGE        partial charges in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nion            total number of partial charges in system
 iion            number of the atom site for each partial charge
 jion            neighbor generation site for each partial charge
 kion            cutoff switching site for each partial charge
-pchg            magnitude of the partial charges (e\PYGZhy{})
+pchg            current atomic partial charge values (e\PYGZhy{})
+pchg0           original partial charge values for charge flux
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CHGPEN Module        charge penetration in current structure}
+{\color{red}\bfseries{}**}MODULE CHGPEN        charge penetration in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ncp             total number of charge penetration sites in system
 pcore           number of core electrons at each multipole site
 pval            number of valence electrons at each multipole site
+pval0           original number of valence electrons for charge flux
 palpha          charge penetration damping at each multipole site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CHGPOT Module        charge\sphinxhyphen{}charge functional form details}
+{\color{red}\bfseries{}**}MODULE CHGPOT        charge\sphinxhyphen{}charge functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 electric        energy factor in kcal/mole for current force field
@@ -7637,7 +7675,7 @@ neutnbr         logical flag governing use of neutral group neighbors
 neutcut         logical flag governing use of neutral group cutoffs
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CHGTRN Module        charge transfer for current structure}
+{\color{red}\bfseries{}**}MODULE CHGTRN        charge transfer for current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nct             total number of dispersion sites in the system
@@ -7645,14 +7683,14 @@ chgct           charge for charge transfer at each multipole site
 dmpct           charge transfer damping factor at each multipole site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CHRONO Module        clock time values for current program}
+{\color{red}\bfseries{}**}MODULE CHRONO        clock time values for current program
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 twall           current processor wall clock time in seconds
 tcpu            elapsed cpu time from start of program in seconds
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CHUNKS Module        PME grid spatial decomposition values}
+{\color{red}\bfseries{}**}MODULE CHUNKS        PME grid spatial decomposition values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nchunk          total number of spatial regions for PME grid
@@ -7668,7 +7706,7 @@ grdoff          offset for index into B\PYGZhy{}spline coefficients
 pmetable        PME grid spatial regions involved for each site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{COUPLE Module        atom neighbor connectivity lists}
+{\color{red}\bfseries{}**}MODULE COUPLE        atom neighbor connectivity lists
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 n12             number of atoms directly bonded to each atom
@@ -7681,13 +7719,13 @@ i14             atom numbers of atoms 1\PYGZhy{}4 connected to each atom
 i15             atom numbers of atoms 1\PYGZhy{}5 connected to each atom
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{CTRPOT Module        charge transfer functional form details}
+{\color{red}\bfseries{}**}MODULE CTRPOT        charge transfer functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ctrntyp         type of charge transfer term (SEPARATE or COMBINED)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DERIV Module         Cartesian coord derivative components}
+{\color{red}\bfseries{}**}MODULE DERIV         Cartesian coord derivative components
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 desum           total energy Cartesian coordinate derivatives
@@ -7721,7 +7759,7 @@ deg             geometric restraint Cartesian coordinate derivatives
 dex             extra energy term Cartesian coordinate derivatives
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DIPOLE Module        bond dipoles in current structure}
+{\color{red}\bfseries{}**}MODULE DIPOLE        bond dipoles in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ndipole         total number of dipoles in the system
@@ -7730,7 +7768,7 @@ bdpl            magnitude of each of the dipoles (Debye)
 sdpl            position of each dipole between defining atoms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DISGEO Module        distance geometry bounds \& parameters}
+{\color{red}\bfseries{}**}MODULE DISGEO        distance geometry bounds \& parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 vdwmax          maximum value of hard sphere sum for an atom pair
@@ -7742,7 +7780,7 @@ use\PYGZus{}invert      flag to use enantiomer closest to input structure
 use\PYGZus{}anneal      flag to use simulated annealing refinement
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DISP Module          damped dispersion for current structure}
+{\color{red}\bfseries{}**}MODULE DISP          damped dispersion for current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ndisp           total number of dispersion sites in the system
@@ -7752,7 +7790,7 @@ csix            C6 dispersion coefficient value at each site
 adisp           alpha dispersion damping value at each site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DMA Module           QM spherical harmonic multipole moments}
+{\color{red}\bfseries{}**}MODULE DMA           QM spherical harmonic multipole moments
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 mp              atomic monopole charge values from DMA
@@ -7766,7 +7804,7 @@ q22c            atomic Q22c quadrupole component from DMA (xx\PYGZhy{}yy)
 q22s            atomic Q22s quadrupole component from DMA (xy)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DOMEGA Module        derivative components over torsions}
+{\color{red}\bfseries{}**}MODULE DOMEGA        derivative components over torsions
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 tesum           total energy derivatives over torsions
@@ -7800,7 +7838,7 @@ teg             geometric restraint derivatives over torsions
 tex             extra energy term derivatives over torsions
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{DSPPOT Module        dispersion interaction scale factors}
+{\color{red}\bfseries{}**}MODULE DSPPOT        dispersion interaction scale factors
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 dsp2scale       scale factor for 1\PYGZhy{}2 dispersion energy interactions
@@ -7810,7 +7848,7 @@ dsp5scale       scale factor for 1\PYGZhy{}5 dispersion energy interactions
 use\PYGZus{}dcorr       flag to use long range dispersion correction
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ENERGI Module        individual potential energy components}
+{\color{red}\bfseries{}**}MODULE ENERGI        individual potential energy components
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 esum            total potential energy of the system
@@ -7844,7 +7882,7 @@ eg              geometric restraint potential energy of the system
 ex              extra term potential energy of the system
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{EWALD Module         Ewald summation parameters and options}
+{\color{red}\bfseries{}**}MODULE EWALD         Ewald summation parameters and options
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 aewald          current value of Ewald convergence coefficient
@@ -7854,7 +7892,7 @@ adewald         Ewald convergence coefficient for dispersion
 boundary        Ewald boundary condition; none, tinfoil or vacuum
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{FACES Module         Connolly area and volume variables}
+{\color{red}\bfseries{}**}MODULE FACES         Connolly area and volume variables
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxcls          maximum number of neighboring atom pairs
@@ -7873,7 +7911,7 @@ mxcyeq          maximum number of convex edge cycles
 mxfqcy          maximum number of convex face cycles
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{FFT Module           Fast Fourier transform control values}
+{\color{red}\bfseries{}**}MODULE FFT           Fast Fourier transform control values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxprime        maximum number of prime factors of FFT dimension
@@ -7884,7 +7922,7 @@ ffttable        intermediate array used by the FFT routine (FFTPACK)
 ffttyp          type of FFT package; currently FFTPACK or FFTW
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{FIELDS Module        molecular mechanics force field type}
+{\color{red}\bfseries{}**}MODULE FIELDS        molecular mechanics force field type
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxbio          maximum number of biopolymer atom definitions
@@ -7892,7 +7930,7 @@ biotyp          force field atom type of each biopolymer type
 forcefield      string used to describe the current forcefield
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{FILES Module         name \& number of current structure file}
+{\color{red}\bfseries{}**}MODULE FILES         name \& number of current structure file
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nprior          number of previously existing cycle files
@@ -7902,7 +7940,7 @@ filename        base filename used by default for all files
 outfile         output filename used for intermediate results
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{FRACS Module         distances to molecular center of mass}
+{\color{red}\bfseries{}**}MODULE FRACS         distances to molecular center of mass
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 xfrac           fractional coordinate along a\PYGZhy{}axis of center of mass
@@ -7910,7 +7948,7 @@ yfrac           fractional coordinate along b\PYGZhy{}axis of center of mass
 zfrac           fractional coordinate along c\PYGZhy{}axis of center of mass
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{FREEZE Module        definition of holonomic constraints}
+{\color{red}\bfseries{}**}MODULE FREEZE        definition of holonomic constraints
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nrat            number of holonomic distance constraints to apply
@@ -7924,14 +7962,14 @@ use\PYGZus{}rattle      logical flag to set use of holonomic contraints
 ratimage        flag to use minimum image for holonomic constraint
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{GKSTUF Module        generalized Kirkwood solvation values}
+{\color{red}\bfseries{}**}MODULE GKSTUF        generalized Kirkwood solvation values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 gkc             tuning parameter exponent in the f(GB) function
 gkr             generalized Kirkwood cavity radii for atom types
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{GROUP Module         partitioning of system into atom groups}
+{\color{red}\bfseries{}**}MODULE GROUP         partitioning of system into atom groups
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ngrp            total number of atom groups in the system
@@ -7945,13 +7983,13 @@ use\PYGZus{}intra       flag to include only intragroup interactions
 use\PYGZus{}inter       flag to include only intergroup interactions
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{HESCUT Module        cutoff for Hessian matrix elements}
+{\color{red}\bfseries{}**}MODULE HESCUT        cutoff for Hessian matrix elements
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 hesscut         magnitude of smallest allowed Hessian element
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{HESSN Module         Cartesian Hessian elements for one atom}
+{\color{red}\bfseries{}**}MODULE HESSN         Cartesian Hessian elements for one atom
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 hessx           Hessian elements for x\PYGZhy{}component of current atom
@@ -7959,7 +7997,7 @@ hessy           Hessian elements for y\PYGZhy{}component of current atom
 hessz           Hessian elements for z\PYGZhy{}component of current atom
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{HPMF Module          hydrophobic potential of mean force term}
+{\color{red}\bfseries{}**}MODULE HPMF          hydrophobic potential of mean force term
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 rcarbon         radius of a carbon atom for use with HPMF
@@ -7978,7 +8016,7 @@ rpmf            radius of each atom for use with hydrophobic PMF
 acsa            SASA value for each hydrophobic PMF carbon atom
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{IELSCF Module        extended Lagrangian induced dipoles}
+{\color{red}\bfseries{}**}MODULE IELSCF        extended Lagrangian induced dipoles
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nfree\PYGZus{}aux       total degrees of freedom for auxiliary dipoles
@@ -7993,7 +8031,7 @@ apaux           auxiliary shadow dipole acceleration at each site
 use\PYGZus{}ielscf      flag to use inertial extended Lagrangian method
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{IMPROP Module        improper dihedrals in current structure}
+{\color{red}\bfseries{}**}MODULE IMPROP        improper dihedrals in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 niprop          total number of improper dihedral angles in the system
@@ -8002,7 +8040,7 @@ kprop           force constant values for improper dihedral angles
 vprop           ideal improper dihedral angle value in degrees
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{IMPTOR Module        improper torsions in current structure}
+{\color{red}\bfseries{}**}MODULE IMPTOR        improper torsions in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nitors          total number of improper torsional angles in the system
@@ -8012,7 +8050,7 @@ itors2          2\PYGZhy{}fold amplitude and phase for each improper torsion
 itors3          3\PYGZhy{}fold amplitude and phase for each improper torsion
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{INFORM Module        program I/O and flow control values}
+{\color{red}\bfseries{}**}MODULE INFORM        program I/O and flow control values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxask          maximum number of queries for interactive input
@@ -8027,26 +8065,26 @@ holdup          logical flag to wait for carriage return on exit
 abort           logical flag to stop execution at next chance
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{INTER Module         sum of intermolecular energy components}
+{\color{red}\bfseries{}**}MODULE INTER         sum of intermolecular energy components
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 einter          total intermolecular potential energy
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{IOUNIT Module        Fortran input/output unit numbers}
+{\color{red}\bfseries{}**}MODULE IOUNIT        Fortran input/output unit numbers
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 input           Fortran I/O unit for main input (default=5)
 iout            Fortran I/O unit for main output (default=6)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KANANG Module        angle\sphinxhyphen{}angle term forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KANANG        angle\sphinxhyphen{}angle term forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 anan            angle\PYGZhy{}angle cross term parameters for each atom class
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KANGS Module         bond angle bend forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KANGS         bond angle bend forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxna           maximum number of harmonic angle bend parameter entries
@@ -8075,7 +8113,7 @@ kap             string of atom classes for in\PYGZhy{}plane angle bends
 kaf             string of atom classes for Fourier angle bends
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KANTOR Module        angle\sphinxhyphen{}torsion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KANTOR        angle\sphinxhyphen{}torsion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnat          maximum number of angle\PYGZhy{}torsion parameter entries
@@ -8083,7 +8121,7 @@ atcon           torsional amplitude parameters for angle\PYGZhy{}torsion
 kat             string of atom classes for angle\PYGZhy{}torsion terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KATOMS Module        atom definition forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KATOMS        atom definition forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 atmcls          atom class number for each of the atom types
@@ -8094,7 +8132,7 @@ symbol          modified atomic symbol for each atom type
 describe        string identifying each of the atom types
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KBONDS Module        bond stretching forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KBONDS        bond stretching forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnb           maximum number of bond stretch parameter entries
@@ -8118,27 +8156,27 @@ kb3             string of atom classes for 3\PYGZhy{}ring bond stretch
 kel             string of atom classes for electronegativity corrections
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KCHRGE Module        partial charge forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KCHRGE        partial charge forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 chg             partial charge parameters for each atom type
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KCPEN Module         charge penetration forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KCPEN         charge penetration forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 cpele           valence electron magnitude for each atom class
 cpalp           alpha charge penetration parameter for each atom class
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KCTRN Module         charge transfer forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KCTRN         charge transfer forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ctchg           charge transfer magnitude for each atom class
 ctdmp           alpha charge transfer parameter for each atom class
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KDIPOL Module        bond dipole forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KDIPOL        bond dipole forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnd           maximum number of bond dipole parameter entries
@@ -8159,14 +8197,14 @@ kd4             string of atom classes for 4\PYGZhy{}ring dipoles
 kd3             string of atom classes for 3\PYGZhy{}ring dipoles
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KDSP Module          damped dispersion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KDSP          damped dispersion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 dspsix          C6 dispersion coefficient for each atom class
 dspdmp          alpha dispersion parameter for each atom class
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KEYS Module          contents of the keyword control file}
+{\color{red}\bfseries{}**}MODULE KEYS          contents of the keyword control file
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxkey          maximum number of lines in the keyword file
@@ -8174,7 +8212,7 @@ nkey            number of nonblank lines in the keyword file
 keyline         contents of each individual keyword file line
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KHBOND Module        H\sphinxhyphen{}bonding term forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KHBOND        H\sphinxhyphen{}bonding term forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnhb          maximum number of hydrogen bonding pair entries
@@ -8183,7 +8221,7 @@ epshb           well depth parameter for hydrogen bonding pairs
 khb             string of atom types for hydrogen bonding pairs
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KIPROP Module        improper dihedral forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KIPROP        improper dihedral forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxndi          maximum number of improper dihedral parameter entries
@@ -8192,7 +8230,7 @@ tdi             ideal dihedral angle values for improper dihedrals
 kdi             string of atom classes for improper dihedral angles
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KITORS Module        improper torsion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KITORS        improper torsion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnti          maximum number of improper torsion parameter entries
@@ -8202,7 +8240,7 @@ ti3             torsional parameters for improper 3\PYGZhy{}fold rotation
 kti             string of atom classes for improper torsional parameters
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KMULTI Module        atomic multipole forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KMULTI        atomic multipole forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnmp          maximum number of atomic multipole parameter entries
@@ -8211,7 +8249,7 @@ mpaxis          type of local axis definition for atomic multipoles
 kmp             string of atom types for atomic multipoles
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KOPBND Module        out\sphinxhyphen{}of\sphinxhyphen{}plane bend forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KOPBND        out\sphinxhyphen{}of\sphinxhyphen{}plane bend forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnopb         maximum number of out\PYGZhy{}of\PYGZhy{}plane bending entries
@@ -8219,7 +8257,7 @@ opbn            force constant parameters for out\PYGZhy{}of\PYGZhy{}plane bendi
 kopb            string of atom classes for out\PYGZhy{}of\PYGZhy{}plane bending
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KOPDST Module        out\sphinxhyphen{}of\sphinxhyphen{}plane distance forcefield params}
+{\color{red}\bfseries{}**}MODULE KOPDST        out\sphinxhyphen{}of\sphinxhyphen{}plane distance forcefield params
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnopd         maximum number of out\PYGZhy{}of\PYGZhy{}plane distance entries
@@ -8227,7 +8265,7 @@ opds            force constant parameters for out\PYGZhy{}of\PYGZhy{}plane dista
 kopd            string of atom classes for out\PYGZhy{}of\PYGZhy{}plane distance
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KORBS Module         pisystem orbital forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KORBS         pisystem orbital forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnpi          maximum number of pisystem bond parameter entries
@@ -8247,7 +8285,7 @@ kpi5            string of atom classes for 5\PYGZhy{}ring pisystem bonds
 kpi4            string of atom classes for 4\PYGZhy{}ring pisystem bonds
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KPITOR Module        pi\sphinxhyphen{}system torsion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KPITOR        pi\sphinxhyphen{}system torsion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnpt          maximum number of pi\PYGZhy{}system torsion parameter entries
@@ -8255,7 +8293,7 @@ ptcon           force constant parameters for pi\PYGZhy{}system torsions
 kpt             string of atom classes for pi\PYGZhy{}system torsion terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KPOLR Module         polarizability forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KPOLR         polarizability forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 pgrp            connected types in polarization group of each atom type
@@ -8264,7 +8302,7 @@ athl            Thole polarizability damping value for each atom type
 ddir            direct polarization damping value for each atom type
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KREPL Module         Pauli repulsion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KREPL         Pauli repulsion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 prsiz           Pauli repulsion size value for each atom class
@@ -8272,7 +8310,7 @@ prdmp           alpha Pauli repulsion parameter for each atom class
 prele           number of valence electrons for each atom class
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KSTBND Module        stretch\sphinxhyphen{}bend forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KSTBND        stretch\sphinxhyphen{}bend forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnsb          maximum number of stretch\PYGZhy{}bend parameter entries
@@ -8280,7 +8318,7 @@ stbn            force constant parameters for stretch\PYGZhy{}bend terms
 ksb             string of atom classes for stretch\PYGZhy{}bend terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KSTTOR Module        stretch\sphinxhyphen{}torsion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KSTTOR        stretch\sphinxhyphen{}torsion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnbt          maximum number of stretch\PYGZhy{}torsion parameter entries
@@ -8288,7 +8326,7 @@ btcon           torsional amplitude parameters for stretch\PYGZhy{}torsion
 kbt             string of atom classes for stretch\PYGZhy{}torsion terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KTORSN Module        torsional angle forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KTORSN        torsional angle forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnt           maximum number of torsional angle parameter entries
@@ -8317,7 +8355,7 @@ kt5             string of atom classes for 5\PYGZhy{}ring torsions
 kt4             string of atom classes for 4\PYGZhy{}ring torsions
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KTRTOR Module        torsion\sphinxhyphen{}torsion forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KTRTOR        torsion\sphinxhyphen{}torsion forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxntt          maximum number of torsion\PYGZhy{}torsion parameter entries
@@ -8334,7 +8372,7 @@ tbxy            Hessian cross components over spline grid
 ktt             string of torsion\PYGZhy{}torsion atom classes
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KURYBR Module        Urey\sphinxhyphen{}Bradley term forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KURYBR        Urey\sphinxhyphen{}Bradley term forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnu           maximum number of Urey\PYGZhy{}Bradley parameter entries
@@ -8343,7 +8381,7 @@ dst13           ideal 1\PYGZhy{}3 distance parameters for Urey\PYGZhy{}Bradley t
 ku              string of atom classes for Urey\PYGZhy{}Bradley terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KVDWPR Module        special vdw term forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KVDWPR        special vdw term forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxnvp          maximum number of special van der Waals pair entries
@@ -8352,7 +8390,7 @@ epspr           well depth parameter for special van der Waals pairs
 kvpr            string of atom classes for special van der Waals pairs
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{KVDWS Module         van der Waals term forcefield parameters}
+{\color{red}\bfseries{}**}MODULE KVDWS         van der Waals term forcefield parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 rad             van der Waals radius parameter for each atom type
@@ -8362,7 +8400,7 @@ eps4            van der Waals well depth parameter in 1\PYGZhy{}4 interactions
 reduct          van der Waals reduction factor for each atom type
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{LIGHT Module         method of lights pair neighbors indices}
+{\color{red}\bfseries{}**}MODULE LIGHT         method of lights pair neighbors indices
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nlight          total number of sites for method of lights calculation
@@ -8380,7 +8418,7 @@ rgy             maps the original interaction list into y\PYGZhy{}sorted list
 rgz             maps the original interaction list into z\PYGZhy{}sorted list
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{LIMITS Module        interaction taper \& cutoff distances}
+{\color{red}\bfseries{}**}MODULE LIMITS        interaction taper \& cutoff distances
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 vdwcut          cutoff distance for van der Waals interactions
@@ -8411,7 +8449,7 @@ use\PYGZus{}mlist       logical flag governing use of multipole list
 use\PYGZus{}ulist       logical flag governing use of preconditioner list
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{LINMIN Module        line search minimization parameters}
+{\color{red}\bfseries{}**}MODULE LINMIN        line search minimization parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 stpmin          minimum step length in current line search direction
@@ -8422,7 +8460,7 @@ angmax          maximum angle between search direction and \PYGZhy{}gradient
 intmax          maximum number of interpolations during line search
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MATH Module          mathematical and geometrical constants}
+{\color{red}\bfseries{}**}MODULE MATH          mathematical and geometrical constants
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 pi              numerical value of the geometric constant
@@ -8435,7 +8473,7 @@ sqrttwo         numerical value of the square root of two
 sqrtthree       numerical value of the square root of three
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MDSTUF Module        molecular dynamics trajectory controls}
+{\color{red}\bfseries{}**}MODULE MDSTUF        molecular dynamics trajectory controls
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nfree           total number of degrees of freedom for a system
@@ -8446,7 +8484,7 @@ dorest          logical flag to remove center of mass motion
 integrate       type of molecular dynamics integration algorithm
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MERCK Module         MMFF\sphinxhyphen{}specific force field parameters}
+{\color{red}\bfseries{}**}MODULE MERCK         MMFF\sphinxhyphen{}specific force field parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nlignes         number of atom pairs having MMFF Bond Type 1
@@ -8467,7 +8505,7 @@ mmffaromc       cationic aromatic rings parameters
 mmffaroma       anionic aromatic rings parameters
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MINIMA Module        general parameters for minimizations}
+{\color{red}\bfseries{}**}MODULE MINIMA        general parameters for minimizations
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 fctmin          value below which function is deemed optimized
@@ -8476,7 +8514,7 @@ maxiter         maximum number of iterations during optimization
 nextiter        iteration number to use for the first iteration
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MOLCUL Module        individual molecules in current system}
+{\color{red}\bfseries{}**}MODULE MOLCUL        individual molecules in current system
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nmol            total number of separate molecules in the system
@@ -8487,7 +8525,7 @@ totmass         total weight of all the molecules in the system
 molmass         molecular weight for each molecule in the system
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MOLDYN Module        MD trajectory velocity \& acceleration}
+{\color{red}\bfseries{}**}MODULE MOLDYN        MD trajectory velocity \& acceleration
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 v               current velocity of each atom along the x,y,z\PYGZhy{}axes
@@ -8495,7 +8533,7 @@ a               current acceleration of each atom along x,y,z\PYGZhy{}axes
 aalt            alternate acceleration of each atom along x,y,z\PYGZhy{}axes
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MOMENT Module        electric multipole moment components}
+{\color{red}\bfseries{}**}MODULE MOMENT        electric multipole moment components
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 netchg          net electric charge for the total system
@@ -8515,7 +8553,7 @@ zyqdp           quadrupole tensor zy\PYGZhy{}component in global frame
 zzqdp           quadrupole tensor zz\PYGZhy{}component in global frame
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MPLPOT Module        multipole functional form details}
+{\color{red}\bfseries{}**}MODULE MPLPOT        multipole functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 m2scale         scale factor for 1\PYGZhy{}2 multipole energy interactions
@@ -8526,7 +8564,7 @@ use\PYGZus{}chgpen      flag to use charge penetration damped potential
 pentyp          type of penetration damping (NONE, GORDON1, GORDON2)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MPOLE Module         atomic multipoles in current structure}
+{\color{red}\bfseries{}**}MODULE MPOLE         atomic multipoles in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxpole         max components (monopole=1,dipole=4,quadrupole=13)
@@ -8541,10 +8579,11 @@ pole            traceless Cartesian multipoles in the local frame
 rpole           traceless Cartesian multipoles in the global frame
 spole           spherical harmonic multipoles in the local frame
 srpole          spherical harmonic multipoles in the global frame
+mono0           original atomic monopole values for charge flux
 polaxe          local axis type for each multipole site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MRECIP Module        reciprocal PME for permanent multipoles}
+{\color{red}\bfseries{}**}MODULE MRECIP        reciprocal PME for permanent multipoles
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 vmxx            scalar sum xx\PYGZhy{}component of virial due to multipoles
@@ -8559,7 +8598,7 @@ cphi            Cartesian permanent multipole potential and field
 fphi            fractional permanent multipole potential and field
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{MUTANT Module        free energy calculation hybrid atoms}
+{\color{red}\bfseries{}**}MODULE MUTANT        free energy calculation hybrid atoms
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nmut            number of atoms mutated from initial to final state
@@ -8578,7 +8617,7 @@ scalpha         scale factor for soft core buffered 14\PYGZhy{}7 potential
 mut             true if an atom is to be mutated, false otherwise
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{NEIGH Module         pairwise neighbor list indices \& storage}
+{\color{red}\bfseries{}**}MODULE NEIGH         pairwise neighbor list indices \& storage
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxvlst         maximum size of van der Waals pair neighbor lists
@@ -8620,7 +8659,7 @@ domlst          logical flag to rebuild multipole neighbor list
 doulst          logical flag to rebuild preconditioner neighbor list
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{NONPOL Module        nonpolar cavity \& dispersion parameters}
+{\color{red}\bfseries{}**}MODULE NONPOL        nonpolar cavity \& dispersion parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 epso            water oxygen eps for implicit dispersion term
@@ -8640,7 +8679,7 @@ rdisp           atomic radius of each atom for dispersion energy
 cdisp           maximum dispersion energy for each atom
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{NUCLEO Module        parameters for nucleic acid structure}
+{\color{red}\bfseries{}**}MODULE NUCLEO        parameters for nucleic acid structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 pucker          sugar pucker, either 2=2\PYGZsq{}\PYGZhy{}endo or 3=3\PYGZsq{}\PYGZhy{}endo
@@ -8651,7 +8690,7 @@ deoxy           flag to mark deoxyribose or ribose sugar units
 hlxform         helix form (A, B or Z) of polynucleotide strands
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{OMEGA Module         torsional space dihedral angle values}
+{\color{red}\bfseries{}**}MODULE OMEGA         torsional space dihedral angle values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nomega          number of dihedral angles allowed to rotate
@@ -8660,7 +8699,7 @@ zline           line number in Z\PYGZhy{}matrix of each dihedral angle
 dihed           current value in radians of each dihedral angle
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{OPBEND Module        out\sphinxhyphen{}of\sphinxhyphen{}plane bends in current structure}
+{\color{red}\bfseries{}**}MODULE OPBEND        out\sphinxhyphen{}of\sphinxhyphen{}plane bends in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nopbend         total number of out\PYGZhy{}of\PYGZhy{}plane bends in the system
@@ -8668,7 +8707,7 @@ iopb            bond angle numbers used in out\PYGZhy{}of\PYGZhy{}plane bending
 opbk            force constant values for out\PYGZhy{}of\PYGZhy{}plane bending
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{OPDIST Module        out\sphinxhyphen{}of\sphinxhyphen{}plane distances in structure}
+{\color{red}\bfseries{}**}MODULE OPDIST        out\sphinxhyphen{}of\sphinxhyphen{}plane distances in structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nopdist         total number of out\PYGZhy{}of\PYGZhy{}plane distances in the system
@@ -8676,14 +8715,14 @@ iopd            numbers of the atoms in each out\PYGZhy{}of\PYGZhy{}plane distan
 opdk            force constant values for out\PYGZhy{}of\PYGZhy{}plane distance
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{OPENMP Module        OpenMP processor and thread values}
+{\color{red}\bfseries{}**}MODULE OPENMP        OpenMP processor and thread values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nproc           number of processors available to OpenMP
 nthread         number of threads to be used with OpenMP
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ORBITS Module        conjugated pisystem orbital energies}
+{\color{red}\bfseries{}**}MODULE ORBITS        conjugated pisystem orbital energies
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 qorb            number of pi\PYGZhy{}electrons contributed by each atom
@@ -8691,7 +8730,7 @@ worb            ionization potential of each pisystem atom
 emorb           repulsion integral for each pisystem atom
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{OUTPUT Module        output file format control parameters}
+{\color{red}\bfseries{}**}MODULE OUTPUT        output file format control parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 archive         logical flag to save structures in an archive
@@ -8704,7 +8743,7 @@ uindsave        logical flag to save induced atomic dipoles
 coordtype       selects Cartesian, internal, rigid body or none
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PARAMS Module        force field parameter file contents}
+{\color{red}\bfseries{}**}MODULE PARAMS        force field parameter file contents
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxprm          maximum number of lines in the parameter file
@@ -8712,7 +8751,7 @@ nprm            number of nonblank lines in the parameter file
 prmline         contents of each individual parameter file line
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PATHS Module         Elber reaction path method parameters}
+{\color{red}\bfseries{}**}MODULE PATHS         Elber reaction path method parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 pnorm           length of the reactant\PYGZhy{}product vector
@@ -8725,7 +8764,7 @@ pzet            current projection on reactant\PYGZhy{}product vector
 gc              gradient of the path constraints
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PBSTUF Module        Poisson\sphinxhyphen{}Boltzmann solvation parameters}
+{\color{red}\bfseries{}**}MODULE PBSTUF        Poisson\sphinxhyphen{}Boltzmann solvation parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 APBS            configuration parameters (see APBS documentation for details)
@@ -8776,7 +8815,7 @@ pbeuind         Poisson\PYGZhy{}Boltzmann field due to induced dipoles
 pbeuinp         Poisson\PYGZhy{}Boltzmann field due to non\PYGZhy{}local induced dipoles
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PDB Module           Protein Data Bank structure definition}
+{\color{red}\bfseries{}**}MODULE PDB           Protein Data Bank structure definition
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 npdb            number of atoms stored in Protein Data Bank format
@@ -8797,7 +8836,7 @@ chnsym          string with PDB chain identifiers to be included
 instyp          string with PDB insertion records to be included
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PHIPSI Module        phi\sphinxhyphen{}psi\sphinxhyphen{}omega\sphinxhyphen{}chi angles for protein}
+{\color{red}\bfseries{}**}MODULE PHIPSI        phi\sphinxhyphen{}psi\sphinxhyphen{}omega\sphinxhyphen{}chi angles for protein
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 chiral          chirality of each amino acid residue (1=L, \PYGZhy{}1=D)
@@ -8808,7 +8847,7 @@ omg             value of the omega angle for each amino acid residue
 chi             values of the chi angles for each amino acid residue
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PIORBS Module        conjugated system in current structure}
+{\color{red}\bfseries{}**}MODULE PIORBS        conjugated system in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 norbit          total number of pisystem orbitals in the system
@@ -8827,7 +8866,7 @@ pnpl            pi\PYGZhy{}bond orders for bonds in \PYGZdq{}nonplanar\PYGZdq{} 
 listpi          atom list indicating whether each atom has an orbital
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PISTUF Module        bond order\sphinxhyphen{}related pisystem parameters}
+{\color{red}\bfseries{}**}MODULE PISTUF        bond order\sphinxhyphen{}related pisystem parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 bkpi            bond stretch force constants for pi\PYGZhy{}bond order of 1.0
@@ -8837,7 +8876,7 @@ lslope          rate of bond length increase with a bond order decrease
 torsp2          2\PYGZhy{}fold torsional energy barrier for pi\PYGZhy{}bond order of 1.0
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PITORS Module        pi\sphinxhyphen{}system torsions in current structure}
+{\color{red}\bfseries{}**}MODULE PITORS        pi\sphinxhyphen{}system torsions in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 npitors         total number of pi\PYGZhy{}system torsional interactions
@@ -8845,7 +8884,7 @@ ipit            numbers of the atoms in each pi\PYGZhy{}system torsion
 kpit            2\PYGZhy{}fold pi\PYGZhy{}system torsional force constants
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PME Module           values for particle mesh Ewald summation}
+{\color{red}\bfseries{}**}MODULE PME           values for particle mesh Ewald summation
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nfft1           current number of PME grid points along a\PYGZhy{}axis
@@ -8873,7 +8912,7 @@ qgrid           values on the particle mesh Ewald grid
 qfac            prefactors for the particle mesh Ewald grid
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POLAR Module         induced dipole moments \& polarizability}
+{\color{red}\bfseries{}**}MODULE POLAR         induced dipole moments \& polarizability
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 npolar          total number of polarizable sites in the system
@@ -8894,7 +8933,7 @@ uexact          exact SCF induced dipoles to full numerical precision
 douind          flag to allow induced dipoles at each atomic site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POLGRP Module        polarization group connectivity lists}
+{\color{red}\bfseries{}**}MODULE POLGRP        polarization group connectivity lists
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxp11          maximum number of atoms in a polarization group
@@ -8911,7 +8950,7 @@ ip13            atom numbers of atoms in groups 1\PYGZhy{}3 to each atom
 ip14            atom numbers of atoms in groups 1\PYGZhy{}4 to each atom
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POLOPT Module        induced dipoles for OPT extrapolation}
+{\color{red}\bfseries{}**}MODULE POLOPT        induced dipoles for OPT extrapolation
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxopt          maximum order for OPT induced dipole extrapolation
@@ -8927,7 +8966,7 @@ fopt            OPT fractional reciprocal potentials at multipole sites
 foptp           OPT fractional reciprocal potentials for energy terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POLPCG Module        induced dipoles via the PCG solver}
+{\color{red}\bfseries{}**}MODULE POLPCG        induced dipoles via the PCG solver
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 mindex          index into preconditioner inverse for PCG solver
@@ -8937,7 +8976,7 @@ pcgprec         flag to allow use of preconditioner with PCG solver
 pcgguess        flag to use initial PCG based on direct field
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POLPOT Module        polarization functional form details}
+{\color{red}\bfseries{}**}MODULE POLPOT        polarization functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 politer         maximum number of induced dipole SCF iterations
@@ -8969,7 +9008,7 @@ use\PYGZus{}dirdamp     flag to use damped direct polarization interactions
 poltyp          type of polarization (MUTUAL, DIRECT, OPT or TCG)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POLTCG Module        induced dipoles via the TCG solver}
+{\color{red}\bfseries{}**}MODULE POLTCG        induced dipoles via the TCG solver
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 tcgorder        total number of TCG iterations to be used
@@ -8982,7 +9021,7 @@ ubp             right\PYGZhy{}hand side mutual induced p\PYGZhy{}dipoles
 tcgguess        flag to use initial TCG based on direct field
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POTENT Module        usage of potential energy components}
+{\color{red}\bfseries{}**}MODULE POTENT        usage of potential energy components
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 use\PYGZus{}bond        logical flag governing use of bond stretch potential
@@ -9008,6 +9047,7 @@ use\PYGZus{}dipole      logical flag governing use of dipole\PYGZhy{}dipole pote
 use\PYGZus{}mpole       logical flag governing use of multipole potential
 use\PYGZus{}polar       logical flag governing use of polarization term
 use\PYGZus{}chgtrn      logical flag governing use of charge transfer term
+use\PYGZus{}chgflx      logical flag governing use of charge flux term
 use\PYGZus{}rxnfld      logical flag governing use of reaction field term
 use\PYGZus{}solv        logical flag governing use of continuum solvation term
 use\PYGZus{}metal       logical flag governing use of ligand field term
@@ -9017,7 +9057,7 @@ use\PYGZus{}born        logical flag governing use of Born radii values
 use\PYGZus{}orbit       logical flag governing use of pisystem computation
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{POTFIT Module        values for electrostatic potential fit}
+{\color{red}\bfseries{}**}MODULE POTFIT        values for electrostatic potential fit
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nconf           total number of configurations to be analyzed
@@ -9052,7 +9092,7 @@ gatm            flag to use potential grid points around each atom
 fatm            flag to use each atom in electrostatic potential fit
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{PTABLE Module        symbols and info for chemical elements}
+{\color{red}\bfseries{}**}MODULE PTABLE        symbols and info for chemical elements
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxele          maximum number of elements from periodic table
@@ -9062,7 +9102,7 @@ covrad          covalent radius for each chemical element
 elemnt          atomic symbol for each chemical element
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{REFER Module         reference atomic coordinate storage}
+{\color{red}\bfseries{}**}MODULE REFER         reference atomic coordinate storage
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nref            total number of atoms in each reference system
@@ -9085,7 +9125,7 @@ reffile         base filename for each reference system
 reftitle        title used to describe each reference system
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{REPEL Module         Pauli repulsion for current structure}
+{\color{red}\bfseries{}**}MODULE REPEL         Pauli repulsion for current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nrep            total number of repulsion sites in the system
@@ -9094,7 +9134,7 @@ dmppr           Pauli repulsion alpha damping value at each site
 elepr           Pauli repulsion valence electrons at each site
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{REPPOT Module        repulsion interaction scale factors}
+{\color{red}\bfseries{}**}MODULE REPPOT        repulsion interaction scale factors
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 r2scale         scale factor for 1\PYGZhy{}2 repulsion energy interactions
@@ -9103,7 +9143,7 @@ r4scale         scale factor for 1\PYGZhy{}4 repulsion energy interactions
 r5scale         scale factor for 1\PYGZhy{}5 repulsion energy interactions
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RESDUE Module        amino acid \& nucleotide residue names}
+{\color{red}\bfseries{}**}MODULE RESDUE        amino acid \& nucleotide residue names
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxamino        maximum number of amino acid residue types
@@ -9153,7 +9193,7 @@ amino1          one\PYGZhy{}letter abbreviations for amino acids types
 nuclz1          one\PYGZhy{}letter abbreviations for nucleic acids types
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RESTRN Module        parameters for geometrical restraints}
+{\color{red}\bfseries{}**}MODULE RESTRN        parameters for geometrical restraints
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 npfix           number of position restraints to be applied
@@ -9185,7 +9225,7 @@ use\PYGZus{}basin       logical flag governing use of Gaussian basin
 use\PYGZus{}wall        logical flag governing use of droplet boundary
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RGDDYN Module        rigid body MD velocities and momenta}
+{\color{red}\bfseries{}**}MODULE RGDDYN        rigid body MD velocities and momenta
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 xcmo            x\PYGZhy{}component from each atom to center of rigid body
@@ -9199,7 +9239,7 @@ wc              half\PYGZhy{}step angular velocity for kinetic energy
 linear          logical flag to mark group as linear or nonlinear
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RIGID Module         rigid body coordinates for atom groups}
+{\color{red}\bfseries{}**}MODULE RIGID         rigid body coordinates for atom groups
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 xrb             rigid body reference x\PYGZhy{}coordinate for each atom
@@ -9209,7 +9249,7 @@ rbc             current rigid body coordinates for each group
 use\PYGZus{}rigid       flag to mark use of rigid body coordinate system
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RING Module          number and location of ring structures}
+{\color{red}\bfseries{}**}MODULE RING          number and location of ring structures
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nring3          total number of 3\PYGZhy{}membered rings in the system
@@ -9224,7 +9264,7 @@ iring6          numbers of the atoms involved in each 6\PYGZhy{}ring
 iring7          numbers of the atoms involved in each 7\PYGZhy{}ring
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ROTBND Module        molecule partitions for bond rotation}
+{\color{red}\bfseries{}**}MODULE ROTBND        molecule partitions for bond rotation
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nrot            total number of atoms moving when bond rotates
@@ -9232,7 +9272,7 @@ rot             atom numbers of atoms moving when bond rotates
 use\PYGZus{}short       logical flag governing use of shortest atom list
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RXNFLD Module        reaction field matrix and indices}
+{\color{red}\bfseries{}**}MODULE RXNFLD        reaction field matrix and indices
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ijk             indices into the reaction field element arrays
@@ -9240,7 +9280,7 @@ b1              first reaction field matrix element array
 b2              second reaction field matrix element array
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{RXNPOT Module        reaction field functional form details}
+{\color{red}\bfseries{}**}MODULE RXNPOT        reaction field functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 rfsize          radius of reaction field sphere centered at origin
@@ -9248,14 +9288,14 @@ rfbulkd         bulk dielectric constant of reaction field continuum
 rfterms         number of terms to use in reaction field summation
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SCALES Module        optimization parameter scale factors}
+{\color{red}\bfseries{}**}MODULE SCALES        optimization parameter scale factors
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 scale           multiplicative factor for each optimization parameter
 set\PYGZus{}scale       logical flag to show if scale factors have been set
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SEQUEN Module        sequence information for biopolymer}
+{\color{red}\bfseries{}**}MODULE SEQUEN        sequence information for biopolymer
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nseq            total number of residues in biopolymer sequences
@@ -9267,7 +9307,7 @@ chnnam          one\PYGZhy{}letter identifier for each sequence chain
 chntyp          contents of each chain (GENERIC, PEPTIDE or NUCLEIC)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SHUNT Module         polynomial switching function values}
+{\color{red}\bfseries{}**}MODULE SHUNT         polynomial switching function values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 off             distance at which the potential energy goes to zero
@@ -9290,14 +9330,14 @@ f6              sixth order coefficient of additive switch function
 f7              seventh order coefficient of additive switch function
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SIZES Module         parameters to set array dimensions}
+{\color{red}\bfseries{}**}MODULE SIZES         parameters to set array dimensions
 
 “sizes” sets values for critical array dimensions used
 throughout the software; these parameters fix the size of
 the largest systems that can be handled
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
-parameter:      maximum allowed number of:
+parameter       maximum allowed number of:
 maxatm          atoms in the molecular system
 maxtyp          force field atom type definitions
 maxclass        force field atom class definitions
@@ -9308,7 +9348,7 @@ maxres          residues in the macromolecule
 maxfix          geometric constraints and restraints
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SOCKET Module        socket communication control parameters}
+{\color{red}\bfseries{}**}MODULE SOCKET        socket communication control parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 skttyp          socket information type (1=DYN, 2=OPT)
@@ -9320,7 +9360,7 @@ sktstop         logical flag to indicate socket shutdown
 use\PYGZus{}socket      logical flag governing use of external sockets
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SOLUTE Module        continuum solvation model parameters}
+{\color{red}\bfseries{}**}MODULE SOLUTE        continuum solvation model parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 doffset         dielectric offset to continuum solvation atomic radii
@@ -9348,7 +9388,7 @@ solvtyp         type of continuum solvation energy model in use
 borntyp         method to be used for the Born radius computation
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{STODYN Module        SD trajectory frictional coefficients}
+{\color{red}\bfseries{}**}MODULE STODYN        SD trajectory frictional coefficients
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 friction        global frictional coefficient for exposed particle
@@ -9356,7 +9396,7 @@ fgamma          atomic frictional coefficients for each atom
 use\PYGZus{}sdarea      logical flag to use surface area friction scaling
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{STRBND Module        stretch\sphinxhyphen{}bends in current structure}
+{\color{red}\bfseries{}**}MODULE STRBND        stretch\sphinxhyphen{}bends in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nstrbnd         total number of stretch\PYGZhy{}bend interactions
@@ -9364,7 +9404,7 @@ isb             angle and bond numbers used in stretch\PYGZhy{}bend
 sbk             force constants for stretch\PYGZhy{}bend terms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{STRTOR Module        stretch\sphinxhyphen{}torsions in current structure}
+{\color{red}\bfseries{}**}MODULE STRTOR        stretch\sphinxhyphen{}torsions in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nstrtor         total number of stretch\PYGZhy{}torsion interactions
@@ -9372,7 +9412,7 @@ ist             torsion and bond numbers used in stretch\PYGZhy{}torsion
 kst             1\PYGZhy{}, 2\PYGZhy{} and 3\PYGZhy{}fold stretch\PYGZhy{}torsion force constants
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{SYNTRN Module        synchronous transit path definition}
+{\color{red}\bfseries{}**}MODULE SYNTRN        synchronous transit path definition
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 tpath           value of the path coordinate (0=reactant, 1=product)
@@ -9382,7 +9422,7 @@ xmin2           product coordinates as array of optimization variables
 xm              extra coordinate set for quadratic synchronous transit
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{TARRAY Module        store dipole\sphinxhyphen{}dipole matrix elements}
+{\color{red}\bfseries{}**}MODULE TARRAY        store dipole\sphinxhyphen{}dipole matrix elements
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ntpair          number of stored dipole\PYGZhy{}dipole matrix elements
@@ -9390,14 +9430,14 @@ tindex          index into stored dipole\PYGZhy{}dipole matrix values
 tdipdip         stored dipole\PYGZhy{}dipole matrix element values
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{TITLES Module        title for current molecular system}
+{\color{red}\bfseries{}**}MODULE TITLES        title for current molecular system
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ltitle          length in characters of the nonblank title string
 title           title used to describe the current structure
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{TORPOT Module        torsional functional form details}
+{\color{red}\bfseries{}**}MODULE TORPOT        torsional functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 idihunit        convert improper dihedral energy to kcal/mole
@@ -9409,7 +9449,7 @@ atorunit        convert angle\PYGZhy{}torsion energy to kcal/mole
 ttorunit        convert torsion\PYGZhy{}torsion energy to kcal/mole
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{TORS Module          torsional angles in current structure}
+{\color{red}\bfseries{}**}MODULE TORS          torsional angles in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ntors           total number of torsional angles in the system
@@ -9422,14 +9462,14 @@ tors5           5\PYGZhy{}fold amplitude and phase for each torsional angle
 tors6           6\PYGZhy{}fold amplitude and phase for each torsional angle
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{TORTOR Module        torsion\sphinxhyphen{}torsions in current structure}
+{\color{red}\bfseries{}**}MODULE TORTOR        torsion\sphinxhyphen{}torsions in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 ntortor         total number of torsion\PYGZhy{}torsion interactions
 itt             atoms and parameter indices for torsion\PYGZhy{}torsion
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{TREE Module          potential smoothing search tree levels}
+{\color{red}\bfseries{}**}MODULE TREE          potential smoothing search tree levels
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxpss          maximum number of potential smoothing levels
@@ -9438,7 +9478,7 @@ etree           energy reference value at the top of the tree
 ilevel          smoothing deformation value at each tree level
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{UNITS Module         physical constants and unit conversions}
+{\color{red}\bfseries{}**}MODULE UNITS         physical constants and unit conversions
 
 D. B. Newell, F. Cabiati, J. Fischer, K. Fujii, S. G. Karshenboim,
 S. Margolis, E. de Mirandes, P. J. Mohr, F. Nez, K. Pachucki,
@@ -9493,7 +9533,7 @@ debye           conversion from electron\PYGZhy{}Ang to Debye
 prescon         conversion from kcal/mole/Ang**3 to Atm
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{UPRIOR Module        previous values of induced dipoles}
+{\color{red}\bfseries{}**}MODULE UPRIOR        previous values of induced dipoles
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxpred         maximum number of predictor induced dipoles to save
@@ -9513,7 +9553,7 @@ use\PYGZus{}pred        flag to control use of induced dipole prediction
 polpred         type of predictor polynomial (GEAR, ASPC or LSQR)
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{UREY Module          Urey\sphinxhyphen{}Bradley interactions in structure}
+{\color{red}\bfseries{}**}MODULE UREY          Urey\sphinxhyphen{}Bradley interactions in structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nurey           total number of Urey\PYGZhy{}Bradley terms in the system
@@ -9522,7 +9562,7 @@ uk              Urey\PYGZhy{}Bradley force constants (kcal/mole/Ang**2)
 ul              ideal 1\PYGZhy{}3 distance values in Angstroms
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{URYPOT Module        Urey\sphinxhyphen{}Bradley functional form details}
+{\color{red}\bfseries{}**}MODULE URYPOT        Urey\sphinxhyphen{}Bradley functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 cury            cubic coefficient in Urey\PYGZhy{}Bradley potential
@@ -9530,7 +9570,7 @@ qury            quartic coefficient in Urey\PYGZhy{}Bradley potential
 ureyunit        convert Urey\PYGZhy{}Bradley energy to kcal/mole
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{USAGE Module         atoms active during energy computation}
+{\color{red}\bfseries{}**}MODULE USAGE         atoms active during energy computation
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nuse            total number of active atoms in energy calculation
@@ -9538,7 +9578,7 @@ iuse            numbers of the atoms active in energy calculation
 use             true if an atom is active, false if inactive
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{VALFIT Module        valence term parameter fitting values}
+{\color{red}\bfseries{}**}MODULE VALFIT        valence term parameter fitting values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 fit\PYGZus{}bond        logical flag to fit bond stretch parameters
@@ -9551,7 +9591,7 @@ fit\PYGZus{}struct      logical flag to structure\PYGZhy{}fit valence parameters
 fit\PYGZus{}force       logical flag to force\PYGZhy{}fit valence parameters
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{VDW Module           van der Waals terms in current structure}
+{\color{red}\bfseries{}**}MODULE VDW           van der Waals terms in current structure
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nvdw            total number van der Waals active sites in the system
@@ -9570,7 +9610,7 @@ radhbnd         minimum energy distance for hydrogen bonding pairs
 epshbnd         well depth parameter for hydrogen bonding pairs
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{VDWPOT Module        van der Waals functional form details}
+{\color{red}\bfseries{}**}MODULE VDWPOT        van der Waals functional form details
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 igauss          coefficients of Gaussian fit to vdw potential
@@ -9594,7 +9634,7 @@ epsrule         combining rule for vdw well depth parameters
 gausstyp        type of Gaussian fit to van der Waals potential
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{VIBS Module          iterative vibrational analysis components}
+{\color{red}\bfseries{}**}MODULE VIBS          iterative vibrational analysis components
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 rho             trial vectors for iterative vibrational analysis
@@ -9602,14 +9642,14 @@ rhok            alternate vectors for iterative vibrational analysis
 rwork           temporary work array for eigenvector transformation
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{VIRIAL Module        components of internal virial tensor}
+{\color{red}\bfseries{}**}MODULE VIRIAL        components of internal virial tensor
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 vir             total internal virial Cartesian tensor components
 use\PYGZus{}virial      logical flag governing use of virial computation
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{WARP Module          potential surface smoothing parameters}
+{\color{red}\bfseries{}**}MODULE WARP          potential surface smoothing parameters
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 deform          value of the smoothing deformation parameter
@@ -9624,7 +9664,7 @@ use\PYGZus{}tophat      flag to use analytical tophat smoothed potential
 use\PYGZus{}stophat     flag to use shifted tophat smoothed potential
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{XTALS Module         structures used for parameter fitting}
+{\color{red}\bfseries{}**}MODULE XTALS         structures used for parameter fitting
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 maxlsq          maximum number of least squares variables
@@ -9639,7 +9679,7 @@ vartyp          type of each potential parameter to be optimized
 rsdtyp          experimental variable for each of the residuals
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ZCLOSE Module        Z\sphinxhyphen{}matrix ring openings and closures}
+{\color{red}\bfseries{}**}MODULE ZCLOSE        Z\sphinxhyphen{}matrix ring openings and closures
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 nadd            number of added bonds between Z\PYGZhy{}matrix atoms
@@ -9648,7 +9688,7 @@ iadd            numbers of the atom pairs defining added bonds
 idel            numbers of the atom pairs defining deleted bonds
 \end{sphinxVerbatim}
 
-\sphinxstylestrong{ZCOORD Module        Z\sphinxhyphen{}matrix internal coordinate values}
+{\color{red}\bfseries{}**}MODULE ZCOORD        Z\sphinxhyphen{}matrix internal coordinate values
 
 \begin{sphinxVerbatim}[commandchars=\\\{\}]
 iz              defining atom numbers for each Z\PYGZhy{}matrix atom
