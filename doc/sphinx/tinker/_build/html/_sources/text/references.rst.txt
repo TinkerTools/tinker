@@ -427,6 +427,15 @@ Derivation of Force Fields for Molecular Mechanics and Dynamics from ab initio E
 
 New Out-of-Plane Angle and Bond Angle Internal Coordinates and Related Potential Energy Functions for Molecular Mechanics and Dynamics Simulations, S.-H. Lee, K. Palmo and S. Krimm, J. Comput. Chem., 20, 1067-1084 (1999)
 
+Geometry-Dependent Charge Flux Terms
+------------------------------------
+
+Geometry-Dependent Atomic Charges: Methodology and Application to Alkanes, Aldehydes, Ketones, and Amides, U. Dinar and A. T. Hagler, J. Comput. Chem., 16, 154-170 (1995)
+
+Inclusion of Charge and Polarizability Fluxes Provides Needed Physical Accuracy in Molecular Mechanics Force Fields, K. Palmo, B. Mannifors, N. G. Mirkin and S. Krimm, Chem. Phys. Lett., 429, 628-632 (2006)
+
+Implementation of Geometry-Dependent Charge Flux into the Polarizable AMOEBA+ Potential, C. Liu, J.-P. Piquemal and P. Ren, J. Phys. Chem. Lett., 11, 419-426 (2020)
+
 Analytical Derivatives of Potential Functions
 ---------------------------------------------
 

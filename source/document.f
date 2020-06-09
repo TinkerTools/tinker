@@ -35,9 +35,9 @@ c
       parameter (maxword=10000)
       parameter (maxfunc=76)
       integer i,j,k,mode
-      integer idoc,isrc
+      integer idoc,isrc,next
       integer nkey,nunit
-      integer next,leng
+      integer leng,size
       integer start,last
       integer freeunit
       integer trimtext
@@ -87,12 +87,12 @@ c
       call initial
       write (iout,10)
    10 format (/,' The Tinker Documentation Utility Can :',
-     &        //,4x,'(1) List of Routines from a Source File',
-     &        /,4x,'(2) List of Calls made by each Routine',
-     &        /,4x,'(3) List of Global Varibles from Modules',
-     &        /,4x,'(4) List of the Tinker Option Keywords',
-     &        /,4x,'(5) List of Used Module Dependencies',
-     &        /,4x,'(6) Documentation from a Parameter File')
+     &        //,4x,'(1) List Routines Contained in a Source File',
+     &        /,4x,'(2) Generate List of Calls made by Routines',
+     &        /,4x,'(3) List Global Variables from a Module',
+     &        /,4x,'(4) Generate List of Tinker Keyword Options',
+     &        /,4x,'(5) Construct a Module Dependency List',
+     &        /,4x,'(6) Produce a Summary from a Parameter File')
       mode = 0
       call nextarg (string,exist)
       if (exist)  read (string,*,err=20,end=20)  mode
@@ -329,11 +329,14 @@ c
             string = routine(i)
             leng = trimtext (string)
             if (sphinx) then
-               write (idoc,250)  string(1:16),string(17:leng)
-  250          format ('**',a16,5x,a,//,'.. code-block:: text',/)
+               size = trimtext(string(8:16))
+               write (idoc,250)  string(8:7+size),
+     &                           string(17:leng)//'**'
+  250          format (/,'**',a,' Module','^^^^^^^^',a,
+     &                 //,'.. code-block:: text',/)
             else
                write (idoc,260)  string(1:leng)
-  260          format (a,/)
+  260          format (/,a)
             end if
             j = link(i)
             do k = 1, nline(j)
@@ -347,14 +350,10 @@ c
   280             format (a)
                end if
             end do
-            if (nline(j) .ne. 0) then
-               write (idoc,290)
-  290          format ()
-            end if
          end do
          close (unit=idoc)
-         write (iout,300)  docfile(1:trimtext(docfile))
-  300    format (/,' Source Documentation Written To :  ',a)
+         write (iout,290)  docfile(1:trimtext(docfile))
+  290    format (/,' Source Documentation Written To :  ',a)
       end if
 c
 c     perform deallocation of some local arrays
@@ -373,8 +372,8 @@ c
       if (mode .eq. 4) then
          nkey = 0
          do while (.true.)
-            read (isrc,310,err=320,end=320)  record
-  310       format (a240)
+            read (isrc,300,err=310,end=310)  record
+  300       format (a240)
             next = index (record,'if (keyword(')
             if (next .ne. 0) then
                next = index (record,'.eq.')
@@ -390,7 +389,7 @@ c
                end if
             end if
          end do
-  320    continue
+  310    continue
          close (unit=isrc)
          call sort6 (nkey,key)
          keylast = '                    '
@@ -402,14 +401,14 @@ c
             keyword = key(i)
             leng = trimtext (keyword)
             if (keyword .ne. keylast) then
-               write (idoc,330)  keyword(1:leng)
-  330          format (a)
+               write (idoc,320)  keyword(1:leng)
+  320          format (a)
                keylast = keyword
             end if
          end do
          close (unit=idoc)
-         write (iout,340)  docfile(1:trimtext(docfile))
-  340    format (/,' Keyword Listing Written To :  ',a)
+         write (iout,330)  docfile(1:trimtext(docfile))
+  330    format (/,' Keyword Listing Written To :  ',a)
       end if
 c
 c     get the used modules from the source code listing
@@ -417,8 +416,8 @@ c
       if (mode .eq. 5) then
          nkey = 0
          do while (.true.)
-            read (isrc,350,err=360,end=360)  record
-  350       format (a240)
+            read (isrc,340,err=350,end=350)  record
+  340       format (a240)
             next = 1
             call getword (record,keyword,next)
             if (keyword .eq. 'use') then
@@ -428,7 +427,7 @@ c
                key(nkey) = keyword
             end if
          end do
-  360    continue
+  350    continue
          close (unit=isrc)
          call sort6 (nkey,key)
          keylast = '                    '
@@ -443,11 +442,11 @@ c
                keylast = keyword
             end if
          end do
-         write (iout,370)
-  370    format (/,' File Dependencies in Makefile Format :',/)
+         write (iout,360)
+  360    format (/,' File Dependencies in Makefile Format :',/)
          leng = trimtext (field)
-         write (iout,380)  field (1:leng)
-  380    format (a)
+         write (iout,370)  field (1:leng)
+  370    format (a)
       end if
 c
 c     perform deallocation of some local arrays
@@ -464,8 +463,8 @@ c
          open (unit=idoc,file=docfile,status='new')
          call prtprm (idoc)
          close (unit=idoc)
-         write (iout,390)  docfile(1:trimtext(docfile))
-  390    format (/,' Parameter Listing Written To :  ',a)
+         write (iout,380)  docfile(1:trimtext(docfile))
+  380    format (/,' Parameter Listing Written To :  ',a)
       end if
 c
 c     perform any final tasks before program exit

@@ -56,6 +56,11 @@ intermolecular in finding the perturbation energies
 "altelec" constructs mutated electrostatic parameters based
 on the lambda mutation parameter "elambda"
 
+**ALTERCHG Subroutine**
+
+"alterchg" calculates the change in atomic partial charge or
+monopole values due to bond and angle charge flux coupling
+
 **ALTERPOL Subroutine**
 
 "alterpol" finds an output set of atomic multipole parameters
@@ -87,6 +92,11 @@ options are provided to display system and force field info,
 partition the energy by atom or by potential function type,
 show force field parameters by atom; output the large energy
 interactions and find electrostatic and inertial properties
+
+**ANGCHG Subroutine**
+
+"angchg" computes modifications to atomic partial charges or
+monopoles due to angle bending using a charge flux formulation
 
 **ANGGUESS Function**
 
@@ -231,6 +241,11 @@ atoms defining each bitorsion
 
 "bmax" computes the maximum order of the B functions needed
 for evaluation of Slater-type (STO) overlap integrals
+
+**BNDCHG Subroutine**
+
+"bndchg" computes modifications to atomic partial charges or
+monopoles due to bond stretch using a charge flux formulation
 
 **BNDERR Function**
 
@@ -605,6 +620,12 @@ function for powers of the interatomic distance
 "dbuild" performs a complete rebuild of the damped dispersion
 neighbor list for all sites
 
+**DCFLUX Subroutine**
+
+"dcflux" takes as input the electrostatic potential at each
+atomic site and calculates gradient chain rule corrections due
+to charge flux coupled with bond stretching and angle bending
+
 **DEFLATE Subroutine**
 
 "deflate" uses the power method with deflation to compute the
@@ -716,11 +737,11 @@ of the bounds errors into the lower half of the matrix
 
 **DOCUMENT Program**
 
-"document" generates a formatted description of all the code
-modules or common blocks, an index of routines called by each
-source code module, a listing of all valid keywords, a list of
-include file dependencies as needed by a Unix-style Makefile,
-or a formatted force field parameter set summary
+"document" generates a formatted description of all the routines
+and modules, an index of routines called by each source file, a
+list of all valid keywords, a list of include file dependencies
+as needed by a Unix-style Makefile, or a formatted force field
+parameter summary
 
 **DOT Function**
 
@@ -3373,6 +3394,12 @@ the structure and processes any new or changed values
 "kchargem" assigns partial charges to the atoms according to
 the Merck Molecular Force Field (MMFF)
 
+**KCHGFLX Subroutine**
+
+"kchgflx" assigns a force constant and ideal bond length
+to each bond in the structure and processes any new or
+changed parameter values
+
 **KCHGTRN Subroutine**
 
 "kchgtrn" assigns charge magnitude and damping parameters for
@@ -5473,11 +5500,6 @@ gradient induced dipole solver using a neighbor pair list
 "valence" refines force field parameters for valence terms based
 on a quantum mechanical optimized structure and frequencies
 
-**VALENCE1 Function**
-
-"valence1" is a service routine that computes the energy and
-gradient for a structure during valence parameter fitting
-
 **VALFIT1 Function**
 
 "valfit1" is a service routine that computes the RMS error
@@ -5487,6 +5509,11 @@ and gradient for valence parameters fit to QM results
 
 "valguess" sets approximate valence parameter values based on
 quantum mechanical structure and frequency data
+
+**VALMIN1 Function**
+
+"valmin1" is a service routine that computes the molecular
+energy and gradient during valence parameter optimization
 
 **VALRMS Function**
 

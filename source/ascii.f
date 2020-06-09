@@ -42,6 +42,7 @@ c     caret        decimal value of ASCII code for caret (94)
 c     underbar     decimal value of ASCII code for underbar (95)
 c     vertical     decimal value of ASCII code for vertical bar (124)
 c     tilde        decimal value of ASCII code for tilde (126)
+c     nbsp         decimal value of ASCII code for nobreak space (255)
 c
 c
       module ascii
@@ -62,6 +63,7 @@ c
       integer atsign,backslash
       integer caret,underbar
       integer vertical,tilde
+      integer nbsp
       parameter (null=0)
       parameter (tab=9)
       parameter (linefeed=10)
@@ -92,5 +94,6 @@ c
       parameter (underbar=95)
       parameter (vertical=124)
       parameter (tilde=126)
+      parameter (nbsp=255)
       save
       end

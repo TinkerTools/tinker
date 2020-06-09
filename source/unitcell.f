@@ -74,7 +74,7 @@ c
             octahedron = .true.
          else if (keyword(1:11) .eq. 'SPACEGROUP ') then
             call getword (record,spacegrp,next)
-         else if (keyword(1:12) .eq. 'NO-SYMMETRY ') then
+         else if (keyword(1:11) .eq. 'NOSYMMETRY ') then
             nosymm = .true.
          end if
    10    continue
