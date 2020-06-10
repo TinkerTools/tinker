@@ -29,7 +29,7 @@ add_library(tinker
             eimptor2.f eimptor3.f elj.f elj1.f elj2.f elj3.f embed.f emetal.f
             emetal1.f emetal2.f emetal3.f emm3hb.f emm3hb1.f emm3hb2.f
             emm3hb3.f empole.f empole1.f empole2.f empole3.f energi.f
-            energy.f eopbend.f eopbend1.f eopbend2.f eopbend3.feopdist.f
+            energy.f eopbend.f eopbend1.f eopbend2.f eopbend3.f eopdist.f
             eopdist1.f eopdist2.f eopdist3.f epitors.f epitors1.f epitors2.f
             epitors3.f epolar.f epolar1.f epolar2.f epolar3.f erepel.f
             erepel1.f erepel2.f erepel3.f erf.f erxnfld.f erxnfld1.f
