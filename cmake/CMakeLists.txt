@@ -34,7 +34,7 @@ add_library(tinker
             epitors3.f epolar.f epolar1.f epolar2.f epolar3.f erepel.f
             erepel1.f erepel2.f erepel3.f erf.f erxnfld.f erxnfld1.f
             erxnfld2.f erxnfld3.f esolv.f esolv1.f esolv2.f esolv3.f
-            estrbnd.f estrbnd1.festrbnd2.f estrbnd3.f estrtor.f estrtor1.f
+            estrbnd.f estrbnd1.f estrbnd2.f estrbnd3.f estrtor.f estrtor1.f
             estrtor2.f estrtor3.f etors.f etors1.f etors2.f etors3.f
             etortor.f etortor1.f etortor2.f etortor3.f eurey.f eurey1.f
             eurey2.f eurey3.f evcorr.f ewald.f extra.f extra1.f extra2.f
