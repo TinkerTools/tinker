@@ -12,7 +12,7 @@ add_library(tinker
             atomid.f atoms.f attach.f baoab.f basefile.f bath.f beeman.f
             bicubic.f bitor.f bitors.f bndpot.f bndstr.f bonds.f born.f
             bound.f bounds.f boxes.f bussi.f calendar.f cell.f center.f
-            cflux.f charge.f chgpen.f chgpot.f chgtrn.f  chkpole.f chkring.f
+            cflux.f charge.f chgpen.f chgpot.f chgtrn.f chkpole.f chkring.f
             chkxyz.f cholesky.f chrono.f chunks.f clock.f cluster.f column.f
             command.f connect.f connolly.f control.f couple.f cspline.f
             ctrpot.f cutoffs.f damping.f deflate.f delete.f deriv.f dcflux.f
