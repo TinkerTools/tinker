@@ -165,6 +165,7 @@ c
 c
 c     assign bond charge flux parameters for each bond
 c
+      nbflx = 0
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
@@ -181,6 +182,7 @@ c
          bflx(i) = 0.0d0
          do j = 1, nb
             if (kcfb(j) .eq. pt2) then
+               nbflx = nbflx + 1
                bflx(i) = cflb(j)
             end if
          end do
@@ -188,6 +190,7 @@ c
 c
 c    assign angle charge flux parameters for each angle
 c
+      naflx = 0
       do i = 1, nangle
          ia = iang(1,i)
          ib = iang(2,i)
@@ -219,6 +222,7 @@ c
          abflx(2,i) = 0.0d0
          do j = 1, na
             if (kcfa(j) .eq. pt3) then
+               naflx = naflx + 1
                aflx(1,i) = cfla(1,j)
                aflx(2,i) = cfla(2,j)
                abflx(1,i) = cflab(1,j)
@@ -227,8 +231,8 @@ c
          end do
       end do
 c
-c     turn off charge flux if bonds and angles are not used
+c     turn off bond and angle charge flux term if not used
 c
-      if (nb.eq.0 .and. na.eq.0)  use_chgflx = .false.
+      if (nbflx.eq.0 .and. naflx.eq.0)  use_chgflx = .false.
       return
       end

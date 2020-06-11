@@ -23,6 +23,7 @@ dielectric              1.0
 penetration             GORDON2
 polarization            MUTUAL
 chargetransfer          COMBINED
+d-equals-p
 vdw-12-scale            0.0
 vdw-13-scale            0.0
 vdw-14-scale            1.0
@@ -47,7 +48,6 @@ mutual-11-scale         1.0
 mutual-12-scale         1.0
 mutual-13-scale         1.0
 mutual-14-scale         1.0
-d-equals-p
 
 
       #############################
