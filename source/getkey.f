@@ -35,7 +35,7 @@ c
       character*240 string
 c
 c
-c     check for a keyfile specified on the command line
+c     check for a keyfile specified on command line
 c
       exist = .false.
       do i = 1, narg-1
@@ -123,7 +123,7 @@ c
          end if
       end do
 c
-c     set number of threads for OpenMP parallelization
+c     set number of OpenMP threads for parallelization
 c
       do i = 1, nkey
          next = 1
@@ -136,6 +136,20 @@ c
 !$          call omp_set_num_threads (nthread)
          end if
    80    continue
+      end do
+c
+c     check for number of OpenMP threads on command line
+c
+      do i = 1, narg-1
+         string = arg(i)
+         call upcase (string)
+         if (string(1:2) .eq. '-T') then
+            next = 1
+            string = arg(i+1)
+            call getnumb (string,nthread,next)
+            if (nthread .eq. 0)  nthread = 1
+!$          call omp_set_num_threads (nthread)
+         end if
       end do
       return
       end
