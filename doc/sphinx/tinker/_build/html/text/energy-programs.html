@@ -81,14 +81,17 @@
 <p>The TESTGRAD program computes and compares the analytical and numerical first derivatives (i.e., the gradient vector) of the potential energy for a Cartesian coordinate input structure. The output can be used to test or debug the current potential or any added user defined energy terms.</p>
 <p><strong>TESTHESS</strong></p>
 <p>The TESTHESS program computes and compares the analytical and numerical second derivatives (i.e., the Hessian matrix) of the potential energy for a Cartesian coordinate input structure. The output can be used to test or debug the current potential or any added user defined energy terms.</p>
-<p><strong>TESTLIGHT</strong></p>
+<p><strong>TESTPAIR</strong></p>
 <p>A program to compare the efficiency of different nonbonded neighbor methods for the current molecular system. The program times the computation of energy and gradient for the van der Waals and charge-charge electrostatic potential terms using a simple double loop over all interactions and using the Method of Lights algorithm to select neighbors. The results can be used to decide whether the Method of Lights has any CPU time advantage for the current structure. Both methods should give exactly the same answer in all cases, since the identical individual interactions are computed by both methods. The default double loop method is faster when cutoffs are not used, or when the cutoff sphere contains about half or more of the total system of unit cell. In cases where the cutoff sphere is much smaller than the system size, the Method of Lights can be much faster since it avoids unnecessary calculation of distances beyond the cutoff range.</p>
+<p><strong>TESTPOL</strong></p>
 <p><strong>TESTROT</strong></p>
 <p>The TESTROT program computes and compares the analytical and numerical first derivatives (i.e., the gradient vector) of the potential energy with respect to dihedral angles. Input is a Tinker INT internal coordinate file. The output can be used to test or debug the current potential functions or any added user defined energy terms.</p>
+<p><strong>TESTVIR</strong></p>
 <p><strong>TIMER</strong></p>
 <p>A simple program to provide timing statistics for energy function calls within the Tinker package. TIMER requires an input XYZ file and outputs the CPU time (or wall clock time, on some machine types) needed to perform a specified number of energy, gradient and Hessian evaluations.</p>
 <p><strong>TIMEROT</strong></p>
 <p>This program is similar to TIMER, only it operates over dihedral angles via input of a Tinker INT internal coordinate file. In the current version, the torsional Hessian is computed numerically from the analytical torsional gradient.</p>
+<p><strong>VIBBIG</strong></p>
 <p><strong>VIBRATE</strong></p>
 <p>A program to perform vibrational analysis by computing and diagonalizing the full Hessian matrix (i.e., the second partial derivatives) for an input structure (a Tinker XYZ file). Eigenvalues and eigenvectors of the mass weighted Hessian (i.e., the vibrational frequencies and normal modes) are also calculated. Structures corresponding to individual normal mode motions can be saved in cycle files.</p>
 <p><strong>VIBROT</strong></p>
@@ -125,11 +128,12 @@
 <li class="toctree-l1"><a class="reference internal" href="parameters.html">Force Field Parameter Sets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="special-features.html">Special Features &amp; Methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="keywords.html">Use of the Keyword Control File</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routines.html">Descriptions of Tinker Routines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Description of Modules &amp; Global Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">Routines &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules &amp; Global Variables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test-cases.html">Test Cases &amp; Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmark Results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div class="relations">

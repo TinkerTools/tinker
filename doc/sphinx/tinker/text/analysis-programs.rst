@@ -7,6 +7,10 @@ This section of the manual contains a brief description of each of the Tinker st
 
 A program for concatenating Tinker cycle files into a single archive file; useful for storing the intermediate results of minimizations, dynamics trajectories, and so on. The program can also extract individual cycle files from a Tinker archive.
 
+**BAR**
+
+A program to compute free energy from sampling of adjacent "lambda" windows using the Bennett acceptance ratio (BAR) algorithm. Input consists of trajectories or configurations sampled from the adjacent windows, as well as keyfiles and parameters used to define the states for the simulations. In a first phase, the BAR program computes the energies of all structures from both simulations under the control of both sets of potential energy parameters, i.e., four sets of numbers which are written to an intermediate .bar file. In its second phase, BAR reads a .bar file and uses the free energy perturbation (FEP) and Bennett acceptance ratio formula to compute the free energy, enthalpy and entropy between the two states.
+
 **CORRELATE**
 
 A program to compute time correlation functions from collections of Tinker cycle files. Its use requires a user supplied function property that computes the value of the property for which a time correlation is desired for two input structures. A sample routine is supplied that computes either a velocity autocorrelation function or an rms structural superposition as a function of time. The main body of the program organizes the overall computation in an efficient manner and outputs the final time correlation function.
@@ -17,7 +21,7 @@ A program for the manipulation of crystal structures including interconversion o
 
 **DIFFUSE**
 
-A program to compute the self-diffusion constant for a homogeneous liquid via the Einstein equation. A previously saved dynamics trajectory is read in and ``unfolded'' to reverse translation of molecules due to use of periodic boundary conditions. The average motion over all molecules is then used to compute the self-diffusion constant. While the current program assumes a homogeneous system, it should be easy to modify the code to handle diffusion of individual molecules or other desired effects.
+A program to compute the self-diffusion constant for a homogeneous liquid via the Einstein equation. A previously saved dynamics trajectory is read in and "unfolded" to reverse translation of molecules due to use of periodic boundary conditions. The average motion over all molecules is then used to compute the self-diffusion constant. While the current program assumes a homogeneous system, it should be easy to modify the code to handle diffusion of individual molecules or other desired effects.
 
 **DISTGEOM**
 
@@ -27,6 +31,10 @@ A program to perform distance geometry calculations using variations on the clas
 
 The DOCUMENT program is provided as a minimal listing and documentation tool. It operates on the Tinker source code, either individual files or the complete source listing produced by the command script listing.make, to generate lists of routines, common blocks or valid keywords. In addition, the program has the ability to output a formatted parameter listing from the standard Tinker parameter files.
 
+**FREEFIX**
+
+A small utility to compute the analytical enthalpy, entropy and free energy associated with the release of a flat-bottomed harmonic distance restraint between two sites within a simulation system.
+
 **INTEDIT**
 
 A program to allow interactive inspection and alteration of the internal coordinate definitions and values of a Tinker structure. If the structure is altered, the user has the option to write out a new internal coordinates file upon exit.
@@ -35,9 +43,13 @@ A program to allow interactive inspection and alteration of the internal coordin
 
 A program to convert a Tinker .int internal coordinates formatted file into a Tinker .xyz Cartesian coordinates formatted file.
 
+**MOLXYZ**
+
+A program for converting a MDL (Molecular Design Limited) MOL file into a Tinker XYZ Cartesian coordinate file. The current version of the program converts the MDL atoms types into Tinker "tiny force field" atom types based on atomic number and connectivity (i.e., a tetravalent carbon is type 64).
+
 **MOL2XYZ**
 
-A program for converting a Tripos Sybyl MOL2 file into a Tinker XYZ Cartesian coordinate file. The current version of the program does not attempt to convert the Sybyl atoms types into the active Tinker force field types, i.e., all atoms types are simply set to zero.
+A program for converting a Tripos Sybyl MOL2 file into a Tinker XYZ Cartesian coordinate file. The current version of the program converts the Sybyl MOL2 atoms types into Tinker "tiny force field" atom types based on atomic number and connectivity (i.e., a tetravalent carbon is type 64).
 
 **NUCLEIC**
 
@@ -49,7 +61,15 @@ A program for converting a Brookhaven Protein Data Bank file (a PDB file) into a
 
 **POLARIZE**
 
-A program for computing molecular polarizability from an atom-based distributed model of polarizability. A damped interaction model due to Thole is optionally via keyfile settings. A Tinker .xyz file is required as input. The output consists of the overall polarizability tensor in the global coordinates and its eigenvalues.
+A program for computing molecular polarizability from an atom-based distributed model of polarizability. POLARIZE implements whichever damped interaction model is specified via keyfile and parameter settings. A Tinker .xyz file is required as input. The output consists of the overall polarizability tensor in the global coordinates and its eigenvalues.
+
+**POLEDIT**
+
+A program for manipulating and processing polarizable atomic multipole models. Its primary use is to read a distributed multipole analysis (DMA) from output of the GDMA or Psi4 quantum chemistry programs. The program defines local coordinate frames, sets atomic polarizabilities, removes molecular mechanics polarization from the quantum DMA, averages over symmetrical atoms and outputs parameters in Tinker format. There are additional invocation options to only change local coordinate frame definitions or remove intramolecular polarization from an existing multipole model.
+
+**POTENTIAL**
+
+A program to perform electrostatic potential comparisons and fitting. POTENTIAL can compare two different force field electrostatic models via computing the RMS between the electrostatic potentials on a grid of points outside the molecular envelope. An electrostatic potential grid can also be generated from quantum chemistry output, and compare against a force field model. Finally, a flexible fitting of a force field model to an existing potential grid is available. The program can also take as model input a set of different molecules containing common types, and multiple conformations of a single molecule.
 
 **PRMEDIT**
 
@@ -75,6 +95,14 @@ A program to compute a power spectrum from velocity autocorrelation data. As inp
 
 A program to superimpose two molecular structures in 3-dimensions. A variety of options for input of the atom sets to be used during the superposition are presented interactively to the user. The superposition can be mass-weighted if desired, and the coordinates of the second structure superimposed on the first structure are optionally output. If Tinker archive files are used as input, the program will compute all pairwise superpositions between structures in the input files.
 
+**TORSFIT**
+
+A program for setting force field parameters for torsional terms by fitting 1-fold to 6-fold torsional amplitudes to the difference between a quantum chemistry rotational profile and a force field rotational profile without any torsional terms.
+
+**VALENCE**
+
+A program for setting force field parameters for local valence terms, either from quantum chemistry data or from embedded empirical rules. [This program is still under development.]
+
 **XYZEDIT**
 
 A program that performs and of a variety of manipulations on an input Tinker .xyz Cartesian coordinates formatted file. The present version of the program has the following interactively selectable options: (1) Offset the Numbers of the Current Atoms, (2) Deletion of Individual Specified Atoms, (3) Deletion of Specified Types of Atoms, (4) Deletion of Atoms outside Cutoff Range, (5) Insertion of Individual Specified Atoms, (6) Replace Old Atom Type with a New Type, (7) Assign Connectivities based on Distance, (8) Convert Units from Bohrs to Angstroms, (9) Invert thru Origin to give Mirror Image, (10) Translate Center of Mass to the Origin, (11) Translate a Specified Atom to the Origin, (12) Translate and Rotate to Inertial Frame, (13) Move to Specified Rigid Body Coordinates, (14) Create and Fill a Periodic Boundary Box, (15) Soak Current Molecule in Box of Solvent, (16) Append another XYZ file to Current One. In most cases, multiply options can be applied sequentially to an input file. At the end of the editing process, a new version of the original .xyz file is written as output.
@@ -89,4 +117,4 @@ A program to convert a Tinker .xyz Cartesian coordinates file into a Tripos Syby
 
 **XYZPDB**
 
-A program for converting a Tinker .xyz Cartesian coordinate file into a Brookhaven Protein Data Bank file (a PDB file).
+A program for converting a Tinker .xyz Cartesian coordinate file into a Brookhaven Protein Data Bank file (a PDB file). A Tinker .seq file with the biopolymer sequence must be present if the output PDB file is to be formatted as a protein or nucleic acid with a defined sequence.

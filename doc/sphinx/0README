@@ -7,6 +7,7 @@
           for Tinker and Force Field Explorer. The restructured text
           files are in the /text areas. To build documentation issue
           "make latexpdf" and "make html" commands in the top-level
-          directory for each package. The output is then found in the
-          /_build area under both /tinker and /ffe.
+          directory for each package. The PDF output is then found in
+          the /_build/latex area under both /tinker and /ffe, while
+          the HTML output is in /_build/html.
 

@@ -95,13 +95,21 @@ The TESTGRAD program computes and compares the analytical and numerical first de
 
 The TESTHESS program computes and compares the analytical and numerical second derivatives (i.e., the Hessian matrix) of the potential energy for a Cartesian coordinate input structure. The output can be used to test or debug the current potential or any added user defined energy terms.
 
-**TESTLIGHT**
+**TESTPAIR**
 
 A program to compare the efficiency of different nonbonded neighbor methods for the current molecular system. The program times the computation of energy and gradient for the van der Waals and charge-charge electrostatic potential terms using a simple double loop over all interactions and using the Method of Lights algorithm to select neighbors. The results can be used to decide whether the Method of Lights has any CPU time advantage for the current structure. Both methods should give exactly the same answer in all cases, since the identical individual interactions are computed by both methods. The default double loop method is faster when cutoffs are not used, or when the cutoff sphere contains about half or more of the total system of unit cell. In cases where the cutoff sphere is much smaller than the system size, the Method of Lights can be much faster since it avoids unnecessary calculation of distances beyond the cutoff range.
+
+**TESTPOL**
+
+
 
 **TESTROT**
 
 The TESTROT program computes and compares the analytical and numerical first derivatives (i.e., the gradient vector) of the potential energy with respect to dihedral angles. Input is a Tinker INT internal coordinate file. The output can be used to test or debug the current potential functions or any added user defined energy terms.
+
+**TESTVIR**
+
+
 
 **TIMER**
 
@@ -110,6 +118,10 @@ A simple program to provide timing statistics for energy function calls within t
 **TIMEROT**
 
 This program is similar to TIMER, only it operates over dihedral angles via input of a Tinker INT internal coordinate file. In the current version, the torsional Hessian is computed numerically from the analytical torsional gradient.
+
+**VIBBIG**
+
+
 
 **VIBRATE**
 

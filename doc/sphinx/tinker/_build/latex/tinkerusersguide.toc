@@ -13,101 +13,101 @@
 \contentsline {chapter}{\numberline {3}Types of Input \& Output Files}{9}{chapter.3}%
 \contentsline {chapter}{\numberline {4}Potential Energy Programs}{13}{chapter.4}%
 \contentsline {chapter}{\numberline {5}Analysis \& Utility Programs \& Scripts}{19}{chapter.5}%
-\contentsline {chapter}{\numberline {6}Force Field Parameter Sets}{23}{chapter.6}%
-\contentsline {chapter}{\numberline {7}Special Features \& Methods}{31}{chapter.7}%
-\contentsline {section}{\numberline {7.1}File Version Numbers}{31}{section.7.1}%
-\contentsline {section}{\numberline {7.2}Command Line Options}{32}{section.7.2}%
-\contentsline {section}{\numberline {7.3}Use on Windows Systems}{32}{section.7.3}%
-\contentsline {section}{\numberline {7.4}Use on MacOS Systems}{33}{section.7.4}%
-\contentsline {section}{\numberline {7.5}Atom Types vs. Atom Classes}{33}{section.7.5}%
-\contentsline {section}{\numberline {7.6}Calculations on Partial Structures}{34}{section.7.6}%
-\contentsline {section}{\numberline {7.7}Metal Complexes and Hypervalent Species}{34}{section.7.7}%
-\contentsline {section}{\numberline {7.8}Neighbor Methods for Nonbonded Terms}{35}{section.7.8}%
-\contentsline {section}{\numberline {7.9}Periodic Boundary Conditions}{35}{section.7.9}%
-\contentsline {section}{\numberline {7.10}Distance Cutoffs for Energy Functions}{35}{section.7.10}%
-\contentsline {section}{\numberline {7.11}Ewald Summations Methods}{35}{section.7.11}%
-\contentsline {section}{\numberline {7.12}Continuum Solvation Models}{36}{section.7.12}%
-\contentsline {section}{\numberline {7.13}Polarizable Multipole Electrostatics}{36}{section.7.13}%
-\contentsline {section}{\numberline {7.14}Potential Energy Smoothing}{37}{section.7.14}%
-\contentsline {section}{\numberline {7.15}Distance Geometry Metrization}{37}{section.7.15}%
-\contentsline {chapter}{\numberline {8}Use of the Keyword Control File}{39}{chapter.8}%
-\contentsline {section}{\numberline {8.1}Using Keywords to Control Tinker Calculations}{39}{section.8.1}%
-\contentsline {section}{\numberline {8.2}Keywords Grouped by Functionality}{40}{section.8.2}%
-\contentsline {subsection}{\numberline {8.2.1}OUTPUT CONTROL KEYWORDS}{40}{subsection.8.2.1}%
-\contentsline {subsection}{\numberline {8.2.2}FORCE FIELD SELECTION KEYWORDS}{40}{subsection.8.2.2}%
-\contentsline {subsection}{\numberline {8.2.3}POTENTIAL FUNCTION SELECTION KEYWORDS}{40}{subsection.8.2.3}%
-\contentsline {subsection}{\numberline {8.2.4}POTENTIAL FUNCTION PARAMETER KEYWORDS}{40}{subsection.8.2.4}%
-\contentsline {subsection}{\numberline {8.2.5}ENERGY UNIT CONVERSION KEYWORDS}{40}{subsection.8.2.5}%
-\contentsline {subsection}{\numberline {8.2.6}LOCAL GEOMETRY FUNCTIONAL FORM KEYWORDS}{40}{subsection.8.2.6}%
-\contentsline {subsection}{\numberline {8.2.7}VAN DER WAALS FUNCTIONAL FORM KEYWORDS}{41}{subsection.8.2.7}%
-\contentsline {subsection}{\numberline {8.2.8}ELECTROSTATICS FUNCTIONAL FORM KEYWORDS}{41}{subsection.8.2.8}%
-\contentsline {subsection}{\numberline {8.2.9}NONBONDED CUTOFF KEYWORDS}{41}{subsection.8.2.9}%
-\contentsline {subsection}{\numberline {8.2.10}EWALD SUMMATION KEYWORDS}{41}{subsection.8.2.10}%
-\contentsline {subsection}{\numberline {8.2.11}CRYSTAL LATTICE \& PERIODIC BOUNDARY KEYWORDS}{41}{subsection.8.2.11}%
-\contentsline {subsection}{\numberline {8.2.12}NEIGHBOR LIST KEYWORDS}{41}{subsection.8.2.12}%
-\contentsline {subsection}{\numberline {8.2.13}OPTIMIZATION KEYWORDS}{41}{subsection.8.2.13}%
-\contentsline {subsection}{\numberline {8.2.14}MOLECULAR DYNAMICS KEYWORDS}{42}{subsection.8.2.14}%
-\contentsline {subsection}{\numberline {8.2.15}THERMOSTAT \& BAROSTAT KEYWORDS}{42}{subsection.8.2.15}%
-\contentsline {subsection}{\numberline {8.2.16}TRANSITION STATE KEYWORDS}{42}{subsection.8.2.16}%
-\contentsline {subsection}{\numberline {8.2.17}DISTANCE GEOMETRY KEYWORDS}{42}{subsection.8.2.17}%
-\contentsline {subsection}{\numberline {8.2.18}VIBRATIONAL ANALYSIS KEYWORDS}{42}{subsection.8.2.18}%
-\contentsline {subsection}{\numberline {8.2.19}IMPLICIT SOLVATION KEYWORDS}{42}{subsection.8.2.19}%
-\contentsline {subsection}{\numberline {8.2.20}POISSON\sphinxhyphen {}BOLTZMANN KEYWORDS}{42}{subsection.8.2.20}%
-\contentsline {subsection}{\numberline {8.2.21}MATHEMATICAL ALGORITHM KEYWORDS}{42}{subsection.8.2.21}%
-\contentsline {subsection}{\numberline {8.2.22}PARALLELIZATION KEYWORDS}{42}{subsection.8.2.22}%
-\contentsline {subsection}{\numberline {8.2.23}FREE ENERGY PERTURBATION KEYWORDS}{43}{subsection.8.2.23}%
-\contentsline {subsection}{\numberline {8.2.24}PARTIAL STRUCTURE KEYWORDS}{43}{subsection.8.2.24}%
-\contentsline {subsection}{\numberline {8.2.25}CONSTRAINT \& RESTRAINT KEYWORDS}{43}{subsection.8.2.25}%
-\contentsline {subsection}{\numberline {8.2.26}PARAMETER FITTING KEYWORDS}{43}{subsection.8.2.26}%
-\contentsline {subsection}{\numberline {8.2.27}POTENTIAL SMOOTHING KEYWORDS}{43}{subsection.8.2.27}%
-\contentsline {section}{\numberline {8.3}Description of Individual Keywords}{43}{section.8.3}%
-\contentsline {chapter}{\numberline {9}Routines \& Functions}{77}{chapter.9}%
-\contentsline {chapter}{\numberline {10}Modules \& Global Variables}{165}{chapter.10}%
-\contentsline {chapter}{\numberline {11}Test Cases \& Examples}{205}{chapter.11}%
-\contentsline {chapter}{\numberline {12}Benchmark Results}{209}{chapter.12}%
-\contentsline {section}{\numberline {12.1}Calmodulin Energy Evaluation (Serial)}{209}{section.12.1}%
-\contentsline {section}{\numberline {12.2}Crambin Crystal Energy Evaluation (Serial)}{209}{section.12.2}%
-\contentsline {section}{\numberline {12.3}Crambin Normal Mode Calculation (Serial)}{210}{section.12.3}%
-\contentsline {section}{\numberline {12.4}Water Box Molecular Dynamics using TIP3P (Serial)}{210}{section.12.4}%
-\contentsline {section}{\numberline {12.5}Water Box Molecular Dynamics using AMOEBA (Serial)}{210}{section.12.5}%
-\contentsline {section}{\numberline {12.6}MD on DHFR in Water using CHARMM (OpenMP Parallel)}{211}{section.12.6}%
-\contentsline {section}{\numberline {12.7}MD on DHFR in Water using AMOEBA (OpenMP Parallel)}{211}{section.12.7}%
-\contentsline {section}{\numberline {12.8}MD on COX\sphinxhyphen {}2 in Water using OPLS\sphinxhyphen {}AA (OpenMP Parallel)}{212}{section.12.8}%
-\contentsline {section}{\numberline {12.9}MD on COX\sphinxhyphen {}2 in Water using AMOEBA (OpenMP Parallel)}{212}{section.12.9}%
-\contentsline {chapter}{\numberline {13}Acknowledgments}{215}{chapter.13}%
-\contentsline {chapter}{\numberline {14}References}{217}{chapter.14}%
-\contentsline {section}{\numberline {14.1}Molecular Mechanics \& Dynamics Software Packages}{217}{section.14.1}%
-\contentsline {subsection}{\numberline {14.1.1}Tinker Software Tools}{217}{subsection.14.1.1}%
-\contentsline {subsection}{\numberline {14.1.2}Alternative Molecular Modeling Software}{218}{subsection.14.1.2}%
-\contentsline {section}{\numberline {14.2}Literature References by Topic}{223}{section.14.2}%
-\contentsline {subsection}{\numberline {14.2.1}Molecular Mechanics Methodology}{223}{subsection.14.2.1}%
-\contentsline {subsection}{\numberline {14.2.2}Intermolecular Interactions}{223}{subsection.14.2.2}%
-\contentsline {subsection}{\numberline {14.2.3}Computer Simulation Methodology}{223}{subsection.14.2.3}%
-\contentsline {subsection}{\numberline {14.2.4}Modeling of Biological Macromolecules}{224}{subsection.14.2.4}%
-\contentsline {subsection}{\numberline {14.2.5}Nonlinear Optimization Algorithms}{224}{subsection.14.2.5}%
-\contentsline {subsection}{\numberline {14.2.6}Truncated Newton Optimization}{225}{subsection.14.2.6}%
-\contentsline {subsection}{\numberline {14.2.7}Potential Energy Smoothing}{225}{subsection.14.2.7}%
-\contentsline {subsection}{\numberline {14.2.8}“Sniffer” Global Optimization}{226}{subsection.14.2.8}%
-\contentsline {subsection}{\numberline {14.2.9}Integration Methods for Molecular Dynamics}{226}{subsection.14.2.9}%
-\contentsline {subsection}{\numberline {14.2.10}Constraint Dynamics}{227}{subsection.14.2.10}%
-\contentsline {subsection}{\numberline {14.2.11}Langevin, Brownian and Stochastic Dynamics}{227}{subsection.14.2.11}%
-\contentsline {subsection}{\numberline {14.2.12}Constant Temperature and Pressure Dynamics}{227}{subsection.14.2.12}%
-\contentsline {subsection}{\numberline {14.2.13}Out\sphinxhyphen {}of\sphinxhyphen {}Plane Deformation Terms}{228}{subsection.14.2.13}%
-\contentsline {subsection}{\numberline {14.2.14}Geometry\sphinxhyphen {}Dependent Charge Flux Terms}{228}{subsection.14.2.14}%
-\contentsline {subsection}{\numberline {14.2.15}Analytical Derivatives of Potential Functions}{228}{subsection.14.2.15}%
-\contentsline {subsection}{\numberline {14.2.16}Torsional Space Derivatives and Normal Modes}{229}{subsection.14.2.16}%
-\contentsline {subsection}{\numberline {14.2.17}Analytical Surface Area and Volume}{229}{subsection.14.2.17}%
-\contentsline {subsection}{\numberline {14.2.18}Approximate Surface Area and Volume}{230}{subsection.14.2.18}%
-\contentsline {subsection}{\numberline {14.2.19}Boundary Conditions and Neighbor Methods}{230}{subsection.14.2.19}%
-\contentsline {subsection}{\numberline {14.2.20}Cutoff and Truncation Methods}{230}{subsection.14.2.20}%
-\contentsline {subsection}{\numberline {14.2.21}Ewald Summation Techniques}{231}{subsection.14.2.21}%
-\contentsline {subsection}{\numberline {14.2.22}Conjugated and Aromatic Systems}{231}{subsection.14.2.22}%
-\contentsline {subsection}{\numberline {14.2.23}Free Energy Simulation Methods}{232}{subsection.14.2.23}%
-\contentsline {subsection}{\numberline {14.2.24}Methods for Parameter Determination}{232}{subsection.14.2.24}%
-\contentsline {subsection}{\numberline {14.2.25}Electrostatic Interactions}{233}{subsection.14.2.25}%
-\contentsline {subsection}{\numberline {14.2.26}Polarization Effects}{233}{subsection.14.2.26}%
-\contentsline {subsection}{\numberline {14.2.27}Macroscopic Treatment of Solvent}{234}{subsection.14.2.27}%
-\contentsline {subsection}{\numberline {14.2.28}Surface Area\sphinxhyphen {}Based Solvation Models}{234}{subsection.14.2.28}%
-\contentsline {subsection}{\numberline {14.2.29}Generalized Born Solvation Models}{234}{subsection.14.2.29}%
-\contentsline {subsection}{\numberline {14.2.30}Superposition of Coordinate Sets}{235}{subsection.14.2.30}%
-\contentsline {subsection}{\numberline {14.2.31}Location of Transition States}{235}{subsection.14.2.31}%
+\contentsline {chapter}{\numberline {6}Force Field Parameter Sets}{25}{chapter.6}%
+\contentsline {chapter}{\numberline {7}Special Features \& Methods}{33}{chapter.7}%
+\contentsline {section}{\numberline {7.1}File Version Numbers}{33}{section.7.1}%
+\contentsline {section}{\numberline {7.2}Command Line Options}{34}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Use on Windows Systems}{34}{section.7.3}%
+\contentsline {section}{\numberline {7.4}Use on MacOS Systems}{35}{section.7.4}%
+\contentsline {section}{\numberline {7.5}Atom Types vs. Atom Classes}{35}{section.7.5}%
+\contentsline {section}{\numberline {7.6}Calculations on Partial Structures}{36}{section.7.6}%
+\contentsline {section}{\numberline {7.7}Metal Complexes and Hypervalent Species}{36}{section.7.7}%
+\contentsline {section}{\numberline {7.8}Neighbor Methods for Nonbonded Terms}{37}{section.7.8}%
+\contentsline {section}{\numberline {7.9}Periodic Boundary Conditions}{37}{section.7.9}%
+\contentsline {section}{\numberline {7.10}Distance Cutoffs for Energy Functions}{37}{section.7.10}%
+\contentsline {section}{\numberline {7.11}Ewald Summations Methods}{37}{section.7.11}%
+\contentsline {section}{\numberline {7.12}Continuum Solvation Models}{38}{section.7.12}%
+\contentsline {section}{\numberline {7.13}Polarizable Multipole Electrostatics}{38}{section.7.13}%
+\contentsline {section}{\numberline {7.14}Potential Energy Smoothing}{39}{section.7.14}%
+\contentsline {section}{\numberline {7.15}Distance Geometry Metrization}{39}{section.7.15}%
+\contentsline {chapter}{\numberline {8}Use of the Keyword Control File}{41}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Using Keywords to Control Tinker Calculations}{41}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Keywords Grouped by Functionality}{42}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}OUTPUT CONTROL KEYWORDS}{42}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}FORCE FIELD SELECTION KEYWORDS}{42}{subsection.8.2.2}%
+\contentsline {subsection}{\numberline {8.2.3}POTENTIAL FUNCTION SELECTION KEYWORDS}{42}{subsection.8.2.3}%
+\contentsline {subsection}{\numberline {8.2.4}POTENTIAL FUNCTION PARAMETER KEYWORDS}{42}{subsection.8.2.4}%
+\contentsline {subsection}{\numberline {8.2.5}ENERGY UNIT CONVERSION KEYWORDS}{42}{subsection.8.2.5}%
+\contentsline {subsection}{\numberline {8.2.6}LOCAL GEOMETRY FUNCTIONAL FORM KEYWORDS}{42}{subsection.8.2.6}%
+\contentsline {subsection}{\numberline {8.2.7}VAN DER WAALS FUNCTIONAL FORM KEYWORDS}{43}{subsection.8.2.7}%
+\contentsline {subsection}{\numberline {8.2.8}ELECTROSTATICS FUNCTIONAL FORM KEYWORDS}{43}{subsection.8.2.8}%
+\contentsline {subsection}{\numberline {8.2.9}NONBONDED CUTOFF KEYWORDS}{43}{subsection.8.2.9}%
+\contentsline {subsection}{\numberline {8.2.10}EWALD SUMMATION KEYWORDS}{43}{subsection.8.2.10}%
+\contentsline {subsection}{\numberline {8.2.11}CRYSTAL LATTICE \& PERIODIC BOUNDARY KEYWORDS}{43}{subsection.8.2.11}%
+\contentsline {subsection}{\numberline {8.2.12}NEIGHBOR LIST KEYWORDS}{43}{subsection.8.2.12}%
+\contentsline {subsection}{\numberline {8.2.13}OPTIMIZATION KEYWORDS}{43}{subsection.8.2.13}%
+\contentsline {subsection}{\numberline {8.2.14}MOLECULAR DYNAMICS KEYWORDS}{44}{subsection.8.2.14}%
+\contentsline {subsection}{\numberline {8.2.15}THERMOSTAT \& BAROSTAT KEYWORDS}{44}{subsection.8.2.15}%
+\contentsline {subsection}{\numberline {8.2.16}TRANSITION STATE KEYWORDS}{44}{subsection.8.2.16}%
+\contentsline {subsection}{\numberline {8.2.17}DISTANCE GEOMETRY KEYWORDS}{44}{subsection.8.2.17}%
+\contentsline {subsection}{\numberline {8.2.18}VIBRATIONAL ANALYSIS KEYWORDS}{44}{subsection.8.2.18}%
+\contentsline {subsection}{\numberline {8.2.19}IMPLICIT SOLVATION KEYWORDS}{44}{subsection.8.2.19}%
+\contentsline {subsection}{\numberline {8.2.20}POISSON\sphinxhyphen {}BOLTZMANN KEYWORDS}{44}{subsection.8.2.20}%
+\contentsline {subsection}{\numberline {8.2.21}MATHEMATICAL ALGORITHM KEYWORDS}{44}{subsection.8.2.21}%
+\contentsline {subsection}{\numberline {8.2.22}PARALLELIZATION KEYWORDS}{44}{subsection.8.2.22}%
+\contentsline {subsection}{\numberline {8.2.23}FREE ENERGY PERTURBATION KEYWORDS}{45}{subsection.8.2.23}%
+\contentsline {subsection}{\numberline {8.2.24}PARTIAL STRUCTURE KEYWORDS}{45}{subsection.8.2.24}%
+\contentsline {subsection}{\numberline {8.2.25}CONSTRAINT \& RESTRAINT KEYWORDS}{45}{subsection.8.2.25}%
+\contentsline {subsection}{\numberline {8.2.26}PARAMETER FITTING KEYWORDS}{45}{subsection.8.2.26}%
+\contentsline {subsection}{\numberline {8.2.27}POTENTIAL SMOOTHING KEYWORDS}{45}{subsection.8.2.27}%
+\contentsline {section}{\numberline {8.3}Description of Individual Keywords}{45}{section.8.3}%
+\contentsline {chapter}{\numberline {9}Routines \& Functions}{79}{chapter.9}%
+\contentsline {chapter}{\numberline {10}Modules \& Global Variables}{167}{chapter.10}%
+\contentsline {chapter}{\numberline {11}Test Cases \& Examples}{207}{chapter.11}%
+\contentsline {chapter}{\numberline {12}Benchmark Results}{211}{chapter.12}%
+\contentsline {section}{\numberline {12.1}Calmodulin Energy Evaluation (Serial)}{211}{section.12.1}%
+\contentsline {section}{\numberline {12.2}Crambin Crystal Energy Evaluation (Serial)}{211}{section.12.2}%
+\contentsline {section}{\numberline {12.3}Crambin Normal Mode Calculation (Serial)}{212}{section.12.3}%
+\contentsline {section}{\numberline {12.4}Water Box Molecular Dynamics using TIP3P (Serial)}{212}{section.12.4}%
+\contentsline {section}{\numberline {12.5}Water Box Molecular Dynamics using AMOEBA (Serial)}{212}{section.12.5}%
+\contentsline {section}{\numberline {12.6}MD on DHFR in Water using CHARMM (OpenMP Parallel)}{213}{section.12.6}%
+\contentsline {section}{\numberline {12.7}MD on DHFR in Water using AMOEBA (OpenMP Parallel)}{213}{section.12.7}%
+\contentsline {section}{\numberline {12.8}MD on COX\sphinxhyphen {}2 in Water using OPLS\sphinxhyphen {}AA (OpenMP Parallel)}{214}{section.12.8}%
+\contentsline {section}{\numberline {12.9}MD on COX\sphinxhyphen {}2 in Water using AMOEBA (OpenMP Parallel)}{214}{section.12.9}%
+\contentsline {chapter}{\numberline {13}Acknowledgments}{217}{chapter.13}%
+\contentsline {chapter}{\numberline {14}References}{219}{chapter.14}%
+\contentsline {section}{\numberline {14.1}Molecular Mechanics \& Dynamics Software Packages}{219}{section.14.1}%
+\contentsline {subsection}{\numberline {14.1.1}Tinker Software Tools}{219}{subsection.14.1.1}%
+\contentsline {subsection}{\numberline {14.1.2}Alternative Molecular Modeling Software}{220}{subsection.14.1.2}%
+\contentsline {section}{\numberline {14.2}Literature References by Topic}{225}{section.14.2}%
+\contentsline {subsection}{\numberline {14.2.1}Molecular Mechanics Methodology}{225}{subsection.14.2.1}%
+\contentsline {subsection}{\numberline {14.2.2}Intermolecular Interactions}{225}{subsection.14.2.2}%
+\contentsline {subsection}{\numberline {14.2.3}Computer Simulation Methodology}{225}{subsection.14.2.3}%
+\contentsline {subsection}{\numberline {14.2.4}Modeling of Biological Macromolecules}{226}{subsection.14.2.4}%
+\contentsline {subsection}{\numberline {14.2.5}Nonlinear Optimization Algorithms}{226}{subsection.14.2.5}%
+\contentsline {subsection}{\numberline {14.2.6}Truncated Newton Optimization}{227}{subsection.14.2.6}%
+\contentsline {subsection}{\numberline {14.2.7}Potential Energy Smoothing}{227}{subsection.14.2.7}%
+\contentsline {subsection}{\numberline {14.2.8}“Sniffer” Global Optimization}{228}{subsection.14.2.8}%
+\contentsline {subsection}{\numberline {14.2.9}Integration Methods for Molecular Dynamics}{228}{subsection.14.2.9}%
+\contentsline {subsection}{\numberline {14.2.10}Constraint Dynamics}{229}{subsection.14.2.10}%
+\contentsline {subsection}{\numberline {14.2.11}Langevin, Brownian and Stochastic Dynamics}{229}{subsection.14.2.11}%
+\contentsline {subsection}{\numberline {14.2.12}Constant Temperature and Pressure Dynamics}{229}{subsection.14.2.12}%
+\contentsline {subsection}{\numberline {14.2.13}Out\sphinxhyphen {}of\sphinxhyphen {}Plane Deformation Terms}{230}{subsection.14.2.13}%
+\contentsline {subsection}{\numberline {14.2.14}Geometry\sphinxhyphen {}Dependent Charge Flux Terms}{230}{subsection.14.2.14}%
+\contentsline {subsection}{\numberline {14.2.15}Analytical Derivatives of Potential Functions}{230}{subsection.14.2.15}%
+\contentsline {subsection}{\numberline {14.2.16}Torsional Space Derivatives and Normal Modes}{231}{subsection.14.2.16}%
+\contentsline {subsection}{\numberline {14.2.17}Analytical Surface Area and Volume}{231}{subsection.14.2.17}%
+\contentsline {subsection}{\numberline {14.2.18}Approximate Surface Area and Volume}{232}{subsection.14.2.18}%
+\contentsline {subsection}{\numberline {14.2.19}Boundary Conditions and Neighbor Methods}{232}{subsection.14.2.19}%
+\contentsline {subsection}{\numberline {14.2.20}Cutoff and Truncation Methods}{232}{subsection.14.2.20}%
+\contentsline {subsection}{\numberline {14.2.21}Ewald Summation Techniques}{233}{subsection.14.2.21}%
+\contentsline {subsection}{\numberline {14.2.22}Conjugated and Aromatic Systems}{233}{subsection.14.2.22}%
+\contentsline {subsection}{\numberline {14.2.23}Free Energy Simulation Methods}{234}{subsection.14.2.23}%
+\contentsline {subsection}{\numberline {14.2.24}Methods for Parameter Determination}{234}{subsection.14.2.24}%
+\contentsline {subsection}{\numberline {14.2.25}Electrostatic Interactions}{235}{subsection.14.2.25}%
+\contentsline {subsection}{\numberline {14.2.26}Polarization Effects}{235}{subsection.14.2.26}%
+\contentsline {subsection}{\numberline {14.2.27}Macroscopic Treatment of Solvent}{236}{subsection.14.2.27}%
+\contentsline {subsection}{\numberline {14.2.28}Surface Area\sphinxhyphen {}Based Solvation Models}{236}{subsection.14.2.28}%
+\contentsline {subsection}{\numberline {14.2.29}Generalized Born Solvation Models}{236}{subsection.14.2.29}%
+\contentsline {subsection}{\numberline {14.2.30}Superposition of Coordinate Sets}{237}{subsection.14.2.30}%
+\contentsline {subsection}{\numberline {14.2.31}Location of Transition States}{237}{subsection.14.2.31}%
