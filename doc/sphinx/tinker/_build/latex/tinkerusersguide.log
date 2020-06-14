@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  13 JUN 2020 19:22
+This is pdfTeX, Version 3.14159265-2.6-1.40.21 (TeX Live 2020) (preloaded format=pdflatex 2020.4.7)  13 JUN 2020 19:38
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -840,21 +840,21 @@ Chapter 7.
 Chapter 8.
 [41]
 LaTeX Font Info:    Font shape `T1/lato-TLF/m/n' will be
-(Font)              scaled to size 12.0pt on input line 919.
+(Font)              scaled to size 12.0pt on input line 925.
  [42] [43] [44]
-Underfull \hbox (badness 10000) in paragraph at lines 1114--1119
+Underfull \hbox (badness 10000) in paragraph at lines 1120--1125
 \T1/bch/m/n/10.95 ORIGIN RATTLE-PLANE RESTRAIN-ANGLE RESTRAIN-DISTANCE RESTRAIN
 -GROUPS
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1123--1131
+Underfull \hbox (badness 10000) in paragraph at lines 1129--1137
 \T1/bch/m/n/10.95 FIX-DIPOLE FIX-MONOPOLE FIX-OPBEND FIX-QUADRUPOLE FIX-STRBND 
 FIX-TORSION
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1123--1131
+Underfull \hbox (badness 10000) in paragraph at lines 1129--1137
 \T1/bch/m/n/10.95 FIX-UREY POTENTIAL-ATOMS POTENTIAL-FIT POTENTIAL-OFFSET POTEN
 TIAL-SHELLS
  []
@@ -876,29 +876,29 @@ Chapter 9.
 ]
 Chapter 10.
 LaTeX Font Info:    Trying to load font information for T1+zi4 on input line 77
-00.
+06.
 (/usr/local/texlive/2020/texmf-dist/tex/latex/inconsolata/t1zi4.fd
 File: t1zi4.fd 2018/01/14 T1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 7700.
+(Font)              scaled to size 10.0pt on input line 7706.
 LaTeX Font Info:    Font shape `T1/zi4/m/n' will be
-(Font)              scaled to size 6.0pt on input line 7700.
+(Font)              scaled to size 6.0pt on input line 7706.
  [167]
 [168] [169] [170] [171] [172] [173] [174] [175] [176] [177] [178] [179]
 [180] [181] [182] [183] [184] [185]
 LaTeX Font Info:    Trying to load font information for TS1+zi4 on input line 8
-863.
+869.
 
 (/usr/local/texlive/2020/texmf-dist/tex/latex/inconsolata/ts1zi4.fd
 File: ts1zi4.fd 2018/01/14 TS1/zi4 (Inconsolata)
 )
 LaTeX Font Info:    Font shape `TS1/zi4/m/n' will be
-(Font)              scaled to size 10.0pt on input line 8863.
+(Font)              scaled to size 10.0pt on input line 8869.
  [186]
 [187] [188] [189] [190] [191] [192] [193] [194] [195] [196] [197] [198]
 [199] [200] [201] [202] [203]
-Overfull \vbox (1.45445pt too high) detected at line 9993
+Overfull \vbox (1.45445pt too high) detected at line 9999
  []
 
 [204] [205] [206]
@@ -910,7 +910,7 @@ Chapter 11.
 ]
 Chapter 12.
 [211] [212]
-Overfull \vbox (1.07898pt too high) detected at line 10278
+Overfull \vbox (1.07898pt too high) detected at line 10284
  []
 
 [213] [214] [215] [216
@@ -918,17 +918,17 @@ Overfull \vbox (1.07898pt too high) detected at line 10278
 ]
 Chapter 13.
 
-Underfull \hbox (badness 10000) in paragraph at lines 10341--10343
+Underfull \hbox (badness 10000) in paragraph at lines 10347--10349
 []\T1/bch/m/n/10.95 and tor-sional
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 10355--10357
+Underfull \hbox (badness 10000) in paragraph at lines 10361--10363
 []\T1/bch/m/n/10.95 treatment;
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 10388--10390
+Underfull \hbox (badness 10000) in paragraph at lines 10394--10396
 []\T1/bch/m/n/10.95 for the AMOEBA
  []
 
@@ -938,18 +938,18 @@ Chapter 14.
 
 ] [220] [221] [222] [223] [224] [225] [226] [227] [228] [229] [230]
 [231] [232] [233] [234] [235] [236] [237] (./tinkerusersguide.ind)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 11126.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 11132.
  [238]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 11126.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 11132.
 
 (./tinkerusersguide.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 11126.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 11132.
 
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 11126
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 11132
 .
 Package rerunfilecheck Info: File `tinkerusersguide.out' has not changed.
 (rerunfilecheck)             Checksum: F0DA1E12FA58D142F872FB54C1209935;11413.
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 11126.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 11132.
  ) 
 Here is how much of TeX's memory you used:
  14522 strings out of 480608
@@ -970,7 +970,7 @@ ts/type1/public/inconsolata/Inconsolata-zi4r.pfb></usr/local/texlive/2020/texmf
 st/fonts/type1/bitstrea/charter/bchb8a.pfb></usr/local/texlive/2020/texmf-dist/
 fonts/type1/bitstrea/charter/bchr8a.pfb></usr/local/texlive/2020/texmf-dist/fon
 ts/type1/public/cm-super/sfrb1095.pfb>
-Output written on tinkerusersguide.pdf (242 pages, 549867 bytes).
+Output written on tinkerusersguide.pdf (242 pages, 549939 bytes).
 PDF statistics:
  1513 PDF objects out of 1728 (max. 8388607)
  1246 compressed objects within 13 object streams

@@ -43,7 +43,10 @@
 </div>
 <div class="section" id="command-line-options">
 <h2>Command Line Options<a class="headerlink" href="#command-line-options" title="Permalink to this headline">¶</a></h2>
-<p>Many operating systems or compiler supplied-libraries make available something like the standard Unix iargc and getarg routines for capturing command line arguments. On these machines most of the Tinker programs support a selection of command line arguments and options. The name of the keyfile to be used for a calculation is read from the argument following a -k (equivalent to either -key or -keyfile, case insensitive) command line argument. Note that the -k options can appear anywhere on the command line following the executable name. All other command line arguments, excepting the name of the executable program itself, are treated as input arguments. These input arguments are read from left to right and interpreted in order as the answers to questions that would be asked by an interactive invocation of the same Tinker program. For example, the following command line:</p>
+<p>Most of the Tinker programs support a selection of command line arguments and options. Many programs will take all the usual interactive input on the original command line used to invoke the program.</p>
+<p>The name of the keyfile to be used for a calculation is read from the argument following a -k (equivalent to either -key or -keyfile, case insensitive) command line argument. Note that the -k options can appear anywhere on the command line following the executable name.</p>
+<p>Similar to the keyfile option just described, the number of OpenMP threads to be used during a calculation can be specified as -t (equivalent to -threads, case insensitive) followed by an integer number.</p>
+<p>All other command line arguments, excepting the name of the executable program itself, are treated as input arguments. These input arguments are read from left to right and interpreted in order as the answers to questions that would be asked by an interactive invocation of the same Tinker program. For example, the following command line:</p>
 <p>newton molecule -k test a a 0.01</p>
 <p>will invoke the NEWTON program on the structure file molecule.xyz using the keyfile test.key, automatic mode [a] for both the method and preconditioning, and 0.01 for the RMS gradient per atom termination criterion in kcal/mole/Ang. Provided that the force field parameter set, etc. is provided in test.key, the above compuation will procede directly from the command line invocation without further interactive input.</p>
 </div>
@@ -158,11 +161,12 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="keywords.html">Use of the Keyword Control File</a></li>
-<li class="toctree-l1"><a class="reference internal" href="routines.html">Descriptions of Tinker Routines</a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">Description of Modules &amp; Global Variables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">Routines &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules &amp; Global Variables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="test-cases.html">Test Cases &amp; Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmark Results</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
 </ul>
 
 <div class="relations">

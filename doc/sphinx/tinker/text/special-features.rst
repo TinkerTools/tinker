@@ -15,7 +15,13 @@ The version scheme as implemented in Tinker does have two known quirks. First, i
 Command Line Options
 --------------------
 
-Many operating systems or compiler supplied-libraries make available something like the standard Unix iargc and getarg routines for capturing command line arguments. On these machines most of the Tinker programs support a selection of command line arguments and options. The name of the keyfile to be used for a calculation is read from the argument following a -k (equivalent to either -key or -keyfile, case insensitive) command line argument. Note that the -k options can appear anywhere on the command line following the executable name. All other command line arguments, excepting the name of the executable program itself, are treated as input arguments. These input arguments are read from left to right and interpreted in order as the answers to questions that would be asked by an interactive invocation of the same Tinker program. For example, the following command line:
+Most of the Tinker programs support a selection of command line arguments and options. Many programs will take all the usual interactive input on the original command line used to invoke the program.
+
+The name of the keyfile to be used for a calculation is read from the argument following a -k (equivalent to either -key or -keyfile, case insensitive) command line argument. Note that the -k options can appear anywhere on the command line following the executable name.
+
+Similar to the keyfile option just described, the number of OpenMP threads to be used during a calculation can be specified as -t (equivalent to -threads, case insensitive) followed by an integer number.
+
+All other command line arguments, excepting the name of the executable program itself, are treated as input arguments. These input arguments are read from left to right and interpreted in order as the answers to questions that would be asked by an interactive invocation of the same Tinker program. For example, the following command line:
 
 newton molecule -k test a a 0.01
 
