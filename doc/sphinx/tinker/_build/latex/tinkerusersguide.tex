@@ -76,7 +76,7 @@
     
 
 \title{Tinker User\textquotesingle{}s Guide}
-\date{Jun 14, 2020}
+\date{Jun 15, 2020}
 \release{}
 \author{TinkerTools Organization}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -290,23 +290,23 @@ This section of the manual contains a brief description of each of the Tinker po
 
 \sphinxstylestrong{ALCHEMY}
 
-A simple program to perform very basic free energy perturbation calculations. This program is provided mostly for demonstration purposes.  For example, we use ALCHEMY in a molecular modeling course laboratory exercise to perform such classic mutations as chloride to bromide and ethane to methanol in water. The present version uses the perturbation formula and windowing with an explicit mapping of atoms involved in the mutation (“Amber”\sphinxhyphen{}style), instead of thermodynamic integration and independent freely propagating groups of mutated atoms (“CHARMM”\sphinxhyphen{}style). Some of the code specific to this program is limited to the Amber and OPLS potential functional forms, but could be easily generalized to handle other potentials. A more general and sophisticated version is currently under development.
+ALCHEMY is a simple program to perform very basic free energy perturbation calculations. This program is provided mostly for demonstration purposes.  For example, we use ALCHEMY in a molecular modeling course laboratory exercise to perform such classic mutations as chloride to bromide and ethane to methanol in water. The present version uses the perturbation formula and windowing with an explicit mapping of atoms involved in the mutation (“Amber”\sphinxhyphen{}style), instead of thermodynamic integration and independent freely propagating groups of mutated atoms (“CHARMM”\sphinxhyphen{}style). Some of the code specific to this program is limited to the Amber and OPLS potential functional forms, but could be easily generalized to handle other potentials. A more general and sophisticated version is currently under development.
 
 \sphinxstylestrong{ANALYZE}
 
-Provides information about a specific molecular structure. The program will ask for the name of a structure file, which must be in the Tinker XYZ file format, and the type of analysis desired. Options allow output of:  (1) total potential energy of the system, (2) breakdown of the energy by potential function type or over individual atoms, (3) computation of the total dipole moment and its components, moments of inertia and radius of gyration, (4) listing of the parameters used to compute selected interaction energies, (5) energies associated with specified individual interactions.
+ANALYZE provides information about a specific molecular structure. The program will ask for the name of a structure file, which must be in the Tinker XYZ file format, and the type of analysis desired. Options allow output of:  (1) total potential energy of the system, (2) breakdown of the energy by potential function type or over individual atoms, (3) computation of the total dipole moment and its components, moments of inertia and radius of gyration, (4) listing of the parameters used to compute selected interaction energies, (5) energies associated with specified individual interactions.
 
 \sphinxstylestrong{ANNEAL}
 
-Performs a molecular dynamics simulated annealing computation. The program starts from a specified input molecular structure in Tinker XYZ format. The trajectory is updated using either a modified Beeman or a velocity Verlet integration method. The annealing protocol is implemented by allowing smooth changes between starting and final values of the system temperature via the Groningen method of coupling to an external bath. The scaling can be linear or sigmoidal in nature. In addition, parameters such as cutoff distance can be transformed along with the temperature. The user must input the desired number of dynamics steps for both the equilibration and cooling phases, a time interval for the dynamics steps, and an interval between coordinate/trajectory saves. All saved coordinate sets along the trajectory are placed in sequentially numbered cycle files.
+ANNEAL performs a molecular dynamics simulated annealing computation. The program starts from a specified input molecular structure in Tinker XYZ format. The trajectory is updated using either a modified Beeman or a velocity Verlet integration method. The annealing protocol is implemented by allowing smooth changes between starting and final values of the system temperature via the Groningen method of coupling to an external bath. The scaling can be linear or sigmoidal in nature. In addition, parameters such as cutoff distance can be transformed along with the temperature. The user must input the desired number of dynamics steps for both the equilibration and cooling phases, a time interval for the dynamics steps, and an interval between coordinate/trajectory saves. All saved coordinate sets along the trajectory are placed in sequentially numbered cycle files.
 
 \sphinxstylestrong{DYNAMIC}
 
-Performs a molecular dynamics (MD) or stochastic dynamics (SD) computation. Starts either from a specified input molecular structure (an XYZ file) or from a structure\sphinxhyphen{}velocity\sphinxhyphen{}acceleration set saved from a previous dynamics trajectory (a restart from a DYN file). MD trajectories are propagated using either a modified Beeman or a velocity Verlet integration method. SD is implemented via our own derivation of a velocity Verlet\sphinxhyphen{}based algorithm. In addition the program can perform full crystal calculations, and can operate in constant energy mode or with maintenance of a desired temperature and/or pressure using the Berendsen method of coupling to external baths. The user must input the desired number of dynamics steps, a time interval for the dynamics steps, and an interval between coordinate/trajectory saves. Coordinate sets along the trajectory can be saved as sequentially numbered cycle files or directly to a Tinker archive (ARC) file. At the same time that a point along the trajectory is saved, the complete information needed to restart the trajectory from that point is updated and stored in the DYN file.
+DYNAMIC performs a molecular dynamics (MD) or stochastic dynamics (SD) computation. Starts either from a specified input molecular structure (an XYZ file) or from a structure\sphinxhyphen{}velocity\sphinxhyphen{}acceleration set saved from a previous dynamics trajectory (a restart from a DYN file). MD trajectories are propagated using either a modified Beeman or a velocity Verlet integration method. SD is implemented via our own derivation of a velocity Verlet\sphinxhyphen{}based algorithm. In addition the program can perform full crystal calculations, and can operate in constant energy mode or with maintenance of a desired temperature and/or pressure using the Berendsen method of coupling to external baths. The user must input the desired number of dynamics steps, a time interval for the dynamics steps, and an interval between coordinate/trajectory saves. Coordinate sets along the trajectory can be saved as sequentially numbered cycle files or directly to a Tinker archive (ARC) file. At the same time that a point along the trajectory is saved, the complete information needed to restart the trajectory from that point is updated and stored in the DYN file.
 
 \sphinxstylestrong{GDA}
 
-A program to implement Straub’s Gaussian Density Annealing algorithm over an effective series of analytically smoothed potential energy surfaces. This method can be viewed as an extended stochastic version of the diffusion equation method of Scheraga, et al., and also has many similar features to the Tinker Potential Smoothing and Search (PSS) series of programs. The current version of GDA is similar to but does not exactly reproduce Straub’s published method and is limited to argon clusters and other simple systems involving only van der Waals interactions; further modification and development of this code is currently underway in the Ponder research group. As with other programs involving potential smoothing, GDA currently requires use of the smooth.prm force field parameters.
+GDA is a program to implement Straub’s Gaussian Density Annealing algorithm over an effective series of analytically smoothed potential energy surfaces. This method can be viewed as an extended stochastic version of the diffusion equation method of Scheraga, et al., and also has many similar features to the Tinker Potential Smoothing and Search (PSS) series of programs. The current version of GDA is similar to but does not exactly reproduce Straub’s published method and is limited to argon clusters and other simple systems involving only van der Waals interactions; further modification and development of this code is currently underway in the Ponder research group. As with other programs involving potential smoothing, GDA currently requires use of the smooth.prm force field parameters.
 
 \sphinxstylestrong{MINIMIZE}
 
@@ -326,7 +326,7 @@ The MONTE program implements the Monte Carlo Minimization algorithm developed by
 
 \sphinxstylestrong{NEWTON}
 
-A truncated Newton minimization method which requires potential energy, gradient and Hessian information. This procedure has significant advantages over standard Newton methods, and is able to minimize very large structures completely. Several options are provided with respect to minimization method and preconditioning of the Newton equations. The default options are recommended unless the user is familiar with the math involved. This program operates in Cartesian coordinate space and is fairly tolerant of poor input structures. Typical algorithm iteration times are longer than with nonlinear conjugate gradient or variable metric methods, but many fewer iterations are required for complete minimization. NEWTON is usually the best choice for minimizations to the 0.01 to 0.000001 kcal/mole/Ang level of RMS gradient convergence. Tests for directions of negative curvature can be removed, allowing NEWTON to be used for optimization to conformational transition state structures (this only works if the starting point is very close to the transition state). Input consists of a Tinker XYZ coordinates file; output is an updated set of minimized coordinates and minimization statistics.
+NEWTON is a truncated Newton minimization method which requires potential energy, gradient and Hessian information. This procedure has significant advantages over standard Newton methods, and is able to minimize very large structures completely. Several options are provided with respect to minimization method and preconditioning of the Newton equations. The default options are recommended unless the user is familiar with the math involved. This program operates in Cartesian coordinate space and is fairly tolerant of poor input structures. Typical algorithm iteration times are longer than with nonlinear conjugate gradient or variable metric methods, but many fewer iterations are required for complete minimization. NEWTON is usually the best choice for minimizations to the 0.01 to 0.000001 kcal/mole/Ang level of RMS gradient convergence. Tests for directions of negative curvature can be removed, allowing NEWTON to be used for optimization to conformational transition state structures (this only works if the starting point is very close to the transition state). Input consists of a Tinker XYZ coordinates file; output is an updated set of minimized coordinates and minimization statistics.
 
 \sphinxstylestrong{NEWTROT}
 
@@ -346,31 +346,31 @@ The OPTRIGID program is similar to OPTIMIZE except that it operates on rigid bod
 
 \sphinxstylestrong{PATH}
 
-A program that implements a variant of Elber’s Lagrangian multiplier\sphinxhyphen{}based reaction path following algorithm. The program takes as input a pair of structural minima as Tinker XYZ files, and then generates a user specified number of points along a path through conformational space connecting the input structures. The intermediate structures are output as Tinker cycle files, and the higher energy intermediates can be used as input to a Newton\sphinxhyphen{}based optimization to locate conformational transition states.
+The PATH program implements a variant of Elber’s Lagrangian multiplier\sphinxhyphen{}based reaction path following algorithm. The program takes as input a pair of structural minima as Tinker XYZ files, and then generates a user specified number of points along a path through conformational space connecting the input structures. The intermediate structures are output as Tinker cycle files, and the higher energy intermediates can be used as input to a Newton\sphinxhyphen{}based optimization to locate conformational transition states.
 
 \sphinxstylestrong{PSS}
 
-Implements our version of a potential smoothing and search algorithm for the global optimization of molecular conformation. An initial structure in .xyz format is first minimized in Cartesian coordinates on a series of increasingly smoothed potential energy surfaces. Then the smoothing procedure is reversed with minimization on each successive surface starting from the coordinates of the minimum on the previous surface. A local search procedure is used during the backtracking to explore for alternative minima better than the one found during the current minimization. The final result is usually a very low energy conformation or, in favorable cases, the global energy minimum conformation. The minimum energy coordinate sets found on each surface during both the forward smoothing and backtracking procedures are placed in sequentially numbered cycle files.
+PSS implements our version of a potential smoothing and search algorithm for the global optimization of molecular conformation. An initial structure in .xyz format is first minimized in Cartesian coordinates on a series of increasingly smoothed potential energy surfaces. Then the smoothing procedure is reversed with minimization on each successive surface starting from the coordinates of the minimum on the previous surface. A local search procedure is used during the backtracking to explore for alternative minima better than the one found during the current minimization. The final result is usually a very low energy conformation or, in favorable cases, the global energy minimum conformation. The minimum energy coordinate sets found on each surface during both the forward smoothing and backtracking procedures are placed in sequentially numbered cycle files.
 
 \sphinxstylestrong{PSSRIGID}
 
-This program implements the potential smoothing and search method as described above for the PSS program, but performs the computation in terms of keyfile\sphinxhyphen{}defined rigid body atom groups instead of Cartesian coordinates. Output is saved in numbered cycle files with the XYZ file format.
+PSSRIGID implements the potential smoothing and search method as described above for the PSS program, but performs the computation in terms of keyfile\sphinxhyphen{}defined rigid body atom groups instead of Cartesian coordinates. Output is saved in numbered cycle files with the XYZ file format.
 
 \sphinxstylestrong{PSSROT}
 
-This program implements the potential smoothing and search method as described above for the PSS program, but performs the computation in terms of a set of user\sphinxhyphen{}specified dihedral angles instead of Cartesian coordinates. Output is saved in numbered cycle files with the INT file format.
+PSSROT implements the potential smoothing and search method as described above for the PSS program, but performs the computation in terms of a set of user\sphinxhyphen{}specified dihedral angles instead of Cartesian coordinates. Output is saved in numbered cycle files with the INT file format.
 
 \sphinxstylestrong{SADDLE}
 
-A program for the location of a conformational transition state between two potential energy minima. SADDLE uses a conglomeration of ideas from the Bell\sphinxhyphen{}Crighton quadratic path and the Halgren\sphinxhyphen{}Lipscomb synchronous transit methods. The basic idea is to perform a nonlinear conjugate gradient optimization in a subspace orthogonal to a suitably defined reaction coordinate. The program requires as input the coordinates, as Tinker XYZ files, of the two minima and an rms gradient convergence criterion for the optimization. The current estimate of the transition state structure is written to the file TSTATE.XYZ. Crude transition state structures generated by SADDLE can sometimes be refined using the NEWTON program. Optionally, a scan of the interconversion pathway can be made at each major iteration.
+The SADDLE program locates a conformational transition state between two potential energy minima. SADDLE uses a conglomeration of ideas from the Bell\sphinxhyphen{}Crighton quadratic path and the Halgren\sphinxhyphen{}Lipscomb synchronous transit methods. The basic idea is to perform a nonlinear conjugate gradient optimization in a subspace orthogonal to a suitably defined reaction coordinate. The program requires as input the coordinates, as Tinker XYZ files, of the two minima and an rms gradient convergence criterion for the optimization. The current estimate of the transition state structure is written to the file TSTATE.XYZ. Crude transition state structures generated by SADDLE can sometimes be refined using the NEWTON program. Optionally, a scan of the interconversion pathway can be made at each major iteration.
 
 \sphinxstylestrong{SCAN}
 
-A program for general conformational search of an entire potential energy surface via a basin hopping method. The program takes as input a Tinker XYZ coordinates file which is then minimized to find the first local minimum for a search list. A series of activations along various normal modes from this initial minimum are used as seed points for additional minimizations. Whenever a previously unknown local minimum is located it is added to the search list. When all minima on the search list have been subjected to the normal mode activation without locating additional new minima, the program terminates. The individual local minima are written to cycle files as they are discovered. While the SCAN program can be used on standard undeformed potential energy surfaces, we have found it to be most useful for quickly “scanning” a smoothed energy surface to enumerate the major basins of attraction spaning the entire surface.
+SCAN is a program for general conformational search of an entire potential energy surface via a basin hopping method. The program takes as input a Tinker XYZ coordinates file which is then minimized to find the first local minimum for a search list. A series of activations along various normal modes from this initial minimum are used as seed points for additional minimizations. Whenever a previously unknown local minimum is located it is added to the search list. When all minima on the search list have been subjected to the normal mode activation without locating additional new minima, the program terminates. The individual local minima are written to cycle files as they are discovered. While the SCAN program can be used on standard undeformed potential energy surfaces, we have found it to be most useful for quickly “scanning” a smoothed energy surface to enumerate the major basins of attraction spaning the entire surface.
 
 \sphinxstylestrong{SNIFFER}
 
-A program that implements the Sniffer global optimization algorithm of Butler and Slaminka, a discrete version of Griewank’s global search trajectory method. The program takes an input Tinker XYZ coordinates file and shakes it vigorously via a modified dynamics trajectory before, hopefully, settling into a low lying minimum. Some trial and error is often required as the current implementation is sensitive to various parameters and tolerances that govern the computation. At present, these parameters are not user accessible, and must be altered in the source code. However, this method can do a good job of quickly optimizing conformation within a limited range of convergence.
+SNIFFER is a program that implements the Sniffer global optimization algorithm of Butler and Slaminka, a discrete version of Griewank’s global search trajectory method. The program takes an input Tinker XYZ coordinates file and shakes it vigorously via a modified dynamics trajectory before, hopefully, settling into a low lying minimum. Some trial and error is often required as the current implementation is sensitive to various parameters and tolerances that govern the computation. At present, these parameters are not user accessible, and must be altered in the source code. However, this method can do a good job of quickly optimizing conformation within a limited range of convergence.
 
 \sphinxstylestrong{TESTGRAD}
 
@@ -382,9 +382,11 @@ The TESTHESS program computes and compares the analytical and numerical second d
 
 \sphinxstylestrong{TESTPAIR}
 
-A program to compare the efficiency of different nonbonded neighbor methods for the current molecular system. The program times the computation of energy and gradient for the van der Waals and charge\sphinxhyphen{}charge electrostatic potential terms using a simple double loop over all interactions and using the Method of Lights algorithm to select neighbors. The results can be used to decide whether the Method of Lights has any CPU time advantage for the current structure. Both methods should give exactly the same answer in all cases, since the identical individual interactions are computed by both methods. The default double loop method is faster when cutoffs are not used, or when the cutoff sphere contains about half or more of the total system of unit cell. In cases where the cutoff sphere is much smaller than the system size, the Method of Lights can be much faster since it avoids unnecessary calculation of distances beyond the cutoff range.
+The TESTPAIR program compares the efficiency of different nonbonded neighbor methods for the current molecular system. The program times the computation of energy and gradient for the van der Waals and charge\sphinxhyphen{}charge electrostatic potential terms using a simple double loop over all interactions and using the Method of Lights algorithm to select neighbors. The results can be used to decide whether the Method of Lights has any CPU time advantage for the current structure. Both methods should give exactly the same answer in all cases, since the identical individual interactions are computed by both methods. The default double loop method is faster when cutoffs are not used, or when the cutoff sphere contains about half or more of the total system of unit cell. In cases where the cutoff sphere is much smaller than the system size, the Method of Lights can be much faster since it avoids unnecessary calculation of distances beyond the cutoff range.
 
 \sphinxstylestrong{TESTPOL}
+
+TESTPOL computes and compares several different methods for determining polarization via atomic induced dipole moments. The available methods include direct polarization (“iAMOEBA”), mutual SCF iteration to varying levels of convergence (via PCG iteration), perturbation theory extrapolation (OPT2 through OPT6), and truncated conjugate gradient (TCG1 and TCG2) solvers. The program will also find the best set of OPT coefficients for the system considered.
 
 \sphinxstylestrong{TESTROT}
 
@@ -392,19 +394,23 @@ The TESTROT program computes and compares the analytical and numerical first der
 
 \sphinxstylestrong{TESTVIR}
 
+The TESTVIR program checks the accuracy of the analytical internal virial calculation by comparison against a numerical virial computed from the finite\sphinxhyphen{}difference derivative of the energy with respect to the lattice vectors.
+
 \sphinxstylestrong{TIMER}
 
-A simple program to provide timing statistics for energy function calls within the Tinker package. TIMER requires an input XYZ file and outputs the CPU time (or wall clock time, on some machine types) needed to perform a specified number of energy, gradient and Hessian evaluations.
+TIMER is a simple program to provide timing statistics for energy function calls within the Tinker package. TIMER requires an input XYZ file and outputs the CPU time (or wall clock time, on some machine types) needed to perform a specified number of energy, gradient and Hessian evaluations.
 
 \sphinxstylestrong{TIMEROT}
 
-This program is similar to TIMER, only it operates over dihedral angles via input of a Tinker INT internal coordinate file. In the current version, the torsional Hessian is computed numerically from the analytical torsional gradient.
+The TIMEROT program is similar to TIMER, only it operates over dihedral angles via input of a Tinker INT internal coordinate file. In the current version, the torsional Hessian is computed numerically from the analytical torsional gradient.
 
 \sphinxstylestrong{VIBBIG}
 
+VIBBIG is a specialized program for the computing selected vibrational frequencies of a large input molecular system using a sliding block iterative method to avoid direct diagonalization of the full Hessian matrix. As implemented the program will first find the lowest frequency vibration and proceed to higher frequencies in order.
+
 \sphinxstylestrong{VIBRATE}
 
-A program to perform vibrational analysis by computing and diagonalizing the full Hessian matrix (i.e., the second partial derivatives) for an input structure (a Tinker XYZ file). Eigenvalues and eigenvectors of the mass weighted Hessian (i.e., the vibrational frequencies and normal modes) are also calculated. Structures corresponding to individual normal mode motions can be saved in cycle files.
+VIBRATE is a program to perform vibrational analysis by computing and diagonalizing the full Hessian matrix (i.e., the second partial derivatives) for an input structure (a Tinker XYZ file). Eigenvalues and eigenvectors of the mass weighted Hessian (i.e., the vibrational frequencies and normal modes) are also calculated. Structures corresponding to individual normal mode motions can be saved in cycle files.
 
 \sphinxstylestrong{VIBROT}
 
@@ -416,7 +422,7 @@ The XTALFIT program is of use in the automated fitting of potential parameters t
 
 \sphinxstylestrong{XTALMIN}
 
-A program to perform full crystal minimizations. The program takes as input the structure coordinates and unit cell lattice parameters. It then alternates cycles of Newton\sphinxhyphen{}style optimization of the structure and conjugate gradient optimization of the crystal lattice parameters. This alternating minimization is slower than more direct optimization of all parameters at once, but is somewhat more robust in our hands. The symmetry of the original crystal is not enforced, so interconversion of crystal forms may be observed in some cases.
+XTALMIN is used to perform full crystal minimizations. The program takes as input the structure coordinates and unit cell lattice parameters. It then alternates cycles of Newton\sphinxhyphen{}style optimization of the structure and conjugate gradient optimization of the crystal lattice parameters. This alternating minimization is slower than more direct optimization of all parameters at once, but is somewhat more robust in our hands. The symmetry of the original crystal is not enforced, so interconversion of crystal forms may be observed in some cases.
 
 
 \chapter{Analysis \& Utility Programs \& Scripts}
@@ -425,27 +431,27 @@ This section of the manual contains a brief description of each of the Tinker st
 
 \sphinxstylestrong{ARCHIVE}
 
-A program for concatenating Tinker cycle files into a single archive file; useful for storing the intermediate results of minimizations, dynamics trajectories, and so on. The program can also extract individual cycle files from a Tinker archive.
+ARCHIVE is a program for concatenating Tinker cycle files into a single archive file; useful for storing the intermediate results of minimizations, dynamics trajectories, and so on. The program can also extract individual cycle files from a Tinker archive.
 
 \sphinxstylestrong{BAR}
 
-A program to compute free energy from sampling of adjacent “lambda” windows using the Bennett acceptance ratio (BAR) algorithm. Input consists of trajectories or configurations sampled from the adjacent windows, as well as keyfiles and parameters used to define the states for the simulations. In a first phase, the BAR program computes the energies of all structures from both simulations under the control of both sets of potential energy parameters, i.e., four sets of numbers which are written to an intermediate .bar file. In its second phase, BAR reads a .bar file and uses the free energy perturbation (FEP) and Bennett acceptance ratio formula to compute the free energy, enthalpy and entropy between the two states.
+The BAR program computes a free energy from sampling of adjacent “lambda” windows using the Bennett acceptance ratio (BAR) algorithm. Input consists of trajectories or configurations sampled from the adjacent windows, as well as keyfiles and parameters used to define the states for the simulations. In a first phase, the BAR program computes the energies of all structures from both simulations under the control of both sets of potential energy parameters, i.e., four sets of numbers which are written to an intermediate .bar file. In its second phase, BAR reads a .bar file and uses the free energy perturbation (FEP) and Bennett acceptance ratio formula to compute the free energy, enthalpy and entropy between the two states.
 
 \sphinxstylestrong{CORRELATE}
 
-A program to compute time correlation functions from collections of Tinker cycle files. Its use requires a user supplied function property that computes the value of the property for which a time correlation is desired for two input structures. A sample routine is supplied that computes either a velocity autocorrelation function or an rms structural superposition as a function of time. The main body of the program organizes the overall computation in an efficient manner and outputs the final time correlation function.
+The CORRELATE program to compute time correlation functions from collections of Tinker cycle files. Its use requires a user supplied function property that computes the value of the property for which a time correlation is desired for two input structures. A sample routine is supplied that computes either a velocity autocorrelation function or an rms structural superposition as a function of time. The main body of the program organizes the overall computation in an efficient manner and outputs the final time correlation function.
 
 \sphinxstylestrong{CRYSTAL}
 
-A program for the manipulation of crystal structures including interconversion of fractional and Cartesian coordinates, generation of the unit cell from an asymmetric unit, and building of a crystalline block of specified size via replication of a single unit cell. The present version can handle about 25 of the most common space groups, others can easily be added as needed by modification of the routine symmetry.
+CRYSTAL is a program for the manipulation of crystal structures including interconversion of fractional and Cartesian coordinates, generation of the unit cell from an asymmetric unit, and building of a crystalline block of specified size via replication of a single unit cell. The present version can handle about 25 of the most common space groups, others can easily be added as needed by modification of the routine symmetry.
 
 \sphinxstylestrong{DIFFUSE}
 
-A program to compute the self\sphinxhyphen{}diffusion constant for a homogeneous liquid via the Einstein equation. A previously saved dynamics trajectory is read in and “unfolded” to reverse translation of molecules due to use of periodic boundary conditions. The average motion over all molecules is then used to compute the self\sphinxhyphen{}diffusion constant. While the current program assumes a homogeneous system, it should be easy to modify the code to handle diffusion of individual molecules or other desired effects.
+DIFFUSE computes the self\sphinxhyphen{}diffusion constant for a homogeneous liquid via the Einstein equation. A previously saved dynamics trajectory is read in and “unfolded” to reverse translation of molecules due to use of periodic boundary conditions. The average motion over all molecules is then used to compute the self\sphinxhyphen{}diffusion constant. While the current program assumes a homogeneous system, it should be easy to modify the code to handle diffusion of individual molecules or other desired effects.
 
 \sphinxstylestrong{DISTGEOM}
 
-A program to perform distance geometry calculations using variations on the classic metric matrix method. A user specified number of structures consistent with keyfile input distance and dihedral restraints is generated. Bond length and angle restraints are derived from the input structure. Trial distances between the triangle smoothed lower and upper bounds can be chosen via any of several metrization methods, including a very effective partial random pairwise scheme. The correct radius of gyration of the structure is automatically maintained by choosing trial distances from Gaussian distributions of appropriate mean and width. The initial embedded structures can be further refined against a geometric restraint\sphinxhyphen{}only potential using either a sequential minimization protocol or simulated annealing.
+The DISTGEOM program performs distance geometry calculations using variations on the classic metric matrix method. A user specified number of structures consistent with keyfile input distance and dihedral restraints is generated. Bond length and angle restraints are derived from the input structure. Trial distances between the triangle smoothed lower and upper bounds can be chosen via any of several metrization methods, including a very effective partial random pairwise scheme. The correct radius of gyration of the structure is automatically maintained by choosing trial distances from Gaussian distributions of appropriate mean and width. The initial embedded structures can be further refined against a geometric restraint\sphinxhyphen{}only potential using either a sequential minimization protocol or simulated annealing.
 
 \sphinxstylestrong{DOCUMENT}
 
@@ -453,91 +459,91 @@ The DOCUMENT program is provided as a minimal listing and documentation tool. It
 
 \sphinxstylestrong{FREEFIX}
 
-A small utility to compute the analytical enthalpy, entropy and free energy associated with the release of a flat\sphinxhyphen{}bottomed harmonic distance restraint between two sites within a simulation system.
+FREEFIX is a small utility to compute the analytical enthalpy, entropy and free energy associated with the release of a flat\sphinxhyphen{}bottomed harmonic distance restraint between two sites within a simulation system.
 
 \sphinxstylestrong{INTEDIT}
 
-A program to allow interactive inspection and alteration of the internal coordinate definitions and values of a Tinker structure. If the structure is altered, the user has the option to write out a new internal coordinates file upon exit.
+INTEDIT allows interactive inspection and alteration of the internal coordinate definitions and values of a Tinker structure. If the structure is altered, the user has the option to write out a new internal coordinates file upon exit.
 
 \sphinxstylestrong{INTXYZ}
 
-A program to convert a Tinker .int internal coordinates formatted file into a Tinker .xyz Cartesian coordinates formatted file.
+The INTXYZ program to convert a Tinker .int internal coordinates formatted file into a Tinker .xyz Cartesian coordinates formatted file.
 
 \sphinxstylestrong{MOLXYZ}
 
-A program for converting a MDL (Molecular Design Limited) MOL file into a Tinker XYZ Cartesian coordinate file. The current version of the program converts the MDL atoms types into Tinker “tiny force field” atom types based on atomic number and connectivity (i.e., a tetravalent carbon is type 64).
+MOLXYZ is a program for converting a MDL (Molecular Design Limited) MOL file into a Tinker XYZ Cartesian coordinate file. The current version of the program converts the MDL atoms types into Tinker “tiny force field” atom types based on atomic number and connectivity (i.e., a tetravalent carbon is type 64).
 
 \sphinxstylestrong{MOL2XYZ}
 
-A program for converting a Tripos Sybyl MOL2 file into a Tinker XYZ Cartesian coordinate file. The current version of the program converts the Sybyl MOL2 atoms types into Tinker “tiny force field” atom types based on atomic number and connectivity (i.e., a tetravalent carbon is type 64).
+The MOL2XYZ program converts a Tripos Sybyl MOL2 file into a Tinker XYZ Cartesian coordinate file. The current version of the program converts the Sybyl MOL2 atoms types into Tinker “tiny force field” atom types based on atomic number and connectivity (i.e., a tetravalent carbon is type 64).
 
 \sphinxstylestrong{NUCLEIC}
 
-A program for automated building of nucleic acid structures. Upon interactive input of a nucleotide sequence with optional phosphate backbone angles, the program builds internal and Cartesian coordinates. Standard bond lengths and angles are used. Both DNA and RNA sequences are supported as are A\sphinxhyphen{}, B\sphinxhyphen{} and Z\sphinxhyphen{}form structures. Double helixes of complementary sequence can be automatically constructed via a rigid docking of individual strands.
+The NUCLEIC program automates building of nucleic acid structures. Upon interactive input of a nucleotide sequence with optional phosphate backbone angles, the program builds internal and Cartesian coordinates. Standard bond lengths and angles are used. Both DNA and RNA sequences are supported as are A\sphinxhyphen{}, B\sphinxhyphen{} and Z\sphinxhyphen{}form structures. Double helixes of complementary sequence can be automatically constructed via a rigid docking of individual strands.
 
 \sphinxstylestrong{PDBXYZ}
 
-A program for converting a Brookhaven Protein Data Bank file (a PDB file) into a Tinker .xyz Cartesian coordinate file. If the PDB file contains only protein/peptide amino acid residues, then standard protein connectivity is assumed, and transferred to the .xyz file. For non\sphinxhyphen{}protein portions of the PDB file, atom connectivity is determined by the program based on interatomic distances. The program also has the ability to add or remove hydrogen atoms from a protein as required by the force field specified during the computation.
+PDBXYZ is a program for converting a Brookhaven Protein Data Bank file (a PDB file) into a Tinker .xyz Cartesian coordinate file. If the PDB file contains only protein/peptide amino acid residues, then standard protein connectivity is assumed, and transferred to the .xyz file. For non\sphinxhyphen{}protein portions of the PDB file, atom connectivity is determined by the program based on interatomic distances. The program also has the ability to add or remove hydrogen atoms from a protein as required by the force field specified during the computation.
 
 \sphinxstylestrong{POLARIZE}
 
-A program for computing molecular polarizability from an atom\sphinxhyphen{}based distributed model of polarizability. POLARIZE implements whichever damped interaction model is specified via keyfile and parameter settings. A Tinker .xyz file is required as input. The output consists of the overall polarizability tensor in the global coordinates and its eigenvalues.
+POLARIZE is a simple program for computing molecular polarizability from an atom\sphinxhyphen{}based distributed model of polarizability. POLARIZE implements whichever damped interaction model is specified via keyfile and parameter settings. A Tinker .xyz file is required as input. The output consists of the overall polarizability tensor in the global coordinates and its eigenvalues.
 
 \sphinxstylestrong{POLEDIT}
 
-A program for manipulating and processing polarizable atomic multipole models. Its primary use is to read a distributed multipole analysis (DMA) from output of the GDMA or Psi4 quantum chemistry programs. The program defines local coordinate frames, sets atomic polarizabilities, removes molecular mechanics polarization from the quantum DMA, averages over symmetrical atoms and outputs parameters in Tinker format. There are additional invocation options to only change local coordinate frame definitions or remove intramolecular polarization from an existing multipole model.
+POLEDIT is a program for manipulating and processing polarizable atomic multipole models. Its primary use is to read a distributed multipole analysis (DMA) from output of the GDMA or Psi4 quantum chemistry programs. The program defines local coordinate frames, sets atomic polarizabilities, removes molecular mechanics polarization from the quantum DMA, averages over symmetrical atoms and outputs parameters in Tinker format. There are additional invocation options to only change local coordinate frame definitions or remove intramolecular polarization from an existing multipole model.
 
 \sphinxstylestrong{POTENTIAL}
 
-A program to perform electrostatic potential comparisons and fitting. POTENTIAL can compare two different force field electrostatic models via computing the RMS between the electrostatic potentials on a grid of points outside the molecular envelope. An electrostatic potential grid can also be generated from quantum chemistry output, and compare against a force field model. Finally, a flexible fitting of a force field model to an existing potential grid is available. The program can also take as model input a set of different molecules containing common types, and multiple conformations of a single molecule.
+The POTENTIAL program performs electrostatic potential comparisons and fitting. POTENTIAL can compare two different force field electrostatic models via computing the RMS between the electrostatic potentials on a grid of points outside the molecular envelope. An electrostatic potential grid can also be generated from quantum chemistry output, and compare against a force field model. Finally, a flexible fitting of a force field model to an existing potential grid is available. The program can also take as model input a set of different molecules containing common types, and multiple conformations of a single molecule.
 
 \sphinxstylestrong{PRMEDIT}
 
-A program for formatting and renumbering Tinker force field parameter files. When atom types or classes are added to a parameter file, this utility program has the ability to renumber all the atom records sequentially, and alter type and class numbers in all other parameter entries to maintain consistency.
+PRMEDIT is a program for formatting and renumbering Tinker force field parameter files. When atom types or classes are added to a parameter file, this utility program has the ability to renumber all the atom records sequentially, and alter type and class numbers in all other parameter entries to maintain consistency.
 
 \sphinxstylestrong{PROTEIN}
 
-A program for automated building of peptide and protein structures. Upon interactive input of an amino acid sequence with optional phi/psi/omega/chi angles, D/L chirality, etc., the program builds internal and Cartesian coordinates. Standard bond lengths and angles are assumed for the peptide. The program will optionally convert the structure to a cyclic peptide, or add either or both N\sphinxhyphen{} and C\sphinxhyphen{}terminal capping groups. Atom type numbers are automatically assigned for the specified force field. The final coordinates and a sequence file are produced as the output.
+The PROTEIN program automates building of peptide and protein structures. Upon interactive input of an amino acid sequence with optional phi/psi/omega/chi angles, D/L chirality, etc., the program builds internal and Cartesian coordinates. Standard bond lengths and angles are assumed for the peptide. The program will optionally convert the structure to a cyclic peptide, or add either or both N\sphinxhyphen{} and C\sphinxhyphen{}terminal capping groups. Atom type numbers are automatically assigned for the specified force field. The final coordinates and a sequence file are produced as the output.
 
 \sphinxstylestrong{RADIAL}
 
-A program to compute the pair radial distribution function between two atom types. The user supplies the two atom names for which the distribution function is to be computed, and the width of the distance bins for data analysis. A previously saved dynamics trajectory is read as input. The raw radial distribution and a spline smoothed version are then output from zero to a distance equal to half the minimum periodic box dimension. The atom names are matched to the atom name column of the Tinker .xyz file, independent of atom type.
+The RADIAL program finds the pair radial distribution function between two atom types. The user supplies the two atom names for which the distribution function is to be computed, and the width of the distance bins for data analysis. A previously saved dynamics trajectory is read as input. The raw radial distribution and a spline smoothed version are then output from zero to a distance equal to half the minimum periodic box dimension. The atom names are matched to the atom name column of the Tinker .xyz file, independent of atom type.
 
 \sphinxstylestrong{SPACEFILL}
 
-A program to compute the volume and surface areas of molecules. Using a modified version of Connolly’s original analytical description of the molecular surface, the program determines either the van der Waals, accessible or molecular (contact/reentrant) volume and surface area. Both surface area and volume are broken down into their geometric components, and surface area is decomposed into the convex contribution for each individual atom. The probe radius is input as a user option, and atomic radii can be set via the keyword file. If Tinker archive files are used as input, the program will compute the volume and surface area of each structure in the input file.
+The SPACEFILL program computes the volume and surface areas of molecules. Using a modified version of Connolly’s original analytical description of the molecular surface, the program determines either the van der Waals, accessible or molecular (contact/reentrant) volume and surface area. Both surface area and volume are broken down into their geometric components, and surface area is decomposed into the convex contribution for each individual atom. The probe radius is input as a user option, and atomic radii can be set via the keyword file. If Tinker archive files are used as input, the program will compute the volume and surface area of each structure in the input file.
 
 \sphinxstylestrong{SPECTRUM}
 
-A program to compute a power spectrum from velocity autocorrelation data. As input, this program requires a velocity autocorrelation function as produced by the CORRELATE program. This data, along with a user input time step, are Fourier transformed to generate the spectral intensities over a wavelength range. The result is a power spectrum, and the positions of the bands are those predicted for an infrared or Raman spectrum. However, the data is not weighted by molecular dipole moment derivatives as would be required to produce correct IR intensities.
+SPECTRUM is a program to compute a power spectrum from velocity autocorrelation data. As input, this program requires a velocity autocorrelation function as produced by the CORRELATE program. This data, along with a user input time step, are Fourier transformed to generate the spectral intensities over a wavelength range. The result is a power spectrum, and the positions of the bands are those predicted for an infrared or Raman spectrum. However, the data is not weighted by molecular dipole moment derivatives as would be required to produce correct IR intensities.
 
 \sphinxstylestrong{SUPERPOSE}
 
-A program to superimpose two molecular structures in 3\sphinxhyphen{}dimensions. A variety of options for input of the atom sets to be used during the superposition are presented interactively to the user. The superposition can be mass\sphinxhyphen{}weighted if desired, and the coordinates of the second structure superimposed on the first structure are optionally output. If Tinker archive files are used as input, the program will compute all pairwise superpositions between structures in the input files.
+The SUPERPOSE program is used to superimpose two molecular structures in 3\sphinxhyphen{}dimensions. A variety of options for input of the atom sets to be used during the superposition are presented interactively to the user. The superposition can be mass\sphinxhyphen{}weighted if desired, and the coordinates of the second structure superimposed on the first structure are optionally output. If Tinker archive files are used as input, the program will compute all pairwise superpositions between structures in the input files.
 
 \sphinxstylestrong{TORSFIT}
 
-A program for setting force field parameters for torsional terms by fitting 1\sphinxhyphen{}fold to 6\sphinxhyphen{}fold torsional amplitudes to the difference between a quantum chemistry rotational profile and a force field rotational profile without any torsional terms.
+TORSFIT is a program for setting force field parameters for torsional terms by fitting 1\sphinxhyphen{}fold to 6\sphinxhyphen{}fold torsional amplitudes to the difference between a quantum chemistry rotational profile and a force field rotational profile without any torsional terms.
 
 \sphinxstylestrong{VALENCE}
 
-A program for setting force field parameters for local valence terms, either from quantum chemistry data or from embedded empirical rules. {[}This program is still under development.{]}
+VALENCE is a program for setting force field parameters for local valence terms, either from quantum chemistry data or from embedded empirical rules. {[}This program is still under development.{]}
 
 \sphinxstylestrong{XYZEDIT}
 
-A program that performs and of a variety of manipulations on an input Tinker .xyz Cartesian coordinates formatted file. The present version of the program has the following interactively selectable options: (1) Offset the Numbers of the Current Atoms, (2) Deletion of Individual Specified Atoms, (3) Deletion of Specified Types of Atoms, (4) Deletion of Atoms outside Cutoff Range, (5) Insertion of Individual Specified Atoms, (6) Replace Old Atom Type with a New Type, (7) Assign Connectivities based on Distance, (8) Convert Units from Bohrs to Angstroms, (9) Invert thru Origin to give Mirror Image, (10) Translate Center of Mass to the Origin, (11) Translate a Specified Atom to the Origin, (12) Translate and Rotate to Inertial Frame, (13) Move to Specified Rigid Body Coordinates, (14) Create and Fill a Periodic Boundary Box, (15) Soak Current Molecule in Box of Solvent, (16) Append another XYZ file to Current One. In most cases, multiply options can be applied sequentially to an input file. At the end of the editing process, a new version of the original .xyz file is written as output.
+XYZEDIT is a program to perform a variety of manipulations on an input Tinker .xyz Cartesian coordinates formatted file. The present version of the program has the following interactively selectable options: (1) Offset the Numbers of the Current Atoms, (2) Deletion of Individual Specified Atoms, (3) Deletion of Specified Types of Atoms, (4) Deletion of Atoms outside Cutoff Range, (5) Insertion of Individual Specified Atoms, (6) Replace Old Atom Type with a New Type, (7) Assign Connectivities based on Distance, (8) Convert Units from Bohrs to Angstroms, (9) Invert thru Origin to give Mirror Image, (10) Translate Center of Mass to the Origin, (11) Translate a Specified Atom to the Origin, (12) Translate and Rotate to Inertial Frame, (13) Move to Specified Rigid Body Coordinates, (14) Create and Fill a Periodic Boundary Box, (15) Soak Current Molecule in Box of Solvent, (16) Append another XYZ file to Current One. In most cases, multiply options can be applied sequentially to an input file. At the end of the editing process, a new version of the original .xyz file is written as output.
 
 \sphinxstylestrong{XYZINT}
 
-A program for converting a Tinker .xyz Cartesian coordinate formatted file into a Tinker .int internal coordinates formatted file. This program can optionally use an existing internal coordinates file as a template for the connectivity information.
+XYZINT converts a Tinker .xyz Cartesian coordinate formatted file into a Tinker .int internal coordinates formatted file. This program can optionally use an existing internal coordinates file as a template for the connectivity information.
 
 \sphinxstylestrong{XYZMOL2}
 
-A program to convert a Tinker .xyz Cartesian coordinates file into a Tripos Sybyl MOL2 file. The conversion generates only the MOLECULE, ATOM, BOND and SUBSTRUCTURE record type in the MOL2 file. Generic Sybyl atom types are used in most cases; while these atom types may need to be altered in some cases, Sybyl is usually able to correctly display the resulting MOL2 file.
+XYZMOL2 is a program to convert a Tinker .xyz Cartesian coordinates file into a Tripos Sybyl MOL2 file. The conversion generates only the MOLECULE, ATOM, BOND and SUBSTRUCTURE record type in the MOL2 file. Generic Sybyl atom types are used in most cases; while these atom types may need to be altered in some cases, Sybyl is usually able to correctly display the resulting MOL2 file.
 
 \sphinxstylestrong{XYZPDB}
 
-A program for converting a Tinker .xyz Cartesian coordinate file into a Brookhaven Protein Data Bank file (a PDB file). A Tinker .seq file with the biopolymer sequence must be present if the output PDB file is to be formatted as a protein or nucleic acid with a defined sequence.
+The XYZPDB program converts a Tinker .xyz Cartesian coordinate file into a Brookhaven Protein Data Bank file (a PDB file). A Tinker .seq file with the biopolymer sequence must be present if the output PDB file is to be formatted as a protein or nucleic acid with a defined sequence.
 
 
 \chapter{Force Field Parameter Sets}
@@ -10342,79 +10348,111 @@ Razer Blade 15 (Ubuntu 18.04, GNU 7.5)        9750H          6/12       545.2 (1
 
 \chapter{Acknowledgments}
 \label{\detokenize{text/acknowledgements:acknowledgments}}\label{\detokenize{text/acknowledgements::doc}}
-The TINKER package has developed over a period of many years, very slowly during the late\sphinxhyphen{}1980s, and more rapidly since the mid\sphinxhyphen{}1990s in Jay Ponder’s research group at the Washington University School of Medicine in Saint Louis. Many people have played significant roles in the development of the package into its current form. The major contributors are listed below:
-\begin{description}
-\item[{Stew Rubenstein coordinate interconversions; original optimization methods}] \leavevmode
-and torsional angle manipulation
+The Tinker package has developed over a period of many years, very slowly during the late\sphinxhyphen{}1980s, and more rapidly since the mid\sphinxhyphen{}1990s in Jay Ponder’s research group at the Washington University School of Medicine in Saint Louis. Many people have played significant roles in the development of the package into its current form. The major contributors are listed below:
 
-\end{description}
+\sphinxstylestrong{Stew Rubenstein}
 
-Craig Kundrot   molecular surface area \& volume and their derivatives
-\begin{description}
-\item[{Shawn Huston    original AMBER/OPLS implementation; free energy}] \leavevmode
-calculations; time correlation functions
+coordinate interconversions; original optimization methods and torsional angle manipulation
 
-\end{description}
+\sphinxstylestrong{Craig Kundrot}
 
-Mike Dudek      initial multipole models for peptides and proteins
-\begin{description}
-\item[{Yong “Mike” Kong        multipole electrostatics; dipole polarization; reaction field}] \leavevmode
-treatment; TINKER water model
+molecular surface area \& volume and their derivatives
 
-\item[{Reece Hart      potential smoothing methodology; Scheraga’s DEM,}] \leavevmode
-Straub’s GDA and extensions
+\sphinxstylestrong{Shawn Huston}
 
-\item[{Mike Hodsdon    extension of the TINKER distgeom program and its}] \leavevmode
-application to NMR NOE structure determination
+original Amber/OPLS implementation; free energy calculations; time correlation functions
 
-\item[{Rohit Pappu     potential smoothing methodology and PSS algorithms;}] \leavevmode
-rigid body optimization; GB/SA solvation derivatives
+\sphinxstylestrong{Mike Dudek}
 
-\item[{Wijnand Mooij   MM3 directional hydrogen bonding term; crystal lattice}] \leavevmode
-minimization code
+initial multipole models for peptides and proteins
 
-\end{description}
+\sphinxstylestrong{Yong “Mike” Kong}
 
-Gerald Loeffler stochastic/Langevin dynamics implementation
+multipole electrostatics; dipole polarization; reaction field treatment; TINKER water model
 
-Marina Vorobieva        nucleic acid building module and parameter translation
-Nina Sokolova
+\sphinxstylestrong{Reece Hart}
 
-Peter Bagossi   AMOEBA force field parameters for alkanes and diatomics
-\begin{description}
-\item[{Pengyu Ren      Ewald summation for polarizable atomic multipoles;}] \leavevmode
-AMOEBA force field for water, organics and peptides
+potential smoothing methodology; Scheraga’s DEM, Straub’s GDA and extensions
 
-\end{description}
+\sphinxstylestrong{Mike Hodsdon}
 
-Anders Carlsson original ligand field potential energy term for transition metals
+extension of the Tinker distance geometry program and its application to NMR NOE structure determination
 
-Andrey Kutepov  integrator for rigid\sphinxhyphen{}body dynamics trajectories
-\begin{description}
-\item[{Tom Darden      Particle Mesh Ewald (PME) code, and development of PME}] \leavevmode
-for the AMOEBA force field
+\sphinxstylestrong{Rohit Pappu}
 
-\end{description}
+potential smoothing methodology and PSS algorithms; rigid body optimization; GB/SA solvation derivatives
 
-Alan Grossfield Monte Carlo minimization; tophat potential smoothing
-\begin{description}
-\item[{Michael Schnieders      Force Field Explorer GUI for TINKER; neighbor lists for}] \leavevmode
-nonbonded interactions
+\sphinxstylestrong{Wijnand Mooij}
 
-\item[{Chuanjie Wu     solvation free energy calculations; AMOEBA nucleic acid force}] \leavevmode
-field; parameterization tools for TINKER
+MM3 directional hydrogen bonding term; crystal lattice minimization code
 
-\item[{Justin Xiang    angular overlap and valence bond potential models for}] \leavevmode
-transition metals
+\sphinxstylestrong{Gerald Loeffler}
 
-\item[{David Gohara    OpenMP parallelization of energy terms including PME,}] \leavevmode
-and parallel neighbor lists
+stochastic/Langevin dynamics implementation
 
-\end{description}
+\sphinxstylestrong{Marina Vorobieva \& Nina Sokolova}
 
-It is critically important that TINKER’s distributed force field parameter sets exactly reproduce the intent of the original force field authors. We would like to thank Julian Tirado\sphinxhyphen{}Rives (OPLS\sphinxhyphen{}AA), Alex MacKerell (CHARMM27), Wilfred van Gunsteren (GROMOS), and Adrian Roitberg and Carlos Simmerling (AMBER) for their help in testing TINKER’s results against those given by the authentic programs and parameter sets. Lou Allinger provided updated parameters for MM2 and MM3 on several occasions. His very successful methods provided the original inspiration for the development of TINKER.
+nucleic acid building module and parameter translation
 
-Still other workers have devoted considerable time in developing code that will hopefully be incorporated into future TINKER versions; for example, Jim Kress (UFF implementation) and Michael Sheets (numerous code optimizations, thermodynamic integration). Finally, we wish to thank the many users of the TINKER package for their suggestions and comments, praise and criticism, which have resulted in a variety of improvements.
+\sphinxstylestrong{Peter Bagossi}
+
+AMOEBA force field parameters for alkanes and diatomics
+
+\sphinxstylestrong{Pengyu Ren}
+
+Ewald summation for polarizable atomic multipoles; AMOEBA force field for water, organics and peptides
+
+\sphinxstylestrong{Anders Carlsson}
+
+original ligand field potential energy term for transition metals
+
+\sphinxstylestrong{Andrey Kutepov}
+
+integrator for rigid\sphinxhyphen{}body dynamics trajectories
+
+\sphinxstylestrong{Tom Darden}
+
+Particle Mesh Ewald (PME) code, and development of PME for the AMOEBA force field
+
+\sphinxstylestrong{Alan Grossfield}
+
+Monte Carlo minimization; tophat potential smoothing
+
+\sphinxstylestrong{Michael Schnieders}
+
+Force Field Explorer GUI for Tinker; neighbor lists for nonbonded interactions
+
+\sphinxstylestrong{Chuanjie Wu}
+
+solvation free energy calculations; AMOEBA nucleic acid force field; parameterization tools for Tinker
+
+\sphinxstylestrong{Justin Xiang}
+
+angular overlap and valence bond potential models for transition metals
+
+\sphinxstylestrong{David Gohara}
+
+OpenMP parallelization of energy terms including PME, and parallel neighbor lists
+
+\sphinxstylestrong{Chao Lu}
+
+derivatives of potential energy with respect to lambda for metadynamics and similar methods
+
+\sphinxstylestrong{Aaron Gordon}
+
+enthalpy and entropy estimates as an adjunct to BAR free energy calculation
+
+\sphinxstylestrong{Zhi Wang}
+
+Bennett acceptance ratio (BAR) for free energy calculations
+
+\sphinxstylestrong{Josh Rackers \& Rose Silva}
+
+implementation of the HIPPO force field for water and general organic molecules
+
+It is critically important that Tinker’s distributed force field parameter sets exactly reproduce the intent of the original force field authors. We would like to thank Julian Tirado\sphinxhyphen{}Rives (OPLS\sphinxhyphen{}AA), Alex MacKerell (CHARMM27), Wilfred van Gunsteren (GROMOS), and Adrian Roitberg and Carlos Simmerling (AMBER) for their help in testing Tinker’s results against those given by the authentic programs and parameter sets. Lou Allinger provided updated parameters for MM2 and MM3 on several occasions. His very successful methods provided the original inspiration for the development of Tinker.
+
+Still other workers have devoted considerable time in developing code that will hopefully be incorporated into future Tinker versions; for example, Jim Kress (UFF implementation) and Michael Sheets (numerous code optimizations, thermodynamic integration). Finally, we wish to thank the many users of the Tinker package for their suggestions and comments, praise and criticism, which have resulted in a variety of improvements.
 
 
 \chapter{References}
