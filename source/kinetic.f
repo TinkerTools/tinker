@@ -166,8 +166,9 @@ c
       subroutine kinaux (temp_aux,temp_auxp)
       use atoms
       use ielscf
+      use usage
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       real*8 term
       real*8 vj,vjp
       real*8 vk,vkp
@@ -192,14 +193,15 @@ c
 c
 c     get the kinetic energy tensor for auxiliary variables
 c
-      do i = 1, n
+      do i = 1, nuse
+         m = iuse(i)
          term = 0.5d0
          do j = 1, 3
-            vj = vaux(j,i)
-            vjp = vpaux(j,i)
+            vj = vaux(j,m)
+            vjp = vpaux(j,m)
             do k = 1, 3
-               vk = vaux(k,i)
-               vkp = vpaux(k,i)
+               vk = vaux(k,m)
+               vkp = vpaux(k,m)
                ekaux(k,j) = ekaux(k,j) + term*vj*vk
                ekauxp(k,j) = ekauxp(k,j) + term*vjp*vkp
             end do

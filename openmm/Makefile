@@ -31,14 +31,18 @@
 ###################################################################
 
 ###################################################################
-##  Master Directory Locations; Change as Needed for Local Site  ##
+##  Main Environment Variables; Change as Needed for Local Site  ##
 ###################################################################
 
-##  TINKERDIR    Tinker Distribution Directory
-##  BINDIR       Hard Copies of Tinker Executables
-##  LINKDIR      Linked Copies of Tinker Executables
-##  FFTWDIR      FFTW Distribution Directory
-##  OPENMMDIR    OpenMM Distribution Directory
+##  TINKERDIR       Tinker Distribution Directory
+##  TINKER_LIBDIR   Libraries needed to build Tinker
+##  BINDIR          Directory with Tinker Executables
+##  LINKDIR         Linked Copies of Tinker Executables
+##  FFTWDIR         FFTW Top-Level Directory
+##  FFTW_LIB_DIR    Directory with FFTW Libraries
+##  FFTW_LIBS       FFTW Libraries needed to build Tinker
+##  OPENMMDIR       OpenMM Installation Directory
+##  CUDA_DIR        CUDA Installation Directory
 
 TINKERDIR = $(HOME)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib
@@ -50,15 +54,15 @@ FFTW_LIB_DIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
 
 OPENMMDIR = /usr/local/openmm
-OPENMM_LIB_DIR = -L$(OPENMMDIR)/lib
 OPENMM_INCLUDE_DIR = $(OPENMMDIR)/include
+OPENMM_LIB_DIR = -L$(OPENMMDIR)/lib
 OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 CUDA_DIR = /usr/local/cuda
-CUDA_LIB = $(CUDA_DIR)/lib
 CUDA_INCLUDE = $(CUDA_DIR)/include
+CUDA_LIB = $(CUDA_DIR)/lib
 
-# Uncomment following for 64-bit Linux machines
+# Uncomment below for 64-bit Linux
 #CUDA_LIB = $(CUDA_DIR)/lib64
 #NVML_INCLUDE = /usr/include/nvidia/gdk
 #NVML_LIB = /usr/local/cuda/lib64/stubs

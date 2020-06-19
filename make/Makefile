@@ -26,7 +26,7 @@
 ###################################################################
 
 ###################################################################
-##  Master Directory Locations; Change as Needed for Local Site  ##
+##  Main Environment Variables; Change as Needed for Local Site  ##
 ###################################################################
 
 ##  TINKERDIR       Tinker Distribution Directory

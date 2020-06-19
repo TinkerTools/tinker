@@ -358,10 +358,11 @@ c
             scalep = sqrt(1.0d0+(dt/tautemp_aux)
      &                              *(kelvin_aux/temp_auxp-1.0d0))
          end if
-         do i = 1, n
+         do i = 1, nuse
+            k = iuse(i)
             do j = 1, 3
-               vaux(j,i) = scale * vaux(j,i)
-               vpaux(j,i) = scalep * vpaux(j,i)
+               vaux(j,k) = scale * vaux(j,k)
+               vpaux(j,k) = scalep * vpaux(j,k)
             end do
          end do
       end if

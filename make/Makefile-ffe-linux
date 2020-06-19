@@ -26,7 +26,7 @@
 ###################################################################
 
 ###################################################################
-##  Master Directory Locations; Change as Needed for Local Site  ##
+##  Main Environment Variables; Change as Needed for Local Site  ##
 ###################################################################
 
 ##  BUILDDIR        Top-Level Directory for Building
@@ -43,8 +43,8 @@
 ##  APBS_LIBS       APBS Libraries needed to build Tinker
 ##  FFEDIR          FFE Top-Level Directory
 ##  JAVA_INCDIR     Directories with Java Include Files
-##  JAVA_LIBDIR     Directory with Java Libraries
-##  JAVA_LIBS       Java Libraries needed to build FFE
+##  JAVA_LIBDIR     Directory with Java Virtual Machine Library
+##  JAVA_LIBS       Name of Java Virtual Machine Library
 
 BUILDDIR = $(HOME)/ffe/build
 
@@ -64,23 +64,30 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 FFEDIR = $(BUILDDIR)/ffe
 
-##  For MacOS
-#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos
+################################################################
+##  Java setup below assumes an install of Oracle Java 8 JDK  ##
+##  and existance of JAVA_HOME pointing to that installation  ##
+################################################################
 
-##  For Linux (JDK 1.8.0_112 installed in /usr/lib/jvm)
+##  For Linux
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-		-I/usr/lib/jvm/jdk1.8.0_112/include \
-		-I/usr/lib/jvm/jdk1.8.0_112/include/linux \
-		-I/usr/lib/jvm/jdk1.8.0_112/lib/amd64/server
-JAVA_LIBDIR = -L/usr/lib/jvm/jdk1.8.0_112/jre/lib/amd64/server
+		-I$(JAVA_HOME)/include \
+		-I$(JAVA_HOME)/include/linux
+JAVA_LIBDIR = -L$(JAVA_HOME)/jre/lib/amd64/server
 JAVA_LIBS = -ljvm
 
-##  For Windows (JDK 1.8.0_112 installed in C:\Program Files\Java)
-#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
-#		-I"C:\Program Files\Java\jdk1.8.0_112\include" \
-#		-I"C:\Program Files\Java\jdk1.8.0_112\include\win32" \
-#		-I"C:\Program Files\Java\jdk1.8.0_112\lib"
-#JAVA_LIBDIR = -L"C:\Program Files\Java\jdk1.8.0_112\lib"
+##  For MacOS
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos \
+#		-I$(JAVA_HOME)/include \
+#		-I$(JAVA_HOME)/include/darwin
+#JAVA_LIBDIR = -L$(JAVA_HOME)/jre/lib/server
+#JAVA_LIBS = -ljvm
+
+##  For Windows
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/windows \
+#		-I$(JAVA_HOME)\include \
+#		-I$(JAVA_HOME)\include\win32
+#JAVA_LIBDIR = -L$(JAVA_HOME)\jre\bin\server
 #JAVA_LIBS = -ljvm
 
 ####################################################################
