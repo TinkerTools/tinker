@@ -11,8 +11,8 @@
 ##   2. make install          Move the executables to BINDIR
 ##   3. make create_links     Create soft links in LINKDIR
 ##   4. make remove_links     Remove soft links from LINKDIR
-##   6. make listing          Concatenate source to tinker.txt
-##   5. make clean            Delete objects and executables
+##   5. make listing          Concatenate source to tinker.txt
+##   6. make clean            Delete objects and executables
 ##
 ##  Original version of this file is due to Peter Happersberger
 ##  and Jochen Buehler of the University of Konstanz, January 1998.
@@ -22,6 +22,11 @@
 ##  Fast Fourier Transform package and (optionally) APBS Poisson-
 ##  Boltzmann solver. These libraries are assumed to already be
 ##  present, and are not built by this Makefile
+##
+##  Java setup assumes standard installation of Oracle Java 8 JDK
+##  and the existence of JAVA_HOME pointing to the installation.
+##  On Windows set JAVA_HOME = C:\Progra~1\Java\jdk1.8.0_251, or
+##  similar, and "\" will convert to "/" during the Cygwin build
 ##
 ###################################################################
 
@@ -64,11 +69,6 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 FFEDIR = $(BUILDDIR)/ffe
 
-################################################################
-##  Java setup below assumes an install of Oracle Java 8 JDK  ##
-##  and existance of JAVA_HOME pointing to that installation  ##
-################################################################
-
 ##  For Linux
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I$(JAVA_HOME)/include \
@@ -85,9 +85,9 @@ FFEDIR = $(BUILDDIR)/ffe
 
 ##  For Windows
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/windows \
-		-I$(JAVA_HOME)\include \
-		-I$(JAVA_HOME)\include\win32
-JAVA_LIBDIR = -L$(JAVA_HOME)\jre\bin\server
+		-I$(JAVA_HOME)/include \
+		-I$(JAVA_HOME)/include/win32
+JAVA_LIBDIR = -L$(JAVA_HOME)/lib
 JAVA_LIBS = -ljvm
 
 ####################################################################
@@ -139,7 +139,7 @@ JAVA_LIBS = -ljvm
 ##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 7.4
+##  Compiler:  MinGW GNU gfortran 9.2
 ##  Parallel:  OpenMP
 
 CC = gcc

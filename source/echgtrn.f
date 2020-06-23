@@ -108,7 +108,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
-         if (alphai .eq. 0.0d0)  alphai = 100.0d0
+         if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -144,7 +144,7 @@ c
                   r = sqrt(r2)
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
-                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
+                  if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      expi = exp(-alphai*r)
                      expk = exp(-alphak*r)
@@ -208,7 +208,7 @@ c
             zi = z(i)
             chgi = chgct(ii)
             alphai = dmpct(ii)
-            if (alphai .eq. 0.0d0)  alphai = 100.0d0
+            if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -245,7 +245,7 @@ c
                         r = sqrt(r2)
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
-                        if (alphak .eq. 0.0d0)  alphak = 100.0d0
+                        if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                         if (ctrntyp .eq. 'SEPARATE') then
                            expi = exp(-alphai*r)
                            expk = exp(-alphak*r)
@@ -404,7 +404,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
-         if (alphai .eq. 0.0d0)  alphai = 100.0d0
+         if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -478,7 +478,7 @@ c
                   r = sqrt(r2)
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
-                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
+                  if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      expi = exp(-alphai*r)
                      expk = exp(-alphak*r)
@@ -628,7 +628,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
-         if (alphai .eq. 0.0d0)  alphai = 100.0d0
+         if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -665,7 +665,7 @@ c
                   r = sqrt(r2)
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
-                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
+                  if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      expi = exp(-alphai*r)
                      expk = exp(-alphak*r)

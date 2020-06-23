@@ -99,7 +99,7 @@ RENAME = rename_bin
 ##  Build:     TINKER
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 7.4
+##  Compiler:  MinGW GNU gfortran 9.2
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
