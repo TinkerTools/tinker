@@ -1319,7 +1319,6 @@ c
          b = h * bfac
          hhh = h * hsq
          term = -b * b
-         expterm = 0.0d0
          if (term .gt. -50.0d0) then
             denom = denom0 * bsmod1(k1) * bsmod2(k2) * bsmod3(k3)
             expterm = exp(term)

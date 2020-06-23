@@ -1671,8 +1671,7 @@ c
          b = h*bfac
          hhh = h*hsq
          term = -b*b
-         expterm = 0.0d0
-         erfcterm = erfc(b)
+         term1 = 0.0d0
          denom = denom0*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
          if (term .gt. -50.0d0) then
             expterm = exp(term)
@@ -1684,9 +1683,9 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
-            term1 = fac1*erfcterm*hhh + expterm*(fac2 + fac3*hsq)
+            term1 = fac1*erfcterm*hhh + expterm*(fac2+fac3*hsq)
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            e = -(term1 / denom) * struc2
+            e = -(term1/denom) * struc2
             edsp = edsp + e
             vterm = 3.0d0*(fac1*erfcterm*h + fac3*expterm)*struc2/denom
             vir(1,1) = vir(1,1) + h1*h1*vterm - e

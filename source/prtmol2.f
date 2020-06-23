@@ -24,7 +24,7 @@ c
       use titles
       implicit none
       integer i,j,imol2
-      integer subnum
+      integer substr
       integer trimtext
       real*8, allocatable :: atmchg(:)
       logical opened
@@ -62,7 +62,8 @@ c
          write (imol2,30)  title(1:ltitle)
    30    format (a)
       end if
-      write (imol2,40)  n,nbond,1
+      substr = 1
+      write (imol2,40)  n,nbond,substr
    40 format (3i7)
       write (imol2,50)
    50 format ('SMALL')
@@ -78,10 +79,10 @@ c
       write (imol2,70)
    70 format (/,'@<TRIPOS>ATOM')
       do i = 1, n
-         subnum = 1
+         substr = 1
          subnam = '<1>'
          write (imol2,80)  i,atmnam(i),x(i),y(i),z(i),atmtyp(i),
-     &                     subnum,subnam,atmchg(i)
+     &                     substr,subnam,atmchg(i)
    80    format (i7,2x,a8,3f12.6,2x,a5,i4,2x,a3,f7.2)
       end do
 c
