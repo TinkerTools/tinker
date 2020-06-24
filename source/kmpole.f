@@ -221,7 +221,7 @@ c
       if (allocated(rpole))  deallocate (rpole)
       if (allocated(spole))  deallocate (spole)
       if (allocated(srpole))  deallocate (srpole)
-      if (allocated(srpole))  deallocate (mono0)
+      if (allocated(mono0))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
       if (allocated(np11))  deallocate (np11)
       if (allocated(np12))  deallocate (np12)
