@@ -1598,12 +1598,12 @@ c
       real*8 e,fi,denom
       real*8 r1,r2,r3
       real*8 h1,h2,h3
-      real*8 term,vterm
+      real*8 term,denom0
+      real*8 eterm,vterm
       real*8 expterm
       real*8 erfcterm
       real*8 hsq,struc2
       real*8 h,hhh,b,bfac
-      real*8 term1,denom0
       real*8 fac1,fac2,fac3
       real*8 de1,de2,de3
       real*8 dn1,dn2,dn3
@@ -1671,7 +1671,7 @@ c
          b = h*bfac
          hhh = h*hsq
          term = -b*b
-         term1 = 0.0d0
+         eterm = 0.0d0
          denom = denom0*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
          if (term .gt. -50.0d0) then
             expterm = exp(term)
@@ -1683,11 +1683,11 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
-            term1 = fac1*erfcterm*hhh + expterm*(fac2+fac3*hsq)
+            eterm = (-fac1*erfcterm*hhh - expterm*(fac2+fac3*hsq))/denom
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            e = -(term1/denom) * struc2
-            edsp = edsp + e
             vterm = 3.0d0*(fac1*erfcterm*h + fac3*expterm)*struc2/denom
+            e = eterm * struc2
+            edsp = edsp + e
             vir(1,1) = vir(1,1) + h1*h1*vterm - e
             vir(2,1) = vir(2,1) + h1*h2*vterm
             vir(3,1) = vir(3,1) + h1*h3*vterm
@@ -1698,8 +1698,8 @@ c
             vir(2,3) = vir(2,3) + h3*h2*vterm
             vir(3,3) = vir(3,3) + h3*h3*vterm - e
          end if
-         qgrid(1,k1,k2,k3) = -(term1/denom) * qgrid(1,k1,k2,k3) 
-         qgrid(2,k1,k2,k3) = -(term1/denom) * qgrid(2,k1,k2,k3)
+         qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3) 
+         qgrid(2,k1,k2,k3) = eterm * qgrid(2,k1,k2,k3)
       end do
 c
 c     perform the 3-D FFT backward transformation

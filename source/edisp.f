@@ -1254,9 +1254,9 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 term,expterm
+      real*8 eterm,denom0
       real*8 hsq,struc2
       real*8 h,hhh,b,bfac
-      real*8 term1,denom0
       real*8 fac1,fac2,fac3
       real*8 erfcterm
 c
@@ -1330,9 +1330,9 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
-            term1 = fac1*erfcterm*hhh + expterm*(fac2+fac3*hsq)
+            eterm = (-fac1*erfcterm*hhh-expterm*(fac2+fac3*hsq))/denom
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            e = -(term1/denom) * struc2
+            e = eterm * struc2
             edsp = edsp + e
          end if
       end do
