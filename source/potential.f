@@ -1027,6 +1027,7 @@ c
       call kdipole
       call kmpole
       call kpolar
+      call kchgtrn
       return
       end
 c

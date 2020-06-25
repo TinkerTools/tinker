@@ -769,6 +769,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expa = exp(-ralpha2) * term
@@ -815,7 +816,7 @@ c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
                   scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
+                  e = e * (expa+scale)
                   edsp = edsp + e
                end if
             end if
@@ -890,6 +891,7 @@ c
                   if (r2 .le. off2) then
                      r = sqrt(r2)
                      r6 = r2**3
+                     e = -ci * ck / r6
                      ralpha2 = r2 * aewald**2
                      term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                      expa = exp(-ralpha2) * term
@@ -941,7 +943,7 @@ c
                         end if
                      end if
                      scale = scale - 1.0d0
-                     e = -ci * ck * (expa+scale) / r6
+                     e = e * (expa+scale)
                      if (ii .eq. kk)  e = 0.5d0 * e
                      edsp = edsp + e
                   end if
@@ -1145,6 +1147,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expa = exp(-ralpha2) * term
@@ -1191,7 +1194,7 @@ c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
                   scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
+                  e = e * (expa+scale)
                   edsp = edsp + e
                end if
             end if

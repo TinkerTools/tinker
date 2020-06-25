@@ -961,6 +961,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expterm = exp(-ralpha2)
@@ -1016,7 +1017,7 @@ c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
                   scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
+                  e = e * (expa+scale)
                   rterm = -(ralpha2**3) * expterm / r
                   de = -6.0d0*e/r2 - ci*ck*rterm/r7
      &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
@@ -1126,6 +1127,7 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   if (r2 .le. off2) then
                      r6 = r2**3
+                     e = -ci * ck / r6
                      ralpha2 = r2 * aewald**2
                      term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                      expterm = exp(-ralpha2)
@@ -1181,7 +1183,7 @@ c
                      scale = dspscale(k) * damp**2
                      if (use_group)  scale = scale * fgrp
                      scale = scale - 1.0d0
-                     e = -ci * ck * (expa+scale) / r6
+                     e = e * (expa+scale)
                      rterm = -(ralpha2**3) * expterm / r
                      de = -6.0d0*e/r2 - ci*ck*rterm/r7
      &                       - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
@@ -1439,6 +1441,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expterm = exp(-ralpha2)
@@ -1494,7 +1497,7 @@ c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
                   scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
+                  e = e * (expa+scale)
                   rterm = -(ralpha2**3) * expterm / r
                   de = -6.0d0*e/r2 - ci*ck*rterm/r7
      &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7

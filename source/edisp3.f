@@ -858,8 +858,8 @@ c
       integer jcell
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 e,fgrp
-      real*8 ci,ck
+      real*8 e,efull
+      real*8 fgrp,ci,ck
       real*8 r,r2,r6
       real*8 ai,ai2
       real*8 ak,ak2
@@ -952,6 +952,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expa = exp(-ralpha2) * term
@@ -997,28 +998,29 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
 c     
-c     increment the overall charge transfer energy components
+c     compute the full undamped energy for this interaction
 c
-                  if (e .ne. 0.0d0) then
-                     edsp = edsp + e
+                  efull = e * scale
+                  if (efull .ne. 0.0d0) then
                      nedsp = nedsp + 1
-                     aedsp(i) = aedsp(i) + 0.5d0*e
-                     aedsp(k) = aedsp(k) + 0.5d0*e
+                     aedsp(i) = aedsp(i) + 0.5d0*efull
+                     aedsp(k) = aedsp(k) + 0.5d0*efull
+                     if (molcule(i) .ne. molcule(k)) then
+                        einter = einter + efull
+                     end if
                   end if
 c
-c     increment the total intermolecular energy
+c     compute the energy contribution for this interaction
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  scale = scale - 1.0d0
+                  e = e * (expa+scale)
+                  edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 4.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  huge = (abs(efull) .gt. 4.0d0)
+                  if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1028,7 +1030,7 @@ c
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,30)  i,name(i),k,name(k),r,e
+                     write (iout,30)  i,name(i),k,name(k),r,efull
    30                format (' Disper',4x,2(i7,'-',a3),9x,
      &                          f10.4,2x,f12.4)
                   end if
@@ -1155,29 +1157,30 @@ c
                            scale = scale * dspscale(k)
                         end if
                      end if
-                     scale = scale - 1.0d0
-                     e = -ci * ck * (expa+scale) / r6
-                     if (ii .eq. kk)  e = 0.5d0 * e
 c     
-c     increment the overall dispersion energy components
+c     compute the full undamped energy for this interaction
 c
-                     if (e .ne. 0.0d0) then
-                        edsp = edsp + e
+                     if (ii .eq. kk)  e = 0.5d0 * e
+                     efull = e * scale
+                     if (efull .ne. 0.0d0) then
                         nedsp = nedsp + 1
-                        aedsp(i) = aedsp(i) + 0.5d0*e
-                        aedsp(k) = aedsp(k) + 0.5d0*e
+                        aedsp(i) = aedsp(i) + 0.5d0*efull
+                        aedsp(k) = aedsp(k) + 0.5d0*efull
+                        if (molcule(i) .ne. molcule(k)) then
+                           einter = einter + efull
+                        end if
                      end if
 c
-c     increment the total intermolecular energy
+c     compute the energy contribution for this interaction
 c
-                     if (molcule(i) .ne. molcule(k)) then
-                        einter = einter + e
-                     end if
+                     scale = scale - 1.0d0
+                     e = e * (expa+scale)
+                     edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(e) .gt. 4.0d0)
-                     if ((debug.and.e.ne.0.0d0)
+                     huge = (abs(efull) .gt. 4.0d0)
+                     if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -1187,7 +1190,7 @@ c
      &                             //,' Type',14x,'Atom Names',
      &                                15x,'Distance',8x,'Energy',/)
                         end if
-                        write (iout,50)  i,name(i),k,name(k),r,e
+                        write (iout,50)  i,name(i),k,name(k),r,efull
    50                   format (' Disper',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',2x,f10.4,2x,f12.4)
                      end if
@@ -1318,8 +1321,8 @@ c
       integer ii,kk,kkk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 e,fgrp
-      real*8 ci,ck
+      real*8 e,efull
+      real*8 fgrp,ci,ck
       real*8 r,r2,r6
       real*8 ai,ai2
       real*8 ak,ak2
@@ -1422,6 +1425,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expa = exp(-ralpha2) * term
@@ -1467,28 +1471,29 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
 c     
-c     increment the overall charge transfer energy components
+c     compute the full undamped energy for this interaction
 c
-                  if (e .ne. 0.0d0) then
-                     edsp = edsp + e
+                  efull = e * scale
+                  if (efull .ne. 0.0d0) then
                      nedsp = nedsp + 1
-                     aedsp(i) = aedsp(i) + 0.5d0*e
-                     aedsp(k) = aedsp(k) + 0.5d0*e
+                     aedsp(i) = aedsp(i) + 0.5d0*efull
+                     aedsp(k) = aedsp(k) + 0.5d0*efull
+                     if (molcule(i) .ne. molcule(k)) then
+                        einter = einter + efull
+                     end if
                   end if
 c
-c     increment the total intermolecular energy
+c     compute the energy contribution for this interaction
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  scale = scale - 1.0d0
+                  e = e * (expa+scale)
+                  edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 4.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  huge = (abs(efull) .gt. 4.0d0)
+                  if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1498,7 +1503,7 @@ c
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,30)  i,name(i),k,name(k),r,e
+                     write (iout,30)  i,name(i),k,name(k),r,efull
    30                format (' Disper',4x,2(i7,'-',a3),9x,
      &                          f10.4,2x,f12.4)
                   end if
