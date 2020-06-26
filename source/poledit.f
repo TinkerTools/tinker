@@ -75,6 +75,7 @@ c
          call katom
          call kmpole
          call kpolar
+         call kchgtrn
          call fixframe
          call prtpole
       else if (mode .eq. 3) then
@@ -84,6 +85,7 @@ c
          call katom
          call kmpole
          call kpolar
+         call kchgtrn
          call alterpol
          call avgpole
          call prtpole

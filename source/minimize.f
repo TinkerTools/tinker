@@ -141,7 +141,7 @@ c
          minimum = energy ()
          call numgrad (energy,derivs,eps)
       end if
-      if (use_rattle)  call shakef (derivs)
+      if (use_rattle)  call shake2 (derivs)
       gnorm = 0.0d0
       do i = 1, nuse
          k = iuse(i)
@@ -278,7 +278,7 @@ c
 c
 c     adjust gradient to remove components along constraints
 c
-      if (use_rattle)  call shakef (derivs)
+      if (use_rattle)  call shake2 (derivs)
 c
 c     convert coordinates and gradient to optimization parameters
 c
