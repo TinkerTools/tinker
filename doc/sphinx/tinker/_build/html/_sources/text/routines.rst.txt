@@ -4934,9 +4934,9 @@ user modification of these values
 positions to maintain interatomic distance and absolute spatial
 constraints
 
-**SHAKEF Subroutine**
+**SHAKE2 Subroutine**
 
-"shakef" modifies the gradient to remove components along any
+"shake2" modifies the gradient to remove components along any
 holonomic distance contraints using a variant of SHAKE
 
 **SHAKEUP Subroutine**
