@@ -326,6 +326,9 @@ c
                rborn(i) = (sum/pi43)**third
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
+               if (verbose) then
+                  write(*,*) ' Born radius ',i,':',rborn(i)
+               end if
             end if
          end do
 c
@@ -384,6 +387,9 @@ c
             call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
+            if (verbose) then
+               write(*,*) ' Perfect radius ',i,':',rborn(i)
+            end if
          end do
       end if
 c

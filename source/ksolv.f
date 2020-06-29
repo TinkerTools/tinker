@@ -843,14 +843,18 @@ c
       use polpot
       use ptable
       use solute
+      use vdw
       implicit none
       integer i,j,k,l,m
       integer atmnum,next
       real*8 rscale
       real*8 offset
+      real*8 dhct
       character*10 radtyp
       character*20 keyword
       character*20 value
+      logical descreenVDW
+      logical descreenHydrogen
       character*240 record
       character*240 string
 c
@@ -887,7 +891,10 @@ c
 c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
+      dhct = 0.69d0
       radtyp = 'SOLUTE'
+      descreenVDW = .false.
+      descreenHydrogen = .true.
 c
 c     get any altered generalized Kirkwood values from keyfile
 c
@@ -916,6 +923,21 @@ c
             else if (value(1:6) .eq. 'SOLUTE') then
                radtyp = 'SOLUTE'
             end if
+         else if (keyword(1:13) .eq. 'DESCREEN-VDW ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:4) .eq. 'TRUE') then
+               descreenVDW = .true.
+            end if
+         else if (keyword(1:18) .eq. 'DESCREEN-HYDROGEN ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:5) .eq. 'FALSE') then
+               descreenHydrogen = .false.
+            end if
+         else if (keyword(1:10) .eq. 'HCT-SCALE ') then
+            read (string,*,err=20,end=20)  dhct
+   20       continue
          end if
       end do
 c
@@ -926,7 +948,21 @@ c
 c     assign generic value for the HCT overlap scale factor
 c
       do i = 1, n
-         shct(i) = 0.69d0
+         shct(i) = dhct
+         if (descreenVDW) then
+c
+c           Update the HCT scale factor so that rsolv*shct equals radmin/2
+c
+            shct(i) = radmin(class(i),class(i))/2.0d0*shct(i)/rsolv(i)
+c           write(*,*) radmin(class(i),class(i))/2.0d0,rsolv(i),shct(i)
+         end if
+         if (.not. descreenHydrogen) then
+c
+c           Do not descreen with hydrogen atoms
+c
+            atmnum = atomic(i)
+            if (atmnum .eq. 1) shct(i) = 0.0d0
+         end if
       end do
       if (radtyp .eq. 'MACROMODEL') then
          do i = 1, n
