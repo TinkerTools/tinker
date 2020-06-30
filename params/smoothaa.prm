@@ -260,8 +260,8 @@ atom        203   30    Cl    "Chlorobenzene C-Cl"          17    35.453    1
 atom        204   35    N     "N-Phenylacetamide N"          7    14.007    3
 atom        205   38    CA    "N-Phenylacetamide N-CA"       6    12.011    3
 atom        206    3    C     "Carboxylic Acid -COOH"        6    12.011    3
-atom        207    5    OH    "Carboxylic Acid C=O"          8    15.999    1
-atom        208    4    O     "Carboxylic Acid -OH"          8    15.999    2
+atom        207    4    O     "Carboxylic Acid C=O"          8    15.999    1
+atom        208    5    OH    "Carboxylic Acid -OH"          8    15.999    2
 atom        209    7    HO    "Carboxylic Acid -COOH"        1     1.008    1
 atom        210    3    C     "Carboxylate COO-"             6    12.011    3
 atom        211   42    O2    "Carboxylate COO-"             8    15.999    1

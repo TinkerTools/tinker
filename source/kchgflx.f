@@ -12,9 +12,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "kchgflx" assigns a force constant and ideal bond length
-c     to each bond in the structure and processes any new or
-c     changed parameter values
+c     "kchgflx" assigns bond stretch and angle bend charge flux
+c     correction values and processes any new or changed values
+c     for these parameters
 c
 c
       subroutine kchgflx

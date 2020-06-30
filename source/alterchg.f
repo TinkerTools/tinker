@@ -306,8 +306,8 @@ c
          dq1 = pb1*(rcb-rcb0) + pa1*(angle-theta0)/radian
          dq2 = pb2*(rab-rab0) + pa2*(angle-theta0)/radian
          pdelta(ia) = pdelta(ia) + dq1
-         pdelta(ic) = pdelta(ic) + dq2
          pdelta(ib) = pdelta(ib) - dq1 - dq2
+         pdelta(ic) = pdelta(ic) + dq2
       end do
       return
       end
