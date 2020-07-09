@@ -57,10 +57,11 @@ c
       use inform
       use iounit
       use math
+      use mpole
       use pbstuf
       use solute
       implicit none
-      integer i,j,k,it,kt
+      integer i,j,k,it,kt,ii,kk
       integer, allocatable :: skip(:)
       real*8 area,rold,t
       real*8 shell,fraction
@@ -83,9 +84,12 @@ c
       real*8 b0,gself
       real*8 third,pi43
       real*8 bornmax
+      real*8 pair,pbtotal
       real*8, allocatable :: roff(:)
       real*8, allocatable :: pos(:,:)
       real*8, allocatable :: pbpole(:,:)
+      real*8, allocatable :: pbself(:)
+      real*8, allocatable :: pbpair(:)
       logical done
 c
 c
@@ -96,6 +100,8 @@ c
       if (borntyp .eq. 'PERFECT') then
          allocate (pos(3,n))
          allocate (pbpole(13,n))
+         allocate (pbself(n))
+         allocate (pbpair(n))
       end if
 c
 c     perform dynamic allocation of some global arrays
@@ -382,14 +388,106 @@ c
             end do
          end do
          term = -0.5d0 * electric * (1.0d0-1.0d0/sdie)
+         if (verbose) then
+c
+c           check the sign of multipole components at chiral sites
+c
+            call chkpole
+c
+c           rotate the multipole components into the global frame
+c
+            call rotpole
+         end if
+         write(*,*) 'Perfect Self Energy (kcal/mol)    Perfect Rad. (A)'
          do i = 1, n
             pbpole(1,i) = 1.0d0
             call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
             if (verbose) then
-               write(*,*) ' Perfect radius ',i,':',rborn(i)
+c
+c              Compute the perfect permanent self energy.
+c
+               ii = ipole(i)
+               pbpole(1,ii) = rpole(1,i)
+               do j = 2, 4
+                  pbpole(j,ii) = rpole(j,i)
+               end do
+               do j = 5, 13
+                  pbpole(j,ii) = 3.0d0 * rpole(j,i)
+               end do
+            call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+c
+c              Zero out the PB multipole.
+c
+               do j = 1, 13
+                  pbpole(j,ii) = 0.0d0
+               end do
+               pbself(i) = pbe
+               write(*,*) i,pbe,rborn(i)
+               pbtotal = pbtotal + pbself(i)
             end if
+         end do
+         if (verbose) then
+c
+c        Compute the perfect permanent pair energy.
+c
+         write(*,*) 'Perfect Pair Energy (kcal/mol)'
+         do i = 1, n
+           ii = ipole(i)
+           pbpole(1,ii) = rpole(1,i)
+           do j = 2, 4
+              pbpole(j,ii) = rpole(j,i)
+           end do
+           do j = 5, 13
+              pbpole(j,ii) = 3.0d0 * rpole(j,i)
+           end do
+           do k = i+1, n 
+              kk = ipole(k)
+              pbpole(1,kk) = rpole(1,k)
+              do j = 2, 4
+                 pbpole(j,kk) = rpole(j,k)
+              end do
+              do j = 5, 13
+                 pbpole(j,kk) = 3.0d0 * rpole(j,k)
+              end do
+           call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+              pair = pbe - pbself(i) - pbself(k)
+              write(*,*) i,k,pair
+              pbtotal = pbtotal + pair
+              pbpair(i) = pbpair(i) + 0.5d0 * pair
+              pbpair(k) = pbpair(k) + 0.5d0 * pair
+              do j = 1, 13
+                 pbpole(j,kk) = 0.0d0
+              end do
+           end do 
+           do j = 1, 13
+              pbpole(j,ii) = 0.0d0
+           end do
+         end do
+c
+c        Consistency check.
+c
+         do i = 1, n
+           ii = ipole(i)
+           pbpole(1,ii) = rpole(1,i)
+           do j = 2, 4
+              pbpole(j,ii) = rpole(j,i)
+           end do
+           do j = 5, 13
+              pbpole(j,ii) = 3.0d0 * rpole(j,i)
+           end do
+         end do
+         call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+         write(*,*) 'Single PB calculation: ',pbe 
+         write(*,*) 'Sum of self + pairs:   ',pbtotal
+         end if
+         write (iout,5)
+    5    format (/,' Perfect PB Self-Energies and',
+     &              ' Cross-Energies :',/)
+         do i = 1, n
+            write (iout,6)  i,pbself(i),pbpair(i)
+    6       format (i8,1x,2f15.4)
          end do
       end if
 c
@@ -400,6 +498,8 @@ c
       if (borntyp .eq. 'PERFECT') then
          deallocate (pos)
          deallocate (pbpole)
+         deallocate (pbself)
+         deallocate (pbpair)
       end if
 c
 c     make sure the final values are in a reasonable range

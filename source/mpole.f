@@ -43,6 +43,7 @@ c
       real*8, allocatable :: rpole(:,:)
       real*8, allocatable :: spole(:,:)
       real*8, allocatable :: srpole(:,:)
+      logical docharge, dodipole, doquadrupole
       character*8, allocatable :: polaxe(:)
       save
       end

@@ -53,12 +53,16 @@ c
       character*8 axt
       character*16 blank,pt
       character*20 keyword
+      character*4 value
       character*240 record
       character*240 string
 c
 c
 c     count the number of existing multipole parameters
 c
+      docharge = .true.
+      dodipole = .true.
+      doquadrupole = .true.
       blank = '                '
       nmp = maxnmp
       do i = maxnmp, 1, -1
@@ -73,7 +77,19 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:10) .eq. 'MULTIPOLE ') then
+         if (keyword(1:9) .eq. 'DOCHARGE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value .eq. 'NONE')  docharge = .false.
+         else if (keyword(1:9) .eq. 'DODIPOLE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value .eq. 'NONE')  dodipole = .false.
+         else if (keyword(1:13) .eq. 'DOQUADRUPOLE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value .eq. 'NONE')  doquadrupole = .false.
+         else if (keyword(1:10) .eq. 'MULTIPOLE ') then
             k = 0
             string = record(next:240)
             read (string,*,err=10,end=10)  k,kz,kx,ky,mpl(1)
@@ -134,7 +150,19 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:10) .eq. 'MULTIPOLE ') then
+         if (keyword(1:9) .eq. 'DOCHARGE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value .eq. 'NONE')  docharge = .false.
+         else if (keyword(1:9) .eq. 'DODIPOLE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value .eq. 'NONE')  dodipole = .false.
+         else if (keyword(1:13) .eq. 'DOQUADRUPOLE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value .eq. 'NONE')  doquadrupole = .false.
+         else if (keyword(1:10) .eq. 'MULTIPOLE ') then
             k = 0
             kz = 0
             kx = 0

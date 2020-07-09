@@ -500,9 +500,14 @@ c
 c
 c     setup the multipoles for solvation only calculations
 c
-      if (.not.use_mpole .and. .not.use_polar) then
-         call chkpole
-         call rotpole
+      if (.not.use_mpole) then
+          call chkpole
+          call rotpole
+      end if
+      if (.not.use_polar) then
+c
+c        Call induce to zero out induced dipoles
+c
          call induce
       end if
 c
@@ -512,7 +517,9 @@ c
 c
 c     correct the solvation energy for vacuum to polarized state
 c
-      call ediff
+      if (use_polar) then
+         call ediff
+      end if
       return
       end
 c

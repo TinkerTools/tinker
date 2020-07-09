@@ -4819,7 +4819,10 @@ c
             uinps(j,i) = 0.0d0
          end do
       end do
-      if (.not.use_polar .and. .not.use_solv)  return
+c
+c     SCRF depends on both use_polar and use_solv
+c
+      if (.not.use_polar .or. .not.use_solv)  return
 c
 c     set the switching function coefficients
 c
@@ -6189,6 +6192,9 @@ c
             uinps(j,i) = 0.0d0
          end do
       end do
+c
+c     SCRF depends on both use_polar and use_solv
+c
       if (.not.use_polar .or. .not.use_solv)  return
 c
 c     set the switching function coefficients

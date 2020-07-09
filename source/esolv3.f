@@ -642,9 +642,14 @@ c
 c
 c     setup the multipoles for solvation only calculations
 c
-      if (.not.use_mpole .and. .not.use_polar) then
+      if (.not.use_mpole) then
          call chkpole
          call rotpole
+      end if
+      if (.not.use_polar) then
+c
+c        Call induce to zero out induced dipoles
+c
          call induce
       end if
 c
@@ -654,7 +659,9 @@ c
 c
 c     correct the solvation energy for vacuum to polarized state
 c
-      call ediff3
+      if (use_polar) then
+         call ediff3
+      end if
       return
       end
 c
@@ -1100,12 +1107,14 @@ c
                      es = es + e + ei
                      aes(i) = aes(i) + e + ei
                      eself(i) = eself(i) + e + ei
+c                    write(*,*) 'Self',i,e,ei
                   else
                      es = es + e + ei
                      aes(i) = aes(i) + 0.5d0*(e+ei)
                      aes(k) = aes(k) + 0.5d0*(e+ei)
                      ecross(i) = ecross(i) + 0.5d0*(e+ei)
                      ecross(k) = ecross(k) + 0.5d0*(e+ei)
+c                    write(*,*) 'Cross',i,k,e,ei
                   end if
 c
 c     increment the total intermolecule energy
@@ -1125,14 +1134,20 @@ c
 c
 c     print the self-energy and cross-energy terms
 c
-      if (debug) then
+      if (verbose) then
          write (iout,10)
    10    format (/,' Generalized Kirkwood Self-Energies and',
      &              ' Cross-Energies :',/)
          do i = 1, n
             write (iout,20)  i,eself(i),ecross(i)
    20       format (i8,1x,2f15.4)
+            if (i .gt. 1) then
+               eself(1) = eself(1) + eself(i)
+               ecross(1) = ecross(1) + ecross(i)
+            end if
          end do
+         write (iout,30) eself(1),ecross(1)
+   30    format ('        ',1x,2f15.4)
       end if
 c
 c     perform deallocation of some local arrays
