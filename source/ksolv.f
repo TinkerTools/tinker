@@ -954,7 +954,7 @@ c
 c           Update the HCT scale factor so that rsolv*shct equals radmin/2
 c
             shct(i) = radmin(class(i),class(i))/2.0d0*shct(i)/rsolv(i)
-c           write(*,*) radmin(class(i),class(i))/2.0d0,rsolv(i),shct(i)
+c           write(*,*) i,radmin(class(i),class(i))/2.0d0,rsolv(i),shct(i)
          end if
          if (.not. descreenHydrogen) then
 c
@@ -1639,6 +1639,7 @@ c
       use polar
       use potent
       use ptable
+      use vdw
       use solute
       implicit none
       integer i,j,k,l,m
@@ -1655,12 +1656,14 @@ c
          rsolv(i) = vdwrad(atmnum)
       end do
 c
-c     assign base atomic radii from consensus vdw values
+c     assign base atomic radii from force field vdw values
 c
       if (radtyp .eq. 'VDW') then
          do i = 1, n
             rsolv(i) = 2.0d0
-            if (class(i) .ne. 0)  rsolv(i) = rad(class(i))
+            if (class(i) .ne. 0) then
+               rsolv(i) = radmin(class(i),class(i))/2.0d0
+            end if
          end do
 c
 c     assign standard solvation radii adapted from Macromodel
