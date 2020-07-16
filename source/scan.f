@@ -28,13 +28,15 @@ c
       use files
       use inform
       use iounit
+      use omega
       use output
       implicit none
       integer maxmap
       parameter (maxmap=100000)
       integer i,ixyz
       integer lext,freeunit
-      integer nmap,niter,neigen
+      integer nmap,niter
+      integer nvec,neigen
       real*8 minimum,grdmin,range
       real*8 emap(maxmap)
       logical exist
@@ -66,14 +68,16 @@ c
       call nextarg (string,exist)
       if (exist)  read (string,*,err=10,end=10)  neigen
    10 continue
+      nvec = min(nomega,5)
       if (neigen .le. 0) then
-         write (iout,20)
-   20    format(/,' Enter the Number Search Directions for Local',
-     &             ' Search [5] :  ',$)
+         write (iout,20)  nvec
+   20    format(/,' Enter the Number of Eigenvectors for Local',
+     &             ' Search [',i1,'] :  ',$)
          read (input,30)  neigen
    30    format (i10)
-         if (neigen .le. 0)  neigen = 5
+         if (neigen .le. 0)  neigen = nvec
       end if
+      neigen = min(neigen,nvec)
 c
 c     get the energy threshold criterion for map membership
 c
@@ -594,6 +598,7 @@ c
       use minima
       use output
       use potent
+      use scales
       implicit none
       integer i,j,nvar
       real*8 minimum,scan1
@@ -628,6 +633,19 @@ c
          nvar = nvar + 1
          xx(nvar) = z(i)
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not. set_scale) then
+         if (.not. allocated(scale))  allocate (scale(nvar))
+c
+c     set scaling parameters to unity due to mixed optimization
+c
+         set_scale = .true.
+         do i = 1, nvar
+            scale(i) = 1.0d0
+         end do
+      end if
 c
 c     adjust polarization and set initial optimization values
 c

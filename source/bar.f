@@ -16,11 +16,11 @@ c     "bar" computes the free energy, enthalpy and entropy difference
 c     between two states via Zwanzig free energy perturbation (FEP)
 c     and Bennett acceptance ratio (BAR) methods
 c
-c     note current version takes as input the trajectory archives A
+c     note in mode 1 the code takes as input trajectory archives A
 c     and B, originally generated for states 0 and 1, respectively;
-c     then finds the total potential energy for all frames of each
-c     trajectory under control of key files for both states 0 and 1;
-c     finally the FEP and BAR algorithms are used to compute the
+c     it then finds the total potential energy for all frames of both
+c     trajectories under control of key files for both states 0 and 1;
+c     in mode 2, the FEP and BAR algorithms are used to compute the
 c     free energy for state 0 --> state 1, and similar estimators
 c     provide the enthalpy and entropy for state 0 --> state 1
 c

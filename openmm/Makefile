@@ -826,7 +826,7 @@ libtinker.a: ${OBJS}
 	ctrpot.o \
 	cutoffs.o \
 	damping.o \
-	dcflux.o\
+	dcflux.o \
 	deflate.o \
 	delete.o \
 	deriv.o \

@@ -1595,7 +1595,7 @@ void set_potent_data_ (int* use_bond, int* use_angle, int* use_strbnd,
                        int* use_angtor, int* use_tortor, int* use_vdw,
                        int* use_repuls, int* use_disp, int* use_charge,
                        int* use_chgdpl, int* use_dipole, int* use_mpole,
-                       int* use_polar, int* use_chgtrn, int* use_chgtrn,
+                       int* use_polar, int* use_chgtrn, int* use_chgflx,
                        int* use_rxnfld, int* use_solv, int* use_metal,
                        int* use_geom, int* use_extra, int* use_born,
                        int* use_orbit) {
