@@ -2124,6 +2124,7 @@ c
                iz = zaxis(i)
                ix = xaxis(i)
                iy = yaxis(i)
+               size = 4
                call numeral (it,pa,size)
                call numeral (iz,pb,size)
                call numeral (ix,pc,size)
