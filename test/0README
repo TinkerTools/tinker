@@ -3,114 +3,95 @@
                      TEST Directory for the Tinker Package
                      #####################################
 
-         This directory contains some test casess illustrating use of
-         several of the programs in the Tinker package.
+      This directory contains some test casess illustrating use of several
+      of the programs in the Tinker package.
 
-         For example, the argon.run file contains the commands to run
-         the first test case. The resulting output is found in the file
-         argon.log.
+      For example, the argon.run file contains commands to run the first
+      test case. The resulting output is found in the file argon.log.
 
-         The clean.make script will remove any output files generated
-         during the example runs and should be used prior to trying
-         to validate Tinker executables against the provided log files.
+      The clean.make script will remove any output files generated during
+      the example runs and should be invoked prior to validating Tinker
+      executables against the provided log files.
 
-         (01) ANION       estimation of the free energy of hydration
-                          of Cl- anion vs. Br- anion via a 2 picosecond
-                          simulation on a "hybrid" anion in a box of
-                          water, followed by free energy perturbation
+      (1) ANION       estimates the free energy of hydration of Cl- anion
+                      vs. Br- anion via a 2 picosecond simulation on a
+                      "hybrid" anion in a box of water, followed by free
+                      energy perturbation
 
-         (02) ARGON       minimization, followed by 25 picoseconds of
-                          molecular dynamics trajectory, on a periodic
-                          box containing 150 argon atoms
+      (2) ARGON       minimize, then perform 25 picoseconds of molecular
+                      dynamics simulation, on a box with 150 argon atoms
 
-         (03) CLUSTER     perform a set of 10 Gaussian density
-                          annealing trials on a cluster of 13 argon
-                          atoms in an attempt to locate the global
-                          minimum energy structure
+      (3) CLUSTER     performs 10 Gaussian density annealing trials on a
+                      cluster of 13 argon atoms to find the global minimum
+                      energy structure
 
-         (04) CRAMBIN     generation of a Tinker file from a PDB
-                          file, followed by a single point energy
-                          computation and determination of the
-                          molecular volume and surface area
+      (4) CRAMBIN     generate a Tinker XYZ file from a PDB file, followed
+                      by single point energy computation and determination
+                      of the molecular volume and surface area
 
-         (05) CYCLOHEX    location of the transition state between
-                          chair and boat cyclohexane via two methods:
-                          refinement of the transition state using
-                          Muller-Brown saddle point algorithm, then
-                          path sampling using the Elber algorithm;
-                          vibrational analysis of both results shows
-                          the same TS with one negative frequency
+      (5) CYCLOHEX    locate the transition state between chair and boat
+                      cyclohexane via two methods: the Muller-Brown saddle
+                      point method, and path sampling using the Elber
+                      algorithm; vibrational analysis of the results shows
+                      the same TS with one negative frequency
 
-         (06) DHFR        performs 10 steps of molecular dynamics on
-                          a pre-equilibrated system of DHFR protein
-                          in a box or water using the AMOEBA force
-                          field (this is the so-called Joint Amber-
-                          CHARMM benchmark with 23558 total atoms)
+      (6) DHFR        run 10 molecular dynamics steps on pre-equilibrated
+                      DHFR protein in water using the AMOEBA force field
+                      (the so-called Joint Amber-CHARMM benchmark)
 
-         (07) DIALANINE   find all the local minima of alanine
-                          dipeptide via a potential energy surface
-                          scan using torsional modes to jump between
-                          the minima
+      (7) DIALANINE   find all local minima of alanine dipeptide via a
+                      potential energy surface scan using torsional modes
+                      to jump between minima
 
-         (08) ENKEPHALIN  generation of coordinates from the
-                          amino acid sequence and phi/psi angles,
-                          followed by energy minimization and
-                          determination of the lowest frequency
-                          normal mode
+      (8) ENKEPHALIN  generate coordinates from amino acid sequence and
+                      phi/psi angles, followed by energy minimization and
+                      determination of the lowest frequency normal mode
 
-         (09) ETHANOL     fitting of torsional parameter values for
-                          the C-C-O-H bond based on relative quantum
-                          mechanical (G09) energies for rotating the
-                          C-O bond
+      (9) ETHANOL     fit torsional parameter values for the C-C-O-H bond
+                      based on relative quantum mechanical (G09) energies
+                      for rotating the C-O bond
 
-         (10) FORMAMIDE   generation of unit cell from fractional
-                          coordinates, followed by full crystal
-                          energy minimization and determination of
-                          optimal carbonyl oxygen energy parameters
-                          from a fit to lattice energy and structure
+      (10) FORMAMIDE  generate a unit cell from fractional coordinates,
+                      followed by full crystal energy minimization and
+                      determination of optimal carbonyl oxygen parameters
+                      via a fit to lattice energy and structure
 
-         (11) GPCR        finds the lowest-frequency normal mode
-                          of bacteriorhodopsin using vibrational
-                          analysis via a sliding block iterative
-                          matrix diagonalization (Alter gpcr.run
-                          script to save the file gpcr.001 if you
-                          want to view the modes. Note this example
-                          requires about an hour to complete.)
+      (11) GPCR       find the lowest-frequency bacteriorhodopsin normal
+                      mode using a sliding block iterative diagonalization
+                      (alter gpcr.run script to save the file gpcr.001 if
+                      you want to view the mode; this example can require
+                      up to an hour to complete)
 
-         (12) HELIX       rigid-body optimization of the packing of
-                          two idealized polyalanine helices using
-                          only van der Waals interactions
+      (12) HELIX      optimize rigid-body packing of two ideal polyalanine
+                      helices using only van der Waals interactions
 
-         (13) ICE         short MD simulation of the monoclinic ice V
-                          crystal form using the iAMOEBA water model,
-                          neighbor lists and PME electrostatics
+      (13) ICE        short MD simulation of the monoclinic ice V crystal
+                      form using the iAMOEBA water model, neighbor lists
+                      and PME electrostatics
 
-         (14) IFABP       generation of distance geometry structures
-                          for intestinal fatty acid binding protein
-                          from NOE distance and torsional restraints
+      (14) IFABP      generate distance geometry structures for intestinal
+                      fatty acid binding protein from NOE distances and
+                      torsional restraints
 
-         (15) METHANOL    process distributed multipole analysis (DMA)
-                          output to extract coordinates and permanent
-                          multipoles, set local frames and polarization
-                          groups, remove intramolecular polarization,
-                          detect and average equivalent atomic sites
+      (15) METHANOL   process distributed multipole analysis (DMA) output
+                      to extract coordinates and permanent multipoles, set
+                      local frames and polarization groups, modify the
+                      intramolecular polarization, and average equivalent
+                      atomic sites
 
-         (16) NITROGEN    calculate the self-diffusion constant and
-                          N-N radial distribution function for liquid
-                          nitrogen via analysis of a 50ps MD trajectory
+      (16) NITROGEN   calculate the self-diffusion constant and N-N radial
+                      distribution function for a liquid nitrogen box via
+                      analysis of a 50ps MD trajectory
 
-         (17) SALT        convert sodium chloride asymmetric unit to
-                          the unit cell, then a crystal minimization
-                          starting from the diffraction structure
-                          using Ewald summation for electrostatics
+      (17) SALT       convert sodium chloride asymmetric unit to the unit
+                      cell, then minimize the crystal from the diffraction
+                      structure using Ewald summation electrostatics
 
-         (18) TETRAALA    generate capped alanine tetrapeptide in an
-                          extended conformation, then use Monte Carlo
-                          Minimization with random torsional moves to
-                          find the global minimum energy structure
+      (18) TETRAALA   generate an extended conformation of capped alanine
+                      tetrapeptide, then use Monte Carlo Minimization with
+                      random torsional moves to find the global minimum
 
-         (19) WATER       fit the electrostatic potential around an
-                          AMOEBA water molecule to the QM-derived
-                          potential (MP2/aug-cc-pVTZ) on a grid of
-                          points outside the molecular surface.
+      (19) WATER      fit the electrostatic potential for an AMOEBA water
+                      molecule to QM-derived potential (MP2/aug-cc-pVTZ)
+                      on a grid of points outside the molecular surface
 

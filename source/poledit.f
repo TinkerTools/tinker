@@ -155,10 +155,6 @@ c
             zr = z(j) - zi
             rij = ri + rad(j)
             dij = sqrt(xr*xr + yr*yr + zr*zr)
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            write (*,99)  i,j,rij,dij
-   99       format (' Here-0  :',2i8,2f12.4)
-cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             if (dij .lt. rij) then
                n12(i) = n12(i) + 1
                i12(n12(i),i) = j
@@ -267,10 +263,6 @@ c
          zaxis(i) = 0
          xaxis(i) = 0
          yaxis(i) = 0
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-         write (*,98)  npole,i
-   99    format (' Here-1 :  ',2i8)
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       end do
 c
 c     assign the local frame definition for an isolated atom
@@ -291,13 +283,7 @@ c
             xaxis(i) = 0
             yaxis(i) = 0
             ia = i12(1,i)
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-            write (*,98)  npole,i,ia
-   98       format (' Here-2 :  ',3i8)
             call frame13 (i,ia)
-            write (*,97)  npole,i,ia
-   97       format (' Here-3 :  ',3i8)
-ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c
 c     assign the local frame definition for a divalent atom
 c
