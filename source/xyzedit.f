@@ -1861,7 +1861,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,molcule,close2,remove,header,nsolute,
-!$OMP& isolute,icount)
+!$OMP& isolute,icount,iout)
 !$OMP DO schedule(guided)
 c
 c     search for short distance between solute and solvent
