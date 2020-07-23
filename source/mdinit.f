@@ -383,12 +383,17 @@ c
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (derivs(3,n))
+c
 c     try to restart using prior velocities and accelerations
 c
       dynfile = filename(1:leng)//'.dyn'
       call version (dynfile,'old')
       inquire (file=dynfile,exist=exist)
       if (exist) then
+         call gradient (e,derivs)
          idyn = freeunit ()
          open (unit=idyn,file=dynfile,status='old')
          rewind (unit=idyn)
@@ -398,6 +403,7 @@ c
 c     set translational velocities for rigid body dynamics
 c
       else if (integrate .eq. 'RIGIDBODY') then
+         call gradient (e,derivs)
          do i = 1, ngrp
             gmass = grpmass(i)
             speed = maxwell (gmass,kelvin)
@@ -413,7 +419,6 @@ c
 c     set velocities and fast/slow accelerations for RESPA method
 c
       else if (integrate .eq. 'RESPA') then
-         allocate (derivs(3,n))
          call gradslow (e,derivs)
          do i = 1, n
             amass = mass(i)
@@ -444,13 +449,11 @@ c
                end do
             end if
          end do
-         deallocate (derivs)
          if (nuse .eq. n)  call mdrest (0)
 c
 c     set velocities and accelerations for Cartesian dynamics
 c
       else
-         allocate (derivs(3,n))
          call gradient (e,derivs)
          do i = 1, n
             amass = mass(i)
@@ -470,9 +473,12 @@ c
                end do
             end if
          end do
-         deallocate (derivs)
          if (nuse .eq. n)  call mdrest (0)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (derivs)
 c
 c     check for any prior dynamics coordinate sets
 c
