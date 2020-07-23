@@ -346,12 +346,13 @@ c
          do k = i, maxclass
             if (radrule(1:6) .eq. 'MMFF94') then
                if (i .ne. k) then
-                  if (DA(i).eq.'D' .or. DA(k).eq.'D') then
-                     rd = 0.5d0 * (rad(i)+rad(k))
-                  else
-                     gik = (rad(i)-rad(k))/(rad(i)+rad(k))
-                     rd = 0.5d0 * (rad(i)+rad(k))
-     &                     * (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+                  rd = 0.5d0 * (rad(i)+rad(k))
+                  if (DA(i).ne.'D' .and. DA(k).ne.'D') then
+                     if (rd .ne. 0.0d0) then
+                        gik = (rad(i)-rad(k))/(rad(i)+rad(k))
+                        rd = (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+     &                           * rd
+                     end if
                   end if
                else
                   rd = rad(i)

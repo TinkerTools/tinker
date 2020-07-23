@@ -1635,7 +1635,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(nref,n,x,y,z,molcule,close2,remove,header,icount)
+!$OMP& shared(nref,n,x,y,z,molcule,close2,remove,header,icount,iout)
 !$OMP DO schedule(guided)
 c
 c     search for close contacts between solute and solvent
