@@ -1140,7 +1140,7 @@ c
      &              ' Cross-Energies :',/)
          do i = 1, n
             write (iout,20)  i,eself(i),ecross(i)
-   20       format (i8,1x,2f15.4)
+   20       format ('GKSELF',i8,1x,2f15.4)
             if (i .gt. 1) then
                eself(1) = eself(1) + eself(i)
                ecross(1) = ecross(1) + ecross(i)

@@ -487,7 +487,7 @@ c
      &              ' Cross-Energies :',/)
          do i = 1, n
             write (iout,6)  i,pbself(i),pbpair(i)
-    6       format (i8,1x,2f15.4)
+    6       format ('PBPERFECT',i8,1x,2f15.4)
          end do
       end if
 c
