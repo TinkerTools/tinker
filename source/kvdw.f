@@ -379,9 +379,10 @@ c
          do k = i, maxclass
             if (epsrule(1:6) .eq. 'MMFF94') then
                ep = 0.0d0
-               if (radmin(i,k) .ne. 0.0d0) then
+               if (nn(i).ne.0.0d0 .and. nn(k).ne.0.0d0
+     &                .and. radmin(i,k).ne.0.0d0) then
                   ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
-     &                    / ((sqrt(alph(i)/Nn(i))+sqrt(alph(k)/Nn(k)))
+     &                    / ((sqrt(alph(i)/nn(i))+sqrt(alph(k)/nn(k)))
      &                                 *radmin(i,k)**6)
                end if
                if (i .eq. k)  eps(i) = ep
@@ -446,9 +447,10 @@ c
          do k = i, maxclass
             if (epsrule(1:6) .eq. 'MMFF94') then
                ep = 0.0d0
-               if (radmin4(i,k) .ne. 0.0d0) then
+               if (nn(i).ne.0.0d0 .and. nn(k).ne.0.0d0
+     &                .and. radmin4(i,k).ne.0.0d0) then
                   ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
-     &                    / ((sqrt(alph(i)/Nn(i))+sqrt(alph(k)/Nn(k)))
+     &                    / ((sqrt(alph(i)/nn(i))+sqrt(alph(k)/nn(k)))
      &                                 *radmin4(i,k)**6)
                end if
                if (i .eq. k)  eps4(i) = ep
