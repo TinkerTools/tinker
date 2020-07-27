@@ -44,6 +44,7 @@ c
       use kpitor
       use kpolr
       use krepl
+      use ksolut
       use kstbnd
       use ksttor
       use ktorsn
@@ -56,6 +57,7 @@ c
       use polpot
       use reppot
       use rxnpot
+      use solpot
       use sizes
       use solute
       use urypot
@@ -220,6 +222,7 @@ c
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
       if (.not. allocated(ctchg))  allocate (ctchg(maxclass))
       if (.not. allocated(ctdmp))  allocate (ctdmp(maxclass))
+      if (.not. allocated(solrad))  allocate (solrad(maxclass))
       if (.not. allocated(electron))  allocate (electron(maxclass))
       if (.not. allocated(ionize))  allocate (ionize(maxclass))
       if (.not. allocated(repulse))  allocate (repulse(maxclass))
@@ -263,6 +266,7 @@ c
          cpalp(i) = 0.0d0
          ctchg(i) = 0.0d0
          ctdmp(i) = 0.0d0
+         solrad(i) = 0.d0
          electron(i) = 0.0d0
          ionize(i) = 0.0d0
          repulse(i) = 0.0d0

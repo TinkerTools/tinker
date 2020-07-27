@@ -28,7 +28,7 @@ c
       use polar
       use polpot
       use potent
-      use solute
+      use solpot
       use units
       use uprior
       implicit none
@@ -6589,7 +6589,7 @@ c
       use polgrp
       use polpot
       use shunt
-      use solute
+      use solpot
       implicit none
       integer i,j,k
       integer ii,kk
@@ -6917,7 +6917,7 @@ c
       use polgrp
       use polpot
       use shunt
-      use solute
+      use solpot
       implicit none
       integer i,j,k
       integer ii,kk

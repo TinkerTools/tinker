@@ -708,6 +708,11 @@ struct {
 } sizes__;
 
 struct {
+   char solvtyp[MAX_STRING];
+   char borntyp[MAX_STRING];
+} solpot__;
+
+struct {
    double doffset;
    double p1;
    double p2;
@@ -729,8 +734,6 @@ struct {
    double* wace;
    double* s2ace;
    double* uace;
-   char solvtyp[MAX_STRING];
-   char borntyp[MAX_STRING];
 } solute__;
 
 struct {
@@ -1684,13 +1687,18 @@ void set_sizes_data_ (int* maxatm, int* maxtyp, int* maxclass, int* maxval,
    sizes__.maxfix = *maxfix;
 }
 
+void set_solpot_data_ (char* solvtyp, char* borntyp) {
+
+   setNullTerminator (solvtyp, 8, solpot__.solvtyp);
+   setNullTerminator (borntyp, 8, solpot__.borntyp);
+}
+
 void set_solute_data_ (double* doffset, double* p1, double* p2, double* p3,
                        double* p4, double* p5, double* rsolv, double* asolv,
                        double* rborn, double* drb, double* drbp, double* drobc,
                        double* gpol, double* shct, double* aobc, double* bobc,
                        double* gobc, double* vsolv, double* wace,
-                       double* s2ace, double* uace, char* solvtyp,
-                       char* borntyp) {
+                       double* s2ace, double* uace) {
 
    solute__.doffset = *doffset;
    solute__.p1 = *p1;
@@ -1713,8 +1721,6 @@ void set_solute_data_ (double* doffset, double* p1, double* p2, double* p3,
    solute__.wace = wace;
    solute__.s2ace = s2ace;
    solute__.uace = uace;
-   setNullTerminator (solvtyp, 8, solute__.solvtyp);
-   setNullTerminator (borntyp, 8, solute__.borntyp);
 }
 
 void set_stodyn_data_ (double* friction, double* fgamma, int* use_sdarea) {
@@ -3332,7 +3338,7 @@ static void setupAmoebaGeneralizedKirkwoodForce (OpenMM_System* system,
 
    // check Born radius type; force use of "Grycuk" for now
 
-   setNullTerminator (solute__.borntyp, 8, buffer);
+   setNullTerminator (solpot__.borntyp, 8, buffer);
    useGrycuk = 1;
    if (strncasecmp (buffer, "GRYCUK", 6 ) != 0) {
       if (log) {
@@ -4483,8 +4489,8 @@ static int usingImplicitSolvent (void) {
    char solvatationType[16];
    char bornType[16];
 
-   setNullTerminator (solute__.solvtyp, 8, solvatationType);
-   setNullTerminator (solute__.borntyp, 8, bornType);
+   setNullTerminator (solpot__.solvtyp, 8, solvatationType);
+   setNullTerminator (solpot__.borntyp, 8, bornType);
 
    // return <0 if parameter/option combination is unsupported
    //         0 if explicit solvent (Ewald is in use)
@@ -4497,7 +4503,7 @@ static int usingImplicitSolvent (void) {
       if (limits__.use_ewald) {
          implicitSolventActive = -2;
       } else {
-         if ((strncasecmp( bornType, "OBC", 3) == 0)) {
+         if ((strncasecmp (bornType, "OBC", 3) == 0)) {
              implicitSolventActive = 1;
          } else {
              implicitSolventActive = 2;
@@ -4864,9 +4870,9 @@ int openmm_test_ (void) {
       double ecav, edisp;
       if (log) {
          char buffer[128];
-         setNullTerminator (solute__.borntyp, 8, buffer);
+         setNullTerminator (solpot__.borntyp, 8, buffer);
          (void) fprintf (log, "Born radius type=%s ", buffer);
-         setNullTerminator (solute__.solvtyp, 8, buffer);
+         setNullTerminator (solpot__.solvtyp, 8, buffer);
          (void) fprintf (log, "Solvation type=%s\n", buffer);
       }
       setupAmoebaMultipoleForce (system, log);

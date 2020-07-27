@@ -89,6 +89,7 @@ gfortran -c -Wall korbs.f
 gfortran -c -Wall kpitor.f
 gfortran -c -Wall kpolr.f
 gfortran -c -Wall krepl.f
+gfortran -c -Wall ksolut.f
 gfortran -c -Wall kstbnd.f
 gfortran -c -Wall ksttor.f
 gfortran -c -Wall ktorsn.f
@@ -153,6 +154,7 @@ gfortran -c -Wall scales.f
 gfortran -c -Wall sequen.f
 gfortran -c -Wall shunt.f
 gfortran -c -Wall socket.f
+gfortran -c -Wall solpot.f
 gfortran -c -Wall solute.f
 gfortran -c -Wall stodyn.f
 gfortran -c -Wall strbnd.f

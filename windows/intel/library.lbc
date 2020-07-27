@@ -310,6 +310,7 @@ kpolar.obj
 kpolr.obj
 krepel.obj
 krepl.obj
+ksolut.obj
 ksolv.obj
 kstbnd.obj
 kstrbnd.obj
@@ -457,6 +458,7 @@ simplex.obj
 sizes.obj
 sktstuf.obj
 socket.obj
+solpot.obj
 solute.obj
 sort.obj
 square.obj

@@ -31,7 +31,6 @@ c
       use openmm
       use openmp
       use potent
-      use solute
       use stodyn
       use usage
       implicit none

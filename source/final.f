@@ -58,6 +58,7 @@ c
       use korbs
       use kpolr
       use krepl
+      use ksolut
       use kvdws
       use light
       use limits
@@ -95,6 +96,7 @@ c
       use ring
       use rotbnd
       use socket
+      use solpot
       use solute
       use stodyn
       use strbnd
@@ -486,6 +488,10 @@ c
       if (allocated(prsiz))  deallocate (prsiz)
       if (allocated(prdmp))  deallocate (prdmp)
       if (allocated(prele))  deallocate (prele)
+c
+c     deallocation of global arrays from module ksolut
+c
+      if (allocated(solrad))  deallocate (solrad)
 c
 c     deallocation of global arrays from module kvdws
 c

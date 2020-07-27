@@ -321,6 +321,7 @@ kpolar.o \
 kpolr.o \
 krepel.o \
 krepl.o \
+ksolut.o \
 ksolv.o \
 kstbnd.o \
 kstrbnd.o \
@@ -468,6 +469,7 @@ simplex.o \
 sizes.o \
 sktstuf.o \
 socket.o \
+solpot.o \
 solute.o \
 sort.o \
 square.o \

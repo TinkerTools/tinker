@@ -90,6 +90,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp korbs.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kpitor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kpolr.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp krepl.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ksolut.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kstbnd.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ksttor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ktorsn.f
@@ -154,6 +155,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp scales.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sequen.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp shunt.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp socket.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp solpot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp solute.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp stodyn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp strbnd.f

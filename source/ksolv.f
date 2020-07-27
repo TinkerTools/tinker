@@ -18,14 +18,19 @@ c     Poisson-Boltzmann, cavity-dispersion and HPMF models
 c
 c
       subroutine ksolv
+      use atomid
+      use atoms
       use gkstuf
       use inform
       use iounit
       use keys
+      use ksolut
       use potent
+      use solpot
       use solute
       implicit none
-      integer i,k,next
+      integer i,k
+      integer ic,next
       real*8 rd
       logical header
       character*20 keyword
@@ -143,6 +148,53 @@ c
    50    continue
       end do
 c
+c     process keywords containing solvation parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'SOLUTE ') then
+            call getnumb (record,k,next)
+            if (k.ge.1 .and. k.le.maxclass) then
+               rd = 0.0d0
+               string = record(next:240)
+               read (string,*,err=60,end=60)  rd
+   60          continue
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,70)
+   70             format (/,' Additional Solvation Parameters :',
+     &                    //,5x,'Atom Class',15x,'Size',/)
+               end if
+               solrad(k) = rd
+               if (.not. silent) then
+                  write (iout,80)  k,rd
+   80             format (6x,i6,7x,f15.4)
+               end if
+            else if (k .gt. maxclass) then
+               write (iout,90)  maxclass
+   90          format (/,' KSOLV  --  Only Atom Classes through',i4,
+     &                    ' are Allowed')
+               abort = .true.
+            end if
+         end if
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(rsolv))  deallocate (rsolv)
+      allocate (rsolv(n))
+c
+c     assign implicit solvation radius values to atoms
+c     
+      do i = 1, n
+         ic = class(i)
+         rsolv(i) = solrad(ic)
+      end do
+c
 c     set a default if no Born radius method was assigned
 c
       if (use_born .and. borntyp.eq.'       ') then
@@ -207,6 +259,7 @@ c
       use atomid
       use atoms
       use couple
+      use solpot
       use solute
       implicit none
       integer i,j,k
@@ -215,9 +268,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(rsolv))  deallocate (rsolv)
       if (allocated(asolv))  deallocate (asolv)
-      allocate (rsolv(n))
       allocate (asolv(n))
 c
 c     assign the Eisenberg-McLachlan ASP solvation parameters;
@@ -353,6 +404,7 @@ c
       use couple
       use math
       use potent
+      use solpot
       use solute
       implicit none
       integer i,j,k,m
@@ -374,10 +426,9 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(wace))  allocate (wace(maxclass,maxclass)) 
-      if (.not. allocated(s2ace))  allocate (s2ace(maxclass,maxclass)) 
-      if (.not. allocated(uace))  allocate (uace(maxclass,maxclass)) 
-      if (allocated(rsolv))  deallocate (rsolv)
+      if (.not. allocated(wace))  allocate (wace(maxclass,maxclass))
+      if (.not. allocated(s2ace))  allocate (s2ace(maxclass,maxclass))
+      if (.not. allocated(uace))  allocate (uace(maxclass,maxclass))
       if (allocated(asolv))  deallocate (asolv)
       if (allocated(rborn))  deallocate (rborn)
       if (allocated(drb))  deallocate (drb)
@@ -388,7 +439,6 @@ c
       if (allocated(bobc))  deallocate (bobc)
       if (allocated(gobc))  deallocate (gobc)
       if (allocated(vsolv))  deallocate (vsolv)
-      allocate (rsolv(n))
       allocate (asolv(n))
       allocate (rborn(n))
       allocate (drb(n))
@@ -838,7 +888,6 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(rsolv))  deallocate (rsolv)
       if (allocated(rborn))  deallocate (rborn)
       if (allocated(drb))  deallocate (drb)
       if (allocated(drbp))  deallocate (drbp)
@@ -850,7 +899,6 @@ c
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
-      allocate (rsolv(n))
       allocate (rborn(n))
       allocate (drb(n))
       allocate (drbp(n))
@@ -1177,7 +1225,6 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(rsolv))  deallocate (rsolv)
       if (allocated(shct))  deallocate (shct)
       if (allocated(udirs))  deallocate (udirs)
       if (allocated(udirps))  deallocate (udirps)
@@ -1185,7 +1232,6 @@ c
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
-      allocate (rsolv(n))
       allocate (shct(n))
       allocate (udirs(3,n))
       allocate (udirps(3,n))
@@ -1873,7 +1919,7 @@ c
       do i = 1, n
          rpmf(i) = 1.0d0
          atn = atomic(i)
-         if (atn .eq. 0) then 
+         if (atn .eq. 0) then
             rpmf(i) = 0.00d0
          else
             rpmf(i) = vdwrad(atn)

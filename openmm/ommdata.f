@@ -61,6 +61,7 @@ c
       use potent
       use restrn
       use sizes
+      use solpot
       use solute
       use stodyn
       use strbnd
@@ -179,9 +180,10 @@ c
      &                      afix,tfix,gfix,chir,use_basin,use_wall)
       call set_sizes_data (maxatm,maxtyp,maxclass,maxval,maxref,
      &                     maxgrp,maxres,maxfix)
+      call set_solpot_data (solvtyp,borntyp)
       call set_solute_data (doffset,p1,p2,p3,p4,p5,rsolv,asolv,rborn,
      &                      drb,drbp,drobc,gpol,shct,aobc,bobc,gobc,
-     &                      vsolv,wace,s2ace,uace,solvtyp,borntyp)
+     &                      vsolv,wace,s2ace,uace)
       call set_stodyn_data (friction,fgamma,use_sdarea)
       call set_strbnd_data (nstrbnd,isb,sbk)
       call set_strtor_data (nstrtor,ist,kst)

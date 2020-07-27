@@ -89,6 +89,7 @@ gfortran -c -O3 -ffast-math -fopenmp korbs.f
 gfortran -c -O3 -ffast-math -fopenmp kpitor.f
 gfortran -c -O3 -ffast-math -fopenmp kpolr.f
 gfortran -c -O3 -ffast-math -fopenmp krepl.f
+gfortran -c -O3 -ffast-math -fopenmp ksolut.f
 gfortran -c -O3 -ffast-math -fopenmp kstbnd.f
 gfortran -c -O3 -ffast-math -fopenmp ksttor.f
 gfortran -c -O3 -ffast-math -fopenmp ktorsn.f
@@ -153,6 +154,7 @@ gfortran -c -O3 -ffast-math -fopenmp scales.f
 gfortran -c -O3 -ffast-math -fopenmp sequen.f
 gfortran -c -O3 -ffast-math -fopenmp shunt.f
 gfortran -c -O3 -ffast-math -fopenmp socket.f
+gfortran -c -O3 -ffast-math -fopenmp solpot.f
 gfortran -c -O3 -ffast-math -fopenmp solute.f
 gfortran -c -O3 -ffast-math -fopenmp stodyn.f
 gfortran -c -O3 -ffast-math -fopenmp strbnd.f

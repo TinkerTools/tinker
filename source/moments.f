@@ -29,7 +29,7 @@ c
       use polar
       use potent
       use rigid
-      use solute
+      use solpot
       use units
       use usage
       implicit none

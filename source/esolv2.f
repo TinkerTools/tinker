@@ -19,7 +19,7 @@ c
 c
       subroutine esolv2 (i)
       use potent
-      use solute
+      use solpot
       use warp
       implicit none
       integer i
@@ -92,7 +92,7 @@ c
       use hessn
       use mpole
       use potent
-      use solute
+      use solpot
       implicit none
       integer i,j,k
       integer nlist

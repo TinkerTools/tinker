@@ -89,6 +89,7 @@ ifort -c -g -warn all -check all korbs.f
 ifort -c -g -warn all -check all kpitor.f
 ifort -c -g -warn all -check all kpolr.f
 ifort -c -g -warn all -check all krepl.f
+ifort -c -g -warn all -check all ksolut.f
 ifort -c -g -warn all -check all kstbnd.f
 ifort -c -g -warn all -check all ksttor.f
 ifort -c -g -warn all -check all ktorsn.f
@@ -153,6 +154,7 @@ ifort -c -g -warn all -check all scales.f
 ifort -c -g -warn all -check all sequen.f
 ifort -c -g -warn all -check all shunt.f
 ifort -c -g -warn all -check all socket.f
+ifort -c -g -warn all -check all solpot.f
 ifort -c -g -warn all -check all solute.f
 ifort -c -g -warn all -check all stodyn.f
 ifort -c -g -warn all -check all strbnd.f

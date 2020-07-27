@@ -58,6 +58,7 @@ c
       use iounit
       use math
       use pbstuf
+      use solpot
       use solute
       implicit none
       integer i,j,k,it,kt
@@ -439,6 +440,7 @@ c
       use couple
       use deriv
       use math
+      use solpot
       use solute
       use virial
       implicit none

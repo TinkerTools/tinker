@@ -25,6 +25,7 @@ c
       use limits
       use math
       use potent
+      use solpot
       use solute
       use warp
       implicit none

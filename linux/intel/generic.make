@@ -89,6 +89,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp korbs.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp kpitor.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp kpolr.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp krepl.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp ksolut.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp kstbnd.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp ksttor.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp ktorsn.f
@@ -153,6 +154,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp scales.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp sequen.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp shunt.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp socket.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp solpot.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp solute.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp stodyn.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp strbnd.f
