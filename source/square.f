@@ -74,9 +74,9 @@ c
       real*8 rftol,faketol
       real*8 xtemp,stepsz
       real*8 amu,sum,temp
-      real*8 xc(*)
       real*8 xlo(*)
       real*8 xhi(*)
+      real*8 xc(*)
       real*8 fc(*)
       real*8 gc(*)
       real*8, allocatable :: xp(:)
@@ -136,6 +136,10 @@ c
             read (string,*,err=10,end=10)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then
             read (string,*,err=10,end=10)  maxiter
+         else if (keyword(1:8) .eq. 'STEPMAX ') then
+            read (string,*,err=10,end=10)  stpmax
+         else if (keyword(1:8) .eq. 'STEPMIN ') then
+            read (string,*,err=10,end=10)  stpmin
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
@@ -352,6 +356,10 @@ c
      &                  stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,
      &                  fpprev,bigstp,ncalls,xlo,xhi,nactive,stpmin,
      &                  rftol,faketol,rsdvalue)
+c
+c     override trust region expansion to accept small steps
+c
+            if (icode .eq. 5)  icode = 0
          end do
          if (icode .eq. 1)  done = .true.
 c
@@ -449,7 +457,7 @@ c
          end if
 c
 c     check stopping criteria at the new point; test the absolute
-c     function value, the gradient norm and step for termination
+c     function value, gradient norm and step norm for termination
 c
          if (fcnorm .le. fctmin)  done = .true.
          if (ganorm .le. grdmin)  done = .true.
@@ -458,7 +466,7 @@ c
             temp = max(abs(xc(j)),1.0d0/xscale(j))
             stpnorm = stpnorm + (sc(j)/temp)**2
          end do
-         stpnorm = sqrt(stpnorm/n)
+         stpnorm = sqrt(stpnorm/dble(n))
          if (stpnorm .le. stpmin)  done = .true.
 c
 c     check for inactive variables that can be made active; in a true
@@ -1063,7 +1071,7 @@ c
             end if
          end if
 c
-c     fpnorm is sufficiently small; the step is acceptable compute
+c     fpnorm is sufficiently small; the step is acceptable, compute
 c     the predicted reduction as predict = g(T)*s + (1/2)*s(T)*h*s
 c     with h = p * r**t * r * p**t
 c

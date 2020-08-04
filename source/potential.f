@@ -96,20 +96,20 @@ c
 c     initialize target molecular dipole and quadrupole values
 c
       use_dpl = .false.
-      use_qdp = .false.
+      use_qpl = .false.
       fit_mpl = .true.
       fit_dpl = .true.
-      fit_qdp = .true.
+      fit_qpl = .true.
       do i = 1, maxref
          xdpl0(i) = 0.0d0
          ydpl0(i) = 0.0d0
          zdpl0(i) = 0.0d0
-         xxqdp0(i) = 0.0d0
-         xyqdp0(i) = 0.0d0
-         xzqdp0(i) = 0.0d0
-         yyqdp0(i) = 0.0d0
-         yzqdp0(i) = 0.0d0
-         zzqdp0(i) = 0.0d0
+         xxqpl0(i) = 0.0d0
+         xyqpl0(i) = 0.0d0
+         xzqpl0(i) = 0.0d0
+         yyqpl0(i) = 0.0d0
+         yzqpl0(i) = 0.0d0
+         zzqpl0(i) = 0.0d0
       end do
 c
 c     find electrostatic potential manipulation to perform
@@ -305,7 +305,7 @@ c
          else if (keyword(1:11) .eq. 'FIX-DIPOLE ') then
             fit_dpl = .false.
          else if (keyword(1:15) .eq. 'FIX-QUADRUPOLE ') then
-            fit_qdp = .false.
+            fit_qpl = .false.
          else if (keyword(1:14) .eq. 'TARGET-DIPOLE ') then
             use_dpl = .true.
             k = 1
@@ -315,16 +315,16 @@ c
             ydpl0(k) = y0
             zdpl0(k) = z0
          else if (keyword(1:18) .eq. 'TARGET-QUADRUPOLE ') then
-            use_qdp = .true.
+            use_qpl = .true.
             k = 1
             read (string,*,err=220,end=220)  xx0,xy0,xz0,yy0,yz0,zz0,k
   220       continue
-            xxqdp0(k) = xx0
-            xyqdp0(k) = xy0
-            xzqdp0(k) = xz0
-            yyqdp0(k) = yy0
-            yzqdp0(k) = yz0
-            zzqdp0(k) = zz0
+            xxqpl0(k) = xx0
+            xyqpl0(k) = xy0
+            xzqpl0(k) = xz0
+            yyqpl0(k) = yy0
+            yzqpl0(k) = yz0
+            zzqpl0(k) = zz0
          end if
       end do
 c
@@ -630,7 +630,11 @@ c
             call setelect
             call prmvar (nvar,xx)
             nresid = nresid + npgrid(j)
+            if (fit_mpl)  nresid = nresid + 1
+            if (use_dpl)  nresid = nresid + 3
+            if (use_qpl)  nresid = nresid + 5
          end do
+         nresid = nresid + nvar
          do j = 1, nvar
             fit0(j) = xx(j)
             xlo(j) = xx(j) - 1000.0d0
@@ -639,7 +643,6 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         nresid = nresid + 10*nconf + nvar
          allocate (gc(nvar))
          allocate (presid(nresid))
          allocate (pjac(nresid,nvar))
@@ -1219,8 +1222,8 @@ c
       integer nresid
       integer iresid
       real*8 xi,yi,zi,pot
-      real*8 tscale
-      real*8 cscale
+      real*8 tscale,cscale
+      real*8 rconf,ratio
       real*8 rscale
       real*8 xx(*)
       real*8 resid(*)
@@ -1237,7 +1240,11 @@ c
       end do
       tscale = 300.0d0
       cscale = 10000.0d0
-      rscale = 0.1d0 * sqrt(resp) * (dble(npoint)/dble(nvar))
+      rconf = dble(nconf)
+      ratio = dble(npoint) / dble(nvar*nconf)
+c     rscale = 1.0d0 * sqrt(resp) * rconf * sqrt(ratio)
+c     rscale = 0.1d0 * sqrt(resp) * rconf * ratio
+      rscale = 0.006d0 * sqrt(resp) * rconf * sqrt(ratio**3)
 c
 c     initialize counters for parameters and residual components
 c
@@ -1265,7 +1272,7 @@ c
 c     get residuals due to potential error over grid points
 c
 !$OMP    PARALLEL default(private)
-!$OMP&    shared(j,npgrid,pgrid,epot,iresid,resid)
+!$OMP&    shared(j,npgrid,pgrid,epot,iresid,resid,rconf)
 !$OMP    DO
          do i = 1, npgrid(j)
             xi = pgrid(1,i,j)
@@ -1279,29 +1286,33 @@ c
 !$OMP    END PARALLEL
          iresid = iresid + npgrid(j)
 c
-c     get residuals from dipole and quadrupole target violations
+c     find moments if they contribute to the overall residue
 c
-         call momfull
-         if (use_dpl) then
-            resid(iresid+1) = (xdpl-xdpl0(j))*tscale
-            resid(iresid+2) = (ydpl-ydpl0(j))*tscale
-            resid(iresid+3) = (zdpl-zdpl0(j))*tscale
-         end if
-         if (use_qdp) then
-            resid(iresid+4) = (xxqdp-xxqdp0(j))*tscale
-            resid(iresid+5) = (xyqdp-xyqdp0(j))*tscale
-            resid(iresid+6) = (xzqdp-xzqdp0(j))*tscale
-            resid(iresid+7) = (yyqdp-yyqdp0(j))*tscale
-            resid(iresid+8) = (yzqdp-yzqdp0(j))*tscale
-            resid(iresid+9) = (zzqdp-zzqdp0(j))*tscale
-         end if
-         iresid = iresid + 9
+         if (fit_mpl .or. use_dpl .or. use_qpl)  call momfull
 c
 c     get residual due to total molecular charge restraint
 c
          if (fit_mpl) then
             iresid = iresid + 1
             resid(iresid) = (netchg-dble(nint(netchg)))*cscale
+         end if
+c
+c     get residuals from dipole and quadrupole target violations
+c
+         if (use_dpl) then
+            resid(iresid+1) = (xdpl-xdpl0(j))*tscale
+            resid(iresid+2) = (ydpl-ydpl0(j))*tscale
+            resid(iresid+3) = (zdpl-zdpl0(j))*tscale
+            iresid = iresid + 3
+         end if
+         if (use_qpl) then
+            resid(iresid+1) = (xxqpl-xxqpl0(j))*tscale
+            resid(iresid+2) = (xyqpl-xyqpl0(j))*tscale
+            resid(iresid+3) = (xzqpl-xzqpl0(j))*tscale
+            resid(iresid+4) = (yyqpl-yyqpl0(j))*tscale
+            resid(iresid+5) = (yzqpl-yzqpl0(j))*tscale
+            resid(iresid+6) = (zzqpl-zzqpl0(j))*tscale
+            iresid = iresid + 6
          end if
       end do
 c
@@ -1402,7 +1413,7 @@ c
                nvar = nvar + 1
                pole(4,i) = dterm * xx(nvar)
             end if
-            if (fit_qdp .and. pole(5,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(5,i).ne.0.0d0) then
                if (pole(5,i).ne.pole(9,i) .and.
      &             pole(5,i).ne.pole(13,i)) then
                   nvar = nvar + 1
@@ -1413,17 +1424,17 @@ c
                   end if
                end if
             end if
-            if (fit_qdp .and. pole(6,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
                pole(6,i) = qterm * xx(nvar)
                pole(8,i) = qterm * xx(nvar)
             end if
-            if (fit_qdp .and. pole(7,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
                pole(7,i) = qterm * xx(nvar)
                pole(11,i) = qterm * xx(nvar)
             end if
-            if (fit_qdp .and. pole(9,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(9,i).ne.0.0d0) then
                if (pole(9,i).ne.pole(5,i) .and.
      &             pole(9,i).ne.pole(13,i)) then
                   nvar = nvar + 1
@@ -1434,12 +1445,12 @@ c
                   end if
                end if
             end if
-            if (fit_qdp .and. pole(10,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
                pole(10,i) = qterm * xx(nvar)
                pole(12,i) = qterm * xx(nvar)
             end if
-            if (fit_qdp .and. pole(13,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(13,i).ne.0.0d0) then
                if (pole(5,i) .eq. pole(9,i)) then
                   nvar = nvar + 1
                   pole(13,i) = qterm * xx(nvar)
@@ -1696,7 +1707,7 @@ c
                write (iout,160)  it,'Z-Dipole',dterm*pole(4,i)
   160          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
-            if (fit_qdp .and. pole(5,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(5,i).ne.0.0d0) then
                if (pole(5,i).ne.pole(9,i) .and.
      &             pole(5,i).ne.pole(13,i)) then
                   nvar = nvar + 1
@@ -1711,7 +1722,7 @@ c
                write (iout,190)  it,'XX-Quad ',qterm*pole(5,i)
   190          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
-            if (fit_qdp .and. pole(6,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = qterm * pole(6,i)
                write (iout,200)  nvar,it,'XY-Quad ',xx(nvar)
@@ -1720,7 +1731,7 @@ c
                write (iout,210)  it,'XY-Quad ',qterm*pole(6,i)
   210          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
-            if (fit_qdp .and. pole(7,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = qterm * pole(7,i)
                write (iout,220)  nvar,it,'XZ-Quad ',xx(nvar)
@@ -1729,7 +1740,7 @@ c
                write (iout,230)  it,'XZ-Quad ',qterm*pole(7,i)
   230          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
-            if (fit_qdp .and. pole(9,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(9,i).ne.0.0d0) then
                if (pole(9,i).ne.pole(5,i) .and.
      &             pole(9,i).ne.pole(13,i)) then
                   nvar = nvar + 1
@@ -1744,7 +1755,7 @@ c
                write (iout,260)  it,'YY-Quad ',qterm*pole(9,i)
   260          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
-            if (fit_qdp .and. pole(10,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
                xx(nvar) = qterm * pole(10,i)
                write (iout,270)  nvar,it,'YZ-Quad ',xx(nvar)
@@ -1753,7 +1764,7 @@ c
                write (iout,280)  it,'YZ-Quad ',qterm*pole(10,i)
   280          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
-            if (fit_qdp .and. pole(13,i).ne.0.0d0) then
+            if (fit_qpl .and. pole(13,i).ne.0.0d0) then
                if (pole(5,i) .eq. pole(9,i)) then
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(13,i)
@@ -2167,7 +2178,7 @@ c
                if (iy .ne. 0)  iy = type(iy)
                if (polaxe(i) .eq. 'None') then
                   write (ikey,60)  it,pole(1,i)
-   60             format ('multipole',27x,f11.5)
+   60             format ('multipole',1x,i5,21x,f11.5)
                else if (polaxe(i) .eq. 'Z-Only') then
                   write (ikey,70)  it,iz,pole(1,i)
    70             format ('multipole',1x,2i5,16x,f11.5)

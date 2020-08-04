@@ -109,6 +109,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use shunt
       use usage
       implicit none
@@ -134,6 +135,7 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -178,10 +180,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -204,6 +207,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -257,6 +261,16 @@ c
      &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        e = e * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        e = e * vlambda
+                     end if
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -337,10 +351,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -363,6 +378,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -417,6 +433,16 @@ c
      &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     if (muti .or. mutk) then
+                        if (vcouple .eq. 1) then
+                           e = e * vlambda
+                        else if (.not.muti .or. .not.mutk) then
+                           e = e * vlambda
+                        end if
+                     end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -527,6 +553,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use neigh
       use shunt
       use usage
@@ -552,6 +579,7 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -590,8 +618,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,off2,cut2,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,vcouple,
+!$OMP& vlambda,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
 c
@@ -601,10 +629,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -628,6 +657,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -678,6 +708,16 @@ c
      &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        e = e * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        e = e * vlambda
+                     end if
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -911,10 +951,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1065,10 +1105,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1383,10 +1423,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c

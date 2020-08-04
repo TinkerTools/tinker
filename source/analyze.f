@@ -751,12 +751,12 @@ c
       write (iout,20)  netdpl,xdpl,ydpl,zdpl
    20 format (/,' Dipole Moment Magnitude :',10x,f13.3,' Debye',
      &        //,' Dipole X,Y,Z-Components :',10x,3f13.3)
-      write (iout,30)  xxqdp,xyqdp,xzqdp,yxqdp,yyqdp,
-     &                 yzqdp,zxqdp,zyqdp,zzqdp
+      write (iout,30)  xxqpl,xyqpl,xzqpl,yxqpl,yyqpl,
+     &                 yzqpl,zxqpl,zyqpl,zzqpl
    30 format (/,' Quadrupole Moment Tensor :',9x,3f13.3,
      &        /,6x,'(Buckinghams)',17x,3f13.3,
      &        /,36x,3f13.3)
-      write (iout,40)  netqdp(1),netqdp(2),netqdp(3)
+      write (iout,40)  netqpl(1),netqpl(2),netqpl(3)
    40 format (/,' Principal Axes Quadrupole :',8x,3f13.3)
       if (dielec .ne. 1.0d0) then
          write (iout,50)  dielec
