@@ -244,6 +244,7 @@ c
       real*8 geometry
       logical exist,query
       logical change
+      logical noinvert
       logical pyramid
       character*240 record
       character*240 string
@@ -264,6 +265,10 @@ c
          xaxis(i) = 0
          yaxis(i) = 0
       end do
+c
+c     set true if pyramidal trivalent nitrogen cannot invert
+c
+      noinvert = .false.
 c
 c     assign the local frame definition for an isolated atom
 c
@@ -332,6 +337,7 @@ c
                xaxis(i) = 0
                yaxis(i) = 0
                pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
                if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = '3-Fold'
                   zaxis(i) = ia
@@ -364,6 +370,7 @@ c
                xaxis(i) = 0
                yaxis(i) = 0
                pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
                if (mbc .eq. ib) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
@@ -390,6 +397,7 @@ c
                xaxis(i) = 0
                yaxis(i) = 0
                pyramid = (abs(geometry(ib,i,ia,ic)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
                if (mac .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
@@ -416,6 +424,7 @@ c
                xaxis(i) = 0
                yaxis(i) = 0
                pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
                if (mab .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
