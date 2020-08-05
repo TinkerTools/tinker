@@ -13,19 +13,19 @@ c     ##################################################################
 c
 c
 c     "square" is a nonlinear least squares routine derived from the
-c     IMSL BCLSF routine and the MINPACK LMDER routine; the Jacobian
-c     is estimated by finite differences and bounds can be specified
-c     for the variables to be refined
+c     IMSL BCLSF and MINPACK LMDER routines; the Jacobian is estimated
+c     by finite differences and bounds are specified for the variables
+c     to be refined
 c
 c     literature references:
-c
-c     B. S. Garbow, K. E. Hillstrom and J. J. More, "MINPACK Subroutine
-c     LMDER", Argonne National Laboratory, March 1980
 c
 c     "BCLSF: Solve Nonlinear Least Squares Problems Subject to Bounds
 c     on the Variables Using a Modified Levenberg-Marquardt Algorithm
 c     and a Finite-Difference Jacobian", IMSL Fortran Library V7.0,
 c     Rogue Wave Software, October 2010
+c
+c     B. S. Garbow, K. E. Hillstrom and J. J. More, "MINPACK Subroutine
+c     LMDER", Argonne National Laboratory, March 1980
 c
 c     arguments and variables:
 c
@@ -356,10 +356,6 @@ c
      &                  stpmax,delta,icode,xp,xpprev,fc,fp,fpnorm,
      &                  fpprev,bigstp,ncalls,xlo,xhi,nactive,stpmin,
      &                  rftol,faketol,rsdvalue)
-c
-c     override trust region expansion to accept small steps
-c
-            if (icode .eq. 5)  icode = 0
          end do
          if (icode .eq. 1)  done = .true.
 c
@@ -471,7 +467,7 @@ c
 c
 c     check for inactive variables that can be made active; in a true
 c     active set strategy, variables are released one at a time at a
-c     minimum of the current active set (via if done and goto's below)
+c     minimum of the current active set (via goto statements below)
 c
 c        if (done) then
             if (nactive .ne. n) then
@@ -496,16 +492,16 @@ c     if still done, then normal termination has been achieved
 c
          if (done) then
             write (iout,100)
-  100       format (/,' SQUARE  --  Normal Termination of Least Squares'
-     &)
+  100       format (/,' SQUARE  --  Normal Termination of',
+     &                 ' Least Squares')
 c
 c     check the limit on the number of iterations
 c
          else if (niter .ge. maxiter) then
             done = .true.
             write (iout,110)
-  110       format (/,' SQUARE  --  Incomplete Convergence due to',
-     &                 ' IterLimit')
+  110       format (/,' SQUARE  --  Incomplete Convergence due',
+     &                 ' to IterLimit')
 c
 c     check for termination due to relative function convergence
 c
@@ -585,8 +581,8 @@ c     ################################################################
 c
 c
 c     "lmstep" computes a Levenberg-Marquardt step during a nonlinear
-c     least squares calculation using ideas from the MINPACK LMPAR
-c     routine and the internal doubling strategy of Dennis and Schnabel
+c     least squares based on the IMSL U7LSF and MINPACK LMPAR routines
+c     and the internal doubling strategy of Dennis and Schnabel
 c
 c     literature reference:
 c
@@ -648,8 +644,8 @@ c
       logical first,gauss
       logical done
       save deltap,nsing
-      save phi,phip
-      integer kiter
+      save gnleng,sgnorm
+      save phi,phip,phipi
 c
 c
 c     set minima for floating point magnitude and spacing
@@ -887,8 +883,8 @@ c     ##############################################################
 c
 c
 c     "trust" updates the model trust region for a nonlinear least
-c     squares calculation based on ideas found in NL2SOL and Dennis
-c     and Schnabel's book
+c     squares calculation based on the IMSL B4LSF routine and the
+c     NL2SOL method of Dennis and colleagues
 c
 c     literature reference:
 c
@@ -1083,7 +1079,7 @@ c
             do j = i, nactive
                temp = temp + sa(k)*a(i,j)
             end do
-            predict = predict + 0.5d0*temp**2
+            predict = predict + 0.5d0*temp*temp
          end do
          ltemp = (abs(predict-reduce) .le. 0.1d0*abs(reduce))
 c

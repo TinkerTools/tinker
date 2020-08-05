@@ -70,19 +70,20 @@
      4     -160.0436     0.2895      0.2293   0.0318      10   TruncNewt      9
      5     -160.0509     0.0464      0.0073   0.0111      13   TruncNewt     13
      6     -160.0512     0.0010      0.0002   0.0024      19   TruncNewt     20
-     7     -160.0512     0.0065      0.0000   0.0150      25    NegCurve     27
-     8     -160.0512     0.0288      0.0001   0.0243      35    NegCurve     40
-     9     -160.0514     0.0170      0.0002   0.0383      46    NegCurve     54
-    10     -160.0516     0.0224      0.0002   0.0253      57    NegCurve     68
-    11     -160.0522     0.0228      0.0006   0.1449      96    NegCurve    111
-    12     -160.0523     0.0005      0.0001   0.0016     102   TruncNewt    118
-    13     -160.0523     0.0000      0.0000   0.0496     152   TruncNewt    169
+     7     -160.0512     0.0064      0.0000   0.0146      25    NegCurve     27
+     8     -160.0512     0.0305      0.0001   0.0257      35    NegCurve     40
+     9     -160.0514     0.0159      0.0002   0.0354      46    NegCurve     54
+    10     -160.0516     0.0236      0.0002   0.0224      57    NegCurve     68
+    11     -160.0521     0.0319      0.0005   0.1268      69    NegCurve     83
+    12     -160.0523     0.0006      0.0001   0.0014      75   TruncNewt     90
+    13     -160.0523     0.0052      0.0000   0.1399     106    NegCurve    123
+    14     -160.0523     0.0000      0.0000   0.0064     131   TruncNewt    149
 
  TNCG  --  Normal Termination due to SmallGrad
 
  Final Function Value :         -160.0523
- Final RMS Gradient :          0.2445D-04
- Final Gradient Norm :         0.1198D-03
+ Final RMS Gradient :          0.1381D-04
+ Final Gradient Norm :         0.6766D-04
 
      ######################################################################
    ##########################################################################
@@ -128,92 +129,92 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0       43.0031     910.4840     910.4840         2         3
+     0       43.0026     910.4820     910.4820         2         3
 
  Parameters and Scaled Derivatives at Iteration   0 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.6612    -1282.2208
-   ( 2)  Well Depth          Atom Type   178          0.2100     -117.7799
+   ( 1)  Atomic Radius       Atom Type   178          1.6612    -1282.2180
+   ( 2)  Well Depth          Atom Type   178          0.2100     -117.7796
 
  Residual Error Function Values at Iteration   0 :
 
-   ( 1)  Force a-Axis          Structure   1         -1.5820
+   ( 1)  Force a-Axis          Structure   1         -1.5819
    ( 2)  Force b-Axis          Structure   1          0.4037
-   ( 3)  Force c-Axis          Structure   1          3.3402
-   ( 4)  Force Alpha           Structure   1         -0.0000
+   ( 3)  Force c-Axis          Structure   1          3.3401
+   ( 4)  Force Alpha           Structure   1          0.0000
    ( 5)  Force Beta            Structure   1          8.4912
-   ( 6)  Force Gamma           Structure   1         -0.0000
+   ( 6)  Force Gamma           Structure   1          0.0000
    ( 7)  Lattice Energy        Structure   1          0.2881
 
-     1       12.3738     113.7988     113.7988         2         6
+     1       12.3734     113.7987     113.7987         2         6
 
  Parameters and Scaled Derivatives at Iteration   1 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.6769     -157.3969
+   ( 1)  Atomic Radius       Atom Type   178          1.6769     -157.3967
    ( 2)  Well Depth          Atom Type   178          0.2804      -33.5644
 
  Residual Error Function Values at Iteration   1 :
 
    ( 1)  Force a-Axis          Structure   1         -2.5201
-   ( 2)  Force b-Axis          Structure   1         -2.4526
+   ( 2)  Force b-Axis          Structure   1         -2.4525
    ( 3)  Force c-Axis          Structure   1          1.4018
-   ( 4)  Force Alpha           Structure   1         -0.0000
-   ( 5)  Force Beta            Structure   1          3.2163
-   ( 6)  Force Gamma           Structure   1         -0.0000
-   ( 7)  Lattice Energy        Structure   1         -0.2690
+   ( 4)  Force Alpha           Structure   1          0.0000
+   ( 5)  Force Beta            Structure   1          3.2162
+   ( 6)  Force Gamma           Structure   1          0.0000
+   ( 7)  Lattice Energy        Structure   1         -0.2689
 
-     2       12.3456     361.8153     509.7409         1         9
+     2       12.3452     361.8152     509.7407         1         9
 
  Parameters and Scaled Derivatives at Iteration   2 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.6543     -509.7409
+   ( 1)  Atomic Radius       Atom Type   178          1.6543     -509.7407
    ( 2)  Well Depth          Atom Type   178          0.3150      -44.5518
 
  Residual Error Function Values at Iteration   2 :
 
    ( 1)  Force a-Axis          Structure   1         -1.5302
-   ( 2)  Force b-Axis          Structure   1         -1.6701
-   ( 3)  Force c-Axis          Structure   1          2.1680
-   ( 4)  Force Alpha           Structure   1         -0.0000
+   ( 2)  Force b-Axis          Structure   1         -1.6700
+   ( 3)  Force c-Axis          Structure   1          2.1679
+   ( 4)  Force Alpha           Structure   1          0.0000
    ( 5)  Force Beta            Structure   1          3.6069
-   ( 6)  Force Gamma           Structure   1         -0.0000
+   ( 6)  Force Gamma           Structure   1          0.0000
    ( 7)  Lattice Energy        Structure   1         -1.3602
 
-     3        9.9500      17.2272      20.9554         1        12
+     3        9.9496      17.2273      20.9555         1        12
 
  Parameters and Scaled Derivatives at Iteration   3 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.6701       20.9554
+   ( 1)  Atomic Radius       Atom Type   178          1.6701       20.9555
    ( 2)  Well Depth          Atom Type   178          0.3150      -12.4268
 
  Residual Error Function Values at Iteration   3 :
 
    ( 1)  Force a-Axis          Structure   1         -2.2883
-   ( 2)  Force b-Axis          Structure   1         -2.7946
-   ( 3)  Force c-Axis          Structure   1          1.2807
-   ( 4)  Force Alpha           Structure   1         -0.0000
+   ( 2)  Force b-Axis          Structure   1         -2.7945
+   ( 3)  Force c-Axis          Structure   1          1.2806
+   ( 4)  Force Alpha           Structure   1          0.0000
    ( 5)  Force Beta            Structure   1          2.0882
-   ( 6)  Force Gamma           Structure   1         -0.0000
+   ( 6)  Force Gamma           Structure   1          0.0000
    ( 7)  Lattice Energy        Structure   1         -0.9236
 
-     4        9.9465       9.6989       0.1759         1        15
+     4        9.9460       9.6990       0.1759         1        15
 
  Parameters and Scaled Derivatives at Iteration   4 :
 
    ( 1)  Atomic Radius       Atom Type   178          1.6695       -0.1759
-   ( 2)  Well Depth          Atom Type   178          0.3150      -13.7152
+   ( 2)  Well Depth          Atom Type   178          0.3150      -13.7153
 
  Residual Error Function Values at Iteration   4 :
 
    ( 1)  Force a-Axis          Structure   1         -2.2596
-   ( 2)  Force b-Axis          Structure   1         -2.7525
-   ( 3)  Force c-Axis          Structure   1          1.3140
-   ( 4)  Force Alpha           Structure   1         -0.0000
-   ( 5)  Force Beta            Structure   1          2.1448
-   ( 6)  Force Gamma           Structure   1         -0.0000
+   ( 2)  Force b-Axis          Structure   1         -2.7524
+   ( 3)  Force c-Axis          Structure   1          1.3139
+   ( 4)  Force Alpha           Structure   1          0.0000
+   ( 5)  Force Beta            Structure   1          2.1447
+   ( 6)  Force Gamma           Structure   1          0.0000
    ( 7)  Lattice Energy        Structure   1         -0.9403
 
-     5        9.9465       9.6905       0.0017         1        18
+     5        9.9460       9.6905       0.0017         1        18
 
  SQUARE  --  Normal Termination of Least Squares
 
@@ -224,10 +225,10 @@
 
  Final Residual Error Function Values :
 
-   ( 1)  Force a-Axis          Structure   1         -2.2599
-   ( 2)  Force b-Axis          Structure   1         -2.7529
-   ( 3)  Force c-Axis          Structure   1          1.3137
-   ( 4)  Force Alpha           Structure   1         -0.0000
-   ( 5)  Force Beta            Structure   1          2.1443
-   ( 6)  Force Gamma           Structure   1         -0.0000
+   ( 1)  Force a-Axis          Structure   1         -2.2598
+   ( 2)  Force b-Axis          Structure   1         -2.7528
+   ( 3)  Force c-Axis          Structure   1          1.3136
+   ( 4)  Force Alpha           Structure   1          0.0000
+   ( 5)  Force Beta            Structure   1          2.1442
+   ( 6)  Force Gamma           Structure   1          0.0000
    ( 7)  Lattice Energy        Structure   1         -0.9402

@@ -66,10 +66,9 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0      621.1492     573.4085     573.4085         8         9
-     1      256.3622     176.7609     176.7609         8        18
-     2      212.1924      33.0067      33.0067         8        27
-     3      190.1350       0.0000       0.0000         8        36
+     0      621.1492     573.4084     573.4084         8         9
+     1      294.7746     205.5944     205.5944         8        18
+     2      213.6779       0.0000       0.0000         8        27
 
  SQUARE  --  Normal Termination of Least Squares
 
@@ -80,40 +79,40 @@
     --              1             Monopole          -0.51966          X
     --              1             X-Dipole           0.00000          X
     --              1             Y-Dipole           0.00000          X
-     1              1             Z-Dipole           0.12673
-     2              1             XX-Quad            0.38780
+     1              1             Z-Dipole           0.12828
+     2              1             XX-Quad            0.38372
     --              1             XY-Quad            0.00000          X
     --              1             XZ-Quad            0.00000          X
-     3              1             YY-Quad           -0.51270
+     3              1             YY-Quad           -0.49549
     --              1             YZ-Quad            0.00000          X
-    --              1             ZZ-Quad            0.12490
+    --              1             ZZ-Quad            0.11177
     --              2             Monopole           0.25983          X
-     4              2             X-Dipole          -0.06207
+     4              2             X-Dipole          -0.05974
     --              2             Y-Dipole           0.00000          X
-     5              2             Z-Dipole          -0.10070
-     6              2             XX-Quad            0.03703
+     5              2             Z-Dipole          -0.09653
+     6              2             XX-Quad            0.03632
     --              2             XY-Quad            0.00000          X
-     7              2             XZ-Quad           -0.02264
-     8              2             YY-Quad           -0.06674
+     7              2             XZ-Quad           -0.01707
+     8              2             YY-Quad           -0.08020
     --              2             YZ-Quad            0.00000          X
-    --              2             ZZ-Quad            0.02971
+    --              2             ZZ-Quad            0.04388
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
 
    Structure   Atom      Points      Potential        Target        RMS Diff
 
-        1        1        1887        -9.2845        -9.1967         0.2914
-        1        2        1237         6.9119         7.0521         0.2504
-        1        3        1233         6.9047         7.0503         0.2635
+        1        1        1887        -9.2779        -9.1967         0.2961
+        1        2        1237         6.9058         7.0521         0.2616
+        1        3        1233         6.8984         7.0503         0.2750
 
  Electrostatic Potential over all Grid Points :
 
- Average Potential Value for Model :                 -0.1048
- Average Potential Magnitude for Model :              8.1461
+ Average Potential Value for Model :                 -0.1054
+ Average Potential Magnitude for Model :              8.1413
  Average Potential Value for Target :                 0.0143
  Average Potential Magnitude for Target :             8.1777
 
- Average Signed Potential Difference :               -0.1190
- Average Unsigned Potential Difference :              0.1628
- Root Mean Square Potential Difference :              0.2725
+ Average Signed Potential Difference :               -0.1197
+ Average Unsigned Potential Difference :              0.1708
+ Root Mean Square Potential Difference :              0.2807
