@@ -398,7 +398,7 @@ c
                   xaxis(i) = ic
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
-                  xaxis(i) = ib
+                  xaxis(i) = ia
                else if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
@@ -424,7 +424,7 @@ c
                   xaxis(i) = ib
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
-                  xaxis(i) = ib
+                  xaxis(i) = ia
                else if (ki .eq. 7) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
