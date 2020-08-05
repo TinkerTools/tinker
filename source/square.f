@@ -909,20 +909,20 @@ c     xscale    vector containing the diagonal scaling matrix for x
 c     gauss     flag set to true when the Gauss-Newton step is taken
 c     stpmax    maximum allowable step size
 c     delta     trust region radius with value retained between calls
-c     icode     return code values, set upon exit
-c                 0  means xp accepted as next iterate, delta
-c                      is trust region for next iteration
-c                 1  means the algorithm was unable to find a
-c                      satisfactory xp sufficiently distinct from xc
-c                 2  means both the scaled actual and predicted
-c                      function reductions are smaller than rftol
-c                 3  means that false convergence is detected
-c                 4  means fpnorm is too large, current iteration is
-c                      continued with a new, reduced trust region
-c                 5  means fpnorm is sufficiently small, but the
-c                      chance of taking a longer successful step
-c                      seems good that the current iteration is to
-c                      be continued with a new, doubled trust region
+c     icode     return code values, set upon exit:
+c                 0  xp is accepted as the next iterate, and delta
+c                      is the trust region for next iteration
+c                 1  the algorithm was unable to find a satisfactory
+c                      xp sufficiently distinct from xc
+c                 2  both the scaled actual and predicted function
+c                      reductions are smaller than rftol
+c                 3  false convergence is detected
+c                 4  fpnorm is too large, so the current iteration
+c                      is continued with a new, reduced trust region
+c                 5  fpnorm is sufficiently small, but the chance of
+c                      taking a longer successful step seems good,
+c                      so the current iteration is to be continued
+c                      with a new, doubled trust region
 c     xp        vector of length n containing the new iterate
 c     xpprev    vector with the value of xp at the  previous call
 c                 within this iteration
