@@ -505,36 +505,6 @@ c
                else
                   call frame13 (i,id)
                end if
-            else if (mab.eq.0 .and. mac.eq.ia .and. mad.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = 0
-            else if (mac.eq.0 .and. mab.eq.ia .and. mad.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (mad.eq.0 .and. mab.eq.ia .and. mac.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = id
-               yaxis(i) = 0
-            else if (mbc.eq.0 .and. mab.eq.ib .and. mbd.eq.ib) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (mbd.eq.0 .and. mab.eq.ib .and. mbc.eq.ib) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = id
-               yaxis(i) = 0
-            else if (mcd.eq.0 .and. mac.eq.ic .and. mbc.eq.ic) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ic
-               xaxis(i) = id
-               yaxis(i) = 0
             else if (mbc.eq.0 .and. mbd.eq.0 .and. mcd.eq.0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ia
@@ -559,6 +529,72 @@ c
                xaxis(i) = 0
                yaxis(i) = 0
                call frame13 (i,id)
+            else if (mab.eq.0 .and. mcd.eq.0) then
+               if (mac .eq. ia) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = 0
+               else if (mac .eq. ic) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ic
+                  xaxis(i) = id
+                  yaxis(i) = 0
+               end if
+            else if (mac.eq.0 .and. mbd.eq.0) then
+               if (mab .eq. ia) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = ic
+                  yaxis(i) = 0
+               else if (mab .eq. ib) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ib
+                  xaxis(i) = id
+                  yaxis(i) = 0
+               end if
+            else if (mad.eq.0 .and. mbc.eq.0) then
+               if (mab .eq. ia) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = id
+                  yaxis(i) = 0
+               else if (mab .eq. ib) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ib
+                  xaxis(i) = ic
+                  yaxis(i) = 0
+               end if
+            else if (mab .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mcd
+               xaxis(i) = ia
+               yaxis(i) = ib
+            else if (mac .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mbd
+               xaxis(i) = ia
+               yaxis(i) = ic
+            else if (mad .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mbc
+               xaxis(i) = ia
+               yaxis(i) = id
+            else if (mbc .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mad
+               xaxis(i) = ib
+               yaxis(i) = ic
+            else if (mbd .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mac
+               xaxis(i) = ib
+               yaxis(i) = id
+            else if (mcd .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mab
+               xaxis(i) = ic
+               yaxis(i) = id
             end if
          end if
       end do
