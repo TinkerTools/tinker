@@ -236,10 +236,11 @@ c
       implicit none
       integer i,j,m
       integer ia,ib,ic,id
-      integer ka,kb,kc
-      integer ki,mabc
-      integer mab,mac,mad
-      integer mbc,mbd,mcd
+      integer ka,kb,kc,ki
+      integer mab,mac,mbc
+      integer mad,mbd,mcd
+      integer mabc,mabd
+      integer macd,mbcd
       integer priority
       real*8 geometry
       logical exist,query
@@ -327,10 +328,10 @@ c
             ka = atomic(ia)
             kb = atomic(ib)
             kc = atomic(ic)
-            mabc = priority (i,ia,ib,ic)
             mab = priority (i,ia,ib,0)
             mac = priority (i,ia,ic,0)
             mbc = priority (i,ib,ic,0)
+            mabc = priority (i,ia,ib,ic)
             if (mabc .eq. 0) then
                polaxe(i) = 'None'
                zaxis(i) = 0
@@ -456,74 +457,74 @@ c
             id = i12(4,i)
             mab = priority (i,ia,ib,0)
             mac = priority (i,ia,ic,0)
-            mad = priority (i,ia,id,0)
             mbc = priority (i,ib,ic,0)
+            mad = priority (i,ia,id,0)
             mbd = priority (i,ib,id,0)
             mcd = priority (i,ic,id,0)
-            if (mab.eq.0 .and. mac.eq.0 .and. mad.eq.0) then
+            mabc = priority (i,ia,ib,ic)
+            mabd = priority (i,ia,ib,id)
+            macd = priority (i,ia,ic,id)
+            mbcd = priority (i,ib,ic,id)
+            if (mabc.eq.0 .and. mbcd.eq.0) then
                polaxe(i) = 'None'
                zaxis(i) = 0
                xaxis(i) = 0
                yaxis(i) = 0
-            else if (mab.eq.ia .and. mac.eq.ia .and. mad.eq.ia) then
+            else if (mabc.eq.ia .and. macd.eq.ia) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                yaxis(i) = 0
-               m = priority (i,ib,ic,id)
-               if (m .ne. 0) then
+               if (mbcd .ne. 0) then
                   xaxis(i) = m
                else
                   call frame13 (i,ia)
                end if
-            else if (mab.eq.ib .and. mbc.eq.ib .and. mbd.eq.ib) then
+            else if (mabc.eq.ib .and. mbcd.eq.ib) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
                yaxis(i) = 0
-               m = priority (i,ia,ic,id)
-               if (m .ne. 0) then
+               if (macd .ne. 0) then
                   xaxis(i) = m
                else
                   call frame13 (i,ib)
                end if
-            else if (mac.eq.ic .and. mbc.eq.ic .and. mcd.eq.ic) then
+            else if (mabc.eq.ic .and. mbcd.eq.ic) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ic
                yaxis(i) = 0
-               m = priority (i,ia,ib,id)
-               if (m .ne. 0) then
+               if (mabd .ne. 0) then
                   xaxis(i) = m
                else
                   call frame13 (i,ic)
                end if
-            else if (mad.eq.id .and. mbd.eq.id .and. mcd.eq.id) then
+            else if (mabd.eq.id .and. mbcd.eq.id) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = id
                yaxis(i) = 0
-               m = priority (i,ia,ib,ic)
-               if (m .ne. 0) then
+               if (mabc .ne. 0) then
                   xaxis(i) = m
                else
                   call frame13 (i,id)
                end if
-            else if (mbc.eq.0 .and. mbd.eq.0 .and. mcd.eq.0) then
+            else if (mbcd .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ia
                xaxis(i) = 0
                yaxis(i) = 0
                call frame13 (i,ia)
-            else if (mac.eq.0 .and. mad.eq.0 .and. mcd.eq.0) then
+            else if (macd .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ib
                xaxis(i) = 0
                yaxis(i) = 0
                call frame13 (i,ib)
-            else if (mab.eq.0 .and. mad.eq.0 .and. mbd.eq.0) then
+            else if (mabd .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ic
                xaxis(i) = 0
                yaxis(i) = 0
                call frame13 (i,ic)
-            else if (mab.eq.0 .and. mac.eq.0 .and. mbc.eq.0) then
+            else if (mabc .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = id
                xaxis(i) = 0
