@@ -3614,20 +3614,12 @@ c     remove multipole components that are zero by symmetry
 c
       if (symmetry) then
          do i = 1, npole
-            yzero = .false.
-            if (yaxis(i) .eq. 0)  yzero = .true.
-            if (polaxe(i) .eq. 'Bisector')  yzero = .true.
-            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
             xyzero = .false.
+            yzero = .false.
+            if (polaxe(i) .eq. 'Bisector')  xyzero = .true.
+            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
             if (polaxe(i) .eq. 'Z-then-X') then
-               iz = zaxis(i)
-               ix = xaxis(i)
-               do j = 1, n12(iz)
-                  iy = i12(j,iz)
-                  if (iy.ne.i .and. iy.ne.ix) then
-                     if (priority(iz,ix,iy,0) .eq. 0)  xyzero = .true.
-                  end if
-               end do
+               if (yaxis(i) .eq. 0)  yzero = .true.
             end if
             if (polaxe(i) .eq. 'None') then
                do j = 2, 13
