@@ -531,11 +531,11 @@ c
          if (grdmin .le. 0.0d0) then
             write (iout,370)
   370       format (/,' Enter RMS Gradient Termination Criterion',
-     &                 ' [0.001] :  ',$)
+     &                 ' [0.01] :  ',$)
             read (input,380)  grdmin
   380       format (f20.0)
          end if
-         if (grdmin .le. 0.0d0)  grdmin = 0.001d0
+         if (grdmin .le. 0.0d0)  grdmin = 0.01d0
       end if
 c
 c     print the parameter restraint value to be used in fitting
