@@ -22,6 +22,8 @@ c
       use atomid
       use atoms
       use bound
+      use boxes
+      use cell
       use deriv
       use energi
       use group
@@ -80,6 +82,9 @@ c
       real*8 a,b,buffer,term
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 xorig,xorig2
+      real*8 yorig,yorig2
+      real*8 zorig,zorig2
       logical proceed,intermol
 c
 c
@@ -91,6 +96,23 @@ c
          deg(2,i) = 0.0d0
          deg(3,i) = 0.0d0
       end do
+c
+c     disable replica mechanism for use with geometric restraints
+c
+      if (use_replica) then
+         xorig = xcell
+         yorig = ycell
+         zorig = zcell
+         xorig2 = xcell2
+         yorig2 = ycell2
+         zorig2 = zcell2
+         xcell = xbox
+         ycell = ybox
+         zcell = zbox
+         xcell2 = xbox2
+         ycell2 = ybox2
+         zcell2 = zbox2
+      end if
 c
 c     get energy and derivatives for position restraint terms
 c
@@ -810,6 +832,17 @@ c
                vir(3,3) = vir(3,3) + vzz
             end if
          end do
+      end if
+c
+c     reinstate the replica mechanism when it is appropriate
+c
+      if (use_replica) then
+         xcell = xorig
+         ycell = yorig
+         zcell = zorig
+         xcell2 = xorig2
+         ycell2 = yorig2
+         zcell2 = zorig2
       end if
       return
       end

@@ -474,8 +474,8 @@ c
                         end if
                         write (iout,50)  i,name(i),k,name(k),
      &                                   rv,sqrt(rik2),e
-   50                   format (' VDW-Hal',3x,2(i7,'-',a3),3x,
-     &                             '(XTAL)',4x,2f10.4,f12.4)
+   50                   format (' VDW-Hal',3x,2(i7,'-',a3),1x,
+     &                             '(XTAL)',6x,2f10.4,f12.4)
                      end if
                   end if
                end do
@@ -814,8 +814,8 @@ c
                      else
                         write (iout,50)  ikmax,name(ikmin),ikmax,
      &                                   name(ikmax),rv,sqrt(rik2),e
-   50                   format (' VDW-Hal',3x,2(i7,'-',a3),3x,
-     &                             '(XTAL)',4x,2f10.4,f12.4)
+   50                   format (' VDW-Hal',3x,2(i7,'-',a3),1x,
+     &                             '(XTAL)',6x,2f10.4,f12.4)
                      end if
                   end if
                end if

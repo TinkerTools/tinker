@@ -24,6 +24,8 @@ c
       use atomid
       use atoms
       use bound
+      use boxes
+      use cell
       use deriv
       use group
       use hessn
@@ -127,8 +129,28 @@ c
       real*8 xi,yi,zi,ri,ri2
       real*8 r,r2,r6,r12
       real*8 a,b,buffer
+      real*8 xorig,xorig2
+      real*8 yorig,yorig2
+      real*8 zorig,zorig2
       logical proceed,intermol,linear
 c
+c
+c     disable replica mechanism for use with geometric restraints
+c
+      if (use_replica) then
+         xorig = xcell
+         yorig = ycell
+         zorig = zcell
+         xorig2 = xcell2
+         yorig2 = ycell2
+         zorig2 = zcell2
+         xcell = xbox
+         ycell = ybox
+         zcell = zbox
+         xcell2 = xbox2
+         ycell2 = ybox2
+         zcell2 = zbox2
+      end if
 c
 c     compute the Hessian elements for position restraints
 c
@@ -1654,6 +1676,17 @@ c
                hessz(j,i) = hessz(j,i) + d2e(3,j)
             end do
          end if
+      end if
+c
+c     reinstate the replica mechanism when it is appropriate
+c
+      if (use_replica) then
+         xcell = xorig
+         ycell = yorig
+         zcell = zorig
+         xcell2 = xorig2
+         ycell2 = yorig2
+         zcell2 = zorig2
       end if
       return
       end

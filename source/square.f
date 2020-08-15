@@ -21,8 +21,8 @@ c     literature references:
 c
 c     "BCLSF: Solve Nonlinear Least Squares Problems Subject to Bounds
 c     on the Variables Using a Modified Levenberg-Marquardt Algorithm
-c     and a Finite-Difference Jacobian", IMSL Fortran Library V7.0,
-c     Rogue Wave Software, October 2010
+c     and a Finite-Difference Jacobian", IMSL Fortran Math Library,
+c     Version 2020.0, Rogue Wave Software, 2019
 c
 c     B. S. Garbow, K. E. Hillstrom and J. J. More, "MINPACK Subroutine
 c     LMDER", Argonne National Laboratory, March 1980
@@ -369,9 +369,9 @@ c
          end do
          fcnorm = fpnorm
 c
-c     update the active vs inactive status of the variables;
-c     in a true active set strategy, at most one constraint is
-c     added to the active set per iteration (via goto's below)
+c     update the active vs inactive status of the variables; in a
+c     true active set strategy, at most one constraint is added to
+c     the active set per iteration (via goto statements below)
 c
          do j = 1, n
             if (iactive(j) .eq. 0) then
@@ -1054,9 +1054,9 @@ c
          else
             icode = 4
             if (abs(reduce-slope) .gt. eps) then
-               temp = -slope*stplen / (2.0d0*(reduce-slope))
+               temp = -0.5d0 * slope * stplen / (reduce-slope)
             else
-               temp = -slope*stplen / 2.0d0
+               temp = -0.5d0 * slope * stplen
             end if
             if (temp .lt. 0.1d0*delta) then
                delta = 0.1d0 * delta
