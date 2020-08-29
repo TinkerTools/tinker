@@ -34,11 +34,11 @@
 ##  BINDIR          Directory with Tinker Executables
 ##  LINKDIR         Linked Copies of Tinker Executables
 ##  FFTWDIR         FFTW Top-Level Directory
-##  FFTW_LIB_DIR    Directory with FFTW Libraries
+##  FFTW_LIBDIR     Directory with FFTW Libraries
 ##  FFTW_LIBS       FFTW Libraries needed to build Tinker
 ##  APBSDIR         APBS Top-Level Directory
-##  APBS_INC_DIR    Directory with APBS Include Files
-##  APBS_LIB_DIR    Directory with APBS Libraries
+##  APBS_INCDIR     Directory with APBS Include Files
+##  APBS_LIBDIR     Directory with APBS Libraries
 ##  APBS_LIBS       APBS Libraries needed to build Tinker
 
 TINKERDIR = $(HOME)/tinker
@@ -60,7 +60,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  GNU gfortran 7.5
@@ -78,7 +78,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RENAME = rename_bin
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  GNU gfortran 8.1
@@ -96,7 +96,7 @@ RANLIB = ranlib -c
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 RENAME = rename_bin
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  MinGW GNU gfortran 9.2
@@ -113,7 +113,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static
 #RENAME = rename_exe
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible (also AMD)
 ##  Compiler:  Intel Fortran for Linux 15.0
@@ -129,7 +129,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 #RENAME = rename_bin
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel Xeon
 ##  Compiler:  Intel Fortran for MacOS 15.0
@@ -145,7 +145,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
 #RENAME = rename_bin
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Apple MacOS
 ##  CPU Type:  Intel Xeon
 ##  Compiler:  PGI Fortran 19.10 for MacOS

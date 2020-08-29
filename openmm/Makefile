@@ -39,7 +39,7 @@
 ##  BINDIR          Directory with Tinker Executables
 ##  LINKDIR         Linked Copies of Tinker Executables
 ##  FFTWDIR         FFTW Top-Level Directory
-##  FFTW_LIB_DIR    Directory with FFTW Libraries
+##  FFTW_LIBDIR     Directory with FFTW Libraries
 ##  FFTW_LIBS       FFTW Libraries needed to build Tinker
 ##  OPENMMDIR       OpenMM Installation Directory
 ##  CUDA_DIR        CUDA Installation Directory
@@ -50,12 +50,12 @@ BINDIR = $(TINKERDIR)/bin
 LINKDIR = /usr/local/bin
 
 FFTWDIR = $(TINKERDIR)/fftw
-FFTW_LIB_DIR = -L$(FFTWDIR)/lib
+FFTW_LIBDIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
 
 OPENMMDIR = /usr/local/openmm
-OPENMM_INCLUDE_DIR = $(OPENMMDIR)/include
-OPENMM_LIB_DIR = -L$(OPENMMDIR)/lib
+OPENMM_INCLUDE = $(OPENMMDIR)/include
+OPENMM_LIBDIR = -L$(OPENMMDIR)/lib
 OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
 
 CUDA_DIR = /usr/local/cuda
@@ -63,58 +63,61 @@ CUDA_INCLUDE = $(CUDA_DIR)/include
 CUDA_LIB = $(CUDA_DIR)/lib
 
 # Uncomment below for 64-bit Linux
-#CUDA_LIB = $(CUDA_DIR)/lib64
-#NVML_INCLUDE = /usr/include/nvidia/gdk
-#NVML_LIB = /usr/local/cuda/lib64/stubs
+CUDA_LIB = $(CUDA_DIR)/lib64
+NVML_INCLUDE = /usr/include/nvidia/gdk
+NVML_LIB = /usr/local/cuda/lib64/stubs
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
+##  Build:    Tinker-OpenMM
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible, Nvidia GPU
 ##  Compiler: GNU gfortran 7.5, g++, nvcc
 ##  Parallel: OpenMP, OpenMM
 
-#CC = gcc
-#CXX = g++
-#NVCC = nvcc
-#F77 = gfortran
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -L$(NVML_LIB) -L$(CUDA_LIB)
-#LIBS = -lstdc++ -lnvidia-ml -lfftw3_threads -lfftw3 -lcudart -lcuda
-#CFLAGS = -c
-#F77FLAGS = -c
-#OPTFLAGS = -Ofast -msse3 -fopenmp
-#CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
-#LIBFLAGS = -crusv
-#RANLIB = ranlib
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+CC = gcc
+CXX = g++
+NVCC = nvcc
+F77 = gfortran
+LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -L$(NVML_LIB) -L$(CUDA_LIB)
+LIBS = -lstdc++ -lnvidia-ml -lfftw3_threads -lfftw3 -lcudart -lcuda -ldl
+CFLAGS = -c
+F77FLAGS = -c
+OPTFLAGS = -Ofast -msse3 -fopenmp
+CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
+LIBFLAGS = -crusv
+RANLIB = ranlib
+LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed
 
+##  Build:    Tinker-OpenMM
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
 ##  Compiler: GNU gfortran 8.1, clang, nvcc
 ##  Parallel: OpenMP, OpenMM
 
-CC = clang
-CXX = g++
-NVCC = nvcc
-OBJECTIVE_CC = clang
-OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
-F77 = gfortran
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -L$(CUDA_LIB)
-LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
-CFLAGS = -c
-F77FLAGS = -c
-OPTFLAGS = -Ofast -mssse3 -fopenmp
+#CC = clang
+#CXX = g++
+#NVCC = nvcc
+#OBJECTIVE_CC = clang
+#OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
+#F77 = gfortran
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -L$(CUDA_LIB)
+#LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
+#CFLAGS = -c
+#F77FLAGS = -c
+#OPTFLAGS = -Ofast -mssse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
-LIBFLAGS = -crusv
-RANLIB = ranlib -c
-OBJS = gpu_usage.o
-GPU_USAGE_OBJS = gpu_usage.o
-LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
+#CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#OBJS = gpu_usage.o
+#GPU_USAGE_OBJS = gpu_usage.o
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
+##  Build:    Tinker-OpenMM
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
 ##  Oper Sys: OS X 10.11 (El Capitan)
@@ -743,16 +746,16 @@ listing:
 	cat *.f *.cpp > tinker.txt
 
 ommstuf.o: ommstuf.cpp
-	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE_DIR} ommstuf.cpp
+	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE} ommstuf.cpp
 
 analyze_omm.x: analyze_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${OPENMM_LIBDIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
 bar_omm.x: bar_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${OPENMM_LIBDIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
 dynamic_omm.x: dynamic_omm.o ommstuf.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIB_DIR} ${OPENMM_LIB_DIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${OPENMM_LIBDIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
 
 rename:
 	mv analyze_omm.x $(BINDIR)/analyze_omm

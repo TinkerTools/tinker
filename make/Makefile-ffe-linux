@@ -95,7 +95,7 @@ JAVA_LIBS = -ljvm
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:    TINKER
+##  Build:    Tinker
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible
 ##  Compiler: GNU gfortran 7.5
@@ -115,7 +115,7 @@ RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 RENAME = rename_bin
 
-##  Build:    TINKER
+##  Build:    Tinker
 ##  OS Type:  Apple MacOS
 ##  CPU Type: Intel x86 Compatible
 ##  Compiler: GNU gfortran 8.1
@@ -136,7 +136,7 @@ RENAME = rename_bin
 #		CoreFoundation
 #RENAME = rename_bin
 
-##  Build:     TINKER
+##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  MinGW GNU gfortran 9.2
@@ -155,7 +155,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static
 #RENAME = rename_exe
 
-##  Build:    TINKER
+##  Build:    Tinker
 ##  OS Type:  Generic Linux
 ##  CPU Type: Intel x86 Compatible (also AMD)
 ##  Oper Sys: Fedora Core
@@ -172,7 +172,7 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 #RENAME = rename_bin
 
-##  Build:    TINKER
+##  Build:    Tinker
 ##  OS Type:  Macintosh
 ##  CPU Type: Intel x86 Compatible
 ##  Oper Sys: MacOS 10.11 (El Capitan)
