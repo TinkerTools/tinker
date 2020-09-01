@@ -90,7 +90,7 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_improp = .true.
          if (value .eq. 'NONE')  use_improp = .false.
-      else if (keyword(1:12) .eq. 'IMPTORSTERM ') then
+      else if (keyword(1:11) .eq. 'IMPTORTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
          use_imptor = .true.
