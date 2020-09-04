@@ -2839,7 +2839,7 @@ static void setupAmoebaChargeForce (OpenMM_System* system, FILE* log) {
 
    // set charges and vdw params; use sigma=1 and eps=0 to turn off vdw
    for (int ii = 0; ii < atoms__.n; ++ii) {
-      OpenMM_NonbondedForce_addParticle (coulombForce, charge__.pchg[ii], 1.0, 0.0);
+      OpenMM_NonbondedForce_addParticle (coulombForce, charge__.pchg[ii], 1, 0);
    }
 
    OpenMM_BondArray* bondArray;
@@ -2886,7 +2886,19 @@ static void setupAmoebaChargeForce (OpenMM_System* system, FILE* log) {
    OpenMM_System_addForce (system, (OpenMM_Force*) coulombForce);
 }
 
-static void setupAmoebaVdwForce (OpenMM_System* system, OpenMM_Context* context, FILE* log) {
+static void setupAmoebaVdwLambda (OpenMM_System* system, OpenMM_Context* context, int vdwForceIndex) {
+
+   if (!potent__.use_vdw)
+      return;
+
+   OpenMM_AmoebaVdwForce* amoebaVdwForce = (OpenMM_AmoebaVdwForce*) OpenMM_System_getForce (system, vdwForceIndex);
+   OpenMM_AmoebaVdwForce_AlchemicalMethod alchemicalMethod = OpenMM_AmoebaVdwForce_getAlchemicalMethod (amoebaVdwForce);
+   if (alchemicalMethod != OpenMM_AmoebaVdwForce_None) {
+      OpenMM_Context_setParameter (context, OpenMM_AmoebaVdwForce_Lambda (), mutant__.vlambda);
+   }
+}
+
+static int setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
 
    bool vdwb147 = false;
    bool vdwlj = false;
@@ -2926,14 +2938,14 @@ static void setupAmoebaVdwForce (OpenMM_System* system, OpenMM_Context* context,
 
    OpenMM_AmoebaVdwForce* amoebaVdwForce;
    amoebaVdwForce = OpenMM_AmoebaVdwForce_create ();
-   OpenMM_System_addForce (system, (OpenMM_Force*) amoebaVdwForce);
+   int vdwForceIndex = OpenMM_System_addForce (system, (OpenMM_Force*) amoebaVdwForce);
    OpenMM_Force_setForceGroup ((OpenMM_Force*) amoebaVdwForce, 1);
 
    // condensed VDW type or class
    std::map<int, int> old_to_new_type;
    std::vector<int> new_to_old_type;
    for (ii = 0; ii < atoms__.n; ++ii) {
-      i = vdw__.jvdw[ii] - 1; // vdw type/index
+      i = vdw__.jvdw[ii] - 1;  // vdw type/index
       int new_type = (int) old_to_new_type.size ();
       if (old_to_new_type.find (i) == old_to_new_type.end ()) {
          old_to_new_type[i] = new_type;
@@ -2944,17 +2956,17 @@ static void setupAmoebaVdwForce (OpenMM_System* system, OpenMM_Context* context,
    for (ii = 0; ii < old_to_new_type.size(); ii++) {
       double sigma, epsilon;
       // ii is the new type
-      int iiold = new_to_old_type[ii]; // jvdw[index] - 1
+      int iiold = new_to_old_type[ii];  // jvdw[index] - 1
       sigma = kvdws__.rad[iiold] * OpenMM_NmPerAngstrom;
       epsilon = kvdws__.eps[iiold] * OpenMM_KJPerKcal;
       OpenMM_AmoebaVdwForce_addParticleType (amoebaVdwForce, sigma, epsilon);  
    }
 
+   OpenMM_Boolean isAlchemical = OpenMM_False;
    int nAlchemical = 0;
    for (ii = 0; ii < atoms__.n; ii++) {
       i = vdw__.jvdw[ii] - 1;
       int cdnstype = old_to_new_type.at (i);
-      OpenMM_Boolean isAlchemical = OpenMM_False;
       if (mutant__.mut[ii]) {
          ++nAlchemical;
          isAlchemical = OpenMM_True;
@@ -2962,13 +2974,12 @@ static void setupAmoebaVdwForce (OpenMM_System* system, OpenMM_Context* context,
       OpenMM_AmoebaVdwForce_addParticle_1 (amoebaVdwForce, vdw__.ired[ii]-1, cdnstype, vdw__.kred[ii], isAlchemical);
    }
 
-   if (nAlchemical) {
+   if (isAlchemical) {
       if (mutant__.vcouple == 0) {
          OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_Decouple);
       } else if (mutant__.vcouple == 1) {
          OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_Annihilate);
       }
-      OpenMM_Context_setParameter (context, OpenMM_AmoebaVdwForce_Lambda (), mutant__.vlambda);
    } else {
       OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_None);
    }
@@ -2976,11 +2987,11 @@ static void setupAmoebaVdwForce (OpenMM_System* system, OpenMM_Context* context,
    // change Tinker Lennard-Jones Rmin to sigma for OpenMM_AmoebaVdwForce
    double convert = 1;
    if (vdwlj) {
-      convert = 0.890898718140339;
+      convert = 0.890898718140339;  // 2^(-1/6)
    }
 
    // Tinker assumes the vdwpr table is of size MAXCLASS x MAXCLASS,
-   // whether using atom class or atom type as vdwindex, as of Feb 2017
+   // regardless of use of atom class or atom type as vdwindex
    int nvdwpr = (int) new_to_old_type.size ();
    for (ii = 0; ii < nvdwpr; ++ii) {
       int iold = new_to_old_type[ii];
@@ -3091,7 +3102,7 @@ static void setupAmoebaVdwForce (OpenMM_System* system, OpenMM_Context* context,
       OpenMM_Force_setForceGroup ((OpenMM_Force*) lj14Force, 1);
       OpenMM_System_addForce (system, (OpenMM_Force*) lj14Force);
    }
-
+   return vdwForceIndex;
 }
 
 static void loadCovalentArray (int numberToLoad, int* valuesToLoad,
@@ -4054,8 +4065,9 @@ void openmm_init_ (void** ommHandle, double* dt) {
       setupAmoebaTorsionTorsionForce (omm->system, log);
    }
 
+   int vdwForceIndex = -1;
    if (potent__.use_vdw) {
-      setupAmoebaVdwForce (omm->system, omm->context, log);
+      vdwForceIndex = setupAmoebaVdwForce (omm->system, log);
    }
 
    if (potent__.use_charge) {
@@ -4237,6 +4249,10 @@ void openmm_init_ (void** ommHandle, double* dt) {
                                            platform);
    OpenMM_Platform_setPropertyValue (platform, omm->context,
                                      "DisablePmeStream", "true");
+
+   if (vdwForceIndex >= 0) {
+      setupAmoebaVdwLambda (omm->system, omm->context, vdwForceIndex);
+   }
 
    if (inform__.debug) {
       (void) fprintf (log, "\n OpenMMDataHandle:  %p\n", (void*)(omm));
@@ -4673,6 +4689,7 @@ int openmm_test_ (void) {
       (void) fprintf (log, "    Extra=   %d\n", abs(potent__.use_extra));
    }
 
+   int vdwForceIndex = -1;
    if (countActiveForces > 1) {
 
       if (potent__.use_bond) {
@@ -4713,7 +4730,7 @@ int openmm_test_ (void) {
          setupAmoebaTorsionTorsionForce (system, log);
       }
       if (potent__.use_vdw) {
-         setupAmoebaVdwForce (system, context, log);
+         vdwForceIndex = setupAmoebaVdwForce (system, log);
       }
       if (potent__.use_charge) {
          setupAmoebaChargeForce (system, log);
@@ -4833,7 +4850,7 @@ int openmm_test_ (void) {
       testName = "AmoebaTorsionTorsionTest";
 
    } else if (potent__.use_vdw) {
-      setupAmoebaVdwForce (system, context, log);
+      setupAmoebaVdwForce (system, log);
       loadTinkerForce (deriv__.dev, 0, tinkerForce);
       tinkerEnergy = *energi__.ev;
       if (limits__.use_vlist) {
@@ -4972,6 +4989,10 @@ int openmm_test_ (void) {
    context = OpenMM_Context_create_2 (system, integrator, platform);
    OpenMM_Platform_setPropertyValue (platform, context, "DisablePmeStream",
                                      "true");
+
+   if (vdwForceIndex >= 0) {
+      setupAmoebaVdwLambda (system, context, vdwForceIndex);
+   }
 
    OpenMM_Context_setPositions (context, initialPosInNm);
 
