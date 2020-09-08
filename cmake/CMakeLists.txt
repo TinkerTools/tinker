@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.6)
 
 project(tinker VERSION 8.8.1 LANGUAGES Fortran)
 
@@ -24,26 +24,37 @@ find_path(
     REQUIRED
 )
 
+# Find required libraries
+
 find_package(OpenMP REQUIRED)
 
-set(BUILD_FFTW OFF CACHE BOOL "Build included fftw package")
-
-if(BUILD_FFTW)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries")
-    set(ENABLE_OPENMP ON CACHE BOOL "Use OpenMP for multithreading")
-    set(ENABLE_THREADS ON CACHE BOOL "Use pthread for multithreading")
-    add_subdirectory(${TINKER_DIR}/fftw ${CMAKE_BINARY_DIR}/fftw)
-    set(FFT_LIB fftw3)
-else()
-    if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
-        # Intel compilers have an FFT library built-in
-        set(FFT_LIB "")
-    else()
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
-        set(FFT_LIB PkgConfig::FFTW3)
-    endif()
+find_package(PkgConfig)
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(FFTW3 fftw3)
 endif()
+
+find_library(FFTW_LIB NAMES libfftw3.a fftw3 HINTS ${FFTW3_LIBRARY_DIRS} ${LIB_INSTALL_DIR})
+if(FFTW_THREAD_TYPE) # specify type of threaded FFTW3 library
+    find_library(FFTW_THREADED_LIB NAMES libfftw3_${FFTW_THREAD_TYPE}.a fftw3_${FFTW_THREAD_TYPE} HINTS ${FFTW3_LIBRARY_DIRS} ${LIB_INSTALL_DIR})
+else()
+    foreach(FFTW_TYPE IN ITEMS threads omp) # mpi does not include dfftw_init_threads_
+        find_library(FFTW_THREADED_LIB NAMES libfftw3_${FFTW_TYPE}.a fftw3_${FFTW_TYPE} HINTS ${FFTW3_LIBRARY_DIRS} ${LIB_INSTALL_DIR})
+        if(FFTW_THREADED_LIB)
+            break()
+        endif()
+    endforeach()
+endif()
+
+if(NOT FFTW_LIB)
+    message(FATAL_ERROR "FFTW3 library not found!")
+elseif(NOT FFTW_THREADED_LIB)
+    message(FATAL_ERROR "Threaded FFTW3 library not found! (threads or omp)")
+else()
+    message(STATUS "Found FFTW3: ${FFTW_LIB}")
+    message(STATUS "Found threaded FFTW3: ${FFTW_THREADED_LIB}")
+endif()
+
+# Set compiler flags
 
 if(APPLE)
     set(ARCH_FLAGS "-mtune=native")
@@ -55,14 +66,17 @@ if(WIN32)
     if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
         set(CMAKE_Fortran_FLAGS_RELEASE "/O3 /QxHost /Qip- /Qprec-div- /w")
         set(CMAKE_Fortran_FLAGS_DEBUG "/debug:full")
+        set(CMAKE_EXE_LINKER_FLAGS "/recursive /libs:static")
     endif()
 elseif(UNIX) # includes cygwin
     if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
         set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast ${ARCH_FLAGS}")
         set(CMAKE_Fortran_FLAGS_DEBUG "-Og -fbacktrace -fcheck=bounds -Wall")
+        set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc")
     elseif(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
         set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -xHost -no-ipo -no-prec-div")
         set(CMAKE_Fortran_FLAGS_DEBUG "-g -warn all -check all")
+        set(CMAKE_EXE_LINKER_FLAGS "-recursive -static-libgcc -static-intel")
     elseif(CMAKE_Fortran_COMPILER_ID MATCHES "PGI")
         set(CMAKE_Fortran_FLAGS_RELEASE "-fast -O3")
         set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -Mdclchk -Mbounds -Mchkptr -Mchkstk")
@@ -128,6 +142,7 @@ foreach(_FILE IN LISTS _FILES)
     list(APPEND _LIB ${TINKER_DIR}/source/${_FILE}.f)
 endforeach()
 add_library(tinker STATIC ${_LIB})
+target_link_libraries(tinker OpenMP::OpenMP_Fortran)
 install(
     TARGETS tinker
     DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -145,7 +160,7 @@ set(_BINS
 )
 foreach(_BIN IN LISTS _BINS)
     add_executable(${_BIN} ${TINKER_DIR}/source/${_BIN}.f)
-    target_link_libraries(${_BIN} tinker ${FFT_LIB} OpenMP::OpenMP_Fortran)
+    target_link_libraries(${_BIN} tinker ${FFTW_LIB} ${FFTW_THREADED_LIB} OpenMP::OpenMP_Fortran)
     install(
         TARGETS ${_BIN}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
