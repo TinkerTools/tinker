@@ -151,6 +151,44 @@ c
             roff(i) = rold
          end do
 c
+c     get the Born radii via the numerical "Onion" method
+c     and the Grycuk 1/r^6 integral approach.
+c
+      else if (borntyp .eq. 'ONION6') then
+         tinit = 0.1d0
+         ratio = 1.5d0
+         do i = 1, n
+            t = tinit
+            rold = roff(i)
+            total = 0.0d0
+            done = .false.
+            do while (.not. done)
+               roff(i) = roff(i) + 0.5d0*t
+               call surfatom (i,area,roff)
+               fraction = area / (4.0d0*pi*roff(i)**2)
+               if (fraction .lt. 0.99d0) then
+                  inner = roff(i) - 0.5d0*t
+                  outer = inner + t
+                  shell = 1.0d0/(inner**3) - 1.0d0/(outer**3)
+                  total = total + fraction*shell
+                  roff(i) = roff(i) + 0.5d0*t
+                  t = ratio * t
+               else
+                  inner = roff(i) - 0.5d0*t
+                  total = total + 1.0d0/(inner**3)
+                  done = .true.
+               end if
+            end do
+c
+c           Change to equation 31.
+c
+            rborn(i) = 3.0d0/(4.0d0*pi)*(total**(1.0d0/3.0d0))
+            roff(i) = rold
+c
+c           ToDo: Numerical inclusion of neck regions
+c
+         end do
+c
 c     get the Born radii via the analytical Still method;
 c     note this code only loops over the variable parts
 c
