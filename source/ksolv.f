@@ -108,8 +108,10 @@ c
                borntyp = 'OBC'
             else if (value(1:3) .eq. 'ACE') then
                borntyp = 'ACE'
-            else if (value(1:4) .eq. 'GRYCUK') then
+            else if (value(1:6) .eq. 'GRYCUK') then
                borntyp = 'GRYCUK'
+            else if (value(1:6) .eq. 'GONION') then
+               borntyp = 'GONION'
             else if (value(1:7) .eq. 'PERFECT') then
                borntyp = 'PERFECT'
             end if

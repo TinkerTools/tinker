@@ -85,7 +85,10 @@ c
       real*8 third,pi43
       real*8 bornmax
       real*8 pair,pbtotal
+      real*8 probe,areatotal
       real*8, allocatable :: roff(:)
+      real*8, allocatable :: weight(:)
+      real*8, allocatable :: garea(:)
       real*8, allocatable :: pos(:,:)
       real*8, allocatable :: pbpole(:,:)
       real*8, allocatable :: pbself(:)
@@ -97,6 +100,8 @@ c     perform dynamic allocation of some local arrays
 c
       if (borntyp .eq. 'STILL')  allocate (skip(n))
       allocate (roff(n))
+      allocate (weight(n))
+      allocate (garea(n))
       if (borntyp .eq. 'PERFECT') then
          allocate (pos(3,n))
          allocate (pbpole(13,n))
@@ -149,14 +154,21 @@ c
             end do
             rborn(i) = 1.0d0 / total
             roff(i) = rold
+            if (verbose) then
+               write(*,*) ' Born radius ',i,':',rborn(i)
+            end if
          end do
 c
 c     get the Born radii via the numerical "Onion" method
 c     and the Grycuk 1/r^6 integral approach.
 c
-      else if (borntyp .eq. 'ONION6') then
+      else if (borntyp .eq. 'GONION') then
          tinit = 0.1d0
          ratio = 1.5d0
+         probe = 0.0d0
+         do i = 1, n
+            weight(i) = 1.0d0
+         end do
          do i = 1, n
             t = tinit
             rold = roff(i)
@@ -164,26 +176,34 @@ c
             done = .false.
             do while (.not. done)
                roff(i) = roff(i) + 0.5d0*t
-               call surfatom (i,area,roff)
-               fraction = area / (4.0d0*pi*roff(i)**2)
+c
+c              call surfatom (i,area,roff)
+c              fraction = area / (4.0d0*pi*roff(i)**2)
+c
+               call surface (areatotal,garea,roff,weight,probe)
+               fraction = garea(i) / (4.0d0*pi*roff(i)**2)
                if (fraction .lt. 0.99d0) then
                   inner = roff(i) - 0.5d0*t
                   outer = inner + t
                   shell = 1.0d0/(inner**3) - 1.0d0/(outer**3)
+                  shell = shell/3.0d0
                   total = total + fraction*shell
                   roff(i) = roff(i) + 0.5d0*t
                   t = ratio * t
                else
                   inner = roff(i) - 0.5d0*t
-                  total = total + 1.0d0/(inner**3)
+                  total = total + 1.0d0/(3.0d0*(inner**3))
                   done = .true.
                end if
             end do
 c
 c           Change to equation 31.
 c
-            rborn(i) = 3.0d0/(4.0d0*pi)*(total**(1.0d0/3.0d0))
+            rborn(i) = 1.0d0/((3.0d0*total)**(1.0d0/3.0d0))
             roff(i) = rold
+            if (verbose) then
+               write(*,*) ' Born radius ',i,':',rborn(i)
+            end if
 c
 c           ToDo: Numerical inclusion of neck regions
 c
@@ -533,6 +553,8 @@ c     perform deallocation of some local arrays
 c
       if (borntyp .eq. 'STILL')  deallocate (skip)
       deallocate (roff)
+      deallocate (weight)
+      deallocate (garea)
       if (borntyp .eq. 'PERFECT') then
          deallocate (pos)
          deallocate (pbpole)
