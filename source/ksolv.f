@@ -43,6 +43,7 @@ c
       solvtyp = '        '
       borntyp = '        '
       doffset = 0.09d0
+      onipr = 0.0d0
 c
 c     search keywords for implicit solvation commands
 c
@@ -115,6 +116,8 @@ c
             else if (value(1:7) .eq. 'PERFECT') then
                borntyp = 'PERFECT'
             end if
+         else if (keyword(1:12) .eq. 'ONION-PROBE ') then
+            read (string,*,err=50,end=50)  onipr 
          else if (keyword(1:18) .eq. 'DIELECTRIC-OFFSET ') then
             read (string,*,err=50,end=50)  doffset
             if (doffset .lt. 0.0d0)  doffset = -doffset

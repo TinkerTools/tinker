@@ -165,7 +165,8 @@ c
       else if (borntyp .eq. 'GONION') then
          tinit = 0.1d0
          ratio = 1.5d0
-         probe = 0.0d0
+         probe = onipr
+         write(*,*) 'Onion Probe: ',probe
          do i = 1, n
             weight(i) = 1.0d0
          end do
@@ -181,8 +182,10 @@ c              call surfatom (i,area,roff)
 c              fraction = area / (4.0d0*pi*roff(i)**2)
 c
                call surface (areatotal,garea,roff,weight,probe)
-               fraction = garea(i) / (4.0d0*pi*roff(i)**2)
+c               write(*,*) 'Area from Surface: ',garea
+               fraction = garea(i) / (4.0d0*pi*(roff(i)+probe)**2)
                if (fraction .lt. 0.99d0) then
+c                  write(*,*) 'Fraction of : ',fraction
                   inner = roff(i) - 0.5d0*t
                   outer = inner + t
                   shell = 1.0d0/(inner**3) - 1.0d0/(outer**3)

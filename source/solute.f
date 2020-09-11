@@ -13,6 +13,7 @@ c     ###############################################################
 c
 c
 c     doffset   dielectric offset to continuum solvation atomic radii
+c     onipr     probe radius to use with the Onion Born radius type
 c     p1        single-atom scale factor for analytical Still radii
 c     p2        1-2 interaction scale factor for analytical Still radii
 c     p3        1-3 interaction scale factor for analytical Still radii
@@ -41,6 +42,7 @@ c
       use sizes
       implicit none
       real*8 doffset
+      real*8 onipr
       real*8 p1,p2,p3,p4,p5
       real*8, allocatable :: rsolv(:)
       real*8, allocatable :: asolv(:)
