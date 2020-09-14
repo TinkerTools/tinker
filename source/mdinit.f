@@ -203,7 +203,7 @@ c
       if (use_pred) then
          if (polpred .eq. 'GEAR')  maxualt = 7
          if (polpred .eq. 'ASPC')  maxualt = 17
-         if (polpred .eq. 'LSQR')  maxualt = 7
+         if (polpred .eq. 'LSQR')  maxualt = 6
          if (.not. allocated(udalt))  allocate (udalt(maxualt,3,n))
          if (.not. allocated(upalt))  allocate (upalt(maxualt,3,n))
          if (.not. allocated(usalt))  allocate (usalt(maxualt,3,n))

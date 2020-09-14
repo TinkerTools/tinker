@@ -72,7 +72,6 @@ NVML_LIB = /usr/local/cuda/lib64/stubs
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:    Tinker-OpenMM
 ##  Machine:  Generic Linux
 ##  CPU Type: Intel x86 Compatible, Nvidia GPU
 ##  Compiler: GNU gfortran 7.5, g++, nvcc
@@ -90,9 +89,8 @@ OPTFLAGS = -Ofast -msse3 -fopenmp
 CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
 LIBFLAGS = -crusv
 RANLIB = ranlib
-LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed
+LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR)/lib
 
-##  Build:    Tinker-OpenMM
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
 ##  Compiler: GNU gfortran 8.1, clang, nvcc
@@ -117,7 +115,6 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed
 #GPU_USAGE_OBJS = gpu_usage.o
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
-##  Build:    Tinker-OpenMM
 ##  Machine:  MacOS
 ##  CPU Type: Intel x86-64, Nvidia GPU
 ##  Oper Sys: OS X 10.11 (El Capitan)

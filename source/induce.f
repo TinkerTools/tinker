@@ -517,10 +517,10 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (debug) then
+         if (verbose) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
-     &                 6x,'RMS Residual',f15.10)
+     &                 7x,'RMS Residual',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge
