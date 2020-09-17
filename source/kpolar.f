@@ -45,6 +45,7 @@ c
       use polpcg
       use poltcg
       use potent
+      use uprior
       implicit none
       integer i,j,k
       integer it,next
@@ -70,6 +71,13 @@ c
       do i = 1, n
          list(i) = 0
       end do
+c
+c     set defaults for use of induced dipole prediction
+c
+      use_pred = .false.
+      polpred = 'LSQR'
+      maxualt = 6
+      nualt = 0
 c
 c     set defaults for PCG induced dipole parameters
 c
@@ -157,6 +165,11 @@ c
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
+         else if (keyword(1:14) .eq. 'POLAR-PREDICT ') then
+            call getword (record,polpred,next)
+            call upcase (polpred)
+            use_pred = .true.
+            if (polpred .eq. '    ')  polpred = 'LSQR'
          else if (keyword(1:12) .eq. 'PCG-PRECOND ') then
             pcgprec = .true.
          else if (keyword(1:14) .eq. 'PCG-NOPRECOND ') then
@@ -181,6 +194,42 @@ c
          end if
    20    continue
       end do
+c
+c     set the 6th-order Gear predictor binomial coefficients
+c
+      if (polpred .eq. 'GEAR') then
+         maxualt = 7
+         gear(1) = 6.0d0
+         gear(2) = -15.0d0
+         gear(3) = 20.0d0
+         gear(4) = -15.0d0
+         gear(5) = 6.0d0
+         gear(6) = -1.0d0
+         gear(7) = 0.0d0
+      end if
+c
+c     set 16-step always stable predictor-corrector (ASPC) coefficients
+c
+      if (polpred .eq. 'ASPC') then
+         maxualt = 17
+         aspc(1) = 62.0d0 / 17.0d0
+         aspc(2) = -310.0d0 / 51.0d0
+         aspc(3) = 2170.0d0 / 323.0d0
+         aspc(4) = -2329.0d0 / 400.0d0
+         aspc(5) = 1701.0d0 / 409.0d0
+         aspc(6) = -806.0d0 / 323.0d0
+         aspc(7) = 1024.0d0 / 809.0d0
+         aspc(8) = -479.0d0 / 883.0d0
+         aspc(9) = 257.0d0 / 1316.0d0
+         aspc(10) = -434.0d0 / 7429.0d0
+         aspc(11) = 191.0d0 / 13375.0d0
+         aspc(12) = -62.0d0 / 22287.0d0
+         aspc(13) = 3.0d0 / 7217.0d0
+         aspc(14) = -3.0d0 / 67015.0d0
+         aspc(15) = 2.0d0 / 646323.0d0
+         aspc(16) = -1.0d0 / 9694845.0d0
+         aspc(17) = 0.0d0
+      end if
 c
 c     get maximum coefficient order for OPT induced dipoles
 c
@@ -218,6 +267,16 @@ c
       allocate (uind(3,n))
       allocate (uinp(3,n))
       allocate (douind(n))
+      if (allocated(udalt))  deallocate (udalt)
+      if (allocated(upalt))  deallocate (upalt)
+      if (allocated(usalt))  deallocate (usalt)
+      if (allocated(upsalt))  deallocate (upsalt)
+      if (use_pred) then
+         allocate (udalt(maxualt,3,n))
+         allocate (upalt(maxualt,3,n))
+         allocate (usalt(maxualt,3,n))
+         allocate (upsalt(maxualt,3,n))
+      end if
       if (allocated(uopt))  deallocate (uopt)
       if (allocated(uoptp))  deallocate (uoptp)
       if (allocated(fopt))  deallocate (fopt)
@@ -227,6 +286,21 @@ c
          allocate (uoptp(0:optorder,3,n))
          allocate (fopt(0:optorder,10,n))
          allocate (foptp(0:optorder,10,n))
+      end if
+c
+c     initialize prior values of induced dipole moments
+c
+      if (use_pred) then
+        do i = 1, n
+            do j = 1, 3
+               do k = 1, maxualt
+                  udalt(k,j,i) = 0.0d0
+                  upalt(k,j,i) = 0.0d0
+                  usalt(k,j,i) = 0.0d0
+                  upsalt(k,j,i) = 0.0d0
+               end do
+            end do
+         end do
       end if
 c
 c     set the atoms allowed to have nonzero induced dipoles

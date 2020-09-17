@@ -517,7 +517,7 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (verbose) then
+         if (debug) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
      &                 7x,'RMS Residual',f15.10)
