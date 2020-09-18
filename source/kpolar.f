@@ -61,16 +61,9 @@ c
       character*240 string
 c
 c
-c     perform dynamic allocation of some local arrays
+c     set the default values for polarization variables
 c
-      allocate (list(n))
-c
-c     set defaults for numbers and lists of polarizable atoms
-c
-      nlist = 0
-      do i = 1, n
-         list(i) = 0
-      end do
+      polprt = .false.
 c
 c     set defaults for use of induced dipole prediction
 c
@@ -151,6 +144,17 @@ c
          copt(6) = 0.122d0
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
+c     set defaults for numbers and lists of polarizable atoms
+c
+      nlist = 0
+      do i = 1, n
+         list(i) = 0
+      end do
+c
 c     get keywords containing polarization-related options
 c
       do j = 1, nkey
@@ -165,6 +169,8 @@ c
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
+         else if (keyword(1:12) .eq. 'POLAR-PRINT ') then
+            polprt = .true.
          else if (keyword(1:14) .eq. 'POLAR-PREDICT ') then
             call getword (record,polpred,next)
             call upcase (polpred)

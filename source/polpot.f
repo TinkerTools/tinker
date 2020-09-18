@@ -35,6 +35,7 @@ c     w3scale      scale factor for 1-3 induced dipole interactions
 c     w4scale      scale factor for 1-4 induced dipole interactions
 c     w5scale      scale factor for 1-5 induced dipole interactions
 c     udiag        acceleration factor for induced dipole SCF iterations
+c     polprt       flag to print summary of induced dipole iterations
 c     dpequal      flag to set dscale values equal to pscale values
 c     use_thole    flag to use Thole damped polarization interactions
 c     use_dirdamp  flag to use damped direct polarization interactions
@@ -56,6 +57,7 @@ c
       real*8 w2scale,w3scale
       real*8 w4scale,w5scale
       real*8 udiag
+      logical polprt
       logical dpequal
       logical use_thole
       logical use_dirdamp

@@ -628,7 +628,10 @@ struct {
    double w4scale;
    double w5scale;
    double udiag;
+   int polprt;
+   int dpequal;
    int use_thole;
+   int use_dirdamp;
    char poltyp[MAX_STRING];
 } polpot__;
 
@@ -1561,7 +1564,8 @@ void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
                        double* d3scale, double* d4scale, double* u1scale,
                        double* u2scale, double* u3scale, double* u4scale,
                        double* w2scale, double* w3scale, double* w4scale,
-                       double* w5scale, double* udiag, int* use_thole,
+                       double* w5scale, double* udiag, int* polprt,
+                       int* dpequal, int* use_thole, int* use_dirdamp,
                        char* poltyp) {
 
    polpot__.politer = *politer;
@@ -1586,8 +1590,11 @@ void set_polpot_data_ (int* politer, double* poleps, double* p2scale,
    polpot__.w3scale = *w3scale;
    polpot__.w4scale = *w4scale;
    polpot__.w5scale = *w5scale;
-   polpot__.use_thole = *use_thole;
    polpot__.udiag = *udiag;
+   polpot__.polprt = *polprt;
+   polpot__.dpequal = *dpequal;
+   polpot__.use_thole = *use_thole;
+   polpot__.use_dirdamp = *use_dirdamp;
    setNullTerminator (poltyp, 6, polpot__.poltyp);
 }
 

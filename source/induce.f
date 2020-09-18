@@ -153,6 +153,7 @@ c
       use uprior
       implicit none
       integer i,j,k,iter
+      integer miniter
       integer maxiter
       real*8 polmin
       real*8 eps,epsold
@@ -274,7 +275,8 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         maxiter = 100
+         miniter = 3
+         maxiter = politer
          iter = 0
          polmin = 0.00000001d0
          eps = 100.0d0
@@ -486,7 +488,8 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
+            if (iter .lt. miniter)  done = .false.
+            if (iter .ge. maxiter)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
@@ -517,7 +520,7 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (debug) then
+         if (debug .or. polprt) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
      &                 7x,'RMS Residual',f15.10)
@@ -4768,6 +4771,7 @@ c
       use uprior
       implicit none
       integer i,j,k,iter
+      integer miniter
       integer maxiter
       real*8 polmin
       real*8 eps,epsold
@@ -4925,7 +4929,8 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         maxiter = 100
+         miniter = 3
+         maxiter = politer
          iter = 0
          polmin = 0.00000001d0
          eps = 100.0d0
@@ -5131,7 +5136,8 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
+            if (iter .ge. miniter)  done = .false.
+            if (iter .ge. maxiter)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
@@ -6138,6 +6144,7 @@ c
       use uprior
       implicit none
       integer i,j,k,iter
+      integer miniter
       integer maxiter
       real*8 polmin
       real*8 eps,epsold
@@ -6295,7 +6302,8 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         maxiter = 100
+         miniter = 3
+         maxiter = politer
          iter = 0
          polmin = 0.00000001d0
          eps = 100.0d0
@@ -6501,7 +6509,8 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. politer)  done = .true.
+            if (iter .ge. miniter)  done = .false.
+            if (iter .ge. maxiter)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
