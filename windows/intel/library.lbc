@@ -331,6 +331,7 @@ light.obj
 lights.obj
 limits.obj
 linmin.obj
+lusolve.obj
 makeint.obj
 makeref.obj
 makexyz.obj
@@ -414,7 +415,7 @@ prtseq.obj
 prtxyz.obj
 ptable.obj
 qmstuf.obj
-qrfact.obj
+qrsolve.obj
 quatfit.obj
 random.obj
 rattle.obj

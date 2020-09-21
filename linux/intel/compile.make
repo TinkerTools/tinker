@@ -443,6 +443,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kvdw.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lattice.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lbfgs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lights.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lusolve.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makeint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makeref.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makexyz.f
@@ -509,7 +510,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pss.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrigid.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qrfact.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qrsolve.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp quatfit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp radial.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp random.f

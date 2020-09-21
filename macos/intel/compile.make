@@ -443,6 +443,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp lattice.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp lbfgs.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp lights.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp lusolve.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp makeint.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp makeref.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp makexyz.f
@@ -509,7 +510,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp 
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp pss.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp pssrigid.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp pssrot.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp qrfact.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp qrsolve.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp quatfit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp radial.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp random.f

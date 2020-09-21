@@ -494,6 +494,7 @@ OBJS =	action.o \
 	lights.o \
 	limits.o \
 	linmin.o \
+	lusolve.o \
 	makeint.o \
 	makeref.o \
 	makexyz.o \
@@ -601,7 +602,7 @@ OBJS =	action.o \
 	pssrot.o \
 	ptable.o \
 	qmstuf.o \
-	qrfact.o \
+	qrsolve.o \
 	quatfit.o \
 	radial.o \
 	random.o \
@@ -1106,6 +1107,7 @@ libtinker.a: ${OBJS}
 	lights.o \
 	limits.o \
 	linmin.o \
+	lusolve.o \
 	makeint.o \
 	makeref.o \
 	makexyz.o \
@@ -1191,7 +1193,7 @@ libtinker.a: ${OBJS}
 	prtxyz.o \
 	ptable.o \
 	qmstuf.o \
-	qrfact.o \
+	qrsolve.o \
 	quatfit.o \
 	random.o \
 	rattle.o \
@@ -1639,6 +1641,7 @@ light.o:
 lights.o: bound.o boxes.o cell.o iounit.o light.o
 limits.o:
 linmin.o:
+lusolve.o: iounit.o
 makeint.o: atoms.o couple.o inform.o iounit.o math.o sizes.o zclose.o zcoord.o
 makeref.o: atomid.o atoms.o boxes.o couple.o files.o refer.o titles.o
 makexyz.o: atoms.o zcoord.o
@@ -1744,7 +1747,7 @@ pssrigid.o: atoms.o files.o group.o inform.o iounit.o math.o minima.o molcul.o r
 pssrot.o: atoms.o files.o inform.o iounit.o math.o minima.o omega.o refer.o warp.o zcoord.o
 ptable.o:
 qmstuf.o:
-qrfact.o:
+qrsolve.o:
 quatfit.o: align.o
 radial.o: argue.o atomid.o atoms.o bound.o boxes.o files.o inform.o iounit.o limits.o math.o molcul.o potent.o
 random.o: inform.o iounit.o keys.o math.o

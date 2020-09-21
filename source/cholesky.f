@@ -13,9 +13,9 @@ c     ################################################################
 c
 c
 c     "cholesky" uses a modified Cholesky method to solve the linear
-c     system Ax = b, returning "x" in "b"; "A" is a real symmetric
-c     positive definite matrix with its upper triangle (including the
-c     diagonal) stored by rows
+c     system Ax = b, returning "x" in "b"; "A" must be a real symmetric
+c     positive definite matrix with its upper triangle including the
+c     diagonal stored by rows
 c
 c     literature reference:
 c
@@ -92,7 +92,7 @@ c
 c
 c     finally, solve (D)(L transpose)(x) = y for x
 c
-      ii = nvar*(nvar+1)/2
+      ii = nvar * (nvar+1) / 2
       do j = 1, nvar
          i = nvar + 1 - j
          r = b(i) * a(ii)

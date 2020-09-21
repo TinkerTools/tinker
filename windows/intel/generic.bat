@@ -444,6 +444,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kvdw.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lattice.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lbfgs.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lights.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lusolve.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makeint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makeref.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makexyz.f
@@ -510,7 +511,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtxyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pss.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pssrigid.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pssrot.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp qrfact.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp qrsolve.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp quatfit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp radial.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp random.f

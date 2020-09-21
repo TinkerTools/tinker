@@ -443,6 +443,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 kvdw
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 lattice.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 lbfgs.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 lights.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 lusolve.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 makeint.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 makeref.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 makexyz.f
@@ -509,7 +510,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 prtx
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 pss.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 pssrigid.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 pssrot.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 qrfact.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 qrsolve.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 quatfit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 radial.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -vec-report0 random.f

@@ -443,6 +443,7 @@ gfortran -c -O3 -ffast-math -fopenmp kvdw.f
 gfortran -c -O3 -ffast-math -fopenmp lattice.f
 gfortran -c -O3 -ffast-math -fopenmp lbfgs.f
 gfortran -c -O3 -ffast-math -fopenmp lights.f
+gfortran -c -O3 -ffast-math -fopenmp lusolve.f
 gfortran -c -O3 -ffast-math -fopenmp makeint.f
 gfortran -c -O3 -ffast-math -fopenmp makeref.f
 gfortran -c -O3 -ffast-math -fopenmp makexyz.f
@@ -509,7 +510,7 @@ gfortran -c -O3 -ffast-math -fopenmp prtxyz.f
 gfortran -c -O3 -ffast-math -fopenmp pss.f
 gfortran -c -O3 -ffast-math -fopenmp pssrigid.f
 gfortran -c -O3 -ffast-math -fopenmp pssrot.f
-gfortran -c -O3 -ffast-math -fopenmp qrfact.f
+gfortran -c -O3 -ffast-math -fopenmp qrsolve.f
 gfortran -c -O3 -ffast-math -fopenmp quatfit.f
 gfortran -c -O3 -ffast-math -fopenmp radial.f
 gfortran -c -O3 -ffast-math -fopenmp random.f

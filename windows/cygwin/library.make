@@ -342,6 +342,7 @@ light.o \
 lights.o \
 limits.o \
 linmin.o \
+lusolve.o \
 makeint.o \
 makeref.o \
 makexyz.o \
@@ -425,7 +426,7 @@ prtseq.o \
 prtxyz.o \
 ptable.o \
 qmstuf.o \
-qrfact.o \
+qrsolve.o \
 quatfit.o \
 random.o \
 rattle.o \

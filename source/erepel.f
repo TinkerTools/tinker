@@ -56,6 +56,7 @@ c
       use energi
       use group
       use mpole
+      use mutant
       use potent
       use repel
       use reppot
@@ -90,6 +91,7 @@ c
       real*8 dmpik(9)
       real*8, allocatable :: rscale(:)
       logical proceed,usei
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -142,6 +144,7 @@ c
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -162,6 +165,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -220,7 +224,7 @@ c
                   call damprep (r,r2,rr1,rr3,rr5,rr7,rr9,rr11,
      &                             9,dmpi,dmpk,dmpik)                  
 c
-c     compute the Pauli repulsion energy for this interaction
+c     compute intermediate terms for the Pauli repulsion energy
 c
                   term1 = vali*valk
                   term2 = valk*dir - vali*dkr + dik
@@ -232,7 +236,26 @@ c
      &                       + term3*dmpik(5) + term4*dmpik(7)
      &                       + term5*dmpik(9)
                   sizik = sizi * sizk
-                  e = sizik * rscale(k) * eterm * rr1
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     e = vlambda * sizik * rscale(k) * eterm
+     &                      / sqrt(1.0d0-vlambda+r2)
+                  else
+                     e = sizik * rscale(k) * eterm * rr1
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c

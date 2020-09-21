@@ -443,6 +443,7 @@ ifort -c -g -warn all -check all kvdw.f
 ifort -c -g -warn all -check all lattice.f
 ifort -c -g -warn all -check all lbfgs.f
 ifort -c -g -warn all -check all lights.f
+ifort -c -g -warn all -check all lusolve.f
 ifort -c -g -warn all -check all makeint.f
 ifort -c -g -warn all -check all makeref.f
 ifort -c -g -warn all -check all makexyz.f
@@ -509,7 +510,7 @@ ifort -c -g -warn all -check all prtxyz.f
 ifort -c -g -warn all -check all pss.f
 ifort -c -g -warn all -check all pssrigid.f
 ifort -c -g -warn all -check all pssrot.f
-ifort -c -g -warn all -check all qrfact.f
+ifort -c -g -warn all -check all qrsolve.f
 ifort -c -g -warn all -check all quatfit.f
 ifort -c -g -warn all -check all radial.f
 ifort -c -g -warn all -check all random.f

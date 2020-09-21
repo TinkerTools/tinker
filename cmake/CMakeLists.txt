@@ -56,32 +56,32 @@ add_library(tinker
             kpitor.f kpitors.f kpolar.f kpolr.f krepel.f krepl.f ksolut.f
             ksolv.f kstbnd.f kstrbnd.f kstrtor.f ksttor.f ktors.f ktorsn.f
             ktortor.f ktrtor.f kurey.f kurybr.f kvdw.f kvdwpr.f kvdws.f
-            lattice.f lbfgs.f light.f lights.f limits.f linmin.f makeint.f
-            makeref.f makexyz.f math.f maxwell.f mdinit.f mdrest.f mdsave.f
-            mdstat.f mdstuf.f mechanic.f merck.f merge.f minima.f molcul.f
-            moldyn.f molecule.f moment.f moments.f mplpot.f mpole.f mrecip.f
-            mutant.f mutate.f nblist.f neigh.f nextarg.f nexttext.f nonpol.f
-            nose.f nspline.f nucleo.f number.f numeral.f numgrad.f ocvm.f
-            omega.f opbend.f opdist.f openend.f openmp.f optinit.f optsave.f
-            orbital.f orbits.f orient.f orthog.f output.f overlap.f params.f
-            paths.f pbstuf.f pdb.f phipsi.f picalc.f piorbs.f pistuf.f
-            pitors.f pme.f pmestuf.f pmpb.f polar.f polgrp.f polopt.f
-            polpcg.f polpot.f poltcg.f polymer.f potent.f potfit.f pressure.f
-            prmkey.f promo.f prtdyn.f prterr.f prtint.f prtmol2.f prtpdb.f
-            prtprm.f prtseq.f prtxyz.f ptable.f qmstuf.f qrfact.f quatfit.f
-            random.f rattle.f readdyn.f readgau.f readgdma.f readint.f
-            readmol.f readmol2.f readpdb.f readprm.f readseq.f readxyz.f
-            refer.f repel.f replica.f reppot.f resdue.f respa.f restrn.f
-            rgddyn.f rgdstep.f rigid.f ring.f rings.f rmsfit.f rotbnd.f
-            rotlist.f rotpole.f rxnfld.f rxnpot.f scales.f sdstep.f search.f
-            sequen.f server.f shakeup.f shunt.f sigmoid.f simplex.f sizes.f
-            sktstuf.f socket.f solpot.f solute.f sort.f square.f stodyn.f
-            strbnd.f strtor.f suffix.f surface.f surfatom.f switch.f
-            syntrn.f tarray.f tcgstuf.f temper.f titles.f tncg.f torphase.f
-            torpot.f torque.f tors.f torsions.f tortor.f tree.f trimtext.f
-            unitcell.f units.f uprior.f urey.f urypot.f usage.f valfit.f
-            vdw.f vdwpot.f verlet.f version.f vibs.f virial.f volume.f
-            warp.f xtals.f xyzatm.f zatom.f zclose.f zcoord.f)
+            lattice.f lbfgs.f light.f lights.f limits.f linmin.f lusolve.f
+            makeint.f makeref.f makexyz.f math.f maxwell.f mdinit.f mdrest.f
+            mdsave.f mdstat.f mdstuf.f mechanic.f merck.f merge.f minima.f
+            molcul.f moldyn.f molecule.f moment.f moments.f mplpot.f mpole.f
+            mrecip.f mutant.f mutate.f nblist.f neigh.f nextarg.f nexttext.f
+            nonpol.f nose.f nspline.f nucleo.f number.f numeral.f numgrad.f
+            ocvm.f omega.f opbend.f opdist.f openend.f openmp.f optinit.f
+            optsave.f orbital.f orbits.f orient.f orthog.f output.f overlap.f
+            params.f paths.f pbstuf.f pdb.f phipsi.f picalc.f piorbs.f
+            pistuf.f pitors.f pme.f pmestuf.f pmpb.f polar.f polgrp.f
+            polopt.f polpcg.f polpot.f poltcg.f polymer.f potent.f potfit.f
+            pressure.f prmkey.f promo.f prtdyn.f prterr.f prtint.f prtmol2.f
+            prtpdb.f prtprm.f prtseq.f prtxyz.f ptable.f qmstuf.f qrsolve.f
+            quatfit.f random.f rattle.f readdyn.f readgau.f readgdma.f
+            readint.f readmol.f readmol2.f readpdb.f readprm.f readseq.f
+            readxyz.f refer.f repel.f replica.f reppot.f resdue.f respa.f
+            restrn.f rgddyn.f rgdstep.f rigid.f ring.f rings.f rmsfit.f
+            rotbnd.f rotlist.f rotpole.f rxnfld.f rxnpot.f scales.f sdstep.f
+            search.f sequen.f server.f shakeup.f shunt.f sigmoid.f simplex.f
+            sizes.f sktstuf.f socket.f solpot.f solute.f sort.f square.f
+            stodyn.f strbnd.f strtor.f suffix.f surface.f surfatom.f
+            switch.f syntrn.f tarray.f tcgstuf.f temper.f titles.f tncg.f
+            torphase.f torpot.f torque.f tors.f torsions.f tortor.f tree.f
+            trimtext.f unitcell.f units.f uprior.f urey.f urypot.f usage.f
+            valfit.f vdw.f vdwpot.f verlet.f version.f vibs.f virial.f
+            volume.f warp.f xtals.f xyzatm.f zatom.f zclose.f zcoord.f)
 install(TARGETS tinker LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE
         DESTINATION ${CMAKE_INSTALL_LIBDIR})
 

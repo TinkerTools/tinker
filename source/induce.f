@@ -7269,7 +7269,7 @@ c
             end do
          end do
 c
-c     check for nonzero coefficients and solve normal equations
+c     check for nonzero coefficients of the normal equations
 c
          k = nualt - 1
          amax = 0.0d0
@@ -7278,8 +7278,13 @@ c
             amax = max(amax,a(i))
             apmax = max(apmax,ap(i))
          end do
-         if (amax .ne. 0.0d0)  call cholesky (k,a,b)
-         if (apmax .ne. 0.0d0)  call cholesky (k,ap,bp)
+c
+c     solve the equations via LU or Cholesky factorization
+c
+         if (amax .ne. 0.0d0)  call lusolve (k,a,b)
+         if (apmax .ne. 0.0d0)  call lusolve (k,ap,bp)
+c        if (amax .ne. 0.0d0)  call cholesky (k,a,b)
+c        if (apmax .ne. 0.0d0)  call cholesky (k,ap,bp)
 c
 c     transfer the final solution to the coefficient vector
 c
