@@ -23,6 +23,7 @@ c
       use hescut
       use inform
       use iounit
+      use uprior
       use usage
       implicit none
       integer i,j,k,m
@@ -99,6 +100,12 @@ c
          end if
          call upcase (answer)
          if (answer .eq. 'N')  donumer = .false.
+      end if
+c
+c     disable induced dipole prediction for numerical Hessian
+c
+      if (donumer) then
+         use_pred = .false.
       end if
 c
 c     get numerical Hessian from either gradient or energy

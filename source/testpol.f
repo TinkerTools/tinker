@@ -31,6 +31,7 @@ c
       use potent
       use rigid
       use units
+      use uprior
       use usage
       implicit none
       integer i,j,k,m
@@ -109,6 +110,10 @@ c
 c     maintain any periodic boundary conditions
 c
       if (use_bounds .and. .not.use_rigid)  call bounds
+c
+c     disable prediction methods for the induced dipoles
+c
+      use_pred = .false.
 c
 c     store the original polarization type for the system
 c

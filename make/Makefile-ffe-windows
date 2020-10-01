@@ -2144,12 +2144,12 @@ syntrn.o:
 tarray.o:
 tcgstuf.o: atoms.o iounit.o limits.o mpole.o polar.o poltcg.o potent.o
 temper.o: atomid.o atoms.o bath.o group.o ielscf.o mdstuf.o molcul.o moldyn.o rgddyn.o units.o usage.o
-testgrad.o: atoms.o deriv.o energi.o files.o inform.o inter.o iounit.o solute.o usage.o
-testhess.o: atoms.o files.o hescut.o inform.o iounit.o usage.o
+testgrad.o: atoms.o deriv.o energi.o files.o inform.o inter.o iounit.o solute.o uprior.o usage.o
+testhess.o: atoms.o files.o hescut.o inform.o iounit.o uprior.o usage.o
 testpair.o: atoms.o deriv.o energi.o inform.o iounit.o light.o limits.o neigh.o polpot.o potent.o tarray.o vdwpot.o
-testpol.o: atoms.o bound.o inform.o iounit.o limits.o minima.o polar.o polopt.o polpot.o poltcg.o potent.o rigid.o units.o usage.o
-testrot.o: domega.o energi.o inform.o iounit.o math.o omega.o zcoord.o
-testvir.o: atoms.o bath.o bound.o boxes.o inform.o iounit.o math.o units.o virial.o
+testpol.o: atoms.o bound.o inform.o iounit.o limits.o minima.o polar.o polopt.o polpot.o poltcg.o potent.o rigid.o units.o uprior.o usage.o
+testrot.o: domega.o energi.o inform.o iounit.o math.o omega.o uprior.o zcoord.o
+testvir.o: atoms.o bath.o bound.o boxes.o inform.o iounit.o math.o units.o uprior.o virial.o
 timer.o: atoms.o hescut.o inform.o iounit.o limits.o
 timerot.o: iounit.o limits.o omega.o
 titles.o:
