@@ -23,6 +23,7 @@ c
       use ctrpot
       use dsppot
       use fields
+      use ielscf
       use kanang
       use kangs
       use kantor
@@ -63,6 +64,7 @@ c
       use urypot
       use torpot
       use units
+      use uprior
       use vdwpot
       implicit none
       integer i,j
@@ -370,7 +372,7 @@ c
       d2scale = 1.0d0
       d3scale = 1.0d0
       d4scale = 1.0d0
-      use_chgpen = .false.
+      use_chgpen = .true.
 c
 c     set default control parameters for induced dipole terms
 c
@@ -397,6 +399,8 @@ c
       dpequal = .false.
       use_thole = .false.
       use_dirdamp = .false.
+      use_pred = .false.
+      use_ielscf = .false.
 c
 c     set default control parameters for charge transfer terms
 c

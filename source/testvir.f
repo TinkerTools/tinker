@@ -22,7 +22,6 @@ c
       use inform
       use iounit
       use virial
-      use uprior
       implicit none
       integer i
       real*8 energy
@@ -34,10 +33,6 @@ c
       call initial
       call getxyz
       call mechanic
-c
-c     disable induced dipole prediction for numerical dE/dV
-c
-      use_pred = .false.
 c
 c     set option control flags based desired analysis types
 c

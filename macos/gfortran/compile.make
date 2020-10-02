@@ -494,6 +494,7 @@ gfortran -c -Ofast -mssse3 -fopenmp polarize.f
 gfortran -c -Ofast -mssse3 -fopenmp poledit.f
 gfortran -c -Ofast -mssse3 -fopenmp polymer.f
 gfortran -c -Ofast -mssse3 -fopenmp potential.f
+gfortran -c -Ofast -mssse3 -fopenmp predict.f
 gfortran -c -Ofast -mssse3 -fopenmp pressure.f
 gfortran -c -Ofast -mssse3 -fopenmp prmedit.f
 gfortran -c -Ofast -mssse3 -fopenmp prmkey.f

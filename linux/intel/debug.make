@@ -494,6 +494,7 @@ ifort -c -g -warn all -check all polarize.f
 ifort -c -g -warn all -check all poledit.f
 ifort -c -g -warn all -check all polymer.f
 ifort -c -g -warn all -check all potential.f
+ifort -c -g -warn all -check all predict.f
 ifort -c -g -warn all -check all pressure.f
 ifort -c -g -warn all -check all prmedit.f
 ifort -c -g -warn all -check all prmkey.f

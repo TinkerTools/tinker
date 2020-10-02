@@ -495,6 +495,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polarize.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp poledit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp polymer.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp potential.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp predict.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pressure.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prmedit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prmkey.f

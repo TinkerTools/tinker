@@ -24,7 +24,6 @@ c
       use iounit
       use math
       use omega
-      use uprior
       use zcoord
       implicit none
       integer i
@@ -71,10 +70,6 @@ c
       end if
       if (delta .le. 0.0d0)  delta = delta0
       eps = -delta / radian
-c
-c     disable induced dipole prediction for numerical gradient
-c
-      use_pred = .false.
 c
 c     perform dynamic allocation of some local arrays
 c

@@ -494,6 +494,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polarize.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp poledit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polymer.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp potential.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp predict.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pressure.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prmedit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prmkey.f

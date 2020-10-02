@@ -413,6 +413,7 @@ poltcg.o \
 polymer.o \
 potent.o \
 potfit.o \
+predict.o \
 pressure.o \
 prmkey.o \
 promo.o \

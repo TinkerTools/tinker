@@ -26,7 +26,6 @@ c
       use inter
       use iounit
       use solute
-      use uprior
       use usage
       implicit none
       integer i,j,ixyz
@@ -116,12 +115,6 @@ c
       end if
       call upcase (answer)
       if (answer .eq. 'N')  donumer = .false.
-c
-c     disable induced dipole prediction for numerical gradient
-c
-      if (donumer) then
-         use_pred = .false.
-      end if
 c
 c     get the stepsize for numerical gradient calculation
 c
