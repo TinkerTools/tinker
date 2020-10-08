@@ -133,7 +133,7 @@ c
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine auxinit  --  initialize auxiliary dipole values  ##
+c     ##  subroutine auxinit  --  setup auxiliary dipoles for IELSCF  ##
 c     ##                                                              ##
 c     ##################################################################
 c

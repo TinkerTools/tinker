@@ -110,7 +110,6 @@ c
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: dscale(:)
       logical header,huge
       character*6 mode
 c
@@ -150,13 +149,11 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
-      allocate (dscale(n))
 c
 c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
-         dscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -197,81 +194,34 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-               dscale(i12(j,i)) = pscale(i12(j,i))
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
             end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-               dscale(i13(j,i)) = pscale(i13(j,i))
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
             end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-               dscale(i14(j,i)) = pscale(i14(j,i))
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = p4scale
+            do k = 1, np11(i)
+               if (i14(j,i) .eq. ip11(k,i))
+     &            pscale(i14(j,i)) = p4iscale
             end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-               dscale(i15(j,i)) = pscale(i15(j,i))
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
             end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = d1scale
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = d2scale
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = d3scale
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = d4scale
-            end do
-         end if
+         end do
 c
 c     evaluate all sites within the cutoff distance
 c
@@ -366,7 +316,7 @@ c
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
-                  scalek = dscale(k)
+                  scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
@@ -418,49 +368,18 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-               dscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-               dscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-               dscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-               dscale(i15(j,i)) = 1.0d0
-            end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = 1.0d0
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = 1.0d0
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = 1.0d0
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = 1.0d0
-            end do
-         end if
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = 1.0d0
+         end do
       end do
 c
 c     for periodic boundary conditions with large cutoffs
@@ -500,81 +419,34 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-            if (dpequal) then
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = p2scale
-                  do k = 1, np11(i)
-                     if (i12(j,i) .eq. ip11(k,i))
-     &                  pscale(i12(j,i)) = p2iscale
-                  end do
-                  dscale(i12(j,i)) = pscale(i12(j,i))
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               pscale(i12(j,i)) = p2iscale
                end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = p3scale
-                  do k = 1, np11(i)
-                     if (i13(j,i) .eq. ip11(k,i))
-     &                  pscale(i13(j,i)) = p3iscale
-                  end do
-                  dscale(i13(j,i)) = pscale(i13(j,i))
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               pscale(i13(j,i)) = p3iscale
                end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = p4scale
-                  do k = 1, np11(i)
-                     if (i14(j,i) .eq. ip11(k,i))
-     &                  pscale(i14(j,i)) = p4iscale
-                  end do
-                  dscale(i14(j,i)) = pscale(i14(j,i))
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                  if (i14(j,i) .eq. ip11(k,i))
+     &               pscale(i14(j,i)) = p4iscale
                end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = p5scale
-                  do k = 1, np11(i)
-                     if (i15(j,i) .eq. ip11(k,i))
-     &                  pscale(i15(j,i)) = p5iscale
-                  end do
-                  dscale(i15(j,i)) = pscale(i15(j,i))
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               pscale(i15(j,i)) = p5iscale
                end do
-            else
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = p2scale
-                  do k = 1, np11(i)
-                     if (i12(j,i) .eq. ip11(k,i))
-     &                  pscale(i12(j,i)) = p2iscale
-                  end do
-               end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = p3scale
-                  do k = 1, np11(i)
-                     if (i13(j,i) .eq. ip11(k,i))
-     &                  pscale(i13(j,i)) = p3iscale
-                  end do
-               end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = p4scale
-                  do k = 1, np11(i)
-                     if (i14(j,i) .eq. ip11(k,i))
-     &                  pscale(i14(j,i)) = p4iscale
-                  end do
-               end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = p5scale
-                  do k = 1, np11(i)
-                     if (i15(j,i) .eq. ip11(k,i))
-     &                  pscale(i15(j,i)) = p5iscale
-                  end do
-               end do
-               do j = 1, np11(i)
-                  dscale(ip11(j,i)) = d1scale
-               end do
-               do j = 1, np12(i)
-                  dscale(ip12(j,i)) = d2scale
-               end do
-               do j = 1, np13(i)
-                  dscale(ip13(j,i)) = d3scale
-               end do
-               do j = 1, np14(i)
-                  dscale(ip14(j,i)) = d4scale
-               end do
-            end if
+            end do
 c
 c     evaluate all sites within the cutoff distance
 c
@@ -588,7 +460,6 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   if (.not. (use_polymer .and. r2.le.polycut2)) then
                      pscale(k) = 1.0d0
-                     dscale(k) = 1.0d0
                   end if
                   if (r2 .le. off2) then
                      r = sqrt(r2)
@@ -676,7 +547,7 @@ c
                         valk = pval(kk)
                         alphak = palpha(kk)
                         call dampdir (r,alphai,alphak,dmpi,dmpk)
-                        scalek = dscale(k)
+                        scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
@@ -728,56 +599,24 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-            if (dpequal) then
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = 1.0d0
-                  dscale(i12(j,i)) = 1.0d0
-               end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = 1.0d0
-                  dscale(i13(j,i)) = 1.0d0
-               end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = 1.0d0
-                  dscale(i14(j,i)) = 1.0d0
-               end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = 1.0d0
-                  dscale(i15(j,i)) = 1.0d0
-               end do
-            else
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = 1.0d0
-               end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = 1.0d0
-               end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = 1.0d0
-               end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = 1.0d0
-               end do
-               do j = 1, np11(i)
-                  dscale(ip11(j,i)) = 1.0d0
-               end do
-               do j = 1, np12(i)
-                  dscale(ip12(j,i)) = 1.0d0
-               end do
-               do j = 1, np13(i)
-                  dscale(ip13(j,i)) = 1.0d0
-               end do
-               do j = 1, np14(i)
-                  dscale(ip14(j,i)) = 1.0d0
-               end do
-            end if
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = 1.0d0
+            end do
          end do
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
-      deallocate (dscale)
       return
       end
 c
@@ -846,7 +685,6 @@ c
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: dscale(:)
       logical header,huge
       character*6 mode
 c
@@ -886,13 +724,11 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
-      allocate (dscale(n))
 c
 c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
-         dscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -907,10 +743,10 @@ c
 !$OMP& shared(npole,ipole,rpole,x,y,z,pdamp,thole,dirdamp,pcore,pval,
 !$OMP& palpha,uind,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& nelst,elst,dpequal,use_thole,use_dirdamp,use_chgpen,use_bounds,
-!$OMP& off2,f,molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(pscale,dscale) shared (ep,nep,aep,einter)
+!$OMP& p3iscale,p4iscale,p5iscale,nelst,elst,use_thole,use_dirdamp,
+!$OMP& use_chgpen,use_bounds,off2,f,molcule,name,verbose,debug,
+!$OMP& header,iout)
+!$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
 c     compute the dipole polarization energy component
@@ -945,81 +781,34 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-               dscale(i12(j,i)) = pscale(i12(j,i))
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
             end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-               dscale(i13(j,i)) = pscale(i13(j,i))
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
             end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-               dscale(i14(j,i)) = pscale(i14(j,i))
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = p4scale
+            do k = 1, np11(i)
+               if (i14(j,i) .eq. ip11(k,i))
+     &            pscale(i14(j,i)) = p4iscale
             end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-               dscale(i15(j,i)) = pscale(i15(j,i))
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
             end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = d1scale
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = d2scale
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = d3scale
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = d4scale
-            end do
-         end if
+         end do
 c
 c     evaluate all sites within the cutoff distance
 c
@@ -1115,7 +904,7 @@ c
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
-                  scalek = dscale(k)
+                  scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
@@ -1166,49 +955,18 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-               dscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-               dscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-               dscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-               dscale(i15(j,i)) = 1.0d0
-            end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = 1.0d0
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = 1.0d0
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = 1.0d0
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = 1.0d0
-            end do
-         end if
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = 1.0d0
+         end do
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1219,7 +977,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
-      deallocate (dscale)
       return
       end
 c
@@ -1422,7 +1179,6 @@ c
       real*8 dmpi(7),dmpk(7)
       real*8 bn(0:3)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: dscale(:)
       logical header,huge
       character*6 mode
       external erfc
@@ -1442,13 +1198,11 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
-      allocate (dscale(n))
 c
 c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
-         dscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -1489,81 +1243,34 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-               dscale(i12(j,i)) = pscale(i12(j,i))
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
             end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-               dscale(i13(j,i)) = pscale(i13(j,i))
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
             end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-               dscale(i14(j,i)) = pscale(i14(j,i))
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = p4scale
+            do k = 1, np11(i)
+               if (i14(j,i) .eq. ip11(k,i))
+     &            pscale(i14(j,i)) = p4iscale
             end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-               dscale(i15(j,i)) = pscale(i15(j,i))
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
             end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = d1scale
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = d2scale
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = d3scale
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = d4scale
-            end do
-         end if
+         end do
 c
 c     evaluate all sites within the cutoff distance
 c
@@ -1679,7 +1386,7 @@ c
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
-                  scalek = dscale(k)
+                  scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
@@ -1747,49 +1454,18 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-               dscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-               dscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-               dscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-               dscale(i15(j,i)) = 1.0d0
-            end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = 1.0d0
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = 1.0d0
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = 1.0d0
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = 1.0d0
-            end do
-         end if
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = 1.0d0
+         end do
       end do
 c
 c     for periodic boundary conditions with large cutoffs
@@ -1829,81 +1505,34 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-            if (dpequal) then
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = p2scale
-                  do k = 1, np11(i)
-                     if (i12(j,i) .eq. ip11(k,i))
-     &                  pscale(i12(j,i)) = p2iscale
-                  end do
-                  dscale(i12(j,i)) = pscale(i12(j,i))
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = p2scale
+               do k = 1, np11(i)
+                  if (i12(j,i) .eq. ip11(k,i))
+     &               pscale(i12(j,i)) = p2iscale
                end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = p3scale
-                  do k = 1, np11(i)
-                     if (i13(j,i) .eq. ip11(k,i))
-     &                  pscale(i13(j,i)) = p3iscale
-                  end do
-                  dscale(i13(j,i)) = pscale(i13(j,i))
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = p3scale
+               do k = 1, np11(i)
+                  if (i13(j,i) .eq. ip11(k,i))
+     &               pscale(i13(j,i)) = p3iscale
                end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = p4scale
-                  do k = 1, np11(i)
-                     if (i14(j,i) .eq. ip11(k,i))
-     &                  pscale(i14(j,i)) = p4iscale
-                  end do
-                  dscale(i14(j,i)) = pscale(i14(j,i))
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = p4scale
+               do k = 1, np11(i)
+                  if (i14(j,i) .eq. ip11(k,i))
+     &               pscale(i14(j,i)) = p4iscale
                end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = p5scale
-                  do k = 1, np11(i)
-                     if (i15(j,i) .eq. ip11(k,i))
-     &                  pscale(i15(j,i)) = p5iscale
-                  end do
-                  dscale(i15(j,i)) = pscale(i15(j,i))
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = p5scale
+               do k = 1, np11(i)
+                  if (i15(j,i) .eq. ip11(k,i))
+     &               pscale(i15(j,i)) = p5iscale
                end do
-            else
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = p2scale
-                  do k = 1, np11(i)
-                     if (i12(j,i) .eq. ip11(k,i))
-     &                  pscale(i12(j,i)) = p2iscale
-                  end do
-               end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = p3scale
-                  do k = 1, np11(i)
-                     if (i13(j,i) .eq. ip11(k,i))
-     &                  pscale(i13(j,i)) = p3iscale
-                  end do
-               end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = p4scale
-                  do k = 1, np11(i)
-                     if (i14(j,i) .eq. ip11(k,i))
-     &                  pscale(i14(j,i)) = p4iscale
-                  end do
-               end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = p5scale
-                  do k = 1, np11(i)
-                     if (i15(j,i) .eq. ip11(k,i))
-     &                  pscale(i15(j,i)) = p5iscale
-                  end do
-               end do
-               do j = 1, np11(i)
-                  dscale(ip11(j,i)) = d1scale
-               end do
-               do j = 1, np12(i)
-                  dscale(ip12(j,i)) = d2scale
-               end do
-               do j = 1, np13(i)
-                  dscale(ip13(j,i)) = d3scale
-               end do
-               do j = 1, np14(i)
-                  dscale(ip14(j,i)) = d4scale
-               end do
-            end if
+            end do
 c
 c     evaluate all sites within the cutoff distance
 c
@@ -1917,7 +1546,6 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   if (.not. (use_polymer .and. r2.le.polycut2)) then
                      pscale(k) = 1.0d0
-                     dscale(k) = 1.0d0
                   end if
                   if (r2 .le. off2) then
                      r = sqrt(r2)
@@ -2028,7 +1656,7 @@ c
                         valk = pval(kk)
                         alphak = palpha(kk)
                         call dampdir (r,alphai,alphak,dmpi,dmpk)
-                        scalek = dscale(k)
+                        scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
@@ -2101,56 +1729,24 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-            if (dpequal) then
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = 1.0d0
-                  dscale(i12(j,i)) = 1.0d0
-               end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = 1.0d0
-                  dscale(i13(j,i)) = 1.0d0
-               end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = 1.0d0
-                  dscale(i14(j,i)) = 1.0d0
-               end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = 1.0d0
-                  dscale(i15(j,i)) = 1.0d0
-               end do
-            else
-               do j = 1, n12(i)
-                  pscale(i12(j,i)) = 1.0d0
-               end do
-               do j = 1, n13(i)
-                  pscale(i13(j,i)) = 1.0d0
-               end do
-               do j = 1, n14(i)
-                  pscale(i14(j,i)) = 1.0d0
-               end do
-               do j = 1, n15(i)
-                  pscale(i15(j,i)) = 1.0d0
-               end do
-               do j = 1, np11(i)
-                  dscale(ip11(j,i)) = 1.0d0
-               end do
-               do j = 1, np12(i)
-                  dscale(ip12(j,i)) = 1.0d0
-               end do
-               do j = 1, np13(i)
-                  dscale(ip13(j,i)) = 1.0d0
-               end do
-               do j = 1, np14(i)
-                  dscale(ip14(j,i)) = 1.0d0
-               end do
-            end if
+            do j = 1, n12(i)
+               pscale(i12(j,i)) = 1.0d0
+            end do
+            do j = 1, n13(i)
+               pscale(i13(j,i)) = 1.0d0
+            end do
+            do j = 1, n14(i)
+               pscale(i14(j,i)) = 1.0d0
+            end do
+            do j = 1, n15(i)
+               pscale(i15(j,i)) = 1.0d0
+            end do
          end do
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
-      deallocate (dscale)
       return
       end
 c
@@ -2353,7 +1949,6 @@ c
       real*8 dmpi(7),dmpk(7)
       real*8 bn(0:3)
       real*8, allocatable :: pscale(:)
-      real*8, allocatable :: dscale(:)
       logical header,huge
       character*6 mode
       external erfc
@@ -2373,13 +1968,11 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
-      allocate (dscale(n))
 c
 c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
          pscale(i) = 1.0d0
-         dscale(i) = 1.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -2394,10 +1987,10 @@ c
 !$OMP& shared(npole,ipole,rpole,uind,x,y,z,pdamp,thole,dirdamp,pcore,
 !$OMP& pval,palpha,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& nelst,elst,dpequal,use_thole,use_dirdamp,use_chgpen,use_bounds,
-!$OMP& off2,f,aewald,molcule,name,verbose,debug,header,iout)
-!$OMP& firstprivate(pscale,dscale) shared (ep,nep,aep,einter)
+!$OMP& p3iscale,p4iscale,p5iscale,nelst,elst,use_thole,use_dirdamp,
+!$OMP& use_chgpen,use_bounds,off2,f,aewald,molcule,name,verbose,debug,
+!$OMP& header,iout)
+!$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
 c     compute the dipole polarization energy component
@@ -2432,81 +2025,34 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-               dscale(i12(j,i)) = pscale(i12(j,i))
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = p2scale
+            do k = 1, np11(i)
+               if (i12(j,i) .eq. ip11(k,i))
+     &            pscale(i12(j,i)) = p2iscale
             end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-               dscale(i13(j,i)) = pscale(i13(j,i))
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = p3scale
+            do k = 1, np11(i)
+               if (i13(j,i) .eq. ip11(k,i))
+     &            pscale(i13(j,i)) = p3iscale
             end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-               dscale(i14(j,i)) = pscale(i14(j,i))
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = p4scale
+            do k = 1, np11(i)
+               if (i14(j,i) .eq. ip11(k,i))
+     &            pscale(i14(j,i)) = p4iscale
             end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-               dscale(i15(j,i)) = pscale(i15(j,i))
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = p5scale
+            do k = 1, np11(i)
+               if (i15(j,i) .eq. ip11(k,i))
+     &            pscale(i15(j,i)) = p5iscale
             end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = p2scale
-               do k = 1, np11(i)
-                  if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
-               end do
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = p3scale
-               do k = 1, np11(i)
-                  if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
-               end do
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = p4scale
-               do k = 1, np11(i)
-                  if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
-               end do
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = p5scale
-               do k = 1, np11(i)
-                  if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
-               end do
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = d1scale
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = d2scale
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = d3scale
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = d4scale
-            end do
-         end if
+         end do
 c
 c     evaluate all sites within the cutoff distance
 c
@@ -2623,7 +2169,7 @@ c
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
-                  scalek = dscale(k)
+                  scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
@@ -2691,49 +2237,18 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         if (dpequal) then
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-               dscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-               dscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-               dscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-               dscale(i15(j,i)) = 1.0d0
-            end do
-         else
-            do j = 1, n12(i)
-               pscale(i12(j,i)) = 1.0d0
-            end do
-            do j = 1, n13(i)
-               pscale(i13(j,i)) = 1.0d0
-            end do
-            do j = 1, n14(i)
-               pscale(i14(j,i)) = 1.0d0
-            end do
-            do j = 1, n15(i)
-               pscale(i15(j,i)) = 1.0d0
-            end do
-            do j = 1, np11(i)
-               dscale(ip11(j,i)) = 1.0d0
-            end do
-            do j = 1, np12(i)
-               dscale(ip12(j,i)) = 1.0d0
-            end do
-            do j = 1, np13(i)
-               dscale(ip13(j,i)) = 1.0d0
-            end do
-            do j = 1, np14(i)
-               dscale(ip14(j,i)) = 1.0d0
-            end do
-         end if
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = 1.0d0
+         end do
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = 1.0d0
+         end do
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = 1.0d0
+         end do
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = 1.0d0
+         end do
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -2744,7 +2259,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
-      deallocate (dscale)
       return
       end
 c

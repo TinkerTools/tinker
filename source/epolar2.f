@@ -34,8 +34,11 @@ c
       use atoms
       use deriv
       use hessn
+      use iounit
       use limits
+      use mplpot
       use mpole
+      use polpot
       use potent
       implicit none
       integer i,j,k
@@ -60,6 +63,15 @@ c
          biglist = .true.
          twosided = .true.
          reinduce = .true.
+      end if
+c
+c     check for use of TCG polarization with charge penetration
+c
+      if (poltyp.eq.'TCG' .and. use_chgpen) then
+         write (iout,10)
+   10    format (/,' EPOLAR2  --  TCG Polarization not Available',
+     &              ' with Charge Penetration')
+         call fatal
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -1255,7 +1267,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -2302,7 +2314,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)

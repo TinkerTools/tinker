@@ -17,9 +17,21 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine epolar1
+      use iounit
       use limits
+      use mplpot
+      use polpot
       implicit none
 c
+c
+c     check for use of TCG polarization with charge penetration
+c
+      if (poltyp.eq.'TCG' .and. use_chgpen) then
+         write (iout,10)
+   10    format (/,' EPOLAR1  --  TCG Polarization not Available',
+     &              ' with Charge Penetration')
+         call fatal
+      end if
 c
 c     choose the method for summing over polarization interactions
 c
@@ -1088,7 +1100,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -2165,7 +2177,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -3552,7 +3564,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -5247,7 +5259,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -6436,7 +6448,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
@@ -8154,7 +8166,7 @@ c
 c
 c     get the dtau/dr terms used for TCG polarization force
 c
-               else if (poltyp .eq. 'TCG') then
+               else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
                      ukx = ubd(1,kk,j)
                      uky = ubd(2,kk,j)
