@@ -276,7 +276,7 @@ c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
          miniter = 3
-         maxiter = politer
+         maxiter = 100
          iter = 0
          polmin = 0.00000001d0
          eps = 100.0d0
@@ -489,7 +489,7 @@ c
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
             if (iter .lt. miniter)  done = .false.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .ge. politer)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
@@ -526,7 +526,7 @@ c
      &                 7x,'RMS Residual',f15.10)
          end if
 c
-c     terminate the calculation if dipoles failed to converge
+c     terminate the calculation if dipoles fail to converge
 c
          if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,40)
@@ -4930,7 +4930,7 @@ c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
          miniter = 3
-         maxiter = politer
+         maxiter = 100
          iter = 0
          polmin = 0.00000001d0
          eps = 100.0d0
@@ -5136,8 +5136,8 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. miniter)  done = .false.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .lt. miniter)  done = .false.
+            if (iter .ge. politer)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
@@ -6303,7 +6303,7 @@ c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
          miniter = 3
-         maxiter = politer
+         maxiter = 100
          iter = 0
          polmin = 0.00000001d0
          eps = 100.0d0
@@ -6509,8 +6509,8 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
-            if (iter .ge. miniter)  done = .false.
-            if (iter .ge. maxiter)  done = .true.
+            if (iter .lt. miniter)  done = .false.
+            if (iter .ge. politer)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
@@ -7279,12 +7279,10 @@ c
             apmax = max(apmax,ap(i))
          end do
 c
-c     solve the equations via LU or Cholesky factorization
+c     solve the normal equations via LU matrix factorization
 c
          if (amax .ne. 0.0d0)  call lusolve (k,a,b)
          if (apmax .ne. 0.0d0)  call lusolve (k,ap,bp)
-c        if (amax .ne. 0.0d0)  call cholesky (k,a,b)
-c        if (apmax .ne. 0.0d0)  call cholesky (k,ap,bp)
 c
 c     transfer the final solution to the coefficient vector
 c
