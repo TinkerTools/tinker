@@ -471,7 +471,7 @@ c
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
+      if (.not. use_chgtrn)  call chkpole
 c
 c     set the values used in the scaling of the polarizability
 c

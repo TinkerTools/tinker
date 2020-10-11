@@ -702,7 +702,7 @@ c
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
+      if (.not.use_polar .and. .not.use_chgtrn)  call chkpole
 c
 c     turn off atomic multipole potentials if not used
 c
