@@ -146,7 +146,7 @@ c
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
-            gnorm = gnorm + derivs(j,i)**2
+            gnorm = gnorm + derivs(j,k)**2
          end do
       end do
       gnorm = sqrt(gnorm)

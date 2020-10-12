@@ -115,7 +115,7 @@ c
       rewind (unit=ipdb)
       call readpdb (ipdb)
 c
-c     use special translation mechanisms used for biopolymers
+c     use special translation mechanisms for biopolymers
 c
       do while (.not. abort)
          if (biopoly) then
@@ -335,19 +335,17 @@ c
       start = resatm(1,jres)
       stop = resatm(2,jres)
       call findatm (' N  ',start,stop,j)
+      if (j .ne. 0)  ni(jres) = j
       start = resatm(1,kres)
       stop = resatm(2,kres)
       call findatm (' C  ',start,stop,k)
-      if (j.ne.0 .and. k.ne.0) then
+      if (k .ne. 0)  ci(kres) = k
+      if (jres.ne.kres .and. j.ne.0 .and. k.ne.0) then
          xr = xpdb(k) - xpdb(j)
          yr = ypdb(k) - ypdb(j)
          zr = zpdb(k) - zpdb(j)
          r = sqrt(xr*xr + yr*yr + zr*zr)
-         if (r .le. 3.0d0) then
-            cyclic = .true.
-            ni(jres) = j
-            ci(kres) = k
-         end if
+         if (r .le. 3.0d0)  cyclic = .true.
       end if
 c
 c     search for any potential cystine disulfide bonds

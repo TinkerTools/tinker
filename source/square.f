@@ -386,7 +386,7 @@ c                 goto 60
                end if
             end if
          end do
-   60    continue
+c  60    continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
@@ -484,7 +484,7 @@ c                    goto 90
 c                    goto 90
                   end if
                end do
-   90          continue
+c  90          continue
             end if
 c        end if
 c
@@ -914,7 +914,7 @@ c                 0  xp is accepted as the next iterate, and delta
 c                      is the trust region for next iteration
 c                 1  the algorithm was unable to find a satisfactory
 c                      xp sufficiently distinct from xc
-c                 2  both the scaled actual and predicted function
+c                 2  both the scaled actual and predicted model
 c                      reductions are smaller than rftol
 c                 3  false convergence is detected
 c                 4  fpnorm is too large, so the current iteration
@@ -951,7 +951,7 @@ c
       integer ipvt(*)
       real*8 fcnorm,stpmax
       real*8 fpnorm,fpnrmp
-      real*8 reduce,predict
+      real*8 reduce,model
       real*8 rellen,slope,eps
       real*8 stplen,stpmin
       real*8 rftol,faketol
@@ -1067,25 +1067,25 @@ c
             end if
          end if
 c
-c     fpnorm is sufficiently small; the step is acceptable, compute
-c     the predicted reduction as predict = g(T)*s + (1/2)*s(T)*h*s
+c     fpnorm is sufficiently small; step is acceptable, compute the
+c     predicted model reduction as model = g(T)*s + (1/2)*s(T)*h*s
 c     with h = p * r**t * r * p**t
 c
       else
-         predict = slope
+         model = slope
          do i = 1, nactive
             k = ipvt(i)
             temp = 0.0d0
             do j = i, nactive
                temp = temp + sa(k)*a(i,j)
             end do
-            predict = predict + 0.5d0*temp*temp
+            model = model + 0.5d0*temp*temp
          end do
-         ltemp = (abs(predict-reduce) .le. 0.1d0*abs(reduce))
+         ltemp = (abs(model-reduce) .le. 0.1d0*abs(reduce))
 c
-c     if reduce and predict agree to within relative error of 0.1
-c     or if negative curvature is indicated, and a longer step is
-c     possible and delta has not been decreased this iteration,
+c     if reduce and predicted model agree to within relative error
+c     of 0.1 or if negative curvature is indicated, and a longer step
+c     is possible and delta has not been decreased this iteration,
 c     then double trust region and continue global step
 c
          if (icode.ne.4 .and. (ltemp.or.(reduce.le.slope)) .and. feas
@@ -1105,18 +1105,18 @@ c
          else
             icode = 0
             if (stplen .gt. 0.99d0*stpmax)  bigstp = .true.
-            if (reduce .ge. 0.1d0*predict) then
+            if (reduce .ge. 0.1d0*model) then
                delta = 0.5d0 * delta
-            else if (reduce .le. 0.75d0*predict) then
+            else if (reduce .le. 0.75d0*model) then
                delta = min(2.0d0*delta,stpmax)
             end if
          end if
 c
 c     check relative function convergence and false convergence
 c
-         if (reduce .le. 2.0d0*predict) then
+         if (reduce .le. 2.0d0*model) then
             if (abs(reduce).le.rftol*abs(fcnorm) .and.
-     &          abs(predict).le.rftol*abs(fcnorm)) then
+     &          abs(model).le.rftol*abs(fcnorm)) then
                icode = 2
             end if
          else

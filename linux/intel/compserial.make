@@ -216,6 +216,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 connect.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 connolly.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 control.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 correlate.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 critical.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 crystal.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 cspline.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 cutoffs.f
@@ -443,6 +444,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kvdw.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 lattice.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 lbfgs.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 lights.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 lusolve.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 makeint.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 makeref.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 makexyz.f
@@ -493,6 +495,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 polarize.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 poledit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 polymer.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 potential.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 predict.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 pressure.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prmedit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prmkey.f
@@ -509,7 +512,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prtxyz.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 pss.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 pssrigid.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 pssrot.f
-ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 qrfact.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 qrsolve.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 quatfit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 radial.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 random.f

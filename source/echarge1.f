@@ -1219,7 +1219,7 @@ c
                   scale = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scale)
                   de = -fik * ((erfterm+scale)/rb2
-     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
+     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/rb)
 c
 c     form the chain rule terms for derivative expressions
 c
@@ -1346,7 +1346,7 @@ c
                      scale = scale - 1.0d0
                      e = (fik/rb) * (erfterm+scale)
                      de = -fik * ((erfterm+scale)/rb2
-     &                       + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
+     &                       + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/rb)
 c
 c     form the chain rule terms for derivative expressions
 c
@@ -1667,7 +1667,7 @@ c
                   scale = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scale)
                   de = -fik * ((erfterm+scale)/rb2
-     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
+     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/rb)
 c
 c     form the chain rule terms for derivative expressions
 c
@@ -1934,7 +1934,7 @@ c
                   scale = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scale)
                   de = -fik * ((erfterm+scale)/rb2
-     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
+     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/rb)
 c
 c     form the chain rule terms for derivative expressions
 c

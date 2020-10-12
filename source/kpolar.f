@@ -60,16 +60,9 @@ c
       character*240 string
 c
 c
-c     perform dynamic allocation of some local arrays
+c     set the default values for polarization variables
 c
-      allocate (list(n))
-c
-c     set defaults for numbers and lists of polarizable atoms
-c
-      nlist = 0
-      do i = 1, n
-         list(i) = 0
-      end do
+      polprt = .false.
 c
 c     set defaults for PCG induced dipole parameters
 c
@@ -143,6 +136,17 @@ c
          copt(6) = 0.122d0
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
+c     set defaults for numbers and lists of polarizable atoms
+c
+      nlist = 0
+      do i = 1, n
+         list(i) = 0
+      end do
+c
 c     get keywords containing polarization-related options
 c
       do j = 1, nkey
@@ -157,6 +161,8 @@ c
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
+         else if (keyword(1:12) .eq. 'POLAR-PRINT ') then
+            polprt = .true.
          else if (keyword(1:12) .eq. 'PCG-PRECOND ') then
             pcgprec = .true.
          else if (keyword(1:14) .eq. 'PCG-NOPRECOND ') then
@@ -465,7 +471,7 @@ c
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
+      if (.not. use_chgtrn)  call chkpole
 c
 c     set the values used in the scaling of the polarizability
 c
@@ -485,7 +491,7 @@ c
 c     turn off polarizable multipole potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
-      if (ncp .ne. 0)  use_chgpen = .true.
+      if (ncp .eq. 0)  use_chgpen = .false.
       if (npolar .eq. 0)  use_polar = .false.
       if (use_polar) then
          do i = 1, npole

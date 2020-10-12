@@ -41,8 +41,8 @@ polar-14-scale          1.0
 polar-15-scale          1.0
 polar-12-intra          0.0
 polar-13-intra          0.0
-polar-14-intra          0.5
-polar-15-intra          1.0
+polar-14-intra          0.0
+polar-15-intra          0.5
 direct-11-scale         0.0
 direct-12-scale         1.0
 direct-13-scale         1.0

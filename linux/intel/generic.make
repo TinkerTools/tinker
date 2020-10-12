@@ -216,6 +216,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp connect.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp connolly.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp control.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp correlate.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp critical.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp crystal.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp cspline.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp cutoffs.f
@@ -443,6 +444,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp kvdw.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp lattice.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp lbfgs.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp lights.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp lusolve.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp makeint.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp makeref.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp makexyz.f
@@ -493,6 +495,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polarize.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp poledit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp polymer.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp potential.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp predict.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pressure.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prmedit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prmkey.f
@@ -509,7 +512,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtxyz.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pss.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pssrigid.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pssrot.f
-ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp qrfact.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp qrsolve.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp quatfit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp radial.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp random.f

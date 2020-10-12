@@ -216,6 +216,7 @@ ifort -c -g -warn all -check all connect.f
 ifort -c -g -warn all -check all connolly.f
 ifort -c -g -warn all -check all control.f
 ifort -c -g -warn all -check all correlate.f
+ifort -c -g -warn all -check all critical.f
 ifort -c -g -warn all -check all crystal.f
 ifort -c -g -warn all -check all cspline.f
 ifort -c -g -warn all -check all cutoffs.f
@@ -443,6 +444,7 @@ ifort -c -g -warn all -check all kvdw.f
 ifort -c -g -warn all -check all lattice.f
 ifort -c -g -warn all -check all lbfgs.f
 ifort -c -g -warn all -check all lights.f
+ifort -c -g -warn all -check all lusolve.f
 ifort -c -g -warn all -check all makeint.f
 ifort -c -g -warn all -check all makeref.f
 ifort -c -g -warn all -check all makexyz.f
@@ -493,6 +495,7 @@ ifort -c -g -warn all -check all polarize.f
 ifort -c -g -warn all -check all poledit.f
 ifort -c -g -warn all -check all polymer.f
 ifort -c -g -warn all -check all potential.f
+ifort -c -g -warn all -check all predict.f
 ifort -c -g -warn all -check all pressure.f
 ifort -c -g -warn all -check all prmedit.f
 ifort -c -g -warn all -check all prmkey.f
@@ -509,7 +512,7 @@ ifort -c -g -warn all -check all prtxyz.f
 ifort -c -g -warn all -check all pss.f
 ifort -c -g -warn all -check all pssrigid.f
 ifort -c -g -warn all -check all pssrot.f
-ifort -c -g -warn all -check all qrfact.f
+ifort -c -g -warn all -check all qrsolve.f
 ifort -c -g -warn all -check all quatfit.f
 ifort -c -g -warn all -check all radial.f
 ifort -c -g -warn all -check all random.f

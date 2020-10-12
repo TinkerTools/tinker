@@ -75,7 +75,7 @@ c     zero out the geometric restraint energy terms
 c
       eg = 0.0d0
 c
-c     disable replica mechanism for use with geometric restraints
+c     disable replica mechanism when computing restraint terms
 c
       if (use_replica) then
          xorig = xcell
@@ -428,7 +428,7 @@ c
          end do
       end if
 c
-c     reinstate the replica mechanism when it is appropriate
+c     reinstate the replica mechanism if it is being used
 c
       if (use_replica) then
          xcell = xorig

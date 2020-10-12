@@ -181,7 +181,7 @@ c
 c     turn off individual electrostatic potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
-      if (ncp .ne. 0)  use_chgpen = .true.
+      if (ncp .eq. 0)  use_chgpen = .false.
       if (npolar .eq. 0)  use_polar = .false.
       if (use_polar) then
          do i = 1, npole

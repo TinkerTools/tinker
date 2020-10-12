@@ -98,7 +98,7 @@ set(_FILES
     echarge2 echarge3 echgdpl echgdpl1 echgdpl2 echgdpl3 echgtrn echgtrn1
     echgtrn2 echgtrn3 edipole edipole1 edipole2 edipole3 edisp edisp1 edisp2
     edisp3 egauss egauss1 egauss2 egauss3 egeom egeom1 egeom2 egeom3 ehal ehal1
-    ehal2 ehal3 eimprop eimprop1 eimprop2 eimprop3 eimptor eimptor1  eimptor2
+    ehal2 ehal3 eimprop eimprop1 eimprop2 eimprop3 eimptor eimptor1 eimptor2
     eimptor3 elj elj1 elj2 elj3 embed emetal emetal1 emetal2 emetal3 emm3hb
     emm3hb1 emm3hb2 emm3hb3 empole empole1 empole2 empole3 energi energy eopbend
     eopbend1 eopbend2 eopbend3 eopdist eopdist1 eopdist2 eopdist3 epitors
@@ -119,23 +119,23 @@ set(_FILES
     kopbend kopbnd kopdist kopdst korbit korbs kpitor kpitors kpolar kpolr
     krepel krepl ksolut ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor
     ktrtor kurey kurybr kvdw kvdwpr kvdws lattice lbfgs light lights limits
-    linmin makeint makeref makexyz math maxwell mdinit mdrest mdsave mdstat
-    mdstuf mechanic merck merge minima molcul moldyn molecule moment moments
-    mplpot mpole mrecip mutant mutate nblist neigh nextarg nexttext nonpol nose
-    nspline nucleo number numeral numgrad ocvm omega opbend opdist openend
-    openmp optinit optsave orbital orbits orient orthog output overlap params
-    paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf pmpb polar
-    polgrp polopt polpcg polpot poltcg polymer potent potfit pressure prmkey
-    promo prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable qmstuf
-    qrfact quatfit random rattle readdyn readgau readgdma readint readmol
-    readmol2 readpdb readprm readseq readxyz refer repel replica reppot resdue
-    respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd rotlist rotpole
-    rxnfld rxnpot scales sdstep search sequen server shakeup shunt sigmoid
-    simplex sizes sktstuf socket solpot solute sort square stodyn strbnd strtor
-    suffix surface surfatom switch syntrn tarray tcgstuf temper titles tncg
-    torphase torpot torque tors torsions tortor tree trimtext unitcell units
-    uprior urey urypot usage valfit vdw vdwpot verlet version vibs virial volume
-    warp xtals xyzatm zatom zclose zcoord
+    linmin lusolve makeint makeref makexyz math maxwell mdinit mdrest mdsave
+    mdstat mdstuf mechanic merck merge minima molcul moldyn molecule moment
+    moments mplpot mpole mrecip mutant mutate nblist neigh nextarg nexttext
+    nonpol nose nspline nucleo number numeral numgrad ocvm omega opbend opdist
+    openend openmp optinit optsave orbital orbits orient orthog output overlap
+    params paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf pmpb
+    polar polgrp polopt polpcg polpot poltcg polymer potent potfit pressure
+    prmkey promo prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
+    qmstuf qrsolve quatfit random rattle readdyn readgau readgdma readint
+    readmol readmol2 readpdb readprm readseq readxyz refer repel replica reppot
+    resdue respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd rotlist
+    rotpole rxnfld rxnpot scales sdstep search sequen server shakeup shunt
+    sigmoid simplex sizes sktstuf socket solpot solute sort square stodyn strbnd
+    strtor suffix surface surfatom switch syntrn tarray tcgstuf temper titles
+    tncg torphase torpot torque tors torsions tortor tree trimtext unitcell
+    units uprior urey urypot usage valfit vdw vdwpot verlet version vibs virial
+    volume warp xtals xyzatm zatom zclose zcoord
 )
 set(_LIB "")
 foreach(_FILE IN LISTS _FILES)
@@ -149,14 +149,14 @@ install(
 )
 
 set(_BINS
-    alchemy analyze anneal archive bar correlate crystal diffuse
-    distgeom document dynamic gda intedit intxyz minimize minirot
-    minrigid mol2xyz molxyz monte newton newtrot nucleic optimize
-    optirot optrigid path pdbxyz polarize poledit potential
+    alchemy analyze anneal archive bar correlate critical crystal
+    diffuse distgeom document dynamic gda intedit intxyz minimize
+    minirot minrigid mol2xyz molxyz monte newton newtrot nucleic
+    optimize optirot optrigid path pdbxyz polarize poledit potential
     prmedit protein pss pssrigid pssrot radial saddle scan sniffer
-    spacefill spectrum superpose testgrad testhess testpair
-    testpol testrot testvir timer timerot torsfit valence vibbig
-    vibrate vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb
+    spacefill spectrum superpose testgrad testhess testpair testpol
+    testrot testvir timer timerot torsfit valence vibbig vibrate
+    vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb
 )
 foreach(_BIN IN LISTS _BINS)
     add_executable(${_BIN} ${TINKER_DIR}/source/${_BIN}.f)
@@ -166,4 +166,3 @@ foreach(_BIN IN LISTS _BINS)
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 endforeach()
-

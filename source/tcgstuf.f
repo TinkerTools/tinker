@@ -124,13 +124,15 @@ c
       call tcg_alphaquad (n0,r0(:,:,1),r0(:,:,2))
       call tcg_t0 (udir,udirp,tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np0,3*npole,tp(:,:,1),udirp)
-      g0 = n0 / np0
+      g0 = 0.0d0
+      if (np0 .ne. 0.0d0)  g0 = n0 / np0
 c
 c     set r1 = r0 - gamma0*T*p0, n1 = r1*a*r1, and p1 <- r1, p0
 c
       rsd = r0 - g0 * tp
       call tcg_alphaquad (n1,rsd(:,:,1),rsd(:,:,2))
-      beta1 = n1 / n0
+      beta1 = 0.0d0
+      if (n0 .ne. 0.0d0)  beta1 = n1 / n0
       p1(:,:,1) = udir
       p1(:,:,2) = udirp
       call tcg_update (p1(:,:,1),rsd(:,:,1),beta1)
@@ -157,10 +159,12 @@ c     beta2 = n2 / n1
 c
       call tcg_t0 (p1(:,:,1),p1(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np1,3*npole,tp(:,:,1),p1(:,:,2))
-      g1 = n1 / np1
+      g1 = 0.0d0
+      if (np1 .ne. 0.0d0)  g1 = n1 / np1
       rsd = rsd - g1 * tp
       call tcg_alphaquad (n2,rsd(:,:,1),rsd(:,:,2))
-      beta2 = n2 / n1
+      beta2 = 0.0d0
+      if (n1 .ne. 0.0d0)  beta2 = n2 / n1
 c
 c     p2 <- r2, p1
 c     np2 = p2*T*p2
@@ -171,7 +175,8 @@ c
       call tcg_update (p2(:,:,2),rsd(:,:,2),beta2)
       call tcg_t0 (p2(:,:,1),p2(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np2,3*npole,tp(:,:,1),p2(:,:,2))
-      g2 = n2 / np2
+      g2 = 0.0d0
+      if (np2 .ne. 0.0d0)  g2 = n2 / np2
 c
 c     r3 = r2 - g2 * T*p2
 c     n3 = r3*a*r3
@@ -179,7 +184,8 @@ c     beta3 = n3 / n2
 c
       rsd = rsd - g2*tp
       call tcg_alphaquad (n3,rsd(:,:,1),rsd(:,:,2))
-      beta3 = n3 / n2
+      beta3 = 0.0d0
+      if (n2 .ne. 0.0d0)  beta3 = n3 / n2
 c
 c     p3 <- r3, p2
 c
@@ -193,7 +199,8 @@ c     ub(2) <- p1
 c     xde <- p0, p1
 c
       b111 = (1.0d0-beta2) * g1
-      a103 = g0 * g1 / g2
+      a103 = 0.0d0
+      if (g2 .ne. 0.0d0)  a103 = g0 * g1 / g2
       a102 = (1.0d0-beta2)*g0 + (1.0d0+beta1)*g1 - (1.0d0+beta3)*a103
       a101 = (beta2**2-1.0d0)*g0 + (1.0d0-beta2-beta1*beta2)*g1
      &          + beta2*a103
@@ -330,16 +337,19 @@ c
       call tcg_alphaquad (n0,rsd(:,:,1),rsd(:,:,2))
       call tcg_alpha22 (rsd(:,:,1),rsd(:,:,2),p0(:,:,1),p0(:,:,2))
       call tcg_dotprod (xi0,3*npole,rsd(:,:,1),udirp)
-      xi0 = xi0 / n0
+      xi0 = 0.0d0
+      if (n0 .ne. 0.0d0)  xi0 = xi0 / n0
       call tcg_t0 (p0(:,:,1),p0(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np0,3*npole,tp(:,:,1),p0(:,:,2))
-      g0 = n0 / np0
+      g0 = 0.0d0
+      if (np0 .ne. 0.0d0)  g0 = n0 / np0
 c
 c     set r1 = r0 - g0*T*p0, n1 and beta1
 c
       rsd = rsd - g0*tp
       call tcg_alphaquad (n1,rsd(:,:,1),rsd(:,:,2))
-      beta1 = n1 / n0
+      beta1 = 0.0d0
+      if (n0 .ne. 0.0d0)  beta1 = n1 / n0
 c
 c     set p1 <- r1, p0
 c
@@ -390,10 +400,12 @@ c
 c     compute the tcg2 intermediates: xi1, np1 and g1
 c
       call tcg_dotprod (xi1,3*npole,rsd(:,:,1),udirp)
-      xi1 = xi1/n1 + xi0
+      if (n1 .ne. 0.0d0)  xi1 = xi1 / n1
+      xi1 = xi1 + xi0
       call tcg_t0 (p1(:,:,1),p1(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np1,3*npole,tp(:,:,1),p1(:,:,2))
-      g1 = n1 / np1
+      g1 = 0.0d0
+      if (np1 .ne. 0.0d0)  g1 = n1 / np1
 c
 c     r2 = r1 - g1*T*p1
 c     n2, beta2
@@ -402,13 +414,15 @@ c     np2, g2
 c
       rsd = rsd - g1*tp
       call tcg_alphaquad (n2,rsd(:,:,1),rsd(:,:,2))
-      beta2 = n2 / n1
+      beta2 = 0.0d0
+      if (n1 .ne. 0.0d0)  beta2 = n2 / n1
       p2 = p1
       call tcg_update (p2(:,:,1),rsd(:,:,1),beta2)
       call tcg_update (p2(:,:,2),rsd(:,:,2),beta2)
       call tcg_t0 (p2(:,:,1),p2(:,:,2),tp(:,:,1),tp(:,:,2))
       call tcg_dotprod (np2,3*npole,tp(:,:,1),p2(:,:,2))
-      g2 = n2 / np2
+      g2 = 0.0d0
+      if (np2 .ne. 0.0d0)  g2 = n2 / np2
 c
 c     r3 = r2 - g2*T*p2
 c     n3, beta3
@@ -416,7 +430,8 @@ c     p3 <- r3, p2
 c
       rsd = rsd - g2*tp
       call tcg_alphaquad (n3,rsd(:,:,1),rsd(:,:,2))
-      beta3 = n3 / n2
+      beta3 = 0.0d0
+      if (n2 .ne. 0.0d0)  beta3 = n3 / n2
       p3 = p2
       call tcg_update (p3(:,:,1),rsd(:,:,1),beta3)
       call tcg_update (p3(:,:,2),rsd(:,:,2),beta3)
@@ -428,7 +443,8 @@ c     ub(3) <- p1
 c     xdr0 <- p0, p1, p2, p3
 c
       b111 = (1.0d0-beta2) * g1
-      a103 = g0 * g1 / g2
+      a103 = 0.0d0
+      if (g2 .ne. 0.0d0)  a103 = g0 * g1 / g2
       a102 = (1.0d0-beta2)*g0 + (1.0d0+beta1)*g1 - (1.0d0+beta3)*a103
       a101 = (beta2**2-1.0d0)*g0 + (1.0d0-beta2-beta1*beta2)*g1
      &          + beta2*a103
@@ -448,12 +464,19 @@ c
          c201 = 0.5d0*(1.0d0-g1)*g0 + (xi0-xi1)*g1*beta1**2
      &             + (xi1-1.0d0)*beta1*beta2*g0
      &             + (xi0+g0-xi0*g0)*beta1*g1
-         c202 = 0.5d0*g1 + (1.0d0-xi1)*beta2*g0*g1/g2
-     &             + (1.0d0-xi1)*(beta2*g0-(1.0d0+beta1)*g1)*beta2
-     &             + (xi0*g0-xi0-g0)*g1 + (beta2*g0-beta1*g1)*(xi0-xi1)
-         c203 = (xi1-1.0d0)*(1.0d0+beta3)*g0*g1/g2
-     &             + (g1+beta1*g1-beta2*g0)*(1.0d0-xi1) + (1.0d0-xi0)*g0
-         c204 = (1.0d0-xi1) * g0 * g1 / g2
+         c202 = 0.0d0
+         c203 = 0.0d0
+         c204 = 0.0d0
+         if (g2 .ne. 0.0d0) then
+            c202 = 0.5d0*g1 + (1.0d0-xi1)*beta2*g0*g1/g2
+     &                + (1.0d0-xi1)*(beta2*g0-(1.0d0+beta1)*g1)*beta2
+     &                + (xi0*g0-xi0-g0)*g1
+     &                + (beta2*g0-beta1*g1)*(xi0-xi1)
+            c203 = (xi1-1.0d0)*(1.0d0+beta3)*g0*g1/g2
+     &                + (g1+beta1*g1-beta2*g0)*(1.0d0-xi1)
+     &                + (1.0d0-xi0)*g0
+            c204 = (1.0d0-xi1) * g0 * g1 / g2
+         end if
          d210 = 0.5d0 * (1.0d0-g1)
          d211 = 0.5d0 * (1.0d0-xi0)*(1.0d0-g1)*g0
          d212 = ((1.0d0-xi0)-(1.0d0-xi1)*beta2) * g1

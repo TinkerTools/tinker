@@ -13,6 +13,7 @@ mv anneal.x    ../bin/anneal
 mv archive.x   ../bin/archive
 mv bar.x       ../bin/bar
 mv correlate.x ../bin/correlate
+mv critical.x  ../bin/critical
 mv crystal.x   ../bin/crystal
 mv diffuse.x   ../bin/diffuse
 mv distgeom.x  ../bin/distgeom

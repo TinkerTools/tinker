@@ -14,6 +14,7 @@ zip anneal.zip anneal.exe
 zip archive.zip archive.exe
 zip bar.zip bar.exe
 zip correlate.zip correlate.exe
+zip critical.zip critical.exe
 zip crystal.zip crystal.exe
 zip diffuse.zip diffuse.exe
 zip distgeom.zip distgeom.exe

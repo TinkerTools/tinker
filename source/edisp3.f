@@ -618,8 +618,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,vcouple,
-!$OMP& vlambda,molcule,name,verbose,debug,header,iout)
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,c0,c1,c2,
+!$OMP& c3,c4,c5,vcouple,vlambda,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
 c

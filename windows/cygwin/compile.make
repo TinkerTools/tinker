@@ -216,6 +216,7 @@ gfortran -c -O3 -ffast-math -fopenmp connect.f
 gfortran -c -O3 -ffast-math -fopenmp connolly.f
 gfortran -c -O3 -ffast-math -fopenmp control.f
 gfortran -c -O3 -ffast-math -fopenmp correlate.f
+gfortran -c -O3 -ffast-math -fopenmp critical.f
 gfortran -c -O3 -ffast-math -fopenmp crystal.f
 gfortran -c -O3 -ffast-math -fopenmp cspline.f
 gfortran -c -O3 -ffast-math -fopenmp cutoffs.f
@@ -443,6 +444,7 @@ gfortran -c -O3 -ffast-math -fopenmp kvdw.f
 gfortran -c -O3 -ffast-math -fopenmp lattice.f
 gfortran -c -O3 -ffast-math -fopenmp lbfgs.f
 gfortran -c -O3 -ffast-math -fopenmp lights.f
+gfortran -c -O3 -ffast-math -fopenmp lusolve.f
 gfortran -c -O3 -ffast-math -fopenmp makeint.f
 gfortran -c -O3 -ffast-math -fopenmp makeref.f
 gfortran -c -O3 -ffast-math -fopenmp makexyz.f
@@ -493,6 +495,7 @@ gfortran -c -O3 -ffast-math -fopenmp polarize.f
 gfortran -c -O3 -ffast-math -fopenmp poledit.f
 gfortran -c -O3 -ffast-math -fopenmp polymer.f
 gfortran -c -O3 -ffast-math -fopenmp potential.f
+gfortran -c -O3 -ffast-math -fopenmp predict.f
 gfortran -c -O3 -ffast-math -fopenmp pressure.f
 gfortran -c -O3 -ffast-math -fopenmp prmedit.f
 gfortran -c -O3 -ffast-math -fopenmp prmkey.f
@@ -509,7 +512,7 @@ gfortran -c -O3 -ffast-math -fopenmp prtxyz.f
 gfortran -c -O3 -ffast-math -fopenmp pss.f
 gfortran -c -O3 -ffast-math -fopenmp pssrigid.f
 gfortran -c -O3 -ffast-math -fopenmp pssrot.f
-gfortran -c -O3 -ffast-math -fopenmp qrfact.f
+gfortran -c -O3 -ffast-math -fopenmp qrsolve.f
 gfortran -c -O3 -ffast-math -fopenmp quatfit.f
 gfortran -c -O3 -ffast-math -fopenmp radial.f
 gfortran -c -O3 -ffast-math -fopenmp random.f

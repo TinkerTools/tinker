@@ -14,6 +14,7 @@ gfortran -O3 -ffast-math -fopenmp -static -o anneal.x anneal.o libtinker.a libff
 gfortran -O3 -ffast-math -fopenmp -static -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a ; strip archive.x
 gfortran -O3 -ffast-math -fopenmp -static -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a ; strip bar.x
 gfortran -O3 -ffast-math -fopenmp -static -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a ; strip correlate.x
+gfortran -O3 -ffast-math -fopenmp -static -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a ; strip critical.x
 gfortran -O3 -ffast-math -fopenmp -static -o crystal.x crystal.o libtinker.a libfftw3_threads.a libfftw3.a ; strip crystal.x
 gfortran -O3 -ffast-math -fopenmp -static -o diffuse.x diffuse.o libtinker.a libfftw3_threads.a libfftw3.a ; strip diffuse.x
 gfortran -O3 -ffast-math -fopenmp -static -o distgeom.x distgeom.o libtinker.a libfftw3_threads.a libfftw3.a ; strip distgeom.x

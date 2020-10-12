@@ -342,6 +342,7 @@ light.o \
 lights.o \
 limits.o \
 linmin.o \
+lusolve.o \
 makeint.o \
 makeref.o \
 makexyz.o \
@@ -412,6 +413,7 @@ poltcg.o \
 polymer.o \
 potent.o \
 potfit.o \
+predict.o \
 pressure.o \
 prmkey.o \
 promo.o \
@@ -425,7 +427,7 @@ prtseq.o \
 prtxyz.o \
 ptable.o \
 qmstuf.o \
-qrfact.o \
+qrsolve.o \
 quatfit.o \
 random.o \
 rattle.o \

@@ -1240,6 +1240,9 @@ c
       end do
       tscale = 300.0d0
       cscale = 10000.0d0
+c
+c     set weight of electrostatic potential vs. parameter restraints
+c
       rconf = dble(nconf)
       ratio = dble(npoint) / dble(nvar*nconf)
 c     rscale = 1.0d0 * sqrt(resp) * rconf * sqrt(ratio)

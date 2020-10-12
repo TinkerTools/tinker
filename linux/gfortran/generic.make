@@ -207,7 +207,7 @@ gfortran -c -Ofast -msse3 -fopenmp center.f
 gfortran -c -Ofast -msse3 -fopenmp chkpole.f
 gfortran -c -Ofast -msse3 -fopenmp chkring.f
 gfortran -c -Ofast -msse3 -fopenmp chkxyz.f
-gfortran -c -Ofast -msse3 -fopenmp cholesky.f
+gfortran -c -Ofast -msse3 -fopenmp choleksy.f
 gfortran -c -Ofast -msse3 -fopenmp clock.f
 gfortran -c -Ofast -msse3 -fopenmp cluster.f
 gfortran -c -Ofast -msse3 -fopenmp column.f
@@ -216,6 +216,7 @@ gfortran -c -Ofast -msse3 -fopenmp connect.f
 gfortran -c -Ofast -msse3 -fopenmp connolly.f
 gfortran -c -Ofast -msse3 -fopenmp control.f
 gfortran -c -Ofast -msse3 -fopenmp correlate.f
+gfortran -c -Ofast -msse3 -fopenmp critical.f
 gfortran -c -Ofast -msse3 -fopenmp crystal.f
 gfortran -c -Ofast -msse3 -fopenmp cspline.f
 gfortran -c -Ofast -msse3 -fopenmp cutoffs.f
@@ -443,6 +444,7 @@ gfortran -c -Ofast -msse3 -fopenmp kvdw.f
 gfortran -c -Ofast -msse3 -fopenmp lattice.f
 gfortran -c -Ofast -msse3 -fopenmp lbfgs.f
 gfortran -c -Ofast -msse3 -fopenmp lights.f
+gfortran -c -Ofast -msse3 -fopenmp lusolve.f
 gfortran -c -Ofast -msse3 -fopenmp makeint.f
 gfortran -c -Ofast -msse3 -fopenmp makeref.f
 gfortran -c -Ofast -msse3 -fopenmp makexyz.f
@@ -493,6 +495,7 @@ gfortran -c -Ofast -msse3 -fopenmp polarize.f
 gfortran -c -Ofast -msse3 -fopenmp poledit.f
 gfortran -c -Ofast -msse3 -fopenmp polymer.f
 gfortran -c -Ofast -msse3 -fopenmp potential.f
+gfortran -c -Ofast -msse3 -fopenmp predict.f
 gfortran -c -Ofast -msse3 -fopenmp pressure.f
 gfortran -c -Ofast -msse3 -fopenmp prmedit.f
 gfortran -c -Ofast -msse3 -fopenmp prmkey.f
@@ -509,7 +512,7 @@ gfortran -c -Ofast -msse3 -fopenmp prtxyz.f
 gfortran -c -Ofast -msse3 -fopenmp pss.f
 gfortran -c -Ofast -msse3 -fopenmp pssrigid.f
 gfortran -c -Ofast -msse3 -fopenmp pssrot.f
-gfortran -c -Ofast -msse3 -fopenmp qrfact.f
+gfortran -c -Ofast -msse3 -fopenmp qrsolve.f
 gfortran -c -Ofast -msse3 -fopenmp quatfit.f
 gfortran -c -Ofast -msse3 -fopenmp radial.f
 gfortran -c -Ofast -msse3 -fopenmp random.f

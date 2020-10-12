@@ -15,6 +15,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static anneal.obj tinker.lib lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static archive.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static bar.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static correlate.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static critical.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static crystal.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static diffuse.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static distgeom.obj tinker.lib libfftw-3.3.lib

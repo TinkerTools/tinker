@@ -1,7 +1,7 @@
 
-                  ###########################################
-                  Files for OpenMM-Enabled Tinker Executables
-                  ###########################################
+                   ##########################################
+                   Building OpenMM-Enabled Tinker Executables
+                   ##########################################
 
        This directory contains the files needed to build Tinker versions
        of the ANALYZE, BAR and DYNAMIC programs using the GPU-capable
@@ -10,17 +10,18 @@
        the programs can be compiled and linked in that modified /source
        directory.
 
-       Building OpenMM-enabled executables requires a special version of
-       OpenMM, called Tinker-OpenMM, and available via a separate GitHub
-       branch, currently https://github.com/TinkerTools/Tinker-OpenMM.
-       This version has changes from the canonical Stanford OpenMM that
-       are needed for the Tinker interface, beyond implementation of the
-       AMOEBA force field.
-
        The provided Makefile can be used, after minor edits, to build
        GPU-enabled executables. Either the GNU compilers or the Intel
        compilers can be used. The Makefile assumes OpenMM is found in
        its default location, /usr/local/openmm. NVIDIA CUDA V9 or later
        must be installed on the target machine, as well as a CUDA-capable
        graphics card.
+
+       This version of the Tinker interface code to OpenMM should work
+       correctly when built against the current Github master version of
+       the OpenMM package, available from https://github.com/openmm/.
+       Only a limited set of Tinker options are available from within the
+       Tinker-OpenMM programs, including Amber and AMOEBA force fields,
+       Verlet and RESPA MD integrators, Bussi thermostat and the Monte
+       Carlo barostat. Only PME periodic box calculations are supported.
 

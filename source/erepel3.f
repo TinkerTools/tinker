@@ -64,6 +64,7 @@ c
       use iounit
       use molcul
       use mpole
+      use mutant
       use potent
       use repel
       use reppot
@@ -98,8 +99,10 @@ c
       real*8 dmpik(9)
       real*8, allocatable :: rscale(:)
       logical proceed,usei
+      logical muti,mutk,mutik
       logical header,huge
       character*6 mode
+      real*8 e100,e075,e050,e025,e010
 c
 c
 c     zero out the repulsion energy and partitioning terms
@@ -166,6 +169,7 @@ c
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -186,6 +190,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -256,7 +261,26 @@ c
      &                       + term3*dmpik(5) + term4*dmpik(7)
      &                       + term5*dmpik(9)
                   sizik = sizi * sizk
-                  e = sizik * rscale(k) * eterm * rr1
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     e = vlambda * sizik * rscale(k) * eterm
+     &                      / sqrt(1.0d0-vlambda+r2)
+                  else
+                     e = sizik * rscale(k) * eterm * rr1
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c

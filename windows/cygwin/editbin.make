@@ -14,6 +14,7 @@ editbin /STACK:60000000 anneal.exe
 editbin /STACK:60000000 archive.exe
 editbin /STACK:60000000 bar.exe
 editbin /STACK:60000000 correlate.exe
+editbin /STACK:60000000 critical.exe
 editbin /STACK:60000000 crystal.exe
 editbin /STACK:60000000 diffuse.exe
 editbin /STACK:60000000 distgeom.exe

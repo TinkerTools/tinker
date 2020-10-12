@@ -14,6 +14,7 @@ ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a ; strip archive.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a ; strip correlate.x
+ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a ; strip critical.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o crystal.x crystal.o libtinker.a libfftw3_threads.a libfftw3.a ; strip crystal.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o diffuse.x diffuse.o libtinker.a libfftw3_threads.a libfftw3.a ; strip diffuse.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o distgeom.x distgeom.o libtinker.a libfftw3_threads.a libfftw3.a ; strip distgeom.x

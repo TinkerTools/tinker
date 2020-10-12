@@ -626,7 +626,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,
-!$OMP& vcouple,vlambda)
+!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vlambda)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
 !$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
 c
