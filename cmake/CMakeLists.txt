@@ -125,17 +125,17 @@ set(_FILES
     nonpol nose nspline nucleo number numeral numgrad ocvm omega opbend opdist
     openend openmp optinit optsave orbital orbits orient orthog output overlap
     params paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf pmpb
-    polar polgrp polopt polpcg polpot poltcg polymer potent potfit pressure
-    prmkey promo prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
-    qmstuf qrsolve quatfit random rattle readdyn readgau readgdma readint
-    readmol readmol2 readpdb readprm readseq readxyz refer repel replica reppot
-    resdue respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd rotlist
-    rotpole rxnfld rxnpot scales sdstep search sequen server shakeup shunt
-    sigmoid simplex sizes sktstuf socket solpot solute sort square stodyn strbnd
-    strtor suffix surface surfatom switch syntrn tarray tcgstuf temper titles
-    tncg torphase torpot torque tors torsions tortor tree trimtext unitcell
-    units uprior urey urypot usage valfit vdw vdwpot verlet version vibs virial
-    volume warp xtals xyzatm zatom zclose zcoord
+    polar polgrp polopt polpcg polpot poltcg polymer potent potfit predict
+    pressure prmkey promo prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq
+    prtxyz ptable qmstuf qrsolve quatfit random rattle readdyn readgau readgdma
+    readint readmol readmol2 readpdb readprm readseq readxyz refer repel replica
+    reppot resdue respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd
+    rotlist rotpole rxnfld rxnpot scales sdstep search sequen server shakeup
+    shunt sigmoid simplex sizes sktstuf socket solpot solute sort square stodyn
+    strbnd strtor suffix surface surfatom switch syntrn tarray tcgstuf temper
+    titles tncg torphase torpot torque tors torsions tortor tree trimtext
+    unitcell units uprior urey urypot usage valfit vdw vdwpot verlet version
+    vibs virial volume warp xtals xyzatm zatom zclose zcoord
 )
 set(_LIB "")
 foreach(_FILE IN LISTS _FILES)
