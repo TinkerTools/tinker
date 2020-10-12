@@ -44,7 +44,7 @@ c
       character*240 record
       character*240 string
       external critical1
-      external critical2
+      external critsave
 c
 c
 c     set up the structure and mechanics calculation
@@ -130,7 +130,7 @@ c
          xhi(i) = 1000000.0d0
       end do
       call square (nvar,nrsd,xlo,xhi,xx,rsd,grd,fjac,
-     &                grdmin,critical1,critical2)
+     &                grdmin,critical1,critsave)
 c
 c     perform deallocation of some local arrays
 c
@@ -245,7 +245,7 @@ c
       integer i
       integer nvar
       integer nrsd
-      real*8 epot
+      real*8 epot 
       real*8 xx(*)
       real*8 rsd(*)
       real*8, allocatable :: derivs(:,:)
@@ -296,21 +296,79 @@ c
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  subroutine critical2  --  least squares output routine  ##
+c     ##  subroutine critsave  --  critical point output routine  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
-      subroutine critical2 (niter,nrsd,xx,gs,rsd)
+      subroutine critsave (niter,nrsd,xx,gs,rsd)
+      use files
+      use iounit
+      use output
       implicit none
-      integer niter
-      integer nrsd
+      integer niter,nrsd
+      integer iopt,iend
+      integer lext
+      integer freeunit
       real*8 xx(*)
       real*8 gs(*)
       real*8 rsd(*)
+      logical exist
+      character*7 ext
+      character*240 optfile
+      character*240 endfile
 c
 c
-c     information to be printed at each least squares iteration
+c     get name of archive or intermediate coordinates file
 c
+      iopt = freeunit ()
+      if (cyclesave) then
+         if (archive) then
+            optfile = filename(1:leng)
+            call suffix (optfile,'arc','old')
+            inquire (file=optfile,exist=exist)
+            if (exist) then
+               call openend (iopt,optfile)
+            else
+               open (unit=iopt,file=optfile,status='new')
+            end if
+         else
+            lext = 3
+            call numeral (niter,ext,lext)
+            optfile = filename(1:leng)//'.'//ext(1:lext)
+            call version (optfile,'new')
+            open (unit=iopt,file=optfile,status='new')
+         end if
+      else
+         optfile = outfile
+         call version (optfile,'old')
+         open (unit=iopt,file=optfile,status='old')
+         rewind (unit=iopt)
+      end if
+c
+c     update intermediate file with desired coordinate type
+c
+      call prtxyz (iopt)
+      close (unit=iopt)
+c
+c     test for requested termination of the optimization
+c
+      endfile = 'tinker.end'
+      inquire (file=endfile,exist=exist)
+      if (.not. exist) then
+         endfile = filename(1:leng)//'.end'
+         inquire (file=endfile,exist=exist)
+         if (exist) then
+            iend = freeunit ()
+            open (unit=iend,file=endfile,status='old')
+            close (unit=iend,status='delete')
+         end if
+      end if
+      if (exist) then
+         write (iout,10)
+   10    format (/,' CRITSAVE  --  Optimization Calculation Ending',
+     &              ' due to User Request')
+         call fatal
+      end if
       return
       end
