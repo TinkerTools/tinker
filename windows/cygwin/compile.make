@@ -216,6 +216,7 @@ gfortran -c -O3 -ffast-math -fopenmp connect.f
 gfortran -c -O3 -ffast-math -fopenmp connolly.f
 gfortran -c -O3 -ffast-math -fopenmp control.f
 gfortran -c -O3 -ffast-math -fopenmp correlate.f
+gfortran -c -O3 -ffast-math -fopenmp critical.f
 gfortran -c -O3 -ffast-math -fopenmp crystal.f
 gfortran -c -O3 -ffast-math -fopenmp cspline.f
 gfortran -c -O3 -ffast-math -fopenmp cutoffs.f

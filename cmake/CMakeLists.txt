@@ -86,14 +86,14 @@ install(TARGETS tinker LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE
         DESTINATION ${CMAKE_INSTALL_LIBDIR})
 
 foreach(_BIN
-        alchemy analyze anneal archive bar correlate crystal diffuse
-        distgeom document dynamic gda intedit intxyz minimize minirot
-        minrigid mol2xyz molxyz monte newton newtrot nucleic optimize
-        optirot optrigid path pdbxyz polarize poledit potential
+        alchemy analyze anneal archive bar correlate critical crystal
+        diffuse distgeom document dynamic gda intedit intxyz minimize
+        minirot minrigid mol2xyz molxyz monte newton newtrot nucleic
+        optimize optirot optrigid path pdbxyz polarize poledit potential
         prmedit protein pss pssrigid pssrot radial saddle scan sniffer
-        spacefill spectrum superpose testgrad testhess testpair
-        testpol testrot testvir timer timerot torsfit valence vibbig
-        vibrate vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb)
+        spacefill spectrum superpose testgrad testhess testpair testpol
+        testrot testvir timer timerot torsfit valence vibbig vibrate
+        vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb)
         add_executable(${_BIN}.x ${_BIN}.f)
         target_link_libraries(${_BIN}.x tinker PkgConfig::FFTW3)
         install(TARGETS ${_BIN}.x DESTINATION ${CMAKE_INSTALL_BINDIR})

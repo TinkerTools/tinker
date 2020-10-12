@@ -19,6 +19,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o anneal
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o archive.x archive.o libtinker.a libjvm.so ; strip archive.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o bar.x bar.o libtinker.a libjvm.so ; strip bar.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o correlate.x correlate.o libtinker.a libjvm.so ; strip correlate.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o critical.x critical.o libtinker.a libjvm.so ; strip critical.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o crystal.x crystal.o libtinker.a libjvm.so ; strip crystal.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o diffuse.x diffuse.o libtinker.a libjvm.so ; strip diffuse.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o distgeom.x distgeom.o libtinker.a libjvm.so ; strip distgeom.x

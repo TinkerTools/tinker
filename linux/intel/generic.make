@@ -216,6 +216,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp connect.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp connolly.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp control.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp correlate.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp critical.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp crystal.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp cspline.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp cutoffs.f

@@ -216,6 +216,7 @@ ifort -c -g -warn all -check all connect.f
 ifort -c -g -warn all -check all connolly.f
 ifort -c -g -warn all -check all control.f
 ifort -c -g -warn all -check all correlate.f
+ifort -c -g -warn all -check all critical.f
 ifort -c -g -warn all -check all crystal.f
 ifort -c -g -warn all -check all cspline.f
 ifort -c -g -warn all -check all cutoffs.f

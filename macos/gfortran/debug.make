@@ -216,6 +216,7 @@ gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized con
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized connolly.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized control.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized correlate.f
+gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized critical.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized crystal.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized cspline.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized cutoffs.f

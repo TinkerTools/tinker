@@ -14,6 +14,7 @@ ifort -O3 -no-ipo -no-prec-div -static-intel -o anneal.x anneal.o libtinker.a ; 
 ifort -O3 -no-ipo -no-prec-div -static-intel -o archive.x archive.o libtinker.a ; strip archive.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o bar.x bar.o libtinker.a ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o correlate.x correlate.o libtinker.a ; strip correlate.x
+ifort -O3 -no-ipo -no-prec-div -static-intel -o critical.x critical.o libtinker.a ; strip critical.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o crystal.x crystal.o libtinker.a ; strip crystal.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o diffuse.x diffuse.o libtinker.a ; strip diffuse.x
 ifort -O3 -no-ipo -no-prec-div -static-intel -o distgeom.x distgeom.o libtinker.a ; strip distgeom.x

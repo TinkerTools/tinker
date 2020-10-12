@@ -386,7 +386,7 @@ c                 goto 60
                end if
             end if
          end do
-   60    continue
+c  60    continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
@@ -484,7 +484,7 @@ c                    goto 90
 c                    goto 90
                   end if
                end do
-   90          continue
+c  90          continue
             end if
 c        end if
 c

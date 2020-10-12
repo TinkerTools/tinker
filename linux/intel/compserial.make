@@ -216,6 +216,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 connect.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 connolly.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 control.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 correlate.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 critical.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 crystal.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 cspline.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 cutoffs.f

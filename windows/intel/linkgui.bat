@@ -22,6 +22,7 @@ ifort /libs:static anneal.obj tinker.lib %javalib%
 ifort /libs:static archive.obj tinker.lib %javalib%
 ifort /libs:static bar.obj tinker.lib %javalib%
 ifort /libs:static correlate.obj tinker.lib %javalib%
+ifort /libs:static critical.obj tinker.lib %javalib%
 ifort /libs:static crystal.obj tinker.lib %javalib%
 ifort /libs:static diffuse.obj tinker.lib %javalib%
 ifort /libs:static distgeom.obj tinker.lib %javalib%

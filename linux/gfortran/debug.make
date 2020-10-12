@@ -216,6 +216,7 @@ gfortran -c -Wall connect.f
 gfortran -c -Wall connolly.f
 gfortran -c -Wall control.f
 gfortran -c -Wall correlate.f
+gfortran -c -Wall critical.f
 gfortran -c -Wall crystal.f
 gfortran -c -Wall cspline.f
 gfortran -c -Wall cutoffs.f

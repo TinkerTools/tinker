@@ -216,6 +216,7 @@ gfortran -c -Ofast -mavx -fopenmp connect.f
 gfortran -c -Ofast -mavx -fopenmp connolly.f
 gfortran -c -Ofast -mavx -fopenmp control.f
 gfortran -c -Ofast -mavx -fopenmp correlate.f
+gfortran -c -Ofast -mavx -fopenmp critical.f
 gfortran -c -Ofast -mavx -fopenmp crystal.f
 gfortran -c -Ofast -mavx -fopenmp cspline.f
 gfortran -c -Ofast -mavx -fopenmp cutoffs.f

@@ -217,6 +217,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp connect.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp connolly.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp control.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp correlate.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp critical.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp crystal.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cspline.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cutoffs.f

@@ -13,6 +13,7 @@ mv anneal.x    ../bin/anneal.exe
 mv archive.x   ../bin/archive.exe
 mv bar.x       ../bin/bar.exe
 mv correlate.x ../bin/correlate.exe
+mv critical.x  ../bin/critical.exe
 mv crystal.x   ../bin/crystal.exe
 mv diffuse.x   ../bin/diffuse.exe
 mv distgeom.x  ../bin/distgeom.exe

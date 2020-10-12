@@ -24,6 +24,7 @@ c
       use iounit
       use limits
       use minima
+      use mpole
       use polar
       use polopt
       use polpot
@@ -35,20 +36,18 @@ c
       implicit none
       integer i,j,k,m
       integer next,kpcg
-      integer nvar,iter
+      integer nvar,size
       integer itercut
       integer saveopt
       integer savetcg
-      integer size,miny
+      integer iter,ntest
       real*8 sum,epscut
       real*8 ux,uy,uz,u2
       real*8 rdirect,rpcg
       real*8 rxpt,rtcg
-      real*8 eps,delta
+      real*8 step,delta
       real*8 optfit
       real*8, allocatable :: var(:)
-      real*8, allocatable :: yval(:)
-      real*8, allocatable :: p(:,:)
       real*8, allocatable :: rms(:)
       real*8, allocatable :: drms(:)
       real*8, allocatable :: tdirect(:)
@@ -83,7 +82,7 @@ c
       if (.not. use_polar) then
          write (iout,10)
    10    format (/,' TESTPOL  --  Induced Dipole Polarization Model',
-     &              ' is not in Use')
+     &              ' Not in Use')
          call fatal
       end if
 c
@@ -417,23 +416,21 @@ c
       poltyp = savetyp
       if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT   '
       call kpolar
-      maxiter = 1000
-      eps = 0.033d0
-      delta = 0.0001d0
       write (iout,230)  optorder
   230 format (/,' Analytical OPT',i1,' Coefficient Refinement :',
      &        //,4x,'Iter',7x,'C0',5x,'C1',5x,'C2',5x,'C3',
      &           5x,'C4',5x,'C5',5x,'C6',5x,'RMS vs Exact',/)
 c
-c     count number of variables and define the initial simplex
+c     perform dynamic allocation of some local arrays
 c
       nvar = 0
       do i = 0, optorder
          if (copt(i) .ne. 0.0d0)  nvar = nvar + 1
       end do
       allocate (var(nvar))
-      allocate (yval(nvar+1))
-      allocate (p(nvar+1,nvar))
+c
+c     count number of variables and define the initial simplex
+c
       nvar = 0
       do i = 0, optorder
          if (copt(i) .ne. 0.0d0) then
@@ -441,35 +438,22 @@ c
             var(nvar) = copt(i)
          end if
       end do
-      do i = 1, nvar
-         p(1,i) = var(i)
-      end do
-      yval(1) = optfit (var)
-      do k = 1, nvar
-         var(k) = var(k) + eps
-         do i = 1, nvar
-            p(k+1,i) = var(i)
-         end do
-         yval(k+1) = optfit (var)
-         var(k) = var(k) - eps
-      end do
 c
-c     optimize coefficients, then find and print refined values
+c     optimize OPT coefficients, then print refined values
 c
-      call simplex (nvar,p,yval,delta,optfit,iter)
-      iter = iter + nvar + 1
-      rxpt = 1000000.0d0
-      do i = 1, nvar+1
-         if (yval(i) .lt. rxpt) then
-            miny = i
-            rxpt = yval(i)
-         end if
-      end do
+      iter = 0
+      maxiter = 3000
+      iprint = 0
+      ntest = 200
+      step = 0.03d0
+      delta = 0.0001d0
+      rxpt = 1000.0d0
+      call simplex (nvar,iter,ntest,var,rxpt,step,delta,optfit)
       nvar = 0
       do i = 0, optorder
          if (copt(i) .ne. 0.0d0) then
             nvar = nvar + 1
-            copt(i) = p(miny,nvar)
+            copt(i) = var(nvar)
          end if
       end do
       write (iout,240)  iter,(copt(i),i=0,6),rxpt
@@ -478,19 +462,20 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (var)
-      deallocate (yval)
-      deallocate (p)
       deallocate (rms)
       deallocate (drms)
       deallocate (tdirect)
-      deallocate (txpt)
       deallocate (tpcg)
+      deallocate (txpt)
+      deallocate (ttcg)
       deallocate (ddirect)
-      deallocate (dxpt)
       deallocate (dpcg)
+      deallocate (dxpt)
+      deallocate (dtcg)
       deallocate (udirect)
       deallocate (upcg)
       deallocate (uxpt)
+      deallocate (utcg)
       deallocate (ustore)
 c
 c     perform any final tasks before program exit

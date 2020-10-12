@@ -14,6 +14,7 @@ unzip anneal.zip anneal.exe
 unzip archive.zip archive.exe
 unzip bar.zip bar.exe
 unzip correlate.zip correlate.exe
+unzip critical.zip critical.exe
 unzip crystal.zip crystal.exe
 unzip diffuse.zip diffuse.exe
 unzip distgeom.zip distgeom.exe
