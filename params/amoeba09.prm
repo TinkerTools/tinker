@@ -60,8 +60,9 @@ mutual-14-scale         1.0
       #############################
 
 
-P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Intermolecular
-Potentials for Small Organic Molecules", in preparation.
+P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-based
+Molecular Mechanics for Organic Molecules", J. Chem. Theory Comput.,
+7, 3143-3161 (2011)
 
 J. W. Ponder and D. A. Case, "Force Fields for Protein Simulation",
 Adv. Prot. Chem., 66, 27-85 (2003)
