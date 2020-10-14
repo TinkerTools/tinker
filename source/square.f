@@ -257,7 +257,7 @@ c
    40       format (i6,f14.4,2f13.4,2i10)
          else
             write (iout,50)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   50       format (i6,f14.4,2d13.4,2i10)
+   50       format (i6,d14.4,2d13.4,2i10)
          end if
       end if
 c
@@ -448,7 +448,7 @@ c
             else
                write (iout,80)  niter,fcnorm,gcnorm,ganorm,
      &                          nactive,ncalls
-   80          format (i6,f14.4,2d13.4,2i10)
+   80          format (i6,d14.4,2d13.4,2i10)
             end if
          end if
 c
