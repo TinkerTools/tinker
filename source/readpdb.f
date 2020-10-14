@@ -713,6 +713,7 @@ c
       if (resname .eq. 'RB ')  resname = ' RB'
       if (resname .eq. 'SR ')  resname = ' SR'
       if (resname .eq. 'I  ')  resname = '  I'
+      if (resname .eq. 'XE ')  resname = ' XE'
       if (resname .eq. 'CS ')  resname = ' CS'
       if (resname .eq. 'CES')  resname = ' CS'
       if (resname .eq. 'BA ')  resname = ' BA'
