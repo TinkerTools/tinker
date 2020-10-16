@@ -217,7 +217,7 @@ c
             end do
          end if
       end do
-c
+
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then

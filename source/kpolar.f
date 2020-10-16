@@ -434,7 +434,7 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      if (.not. use_chgtrn) then
+      if (use_polar .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
          npolar = 0
@@ -475,14 +475,16 @@ c
 c
 c     set the values used in the scaling of the polarizability
 c
-      sixth = 1.0d0 / 6.0d0
-      do i = 1, npole
-         if (thole(i) .eq. 0.0d0) then
-            pdamp(i) = 0.0d0
-         else
-            pdamp(i) = polarity(i)**sixth
-         end if
-      end do
+      if (.not. use_chgtrn) then
+         sixth = 1.0d0 / 6.0d0
+         do i = 1, npole
+            if (thole(i) .eq. 0.0d0) then
+               pdamp(i) = 0.0d0
+            else
+               pdamp(i) = polarity(i)**sixth
+            end if
+         end do
+      end if
 c
 c     assign polarization group connectivity of each atom
 c

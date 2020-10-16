@@ -36,6 +36,7 @@ c
       integer i,k
       integer ia,ic,next
       real*8 chtrn,actrn
+      real*8 sixth
       logical header
       character*20 keyword
       character*240 record
@@ -134,49 +135,62 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      npole = 0
-      ncp = 0
-      npolar = 0
-      nct = 0
-      do i = 1, n
-         if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
-         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0 .or.
-     &          chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do k = 1, maxpole
-               pole(k,npole) = pole(k,i)
-            end do
-            mono0(npole) = pole(1,i)
-            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-            pcore(npole) = pcore(i)
-            pval(npole) = pval(i)
-            pval0(npole) = pval(i)
-            palpha(npole) = palpha(i)
-            if (polarity(i) .ne. 0.0d0) then
-               npolar = npolar + 1
-               ipolar(npolar) = npole
-               douind(i) = .true.
+      if (use_chgtrn) then
+         npole = 0
+         ncp = 0
+         npolar = 0
+         nct = 0
+         do i = 1, n
+            if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
+            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0 .or.
+     &             chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do k = 1, maxpole
+                  pole(k,npole) = pole(k,i)
+               end do
+               mono0(npole) = pole(1,i)
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               pval0(npole) = pval(i)
+               palpha(npole) = palpha(i)
+               if (polarity(i) .ne. 0.0d0) then
+                  npolar = npolar + 1
+                  ipolar(npolar) = npole
+                  douind(i) = .true.
+               end if
+               polarity(npole) = polarity(i)
+               thole(npole) = thole(i)
+               dirdamp(npole) = dirdamp(i)
+               if (chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
+                  nct = nct + 1
+               end if
+               chgct(npole) = chgct(i)
+               dmpct(npole) = dmpct(i)
             end if
-            polarity(npole) = polarity(i)
-            thole(npole) = thole(i)
-            dirdamp(npole) = dirdamp(i)
-            if (chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
-               nct = nct + 1
-            end if
-            chgct(npole) = chgct(i)
-            dmpct(npole) = dmpct(i)
-         end if
-      end do
+         end do
+      end if
 c
 c     test multipoles at chiral sites and invert if necessary
 c
       call chkpole
+c
+c     set the values used in the scaling of the polarizability
+c
+      sixth = 1.0d0 / 6.0d0
+      do i = 1, npole
+         if (thole(i) .eq. 0.0d0) then
+            pdamp(i) = 0.0d0
+         else
+            pdamp(i) = polarity(i)**sixth
+         end if
+      end do
 c
 c     turn off individual electrostatic potentials if not used
 c
