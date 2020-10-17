@@ -36,7 +36,6 @@ c
       integer i,k
       integer ia,ic,next
       real*8 chtrn,actrn
-      real*8 sixth
       logical header
       character*20 keyword
       character*240 record
@@ -168,6 +167,7 @@ c
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
                dirdamp(npole) = dirdamp(i)
+               pdamp(npole) = pdamp(i)
                if (chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
                   nct = nct + 1
                end if
@@ -181,17 +181,6 @@ c     test multipoles at chiral sites and invert if necessary
 c
       call chkpole
 c
-c     set the values used in the scaling of the polarizability
-c
-      sixth = 1.0d0 / 6.0d0
-      do i = 1, npole
-         if (thole(i) .eq. 0.0d0) then
-            pdamp(i) = 0.0d0
-         else
-            pdamp(i) = polarity(i)**sixth
-         end if
-      end do
-c
 c     turn off individual electrostatic potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
@@ -199,19 +188,9 @@ c
       if (npolar .eq. 0)  use_polar = .false.
       if (use_polar) then
          do i = 1, npole
-            if (thole(i) .ne. 0.0d0) then
-               use_thole = .true.
-               goto 80
-            end if
+            if (thole(i) .ne. 0.0d0)  use_thole = .true.
+            if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
          end do
-   80    continue
-         do i = 1, npole
-            if (dirdamp(i) .ne. 0.0d0) then
-               use_dirdamp = .true.
-               goto 90
-            end if
-         end do
-   90    continue
       end if
       if (nct .eq. 0)  use_chgtrn = .false.
       return

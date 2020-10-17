@@ -364,16 +364,19 @@ c
 c
 c     find and store the atomic dipole polarizability parameters
 c
+      sixth = 1.0d0 / 6.0d0
       npolar = n
       do i = 1, n
          polarity(i) = 0.0d0
          thole(i) = 0.0d0
          dirdamp(i) = 0.0d0
+         pdamp(i) = 0.0d0
          it = type(i)
          if (it .ne. 0) then
             polarity(i) = polr(it)
             thole(i) = athl(it)
             dirdamp(i) = ddir(it)
+            pdamp(i) = polarity(i)**sixth
          end if
       end do
 c
@@ -465,6 +468,7 @@ c
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
                dirdamp(npole) = dirdamp(i)
+               pdamp(npole) = pdamp(i)
             end if
          end do
       end if
@@ -472,19 +476,6 @@ c
 c     test multipoles at chiral sites and invert if necessary
 c
       if (.not. use_chgtrn)  call chkpole
-c
-c     set the values used in the scaling of the polarizability
-c
-      if (.not. use_chgtrn) then
-         sixth = 1.0d0 / 6.0d0
-         do i = 1, npole
-            if (thole(i) .eq. 0.0d0) then
-               pdamp(i) = 0.0d0
-            else
-               pdamp(i) = polarity(i)**sixth
-            end if
-         end do
-      end if
 c
 c     assign polarization group connectivity of each atom
 c
@@ -497,19 +488,9 @@ c
       if (npolar .eq. 0)  use_polar = .false.
       if (use_polar) then
          do i = 1, npole
-            if (thole(i) .ne. 0.0d0) then
-               use_thole = .true.
-               goto 210
-            end if
+            if (thole(i) .ne. 0.0d0)  use_thole = .true.
+            if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
          end do
-  210    continue
-         do i = 1, npole
-            if (dirdamp(i) .ne. 0.0d0) then
-               use_dirdamp = .true.
-               goto 220
-            end if
-         end do
-  220    continue
       end if
 c
 c     perform dynamic allocation of some global arrays
