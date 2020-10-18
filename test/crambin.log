@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.8  June 2020                          ##
+ ##                       Version 8.8.2   October 2020                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
@@ -18,7 +18,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.8  June 2020                          ##
+ ##                       Version 8.8.2   October 2020                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
@@ -276,7 +276,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.8  June 2020                          ##
+ ##                       Version 8.8.2   October 2020                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2020               ##
  ###                           All Rights Reserved                          ###
@@ -339,7 +339,7 @@
      246   0.000    247   0.000    248   0.000    249   1.440    250   0.000
      251   2.603    252   3.673    253   4.563    254   0.000    255   0.000
      256   0.106    257   7.336    258   0.000    259   0.493    260   0.055
-     261   0.044    262   2.594    263   3.100    264   2.055    265   0.217
+     261   0.044    262   2.594    263   3.099    264   2.055    265   0.217
      266   0.035    267   3.357    268   3.836    269   0.728    270   4.661
      271   2.983    272   3.754    273   0.070    274   0.038    275   0.587
      276   8.329    277   2.953    278   1.349    279   1.130    280   0.114
@@ -421,7 +421,7 @@
 
  Convex Faces :         417     Area :      729.939    Volume :      333.229
  Saddle Faces :        1239     Area :      981.531    Volume :      713.848
- Concave Faces :        826     Area :      701.162    Volume :      855.243
+ Concave Faces :        826     Area :      701.161    Volume :      855.243
  Buried Polyhedra :                                    Volume :     3341.974
 
  Spindle Correction :           Area :       10.988    Volume :       -2.865
