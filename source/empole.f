@@ -360,7 +360,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            do kk = i, npole
+            do kk = ii, npole
                k = ipole(kk)
                kz = zaxis(kk)
                kx = xaxis(kk)
@@ -1036,7 +1036,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kk = i+1, npole
+         do kk = ii+1, npole
             k = ipole(kk)
             xr = x(k) - xi
             yr = y(k) - yi

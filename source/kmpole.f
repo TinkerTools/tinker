@@ -675,7 +675,7 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      if (.not.use_polar .and. .not.use_chgtrn) then
+      if (use_mpole .and. .not.use_polar .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
          do i = 1, n
@@ -702,7 +702,8 @@ c
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      if (.not.use_polar .and. .not.use_chgtrn)  call chkpole
+      if (use_mpole .and. .not.use_polar .and. .not.use_chgtrn)
+     &   call chkpole
 c
 c     turn off atomic multipole potentials if not used
 c

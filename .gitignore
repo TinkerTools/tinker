@@ -1,5 +1,6 @@
 apbs
-bin
+bin/*
+!bin/0README
 build
 doc/amoeba
 doc/announce
