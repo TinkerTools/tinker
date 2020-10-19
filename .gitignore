@@ -1,7 +1,6 @@
 apbs
 bin/*
 !bin/0README
-build
 doc/amoeba
 doc/announce
 doc/heart

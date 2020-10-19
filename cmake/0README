@@ -7,26 +7,25 @@
       CMake works on Linux, MacOS and Windows. It requires the pkg-config
       and cmake-data packages, in addition to cmake.
 
-      cmake is a command-line utility, and can be replaced in step 3 by
-      ccmake for a text-based UI or cmake-gui for a graphical frontend.
+      "cmake" is a command-line utility, and can be replaced in step 3 by
+      "ccmake" for a text-based UI or cmake-gui for a graphical frontend.
 
       Note that before building Tinker, the FFTW libraries must be built or
       installed. These libraries can be built following the instructions in
-      the file ../fftw/0README. Alternatively, the libraries can be installed
-      on Ubuntu Linux or similar by using the command
-      "sudo apt-get install libfftw3-dev". If multiple threaded FFTW libraries
-      are installed, the linked version can be specified in step 3 with the flag
-      "-DFFTW_THREAD_TYPE=omp".
+      the file ../fftw/0README. Alternatively, are libraries are installed
+      on Ubuntu Linux via the command "sudo apt-get install libfftw3-dev".
+      If multiple threaded FFTW libraries are installed, the linked version
+      can be specified in step 3 with the flag "-DFFTW_THREAD_TYPE=omp".
 
-      To change where Tinker executables are installed pass the flag
+      To change where the Tinker executables are installed, use the flag
       "-DCMAKE_INSTALL_PREFIX=/path/to/install" in step 3. This is useful
       in situations where the user may not have root privileges (e.g. on a
-      computing cluster).
+      computer cluster).
 
       To build Tinker with cmake, issue the following commands:
 
-               (1) cd Tinker  [i.e., the top-level directory]
-               (2) mkdir build && cd build
-               (3) cmake ../cmake
-               (4) make -j4
-               (5) make install
+             (1) cd Tinker   [i.e., the top-level directory]
+             (2) mkdir build && cd build
+             (3) cmake ../cmake
+             (4) make -j4    [replace 4 with # of processes to use]
+             (5) make install
