@@ -164,6 +164,8 @@ c
                   ipolar(npolar) = npole
                   douind(i) = .true.
                end if
+               if (thole(i) .ne. 0.0d0)  use_thole = .true.
+               if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
                dirdamp(npole) = dirdamp(i)
@@ -179,19 +181,13 @@ c
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
+      if (use_chgtrn)  call chkpole
 c
 c     turn off individual electrostatic potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .eq. 0)  use_chgpen = .false.
       if (npolar .eq. 0)  use_polar = .false.
-      if (use_polar) then
-         do i = 1, npole
-            if (thole(i) .ne. 0.0d0)  use_thole = .true.
-            if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
-         end do
-      end if
       if (nct .eq. 0)  use_chgtrn = .false.
       return
       end

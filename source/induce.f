@@ -144,6 +144,7 @@ c
       use iounit
       use limits
       use mpole
+      use neigh
       use polar
       use polopt
       use polpcg
@@ -331,8 +332,8 @@ c
          else
             call ufield0a (field,fieldp)
          end if
-
-c     set initial conjugate gradient residual and conjugate vector
+c
+c     set initial values for the residual vector components
 c
          do i = 1, npole
             if (douind(ipole(i))) then
@@ -359,7 +360,15 @@ c
                end do
             end if
          end do
+c
+c     perform dynamic allocation of some global arrays
+c
          if (pcgprec) then
+            if (.not. allocated(mindex))  allocate (mindex(npole))
+            if (.not. allocated(minv))  allocate (minv(3*maxulst*npole))
+c
+c     apply a sparse matrix conjugate gradient preconditioner
+c
             mode = 'BUILD'
             if (use_mlist) then
                call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
@@ -371,6 +380,9 @@ c
                call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
             end if
          end if
+c
+c     set the initial conjugate vector to be the residuals
+c
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3

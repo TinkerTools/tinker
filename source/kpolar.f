@@ -38,7 +38,6 @@ c
       use kpolr
       use mplpot
       use mpole
-      use neigh
       use polar
       use polopt
       use polpot
@@ -465,6 +464,8 @@ c
                   ipolar(npolar) = npole
                   douind(i) = .true.
                end if
+               if (thole(i) .ne. 0.0d0)  use_thole = .true.
+               if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
                dirdamp(npole) = dirdamp(i)
@@ -475,7 +476,7 @@ c
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      if (.not. use_chgtrn)  call chkpole
+      if (use_polar .and. .not.use_chgtrn)  call chkpole
 c
 c     assign polarization group connectivity of each atom
 c
@@ -486,21 +487,6 @@ c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .eq. 0)  use_chgpen = .false.
       if (npolar .eq. 0)  use_polar = .false.
-      if (use_polar) then
-         do i = 1, npole
-            if (thole(i) .ne. 0.0d0)  use_thole = .true.
-            if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
-         end do
-      end if
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (use_polar) then
-         if (allocated(mindex))  deallocate (mindex)
-         if (allocated(minv))  deallocate (minv)
-         allocate (mindex(npole))
-         allocate (minv(3*maxulst*npole))
-      end if
       return
       end
 c
