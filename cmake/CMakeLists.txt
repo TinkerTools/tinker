@@ -3,98 +3,166 @@ cmake_minimum_required(VERSION 3.6)
 project(tinker VERSION 8.8.1 LANGUAGES Fortran)
 
 include(GNUInstallDirs)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(FFTW3 REQUIRED IMPORTED_TARGET fftw3)
 
-add_library(tinker 
-            action.f active.f align.f alterchg.f analysis.f analyz.f angang.f
-            angbnd.f angles.f angpot.f angtor.f argue.f ascii.f atmlst.f
-            atomid.f atoms.f attach.f baoab.f basefile.f bath.f beeman.f
-            bicubic.f bitor.f bitors.f bndpot.f bndstr.f bonds.f born.f
-            bound.f bounds.f boxes.f bussi.f calendar.f cell.f center.f
-            cflux.f charge.f chgpen.f chgpot.f chgtrn.f chkpole.f chkring.f
-            chkxyz.f cholesky.f chrono.f chunks.f clock.f cluster.f column.f
-            command.f connect.f connolly.f control.f couple.f cspline.f
-            ctrpot.f cutoffs.f damping.f deflate.f delete.f deriv.f dcflux.f
-            diagq.f diffeq.f dipole.f disgeo.f disp.f dma.f domega.f dsppot.f
-            eangang.f eangang1.f eangang2.f eangang3.f eangle.f eangle1.f
-            eangle2.f eangle3.f eangtor.f eangtor1.f eangtor2.f eangtor3.f
-            ebond.f ebond1.f ebond2.f ebond3.f ebuck.f ebuck1.f ebuck2.f
-            ebuck3.f echarge.f echarge1.f echarge2.f echarge3.f echgdpl.f
-            echgdpl1.f echgdpl2.f echgdpl3.f echgtrn.f echgtrn1.f echgtrn2.f
-            echgtrn3.f edipole.f edipole1.f edipole2.f edipole3.f edisp.f
-            edisp1.f edisp2.f edisp3.f egauss.f egauss1.f egauss2.f egauss3.f
-            egeom.f egeom1.f egeom2.f egeom3.f ehal.f ehal1.f ehal2.f ehal3.f
-            eimprop.f eimprop1.f eimprop2.f eimprop3.f eimptor.f eimptor1.f 
-            eimptor2.f eimptor3.f elj.f elj1.f elj2.f elj3.f embed.f emetal.f
-            emetal1.f emetal2.f emetal3.f emm3hb.f emm3hb1.f emm3hb2.f
-            emm3hb3.f empole.f empole1.f empole2.f empole3.f energi.f
-            energy.f eopbend.f eopbend1.f eopbend2.f eopbend3.f eopdist.f
-            eopdist1.f eopdist2.f eopdist3.f epitors.f epitors1.f epitors2.f
-            epitors3.f epolar.f epolar1.f epolar2.f epolar3.f erepel.f
-            erepel1.f erepel2.f erepel3.f erf.f erxnfld.f erxnfld1.f
-            erxnfld2.f erxnfld3.f esolv.f esolv1.f esolv2.f esolv3.f
-            estrbnd.f estrbnd1.f estrbnd2.f estrbnd3.f estrtor.f estrtor1.f
-            estrtor2.f estrtor3.f etors.f etors1.f etors2.f etors3.f
-            etortor.f etortor1.f etortor2.f etortor3.f eurey.f eurey1.f
-            eurey2.f eurey3.f evcorr.f ewald.f extra.f extra1.f extra2.f
-            extra3.f faces.f fatal.f fft.f fft3d.f fftpack.f field.f fields.f
-            files.f final.f flatten.f fracs.f freeunit.f freeze.f geometry.f
-            getarc.f getint.f getkey.f getmol.f getmol2.f getnumb.f getpdb.f
-            getprm.f getref.f getstring.f gettext.f getword.f getxyz.f
-            ghmcstep.f gkstuf.f gradient.f gradrgd.f gradrot.f group.f
-            groups.f grpline.f gyrate.f hescut.f hessian.f hessn.f hessrgd.f
-            hessrot.f hpmf.f hybrid.f ielscf.f image.f impose.f improp.f
-            imptor.f induce.f inertia.f inform.f initatom.f initial.f
-            initprm.f initres.f initrot.f insert.f inter.f invbeta.f invert.f
-            iounit.f jacobi.f kanang.f kangang.f kangle.f kangs.f kangtor.f
-            kantor.f katom.f katoms.f kbond.f kbonds.f kcflux.f kcharge.f
-            kchgflx.f kchgtrn.f kchrge.f kcpen.f kctrn.f kdipol.f kdipole.f
-            kdisp.f kdsp.f kewald.f kextra.f keys.f kgeom.f khbond.f
-            kimprop.f kimptor.f kinetic.f kiprop.f kitors.f kmetal.f kmpole.f
-            kmulti.f kopbend.f kopbnd.f kopdist.f kopdst.f korbit.f korbs.f
-            kpitor.f kpitors.f kpolar.f kpolr.f krepel.f krepl.f ksolut.f
-            ksolv.f kstbnd.f kstrbnd.f kstrtor.f ksttor.f ktors.f ktorsn.f
-            ktortor.f ktrtor.f kurey.f kurybr.f kvdw.f kvdwpr.f kvdws.f
-            lattice.f lbfgs.f light.f lights.f limits.f linmin.f lusolve.f
-            makeint.f makeref.f makexyz.f math.f maxwell.f mdinit.f mdrest.f
-            mdsave.f mdstat.f mdstuf.f mechanic.f merck.f merge.f minima.f
-            molcul.f moldyn.f molecule.f moment.f moments.f mplpot.f mpole.f
-            mrecip.f mutant.f mutate.f nblist.f neigh.f nextarg.f nexttext.f
-            nonpol.f nose.f nspline.f nucleo.f number.f numeral.f numgrad.f
-            ocvm.f omega.f opbend.f opdist.f openend.f openmp.f optinit.f
-            optsave.f orbital.f orbits.f orient.f orthog.f output.f overlap.f
-            params.f paths.f pbstuf.f pdb.f phipsi.f picalc.f piorbs.f
-            pistuf.f pitors.f pme.f pmestuf.f pmpb.f polar.f polgrp.f
-            polopt.f polpcg.f polpot.f poltcg.f polymer.f potent.f potfit.f
-            pressure.f prmkey.f promo.f prtdyn.f prterr.f prtint.f prtmol2.f
-            prtpdb.f prtprm.f prtseq.f prtxyz.f ptable.f qmstuf.f qrsolve.f
-            quatfit.f random.f rattle.f readdyn.f readgau.f readgdma.f
-            readint.f readmol.f readmol2.f readpdb.f readprm.f readseq.f
-            readxyz.f refer.f repel.f replica.f reppot.f resdue.f respa.f
-            restrn.f rgddyn.f rgdstep.f rigid.f ring.f rings.f rmsfit.f
-            rotbnd.f rotlist.f rotpole.f rxnfld.f rxnpot.f scales.f sdstep.f
-            search.f sequen.f server.f shakeup.f shunt.f sigmoid.f simplex.f
-            sizes.f sktstuf.f socket.f solpot.f solute.f sort.f square.f
-            stodyn.f strbnd.f strtor.f suffix.f surface.f surfatom.f
-            switch.f syntrn.f tarray.f tcgstuf.f temper.f titles.f tncg.f
-            torphase.f torpot.f torque.f tors.f torsions.f tortor.f tree.f
-            trimtext.f unitcell.f units.f uprior.f urey.f urypot.f usage.f
-            valfit.f vdw.f vdwpot.f verlet.f version.f vibs.f virial.f
-            volume.f warp.f xtals.f xyzatm.f zatom.f zclose.f zcoord.f)
-install(TARGETS tinker LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} ARCHIVE
-        DESTINATION ${CMAKE_INSTALL_LIBDIR})
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod)
 
-foreach(_BIN
-        alchemy analyze anneal archive bar correlate critical crystal
-        diffuse distgeom document dynamic gda intedit intxyz minimize
-        minirot minrigid mol2xyz molxyz monte newton newtrot nucleic
-        optimize optirot optrigid path pdbxyz polarize poledit potential
-        prmedit protein pss pssrigid pssrot radial saddle scan sniffer
-        spacefill spectrum superpose testgrad testhess testpair testpol
-        testrot testvir timer timerot torsfit valence vibbig vibrate
-        vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb)
-        add_executable(${_BIN}.x ${_BIN}.f)
-        target_link_libraries(${_BIN}.x tinker PkgConfig::FFTW3)
-        install(TARGETS ${_BIN}.x DESTINATION ${CMAKE_INSTALL_BINDIR})
+# make sure that the default is a RELEASE
+if(NOT CMAKE_BUILD_TYPE)
+    set(
+        CMAKE_BUILD_TYPE RELEASE CACHE STRING
+        "Choose the type of build, options are: None Debug Release."
+        FORCE
+    )
+endif()
+
+# Determine main Tinker directory
+find_path(
+    TINKER_DIR
+    "source/dynamic.f"
+    HINTS ../
+    DOC "Main Tinker directory"
+    REQUIRED
+)
+
+# Find required libraries
+
+find_package(OpenMP REQUIRED)
+
+find_package(PkgConfig)
+if(PKG_CONFIG_FOUND)
+    pkg_check_modules(FFTW3 fftw3)
+endif()
+
+find_library(FFTW_LIB NAMES libfftw3.a fftw3 HINTS ${FFTW3_LIBRARY_DIRS} ${LIB_INSTALL_DIR})
+if(FFTW_THREAD_TYPE) # specify type of threaded FFTW3 library
+    find_library(FFTW_THREADED_LIB NAMES libfftw3_${FFTW_THREAD_TYPE}.a fftw3_${FFTW_THREAD_TYPE} HINTS ${FFTW3_LIBRARY_DIRS} ${LIB_INSTALL_DIR})
+else()
+    foreach(FFTW_TYPE IN ITEMS threads omp) # mpi does not include dfftw_init_threads_
+        find_library(FFTW_THREADED_LIB NAMES libfftw3_${FFTW_TYPE}.a fftw3_${FFTW_TYPE} HINTS ${FFTW3_LIBRARY_DIRS} ${LIB_INSTALL_DIR})
+        if(FFTW_THREADED_LIB)
+            break()
+        endif()
+    endforeach()
+endif()
+
+if(NOT FFTW_LIB)
+    message(FATAL_ERROR "FFTW3 library not found!")
+elseif(NOT FFTW_THREADED_LIB)
+    message(FATAL_ERROR "Threaded FFTW3 library not found! (threads or omp)")
+else()
+    message(STATUS "Found FFTW3: ${FFTW_LIB}")
+    message(STATUS "Found threaded FFTW3: ${FFTW_THREADED_LIB}")
+endif()
+
+# Set compiler flags
+
+if(APPLE)
+    set(ARCH_FLAGS "-mtune=native")
+else()
+    set(ARCH_FLAGS "-march=native")
+endif()
+
+if(WIN32)
+    if(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+        set(CMAKE_Fortran_FLAGS_RELEASE "/O3 /QxHost /Qip- /Qprec-div- /w")
+        set(CMAKE_Fortran_FLAGS_DEBUG "/debug:full")
+        set(CMAKE_EXE_LINKER_FLAGS "/recursive /libs:static")
+    endif()
+elseif(UNIX) # includes cygwin
+    if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+        set(CMAKE_Fortran_FLAGS_RELEASE "-Ofast ${ARCH_FLAGS}")
+        set(CMAKE_Fortran_FLAGS_DEBUG "-Og -fbacktrace -fcheck=bounds -Wall")
+        set(CMAKE_EXE_LINKER_FLAGS "-static-libgcc")
+    elseif(CMAKE_Fortran_COMPILER_ID MATCHES "Intel")
+        set(CMAKE_Fortran_FLAGS_RELEASE "-O3 -xHost -no-ipo -no-prec-div")
+        set(CMAKE_Fortran_FLAGS_DEBUG "-g -warn all -check all")
+        set(CMAKE_EXE_LINKER_FLAGS "-recursive -static-libgcc -static-intel")
+    elseif(CMAKE_Fortran_COMPILER_ID MATCHES "PGI")
+        set(CMAKE_Fortran_FLAGS_RELEASE "-fast -O3")
+        set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -Mdclchk -Mbounds -Mchkptr -Mchkstk")
+    endif()
+else()
+    message(WARNING "OS-specific flags were not set properly!")
+endif()
+
+set(_FILES
+    action active align alterchg analysis analyz angang angbnd angles angpot
+    angtor argue ascii atmlst atomid atoms attach baoab basefile bath beeman
+    bicubic bitor bitors bndpot bndstr bonds born bound bounds boxes bussi
+    calendar cell center cflux charge chgpen chgpot chgtrn chkpole chkring
+    chkxyz cholesky chrono chunks clock cluster column command connect connolly
+    control couple cspline ctrpot cutoffs damping deflate delete deriv dcflux
+    diagq diffeq dipole disgeo disp dma domega dsppot eangang eangang1 eangang2
+    eangang3 eangle eangle1 eangle2 eangle3 eangtor eangtor1 eangtor2 eangtor3
+    ebond ebond1 ebond2 ebond3 ebuck ebuck1 ebuck2 ebuck3 echarge echarge1
+    echarge2 echarge3 echgdpl echgdpl1 echgdpl2 echgdpl3 echgtrn echgtrn1
+    echgtrn2 echgtrn3 edipole edipole1 edipole2 edipole3 edisp edisp1 edisp2
+    edisp3 egauss egauss1 egauss2 egauss3 egeom egeom1 egeom2 egeom3 ehal ehal1
+    ehal2 ehal3 eimprop eimprop1 eimprop2 eimprop3 eimptor eimptor1 eimptor2
+    eimptor3 elj elj1 elj2 elj3 embed emetal emetal1 emetal2 emetal3 emm3hb
+    emm3hb1 emm3hb2 emm3hb3 empole empole1 empole2 empole3 energi energy eopbend
+    eopbend1 eopbend2 eopbend3 eopdist eopdist1 eopdist2 eopdist3 epitors
+    epitors1 epitors2 epitors3 epolar epolar1 epolar2 epolar3 erepel erepel1
+    erepel2 erepel3 erf erxnfld erxnfld1 erxnfld2 erxnfld3 esolv esolv1 esolv2
+    esolv3 estrbnd estrbnd1 estrbnd2 estrbnd3 estrtor estrtor1 estrtor2 estrtor3
+    etors etors1 etors2 etors3 etortor etortor1 etortor2 etortor3 eurey eurey1
+    eurey2 eurey3 evcorr ewald extra extra1 extra2 extra3 faces fatal fft fft3d
+    fftpack field fields files final flatten fracs freeunit freeze geometry
+    getarc getint getkey getmol getmol2 getnumb getpdb getprm getref getstring
+    gettext getword getxyz ghmcstep gkstuf gradient gradrgd gradrot group groups
+    grpline gyrate hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image
+    impose improp imptor induce inertia inform initatom initial initprm initres
+    initrot insert inter invbeta invert iounit jacobi kanang kangang kangle
+    kangs kangtor kantor katom katoms kbond kbonds kcflux kcharge kchgflx
+    kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp kewald kextra keys
+    kgeom khbond kimprop kimptor kinetic kiprop kitors kmetal kmpole kmulti
+    kopbend kopbnd kopdist kopdst korbit korbs kpitor kpitors kpolar kpolr
+    krepel krepl ksolut ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor
+    ktrtor kurey kurybr kvdw kvdwpr kvdws lattice lbfgs light lights limits
+    linmin lusolve makeint makeref makexyz math maxwell mdinit mdrest mdsave
+    mdstat mdstuf mechanic merck merge minima molcul moldyn molecule moment
+    moments mplpot mpole mrecip mutant mutate nblist neigh nextarg nexttext
+    nonpol nose nspline nucleo number numeral numgrad ocvm omega opbend opdist
+    openend openmp optinit optsave orbital orbits orient orthog output overlap
+    params paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf pmpb
+    polar polgrp polopt polpcg polpot poltcg polymer potent potfit predict
+    pressure prmkey promo prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq
+    prtxyz ptable qmstuf qrsolve quatfit random rattle readdyn readgau readgdma
+    readint readmol readmol2 readpdb readprm readseq readxyz refer repel replica
+    reppot resdue respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd
+    rotlist rotpole rxnfld rxnpot scales sdstep search sequen server shakeup
+    shunt sigmoid simplex sizes sktstuf socket solpot solute sort square stodyn
+    strbnd strtor suffix surface surfatom switch syntrn tarray tcgstuf temper
+    titles tncg torphase torpot torque tors torsions tortor tree trimtext
+    unitcell units uprior urey urypot usage valfit vdw vdwpot verlet version
+    vibs virial volume warp xtals xyzatm zatom zclose zcoord
+)
+set(_LIB "")
+foreach(_FILE IN LISTS _FILES)
+    list(APPEND _LIB ${TINKER_DIR}/source/${_FILE}.f)
+endforeach()
+add_library(tinker STATIC ${_LIB})
+target_link_libraries(tinker OpenMP::OpenMP_Fortran)
+install(
+    TARGETS tinker
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+set(_BINS
+    alchemy analyze anneal archive bar correlate critical crystal
+    diffuse distgeom document dynamic gda intedit intxyz minimize
+    minirot minrigid mol2xyz molxyz monte newton newtrot nucleic
+    optimize optirot optrigid path pdbxyz polarize poledit potential
+    prmedit protein pss pssrigid pssrot radial saddle scan sniffer
+    spacefill spectrum superpose testgrad testhess testpair testpol
+    testrot testvir timer timerot torsfit valence vibbig vibrate
+    vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb
+)
+foreach(_BIN IN LISTS _BINS)
+    add_executable(${_BIN} ${TINKER_DIR}/source/${_BIN}.f)
+    target_link_libraries(${_BIN} tinker ${FFTW_LIB} ${FFTW_THREADED_LIB} OpenMP::OpenMP_Fortran)
+    install(
+        TARGETS ${_BIN}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
 endforeach()

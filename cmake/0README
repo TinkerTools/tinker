@@ -7,21 +7,26 @@
       CMake works on Linux, MacOS and Windows. It requires the pkg-config
       and cmake-data packages, in addition to cmake.
 
-      cmake is a command-line utility, and can be replaced in step 4 by
+      cmake is a command-line utility, and can be replaced in step 3 by
       ccmake for a text-based UI or cmake-gui for a graphical frontend.
 
       Note that before building Tinker, the FFTW libraries must be built or
       installed. These libraries can be built following the instructions in
-      the file /fftw/0README. Alternatively, the libraries can be installed
-      on Ubuntu Linux or similar by using the command "sudo apt-get install
-      libfftw3-dev".
+      the file ../fftw/0README. Alternatively, the libraries can be installed
+      on Ubuntu Linux or similar by using the command
+      "sudo apt-get install libfftw3-dev". If multiple threaded FFTW libraries
+      are installed, the linked version can be specified in step 3 with the flag
+      "-DFFTW_THREAD_TYPE=omp".
+
+      To change where Tinker executables are installed pass the flag
+      "-DCMAKE_INSTALL_PREFIX=/path/to/install" in step 3. This is useful
+      in situations where the user may not have root privileges (e.g. on a
+      computing cluster).
 
       To build Tinker with cmake, issue the following commands:
 
                (1) cd Tinker  [i.e., the top-level directory]
-               (2) cp cmake/CMakeLists.txt ./source
-               (3) mkdir build && cd build
-               (4) cmake ../source
-               (5) make -j4
-               (6) make install
-
+               (2) mkdir build && cd build
+               (3) cmake ../cmake
+               (4) make -j4
+               (5) make install
