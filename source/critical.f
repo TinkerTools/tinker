@@ -77,7 +77,7 @@ c
    20 continue
       if (grdmin .le. 0.0d0) then
          write (iout,30)
-   30    format (/,' Enter Energy Tolerance Convergence Criterion',
+   30    format (/,' Enter Residual Gradient Convergence Criterion',
      &              ' [0.01] :  ',$)
          read (input,40)  grdmin
    40    format (f20.0)

@@ -475,7 +475,7 @@ c
                zaxis(i) = ia
                yaxis(i) = 0
                if (mbcd .ne. 0) then
-                  xaxis(i) = m
+                  xaxis(i) = mbcd
                else
                   call frame13 (i,ia)
                end if
@@ -484,7 +484,7 @@ c
                zaxis(i) = ib
                yaxis(i) = 0
                if (macd .ne. 0) then
-                  xaxis(i) = m
+                  xaxis(i) = macd
                else
                   call frame13 (i,ib)
                end if
@@ -493,7 +493,7 @@ c
                zaxis(i) = ic
                yaxis(i) = 0
                if (mabd .ne. 0) then
-                  xaxis(i) = m
+                  xaxis(i) = mabd
                else
                   call frame13 (i,ic)
                end if
@@ -502,7 +502,7 @@ c
                zaxis(i) = id
                yaxis(i) = 0
                if (mabc .ne. 0) then
-                  xaxis(i) = m
+                  xaxis(i) = mabc
                else
                   call frame13 (i,id)
                end if

@@ -91,7 +91,8 @@ c
       allocate (dmpct(n))
 c
 c     assign the charge transfer charge and alpha parameters 
-c     
+c
+      nct = n
       do i = 1, n
          ic = class(i)
          chgct(i) = ctchg(ic)
