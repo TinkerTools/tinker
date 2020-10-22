@@ -89,12 +89,6 @@ c
       call kangtor
       call ktortor
 c
-c     assign van der Waals, repulsion and dispersion parameters
-c
-      call kvdw
-      call krepel
-      call kdisp
-c
 c     assign electrostatic interaction potential parameters
 c
       call kcharge
@@ -103,6 +97,12 @@ c
       call kpolar
       call kchgtrn
       call kchgflx
+c
+c     assign van der Waals, repulsion and dispersion parameters
+c
+      call kvdw
+      call krepel
+      call kdisp
 c
 c     assign solvation, metal, pisystem and restraint parameters
 c

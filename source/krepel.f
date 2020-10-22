@@ -24,11 +24,12 @@ c
       use iounit
       use krepl
       use keys
+      use mpole
       use potent
       use repel
       use sizes
       implicit none
-      integer i,k
+      integer i,k,ii
       integer ia,ic,next
       real*8 spr,apr,epr
       logical header
@@ -91,7 +92,8 @@ c
       allocate (elepr(n))
 c
 c     assign the repulsion size, alpha and valence parameters 
-c     
+c
+      nrep = n
       do i = 1, n
          sizpr(i) = 0.0d0
          dmppr(i) = 0.0d0
@@ -141,14 +143,18 @@ c
          end if
       end do
 c
-c     remove zero and undefined repulsion sites from the list
+c     condense repulsion sites to the list of multipole sites
 c
-      nrep = 0
-      do i = 1, n
-         if (sizpr(i) .ne. 0.0d0) then
-            nrep = nrep + 1
-         end if
-      end do
+      if (use_repuls) then
+         nrep = 0
+         do ii = 1, npole
+            i = ipole(ii)
+            if (sizpr(i) .ne. 0)  nrep = nrep + 1
+            sizpr(ii) = sizpr(i)
+            dmppr(ii) = dmppr(i)
+            elepr(ii) = elepr(i)
+         end do
+      end if
 c
 c     turn off the Pauli repulsion potential if not used
 c
