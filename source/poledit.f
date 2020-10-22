@@ -1645,7 +1645,7 @@ c
       integer jj,ia,ib
       integer atn,next
       real*8 pol,thl
-      real*8 pcor,pdmp
+      real*8 pel,pal
       real*8 sixth
       logical exist,query
       logical change
@@ -1961,7 +1961,7 @@ c
          end if
       end do
 c
-c     list the polariability and charge penetration values
+c     list the polarizability and charge penetration values
 c
       write (iout,60)
    60 format (/,' Polarizability Parameters for Multipole Sites :')
@@ -2009,9 +2009,9 @@ c
       do while (query)
          i = 0
          k = 0
-         pol = 0.0d0
-         thl = 0.39d0
          if (use_thole) then
+            pol = 0.0d0
+            thl = 0.39d0
             write (iout,140)
   140       format (/,' Enter Atom Number, Polarizability & Thole',
      &                 ' Values :  ',$)
@@ -2019,12 +2019,15 @@ c
   150       format (a240)
             read (record,*,err=180,end=180)  k,pol,thl
          else if (use_chgpen) then
+            pol = 0.0d0
+            pel = 0.0d0
+            pal = 0.0d0
             write (iout,160)
   160       format (/,' Enter Atom Number, Polarize, Core & Damp',
      &                 ' Values :  ',$)
             read (input,170)  record
   170       format (a240)
-            read (record,*,err=180,end=180)  k,pcor,pdmp
+            read (record,*,err=180,end=180)  k,pol,pel,pal
          end if
   180    continue
          if (k .eq. 0) then
@@ -2035,7 +2038,14 @@ c
          if (i .ne. 0) then
             change = .true.
             polarity(i) = pol
-            thole(i) = thl
+            if (use_thole) then
+               thole(i) = thl
+               pdamp(i) = polarity(i)**sixth
+            else if (use_chgpen) then
+               pcore(i) = pel
+               palpha(i) = pal
+               pval(i) = pole(1,i) - pcore(i)
+            end if
          end if
       end do
 c
@@ -2049,7 +2059,8 @@ c
   200       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
          else if (use_chgpen) then
             write (iout,210)
-  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',/)
+  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
+     &                 8x,'Damp',/)
          end if
          do k = 1, n
             i = pollist(k)
@@ -2064,11 +2075,11 @@ c
             else if (use_chgpen) then
                if (i .eq. 0) then
                   write (iout,240)  k,name(k)
-  240             format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
+  240             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
                else
                   write (iout,250)  k,name(k),polarity(i),pcore(i),
-     &                              pval(i),palpha(i)
-  250             format (i8,6x,a3,4x,f12.4,3x,3f12.4)
+     &                              palpha(i)
+  250             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
                end if
             end if
          end do
