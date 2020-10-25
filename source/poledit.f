@@ -2017,19 +2017,31 @@ c
      &                 ' Values :  ',$)
             read (input,150)  record
   150       format (a240)
-            read (record,*,err=180,end=180)  k,pol,thl
+            read (record,*,err=160,end=160)  k,pol,thl
+  160       continue
+            if (k .ne. 0) then
+               i = pollist(k)
+               if (pol .eq. 0.0d0)  pol = polarity(i)
+               if (thl .eq. 0.0d0)  thl = thole(i)
+            end if
          else if (use_chgpen) then
             pol = 0.0d0
             pel = 0.0d0
             pal = 0.0d0
-            write (iout,160)
-  160       format (/,' Enter Atom Number, Polarize, Core & Damp',
+            write (iout,170)
+  170       format (/,' Enter Atom Number, Polarize, Core & Damp',
      &                 ' Values :  ',$)
-            read (input,170)  record
-  170       format (a240)
-            read (record,*,err=180,end=180)  k,pol,pel,pal
+            read (input,180)  record
+  180       format (a240)
+            read (record,*,err=190,end=190)  k,pol,pel,pal
+  190       continue
+            if (k .ne. 0) then
+               i = pollist(k)
+               if (pol .eq. 0.0d0)  pol = polarity(i)
+               if (pel .eq. 0.0d0)  pel = pcore(i)
+               if (pal .eq. 0.0d0)  pal = palpha(i)
+            end if
          end if
-  180    continue
          if (k .eq. 0) then
             query = .false.
          else
@@ -2052,34 +2064,34 @@ c
 c     repeat polarizability values if parameters were altered
 c
       if (change) then
-         write (iout,190)
-  190    format (/,' Atomic Polarizabilities for Multipole Sites :')
+         write (iout,200)
+  200    format (/,' Atomic Polarizabilities for Multipole Sites :')
          if (use_thole) then
-            write (iout,200)
-  200       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-         else if (use_chgpen) then
             write (iout,210)
-  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
+  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+         else if (use_chgpen) then
+            write (iout,220)
+  220       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
      &                 8x,'Damp',/)
          end if
          do k = 1, n
             i = pollist(k)
             if (use_thole) then
                if (i .eq. 0) then
-                  write (iout,220)  k,name(k)
-  220             format (i8,6x,a3,12x,'--',13x,'--')
+                  write (iout,230)  k,name(k)
+  230             format (i8,6x,a3,12x,'--',13x,'--')
                else
-                  write (iout,230)  k,name(k),polarity(i),thole(i)
-  230             format (i8,6x,a3,4x,f12.4,3x,f12.4)
+                  write (iout,240)  k,name(k),polarity(i),thole(i)
+  240             format (i8,6x,a3,4x,f12.4,3x,f12.4)
                end if
             else if (use_chgpen) then
                if (i .eq. 0) then
-                  write (iout,240)  k,name(k)
-  240             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
+                  write (iout,250)  k,name(k)
+  250             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
                else
-                  write (iout,250)  k,name(k),polarity(i),pcore(i),
+                  write (iout,260)  k,name(k),polarity(i),pcore(i),
      &                              palpha(i)
-  250             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
+  260             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
                end if
             end if
          end do
@@ -2087,8 +2099,8 @@ c
 c
 c     use bonded atoms as initial guess at polarization groups
 c
-      write (iout,260)
-  260 format (/,' The default is to place all atoms into one',
+      write (iout,270)
+  270 format (/,' The default is to place all atoms into one',
      &           ' polarization group;',
      &        /,' This can be altered by entering a series of',
      &           ' bonded atom pairs',
@@ -2106,20 +2118,20 @@ c
       i = -1
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=270,end=270)  i
+         read (string,*,err=280,end=280)  i
          if (i .eq. 0)  query = .false.
       end if
-  270 continue
+  280 continue
       do while (query)
          ia = 0
          ib = 0
-         write (iout,280)
-  280    format (/,' Enter a Bond between Polarization Groups',
+         write (iout,290)
+  290    format (/,' Enter a Bond between Polarization Groups',
      &              ' [<Enter>=Exit] :  ',$)
-         read (input,290)  record
-  290    format (a240)
-         read (record,*,err=300,end=300)  ia,ib
-  300    continue
+         read (input,300)  record
+  300    format (a240)
+         read (record,*,err=310,end=310)  ia,ib
+  310    continue
          if (ia.eq.0 .or. ib.eq.0) then
             query = .false.
          else
@@ -2145,18 +2157,18 @@ c
 c
 c     list the polarization group for each multipole site
 c
-      write (iout,310)
-  310 format (/,' Polarization Groups for Multipole Sites :')
       write (iout,320)
-  320 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
+  320 format (/,' Polarization Groups for Multipole Sites :')
+      write (iout,330)
+  330 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
      &           ' Definition',/)
       do i = 1, n
          k = 0
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0)  k = j
          end do
-         write (iout,330)  i,name(i),(pgrp(j,i),j=1,k)
-  330    format (i8,6x,a3,8x,20i6)
+         write (iout,340)  i,name(i),(pgrp(j,i),j=1,k)
+  340    format (i8,6x,a3,8x,20i6)
       end do
       return
       end
@@ -2344,7 +2356,7 @@ c
       integer trimtext
       real*8 eps,epsold
       real*8 polmin,norm
-      real*8 a,b,sum
+      real*8 a,b,sum,term
       real*8 utmp(3)
       real*8 rmt(3,3)
       real*8, allocatable :: poli(:)
@@ -2424,13 +2436,16 @@ c
       write (iout,110)  truth(1:trimtext(truth))
   110 format (' Set D Equal to P:',12x,a)
 c
-c     compute intergroup induced dipole moments via CG algorithm
+c     set tolerances for computation of mutual induced dipoles
 c
       done = .false.
-      maxiter = 500
+      maxiter = 100
       iter = 0
-      eps = 100.0d0
       polmin = 0.00000001d0
+      eps = 100.0d0
+c
+c     compute intergroup induced dipole moments via CG algorithm
+c
       call ufieldi (field)
       do i = 1, npole
          poli(i) = max(polmin,polarity(i))
@@ -2441,7 +2456,7 @@ c
          end do
       end do
 c
-c     iterate the intergroup induced dipoles and check convergence
+c     conjugate gradient iteration of intergroup induced dipoles
 c
       do while (.not. done)
          iter = iter + 1
@@ -2488,6 +2503,9 @@ c
                eps = eps + rsd(j,i)*rsd(j,i)
             end do
          end do
+c
+c     check the convergence of the intergroup induced dipoles
+c
          eps = debye * sqrt(eps/dble(npolar))
          epsold = eps
          if (iter .eq. 1) then
@@ -2501,6 +2519,17 @@ c
          if (eps .lt. poleps)  done = .true.
          if (eps .gt. epsold)  done = .true.
          if (iter .ge. maxiter)  done = .true.
+c
+c     apply a "peek" iteration to the intergroup induced dipoles
+c
+         if (done) then
+            do i = 1, npole
+               term = poli(i)
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + term*rsd(j,i)
+               end do
+            end do
+         end if
       end do
 c
 c     perform deallocation of some local arrays
