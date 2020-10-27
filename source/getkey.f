@@ -23,7 +23,7 @@ c
       use keys
       use openmp
       implicit none
-      integer i,ikey
+      integer i,j,ikey
       integer next,length
       integer freeunit
       integer trimtext
@@ -96,6 +96,17 @@ c
    40    continue
          close (unit=ikey)
       end if
+c
+c     convert underbar characters to dashes in all keywords
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         do j = 1, next-1
+            if (keyword(j:j) .eq. '_')  keyline(i)(j:j) = '-'
+         end do
+      end do
 c
 c     check for comment lines to be echoed to the output
 c
