@@ -104,7 +104,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          do j = 1, next-1
-            if (keyword(j:j) .eq. '_')  keyline(i)(j:j) = '-'
+            if (record(j:j) .eq. '_')  keyline(i)(j:j) = '-'
          end do
       end do
 c
