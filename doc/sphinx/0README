@@ -1,13 +1,14 @@
 
-                   #########################################
-                   Sphinx Documentation Generator for Tinker
-                   #########################################
+                ###############################################
+                Sphinx Documentation Generator for Tinker & FFE
+                ###############################################
 
-          This directory contains Sphinx files to build documentation
-          for Tinker and Force Field Explorer. The restructured text
-          files are in the /text areas. To build documentation issue
-          "make latexpdf" and "make html" commands in the top-level
-          directory for each package. The PDF output is then found in
-          the /_build/latex area under both /tinker and /ffe, while
-          the HTML output is in /_build/html.
+         This directory contains Sphinx files to build documentation
+         for the Tinker and Force Field Explorer packages. The editable
+         restructured text files containing the raw documentation are in
+         the /text areas. To build documentation issue "make latexpdf"
+         and "make html" commands in the top-level directory for each
+         package. The PDF output is then found in the /_build/latex area
+         under both /tinker and /ffe, while the HTML output is in the
+         /_build/html area.
 

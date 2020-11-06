@@ -201,7 +201,7 @@ FREE ENERGY PERTURBATION KEYWORDS
 
 CHG-LAMBDA	DPL-LAMBDA	LAMBDA
 LIGAND	MPOLE-LAMBDA	MUTATE
-POLAR-LAMBDA	VDW-LAMBDA
+POLAR-LAMBDA	VDW-ANNIHILATE	VDW-LAMBDA
 
 PARTIAL STRUCTURE KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1010,7 +1010,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **VDW-15-SCALE [real]**  This keyword provides a multiplicative scale factor that is applied to van der Waals potential interactions between 1-5 connected atoms, i.e., atoms separated by four covalent bonds. The default value of 1.0 is used, if the VDW-15-SCALE keyword is not given in either the parameter file or the keyfile.
 
-**VDW-ANNHILATE**
+**VDW-ANNIHILATE**
 
 **VDW-CORRECTION**
 

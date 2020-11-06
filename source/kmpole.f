@@ -490,13 +490,13 @@ c
                   write (iout,190)
   190             format (/,' Additional Atomic Multipoles',
      &                       ' for Specific Atoms :',
-     &                    //,6x,'Atom',9x,'Coordinate Frame',
+     &                    //,5x,'Atom',10x,'Coordinate Frame',
      &                       ' Definition',9x,'Multipole Moments')
                end if
                if (.not. silent) then
                   write (iout,200)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
      &                              mpl(8),mpl(9),(mpl(j),j=11,13)
-  200             format (/,6x,i6,3x,i6,1x,i6,1x,i6,3x,a8,3x,f9.5,
+  200             format (/,3x,i6,6x,i6,1x,i6,1x,i6,3x,a8,3x,f9.5,
      &                       /,49x,3f9.5,/,49x,f9.5,
      &                       /,49x,2f9.5,/,49x,3f9.5)
                end if

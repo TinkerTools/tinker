@@ -85,7 +85,7 @@ c
                ligand(k) = lig
                if (.not. silent) then
                   write (iout,20)  k,cls,symb,notice,atn,wght,lig
-   20             format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+   20             format (1x,i8,i6,5x,a3,3x,a24,i6,f11.3,i6)
                end if
             else if (k .ge. maxtyp) then
                write (iout,30)
@@ -216,7 +216,7 @@ c
                valence(k) = lig
                if (.not. silent) then
                   write (iout,70)  k,cls,symb,notice,atn,wght,lig
-   70             format (2x,i6,1x,i6,5x,a3,3x,a24,i6,f11.3,i6)
+   70             format (1x,i8,i6,5x,a3,3x,a24,i6,f11.3,i6)
                end if
             end if
    80       continue

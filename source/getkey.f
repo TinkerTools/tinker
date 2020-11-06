@@ -104,8 +104,9 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          do j = 1, next-1
-            if (record(j:j) .eq. '_')  keyline(i)(j:j) = '-'
+            if (record(j:j) .eq. '_')  record(j:j) = '-'
          end do
+         keyline(i) = record
       end do
 c
 c     check for comment lines to be echoed to the output

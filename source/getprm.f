@@ -151,8 +151,9 @@ c
          record = prmline(i)
          call gettext (record,keyword,next)
          do j = 1, next-1
-            if (record(j:j) .eq. '_')  prmline(i)(j:j) = '-'
+            if (record(j:j) .eq. '_')  record(j:j) = '-'
          end do
+         prmline(i) = record
       end do
 c
 c     get control and parameter values from the parameter file

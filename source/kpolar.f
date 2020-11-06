@@ -341,14 +341,14 @@ c
                   if (.not. silent) then
                      if (ddp .ge. 0.0d0) then
                         write (iout,90)  k,pol,thl,ddp,(pg(j),j=1,npg)
-   90                   format (6x,i6,8x,f10.3,2x,f10.3,2x,f10.3,
+   90                   format (4x,i8,8x,f10.3,2x,f10.3,2x,f10.3,
      &                             7x,20i5)
                      else if (thl .ge. 0.0d0) then
                         write (iout,100)  k,pol,thl,(pg(j),j=1,npg)
-  100                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
+  100                   format (4x,i8,8x,f10.3,2x,f10.3,7x,20i5)
                      else
                         write (iout,110)  k,pol,(pg(j),j=1,npg)
-  110                   format (6x,i6,8x,f10.3,7x,20i5)
+  110                   format (4x,i8,8x,f10.3,7x,20i5)
                      end if
                   end if
                else
@@ -405,26 +405,26 @@ c
      &                       ' for Specific Atoms :')
                   if (ddp .ge. 0.0d0) then
                      write (iout,150)
-  150                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',
+  150                format (/,5x,'Atom',16x,'Alpha',7x,'Thole',
      &                          8x,'Damp',/)
                   else if (thl .ge. 0.0d0) then
                      write (iout,160)
-  160                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
+  160                format (/,5x,'Atom',16x,'Alpha',7x,'Thole',/)
                   else
                      write (iout,170)
-  170                format (/,6x,'Atom',15x,'Alpha',/)
+  170                format (/,5x,'Atom',16x,'Alpha',/)
                   end if
                end if
                if (.not. silent) then
                   if (ddp .ge. 0.0d0) then
                      write (iout,180)  k,pol,thl,ddp
-  180                format (6x,i6,8x,f10.3,2x,f10.3,2x,f10.3)
+  180                format (1x,i8,11x,f10.3,2x,f10.3,2x,f10.3)
                   else if (thl .ge. 0.0d0) then
                      write (iout,190)  k,pol,thl
-  190                format (6x,i6,8x,f10.3,2x,f10.3)
+  190                format (1x,i8,11x,f10.3,2x,f10.3)
                   else
                      write (iout,200)  k,pol
-  200                format (6x,i6,8x,f10.3)
+  200                format (1x,i8,11x,f10.3)
                   end if
                end if
                polarity(k) = pol
