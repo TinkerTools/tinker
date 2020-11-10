@@ -2969,24 +2969,23 @@ static int setupAmoebaVdwForce (OpenMM_System* system, FILE* log) {
       OpenMM_AmoebaVdwForce_addParticleType (amoebaVdwForce, sigma, epsilon);  
    }
 
-   OpenMM_Boolean isAlchemical = OpenMM_False;
-   int nAlchemical = 0;
+   OpenMM_Boolean isAlchemical;
    for (ii = 0; ii < atoms__.n; ii++) {
       i = vdw__.jvdw[ii] - 1;
       int cdnstype = old_to_new_type.at (i);
       if (mutant__.mut[ii]) {
-         ++nAlchemical;
          isAlchemical = OpenMM_True;
+         OpenMM_AmoebaVdwForce_addParticle_1 (amoebaVdwForce, vdw__.ired[ii]-1, cdnstype, vdw__.kred[ii], isAlchemical);
+      } else {
+         isAlchemical = OpenMM_False;
+         OpenMM_AmoebaVdwForce_addParticle_1 (amoebaVdwForce, vdw__.ired[ii]-1, cdnstype, vdw__.kred[ii], isAlchemical);
       }
-      OpenMM_AmoebaVdwForce_addParticle_1 (amoebaVdwForce, vdw__.ired[ii]-1, cdnstype, vdw__.kred[ii], isAlchemical);
    }
 
-   if (isAlchemical) {
-      if (mutant__.vcouple == 0) {
-         OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_Decouple);
-      } else if (mutant__.vcouple == 1) {
-         OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_Annihilate);
-      }
+   if (mutant__.vcouple == 0) {
+      OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_Decouple);
+   } else if (mutant__.vcouple == 1) {
+      OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_Annihilate);
    } else {
       OpenMM_AmoebaVdwForce_setAlchemicalMethod (amoebaVdwForce, OpenMM_AmoebaVdwForce_None);
    }
@@ -4997,9 +4996,8 @@ int openmm_test_ (void) {
    OpenMM_Platform_setPropertyValue (platform, context, "DisablePmeStream",
                                      "true");
 
-   if (vdwForceIndex >= 0) {
-      setupAmoebaVdwLambda (system, context, vdwForceIndex);
-   }
+   vdwForceIndex = 0;
+   setupAmoebaVdwLambda (system, context, vdwForceIndex);
 
    OpenMM_Context_setPositions (context, initialPosInNm);
 
