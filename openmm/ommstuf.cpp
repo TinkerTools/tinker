@@ -4856,7 +4856,7 @@ int openmm_test_ (void) {
       testName = "AmoebaTorsionTorsionTest";
 
    } else if (potent__.use_vdw) {
-      setupAmoebaVdwForce (system, log);
+      vdwForceIndex = setupAmoebaVdwForce (system, log);
       loadTinkerForce (deriv__.dev, 0, tinkerForce);
       tinkerEnergy = *energi__.ev;
       if (limits__.use_vlist) {
@@ -4996,8 +4996,9 @@ int openmm_test_ (void) {
    OpenMM_Platform_setPropertyValue (platform, context, "DisablePmeStream",
                                      "true");
 
-   vdwForceIndex = 0;
-   setupAmoebaVdwLambda (system, context, vdwForceIndex);
+   if (vdwForceIndex >= 0) {
+      setupAmoebaVdwLambda (system, context, vdwForceIndex);
+   }
 
    OpenMM_Context_setPositions (context, initialPosInNm);
 
