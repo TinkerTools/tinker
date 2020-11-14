@@ -123,7 +123,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
-         cscale(in) = c2scale
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
