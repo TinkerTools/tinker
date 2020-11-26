@@ -201,7 +201,7 @@ FREE ENERGY PERTURBATION KEYWORDS
 
 CHG-LAMBDA	DPL-LAMBDA	LAMBDA
 LIGAND	MPOLE-LAMBDA	MUTATE
-POLAR-LAMBDA	VDW-LAMBDA
+POLAR-LAMBDA	VDW-ANNIHILATE	VDW-LAMBDA
 
 PARTIAL STRUCTURE KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -334,7 +334,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **BONDTERM [NONE/ONLY]**  This keyword controls use of the bond stretching potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-**BONDTYPE [TAYLOR/MORSE/GAUSSIAN]**  Chooses the functional form of the bond stretching potential. The TAYLOR option selects a Taylor series expansion containing terms from harmonic through quartic. The MORSE option selects a Morse potential fit to the ideal bond length and stretching force constant parameter values. The GAUSSIAN option uses an inverted Gaussian with amplitude equal to the Morse bond dissociation energy and width set to reproduce the vibrational frequency of a harmonic potential. The default is to use the TAYLOR potential.
+**BONDTYPE [HARMONIC/MORSE]**  Chooses the functional form of the bond stretching potential. The HARMONIC option selects a Taylor series expansion containing terms from harmonic through quartic. The MORSE option selects a Morse potential fit to the ideal bond length and stretching force constant parameter values. The default is to use the HARMONIC potential.
 
 **BONDUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the bond stretching potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of 1.0 is used, if the BONDUNIT keyword is not given in the force field parameter file or the keyfile.
 
@@ -1010,7 +1010,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **VDW-15-SCALE [real]**  This keyword provides a multiplicative scale factor that is applied to van der Waals potential interactions between 1-5 connected atoms, i.e., atoms separated by four covalent bonds. The default value of 1.0 is used, if the VDW-15-SCALE keyword is not given in either the parameter file or the keyfile.
 
-**VDW-ANNHILATE**
+**VDW-ANNIHILATE**
 
 **VDW-CORRECTION**
 
