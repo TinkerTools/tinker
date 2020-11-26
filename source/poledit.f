@@ -3295,7 +3295,7 @@ c
       logical query,condense
       logical match,diff
       logical useframe
-      logical symmetry
+      logical symm
       logical yzero,xyzero
       character*1 answer
       character*4 pa,pb,pc,pd
@@ -3632,7 +3632,7 @@ c
 c
 c     check for user requested zeroing of moments by symmetry
 c
-      symmetry = .true.
+      symm = .true.
       answer = 'Y'
       query = .true.
       call nextarg (string,exist)
@@ -3649,11 +3649,11 @@ c
   150    format (a1)
       end if
       call upcase (answer)
-      if (answer .eq. 'N')  symmetry = .false.
+      if (answer .eq. 'N')  symm = .false.
 c
 c     remove multipole components that are zero by symmetry
 c
-      if (symmetry) then
+      if (symm) then
          do i = 1, npole
             xyzero = .false.
             yzero = .false.

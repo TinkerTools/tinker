@@ -88,8 +88,8 @@ c
                deddt = 2.0d0 * bndunit * force * dt
      &                    * (1.0d0+1.5d0*cbnd*dt+2.0d0*qbnd*dt2)
 c
-c     Morse potential uses energy = BDE * (1 - e**(-alpha*dt))**2)
-c     with the approximations alpha = sqrt(ForceConst/BDE) = -2
+c     Morse potential uses energy = BDE * (1 - e**(-alpha*dt))**2
+c     with the approximations alpha = sqrt(ForceConst/BDE) = 2
 c     and BDE = Bond Dissociation Energy = ForceConst/alpha**2
 c
             else if (bndtyp .eq. 'MORSE') then
