@@ -2123,10 +2123,13 @@ c
       use ring
       implicit none
       integer i,j,k,m
-      integer ia,ib
       integer mode
+      integer ia,ib,ic
+      integer ita,itb,itc
+      integer n12a,n12b
       logical exist,query
       logical chkarom,split
+      logical aroma,aromb
       character*240 record
       character*240 string
 c
@@ -2227,9 +2230,21 @@ c
          do k = 1, nbond
             ia = ibnd(1,k)
             ib = ibnd(2,k)
+            n12a = n12(ia)
+            n12b = n12(ib)
+            ita = 10*atomic(ia) + n12a
+            itb = 10*atomic(ib) + n12b
+            aroma = chkarom(ia)
+            aromb = chkarom(ib)
             split = .true.
-            if (min(n12(ia),n12(ib)) .le. 1)  split = .false.
-            if (chkarom(ia) .and. chkarom(ib)) then
+c
+c     remove bonds involving univalent atoms
+c
+            if (min(n12a,n12b) .le. 1)  split = .false.
+c
+c     remove bonds internal to aromatic rings
+c
+            if (aroma .and. aromb) then
                do i = 1, nring5
                   m = 0
                   do j = 1, 5
@@ -2247,21 +2262,100 @@ c
                   if (m .eq. 2)  split = .false.
                end do
             end if
-            if (split) then
-               do i = 1, n12(ia)
-                  if (pgrp(i,ia) .eq. ib) then
-                     do j = i+1, n12(ia)
-                        pgrp(j-1,ia) = pgrp(j,ia)
-                     end do
-                     pgrp(n12(ia),ia) = 0
+c
+c     remove the C-O bonds of alcohols and ethers
+c
+            if (ita.eq.82 .and. itb.eq.64) then
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  split = .false.
                   end if
                end do
-               do i = 1, n12(ib)
+            else if (itb.eq.82 .and. ita.eq.64) then
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  if (ic .ne. ia) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  split = .false.
+                  end if
+               end do
+            end if
+c
+c     remove the C-O bonds of carboxylic acids and esters
+c
+            if (ita.eq.82 .and. itb.eq.63) then
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  itc = 10*atomic(ic) + n12(ic)
+                  if (itc .eq. 81)  split = .false.
+               end do
+            else if (itb.eq.82 .and. ita.eq.63) then
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  itc = 10*atomic(ic) + n12(ic)
+                  if (itc .eq. 81)  split = .false.
+               end do
+            end if
+c
+c     remove the C-N bonds of alkyl amines
+c
+            if (ita.eq.73 .and. itb.eq.64) then
+               m = 0
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  m = m + 1
+                  end if
+               end do
+               if (m .eq. 2)  split = .false.
+            else if (itb.eq.73 .and. ita.eq.64) then
+               m = 0
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  if (ic .ne. ia) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  m = m + 1
+                  end if
+               end do
+               if (m .eq. 2)  split = .false.
+            end if
+c
+c     remove the C-N bonds of amides and ureas
+c
+            if (ita.eq.73 .and. itb.eq.63) then
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  itc = 10*atomic(ic) + n12(ic)
+                  if (itc .eq. 81)  split = .false.
+               end do
+            else if (itb.eq.73 .and. ita.eq.63) then
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  itc = 10*atomic(ic) + n12(ic)
+                  if (itc .eq. 81)  split = .false.
+               end do
+            end if
+c
+c     modify membership to split groups at allowed bonds
+c
+            if (split) then
+               do i = 1, n12a
+                  if (pgrp(i,ia) .eq. ib) then
+                     do j = i+1, n12a
+                        pgrp(j-1,ia) = pgrp(j,ia)
+                     end do
+                     pgrp(n12a,ia) = 0
+                  end if
+               end do
+               do i = 1, n12b
                   if (pgrp(i,ib) .eq. ia) then
-                     do j = i+1, n12(ib)
+                     do j = i+1, n12b
                         pgrp(j-1,ib) = pgrp(j,ib)
                      end do
-                     pgrp(n12(ib),ib) = 0
+                     pgrp(n12b,ib) = 0
                   end if
                end do
             end if
