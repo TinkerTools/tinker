@@ -84,7 +84,8 @@ c
       dopair = .false.
       dotarget = .false.
       dofit = .false.
-      resp = 1.0d0
+      resptyp = 'ORIG'
+      wresp = 1.0d0
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -297,8 +298,11 @@ c
                nflist = nflist + 1
                flist(nflist) = max(-namax,min(namax,flist(nflist)))
             end do
+         else if (keyword(1:9) .eq. 'RESPTYPE ') then
+            call getword (record,resptyp,next)
+            call upcase (resptyp)
          else if (keyword(1:12) .eq. 'RESP-WEIGHT ') then
-            read (string,*,err=200,end=200)  resp
+            read (string,*,err=200,end=200)  wresp
   200       continue
          else if (keyword(1:13) .eq. 'FIX-MONOPOLE ') then
             fit_mpl = .false.
@@ -541,7 +545,7 @@ c
 c     print the parameter restraint value to be used in fitting
 c
       if (dofit) then
-         write (iout,390)  resp
+         write (iout,390)  wresp
   390    format (/,' Electrostatic Parameter Restraint Value :',f18.4)
       end if
 c
@@ -1207,7 +1211,7 @@ c
 c
 c     "fitrsd" computes residuals for electrostatic potential fitting
 c     including total charge restraints, dipole and quadrupole moment
-c     targets, and restraints to initial parameter values
+c     targets, and restraints on initial parameter values
 c
 c
       subroutine fitrsd (nvar,nresid,xx,resid)
@@ -1245,9 +1249,9 @@ c     set weight of electrostatic potential vs. parameter restraints
 c
       rconf = dble(nconf)
       ratio = dble(npoint) / dble(nvar*nconf)
-c     rscale = 1.0d0 * sqrt(resp) * rconf * sqrt(ratio)
-c     rscale = 0.1d0 * sqrt(resp) * rconf * ratio
-      rscale = 0.006d0 * sqrt(resp) * rconf * sqrt(ratio**3)
+c     rscale = 1.0d0 * sqrt(wresp) * rconf * sqrt(ratio)
+c     rscale = 0.1d0 * sqrt(wresp) * rconf * ratio
+      rscale = 0.006d0 * sqrt(wresp) * rconf * sqrt(ratio**3)
 c
 c     initialize counters for parameters and residual components
 c
@@ -1283,7 +1287,7 @@ c
             zi = pgrid(3,i,j)
             call potpoint (xi,yi,zi,pot)
             epot(1,i,j) = pot
-            resid(iresid+i) = (epot(1,i,j)-epot(2,i,j))
+            resid(iresid+i) = epot(1,i,j) - epot(2,i,j)
          end do
 !$OMP    END DO
 !$OMP    END PARALLEL
@@ -1297,34 +1301,41 @@ c     get residual due to total molecular charge restraint
 c
          if (fit_mpl) then
             iresid = iresid + 1
-            resid(iresid) = (netchg-dble(nint(netchg)))*cscale
+            resid(iresid) = (netchg-dble(nint(netchg))) * cscale
          end if
 c
 c     get residuals from dipole and quadrupole target violations
 c
          if (use_dpl) then
-            resid(iresid+1) = (xdpl-xdpl0(j))*tscale
-            resid(iresid+2) = (ydpl-ydpl0(j))*tscale
-            resid(iresid+3) = (zdpl-zdpl0(j))*tscale
+            resid(iresid+1) = (xdpl-xdpl0(j)) * tscale
+            resid(iresid+2) = (ydpl-ydpl0(j)) * tscale
+            resid(iresid+3) = (zdpl-zdpl0(j)) * tscale
             iresid = iresid + 3
          end if
          if (use_qpl) then
-            resid(iresid+1) = (xxqpl-xxqpl0(j))*tscale
-            resid(iresid+2) = (xyqpl-xyqpl0(j))*tscale
-            resid(iresid+3) = (xzqpl-xzqpl0(j))*tscale
-            resid(iresid+4) = (yyqpl-yyqpl0(j))*tscale
-            resid(iresid+5) = (yzqpl-yzqpl0(j))*tscale
-            resid(iresid+6) = (zzqpl-zzqpl0(j))*tscale
+            resid(iresid+1) = (xxqpl-xxqpl0(j)) * tscale
+            resid(iresid+2) = (xyqpl-xyqpl0(j)) * tscale
+            resid(iresid+3) = (xzqpl-xzqpl0(j)) * tscale
+            resid(iresid+4) = (yyqpl-yyqpl0(j)) * tscale
+            resid(iresid+5) = (yzqpl-yzqpl0(j)) * tscale
+            resid(iresid+6) = (zzqpl-zzqpl0(j)) * tscale
             iresid = iresid + 6
          end if
       end do
 c
-c     get residuals due to deviation from initial parameters
+c     get residuals due to deviation of initial parameters
 c
-      do i = 1, nvar
-         iresid = iresid + 1
-         resid(iresid) = (xx(i)-fit0(i))*rscale
-      end do
+      if (resptyp .eq. 'ORIG') then
+         do i = 1, nvar
+            iresid = iresid + 1
+            resid(iresid) = (xx(i)-fit0(i)) * rscale
+         end do
+      else if (resptyp .eq. 'ZERO') then
+         do i = 1, nvar
+            iresid = iresid + 1
+            resid(iresid) = xx(i) * rscale
+         end do
+      end if
       return
       end
 c
@@ -2067,7 +2078,7 @@ c     zero the keyfile length to avoid parameter reprocessing
 c
       nkey = 0
 c
-c     output the optimized partial charge values to the keyfile
+c     output optimized partial charge values to the keyfile
 c
       header = .true.
       do i = 1, maxtyp
@@ -2122,7 +2133,7 @@ c
          pt(i) = '                '
       end do
 c
-c     output the optimized atomic multipole values to the keyfile
+c     output optimized atomic multipole values to the keyfile
 c
       header = .true.
       m = 0
@@ -2138,6 +2149,9 @@ c
                iz = zaxis(i)
                ix = xaxis(i)
                iy = yaxis(i)
+               if (iz .ne. 0)  iz = type(iz)
+               if (ix .ne. 0)  ix = type(ix)
+               if (iy .ne. 0)  iy = type(abs(iy))
                size = 4
                call numeral (it,pa,size)
                call numeral (iz,pb,size)
@@ -2167,18 +2181,6 @@ c
                do j = 5, 13
                   pole(j,i) = qterm * fpol(j,it)
                end do
-               if (iy .lt. 0) then
-                  yaxis(i) = -yaxis(i)
-                  iy = yaxis(i)
-                  pole(3,i) = -pole(3,i)
-                  pole(6,i) = -pole(6,i)
-                  pole(8,i) = -pole(8,i)
-                  pole(10,i) = -pole(10,i)
-                  pole(12,i) = -pole(12,i)
-               end if
-               if (iz .ne. 0)  iz = type(iz)
-               if (ix .ne. 0)  ix = type(ix)
-               if (iy .ne. 0)  iy = type(iy)
                if (polaxe(i) .eq. 'None') then
                   write (ikey,60)  it,pole(1,i)
    60             format ('multipole',1x,i5,21x,f11.5)
@@ -2190,6 +2192,13 @@ c
                      write (ikey,80)  it,iz,ix,pole(1,i)
    80                format ('multipole',1x,3i5,11x,f11.5)
                   else
+                     if (yaxis(i) .lt. 0) then
+                        pole(3,i) = -pole(3,i)
+                        pole(6,i) = -pole(6,i)
+                        pole(8,i) = -pole(8,i)
+                        pole(10,i) = -pole(10,i)
+                        pole(12,i) = -pole(12,i)
+                     end if
                      write (ikey,90)  it,iz,ix,iy,pole(1,i)
    90                format ('multipole',1x,4i5,6x,f11.5)
                   end if

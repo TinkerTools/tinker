@@ -506,7 +506,6 @@ c
       subroutine polargrp
       use atoms
       use couple
-      use inform
       use iounit
       use kpolr
       use mpole
@@ -521,7 +520,7 @@ c
       integer, allocatable :: keep(:)
       integer, allocatable :: list(:)
       integer, allocatable :: mask(:)
-      logical done
+      logical done,abort
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -543,11 +542,25 @@ c
       allocate (ip13(maxp13,n))
       allocate (ip14(maxp14,n))
 c
-c     find the directly connected group members for each atom
+c     initialize size and connectivity of polarization groups
 c
       do i = 1, n
          np11(i) = 1
          ip11(1,i) = i
+         np12(i) = 0
+         np13(i) = 0
+         np14(i) = 0
+      end do
+c
+c     set termination flag and temporary group storage
+c
+      abort = .false.
+      maxkeep = 100
+      maxlist = 10000
+c
+c     find the directly connected group members for each atom
+c
+      do i = 1, n
          it = type(i)
          if (it .ne. 0) then
             do j = 1, n12(i)
@@ -557,8 +570,8 @@ c
                   kk = pgrp(k,it)
                   if (kk .eq. 0)  goto 20
                   if (pgrp(k,it) .eq. jt) then
-                     np11(i) = np11(i) + 1
-                     if (np11(i) .le. maxp11) then
+                     if (np11(i) .lt. maxp11) then
+                        np11(i) = np11(i) + 1
                         ip11(np11(i),i) = jj
                      else
                         write (iout,10)
@@ -590,12 +603,9 @@ c
    50       continue
          end do
       end do
-      if (abort)  call fatal
 c
 c     perform dynamic allocation of some local arrays
 c
-      maxkeep = 100
-      maxlist = 10000
       allocate (keep(maxkeep))
       allocate (list(maxlist))
       allocate (mask(n))
@@ -628,8 +638,8 @@ c
                do k = 1, np11(jj)
                   kk = ip11(k,jj)
                   if (mask(kk) .ne. i) then
-                     np11(i) = np11(i) + 1
-                     if (np11(i) .le. maxp11) then
+                     if (np11(i) .lt. maxp11) then
+                        np11(i) = np11(i) + 1
                         ip11(np11(i),i) = kk
                      else
                         write (iout,60)
@@ -651,6 +661,7 @@ c
          call sort (np11(i),ip11(1,i))
       end do
    70 continue
+      if (abort)  call fatal
 c
 c     loop over atoms finding all the 1-2 group relationships
 c
@@ -783,6 +794,7 @@ c
          end if
       end do
   130 continue
+      if (abort)  call fatal
 c
 c     perform deallocation of some local arrays
 c

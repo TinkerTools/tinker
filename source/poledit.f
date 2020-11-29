@@ -61,10 +61,12 @@ c
          idma = freeunit ()
          call readgdma (idma)
          call field
+         call initprm
          call molsetup
          call setframe
          call rotframe
          call setpolar
+         call setpgrp
          call alterpol
          call avgpole
          call prtpole
@@ -143,6 +145,9 @@ c     assign atom connectivities based on interatomic distances
 c
       do i = 1, n
          n12(i) = 0
+         do j = 1, maxval
+            i12(j,i) = 0
+         end do
       end do
       do i = 1, n-1
          xi = x(i)
@@ -1611,16 +1616,15 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine setpolar  --  define polarization and groups  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine setpolar  --  define the polarization model  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "setpolar" assigns atomic polarizabilities, Thole damping or
-c     charge penetration parameters, and polarization groups with
-c     user modification of these values
+c     charge penetration parameters, and allows user modification
 c
 c     note this routine contains directly coded Thole and charge
 c     penetration values for elements and atom classes that should
@@ -1634,11 +1638,9 @@ c
       use couple
       use fields
       use iounit
-      use kpolr
       use mplpot
       use mpole
       use polar
-      use polgrp
       use polpot
       implicit none
       integer i,j,k,m
@@ -2096,79 +2098,194 @@ c
             end if
          end do
       end if
+      return
+      end
 c
-c     use bonded atoms as initial guess at polarization groups
 c
-      write (iout,270)
-  270 format (/,' The default is to place all atoms into one',
-     &           ' polarization group;',
-     &        /,' This can be altered by entering a series of',
-     &           ' bonded atom pairs',
-     &        /,' that separate the molecule into distinct',
-     &           ' polarization groups')
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine setpgrp  --  define the polarization groups  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "setpgrp" chooses the polarization groups as defined by bonds
+c     separating groups, and allows user modification of the groups
+c
+c
+      subroutine setpgrp
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use iounit
+      use kpolr
+      use ring
+      implicit none
+      integer i,j,k,m
+      integer ia,ib
+      integer mode
+      logical exist,query
+      logical chkarom,split
+      character*240 record
+      character*240 string
+c
+c
+c     get the desired type of coordinate file modification
+c
+      mode = -1
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=10,end=10)  mode
+         if (mode.ge.1 .and. mode.le.2)  query = .false.
+      end if
+   10 continue
+      if (query) then
+         write (iout,20)
+   20    format (/,' Choose Method for Division into Polarization',
+     &              ' Groups :',
+     &           //,4x,'(1) Put All Atoms in One Polarization Group',
+     &           /,4x,'(2) Separate into Groups at Rotatable Bonds')
+         do while (mode.lt.1 .or. mode.gt.2)
+            mode = 0
+            write (iout,30)
+   30       format (/,' Enter the Number of the Desired Choice',
+     &                 ' [1] :  ',$)
+            read (input,40,err=50,end=50)  mode
+   40       format (i10)
+            if (mode .le. 0)  mode = 1
+   50       continue
+         end do
+      end if
+c
+c     initialize by placing all atoms in one polarization group
+c
       do i = 1, n
          do j = 1, n12(i)
             pgrp(j,i) = i12(j,i)
          end do
       end do
 c
+c     allow modification of polarization group one bond at a time
+c
+      if (mode .eq. 1) then
+         write (iout,60)
+   60    format (/,' All atoms are placed initially into one',
+     &              ' polarization group;',
+     &           /,' This can be modified by entering a series',
+     &              ' of bonded atom pairs',
+     &           /,' that separate the molecule into distinct',
+     &              ' polarization groups')
+c
 c     get the bonds that separate the polarization groups
 c
-      query = .true.
-      i = -1
-      call nextarg (string,exist)
-      if (exist) then
-         read (string,*,err=280,end=280)  i
-         if (i .eq. 0)  query = .false.
-      end if
-  280 continue
-      do while (query)
-         ia = 0
-         ib = 0
-         write (iout,290)
-  290    format (/,' Enter a Bond between Polarization Groups',
-     &              ' [<Enter>=Exit] :  ',$)
-         read (input,300)  record
-  300    format (a240)
-         read (record,*,err=310,end=310)  ia,ib
-  310    continue
-         if (ia.eq.0 .or. ib.eq.0) then
-            query = .false.
-         else
-            do i = 1, n12(ia)
-               if (pgrp(i,ia) .eq. ib) then
-                  do j = i+1, n12(ia)
-                     pgrp(j-1,ia) = pgrp(j,ia)
-                  end do
-                  pgrp(n12(ia),ia) = 0
-               end if
-            end do
-            do i = 1, n12(ib)
-               if (pgrp(i,ib) .eq. ia) then
-                  do j = i+1, n12(ib)
-                     pgrp(j-1,ib) = pgrp(j,ib)
-                  end do
-                  pgrp(n12(ib),ib) = 0
-               end if
-            end do
+         query = .true.
+         i = -1
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=70,end=70)  i
+            if (i .eq. 0)  query = .false.
          end if
-      end do
+   70    continue
+         do while (query)
+            ia = 0
+            ib = 0
+            write (iout,80)
+   80       format (/,' Enter a Bond between Polarization Groups',
+     &                 ' [<Enter>=Exit] :  ',$)
+            read (input,90)  record
+   90       format (a240)
+            read (record,*,err=100,end=100)  ia,ib
+  100       continue
+            if (ia.eq.0 .or. ib.eq.0) then
+               query = .false.
+            else
+               do i = 1, n12(ia)
+                  if (pgrp(i,ia) .eq. ib) then
+                     do j = i+1, n12(ia)
+                        pgrp(j-1,ia) = pgrp(j,ia)
+                     end do
+                     pgrp(n12(ia),ia) = 0
+                  end if
+               end do
+               do i = 1, n12(ib)
+                  if (pgrp(i,ib) .eq. ia) then
+                     do j = i+1, n12(ib)
+                        pgrp(j-1,ib) = pgrp(j,ib)
+                     end do
+                     pgrp(n12(ib),ib) = 0
+                  end if
+               end do
+            end if
+         end do
+c
+c     separate into polarization groups at rotatable bonds
+c
+      else if (mode .eq. 2) then
+         call bonds
+         do k = 1, nbond
+            ia = ibnd(1,k)
+            ib = ibnd(2,k)
+            split = .true.
+            if (min(n12(ia),n12(ib)) .le. 1)  split = .false.
+            if (chkarom(ia) .and. chkarom(ib)) then
+               do i = 1, nring5
+                  m = 0
+                  do j = 1, 5
+                     if (iring5(j,i) .eq. ia)  m = m + 1
+                     if (iring5(j,i) .eq. ib)  m = m + 1
+                  end do
+                  if (m .eq. 2)  split = .false.
+               end do
+               do i = 1, nring6
+                  m = 0
+                  do j = 1, 6
+                     if (iring6(j,i) .eq. ia)  m = m + 1
+                     if (iring6(j,i) .eq. ib)  m = m + 1
+                  end do
+                  if (m .eq. 2)  split = .false.
+               end do
+            end if
+            if (split) then
+               do i = 1, n12(ia)
+                  if (pgrp(i,ia) .eq. ib) then
+                     do j = i+1, n12(ia)
+                        pgrp(j-1,ia) = pgrp(j,ia)
+                     end do
+                     pgrp(n12(ia),ia) = 0
+                  end if
+               end do
+               do i = 1, n12(ib)
+                  if (pgrp(i,ib) .eq. ia) then
+                     do j = i+1, n12(ib)
+                        pgrp(j-1,ib) = pgrp(j,ib)
+                     end do
+                     pgrp(n12(ib),ib) = 0
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     find the polarization groups and their connectivities
+c
       call polargrp
 c
 c     list the polarization group for each multipole site
 c
-      write (iout,320)
-  320 format (/,' Polarization Groups for Multipole Sites :')
-      write (iout,330)
-  330 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
+      write (iout,110)
+  110 format (/,' Polarization Groups for Multipole Sites :')
+      write (iout,120)
+  120 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
      &           ' Definition',/)
       do i = 1, n
          k = 0
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0)  k = j
          end do
-         write (iout,340)  i,name(i),(pgrp(j,i),j=1,k)
-  340    format (i8,6x,a3,8x,20i6)
+         write (iout,130)  i,name(i),(pgrp(j,i),j=1,k)
+  130    format (i8,6x,a3,8x,20i6)
       end do
       return
       end

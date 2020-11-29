@@ -18,7 +18,7 @@ c     ngatm     total number of atoms with active potential grid points
 c     nfatm     total number of atoms in electrostatic potential fit
 c     npgrid    total number of electrostatic potential grid points
 c     ipgrid    atom associated with each potential grid point
-c     resp      weight used to restrain parameters to original values
+c     wresp     weight used to restrain electrostatic parameters
 c     xdpl0     target x-component of the molecular dipole moment
 c     ydpl0     target y-component of the molecular dipole moment
 c     zdpl0     target z-component of the molecular dipole moment
@@ -42,6 +42,7 @@ c     fitchg    flag marking atom types for use in partial charge fit
 c     fitpol    flag marking atom types for use in atomic multipole fit
 c     gatm      flag to use potential grid points around each atom
 c     fatm      flag to use each atom in electrostatic potential fit
+c     resptyp   electrostatic restraint target (ORIG, ZERO or NONE)
 c
 c
       module potfit
@@ -51,7 +52,7 @@ c
       integer ngatm,nfatm
       integer npgrid(maxref)
       integer, allocatable :: ipgrid(:,:)
-      real*8 resp
+      real*8 wresp
       real*8 xdpl0(maxref)
       real*8 ydpl0(maxref)
       real*8 zdpl0(maxref)
@@ -73,5 +74,6 @@ c
       logical, allocatable :: fitpol(:)
       logical, allocatable :: gatm(:)
       logical, allocatable :: fatm(:)
+      character*4 resptyp
       save
       end

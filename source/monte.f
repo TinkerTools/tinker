@@ -99,7 +99,7 @@ c
          write (iout,20)
    20    format (/,' Number of Monte Carlo Steps [1000] :  ', $)
          read (input,30)  nstep
-   30    format (i15)
+   30    format (i10)
          if (nstep .le. 0)  nstep = 1000
       end if
 c
