@@ -61,7 +61,6 @@ c
          idma = freeunit ()
          call readgdma (idma)
          call field
-         call initprm
          call molsetup
          call setframe
          call rotframe
@@ -112,6 +111,7 @@ c
       use atoms
       use couple
       use files
+      use kpolr
       use mpole
       use polar
       use ptable
@@ -216,6 +216,14 @@ c
          ipole(i) = i
          polsiz(i) = 13
          pollist(i) = i
+      end do
+c
+c     zero out polarization group membership by atom type
+c
+      do i = 1, maxtyp
+         do j = 1, maxval
+            pgrp(j,i) = 0
+         end do
       end do
       return
       end
@@ -3966,9 +3974,10 @@ c
       use mpole
       use units
       implicit none
-      integer i,j,k
-      real*8 eps,big,sum
-      real*8 ci,cj
+      integer i,j,k,m
+      integer ktype
+      integer, allocatable :: equiv(:)
+      real*8 eps,sum,big
 c
 c
 c     convert dipole and quadrupole moments to atomic units
@@ -3992,26 +4001,47 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (equiv(n))
+c
 c     enforce integer net charge over atomic multipoles
 c
-      k = 0
-      big = 0.0d0
+      do i = 1, n
+         equiv(i) = 0
+      end do
       sum = 0.0d0
       do i = 1, npole
+         j = type(ipole(i))
+         equiv(j) = equiv(j) + 1 
          sum = sum + pole(1,i)
-         ci = abs(pole(1,i))
-         if (ci .gt. big) then
-            do j = 1, n
-               cj = abs(pole(1,j))
-               if (i.ne.j .and. ci.eq.cj)  goto 10
-            end do
-            k = i
-            big = ci
-   10       continue
-         end if
       end do
       sum = sum - dble(nint(sum))
-      if (k .ne. 0)  pole(1,k) = pole(1,k) - sum
+      k = nint(sum/eps)
+      if (k .ne. 0) then
+         ktype = 0
+         do j = 1, k
+            m = k / j
+            if (k .eq. m*j) then
+               do i = 1, n
+                  if (equiv(i) .eq. m)  ktype = i
+               end do
+            end if
+            if (ktype .ne. 0)  goto 10
+         end do
+   10    continue
+         if (ktype .ne. 0) then
+            sum = sum / dble(m)
+            do i = 1, npole
+               j = type(ipole(i))
+               if (j .eq. ktype)  pole(1,i) = pole(1,i) - sum
+            end do
+         end if
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (equiv)
 c
 c     enforce traceless quadrupole at each multipole site
 c

@@ -1511,13 +1511,13 @@ c
       use potfit
       use units
       implicit none
-      integer i,j,k
-      integer ii,it
-      integer kk,kt
+      integer i,j,k,m
+      integer ii,it,kt
+      integer ktype
       integer nvar
+      integer, allocatable :: equiv(:)
       real*8 dterm,qterm
-      real*8 ci,cj
-      real*8 eps,big,sum
+      real*8 eps,sum,big
       real*8 xx(*)
       logical done
       character*17 prmtyp
@@ -1544,57 +1544,87 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (equiv(n))
+c
 c     enforce integer net charge over partial charges
 c
-      k = 0
-      big = 0.0d0
+      do i = 1, n
+         equiv(i) = 0
+      end do
       sum = 0.0d0
       do i = 1, nion
+         j = type(iion(i))
+         equiv(j) = equiv(j) + 1 
          sum = sum + pchg(i)
-         ci = abs(pchg(i))
-         if (ci .gt. big) then
-            do j = 1, nion
-               cj = abs(pchg(j))
-               if (i.ne.j .and. ci.eq.cj)  goto 10
-            end do
-            k = i
-            big = ci
-   10       continue
-         end if
       end do
       sum = sum - dble(nint(sum))
+      k = nint(sum/eps)
       if (k .ne. 0) then
-         kk = iion(k)
-         kt = type(kk)
-         pchg(k) = pchg(k) - sum
-         fchg(kt) = pchg(k)
+         ktype = 0
+         do j = 1, k
+            m = k / j
+            if (k .eq. m*j) then
+               do i = 1, n
+                  if (equiv(i) .eq. m)  ktype = i
+               end do
+            end if
+            if (ktype .ne. 0)  goto 10
+         end do
+   10    continue
+         if (ktype .ne. 0) then
+            sum = sum / dble(m)
+            do i = 1, nion
+               j = type(iion(i))
+               if (j .eq. ktype) then
+                  pchg(i) = pchg(i) - sum
+                  fchg(j) = pchg(i)
+               end if
+            end do
+         end if
       end if
 c
 c     enforce integer net charge over atomic multipoles
 c
-      k = 0
-      big = 0.0d0
+      do i = 1, n
+         equiv(i) = 0
+      end do
       sum = 0.0d0
       do i = 1, npole
+         j = type(ipole(i))
+         equiv(j) = equiv(j) + 1 
          sum = sum + pole(1,i)
-         ci = abs(pole(1,i))
-         if (ci .gt. big) then
-            do j = 1, npole
-               cj = abs(pole(1,j))
-               if (i.ne.j .and. ci.eq.cj)  goto 20
-            end do
-            k = i
-            big = ci
-   20       continue
-         end if
       end do
       sum = sum - dble(nint(sum))
+      k = nint(sum/eps)
       if (k .ne. 0) then
-         kk = ipole(k)
-         kt = type(kk)
-         pole(1,k) = pole(1,k) - sum
-         fpol(1,kt) = pole(1,k)
+         ktype = 0
+         do j = 1, k
+            m = k / j
+            if (k .eq. m*j) then
+               do i = 1, n
+                  if (equiv(i) .eq. m)  ktype = i
+               end do
+            end if
+            if (ktype .ne. 0)  goto 20
+         end do
+   20    continue
+         if (ktype .ne. 0) then
+            sum = sum / dble(m)
+            do i = 1, npole
+               j = type(ipole(i))
+               if (j .eq. ktype) then
+                  pole(1,i) = pole(1,i) - sum
+                  fpol(1,j) = pole(1,i)
+               end if
+            end do
+         end if
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (equiv)
 c
 c     enforce traceless quadrupole at each multipole site
 c
@@ -1606,8 +1636,7 @@ c
          if (big .eq. abs(pole(9,i)))  k = 9
          if (big .eq. abs(pole(13,i)))  k = 13
          if (k .ne. 0) then
-            ii = ipole(i)
-            it = type(ii)
+            it = type(ipole(i))
             pole(k,i) = pole(k,i) - sum
             fpol(k,it) = pole(k,i)
          end if
