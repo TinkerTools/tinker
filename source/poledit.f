@@ -4010,6 +4010,7 @@ c
       do i = 1, n
          equiv(i) = 0
       end do
+      ktype = 0
       sum = 0.0d0
       do i = 1, npole
          j = type(ipole(i))
@@ -4018,25 +4019,22 @@ c
       end do
       sum = sum - dble(nint(sum))
       k = nint(sum/eps)
-      if (k .ne. 0) then
-         ktype = 0
-         do j = 1, k
-            m = k / j
-            if (k .eq. m*j) then
-               do i = 1, n
-                  if (equiv(i) .eq. m)  ktype = i
-               end do
-            end if
-            if (ktype .ne. 0)  goto 10
-         end do
-   10    continue
-         if (ktype .ne. 0) then
-            sum = sum / dble(m)
-            do i = 1, npole
-               j = type(ipole(i))
-               if (j .eq. ktype)  pole(1,i) = pole(1,i) - sum
+      do j = 1, k
+         m = k / j
+         if (k .eq. m*j) then
+            do i = 1, n
+               if (equiv(i) .eq. m)  ktype = i
             end do
          end if
+         if (ktype .ne. 0)  goto 10
+      end do
+   10 continue
+      if (ktype .ne. 0) then
+         sum = sum / dble(m)
+         do i = 1, npole
+            j = type(ipole(i))
+            if (j .eq. ktype)  pole(1,i) = pole(1,i) - sum
+         end do
       end if
 c
 c     perform deallocation of some local arrays
