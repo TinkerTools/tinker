@@ -77,7 +77,7 @@
     
 
 \title{Tinker User\textquotesingle{}s Guide}
-\date{Nov 26, 2020}
+\date{Nov 30, 2020}
 \release{}
 \author{TinkerTools Organization}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -1781,6 +1781,8 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{RESPA\sphinxhyphen{}INNER}
 
+\sphinxstylestrong{RESPTYPE}
+
 \sphinxstylestrong{RESTRAIN\sphinxhyphen{}ANGLE {[}3 integers \& 3 reals{]}}  This keyword implements a flat\sphinxhyphen{}welled harmonic potential that can be used to restrain the angle between three atoms to lie within a specified angle range. The integer modifiers contain the atom numbers of the three atoms whose angle is to be restrained.  The first real modifier is the force constant in kcal/degree\textasciicircum{}2 for the restraint. The last two real modifiers give the lower and upper bounds in degrees on the allowed angle values. If the angle lies between the lower and upper bounds, the restraint potential is zero. Outside the bounds, the harmonic restraint is applied. If the angle range modifiers are omitted, then the atoms are restrained to the angle found in the input structure. If the force constant is also omitted, a default value of 10.0 is used.
 
 \sphinxstylestrong{RESTRAIN\sphinxhyphen{}DISTANCE {[}2 integers \& 3 reals{]}}  This keyword implements a flat\sphinxhyphen{}welled harmonic potential that can be used to restrain two atoms to lie within a specified distance range. The integer modifiers contain the atom numbers of the two atoms to be restrained. The first real modifier specifies the force constant in kcal/Ang\textasciicircum{}2 for the restraint. The next two real modifiers give the lower and upper bounds in Angstroms on the allowed distance range. If the interatomic distance lies between these lower and upper bounds, the restraint potential is zero. Outside the bounds, the harmonic restraint is applied. If the distance range modifiers are omitted, then the atoms are restrained to the interatomic distance found in the input structure. If the force constant is also omitted, a default value of 100.0 is used.
@@ -1837,7 +1839,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{STEPMIN {[}real{]}}  This keyword and its modifying value set the minimum size of an individual step during the line search phase of conjugate gradient or truncated Newton optimizations. The step size is computed as the norm of the vector of changes in parameters being optimized. The default value is usually set to about 10\sphinxhyphen{}16 when not specified via the STEPMIN keyword.
 
-\sphinxstylestrong{STRBND {[}1 integer \& 3 reals{]}}  This keyword provides the values for a single stretch\sphinxhyphen{}bend cross term potential parameter. The integer modifier gives the atom class number for the central atom of the bond angle involved in stretch\sphinxhyphen{}bend interactions. The real number modifiers give the force constant values to be used when the central atom of the angle is attached to 0, 1 or 2 additional hydrogen atoms, respectively. The default units for the stretch\sphinxhyphen{}bend force constant are kcal/mole/Ang\sphinxhyphen{}degree, but this can be controlled via the STRBNDUNIT keyword.
+\sphinxstylestrong{STRBND {[}3 integers \& 2 reals{]}}  This keyword provides the values for a single stretch\sphinxhyphen{}bend cross term potential parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant values for the first bond (first two atom classes) with the angle, and the second bond with the angle, respectively. The default units for the stretch\sphinxhyphen{}bend force constant are kcal/mole/Ang\sphinxhyphen{}degree, but this can be controlled via the STRBNDUNIT keyword.
 
 \sphinxstylestrong{STRBNDTERM {[}NONE/ONLY{]}}  This keyword controls use of the bond stretching\sphinxhyphen{}angle bending cross term potential energy. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
