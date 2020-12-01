@@ -2271,6 +2271,10 @@ c
                end do
             end if
 c
+c     remove bonds with sp-hybridized carbon atom
+c
+            if (ita.eq.62 .or. itb.eq.62)  split = .false.
+c
 c     remove the C=C bond of terminal alkene
 c
             if (ita.eq.63 .and. .not.aroma .and.
@@ -2280,8 +2284,10 @@ c
                   ic = i12(i,ia)
                   if (ic .ne. ib) then
                      itc = 10*atomic(ic) + n12(ic)
-                     if (itc.eq.63 .or. itc.eq.73
-     &                      .or. itc.eq.81)  split = .true.
+                     if (itc.eq.63 .or. itc.eq.73 .or.
+     &                   itc.eq.72 .or. itc.eq.81) then
+                        split = .true.
+                     end if
                   end if
                end do
                if (split) then
@@ -2290,8 +2296,10 @@ c
                      ic = i12(i,ib)
                      if (ic .ne. ia) then
                         itc = 10*atomic(ic) + n12(ic)
-                        if (itc.eq.63 .or. itc.eq.73
-     &                         .or. itc.eq.81)  split = .true.
+                        if (itc.eq.63 .or. itc.eq.72 .or.
+     &                      itc.eq.73 .or. itc.eq.81) then
+                           split = .true.
+                        end if
                      end if
                   end do
                end if
