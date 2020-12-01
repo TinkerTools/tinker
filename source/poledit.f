@@ -2250,7 +2250,7 @@ c     remove bonds involving univalent atoms
 c
             if (min(n12a,n12b) .le. 1)  split = .false.
 c
-c     remove bonds internal to aromatic rings
+c     remove bonds internal to aromatic ring
 c
             if (aroma .and. aromb) then
                do i = 1, nring5
@@ -2271,7 +2271,33 @@ c
                end do
             end if
 c
-c     remove the C-O bonds of alcohols and ethers
+c     remove the C=C bond of terminal alkene
+c
+            if (ita.eq.63 .and. .not.aroma .and.
+     &             itb.eq.63 .and. .not.aromb) then
+               split = .false.
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.63 .or. itc.eq.73
+     &                      .or. itc.eq.81)  split = .true.
+                  end if
+               end do
+               if (split) then
+                  split = .false.
+                  do i = 1, n12b
+                     ic = i12(i,ib)
+                     if (ic .ne. ia) then
+                        itc = 10*atomic(ic) + n12(ic)
+                        if (itc.eq.63 .or. itc.eq.73
+     &                         .or. itc.eq.81)  split = .true.
+                     end if
+                  end do
+               end if
+            end if
+c
+c     remove the C-O bonds of alcohol and ether
 c
             if (ita.eq.82 .and. itb.eq.64) then
                do i = 1, n12a
@@ -2291,7 +2317,7 @@ c
                end do
             end if
 c
-c     remove the C-O bonds of carboxylic acids and esters
+c     remove the C-O bonds of carboxylic acid and ester
 c
             if (ita.eq.82 .and. itb.eq.63) then
                do i = 1, n12b
@@ -2307,7 +2333,7 @@ c
                end do
             end if
 c
-c     remove the C-N bonds of alkyl amines
+c     remove the C-N bonds of alkyl amine
 c
             if (ita.eq.73 .and. itb.eq.64) then
                m = 0
@@ -2331,19 +2357,25 @@ c
                if (m .eq. 2)  split = .false.
             end if
 c
-c     remove the C-N bonds of amides and ureas
+c     remove the C-N bonds of amide, urea, amidine and guanidinium
 c
             if (ita.eq.73 .and. itb.eq.63) then
                do i = 1, n12b
                   ic = i12(i,ib)
-                  itc = 10*atomic(ic) + n12(ic)
-                  if (itc .eq. 81)  split = .false.
+                  if (ic .ne. ia) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc .eq. 81)  split = .false.
+                     if (itc .eq. 73)  split = .false.
+                  end if
                end do
             else if (itb.eq.73 .and. ita.eq.63) then
                do i = 1, n12a
                   ic = i12(i,ia)
-                  itc = 10*atomic(ic) + n12(ic)
-                  if (itc .eq. 81)  split = .false.
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc .eq. 81)  split = .false.
+                     if (itc .eq. 73)  split = .false.
+                  end if
                end do
             end if
 c
