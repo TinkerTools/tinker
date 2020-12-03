@@ -2134,6 +2134,7 @@ c
       integer mode
       integer ia,ib,ic
       integer ita,itb,itc
+      integer ata,atb
       integer n12a,n12b
       logical exist,query
       logical chkarom,split
@@ -2240,8 +2241,10 @@ c
             ib = ibnd(2,k)
             n12a = n12(ia)
             n12b = n12(ib)
-            ita = 10*atomic(ia) + n12a
-            itb = 10*atomic(ib) + n12b
+            ata = atomic(ia)
+            atb = atomic(ib)
+            ita = 10*ata + n12a
+            itb = 10*atb + n12b
             aroma = chkarom(ia)
             aromb = chkarom(ib)
             split = .true.
@@ -2385,6 +2388,14 @@ c
                      if (itc .eq. 73)  split = .false.
                   end if
                end do
+            end if
+c
+c     remove any P-X and S-X bonds with X = N or O
+c
+            if (ata.eq.15 .or. ata.eq.16) then
+               if (atb.eq.7 .or. atb.eq.8)  split = .false.
+            else if (atb.eq.15 .or. atb.eq.16) then
+               if (ata.eq.7 .or. ata.eq.8)  split = .false.
             end if
 c
 c     modify membership to split groups at allowed bonds
