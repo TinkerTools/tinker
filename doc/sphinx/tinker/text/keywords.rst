@@ -228,8 +228,8 @@ FIX-ANGLE	FIX-BOND	FIX-DIPOLE
 FIX-MONOPOLE	FIX-OPBEND	FIX-QUADRUPOLE
 FIX-STRBND	FIX-TORSION	FIX-UREY
 POTENTIAL-ATOMS	POTENTIAL-FIT	POTENTIAL-OFFSET
-POTENTIAL-SHELLS	POTENTIAL-SPACING	TARGET-DIPOLE
-TARGET-QUADRUPOLE
+POTENTIAL-SHELLS	POTENTIAL-SPACING	RESP-WEIGHT
+RESPTYPE	TARGET-DIPOLE	TARGET-QUADRUPOLE
 
 POTENTIAL SMOOTHING KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -698,19 +698,19 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **OCTAHEDRON**  Specifies that the periodic "box" is a truncated octahedron with maximal distance across the truncated octahedron as given by the A-AXIS keyword. All other unit cell and periodic box size-defining keywords are ignored if the OCTAHEDRON keyword is present.
 
-**OPBEND [2 integers & 1 real]**  This keyword provides the values for a single Allinger MM-style out-of-plane angle bending potential parameter. The first integer modifier is the atom class of the central trigonal atom and the second integer is the atom class of the out-of-plane atom. The real number modifier gives the force constant value for the out-of-plane angle. The default units for the force constant are kcal/mole/radian^2, but this can be controlled via the OPBENDUNIT keyword.
+**OPBEND [4 integers & 1 real]**  This keyword provides the values for a single out-of-plane bending potential parameter. The first integer modifier is the atom class of the out-of-plane atom and the second integer is the atom class of the central trigonal atom. The third and fourth integers give the atom classes of the two remaining atoms attached to the trigonal atom. Values of zero for the third and fourth integers are treated as wildcards, and can represent any atom type. The real number modifier gives the force constant value for the out-of-plane angle. The default units for the force constant are kcal/mole/radian^2, but this can be controlled via the OPBENDUNIT keyword.
 
-**OPBEND-CUBIC**
+**OPBEND-CUBIC [real]**  Sets the value of the cubic term in the Taylor series expansion form of the out-of-plane bending potential energy. The real number modifier gives the value of the coefficient as a multiple of the quadratic coefficient. This term multiplied by the out-of-plane bending energy unit conversion factor, the force constant, and the cube of the deviation of the out-of-plane angle from zero gives the cubic contribution to the out-of-plane bending energy. The default value in the absence of the OPBEND-CUBIC keyword is zero; i.e., the cubic out-of-plane bending term is omitted.
 
-**OPBEND-PENTIC**
+**OPBEND-PENTIC [real]**  Sets the value of the fifth power term in the Taylor series expansion form of the out-of-plane bending potential energy. The real number modifier gives the value of the coefficient as a multiple of the quadratic coefficient. This term multiplied by the out-of-plane bending energy unit conversion factor, the force constant, and the fifth power of the deviation of the out-of-plane angle from zero gives the pentic contribution to the out-of-plane bending energy. The default value in the absence of the OPBEND-PENTIC keyword is zero; i.e., the pentic out-of-plane bending term is omitted.
 
-**OPBEND-QUARTIC**
+**OPBEND-QUARTIC [real]**  Sets the value of the quartic term in the Taylor series expansion form of the out-of-plane bending potential energy. The real number modifier gives the value of the coefficient as a multiple of the quadratic coefficient. This term multiplied by the out-of-plane bending energy unit conversion factor, the force constant, and the forth power of the deviation of the out-of-plane angle from zero gives the quartic contribution to the out-of-plane bending energy. The default value in the absence of the OPBEND-QUARTIC keyword is zero; i.e., the quartic out-of-plane bending term is omitted.
 
-**OPBEND-SEXTIC**
+**OPBEND-SEXTIC [real]**  Sets the value of the sixth power term in the Taylor series expansion form of the out-of-plane bending potential energy. The real number modifier gives the value of the coefficient as a multiple of the quadratic coefficient. This term multiplied by the out-of-plane bending energy unit conversion factor, the force constant, and the sixth power of the deviation of the out-of-plane angle from zero gives the sextic contribution to the out-of-plane bending energy. The default value in the absence of the OPBEND-SEXTIC keyword is zero; i.e., the sextic out-of-plane bending term is omitted.
 
-**OPBENDTERM [NONE/ONLY]**  This keyword controls use of the Allinger MM-style out-of-plane bending potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
+**OPBENDTERM [NONE/ONLY]**  This keyword controls use of the out-of-plane bending potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-**OPBENDTYPE**
+**OPBENDTYPE [ALLINGER/W-D-C]**  Sets the type of angle to be used in the out-of-plane bending potential energy term. The choices are to use the Allinger angle from the MM2/MM3 force fields, or the Wilson-Decius-Cross (W-D-C) formulation from vibrational spectroscopy. The default value in the absence of the OPBENDTYPE keyword is to use the Allinger angle.
 
 **OPBENDUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the Allinger MM-style out-of-plane bending potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default of (Pi/180)^2 = 0.0003046 is used, if the OPBENDUNIT keyword is not given in the force field parameter file or the keyfile.
 
