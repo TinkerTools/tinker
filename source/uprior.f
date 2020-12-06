@@ -27,7 +27,7 @@ c     upalt     prior values for induced dipoles in energy field
 c     usalt     prior values for induced dipoles for PB/GK solvation
 c     upsalt    prior values for induced dipoles in PB/GK energy field
 c     use_pred  flag to control use of induced dipole prediction
-c     polpred   type of predictor polynomial (GEAR, ASPC or LSQR)
+c     polpred   type of predictor polynomial (ASPC, GEAR or LSQR)
 c
 c
       module uprior

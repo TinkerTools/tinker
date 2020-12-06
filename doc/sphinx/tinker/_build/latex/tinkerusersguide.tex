@@ -77,7 +77,7 @@
     
 
 \title{Tinker User\textquotesingle{}s Guide}
-\date{Dec 05, 2020}
+\date{Dec 06, 2020}
 \release{}
 \author{TinkerTools Organization}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -1203,7 +1203,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{ANGLEUNIT {[}real{]}}  Sets the scale factor needed to convert the energy value computed by the bond angle bending potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of (Pi/180)\textasciicircum{}2 = 0.0003046 is used, if the ANGLEUNIT keyword is not given in the force field parameter file or the keyfile.
 
-\sphinxstylestrong{ANGMAX {[}real{]}}  Set the maximum permissible angle between the current optimization search direction and the negative of the gradient direction. If this maximum angle value is exceeded, the optimization routine will note an error condition and may restart from the steepest descent direction. The default value in the absence of the ANGMAX keyword is usually 88 degrees for conjugate gradient methods and 180 degrees (i.e., disabled) for variable metric optimizations.
+\sphinxstylestrong{ANGMAX {[}real{]}}  Set the maximum permissible angle between the current optimization search direction and the negative of the gradient direction. If this maximum angle value is exceeded, the optimization routine will note an error condition and may restart from the steepest descent direction. The default value in the absence of the ANGMAX keyword is usually 88 degrees for conjugate gradient methods and 180 degrees (i.e., ANGMAX is disabled) for variable metric optimizations.
 
 \sphinxstylestrong{ANGTORS}
 
@@ -1717,11 +1717,11 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{POLAR\sphinxhyphen{}EPS {[}real{]}}  Sets the convergence criterion applied during computation of self\sphinxhyphen{}consistent induced dipoles. The calculation is deemed to have converged when the rms change in Debyes in the induced dipole at all polarizable sites is less than the value specified with this keyword. The default value in the absence of the keyword is 0.000001 Debyes.
 
-\sphinxstylestrong{POLAR\sphinxhyphen{}ITER}
+\sphinxstylestrong{POLAR\sphinxhyphen{}ITER}  Sets the maximum number of conjugate gradient iterations to be used in the solution of the self\sphinxhyphen{}consistent mutual induced dipoles. The default values in the absence of the keyword is 100 iterations.
 
 \sphinxstylestrong{POLARIZATION {[}DIRECT/MUTUAL{]}}  Selects between the use of direct and mutual dipole polarization for force fields that incorporate the polarization term. The DIRECT modifier avoids an iterative calculation by using only the permanent electric field in computation of induced dipoles. The MUTUAL option, which is the default in the absence of the POLARIZATION keyword, iterates the induced dipoles to self\sphinxhyphen{}consistency.
 
-\sphinxstylestrong{POLAR\sphinxhyphen{}PREDICT}
+\sphinxstylestrong{POLAR\sphinxhyphen{}PREDICT {[}ASPC/GEAR/LSQR{]}}  Turns on use of an induced dipole prediction method to accelerate convergence of self\sphinxhyphen{}consistent induced dipoles. The Always Stable Predictor\sphinxhyphen{}Corrector (ASPC) method, a standard Gear extrapolation method (GEAR), and extrapolation based on a least squared prediction (LSQR) are available as modifiers to the keyword. The default value if the keyword is used without a modifier is ASPC. Use of POLAR\sphinxhyphen{}PREDICT biases the early stages of induced dipole convergence, and should only be used when requesting tight convergence of 0.00001 or less via POLAR\sphinxhyphen{}EPS.
 
 \sphinxstylestrong{POLARIZABLE}
 

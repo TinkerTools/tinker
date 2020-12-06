@@ -34,7 +34,7 @@ c
       use_pred = .false.
       use_ielscf = .false.
       polpred = '    '
-      maxualt = 6
+      maxualt = 0
       nualt = 0
 c
 c     get keywords containing induced dipole prediction options
@@ -50,7 +50,7 @@ c
             call upcase (polpred)
             use_pred = .true.
             if (polpred .eq. '    ') then
-               polpred = 'LSQR'
+               polpred = 'ASPC'
             else if (polpred .eq. 'IEL ') then
                use_pred = .false.
                use_ielscf = .true.
@@ -60,20 +60,7 @@ c
          end if
       end do
 c
-c     set the 6th-order Gear predictor binomial coefficients
-c
-      if (polpred .eq. 'GEAR') then
-         maxualt = 7
-         gear(1) = 6.0d0
-         gear(2) = -15.0d0
-         gear(3) = 20.0d0
-         gear(4) = -15.0d0
-         gear(5) = 6.0d0
-         gear(6) = -1.0d0
-         gear(7) = 0.0d0
-      end if
-c
-c     set 16-step always stable predictor-corrector (ASPC) coefficients
+c     set always stable predictor-corrector (ASPC) coefficients
 c
       if (polpred .eq. 'ASPC') then
          maxualt = 17
@@ -96,17 +83,38 @@ c
          aspc(17) = 0.0d0
       end if
 c
+c     set the 6th-order Gear predictor binomial coefficients
+c
+      if (polpred .eq. 'GEAR') then
+         maxualt = 7
+         gear(1) = 6.0d0
+         gear(2) = -15.0d0
+         gear(3) = 20.0d0
+         gear(4) = -15.0d0
+         gear(5) = 6.0d0
+         gear(6) = -1.0d0
+         gear(7) = 0.0d0
+      end if
+c
+c     set maximum storage size for least squares prediction
+c
+      if (polpred .eq. 'LSQR') then
+         maxualt = 6
+      end if
+c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(udalt))  deallocate (udalt)
-      if (allocated(upalt))  deallocate (upalt)
-      if (allocated(usalt))  deallocate (usalt)
-      if (allocated(upsalt))  deallocate (upsalt)
       if (use_pred) then
-         allocate (udalt(maxualt,3,n))
-         allocate (upalt(maxualt,3,n))
-         allocate (usalt(maxualt,3,n))
-         allocate (upsalt(maxualt,3,n))
+         if (allocated(udalt))  deallocate (udalt)
+         if (allocated(upalt))  deallocate (upalt)
+         if (allocated(usalt))  deallocate (usalt)
+         if (allocated(upsalt))  deallocate (upsalt)
+         if (use_pred) then
+            allocate (udalt(maxualt,3,n))
+            allocate (upalt(maxualt,3,n))
+            allocate (usalt(maxualt,3,n))
+            allocate (upsalt(maxualt,3,n))
+         end if
       end if
 c
 c     initialize prior values of induced dipole moments

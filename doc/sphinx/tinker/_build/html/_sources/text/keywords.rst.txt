@@ -288,7 +288,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **ANGLEUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the bond angle bending potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of (Pi/180)^2 = 0.0003046 is used, if the ANGLEUNIT keyword is not given in the force field parameter file or the keyfile.
 
-**ANGMAX [real]**  Set the maximum permissible angle between the current optimization search direction and the negative of the gradient direction. If this maximum angle value is exceeded, the optimization routine will note an error condition and may restart from the steepest descent direction. The default value in the absence of the ANGMAX keyword is usually 88 degrees for conjugate gradient methods and 180 degrees (i.e., disabled) for variable metric optimizations.
+**ANGMAX [real]**  Set the maximum permissible angle between the current optimization search direction and the negative of the gradient direction. If this maximum angle value is exceeded, the optimization routine will note an error condition and may restart from the steepest descent direction. The default value in the absence of the ANGMAX keyword is usually 88 degrees for conjugate gradient methods and 180 degrees (i.e., ANGMAX is disabled) for variable metric optimizations.
 
 **ANGTORS**
 
@@ -802,11 +802,11 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **POLAR-EPS [real]**  Sets the convergence criterion applied during computation of self-consistent induced dipoles. The calculation is deemed to have converged when the rms change in Debyes in the induced dipole at all polarizable sites is less than the value specified with this keyword. The default value in the absence of the keyword is 0.000001 Debyes.
 
-**POLAR-ITER**
+**POLAR-ITER**  Sets the maximum number of conjugate gradient iterations to be used in the solution of the self-consistent mutual induced dipoles. The default values in the absence of the keyword is 100 iterations.
 
 **POLARIZATION [DIRECT/MUTUAL]**  Selects between the use of direct and mutual dipole polarization for force fields that incorporate the polarization term. The DIRECT modifier avoids an iterative calculation by using only the permanent electric field in computation of induced dipoles. The MUTUAL option, which is the default in the absence of the POLARIZATION keyword, iterates the induced dipoles to self-consistency.
 
-**POLAR-PREDICT**
+**POLAR-PREDICT [ASPC/GEAR/LSQR]**  Turns on use of an induced dipole prediction method to accelerate convergence of self-consistent induced dipoles. The Always Stable Predictor-Corrector (ASPC) method, a standard Gear extrapolation method (GEAR), and extrapolation based on a least squared prediction (LSQR) are available as modifiers to the keyword. The default value if the keyword is used without a modifier is ASPC. Use of POLAR-PREDICT biases the early stages of induced dipole convergence, and should only be used when requesting tight convergence of 0.00001 or less via POLAR-EPS.
 
 **POLARIZABLE**
 
@@ -831,7 +831,6 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 **POTENTIAL-SPACING**
 
 **PPME-ORDER [integer]**  Sets the order of the B-spline interpolation used during particle mesh Ewald summation for polarization interactions. A default value of 5 is used in the absence of the PPME-ORDER keyword.
-
 
 **PRINTOUT [integer]**  Sets the number of iterations between writes of status information to the standard output for iterative procedures such as minimizations. The default value in the absence of the keyword is 1, i.e., the calculation status is given every iteration.
 

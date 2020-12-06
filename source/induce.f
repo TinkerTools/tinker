@@ -7197,14 +7197,20 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ulspred" uses standard extrapolation or a least squares fit
-c     to set coefficients of an induced dipole predictor polynomial
+c     "ulspred" uses an ASPC or Gear extrapolation method, or a least
+c     squares fit, to set coefficients of an induced dipole predictor
+c     polynomial
 c
 c     literature references:
 c
 c     J. Kolafa, "Time-Reversible Always Stable Predictor-Corrector
 c     Method for Molecular Dynamics of Polarizable Molecules", Journal
 c     of Computational Chemistry, 25, 335-342 (2004)
+c
+c     D. Nocito and G. J. O. Beran, Reduced Computational Cost
+c     of Polarizable Force Fields by a Modification of the Always
+c     Stable Predictor-Corrector, Journal of Chemical Physics, 150,
+c     151103 (2019)
 c
 c     W. Wang and R. D. Skeel, "Fast Evaluation of Polarizable Forces",
 c     Journal of Chemical Physics, 123, 164107 (2005)
@@ -7225,20 +7231,9 @@ c
       real*8 cp(maxualt,maxualt)
 c
 c
-c     set the Gear predictor binomial coefficients
-c
-      if (polpred .eq. 'GEAR') then
-         do i = 1, nualt
-            coeff = gear(i)
-            bpred(i) = coeff
-            bpredp(i) = coeff
-            bpreds(i) = coeff
-            bpredps(i) = coeff
-         end do
-c
 c     set always stable predictor-corrector (ASPC) coefficients
 c
-      else if (polpred .eq. 'ASPC') then
+      if (polpred .eq. 'ASPC') then
          do i = 1, nualt
             coeff = aspc(i)
             bpred(i) = coeff
@@ -7247,9 +7242,20 @@ c
             bpredps(i) = coeff
          end do
 c
+c     set the Gear predictor binomial coefficients
+c
+      else if (polpred .eq. 'GEAR') then
+         do i = 1, nualt
+            coeff = gear(i)
+            bpred(i) = coeff
+            bpredp(i) = coeff
+            bpreds(i) = coeff
+            bpredps(i) = coeff
+         end do
+c
 c     derive normal equations corresponding to least squares fit
 c
-      else
+      else if (polpred .eq. 'LSQR') then
          do k = 1, nualt
             b(k) = 0.0d0
             bp(k) = 0.0d0
