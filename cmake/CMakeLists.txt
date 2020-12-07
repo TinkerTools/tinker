@@ -63,7 +63,6 @@ else()
 endif()
 
 # Link libraries automatically so that LD_LIBRARY_PATH does not need to be set
-
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -188,3 +187,11 @@ foreach(_BIN IN LISTS _BINS)
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 endforeach()
+
+# Build and 
+
+set(TINKER_OPENMM OFF CACHE BOOL "Build Tinker with OpenMM")
+
+if(TINKER_OPENMM)
+    include(${TINKER_DIR}/cmake/TinkerOpenMM.cmake)
+endif()

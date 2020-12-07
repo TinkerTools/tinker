@@ -29,3 +29,19 @@
              (3) cmake ../cmake
              (4) make -j4    [replace 4 with # of processes to use]
              (5) make install
+
+      A CMake module is included here to facilitate building Tinker with
+      OpenMM libraries and CUDA. To turn on this capability, use the flag
+      "-DTINKER_OPENMM=ON". This will try to find the OpenMM libraries
+      in the default location (/usr/local/openmm) or in the location set
+      by the environment variable OPENMM_PLUGIN_DIR or by passing the flag
+      "-DOPENMM_DIR=/path/to/openmm". You do not need to build the base
+      version of Tinker first, these steps will compile it automatically.
+
+      To build Tinker with OpenMM libraries, issue the following commands:
+
+             (1) cd Tinker   [i.e., the top-level directory]
+             (2) mkdir build && cd build
+             (3) cmake ../cmake -DTINKER_OPENMM=ON -DOPENMM_DIR=/path/to/openmm
+             (4) make -j4    [replace 4 with # of processes to use]
+             (5) make install
