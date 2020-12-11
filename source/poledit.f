@@ -4054,7 +4054,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (equiv(n))
+      allocate (equiv(maxtyp))
 c
 c     enforce integer net charge over atomic multipoles
 c
