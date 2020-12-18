@@ -63,7 +63,7 @@ c
       bmnmix = 8
       arespa = 0.00025d0
       nfree = 0
-      irest = 1
+      irest = 100
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
