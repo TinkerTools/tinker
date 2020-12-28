@@ -781,7 +781,6 @@ c
 c
 c     set the frame ratio, temperature and Boltzmann factor
 c
-      term = random ()
       frma = dble(nfrma)
       frmb = dble(nfrmb)
       rfrm = frma / frmb
