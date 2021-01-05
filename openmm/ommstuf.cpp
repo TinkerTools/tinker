@@ -3647,9 +3647,9 @@ static void setupAngleRestraints (OpenMM_System* system, FILE* log) {
 
    for (int i = 0; i < restrn__.nafix; ++i) {
       OpenMM_DoubleArray* AngleParameters = OpenMM_DoubleArray_create(0);
-      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2]*convert);
-      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2 + 1]*RADIANS_PER_DEGREE);
-      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*2 + 2]*RADIANS_PER_DEGREE);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*3]*convert);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*3 + 1]*RADIANS_PER_DEGREE);
+      OpenMM_DoubleArray_append (AngleParameters, restrn__.afix[i*3 + 2]*RADIANS_PER_DEGREE);
       OpenMM_CustomAngleForce_addAngle (force, restrn__.iafix[i*3]-1, restrn__.iafix[i*3+1]-1,
                                        restrn__.iafix[i*3+2]-1, AngleParameters);
       OpenMM_DoubleArray_destroy (AngleParameters);
