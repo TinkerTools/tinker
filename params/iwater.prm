@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              iAMOEBA-WATER
+forcefield              AMOEBA-iWATER
 
 bond-cubic              -2.55
 bond-quartic            3.793125

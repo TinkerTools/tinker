@@ -822,7 +822,7 @@ c
          dmpi24 = dmpi23 * dmpi2
          dmpi25 = dmpi24 * dmpi2
          dmpi26 = dmpi25 * dmpi2
-         pre = 128.0d0        
+         pre = 2.0d0
          s = (r + dmpi2*r2 + dmpi22*r3/3.0d0) * expi
          ds = (dmpi22*r3 + dmpi23*r4) * expi / 3.0d0
          d2s = dmpi24 * expi * r5 / 9.0d0
@@ -856,7 +856,7 @@ c
          dmpk24 = dmpk23 * dmpk2
          dmpk25 = dmpk24 * dmpk2
          term = dmpi22 - dmpk22
-         pre = 8192.0d0 * dmpi23 * dmpk23 / term**4
+         pre = 128.0d0 * dmpi23 * dmpk23 / term**4
          tmp = 4.0d0 * dmpi2 * dmpk2 / term
          s = (dampi-tmp)*expk + (dampk+tmp)*expi
          ds = (dmpi2*dmpk2*r2 - 4.0d0*dmpi2*dmpk22*r/term
