@@ -26,13 +26,19 @@ c
       subroutine dcflux (pot,dcfx,dcfy,dcfz)
       use sizes
       use angbnd
+      use atomid
       use atoms
       use bndstr
       use bound
+      use couple
       use cflux
       use mutant
       implicit none
-      integer i,ia,ib,ic
+      integer i,j,ia,ib,ic
+      integer atoma,atomb
+      integer nha,nhb
+      integer n12a,n12b
+      real*8 priority
       real*8 xa,ya,za
       real*8 xb,yb,zb
       real*8 xc,yc,zc
@@ -76,11 +82,56 @@ c
          ia = ibnd(1,i)
          ib = ibnd(2,i)
          pb = bflx(i)
+         atoma = atomic(ia)
+         atomb = atomic(ib)
          muta = mut(ia)
          mutb = mut(ib)
          if (muta .or. mutb) then
             pb = pb * elambda
          end if
+c
+c     determine the higher priority of the bonded atoms
+c
+         if (atoma .ne. atomb) then
+            if (atoma .gt. atomb) then
+               priority = 1.0d0
+            else
+               priority = -1.0d0
+            end if
+         else
+            n12a = n12(ia)
+            n12b = n12(ib)
+            if (n12a .ne. n12b) then
+               if (n12a .gt. n12b) then
+                  priority = 1.0d0
+               else
+                  priority = -1.0d0
+               end if
+            else
+               nha = 0
+               nhb = 0
+               do j = 1, n12a
+                  if (atomic(i12(j,ia)) .eq. 1) then
+                     nha = nha + 1
+                  end if
+               end do
+               do j = 1, n12b
+                  if (atomic(i12(j,ib)) .eq. 1) then
+                     nhb = nhb + 1
+                  end if
+               end do
+               if (nha .ne. nhb) then
+                  if (nha .gt. nhb) then
+                     priority = 1.0d0
+                  else
+                     priority = -1.0d0
+                  end if
+               else
+                  priority = 0.0d0
+               end if
+            end if
+         end if
+
          xa = x(ia)
          ya = y(ia)
          za = z(ia)
@@ -100,12 +151,12 @@ c
          fx = dpot * ddqdx
          fy = dpot * ddqdy
          fz = dpot * ddqdz
-         dcfx(ia) = dcfx(ia) + fx
-         dcfy(ia) = dcfy(ia) + fy
-         dcfz(ia) = dcfz(ia) + fz
-         dcfx(ib) = dcfx(ib) - fx
-         dcfy(ib) = dcfy(ib) - fy
-         dcfz(ib) = dcfz(ib) - fz
+         dcfx(ia) = dcfx(ia) + fx*priority 
+         dcfy(ia) = dcfy(ia) + fy*priority
+         dcfz(ia) = dcfz(ia) + fz*priority
+         dcfx(ib) = dcfx(ib) - fx*priority
+         dcfy(ib) = dcfy(ib) - fy*priority
+         dcfz(ib) = dcfz(ib) - fz*priority
       end do
 c
 c     calculate the charge flux forces due to each bond angle
