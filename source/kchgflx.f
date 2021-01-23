@@ -94,11 +94,20 @@ c
             do j = 1, maxncfb
                if (kcfb(j).eq.blank8 .or. kcfb(j).eq.pt2) then
                   kcfb(j) = pt2
-                  cflb(j) = cfb
-                  goto 40
+                  if (ia .lt. ib) then
+                     cflb(j) = cfb
+                  else if (ib .lt. ia) then
+                     cflb(j) = -cfb
+                  else
+                     cflb(j) = 0.0d0
+                     write (iout,40)
+   40                format (/,' KCHGFLX  --  Bond Charge Flux for',
+     &                          ' Identical Classes Set to Zero')
+                  end if
+                  goto 50
                end if
             end do
-   40       continue
+   50       continue
          else if (keyword(1:9) .eq. 'ANGCFLUX ') then
             ia = 0
             ib = 0
@@ -108,18 +117,18 @@ c
             cfb1 = 0.0d0
             cfb2 = 0.0d0
             string = record(next:240)
-            read (string,*,err=50,end=50) ia,ib,ic,cfa1,cfa2,cfb1,cfb2
-   50       continue
+            read (string,*,err=60,end=60) ia,ib,ic,cfa1,cfa2,cfb1,cfb2
+   60       continue
             if (headera .and. .not.silent) then
                headera = .false.
-               write (iout,60)
-   60          format (/,' Additional Angle Charge Flux Parameters :',
+               write (iout,70)
+   70          format (/,' Additional Angle Charge Flux Parameters :',
      &                 //,5x,'Atom Classes',10x,'K(CFA1)',
      &                    7x,'K(CFA2)',7x,'K(CFB1)',7x,'K(CFB2)',/)
             end if
             if (.not. silent) then
-               write (iout,70)  ia,ib,ic,cfa1,cfa2,cfb1,cfb2
-   70          format (4x,3i4,4x,4f14.6)
+               write (iout,80)  ia,ib,ic,cfa1,cfa2,cfb1,cfb2
+   80          format (4x,3i4,4x,4f14.6)
             end if
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -136,10 +145,10 @@ c
                   cfla(2,j) = cfa2
                   cflab(1,j) = cfb1
                   cflab(2,j) = cfb2
-                  goto 80
+                  goto 90
                end if
             end do
-   80       continue
+   90       continue
          end if
       end do
 c
@@ -183,7 +192,11 @@ c
          do j = 1, nb
             if (kcfb(j) .eq. pt2) then
                nbflx = nbflx + 1
-               bflx(i) = cflb(j)
+               if (ita .le. itb) then
+                  bflx(i) = cflb(j)
+               else
+                  bflx(i) = -cflb(j)
+               end if
             end if
          end do
       end do

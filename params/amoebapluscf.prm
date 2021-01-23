@@ -154,12 +154,12 @@ polarize      2          0.4282950  0.3900     0.7000      1
       ##                              ##
       ##################################
 
-      ##############################################################
-      ##                                                          ##
-      ##  charge prefactors multiplied by 1000/electric=3.01147   ##
-      ##  to convert parameters determined by Pengyu Ren's group  ##
-      ##                                                          ##
-      ##############################################################
+      #############################################################
+      ##                                                         ##
+      ##  charge prefactors multiplied by 1000/electric=3.01147  ##
+      ##  to convert parameters determined by Pengyu Ren group   ##
+      ##                                                         ##
+      #############################################################
 
 
 chgtrn             1          9.4882363  3.8982113
@@ -186,7 +186,7 @@ chgpen             2          1.0000     3.2541096
       ############################################################
       ##                                                        ##
       ##  angle charge flux parameters multiplied by radian to  ##
-      ##  convert e-/degree used by the Ren group to e-/radian  ##
+      ##  change e-/deg used by Pengyu Ren group to e-/radian   ##
       ##                                                        ##
       ############################################################
 

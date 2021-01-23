@@ -115,17 +115,13 @@ c
       use bndstr
       use bound
       use cflux
-      use couple
       use mutant
       implicit none
-      integer i,j,ia,ib
+      integer i,ia,ib
       integer atoma,atomb
-      integer nha,nhb
-      integer n12a,n12b
       real*8 xab,yab,zab
       real*8 rab,rab0
       real*8 pb,dq
-      real*8 priority
       real*8 pdelta(*)
       logical muta,mutb
 c
@@ -144,48 +140,6 @@ c
             pb = pb * elambda
          end if
 c
-c     determine the higher priority of the bonded atoms
-c
-         if (atoma .ne. atomb) then
-            if (atoma .gt. atomb) then
-               priority = 1.0d0
-            else
-               priority = -1.0d0
-            end if
-         else
-            n12a = n12(ia)
-            n12b = n12(ib)
-            if (n12a .ne. n12b) then
-               if (n12a .gt. n12b) then
-                  priority = 1.0d0
-               else
-                  priority = -1.0d0
-               end if
-            else
-               nha = 0
-               nhb = 0
-               do j = 1, n12a
-                  if (atomic(i12(j,ia)) .eq. 1) then
-                     nha = nha + 1
-                  end if
-               end do
-               do j = 1, n12b
-                  if (atomic(i12(j,ib)) .eq. 1) then
-                     nhb = nhb + 1
-                  end if
-               end do
-               if (nha .ne. nhb) then
-                  if (nha .gt. nhb) then
-                     priority = 1.0d0
-                  else
-                     priority = -1.0d0
-                  end if
-               else
-                  priority = 0.0d0
-               end if
-            end if
-         end if
-c
 c     compute the bond length value for the current bond
 c
          xab = x(ia) - x(ib)
@@ -198,8 +152,8 @@ c     find the charge flux increment for the current bond
 c
          rab0 = bl(i)
          dq = pb * (rab-rab0)
-         pdelta(ia) = pdelta(ia) - dq*priority
-         pdelta(ib) = pdelta(ib) + dq*priority
+         pdelta(ia) = pdelta(ia) - dq
+         pdelta(ib) = pdelta(ib) + dq
       end do
       return
       end

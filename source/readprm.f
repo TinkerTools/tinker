@@ -1098,11 +1098,13 @@ c
             nd = nd + 1
             if (ia .le. ib) then
                kd(nd) = pa//pb
+               dpl(nd) = dp
+               pos(nd) = ps
             else
                kd(nd) = pb//pa
+               dpl(nd) = -dp
+               pos(nd) = 1.0d0 - ps
             end if
-            dpl(nd) = dp
-            pos(nd) = ps
 c
 c     bond dipole moment parameters for 5-membered rings
 c
@@ -1119,11 +1121,13 @@ c
             nd5 = nd5 + 1
             if (ia .le. ib) then
                kd5(nd5) = pa//pb
+               dpl5(nd5) = dp
+               pos5(nd5) = ps
             else
                kd5(nd5) = pb//pa
+               dpl5(nd5) = -dp
+               pos5(nd5) = 1.0d0 - ps
             end if
-            dpl5(nd5) = dp
-            pos5(nd5) = ps
 c
 c     bond dipole moment parameters for 4-membered rings
 c
@@ -1140,11 +1144,13 @@ c
             nd4 = nd4 + 1
             if (ia .le. ib) then
                kd4(nd4) = pa//pb
+               dpl4(nd4) = dp
+               pos4(nd4) = ps
             else
                kd4(nd4) = pb//pa
+               dpl4(nd4) = -dp
+               pos4(nd4) = 1.0d0 - ps
             end if
-            dpl4(nd4) = dp
-            pos4(nd4) = ps
 c
 c     bond dipole moment parameters for 3-membered rings
 c
@@ -1161,11 +1167,13 @@ c
             nd3 = nd3 + 1
             if (ia .le. ib) then
                kd3(nd3) = pa//pb
+               dpl3(nd3) = dp
+               pos3(nd3) = ps
             else
                kd3(nd3) = pb//pa
+               dpl3(nd3) = -dp
+               pos3(nd3) = 1.0d0 - ps
             end if
-            dpl3(nd3) = dp
-            pos3(nd3) = ps
 c
 c     atomic multipole moment parameters
 c
@@ -1318,12 +1326,16 @@ c
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             ncfb = ncfb + 1
-            if (ia .le. ib) then
+            if (ia .lt. ib) then
                kcfb(ncfb) = pa//pb
-            else
+               cflb(ncfb) = cfb
+            else if (ib .lt. ia) then
                kcfb(ncfb) = pb//pa
+               cflb(ncfb) = -cfb
+            else
+               kcfb(ncfb) = pa//pb
+               cflb(ncfb) = 0.0d0
             end if
-            cflb(ncfb) = cfb
 c
 c     angle charge flux parameters
 c
