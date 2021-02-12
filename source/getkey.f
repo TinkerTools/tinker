@@ -144,7 +144,7 @@ c
          call gettext (record,keyword,next)
          string = record(next:240)
          if (keyword(1:15) .eq. 'OPENMP-THREADS ') then
-            read (string,*,err=80,end=80)  nthread
+!$          read (string,*,err=80,end=80)  nthread
 !$          call omp_set_num_threads (nthread)
          end if
    80    continue
