@@ -96,7 +96,7 @@ c     perform dynamic allocation of some local arrays
 c
       maxfft = max(nfft1,nfft2,nfft3)
       allocate (array(bsorder))
-      allocate (bsarray(maxfft))
+      allocate (bsarray(max(maxfft,bsorder+1)))
 c
 c     compute and load the moduli values
 c
@@ -433,7 +433,7 @@ c
 !$OMP PARALLEL default(private) shared(n,nchunk,pmetable,igrid,
 !$OMP& nfft1,nfft2,nfft3,nchk1,nchk2,nchk3,ngrd1,ngrd2,ngrd3,
 !$OMP& nlpts,nrpts,grdoff)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     zero out the PME table marking chunks per site
 c
@@ -446,7 +446,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     loop over sites to find the spatial chunks for each
 c
@@ -627,7 +627,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -643,7 +643,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid) schedule(guided)
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -749,7 +749,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -765,7 +765,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid) schedule(guided)
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -884,7 +884,7 @@ c
 !$OMP& pmetable,nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,
 !$OMP& ngrd2,ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -900,7 +900,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid) schedule(guided)
 c
 c     put the induced dipole moments onto the grid
 c
@@ -1014,7 +1014,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -1030,7 +1030,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO
+!$OMP DO reduction(+:qgrid) schedule(guided)
 c
 c     put the dispersion sites onto the grid
 c
@@ -1178,7 +1178,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     extract the permanent multipole field at each site
 c
@@ -1361,7 +1361,7 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fdip_phi1,
 !$OMP& fdip_phi2,fdip_sum_phi)
-!$OMP DO
+!$OMP DO schedule(guided)
 c
 c     extract the induced dipole field at each site
 c
