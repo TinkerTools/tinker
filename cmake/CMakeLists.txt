@@ -1,20 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
-
-project(tinker VERSION 8.8.2 LANGUAGES Fortran)
-
-include(GNUInstallDirs)
-
-set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod)
-
-# make sure that the default is a RELEASE
-
-if(NOT CMAKE_BUILD_TYPE)
-    set(
-        CMAKE_BUILD_TYPE RELEASE CACHE STRING
-        "Choose the Type of Build, Options are: None Debug Release"
-        FORCE
-    )
-endif()
+cmake_minimum_required(VERSION 3.9)
 
 # Determine main Tinker directory
 
@@ -25,6 +9,28 @@ find_path(
     DOC "Main Tinker directory"
     REQUIRED
 )
+
+# Get the version number from the banner file
+
+file(READ "${TINKER_DIR}/source/promo.f" PROMO_F)
+string(REGEX MATCH "Version (([0-9]+)(\\.[0-9]+)*)" _ ${PROMO_F})
+set(VERSION ${CMAKE_MATCH_1})
+
+project(tinker VERSION ${VERSION} LANGUAGES Fortran)
+
+include(GNUInstallDirs)
+
+set(CMAKE_Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod)
+
+# Make sure that the default is a RELEASE
+
+if(NOT CMAKE_BUILD_TYPE)
+    set(
+        CMAKE_BUILD_TYPE RELEASE CACHE STRING
+        "Choose the Type of Build, Options are: None Debug Release"
+        FORCE
+    )
+endif()
 
 # Find required libraries
 
@@ -55,6 +61,10 @@ else()
     message(STATUS "Found FFTW3: ${FFTW_LIB}")
     message(STATUS "Found threaded FFTW3: ${FFTW_THREADED_LIB}")
 endif()
+
+# Link libraries automatically so that LD_LIBRARY_PATH does not need to be set
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # Set compiler flags
 
@@ -177,3 +187,11 @@ foreach(_BIN IN LISTS _BINS)
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     )
 endforeach()
+
+# Build and 
+
+set(TINKER_OPENMM OFF CACHE BOOL "Build Tinker with OpenMM")
+
+if(TINKER_OPENMM)
+    include(${TINKER_DIR}/cmake/TinkerOpenMM.cmake)
+endif()
