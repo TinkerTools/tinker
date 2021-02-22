@@ -378,7 +378,7 @@ c
             xk = x(k)
             yk = y(k)
             zk = z(k)
-            r2 = (xi-xk)**2 + (yi-yk)**2 + (zi-zk)**2
+            r2 = (xk-xi)**2 + (yk-yi)**2 + (zk-zi)**2
             rmax = max(r2,rmax)
          end do
       end do

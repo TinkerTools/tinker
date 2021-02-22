@@ -1261,7 +1261,7 @@ c
 c
 c     rebuild the higher numbered neighbors for updated sites
 c
-!$OMP DO schedule (guided)
+!$OMP DO schedule(guided)
       do i = 1, npole
          if (update(i)) then
             xi = xeold(i)
@@ -1285,7 +1285,7 @@ c
 c
 c     adjust lists of lower numbered neighbors of updated sites
 c
-!$OMP DO schedule (guided)
+!$OMP DO schedule(guided)
       do i = 1, npole
          if (update(i)) then
             xi = xeold(i)

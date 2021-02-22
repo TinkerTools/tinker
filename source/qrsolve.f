@@ -208,13 +208,11 @@ c
          xpvt(j) = qtb(j)
       end do
 c
-c     eliminate the diagonal matrix d using a Givens rotation
+c     eliminate the diagonal matrix d using a Givens rotation;
+c     first, prepare the row of d to be eliminated, locating
+c     the diagonal element from the QR factorization
 c
       do j = 1, n
-c
-c     prepare the row of d to be eliminated, locating the
-c     diagonal element using p from the QR factorization
-c
          jj = ipvt(j)
          if (diag(jj) .ne. 0.0d0) then
             do k = j, n

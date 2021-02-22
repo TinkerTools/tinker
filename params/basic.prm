@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              TINY
+forcefield              BASIC
 
 vdwtype                 LENNARD-JONES
 radiusrule              GEOMETRIC
@@ -28,6 +28,9 @@ optimization of crude structures to avoid steric clashes. The valence
 parameters are set to idealized values. The vdw values model sterics
 and hydrogen bonds. Electrostatics are treated via bond dipoles.
 
+Atom type numbers are just ten times the atomic number plus the number
+of attached atoms, thus tetravalent carbon is atom type 64.
+
 
       #############################
       ##                         ##
@@ -40,6 +43,7 @@ atom         10    H     "H Atom"                       1     1.000    0
 atom         11    H     "H Monovalent"                 1     1.000    1
 atom         12    H     "H Divalent"                   1     1.000    2
 atom         20    He    "He Atom"                      2     4.000    0
+atom         30    Li+   "Li+ Ion"                      0     7.000    0
 atom         53    B     "B Trivalent"                  5    10.800    3
 atom         54    B     "B Tetravalent"                5    10.800    4
 atom         62    C     "C Divalent"                   6    12.000    2
@@ -367,6 +371,29 @@ torsion       0   82   82    0           -2.000  180.0  2
 torsion       0   73  154    0
 torsion       0   82  154    0
 torsion       0  162  162    0           -7.000  180.0  2
+
+
+      ########################################
+      ##                                    ##
+      ##  Atomic Partial Charge Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+charge       30               1.0000
+charge       90              -1.0000
+charge      110               1.0000
+charge      120               2.0000
+charge      130               3.0000
+charge      170              -1.0000
+charge      190               1.0000
+charge      200               2.0000
+charge      350              -1.0000
+charge      370               1.0000
+charge      380               2.0000
+charge      530              -1.0000
+charge      550               1.0000
+charge      560               2.0000
 
 
       #####################################
