@@ -35,7 +35,7 @@ c
       integer freeunit
       integer, allocatable :: row(:)
       real*8 xi,yi,zi,rij
-      real*8 rcut,rmax(0:9)
+      real*8 rcut,rmax(0:25)
       logical biopoly
       logical clash
       character*1 letter
@@ -138,7 +138,16 @@ c
                x(i) = xpdb(i)
                y(i) = ypdb(i)
                z(i) = zpdb(i)
-               name(i) = pdbatm(i)(2:4)
+               if (pdbsym(i) .ne. '   ') then
+                  name(i) = pdbsym(i)
+               else
+                  letter = pdbatm(i)(1:1)
+                  if (letter.ge.'A' .and. letter.le.'Z') then
+                     name(i) = pdbatm(i)(1:3)
+                  else
+                     name(i) = pdbatm(i)(2:4)
+                  end if
+               end if
                n12(i) = 0
                next = 1
                call getnumb (pdbres(i),type(i),next)
@@ -159,6 +168,7 @@ c
                      row(i) = 1
                   else if (letter .eq. 'C') then
                      row(i) = 2
+                     if (name(i)(2:2) .eq. 'L')  row(i) = 3
                   else if (letter .eq. 'N') then
                      row(i) = 2
                   else if (letter .eq. 'O') then
@@ -176,8 +186,10 @@ c
                   row(i) = 1
                else if (atmnum(it) .le. 10) then
                   row(i) = 2
-               else
+               else if (atmnum(it) .le. 18) then
                   row(i) = 3
+               else
+                  row(i) = 5
                end if
             end do
 c
@@ -188,8 +200,12 @@ c
             rmax(2) = 1.3d0
             rmax(3) = 1.55d0
             rmax(4) = 1.75d0
+            rmax(5) = 1.90d0
             rmax(6) = 2.0d0
             rmax(9) = 2.2d0
+            rmax(10) = 2.4d0
+            rmax(15) = 2.6d0
+            rmax(25) = 2.8d0
 c
 c     find and connect atom pairs within bonding distance
 c

@@ -39,7 +39,7 @@ c
       character*1 insert,inslast
       character*1 letter
       character*1, allocatable :: chnatm(:)
-      character*3 resname
+      character*3 resname,atmsymb
       character*3 namelast
       character*4 atmname
       character*6 remark
@@ -96,6 +96,7 @@ c
          if (.not. allocated(ypdb))  allocate (ypdb(maxatm))
          if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
          if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
+         if (.not. allocated(pdbsym))  allocate (pdbsym(maxatm))
          if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
          if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
       end if
@@ -155,6 +156,8 @@ c
             string = record(47:54)
             read (string,*)  zz
   100       continue
+            next = 77
+            call getword (record,atmsymb,next)
             if (index(chnsym,chain) .eq. 0)  goto 120
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 120
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 120
@@ -205,6 +208,7 @@ c
             zpdb(npdb) = zz
             pdbtyp(npdb) = remark
             pdbatm(npdb) = atmname
+            pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
             resnum(npdb) = nres
             if (resname .eq. 'HOH')  resnum(npdb) = 0
@@ -249,6 +253,8 @@ c
             string = record(47:54)
             read (string,*)  zz
   200       continue
+            next = 77
+            call getword (record,atmsymb,next)
             if (index(chnsym,chain) .eq. 0)  goto 210
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 210
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 210
@@ -259,6 +265,7 @@ c
             zpdb(npdb) = zz
             pdbtyp(npdb) = remark
             pdbatm(npdb) = atmname
+            pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
             resnum(npdb) = 0
             chnatm(npdb) = chain

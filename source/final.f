@@ -681,6 +681,7 @@ c
       if (allocated(ypdb))  deallocate (ypdb)
       if (allocated(zpdb))  deallocate (zpdb)
       if (allocated(pdbres))  deallocate (pdbres)
+      if (allocated(pdbsym))  deallocate (pdbsym)
       if (allocated(pdbatm))  deallocate (pdbatm)
       if (allocated(pdbtyp))  deallocate (pdbtyp)
 c
