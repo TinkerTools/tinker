@@ -70,7 +70,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      size = max(40,n)
+      size = max(100,n)
       allocate (list(size))
 c
 c     get any keywords containing atom group definitions

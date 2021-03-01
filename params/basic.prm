@@ -46,6 +46,7 @@ atom         20    He    "He Atom"                      2     4.000    0
 atom         30    Li+   "Li+ Ion"                      0     7.000    0
 atom         53    B     "B Trivalent"                  5    10.800    3
 atom         54    B     "B Tetravalent"                5    10.800    4
+atom         61    C     "C Monovalent"                 6    12.000    1
 atom         62    C     "C Divalent"                   6    12.000    2
 atom         63    C     "C Trivalent"                  6    12.000    3
 atom         64    C     "C Tetravalent"                6    12.000    4
@@ -101,6 +102,7 @@ vdw          12               1.2000     0.0300
 vdw          20               1.3000     0.0200
 vdw          53               1.9000     0.0400
 vdw          54               1.9000     0.0400
+vdw          61               1.7500     0.0700
 vdw          62               1.7500     0.0700
 vdw          63               1.7500     0.0700
 vdw          64               1.7500     0.0700
@@ -150,10 +152,13 @@ bond         11   83          500.00     1.0000
 bond         11  144          200.00     1.5000
 bond         11  154          240.00     1.4000
 bond         11  162          300.00     1.3500
+bond         61   63          750.00     1.3100
+bond         61   81         1350.00     1.1300
 bond         62   62         1200.00     1.2100
 bond         62   63          750.00     1.3100
 bond         62   64          400.00     1.4700
 bond         62   71         1350.00     1.1600
+bond         62   82          700.00     1.3300
 bond         63   63          550.00     1.3600
 bond         63   64          400.00     1.5000
 bond         63   72          500.00     1.3400
@@ -198,6 +203,10 @@ bond        162  162          200.00     2.0200
 
 
 angle        11   62   62      35.00     180.00
+angle        62   62   62      35.00     180.00
+angle        62   62   63      35.00     180.00
+angle        62   62   82      35.00     180.00
+angle        63   62   63      35.00     180.00
 angle        71   62   63      35.00     180.00
 angle        71   62   64      35.00     180.00
 angle        11   63   62      35.00     120.00
@@ -209,7 +218,15 @@ angle        11   63   73      35.00     120.00
 angle        11   63   74      35.00     120.00
 angle        11   63   82      45.00     120.00
 angle        11   63  162      30.00     120.00
-angle        63   63   62      70.00     120.00
+angle        61   63   62      70.00     120.00
+angle        61   63   63      70.00     120.00
+angle        62   63   62      70.00     120.00
+angle        62   63   63      70.00     120.00
+angle        62   63   72      70.00     120.00
+angle        62   63   82      70.00     120.00
+angle        62   63  171      50.00     120.00
+angle        62   63  351      45.00     120.00
+angle        62   63  531      40.00     120.00
 angle        63   63   63      70.00     120.00
 angle        63   63   64      70.00     120.00
 angle        63   63   72      70.00     120.00
@@ -228,6 +245,9 @@ angle        64   63   81      80.00     120.00
 angle        64   63   82      70.00     120.00
 angle        64   63   72      45.00     120.00
 angle        64   63  162      45.00     120.00
+angle        64   63  171      50.00     120.00
+angle        64   63  351      45.00     120.00
+angle        64   63  531      40.00     120.00
 angle        72   63   72      70.00     120.00
 angle        72   63   73      70.00     120.00
 angle        72   63   81      70.00     120.00
@@ -306,6 +326,7 @@ angle        64   74   64      50.00     109.50
 angle        11   82   11      35.00     109.50
 angle        11   82   63      35.00     109.50
 angle        11   82   64      55.00     109.50
+angle        62   82   63      70.00     109.50
 angle        63   82   63      70.00     109.50
 angle        63   82   64      70.00     109.50
 angle        64   82   64      60.00     109.50
@@ -436,7 +457,7 @@ dipole       81  164         -2.9000      0.500     ! sulfone
 
 biotype       1    N       "Glycine"                          73
 biotype       2    CA      "Glycine"                          64
-biotype       3    C       "Glycine"                          64
+biotype       3    C       "Glycine"                          63
 biotype       4    HN      "Glycine"                          11
 biotype       5    O       "Glycine"                          81
 biotype       6    HA      "Glycine"                          11
@@ -695,7 +716,7 @@ biotype     258    C       "Asparagine"                       63
 biotype     259    HN      "Asparagine"                       11
 biotype     260    O       "Asparagine"                       81
 biotype     261    HA      "Asparagine"                       11
-biotype     262    CB      "Asparagine"                       63
+biotype     262    CB      "Asparagine"                       64
 biotype     263    HB      "Asparagine"                       11
 biotype     264    CG      "Asparagine"                       63
 biotype     265    OD1     "Asparagine"                       81
@@ -709,7 +730,7 @@ biotype     272    O       "Glutamic Acid"                    81
 biotype     273    HA      "Glutamic Acid"                    11
 biotype     274    CB      "Glutamic Acid"                    64
 biotype     275    HB      "Glutamic Acid"                    11
-biotype     276    CG      "Glutamic Acid"                    63
+biotype     276    CG      "Glutamic Acid"                    64
 biotype     277    HG      "Glutamic Acid"                    11
 biotype     278    CD      "Glutamic Acid"                    63
 biotype     279    OE      "Glutamic Acid"                    81
