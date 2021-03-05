@@ -28,7 +28,7 @@ c
       use solute
       implicit none
       integer i,k,next
-      real*8 rd,pbrd
+      real*8 pbrd,crd,rd
       logical header
       character*20 keyword
       character*20 value
@@ -123,12 +123,12 @@ c
             if (doffset .lt. 0.0d0)  doffset = -doffset
          else if (keyword(1:7) .eq. 'SOLUTE ') then
             k = 0
-            rd = 0.0d0
             pbrd = 0.0d0
+            crd = 0.0d0
+            rd = 0.0d0
             call getnumb (record,k,next)
-c           call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=15,end=15)  keyword, rd, pbrd
+            read (string,*,err=15,end=15)  keyword, pbrd, crd, rd
    15       continue
             if (k.ge.1 .and. k.le.maxtyp) then
                if (header .and. .not.silent) then
@@ -139,11 +139,12 @@ c           call gettext (record,keyword,next)
      &                    //,5x,'Atom Type',10x,'Radius',/)
                end if
 c
-c              If there is no text descriptor, then read rd from keyword
+c              If there is no text descriptor, then read pbrd from keyword
 c
-               if (pbrd .le. 0.0d0) then
-                  pbrd = rd
-                  read (keyword,*,err=25,end=25) rd
+               if (rd .le. 0.0d0) then
+                  rd = crd
+                  crd = pbrd
+                  read (keyword,*,err=25,end=25) pbrd
    25             continue
                end if
                rd = 0.5 * rd
@@ -151,8 +152,8 @@ c
                gkr(k) = rd
                pbrtype(k) = pbrd
                if (.not. silent) then
-                  write (iout,30)  k,rd,pbrd
-   30             format (4x,i6,8x,f12.4,f12.4)
+                  write (iout,30)  k,pbrd,crd,rd
+   30             format (4x,i6,8x,f12.4,f12.4,f12.4)
                end if
             else if (k .gt. maxtyp) then
                write (iout,40)  maxtyp
@@ -867,6 +868,7 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(rsolv))  deallocate (rsolv)
+      if (allocated(rdescreen))  deallocate (rdescreen)
       if (allocated(rborn))  deallocate (rborn)
       if (allocated(drb))  deallocate (drb)
       if (allocated(drbp))  deallocate (drbp)
@@ -879,6 +881,7 @@ c
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
       allocate (rsolv(n))
+      allocate (rdescreen(n))
       allocate (rborn(n))
       allocate (drb(n))
       allocate (drbp(n))
@@ -896,10 +899,10 @@ c
 c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
-      dhct = 0.69d0
+      dhct = 0.72d0
       radtyp = 'SOLUTE'
-      descreenVDW = .false.
-      descreenHydrogen = .true.
+      descreenVDW = .true.
+      descreenHydrogen = .false.
 c
 c     get any altered generalized Kirkwood values from keyfile
 c
@@ -954,17 +957,11 @@ c     assign generic value for the HCT overlap scale factor
 c
       do i = 1, n
          shct(i) = dhct
+         rdescreen(i) = rsolv(i)
          if (descreenVDW) then
-c
-c           Update the HCT scale factor so that rsolv*shct equals radmin/2
-c
-            shct(i) = radmin(class(i),class(i))/2.0d0*shct(i)/rsolv(i)
-c           write(*,*) i,radmin(class(i),class(i))/2.0d0,rsolv(i),shct(i)
+            rdescreen(i) = radmin(class(i),class(i))/2.0d0
          end if
          if (.not. descreenHydrogen) then
-c
-c           Do not descreen with hydrogen atoms
-c
             atmnum = atomic(i)
             if (atmnum .eq. 1) shct(i) = 0.0d0
          end if
@@ -1184,6 +1181,14 @@ c
          else if (keyword(1:5) .eq. 'SMIN ') then
             read (string,*,err=70,end=70)  smin
    70       continue
+         else if (keyword(1:7) .eq. 'PBTYPE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:4) .eq. 'LPBE') then
+               pbtyp = 'LPBE'
+            else if (value(1:4) .eq. 'NPBE') then
+               pbtyp = 'NPBE'
+            end if
          else if (keyword(1:5) .eq. 'SRFM ') then
             call getword (record,value,next)
             call upcase (value)

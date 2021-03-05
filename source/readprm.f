@@ -71,7 +71,7 @@ c
       integer nx,ny,nxy
       integer bt,at,sbt,tt
       integer ft(6),pg(maxval)
-      real*8 wght,rd,pbrd,ep,rdn
+      real*8 wght,rd,cosrd,pbrd,ep,rdn
       real*8 spr,apr,epr
       real*8 cdp,adp
       real*8 an1,an2,an3
@@ -985,23 +985,23 @@ c
          else if (keyword(1:7) .eq. 'SOLUTE ') then
             ia = 0
             rd = 0.0d0
+            cosrd = 0.0d0
             pbrd = 0.0d0
             call getnumb (record,ia,next)
             call gettext (record,keyword,next)
             string = record(next:240)
-            read (string,*,err=325,end=325) rd,pbrd
+            read (string,*,err=325,end=325) pbrd,cosrd,rd
   325       continue
             if (ia .ne. 0) then
 c 
 c              If there is no text descriptor, then read rd from keyword
 c
-               if (pbrd .le. 0.0d0) then
-                  pbrd = rd
-                  read (keyword,*,err=326,end=326) rd
+               if (rd .le. 0.0d0) then
+                  rd = cosrd
+                  cosrd = pbrd
+                  read (keyword,*,err=326,end=326) pbrd
   326             continue
-                  write(*,*) "SOLUTE",ia," ",rd," ",pbrd
                else
-                  write(*,*) "SOLUTE",ia," ",keyword," ",rd," ",pbrd
                end if
                gkr(ia) = rd * 0.5
                pbrtype(ia) = pbrd * 0.5

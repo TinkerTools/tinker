@@ -352,8 +352,9 @@ c
                yi = y(i)
                zi = z(i)
                sum = pi43 / ri**3
+               ri = max(rsolv(i),rdescreen(i)) 
                do k = 1, n
-                  rk = rsolv(k)
+                  rk = rdescreen(k)
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -887,7 +888,7 @@ c
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n
-            ri = rsolv(i)
+            ri = max(rsolv(i),rdescreen(i))
             if (ri .gt. 0.0d0) then
                xi = x(i)
                yi = y(i)
@@ -895,7 +896,7 @@ c
                term = pi43 / rborn(i)**3.0d0
                term = factor / term**(4.0d0*third)
                do k = 1, n
-                  rk = rsolv(k)
+                  rk = rdescreen(k)
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
