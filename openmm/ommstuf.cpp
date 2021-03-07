@@ -207,6 +207,8 @@ struct {
    int monoclinic;
    int triclinic;
    int octahedron;
+   int dodecadron;
+   int nonprism;
    char spacegrp[MAX_STRING];
 } boxes__;
 
@@ -1031,7 +1033,8 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
                       double* beta_cos, double* gamma_sin, double* gamma_cos,
                       double* beta_term, double* gamma_term, double* lvec,
                       double* recip, int* orthogonal, int* monoclinic,
-                      int* triclinic, int* octahedron, char* spacegrp) {
+                      int* triclinic, int* octahedron, int* dodecadron,
+                      int* nonprism, char* spacegrp) {
 
    boxes__.xbox = xbox;
    boxes__.ybox = ybox;
@@ -1056,6 +1059,8 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
    boxes__.monoclinic = *monoclinic;
    boxes__.triclinic = *triclinic;
    boxes__.octahedron = *octahedron;
+   boxes__.dodecadron = *dodecadron;
+   boxes__.nonprism = *nonprism;
    setNullTerminator (spacegrp, 10, boxes__.spacegrp);
 }
 

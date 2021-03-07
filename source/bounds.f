@@ -20,11 +20,12 @@ c
       use atomid
       use atoms
       use boxes
+      use math
       use molcul
       implicit none
       integer i,j,k
       integer init,stop
-      real*8 weigh
+      real*8 weigh,corr
       real*8 xmid,ymid,zmid
       real*8 xfrac,yfrac,zfrac
       real*8 xcom,ycom,zcom
@@ -52,65 +53,60 @@ c
 c
 c     get fractional coordinates of center of mass
 c
-         if (orthogonal .or. octahedron) then
-            zfrac = zmid
-            yfrac = ymid
-            xfrac = xmid
+         if (triclinic) then
+            zfrac = zmid / gamma_term
+            yfrac = (ymid - zfrac*beta_term) / gamma_sin
+            xfrac = xmid - yfrac*gamma_cos - zfrac*beta_cos
          else if (monoclinic) then
             zfrac = zmid / beta_sin
             yfrac = ymid
             xfrac = xmid - zfrac*beta_cos
-         else if (triclinic) then
-            zfrac = zmid / gamma_term
-            yfrac = (ymid - zfrac*beta_term) / gamma_sin
-            xfrac = xmid - yfrac*gamma_cos - zfrac*beta_cos
+         else
+            zfrac = zmid
+            yfrac = ymid
+            xfrac = xmid
          end if
 c
 c     translate center of mass into the periodic box
 c
-         do while (xfrac .gt. xbox2)
-            xfrac = xfrac - xbox
-         end do
-         do while (xfrac .lt. -xbox2)
-            xfrac = xfrac + xbox
-         end do
-         do while (yfrac .gt. ybox2)
-            yfrac = yfrac - ybox
-         end do
-         do while (yfrac .lt. -ybox2)
-            yfrac = yfrac + ybox
-         end do
-         do while (zfrac .gt. zbox2)
-            zfrac = zfrac - zbox
-         end do
-         do while (zfrac .lt. -zbox2)
-            zfrac = zfrac + zbox
-         end do
-c
-c     truncated octahedron needs to have corners removed
-c
-         if (octahedron) then
-            if (abs(xfrac)+abs(yfrac)+abs(zfrac) .gt. box34) then
-               xfrac = xfrac - sign(xbox2,xfrac)
-               yfrac = yfrac - sign(ybox2,yfrac)
-               zfrac = zfrac - sign(zbox2,zfrac)
-            end if
+         if (dodecadron) then
+            xfrac = xfrac - xbox*nint(xfrac/xbox)
+            yfrac = yfrac - ybox*nint(yfrac/ybox)
+            zfrac = zfrac - root2*zbox*nint(zfrac/(zbox*root2))
+            corr = xbox2 * int(abs(xfrac/xbox)+abs(yfrac/ybox)
+     &                               +abs(root2*zfrac/zbox))
+            xfrac = xfrac - sign(corr,xfrac)
+            yfrac = yfrac - sign(corr,yfrac)
+            zfrac = zfrac - sign(corr,zfrac)*root2
+         else if (octahedron) then
+            xfrac = xfrac - xbox*nint(xfrac/xbox)
+            yfrac = yfrac - ybox*nint(yfrac/ybox)
+            zfrac = zfrac - zbox*nint(zfrac/zbox)
+            corr = box23 * int(abs(xfrac/xbox)+abs(yfrac/ybox)
+     &                                +abs(zfrac/zbox))
+            xfrac = xfrac - sign(corr,xfrac)
+            yfrac = yfrac - sign(corr,yfrac)
+            zfrac = zfrac - sign(corr,zfrac)
+         else
+            xfrac = xfrac - xbox*nint(xfrac/xbox)
+            yfrac = yfrac - ybox*nint(yfrac/ybox)
+            zfrac = zfrac - zbox*nint(zfrac/zbox)
          end if
 c
-c     convert translated fraction center of mass to Cartesian
+c     convert translated fractional center of mass to Cartesian
 c
-         if (orthogonal .or. octahedron) then
-            xcom = xfrac
-            ycom = yfrac
-            zcom = zfrac
+         if (triclinic) then
+            xcom = xfrac + yfrac*gamma_cos + zfrac*beta_cos
+            ycom = yfrac*gamma_sin + zfrac*beta_term
+            zcom = zfrac * gamma_term
          else if (monoclinic) then
             xcom = xfrac + zfrac*beta_cos
             ycom = yfrac
             zcom = zfrac * beta_sin
-         else if (triclinic) then
-            xcom = xfrac + yfrac*gamma_cos + zfrac*beta_cos
-            ycom = yfrac*gamma_sin + zfrac*beta_term
-            zcom = zfrac * gamma_term
+         else
+            xcom = xfrac
+            ycom = yfrac
+            zcom = zfrac
          end if
 c
 c     translate coordinates via offset from center of mass

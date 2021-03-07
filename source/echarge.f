@@ -840,7 +840,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          e = fs * pchg(ii)**2
          ec = ec + e
@@ -1128,7 +1128,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          e = fs * pchg(ii)**2
          ec = ec + e
@@ -1383,7 +1383,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          e = fs * pchg(ii)**2
          ec = ec + e
@@ -1690,6 +1690,10 @@ c     U. Essmann, L. Perera, M. L Berkowitz, T. Darden, H. Lee and
 c     L. G. Pedersen, "A Smooth Particle Mesh Ewald Method", Journal
 c     of Chemical Physics, 103, 8577-8593 (1995)
 c
+c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
+c     10, 67-71 (1993)
+c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
 c
@@ -1775,7 +1779,7 @@ c
             expterm = exp(term) / denom
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2

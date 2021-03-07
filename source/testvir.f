@@ -101,9 +101,9 @@ c
       if (.not. use_bounds)  return
       eps = 0.000001d0
 c
-c     set the lattice type to the general triclinic case
+c     set prism lattice type to the general triclinic case
 c
-      if (.not. octahedron) then
+      if (.not. nonprism) then
          orthogonal = .false.
          monoclinic = .false.
          triclinic = .true.
@@ -169,7 +169,7 @@ c
             virn(i,j) = virn(j,i)
          end do
       end do
-      if (octahedron) then
+      if (nonprism) then
          write (iout,30)  virn(1,1),virn(2,2),virn(3,3)
    30    format (/,' Numerical Virial Diagonal :',8x,3f13.3)
 

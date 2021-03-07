@@ -83,13 +83,13 @@
                       distribution function for a liquid nitrogen box via
                       analysis of a 50ps MD trajectory
 
-      (17) SALT       convert sodium chloride asymmetric unit to the unit
+      (17) POLYALA    generate an extended conformation of capped alanine
+                      octapeptide, then use Monte Carlo Minimization with
+                      torsion moves to find the 3/10 helix global minimum
+
+      (18) SALT       convert sodium chloride asymmetric unit to the unit
                       cell, then minimize the crystal from the diffraction
                       structure using Ewald summation electrostatics
-
-      (18) TETRAALA   generate an extended conformation of capped alanine
-                      tetrapeptide, then use Monte Carlo Minimization with
-                      random torsional moves to find the global minimum
 
       (19) WATER      fit the electrostatic potential for an AMOEBA water
                       molecule to QM-derived potential (MP2/aug-cc-pVTZ)

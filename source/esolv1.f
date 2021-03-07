@@ -631,7 +631,7 @@ c
                   wterm = exp(-0.006d0*rb2/deform)
                   width = sterm / sqrt(deform+0.15d0*rb2*wterm)
                   erfterm = erf(width*fgb)
-                  term = width * exp(-(width*fgb)**2) / sqrtpi
+                  term = width * exp(-(width*fgb)**2) / rootpi
                   rterm = term * (2.0d0*r-0.5d0*r*expterm)/fgb
                   bterm = term * ((expterm*(1.0d0+0.25d0*r2/rb2)/fgb)
      &                              - (fgb*(width/sterm)**2) * wterm

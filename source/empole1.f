@@ -1723,7 +1723,7 @@ c
 c     compute the Ewald self-energy term over all the atoms
 c
       term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
+      fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,ii)
@@ -2131,7 +2131,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 5
                   bfac = dble(j+j-1)
@@ -2502,7 +2502,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 5
                   bfac = dble(j+j-1)
@@ -2919,7 +2919,7 @@ c
 c     compute the Ewald self-energy term over all the atoms
 c
       term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
+      fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,ii)
@@ -3338,7 +3338,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 5
                   bfac = dble(j+j-1)
@@ -3662,13 +3662,17 @@ c
 c     "emrecip1" evaluates the reciprocal space portion of particle
 c     mesh Ewald summation energy and gradient due to multipoles
 c
-c     literature reference:
+c     literature references:
 c
 c     C. Sagui, L. G. Pedersen and T. A. Darden, "Towards an Accurate
 c     Representation of Electrostatics in Classical Force Fields:
 c     Efficient Implementation of Multipolar Interactions in
 c     Biomolecular Simulations", Journal of Chemical Physics, 120,
 c     73-87 (2004)
+c
+c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
+c     10, 67-71 (1993)
 c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
@@ -3838,7 +3842,7 @@ c
             expterm = exp(term) / denom
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2

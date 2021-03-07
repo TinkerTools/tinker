@@ -16,12 +16,29 @@ c     "image" takes the components of pairwise distance between
 c     two points in a periodic box and converts to the components
 c     of the minimum image distance
 c
+c     literature reference:
+c
+c     U. K. Deiters, "Efficient Coding of the Minimum Image Convention",
+c     Zeitschrift fur Physikalische Chemie, 227, 345-352 (2013)
+c
+c     note the "do while" clause below can be written using the "nint"
+c     intrinsic, and the two forms give equivalent values:
+c
+c     do while (abs(xr) .gt. xbox2)
+c        xr = xr - sign(xbox,xr)    vs.  xr = xr - xbox*nint(xr/xbox)
+c     end do
+c
+c     which is faster depends on the specific machine and compiler
+c     combination, and other implementations are also possible
+c
 c
       subroutine image (xr,yr,zr)
       use boxes
       use cell
+      use math
       implicit none
       real*8 xr,yr,zr
+      real*8 corr
 c
 c
 c     for orthogonal lattice, find the desired image directly
@@ -37,9 +54,8 @@ c
             zr = zr - sign(zcell,zr)
          end do
 c
-c     for monoclinic lattice, convert "xr" and "zr" to
-c     fractional coordinates, find desired image and then
-c     translate fractional coordinates back to Cartesian
+c     for monoclinic lattice, convert x and z to fractional,
+c     find desired image, then translate back to Cartesian
 c
       else if (monoclinic) then
          zr = zr / beta_sin
@@ -56,9 +72,8 @@ c
          xr = xr + zr*beta_cos
          zr = zr * beta_sin
 c
-c     for triclinic lattice, convert pairwise components to
-c     fractional coordinates, find desired image and then
-c     translate fractional coordinates back to Cartesian
+c     for triclinic lattice, convert to fractional coordinates,
+c     find image, then translate fractional back to Cartesian
 c
       else if (triclinic) then
          zr = zr / gamma_term
@@ -77,24 +92,28 @@ c
          yr = yr*gamma_sin + zr*beta_term
          zr = zr * gamma_term
 c
-c     for truncated octahedron, use orthogonal box equations,
-c     then perform extra tests to remove corner pieces
+c     for truncated octahedron, remove the corner pieces
 c
       else if (octahedron) then
-         do while (abs(xr) .gt. xbox2)
-            xr = xr - sign(xbox,xr)
-         end do
-         do while (abs(yr) .gt. ybox2)
-            yr = yr - sign(ybox,yr)
-         end do
-         do while (abs(zr) .gt. zbox2)
-            zr = zr - sign(zbox,zr)
-         end do
-         if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
-            xr = xr - sign(xbox2,xr)
-            yr = yr - sign(ybox2,yr)
-            zr = zr - sign(zbox2,zr)
-         end if
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - zbox*nint(zr/zbox)
+         corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
+         xr = xr - sign(corr,xr)
+         yr = yr - sign(corr,yr)
+         zr = zr - sign(corr,zr)
+c
+c     for rhombic dodecahedron, align along the x- and y-axes
+c
+      else if (dodecadron) then
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - root2*zbox*nint(zr/(zbox*root2))
+         corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
+     &                        +abs(root2*zr/zbox))
+         xr = xr - sign(corr,xr)
+         yr = yr - sign(corr,yr)
+         zr = zr - sign(corr,zr)*root2
       end if
       return
       end
@@ -115,10 +134,12 @@ c
       subroutine imager (xr,yr,zr,i)
       use boxes
       use cell
+      use math
       implicit none
       integer i
       real*8 xr,yr,zr
       real*8 xmove,ymove,zmove
+      real*8 corr
 c
 c
 c     set the distance to translate along each cell axis
@@ -143,9 +164,8 @@ c
             zr = zr - sign(zcell,zr)
          end do
 c
-c     for monoclinic lattice, convert "xr" and "zr" to
-c     fractional coordinates, find desired image and then
-c     translate fractional coordinates back to Cartesian
+c     for monoclinic lattice, convert x and z to fractional,
+c     find desired image, then translate back to Cartesian
 c
       else if (monoclinic) then
          zr = zr / beta_sin
@@ -165,9 +185,8 @@ c
          xr = xr + zr*beta_cos
          zr = zr * beta_sin
 c
-c     for triclinic lattice, convert pairwise components to
-c     fractional coordinates, find desired image and then
-c     translate fractional coordinates back to Cartesian
+c     for triclinic lattice, convert to fractional coordinates,
+c     find image, then translate fractional back to Cartesian
 c
       else if (triclinic) then
          zr = zr / gamma_term
@@ -189,24 +208,28 @@ c
          yr = yr*gamma_sin + zr*beta_term
          zr = zr * gamma_term
 c
-c     for truncated octahedron, use orthogonal box equations,
-c     then perform extra tests to remove corner pieces
+c     for truncated octahedron, remove the corner pieces
 c
       else if (octahedron) then
-         do while (abs(xr) .gt. xbox2)
-            xr = xr - sign(xbox,xr)
-         end do
-         do while (abs(yr) .gt. ybox2)
-            yr = yr - sign(ybox,yr)
-         end do
-         do while (abs(zr) .gt. zbox2)
-            zr = zr - sign(zbox,zr)
-         end do
-         if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
-            xr = xr - sign(xbox2,xr)
-            yr = yr - sign(ybox2,yr)
-            zr = zr - sign(zbox2,zr)
-         end if
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - zbox*nint(zr/zbox)
+         corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
+         xr = xr - sign(corr,xr)
+         yr = yr - sign(corr,yr)
+         zr = zr - sign(corr,zr)
+c
+c     for rhombic dodecahedron, align along the x- and y-axes
+c
+      else if (dodecadron) then
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - root2*zbox*nint(zr/(zbox*root2))
+         corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
+     &                        +abs(root2*zr/zbox))
+         xr = xr - sign(corr,xr)
+         yr = yr - sign(corr,yr)
+         zr = zr - sign(corr,zr)*root2
       end if
       return
       end
@@ -229,8 +252,10 @@ c
 c
       subroutine imagen (xr,yr,zr)
       use boxes
+      use math
       implicit none
       real*8 xr,yr,zr
+      real*8 corr
 c
 c
 c     for orthogonal lattice, find the desired image directly
@@ -243,7 +268,8 @@ c
          if (yr .gt. ybox2)  yr = yr - ybox
          if (zr .gt. zbox2)  zr = zr - zbox
 c
-c     for monoclinic lattice, convert "xr" and "zr" specially
+c     for monoclinic lattice, convert x and z to fractional,
+c     find desired image, then translate back to Cartesian
 c
       else if (monoclinic) then
          zr = zr / beta_sin
@@ -255,7 +281,8 @@ c
          xr = xr + zr*beta_cos
          zr = zr * beta_sin
 c
-c     for triclinic lattice, use general conversion equations
+c     for triclinic lattice, convert to fractional coordinates,
+c     find image, then translate fractional back to Cartesian
 c
       else if (triclinic) then
          zr = zr / gamma_term
@@ -271,14 +298,25 @@ c
 c     for truncated octahedron, remove the corner pieces
 c
       else if (octahedron) then
-         if (abs(xr) .gt. xbox2)  xr = xr - sign(xbox,xr)
-         if (abs(yr) .gt. ybox2)  yr = yr - sign(ybox,yr)
-         if (abs(zr) .gt. zbox2)  zr = zr - sign(zbox,zr)
-         if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
-            xr = xr - sign(xbox2,xr)
-            yr = yr - sign(ybox2,yr)
-            zr = zr - sign(zbox2,zr)
-         end if
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - zbox*nint(zr/zbox)
+         corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
+         xr = xr - sign(corr,xr)
+         yr = yr - sign(corr,yr)
+         zr = zr - sign(corr,zr)
+c
+c     for rhombic dodecahedron, align along the x- and y-axes
+c
+      else if (dodecadron) then
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - root2*zbox*nint(zr/(zbox*root2))
+         corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
+     &                        +abs(root2*zr/zbox))
+         xr = xr - sign(corr,xr)
+         yr = yr - sign(corr,yr)
+         zr = zr - sign(corr,zr)*root2
       end if
       return
       end

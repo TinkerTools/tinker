@@ -1729,7 +1729,7 @@ c
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
                erfcterm = erfcterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if

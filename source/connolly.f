@@ -2888,7 +2888,7 @@ c
          vect2(k) = pav(k,3) - pav(k,1)
       end do
       call vcross (vect1,vect2,vect3)
-      prism = height * vect3(3) / 2.0d0
+      prism = 0.5d0 * height * vect3(3)
       return
       end
 c

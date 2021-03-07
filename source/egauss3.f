@@ -1204,7 +1204,7 @@ c
                         expterm2 = 0.0d0
                      end if
                      term = broot * (expterm-expterm2)
-                     term = term + sqrtpi*b(j)*rik
+                     term = term + rootpi*b(j)*rik
      &                         * (erf(broot*(rik+width))
      &                           +erf(broot*(width-rik)))
                      e = e + term*a(j)/(b(j)*b(j)*broot)

@@ -1,3 +1,0 @@
-../bin/protein < tetraala.dat
-../bin/monte tetraala 500 t 0 180.0 500.0 0.01
-rm tetraala.xyz* tetraala.int* tetraala.seq* tetraala.arc*

@@ -97,10 +97,10 @@ c
       call set_bound_data (polycut,polycut2,use_bounds,use_replica,
      &                     use_polymer)
       call set_boxes_data (xbox,ybox,zbox,alpha,beta,gamma,xbox2,
-     &                     ybox2,zbox2,box34,volbox,beta_sin,beta_cos,
+     &                     ybox2,zbox2,box23,volbox,beta_sin,beta_cos,
      &                     gamma_sin,gamma_cos,beta_term,gamma_term,
      &                     lvec,recip,orthogonal,monoclinic,triclinic,
-     &                     octahedron,spacegrp)
+     &                     octahedron,dodecadron,nonprism,spacegrp)
       call set_cell_data (ncell,icell,xcell,ycell,zcell,
      &                    xcell2,ycell2,zcell2)
       call set_charge_data (nion,iion,jion,kion,pchg)

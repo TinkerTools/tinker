@@ -21,6 +21,7 @@ c
 c
       program analyze
       use atoms
+      use boxes
       use files
       use inform
       use iounit
@@ -66,7 +67,7 @@ c
      &           /,' List of the Large Individual Interactions [L]',
      &           /,' Details for All Individual Interactions [D]',
      &           /,' Electrostatic Moments and Principle Axes [M]',
-     &           /,' Internal Virial, dE/dV Values & Pressure [V]',
+     &           /,' Internal Virial & Instantaneous Pressure [V]',
      &           /,' Connectivity Lists for Each of the Atoms [C]')
    20    continue
          write (iout,30)
@@ -334,6 +335,7 @@ c
          if (monoclinic)  value = 'MONOCLINIC'
          if (triclinic)  value = 'TRICLINIC'
          if (octahedron)  value = 'TRUNCATED OCTAHEDRON'
+         if (dodecadron)  value = 'RHOMBIC DODECAHEDRON'
          call justify (value)
          write (iout,30)  xbox,ybox,zbox,alpha,beta,gamma,volbox,value
    30    format (/,' Periodic Boundary Box :',
@@ -872,6 +874,7 @@ c
       subroutine viriyze
       use atoms
       use bath
+      use bound
       use boxes
       use iounit
       use units
@@ -889,13 +892,15 @@ c
 c
 c     compute the dE/dV value and construct isotropic pressure
 c
-      temp = kelvin
-      if (temp .eq. 0.0d0)  temp = 298.0d0
-      dedv = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
-      pres = prescon * (dble(n)*gasconst*temp/volbox-dedv)
-      write (iout,20)  nint(temp),pres
-   20 format (/,' Pressure (Temp',i4,' K) :',12x,f13.3,
-     &           ' Atmospheres')
+      if (use_bounds) then
+         temp = kelvin
+         if (temp .eq. 0.0d0)  temp = 298.0d0
+         dedv = (vir(1,1)+vir(2,2)+vir(3,3)) / (3.0d0*volbox)
+         pres = prescon * (dble(n)*gasconst*temp/volbox-dedv)
+         write (iout,20)  nint(temp),pres
+   20    format (/,' Pressure (Temp',i4,' K) :',12x,f13.3,
+     &              ' Atmospheres')
+      end if
       return
       end
 c

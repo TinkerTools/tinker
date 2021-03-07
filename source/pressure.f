@@ -21,6 +21,7 @@ c
       use bath
       use boxes
       use bound
+      use math
       use units
       use virial
       implicit none
@@ -47,7 +48,7 @@ c
 c
 c     set isotropic pressure to the average of tensor diagonal
 c
-      pres = (stress(1,1)+stress(2,2)+stress(3,3)) / 3.0d0
+      pres = third * (stress(1,1)+stress(2,2)+stress(3,3))
 c
 c     use the desired barostat to maintain constant pressure
 c
@@ -128,9 +129,8 @@ c
       integer start,stop
       real*8 epot,temp,term
       real*8 energy,random
-      real*8 kt,expterm
-      real*8 third,weigh
-      real*8 step,scale
+      real*8 expterm,weigh
+      real*8 kt,step,scale
       real*8 eold,rnd6
       real*8 xcm,ycm,zcm
       real*8 vxcm,vycm,vzcm
@@ -160,7 +160,6 @@ c
 c     set constants and decide on type of trial box size change
 c
       if (dotrial) then
-         third = 1.0d0 / 3.0d0
          kt = gasconst * temp
          if (isothermal)  kt = gasconst * kelvin
          isotropic = .true.
@@ -592,9 +591,8 @@ c
       implicit none
       integer i,j,k
       integer start,stop
-      real*8 dt,pres
-      real*8 weigh,cosine
-      real*8 scale,third
+      real*8 dt,pres,weigh
+      real*8 cosine,scale
       real*8 xcm,xmove
       real*8 ycm,ymove
       real*8 zcm,zmove
@@ -607,7 +605,6 @@ c
 c     find the isotropic scale factor for constant pressure
 c
       if (.not. anisotrop) then
-         third = 1.0d0 / 3.0d0
          scale = (1.0d0 + (dt*compress/taupres)*(pres-atmsph))**third
 c
 c     modify the current periodic box dimension values
@@ -662,7 +659,7 @@ c
 c     find the anisotropic scale factors for constant pressure
 c
       else
-         scale = dt*compress / (3.0d0*taupres)
+         scale = third * dt * compress / taupres
          do i = 1, 3
             do j = 1, 3
                if (j. eq. i) then

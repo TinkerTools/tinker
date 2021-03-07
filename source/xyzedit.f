@@ -73,7 +73,7 @@ c
       call initial
       opened = .false.
       multi = .false.
-      nmode = 21
+      nmode = 23
       offset = 0
 c
 c     try to get a filename from the command line arguments
@@ -115,9 +115,9 @@ c
       write (iout,30)
    30 format (/,' The Tinker XYZ File Editing Utility Can :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
-     &        /,4x,'(2) Deletion of Individual Specified Atoms',
-     &        /,4x,'(3) Deletion of Specified Types of Atoms',
-     &        /,4x,'(4) Deletion of Atoms Outside Cutoff Range',
+     &        /,4x,'(2) Remove User Specified Individual Atoms',
+     &        /,4x,'(3) Remove User Specified Types of Atoms',
+     &        /,4x,'(4) Delete Inactive Atoms Beyond Cutoff Range',
      &        /,4x,'(5) Insertion of Individual Specified Atoms',
      &        /,4x,'(6) Replace Old Atom Type with a New Type',
      &        /,4x,'(7) Assign Connectivities for Linear Chain',
@@ -130,11 +130,13 @@ c
      &        /,3x,'(14) Translate and Rotate to Inertial Frame',
      &        /,3x,'(15) Move to Specified Rigid Body Coordinates',
      &        /,3x,'(16) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(17) Delete Molecules Outside of Periodic Box',
-     &        /,3x,'(18) Append a Second XYZ File to Current One',
-     &        /,3x,'(19) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(20) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(21) Place Monoatomic Ions around a Solute')
+     &        /,3x,'(17) Trim a Periodic Box to a Smaller Size',
+     &        /,3x,'(18) Make Truncated Octahedron from Cubic Box',
+     &        /,3x,'(19) Make Rhombic Dodecahedron from Cubic Box',
+     &        /,3x,'(20) Append a Second XYZ File to Current One',
+     &        /,3x,'(21) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(22) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(23) Place Monoatomic Ions around a Solute')
 c
 c     get the desired type of coordinate file modification
 c
@@ -861,14 +863,14 @@ c
          end do
          if (ynew .eq. 0.0d0)  ynew = xnew
          if (znew .eq. 0.0d0)  znew = xnew
+         call lattice
+         call molecule
          allocate (list(n))
          allocate (keep(n))
          do while (.not. abort)
             xbox = xnew
             ybox = ynew
             zbox = znew
-            call lattice
-            call molecule
             do i = 1, n
                list(i) = 1
             end do
@@ -936,9 +938,108 @@ c
          end if
       end if
 c
+c     trim cube to truncated octahedron or rhombic dodecahedron
+c
+      if (mode.eq.18 .or. mode.eq.19) then
+         call unitcell
+         dowhile (xbox .eq. 0.0d0)
+            write (iout,430)
+  430       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
+            read (input,440)  record
+  440       format (a240)
+            read (record,*,err=450,end=450)  xbox
+  450       continue
+         end do
+         if (mode .eq. 18)  octahedron = .true.
+         if (mode .eq. 19)  dodecadron = .true.
+         call molecule
+         allocate (list(n))
+         allocate (keep(n))
+         do while (.not. abort)
+            do i = 1, n
+               list(i) = 1
+            end do
+            do i = 1, nmol
+               init = imol(1,i)
+               stop = imol(2,i)
+               xcm = 0.0d0
+               ycm = 0.0d0
+               zcm = 0.0d0
+               do j = init, stop
+                  k = kmol(j)
+                  weigh = mass(k)
+                  xcm = xcm + x(k)*weigh
+                  ycm = ycm + y(k)*weigh
+                  zcm = zcm + z(k)*weigh
+               end do
+               weigh = molmass(i)
+               xcm = xcm / weigh
+               ycm = ycm / weigh
+               zcm = zcm / weigh
+               if (octahedron) then
+                  xcm = xcm - xbox*nint(xcm/xbox)
+                  ycm = ycm - ybox*nint(ycm/ybox)
+                  zcm = zcm - zbox*nint(zcm/zbox)
+                  if (abs(xcm)+abs(ycm)+abs(zcm) .gt. 0.75*xbox) then
+                     do j = init, stop
+                        k = kmol(j)
+                        list(k) = 0
+                     end do
+                  end if
+               else if (dodecadron) then
+                  xcm = xcm - xbox*nint(xcm/xbox)
+                  ycm = ycm - ybox*nint(ycm/ybox)
+                  zcm = zcm - root2*zbox*nint(zcm/(zbox*root2))
+                  if (abs(xcm)+abs(ycm)+abs(root2*zcm) .gt. xbox) then
+                     do j = init, stop
+                        k = kmol(j)
+                        list(k) = 0
+                     end do
+                  end if
+               end if
+            end do
+            k = 0
+            do i = 1, n
+               if (list(i) .ne. 0) then
+                  k = k + 1
+                  keep(k) = i
+                  list(i) = k
+               end if
+            end do
+            n = k
+            do k = 1, n
+               i = keep(k)
+               name(k) = name(i)
+               x(k) = x(i)
+               y(k) = y(i)
+               z(k) = z(i)
+               type(k) = type(i)
+               n12(k) = n12(i)
+               do j = 1, n12(k)
+                  i12(j,k) = list(i12(j,i))
+               end do
+            end do
+            call makeref (1)
+            call readxyz (ixyz)
+            if (.not. abort)  multi = .true.
+            if (multi) then
+               call makeref (2)
+               call getref (1)
+               call prtmod (imod,offset)
+               call getref (2)
+            end if
+         end do
+         deallocate (list)
+         deallocate (keep)
+         if (.not. multi) then
+            call getref (1)
+            goto 40
+         end if
+      end if
+c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 18) then
+      if (mode .eq. 20) then
          append = .false.
          do while (.not. abort)
             call makeref (1)
@@ -968,19 +1069,19 @@ c
 c
 c     create random box full of the current coordinates file
 c
-      if (mode .eq. 19) then
+      if (mode .eq. 21) then
          call makebox
       end if
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 20) then
+      if (mode .eq. 22) then
          call soak
       end if
 c
 c     replace random solvent molecules outside solute with ions
 c
-      if (mode .eq. 21) then
+      if (mode .eq. 23) then
          call molecule
          call addions
       end if
@@ -992,8 +1093,8 @@ c
       end if
       if (opened) then
          close (unit=imod)
-         write (iout,430)  modfile(1:trimtext(modfile))
-  430    format (/,' New Coordinates Written To :  ',a)
+         write (iout,460)  modfile(1:trimtext(modfile))
+  460    format (/,' New Coordinates Written To :  ',a)
       end if
       close (unit=ixyz)
 c

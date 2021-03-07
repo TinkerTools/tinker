@@ -81,8 +81,7 @@ c
       real*8 l2,l4,lr,l4r
       real*8 u2,u4,ur,u4r
       real*8 expterm,rmu
-      real*8 b0,gself
-      real*8 third,pi43
+      real*8 b0,gself,pi43
       real*8 bornmax
       real*8, allocatable :: roff(:)
       real*8, allocatable :: pos(:,:)
@@ -276,7 +275,6 @@ c
 c     get the Born radii via Grycuk's modified HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
-         third = 1.0d0 / 3.0d0
          pi43 = 4.0d0 * third * pi
          do i = 1, n
             rborn(i) = 0.0d0
@@ -333,7 +331,6 @@ c
 c     get the Born radii via analytical continuum electrostatics
 c
       else if (borntyp .eq. 'ACE') then
-         third = 1.0d0 / 3.0d0
          b0 = 0.0d0
          do i = 1, n
             b0 = b0 + vsolv(i)
@@ -463,8 +460,7 @@ c
       real*8 t1,t2,t3
       real*8 rbi,rbi2,vi
       real*8 ws2,s2ik,uik4
-      real*8 third,pi43
-      real*8 dbr,dborn
+      real*8 dbr,dborn,pi43
       real*8 expterm,rusum
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
@@ -716,7 +712,6 @@ c
 c     get Born radius chain rule components for Grycuk's HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
-         third = 1.0d0 / 3.0d0
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n

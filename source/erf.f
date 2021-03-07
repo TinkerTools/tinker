@@ -270,8 +270,8 @@ c
 c
 c     use two steps of Newton-Raphson correction to increase accuracy
 c
-      z = z - (erf(z) - x) / (2.0d0/sqrtpi * exp(-z*z))
-      z = z - (erf(z) - x) / (2.0d0/sqrtpi * exp(-z*z))
+      z = z - (erf(z) - x) / (2.0d0/rootpi * exp(-z*z))
+      z = z - (erf(z) - x) / (2.0d0/rootpi * exp(-z*z))
       erfinv = z
       return
       end

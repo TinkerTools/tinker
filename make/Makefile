@@ -1595,7 +1595,7 @@ action.o:
 active.o: atoms.o inform.o iounit.o keys.o usage.o
 alchemy.o: analyz.o atoms.o energi.o files.o inform.o iounit.o katoms.o mutant.o potent.o units.o usage.o
 align.o:
-alterchg.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o couple.o inform.o iounit.o math.o mplpot.o mpole.o mutant.o sizes.o
+alterchg.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o inform.o iounit.o math.o mplpot.o mpole.o mutant.o sizes.o
 analysis.o: analyz.o atoms.o energi.o group.o inter.o iounit.o limits.o potent.o vdwpot.o
 analyz.o:
 analyze.o: action.o analyz.o angang.o angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndstr.o bound.o boxes.o cflux.o charge.o chgpen.o chgpot.o chgtrn.o couple.o deriv.o dipole.o disp.o energi.o ewald.o fields.o files.o improp.o imptor.o inform.o inter.o iounit.o korbs.o ktrtor.o kvdws.o limits.o math.o molcul.o moment.o mplpot.o mpole.o opbend.o opdist.o output.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o repel.o solute.o strbnd.o strtor.o titles.o tors.o tortor.o units.o urey.o vdw.o vdwpot.o virial.o
@@ -1625,7 +1625,7 @@ bndstr.o:
 bonds.o: atmlst.o atoms.o bndstr.o couple.o iounit.o
 born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math.o pbstuf.o solpot.o solute.o virial.o
 bound.o:
-bounds.o: atomid.o atoms.o boxes.o molcul.o
+bounds.o: atomid.o atoms.o boxes.o math.o molcul.o
 boxes.o:
 bussi.o: atomid.o atoms.o bath.o boxes.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o units.o usage.o
 calendar.o:
@@ -1850,7 +1850,7 @@ hessrot.o: math.o omega.o zcoord.o
 hpmf.o:
 hybrid.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o charge.o couple.o dipole.o imptor.o inform.o iounit.o kangs.o katoms.o kbonds.o kchrge.o kdipol.o kitors.o kstbnd.o ksttor.o ktorsn.o kvdws.o math.o mutant.o strbnd.o strtor.o tors.o vdw.o vdwpot.o
 ielscf.o:
-image.o: boxes.o cell.o
+image.o: boxes.o cell.o math.o
 impose.o: align.o inform.o iounit.o
 improp.o:
 imptor.o:
@@ -2015,7 +2015,7 @@ pmestuf.o: atoms.o boxes.o charge.o chunks.o disp.o math.o mpole.o openmp.o pme.
 pmpb.o: iounit.o
 polar.o:
 polarize.o: atoms.o inform.o iounit.o molcul.o mpole.o polar.o polopt.o polpcg.o polpot.o potent.o units.o
-poledit.o: atomid.o atoms.o chgpen.o couple.o fields.o files.o inform.o iounit.o keys.o kpolr.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o ptable.o ring.o sizes.o units.o
+poledit.o: atomid.o atoms.o bndstr.o chgpen.o couple.o fields.o files.o inform.o iounit.o keys.o kpolr.o mplpot.o mpole.o polar.o polgrp.o polpot.o potent.o ptable.o ring.o sizes.o units.o
 polgrp.o:
 polopt.o:
 polpcg.o:
@@ -2129,7 +2129,7 @@ torsions.o: atoms.o bndstr.o couple.o iounit.o tors.o
 tortor.o:
 tree.o:
 trimtext.o:
-unitcell.o: bound.o boxes.o iounit.o keys.o
+unitcell.o: bound.o boxes.o keys.o math.o
 units.o:
 uprior.o:
 urey.o:

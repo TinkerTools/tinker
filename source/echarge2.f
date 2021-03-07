@@ -905,9 +905,9 @@ c
 c     compute chain rule terms for Hessian matrix elements
 c
                de = -fik * ((erfterm+scale)/rb2
-     &                        + (2.0d0*aewald/sqrtpi)*expterm/r)
+     &                        + (2.0d0*aewald/rootpi)*expterm/r)
                d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scale
-     &                  + (4.0d0*fik*aewald**3/sqrtpi)*expterm
+     &                  + (4.0d0*fik*aewald**3/rootpi)*expterm
      &                  + 2.0d0*(fik/(rb*rb2))*scale
 c
 c     form the individual Hessian element components
@@ -983,9 +983,9 @@ c
 c     compute chain rule terms for Hessian matrix elements
 c
                   de = -fik * ((erfterm+scale)/rb2
-     &                    + (2.0d0*aewald/sqrtpi)*exp(-rew**2)/r)
+     &                    + (2.0d0*aewald/rootpi)*exp(-rew**2)/r)
                   d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scale
-     &                     + (4.0d0*fik*aewald**3/sqrtpi)*expterm
+     &                     + (4.0d0*fik*aewald**3/rootpi)*expterm
      &                     + 2.0d0*(fik/(rb*rb2))*scale
 c
 c     form the individual Hessian element components
@@ -1158,9 +1158,9 @@ c
 c     compute chain rule terms for Hessian matrix elements
 c
                de = -fik * ((erfterm+scale)/rb2
-     &                        + (2.0d0*aewald/sqrtpi)*expterm/r)
+     &                        + (2.0d0*aewald/rootpi)*expterm/r)
                d2e = -2.0d0*de/rb + 2.0d0*(fik/(rb*rb2))*scale
-     &                  + (4.0d0*fik*aewald**3/sqrtpi)*expterm
+     &                  + (4.0d0*fik*aewald**3/rootpi)*expterm
      &                  + 2.0d0*(fik/(rb*rb2))*scale
 c
 c     form the individual Hessian element components
@@ -1336,7 +1336,7 @@ c
                   expterm = -rb2 * width2
                   if (expterm .gt. expcut) then
                      expterm = 2.0d0*fik*width*exp(expterm)
-     &                            / (sqrtpi*rb)
+     &                            / (rootpi*rb)
                   else
                      expterm = 0.0d0
                   end if
@@ -1352,7 +1352,7 @@ c
                   expterm = -rb2 * width2
                   if (expterm .gt. expcut) then
                      expterm = 2.0d0*fik*width*exp(expterm)
-     &                            / (sqrtpi*rb)
+     &                            / (rootpi*rb)
                   else
                      expterm = 0.0d0
                   end if

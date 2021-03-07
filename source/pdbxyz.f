@@ -153,6 +153,10 @@ c
                call getnumb (pdbres(i),type(i),next)
             end do
 c
+c     add hydrogen atoms to satisfy unfilled valences
+c
+
+c
 c     perform dynamic allocation of some local arrays
 c
             allocate (row(n))
@@ -162,21 +166,48 @@ c
             do i = 1, n
                it = type(i)
                if (it .eq. 0) then
+                  atomic(i) = 0
                   letter = name(i)(1:1)
                   call upcase (letter)
                   if (letter .eq. 'H') then
                      row(i) = 1
+                     atomic(i) = 1
+                  else if (letter .eq. 'B') then
+                     row(i) = 2
+                     atomic(i) = 5
+                     if (name(i)(2:2) .eq. 'R') then
+                        row(i) = 5
+                        atomic(i) = 35
+                     end if
                   else if (letter .eq. 'C') then
                      row(i) = 2
-                     if (name(i)(2:2) .eq. 'L')  row(i) = 3
+                     atomic(i) = 6
+                     if (name(i)(2:2) .eq. 'L') then
+                        row(i) = 3
+                        atomic(i) = 17
+                     end if
                   else if (letter .eq. 'N') then
                      row(i) = 2
+                     atomic(i) = 7
                   else if (letter .eq. 'O') then
                      row(i) = 2
+                     atomic(i) = 8
+                  else if (letter .eq. 'F') then
+                     row(i) = 2
+                     atomic(i) = 9
                   else if (letter .eq. 'P') then
                      row(i) = 3
+                     atomic(i) = 15
                   else if (letter .eq. 'S') then
                      row(i) = 3
+                     atomic(i) = 16
+                     if (name(i)(2:2) .eq. 'I') then
+                        row(i) = 3
+                        atomic(i) = 14
+                     end if
+                  else if (letter .eq. 'I') then
+                     row(i) = 5
+                     atomic(i) = 53
                   else
                      row(i) = 0
                   end if
@@ -228,6 +259,12 @@ c
 c     perform deallocation of some local arrays
 c
             deallocate (row)
+c
+c     assign generic atom types if currently unassigned
+c
+            do i = 1, n
+               if (it .eq. 0)  type(i) = 10*atomic(i) + n12(i)
+            end do      
          end if
 c
 c     sort the attached atom lists into ascending order

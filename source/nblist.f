@@ -103,7 +103,7 @@ c     perform a complete list build instead of an update
 c
       if (dovlst) then
          dovlst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call vbuild
          else
             call vlight
@@ -475,7 +475,7 @@ c     perform a complete list build instead of an update
 c
       if (dodlst) then
          dodlst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call dbuild
          else
             call dlight
@@ -851,7 +851,7 @@ c     perform a complete list build instead of an update
 c
       if (doclst) then
          doclst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call cbuild
          else
             call clight
@@ -1227,7 +1227,7 @@ c     perform a complete list build instead of an update
 c
       if (domlst) then
          domlst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call mbuild
          else
             call mlight
@@ -1603,7 +1603,7 @@ c     perform a complete list build instead of an update
 c
       if (doulst) then
          doulst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call ubuild
          else
             call ulight

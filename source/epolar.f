@@ -932,7 +932,7 @@ c
 c     compute the Ewald self-energy term over all the atoms
 c
       term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
+      fterm = -f * aewald / rootpi
       do i = 1, npole
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1166,7 +1166,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 3
                   bfac = dble(j+j-1)
@@ -1400,7 +1400,7 @@ c
                      alsq2 = 2.0d0 * aewald**2
                      alsq2n = 0.0d0
                      if (aewald .gt. 0.0d0) then
-                        alsq2n = 1.0d0 / (sqrtpi*aewald)
+                        alsq2n = 1.0d0 / (rootpi*aewald)
                      end if
                      exp2a = exp(-ralpha**2)
                      do j = 1, 3
@@ -1599,7 +1599,7 @@ c
 c     compute the Ewald self-energy term over all the atoms
 c
       term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
+      fterm = -f * aewald / rootpi
       do i = 1, npole
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1845,7 +1845,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 3
                   bfac = dble(j+j-1)
@@ -2228,7 +2228,7 @@ c
                expterm = exp(term) / denom
                if (.not. use_bounds) then
                   expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-               else if (octahedron) then
+               else if (nonprism) then
                   if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                end if
             end if

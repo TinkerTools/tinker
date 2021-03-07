@@ -47,7 +47,7 @@ c
       scale(1) = bn(0)
       alsq2 = 2.0d0 * aewald**2
       alsq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+      if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
       exp2a = exp(-ralpha**2)
       do i = 1, maxi
          bfac = dble(2*i-1)

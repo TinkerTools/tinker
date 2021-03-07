@@ -540,7 +540,7 @@ c
                width = deform + 0.15d0*rb2*exp(-0.006d0*rb2/deform)
                width = sterm / sqrt(width)
                erfterm = erf(width*fgb)
-               expterm = width * exp(-(width*fgb)**2) / sqrtpi
+               expterm = width * exp(-(width*fgb)**2) / rootpi
                de = de * (erfterm-2.0d0*expterm*fgb)
                d2e = d2e*erfterm + 2.0d0*fik*expterm
      &                  * (d2fgb/fgb-2.0d0*dfgb2*(1.0d0/fgb2+width**2))

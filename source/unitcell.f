@@ -19,8 +19,8 @@ c
       subroutine unitcell
       use bound
       use boxes
-      use iounit
       use keys
+      use math
       implicit none
       integer i,next
       real*8 boxmax
@@ -41,6 +41,8 @@ c
       monoclinic = .false.
       triclinic = .false.
       octahedron = .false.
+      dodecadron = .false.
+      nonprism = .false.
       spacegrp = '          '
       nosymm = .false.
 c
@@ -72,6 +74,8 @@ c
             if (gamma .eq. 0.0d0)  read (string,*,err=10,end=10)  gamma
          else if (keyword(1:11) .eq. 'OCTAHEDRON ') then
             octahedron = .true.
+         else if (keyword(1:13) .eq. 'DODECAHEDRON ') then
+            dodecadron = .true.
          else if (keyword(1:11) .eq. 'SPACEGROUP ') then
             call getword (record,spacegrp,next)
          else if (keyword(1:11) .eq. 'NOSYMMETRY ') then
@@ -109,19 +113,22 @@ c
          end if
       end if
 c
-c     check for proper use of truncated octahedron boundary
+c     check for proper use of non-prism periodic boundaries
 c
-      if (octahedron) then
-         if (xbox.eq.ybox .and. xbox.eq.zbox .and. orthogonal) then
-            orthogonal = .false.
-            monoclinic = .false.
-            triclinic = .false.
-         else
-            write (iout,20)
-   20       format (/,' UNITCELL  --  Truncated Octahedron',
-     &                 ' Incompatible with Defined Cell')
-            call fatal
-         end if
+      if (octahedron .or. dodecadron) then
+         orthogonal = .false.
+         monoclinic = .false.
+         triclinic = .false.
+         nonprism = .true.
+         ybox = xbox
+         if (octahedron) then
+            zbox = xbox
+         else if (dodecadron) then
+            zbox = xbox * root2
+         end if         
+         alpha = 90.0d0
+         beta = 90.0d0
+         gamma = 90.0d0
       end if
       return
       end

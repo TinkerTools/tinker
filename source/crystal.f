@@ -23,7 +23,6 @@ c
       use boxes
       use iounit
       use files
-      use math
       implicit none
       integer maxspace
       parameter (maxspace=92)
@@ -696,11 +695,11 @@ c
 c
       subroutine symmetry (spacegrp)
       use atoms
+      use math
       implicit none
       integer i,j,k
       integer ii,jj,kk
       integer nsym,noff
-      real*8 one3,two3
       real*8 one6,five6
       real*8 xoff,yoff,zoff
       character*10 spacegrp
@@ -3183,8 +3182,6 @@ c
       else if (spacegrp .eq. 'P31     ') then
          nsym = 3
          noff = 1
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
@@ -3196,11 +3193,11 @@ c
                else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
-                  z(jj) = one3 + z(j)
+                  z(jj) = third + z(j)
                else if (i .eq. 3) then
                   x(jj) = y(j) - x(j)
                   y(jj) = -x(j)
-                  z(jj) = two3 + z(j)
+                  z(jj) = third2 + z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -3211,8 +3208,6 @@ c
       else if (spacegrp .eq. 'P32     ') then
          nsym = 3
          noff = 1
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
@@ -3224,11 +3219,11 @@ c
                else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
-                  z(jj) = two3 + z(j)
+                  z(jj) = third2 + z(j)
                else if (i .eq. 3) then
                   x(jj) = y(j) - x(j)
                   y(jj) = -x(j)
-                  z(jj) = one3 + z(j)
+                  z(jj) = third + z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -3239,8 +3234,6 @@ c
       else if (spacegrp .eq. 'R3      ') then
          nsym = 3
          noff = 3
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * noff * n
             do k = 1, noff
@@ -3250,13 +3243,13 @@ c
                   yoff = 0.0d0
                   zoff = 0.0d0
                else if (k .eq. 2) then
-                  xoff = two3
-                  yoff = one3
-                  zoff = one3
+                  xoff = third2
+                  yoff = third
+                  zoff = third
                else if (k .eq. 3) then
-                  xoff = one3
-                  yoff = two3
-                  zoff = two3
+                  xoff = third
+                  yoff = third2
+                  zoff = third2
                end if
                do j = 1, n
                   jj = j + kk
@@ -3321,8 +3314,6 @@ c
 c     else if (spacegrp .eq. 'R3(-)   ') then
 c        nsym = 6
 c        noff = 3
-c        one3 = 1.0d0 / 3.0d0
-c        two3 = 2.0d0 / 3.0d0
 c        do i = 1, nsym
 c           ii = (i-1) * noff * n
 c           do k = 1, noff
@@ -3332,13 +3323,13 @@ c                 xoff = 0.0d0
 c                 yoff = 0.0d0
 c                 zoff = 0.0d0
 c              else if (k .eq. 2) then
-c                 xoff = two3
-c                 yoff = one3
-c                 zoff = one3
+c                 xoff = third2
+c                 yoff = third
+c                 zoff = third
 c              else if (k .eq. 3) then
-c                 xoff = one3
-c                 yoff = two3
-c                 zoff = two3
+c                 xoff = third
+c                 yoff = third2
+c                 zoff = third2
 c              end if
 c              do j = 1, n
 c                 jj = j + kk
@@ -3415,8 +3406,6 @@ c
       else if (spacegrp .eq. 'P3121   ') then
          nsym = 6
          noff = 1
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
@@ -3428,11 +3417,11 @@ c
                else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
-                  z(jj) = one3 + z(j)
+                  z(jj) = third + z(j)
                else if (i .eq. 3) then
                   x(jj) = y(j) - x(j)
                   y(jj) = -x(j)
-                  z(jj) = two3 + z(j)
+                  z(jj) = third2 + z(j)
                else if (i .eq. 4) then
                   x(jj) = y(j)
                   y(jj) = x(j)
@@ -3440,11 +3429,11 @@ c
                else if (i .eq. 5) then
                   x(jj) = x(j) - y(j)
                   y(jj) = -y(j)
-                  z(jj) = two3 - z(j)
+                  z(jj) = third2 - z(j)
                else if (i .eq. 6) then
                   x(jj) = -x(j)
                   y(jj) = y(j) - x(j)
-                  z(jj) = one3 - z(j)
+                  z(jj) = third - z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -3455,8 +3444,6 @@ c
       else if (spacegrp .eq. 'P3221   ') then
          nsym = 6
          noff = 1
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * n
             do j = 1, n
@@ -3468,11 +3455,11 @@ c
                else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
-                  z(jj) = two3 + z(j)
+                  z(jj) = third2 + z(j)
                else if (i .eq. 3) then
                   x(jj) = y(j) - x(j)
                   y(jj) = -x(j)
-                  z(jj) = one3 + z(j)
+                  z(jj) = third + z(j)
                else if (i .eq. 4) then
                   x(jj) = y(j)
                   y(jj) = x(j)
@@ -3480,11 +3467,11 @@ c
                else if (i .eq. 5) then
                   x(jj) = x(j) - y(j)
                   y(jj) = -y(j)
-                  z(jj) = one3 - z(j)
+                  z(jj) = third - z(j)
                else if (i .eq. 6) then
                   x(jj) = -x(j)
                   y(jj) = y(j) - x(j)
-                  z(jj) = two3 - z(j)
+                  z(jj) = third2 - z(j)
                end if
                call cellatom (jj,j)
             end do
@@ -3495,8 +3482,6 @@ c
       else if (spacegrp .eq. 'R3m     ') then
          nsym = 6
          noff = 3
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * noff * n
             do k = 1, noff
@@ -3506,13 +3491,13 @@ c
                   yoff = 0.0d0
                   zoff = 0.0d0
                else if (k .eq. 2) then
-                  xoff = two3
-                  yoff = one3
-                  zoff = one3
+                  xoff = third2
+                  yoff = third
+                  zoff = third
                else if (k .eq. 3) then
-                  xoff = one3
-                  yoff = two3
-                  zoff = two3
+                  xoff = third
+                  yoff = third2
+                  zoff = third2
                end if
                do j = 1, n
                   jj = j + kk
@@ -3551,8 +3536,6 @@ c
       else if (spacegrp .eq. 'R3c     ') then
          nsym = 6
          noff = 3
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * noff * n
             do k = 1, noff
@@ -3562,13 +3545,13 @@ c
                   yoff = 0.0d0
                   zoff = 0.0d0
                else if (k .eq. 2) then
-                  xoff = two3
-                  yoff = one3
-                  zoff = one3
+                  xoff = third2
+                  yoff = third
+                  zoff = third
                else if (k .eq. 3) then
-                  xoff = one3
-                  yoff = two3
-                  zoff = two3
+                  xoff = third
+                  yoff = third2
+                  zoff = third2
                end if
                do j = 1, n
                   jj = j + kk
@@ -3731,8 +3714,6 @@ c
       else if (spacegrp .eq. 'R3(-)c  ') then
          nsym = 12
          noff = 3
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          do i = 1, nsym
             ii = (i-1) * noff * n
             do k = 1, noff
@@ -3742,13 +3723,13 @@ c
                   yoff = 0.0d0
                   zoff = 0.0d0
                else if (k .eq. 2) then
-                  xoff = two3
-                  yoff = one3
-                  zoff = one3
+                  xoff = third2
+                  yoff = third
+                  zoff = third
                else if (k .eq. 3) then
-                  xoff = one3
-                  yoff = two3
-                  zoff = two3
+                  xoff = third
+                  yoff = third2
+                  zoff = third2
                end if
                do j = 1, n
                   jj = j + kk
@@ -3811,8 +3792,6 @@ c
       else if (spacegrp .eq. 'P61     ') then
          nsym = 6
          noff = 1
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          one6 = 1.0d0 / 6.0d0
          five6 = 5.0d0 / 6.0d0
          do i = 1, nsym
@@ -3826,11 +3805,11 @@ c
                else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
-                  z(jj) = one3 + z(j)
+                  z(jj) = third + z(j)
                else if (i .eq. 3) then
                   x(jj) = y(j) - x(j)
                   y(jj) = -x(j)
-                  z(jj) = two3 + z(j)
+                  z(jj) = third2 + z(j)
                else if (i .eq. 4) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)
@@ -3853,8 +3832,6 @@ c
       else if (spacegrp .eq. 'P65     ') then
          nsym = 6
          noff = 1
-         one3 = 1.0d0 / 3.0d0
-         two3 = 2.0d0 / 3.0d0
          one6 = 1.0d0 / 6.0d0
          five6 = 5.0d0 / 6.0d0
          do i = 1, nsym
@@ -3868,11 +3845,11 @@ c
                else if (i .eq. 2) then
                   x(jj) = -y(j)
                   y(jj) = x(j) - y(j)
-                  z(jj) = two3 + z(j)
+                  z(jj) = third2 + z(j)
                else if (i .eq. 3) then
                   x(jj) = y(j) - x(j)
                   y(jj) = -x(j)
-                  z(jj) = one3 + z(j)
+                  z(jj) = third + z(j)
                else if (i .eq. 4) then
                   x(jj) = -x(j)
                   y(jj) = -y(j)

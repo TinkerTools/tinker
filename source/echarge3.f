@@ -1062,7 +1062,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          i = iion(ii)
          e = fs * pchg(ii)**2
@@ -1442,7 +1442,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          i = iion(ii)
          e = fs * pchg(ii)**2
@@ -1770,7 +1770,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          i = iion(ii)
          e = fs * pchg(ii)**2

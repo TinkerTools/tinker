@@ -61,12 +61,12 @@ c
          end if
       end if
 c
-c     truncated octahedron periodicity is not handled at present
+c     non-prism periodic cell is not handled at present
 c
       if (use_bounds) then
-         if (octahedron) then
+         if (nonprism) then
             write (iout,20)
-   20       format (/,' LIGHTS  --  Truncated Octahedron not',
+   20       format (/,' LIGHTS  --  Non-Prism Cell is not',
      &                 ' Supported by Method of Lights')
             call fatal
          end if

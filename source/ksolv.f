@@ -809,8 +809,8 @@ c
 c     calculate the pairwise parameters for the ACE method
 c
          c1 = 4.0d0 / (3.0d0*pi)
-         c2 = 77.0d0 * pi * sqrttwo / 512.0d0
-         c3 = 2.0d0 * pi * sqrtpi
+         c2 = 77.0d0 * pi * root2 / 512.0d0
+         c3 = 2.0d0 * pi * rootpi
          pi2 = 1.0d0 / (pi*pi)
          do i = 1, n
             ic = class(i)

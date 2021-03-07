@@ -3983,7 +3983,7 @@ c
 c
 c     compute the Ewald self-energy torque and virial terms
 c
-      term = (4.0d0/3.0d0) * f * aewald**3 / sqrtpi
+      term = (4.0d0/3.0d0) * f * aewald**3 / rootpi
       do ii = 1, npole
          i = ipole(ii)
          dix = rpole(2,ii)
@@ -4492,7 +4492,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 4
                   bfac = dble(j+j-1)
@@ -5681,7 +5681,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 4
                   bfac = dble(j+j-1)
@@ -6876,7 +6876,7 @@ c
 c
 c     compute the Ewald self-energy torque and virial terms
 c
-      term = (4.0d0/3.0d0) * f * aewald**3 / sqrtpi
+      term = (4.0d0/3.0d0) * f * aewald**3 / rootpi
       do ii = 1, npole
          i = ipole(ii)
          dix = rpole(2,ii)
@@ -7399,7 +7399,7 @@ c
                bn(0) = erfc(ralpha) / r
                alsq2 = 2.0d0 * aewald**2
                alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
+               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
                exp2a = exp(-ralpha**2)
                do j = 1, 4
                   bfac = dble(j+j-1)
@@ -8795,7 +8795,7 @@ c
                expterm = exp(term) / denom
                if (.not. use_bounds) then
                   expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-               else if (octahedron) then
+               else if (nonprism) then
                   if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                end if
                struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
@@ -9342,7 +9342,7 @@ c
             expterm = exp(term) / denom
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
             struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
@@ -9418,7 +9418,7 @@ c
                expterm = exp(term) / denom
                if (.not. use_bounds) then
                   expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-               else if (octahedron) then
+               else if (nonprism) then
                   if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                end if
                struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
@@ -9495,7 +9495,7 @@ c
                   expterm = exp(term) / denom
                   if (.not. use_bounds) then
                      expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-                  else if (octahedron) then
+                  else if (nonprism) then
                      if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                   end if
                   struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)
@@ -9568,7 +9568,7 @@ c
                   expterm = exp(term) / denom
                   if (.not. use_bounds) then
                      expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-                  else if (octahedron) then
+                  else if (nonprism) then
                      if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                   end if
                   struc2 = qgrid(1,k1,k2,k3)*qgrip(1,k1,k2,k3)

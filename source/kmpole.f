@@ -534,10 +534,10 @@ c
          spole(3,i) = pole(2,i)
          spole(4,i) = pole(3,i)
          spole(5,i) = pole(13,i)
-         spole(6,i) = 2.0d0 * sqrtthree * pole(7,i)
-         spole(7,i) = 2.0d0 * sqrtthree * pole(10,i)
-         spole(8,i) = sqrtthree * (pole(5,i)-pole(9,i))
-         spole(9,i) = 2.0d0 * sqrtthree * pole(6,i)
+         spole(6,i) = 2.0d0 * root3 * pole(7,i)
+         spole(7,i) = 2.0d0 * root3 * pole(10,i)
+         spole(8,i) = root3 * (pole(5,i)-pole(9,i))
+         spole(9,i) = 2.0d0 * root3 * pole(6,i)
       end do
 c
 c     get the order of the multipole expansion at each site
