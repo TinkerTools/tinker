@@ -153,9 +153,9 @@ c
                call getnumb (pdbres(i),type(i),next)
             end do
 c
-c     add hydrogen atoms to satisfy unfilled valences
+c     add missing hydrogen atoms to satisfy empty valences
 c
-
+c           call addhydro
 c
 c     perform dynamic allocation of some local arrays
 c

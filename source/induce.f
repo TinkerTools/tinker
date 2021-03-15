@@ -2584,7 +2584,6 @@ c
       real*8 rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
-      real*8 erfc,bfac,exp2a
       real*8 ci,dix,diy,diz
       real*8 qixx,qiyy,qizz
       real*8 qixy,qixz,qiyz
@@ -2597,25 +2596,23 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 ralpha,aefac
-      real*8 aesq2,aesq2n
       real*8 pdi,pti,ddi
       real*8 pgamma
       real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7,scalek
+      real*8 dmp3,dmp5,dmp7
       real*8 dsc3,dsc5,dsc7
       real*8 psc3,psc5,psc7
-      real*8 bn(0:3),bcn(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpi(7),dmpk(7)
+      real*8 dmpe(7)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
-      external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -2623,9 +2620,6 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
-      aesq2 = 2.0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (rootpi*aewald)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2781,17 +2775,9 @@ c
                qkz = qkxz*xr + qkyz*yr + qkzz*zr
                qkr = qkx*xr + qky*yr + qkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
-               exp2a = exp(-ralpha**2)
-               aefac = aesq2n
-               do j = 1, 3
-                  bfac = dble(j+j-1)
-                  aefac = aesq2 * aefac
-                  bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-               end do
+               call dampewald (7,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
@@ -2824,37 +2810,37 @@ c
                      end if
                   end if
                   scalek = dscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fid(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fid(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fid(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkd(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkd(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkd(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*scale3)*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*scale5)*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*scale7)*rr7
+                  fid(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fid(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fid(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkd(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkd(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkd(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
                   scalek = pscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fip(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fip(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fip(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkp(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkp(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkp(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*scale3)*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*scale5)*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*scale7)*rr7
+                  fip(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fip(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fip(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkp(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkp(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkp(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
 c
 c     find the field components for charge penetration damping
 c
@@ -2864,13 +2850,13 @@ c
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = dscale(k)
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fid(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -2891,13 +2877,13 @@ c
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
                   scalek = pscale(k)
                   rr3 = rr2 * rr1
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fip(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3123,17 +3109,9 @@ c
                      qkz = qkxz*xr + qkyz*yr + qkzz*zr
                      qkr = qkx*xr + qky*yr + qkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-                     ralpha = aewald * r
-                     bn(0) = erfc(ralpha) * rr1
-                     exp2a = exp(-ralpha**2)
-                     aefac = aesq2n
-                     do j = 1, 3
-                        bfac = dble(j+j-1)
-                        aefac = aesq2 * aefac
-                        bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-                     end do
+                     call dampewald (7,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
@@ -3183,36 +3161,36 @@ c
                               psc7 = scale7 * pscale(k)
                            end if
                         end if
-                        bcn(1) = bn(1) - (1.0d0-dsc3)*rr3
-                        bcn(2) = bn(2) - (1.0d0-dsc5)*rr5
-                        bcn(3) = bn(3) - (1.0d0-dsc7)*rr7
-                        fid(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                        fid(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                        fid(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                        fkd(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                        fkd(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                        fkd(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diz - 2.0d0*bcn(2)*qiz
-                        bcn(1) = bn(1) - (1.0d0-psc3)*rr3
-                        bcn(2) = bn(2) - (1.0d0-psc5)*rr5
-                        bcn(3) = bn(3) - (1.0d0-psc7)*rr7
-                        fip(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                        fip(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                        fip(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                        fkp(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                        fkp(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                        fkp(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                        dmp3 = dmpe(3) - (1.0d0-dsc3)*rr3
+                        dmp5 = dmpe(5) - (1.0d0-dsc5)*rr5
+                        dmp7 = dmpe(7) - (1.0d0-dsc7)*rr7
+                        fid(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkx + 2.0d0*dmp5*qkx
+                        fid(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dky + 2.0d0*dmp5*qky
+                        fid(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkz + 2.0d0*dmp5*qkz
+                        fkd(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*dix - 2.0d0*dmp5*qix
+                        fkd(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diy - 2.0d0*dmp5*qiy
+                        fkd(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diz - 2.0d0*dmp5*qiz
+                        dmp3 = dmpe(3) - (1.0d0-psc3)*rr3
+                        dmp5 = dmpe(5) - (1.0d0-psc5)*rr5
+                        dmp7 = dmpe(7) - (1.0d0-psc7)*rr7
+                        fip(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkx + 2.0d0*dmp5*qkx
+                        fip(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dky + 2.0d0*dmp5*qky
+                        fip(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkz + 2.0d0*dmp5*qkz
+                        fkp(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*dix - 2.0d0*dmp5*qix
+                        fkp(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diy - 2.0d0*dmp5*qiy
+                        fkp(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diz - 2.0d0*dmp5*qiz
 c
 c     find the field components for charge penetration damping
 c
@@ -3227,13 +3205,13 @@ c
                               scalek = dscale(k)
                            end if
                         end if
-                        rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                        rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                        rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                        rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                        rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                        rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                        rr3 = bn(1) - (1.0d0-scalek)*rr3
+                        rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                        rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                        rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                        rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                        rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                        rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                        rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                         fid(1) = -xr*(rr3*corek + rr3k*valk
      &                              - rr5k*dkr + rr7k*qkr)
      &                              - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3259,13 +3237,13 @@ c
                            end if
                         end if
                         rr3 = rr2 * rr1
-                        rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                        rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                        rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                        rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                        rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                        rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                        rr3 = bn(1) - (1.0d0-scalek)*rr3
+                        rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                        rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                        rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                        rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                        rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                        rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                        rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                         fip(1) = -xr*(rr3*corek + rr3k*valk
      &                              - rr5k*dkr + rr7k*qkr)
      &                              - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3399,7 +3377,6 @@ c
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 rr3ik,rr5ik
-      real*8 erfc,bfac,exp2a
       real*8 ci,dix,diy,diz
       real*8 qixx,qiyy,qizz
       real*8 qixy,qixz,qiyz
@@ -3412,18 +3389,16 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 ralpha,aefac
-      real*8 aesq2,aesq2n
       real*8 pdi,pti,ddi
       real*8 pgamma
       real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7,scalek
-      real*8 bn(0:3),bcn(3)
+      real*8 dmp3,dmp5,dmp7
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpi(7),dmpk(7)
-      real*8 dmpik(5)
+      real*8 dmpik(5),dmpe(7)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
@@ -3434,7 +3409,6 @@ c
       real*8, allocatable :: fieldtp(:,:)
       real*8, allocatable :: dlocal(:,:)
       character*6 mode
-      external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -3442,9 +3416,6 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
-      aesq2 = 2.0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (rootpi*aewald)
 c
 c     values for storage of mutual polarization intermediates
 c
@@ -3493,8 +3464,8 @@ c
 !$OMP& w5scale,d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,
 !$OMP& u4scale,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,nelst,elst,dpequal,use_thole,use_chgpen,
-!$OMP& use_bounds,off2,aewald,aesq2,aesq2n,poltyp,nchunk,ntpair,tindex,
-!$OMP& tdipdip,toffset,field,fieldp,fieldt,fieldtp)
+!$OMP& use_bounds,off2,poltyp,nchunk,ntpair,tindex,tdipdip,toffset,
+!$OMP& field,fieldp,fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nchunk)
 c
@@ -3665,17 +3636,9 @@ c
                qkz = qkxz*xr + qkyz*yr + qkzz*zr
                qkr = qkx*xr + qky*yr + qkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
-               exp2a = exp(-ralpha**2)
-               aefac = aesq2n
-               do j = 1, 3
-                  bfac = dble(j+j-1)
-                  aefac = aesq2 * aefac
-                  bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-               end do
+               call dampewald (7,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
@@ -3708,37 +3671,37 @@ c
                      end if
                   end if
                   scalek = dscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fid(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fid(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fid(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkd(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkd(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkd(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*scale3)*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*scale5)*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*scale7)*rr7
+                  fid(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fid(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fid(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkd(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkd(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkd(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
                   scalek = pscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fip(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fip(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fip(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkp(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkp(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkp(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*scale3)*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*scale5)*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*scale7)*rr7
+                  fip(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fip(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fip(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkp(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkp(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkp(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
 c
 c     find terms needed later to compute mutual polarization
 c
@@ -3756,17 +3719,17 @@ c
                         end if
                      end if
                      scalek = uscale(k)
-                     bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                     bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
+                     dmp3 = dmpe(3) - (1.0d0-scalek*scale3)*rr3
+                     dmp5 = dmpe(5) - (1.0d0-scalek*scale5)*rr5
                      nlocal = nlocal + 1
                      ilocal(1,nlocal) = ii
                      ilocal(2,nlocal) = kk
-                     dlocal(1,nlocal) = -bcn(1) + bcn(2)*xr*xr
-                     dlocal(2,nlocal) = bcn(2)*xr*yr
-                     dlocal(3,nlocal) = bcn(2)*xr*zr
-                     dlocal(4,nlocal) = -bcn(1) + bcn(2)*yr*yr
-                     dlocal(5,nlocal) = bcn(2)*yr*zr
-                     dlocal(6,nlocal) = -bcn(1) + bcn(2)*zr*zr
+                     dlocal(1,nlocal) = -dmp3 + dmp5*xr*xr
+                     dlocal(2,nlocal) = dmp5*xr*yr
+                     dlocal(3,nlocal) = dmp5*xr*zr
+                     dlocal(4,nlocal) = -dmp3 + dmp5*yr*yr
+                     dlocal(5,nlocal) = dmp5*yr*zr
+                     dlocal(6,nlocal) = -dmp3 + dmp5*zr*zr
                   end if
 c
 c     find the field components for charge penetration damping
@@ -3777,13 +3740,13 @@ c
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = dscale(k)
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fid(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3804,13 +3767,13 @@ c
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
                   scalek = pscale(k)
                   rr3 = rr2 * rr1
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fip(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3836,8 +3799,8 @@ c
                      call dampmut (r,alphai,alphak,dmpik)
                      scalek = wscale(k)
                      rr3 = rr2 * rr1
-                     rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
-                     rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
+                     rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                     rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
                      nlocal = nlocal + 1
                      ilocal(1,nlocal) = ii
                      ilocal(2,nlocal) = kk
@@ -4246,7 +4209,6 @@ c
       integer ii,kk
       real*8 xr,yr,zr,r,r2
       real*8 rr1,rr2,rr3,rr5
-      real*8 erfc,bfac,exp2a
       real*8 dix,diy,diz
       real*8 pix,piy,piz
       real*8 dkx,dky,dkz
@@ -4256,21 +4218,17 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 ralpha,aefac
-      real*8 aesq2,aesq2n
       real*8 pdi,pti,pgamma
       real*8 damp,expdamp
       real*8 scale3,scale5
-      real*8 bn(0:2)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dmpik(5)
+      real*8 dmpik(5),dmpe(5)
       real*8, allocatable :: uscale(:)
       real*8, allocatable :: wscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
-      external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -4278,9 +4236,6 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
-      aesq2 = 2.0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (rootpi*aewald)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -4369,17 +4324,9 @@ c
                pir = pix*xr + piy*yr + piz*zr
                pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
-               exp2a = exp(-ralpha**2)
-               aefac = aesq2n
-               do j = 1, 2
-                  bfac = dble(j+j-1)
-                  aefac = aesq2 * aefac
-                  bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-               end do
+               call dampewald (5,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
@@ -4410,8 +4357,8 @@ c
 c
 c     find the field terms for the current interaction
 c
-               rr3 = -bn(1) + (1.0d0-scale3)*rr3
-               rr5 = bn(2) - 3.0d0*(1.0d0-scale5)*rr5
+               rr3 = -dmpe(3) + (1.0d0-scale3)*rr3
+               rr5 = dmpe(5) - 3.0d0*(1.0d0-scale5)*rr5
                fid(1) = rr3*dkx + rr5*dkr*xr
                fid(2) = rr3*dky + rr5*dkr*yr
                fid(3) = rr3*dkz + rr5*dkr*zr
@@ -4541,17 +4488,9 @@ c
                      pir = pix*xr + piy*yr + piz*zr
                      pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-                     ralpha = aewald * r
-                     bn(0) = erfc(ralpha) * rr1
-                     exp2a = exp(-ralpha**2)
-                     aefac = aesq2n
-                     do j = 1, 2
-                        bfac = dble(j+j-1)
-                        aefac = aesq2 * aefac
-                        bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-                     end do
+                     call dampewald (5,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
@@ -4583,8 +4522,8 @@ c
 c
 c     find the field terms for the current interaction
 c
-                     rr3 = -bn(1) + (1.0d0-scale3)*rr3
-                     rr5 = bn(2) - 3.0d0*(1.0d0-scale5)*rr5
+                     rr3 = -dmpe(3) + (1.0d0-scale3)*rr3
+                     rr5 = dmpe(5) - 3.0d0*(1.0d0-scale5)*rr5
                      fid(1) = rr3*dkx + rr5*dkr*xr
                      fid(2) = rr3*dky + rr5*dkr*yr
                      fid(3) = rr3*dkz + rr5*dkr*zr

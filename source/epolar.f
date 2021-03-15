@@ -76,9 +76,9 @@ c
       integer i,j,k
       integer ii,kk
       integer jcell
-      real*8 e,f,damp,expdamp
+      real*8 e,f,pgamma
       real*8 pdi,pti,ddi
-      real*8 pgamma
+      real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 xi,yi,zi
@@ -577,9 +577,9 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      real*8 e,f,damp,expdamp
+      real*8 e,f,pgamma
       real*8 pdi,pti,ddi
-      real*8 pgamma
+      real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 xi,yi,zi
@@ -1001,13 +1001,9 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,jcell
-      real*8 e,f,damp
-      real*8 expdamp
-      real*8 erfc,bfac
-      real*8 alsq2,alsq2n
-      real*8 exp2a,ralpha
+      real*8 e,f,pgamma
       real*8 pdi,pti,ddi
-      real*8 pgamma
+      real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 sr3,sr5,sr7
@@ -1033,10 +1029,9 @@ c
       real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
-      real*8 bn(0:3)
+      real*8 dmpe(7)
       real*8, allocatable :: pscale(:)
       character*6 mode
-      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -1160,22 +1155,9 @@ c
                qku = qkx*uix + qky*uiy + qkz*uiz
                ukr = ukx*xr + uky*yr + ukz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
-               alsq2 = 2.0d0 * aewald**2
-               alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
-               exp2a = exp(-ralpha**2)
-               do j = 1, 3
-                  bfac = dble(j+j-1)
-                  alsq2n = alsq2 * alsq2n
-                  bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
-               end do
-               do j = 0, 3
-                  bn(j) = f * bn(j)
-               end do
+               call dampewald (7,r,r2,f,dmpe)
 c
 c     find the energy value for Thole polarization damping
 c
@@ -1214,9 +1196,9 @@ c
                   sr3 = scale3 * rr3
                   sr5 = scale5 * rr5
                   sr7 = scale7 * rr7
-                  sr3 = bn(1) - rr3 + sr3
-                  sr5 = bn(2) - rr5 + sr5
-                  sr7 = bn(3) - rr7 + sr7
+                  sr3 = dmpe(3) - rr3 + sr3
+                  sr5 = dmpe(5) - rr5 + sr5
+                  sr7 = dmpe(7) - rr7 + sr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
@@ -1242,13 +1224,13 @@ c
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  rr3i = bn(1) - rr3 + rr3i
-                  rr5i = bn(2) - rr5 + rr5i
-                  rr7i = bn(3) - rr7 + rr7i
-                  rr3k = bn(1) - rr3 + rr3k
-                  rr5k = bn(2) - rr5 + rr5k
-                  rr7k = bn(3) - rr7 + rr7k
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - rr3 + rr3i
+                  rr5i = dmpe(5) - rr5 + rr5i
+                  rr7i = dmpe(7) - rr7 + rr7i
+                  rr3k = dmpe(3) - rr3 + rr3k
+                  rr5k = dmpe(5) - rr5 + rr5k
+                  rr7k = dmpe(7) - rr7 + rr7k
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   e = uir*(corek*rr3+valk*rr3k)
      &                   - ukr*(corei*rr3+vali*rr3i)
      &                   + diu*rr3i + dku*rr3k
@@ -1393,24 +1375,9 @@ c
                      qku = qkx*uix + qky*uiy + qkz*uiz
                      ukr = ukx*xr + uky*yr + ukz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-                     ralpha = aewald * r
-                     bn(0) = erfc(ralpha) / r
-                     alsq2 = 2.0d0 * aewald**2
-                     alsq2n = 0.0d0
-                     if (aewald .gt. 0.0d0) then
-                        alsq2n = 1.0d0 / (rootpi*aewald)
-                     end if
-                     exp2a = exp(-ralpha**2)
-                     do j = 1, 3
-                        bfac = dble(j+j-1)
-                        alsq2n = alsq2 * alsq2n
-                        bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
-                     end do
-                     do j = 0, 3
-                        bn(j) = f * bn(j)
-                     end do
+                     call dampewald (7,r,r2,f,dmpe)
 c
 c     find the energy value for Thole polarization damping
 c
@@ -1451,9 +1418,9 @@ c
                         sr3 = scale3 * rr3
                         sr5 = scale5 * rr5
                         sr7 = scale7 * rr7
-                        sr3 = bn(1) - rr3 + sr3
-                        sr5 = bn(2) - rr5 + sr5
-                        sr7 = bn(3) - rr7 + sr7
+                        sr3 = dmpe(3) - rr3 + sr3
+                        sr5 = dmpe(5) - rr5 + sr5
+                        sr7 = dmpe(7) - rr7 + sr7
                         term1 = ck*uir - ci*ukr + diu + dku
                         term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                         term3 = uir*qkr - ukr*qir
@@ -1479,13 +1446,13 @@ c
                         rr3 = f / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
-                        rr3i = bn(1) - rr3 + rr3i
-                        rr5i = bn(2) - rr5 + rr5i
-                        rr7i = bn(3) - rr7 + rr7i
-                        rr3k = bn(1) - rr3 + rr3k
-                        rr5k = bn(2) - rr5 + rr5k
-                        rr7k = bn(3) - rr7 + rr7k
-                        rr3 = bn(1) - (1.0d0-scalek)*rr3
+                        rr3i = dmpe(3) - rr3 + rr3i
+                        rr5i = dmpe(5) - rr5 + rr5i
+                        rr7i = dmpe(7) - rr7 + rr7i
+                        rr3k = dmpe(3) - rr3 + rr3k
+                        rr5k = dmpe(5) - rr5 + rr5k
+                        rr7k = dmpe(7) - rr7 + rr7k
+                        rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                         e = uir*(corek*rr3+valk*rr3k)
      &                         - ukr*(corei*rr3+vali*rr3i)
      &                         + diu*rr3i + dku*rr3k
@@ -1668,13 +1635,9 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      real*8 e,f,damp
-      real*8 expdamp
-      real*8 erfc,bfac
-      real*8 alsq2,alsq2n
-      real*8 exp2a,ralpha
+      real*8 e,f,pgamma
       real*8 pdi,pti,ddi
-      real*8 pgamma
+      real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7,scalek
       real*8 sr3,sr5,sr7
@@ -1700,10 +1663,9 @@ c
       real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
-      real*8 bn(0:3)
+      real*8 dmpe(7)
       real*8, allocatable :: pscale(:)
       character*6 mode
-      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -1839,22 +1801,9 @@ c
                qku = qkx*uix + qky*uiy + qkz*uiz
                ukr = ukx*xr + uky*yr + ukz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
-               alsq2 = 2.0d0 * aewald**2
-               alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (rootpi*aewald)
-               exp2a = exp(-ralpha**2)
-               do j = 1, 3
-                  bfac = dble(j+j-1)
-                  alsq2n = alsq2 * alsq2n
-                  bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
-               end do
-               do j = 0, 3
-                  bn(j) = f * bn(j)
-               end do
+               call dampewald (7,r,r2,f,dmpe)
 c
 c     find the energy value for Thole polarization damping
 c
@@ -1893,9 +1842,9 @@ c
                   sr3 = scalek * scale3 * rr3
                   sr5 = scalek * scale5 * rr5
                   sr7 = scalek * scale7 * rr7
-                  sr3 = bn(1) - rr3 + sr3
-                  sr5 = bn(2) - rr5 + sr5
-                  sr7 = bn(3) - rr7 + sr7
+                  sr3 = dmpe(3) - rr3 + sr3
+                  sr5 = dmpe(5) - rr5 + sr5
+                  sr7 = dmpe(7) - rr7 + sr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
@@ -1921,13 +1870,13 @@ c
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  rr3i = bn(1) - rr3 + rr3i
-                  rr5i = bn(2) - rr5 + rr5i
-                  rr7i = bn(3) - rr7 + rr7i
-                  rr3k = bn(1) - rr3 + rr3k
-                  rr5k = bn(2) - rr5 + rr5k
-                  rr7k = bn(3) - rr7 + rr7k
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - rr3 + rr3i
+                  rr5i = dmpe(5) - rr5 + rr5i
+                  rr7i = dmpe(7) - rr7 + rr7i
+                  rr3k = dmpe(3) - rr3 + rr3k
+                  rr5k = dmpe(5) - rr5 + rr5k
+                  rr7k = dmpe(7) - rr7 + rr7k
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   e = uir*(corek*rr3+valk*rr3k)
      &                   - ukr*(corei*rr3+vali*rr3i)
      &                   + diu*rr3i + dku*rr3k

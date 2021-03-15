@@ -286,9 +286,9 @@ c
       integer ii,kk,iii
       integer nlist,jcell
       integer list(*)
-      real*8 f,damp,expdamp
+      real*8 f,pgamma
       real*8 pdi,pti,ddi
-      real*8 pgamma
+      real*8 damp,expdamp
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
       real*8 sr3,sr5,sr7

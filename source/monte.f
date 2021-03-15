@@ -50,7 +50,7 @@ c
       real*8 tsize,factor
       real*8 beta,boltz
       real*8 random,trial
-      real*8 converge
+      real*8 converge,delta
       real*8 efficient
       real*8 vector(3)
       real*8, allocatable :: xg(:)
@@ -85,6 +85,7 @@ c
       keep = 0
       nbig = 0
       nmap = 0
+      delta = 0.00001d0
       eps = 0.0001d0
       big = 100000.0d0
       reset = .false.
@@ -119,6 +120,7 @@ c
    70    continue
          if (converge .lt. 0.0d0)  converge = 0.01
       end if
+      converge = converge + delta
 c
 c     choose either the torsional or single atom move set
 c
@@ -515,7 +517,7 @@ c
   340    format (/,' Global Minimum Energy Value :',4x,f16.6)
       else
          write (iout,350)  global
-  350    format (/,' Global Minimum Energy Value :',5x,f14.4)
+  350    format (/,' Global Minimum Energy Value :',6x,f14.4)
       end if
 c
 c     perform any final tasks before program exit

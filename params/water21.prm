@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              HIPPO-WATER-2019
+forcefield              HIPPO-WATER-2021
 
 bond-cubic              -2.55
 bond-quartic            3.793125
@@ -64,24 +64,26 @@ induce-15-scale         1.0
       #############################
 
 
-This is a preliminary parameter set for water based on the HIPPO
-(Hydrogen-like Intermolecular Polarizable Potential) force field.
-It uses terms describing charge penetration, damped dispersion, and
-anisotropic repulsion as per the papers below. The parameters are
-from Roseane dos Reis Silva and Josh Rackers in the Ponder lab at
-Washington University. These parameter values are under development
-and are subject to change.
+Preliminary parameter for water in the HIPPO (Hydrogen-like Intermolecular
+Polarizable Potential) force field. It accounts for charge penetration,
+damped dispersion, and anisotropic repulsion as per the papers below. The
+parameters are from Roseane dos Reis Silva and Josh Rackers in the Ponder
+lab at Washington University. These parameters are under development and
+subject to change.
 
-J. A. Rackers, Q. Wang, C. Liu, J.-P. Piquemal, P. Ren and J. W. Ponder,
-An Optimized Charge Penetration Model for Use with the AMOEBA Force Field, 
-Physical Chemistry Chemical Physics, 19, 276-291 (2017)
+J. A. Rackers, R. R. Silva and J. W. Ponder, A Polarizable Water Model
+Derived from a Model Electron Density, manuscript in preparation (2021)
+
+J. A. Rackers and J. W. Ponder, Classical Pauli Repulsion: An Anisotropic,
+Atomic Multipole Model, Journal of Chemical Physics, 150, 084104 (2019)
 
 J. A. Rackers, C. Liu, P. Ren and J. W. Ponder, A Physically Grounded
 Damped Dispersion Model with Particle Mesh Ewald  Summation, Journal
 of Chemical Physics, 149, 084115 (2018)
 
-J. A. Rackers and J. W. Ponder, Classical Pauli Repulsion: An Anisotropic,
-Atomic Multipole Model, Journal of Chemical Physics, 150, 084104 (2019)
+J. A. Rackers, Q. Wang, C. Liu, J.-P. Piquemal, P. Ren and J. W. Ponder,
+An Optimized Charge Penetration Model for Use with the AMOEBA Force Field, 
+Physical Chemistry Chemical Physics, 19, 276-291 (2017)
 
 
       #############################
@@ -102,7 +104,7 @@ atom          2    2    H     "HIPPO Water H"                1     1.008    1
       ##################################
 
 
-bond          1    2          556.85     0.9572   !! all
+bond          1    2         551.108     0.9572
 
 
       ################################
@@ -112,7 +114,7 @@ bond          1    2          556.85     0.9572   !! all
       ################################
 
 
-angle         2    1    2      48.70     107.70
+angle         2    1    2    47.8253    104.520
 
 
       ##################################
@@ -122,8 +124,8 @@ angle         2    1    2      48.70     107.70
       ##################################
 
 
-repulsion          1         23.0064     4.4394     3.3883
-repulsion          2         16.4880     4.9367     0.6505
+repulsion          1         23.0592    4.41372     3.37829
+repulsion          2         16.0230    4.92152     0.63308
 
 
       #############################
@@ -133,8 +135,8 @@ repulsion          2         16.4880     4.9367     0.6505
       #############################
 
 
-dispersion         1         16.7190     4.3418
-dispersion         2          3.4239     4.9577
+dispersion         1        16.11930    4.28982
+dispersion         2         3.68130    5.21764
 
 
       ###################################
@@ -144,16 +146,16 @@ dispersion         2          3.4239     4.9577
       ###################################
 
 
-multipole     1   -2   -2              -0.37724
-                                        0.00000    0.00000    0.05410
-                                        0.68565
-                                        0.00000   -0.60559
-                                        0.00000    0.00000   -0.08006
-multipole     2    1    2               0.18862
-                                        0.00000    0.00000   -0.19902
-                                        0.06206
-                                        0.00000    0.04341
-                                        0.00709    0.00000   -0.10547
+multipole     1   -2   -2             -0.374842
+                                       0.000000   0.000000   0.054116
+                                       0.680265
+                                       0.000000  -0.611121
+                                       0.000000   0.000000  -0.069144
+multipole     2    1    2              0.187421
+                                       0.000000   0.000000  -0.200116
+                                       0.066936
+                                       0.000000   0.043814
+                                       0.007338   0.000000  -0.110750
 
 
       #####################################
@@ -163,8 +165,8 @@ multipole     2    1    2               0.18862
       #####################################
 
 
-chgpen             1          6.0000     4.3418
-chgpen             2          1.0000     4.9577
+chgpen             1          6.0000    4.28982
+chgpen             2          1.0000    5.21764
 
 
       ########################################
@@ -174,8 +176,8 @@ chgpen             2          1.0000     4.9577
       ########################################
 
 
-polarize           1          0.7332            2
-polarize           2          0.3691            1
+polarize           1        0.725918            2
+polarize           2        0.359954            1
 
 
       ##################################
@@ -185,5 +187,16 @@ polarize           2          0.3691            1
       ##################################
 
 
-chgtrn             1          3.5551     0.0000
-chgtrn             2          0.0000     3.2812
+chgtrn             1         3.63984    0.00000
+chgtrn             2         0.00000    3.27760
+
+
+      ##############################
+      ##                          ##
+      ##  Charge Flux Parameters  ##
+      ##                          ##
+      ##############################
+
+
+bndcflux      1    2           -0.027265
+angcflux      2    1    2       0.102621   0.102621  -0.039303  -0.039303 
