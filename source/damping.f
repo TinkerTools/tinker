@@ -16,16 +16,16 @@ c     "dampewald" generates coefficients for Ewald error function
 c     damping for powers of the interatomic distance
 c
 c
-      subroutine dampewald (rorder,r,r2,f,dmpe)
+      subroutine dampewald (rorder,r,r2,scale,dmpe)
       use ewald
       use math
       implicit none
       integer i,maxi
       integer rorder
-      real*8 r,r2,f
+      real*8 r,r2,scale
       real*8 bfac,erfc
-      real*8 aesq2,aesq2n
-      real*8 exp2a,ralpha
+      real*8 aesq2,afac
+      real*8 expterm,ra
       real*8 dmpe(*)
       real*8, allocatable :: bn(:)
       external erfc
@@ -34,7 +34,7 @@ c
 c     initialize Ewald damping factors and set storage size
 c
       do i = 1, rorder
-         dmpe(i) = f
+         dmpe(i) = scale
       end do
       maxi = (rorder-1) / 2
 c
@@ -44,18 +44,18 @@ c
 c     
 c     compute the successive Ewald damping factors
 c
-      ralpha = aewald * r
-      bn(0) = erfc(ralpha) / r
-      dmpe(1) = f * bn(0)
+      ra = aewald * r
+      bn(0) = erfc(ra) / r
+      dmpe(1) = scale * bn(0)
+      expterm = exp(-ra*ra)
       aesq2 = 2.0d0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (rootpi*aewald)
-      exp2a = exp(-ralpha**2)
+      afac = 0.0d0
+      if (aewald .gt. 0.0d0)  afac = 1.0d0 / (rootpi*aewald)
       do i = 1, maxi
          bfac = dble(2*i-1)
-         aesq2n = aesq2 * aesq2n
-         bn(i) = (bfac*bn(i-1)+aesq2n*exp2a) / r2
-         dmpe(2*i+1) = f * bn(i)
+         afac = aesq2 * afac
+         bn(i) = (bfac*bn(i-1)+afac*expterm) / r2
+         dmpe(2*i+1) = scale * bn(i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -79,6 +79,9 @@ c     literature reference:
 c
 c     B. T. Thole, "Molecular Polarizabilities Calculated with a
 c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
+c
+c     note this version implements the charge density rho(2) from the
+c     original Thole damping article cited above
 c
 c
       subroutine dampthole (i,k,rorder,r,scale)

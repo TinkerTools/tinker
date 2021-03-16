@@ -34,12 +34,9 @@ c
       use atoms
       use deriv
       use hessn
-      use iounit
       use limits
-      use mplpot
       use mpole
       use polpot
-      use potent
       implicit none
       integer i,j,k
       integer nlist
@@ -50,7 +47,6 @@ c
       logical biglist
       logical twosided
       logical reinduce
-      logical save_mpole
 c
 c
 c     set the default stepsize and accuracy control flags
@@ -63,15 +59,6 @@ c
          biglist = .true.
          twosided = .true.
          reinduce = .true.
-      end if
-c
-c     check for use of TCG polarization with charge penetration
-c
-      if (poltyp.eq.'TCG' .and. use_chgpen) then
-         write (iout,10)
-   10    format (/,' EPOLAR2  --  TCG Polarization not Available',
-     &              ' with Charge Penetration')
-         call fatal
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -99,23 +86,10 @@ c
          end if
       end do
 c
-c     turn off multipole term as needed for Ewald gradient calls
-c
-      save_mpole = use_mpole
-      use_mpole = .false.
-c
 c     get multipole first derivatives for the base structure
 c
       if (.not. twosided) then
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            call epolar2a (nlist,list,reinduce)
-         end if
+         call epolar2a (nlist,list,reinduce)
          do k = 1, n
             do j = 1, 3
                d0(j,k) = dep(j,k)
@@ -128,15 +102,7 @@ c
       old = x(i)
       if (twosided) then
          x(i) = x(i) - 0.5d0*eps
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            call epolar2a (nlist,list,reinduce)
-         end if
+         call epolar2a (nlist,list,reinduce)
          do k = 1, n
             do j = 1, 3
                d0(j,k) = dep(j,k)
@@ -144,19 +110,11 @@ c
          end do
       end if
       x(i) = x(i) + eps
-      if (use_ewald) then
-         if (use_mlist) then
-            call epolar1d
-         else
-            call epolar1c
-         end if
-      else
-         call epolar2a (nlist,list,reinduce)
-      end if
+      call epolar2a (nlist,list,reinduce)
       x(i) = old
       do k = 1, n
          do j = 1, 3
-            hessx(j,k) = hessx(j,k) + (dep(j,k)-d0(j,k))/eps
+            hessx(j,k) = hessx(j,k) + 0.5d0*(dep(j,k)-d0(j,k))/eps
          end do
       end do
 c
@@ -165,15 +123,7 @@ c
       old = y(i)
       if (twosided) then
          y(i) = y(i) - 0.5d0*eps
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            call epolar2a (nlist,list,reinduce)
-         end if
+         call epolar2a (nlist,list,reinduce)
          do k = 1, n
             do j = 1, 3
                d0(j,k) = dep(j,k)
@@ -181,19 +131,11 @@ c
          end do
       end if
       y(i) = y(i) + eps
-      if (use_ewald) then
-         if (use_mlist) then
-            call epolar1d
-         else
-            call epolar1c
-         end if
-      else
-         call epolar2a (nlist,list,reinduce)
-      end if
+      call epolar2a (nlist,list,reinduce)
       y(i) = old
       do k = 1, n
          do j = 1, 3
-            hessy(j,k) = hessy(j,k) + (dep(j,k)-d0(j,k))/eps
+            hessy(j,k) = hessy(j,k) + 0.5d0*(dep(j,k)-d0(j,k))/eps
          end do
       end do
 c
@@ -202,15 +144,7 @@ c
       old = z(i)
       if (twosided) then
          z(i) = z(i) - 0.5d0*eps
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            call epolar2a (nlist,list,reinduce)
-         end if
+         call epolar2a (nlist,list,reinduce)
          do k = 1, n
             do j = 1, 3
                d0(j,k) = dep(j,k)
@@ -218,25 +152,13 @@ c
          end do
       end if
       z(i) = z(i) + eps
-      if (use_ewald) then
-         if (use_mlist) then
-            call epolar1d
-         else
-            call epolar1c
-         end if
-      else
-         call epolar2a (nlist,list,reinduce)
-      end if
+      call epolar2a (nlist,list,reinduce)
       z(i) = old
       do k = 1, n
          do j = 1, 3
-            hessz(j,k) = hessz(j,k) + (dep(j,k)-d0(j,k))/eps
+            hessz(j,k) = hessz(j,k) + 0.5d0*(dep(j,k)-d0(j,k))/eps
          end do
       end do
-c
-c     restore permanent multipole term to its original status
-c
-      use_mpole = save_mpole
 c
 c     perform deallocation of some global arrays
 c
@@ -338,6 +260,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term4k,term5k,term6k
       real*8 term7k,term8k
+      real*8 poti,potk
       real*8 depx,depy,depz
       real*8 frcx,frcy,frcz
       real*8 rc3(3),rc5(3),rc7(3)
@@ -355,6 +278,10 @@ c
       real*8, allocatable :: wscale(:)
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
+      real*8, allocatable :: pot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       logical reinduce
       character*6 mode
 c
@@ -367,6 +294,14 @@ c
          end do
       end do
       if (npole .eq. 0)  return
+c
+c     alter partial charges and multipoles for charge flux
+c
+      if (use_chgflx)  call alterchg
+c
+c     alter partial charges and multipoles for charge flux
+c
+      if (use_chgflx)  call alterchg
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -388,6 +323,10 @@ c
       allocate (wscale(n))
       allocate (ufld(3,n))
       allocate (dufld(6,n))
+      allocate (pot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -402,6 +341,7 @@ c
          do j = 1, 6
             dufld(j,i) = 0.0d0
          end do
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -704,6 +644,20 @@ c
                   dsr3k = 2.0d0 * rr3 * dmpk(3) * dscale(k)
                   dsr5k = 2.0d0 * rr5 * dmpk(5) * dscale(k)
                   dsr7k = 2.0d0 * rr7 * dmpk(7) * dscale(k)
+               end if
+c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
+                  else if (use_chgpen) then
+                     poti = -ukr * dsr3i
+                     potk = uir * dsr3k
+                  end if
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
                end if
 c
 c     get the induced dipole field used for dipole torques
@@ -1753,6 +1707,20 @@ c
                   dsr7k = 2.0d0 * rr7 * dmpk(7) * dscale(k)
                end if
 c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_thole) then
+                     poti = -ukr*psr3 - ukrp*dsr3
+                     potk = uir*psr3 + uirp*dsr3
+                  else if (use_chgpen) then
+                     poti = -ukr * dsr3i
+                     potk = uir * dsr3k
+                  end if
+                  pot(i) = pot(i) + poti 
+                  pot(k) = pot(k) + potk 
+               end if
+c
 c     get the induced dipole field used for dipole torques
 c
                if (use_thole) then
@@ -2537,6 +2505,21 @@ c
          call torque (ii,tep,fix,fiy,fiz,dep)
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (pot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dep(1,i) = dep(1,i) + frcx
+            dep(2,i) = dep(2,i) + frcy
+            dep(3,i) = dep(3,i) + frcz
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
@@ -2545,5 +2528,9 @@ c
       deallocate (wscale)
       deallocate (ufld)
       deallocate (dufld)
+      deallocate (pot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end
