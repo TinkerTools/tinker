@@ -654,9 +654,9 @@ c
             read (string,*,err=270,end=270)  k,pel,pal
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
-               pcore(i) = pole(1,i) + abs(pel)
-               pval(i) = -abs(pel)
-               palpha(i) = pal
+               pcore(k) = abs(pel)
+               pval(k) = pole(1,k) - abs(pel)
+               palpha(k) = pal
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,250)
