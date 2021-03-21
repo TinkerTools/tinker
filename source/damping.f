@@ -80,12 +80,10 @@ c
 c     B. T. Thole, "Molecular Polarizabilities Calculated with a
 c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
 c
-c     note this version implements the charge density rho(2) from the
-c     original Thole damping article cited above
 c
-c
-      subroutine dampthole (i,k,rorder,r,scale)
+      subroutine dampthole (i,k,rorder,r,dmpik)
       use polar
+      use polpot
       implicit none
       integer i,j,k
       integer rorder
@@ -93,43 +91,49 @@ c
       real*8 damp2
       real*8 damp3
       real*8 expdamp
-      real*8 pdi,pti
-      real*8 pdk,ptk
       real*8 pgamma
-      real*8 scale(*)
+      real*8 dmpik(*)
 c
 c
 c     initialize the Thole damping factors to a value of one
 c
       do j = 1, rorder
-         scale(j) = 1.0d0
+         dmpik(j) = 1.0d0
       end do
-c
-c     get the Thole damping parameters for the two sites
-c
-      pdi = pdamp(i)
-      pti = thole(i)
-      pdk = pdamp(k)
-      ptk = thole(k)
 c
 c     assign the Thole polarization model damping factors
 c
-      damp = pdi * pdk
+      damp = pdamp(i) * pdamp(k)
       if (damp .ne. 0.0d0) then
-         pgamma = min(pti,ptk)
-         damp = pgamma * (r/damp)**3
-         if (damp .lt. 50.0d0) then
-            expdamp = exp(-damp)
-            scale(3) = 1.0d0 - expdamp
-            scale(5) = 1.0d0 - (1.0d0+damp)*expdamp
-            if (rorder .ge. 7) then
-               damp2 = damp * damp
-               scale(7) = 1.0d0 - (1.0d0+damp+0.6d0*damp2)*expdamp
-               if (rorder .ge. 9) then
-                  damp3 = damp * damp2
-                  scale(9) = 1.0d0 - (1.0d0 + damp
-     &                          + (18.0d0/35.0d0)*damp2
-     &                          + (9.0d0/35.0d0)*damp3) * expdamp
+         if (use_dirdamp) then
+            pgamma = min(dirdamp(i),dirdamp(k))
+            damp = pgamma * (r/damp)**(1.5d0)
+            if (damp .lt. 50.0d0) then
+               expdamp = exp(-damp)
+               dmpik(3) = 1.0d0 - expdamp
+               dmpik(5) = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+               if (rorder .ge. 7) then
+                  damp2 = damp * damp
+                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                  +0.15d0*damp2)
+               end if
+            end if
+         else
+            pgamma = min(thole(i),thole(k))
+            damp = pgamma * (r/damp)**3
+            if (damp .lt. 50.0d0) then
+               expdamp = exp(-damp)
+               dmpik(3) = 1.0d0 - expdamp
+               dmpik(5) = 1.0d0 - expdamp*(1.0d0+damp)
+               if (rorder .ge. 7) then
+                  damp2 = damp * damp
+                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+damp+0.6d0*damp2)
+                  if (rorder .ge. 9) then
+                     damp3 = damp * damp2
+                     dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
+     &                                     +(18.0d0/35.0d0)*damp2
+     &                                     +(9.0d0/35.0d0)*damp3)
+                  end if
                end if
             end if
          end if
@@ -400,133 +404,6 @@ c
      &                          + 4.0d0*dampk2/9.0d0 + dampk3/9.0d0
      &                          + dampk4/63.0d0 + dampk5/945.0d0)*expk
             end if
-         end if
-      end if
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine damppolar  --  polarization damping coefficents  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "damppolar" generates coefficients for the charge penetration
-c     damping function used for polarization interactions
-c
-c
-      subroutine damppolar (r,alphai,alphak,dmpi,dmpk,dmpik)
-      use mplpot
-      implicit none
-      real*8 termi,termk
-      real*8 termi2,termk2
-      real*8 alphai,alphak
-      real*8 alphai2,alphak2
-      real*8 r,eps,diff
-      real*8 expi,expk
-      real*8 dampi,dampk
-      real*8 dampi2,dampi3
-      real*8 dampi4,dampi5
-      real*8 dampk2,dampk3
-      real*8 dmpi(*)
-      real*8 dmpk(*)
-      real*8 dmpik(*)
-c
-c
-c     compute tolerance and exponential damping factors
-c
-      eps = 0.001d0
-      diff = abs(alphai-alphak)
-      dampi = alphai * r
-      dampk = alphak * r
-      expi = exp(-dampi)
-      expk = exp(-dampk)
-c
-c     core-valence charge penetration damping for Gordon f1
-c
-      if (pentyp .eq. 'GORDON1') then
-         dampi2 = dampi * dampi
-         dampi3 = dampi * dampi2
-         dmpi(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2)*expi
-         dmpi(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2 
-     &                + dampi3/6.0d0)*expi
-         if (diff .lt. eps) then
-            dmpk(3) = dmpi(3)
-            dmpk(5) = dmpi(5)
-         else
-            dampk2 = dampk * dampk
-            dampk3 = dampk * dampk2
-            dmpk(3) = 1.0d0 - (1.0d0 + dampk + 0.5d0*dampk2)*expk
-            dmpk(5) = 1.0d0 - (1.0d0 + dampk + 0.5d0*dampk2
-     &                   + dampk3/6.0d0)*expk
-         end if
-c
-c     valence-valence charge penetration damping for Gordon f1
-c
-         if (diff .lt. eps) then
-            dampi4 = dampi2 * dampi2
-            dampi5 = dampi2 * dampi3
-            dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
-     &                    + 7.0d0*dampi3/48.0d0
-     &                    + dampi4/48.0d0)*expi
-            dmpik(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
-     &                    + dampi3/6.0d0 + dampi4/24.0d0
-     &                    + dampi5/144.0d0)*expi
-         else
-            alphai2 = alphai * alphai
-            alphak2 = alphak * alphak
-            termi = alphak2 / (alphak2-alphai2)
-            termk = alphai2 / (alphai2-alphak2)
-            termi2 = termi * termi
-            termk2 = termk * termk
-            dmpik(3) = 1.0d0 - termi2*(1.0d0 + dampi
-     &                            + 0.5d0*dampi2)*expi
-     &                    - termk2*(1.0d0 + dampk
-     &                         + 0.5d0*dampk2)*expk
-     &                    - 2.0d0*termi2*termk*(1.0d0+dampi)*expi
-     &                    - 2.0d0*termk2*termi*(1.0d0+dampk)*expk
-            dmpik(5) = 1.0d0 - termi2*(1.0d0 + dampi + 0.5d0*dampi2
-     &                                    + dampi3/6.0d0)*expi
-     &                    - termk2*(1.0d0 + dampk + 0.5d0*dampk2
-     &                                 + dampk3/6.00)*expk
-     &                    - 2.0d0*termi2*termk
-     &                         *(1.0d0 + dampi + dampi2/3.0d0)*expi
-     &                    - 2.0d0*termk2*termi
-     &                         *(1.0d0 + dampk + dampk2/3.0d0)*expk
-         end if
-c
-c     core-valence charge penetration damping for Gordon f2
-c
-      else if (pentyp .eq. 'GORDON2') then
-         dampi2 = dampi * dampi
-         dmpi(3) = 1.0d0 - (1.0d0 + dampi)*expi
-         dmpi(5) = 1.0d0 - (1.0d0 + dampi + dampi2/3.0d0)*expi
-         if (diff .lt. eps) then
-            dmpk(3) = dmpi(3)
-            dmpk(5) = dmpi(5)
-         else
-            dampk2 = dampk * dampk
-            dmpk(3) = 1.0d0 - (1.0d0 + dampk)*expk
-            dmpk(5) = 1.0d0 - (1.0d0 + dampk + dampk2/3.0d0)*expk
-         end if
-c
-c     valence-valence charge penetration damping for Gordon f2
-c
-         if (diff .lt. eps) then
-            dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2)*expi
-            dmpik(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
-     &                    + dampi3/6.0d0)*expi
-         else
-            alphai2 = alphai * alphai
-            alphak2 = alphak * alphak
-            termi = alphak2 / (alphak2-alphai2)
-            termk = alphai2 / (alphai2-alphak2)
-            dmpik(3) = 1.0d0 - termi*(1.0d0 + dampi)*expi
-     &                    - termk*(1.0d0 + dampk)*expk
-            dmpik(5) = 1.0d0 - termi*(1.0d0 + dampi + dampi2/3.0d0)*expi
-     &                    - termk*(1.0d0 + dampk + dampk2/3.0d0)*expk
          end if
       end if
       return

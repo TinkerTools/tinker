@@ -2149,9 +2149,11 @@ c
                   rr1i = dmpe(1) - (1.0d0-scalek*dmpi(1))*rr1
                   rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
                   rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
                   rr1k = dmpe(1) - (1.0d0-scalek*dmpk(1))*rr1
                   rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
                   rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
                   rr1ik = dmpe(1) - (1.0d0-scalek*dmpik(1))*rr1
                   rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -2505,9 +2507,11 @@ c
                   rr1i = dmpe(1) - (1.0d0-scalek*dmpi(1))*rr1
                   rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
                   rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
                   rr1k = dmpe(1) - (1.0d0-scalek*dmpk(1))*rr1
                   rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
                   rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
                   rr1ik = dmpe(1) - (1.0d0-scalek*dmpik(1))*rr1
                   rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -3321,9 +3325,11 @@ c
                   rr1i = dmpe(1) - (1.0d0-scalek*dmpi(1))*rr1
                   rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
                   rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
                   rr1k = dmpe(1) - (1.0d0-scalek*dmpk(1))*rr1
                   rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
                   rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
                   rr1ik = dmpe(1) - (1.0d0-scalek*dmpik(1))*rr1
                   rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5

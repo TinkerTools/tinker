@@ -2925,7 +2925,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -3194,7 +3193,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -3956,7 +3954,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -4225,7 +4222,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5

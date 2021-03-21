@@ -82,14 +82,10 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,jcell
-      real*8 e,f,pgamma
-      real*8 pdi,pti,ddi
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7,scalek
+      real*8 e,f,scalek
       real*8 xi,yi,zi
-      real*8 xr,yr,zr,r,r2
-      real*8 rr3,rr5,rr7
+      real*8 xr,yr,zr
+      real*8 r,r2,rr3,rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 ci,dix,diy,diz
@@ -109,6 +105,7 @@ c
       real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
+      real*8 dmpik(7)
       real*8, allocatable :: pscale(:)
       logical header,huge
       character*6 mode
@@ -182,11 +179,7 @@ c
          uix = uind(1,ii)
          uiy = uind(2,ii)
          uiz = uind(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -270,40 +263,14 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     if (use_dirdamp) then
-                        pgamma = min(ddi,dirdamp(kk))
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
+                  call dampthole (ii,kk,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  rr3 = scale3 * rr3
-                  rr5 = scale5 * rr5
-                  rr7 = scale7 * rr7
+                  rr3 = dmpik(3) * rr3
+                  rr5 = dmpik(5) * rr5
+                  rr7 = dmpik(7) * rr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
@@ -407,11 +374,7 @@ c
             uix = uind(1,ii)
             uiy = uind(2,ii)
             uiz = uind(3,ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-               ddi = dirdamp(ii)
-            else if (use_chgpen) then
+            if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -499,42 +462,14 @@ c
 c     find the energy value for Thole polarization damping
 c
                      if (use_thole) then
-                        scale3 = 1.0d0
-                        scale5 = 1.0d0
-                        scale7 = 1.0d0
-                        damp = pdi * pdamp(kk)
-                        if (damp .ne. 0.0d0) then
-                           if (use_dirdamp) then
-                              pgamma = min(ddi,dirdamp(kk))
-                              damp = pgamma * (r/damp)**(1.5d0)
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp) 
-                                 scale3 = 1.0d0 - expdamp 
-                                 scale5 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.5d0*damp)
-                                 scale7 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.65d0*damp
-     &                                                  +0.15d0*damp**2)
-                              end if
-                           else
-                              pgamma = min(pti,thole(kk))
-                              damp = pgamma * (r/damp)**3
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp)
-                                 scale3 = 1.0d0 - expdamp
-                                 scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                                 scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                               +0.6d0*damp**2)
-                              end if
-                           end if
-                        end if
+                        call dampthole (ii,kk,7,r,dmpik)
                         scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
-                        rr3 = scale3 * rr3
-                        rr5 = scale5 * rr5
-                        rr7 = scale7 * rr7
+                        rr3 = dmpik(3) * rr3
+                        rr5 = dmpik(5) * rr5
+                        rr7 = dmpik(7) * rr7
                         term1 = ck*uir - ci*ukr + diu + dku
                         term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                         term3 = uir*qkr - ukr*qir
@@ -657,14 +592,10 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      real*8 e,f,pgamma
-      real*8 pdi,pti,ddi
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7,scalek
+      real*8 e,f,scalek
       real*8 xi,yi,zi
-      real*8 xr,yr,zr,r,r2
-      real*8 rr3,rr5,rr7
+      real*8 xr,yr,zr
+      real*8 r,r2,rr3,rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 ci,dix,diy,diz
@@ -684,6 +615,7 @@ c
       real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
+      real*8 dmpik(7)
       real*8, allocatable :: pscale(:)
       logical header,huge
       character*6 mode
@@ -740,12 +672,11 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,rpole,x,y,z,pdamp,thole,dirdamp,pcore,pval,
-!$OMP& palpha,uind,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
-!$OMP& np13,ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,nelst,elst,use_thole,use_dirdamp,
-!$OMP& use_chgpen,use_bounds,off2,f,molcule,name,verbose,debug,
-!$OMP& header,iout)
+!$OMP& shared(npole,ipole,rpole,x,y,z,pcore,pval,palpha,uind,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& p5iscale,nelst,elst,use_thole,use_dirdamp,use_chgpen,use_bounds,
+!$OMP& off2,f,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
@@ -769,11 +700,7 @@ c
          uix = uind(1,ii)
          uiy = uind(2,ii)
          uiz = uind(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -858,40 +785,14 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     if (use_dirdamp) then
-                        pgamma = min(ddi,dirdamp(kk))
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
+                  call dampthole (ii,kk,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  rr3 = scale3 * rr3
-                  rr5 = scale5 * rr5
-                  rr7 = scale7 * rr7
+                  rr3 = dmpik(3) * rr3
+                  rr5 = dmpik(5) * rr5
+                  rr7 = dmpik(7) * rr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
@@ -1146,15 +1047,11 @@ c
       integer i,j,k
       integer ii,kk,jcell
       real*8 e,efull
-      real*8 f,pgamma
-      real*8 pdi,pti,ddi
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7,scalek
-      real*8 sr3,sr5,sr7
+      real*8 f,scalek
       real*8 xi,yi,zi
-      real*8 xr,yr,zr,r,r2
-      real*8 rr3,rr5,rr7
+      real*8 xr,yr,zr
+      real*8 sr3,sr5,sr7
+      real*8 r,r2,rr3,rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 ci,dix,diy,diz
@@ -1174,7 +1071,7 @@ c
       real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
-      real*8 dmpe(7)
+      real*8 dmpik(7),dmpe(7)
       real*8, allocatable :: pscale(:)
       logical header,huge
       character*6 mode
@@ -1227,11 +1124,7 @@ c
          uix = uind(1,ii)
          uiy = uind(2,ii)
          uiz = uind(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -1319,40 +1212,14 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     if (use_dirdamp) then
-                        pgamma = min(ddi,dirdamp(kk))
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
+                  call dampthole (ii,kk,7,r,dmpik)
+                  scalek = pscale(k)
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  scalek = pscale(k)
-                  sr3 = scalek * scale3 * rr3
-                  sr5 = scalek * scale5 * rr5
-                  sr7 = scalek * scale7 * rr7
+                  sr3 = scalek * dmpik(3) * rr3
+                  sr5 = scalek * dmpik(5) * rr5
+                  sr7 = scalek * dmpik(7) * rr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
@@ -1476,11 +1343,7 @@ c
             uix = uind(1,ii)
             uiy = uind(2,ii)
             uiz = uind(3,ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-               ddi = dirdamp(ii)
-            else if (use_chgpen) then
+            if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -1572,42 +1435,14 @@ c
 c     find the energy value for Thole polarization damping
 c
                      if (use_thole) then
-                        scale3 = 1.0d0
-                        scale5 = 1.0d0
-                        scale7 = 1.0d0
-                        damp = pdi * pdamp(kk)
-                        if (damp .ne. 0.0d0) then
-                           if (use_dirdamp) then
-                              pgamma = min(ddi,dirdamp(kk))
-                              damp = pgamma * (r/damp)**(1.5d0)
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp) 
-                                 scale3 = 1.0d0 - expdamp 
-                                 scale5 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.5d0*damp)
-                                 scale7 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.65d0*damp
-     &                                                  +0.15d0*damp**2)
-                              end if
-                           else
-                              pgamma = min(pti,thole(kk))
-                              damp = pgamma * (r/damp)**3
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(damp)
-                                 scale3 = 1.0d0 - expdamp
-                                 scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                                 scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                               +0.6d0*damp**2)
-                              end if
-                           end if
-                        end if
+                        call dampthole (ii,kk,7,r,dmpik)
+                        scalek = pscale(k)
                         rr3 = f / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
-                        scalek = pscale(k)
-                        sr3 = scalek * scale3 * rr3
-                        sr5 = scalek * scale5 * rr5
-                        sr7 = scalek * scale7 * rr7
+                        sr3 = scalek * dmpik(3) * rr3
+                        sr5 = scalek * dmpik(5) * rr5
+                        sr7 = scalek * dmpik(7) * rr7
                         term1 = ck*uir - ci*ukr + diu + dku
                         term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                         term3 = uir*qkr - ukr*qir
@@ -1884,15 +1719,11 @@ c
       integer i,j,k
       integer ii,kk,kkk
       real*8 e,efull
-      real*8 f,pgamma
-      real*8 pdi,pti,ddi
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7,scalek
-      real*8 sr3,sr5,sr7
+      real*8 f,scalek
       real*8 xi,yi,zi
-      real*8 xr,yr,zr,r,r2
-      real*8 rr3,rr5,rr7
+      real*8 xr,yr,zr
+      real*8 sr3,sr5,sr7
+      real*8 r,r2,rr3,rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 ci,dix,diy,diz
@@ -1912,7 +1743,7 @@ c
       real*8 alphai,alphak
       real*8 term1,term2,term3
       real*8 dmpi(7),dmpk(7)
-      real*8 dmpe(7)
+      real*8 dmpik(7),dmpe(7)
       real*8, allocatable :: pscale(:)
       logical header,huge
       character*6 mode
@@ -1948,12 +1779,11 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,rpole,uind,x,y,z,pdamp,thole,dirdamp,pcore,
-!$OMP& pval,palpha,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
-!$OMP& np13,ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,nelst,elst,use_thole,use_dirdamp,
-!$OMP& use_chgpen,use_bounds,off2,f,aewald,molcule,name,verbose,debug,
-!$OMP& header,iout)
+!$OMP& shared(npole,ipole,rpole,uind,x,y,z,pcore,pval,palpha,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& p5iscale,nelst,elst,use_thole,use_dirdamp,use_chgpen,use_bounds,
+!$OMP& off2,f,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
@@ -1977,11 +1807,7 @@ c
          uix = uind(1,ii)
          uiy = uind(2,ii)
          uiz = uind(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -2070,40 +1896,14 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     if (use_dirdamp) then
-                        pgamma = min(ddi,dirdamp(kk))
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
+                  call dampthole (ii,kk,7,r,dmpik)
+                  scalek = pscale(k)
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  scalek = pscale(k)
-                  sr3 = scalek * scale3 * rr3
-                  sr5 = scalek * scale5 * rr5
-                  sr7 = scalek * scale7 * rr7
+                  sr3 = scalek * dmpik(3) * rr3
+                  sr5 = scalek * dmpik(5) * rr5
+                  sr7 = scalek * dmpik(7) * rr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir

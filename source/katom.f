@@ -20,7 +20,12 @@ c
 c     K. A. Feenstra, B. Hess and H. J. C. Berendsen, "Improving
 c     Efficiency of Large Time-Scale Molecular Dynamics Simulations
 c     of Hydrogen-Rich Systems", Journal of Computational Chemistry,
-c     8, 786-798 (1999)  [heavy hydrogen reweighting]
+c     8, 786-798 (1999)
+c
+c     C. W. Hopkins, S. Le Grand, R. C. Walker and A. E. Roitberg,
+c     "Long-Time-Step Molecular Dynamics through Hydrogen Mass
+c     Repartitioning", Journal of Chemical Theory and Computation,
+c     11, 1864-1874 (2015)
 c
 c
       subroutine katom
@@ -125,12 +130,15 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
+         string = record(next:240)
          if (keyword(1:15) .eq. 'HEAVY-HYDROGEN ') then
             heavy = .true.
+            hmax = 4.0d0
+            read (string,*,err=50,end=50)  hmax
          end if
+   50    continue
       end do
       if (heavy) then
-         hmax = 4.0d0
          do i = 1, n
             nh = 0
             sum = mass(i)
@@ -160,7 +168,7 @@ c
                   if (mass(k) .gt. dmin) then
                      mass(k) = mass(k) - dmass
                      mass(i) = hmax
-                     goto 50
+                     goto 60
                   end if
                end do
                do j = 1, n13(i)
@@ -168,10 +176,10 @@ c
                   if (mass(k) .gt. dmin) then
                      mass(k) = mass(k) - dmass
                      mass(i) = hmax
-                     goto 50
+                     goto 60
                   end if
                end do
-   50          continue
+   60          continue
             end if
          end do
       end if
@@ -196,12 +204,12 @@ c
             call gettext (record,symb,next)
             call getstring (record,notice,next)
             string = record(next:240)
-            read (string,*,err=80,end=80)  atn,wght,lig
+            read (string,*,err=90,end=90)  atn,wght,lig
             if (k.lt.0 .and. k.ge.-n) then
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,60)
-   60             format (/,' Additional Atom Definitions for',
+                  write (iout,70)
+   70             format (/,' Additional Atom Definitions for',
      &                       ' Specific Atoms :',
      &                    //,5x,'Atom  Class  Symbol  Description',
      &                       15x,'Atomic',4x,'Mass',3x,'Valence',/)
@@ -215,11 +223,11 @@ c
                mass(k) = wght
                valence(k) = lig
                if (.not. silent) then
-                  write (iout,70)  k,cls,symb,notice,atn,wght,lig
-   70             format (1x,i8,i6,5x,a3,3x,a24,i6,f11.3,i6)
+                  write (iout,80)  k,cls,symb,notice,atn,wght,lig
+   80             format (1x,i8,i6,5x,a3,3x,a24,i6,f11.3,i6)
                end if
             end if
-   80       continue
+   90       continue
          end if
       end do
 c
@@ -234,13 +242,13 @@ c
             abort = .true.
             if (header) then
                header = .false.
-               write (iout,90)
-   90          format (/,' Undefined Atom Types or Classes :',
+               write (iout,100)
+  100          format (/,' Undefined Atom Types or Classes :',
      &                 //,' Type',10x,'Atom Number',5x,'Atom Type',
      &                    5x,'Atom Class',/)
             end if
-            write (iout,100)  i,k,cls
-  100       format (' Atom',12x,i5,10x,i5,10x,i5)
+            write (iout,110)  i,k,cls
+  110       format (' Atom',12x,i5,10x,i5,10x,i5)
          end if
       end do
 c
@@ -251,14 +259,14 @@ c
          if (n12(i) .ne. valence(i)) then
             if (header) then
                header = .false.
-               write (iout,110)
-  110          format (/,' Atoms with an Unusual Number of Attached',
+               write (iout,120)
+  120          format (/,' Atoms with an Unusual Number of Attached',
      &                    ' Atoms :',
      &                 //,' Type',11x,'Atom Name',6x,'Atom Type',7x,
      &                    'Expected',4x,'Found',/)
             end if
-            write (iout,120)  i,name(i),type(i),valence(i),n12(i)
-  120       format (' Valence',5x,i7,'-',a3,8x,i5,10x,i5,5x,i5)
+            write (iout,130)  i,name(i),type(i),valence(i),n12(i)
+  130       format (' Valence',5x,i7,'-',a3,8x,i5,10x,i5,5x,i5)
          end if
       end do
       return
