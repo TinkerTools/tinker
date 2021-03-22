@@ -1481,7 +1481,7 @@ c
      &                    ' Increase MAXBIO')
                call fatal
             end if
-            if (ia .ne. 0)  biotyp(ia) = ib
+            if (ia .gt. 0)  biotyp(ia) = ib
 c
 c     MMFF atom class equivalency parameters
 c

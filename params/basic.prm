@@ -1503,3 +1503,4 @@ biotype    2012    F       "Fluoride Ion"                     90
 biotype    2013    CL      "Chloride Ion"                    170
 biotype    2014    BR      "Bromide Ion"                     350
 biotype    2015    I       "Iodide Ion"                      530
+biotype    2016    ZN      "Zinc Ion"                        300

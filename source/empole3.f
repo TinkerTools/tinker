@@ -1075,7 +1075,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use inform
       use inter
       use iounit
@@ -1774,7 +1773,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use inform
       use inter
       use iounit
@@ -1856,8 +1854,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
-!$OMP& f,nelst,elst,use_chgpen,use_bounds,off2,aewald,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& nelst,elst,use_chgpen,use_bounds,f,off2,molcule,name,
+!$OMP& verbose,debug,header,iout)
 !$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
 !$OMP DO reduction(+:em,nem,aem,einter) schedule(guided)
 c

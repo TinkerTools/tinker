@@ -228,6 +228,7 @@ c
       if (.not. allocated(electron))  allocate (electron(maxclass))
       if (.not. allocated(ionize))  allocate (ionize(maxclass))
       if (.not. allocated(repulse))  allocate (repulse(maxclass))
+      if (.not. allocated(biotyp))  allocate (biotyp(maxbio))
 c
 c     initialize values of some force field parameters
 c

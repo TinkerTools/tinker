@@ -397,10 +397,10 @@ atom        250   46    Na+   "Sodium Ion Na+"              11    22.990    0
 atom        251   47    K+    "Potassium Ion K+"            19    39.098    0
 atom        252   48    Rb+   "Rubidium Ion Rb+"            37    85.468    0
 atom        253   49    Cs+   "Cesium Ion Cs+"              55   132.905    0
-atom        254   50    Be+   "Beryllium Ion Be+2"           4     9.012    0
-atom        255   51    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
-atom        256   52    Ca+   "Calcium Ion Ca+2"            20    40.078    0
-atom        257   53    Zn+   "Zinc Ion Zn+2"               30    65.380    0
+atom        254   50    Be2   "Beryllium Ion Be+2"           4     9.012    0
+atom        255   51    Mg2   "Magnesium Ion Mg+2"          12    24.305    0
+atom        256   52    Ca2   "Calcium Ion Ca+2"            20    40.078    0
+atom        257   53    Zn2   "Zinc Ion Zn+2"               30    65.380    0
 atom        258   54    F-    "Fluoride Ion F-"              9    18.998    0
 atom        259   55    Cl-   "Chloride Ion Cl-"            17    35.453    0
 atom        260   56    Br-   "Bromide Ion Br-"             35    79.904    0
@@ -5926,3 +5926,4 @@ biotype    2012    F       "Fluoride Ion"                    258
 biotype    2013    CL      "Chloride Ion"                    259
 biotype    2014    BR      "Bromide Ion"                     260
 biotype    2015    I       "Iodide Ion"                      261
+biotype    2016    ZN      "Zinc Ion"                        257

@@ -39,6 +39,7 @@ c
       use domega
       use faces
       use fft
+      use fields
       use fracs
       use freeze
       use group
@@ -381,6 +382,10 @@ c
 c     deallocation of global arrays from module fft
 c
       if (allocated(ffttable))  deallocate (ffttable)
+c
+c     deallocation of global arrays from module fields
+c
+      if (allocated(biotyp))  deallocate (biotyp)
 c
 c     deallocation of global arrays from module fracs
 c

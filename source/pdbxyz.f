@@ -88,10 +88,14 @@ c
             resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
-               if (resname.eq.'HOH' .or. resname.eq.' NA' .or.
-     &             resname.eq.'  K' .or. resname.eq.' MG' .or.
-     &             resname.eq.' CA' .or. resname.eq.' CL' .or.
-     &             resname.eq.' BR' .or. resname.eq.'  I') then
+               if (resname.eq.'HOH' .or. resname.eq.' LI' .or.
+     &             resname.eq.' NA' .or. resname.eq.'  K' .or.
+     &             resname.eq.' RB' .or. resname.eq.' CS' .or.
+     &             resname.eq.' MG' .or. resname.eq.' CA' .or.
+     &             resname.eq.' SR' .or. resname.eq.' BA' .or.
+     &             resname.eq.'  F' .or. resname.eq.' CL' .or.
+     &             resname.eq.' BR' .or. resname.eq.'  I' .or.
+     &             resname.eq.' ZN') then
                   pdbtyp(i) = 'HETATM'
                end if
             end if
@@ -2120,6 +2124,8 @@ c
                call oldatm (i,2014,0,0)
             else if (pdbres(i) .eq. '  I') then
                call oldatm (i,2015,0,0)
+            else if (pdbres(i) .eq. ' ZN') then
+               call oldatm (i,2016,0,0)
             end if
          end if
       end do

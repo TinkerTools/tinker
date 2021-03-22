@@ -336,9 +336,9 @@ atom        205   42    Na+   "Sodium Ion Na+"              11    22.990    0
 atom        206   43    K+    "Potassium Ion K+"            19    39.098    0
 atom        207   44    Rb+   "Rubidium Ion Rb+"            37    85.468    0
 atom        208   45    Cs+   "Cesium Ion Cs+"              55   132.905    0
-atom        209   46    Be+   "Beryllium Ion Be+2"           4     9.012    0
-atom        210   47    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
-atom        211   48    Ca+   "Calcium Ion Ca+2"            20    40.078    0
+atom        209   46    Be2   "Beryllium Ion Be+2"           4     9.012    0
+atom        210   47    Mg2   "Magnesium Ion Mg+2"          12    24.305    0
+atom        211   48    Ca2   "Calcium Ion Ca+2"            20    40.078    0
 atom        212   49    Cl-   "Chloride Ion Cl-"            17    35.453    0
 
 
@@ -6032,8 +6032,11 @@ biotype     779    CH3     "N-MeAmide C-Terminus"            188
 biotype     780    H       "N-MeAmide C-Terminus"            189
 biotype    2001    O       "Water"                           202
 biotype    2002    H       "Water"                           203
-biotype    2003    NA      "Sodium Ion"                      205
-biotype    2004    K       "Potassium Ion"                   206
-biotype    2005    MG      "Magnesium Ion"                   210
-biotype    2006    CA      "Calcium Ion"                     211
-biotype    2007    CL      "Chloride Ion"                    212
+biotype    2003    NA      "Lithium Ion"                     204
+biotype    2004    NA      "Sodium Ion"                      205
+biotype    2005    K       "Potassium Ion"                   206
+biotype    2006    RB      "Rubidium Ion"                    207
+biotype    2007    CS      "Cesium Ion"                      208
+biotype    2008    MG      "Magnesium Ion"                   210
+biotype    2009    CA      "Calcium Ion"                     211
+biotype    2013    CL      "Chloride Ion"                    212

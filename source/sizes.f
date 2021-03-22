@@ -26,6 +26,7 @@ c     maxref          stored reference molecular systems
 c     maxgrp          user-defined groups of atoms
 c     maxres          residues in all macromolecules
 c     maxfix          geometric constraints and restraints
+c     maxbio          biopolymer atom type definitions
 c
 c
       module sizes
@@ -34,6 +35,7 @@ c
       integer maxclass,maxval
       integer maxref,maxgrp
       integer maxres,maxfix
+      integer maxbio
       parameter (maxatm=1000000)
       parameter (maxtyp=5000)
       parameter (maxclass=1000)
@@ -42,5 +44,6 @@ c
       parameter (maxgrp=1000)
       parameter (maxres=10000)
       parameter (maxfix=100000)
+      parameter (maxbio=10000)
       save
       end

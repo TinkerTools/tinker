@@ -1878,7 +1878,6 @@ c
       use couple
       use deriv
       use energi
-      use ewald
       use math
       use mplpot
       use mpole
@@ -3042,7 +3041,6 @@ c
       use couple
       use deriv
       use energi
-      use ewald
       use math
       use mplpot
       use mpole
@@ -3148,8 +3146,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
-!$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,aewald,
-!$OMP& xaxis,yaxis,zaxis)
+!$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
+!$OMP& yaxis,zaxis)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
 !$OMP DO reduction(+:em,dem,tem,pot,vir) schedule(guided)
 c
