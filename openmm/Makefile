@@ -34,7 +34,7 @@
 ##  Main Environment Variables; Change as Needed for Local Site  ##
 ###################################################################
 
-##  TINKERDIR       Tinker Distribution Directory
+##  TINKERDIR       Tinker Top-Level Directory
 ##  TINKER_LIBDIR   Libraries needed to build Tinker
 ##  BINDIR          Directory with Tinker Executables
 ##  LINKDIR         Linked Copies of Tinker Executables
@@ -72,10 +72,11 @@ NVML_LIB = /usr/local/cuda/lib64/stubs
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Machine:  Generic Linux
-##  CPU Type: Intel x86 Compatible, Nvidia GPU
-##  Compiler: GNU gfortran 7.5, g++, nvcc
-##  Parallel: OpenMP, OpenMM
+##  Build:     Tinker-FFE
+##  OS Type:   Generic Linux
+##  CPU Type:  Intel x86 Compatible, Nvidia GPU
+##  Compiler:  GNU gfortran 9.3, g++, nvcc
+##  Parallel:  OpenMP, OpenMM
 
 CC = gcc
 CXX = g++
@@ -91,10 +92,11 @@ LIBFLAGS = -crusv
 RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR)/lib
 
-##  Machine:  MacOS
-##  CPU Type: Intel x86-64, Nvidia GPU
-##  Compiler: GNU gfortran 8.1, clang, nvcc
-##  Parallel: OpenMP, OpenMM
+##  Build:     Tinker-FFE
+##  OS Type:   Apple macOS
+##  CPU Type:  Intel x86-64, Nvidia GPU
+##  Compiler:  GNU gfortran 8.1, clang, nvcc
+##  Parallel:  OpenMP, OpenMM
 
 #CC = clang
 #CXX = g++
@@ -115,11 +117,11 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR
 #GPU_USAGE_OBJS = gpu_usage.o
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
-##  Machine:  MacOS
-##  CPU Type: Intel x86-64, Nvidia GPU
-##  Oper Sys: OS X 10.11 (El Capitan)
-##  Compiler: Intel Fortran for Mac 15.0, clang, nvcc
-##  Parallel: OpenMP, OpenMM
+##  Build:     Tinker-FFE
+##  OS Type:   Apple macOS
+##  CPU Type:  Intel x86-64, Nvidia GPU
+##  Compiler:  Intel Fortran for Mac 15.0, clang, nvcc
+##  Parallel:  OpenMP, OpenMM
 
 #CC = icc
 #CXX = icpc -stdlib=libstdc++

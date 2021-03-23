@@ -76,7 +76,7 @@ FFEDIR = $(BUILDDIR)/ffe
 #JAVA_LIBDIR = -L$(JAVA_HOME)/jre/lib/amd64/server
 #JAVA_LIBS = -ljvm
 
-##  For MacOS
+##  For macOS
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos \
 		-I$(JAVA_HOME)/include \
 		-I$(JAVA_HOME)/include/darwin
@@ -95,11 +95,11 @@ JAVA_LIBS = -ljvm
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:    Tinker
-##  OS Type:  Generic Linux
-##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 7.5
-##  Parallel: OpenMP
+##  Build:     Tinker
+##  OS Type:   Generic Linux
+##  CPU Type:  Intel x86 Compatible
+##  Compiler:  GNU gfortran 9.3
+##  Parallel:  OpenMP
 
 #CC = gcc
 #F77 = gfortran
@@ -115,11 +115,11 @@ JAVA_LIBS = -ljvm
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RENAME = rename_bin
 
-##  Build:    Tinker
-##  OS Type:  Apple MacOS
-##  CPU Type: Intel x86 Compatible
-##  Compiler: GNU gfortran 8.1
-##  Parallel: OpenMP
+##  Build:     Tinker
+##  OS Type:   Apple macOS
+##  CPU Type:  Intel x86 Compatible
+##  Compiler:  GNU gfortran 8.1
+##  Parallel:  OpenMP
 
 CC = gcc
 F77 = gfortran
@@ -155,12 +155,11 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static
 #RENAME = rename_exe
 
-##  Build:    Tinker
-##  OS Type:  Generic Linux
-##  CPU Type: Intel x86 Compatible (also AMD)
-##  Oper Sys: Fedora Core
-##  Compiler: Intel Fortran for Linux 15.0
-##  Parallel: OpenMP
+##  Build:     Tinker
+##  OS Type:   Generic Linux
+##  CPU Type:  Intel x86 Compatible (also AMD)
+##  Compiler:  Intel Fortran for Linux 15.0
+##  Parallel:  OpenMP
 
 #F77 = ifort
 #F77FLAGS = -c -xHost
@@ -172,12 +171,11 @@ RENAME = rename_bin
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 #RENAME = rename_bin
 
-##  Build:    Tinker
-##  OS Type:  Macintosh
-##  CPU Type: Intel x86 Compatible
-##  Oper Sys: MacOS 10.11 (El Capitan)
-##  Compiler: Intel Fortran for MacOS 15.0
-##  Parallel: OpenMP
+##  Build:     Tinker
+##  OS Type:   Apple macOS
+##  CPU Type:  Intel x86 Compatible
+##  Compiler:  Intel Fortran for MacOS 15.0
+##  Parallel:  OpenMP
 
 #CC = icc
 #F77 = ifort

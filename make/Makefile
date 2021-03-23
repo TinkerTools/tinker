@@ -11,8 +11,8 @@
 ##   2. make install          Move the executables to BINDIR
 ##   3. make create_links     Create soft links in LINKDIR
 ##   4. make remove_links     Remove soft links from LINKDIR
-##   6. make listing          Concatenate source to tinker.txt
-##   5. make clean            Delete objects and executables
+##   5. make listing          Concatenate source to tinker.txt
+##   6. make clean            Delete objects and executables
 ##
 ##  Original version of this file is due to Peter Happersberger
 ##  and Jochen Buehler of the University of Konstanz, January 1998.
@@ -29,7 +29,7 @@
 ##  Main Environment Variables; Change as Needed for Local Site  ##
 ###################################################################
 
-##  TINKERDIR       Tinker Distribution Directory
+##  TINKERDIR       Tinker Top-Level Directory
 ##  TINKER_LIBDIR   Libraries needed to build Tinker
 ##  BINDIR          Directory with Tinker Executables
 ##  LINKDIR         Linked Copies of Tinker Executables
@@ -63,7 +63,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Build:     Tinker
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 7.5
+##  Compiler:  GNU gfortran 9.3
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
@@ -79,7 +79,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 #RENAME = rename_bin
 
 ##  Build:     Tinker
-##  OS Type:   Apple MacOS
+##  OS Type:   Apple macOS
 ##  CPU Type:  Intel x86 Compatible
 ##  Compiler:  GNU gfortran 8.1
 ##  Parallel:  OpenMP
@@ -130,7 +130,7 @@ RENAME = rename_bin
 #RENAME = rename_bin
 
 ##  Build:     Tinker
-##  OS Type:   Apple MacOS
+##  OS Type:   Apple macOS
 ##  CPU Type:  Intel Xeon
 ##  Compiler:  Intel Fortran for MacOS 15.0
 ##  Parallel:  OpenMP
@@ -143,22 +143,6 @@ RENAME = rename_bin
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
-#RENAME = rename_bin
-
-##  Build:     Tinker
-##  OS Type:   Apple MacOS
-##  CPU Type:  Intel Xeon
-##  Compiler:  PGI Fortran 19.10 for MacOS
-##  Parallel:  OpenMP
-
-#F77 = pgfortran
-#F77FLAGS = -c
-#OPTFLAGS = -fast -O3 -mp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS)
 #RENAME = rename_bin
 
 #################################################################
