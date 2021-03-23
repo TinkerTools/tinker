@@ -1030,7 +1030,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use inform
       use inter
       use iounit
@@ -1701,7 +1700,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use inform
       use inter
       use iounit

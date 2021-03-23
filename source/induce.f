@@ -2443,7 +2443,6 @@ c
       use cell
       use chgpen
       use couple
-      use ewald
       use math
       use mplpot
       use mpole
@@ -3161,7 +3160,6 @@ c
       use bound
       use chgpen
       use couple
-      use ewald
       use math
       use mplpot
       use mpole
@@ -3958,7 +3956,6 @@ c
       use cell
       use chgpen
       use couple
-      use ewald
       use math
       use mplpot
       use mpole

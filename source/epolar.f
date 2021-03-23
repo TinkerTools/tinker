@@ -891,7 +891,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use math
       use mplpot
       use mpole
@@ -1458,7 +1457,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use math
       use mplpot
       use mpole
