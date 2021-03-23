@@ -20,27 +20,22 @@ c
       use ewald
       use math
       implicit none
-      integer i,maxi
+      integer i,niter
       integer rorder
       real*8 r,r2,scale
       real*8 bfac,erfc
       real*8 aesq2,afac
       real*8 expterm,ra
+      real*8 bn(0:5)
       real*8 dmpe(*)
-      real*8, allocatable :: bn(:)
       external erfc
 c
 c
-c     initialize Ewald damping factors and set storage size
+c     initialize the Ewald damping factor coefficients
 c
       do i = 1, rorder
          dmpe(i) = scale
       end do
-      maxi = (rorder-1) / 2
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (bn(0:maxi))
 c     
 c     compute the successive Ewald damping factors
 c
@@ -51,16 +46,13 @@ c
       aesq2 = 2.0d0 * aewald * aewald
       afac = 0.0d0
       if (aewald .gt. 0.0d0)  afac = 1.0d0 / (rootpi*aewald)
-      do i = 1, maxi
+      niter = (rorder-1) / 2
+      do i = 1, niter
          bfac = dble(2*i-1)
          afac = aesq2 * afac
          bn(i) = (bfac*bn(i-1)+afac*expterm) / r2
          dmpe(2*i+1) = scale * bn(i)
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (bn)
       return
       end
 c

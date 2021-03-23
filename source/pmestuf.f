@@ -599,7 +599,8 @@ c     "grid_pchg" places the fractional atomic partial charges onto
 c     the particle mesh Ewald grid
 c
 c     note the main loop does not need to be an OpenMP reduction
-c     since a given qgrid element is always part of the same chunk
+c     since a given qgrid element is always part of the same chunk,
+c     and the code runs faster without use of a reduction
 c
 c
       subroutine grid_pchg
@@ -643,7 +644,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid) schedule(guided)
+!$OMP DO schedule(guided)
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -718,7 +719,8 @@ c     "grid_mpole" places the fractional atomic multipoles onto
 c     the particle mesh Ewald grid
 c
 c     note the main loop does not need to be an OpenMP reduction
-c     since a given qgrid element is always part of the same chunk
+c     since a given qgrid element is always part of the same chunk,
+c     and the code runs faster without use of a reduction
 c
 c
       subroutine grid_mpole (fmp)
@@ -765,7 +767,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid) schedule(guided)
+!$OMP DO schedule(guided)
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -852,7 +854,8 @@ c     "grid_uind" places the fractional induced dipoles onto the
 c     particle mesh Ewald grid
 c
 c     note the main loop does not need to be an OpenMP reduction
-c     since a given qgrid element is always part of the same chunk
+c     since a given qgrid element is always part of the same chunk,
+c     and the code runs faster without use of a reduction
 c
 c
       subroutine grid_uind (fuind,fuinp)
@@ -900,7 +903,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid) schedule(guided)
+!$OMP DO schedule(guided)
 c
 c     put the induced dipole moments onto the grid
 c
@@ -986,7 +989,8 @@ c     "grid_disp" places the damped dispersion coefficients onto
 c     the particle mesh Ewald grid
 c
 c     note the main loop does not need to be an OpenMP reduction
-c     since a given qgrid element is always part of the same chunk
+c     since a given qgrid element is always part of the same chunk,
+c     and the code runs faster without use of a reduction
 c
 c
       subroutine grid_disp
@@ -1030,7 +1034,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:qgrid) schedule(guided)
+!$OMP DO schedule(guided)
 c
 c     put the dispersion sites onto the grid
 c

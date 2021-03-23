@@ -68,8 +68,8 @@ c
       mpoletaper = 0.65d0
       ctrntaper = 0.90d0
       hesscut = 0.0d0
-      lbuffer = 1.0d0
-      pbuffer = 1.0d0
+      lbuffer = 2.0d0
+      pbuffer = 2.0d0
 c
 c     set defaults for Ewald sum, tapering style and neighbor method
 c
