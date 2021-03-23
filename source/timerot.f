@@ -19,9 +19,12 @@ c     Hessian matrix evaluation
 c
 c
       program timerot
+      use hescut
+      use inform
       use iounit
       use limits
       use omega
+      use polpot
       implicit none
       integer i,ncalls,next
       real*8 energy,value
@@ -92,6 +95,12 @@ c
       write (iout,70)  wall,cpu
    70 format (/,' Computation Set-up :',f15.3,' Sec (Wall)',
      &           f15.3,' Sec (CPU)')
+c
+c     set a large Hessian cutoff and turn off extra printing
+c
+      hesscut = 1.0d0
+      verbose = .false.
+      polprt = .false.
 c
 c     run the potential energy only timing experiment
 c
