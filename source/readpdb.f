@@ -684,7 +684,9 @@ c
 c     convert unusual names for other amino acid residues
 c
       if (resname .eq. 'CYN')  resname = 'CYS'
+      if (resname .eq. 'CYM')  resname = 'CYD'
       if (resname .eq. 'LYP')  resname = 'LYS'
+      if (resname .eq. 'LYN')  resname = 'LYD'
 c
 c     convert unusual names for terminal capping residues
 c
