@@ -1956,7 +1956,7 @@ kpitor.o:
 kpitors.o: atomid.o atoms.o bndstr.o couple.o inform.o iounit.o keys.o kpitor.o pitors.o potent.o tors.o
 kpolar.o: atoms.o chgpen.o couple.o inform.o iounit.o keys.o kpolr.o mplpot.o mpole.o polar.o polgrp.o polopt.o polpcg.o polpot.o poltcg.o potent.o
 kpolr.o:
-krepel.o: atomid.o atoms.o inform.o iounit.o keys.o krepl.o mpole.o potent.o repel.o sizes.o
+krepel.o: atomid.o atoms.o inform.o iounit.o keys.o krepl.o mpole.o potent.o repel.o reppot.o sizes.o
 krepl.o:
 ksolut.o:
 ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o ksolut.o kvdws.o math.o nonpol.o pbstuf.o polar.o polopt.o polpot.o potent.o ptable.o solpot.o solute.o

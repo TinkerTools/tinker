@@ -23,8 +23,18 @@ c
 c
       subroutine erepel
       use limits
+      use potent
+      use reppot
       implicit none
 c
+c
+c     compute the induced dipoles at each polarizable atom
+c
+      if (reppolar .and. .not.use_polar) then
+         use_polar = .true.
+         call induce
+         use_polar = .false.
+      end if
 c
 c     choose the method for summing over pairwise interactions
 c
@@ -57,6 +67,7 @@ c
       use group
       use mpole
       use mutant
+      use polar
       use potent
       use repel
       use reppot
@@ -137,6 +148,11 @@ c
          dix = rpole(2,ii)
          diy = rpole(3,ii)
          diz = rpole(4,ii)
+         if (reppolar) then
+            dix = dix + uind(1,ii)
+            diy = diy + uind(2,ii)
+            diz = diz + uind(3,ii)
+         end if
          qixx = rpole(5,ii)
          qixy = rpole(6,ii)
          qixz = rpole(7,ii)
@@ -185,6 +201,11 @@ c
                   dkx = rpole(2,kk)
                   dky = rpole(3,kk)
                   dkz = rpole(4,kk)
+                  if (reppolar) then
+                     dkx = dkx + uind(1,kk)
+                     dky = dky + uind(2,kk)
+                     dkz = dkz + uind(3,kk)
+                  end if
                   qkxx = rpole(5,kk)
                   qkxy = rpole(6,kk)
                   qkxz = rpole(7,kk)
@@ -314,6 +335,11 @@ c
             dix = rpole(2,ii)
             diy = rpole(3,ii)
             diz = rpole(4,ii)
+            if (reppolar) then
+               dix = dix + uind(1,ii)
+               diy = diy + uind(2,ii)
+               diz = diz + uind(3,ii)
+            end if
             qixx = rpole(5,ii)
             qixy = rpole(6,ii)
             qixz = rpole(7,ii)
@@ -339,7 +365,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            do kk = i, npole
+            do kk = ii, npole
                k = ipole(kk)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -361,6 +387,11 @@ c
                         dkx = rpole(2,kk)
                         dky = rpole(3,kk)
                         dkz = rpole(4,kk)
+                        if (reppolar) then
+                           dkx = dkx + uind(1,kk)
+                           dky = dky + uind(2,kk)
+                           dkz = dkz + uind(3,kk)
+                        end if
                         qkxx = rpole(5,kk)
                         qkxy = rpole(6,kk)
                         qkxz = rpole(7,kk)
@@ -484,6 +515,7 @@ c
       use inter
       use mpole
       use neigh
+      use polar
       use repel
       use reppot
       use shunt
@@ -550,10 +582,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,cut2,off2,
-!$OMP& c0,c1,c2,c3,c4,c5)
+!$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,uind,n12,
+!$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,reppolar,cut2,
+!$OMP& off2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er)
 !$OMP DO reduction(+:er) schedule(guided)
@@ -572,6 +604,11 @@ c
          dix = rpole(2,ii)
          diy = rpole(3,ii)
          diz = rpole(4,ii)
+         if (reppolar) then
+            dix = dix + uind(1,ii)
+            diy = diy + uind(2,ii)
+            diz = diz + uind(3,ii)
+         end if
          qixx = rpole(5,ii)
          qixy = rpole(6,ii)
          qixz = rpole(7,ii)
@@ -619,6 +656,11 @@ c
                   dkx = rpole(2,kk)
                   dky = rpole(3,kk)
                   dkz = rpole(4,kk)
+                  if (reppolar) then
+                     dkx = dkx + uind(1,kk)
+                     dky = dky + uind(2,kk)
+                     dkz = dkz + uind(3,kk)
+                  end if
                   qkxx = rpole(5,kk)
                   qkxy = rpole(6,kk)
                   qkxz = rpole(7,kk)

@@ -206,6 +206,16 @@ c
       if (use_angtor)  call eangtor3
       if (use_tortor)  call etortor3
 c
+c     call the electrostatic energy component routines
+c
+      if (use_charge)  call echarge3
+      if (use_chgdpl)  call echgdpl3
+      if (use_dipole)  call edipole3
+      if (use_mpole)  call empole3
+      if (use_polar)  call epolar3
+      if (use_chgtrn)  call echgtrn3
+      if (use_rxnfld)  call erxnfld3
+c
 c     call the van der Waals energy component routines
 c
       if (use_vdw) then
@@ -217,16 +227,6 @@ c
       end if
       if (use_repuls)  call erepel3
       if (use_disp)  call edisp3
-c
-c     call the electrostatic energy component routines
-c
-      if (use_charge)  call echarge3
-      if (use_chgdpl)  call echgdpl3
-      if (use_dipole)  call edipole3
-      if (use_mpole)  call empole3
-      if (use_polar)  call epolar3
-      if (use_chgtrn)  call echgtrn3
-      if (use_rxnfld)  call erxnfld3
 c
 c     call any miscellaneous energy component routines
 c

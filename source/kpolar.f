@@ -148,14 +148,14 @@ c
 c
 c     get keywords containing polarization-related options
 c
-      do j = 1, nkey
+      do i = 1, nkey
          next = 1
-         record = keyline(j)
+         record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:240)
          if (keyword(1:12) .eq. 'POLARIZABLE ') then
-            read (string,*,err=10,end=10)  (list(i),i=nlist+1,n)
+            read (string,*,err=10,end=10)  (list(j),j=nlist+1,n)
    10       continue
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
@@ -179,10 +179,10 @@ c
          else if (keyword(1:9) .eq. 'TCG-PEEK ') then
             read (string,*,err=20,end=20)  tcgpeek
          else if (keyword(1:10) .eq. 'OPT-COEFF ') then
-            do i = 0, maxopt
-               copt(i) = 0.0d0
+            do j = 0, maxopt
+               copt(j) = 0.0d0
             end do
-            read (string,*,err=20,end=20)  (copt(i),i=0,maxopt)
+            read (string,*,err=20,end=20)  (copt(j),j=0,maxopt)
          end if
    20    continue
       end do
@@ -436,7 +436,7 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      if (use_polar .and. .not.use_chgtrn) then
+      if ((use_polar .or. use_repuls) .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
          npolar = 0
