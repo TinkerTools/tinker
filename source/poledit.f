@@ -4027,7 +4027,7 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer ktype
+      integer it,ktype
       integer, allocatable :: equiv(:)
       real*8 eps,sum,big
       real*8 ival,kval
@@ -4066,8 +4066,8 @@ c
       ktype = 0
       sum = 0.0d0
       do i = 1, npole
-         j = type(ipole(i))
-         equiv(j) = equiv(j) + 1 
+         it = type(ipole(i))
+         equiv(it) = equiv(it) + 1 
          sum = sum + pole(1,i)
       end do
       sum = sum - dble(nint(sum))
@@ -4075,14 +4075,15 @@ c
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
-            do i = 1, n
-               if (equiv(i) .eq. m) then
+            do i = 1, npole
+               it = type(ipole(i))
+               if (equiv(it) .eq. m) then
                   ival = abs(pole(1,ipole(i)))
                   if (ktype .eq. 0) then
-                     ktype = i
+                     ktype = it
                      kval = ival
                   else if (ival .gt. kval) then
-                     ktype = i
+                     ktype = it
                      kval = ival
                   end if
                end if
@@ -4094,8 +4095,8 @@ c
       if (ktype .ne. 0) then
          sum = sum / dble(m)
          do i = 1, npole
-            j = type(ipole(i))
-            if (j .eq. ktype)  pole(1,i) = pole(1,i) - sum
+            it = type(ipole(i))
+            if (it .eq. ktype)  pole(1,i) = pole(1,i) - sum
          end do
       end if
 c

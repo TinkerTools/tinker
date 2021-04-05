@@ -1518,6 +1518,7 @@ c
       integer, allocatable :: equiv(:)
       real*8 dterm,qterm
       real*8 eps,sum,big
+      real*8 ival,kval
       real*8 xx(*)
       logical done
       character*17 prmtyp
@@ -1556,17 +1557,27 @@ c
       ktype = 0
       sum = 0.0d0
       do i = 1, nion
-         j = type(iion(i))
-         equiv(j) = equiv(j) + 1 
+         it = type(iion(i))
+         equiv(it) = equiv(it) + 1 
          sum = sum + pchg(i)
       end do
       sum = sum - dble(nint(sum))
-      k = nint(sum/eps)
+      k = nint(abs(sum)/eps)
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
-            do i = 1, n
-               if (equiv(i) .eq. m)  ktype = i
+            do i = 1, nion
+               it = type(iion(i))
+               if (equiv(it) .eq. m) then
+                  ival = abs(pchg(i))
+                  if (ktype .eq. 0) then
+                     ktype = it
+                     kval = ival
+                  else if (ival .gt. kval) then
+                     ktype = it
+                     kval = ival
+                  end if
+               end if
             end do
          end if
          if (ktype .ne. 0)  goto 10
@@ -1575,10 +1586,10 @@ c
       if (ktype .ne. 0) then
          sum = sum / dble(m)
          do i = 1, nion
-            j = type(iion(i))
-            if (j .eq. ktype) then
+            it = type(iion(i))
+            if (it .eq. ktype) then
                pchg(i) = pchg(i) - sum
-               fchg(j) = pchg(i)
+               fchg(it) = pchg(i)
             end if
          end do
       end if
@@ -1591,17 +1602,27 @@ c
       ktype = 0
       sum = 0.0d0
       do i = 1, npole
-         j = type(ipole(i))
-         equiv(j) = equiv(j) + 1 
+         it = type(ii)
+         equiv(it) = equiv(it) + 1 
          sum = sum + pole(1,i)
       end do
       sum = sum - dble(nint(sum))
-      k = nint(sum/eps)
+      k = nint(abs(sum)/eps)
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
-            do i = 1, n
-               if (equiv(i) .eq. m)  ktype = i
+            do i = 1, npole
+               it = type(ipole(i))
+               if (equiv(it) .eq. m) then
+                  ival = abs(pole(1,ipole(i)))
+                  if (ktype .eq. 0) then
+                     ktype = it
+                     kval = ival
+                  else if (ival .gt. kval) then
+                     ktype = it
+                     kval = ival
+                  end if
+               end if
             end do
          end if
          if (ktype .ne. 0)  goto 20
@@ -1610,10 +1631,10 @@ c
       if (ktype .ne. 0) then
          sum = sum / dble(m)
          do i = 1, npole
-            j = type(ipole(i))
-            if (j .eq. ktype) then
+            it = type(ipole(i))
+            if (it .eq. ktype) then
                pole(1,i) = pole(1,i) - sum
-               fpol(1,j) = pole(1,i)
+               fpol(1,it) = pole(1,i)
             end if
          end do
       end if
