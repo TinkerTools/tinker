@@ -1551,7 +1551,7 @@ c
 c
 c     enforce integer net charge over partial charges
 c
-      do i = 1, n
+      do i = 1, maxtyp
          equiv(i) = 0
       end do
       ktype = 0
@@ -1596,7 +1596,7 @@ c
 c
 c     enforce integer net charge over atomic multipoles
 c
-      do i = 1, n
+      do i = 1, maxtyp
          equiv(i) = 0
       end do
       ktype = 0
