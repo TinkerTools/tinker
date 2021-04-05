@@ -2158,8 +2158,9 @@ c
    20    format (/,' Choose Method for Division into Polarization',
      &              ' Groups :',
      &           //,4x,'(1) Put All Atoms in One Polarization Group',
-     &           /,4x,'(2) Separate into Groups at Rotatable Bonds')
-         do while (mode.lt.1 .or. mode.gt.2)
+     &           /,4x,'(2) Separate into Groups at Rotatable Bonds',
+     &           /,4x,'(3) Manual Entry of Bonds Separating Groups')
+         do while (mode.lt.1 .or. mode.gt.3)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice',
@@ -2179,62 +2180,9 @@ c
          end do
       end do
 c
-c     allow modification of polarization group one bond at a time
-c
-      if (mode .eq. 1) then
-         write (iout,60)
-   60    format (/,' All atoms are placed initially into one',
-     &              ' polarization group;',
-     &           /,' This can be modified by entering a series',
-     &              ' of bonded atom pairs',
-     &           /,' that separate the molecule into distinct',
-     &              ' polarization groups')
-c
-c     get the bonds that separate the polarization groups
-c
-         query = .true.
-         i = -1
-         call nextarg (string,exist)
-         if (exist) then
-            read (string,*,err=70,end=70)  i
-            if (i .eq. 0)  query = .false.
-         end if
-   70    continue
-         do while (query)
-            ia = 0
-            ib = 0
-            write (iout,80)
-   80       format (/,' Enter a Bond between Polarization Groups',
-     &                 ' [<Enter>=Exit] :  ',$)
-            read (input,90)  record
-   90       format (a240)
-            read (record,*,err=100,end=100)  ia,ib
-  100       continue
-            if (ia.eq.0 .or. ib.eq.0) then
-               query = .false.
-            else
-               do i = 1, n12(ia)
-                  if (pgrp(i,ia) .eq. ib) then
-                     do j = i+1, n12(ia)
-                        pgrp(j-1,ia) = pgrp(j,ia)
-                     end do
-                     pgrp(n12(ia),ia) = 0
-                  end if
-               end do
-               do i = 1, n12(ib)
-                  if (pgrp(i,ib) .eq. ia) then
-                     do j = i+1, n12(ib)
-                        pgrp(j-1,ib) = pgrp(j,ib)
-                     end do
-                     pgrp(n12(ib),ib) = 0
-                  end if
-               end do
-            end if
-         end do
-c
 c     separate into polarization groups at rotatable bonds
 c
-      else if (mode .eq. 2) then
+      if (mode .eq. 2) then
          call bonds
          do k = 1, nbond
             ia = ibnd(1,k)
@@ -2415,6 +2363,59 @@ c
                         pgrp(j-1,ib) = pgrp(j,ib)
                      end do
                      pgrp(n12b,ib) = 0
+                  end if
+               end do
+            end if
+         end do
+c
+c     allow modification of polarization group one bond at a time
+c
+      else if (mode .eq. 3) then
+         write (iout,60)
+   60    format (/,' All atoms are placed initially into one',
+     &              ' polarization group;',
+     &           /,' This can be modified by entering a series',
+     &              ' of bonded atom pairs',
+     &           /,' that separate the molecule into distinct',
+     &              ' polarization groups')
+c
+c     get the bonds that separate the polarization groups
+c
+         query = .true.
+         i = -1
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=70,end=70)  i
+            if (i .eq. 0)  query = .false.
+         end if
+   70    continue
+         do while (query)
+            ia = 0
+            ib = 0
+            write (iout,80)
+   80       format (/,' Enter a Bond between Polarization Groups',
+     &                 ' [<Enter>=Exit] :  ',$)
+            read (input,90)  record
+   90       format (a240)
+            read (record,*,err=100,end=100)  ia,ib
+  100       continue
+            if (ia.eq.0 .or. ib.eq.0) then
+               query = .false.
+            else
+               do i = 1, n12(ia)
+                  if (pgrp(i,ia) .eq. ib) then
+                     do j = i+1, n12(ia)
+                        pgrp(j-1,ia) = pgrp(j,ia)
+                     end do
+                     pgrp(n12(ia),ia) = 0
+                  end if
+               end do
+               do i = 1, n12(ib)
+                  if (pgrp(i,ib) .eq. ia) then
+                     do j = i+1, n12(ib)
+                        pgrp(j-1,ib) = pgrp(j,ib)
+                     end do
+                     pgrp(n12(ib),ib) = 0
                   end if
                end do
             end if
@@ -4029,6 +4030,7 @@ c
       integer ktype
       integer, allocatable :: equiv(:)
       real*8 eps,sum,big
+      real*8 ival,kval
 c
 c
 c     convert dipole and quadrupole moments to atomic units
@@ -4069,12 +4071,21 @@ c
          sum = sum + pole(1,i)
       end do
       sum = sum - dble(nint(sum))
-      k = nint(sum/eps)
+      k = nint(abs(sum)/eps)
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
             do i = 1, n
-               if (equiv(i) .eq. m)  ktype = i
+               if (equiv(i) .eq. m) then
+                  ival = abs(pole(1,ipole(i)))
+                  if (ktype .eq. 0) then
+                     ktype = i
+                     kval = ival
+                  else if (ival .gt. kval) then
+                     ktype = i
+                     kval = ival
+                  end if
+               end if
             end do
          end if
          if (ktype .ne. 0)  goto 10

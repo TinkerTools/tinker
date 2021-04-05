@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.3  November 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -18,9 +18,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.2   October 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -276,9 +276,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.2   October 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -421,7 +421,7 @@
 
  Convex Faces :         417     Area :      729.939    Volume :      333.229
  Saddle Faces :        1239     Area :      981.531    Volume :      713.848
- Concave Faces :        826     Area :      701.161    Volume :      855.243
+ Concave Faces :        826     Area :      701.162    Volume :      855.243
  Buried Polyhedra :                                    Volume :     3341.974
 
  Spindle Correction :           Area :       10.988    Volume :       -2.865

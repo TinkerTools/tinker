@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.3  November 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -120,8 +120,15 @@
        6      H            0.4960         0.3900
 
  Enter Atom Number, Polarizability & Thole Values :  
- The default is to place all atoms into one polarization group;
- This can be altered by entering a series of bonded atom pairs
+ Choose Method for Division into Polarization Groups :
+
+    (1) Put All Atoms in One Polarization Group
+    (2) Separate into Groups at Rotatable Bonds
+    (3) Manual Entry of Bonds Separating Groups
+
+ Enter the Number of the Desired Choice [1] :  
+ All atoms are placed initially into one polarization group;
+ This can be modified by entering a series of bonded atom pairs
  that separate the molecule into distinct polarization groups
 
  Enter a Bond between Polarization Groups [<Enter>=Exit] :  

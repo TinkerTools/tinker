@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.3  November 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -25,9 +25,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.2   October 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -48,9 +48,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                       Version 8.8.2   October 2020                       ##
+ ##                       Version 8.9.1  February 2021                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2020               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -61,15 +61,8 @@
 
      Type  Class  Symbol  Description               Atomic    Mass   Valence
 
-       1      1     Na+   Na+ Sodium Ion              11     22.990     0
-       2      2     Cl-   Cl- Chloride Ion            17     35.453     0
-
- Additional van der Waals Parameters :
-
-     Atom Class               Size        Epsilon        Reduction
-
-           1                3.3304         0.0028          0.000
-           2                4.4172         0.1180          0.000
+        1     1     Na+   Na+ Sodium Ion              11     22.990     0
+        2     2     Cl-   Cl- Chloride Ion            17     35.453     0
 
  Additional Atomic Partial Charge Parameters :
 
@@ -77,6 +70,13 @@
 
            1                1.0000
            2               -1.0000
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+           1                3.3304         0.0028          0.000
+           2                4.4172         0.1180          0.000
 
  Initial Lattice Dimensions :    a         5.6280
                                  b         5.6280
