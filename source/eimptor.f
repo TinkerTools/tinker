@@ -25,7 +25,8 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,rcb,fgrp
+      real*8 e,eps
+      real*8 rcb,fgrp
       real*8 xt,yt,zt
       real*8 xu,yu,zu
       real*8 xtu,ytu,ztu
@@ -52,10 +53,14 @@ c
       eit = 0.0d0
       if (nitors .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nitors,iitors,use,x,y,z,
-!$OMP& itors1,itors2,itors3,itorunit,use_group,use_polymer)
+!$OMP& itors1,itors2,itors3,itorunit,eps,use_group,use_polymer)
 !$OMP& shared(eit)
 !$OMP DO reduction(+:eit) schedule(guided)
 c
@@ -103,6 +108,7 @@ c
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xt = yba*zcb - ycb*zba
             yt = zba*xcb - zcb*xba
             zt = xba*ycb - xcb*yba
@@ -112,48 +118,45 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
 c     set the improper torsional parameters for this angle
 c
-               v1 = itors1(1,i)
-               c1 = itors1(3,i)
-               s1 = itors1(4,i)
-               v2 = itors2(1,i)
-               c2 = itors2(3,i)
-               s2 = itors2(4,i)
-               v3 = itors3(1,i)
-               c3 = itors3(3,i)
-               s3 = itors3(4,i)
+            v1 = itors1(1,i)
+            c1 = itors1(3,i)
+            s1 = itors1(4,i)
+            v2 = itors2(1,i)
+            c2 = itors2(3,i)
+            s2 = itors2(4,i)
+            v3 = itors3(1,i)
+            c3 = itors3(3,i)
+            s3 = itors3(4,i)
 c
 c     compute the multiple angle trigonometry and the phase terms
 c
-               cosine2 = cosine*cosine - sine*sine
-               sine2 = 2.0d0 * cosine * sine
-               cosine3 = cosine*cosine2 - sine*sine2
-               sine3 = cosine*sine2 + sine*cosine2
-               phi1 = 1.0d0 + (cosine*c1 + sine*s1)
-               phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
-               phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
+            cosine2 = cosine*cosine - sine*sine
+            sine2 = 2.0d0 * cosine * sine
+            cosine3 = cosine*cosine2 - sine*sine2
+            sine3 = cosine*sine2 + sine*cosine2
+            phi1 = 1.0d0 + (cosine*c1 + sine*s1)
+            phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
+            phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
 c
 c     calculate the improper torsional energy for this angle
 c
-               e = itorunit * (v1*phi1 + v2*phi2 + v3*phi3)
+            e = itorunit * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+            if (use_group)  e = e * fgrp
 c
 c     increment the total torsional angle energy
 c
-               eit = eit + e
-            end if
+            eit = eit + e
          end if
       end do
 c

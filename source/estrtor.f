@@ -28,7 +28,7 @@ c
       implicit none
       integer i,k,istrtor
       integer ia,ib,ic,id
-      real*8 e,dr,fgrp
+      real*8 e,eps,dr,fgrp
       real*8 rt2,ru2,rtru
       real*8 rba,rcb,rdc
       real*8 e1,e2,e3
@@ -57,10 +57,14 @@ c
       ebt = 0.0d0
       if (nstrtor .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
-!$OMP& tors1,tors2,tors3,use,x,y,z,storunit,use_group,use_polymer)
+!$OMP& tors1,tors2,tors3,use,x,y,z,storunit,eps,use_group,use_polymer)
 !$OMP& shared(ebt)
 !$OMP DO reduction(+:ebt) schedule(guided)
 c
@@ -111,81 +115,80 @@ c
             end if
             rba = sqrt(xba*xba + yba*yba + zba*zba)
             rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
+            rcb = max(rcb,eps)
             rdc = sqrt(xdc*xdc + ydc*ydc + zdc*zdc)
-            if (min(rba,rcb,rdc) .ne. 0.0d0) then
-               xt = yba*zcb - ycb*zba
-               yt = zba*xcb - zcb*xba
-               zt = xba*ycb - xcb*yba
-               xu = ycb*zdc - ydc*zcb
-               yu = zcb*xdc - zdc*xcb
-               zu = xcb*ydc - xdc*ycb
-               xtu = yt*zu - yu*zt
-               ytu = zt*xu - zu*xt
-               ztu = xt*yu - xu*yt
-               rt2 = xt*xt + yt*yt + zt*zt
-               rt2 = max(rt2,0.000001d0)
-               ru2 = xu*xu + yu*yu + zu*zu
-               ru2 = max(ru2,0.000001d0)
-               rtru = sqrt(rt2*ru2)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            xt = yba*zcb - ycb*zba
+            yt = zba*xcb - zcb*xba
+            zt = xba*ycb - xcb*yba
+            xu = ycb*zdc - ydc*zcb
+            yu = zcb*xdc - zdc*xcb
+            zu = xcb*ydc - xdc*ycb
+            xtu = yt*zu - yu*zt
+            ytu = zt*xu - zu*xt
+            ztu = xt*yu - xu*yt
+            rt2 = xt*xt + yt*yt + zt*zt
+            rt2 = max(rt2,eps)
+            ru2 = xu*xu + yu*yu + zu*zu
+            ru2 = max(ru2,eps)
+            rtru = sqrt(rt2*ru2)
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
 c     compute multiple angle trigonometry and phase terms
 c
-               c1 = tors1(3,i)
-               s1 = tors1(4,i)
-               c2 = tors2(3,i)
-               s2 = tors2(4,i)
-               c3 = tors3(3,i)
-               s3 = tors3(4,i)
-               cosine2 = cosine*cosine - sine*sine
-               sine2 = 2.0d0 * cosine * sine
-               cosine3 = cosine*cosine2 - sine*sine2
-               sine3 = cosine*sine2 + sine*cosine2
-               phi1 = 1.0d0 + (cosine*c1 + sine*s1)
-               phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
-               phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
+            c1 = tors1(3,i)
+            s1 = tors1(4,i)
+            c2 = tors2(3,i)
+            s2 = tors2(4,i)
+            c3 = tors3(3,i)
+            s3 = tors3(4,i)
+            cosine2 = cosine*cosine - sine*sine
+            sine2 = 2.0d0 * cosine * sine
+            cosine3 = cosine*cosine2 - sine*sine2
+            sine3 = cosine*sine2 + sine*cosine2
+            phi1 = 1.0d0 + (cosine*c1 + sine*s1)
+            phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
+            phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
 c
 c     get the stretch-torsion values for the first bond
 c
-               v1 = kst(1,istrtor)
-               v2 = kst(2,istrtor)
-               v3 = kst(3,istrtor)
-               k = ist(2,istrtor)
-               dr = rba - bl(k)
-               e1 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
+            v1 = kst(1,istrtor)
+            v2 = kst(2,istrtor)
+            v3 = kst(3,istrtor)
+            k = ist(2,istrtor)
+            dr = rba - bl(k)
+            e1 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the stretch-torsion values for the second bond
 c
-               v1 = kst(4,istrtor)
-               v2 = kst(5,istrtor)
-               v3 = kst(6,istrtor)
-               k = ist(3,istrtor)
-               dr = rcb - bl(k)
-               e2 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
+            v1 = kst(4,istrtor)
+            v2 = kst(5,istrtor)
+            v3 = kst(6,istrtor)
+            k = ist(3,istrtor)
+            dr = rcb - bl(k)
+            e2 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the stretch-torsion values for the third bond
 c
-               v1 = kst(7,istrtor)
-               v2 = kst(8,istrtor)
-               v3 = kst(9,istrtor)
-               k = ist(4,istrtor)
-               dr = rdc - bl(k)
-               e3 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
+            v1 = kst(7,istrtor)
+            v2 = kst(8,istrtor)
+            v3 = kst(9,istrtor)
+            k = ist(4,istrtor)
+            dr = rdc - bl(k)
+            e3 = storunit * dr * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group) then
-                  e1 = e1 * fgrp
-                  e2 = e2 * fgrp
-                  e3 = e3 * fgrp
-               end if
+            if (use_group) then
+               e1 = e1 * fgrp
+               e2 = e2 * fgrp
+               e3 = e3 * fgrp
+            end if
 c
 c     increment the total stretch-torsion energy
 c
-               e = e1 + e2 + e3
-               ebt = ebt + e
-            end if
+            e = e1 + e2 + e3
+            ebt = ebt + e
          end if
       end do
 c

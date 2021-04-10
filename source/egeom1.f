@@ -35,8 +35,9 @@ c
       implicit none
       integer i,j,k
       integer ia,ib,ic,id
-      real*8 e,xr,yr,zr,fgrp
+      real*8 e,eps,fgrp
       real*8 de,dt,dt2,deddt
+      real*8 xr,yr,zr
       real*8 r,r2,r6,r12
       real*8 dedx,dedy,dedz
       real*8 angle,target
@@ -97,6 +98,10 @@ c
          deg(3,i) = 0.0d0
       end do
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     disable replica mechanism when computing restraint terms
 c
       if (use_replica) then
@@ -134,8 +139,7 @@ c
             dt = max(0.0d0,r-pfix(2,i))
             dt2 = dt * dt
             e = force * dt2
-            if (r .eq. 0.0d0)  r = 1.0d0
-            de = 2.0d0 * force * dt / r
+            de = 2.0d0 * force * dt / max(r,eps)
 c
 c     scale the interaction based on its group membership
 c
@@ -201,8 +205,7 @@ c
             dt = r - target
             dt2 = dt * dt
             e = force * dt2
-            if (r .eq. 0.0d0)  r = 1.0d0
-            de = 2.0d0 * force * dt / r
+            de = 2.0d0 * force * dt / max(r,eps)
 c
 c     scale the interaction based on its group membership
 c
@@ -272,81 +275,78 @@ c
             xcb = xic - xib
             ycb = yic - yib
             zcb = zic - zib
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-               xp = ycb*zab - zcb*yab
-               yp = zcb*xab - xcb*zab
-               zp = xcb*yab - ycb*xab
-               rp = sqrt(xp*xp + yp*yp + zp*zp)
-               rp = max(rp,0.000001d0)
-               dot = xab*xcb + yab*ycb + zab*zcb
-               cosine = dot / sqrt(rab2*rcb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               force = afix(1,i)
-               af1 = afix(2,i)
-               af2 = afix(3,i)
-               target = angle
-               if (angle .lt. af1)  target = af1
-               if (angle .gt. af2)  target = af2
-               dt = angle - target
-               dt2 = dt * dt
-               e = force * dt2
-               deddt = 2.0d0 * force * dt * radian
+            rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+            xp = ycb*zab - zcb*yab
+            yp = zcb*xab - xcb*zab
+            zp = xcb*yab - ycb*xab
+            rp = sqrt(max(xp*xp+yp*yp+zp*zp,eps))
+            dot = xab*xcb + yab*ycb + zab*zcb
+            cosine = dot / sqrt(rab2*rcb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            force = afix(1,i)
+            af1 = afix(2,i)
+            af2 = afix(3,i)
+            target = angle
+            if (angle .lt. af1)  target = af1
+            if (angle .gt. af2)  target = af2
+            dt = angle - target
+            dt2 = dt * dt
+            e = force * dt2
+            deddt = 2.0d0 * force * dt * radian
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group) then
-                  e = e * fgrp
-                  deddt = deddt * fgrp
-               end if
+            if (use_group) then
+               e = e * fgrp
+               deddt = deddt * fgrp
+            end if
 c
 c     compute derivative components for this interaction
 c
-               terma = -deddt / (rab2*rp)
-               termc = deddt / (rcb2*rp)
-               dedxia = terma * (yab*zp-zab*yp)
-               dedyia = terma * (zab*xp-xab*zp)
-               dedzia = terma * (xab*yp-yab*xp)
-               dedxic = termc * (ycb*zp-zcb*yp)
-               dedyic = termc * (zcb*xp-xcb*zp)
-               dedzic = termc * (xcb*yp-ycb*xp)
-               dedxib = -dedxia - dedxic
-               dedyib = -dedyia - dedyic
-               dedzib = -dedzia - dedzic
+            terma = -deddt / (rab2*rp)
+            termc = deddt / (rcb2*rp)
+            dedxia = terma * (yab*zp-zab*yp)
+            dedyia = terma * (zab*xp-xab*zp)
+            dedzia = terma * (xab*yp-yab*xp)
+            dedxic = termc * (ycb*zp-zcb*yp)
+            dedyic = termc * (zcb*xp-xcb*zp)
+            dedzic = termc * (xcb*yp-ycb*xp)
+            dedxib = -dedxia - dedxic
+            dedyib = -dedyia - dedyic
+            dedzib = -dedzia - dedzic
 c
 c     increment the overall energy term and derivatives
 c
-               eg = eg + e
-               deg(1,ia) = deg(1,ia) + dedxia
-               deg(2,ia) = deg(2,ia) + dedyia
-               deg(3,ia) = deg(3,ia) + dedzia
-               deg(1,ib) = deg(1,ib) + dedxib
-               deg(2,ib) = deg(2,ib) + dedyib
-               deg(3,ib) = deg(3,ib) + dedzib
-               deg(1,ic) = deg(1,ic) + dedxic
-               deg(2,ic) = deg(2,ic) + dedyic
-               deg(3,ic) = deg(3,ic) + dedzic
+            eg = eg + e
+            deg(1,ia) = deg(1,ia) + dedxia
+            deg(2,ia) = deg(2,ia) + dedyia
+            deg(3,ia) = deg(3,ia) + dedzia
+            deg(1,ib) = deg(1,ib) + dedxib
+            deg(2,ib) = deg(2,ib) + dedyib
+            deg(3,ib) = deg(3,ib) + dedzib
+            deg(1,ic) = deg(1,ic) + dedxic
+            deg(2,ic) = deg(2,ic) + dedyic
+            deg(3,ic) = deg(3,ic) + dedzic
 c
 c     increment the internal virial tensor components
 c
-               vxx = xab*dedxia + xcb*dedxic
-               vyx = yab*dedxia + ycb*dedxic
-               vzx = zab*dedxia + zcb*dedxic
-               vyy = yab*dedyia + ycb*dedyic
-               vzy = zab*dedyia + zcb*dedyic
-               vzz = zab*dedzia + zcb*dedzic
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
-            end if
+            vxx = xab*dedxia + xcb*dedxic
+            vyx = yab*dedxia + ycb*dedxic
+            vzx = zab*dedxia + zcb*dedxic
+            vyy = yab*dedyia + ycb*dedyic
+            vzy = zab*dedyia + zcb*dedyic
+            vzz = zab*dedzia + zcb*dedzic
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vyx
+            vir(3,1) = vir(3,1) + vzx
+            vir(1,2) = vir(1,2) + vyx
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vzy
+            vir(1,3) = vir(1,3) + vzx
+            vir(2,3) = vir(2,3) + vzy
+            vir(3,3) = vir(3,3) + vzz
          end if
       end do
 c
@@ -380,6 +380,7 @@ c
             xcb = xic - xib
             ycb = yic - yib
             zcb = zic - zib
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xdc = xid - xic
             ydc = yid - yic
             zdc = zid - zic
@@ -392,125 +393,122 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               if (sine .lt. 0.0d0)  angle = -angle
-               force = tfix(1,i)
-               tf1 = tfix(2,i)
-               tf2 = tfix(3,i)
-               if (angle.gt.tf1 .and. angle.lt.tf2) then
-                  target = angle
-               else if (angle.gt.tf1 .and. tf1.gt.tf2) then
-                  target = angle
-               else if (angle.lt.tf2 .and. tf1.gt.tf2) then
-                  target = angle
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            if (sine .lt. 0.0d0)  angle = -angle
+            force = tfix(1,i)
+            tf1 = tfix(2,i)
+            tf2 = tfix(3,i)
+            if (angle.gt.tf1 .and. angle.lt.tf2) then
+               target = angle
+            else if (angle.gt.tf1 .and. tf1.gt.tf2) then
+               target = angle
+            else if (angle.lt.tf2 .and. tf1.gt.tf2) then
+               target = angle
+            else
+               t1 = angle - tf1
+               t2 = angle - tf2
+               if (t1 .gt. 180.0d0) then
+                  t1 = t1 - 360.0d0
+               else if (t1 .lt. -180.0d0) then
+                  t1 = t1 + 360.0d0
+               end if
+               if (t2 .gt. 180.0d0) then
+                  t2 = t2 - 360.0d0
+               else if (t2 .lt. -180.0d0) then
+                  t2 = t2 + 360.0d0
+               end if
+               if (abs(t1) .lt. abs(t2)) then
+                  target = tf1
                else
-                  t1 = angle - tf1
-                  t2 = angle - tf2
-                  if (t1 .gt. 180.0d0) then
-                     t1 = t1 - 360.0d0
-                  else if (t1 .lt. -180.0d0) then
-                     t1 = t1 + 360.0d0
-                  end if
-                  if (t2 .gt. 180.0d0) then
-                     t2 = t2 - 360.0d0
-                  else if (t2 .lt. -180.0d0) then
-                     t2 = t2 + 360.0d0
-                  end if
-                  if (abs(t1) .lt. abs(t2)) then
-                     target = tf1
-                  else
-                     target = tf2
-                  end if
+                  target = tf2
                end if
-               dt = angle - target
-               if (dt .gt. 180.0d0) then
-                  dt = dt - 360.0d0
-               else if (dt .lt. -180.0d0) then
-                  dt = dt + 360.0d0
-               end if
-               dt2 = dt * dt
-               e = force * dt2
-               dedphi = 2.0d0 * radian * force * dt
+            end if
+            dt = angle - target
+            if (dt .gt. 180.0d0) then
+               dt = dt - 360.0d0
+            else if (dt .lt. -180.0d0) then
+               dt = dt + 360.0d0
+            end if
+            dt2 = dt * dt
+            e = force * dt2
+            dedphi = 2.0d0 * radian * force * dt
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group) then
-                  e = e * fgrp
-                  dedphi = dedphi * fgrp
-               end if
+            if (use_group) then
+               e = e * fgrp
+               dedphi = dedphi * fgrp
+            end if
 c
 c     chain rule terms for first derivative components
 c
-               xca = xic - xia
-               yca = yic - yia
-               zca = zic - zia
-               xdb = xid - xib
-               ydb = yid - yib
-               zdb = zid - zib
-               dedxt = dedphi * (yt*zcb - ycb*zt) / (rt2*rcb)
-               dedyt = dedphi * (zt*xcb - zcb*xt) / (rt2*rcb)
-               dedzt = dedphi * (xt*ycb - xcb*yt) / (rt2*rcb)
-               dedxu = -dedphi * (yu*zcb - ycb*zu) / (ru2*rcb)
-               dedyu = -dedphi * (zu*xcb - zcb*xu) / (ru2*rcb)
-               dedzu = -dedphi * (xu*ycb - xcb*yu) / (ru2*rcb)
+            xca = xic - xia
+            yca = yic - yia
+            zca = zic - zia
+            xdb = xid - xib
+            ydb = yid - yib
+            zdb = zid - zib
+            dedxt = dedphi * (yt*zcb - ycb*zt) / (rt2*rcb)
+            dedyt = dedphi * (zt*xcb - zcb*xt) / (rt2*rcb)
+            dedzt = dedphi * (xt*ycb - xcb*yt) / (rt2*rcb)
+            dedxu = -dedphi * (yu*zcb - ycb*zu) / (ru2*rcb)
+            dedyu = -dedphi * (zu*xcb - zcb*xu) / (ru2*rcb)
+            dedzu = -dedphi * (xu*ycb - xcb*yu) / (ru2*rcb)
 c
 c     compute derivative components for this interaction
 c
-               dedxia = zcb*dedyt - ycb*dedzt
-               dedyia = xcb*dedzt - zcb*dedxt
-               dedzia = ycb*dedxt - xcb*dedyt
-               dedxib = yca*dedzt - zca*dedyt + zdc*dedyu - ydc*dedzu
-               dedyib = zca*dedxt - xca*dedzt + xdc*dedzu - zdc*dedxu
-               dedzib = xca*dedyt - yca*dedxt + ydc*dedxu - xdc*dedyu
-               dedxic = zba*dedyt - yba*dedzt + ydb*dedzu - zdb*dedyu
-               dedyic = xba*dedzt - zba*dedxt + zdb*dedxu - xdb*dedzu
-               dedzic = yba*dedxt - xba*dedyt + xdb*dedyu - ydb*dedxu
-               dedxid = zcb*dedyu - ycb*dedzu
-               dedyid = xcb*dedzu - zcb*dedxu
-               dedzid = ycb*dedxu - xcb*dedyu
+            dedxia = zcb*dedyt - ycb*dedzt
+            dedyia = xcb*dedzt - zcb*dedxt
+            dedzia = ycb*dedxt - xcb*dedyt
+            dedxib = yca*dedzt - zca*dedyt + zdc*dedyu - ydc*dedzu
+            dedyib = zca*dedxt - xca*dedzt + xdc*dedzu - zdc*dedxu
+            dedzib = xca*dedyt - yca*dedxt + ydc*dedxu - xdc*dedyu
+            dedxic = zba*dedyt - yba*dedzt + ydb*dedzu - zdb*dedyu
+            dedyic = xba*dedzt - zba*dedxt + zdb*dedxu - xdb*dedzu
+            dedzic = yba*dedxt - xba*dedyt + xdb*dedyu - ydb*dedxu
+            dedxid = zcb*dedyu - ycb*dedzu
+            dedyid = xcb*dedzu - zcb*dedxu
+            dedzid = ycb*dedxu - xcb*dedyu
 c
 c     increment the overall energy term and derivatives
 c
-               eg = eg + e
-               deg(1,ia) = deg(1,ia) + dedxia
-               deg(2,ia) = deg(2,ia) + dedyia
-               deg(3,ia) = deg(3,ia) + dedzia
-               deg(1,ib) = deg(1,ib) + dedxib
-               deg(2,ib) = deg(2,ib) + dedyib
-               deg(3,ib) = deg(3,ib) + dedzib
-               deg(1,ic) = deg(1,ic) + dedxic
-               deg(2,ic) = deg(2,ic) + dedyic
-               deg(3,ic) = deg(3,ic) + dedzic
-               deg(1,id) = deg(1,id) + dedxid
-               deg(2,id) = deg(2,id) + dedyid
-               deg(3,id) = deg(3,id) + dedzid
+            eg = eg + e
+            deg(1,ia) = deg(1,ia) + dedxia
+            deg(2,ia) = deg(2,ia) + dedyia
+            deg(3,ia) = deg(3,ia) + dedzia
+            deg(1,ib) = deg(1,ib) + dedxib
+            deg(2,ib) = deg(2,ib) + dedyib
+            deg(3,ib) = deg(3,ib) + dedzib
+            deg(1,ic) = deg(1,ic) + dedxic
+            deg(2,ic) = deg(2,ic) + dedyic
+            deg(3,ic) = deg(3,ic) + dedzic
+            deg(1,id) = deg(1,id) + dedxid
+            deg(2,id) = deg(2,id) + dedyid
+            deg(3,id) = deg(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
-               vxx = xcb*(dedxic+dedxid) - xba*dedxia + xdc*dedxid
-               vyx = ycb*(dedxic+dedxid) - yba*dedxia + ydc*dedxid
-               vzx = zcb*(dedxic+dedxid) - zba*dedxia + zdc*dedxid
-               vyy = ycb*(dedyic+dedyid) - yba*dedyia + ydc*dedyid
-               vzy = zcb*(dedyic+dedyid) - zba*dedyia + zdc*dedyid
-               vzz = zcb*(dedzic+dedzid) - zba*dedzia + zdc*dedzid
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vyx
-               vir(3,1) = vir(3,1) + vzx
-               vir(1,2) = vir(1,2) + vyx
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vzy
-               vir(1,3) = vir(1,3) + vzx
-               vir(2,3) = vir(2,3) + vzy
-               vir(3,3) = vir(3,3) + vzz
-            end if
+            vxx = xcb*(dedxic+dedxid) - xba*dedxia + xdc*dedxid
+            vyx = ycb*(dedxic+dedxid) - yba*dedxia + ydc*dedxid
+            vzx = zcb*(dedxic+dedxid) - zba*dedxia + zdc*dedxid
+            vyy = ycb*(dedyic+dedyid) - yba*dedyia + ydc*dedyid
+            vzy = zcb*(dedyic+dedyid) - zba*dedyia + zdc*dedyid
+            vzz = zcb*(dedzic+dedzid) - zba*dedzia + zdc*dedzid
+            vir(1,1) = vir(1,1) + vxx
+            vir(2,1) = vir(2,1) + vyx
+            vir(3,1) = vir(3,1) + vzx
+            vir(1,2) = vir(1,2) + vyx
+            vir(2,2) = vir(2,2) + vyy
+            vir(3,2) = vir(3,2) + vzy
+            vir(1,3) = vir(1,3) + vzx
+            vir(2,3) = vir(2,3) + vzy
+            vir(3,3) = vir(3,3) + vzz
          end if
       end do
 c
@@ -560,8 +558,7 @@ c
          dt = r - target
          dt2 = dt * dt
          e = force * dt2
-         if (r .eq. 0.0d0)  r = 1.0d0
-         de = 2.0d0 * force * dt / r
+         de = 2.0d0 * force * dt / max(r,eps)
 c
 c     compute chain rule terms needed for derivatives
 c

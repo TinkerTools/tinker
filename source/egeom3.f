@@ -37,7 +37,8 @@ c
       implicit none
       integer i,j,k
       integer ia,ib,ic,id
-      real*8 e,dt,dt2,fgrp
+      real*8 e,eps,fgrp
+      real*8 dt,dt2
       real*8 xr,yr,zr
       real*8 r,r2,r6,r12
       real*8 angle,target
@@ -85,6 +86,10 @@ c
       do i = 1, n
          aeg(i) = 0.0d0
       end do
+c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
 c
 c     disable replica mechanism when computing restraint terms
 c
@@ -236,43 +241,41 @@ c
             xcb = xic - xib
             ycb = yic - yib
             zcb = zic - zib
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-               dot = xab*xcb + yab*ycb + zab*zcb
-               cosine = dot / sqrt(rab2*rcb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               force = afix(1,i)
-               af1 = afix(2,i)
-               af2 = afix(3,i)
-               target = angle
-               if (angle .lt. af1)  target = af1
-               if (angle .gt. af2)  target = af2
-               dt = angle - target
-               dt2 = dt * dt
-               e = force * dt2
-               if (use_group)  e = e * fgrp
-               neg = neg + 1
-               eg = eg + e
-               aeg(ib) = aeg(ib) + e
-               if (molcule(ia).ne.molcule(ib) .or.
-     &             molcule(ia).ne.molcule(ic)) then
-                  einter = einter + e
+            rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+            dot = xab*xcb + yab*ycb + zab*zcb
+            cosine = dot / sqrt(rab2*rcb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            force = afix(1,i)
+            af1 = afix(2,i)
+            af2 = afix(3,i)
+            target = angle
+            if (angle .lt. af1)  target = af1
+            if (angle .gt. af2)  target = af2
+            dt = angle - target
+            dt2 = dt * dt
+            e = force * dt2
+            if (use_group)  e = e * fgrp
+            neg = neg + 1
+            eg = eg + e
+            aeg(ib) = aeg(ib) + e
+            if (molcule(ia).ne.molcule(ib) .or.
+     &          molcule(ia).ne.molcule(ic)) then
+               einter = einter + e
+            end if
+            huge = (e .gt. 10.0d0)
+            if (debug .or. (verbose.and.huge)) then
+               if (header) then
+                  header = .false.
+                  write (iout,80)
+   80             format (/,' Individual Interatomic Angle',
+     &                       ' Restraint Terms :',
+     &                    //,' Type',14x,'Atom Numbers',14x,'Ideal',
+     &                       ' Range',4x,'Actual',6x,'Energy',/)
                end if
-               huge = (e .gt. 10.0d0)
-               if (debug .or. (verbose.and.huge)) then
-                  if (header) then
-                     header = .false.
-                     write (iout,80)
-   80                format (/,' Individual Interatomic Angle',
-     &                          ' Restraint Terms :',
-     &                       //,' Type',14x,'Atom Numbers',14x,'Ideal',
-     &                          ' Range',4x,'Actual',6x,'Energy',/)
-                  end if
-                  write (iout,90)  ia,ib,ic,af1,af2,angle,e
-   90             format (' Angle',8x,3i6,8x,2f8.2,f10.4,f12.4)
-               end if
+               write (iout,90)  ia,ib,ic,af1,af2,angle,e
+   90          format (' Angle',8x,3i6,8x,2f8.2,f10.4,f12.4)
             end if
          end if
       end do
@@ -308,6 +311,7 @@ c
             xcb = xic - xib
             ycb = yic - yib
             zcb = zic - zib
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xdc = xid - xic
             ydc = yid - yic
             zdc = zid - zic
@@ -320,75 +324,72 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               if (sine .lt. 0.0d0)  angle = -angle
-               force = tfix(1,i)
-               tf1 = tfix(2,i)
-               tf2 = tfix(3,i)
-               if (angle.gt.tf1 .and. angle.lt.tf2) then
-                  target = angle
-               else if (angle.gt.tf1 .and. tf1.gt.tf2) then
-                  target = angle
-               else if (angle.lt.tf2 .and. tf1.gt.tf2) then
-                  target = angle
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            if (sine .lt. 0.0d0)  angle = -angle
+            force = tfix(1,i)
+            tf1 = tfix(2,i)
+            tf2 = tfix(3,i)
+            if (angle.gt.tf1 .and. angle.lt.tf2) then
+               target = angle
+            else if (angle.gt.tf1 .and. tf1.gt.tf2) then
+               target = angle
+            else if (angle.lt.tf2 .and. tf1.gt.tf2) then
+               target = angle
+            else
+               t1 = angle - tf1
+               t2 = angle - tf2
+               if (t1 .gt. 180.0d0) then
+                  t1 = t1 - 360.0d0
+               else if (t1 .lt. -180.0d0) then
+                  t1 = t1 + 360.0d0
+               end if
+               if (t2 .gt. 180.0d0) then
+                  t2 = t2 - 360.0d0
+               else if (t2 .lt. -180.0d0) then
+                  t2 = t2 + 360.0d0
+               end if
+               if (abs(t1) .lt. abs(t2)) then
+                  target = tf1
                else
-                  t1 = angle - tf1
-                  t2 = angle - tf2
-                  if (t1 .gt. 180.0d0) then
-                     t1 = t1 - 360.0d0
-                  else if (t1 .lt. -180.0d0) then
-                     t1 = t1 + 360.0d0
-                  end if
-                  if (t2 .gt. 180.0d0) then
-                     t2 = t2 - 360.0d0
-                  else if (t2 .lt. -180.0d0) then
-                     t2 = t2 + 360.0d0
-                  end if
-                  if (abs(t1) .lt. abs(t2)) then
-                     target = tf1
-                  else
-                     target = tf2
-                  end if
+                  target = tf2
                end if
-               dt = angle - target
-               if (dt .gt. 180.0d0) then
-                  dt = dt - 360.0d0
-               else if (dt .lt. -180.0d0) then
-                  dt = dt + 360.0d0
+            end if
+            dt = angle - target
+            if (dt .gt. 180.0d0) then
+               dt = dt - 360.0d0
+            else if (dt .lt. -180.0d0) then
+               dt = dt + 360.0d0
+            end if
+            dt2 = dt * dt
+            e = force * dt2
+            if (use_group)  e = e * fgrp
+            neg = neg + 1
+            eg = eg + e
+            aeg(ib) = aeg(ib) + 0.5d0*e
+            aeg(ic) = aeg(ic) + 0.5d0*e
+            if (molcule(ia).ne.molcule(ib) .or.
+     &          molcule(ia).ne.molcule(ic) .or.
+     &          molcule(ia).ne.molcule(id)) then
+               einter = einter + e
+            end if
+            huge = (e .gt. 10.0d0)
+            if (debug .or. (verbose.and.huge)) then
+               if (header) then
+                  header = .false.
+                  write (iout,100)
+  100             format (/,' Individual Torsional Angle Restraint',
+     &                         ' Terms :',
+     &                    //,' Type',14x,'Atom Numbers',14x,'Ideal',
+     &                       ' Range',4x,'Actual',6x,'Energy',/)
                end if
-               dt2 = dt * dt
-               e = force * dt2
-               if (use_group)  e = e * fgrp
-               neg = neg + 1
-               eg = eg + e
-               aeg(ib) = aeg(ib) + 0.5d0*e
-               aeg(ic) = aeg(ic) + 0.5d0*e
-               if (molcule(ia).ne.molcule(ib) .or.
-     &             molcule(ia).ne.molcule(ic) .or.
-     &             molcule(ia).ne.molcule(id)) then
-                  einter = einter + e
-               end if
-               huge = (e .gt. 10.0d0)
-               if (debug .or. (verbose.and.huge)) then
-                  if (header) then
-                     header = .false.
-                     write (iout,100)
-  100                format (/,' Individual Torsional Angle Restraint
-     &',                          ' Terms :',
-     &                       //,' Type',14x,'Atom Numbers',14x,'Ideal',
-     &                          ' Range',4x,'Actual',6x,'Energy',/)
-                  end if
-                  write (iout,110)  ia,ib,ic,id,tf1,tf2,angle,e
-  110             format (' Torsion',4x,4i6,4x,2f8.2,f10.4,f12.4)
-               end if
+               write (iout,110)  ia,ib,ic,id,tf1,tf2,angle,e
+  110          format (' Torsion',4x,4i6,4x,2f8.2,f10.4,f12.4)
             end if
          end if
       end do
