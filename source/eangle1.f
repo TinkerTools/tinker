@@ -31,7 +31,8 @@ c
       use virial
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,ideal,force
+      real*8 e,eps
+      real*8 ideal,force
       real*8 fold,factor,dot
       real*8 cosine,sine
       real*8 angle,fgrp
@@ -79,10 +80,15 @@ c
       end do
       if (nangle .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
-!$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer)
+!$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,
+!$OMP& use,x,y,z,cang,qang,pang,sang,angtyp,angunit,eps,use_group,
+!$OMP& use_polymer)
 !$OMP& shared(ea,dea,vir)
 !$OMP DO reduction(+:ea,dea,vir) schedule(guided)
 c
@@ -134,97 +140,94 @@ c
                   call image (xab,yab,zab)
                   call image (xcb,ycb,zcb)
                end if
-               rab2 = xab*xab + yab*yab + zab*zab
-               rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-               if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-                  xp = ycb*zab - zcb*yab
-                  yp = zcb*xab - xcb*zab
-                  zp = xcb*yab - ycb*xab
-                  rp = sqrt(xp*xp + yp*yp + zp*zp)
-                  rp = max(rp,0.0001d0)
-                  dot = xab*xcb + yab*ycb + zab*zcb
-                  cosine = dot / sqrt(rab2*rcb2)
-                  cosine = min(1.0d0,max(-1.0d0,cosine))
-                  angle = radian * acos(cosine)
+               rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+               rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+               xp = ycb*zab - zcb*yab
+               yp = zcb*xab - xcb*zab
+               zp = xcb*yab - ycb*xab
+               rp = sqrt(max(xp*xp+yp*yp+zp*zp,eps))
+               dot = xab*xcb + yab*ycb + zab*zcb
+               cosine = dot / sqrt(rab2*rcb2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
 c
 c     get the energy and master chain rule term for derivatives
 c
-                  if (angtyp(i) .eq. 'HARMONIC') then
-                     dt = angle - ideal
-                     dt2 = dt * dt
-                     dt3 = dt2 * dt
-                     dt4 = dt2 * dt2
-                     e = angunit * force * dt2
-     &                      * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
-                     deddt = angunit * force * dt * radian
-     &                         * (2.0d0 + 3.0d0*cang*dt + 4.0d0*qang*dt2
-     &                              + 5.0d0*pang*dt3 + 6.0d0*sang*dt4)
-                  else if (angtyp(i) .eq. 'LINEAR') then
-                     factor = 2.0d0 * angunit * radian**2
-                     sine = sqrt(1.0d0-cosine*cosine)
-                     e = factor * force * (1.0d0+cosine)
-                     deddt = -factor * force * sine
-                  else if (angtyp(i) .eq. 'FOURIER') then
-                     fold = afld(i)
-                     factor = 2.0d0 * angunit * (radian/fold)**2
-                     cosine = cos((fold*angle-ideal)/radian)
-                     sine = sin((fold*angle-ideal)/radian)
-                     e = factor * force * (1.0d0+cosine)
-                     deddt = -factor * force * fold * sine
-                  end if
+               if (angtyp(i) .eq. 'HARMONIC') then
+                  dt = angle - ideal
+                  dt2 = dt * dt
+                  dt3 = dt2 * dt
+                  dt4 = dt2 * dt2
+                  e = angunit * force * dt2
+     &                   * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+                  deddt = angunit * force * dt * radian
+     &                       * (2.0d0 + 3.0d0*cang*dt + 4.0d0*qang*dt2
+     &                            + 5.0d0*pang*dt3 + 6.0d0*sang*dt4)
+               else if (angtyp(i) .eq. 'LINEAR') then
+                  factor = 2.0d0 * angunit * radian**2
+                  sine = sqrt(1.0d0-cosine*cosine)
+                  e = factor * force * (1.0d0+cosine)
+                  deddt = -factor * force * sine
+               else if (angtyp(i) .eq. 'FOURIER') then
+                  fold = afld(i)
+                  factor = 2.0d0 * angunit * (radian/fold)**2
+                  cosine = cos((fold*angle-ideal)/radian)
+                  sine = sin((fold*angle-ideal)/radian)
+                  e = factor * force * (1.0d0+cosine)
+                  deddt = -factor * force * fold * sine
+               end if
 c
 c     scale the interaction based on its group membership
 c
-                  if (use_group) then
-                     e = e * fgrp
-                     deddt = deddt * fgrp
-                  end if
+               if (use_group) then
+                  e = e * fgrp
+                  deddt = deddt * fgrp
+               end if
 c
 c     compute derivative components for this interaction
 c
-                  terma = -deddt / (rab2*rp)
-                  termc = deddt / (rcb2*rp)
-                  dedxia = terma * (yab*zp-zab*yp)
-                  dedyia = terma * (zab*xp-xab*zp)
-                  dedzia = terma * (xab*yp-yab*xp)
-                  dedxic = termc * (ycb*zp-zcb*yp)
-                  dedyic = termc * (zcb*xp-xcb*zp)
-                  dedzic = termc * (xcb*yp-ycb*xp)
-                  dedxib = -dedxia - dedxic
-                  dedyib = -dedyia - dedyic
-                  dedzib = -dedzia - dedzic
+               terma = -deddt / (rab2*rp)
+               termc = deddt / (rcb2*rp)
+               dedxia = terma * (yab*zp-zab*yp)
+               dedyia = terma * (zab*xp-xab*zp)
+               dedzia = terma * (xab*yp-yab*xp)
+               dedxic = termc * (ycb*zp-zcb*yp)
+               dedyic = termc * (zcb*xp-xcb*zp)
+               dedzic = termc * (xcb*yp-ycb*xp)
+               dedxib = -dedxia - dedxic
+               dedyib = -dedyia - dedyic
+               dedzib = -dedzia - dedzic
 c
 c     increment the total bond angle energy and derivatives
 c
-                  ea = ea + e
-                  dea(1,ia) = dea(1,ia) + dedxia
-                  dea(2,ia) = dea(2,ia) + dedyia
-                  dea(3,ia) = dea(3,ia) + dedzia
-                  dea(1,ib) = dea(1,ib) + dedxib
-                  dea(2,ib) = dea(2,ib) + dedyib
-                  dea(3,ib) = dea(3,ib) + dedzib
-                  dea(1,ic) = dea(1,ic) + dedxic
-                  dea(2,ic) = dea(2,ic) + dedyic
-                  dea(3,ic) = dea(3,ic) + dedzic
+               ea = ea + e
+               dea(1,ia) = dea(1,ia) + dedxia
+               dea(2,ia) = dea(2,ia) + dedyia
+               dea(3,ia) = dea(3,ia) + dedzia
+               dea(1,ib) = dea(1,ib) + dedxib
+               dea(2,ib) = dea(2,ib) + dedyib
+               dea(3,ib) = dea(3,ib) + dedzib
+               dea(1,ic) = dea(1,ic) + dedxic
+               dea(2,ic) = dea(2,ic) + dedyic
+               dea(3,ic) = dea(3,ic) + dedzic
 c
 c     increment the internal virial tensor components
 c
-                  vxx = xab*dedxia + xcb*dedxic
-                  vyx = yab*dedxia + ycb*dedxic
-                  vzx = zab*dedxia + zcb*dedxic
-                  vyy = yab*dedyia + ycb*dedyic
-                  vzy = zab*dedyia + zcb*dedyic
-                  vzz = zab*dedzia + zcb*dedzic
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
-               end if
+               vxx = xab*dedxia + xcb*dedxic
+               vyx = yab*dedxia + ycb*dedxic
+               vzx = zab*dedxia + zcb*dedxic
+               vyy = yab*dedyia + ycb*dedyic
+               vzy = zab*dedyia + zcb*dedyic
+               vzz = zab*dedzia + zcb*dedzic
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
 c
 c     compute the projected in-plane angle energy and gradient
 c
@@ -249,7 +252,7 @@ c
                xt = yad*zcd - zad*ycd
                yt = zad*xcd - xad*zcd
                zt = xad*ycd - yad*xcd
-               rt2 = xt*xt + yt*yt + zt*zt
+               rt2 = max(xt*xt+yt*yt+zt*zt,eps)
                delta = -(xt*xbd + yt*ybd + zt*zbd) / rt2
                xip = xib + xt*delta
                yip = yib + yt*delta
@@ -264,118 +267,115 @@ c
                   call image (xap,yap,zap)
                   call image (xcp,ycp,zcp)
                end if
-               rap2 = xap*xap + yap*yap + zap*zap
-               rcp2 = xcp*xcp + ycp*ycp + zcp*zcp
-               if (rap2.ne.0.0d0 .and. rcp2.ne.0.0d0) then
-                  xm = ycp*zap - zcp*yap
-                  ym = zcp*xap - xcp*zap
-                  zm = xcp*yap - ycp*xap
-                  rm = sqrt(xm*xm + ym*ym + zm*zm)
-                  rm = max(rm,0.0001d0)
-                  dot = xap*xcp + yap*ycp + zap*zcp
-                  cosine = dot / sqrt(rap2*rcp2)
-                  cosine = min(1.0d0,max(-1.0d0,cosine))
-                  angle = radian * acos(cosine)
+               rap2 = max(xap*xap+yap*yap+zap*zap,eps)
+               rcp2 = max(xcp*xcp+ycp*ycp+zcp*zcp,eps)
+               xm = ycp*zap - zcp*yap
+               ym = zcp*xap - xcp*zap
+               zm = xcp*yap - ycp*xap
+               rm = sqrt(max(xm*xm+ym*ym+zm*zm,eps))
+               dot = xap*xcp + yap*ycp + zap*zcp
+               cosine = dot / sqrt(rap2*rcp2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
 c
 c     get the energy and master chain rule term for derivatives
 c
-                  dt = angle - ideal
-                  dt2 = dt * dt
-                  dt3 = dt2 * dt
-                  dt4 = dt2 * dt2
-                  e = angunit * force * dt2
-     &                   * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
-                  deddt = angunit * force * dt * radian
-     &                      * (2.0d0 + 3.0d0*cang*dt + 4.0d0*qang*dt2
-     &                           + 5.0d0*pang*dt3 + 6.0d0*sang*dt4)
+               dt = angle - ideal
+               dt2 = dt * dt
+               dt3 = dt2 * dt
+               dt4 = dt2 * dt2
+               e = angunit * force * dt2
+     &                * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+               deddt = angunit * force * dt * radian
+     &                    * (2.0d0 + 3.0d0*cang*dt + 4.0d0*qang*dt2
+     &                         + 5.0d0*pang*dt3 + 6.0d0*sang*dt4)
 c
 c     scale the interaction based on its group membership
 c
-                  if (use_group) then
-                     e = e * fgrp
-                     deddt = deddt * fgrp
-                  end if
+               if (use_group) then
+                  e = e * fgrp
+                  deddt = deddt * fgrp
+               end if
 c
 c     chain rule terms for first derivative components
 c
-                  terma = -deddt / (rap2*rm)
-                  termc = deddt / (rcp2*rm)
-                  dedxia = terma * (yap*zm-zap*ym)
-                  dedyia = terma * (zap*xm-xap*zm)
-                  dedzia = terma * (xap*ym-yap*xm)
-                  dedxic = termc * (ycp*zm-zcp*ym)
-                  dedyic = termc * (zcp*xm-xcp*zm)
-                  dedzic = termc * (xcp*ym-ycp*xm)
-                  dedxip = -dedxia - dedxic
-                  dedyip = -dedyia - dedyic
-                  dedzip = -dedzia - dedzic
+               terma = -deddt / (rap2*rm)
+               termc = deddt / (rcp2*rm)
+               dedxia = terma * (yap*zm-zap*ym)
+               dedyia = terma * (zap*xm-xap*zm)
+               dedzia = terma * (xap*ym-yap*xm)
+               dedxic = termc * (ycp*zm-zcp*ym)
+               dedyic = termc * (zcp*xm-xcp*zm)
+               dedzic = termc * (xcp*ym-ycp*xm)
+               dedxip = -dedxia - dedxic
+               dedyip = -dedyia - dedyic
+               dedzip = -dedzia - dedzic
 c
 c     chain rule components for the projection of the central atom
 c
-                  delta2 = 2.0d0 * delta
-                  ptrt2 = (dedxip*xt + dedyip*yt + dedzip*zt) / rt2
-                  term = (zcd*ybd-ycd*zbd) + delta2*(yt*zcd-zt*ycd)
-                  dpdxia = delta*(ycd*dedzip-zcd*dedyip) + term*ptrt2
-                  term = (xcd*zbd-zcd*xbd) + delta2*(zt*xcd-xt*zcd)
-                  dpdyia = delta*(zcd*dedxip-xcd*dedzip) + term*ptrt2
-                  term = (ycd*xbd-xcd*ybd) + delta2*(xt*ycd-yt*xcd)
-                  dpdzia = delta*(xcd*dedyip-ycd*dedxip) + term*ptrt2
-                  term = (yad*zbd-zad*ybd) + delta2*(zt*yad-yt*zad)
-                  dpdxic = delta*(zad*dedyip-yad*dedzip) + term*ptrt2
-                  term = (zad*xbd-xad*zbd) + delta2*(xt*zad-zt*xad)
-                  dpdyic = delta*(xad*dedzip-zad*dedxip) + term*ptrt2
-                  term = (xad*ybd-yad*xbd) + delta2*(yt*xad-xt*yad)
-                  dpdzic = delta*(yad*dedxip-xad*dedyip) + term*ptrt2
+               delta2 = 2.0d0 * delta
+               ptrt2 = (dedxip*xt + dedyip*yt + dedzip*zt) / rt2
+               term = (zcd*ybd-ycd*zbd) + delta2*(yt*zcd-zt*ycd)
+               dpdxia = delta*(ycd*dedzip-zcd*dedyip) + term*ptrt2
+               term = (xcd*zbd-zcd*xbd) + delta2*(zt*xcd-xt*zcd)
+               dpdyia = delta*(zcd*dedxip-xcd*dedzip) + term*ptrt2
+               term = (ycd*xbd-xcd*ybd) + delta2*(xt*ycd-yt*xcd)
+               dpdzia = delta*(xcd*dedyip-ycd*dedxip) + term*ptrt2
+               term = (yad*zbd-zad*ybd) + delta2*(zt*yad-yt*zad)
+               dpdxic = delta*(zad*dedyip-yad*dedzip) + term*ptrt2
+               term = (zad*xbd-xad*zbd) + delta2*(xt*zad-zt*xad)
+               dpdyic = delta*(xad*dedzip-zad*dedxip) + term*ptrt2
+               term = (xad*ybd-yad*xbd) + delta2*(yt*xad-xt*yad)
+               dpdzic = delta*(yad*dedxip-xad*dedyip) + term*ptrt2
 c
 c     compute derivative components for this interaction
 c
-                  dedxia = dedxia + dpdxia
-                  dedyia = dedyia + dpdyia
-                  dedzia = dedzia + dpdzia
-                  dedxib = dedxip
-                  dedyib = dedyip
-                  dedzib = dedzip
-                  dedxic = dedxic + dpdxic
-                  dedyic = dedyic + dpdyic
-                  dedzic = dedzic + dpdzic
-                  dedxid = -dedxia - dedxib - dedxic
-                  dedyid = -dedyia - dedyib - dedyic
-                  dedzid = -dedzia - dedzib - dedzic
+               dedxia = dedxia + dpdxia
+               dedyia = dedyia + dpdyia
+               dedzia = dedzia + dpdzia
+               dedxib = dedxip
+               dedyib = dedyip
+               dedzib = dedzip
+               dedxic = dedxic + dpdxic
+               dedyic = dedyic + dpdyic
+               dedzic = dedzic + dpdzic
+               dedxid = -dedxia - dedxib - dedxic
+               dedyid = -dedyia - dedyib - dedyic
+               dedzid = -dedzia - dedzib - dedzic
 c
 c     increment the total bond angle energy and derivatives
 c
-                  ea = ea + e
-                  dea(1,ia) = dea(1,ia) + dedxia
-                  dea(2,ia) = dea(2,ia) + dedyia
-                  dea(3,ia) = dea(3,ia) + dedzia
-                  dea(1,ib) = dea(1,ib) + dedxib
-                  dea(2,ib) = dea(2,ib) + dedyib
-                  dea(3,ib) = dea(3,ib) + dedzib
-                  dea(1,ic) = dea(1,ic) + dedxic
-                  dea(2,ic) = dea(2,ic) + dedyic
-                  dea(3,ic) = dea(3,ic) + dedzic
-                  dea(1,id) = dea(1,id) + dedxid
-                  dea(2,id) = dea(2,id) + dedyid
-                  dea(3,id) = dea(3,id) + dedzid
+               ea = ea + e
+               dea(1,ia) = dea(1,ia) + dedxia
+               dea(2,ia) = dea(2,ia) + dedyia
+               dea(3,ia) = dea(3,ia) + dedzia
+               dea(1,ib) = dea(1,ib) + dedxib
+               dea(2,ib) = dea(2,ib) + dedyib
+               dea(3,ib) = dea(3,ib) + dedzib
+               dea(1,ic) = dea(1,ic) + dedxic
+               dea(2,ic) = dea(2,ic) + dedyic
+               dea(3,ic) = dea(3,ic) + dedzic
+               dea(1,id) = dea(1,id) + dedxid
+               dea(2,id) = dea(2,id) + dedyid
+               dea(3,id) = dea(3,id) + dedzid
 c
 c     increment the internal virial tensor components
 c
-                  vxx = xad*dedxia + xbd*dedxib + xcd*dedxic
-                  vyx = yad*dedxia + ybd*dedxib + ycd*dedxic
-                  vzx = zad*dedxia + zbd*dedxib + zcd*dedxic
-                  vyy = yad*dedyia + ybd*dedyib + ycd*dedyic
-                  vzy = zad*dedyia + zbd*dedyib + zcd*dedyic
-                  vzz = zad*dedzia + zbd*dedzib + zcd*dedzic
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
-               end if
+               vxx = xad*dedxia + xbd*dedxib + xcd*dedxic
+               vyx = yad*dedxia + ybd*dedxib + ycd*dedxic
+               vzx = zad*dedxia + zbd*dedxib + zcd*dedxic
+               vyy = yad*dedyia + ybd*dedyib + ycd*dedyic
+               vzy = zad*dedyia + zbd*dedyib + zcd*dedyic
+               vzz = zad*dedzia + zbd*dedzib + zcd*dedzic
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
             end if
          end if
       end do
