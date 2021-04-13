@@ -166,6 +166,24 @@ c
          close (unit=iseq)
       end if
 c
+c     check for the existence of a generic sequence file
+c
+      if (.not. exist) then
+         if (ldir .eq. 0) then
+            seqfile = 'tinker.seq'
+         else
+            seqfile = filename(1:ldir)//'tinker.seq'
+         end if
+         call version (seqfile,'old')
+         inquire (file=seqfile,exist=exist)
+         if (exist) then
+            open (unit=iseq,file=seqfile,status='old')
+            rewind (unit=iseq)
+            call readseq (iseq)
+            close (unit=iseq)
+         end if
+      end if
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (ni(maxres))
