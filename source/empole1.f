@@ -3807,7 +3807,7 @@ c
          qfac(k1,k2,k3) = expterm
       end do
 c
-c     save the virial for use in polarization computation
+c     save the partial virial for the polarization computation
 c
       vmxx = vxx
       vmxy = vxy

@@ -1602,7 +1602,7 @@ c
       ktype = 0
       sum = 0.0d0
       do i = 1, npole
-         it = type(ii)
+         it = type(ipole(i))
          equiv(it) = equiv(it) + 1 
          sum = sum + pole(1,i)
       end do
