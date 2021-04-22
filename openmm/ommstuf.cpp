@@ -4380,7 +4380,7 @@ void openmm_update_ (void** omm, double* dt, int* istep,
 
    positionConvert = 1.0 / OpenMM_NmPerAngstrom;
    velocityConvert = 1.0 / OpenMM_NmPerAngstrom;
-   forceConvert = 10.0;
+   forceConvert = 1.0 / OpenMM_NmPerAngstrom;
 
    positionArray = OpenMM_State_getPositions (state);
    velocityArray = OpenMM_State_getVelocities (state);
