@@ -1677,7 +1677,7 @@ mplpot.o:
 mpole.o:
 mrecip.o:
 mutant.o:
-mutate.o: atomid.o atoms.o bndstr.o charge.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o tors.o
+mutate.o: atomid.o atoms.o bndstr.o charge.o chgtrn.o inform.o iounit.o katoms.o keys.o mpole.o mutant.o polar.o potent.o tors.o
 nblist.o: atoms.o bound.o boxes.o cell.o charge.o disp.o iounit.o light.o limits.o mpole.o neigh.o potent.o vdw.o
 neigh.o:
 newton.o: atoms.o bound.o files.o inform.o iounit.o usage.o
