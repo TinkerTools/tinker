@@ -264,6 +264,8 @@ c
       subroutine altelec
       use atoms
       use charge
+      use chgtrn
+      use ctrpot
       use mpole
       use mutant
       use polar
@@ -301,6 +303,17 @@ c
             if (mut(k)) then
                polarity(i) = polarity(i) * elambda
                if (elambda .eq. 0.0d0)  douind(k) = .false.
+            end if
+         end do
+      end if
+c
+c   set charge transfer prefactor for charge transfer model 
+c
+      if (use_chgtrn .and. ctrntyp .eq. "COMBINED") then
+         do i = 1, npole
+            k = ipole(i)
+            if (mut(k)) then
+              chgct(i) = chgct(i) * elambda
             end if
          end do
       end if
