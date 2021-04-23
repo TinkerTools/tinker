@@ -3479,6 +3479,7 @@ c
 c     find terms needed later to compute mutual polarization
 c
                   if (poltyp .ne. 'DIRECT') then
+                     call dampthole2 (ii,kk,5,r,dmpik)
                      scalek = uscale(k)
                      dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                      dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
