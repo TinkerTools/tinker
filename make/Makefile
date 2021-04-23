@@ -1640,7 +1640,7 @@ cspline.o: iounit.o
 ctrpot.o:
 cutoffs.o: atoms.o bound.o hescut.o keys.o limits.o neigh.o polpot.o tarray.o
 damping.o: ewald.o math.o mplpot.o polar.o polpot.o
-dcflux.o: angbnd.o atoms.o bndstr.o bound.o cflux.o mutant.o sizes.o
+dcflux.o: angbnd.o atoms.o bndstr.o bound.o cflux.o sizes.o
 deflate.o: iounit.o
 delete.o: atomid.o atoms.o couple.o inform.o iounit.o
 deriv.o:
