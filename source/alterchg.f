@@ -110,20 +110,16 @@ c
 c
       subroutine bndchg (pdelta)
       use sizes
-      use atomid
       use atoms
       use bndstr
       use bound
       use cflux
-      use mutant
       implicit none
       integer i,ia,ib
-      integer atoma,atomb
       real*8 xab,yab,zab
       real*8 rab,rab0
       real*8 pb,dq
       real*8 pdelta(*)
-      logical muta,mutb
 c
 c
 c     loop over all the bond distances in the system
@@ -131,14 +127,7 @@ c
       do i = 1, nbond
          ia = ibnd(1,i)
          ib = ibnd(2,i)
-         atoma = atomic(ia)
-         atomb = atomic(ib)
          pb = bflx(i)
-         muta = mut(ia)
-         mutb = mut(ib)
-         if (muta .or. mutb) then
-            pb = pb * elambda
-         end if
 c
 c     compute the bond length value for the current bond
 c
@@ -179,7 +168,6 @@ c
       use bound
       use cflux
       use math
-      use mutant
       implicit none
       integer i,ia,ib,ic
       real*8 angle
@@ -196,7 +184,6 @@ c
       real*8 rab0,rcb0
       real*8 dq1,dq2
       real*8 pdelta(*)
-      logical muta,mutb,mutc
 c
 c
 c     loop over all the bond angles in the system
@@ -205,22 +192,10 @@ c
          ia = iang(1,i)
          ib = iang(2,i)
          ic = iang(3,i)
-c
-c     assign the charge flux parameters for this angle
-c
          pa1 = aflx(1,i)
          pa2 = aflx(2,i)
          pb1 = abflx(1,i)
          pb2 = abflx(2,i)
-         muta = mut(ia)
-         mutb = mut(ib)
-         mutc = mut(ic)
-         if (muta .or. mutb .or. mutc) then
-            pa1 = pa1 * elambda
-            pa2 = pa2 * elambda
-            pb1 = pb1 * elambda
-            pb2 = pb2 * elambda
-         end if
 c
 c     calculate the angle values and included bond lengths
 c
