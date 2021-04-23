@@ -30,7 +30,6 @@ c
       use bndstr
       use bound
       use cflux
-      use mutant
       implicit none
       integer i,ia,ib,ic
       real*8 xa,ya,za
@@ -59,7 +58,6 @@ c
       real*8 dcfx(*)
       real*8 dcfy(*)
       real*8 dcfz(*)
-      logical muta,mutb,mutc
 c
 c
 c     zero out the charge flux correction forces
@@ -76,11 +74,6 @@ c
          ia = ibnd(1,i)
          ib = ibnd(2,i)
          pb = bflx(i)
-         muta = mut(ia)
-         mutb = mut(ib)
-         if (muta .or. mutb) then
-            pb = pb * elambda
-         end if
          xa = x(ia)
          ya = y(ia)
          za = z(ia)
@@ -118,15 +111,6 @@ c
          pa2 = aflx(2,i)
          pb1 = abflx(1,i)
          pb2 = abflx(2,i)
-         muta = mut(ia)
-         mutb = mut(ib)
-         mutc = mut(ic)
-         if (muta .or. mutb .or. mutc) then
-            pa1 = pa1 * elambda
-            pa2 = pa2 * elambda
-            pb1 = pb1 * elambda
-            pb2 = pb2 * elambda
-         end if
          xa = x(ia)
          ya = y(ia)
          za = z(ia)
