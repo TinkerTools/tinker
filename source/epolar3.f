@@ -675,8 +675,8 @@ c
 !$OMP& shared(npole,ipole,rpole,x,y,z,pcore,pval,palpha,uind,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
-!$OMP& p5iscale,nelst,elst,use_thole,use_dirdamp,use_chgpen,use_bounds,
-!$OMP& off2,f,molcule,name,verbose,debug,header,iout)
+!$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,
+!$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c
@@ -1780,8 +1780,8 @@ c
 !$OMP& shared(npole,ipole,rpole,uind,x,y,z,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
-!$OMP& p5iscale,nelst,elst,use_thole,use_dirdamp,use_chgpen,use_bounds,
-!$OMP& off2,f,molcule,name,verbose,debug,header,iout)
+!$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,
+!$OMP& molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter) schedule(guided)
 c

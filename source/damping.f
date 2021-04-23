@@ -12,8 +12,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dampewald" generates coefficients for Ewald error function
-c     damping for powers of the interatomic distance
+c     "dampewald" finds coefficients for error function damping used
+c     for Ewald real space interactions
 c
 c
       subroutine dampewald (rorder,r,r2,scale,dmpe)
@@ -64,8 +64,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dampthole" generates coefficients for the Thole damping
-c     function for powers of the interatomic distance
+c     "dampthole" finds coefficients for the Thole damping function
+c     used by AMOEBA and the modified Thole damping used by AMOEBA+
 c
 c     literature reference:
 c
@@ -93,7 +93,7 @@ c
          dmpik(j) = 1.0d0
       end do
 c
-c     assign the Thole polarization model damping factors
+c     use alternate Thole model for AMOEBA+ direct polarization
 c
       damp = pdamp(i) * pdamp(k)
       if (damp .ne. 0.0d0) then
@@ -110,6 +110,9 @@ c
      &                                  +0.15d0*damp2)
                end if
             end if
+c
+c     uaw original AMOEBA Thole polarization damping factors
+c
          else
             pgamma = min(thole(i),thole(k))
             damp = pgamma * (r/damp)**3
@@ -136,13 +139,74 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
+c     ##  subroutine dampthole2  --  original Thole damping values  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "dampthole2" finds coefficients for the original Thole damping
+c     function used by AMOEBA and for mutual polarization by AMOEBA+
+c
+c     literature reference:
+c
+c     B. T. Thole, "Molecular Polarizabilities Calculated with a
+c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
+c
+c
+      subroutine dampthole2 (i,k,rorder,r,dmpik)
+      use polar
+      implicit none
+      integer i,j,k
+      integer rorder
+      real*8 r,damp
+      real*8 damp2
+      real*8 damp3
+      real*8 expdamp
+      real*8 pgamma
+      real*8 dmpik(*)
+c
+c
+c     initialize the Thole damping factors to a value of one
+c
+      do j = 1, rorder
+         dmpik(j) = 1.0d0
+      end do
+c
+c     assign standard Thole polarization model damping factors
+c
+      damp = pdamp(i) * pdamp(k)
+      if (damp .ne. 0.0d0) then
+         pgamma = min(thole(i),thole(k))
+         damp = pgamma * (r/damp)**3
+         if (damp .lt. 50.0d0) then
+            expdamp = exp(-damp)
+            dmpik(3) = 1.0d0 - expdamp
+            dmpik(5) = 1.0d0 - expdamp*(1.0d0+damp)
+            if (rorder .ge. 7) then
+               damp2 = damp * damp
+               dmpik(7) = 1.0d0 - expdamp*(1.0d0+damp+0.6d0*damp2)
+               if (rorder .ge. 9) then
+                  damp3 = damp * damp2
+                  dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
+     &                                  +(18.0d0/35.0d0)*damp2
+     &                                  +(9.0d0/35.0d0)*damp3)
+               end if
+            end if
+         end if
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
 c     ##  subroutine damppole  --  penetration damping coefficents  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "damppole" generates coefficients for the charge penetration
-c     damping function for powers of the interatomic distance
+c     "damppole" finds coefficients for two alternative Gordon charge
+c     penetration damping function
 c
 c     literature references:
 c
@@ -409,8 +473,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "dampdir" generates coefficients for the direct field damping
-c     function for powers of the interatomic distance
+c     "dampdir" finds coefficients for two alternative Gordon direct
+c     field damping functions
 c
 c
       subroutine dampdir (r,alphai,alphak,dmpi,dmpk)
@@ -495,8 +559,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "dampmut" generates coefficients for the mutual field damping
-c     function for powers of the interatomic distance
+c     "dampmut" finds coefficients for two alternative Gordon mutual
+c     field damping functions
 c
 c
       subroutine dampmut (r,alphai,alphak,dmpik)
@@ -593,8 +657,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "damppot" generates coefficients for the charge penetration
-c     damping function used for the electrostatic potential
+c     "damppot" finds coefficients for two alternative Gordon charge
+c     penetration damping functions for the electrostatic potential
 c
 c
       subroutine damppot (r,alphak,dmpk)
@@ -640,8 +704,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "damprep" generates coefficients for the Pauli repulsion
-c     damping function for powers of the interatomic distance
+c     "damprep" finds coefficients for the Pauli repulsion damping
+c     function used by HIPPO
 c
 c     literature reference:
 c

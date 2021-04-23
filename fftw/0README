@@ -9,10 +9,10 @@
       to fft3d.f), but FFTPACK is a serial only code.
 
       ###################################
-      Building FFTW on Linux and on MacOS
+      Building FFTW on Linux and on macOS
       ###################################
 
-      Under MacOS and Linux, Tinker requires the two FFTW static object
+      Under Linux and macOS, Tinker requires the two FFTW static object
       libraries, libfftw3.a and libfftw3_threads.a. To build FFTW using
       the GNU compilers, issue each of the commands indicated below.
       Note that the "setenv" syntax is for csh/tcsh shells, and should

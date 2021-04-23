@@ -8759,6 +8759,7 @@ c
                vyz = vyz - h2*h3*vterm
                vzz = vzz - h3*h3*vterm + eterm
             end if
+            qfac(k1,k2,k3) = expterm
          end do
 c
 c     account for zeroth grid point for nonperiodic system
@@ -9044,24 +9045,30 @@ c
                         cphip(j) = cphip(j) + ftc(j,j1)*fphip(j1,i)
                      end do
                   end do
-                  vxx = vxx - 0.5d0*copm(k+m+1)*(cphid(2)*uoptp(m,1,i)
-     &                                          +cphip(2)*uopt(m,1,i))
-                  vxy = vxy - 0.25d0*copm(k+m+1)*(cphid(2)*uoptp(m,2,i)
-     &                                           +cphip(2)*uopt(m,2,i)
-     &                                           +cphid(3)*uoptp(m,1,i)
-     &                                           +cphip(3)*uopt(m,1,i))
-                  vxz = vxz - 0.25d0*copm(k+m+1)*(cphid(2)*uoptp(m,3,i)
-     &                                           +cphip(2)*uopt(m,3,i)
-     &                                           +cphid(4)*uoptp(m,1,i)
-     &                                           +cphip(4)*uopt(m,1,i))
-                  vyy = vyy - 0.5d0*copm(k+m+1)*(cphid(3)*uoptp(m,2,i)
-     &                                          +cphip(3)*uopt(m,2,i))
-                  vyz = vyz - 0.25d0*copm(k+m+1)*(cphid(3)*uoptp(m,3,i)
-     &                                           +cphip(3)*uopt(m,3,i)
-     &                                           +cphid(4)*uoptp(m,2,i)
-     &                                           +cphip(4)*uopt(m,2,i))
-                  vzz = vzz - 0.5d0*copm(k+m+1)*(cphid(4)*uoptp(m,3,i)
-     &                                          +cphip(4)*uopt(m,3,i))
+                  vxx = vxx - 0.5d0*copm(k+m+1)
+     &                           *(cphid(2)*uoptp(m,1,i)
+     &                            +cphip(2)*uopt(m,1,i))
+                  vxy = vxy - 0.25d0*copm(k+m+1)
+     &                           *(cphid(2)*uoptp(m,2,i)
+     &                            +cphip(2)*uopt(m,2,i)
+     &                            +cphid(3)*uoptp(m,1,i)
+     &                            +cphip(3)*uopt(m,1,i))
+                  vxz = vxz - 0.25d0*copm(k+m+1)
+     &                           *(cphid(2)*uoptp(m,3,i)
+     &                            +cphip(2)*uopt(m,3,i)
+     &                            +cphid(4)*uoptp(m,1,i)
+     &                            +cphip(4)*uopt(m,1,i))
+                  vyy = vyy - 0.5d0*copm(k+m+1)
+     &                           *(cphid(3)*uoptp(m,2,i)
+     &                            +cphip(3)*uopt(m,2,i))
+                  vyz = vyz - 0.25d0*copm(k+m+1)
+     &                           *(cphid(3)*uoptp(m,3,i)
+     &                            +cphip(3)*uopt(m,3,i)
+     &                            +cphid(4)*uoptp(m,2,i)
+     &                            +cphip(4)*uopt(m,2,i))
+                  vzz = vzz - 0.5d0*copm(k+m+1)
+     &                           *(cphid(4)*uoptp(m,3,i)
+     &                            +cphip(4)*uopt(m,3,i))
                end do
             end do
          end do

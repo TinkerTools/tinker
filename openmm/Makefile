@@ -120,7 +120,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR
 ##  Build:     Tinker-FFE
 ##  OS Type:   Apple macOS
 ##  CPU Type:  Intel x86-64, Nvidia GPU
-##  Compiler:  Intel Fortran for Mac 15.0, clang, nvcc
+##  Compiler:  Intel Fortran for macOS 15.0, clang, nvcc
 ##  Parallel:  OpenMP, OpenMM
 
 #CC = icc

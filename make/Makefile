@@ -132,7 +132,7 @@ RENAME = rename_bin
 ##  Build:     Tinker
 ##  OS Type:   Apple macOS
 ##  CPU Type:  Intel Xeon
-##  Compiler:  Intel Fortran for MacOS 15.0
+##  Compiler:  Intel Fortran for macOS 15.0
 ##  Parallel:  OpenMP
 
 #F77 = ifort
