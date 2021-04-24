@@ -73,25 +73,29 @@
                       fatty acid binding protein from NOE distances and
                       torsional restraints
 
-      (15) METHANOL   process distributed multipole analysis (DMA) output
+      (15) LIQUID     print the system setup and compute the force field
+                      energy components for three small liquid water boxes
+                      using the AMOEBA, AMOEBA+ and HIPPO force fields
+
+      (16) METHANOL   process distributed multipole analysis (DMA) output
                       to extract coordinates and permanent multipoles, set
                       local frames and polarization groups, modify the
                       intramolecular polarization, and average equivalent
                       atomic sites
 
-      (16) NITROGEN   calculate the self-diffusion constant and N-N radial
+      (17) NITROGEN   calculate the self-diffusion constant and N-N radial
                       distribution function for a liquid nitrogen box via
                       analysis of a 50ps MD trajectory
 
-      (17) POLYALA    generate an extended conformation of capped alanine
+      (18) POLYALA    generate an extended conformation of capped alanine
                       octapeptide, then use Monte Carlo Minimization with
                       torsion moves to find the 3/10 helix global minimum
 
-      (18) SALT       convert sodium chloride asymmetric unit to the unit
+      (19) SALT       convert sodium chloride asymmetric unit to the unit
                       cell, then minimize the crystal from the diffraction
                       structure using Ewald summation electrostatics
 
-      (19) WATER      fit the electrostatic potential for an AMOEBA water
+      (20) WATER      fit the electrostatic potential for an AMOEBA water
                       molecule to QM-derived potential (MP2/aug-cc-pVTZ)
                       on a grid of points outside the molecular surface
 
