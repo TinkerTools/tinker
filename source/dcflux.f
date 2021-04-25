@@ -35,10 +35,10 @@ c
       real*8 xa,ya,za
       real*8 xb,yb,zb
       real*8 xc,yc,zc
-      real*8 xba,yba,zba
-      real*8 xbc,ybc,zbc
-      real*8 rba,rba2,rba3
-      real*8 rbc,rbc2,rbc3
+      real*8 xab,yab,zab
+      real*8 xcb,ycb,zcb
+      real*8 rab,rab2,rab3
+      real*8 rcb,rcb2,rcb3
       real*8 dpot,dpota,dpotc
       real*8 ddqdx,ddqdy,ddqdz
       real*8 fx,fy,fz
@@ -50,7 +50,8 @@ c
       real*8 fxc2,fyc2,fzc2
       real*8 pb,pb1,pb2
       real*8 pa1,pa2
-      real*8 dot,term,fterm
+      real*8 eps,dot
+      real*8 term,fterm
       real*8 termxa,termxc
       real*8 termya,termyc
       real*8 termza,termzc
@@ -68,7 +69,7 @@ c
          dcfz(i) = 0.0d0
       end do
 c
-c     calculate the charge flux forces due to individual bonds
+c     calculate the charge flux forces due to bond stretches
 c
       do i = 1, nbond
          ia = ibnd(1,i)
@@ -80,12 +81,12 @@ c
          xb = x(ib)
          yb = y(ib)
          zb = z(ib)
-         xba = xa - xb
-         yba = ya - yb
-         zba = za - zb
-         if (use_polymer)  call image (xba,yba,zba)
-         rba2 = xba*xba + yba*yba + zba*zba
-         pb = pb / sqrt(rba2)
+         xab = xa - xb
+         yab = ya - yb
+         zab = za - zb
+         if (use_polymer)  call image (xab,yab,zab)
+         rab2 = xab*xab + yab*yab + zab*zab
+         pb = pb / sqrt(rab2)
          dpot = pot(ib) - pot(ia)
          ddqdx = pb * (xa-xb)
          ddqdy = pb * (ya-yb)
@@ -101,8 +102,9 @@ c
          dcfz(ib) = dcfz(ib) - fz
       end do
 c
-c     calculate the charge flux forces due to each bond angle
+c     calculate the charge flux forces due to angle bends
 c
+      eps = 0.0001d0
       do i = 1, nangle
          ia = iang(1,i)
          ib = iang(2,i)
@@ -120,22 +122,22 @@ c
          xc = x(ic)
          yc = y(ic)
          zc = z(ic)
-         xba = xa - xb
-         yba = ya - yb
-         zba = za - zb
-         xbc = xc - xb
-         ybc = yc - yb
-         zbc = zc - zb
+         xab = xa - xb
+         yab = ya - yb
+         zab = za - zb
+         xcb = xc - xb
+         ycb = yc - yb
+         zcb = zc - zb
          if (use_polymer) then
-            call image (xba,yba,zba)
-            call image (xbc,ybc,zbc)
+            call image (xab,yab,zab)
+            call image (xcb,ycb,zcb)
          end if
-         rba2 = xba*xba + yba*yba + zba*zba
-         rba  = sqrt(rba2)
-         rba3 = rba2 * rba
-         rbc2 = xbc*xbc + ybc*ybc + zbc*zbc
-         rbc  = sqrt(rbc2)
-         rbc3 = rbc2 * rbc
+         rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+         rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+         rab  = sqrt(rab2)
+         rab3 = rab2 * rab
+         rcb  = sqrt(rcb2)
+         rcb3 = rcb2 * rcb
 c
 c     get terms corresponding to asymmetric bond stretches
 c
@@ -143,27 +145,27 @@ c
          dpotc = pot(ic) - pot(ib)
          pb1 = dpota * pb1
          pb2 = dpotc * pb2
-         fxa1 = pb2 * xba/rba
-         fya1 = pb2 * yba/rba
-         fza1 = pb2 * zba/rba
-         fxc1 = pb1 * xbc/rbc
-         fyc1 = pb1 * ybc/rbc
-         fzc1 = pb1 * zbc/rbc
+         fxa1 = pb2 * xab/rab
+         fya1 = pb2 * yab/rab
+         fza1 = pb2 * zab/rab
+         fxc1 = pb1 * xcb/rcb
+         fyc1 = pb1 * ycb/rcb
+         fzc1 = pb1 * zcb/rcb
          fxb1 = -fxa1 - fxc1
          fyb1 = -fya1 - fyc1
          fzb1 = -fza1 - fzc1
 c
 c     get terms corresponding to bond angle bending
 c
-         dot = xba*xbc + yba*ybc + zba*zbc
-         term = -rba*rbc / sqrt(rba2*rbc2-dot*dot)
+         dot = xab*xcb + yab*ycb + zab*zcb
+         term = -rab*rcb / sqrt(rab2*rcb2-dot*dot)
          fterm = term * (dpota*pa1+dpotc*pa2)
-         termxa = xbc/(rba*rbc) - xba*dot/(rba3*rbc)
-         termya = ybc/(rba*rbc) - yba*dot/(rba3*rbc)
-         termza = zbc/(rba*rbc) - zba*dot/(rba3*rbc)
-         termxc = xba/(rba*rbc) - xbc*dot/(rba*rbc3)
-         termyc = yba/(rba*rbc) - ybc*dot/(rba*rbc3)
-         termzc = zba/(rba*rbc) - zbc*dot/(rba*rbc3)
+         termxa = xcb/(rab*rcb) - xab*dot/(rab3*rcb)
+         termya = ycb/(rab*rcb) - yab*dot/(rab3*rcb)
+         termza = zcb/(rab*rcb) - zab*dot/(rab3*rcb)
+         termxc = xab/(rab*rcb) - xcb*dot/(rab*rcb3)
+         termyc = yab/(rab*rcb) - ycb*dot/(rab*rcb3)
+         termzc = zab/(rab*rcb) - zcb*dot/(rab*rcb3)
          fxa2 = fterm * termxa
          fya2 = fterm * termya
          fza2 = fterm * termza

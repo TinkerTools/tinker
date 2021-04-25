@@ -170,7 +170,7 @@ c
       use math
       implicit none
       integer i,ia,ib,ic
-      real*8 angle
+      real*8 angle,eps
       real*8 rab,rcb
       real*8 xia,yia,zia
       real*8 xib,yib,zib
@@ -188,6 +188,7 @@ c
 c
 c     loop over all the bond angles in the system
 c
+      eps = 0.0001d0
       do i = 1, nangle
          ia = iang(1,i)
          ib = iang(2,i)
@@ -218,14 +219,12 @@ c
             call image (xab,yab,zab)
             call image (xcb,ycb,zcb)
          end if
-         rab = sqrt(xab*xab + yab*yab + zab*zab)
-         rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-         if (rab.ne.0.0d0 .and. rcb.ne.0.0d0) then
-            dot = xab*xcb + yab*ycb + zab*zcb
-            cosine = dot / (rab*rcb)
-            cosine = min(1.0d0,max(-1.0d0,cosine))
-            angle = radian * acos(cosine)
-         end if
+         rab = sqrt(max(xab*xab+yab*yab+zab*zab,eps))
+         rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
+         dot = xab*xcb + yab*ycb + zab*zcb
+         cosine = dot / (rab*rcb)
+         cosine = min(1.0d0,max(-1.0d0,cosine))
+         angle = radian * acos(cosine)
 c
 c     find the charge flux increment for the current angle
 c

@@ -221,7 +221,7 @@ c
       integer itbnd(2,*)
 c
 c
-c     set torsional parameters across freely rotatable bonds
+c     set scaled parameters for specified rotatable bonds
 c
       if (use_tors) then
          do i = 1, ntors
@@ -291,7 +291,7 @@ c
          end do
       end if
 c
-c     set scaled parameters for polarizable multipole models
+c     set scaled parameters for atomic multipole models
 c
       if (use_mpole) then
          do i = 1, npole
@@ -309,6 +309,9 @@ c
             end if
          end do
       end if
+c
+c     set scaled parameters for atomic polarizability models
+c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
@@ -336,7 +339,7 @@ c
          do i = 1, nbond
             ia = ibnd(1,i)
             ib = ibnd(2,i)
-            if (mut(ia) .or. mut(ib)) then
+            if (mut(ia) .and. mut(ib)) then
                bflx(i) = bflx(i) * elambda
             end if
          end do
@@ -349,7 +352,7 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
-            if (mut(ia) .or. mut(ib) .or. mut(ic)) then
+            if (mut(ia) .and. mut(ib) .and. mut(ic)) then
                aflx(1,i) = aflx(1,i) * elambda
                aflx(2,i) = aflx(2,i) * elambda
                abflx(1,i) = abflx(1,i) * elambda
