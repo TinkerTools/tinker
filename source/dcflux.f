@@ -13,8 +13,8 @@ c     ##############################################################
 c
 c
 c     "dcflux" takes as input the electrostatic potential at each
-c     atomic site and calculates gradient chain rule corrections due
-c     to charge flux coupled with bond stretching and angle bending
+c     atomic site and calculates gradient chain rule terms due to
+c     charge flux coupling with bond stretching and angle bending
 c
 c     literature reference:
 c
@@ -158,7 +158,7 @@ c
 c     get terms corresponding to bond angle bending
 c
          dot = xab*xcb + yab*ycb + zab*zcb
-         term = -rab*rcb / sqrt(rab2*rcb2-dot*dot)
+         term = -rab*rcb / max(sqrt(rab2*rcb2-dot*dot),eps)
          fterm = term * (dpota*pa1+dpotc*pa2)
          termxa = xcb/(rab*rcb) - xab*dot/(rab3*rcb)
          termya = ycb/(rab*rcb) - yab*dot/(rab3*rcb)

@@ -124,7 +124,7 @@
    c           0.0000        0.0000       18.6430
 
 
- Force Field Name :                   AMOEBA-PLUS
+ Force Field Name :                AMOEBA-PLUS-CF
 
  VDW Function                       BUFFERED-14-7
  Size Descriptor                            R-MIN
@@ -153,51 +153,51 @@
 
  Type              Atom Names                    Minimum    Actual      Energy
 
- VDW-Hal        84-H      472-O                   3.6023    1.7103     10.7461
- VDW-Hal       277-O      635-H                   3.6023    1.7222     10.2754
- VDW-Hal       223-O      441-H                   3.6023    1.6478     13.6557
- VDW-Hal       169-O      195-H                   3.6023    1.7013     11.1233
- VDW-Hal       286-O      572-H                   3.6023    1.6631     12.8749
- VDW-Hal        94-O      599-H                   3.6023    1.6872     11.7351
- VDW-Hal        94-O      188-H                   3.6023    1.6869     11.7497
- VDW-Hal       439-O      566-H                   3.6023    1.6982     11.2536
- VDW-Hal        16-O      557-H                   3.6023    1.6771     12.1981
- VDW-Hal       239-H      505-O                   3.6023    1.6826     11.9429
- VDW-Hal       177-H      193-O                   3.6023    1.6618     12.9351
- VDW-Hal        19-O      575-H                   3.6023    1.7077     10.8541
- VDW-Hal       468-H      595-O                   3.6023    1.7169     10.4826
- VDW-Hal        21-H      130-O                   3.6023    1.7089     10.8064
- VDW-Hal       184-O      398-H                   3.6023    1.7245     10.1847
- VDW-Hal       498-H      646-O                   3.6023    1.7275     10.0705
- VDW-Hal       112-O      555-H                   3.6023    1.6785     12.1344
- VDW-Hal       255-H      601-O                   3.6023    1.6660     12.7272
- VDW-Hal       256-O      608-H                   3.6023    1.6962     11.3405
- VDW-Hal       317-H      406-O                   3.6023    1.6786     12.1302
- VDW-Hal       115-O      513-H                   3.6023    1.6754     12.2787
- VDW-Hal       265-O      446-H                   3.6023    1.7218     10.2884
- VDW-Hal       129-H      529-O                   3.6023    1.6464     13.7297
- VDW-Hal        47-H      490-O                   3.6023    1.7263     10.1159
- VDW-Hal        49-O      632-H                   3.6023    1.7269     10.0922
- VDW-Hal        55-O      402-H                   3.6023    1.6966     11.3242
- VDW-Hal       151-O      504-H                   3.6023    1.7159     10.5205
- VDW-Hal        59-H      199-O                   3.6023    1.7222     10.2721
- VDW-Hal        63-H      586-O                   3.6023    1.6571     13.1747
- VDW-Hal        66-H      142-O                   3.6023    1.6935     11.4556
- VDW-Hal        67-O      582-H                   3.6023    1.6415     13.9937
- VDW-Hal        69-H      322-O                   3.6023    1.6975     11.2851
- VDW-Hal        75-H      253-O                   3.6023    1.6766     12.2237
+ VDW-Hal        84-H      472-O                   3.6023    1.7103     10.7463
+ VDW-Hal       277-O      635-H                   3.6023    1.7222     10.2756
+ VDW-Hal       223-O      441-H                   3.6023    1.6478     13.6559
+ VDW-Hal       286-O      572-H                   3.6023    1.6631     12.8751
+ VDW-Hal       169-O      195-H                   3.6023    1.7013     11.1235
+ VDW-Hal        94-O      599-H                   3.6023    1.6872     11.7353
+ VDW-Hal        94-O      188-H                   3.6023    1.6869     11.7499
+ VDW-Hal       439-O      566-H                   3.6023    1.6982     11.2538
+ VDW-Hal        16-O      557-H                   3.6023    1.6771     12.1983
+ VDW-Hal       239-H      505-O                   3.6023    1.6826     11.9431
+ VDW-Hal       177-H      193-O                   3.6023    1.6618     12.9353
+ VDW-Hal       468-H      595-O                   3.6023    1.7169     10.4828
+ VDW-Hal        19-O      575-H                   3.6023    1.7077     10.8543
+ VDW-Hal        21-H      130-O                   3.6023    1.7089     10.8065
+ VDW-Hal       184-O      398-H                   3.6023    1.7245     10.1849
+ VDW-Hal       498-H      646-O                   3.6023    1.7275     10.0707
+ VDW-Hal       317-H      406-O                   3.6023    1.6786     12.1304
+ VDW-Hal       112-O      555-H                   3.6023    1.6785     12.1346
+ VDW-Hal       255-H      601-O                   3.6023    1.6660     12.7274
+ VDW-Hal       256-O      608-H                   3.6023    1.6962     11.3407
+ VDW-Hal       115-O      513-H                   3.6023    1.6754     12.2789
+ VDW-Hal       265-O      446-H                   3.6023    1.7218     10.2886
+ VDW-Hal       129-H      529-O                   3.6023    1.6464     13.7299
+ VDW-Hal        47-H      490-O                   3.6023    1.7263     10.1160
+ VDW-Hal        49-O      632-H                   3.6023    1.7269     10.0923
+ VDW-Hal       151-O      504-H                   3.6023    1.7159     10.5207
+ VDW-Hal        55-O      402-H                   3.6023    1.6966     11.3244
+ VDW-Hal        59-H      199-O                   3.6023    1.7222     10.2723
+ VDW-Hal        63-H      586-O                   3.6023    1.6571     13.1749
+ VDW-Hal        66-H      142-O                   3.6023    1.6935     11.4558
+ VDW-Hal        67-O      582-H                   3.6023    1.6415     13.9939
+ VDW-Hal        69-H      322-O                   3.6023    1.6975     11.2853
+ VDW-Hal        75-H      253-O                   3.6023    1.6766     12.2239
 
- Total Potential Energy :              -1948.5514 Kcal/mole
+ Total Potential Energy :              -1948.5077 Kcal/mole
 
  Energy Component Breakdown :           Kcal/mole        Interactions
 
  Bond Stretching                         170.6587              432
  Angle Bending                            61.9733              216
- Urey-Bradley                             -9.0537              216
- Van der Waals                          2580.2194            98142
- Atomic Multipoles                     -3477.6207            46123
- Polarization                           -842.9290            46123
- Charge Transfer                        -431.7993            28156
+ Urey-Bradley                             -9.3378              216
+ Van der Waals                          2580.2531            98142
+ Atomic Multipoles                     -3477.6389            46123
+ Polarization                           -842.6334            46123
+ Charge Transfer                        -431.7826            28156
 
      ######################################################################
    ##########################################################################
@@ -273,14 +273,14 @@
  B-Spline Order                                 5
  Boundary Condition                       TINFOIL
 
- Total Potential Energy :              -1974.8232 Kcal/mole
+ Total Potential Energy :              -1953.3233 Kcal/mole
 
  Energy Component Breakdown :           Kcal/mole        Interactions
 
- Bond Stretching                         147.6796              432
- Angle Bending                            81.1426              216
- Repulsion                              4362.5862            28126
- Dispersion                             -994.0112            28774
- Atomic Multipoles                     -3681.3798            46161
- Polarization                           -821.8915            46161
- Charge Transfer                       -1068.9491            12573
+ Bond Stretching                         148.4588              432
+ Angle Bending                            86.4440              216
+ Repulsion                              4322.4024            28281
+ Dispersion                             -988.7515            28929
+ Atomic Multipoles                     -3651.8190            46179
+ Polarization                           -811.2931            46179
+ Charge Transfer                       -1058.7649            12633
