@@ -69,6 +69,10 @@ c
          dcfz(i) = 0.0d0
       end do
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     calculate the charge flux forces due to bond stretches
 c
       do i = 1, nbond
@@ -85,7 +89,7 @@ c
          yab = ya - yb
          zab = za - zb
          if (use_polymer)  call image (xab,yab,zab)
-         rab2 = xab*xab + yab*yab + zab*zab
+         rab2 = max(xab*xab+yab*yab+zab*zab,eps)
          pb = pb / sqrt(rab2)
          dpot = pot(ib) - pot(ia)
          ddqdx = pb * (xa-xb)
@@ -104,7 +108,6 @@ c
 c
 c     calculate the charge flux forces due to angle bends
 c
-      eps = 0.0001d0
       do i = 1, nangle
          ia = iang(1,i)
          ib = iang(2,i)
