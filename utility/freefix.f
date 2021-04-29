@@ -281,10 +281,6 @@ c     Binding Free Energies: A Quantitative Approach for Their
 c     Calculation", Journal of Physical Chemistry B, 107, 9535-9551
 c     (2003)  [equation 14]
 c
-c     M. Aldeghi, J. P. Bluck and P. C. Biggin, "Absolute Alchemical
-c     Free Energy Calculations for Ligand Binding: A Beginner's Guide",
-c     Methods in Molecular Biology, 1762, 199-232 (2018)  [equation 11]
-c
 c
       subroutine bfix
       use iounit
@@ -423,7 +419,7 @@ c
 c     calculate and print the restraint thermodynamic values
 c
       dg = kt * log((term1*term2)/(term3*term4))
-      ds = dg/temp - 2.0d0*gasconst
+      ds = dg/temp - 3.0d0*gasconst
       dh = dg + temp*ds
       write (iout,270)  dg
   270 format (/,' Restraint Free Energy :',8x,f12.4,' Kcal/mole')
