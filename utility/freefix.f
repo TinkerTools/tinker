@@ -418,7 +418,7 @@ c
       term1 = 8.0d0 * pi * pi * stdcon
       term2 = sqrt(fd*fa1*fa2*ft1*ft2*ft3)
       term3 = dist * dist * sine1 * sine2
-      term4 = (2.0d0 * pi * kt)**2
+      term4 = (2.0d0 * pi * kt)**3
 c
 c     calculate and print the restraint thermodynamic values
 c
