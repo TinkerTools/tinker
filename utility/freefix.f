@@ -292,7 +292,6 @@ c
       real*8 fd,fa1,fa2
       real*8 ft1,ft2,ft3
       real*8 kt,stdcon
-      real*8 rad2
       real*8 sine1,sine2
       real*8 term1,term2
       real*8 term3,term4
@@ -377,17 +376,17 @@ c
       write (iout,190)  ang1
   190 format (' Angle 1 Reference Value :',6x,f12.4,' Deg')
       write (iout,200)  fa1
-  200 format (' Angle 1 Force Constant :',7x,f12.4,' Kcal/mole/Deg^2')
+  200 format (' Angle 1 Force Constant :',7x,f12.4,' Kcal/mole/Rad^2')
       write (iout,210)  ang2
   210 format (' Angle 2 Reference Value :',6x,f12.4,' Deg')
       write (iout,220)  fa2
-  220 format (' Angle 2 Force Constant :',7x,f12.4,' Kcal/mole/Deg^2')
+  220 format (' Angle 2 Force Constant :',7x,f12.4,' Kcal/mole/Rad^2')
       write (iout,230)  ft1
-  230 format (' Torsion 1 Force Constant :',5x,f12.4,' Kcal/mole/Deg^2')
+  230 format (' Torsion 1 Force Constant :',5x,f12.4,' Kcal/mole/Rad^2')
       write (iout,240)  ft2
-  240 format (' Torsion 2 Force Constant :',5x,f12.4,' Kcal/mole/Deg^2')
+  240 format (' Torsion 2 Force Constant :',5x,f12.4,' Kcal/mole/Rad^2')
       write (iout,250)  ft3
-  250 format (' Torsion 3 Force Constant :',5x,f12.4,' Kcal/mole/Deg^2')
+  250 format (' Torsion 3 Force Constant :',5x,f12.4,' Kcal/mole/Rad^2')
       write (iout,260)  temp
   260 format (' System Temperature Value :',5x,f12.4,' Kelvin')
 c
@@ -396,21 +395,10 @@ c
       kt = temp * gasconst
       stdcon = 1.0d27 / avogadro
 c
-c     convert geometry and force constants to appropriate units
-c
-      rad2 = radian * radian
-      ang1 = ang1 / radian
-      ang2 = ang2 / radian
-      sine1 = sin(ang1)
-      sine2 = sin(ang2)
-      fa1 = fa1 * rad2
-      fa2 = fa2 * rad2
-      ft1 = ft1 * rad2
-      ft2 = ft2 * rad2
-      ft3 = ft3 * rad2
-c
 c     compute the free energy correction due to Boresch restraints
 c
+      sine1 = sin(ang1/radian)
+      sine2 = sin(ang2/radian)
       term1 = 8.0d0 * pi * pi * stdcon
       term2 = sqrt(fd*fa1*fa2*ft1*ft2*ft3)
       term3 = dist * dist * sine1 * sine2

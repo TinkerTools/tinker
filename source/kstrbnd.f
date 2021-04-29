@@ -297,7 +297,7 @@ c
 c     determine the MMFF stretch-bend type for the current angle
 c
             if (ita .lt. itc) then
-               do j = 1, nlignes
+               do j = 1, nligne
                   if (((ia.eq.bt_1(j,1).and.ib.eq.bt_1(j,2)) .or.
      &                 (ib.eq.bt_1(j,1).and.ia.eq.bt_1(j,2)))) then
                      ab = 1
@@ -328,7 +328,7 @@ c
                   stbnt = 11
                end if
             else if (ita .gt. itc) then
-               do j = 1, nlignes
+               do j = 1, nligne
                   if (((ia.eq.bt_1(j,1).and.ib.eq.bt_1(j,2)) .or.
      &                 (ib.eq.bt_1(j,1).and.ia.eq.bt_1(j,2)))) then
                      ab = 1
@@ -359,7 +359,7 @@ c
                   stbnt = 11
                end if
             else if (ita .eq. itc) then
-               do j = 1, nlignes
+               do j = 1, nligne
                   if (((ic.eq.bt_1(j,1).and.ib.eq.bt_1(j,2)) .or.
      &                 (ib.eq.bt_1(j,1).and.ic.eq.bt_1(j,2)))) then
                      bc = 1

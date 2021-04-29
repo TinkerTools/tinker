@@ -310,7 +310,7 @@ c
                pchg(i) = pchg(i) + fcadj(kc)*pbase(k)
             end if
             bt = 0
-            do m = 1, nlignes
+            do m = 1, nligne
                if ((i.eq.bt_1(m,1) .and. i12(j,i).eq.bt_1(m,2)).or.
      &                (i12(j,i).eq.bt_1(m,1) .and. i.eq.bt_1(m,2))) then
                   bt = 1
@@ -343,7 +343,7 @@ c
                k = i12(j,i)
                kc = class(k)
                bt = 0
-               do k = 1, nlignes
+               do k = 1, nligne
                   if ((i.eq.bt_1(k,1) .and.
      &                      i12(j,i).eq.bt_1(k,2)) .or.
      &                   (i12(j,i).eq.bt_1(k,1) .and.

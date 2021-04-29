@@ -541,7 +541,7 @@ c
 c
 c     get single bonds that could be double (MMFF bond type=1)
 c
-      nlignes = 0
+      nligne = 0
       do i = 1, nkey
          next = 1
          record = keyline(i)
@@ -556,9 +556,9 @@ c
    10       continue
             do j = 1, size, 2
                if (list(j).ne.0 .and. list(j+1).ne.0) then
-                  nlignes = nlignes + 1
-                  bt_1(nlignes,1) = list(j)
-                  bt_1(nlignes,2) = list(j+1)
+                  nligne = nligne + 1
+                  bt_1(nligne,1) = list(j)
+                  bt_1(nligne,2) = list(j+1)
                else
                   goto 20
                end if
@@ -580,7 +580,7 @@ c
          ita = class(ia)
          itb = class(ib)
          if (ia .le. ib) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ia.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) then
                   bk(i) = mmff_kb1(ita,itb)
                   bl(i) = mmff_b1(ita,itb)
@@ -597,7 +597,7 @@ c
             if (bl(i) .eq. 1000.0d0)  done = .false.
             goto 30
          else if (ib .le. ia) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ib.eq.bt_1(j,1) .and. ia.eq.bt_1(j,2)) then
                   bk(i) = mmff_kb1(itb,ita)
                   bl(i) = mmff_b1(itb,ita)

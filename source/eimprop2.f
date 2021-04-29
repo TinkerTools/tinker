@@ -29,7 +29,7 @@ c
       integer ia,ib,ic,id
       real*8 eps,fgrp
       real*8 ideal,force
-      real*8 angle,dt
+      real*8 angle,dt,term
       real*8 dedphi,d2edphi2
       real*8 sine,cosine
       real*8 xia,yia,zia
@@ -165,12 +165,12 @@ c
             do while (dt .lt. -180.0d0)
                dt = dt + 360.0d0
             end do
-            dt = dt / radian
 c
 c     calculate the improper torsion master chain rule terms
 c
-            dedphi = 2.0d0 * idihunit * force * dt
-            d2edphi2 = 2.0d0 * idihunit * force
+            term = 2.0d0 * radian * idihunit * force
+            dedphi = term * dt
+            d2edphi2 = radian * term
 c
 c     scale the interaction based on its group membership
 c

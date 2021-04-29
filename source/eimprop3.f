@@ -159,7 +159,6 @@ c
             do while (dt .lt. -180.0d0)
                dt = dt + 360.0d0
             end do
-            dt = dt / radian
 c
 c     calculate the improper dihedral energy
 c

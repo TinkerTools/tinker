@@ -292,9 +292,10 @@ c
             if (angle .lt. af1)  target = af1
             if (angle .gt. af2)  target = af2
             dt = angle - target
+            dt = dt / radian
             dt2 = dt * dt
             e = force * dt2
-            deddt = 2.0d0 * force * dt * radian
+            deddt = 2.0d0 * force * dt
 c
 c     scale the interaction based on its group membership
 c
@@ -435,9 +436,10 @@ c
             else if (dt .lt. -180.0d0) then
                dt = dt + 360.0d0
             end if
+            dt = dt / radian
             dt2 = dt * dt
             e = force * dt2
-            dedphi = 2.0d0 * radian * force * dt
+            dedphi = 2.0d0 * force * dt
 c
 c     scale the interaction based on its group membership
 c

@@ -695,13 +695,13 @@ c     set the MMFF torsion type attribution
 c
          ab = 0
          if (ia .le. ib) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ia.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) then
                   ab = 1
                end if
             end do
          else if (ib .le. ia) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ib.eq.bt_1(j,1) .and. ia.eq.bt_1(j,2)) then
                   ab = 1
                end if
@@ -709,13 +709,13 @@ c
          end if
          bc = 0
          if (ib .le. ic) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ib.eq.bt_1(j,1) .and. ic.eq.bt_1(j,2)) then
                   bc = 1
                end if
             end do
          else if (ic .le. ib) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ic.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) then
                   bc = 1
                end if
@@ -723,13 +723,13 @@ c
          end if
          cd = 0
          if (ic .le. id) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (ic.eq.bt_1(j,1) .and. id.eq.bt_1(j,2)) then
                   cd = 1
                end if
             end do
          else if (id .le. ic) then
-            do j = 1, nlignes
+            do j = 1, nligne
                if (id.eq.bt_1(j,1) .and. ic.eq.bt_1(j,2)) then
                   cd = 1
                end if
