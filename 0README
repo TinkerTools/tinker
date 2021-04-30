@@ -7,5 +7,5 @@
       Modeling package. Source code, extra utility programs and scripts,
       examples, test and benchmark cases are provided. Interfaces to many
       external packages such as Force Field Explorer (FFE), Tinker-OpenMM,
-      FFTW, APBS, and CHARMM via MSCALE are also available.
+      APBS, and CHARMM via MSCALE are also available.
 

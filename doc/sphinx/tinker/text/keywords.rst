@@ -264,7 +264,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **ANGCFLUX [3 integers & 4 reals]**
 
-**ANGLE [3 integers & 4 reals]**  Provides the values for a single bond angle bending parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant value for the angle and up to three ideal bond angles in degrees. In most cases only one ideal bond angle is given, and that value is used for all occurrences of the specified bond angle. If all three ideal angles are given, the values apply when the central atom of the angle is attached to 0, 1 or 2 additional hydrogen atoms, respectively. This "hydrogen environment" option is provided to implement the corresponding feature of Allinger's MM force fields. The default units for the force constant are kcal/mole/radian2, but this can be controlled via the ANGLEUNIT keyword.
+**ANGLE [3 integers & 4 reals]**  Provides the values for a single bond angle bending parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant value for the angle and up to three ideal bond angles in degrees. In most cases only one ideal bond angle is given, and that value is used for all occurrences of the specified bond angle. If all three ideal angles are given, the values apply when the central atom of the angle is attached to 0, 1 or 2 additional hydrogen atoms, respectively. This "hydrogen environment" option is provided to implement the corresponding feature of Allinger's MM force fields. The default units for the force constant are kcal/mole/radian^2, but this can be controlled via the ANGLEUNIT keyword.
 
 **ANGLE-CUBIC [real]**  Sets the value of the cubic term in the Taylor series expansion form of the bond angle bending potential energy. The real number modifier gives the value of the coefficient as a multiple of the quadratic coefficient. This term multiplied by the angle bending energy unit conversion factor, the force constant, and the cube of the deviation of the bond angle from its ideal value gives the cubic contribution to the angle bending energy. The default value in the absence of the ANGLE-CUBIC keyword is zero; i.e., the cubic angle bending term is omitted.
 
@@ -290,11 +290,11 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **ANGMAX [real]**  Set the maximum permissible angle between the current optimization search direction and the negative of the gradient direction. If this maximum angle value is exceeded, the optimization routine will note an error condition and may restart from the steepest descent direction. The default value in the absence of the ANGMAX keyword is usually 88 degrees for conjugate gradient methods and 180 degrees (i.e., ANGMAX is disabled) for variable metric optimizations.
 
-**ANGTORS**
+**ANGTORS [4 integers & 6 reals]**  Provides the values for a single bond angle bending-torsional angle parameter. The integer modifiers give the atom class numbers for the four kinds of atoms involved in the torsion and its contained angles. The real number modifiers give the force constant values for both angles coupled with 1-, 2- and 3-fold torsional terms. The default units for the force constants are kcal/mole/radian, but this can be controlled via the ANGTORUNIT keyword.
 
-**ANGTORTERM**
+**ANGTORTERM [NONE/ONLY]**  Controls use of the angle bending-torsional angle cross term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-**ANGTORUNIT**
+**ANGTORUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the angle bending-torsional angle cross term into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of (Pi/180) = 0.0174533 is used, if the ANGTORUNIT keyword is not given in the force field parameter file or the keyfile.
 
 **ANISO-PRESSURE**  Invokes use of full anisotropic pressure during dynamics simulations. When using this option, the three axis lengths and axis angles vary separately in response to the pressure tensor. The default, in the absence of the keyword, is isotropic pressure based on the average of the diagonal of the pressure tensor.
 
@@ -316,7 +316,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **BCFL**
 
-**BEEMAN-MIXING**
+**BEEMAN-MIXING [integer]**  Sets the "mixing" coefficient between old and new forces in position and velocity updates when using the Beeman integrator. The original algorithm of Beeman uses a value of 6. The default value in the absence of the BEEMAN-MIXING keyword is to use 8, which corresponds to the "Better Beeman" algorithm proposed by Bernie Brooks.
 
 **BETA [real]**  Sets the value of the ? angle of a crystal unit cell, i.e., the angle between the a-axis and c-axis of a unit cell, or, equivalently, the angle between the X-axis and Z-axis of a periodic box. The default value in the absence of the BETA keyword is to set the beta angle equal to the alpha angle as given by the keyword ALPHA.
 
@@ -386,7 +386,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **CHGTRN-TAPER**
 
-**CHGTRNTERM**
+**CHGTRNTERM [NONE/ONLY]**  Controls use of the charge transfer potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
 **COLLISION [real]**  Sets the value of the random collision frequency used in the Andersen stochastic collision dynamics thermostat. The supplied value has units of fs-1 atom-1 and is multiplied internal to Tinker by the time step in fs and N^2/3 where N is the number of atoms. The default value used in the absence of the COLLISION keyword is 0.1 which is appropriate for many systems but may need adjustment to achieve adequate temperature control without perturbing the dynamics.
 
@@ -404,9 +404,9 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **DELTA-HALGREN [real]**  Sets the value of the delta parameter in Halgren's buffered 14-7 vdw potential energy functional form. In the absence of the DELTA-HALGREN keyword, a default value of 0.07 is used.
 
-**DEWALD**
+**DEWALD**  Turns on the use of smooth particle mesh Ewald (PME) summation during computation of dispersion interactions in periodic systems. By default, in the absence of the DEWALD keyword, distance-based cutoffs are used for dispersion interactions.
 
-**DEWALD-ALPHA**
+**DEWALD-ALPHA [real]**  Sets the value of the Ewald coefficient which controls the width of the Gaussian screening charges during particle mesh Ewald summation for dispersion. In the absence of the DEWALD-ALPHA keyword, the EWALD-ALPHA is used, or a value is chosen which causes interactions outside the real-space cutoff to be below a fixed tolerance. For most standard applications of dispersion Ewald summation, the program default should be used.
 
 **DEWALD-CUTOFF**
 
@@ -492,9 +492,9 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **EPSILONRULE [GEOMETRIC/ARITHMETIC/HARMONIC/HHG]**  Selects the combining rule used to derive the ? value for van der Waals interactions. The default in the absence of the EPSILONRULE keyword is to use the GEOMETRIC mean of the individual epsilon values of the two atoms involved in the van der Waals interaction.
 
-**EWALD**  Turns on the use of Ewald summation during computation of electrostatic interactions in periodic systems. In the current version of Tinker, regular Ewald is used for polarizable atomic multipoles, and smooth particle mesh Ewald (PME) is used for charge-charge interactions. Ewald summation is not available for interactions involving bond-centered dipoles. By default, in the absence of the EWALD keyword, distance-based cutoffs are used for electrostatic interactions.
+**EWALD**  Turns on the use of smooth particle mesh Ewald (PME) summation during computation of partial charge, atomic multipole and polarization interactions in periodic systems. By default, in the absence of the EWALD keyword, distance-based cutoffs are used for electrostatic interactions.
 
-**EWALD-ALPHA [real]**  Sets the value of the Ewald coefficient which controls the width of the Gaussian screening charges during particle mesh Ewald summation. In the absence of the EWALD-ALPHA keyword, a value is chosen which causes interactions outside the real-space cutoff to be below a fixed tolerance. For most standard applications of Ewald summation, the program default should be used.
+**EWALD-ALPHA [real]**  Sets the value of the Ewald coefficient which controls the width of the Gaussian screening charges during particle mesh Ewald summation for multipole electrostatics, and by default for other PME interactions. In the absence of the EWALD-ALPHA keyword, a value is chosen which causes interactions outside the real-space cutoff to be below a fixed tolerance. For most standard applications of Ewald summation, the program default should be used.
 
 **EWALD-BOUNDARY**  Invokes the use of insulating (ie, vacuum) boundary conditions during Ewald summation, corresponding to the media surrounding the system having a dielectric value of 1. The default in the absence of the EWALD-BOUNDARY keyword is to use conducting (ie, tinfoil) boundary conditions where the surrounding media is assumed to have an infinite dielectric value.
 
@@ -576,7 +576,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **HBOND [2 integers & 2 reals]**  Provides the values for the MM3-style directional hydrogen bonding parameters for a single pair of atoms. The integer modifiers give the pair of atom class numbers for which hydrogen bonding parameters are to be defined. The two real number modifiers give the values of the minimum energy contact distance in Angstroms and the well depth at the minimum distance in kcal/mole.
 
-**HEAVY-HYDROGEN**
+**HEAVY-HYDROGEN [real]**  Turns on use of hydrogen mass repartitioning (HMR) and sets the target value for hydrogen masses. HMR transfers atomic mass from heavy atoms to their attached hydrogen atoms. Mass transfer is allowed until the hydrogen mass target is reached, or until a heavy atom and its attached hydrogens all have equal mass. A default value of 4.0 is used as the hydrogen mass target in the absence of the HEAVY-HYDROGEN keyword.
 
 **HESSIAN-CUTOFF [real]**  Defines a lower limit for significant Hessian matrix elements. During computation of the Hessian matrix of partial second derivatives, any matrix elements with absolute value below HESS-CUTOFF will be set to zero and omitted from the sparse matrix Hessian storage scheme used by Tinker. For most calculations, the default in the absence of this keyword is zero, i.e., all elements will be stored. For most Truncated Newton optimizations the Hessian cutoff will be chosen dynamically by the optimizer.
 
@@ -588,7 +588,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **IMPROPTERM [NONE/ONLY]**  Controls use of the CHARMM-style improper dihedral angle potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-**IMPROPUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the CHARMM-style improper dihedral angle potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of 1.0 is used, if the IMPROPUNIT keyword is not given in the force field parameter file or the keyfile.
+**IMPROPUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the CHARMM-style improper dihedral angle potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of (180/Pi)^2 = 0.0003046 is used, if the IMPROPUNIT keyword is not given in the force field parameter file or the keyfile.
 
 **IMPTORS [4 integers & up to 3 real/real/integer triples]**  Provides the values for a single AMBER-style improper torsional angle parameter. The first four integer modifiers give the atom class numbers for the atoms involved in the improper torsional angle to be defined. By convention, the third atom class of the four is the trigonal atom on which the improper torsion is centered. The torsional angle computed is literally that defined by the four atom classes in the order specified by the keyword. Each of the remaining triples of real/real/integer modifiers give the half-amplitude, phase offset in degrees and periodicity of a particular improper torsional term, respectively. Periodicities through 3-fold are allowed for improper torsional parameters.
 
@@ -702,7 +702,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **NOARCHIVE**  Causes Tinker molecular dynamics-based programs to write trajectories directly to "cycle" files with a sequentially numbered file extension. The default, in the absence of this keyword, is to write a single plain-text archive file with the .arc format. If an archive file already exists at the start of the calculation, then the newly generated trajectory is appended to the end of the existing file. The default in the absence of this keyword is to write the trajectory snapshots to consecutively numbered cycle files.
 
-**NOSYMMETRY**
+**NOSYMMETRY**  Forces the use of triclinic periodic boundary conditions and minimum image generation regardless of any symmetry or equilvalent values in the periodic box or crystal lattice values. Used to allow the possibility of symmetry breaking during calculations that begin from a symmetric structure.
 
 **NOVERSION**  Turns off the use of version numbers appended to the end of filenames as the method for generating filenames for updated copies of an existing file. The presence of this keyword results in direct use of input file names without a search for the highest available version, and requires the entry of specific output file names in many additional cases. By default, in the absence of this keyword, Tinker generates and attaches version numbers in a manner similar to the Digital OpenVMS operating system. For example, subsequent new versions of the file molecule.xyz would be written first to the file molecule.xyz_2, then to molecule.xyz_3, etc.
 
@@ -762,7 +762,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **PENETRATION**
 
-**PEWALD-ALPHA**
+**PEWALD-ALPHA [real]**  Sets the value of the Ewald coefficient which controls the width of the Gaussian screening charges during particle mesh Ewald summation for polarization interactions. In the absence of the PEWALD-ALPHA keyword, the EWALD-ALPHA is used, or a value is chosen which causes interactions outside the real-space cutoff to be below a fixed tolerance. For most standard applications of polarization Ewald summation, the program default should be used.
 
 **PIATOM [1 integer & 3 reals]**  Provides the values for the pisystem MO potential parameters for a single atom class belonging to a pisystem.
 
@@ -874,7 +874,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **REPULSION**
 
-**REPULSIONTERM**
+**REPULSIONTERM [NONE/ONLY]**  Controls use of the Pauli repulsion potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
 **RESP-WEIGHT**
 
