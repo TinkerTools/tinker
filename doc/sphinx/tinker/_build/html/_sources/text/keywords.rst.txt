@@ -256,7 +256,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **ALPHA [real]**  Sets the value of the alpha angle of a crystal unit cell, i.e., the angle between the b-axis and c-axis of a unit cell, or, equivalently, the angle between the Y-axis and Z-axis of a periodic box. The default value in the absence of the ALPHA keyword is 90 degrees.
 
-**ANGANG [1 integer & 3 reals]**  Provides the values for a single angle-angle cross term potential parameter.
+**ANGANG [1 integer & 3 reals]**  Provides the values for a single angle-angle cross term potential parameter. The integer modifier is the atom class of the central atom in the coupled angles. The real number modifiers give the force constant values for individual angles with 0, 1 or 2 terminal hydrogen atoms, respectively. The default units for the force constant are kcal/mole/radian^2, but this can be controlled via the ANGANGUNIT keyword.
 
 **ANGANGTERM [NONE/ONLY]**  Controls use of the angle-angle cross term potential energy. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
@@ -364,7 +364,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **CHARGETRANSFER**
 
-**CHG-11-SCALE**
+**CHG-11-SCALE [real]**  Provides a multiplicative scale factor that is applied to charge-charge electrostatic interactions between self-atoms. These interactions are usually to be ignored, but this value is used in certain cases involving infinite polymers or atoms using the same "neighbor generating" site. The default value of 0.0 is used, if the CHG-11-SCALE keyword is not given in either the parameter file or the keyfile.
 
 **CHG-12-SCALE [real]**  Provides a multiplicative scale factor that is applied to charge-charge electrostatic interactions between 1-2 connected atoms, i.e., atoms that are directly bonded. The default value of 0.0 is used, if the CHG-12-SCALE keyword is not given in either the parameter file or the keyfile.
 
@@ -408,7 +408,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **DEWALD-ALPHA [real]**  Sets the value of the Ewald coefficient which controls the width of the Gaussian screening charges during particle mesh Ewald summation for dispersion. In the absence of the DEWALD-ALPHA keyword, the EWALD-ALPHA is used, or a value is chosen which causes interactions outside the real-space cutoff to be below a fixed tolerance. For most standard applications of dispersion Ewald summation, the program default should be used.
 
-**DEWALD-CUTOFF**
+**DEWALD-CUTOFF [real]**  Sets the value in Angstroms of the real-space distance cutoff for use during Ewald summation for dispersion interactions. By default, in the absence of the DEWALD-CUTOFF keyword, a value of 7.0 is used.
 
 **DIELECTRIC [real]**  Sets the value of the bulk dielectric constant used to damp all electrostatic interaction energies for any of the Tinker electrostatic potential functions. The default value is force field dependent, but is usually equal to 1.0 (for Allinger's MM force fields the default is 1.5).
 
@@ -498,7 +498,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **EWALD-BOUNDARY**  Invokes the use of insulating (ie, vacuum) boundary conditions during Ewald summation, corresponding to the media surrounding the system having a dielectric value of 1. The default in the absence of the EWALD-BOUNDARY keyword is to use conducting (ie, tinfoil) boundary conditions where the surrounding media is assumed to have an infinite dielectric value.
 
-**EWALD-CUTOFF [real]**  Sets the value in Angstroms of the real-space distance cutoff for use during Ewald summation. By default, in the absence of the EWALD-CUTOFF keyword, a value of 9.0 is used.
+**EWALD-CUTOFF [real]**  Sets the value in Angstroms of the real-space distance cutoff for use during Ewald summation. By default, in the absence of the EWALD-CUTOFF keyword, a value of 7.0 is used.
 
 **EXIT-PAUSE**  Causes Tinker programs to pause and wait for a carriage return at the end of executation prior to returning control to the operating system. This is useful to keep the execution window open following termination on machines running Microsoft Windows or Apple MacOS. The default in the absence of the EXIT-PAUSE keyword, is to return control to the operating system immediately at program termination.
 

@@ -34,7 +34,7 @@ c
       implicit none
       integer i,k,iangang
       integer ia,ib,ic,id,ie
-      real*8 e,fgrp
+      real*8 e,eps,fgrp
       real*8 dt1,dt2
       real*8 angle,dot,cosine
       real*8 xia,yia,zia
@@ -61,6 +61,10 @@ c
       end do
       if (nangang .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -76,7 +80,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangang,iaa,iang,
-!$OMP& use,x,y,z,anat,kaa,aaunit,use_group,use_polymer,
+!$OMP& use,x,y,z,anat,kaa,aaunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eaa,neaa,aeaa)
 !$OMP DO reduction(+:eaa,neaa,aeaa) schedule(guided)
@@ -138,51 +142,49 @@ c
                call image (xdb,ydb,zdb)
                call image (xeb,yeb,zeb)
             end if
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rdb2 = xdb*xdb + ydb*ydb + zdb*zdb
-            reb2 = xeb*xeb + yeb*yeb + zeb*zeb
-            if (rab2*rcb2*rdb2*reb2 .ne. 0.0d0) then
-               dot = xab*xcb + yab*ycb + zab*zcb
-               cosine = dot / sqrt(rab2*rcb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               dt1 = angle - anat(i)
-               dot = xdb*xeb + ydb*yeb + zdb*zeb
-               cosine = dot / sqrt(rdb2*reb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               dt2 = angle - anat(k)
+            rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+            rdb2 = max(xdb*xdb+ydb*ydb+zdb*zdb,eps)
+            reb2 = max(xeb*xeb+yeb*yeb+zeb*zeb,eps)
+            dot = xab*xcb + yab*ycb + zab*zcb
+            cosine = dot / sqrt(rab2*rcb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            dt1 = angle - anat(i)
+            dot = xdb*xeb + ydb*yeb + zdb*zeb
+            cosine = dot / sqrt(rdb2*reb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            dt2 = angle - anat(k)
 c
 c     get the angle-angle interaction energy
 c
-               e = aaunit * kaa(iangang) * dt1 * dt2
+            e = aaunit * kaa(iangang) * dt1 * dt2
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+            if (use_group)  e = e * fgrp
 c
 c     increment the total angle-angle energy
 c
-               neaa = neaa + 1
-               eaa = eaa + e
-               aeaa(ib) = aeaa(ib) + e
+            neaa = neaa + 1
+            eaa = eaa + e
+            aeaa(ib) = aeaa(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (e .gt. 5.0d0)
-               if (debug .or. (verbose.and.huge)) then
-                  if (header) then
-                     header = .false.
-                     write (iout,20)
-   20                format (/,' Individual Angle-Angle Interactions :',
-     &                       //,' Type',10x,'Center',6x,'Angle1',
-     &                          6x,'Angle2',4x,'dAngle1',
-     &                          3x,'dAngle2',6x,'Energy',/)
-                  end if
-                  write (iout,30)  ib,name(ib),ia,ic,id,ie,dt1,dt2,e
-   30             format (' AngAng',4x,i7,'-',a3,4i6,2f10.4,f12.4)
+            huge = (e .gt. 5.0d0)
+            if (debug .or. (verbose.and.huge)) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Individual Angle-Angle Interactions :',
+     &                    //,' Type',10x,'Center',6x,'Angle1',
+     &                       6x,'Angle2',4x,'dAngle1',
+     &                       3x,'dAngle2',6x,'Energy',/)
                end if
+               write (iout,30)  ib,name(ib),ia,ic,id,ie,dt1,dt2,e
+   30          format (' AngAng',4x,i7,'-',a3,4i6,2f10.4,f12.4)
             end if
          end if
       end do
