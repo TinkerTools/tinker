@@ -117,6 +117,7 @@ c
                call image (xad,yad,zad)
                call image (xcd,ycd,zcd)
             end if
+            rdb2 = max(xdb*xdb+ydb*ydb+zdb*zdb,0.0001d0)
 c
 c     W-D-C angle between A-B-C plane and B-D vector for D-B<AC
 c
@@ -135,10 +136,9 @@ c
 c
 c     find the out-of-plane angle bending energy
 c
-            ee = xdb*(yab*zcb-zab*ycb) + ydb*(zab*xcb-xab*zcb)
-     &              + zdb*(xab*ycb-yab*xcb)
-            rdb2 = xdb*xdb + ydb*ydb + zdb*zdb
-            if (rdb2.ne.0.0d0 .and. cc.ne.0.0d0) then
+            if (cc .ne. 0.0d0) then
+               ee = xdb*(yab*zcb-zab*ycb) + ydb*(zab*xcb-xab*zcb)
+     &                 + zdb*(xab*ycb-yab*xcb)
                sine = abs(ee) / sqrt(cc*rdb2)
                sine = min(1.0d0,sine)
                angle = radian * asin(sine)

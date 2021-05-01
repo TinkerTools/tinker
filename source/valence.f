@@ -464,14 +464,12 @@ c
          xcb = gx(ic) - gx(ib)
          ycb = gy(ic) - gy(ib)
          zcb = gz(ic) - gz(ib)
-         rab2 = xab*xab + yab*yab + zab*zab
-         rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-         if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-            dot = xab*xcb + yab*ycb + zab*zcb
-            cosine = dot / sqrt(rab2*rcb2)
-            cosine = min(1.0d0,max(-1.0d0,cosine))
-            anat(i) = radian * acos(cosine)
-         end if
+         rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+         rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+         dot = xab*xcb + yab*ycb + zab*zcb
+         cosine = dot / sqrt(rab2*rcb2)
+         cosine = min(1.0d0,max(-1.0d0,cosine))
+         anat(i) = radian * acos(cosine)
          done = .false.
          do j = 1, k
             if (pta .eq. ka(j)) then
@@ -2031,28 +2029,24 @@ c
             xcb = x(ic) - x(ib)
             ycb = y(ic) - y(ib)
             zcb = z(ic) - z(ib)
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rabc = sqrt(rab2 * rcb2)
-            if (rabc .ne. 0.0d0) then
-               cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-            end if
+            rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+            rabc = sqrt(rab2*rcb2)
+            cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
             xab = gx(ia) - gx(ib)
             yab = gy(ia) - gy(ib)
             zab = gz(ia) - gz(ib)
             xcb = gx(ic) - gx(ib)
             ycb = gy(ic) - gy(ib)
             zcb = gz(ic) - gz(ib)
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rabc = sqrt(rab2 * rcb2)
-            if (rabc .ne. 0.0d0) then
-               cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               gangle = radian * acos(cosine)
-            end if
+            rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+            rabc = sqrt(rab2*rcb2)
+            cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            gangle = radian * acos(cosine)
             delta = angle - gangle
             aave = aave + abs(delta)
             arms = arms + delta*delta

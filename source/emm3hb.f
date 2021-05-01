@@ -236,9 +236,8 @@ c
                      ycb = yic - yib
                      zcb = zic - zib
                      call image (xcb,ycb,zcb)
-                     rab2 = xab*xab + yab*yab + zab*zab
-                     rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-                     rcb2 = max(0.0001d0,rcb2)
+                     rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+                     rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
                      dot = xab*xcb + yab*ycb + zab*zcb
                      cosine = dot / sqrt(rab2*rcb2)
                      rab = sqrt(rab2)
@@ -384,9 +383,8 @@ c
                         ycb = yic - yib
                         zcb = zic - zib
                         call imager (xcb,ycb,zcb,j)
-                        rab2 = xab*xab + yab*yab + zab*zab
-                        rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-                        rcb2 = max(0.0001d0,rcb2)
+                        rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+                        rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
                         dot = xab*xcb + yab*ycb + zab*zcb
                         cosine = dot / sqrt(rab2*rcb2)
                         rab = sqrt(rab2)
@@ -724,9 +722,8 @@ c
                            zcb = zcb * gamma_term
                         end if
                      end if
-                     rab2 = xab*xab + yab*yab + zab*zab
-                     rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-                     rcb2 = max(0.0001d0,rcb2)
+                     rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+                     rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
                      dot = xab*xcb + yab*ycb + zab*zcb
                      cosine = dot / sqrt(rab2*rcb2)
                      rab = sqrt(rab2)
@@ -995,9 +992,8 @@ c
                      ycb = yic - yib
                      zcb = zic - zib
                      call image (xcb,ycb,zcb)
-                     rab2 = xab*xab + yab*yab + zab*zab
-                     rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-                     rcb2 = max(0.0001d0,rcb2)
+                     rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+                     rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
                      dot = xab*xcb + yab*ycb + zab*zcb
                      cosine = dot / sqrt(rab2*rcb2)
                      rab = sqrt(rab2)
