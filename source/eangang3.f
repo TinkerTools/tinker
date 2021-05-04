@@ -34,9 +34,10 @@ c
       implicit none
       integer i,k,iangang
       integer ia,ib,ic,id,ie
-      real*8 e,eps,fgrp
+      real*8 e,angle
+      real*8 eps,fgrp
       real*8 dt1,dt2
-      real*8 angle,dot,cosine
+      real*8 dot,cosine
       real*8 xia,yia,zia
       real*8 xib,yib,zib
       real*8 xic,yic,zic

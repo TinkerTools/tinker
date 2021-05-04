@@ -1,4 +1,5 @@
-apbs
+apbs/*
+!apbs/0README
 bin/*
 !bin/0README
 doc/amoeba
@@ -7,13 +8,16 @@ doc/heart
 doc/hippo
 doc/mechanic
 doc/multipoles
+doc/sphinx
 doc/word
 #fftw
-lib/linux/lib*
-lib/macos/lib*
-lib/windows/lib*
+lib/linux/*
+!lib/linux/0README
+lib/macos/*
+!lib/macos/0README
+lib/windows/*
+!lib/windows/0README
 listing
-mscale
 source/*.a
 source/*.mod
 source/*.o

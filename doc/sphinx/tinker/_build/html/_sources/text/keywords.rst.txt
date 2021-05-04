@@ -482,7 +482,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **ECHO [text string]**  Causes whatever text follows it on the line to be copied directly to the output file. This keyword is also active in parameter files. It has no default value; if no text follows the ECHO keyword, a blank line is placed in the output file.
 
-**ELE-LAMBDA**
+**ELE-LAMBDA**  Sets the value of the lambda scaling parameters for electrostatic interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
 
 **ELECTNEG [3 integers & 1 real]**  Provides the values for a single electronegativity bond length correction parameter. The first two integer modifiers give the atom class numbers of the atoms involved in the bond to be corrected. The third integer modifier is the atom class of an electronegative atom. In the case of a primary correction, an atom of this third class must be directly bonded to an atom of the second atom class. For a secondary correction, the third class is one atom removed from an atom of the second class. The real number modifier is the value in Angstroms by which the original ideal bond length is to be corrected.
 
@@ -584,7 +584,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **IEL-SCF**
 
-**IMPROPER [4 integers & 2 reals]**  Provides the values for a single CHARMM-style improper dihedral angle parameter.
+**IMPROPER [4 integers & 2 reals]**  Provides the values for a single CHARMM-style improper dihedral angle parameter. The integer modifiers give the atom class numbers for the four kinds of atoms involved in the torsion which is to be defined. The real number modifiers give the force constant value for the deviation from the target improper torsional angle, and the target value for the torsional angle, respectively. The default units for the improper force constant are kcal/mole/radian^2, but this can be controlled via the IMPROPUNIT keyword.
 
 **IMPROPTERM [NONE/ONLY]**  Controls use of the CHARMM-style improper dihedral angle potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
@@ -612,7 +612,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **ION**
 
-**LAMBDA [real]**  Sets the value of the lambda path parameter for free energy perturbation calculations. The real number modifier specifies the position along the mutation path and must be a number in the range from 0 (initial state) to 1 (final state). The actual atoms involved in the mutation are given separately in individual MUTATE keyword lines.
+**LAMBDA [real]**  Sets the value of the lambda scaling parameters for electrostatic, vdw and torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
 
 **LBFGS-VECTORS [integer]**  Sets the number of correction vectors used by the limited-memory L-BFGS optimization routine. The current maximum allowable value, and the default in the absence of the LBFGS-VECTORS keyword is 15.
 
@@ -858,7 +858,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 **REDUCE [real]**  Specifies the fraction between zero and one by which the path between starting and final conformational state will be shortened at each major cycle of the transition state location algorithm implemented by the SADDLE program. This causes the path endpoints to move up and out of the terminal structures toward the transition state region. In favorable cases, a nonzero value of the REDUCE modifier can speed convergence to the transition state. The default value in the absence of the REDUCE keyword is zero.
 
-**REMOVE-INERTIA**
+**REMOVE-INERTIA [integer]**  Specifies the number of molecular dynamics steps between removal of overall tranlational and/or rotational motion of the system. The default value in the absence of the REMOVE-INERTIA keyword is 100 steps.
 
 **REP-12-SCALE**
 
@@ -910,7 +910,7 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 **SAVE-INDUCED**  Causes Tinker molecular dynamics calculations that involve polarizable atomic multipoles to save the values of the induced dipole components on each polarizable atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each induced dipole file name contains as a suffix the cycle number followed by the letter u.
 
-**SAVE-VECTS**
+**SAVE-VECTS [integer]** Specifies the number of iterations between the saving of restart vectors during block iterative determination of the low frequence vibrational modes. A default value of 10 is used for SAVE-VECTS in the absence of the keyword.
 
 **SAVE-VELOCITY**  Causes Tinker molecular dynamics calculations to save the values of the velocity components on each atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each velocity file name contains as a suffix the cycle number followed by the letter v.
 
@@ -942,13 +942,13 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 **STEPMIN [real]**  Sets via its modifying value the minimum size of an individual step during the line search phase of conjugate gradient or truncated Newton optimizations. The step size is computed as the norm of the vector of changes in parameters being optimized. The default value is usually set to about 10-16 when not specified via the STEPMIN keyword.
 
-**STRBND [3 integers & 2 reals]**  Provides the values for a single stretch-bend cross term potential parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant values for the first bond (first two atom classes) with the angle, and the second bond with the angle, respectively. The default units for the stretch-bend force constant are kcal/mole/Ang-degree, but this can be controlled via the STRBNDUNIT keyword.
+**STRBND [3 integers & 2 reals]**  Provides the values for a single stretch-bend cross term potential parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant values for the first bond (first two atom classes) with the angle, and the second bond with the angle, respectively. The default units for the stretch-bend force constant are kcal/mole/Ang-radian, but this can be controlled via the STRBNDUNIT keyword.
 
 **STRBNDTERM [NONE/ONLY]**  Controls use of the bond stretching-angle bending cross term potential energy. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-**STRBNDUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the bond stretching-angle bending cross term potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of 1.0 is used, if the STRBNDUNIT keyword is not given in the force field parameter file or the keyfile.
+**STRBNDUNIT [real]**  Sets the scale factor needed to convert the energy value computed by the bond stretching-angle bending cross term potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of (Pi/180) = 0.0174533 is used, if the STRBNDUNIT keyword is not given in the force field parameter file or the keyfile.
 
-**STRTORS [2 integers & 1 real]**  Provides the values for a single stretch-torsion cross term potential parameter. The two integer modifiers give the atom class numbers for the atoms involved in the central bond of the torsional angles to be parameterized. The real modifier gives the value of the stretch-torsion force constant for all torsional angles with the defined central bond atom classes. The default units for the stretch-torsion force constant can be controlled via the STRTORUNIT keyword.
+**STRTORS [2 integers & 1 real]**  Provides the values for a single stretch-torsion cross term potential parameter. The two integer modifiers give the atom class numbers for the atoms involved in the central bond of the torsional angles to be parameterized. The real modifier gives the value of the stretch-torsion force constant for all torsional angles with the defined atom classes for the central bond. The default units for the stretch-torsion force constant can be controlled via the STRTORUNIT keyword.
 
 **STRTORTERM [NONE/ONLY]**  Controls use of the bond stretching-torsional angle cross term potential energy. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
@@ -976,7 +976,7 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 **THERMOSTAT [BERENDSEN/ANDERSEN]**  Selects a thermostat algorithm for use during molecular dynamics. Two modifiers are available, a Berendsen bath coupling method, and an Andersen stochastic collision method. The default in the absence of the THERMOSTAT keyword is to use the BERENDSEN algorithm.
 
-**TORS-LAMBDA**
+**TORS-LAMBDA [real]**  Sets the value of the lambda scaling parameters for torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of annihilation for specified torsional interactions from none (lambda=1) to complete (lambda=0). The torsions involved in the scaling are given separately via ROTATABLE-BOND keywords.
 
 **TORSION [4 integers & up to 6 real/real/integer triples]**  Provides the values for a single torsional angle parameter. The first four integer modifiers give the atom class numbers for the atoms involved in the torsional angle to be defined. Each of the remaining triples of real/real/integer modifiers give the amplitude, phase offset in degrees and periodicity of a particular torsional function term, respectively. Periodicities through 6-fold are allowed for torsional parameters.
 
@@ -1032,7 +1032,7 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 **VDW-CUTOFF [real]**  Sets the cutoff distance value in Angstroms for van der Waals potential energy interactions. The energy for any pair of van der Waals sites beyond the cutoff distance will be set to zero. Other keywords can be used to select a smoothing scheme near the cutoff distance. The default cutoff distance in the absence of the VDW-CUTOFF keyword is infinite for nonperiodic systems and 9.0 for periodic systems.
 
-**VDW-LAMBDA**
+**VDW-LAMBDA [real]**  Sets the value of the lambda scaling parameters for vdw interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
 
 **VDW-LIST**
 
@@ -1054,11 +1054,11 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 **VIB-TOLERANCE**
 
-**VOLUME-MOVE**
+**VOLUME-MOVE [real]**  Specifies the maximum magnitude in Ang^3 of a trial change in the periodic box size when using a Monte Carlo barostat. The default value of 100.0 Ang^3 is used in the absence of the VOLUME-MOVE keyword.
 
-**VOLUME-SCALE**
+**VOLUME-SCALE [MOLECULAR/ATOMIC]**  Specifies the type of coordinate scaling to be used when making trial periodic box volume size changes during use of a Monte Carlo barostat. The MOLECULAR modifier enforces rigid body translation of molecules based on center of mass, while the ATOMIC value treats all coordinates independently. The default in the absence of the VOLUME-SCALE keyword is to use MOLECULAR scaling.
 
-**VOLUME-TRIAL**
+**VOLUME-TRIAL [integer]**  Specifies the average number of molecular dynamics steps between attempts to change the periodic box size when using a Monte Carlo barostat. The default value of 25 steps is used in the absence of the VOLUME-TRIAL keyword.
 
 **WALL [real]**  Sets the radius of a spherical boundary used to maintain droplet boundary conditions. The real modifier specifies the desired approximate radius of the droplet. In practice, an artificial van der Waals wall is constructed at a fixed buffer distance of 2.5 Angstroms outside the specified radius. The effect is that atoms which attempt to move outside the region defined by the droplet radius will be forced toward the center.
 

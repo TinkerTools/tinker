@@ -77,7 +77,7 @@
     
 
 \title{Tinker User\textquotesingle{}s Guide}
-\date{Apr 30, 2021}
+\date{May 04, 2021}
 \release{}
 \author{TinkerTools Organization}
 \newcommand{\sphinxlogo}{\vbox{}}
@@ -1397,7 +1397,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{ECHO {[}text string{]}}  Causes whatever text follows it on the line to be copied directly to the output file. This keyword is also active in parameter files. It has no default value; if no text follows the ECHO keyword, a blank line is placed in the output file.
 
-\sphinxstylestrong{ELE\sphinxhyphen{}LAMBDA}
+\sphinxstylestrong{ELE\sphinxhyphen{}LAMBDA}  Sets the value of the lambda scaling parameters for electrostatic interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
 
 \sphinxstylestrong{ELECTNEG {[}3 integers \& 1 real{]}}  Provides the values for a single electronegativity bond length correction parameter. The first two integer modifiers give the atom class numbers of the atoms involved in the bond to be corrected. The third integer modifier is the atom class of an electronegative atom. In the case of a primary correction, an atom of this third class must be directly bonded to an atom of the second atom class. For a secondary correction, the third class is one atom removed from an atom of the second class. The real number modifier is the value in Angstroms by which the original ideal bond length is to be corrected.
 
@@ -1499,7 +1499,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{IEL\sphinxhyphen{}SCF}
 
-\sphinxstylestrong{IMPROPER {[}4 integers \& 2 reals{]}}  Provides the values for a single CHARMM\sphinxhyphen{}style improper dihedral angle parameter.
+\sphinxstylestrong{IMPROPER {[}4 integers \& 2 reals{]}}  Provides the values for a single CHARMM\sphinxhyphen{}style improper dihedral angle parameter. The integer modifiers give the atom class numbers for the four kinds of atoms involved in the torsion which is to be defined. The real number modifiers give the force constant value for the deviation from the target improper torsional angle, and the target value for the torsional angle, respectively. The default units for the improper force constant are kcal/mole/radian\textasciicircum{}2, but this can be controlled via the IMPROPUNIT keyword.
 
 \sphinxstylestrong{IMPROPTERM {[}NONE/ONLY{]}}  Controls use of the CHARMM\sphinxhyphen{}style improper dihedral angle potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
@@ -1527,7 +1527,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{ION}
 
-\sphinxstylestrong{LAMBDA {[}real{]}}  Sets the value of the lambda path parameter for free energy perturbation calculations. The real number modifier specifies the position along the mutation path and must be a number in the range from 0 (initial state) to 1 (final state). The actual atoms involved in the mutation are given separately in individual MUTATE keyword lines.
+\sphinxstylestrong{LAMBDA {[}real{]}}  Sets the value of the lambda scaling parameters for electrostatic, vdw and torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
 
 \sphinxstylestrong{LBFGS\sphinxhyphen{}VECTORS {[}integer{]}}  Sets the number of correction vectors used by the limited\sphinxhyphen{}memory L\sphinxhyphen{}BFGS optimization routine. The current maximum allowable value, and the default in the absence of the LBFGS\sphinxhyphen{}VECTORS keyword is 15.
 
@@ -1773,7 +1773,7 @@ The following is an alphabetical list of the Tinker keywords along with a brief 
 
 \sphinxstylestrong{REDUCE {[}real{]}}  Specifies the fraction between zero and one by which the path between starting and final conformational state will be shortened at each major cycle of the transition state location algorithm implemented by the SADDLE program. This causes the path endpoints to move up and out of the terminal structures toward the transition state region. In favorable cases, a nonzero value of the REDUCE modifier can speed convergence to the transition state. The default value in the absence of the REDUCE keyword is zero.
 
-\sphinxstylestrong{REMOVE\sphinxhyphen{}INERTIA}
+\sphinxstylestrong{REMOVE\sphinxhyphen{}INERTIA {[}integer{]}}  Specifies the number of molecular dynamics steps between removal of overall tranlational and/or rotational motion of the system. The default value in the absence of the REMOVE\sphinxhyphen{}INERTIA keyword is 100 steps.
 
 \sphinxstylestrong{REP\sphinxhyphen{}12\sphinxhyphen{}SCALE}
 
@@ -1825,7 +1825,7 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 \sphinxstylestrong{SAVE\sphinxhyphen{}INDUCED}  Causes Tinker molecular dynamics calculations that involve polarizable atomic multipoles to save the values of the induced dipole components on each polarizable atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each induced dipole file name contains as a suffix the cycle number followed by the letter u.
 
-\sphinxstylestrong{SAVE\sphinxhyphen{}VECTS}
+\sphinxstylestrong{SAVE\sphinxhyphen{}VECTS {[}integer{]}} Specifies the number of iterations between the saving of restart vectors during block iterative determination of the low frequence vibrational modes. A default value of 10 is used for SAVE\sphinxhyphen{}VECTS in the absence of the keyword.
 
 \sphinxstylestrong{SAVE\sphinxhyphen{}VELOCITY}  Causes Tinker molecular dynamics calculations to save the values of the velocity components on each atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each velocity file name contains as a suffix the cycle number followed by the letter v.
 
@@ -1857,13 +1857,13 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 \sphinxstylestrong{STEPMIN {[}real{]}}  Sets via its modifying value the minimum size of an individual step during the line search phase of conjugate gradient or truncated Newton optimizations. The step size is computed as the norm of the vector of changes in parameters being optimized. The default value is usually set to about 10\sphinxhyphen{}16 when not specified via the STEPMIN keyword.
 
-\sphinxstylestrong{STRBND {[}3 integers \& 2 reals{]}}  Provides the values for a single stretch\sphinxhyphen{}bend cross term potential parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant values for the first bond (first two atom classes) with the angle, and the second bond with the angle, respectively. The default units for the stretch\sphinxhyphen{}bend force constant are kcal/mole/Ang\sphinxhyphen{}degree, but this can be controlled via the STRBNDUNIT keyword.
+\sphinxstylestrong{STRBND {[}3 integers \& 2 reals{]}}  Provides the values for a single stretch\sphinxhyphen{}bend cross term potential parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle which is to be defined. The real number modifiers give the force constant values for the first bond (first two atom classes) with the angle, and the second bond with the angle, respectively. The default units for the stretch\sphinxhyphen{}bend force constant are kcal/mole/Ang\sphinxhyphen{}radian, but this can be controlled via the STRBNDUNIT keyword.
 
 \sphinxstylestrong{STRBNDTERM {[}NONE/ONLY{]}}  Controls use of the bond stretching\sphinxhyphen{}angle bending cross term potential energy. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-\sphinxstylestrong{STRBNDUNIT {[}real{]}}  Sets the scale factor needed to convert the energy value computed by the bond stretching\sphinxhyphen{}angle bending cross term potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of 1.0 is used, if the STRBNDUNIT keyword is not given in the force field parameter file or the keyfile.
+\sphinxstylestrong{STRBNDUNIT {[}real{]}}  Sets the scale factor needed to convert the energy value computed by the bond stretching\sphinxhyphen{}angle bending cross term potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of (Pi/180) = 0.0174533 is used, if the STRBNDUNIT keyword is not given in the force field parameter file or the keyfile.
 
-\sphinxstylestrong{STRTORS {[}2 integers \& 1 real{]}}  Provides the values for a single stretch\sphinxhyphen{}torsion cross term potential parameter. The two integer modifiers give the atom class numbers for the atoms involved in the central bond of the torsional angles to be parameterized. The real modifier gives the value of the stretch\sphinxhyphen{}torsion force constant for all torsional angles with the defined central bond atom classes. The default units for the stretch\sphinxhyphen{}torsion force constant can be controlled via the STRTORUNIT keyword.
+\sphinxstylestrong{STRTORS {[}2 integers \& 1 real{]}}  Provides the values for a single stretch\sphinxhyphen{}torsion cross term potential parameter. The two integer modifiers give the atom class numbers for the atoms involved in the central bond of the torsional angles to be parameterized. The real modifier gives the value of the stretch\sphinxhyphen{}torsion force constant for all torsional angles with the defined atom classes for the central bond. The default units for the stretch\sphinxhyphen{}torsion force constant can be controlled via the STRTORUNIT keyword.
 
 \sphinxstylestrong{STRTORTERM {[}NONE/ONLY{]}}  Controls use of the bond stretching\sphinxhyphen{}torsional angle cross term potential energy. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
@@ -1891,7 +1891,7 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 \sphinxstylestrong{THERMOSTAT {[}BERENDSEN/ANDERSEN{]}}  Selects a thermostat algorithm for use during molecular dynamics. Two modifiers are available, a Berendsen bath coupling method, and an Andersen stochastic collision method. The default in the absence of the THERMOSTAT keyword is to use the BERENDSEN algorithm.
 
-\sphinxstylestrong{TORS\sphinxhyphen{}LAMBDA}
+\sphinxstylestrong{TORS\sphinxhyphen{}LAMBDA {[}real{]}}  Sets the value of the lambda scaling parameters for torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of annihilation for specified torsional interactions from none (lambda=1) to complete (lambda=0). The torsions involved in the scaling are given separately via ROTATABLE\sphinxhyphen{}BOND keywords.
 
 \sphinxstylestrong{TORSION {[}4 integers \& up to 6 real/real/integer triples{]}}  Provides the values for a single torsional angle parameter. The first four integer modifiers give the atom class numbers for the atoms involved in the torsional angle to be defined. Each of the remaining triples of real/real/integer modifiers give the amplitude, phase offset in degrees and periodicity of a particular torsional function term, respectively. Periodicities through 6\sphinxhyphen{}fold are allowed for torsional parameters.
 
@@ -1947,7 +1947,7 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 \sphinxstylestrong{VDW\sphinxhyphen{}CUTOFF {[}real{]}}  Sets the cutoff distance value in Angstroms for van der Waals potential energy interactions. The energy for any pair of van der Waals sites beyond the cutoff distance will be set to zero. Other keywords can be used to select a smoothing scheme near the cutoff distance. The default cutoff distance in the absence of the VDW\sphinxhyphen{}CUTOFF keyword is infinite for nonperiodic systems and 9.0 for periodic systems.
 
-\sphinxstylestrong{VDW\sphinxhyphen{}LAMBDA}
+\sphinxstylestrong{VDW\sphinxhyphen{}LAMBDA {[}real{]}}  Sets the value of the lambda scaling parameters for vdw interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
 
 \sphinxstylestrong{VDW\sphinxhyphen{}LIST}
 
@@ -1969,11 +1969,11 @@ Alternatively, if the initial integer modifier is negative, then a second intege
 
 \sphinxstylestrong{VIB\sphinxhyphen{}TOLERANCE}
 
-\sphinxstylestrong{VOLUME\sphinxhyphen{}MOVE}
+\sphinxstylestrong{VOLUME\sphinxhyphen{}MOVE {[}real{]}}  Specifies the maximum magnitude in Ang\textasciicircum{}3 of a trial change in the periodic box size when using a Monte Carlo barostat. The default value of 100.0 Ang\textasciicircum{}3 is used in the absence of the VOLUME\sphinxhyphen{}MOVE keyword.
 
-\sphinxstylestrong{VOLUME\sphinxhyphen{}SCALE}
+\sphinxstylestrong{VOLUME\sphinxhyphen{}SCALE {[}MOLECULAR/ATOMIC{]}}  Specifies the type of coordinate scaling to be used when making trial periodic box volume size changes during use of a Monte Carlo barostat. The MOLECULAR modifier enforces rigid body translation of molecules based on center of mass, while the ATOMIC value treats all coordinates independently. The default in the absence of the VOLUME\sphinxhyphen{}SCALE keyword is to use MOLECULAR scaling.
 
-\sphinxstylestrong{VOLUME\sphinxhyphen{}TRIAL}
+\sphinxstylestrong{VOLUME\sphinxhyphen{}TRIAL {[}integer{]}}  Specifies the average number of molecular dynamics steps between attempts to change the periodic box size when using a Monte Carlo barostat. The default value of 25 steps is used in the absence of the VOLUME\sphinxhyphen{}TRIAL keyword.
 
 \sphinxstylestrong{WALL {[}real{]}}  Sets the radius of a spherical boundary used to maintain droplet boundary conditions. The real modifier specifies the desired approximate radius of the droplet. In practice, an artificial van der Waals wall is constructed at a fixed buffer distance of 2.5 Angstroms outside the specified radius. The effect is that atoms which attempt to move outside the region defined by the droplet radius will be forced toward the center.
 
