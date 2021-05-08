@@ -1,5 +1,6 @@
-apbs/*
-!apbs/0README
+apbs/linux
+apbs/macos
+apbs/windows
 bin/*
 !bin/0README
 doc/amoeba

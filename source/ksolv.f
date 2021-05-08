@@ -1318,9 +1318,9 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:240)
-         if (keyword(1:8) .eq. 'MG-AUTO ') then
+         if (keyword(1:13) .eq. 'APBS-MG-AUTO ') then
             pbsoln = 'MG-AUTO'
-         else if (keyword(1:10) .eq. 'MG-MANUAL ') then
+         else if (keyword(1:15) .eq. 'APBS-MG-MANUAL ') then
             pbsoln = 'MG-MANUAL'
          else if (keyword(1:10) .eq. 'APBS-GRID ') then
             nx = dime(1)
@@ -1331,7 +1331,7 @@ c
             if (nx .ge. 33)  dime(1) = nx
             if (ny .ge. 33)  dime(2) = ny
             if (nz .ge. 33)  dime(3) = nz
-         else if (keyword(1:10) .eq. 'PB-RADIUS ') then
+         else if (keyword(1:11) .eq. 'APBS-RADII ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:3) .eq. 'VDW') then
@@ -1343,25 +1343,25 @@ c
             else if (value(1:6) .eq. 'TOMASI') then
                radtyp = 'TOMASI'
             end if
-         else if (keyword(1:6) .eq. 'SDENS ') then
+         else if (keyword(1:11) .eq. 'APBS-SDENS ') then
             read (string,*,err=20,end=20)  sdens
    20       continue
-         else if (keyword(1:5) .eq. 'PDIE ') then
+         else if (keyword(1:10) .eq. 'APBS-PDIE ') then
             read (string,*,err=30,end=30)  pdie
    30       continue
-         else if (keyword(1:5) .eq. 'SDIE ') then
+         else if (keyword(1:10) .eq. 'APBS-SDIE ') then
             read (string,*,err=40,end=40)  sdie
    40       continue
-         else if (keyword(1:5) .eq. 'SRAD ') then
+         else if (keyword(1:10) .eq. 'APBS-SRAD ') then
             read (string,*,err=50,end=50)  srad
    50       continue
-         else if (keyword(1:5) .eq. 'SWIN ') then
+         else if (keyword(1:10) .eq. 'APBS-SWIN ') then
             read (string,*,err=60,end=60)  swin
    60       continue
-         else if (keyword(1:5) .eq. 'SMIN ') then
+         else if (keyword(1:10) .eq. 'APBS-SMIN ') then
             read (string,*,err=70,end=70)  smin
    70       continue
-         else if (keyword(1:5) .eq. 'SRFM ') then
+         else if (keyword(1:10) .eq. 'APBS-SRFM ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:3) .eq. 'MOL') then
@@ -1371,7 +1371,7 @@ c
             else if (value(1:4) .eq. 'SPL2') then
                srfm = 'SPL2'
             end if
-         else if (keyword(1:5) .eq. 'BCFL ') then
+         else if (keyword(1:10) .eq. 'APBS-BCFL ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:3) .eq. 'ZERO') then
@@ -1381,7 +1381,7 @@ c
             else if (value(1:3) .eq. 'SDH') then
                bcfl = 'SDH'
             end if
-         else if (keyword(1:4) .eq. 'ION ') then
+         else if (keyword(1:9) .eq. 'APBS-ION ') then
             pbionc = 0.0d0
             pbionq = 1
             pbionr = 2.0d0
@@ -1444,7 +1444,7 @@ c
 c
 c     if this is an "mg-auto" (focusing) calculation, set the
 c     fine grid to the default size, and the coarse grid to
-c     twice its original size. Currently, all energies and
+c     twice its original size; currently, all energies and
 c     forces need to be evaluated at the same resolution
 c
       if (pbsoln .eq. 'MG-AUTO') then
@@ -1467,7 +1467,7 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:240)
-         if (keyword(1:5) .eq. 'DIME ') then
+         if (keyword(1:10) .eq. 'APBS-DIME ') then
             read (string,*,err=90,end=90)  nx,ny,nz
             dime(1) = nx
             dime(2) = ny
@@ -1478,37 +1478,37 @@ c
                   dime(j) = 32*(1+(dime(j)-1)/32) + 1
                end if
             end do
-         else if (keyword(1:6) .eq. 'AGRID ') then
+         else if (keyword(1:11) .eq. 'APBS-AGRID ') then
             read (string,*,err=100,end=100)  gx,gy,gz
             grid(1) = gx
             grid(2) = gy
             grid(3) = gz
   100       continue
-         else if (keyword(1:6) .eq. 'CGRID ') then
+         else if (keyword(1:11) .eq. 'APBS-CGRID ') then
             read (string,*,err=110,end=110)  gx,gy,gz
             cgrid(1) = gx
             cgrid(2) = gy
             cgrid(3) = gz
   110       continue
-         else if (keyword(1:6) .eq. 'FGRID ') then
+         else if (keyword(1:11) .eq. 'APBS-FGRID ') then
             read (string,*,err=120,end=120)  gx,gy,gz
             fgrid(1) = gx
             fgrid(2) = gy
             fgrid(3) = gz
   120       continue
-         else if (keyword(1:6) .eq. 'GCENT ') then
+         else if (keyword(1:11) .eq. 'APBS-GCENT ') then
             read (string,*,err=130,end=130)  gx,gy,gz
             gcent(1) = gx
             gcent(2) = gy
             gcent(3) = gz
   130       continue
-         else if (keyword(1:7) .eq. 'CGCENT ') then
+         else if (keyword(1:12) .eq. 'APBS-CGCENT ') then
             read (string,*,err=140,end=140)  gx,gy,gz
             cgcent(1) = gx
             cgcent(2) = gy
             cgcent(3) = gz
   140       continue
-         else if (keyword(1:7) .eq. 'FGCENT ') then
+         else if (keyword(1:12) .eq. 'APBS-FGCENT ') then
             read (string,*,err=150,end=150)  gx,gy,gz
             fgcent(1) = gx
             fgcent(2) = gy
