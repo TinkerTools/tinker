@@ -5004,12 +5004,11 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,rpole,pdamp,thole,
-!$OMP& dirdamp,rborn,n12,n13,n14,n15,np11,np12,np13,np14,i12,i13,i14,
-!$OMP& i15,ip11,ip12,ip13,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& dpequal,use_intra,x,y,z,off2,fc,fd,fq,gkc,field,fieldp,fields,
-!$OMP& fieldps)
+!$OMP PARALLEL default(private) shared(npole,ipole,rpole,rborn,n12,n13,
+!$OMP& n14,n15,np11,np12,np13,np14,i12,i13,i14,i15,ip11,ip12,ip13,ip14,
+!$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,dpequal,use_intra,
+!$OMP& x,y,z,off2,fc,fd,fq,gkc,field,fieldp,fields,fieldps)
 !$OMP& firstprivate(dscale,pscale)
 !$OMP& shared(fieldt,fieldtp,fieldts,fieldtps)
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
@@ -5542,10 +5541,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
-!$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
-!$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
-!$OMP& field,fieldp,fields,fieldps)
+!$OMP PARALLEL default(private) shared(npole,ipole,rborn,uind,uinp,
+!$OMP& uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,u1scale,
+!$OMP& u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,field,
+!$OMP& fieldp,fields,fieldps)
 !$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
 c
@@ -7283,10 +7282,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,polarity,
-!$OMP& pdamp,thole,palpha,u1scale,u2scale,u3scale,u4scale,w2scale,
-!$OMP& w3scale,w4scale,w5scale,n12,i12,n13,i13,n14,i14,n15,i15,
-!$OMP& np11,ip11,np12,ip12,np13,ip13,np14,ip14,use_thole,use_chgpen,
-!$OMP& nulst,ulst,mindex,minv)
+!$OMP& palpha,u1scale,u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,
+!$OMP& w5scale,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
+!$OMP& np13,ip13,np14,ip14,use_thole,use_chgpen,nulst,ulst,mindex,minv)
 !$OMP& firstprivate (uscale,wscale)
 c
 c     determine the off-diagonal elements of the preconditioner

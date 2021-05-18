@@ -623,7 +623,7 @@ c
 c
 c     assign the charge penetration charge and alpha parameters 
 c
-      ncp = n
+      ncp = 0
       do i = 1, n
          pcore(i) = 0.0d0
          pval(i) = pole(1,i)
@@ -709,6 +709,6 @@ c
 c     turn off atomic multipole potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
-      if (ncp .eq. 0)  use_chgpen = .false.
+      if (ncp .ne. 0)  use_chgpen = .true.
       return
       end

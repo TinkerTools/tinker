@@ -64,8 +64,9 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dampthole" finds coefficients for the Thole damping function
-c     used by AMOEBA and the modified Thole damping used by AMOEBA+
+c     "dampthole" finds coefficients for the original Thole damping
+c     function used by AMOEBA or for the alternate direct polarization
+c     damping used by AMOEBA+
 c
 c     literature reference:
 c
@@ -96,9 +97,10 @@ c
 c     use alternate Thole model for AMOEBA+ direct polarization
 c
       damp = pdamp(i) * pdamp(k)
-      if (damp .ne. 0.0d0) then
-         if (use_dirdamp) then
-            pgamma = min(dirdamp(i),dirdamp(k))
+      if (use_dirdamp) then
+         pgamma = min(dirdamp(i),dirdamp(k))
+         if (pgamma .eq. 0.0d0)  pgamma = max(dirdamp(i),dirdamp(k))
+         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
             damp = pgamma * (r/damp)**(1.5d0)
             if (damp .lt. 50.0d0) then
                expdamp = exp(-damp)
@@ -110,11 +112,14 @@ c
      &                                  +0.15d0*damp2)
                end if
             end if
+         end if
 c
-c     uaw original AMOEBA Thole polarization damping factors
+c     use original AMOEBA Thole polarization damping factors
 c
-         else
-            pgamma = min(thole(i),thole(k))
+      else
+         pgamma = min(thole(i),thole(k))
+         if (pgamma .eq. 0.0d0)  pgamma = max(thole(i),thole(k))
+         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
             damp = pgamma * (r/damp)**3
             if (damp .lt. 50.0d0) then
                expdamp = exp(-damp)
@@ -172,11 +177,12 @@ c
          dmpik(j) = 1.0d0
       end do
 c
-c     assign standard Thole polarization model damping factors
+c     assign original Thole polarization model damping factors
 c
       damp = pdamp(i) * pdamp(k)
-      if (damp .ne. 0.0d0) then
-         pgamma = min(thole(i),thole(k))
+      pgamma = min(thole(i),thole(k))
+      if (pgamma .eq. 0.0d0)  pgamma = max(thole(i),thole(k))
+      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
          damp = pgamma * (r/damp)**3
          if (damp .lt. 50.0d0) then
             expdamp = exp(-damp)

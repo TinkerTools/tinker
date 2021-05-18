@@ -295,7 +295,7 @@ c
          p(1) = u(1) + v(1) + w(1)
          p(2) = u(2) + v(2) + w(2)
          p(3) = u(3) + v(3) + w(3)
-         psiz = sqrt(p(1)*p(1) + p(2)*p(2) + p(3)*p(3)) 
+         psiz = sqrt(p(1)*p(1)+p(2)*p(2)+p(3)*p(3)) 
          do j = 1, 3 
             p(j) = p(j) / psiz
          end do
@@ -305,7 +305,7 @@ c
          r(1) = u(1) + v(1)
          r(2) = u(2) + v(2)
          r(3) = u(3) + v(3)
-         rsiz = sqrt(r(1)*r(1) + r(2)*r(2) + r(3)*r(3))
+         rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
          do j = 1, 3
             r(j) = r(j) / rsiz
          end do
@@ -315,7 +315,7 @@ c
          del(1) = r(2)*w(3) - r(3)*w(2)
          del(2) = r(3)*w(1) - r(1)*w(3) 
          del(3) = r(1)*w(2) - r(2)*w(1)
-         delsiz = sqrt(del(1)*del(1) + del(2)*del(2) + del(3)*del(3))    
+         delsiz = sqrt(del(1)*del(1)+del(2)*del(2)+del(3)*del(3))    
          do j = 1, 3
             del(j) = del(j) / delsiz
          end do
@@ -333,7 +333,7 @@ c
          r(1) = v(1) + w(1)
          r(2) = v(2) + w(2)
          r(3) = v(3) + w(3)
-         rsiz = sqrt(r(1)*r(1) + r(2)*r(2) + r(3)*r(3))
+         rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
          do j = 1, 3
             r(j) = r(j) / rsiz
          end do
@@ -343,7 +343,7 @@ c
          del(1) = r(2)*u(3) - r(3)*u(2)
          del(2) = r(3)*u(1) - r(1)*u(3)
          del(3) = r(1)*u(2) - r(2)*u(1)
-         delsiz = sqrt(del(1)*del(1) + del(2)*del(2) + del(3)*del(3))
+         delsiz = sqrt(del(1)*del(1)+del(2)*del(2)+del(3)*del(3))
          do j = 1, 3
             del(j) = del(j) / delsiz
          end do
@@ -361,7 +361,7 @@ c
          r(1) = u(1) + w(1)
          r(2) = u(2) + w(2)
          r(3) = u(3) + w(3)
-         rsiz = sqrt(r(1)*r(1) + r(2)*r(2) + r(3)*r(3))
+         rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
          do j = 1, 3
             r(j) = r(j) / rsiz
          end do
@@ -371,7 +371,7 @@ c
          del(1) = r(2)*v(3) - r(3)*v(2)
          del(2) = r(3)*v(1) - r(1)*v(3)
          del(3) = r(1)*v(2) - r(2)*v(1)
-         delsiz = sqrt(del(1)*del(1) + del(2)*del(2) + del(3)*del(3))
+         delsiz = sqrt(del(1)*del(1)+del(2)*del(2)+del(3)*del(3))
          do j = 1, 3
             del(j) = del(j) / delsiz
          end do

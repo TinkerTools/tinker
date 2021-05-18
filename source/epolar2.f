@@ -569,9 +569,12 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     if (use_dirdamp) then
-                        pgamma = min(ddi,dirdamp(kk))
+                  if (use_dirdamp) then
+                     pgamma = min(ddi,dirdamp(kk))
+                     if (pgamma .eq. 0.0d0) then
+                        pgamma = max(ddi,dirdamp(k))
+                     end if
+                     if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
                            expdamp = exp(-damp) 
@@ -597,8 +600,13 @@ c
                            rc7(2) = rc5(2) * temp7
                            rc7(3) = rc5(3) * temp7
                         end if
-                     else
-                        pgamma = min(pti,thole(kk))
+                     end if
+                  else
+                     pgamma = min(pti,thole(kk))
+                     if (pgamma .eq. 0.0d0) then
+                        pgamma = max(pti,thole(k))
+                     end if
+                     if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
                            expdamp = exp(-damp)
@@ -1630,9 +1638,12 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     if (use_dirdamp) then
-                        pgamma = min(ddi,dirdamp(kk))
+                  if (use_dirdamp) then
+                     pgamma = min(ddi,dirdamp(kk))
+                     if (pgamma .eq. 0.0d0) then
+                        pgamma = max(ddi,dirdamp(k))
+                     end if
+                     if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
                            expdamp = exp(-damp) 
@@ -1658,8 +1669,13 @@ c
                            rc7(2) = rc5(2) * temp7
                            rc7(3) = rc5(3) * temp7
                         end if
-                     else
-                        pgamma = min(pti,thole(kk))
+                     end if
+                  else
+                     pgamma = min(pti,thole(kk))
+                     if (pgamma .eq. 0.0d0) then
+                        pgamma = max(pti,thole(k))
+                     end if
+                     if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
                            expdamp = exp(-damp)

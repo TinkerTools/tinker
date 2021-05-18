@@ -373,7 +373,7 @@ c
       d2scale = 1.0d0
       d3scale = 1.0d0
       d4scale = 1.0d0
-      use_chgpen = .true.
+      use_chgpen = .false.
 c
 c     set default control parameters for induced dipole terms
 c
@@ -397,11 +397,11 @@ c
       w3scale = 1.0d0
       w4scale = 1.0d0
       w5scale = 1.0d0
-      dpequal = .false.
-      use_thole = .false.
+      use_thole = .true.
       use_dirdamp = .false.
       use_pred = .false.
       use_ielscf = .false.
+      dpequal = .false.
 c
 c     set default control parameters for charge transfer terms
 c

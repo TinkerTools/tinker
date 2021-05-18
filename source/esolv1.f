@@ -2601,8 +2601,9 @@ c
 c     apply Thole polarization damping to scale factors
 c
                damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
+               pgamma = min(pti,thole(k))
+               if (pgamma .eq. 0.0d0)  pgamma = max(pti,thole(k))
+               if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                   damp = -pgamma * (r/damp)**3
                   if (damp .gt. -50.0d0) then
                      scale3 = 1.0d0 - exp(damp)
@@ -3630,8 +3631,9 @@ c
 c     apply Thole polarization damping to scale factors
 c
                damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
+               pgamma = min(pti,thole(k))
+               if (pgamma .eq. 0.0d0)  pgamma = max(pti,thole(k))
+               if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                   damp = -pgamma * (r/damp)**3
                   if (damp .gt. -50.0d0) then
                      scale3 = 1.0d0 - exp(damp)

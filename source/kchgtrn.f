@@ -165,7 +165,6 @@ c
                   ipolar(npolar) = npole
                   douind(i) = .true.
                end if
-               if (thole(i) .ne. 0.0d0)  use_thole = .true.
                if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
@@ -187,7 +186,9 @@ c
 c     turn off individual electrostatic potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
-      if (ncp .eq. 0)  use_chgpen = .false.
+      if (ncp .ne. 0)  use_chgpen = .true.
+      if (ncp .ne. 0)  use_thole = .false.
+      if (use_dirdamp)  use_thole = .true.
       if (npolar .eq. 0)  use_polar = .false.
       if (nct .eq. 0)  use_chgtrn = .false.
       return

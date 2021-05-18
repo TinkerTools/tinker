@@ -847,11 +847,11 @@ c
          ynew = 0.0d0
          znew = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  xbox
+         if (exist)  read (string,*,err=390,end=390)  xnew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  ybox
+         if (exist)  read (string,*,err=390,end=390)  ynew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  zbox
+         if (exist)  read (string,*,err=390,end=390)  znew
   390    continue
          do while (xnew .eq. 0.0d0)
             write (iout,400)
@@ -863,14 +863,14 @@ c
          end do
          if (ynew .eq. 0.0d0)  ynew = xnew
          if (znew .eq. 0.0d0)  znew = xnew
+         xbox = xnew
+         ybox = ynew
+         zbox = znew
          call lattice
          call molecule
          allocate (list(n))
          allocate (keep(n))
          do while (.not. abort)
-            xbox = xnew
-            ybox = ynew
-            zbox = znew
             do i = 1, n
                list(i) = 1
             end do
@@ -922,7 +922,14 @@ c
             end do
             call makeref (1)
             call readxyz (ixyz)
-            if (.not. abort)  multi = .true.
+            if (.not. abort) then
+               multi = .true.
+               xbox = xnew
+               ybox = ynew
+               zbox = znew
+               call lattice
+               call molecule
+            end if
             if (multi) then
                call makeref (2)
                call getref (1)
@@ -1645,12 +1652,16 @@ c
       implicit none
       integer i,j,k
       integer ii,jj
+      integer n12i,n12k
       integer isolv,icount
       integer ntot,freeunit
       integer, allocatable :: map(:)
       real*8 xi,yi,zi
-      real*8 xr,yr,zr,rik2
-      real*8 close,close2
+      real*8 xr,yr,zr
+      real*8 rik2,close2
+      real*8 dxx,dxx2
+      real*8 dxh,dxh2
+      real*8 dhh,dhh2
       logical exist,header
       logical, allocatable :: remove(:)
       character*240 solvfile
@@ -1708,10 +1719,14 @@ c
       call unitcell
       call lattice
 c
-c     set distance cutoff for solute-solvent close contacts
+c     set distance cutoffs for solute-solvent close contacts
 c
-      close = 1.5d0
-      close2 = close * close
+      dxx = 2.40d0
+      dxh = 2.19d0
+      dhh = 1.82d0
+      dxx2 = dxx * dxx
+      dxh2 = dxh * dxh
+      dhh2 = dhh * dhh
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1736,7 +1751,8 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(nref,n,x,y,z,molcule,close2,remove,header,icount,iout)
+!$OMP& shared(nref,n,x,y,z,n12,molcule,dxx2,dxh2,dhh2,remove,
+!$OMP& header,icount,iout)
 !$OMP DO schedule(guided)
 c
 c     search for close contacts between solute and solvent
@@ -1746,12 +1762,21 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
+            n12i = n12(i)
             do k = 1, nref(1)
+               n12k = n12(k)
                xr = x(k) - xi
                yr = y(k) - yi
                zr = z(k) - zi
                call imagen (xr,yr,zr)
                rik2 = xr*xr + yr*yr + zr*zr
+               if (n12i.gt.1 .and. n12k.gt.1) then
+                  close2 = dxx2
+               else if (n12i.gt.1 .or. n12k.gt.1) then
+                  close2 = dxh2
+               else
+                  close2 = dhh2
+               end if
                if (rik2 .lt. close2) then
                   remove(molcule(i)) = .true.
                   goto 40
