@@ -248,7 +248,7 @@ c
      &                    5x,'Atom Class',/)
             end if
             write (iout,110)  i,k,cls
-  110       format (' Atom',12x,i5,10x,i5,10x,i5)
+  110       format (' Atom',9x,i8,10x,i5,10x,i5)
          end if
       end do
 c
@@ -266,7 +266,7 @@ c
      &                    'Expected',4x,'Found',/)
             end if
             write (iout,130)  i,name(i),type(i),valence(i),n12(i)
-  130       format (' Valence',5x,i7,'-',a3,8x,i5,10x,i5,5x,i5)
+  130       format (' Valence',4x,i8,'-',a3,8x,i5,10x,i5,5x,i5)
          end if
       end do
       return
