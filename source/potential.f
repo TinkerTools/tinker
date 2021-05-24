@@ -1529,7 +1529,7 @@ c
       dterm = 1.0d0 / bohr
       qterm = 3.0d0 / bohr**2
 c
-c     regularize charges and multipoles to desired precision
+c     regularize charges, monopoles and diagonal quadrupoles
 c
       eps = 0.00001d0
       do i = 1, nion
@@ -1537,12 +1537,9 @@ c
       end do
       do i = 1, npole
          pole(1,i) = dble(nint(pole(1,i)/eps)) * eps
-         do j = 2, 4
-            pole(j,i) = dble(nint(dterm*pole(j,i)/eps)) * eps/dterm
-         end do
-         do j = 5, 13
-            pole(j,i) = dble(nint(qterm*pole(j,i)/eps)) * eps/qterm
-         end do
+         pole(5,i) = dble(nint(qterm*pole(5,i)/eps)) * eps/qterm
+         pole(9,i) = dble(nint(qterm*pole(9,i)/eps)) * eps/qterm
+         pole(13,i) = dble(nint(qterm*pole(13,i)/eps)) * eps/qterm
       end do
 c
 c     perform dynamic allocation of some local arrays

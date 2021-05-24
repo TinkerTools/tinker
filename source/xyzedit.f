@@ -1958,7 +1958,7 @@ c
 c
 c     set minimum distance cutoff for solute-ion contacts
 c
-      close = 5.0d0
+      close = 6.0d0
       close2 = close * close
 c
 c     perform dynamic allocation of some local arrays
