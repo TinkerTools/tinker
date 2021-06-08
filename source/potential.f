@@ -1428,14 +1428,9 @@ c
                pole(4,i) = dterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(5,i).ne.0.0d0) then
-               if (pole(5,i).ne.pole(9,i) .and.
-     &             pole(5,i).ne.pole(13,i)) then
+               if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   pole(5,i) = qterm * xx(nvar)
-                  if (pole(9,i) .eq. pole(13,i)) then
-                     pole(9,i) = -0.5d0 * pole(5,i)
-                     pole(13,i) = pole(9,i)
-                  end if
                end if
             end if
             if (fit_qpl .and. pole(6,i).ne.0.0d0) then
@@ -1449,14 +1444,9 @@ c
                pole(11,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(9,i).ne.0.0d0) then
-               if (pole(9,i).ne.pole(5,i) .and.
-     &             pole(9,i).ne.pole(13,i)) then
+               if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   pole(9,i) = qterm * xx(nvar)
-                  if (pole(5,i) .eq. pole(13,i)) then
-                     pole(5,i) = -0.5d0 * pole(9,i)
-                     pole(13,i) = pole(5,i)
-                  end if
                end if
             end if
             if (fit_qpl .and. pole(10,i).ne.0.0d0) then
@@ -1465,7 +1455,7 @@ c
                pole(12,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(13,i).ne.0.0d0) then
-               if (pole(5,i) .eq. pole(9,i)) then
+               if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
                   pole(13,i) = qterm * xx(nvar)
                   pole(5,i) = -0.5d0 * pole(13,i)
@@ -1765,8 +1755,7 @@ c
   160          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(5,i).ne.0.0d0) then
-               if (pole(5,i).ne.pole(9,i) .and.
-     &             pole(5,i).ne.pole(13,i)) then
+               if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(5,i)
                   write (iout,170)  nvar,it,'XX-Quad ',xx(nvar)
@@ -1798,8 +1787,7 @@ c
   230          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(9,i).ne.0.0d0) then
-               if (pole(9,i).ne.pole(5,i) .and.
-     &             pole(9,i).ne.pole(13,i)) then
+               if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(9,i)
                   write (iout,240)  nvar,it,'YY-Quad ',xx(nvar)
@@ -1822,7 +1810,7 @@ c
   280          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(13,i).ne.0.0d0) then
-               if (pole(5,i) .eq. pole(9,i)) then
+               if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
                   xx(nvar) = qterm * pole(13,i)
                   write (iout,290)  nvar,it,'ZZ-Quad ',xx(nvar)
