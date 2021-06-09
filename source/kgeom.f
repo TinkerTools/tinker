@@ -161,14 +161,16 @@ c
 c     get atom restrained to a specified position range
 c
          else if (keyword(1:15) .eq. 'RESTRAIN-PLANE ') then
+            letter = ' '
             ia = 0
             p1 = 0.0d0
             p2 = 0.0d0
             p3 = 0.0d0
+            next = 1
+            call getword (string,letter,next)
             call upcase (letter)
-            read (string,*,err=50,end=50)  ia
             string = string(next:240)
-            read (string,*,err=50,end=50)  p1,p2,p3
+            read (string,*,err=50,end=50)  ia,p1,p2,p3
    50       continue
             if (p2 .eq. 0.0d0)  p2 = 100.0d0
             npfix = npfix + 1
