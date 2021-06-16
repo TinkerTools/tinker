@@ -9,24 +9,27 @@ HELP_MSG = '''
 Quick start
 
   The output is printed as a table.
-  [equ, dF(kcal/mol)] and [equ, sd_dF(kcal/mol)] are the estimated free energy difference and its uncertainty using equilibrated samples;
-  [blockave_uncorr, sd_dF(kcal/mol)] is the standard error estimated using blocks in one file or using different files.
-  Take caution when the difference between [equ, dF(kcal/mol)] and [uncorr, dF(kcal/mol)] is much larger than [equ, sd_dF(kcal/mol)].
+  [equ, dF] and [equ, sd_dF] are the estimated free energy difference and its uncertainty using equilibrated samples;
+  [blockave_uncorr, sd_dF] is the standard error estimated using blocks in one file or using different files.
+  Take caution when the difference between [equ, dF] and [uncorr, dF] is much larger than [equ, sd_dF(kcal/mol)].
 '''
 
 HELP_SUMMARY = '''
   SUMMARY
   --------
-  dF               free energy difference using equilibrated data (kcal/mol)
+  dF_equ           free energy difference using equilibrated data (kcal/mol)
   dF_all           free energy difference using all data (kcal/mol)
   se_dF_block      standard error using block average (kcal/mol)
   se_dF_bar        standard error using BAR (kcal/mol)
   dF_fwd           Forward FEP (kcal/mol)
   dF_bwd           Backward FEP (kcal/mol)
   ddF_fwd_bwd      difference between fwd and bwd FEP (kcal/mol)
+  dH               enthalpy difference using equilibrated data (kcal/mol)
+  TdS              entropy difference using equilibrated data (kcal/mol)
+  se_dH            standard error of dH (kcal/mol)
   sd_dE            sd of deltaE (kcal/mol)
-  overlap1         connectivity using all data
-  overlap2         connectivity using equilibrated data
+  overlap_all      connectivity using all data
+  overlap_equ      connectivity using equilibrated data
   nA               effective sample size
   nB
 
@@ -46,7 +49,7 @@ Details
   dF_fwd:          mean(deltaE) in forward FEP
   sd_dF_fwd:       sd(deltaE) in forward FEP
   p_A(traj_B):     probabiliy that samples in state A are from trajetory B
-  eig_overlap:     connectivity between two states; 1 means perfect overlap
+  overlap:         connectivity between two states; 1 means perfect overlap
   
   all:             using all samples. This assumes independent samples, so the free energy results will have larger variance and the uncertainty will be underestimated. 
   uncorr:          using uncorrelated samples. 
@@ -296,24 +299,31 @@ def exp_ave(ener, return_sd=True, ener_unit=1):
 
 def calc_mbar(u_kn, N_k, teff=1, temp=298):
   #data = concat_arr(arr1, arr2, idx1, idx2)
-  cols = 'start_A end_A start_B end_B g_A g_B dF(kcal/mol) se_dF(kcal/mol) dF_fwd dF_bwd dE_fwd dE_bwd sd_dE_fwd sd_dE_bwd p_A(traj_B) p_B(traj_A) eig_overlap'.split()
+  #cols = 'dF(kcal/mol) se_dF(kcal/mol) dH se_dH TdS se_TdS dF_fwd dF_bwd dE_fwd dE_bwd sd_dE_fwd sd_dE_bwd p_A(traj_B) p_B(traj_A) eig_overlap'.split()
+  cols = 'dF(kcal/mol) se_dF(kcal/mol) dH TdS se_dH dF_fwd dF_bwd dE_fwd dE_bwd sd_dE_fwd sd_dE_bwd overlap'.split()
   if u_kn is None:
     return cols
   kt = temp*8.314/4184
 
   mbar = pymbar.MBAR(u_kn, N_k)
-  results = mbar.getFreeEnergyDifferences()
+  #results = mbar.getFreeEnergyDifferences()
+  results = mbar.computeEntropyAndEnthalpy()
   overlap = mbar.computeOverlap()
   #msg1 = get_index_summary(idx1)
   #msg2 = get_index_summary(idx2)
   es_fwd = (u_kn[1, 0:N_k[0]] - u_kn[0, 0:N_k[0]])
   es_bwd = (u_kn[0, N_k[0]:sum(N_k[0:2])] - u_kn[1, N_k[0]:sum(N_k[0:2])])
-  de_fwd = np.mean(es_fwd)
-  de_bwd = np.mean(es_bwd)
+  de_fwd = np.mean(es_fwd)*kt
+  de_bwd = np.mean(es_bwd)*kt
 
   fwd, sd_fwd = exp_ave(es_fwd, ener_unit=kt)
   bwd, sd_bwd = exp_ave(es_bwd, ener_unit=kt)
-  return kt*results[0][0, 1], kt*results[1][0, 1]*np.sqrt(teff), fwd, -bwd, de_fwd, -de_bwd, sd_fwd, sd_bwd, overlap['matrix'][0, 1], overlap['matrix'][1, 0], overlap['scalar']
+  ghs = [] # free energy, enthalpy, entropy
+  for i in range(3):
+    ghs.append(kt*results[i*2][0, 1])
+    ghs.append(kt*results[i*2+1][0, 1]*np.sqrt(teff))
+  #return ghs[0], ghs[1], ghs[2], ghs[3], ghs[4], ghs[5], fwd, -bwd, de_fwd, -de_bwd, sd_fwd, sd_bwd, overlap['matrix'][0, 1], overlap['matrix'][1, 0], overlap['scalar']
+  return ghs[0], ghs[1], ghs[2], ghs[4], ghs[3], fwd, -bwd, de_fwd, -de_bwd, sd_fwd, sd_bwd, overlap['scalar']
 
 
 def get_bar_res(data, ishift=0, **kwargs):
@@ -321,8 +331,9 @@ def get_bar_res(data, ishift=0, **kwargs):
   data: [array1, array2, temp]
   return 1 row of data frame
   '''
+  col0 = 'start_A end_A start_B end_B g_A g_B'.split()
   if data is None:
-    return calc_mbar(None, None)
+    return col0 + calc_mbar(None, None)
   opt1 = kwargs
   arr1, t1, t1b, g1 = subsample_arrays(data[0], **opt1)
   arr2, t2, t2b, g2 = subsample_arrays(data[1], **opt1)
@@ -336,6 +347,22 @@ def get_bar_res(data, ishift=0, **kwargs):
   res = calc_mbar(u_kn, N_k, temp=data[2][0])
   return [_+ishift for _ in [t1, t1b, t2, t2b]] + [g1, g2] + list(res)
 
+
+def compute_total_sd(df1):
+  ''' compute sum on df columns
+  sqrt(sum of squares) for 'sd_XXX', 'se_XXX'
+  mininum for 'overlap*'
+  '''
+  arr1 = df1.sum(axis=0)
+  for i, col in enumerate(df1.columns):
+    if col.startswith('se_') or col.startswith('sd_'):
+      arr1.iloc[i] = np.sqrt(np.sum(df1[col]**2.0))
+    elif col.startswith('overlap') or col.endswith('overlap'):
+      arr1.iloc[i] = df1[col].min()
+    elif col.startswith('g_'):
+      arr1.iloc[i] = df1[col].mean()
+  return arr1
+
 def compute_block_ave(df1):
   ''' compute average on df columns
   if df contains se_XXX and XXX, se_XXX will be calculated by the stderr of XXX
@@ -345,10 +372,27 @@ def compute_block_ave(df1):
   for i, col in enumerate(df1.columns):
     if col.startswith('se_') and col[3:] in df1.columns:
       arr1.iloc[i] = (df1[col[3:]].std())/np.sqrt(nrow)
-  #print("block ave")
-  #print(df1)
-  #print(arr1)
   return arr1
+
+def sum_df_list(dflist):
+  ''' compute sum for list of dfs
+  sqrt(sum of squares) for 'sd_XXX', 'se_XXX'
+  mininum for 'overlap*' '*overlap'
+  '''
+  if len(dflist) == 0:
+    return None
+  elif len(dflist) == 1:
+    return dflist[0]
+
+  idx0 = dflist[0].index
+  for df1 in dflist[1:]:
+    idx0 = idx0 & df1.index
+  df2list = []
+  df3 = pd.DataFrame(columns=dflist[0].columns)
+  for row in idx0:
+    df2 = pd.concat([_.loc[[row], :] for _ in dflist], axis=0, ignore_index=True)
+    df3.loc[row, :] = (compute_total_sd(df2))
+  return df3
 
 def check_data_size(data, ibegin, iend):
   data1 = [[], [], []]
@@ -359,33 +403,43 @@ def check_data_size(data, ibegin, iend):
   return data1
 def get_summary(df1, verbose=True):
   name_val = []
-  name_val.append(('dF', df1.loc['equ', 'dF(kcal/mol)']))
+  name_val.append(('dF_equ', df1.loc['equ', 'dF(kcal/mol)']))
   name_val.append(('dF_all', df1.loc['all', 'dF(kcal/mol)']))
   if 'blockave_all' in df1.index:
     name_val.append(('se_dF_block', df1.loc['blockave_all', 'se_dF(kcal/mol)']))
   else:
     name_val.append(('se_dF_block', np.nan))
+  nA = (df1.loc['equ', 'end_A']-df1.loc['equ', 'start_A'])//df1.loc['equ', 'g_A']
+  nB = (df1.loc['equ', 'end_B']-df1.loc['equ', 'start_B'])//df1.loc['equ', 'g_B']
+
+  sd_de_fwd = df1.loc['all', 'sd_dE_fwd']
+  sd_de_bwd = df1.loc['all', 'sd_dE_bwd']
+
   name_val.append(('se_dF_bar', df1.loc['equ', 'se_dF(kcal/mol)']))
   name_val.append(('dF_fwd', df1.loc['all', 'dF_fwd']))
   name_val.append(('dF_bwd', df1.loc['all', 'dF_bwd']))
   name_val.append(('ddF_fwd_bwd', abs(df1.loc['all', 'dF_fwd']-df1.loc['all', 'dF_bwd'])))
-  name_val.append(('sd_dE', np.sqrt(np.sum(df1.loc['all', ['sd_dE_fwd', 'sd_dE_bwd']]**2.0))))
-  name_val.append(('overlap1', df1.loc['all', 'eig_overlap']))
-  name_val.append(('overlap2', df1.loc['equ', 'eig_overlap']))
-  name_val.append(('nA', (df1.loc['equ', 'end_A']-df1.loc['equ', 'start_A'])//df1.loc['equ', 'g_A']))
-  name_val.append(('nB', (df1.loc['equ', 'end_B']-df1.loc['equ', 'start_B'])//df1.loc['equ', 'g_B']))
+  name_val.append(('dH', df1.loc['equ', 'dH']))
+  name_val.append(('se_dH', df1.loc['equ', 'se_dH']))
+  name_val.append(('sd_dE', np.sqrt(np.sum(np.array([sd_de_fwd, sd_de_bwd])**2.0))))
+  name_val.append(('overlap_all', df1.loc['all', 'overlap']))
+  name_val.append(('overlap_equ', df1.loc['equ', 'overlap']))
+  name_val.append(('nA', nA))
+  name_val.append(('nB', nB))
   names, vals = zip(*name_val)
   df2 = pd.DataFrame([vals], columns=names, index=['SUMMARY'])
-  CHECK_THR = (('se_dF_block', 0.5, 1), ('ddF_fwd_bwd', 1.0, 1), ('sd_dE', 2.0, 1), ('overlap1', 0.3, -1))
+  CHECK_THR = (('se_dF_block', 0.5, 1), ('se_dF_bar', 0.5, 1), ('ddF_fwd_bwd', 1.0, 1), ('sd_dE', 2.0, 1), ('overlap_all', 0.3, -1))
   name_desc = {}
-  name_desc.update({'dF':'Free energy difference (equilibrated) (kcal/mol)'})
+  name_desc.update({'dF_equ':'Free energy difference (equilibrated) (kcal/mol)'})
   name_desc.update({'dF_all':'Free energy difference (all data) (kcal/mol) '})
   name_desc.update({'se_dF_block':'Standard error (block average) (kcal/mol) '})
   name_desc.update({'ddF_fwd_bwd':'Difference between forward and backward FEP (kcal/mol) '})
   name_desc.update({'sd_dE':'Standard deviation of energy difference (kcal/mol)'})
-  name_desc.update({'overlap1':'Connectivity between two states'})
+  name_desc.update({'overlap_all':'Connectivity between two states'})
   if verbose:
     for (_row, _thr, _sign) in CHECK_THR:
+      if _row not in df2.columns:
+        continue
       val = df2.loc['SUMMARY', _row] 
       if (val - _thr)*_sign > 0:
         _name = name_desc[_row] if _row in name_desc else _row
@@ -406,7 +460,10 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
           ]
 
   df_out = pd.DataFrame(columns=get_bar_res(None))
-  df_blocks = [pd.DataFrame(columns=get_bar_res(None)) for _ in names]
+  namesb = names[:1]
+  optsb = opts[:1]
+  df_blocks = [pd.DataFrame(columns=get_bar_res(None)) for _ in namesb]
+  n_name_blocks = 1
   data0 = read_tinker_bars(flist, ibegin=ibegin, iend=iend)
   if data0 is None:
     print("ERROR: empty data")
@@ -429,7 +486,7 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
       #bn1 = n1//NBLOCK
       #bn2 = n2//NBLOCK
       iblk = -1
-      for opt, name1 in zip(opts, names):
+      for opt, name1 in zip(optsb, namesb):
         iblk += 1
         for i in range(NBLOCK):
           name = "block%d%s"%(i+1, name1)
@@ -444,7 +501,7 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
     #opt1 = {'skip':ibegin, 'last':iend, 'uniform':True}
     opt1 = {'skip':0, 'last':None, 'uniform':True, "ishift":ibegin}
     iblk = -1
-    for opt, name1 in zip(opts, names):
+    for opt, name1 in zip(optsb, namesb):
       iblk += 1
     # calculate results of files
       for i in range(len(data0[0])):
@@ -454,9 +511,8 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
         res = get_bar_res(data1, **opt1)
         if res is not None:
           df_blocks[iblk].loc[name, :] = res
-      break
 
-  for name, df2 in zip(names, df_blocks):
+  for name, df2 in zip(namesb, df_blocks):
     if len(df2.index) > 1:
       df_out.loc['blockave_%s'%name, :] = compute_block_ave(df2)
   df_out = pd.concat([df_out]+df_blocks)
@@ -466,7 +522,20 @@ def calc_dg(flist, ibegin=0, iend=-1, nblocks=5, summary=True, verbose=True):
   if summary:
     print()
     print(df_sum.to_string(max_rows=len(df_sum.index), max_cols=len(df_sum.columns)))
-  return df_out, df_sum
+  return df_out, df_sum, (namesb, df_blocks)
+
+def add_line(inp):
+  return '\n'+'*'*8+' '+inp+' '+'*'*8+'\n'
+def list_to_string(alist, maxl=12):
+  if len(alist) == 0:
+    return '[]'
+  def trim(s):
+    if len(s) > maxl:
+      return '..'+s[-maxl:]
+    else:
+      return s
+
+  return '[%s ... %s]'%(trim(str(alist[0])), trim(str(alist[-1])))
 
 def calc_dg_summary(flist, seperate=False, outfile=None, **kwargs):
   '''
@@ -477,22 +546,42 @@ def calc_dg_summary(flist, seperate=False, outfile=None, **kwargs):
   '''
   if seperate and len(flist) > 1:
     dflist = []
+    df1list = []
+    df_block_list = []
+    names_block = []
     if outfile is None:
       fout = sys.__stdout__
     else:
       fout = open(outfile, 'w')
     for f1 in flist:
-      print('*'*8, 'Analysis of %s'%f1, '*'*8, '\n')
-      df1, df1sum = calc_dg([f1], **kwargs)
+      print(add_line('Analysis of %s'%f1))
+      df1, df1sum, data_block = calc_dg([f1], **kwargs)
       dflist.append(df1sum)
+      df1list.append(df1)
+      df_block_list.append(data_block[1])
+      names_block = data_block[0]
+    df_blocks = [sum_df_list(_) for _ in zip(*df_block_list)]
+    print(add_line('Sum of %d files %s'%(len(flist), list_to_string(flist))))
+    df3 = sum_df_list(df1list)
+    for name, df_block in zip(names_block, df_blocks):
+        df3.loc['blockave_%s'%name, :] = compute_block_ave(df_block)
+    print(df3.to_string())
     df2 = pd.concat(dflist, axis=0)
+    #df2 = pd.DataFrame(df2.to_numpy(), index=flist, columns=df2.columns)
+    df2.set_axis(flist, axis=0, inplace=True)
     #df2.reindex(flist)
-    df2 = pd.DataFrame(df2.to_numpy(), index=flist, columns=df2.columns)
+    #df2.loc['Total', :] = compute_total_sd(df2)
+    df2.loc['Total', :] = get_summary(df3, verbose=False).iloc[0, :].to_numpy()
+    for col in 'nA nB'.split():
+      if col in (df2.columns & df3.columns):
+        df2.loc['Total', col] = df2.iloc[:-1, col].sum()
+
+    print(add_line('SUMMARY'))
     print(df2.to_string(), file=fout)
     if outfile is not None:
       fout.close()
   else:
-    df1, df1sum = calc_dg(flist, **kwargs)
+    df1, df1sum, _ = calc_dg(flist, **kwargs)
 
 def main():
   parser = argparse.ArgumentParser(prog='t_bar.py', usage='%(prog)s [options]', description=__doc__)
