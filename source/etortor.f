@@ -240,12 +240,13 @@ c     ###############################################################
 c
 c
 c     "chkttor" tests the attached atoms at a torsion-torsion central
-c     site and inverts the angle values if the site is chiral
+c     site and changes the sign of the torsion values if the site has
+c     opposite chirality to that for the original parameter
 c
 c     note that the sign convention used in this version is correct
-c     for phi-psi torsion-torsion interactions as defined in the
-c     AMOEBA protein force field; the code may need to be altered
-c     for other uses of the torsion-torsion potential, and will not
+c     for phi-psi torsion-torsion interactions defined for L-amino
+c     acids in a protein force field; the code may need to be altered
+c     for other chiral torsion-torsion potential, and will not
 c     correctly handle enantiomeric sugar rings in nucleic acids
 c
 c

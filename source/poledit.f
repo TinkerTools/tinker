@@ -753,7 +753,7 @@ c
          zaxis(i) = ia
          xaxis(i) = 0
          yaxis(i) = 0
-         pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
+         pyramid = (abs(geometry(i,ia,ib,ic)) .lt. 135.0d0)
          m = priority (ia,ib,ic,0)
          if (m .ne. 0) then
             polaxe(i) = 'Z-then-X'
