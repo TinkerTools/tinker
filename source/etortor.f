@@ -246,8 +246,8 @@ c
 c     note that the sign convention used in this version is correct
 c     for phi-psi torsion-torsion interactions defined for L-amino
 c     acids in a protein force field; the code may need to be altered
-c     for other chiral torsion-torsion potential, and will not
-c     correctly handle enantiomeric sugar rings in nucleic acids
+c     for other chiral torsion-torsion situations, such as the sugar
+c     rings in nucleic acids
 c
 c
       subroutine chkttor (ib,ic,id,sign,value1,value2)

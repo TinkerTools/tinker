@@ -246,8 +246,8 @@ c     "imagen" takes the components of pairwise distance between
 c     two points and converts to the components of the minimum
 c     image distance
 c
-c     note this is a fast version which only returns the correct
-c     component magnitudes for use in computing the 3D distance
+c     note this is a fast version for use in computing the 3D
+c     distance during neighbor list construction
 c
 c
       subroutine imagen (xr,yr,zr)
@@ -261,23 +261,19 @@ c
 c     for orthogonal lattice, find the desired image directly
 c
       if (orthogonal) then
-         xr = abs(xr)
-         yr = abs(yr)
-         zr = abs(zr)
-         if (xr .gt. xbox2)  xr = xr - xbox
-         if (yr .gt. ybox2)  yr = yr - ybox
-         if (zr .gt. zbox2)  zr = zr - zbox
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - zbox*nint(zr/zbox)
 c
 c     for monoclinic lattice, convert x and z to fractional,
 c     find desired image, then translate back to Cartesian
 c
       else if (monoclinic) then
          zr = zr / beta_sin
-         yr = abs(yr)
          xr = xr - zr*beta_cos
-         if (abs(xr) .gt. xbox2)  xr = xr - sign(xbox,xr)
-         if (yr .gt. ybox2)  yr = yr - ybox
-         if (abs(zr) .gt. zbox2)  zr = zr - sign(zbox,zr)
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - zbox*nint(zr/zbox)
          xr = xr + zr*beta_cos
          zr = zr * beta_sin
 c
@@ -288,9 +284,9 @@ c
          zr = zr / gamma_term
          yr = (yr - zr*beta_term) / gamma_sin
          xr = xr - yr*gamma_cos - zr*beta_cos
-         if (abs(xr) .gt. xbox2)  xr = xr - sign(xbox,xr)
-         if (abs(yr) .gt. ybox2)  yr = yr - sign(ybox,yr)
-         if (abs(zr) .gt. zbox2)  zr = zr - sign(zbox,zr)
+         xr = xr - xbox*nint(xr/xbox)
+         yr = yr - ybox*nint(yr/ybox)
+         zr = zr - zbox*nint(zr/zbox)
          xr = xr + yr*gamma_cos + zr*beta_cos
          yr = yr*gamma_sin + zr*beta_term
          zr = zr * gamma_term
