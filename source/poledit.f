@@ -302,7 +302,7 @@ c
             xaxis(i) = 0
             yaxis(i) = 0
             ia = i12(1,i)
-            call frame13 (i,ia)
+            call frame13 (i,ia,noinvert)
 c
 c     assign the local frame definition for a divalent atom
 c
@@ -403,7 +403,7 @@ c
                   xaxis(i) = ib
                   yaxis(i) = ic
                else
-                  call frame13 (i,ia)
+                  call frame13 (i,ia,noinvert)
                end if
             else if (mabc .eq. ib) then
                polaxe(i) = 'Z-Only'
@@ -430,7 +430,7 @@ c
                   xaxis(i) = ia
                   yaxis(i) = ic
                else
-                  call frame13 (i,ib)
+                  call frame13 (i,ib,noinvert)
                end if
             else if (mabc .eq. ic) then
                polaxe(i) = 'Z-Only'
@@ -457,7 +457,7 @@ c
                   xaxis(i) = ia
                   yaxis(i) = ib
                else
-                  call frame13 (i,ic)
+                  call frame13 (i,ic,noinvert)
                end if
             end if
 c
@@ -490,7 +490,7 @@ c
                if (mbcd .ne. 0) then
                   xaxis(i) = mbcd
                else
-                  call frame13 (i,ia)
+                  call frame13 (i,ia,noinvert)
                end if
             else if (mabc.eq.ib .and. mbcd.eq.ib) then
                polaxe(i) = 'Z-then-X'
@@ -499,7 +499,7 @@ c
                if (macd .ne. 0) then
                   xaxis(i) = macd
                else
-                  call frame13 (i,ib)
+                  call frame13 (i,ib,noinvert)
                end if
             else if (mabc.eq.ic .and. mbcd.eq.ic) then
                polaxe(i) = 'Z-then-X'
@@ -508,7 +508,7 @@ c
                if (mabd .ne. 0) then
                   xaxis(i) = mabd
                else
-                  call frame13 (i,ic)
+                  call frame13 (i,ic,noinvert)
                end if
             else if (mabd.eq.id .and. mbcd.eq.id) then
                polaxe(i) = 'Z-then-X'
@@ -517,32 +517,32 @@ c
                if (mabc .ne. 0) then
                   xaxis(i) = mabc
                else
-                  call frame13 (i,id)
+                  call frame13 (i,id,noinvert)
                end if
             else if (mbcd .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ia
                xaxis(i) = 0
                yaxis(i) = 0
-               call frame13 (i,ia)
+               call frame13 (i,ia,noinvert)
             else if (macd .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ib
                xaxis(i) = 0
                yaxis(i) = 0
-               call frame13 (i,ib)
+               call frame13 (i,ib,noinvert)
             else if (mabd .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ic
                xaxis(i) = 0
                yaxis(i) = 0
-               call frame13 (i,ic)
+               call frame13 (i,ic,noinvert)
             else if (mabc .eq. 0) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = id
                xaxis(i) = 0
                yaxis(i) = 0
-               call frame13 (i,id)
+               call frame13 (i,id,noinvert)
             else if (mab.eq.0 .and. mcd.eq.0) then
                if (mac .eq. ia) then
                   polaxe(i) = 'Bisector'
@@ -694,7 +694,7 @@ c     "frame13" finds local coordinate frame defining atoms in cases
 c     where the use of 1-3 connected atoms is required
 c
 c
-      subroutine frame13 (i,ia)
+      subroutine frame13 (i,ia,noinvert)
       use atomid
       use couple
       use mpole
@@ -704,6 +704,7 @@ c
       integer k,ka,m
       integer priority
       real*8 geometry
+      logical noinvert
       logical pyramid
 c
 c
@@ -762,10 +763,12 @@ c
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
          else if (ka.eq.7 .and. pyramid) then
-            polaxe(i) = 'Z-Bisect'
-            xaxis(i) = ib
-            yaxis(i) = ic
-         else if (ka .eq. 7) then
+            if (noinvert) then
+               polaxe(i) = 'Z-Bisect'
+               xaxis(i) = ib
+               yaxis(i) = ic
+            end if
+         else if (ka.eq.7 .and. .not.pyramid) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
          else if (ka.eq.15 .or. ka.eq.16) then

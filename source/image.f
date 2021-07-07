@@ -95,9 +95,15 @@ c
 c     for truncated octahedron, remove the corner pieces
 c
       else if (octahedron) then
-         xr = xr - xbox*nint(xr/xbox)
-         yr = yr - ybox*nint(yr/ybox)
-         zr = zr - zbox*nint(zr/zbox)
+         do while (abs(xr) .gt. xbox2)
+            xr = xr - sign(xbox,xr)
+         end do
+         do while (abs(yr) .gt. ybox2)
+            yr = yr - sign(ybox,yr)
+         end do
+         do while (abs(zr) .gt. zbox2)
+            zr = zr - sign(zbox,zr)
+         end do
          corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
          xr = xr - sign(corr,xr)
          yr = yr - sign(corr,yr)
@@ -106,8 +112,12 @@ c
 c     for rhombic dodecahedron, align along the x- and y-axes
 c
       else if (dodecadron) then
-         xr = xr - xbox*nint(xr/xbox)
-         yr = yr - ybox*nint(yr/ybox)
+         do while (abs(xr) .gt. xbox2)
+            xr = xr - sign(xbox,xr)
+         end do
+         do while (abs(yr) .gt. ybox2)
+            yr = yr - sign(ybox,yr)
+         end do
          zr = zr - root2*zbox*nint(zr/(zbox*root2))
          corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
      &                        +abs(root2*zr/zbox))
@@ -211,9 +221,15 @@ c
 c     for truncated octahedron, remove the corner pieces
 c
       else if (octahedron) then
-         xr = xr - xbox*nint(xr/xbox)
-         yr = yr - ybox*nint(yr/ybox)
-         zr = zr - zbox*nint(zr/zbox)
+         do while (abs(xr) .gt. xbox2)
+            xr = xr - sign(xbox,xr)
+         end do
+         do while (abs(yr) .gt. ybox2)
+            yr = yr - sign(ybox,yr)
+         end do
+         do while (abs(zr) .gt. zbox2)
+            zr = zr - sign(zbox,zr)
+         end do
          corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
          xr = xr - sign(corr,xr)
          yr = yr - sign(corr,yr)
@@ -222,8 +238,12 @@ c
 c     for rhombic dodecahedron, align along the x- and y-axes
 c
       else if (dodecadron) then
-         xr = xr - xbox*nint(xr/xbox)
-         yr = yr - ybox*nint(yr/ybox)
+         do while (abs(xr) .gt. xbox2)
+            xr = xr - sign(xbox,xr)
+         end do
+         do while (abs(yr) .gt. ybox2)
+            yr = yr - sign(ybox,yr)
+         end do
          zr = zr - root2*zbox*nint(zr/(zbox*root2))
          corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
      &                        +abs(root2*zr/zbox))
