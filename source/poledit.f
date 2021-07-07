@@ -483,6 +483,24 @@ c
                zaxis(i) = 0
                xaxis(i) = 0
                yaxis(i) = 0
+            else if (mabc.eq.ia .and. mabd.eq.ia) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ia
+               yaxis(i) = 0
+               if (mbcd .ne. 0) then
+                  xaxis(i) = mbcd
+               else
+                  call frame13 (i,ia,noinvert)
+               end if
+            else if (mabc.eq.ib .and. mabd.eq.ib) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ib
+               yaxis(i) = 0
+               if (macd .ne. 0) then
+                  xaxis(i) = macd
+               else
+                  call frame13 (i,ib,noinvert)
+               end if
             else if (mabc.eq.ia .and. macd.eq.ia) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
@@ -491,6 +509,15 @@ c
                   xaxis(i) = mbcd
                else
                   call frame13 (i,ia,noinvert)
+               end if
+            else if (mabc.eq.ic .and. macd.eq.ic) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ic
+               yaxis(i) = 0
+               if (mabd .ne. 0) then
+                  xaxis(i) = mabd
+               else
+                  call frame13 (i,ic,noinvert)
                end if
             else if (mabc.eq.ib .and. mbcd.eq.ib) then
                polaxe(i) = 'Z-then-X'
@@ -510,7 +537,52 @@ c
                else
                   call frame13 (i,ic,noinvert)
                end if
+            else if (mabd.eq.ia .and. macd.eq.ia) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ia
+               yaxis(i) = 0
+               if (mbcd .ne. 0) then
+                  xaxis(i) = mbcd
+               else
+                  call frame13 (i,ia,noinvert)
+               end if
+            else if (mabd.eq.id .and. macd.eq.id) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = id
+               yaxis(i) = 0
+               if (mabc .ne. 0) then
+                  xaxis(i) = mabc
+               else
+                  call frame13 (i,id,noinvert)
+               end if
+            else if (mabd.eq.ib .and. mbcd.eq.ib) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ib
+               yaxis(i) = 0
+               if (macd .ne. 0) then
+                  xaxis(i) = macd
+               else
+                  call frame13 (i,ib,noinvert)
+               end if
             else if (mabd.eq.id .and. mbcd.eq.id) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = id
+               yaxis(i) = 0
+               if (mabc .ne. 0) then
+                  xaxis(i) = mabc
+               else
+                  call frame13 (i,id,noinvert)
+               end if
+            else if (macd.eq.ic .and. mbcd.eq.ic) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ic
+               yaxis(i) = 0
+               if (mabd .ne. 0) then
+                  xaxis(i) = mabd
+               else
+                  call frame13 (i,ic,noinvert)
+               end if
+            else if (macd.eq.id .and. mbcd.eq.id) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = id
                yaxis(i) = 0
