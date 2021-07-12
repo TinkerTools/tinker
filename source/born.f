@@ -57,11 +57,12 @@ c
       use inform
       use iounit
       use math
+      use mpole
       use pbstuf
       use solpot
       use solute
       implicit none
-      integer i,j,k,it,kt
+      integer i,j,k,it,kt,ii,kk
       integer, allocatable :: skip(:)
       real*8 area,rold,t
       real*8 shell,fraction
@@ -83,9 +84,15 @@ c
       real*8 expterm,rmu
       real*8 b0,gself,pi43
       real*8 bornmax
+      real*8 pair,pbtotal
+      real*8 probe,areatotal
       real*8, allocatable :: roff(:)
+      real*8, allocatable :: weight(:)
+      real*8, allocatable :: garea(:)
       real*8, allocatable :: pos(:,:)
       real*8, allocatable :: pbpole(:,:)
+      real*8, allocatable :: pbself(:)
+      real*8, allocatable :: pbpair(:)
       logical done
 c
 c
@@ -93,9 +100,13 @@ c     perform dynamic allocation of some local arrays
 c
       if (borntyp .eq. 'STILL')  allocate (skip(n))
       allocate (roff(n))
+      allocate (weight(n))
+      allocate (garea(n))
       if (borntyp .eq. 'PERFECT') then
          allocate (pos(3,n))
          allocate (pbpole(13,n))
+         allocate (pbself(n))
+         allocate (pbpair(n))
       end if
 c
 c     perform dynamic allocation of some global arrays
@@ -143,6 +154,62 @@ c
             end do
             rborn(i) = 1.0d0 / total
             roff(i) = rold
+            if (verbose) then
+               write(*,*) ' Born radius ',i,':',rborn(i)
+            end if
+         end do
+c
+c     get the Born radii via the numerical "Onion" method
+c     and the Grycuk 1/r^6 integral approach.
+c
+      else if (borntyp .eq. 'GONION') then
+         tinit = 0.1d0
+         ratio = 1.5d0
+         probe = onipr
+         write(*,*) 'Onion Probe: ',probe
+         do i = 1, n
+            weight(i) = 1.0d0
+         end do
+         do i = 1, n
+            t = tinit
+            rold = roff(i)
+            total = 0.0d0
+            done = .false.
+            do while (.not. done)
+               roff(i) = roff(i) + 0.5d0*t
+c
+c              call surfatom (i,area,roff)
+c              fraction = area / (4.0d0*pi*roff(i)**2)
+c
+               call surface (areatotal,garea,roff,weight,probe)
+c               write(*,*) 'Area from Surface: ',garea
+               fraction = garea(i) / (4.0d0*pi*(roff(i)+probe)**2)
+               if (fraction .lt. 0.99d0) then
+c                  write(*,*) 'Fraction of : ',fraction
+                  inner = roff(i) - 0.5d0*t
+                  outer = inner + t
+                  shell = 1.0d0/(inner**3) - 1.0d0/(outer**3)
+                  shell = shell/3.0d0
+                  total = total + fraction*shell
+                  roff(i) = roff(i) + 0.5d0*t
+                  t = ratio * t
+               else
+                  inner = roff(i) - 0.5d0*t
+                  total = total + 1.0d0/(3.0d0*(inner**3))
+                  done = .true.
+               end if
+            end do
+c
+c           Change to equation 31.
+c
+            rborn(i) = 1.0d0/((3.0d0*total)**(1.0d0/3.0d0))
+            roff(i) = rold
+            if (verbose) then
+               write(*,*) ' Born radius ',i,':',rborn(i)
+            end if
+c
+c           ToDo: Numerical inclusion of neck regions
+c
          end do
 c
 c     get the Born radii via the analytical Still method;
@@ -284,8 +351,9 @@ c
                yi = y(i)
                zi = z(i)
                sum = pi43 / ri**3
+               ri = max(rsolv(i),rdescreen(i)) 
                do k = 1, n
-                  rk = rsolv(k)
+                  rk = rdescreen(k)
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -325,6 +393,9 @@ c
                rborn(i) = (sum/pi43)**third
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
+               if (verbose) then
+                  write(*,*) ' Born radius ',i,':',rborn(i)
+               end if
             end if
          end do
 c
@@ -377,11 +448,106 @@ c
             end do
          end do
          term = -0.5d0 * electric * (1.0d0-1.0d0/sdie)
+         if (verbose) then
+c
+c           check the sign of multipole components at chiral sites
+c
+            call chkpole
+c
+c           rotate the multipole components into the global frame
+c
+            call rotpole
+         end if
+         write(*,*) 'Perfect Self Energy (kcal/mol)    Perfect Rad. (A)'
          do i = 1, n
             pbpole(1,i) = 1.0d0
             call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
+            if (verbose) then
+c
+c              Compute the perfect permanent self energy.
+c
+               ii = ipole(i)
+               pbpole(1,ii) = rpole(1,i)
+               do j = 2, 4
+                  pbpole(j,ii) = rpole(j,i)
+               end do
+               do j = 5, 13
+                  pbpole(j,ii) = 3.0d0 * rpole(j,i)
+               end do
+            call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+c
+c              Zero out the PB multipole.
+c
+               do j = 1, 13
+                  pbpole(j,ii) = 0.0d0
+               end do
+               pbself(i) = pbe
+               write(*,*) i,pbe,rborn(i)
+               pbtotal = pbtotal + pbself(i)
+            end if
+         end do
+         if (verbose) then
+c
+c        Compute the perfect permanent pair energy.
+c
+         write(*,*) 'Perfect Pair Energy (kcal/mol)'
+         do i = 1, n
+           ii = ipole(i)
+           pbpole(1,ii) = rpole(1,i)
+           do j = 2, 4
+              pbpole(j,ii) = rpole(j,i)
+           end do
+           do j = 5, 13
+              pbpole(j,ii) = 3.0d0 * rpole(j,i)
+           end do
+           do k = i+1, n 
+              kk = ipole(k)
+              pbpole(1,kk) = rpole(1,k)
+              do j = 2, 4
+                 pbpole(j,kk) = rpole(j,k)
+              end do
+              do j = 5, 13
+                 pbpole(j,kk) = 3.0d0 * rpole(j,k)
+              end do
+           call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+              pair = pbe - pbself(i) - pbself(k)
+              write(*,*) i,k,pair
+              pbtotal = pbtotal + pair
+              pbpair(i) = pbpair(i) + 0.5d0 * pair
+              pbpair(k) = pbpair(k) + 0.5d0 * pair
+              do j = 1, 13
+                 pbpole(j,kk) = 0.0d0
+              end do
+           end do 
+           do j = 1, 13
+              pbpole(j,ii) = 0.0d0
+           end do
+         end do
+c
+c        Consistency check.
+c
+         do i = 1, n
+           ii = ipole(i)
+           pbpole(1,ii) = rpole(1,i)
+           do j = 2, 4
+              pbpole(j,ii) = rpole(j,i)
+           end do
+           do j = 5, 13
+              pbpole(j,ii) = 3.0d0 * rpole(j,i)
+           end do
+         end do
+         call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+         write(*,*) 'Single PB calculation: ',pbe 
+         write(*,*) 'Sum of self + pairs:   ',pbtotal
+         end if
+         write (iout,5)
+    5    format (/,' Perfect PB Self-Energies and',
+     &              ' Cross-Energies :',/)
+         do i = 1, n
+            write (iout,6)  i,pbself(i),pbpair(i)
+    6       format ('PBPERFECT',i8,1x,2f15.4)
          end do
       end if
 c
@@ -389,9 +555,13 @@ c     perform deallocation of some local arrays
 c
       if (borntyp .eq. 'STILL')  deallocate (skip)
       deallocate (roff)
+      deallocate (weight)
+      deallocate (garea)
       if (borntyp .eq. 'PERFECT') then
          deallocate (pos)
          deallocate (pbpole)
+         deallocate (pbself)
+         deallocate (pbpair)
       end if
 c
 c     make sure the final values are in a reasonable range
@@ -715,7 +885,7 @@ c
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n
-            ri = rsolv(i)
+            ri = max(rsolv(i),rdescreen(i))
             if (ri .gt. 0.0d0) then
                xi = x(i)
                yi = y(i)
@@ -723,7 +893,7 @@ c
                term = pi43 / rborn(i)**3.0d0
                term = factor / term**(4.0d0*third)
                do k = 1, n
-                  rk = rsolv(k)
+                  rk = rdescreen(k)
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi

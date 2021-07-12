@@ -288,6 +288,7 @@ c
       implicit none
       integer i,j,k,m
       integer isite
+      real*8 cs,ds,qs
       real*8 a(3,3)
       real*8 mp(3,3)
       real*8 rp(3,3)
@@ -295,19 +296,26 @@ c
 c
 c     monopoles have the same value in any coordinate frame
 c
-      rpole(1,isite) = pole(1,isite)
+      cs = 1.0d0
+      if (.not. docharge) cs = 0.0d0
+      rpole(1,isite) = cs * pole(1,isite)
 c
 c     rotate the dipoles to the global coordinate frame
 c
+      ds = 1.0d0
+      if (.not. dodipole) ds = 0.0d0
       do i = 2, 4
          rpole(i,isite) = 0.0d0
          do j = 2, 4
             rpole(i,isite) = rpole(i,isite) + pole(j,isite)*a(i-1,j-1)
          end do
+         rpole(i,isite) = ds*rpole(i,isite)
       end do
 c
 c     rotate the quadrupoles to the global coordinate frame
 c
+      qs = 1.0d0
+      if (.not. doquadrupole) qs = 0.0d0
       k = 5
       do i = 1, 3
          do j = 1, 3
@@ -332,7 +340,7 @@ c
       k = 5
       do i = 1, 3
          do j = 1, 3
-            rpole(k,isite) = rp(i,j)
+            rpole(k,isite) = qs*rp(i,j)
             k = k + 1
          end do
       end do

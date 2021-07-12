@@ -319,6 +319,7 @@ c
                      em = em + e
                      aem(i) = aem(i) + 0.5d0*e
                      aem(k) = aem(k) + 0.5d0*e
+c                    write(*,*) 'Vacuum', i, k, e
                      if (molcule(i) .ne. molcule(k)) then
                         einter = einter + e
                      end if

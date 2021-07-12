@@ -643,9 +643,14 @@ c
 c
 c     setup the multipoles for solvation only calculations
 c
-      if (.not.use_mpole .and. .not.use_polar) then
+      if (.not.use_mpole) then
          call chkpole
          call rotpole
+      end if
+      if (.not.use_polar) then
+c
+c        Call induce to zero out induced dipoles
+c
          call induce
       end if
 c
@@ -655,7 +660,9 @@ c
 c
 c     correct the solvation energy for vacuum to polarized state
 c
-      call ediff3
+      if (use_polar) then
+         call ediff3
+      end if
       return
       end
 c
@@ -1100,12 +1107,14 @@ c
                      es = es + e + ei
                      aes(i) = aes(i) + e + ei
                      eself(i) = eself(i) + e + ei
+c                    write(*,*) 'Self',i,e,ei
                   else
                      es = es + e + ei
                      aes(i) = aes(i) + 0.5d0*(e+ei)
                      aes(k) = aes(k) + 0.5d0*(e+ei)
                      ecross(i) = ecross(i) + 0.5d0*(e+ei)
                      ecross(k) = ecross(k) + 0.5d0*(e+ei)
+c                    write(*,*) 'Cross',i,k,e,ei
                   end if
 c
 c     increment the total intermolecule energy
@@ -1125,14 +1134,20 @@ c
 c
 c     print the self-energy and cross-energy terms
 c
-      if (debug) then
+      if (verbose) then
          write (iout,10)
    10    format (/,' Generalized Kirkwood Self-Energies and',
      &              ' Cross-Energies :',/)
          do i = 1, n
             write (iout,20)  i,eself(i),ecross(i)
-   20       format (i8,1x,2f15.4)
+   20       format ('GKSELF',i8,1x,2f15.4)
+            if (i .gt. 1) then
+               eself(1) = eself(1) + eself(i)
+               ecross(1) = ecross(1) + ecross(i)
+            end if
          end do
+         write (iout,30) eself(1),ecross(1)
+   30    format ('        ',1x,2f15.4)
       end if
 c
 c     perform deallocation of some local arrays
@@ -1529,7 +1544,7 @@ c
          aevol = evol / dble(n)
       end if
 c
-c     find cavity energy from only the solvent excluded volume
+c     include the full SEV term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -1537,9 +1552,9 @@ c
             aecav(i) = aevol
          end do
 c
-c     find cavity energy from only a tapered volume term
+c     include a tapered SEV term
 c
-      else if (reff.gt.spcut .and. reff.le.stoff) then
+      else if (reff .le. spoff) then
          mode = 'GKV'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -1548,15 +1563,19 @@ c
          do i = 1, n
             aecav(i) = taper * aevol
          end do
+      end if
 c
-c     find cavity energy using both volume and SASA terms
+c     include a full SASA term
 c
-      else if (reff .gt. stoff .and. reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
+      if (reff .gt. stcut) then
+         ecav = esurf
+         do i = 1, n
+            aecav(i) = aesurf(i)
+         end do
+c
+c     include a tapered SASA term
+c
+      else if (reff .gt. stoff) then
          mode = 'GKSA'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -1565,27 +1584,6 @@ c
          ecav = ecav + taper*esurf
          do i = 1, n
             aecav(i) = taper * (aevol+aesurf(i))
-         end do
-c
-c     find cavity energy from only a tapered SASA term
-c
-      else if (reff.gt.spoff .and. reff.le.stcut) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = taper * esurf
-         do i = 1, n
-            aecav(i) = taper * aesurf(i)
-         end do
-c
-c     find cavity energy from only a SASA-based term
-c
-      else
-         ecav = esurf
-         do i = 1, n
-            aecav(i) = aesurf(i)
          end do
       end if
 c
@@ -1630,9 +1628,9 @@ c
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
-      real*8 sum,term,shctd
-      real*8 iwca,irep,offset
-      real*8 epsi,rmini,ri,rmax
+      real*8 sum,term
+      real*8 iwca,irep
+      real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
       real*8 lik,lik2,lik3,lik4
@@ -1652,10 +1650,8 @@ c
 c
 c     set overlap scale factor for HCT descreening method
 c
-      shctd = 0.81d0
-      offset = 0.0d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
+         rdisp(i) = rad(class(i))
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -1671,7 +1667,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,cdisp)
 !$OMP& shared(edisp,aedispo)
 !$OMP DO reduction(+:edisp,aedispo) schedule(guided)
 c
@@ -1691,7 +1687,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ri = rdisp(i)
+         rio = rmixo / 2.0d0 + dispoff
+         rih = rmixh / 2.0d0 + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -1703,17 +1700,19 @@ c
                zr = z(k) - zi
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
-               rk = rdisp(k)
-c              sk = rk * shct(k)
+               rk = rad(class(k))
                sk = rk * shctd
                sk2 = sk * sk
-               if (ri .lt. r+sk) then
-                  rmax = max(ri,r-sk)
+c
+c              Atom i with water oxygen
+c
+               if (rio .lt. r+sk) then
+                  rmax = max(rio,r-sk)
                   lik = rmax
-                  lik2 = lik * lik
-                  lik3 = lik2 * lik
-                  lik4 = lik3 * lik
                   if (lik .lt. rmixo) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixo)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -1724,26 +1723,15 @@ c              sk = rk * shct(k)
                      iwca = -emixo * term
                      sum = sum + iwca
                   end if
-                  if (lik .lt. rmixh) then
-                     uik = min(r+sk,rmixh)
+                  uik = r + sk
+                  if (uik .gt. rmixo) then
                      uik2 = uik * uik
                      uik3 = uik2 * uik
                      uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -2.0d0 * emixh * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  uik2 = uik * uik
-                  uik3 = uik2 * uik
-                  uik4 = uik3 * uik
-                  uik5 = uik4 * uik
-                  uik10 = uik5 * uik5
-                  uik11 = uik10 * uik
-                  uik12 = uik11 * uik
-                  if (uik .gt. rmixo) then
+                     uik5 = uik4 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
                      lik = max(rmax,rmixo)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -1764,7 +1752,36 @@ c              sk = rk * shct(k)
                      irep = ao * rmixo7 * term
                      sum = sum + irep + idisp
                   end if
+               end if
+c
+c              Atom i with water hydrogen
+c
+               if (rih .lt. r+sk) then
+                  rmax = max(rih,r-sk)
+                  lik = rmax
+                  if (lik .lt. rmixh) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
+                     uik = min(r+sk,rmixh)
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     term = 4.0d0 * pi / (48.0d0*r)
+     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
+     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
+                     iwca = -2.0d0 * emixh * term
+                     sum = sum + iwca
+                  end if
+                  uik = r + sk
                   if (uik .gt. rmixh) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
                      lik = max(rmax,rmixh)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -1875,19 +1892,19 @@ c
 c
 c     set parameters for high accuracy numerical shells
 c
-c     tinit = 0.2d0
-c     rinit = 1.0d0
-c     rmult = 1.5d0
-c     rswitch = 7.0d0
-c     rmax = 12.0d0
+      tinit = 0.2d0
+      rinit = 1.0d0
+      rmult = 1.5d0
+      rswitch = 7.0d0
+      rmax = 12.0d0
 c
 c     set parameters for medium accuracy numerical shells
 c
-      tinit = 1.0d0
-      rinit = 1.0d0
-      rmult = 2.0d0
-      rswitch = 5.0d0
-      rmax = 9.0d0
+c     tinit = 1.0d0
+c     rinit = 1.0d0
+c     rmult = 2.0d0
+c     rswitch = 5.0d0
+c     rmax = 9.0d0
 c
 c     set parameters for low accuracy numerical shells
 c
@@ -1903,8 +1920,8 @@ c
 c
 c     set parameters for atomic radii and probe radii
 c
-      delta = 0.55d0
-      offset = 0.27d0
+      delta = 0.00d0
+      offset = 0.00d0
       do i = 1, n
          rdisp(i) = rad(class(i)) + offset
          roff(i) = rdisp(i) + delta
@@ -1933,7 +1950,7 @@ c
 c
 c     alter radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i)
+         roff(i) = rminhi / 2.0 + dispoff
          do j = 1, n12(i)
             k = i12(j,i)
             roff(k) = rdisp(k)
@@ -1963,21 +1980,23 @@ c
             roff(i) = 0.5d0 * (inner+outer)
             call surfatom (i,area,roff)
             fraction = area / (4.0d0*pi*roff(i)**2)
-            if (outer .lt. rminoi) then
-               shell = (outer**3-inner**3)/3.0d0
-               e = e - epsoi*fraction*shell
-            else if (inner .gt. rminoi) then
-               shell = (1.0d0/(inner**4)-1.0d0/(outer**4)) / 4.0d0
-               e = e - 2.0d0*oer7*fraction*shell
-               shell = (1.0d0/(inner**11)-1.0d0/(outer**11)) / 11.0d0
-               e = e + oer14*fraction*shell
-            else
-               shell = (rminoi**3-inner**3)/3.0d0
-               e = e - epsoi*fraction*shell
-               shell = (1.0d0/(rminoi**4)-1.0d0/(outer**4)) / 4.0d0
-               e = e - 2.0d0*oer7*fraction*shell
-               shell = (1.0d0/(rminoi**11)-1.0d0/(outer**11)) / 11.0d0
-               e = e + oer14*fraction*shell
+            if (roff(i) .gt. rminoi / 2.0 + dispoff) then
+               if (outer .lt. rminoi) then
+                  shell = (outer**3-inner**3)/3.0d0
+                  e = e - epsoi*fraction*shell
+               else if (inner .gt. rminoi) then
+                  shell = (1.0d0/(inner**4)-1.0d0/(outer**4))/4.0d0
+                  e = e - 2.0d0*oer7*fraction*shell
+                  shell = (1.0d0/(inner**11)-1.0d0/(outer**11))/11.0d0
+                  e = e + oer14*fraction*shell
+               else
+                  shell = (rminoi**3-inner**3)/3.0d0
+                  e = e - epsoi*fraction*shell
+                  shell = (1.0d0/(rminoi**4)-1.0d0/(outer**4))/4.0d0
+                  e = e - 2.0d0*oer7*fraction*shell
+                  shell = (1.0d0/(rminoi**11)-1.0d0/(outer**11))/11.0d0
+                  e = e + oer14*fraction*shell
+               end if
             end if
             if (outer .lt. rminhi) then
                shell = (outer**3-inner**3)/3.0d0
