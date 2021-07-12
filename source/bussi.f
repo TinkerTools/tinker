@@ -37,7 +37,8 @@ c
       use units
       use usage
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,dt_2,dt_x
       real*8 dt2_2,dt3_2
       real*8 epot,etot,eksum
@@ -77,14 +78,13 @@ c     get half-step Beeman velocities and update barostat velocity
 c
       eta = eta + 3.0d0*(volbox*(pres-atmsph)*ekcal/prescon
      &                         + 2.0*kt)*dt_2/w
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               eta = eta + mass(i)*a(j,i)*v(j,i)*dt2_2/w
-     &                   + mass(i)*a(j,i)*a(j,i)*dt3_2/(3.0d0*w)
-               v(j,i) = v(j,i) + (part1*a(j,i)-aalt(j,i))*dt_x
-            end do
-        end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            eta = eta + mass(k)*a(j,k)*v(j,k)*dt2_2/w
+     &               + mass(k)*a(j,k)*a(j,k)*dt3_2/(3.0d0*w)
+            v(j,k) = v(j,k) + (part1*a(j,k)-aalt(j,k))*dt_x
+         end do
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -100,18 +100,17 @@ c
       term = eta * dt
       expterm = exp(term)
       sinhterm = sinh(term)
-      do i = 1, n
-         if (use(i)) then
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            x(i) = x(i)*expterm + v(1,i)*sinhterm/eta
-            y(i) = y(i)*expterm + v(2,i)*sinhterm/eta
-            z(i) = z(i)*expterm + v(3,i)*sinhterm/eta
-            do j = 1, 3
-               v(j,i) = v(j,i) / expterm
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         xold(k) = x(k)
+         yold(k) = y(k)
+         zold(k) = z(k)
+         x(k) = x(k)*expterm + v(1,k)*sinhterm/eta
+         y(k) = y(k)*expterm + v(2,k)*sinhterm/eta
+         z(k) = z(k)*expterm + v(3,k)*sinhterm/eta
+         do j = 1, 3
+            v(j,k) = v(j,k) / expterm
+         end do
       end do
 c
 c     set the new box dimensions and other lattice values;
@@ -125,15 +124,14 @@ c
 c     apply Verlet half-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-                  uaux(j,i) = uaux(j,i) + vaux(j,i)*dt
-                  upaux(j,i) = upaux(j,i) + vpaux(j,i)*dt
-               end do
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            do j = 1, 3
+               vaux(j,k) = vaux(j,k) + aaux(j,k)*dt_2
+               vpaux(j,k) = vpaux(j,k) + apaux(j,k)*dt_2
+               uaux(j,k) = uaux(j,k) + vaux(j,k)*dt
+               upaux(j,k) = upaux(j,k) + vpaux(j,k)*dt
+            end do
          end do
          call temper2 (dt,temp)
       end if
@@ -148,13 +146,12 @@ c
 c
 c     use Newton's second law to get the next accelerations
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               aalt(j,i) = a(j,i)
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            aalt(j,k) = a(j,k)
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+         end do
       end do
 c
 c     perform deallocation of some local arrays
@@ -168,29 +165,27 @@ c     get full-step Beeman velocities and update barostat velocity
 c
       eta = eta + 3.0d0*(volbox*(pres-atmsph)*ekcal/prescon
      &                         + 2.0*kt)*dt_2/w
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               eta = eta + mass(i)*a(j,i)*v(j,i)*dt2_2/w
-     &                   + mass(i)*a(j,i)*a(j,i)*dt3_2/(3.0d0*w)
-               v(j,i) = v(j,i) + (part2*a(j,i)+aalt(j,i))*dt_x
-            end do
-        end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            eta = eta + mass(k)*a(j,k)*v(j,k)*dt2_2/w
+     &               + mass(k)*a(j,k)*a(j,k)*dt3_2/(3.0d0*w)
+            v(j,k) = v(j,k) + (part2*a(j,k)+aalt(j,k))*dt_x
+         end do
       end do
 c
 c     apply Verlet full-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
          term = 2.0d0 / (dt*dt)
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  aaux(j,i) = term * (uind(j,i)-uaux(j,i))
-                  apaux(j,i) = term * (uinp(j,i)-upaux(j,i))
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-               end do
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            do j = 1, 3
+               aaux(j,k) = term * (uind(j,k)-uaux(j,k))
+               apaux(j,k) = term * (uinp(j,k)-upaux(j,k))
+               vaux(j,k) = vaux(j,k) + aaux(j,k)*dt_2
+               vpaux(j,k) = vpaux(j,k) + apaux(j,k)*dt_2
+            end do
          end do
       end if
 c

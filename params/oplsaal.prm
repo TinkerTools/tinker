@@ -225,20 +225,20 @@ atom        166   45    OW    "O Water (SPC)"                8    15.999    2
 atom        167   44    HW    "H Water (SPC)"                1     1.008    1
 atom        168   46    NT    "N Ammonia"                    7    14.007    3
 atom        169   20    H2    "H Ammonia"                    1     1.008    1
-atom        170   47    O-    "O- Hydroxide Ion"             8    15.999    1
+atom        170   47    O     "O- Hydroxide Ion"             8    15.999    1
 atom        171    8    HO    "H Hydroxide Ion"              1     1.008    1
-atom        172   48    Li+   "Li+ Lithium Ion"              3     6.941    0
-atom        173   49    Na+   "Na+ Sodium Ion"              11    22.990    0
-atom        174   50    K+    "K+ Potassium Ion"            19    39.098    0
-atom        175   51    Rb+   "Rb+ Rubidium Ion"            37    85.468    0
-atom        176   52    Cs+   "Cs+ Cesium Ion"              55   132.905    0
-atom        177   53    Mg+   "Mg+2 Magnesium Ion"          12    24.305    0
-atom        178   54    Ca+   "Ca+2 Calcium Ion"            20    40.078    0
-atom        179   55    Sr+   "Sr+2 Strontium Ion"          38    87.620    0
-atom        180   56    Ba+   "Ba+2 Barium Ion"             56   137.327    0
-atom        181   57    F-    "F- Fluoride Ion"              9    18.998    0
-atom        182   58    Cl-   "Cl- Chloride Ion"            17    35.453    0
-atom        183   59    Br-   "Br- Bromide Ion"             35    79.904    0
+atom        172   48    Li    "Li+ Lithium Ion"              3     6.941    0
+atom        173   49    Na    "Na+ Sodium Ion"              11    22.990    0
+atom        174   50    K     "K+ Potassium Ion"            19    39.098    0
+atom        175   51    Rb    "Rb+ Rubidium Ion"            37    85.468    0
+atom        176   52    Cs    "Cs+ Cesium Ion"              55   132.905    0
+atom        177   53    Mg    "Mg+2 Magnesium Ion"          12    24.305    0
+atom        178   54    Ca    "Ca+2 Calcium Ion"            20    40.078    0
+atom        179   55    Sr    "Sr+2 Strontium Ion"          38    87.620    0
+atom        180   56    Ba    "Ba+2 Barium Ion"             56   137.327    0
+atom        181   57    F     "F- Fluoride Ion"              9    18.998    0
+atom        182   58    Cl    "Cl- Chloride Ion"            17    35.453    0
+atom        183   59    Br    "Br- Bromide Ion"             35    79.904    0
 atom        184   60    He    "Helium Atom"                  2     4.003    0
 atom        185   61    Ne    "Neon Atom"                   10    20.179    0
 atom        186   62    Ar    "Argon Atom"                  18    39.948    0
@@ -2197,8 +2197,15 @@ biotype     779    CH3     "N-MeAmide C-Terminus"             89
 biotype     780    H       "N-MeAmide C-Terminus"              6
 biotype    2001    O       "Water"                           164
 biotype    2002    H       "Water"                           165
+biotype    2003    LI      "Lithium Ion"                     172
 biotype    2004    NA      "Sodium Ion"                      173
 biotype    2005    K       "Potassium Ion"                   174
+biotype    2006    RB      "Rubidium Ion"                    175
+biotype    2007    CS      "Cesium Ion"                      176
 biotype    2008    MG      "Magnesium Ion"                   177
 biotype    2009    CA      "Calcium Ion"                     178
+biotype    2010    SR      "Strontium Ion"                   179
+biotype    2011    BA      "Barium Ion"                      180
+biotype    2012    F       "Fluoride Ion"                    181
 biotype    2013    CL      "Chloride Ion"                    182
+biotype    2014    BR      "Bromide Ion"                     183

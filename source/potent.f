@@ -35,6 +35,7 @@ c     use_dipole  logical flag governing use of dipole-dipole potential
 c     use_mpole   logical flag governing use of multipole potential
 c     use_polar   logical flag governing use of polarization term
 c     use_chgtrn  logical flag governing use of charge transfer term
+c     use_chgflx  logical flag governing use of charge flux term
 c     use_rxnfld  logical flag governing use of reaction field term
 c     use_solv    logical flag governing use of continuum solvation term
 c     use_metal   logical flag governing use of ligand field term
@@ -57,9 +58,10 @@ c
       logical use_disp,use_charge
       logical use_chgdpl,use_dipole
       logical use_mpole,use_polar
-      logical use_chgtrn,use_rxnfld
-      logical use_solv,use_metal
-      logical use_geom,use_extra
-      logical use_born,use_orbit
+      logical use_chgtrn,use_chgflx
+      logical use_rxnfld,use_solv
+      logical use_metal,use_geom
+      logical use_extra,use_born
+      logical use_orbit
       save
       end

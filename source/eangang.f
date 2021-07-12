@@ -27,9 +27,10 @@ c
       implicit none
       integer i,k,iangang
       integer ia,ib,ic,id,ie
-      real*8 e,fgrp
+      real*8 e,angle
+      real*8 eps,fgrp
       real*8 dt1,dt2
-      real*8 angle,dot,cosine
+      real*8 dot,cosine
       real*8 xia,yia,zia
       real*8 xib,yib,zib
       real*8 xic,yic,zic
@@ -49,10 +50,14 @@ c
       eaa = 0.0d0
       if (nangang .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangang,iaa,iang,
-!$OMP& use,x,y,z,anat,kaa,aaunit,use_group,use_polymer)
+!$OMP& use,x,y,z,anat,kaa,aaunit,eps,use_group,use_polymer)
 !$OMP& shared(eaa)
 !$OMP DO reduction(+:eaa) schedule(guided)
 c
@@ -113,34 +118,32 @@ c
                call image (xdb,ydb,zdb)
                call image (xeb,yeb,zeb)
             end if
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rdb2 = xdb*xdb + ydb*ydb + zdb*zdb
-            reb2 = xeb*xeb + yeb*yeb + zeb*zeb
-            if (rab2*rcb2*rdb2*reb2 .ne. 0.0d0) then
-               dot = xab*xcb + yab*ycb + zab*zcb
-               cosine = dot / sqrt(rab2*rcb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               dt1 = angle - anat(i)
-               dot = xdb*xeb + ydb*yeb + zdb*zeb
-               cosine = dot / sqrt(rdb2*reb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               dt2 = angle - anat(k)
+            rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+            rdb2 = max(xdb*xdb+ydb*ydb+zdb*zdb,eps)
+            reb2 = max(xeb*xeb+yeb*yeb+zeb*zeb,eps)
+            dot = xab*xcb + yab*ycb + zab*zcb
+            cosine = dot / sqrt(rab2*rcb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            dt1 = angle - anat(i)
+            dot = xdb*xeb + ydb*yeb + zdb*zeb
+            cosine = dot / sqrt(rdb2*reb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            dt2 = angle - anat(k)
 c
 c     get the angle-angle interaction energy
 c
-               e = aaunit * kaa(iangang) * dt1 * dt2
+            e = aaunit * kaa(iangang) * dt1 * dt2
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+            if (use_group)  e = e * fgrp
 c
 c     increment the total angle-angle energy
 c
-               eaa = eaa + e
-            end if
+            eaa = eaa + e
          end if
       end do
 c

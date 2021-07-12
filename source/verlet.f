@@ -26,7 +26,8 @@ c
       use units
       use usage
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,dt_2
       real*8 etot,epot
       real*8 eksum
@@ -54,32 +55,30 @@ c
 c     store the current atom positions, then find half-step
 c     velocities and full-step positions via Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            x(i) = x(i) + v(1,i)*dt
-            y(i) = y(i) + v(2,i)*dt
-            z(i) = z(i) + v(3,i)*dt
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
+         xold(k) = x(k)
+         yold(k) = y(k)
+         zold(k) = z(k)
+         x(k) = x(k) + v(1,k)*dt
+         y(k) = y(k) + v(2,k)*dt
+         z(k) = z(k) + v(3,k)*dt
       end do
 c
 c     apply Verlet half-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-                  uaux(j,i) = uaux(j,i) + vaux(j,i)*dt
-                  upaux(j,i) = upaux(j,i) + vpaux(j,i)*dt
-               end do
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            do j = 1, 3
+               vaux(j,k) = vaux(j,k) + aaux(j,k)*dt_2
+               vpaux(j,k) = vpaux(j,k) + apaux(j,k)*dt_2
+               uaux(j,k) = uaux(j,k) + vaux(j,k)*dt
+               upaux(j,k) = upaux(j,k) + vpaux(j,k)*dt
+            end do
          end do
       end if
 c
@@ -99,28 +98,26 @@ c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
       end do
 c
 c     apply Verlet full-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
          term = 2.0d0 / (dt*dt)
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  aaux(j,i) = term * (uind(j,i)-uaux(j,i))
-                  apaux(j,i) = term * (uinp(j,i)-upaux(j,i))
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-               end do
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            do j = 1, 3
+               aaux(j,k) = term * (uind(j,k)-uaux(j,k))
+               apaux(j,k) = term * (uinp(j,k)-upaux(j,k))
+               vaux(j,k) = vaux(j,k) + aaux(j,k)*dt_2
+               vpaux(j,k) = vpaux(j,k) + apaux(j,k)*dt_2
+            end do
          end do
       end if
 c

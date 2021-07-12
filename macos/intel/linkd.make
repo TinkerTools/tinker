@@ -14,6 +14,7 @@ ifort -g -Wl,-no_pie -o anneal.x anneal.o libtinker.a
 ifort -g -Wl,-no_pie -o archive.x archive.o libtinker.a
 ifort -g -Wl,-no_pie -o bar.x bar.o libtinker.a
 ifort -g -Wl,-no_pie -o correlate.x correlate.o libtinker.a
+ifort -g -Wl,-no_pie -o critical.x critical.o libtinker.a
 ifort -g -Wl,-no_pie -o crystal.x crystal.o libtinker.a
 ifort -g -Wl,-no_pie -o diffuse.x diffuse.o libtinker.a
 ifort -g -Wl,-no_pie -o distgeom.x distgeom.o libtinker.a

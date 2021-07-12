@@ -35,8 +35,6 @@ c     vsolv     atomic volume of each atom for use with ACE
 c     wace      "omega" values for atom class pairs for use with ACE
 c     s2ace     "sigma^2" values for atom class pairs for use with ACE
 c     uace      "mu" values for atom class pairs for use with ACE
-c     solvtyp   type of continuum solvation energy model in use
-c     borntyp   method to be used for the Born radius computation
 c
 c
       module solute
@@ -61,7 +59,5 @@ c
       real*8, allocatable :: wace(:,:)
       real*8, allocatable :: s2ace(:,:)
       real*8, allocatable :: uace(:,:)
-      character*8 solvtyp
-      character*8 borntyp
       save
       end

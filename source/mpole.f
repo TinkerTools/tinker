@@ -25,6 +25,7 @@ c     pole      traceless Cartesian multipoles in the local frame
 c     rpole     traceless Cartesian multipoles in the global frame
 c     spole     spherical harmonic multipoles in the local frame
 c     srpole    spherical harmonic multipoles in the global frame
+c     mono0     original atomic monopole values for charge flux
 c     polaxe    local axis type for each multipole site
 c
 c
@@ -43,7 +44,7 @@ c
       real*8, allocatable :: rpole(:,:)
       real*8, allocatable :: spole(:,:)
       real*8, allocatable :: srpole(:,:)
-      logical docharge, dodipole, doquadrupole
+      real*8, allocatable :: mono0(:)
       character*8, allocatable :: polaxe(:)
       save
       end

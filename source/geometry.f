@@ -54,14 +54,12 @@ c
          xcb = x(ic) - x(ib)
          ycb = y(ic) - y(ib)
          zcb = z(ic) - z(ib)
-         rab2 = xab*xab + yab*yab + zab*zab
-         rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-         rabc = sqrt(rab2 * rcb2)
-         if (rabc .ne. 0.0d0) then
-            cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
-            cosine = min(1.0d0,max(-1.0d0,cosine))
-            geometry = radian * acos(cosine)
-         end if
+         rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+         rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+         rabc = sqrt(rab2*rcb2)
+         cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
+         cosine = min(1.0d0,max(-1.0d0,cosine))
+         geometry = radian * acos(cosine)
 c
 c     compute the value of the dihedral angle in degrees
 c
@@ -81,16 +79,14 @@ c
          xu = ycb*zdc - ydc*zcb
          yu = xdc*zcb - xcb*zdc
          zu = xcb*ydc - xdc*ycb
-         rt2 = xt*xt + yt*yt + zt*zt
-         ru2 = xu*xu + yu*yu + zu*zu
-         rtru = sqrt(rt2 * ru2)
-         if (rtru .ne. 0.0d0) then
-            cosine = (xt*xu + yt*yu + zt*zu) / rtru
-            cosine = min(1.0d0,max(-1.0d0,cosine))
-            geometry = radian * acos(cosine)
-            sign = xba*xu + yba*yu + zba*zu
-            if (sign .lt. 0.0d0)  geometry = -geometry
-         end if
+         rt2 = max(xt*xt+yt*yt+zt*zt,0.0001d0)
+         ru2 = max(xu*xu+yu*yu+zu*zu,0.0001d0)
+         rtru = sqrt(rt2*ru2)
+         cosine = (xt*xu + yt*yu + zt*zu) / rtru
+         cosine = min(1.0d0,max(-1.0d0,cosine))
+         geometry = radian * acos(cosine)
+         sign = xba*xu + yba*yu + zba*zu
+         if (sign .lt. 0.0d0)  geometry = -geometry
       end if
       return
       end

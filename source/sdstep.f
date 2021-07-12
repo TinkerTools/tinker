@@ -35,7 +35,8 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,term
       real*8 epot,etot
       real*8 eksum
@@ -74,18 +75,17 @@ c
 c     store the current atom positions, then find full-step
 c     positions and half-step velocities via modified Verlet
 c
-      do i = 1, n
-         if (use(i)) then
-            xold(i) = x(i)
-            yold(i) = y(i)
-            zold(i) = z(i)
-            x(i) = x(i) + v(1,i)*vfric(i) + a(1,i)*afric(i) + prand(1,i)
-            y(i) = y(i) + v(2,i)*vfric(i) + a(2,i)*afric(i) + prand(2,i)
-            z(i) = z(i) + v(3,i)*vfric(i) + a(3,i)*afric(i) + prand(3,i)
-            do j = 1, 3
-               v(j,i) = v(j,i)*pfric(i) + 0.5d0*a(j,i)*vfric(i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         xold(k) = x(k)
+         yold(k) = y(k)
+         zold(k) = z(k)
+         x(k) = x(k) + v(1,k)*vfric(k) + a(1,k)*afric(k) + prand(1,k)
+         y(k) = y(k) + v(2,k)*vfric(k) + a(2,k)*afric(k) + prand(2,k)
+         z(k) = z(k) + v(3,k)*vfric(k) + a(3,k)*afric(k) + prand(3,k)
+         do j = 1, 3
+            v(j,k) = v(j,k)*pfric(k) + 0.5d0*a(j,k)*vfric(k)
+         end do
       end do
 c
 c     get constraint-corrected positions and half-step velocities
@@ -99,36 +99,34 @@ c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using modified Verlet
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + 0.5d0*a(j,i)*vfric(i) + vrand(j,i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + 0.5d0*a(j,k)*vfric(k) + vrand(j,k)
+         end do
       end do
 c
 c     correct internal virial to account for frictional forces
 c
-      do i = 1, n
-         if (use(i)) then
-            term = vfric(i)/dt - 1.0d0
-            vxx = term * x(i) * derivs(1,i)
-            vyx = 0.5d0 * term * (y(i)*derivs(1,i)+x(i)*derivs(2,i))
-            vzx = 0.5d0 * term * (z(i)*derivs(1,i)+x(i)*derivs(3,i))
-            vyy = term * y(i) * derivs(2,i)
-            vzy = 0.5d0 * term * (z(i)*derivs(2,i)+y(i)*derivs(3,i))
-            vzz = term * z(i) * derivs(3,i)
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vyx
-            vir(3,1) = vir(3,1) + vzx
-            vir(1,2) = vir(1,2) + vyx
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vzy
-            vir(1,3) = vir(1,3) + vzx
-            vir(2,3) = vir(2,3) + vzy
-            vir(3,3) = vir(3,3) + vzz
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         term = vfric(k)/dt - 1.0d0
+         vxx = term * x(k) * derivs(1,k)
+         vyx = 0.5d0 * term * (y(k)*derivs(1,k)+x(k)*derivs(2,k))
+         vzx = 0.5d0 * term * (z(k)*derivs(1,k)+x(k)*derivs(3,k))
+         vyy = term * y(k) * derivs(2,k)
+         vzy = 0.5d0 * term * (z(k)*derivs(2,k)+y(k)*derivs(3,k))
+         vzz = term * z(k) * derivs(3,k)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vyx
+         vir(3,1) = vir(3,1) + vzx
+         vir(1,2) = vir(1,2) + vyx
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vzy
+         vir(1,3) = vir(1,3) + vzx
+         vir(2,3) = vir(2,3) + vzy
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     perform deallocation of some local arrays
@@ -183,7 +181,8 @@ c
       use units
       use usage
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,ktm
       real*8 gdt,egdt
       real*8 gdt2,gdt3
@@ -225,80 +224,79 @@ c
 c
 c     get the frictional and random terms for stochastic dynamics
 c
-      do i = 1, n
-         if (use(i)) then
-            gdt = fgamma(i) * dt
+      do i = 1, nuse
+         k = iuse(i)
+         gdt = fgamma(k) * dt
 c
 c     stochastic dynamics reduces to simple MD for zero friction
 c
-            if (gdt .le. 0.0d0) then
-               pfric(i) = 1.0d0
-               vfric(i) = dt
-               afric(i) = 0.5d0 * dt * dt
-               do j = 1, 3
-                  prand(j,i) = 0.0d0
-                  vrand(j,i) = 0.0d0
-               end do
+         if (gdt .le. 0.0d0) then
+            pfric(k) = 1.0d0
+            vfric(k) = dt
+            afric(k) = 0.5d0 * dt * dt
+            do j = 1, 3
+               prand(j,k) = 0.0d0
+               vrand(j,k) = 0.0d0
+            end do
 c
 c     analytical expressions when friction coefficient is large
 c
-            else
-               if (gdt .ge. 0.05d0) then
-                  egdt = exp(-gdt)
-                  pfric(i) = egdt
-                  vfric(i) = (1.0d0-egdt) / fgamma(i)
-                  afric(i) = (dt-vfric(i)) / fgamma(i)
-                  pterm = 2.0d0*gdt - 3.0d0 + (4.0d0-egdt)*egdt
-                  vterm = 1.0d0 - egdt**2
-                  rho = (1.0d0-egdt)**2 / sqrt(pterm*vterm)
+         else
+            if (gdt .ge. 0.05d0) then
+               egdt = exp(-gdt)
+               pfric(k) = egdt
+               vfric(k) = (1.0d0-egdt) / fgamma(k)
+               afric(k) = (dt-vfric(k)) / fgamma(k)
+               pterm = 2.0d0*gdt - 3.0d0 + (4.0d0-egdt)*egdt
+               vterm = 1.0d0 - egdt**2
+               rho = (1.0d0-egdt)**2 / sqrt(pterm*vterm)
 c
 c     use series expansions when friction coefficient is small
 c
-               else
-                  gdt2 = gdt * gdt
-                  gdt3 = gdt * gdt2
-                  gdt4 = gdt2 * gdt2
-                  gdt5 = gdt2 * gdt3
-                  gdt6 = gdt3 * gdt3
-                  gdt7 = gdt3 * gdt4
-                  gdt8 = gdt4 * gdt4
-                  gdt9 = gdt4 * gdt5
-                  afric(i) = (gdt2/2.0d0 - gdt3/6.0d0 + gdt4/24.0d0
-     &                          - gdt5/120.0d0 + gdt6/720.0d0
-     &                          - gdt7/5040.0d0 + gdt8/40320.0d0
-     &                          - gdt9/362880.0d0) / fgamma(i)**2
-                  vfric(i) = dt - fgamma(i)*afric(i)
-                  pfric(i) = 1.0d0 - fgamma(i)*vfric(i)
-                  pterm = 2.0d0*gdt3/3.0d0 - gdt4/2.0d0
-     &                       + 7.0d0*gdt5/30.0d0 - gdt6/12.0d0
-     &                       + 31.0d0*gdt7/1260.0d0 - gdt8/160.0d0
-     &                       + 127.0d0*gdt9/90720.0d0
-                  vterm = 2.0d0*gdt - 2.0d0*gdt2 + 4.0d0*gdt3/3.0d0
-     &                       - 2.0d0*gdt4/3.0d0 + 4.0d0*gdt5/15.0d0
-     &                       - 4.0d0*gdt6/45.0d0 + 8.0d0*gdt7/315.0d0
-     &                       - 2.0d0*gdt8/315.0d0 + 4.0d0*gdt9/2835.0d0
-                  rho = sqrt(3.0d0) * (0.5d0 - gdt/16.0d0
-     &                       - 17.0d0*gdt2/1280.0d0
-     &                       + 17.0d0*gdt3/6144.0d0
-     &                       + 40967.0d0*gdt4/34406400.0d0
-     &                       - 57203.0d0*gdt5/275251200.0d0
-     &                       - 1429487.0d0*gdt6/13212057600.0d0
-     &                       + 1877509.0d0*gdt7/105696460800.0d0)
-               end if
+            else
+               gdt2 = gdt * gdt
+               gdt3 = gdt * gdt2
+               gdt4 = gdt2 * gdt2
+               gdt5 = gdt2 * gdt3
+               gdt6 = gdt3 * gdt3
+               gdt7 = gdt3 * gdt4
+               gdt8 = gdt4 * gdt4
+               gdt9 = gdt4 * gdt5
+               afric(k) = (gdt2/2.0d0 - gdt3/6.0d0 + gdt4/24.0d0
+     &                       - gdt5/120.0d0 + gdt6/720.0d0
+     &                       - gdt7/5040.0d0 + gdt8/40320.0d0
+     &                       - gdt9/362880.0d0) / fgamma(k)**2
+               vfric(k) = dt - fgamma(k)*afric(k)
+               pfric(k) = 1.0d0 - fgamma(k)*vfric(k)
+               pterm = 2.0d0*gdt3/3.0d0 - gdt4/2.0d0
+     &                    + 7.0d0*gdt5/30.0d0 - gdt6/12.0d0
+     &                    + 31.0d0*gdt7/1260.0d0 - gdt8/160.0d0
+     &                    + 127.0d0*gdt9/90720.0d0
+               vterm = 2.0d0*gdt - 2.0d0*gdt2 + 4.0d0*gdt3/3.0d0
+     &                    - 2.0d0*gdt4/3.0d0 + 4.0d0*gdt5/15.0d0
+     &                    - 4.0d0*gdt6/45.0d0 + 8.0d0*gdt7/315.0d0
+     &                    - 2.0d0*gdt8/315.0d0 + 4.0d0*gdt9/2835.0d0
+               rho = sqrt(3.0d0) * (0.5d0 - gdt/16.0d0
+     &                    - 17.0d0*gdt2/1280.0d0
+     &                    + 17.0d0*gdt3/6144.0d0
+     &                    + 40967.0d0*gdt4/34406400.0d0
+     &                    - 57203.0d0*gdt5/275251200.0d0
+     &                    - 1429487.0d0*gdt6/13212057600.0d0
+     &                    + 1877509.0d0*gdt7/105696460800.0d0)
+            end if
 c
 c     compute random terms to thermostat the nonzero friction case
 c
-               ktm = boltzmann * kelvin / mass(i)
-               psig = sqrt(ktm*pterm) / fgamma(i)
-               vsig = sqrt(ktm*vterm)
-               rhoc = sqrt(1.0d0 - rho*rho)
-               do j = 1, 3
-                  pnorm = normal ()
-                  vnorm = normal ()
-                  prand(j,i) = psig * pnorm
-                  vrand(j,i) = vsig * (rho*pnorm+rhoc*vnorm)
-               end do
-            end if
+            ktm = boltzmann * kelvin / mass(k)
+            psig = sqrt(ktm*pterm) / fgamma(k)
+            vsig = sqrt(ktm*vterm)
+            rhoc = sqrt(1.0d0 - rho*rho)
+            do j = 1, 3
+               pnorm = normal ()
+               vnorm = normal ()
+               prand(j,k) = psig * pnorm
+               vrand(j,k) = vsig * (rho*pnorm+rhoc*vnorm)
+            end do
          end if
       end do
       return
@@ -332,7 +330,7 @@ c
       use stodyn
       use usage
       implicit none
-      integer i,istep
+      integer i,k,istep
       integer resurf,modstep
       real*8 probe,ratio,area
       real*8, allocatable :: radius(:)
@@ -358,23 +356,21 @@ c
 c
 c     scale atomic friction coefficients by accessible area
 c
-      do i = 1, n
-         if (use(i)) then
-            if (radius(i) .ne. 0.0d0) then
-               call surfatom (i,area,radius)
-               ratio = area / (4.0d0*pi*radius(i)**2)
-               fgamma(i) = ratio * friction
-            end if
+      do i = 1, nuse
+         k = iuse(i)
+         if (radius(k) .ne. 0.0d0) then
+            call surfatom (k,area,radius)
+            ratio = area / (4.0d0*pi*radius(k)**2)
+            fgamma(k) = ratio * friction
          end if
       end do
 c
 c     monovalent atoms with zero radius get attached atom value
 c
-      do i = 1, n
-         if (use(i)) then
-            if (radius(i).eq.0.0d0 .and. n12(i).eq.1) then
-               fgamma(i) = fgamma(i12(1,i))
-            end if
+      do i = 1, nuse
+         k = iuse(i)
+         if (radius(k).eq.0.0d0 .and. n12(k).eq.1) then
+            fgamma(k) = fgamma(i12(1,k))
          end if
       end do
 c

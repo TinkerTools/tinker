@@ -42,8 +42,8 @@ c
       if (use_vdw .and. use_vlist)  call vlist
       if (use_disp .and. use_dlist)  call dlist
       if ((use_charge.or.use_solv) .and. use_clist)  call clist
-      if ((use_mpole.or.use_polar.or.use_chgtrn.or.use_solv)
-     &      .and. use_mlist)  call mlist
+      if ((use_repuls.or.use_mpole.or.use_polar
+     &       .or.use_chgtrn.or.use_solv) .and. use_mlist)  call mlist
       if (use_polar .and. use_ulist)  call ulist
       return
       end
@@ -103,7 +103,7 @@ c     perform a complete list build instead of an update
 c
       if (dovlst) then
          dovlst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call vbuild
          else
             call vlight
@@ -138,7 +138,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors for updated sites
+c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nvdw
@@ -162,7 +162,7 @@ c
       end do
 !$OMP END DO
 c
-c     adjust lists of lower numbered neighbors of updated sites
+c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nvdw
@@ -475,7 +475,7 @@ c     perform a complete list build instead of an update
 c
       if (dodlst) then
          dodlst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call dbuild
          else
             call dlight
@@ -507,7 +507,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors for updated sites
+c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, ndisp
@@ -531,7 +531,7 @@ c
       end do
 !$OMP END DO
 c
-c     adjust lists of lower numbered neighbors of updated sites
+c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, ndisp
@@ -851,7 +851,7 @@ c     perform a complete list build instead of an update
 c
       if (doclst) then
          doclst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call cbuild
          else
             call clight
@@ -883,7 +883,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors for updated sites
+c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nion
@@ -907,7 +907,7 @@ c
       end do
 !$OMP END DO
 c
-c     adjust lists of lower numbered neighbors of updated sites
+c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, nion
@@ -1227,7 +1227,7 @@ c     perform a complete list build instead of an update
 c
       if (domlst) then
          domlst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call mbuild
          else
             call mlight
@@ -1259,9 +1259,9 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors for updated sites
+c     rebuild the higher numbered neighbors of updated sites
 c
-!$OMP DO schedule (guided)
+!$OMP DO schedule(guided)
       do i = 1, npole
          if (update(i)) then
             xi = xeold(i)
@@ -1283,9 +1283,9 @@ c
       end do
 !$OMP END DO
 c
-c     adjust lists of lower numbered neighbors of updated sites
+c     adjust lists for lower numbered neighbors of updated sites
 c
-!$OMP DO schedule (guided)
+!$OMP DO schedule(guided)
       do i = 1, npole
          if (update(i)) then
             xi = xeold(i)
@@ -1603,7 +1603,7 @@ c     perform a complete list build instead of an update
 c
       if (doulst) then
          doulst = .false.
-         if (octahedron) then
+         if (nonprism) then
             call ubuild
          else
             call ulight
@@ -1635,7 +1635,7 @@ c
       end do
 !$OMP END DO
 c
-c     rebuild the higher numbered neighbors for updated sites
+c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, npole
@@ -1659,7 +1659,7 @@ c
       end do
 !$OMP END DO
 c
-c     adjust lists of lower numbered neighbors of updated sites
+c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
       do i = 1, npole

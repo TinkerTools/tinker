@@ -12,7 +12,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     nlignes    number of atom pairs having MMFF Bond Type 1
+c     nligne     number of atom pairs having MMFF Bond Type 1
 c     bt_1       atom pairs having MMFF Bond Type 1
 c     eqclass    table of atom class equivalencies used to find
 c                default parameters if explicit values are missing
@@ -33,7 +33,7 @@ c
       module merck
       use sizes
       implicit none
-      integer nlignes
+      integer nligne 
       integer bt_1(500,2)
       integer eqclass(500,5)
       integer crd(100)

@@ -32,6 +32,7 @@ ifort -c -g -warn all -check all bndstr.f
 ifort -c -g -warn all -check all bound.f
 ifort -c -g -warn all -check all boxes.f
 ifort -c -g -warn all -check all cell.f
+ifort -c -g -warn all -check all cflux.f
 ifort -c -g -warn all -check all charge.f
 ifort -c -g -warn all -check all chgpen.f
 ifort -c -g -warn all -check all chgpot.f
@@ -71,6 +72,7 @@ ifort -c -g -warn all -check all kangs.f
 ifort -c -g -warn all -check all kantor.f
 ifort -c -g -warn all -check all katoms.f
 ifort -c -g -warn all -check all kbonds.f
+ifort -c -g -warn all -check all kcflux.f
 ifort -c -g -warn all -check all kchrge.f
 ifort -c -g -warn all -check all kcpen.f
 ifort -c -g -warn all -check all kctrn.f
@@ -87,6 +89,7 @@ ifort -c -g -warn all -check all korbs.f
 ifort -c -g -warn all -check all kpitor.f
 ifort -c -g -warn all -check all kpolr.f
 ifort -c -g -warn all -check all krepl.f
+ifort -c -g -warn all -check all ksolut.f
 ifort -c -g -warn all -check all kstbnd.f
 ifort -c -g -warn all -check all ksttor.f
 ifort -c -g -warn all -check all ktorsn.f
@@ -151,6 +154,7 @@ ifort -c -g -warn all -check all scales.f
 ifort -c -g -warn all -check all sequen.f
 ifort -c -g -warn all -check all shunt.f
 ifort -c -g -warn all -check all socket.f
+ifort -c -g -warn all -check all solpot.f
 ifort -c -g -warn all -check all solute.f
 ifort -c -g -warn all -check all stodyn.f
 ifort -c -g -warn all -check all strbnd.f
@@ -181,6 +185,7 @@ ifort -c -g -warn all -check all zcoord.f
 #
 ifort -c -g -warn all -check all active.f
 ifort -c -g -warn all -check all alchemy.f
+ifort -c -g -warn all -check all alterchg.f
 ifort -c -g -warn all -check all analysis.f
 ifort -c -g -warn all -check all analyze.f
 ifort -c -g -warn all -check all angles.f
@@ -211,10 +216,12 @@ ifort -c -g -warn all -check all connect.f
 ifort -c -g -warn all -check all connolly.f
 ifort -c -g -warn all -check all control.f
 ifort -c -g -warn all -check all correlate.f
+ifort -c -g -warn all -check all critical.f
 ifort -c -g -warn all -check all crystal.f
 ifort -c -g -warn all -check all cspline.f
 ifort -c -g -warn all -check all cutoffs.f
 ifort -c -g -warn all -check all damping.f
+ifort -c -g -warn all -check all dcflux.f
 ifort -c -g -warn all -check all deflate.f
 ifort -c -g -warn all -check all delete.f
 ifort -c -g -warn all -check all diagq.f
@@ -409,6 +416,7 @@ ifort -c -g -warn all -check all kangtor.f
 ifort -c -g -warn all -check all katom.f
 ifort -c -g -warn all -check all kbond.f
 ifort -c -g -warn all -check all kcharge.f
+ifort -c -g -warn all -check all kchgflx.f
 ifort -c -g -warn all -check all kchgtrn.f
 ifort -c -g -warn all -check all kdipole.f
 ifort -c -g -warn all -check all kdisp.f
@@ -436,6 +444,7 @@ ifort -c -g -warn all -check all kvdw.f
 ifort -c -g -warn all -check all lattice.f
 ifort -c -g -warn all -check all lbfgs.f
 ifort -c -g -warn all -check all lights.f
+ifort -c -g -warn all -check all lusolve.f
 ifort -c -g -warn all -check all makeint.f
 ifort -c -g -warn all -check all makeref.f
 ifort -c -g -warn all -check all makexyz.f
@@ -486,6 +495,7 @@ ifort -c -g -warn all -check all polarize.f
 ifort -c -g -warn all -check all poledit.f
 ifort -c -g -warn all -check all polymer.f
 ifort -c -g -warn all -check all potential.f
+ifort -c -g -warn all -check all predict.f
 ifort -c -g -warn all -check all pressure.f
 ifort -c -g -warn all -check all prmedit.f
 ifort -c -g -warn all -check all prmkey.f
@@ -502,7 +512,7 @@ ifort -c -g -warn all -check all prtxyz.f
 ifort -c -g -warn all -check all pss.f
 ifort -c -g -warn all -check all pssrigid.f
 ifort -c -g -warn all -check all pssrot.f
-ifort -c -g -warn all -check all qrfact.f
+ifort -c -g -warn all -check all qrsolve.f
 ifort -c -g -warn all -check all quatfit.f
 ifort -c -g -warn all -check all radial.f
 ifort -c -g -warn all -check all random.f

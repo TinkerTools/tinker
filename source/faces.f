@@ -20,12 +20,12 @@ c     maxv     maximum number of vertices
 c     maxen    maximum number of concave edges
 c     maxfn    maximum number of concave faces
 c     maxc     maximum number of circles
-c     maxep    maximum number of convex edges
+c     maxeq    maximum number of convex edges
 c     maxfs    maximum number of saddle faces
+c     maxfq    maximum number of convex faces
 c     maxcy    maximum number of cycles
-c     mxcyep   maximum number of cycle convex edges
-c     maxfp    maximum number of convex faces
-c     mxfpcy   maximum number of convex face cycles
+c     mxcyeq   maximum number of convex edge cycles
+c     mxfqcy   maximum number of convex face cycles
 c
 c
       module faces
@@ -34,9 +34,9 @@ c
       integer maxt,maxp
       integer maxv,maxen
       integer maxfn,maxc
-      integer maxep,maxfs
-      integer maxcy,mxcyep
-      integer maxfp,mxfpcy
+      integer maxeq,maxfs
+      integer maxfq,maxcy
+      integer mxcyeq,mxfqcy
 c
 c
 c     na       number of atoms
@@ -157,51 +157,51 @@ c
       real*8, allocatable :: c(:,:)
 c
 c
-c     nep      number of convex edges
-c     epc      convex edge circle number
-c     epv      convex edge vertex numbers
+c     neq      number of convex edges
+c     eqc      convex edge circle number
+c     eqv      convex edge vertex numbers
 c     afe      first convex edge of each atom
 c     ale      last convex edge of each atom
-c     epnext   pointer to next convex edge of atom
+c     eqnext   pointer to next convex edge of atom
 c
 c
-      integer nep
-      integer, allocatable :: epc(:)
-      integer, allocatable :: epv(:,:)
+      integer neq
+      integer, allocatable :: eqc(:)
+      integer, allocatable :: eqv(:,:)
       integer, allocatable :: afe(:)
       integer, allocatable :: ale(:)
-      integer, allocatable :: epnext(:)
+      integer, allocatable :: eqnext(:)
 c
 c
 c     nfs      number of saddle faces
 c     fsen     saddle face concave edge numbers
-c     fsep     saddle face convex edge numbers
+c     fseq     saddle face convex edge numbers
 c
 c
       integer nfs
       integer, allocatable :: fsen(:,:)
-      integer, allocatable :: fsep(:,:)
+      integer, allocatable :: fseq(:,:)
 c
 c
 c     ncy      number of cycles
-c     cynep    number of convex edges in cycle
-c     cyep     cycle convex edge numbers
+c     cyneq    number of convex edges in cycle
+c     cyeq     cycle convex edge numbers
 c
 c
       integer ncy
-      integer, allocatable :: cynep(:)
-      integer, allocatable :: cyep(:,:)
+      integer, allocatable :: cyneq(:)
+      integer, allocatable :: cyeq(:,:)
 c
 c
-c     nfp      number of convex faces
-c     fpa      atom number of convex face
-c     fpncy    number of cycles bounding convex face
-c     fpcy     convex face cycle numbers
+c     nfq      number of convex faces
+c     fqa      atom number of convex face
+c     fqncy    number of cycles bounding convex face
+c     fqcy     convex face cycle numbers
 c
 c
-      integer nfp
-      integer, allocatable :: fpa(:)
-      integer, allocatable :: fpncy(:)
-      integer, allocatable :: fpcy(:,:)
+      integer nfq
+      integer, allocatable :: fqa(:)
+      integer, allocatable :: fqncy(:)
+      integer, allocatable :: fqcy(:,:)
       save
       end

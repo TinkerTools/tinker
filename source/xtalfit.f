@@ -367,9 +367,11 @@ c
       use xtals
       implicit none
       integer i,j,k
+      integer init,stop
       integer ixtal,prmtyp
       integer atom1,atom2
-      real*8 rd,ep,sixth
+      real*8 rd,ep
+      real*8 sixth,weigh
       real*8 xmid,ymid,zmid
       real*8 e0_lattices(maxref)
       real*8 xx(*)
@@ -404,25 +406,32 @@ c
          end if
       end if
 c
-c     coordinates of molecular centers of mass
+c     get fractional coordinates of center of mass
 c
       if (mode .eq. 'RESET') then
          do i = 1, nmol
+            init = imol(1,i)
+            stop = imol(2,i)
             xmid = 0.0d0
             ymid = 0.0d0
             zmid = 0.0d0
-            do j = imol(1,i), imol(2,i)
+            do j = init, stop
                k = kmol(j)
-               xmid = xmid + x(k)*mass(k)
-               ymid = ymid + y(k)*mass(k)
-               zmid = zmid + z(k)*mass(k)
+               weigh = mass(k)
+               xmid = xmid + x(k)*weigh
+               ymid = ymid + y(k)*weigh
+               zmid = zmid + z(k)*weigh
             end do
-            zmid = zmid / gamma_term
-            ymid = (ymid - zmid*beta_term) / gamma_sin
-            xmid = xmid - ymid*gamma_cos - zmid*beta_cos
-            xfrac(i) = xmid / (xbox * molmass(i))
-            yfrac(i) = ymid / (ybox * molmass(i))
-            zfrac(i) = zmid / (zbox * molmass(i))
+            weigh = molmass(i)
+            xmid = xmid / weigh
+            ymid = ymid / weigh
+            zmid = zmid / weigh
+            zfrac(i) = zmid / gamma_term
+            yfrac(i) = (ymid - zmid*beta_term) / gamma_sin
+            xfrac(i) = xmid - ymid*gamma_cos - zmid*beta_cos
+            zfrac(i) = zfrac(i) / zbox 
+            yfrac(i) = yfrac(i) / ybox 
+            xfrac(i) = xfrac(i) / xbox 
          end do
       end if
 c

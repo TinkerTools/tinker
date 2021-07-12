@@ -35,7 +35,7 @@ c
       integer freeunit
       integer, allocatable :: row(:)
       real*8 xi,yi,zi,rij
-      real*8 rcut,rmax(0:9)
+      real*8 rcut,rmax(0:25)
       logical biopoly
       logical clash
       character*1 letter
@@ -88,10 +88,14 @@ c
             resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
-               if (resname.eq.'HOH' .or. resname.eq.' NA' .or.
-     &             resname.eq.'  K' .or. resname.eq.' MG' .or.
-     &             resname.eq.' CA' .or. resname.eq.' CL' .or.
-     &             resname.eq.' BR' .or. resname.eq.'  I') then
+               if (resname.eq.'HOH' .or. resname.eq.' LI' .or.
+     &             resname.eq.' NA' .or. resname.eq.'  K' .or.
+     &             resname.eq.' RB' .or. resname.eq.' CS' .or.
+     &             resname.eq.' MG' .or. resname.eq.' CA' .or.
+     &             resname.eq.' SR' .or. resname.eq.' BA' .or.
+     &             resname.eq.'  F' .or. resname.eq.' CL' .or.
+     &             resname.eq.' BR' .or. resname.eq.'  I' .or.
+     &             resname.eq.' ZN') then
                   pdbtyp(i) = 'HETATM'
                end if
             end if
@@ -115,7 +119,7 @@ c
       rewind (unit=ipdb)
       call readpdb (ipdb)
 c
-c     use special translation mechanisms used for biopolymers
+c     use special translation mechanisms for biopolymers
 c
       do while (.not. abort)
          if (biopoly) then
@@ -138,11 +142,24 @@ c
                x(i) = xpdb(i)
                y(i) = ypdb(i)
                z(i) = zpdb(i)
-               name(i) = pdbatm(i)(2:4)
+               if (pdbsym(i) .ne. '   ') then
+                  name(i) = pdbsym(i)
+               else
+                  letter = pdbatm(i)(1:1)
+                  if (letter.ge.'A' .and. letter.le.'Z') then
+                     name(i) = pdbatm(i)(1:3)
+                  else
+                     name(i) = pdbatm(i)(2:4)
+                  end if
+               end if
                n12(i) = 0
                next = 1
                call getnumb (pdbres(i),type(i),next)
             end do
+c
+c     add missing hydrogen atoms to satisfy empty valences
+c
+c           call addhydro
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -153,20 +170,48 @@ c
             do i = 1, n
                it = type(i)
                if (it .eq. 0) then
+                  atomic(i) = 0
                   letter = name(i)(1:1)
                   call upcase (letter)
                   if (letter .eq. 'H') then
                      row(i) = 1
+                     atomic(i) = 1
+                  else if (letter .eq. 'B') then
+                     row(i) = 2
+                     atomic(i) = 5
+                     if (name(i)(2:2) .eq. 'R') then
+                        row(i) = 5
+                        atomic(i) = 35
+                     end if
                   else if (letter .eq. 'C') then
                      row(i) = 2
+                     atomic(i) = 6
+                     if (name(i)(2:2) .eq. 'L') then
+                        row(i) = 3
+                        atomic(i) = 17
+                     end if
                   else if (letter .eq. 'N') then
                      row(i) = 2
+                     atomic(i) = 7
                   else if (letter .eq. 'O') then
                      row(i) = 2
+                     atomic(i) = 8
+                  else if (letter .eq. 'F') then
+                     row(i) = 2
+                     atomic(i) = 9
                   else if (letter .eq. 'P') then
                      row(i) = 3
+                     atomic(i) = 15
                   else if (letter .eq. 'S') then
                      row(i) = 3
+                     atomic(i) = 16
+                     if (name(i)(2:2) .eq. 'I') then
+                        row(i) = 3
+                        atomic(i) = 14
+                     end if
+                  else if (letter .eq. 'I') then
+                     row(i) = 5
+                     atomic(i) = 53
                   else
                      row(i) = 0
                   end if
@@ -176,8 +221,10 @@ c
                   row(i) = 1
                else if (atmnum(it) .le. 10) then
                   row(i) = 2
-               else
+               else if (atmnum(it) .le. 18) then
                   row(i) = 3
+               else
+                  row(i) = 5
                end if
             end do
 c
@@ -188,8 +235,12 @@ c
             rmax(2) = 1.3d0
             rmax(3) = 1.55d0
             rmax(4) = 1.75d0
+            rmax(5) = 1.90d0
             rmax(6) = 2.0d0
             rmax(9) = 2.2d0
+            rmax(10) = 2.4d0
+            rmax(15) = 2.6d0
+            rmax(25) = 2.8d0
 c
 c     find and connect atom pairs within bonding distance
 c
@@ -212,6 +263,12 @@ c
 c     perform deallocation of some local arrays
 c
             deallocate (row)
+c
+c     assign generic atom types if currently unassigned
+c
+            do i = 1, n
+               if (it .eq. 0)  type(i) = 10*atomic(i) + n12(i)
+            end do      
          end if
 c
 c     sort the attached atom lists into ascending order
@@ -335,19 +392,17 @@ c
       start = resatm(1,jres)
       stop = resatm(2,jres)
       call findatm (' N  ',start,stop,j)
+      if (j .ne. 0)  ni(jres) = j
       start = resatm(1,kres)
       stop = resatm(2,kres)
       call findatm (' C  ',start,stop,k)
-      if (j.ne.0 .and. k.ne.0) then
+      if (k .ne. 0)  ci(kres) = k
+      if (jres.ne.kres .and. j.ne.0 .and. k.ne.0) then
          xr = xpdb(k) - xpdb(j)
          yr = ypdb(k) - ypdb(j)
          zr = zpdb(k) - zpdb(j)
          r = sqrt(xr*xr + yr*yr + zr*zr)
-         if (r .le. 3.0d0) then
-            cyclic = .true.
-            ni(jres) = j
-            ci(kres) = k
-         end if
+         if (r .le. 3.0d0)  cyclic = .true.
       end if
 c
 c     search for any potential cystine disulfide bonds
@@ -2069,6 +2124,8 @@ c
                call oldatm (i,2014,0,0)
             else if (pdbres(i) .eq. '  I') then
                call oldatm (i,2015,0,0)
+            else if (pdbres(i) .eq. ' ZN') then
+               call oldatm (i,2016,0,0)
             end if
          end if
       end do

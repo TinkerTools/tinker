@@ -15,6 +15,7 @@ c
 c     electric   energy factor in kcal/mole for current force field
 c     dielec     dielectric constant for electrostatic interactions
 c     ebuffer    electrostatic buffering constant added to distance
+c     c1scale    factor by which 1-1 charge interactions are scaled
 c     c2scale    factor by which 1-2 charge interactions are scaled
 c     c3scale    factor by which 1-3 charge interactions are scaled
 c     c4scale    factor by which 1-4 charge interactions are scaled
@@ -27,8 +28,9 @@ c
       implicit none
       real*8 electric
       real*8 dielec,ebuffer
-      real*8 c2scale,c3scale
-      real*8 c4scale,c5scale
+      real*8 c1scale,c2scale
+      real*8 c3scale,c4scale
+      real*8 c5scale
       logical neutnbr,neutcut
       save
       end

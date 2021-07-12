@@ -23,11 +23,13 @@ c
       use ctrpot
       use dsppot
       use fields
+      use ielscf
       use kanang
       use kangs
       use kantor
       use katoms
       use kbonds
+      use kcflux
       use kchrge
       use kcpen
       use kctrn
@@ -43,6 +45,7 @@ c
       use kpitor
       use kpolr
       use krepl
+      use ksolut
       use kstbnd
       use ksttor
       use ktorsn
@@ -55,11 +58,13 @@ c
       use polpot
       use reppot
       use rxnpot
+      use solpot
       use sizes
       use solute
       use urypot
       use torpot
       use units
+      use uprior
       use vdwpot
       implicit none
       integer i,j
@@ -175,6 +180,12 @@ c
       do i = 1, maxnmp
          kmp(i) = blank12
       end do
+      do i = 1, maxncfb
+         kcfb(i) = blank8
+      end do
+      do i = 1, maxncfa
+         kcfa(i) = blank12
+      end do
       do i = 1, maxnpi
          kpi(i) = blank8
       end do
@@ -213,9 +224,11 @@ c
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
       if (.not. allocated(ctchg))  allocate (ctchg(maxclass))
       if (.not. allocated(ctdmp))  allocate (ctdmp(maxclass))
+      if (.not. allocated(solrad))  allocate (solrad(maxclass))
       if (.not. allocated(electron))  allocate (electron(maxclass))
       if (.not. allocated(ionize))  allocate (ionize(maxclass))
       if (.not. allocated(repulse))  allocate (repulse(maxclass))
+      if (.not. allocated(biotyp))  allocate (biotyp(maxbio))
 c
 c     initialize values of some force field parameters
 c
@@ -256,6 +269,7 @@ c
          cpalp(i) = 0.0d0
          ctchg(i) = 0.0d0
          ctdmp(i) = 0.0d0
+         solrad(i) = 0.d0
          electron(i) = 0.0d0
          ionize(i) = 0.0d0
          repulse(i) = 0.0d0
@@ -291,12 +305,12 @@ c
       qopd = 0.0d0
       popd = 0.0d0
       sopd = 0.0d0
-      idihunit = 1.0d0
+      idihunit = 1.0d0 / radian**2
       itorunit = 1.0d0
       torsunit = 1.0d0
       ptorunit = 1.0d0
       storunit = 1.0d0
-      atorunit = 1.0d0
+      atorunit = 1.0d0 / radian
       ttorunit = 1.0d0
 c
 c     set default control parameters for van der Waals terms
@@ -340,6 +354,7 @@ c
       electric = coulomb
       dielec = 1.0d0
       ebuffer = 0.0d0
+      c1scale = 0.0d0
       c2scale = 0.0d0
       c3scale = 0.0d0
       c4scale = 1.0d0
@@ -382,9 +397,11 @@ c
       w3scale = 1.0d0
       w4scale = 1.0d0
       w5scale = 1.0d0
-      dpequal = .false.
-      use_thole = .false.
+      use_thole = .true.
       use_dirdamp = .false.
+      use_pred = .false.
+      use_ielscf = .false.
+      dpequal = .false.
 c
 c     set default control parameters for charge transfer terms
 c

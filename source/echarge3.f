@@ -149,6 +149,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -246,6 +247,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -282,6 +284,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -383,6 +386,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -534,6 +538,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -692,6 +697,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -806,8 +812,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
-!$OMP& c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,off,
-!$OMP& off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
+!$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
+!$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
 !$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
@@ -830,6 +836,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -928,6 +935,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1054,7 +1062,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          i = iion(ii)
          e = fs * pchg(ii)**2
@@ -1102,6 +1110,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1182,6 +1191,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1214,6 +1224,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1299,6 +1310,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1430,7 +1442,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          i = iion(ii)
          e = fs * pchg(ii)**2
@@ -1493,6 +1505,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1632,6 +1645,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1756,7 +1770,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          i = iion(ii)
          e = fs * pchg(ii)**2
@@ -1793,8 +1807,8 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,
-!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,
-!$OMP& i15,c2scale,c3scale,c4scale,c5scale,use_group,off2,
+!$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
+!$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
 !$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
@@ -1813,6 +1827,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1894,6 +1909,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -2024,6 +2040,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -2116,6 +2133,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do

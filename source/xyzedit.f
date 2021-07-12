@@ -73,7 +73,7 @@ c
       call initial
       opened = .false.
       multi = .false.
-      nmode = 21
+      nmode = 23
       offset = 0
 c
 c     try to get a filename from the command line arguments
@@ -115,9 +115,9 @@ c
       write (iout,30)
    30 format (/,' The Tinker XYZ File Editing Utility Can :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
-     &        /,4x,'(2) Deletion of Individual Specified Atoms',
-     &        /,4x,'(3) Deletion of Specified Types of Atoms',
-     &        /,4x,'(4) Deletion of Atoms Outside Cutoff Range',
+     &        /,4x,'(2) Remove User Specified Individual Atoms',
+     &        /,4x,'(3) Remove User Specified Types of Atoms',
+     &        /,4x,'(4) Delete Inactive Atoms Beyond Cutoff Range',
      &        /,4x,'(5) Insertion of Individual Specified Atoms',
      &        /,4x,'(6) Replace Old Atom Type with a New Type',
      &        /,4x,'(7) Assign Connectivities for Linear Chain',
@@ -130,11 +130,13 @@ c
      &        /,3x,'(14) Translate and Rotate to Inertial Frame',
      &        /,3x,'(15) Move to Specified Rigid Body Coordinates',
      &        /,3x,'(16) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(17) Delete Molecules Outside of Periodic Box',
-     &        /,3x,'(18) Append a Second XYZ File to Current One',
-     &        /,3x,'(19) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(20) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(21) Place Monoatomic Ions around a Solute')
+     &        /,3x,'(17) Trim a Periodic Box to a Smaller Size',
+     &        /,3x,'(18) Make Truncated Octahedron from Cubic Box',
+     &        /,3x,'(19) Make Rhombic Dodecahedron from Cubic Box',
+     &        /,3x,'(20) Append a Second XYZ File to Current One',
+     &        /,3x,'(21) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(22) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(23) Place Monoatomic Ions around a Solute')
 c
 c     get the desired type of coordinate file modification
 c
@@ -845,11 +847,11 @@ c
          ynew = 0.0d0
          znew = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  xbox
+         if (exist)  read (string,*,err=390,end=390)  xnew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  ybox
+         if (exist)  read (string,*,err=390,end=390)  ynew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  zbox
+         if (exist)  read (string,*,err=390,end=390)  znew
   390    continue
          do while (xnew .eq. 0.0d0)
             write (iout,400)
@@ -861,14 +863,14 @@ c
          end do
          if (ynew .eq. 0.0d0)  ynew = xnew
          if (znew .eq. 0.0d0)  znew = xnew
+         xbox = xnew
+         ybox = ynew
+         zbox = znew
+         call lattice
+         call molecule
          allocate (list(n))
          allocate (keep(n))
          do while (.not. abort)
-            xbox = xnew
-            ybox = ynew
-            zbox = znew
-            call lattice
-            call molecule
             do i = 1, n
                list(i) = 1
             end do
@@ -920,6 +922,112 @@ c
             end do
             call makeref (1)
             call readxyz (ixyz)
+            if (.not. abort) then
+               multi = .true.
+               xbox = xnew
+               ybox = ynew
+               zbox = znew
+               call lattice
+               call molecule
+            end if
+            if (multi) then
+               call makeref (2)
+               call getref (1)
+               call prtmod (imod,offset)
+               call getref (2)
+            end if
+         end do
+         deallocate (list)
+         deallocate (keep)
+         if (.not. multi) then
+            call getref (1)
+            goto 40
+         end if
+      end if
+c
+c     trim cube to truncated octahedron or rhombic dodecahedron
+c
+      if (mode.eq.18 .or. mode.eq.19) then
+         call unitcell
+         dowhile (xbox .eq. 0.0d0)
+            write (iout,430)
+  430       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
+            read (input,440)  record
+  440       format (a240)
+            read (record,*,err=450,end=450)  xbox
+  450       continue
+         end do
+         if (mode .eq. 18)  octahedron = .true.
+         if (mode .eq. 19)  dodecadron = .true.
+         call molecule
+         allocate (list(n))
+         allocate (keep(n))
+         do while (.not. abort)
+            do i = 1, n
+               list(i) = 1
+            end do
+            do i = 1, nmol
+               init = imol(1,i)
+               stop = imol(2,i)
+               xcm = 0.0d0
+               ycm = 0.0d0
+               zcm = 0.0d0
+               do j = init, stop
+                  k = kmol(j)
+                  weigh = mass(k)
+                  xcm = xcm + x(k)*weigh
+                  ycm = ycm + y(k)*weigh
+                  zcm = zcm + z(k)*weigh
+               end do
+               weigh = molmass(i)
+               xcm = xcm / weigh
+               ycm = ycm / weigh
+               zcm = zcm / weigh
+               if (octahedron) then
+                  xcm = xcm - xbox*nint(xcm/xbox)
+                  ycm = ycm - ybox*nint(ycm/ybox)
+                  zcm = zcm - zbox*nint(zcm/zbox)
+                  if (abs(xcm)+abs(ycm)+abs(zcm) .gt. 0.75*xbox) then
+                     do j = init, stop
+                        k = kmol(j)
+                        list(k) = 0
+                     end do
+                  end if
+               else if (dodecadron) then
+                  xcm = xcm - xbox*nint(xcm/xbox)
+                  ycm = ycm - ybox*nint(ycm/ybox)
+                  zcm = zcm - root2*zbox*nint(zcm/(zbox*root2))
+                  if (abs(xcm)+abs(ycm)+abs(root2*zcm) .gt. xbox) then
+                     do j = init, stop
+                        k = kmol(j)
+                        list(k) = 0
+                     end do
+                  end if
+               end if
+            end do
+            k = 0
+            do i = 1, n
+               if (list(i) .ne. 0) then
+                  k = k + 1
+                  keep(k) = i
+                  list(i) = k
+               end if
+            end do
+            n = k
+            do k = 1, n
+               i = keep(k)
+               name(k) = name(i)
+               x(k) = x(i)
+               y(k) = y(i)
+               z(k) = z(i)
+               type(k) = type(i)
+               n12(k) = n12(i)
+               do j = 1, n12(k)
+                  i12(j,k) = list(i12(j,i))
+               end do
+            end do
+            call makeref (1)
+            call readxyz (ixyz)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -938,7 +1046,7 @@ c
 c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 18) then
+      if (mode .eq. 20) then
          append = .false.
          do while (.not. abort)
             call makeref (1)
@@ -968,19 +1076,19 @@ c
 c
 c     create random box full of the current coordinates file
 c
-      if (mode .eq. 19) then
+      if (mode .eq. 21) then
          call makebox
       end if
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 20) then
+      if (mode .eq. 22) then
          call soak
       end if
 c
 c     replace random solvent molecules outside solute with ions
 c
-      if (mode .eq. 21) then
+      if (mode .eq. 23) then
          call molecule
          call addions
       end if
@@ -992,8 +1100,8 @@ c
       end if
       if (opened) then
          close (unit=imod)
-         write (iout,430)  modfile(1:trimtext(modfile))
-  430    format (/,' New Coordinates Written To :  ',a)
+         write (iout,460)  modfile(1:trimtext(modfile))
+  460    format (/,' New Coordinates Written To :  ',a)
       end if
       close (unit=ixyz)
 c
@@ -1544,12 +1652,16 @@ c
       implicit none
       integer i,j,k
       integer ii,jj
+      integer n12i,n12k
       integer isolv,icount
       integer ntot,freeunit
       integer, allocatable :: map(:)
       real*8 xi,yi,zi
-      real*8 xr,yr,zr,rik2
-      real*8 close,close2
+      real*8 xr,yr,zr
+      real*8 rik2,close2
+      real*8 dxx,dxx2
+      real*8 dxh,dxh2
+      real*8 dhh,dhh2
       logical exist,header
       logical, allocatable :: remove(:)
       character*240 solvfile
@@ -1607,10 +1719,14 @@ c
       call unitcell
       call lattice
 c
-c     set distance cutoff for solute-solvent close contacts
+c     set distance cutoffs for solute-solvent close contacts
 c
-      close = 1.5d0
-      close2 = close * close
+      dxx = 2.40d0
+      dxh = 2.19d0
+      dhh = 1.82d0
+      dxx2 = dxx * dxx
+      dxh2 = dxh * dxh
+      dhh2 = dhh * dhh
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1629,13 +1745,14 @@ c
       header = .true.
       if (n-nref(1) .ge. 10000) then
          write (iout,30)
-   30    format (/,' Scan for Solvent Molecules to be Removed')
+   30    format (/,' Scan for Solvent Molecules to be Removed :')
       end if
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(nref,n,x,y,z,molcule,close2,remove,header,icount)
+!$OMP& shared(nref,n,x,y,z,n12,molcule,dxx2,dxh2,dhh2,remove,
+!$OMP& header,icount,iout)
 !$OMP DO schedule(guided)
 c
 c     search for close contacts between solute and solvent
@@ -1645,12 +1762,21 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
+            n12i = n12(i)
             do k = 1, nref(1)
+               n12k = n12(k)
                xr = x(k) - xi
                yr = y(k) - yi
                zr = z(k) - zi
                call imagen (xr,yr,zr)
                rik2 = xr*xr + yr*yr + zr*zr
+               if (n12i.gt.1 .and. n12k.gt.1) then
+                  close2 = dxx2
+               else if (n12i.gt.1 .or. n12k.gt.1) then
+                  close2 = dxh2
+               else
+                  close2 = dhh2
+               end if
                if (rik2 .lt. close2) then
                   remove(molcule(i)) = .true.
                   goto 40
@@ -1743,10 +1869,13 @@ c
       use katoms
       use molcul
       implicit none
-      integer i,k
+      integer i,j,k
+      integer nsolute,size
       integer start,stop
       integer icount,iontyp
       integer ncopy,ranatm
+      integer, allocatable :: list(:)
+      integer, allocatable :: isolute(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr,rik2
       real*8 close,close2
@@ -1757,31 +1886,57 @@ c
       real*8, allocatable :: zion(:)
       logical exist,header,done
       logical, allocatable :: remove(:)
-      logical, allocatable :: solute(:)
       character*240 record
       character*240 string
       external random
 c
 c
+c     perform dynamic allocation of some local arrays
+c
+      size = 40
+      allocate (list(size))
+      allocate (isolute(n))
+c
 c     get the range atoms numbers constituting the solute
 c
+      do i = 1, size
+         list(i) = 0
+      end do
+      i = 0
+      do while (exist)
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=10,end=10)  list(i+1)
+            i = i + 1
+         end if
+      end do
    10 continue
-      start = 0
-      stop = 0
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=20,end=20)  start
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=20,end=20)  stop
-   20 continue
-      if (start.eq.0 .or. stop.eq.0) then
-         write (iout,30)
-   30    format (/,' Enter Start and End Atom Numbers of Solute :  ',$)
-         read (input,40)  record
-   40    format (a240)
+      if (i .eq. 0) then
+         write (iout,20)
+   20    format (/,' Enter Atom Numbers in Solute Molecules :  ',$)
+         read (input,30)  record
+   30    format (a240)
+         read (record,*,err=40,end=40)  (list(i),i=1,size)
+   40    continue
       end if
-      read (record,*,err=10,end=10)  start,stop
-      start = abs(start)
-      stop = abs(stop)
+      i = 1
+      nsolute = 0
+      do while (list(i) .ne. 0)
+         list(i) = max(-n,min(n,list(i)))
+         if (list(i) .gt. 0) then
+            k = list(i)
+            nsolute = nsolute + 1
+            isolute(nsolute) = k
+            i = i + 1
+         else
+            list(i+1) = max(-n,min(n,list(i+1)))
+            do k = abs(list(i)), abs(list(i+1))
+               nsolute = nsolute + 1
+               isolute(nsolute) = k
+            end do
+            i = i + 2
+         end if
+      end do
 c
 c     get the atom type of ion to be added and number of copies
 c
@@ -1795,21 +1950,20 @@ c
    60 continue
       if (iontyp.eq.0 .or. ncopy.eq.0) then
          write (iout,70)
-   70    format (/,' Enter Atom Type to Add and Number of Copies :  ',$)
+   70    format (/,' Enter Ion Atom Type Number & Copies to Add :  ',$)
          read (input,80)  record
    80    format (a240)
       end if
       read (record,*,err=50,end=50)  iontyp,ncopy
 c
-c     set distance cutoff for solute-ion close contacts
+c     set minimum distance cutoff for solute-ion contacts
 c
-      close = 5.0d0
+      close = 6.0d0
       close2 = close * close
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (remove(nmol))
-      allocate (solute(nmol))
       allocate (xion(ncopy))
       allocate (yion(ncopy))
       allocate (zion(ncopy))
@@ -1818,7 +1972,6 @@ c     initialize the list of solvent molecules to be deleted
 c
       do i = 1, nmol
          remove(i) = .false.
-         solute(i) = .false.
       end do
 c
 c     print header information when processing large systems
@@ -1827,26 +1980,28 @@ c
       header = .true.
       if (n .ge. 10000) then
          write (iout,90)
-   90    format (/,' Scan for Available Locations to Place Ions')
+   90    format (/,' Scan for Available Locations to Place Ions :')
       end if
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(n,x,y,z,molcule,close2,remove,header,start,stop,icount)
+!$OMP& shared(n,x,y,z,molcule,close2,remove,header,nsolute,
+!$OMP& isolute,icount,iout)
 !$OMP DO schedule(guided)
 c
-c     search for close contacts between solute and solvent
+c     search for short distance between solute and solvent
 c
       do i = 1, n
          if (.not. remove(molcule(i))) then
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            do k = start, stop
-               xr = x(k) - xi
-               yr = y(k) - yi
-               zr = z(k) - zi
+            do k = 1, nsolute
+               j = isolute(k)
+               xr = x(j) - xi
+               yr = y(j) - yi
+               zr = z(j) - zi
                call imagen (xr,yr,zr)
                rik2 = xr*xr + yr*yr + zr*zr
                if (rik2 .lt. close2) then
@@ -1873,12 +2028,16 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (isolute)
+c
 c     print final status when processing large systems
 c
-      icount = n
-      if (mod(icount,10000).ne.0 .and. icount.gt.10000) then
-         write (iout,130)  icount
-  130    format (' Atoms Processed',i15)
+      if (mod(n,10000).ne.0 .and. n.gt.10000) then
+         write (iout,130)  n
+  130    format (' Solvent Atoms Processed',i15)
       end if
 c
 c     randomly replace the solvent molecules with ions
@@ -1932,5 +2091,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (remove)
+      deallocate (xion)
+      deallocate (yion)
+      deallocate (zion)
       return
       end

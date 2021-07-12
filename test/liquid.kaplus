@@ -1,0 +1,17 @@
+parameters        ../params/amoebaplus
+verbose
+
+a-axis                       18.643
+integrator                    RESPA
+thermostat                    BUSSI
+barostat                 MONTECARLO
+
+neighbor-list
+list-buffer                     0.2
+vdw-cutoff                      9.0
+ewald
+ewald-cutoff                    7.0
+
+polarization                 MUTUAL
+polar-eps                   0.00001
+polar-predict

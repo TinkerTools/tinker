@@ -32,6 +32,7 @@ gfortran -c -Ofast -msse3 -fopenmp bndstr.f
 gfortran -c -Ofast -msse3 -fopenmp bound.f
 gfortran -c -Ofast -msse3 -fopenmp boxes.f
 gfortran -c -Ofast -msse3 -fopenmp cell.f
+gfortran -c -Ofast -msse3 -fopenmp cflux.f
 gfortran -c -Ofast -msse3 -fopenmp charge.f
 gfortran -c -Ofast -msse3 -fopenmp chgpen.f
 gfortran -c -Ofast -msse3 -fopenmp chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -Ofast -msse3 -fopenmp kangs.f
 gfortran -c -Ofast -msse3 -fopenmp kantor.f
 gfortran -c -Ofast -msse3 -fopenmp katoms.f
 gfortran -c -Ofast -msse3 -fopenmp kbonds.f
+gfortran -c -Ofast -msse3 -fopenmp kcflux.f
 gfortran -c -Ofast -msse3 -fopenmp kchrge.f
 gfortran -c -Ofast -msse3 -fopenmp kcpen.f
 gfortran -c -Ofast -msse3 -fopenmp kctrn.f
@@ -87,6 +89,7 @@ gfortran -c -Ofast -msse3 -fopenmp korbs.f
 gfortran -c -Ofast -msse3 -fopenmp kpitor.f
 gfortran -c -Ofast -msse3 -fopenmp kpolr.f
 gfortran -c -Ofast -msse3 -fopenmp krepl.f
+gfortran -c -Ofast -msse3 -fopenmp ksolut.f
 gfortran -c -Ofast -msse3 -fopenmp kstbnd.f
 gfortran -c -Ofast -msse3 -fopenmp ksttor.f
 gfortran -c -Ofast -msse3 -fopenmp ktorsn.f
@@ -151,6 +154,7 @@ gfortran -c -Ofast -msse3 -fopenmp scales.f
 gfortran -c -Ofast -msse3 -fopenmp sequen.f
 gfortran -c -Ofast -msse3 -fopenmp shunt.f
 gfortran -c -Ofast -msse3 -fopenmp socket.f
+gfortran -c -Ofast -msse3 -fopenmp solpot.f
 gfortran -c -Ofast -msse3 -fopenmp solute.f
 gfortran -c -Ofast -msse3 -fopenmp stodyn.f
 gfortran -c -Ofast -msse3 -fopenmp strbnd.f
@@ -181,6 +185,7 @@ gfortran -c -Ofast -msse3 -fopenmp zcoord.f
 #
 gfortran -c -Ofast -msse3 -fopenmp active.f
 gfortran -c -Ofast -msse3 -fopenmp alchemy.f
+gfortran -c -Ofast -msse3 -fopenmp alterchg.f
 gfortran -c -Ofast -msse3 -fopenmp analysis.f
 gfortran -c -Ofast -msse3 -fopenmp analyze.f
 gfortran -c -Ofast -msse3 -fopenmp angles.f
@@ -202,7 +207,7 @@ gfortran -c -Ofast -msse3 -fopenmp center.f
 gfortran -c -Ofast -msse3 -fopenmp chkpole.f
 gfortran -c -Ofast -msse3 -fopenmp chkring.f
 gfortran -c -Ofast -msse3 -fopenmp chkxyz.f
-gfortran -c -Ofast -msse3 -fopenmp cholesky.f
+gfortran -c -Ofast -msse3 -fopenmp choleksy.f
 gfortran -c -Ofast -msse3 -fopenmp clock.f
 gfortran -c -Ofast -msse3 -fopenmp cluster.f
 gfortran -c -Ofast -msse3 -fopenmp column.f
@@ -211,10 +216,12 @@ gfortran -c -Ofast -msse3 -fopenmp connect.f
 gfortran -c -Ofast -msse3 -fopenmp connolly.f
 gfortran -c -Ofast -msse3 -fopenmp control.f
 gfortran -c -Ofast -msse3 -fopenmp correlate.f
+gfortran -c -Ofast -msse3 -fopenmp critical.f
 gfortran -c -Ofast -msse3 -fopenmp crystal.f
 gfortran -c -Ofast -msse3 -fopenmp cspline.f
 gfortran -c -Ofast -msse3 -fopenmp cutoffs.f
 gfortran -c -Ofast -msse3 -fopenmp damping.f
+gfortran -c -Ofast -msse3 -fopenmp dcflux.f
 gfortran -c -Ofast -msse3 -fopenmp deflate.f
 gfortran -c -Ofast -msse3 -fopenmp delete.f
 gfortran -c -Ofast -msse3 -fopenmp diagq.f
@@ -409,6 +416,7 @@ gfortran -c -Ofast -msse3 -fopenmp kangtor.f
 gfortran -c -Ofast -msse3 -fopenmp katom.f
 gfortran -c -Ofast -msse3 -fopenmp kbond.f
 gfortran -c -Ofast -msse3 -fopenmp kcharge.f
+gfortran -c -Ofast -msse3 -fopenmp kchgflx.f
 gfortran -c -Ofast -msse3 -fopenmp kchgtrn.f
 gfortran -c -Ofast -msse3 -fopenmp kdipole.f
 gfortran -c -Ofast -msse3 -fopenmp kdisp.f
@@ -436,6 +444,7 @@ gfortran -c -Ofast -msse3 -fopenmp kvdw.f
 gfortran -c -Ofast -msse3 -fopenmp lattice.f
 gfortran -c -Ofast -msse3 -fopenmp lbfgs.f
 gfortran -c -Ofast -msse3 -fopenmp lights.f
+gfortran -c -Ofast -msse3 -fopenmp lusolve.f
 gfortran -c -Ofast -msse3 -fopenmp makeint.f
 gfortran -c -Ofast -msse3 -fopenmp makeref.f
 gfortran -c -Ofast -msse3 -fopenmp makexyz.f
@@ -486,6 +495,7 @@ gfortran -c -Ofast -msse3 -fopenmp polarize.f
 gfortran -c -Ofast -msse3 -fopenmp poledit.f
 gfortran -c -Ofast -msse3 -fopenmp polymer.f
 gfortran -c -Ofast -msse3 -fopenmp potential.f
+gfortran -c -Ofast -msse3 -fopenmp predict.f
 gfortran -c -Ofast -msse3 -fopenmp pressure.f
 gfortran -c -Ofast -msse3 -fopenmp prmedit.f
 gfortran -c -Ofast -msse3 -fopenmp prmkey.f
@@ -502,7 +512,7 @@ gfortran -c -Ofast -msse3 -fopenmp prtxyz.f
 gfortran -c -Ofast -msse3 -fopenmp pss.f
 gfortran -c -Ofast -msse3 -fopenmp pssrigid.f
 gfortran -c -Ofast -msse3 -fopenmp pssrot.f
-gfortran -c -Ofast -msse3 -fopenmp qrfact.f
+gfortran -c -Ofast -msse3 -fopenmp qrsolve.f
 gfortran -c -Ofast -msse3 -fopenmp quatfit.f
 gfortran -c -Ofast -msse3 -fopenmp radial.f
 gfortran -c -Ofast -msse3 -fopenmp random.f

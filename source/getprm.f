@@ -23,7 +23,7 @@ c
       use keys
       use params
       implicit none
-      integer i,iprm
+      integer i,j,iprm
       integer nask,next
       integer freeunit
       integer trimtext
@@ -143,6 +143,18 @@ c
    50    continue
          close (unit=iprm)
       end if
+c
+c     convert underbar characters to dashes in all keywords
+c
+      do i = 1, nprm
+         next = 1
+         record = prmline(i)
+         call gettext (record,keyword,next)
+         do j = 1, next-1
+            if (record(j:j) .eq. '_')  record(j:j) = '-'
+         end do
+         prmline(i) = record
+      end do
 c
 c     get control and parameter values from the parameter file
 c

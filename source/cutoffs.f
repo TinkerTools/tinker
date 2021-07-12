@@ -160,6 +160,7 @@ c
             dplcut = value
             mpolecut = value
             ewaldcut = value
+            dewaldcut = value
             ctrncut = value
          else if (keyword(1:11) .eq. 'VDW-CUTOFF ') then
             read (string,*,err=10,end=10)  vdwcut

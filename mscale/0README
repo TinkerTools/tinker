@@ -1,0 +1,9 @@
+
+                    #######################################
+                    Tinker Interface to the MSCALE Protocol
+                    #######################################
+
+           This directory contains a sample program to interface the
+           Tinker package as a slave under the MSCALE protocol. The
+           code provided allows communication with a CHARMM master.
+

@@ -29,6 +29,7 @@ c
       use limits
       use math
       use potent
+      use solpot
       use solute
       use warp
       implicit none
@@ -765,8 +766,7 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
 !$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
 !$OMP& shared(es,nes,aes,eself,ecross,einter)
-!$OMP DO reduction(+:es,nes,aes,eself,ecross,einter)
-!$OMP& schedule(guided)
+!$OMP DO reduction(+:es,nes,aes,eself,ecross,einter) schedule(guided)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -1189,11 +1189,11 @@ c
       integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
-      real*8 ei,f,fikp
-      real*8 fgrp,damp
-      real*8 r,r2,xr,yr,zr
+      real*8 ei,f
+      real*8 fikp,fgrp
+      real*8 xi,yi,zi
+      real*8 xr,yr,zr,r,r2
       real*8 rr1,rr3,rr5,rr7
-      real*8 pdi,pti,pgamma
       real*8 ci,dix,diy,diz
       real*8 uix,uiy,uiz
       real*8 qixx,qixy,qixz
@@ -1204,11 +1204,10 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 qix,qiy,qiz
       real*8 qkx,qky,qkz
-      real*8 scale3,scale5
-      real*8 scale7
       real*8 sc(6)
       real*8 sci(8)
       real*8 gli(3)
+      real*8 dmpik(7)
       real*8, allocatable :: pscale(:)
       logical proceed,usei,usek
       character*6 mode
@@ -1234,9 +1233,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
-!$OMP& zaxis,pdamp,thole,rpole,uind,uinds,use,n12,n13,n14,n15,np11,
-!$OMP& i12,i13,i14,i15,ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,use_group,use_intra,off2,f)
+!$OMP& zaxis,rpole,uind,uinds,use,n12,n13,n14,n15,np11,i12,i13,i14,i15,
+!$OMP& ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& p5iscale,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale) shared(es,nes,aes)
 !$OMP DO reduction(+:es,nes,aes) schedule(guided)
 c
@@ -1244,11 +1243,12 @@ c     calculate the multipole interaction energy term
 c
       do i = 1, npole-1
          ii = ipole(i)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
-         pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1311,9 +1311,9 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - x(ii)
-               yr = y(kk) - y(ii)
-               zr = z(kk) - z(ii)
+               xr = x(kk) - xi
+               yr = y(kk) - yi
+               zr = z(kk) - zi
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -1370,22 +1370,9 @@ c
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        scale3 = 1.0d0 - exp(damp)
-                        scale5 = 1.0d0 - (1.0d0-damp)*exp(damp)
-                        scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
-     &                                          *exp(damp)
-                     end if
-                  end if
-                  ei = gli(1)*rr3*scale3 + gli(2)*rr5*scale5
-     &                    + gli(3)*rr7*scale7
+                  call dampthole2 (i,k,7,r,dmpik)
+                  ei = gli(1)*rr3*dmpik(3) + gli(2)*rr5*dmpik(5)
+     &                    + gli(3)*rr7*dmpik(7)
 c
 c     make the adjustment for scaled interactions
 c
@@ -2178,7 +2165,7 @@ c
             end if
          end do
          sasa = acsurf * sasa
-         cutv = tanh(tslope*(sasa-toffset))
+         cutv = tanh(tgrad*(sasa-toffset))
          cutmtx(i) = 0.5d0 * (1.0d0+cutv)
       end do
 c
@@ -2222,15 +2209,15 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. hpmfcut2) then
                   r = sqrt(r2)
-                  arg1 = (r-c1) * w1
+                  arg1 = (r-hc1) * hw1
                   arg12 = arg1 * arg1
-                  arg2 = (r-c2) * w2
+                  arg2 = (r-hc2) * hw2
                   arg22 = arg2 * arg2
-                  arg3 = (r-c3) * w3
+                  arg3 = (r-hc3) * hw3
                   arg32 = arg3 * arg3
-                  e1 = h1 * exp(-arg12)
-                  e2 = h2 * exp(-arg22)
-                  e3 = h3 * exp(-arg32)
+                  e1 = hd1 * exp(-arg12)
+                  e2 = hd2 * exp(-arg22)
+                  e3 = hd3 * exp(-arg32)
                   sum = e1 + e2 + e3
                   e = sum * cutmtx(i) * cutmtx(k)
                   ehp = ehp + e

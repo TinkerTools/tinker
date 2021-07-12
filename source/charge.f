@@ -16,7 +16,8 @@ c     nion      total number of partial charges in system
 c     iion      number of the atom site for each partial charge
 c     jion      neighbor generation site for each partial charge
 c     kion      cutoff switching site for each partial charge
-c     pchg      magnitude of the partial charges (e-)
+c     pchg      current atomic partial charge values (e-)
+c     pchg0     original partial charge values for charge flux
 c
 c
       module charge
@@ -26,5 +27,6 @@ c
       integer, allocatable :: jion(:)
       integer, allocatable :: kion(:)
       real*8, allocatable :: pchg(:)
+      real*8, allocatable :: pchg0(:)
       save
       end

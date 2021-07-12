@@ -29,7 +29,8 @@ c     apostrophe   decimal value of ASCII code for single quote (39)
 c     asterisk     decimal value of ASCII code for asterisk (42)
 c     plus         decimal value of ASCII code for plus sign (43)
 c     comma        decimal value of ASCII code for comma (44)
-c     minus        decimal value of ASCII code for minus sign (45)
+c     minus        decimal value of ASCII code for minus/dash sign (45)
+c     dash         decimal value of ASCII code for minus/dash sign (45)
 c     period       decimal value of ASCII code for period (46)
 c     frontslash   decimal value of ASCII codd for frontslash (47)
 c     colon        decimal value of ASCII code for colon (58)
@@ -42,6 +43,7 @@ c     caret        decimal value of ASCII code for caret (94)
 c     underbar     decimal value of ASCII code for underbar (95)
 c     vertical     decimal value of ASCII code for vertical bar (124)
 c     tilde        decimal value of ASCII code for tilde (126)
+c     nbsp         decimal value of ASCII code for nobreak space (255)
 c
 c
       module ascii
@@ -56,12 +58,13 @@ c
       integer apostrophe
       integer asterisk,plus
       integer comma,minus
-      integer period,frontslash
-      integer colon,semicolon
-      integer equal,question
-      integer atsign,backslash
-      integer caret,underbar
-      integer vertical,tilde
+      integer dash,period
+      integer frontslash,colon
+      integer semicolon,equal
+      integer question,atsign
+      integer backslash,caret
+      integer underbar,vertical
+      integer tilde,nbsp
       parameter (null=0)
       parameter (tab=9)
       parameter (linefeed=10)
@@ -80,6 +83,7 @@ c
       parameter (plus=43)
       parameter (comma=44)
       parameter (minus=45)
+      parameter (dash=45)
       parameter (period=46)
       parameter (frontslash=47)
       parameter (colon=58)
@@ -92,5 +96,6 @@ c
       parameter (underbar=95)
       parameter (vertical=124)
       parameter (tilde=126)
+      parameter (nbsp=255)
       save
       end

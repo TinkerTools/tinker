@@ -22,6 +22,7 @@ c
       use atoms
       use bound
       use boxes
+      use deriv
       use files
       use group
       use inform
@@ -43,8 +44,8 @@ c
       integer iend,isave,lext
       integer freeunit,trimtext
       integer modsave
-      real*8 dt,epot,eksum
-      real*8 pico,wt
+      real*8 dt,pico
+      real*8 epot,eksum
       logical exist
       character*7 ext
       character*240 endfile
@@ -191,9 +192,11 @@ c
   240    format (' Velocity File',15x,a)
       end if
 c
-c     save the force vector components for the current step
+c     save the force vector components for the current step,
+c     only correct for single time step Cartesian integrators
 c
-      if (frcsave .and. integrate.ne.'RIGIDBODY') then
+      if (frcsave .and. integrate.ne.'RIGIDBODY'
+     &       .and. integrate.ne.'RESPA') then
          ifrc = freeunit ()
          if (archive) then
             frcfile = filename(1:leng)
@@ -212,8 +215,7 @@ c
          write (ifrc,250)  n,title(1:ltitle)
   250    format (i6,2x,a)
          do i = 1, n
-            wt = mass(i) / ekcal
-            write (ifrc,260)  i,name(i),(wt*a(j,i),j=1,3)
+            write (ifrc,260)  i,name(i),(-desum(j,i),j=1,3)
   260       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
          end do
          close (unit=ifrc)

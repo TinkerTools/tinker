@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.7  June 2019                          ##
+ ##                         Version 8.9.1  June 2021                         ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -18,9 +18,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.6  February 2019                        ##
+ ##                         Version 8.9.1  June 2021                         ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -40,7 +40,7 @@
  Atomic Partial Charges                         9
  Bond Dipole Moments                          311
 
- Atom Type Definition Parameters :
+ Atom Definition Parameters :
 
    Atom  Symbol  Type  Class  Atomic   Mass  Valence  Description
 
@@ -48,15 +48,6 @@
    253     H       23     23     1     1.008    1     Guanidinium             
    254     N        8      8     7    14.003    3     Amide                   
    255     C        1      1     6    12.000    4     Alkane (Csp3)           
-
- Van der Waals Parameters :
-
-          Atom Number       Size   Epsilon   Size 1-4   Eps 1-4   Reduction
-
-     1      252           1.6000    0.0150                          0.9230
-     2      253           1.6000    0.0150                          0.9230
-     3      254           1.9300    0.0430
-     4      255           2.0400    0.0270
 
  Bond Stretching Parameters :
 
@@ -245,6 +236,15 @@
                                         2nd     0.000   0  0.000 180  0.059   0
                                         3rd     0.000   0  0.000 180  0.000   0
 
+ Van der Waals Parameters :
+
+          Atom Number       Size   Epsilon   Size 1-4   Eps 1-4   Reduction
+
+     1      252           1.6000    0.0150                          0.9230
+     2      253           1.6000    0.0150                          0.9230
+     3      254           1.9300    0.0430
+     4      255           2.0400    0.0270
+
  Bond Dipole Moment Parameters :
 
           Atom Numbers                      Dipole   Position
@@ -276,9 +276,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                        Version 8.6  February 2019                        ##
+ ##                         Version 8.9.1  June 2021                         ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -339,7 +339,7 @@
      246   0.000    247   0.000    248   0.000    249   1.440    250   0.000
      251   2.603    252   3.673    253   4.563    254   0.000    255   0.000
      256   0.106    257   7.336    258   0.000    259   0.493    260   0.055
-     261   0.044    262   2.594    263   3.100    264   2.055    265   0.217
+     261   0.044    262   2.594    263   3.099    264   2.055    265   0.217
      266   0.035    267   3.357    268   3.836    269   0.728    270   4.661
      271   2.983    272   3.754    273   0.070    274   0.038    275   0.587
      276   8.329    277   2.953    278   1.349    279   1.130    280   0.114

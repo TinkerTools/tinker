@@ -91,7 +91,8 @@ c
       allocate (dmpct(n))
 c
 c     assign the charge transfer charge and alpha parameters 
-c     
+c
+      nct = n
       do i = 1, n
          ic = class(i)
          chgct(i) = ctchg(ic)
@@ -134,69 +135,61 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      npole = 0
-      ncp = 0
-      npolar = 0
-      nct = 0
-      do i = 1, n
-         if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
-         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0 .or.
-     &          chgct(i).ne. 0.0d0 .or. dmpct(i).ne.0.0d0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do k = 1, maxpole
-               pole(k,npole) = pole(k,i)
-            end do
-            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-            pcore(npole) = pcore(i)
-            pval(npole) = pval(i)
-            palpha(npole) = palpha(i)
-            if (polarity(i) .ne. 0.0d0) then
-               npolar = npolar + 1
-               ipolar(npolar) = npole
-               douind(i) = .true.
+      if (use_chgtrn) then
+         npole = 0
+         ncp = 0
+         npolar = 0
+         nct = 0
+         do i = 1, n
+            if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
+            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0 .or.
+     &             chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do k = 1, maxpole
+                  pole(k,npole) = pole(k,i)
+               end do
+               mono0(npole) = pole(1,i)
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               pval0(npole) = pval(i)
+               palpha(npole) = palpha(i)
+               if (polarity(i) .ne. 0.0d0) then
+                  npolar = npolar + 1
+                  ipolar(npolar) = npole
+                  douind(i) = .true.
+               end if
+               if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
+               polarity(npole) = polarity(i)
+               thole(npole) = thole(i)
+               dirdamp(npole) = dirdamp(i)
+               pdamp(npole) = pdamp(i)
+               if (chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
+                  nct = nct + 1
+               end if
+               chgct(npole) = chgct(i)
+               dmpct(npole) = dmpct(i)
             end if
-            polarity(npole) = polarity(i)
-            thole(npole) = thole(i)
-            dirdamp(npole) = dirdamp(i)
-            if (chgct(i).ne.0.0d0 .or. dmpct(i).ne.0.0d0) then
-               nct = nct + 1
-            end if
-            chgct(npole) = chgct(i)
-            dmpct(npole) = dmpct(i)
-         end if
-      end do
+         end do
+      end if
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
+      if (use_chgtrn)  call chkpole
 c
 c     turn off individual electrostatic potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .ne. 0)  use_chgpen = .true.
+      if (ncp .ne. 0)  use_thole = .false.
+      if (use_dirdamp)  use_thole = .true.
       if (npolar .eq. 0)  use_polar = .false.
-      if (use_polar) then
-         do i = 1, npole
-            if (thole(i) .ne. 0.0d0) then
-               use_thole = .true.
-               goto 80
-            end if
-         end do
-   80    continue
-         do i = 1, npole
-            if (dirdamp(i) .ne. 0.0d0) then
-               use_dirdamp = .true.
-               goto 90
-            end if
-         end do
-   90    continue
-      end if
       if (nct .eq. 0)  use_chgtrn = .false.
       return
       end

@@ -14,6 +14,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static -o anneal.x anneal.o libtinker
 ifort -O3 -no-prec-div -recursive -openmp -static -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a ; strip archive.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a ; strip bar.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a ; strip correlate.x
+ifort -O3 -no-prec-div -recursive -openmp -static -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a ; strip critical.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o crystal.x crystal.o libtinker.a libfftw3_threads.a libfftw3.a ; strip crystal.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o diffuse.x diffuse.o libtinker.a libfftw3_threads.a libfftw3.a ; strip diffuse.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o distgeom.x distgeom.o libtinker.a libfftw3_threads.a libfftw3.a ; strip distgeom.x

@@ -12,10 +12,10 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     fctmin    value below which function is deemed optimized
-c     hguess    initial value for the H-matrix diagonal elements
 c     maxiter   maximum number of iterations during optimization
 c     nextiter  iteration number to use for the first iteration
+c     fctmin    value below which function is deemed optimized
+c     hguess    initial value for the H-matrix diagonal elements
 c
 c
       module minima

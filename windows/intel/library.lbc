@@ -1,6 +1,7 @@
 action.obj
 active.obj
 align.obj
+alterchg.obj
 analysis.obj
 analyz.obj
 angang.obj
@@ -32,6 +33,7 @@ bussi.obj
 calendar.obj
 cell.obj
 center.obj
+cflux.obj
 charge.obj
 chgpen.obj
 chgpot.obj
@@ -54,6 +56,7 @@ cspline.obj
 ctrpot.obj
 cutoffs.obj
 damping.obj
+dcflux.obj
 deflate.obj
 delete.obj
 deriv.obj
@@ -271,7 +274,9 @@ katom.obj
 katoms.obj
 kbond.obj
 kbonds.obj
+kcflux.obj
 kcharge.obj
+kchgflx.obj
 kchgtrn.obj
 kchrge.obj
 kcpen.obj
@@ -305,6 +310,7 @@ kpolar.obj
 kpolr.obj
 krepel.obj
 krepl.obj
+ksolut.obj
 ksolv.obj
 kstbnd.obj
 kstrbnd.obj
@@ -325,6 +331,7 @@ light.obj
 lights.obj
 limits.obj
 linmin.obj
+lusolve.obj
 makeint.obj
 makeref.obj
 makexyz.obj
@@ -395,6 +402,7 @@ poltcg.obj
 polymer.obj
 potent.obj
 potfit.obj
+predict.obj
 pressure.obj
 prmkey.obj
 promo.obj
@@ -408,7 +416,7 @@ prtseq.obj
 prtxyz.obj
 ptable.obj
 qmstuf.obj
-qrfact.obj
+qrsolve.obj
 quatfit.obj
 random.obj
 rattle.obj
@@ -452,6 +460,7 @@ simplex.obj
 sizes.obj
 sktstuf.obj
 socket.obj
+solpot.obj
 solute.obj
 sort.obj
 square.obj

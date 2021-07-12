@@ -20,6 +20,7 @@ c
       use inform
       use keys
       use output
+      use potent
       implicit none
       integer i,next
       character*20 keyword
@@ -53,5 +54,9 @@ c
          end if
    10    continue
       end do
+c
+c     check for use of induced dipole prediction methods
+c
+      if (use_polar)  call predict
       return
       end

@@ -17,11 +17,19 @@ c     a parameter file and modifications specified in a keyfile
 c
 c
       subroutine field
+      use fields
+      use inform
+      use iounit
       use keys
       use potent
+      use sizes
       implicit none
-      integer i
+      integer i,next
+      integer ia,ib
+      logical header
+      character*20 keyword
       character*240 record
+      character*240 string
 c
 c
 c     set the default values for the active potentials
@@ -49,6 +57,7 @@ c
       use_mpole = .true.
       use_polar = .true.
       use_chgtrn = .true.
+      use_chgflx = .true.
       use_rxnfld = .false.
       use_solv = .true.
       use_metal = .false.
@@ -58,6 +67,46 @@ c
 c     read the potential energy force field parameter file
 c
       call getprm
+c
+c     check keywords for biopolymer atom type definitions
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:8) .eq. 'BIOTYPE ') then
+            ia = 0
+            ib = 0
+            string = record(next:240)
+            read (string,*,err=10,end=10)  ia
+            call getword (record,string,next)
+            call getstring (record,string,next)
+            string = record(next:240)
+            read (string,*,err=10,end=10)  ib
+   10       continue
+            if (ia.ge.0 .and. ia.le.maxbio) then
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Additional Biopolymer Type Definitions',
+     &                    //,5x,'BioType',10x,'Atom Type',/)
+               end if
+               biotyp(ia) = ib
+               if (.not. silent) then
+                  write (iout,30)  ia,ib
+   30             format (1x,i8,8x,i8)
+               end if
+
+            else if (ia .gt. maxbio) then
+               write (iout,40)
+   40          format (/,' FIELDS  --  Too many Biopolymer Types;',
+     &                    ' Increase MAXBIO')
+               call fatal
+            end if
+         end if
+      end do
 c
 c     check keywords for potential function control parameters
 c

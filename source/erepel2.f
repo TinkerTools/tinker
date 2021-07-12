@@ -70,7 +70,7 @@ c
          end if
       end do
 c
-c     get multipole first derivatives for the base structure
+c     get repulsion first derivatives for the base structure
 c
       if (.not. twosided) then
          call erepel2a (nlist,list)
@@ -250,6 +250,14 @@ c
 c     rotate the multipole components into the global frame
 c
       call rotpole
+c
+c     compute the induced dipoles at each polarizable atom
+c
+      if (.not. use_polar) then
+         use_polar = .true.
+         call induce
+         use_polar = .false.
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c

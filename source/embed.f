@@ -2315,7 +2315,7 @@ c
       parameter (start=-20)
       parameter (stop=120)
       integer i,j,k,sum
-      integer leng,trimtext
+      integer trimtext
       integer bin(start:stop)
       integer bin2(start:stop)
       real*8 xi,yi,zi,size
@@ -2371,8 +2371,7 @@ c
 c
 c     print the normalized fractional distance probability
 c
-      leng = trimtext(title)
-      write (iout,10)  title(1:leng)
+      write (iout,10)  title(1:trimtext(title))
    10 format (/,' Fractional Distance Distribution ',a,/)
       do i = start, stop
          write (iout,20)  size*dble(i),fdist(i),fdist2(i)
@@ -2403,7 +2402,7 @@ c
       integer i,j,k,npair
       integer nhierr,nloerr
       integer ihi,jhi,ilo,jlo
-      integer leng,trimtext
+      integer trimtext
       real*8 rms,himax,lomax
       real*8 dist,hierr,loerr
       character*240 title
@@ -2451,8 +2450,7 @@ c
 c
 c     print the maximal and rms bound deviations
 c
-      leng = trimtext(title)
-      write (iout,10)  title(1:leng)
+      write (iout,10)  title(1:trimtext(title))
    10 format (/,' Fit to Bounds ',a)
       write (iout,20)  nhierr,npair,nloerr,npair,himax,
      &                 ihi,jhi,lomax,ilo,jlo,rms

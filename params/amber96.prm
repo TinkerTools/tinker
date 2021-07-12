@@ -2106,8 +2106,8 @@ charge      340              -0.3662
 charge      341               0.1123
 charge      342               0.5972
 charge      343              -0.5679
-charge      344              -0.8400      !! Tinker
-charge      345               0.4200      !! Tinker
+charge      344              -0.4630
+charge      345               0.2315
 charge      346              -0.4157
 charge      347               0.2719
 charge      348              -0.1490

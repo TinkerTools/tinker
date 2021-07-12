@@ -34,7 +34,8 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,ideal,force
+      real*8 e,eps
+      real*8 ideal,force
       real*8 fold,factor
       real*8 dot,cosine
       real*8 angle,fgrp
@@ -69,6 +70,10 @@ c
       end do
       if (nangle .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -82,8 +87,9 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
-!$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer,
+!$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,
+!$OMP& use,x,y,z,cang,qang,pang,sang,angtyp,angunit,eps,use_group,
+!$OMP& use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ea,nea,aea)
 !$OMP DO reduction(+:ea,nea,aea) schedule(guided)
@@ -136,66 +142,64 @@ c
                   call image (xab,yab,zab)
                   call image (xcb,ycb,zcb)
                end if
-               rab2 = xab*xab + yab*yab + zab*zab
-               rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-               if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-                  dot = xab*xcb + yab*ycb + zab*zcb
-                  cosine = dot / sqrt(rab2*rcb2)
-                  cosine = min(1.0d0,max(-1.0d0,cosine))
-                  angle = radian * acos(cosine)
-                  if (angtyp(i) .eq. 'HARMONIC') then
-                     dt = angle - ideal
-                     dt2 = dt * dt
-                     dt3 = dt2 * dt
-                     dt4 = dt2 * dt2
-                     e = angunit * force * dt2
-     &                      * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
-                  else if (angtyp(i) .eq. 'LINEAR') then
-                     factor = 2.0d0 * angunit * radian**2
-                     e = factor * force * (1.0d0+cosine)
-                  else if (angtyp(i) .eq. 'FOURIER') then
-                     fold = afld(i)
-                     factor = 2.0d0 * angunit * (radian/fold)**2
-                     cosine = cos((fold*angle-ideal)/radian)
-                     e = factor * force * (1.0d0+cosine)
-                  end if
+               rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+               rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+               dot = xab*xcb + yab*ycb + zab*zcb
+               cosine = dot / sqrt(rab2*rcb2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+               if (angtyp(i) .eq. 'HARMONIC') then
+                  dt = angle - ideal
+                  dt2 = dt * dt
+                  dt3 = dt2 * dt
+                  dt4 = dt2 * dt2
+                  e = angunit * force * dt2
+     &                   * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+               else if (angtyp(i) .eq. 'LINEAR') then
+                  factor = 2.0d0 * angunit * radian**2
+                  e = factor * force * (1.0d0+cosine)
+               else if (angtyp(i) .eq. 'FOURIER') then
+                  fold = afld(i)
+                  factor = 2.0d0 * angunit * (radian/fold)**2
+                  cosine = cos((fold*angle-ideal)/radian)
+                  e = factor * force * (1.0d0+cosine)
+               end if
 c
 c     scale the interaction based on its group membership
 c
-                  if (use_group)  e = e * fgrp
+               if (use_group)  e = e * fgrp
 c
 c     increment the total bond angle bending energy
 c
-                  nea = nea + 1
-                  ea = ea + e
-                  aea(ib) = aea(ib) + e
+               nea = nea + 1
+               ea = ea + e
+               aea(ib) = aea(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (e .gt. 5.0d0)
-                  if (debug .or. (verbose.and.huge)) then
-                     if (header) then
-                        header = .false.
-                        write (iout,20)
-   20                   format (/,' Individual Angle Bending',
-     &                             ' Interactions :',
-     &                          //,' Type',18x,'Atom Names',18x,
-     &                             'Ideal',4x,'Actual',6x,'Energy',/)
-                     end if
-                     label = 'Angle    '
-                     if (angtyp(i) .eq. 'LINEAR') then
-                        label = 'Angle-Lin'
-                     else if (angtyp(i) .eq. 'FOURIER') then
-                        label = 'Angle-Cos'
-                        ideal = (ideal+180.0d0) / fold
-                        if (angle-ideal .gt. 180.0d0/fold)
-     &                     ideal = ideal + 360.0d0/fold
-                     end if
-                     write (iout,30)  label,ia,name(ia),ib,name(ib),
-     &                                ic,name(ic),ideal,angle,e
-   30                format (1x,a9,1x,i7,'-',a3,i7,'-',a3,i7,
-     &                          '-',a3,2x,2f10.4,f12.4)
+               huge = (e .gt. 5.0d0)
+               if (debug .or. (verbose.and.huge)) then
+                  if (header) then
+                     header = .false.
+                     write (iout,20)
+   20                format (/,' Individual Angle Bending',
+     &                          ' Interactions :',
+     &                       //,' Type',18x,'Atom Names',18x,
+     &                          'Ideal',4x,'Actual',6x,'Energy',/)
                   end if
+                  label = 'Angle    '
+                  if (angtyp(i) .eq. 'LINEAR') then
+                     label = 'Angle-Lin'
+                  else if (angtyp(i) .eq. 'FOURIER') then
+                     label = 'Angle-Cos'
+                     ideal = (ideal+180.0d0) / fold
+                     if (angle-ideal .gt. 180.0d0/fold)
+     &                  ideal = ideal + 360.0d0/fold
+                  end if
+                  write (iout,30)  label,ia,name(ia),ib,name(ib),
+     &                             ic,name(ic),ideal,angle,e
+   30             format (1x,a9,1x,i7,'-',a3,i7,'-',a3,i7,
+     &                       '-',a3,2x,2f10.4,f12.4)
                end if
 c
 c     compute the projected in-plane angle bend energy
@@ -236,47 +240,45 @@ c
                   call image (xap,yap,zap)
                   call image (xcp,ycp,zcp)
                end if
-               rap2 = xap*xap + yap*yap + zap*zap
-               rcp2 = xcp*xcp + ycp*ycp + zcp*zcp
-               if (rap2.ne.0.0d0 .and. rcp2.ne.0.0d0) then
-                  dot = xap*xcp + yap*ycp + zap*zcp
-                  cosine = dot / sqrt(rap2*rcp2)
-                  cosine = min(1.0d0,max(-1.0d0,cosine))
-                  angle = radian * acos(cosine)
-                  dt = angle - ideal
-                  dt2 = dt * dt
-                  dt3 = dt2 * dt
-                  dt4 = dt2 * dt2
-                  e = angunit * force * dt2
-     &                   * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+               rap2 = max(xap*xap+yap*yap+zap*zap,eps)
+               rcp2 = max(xcp*xcp+ycp*ycp+zcp*zcp,eps)
+               dot = xap*xcp + yap*ycp + zap*zcp
+               cosine = dot / sqrt(rap2*rcp2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+               dt = angle - ideal
+               dt2 = dt * dt
+               dt3 = dt2 * dt
+               dt4 = dt2 * dt2
+               e = angunit * force * dt2
+     &                * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
 c
 c     scale the interaction based on its group membership
 c
-                  if (use_group)  e = e * fgrp
+               if (use_group)  e = e * fgrp
 c
 c     increment the total bond angle bending energy
 c
-                  nea = nea + 1
-                  ea = ea + e
-                  aea(ib) = aea(ib) + e
+               nea = nea + 1
+               ea = ea + e
+               aea(ib) = aea(ib) + e
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (e .gt. 5.0d0)
-                  if (debug .or. (verbose.and.huge)) then
-                     if (header) then
-                        header = .false.
-                        write (iout,40)
-   40                   format (/,' Individual Angle Bending',
-     &                             ' Interactions :',
-     &                          //,' Type',18x,'Atom Names',18x,
-     &                             'Ideal',4x,'Actual',6x,'Energy',/)
-                     end if
-                     write (iout,50)  ia,name(ia),ib,name(ib),ic,
-     &                                name(ic),ideal,angle,e
-   50                format (' Angle-IP',2x,i7,'-',a3,i7,'-',a3,i7,
-     &                          '-',a3,2x,2f10.4,f12.4)
+               huge = (e .gt. 5.0d0)
+               if (debug .or. (verbose.and.huge)) then
+                  if (header) then
+                     header = .false.
+                     write (iout,40)
+   40                format (/,' Individual Angle Bending',
+     &                          ' Interactions :',
+     &                       //,' Type',18x,'Atom Names',18x,
+     &                          'Ideal',4x,'Actual',6x,'Energy',/)
                   end if
+                  write (iout,50)  ia,name(ia),ib,name(ib),ic,
+     &                             name(ic),ideal,angle,e
+   50             format (' Angle-IP',2x,i7,'-',a3,i7,'-',a3,i7,
+     &                       '-',a3,2x,2f10.4,f12.4)
                end if
             end if
          end if

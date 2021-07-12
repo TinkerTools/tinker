@@ -275,6 +275,7 @@ c
       tot1 = dble(ndot-1)
       do i = 1, ndot
          h = -1.0d0 + 2.0d0*dble(i-1)/tot1
+         h = min(1.0d0,h)
          theta = acos(h)
          if (i.eq.1 .or. i.eq.ndot) then
             phi = 0.0d0

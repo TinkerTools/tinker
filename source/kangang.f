@@ -88,30 +88,32 @@ c
       do i = 1, n
          nang = n12(i) * (n12(i)-1) / 2
          it = class(i)
-         do j = 1, nang-1
-            jang = anglist(j,i)
-            ia = iang(1,jang)
-            ic = iang(3,jang)
-            m = 1
-            if (atomic(ia) .le. 1)  m = m + 1
-            if (atomic(ic) .le. 1)  m = m + 1
-            fa = anan(m,it)
-            do k = j+1, nang
-               kang = anglist(k,i)
-               ia = iang(1,kang)
-               ic = iang(3,kang)
+         if (it .ne. 0) then
+            do j = 1, nang-1
+               jang = anglist(j,i)
+               ia = iang(1,jang)
+               ic = iang(3,jang)
                m = 1
                if (atomic(ia) .le. 1)  m = m + 1
                if (atomic(ic) .le. 1)  m = m + 1
-               faa = fa * anan(m,it)
-               if (faa .ne. 0.0d0) then
-                  nangang = nangang + 1
-                  iaa(1,nangang) = jang
-                  iaa(2,nangang) = kang
-                  kaa(nangang) = faa
-               end if
+               fa = anan(m,it)
+               do k = j+1, nang
+                  kang = anglist(k,i)
+                  ia = iang(1,kang)
+                  ic = iang(3,kang)
+                  m = 1
+                  if (atomic(ia) .le. 1)  m = m + 1
+                  if (atomic(ic) .le. 1)  m = m + 1
+                  faa = fa * anan(m,it)
+                  if (faa .ne. 0.0d0) then
+                     nangang = nangang + 1
+                     iaa(1,nangang) = jang
+                     iaa(2,nangang) = kang
+                     kaa(nangang) = faa
+                  end if
+               end do
             end do
-         end do
+         end if
       end do
 c
 c     turn off the angle-angle potential if it is not used

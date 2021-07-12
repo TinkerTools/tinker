@@ -27,7 +27,6 @@ c
       use keys
       use mdstuf
       use potent
-      use solute
       use stodyn
       use usage
       implicit none

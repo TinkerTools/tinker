@@ -12,53 +12,47 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dampewald" generates coefficients for Ewald error function
-c     damping for powers of the interatomic distance
+c     "dampewald" finds coefficients for error function damping used
+c     for Ewald real space interactions
 c
 c
-      subroutine dampewald (rorder,r,r2,scale)
+      subroutine dampewald (rorder,r,r2,scale,dmpe)
       use ewald
       use math
       implicit none
-      integer i,maxi
+      integer i,niter
       integer rorder
-      real*8 r,r2,bfac
-      real*8 alsq2,alsq2n
-      real*8 exp2a,ralpha
-      real*8 scale(*)
-      real*8, allocatable :: bn(:)
+      real*8 r,r2,scale
+      real*8 bfac,erfc
+      real*8 aesq2,afac
+      real*8 expterm,ra
+      real*8 bn(0:5)
+      real*8 dmpe(*)
+      external erfc
 c
 c
-c     initialize Ewald damping factors and set storage size
+c     initialize the Ewald damping factor coefficients
 c
       do i = 1, rorder
-         scale(i) = 1.0d0
+         dmpe(i) = scale
       end do
-      maxi = (rorder-1) / 2
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (bn(0:maxi))
 c     
 c     compute the successive Ewald damping factors
 c
-      ralpha = aewald * r
-      bn(0) = erfc(ralpha) / r
-      scale(1) = bn(0)
-      alsq2 = 2.0d0 * aewald**2
-      alsq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
-      exp2a = exp(-ralpha**2)
-      do i = 1, maxi
+      ra = aewald * r
+      bn(0) = erfc(ra) / r
+      dmpe(1) = scale * bn(0)
+      expterm = exp(-ra*ra)
+      aesq2 = 2.0d0 * aewald * aewald
+      afac = 0.0d0
+      if (aewald .gt. 0.0d0)  afac = 1.0d0 / (rootpi*aewald)
+      niter = (rorder-1) / 2
+      do i = 1, niter
          bfac = dble(2*i-1)
-         alsq2n = alsq2 * alsq2n
-         bn(i) = (bfac*bn(i-1)+alsq2n*exp2a) / r2
-         scale(2*i+1) = bn(i)
+         afac = aesq2 * afac
+         bn(i) = (bfac*bn(i-1)+afac*expterm) / r2
+         dmpe(2*i+1) = scale * bn(i)
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (bn)
       return
       end
 c
@@ -70,8 +64,9 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "dampthole" generates coefficients for the Thole damping
-c     function for powers of the interatomic distance
+c     "dampthole" finds coefficients for the original Thole damping
+c     function used by AMOEBA or for the alternate direct polarization
+c     damping used by AMOEBA+
 c
 c     literature reference:
 c
@@ -79,7 +74,91 @@ c     B. T. Thole, "Molecular Polarizabilities Calculated with a
 c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
 c
 c
-      subroutine dampthole (i,k,rorder,r,scale)
+      subroutine dampthole (i,k,rorder,r,dmpik)
+      use polar
+      use polpot
+      implicit none
+      integer i,j,k
+      integer rorder
+      real*8 r,damp
+      real*8 damp2
+      real*8 damp3
+      real*8 expdamp
+      real*8 pgamma
+      real*8 dmpik(*)
+c
+c
+c     initialize the Thole damping factors to a value of one
+c
+      do j = 1, rorder
+         dmpik(j) = 1.0d0
+      end do
+c
+c     use alternate Thole model for AMOEBA+ direct polarization
+c
+      damp = pdamp(i) * pdamp(k)
+      if (use_dirdamp) then
+         pgamma = min(dirdamp(i),dirdamp(k))
+         if (pgamma .eq. 0.0d0)  pgamma = max(dirdamp(i),dirdamp(k))
+         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
+            damp = pgamma * (r/damp)**(1.5d0)
+            if (damp .lt. 50.0d0) then
+               expdamp = exp(-damp)
+               dmpik(3) = 1.0d0 - expdamp
+               dmpik(5) = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+               if (rorder .ge. 7) then
+                  damp2 = damp * damp
+                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                  +0.15d0*damp2)
+               end if
+            end if
+         end if
+c
+c     use original AMOEBA Thole polarization damping factors
+c
+      else
+         pgamma = min(thole(i),thole(k))
+         if (pgamma .eq. 0.0d0)  pgamma = max(thole(i),thole(k))
+         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
+            damp = pgamma * (r/damp)**3
+            if (damp .lt. 50.0d0) then
+               expdamp = exp(-damp)
+               dmpik(3) = 1.0d0 - expdamp
+               dmpik(5) = 1.0d0 - expdamp*(1.0d0+damp)
+               if (rorder .ge. 7) then
+                  damp2 = damp * damp
+                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+damp+0.6d0*damp2)
+                  if (rorder .ge. 9) then
+                     damp3 = damp * damp2
+                     dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
+     &                                     +(18.0d0/35.0d0)*damp2
+     &                                     +(9.0d0/35.0d0)*damp3)
+                  end if
+               end if
+            end if
+         end if
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine dampthole2  --  original Thole damping values  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "dampthole2" finds coefficients for the original Thole damping
+c     function used by AMOEBA and for mutual polarization by AMOEBA+
+c
+c     literature reference:
+c
+c     B. T. Thole, "Molecular Polarizabilities Calculated with a
+c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
+c
+c
+      subroutine dampthole2 (i,k,rorder,r,dmpik)
       use polar
       implicit none
       integer i,j,k
@@ -88,43 +167,35 @@ c
       real*8 damp2
       real*8 damp3
       real*8 expdamp
-      real*8 pdi,pti
-      real*8 pdk,ptk
       real*8 pgamma
-      real*8 scale(*)
+      real*8 dmpik(*)
 c
 c
 c     initialize the Thole damping factors to a value of one
 c
       do j = 1, rorder
-         scale(j) = 1.0d0
+         dmpik(j) = 1.0d0
       end do
 c
-c     get the Thole damping parameters for the two sites
+c     assign original Thole polarization model damping factors
 c
-      pdi = pdamp(i)
-      pti = thole(i)
-      pdk = pdamp(k)
-      ptk = thole(k)
-c
-c     assign the Thole polarization model damping factors
-c
-      damp = pdi * pdk
-      if (damp .ne. 0.0d0) then
-         pgamma = min(pti,ptk)
+      damp = pdamp(i) * pdamp(k)
+      pgamma = min(thole(i),thole(k))
+      if (pgamma .eq. 0.0d0)  pgamma = max(thole(i),thole(k))
+      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
          damp = pgamma * (r/damp)**3
          if (damp .lt. 50.0d0) then
             expdamp = exp(-damp)
-            scale(3) = 1.0d0 - expdamp
-            scale(5) = 1.0d0 - (1.0d0+damp)*expdamp
+            dmpik(3) = 1.0d0 - expdamp
+            dmpik(5) = 1.0d0 - expdamp*(1.0d0+damp)
             if (rorder .ge. 7) then
                damp2 = damp * damp
-               scale(7) = 1.0d0 - (1.0d0+damp+0.6d0*damp2)*expdamp
+               dmpik(7) = 1.0d0 - expdamp*(1.0d0+damp+0.6d0*damp2)
                if (rorder .ge. 9) then
                   damp3 = damp * damp2
-                  scale(9) = 1.0d0 - (1.0d0 + damp
-     &                          + (18.0d0/35.0d0)*damp2
-     &                          + (9.0d0/35.0d0)*damp3) * expdamp
+                  dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
+     &                                  +(18.0d0/35.0d0)*damp2
+     &                                  +(9.0d0/35.0d0)*damp3)
                end if
             end if
          end if
@@ -140,8 +211,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "damppole" generates coefficients for the charge penetration
-c     damping function for powers of the interatomic distance
+c     "damppole" finds coefficients for two alternative Gordon charge
+c     penetration damping function
 c
 c     literature references:
 c
@@ -401,133 +472,6 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine damppolar  --  polarization damping coefficents  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "damppolar" generates coefficients for the charge penetration
-c     damping function used for polarization interactions
-c
-c
-      subroutine damppolar (r,alphai,alphak,dmpi,dmpk,dmpik)
-      use mplpot
-      implicit none
-      real*8 termi,termk
-      real*8 termi2,termk2
-      real*8 alphai,alphak
-      real*8 alphai2,alphak2
-      real*8 r,eps,diff
-      real*8 expi,expk
-      real*8 dampi,dampk
-      real*8 dampi2,dampi3
-      real*8 dampi4,dampi5
-      real*8 dampk2,dampk3
-      real*8 dmpi(*)
-      real*8 dmpk(*)
-      real*8 dmpik(*)
-c
-c
-c     compute tolerance and exponential damping factors
-c
-      eps = 0.001d0
-      diff = abs(alphai-alphak)
-      dampi = alphai * r
-      dampk = alphak * r
-      expi = exp(-dampi)
-      expk = exp(-dampk)
-c
-c     core-valence charge penetration damping for Gordon f1
-c
-      if (pentyp .eq. 'GORDON1') then
-         dampi2 = dampi * dampi
-         dampi3 = dampi * dampi2
-         dmpi(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2)*expi
-         dmpi(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2 
-     &                + dampi3/6.0d0)*expi
-         if (diff .lt. eps) then
-            dmpk(3) = dmpi(3)
-            dmpk(5) = dmpi(5)
-         else
-            dampk2 = dampk * dampk
-            dampk3 = dampk * dampk2
-            dmpk(3) = 1.0d0 - (1.0d0 + dampk + 0.5d0*dampk2)*expk
-            dmpk(5) = 1.0d0 - (1.0d0 + dampk + 0.5d0*dampk2
-     &                   + dampk3/6.0d0)*expk
-         end if
-c
-c     valence-valence charge penetration damping for Gordon f1
-c
-         if (diff .lt. eps) then
-            dampi4 = dampi2 * dampi2
-            dampi5 = dampi2 * dampi3
-            dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
-     &                    + 7.0d0*dampi3/48.0d0
-     &                    + dampi4/48.0d0)*expi
-            dmpik(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
-     &                    + dampi3/6.0d0 + dampi4/24.0d0
-     &                    + dampi5/144.0d0)*expi
-         else
-            alphai2 = alphai * alphai
-            alphak2 = alphak * alphak
-            termi = alphak2 / (alphak2-alphai2)
-            termk = alphai2 / (alphai2-alphak2)
-            termi2 = termi * termi
-            termk2 = termk * termk
-            dmpik(3) = 1.0d0 - termi2*(1.0d0 + dampi
-     &                            + 0.5d0*dampi2)*expi
-     &                    - termk2*(1.0d0 + dampk
-     &                         + 0.5d0*dampk2)*expk
-     &                    - 2.0d0*termi2*termk*(1.0d0+dampi)*expi
-     &                    - 2.0d0*termk2*termi*(1.0d0+dampk)*expk
-            dmpik(5) = 1.0d0 - termi2*(1.0d0 + dampi + 0.5d0*dampi2
-     &                                    + dampi3/6.0d0)*expi
-     &                    - termk2*(1.0d0 + dampk + 0.5d0*dampk2
-     &                                 + dampk3/6.00)*expk
-     &                    - 2.0d0*termi2*termk
-     &                         *(1.0d0 + dampi + dampi2/3.0d0)*expi
-     &                    - 2.0d0*termk2*termi
-     &                         *(1.0d0 + dampk + dampk2/3.0d0)*expk
-         end if
-c
-c     core-valence charge penetration damping for Gordon f2
-c
-      else if (pentyp .eq. 'GORDON2') then
-         dampi2 = dampi * dampi
-         dmpi(3) = 1.0d0 - (1.0d0 + dampi)*expi
-         dmpi(5) = 1.0d0 - (1.0d0 + dampi + dampi2/3.0d0)*expi
-         if (diff .lt. eps) then
-            dmpk(3) = dmpi(3)
-            dmpk(5) = dmpi(5)
-         else
-            dampk2 = dampk * dampk
-            dmpk(3) = 1.0d0 - (1.0d0 + dampk)*expk
-            dmpk(5) = 1.0d0 - (1.0d0 + dampk + dampk2/3.0d0)*expk
-         end if
-c
-c     valence-valence charge penetration damping for Gordon f2
-c
-         if (diff .lt. eps) then
-            dmpik(3) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2)*expi
-            dmpik(5) = 1.0d0 - (1.0d0 + dampi + 0.5d0*dampi2
-     &                    + dampi3/6.0d0)*expi
-         else
-            alphai2 = alphai * alphai
-            alphak2 = alphak * alphak
-            termi = alphak2 / (alphak2-alphai2)
-            termk = alphai2 / (alphai2-alphak2)
-            dmpik(3) = 1.0d0 - termi*(1.0d0 + dampi)*expi
-     &                    - termk*(1.0d0 + dampk)*expk
-            dmpik(5) = 1.0d0 - termi*(1.0d0 + dampi + dampi2/3.0d0)*expi
-     &                    - termk*(1.0d0 + dampk + dampk2/3.0d0)*expk
-         end if
-      end if
-      return
-      end
-c
-c
 c     ################################################################
 c     ##                                                            ##
 c     ##  subroutine dampdir  --  direct field damping coefficents  ##
@@ -535,8 +479,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "dampdir" generates coefficients for the direct field damping
-c     function for powers of the interatomic distance
+c     "dampdir" finds coefficients for two alternative Gordon direct
+c     field damping functions
 c
 c
       subroutine dampdir (r,alphai,alphak,dmpi,dmpk)
@@ -621,8 +565,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "dampmut" generates coefficients for the mutual field damping
-c     function for powers of the interatomic distance
+c     "dampmut" finds coefficients for two alternative Gordon mutual
+c     field damping functions
 c
 c
       subroutine dampmut (r,alphai,alphak,dmpik)
@@ -719,8 +663,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "damppot" generates coefficients for the charge penetration
-c     damping function used for the electrostatic potential
+c     "damppot" finds coefficients for two alternative Gordon charge
+c     penetration damping functions for the electrostatic potential
 c
 c
       subroutine damppot (r,alphak,dmpk)
@@ -759,15 +703,15 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine damprep  --  find repulsion damping coefficents  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine damprep  --  Pauli exchange repulsion damping  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "damprep" generates coefficients for the Pauli repulsion
-c     damping function for powers of the interatomic distance
+c     "damprep" finds coefficients for the Pauli repulsion damping
+c     function used by HIPPO
 c
 c     literature reference:
 c
@@ -813,7 +757,6 @@ c
          r4 = r3 * r
          r5 = r4 * r
          r6 = r5 * r
-         r7 = r6 * r
          dmpi2 = 0.5d0 * dmpi
          dampi = dmpi2 * r
          expi = exp(-dampi)
@@ -821,18 +764,21 @@ c
          dmpi23 = dmpi22 * dmpi2
          dmpi24 = dmpi23 * dmpi2
          dmpi25 = dmpi24 * dmpi2
-         dmpi26 = dmpi25 * dmpi2
-         pre = 128.0d0        
+         pre = 2.0d0
          s = (r + dmpi2*r2 + dmpi22*r3/3.0d0) * expi
          ds = (dmpi22*r3 + dmpi23*r4) * expi / 3.0d0
          d2s = dmpi24 * expi * r5 / 9.0d0
          d3s = dmpi25 * expi * r6 / 45.0d0
-         d4s = (dmpi25*r6 + dmpi26*r7) * expi / 315.0d0
-         if (rorder .ge. 11) then
-            r8 = r7 * r
-            dmpi27 = dmpi2 * dmpi26
-            d5s = (dmpi25*r6 + dmpi26*r7 + dmpi27*r8/3.0d0)
-     &                * expi / 945.0d0
+         if (rorder .ge. 9) then
+            r7 = r6 * r
+            dmpi26 = dmpi25 * dmpi2
+            d4s = (dmpi25*r6 + dmpi26*r7) * expi / 315.0d0
+            if (rorder .ge. 11) then
+               r8 = r7 * r
+               dmpi27 = dmpi2 * dmpi26
+               d5s = (dmpi25*r6 + dmpi26*r7 + dmpi27*r8/3.0d0)
+     &                   * expi / 945.0d0
+            end if
          end if
 c
 c     treat the case where alpha damping exponents are unequal
@@ -840,7 +786,6 @@ c
       else
          r3 = r2 * r
          r4 = r3 * r
-         r5 = r4 * r
          dmpi2 = 0.5d0 * dmpi
          dmpk2 = 0.5d0 * dmpk
          dampi = dmpi2 * r
@@ -850,13 +795,11 @@ c
          dmpi22 = dmpi2 * dmpi2
          dmpi23 = dmpi22 * dmpi2
          dmpi24 = dmpi23 * dmpi2
-         dmpi25 = dmpi24 * dmpi2
          dmpk22 = dmpk2 * dmpk2
          dmpk23 = dmpk22 * dmpk2
          dmpk24 = dmpk23 * dmpk2
-         dmpk25 = dmpk24 * dmpk2
          term = dmpi22 - dmpk22
-         pre = 8192.0d0 * dmpi23 * dmpk23 / term**4
+         pre = 128.0d0 * dmpi23 * dmpk23 / term**4
          tmp = 4.0d0 * dmpi2 * dmpk2 / term
          s = (dampi-tmp)*expk + (dampk+tmp)*expi
          ds = (dmpi2*dmpk2*r2 - 4.0d0*dmpi2*dmpk22*r/term
@@ -887,50 +830,55 @@ c
      &             + (8.0d0/5.0d0)*dmpi23*dmpk2*r2/term
      &             + 4.0d0*dmpi22*dmpk2*r/term
      &             + 4.0d0/term*dmpi2*dmpk2) * expi
-         d4s = (dmpi2*dmpk24*r5/105.0d0
-     &             + (2.0d0/35.0d0)*dmpi2*dmpk23*r4
-     &             + dmpi2*dmpk22*r3/7.0d0
-     &             + dmpi2*dmpk2*r2/7.0d0
-     &             - (4.0d0/105.0d0)*dmpi2*dmpk25*r4/term
-     &             - (8.0d0/21.0d0)*dmpi2*dmpk24*r3/term
-     &             - (12.0d0/7.0d0)*dmpi2*dmpk23*r2/term
-     &             - 4.0d0*dmpi2*dmpk22*r/term
-     &             - 4.0d0*dmpi2*dmpk2/term) * expk
-     &       + (dmpi24*dmpk2*r5/105.0d0
-     &             + (2.0d0/35.0d0)*dmpi23*dmpk2*r4
-     &             + dmpi22*dmpk2*r3/7.0d0
-     &             + dmpi2*dmpk2*r2/7.0d0
-     &             + (4.0d0/105.0d0)*dmpi25*dmpk2*r4/term
-     &             + (8.0d0/21.0d0)*dmpi24*dmpk2*r3/term
-     &             + (12.0d0/7.0d0)*dmpi23*dmpk2*r2/term
-     &             + 4.0d0*dmpi22*dmpk2*r/term
-     &             + 4.0d0*dmpi2*dmpk2/term) * expi
-         if (rorder .ge. 11) then
-            r6 = r5 * r
-            dmpi26 = dmpi25 * dmpi2
-            dmpk26 = dmpk25 * dmpk2
-            d5s = (dmpi2*dmpk25*r6/945.0d0
-     &                + (2.0d0/189.0d0)*dmpi2*dmpk24*r5
-     &                + dmpi2*dmpk23*r4/21.0d0
-     &                + dmpi2*dmpk22*r3/9.0d0
-     &                + dmpi2*dmpk2*r2/9.0d0
-     &                - (4.0d0/945.0d0)*dmpi2*dmpk26*r5/term
-     &                - (4.0d0/63.0d0)*dmpi2*dmpk25*r4/term
-     &                - (4.0d0/9.0d0)*dmpi2*dmpk24*r3/term
-     &                - (16.0d0/9.0d0)*dmpi2*dmpk23*r2/term
+         if (rorder .ge. 9) then
+            r5 = r4 * r
+            dmpi25 = dmpi24 * dmpi2
+            dmpk25 = dmpk24 * dmpk2
+            d4s = (dmpi2*dmpk24*r5/105.0d0
+     &                + (2.0d0/35.0d0)*dmpi2*dmpk23*r4
+     &                + dmpi2*dmpk22*r3/7.0d0
+     &                + dmpi2*dmpk2*r2/7.0d0
+     &                - (4.0d0/105.0d0)*dmpi2*dmpk25*r4/term
+     &                - (8.0d0/21.0d0)*dmpi2*dmpk24*r3/term
+     &                - (12.0d0/7.0d0)*dmpi2*dmpk23*r2/term
      &                - 4.0d0*dmpi2*dmpk22*r/term
      &                - 4.0d0*dmpi2*dmpk2/term) * expk
-     &          + (dmpi25*dmpk2*r6/945.0d0
-     &                + (2.0d0/189.0d0)*dmpi24*dmpk2*r5
-     &                + dmpi23*dmpk2*r4/21.0d0
-     &                + dmpi22*dmpk2*r3/9.0d0
-     &                + dmpi2*dmpk2*r2/9.0d0
-     &                + (4.0d0/945.0d0)*dmpi26*dmpk2*r5/term
-     &                + (4.0d0/63.0d0)*dmpi25*dmpk2*r4/term
-     &                + (4.0d0/9.0d0)*dmpi24*dmpk2*r3/term
-     &                + (16.0d0/9.0d0)*dmpi23*dmpk2*r2/term
+     &          + (dmpi24*dmpk2*r5/105.0d0
+     &                + (2.0d0/35.0d0)*dmpi23*dmpk2*r4
+     &                + dmpi22*dmpk2*r3/7.0d0
+     &                + dmpi2*dmpk2*r2/7.0d0
+     &                + (4.0d0/105.0d0)*dmpi25*dmpk2*r4/term
+     &                + (8.0d0/21.0d0)*dmpi24*dmpk2*r3/term
+     &                + (12.0d0/7.0d0)*dmpi23*dmpk2*r2/term
      &                + 4.0d0*dmpi22*dmpk2*r/term
      &                + 4.0d0*dmpi2*dmpk2/term) * expi
+            if (rorder .ge. 11) then
+               r6 = r5 * r
+               dmpi26 = dmpi25 * dmpi2
+               dmpk26 = dmpk25 * dmpk2
+               d5s = (dmpi2*dmpk25*r6/945.0d0
+     &                   + (2.0d0/189.0d0)*dmpi2*dmpk24*r5
+     &                   + dmpi2*dmpk23*r4/21.0d0
+     &                   + dmpi2*dmpk22*r3/9.0d0
+     &                   + dmpi2*dmpk2*r2/9.0d0
+     &                   - (4.0d0/945.0d0)*dmpi2*dmpk26*r5/term
+     &                   - (4.0d0/63.0d0)*dmpi2*dmpk25*r4/term
+     &                   - (4.0d0/9.0d0)*dmpi2*dmpk24*r3/term
+     &                   - (16.0d0/9.0d0)*dmpi2*dmpk23*r2/term
+     &                   - 4.0d0*dmpi2*dmpk22*r/term
+     &                   - 4.0d0*dmpi2*dmpk2/term) * expk
+     &             + (dmpi25*dmpk2*r6/945.0d0
+     &                   + (2.0d0/189.0d0)*dmpi24*dmpk2*r5
+     &                   + dmpi23*dmpk2*r4/21.0d0
+     &                   + dmpi22*dmpk2*r3/9.0d0
+     &                   + dmpi2*dmpk2*r2/9.0d0
+     &                   + (4.0d0/945.0d0)*dmpi26*dmpk2*r5/term
+     &                   + (4.0d0/63.0d0)*dmpi25*dmpk2*r4/term
+     &                   + (4.0d0/9.0d0)*dmpi24*dmpk2*r3/term
+     &                   + (16.0d0/9.0d0)*dmpi23*dmpk2*r2/term
+     &                   + 4.0d0*dmpi22*dmpk2*r/term
+     &                   + 4.0d0*dmpi2*dmpk2/term) * expi
+            end if
          end if
       end if
 c
@@ -940,15 +888,17 @@ c
       ds = ds * rr3
       d2s = d2s * rr5
       d3s = d3s * rr7
-      d4s = d4s * rr9
-      d5s = d5s * rr11
       dmpik(1) = 0.5d0 * pre * s * s
       dmpik(3) = pre * s * ds
       dmpik(5) = pre * (s*d2s + ds*ds)
       dmpik(7) = pre * (s*d3s + 3.0d0*ds*d2s)
-      dmpik(9) = pre * (s*d4s + 4.0d0*ds*d3s + 3.0d0*d2s*d2s)
-      if (rorder .ge. 11) then
-         dmpik(11) = pre * (s*d5s + 5.0d0*ds*d4s + 10.0d0*d2s*d3s)
+      if (rorder .ge. 9) then
+         d4s = d4s * rr9
+         dmpik(9) = pre * (s*d4s + 4.0d0*ds*d3s + 3.0d0*d2s*d2s)
+         if (rorder .ge. 11) then
+            d5s = d5s * rr11
+            dmpik(11) = pre * (s*d5s + 5.0d0*ds*d4s + 10.0d0*d2s*d3s)
+         end if
       end if
       return
       end

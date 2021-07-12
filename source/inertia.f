@@ -41,15 +41,15 @@ c
       real*8 phi,theta,psi
       real*8 moment(3),vec(3,3)
       real*8 tensor(3,3),a(3,3)
-      logical print,move
+      logical print,moved
 c
 c
 c     decide upon the type of output desired
 c
       print = .false.
-      move = .false.
+      moved = .false.
       if (mode.eq.1 .or. mode.eq.3)  print = .true.
-      if (mode.eq.2 .or. mode.eq.3)  move = .true.
+      if (mode.eq.2 .or. mode.eq.3)  moved = .true.
 c
 c     compute the position of the center of mass
 c
@@ -131,7 +131,7 @@ c
 c
 c     principal moment axes form rows of Euler rotation matrix
 c
-      if (move) then
+      if (moved) then
          do i = 1, 3
             do j = 1, 3
                a(i,j) = vec(j,i)

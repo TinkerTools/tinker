@@ -37,12 +37,12 @@ c     nv      number of vertices
 c     nen     number of concave edges
 c     nfn     number of concave faces
 c     nc      number of circles
-c     nep     number of convex edges
+c     neq     number of convex edges
 c     nfs     number of saddle faces
 c     ncy     number of cycles
-c     fpncy   number of cycles bounding convex face
-c     nfp     number of convex faces
-c     cynep   number of convex edges in cycle
+c     fqncy   number of cycles bounding convex face
+c     nfq     number of convex faces
+c     cyneq   number of convex edges in cycle
 c
 c     axyz    atomic coordinates
 c     ar      atomic radii
@@ -82,16 +82,16 @@ c     ct      circle torus number
 c
 c     env     concave edge vertex numbers
 c     fnen    concave face concave edge numbers
-c     epc     convex edge circle number
-c     epv     convex edge vertex numbers
+c     eqc     convex edge circle number
+c     eqv     convex edge vertex numbers
 c     afe     first convex edge of each atom
 c     ale     last convex edge of each atom
-c     epnext  pointer to next convex edge of atom
+c     eqnext  pointer to next convex edge of atom
 c     fsen    saddle face concave edge numbers
-c     fsep    saddle face convex edge numbers
-c     cyep    cycle convex edge numbers
-c     fpa     atom number of convex face
-c     fpcy    convex face cycle numbers
+c     fseq    saddle face convex edge numbers
+c     cyeq    cycle convex edge numbers
+c     fqa     atom number of convex face
+c     fqcy    convex face cycle numbers
 c
 c
       subroutine connolly (volume,area,radius,probe,exclude)
@@ -114,12 +114,12 @@ c
       maxen = 12 * n
       maxfn = 4 * n
       maxc = 8 * n
-      maxep = 12 * n
+      maxeq = 12 * n
       maxfs = 6 * n
       maxcy = 3 * n
-      mxcyep = 30
-      maxfp = 2 * n
-      mxfpcy = 10
+      mxcyeq = 30
+      maxfq = 2 * n
+      mxfqcy = 10
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -155,18 +155,18 @@ c
       if (.not. allocated(ct))  allocate (ct(maxc))
       if (.not. allocated(cr))  allocate (cr(maxc))
       if (.not. allocated(c))  allocate (c(3,maxc))
-      if (.not. allocated(epc))  allocate (epc(maxep))
-      if (.not. allocated(epv))  allocate (epv(2,maxep))
+      if (.not. allocated(eqc))  allocate (eqc(maxeq))
+      if (.not. allocated(eqv))  allocate (eqv(2,maxeq))
       if (.not. allocated(afe))  allocate (afe(n))
       if (.not. allocated(ale))  allocate (ale(n))
-      if (.not. allocated(epnext))  allocate (epnext(maxep))
+      if (.not. allocated(eqnext))  allocate (eqnext(maxeq))
       if (.not. allocated(fsen))  allocate (fsen(2,maxfs))
-      if (.not. allocated(fsep))  allocate (fsep(2,maxfs))
-      if (.not. allocated(cynep))  allocate (cynep(maxcy))
-      if (.not. allocated(cyep))  allocate (cyep(mxcyep,maxcy))
-      if (.not. allocated(fpa))  allocate (fpa(maxfp))
-      if (.not. allocated(fpncy))  allocate (fpncy(maxfp))
-      if (.not. allocated(fpcy))  allocate (fpcy(mxfpcy,maxfp))
+      if (.not. allocated(fseq))  allocate (fseq(2,maxfs))
+      if (.not. allocated(cyneq))  allocate (cyneq(maxcy))
+      if (.not. allocated(cyeq))  allocate (cyeq(mxcyeq,maxcy))
+      if (.not. allocated(fqa))  allocate (fqa(maxfq))
+      if (.not. allocated(fqncy))  allocate (fqncy(maxfq))
+      if (.not. allocated(fqcy))  allocate (fqcy(mxfqcy,maxfq))
 c
 c     set the probe radius and the number of atoms
 c
@@ -1024,7 +1024,7 @@ c
       subroutine inedge (ien,itt)
       use faces
       implicit none
-      integer ien,itt,iepen
+      integer ien,itt,ieqen
 c
 c
 c     check for a serious error in the calling arguments
@@ -1039,8 +1039,8 @@ c
          enext(ien) = 0
          ttle(itt) = ien
       else
-         iepen = ttle(itt)
-         enext(iepen) = ien
+         ieqen = ttle(itt)
+         enext(ieqen) = ien
          enext(ien) = 0
          ttle(itt) = ien
       end if
@@ -1151,7 +1151,7 @@ c
 c     zero the number of circles, convex edges and saddle faces
 c
       nc = 0
-      nep = 0
+      neq = 0
       nfs = 0
       do ia = 1, na
          afe(ia) = 0
@@ -1359,12 +1359,12 @@ c
 c
 c     one more convex edge
 c
-            nep = nep + 1
-            if (nep .gt. maxep)  call cerror ('Too many Convex Edges')
+            neq = neq + 1
+            if (neq .gt. maxeq)  call cerror ('Too many Convex Edges')
 c
 c     first convex edge points to second circle
 c
-            epc(nep) = nc
+            eqc(neq) = nc
 c
 c     atom circle lies on
 c
@@ -1372,34 +1372,34 @@ c
 c
 c     insert convex edge into linked list for atom
 c
-            call ipedge (nep,ia)
+            call ipedge (neq,ia)
 c
 c     first vertex of convex edge is second vertex of concave edge
 c
-            epv(1,nep) = env(2,ien)
+            eqv(1,neq) = env(2,ien)
 c
 c     first convex edge of saddle
 c
-            fsep(1,nfs) = nep
+            fseq(1,nfs) = neq
 c
 c     one more convex edge
 c
-            nep = nep + 1
-            if (nep .gt. maxep)  call cerror ('Too many Convex Edges')
+            neq = neq + 1
+            if (neq .gt. maxeq)  call cerror ('Too many Convex Edges')
 c
 c     second convex edge points to first circle
 c
-            epc(nep) = nc - 1
+            eqc(neq) = nc - 1
             ia = ca(nc-1)
 c
 c     insert convex edge into linked list for atom
 c
-            call ipedge (nep,ia)
+            call ipedge (neq,ia)
 c
 c     second vertex of second convex edge
 c     is first vertex of first concave edge
 c
-            epv(2,nep) = env(1,ien)
+            eqv(2,neq) = env(1,ien)
             l1 = nxtang(l1)
 c
 c     wrap around
@@ -1426,13 +1426,13 @@ c
 c     second vertex of first convex edge is
 c     first vertex of second concave edge
 c
-            epv(2,nep-1) = env(1,ien)
+            eqv(2,neq-1) = env(1,ien)
 c
 c     first vertex of second convex edge is
 c     second vertex of second concave edge
 c
-            epv(1,nep) = env(2,ien)
-            fsep(2,nfs) = nep
+            eqv(1,neq) = env(2,ien)
+            fseq(2,nfs) = neq
 c
 c     quit if we have wrapped around to first edge
 c
@@ -1463,47 +1463,47 @@ c
 c
 c     one more convex edge
 c
-         nep = nep + 1
+         neq = neq + 1
          ia = ca(nc)
 c
 c     insert convex edge into linked list for atom
 c
-         call ipedge (nep,ia)
+         call ipedge (neq,ia)
 c
 c     no vertices for convex edge
 c
-         epv(1,nep) = 0
-         epv(2,nep) = 0
+         eqv(1,neq) = 0
+         eqv(2,neq) = 0
 c
 c     pointer from convex edge to second circle
 c
-         epc(nep) = nc
+         eqc(neq) = nc
 c
 c     first convex edge for saddle face
 c
-         fsep(1,nfs) = nep
+         fseq(1,nfs) = neq
 c
 c     one more convex edge
 c
-         nep = nep + 1
+         neq = neq + 1
          ia = ca(nc-1)
 c
 c     insert second convex edge into linked list
 c
-         call ipedge (nep,ia)
+         call ipedge (neq,ia)
 c
 c     no vertices for convex edge
 c
-         epv(1,nep) = 0
-         epv(2,nep) = 0
+         eqv(1,neq) = 0
+         eqv(2,neq) = 0
 c
 c     convex edge points to first circle
 c
-         epc(nep) = nc - 1
+         eqc(neq) = nc - 1
 c
 c     second convex edge for saddle face
 c
-         fsep(2,nfs) = nep
+         fseq(2,nfs) = neq
 c
 c     nothing to do for buried torus
 c
@@ -1679,28 +1679,28 @@ c
 c     "ipedge" inserts convex edge into linked list for atom
 c
 c
-      subroutine ipedge (iep,ia)
+      subroutine ipedge (ieq,ia)
       use faces
       implicit none
-      integer iep,ia,iepen
+      integer ieq,ia,ieqen
 c
 c
 c     first, check for an error condition
 c
-      if (iep .le. 0)  call cerror ('Bad Edge Number in IPEDGE')
+      if (ieq .le. 0)  call cerror ('Bad Edge Number in IPEDGE')
       if (ia .le. 0)  call cerror ('Bad Atom Number in IPEDGE')
 c
 c     set beginning of list or add to end
 c
       if (afe(ia) .eq. 0) then
-         afe(ia) = iep
-         epnext(iep) = 0
-         ale(ia) = iep
+         afe(ia) = ieq
+         eqnext(ieq) = 0
+         ale(ia) = ieq
       else
-         iepen = ale(ia)
-         epnext(iepen) = iep
-         epnext(iep) = 0
-         ale(ia) = iep
+         ieqen = ale(ia)
+         eqnext(ieqen) = ieq
+         eqnext(ieq) = 0
+         ale(ia) = ieq
       end if
       return
       end
@@ -1719,27 +1719,27 @@ c
       subroutine contact
       use faces
       implicit none
-      integer maxepa,maxcypa
-      parameter (maxepa=300)
+      integer maxeqa,maxcypa
+      parameter (maxeqa=300)
       parameter (maxcypa=100)
       integer i,k,ia,ia2,it
-      integer iep,ic,jc,jcy
-      integer nepa,iepa,jepa
+      integer ieq,ic,jc,jcy
+      integer neqa,ieqa,jeqa
       integer ncypa,icya,jcya,kcya
-      integer ncyep,icyep,jcyep
+      integer ncyeq,icyeq,jcyeq
       integer ncyold,nused,lookv
-      integer aic(maxepa)
-      integer aia(maxepa)
-      integer aep(maxepa)
-      integer av(2,maxepa)
-      integer ncyepa(maxcypa)
-      integer cyepa(mxcyep,maxcypa)
+      integer aic(maxeqa)
+      integer aia(maxeqa)
+      integer aeq(maxeqa)
+      integer av(2,maxeqa)
+      integer ncyeqa(maxcypa)
+      integer cyeqa(mxcyeq,maxcypa)
       real*8 anorm,anaa,factor
-      real*8 acvect(3,maxepa)
-      real*8 aavect(3,maxepa)
+      real*8 acvect(3,maxeqa)
+      real*8 aavect(3,maxeqa)
       real*8 pole(3),unvect(3)
-      real*8 acr(maxepa)
-      logical ptincy,epused(maxepa)
+      real*8 acr(maxeqa)
+      logical ptincy,eqused(maxeqa)
       logical cycy(maxcypa,maxcypa)
       logical cyused(maxcypa)
       logical samef(maxcypa,maxcypa)
@@ -1748,7 +1748,7 @@ c
 c     zero out the number of cycles and convex faces
 c
       ncy = 0
-      nfp = 0
+      nfq = 0
 c
 c     mark all free atoms not buried
 c
@@ -1772,37 +1772,37 @@ c
 c     gather convex edges for atom
 c     clear number of convex edges for atom
 c
-         nepa = 0
+         neqa = 0
 c
 c     pointer to first edge
 c
-         iep = afe(ia)
+         ieq = afe(ia)
    10    continue
 c
 c     check whether finished gathering
 c
-         if (iep .le. 0)  goto 20
+         if (ieq .le. 0)  goto 20
 c
 c     one more edge
 c
-         nepa = nepa + 1
-         if (nepa .gt. maxepa) then
+         neqa = neqa + 1
+         if (neqa .gt. maxeqa) then
             call cerror ('Too many Convex Edges for Atom')
          end if
 c
 c      store vertices of edge
 c
-         av(1,nepa) = epv(1,iep)
-         av(2,nepa) = epv(2,iep)
+         av(1,neqa) = eqv(1,ieq)
+         av(2,neqa) = eqv(2,ieq)
 c
 c     store convex edge number
 c
-         aep(nepa) = iep
-         ic = epc(iep)
+         aeq(neqa) = ieq
+         ic = eqc(ieq)
 c
 c     store circle number
 c
-         aic(nepa) = ic
+         aic(neqa) = ic
 c
 c     get neighboring atom
 c
@@ -1815,35 +1815,35 @@ c
 c
 c     store other atom number, we might need it sometime
 c
-         aia(nepa) = ia2
+         aia(neqa) = ia2
 c
 c     vector from atom to circle center; also
 c     vector from atom to center of neighboring atom
 c     sometimes we use one vector, sometimes the other
 c
          do k = 1, 3
-            acvect(k,nepa) = c(k,ic) - axyz(k,ia)
-            aavect(k,nepa) = axyz(k,ia2) - axyz(k,ia)
+            acvect(k,neqa) = c(k,ic) - axyz(k,ia)
+            aavect(k,neqa) = axyz(k,ia2) - axyz(k,ia)
          end do
 c
 c     circle radius
 c
-         acr(nepa) = cr(ic)
+         acr(neqa) = cr(ic)
 c
 c     pointer to next edge
 c
-         iep = epnext(iep)
+         ieq = eqnext(ieq)
          goto 10
    20    continue
-         if (nepa .le. 0) then
+         if (neqa .le. 0) then
             call cerror ('No Edges for Non-buried, Non-free Atom')
          end if
 c
 c     form cycles; initialize all the
 c     convex edges as not used in cycle
 c
-         do iepa = 1, nepa
-            epused(iepa) = .false.
+         do ieqa = 1, neqa
+            eqused(ieqa) = .false.
          end do
 c
 c     save old number of cycles
@@ -1855,8 +1855,8 @@ c
 c
 c     look for starting edge
 c
-         do iepa = 1, nepa
-            if (.not. epused(iepa))  goto 40
+         do ieqa = 1, neqa
+            if (.not. eqused(ieqa))  goto 40
          end do
 c
 c     cannot find starting edge, finished
@@ -1866,11 +1866,11 @@ c
 c
 c     pointer to edge
 c
-         iep = aep(iepa)
+         ieq = aeq(ieqa)
 c
 c     one edge so far for this cycle
 c
-         ncyep = 1
+         ncyeq = 1
 c
 c     one more cycle for atom
 c
@@ -1881,7 +1881,7 @@ c
 c
 c     mark edge used in cycle
 c
-         epused(iepa) = .true.
+         eqused(ieqa) = .true.
          nused = nused + 1
 c
 c     one more cycle for molecule
@@ -1891,16 +1891,16 @@ c
 c
 c     index of edge in atom cycle array
 c
-         cyepa(ncyep,ncypa) = iepa
+         cyeqa(ncyeq,ncypa) = ieqa
 c
 c     store in molecule cycle array a pointer to edge
 c
-         cyep(ncyep,ncy) = iep
+         cyeq(ncyeq,ncy) = ieq
 c
 c     second vertex of this edge is the vertex to look
 c     for next as the first vertex of another edge
 c
-         lookv = av(2,iepa)
+         lookv = av(2,ieqa)
 c
 c     if no vertex, this cycle is finished
 c
@@ -1909,38 +1909,38 @@ c
 c
 c     look for next connected edge
 c
-         do jepa = 1, nepa
-            if (epused(jepa))  goto 60
+         do jeqa = 1, neqa
+            if (eqused(jeqa))  goto 60
 c
-c     check second vertex of iepa versus first vertex of jepa
+c     check second vertex of ieqa versus first vertex of jeqa
 c
-            if (av(1,jepa) .ne. lookv)  goto 60
+            if (av(1,jeqa) .ne. lookv)  goto 60
 c
 c     edges are connected
 c     pointer to edge
 c
-            iep = aep(jepa)
+            ieq = aeq(jeqa)
 c
 c     one more edge for this cycle
 c
-            ncyep = ncyep + 1
-            if (ncyep .gt. mxcyep) then
+            ncyeq = ncyeq + 1
+            if (ncyeq .gt. mxcyeq) then
                call cerror ('Too many Edges per Cycle')
             end if
-            epused(jepa) = .true.
+            eqused(jeqa) = .true.
             nused = nused + 1
 c
 c     store index in local edge array
 c
-            cyepa(ncyep,ncypa) = jepa
+            cyeqa(ncyeq,ncypa) = jeqa
 c
 c     store pointer to edge
 c
-            cyep(ncyep,ncy) = iep
+            cyeq(ncyeq,ncy) = ieq
 c
 c     new vertex to look for
 c
-            lookv = av(2,jepa)
+            lookv = av(2,jeqa)
 c
 c     if no vertex, this cycle is in trouble
 c
@@ -1953,16 +1953,16 @@ c
 c
 c     it better connect to first edge of cycle
 c
-         if (lookv .ne. av(1,iepa)) then
+         if (lookv .ne. av(1,ieqa)) then
             call cerror ('Cycle does not Close')
          end if
    70    continue
 c
 c     this cycle is finished, store number of edges in cycle
 c
-         ncyepa(ncypa) = ncyep
-         cynep(ncy) = ncyep
-         if (nused .ge. nepa)  goto 80
+         ncyeqa(ncypa) = ncyeq
+         cyneq(ncy) = ncyeq
+         if (nused .ge. neqa)  goto 80
 c
 c     look for more cycles
 c
@@ -1981,32 +1981,32 @@ c
 c     if cycle j has two or fewer edges, nothing can
 c     lie in its exterior; i is therefore inside j
 c
-               if (ncyepa(jcya) .le. 2)  goto 90
+               if (ncyeqa(jcya) .le. 2)  goto 90
 c
 c     if cycles i and j have a pair of edges belonging
 c     to the same circle, then they are outside each other
 c
-               do icyep = 1, ncyepa(icya)
-                  iepa = cyepa(icyep,icya)
-                  ic = aic(iepa)
-                  do jcyep = 1, ncyepa(jcya)
-                     jepa = cyepa(jcyep,jcya)
-                     jc = aic(jepa)
+               do icyeq = 1, ncyeqa(icya)
+                  ieqa = cyeqa(icyeq,icya)
+                  ic = aic(ieqa)
+                  do jcyeq = 1, ncyeqa(jcya)
+                     jeqa = cyeqa(jcyeq,jcya)
+                     jc = aic(jeqa)
                      if (ic .eq. jc) then
                         cycy(icya,jcya) = .false.
                         goto 90
                      end if
                   end do
                end do
-               iepa = cyepa(1,icya)
-               anaa = anorm(aavect(1,iepa))
+               ieqa = cyeqa(1,icya)
+               anaa = anorm(aavect(1,ieqa))
                factor = ar(ia) / anaa
 c
 c     north pole and unit vector pointing south
 c
                do k = 1, 3
-                  pole(k) = factor*aavect(k,iepa) + axyz(k,ia)
-                  unvect(k) = -aavect(k,iepa) / anaa
+                  pole(k) = factor*aavect(k,ieqa) + axyz(k,ia)
+                  unvect(k) = -aavect(k,ieqa) / anaa
                end do
                cycy(icya,jcya) = ptincy(pole,unvect,jcy)
    90          continue
@@ -2077,18 +2077,18 @@ c
 c
 c     one more convex face
 c
-            nfp = nfp + 1
-            if (nfp .gt. maxfp) then
+            nfq = nfq + 1
+            if (nfq .gt. maxfq) then
                call cerror ('Too many Convex Faces')
             end if
 c
 c     clear number of cycles for face
 c
-            fpncy(nfp) = 0
+            fqncy(nfq) = 0
 c
 c     pointer from face to atom
 c
-            fpa(nfp) = ia
+            fqa(nfq) = ia
 c
 c     look for all other cycles belonging to same face
 c
@@ -2109,15 +2109,15 @@ c
 c
 c     one more cycle for face
 c
-               fpncy(nfp) = fpncy(nfp) + 1
-               if (fpncy(nfp) .gt. mxfpcy) then
+               fqncy(nfq) = fqncy(nfq) + 1
+               if (fqncy(nfq) .gt. mxfqcy) then
                   call cerror ('Too many Cycles bounding Convex Face')
                end if
-               i = fpncy(nfp)
+               i = fqncy(nfq)
 c
 c     store cycle number
 c
-               fpcy(i,nfp) = ncyold + jcya
+               fqcy(i,nfq) = ncyold + jcya
 c
 c     check for finished
 c
@@ -2134,12 +2134,12 @@ c
 c
 c     one face for free atom; no cycles
 c
-         nfp = nfp + 1
-         if (nfp .gt. maxfp) then
+         nfq = nfq + 1
+         if (nfq .gt. maxfq) then
             call cerror ('Too many Convex Faces')
          end if
-         fpa(nfp) = ia
-         fpncy(nfp) = 0
+         fqa(nfq) = ia
+         fqncy(nfq) = 0
   130    continue
       end do
       return
@@ -2170,8 +2170,8 @@ c
       parameter (nscale=20)
       integer k,ke,ke2,kv
       integer ia,ic,ip,it
-      integer ien,iep
-      integer ifn,ifp,ifs
+      integer ien,ieq
+      integer ifn,ifq,ifs
       integer iv,iv1,iv2
       integer isc,jfn
       integer ndots,idot
@@ -2188,12 +2188,12 @@ c
       real*8 volume,area
       real*8 alens,vint,vcone
       real*8 vpyr,vlens,hedron
-      real*8 totap,totvp,totas
+      real*8 totaq,totvq,totas
       real*8 totvs,totasp,totvsp
       real*8 totan,totvn
       real*8 alenst,alensn
       real*8 vlenst,vlensn,prism
-      real*8 areap,volp,areas,vols
+      real*8 areaq,volq,areas,vols
       real*8 areasp,volsp,arean,voln
       real*8 depth,triple,dist2
       real*8 areado,voldo,dot,dota
@@ -2269,17 +2269,17 @@ c
 c     compute the area and volume due to convex faces
 c     as well as the area partitioned among the atoms
 c
-      totap = 0.0d0
-      totvp = 0.0d0
+      totaq = 0.0d0
+      totvq = 0.0d0
       do ia = 1, na
          atmarea(ia) = 0.0d0
       end do
-      do ifp = 1, nfp
-         call measfp (ifp,areap,volp)
-         ia = fpa(ifp)
-         atmarea(ia) = atmarea(ia) + areap
-         totap = totap + areap
-         totvp = totvp + volp
+      do ifq = 1, nfq
+         call measfq (ifq,areaq,volq)
+         ia = fqa(ifq)
+         atmarea(ia) = atmarea(ia) + areaq
+         totaq = totaq + areaq
+         totvq = totvq + volq
       end do
 c
 c     compute the area and volume due to saddle faces
@@ -2349,8 +2349,8 @@ c
             ivs(ke) = env(1,ien)
             ia = va(ivs(ke))
             ifs = enfs(ien)
-            iep = fsep(1,ifs)
-            ic = epc(iep)
+            ieq = fseq(1,ifs)
+            ic = eqc(ieq)
             it = ct(ic)
             fnt(ke,ifn) = it
             fntrev(ke,ifn) = (ta(1,it) .ne. ia)
@@ -2760,7 +2760,7 @@ c
          end do
          write (iout,170)
   170    format (/,' Surface Area and Volume by Geometry Type :')
-         write (iout,180)  nfp,totap,totvp
+         write (iout,180)  nfq,totaq,totvq
   180    format (/,' Convex Faces :',i12,5x,'Area :',f13.3,
      &              4x,'Volume :',f13.3)
          write (iout,190)  nfs,totas,totvs
@@ -2808,8 +2808,8 @@ c
 c
 c     finally, compute the total area and total volume
 c
-      area = totap + totas + totan - totasp - alenst
-      volume = totvp + totvs + totvn + hedron - totvsp + vlenst
+      area = totaq + totas + totan - totasp - alenst
+      volume = totvq + totvs + totvn + hedron - totvsp + vlenst
       return
       end
 c
@@ -2888,29 +2888,29 @@ c
          vect2(k) = pav(k,3) - pav(k,1)
       end do
       call vcross (vect1,vect2,vect3)
-      prism = height * vect3(3) / 2.0d0
+      prism = 0.5d0 * height * vect3(3)
       return
       end
 c
 c
 c     #########################
 c     ##                     ##
-c     ##  subroutine measfp  ##
+c     ##  subroutine measfq  ##
 c     ##                     ##
 c     #########################
 c
 c
-      subroutine measfp (ifp,areap,volp)
+      subroutine measfq (ifq,areaq,volq)
       use faces
       use math
       implicit none
-      integer k,ke,ifp,iep
+      integer k,ke,ifq,ieq
       integer ia,ia2,ic
       integer it,iv1,iv2
       integer ncycle,ieuler
       integer icyptr,icy
       integer nedge
-      real*8 areap,volp
+      real*8 areaq,volq
       real*8 dot,dt,gauss
       real*8 vecang,angle,geo
       real*8 pcurve,gcurve
@@ -2918,25 +2918,25 @@ c
       real*8 vect2(3)
       real*8 acvect(3)
       real*8 aavect(3)
-      real*8 radial(3,mxcyep)
-      real*8 tanv(3,2,mxcyep)
+      real*8 radial(3,mxcyeq)
+      real*8 tanv(3,2,mxcyeq)
 c
 c
-      ia = fpa(ifp)
+      ia = fqa(ifq)
       pcurve = 0.0d0
       gcurve = 0.0d0
-      ncycle = fpncy(ifp)
+      ncycle = fqncy(ifq)
       if (ncycle .gt. 0) then
          ieuler = 2 - ncycle
       else
          ieuler = 2
       end if
       do icyptr = 1, ncycle
-         icy = fpcy(icyptr,ifp)
-         nedge = cynep(icy)
+         icy = fqcy(icyptr,ifq)
+         nedge = cyneq(icy)
          do ke = 1, nedge
-            iep = cyep(ke,icy)
-            ic = epc(iep)
+            ieq = cyeq(ke,icy)
+            ic = eqc(ieq)
             it = ct(ic)
             if (ia .eq. ta(1,it)) then
                ia2 = ta(2,it)
@@ -2950,8 +2950,8 @@ c
             call vnorm (aavect,aavect)
             dt = dot(acvect,aavect)
             geo = -dt / (ar(ia)*cr(ic))
-            iv1 = epv(1,iep)
-            iv2 = epv(2,iep)
+            iv1 = eqv(1,ieq)
+            iv2 = eqv(2,ieq)
             if (iv1.eq.0 .or. iv2.eq.0) then
                angle = 2.0d0 * pi
             else
@@ -2973,7 +2973,7 @@ c
                   angle = vecang(tanv(1,2,ke-1),tanv(1,1,ke),
      &                               radial(1,ke),1.0d0)
                   if (angle .lt. 0.0d0) then
-                     call cerror ('Negative Angle in MEASFP')
+                     call cerror ('Negative Angle in MEASFQ')
                   end if
                   pcurve = pcurve + angle
                end if
@@ -2983,14 +2983,14 @@ c
             angle = vecang(tanv(1,2,nedge),tanv(1,1,1),
      &                         radial(1,1),1.0d0)
             if (angle .lt. 0.0d0) then
-               call cerror ('Negative Angle in MEASFP')
+               call cerror ('Negative Angle in MEASFQ')
             end if
             pcurve = pcurve + angle
          end if
       end do
       gauss = 2.0d0*pi*ieuler - pcurve - gcurve
-      areap = gauss * (ar(ia)**2)
-      volp = areap * ar(ia) / 3.0d0
+      areaq = gauss * (ar(ia)**2)
+      volq = areaq * ar(ia) / 3.0d0
       return
       end
 c
@@ -3006,7 +3006,7 @@ c
       use faces
       use math
       implicit none
-      integer k,ifs,iep
+      integer k,ifs,ieq
       integer ic,ic1,ic2
       integer it,ia1,ia2
       integer iv1,iv2
@@ -3026,8 +3026,8 @@ c
       logical cusp
 c
 c
-      iep = fsep(1,ifs)
-      ic = epc(iep)
+      ieq = fseq(1,ifs)
+      ic = eqc(ieq)
       it = ct(ic)
       ia1 = ta(1,it)
       ia2 = ta(2,it)
@@ -3035,8 +3035,8 @@ c
          aavect(k) = axyz(k,ia2) - axyz(k,ia1)
       end do
       call vnorm (aavect,aavect)
-      iv1 = epv(1,iep)
-      iv2 = epv(2,iep)
+      iv1 = eqv(1,ieq)
+      iv2 = eqv(2,ieq)
       if (iv1.eq.0 .or. iv2.eq.0) then
          phi = 2.0d0 * pi
       else
@@ -3078,10 +3078,10 @@ c
          areasp = 2.0d0 * phi * spin
       end if
 c
-      iep = fsep(1,ifs)
-      ic2 = epc(iep)
-      iep = fsep(2,ifs)
-      ic1 = epc(iep)
+      ieq = fseq(1,ifs)
+      ic2 = eqc(ieq)
+      ieq = fseq(2,ifs)
+      ic1 = eqc(ieq)
       if (ca(ic1) .ne. ia1) then
          call cerror ('IA1 Inconsistency in MEASFS')
       end if
@@ -3186,7 +3186,7 @@ c
       use faces
       implicit none
       integer k,ke,icy,ia
-      integer nedge,iep,iv
+      integer nedge,ieq,iv
       real*8 dot,dt,f
       real*8 polev(3)
       real*8 pnt(3)
@@ -3196,13 +3196,13 @@ c
 c
 c
       fail = .false.
-      nedge = cynep(icy)
-      do ke = 1, cynep(icy)
+      nedge = cyneq(icy)
+      do ke = 1, cyneq(icy)
 c
 c     vertex number (use first vertex of edge)
 c
-         iep = cyep(ke,icy)
-         iv = epv(1,iep)
+         ieq = cyeq(ke,icy)
+         iv = eqv(1,ieq)
          if (iv .ne. 0) then
 c
 c     vector from north pole to vertex
@@ -3246,7 +3246,7 @@ c
       function ptincy (pnt,unvect,icy)
       use faces
       implicit none
-      integer k,ke,icy,iep
+      integer k,ke,icy,ieq
       integer ic,it,iatom
       integer iaoth,nedge
       real*8 dot,rotang
@@ -3255,16 +3255,16 @@ c
       real*8 pnt(3)
       real*8 acvect(3)
       real*8 cpvect(3)
-      real*8 spv(3,mxcyep)
-      real*8 epu(3,mxcyep)
+      real*8 spv(3,mxcyeq)
+      real*8 equ(3,mxcyeq)
       logical ptincy,fail
 c
 c
 c     check for eaten by neighbor
 c
-      do ke = 1, cynep(icy)
-         iep = cyep(ke,icy)
-         ic = epc(iep)
+      do ke = 1, cyneq(icy)
+         ieq = cyeq(ke,icy)
+         ic = eqc(ieq)
          it = ct(ic)
          iatom = ca(ic)
          if (ta(1,it) .eq. iatom) then
@@ -3281,7 +3281,7 @@ c
             return
          end if
       end do
-      if (cynep(icy) .le. 2) then
+      if (cyneq(icy) .le. 2) then
          ptincy = .true.
          return
       end if
@@ -3290,8 +3290,8 @@ c
          ptincy = .true.
          return
       end if
-      call epuclc (spv,nedge,epu)
-      totang = rotang(epu,nedge,unvect)
+      call equclc (spv,nedge,equ)
+      totang = rotang(equ,nedge,unvect)
       ptincy = (totang .gt. 0.0d0)
       return
       end
@@ -3299,18 +3299,18 @@ c
 c
 c     #########################
 c     ##                     ##
-c     ##  subroutine epuclc  ##
+c     ##  subroutine equclc  ##
 c     ##                     ##
 c     #########################
 c
 c
-      subroutine epuclc (spv,nedge,epu)
+      subroutine equclc (spv,nedge,equ)
       implicit none
       integer k,ke,ke2,le
       integer nedge
-      real*8 anorm,epun
+      real*8 anorm,equn
       real*8 spv(3,*)
-      real*8 epu(3,*)
+      real*8 equ(3,*)
 c
 c
 c     calculate unit vectors along edges
@@ -3328,20 +3328,20 @@ c
 c     unit vector along edge of cycle
 c
          do k = 1, 3
-            epu(k,ke) = spv(k,ke2) - spv(k,ke)
+            equ(k,ke) = spv(k,ke2) - spv(k,ke)
          end do
-         epun = anorm(epu(1,ke))
-c        if (epun .le. 0.0d0)  call cerror ('Null Edge in Cycle')
+         equn = anorm(equ(1,ke))
+c        if (equn .le. 0.0d0)  call cerror ('Null Edge in Cycle')
 c
 c     normalize
 c
-         if (epun .gt. 0.0d0) then
+         if (equn .gt. 0.0d0) then
             do k = 1, 3
-               epu(k,ke) = epu(k,ke) / epun
+               equ(k,ke) = equ(k,ke) / equn
             end do
          else
             do k = 1, 3
-               epu(k,ke) = 0.0d0
+               equ(k,ke) = 0.0d0
             end do
          end if
       end do
@@ -3349,11 +3349,11 @@ c
 c     vectors for null edges come from following or preceding edges
 c
       do ke = 1, nedge
-         if (anorm(epu(1,ke)) .le. 0.0d0) then
+         if (anorm(equ(1,ke)) .le. 0.0d0) then
             le = ke - 1
             if (le .le. 0)  le = nedge
             do k = 1, 3
-               epu(k,ke) = epu(k,le)
+               equ(k,ke) = equ(k,le)
             end do
          end if
       end do
@@ -3368,14 +3368,14 @@ c     ##                   ##
 c     #######################
 c
 c
-      function rotang (epu,nedge,unvect)
+      function rotang (equ,nedge,unvect)
       implicit none
       integer ke,nedge
       real*8 rotang,totang
       real*8 dot,dt,ang
       real*8 unvect(3)
       real*8 crs(3)
-      real*8 epu(3,*)
+      real*8 equ(3,*)
 c
 c
       totang = 0.0d0
@@ -3384,14 +3384,14 @@ c     sum angles at vertices of cycle
 c
       do ke = 1, nedge
          if (ke .lt. nedge) then
-            dt = dot(epu(1,ke),epu(1,ke+1))
-            call vcross (epu(1,ke),epu(1,ke+1),crs)
+            dt = dot(equ(1,ke),equ(1,ke+1))
+            call vcross (equ(1,ke),equ(1,ke+1),crs)
          else
 c
 c     closing edge of cycle
 c
-            dt = dot(epu(1,ke),epu(1,1))
-            call vcross (epu(1,ke),epu(1,1),crs)
+            dt = dot(equ(1,ke),equ(1,1))
+            call vcross (equ(1,ke),equ(1,1),crs)
          end if
          if (dt .lt. -1.0d0)  dt = -1.0d0
          if (dt .gt. 1.0d0)  dt = 1.0d0

@@ -96,7 +96,7 @@ c
          zi = z(i)
          chgi = chgct(ii)
          alphai = dmpct(ii)
-         if (alphai .eq. 0.0d0)  alphai = 100.0d0
+         if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          alphai2 = alphai * alphai
          usei = use(i)
 c
@@ -134,7 +134,7 @@ c
                   rr1 = 1.0d0 / r
                   chgk = chgct(kk)
                   alphak = dmpct(kk)
-                  if (alphak .eq. 0.0d0)  alphak = 100.0d0
+                  if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      alphak2 = alphak * alphak
                      expi = exp(-alphai*r)
@@ -244,7 +244,7 @@ c
             zi = z(i)
             chgi = chgct(ii)
             alphai = dmpct(ii)
-            if (alphai .eq. 0.0d0)  alphai = 100.0d0
+            if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             alphai2 = alphai * alphai
             usei = use(i)
 c
@@ -283,7 +283,7 @@ c
                         rr1 = 1.0d0 / r
                         chgk = chgct(kk)
                         alphak = dmpct(kk)
-                        if (alphak .eq. 0.0d0)  alphak = 100.0d0
+                        if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                         if (ctrntyp .eq. 'SEPARATE') then
                            alphak2 = alphak * alphak
                            expi = exp(-alphai*r)

@@ -60,8 +60,9 @@ mutual-14-scale         1.0
       #############################
 
 
-P. Ren and J. W. Ponder, "Polarizable Atomic Multipole Intermolecular
-Potentials for Small Organic Molecules", in preparation.
+P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-based
+Molecular Mechanics for Organic Molecules", J. Chem. Theory Comput.,
+7, 3143-3161 (2011)
 
 J. W. Ponder and D. A. Case, "Force Fields for Protein Simulation",
 Adv. Prot. Chem., 66, 27-85 (2003)
@@ -95,9 +96,9 @@ atom          7    7    Na+   "Sodium Ion Na+"              11    22.990    0
 atom          8    8    K+    "Potassium Ion K+"            19    39.098    0
 atom          9    9    Rb+   "Rubidium Ion Rb+"            37    85.468    0
 atom         10   10    Cs+   "Cesium Ion Cs+"              55   132.905    0
-atom         11   11    Mg+   "Magnesium Ion Mg+2"          12    24.305    0
-atom         12   12    Ca+   "Calcium Ion Ca+2"            20    40.078    0
-atom         13   13    Zn+   "Zinc Ion Zn+2"               30    65.390    0
+atom         11   11    Mg2   "Magnesium Ion Mg+2"          12    24.305    0
+atom         12   12    Ca2   "Calcium Ion Ca+2"            20    40.078    0
+atom         13   13    Zn2   "Zinc Ion Zn+2"               30    65.390    0
 atom         14   14    F-    "Fluoride Ion F-"              9    18.998    0
 atom         15   15    Cl-   "Chloride Ion Cl-"            17    35.453    0
 atom         16   16    Br-   "Bromide Ion Br-"             35    79.904    0

@@ -11,6 +11,7 @@
 ar -crusv libtinker.a \
 action.o \
 active.o \
+alterchg.o \
 align.o \
 analysis.o \
 analyz.o \
@@ -43,6 +44,7 @@ bussi.o \
 calendar.o \
 cell.o \
 center.o \
+cflux.o \
 charge.o \
 chgpen.o \
 chgpot.o \
@@ -65,6 +67,7 @@ cspline.o \
 ctrpot.o \
 cutoffs.o \
 damping.o \
+dcflux.o \
 deflate.o \
 delete.o \
 deriv.o \
@@ -282,7 +285,9 @@ katom.o \
 katoms.o \
 kbond.o \
 kbonds.o \
+kcflux.o \
 kcharge.o \
+kchgflx.o \
 kchgtrn.o \
 kchrge.o \
 kcpen.o \
@@ -316,6 +321,7 @@ kpolar.o \
 kpolr.o \
 krepel.o \
 krepl.o \
+ksolut.o \
 ksolv.o \
 kstbnd.o \
 kstrbnd.o \
@@ -336,6 +342,7 @@ light.o \
 lights.o \
 limits.o \
 linmin.o \
+lusolve.o \
 makeint.o \
 makeref.o \
 makexyz.o \
@@ -406,6 +413,7 @@ poltcg.o \
 polymer.o \
 potent.o \
 potfit.o \
+predict.o \
 pressure.o \
 prmkey.o \
 promo.o \
@@ -419,7 +427,7 @@ prtseq.o \
 prtxyz.o \
 ptable.o \
 qmstuf.o \
-qrfact.o \
+qrsolve.o \
 quatfit.o \
 random.o \
 rattle.o \
@@ -463,6 +471,7 @@ simplex.o \
 sizes.o \
 sktstuf.o \
 socket.o \
+solpot.o \
 solute.o \
 sort.o \
 square.o \

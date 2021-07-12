@@ -648,7 +648,7 @@ c
 c     set angle index value, accounting for MMFF bond type = 1
 c
          at = 0
-         do j = 1, nlignes
+         do j = 1, nligne
             if ((ia.eq.bt_1(j,1) .and. ib.eq.bt_1(j,2)) .or.
      &          (ib.eq.bt_1(j,1) .and. ia.eq.bt_1(j,2))) then
                at = at + 1

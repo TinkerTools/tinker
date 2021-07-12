@@ -3,6 +3,6 @@ bench/* linguist-vendored
 doc/* linguist-documentation
 example/* linguist-documentation
 fftw/* linguist-vendored
-openmm/* linguist-vendored
+openmm/* linguist-language=Fortran
 params/* linguist-documentation
 test/* linguist-documentation

@@ -271,7 +271,7 @@ c
          ta(n) = elim1
          tb(n) = 0.0d0
          p(n) = 0.0d0
-         p(nn) = 0.0d0
+         if (nn .ne. 0)  p(nn) = 0.0d0
          iter = 1
          if (ia .ne. 0)  goto 40
    20    continue

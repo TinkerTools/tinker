@@ -30,6 +30,9 @@ c     zero out the number of atoms attached to each atom
 c
       do i = 1, n
          n12(i) = 0
+         do j = 1, maxval
+            i12(j,i) = 0
+         end do
       end do
 c
 c     loop over the bonds in the Z-matrix, adding each bond

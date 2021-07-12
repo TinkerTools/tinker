@@ -28,7 +28,8 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,ideal,force
+      real*8 e,eps
+      real*8 ideal,force
       real*8 fold,factor
       real*8 dot,cosine
       real*8 angle,fgrp
@@ -57,10 +58,15 @@ c
       ea = 0.0d0
       if (nangle .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,use,
-!$OMP& x,y,z,cang,qang,pang,sang,angtyp,angunit,use_group,use_polymer)
+!$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,
+!$OMP& use,x,y,z,cang,qang,pang,sang,angtyp,angunit,eps,use_group,
+!$OMP& use_polymer)
 !$OMP& shared(ea)
 !$OMP DO reduction(+:ea) schedule(guided)
 c
@@ -112,38 +118,36 @@ c
                   call image (xab,yab,zab)
                   call image (xcb,ycb,zcb)
                end if
-               rab2 = xab*xab + yab*yab + zab*zab
-               rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-               if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-                  dot = xab*xcb + yab*ycb + zab*zcb
-                  cosine = dot / sqrt(rab2*rcb2)
-                  cosine = min(1.0d0,max(-1.0d0,cosine))
-                  angle = radian * acos(cosine)
-                  if (angtyp(i) .eq. 'HARMONIC') then
-                     dt = angle - ideal
-                     dt2 = dt * dt
-                     dt3 = dt2 * dt
-                     dt4 = dt2 * dt2
-                     e = angunit * force * dt2
-     &                      * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
-                  else if (angtyp(i) .eq. 'LINEAR') then
-                     factor = 2.0d0 * angunit * radian**2
-                     e = factor * force * (1.0d0+cosine)
-                  else if (angtyp(i) .eq. 'FOURIER') then
-                     fold = afld(i)
-                     factor = 2.0d0 * angunit * (radian/fold)**2
-                     cosine = cos((fold*angle-ideal)/radian)
-                     e = factor * force * (1.0d0+cosine)
-                  end if
+               rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+               rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+               dot = xab*xcb + yab*ycb + zab*zcb
+               cosine = dot / sqrt(rab2*rcb2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+               if (angtyp(i) .eq. 'HARMONIC') then
+                  dt = angle - ideal
+                  dt2 = dt * dt
+                  dt3 = dt2 * dt
+                  dt4 = dt2 * dt2
+                  e = angunit * force * dt2
+     &                   * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+               else if (angtyp(i) .eq. 'LINEAR') then
+                  factor = 2.0d0 * angunit * radian**2
+                  e = factor * force * (1.0d0+cosine)
+               else if (angtyp(i) .eq. 'FOURIER') then
+                  fold = afld(i)
+                  factor = 2.0d0 * angunit * (radian/fold)**2
+                  cosine = cos((fold*angle-ideal)/radian)
+                  e = factor * force * (1.0d0+cosine)
+               end if
 c
 c     scale the interaction based on its group membership
 c
-                  if (use_group)  e = e * fgrp
+               if (use_group)  e = e * fgrp
 c
 c     increment the total bond angle bending energy
 c
-                  ea = ea + e
-               end if
+               ea = ea + e
 c
 c     compute the projected in-plane angle bend energy
 c
@@ -183,28 +187,26 @@ c
                   call image (xap,yap,zap)
                   call image (xcp,ycp,zcp)
                end if
-               rap2 = xap*xap + yap*yap + zap*zap
-               rcp2 = xcp*xcp + ycp*ycp + zcp*zcp
-               if (rap2.ne.0.0d0 .and. rcp2.ne.0.0d0) then
-                  dot = xap*xcp + yap*ycp + zap*zcp
-                  cosine = dot / sqrt(rap2*rcp2)
-                  cosine = min(1.0d0,max(-1.0d0,cosine))
-                  angle = radian * acos(cosine)
-                  dt = angle - ideal
-                  dt2 = dt * dt
-                  dt3 = dt2 * dt
-                  dt4 = dt2 * dt2
-                  e = angunit * force * dt2
-     &                   * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
+               rap2 = max(xap*xap+yap*yap+zap*zap,eps)
+               rcp2 = max(xcp*xcp+ycp*ycp+zcp*zcp,eps)
+               dot = xap*xcp + yap*ycp + zap*zcp
+               cosine = dot / sqrt(rap2*rcp2)
+               cosine = min(1.0d0,max(-1.0d0,cosine))
+               angle = radian * acos(cosine)
+               dt = angle - ideal
+               dt2 = dt * dt
+               dt3 = dt2 * dt
+               dt4 = dt2 * dt2
+               e = angunit * force * dt2
+     &                * (1.0d0+cang*dt+qang*dt2+pang*dt3+sang*dt4)
 c
 c     scale the interaction based on its group membership
 c
-                  if (use_group)  e = e * fgrp
+               if (use_group)  e = e * fgrp
 c
 c     increment the total bond angle bending energy
 c
-                  ea = ea + e
-               end if
+               ea = ea + e
             end if
          end if
       end do

@@ -50,8 +50,6 @@ c
       character*20 keyword
       character*240 record
       character*240 string
-      save first
-      data first  / .true. /
 c
 c
 c     set the default values for the restraint variables
@@ -70,25 +68,22 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (first) then
-         first = .false.
-         if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
-         if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
-         if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
-         if (.not. allocated(iafix))  allocate (iafix(3,maxfix))
-         if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
-         if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
-         if (.not. allocated(ichir))  allocate (ichir(4,maxfix))
-         if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
-         if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
-         if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
-         if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
-         if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
-         if (.not. allocated(afix))  allocate (afix(3,maxfix))
-         if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
-         if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
-         if (.not. allocated(chir))  allocate (chir(3,maxfix))
-      end if
+      if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
+      if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
+      if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
+      if (.not. allocated(iafix))  allocate (iafix(3,maxfix))
+      if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
+      if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
+      if (.not. allocated(ichir))  allocate (ichir(4,maxfix))
+      if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
+      if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
+      if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
+      if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
+      if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
+      if (.not. allocated(afix))  allocate (afix(3,maxfix))
+      if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
+      if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
+      if (.not. allocated(chir))  allocate (chir(3,maxfix))
 c
 c     search the keywords for restraint parameters
 c
@@ -110,79 +105,97 @@ c
             p4 = 0.0d0
             p5 = 0.0d0
             next = 1
-            call getword (string,letter,next)
-            if (letter .eq. ' ') then
-               call getnumb (string,ia,next)
-               if (ia.ge.1 .and. ia.le.n) then
-                  p1 = x(ia)
-                  p2 = y(ia)
-                  p3 = z(ia)
-                  string = string(next:240)
-                  read (string,*,err=10,end=10)  p1,p2,p3,p4,p5
-   10             continue
-                  if (p4 .eq. 0.0d0)  p4 = 100.0d0
-                  npfix = npfix + 1
-                  ipfix(npfix) = ia
-                  kpfix(1,npfix) = 1
-                  kpfix(2,npfix) = 1
-                  kpfix(3,npfix) = 1
-                  xpfix(npfix) = p1
-                  ypfix(npfix) = p2
-                  zpfix(npfix) = p3
-                  pfix(1,npfix) = p4
-                  pfix(2,npfix) = p5
-               else if (ia.ge.-n .and. ia.le.-1) then
-                  ia = abs(ia)
-                  call getnumb (string,ib,next)
-                  ib = min(abs(ib),n)
-                  string = string(next:240)
-                  read (string,*,err=20,end=20)  p1,p2
-   20             continue
-                  if (p1 .eq. 0.0d0)  p1 = 100.0d0
-                  do j = ia, ib
-                     npfix = npfix + 1
-                     ipfix(npfix) = j
-                     kpfix(1,npfix) = 1
-                     kpfix(2,npfix) = 1
-                     kpfix(3,npfix) = 1
-                     xpfix(npfix) = x(j)
-                     ypfix(npfix) = y(j)
-                     zpfix(npfix) = z(j)
-                     pfix(1,npfix) = p1
-                     pfix(2,npfix) = p2
-                  end do
-               end if
-            else
-               call upcase (letter)
-               read (string,*,err=30,end=30)  ia
+            call getnumb (string,ia,next)
+            if (ia.ge.1 .and. ia.le.n) then
+               p1 = x(ia)
+               p2 = y(ia)
+               p3 = z(ia)
                string = string(next:240)
-               read (string,*,err=30,end=30)  p1,p2,p3
-   30          continue
-               if (p2 .eq. 0.0d0)  p2 = 100.0d0
+               read (string,*,err=10,end=10)  p1,p2,p3,p4,p5
+   10          continue
+               if (p4 .eq. 0.0d0)  p4 = 100.0d0
                npfix = npfix + 1
-               ipfix(npfix) = ia
-               kpfix(1,npfix) = 0
-               kpfix(2,npfix) = 0
-               kpfix(3,npfix) = 0
-               if (letter .eq. 'X') then
-                  kpfix(1,npfix) = 1
-                  xpfix(npfix) = p1
-               else if (letter .eq. 'Y') then
-                  kpfix(2,npfix) = 1
-                  ypfix(npfix) = p1
-               else if (letter .eq. 'Z') then
-                  kpfix(3,npfix) = 1
-                  zpfix(npfix) = p1
+               if (npfix .gt. maxfix) then
+                  write (iout,20)
+   20             format (/,' KGEOM  --  Too many Position Restraints;',
+     &                       ' Increase MAXFIX')
+                  call fatal
                end if
-               pfix(1,npfix) = p2
-               pfix(2,npfix) = p3
+               ipfix(npfix) = ia
+               kpfix(1,npfix) = 1
+               kpfix(2,npfix) = 1
+               kpfix(3,npfix) = 1
+               xpfix(npfix) = p1
+               ypfix(npfix) = p2
+               zpfix(npfix) = p3
+               pfix(1,npfix) = p4
+               pfix(2,npfix) = p5
+            else if (ia.ge.-n .and. ia.le.-1) then
+               ia = abs(ia)
+               call getnumb (string,ib,next)
+               ib = min(abs(ib),n)
+               string = string(next:240)
+               read (string,*,err=30,end=30)  p1,p2
+   30          continue
+               if (p1 .eq. 0.0d0)  p1 = 100.0d0
+               if (npfix+ib-ia+1 .gt. maxfix) then
+                  write (iout,40)
+   40             format (/,' KGEOM  --  Too many Position Restraints;',
+     &                       ' Increase MAXFIX')
+                  call fatal
+               end if
+               do j = ia, ib
+                  npfix = npfix + 1
+                  ipfix(npfix) = j
+                  kpfix(1,npfix) = 1
+                  kpfix(2,npfix) = 1
+                  kpfix(3,npfix) = 1
+                  xpfix(npfix) = x(j)
+                  ypfix(npfix) = y(j)
+                  zpfix(npfix) = z(j)
+                  pfix(1,npfix) = p1
+                  pfix(2,npfix) = p2
+               end do
             end if
+c
+c     get atom restrained to a specified position range
+c
+         else if (keyword(1:15) .eq. 'RESTRAIN-PLANE ') then
+            letter = ' '
+            ia = 0
+            p1 = 0.0d0
+            p2 = 0.0d0
+            p3 = 0.0d0
+            next = 1
+            call getword (string,letter,next)
+            call upcase (letter)
+            string = string(next:240)
+            read (string,*,err=50,end=50)  ia,p1,p2,p3
+   50       continue
+            if (p2 .eq. 0.0d0)  p2 = 100.0d0
+            npfix = npfix + 1
             if (npfix .gt. maxfix) then
-               write (iout,40)
-   40          format (/,' KGEOM  --  Too many Position Restraints;',
+               write (iout,60)
+   60          format (/,' KGEOM  --  Too many Plane Restraints;',
      &                    ' Increase MAXFIX')
                call fatal
             end if
+            ipfix(npfix) = ia
+            kpfix(1,npfix) = 0
+            kpfix(2,npfix) = 0
+            kpfix(3,npfix) = 0
+            if (letter .eq. 'X') then
+               kpfix(1,npfix) = 1
+               xpfix(npfix) = p1
+            else if (letter .eq. 'Y') then
+               kpfix(2,npfix) = 1
+               ypfix(npfix) = p1
+            else if (letter .eq. 'Z') then
+               kpfix(3,npfix) = 1
+               zpfix(npfix) = p1
+            end if
+            pfix(1,npfix) = p2
+            pfix(2,npfix) = p3
 c
 c     get atoms restrained to a specified distance range
 c
@@ -193,11 +206,11 @@ c
             d2 = 0.0d0
             d3 = 0.0d0
             exist = .false.
-            read (string,*,err=50,end=50)  ia,ib,d1,d2
+            read (string,*,err=70,end=70)  ia,ib,d1,d2
             exist = .true.
-   50       continue
-            read (string,*,err=60,end=60)  ia,ib,d1,d2,d3
-   60       continue
+   70       continue
+            read (string,*,err=80,end=80)  ia,ib,d1,d2,d3
+   80       continue
             if (.not. exist) then
                xr = x(ia) - x(ib)
                yr = y(ia) - y(ib)
@@ -208,17 +221,17 @@ c
             end if
             if (d3 .eq. 0.0d0)  d3 = d2
             ndfix = ndfix + 1
+            if (ndfix .gt. maxfix) then
+               write (iout,90)
+   90          format (/,' KGEOM  --  Too many Distance Restraints;',
+     &                    ' Increase MAXFIX')
+               call fatal
+            end if
             idfix(1,ndfix) = ia
             idfix(2,ndfix) = ib
             dfix(1,ndfix) = d1
             dfix(2,ndfix) = d2
             dfix(3,ndfix) = d3
-            if (ndfix .gt. maxfix) then
-               write (iout,70)
-   70          format (/,' KGEOM  --  Too many Distance Restraints;',
-     &                    ' Increase MAXFIX')
-               call fatal
-            end if
 c
 c     get atoms restrained to a specified angle range
 c
@@ -230,26 +243,26 @@ c
             a2 = 0.0d0
             a3 = 0.0d0
             exist = .false.
-            read (string,*,err=80,end=80)  ia,ib,ic,a1,a2
+            read (string,*,err=100,end=100)  ia,ib,ic,a1,a2
             exist = .true.
-   80       continue
-            read (string,*,err=90,end=90)  ia,ib,ic,a1,a2,a3
-   90       continue
+  100       continue
+            read (string,*,err=110,end=110)  ia,ib,ic,a1,a2,a3
+  110       continue
             if (.not. exist)  a2 = geometry (ia,ib,ic,0)
             if (a3 .eq. 0.0d0)  a3 = a2
             nafix = nafix + 1
+            if (nafix .gt. maxfix) then
+               write (iout,120)
+  120          format (/,' KGEOM  --  Too many Angle Restraints;',
+     &                    ' Increase MAXFIX')
+               call fatal
+            end if
             iafix(1,nafix) = ia
             iafix(2,nafix) = ib
             iafix(3,nafix) = ic
             afix(1,nafix) = a1
             afix(2,nafix) = a2
             afix(3,nafix) = a3
-            if (nafix .gt. maxfix) then
-               write (iout,100)
-  100          format (/,' KGEOM  --  Too many Angle Restraints;',
-     &                    ' Increase MAXFIX')
-               call fatal
-            end if
 c
 c     get atoms restrained to a specified torsion range
 c
@@ -262,12 +275,12 @@ c
             t2 = 0.0d0
             t3 = 0.0d0
             exist = .false.
-            read (string,*,err=110,end=110)  ia,ib,ic,id,t1,t2
+            read (string,*,err=130,end=130)  ia,ib,ic,id,t1,t2
             exist = .true.
-  110       continue
-            read (string,*,err=120,end=120)  ia,ib,ic,id,t1,t2,t3
+  130       continue
+            read (string,*,err=140,end=140)  ia,ib,ic,id,t1,t2,t3
             exist = .true.
-  120       continue
+  140       continue
             if (.not. exist)  t2 = geometry (ia,ib,ic,id)
             if (t3 .eq. 0.0d0)  t3 = t2
             do while (t2 .gt. 180.0d0)
@@ -283,6 +296,12 @@ c
                t3 = t3 + 360.0d0
             end do
             ntfix = ntfix + 1
+            if (ntfix .gt. maxfix) then
+               write (iout,150)
+  150          format (/,' KGEOM  --  Too many Torsion Restraints;',
+     &                    ' Increase MAXFIX')
+               call fatal
+            end if
             itfix(1,ntfix) = ia
             itfix(2,ntfix) = ib
             itfix(3,ntfix) = ic
@@ -290,12 +309,6 @@ c
             tfix(1,ntfix) = t1
             tfix(2,ntfix) = t2
             tfix(3,ntfix) = t3
-            if (ntfix .gt. maxfix) then
-               write (iout,130)
-  130          format (/,' KGEOM  --  Too many Torsion Restraints;',
-     &                    ' Increase MAXFIX')
-               call fatal
-            end if
 c
 c     get groups restrained to a specified distance range
 c
@@ -306,11 +319,11 @@ c
             g2 = 0.0d0
             g3 = 0.0d0
             exist = .false.
-            read (string,*,err=140,end=140)  ia,ib,g1,g2
+            read (string,*,err=160,end=160)  ia,ib,g1,g2
             exist = .true.
-  140       continue
-            read (string,*,err=150,end=150)  ia,ib,g1,g2,g3
-  150       continue
+  160       continue
+            read (string,*,err=170,end=170)  ia,ib,g1,g2,g3
+  170       continue
             if (.not. exist) then
                xcm = 0.0d0
                ycm = 0.0d0
@@ -347,17 +360,17 @@ c
             end if
             if (g3 .eq. 0.0d0)  g3 = g2
             ngfix = ngfix + 1
+            if (ngfix .gt. maxfix) then
+               write (iout,180)
+  180          format (/,' KGEOM  --  Too many Group Restraints;',
+     &                    ' Increase MAXFIX')
+               call fatal
+            end if
             igfix(1,ngfix) = ia
             igfix(2,ngfix) = ib
             gfix(1,ngfix) = g1
             gfix(2,ngfix) = g2
             gfix(3,ngfix) = g3
-            if (ngfix .gt. maxfix) then
-               write (iout,160)
-  160          format (/,' KGEOM  --  Too many Group Restraints;',
-     &                    ' Increase MAXFIX')
-               call fatal
-            end if
 c
 c     maintain chirality as found in the original input structure
 c
@@ -416,8 +429,8 @@ c
          else if (keyword(1:6) .eq. 'BASIN ') then
             depth = 0.0d0
             width = 0.0d0
-            read (string,*,err=170,end=170)  depth,width
-  170       continue
+            read (string,*,err=190,end=190)  depth,width
+  190       continue
             use_basin = .true.
             if (depth .eq. 0.0d0)  use_basin = .false.
             if (width .eq. 0.0d0)  use_basin = .false.
@@ -427,22 +440,15 @@ c     setup any spherical droplet restraint between atoms
 c
          else if (keyword(1:5) .eq. 'WALL ') then
             rwall = 0.0d0
-            read (string,*,err=180,end=180)  rwall
-  180       continue
+            read (string,*,err=200,end=200)  rwall
+  200       continue
             if (rwall .gt. 0.0d0)  use_wall = .true.
          end if
       end do
 c
-c     turn on the geometric restraint potential if it is used
+c     turn off the geometric restraint potential if it is not used
 c
-      use_geom = .false.
-      if (npfix .ne. 0)  use_geom = .true.
-      if (ndfix .ne. 0)  use_geom = .true.
-      if (nafix .ne. 0)  use_geom = .true.
-      if (ntfix .ne. 0)  use_geom = .true.
-      if (ngfix .ne. 0)  use_geom = .true.
-      if (nchir .ne. 0)  use_geom = .true.
-      if (use_basin)  use_geom = .true.
-      if (use_wall)  use_geom = .true.
+      if (max(npfix,ndfix,nafix,ntfix,ngfix,nchir).eq.0 .and.
+     &       .not.use_basin .and. .not.use_wall)  use_geom = .false.
       return
       end

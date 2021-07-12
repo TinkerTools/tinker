@@ -36,9 +36,9 @@ c
       integer i,k,iangtor
       integer ia,ib,ic,id
       real*8 e,e1,e2
-      real*8 rcb,fgrp
+      real*8 eps,fgrp
+      real*8 rba,rcb,rdc
       real*8 rt2,ru2,rtru
-      real*8 rba2,rcb2,rdc2
       real*8 dot,dt,tangle
       real*8 xt,yt,zt
       real*8 xu,yu,zu
@@ -71,6 +71,10 @@ c
       end do
       if (nangtor .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -85,7 +89,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
-!$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,use_group,use_polymer,
+!$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eat,neat,aeat)
 !$OMP DO reduction(+:eat,neat,aeat) schedule(guided)
@@ -135,103 +139,98 @@ c
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
-            rba2 = xba*xba + yba*yba + zba*zba
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rdc2 = xdc*xdc + ydc*ydc + zdc*zdc
-            if (min(rba2,rcb2,rdc2) .ne. 0.0d0) then
-               xt = yba*zcb - ycb*zba
-               yt = zba*xcb - zcb*xba
-               zt = xba*ycb - xcb*yba
-               xu = ycb*zdc - ydc*zcb
-               yu = zcb*xdc - zdc*xcb
-               zu = xcb*ydc - xdc*ycb
-               xtu = yt*zu - yu*zt
-               ytu = zt*xu - zu*xt
-               ztu = xt*yu - xu*yt
-               rt2 = xt*xt + yt*yt + zt*zt
-               rt2 = max(rt2,0.000001d0)
-               ru2 = xu*xu + yu*yu + zu*zu
-               ru2 = max(ru2,0.000001d0)
-               rtru = sqrt(rt2*ru2)
-               rcb = sqrt(rcb2)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
-               tangle = radian * acos(cosine)
-               if (sine .lt. 0.0d0)  tangle = -tangle
+            rba = sqrt(max(xba*xba+yba*yba+zba*zba,eps))
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
+            rdc = sqrt(max(xdc*xdc+ydc*ydc+zdc*zdc,eps))
+            xt = yba*zcb - ycb*zba
+            yt = zba*xcb - zcb*xba
+            zt = xba*ycb - xcb*yba
+            xu = ycb*zdc - ydc*zcb
+            yu = zcb*xdc - zdc*xcb
+            zu = xcb*ydc - xdc*ycb
+            xtu = yt*zu - yu*zt
+            ytu = zt*xu - zu*xt
+            ztu = xt*yu - xu*yt
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
+            rtru = sqrt(rt2*ru2)
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            tangle = radian * acos(cosine)
+            if (sine .lt. 0.0d0)  tangle = -tangle
 c
 c     compute multiple angle trigonometry and phase terms
 c
-               c1 = tors1(3,i)
-               s1 = tors1(4,i)
-               c2 = tors2(3,i)
-               s2 = tors2(4,i)
-               c3 = tors3(3,i)
-               s3 = tors3(4,i)
-               cosine2 = cosine*cosine - sine*sine
-               sine2 = 2.0d0 * cosine * sine
-               cosine3 = cosine*cosine2 - sine*sine2
-               sine3 = cosine*sine2 + sine*cosine2
-               phi1 = 1.0d0 + (cosine*c1 + sine*s1)
-               phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
-               phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
+            c1 = tors1(3,i)
+            s1 = tors1(4,i)
+            c2 = tors2(3,i)
+            s2 = tors2(4,i)
+            c3 = tors3(3,i)
+            s3 = tors3(4,i)
+            cosine2 = cosine*cosine - sine*sine
+            sine2 = 2.0d0 * cosine * sine
+            cosine3 = cosine*cosine2 - sine*sine2
+            sine3 = cosine*sine2 + sine*cosine2
+            phi1 = 1.0d0 + (cosine*c1 + sine*s1)
+            phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
+            phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
 c
 c     get the angle-torsion values for the first angle
 c
-               v1 = kant(1,iangtor)
-               v2 = kant(2,iangtor)
-               v3 = kant(3,iangtor)
-               k = iat(2,iangtor)
-               dot = xba*xcb + yba*ycb + zba*zcb
-               cosang = -dot / sqrt(rba2*rcb2)
-               angle = radian * acos(cosang)
-               dt = angle - anat(k)
-               e1 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
+            v1 = kant(1,iangtor)
+            v2 = kant(2,iangtor)
+            v3 = kant(3,iangtor)
+            k = iat(2,iangtor)
+            dot = xba*xcb + yba*ycb + zba*zcb
+            cosang = -dot / (rba*rcb)
+            angle = radian * acos(cosang)
+            dt = angle - anat(k)
+            e1 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     get the angle-torsion values for the second angle
 c
-               v1 = kant(4,iangtor)
-               v2 = kant(5,iangtor)
-               v3 = kant(6,iangtor)
-               k = iat(3,iangtor)
-               dot = xcb*xdc + ycb*ydc + zcb*zdc
-               cosang = -dot / sqrt(rcb2*rdc2)
-               angle = radian * acos(cosang)
-               dt = angle - anat(k)
-               e2 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
+            v1 = kant(4,iangtor)
+            v2 = kant(5,iangtor)
+            v3 = kant(6,iangtor)
+            k = iat(3,iangtor)
+            dot = xcb*xdc + ycb*ydc + zcb*zdc
+            cosang = -dot / (rcb*rdc)
+            angle = radian * acos(cosang)
+            dt = angle - anat(k)
+            e2 = atorunit * dt * (v1*phi1 + v2*phi2 + v3*phi3)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group) then
-                  e1 = e1 * fgrp
-                  e2 = e2 * fgrp
-               end if
+            if (use_group) then
+               e1 = e1 * fgrp
+               e2 = e2 * fgrp
+            end if
 c
 c     increment the total angle-torsion energy
 c
-               neat = neat + 1
-               e = e1 + e2
-               eat = eat + e
-               aeat(ia) = aeat(ia) + e1/3.0d0
-               aeat(ib) = aeat(ib) + e/3.0d0
-               aeat(ic) = aeat(ic) + e/3.0d0
-               aeat(id) = aeat(id) + e2/3.0d0
+            neat = neat + 1
+            e = e1 + e2
+            eat = eat + e
+            aeat(ia) = aeat(ia) + e1/3.0d0
+            aeat(ib) = aeat(ib) + e/3.0d0
+            aeat(ic) = aeat(ic) + e/3.0d0
+            aeat(id) = aeat(id) + e2/3.0d0
 c
 c     print a message if the energy of this interaction is large
 c
-               huge = (e .gt. 3.0d0)
-               if (debug .or. (verbose.and.huge)) then
-                  if (header) then
-                     header = .false.
-                     write (iout,20)
-   20                format (/,' Individual Angle-Torsion',
-     &                          ' Interactions :',
-     &                       //,' Type',25x,'Atom Names',21x,'Angle',
-     &                          6x,'Energy',/)
-                  end if
-                  write (iout,30)  ia,name(ia),ib,name(ib),ic,
-     &                             name(ic),id,name(id),tangle,e
-   30             format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
+            huge = (e .gt. 3.0d0)
+            if (debug .or. (verbose.and.huge)) then
+               if (header) then
+                  header = .false.
+                  write (iout,20)
+   20             format (/,' Individual Angle-Torsion',
+     &                       ' Interactions :',
+     &                    //,' Type',25x,'Atom Names',21x,'Angle',
+     &                       6x,'Energy',/)
                end if
+               write (iout,30)  ia,name(ia),ib,name(ib),ic,
+     &                          name(ic),id,name(id),tangle,e
+   30          format (' AngTors',3x,4(i7,'-',a3),f11.4,f12.4)
             end if
          end if
       end do

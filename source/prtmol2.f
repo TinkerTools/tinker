@@ -24,7 +24,7 @@ c
       use titles
       implicit none
       integer i,j,imol2
-      integer subnum
+      integer substr
       integer trimtext
       real*8, allocatable :: atmchg(:)
       logical opened
@@ -62,7 +62,8 @@ c
          write (imol2,30)  title(1:ltitle)
    30    format (a)
       end if
-      write (imol2,40)  n,nbond,1
+      substr = 1
+      write (imol2,40)  n,nbond,substr
    40 format (3i7)
       write (imol2,50)
    50 format ('SMALL')
@@ -78,10 +79,10 @@ c
       write (imol2,70)
    70 format (/,'@<TRIPOS>ATOM')
       do i = 1, n
-         subnum = 1
+         substr = 1
          subnam = '<1>'
          write (imol2,80)  i,atmnam(i),x(i),y(i),z(i),atmtyp(i),
-     &                     subnum,subnam,atmchg(i)
+     &                     substr,subnam,atmchg(i)
    80    format (i7,2x,a8,3f12.6,2x,a5,i4,2x,a3,f7.2)
       end do
 c
@@ -133,15 +134,17 @@ c
       use atoms
       use bndstr
       use couple
+      use ptable
       use ring
       use tors
       implicit none
       integer i,j,k,m
       integer ia,ib,ic,id
       integer ka,kb,kc
-      integer tenthou,thousand
-      integer hundred,tens,ones
-      integer atmnum,it,nlist
+      integer leng,size
+      integer atmnum
+      integer it,nlist
+      integer trimtext
       integer list(12)
       real*8 atmchg(*)
       logical aromat
@@ -150,8 +153,9 @@ c
       character*1 ta,tb,tc,td
       character*1 digit(0:9)
       character*2 bndtyp(*)
-      character*5 number
+      character*3 element
       character*5 atmtyp(*)
+      character*8 number
       character*8 atmnam(*)
       data digit  / '0','1','2','3','4','5','6','7','8','9' /
 c
@@ -163,44 +167,6 @@ c
          atmtyp(i) = '     '
          atmchg(i) = 0.0d0
          bndtyp(i) = '  '
-      end do
-c
-c     construct the generic MOL2 atom_name for each atom
-c
-      do i = 1, n
-         tenthou = 1 / 10000
-         thousand = (i - 10000*tenthou) / 1000
-         hundred = (i - 10000*tenthou - 1000*thousand) / 100
-         tens = (i - 10000*tenthou - 1000*thousand - 100*hundred) / 10
-         ones = i - 10000*tenthou - 1000*thousand
-     &             - 100*hundred - 10*tens
-         number(1:1) = digit(tenthou)
-         number(2:2) = digit(thousand)
-         number(3:3) = digit(hundred)
-         number(4:4) = digit(tens)
-         number(5:5) = digit(ones)
-         if (number(1:1) .eq. '0')  number(1:1) = ' '
-         if (number(2:2).eq.'0' .and. number(1:1).eq.' ') then
-            number(2:2) = ' '
-         end if
-         if (number(3:3).eq.'0' .and. number(2:2).eq.' ') then
-            number(3:3) = ' '
-         end if
-         if (number(4:4).eq.'0' .and. number(3:3).eq.' ') then
-            number(4:4) = ' '
-         end if
-         atmnam(i) = name(i)//number
-         do j = 1, 7
-            do while (atmnam(i)(j:j) .eq. ' ')
-               do k = j, 7
-                  atmnam(i)(k:k) = atmnam(i)(k+1:k+1)
-               end do
-               atmnam(i)(8:8) = '*'
-            end do
-         end do
-         do j = 1, 8
-            if (atmnam(i)(j:j) .eq. '*')  atmnam(i)(j:j) = ' '
-         end do
       end do
 c
 c     determine the element types based upon atom names
@@ -235,6 +201,20 @@ c
             if (name(i)(1:1) .eq. 'N')  atomic(i) = 7
             if (name(i)(1:1) .eq. 'O')  atomic(i) = 8
             if (name(i)(1:1) .eq. 'S')  atomic(i) = 16
+         end if
+      end do
+c
+c     construct the generic MOL2 atom_name for each atom
+c
+      do i = 1, n
+         size = 1
+         call numeral (i,number,size)
+         if (atomic(i) .eq. 0) then
+            atmnam(i) = 'X'//number(1:size)
+         else
+            element = elemnt(atomic(i))
+            leng = trimtext (element)
+            atmnam(i) = element(1:leng)//number(1:size)
          end if
       end do
 c

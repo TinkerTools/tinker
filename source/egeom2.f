@@ -24,6 +24,8 @@ c
       use atomid
       use atoms
       use bound
+      use boxes
+      use cell
       use deriv
       use group
       use hessn
@@ -35,7 +37,8 @@ c
       integer ia,ib,ic,id
       integer kpos,kdist,kang
       integer ktors,kchir
-      real*8 xr,yr,zr,fgrp
+      real*8 eps,fgrp
+      real*8 xr,yr,zr
       real*8 target,force
       real*8 dot,angle
       real*8 cosine,sine
@@ -127,8 +130,32 @@ c
       real*8 xi,yi,zi,ri,ri2
       real*8 r,r2,r6,r12
       real*8 a,b,buffer
+      real*8 xorig,xorig2
+      real*8 yorig,yorig2
+      real*8 zorig,zorig2
       logical proceed,intermol,linear
 c
+c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
+c     disable replica mechanism when computing restraint terms
+c
+      if (use_replica) then
+         xorig = xcell
+         yorig = ycell
+         zorig = zcell
+         xorig2 = xcell2
+         yorig2 = ycell2
+         zorig2 = zcell2
+         xcell = xbox
+         ycell = ybox
+         zcell = zbox
+         xcell2 = xbox2
+         ycell2 = ybox2
+         zcell2 = zbox2
+      end if
 c
 c     compute the Hessian elements for position restraints
 c
@@ -158,13 +185,10 @@ c
 c
 c     set the chain rule terms for the Hessian elements
 c
-            if (r .eq. 0.0d0) then
-               de = deddt
-               term = 0.0d0
-            else
-               de = deddt * dt/r
-               term = (deddt-de) / r2
-            end if
+            r = max(r,eps)
+            r2 = r * r
+            de = deddt * dt/r
+            term = (deddt-de) / r2
             termx = term * xr
             termy = term * yr
             termz = term * zr
@@ -223,10 +247,8 @@ c
 c
 c     set the chain rule terms for the Hessian elements
 c
-            if (r .eq. 0.0d0) then
-               r = 0.0001d0
-               r2 = r * r
-            end if
+            r = max(r,eps)
+            r2 = r * r
             de = deddt * dt/r
             term = (deddt-de) / r2
             termx = term * xr
@@ -280,324 +302,323 @@ c
             xcb = xic - xib
             ycb = yic - yib
             zcb = zic - zib
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-               xp = ycb*zab - zcb*yab
-               yp = zcb*xab - xcb*zab
-               zp = xcb*yab - ycb*xab
-               rp = sqrt(xp*xp + yp*yp + zp*zp)
-               dot = xab*xcb + yab*ycb + zab*zcb
-               cosine = dot / sqrt(rab2*rcb2)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               force = afix(1,kang)
-               af1 = afix(2,kang)
-               af2 = afix(3,kang)
-               target = angle
-               if (angle .lt. af1)  target = af1
-               if (angle .gt. af2)  target = af2
-               dt = angle - target
-               dt2 = dt * dt
-               deddt = 2.0d0 * force * dt * radian
-               d2eddt2 = 2.0d0 * force * radian**2
+            rab2 = max(xab*xab+yab*yab+zab*zab,eps)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
+            xp = ycb*zab - zcb*yab
+            yp = zcb*xab - xcb*zab
+            zp = xcb*yab - ycb*xab
+            rp = sqrt(max(xp*xp+yp*yp+zp*zp,eps))
+            dot = xab*xcb + yab*ycb + zab*zcb
+            cosine = dot / sqrt(rab2*rcb2)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            force = afix(1,kang)
+            af1 = afix(2,kang)
+            af2 = afix(3,kang)
+            target = angle
+            if (angle .lt. af1)  target = af1
+            if (angle .gt. af2)  target = af2
+            dt = angle - target
+            dt = dt / radian
+            dt2 = dt * dt
+            deddt = 2.0d0 * force * dt
+            d2eddt2 = 2.0d0 * force
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group) then
-                  deddt = deddt * fgrp
-                  d2eddt2 = d2eddt2 * fgrp
-               end if
+            if (use_group) then
+               deddt = deddt * fgrp
+               d2eddt2 = d2eddt2 * fgrp
+            end if
 c
 c     construct an orthogonal direction for linear angles
 c
-               linear = .false.
-               if (rp .lt. 0.000001d0) then
-                  linear = .true.
-                  if (xab.ne.0.0d0 .and. yab.ne.0.0d0) then
-                     xp = -yab
-                     yp = xab
-                     zp = 0.0d0
-                  else if (xab.eq.0.0d0 .and. yab.eq.0.0d0) then
-                     xp = 1.0d0
-                     yp = 0.0d0
-                     zp = 0.0d0
-                  else if (xab.ne.0.0d0 .and. yab.eq.0.0d0) then
-                     xp = 0.0d0
-                     yp = 1.0d0
-                     zp = 0.0d0
-                  else if (xab.eq.0.0d0 .and. yab.ne.0.0d0) then
-                     xp = 1.0d0
-                     yp = 0.0d0
-                     zp = 0.0d0
-                  end if
-                  rp = sqrt(xp*xp + yp*yp + zp*zp)
+            linear = .false.
+            if (rp .lt. eps) then
+               linear = .true.
+               if (xab.ne.0.0d0 .and. yab.ne.0.0d0) then
+                  xp = -yab
+                  yp = xab
+                  zp = 0.0d0
+               else if (xab.eq.0.0d0 .and. yab.eq.0.0d0) then
+                  xp = 1.0d0
+                  yp = 0.0d0
+                  zp = 0.0d0
+               else if (xab.ne.0.0d0 .and. yab.eq.0.0d0) then
+                  xp = 0.0d0
+                  yp = 1.0d0
+                  zp = 0.0d0
+               else if (xab.eq.0.0d0 .and. yab.ne.0.0d0) then
+                  xp = 1.0d0
+                  yp = 0.0d0
+                  zp = 0.0d0
                end if
+               rp = sqrt(xp*xp + yp*yp + zp*zp)
+            end if
 c
 c     first derivatives of bond angle with respect to coordinates
 c
-   10          continue
-               terma = -1.0d0 / (rab2*rp)
-               termc = 1.0d0 / (rcb2*rp)
-               ddtdxia = terma * (yab*zp-zab*yp)
-               ddtdyia = terma * (zab*xp-xab*zp)
-               ddtdzia = terma * (xab*yp-yab*xp)
-               ddtdxic = termc * (ycb*zp-zcb*yp)
-               ddtdyic = termc * (zcb*xp-xcb*zp)
-               ddtdzic = termc * (xcb*yp-ycb*xp)
-               ddtdxib = -ddtdxia - ddtdxic
-               ddtdyib = -ddtdyia - ddtdyic
-               ddtdzib = -ddtdzia - ddtdzic
+   10       continue
+            terma = -1.0d0 / (rab2*rp)
+            termc = 1.0d0 / (rcb2*rp)
+            ddtdxia = terma * (yab*zp-zab*yp)
+            ddtdyia = terma * (zab*xp-xab*zp)
+            ddtdzia = terma * (xab*yp-yab*xp)
+            ddtdxic = termc * (ycb*zp-zcb*yp)
+            ddtdyic = termc * (zcb*xp-xcb*zp)
+            ddtdzic = termc * (xcb*yp-ycb*xp)
+            ddtdxib = -ddtdxia - ddtdxic
+            ddtdyib = -ddtdyia - ddtdyic
+            ddtdzib = -ddtdzia - ddtdzic
 c
 c     abbreviations used in defining chain rule terms
 c
-               xrab = 2.0d0 * xab / rab2
-               yrab = 2.0d0 * yab / rab2
-               zrab = 2.0d0 * zab / rab2
-               xrcb = 2.0d0 * xcb / rcb2
-               yrcb = 2.0d0 * ycb / rcb2
-               zrcb = 2.0d0 * zcb / rcb2
-               rp2 = 1.0d0 / (rp*rp)
-               xabp = (yab*zp-zab*yp) * rp2
-               yabp = (zab*xp-xab*zp) * rp2
-               zabp = (xab*yp-yab*xp) * rp2
-               xcbp = (ycb*zp-zcb*yp) * rp2
-               ycbp = (zcb*xp-xcb*zp) * rp2
-               zcbp = (xcb*yp-ycb*xp) * rp2
+            xrab = 2.0d0 * xab / rab2
+            yrab = 2.0d0 * yab / rab2
+            zrab = 2.0d0 * zab / rab2
+            xrcb = 2.0d0 * xcb / rcb2
+            yrcb = 2.0d0 * ycb / rcb2
+            zrcb = 2.0d0 * zcb / rcb2
+            rp2 = 1.0d0 / (rp*rp)
+            xabp = (yab*zp-zab*yp) * rp2
+            yabp = (zab*xp-xab*zp) * rp2
+            zabp = (xab*yp-yab*xp) * rp2
+            xcbp = (ycb*zp-zcb*yp) * rp2
+            ycbp = (zcb*xp-xcb*zp) * rp2
+            zcbp = (xcb*yp-ycb*xp) * rp2
 c
 c     chain rule terms for second derivative components
 c
-               dxiaxia = terma*(xab*xcb-dot) + ddtdxia*(xcbp-xrab)
-               dxiayia = terma*(zp+yab*xcb) + ddtdxia*(ycbp-yrab)
-               dxiazia = terma*(zab*xcb-yp) + ddtdxia*(zcbp-zrab)
-               dyiayia = terma*(yab*ycb-dot) + ddtdyia*(ycbp-yrab)
-               dyiazia = terma*(xp+zab*ycb) + ddtdyia*(zcbp-zrab)
-               dziazia = terma*(zab*zcb-dot) + ddtdzia*(zcbp-zrab)
-               dxicxic = termc*(dot-xab*xcb) - ddtdxic*(xabp+xrcb)
-               dxicyic = termc*(zp-ycb*xab) - ddtdxic*(yabp+yrcb)
-               dxiczic = -termc*(yp+zcb*xab) - ddtdxic*(zabp+zrcb)
-               dyicyic = termc*(dot-yab*ycb) - ddtdyic*(yabp+yrcb)
-               dyiczic = termc*(xp-zcb*yab) - ddtdyic*(zabp+zrcb)
-               dziczic = termc*(dot-zab*zcb) - ddtdzic*(zabp+zrcb)
-               dxiaxic = terma*(yab*yab+zab*zab) - ddtdxia*xabp
-               dxiayic = -terma*xab*yab - ddtdxia*yabp
-               dxiazic = -terma*xab*zab - ddtdxia*zabp
-               dyiaxic = -terma*xab*yab - ddtdyia*xabp
-               dyiayic = terma*(xab*xab+zab*zab) - ddtdyia*yabp
-               dyiazic = -terma*yab*zab - ddtdyia*zabp
-               dziaxic = -terma*xab*zab - ddtdzia*xabp
-               dziayic = -terma*yab*zab - ddtdzia*yabp
-               dziazic = terma*(xab*xab+yab*yab) - ddtdzia*zabp
+            dxiaxia = terma*(xab*xcb-dot) + ddtdxia*(xcbp-xrab)
+            dxiayia = terma*(zp+yab*xcb) + ddtdxia*(ycbp-yrab)
+            dxiazia = terma*(zab*xcb-yp) + ddtdxia*(zcbp-zrab)
+            dyiayia = terma*(yab*ycb-dot) + ddtdyia*(ycbp-yrab)
+            dyiazia = terma*(xp+zab*ycb) + ddtdyia*(zcbp-zrab)
+            dziazia = terma*(zab*zcb-dot) + ddtdzia*(zcbp-zrab)
+            dxicxic = termc*(dot-xab*xcb) - ddtdxic*(xabp+xrcb)
+            dxicyic = termc*(zp-ycb*xab) - ddtdxic*(yabp+yrcb)
+            dxiczic = -termc*(yp+zcb*xab) - ddtdxic*(zabp+zrcb)
+            dyicyic = termc*(dot-yab*ycb) - ddtdyic*(yabp+yrcb)
+            dyiczic = termc*(xp-zcb*yab) - ddtdyic*(zabp+zrcb)
+            dziczic = termc*(dot-zab*zcb) - ddtdzic*(zabp+zrcb)
+            dxiaxic = terma*(yab*yab+zab*zab) - ddtdxia*xabp
+            dxiayic = -terma*xab*yab - ddtdxia*yabp
+            dxiazic = -terma*xab*zab - ddtdxia*zabp
+            dyiaxic = -terma*xab*yab - ddtdyia*xabp
+            dyiayic = terma*(xab*xab+zab*zab) - ddtdyia*yabp
+            dyiazic = -terma*yab*zab - ddtdyia*zabp
+            dziaxic = -terma*xab*zab - ddtdzia*xabp
+            dziayic = -terma*yab*zab - ddtdzia*yabp
+            dziazic = terma*(xab*xab+yab*yab) - ddtdzia*zabp
 c
 c     get some second derivative chain rule terms by difference
 c
-               dxibxia = -dxiaxia - dxiaxic
-               dxibyia = -dxiayia - dyiaxic
-               dxibzia = -dxiazia - dziaxic
-               dyibxia = -dxiayia - dxiayic
-               dyibyia = -dyiayia - dyiayic
-               dyibzia = -dyiazia - dziayic
-               dzibxia = -dxiazia - dxiazic
-               dzibyia = -dyiazia - dyiazic
-               dzibzia = -dziazia - dziazic
-               dxibxic = -dxicxic - dxiaxic
-               dxibyic = -dxicyic - dxiayic
-               dxibzic = -dxiczic - dxiazic
-               dyibxic = -dxicyic - dyiaxic
-               dyibyic = -dyicyic - dyiayic
-               dyibzic = -dyiczic - dyiazic
-               dzibxic = -dxiczic - dziaxic
-               dzibyic = -dyiczic - dziayic
-               dzibzic = -dziczic - dziazic
-               dxibxib = -dxibxia - dxibxic
-               dxibyib = -dxibyia - dxibyic
-               dxibzib = -dxibzia - dxibzic
-               dyibyib = -dyibyia - dyibyic
-               dyibzib = -dyibzia - dyibzic
-               dzibzib = -dzibzia - dzibzic
+            dxibxia = -dxiaxia - dxiaxic
+            dxibyia = -dxiayia - dyiaxic
+            dxibzia = -dxiazia - dziaxic
+            dyibxia = -dxiayia - dxiayic
+            dyibyia = -dyiayia - dyiayic
+            dyibzia = -dyiazia - dziayic
+            dzibxia = -dxiazia - dxiazic
+            dzibyia = -dyiazia - dyiazic
+            dzibzia = -dziazia - dziazic
+            dxibxic = -dxicxic - dxiaxic
+            dxibyic = -dxicyic - dxiayic
+            dxibzic = -dxiczic - dxiazic
+            dyibxic = -dxicyic - dyiaxic
+            dyibyic = -dyicyic - dyiayic
+            dyibzic = -dyiczic - dyiazic
+            dzibxic = -dxiczic - dziaxic
+            dzibyic = -dyiczic - dziayic
+            dzibzic = -dziczic - dziazic
+            dxibxib = -dxibxia - dxibxic
+            dxibyib = -dxibyia - dxibyic
+            dxibzib = -dxibzia - dxibzic
+            dyibyib = -dyibyia - dyibyic
+            dyibzib = -dyibzia - dyibzic
+            dzibzib = -dzibzia - dzibzic
 c
 c     increment diagonal and off-diagonal Hessian elements
 c
-               if (ia .eq. i) then
-                  hessx(1,ia) = hessx(1,ia) + deddt*dxiaxia
-     &                               + d2eddt2*ddtdxia*ddtdxia
-                  hessx(2,ia) = hessx(2,ia) + deddt*dxiayia
-     &                               + d2eddt2*ddtdxia*ddtdyia
-                  hessx(3,ia) = hessx(3,ia) + deddt*dxiazia
-     &                               + d2eddt2*ddtdxia*ddtdzia
-                  hessy(1,ia) = hessy(1,ia) + deddt*dxiayia
-     &                               + d2eddt2*ddtdyia*ddtdxia
-                  hessy(2,ia) = hessy(2,ia) + deddt*dyiayia
-     &                               + d2eddt2*ddtdyia*ddtdyia
-                  hessy(3,ia) = hessy(3,ia) + deddt*dyiazia
-     &                               + d2eddt2*ddtdyia*ddtdzia
-                  hessz(1,ia) = hessz(1,ia) + deddt*dxiazia
-     &                               + d2eddt2*ddtdzia*ddtdxia
-                  hessz(2,ia) = hessz(2,ia) + deddt*dyiazia
-     &                               + d2eddt2*ddtdzia*ddtdyia
-                  hessz(3,ia) = hessz(3,ia) + deddt*dziazia
-     &                               + d2eddt2*ddtdzia*ddtdzia
-                  hessx(1,ib) = hessx(1,ib) + deddt*dxibxia
-     &                               + d2eddt2*ddtdxia*ddtdxib
-                  hessx(2,ib) = hessx(2,ib) + deddt*dyibxia
-     &                               + d2eddt2*ddtdxia*ddtdyib
-                  hessx(3,ib) = hessx(3,ib) + deddt*dzibxia
-     &                               + d2eddt2*ddtdxia*ddtdzib
-                  hessy(1,ib) = hessy(1,ib) + deddt*dxibyia
-     &                               + d2eddt2*ddtdyia*ddtdxib
-                  hessy(2,ib) = hessy(2,ib) + deddt*dyibyia
-     &                               + d2eddt2*ddtdyia*ddtdyib
-                  hessy(3,ib) = hessy(3,ib) + deddt*dzibyia
-     &                               + d2eddt2*ddtdyia*ddtdzib
-                  hessz(1,ib) = hessz(1,ib) + deddt*dxibzia
-     &                               + d2eddt2*ddtdzia*ddtdxib
-                  hessz(2,ib) = hessz(2,ib) + deddt*dyibzia
-     &                               + d2eddt2*ddtdzia*ddtdyib
-                  hessz(3,ib) = hessz(3,ib) + deddt*dzibzia
-     &                               + d2eddt2*ddtdzia*ddtdzib
-                  hessx(1,ic) = hessx(1,ic) + deddt*dxiaxic
-     &                               + d2eddt2*ddtdxia*ddtdxic
-                  hessx(2,ic) = hessx(2,ic) + deddt*dxiayic
-     &                               + d2eddt2*ddtdxia*ddtdyic
-                  hessx(3,ic) = hessx(3,ic) + deddt*dxiazic
-     &                               + d2eddt2*ddtdxia*ddtdzic
-                  hessy(1,ic) = hessy(1,ic) + deddt*dyiaxic
-     &                               + d2eddt2*ddtdyia*ddtdxic
-                  hessy(2,ic) = hessy(2,ic) + deddt*dyiayic
-     &                               + d2eddt2*ddtdyia*ddtdyic
-                  hessy(3,ic) = hessy(3,ic) + deddt*dyiazic
-     &                               + d2eddt2*ddtdyia*ddtdzic
-                  hessz(1,ic) = hessz(1,ic) + deddt*dziaxic
-     &                               + d2eddt2*ddtdzia*ddtdxic
-                  hessz(2,ic) = hessz(2,ic) + deddt*dziayic
-     &                               + d2eddt2*ddtdzia*ddtdyic
-                  hessz(3,ic) = hessz(3,ic) + deddt*dziazic
-     &                               + d2eddt2*ddtdzia*ddtdzic
-               else if (ib .eq. i) then
-                  hessx(1,ib) = hessx(1,ib) + deddt*dxibxib
-     &                               + d2eddt2*ddtdxib*ddtdxib
-                  hessx(2,ib) = hessx(2,ib) + deddt*dxibyib
-     &                               + d2eddt2*ddtdxib*ddtdyib
-                  hessx(3,ib) = hessx(3,ib) + deddt*dxibzib
-     &                               + d2eddt2*ddtdxib*ddtdzib
-                  hessy(1,ib) = hessy(1,ib) + deddt*dxibyib
-     &                               + d2eddt2*ddtdyib*ddtdxib
-                  hessy(2,ib) = hessy(2,ib) + deddt*dyibyib
-     &                               + d2eddt2*ddtdyib*ddtdyib
-                  hessy(3,ib) = hessy(3,ib) + deddt*dyibzib
-     &                               + d2eddt2*ddtdyib*ddtdzib
-                  hessz(1,ib) = hessz(1,ib) + deddt*dxibzib
-     &                               + d2eddt2*ddtdzib*ddtdxib
-                  hessz(2,ib) = hessz(2,ib) + deddt*dyibzib
-     &                               + d2eddt2*ddtdzib*ddtdyib
-                  hessz(3,ib) = hessz(3,ib) + deddt*dzibzib
-     &                               + d2eddt2*ddtdzib*ddtdzib
-                  hessx(1,ia) = hessx(1,ia) + deddt*dxibxia
-     &                               + d2eddt2*ddtdxib*ddtdxia
-                  hessx(2,ia) = hessx(2,ia) + deddt*dxibyia
-     &                               + d2eddt2*ddtdxib*ddtdyia
-                  hessx(3,ia) = hessx(3,ia) + deddt*dxibzia
-     &                               + d2eddt2*ddtdxib*ddtdzia
-                  hessy(1,ia) = hessy(1,ia) + deddt*dyibxia
-     &                               + d2eddt2*ddtdyib*ddtdxia
-                  hessy(2,ia) = hessy(2,ia) + deddt*dyibyia
-     &                               + d2eddt2*ddtdyib*ddtdyia
-                  hessy(3,ia) = hessy(3,ia) + deddt*dyibzia
-     &                               + d2eddt2*ddtdyib*ddtdzia
-                  hessz(1,ia) = hessz(1,ia) + deddt*dzibxia
-     &                               + d2eddt2*ddtdzib*ddtdxia
-                  hessz(2,ia) = hessz(2,ia) + deddt*dzibyia
-     &                               + d2eddt2*ddtdzib*ddtdyia
-                  hessz(3,ia) = hessz(3,ia) + deddt*dzibzia
-     &                               + d2eddt2*ddtdzib*ddtdzia
-                  hessx(1,ic) = hessx(1,ic) + deddt*dxibxic
-     &                               + d2eddt2*ddtdxib*ddtdxic
-                  hessx(2,ic) = hessx(2,ic) + deddt*dxibyic
-     &                               + d2eddt2*ddtdxib*ddtdyic
-                  hessx(3,ic) = hessx(3,ic) + deddt*dxibzic
-     &                               + d2eddt2*ddtdxib*ddtdzic
-                  hessy(1,ic) = hessy(1,ic) + deddt*dyibxic
-     &                               + d2eddt2*ddtdyib*ddtdxic
-                  hessy(2,ic) = hessy(2,ic) + deddt*dyibyic
-     &                               + d2eddt2*ddtdyib*ddtdyic
-                  hessy(3,ic) = hessy(3,ic) + deddt*dyibzic
-     &                               + d2eddt2*ddtdyib*ddtdzic
-                  hessz(1,ic) = hessz(1,ic) + deddt*dzibxic
-     &                               + d2eddt2*ddtdzib*ddtdxic
-                  hessz(2,ic) = hessz(2,ic) + deddt*dzibyic
-     &                               + d2eddt2*ddtdzib*ddtdyic
-                  hessz(3,ic) = hessz(3,ic) + deddt*dzibzic
-     &                               + d2eddt2*ddtdzib*ddtdzic
-               else if (ic .eq. i) then
-                  hessx(1,ic) = hessx(1,ic) + deddt*dxicxic
-     &                               + d2eddt2*ddtdxic*ddtdxic
-                  hessx(2,ic) = hessx(2,ic) + deddt*dxicyic
-     &                               + d2eddt2*ddtdxic*ddtdyic
-                  hessx(3,ic) = hessx(3,ic) + deddt*dxiczic
-     &                               + d2eddt2*ddtdxic*ddtdzic
-                  hessy(1,ic) = hessy(1,ic) + deddt*dxicyic
-     &                               + d2eddt2*ddtdyic*ddtdxic
-                  hessy(2,ic) = hessy(2,ic) + deddt*dyicyic
-     &                               + d2eddt2*ddtdyic*ddtdyic
-                  hessy(3,ic) = hessy(3,ic) + deddt*dyiczic
-     &                               + d2eddt2*ddtdyic*ddtdzic
-                  hessz(1,ic) = hessz(1,ic) + deddt*dxiczic
-     &                               + d2eddt2*ddtdzic*ddtdxic
-                  hessz(2,ic) = hessz(2,ic) + deddt*dyiczic
-     &                               + d2eddt2*ddtdzic*ddtdyic
-                  hessz(3,ic) = hessz(3,ic) + deddt*dziczic
-     &                               + d2eddt2*ddtdzic*ddtdzic
-                  hessx(1,ib) = hessx(1,ib) + deddt*dxibxic
-     &                               + d2eddt2*ddtdxic*ddtdxib
-                  hessx(2,ib) = hessx(2,ib) + deddt*dyibxic
-     &                               + d2eddt2*ddtdxic*ddtdyib
-                  hessx(3,ib) = hessx(3,ib) + deddt*dzibxic
-     &                               + d2eddt2*ddtdxic*ddtdzib
-                  hessy(1,ib) = hessy(1,ib) + deddt*dxibyic
-     &                               + d2eddt2*ddtdyic*ddtdxib
-                  hessy(2,ib) = hessy(2,ib) + deddt*dyibyic
-     &                               + d2eddt2*ddtdyic*ddtdyib
-                  hessy(3,ib) = hessy(3,ib) + deddt*dzibyic
-     &                               + d2eddt2*ddtdyic*ddtdzib
-                  hessz(1,ib) = hessz(1,ib) + deddt*dxibzic
-     &                               + d2eddt2*ddtdzic*ddtdxib
-                  hessz(2,ib) = hessz(2,ib) + deddt*dyibzic
-     &                               + d2eddt2*ddtdzic*ddtdyib
-                  hessz(3,ib) = hessz(3,ib) + deddt*dzibzic
-     &                               + d2eddt2*ddtdzic*ddtdzib
-                  hessx(1,ia) = hessx(1,ia) + deddt*dxiaxic
-     &                               + d2eddt2*ddtdxic*ddtdxia
-                  hessx(2,ia) = hessx(2,ia) + deddt*dyiaxic
-     &                               + d2eddt2*ddtdxic*ddtdyia
-                  hessx(3,ia) = hessx(3,ia) + deddt*dziaxic
-     &                               + d2eddt2*ddtdxic*ddtdzia
-                  hessy(1,ia) = hessy(1,ia) + deddt*dxiayic
-     &                               + d2eddt2*ddtdyic*ddtdxia
-                  hessy(2,ia) = hessy(2,ia) + deddt*dyiayic
-     &                               + d2eddt2*ddtdyic*ddtdyia
-                  hessy(3,ia) = hessy(3,ia) + deddt*dziayic
-     &                               + d2eddt2*ddtdyic*ddtdzia
-                  hessz(1,ia) = hessz(1,ia) + deddt*dxiazic
-     &                               + d2eddt2*ddtdzic*ddtdxia
-                  hessz(2,ia) = hessz(2,ia) + deddt*dyiazic
-     &                               + d2eddt2*ddtdzic*ddtdyia
-                  hessz(3,ia) = hessz(3,ia) + deddt*dziazic
-     &                               + d2eddt2*ddtdzic*ddtdzia
-               end if
+            if (ia .eq. i) then
+               hessx(1,ia) = hessx(1,ia) + deddt*dxiaxia
+     &                            + d2eddt2*ddtdxia*ddtdxia
+               hessx(2,ia) = hessx(2,ia) + deddt*dxiayia
+     &                            + d2eddt2*ddtdxia*ddtdyia
+               hessx(3,ia) = hessx(3,ia) + deddt*dxiazia
+     &                            + d2eddt2*ddtdxia*ddtdzia
+               hessy(1,ia) = hessy(1,ia) + deddt*dxiayia
+     &                            + d2eddt2*ddtdyia*ddtdxia
+               hessy(2,ia) = hessy(2,ia) + deddt*dyiayia
+     &                            + d2eddt2*ddtdyia*ddtdyia
+               hessy(3,ia) = hessy(3,ia) + deddt*dyiazia
+     &                            + d2eddt2*ddtdyia*ddtdzia
+               hessz(1,ia) = hessz(1,ia) + deddt*dxiazia
+     &                            + d2eddt2*ddtdzia*ddtdxia
+               hessz(2,ia) = hessz(2,ia) + deddt*dyiazia
+     &                            + d2eddt2*ddtdzia*ddtdyia
+               hessz(3,ia) = hessz(3,ia) + deddt*dziazia
+     &                            + d2eddt2*ddtdzia*ddtdzia
+               hessx(1,ib) = hessx(1,ib) + deddt*dxibxia
+     &                            + d2eddt2*ddtdxia*ddtdxib
+               hessx(2,ib) = hessx(2,ib) + deddt*dyibxia
+     &                            + d2eddt2*ddtdxia*ddtdyib
+               hessx(3,ib) = hessx(3,ib) + deddt*dzibxia
+     &                            + d2eddt2*ddtdxia*ddtdzib
+               hessy(1,ib) = hessy(1,ib) + deddt*dxibyia
+     &                            + d2eddt2*ddtdyia*ddtdxib
+               hessy(2,ib) = hessy(2,ib) + deddt*dyibyia
+     &                            + d2eddt2*ddtdyia*ddtdyib
+               hessy(3,ib) = hessy(3,ib) + deddt*dzibyia
+     &                            + d2eddt2*ddtdyia*ddtdzib
+               hessz(1,ib) = hessz(1,ib) + deddt*dxibzia
+     &                            + d2eddt2*ddtdzia*ddtdxib
+               hessz(2,ib) = hessz(2,ib) + deddt*dyibzia
+     &                            + d2eddt2*ddtdzia*ddtdyib
+               hessz(3,ib) = hessz(3,ib) + deddt*dzibzia
+     &                            + d2eddt2*ddtdzia*ddtdzib
+               hessx(1,ic) = hessx(1,ic) + deddt*dxiaxic
+     &                            + d2eddt2*ddtdxia*ddtdxic
+               hessx(2,ic) = hessx(2,ic) + deddt*dxiayic
+     &                            + d2eddt2*ddtdxia*ddtdyic
+               hessx(3,ic) = hessx(3,ic) + deddt*dxiazic
+     &                            + d2eddt2*ddtdxia*ddtdzic
+               hessy(1,ic) = hessy(1,ic) + deddt*dyiaxic
+     &                            + d2eddt2*ddtdyia*ddtdxic
+               hessy(2,ic) = hessy(2,ic) + deddt*dyiayic
+     &                            + d2eddt2*ddtdyia*ddtdyic
+               hessy(3,ic) = hessy(3,ic) + deddt*dyiazic
+     &                            + d2eddt2*ddtdyia*ddtdzic
+               hessz(1,ic) = hessz(1,ic) + deddt*dziaxic
+     &                            + d2eddt2*ddtdzia*ddtdxic
+               hessz(2,ic) = hessz(2,ic) + deddt*dziayic
+     &                            + d2eddt2*ddtdzia*ddtdyic
+               hessz(3,ic) = hessz(3,ic) + deddt*dziazic
+     &                            + d2eddt2*ddtdzia*ddtdzic
+            else if (ib .eq. i) then
+               hessx(1,ib) = hessx(1,ib) + deddt*dxibxib
+     &                            + d2eddt2*ddtdxib*ddtdxib
+               hessx(2,ib) = hessx(2,ib) + deddt*dxibyib
+     &                            + d2eddt2*ddtdxib*ddtdyib
+               hessx(3,ib) = hessx(3,ib) + deddt*dxibzib
+     &                            + d2eddt2*ddtdxib*ddtdzib
+               hessy(1,ib) = hessy(1,ib) + deddt*dxibyib
+     &                            + d2eddt2*ddtdyib*ddtdxib
+               hessy(2,ib) = hessy(2,ib) + deddt*dyibyib
+     &                            + d2eddt2*ddtdyib*ddtdyib
+               hessy(3,ib) = hessy(3,ib) + deddt*dyibzib
+     &                            + d2eddt2*ddtdyib*ddtdzib
+               hessz(1,ib) = hessz(1,ib) + deddt*dxibzib
+     &                            + d2eddt2*ddtdzib*ddtdxib
+               hessz(2,ib) = hessz(2,ib) + deddt*dyibzib
+     &                            + d2eddt2*ddtdzib*ddtdyib
+               hessz(3,ib) = hessz(3,ib) + deddt*dzibzib
+     &                            + d2eddt2*ddtdzib*ddtdzib
+               hessx(1,ia) = hessx(1,ia) + deddt*dxibxia
+     &                            + d2eddt2*ddtdxib*ddtdxia
+               hessx(2,ia) = hessx(2,ia) + deddt*dxibyia
+     &                            + d2eddt2*ddtdxib*ddtdyia
+               hessx(3,ia) = hessx(3,ia) + deddt*dxibzia
+     &                            + d2eddt2*ddtdxib*ddtdzia
+               hessy(1,ia) = hessy(1,ia) + deddt*dyibxia
+     &                            + d2eddt2*ddtdyib*ddtdxia
+               hessy(2,ia) = hessy(2,ia) + deddt*dyibyia
+     &                            + d2eddt2*ddtdyib*ddtdyia
+               hessy(3,ia) = hessy(3,ia) + deddt*dyibzia
+     &                            + d2eddt2*ddtdyib*ddtdzia
+               hessz(1,ia) = hessz(1,ia) + deddt*dzibxia
+     &                            + d2eddt2*ddtdzib*ddtdxia
+               hessz(2,ia) = hessz(2,ia) + deddt*dzibyia
+     &                            + d2eddt2*ddtdzib*ddtdyia
+               hessz(3,ia) = hessz(3,ia) + deddt*dzibzia
+     &                            + d2eddt2*ddtdzib*ddtdzia
+               hessx(1,ic) = hessx(1,ic) + deddt*dxibxic
+     &                            + d2eddt2*ddtdxib*ddtdxic
+               hessx(2,ic) = hessx(2,ic) + deddt*dxibyic
+     &                            + d2eddt2*ddtdxib*ddtdyic
+               hessx(3,ic) = hessx(3,ic) + deddt*dxibzic
+     &                            + d2eddt2*ddtdxib*ddtdzic
+               hessy(1,ic) = hessy(1,ic) + deddt*dyibxic
+     &                            + d2eddt2*ddtdyib*ddtdxic
+               hessy(2,ic) = hessy(2,ic) + deddt*dyibyic
+     &                            + d2eddt2*ddtdyib*ddtdyic
+               hessy(3,ic) = hessy(3,ic) + deddt*dyibzic
+     &                            + d2eddt2*ddtdyib*ddtdzic
+               hessz(1,ic) = hessz(1,ic) + deddt*dzibxic
+     &                            + d2eddt2*ddtdzib*ddtdxic
+               hessz(2,ic) = hessz(2,ic) + deddt*dzibyic
+     &                            + d2eddt2*ddtdzib*ddtdyic
+               hessz(3,ic) = hessz(3,ic) + deddt*dzibzic
+     &                            + d2eddt2*ddtdzib*ddtdzic
+            else if (ic .eq. i) then
+               hessx(1,ic) = hessx(1,ic) + deddt*dxicxic
+     &                            + d2eddt2*ddtdxic*ddtdxic
+               hessx(2,ic) = hessx(2,ic) + deddt*dxicyic
+     &                            + d2eddt2*ddtdxic*ddtdyic
+               hessx(3,ic) = hessx(3,ic) + deddt*dxiczic
+     &                            + d2eddt2*ddtdxic*ddtdzic
+               hessy(1,ic) = hessy(1,ic) + deddt*dxicyic
+     &                            + d2eddt2*ddtdyic*ddtdxic
+               hessy(2,ic) = hessy(2,ic) + deddt*dyicyic
+     &                            + d2eddt2*ddtdyic*ddtdyic
+               hessy(3,ic) = hessy(3,ic) + deddt*dyiczic
+     &                            + d2eddt2*ddtdyic*ddtdzic
+               hessz(1,ic) = hessz(1,ic) + deddt*dxiczic
+     &                            + d2eddt2*ddtdzic*ddtdxic
+               hessz(2,ic) = hessz(2,ic) + deddt*dyiczic
+     &                            + d2eddt2*ddtdzic*ddtdyic
+               hessz(3,ic) = hessz(3,ic) + deddt*dziczic
+     &                            + d2eddt2*ddtdzic*ddtdzic
+               hessx(1,ib) = hessx(1,ib) + deddt*dxibxic
+     &                            + d2eddt2*ddtdxic*ddtdxib
+               hessx(2,ib) = hessx(2,ib) + deddt*dyibxic
+     &                            + d2eddt2*ddtdxic*ddtdyib
+               hessx(3,ib) = hessx(3,ib) + deddt*dzibxic
+     &                            + d2eddt2*ddtdxic*ddtdzib
+               hessy(1,ib) = hessy(1,ib) + deddt*dxibyic
+     &                            + d2eddt2*ddtdyic*ddtdxib
+               hessy(2,ib) = hessy(2,ib) + deddt*dyibyic
+     &                            + d2eddt2*ddtdyic*ddtdyib
+               hessy(3,ib) = hessy(3,ib) + deddt*dzibyic
+     &                            + d2eddt2*ddtdyic*ddtdzib
+               hessz(1,ib) = hessz(1,ib) + deddt*dxibzic
+     &                            + d2eddt2*ddtdzic*ddtdxib
+               hessz(2,ib) = hessz(2,ib) + deddt*dyibzic
+     &                            + d2eddt2*ddtdzic*ddtdyib
+               hessz(3,ib) = hessz(3,ib) + deddt*dzibzic
+     &                            + d2eddt2*ddtdzic*ddtdzib
+               hessx(1,ia) = hessx(1,ia) + deddt*dxiaxic
+     &                            + d2eddt2*ddtdxic*ddtdxia
+               hessx(2,ia) = hessx(2,ia) + deddt*dyiaxic
+     &                            + d2eddt2*ddtdxic*ddtdyia
+               hessx(3,ia) = hessx(3,ia) + deddt*dziaxic
+     &                            + d2eddt2*ddtdxic*ddtdzia
+               hessy(1,ia) = hessy(1,ia) + deddt*dxiayic
+     &                            + d2eddt2*ddtdyic*ddtdxia
+               hessy(2,ia) = hessy(2,ia) + deddt*dyiayic
+     &                            + d2eddt2*ddtdyic*ddtdyia
+               hessy(3,ia) = hessy(3,ia) + deddt*dziayic
+     &                            + d2eddt2*ddtdyic*ddtdzia
+               hessz(1,ia) = hessz(1,ia) + deddt*dxiazic
+     &                            + d2eddt2*ddtdzic*ddtdxia
+               hessz(2,ia) = hessz(2,ia) + deddt*dyiazic
+     &                            + d2eddt2*ddtdzic*ddtdyia
+               hessz(3,ia) = hessz(3,ia) + deddt*dziazic
+     &                            + d2eddt2*ddtdzic*ddtdzia
+            end if
 c
 c     construct a second orthogonal direction for linear angles
 c
-               if (linear) then
-                  linear = .false.
-                  xpo = xp
-                  ypo = yp
-                  zpo = zp
-                  xp = ypo*zab - zpo*yab
-                  yp = zpo*xab - xpo*zab
-                  zp = xpo*yab - ypo*xab
-                  rp = sqrt(xp*xp + yp*yp + zp*zp)
-                  goto 10
-               end if
+            if (linear) then
+               linear = .false.
+               xpo = xp
+               ypo = yp
+               zpo = zp
+               xp = ypo*zab - zpo*yab
+               yp = zpo*xab - xpo*zab
+               zp = xpo*yab - ypo*xab
+               rp = sqrt(xp*xp + yp*yp + zp*zp)
+               goto 10
             end if
          end if
       end do
@@ -631,6 +652,7 @@ c
             xcb = xic - xib
             ycb = yic - yib
             zcb = zic - zib
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xdc = xid - xic
             ydc = yid - yic
             zdc = zid - zic
@@ -643,547 +665,542 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               if (sine .lt. 0.0d0)  angle = -angle
-c
-c     calculate the pseudoenergy master chain rule terms
-c
-               force = tfix(1,ktors)
-               tf1 = tfix(2,ktors)
-               tf2 = tfix(3,ktors)
-               if (angle.gt.tf1 .and. angle.lt.tf2) then
-                  target = angle
-               else if (angle.gt.tf1 .and. tf1.gt.tf2) then
-                  target = angle
-               else if (angle.lt.tf2 .and. tf1.gt.tf2) then
-                  target = angle
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            if (sine .lt. 0.0d0)  angle = -angle
+            force = tfix(1,ktors)
+            tf1 = tfix(2,ktors)
+            tf2 = tfix(3,ktors)
+            if (angle.gt.tf1 .and. angle.lt.tf2) then
+               target = angle
+            else if (angle.gt.tf1 .and. tf1.gt.tf2) then
+               target = angle
+            else if (angle.lt.tf2 .and. tf1.gt.tf2) then
+               target = angle
+            else
+               t1 = angle - tf1
+               t2 = angle - tf2
+               if (t1 .gt. 180.0d0) then
+                  t1 = t1 - 360.0d0
+               else if (t1 .lt. -180.0d0) then
+                  t1 = t1 + 360.0d0
+               end if
+               if (t2 .gt. 180.0d0) then
+                  t2 = t2 - 360.0d0
+               else if (t2 .lt. -180.0d0) then
+                  t2 = t2 + 360.0d0
+               end if
+               if (abs(t1) .lt. abs(t2)) then
+                  target = tf1
                else
-                  t1 = angle - tf1
-                  t2 = angle - tf2
-                  if (t1 .gt. 180.0d0) then
-                     t1 = t1 - 360.0d0
-                  else if (t1 .lt. -180.0d0) then
-                     t1 = t1 + 360.0d0
-                  end if
-                  if (t2 .gt. 180.0d0) then
-                     t2 = t2 - 360.0d0
-                  else if (t2 .lt. -180.0d0) then
-                     t2 = t2 + 360.0d0
-                  end if
-                  if (abs(t1) .lt. abs(t2)) then
-                     target = tf1
-                  else
-                     target = tf2
-                  end if
+                  target = tf2
                end if
-               dt = angle - target
-               if (dt .gt. 180.0d0) then
-                  dt = dt - 360.0d0
-               else if (dt .lt. -180.0d0) then
-                  dt = dt + 360.0d0
-               end if
-               dedphi = 2.0d0 * radian * force * dt
-               d2edphi2 = 2.0d0 * radian**2 * force
+            end if
+            dt = angle - target
+            if (dt .gt. 180.0d0) then
+               dt = dt - 360.0d0
+            else if (dt .lt. -180.0d0) then
+               dt = dt + 360.0d0
+            end if
+            dt = dt / radian
+            dedphi = 2.0d0 * force * dt
+            d2edphi2 = 2.0d0 * force
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group) then
-                  dedphi = dedphi * fgrp
-                  d2edphi2 = d2edphi2 * fgrp
-               end if
+            if (use_group) then
+               dedphi = dedphi * fgrp
+               d2edphi2 = d2edphi2 * fgrp
+            end if
 c
 c     abbreviations for first derivative chain rule terms
 c
-               xca = xic - xia
-               yca = yic - yia
-               zca = zic - zia
-               xdb = xid - xib
-               ydb = yid - yib
-               zdb = zid - zib
-               dphidxt = (yt*zcb - ycb*zt) / (rt2*rcb)
-               dphidyt = (zt*xcb - zcb*xt) / (rt2*rcb)
-               dphidzt = (xt*ycb - xcb*yt) / (rt2*rcb)
-               dphidxu = -(yu*zcb - ycb*zu) / (ru2*rcb)
-               dphidyu = -(zu*xcb - zcb*xu) / (ru2*rcb)
-               dphidzu = -(xu*ycb - xcb*yu) / (ru2*rcb)
+            xca = xic - xia
+            yca = yic - yia
+            zca = zic - zia
+            xdb = xid - xib
+            ydb = yid - yib
+            zdb = zid - zib
+            dphidxt = (yt*zcb - ycb*zt) / (rt2*rcb)
+            dphidyt = (zt*xcb - zcb*xt) / (rt2*rcb)
+            dphidzt = (xt*ycb - xcb*yt) / (rt2*rcb)
+            dphidxu = -(yu*zcb - ycb*zu) / (ru2*rcb)
+            dphidyu = -(zu*xcb - zcb*xu) / (ru2*rcb)
+            dphidzu = -(xu*ycb - xcb*yu) / (ru2*rcb)
 c
 c     abbreviations for second derivative chain rule terms
 c
-               xycb2 = xcb*xcb + ycb*ycb
-               xzcb2 = xcb*xcb + zcb*zcb
-               yzcb2 = ycb*ycb + zcb*zcb
-               rcbxt = -2.0d0 * rcb * dphidxt
-               rcbyt = -2.0d0 * rcb * dphidyt
-               rcbzt = -2.0d0 * rcb * dphidzt
-               rcbt2 = rcb * rt2
-               rcbxu = 2.0d0 * rcb * dphidxu
-               rcbyu = 2.0d0 * rcb * dphidyu
-               rcbzu = 2.0d0 * rcb * dphidzu
-               rcbu2 = rcb * ru2
-               dphidxibt = yca*dphidzt - zca*dphidyt
-               dphidxibu = zdc*dphidyu - ydc*dphidzu
-               dphidyibt = zca*dphidxt - xca*dphidzt
-               dphidyibu = xdc*dphidzu - zdc*dphidxu
-               dphidzibt = xca*dphidyt - yca*dphidxt
-               dphidzibu = ydc*dphidxu - xdc*dphidyu
-               dphidxict = zba*dphidyt - yba*dphidzt
-               dphidxicu = ydb*dphidzu - zdb*dphidyu
-               dphidyict = xba*dphidzt - zba*dphidxt
-               dphidyicu = zdb*dphidxu - xdb*dphidzu
-               dphidzict = yba*dphidxt - xba*dphidyt
-               dphidzicu = xdb*dphidyu - ydb*dphidxu
+            xycb2 = xcb*xcb + ycb*ycb
+            xzcb2 = xcb*xcb + zcb*zcb
+            yzcb2 = ycb*ycb + zcb*zcb
+            rcbxt = -2.0d0 * rcb * dphidxt
+            rcbyt = -2.0d0 * rcb * dphidyt
+            rcbzt = -2.0d0 * rcb * dphidzt
+            rcbt2 = rcb * rt2
+            rcbxu = 2.0d0 * rcb * dphidxu
+            rcbyu = 2.0d0 * rcb * dphidyu
+            rcbzu = 2.0d0 * rcb * dphidzu
+            rcbu2 = rcb * ru2
+            dphidxibt = yca*dphidzt - zca*dphidyt
+            dphidxibu = zdc*dphidyu - ydc*dphidzu
+            dphidyibt = zca*dphidxt - xca*dphidzt
+            dphidyibu = xdc*dphidzu - zdc*dphidxu
+            dphidzibt = xca*dphidyt - yca*dphidxt
+            dphidzibu = ydc*dphidxu - xdc*dphidyu
+            dphidxict = zba*dphidyt - yba*dphidzt
+            dphidxicu = ydb*dphidzu - zdb*dphidyu
+            dphidyict = xba*dphidzt - zba*dphidxt
+            dphidyicu = zdb*dphidxu - xdb*dphidzu
+            dphidzict = yba*dphidxt - xba*dphidyt
+            dphidzicu = xdb*dphidyu - ydb*dphidxu
 c
 c     chain rule terms for first derivative components
 c
-               dphidxia = zcb*dphidyt - ycb*dphidzt
-               dphidyia = xcb*dphidzt - zcb*dphidxt
-               dphidzia = ycb*dphidxt - xcb*dphidyt
-               dphidxib = dphidxibt + dphidxibu
-               dphidyib = dphidyibt + dphidyibu
-               dphidzib = dphidzibt + dphidzibu
-               dphidxic = dphidxict + dphidxicu
-               dphidyic = dphidyict + dphidyicu
-               dphidzic = dphidzict + dphidzicu
-               dphidxid = zcb*dphidyu - ycb*dphidzu
-               dphidyid = xcb*dphidzu - zcb*dphidxu
-               dphidzid = ycb*dphidxu - xcb*dphidyu
+            dphidxia = zcb*dphidyt - ycb*dphidzt
+            dphidyia = xcb*dphidzt - zcb*dphidxt
+            dphidzia = ycb*dphidxt - xcb*dphidyt
+            dphidxib = dphidxibt + dphidxibu
+            dphidyib = dphidyibt + dphidyibu
+            dphidzib = dphidzibt + dphidzibu
+            dphidxic = dphidxict + dphidxicu
+            dphidyic = dphidyict + dphidyicu
+            dphidzic = dphidzict + dphidzicu
+            dphidxid = zcb*dphidyu - ycb*dphidzu
+            dphidyid = xcb*dphidzu - zcb*dphidxu
+            dphidzid = ycb*dphidxu - xcb*dphidyu
 c
 c     chain rule terms for second derivative components
 c
-               dxiaxia = rcbxt*dphidxia
-               dxiayia = rcbxt*dphidyia - zcb*rcb/rt2
-               dxiazia = rcbxt*dphidzia + ycb*rcb/rt2
-               dxiaxic = rcbxt*dphidxict + xcb*xt/rcbt2
-               dxiayic = rcbxt*dphidyict - dphidzt
-     &                      - (xba*zcb*xcb+zba*yzcb2)/rcbt2
-               dxiazic = rcbxt*dphidzict + dphidyt
-     &                      + (xba*ycb*xcb+yba*yzcb2)/rcbt2
-               dxiaxid = 0.0d0
-               dxiayid = 0.0d0
-               dxiazid = 0.0d0
-               dyiayia = rcbyt*dphidyia
-               dyiazia = rcbyt*dphidzia - xcb*rcb/rt2
-               dyiaxib = rcbyt*dphidxibt - dphidzt
-     &                      - (yca*zcb*ycb+zca*xzcb2)/rcbt2
-               dyiaxic = rcbyt*dphidxict + dphidzt
-     &                      + (yba*zcb*ycb+zba*xzcb2)/rcbt2
-               dyiayic = rcbyt*dphidyict + ycb*yt/rcbt2
-               dyiazic = rcbyt*dphidzict - dphidxt
-     &                      - (yba*xcb*ycb+xba*xzcb2)/rcbt2
-               dyiaxid = 0.0d0
-               dyiayid = 0.0d0
-               dyiazid = 0.0d0
-               dziazia = rcbzt*dphidzia
-               dziaxib = rcbzt*dphidxibt + dphidyt
-     &                      + (zca*ycb*zcb+yca*xycb2)/rcbt2
-               dziayib = rcbzt*dphidyibt - dphidxt
-     &                      - (zca*xcb*zcb+xca*xycb2)/rcbt2
-               dziaxic = rcbzt*dphidxict - dphidyt
-     &                      - (zba*ycb*zcb+yba*xycb2)/rcbt2
-               dziayic = rcbzt*dphidyict + dphidxt
-     &                      + (zba*xcb*zcb+xba*xycb2)/rcbt2
-               dziazic = rcbzt*dphidzict + zcb*zt/rcbt2
-               dziaxid = 0.0d0
-               dziayid = 0.0d0
-               dziazid = 0.0d0
-               dxibxic = -xcb*dphidxib/(rcb*rcb)
-     &             - (yca*(zba*xcb+yt)-zca*(yba*xcb-zt))/rcbt2
-     &             - 2.0d0*(yt*zba-yba*zt)*dphidxibt/rt2
-     &             - (zdc*(ydb*xcb+zu)-ydc*(zdb*xcb-yu))/rcbu2
-     &             + 2.0d0*(yu*zdb-ydb*zu)*dphidxibu/ru2
-               dxibyic = -ycb*dphidxib/(rcb*rcb) + dphidzt + dphidzu
-     &             - (yca*(zba*ycb-xt)+zca*(xba*xcb+zcb*zba))/rcbt2
-     &             - 2.0d0*(zt*xba-zba*xt)*dphidxibt/rt2
-     &             + (zdc*(xdb*xcb+zcb*zdb)+ydc*(zdb*ycb+xu))/rcbu2
-     &             + 2.0d0*(zu*xdb-zdb*xu)*dphidxibu/ru2
-               dxibxid = rcbxu*dphidxibu + xcb*xu/rcbu2
-               dxibyid = rcbyu*dphidxibu - dphidzu
-     &                      - (ydc*zcb*ycb+zdc*xzcb2)/rcbu2
-               dxibzid = rcbzu*dphidxibu + dphidyu
-     &                      + (zdc*ycb*zcb+ydc*xycb2)/rcbu2
-               dyibzib = ycb*dphidzib/(rcb*rcb)
-     &             - (xca*(xca*xcb+zcb*zca)+yca*(ycb*xca+zt))/rcbt2
-     &             - 2.0d0*(xt*zca-xca*zt)*dphidzibt/rt2
-     &             + (ydc*(xdc*ycb-zu)+xdc*(xdc*xcb+zcb*zdc))/rcbu2
-     &             + 2.0d0*(xu*zdc-xdc*zu)*dphidzibu/ru2
-               dyibxic = -xcb*dphidyib/(rcb*rcb) - dphidzt - dphidzu
-     &             + (xca*(zba*xcb+yt)+zca*(zba*zcb+ycb*yba))/rcbt2
-     &             - 2.0d0*(yt*zba-yba*zt)*dphidyibt/rt2
-     &             - (zdc*(zdb*zcb+ycb*ydb)+xdc*(zdb*xcb-yu))/rcbu2
-     &             + 2.0d0*(yu*zdb-ydb*zu)*dphidyibu/ru2
-               dyibyic = -ycb*dphidyib/(rcb*rcb)
-     &             - (zca*(xba*ycb+zt)-xca*(zba*ycb-xt))/rcbt2
-     &             - 2.0d0*(zt*xba-zba*xt)*dphidyibt/rt2
-     &             - (xdc*(zdb*ycb+xu)-zdc*(xdb*ycb-zu))/rcbu2
-     &             + 2.0d0*(zu*xdb-zdb*xu)*dphidyibu/ru2
-               dyibxid = rcbxu*dphidyibu + dphidzu
-     &                      + (xdc*zcb*xcb+zdc*yzcb2)/rcbu2
-               dyibyid = rcbyu*dphidyibu + ycb*yu/rcbu2
-               dyibzid = rcbzu*dphidyibu - dphidxu
-     &                      - (zdc*xcb*zcb+xdc*xycb2)/rcbu2
-               dzibxic = -xcb*dphidzib/(rcb*rcb) + dphidyt + dphidyu
-     &             - (xca*(yba*xcb-zt)+yca*(zba*zcb+ycb*yba))/rcbt2
-     &             - 2.0d0*(yt*zba-yba*zt)*dphidzibt/rt2
-     &             + (ydc*(zdb*zcb+ycb*ydb)+xdc*(ydb*xcb+zu))/rcbu2
-     &             + 2.0d0*(yu*zdb-ydb*zu)*dphidzibu/ru2
-               dzibzic = -zcb*dphidzib/(rcb*rcb)
-     &             - (xca*(yba*zcb+xt)-yca*(xba*zcb-yt))/rcbt2
-     &             - 2.0d0*(xt*yba-xba*yt)*dphidzibt/rt2
-     &             - (ydc*(xdb*zcb+yu)-xdc*(ydb*zcb-xu))/rcbu2
-     &             + 2.0d0*(xu*ydb-xdb*yu)*dphidzibu/ru2
-               dzibxid = rcbxu*dphidzibu - dphidyu
-     &                      - (xdc*ycb*xcb+ydc*yzcb2)/rcbu2
-               dzibyid = rcbyu*dphidzibu + dphidxu
-     &                      + (ydc*xcb*ycb+xdc*xzcb2)/rcbu2
-               dzibzid = rcbzu*dphidzibu + zcb*zu/rcbu2
-               dxicxid = rcbxu*dphidxicu - xcb*(zdb*ycb-ydb*zcb)/rcbu2
-               dxicyid = rcbyu*dphidxicu + dphidzu
-     &                      + (ydb*zcb*ycb+zdb*xzcb2)/rcbu2
-               dxiczid = rcbzu*dphidxicu - dphidyu
-     &                      - (zdb*ycb*zcb+ydb*xycb2)/rcbu2
-               dyicxid = rcbxu*dphidyicu - dphidzu
-     &                      - (xdb*zcb*xcb+zdb*yzcb2)/rcbu2
-               dyicyid = rcbyu*dphidyicu - ycb*(xdb*zcb-zdb*xcb)/rcbu2
-               dyiczid = rcbzu*dphidyicu + dphidxu
-     &                      + (zdb*xcb*zcb+xdb*xycb2)/rcbu2
-               dzicxid = rcbxu*dphidzicu + dphidyu
-     &                      + (xdb*ycb*xcb+ydb*yzcb2)/rcbu2
-               dzicyid = rcbyu*dphidzicu - dphidxu
-     &                      - (ydb*xcb*ycb+xdb*xzcb2)/rcbu2
-               dziczid = rcbzu*dphidzicu - zcb*(ydb*xcb-xdb*ycb)/rcbu2
-               dxidxid = rcbxu*dphidxid
-               dxidyid = rcbxu*dphidyid + zcb*rcb/ru2
-               dxidzid = rcbxu*dphidzid - ycb*rcb/ru2
-               dyidyid = rcbyu*dphidyid
-               dyidzid = rcbyu*dphidzid + xcb*rcb/ru2
-               dzidzid = rcbzu*dphidzid
+            dxiaxia = rcbxt*dphidxia
+            dxiayia = rcbxt*dphidyia - zcb*rcb/rt2
+            dxiazia = rcbxt*dphidzia + ycb*rcb/rt2
+            dxiaxic = rcbxt*dphidxict + xcb*xt/rcbt2
+            dxiayic = rcbxt*dphidyict - dphidzt
+     &                   - (xba*zcb*xcb+zba*yzcb2)/rcbt2
+            dxiazic = rcbxt*dphidzict + dphidyt
+     &                   + (xba*ycb*xcb+yba*yzcb2)/rcbt2
+            dxiaxid = 0.0d0
+            dxiayid = 0.0d0
+            dxiazid = 0.0d0
+            dyiayia = rcbyt*dphidyia
+            dyiazia = rcbyt*dphidzia - xcb*rcb/rt2
+            dyiaxib = rcbyt*dphidxibt - dphidzt
+     &                   - (yca*zcb*ycb+zca*xzcb2)/rcbt2
+            dyiaxic = rcbyt*dphidxict + dphidzt
+     &                   + (yba*zcb*ycb+zba*xzcb2)/rcbt2
+            dyiayic = rcbyt*dphidyict + ycb*yt/rcbt2
+            dyiazic = rcbyt*dphidzict - dphidxt
+     &                   - (yba*xcb*ycb+xba*xzcb2)/rcbt2
+            dyiaxid = 0.0d0
+            dyiayid = 0.0d0
+            dyiazid = 0.0d0
+            dziazia = rcbzt*dphidzia
+            dziaxib = rcbzt*dphidxibt + dphidyt
+     &                   + (zca*ycb*zcb+yca*xycb2)/rcbt2
+            dziayib = rcbzt*dphidyibt - dphidxt
+     &                   - (zca*xcb*zcb+xca*xycb2)/rcbt2
+            dziaxic = rcbzt*dphidxict - dphidyt
+     &                   - (zba*ycb*zcb+yba*xycb2)/rcbt2
+            dziayic = rcbzt*dphidyict + dphidxt
+     &                   + (zba*xcb*zcb+xba*xycb2)/rcbt2
+            dziazic = rcbzt*dphidzict + zcb*zt/rcbt2
+            dziaxid = 0.0d0
+            dziayid = 0.0d0
+            dziazid = 0.0d0
+            dxibxic = -xcb*dphidxib/(rcb*rcb)
+     &          - (yca*(zba*xcb+yt)-zca*(yba*xcb-zt))/rcbt2
+     &          - 2.0d0*(yt*zba-yba*zt)*dphidxibt/rt2
+     &          - (zdc*(ydb*xcb+zu)-ydc*(zdb*xcb-yu))/rcbu2
+     &          + 2.0d0*(yu*zdb-ydb*zu)*dphidxibu/ru2
+            dxibyic = -ycb*dphidxib/(rcb*rcb) + dphidzt + dphidzu
+     &          - (yca*(zba*ycb-xt)+zca*(xba*xcb+zcb*zba))/rcbt2
+     &          - 2.0d0*(zt*xba-zba*xt)*dphidxibt/rt2
+     &          + (zdc*(xdb*xcb+zcb*zdb)+ydc*(zdb*ycb+xu))/rcbu2
+     &          + 2.0d0*(zu*xdb-zdb*xu)*dphidxibu/ru2
+            dxibxid = rcbxu*dphidxibu + xcb*xu/rcbu2
+            dxibyid = rcbyu*dphidxibu - dphidzu
+     &                   - (ydc*zcb*ycb+zdc*xzcb2)/rcbu2
+            dxibzid = rcbzu*dphidxibu + dphidyu
+     &                   + (zdc*ycb*zcb+ydc*xycb2)/rcbu2
+            dyibzib = ycb*dphidzib/(rcb*rcb)
+     &          - (xca*(xca*xcb+zcb*zca)+yca*(ycb*xca+zt))/rcbt2
+     &          - 2.0d0*(xt*zca-xca*zt)*dphidzibt/rt2
+     &          + (ydc*(xdc*ycb-zu)+xdc*(xdc*xcb+zcb*zdc))/rcbu2
+     &          + 2.0d0*(xu*zdc-xdc*zu)*dphidzibu/ru2
+            dyibxic = -xcb*dphidyib/(rcb*rcb) - dphidzt - dphidzu
+     &          + (xca*(zba*xcb+yt)+zca*(zba*zcb+ycb*yba))/rcbt2
+     &          - 2.0d0*(yt*zba-yba*zt)*dphidyibt/rt2
+     &          - (zdc*(zdb*zcb+ycb*ydb)+xdc*(zdb*xcb-yu))/rcbu2
+     &          + 2.0d0*(yu*zdb-ydb*zu)*dphidyibu/ru2
+            dyibyic = -ycb*dphidyib/(rcb*rcb)
+     &          - (zca*(xba*ycb+zt)-xca*(zba*ycb-xt))/rcbt2
+     &          - 2.0d0*(zt*xba-zba*xt)*dphidyibt/rt2
+     &          - (xdc*(zdb*ycb+xu)-zdc*(xdb*ycb-zu))/rcbu2
+     &          + 2.0d0*(zu*xdb-zdb*xu)*dphidyibu/ru2
+            dyibxid = rcbxu*dphidyibu + dphidzu
+     &                   + (xdc*zcb*xcb+zdc*yzcb2)/rcbu2
+            dyibyid = rcbyu*dphidyibu + ycb*yu/rcbu2
+            dyibzid = rcbzu*dphidyibu - dphidxu
+     &                   - (zdc*xcb*zcb+xdc*xycb2)/rcbu2
+            dzibxic = -xcb*dphidzib/(rcb*rcb) + dphidyt + dphidyu
+     &          - (xca*(yba*xcb-zt)+yca*(zba*zcb+ycb*yba))/rcbt2
+     &          - 2.0d0*(yt*zba-yba*zt)*dphidzibt/rt2
+     &          + (ydc*(zdb*zcb+ycb*ydb)+xdc*(ydb*xcb+zu))/rcbu2
+     &          + 2.0d0*(yu*zdb-ydb*zu)*dphidzibu/ru2
+            dzibzic = -zcb*dphidzib/(rcb*rcb)
+     &          - (xca*(yba*zcb+xt)-yca*(xba*zcb-yt))/rcbt2
+     &          - 2.0d0*(xt*yba-xba*yt)*dphidzibt/rt2
+     &          - (ydc*(xdb*zcb+yu)-xdc*(ydb*zcb-xu))/rcbu2
+     &          + 2.0d0*(xu*ydb-xdb*yu)*dphidzibu/ru2
+            dzibxid = rcbxu*dphidzibu - dphidyu
+     &                   - (xdc*ycb*xcb+ydc*yzcb2)/rcbu2
+            dzibyid = rcbyu*dphidzibu + dphidxu
+     &                   + (ydc*xcb*ycb+xdc*xzcb2)/rcbu2
+            dzibzid = rcbzu*dphidzibu + zcb*zu/rcbu2
+            dxicxid = rcbxu*dphidxicu - xcb*(zdb*ycb-ydb*zcb)/rcbu2
+            dxicyid = rcbyu*dphidxicu + dphidzu
+     &                   + (ydb*zcb*ycb+zdb*xzcb2)/rcbu2
+            dxiczid = rcbzu*dphidxicu - dphidyu
+     &                   - (zdb*ycb*zcb+ydb*xycb2)/rcbu2
+            dyicxid = rcbxu*dphidyicu - dphidzu
+     &                   - (xdb*zcb*xcb+zdb*yzcb2)/rcbu2
+            dyicyid = rcbyu*dphidyicu - ycb*(xdb*zcb-zdb*xcb)/rcbu2
+            dyiczid = rcbzu*dphidyicu + dphidxu
+     &                   + (zdb*xcb*zcb+xdb*xycb2)/rcbu2
+            dzicxid = rcbxu*dphidzicu + dphidyu
+     &                   + (xdb*ycb*xcb+ydb*yzcb2)/rcbu2
+            dzicyid = rcbyu*dphidzicu - dphidxu
+     &                   - (ydb*xcb*ycb+xdb*xzcb2)/rcbu2
+            dziczid = rcbzu*dphidzicu - zcb*(ydb*xcb-xdb*ycb)/rcbu2
+            dxidxid = rcbxu*dphidxid
+            dxidyid = rcbxu*dphidyid + zcb*rcb/ru2
+            dxidzid = rcbxu*dphidzid - ycb*rcb/ru2
+            dyidyid = rcbyu*dphidyid
+            dyidzid = rcbyu*dphidzid + xcb*rcb/ru2
+            dzidzid = rcbzu*dphidzid
 c
 c     get some second derivative chain rule terms by difference
 c
-               dxiaxib = -dxiaxia - dxiaxic - dxiaxid
-               dxiayib = -dxiayia - dxiayic - dxiayid
-               dxiazib = -dxiazia - dxiazic - dxiazid
-               dyiayib = -dyiayia - dyiayic - dyiayid
-               dyiazib = -dyiazia - dyiazic - dyiazid
-               dziazib = -dziazia - dziazic - dziazid
-               dxibxib = -dxiaxib - dxibxic - dxibxid
-               dxibyib = -dyiaxib - dxibyic - dxibyid
-               dxibzib = -dxiazib - dzibxic - dzibxid
-               dxibzic = -dziaxib - dxibzib - dxibzid
-               dyibyib = -dyiayib - dyibyic - dyibyid
-               dyibzic = -dziayib - dyibzib - dyibzid
-               dzibzib = -dziazib - dzibzic - dzibzid
-               dzibyic = -dyiazib - dyibzib - dzibyid
-               dxicxic = -dxiaxic - dxibxic - dxicxid
-               dxicyic = -dyiaxic - dyibxic - dxicyid
-               dxiczic = -dziaxic - dzibxic - dxiczid
-               dyicyic = -dyiayic - dyibyic - dyicyid
-               dyiczic = -dziayic - dzibyic - dyiczid
-               dziczic = -dziazic - dzibzic - dziczid
+            dxiaxib = -dxiaxia - dxiaxic - dxiaxid
+            dxiayib = -dxiayia - dxiayic - dxiayid
+            dxiazib = -dxiazia - dxiazic - dxiazid
+            dyiayib = -dyiayia - dyiayic - dyiayid
+            dyiazib = -dyiazia - dyiazic - dyiazid
+            dziazib = -dziazia - dziazic - dziazid
+            dxibxib = -dxiaxib - dxibxic - dxibxid
+            dxibyib = -dyiaxib - dxibyic - dxibyid
+            dxibzib = -dxiazib - dzibxic - dzibxid
+            dxibzic = -dziaxib - dxibzib - dxibzid
+            dyibyib = -dyiayib - dyibyic - dyibyid
+            dyibzic = -dziayib - dyibzib - dyibzid
+            dzibzib = -dziazib - dzibzic - dzibzid
+            dzibyic = -dyiazib - dyibzib - dzibyid
+            dxicxic = -dxiaxic - dxibxic - dxicxid
+            dxicyic = -dyiaxic - dyibxic - dxicyid
+            dxiczic = -dziaxic - dzibxic - dxiczid
+            dyicyic = -dyiayic - dyibyic - dyicyid
+            dyiczic = -dziayic - dzibyic - dyiczid
+            dziczic = -dziazic - dzibzic - dziczid
 c
 c     increment diagonal and off-diagonal Hessian elements
 c
-               if (i .eq. ia) then
-                  hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxia
-     &                              + d2edphi2*dphidxia*dphidxia
-                  hessy(1,ia) = hessy(1,ia) + dedphi*dxiayia
-     &                              + d2edphi2*dphidxia*dphidyia
-                  hessz(1,ia) = hessz(1,ia) + dedphi*dxiazia
-     &                              + d2edphi2*dphidxia*dphidzia
-                  hessx(2,ia) = hessx(2,ia) + dedphi*dxiayia
-     &                              + d2edphi2*dphidxia*dphidyia
-                  hessy(2,ia) = hessy(2,ia) + dedphi*dyiayia
-     &                              + d2edphi2*dphidyia*dphidyia
-                  hessz(2,ia) = hessz(2,ia) + dedphi*dyiazia
-     &                              + d2edphi2*dphidyia*dphidzia
-                  hessx(3,ia) = hessx(3,ia) + dedphi*dxiazia
-     &                              + d2edphi2*dphidxia*dphidzia
-                  hessy(3,ia) = hessy(3,ia) + dedphi*dyiazia
-     &                              + d2edphi2*dphidyia*dphidzia
-                  hessz(3,ia) = hessz(3,ia) + dedphi*dziazia
-     &                              + d2edphi2*dphidzia*dphidzia
-                  hessx(1,ib) = hessx(1,ib) + dedphi*dxiaxib
-     &                              + d2edphi2*dphidxia*dphidxib
-                  hessy(1,ib) = hessy(1,ib) + dedphi*dyiaxib
-     &                              + d2edphi2*dphidyia*dphidxib
-                  hessz(1,ib) = hessz(1,ib) + dedphi*dziaxib
-     &                              + d2edphi2*dphidzia*dphidxib
-                  hessx(2,ib) = hessx(2,ib) + dedphi*dxiayib
-     &                              + d2edphi2*dphidxia*dphidyib
-                  hessy(2,ib) = hessy(2,ib) + dedphi*dyiayib
-     &                              + d2edphi2*dphidyia*dphidyib
-                  hessz(2,ib) = hessz(2,ib) + dedphi*dziayib
-     &                              + d2edphi2*dphidzia*dphidyib
-                  hessx(3,ib) = hessx(3,ib) + dedphi*dxiazib
-     &                              + d2edphi2*dphidxia*dphidzib
-                  hessy(3,ib) = hessy(3,ib) + dedphi*dyiazib
-     &                              + d2edphi2*dphidyia*dphidzib
-                  hessz(3,ib) = hessz(3,ib) + dedphi*dziazib
-     &                              + d2edphi2*dphidzia*dphidzib
-                  hessx(1,ic) = hessx(1,ic) + dedphi*dxiaxic
-     &                              + d2edphi2*dphidxia*dphidxic
-                  hessy(1,ic) = hessy(1,ic) + dedphi*dyiaxic
-     &                              + d2edphi2*dphidyia*dphidxic
-                  hessz(1,ic) = hessz(1,ic) + dedphi*dziaxic
-     &                              + d2edphi2*dphidzia*dphidxic
-                  hessx(2,ic) = hessx(2,ic) + dedphi*dxiayic
-     &                              + d2edphi2*dphidxia*dphidyic
-                  hessy(2,ic) = hessy(2,ic) + dedphi*dyiayic
-     &                              + d2edphi2*dphidyia*dphidyic
-                  hessz(2,ic) = hessz(2,ic) + dedphi*dziayic
-     &                              + d2edphi2*dphidzia*dphidyic
-                  hessx(3,ic) = hessx(3,ic) + dedphi*dxiazic
-     &                              + d2edphi2*dphidxia*dphidzic
-                  hessy(3,ic) = hessy(3,ic) + dedphi*dyiazic
-     &                              + d2edphi2*dphidyia*dphidzic
-                  hessz(3,ic) = hessz(3,ic) + dedphi*dziazic
-     &                              + d2edphi2*dphidzia*dphidzic
-                  hessx(1,id) = hessx(1,id) + dedphi*dxiaxid
-     &                              + d2edphi2*dphidxia*dphidxid
-                  hessy(1,id) = hessy(1,id) + dedphi*dyiaxid
-     &                              + d2edphi2*dphidyia*dphidxid
-                  hessz(1,id) = hessz(1,id) + dedphi*dziaxid
-     &                              + d2edphi2*dphidzia*dphidxid
-                  hessx(2,id) = hessx(2,id) + dedphi*dxiayid
-     &                              + d2edphi2*dphidxia*dphidyid
-                  hessy(2,id) = hessy(2,id) + dedphi*dyiayid
-     &                              + d2edphi2*dphidyia*dphidyid
-                  hessz(2,id) = hessz(2,id) + dedphi*dziayid
-     &                              + d2edphi2*dphidzia*dphidyid
-                  hessx(3,id) = hessx(3,id) + dedphi*dxiazid
-     &                              + d2edphi2*dphidxia*dphidzid
-                  hessy(3,id) = hessy(3,id) + dedphi*dyiazid
-     &                              + d2edphi2*dphidyia*dphidzid
-                  hessz(3,id) = hessz(3,id) + dedphi*dziazid
-     &                              + d2edphi2*dphidzia*dphidzid
-               else if (i .eq. ib) then
-                  hessx(1,ib) = hessx(1,ib) + dedphi*dxibxib
-     &                              + d2edphi2*dphidxib*dphidxib
-                  hessy(1,ib) = hessy(1,ib) + dedphi*dxibyib
-     &                              + d2edphi2*dphidxib*dphidyib
-                  hessz(1,ib) = hessz(1,ib) + dedphi*dxibzib
-     &                              + d2edphi2*dphidxib*dphidzib
-                  hessx(2,ib) = hessx(2,ib) + dedphi*dxibyib
-     &                              + d2edphi2*dphidxib*dphidyib
-                  hessy(2,ib) = hessy(2,ib) + dedphi*dyibyib
-     &                              + d2edphi2*dphidyib*dphidyib
-                  hessz(2,ib) = hessz(2,ib) + dedphi*dyibzib
-     &                              + d2edphi2*dphidyib*dphidzib
-                  hessx(3,ib) = hessx(3,ib) + dedphi*dxibzib
-     &                              + d2edphi2*dphidxib*dphidzib
-                  hessy(3,ib) = hessy(3,ib) + dedphi*dyibzib
-     &                              + d2edphi2*dphidyib*dphidzib
-                  hessz(3,ib) = hessz(3,ib) + dedphi*dzibzib
-     &                              + d2edphi2*dphidzib*dphidzib
-                  hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxib
-     &                              + d2edphi2*dphidxib*dphidxia
-                  hessy(1,ia) = hessy(1,ia) + dedphi*dxiayib
-     &                              + d2edphi2*dphidyib*dphidxia
-                  hessz(1,ia) = hessz(1,ia) + dedphi*dxiazib
-     &                              + d2edphi2*dphidzib*dphidxia
-                  hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxib
-     &                              + d2edphi2*dphidxib*dphidyia
-                  hessy(2,ia) = hessy(2,ia) + dedphi*dyiayib
-     &                              + d2edphi2*dphidyib*dphidyia
-                  hessz(2,ia) = hessz(2,ia) + dedphi*dyiazib
-     &                              + d2edphi2*dphidzib*dphidyia
-                  hessx(3,ia) = hessx(3,ia) + dedphi*dziaxib
-     &                              + d2edphi2*dphidxib*dphidzia
-                  hessy(3,ia) = hessy(3,ia) + dedphi*dziayib
-     &                              + d2edphi2*dphidyib*dphidzia
-                  hessz(3,ia) = hessz(3,ia) + dedphi*dziazib
-     &                              + d2edphi2*dphidzib*dphidzia
-                  hessx(1,ic) = hessx(1,ic) + dedphi*dxibxic
-     &                              + d2edphi2*dphidxib*dphidxic
-                  hessy(1,ic) = hessy(1,ic) + dedphi*dyibxic
-     &                              + d2edphi2*dphidyib*dphidxic
-                  hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
-     &                              + d2edphi2*dphidzib*dphidxic
-                  hessx(2,ic) = hessx(2,ic) + dedphi*dxibyic
-     &                              + d2edphi2*dphidxib*dphidyic
-                  hessy(2,ic) = hessy(2,ic) + dedphi*dyibyic
-     &                              + d2edphi2*dphidyib*dphidyic
-                  hessz(2,ic) = hessz(2,ic) + dedphi*dzibyic
-     &                              + d2edphi2*dphidzib*dphidyic
-                  hessx(3,ic) = hessx(3,ic) + dedphi*dxibzic
-     &                              + d2edphi2*dphidxib*dphidzic
-                  hessy(3,ic) = hessy(3,ic) + dedphi*dyibzic
-     &                              + d2edphi2*dphidyib*dphidzic
-                  hessz(3,ic) = hessz(3,ic) + dedphi*dzibzic
-     &                              + d2edphi2*dphidzib*dphidzic
-                  hessx(1,id) = hessx(1,id) + dedphi*dxibxid
-     &                              + d2edphi2*dphidxib*dphidxid
-                  hessy(1,id) = hessy(1,id) + dedphi*dyibxid
-     &                              + d2edphi2*dphidyib*dphidxid
-                  hessz(1,id) = hessz(1,id) + dedphi*dzibxid
-     &                              + d2edphi2*dphidzib*dphidxid
-                  hessx(2,id) = hessx(2,id) + dedphi*dxibyid
-     &                              + d2edphi2*dphidxib*dphidyid
-                  hessy(2,id) = hessy(2,id) + dedphi*dyibyid
-     &                              + d2edphi2*dphidyib*dphidyid
-                  hessz(2,id) = hessz(2,id) + dedphi*dzibyid
-     &                              + d2edphi2*dphidzib*dphidyid
-                  hessx(3,id) = hessx(3,id) + dedphi*dxibzid
-     &                              + d2edphi2*dphidxib*dphidzid
-                  hessy(3,id) = hessy(3,id) + dedphi*dyibzid
-     &                              + d2edphi2*dphidyib*dphidzid
-                  hessz(3,id) = hessz(3,id) + dedphi*dzibzid
-     &                              + d2edphi2*dphidzib*dphidzid
-               else if (i .eq. ic) then
-                  hessx(1,ic) = hessx(1,ic) + dedphi*dxicxic
-     &                              + d2edphi2*dphidxic*dphidxic
-                  hessy(1,ic) = hessy(1,ic) + dedphi*dxicyic
-     &                              + d2edphi2*dphidxic*dphidyic
-                  hessz(1,ic) = hessz(1,ic) + dedphi*dxiczic
-     &                              + d2edphi2*dphidxic*dphidzic
-                  hessx(2,ic) = hessx(2,ic) + dedphi*dxicyic
-     &                              + d2edphi2*dphidxic*dphidyic
-                  hessy(2,ic) = hessy(2,ic) + dedphi*dyicyic
-     &                              + d2edphi2*dphidyic*dphidyic
-                  hessz(2,ic) = hessz(2,ic) + dedphi*dyiczic
-     &                              + d2edphi2*dphidyic*dphidzic
-                  hessx(3,ic) = hessx(3,ic) + dedphi*dxiczic
-     &                              + d2edphi2*dphidxic*dphidzic
-                  hessy(3,ic) = hessy(3,ic) + dedphi*dyiczic
-     &                              + d2edphi2*dphidyic*dphidzic
-                  hessz(3,ic) = hessz(3,ic) + dedphi*dziczic
-     &                              + d2edphi2*dphidzic*dphidzic
-                  hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxic
-     &                              + d2edphi2*dphidxic*dphidxia
-                  hessy(1,ia) = hessy(1,ia) + dedphi*dxiayic
-     &                              + d2edphi2*dphidyic*dphidxia
-                  hessz(1,ia) = hessz(1,ia) + dedphi*dxiazic
-     &                              + d2edphi2*dphidzic*dphidxia
-                  hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxic
-     &                              + d2edphi2*dphidxic*dphidyia
-                  hessy(2,ia) = hessy(2,ia) + dedphi*dyiayic
-     &                              + d2edphi2*dphidyic*dphidyia
-                  hessz(2,ia) = hessz(2,ia) + dedphi*dyiazic
-     &                              + d2edphi2*dphidzic*dphidyia
-                  hessx(3,ia) = hessx(3,ia) + dedphi*dziaxic
-     &                              + d2edphi2*dphidxic*dphidzia
-                  hessy(3,ia) = hessy(3,ia) + dedphi*dziayic
-     &                              + d2edphi2*dphidyic*dphidzia
-                  hessz(3,ia) = hessz(3,ia) + dedphi*dziazic
-     &                              + d2edphi2*dphidzic*dphidzia
-                  hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
-     &                              + d2edphi2*dphidxic*dphidxib
-                  hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
-     &                              + d2edphi2*dphidyic*dphidxib
-                  hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
-     &                              + d2edphi2*dphidzic*dphidxib
-                  hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
-     &                              + d2edphi2*dphidxic*dphidyib
-                  hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
-     &                              + d2edphi2*dphidyic*dphidyib
-                  hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
-     &                              + d2edphi2*dphidzic*dphidyib
-                  hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
-     &                              + d2edphi2*dphidxic*dphidzib
-                  hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
-     &                              + d2edphi2*dphidyic*dphidzib
-                  hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
-     &                              + d2edphi2*dphidzic*dphidzib
-                  hessx(1,id) = hessx(1,id) + dedphi*dxicxid
-     &                              + d2edphi2*dphidxic*dphidxid
-                  hessy(1,id) = hessy(1,id) + dedphi*dyicxid
-     &                              + d2edphi2*dphidyic*dphidxid
-                  hessz(1,id) = hessz(1,id) + dedphi*dzicxid
-     &                              + d2edphi2*dphidzic*dphidxid
-                  hessx(2,id) = hessx(2,id) + dedphi*dxicyid
-     &                              + d2edphi2*dphidxic*dphidyid
-                  hessy(2,id) = hessy(2,id) + dedphi*dyicyid
-     &                              + d2edphi2*dphidyic*dphidyid
-                  hessz(2,id) = hessz(2,id) + dedphi*dzicyid
-     &                              + d2edphi2*dphidzic*dphidyid
-                  hessx(3,id) = hessx(3,id) + dedphi*dxiczid
-     &                              + d2edphi2*dphidxic*dphidzid
-                  hessy(3,id) = hessy(3,id) + dedphi*dyiczid
-     &                              + d2edphi2*dphidyic*dphidzid
-                  hessz(3,id) = hessz(3,id) + dedphi*dziczid
-     &                              + d2edphi2*dphidzic*dphidzid
-               else if (i .eq. id) then
-                  hessx(1,id) = hessx(1,id) + dedphi*dxidxid
-     &                              + d2edphi2*dphidxid*dphidxid
-                  hessy(1,id) = hessy(1,id) + dedphi*dxidyid
-     &                              + d2edphi2*dphidxid*dphidyid
-                  hessz(1,id) = hessz(1,id) + dedphi*dxidzid
-     &                              + d2edphi2*dphidxid*dphidzid
-                  hessx(2,id) = hessx(2,id) + dedphi*dxidyid
-     &                              + d2edphi2*dphidxid*dphidyid
-                  hessy(2,id) = hessy(2,id) + dedphi*dyidyid
-     &                              + d2edphi2*dphidyid*dphidyid
-                  hessz(2,id) = hessz(2,id) + dedphi*dyidzid
-     &                              + d2edphi2*dphidyid*dphidzid
-                  hessx(3,id) = hessx(3,id) + dedphi*dxidzid
-     &                              + d2edphi2*dphidxid*dphidzid
-                  hessy(3,id) = hessy(3,id) + dedphi*dyidzid
-     &                              + d2edphi2*dphidyid*dphidzid
-                  hessz(3,id) = hessz(3,id) + dedphi*dzidzid
-     &                              + d2edphi2*dphidzid*dphidzid
-                  hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxid
-     &                              + d2edphi2*dphidxid*dphidxia
-                  hessy(1,ia) = hessy(1,ia) + dedphi*dxiayid
-     &                              + d2edphi2*dphidyid*dphidxia
-                  hessz(1,ia) = hessz(1,ia) + dedphi*dxiazid
-     &                              + d2edphi2*dphidzid*dphidxia
-                  hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxid
-     &                              + d2edphi2*dphidxid*dphidyia
-                  hessy(2,ia) = hessy(2,ia) + dedphi*dyiayid
-     &                              + d2edphi2*dphidyid*dphidyia
-                  hessz(2,ia) = hessz(2,ia) + dedphi*dyiazid
-     &                              + d2edphi2*dphidzid*dphidyia
-                  hessx(3,ia) = hessx(3,ia) + dedphi*dziaxid
-     &                              + d2edphi2*dphidxid*dphidzia
-                  hessy(3,ia) = hessy(3,ia) + dedphi*dziayid
-     &                              + d2edphi2*dphidyid*dphidzia
-                  hessz(3,ia) = hessz(3,ia) + dedphi*dziazid
-     &                              + d2edphi2*dphidzid*dphidzia
-                  hessx(1,ib) = hessx(1,ib) + dedphi*dxibxid
-     &                              + d2edphi2*dphidxid*dphidxib
-                  hessy(1,ib) = hessy(1,ib) + dedphi*dxibyid
-     &                              + d2edphi2*dphidyid*dphidxib
-                  hessz(1,ib) = hessz(1,ib) + dedphi*dxibzid
-     &                              + d2edphi2*dphidzid*dphidxib
-                  hessx(2,ib) = hessx(2,ib) + dedphi*dyibxid
-     &                              + d2edphi2*dphidxid*dphidyib
-                  hessy(2,ib) = hessy(2,ib) + dedphi*dyibyid
-     &                              + d2edphi2*dphidyid*dphidyib
-                  hessz(2,ib) = hessz(2,ib) + dedphi*dyibzid
-     &                              + d2edphi2*dphidzid*dphidyib
-                  hessx(3,ib) = hessx(3,ib) + dedphi*dzibxid
-     &                              + d2edphi2*dphidxid*dphidzib
-                  hessy(3,ib) = hessy(3,ib) + dedphi*dzibyid
-     &                              + d2edphi2*dphidyid*dphidzib
-                  hessz(3,ib) = hessz(3,ib) + dedphi*dzibzid
-     &                              + d2edphi2*dphidzid*dphidzib
-                  hessx(1,ic) = hessx(1,ic) + dedphi*dxicxid
-     &                              + d2edphi2*dphidxid*dphidxic
-                  hessy(1,ic) = hessy(1,ic) + dedphi*dxicyid
-     &                              + d2edphi2*dphidyid*dphidxic
-                  hessz(1,ic) = hessz(1,ic) + dedphi*dxiczid
-     &                              + d2edphi2*dphidzid*dphidxic
-                  hessx(2,ic) = hessx(2,ic) + dedphi*dyicxid
-     &                              + d2edphi2*dphidxid*dphidyic
-                  hessy(2,ic) = hessy(2,ic) + dedphi*dyicyid
-     &                              + d2edphi2*dphidyid*dphidyic
-                  hessz(2,ic) = hessz(2,ic) + dedphi*dyiczid
-     &                              + d2edphi2*dphidzid*dphidyic
-                  hessx(3,ic) = hessx(3,ic) + dedphi*dzicxid
-     &                              + d2edphi2*dphidxid*dphidzic
-                  hessy(3,ic) = hessy(3,ic) + dedphi*dzicyid
-     &                              + d2edphi2*dphidyid*dphidzic
-                  hessz(3,ic) = hessz(3,ic) + dedphi*dziczid
-     &                              + d2edphi2*dphidzid*dphidzic
-               end if
+            if (i .eq. ia) then
+               hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxia
+     &                           + d2edphi2*dphidxia*dphidxia
+               hessy(1,ia) = hessy(1,ia) + dedphi*dxiayia
+     &                           + d2edphi2*dphidxia*dphidyia
+               hessz(1,ia) = hessz(1,ia) + dedphi*dxiazia
+     &                           + d2edphi2*dphidxia*dphidzia
+               hessx(2,ia) = hessx(2,ia) + dedphi*dxiayia
+     &                           + d2edphi2*dphidxia*dphidyia
+               hessy(2,ia) = hessy(2,ia) + dedphi*dyiayia
+     &                           + d2edphi2*dphidyia*dphidyia
+               hessz(2,ia) = hessz(2,ia) + dedphi*dyiazia
+     &                           + d2edphi2*dphidyia*dphidzia
+               hessx(3,ia) = hessx(3,ia) + dedphi*dxiazia
+     &                           + d2edphi2*dphidxia*dphidzia
+               hessy(3,ia) = hessy(3,ia) + dedphi*dyiazia
+     &                           + d2edphi2*dphidyia*dphidzia
+               hessz(3,ia) = hessz(3,ia) + dedphi*dziazia
+     &                           + d2edphi2*dphidzia*dphidzia
+               hessx(1,ib) = hessx(1,ib) + dedphi*dxiaxib
+     &                           + d2edphi2*dphidxia*dphidxib
+               hessy(1,ib) = hessy(1,ib) + dedphi*dyiaxib
+     &                           + d2edphi2*dphidyia*dphidxib
+               hessz(1,ib) = hessz(1,ib) + dedphi*dziaxib
+     &                           + d2edphi2*dphidzia*dphidxib
+               hessx(2,ib) = hessx(2,ib) + dedphi*dxiayib
+     &                           + d2edphi2*dphidxia*dphidyib
+               hessy(2,ib) = hessy(2,ib) + dedphi*dyiayib
+     &                           + d2edphi2*dphidyia*dphidyib
+               hessz(2,ib) = hessz(2,ib) + dedphi*dziayib
+     &                           + d2edphi2*dphidzia*dphidyib
+               hessx(3,ib) = hessx(3,ib) + dedphi*dxiazib
+     &                           + d2edphi2*dphidxia*dphidzib
+               hessy(3,ib) = hessy(3,ib) + dedphi*dyiazib
+     &                           + d2edphi2*dphidyia*dphidzib
+               hessz(3,ib) = hessz(3,ib) + dedphi*dziazib
+     &                           + d2edphi2*dphidzia*dphidzib
+               hessx(1,ic) = hessx(1,ic) + dedphi*dxiaxic
+     &                           + d2edphi2*dphidxia*dphidxic
+               hessy(1,ic) = hessy(1,ic) + dedphi*dyiaxic
+     &                           + d2edphi2*dphidyia*dphidxic
+               hessz(1,ic) = hessz(1,ic) + dedphi*dziaxic
+     &                           + d2edphi2*dphidzia*dphidxic
+               hessx(2,ic) = hessx(2,ic) + dedphi*dxiayic
+     &                           + d2edphi2*dphidxia*dphidyic
+               hessy(2,ic) = hessy(2,ic) + dedphi*dyiayic
+     &                           + d2edphi2*dphidyia*dphidyic
+               hessz(2,ic) = hessz(2,ic) + dedphi*dziayic
+     &                           + d2edphi2*dphidzia*dphidyic
+               hessx(3,ic) = hessx(3,ic) + dedphi*dxiazic
+     &                           + d2edphi2*dphidxia*dphidzic
+               hessy(3,ic) = hessy(3,ic) + dedphi*dyiazic
+     &                           + d2edphi2*dphidyia*dphidzic
+               hessz(3,ic) = hessz(3,ic) + dedphi*dziazic
+     &                           + d2edphi2*dphidzia*dphidzic
+               hessx(1,id) = hessx(1,id) + dedphi*dxiaxid
+     &                           + d2edphi2*dphidxia*dphidxid
+               hessy(1,id) = hessy(1,id) + dedphi*dyiaxid
+     &                           + d2edphi2*dphidyia*dphidxid
+               hessz(1,id) = hessz(1,id) + dedphi*dziaxid
+     &                           + d2edphi2*dphidzia*dphidxid
+               hessx(2,id) = hessx(2,id) + dedphi*dxiayid
+     &                           + d2edphi2*dphidxia*dphidyid
+               hessy(2,id) = hessy(2,id) + dedphi*dyiayid
+     &                           + d2edphi2*dphidyia*dphidyid
+               hessz(2,id) = hessz(2,id) + dedphi*dziayid
+     &                           + d2edphi2*dphidzia*dphidyid
+               hessx(3,id) = hessx(3,id) + dedphi*dxiazid
+     &                           + d2edphi2*dphidxia*dphidzid
+               hessy(3,id) = hessy(3,id) + dedphi*dyiazid
+     &                           + d2edphi2*dphidyia*dphidzid
+               hessz(3,id) = hessz(3,id) + dedphi*dziazid
+     &                           + d2edphi2*dphidzia*dphidzid
+            else if (i .eq. ib) then
+               hessx(1,ib) = hessx(1,ib) + dedphi*dxibxib
+     &                           + d2edphi2*dphidxib*dphidxib
+               hessy(1,ib) = hessy(1,ib) + dedphi*dxibyib
+     &                           + d2edphi2*dphidxib*dphidyib
+               hessz(1,ib) = hessz(1,ib) + dedphi*dxibzib
+     &                           + d2edphi2*dphidxib*dphidzib
+               hessx(2,ib) = hessx(2,ib) + dedphi*dxibyib
+     &                           + d2edphi2*dphidxib*dphidyib
+               hessy(2,ib) = hessy(2,ib) + dedphi*dyibyib
+     &                           + d2edphi2*dphidyib*dphidyib
+               hessz(2,ib) = hessz(2,ib) + dedphi*dyibzib
+     &                           + d2edphi2*dphidyib*dphidzib
+               hessx(3,ib) = hessx(3,ib) + dedphi*dxibzib
+     &                           + d2edphi2*dphidxib*dphidzib
+               hessy(3,ib) = hessy(3,ib) + dedphi*dyibzib
+     &                           + d2edphi2*dphidyib*dphidzib
+               hessz(3,ib) = hessz(3,ib) + dedphi*dzibzib
+     &                           + d2edphi2*dphidzib*dphidzib
+               hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxib
+     &                           + d2edphi2*dphidxib*dphidxia
+               hessy(1,ia) = hessy(1,ia) + dedphi*dxiayib
+     &                           + d2edphi2*dphidyib*dphidxia
+               hessz(1,ia) = hessz(1,ia) + dedphi*dxiazib
+     &                           + d2edphi2*dphidzib*dphidxia
+               hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxib
+     &                           + d2edphi2*dphidxib*dphidyia
+               hessy(2,ia) = hessy(2,ia) + dedphi*dyiayib
+     &                           + d2edphi2*dphidyib*dphidyia
+               hessz(2,ia) = hessz(2,ia) + dedphi*dyiazib
+     &                           + d2edphi2*dphidzib*dphidyia
+               hessx(3,ia) = hessx(3,ia) + dedphi*dziaxib
+     &                           + d2edphi2*dphidxib*dphidzia
+               hessy(3,ia) = hessy(3,ia) + dedphi*dziayib
+     &                           + d2edphi2*dphidyib*dphidzia
+               hessz(3,ia) = hessz(3,ia) + dedphi*dziazib
+     &                           + d2edphi2*dphidzib*dphidzia
+               hessx(1,ic) = hessx(1,ic) + dedphi*dxibxic
+     &                           + d2edphi2*dphidxib*dphidxic
+               hessy(1,ic) = hessy(1,ic) + dedphi*dyibxic
+     &                           + d2edphi2*dphidyib*dphidxic
+               hessz(1,ic) = hessz(1,ic) + dedphi*dzibxic
+     &                           + d2edphi2*dphidzib*dphidxic
+               hessx(2,ic) = hessx(2,ic) + dedphi*dxibyic
+     &                           + d2edphi2*dphidxib*dphidyic
+               hessy(2,ic) = hessy(2,ic) + dedphi*dyibyic
+     &                           + d2edphi2*dphidyib*dphidyic
+               hessz(2,ic) = hessz(2,ic) + dedphi*dzibyic
+     &                           + d2edphi2*dphidzib*dphidyic
+               hessx(3,ic) = hessx(3,ic) + dedphi*dxibzic
+     &                           + d2edphi2*dphidxib*dphidzic
+               hessy(3,ic) = hessy(3,ic) + dedphi*dyibzic
+     &                           + d2edphi2*dphidyib*dphidzic
+               hessz(3,ic) = hessz(3,ic) + dedphi*dzibzic
+     &                           + d2edphi2*dphidzib*dphidzic
+               hessx(1,id) = hessx(1,id) + dedphi*dxibxid
+     &                           + d2edphi2*dphidxib*dphidxid
+               hessy(1,id) = hessy(1,id) + dedphi*dyibxid
+     &                           + d2edphi2*dphidyib*dphidxid
+               hessz(1,id) = hessz(1,id) + dedphi*dzibxid
+     &                           + d2edphi2*dphidzib*dphidxid
+               hessx(2,id) = hessx(2,id) + dedphi*dxibyid
+     &                           + d2edphi2*dphidxib*dphidyid
+               hessy(2,id) = hessy(2,id) + dedphi*dyibyid
+     &                           + d2edphi2*dphidyib*dphidyid
+               hessz(2,id) = hessz(2,id) + dedphi*dzibyid
+     &                           + d2edphi2*dphidzib*dphidyid
+               hessx(3,id) = hessx(3,id) + dedphi*dxibzid
+     &                           + d2edphi2*dphidxib*dphidzid
+               hessy(3,id) = hessy(3,id) + dedphi*dyibzid
+     &                           + d2edphi2*dphidyib*dphidzid
+               hessz(3,id) = hessz(3,id) + dedphi*dzibzid
+     &                           + d2edphi2*dphidzib*dphidzid
+            else if (i .eq. ic) then
+               hessx(1,ic) = hessx(1,ic) + dedphi*dxicxic
+     &                           + d2edphi2*dphidxic*dphidxic
+               hessy(1,ic) = hessy(1,ic) + dedphi*dxicyic
+     &                           + d2edphi2*dphidxic*dphidyic
+               hessz(1,ic) = hessz(1,ic) + dedphi*dxiczic
+     &                           + d2edphi2*dphidxic*dphidzic
+               hessx(2,ic) = hessx(2,ic) + dedphi*dxicyic
+     &                           + d2edphi2*dphidxic*dphidyic
+               hessy(2,ic) = hessy(2,ic) + dedphi*dyicyic
+     &                           + d2edphi2*dphidyic*dphidyic
+               hessz(2,ic) = hessz(2,ic) + dedphi*dyiczic
+     &                           + d2edphi2*dphidyic*dphidzic
+               hessx(3,ic) = hessx(3,ic) + dedphi*dxiczic
+     &                           + d2edphi2*dphidxic*dphidzic
+               hessy(3,ic) = hessy(3,ic) + dedphi*dyiczic
+     &                           + d2edphi2*dphidyic*dphidzic
+               hessz(3,ic) = hessz(3,ic) + dedphi*dziczic
+     &                           + d2edphi2*dphidzic*dphidzic
+               hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxic
+     &                           + d2edphi2*dphidxic*dphidxia
+               hessy(1,ia) = hessy(1,ia) + dedphi*dxiayic
+     &                           + d2edphi2*dphidyic*dphidxia
+               hessz(1,ia) = hessz(1,ia) + dedphi*dxiazic
+     &                           + d2edphi2*dphidzic*dphidxia
+               hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxic
+     &                           + d2edphi2*dphidxic*dphidyia
+               hessy(2,ia) = hessy(2,ia) + dedphi*dyiayic
+     &                           + d2edphi2*dphidyic*dphidyia
+               hessz(2,ia) = hessz(2,ia) + dedphi*dyiazic
+     &                           + d2edphi2*dphidzic*dphidyia
+               hessx(3,ia) = hessx(3,ia) + dedphi*dziaxic
+     &                           + d2edphi2*dphidxic*dphidzia
+               hessy(3,ia) = hessy(3,ia) + dedphi*dziayic
+     &                           + d2edphi2*dphidyic*dphidzia
+               hessz(3,ia) = hessz(3,ia) + dedphi*dziazic
+     &                           + d2edphi2*dphidzic*dphidzia
+               hessx(1,ib) = hessx(1,ib) + dedphi*dxibxic
+     &                           + d2edphi2*dphidxic*dphidxib
+               hessy(1,ib) = hessy(1,ib) + dedphi*dxibyic
+     &                           + d2edphi2*dphidyic*dphidxib
+               hessz(1,ib) = hessz(1,ib) + dedphi*dxibzic
+     &                           + d2edphi2*dphidzic*dphidxib
+               hessx(2,ib) = hessx(2,ib) + dedphi*dyibxic
+     &                           + d2edphi2*dphidxic*dphidyib
+               hessy(2,ib) = hessy(2,ib) + dedphi*dyibyic
+     &                           + d2edphi2*dphidyic*dphidyib
+               hessz(2,ib) = hessz(2,ib) + dedphi*dyibzic
+     &                           + d2edphi2*dphidzic*dphidyib
+               hessx(3,ib) = hessx(3,ib) + dedphi*dzibxic
+     &                           + d2edphi2*dphidxic*dphidzib
+               hessy(3,ib) = hessy(3,ib) + dedphi*dzibyic
+     &                           + d2edphi2*dphidyic*dphidzib
+               hessz(3,ib) = hessz(3,ib) + dedphi*dzibzic
+     &                           + d2edphi2*dphidzic*dphidzib
+               hessx(1,id) = hessx(1,id) + dedphi*dxicxid
+     &                           + d2edphi2*dphidxic*dphidxid
+               hessy(1,id) = hessy(1,id) + dedphi*dyicxid
+     &                           + d2edphi2*dphidyic*dphidxid
+               hessz(1,id) = hessz(1,id) + dedphi*dzicxid
+     &                           + d2edphi2*dphidzic*dphidxid
+               hessx(2,id) = hessx(2,id) + dedphi*dxicyid
+     &                           + d2edphi2*dphidxic*dphidyid
+               hessy(2,id) = hessy(2,id) + dedphi*dyicyid
+     &                           + d2edphi2*dphidyic*dphidyid
+               hessz(2,id) = hessz(2,id) + dedphi*dzicyid
+     &                           + d2edphi2*dphidzic*dphidyid
+               hessx(3,id) = hessx(3,id) + dedphi*dxiczid
+     &                           + d2edphi2*dphidxic*dphidzid
+               hessy(3,id) = hessy(3,id) + dedphi*dyiczid
+     &                           + d2edphi2*dphidyic*dphidzid
+               hessz(3,id) = hessz(3,id) + dedphi*dziczid
+     &                           + d2edphi2*dphidzic*dphidzid
+            else if (i .eq. id) then
+               hessx(1,id) = hessx(1,id) + dedphi*dxidxid
+     &                           + d2edphi2*dphidxid*dphidxid
+               hessy(1,id) = hessy(1,id) + dedphi*dxidyid
+     &                           + d2edphi2*dphidxid*dphidyid
+               hessz(1,id) = hessz(1,id) + dedphi*dxidzid
+     &                           + d2edphi2*dphidxid*dphidzid
+               hessx(2,id) = hessx(2,id) + dedphi*dxidyid
+     &                           + d2edphi2*dphidxid*dphidyid
+               hessy(2,id) = hessy(2,id) + dedphi*dyidyid
+     &                           + d2edphi2*dphidyid*dphidyid
+               hessz(2,id) = hessz(2,id) + dedphi*dyidzid
+     &                           + d2edphi2*dphidyid*dphidzid
+               hessx(3,id) = hessx(3,id) + dedphi*dxidzid
+     &                           + d2edphi2*dphidxid*dphidzid
+               hessy(3,id) = hessy(3,id) + dedphi*dyidzid
+     &                           + d2edphi2*dphidyid*dphidzid
+               hessz(3,id) = hessz(3,id) + dedphi*dzidzid
+     &                           + d2edphi2*dphidzid*dphidzid
+               hessx(1,ia) = hessx(1,ia) + dedphi*dxiaxid
+     &                           + d2edphi2*dphidxid*dphidxia
+               hessy(1,ia) = hessy(1,ia) + dedphi*dxiayid
+     &                           + d2edphi2*dphidyid*dphidxia
+               hessz(1,ia) = hessz(1,ia) + dedphi*dxiazid
+     &                           + d2edphi2*dphidzid*dphidxia
+               hessx(2,ia) = hessx(2,ia) + dedphi*dyiaxid
+     &                           + d2edphi2*dphidxid*dphidyia
+               hessy(2,ia) = hessy(2,ia) + dedphi*dyiayid
+     &                           + d2edphi2*dphidyid*dphidyia
+               hessz(2,ia) = hessz(2,ia) + dedphi*dyiazid
+     &                           + d2edphi2*dphidzid*dphidyia
+               hessx(3,ia) = hessx(3,ia) + dedphi*dziaxid
+     &                           + d2edphi2*dphidxid*dphidzia
+               hessy(3,ia) = hessy(3,ia) + dedphi*dziayid
+     &                           + d2edphi2*dphidyid*dphidzia
+               hessz(3,ia) = hessz(3,ia) + dedphi*dziazid
+     &                           + d2edphi2*dphidzid*dphidzia
+               hessx(1,ib) = hessx(1,ib) + dedphi*dxibxid
+     &                           + d2edphi2*dphidxid*dphidxib
+               hessy(1,ib) = hessy(1,ib) + dedphi*dxibyid
+     &                           + d2edphi2*dphidyid*dphidxib
+               hessz(1,ib) = hessz(1,ib) + dedphi*dxibzid
+     &                           + d2edphi2*dphidzid*dphidxib
+               hessx(2,ib) = hessx(2,ib) + dedphi*dyibxid
+     &                           + d2edphi2*dphidxid*dphidyib
+               hessy(2,ib) = hessy(2,ib) + dedphi*dyibyid
+     &                           + d2edphi2*dphidyid*dphidyib
+               hessz(2,ib) = hessz(2,ib) + dedphi*dyibzid
+     &                           + d2edphi2*dphidzid*dphidyib
+               hessx(3,ib) = hessx(3,ib) + dedphi*dzibxid
+     &                           + d2edphi2*dphidxid*dphidzib
+               hessy(3,ib) = hessy(3,ib) + dedphi*dzibyid
+     &                           + d2edphi2*dphidyid*dphidzib
+               hessz(3,ib) = hessz(3,ib) + dedphi*dzibzid
+     &                           + d2edphi2*dphidzid*dphidzib
+               hessx(1,ic) = hessx(1,ic) + dedphi*dxicxid
+     &                           + d2edphi2*dphidxid*dphidxic
+               hessy(1,ic) = hessy(1,ic) + dedphi*dxicyid
+     &                           + d2edphi2*dphidyid*dphidxic
+               hessz(1,ic) = hessz(1,ic) + dedphi*dxiczid
+     &                           + d2edphi2*dphidzid*dphidxic
+               hessx(2,ic) = hessx(2,ic) + dedphi*dyicxid
+     &                           + d2edphi2*dphidxid*dphidyic
+               hessy(2,ic) = hessy(2,ic) + dedphi*dyicyid
+     &                           + d2edphi2*dphidyid*dphidyic
+               hessz(2,ic) = hessz(2,ic) + dedphi*dyiczid
+     &                           + d2edphi2*dphidzid*dphidyic
+               hessx(3,ic) = hessx(3,ic) + dedphi*dzicxid
+     &                           + d2edphi2*dphidxid*dphidzic
+               hessy(3,ic) = hessy(3,ic) + dedphi*dzicyid
+     &                           + d2edphi2*dphidyid*dphidzic
+               hessz(3,ic) = hessz(3,ic) + dedphi*dziczid
+     &                           + d2edphi2*dphidzid*dphidzic
             end if
          end if
       end do
@@ -1243,10 +1260,8 @@ c
 c
 c     set the chain rule terms for the Hessian elements
 c
-            if (r .eq. 0.0d0) then
-               r = 0.0001d0
-               r2 = r * r
-            end if
+            r = max(r,eps)
+            r2 = r * r
             de = deddt * dt/r
             term = (deddt-de) / r2
             termx = term * xr
@@ -1654,6 +1669,17 @@ c
                hessz(j,i) = hessz(j,i) + d2e(3,j)
             end do
          end if
+      end if
+c
+c     reinstate the replica mechanism if it is being used
+c
+      if (use_replica) then
+         xcell = xorig
+         ycell = yorig
+         zcell = zorig
+         xcell2 = xorig2
+         ycell2 = yorig2
+         zcell2 = zorig2
       end if
       return
       end

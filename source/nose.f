@@ -36,7 +36,8 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,istep
+      integer i,j,k
+      integer istep
       real*8 dt,dt_2
       real*8 epot,etot
       real*8 eksum,temp
@@ -62,12 +63,11 @@ c
 c
 c     get half-step velocities via Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
       end do
 c
 c     update atomic positions via coupling to barostat
@@ -82,12 +82,11 @@ c
       e8 = e6 / 72.0d0
       poly = 1.0d0 + term2*(e2+term2*(e4+term2*(e6+term2*e8)))
       poly = expterm * poly * dt
-      do i = 1, n
-         if (use(i)) then
-            x(i) = x(i)*eterm2 + v(1,i)*poly
-            y(i) = y(i)*eterm2 + v(2,i)*poly
-            z(i) = z(i)*eterm2 + v(3,i)*poly
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         x(k) = x(k)*eterm2 + v(1,k)*poly
+         y(k) = y(k)*eterm2 + v(2,k)*poly
+         z(k) = z(k)*eterm2 + v(3,k)*poly
       end do
 c
 c     constraints under NH-NPT require the ROLL algorithm
@@ -112,13 +111,12 @@ c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using the Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + a(j,k)*dt_2
+         end do
       end do
 c
 c     perform deallocation of some local arrays
@@ -266,12 +264,11 @@ c
 c
 c     use scale factor to update the atomic velocities
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = scale * v(j,i)
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            v(j,k) = scale * v(j,k)
+         end do
       end do
       return
       end

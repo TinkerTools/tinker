@@ -26,6 +26,7 @@ c
       use kantor
       use katoms
       use kbonds
+      use kcflux
       use kchrge
       use kcpen
       use kctrn
@@ -41,6 +42,7 @@ c
       use kpitor
       use kpolr
       use krepl
+      use ksolut
       use kstbnd
       use ksttor
       use ktorsn
@@ -59,14 +61,16 @@ c
       integer ii,imin
       integer size,next
       integer length,trimtext
-      integer nb,nb5,nb4,nb3,nel
+      integer nb,nb5,nb4
+      integer nb3,nel
       integer na,na5,na4
       integer na3,nap,naf
       integer nsb,nu,nopb,nopd
       integer ndi,nti,nt,nt5,nt4
       integer npt,nbt,nat,ntt,nvp
       integer nhb,nd,nd5,nd4,nd3
-      integer nmp,npi,npi5,npi4
+      integer nmp,ncfb,ncfa
+      integer npi,npi5,npi4
       integer cls,atn,lig
       integer nx,ny,nxy
       integer bt,at,sbt,tt
@@ -84,11 +88,14 @@ c
       real*8 at4,at5,at6
       real*8 an,pr,ds,dk
       real*8 vd,cg,dp,ps
-      real*8 fc,bd,dl,el
+      real*8 fc,bd,dl
       real*8 pt,pel,pal
       real*8 pol,thl,ddp
       real*8 ctrn,atrn
-      real*8 iz,rp,ss,ts
+      real*8 cfb,cfb1,cfb2
+      real*8 cfa1,cfa2,srd
+      real*8 el,iz,rp
+      real*8 ss,ts
       real*8 abc,cba
       real*8 gi,alphi
       real*8 nni,factor
@@ -141,6 +148,8 @@ c
       nd4 = 0
       nd3 = 0
       nmp = 0
+      ncfb = 0
+      ncfa = 0
       npi = 0
       npi5 = 0
       npi4 = 0
@@ -1118,11 +1127,13 @@ c
             nd = nd + 1
             if (ia .le. ib) then
                kd(nd) = pa//pb
+               dpl(nd) = dp
+               pos(nd) = ps
             else
                kd(nd) = pb//pa
+               dpl(nd) = -dp
+               pos(nd) = 1.0d0 - ps
             end if
-            dpl(nd) = dp
-            pos(nd) = ps
 c
 c     bond dipole moment parameters for 5-membered rings
 c
@@ -1139,11 +1150,13 @@ c
             nd5 = nd5 + 1
             if (ia .le. ib) then
                kd5(nd5) = pa//pb
+               dpl5(nd5) = dp
+               pos5(nd5) = ps
             else
                kd5(nd5) = pb//pa
+               dpl5(nd5) = -dp
+               pos5(nd5) = 1.0d0 - ps
             end if
-            dpl5(nd5) = dp
-            pos5(nd5) = ps
 c
 c     bond dipole moment parameters for 4-membered rings
 c
@@ -1160,11 +1173,13 @@ c
             nd4 = nd4 + 1
             if (ia .le. ib) then
                kd4(nd4) = pa//pb
+               dpl4(nd4) = dp
+               pos4(nd4) = ps
             else
                kd4(nd4) = pb//pa
+               dpl4(nd4) = -dp
+               pos4(nd4) = 1.0d0 - ps
             end if
-            dpl4(nd4) = dp
-            pos4(nd4) = ps
 c
 c     bond dipole moment parameters for 3-membered rings
 c
@@ -1181,11 +1196,13 @@ c
             nd3 = nd3 + 1
             if (ia .le. ib) then
                kd3(nd3) = pa//pb
+               dpl3(nd3) = dp
+               pos3(nd3) = ps
             else
                kd3(nd3) = pb//pa
+               dpl3(nd3) = -dp
+               pos3(nd3) = 1.0d0 - ps
             end if
-            dpl3(nd3) = dp
-            pos3(nd3) = ps
 c
 c     atomic multipole moment parameters
 c
@@ -1326,6 +1343,69 @@ c
                ctdmp(ia) = atrn
             end if
 c
+c     bond charge flux parameters
+c
+         else if (keyword(1:9) .eq. 'BNDCFLUX ') then
+            ia = 0
+            ib = 0
+            cfb = 0.0d0
+            string = record(next:240)
+            read (string,*,err=510,end=510)  ia,ib,cfb
+  510       continue
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            ncfb = ncfb + 1
+            if (ia .lt. ib) then
+               kcfb(ncfb) = pa//pb
+               cflb(ncfb) = cfb
+            else if (ib .lt. ia) then
+               kcfb(ncfb) = pb//pa
+               cflb(ncfb) = -cfb
+            else
+               kcfb(ncfb) = pa//pb
+               cflb(ncfb) = 0.0d0
+            end if
+c
+c     angle charge flux parameters
+c
+         else if (keyword(1:9) .eq. 'ANGCFLUX ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            cfa1 = 0.0d0
+            cfa2 = 0.0d0
+            cfb1 = 0.0d0
+            cfb2 = 0.0d0
+            string = record(next:240)
+            read (string,*,err=520,end=520)  ia,ib,ic,cfa1,cfa2,
+     &                                       cfb1,cfb2
+  520       continue
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            call numeral (ic,pc,size)
+            ncfa = ncfa + 1
+            if (ia .le. ic) then
+               kcfa(ncfa) = pa//pb//pc
+            else
+               kcfa(ncfa) = pc//pb//pa
+            end if
+            cfla(1,ncfa) = cfa1
+            cfla(2,ncfa) = cfa2
+            cflab(1,ncfa) = cfb1
+            cflab(2,ncfa) = cfb2
+c
+c     implicit solvation parameters
+c
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
+            ia = 0
+            srd = 0.0d0
+            string = record(next:240)
+            read (string,*,err=530,end=530)  ia,srd
+  530       continue
+            if (ia .ne. 0) then
+               solrad(ia) = srd
+            end if
+c
 c     conjugated pisystem atom parameters
 c
          else if (keyword(1:7) .eq. 'PIATOM ') then
@@ -1334,8 +1414,8 @@ c
             iz = 0.0d0
             rp = 0.0d0
             string = record(next:240)
-            read (string,*,err=510,end=510)  ia,el,iz,rp
-  510       continue
+            read (string,*,err=540,end=540)  ia,el,iz,rp
+  540       continue
             if (ia .ne. 0) then
                electron(ia) = el
                ionize(ia) = iz
@@ -1350,8 +1430,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:240)
-            read (string,*,err=520,end=520)  ia,ib,ss,ts
-  520       continue
+            read (string,*,err=550,end=550)  ia,ib,ss,ts
+  550       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi = npi + 1
@@ -1371,8 +1451,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:240)
-            read (string,*,err=530,end=530)  ia,ib,ss,ts
-  530       continue
+            read (string,*,err=560,end=560)  ia,ib,ss,ts
+  560       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi5 = npi5 + 1
@@ -1392,8 +1472,8 @@ c
             ss = 0.0d0
             ts = 0.0d0
             string = record(next:240)
-            read (string,*,err=540,end=540)  ia,ib,ss,ts
-  540       continue
+            read (string,*,err=570,end=570)  ia,ib,ss,ts
+  570       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             npi4 = npi4 + 1
@@ -1409,8 +1489,8 @@ c     metal ligand field splitting parameters
 c
          else if (keyword(1:6) .eq. 'METAL ') then
             string = record(next:240)
-            read (string,*,err=550,end=550)  ia
-  550       continue
+            read (string,*,err=580,end=580)  ia
+  580       continue
 c
 c     biopolymer atom type conversion definitions
 c
@@ -1418,19 +1498,19 @@ c
             ia = 0
             ib = 0
             string = record(next:240)
-            read (string,*,err=560,end=560)  ia
+            read (string,*,err=590,end=590)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:240)
-            read (string,*,err=560,end=560)  ib
-  560       continue
+            read (string,*,err=590,end=590)  ib
+  590       continue
             if (ia .ge. maxbio) then
-               write (iout,570)
-  570          format (/,' READPRM  --  Too many Biopolymer Types;',
+               write (iout,600)
+  600          format (/,' READPRM  --  Too many Biopolymer Types;',
      &                    ' Increase MAXBIO')
                call fatal
             end if
-            if (ia .ne. 0)  biotyp(ia) = ib
+            if (ia .gt. 0)  biotyp(ia) = ib
 c
 c     MMFF atom class equivalency parameters
 c
@@ -1442,8 +1522,8 @@ c
             id = 1000
             ie = 1000
             if = 0
-            read (string,*,err=580,end=580)  ia,ib,ic,id,ie,if
-  580       continue
+            read (string,*,err=610,end=610)  ia,ib,ic,id,ie,if
+  610       continue
             eqclass(if,1) = ia
             eqclass(if,2) = ib
             eqclass(if,3) = ic
@@ -1457,8 +1537,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=590,end=590)  ia,fc,bd
-  590       continue
+            read (string,*,err=620,end=620)  ia,fc,bd
+  620       continue
             rad0(ia) = fc
             paulel(ia) = bd
 c
@@ -1475,9 +1555,9 @@ c
             ig = 1000
             ih = 1000
             ii = 1000
-            read (string,*,err=600,end=600)  ia,ib,ic,id,ie,
+            read (string,*,err=630,end=630)  ia,ib,ic,id,ie,
      &                                       if,ig,ih,ii
-  600       continue
+  630       continue
             crd(ia) = ic
             val(ia) = id
             pilp(ia) = ie
@@ -1495,8 +1575,8 @@ c
             bd = 0.0d0
             bt = 2
             string = record(next:240)
-            read (string,*,err=610,end=610)  ia,ib,fc,bd,bt
-  610       continue
+            read (string,*,err=640,end=640)  ia,ib,fc,bd,bt
+  640       continue
             nb = nb + 1
             if (bt .eq. 0) then
                mmff_kb(ia,ib) = fc
@@ -1518,8 +1598,8 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=620,end=620)  ia,ib,fc,bd
-  620       continue
+            read (string,*,err=650,end=650)  ia,ib,fc,bd
+  650       continue
             r0ref(ia,ib) = fc
             r0ref(ib,ia) = fc
             kbref(ia,ib) = bd
@@ -1535,8 +1615,8 @@ c
             an1 = 0.0d0
             at = 3
             string = record(next:240)
-            read (string,*,err=630,end=630)  ia,ib,ic,fc,an1,at
-  630       continue
+            read (string,*,err=660,end=660)  ia,ib,ic,fc,an1,at
+  660       continue
             na = na + 1
             if (an1 .ne. 0.0d0) then
                if (at .eq. 0) then
@@ -1597,8 +1677,8 @@ c
             cba = 0.0d0
             sbt = 4
             string = record(next:240)
-            read (string,*,err=640,end=640)  ia,ib,ic,abc,cba,sbt
-  640       continue
+            read (string,*,err=670,end=670)  ia,ib,ic,abc,cba,sbt
+  670       continue
             if (ia .ne. 0) then
                if (sbt .eq. 0) then
                   stbn_abc(ia,ib,ic) = abc
@@ -1672,8 +1752,8 @@ c
             ic = 1000
             abc = 0.0d0
             cba = 0.0d0
-            read (string,*,err=650,end=650)  ia,ib,ic,abc,cba
-  650       continue
+            read (string,*,err=680,end=680)  ia,ib,ic,abc,cba
+  680       continue
             defstbn_abc(ia,ib,ic) = abc
             defstbn_cba(ia,ib,ic) = cba
             defstbn_abc(ic,ib,ia) = cba
@@ -1688,8 +1768,8 @@ c
             id = 0
             fc = 0.0d0
             string = record(next:240)
-            read (string,*,err=660,end=660)  ia,ib,ic,id,fc
-  660       continue
+            read (string,*,err=690,end=690)  ia,ib,ic,id,fc
+  690       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1732,9 +1812,9 @@ c
             end do
             tt = 3
             string = record(next:240)
-            read (string,*,err=670,end=670)  ia,ib,ic,id,(vt(j),
+            read (string,*,err=700,end=700)  ia,ib,ic,id,(vt(j),
      &                                       st(j),ft(j),j=1,3),tt
-  670       continue
+  700       continue
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
@@ -1838,8 +1918,8 @@ c
             rdn = 0.0d0
             da1 = 'C'
             string = record(next:240)
-            read (string,*,err=680,end=680)  ia,rd,alphi,nni,gi,da1
-  680       continue
+            read (string,*,err=710,end=710)  ia,rd,alphi,nni,gi,da1
+  710       continue
             if (ia .ne. 0) then
                rad(ia) = rd
                g(ia) = gi
@@ -1856,8 +1936,8 @@ c
             cg = 1000.0d0
             bt = 2
             string = record(next:240)
-            read (string,*,err=690,end=690)  ia,ib,cg,bt
-  690       continue
+            read (string,*,err=720,end=720)  ia,ib,cg,bt
+  720       continue
             if (ia .ne. 0) then
                if (bt .eq. 0) then
                   bci(ia,ib) = cg
@@ -1873,8 +1953,8 @@ c
          else if (keyword(1:9) .eq. 'MMFFPBCI ') then
             ia = 0
             string = record(next:240)
-            read (string,*,err=700,end=700)  ia,cg,factor
-  700       continue
+            read (string,*,err=730,end=730)  ia,cg,factor
+  730       continue
             if (ia .ne. 0) then
                pbci(ia) = cg
                fcadj(ia) = factor
@@ -1884,8 +1964,8 @@ c     MMFF aromatic ion parameters
 c
          else if (keyword(1:9) .eq. 'MMFFAROM ') then
             string = record(next:240)
-            read (string,*,err=710,end=710)  ia,ib,ic,id,ie,if
-  710       continue
+            read (string,*,err=740,end=740)  ia,ib,ic,id,ie,if
+  740       continue
             if (ie.eq.0 .and. id.eq.0) then
                mmffarom(ia,if) = ic
             else if (id .eq. 1) then

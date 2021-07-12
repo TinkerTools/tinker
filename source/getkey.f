@@ -23,7 +23,7 @@ c
       use keys
       use openmp
       implicit none
-      integer i,ikey
+      integer i,j,ikey
       integer next,length
       integer freeunit
       integer trimtext
@@ -35,7 +35,7 @@ c
       character*240 string
 c
 c
-c     check for a keyfile specified on the command line
+c     check for a keyfile specified on command line
 c
       exist = .false.
       do i = 1, narg-1
@@ -97,6 +97,18 @@ c
          close (unit=ikey)
       end if
 c
+c     convert underbar characters to dashes in all keywords
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         do j = 1, next-1
+            if (record(j:j) .eq. '_')  record(j:j) = '-'
+         end do
+         keyline(i) = record
+      end do
+c
 c     check for comment lines to be echoed to the output
 c
       header = .true.
@@ -123,7 +135,7 @@ c
          end if
       end do
 c
-c     set number of threads for OpenMP parallelization
+c     set number of OpenMP threads for parallelization
 c
       do i = 1, nkey
          next = 1
@@ -132,10 +144,24 @@ c
          call gettext (record,keyword,next)
          string = record(next:240)
          if (keyword(1:15) .eq. 'OPENMP-THREADS ') then
-            read (string,*,err=80,end=80)  nthread
+!$          read (string,*,err=80,end=80)  nthread
 !$          call omp_set_num_threads (nthread)
          end if
    80    continue
+      end do
+c
+c     check for number of OpenMP threads on command line
+c
+      do i = 1, narg-1
+         string = arg(i)
+         call upcase (string)
+         if (string(1:2) .eq. '-T') then
+            next = 1
+            string = arg(i+1)
+            call getnumb (string,nthread,next)
+            if (nthread .eq. 0)  nthread = 1
+!$          call omp_set_num_threads (nthread)
+         end if
       end do
       return
       end

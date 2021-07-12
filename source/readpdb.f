@@ -39,7 +39,7 @@ c
       character*1 insert,inslast
       character*1 letter
       character*1, allocatable :: chnatm(:)
-      character*3 resname
+      character*3 resname,atmsymb
       character*3 namelast
       character*4 atmname
       character*6 remark
@@ -96,6 +96,7 @@ c
          if (.not. allocated(ypdb))  allocate (ypdb(maxatm))
          if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
          if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
+         if (.not. allocated(pdbsym))  allocate (pdbsym(maxatm))
          if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
          if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
       end if
@@ -155,11 +156,35 @@ c
             string = record(47:54)
             read (string,*)  zz
   100       continue
-            if (chain.ne.' ' .and. index(chnsym,chain).eq.0)  goto 120
+            next = 77
+            call getword (record,atmsymb,next)
+            if (index(chnsym,chain) .eq. 0)  goto 120
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 120
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 120
             call fixpdb (resname,atmname)
             if (resname .eq. 'HOH') then
+               remark = 'HETATM'
+            else if (resname .eq. ' LI') then
+               remark = 'HETATM'
+            else if (resname .eq. '  F') then
+               remark = 'HETATM'
+            else if (resname .eq. ' NA') then
+               remark = 'HETATM'
+            else if (resname .eq. ' MG') then
+               remark = 'HETATM'
+            else if (resname .eq. ' CL') then
+               remark = 'HETATM'
+            else if (resname .eq. '  K') then
+               remark = 'HETATM'
+            else if (resname .eq. ' CA') then
+               remark = 'HETATM'
+            else if (resname .eq. ' FE') then
+               remark = 'HETATM'
+            else if (resname .eq. ' ZN') then
+               remark = 'HETATM'
+            else if (resname .eq. ' BR') then
+               remark = 'HETATM'
+            else if (resname .eq. '  I') then
                remark = 'HETATM'
             else if (residue.ne.reslast .or. resname.ne.namelast .or.
      &               chain.ne.chnlast .or. insert.ne.inslast) then
@@ -183,6 +208,7 @@ c
             zpdb(npdb) = zz
             pdbtyp(npdb) = remark
             pdbatm(npdb) = atmname
+            pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
             resnum(npdb) = nres
             if (resname .eq. 'HOH')  resnum(npdb) = 0
@@ -227,7 +253,9 @@ c
             string = record(47:54)
             read (string,*)  zz
   200       continue
-            if (chain.ne.' ' .and. index(chnsym,chain).eq.0)  goto 210
+            next = 77
+            call getword (record,atmsymb,next)
+            if (index(chnsym,chain) .eq. 0)  goto 210
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 210
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 210
             call fixpdb (resname,atmname)
@@ -237,6 +265,7 @@ c
             zpdb(npdb) = zz
             pdbtyp(npdb) = remark
             pdbatm(npdb) = atmname
+            pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
             resnum(npdb) = 0
             chnatm(npdb) = chain
@@ -476,16 +505,16 @@ c
          if (.not. exist) then
             chntemp = blank
             if (chnsym(1:1) .eq. ' ') then
-               string = 'BLANK'
-               length = 5
+               string = 'BLANK=@'
+               length = 7
             else
                string(1:1) = chnsym(1:1)
                length = 1
             end if
             do i = 2, nchain
                if (chnsym(i:i) .eq. ' ') then
-                  string = string(1:length)//' BLANK'
-                  length = length + 6
+                  string = string(1:length)//' BLANK=@'
+                  length = length + 8
                else
                   string = string(1:length)//' '//chnsym(i:i)
                   length = length + 2
@@ -507,6 +536,7 @@ c
          else
             do i = 1, nchain
                chain = chnsym(i:i)
+               if (chain .eq. ' ')  chain = '@'
                k = index(chntemp,chain)
                if (k .eq. 0)  chnsym(i:i) = '#'
             end do
@@ -514,6 +544,7 @@ c
             k = 0
             do i = 1, nchain
                chain = chntemp(i:i)
+               if (chain .eq. '@')  chain = ' '
                if (chain .ne. '#') then
                   k = k + 1
                   chnsym(k:k) = chain
@@ -522,7 +553,9 @@ c
             nchain = k
          end if
       end if
-      chnsym = chnsym(1:nchain)//blank(nchain+1:20)
+      do i = nchain+1, 20
+         chnsym(i:i) = '#'
+      end do
 c
 c     find out which of the alternate locations will be used
 c
@@ -651,7 +684,9 @@ c
 c     convert unusual names for other amino acid residues
 c
       if (resname .eq. 'CYN')  resname = 'CYS'
+      if (resname .eq. 'CYM')  resname = 'CYD'
       if (resname .eq. 'LYP')  resname = 'LYS'
+      if (resname .eq. 'LYN')  resname = 'LYD'
 c
 c     convert unusual names for terminal capping residues
 c
@@ -664,21 +699,33 @@ c
       if (resname .eq. 'TIP')  resname = 'HOH'
       if (resname .eq. 'DOD')  resname = 'HOH'
 c
-c     convert shifted names for cations and anions
+c     convert shifted and unusual names for atoms and ions
 c
+      if (resname .eq. 'HE ')  resname = ' HE'
       if (resname .eq. 'LI ')  resname = ' LI'
+      if (resname .eq. 'F  ')  resname = '  F'
+      if (resname .eq. 'NE ')  resname = ' NE'
       if (resname .eq. 'NA ')  resname = ' NA'
+      if (resname .eq. 'SOD')  resname = ' NA'
       if (resname .eq. 'MG ')  resname = ' MG'
+      if (resname .eq. 'CL ')  resname = ' CL'
+      if (resname .eq. 'CLA')  resname = ' CL'
+      if (resname .eq. 'AR ')  resname = ' AR'
       if (resname .eq. 'K  ')  resname = '  K'
+      if (resname .eq. 'POT')  resname = '  K'
       if (resname .eq. 'CA ')  resname = ' CA'
+      if (resname .eq. 'CAL')  resname = ' CA'
+      if (resname .eq. 'FE ')  resname = ' FE'
+      if (resname .eq. 'ZN ')  resname = ' ZN'
+      if (resname .eq. 'BR ')  resname = ' BR'
+      if (resname .eq. 'KR ')  resname = ' KR'
       if (resname .eq. 'RB ')  resname = ' RB'
       if (resname .eq. 'SR ')  resname = ' SR'
-      if (resname .eq. 'CS ')  resname = ' CS'
-      if (resname .eq. 'BA ')  resname = ' BA'
-      if (resname .eq. 'F  ')  resname = '  F'
-      if (resname .eq. 'CL ')  resname = ' CL'
-      if (resname .eq. 'BR ')  resname = ' BR'
       if (resname .eq. 'I  ')  resname = '  I'
+      if (resname .eq. 'XE ')  resname = ' XE'
+      if (resname .eq. 'CS ')  resname = ' CS'
+      if (resname .eq. 'CES')  resname = ' CS'
+      if (resname .eq. 'BA ')  resname = ' BA'
 c
 c     decide whether residue is protein or nucleic acid
 c

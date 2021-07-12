@@ -540,12 +540,12 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine shakef  --  SHAKE gradient vector correction  ##
+c     ##  subroutine shake2  --  SHAKE gradient vector correction  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "shakef" modifies the gradient to remove components along any
+c     "shake2" modifies the gradient to remove components along any
 c     holonomic distance contraints using a variant of SHAKE
 c
 c     literature reference:
@@ -556,7 +556,7 @@ c     Macromolecular Simulations", Journal of Computational Chemistry,
 c     16, 1351-1356 (1995)
 c
 c
-      subroutine shakef (derivs)
+      subroutine shake2 (derivs)
       use atoms
       use freeze
       use inform
@@ -650,13 +650,13 @@ c     write information on the number of iterations needed
 c
       if (niter .eq. maxiter) then
          write (iout,10)
-   10    format (/,' SHAKEF  --  Warning, Gradient Constraints',
+   10    format (/,' SHAKE2  --  Warning, Gradient Constraints',
      &              ' not Satisfied')
          call prterr
          call fatal
       else if (debug) then
          write (iout,20)  niter
-   20    format (' SHAKEF  --  Gradient Constraints met at',i6,
+   20    format (' SHAKE2  --  Gradient Constraints met at',i6,
      &              ' Iterations')
       end if
       return

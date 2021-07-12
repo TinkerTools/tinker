@@ -200,7 +200,7 @@ c
          i = i + 1
          phi(i) = 0.0d0
          psi(i) = 0.0d0
-         omega(i) = 0.0d0
+         omg(i) = 0.0d0
          do j = 1, 4
             chi(j,i) = 0.0d0
          end do
@@ -216,7 +216,7 @@ c
          call gettext (record,name,next)
          length = trimtext (name)
          string = record(next:240)
-         read (string,*,err=40,end=40)  phi(i),psi(i),omega(i),
+         read (string,*,err=40,end=40)  phi(i),psi(i),omg(i),
      &                                  (chi(j,i),j=1,4),disulf(i)
    40    continue
          call getword (record,chir,next)
@@ -295,8 +295,8 @@ c
             if (seq(i) .eq. 'PRO')  phi(i) = -60.0d0
             psi(i) = 135.0d0
          end if
-         if (omega(i) .eq. 0.0d0) then
-            omega(i) = 180.0d0
+         if (omg(i) .eq. 0.0d0) then
+            omg(i) = 180.0d0
          end if
          if (chi(1,i) .eq. 0.0d0) then
             do j = 1, 4
@@ -683,7 +683,7 @@ c
             call zatom (ntyp(k),1.34d0,112.7d0,psi(i-1),
      &                  ci(i-1),cai(i-1),ni(i-1),0)
             cai(i) = n
-            call zatom (catyp(k),1.46d0,121.0d0,omega(i-1),
+            call zatom (catyp(k),1.46d0,121.0d0,omg(i-1),
      &                  ni(i),ci(i-1),cai(i-1),0)
             ci(i) = n
             call zatom (ctyp(k),1.51d0,111.6d0,phi(i),
@@ -710,7 +710,7 @@ c
             call zatom (ntyp(k),1.34d0,112.7d0,psi(i-1),
      &                  ci(i-1),cai(i-1),ni(i-1),0)
             cai(i) = n
-            call zatom (catyp(k),1.46d0,121.0d0,omega(i-1),
+            call zatom (catyp(k),1.46d0,121.0d0,omg(i-1),
      &                  ni(i),ci(i-1),cai(i-1),0)
             ci(i) = n
             call zatom (ctyp(k),1.51d0,111.6d0,phi(i),
@@ -773,7 +773,7 @@ c
                call zatom (nctyp(k),1.34d0,112.7d0,psi(i-1),
      &                     ci(i-1),cai(i-1),ni(i-1),0)
                cai(i) = n
-               call zatom (cactyp(k),1.46d0,121.0d0,omega(i-1),
+               call zatom (cactyp(k),1.46d0,121.0d0,omg(i-1),
      &                     ni(i),ci(i-1),cai(i-1),0)
                ci(i) = n
                call zatom (cctyp(k),1.51d0,111.6d0,phi(i),

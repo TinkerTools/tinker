@@ -240,9 +240,8 @@ c
                      yp = zcb*xab - xcb*zab
                      zp = xcb*yab - ycb*xab
                      rp = sqrt(xp*xp + yp*yp + zp*zp)
-                     rab2 = xab*xab + yab*yab + zab*zab
-                     rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-                     rcb2 = max(0.0001d0,rcb2)
+                     rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+                     rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
                      dot = xab*xcb + yab*ycb + zab*zcb
                      cosine = dot / sqrt(rab2*rcb2)
                      sine = sqrt(abs(1.0d0-cosine**2))
@@ -522,9 +521,8 @@ c
                         yp = zcb*xab - xcb*zab
                         zp = xcb*yab - ycb*xab
                         rp = sqrt(xp*xp + yp*yp + zp*zp)
-                        rab2 = xab*xab + yab*yab + zab*zab
-                        rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-                        rcb2 = max(0.0001d0,rcb2)
+                        rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+                        rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
                         dot = xab*xcb + yab*ycb + zab*zcb
                         cosine = dot / sqrt(rab2*rcb2)
                         sine = sqrt(abs(1.0d0-cosine**2))

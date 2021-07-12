@@ -52,7 +52,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,rcb,fgrp
+      real*8 e,eps,rcb,fgrp
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
       real*8 xtu,ytu,ztu,rtru
@@ -81,10 +81,14 @@ c
       et = 0.0d0
       if (ntors .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
-!$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,use_group,use_polymer)
+!$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,eps,use_group,use_polymer)
 !$OMP& shared(et)
 !$OMP DO reduction(+:et) schedule(guided)
 c
@@ -132,6 +136,7 @@ c
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xt = yba*zcb - ycb*zba
             yt = zba*xcb - zcb*xba
             zt = xba*ycb - xcb*yba
@@ -141,67 +146,64 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
 c     set the torsional parameters for this angle
 c
-               v1 = tors1(1,i)
-               c1 = tors1(3,i)
-               s1 = tors1(4,i)
-               v2 = tors2(1,i)
-               c2 = tors2(3,i)
-               s2 = tors2(4,i)
-               v3 = tors3(1,i)
-               c3 = tors3(3,i)
-               s3 = tors3(4,i)
-               v4 = tors4(1,i)
-               c4 = tors4(3,i)
-               s4 = tors4(4,i)
-               v5 = tors5(1,i)
-               c5 = tors5(3,i)
-               s5 = tors5(4,i)
-               v6 = tors6(1,i)
-               c6 = tors6(3,i)
-               s6 = tors6(4,i)
+            v1 = tors1(1,i)
+            c1 = tors1(3,i)
+            s1 = tors1(4,i)
+            v2 = tors2(1,i)
+            c2 = tors2(3,i)
+            s2 = tors2(4,i)
+            v3 = tors3(1,i)
+            c3 = tors3(3,i)
+            s3 = tors3(4,i)
+            v4 = tors4(1,i)
+            c4 = tors4(3,i)
+            s4 = tors4(4,i)
+            v5 = tors5(1,i)
+            c5 = tors5(3,i)
+            s5 = tors5(4,i)
+            v6 = tors6(1,i)
+            c6 = tors6(3,i)
+            s6 = tors6(4,i)
 c
 c     compute the multiple angle trigonometry and the phase terms
 c
-               cosine2 = cosine*cosine - sine*sine
-               sine2 = 2.0d0 * cosine * sine
-               cosine3 = cosine*cosine2 - sine*sine2
-               sine3 = cosine*sine2 + sine*cosine2
-               cosine4 = cosine*cosine3 - sine*sine3
-               sine4 = cosine*sine3 + sine*cosine3
-               cosine5 = cosine*cosine4 - sine*sine4
-               sine5 = cosine*sine4 + sine*cosine4
-               cosine6 = cosine*cosine5 - sine*sine5
-               sine6 = cosine*sine5 + sine*cosine5
-               phi1 = 1.0d0 + (cosine*c1 + sine*s1)
-               phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
-               phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
-               phi4 = 1.0d0 + (cosine4*c4 + sine4*s4)
-               phi5 = 1.0d0 + (cosine5*c5 + sine5*s5)
-               phi6 = 1.0d0 + (cosine6*c6 + sine6*s6)
+            cosine2 = cosine*cosine - sine*sine
+            sine2 = 2.0d0 * cosine * sine
+            cosine3 = cosine*cosine2 - sine*sine2
+            sine3 = cosine*sine2 + sine*cosine2
+            cosine4 = cosine*cosine3 - sine*sine3
+            sine4 = cosine*sine3 + sine*cosine3
+            cosine5 = cosine*cosine4 - sine*sine4
+            sine5 = cosine*sine4 + sine*cosine4
+            cosine6 = cosine*cosine5 - sine*sine5
+            sine6 = cosine*sine5 + sine*cosine5
+            phi1 = 1.0d0 + (cosine*c1 + sine*s1)
+            phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
+            phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
+            phi4 = 1.0d0 + (cosine4*c4 + sine4*s4)
+            phi5 = 1.0d0 + (cosine5*c5 + sine5*s5)
+            phi6 = 1.0d0 + (cosine6*c6 + sine6*s6)
 c
 c     calculate the torsional energy for this angle
 c
-               e = torsunit * (v1*phi1 + v2*phi2 + v3*phi3
-     &                            + v4*phi4 + v5*phi5 + v6*phi6)
+            e = torsunit * (v1*phi1 + v2*phi2 + v3*phi3
+     &                         + v4*phi4 + v5*phi5 + v6*phi6)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+            if (use_group)  e = e * fgrp
 c
 c     increment the total torsional angle energy
 c
-               et = et + e
-            end if
+            et = et + e
          end if
       end do
 c
@@ -234,7 +236,7 @@ c
       use warp
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,rcb,fgrp
+      real*8 e,eps,rcb,fgrp
       real*8 width,wterm
       real*8 xt,yt,zt,rt2
       real*8 xu,yu,zu,ru2
@@ -265,6 +267,10 @@ c     zero out the torsional potential energy
 c
       et = 0.0d0
       if (ntors .eq. 0)  return
+c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
 c
 c     set the extent of smoothing to be performed
 c
@@ -344,6 +350,7 @@ c
             xdc = xid - xic
             ydc = yid - yic
             zdc = zid - zic
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xt = yba*zcb - ycb*zba
             yt = zba*xcb - zcb*xba
             zt = xba*ycb - xcb*yba
@@ -353,85 +360,82 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
 c
 c     set the torsional parameters for this angle
 c
-               v1 = tors1(1,i)
-               c1 = tors1(3,i)
-               s1 = tors1(4,i)
-               v2 = tors2(1,i)
-               c2 = tors2(3,i)
-               s2 = tors2(4,i)
-               v3 = tors3(1,i)
-               c3 = tors3(3,i)
-               s3 = tors3(4,i)
-               v4 = tors4(1,i)
-               c4 = tors4(3,i)
-               s4 = tors4(4,i)
-               v5 = tors5(1,i)
-               c5 = tors5(3,i)
-               s5 = tors5(4,i)
-               v6 = tors6(1,i)
-               c6 = tors6(3,i)
-               s6 = tors6(4,i)
+            v1 = tors1(1,i)
+            c1 = tors1(3,i)
+            s1 = tors1(4,i)
+            v2 = tors2(1,i)
+            c2 = tors2(3,i)
+            s2 = tors2(4,i)
+            v3 = tors3(1,i)
+            c3 = tors3(3,i)
+            s3 = tors3(4,i)
+            v4 = tors4(1,i)
+            c4 = tors4(3,i)
+            s4 = tors4(4,i)
+            v5 = tors5(1,i)
+            c5 = tors5(3,i)
+            s5 = tors5(4,i)
+            v6 = tors6(1,i)
+            c6 = tors6(3,i)
+            s6 = tors6(4,i)
 c
 c     compute the multiple angle trigonometry and the phase terms
 c
-               cosine2 = cosine*cosine - sine*sine
-               sine2 = 2.0d0 * cosine * sine
-               cosine3 = cosine*cosine2 - sine*sine2
-               sine3 = cosine*sine2 + sine*cosine2
-               cosine4 = cosine*cosine3 - sine*sine3
-               sine4 = cosine*sine3 + sine*cosine3
-               cosine5 = cosine*cosine4 - sine*sine4
-               sine5 = cosine*sine4 + sine*cosine4
-               cosine6 = cosine*cosine5 - sine*sine5
-               sine6 = cosine*sine5 + sine*cosine5
-               phi1 = 1.0d0 + (cosine*c1 + sine*s1)
-               phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
-               phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
-               phi4 = 1.0d0 + (cosine4*c4 + sine4*s4)
-               phi5 = 1.0d0 + (cosine5*c5 + sine5*s5)
-               phi6 = 1.0d0 + (cosine6*c6 + sine6*s6)
+            cosine2 = cosine*cosine - sine*sine
+            sine2 = 2.0d0 * cosine * sine
+            cosine3 = cosine*cosine2 - sine*sine2
+            sine3 = cosine*sine2 + sine*cosine2
+            cosine4 = cosine*cosine3 - sine*sine3
+            sine4 = cosine*sine3 + sine*cosine3
+            cosine5 = cosine*cosine4 - sine*sine4
+            sine5 = cosine*sine4 + sine*cosine4
+            cosine6 = cosine*cosine5 - sine*sine5
+            sine6 = cosine*sine5 + sine*cosine5
+            phi1 = 1.0d0 + (cosine*c1 + sine*s1)
+            phi2 = 1.0d0 + (cosine2*c2 + sine2*s2)
+            phi3 = 1.0d0 + (cosine3*c3 + sine3*s3)
+            phi4 = 1.0d0 + (cosine4*c4 + sine4*s4)
+            phi5 = 1.0d0 + (cosine5*c5 + sine5*s5)
+            phi6 = 1.0d0 + (cosine6*c6 + sine6*s6)
 c
 c     transform the potential function via smoothing
 c
-               if (use_gda) then
-                  width = wterm * (m2(ia)+m2(ib)+m2(ic)+m2(id))
-                  damp1 = exp(-width)
-                  damp2 = exp(-4.0d0*width)
-                  damp3 = exp(-9.0d0*width)
-                  damp4 = exp(-16.0d0*width)
-                  damp5 = exp(-25.0d0*width)
-                  damp6 = exp(-36.0d0*width)
-               end if
-               phi1 = phi1 * damp1
-               phi2 = phi2 * damp2
-               phi3 = phi3 * damp3
-               phi4 = phi4 * damp4
-               phi5 = phi5 * damp5
-               phi6 = phi6 * damp6
+            if (use_gda) then
+               width = wterm * (m2(ia)+m2(ib)+m2(ic)+m2(id))
+               damp1 = exp(-width)
+               damp2 = exp(-4.0d0*width)
+               damp3 = exp(-9.0d0*width)
+               damp4 = exp(-16.0d0*width)
+               damp5 = exp(-25.0d0*width)
+               damp6 = exp(-36.0d0*width)
+            end if
+            phi1 = phi1 * damp1
+            phi2 = phi2 * damp2
+            phi3 = phi3 * damp3
+            phi4 = phi4 * damp4
+            phi5 = phi5 * damp5
+            phi6 = phi6 * damp6
 c
 c     calculate the torsional energy for this angle
 c
-               e = torsunit * (v1*phi1 + v2*phi2 + v3*phi3
-     &                            + v4*phi4 + v5*phi5 + v6*phi6)
+            e = torsunit * (v1*phi1 + v2*phi2 + v3*phi3
+     &                         + v4*phi4 + v5*phi5 + v6*phi6)
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+            if (use_group)  e = e * fgrp
 c
 c     increment the total torsional angle energy
 c
-               et = et + e
-            end if
+            et = et + e
          end if
       end do
       return

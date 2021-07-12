@@ -29,12 +29,12 @@ c
       real*8 cr1,cr2,cr3
 c
 c
-c     compute and store half and three-quarter box lengths
+c     compute and store half box lengths and other lengths
 c
       xbox2 = 0.5d0 * xbox
       ybox2 = 0.5d0 * ybox
       zbox2 = 0.5d0 * zbox
-      if (octahedron)  box34 = 0.75d0 * xbox
+      if (octahedron)  box23 = third2 * xbox
 c
 c     set replicated cell dimensions equal to the unit cell
 c
@@ -47,14 +47,14 @@ c
 c
 c     get values needed for fractional coordinate computations
 c
-      if (orthogonal .or. octahedron) then
-         alpha_cos = 0.0d0
-         beta_sin = 1.0d0
-         beta_cos = 0.0d0
-         gamma_sin = 1.0d0
-         gamma_cos = 0.0d0
-         beta_term = 0.0d0
-         gamma_term = 1.0d0
+      if (triclinic) then
+         alpha_cos = cos(alpha/radian)
+         beta_sin = sin(beta/radian)
+         beta_cos = cos(beta/radian)
+         gamma_sin = sin(gamma/radian)
+         gamma_cos = cos(gamma/radian)
+         beta_term = (alpha_cos - beta_cos*gamma_cos) / gamma_sin
+         gamma_term = sqrt(beta_sin**2 - beta_term**2)
       else if (monoclinic) then
          alpha_cos = 0.0d0
          beta_sin = sin(beta/radian)
@@ -63,25 +63,25 @@ c
          gamma_cos = 0.0d0
          beta_term = 0.0d0
          gamma_term = beta_sin
-      else if (triclinic) then
-         alpha_cos = cos(alpha/radian)
-         beta_sin = sin(beta/radian)
-         beta_cos = cos(beta/radian)
-         gamma_sin = sin(gamma/radian)
-         gamma_cos = cos(gamma/radian)
-         beta_term = (alpha_cos - beta_cos*gamma_cos) / gamma_sin
-         gamma_term = sqrt(beta_sin**2 - beta_term**2)
+      else
+         alpha_cos = 0.0d0
+         beta_sin = 1.0d0
+         beta_cos = 0.0d0
+         gamma_sin = 1.0d0
+         gamma_cos = 0.0d0
+         beta_term = 0.0d0
+         gamma_term = 1.0d0
       end if
 c
 c     determine the volume of the parent periodic box
 c
       volbox = 0.0d0
-      if (orthogonal .or. octahedron) then
-         volbox = xbox * ybox * zbox
+      if (triclinic) then
+         volbox = (gamma_sin*gamma_term) * xbox * ybox * zbox
       else if (monoclinic) then
          volbox = beta_sin * xbox * ybox * zbox
-      else if (triclinic) then
-         volbox = (gamma_sin*gamma_term) * xbox * ybox * zbox
+      else
+         volbox = xbox * ybox * zbox
       end if
 c
 c     compute and store real space lattice vectors as rows
@@ -119,8 +119,8 @@ c
          recip(3,3) = (ar1*br2 - br1*ar2) / volbox
       end if
 c
-c     volume of truncated octahedron is half of cubic parent
+c     correct volume of non-parallelepiped periodic cells
 c
-      if (octahedron)  volbox = 0.5d0 * volbox
+      if (nonprism)  volbox = 0.5d0 * volbox
       return
       end

@@ -26,7 +26,7 @@ c
       use usage
       implicit none
       integer i,ia,ib,ic,id
-      real*8 e,dt,fgrp
+      real*8 e,eps,dt,fgrp
       real*8 ideal,force
       real*8 cosine,sine
       real*8 rcb,angle
@@ -49,10 +49,14 @@ c
       eid = 0.0d0
       if (niprop .eq. 0)  return
 c
+c     set tolerance for minimum distance and angle values
+c
+      eps = 0.0001d0
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
-!$OMP& x,y,z,kprop,vprop,idihunit,use_group,use_polymer)
+!$OMP& x,y,z,kprop,vprop,idihunit,eps,use_group,use_polymer)
 !$OMP& shared(eid)
 !$OMP DO reduction(+:eid) schedule(guided)
 c
@@ -100,6 +104,7 @@ c
                call image (xcb,ycb,zcb)
                call image (xdc,ydc,zdc)
             end if
+            rcb = sqrt(max(xcb*xcb+ycb*ycb+zcb*zcb,eps))
             xt = yba*zcb - ycb*zba
             yt = zba*xcb - zcb*xba
             zt = xba*ycb - xcb*yba
@@ -109,44 +114,40 @@ c
             xtu = yt*zu - yu*zt
             ytu = zt*xu - zu*xt
             ztu = xt*yu - xu*yt
-            rt2 = xt*xt + yt*yt + zt*zt
-            ru2 = xu*xu + yu*yu + zu*zu
+            rt2 = max(xt*xt+yt*yt+zt*zt,eps)
+            ru2 = max(xu*xu+yu*yu+zu*zu,eps)
             rtru = sqrt(rt2 * ru2)
-            if (rtru .ne. 0.0d0) then
-               rcb = sqrt(xcb*xcb + ycb*ycb + zcb*zcb)
-               cosine = (xt*xu + yt*yu + zt*zu) / rtru
-               sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-               if (sine .lt. 0.0d0)  angle = -angle
+            cosine = (xt*xu + yt*yu + zt*zu) / rtru
+            sine = (xcb*xtu + ycb*ytu + zcb*ztu) / (rcb*rtru)
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
+            if (sine .lt. 0.0d0)  angle = -angle
 c
 c     set the improper dihedral parameters for this angle
 c
-               ideal = vprop(i)
-               force = kprop(i)
-               if (abs(angle+ideal) .lt. abs(angle-ideal))
-     &            ideal = -ideal
-               dt = angle - ideal
-               do while (dt .gt. 180.0d0)
-                  dt = dt - 360.0d0
-               end do
-               do while (dt .lt. -180.0d0)
-                  dt = dt + 360.0d0
-               end do
-               dt = dt / radian
+            ideal = vprop(i)
+            force = kprop(i)
+            if (abs(angle+ideal) .lt. abs(angle-ideal))
+     &         ideal = -ideal
+            dt = angle - ideal
+            do while (dt .gt. 180.0d0)
+               dt = dt - 360.0d0
+            end do
+            do while (dt .lt. -180.0d0)
+               dt = dt + 360.0d0
+            end do
 c
 c     calculate the improper dihedral energy
 c
-               e = idihunit * force * dt**2
+            e = idihunit * force * dt**2
 c
 c     scale the interaction based on its group membership
 c
-               if (use_group)  e = e * fgrp
+            if (use_group)  e = e * fgrp
 c
 c     increment the total improper dihedral energy
 c
-               eid = eid + e
-            end if
+            eid = eid + e
          end if
       end do
 c

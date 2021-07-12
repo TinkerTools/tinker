@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "poledit" provides for modification and manipulation of
-c     the atomic multipole electrostatic models used in Tinker
+c     "poledit" provides for the modification and manipulation
+c     of polarizable atomic multipole electrostatic models
 c
 c
       program poledit
@@ -65,6 +65,7 @@ c
          call setframe
          call rotframe
          call setpolar
+         call setpgrp
          call alterpol
          call avgpole
          call prtpole
@@ -75,6 +76,7 @@ c
          call katom
          call kmpole
          call kpolar
+         call kchgtrn
          call fixframe
          call prtpole
       else if (mode .eq. 3) then
@@ -84,6 +86,7 @@ c
          call katom
          call kmpole
          call kpolar
+         call kchgtrn
          call alterpol
          call avgpole
          call prtpole
@@ -108,6 +111,7 @@ c
       use atoms
       use couple
       use files
+      use kpolr
       use mpole
       use polar
       use ptable
@@ -130,13 +134,20 @@ c
          rad(i) = 0.76d0
          atn = atomic(i)
          if (atn .ne. 0)  rad(i) = covrad(atn)
-         rad(i) = 1.1d0 * rad(i)
+         if (atn .eq. 1) then
+            rad(i) = 1.25d0 * rad(i)
+         else
+            rad(i) = 1.15d0 * rad(i)
+         end if
       end do
 c
 c     assign atom connectivities based on interatomic distances
 c
       do i = 1, n
          n12(i) = 0
+         do j = 1, maxval
+            i12(j,i) = 0
+         end do
       end do
       do i = 1, n-1
          xi = x(i)
@@ -206,6 +217,14 @@ c
          polsiz(i) = 13
          pollist(i) = i
       end do
+c
+c     zero out polarization group membership by atom type
+c
+      do i = 1, maxtyp
+         do j = 1, maxval
+            pgrp(j,i) = 0
+         end do
+      end do
       return
       end
 c
@@ -228,13 +247,19 @@ c
       use iounit
       use mpole
       implicit none
-      integer i,j,k,m,kb
+      integer i,j,m
       integer ia,ib,ic,id
-      integer kab,kac,kad
-      integer kbc,kbd,kcd
+      integer ka,kb,kc,ki
+      integer mab,mac,mbc
+      integer mad,mbd,mcd
+      integer mabc,mabd
+      integer macd,mbcd
       integer priority
+      real*8 geometry
       logical exist,query
       logical change
+      logical noinvert
+      logical pyramid
       character*240 record
       character*240 string
 c
@@ -255,6 +280,10 @@ c
          yaxis(i) = 0
       end do
 c
+c     set true if pyramidal trivalent nitrogen cannot invert
+c
+      noinvert = .false.
+c
 c     assign the local frame definition for an isolated atom
 c
       do i = 1, npole
@@ -268,48 +297,38 @@ c
 c     assign the local frame definition for a monovalent atom
 c
          else if (j .eq. 1) then
+            polaxe(i) = 'Z-Only'
+            zaxis(i) = ia
+            xaxis(i) = 0
+            yaxis(i) = 0
             ia = i12(1,i)
-            if (n12(ia) .eq. 1) then
-               polaxe(i) = 'Z-Only'
-               zaxis(i) = ia
-               xaxis(i) = 0
-               yaxis(i) = 0
-            else
-               polaxe(i) = 'Z-then-X'
-               zaxis(i) = ia
-               m = 0
-               do k = 1, n12(ia)
-                  ib = i12(k,ia)
-                  kb = atomic(ib)
-                  if (kb.gt.m .and. ib.ne.i) then
-                     xaxis(i) = ib
-                     m = kb
-                  end if
-               end do
-               yaxis(i) = 0
-            end if
+            call frame13 (i,ia,noinvert)
 c
 c     assign the local frame definition for a divalent atom
 c
          else if (j .eq. 2) then
             ia = i12(1,i)
             ib = i12(2,i)
-            kab = priority (i,ia,ib)
-            if (kab .eq. ia) then
+            ki = atomic(i)
+            yaxis(i) = 0
+            m = priority (i,ia,ib,0)
+            if (ki .eq. 6) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = m
+               if (m .eq. 0)  zaxis(i) = ia
+               xaxis(i) = 0
+            else if (m .eq. ia) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
                xaxis(i) = ib
-               yaxis(i) = 0
-            else if (kab .eq. ib) then
+            else if (m .eq. ib) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
                xaxis(i) = ia
-               yaxis(i) = 0
             else
                polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ib
-               yaxis(i) = 0
             end if
 c
 c     assign the local frame definition for a trivalent atom
@@ -318,47 +337,128 @@ c
             ia = i12(1,i)
             ib = i12(2,i)
             ic = i12(3,i)
-            kab = priority (i,ia,ib)
-            kac = priority (i,ia,ic)
-            kbc = priority (i,ib,ic)
-            if (kab.eq.0 .and. kac.eq.0) then
-               polaxe(i) = 'Z-then-X'
+            ki = atomic(i)
+            ka = atomic(ia)
+            kb = atomic(ib)
+            kc = atomic(ic)
+            mab = priority (i,ia,ib,0)
+            mac = priority (i,ia,ic,0)
+            mbc = priority (i,ib,ic,0)
+            mabc = priority (i,ia,ib,ic)
+            if (mabc .eq. 0) then
+               polaxe(i) = 'None'
+               zaxis(i) = 0
+               xaxis(i) = 0
+               yaxis(i) = 0
+               pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = '3-Fold'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = '3-Fold'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               end if
+            else if (mab.eq.0 .and. kb.ge.kc) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ib
                yaxis(i) = 0
-            else if (kab.eq.ia .and. kac.eq.ia) then
-               polaxe(i) = 'Z-then-X'
+            else if (mac.eq.0 .and. ka.ge.kb) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ia
-               xaxis(i) = ib
-               if (kbc .eq. ic)  xaxis(i) = ic
+               xaxis(i) = ic
                yaxis(i) = 0
-            else if (kab.eq.ib .and. kbc.eq.ib) then
-               polaxe(i) = 'Z-then-X'
+            else if (mbc.eq.0 .and. kc.ge.ka) then
+               polaxe(i) = 'Bisector'
                zaxis(i) = ib
-               xaxis(i) = ia
-               if (kac .eq. ic)  xaxis(i) = ic
+               xaxis(i) = ic
                yaxis(i) = 0
-            else if (kac.eq.ic .and. kbc.eq.ic) then
-               polaxe(i) = 'Z-then-X'
+            else if (mabc .eq. ia) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = ia
+               xaxis(i) = 0
+               yaxis(i) = 0
+               pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
+               if (mbc .eq. ib) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
+               else if (mbc .eq. ic) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ic
+               else if (ki .eq. 6) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
+               else if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else
+                  call frame13 (i,ia,noinvert)
+               end if
+            else if (mabc .eq. ib) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = ib
+               xaxis(i) = 0
+               yaxis(i) = 0
+               pyramid = (abs(geometry(ib,i,ia,ic)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
+               if (mac .eq. ia) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
+               else if (mac .eq. ic) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ic
+               else if (ki .eq. 6) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
+               else if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else
+                  call frame13 (i,ib,noinvert)
+               end if
+            else if (mabc .eq. ic) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ic
-               xaxis(i) = ia
-               if (kab .eq. ib)  xaxis(i) = ib
+               xaxis(i) = 0
                yaxis(i) = 0
-            else if (kab .eq. 0) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = 0
-            else if (kac .eq. 0) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kbc .eq. 0) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = 0
+               pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
+               pyramid = (pyramid .and. noinvert)
+               if (mab .eq. ia) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
+               else if (mab .eq. ib) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
+               else if (ki .eq. 6) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
+               else if (ki .eq. 7) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else
+                  call frame13 (i,ic,noinvert)
+               end if
             end if
 c
 c     assign the local frame definition for a tetravalent atom
@@ -368,99 +468,219 @@ c
             ib = i12(2,i)
             ic = i12(3,i)
             id = i12(4,i)
-            kab = priority (i,ia,ib)
-            kac = priority (i,ia,ic)
-            kad = priority (i,ia,id)
-            kbc = priority (i,ib,ic)
-            kbd = priority (i,ib,id)
-            kcd = priority (i,ic,id)
-            if (kab.eq.0 .and. kac.eq.0 .and. kad.eq.0) then
+            mab = priority (i,ia,ib,0)
+            mac = priority (i,ia,ic,0)
+            mbc = priority (i,ib,ic,0)
+            mad = priority (i,ia,id,0)
+            mbd = priority (i,ib,id,0)
+            mcd = priority (i,ic,id,0)
+            mabc = priority (i,ia,ib,ic)
+            mabd = priority (i,ia,ib,id)
+            macd = priority (i,ia,ic,id)
+            mbcd = priority (i,ib,ic,id)
+            if (mabc.eq.0 .and. mbcd.eq.0) then
+               polaxe(i) = 'None'
+               zaxis(i) = 0
+               xaxis(i) = 0
+               yaxis(i) = 0
+            else if (mabc.eq.ia .and. mabd.eq.ia) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ia
-               xaxis(i) = ib
                yaxis(i) = 0
-            else if (kab.eq.ia .and. kac.eq.ia .and. kad.eq.ia) then
-               polaxe(i) = 'Z-then-X'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               if (kbc.eq.ic .and. kcd.eq.ic)  xaxis(i) = ic
-               if (kbd.eq.id .and. kcd.eq.id)  xaxis(i) = id
-               if (kbc.eq.ic .and. kcd.eq.0)  xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kab.eq.ib .and. kbc.eq.ib .and. kbd.eq.ib) then
+               if (mbcd .ne. 0) then
+                  xaxis(i) = mbcd
+               else
+                  call frame13 (i,ia,noinvert)
+               end if
+            else if (mabc.eq.ib .and. mabd.eq.ib) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ib
-               xaxis(i) = ia
-               if (kac.eq.ic .and. kcd.eq.ic)  xaxis(i) = ic
-               if (kad.eq.id .and. kcd.eq.id)  xaxis(i) = id
-               if (kac.eq.ic .and. kcd.eq.0)  xaxis(i) = ic
                yaxis(i) = 0
-            else if (kac.eq.ic .and. kbc.eq.ic .and. kcd.eq.ic) then
+               if (macd .ne. 0) then
+                  xaxis(i) = macd
+               else
+                  call frame13 (i,ib,noinvert)
+               end if
+            else if (mabc.eq.ia .and. macd.eq.ia) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ia
+               yaxis(i) = 0
+               if (mbcd .ne. 0) then
+                  xaxis(i) = mbcd
+               else
+                  call frame13 (i,ia,noinvert)
+               end if
+            else if (mabc.eq.ic .and. macd.eq.ic) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = ic
-               xaxis(i) = ia
-               if (kab.eq.ib .and. kbd.eq.ib)  xaxis(i) = ib
-               if (kad.eq.id .and. kbd.eq.id)  xaxis(i) = id
-               if (kab.eq.ib .and. kbd.eq.0)  xaxis(i) = ib
                yaxis(i) = 0
-            else if (kad.eq.id .and. kbd.eq.id .and. kcd.eq.id) then
+               if (mabd .ne. 0) then
+                  xaxis(i) = mabd
+               else
+                  call frame13 (i,ic,noinvert)
+               end if
+            else if (mabc.eq.ib .and. mbcd.eq.ib) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ib
+               yaxis(i) = 0
+               if (macd .ne. 0) then
+                  xaxis(i) = macd
+               else
+                  call frame13 (i,ib,noinvert)
+               end if
+            else if (mabc.eq.ic .and. mbcd.eq.ic) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ic
+               yaxis(i) = 0
+               if (mabd .ne. 0) then
+                  xaxis(i) = mabd
+               else
+                  call frame13 (i,ic,noinvert)
+               end if
+            else if (mabd.eq.ia .and. macd.eq.ia) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ia
+               yaxis(i) = 0
+               if (mbcd .ne. 0) then
+                  xaxis(i) = mbcd
+               else
+                  call frame13 (i,ia,noinvert)
+               end if
+            else if (mabd.eq.id .and. macd.eq.id) then
                polaxe(i) = 'Z-then-X'
                zaxis(i) = id
-               xaxis(i) = ia
-               if (kab.eq.ib .and. kbc.eq.ib)  xaxis(i) = ib
-               if (kac.eq.ic .and. kbc.eq.ic)  xaxis(i) = ic
-               if (kab.eq.ib .and. kbc.eq.0)  xaxis(i) = ib
                yaxis(i) = 0
-            else if (kab.eq.0 .and. kac.eq.0 .and. kbc.eq.0) then
-               polaxe(i) = 'Z-Bisect'
+               if (mabc .ne. 0) then
+                  xaxis(i) = mabc
+               else
+                  call frame13 (i,id,noinvert)
+               end if
+            else if (mabd.eq.ib .and. mbcd.eq.ib) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ib
+               yaxis(i) = 0
+               if (macd .ne. 0) then
+                  xaxis(i) = macd
+               else
+                  call frame13 (i,ib,noinvert)
+               end if
+            else if (mabd.eq.id .and. mbcd.eq.id) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = id
+               yaxis(i) = 0
+               if (mabc .ne. 0) then
+                  xaxis(i) = mabc
+               else
+                  call frame13 (i,id,noinvert)
+               end if
+            else if (macd.eq.ic .and. mbcd.eq.ic) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = ic
+               yaxis(i) = 0
+               if (mabd .ne. 0) then
+                  xaxis(i) = mabd
+               else
+                  call frame13 (i,ic,noinvert)
+               end if
+            else if (macd.eq.id .and. mbcd.eq.id) then
+               polaxe(i) = 'Z-then-X'
+               zaxis(i) = id
+               yaxis(i) = 0
+               if (mabc .ne. 0) then
+                  xaxis(i) = mabc
+               else
+                  call frame13 (i,id,noinvert)
+               end if
+            else if (mbcd .eq. 0) then
+               polaxe(i) = 'Z-Only'
                zaxis(i) = ia
+               xaxis(i) = 0
+               yaxis(i) = 0
+               call frame13 (i,ia,noinvert)
+            else if (macd .eq. 0) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = ib
+               xaxis(i) = 0
+               yaxis(i) = 0
+               call frame13 (i,ib,noinvert)
+            else if (mabd .eq. 0) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = ic
+               xaxis(i) = 0
+               yaxis(i) = 0
+               call frame13 (i,ic,noinvert)
+            else if (mabc .eq. 0) then
+               polaxe(i) = 'Z-Only'
+               zaxis(i) = id
+               xaxis(i) = 0
+               yaxis(i) = 0
+               call frame13 (i,id,noinvert)
+            else if (mab.eq.0 .and. mcd.eq.0) then
+               if (mac .eq. ia) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = 0
+               else if (mac .eq. ic) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ic
+                  xaxis(i) = id
+                  yaxis(i) = 0
+               end if
+            else if (mac.eq.0 .and. mbd.eq.0) then
+               if (mab .eq. ia) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = ic
+                  yaxis(i) = 0
+               else if (mab .eq. ib) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ib
+                  xaxis(i) = id
+                  yaxis(i) = 0
+               end if
+            else if (mad.eq.0 .and. mbc.eq.0) then
+               if (mab .eq. ia) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = id
+                  yaxis(i) = 0
+               else if (mab .eq. ib) then
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ib
+                  xaxis(i) = ic
+                  yaxis(i) = 0
+               end if
+            else if (mab .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mcd
+               xaxis(i) = ia
+               yaxis(i) = ib
+            else if (mac .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mbd
+               xaxis(i) = ia
+               yaxis(i) = ic
+            else if (mad .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mbc
+               xaxis(i) = ia
+               yaxis(i) = id
+            else if (mbc .eq. 0) then
+               polaxe(i) = 'Z-Bisect'
+               zaxis(i) = mad
                xaxis(i) = ib
                yaxis(i) = ic
-            else if (kab.eq.0 .and. kad.eq.0 .and. kbd.eq.0) then
+            else if (mbd .eq. 0) then
                polaxe(i) = 'Z-Bisect'
-               zaxis(i) = ia
+               zaxis(i) = mac
                xaxis(i) = ib
                yaxis(i) = id
-            else if (kac.eq.0 .and. kad.eq.0 .and. kcd.eq.0) then
+            else if (mcd .eq. 0) then
                polaxe(i) = 'Z-Bisect'
-               zaxis(i) = ia
+               zaxis(i) = mab
                xaxis(i) = ic
                yaxis(i) = id
-            else if (kbc.eq.0 .and. kbd.eq.0 .and. kcd.eq.0) then
-               polaxe(i) = 'Z-Bisect'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = id
-            else if (kab.eq.0 .and. kac.eq.ia .and. kad.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = 0
-            else if (kac.eq.0 .and. kab.eq.ia .and. kad.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kad.eq.0 .and. kab.eq.ia .and. kac.eq.ia) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = id
-               yaxis(i) = 0
-            else if (kbc.eq.0 .and. kab.eq.ib .and. kbd.eq.ib) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = 0
-            else if (kbd.eq.0 .and. kab.eq.ib .and. kbc.eq.ib) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = id
-               yaxis(i) = 0
-            else if (kcd.eq.0 .and. kac.eq.ic .and. kbc.eq.ic) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ic
-               xaxis(i) = id
-               yaxis(i) = 0
             end if
          end if
       end do
@@ -535,6 +755,117 @@ c
       end
 c
 c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine frame13  --  set local axis via 1-3 attachments  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "frame13" finds local coordinate frame defining atoms in cases
+c     where the use of 1-3 connected atoms is required
+c
+c
+      subroutine frame13 (i,ia,noinvert)
+      use atomid
+      use couple
+      use mpole
+      implicit none
+      integer i,ia
+      integer ib,ic,id
+      integer k,ka,m
+      integer priority
+      real*8 geometry
+      logical noinvert
+      logical pyramid
+c
+c
+c     get atoms directly adjacent to the primary connected atom
+c
+      ib = 0
+      ic = 0
+      id = 0
+      ka = atomic(ia)
+      do k = 1, n12(ia)
+         m = i12(k,ia)
+         if (m .ne. i) then
+            if (ib .eq. 0) then
+               ib = m
+            else if (ic .eq. 0) then
+               ic = m
+            else if (id .eq. 0) then
+               id = m
+            end if
+         end if
+      end do
+c
+c     case with no atoms attached 1-3 through primary connection
+c
+      if (n12(ia) .eq. 1) then
+         polaxe(i) = 'Z-Only'
+         zaxis(i) = ia
+         xaxis(i) = 0
+         yaxis(i) = 0
+c
+c     only one atom is attached 1-3 through primary connection
+c
+      else if (n12(ia) .eq. 2) then
+         polaxe(i) = 'Z-then-X'
+         zaxis(i) = ia
+         xaxis(i) = ib
+         yaxis(i) = 0
+         if (ka .eq. 6) then
+            polaxe(i) = 'Z-Only'
+            xaxis(i) = 0
+         end if
+c
+c     two atoms are attached 1-3 through primary connection
+c
+      else if (n12(ia) .eq. 3) then
+         polaxe(i) = 'Z-Only'
+         zaxis(i) = ia
+         xaxis(i) = 0
+         yaxis(i) = 0
+         pyramid = (abs(geometry(i,ia,ib,ic)) .lt. 135.0d0)
+         m = priority (ia,ib,ic,0)
+         if (m .ne. 0) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = m
+         else if (ka .eq. 6) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = ib
+         else if (ka.eq.7 .and. pyramid) then
+            if (noinvert) then
+               polaxe(i) = 'Z-Bisect'
+               xaxis(i) = ib
+               yaxis(i) = ic
+            end if
+         else if (ka.eq.7 .and. .not.pyramid) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = ib
+         else if (ka.eq.15 .or. ka.eq.16) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
+         end if
+c
+c     three atoms are attached 1-3 through primary connection
+c
+      else if (n12(ia) .eq. 4) then
+         polaxe(i) = 'Z-Only'
+         zaxis(i) = ia
+         xaxis(i) = 0
+         yaxis(i) = 0
+         m = priority (ia,ib,ic,id)
+         if (m .ne. 0) then
+            polaxe(i) = 'Z-then-X'
+            xaxis(i) = m
+         end if
+      end if
+      return
+      end
+c
+c
 c     ################################################################
 c     ##                                                            ##
 c     ##  function priority  --  atom priority for axis assignment  ##
@@ -542,75 +873,434 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "priority" decides which of two connected atoms should be
-c     preferred during construction of a local coordinate frame
-c     and returns that atom number; if the two atoms have equal
-c     priority then a zero is returned
+c     "priority" decides which of a set of connected atoms should
+c     have highest priority in construction of a local coordinate
+c     frame and returns its atom number; if all atoms are of equal
+c     priority then zero is returned
 c
 c
-      function priority (i,ia,ib)
+      function priority (i,ia,ib,ic)
       use atomid
       use couple
       implicit none
-      integer i,k,m
-      integer ia,ib
-      integer ka,kb
-      integer ka1,kb1
-      integer ka2,kb2
+      integer i,j,m
+      integer nlink
+      integer ia,ib,ic
+      integer ja,jb,jc
+      integer ka,kb,kc
+      integer ma,mb,mc
       integer priority
 c
 c
-c     get priority based on atomic number and connected atoms
+c     get info on sites to consider for priority assignment
 c
-      ka = atomic(ia)
-      kb = atomic(ib)
-      if (ka .gt. kb) then
+      priority = 0
+      nlink = 0
+      if (ia .gt. 0) then
+         nlink = nlink + 1
+         ja = n12(ia)
+         ka = atomic(ia)
+      end if
+      if (ib .gt. 0) then
+         nlink = nlink + 1
+         jb = n12(ib)
+         kb = atomic(ib)
+      end if
+      if (ic .gt. 0) then
+         nlink = nlink + 1
+         jc = n12(ic)
+         kc = atomic(ic)
+      end if
+c
+c     for only one linked atom, it has the highest priority
+c
+      if (nlink .eq. 1) then
          priority = ia
-      else if (kb .gt. ka) then
-         priority = ib
-      else
-         ka1 = 0
-         ka2 = 0
-         do k = 1, n12(ia)
-            m = i12(k,ia)
-            if (i .ne. m) then
-               m = atomic(m)
-               if (m .ge. ka1) then
-                  ka2 = ka1
-                  ka1 = m
-               else if (m .gt. ka2) then
-                  ka2 = m
-               end if
-            end if
-         end do
-         kb1 = 0
-         kb2 = 0
-         do k = 1, n12(ib)
-            m = i12(k,ib)
-            if (i .ne. m) then
-               m = atomic(m)
-               if (m .gt. kb1) then
-                  kb2 = kb1
-                  kb1 = m
-               else if (m .gt. kb2) then
-                  kb2 = m
-               end if
-            end if
-         end do
-         if (n12(ia) .lt. n12(ib)) then
+      end if
+c
+c     for two linked atoms, find the one with highest priority
+c
+      if (nlink .eq. 2) then
+         if (ka .gt. kb) then
             priority = ia
-         else if (n12(ib) .lt. n12(ia)) then
-            priority = ib
-         else if (ka1 .gt. kb1) then
-            priority = ia
-         else if (kb1 .gt. ka1) then
-            priority = ib
-         else if (ka2 .gt. kb2) then
-            priority = ia
-         else if (kb2 .gt. ka2) then
+         else if (kb .gt. ka) then
             priority = ib
          else
-            priority = 0
+            if (ja .lt. jb) then
+               priority = ia
+            else if (jb .lt. ja) then
+               priority = ib
+            else
+               ma = 0
+               mb = 0
+               do j = 1, ja
+                  ma = ma + atomic(i12(j,ia))
+                  mb = mb + atomic(i12(j,ib))
+               end do
+               if (ma .gt. mb) then
+                  priority = ia
+               else if (mb .gt. ma) then
+                  priority = ib
+               else
+                  ma = 0
+                  mb = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  if (ma .gt. mb) then
+                     priority = ia
+                  else if (mb .gt. ma) then
+                     priority = ib
+                  else
+                     ma = 0
+                     mb = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     if (ma .gt. mb) then
+                        priority = ia
+                     else if (mb .gt. ma) then
+                        priority = ib
+                     else
+                        ma = 0
+                        mb = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        if (ma .gt. mb) then
+                           priority = ia
+                        else if (mb .gt. ma) then
+                           priority = ib
+                        else
+                           priority = 0
+                        end if
+                     end if
+                  end if
+               end if
+            end if
+         end if
+      end if
+c
+c     for three linked atoms, find the one with highest priority
+c
+      if (nlink .eq. 3) then
+         if (ka.gt.kb .and. ka.gt.kc) then
+            priority = ia
+         else if (kb.gt.ka .and. kb.gt.kc) then
+            priority = ib
+         else if (kc.gt.ka .and. kc.gt.kb) then
+            priority = ic
+         else if (ka.eq.kb .and. kc.lt.ka) then
+            if (ja .lt. jb) then
+               priority = ia
+            else if (jb .lt. ja) then
+               priority = ib
+            else
+               ma = 0
+               mb = 0
+               do j = 1, ja
+                  ma = ma + atomic(i12(j,ia))
+                  mb = mb + atomic(i12(j,ib))
+               end do
+               if (ma .gt. mb) then
+                  priority = ia
+               else if (mb .gt. ma) then
+                  priority = ib
+               else
+                  ma = 0
+                  mb = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  if (ma .gt. mb) then
+                     priority = ia
+                  else if (mb .gt. ma) then
+                     priority = ib
+                  else
+                     ma = 0
+                     mb = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     if (ma .gt. mb) then
+                        priority = ia
+                     else if (mb .gt. ma) then
+                        priority = ib
+                     else
+                        ma = 0
+                        mb = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        if (ma .gt. mb) then
+                           priority = ia
+                        else if (mb .gt. ma) then
+                           priority = ib
+                        else
+                           priority = ic
+                        end if
+                     end if
+                  end if
+               end if
+            end if
+         else if (ka.eq.kc .and. kb.lt.kc) then
+            if (ja .lt. jc) then
+               priority = ia
+            else if (jc .lt. ja) then
+               priority = ic
+            else
+               ma = 0
+               mc = 0
+               do j = 1, ja
+                  ma = ma + atomic(i12(j,ia))
+                  mc = mc + atomic(i12(j,ic))
+               end do
+               if (ma .gt. mc) then
+                  priority = ia
+               else if (mc .gt. ma) then
+                  priority = ic
+               else
+                  ma = 0
+                  mc = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ic)
+                     mc = mc + atomic(i13(j,ic))
+                  end do
+                  if (ma .gt. mc) then
+                     priority = ia
+                  else if (mc .gt. ma) then
+                     priority = ic
+                  else
+                     ma = 0
+                     mc = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ic)
+                        mc = mc + atomic(i14(j,ic))
+                     end do
+                     if (ma .gt. mc) then
+                        priority = ia
+                     else if (mc .gt. ma) then
+                        priority = ic
+                     else
+                        ma = 0
+                        mc = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ic)
+                           mc = mc + atomic(i15(j,ic))
+                        end do
+                        if (ma .gt. mc) then
+                           priority = ia
+                        else if (mc .gt. ma) then
+                           priority = ic
+                        else
+                           priority = ib
+                        end if
+                     end if
+                  end if
+               end if
+            end if
+         else if (kb.eq.kc .and. ka.lt.kb) then
+            if (jb .lt. jc) then
+               priority = ib
+            else if (jc .lt. jb) then
+               priority = ic
+            else
+               mb = 0
+               mc = 0
+               do j = 1, jb
+                  mb = mb + atomic(i12(j,ib))
+                  mc = mc + atomic(i12(j,ic))
+               end do
+               if (mb .gt. mc) then
+                  priority = ib
+               else if (mc .gt. mb) then
+                  priority = ic
+               else
+                  mb = 0
+                  mc = 0
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  do j = 1, n13(ic)
+                     mc = mc + atomic(i13(j,ic))
+                  end do
+                  if (mb .gt. mc) then
+                     priority = ia
+                  else if (mc .gt. mb) then
+                     priority = ic
+                  else
+                     mb = 0
+                     mc = 0
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     do j = 1, n14(ic)
+                        mc = mc + atomic(i14(j,ic))
+                     end do
+                     if (mb .gt. mc) then
+                        priority = ia
+                     else if (mc .gt. mb) then
+                        priority = ic
+                     else
+                        mb = 0
+                        mc = 0
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        do j = 1, n15(ic)
+                           mc = mc + atomic(i15(j,ic))
+                        end do
+                        if (mb .gt. mc) then
+                           priority = ia
+                        else if (mc .gt. mb) then
+                           priority = ic
+                        else
+                           priority = ia
+                        end if
+                     end if
+                  end if
+               end if
+            end if
+         else
+            if (ja.gt.jb.and.ja.gt.jc) then
+               priority = ia
+            else if (jb.gt.ja .and. jb.gt.jc) then
+               priority = ib
+            else if (jc.gt.ja .and. jc.gt.jb) then
+               priority = ic
+            else if (ja.lt.jb .and. ja.lt.jc) then
+               priority = ia
+            else if (jb.lt.ja .and. jb.lt.jc) then
+               priority = ib
+            else if (jc.lt.ja .and. jc.lt.jb) then
+               priority = ic
+            else
+               ma = 0
+               mb = 0
+               mc = 0
+               do j = 1, ja
+                  ma = ma + atomic(i12(j,ia))
+                  mb = mb + atomic(i12(j,ib))
+                  mc = mc + atomic(i12(j,ic))
+               end do
+               if (ma.gt.mb .and. ma.gt.mc) then
+                  priority = ia
+               else if (mb.gt.ma .and. mb.gt.mc) then
+                  priority = ib
+               else if (mc.gt.ma .and. mc.gt.mb) then
+                  priority = ic
+               else if (ma.lt.mb .and. ma.lt.mc) then
+                  priority = ia
+               else if (mb.lt.ma .and. mb.lt.mc) then
+                  priority = ib
+               else if (mc.lt.ma .and. mc.lt.mb) then
+                  priority = ic
+               else
+                  ma = 0
+                  mb = 0
+                  mc = 0
+                  do j = 1, n13(ia)
+                     ma = ma + atomic(i13(j,ia))
+                  end do
+                  do j = 1, n13(ib)
+                     mb = mb + atomic(i13(j,ib))
+                  end do
+                  do j = 1, n13(ic)
+                     mc = mc + atomic(i13(j,ic))
+                  end do
+                  if (ma.gt.mb .and. ma.gt.mc) then
+                     priority = ia
+                  else if (mb.gt.ma .and. mb.gt.mc) then
+                     priority = ib
+                  else if (mc.gt.ma .and. mc.gt.mb) then
+                     priority = ic
+                  else if (ma.lt.mb .and. ma.lt.mc) then
+                     priority = ia
+                  else if (mb.lt.ma .and. mb.lt.mc) then
+                     priority = ib
+                  else if (mc.lt.ma .and. mc.lt.mb) then
+                     priority = ic
+                  else
+                     ma = 0
+                     mb = 0
+                     mc = 0
+                     do j = 1, n14(ia)
+                        ma = ma + atomic(i14(j,ia))
+                     end do
+                     do j = 1, n14(ib)
+                        mb = mb + atomic(i14(j,ib))
+                     end do
+                     do j = 1, n14(ic)
+                        mc = mc + atomic(i14(j,ic))
+                     end do
+                     if (ma.gt.mb .and. ma.gt.mc) then
+                        priority = ia
+                     else if (mb.gt.ma .and. mb.gt.mc) then
+                        priority = ib
+                     else if (mc.gt.ma .and. mc.gt.mb) then
+                        priority = ic
+                     else if (ma.lt.mb .and. ma.lt.mc) then
+                        priority = ia
+                     else if (mb.lt.ma .and. mb.lt.mc) then
+                        priority = ib
+                     else if (mc.lt.ma .and. mc.lt.mb) then
+                        priority = ic
+                     else
+                        ma = 0
+                        mb = 0
+                        mc = 0
+                        do j = 1, n15(ia)
+                           ma = ma + atomic(i15(j,ia))
+                        end do
+                        do j = 1, n15(ib)
+                           mb = mb + atomic(i15(j,ib))
+                        end do
+                        do j = 1, n15(ic)
+                           mc = mc + atomic(i15(j,ic))
+                        end do
+                        if (ma.gt.mb .and. ma.gt.mc) then
+                           priority = ia
+                        else if (mb.gt.ma .and. mb.gt.mc) then
+                           priority = ib
+                        else if (mc.gt.ma .and. mc.gt.mb) then
+                           priority = ic
+                        else if (ma.lt.mb .and. ma.lt.mc) then
+                           priority = ia
+                        else if (mb.lt.ma .and. mb.lt.mc) then
+                           priority = ib
+                        else if (mc.lt.ma .and. mc.lt.mb) then
+                           priority = ic
+                        else
+                           priority = 0
+                        end if
+                     end if
+                  end if
+               end if
+            end if
          end if
       end if
       return
@@ -1009,16 +1699,15 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine setpolar  --  define polarization and groups  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine setpolar  --  define the polarization model  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "setpolar" assigns atomic polarizabilities, Thole damping or
-c     charge penetration parameters, and polarization groups with
-c     user modification of these values
+c     charge penetration parameters, and allows user modification
 c
 c     note this routine contains directly coded Thole and charge
 c     penetration values for elements and atom classes that should
@@ -1030,19 +1719,18 @@ c
       use atoms
       use chgpen
       use couple
+      use fields
       use iounit
-      use kpolr
       use mplpot
       use mpole
       use polar
-      use polgrp
       use polpot
       implicit none
       integer i,j,k,m
       integer jj,ia,ib
       integer atn,next
       real*8 pol,thl
-      real*8 pcor,pdmp
+      real*8 pel,pal
       real*8 sixth
       logical exist,query
       logical change
@@ -1056,6 +1744,7 @@ c
 c
 c     allow the user to select the polarization model
 c
+      forcefield = 'AMOEBA'
       use_thole = .true.
       use_dirdamp = .false.
       use_chgpen = .false.
@@ -1080,6 +1769,7 @@ c
          call upcase (answer)
       end if
       if (answer .eq. 'H') then
+         forcefield = 'HIPPO'
          use_thole = .false.
          use_chgpen = .true.
       end if
@@ -1106,9 +1796,9 @@ c
          palpha(i) = 0.0d0
       end do
 c
-c     assign default atomic polarizabilities for Thole model
+c     assign default atomic polarizabilities for AMOEBA model
 c
-      if (use_thole) then
+      if (forcefield .eq. 'AMOEBA') then
          do i = 1, n
             thole(i) = 0.39d0
             atn = atomic(i)
@@ -1137,7 +1827,7 @@ c
             end if
          end do
 c
-c     alter Thole values for alkene/aromatic carbon and hydrogen
+c     alter polarizabilities for alkene/aromatic carbon and hydrogen
 c
          do i = 1, n
             atn = atomic(i)
@@ -1165,9 +1855,9 @@ c
             end if
          end do
 c
-c     assign default atomic polarizabilities for HIPPO model
+c     assign default atom-based parameters for HIPPO model
 c
-      else if (use_chgpen) then
+      else if (forcefield .eq. 'HIPPO') then
          do i = 1, n
             atn = atomic(i)
             if (atn .eq. 1) then
@@ -1356,7 +2046,7 @@ c
          end if
       end do
 c
-c     list the polariability and charge penetration values
+c     list the polarizability and charge penetration values
 c
       write (iout,60)
    60 format (/,' Polarizability Parameters for Multipole Sites :')
@@ -1404,24 +2094,39 @@ c
       do while (query)
          i = 0
          k = 0
-         pol = 0.0d0
-         thl = 0.39d0
          if (use_thole) then
+            pol = 0.0d0
+            thl = 0.39d0
             write (iout,140)
   140       format (/,' Enter Atom Number, Polarizability & Thole',
      &                 ' Values :  ',$)
             read (input,150)  record
   150       format (a240)
-            read (record,*,err=180,end=180)  k,pol,thl
+            read (record,*,err=160,end=160)  k,pol,thl
+  160       continue
+            if (k .ne. 0) then
+               i = pollist(k)
+               if (pol .eq. 0.0d0)  pol = polarity(i)
+               if (thl .eq. 0.0d0)  thl = thole(i)
+            end if
          else if (use_chgpen) then
-            write (iout,160)
-  160       format (/,' Enter Atom Number, Polarize, Core & Damp',
+            pol = 0.0d0
+            pel = 0.0d0
+            pal = 0.0d0
+            write (iout,170)
+  170       format (/,' Enter Atom Number, Polarize, Core & Damp',
      &                 ' Values :  ',$)
-            read (input,170)  record
-  170       format (a240)
-            read (record,*,err=180,end=180)  k,pcor,pdmp
+            read (input,180)  record
+  180       format (a240)
+            read (record,*,err=190,end=190)  k,pol,pel,pal
+  190       continue
+            if (k .ne. 0) then
+               i = pollist(k)
+               if (pol .eq. 0.0d0)  pol = polarity(i)
+               if (pel .eq. 0.0d0)  pel = pcore(i)
+               if (pal .eq. 0.0d0)  pal = palpha(i)
+            end if
          end if
-  180    continue
          if (k .eq. 0) then
             query = .false.
          else
@@ -1430,117 +2135,386 @@ c
          if (i .ne. 0) then
             change = .true.
             polarity(i) = pol
-            thole(i) = thl
+            if (use_thole) then
+               thole(i) = thl
+               pdamp(i) = polarity(i)**sixth
+            else if (use_chgpen) then
+               pcore(i) = pel
+               palpha(i) = pal
+               pval(i) = pole(1,i) - pcore(i)
+            end if
          end if
       end do
 c
 c     repeat polarizability values if parameters were altered
 c
       if (change) then
-         write (iout,190)
-  190    format (/,' Atomic Polarizabilities for Multipole Sites :')
+         write (iout,200)
+  200    format (/,' Atomic Polarizabilities for Multipole Sites :')
          if (use_thole) then
-            write (iout,200)
-  200       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-         else if (use_chgpen) then
             write (iout,210)
-  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',/)
+  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+         else if (use_chgpen) then
+            write (iout,220)
+  220       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
+     &                 8x,'Damp',/)
          end if
          do k = 1, n
             i = pollist(k)
             if (use_thole) then
                if (i .eq. 0) then
-                  write (iout,220)  k,name(k)
-  220             format (i8,6x,a3,12x,'--',13x,'--')
+                  write (iout,230)  k,name(k)
+  230             format (i8,6x,a3,12x,'--',13x,'--')
                else
-                  write (iout,230)  k,name(k),polarity(i),thole(i)
-  230             format (i8,6x,a3,4x,f12.4,3x,f12.4)
+                  write (iout,240)  k,name(k),polarity(i),thole(i)
+  240             format (i8,6x,a3,4x,f12.4,3x,f12.4)
                end if
             else if (use_chgpen) then
                if (i .eq. 0) then
-                  write (iout,240)  k,name(k)
-  240             format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
+                  write (iout,250)  k,name(k)
+  250             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
                else
-                  write (iout,250)  k,name(k),polarity(i),pcore(i),
-     &                              pval(i),palpha(i)
-  250             format (i8,6x,a3,4x,f12.4,3x,3f12.4)
+                  write (iout,260)  k,name(k),polarity(i),pcore(i),
+     &                              palpha(i)
+  260             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
                end if
             end if
          end do
       end if
+      return
+      end
 c
-c     use bonded atoms as initial guess at polarization groups
 c
-      write (iout,260)
-  260 format (/,' The default is to place all atoms into one',
-     &           ' polarization group;',
-     &        /,' This can be altered by entering a series of',
-     &           ' bonded atom pairs',
-     &        /,' that separate the molecule into distinct',
-     &           ' polarization groups')
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine setpgrp  --  define the polarization groups  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "setpgrp" chooses the polarization groups as defined by bonds
+c     separating groups, and allows user modification of the groups
+c
+c
+      subroutine setpgrp
+      use atomid
+      use atoms
+      use bndstr
+      use couple
+      use iounit
+      use kpolr
+      use ring
+      implicit none
+      integer i,j,k,m
+      integer mode
+      integer ia,ib,ic
+      integer ita,itb,itc
+      integer ata,atb
+      integer n12a,n12b
+      logical exist,query
+      logical chkarom,split
+      logical aroma,aromb
+      character*240 record
+      character*240 string
+c
+c
+c     get the desired type of coordinate file modification
+c
+      mode = -1
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=10,end=10)  mode
+         if (mode.ge.1 .and. mode.le.2)  query = .false.
+      end if
+   10 continue
+      if (query) then
+         write (iout,20)
+   20    format (/,' Choose Method for Division into Polarization',
+     &              ' Groups :',
+     &           //,4x,'(1) Put All Atoms in One Polarization Group',
+     &           /,4x,'(2) Separate into Groups at Rotatable Bonds',
+     &           /,4x,'(3) Manual Entry of Bonds Separating Groups')
+         do while (mode.lt.1 .or. mode.gt.3)
+            mode = 0
+            write (iout,30)
+   30       format (/,' Enter the Number of the Desired Choice',
+     &                 ' [1] :  ',$)
+            read (input,40,err=50,end=50)  mode
+   40       format (i10)
+            if (mode .le. 0)  mode = 1
+   50       continue
+         end do
+      end if
+c
+c     initialize by placing all atoms in one polarization group
+c
       do i = 1, n
          do j = 1, n12(i)
             pgrp(j,i) = i12(j,i)
          end do
       end do
 c
+c     separate into polarization groups at rotatable bonds
+c
+      if (mode .eq. 2) then
+         call bonds
+         do k = 1, nbond
+            ia = ibnd(1,k)
+            ib = ibnd(2,k)
+            n12a = n12(ia)
+            n12b = n12(ib)
+            ata = atomic(ia)
+            atb = atomic(ib)
+            ita = 10*ata + n12a
+            itb = 10*atb + n12b
+            aroma = chkarom(ia)
+            aromb = chkarom(ib)
+            split = .true.
+c
+c     remove bonds involving univalent atoms
+c
+            if (min(n12a,n12b) .le. 1)  split = .false.
+c
+c     remove bonds internal to aromatic ring
+c
+            if (aroma .and. aromb) then
+               do i = 1, nring5
+                  m = 0
+                  do j = 1, 5
+                     if (iring5(j,i) .eq. ia)  m = m + 1
+                     if (iring5(j,i) .eq. ib)  m = m + 1
+                  end do
+                  if (m .eq. 2)  split = .false.
+               end do
+               do i = 1, nring6
+                  m = 0
+                  do j = 1, 6
+                     if (iring6(j,i) .eq. ia)  m = m + 1
+                     if (iring6(j,i) .eq. ib)  m = m + 1
+                  end do
+                  if (m .eq. 2)  split = .false.
+               end do
+            end if
+c
+c     remove bonds with sp-hybridized carbon atom
+c
+            if (ita.eq.62 .or. itb.eq.62)  split = .false.
+c
+c     remove the C=C bond of terminal alkene
+c
+            if (ita.eq.63 .and. .not.aroma .and.
+     &             itb.eq.63 .and. .not.aromb) then
+               split = .false.
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.63 .or. itc.eq.73 .or.
+     &                   itc.eq.72 .or. itc.eq.81) then
+                        split = .true.
+                     end if
+                  end if
+               end do
+               if (split) then
+                  split = .false.
+                  do i = 1, n12b
+                     ic = i12(i,ib)
+                     if (ic .ne. ia) then
+                        itc = 10*atomic(ic) + n12(ic)
+                        if (itc.eq.63 .or. itc.eq.72 .or.
+     &                      itc.eq.73 .or. itc.eq.81) then
+                           split = .true.
+                        end if
+                     end if
+                  end do
+               end if
+            end if
+c
+c     remove the C-O bonds of alcohol and ether
+c
+            if (ita.eq.82 .and. itb.eq.64) then
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  split = .false.
+                  end if
+               end do
+            else if (itb.eq.82 .and. ita.eq.64) then
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  if (ic .ne. ia) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  split = .false.
+                  end if
+               end do
+            end if
+c
+c     remove the C-O bonds of carboxylic acid and ester
+c
+            if (ita.eq.82 .and. itb.eq.63) then
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  itc = 10*atomic(ic) + n12(ic)
+                  if (itc .eq. 81)  split = .false.
+               end do
+            else if (itb.eq.82 .and. ita.eq.63) then
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  itc = 10*atomic(ic) + n12(ic)
+                  if (itc .eq. 81)  split = .false.
+               end do
+            end if
+c
+c     remove the C-N bonds of alkyl amine
+c
+            if (ita.eq.73 .and. itb.eq.64) then
+               m = 0
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  m = m + 1
+                  end if
+               end do
+               if (m .eq. 2)  split = .false.
+            else if (itb.eq.73 .and. ita.eq.64) then
+               m = 0
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  if (ic .ne. ia) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc.eq.11 .or. itc.eq.64)  m = m + 1
+                  end if
+               end do
+               if (m .eq. 2)  split = .false.
+            end if
+c
+c     remove the C-N bonds of amide, urea, amidine and guanidinium
+c
+            if (ita.eq.73 .and. itb.eq.63) then
+               do i = 1, n12b
+                  ic = i12(i,ib)
+                  if (ic .ne. ia) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc .eq. 81)  split = .false.
+                     if (itc .eq. 73)  split = .false.
+                  end if
+               end do
+            else if (itb.eq.73 .and. ita.eq.63) then
+               do i = 1, n12a
+                  ic = i12(i,ia)
+                  if (ic .ne. ib) then
+                     itc = 10*atomic(ic) + n12(ic)
+                     if (itc .eq. 81)  split = .false.
+                     if (itc .eq. 73)  split = .false.
+                  end if
+               end do
+            end if
+c
+c     remove any P-X and S-X bonds with X = N or O
+c
+            if (ata.eq.15 .or. ata.eq.16) then
+               if (atb.eq.7 .or. atb.eq.8)  split = .false.
+            else if (atb.eq.15 .or. atb.eq.16) then
+               if (ata.eq.7 .or. ata.eq.8)  split = .false.
+            end if
+c
+c     modify membership to split groups at allowed bonds
+c
+            if (split) then
+               do i = 1, n12a
+                  if (pgrp(i,ia) .eq. ib) then
+                     do j = i+1, n12a
+                        pgrp(j-1,ia) = pgrp(j,ia)
+                     end do
+                     pgrp(n12a,ia) = 0
+                  end if
+               end do
+               do i = 1, n12b
+                  if (pgrp(i,ib) .eq. ia) then
+                     do j = i+1, n12b
+                        pgrp(j-1,ib) = pgrp(j,ib)
+                     end do
+                     pgrp(n12b,ib) = 0
+                  end if
+               end do
+            end if
+         end do
+c
+c     allow modification of polarization group one bond at a time
+c
+      else if (mode .eq. 3) then
+         write (iout,60)
+   60    format (/,' All atoms are placed initially into one',
+     &              ' polarization group;',
+     &           /,' This can be modified by entering a series',
+     &              ' of bonded atom pairs',
+     &           /,' that separate the molecule into distinct',
+     &              ' polarization groups')
+c
 c     get the bonds that separate the polarization groups
 c
-      query = .true.
-      i = -1
-      call nextarg (string,exist)
-      if (exist) then
-         read (string,*,err=270,end=270)  i
-         if (i .eq. 0)  query = .false.
-      end if
-  270 continue
-      do while (query)
-         ia = 0
-         ib = 0
-         write (iout,280)
-  280    format (/,' Enter a Bond between Polarization Groups',
-     &              ' [<Enter>=Exit] :  ',$)
-         read (input,290)  record
-  290    format (a240)
-         read (record,*,err=300,end=300)  ia,ib
-  300    continue
-         if (ia.eq.0 .or. ib.eq.0) then
-            query = .false.
-         else
-            do i = 1, n12(ia)
-               if (pgrp(i,ia) .eq. ib) then
-                  do j = i+1, n12(ia)
-                     pgrp(j-1,ia) = pgrp(j,ia)
-                  end do
-                  pgrp(n12(ia),ia) = 0
-               end if
-            end do
-            do i = 1, n12(ib)
-               if (pgrp(i,ib) .eq. ia) then
-                  do j = i+1, n12(ib)
-                     pgrp(j-1,ib) = pgrp(j,ib)
-                  end do
-                  pgrp(n12(ib),ib) = 0
-               end if
-            end do
+         query = .true.
+         i = -1
+         call nextarg (string,exist)
+         if (exist) then
+            read (string,*,err=70,end=70)  i
+            if (i .eq. 0)  query = .false.
          end if
-      end do
+   70    continue
+         do while (query)
+            ia = 0
+            ib = 0
+            write (iout,80)
+   80       format (/,' Enter a Bond between Polarization Groups',
+     &                 ' [<Enter>=Exit] :  ',$)
+            read (input,90)  record
+   90       format (a240)
+            read (record,*,err=100,end=100)  ia,ib
+  100       continue
+            if (ia.eq.0 .or. ib.eq.0) then
+               query = .false.
+            else
+               do i = 1, n12(ia)
+                  if (pgrp(i,ia) .eq. ib) then
+                     do j = i+1, n12(ia)
+                        pgrp(j-1,ia) = pgrp(j,ia)
+                     end do
+                     pgrp(n12(ia),ia) = 0
+                  end if
+               end do
+               do i = 1, n12(ib)
+                  if (pgrp(i,ib) .eq. ia) then
+                     do j = i+1, n12(ib)
+                        pgrp(j-1,ib) = pgrp(j,ib)
+                     end do
+                     pgrp(n12(ib),ib) = 0
+                  end if
+               end do
+            end if
+         end do
+      end if
+c
+c     find the polarization groups and their connectivities
+c
       call polargrp
 c
 c     list the polarization group for each multipole site
 c
-      write (iout,310)
-  310 format (/,' Polarization Groups for Multipole Sites :')
-      write (iout,320)
-  320 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
+      write (iout,110)
+  110 format (/,' Polarization Groups for Multipole Sites :')
+      write (iout,120)
+  120 format (/,5x,'Atom',5x,'Name',7x,'Polarization Group',
      &           ' Definition',/)
       do i = 1, n
          k = 0
          do j = 1, maxval
             if (pgrp(j,i) .ne. 0)  k = j
          end do
-         write (iout,330)  i,name(i),(pgrp(j,i),j=1,k)
-  330    format (i8,6x,a3,8x,20i6)
+         write (iout,130)  i,name(i),(pgrp(j,i),j=1,k)
+  130    format (i8,6x,a3,8x,20i6)
       end do
       return
       end
@@ -1728,7 +2702,7 @@ c
       integer trimtext
       real*8 eps,epsold
       real*8 polmin,norm
-      real*8 a,b,sum
+      real*8 a,b,sum,term
       real*8 utmp(3)
       real*8 rmt(3,3)
       real*8, allocatable :: poli(:)
@@ -1808,13 +2782,16 @@ c
       write (iout,110)  truth(1:trimtext(truth))
   110 format (' Set D Equal to P:',12x,a)
 c
-c     compute intergroup induced dipole moments via CG algorithm
+c     set tolerances for computation of mutual induced dipoles
 c
       done = .false.
-      maxiter = 500
+      maxiter = 100
       iter = 0
-      eps = 100.0d0
       polmin = 0.00000001d0
+      eps = 100.0d0
+c
+c     compute intergroup induced dipole moments via CG algorithm
+c
       call ufieldi (field)
       do i = 1, npole
          poli(i) = max(polmin,polarity(i))
@@ -1825,7 +2802,7 @@ c
          end do
       end do
 c
-c     iterate the intergroup induced dipoles and check convergence
+c     conjugate gradient iteration of intergroup induced dipoles
 c
       do while (.not. done)
          iter = iter + 1
@@ -1872,6 +2849,9 @@ c
                eps = eps + rsd(j,i)*rsd(j,i)
             end do
          end do
+c
+c     check the convergence of the intergroup induced dipoles
+c
          eps = debye * sqrt(eps/dble(npolar))
          epsold = eps
          if (iter .eq. 1) then
@@ -1885,6 +2865,17 @@ c
          if (eps .lt. poleps)  done = .true.
          if (eps .gt. epsold)  done = .true.
          if (iter .ge. maxiter)  done = .true.
+c
+c     apply a "peek" iteration to the intergroup induced dipoles
+c
+         if (done) then
+            do i = 1, npole
+               term = poli(i)
+               do j = 1, 3
+                  uind(j,i) = uind(j,i) + term*rsd(j,i)
+               end do
+            end do
+         end if
       end do
 c
 c     perform deallocation of some local arrays
@@ -2616,8 +3607,8 @@ c     #############################################################
 c
 c
 c     "avgpole" condenses the number of multipole atom types based
-c     on equivalent attached atoms and additional user specified
-c     sets of equivalent atoms
+c     upon atoms with equivalent attachments and additional user
+c     specified sets of equivalent atoms
 c
 c
       subroutine avgpole
@@ -2628,29 +3619,30 @@ c
       use kpolr
       use mpole
       use sizes
-      use units
       implicit none
       integer i,j,k,m
-      integer it,jt,kt,mt
-      integer ia,ja,ka,ma
-      integer in,jn
-      integer mintyp
-      integer size,nsing
-      integer nsame,nave
-      integer xaxe,yaxe
-      integer zaxe
+      integer it,mt
+      integer ix,iy,iz
+      integer in,jn,ni,nj
+      integer size,numtyp
+      integer priority
+      integer nlist,nave
+      integer xaxe,yaxe,zaxe
+      integer indx(4)
+      integer, allocatable :: ci(:)
+      integer, allocatable :: cj(:)
       integer, allocatable :: list(:)
-      integer, allocatable :: ising(:)
-      integer, allocatable :: jsing(:)
-      integer, allocatable :: isame(:)
       integer, allocatable :: tsort(:)
-      integer, allocatable :: tkey(:)
       integer, allocatable :: pkey(:)
       integer, allocatable :: pgrt(:,:)
       real*8 pave(13)
       logical done,repeat
       logical header,exist
       logical query,condense
+      logical match,diff
+      logical useframe
+      logical symm
+      logical yzero,xyzero
       character*1 answer
       character*4 pa,pb,pc,pd
       character*16 ptlast
@@ -2683,214 +3675,198 @@ c
 c     perform dynamic allocation of some local arrays
 c
       if (condense) then
-         allocate (ising(n))
-         allocate (jsing(n))
-         allocate (isame(n))
-         allocate (tsort(n))
-         allocate (tkey(n))
-         allocate (pkey(n))
-         allocate (pt(n))
+         allocate (ci(n))
+         allocate (cj(n))
+         size = 40
+         allocate (list(max(n,size)))
 c
-c     store atomic numbers and atoms attached for each atom
+c     condense groups of equivalent atoms to the same atom type
 c
+         header = .true.
          do i = 1, n
-            do j = 1, 4
-               list(j) = 0
-            end do
-            do j = 1, n12(i)
-               k = i12(j,i)
-               list(j) = 10*atomic(k) + n12(k)
-            end do
-            call sort (n12(i),list)
-            size = 4
-            call numeral (list(1),pa,size)
-            call numeral (list(2),pb,size)
-            call numeral (list(3),pc,size)
-            call numeral (list(4),pd,size)
-            pt(i) = pa//pb//pc//pd
+            list(i) = 0
          end do
-c
-c     find the monovalent and singly attached atom groups
-c
-         nsing = 0
-         do i = 1, n
-            ising(i) = 0
-            jsing(i) = 0
-            k = 0
+         do i = 1, n-1
+            ni = n12(i) + n13(i) + n14(i) + n15(i)
             m = 0
-            do j = 1, n12(i)
-               if (n12(i12(j,i)) .gt. 1) then
-                  m = m + 1
-                  k = i12(j,i)
+            do k = 1, n12(i)
+               m = m + 1
+               in = i12(k,i)
+               ci(m) = 2000 + 10*atomic(in) + n12(in)
+            end do
+            do k = 1, n13(i)
+               m = m + 1
+               in = i13(k,i)
+               ci(m) = 3000 + 10*atomic(in) + n12(in)
+            end do
+            do k = 1, n14(i)
+               m = m + 1
+               in = i14(k,i)
+               ci(m) = 4000 + 10*atomic(in) + n12(in)
+            end do
+            do k = 1, n15(i)
+               m = m + 1
+               in = i15(k,i)
+               ci(m) = 5000 + 10*atomic(in) + n12(in)
+            end do
+            call sort (ni,ci)
+            do j = i+1, n
+               if (atomic(i) .eq. atomic(j)) then
+                  nj = n12(j) + n13(j) + n14(j) + n15(j)
+                  if (nj .eq. ni) then
+                     m = 0
+                     do k = 1, n12(j)
+                        m = m + 1
+                        jn = i12(k,j)
+                        cj(m) = 2000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n13(j)
+                        m = m + 1
+                        jn = i13(k,j)
+                        cj(m) = 3000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n14(j)
+                        m = m + 1
+                        jn = i14(k,j)
+                        cj(m) = 4000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n15(j)
+                        m = m + 1
+                        jn = i15(k,j)
+                        cj(m) = 5000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     call sort (nj,cj)
+                     match = .true.
+                     do k = 1, ni
+                        if (ci(k) .ne. cj(k)) then
+                           match = .false.
+                           goto 40
+                        end if
+   40                   continue
+                     end do
+                     if (match) then
+                        type(j) = type(i)
+                        if (list(i).eq.0 .or. list(j).eq.0) then
+                           if (header) then
+                              header = .false.
+                              write (iout,50)
+   50                         format (/,' Equivalent Atoms Assigned',
+     &                                   ' the Same Atom Type :',/)
+                           end if
+                           write (iout,60)  i,j
+   60                      format (' Atoms',i6,2x,'and',i6,2x,
+     &                                'Set to Equivalent Types')
+                           list(i) = 1
+                           list(j) = 1
+                        end if
+                     end if
+                  end if
                end if
             end do
-            if (m .eq. 1) then
-               nsing = nsing + 1
-               ising(nsing) = i
-               jsing(nsing) = k
-            end if
          end do
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (ci)
+         deallocate (cj)
 c
 c     perform dynamic allocation of some local arrays
 c
-         size = 40
-         allocate (list(size))
+         allocate (tsort(n))
+         allocate (pkey(n))
+         allocate (pt(n))
 c
-c     partially automated determination of equivalent atoms
+c     count the number of distinct atom types in the system
 c
-         repeat = .true.
-         dowhile (repeat)
-            repeat = .false.
+         numtyp = 0
+         do i = 1, n
+            numtyp = max(numtyp,type(i))
+         end do
 c
-c     condense equivalent attached atom groups to same type
+c     query for more atom sets to condense to a single type
 c
-            header = .true.
-            do i = 1, nsing-1
-               ia = ising(i)
-               it = atomic(ia)
-               in = type(jsing(i))
-               do j = i+1, nsing
-                  ja = ising(j)
-                  jt = atomic(ja)
-                  jn = type(jsing(j))
-                  if (it.eq.jt .and. in.eq.jn
-     &                   .and. pt(ia).eq.pt(ja)) then
-                     if (type(ia) .ne. type(ja)) then
-                        mintyp = min(type(ia),type(ja))
-                        type(ia) = mintyp
-                        type(ja) = mintyp
-                        if (header) then
-                           header = .false.
-                           write (iout,40)
-   40                      format (/,' Equivalent Atoms Set',
-     &                                ' to Same Atom Type :',/)
-                        end if
-                        write (iout,50)  ia,ja
-   50                   format (' Atoms',i6,2x,'and',i6,2x,
-     &                             ' are Equivalent')
-                     end if
-                     do k = 1, n12(ia)
-                        ka = i12(k,ia)
-                        kt = atomic(ka)
-                        do m = 1, n12(ja)
-                           ma = i12(m,ja)
-                           mt = atomic(ma)
-                           if (kt .eq. mt) then
-                              if (type(ka) .ne. type(ma)) then
-                                 mintyp = min(type(ka),type(ma))
-                                 type(ka) = mintyp
-                                 type(ma) = mintyp
-                                 if (header) then
-                                    header = .false.
-                                    write (iout,60)
-   60                               format (/,' Equivalent Atoms Set',
-     &                                         ' to Same Atom Type :',/)
-                                 end if
-                                 write (iout,70)  ka,ma
-   70                            format (' Atoms',i6,2x,'and',i6,2x,
-     &                                      'are Equivalent')
-                              end if
-                           end if
-                        end do
-                     end do
-                  end if
-               end do
+         done = .false.
+         dowhile (.not. done)
+            do i = 1, size
+               list(i) = 0
             end do
+            write (iout,70)
+   70       format (/,' Enter Sets of Equivalent or Different',
+     &                 ' Atoms [<Enter>=Exit] :  ',$)
+            read (input,80)  record
+   80       format (a240)
+            read (record,*,err=90,end=90)  (list(i),i=1,size)
+   90       continue
 c
-c     query for sets of atoms to condense to a single type
+c     add or remove the equivalence of specified sets of atoms
 c
-            done = .false.
-            dowhile (.not. done)
-               do i = 1, size
-                  list(i) = 0
-               end do
-               write (iout,80)
-   80          format (/,' Enter Further Sets of Equivalent Atoms',
-     &                    ' [<Enter>=Exit] :  ',$)
-               read (input,90)  record
-   90          format (a240)
-               read (record,*,err=100,end=100)  (list(i),i=1,size)
-  100          continue
-c
-c     process the input groups to a list of equivalent atoms
-c
-               nsame = 0
-               do i = 1, n
-                  isame(i) = 0
-               end do
-               i = 1
-               do while (list(i) .ne. 0)
-                  list(i) = max(-n,min(n,list(i)))
-                  if (list(i) .gt. 0) then
-                     k = list(i)
-                     nsame = nsame + 1
-                     isame(nsame) = k
-                     i = i + 1
-                  else
-                     list(i+1) = max(-n,min(n,list(i+1)))
-                     do k = abs(list(i)), abs(list(i+1))
-                        nsame = nsame + 1
-                        isame(nsame) = k
-                     end do
-                     i = i + 2
-                  end if
-               end do
-               if (nsame .eq. 0)  done = .true.
-c
-c     assign equivalent atoms to a common atom type number
-c
-               if (nsame .ne. 0) then
-                  repeat = .true.
-                  call sort8 (nsame,isame)
-                  k = type(isame(1))
-                  do i = 1, nsame
-                     type(isame(i)) = k
-                  end do
-               end if
+            diff = .false.
+            nlist = 1
+            dowhile (list(nlist) .ne. 0)
+               if (type(list(nlist)) .ne. type(list(1)))  diff = .true.
+               nlist = nlist + 1
             end do
+            nlist = nlist - 1
+            if (nlist .eq. 0) then
+               done = .true.
+            else if (diff) then
+               do i = 2, nlist
+                  type(list(i)) = type(list(1))
+               end do
+            else
+               do i = 2, nlist
+                  numtyp = numtyp + 1
+                  type(list(i)) = numtyp
+               end do
+            end if
+         end do
 c
-c     renumber the atom types to remove deleted type numbers
+c     renumber the atom types to give consecutive ordering
 c
-            do i = 1, n
-               tsort(i) = type(i)
-            end do
-            call sort3 (n,tsort,tkey)
-            k = 0
-            m = 0
-            do i = 1, n
-               if (tsort(i) .ne. k) then
-                  m = m + 1
-                  k = tsort(i)
-               end if
-               type(tkey(i)) = m
-            end do
+         do i = 1, n
+            tsort(i) = 0
+         end do
+         m = 0
+         do i = 1, n
+            k = type(i)
+            if (tsort(k) .eq. 0) then
+               tsort(k) = i
+               m = m + 1
+               type(i) = m
+            else
+               type(i) = type(tsort(k))
+            end if
+         end do
 c
 c     print the atoms, atom types and local frame definitions
 c
-            write (iout,110)
-  110       format (/,' Atom Type and Local Frame Definition',
-     &                 ' for Each Atom :',
-     &              //,5x,'Atom',4x,'Type',6x,'Local Frame',10x,
-     &                 'Frame Defining Atoms',/)
-            do i = 1, n
-               k = pollist(i)
-               write (iout,120)  i,type(i),polaxe(k),zaxis(k),
-     &                          xaxis(k),yaxis(k)
-  120          format (2i8,9x,a8,6x,3i8)
-            end do
+         write (iout,100)
+  100    format (/,' Atom Type and Local Frame Definition',
+     &              ' for Each Atom :',
+     &           //,5x,'Atom',4x,'Type',6x,'Local Frame',10x,
+     &              'Frame Defining Atoms',/)
+         do i = 1, n
+            k = pollist(i)
+            write (iout,110)  i,type(i),polaxe(k),zaxis(k),
+     &                        xaxis(k),yaxis(k)
+  110       format (2i8,9x,a8,6x,3i8)
          end do
 c
-c     locate the equivalently defined multipole sites
+c     identify atoms with the same atom type number, or find
+c     atoms with equivalent local frame defining atom types
 c
+         useframe = .false.
          do i = 1, npole
             k = ipole(i)
             it = type(k)
             zaxe = 0
             xaxe = 0
             yaxe = 0
-            if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
-            if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
-            if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+            if (useframe) then
+               if (zaxis(i) .ne. 0)  zaxe = type(zaxis(i))
+               if (xaxis(i) .ne. 0)  xaxe = type(xaxis(i))
+               if (yaxis(i) .ne. 0)  yaxe = type(yaxis(i))
+            end if
             size = 4
             call numeral (it,pa,size)
             call numeral (zaxe,pb,size)
@@ -2945,11 +3921,7 @@ c
 c     perform deallocation of some local arrays
 c
          deallocate (list)
-         deallocate (ising)
-         deallocate (jsing)
-         deallocate (isame)
          deallocate (tsort)
-         deallocate (tkey)
          deallocate (pkey)
          deallocate (pt)
       end if
@@ -2981,10 +3953,10 @@ c
             do m = 1, maxval
                if (pgrt(m,it) .eq. 0) then
                   pgrt(m,it) = pgrp(j,it)
-                  goto 130
+                  goto 120
                end if
             end do
-  130       continue
+  120       continue
          end do
       end do
       do i = 1, npole
@@ -3000,55 +3972,112 @@ c     perform deallocation of some local arrays
 c
       deallocate (pgrt)
 c
-c     convert dipole and quadrupole moments back to atomic units
-c
-      do i = 1, npole
-         pole(1,i) = pole(1,i)
-         do j = 2, 4
-            pole(j,i) = pole(j,i) / bohr
-         end do
-         do j = 5, 13
-            pole(j,i) = 3.0d0 * pole(j,i) / bohr**2
-         end do
-      end do
-c
 c     regularize the multipole moments to standardized values
 c
       call fixpole
 c
+c     check for user requested zeroing of moments by symmetry
+c
+      symm = .true.
+      answer = 'Y'
+      query = .true.
+      call nextarg (string,exist)
+      if (exist) then
+         read (string,*,err=130,end=130)  answer
+         query = .false.
+      end if
+  130 continue
+      if (query) then
+         write (iout,140)
+  140    format (/,' Remove Multipole Components Zeroed by',
+     &              ' Symmetry [Y] :  ',$)
+         read (input,150)  answer
+  150    format (a1)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'N')  symm = .false.
+c
+c     remove multipole components that are zero by symmetry
+c
+      if (symm) then
+         do i = 1, npole
+            xyzero = .false.
+            yzero = .false.
+            if (polaxe(i) .eq. 'Bisector')  xyzero = .true.
+            if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
+            if (polaxe(i) .eq. 'Z-then-X') then
+               if (yaxis(i) .eq. 0)  yzero = .true.
+            end if
+            if (polaxe(i) .eq. 'None') then
+               do j = 2, 13
+                  pole(j,i) = 0.0d0
+               end do
+            end if
+            if (polaxe(i) .eq. 'Z-Only') then
+               pole(2,i) = 0.0d0
+               pole(3,i) = 0.0d0
+               pole(5,i) = -0.5d0 * pole(13,i)
+               pole(6,i) = 0.0d0
+               pole(7,i) = 0.0d0
+               pole(8,i) = 0.0d0
+               pole(9,i) = pole(5,i)
+               pole(10,i) = 0.0d0
+               pole(11,i) = 0.0d0
+               pole(12,i) = 0.0d0
+            end if
+            if (xyzero) then
+               pole(2,i) = 0.0d0
+               pole(3,i) = 0.0d0
+               pole(6,i) = 0.0d0
+               pole(7,i) = 0.0d0
+               pole(8,i) = 0.0d0
+               pole(10,i) = 0.0d0
+               pole(11,i) = 0.0d0
+               pole(12,i) = 0.0d0
+            end if
+            if (yzero) then
+               pole(3,i) = 0.0d0
+               pole(6,i) = 0.0d0
+               pole(8,i) = 0.0d0
+               pole(10,i) = 0.0d0
+               pole(12,i) = 0.0d0
+            end if
+         end do
+      end if
+c
 c     print the final multipole values for force field use
 c
-      write (iout,140)
-  140 format (/,' Final Atomic Multipole Moments after',
+      write (iout,160)
+  160 format (/,' Final Atomic Multipole Moments after',
      &           ' Regularization :')
       do i = 1, n
          k = pollist(i)
          if (k .eq. 0) then
-            write (iout,150)  i,name(i),atomic(i)
-  150       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,170)  i,name(i),atomic(i)
+  170       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,160)
-  160       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,180)
+  180       format (/,' No Atomic Multipole Moments for this Site')
          else
             zaxe = zaxis(k)
             xaxe = xaxis(k)
             yaxe = yaxis(k)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,170)  i,name(i),atomic(i)
-  170       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,190)  i,name(i),atomic(i)
+  190       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,180)  polaxe(k),zaxe,xaxe,yaxe
-  180       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,190)  pole(1,k)
-  190       format (/,' Charge:',10x,f15.5)
-            write (iout,200)  pole(2,k),pole(3,k),pole(4,k)
-  200       format (' Dipole:',10x,3f15.5)
-            write (iout,210)  pole(5,k)
-  210       format (' Quadrupole:',6x,f15.5)
-            write (iout,220)  pole(8,k),pole(9,k)
-  220       format (18x,2f15.5)
-            write (iout,230)  pole(11,k),pole(12,k),pole(13,k)
-  230       format (18x,3f15.5)
+            write (iout,200)  polaxe(k),zaxe,xaxe,yaxe
+  200       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,210)  pole(1,k)
+  210       format (/,' Charge:',10x,f15.5)
+            write (iout,220)  pole(2,k),pole(3,k),pole(4,k)
+  220       format (' Dipole:',10x,3f15.5)
+            write (iout,230)  pole(5,k)
+  230       format (' Quadrupole:',6x,f15.5)
+            write (iout,240)  pole(8,k),pole(9,k)
+  240       format (18x,2f15.5)
+            write (iout,250)  pole(11,k),pole(12,k),pole(13,k)
+  250       format (18x,3f15.5)
          end if
       end do
       return
@@ -3062,7 +4091,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "fixpole" removes multipole values that are zero by symmetry,
+c     "fixpole" performs unit conversion of the multipole components,
 c     rounds moments to desired precision, and enforces integer net
 c     charge and traceless quadrupoles
 c
@@ -3070,37 +4099,25 @@ c
       subroutine fixpole
       use atoms
       use mpole
+      use units
       implicit none
-      integer i,j,k
-      real*8 eps,big,sum
-      real*8 ci,cj
-      logical yzero
+      integer i,j,k,m
+      integer it,ktype
+      integer, allocatable :: equiv(:)
+      real*8 eps,sum,big
+      real*8 ival,kval
 c
 c
-c     remove multipole components that are zero by symmetry
+c     convert dipole and quadrupole moments to atomic units
 c
       do i = 1, npole
-         yzero = .false.
-         if (yaxis(i) .eq. 0)  yzero = .true.
-         if (polaxe(i) .eq. 'Bisector')  yzero = .true.
-         if (polaxe(i) .eq. 'Z-Bisect')  yzero = .true.
-         if (zaxis(i).eq.0 .or. zaxis(i).gt.n) then
-            pole(13,i) = 0.0d0
-         end if
-         if (xaxis(i).eq.0 .or. xaxis(i).gt.n) then
-            pole(2,i) = 0.0d0
-            pole(5,i) = -0.5d0 * pole(13,i)
-            pole(7,i) = 0.0d0
-            pole(9,i) = pole(5,i)
-            pole(11,i) = 0.0d0
-         end if
-         if (yzero) then
-            pole(3,i) = 0.0d0
-            pole(6,i) = 0.0d0
-            pole(8,i) = 0.0d0
-            pole(10,i) = 0.0d0
-            pole(12,i) = 0.0d0
-         end if
+         pole(1,i) = pole(1,i)
+         do j = 2, 4
+            pole(j,i) = pole(j,i) / bohr
+         end do
+         do j = 5, 13
+            pole(j,i) = 3.0d0 * pole(j,i) / bohr**2
+         end do
       end do
 c
 c     regularize multipole moments to desired precision
@@ -3112,26 +4129,55 @@ c
          end do
       end do
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (equiv(maxtyp))
+c
 c     enforce integer net charge over atomic multipoles
 c
-      k = 0
-      big = 0.0d0
+      do i = 1, maxtyp
+         equiv(i) = 0
+      end do
+      ktype = 0
       sum = 0.0d0
       do i = 1, npole
+         it = type(ipole(i))
+         equiv(it) = equiv(it) + 1 
          sum = sum + pole(1,i)
-         ci = abs(pole(1,i))
-         if (ci .gt. big) then
-            do j = 1, n
-               cj = abs(pole(1,j))
-               if (i.ne.j .and. ci.eq.cj)  goto 10
-            end do
-            k = i
-            big = ci
-   10       continue
-         end if
       end do
       sum = sum - dble(nint(sum))
-      if (k .ne. 0)  pole(1,k) = pole(1,k) - sum
+      k = nint(abs(sum)/eps)
+      do j = 1, k
+         m = k / j
+         if (k .eq. m*j) then
+            do i = 1, npole
+               it = type(ipole(i))
+               if (equiv(it) .eq. m) then
+                  ival = abs(pole(1,ipole(i)))
+                  if (ktype .eq. 0) then
+                     ktype = it
+                     kval = ival
+                  else if (ival .gt. kval) then
+                     ktype = it
+                     kval = ival
+                  end if
+               end if
+            end do
+         end if
+         if (ktype .ne. 0)  goto 10
+      end do
+   10 continue
+      if (ktype .ne. 0) then
+         sum = sum / dble(m)
+         do i = 1, npole
+            it = type(ipole(i))
+            if (it .eq. ktype)  pole(1,i) = pole(1,i) - sum
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (equiv)
 c
 c     enforce traceless quadrupole at each multipole site
 c

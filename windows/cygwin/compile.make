@@ -32,6 +32,7 @@ gfortran -c -O3 -ffast-math -fopenmp bndstr.f
 gfortran -c -O3 -ffast-math -fopenmp bound.f
 gfortran -c -O3 -ffast-math -fopenmp boxes.f
 gfortran -c -O3 -ffast-math -fopenmp cell.f
+gfortran -c -O3 -ffast-math -fopenmp cflux.f
 gfortran -c -O3 -ffast-math -fopenmp charge.f
 gfortran -c -O3 -ffast-math -fopenmp chgpen.f
 gfortran -c -O3 -ffast-math -fopenmp chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -O3 -ffast-math -fopenmp kangs.f
 gfortran -c -O3 -ffast-math -fopenmp kantor.f
 gfortran -c -O3 -ffast-math -fopenmp katoms.f
 gfortran -c -O3 -ffast-math -fopenmp kbonds.f
+gfortran -c -O3 -ffast-math -fopenmp kcflux.f
 gfortran -c -O3 -ffast-math -fopenmp kchrge.f
 gfortran -c -O3 -ffast-math -fopenmp kcpen.f
 gfortran -c -O3 -ffast-math -fopenmp kctrn.f
@@ -87,6 +89,7 @@ gfortran -c -O3 -ffast-math -fopenmp korbs.f
 gfortran -c -O3 -ffast-math -fopenmp kpitor.f
 gfortran -c -O3 -ffast-math -fopenmp kpolr.f
 gfortran -c -O3 -ffast-math -fopenmp krepl.f
+gfortran -c -O3 -ffast-math -fopenmp ksolut.f
 gfortran -c -O3 -ffast-math -fopenmp kstbnd.f
 gfortran -c -O3 -ffast-math -fopenmp ksttor.f
 gfortran -c -O3 -ffast-math -fopenmp ktorsn.f
@@ -151,6 +154,7 @@ gfortran -c -O3 -ffast-math -fopenmp scales.f
 gfortran -c -O3 -ffast-math -fopenmp sequen.f
 gfortran -c -O3 -ffast-math -fopenmp shunt.f
 gfortran -c -O3 -ffast-math -fopenmp socket.f
+gfortran -c -O3 -ffast-math -fopenmp solpot.f
 gfortran -c -O3 -ffast-math -fopenmp solute.f
 gfortran -c -O3 -ffast-math -fopenmp stodyn.f
 gfortran -c -O3 -ffast-math -fopenmp strbnd.f
@@ -181,6 +185,7 @@ gfortran -c -O3 -ffast-math -fopenmp zcoord.f
 #
 gfortran -c -O3 -ffast-math -fopenmp active.f
 gfortran -c -O3 -ffast-math -fopenmp alchemy.f
+gfortran -c -O3 -ffast-math -fopenmp alterchg.f
 gfortran -c -O3 -ffast-math -fopenmp analysis.f
 gfortran -c -O3 -ffast-math -fopenmp analyze.f
 gfortran -c -O3 -ffast-math -fopenmp angles.f
@@ -211,10 +216,12 @@ gfortran -c -O3 -ffast-math -fopenmp connect.f
 gfortran -c -O3 -ffast-math -fopenmp connolly.f
 gfortran -c -O3 -ffast-math -fopenmp control.f
 gfortran -c -O3 -ffast-math -fopenmp correlate.f
+gfortran -c -O3 -ffast-math -fopenmp critical.f
 gfortran -c -O3 -ffast-math -fopenmp crystal.f
 gfortran -c -O3 -ffast-math -fopenmp cspline.f
 gfortran -c -O3 -ffast-math -fopenmp cutoffs.f
 gfortran -c -O3 -ffast-math -fopenmp damping.f
+gfortran -c -O3 -ffast-math -fopenmp dcflux.f
 gfortran -c -O3 -ffast-math -fopenmp deflate.f
 gfortran -c -O3 -ffast-math -fopenmp delete.f
 gfortran -c -O3 -ffast-math -fopenmp diagq.f
@@ -409,6 +416,7 @@ gfortran -c -O3 -ffast-math -fopenmp kangtor.f
 gfortran -c -O3 -ffast-math -fopenmp katom.f
 gfortran -c -O3 -ffast-math -fopenmp kbond.f
 gfortran -c -O3 -ffast-math -fopenmp kcharge.f
+gfortran -c -O3 -ffast-math -fopenmp kchgflx.f
 gfortran -c -O3 -ffast-math -fopenmp kchgtrn.f
 gfortran -c -O3 -ffast-math -fopenmp kdipole.f
 gfortran -c -O3 -ffast-math -fopenmp kdisp.f
@@ -436,6 +444,7 @@ gfortran -c -O3 -ffast-math -fopenmp kvdw.f
 gfortran -c -O3 -ffast-math -fopenmp lattice.f
 gfortran -c -O3 -ffast-math -fopenmp lbfgs.f
 gfortran -c -O3 -ffast-math -fopenmp lights.f
+gfortran -c -O3 -ffast-math -fopenmp lusolve.f
 gfortran -c -O3 -ffast-math -fopenmp makeint.f
 gfortran -c -O3 -ffast-math -fopenmp makeref.f
 gfortran -c -O3 -ffast-math -fopenmp makexyz.f
@@ -486,6 +495,7 @@ gfortran -c -O3 -ffast-math -fopenmp polarize.f
 gfortran -c -O3 -ffast-math -fopenmp poledit.f
 gfortran -c -O3 -ffast-math -fopenmp polymer.f
 gfortran -c -O3 -ffast-math -fopenmp potential.f
+gfortran -c -O3 -ffast-math -fopenmp predict.f
 gfortran -c -O3 -ffast-math -fopenmp pressure.f
 gfortran -c -O3 -ffast-math -fopenmp prmedit.f
 gfortran -c -O3 -ffast-math -fopenmp prmkey.f
@@ -502,7 +512,7 @@ gfortran -c -O3 -ffast-math -fopenmp prtxyz.f
 gfortran -c -O3 -ffast-math -fopenmp pss.f
 gfortran -c -O3 -ffast-math -fopenmp pssrigid.f
 gfortran -c -O3 -ffast-math -fopenmp pssrot.f
-gfortran -c -O3 -ffast-math -fopenmp qrfact.f
+gfortran -c -O3 -ffast-math -fopenmp qrsolve.f
 gfortran -c -O3 -ffast-math -fopenmp quatfit.f
 gfortran -c -O3 -ffast-math -fopenmp radial.f
 gfortran -c -O3 -ffast-math -fopenmp random.f

@@ -25,6 +25,7 @@ c
       use limits
       use math
       use potent
+      use solpot
       use solute
       use warp
       implicit none
@@ -45,13 +46,17 @@ c
       ehp = 0.0d0
       eace = 0.0d0
       do i = 1, n
-         drb(i) = 0.0d0
          des(1,i) = 0.0d0
          des(2,i) = 0.0d0
          des(3,i) = 0.0d0
       end do
-      if (solvtyp(1:2) .eq. 'GK') then
+      if (solvtyp(1:2) .eq. 'GB') then
          do i = 1, n
+            drb(i) = 0.0d0
+         end do
+      else if (solvtyp(1:2) .eq. 'GK') then
+         do i = 1, n
+            drb(i) = 0.0d0
             drbp(i) = 0.0d0
          end do
       end if
@@ -630,7 +635,7 @@ c
                   wterm = exp(-0.006d0*rb2/deform)
                   width = sterm / sqrt(deform+0.15d0*rb2*wterm)
                   erfterm = erf(width*fgb)
-                  term = width * exp(-(width*fgb)**2) / sqrtpi
+                  term = width * exp(-(width*fgb)**2) / rootpi
                   rterm = term * (2.0d0*r-0.5d0*r*expterm)/fgb
                   bterm = term * ((expterm*(1.0d0+0.25d0*r2/rb2)/fgb)
      &                              - (fgb*(width/sterm)**2) * wterm
@@ -2603,8 +2608,9 @@ c
 c     apply Thole polarization damping to scale factors
 c
                damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
+               pgamma = min(pti,thole(k))
+               if (pgamma .eq. 0.0d0)  pgamma = max(pti,thole(k))
+               if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                   damp = -pgamma * (r/damp)**3
                   if (damp .gt. -50.0d0) then
                      scale3 = 1.0d0 - exp(damp)
@@ -2927,7 +2933,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -3196,7 +3201,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -3634,8 +3638,9 @@ c
 c     apply Thole polarization damping to scale factors
 c
                damp = pdi * pdamp(k)
-               if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(k))
+               pgamma = min(pti,thole(k))
+               if (pgamma .eq. 0.0d0)  pgamma = max(pti,thole(k))
+               if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                   damp = -pgamma * (r/damp)**3
                   if (damp .gt. -50.0d0) then
                      scale3 = 1.0d0 - exp(damp)
@@ -3958,7 +3963,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -4227,7 +4231,6 @@ c
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
                end if
 c
-c     now perform the torque calculation
 c     intermediate terms for torque between multipoles i and k
 c
                gti(2) = 0.5d0 * (sci(4)*psc5+scip(4)*dsc5) * rr5
@@ -5106,9 +5109,9 @@ c
             end if
          end do
          sasa = acsurf * sasa
-         cutv = tanh(tslope*(sasa-toffset))
+         cutv = tanh(tgrad*(sasa-toffset))
          cutmtx(i) = 0.5d0 * (1.0d0+cutv)
-         dcutmtx(i) = 0.5d0 * tslope * (1.0d0-cutv*cutv)
+         dcutmtx(i) = 0.5d0 * tgrad * (1.0d0-cutv*cutv)
          do k = 1, n
             dacsa(k,ii) = 0.0d0
             if (i .ne. k) then
@@ -5175,24 +5178,24 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. hpmfcut2) then
                   r = sqrt(r2)
-                  arg1 = (r-c1) * w1
+                  arg1 = (r-hc1) * hw1
                   arg12 = arg1 * arg1
-                  arg2 = (r-c2) * w2
+                  arg2 = (r-hc2) * hw2
                   arg22 = arg2 * arg2
-                  arg3 = (r-c3) * w3
+                  arg3 = (r-hc3) * hw3
                   arg32 = arg3 * arg3
-                  e1 = h1 * exp(-arg12)
-                  e2 = h2 * exp(-arg22)
-                  e3 = h3 * exp(-arg32)
+                  e1 = hd1 * exp(-arg12)
+                  e2 = hd2 * exp(-arg22)
+                  e3 = hd3 * exp(-arg32)
                   sum = e1 + e2 + e3
                   e = sum * cutmtx(i) * cutmtx(k)
                   ehp = ehp + e
 c
 c     first part of hydrophobic PMF derivative calculation
 c
-                  de1 = -2.0d0 * e1 * arg1 * w1
-                  de2 = -2.0d0 * e2 * arg2 * w2
-                  de3 = -2.0d0 * e3 * arg3 * w3
+                  de1 = -2.0d0 * e1 * arg1 * hw1
+                  de2 = -2.0d0 * e2 * arg2 * hw2
+                  de3 = -2.0d0 * e3 * arg3 * hw3
                   dsum = (de1+de2+de3) * cutmtx(i) * cutmtx(k) / r
                   dedx = dsum * xr
                   dedy = dsum * yr

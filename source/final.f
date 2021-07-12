@@ -27,6 +27,7 @@ c
       use bitor
       use bndstr
       use cell
+      use cflux
       use charge
       use chgpen
       use chgtrn
@@ -38,6 +39,7 @@ c
       use domega
       use faces
       use fft
+      use fields
       use fracs
       use freeze
       use group
@@ -57,6 +59,7 @@ c
       use korbs
       use kpolr
       use krepl
+      use ksolut
       use kvdws
       use light
       use limits
@@ -94,6 +97,7 @@ c
       use ring
       use rotbnd
       use socket
+      use solpot
       use solute
       use stodyn
       use strbnd
@@ -198,6 +202,7 @@ c     deallocation of global arrays from module atmlst
 c
       if (allocated(bndlist))  deallocate (bndlist)
       if (allocated(anglist))  deallocate (anglist)
+      if (allocated(balist))  deallocate (balist)
 c
 c     deallocation of global arrays from module bitor
 c
@@ -213,17 +218,25 @@ c     deallocation of global arrays from module cell
 c
       if (allocated(icell))  deallocate (icell)
 c
+c     deallocation of global arrays from module cflux
+c
+      if (allocated(bflx))  deallocate (bflx)
+      if (allocated(aflx))  deallocate (aflx)
+      if (allocated(abflx))  deallocate (abflx)
+c
 c     deallocation of global arrays from module charge
 c
       if (allocated(iion))  deallocate (iion)
       if (allocated(jion))  deallocate (jion)
       if (allocated(kion))  deallocate (kion)
       if (allocated(pchg))  deallocate (pchg)
+      if (allocated(pchg0))  deallocate (pchg0)
 c
 c     deallocation of global arrays from module chgpen
 c
       if (allocated(pcore))  deallocate (pcore)
       if (allocated(pval))  deallocate (pval)
+      if (allocated(pval0))  deallocate (pval0)
       if (allocated(palpha))  deallocate (palpha)
 c
 c     deallocation of global arrays from module chgtrn
@@ -353,22 +366,26 @@ c
       if (allocated(ct))  deallocate (ct)
       if (allocated(cr))  deallocate (cr)
       if (allocated(c))  deallocate (c)
-      if (allocated(epc))  deallocate (epc)
-      if (allocated(epv))  deallocate (epv)
+      if (allocated(eqc))  deallocate (eqc)
+      if (allocated(eqv))  deallocate (eqv)
       if (allocated(afe))  deallocate (afe)
       if (allocated(ale))  deallocate (ale)
-      if (allocated(epnext))  deallocate (epnext)
+      if (allocated(eqnext))  deallocate (eqnext)
       if (allocated(fsen))  deallocate (fsen)
-      if (allocated(fsep))  deallocate (fsep)
-      if (allocated(cynep))  deallocate (cynep)
-      if (allocated(cyep))  deallocate (cyep)
-      if (allocated(fpa))  deallocate (fpa)
-      if (allocated(fpncy))  deallocate (fpncy)
-      if (allocated(fpcy))  deallocate (fpcy)
+      if (allocated(fseq))  deallocate (fseq)
+      if (allocated(cyneq))  deallocate (cyneq)
+      if (allocated(cyeq))  deallocate (cyeq)
+      if (allocated(fqa))  deallocate (fqa)
+      if (allocated(fqncy))  deallocate (fqncy)
+      if (allocated(fqcy))  deallocate (fqcy)
 c
 c     deallocation of global arrays from module fft
 c
       if (allocated(ffttable))  deallocate (ffttable)
+c
+c     deallocation of global arrays from module fields
+c
+      if (allocated(biotyp))  deallocate (biotyp)
 c
 c     deallocation of global arrays from module fracs
 c
@@ -477,6 +494,10 @@ c
       if (allocated(prdmp))  deallocate (prdmp)
       if (allocated(prele))  deallocate (prele)
 c
+c     deallocation of global arrays from module ksolut
+c
+      if (allocated(solrad))  deallocate (solrad)
+c
 c     deallocation of global arrays from module kvdws
 c
       if (allocated(rad))  deallocate (rad)
@@ -570,6 +591,7 @@ c
       if (allocated(rpole))  deallocate (rpole)
       if (allocated(spole))  deallocate (spole)
       if (allocated(srpole))  deallocate (srpole)
+      if (allocated(mono0))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
 c
 c     deallocation of global arrays from module mrecip
@@ -664,6 +686,7 @@ c
       if (allocated(ypdb))  deallocate (ypdb)
       if (allocated(zpdb))  deallocate (zpdb)
       if (allocated(pdbres))  deallocate (pdbres)
+      if (allocated(pdbsym))  deallocate (pdbsym)
       if (allocated(pdbatm))  deallocate (pdbatm)
       if (allocated(pdbtyp))  deallocate (pdbtyp)
 c
@@ -925,9 +948,9 @@ c
 c
 c     deallocation of global arrays from module vibs
 c
-      if (allocated(phi))  deallocate (phi)
-      if (allocated(phik))  deallocate (phik)
-      if (allocated(pwork))  deallocate (pwork)
+      if (allocated(rho))  deallocate (rho)
+      if (allocated(rhok))  deallocate (rhok)
+      if (allocated(rwork))  deallocate (rwork)
 c
 c     deallocation of global arrays from module warp
 c

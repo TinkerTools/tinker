@@ -38,7 +38,6 @@ c
       use kpolr
       use mplpot
       use mpole
-      use neigh
       use polar
       use polopt
       use polpot
@@ -46,12 +45,13 @@ c
       use poltcg
       use potent
       implicit none
-      integer i,j,k,next
+      integer i,j,k
+      integer it,next
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
       real*8 pol,thl,ddp
-      real*8 sixth
+      real*8 sixth,thole0
       logical header
       character*20 keyword
       character*20 text
@@ -59,16 +59,9 @@ c
       character*240 string
 c
 c
-c     perform dynamic allocation of some local arrays
+c     set the default values for polarization variables
 c
-      allocate (list(n))
-c
-c     set defaults for numbers and lists of polarizable atoms
-c
-      nlist = 0
-      do i = 1, n
-         list(i) = 0
-      end do
+      polprt = .false.
 c
 c     set defaults for PCG induced dipole parameters
 c
@@ -142,20 +135,33 @@ c
          copt(6) = 0.122d0
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
+c     set defaults for numbers and lists of polarizable atoms
+c
+      nlist = 0
+      do i = 1, n
+         list(i) = 0
+      end do
+c
 c     get keywords containing polarization-related options
 c
-      do j = 1, nkey
+      do i = 1, nkey
          next = 1
-         record = keyline(j)
+         record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:240)
          if (keyword(1:12) .eq. 'POLARIZABLE ') then
-            read (string,*,err=10,end=10)  (list(i),i=nlist+1,n)
+            read (string,*,err=10,end=10)  (list(j),j=nlist+1,n)
    10       continue
             do while (list(nlist+1) .ne. 0)
                nlist = nlist + 1
             end do
+         else if (keyword(1:12) .eq. 'POLAR-PRINT ') then
+            polprt = .true.
          else if (keyword(1:12) .eq. 'PCG-PRECOND ') then
             pcgprec = .true.
          else if (keyword(1:14) .eq. 'PCG-NOPRECOND ') then
@@ -173,10 +179,10 @@ c
          else if (keyword(1:9) .eq. 'TCG-PEEK ') then
             read (string,*,err=20,end=20)  tcgpeek
          else if (keyword(1:10) .eq. 'OPT-COEFF ') then
-            do i = 0, maxopt
-               copt(i) = 0.0d0
+            do j = 0, maxopt
+               copt(j) = 0.0d0
             end do
-            read (string,*,err=20,end=20)  (copt(i),i=0,maxopt)
+            read (string,*,err=20,end=20)  (copt(j),j=0,maxopt)
          end if
    20    continue
       end do
@@ -335,14 +341,14 @@ c
                   if (.not. silent) then
                      if (ddp .ge. 0.0d0) then
                         write (iout,90)  k,pol,thl,ddp,(pg(j),j=1,npg)
-   90                   format (6x,i6,8x,f10.3,2x,f10.3,2x,f10.3,
+   90                   format (4x,i8,8x,f10.3,2x,f10.3,2x,f10.3,
      &                             7x,20i5)
                      else if (thl .ge. 0.0d0) then
                         write (iout,100)  k,pol,thl,(pg(j),j=1,npg)
-  100                   format (6x,i6,8x,f10.3,2x,f10.3,7x,20i5)
+  100                   format (4x,i8,8x,f10.3,2x,f10.3,7x,20i5)
                      else
                         write (iout,110)  k,pol,(pg(j),j=1,npg)
-  110                   format (6x,i6,8x,f10.3,7x,20i5)
+  110                   format (4x,i8,8x,f10.3,7x,20i5)
                      end if
                   end if
                else
@@ -357,10 +363,20 @@ c
 c
 c     find and store the atomic dipole polarizability parameters
 c
+      sixth = 1.0d0 / 6.0d0
+      npolar = n
       do i = 1, n
-         polarity(i) = polr(type(i))
-         thole(i) = athl(type(i))
-         dirdamp(i) = ddir(type(i))
+         polarity(i) = 0.0d0
+         thole(i) = 0.0d0
+         dirdamp(i) = 0.0d0
+         pdamp(i) = 0.0d0
+         it = type(i)
+         if (it .ne. 0) then
+            polarity(i) = polr(it)
+            thole(i) = athl(it)
+            dirdamp(i) = ddir(it)
+            pdamp(i) = polarity(i)**sixth
+         end if
       end do
 c
 c     process keywords containing atom specific polarizabilities
@@ -389,26 +405,26 @@ c
      &                       ' for Specific Atoms :')
                   if (ddp .ge. 0.0d0) then
                      write (iout,150)
-  150                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',
+  150                format (/,5x,'Atom',16x,'Alpha',7x,'Thole',
      &                          8x,'Damp',/)
                   else if (thl .ge. 0.0d0) then
                      write (iout,160)
-  160                format (/,6x,'Atom',15x,'Alpha',7x,'Thole',/)
+  160                format (/,5x,'Atom',16x,'Alpha',7x,'Thole',/)
                   else
                      write (iout,170)
-  170                format (/,6x,'Atom',15x,'Alpha',/)
+  170                format (/,5x,'Atom',16x,'Alpha',/)
                   end if
                end if
                if (.not. silent) then
                   if (ddp .ge. 0.0d0) then
                      write (iout,180)  k,pol,thl,ddp
-  180                format (6x,i6,8x,f10.3,2x,f10.3,2x,f10.3)
+  180                format (1x,i8,11x,f10.3,2x,f10.3,2x,f10.3)
                   else if (thl .ge. 0.0d0) then
                      write (iout,190)  k,pol,thl
-  190                format (6x,i6,8x,f10.3,2x,f10.3)
+  190                format (1x,i8,11x,f10.3,2x,f10.3)
                   else
                      write (iout,200)  k,pol
-  200                format (6x,i6,8x,f10.3)
+  200                format (1x,i8,11x,f10.3)
                   end if
                end if
                polarity(k) = pol
@@ -418,53 +434,48 @@ c
          end if
       end do
 c
-c     remove zero and or undefined polarizable sites from the list
+c     remove zero or undefined electrostatic sites from the list
 c
-      npole = 0
-      ncp = 0
-      npolar = 0
-      do i = 1, n
-         if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
-         if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do k = 1, maxpole
-               pole(k,npole) = pole(k,i)
-            end do
-            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-            pcore(npole) = pcore(i)
-            pval(npole) = pval(i)
-            palpha(npole) = palpha(i)
-            if (polarity(i) .ne. 0.0d0) then
-               npolar = npolar + 1
-               ipolar(npolar) = npole
-               douind(i) = .true.
+      if ((use_polar .or. use_repuls) .and. .not.use_chgtrn) then
+         npole = 0
+         ncp = 0
+         npolar = 0
+         do i = 1, n
+            if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
+            if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do k = 1, maxpole
+                  pole(k,npole) = pole(k,i)
+               end do
+               mono0(npole) = pole(1,i)
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               pval0(npole) = pval(i)
+               palpha(npole) = palpha(i)
+               if (polarity(i) .ne. 0.0d0) then
+                  npolar = npolar + 1
+                  ipolar(npolar) = npole
+                  douind(i) = .true.
+               end if
+               if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
+               polarity(npole) = polarity(i)
+               thole(npole) = thole(i)
+               dirdamp(npole) = dirdamp(i)
+               pdamp(npole) = pdamp(i)
             end if
-            polarity(npole) = polarity(i)
-            thole(npole) = thole(i)
-            dirdamp(npole) = dirdamp(i)
-         end if
-      end do
+         end do
+      end if
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
-c
-c     set the values used in the scaling of the polarizability
-c
-      sixth = 1.0d0 / 6.0d0
-      do i = 1, npole
-         if (thole(i) .eq. 0.0d0) then
-            pdamp(i) = 0.0d0
-         else
-            pdamp(i) = polarity(i)**sixth
-         end if
-      end do
+      if (use_polar .and. .not.use_chgtrn)  call chkpole
 c
 c     assign polarization group connectivity of each atom
 c
@@ -474,32 +485,9 @@ c     turn off polarizable multipole potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .ne. 0)  use_chgpen = .true.
+      if (ncp .ne. 0)  use_thole = .false.
+      if (use_dirdamp)  use_thole = .true.
       if (npolar .eq. 0)  use_polar = .false.
-      if (use_polar) then
-         do i = 1, npole
-            if (thole(i) .ne. 0.0d0) then
-               use_thole = .true.
-               goto 210
-            end if
-         end do
-  210    continue
-         do i = 1, npole
-            if (dirdamp(i) .ne. 0.0d0) then
-               use_dirdamp = .true.
-               goto 220
-            end if
-         end do
-  220    continue
-      end if
-c
-c     perform dynamic allocation of some global arrays
-c
-      if (use_polar) then
-         if (allocated(mindex))  deallocate (mindex)
-         if (allocated(minv))  deallocate (minv)
-         allocate (mindex(npole))
-         allocate (minv(3*maxulst*npole))
-      end if
       return
       end
 c
@@ -519,7 +507,6 @@ c
       subroutine polargrp
       use atoms
       use couple
-      use inform
       use iounit
       use kpolr
       use mpole
@@ -534,7 +521,7 @@ c
       integer, allocatable :: keep(:)
       integer, allocatable :: list(:)
       integer, allocatable :: mask(:)
-      logical done
+      logical done,abort
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -556,33 +543,49 @@ c
       allocate (ip13(maxp13,n))
       allocate (ip14(maxp14,n))
 c
-c     find the directly connected group members for each atom
+c     initialize size and connectivity of polarization groups
 c
       do i = 1, n
          np11(i) = 1
          ip11(1,i) = i
+         np12(i) = 0
+         np13(i) = 0
+         np14(i) = 0
+      end do
+c
+c     set termination flag and temporary group storage
+c
+      abort = .false.
+      maxkeep = 100
+      maxlist = 10000
+c
+c     find the directly connected group members for each atom
+c
+      do i = 1, n
          it = type(i)
-         do j = 1, n12(i)
-            jj = i12(j,i)
-            jt = type(jj)
-            do k = 1, maxval
-               kk = pgrp(k,it)
-               if (kk .eq. 0)  goto 20
-               if (pgrp(k,it) .eq. jt) then
-                  np11(i) = np11(i) + 1
-                  if (np11(i) .le. maxp11) then
-                     ip11(np11(i),i) = jj
-                  else
-                     write (iout,10)
-   10                format (/,' POLARGRP  --  Too many Atoms',
-     &                          ' in Polarization Group')
-                     abort = .true.
-                     goto 30
+         if (it .ne. 0) then
+            do j = 1, n12(i)
+               jj = i12(j,i)
+               jt = type(jj)
+               do k = 1, maxval
+                  kk = pgrp(k,it)
+                  if (kk .eq. 0)  goto 20
+                  if (pgrp(k,it) .eq. jt) then
+                     if (np11(i) .lt. maxp11) then
+                        np11(i) = np11(i) + 1
+                        ip11(np11(i),i) = jj
+                     else
+                        write (iout,10)
+   10                   format (/,' POLARGRP  --  Too many Atoms',
+     &                             ' in Polarization Group')
+                        abort = .true.
+                        goto 30
+                     end if
                   end if
-               end if
+               end do
+   20          continue
             end do
-   20       continue
-         end do
+         end if
       end do
    30 continue
 c
@@ -601,12 +604,9 @@ c
    50       continue
          end do
       end do
-      if (abort)  call fatal
 c
 c     perform dynamic allocation of some local arrays
 c
-      maxkeep = 100
-      maxlist = 10000
       allocate (keep(maxkeep))
       allocate (list(maxlist))
       allocate (mask(n))
@@ -639,8 +639,8 @@ c
                do k = 1, np11(jj)
                   kk = ip11(k,jj)
                   if (mask(kk) .ne. i) then
-                     np11(i) = np11(i) + 1
-                     if (np11(i) .le. maxp11) then
+                     if (np11(i) .lt. maxp11) then
+                        np11(i) = np11(i) + 1
                         ip11(np11(i),i) = kk
                      else
                         write (iout,60)
@@ -662,6 +662,7 @@ c
          call sort (np11(i),ip11(1,i))
       end do
    70 continue
+      if (abort)  call fatal
 c
 c     loop over atoms finding all the 1-2 group relationships
 c
@@ -794,6 +795,7 @@ c
          end if
       end do
   130 continue
+      if (abort)  call fatal
 c
 c     perform deallocation of some local arrays
 c

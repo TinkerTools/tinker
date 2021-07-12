@@ -32,6 +32,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bndstr.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bound.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp boxes.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cell.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cflux.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp charge.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgpen.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgpot.f
@@ -71,6 +72,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kantor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katoms.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbonds.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcflux.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchrge.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcpen.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kctrn.f
@@ -87,6 +89,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp korbs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpitor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpolr.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp krepl.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ksolut.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kstbnd.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ksttor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ktorsn.f
@@ -151,6 +154,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp scales.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sequen.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp shunt.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp socket.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp solpot.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp solute.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp stodyn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp strbnd.f
@@ -181,6 +185,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp zcoord.f
 #
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp active.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alchemy.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alterchg.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analysis.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analyze.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angles.f
@@ -211,10 +216,12 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp connect.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp connolly.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp control.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp correlate.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp critical.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp crystal.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cspline.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cutoffs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp damping.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dcflux.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp deflate.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp delete.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp diagq.f
@@ -409,6 +416,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangtor.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katom.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbond.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcharge.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchgflx.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchgtrn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdipole.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdisp.f
@@ -436,6 +444,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kvdw.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lattice.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lbfgs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lights.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lusolve.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makeint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makeref.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makexyz.f
@@ -486,6 +495,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polarize.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp poledit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polymer.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potential.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp predict.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pressure.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmedit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmkey.f
@@ -502,7 +512,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pss.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrigid.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qrfact.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qrsolve.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp quatfit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp radial.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp random.f

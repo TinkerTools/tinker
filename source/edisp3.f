@@ -109,6 +109,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use shunt
       use usage
       implicit none
@@ -134,6 +135,7 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -178,10 +180,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -204,6 +207,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -257,6 +261,16 @@ c
      &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        e = e * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        e = e * vlambda
+                     end if
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -337,10 +351,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -363,6 +378,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -417,6 +433,16 @@ c
      &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     if (muti .or. mutk) then
+                        if (vcouple .eq. 1) then
+                           e = e * vlambda
+                        else if (.not.muti .or. .not.mutk) then
+                           e = e * vlambda
+                        end if
+                     end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -527,6 +553,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use neigh
       use shunt
       use usage
@@ -552,6 +579,7 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -590,8 +618,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,off2,cut2,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,c0,c1,c2,
+!$OMP& c3,c4,c5,vcouple,vlambda,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
 c
@@ -601,10 +629,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -628,6 +657,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -678,6 +708,16 @@ c
      &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        e = e * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        e = e * vlambda
+                     end if
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -858,8 +898,8 @@ c
       integer jcell
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 e,fgrp
-      real*8 ci,ck
+      real*8 e,efull
+      real*8 fgrp,ci,ck
       real*8 r,r2,r6
       real*8 ai,ai2
       real*8 ak,ak2
@@ -911,10 +951,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -952,6 +992,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expa = exp(-ralpha2) * term
@@ -997,28 +1038,29 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
 c     
-c     increment the overall charge transfer energy components
+c     compute the full undamped energy for this interaction
 c
-                  if (e .ne. 0.0d0) then
-                     edsp = edsp + e
+                  efull = e * scale
+                  if (efull .ne. 0.0d0) then
                      nedsp = nedsp + 1
-                     aedsp(i) = aedsp(i) + 0.5d0*e
-                     aedsp(k) = aedsp(k) + 0.5d0*e
+                     aedsp(i) = aedsp(i) + 0.5d0*efull
+                     aedsp(k) = aedsp(k) + 0.5d0*efull
+                     if (molcule(i) .ne. molcule(k)) then
+                        einter = einter + efull
+                     end if
                   end if
 c
-c     increment the total intermolecular energy
+c     compute the energy contribution for this interaction
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  scale = scale - 1.0d0
+                  e = e * (expa+scale)
+                  edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 4.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  huge = (abs(efull) .gt. 4.0d0)
+                  if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1028,7 +1070,7 @@ c
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,30)  i,name(i),k,name(k),r,e
+                     write (iout,30)  i,name(i),k,name(k),r,efull
    30                format (' Disper',4x,2(i7,'-',a3),9x,
      &                          f10.4,2x,f12.4)
                   end if
@@ -1063,10 +1105,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1155,29 +1197,30 @@ c
                            scale = scale * dspscale(k)
                         end if
                      end if
-                     scale = scale - 1.0d0
-                     e = -ci * ck * (expa+scale) / r6
-                     if (ii .eq. kk)  e = 0.5d0 * e
 c     
-c     increment the overall dispersion energy components
+c     compute the full undamped energy for this interaction
 c
-                     if (e .ne. 0.0d0) then
-                        edsp = edsp + e
+                     if (ii .eq. kk)  e = 0.5d0 * e
+                     efull = e * scale
+                     if (efull .ne. 0.0d0) then
                         nedsp = nedsp + 1
-                        aedsp(i) = aedsp(i) + 0.5d0*e
-                        aedsp(k) = aedsp(k) + 0.5d0*e
+                        aedsp(i) = aedsp(i) + 0.5d0*efull
+                        aedsp(k) = aedsp(k) + 0.5d0*efull
+                        if (molcule(i) .ne. molcule(k)) then
+                           einter = einter + efull
+                        end if
                      end if
 c
-c     increment the total intermolecular energy
+c     compute the energy contribution for this interaction
 c
-                     if (molcule(i) .ne. molcule(k)) then
-                        einter = einter + e
-                     end if
+                     scale = scale - 1.0d0
+                     e = e * (expa+scale)
+                     edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
 c
-                     huge = (abs(e) .gt. 4.0d0)
-                     if ((debug.and.e.ne.0.0d0)
+                     huge = (abs(efull) .gt. 4.0d0)
+                     if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -1187,7 +1230,7 @@ c
      &                             //,' Type',14x,'Atom Names',
      &                                15x,'Distance',8x,'Energy',/)
                         end if
-                        write (iout,50)  i,name(i),k,name(k),r,e
+                        write (iout,50)  i,name(i),k,name(k),r,efull
    50                   format (' Disper',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',2x,f10.4,2x,f12.4)
                      end if
@@ -1318,8 +1361,8 @@ c
       integer ii,kk,kkk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 e,fgrp
-      real*8 ci,ck
+      real*8 e,efull
+      real*8 fgrp,ci,ck
       real*8 r,r2,r6
       real*8 ai,ai2
       real*8 ak,ak2
@@ -1380,10 +1423,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1422,6 +1465,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expa = exp(-ralpha2) * term
@@ -1467,28 +1511,29 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
 c     
-c     increment the overall charge transfer energy components
+c     compute the full undamped energy for this interaction
 c
-                  if (e .ne. 0.0d0) then
-                     edsp = edsp + e
+                  efull = e * scale
+                  if (efull .ne. 0.0d0) then
                      nedsp = nedsp + 1
-                     aedsp(i) = aedsp(i) + 0.5d0*e
-                     aedsp(k) = aedsp(k) + 0.5d0*e
+                     aedsp(i) = aedsp(i) + 0.5d0*efull
+                     aedsp(k) = aedsp(k) + 0.5d0*efull
+                     if (molcule(i) .ne. molcule(k)) then
+                        einter = einter + efull
+                     end if
                   end if
 c
-c     increment the total intermolecular energy
+c     compute the energy contribution for this interaction
 c
-                  if (molcule(i) .ne. molcule(k)) then
-                     einter = einter + e
-                  end if
+                  scale = scale - 1.0d0
+                  e = e * (expa+scale)
+                  edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
 c
-                  huge = (abs(e) .gt. 4.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  huge = (abs(efull) .gt. 4.0d0)
+                  if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1498,7 +1543,7 @@ c
      &                          //,' Type',14x,'Atom Names',
      &                             15x,'Distance',8x,'Energy',/)
                      end if
-                     write (iout,30)  i,name(i),k,name(k),r,e
+                     write (iout,30)  i,name(i),k,name(k),r,efull
    30                format (' Disper',4x,2(i7,'-',a3),9x,
      &                          f10.4,2x,f12.4)
                   end if

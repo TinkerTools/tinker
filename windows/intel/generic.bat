@@ -33,6 +33,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bndstr.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bound.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp boxes.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp cell.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp cflux.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp charge.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp chgpen.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp chgpot.f
@@ -72,6 +73,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kangs.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kantor.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp katoms.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kbonds.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kcflux.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kchrge.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kcpen.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kctrn.f
@@ -88,6 +90,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp korbs.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kpitor.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kpolr.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp krepl.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp ksolut.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kstbnd.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp ksttor.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp ktorsn.f
@@ -152,6 +155,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp scales.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp sequen.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp shunt.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp socket.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp solpot.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp solute.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp stodyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp strbnd.f
@@ -182,6 +186,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp zcoord.f
 #
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp active.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp alchemy.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp alterchg.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp analysis.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp analyze.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp angles.f
@@ -212,10 +217,12 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp connect.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp connolly.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp control.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp correlate.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp critical.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp crystal.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp cspline.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp cutoffs.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp damping.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp dcflux.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp deflate.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp delete.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp diagq.f
@@ -410,6 +417,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kangtor.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp katom.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kbond.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kcharge.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kchgflx.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kchgtrn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kdipole.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kdisp.f
@@ -437,6 +445,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp kvdw.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lattice.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lbfgs.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lights.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp lusolve.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makeint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makeref.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makexyz.f
@@ -487,6 +496,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp polarize.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp poledit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp polymer.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp potential.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp predict.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pressure.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prmedit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prmkey.f
@@ -503,7 +513,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtxyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pss.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pssrigid.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pssrot.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp qrfact.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp qrsolve.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp quatfit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp radial.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp random.f

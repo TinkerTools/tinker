@@ -62,9 +62,9 @@ c
          if (keyword(1:4) .eq. 'VDW ') then
             call getnumb (record,k,next)
             if (k.ge.1 .and. k.le.maxclass) then
-               rd = rad(k)
-               ep = eps(k)
-               rdn = reduct(k)
+               rd = 0.0d0
+               ep = 0.0d0
+               rdn = 0.0d0
                string = record(next:240)
                read (string,*,err=10,end=10)  rd,ep,rdn
    10          continue
@@ -109,8 +109,8 @@ c
          if (keyword(1:6) .eq. 'VDW14 ') then
             call getnumb (record,k,next)
             if (k.ge.1 .and. k.le.maxclass) then
-               rd = rad4(k)
-               ep = eps4(k)
+               rd = 0.0d0
+               ep = 0.0d0
                string = record(next:240)
                read (string,*,err=60,end=60)  rd,ep
    60          continue
@@ -346,12 +346,13 @@ c
          do k = i, maxclass
             if (radrule(1:6) .eq. 'MMFF94') then
                if (i .ne. k) then
-                  if (DA(i).eq.'D' .or. DA(k).eq.'D') then
-                     rd = 0.5d0 * (rad(i)+rad(k))
-                  else
-                     gik = (rad(i)-rad(k))/(rad(i)+rad(k))
-                     rd = 0.5d0 * (rad(i)+rad(k))
-     &                     * (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+                  rd = 0.5d0 * (rad(i)+rad(k))
+                  if (DA(i).ne.'D' .and. DA(k).ne.'D') then
+                     if (rd .ne. 0.0d0) then
+                        gik = (rad(i)-rad(k))/(rad(i)+rad(k))
+                        rd = (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+     &                           * rd
+                     end if
                   end if
                else
                   rd = rad(i)
@@ -377,9 +378,13 @@ c
       do i = 1, maxclass
          do k = i, maxclass
             if (epsrule(1:6) .eq. 'MMFF94') then
-               ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
-     &                 / ((sqrt(alph(i)/Nn(i))+sqrt(alph(k)/Nn(k)))
-     &                              *radmin(i,k)**6)
+               ep = 0.0d0
+               if (nn(i).ne.0.0d0 .and. nn(k).ne.0.0d0
+     &                .and. radmin(i,k).ne.0.0d0) then
+                  ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
+     &                    / ((sqrt(alph(i)/nn(i))+sqrt(alph(k)/nn(k)))
+     &                                 *radmin(i,k)**6)
+               end if
                if (i .eq. k)  eps(i) = ep
             else if (eps(i).eq.0.0d0 .and. eps(k).eq.0.0d0) then
                ep = 0.0d0
@@ -408,12 +413,13 @@ c
          do k = i, maxclass
             if (radrule(1:6) .eq. 'MMFF94') then
                if (i .ne. k) then
-                  if (DA(i).eq.'D' .or. DA(k).eq.'D') then
-                     rd = 0.5d0 * (rad(i)+rad(k))
-                  else
-                     gik = (rad(i)-rad(k))/(rad(i)+rad(k))
-                     rd = 0.5d0 * (rad(i)+rad(k))
-     &                     * (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+                  rd = 0.5d0 * (rad(i)+rad(k))
+                  if (DA(i).ne.'D' .and. DA(k).ne.'D') then
+                     if (rd .ne. 0.0d0) then
+                        gik = (rad(i)-rad(k))/(rad(i)+rad(k))
+                        rd = (1.0d0+0.2d0*(1.0d0-exp(-12.0d0*gik*gik)))
+     &                           * rd
+                     end if
                   end if
                else
                   rd = rad(i)
@@ -440,9 +446,13 @@ c
       do i = 1, maxclass
          do k = i, maxclass
             if (epsrule(1:6) .eq. 'MMFF94') then
-               ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
-     &                 / ((sqrt(alph(i)/Nn(i))+sqrt(alph(k)/Nn(k)))
-     &                              *radmin(i,k)**6)
+               ep = 0.0d0
+               if (nn(i).ne.0.0d0 .and. nn(k).ne.0.0d0
+     &                .and. radmin4(i,k).ne.0.0d0) then
+                  ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
+     &                    / ((sqrt(alph(i)/nn(i))+sqrt(alph(k)/nn(k)))
+     &                                 *radmin4(i,k)**6)
+               end if
                if (i .eq. k)  eps4(i) = ep
             else if (eps4(i).eq.0.0d0 .and. eps4(k).eq.0.0d0) then
                ep = 0.0d0
@@ -495,10 +505,10 @@ c
 c     vdw reduction factor information for each individual atom
 c
       do i = 1, n
-         kred(i) = reduct(jvdw(i))
-         if (n12(i).ne.1 .or. kred(i).eq.0.0d0) then
-            ired(i) = i
-         else
+         ired(i) = i
+         kred(i) = 0.0d0
+         if (jvdw(i) .ne. 0)  kred(i) = reduct(jvdw(i))
+         if (n12(i).eq.1 .and. kred(i).ne.0.0d0) then
             ired(i) = i12(1,i)
          end if
       end do
@@ -591,9 +601,11 @@ c     remove zero-sized atoms from the list of vdw sites
 c
       nvdw = 0
       do i = 1, n
-         if (rad(jvdw(i)) .ne. 0.0d0) then
-            nvdw = nvdw + 1
-            ivdw(nvdw) = i
+         if (jvdw(i) .ne. 0) then
+            if (rad(jvdw(i)) .ne. 0.0d0) then
+               nvdw = nvdw + 1
+               ivdw(nvdw) = i
+            end if
          end if
       end do
 c

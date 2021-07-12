@@ -203,7 +203,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kk = i+1, npole
+         do kk = ii+1, npole
             k = ipole(kk)
             kz = zaxis(kk)
             kx = xaxis(kk)
@@ -411,7 +411,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            do kk = i, npole
+            do kk = ii, npole
                k = ipole(kk)
                kz = zaxis(kk)
                kx = xaxis(kk)
@@ -996,7 +996,7 @@ c
 c     compute the self-energy part of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
+      fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,ii)
@@ -1076,7 +1076,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use inform
       use inter
       use iounit
@@ -1091,9 +1090,6 @@ c
       integer ii,kk
       integer jcell
       real*8 e,efull,f
-      real*8 bfac,erfc
-      real*8 alsq2,alsq2n
-      real*8 exp2a,ralpha
       real*8 scalek
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1123,12 +1119,10 @@ c
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
       real*8 dmpi(9),dmpk(9)
-      real*8 dmpik(9)
-      real*8 bn(0:4)
+      real*8 dmpik(9),dmpe(9)
       real*8, allocatable :: mscale(:)
       logical header,huge
       character*6 mode
-      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -1198,7 +1192,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kk = i+1, npole
+         do kk = ii+1, npole
             k = ipole(kk)
             xr = x(k) - xi
             yr = y(k) - yi
@@ -1245,23 +1239,10 @@ c
                rr7 = 5.0d0 * rr5 / r2
                rr9 = 7.0d0 * rr7 / r2
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
-               alsq2 = 2.0d0 * aewald**2
-               alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
-               exp2a = exp(-ralpha**2)
-               do j = 1, 4
-                  bfac = dble(j+j-1)
-                  alsq2n = alsq2 * alsq2n
-                  bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
-               end do
-               do j = 0, 4
-                  bn(j) = f * bn(j)
-               end do
-
+               call dampewald (9,r,r2,f,dmpe)
+c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
@@ -1328,29 +1309,29 @@ c     compute the energy contribution for this interaction
 c
                if (use_chgpen) then
                   scalek = mscale(k)
-                  rr1i = bn(0) - (1.0d0-scalek*dmpi(1))*rr1
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr1k = bn(0) - (1.0d0-scalek*dmpk(1))*rr1
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr1ik = bn(0) - (1.0d0-scalek*dmpik(1))*rr1
-                  rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
-                  rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
-                  rr7ik = bn(3) - (1.0d0-scalek*dmpik(7))*rr7
-                  rr9ik = bn(4) - (1.0d0-scalek*dmpik(9))*rr9
-                  rr1 = bn(0) - (1.0d0-scalek)*rr1
+                  rr1i = dmpe(1) - (1.0d0-scalek*dmpi(1))*rr1
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr1k = dmpe(1) - (1.0d0-scalek*dmpk(1))*rr1
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr1ik = dmpe(1) - (1.0d0-scalek*dmpik(1))*rr1
+                  rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                  rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                  rr7ik = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                  rr9ik = dmpe(9) - (1.0d0-scalek*dmpik(9))*rr9
+                  rr1 = dmpe(1) - (1.0d0-scalek)*rr1
                   e = term1*rr1 + term4ik*rr7ik + term5ik*rr9ik
      &                   + term1i*rr1i + term1k*rr1k + term1ik*rr1ik
      &                   + term2i*rr3i + term2k*rr3k + term2ik*rr3ik
      &                   + term3i*rr5i + term3k*rr5k + term3ik*rr5ik
                else
                   scalek = 1.0d0 - mscale(k)
-                  rr1 = bn(0) - scalek*rr1
-                  rr3 = bn(1) - scalek*rr3
-                  rr5 = bn(2) - scalek*rr5
-                  rr7 = bn(3) - scalek*rr7
-                  rr9 = bn(4) - scalek*rr9
+                  rr1 = dmpe(1) - scalek*rr1
+                  rr3 = dmpe(3) - scalek*rr3
+                  rr5 = dmpe(5) - scalek*rr5
+                  rr7 = dmpe(7) - scalek*rr7
+                  rr9 = dmpe(9) - scalek*rr9
                   e = term1*rr1 + term2*rr3 + term3*rr5
      &                   + term4*rr7 + term5*rr9
                end if
@@ -1440,7 +1421,7 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            do kk = i, npole
+            do kk = ii, npole
                k = ipole(kk)
                do jcell = 2, ncell
                   xr = x(k) - xi
@@ -1490,23 +1471,9 @@ c
                      rr7 = 5.0d0 * rr5 / r2
                      rr9 = 7.0d0 * rr7 / r2
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-                     ralpha = aewald * r
-                     bn(0) = erfc(ralpha) / r
-                     alsq2 = 2.0d0 * aewald**2
-                     alsq2n = 0.0d0
-                     if (aewald .gt. 0.0d0)
-     &                  alsq2n = 1.0d0 / (sqrtpi*aewald)
-                     exp2a = exp(-ralpha**2)
-                     do j = 1, 4
-                        bfac = dble(j+j-1)
-                        alsq2n = alsq2 * alsq2n
-                        bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
-                     end do
-                     do j = 0, 4
-                        bn(j) = f * bn(j)
-                     end do
+                     call dampewald (9,r,r2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -1575,18 +1542,18 @@ c     compute the energy contribution for this interaction
 c
                      if (use_chgpen) then
                         scalek = mscale(k)
-                        rr1i = bn(0) - (1.0d0-scalek*dmpi(1))*rr1
-                        rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                        rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                        rr1k = bn(0) - (1.0d0-scalek*dmpk(1))*rr1
-                        rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                        rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                        rr1ik = bn(0) - (1.0d0-scalek*dmpik(1))*rr1
-                        rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
-                        rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
-                        rr7ik = bn(3) - (1.0d0-scalek*dmpik(7))*rr7
-                        rr9ik = bn(4) - (1.0d0-scalek*dmpik(9))*rr9
-                        rr1 = bn(0) - (1.0d0-scalek)*rr1
+                        rr1i = dmpe(1) - (1.0d0-scalek*dmpi(1))*rr1
+                        rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                        rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                        rr1k = dmpe(1) - (1.0d0-scalek*dmpk(1))*rr1
+                        rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                        rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                        rr1ik = dmpe(1) - (1.0d0-scalek*dmpik(1))*rr1
+                        rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                        rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                        rr7ik = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                        rr9ik = dmpe(9) - (1.0d0-scalek*dmpik(9))*rr9
+                        rr1 = dmpe(1) - (1.0d0-scalek)*rr1
                         e = term1*rr1 + term1i*rr1i
      &                         + term1k*rr1k + term1ik*rr1ik
      &                         + term2i*rr3i + term2k*rr3k
@@ -1595,11 +1562,11 @@ c
      &                         + term4ik*rr7ik + term5ik*rr9ik
                      else
                         scalek = 1.0d0 - mscale(k)
-                        rr1 = bn(0) - scalek*rr1
-                        rr3 = bn(1) - scalek*rr3
-                        rr5 = bn(2) - scalek*rr5
-                        rr7 = bn(3) - scalek*rr7
-                        rr9 = bn(4) - scalek*rr9
+                        rr1 = dmpe(1) - scalek*rr1
+                        rr3 = dmpe(3) - scalek*rr3
+                        rr5 = dmpe(5) - scalek*rr5
+                        rr7 = dmpe(7) - scalek*rr7
+                        rr9 = dmpe(9) - scalek*rr9
                         e = term1*rr1 + term2*rr3 + term3*rr5
      &                               + term4*rr7 + term5*rr9
                      end if
@@ -1728,7 +1695,7 @@ c
 c     compute the self-energy part of the Ewald summation
 c
       term = 2.0d0 * aewald * aewald
-      fterm = -f * aewald / sqrtpi
+      fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,ii)
@@ -1807,7 +1774,6 @@ c
       use chgpot
       use couple
       use energi
-      use ewald
       use inform
       use inter
       use iounit
@@ -1822,9 +1788,6 @@ c
       integer i,j,k
       integer ii,kk,kkk
       real*8 e,efull,f
-      real*8 bfac,erfc
-      real*8 alsq2,alsq2n
-      real*8 exp2a,ralpha
       real*8 scalek
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1854,12 +1817,10 @@ c
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
       real*8 dmpi(9),dmpk(9)
-      real*8 dmpik(9)
-      real*8 bn(0:4)
+      real*8 dmpik(9),dmpe(9)
       real*8, allocatable :: mscale(:)
       logical header,huge
       character*6 mode
-      external erfc
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -1894,8 +1855,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
-!$OMP& f,nelst,elst,use_chgpen,use_bounds,off2,aewald,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& nelst,elst,use_chgpen,use_bounds,f,off2,molcule,name,
+!$OMP& verbose,debug,header,iout)
 !$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
 !$OMP DO reduction(+:em,nem,aem,einter) schedule(guided)
 c
@@ -1987,22 +1948,9 @@ c
                rr7 = 5.0d0 * rr5 / r2
                rr9 = 7.0d0 * rr7 / r2
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) / r
-               alsq2 = 2.0d0 * aewald**2
-               alsq2n = 0.0d0
-               if (aewald .gt. 0.0d0)  alsq2n = 1.0d0 / (sqrtpi*aewald)
-               exp2a = exp(-ralpha**2)
-               do j = 1, 4
-                  bfac = dble(j+j-1)
-                  alsq2n = alsq2 * alsq2n
-                  bn(j) = (bfac*bn(j-1)+alsq2n*exp2a) / r2
-               end do
-               do j = 0, 4
-                  bn(j) = f * bn(j)
-               end do
+               call dampewald (9,r,r2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -2070,29 +2018,29 @@ c     compute the energy contribution for this interaction
 c
                if (use_chgpen) then
                   scalek = mscale(k)
-                  rr1i = bn(0) - (1.0d0-scalek*dmpi(1))*rr1
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr1k = bn(0) - (1.0d0-scalek*dmpk(1))*rr1
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr1ik = bn(0) - (1.0d0-scalek*dmpik(1))*rr1
-                  rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
-                  rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
-                  rr7ik = bn(3) - (1.0d0-scalek*dmpik(7))*rr7
-                  rr9ik = bn(4) - (1.0d0-scalek*dmpik(9))*rr9
-                  rr1 = bn(0) - (1.0d0-scalek)*rr1
+                  rr1i = dmpe(1) - (1.0d0-scalek*dmpi(1))*rr1
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr1k = dmpe(1) - (1.0d0-scalek*dmpk(1))*rr1
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr1ik = dmpe(1) - (1.0d0-scalek*dmpik(1))*rr1
+                  rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                  rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                  rr7ik = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                  rr9ik = dmpe(9) - (1.0d0-scalek*dmpik(9))*rr9
+                  rr1 = dmpe(1) - (1.0d0-scalek)*rr1
                   e = term1*rr1 + term4ik*rr7ik + term5ik*rr9ik
      &                   + term1i*rr1i + term1k*rr1k + term1ik*rr1ik
      &                   + term2i*rr3i + term2k*rr3k + term2ik*rr3ik
      &                   + term3i*rr5i + term3k*rr5k + term3ik*rr5ik
                else
                   scalek = 1.0d0 - mscale(k)
-                  rr1 = bn(0) - scalek*rr1
-                  rr3 = bn(1) - scalek*rr3
-                  rr5 = bn(2) - scalek*rr5
-                  rr7 = bn(3) - scalek*rr7
-                  rr9 = bn(4) - scalek*rr9
+                  rr1 = dmpe(1) - scalek*rr1
+                  rr3 = dmpe(3) - scalek*rr3
+                  rr5 = dmpe(5) - scalek*rr5
+                  rr7 = dmpe(7) - scalek*rr7
+                  rr9 = dmpe(9) - scalek*rr9
                   e = term1*rr1 + term2*rr3 + term3*rr5
      &                   + term4*rr7 + term5*rr9
                end if

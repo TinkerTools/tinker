@@ -57,6 +57,12 @@
                  multipole force field. The original 2004 version and
                  current 2013 version are provided.
 
+      basic      A generic parameter file intended to enable simple
+                 geometry optimization of crude structures to avoid
+                 steric clashes. The bond, angle and torsion parameters
+                 are set to idealized values. The vdw values are loosely
+                 based on OPLS. Electrostatics is largely neglected.
+
       charmm19   CHARMM19 parameters for proteins and water. The nucleic
                  acid values are not yet implemented. There are some
                  differences between authentic CHARMM19 and the Tinker
@@ -100,10 +106,8 @@
 
       iwater     The current AMOEBA water parameters for a polarizable
                  multipole model including only "direct" (non-iterative)
-                 polarization. The parameters were fit to a variety of
-                 water properties using the Force Balance method of
-                 Lee-Ping Wang.
-
+                 polarization. The parameters were fit using the Force
+                 Balance method.
 
       mm2        Full MM2(1991) parameters including pi-systems. The
                  anomeric and electronegativity correction terms are
@@ -142,15 +146,15 @@
 
       smoothua   Similar to SMOOTHAA, but based on OPLS-UA parameters.
 
-      tiny       A generic parameter file intended to enable simple
-                 geometry optimization of crude structures to avoid
-                 steric clashes. The bond, angle and torsion parameters
-                 are set to idealized values. The vdw values are loosely
-                 based on OPLS. Electrostatics is neglected completely.
+      water03    The original 2003 AMOEBA water model parameters for a
+                 polarizable multipole electrostatics model.
 
-      water      The current AMOEBA water parameters for a polarizable
-                 multipole electrostatics model. This model is equal to
-                 or better than the best available water models for many
-                 bulk and cluster properties. The AMOEBA 2003 and 2014
-                 water models and the HIPPO 2019 model are provided.
+      water14    Parameters for a revision of the 2003 AMOEBA water model
+                 fit to cluster data and a number of liquid properties
+                 using the Force Balance optimization method.
 
+      water19    Initial unpublished parameters for a HIPPO water model
+                 fit to clusters, liquid properties and ice without and
+                 charge flux terms.
+
+      water21    Final HIPPO water parameters including charge flux terms.

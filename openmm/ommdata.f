@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  2017  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ommdata  --  copy data from Tinker to OpenMM  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ommdata  --  transfer Tinker data to OpenMM  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "ommdata" uses calls to the OpenMM interface to copy data
@@ -61,6 +61,7 @@ c
       use potent
       use restrn
       use sizes
+      use solpot
       use solute
       use stodyn
       use strbnd
@@ -96,10 +97,10 @@ c
       call set_bound_data (polycut,polycut2,use_bounds,use_replica,
      &                     use_polymer)
       call set_boxes_data (xbox,ybox,zbox,alpha,beta,gamma,xbox2,
-     &                     ybox2,zbox2,box34,volbox,beta_sin,beta_cos,
+     &                     ybox2,zbox2,box23,volbox,beta_sin,beta_cos,
      &                     gamma_sin,gamma_cos,beta_term,gamma_term,
      &                     lvec,recip,orthogonal,monoclinic,triclinic,
-     &                     octahedron,spacegrp)
+     &                     octahedron,dodecadron,nonprism,spacegrp)
       call set_cell_data (ncell,icell,xcell,ycell,zcell,
      &                    xcell2,ycell2,zcell2)
       call set_charge_data (nion,iion,jion,kion,pchg)
@@ -164,24 +165,26 @@ c
      &                      p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
      &                      d1scale,d2scale,d3scale,d4scale,u1scale,
      &                      u2scale,u3scale,u4scale,w2scale,w3scale,
-     &                      w4scale,w5scale,udiag,use_thole,poltyp)
+     &                      w4scale,w5scale,udiag,polprt,dpequal,
+     &                      use_thole,use_dirdamp,poltyp)
       call set_potent_data (use_bond,use_angle,use_strbnd,use_urey,
      &                      use_angang,use_opbend,use_opdist,use_improp,
      &                      use_imptor,use_tors,use_pitors,use_strtor,
      &                      use_angtor,use_tortor,use_vdw,use_repuls,
      &                      use_disp,use_charge,use_chgdpl,use_dipole,
-     &                      use_mpole,use_polar,use_chgtrn,use_rxnfld,
-     &                      use_solv,use_metal,use_geom,use_extra,
-     &                      use_born,use_orbit)
+     &                      use_mpole,use_polar,use_chgtrn,use_chgflx,
+     &                      use_rxnfld,use_solv,use_metal,use_geom,
+     &                      use_extra,use_born,use_orbit)
       call set_restrn_data (npfix,ndfix,nafix,ntfix,ngfix,nchir,ipfix,
      &                      kpfix,idfix,iafix,itfix,igfix,ichir,depth,
      &                      width,rwall,xpfix,ypfix,zpfix,pfix,dfix,
      &                      afix,tfix,gfix,chir,use_basin,use_wall)
       call set_sizes_data (maxatm,maxtyp,maxclass,maxval,maxref,
      &                     maxgrp,maxres,maxfix)
+      call set_solpot_data (solvtyp,borntyp)
       call set_solute_data (doffset,p1,p2,p3,p4,p5,rsolv,asolv,rborn,
      &                      drb,drbp,drobc,gpol,shct,aobc,bobc,gobc,
-     &                      vsolv,wace,s2ace,uace,solvtyp,borntyp)
+     &                      vsolv,wace,s2ace,uace)
       call set_stodyn_data (friction,fgamma,use_sdarea)
       call set_strbnd_data (nstrbnd,isb,sbk)
       call set_strtor_data (nstrtor,ist,kst)

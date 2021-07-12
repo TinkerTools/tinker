@@ -23,6 +23,7 @@ c
       use inform
       use iounit
       use limits
+      use polpot
       implicit none
       integer i,ncalls,next
       integer, allocatable :: hindex(:)
@@ -109,6 +110,7 @@ c     set a large Hessian cutoff and turn off extra printing
 c
       hesscut = 1.0d0
       verbose = .false.
+      polprt = .false.
 c
 c     run the potential energy only timing experiment
 c

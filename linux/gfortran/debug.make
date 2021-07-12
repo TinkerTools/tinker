@@ -32,6 +32,7 @@ gfortran -c -Wall bndstr.f
 gfortran -c -Wall bound.f
 gfortran -c -Wall boxes.f
 gfortran -c -Wall cell.f
+gfortran -c -Wall cflux.f
 gfortran -c -Wall charge.f
 gfortran -c -Wall chgpen.f
 gfortran -c -Wall chgpot.f
@@ -71,6 +72,7 @@ gfortran -c -Wall kangs.f
 gfortran -c -Wall kantor.f
 gfortran -c -Wall katoms.f
 gfortran -c -Wall kbonds.f
+gfortran -c -Wall kcflux.f
 gfortran -c -Wall kchrge.f
 gfortran -c -Wall kcpen.f
 gfortran -c -Wall kctrn.f
@@ -87,6 +89,7 @@ gfortran -c -Wall korbs.f
 gfortran -c -Wall kpitor.f
 gfortran -c -Wall kpolr.f
 gfortran -c -Wall krepl.f
+gfortran -c -Wall ksolut.f
 gfortran -c -Wall kstbnd.f
 gfortran -c -Wall ksttor.f
 gfortran -c -Wall ktorsn.f
@@ -151,6 +154,7 @@ gfortran -c -Wall scales.f
 gfortran -c -Wall sequen.f
 gfortran -c -Wall shunt.f
 gfortran -c -Wall socket.f
+gfortran -c -Wall solpot.f
 gfortran -c -Wall solute.f
 gfortran -c -Wall stodyn.f
 gfortran -c -Wall strbnd.f
@@ -181,6 +185,7 @@ gfortran -c -Wall zcoord.f
 #
 gfortran -c -Wall active.f
 gfortran -c -Wall alchemy.f
+gfortran -c -Wall alterchg.f
 gfortran -c -Wall analysis.f
 gfortran -c -Wall analyze.f
 gfortran -c -Wall angles.f
@@ -211,10 +216,12 @@ gfortran -c -Wall connect.f
 gfortran -c -Wall connolly.f
 gfortran -c -Wall control.f
 gfortran -c -Wall correlate.f
+gfortran -c -Wall critical.f
 gfortran -c -Wall crystal.f
 gfortran -c -Wall cspline.f
 gfortran -c -Wall cutoffs.f
 gfortran -c -Wall damping.f
+gfortran -c -Wall dcflux.f
 gfortran -c -Wall deflate.f
 gfortran -c -Wall delete.f
 gfortran -c -Wall diagq.f
@@ -409,6 +416,7 @@ gfortran -c -Wall kangtor.f
 gfortran -c -Wall katom.f
 gfortran -c -Wall kbond.f
 gfortran -c -Wall kcharge.f
+gfortran -c -Wall kchgflx.f
 gfortran -c -Wall kchgtrn.f
 gfortran -c -Wall kdipole.f
 gfortran -c -Wall kdisp.f
@@ -436,6 +444,7 @@ gfortran -c -Wall kvdw.f
 gfortran -c -Wall lattice.f
 gfortran -c -Wall lbfgs.f
 gfortran -c -Wall lights.f
+gfortran -c -Wall lusolve.f
 gfortran -c -Wall makeint.f
 gfortran -c -Wall makeref.f
 gfortran -c -Wall makexyz.f
@@ -486,6 +495,7 @@ gfortran -c -Wall polarize.f
 gfortran -c -Wall poledit.f
 gfortran -c -Wall polymer.f
 gfortran -c -Wall potential.f
+gfortran -c -Wall predict.f
 gfortran -c -Wall pressure.f
 gfortran -c -Wall prmedit.f
 gfortran -c -Wall prmkey.f
@@ -502,7 +512,7 @@ gfortran -c -Wall prtxyz.f
 gfortran -c -Wall pss.f
 gfortran -c -Wall pssrigid.f
 gfortran -c -Wall pssrot.f
-gfortran -c -Wall qrfact.f
+gfortran -c -Wall qrsolve.f
 gfortran -c -Wall quatfit.f
 gfortran -c -Wall radial.f
 gfortran -c -Wall random.f

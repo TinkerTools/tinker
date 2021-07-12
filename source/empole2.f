@@ -19,6 +19,7 @@ c
       subroutine empole2 (i)
       use atoms
       use deriv
+      use energi
       use hessn
       use mpole
       use potent
@@ -227,6 +228,7 @@ c
       real*8 term1k,term2k,term3k
       real*8 term1ik,term2ik,term3ik
       real*8 term4ik,term5ik
+      real*8 poti,potk
       real*8 frcx,frcy,frcz
       real*8 ttmi(3),ttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
@@ -234,6 +236,10 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: pot(:)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
       logical proceed
       logical usei,usek
       character*6 mode
@@ -252,14 +258,19 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (pot(n))
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
 c
-c     initialize connected atom scaling and torque arrays
+c     initialize scaling, torque and potential arrays
 c
       do i = 1, n
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
          end do
+         pot(i) = 0.0d0
       end do
 c
 c     set conversion factor, cutoff and switching coefficients
@@ -267,6 +278,10 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     alter partial charges and multipoles for charge flux
+c
+      if (use_chgflx)  call alterchg
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -479,7 +494,6 @@ c
                   term5 = -2.0d0 * (corei*rr5k+vali*rr5ik
      &                                +dir*rr7ik+qir*rr9ik)
                   term6 = 4.0d0 * rr7ik
-                  rr3 = rr3ik
 c
 c     find standard multipole intermediates for force and torque
 c
@@ -500,6 +514,26 @@ c
                   term6 = 4.0d0 * rr7
                end if
 c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*dmpi(1) + valk*dmpik(1) 
+                     term1k = corei*dmpk(1) + vali*dmpik(1) 
+                     term2i = -dkr * dmpik(3)
+                     term2k = dir * dmpik(3)
+                     term3i = qkr * dmpik(5)
+                     term3k = qir * dmpik(5)
+                     poti = term1i*rr1 + term2i*rr3 + term3i*rr5
+                     potk = term1k*rr1 + term2k*rr3 + term3k*rr5
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
+               end if 
+c
 c     compute the force components for this interaction
 c
                frcx = de*xr + term1*dix + term2*dkx
@@ -514,6 +548,7 @@ c
 c
 c     compute the torque components for this interaction
 c
+               if (use_chgpen)  rr3 = rr3ik
                ttmi(1) = -rr3*dikx + term1*dirx
      &                      + term3*(dqikx+dkqirx)
      &                      - term4*qirx - term6*(qikrx+qikx)
@@ -813,6 +848,26 @@ c
                   term6 = 4.0d0 * rr7
                end if
 c
+c     store the potential at each site for use in charge flux
+c
+               if (use_chgflx) then
+                  if (use_chgpen) then
+                     term1i = corek*dmpi(1) + valk*dmpik(1) 
+                     term1k = corei*dmpk(1) + vali*dmpik(1) 
+                     term2i = -dkr * dmpik(3)
+                     term2k = dir * dmpik(3)
+                     term3i = qkr * dmpik(5)
+                     term3k = qir * dmpik(5)
+                     poti = term1i*rr1 + term2i*rr3 + term3i*rr5
+                     potk = term1k*rr1 + term2k*rr3 + term3k*rr5
+                  else
+                     poti = ck*rr1 - dkr*rr3 + qkr*rr5
+                     potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  pot(i) = pot(i) + poti
+                  pot(k) = pot(k) + potk
+               end if 
+c
 c     compute the force components for this interaction
 c
                frcx = de*xr + term1*dix + term2*dkx
@@ -913,8 +968,28 @@ c
          call torque (ii,tem(1,i),fix,fiy,fiz,dem)
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx) then
+         call dcflux (pot,decfx,decfy,decfz)
+         do ii = 1, npole
+            i = ipole(ii)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dem(1,i) = dem(1,i) + frcx
+            dem(2,i) = dem(2,i) + frcy
+            dem(3,i) = dem(3,i) + frcz
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
+      deallocate (tem)
+      deallocate (pot)
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end

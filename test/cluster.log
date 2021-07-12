@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                          Version 8.7  June 2019                          ##
+ ##                         Version 8.9.1  June 2021                         ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2019               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -15,23 +15,23 @@
 
  Enter Cartesian Coordinate File Name :  
  Enter the Initial Mean Squared Gaussian Width [200.0] :  
- Additional Atom Type Parameters :
+ Additional Atom Definition Parameters :
 
      Type  Class  Symbol  Description               Atomic    Mass   Valence
 
-     175    175     Ar    Argon Atom                  18     39.948     0
-
- Additional van der Waals Parameters :
-
-     Atom Class               Size        Epsilon        Reduction
-
-         175                3.3610         0.2824          0.000
+      175   175     Ar    Argon Atom                  18     39.948     0
 
  Additional Atomic Partial Charge Parameters :
 
      Atom Type              Charge
 
          175                0.0000
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+         175                3.3610         0.2824          0.000
 
  Enter Number of Annealing Trials [1] :  
  Enter Initial and Final Beta [0.01, 10**10] :  

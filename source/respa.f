@@ -41,7 +41,7 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer istep
       integer nalt
       real*8 dt,dt_2
@@ -73,12 +73,11 @@ c
 c     store the current atom positions, then find half-step
 c     velocities via velocity Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         m = iuse(i)
+         do j = 1, 3
+            v(j,m) = v(j,m) + a(j,m)*dt_2
+         end do
       end do
 c
 c     initialize virial from fast-evolving potential energy terms
@@ -99,18 +98,17 @@ c
 c     find fast-evolving velocities and positions via Verlet recursion
 c
       do k = 1, nalt
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  v(j,i) = v(j,i) + aalt(j,i)*dta_2
-               end do
-               xold(i) = x(i)
-               yold(i) = y(i)
-               zold(i) = z(i)
-               x(i) = x(i) + v(1,i)*dta
-               y(i) = y(i) + v(2,i)*dta
-               z(i) = z(i) + v(3,i)*dta
-            end if
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3
+               v(j,m) = v(j,m) + aalt(j,m)*dta_2
+            end do
+            xold(m) = x(m)
+            yold(m) = y(m)
+            zold(m) = z(m)
+            x(m) = x(m) + v(1,m)*dta
+            y(m) = y(m) + v(2,m)*dta
+            z(m) = z(m) + v(3,m)*dta
          end do
          if (use_rattle)  call rattle (dta,xold,yold,zold)
 c
@@ -121,13 +119,12 @@ c
 c     use Newton's second law to get fast-evolving accelerations;
 c     update fast-evolving velocities using the Verlet recursion
 c
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  aalt(j,i) = -ekcal * derivs(j,i) / mass(i)
-                  v(j,i) = v(j,i) + aalt(j,i)*dta_2
-               end do
-            end if
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3
+               aalt(j,m) = -ekcal * derivs(j,m) / mass(m)
+               v(j,m) = v(j,m) + aalt(j,m)*dta_2
+            end do
          end do
          if (use_rattle)  call rattle2 (dta)
 c
@@ -143,15 +140,14 @@ c
 c     apply Verlet half-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-                  uaux(j,i) = uaux(j,i) + vaux(j,i)*dt
-                  upaux(j,i) = upaux(j,i) + vpaux(j,i)*dt
-               end do
-            end if
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3
+               vaux(j,m) = vaux(j,m) + aaux(j,m)*dt_2
+               vpaux(j,m) = vpaux(j,m) + apaux(j,m)*dt_2
+               uaux(j,m) = uaux(j,m) + vaux(j,m)*dt
+               upaux(j,m) = upaux(j,m) + vpaux(j,m)*dt
+            end do
          end do
       end if
 c
@@ -168,28 +164,26 @@ c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
 c
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               a(j,i) = -ekcal * derivs(j,i) / mass(i)
-               v(j,i) = v(j,i) + a(j,i)*dt_2
-            end do
-         end if
+      do i = 1, nuse
+         m = iuse(i)
+         do j = 1, 3
+            a(j,m) = -ekcal * derivs(j,m) / mass(m)
+            v(j,m) = v(j,m) + a(j,m)*dt_2
+         end do
       end do
 c
 c     apply Verlet full-step updates for any auxiliary dipoles
 c
       if (use_ielscf) then
          term = 2.0d0 / (dt*dt)
-         do i = 1, n
-            if (use(i)) then
-               do j = 1, 3
-                  aaux(j,i) = term * (uind(j,i)-uaux(j,i))
-                  apaux(j,i) = term * (uinp(j,i)-upaux(j,i))
-                  vaux(j,i) = vaux(j,i) + aaux(j,i)*dt_2
-                  vpaux(j,i) = vpaux(j,i) + apaux(j,i)*dt_2
-               end do
-            end if
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3
+               aaux(j,m) = term * (uind(j,m)-uaux(j,m))
+               apaux(j,m) = term * (uinp(j,m)-upaux(j,m))
+               vaux(j,m) = vaux(j,m) + aaux(j,m)*dt_2
+               vpaux(j,m) = vpaux(j,m) + apaux(j,m)*dt_2
+            end do
          end do
       end if
 c

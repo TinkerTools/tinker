@@ -12,15 +12,15 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "document" generates a formatted description of all the code
-c     modules or common blocks, an index of routines called by each
-c     source code module, a listing of all valid keywords, a list of
-c     include file dependencies as needed by a Unix-style Makefile,
-c     or a formatted force field parameter set summary
+c     "document" generates a formatted description of all the routines
+c     and modules, an index of routines called by each source file, a
+c     list of all valid keywords, a list of include file dependencies
+c     as needed by a Unix-style Makefile, or a formatted force field
+c     parameter summary
 c
-c     note the logical variable "wiki" should be set true to make
-c     output suitable for inclusion in the Tinker User's Guide
-c     under MediaWiki
+c     note the logical variable "sphinx" should be set true to make
+c     output suitable for inclusion in the Tinker User's Guide built
+c     via the Sphinx documentation generator
 c
 c
       program document
@@ -30,73 +30,69 @@ c
       integer maxunit
       integer maxword
       integer maxfunc
-      parameter (maxline=100)
-      parameter (maxunit=1000)
-      parameter (maxword=1000)
-      parameter (maxfunc=73)
+      parameter (maxline=1000)
+      parameter (maxunit=10000)
+      parameter (maxword=10000)
+      parameter (maxfunc=76)
       integer i,j,k,mode
-      integer idoc,isrc
+      integer idoc,isrc,next
       integer nkey,nunit
-      integer next,leng
+      integer leng,size
       integer start,last
       integer freeunit
       integer trimtext
       integer nexttext
-      integer nline(maxunit)
-      integer link(maxunit)
-      logical exist,done,wiki
+      integer, allocatable :: nline(:)
+      integer, allocatable :: link(:)
+      logical exist,done,sphinx
       character*20 module
       character*20 keyword
       character*20 keylast
       character*20 fname1,fname2
-      character*20 key(maxword)
       character*20 fname(maxfunc)
+      character*20, allocatable :: key(:)
       character*240 docfile
       character*240 srcfile
       character*240 record
       character*240 string
-      character*240 routine(maxunit)
-      character*240 info(maxline,maxunit)
+      character*230, allocatable :: routine(:)
+      character*240, allocatable :: info(:,:)
       character*2048 field
 c
 c     list of the Fortran functions in the Tinker package
 c
       data fname / 'ADJACENT',  'ANGGUESS',  'ANORM',     'BETACF',
      &             'BETAI',     'BMAX',      'BNDERR',    'BNDGUESS',
-     &             'CHIRER',    'CJKM',      'D1D2',      'DEPTH',
-     &             'DIST2',     'DOT',       'ENERGY',    'ERF',
-     &             'ERFC',      'ERFINV',    'FREEUNIT',  'GAMMLN',
-     &             'GDA2',      'GEOMETRY',  'INITERR',   'INVBETA',
-     &             'LOCERR',    'MAXWELL',   'MCM1',      'MCMSTEP',
-     &             'MIDERR',    'MINIMIZ1',  'MINIROT1',  'MINRIGID1',
-     &             'NEWTON1',   'NEWTROT1',  'NEXTTEXT',  'NORMAL',
-     &             'NUMBER',    'OPBGUESS',  'OPTIMIZ1',  'OPTIROT1',
-     &             'OPTRIGID1', 'PATH1',     'PAULING1',  'POTFIT1',
-     &             'POTNRG',    'PRECISE',   'PRIORITY',  'PROPERTY',
-     &             'PSS1',      'PSSRGD1',   'PSSROT1',   'PTINCY',
-     &             'RANDOM',    'RMSFIT',    'ROTANG',    'ROTCHECK',
-     &             'SADDLE1',   'SCAN1',     'SIGMOID',   'SNIFFER1',
-     &             'TORFIT1',   'TORSER',    'TOTERR',    'TRANSIT',
-     &             'TRIMTEXT',  'TRIPLE',    'URYGUESS',  'VALFIT1',
-     &             'VALRMS',    'VDWERR',    'VECANG',    'WATSON1',
-     &             'XTALMIN1' /
+     &             'BOXMIN1',   'CHIRER',    'CHKAROM',   'CJKM',
+     &             'D1D2',      'DEPTH',     'DIST2',     'DOT',
+     &             'ENERGY',    'ERF',       'ERFC',      'ERFINV',
+     &             'FREEUNIT',  'GAMMLN',    'GDA2',      'GEOMETRY',
+     &             'INITERR',   'INVBETA',   'LOCERR',    'MAXWELL',
+     &             'MCM1',      'MCMSTEP',   'MIDERR',    'MINIMIZ1',
+     &             'MINIROT1',  'MINRIGID1', 'NEWTON1',   'NEWTROT1',
+     &             'NEXTTEXT',  'NORMAL',    'NUMBER',    'OPBGUESS',
+     &             'OPTFIT',    'OPTIMIZ1',  'OPTIROT1',  'OPTRIGID1',
+     &             'PATH1',     'PAULING1',  'POTNRG',    'PRIORITY',
+     &             'PROPERTY',  'PSS1',      'PSSRGD1',   'PSSROT1',
+     &             'PTINCY',    'RANDOM',    'RMSFIT',    'ROTANG',
+     &             'ROTCHECK',  'SADDLE1',   'SCAN1',     'SIGMOID',
+     &             'SIMPLEX1',  'SNIFFER1',  'TORFIT1',   'TORSER',
+     &             'TOTERR',    'TRANSIT',   'TRIMTEXT',  'TRIPLE',
+     &             'URYGUESS',  'VALFIT1',   'VALMIN1',   'VALRMS',
+     &             'VDWERR',    'VECANG',    'WATSON1',   'XTALMIN1' /
 c
 c
-c     set flag to format for Tinker User's Guide under MediaWiki
-c
-      wiki = .true.
-c
-c     find out what documentation the user wants to generate
+c     select the type of documentation that is to be generated
 c
       call initial
       write (iout,10)
    10 format (/,' The Tinker Documentation Utility Can :',
-     &        //,4x,'(1) List of Routines from a Source File',
-     &        /,4x,'(2) List of Calls made by each Routine',
-     &        /,4x,'(3) List of Common Blocks from Source',
-     &        /,4x,'(4) List of the Tinker Option Keywords',
-     &        /,4x,'(5) List of Used Module Dependencies',
-     &        /,4x,'(6) Documentation from a Parameter File')
+     &        //,4x,'(1) List Routines Contained in a Source File',
+     &        /,4x,'(2) Generate List of Calls made by Routines',
+     &        /,4x,'(3) List Global Variables from a Module',
+     &        /,4x,'(4) Generate List of Tinker Keyword Options',
+     &        /,4x,'(5) Construct a Module Dependency List',
+     &        /,4x,'(6) Produce a Summary from a Parameter File')
       mode = 0
       call nextarg (string,exist)
       if (exist)  read (string,*,err=20,end=20)  mode
@@ -127,6 +123,17 @@ c
          end do
          open (unit=isrc,file=srcfile,status='old')
       end if
+c
+c     choose to make output for Sphinx documentation generator
+c
+      sphinx = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (nline(maxunit))
+      allocate (link(maxunit))
+      allocate (routine(maxunit))
+      allocate (info(maxline,maxunit))
 c
 c     get a list of routines and descriptions from source code
 c
@@ -178,9 +185,9 @@ c
          do i = 1, nunit
             string = routine(i)
             leng = trimtext (string)
-            if (wiki) then
+            if (sphinx) then
                write (idoc,110)  string(1:leng)
-  110          format ('''''''',a,'''''''',/)
+  110          format ('**',a,'**',/)
             else
                write (idoc,120)  string(1:leng)
   120          format (a,/)
@@ -189,37 +196,18 @@ c
             j = link(i)
             do k = 1, nline(j)
                string = info(k,j)
-               if (wiki) then
-                  if (k .eq. 1) then
-                     leng = trimtext (string)
-                     field(1:leng) = string(1:leng)
-                     last = leng
-                  else
-                     last = last + 1
-                     field(last:last) = ' '
-                     leng = trimtext (string)
-                     field(last+1:last+leng) = string(1:leng)
-                     last = last + leng
-                  end if
-               else
-                  string = info(k,j)
-                  leng = trimtext (string)
-                  write (idoc,130)  string(1:leng)
-  130             format (a)
-               end if
+               leng = trimtext (string)
+               write (idoc,130)  string(1:leng)
+  130          format (a)
             end do
-            if (wiki .and. last.ne.0) then
-               write (idoc,140)  field(1:last)
-  140          format (a)
-            end if
             if (nline(j) .ne. 0) then
-               write (idoc,150)
-  150          format ()
+               write (idoc,140)
+  140          format ()
             end if
          end do
          close (unit=idoc)
-         write (iout,160)  docfile(1:trimtext(docfile))
-  160    format (/,' Source Documentation Written To :  ',a)
+         write (iout,150)  docfile(1:trimtext(docfile))
+  150    format (/,' Source Documentation Written To :  ',a)
       end if
 c
 c     get a list of the calls made by each source code routine
@@ -227,8 +215,8 @@ c
       if (mode .eq. 2) then
          nunit = 0
          do while (.true.)
-            read (isrc,170,err=180,end=180)  record
-  170       format (a240)
+            read (isrc,160,err=170,end=170)  record
+  160       format (a240)
             call upcase (record)
             if (record(1:1) .ne. 'C') then
                next = 1
@@ -260,7 +248,7 @@ c
                end if
             end if
          end do
-  180    continue
+  170    continue
          close (unit=isrc)
          call sort7 (nunit,routine,link)
          idoc = freeunit ()
@@ -272,57 +260,45 @@ c
             leng = trimtext (string)
             j = link(i)
             call sort10 (nline(j),info(1,j))
-            if (wiki) then
-               field = string(1:leng)
-               do k = 1, nline(j)
-                  leng = trimtext (info(k,j))
-                  last = trimtext (field)
-                  field = field(1:last)//'    '//info(k,j)(1:leng)
-               end do
-               leng = trimtext (field)
-               write (idoc,190)  field(1:leng)
-  190          format (a,/)
-            else
-               write (idoc,200)  string(1:leng)
-  200          format (a)
-               do k = 1, nline(j)
-                  string = info(k,j)
-                  leng = trimtext (string)
-                  write (idoc,210)  string(1:leng)
-  210             format (5x,a)
-               end do
-            end if
+            write (idoc,180)  string(1:leng)
+  180       format (a)
+            do k = 1, nline(j)
+               string = info(k,j)
+               leng = trimtext (string)
+               write (idoc,190)  string(1:leng)
+  190          format (5x,a)
+            end do
          end do
          close (unit=idoc)
-         write (iout,220)  docfile(1:trimtext(docfile))
-  220    format (/,' Source Documentation Written To :  ',a)
+         write (iout,200)  docfile(1:trimtext(docfile))
+  200    format (/,' Source Documentation Written To :  ',a)
       end if
 c
-c     get a list of common block contents from source code
+c     get a list of global variables from contents of modules
 c
       if (mode .eq. 3) then
          nunit = 0
          do while (.true.)
-            read (isrc,230,err=260,end=260)  record
-  230       format (a240)
-            if (record(1:9) .eq. 'c     ## ') then
-               next = index (record,'.i  --')
+            read (isrc,210,err=240,end=240)  record
+  210       format (a240)
+            call upcase (record(1:17))
+            if (record(1:17) .eq. 'C     ##  MODULE ') then
+               next = index (record,'  --')
                if (next .ne. 0) then
                   nunit = nunit + 1
                   leng = trimtext (record)
-                  call upcase (record(11:next-1))
-                  string = record(11:next-1)
-                  start = 20
-                  if (wiki)  start = trimtext(string) + 5
-                  string(start:240) = record(next+8:leng-4)
+                  call upcase (record(18:next-1))
+                  string(1:next-11) = record(11:next-1)
+                  start = 17
+                  string(start:240) = record(next+6:leng-4)
                   routine(nunit) = string
-                  read (isrc,240,err=260,end=260)
-  240             format (///)
+                  read (isrc,220,err=240,end=240)
+  220             format (///)
                   k = 0
                   done = .false.
                   do while (.not. done)
-                     read (isrc,250,err=260,end=260)  record
-  250                format (a240)
+                     read (isrc,230,err=240,end=240)  record
+  230                format (a240)
                      leng = trimtext (record)
                      if (record(1:1) .eq. ' ') then
                         done = .true.
@@ -333,8 +309,7 @@ c
                         record = record(next:leng)
                         next = nexttext (record)
                         leng = trimtext (record)
-                        start = 20
-                        if (wiki)  start = trimtext(string) + 5
+                        start = 17
                         string(start:240) = record(next:leng)
                         info(k,nunit) = string
                      end if
@@ -343,56 +318,62 @@ c
                end if
             end if
          end do
-  260    continue
+  240    continue
          close (unit=isrc)
          call sort7 (nunit,routine,link)
          idoc = freeunit ()
-         docfile = 'common.doc'
+         docfile = 'modules.doc'
          call version (docfile,'new')
          open (unit=idoc,file=docfile,status='new')
          do i = 1, nunit
             string = routine(i)
             leng = trimtext (string)
-            if (wiki) then
-               write (idoc,270)  string(1:leng)
-  270          format ('''''''',a,'''''''',/)
+            if (sphinx) then
+               size = trimtext(string(8:16))
+               write (idoc,250)  string(8:7+size),
+     &                           string(17:leng)//'**'
+  250          format (/,'**',a,' Module','^^^^^^^^',a,
+     &                 //,'.. code-block:: text',/)
             else
-               write (idoc,280)  string(1:leng)
-  280          format (a,/)
+               write (idoc,260)  string(1:leng)
+  260          format (/,a)
             end if
             j = link(i)
-            if (wiki) then
-               do k = 1, nline(j)
-                  string = info(k,j)
-                  leng = trimtext (string)
-                  write (idoc,290)  string(1:leng)
-  290             format (a,/)
-               end do
-            else
-               do k = 1, nline(j)
-                  string = info(k,j)
-                  leng = trimtext (string)
-                  write (idoc,300)  string(1:leng)
-  300             format (a)
-               end do
-            end if
-            if (nline(j) .ne. 0) then
-               write (idoc,310)
-  310          format ()
-            end if
+            do k = 1, nline(j)
+               string = info(k,j)
+               leng = trimtext (string)
+               if (sphinx) then
+                  write (idoc,270)  string(1:leng)
+  270             format (' ',a)
+               else
+                  write (idoc,280)  string(1:leng)
+  280             format (a)
+               end if
+            end do
          end do
          close (unit=idoc)
-         write (iout,320)  docfile(1:trimtext(docfile))
-  320    format (/,' Source Documentation Written To :  ',a)
+         write (iout,290)  docfile(1:trimtext(docfile))
+  290    format (/,' Source Documentation Written To :  ',a)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (nline)
+      deallocate (link)
+      deallocate (routine)
+      deallocate (info)
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (key(maxword))
 c
 c     get the keyword values from the source code listing
 c
       if (mode .eq. 4) then
          nkey = 0
          do while (.true.)
-            read (isrc,330,err=340,end=340)  record
-  330       format (a240)
+            read (isrc,300,err=310,end=310)  record
+  300       format (a240)
             next = index (record,'if (keyword(')
             if (next .ne. 0) then
                next = index (record,'.eq.')
@@ -408,7 +389,7 @@ c
                end if
             end if
          end do
-  340    continue
+  310    continue
          close (unit=isrc)
          call sort6 (nkey,key)
          keylast = '                    '
@@ -420,14 +401,14 @@ c
             keyword = key(i)
             leng = trimtext (keyword)
             if (keyword .ne. keylast) then
-               write (idoc,350)  keyword(1:leng)
-  350          format (a)
+               write (idoc,320)  keyword(1:leng)
+  320          format (a)
                keylast = keyword
             end if
          end do
          close (unit=idoc)
-         write (iout,360)  docfile(1:trimtext(docfile))
-  360    format (/,' Keyword Listing Written To :  ',a)
+         write (iout,330)  docfile(1:trimtext(docfile))
+  330    format (/,' Keyword Listing Written To :  ',a)
       end if
 c
 c     get the used modules from the source code listing
@@ -435,8 +416,8 @@ c
       if (mode .eq. 5) then
          nkey = 0
          do while (.true.)
-            read (isrc,370,err=380,end=380)  record
-  370       format (a240)
+            read (isrc,340,err=350,end=350)  record
+  340       format (a240)
             next = 1
             call getword (record,keyword,next)
             if (keyword .eq. 'use') then
@@ -446,7 +427,7 @@ c
                key(nkey) = keyword
             end if
          end do
-  380    continue
+  350    continue
          close (unit=isrc)
          call sort6 (nkey,key)
          keylast = '                    '
@@ -461,12 +442,16 @@ c
                keylast = keyword
             end if
          end do
-         write (iout,390)
-  390    format (/,' File Dependencies in Makefile Format :',/)
+         write (iout,360)
+  360    format (/,' File Dependencies in Makefile Format :',/)
          leng = trimtext (field)
-         write (iout,400)  field (1:leng)
-  400    format (a)
+         write (iout,370)  field (1:leng)
+  370    format (a)
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (key)
 c
 c     get a force field parameter file and write a listing
 c
@@ -478,8 +463,8 @@ c
          open (unit=idoc,file=docfile,status='new')
          call prtprm (idoc)
          close (unit=idoc)
-         write (iout,410)  docfile(1:trimtext(docfile))
-  410    format (/,' Parameter Listing Written To :  ',a)
+         write (iout,380)  docfile(1:trimtext(docfile))
+  380    format (/,' Parameter Listing Written To :  ',a)
       end if
 c
 c     perform any final tasks before program exit

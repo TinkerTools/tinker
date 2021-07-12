@@ -13,19 +13,19 @@ c     ##################################################################
 c
 c
 c     "square" is a nonlinear least squares routine derived from the
-c     IMSL BCLSF routine and the MINPACK LMDER routine; the Jacobian
-c     is estimated by finite differences and bounds can be specified
-c     for the variables to be refined
+c     IMSL BCLSF and MINPACK LMDER routines; the Jacobian is estimated
+c     by finite differences and bounds are specified for the variables
+c     to be refined
 c
 c     literature references:
 c
-c     B. S. Garbow, K. E. Hillstrom and J. J. More, "MINPACK Subroutine
-c     LMDER", Argonne National Laboratory, March 1980
-c
 c     "BCLSF: Solve Nonlinear Least Squares Problems Subject to Bounds
 c     on the Variables Using a Modified Levenberg-Marquardt Algorithm
-c     and a Finite-Difference Jacobian", IMSL Fortran Library V7.0,
-c     Rogue Wave Software, October 2010
+c     and a Finite-Difference Jacobian", IMSL Fortran Math Library,
+c     Version 2020.0, Rogue Wave Software, 2019
+c
+c     B. S. Garbow, K. E. Hillstrom and J. J. More, "MINPACK Subroutine
+c     LMDER", Argonne National Laboratory, March 1980
 c
 c     arguments and variables:
 c
@@ -74,9 +74,9 @@ c
       real*8 rftol,faketol
       real*8 xtemp,stepsz
       real*8 amu,sum,temp
-      real*8 xc(*)
       real*8 xlo(*)
       real*8 xhi(*)
+      real*8 xc(*)
       real*8 fc(*)
       real*8 gc(*)
       real*8, allocatable :: xp(:)
@@ -136,6 +136,10 @@ c
             read (string,*,err=10,end=10)  fctmin
          else if (keyword(1:8) .eq. 'MAXITER ') then
             read (string,*,err=10,end=10)  maxiter
+         else if (keyword(1:8) .eq. 'STEPMAX ') then
+            read (string,*,err=10,end=10)  stpmax
+         else if (keyword(1:8) .eq. 'STEPMIN ') then
+            read (string,*,err=10,end=10)  stpmin
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
@@ -253,7 +257,7 @@ c
    40       format (i6,f14.4,2f13.4,2i10)
          else
             write (iout,50)  niter,fcnorm,gcnorm,ganorm,nactive,ncalls
-   50       format (i6,f14.4,2d13.4,2i10)
+   50       format (i6,d14.4,2d13.4,2i10)
          end if
       end if
 c
@@ -365,9 +369,9 @@ c
          end do
          fcnorm = fpnorm
 c
-c     update the active vs inactive status of the variables;
-c     in a true active set strategy, at most one constraint is
-c     added to the active set per iteration (via goto's below)
+c     update the active vs inactive status of the variables; in a
+c     true active set strategy, at most one constraint is added to
+c     the active set per iteration (via goto statements below)
 c
          do j = 1, n
             if (iactive(j) .eq. 0) then
@@ -382,7 +386,7 @@ c                 goto 60
                end if
             end if
          end do
-   60    continue
+c  60    continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
@@ -444,12 +448,12 @@ c
             else
                write (iout,80)  niter,fcnorm,gcnorm,ganorm,
      &                          nactive,ncalls
-   80          format (i6,f14.4,2d13.4,2i10)
+   80          format (i6,d14.4,2d13.4,2i10)
             end if
          end if
 c
 c     check stopping criteria at the new point; test the absolute
-c     function value, the gradient norm and step for termination
+c     function value, gradient norm and step norm for termination
 c
          if (fcnorm .le. fctmin)  done = .true.
          if (ganorm .le. grdmin)  done = .true.
@@ -458,12 +462,12 @@ c
             temp = max(abs(xc(j)),1.0d0/xscale(j))
             stpnorm = stpnorm + (sc(j)/temp)**2
          end do
-         stpnorm = sqrt(stpnorm/n)
+         stpnorm = sqrt(stpnorm/dble(n))
          if (stpnorm .le. stpmin)  done = .true.
 c
 c     check for inactive variables that can be made active; in a true
 c     active set strategy, variables are released one at a time at a
-c     minimum of the current active set (via if done and goto's below)
+c     minimum of the current active set (via goto statements below)
 c
 c        if (done) then
             if (nactive .ne. n) then
@@ -480,7 +484,7 @@ c                    goto 90
 c                    goto 90
                   end if
                end do
-   90          continue
+c  90          continue
             end if
 c        end if
 c
@@ -488,16 +492,16 @@ c     if still done, then normal termination has been achieved
 c
          if (done) then
             write (iout,100)
-  100       format (/,' SQUARE  --  Normal Termination of Least Squares'
-     &)
+  100       format (/,' SQUARE  --  Normal Termination of',
+     &                 ' Least Squares')
 c
 c     check the limit on the number of iterations
 c
          else if (niter .ge. maxiter) then
             done = .true.
             write (iout,110)
-  110       format (/,' SQUARE  --  Incomplete Convergence due to',
-     &                 ' IterLimit')
+  110       format (/,' SQUARE  --  Incomplete Convergence due',
+     &                 ' to IterLimit')
 c
 c     check for termination due to relative function convergence
 c
@@ -577,8 +581,8 @@ c     ################################################################
 c
 c
 c     "lmstep" computes a Levenberg-Marquardt step during a nonlinear
-c     least squares calculation using ideas from the MINPACK LMPAR
-c     routine and the internal doubling strategy of Dennis and Schnabel
+c     least squares based on the IMSL U7LSF and MINPACK LMPAR routines
+c     and the internal doubling strategy of Dennis and Schnabel
 c
 c     literature reference:
 c
@@ -640,8 +644,8 @@ c
       logical first,gauss
       logical done
       save deltap,nsing
-      save phi,phip
-      integer kiter
+      save gnleng,sgnorm
+      save phi,phip,phipi
 c
 c
 c     set minima for floating point magnitude and spacing
@@ -879,8 +883,8 @@ c     ##############################################################
 c
 c
 c     "trust" updates the model trust region for a nonlinear least
-c     squares calculation based on ideas found in NL2SOL and Dennis
-c     and Schnabel's book
+c     squares calculation based on the IMSL B4LSF routine and the
+c     NL2SOL method of Dennis and colleagues
 c
 c     literature reference:
 c
@@ -905,20 +909,20 @@ c     xscale    vector containing the diagonal scaling matrix for x
 c     gauss     flag set to true when the Gauss-Newton step is taken
 c     stpmax    maximum allowable step size
 c     delta     trust region radius with value retained between calls
-c     icode     return code values, set upon exit
-c                 0  means xp accepted as next iterate, delta
-c                      is trust region for next iteration
-c                 1  means the algorithm was unable to find a
-c                      satisfactory xp sufficiently distinct from xc
-c                 2  means both the scaled actual and predicted
-c                      function reductions are smaller than rftol
-c                 3  means that false convergence is detected
-c                 4  means fpnorm is too large, current iteration is
-c                      continued with a new, reduced trust region
-c                 5  means fpnorm is sufficiently small, but the
-c                      chance of taking a longer successful step
-c                      seems good that the current iteration is to
-c                      be continued with a new, doubled trust region
+c     icode     return code values, set upon exit:
+c                 0  xp is accepted as the next iterate, and delta
+c                      is the trust region for next iteration
+c                 1  the algorithm was unable to find a satisfactory
+c                      xp sufficiently distinct from xc
+c                 2  both the scaled actual and predicted model
+c                      reductions are smaller than rftol
+c                 3  false convergence is detected
+c                 4  fpnorm is too large, so the current iteration
+c                      is continued with a new, reduced trust region
+c                 5  fpnorm is sufficiently small, but the chance of
+c                      taking a longer successful step seems good,
+c                      so the current iteration is to be continued
+c                      with a new, doubled trust region
 c     xp        vector of length n containing the new iterate
 c     xpprev    vector with the value of xp at the  previous call
 c                 within this iteration
@@ -947,7 +951,7 @@ c
       integer ipvt(*)
       real*8 fcnorm,stpmax
       real*8 fpnorm,fpnrmp
-      real*8 reduce,predict
+      real*8 reduce,model
       real*8 rellen,slope,eps
       real*8 stplen,stpmin
       real*8 rftol,faketol
@@ -1050,9 +1054,9 @@ c
          else
             icode = 4
             if (abs(reduce-slope) .gt. eps) then
-               temp = -slope*stplen / (2.0d0*(reduce-slope))
+               temp = -0.5d0 * slope * stplen / (reduce-slope)
             else
-               temp = -slope*stplen / 2.0d0
+               temp = -0.5d0 * slope * stplen
             end if
             if (temp .lt. 0.1d0*delta) then
                delta = 0.1d0 * delta
@@ -1063,25 +1067,25 @@ c
             end if
          end if
 c
-c     fpnorm is sufficiently small; the step is acceptable compute
-c     the predicted reduction as predict = g(T)*s + (1/2)*s(T)*h*s
+c     fpnorm is sufficiently small; step is acceptable, compute the
+c     predicted model reduction as model = g(T)*s + (1/2)*s(T)*h*s
 c     with h = p * r**t * r * p**t
 c
       else
-         predict = slope
+         model = slope
          do i = 1, nactive
             k = ipvt(i)
             temp = 0.0d0
             do j = i, nactive
                temp = temp + sa(k)*a(i,j)
             end do
-            predict = predict + 0.5d0*temp**2
+            model = model + 0.5d0*temp*temp
          end do
-         ltemp = (abs(predict-reduce) .le. 0.1d0*abs(reduce))
+         ltemp = (abs(model-reduce) .le. 0.1d0*abs(reduce))
 c
-c     if reduce and predict agree to within relative error of 0.1
-c     or if negative curvature is indicated, and a longer step is
-c     possible and delta has not been decreased this iteration,
+c     if reduce and predicted model agree to within relative error
+c     of 0.1 or if negative curvature is indicated, and a longer step
+c     is possible and delta has not been decreased this iteration,
 c     then double trust region and continue global step
 c
          if (icode.ne.4 .and. (ltemp.or.(reduce.le.slope)) .and. feas
@@ -1101,18 +1105,18 @@ c
          else
             icode = 0
             if (stplen .gt. 0.99d0*stpmax)  bigstp = .true.
-            if (reduce .ge. 0.1d0*predict) then
+            if (reduce .ge. 0.1d0*model) then
                delta = 0.5d0 * delta
-            else if (reduce .le. 0.75d0*predict) then
+            else if (reduce .le. 0.75d0*model) then
                delta = min(2.0d0*delta,stpmax)
             end if
          end if
 c
 c     check relative function convergence and false convergence
 c
-         if (reduce .le. 2.0d0*predict) then
+         if (reduce .le. 2.0d0*model) then
             if (abs(reduce).le.rftol*abs(fcnorm) .and.
-     &          abs(predict).le.rftol*abs(fcnorm)) then
+     &          abs(model).le.rftol*abs(fcnorm)) then
                icode = 2
             end if
          else

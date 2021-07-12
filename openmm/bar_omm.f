@@ -107,8 +107,8 @@ c
       use openmm
       use titles
       implicit none
-      integer i,ibar
-      integer iarc,ilog
+      integer i,ibar,iarc
+      integer ilog,imod
       integer lenga,lengb
       integer ltitlea,ltitleb
       integer nkey0,nkey1
@@ -298,12 +298,13 @@ c
             call openmm_bar_energy (ommHandle,ua0(i))
             call readxyz (iarc)
          end if
-         if (i .ge. maxframe)  abort = .true.
-         if (mod(i,100).eq.0 .or. abort) then
+         imod = mod(i,100)
+         if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
             write (iout,130)  i
   130       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
          end if
+         if (i .ge. maxframe)  abort = .true.
       end do
       if (.not. use_log)  call openmm_cleanup (ommHandle)
 c
@@ -419,12 +420,13 @@ c
             call openmm_bar_energy (ommHandle,ub1(i))
             call readxyz (iarc)
          end if
-         if (i .ge. maxframe)  abort = .true.
-         if (mod(i,100).eq.0 .or. abort) then
+         imod = mod(i,100)
+         if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
             write (iout,230)  i
   230       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
          end if
+         if (i .ge. maxframe)  abort = .true.
       end do
       if (.not. use_log)  call openmm_cleanup (ommHandle)
 c
@@ -779,7 +781,6 @@ c
 c
 c     set the frame ratio, temperature and Boltzmann factor
 c
-      term = random ()
       frma = dble(nfrma)
       frmb = dble(nfrmb)
       rfrm = frma / frmb

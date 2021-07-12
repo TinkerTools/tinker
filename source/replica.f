@@ -53,6 +53,10 @@ c
          xlimit = (sqrt(3.0d0)/4.0d0) * xbox
          ylimit = xlimit
          zlimit = xlimit
+      else if (dodecadron) then
+         xlimit = xbox2
+         ylimit = xlimit
+         zlimit = xlimit
       end if
       maximage = min(xlimit,ylimit,zlimit)
 c
@@ -64,13 +68,15 @@ c
          use_replica = .true.
       end if
 c
-c     truncated octahedron cannot use the replicates method
+c     non-prism periodic cells cannot use the replicates method
 c
-      if (octahedron .and. use_replica) then
-         write (iout,10)
-   10    format (/,' REPLICA  --  Truncated Octahedron',
-     &              ' cannot be Replicated')
-         call fatal
+      if (use_replica) then
+         if (nonprism) then
+            write (iout,10)
+   10       format (/,' REPLICA  --  Non-Parallelepiped Cells',
+     &                 ' cannot be Replicated')
+            call fatal
+         end if
       end if
 c
 c     find the number of replicates needed based on cutoff

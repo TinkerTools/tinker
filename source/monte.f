@@ -42,8 +42,7 @@ c
       integer keep,nbig
       integer nmap,lext
       integer istep,nstep
-      integer ixyz,nusave
-      integer freeunit
+      integer ixyz,freeunit
       real*8 global,ratio
       real*8 big,eps,size
       real*8 grdmin,temper
@@ -51,6 +50,8 @@ c
       real*8 tsize,factor
       real*8 beta,boltz
       real*8 random,trial
+      real*8 converge,delta
+      real*8 efficient
       real*8 vector(3)
       real*8, allocatable :: xg(:)
       real*8, allocatable :: yg(:)
@@ -61,10 +62,8 @@ c
       real*8, allocatable :: xp(:)
       real*8, allocatable :: yp(:)
       real*8, allocatable :: zp(:)
-      logical exist
-      logical reset
+      logical exist,reset,done
       logical torsmove
-      logical, allocatable :: usave(:)
       character*1 answer
       character*6 status
       character*7 ext
@@ -82,9 +81,11 @@ c
 c
 c     initialize values of some counters and parameters
 c
+      istep = 0
       keep = 0
       nbig = 0
       nmap = 0
+      delta = 0.00001d0
       eps = 0.0001d0
       big = 100000.0d0
       reset = .false.
@@ -97,40 +98,55 @@ c
    10 continue
       if (nstep .le. 0) then
          write (iout,20)
-   20    format (/,' Number of Monte Carlo Steps [1000] :  ', $)
+   20    format (/,' Maximum Number of Monte Carlo Steps [1000] :  ', $)
          read (input,30)  nstep
-   30    format (i15)
+   30    format (i10)
          if (nstep .le. 0)  nstep = 1000
       end if
+c
+c     get the search efficiency criterion for convergence
+c
+      converge = -1.0d0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=40,end=40)  converge
+   40 continue
+      if (converge .lt. 0.0d0) then
+         write (iout,50)
+   50    format (/,' Enter Search Efficiency Termination Criterion',
+     &              ' [0.01] :  ', $)
+         read (input,60)  string
+   60    format (a240)
+         read (string,*,err=70,end=70)  converge
+   70    continue
+         if (converge .lt. 0.0d0)  converge = 0.01
+      end if
+      converge = converge + delta
 c
 c     choose either the torsional or single atom move set
 c
       torsmove = .false.
       call nextarg (answer, exist)
       if (.not. exist) then
-         write (iout,40)
-   40    format (/,' Use [C]artesian or [T]orsional Moves [C] :  ',$)
-         read (input,50)  record
-   50    format (a240)
+         write (iout,80)
+   80    format (/,' Use [C]artesian or [T]orsional Moves [C] :  ',$)
+         read (input,90)  record
+   90    format (a240)
          next = 1
          call gettext (record,answer,next)
       end if
       call upcase (answer)
       if (answer .eq. 'T')  torsmove = .true.
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (usave(n))
-c
-c     generate the internal coordinates, keep active atom list
+c     for torsional moves, generate the internal coordinates
 c
       if (torsmove) then
          call makeint (0)
          call initrot
-         nusave = nuse
+c
+c     set all atoms active to simplify torsional calculation
+c
          nuse = n
          do i = 1, n
-            usave(i) = use(i)
             use(i) = .true.
          end do
       end if
@@ -139,20 +155,20 @@ c     get the desired Cartesian or torsional step size
 c
       size = -1.0d0
       call nextarg (string,exist)
-      if (exist)  read (string,*,err=60,end=60)  size
-   60 continue
+      if (exist)  read (string,*,err=100,end=100)  size
+  100 continue
       if (size .lt. 0.0d0) then
          if (torsmove) then
-            write (iout,70)
-   70       format (/,' Enter Maximum Step in Degrees [180] :  ', $)
+            write (iout,110)
+  110       format (/,' Enter Maximum Step in Degrees [180.0] :  ', $)
          else
-            write (iout,80)
-   80       format (/,' Enter Maximum Step in Angstroms [3.0] :  ', $)
+            write (iout,120)
+  120       format (/,' Enter Maximum Step in Angstroms [3.0] :  ', $)
          end if
-         read (input,90)  string
-   90    format (a240)
-         read (string,*,err=100,end=100)  size
-  100    continue
+         read (input,130)  string
+  130    format (a240)
+         read (string,*,err=140,end=140)  size
+  140    continue
          if (size .lt. 0.0d0) then
             if (torsmove) then
                size = 180.0d0
@@ -163,24 +179,6 @@ c
          if (torsmove)  size = min(size,180.0d0)
       end if
 c
-c     get the desired temperature for Metropolis criterion
-c
-      temper = -1.0d0
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=110,end=110)  temper
-  110 continue
-      if (temper .lt. 0.0d0) then
-         write (iout,120)
-  120    format (/,' Enter the Desired Temperature in Degrees',
-     &              ' K [500] :  ', $)
-         read (input,130)  string
-  130    format (a240)
-         read (string,*,err=140,end=140)  temper
-  140    continue
-         if (temper .lt. 0.0d0)  temper = 500.0d0
-      end if
-      beta = 1.0d0 / (gasconst*temper)
-c
 c     get the gradient convergence for local minimizations
 c
       grdmin = -1.0d0
@@ -189,7 +187,8 @@ c
   150 continue
       if (grdmin .lt. 0.0d0) then
          write (iout,160)
-  160    format (/,' Enter RMS Gradient Criterion [0.01] :  ', $)
+  160    format (/,' Enter RMS Gradient Criterion for Minima',
+     &              ' [0.01] :  ', $)
          read (input,170)  string
   170    format (a240)
          read (string,*,err=180,end=180)  grdmin
@@ -197,14 +196,23 @@ c
          if (grdmin .lt. 0.0d0)  grdmin = 0.01
       end if
 c
-c     print some information prior to initial iteration
+c     get the desired temperature for Metropolis criterion
 c
-      write (iout,190)
-  190 format (/,' Monte Carlo Minimization Global Search :')
-      write (iout,200)
-  200 format (/,' MCM Iter       Current         Global       Temper',
-     &           '      Ratio      Status',/)
-      flush (iout)
+      temper = -1.0d0
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=190,end=190)  temper
+  190 continue
+      if (temper .lt. 0.0d0) then
+         write (iout,200)
+  200    format (/,' Enter the Desired Temperature in Degrees',
+     &              ' K [500] :  ', $)
+         read (input,210)  string
+  210    format (a240)
+         read (string,*,err=220,end=220)  temper
+  220    continue
+         if (temper .lt. 0.0d0)  temper = 500.0d0
+      end if
+      beta = 1.0d0 / (gasconst*temper)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -217,6 +225,15 @@ c
       allocate (xp(n))
       allocate (yp(n))
       allocate (zp(n))
+c
+c     print some information prior to initial iteration
+c
+      write (iout,230)
+  230 format (/,' Monte Carlo Minimization Global Search :')
+      write (iout,240)
+  240 format (/,' MCM Iter       Current         Global',
+     &           '    Efficiency    Accept      Status',/)
+      flush (iout)
 c
 c     create and open an output file if using archive mode
 c
@@ -235,22 +252,10 @@ c
          yi(i) = y(i)
          zi(i) = z(i)
       end do
-      if (torsmove) then
-         nuse = nusave
-         do i = 1, n
-            use(i) = usave(i)
-         end do
-      end if
       call mcmstep (minimum,grdmin)
-      if (torsmove) then
-         nuse = n
-         do i = 1, n
-            use(i) = .true.
-         end do
-      end if
       pminimum = minimum
-      write (iout,210)  0,minimum
-  210 format (i8,3x,f12.4)
+      write (iout,250)  0,minimum
+  250 format (i8,3x,f12.4)
 c
 c     save coordinates as the initial global minimum
 c
@@ -280,8 +285,8 @@ c
       end if
       call prtxyz (ixyz)
       close (unit=ixyz)
-      write (iout,220)  nmap,global
-  220 format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
+      write (iout,260)  nmap,global
+  260 format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
       call flush (iout)
 c
 c     optionally reset coordinates to before the minimization
@@ -297,7 +302,9 @@ c
 c
 c     store the prior coordinates to start each MCM iteration
 c
-      do istep = 1, nstep
+      done = .false.
+      dowhile (.not. done)
+         istep = istep + 1
          do i = 1, n
             xp(i) = x(i)
             yp(i) = y(i)
@@ -324,14 +331,13 @@ c
 c     generate a random Cartesian move for each atom
 c
          else
-            do i = 1, n
-               if (use(i)) then
-                  call ranvec (vector)
-                  factor = size * random ()
-                  x(i) = x(i) + factor*vector(1)
-                  y(i) = y(i) + factor*vector(2)
-                  z(i) = z(i) + factor*vector(3)
-               end if
+            do i = 1, nuse
+               k = iuse(i)
+               call ranvec (vector)
+               factor = size * random ()
+               x(k) = x(k) + factor*vector(1)
+               y(k) = y(k) + factor*vector(2)
+               z(k) = z(k) + factor*vector(3)
             end do
          end if
 c
@@ -342,19 +348,7 @@ c
             yi(i) = y(i)
             zi(i) = z(i)
          end do
-         if (torsmove) then
-            nuse = nusave
-            do i = 1, n
-               use(i) = usave(i)
-            end do
-         end if
          call mcmstep (minimum,grdmin)
-         if (torsmove) then
-            nuse = n
-            do i = 1, n
-               use(i) = .true.
-            end do
-         end if
 c
 c     test for an unreasonably low energy at the minimum
 c
@@ -420,26 +414,33 @@ c
             end if
             call prtxyz (ixyz)
             close (unit=ixyz)
-            write (iout,230)  nmap,global
-  230       format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
+            write (iout,270)  nmap,global
+  270       format (/,4x,'Minimum Energy Structure',i7,6x,f16.4,/)
             flush (iout)
          end if
 c
-c     update the overall Monte Carlo acceptance ratio
+c     update the efficiency and Monte Carlo acceptance ratio
 c
+         efficient = dble(nmap) / dble(istep)
          if (status .eq. 'Accept')  keep = keep + 1
          ratio = dble(keep) / dble(istep)
 c
 c     print intermediate results for the current iteration
 c
+         if (istep.ne.1 .and. mod(istep,100).eq.1) then
+            write (iout,280)
+  280       format (/,' MCM Iter       Current         Global',
+     &                 '    Efficiency    Accept      Status',/)
+         end if
          if (minimum .lt. big) then
             nbig = 0
-            write (iout,240)  istep,minimum,global,temper,ratio,status
-  240       format (i8,3x,f12.4,3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
+            write (iout,290)  istep,minimum,global,efficient,
+     &                        ratio,status
+  290       format (i8,3x,f12.4,3x,f12.4,3x,f9.4,3x,f9.4,6x,a6)
          else
             nbig = nbig + 1
-            write (iout,250)  istep,global,temper,ratio,status
-  250       format (i8,9x,'------',3x,f12.4,3x,f10.2,3x,f8.3,6x,a6)
+            write (iout,300)  istep,global,efficient,ratio,status
+  300       format (i8,9x,'------',3x,f12.4,3x,f9.4,3x,f9.4,6x,a6)
          end if
          flush (iout)
 c
@@ -477,11 +478,25 @@ c
 c     update internal coordinates if using torsional moves
 c
          if (torsmove)  call makeint (2)
+c
+c     check criteria based on search efficiency and step number
+c
+         if (efficient .le. converge) then
+            done = .true.
+            write (iout,310)
+  310       format (/,' MONTE  --  Termination based on Overall',
+     &                 ' Search Efficiency')
+         end if
+         if (istep .ge. nstep) then
+            done = .true.
+            write (iout,320)
+  320       format (/,' MONTE  --  Termination based on Maximum',
+     &                 ' MCM Step Limit')
+         end if
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (usave)
       deallocate (xg)
       deallocate (yg)
       deallocate (zg)
@@ -495,14 +510,14 @@ c
 c     write out the final global minimum energy value
 c
       if (digits .ge. 8) then
-         write (iout,260)  global
-  260    format (/,' Global Minimum Energy Value :',1x,f20.8)
+         write (iout,330)  global
+  330    format (/,' Global Minimum Energy Value :',2x,f18.8)
       else if (digits .ge. 6) then
-         write (iout,270)  global
-  270    format (/,' Global Minimum Energy Value :',3x,f18.6)
+         write (iout,340)  global
+  340    format (/,' Global Minimum Energy Value :',4x,f16.6)
       else
-         write (iout,280)  global
-  280    format (/,' Global Minimum Energy Value :',5x,f16.4)
+         write (iout,350)  global
+  350    format (/,' Global Minimum Energy Value :',6x,f14.4)
       end if
 c
 c     perform any final tasks before program exit
@@ -528,9 +543,10 @@ c
       use files
       use inform
       use output
+      use potent
       use usage
       implicit none
-      integer i,nvar
+      integer i,k,nvar
       real*8 mcm1,minimum,grdmin
       real*8, allocatable :: xx(:)
       character*6 mode,method
@@ -553,15 +569,14 @@ c
 c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            xx(nvar) = x(i)
-            nvar = nvar + 1
-            xx(nvar) = y(i)
-            nvar = nvar + 1
-            xx(nvar) = z(i)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k)
+         nvar = nvar + 1
+         xx(nvar) = y(k)
+         nvar = nvar + 1
+         xx(nvar) = z(k)
       end do
 c
 c     make the call to the optimization routine
@@ -572,15 +587,14 @@ c
 c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
 c
 c     maintain any periodic boundary conditions
@@ -610,7 +624,7 @@ c
       use atoms
       use usage
       implicit none
-      integer i,nvar
+      integer i,k,nvar
       real*8 mcm1,e
       real*8 xx(*)
       real*8 g(*)
@@ -620,15 +634,14 @@ c
 c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -643,15 +656,14 @@ c
 c     store gradient components to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            g(nvar) = derivs(1,i)
-            nvar = nvar + 1
-            g(nvar) = derivs(2,i)
-            nvar = nvar + 1
-            g(nvar) = derivs(3,i)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         g(nvar) = derivs(1,k)
+         nvar = nvar + 1
+         g(nvar) = derivs(2,k)
+         nvar = nvar + 1
+         g(nvar) = derivs(3,k)
       end do
 c
 c     perform deallocation of some local arrays
@@ -693,15 +705,14 @@ c     convert optimization parameters to atomic coordinates
 c
       if (mode .eq. 'NONE')  return
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
 c
 c     compute and store the Hessian elements
@@ -745,15 +756,14 @@ c
 c     convert atomic coordinates to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            xx(nvar) = x(i)
-            nvar = nvar + 1
-            xx(nvar) = y(i)
-            nvar = nvar + 1
-            xx(nvar) = z(i)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k)
+         nvar = nvar + 1
+         xx(nvar) = y(k)
+         nvar = nvar + 1
+         xx(nvar) = z(k)
       end do
 c
 c     perform deallocation of some local arrays

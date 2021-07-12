@@ -65,7 +65,11 @@ c     many implicit solvation models require Born radii
 c
       if (use_born)  call born
 c
-c     alter bond and torsion constants for pisystem
+c     alter partial charges and multipoles for charge flux
+c
+      if (use_chgflx)  call alterchg
+c
+c     modify bond and torsion constants for pisystem
 c
       if (use_orbit)  call picalc
 c
@@ -136,6 +140,16 @@ c
             if (use_angtor)  call eangtor2 (i)
             if (use_tortor)  call etortor2 (i)
 c
+c     call the electrostatic Hessian component routines
+c
+            if (use_charge)  call echarge2 (i)
+            if (use_chgdpl)  call echgdpl2 (i)
+            if (use_dipole)  call edipole2 (i)
+            if (use_mpole)  call empole2 (i)
+            if (use_polar)  call epolar2 (i)
+            if (use_chgtrn)  call echgtrn2 (i)
+            if (use_rxnfld)  call erxnfld2 (i)
+c
 c     call the van der Waals Hessian component routines
 c
             if (use_vdw) then
@@ -147,16 +161,6 @@ c
             end if
             if (use_repuls)  call erepel2 (i)
             if (use_disp)  call edisp2 (i)
-c
-c     call the electrostatic Hessian component routines
-c
-            if (use_charge)  call echarge2 (i)
-            if (use_chgdpl)  call echgdpl2 (i)
-            if (use_dipole)  call edipole2 (i)
-            if (use_mpole)  call empole2 (i)
-            if (use_polar)  call epolar2 (i)
-            if (use_chgtrn)  call echgtrn2 (i)
-            if (use_rxnfld)  call erxnfld2 (i)
 c
 c     call any miscellaneous Hessian component routines
 c

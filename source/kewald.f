@@ -44,6 +44,7 @@ c
       real*8 delta,rmax
       real*8 edens,ddens
       real*8 size,slope
+      real*8 fft1,fft2,fft3
       character*20 keyword
       character*240 record
       character*240 string
@@ -155,19 +156,25 @@ c
          else if (keyword(1:15) .eq. 'EWALD-BOUNDARY ') then
             boundary = 'VACUUM'
          else if (keyword(1:9) .eq. 'PME-GRID ') then
-            iefft1 = 0
-            iefft2 = 0
-            iefft3 = 0
-            read (string,*,err=20,end=20)  iefft1,iefft2,iefft3
+            fft1 = 0.0d0
+            fft2 = 0.0d0
+            fft3 = 0.0d0
+            read (string,*,err=20,end=20)  fft1,fft2,fft3
    20       continue
+            iefft1 = nint(fft1)
+            iefft2 = nint(fft2)
+            iefft3 = nint(fft3)
             if (iefft2 .eq. 0)  iefft2 = iefft1
             if (iefft3 .eq. 0)  iefft3 = iefft1
          else if (keyword(1:10) .eq. 'DPME-GRID ') then
-            idfft1 = 0
-            idfft2 = 0
-            idfft3 = 0
-            read (string,*,err=30,end=30)  idfft1,idfft2,idfft3
+            fft1 = 0.0d0
+            fft2 = 0.0d0
+            fft3 = 0.0d0
+            read (string,*,err=30,end=30)  fft1,fft2,fft3
    30       continue
+            idfft1 = nint(fft1)
+            idfft2 = nint(fft2)
+            idfft3 = nint(fft3)
             if (idfft2 .eq. 0)  idfft2 = idfft1
             if (idfft3 .eq. 0)  idfft3 = idfft1
          else if (keyword(1:10) .eq. 'PME-ORDER ') then
@@ -378,7 +385,7 @@ c
             xk = x(k)
             yk = y(k)
             zk = z(k)
-            r2 = (xi-xk)**2 + (yi-yk)**2 + (zi-zk)**2
+            r2 = (xk-xi)**2 + (yk-yi)**2 + (zk-zi)**2
             rmax = max(r2,rmax)
          end do
       end do

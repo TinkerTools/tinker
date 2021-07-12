@@ -123,6 +123,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -192,6 +193,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -228,6 +230,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -303,6 +306,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -429,6 +433,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -549,6 +554,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -639,8 +645,9 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,kion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
-!$OMP& c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,off,off2,
-!$OMP& cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,ebuffer)
+!$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
+!$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
+!$OMP& ebuffer)
 !$OMP& firstprivate(cscale) shared (ec)
 !$OMP DO reduction(+:ec) schedule(guided)
 c
@@ -661,6 +668,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -731,6 +739,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -831,7 +840,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          e = fs * pchg(ii)**2
          ec = ec + e
@@ -870,6 +879,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -920,6 +930,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -952,6 +963,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1010,6 +1022,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1115,7 +1128,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          e = fs * pchg(ii)**2
          ec = ec + e
@@ -1169,6 +1182,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1270,6 +1284,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1368,7 +1383,7 @@ c
 c
 c     compute the Ewald self-energy term over all the atoms
 c
-      fs = -f * aewald / sqrtpi
+      fs = -f * aewald / rootpi
       do ii = 1, nion
          e = fs * pchg(ii)**2
          ec = ec + e
@@ -1397,8 +1412,8 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,x,y,z,
-!$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c2scale,
-!$OMP& c3scale,c4scale,c5scale,use_group,off2,aewald,ebuffer)
+!$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c1scale,
+!$OMP& c2scale,c3scale,c4scale,c5scale,use_group,off2,aewald,ebuffer)
 !$OMP& firstprivate(cscale) shared (ec)
 !$OMP DO reduction(+:ec) schedule(guided)
 c
@@ -1415,6 +1430,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1466,6 +1482,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1570,6 +1587,7 @@ c
 c
 c     set exclusion coefficients for connected atoms
 c
+         cscale(in) = c1scale
          do j = 1, n12(in)
             cscale(i12(j,in)) = c2scale
          end do
@@ -1634,6 +1652,7 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
+         cscale(in) = 1.0d0
          do j = 1, n12(in)
             cscale(i12(j,in)) = 1.0d0
          end do
@@ -1670,6 +1689,10 @@ c
 c     U. Essmann, L. Perera, M. L Berkowitz, T. Darden, H. Lee and
 c     L. G. Pedersen, "A Smooth Particle Mesh Ewald Method", Journal
 c     of Chemical Physics, 103, 8577-8593 (1995)
+c
+c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
+c     10, 67-71 (1993)
 c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
@@ -1756,7 +1779,7 @@ c
             expterm = exp(term) / denom
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2

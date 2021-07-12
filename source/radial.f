@@ -314,6 +314,7 @@ c
             pairs = dble(numj) * dble(numk)
             volume = (gamma_sin*gamma_term) * xbox * ybox * zbox
             if (octahedron)  volume = 0.5d0 * volume
+            if (dodecadron)  volume = volume / root2
             factor = factor * pairs / volume
          end if
          do i = 1, nbin

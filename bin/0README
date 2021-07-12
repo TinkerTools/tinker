@@ -1,0 +1,11 @@
+
+                    #######################################
+                    Binary Directory for the Tinker Package
+                    #######################################
+
+      This directory contains binary executables for the Tinker Molecular
+      Modeling package. If this is a new installation of Tinker, you will
+      need to build the executables from the source code. Alternatively,
+      prebuilt executables for Linux, macOS or Windows systems can be
+      obtained from the Tinker web site, https://dasher.wustl.edu/tinker/.
+

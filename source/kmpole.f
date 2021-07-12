@@ -249,6 +249,7 @@ c
       if (allocated(rpole))  deallocate (rpole)
       if (allocated(spole))  deallocate (spole)
       if (allocated(srpole))  deallocate (srpole)
+      if (allocated(mono0))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
       if (allocated(np11))  deallocate (np11)
       if (allocated(np12))  deallocate (np12)
@@ -264,6 +265,7 @@ c
       allocate (rpole(maxpole,n))
       allocate (spole(maxpole,n))
       allocate (srpole(maxpole,n))
+      allocate (mono0(n))
       allocate (polaxe(n))
       allocate (np11(n))
       allocate (np12(n))
@@ -279,10 +281,11 @@ c
          zaxis(i) = 0
          xaxis(i) = 0
          yaxis(i) = 0
-         polaxe(i) = '        '
+         polaxe(i) = 'None'
          do j = 1, 13
             pole(j,i) = 0.0d0
          end do
+         mono0(i) = 0.0d0
          np11(i) = 0
          np12(i) = 0
          np13(i) = 0
@@ -515,13 +518,13 @@ c
                   write (iout,190)
   190             format (/,' Additional Atomic Multipoles',
      &                       ' for Specific Atoms :',
-     &                    //,6x,'Atom',9x,'Coordinate Frame',
+     &                    //,5x,'Atom',10x,'Coordinate Frame',
      &                       ' Definition',9x,'Multipole Moments')
                end if
                if (.not. silent) then
                   write (iout,200)  k,kz,kx,ky,axt,(mpl(j),j=1,5),
      &                              mpl(8),mpl(9),(mpl(j),j=11,13)
-  200             format (/,6x,i6,3x,i6,1x,i6,1x,i6,3x,a8,3x,f9.5,
+  200             format (/,3x,i6,6x,i6,1x,i6,1x,i6,3x,a8,3x,f9.5,
      &                       /,49x,3f9.5,/,49x,f9.5,
      &                       /,49x,2f9.5,/,49x,3f9.5)
                end if
@@ -559,15 +562,15 @@ c
          spole(3,i) = pole(2,i)
          spole(4,i) = pole(3,i)
          spole(5,i) = pole(13,i)
-         spole(6,i) = 2.0d0 * sqrtthree * pole(7,i)
-         spole(7,i) = 2.0d0 * sqrtthree * pole(10,i)
-         spole(8,i) = sqrtthree * (pole(5,i)-pole(9,i))
-         spole(9,i) = 2.0d0 * sqrtthree * pole(6,i)
+         spole(6,i) = 2.0d0 * root3 * pole(7,i)
+         spole(7,i) = 2.0d0 * root3 * pole(10,i)
+         spole(8,i) = root3 * (pole(5,i)-pole(9,i))
+         spole(9,i) = 2.0d0 * root3 * pole(6,i)
       end do
 c
 c     get the order of the multipole expansion at each site
 c
-      npole = 0
+      npole = n
       do i = 1, n
          size = 0
          do k = 1, maxpole
@@ -579,7 +582,6 @@ c
             size = 4
          end if
          polsiz(i) = size
-         if (polsiz(i) .ne. 0)  npole = npole + 1
       end do
 c
 c     perform dynamic allocation of some global arrays
@@ -610,9 +612,11 @@ c     perform dynamic allocation of some global arrays
 c
       if (allocated(pcore))  deallocate (pcore)
       if (allocated(pval))  deallocate (pval)
+      if (allocated(pval0))  deallocate (pval0)
       if (allocated(palpha))  deallocate (palpha)
       allocate (pcore(n))
       allocate (pval(n))
+      allocate (pval0(n))
       allocate (palpha(n))
 c
 c     find new charge penetration parameters in the keyfile
@@ -646,12 +650,20 @@ c
       end do
 c
 c     assign the charge penetration charge and alpha parameters 
-c     
+c
+      ncp = 0
       do i = 1, n
+         pcore(i) = 0.0d0
+         pval(i) = pole(1,i)
+         pval0(i) = pval(i)
+         palpha(i) = 0.0d0
          ic = class(i)
-         pcore(i) = cpele(ic)
-         pval(i) = pole(1,i) - cpele(ic)
-         palpha(i) = cpalp(ic)
+         if (ic .ne. 0) then
+            pcore(i) = cpele(ic)
+            pval(i) = pole(1,i) - cpele(ic)
+            pval0(i) = pval(i)
+            palpha(i) = cpalp(ic)
+         end if
       end do
 c
 c     process keywords with charge penetration for specific atoms
@@ -670,9 +682,9 @@ c
             read (string,*,err=270,end=270)  k,pel,pal
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
-               pcore(i) = pole(1,i) + abs(pel)
-               pval(i) = -abs(pel)
-               palpha(i) = pal
+               pcore(k) = abs(pel)
+               pval(k) = pole(1,k) - abs(pel)
+               palpha(k) = pal
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,250)
@@ -689,32 +701,38 @@ c
          end if
       end do
 c
-c     remove zero or undefined atomic multipoles from the list
+c     remove zero or undefined electrostatic sites from the list
 c
-      npole = 0
-      ncp = 0
-      do i = 1, n
-         if (polsiz(i) .ne. 0) then
-            npole = npole + 1
-            ipole(npole) = i
-            pollist(i) = npole
-            zaxis(npole) = zaxis(i)
-            xaxis(npole) = xaxis(i)
-            yaxis(npole) = yaxis(i)
-            polaxe(npole) = polaxe(i)
-            do j = 1, maxpole
-               pole(j,npole) = pole(j,i)
-            end do
-            if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-            pcore(npole) = pcore(i)
-            pval(npole) = pval(i)
-            palpha(npole) = palpha(i)
-         end if
-      end do
+      if ((use_mpole .or. use_repuls) .and.
+     &      .not.use_polar .and. .not.use_chgtrn) then
+         npole = 0
+         ncp = 0
+         do i = 1, n
+            if (polsiz(i) .ne. 0) then
+               npole = npole + 1
+               ipole(npole) = i
+               pollist(i) = npole
+               zaxis(npole) = zaxis(i)
+               xaxis(npole) = xaxis(i)
+               yaxis(npole) = yaxis(i)
+               polaxe(npole) = polaxe(i)
+               do j = 1, maxpole
+                  pole(j,npole) = pole(j,i)
+               end do
+               mono0(npole) = pole(1,i)
+               if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
+               pcore(npole) = pcore(i)
+               pval(npole) = pval(i)
+               pval0(npole) = pval(i)
+               palpha(npole) = palpha(i)
+            end if
+         end do
+      end if
 c
 c     test multipoles at chiral sites and invert if necessary
 c
-      call chkpole
+      if (use_mpole .and. .not.use_polar .and. .not.use_chgtrn)
+     &   call chkpole
 c
 c     turn off atomic multipole potentials if not used
 c

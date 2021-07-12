@@ -77,15 +77,14 @@ c     convert optimization parameters to atomic coordinates
 c
       if (coordtype .eq. 'CARTESIAN') then
          nvar = 0
-         do i = 1, n
-            if (use(i)) then
-               nvar = nvar + 1
-               x(i) = xx(nvar) / scale(nvar)
-               nvar = nvar + 1
-               y(i) = xx(nvar) / scale(nvar)
-               nvar = nvar + 1
-               z(i) = xx(nvar) / scale(nvar)
-            end if
+         do i = 1, nuse
+            k = iuse(i)
+            nvar = nvar + 1
+            x(k) = xx(nvar) / scale(nvar)
+            nvar = nvar + 1
+            y(k) = xx(nvar) / scale(nvar)
+            nvar = nvar + 1
+            z(k) = xx(nvar) / scale(nvar)
          end do
          if (use_bounds)  call bounds
       else if (coordtype .eq. 'INTERNAL') then
@@ -151,15 +150,15 @@ c
             call version (frcfile,'new')
             open (unit=ifrc,file=frcfile,status='new')
          end if
-         write (ifrc,250)  n,title(1:ltitle)
-  250    format (i6,2x,a)
+         write (ifrc,10)  n,title(1:ltitle)
+   10    format (i6,2x,a)
          do i = 1, n
-            write (ifrc,260)  i,name(i),(-desum(j,i),j=1,3)
-  260       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
+            write (ifrc,20)  i,name(i),(-desum(j,i),j=1,3)
+   20       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
          end do
          close (unit=ifrc)
-         write (iout,270)  frcfile(1:trimtext(frcfile))
-  270    format (' Force Vector File',11x,a)
+         write (iout,30)  frcfile(1:trimtext(frcfile))
+   30    format (' Force Vector File',11x,a)
       end if
 c
 c     save the current induced dipole moment at each site
@@ -180,18 +179,18 @@ c
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
          end if
-         write (iind,280)  n,title(1:ltitle)
-  280    format (i6,2x,a)
+         write (iind,40)  n,title(1:ltitle)
+   40    format (i6,2x,a)
          do i = 1, npole
             if (polarity(i) .ne. 0.0d0) then
                k = ipole(i)
-               write (iind,290)  k,name(k),(debye*uind(j,i),j=1,3)
-  290          format (i6,2x,a3,3f12.6)
+               write (iind,50)  k,name(k),(debye*uind(j,i),j=1,3)
+   50          format (i6,2x,a3,3f12.6)
             end if
          end do
          close (unit=iind)
-         write (iout,300)  indfile(1:trimtext(indfile))
-  300    format (' Induced Dipole File',10x,a)
+         write (iout,60)  indfile(1:trimtext(indfile))
+   60    format (' Induced Dipole File',10x,a)
       end if
 c
 c     send data via external socket communication if desired
@@ -215,8 +214,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,10)
-   10    format (/,' OPTSAVE  --  Optimization Calculation Ending',
+         write (iout,70)
+   70    format (/,' OPTSAVE  --  Optimization Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if

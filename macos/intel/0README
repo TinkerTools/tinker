@@ -1,17 +1,17 @@
 
                #################################################
-               Tinker Notes for Intel Fortran Compiler for MacOS
+               Tinker Notes for Intel Fortran Compiler for macOS
                #################################################
 
          This subdirectory contains a set of script files that can be
          used to build the Tinker program package on an Intel-based
-         Macintosh system using the Intel Fortran Compiler for MacOS.
+         Macintosh system using the Intel Fortran Compiler for macOS.
 
          Building OpenMP parallel executables requires uncommenting
          the two Intel-specific routine calls kmp_set_stacksize_s and
          kmp_set_blocksize in the source file initial.f.
 
-         Please note that by default the MacOS distributions limit
+         Please note that by default the macOS distributions limit
          stacksize and datasize for processes as can be checked via
          the csh limit command or similar. Large Tinker executables
          will need these values increased to avoid failure at startup. 

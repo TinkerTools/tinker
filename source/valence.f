@@ -464,14 +464,12 @@ c
          xcb = gx(ic) - gx(ib)
          ycb = gy(ic) - gy(ib)
          zcb = gz(ic) - gz(ib)
-         rab2 = xab*xab + yab*yab + zab*zab
-         rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-         if (rab2.ne.0.0d0 .and. rcb2.ne.0.0d0) then
-            dot = xab*xcb + yab*ycb + zab*zcb
-            cosine = dot / sqrt(rab2*rcb2)
-            cosine = min(1.0d0,max(-1.0d0,cosine))
-            anat(i) = radian * acos(cosine)
-         end if
+         rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+         rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+         dot = xab*xcb + yab*ycb + zab*zcb
+         cosine = dot / sqrt(rab2*rcb2)
+         cosine = min(1.0d0,max(-1.0d0,cosine))
+         anat(i) = radian * acos(cosine)
          done = .false.
          do j = 1, k
             if (pta .eq. ka(j)) then
@@ -1890,7 +1888,7 @@ c
       real*8 xt,yt,zt,xu,yu,zu
       real*8 xtu,ytu,ztu
       real*8 rt2,ru2,rtru
-      real*8 minimiz1,minimum
+      real*8 valmin1,minimum
       real*8 valrms,energy
       real*8 bave,brms,bfac
       real*8 aave,arms,afac
@@ -1907,7 +1905,7 @@ c
       real*8, allocatable :: hdiag(:,:)
       real*8, allocatable :: vects(:,:)
       character*1 axis(3)
-      external minimiz1
+      external valmin1
       external optsave
       data axis  / 'X','Y','Z' /
 c
@@ -1947,7 +1945,7 @@ c
          iwrite = 0
          grdmin = 0.0001d0
          coordtype = 'CARTESIAN'
-         call lbfgs (nvar,xx,minimum,grdmin,minimiz1,optsave)
+         call lbfgs (nvar,xx,minimum,grdmin,valmin1,optsave)
          coordtype = 'NONE'
          stpmax = oldstep
          maxiter = olditer
@@ -2031,28 +2029,24 @@ c
             xcb = x(ic) - x(ib)
             ycb = y(ic) - y(ib)
             zcb = z(ic) - z(ib)
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rabc = sqrt(rab2 * rcb2)
-            if (rabc .ne. 0.0d0) then
-               cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               angle = radian * acos(cosine)
-            end if
+            rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+            rabc = sqrt(rab2*rcb2)
+            cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            angle = radian * acos(cosine)
             xab = gx(ia) - gx(ib)
             yab = gy(ia) - gy(ib)
             zab = gz(ia) - gz(ib)
             xcb = gx(ic) - gx(ib)
             ycb = gy(ic) - gy(ib)
             zcb = gz(ic) - gz(ib)
-            rab2 = xab*xab + yab*yab + zab*zab
-            rcb2 = xcb*xcb + ycb*ycb + zcb*zcb
-            rabc = sqrt(rab2 * rcb2)
-            if (rabc .ne. 0.0d0) then
-               cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
-               cosine = min(1.0d0,max(-1.0d0,cosine))
-               gangle = radian * acos(cosine)
-            end if
+            rab2 = max(xab*xab+yab*yab+zab*zab,0.0001d0)
+            rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,0.0001d0)
+            rabc = sqrt(rab2*rcb2)
+            cosine = (xab*xcb + yab*ycb + zab*zcb) / rabc
+            cosine = min(1.0d0,max(-1.0d0,cosine))
+            gangle = radian * acos(cosine)
             delta = angle - gangle
             aave = aave + abs(delta)
             arms = arms + delta*delta
@@ -2348,25 +2342,24 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  function minimiz1  --  energy and gradient for minimize  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function valmin1  --  energy and gradient for minimize  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "minimiz1" is a service routine that computes the energy and
-c     gradient for a low storage BFGS optimization in Cartesian
-c     coordinate space
+c     "valmin1" is a service routine that computes the molecular
+c     energy and gradient during valence parameter optimization
 c
 c
-      function minimiz1 (xx,g)
+      function valmin1 (xx,g)
       use atoms
       use scales
       use usage
       implicit none
       integer i,nvar
-      real*8 minimiz1,e
+      real*8 valmin1,e
       real*8 energy,eps
       real*8 xx(*)
       real*8 g(*)
@@ -2406,7 +2399,7 @@ c
          e = energy ()
          call numgrad (energy,derivs,eps)
       end if
-      minimiz1 = e
+      valmin1 = e
 c
 c     convert gradient components to optimization parameters
 c

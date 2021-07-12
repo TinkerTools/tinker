@@ -85,6 +85,7 @@ c
       use dsppot
       use energi
       use group
+      use mutant
       use shunt
       use usage
       use virial
@@ -114,6 +115,7 @@ c
       real*8 vyx,vzx,vzy
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -148,10 +150,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -174,6 +177,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -236,6 +240,18 @@ c
      &                          / 96.0d0
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        de = de * vlambda
+                        e = e * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        de = de * vlambda
+                        e = e * vlambda
+                     end if
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -326,10 +342,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -352,6 +369,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -415,6 +433,18 @@ c
      &                             / 96.0d0
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     if (muti .or. mutk) then
+                        if (vcouple .eq. 1) then
+                           de = de * vlambda
+                           e = e * vlambda
+                        else if (.not.muti .or. .not.mutk) then
+                           de = de * vlambda
+                           e = e * vlambda
+                        end if
+                     end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -532,6 +562,7 @@ c
       use dsppot
       use energi
       use group
+      use mutant
       use neigh
       use shunt
       use usage
@@ -561,6 +592,7 @@ c
       real*8 vyx,vzx,vzy
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -593,7 +625,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,off2,cut2)
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,
+!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vlambda)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
 !$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
 c
@@ -603,10 +636,11 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -630,6 +664,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -692,6 +727,18 @@ c
      &                          / 96.0d0
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        de = de * vlambda
+                        e = e * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        de = de * vlambda
+                        e = e * vlambda
+                     end if
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -921,10 +968,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -961,6 +1008,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expterm = exp(-ralpha2)
@@ -1016,7 +1064,7 @@ c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
                   scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
+                  e = e * (expa+scale)
                   rterm = -(ralpha2**3) * expterm / r
                   de = -6.0d0*e/r2 - ci*ck*rterm/r7
      &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
@@ -1085,10 +1133,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1126,6 +1174,7 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   if (r2 .le. off2) then
                      r6 = r2**3
+                     e = -ci * ck / r6
                      ralpha2 = r2 * aewald**2
                      term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                      expterm = exp(-ralpha2)
@@ -1181,7 +1230,7 @@ c
                      scale = dspscale(k) * damp**2
                      if (use_group)  scale = scale * fgrp
                      scale = scale - 1.0d0
-                     e = -ci * ck * (expa+scale) / r6
+                     e = e * (expa+scale)
                      rterm = -(ralpha2**3) * expterm / r
                      de = -6.0d0*e/r2 - ci*ck*rterm/r7
      &                       - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
@@ -1398,10 +1447,10 @@ c
          i = idisp(ii)
          ci = csix(ii)
          ai = adisp(ii)
-         usei = use(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1439,6 +1488,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r6 = r2**3
+                  e = -ci * ck / r6
                   ralpha2 = r2 * aewald**2
                   term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                   expterm = exp(-ralpha2)
@@ -1494,7 +1544,7 @@ c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
                   scale = scale - 1.0d0
-                  e = -ci * ck * (expa+scale) / r6
+                  e = e * (expa+scale)
                   rterm = -(ralpha2**3) * expterm / r
                   de = -6.0d0*e/r2 - ci*ck*rterm/r7
      &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
@@ -1598,12 +1648,12 @@ c
       real*8 e,fi,denom
       real*8 r1,r2,r3
       real*8 h1,h2,h3
-      real*8 term,vterm
+      real*8 term,denom0
+      real*8 eterm,vterm
       real*8 expterm
       real*8 erfcterm
       real*8 hsq,struc2
       real*8 h,hhh,b,bfac
-      real*8 term1,denom0
       real*8 fac1,fac2,fac3
       real*8 de1,de2,de3
       real*8 dn1,dn2,dn3
@@ -1671,8 +1721,7 @@ c
          b = h*bfac
          hhh = h*hsq
          term = -b*b
-         expterm = 0.0d0
-         erfcterm = erfc(b)
+         eterm = 0.0d0
          denom = denom0*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
          if (term .gt. -50.0d0) then
             expterm = exp(term)
@@ -1680,15 +1729,15 @@ c
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
                erfcterm = erfcterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
-            term1 = fac1*erfcterm*hhh + expterm*(fac2 + fac3*hsq)
+            eterm = (-fac1*erfcterm*hhh - expterm*(fac2+fac3*hsq))/denom
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            e = -(term1 / denom) * struc2
-            edsp = edsp + e
             vterm = 3.0d0*(fac1*erfcterm*h + fac3*expterm)*struc2/denom
+            e = eterm * struc2
+            edsp = edsp + e
             vir(1,1) = vir(1,1) + h1*h1*vterm - e
             vir(2,1) = vir(2,1) + h1*h2*vterm
             vir(3,1) = vir(3,1) + h1*h3*vterm
@@ -1699,8 +1748,8 @@ c
             vir(2,3) = vir(2,3) + h3*h2*vterm
             vir(3,3) = vir(3,3) + h3*h3*vterm - e
          end if
-         qgrid(1,k1,k2,k3) = -(term1/denom) * qgrid(1,k1,k2,k3) 
-         qgrid(2,k1,k2,k3) = -(term1/denom) * qgrid(2,k1,k2,k3)
+         qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3) 
+         qgrid(2,k1,k2,k3) = eterm * qgrid(2,k1,k2,k3)
       end do
 c
 c     perform the 3-D FFT backward transformation

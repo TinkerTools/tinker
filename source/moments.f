@@ -29,7 +29,7 @@ c
       use polar
       use potent
       use rigid
-      use solute
+      use solpot
       use units
       use usage
       implicit none
@@ -49,21 +49,21 @@ c     zero out total charge, dipole and quadrupole components
 c
       netchg = 0.0d0
       netdpl = 0.0d0
-      netqdp(1) = 0.0d0
-      netqdp(2) = 0.0d0
-      netqdp(3) = 0.0d0
+      netqpl(1) = 0.0d0
+      netqpl(2) = 0.0d0
+      netqpl(3) = 0.0d0
       xdpl = 0.0d0
       ydpl = 0.0d0
       zdpl = 0.0d0
-      xxqdp = 0.0d0
-      xyqdp = 0.0d0
-      xzqdp = 0.0d0
-      yxqdp = 0.0d0
-      yyqdp = 0.0d0
-      yzqdp = 0.0d0
-      zxqdp = 0.0d0
-      zyqdp = 0.0d0
-      zzqdp = 0.0d0
+      xxqpl = 0.0d0
+      xyqpl = 0.0d0
+      xzqpl = 0.0d0
+      yxqpl = 0.0d0
+      yyqpl = 0.0d0
+      yzqpl = 0.0d0
+      zxqpl = 0.0d0
+      zyqpl = 0.0d0
+      zzqpl = 0.0d0
 c
 c     maintain periodic boundaries and neighbor lists
 c
@@ -110,15 +110,15 @@ c
             xdpl = xdpl + xcm(k)*pchg(i)
             ydpl = ydpl + ycm(k)*pchg(i)
             zdpl = zdpl + zcm(k)*pchg(i)
-            xxqdp = xxqdp + xcm(k)*xcm(k)*pchg(i)
-            xyqdp = xyqdp + xcm(k)*ycm(k)*pchg(i)
-            xzqdp = xzqdp + xcm(k)*zcm(k)*pchg(i)
-            yxqdp = yxqdp + ycm(k)*xcm(k)*pchg(i)
-            yyqdp = yyqdp + ycm(k)*ycm(k)*pchg(i)
-            yzqdp = yzqdp + ycm(k)*zcm(k)*pchg(i)
-            zxqdp = zxqdp + zcm(k)*xcm(k)*pchg(i)
-            zyqdp = zyqdp + zcm(k)*ycm(k)*pchg(i)
-            zzqdp = zzqdp + zcm(k)*zcm(k)*pchg(i)
+            xxqpl = xxqpl + xcm(k)*xcm(k)*pchg(i)
+            xyqpl = xyqpl + xcm(k)*ycm(k)*pchg(i)
+            xzqpl = xzqpl + xcm(k)*zcm(k)*pchg(i)
+            yxqpl = yxqpl + ycm(k)*xcm(k)*pchg(i)
+            yyqpl = yyqpl + ycm(k)*ycm(k)*pchg(i)
+            yzqpl = yzqpl + ycm(k)*zcm(k)*pchg(i)
+            zxqpl = zxqpl + zcm(k)*xcm(k)*pchg(i)
+            zyqpl = zyqpl + zcm(k)*ycm(k)*pchg(i)
+            zzqpl = zzqpl + zcm(k)*zcm(k)*pchg(i)
          end if
       end do
 c
@@ -141,15 +141,15 @@ c
             xdpl = xdpl + xbnd
             ydpl = ydpl + ybnd
             zdpl = zdpl + zbnd
-            xxqdp = xxqdp + 2.0d0*xc*xbnd
-            xyqdp = xyqdp + xc*ybnd + yc*xbnd
-            xzqdp = xzqdp + xc*zbnd + zc*xbnd
-            yxqdp = yxqdp + yc*xbnd + xc*ybnd
-            yyqdp = yyqdp + 2.0d0*yc*ybnd
-            yzqdp = yzqdp + yc*zbnd + zc*ybnd
-            zxqdp = zxqdp + zc*xbnd + xc*zbnd
-            zyqdp = zyqdp + zc*ybnd + yc*zbnd
-            zzqdp = zzqdp + 2.0d0*zc*zbnd
+            xxqpl = xxqpl + 2.0d0*xc*xbnd
+            xyqpl = xyqpl + xc*ybnd + yc*xbnd
+            xzqpl = xzqpl + xc*zbnd + zc*xbnd
+            yxqpl = yxqpl + yc*xbnd + xc*ybnd
+            yyqpl = yyqpl + 2.0d0*yc*ybnd
+            yzqpl = yzqpl + yc*zbnd + zc*ybnd
+            zxqpl = zxqpl + zc*xbnd + xc*zbnd
+            zyqpl = zyqpl + zc*ybnd + yc*zbnd
+            zzqpl = zzqpl + 2.0d0*zc*zbnd
          end if
       end do
 c
@@ -182,23 +182,23 @@ c
             xdpl = xdpl + xcm(k)*rpole(1,i) + rpole(2,i)
             ydpl = ydpl + ycm(k)*rpole(1,i) + rpole(3,i)
             zdpl = zdpl + zcm(k)*rpole(1,i) + rpole(4,i)
-            xxqdp = xxqdp + xcm(k)*xcm(k)*rpole(1,i)
+            xxqpl = xxqpl + xcm(k)*xcm(k)*rpole(1,i)
      &                 + 2.0d0*xcm(k)*rpole(2,i)
-            xyqdp = xyqdp + xcm(k)*ycm(k)*rpole(1,i)
+            xyqpl = xyqpl + xcm(k)*ycm(k)*rpole(1,i)
      &                 + xcm(k)*rpole(3,i) + ycm(k)*rpole(2,i)
-            xzqdp = xzqdp + xcm(k)*zcm(k)*rpole(1,i)
+            xzqpl = xzqpl + xcm(k)*zcm(k)*rpole(1,i)
      &                 + xcm(k)*rpole(4,i) + zcm(k)*rpole(2,i)
-            yxqdp = yxqdp + ycm(k)*xcm(k)*rpole(1,i)
+            yxqpl = yxqpl + ycm(k)*xcm(k)*rpole(1,i)
      &                 + ycm(k)*rpole(2,i) + xcm(k)*rpole(3,i)
-            yyqdp = yyqdp + ycm(k)*ycm(k)*rpole(1,i)
+            yyqpl = yyqpl + ycm(k)*ycm(k)*rpole(1,i)
      &                 + 2.0d0*ycm(k)*rpole(3,i)
-            yzqdp = yzqdp + ycm(k)*zcm(k)*rpole(1,i)
+            yzqpl = yzqpl + ycm(k)*zcm(k)*rpole(1,i)
      &                 + ycm(k)*rpole(4,i) + zcm(k)*rpole(3,i)
-            zxqdp = zxqdp + zcm(k)*xcm(k)*rpole(1,i)
+            zxqpl = zxqpl + zcm(k)*xcm(k)*rpole(1,i)
      &                 + zcm(k)*rpole(2,i) + xcm(k)*rpole(4,i)
-            zyqdp = zyqdp + zcm(k)*ycm(k)*rpole(1,i)
+            zyqpl = zyqpl + zcm(k)*ycm(k)*rpole(1,i)
      &                 + zcm(k)*rpole(3,i) + ycm(k)*rpole(4,i)
-            zzqdp = zzqdp + zcm(k)*zcm(k)*rpole(1,i)
+            zzqpl = zzqpl + zcm(k)*zcm(k)*rpole(1,i)
      &                 + 2.0d0*zcm(k)*rpole(4,i)
          end if
       end do
@@ -211,31 +211,31 @@ c
 c
 c     convert the quadrupole from traced to traceless form
 c
-      qave = (xxqdp + yyqdp + zzqdp) / 3.0d0
-      xxqdp = 1.5d0 * (xxqdp-qave)
-      xyqdp = 1.5d0 * xyqdp
-      xzqdp = 1.5d0 * xzqdp
-      yxqdp = 1.5d0 * yxqdp
-      yyqdp = 1.5d0 * (yyqdp-qave)
-      yzqdp = 1.5d0 * yzqdp
-      zxqdp = 1.5d0 * zxqdp
-      zyqdp = 1.5d0 * zyqdp
-      zzqdp = 1.5d0 * (zzqdp-qave)
+      qave = (xxqpl + yyqpl + zzqpl) / 3.0d0
+      xxqpl = 1.5d0 * (xxqpl-qave)
+      xyqpl = 1.5d0 * xyqpl
+      xzqpl = 1.5d0 * xzqpl
+      yxqpl = 1.5d0 * yxqpl
+      yyqpl = 1.5d0 * (yyqpl-qave)
+      yzqpl = 1.5d0 * yzqpl
+      zxqpl = 1.5d0 * zxqpl
+      zyqpl = 1.5d0 * zyqpl
+      zzqpl = 1.5d0 * (zzqpl-qave)
 c
 c     add the traceless atomic quadrupoles to total quadrupole
 c
       do i = 1, npole
          k = ipole(i)
          if (use(k)) then
-            xxqdp = xxqdp + 3.0d0*rpole(5,i)
-            xyqdp = xyqdp + 3.0d0*rpole(6,i)
-            xzqdp = xzqdp + 3.0d0*rpole(7,i)
-            yxqdp = yxqdp + 3.0d0*rpole(8,i)
-            yyqdp = yyqdp + 3.0d0*rpole(9,i)
-            yzqdp = yzqdp + 3.0d0*rpole(10,i)
-            zxqdp = zxqdp + 3.0d0*rpole(11,i)
-            zyqdp = zyqdp + 3.0d0*rpole(12,i)
-            zzqdp = zzqdp + 3.0d0*rpole(13,i)
+            xxqpl = xxqpl + 3.0d0*rpole(5,i)
+            xyqpl = xyqpl + 3.0d0*rpole(6,i)
+            xzqpl = xzqpl + 3.0d0*rpole(7,i)
+            yxqpl = yxqpl + 3.0d0*rpole(8,i)
+            yyqpl = yyqpl + 3.0d0*rpole(9,i)
+            yzqpl = yzqpl + 3.0d0*rpole(10,i)
+            zxqpl = zxqpl + 3.0d0*rpole(11,i)
+            zyqpl = zyqpl + 3.0d0*rpole(12,i)
+            zzqpl = zzqpl + 3.0d0*rpole(13,i)
          end if
       end do
 c
@@ -244,29 +244,29 @@ c
       xdpl = xdpl * debye
       ydpl = ydpl * debye
       zdpl = zdpl * debye
-      xxqdp = xxqdp * debye
-      xyqdp = xyqdp * debye
-      xzqdp = xzqdp * debye
-      yxqdp = yxqdp * debye
-      yyqdp = yyqdp * debye
-      yzqdp = yzqdp * debye
-      zxqdp = zxqdp * debye
-      zyqdp = zyqdp * debye
-      zzqdp = zzqdp * debye
+      xxqpl = xxqpl * debye
+      xyqpl = xyqpl * debye
+      xzqpl = xzqpl * debye
+      yxqpl = yxqpl * debye
+      yyqpl = yyqpl * debye
+      yzqpl = yzqpl * debye
+      zxqpl = zxqpl * debye
+      zyqpl = zyqpl * debye
+      zzqpl = zzqpl * debye
 c
 c     get dipole magnitude and diagonalize quadrupole tensor
 c
       netdpl = sqrt(xdpl*xdpl + ydpl*ydpl + zdpl*zdpl)
-      a(1,1) = xxqdp
-      a(1,2) = xyqdp
-      a(1,3) = xzqdp
-      a(2,1) = yxqdp
-      a(2,2) = yyqdp
-      a(2,3) = yzqdp
-      a(3,1) = zxqdp
-      a(3,2) = zyqdp
-      a(3,3) = zzqdp
-      call jacobi (3,a,netqdp,b)
+      a(1,1) = xxqpl
+      a(1,2) = xyqpl
+      a(1,3) = xzqpl
+      a(2,1) = yxqpl
+      a(2,2) = yyqpl
+      a(2,3) = yzqpl
+      a(3,1) = zxqpl
+      a(3,2) = zyqpl
+      a(3,3) = zzqpl
+      call jacobi (3,a,netqpl,b)
       return
       end
 c

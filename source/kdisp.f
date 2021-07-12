@@ -93,9 +93,13 @@ c
 c     assign the dispersion C6 values and alpha parameters 
 c
       do i = 1, n
+         csix(i) = 0.0d0
+         adisp(i) = 0.0d0
          ic = class(i)
-         csix(i) = dspsix(ic)
-         adisp(i) = dspdmp(ic)
+         if (ic .ne. 0) then
+            csix(i) = dspsix(ic)
+            adisp(i) = dspdmp(ic)
+         end if
       end do
 c
 c     process keywords containing atom specific dispersion parameters

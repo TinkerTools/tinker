@@ -20,7 +20,7 @@
  *
  * Also use the -Qlowercase flag to deal with the Intel
  * compiler's name mangling on Windows; underscores are
- * used by default on Linux and MacOS, but not Windows 
+ * used by default on Linux and macOS, but not Windows 
  */
 
 #ifdef __ICL

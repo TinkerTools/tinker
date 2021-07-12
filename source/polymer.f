@@ -99,6 +99,10 @@ c
             xlimit = (sqrt(3.0d0)/4.0d0) * xbox
             ylimit = xlimit
             zlimit = xlimit
+         else if (dodecadron) then
+            xlimit = xbox2
+            ylimit = xlimit
+            zlimit = xlimit
          end if
          maximage = min(xlimit,ylimit,zlimit)
 c

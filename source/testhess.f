@@ -109,14 +109,14 @@ c
          if (.not. exist) then
             write (iout,50)
    50       format (/,' Numerical Hessian from Gradient',
-     &                 ' or Function [G] :  ',$)
+     &                 ' or Energy [G] :  ',$)
             read (input,60)  record
    60       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
          call upcase (answer)
-         if (answer .eq. 'F')  dograd = .false.
+         if (answer .eq. 'E')  dograd = .false.
 c
 c     get the stepsize for numerical Hessian calculation
 c

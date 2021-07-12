@@ -14,28 +14,24 @@ c
 c
 c     literature references:
 c
-c     D. B. Newell, F. Cabiati, J. Fischer, K. Fujii, S. G. Karshenboim,
-c     S. Margolis, E. de Mirandes, P. J. Mohr, F. Nez, K. Pachucki,
-c     T. J. Quinn, N. Taylor, M. Wang, B. M. Wood and Z. Zhang, "The
-c     CODATA 2017 Values of h, e, k, and Na for the Revision of the SI",
-c     Metrologia, 55, L13-L16 (2018)
+c     M. Stock, R. Davis, E. de Mirandes and M. J. T. Milton, "The
+c     Revision of the SI - The Result of Three Decades of Progress
+c     in Metrology", Metrologia, 56, 022001 (2019)
 c
 c     P. J. Mohr, D. B. Newell and B. N. Taylor, "CODATA Recommended
 c     Values of the Fundamental Physical Constants: 2014", Journal of
 c     Physical and Chemical Reference Data, 45, 043102 (2016)
 c
-c     Where available, values are from the 2017 CODATA adjustment
-c     based on exact physical constants for the revised SI
-c
-c     Other values are from the 2014 CODATA reference constants; also
-c     available online from the National Institute of Standards and
-c     Technology at http://physics.nist.gov/cuu/Constants/index.html/
+c     Where appropriate, values are from the November 2018 revision
+c     of SI units to fixed values by the 26th General Conference on
+c     Weights and Measures; other values are taken from 2014 CODATA
+c     reference constants or are described below
 c
 c     The conversion from calorie to Joule is the definition of the
 c     thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
 c
 c     The "coulomb" energy conversion factor is found by dimensional
-c     analysis of Coulomb's Law, ie, by dividing the square of the
+c     analysis of Coulomb's Law, that is by dividing the square of the
 c     elementary charge in Coulombs by 4*pi*eps0*rij, where eps0 is
 c     the permittivity of vacuum (the "electric constant"); note that
 c     eps0 is typically given in F/m, equivalent to C**2/(J-m)

@@ -50,6 +50,7 @@ c
       call molecule
       call kmpole
       call kpolar
+      call kchgtrn
       call mutate
 c
 c     sum atomic polarizabilities to get additive molecular value

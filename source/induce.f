@@ -28,7 +28,7 @@ c
       use polar
       use polpot
       use potent
-      use solute
+      use solpot
       use units
       use uprior
       implicit none
@@ -144,6 +144,7 @@ c
       use iounit
       use limits
       use mpole
+      use neigh
       use polar
       use polopt
       use polpcg
@@ -153,6 +154,7 @@ c
       use uprior
       implicit none
       integer i,j,k,iter
+      integer miniter
       integer maxiter
       real*8 polmin
       real*8 eps,epsold
@@ -216,7 +218,7 @@ c
             end do
          end if
       end do
-c
+
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then
@@ -274,6 +276,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
+         miniter = 3
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0
@@ -329,8 +332,8 @@ c
          else
             call ufield0a (field,fieldp)
          end if
-
-c     set initial conjugate gradient residual and conjugate vector
+c
+c     set initial values for the residual vector components
 c
          do i = 1, npole
             if (douind(ipole(i))) then
@@ -357,7 +360,15 @@ c
                end do
             end if
          end do
+c
+c     perform dynamic allocation of some global arrays
+c
          if (pcgprec) then
+            if (.not. allocated(mindex))  allocate (mindex(npole))
+            if (.not. allocated(minv))  allocate (minv(3*maxulst*npole))
+c
+c     apply a sparse matrix conjugate gradient preconditioner
+c
             mode = 'BUILD'
             if (use_mlist) then
                call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
@@ -369,6 +380,9 @@ c
                call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
             end if
          end if
+c
+c     set the initial conjugate vector to be the residuals
+c
          do i = 1, npole
             if (douind(ipole(i))) then
                do j = 1, 3
@@ -486,6 +500,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
+            if (iter .lt. miniter)  done = .false.
             if (iter .ge. politer)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
@@ -517,13 +532,13 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (debug) then
+         if (debug .or. polprt) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
-     &                 6x,'RMS Residual',f15.10)
+     &                 7x,'RMS Residual',f15.10)
          end if
 c
-c     terminate the calculation if dipoles failed to converge
+c     terminate the calculation if dipoles fail to converge
 c
          if (iter.ge.maxiter .or. eps.gt.epsold) then
             write (iout,40)
@@ -569,7 +584,8 @@ c
       integer i,j,k,m
       integer ii,kk
       real*8 xr,yr,zr
-      real*8 r,r2,rr3,rr5,rr7
+      real*8 r,r2,rr3
+      real*8 rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 ci,dix,diy,diz
@@ -584,14 +600,10 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 pdi,pti,ddi
-      real*8 pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpi(7),dmpk(7)
+      real*8 dmpik(7)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
@@ -639,11 +651,7 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -765,36 +773,10 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  damp = pdi * pdamp(kk)
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(ddi,dirdamp(kk))
-                     if (pgamma .ne. 0.0d0) then
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
-                  rr3 = scale3 / (r*r2)
-                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                  rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
+                  call dampthole (ii,kk,7,r,dmpik)
+                  rr3 = dmpik(3) / (r*r2)
+                  rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
+                  rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
                   fid(1) = -xr*(rr3*ck-rr5*dkr+rr7*qkr)
      &                        - rr3*dkx + 2.0d0*rr5*qkx
                   fid(2) = -yr*(rr3*ck-rr5*dkr+rr7*qkr)
@@ -843,6 +825,9 @@ c
      &                        + rr5i*dir + rr7i*qir)
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
                end if
+c
+c     increment the direct electrostatic field components
+c
                do j = 1, 3
                   field(j,ii) = field(j,ii) + fid(j)*dscale(k)
                   field(j,kk) = field(j,kk) + fkd(j)*dscale(k)
@@ -914,11 +899,7 @@ c
             qiyy = rpole(9,ii)
             qiyz = rpole(10,ii)
             qizz = rpole(13,ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-               ddi = dirdamp(ii)
-            else if (use_chgpen) then
+            if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -1041,38 +1022,10 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        damp = pdi * pdamp(kk)
-                        scale3 = 1.0d0
-                        scale5 = 1.0d0
-                        scale7 = 1.0d0
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(ddi,dirdamp(kk))
-                           if (pgamma .ne. 0.0d0) then
-                              damp = pgamma * (r/damp)**(1.5d0)
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp) 
-                                 scale3 = 1.0d0 - expdamp 
-                                 scale5 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.5d0*damp)
-                                 scale7 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.65d0*damp
-     &                                                  +0.15d0*damp**2)
-                              end if
-                           else
-                              pgamma = min(pti,thole(kk))
-                              damp = pgamma * (r/damp)**3
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp)
-                                 scale3 = 1.0d0 - expdamp
-                                 scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                                 scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                               +0.6d0*damp**2)
-                              end if
-                           end if
-                        end if
-                        rr3 = scale3 / (r*r2)
-                        rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                        rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
+                        call dampthole (ii,kk,7,r,dmpik)
+                        rr3 = dmpik(3) / (r*r2)
+                        rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
+                        rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
                         fid(1) = -xr*(rr3*ck-rr5*dkr+rr7*qkr)
      &                              - rr3*dkx + 2.0d0*rr5*qkx
                         fid(2) = -yr*(rr3*ck-rr5*dkr+rr7*qkr)
@@ -1121,6 +1074,9 @@ c
      &                              + rr5i*dir + rr7i*qir)
      &                              - rr3i*diz - 2.0d0*rr5i*qiz
                      end if
+c
+c     increment the direct electrostatic field components
+c
                      do j = 1, 3
                         fip(j) = fid(j)
                         fkp(j) = fkd(j)
@@ -1238,9 +1194,6 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpik(5)
@@ -1287,10 +1240,7 @@ c
          pix = uinp(1,ii)
          piy = uinp(2,ii)
          piz = uinp(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -1348,34 +1298,28 @@ c
                pir = pix*xr + piy*yr + piz*zr
                pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     find the field components for Thole polarization damping
+c     find the scale factors for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = uscale(k)
-                  scale5 = uscale(k)
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = pgamma * (r/damp)**3
-                     if (damp .lt. 50.0d0) then
-                        expdamp = exp(-damp)
-                        scale3 = scale3 * (1.0d0-expdamp)
-                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0+damp))
-                     end if
-                  end if
+                  call dampthole2 (ii,kk,5,r,dmpik)
+                  dmpik(3) = uscale(k) * dmpik(3)
+                  dmpik(5) = uscale(k) * dmpik(5)
 c
-c     find the field components for charge penetration damping
+c     find the scale factors for charge penetration damping
 c
                else if (use_chgpen) then
                   corek = pcore(kk)
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampmut (r,alphai,alphak,dmpik)
-                  scale3 = wscale(k) * dmpik(3)
-                  scale5 = wscale(k) * dmpik(5)
+                  dmpik(3) = wscale(k) * dmpik(3)
+                  dmpik(5) = wscale(k) * dmpik(5)
                end if
-               rr3 = -scale3 / (r*r2)
-               rr5 = 3.0d0 * scale5 / (r*r2*r2)
+c
+c     increment the mutual electrostatic field components
+c
+               rr3 = -dmpik(3) / (r*r2)
+               rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                fid(1) = rr3*dkx + rr5*dkr*xr
                fid(2) = rr3*dky + rr5*dkr*yr
                fid(3) = rr3*dkz + rr5*dkr*zr
@@ -1436,10 +1380,7 @@ c
             pix = uinp(1,ii)
             piy = uinp(2,ii)
             piz = uinp(3,ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-            else if (use_chgpen) then
+            if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -1498,35 +1439,28 @@ c
                      pir = pix*xr + piy*yr + piz*zr
                      pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     find the field components for Thole polarization damping
+c     find the scale factors for Thole polarization damping
 c
                      if (use_thole) then
-                        scale3 = uscale(k)
-                        scale5 = uscale(k)
-                        damp = pdi * pdamp(kk)
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(kk))
-                           damp = pgamma * (r/damp)**3
-                           if (damp .lt. 50.0d0) then
-                              expdamp = exp(damp)
-                              scale3 = scale3 * (1.0d0-expdamp)
-                              scale5 = scale5 * (1.0d0-expdamp
-     &                                              *(1.0d0+damp))
-                           end if
-                        end if
+                        call dampthole2 (ii,kk,5,r,dmpik)
+                        dmpik(3) = uscale(k) * dmpik(3)
+                        dmpik(5) = uscale(k) * dmpik(5)
 c
-c     find the field components for charge penetration damping
+c     find the scale factors for charge penetration damping
 c
                      else if (use_chgpen) then
                         corek = pcore(kk)
                         valk = pval(kk)
                         alphak = palpha(kk)
                         call dampmut (r,alphai,alphak,dmpik)
-                        scale3 = wscale(k) * dmpik(3)
-                        scale5 = wscale(k) * dmpik(5)
+                        dmpik(3) = wscale(k) * dmpik(3)
+                        dmpik(5) = wscale(k) * dmpik(5)
                      end if
-                     rr3 = -scale3 / (r*r2)
-                     rr5 = 3.0d0 * scale5 / (r*r2*r2)
+c
+c     increment the mutual electrostatic field components
+c
+                     rr3 = -dmpik(3) / (r*r2)
+                     rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                      fid(1) = rr3*dkx + rr5*dkr*xr
                      fid(2) = rr3*dky + rr5*dkr*yr
                      fid(3) = rr3*dkz + rr5*dkr*zr
@@ -1625,7 +1559,8 @@ c
       integer i,j,k
       integer ii,kk,kkk
       real*8 xr,yr,zr
-      real*8 r,r2,rr3,rr5,rr7
+      real*8 r,r2,rr3
+      real*8 rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 ci,dix,diy,diz
@@ -1640,13 +1575,9 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 pdi,pti,ddi
-      real*8 pgamma
       real*8 fid(3),fkd(3)
       real*8 dmpi(7),dmpk(7)
+      real*8 dmpik(7)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
@@ -1687,11 +1618,11 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,rpole,x,y,z,pdamp,thole,dirdamp,pcore,pval,
-!$OMP& palpha,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,
-!$OMP& ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
-!$OMP& p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,
-!$OMP& dpequal,use_thole,use_chgpen,use_bounds,off2,field,fieldp)
+!$OMP& shared(npole,ipole,rpole,x,y,z,pcore,pval,palpha,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,dpequal,
+!$OMP& use_thole,use_chgpen,use_bounds,off2,field,fieldp)
 !$OMP& firstprivate(dscale,pscale) shared (fieldt,fieldtp)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
 c
@@ -1709,11 +1640,7 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -1836,36 +1763,10 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  damp = pdi * pdamp(kk)
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(ddi,dirdamp(kk))
-                     if (pgamma .ne. 0.0d0) then
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
-                  rr3 = scale3 / (r*r2)
-                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                  rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
+                  call dampthole (ii,kk,7,r,dmpik)
+                  rr3 = dmpik(3) / (r*r2)
+                  rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
+                  rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
                   fid(1) = -xr*(rr3*ck-rr5*dkr+rr7*qkr)
      &                        - rr3*dkx + 2.0d0*rr5*qkx
                   fid(2) = -yr*(rr3*ck-rr5*dkr+rr7*qkr)
@@ -1914,6 +1815,9 @@ c
      &                        + rr5i*dir + rr7i*qir)
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
                end if
+c
+c     increment the direct electrostatic field components
+c
                do j = 1, 3
                   fieldt(j,ii) = fieldt(j,ii) + fid(j)*dscale(k)
                   fieldt(j,kk) = fieldt(j,kk) + fkd(j)*dscale(k)
@@ -2030,9 +1934,6 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpik(5)
@@ -2076,11 +1977,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,uind,uinp,x,y,z,pdamp,thole,pcore,pval,
-!$OMP& palpha,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
-!$OMP& np13,ip13,np14,ip14,u1scale,u2scale,u3scale,u4scale,w2scale,
-!$OMP& w3scale,w4scale,w5scale,nelst,elst,use_thole,use_chgpen,
-!$OMP& use_bounds,off2,field,fieldp)
+!$OMP& shared(npole,ipole,uind,uinp,x,y,z,pcore,pval,palpha,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP& u1scale,u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,
+!$OMP& nelst,elst,use_thole,use_chgpen,use_bounds,off2,field,fieldp)
 !$OMP& firstprivate(uscale,wscale) shared (fieldt,fieldtp)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
 c
@@ -2094,10 +1994,7 @@ c
          pix = uinp(1,ii)
          piy = uinp(2,ii)
          piz = uinp(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -2156,34 +2053,28 @@ c
                pir = pix*xr + piy*yr + piz*zr
                pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     find the field components for Thole polarization damping
+c     find the scale factors for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = uscale(k)
-                  scale5 = uscale(k)
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = pgamma * (r/damp)**3
-                     if (damp .lt. 50.0d0) then
-                        expdamp = exp(-damp)
-                        scale3 = scale3 * (1.0d0-expdamp)
-                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0+damp))
-                     end if
-                  end if
+                  call dampthole2 (ii,kk,5,r,dmpik)
+                  dmpik(3) = uscale(k) * dmpik(3)
+                  dmpik(5) = uscale(k) * dmpik(5)
 c
-c     find the field components for charge penetration damping
+c     find the scale factors for charge penetration damping
 c
                else if (use_chgpen) then
                   corek = pcore(kk)
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampmut (r,alphai,alphak,dmpik)
-                  scale3 = wscale(k) * dmpik(3)
-                  scale5 = wscale(k) * dmpik(5)
+                  dmpik(3) = wscale(k) * dmpik(3)
+                  dmpik(5) = wscale(k) * dmpik(5)
                end if
-               rr3 = -scale3 / (r*r2)
-               rr5 = 3.0d0 * scale5 / (r*r2*r2)
+c
+c     increment the mutual electrostatic field components
+c
+               rr3 = -dmpik(3) / (r*r2)
+               rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                fid(1) = rr3*dkx + rr5*dkr*xr
                fid(2) = rr3*dky + rr5*dkr*yr
                fid(3) = rr3*dkz + rr5*dkr*zr
@@ -2320,7 +2211,7 @@ c
 c
 c     get the self-energy portion of the permanent field
 c
-      term = (4.0d0/3.0d0) * aewald**3 / sqrtpi
+      term = (4.0d0/3.0d0) * aewald**3 / rootpi
       do ii = 1, npole
          do j = 1, 3
             field(j,ii) = field(j,ii) + term*rpole(j+1,ii)
@@ -2481,7 +2372,7 @@ c
             expterm = exp(term) / denom
             if (.not. use_bounds) then
                expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (octahedron) then
+            else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
          end if
@@ -2552,7 +2443,6 @@ c
       use cell
       use chgpen
       use couple
-      use ewald
       use math
       use mplpot
       use mpole
@@ -2564,12 +2454,11 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk
-      real*8 xr,yr,zr,r,r2
-      real*8 rr1,rr2,rr3
-      real*8 rr5,rr7
+      real*8 xr,yr,zr
+      real*8 r,r2,rr1,rr2
+      real*8 rr3,rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
-      real*8 erfc,bfac,exp2a
       real*8 ci,dix,diy,diz
       real*8 qixx,qiyy,qizz
       real*8 qixy,qixz,qiyz
@@ -2582,25 +2471,19 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 ralpha,aefac
-      real*8 aesq2,aesq2n
-      real*8 pdi,pti,ddi
-      real*8 pgamma
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7,scalek
+      real*8 scalek
+      real*8 dmp3,dmp5,dmp7
       real*8 dsc3,dsc5,dsc7
       real*8 psc3,psc5,psc7
-      real*8 bn(0:3),bcn(3)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpi(7),dmpk(7)
+      real*8 dmpik(7),dmpe(7)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
-      external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -2608,9 +2491,6 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
-      aesq2 = 2.0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2638,11 +2518,7 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -2766,80 +2642,46 @@ c
                qkz = qkxz*xr + qkyz*yr + qkzz*zr
                qkr = qkx*xr + qky*yr + qkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
-               exp2a = exp(-ralpha**2)
-               aefac = aesq2n
-               do j = 1, 3
-                  bfac = dble(j+j-1)
-                  aefac = aesq2 * aefac
-                  bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-               end do
+               call dampewald (7,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(ddi,dirdamp(kk))
-                     if (pgamma .ne. 0.0d0) then
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
+                  call dampthole (ii,kk,7,r,dmpik)
                   scalek = dscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fid(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fid(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fid(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkd(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkd(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkd(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                  fid(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fid(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fid(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkd(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkd(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkd(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
                   scalek = pscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fip(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fip(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fip(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkp(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkp(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkp(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                  fip(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fip(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fip(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkp(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkp(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkp(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
 c
 c     find the field components for charge penetration damping
 c
@@ -2849,13 +2691,13 @@ c
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = dscale(k)
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fid(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -2876,13 +2718,13 @@ c
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
                   scalek = pscale(k)
                   rr3 = rr2 * rr1
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fip(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -2976,11 +2818,7 @@ c
             qiyy = rpole(9,ii)
             qiyz = rpole(10,ii)
             qizz = rpole(13,ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-               ddi = dirdamp(ii)
-            else if (use_chgpen) then
+            if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -3108,96 +2946,60 @@ c
                      qkz = qkxz*xr + qkyz*yr + qkzz*zr
                      qkr = qkx*xr + qky*yr + qkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-                     ralpha = aewald * r
-                     bn(0) = erfc(ralpha) * rr1
-                     exp2a = exp(-ralpha**2)
-                     aefac = aesq2n
-                     do j = 1, 3
-                        bfac = dble(j+j-1)
-                        aefac = aesq2 * aefac
-                        bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-                     end do
+                     call dampewald (7,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        scale3 = 1.0d0
-                        scale5 = 1.0d0
-                        scale7 = 1.0d0
-                        damp = pdi * pdamp(kk)
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(ddi,dirdamp(kk))
-                           if (pgamma .ne. 0.0d0) then
-                              damp = pgamma * (r/damp)**(1.5d0)
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp) 
-                                 scale3 = 1.0d0 - expdamp 
-                                 scale5 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.5d0*damp)
-                                 scale7 = 1.0d0 - expdamp
-     &                                               *(1.0d0+0.65d0*damp
-     &                                                  +0.15d0*damp**2)
-                              end if
-                           else
-                              pgamma = min(pti,thole(kk))
-                              damp = pgamma * (r/damp)**3
-                              if (damp .lt. 50.0d0) then
-                                 expdamp = exp(-damp)
-                                 scale3 = 1.0d0 - expdamp
-                                 scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                                 scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                               +0.6d0*damp**2)
-                              end if
-                           end if
-                        end if
-                        dsc3 = scale3
-                        dsc5 = scale5
-                        dsc7 = scale7
-                        psc3 = scale3
-                        psc5 = scale5
-                        psc7 = scale7
+                        call dampthole (ii,kk,7,r,dmpik)
+                        dsc3 = dmpik(3)
+                        dsc5 = dmpik(5)
+                        dsc7 = dmpik(7)
+                        psc3 = dmpik(3)
+                        psc5 = dmpik(5)
+                        psc7 = dmpik(7)
                         if (use_polymer) then
                            if (r2 .le. polycut2) then
-                              dsc3 = scale3 * dscale(k)
-                              dsc5 = scale5 * dscale(k)
-                              dsc7 = scale7 * dscale(k)
-                              psc3 = scale3 * pscale(k)
-                              psc5 = scale5 * pscale(k)
-                              psc7 = scale7 * pscale(k)
+                              dsc3 = dmpik(3) * dscale(k)
+                              dsc5 = dmpik(5) * dscale(k)
+                              dsc7 = dmpik(7) * dscale(k)
+                              psc3 = dmpik(3) * pscale(k)
+                              psc5 = dmpik(5) * pscale(k)
+                              psc7 = dmpik(7) * pscale(k)
                            end if
                         end if
-                        bcn(1) = bn(1) - (1.0d0-dsc3)*rr3
-                        bcn(2) = bn(2) - (1.0d0-dsc5)*rr5
-                        bcn(3) = bn(3) - (1.0d0-dsc7)*rr7
-                        fid(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                        fid(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                        fid(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                        fkd(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                        fkd(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                        fkd(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diz - 2.0d0*bcn(2)*qiz
-                        bcn(1) = bn(1) - (1.0d0-psc3)*rr3
-                        bcn(2) = bn(2) - (1.0d0-psc5)*rr5
-                        bcn(3) = bn(3) - (1.0d0-psc7)*rr7
-                        fip(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                        fip(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                        fip(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                              - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                        fkp(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                        fkp(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                        fkp(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                              - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                        dmp3 = dmpe(3) - (1.0d0-dsc3)*rr3
+                        dmp5 = dmpe(5) - (1.0d0-dsc5)*rr5
+                        dmp7 = dmpe(7) - (1.0d0-dsc7)*rr7
+                        fid(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkx + 2.0d0*dmp5*qkx
+                        fid(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dky + 2.0d0*dmp5*qky
+                        fid(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkz + 2.0d0*dmp5*qkz
+                        fkd(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*dix - 2.0d0*dmp5*qix
+                        fkd(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diy - 2.0d0*dmp5*qiy
+                        fkd(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diz - 2.0d0*dmp5*qiz
+                        dmp3 = dmpe(3) - (1.0d0-psc3)*rr3
+                        dmp5 = dmpe(5) - (1.0d0-psc5)*rr5
+                        dmp7 = dmpe(7) - (1.0d0-psc7)*rr7
+                        fip(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkx + 2.0d0*dmp5*qkx
+                        fip(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dky + 2.0d0*dmp5*qky
+                        fip(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                              - dmp3*dkz + 2.0d0*dmp5*qkz
+                        fkp(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*dix - 2.0d0*dmp5*qix
+                        fkp(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diy - 2.0d0*dmp5*qiy
+                        fkp(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                              - dmp3*diz - 2.0d0*dmp5*qiz
 c
 c     find the field components for charge penetration damping
 c
@@ -3212,13 +3014,13 @@ c
                               scalek = dscale(k)
                            end if
                         end if
-                        rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                        rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                        rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                        rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                        rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                        rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                        rr3 = bn(1) - (1.0d0-scalek)*rr3
+                        rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                        rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                        rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                        rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                        rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                        rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                        rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                         fid(1) = -xr*(rr3*corek + rr3k*valk
      &                              - rr5k*dkr + rr7k*qkr)
      &                              - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3244,13 +3046,13 @@ c
                            end if
                         end if
                         rr3 = rr2 * rr1
-                        rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                        rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                        rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                        rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                        rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                        rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                        rr3 = bn(1) - (1.0d0-scalek)*rr3
+                        rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                        rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                        rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                        rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                        rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                        rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                        rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                         fip(1) = -xr*(rr3*corek + rr3k*valk
      &                              - rr5k*dkr + rr7k*qkr)
      &                              - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3358,7 +3160,6 @@ c
       use bound
       use chgpen
       use couple
-      use ewald
       use math
       use mplpot
       use mpole
@@ -3378,13 +3179,12 @@ c
 !$    integer omp_get_thread_num
       integer, allocatable :: toffset(:)
       integer, allocatable :: ilocal(:,:)
-      real*8 xr,yr,zr,r,r2
-      real*8 rr1,rr2,rr3
-      real*8 rr5,rr7
+      real*8 xr,yr,zr
+      real*8 r,r2,rr1,rr2
+      real*8 rr3,rr5,rr7
       real*8 rr3i,rr5i,rr7i
       real*8 rr3k,rr5k,rr7k
       real*8 rr3ik,rr5ik
-      real*8 erfc,bfac,exp2a
       real*8 ci,dix,diy,diz
       real*8 qixx,qiyy,qizz
       real*8 qixy,qixz,qiyz
@@ -3397,18 +3197,12 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 ralpha,aefac
-      real*8 aesq2,aesq2n
-      real*8 pdi,pti,ddi
-      real*8 pgamma
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7,scalek
-      real*8 bn(0:3),bcn(3)
+      real*8 scalek
+      real*8 dmp3,dmp5,dmp7
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpi(7),dmpk(7)
-      real*8 dmpik(5)
+      real*8 dmpik(7),dmpe(7)
       real*8, allocatable :: pscale(:)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: uscale(:)
@@ -3419,7 +3213,6 @@ c
       real*8, allocatable :: fieldtp(:,:)
       real*8, allocatable :: dlocal(:,:)
       character*6 mode
-      external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -3427,9 +3220,6 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
-      aesq2 = 2.0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
 c
 c     values for storage of mutual polarization intermediates
 c
@@ -3472,14 +3262,13 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,rpole,x,y,z,pdamp,
-!$OMP& thole,dirdamp,pcore,pval,palpha,p2scale,p3scale,p4scale,p5scale,
-!$OMP& p2iscale,p3iscale,p4iscale,p5iscale,w2scale,w3scale,w4scale,
-!$OMP& w5scale,d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,
-!$OMP& u4scale,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
-!$OMP& np13,ip13,np14,ip14,nelst,elst,dpequal,use_thole,use_chgpen,
-!$OMP& use_bounds,off2,aewald,aesq2,aesq2n,poltyp,nchunk,ntpair,tindex,
-!$OMP& tdipdip,toffset,field,fieldp,fieldt,fieldtp)
+!$OMP PARALLEL default(private) shared(npole,ipole,rpole,x,y,z,pcore,
+!$OMP& pval,palpha,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
+!$OMP& p4iscale,p5iscale,w2scale,w3scale,w4scale,w5scale,d1scale,
+!$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,
+!$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
+!$OMP& nelst,elst,dpequal,use_thole,use_chgpen,use_bounds,off2,poltyp,
+!$OMP& nchunk,ntpair,tindex,tdipdip,toffset,field,fieldp,fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nchunk)
 c
@@ -3497,11 +3286,7 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = dirdamp(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -3650,108 +3435,63 @@ c
                qkz = qkxz*xr + qkyz*yr + qkzz*zr
                qkr = qkx*xr + qky*yr + qkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
-               exp2a = exp(-ralpha**2)
-               aefac = aesq2n
-               do j = 1, 3
-                  bfac = dble(j+j-1)
-                  aefac = aesq2 * aefac
-                  bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-               end do
+               call dampewald (7,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(ddi,dirdamp(kk))
-                     if (pgamma .ne. 0.0d0) then
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
+                  call dampthole (ii,kk,7,r,dmpik)
                   scalek = dscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fid(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fid(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fid(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkd(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkd(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkd(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                  fid(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fid(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fid(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkd(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkd(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkd(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
                   scalek = pscale(k)
-                  bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                  bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
-                  bcn(3) = bn(3) - (1.0d0-scalek*scale7)*rr7
-                  fip(1) = -xr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkx + 2.0d0*bcn(2)*qkx
-                  fip(2) = -yr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dky + 2.0d0*bcn(2)*qky
-                  fip(3) = -zr*(bcn(1)*ck-bcn(2)*dkr+bcn(3)*qkr)
-     &                        - bcn(1)*dkz + 2.0d0*bcn(2)*qkz
-                  fkp(1) = xr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*dix - 2.0d0*bcn(2)*qix
-                  fkp(2) = yr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diy - 2.0d0*bcn(2)*qiy
-                  fkp(3) = zr*(bcn(1)*ci+bcn(2)*dir+bcn(3)*qir)
-     &                        - bcn(1)*diz - 2.0d0*bcn(2)*qiz
+                  dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                  dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
+                  dmp7 = dmpe(7) - (1.0d0-scalek*dmpik(7))*rr7
+                  fip(1) = -xr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkx + 2.0d0*dmp5*qkx
+                  fip(2) = -yr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dky + 2.0d0*dmp5*qky
+                  fip(3) = -zr*(dmp3*ck-dmp5*dkr+dmp7*qkr)
+     &                        - dmp3*dkz + 2.0d0*dmp5*qkz
+                  fkp(1) = xr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*dix - 2.0d0*dmp5*qix
+                  fkp(2) = yr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diy - 2.0d0*dmp5*qiy
+                  fkp(3) = zr*(dmp3*ci+dmp5*dir+dmp7*qir)
+     &                        - dmp3*diz - 2.0d0*dmp5*qiz
 c
 c     find terms needed later to compute mutual polarization
 c
                   if (poltyp .ne. 'DIRECT') then
-                     scale3 = 1.0d0
-                     scale5 = 1.0d0
-                     damp = pdi * pdamp(kk)
-                     if (damp .ne. 0.0d0) then
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                        end if
-                     end if
+                     call dampthole2 (ii,kk,5,r,dmpik)
                      scalek = uscale(k)
-                     bcn(1) = bn(1) - (1.0d0-scalek*scale3)*rr3
-                     bcn(2) = bn(2) - (1.0d0-scalek*scale5)*rr5
+                     dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                     dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
                      nlocal = nlocal + 1
                      ilocal(1,nlocal) = ii
                      ilocal(2,nlocal) = kk
-                     dlocal(1,nlocal) = -bcn(1) + bcn(2)*xr*xr
-                     dlocal(2,nlocal) = bcn(2)*xr*yr
-                     dlocal(3,nlocal) = bcn(2)*xr*zr
-                     dlocal(4,nlocal) = -bcn(1) + bcn(2)*yr*yr
-                     dlocal(5,nlocal) = bcn(2)*yr*zr
-                     dlocal(6,nlocal) = -bcn(1) + bcn(2)*zr*zr
+                     dlocal(1,nlocal) = -dmp3 + dmp5*xr*xr
+                     dlocal(2,nlocal) = dmp5*xr*yr
+                     dlocal(3,nlocal) = dmp5*xr*zr
+                     dlocal(4,nlocal) = -dmp3 + dmp5*yr*yr
+                     dlocal(5,nlocal) = dmp5*yr*zr
+                     dlocal(6,nlocal) = -dmp3 + dmp5*zr*zr
                   end if
 c
 c     find the field components for charge penetration damping
@@ -3762,13 +3502,13 @@ c
                   alphak = palpha(kk)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = dscale(k)
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fid(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3789,13 +3529,13 @@ c
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
                   scalek = pscale(k)
                   rr3 = rr2 * rr1
-                  rr3i = bn(1) - (1.0d0-scalek*dmpi(3))*rr3
-                  rr5i = bn(2) - (1.0d0-scalek*dmpi(5))*rr5
-                  rr7i = bn(3) - (1.0d0-scalek*dmpi(7))*rr7
-                  rr3k = bn(1) - (1.0d0-scalek*dmpk(3))*rr3
-                  rr5k = bn(2) - (1.0d0-scalek*dmpk(5))*rr5
-                  rr7k = bn(3) - (1.0d0-scalek*dmpk(7))*rr7
-                  rr3 = bn(1) - (1.0d0-scalek)*rr3
+                  rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
+                  rr5i = dmpe(5) - (1.0d0-scalek*dmpi(5))*rr5
+                  rr7i = dmpe(7) - (1.0d0-scalek*dmpi(7))*rr7
+                  rr3k = dmpe(3) - (1.0d0-scalek*dmpk(3))*rr3
+                  rr5k = dmpe(5) - (1.0d0-scalek*dmpk(5))*rr5
+                  rr7k = dmpe(7) - (1.0d0-scalek*dmpk(7))*rr7
+                  rr3 = dmpe(3) - (1.0d0-scalek)*rr3
                   fip(1) = -xr*(rr3*corek + rr3k*valk
      &                        - rr5k*dkr + rr7k*qkr)
      &                        - rr3k*dkx + 2.0d0*rr5k*qkx
@@ -3821,8 +3561,8 @@ c
                      call dampmut (r,alphai,alphak,dmpik)
                      scalek = wscale(k)
                      rr3 = rr2 * rr1
-                     rr3ik = bn(1) - (1.0d0-scalek*dmpik(3))*rr3
-                     rr5ik = bn(2) - (1.0d0-scalek*dmpik(5))*rr5
+                     rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
+                     rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
                      nlocal = nlocal + 1
                      ilocal(1,nlocal) = ii
                      ilocal(2,nlocal) = kk
@@ -4028,7 +3768,7 @@ c
 c
 c     get the self-energy portion of the mutual field
 c
-      term = (4.0d0/3.0d0) * aewald**3 / sqrtpi
+      term = (4.0d0/3.0d0) * aewald**3 / rootpi
       do ii = 1, npole
          do j = 1, 3
             field(j,ii) = field(j,ii) + term*uind(j,ii)
@@ -4217,7 +3957,6 @@ c
       use cell
       use chgpen
       use couple
-      use ewald
       use math
       use mplpot
       use mpole
@@ -4229,9 +3968,9 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk
-      real*8 xr,yr,zr,r,r2
-      real*8 rr1,rr2,rr3,rr5
-      real*8 erfc,bfac,exp2a
+      real*8 xr,yr,zr
+      real*8 r,r2,rr1
+      real*8 rr2,rr3,rr5
       real*8 dix,diy,diz
       real*8 pix,piy,piz
       real*8 dkx,dky,dkz
@@ -4241,21 +3980,14 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
-      real*8 ralpha,aefac
-      real*8 aesq2,aesq2n
-      real*8 pdi,pti,pgamma
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 bn(0:2)
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
-      real*8 dmpik(5)
+      real*8 dmpik(5),dmpe(5)
       real*8, allocatable :: uscale(:)
       real*8, allocatable :: wscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       character*6 mode
-      external erfc
 c
 c
 c     check for multipoles and set cutoff coefficients
@@ -4263,9 +3995,6 @@ c
       if (npole .eq. 0)  return
       mode = 'EWALD'
       call switch (mode)
-      aesq2 = 2.0 * aewald * aewald
-      aesq2n = 0.0d0
-      if (aewald .gt. 0.0d0)  aesq2n = 1.0d0 / (sqrtpi*aewald)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -4289,10 +4018,7 @@ c
          pix = uinp(1,ii)
          piy = uinp(2,ii)
          piz = uinp(3,ii)
-         if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-         else if (use_chgpen) then
+         if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
             alphai = palpha(ii)
@@ -4354,33 +4080,16 @@ c
                pir = pix*xr + piy*yr + piz*zr
                pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-               ralpha = aewald * r
-               bn(0) = erfc(ralpha) * rr1
-               exp2a = exp(-ralpha**2)
-               aefac = aesq2n
-               do j = 1, 2
-                  bfac = dble(j+j-1)
-                  aefac = aesq2 * aefac
-                  bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-               end do
+               call dampewald (5,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  scale3 = uscale(k)
-                  scale5 = uscale(k)
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = pgamma * (r/damp)**3
-                     if (damp .lt. 50.0d0) then
-                        expdamp = exp(-damp)
-                        scale3 = scale3 * (1.0d0-expdamp)
-                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0+damp))
-                     end if
-                  end if
+                  call dampthole2 (ii,kk,5,r,dmpik)
+                  dmpik(3) = uscale(k) * dmpik(3)
+                  dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the field components for charge penetration damping
 c
@@ -4389,14 +4098,14 @@ c
                   valk = pval(kk)
                   alphak = palpha(kk)
                   call dampmut (r,alphai,alphak,dmpik)
-                  scale3 = wscale(k) * dmpik(3)
-                  scale5 = wscale(k) * dmpik(5)
+                  dmpik(3) = wscale(k) * dmpik(3)
+                  dmpik(5) = wscale(k) * dmpik(5)
                end if
 c
 c     find the field terms for the current interaction
 c
-               rr3 = -bn(1) + (1.0d0-scale3)*rr3
-               rr5 = bn(2) - 3.0d0*(1.0d0-scale5)*rr5
+               rr3 = -dmpe(3) + (1.0d0-dmpik(3))*rr3
+               rr5 = dmpe(5) - 3.0d0*(1.0d0-dmpik(5))*rr5
                fid(1) = rr3*dkx + rr5*dkr*xr
                fid(2) = rr3*dky + rr5*dkr*yr
                fid(3) = rr3*dkz + rr5*dkr*zr
@@ -4460,10 +4169,7 @@ c
             pix = uinp(1,ii)
             piy = uinp(2,ii)
             piz = uinp(3,ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-            else if (use_chgpen) then
+            if (use_chgpen) then
                corei = pcore(ii)
                vali = pval(ii)
                alphai = palpha(ii)
@@ -4526,34 +4232,16 @@ c
                      pir = pix*xr + piy*yr + piz*zr
                      pkr = pkx*xr + pky*yr + pkz*zr
 c
-c     calculate the real space Ewald error function terms
+c     calculate real space Ewald error function damping
 c
-                     ralpha = aewald * r
-                     bn(0) = erfc(ralpha) * rr1
-                     exp2a = exp(-ralpha**2)
-                     aefac = aesq2n
-                     do j = 1, 2
-                        bfac = dble(j+j-1)
-                        aefac = aesq2 * aefac
-                        bn(j) = (bfac*bn(j-1)+aefac*exp2a) * rr2
-                     end do
+                     call dampewald (5,r,r2,1.0d0,dmpe)
 c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        scale3 = uscale(k)
-                        scale5 = uscale(k)
-                        damp = pdi * pdamp(kk)
-                        if (damp .ne. 0.0d0) then
-                           pgamma = min(pti,thole(kk))
-                           damp = pgamma * (r/damp)**3
-                           if (damp .lt. 50.0d0) then
-                              expdamp = exp(-damp)
-                              scale3 = scale3 * (1.0d0-expdamp)
-                              scale5 = scale5 * (1.0d0-expdamp
-     &                                              *(1.0d0+damp))
-                           end if
-                        end if
+                        call dampthole2 (ii,kk,5,r,dmpik)
+                        dmpik(3) = uscale(k) * dmpik(3)
+                        dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the field components for charge penetration damping
 c
@@ -4562,14 +4250,14 @@ c
                         valk = pval(kk)
                         alphak = palpha(kk)
                         call dampmut (r,alphai,alphak,dmpik)
-                        scale3 = wscale(k) * dmpik(3)
-                        scale5 = wscale(k) * dmpik(5)
+                        dmpik(3) = wscale(k) * dmpik(3)
+                        dmpik(5) = wscale(k) * dmpik(5)
                      end if
 c
 c     find the field terms for the current interaction
 c
-                     rr3 = -bn(1) + (1.0d0-scale3)*rr3
-                     rr5 = bn(2) - 3.0d0*(1.0d0-scale5)*rr5
+                     rr3 = -dmpe(3) + (1.0d0-dmpik(3))*rr3
+                     rr5 = dmpe(5) - 3.0d0*(1.0d0-dmpik(5))*rr5
                      fid(1) = rr3*dkx + rr5*dkr*xr
                      fid(2) = rr3*dky + rr5*dkr*yr
                      fid(3) = rr3*dkz + rr5*dkr*zr
@@ -4768,6 +4456,7 @@ c
       use uprior
       implicit none
       integer i,j,k,iter
+      integer miniter
       integer maxiter
       real*8 polmin
       real*8 eps,epsold
@@ -4928,6 +4617,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
+         miniter = 3
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0
@@ -5134,6 +4824,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
+            if (iter .lt. miniter)  done = .false.
             if (iter .ge. politer)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
@@ -5240,11 +4931,6 @@ c
       real*8 dir,dkr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 pdi,pti,ddi
-      real*8 pgamma
       real*8 rb2,rbi,rbk
       real*8 dwater,fc,fd,fq
       real*8 gf,gf2,gf3,gf5,gf7
@@ -5257,6 +4943,7 @@ c
       real*8 gqxz(4),gqyy(4)
       real*8 gqyz(4),gqzz(4)
       real*8 fid(3),fkd(3)
+      real*8 dmpik(7)
       real*8, allocatable :: dscale(:)
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
@@ -5320,12 +5007,11 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,rpole,pdamp,thole,
-!$OMP& dirdamp,rborn,n12,n13,n14,n15,np11,np12,np13,np14,i12,i13,i14,
-!$OMP& i15,ip11,ip12,ip13,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
-!$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
-!$OMP& dpequal,use_intra,x,y,z,off2,fc,fd,fq,gkc,field,fieldp,fields,
-!$OMP& fieldps)
+!$OMP PARALLEL default(private) shared(npole,ipole,rpole,rborn,n12,n13,
+!$OMP& n14,n15,np11,np12,np13,np14,i12,i13,i14,i15,ip11,ip12,ip13,ip14,
+!$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,dpequal,use_intra,
+!$OMP& x,y,z,off2,fc,fd,fq,gkc,field,fieldp,fields,fieldps)
 !$OMP& firstprivate(dscale,pscale)
 !$OMP& shared(fieldt,fieldtp,fieldts,fieldtps)
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
@@ -5344,9 +5030,6 @@ c
          qyyi = rpole(9,ii)
          qyzi = rpole(10,ii)
          qzzi = rpole(13,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         ddi = dirdamp(ii)
          rbi = rborn(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -5458,38 +5141,10 @@ c
 c     self-interactions for the solute field are skipped
 c
                   if (i .ne. k) then
-                     scale3 = 1.0d0
-                     scale5 = 1.0d0
-                     scale7 = 1.0d0
-                     damp = pdi * pdamp(kk)
-                     if (damp .ne. 0.0d0) then
-                        pgamma = min(ddi,dirdamp(kk))
-                        if (pgamma .ne. 0.0d0) then
-                           damp = pgamma * (r/damp)**(1.5d0)
-                           if (damp .lt. 50.0d0) then
-                              expdamp = exp(-damp) 
-                              scale3 = 1.0d0 - expdamp 
-                              scale5 = 1.0d0 - expdamp
-     &                                            *(1.0d0+0.5d0*damp)
-                              scale7 = 1.0d0 - expdamp
-     &                                            *(1.0d0+0.65d0*damp
-     &                                               +0.15d0*damp**2)
-                           end if
-                        else
-                           pgamma = min(pti,thole(kk))
-                           damp = pgamma * (r/damp)**3
-                           if (damp .lt. 50.0d0) then
-                              expdamp = exp(-damp)
-                              scale3 = 1.0d0 - expdamp
-                              scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                              scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                            +0.6d0*damp**2)
-                           end if
-                        end if
-                     end if
-                     rr3 = scale3 / (r*r2)
-                     rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                     rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
+                     call dampthole (ii,kk,7,r,dmpik)
+                     rr3 = dmpik(3) / (r*r2)
+                     rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
+                     rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
                      dir = uxi*xr + uyi*yr + uzi*zr
                      qix = qxxi*xr + qxyi*yr + qxzi*zr
                      qiy = qxyi*xr + qyyi*yr + qyzi*zr
@@ -5818,9 +5473,6 @@ c
       real*8 pukxs,pukys,pukzs
       real*8 duirs,puirs
       real*8 dukrs,pukrs
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 pdi,pti,pgamma
       real*8 rb2,rbi,rbk
       real*8 dwater,fd
       real*8 gf,gf2,gf3,gf5
@@ -5833,6 +5485,7 @@ c
       real*8 fip(3),fkp(3)
       real*8 fids(3),fkds(3)
       real*8 fips(3),fkps(3)
+      real*8 dmpik(5)
       real*8, allocatable :: uscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
@@ -5891,10 +5544,10 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,pdamp,thole,rborn,
-!$OMP& uind,uinp,uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,
-!$OMP& u1scale,u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,
-!$OMP& field,fieldp,fields,fieldps)
+!$OMP PARALLEL default(private) shared(npole,ipole,rborn,uind,uinp,
+!$OMP& uinds,uinps,np11,np12,np13,np14,ip11,ip12,ip13,ip14,u1scale,
+!$OMP& u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,field,
+!$OMP& fieldp,fields,fieldps)
 !$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
 !$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
 c
@@ -5914,8 +5567,6 @@ c
          puixs = uinps(1,ii)
          puiys = uinps(2,ii)
          puizs = uinps(3,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
          rbi = rborn(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -5963,21 +5614,11 @@ c
                   pukzs = uinps(3,kk)
                   rbk = rborn(k)
                   if (i .ne. k) then
-                     scale3 = uscale(k)
-                     scale5 = uscale(k)
-                     damp = pdi * pdamp(kk)
-                     if (damp .ne. 0.0d0) then
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = scale3 * (1.0d0-expdamp)
-                           scale5 = scale5 * (1.0d0-expdamp
-     &                                           *(1.0d0+damp))
-                        end if
-                     end if
-                     rr3 = -scale3 / (r*r2)
-                     rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                     call dampthole2 (ii,kk,5,r,dmpik)
+                     dmpik(3) = uscale(k) * dmpik(3)
+                     dmpik(5) = uscale(k) * dmpik(5)
+                     rr3 = -dmpik(3) / (r*r2)
+                     rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                      duir = xr*duix + yr*duiy + zr*duiz
                      dukr = xr*dukx + yr*duky + zr*dukz
                      puir = xr*puix + yr*puiy + zr*puiz
@@ -6141,6 +5782,7 @@ c
       use uprior
       implicit none
       integer i,j,k,iter
+      integer miniter
       integer maxiter
       real*8 polmin
       real*8 eps,epsold
@@ -6301,6 +5943,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
+         miniter = 3
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0
@@ -6507,6 +6150,7 @@ c
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
+            if (iter .lt. miniter)  done = .false.
             if (iter .ge. politer)  done = .true.
 c
 c     apply a "peek" iteration to the mutual induced dipoles
@@ -6595,7 +6239,7 @@ c
       use polgrp
       use polpot
       use shunt
-      use solute
+      use solpot
       implicit none
       integer i,j,k
       integer ii,kk
@@ -6612,12 +6256,8 @@ c
       real*8 dir,dkr
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 scale7
-      real*8 pdi,pti,ddi
-      real*8 pgamma
       real*8 fid(3),fkd(3)
+      real*8 dmpik(7)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       real*8 fields(3,*)
@@ -6664,9 +6304,6 @@ c
          qiyy = rpole(9,ii)
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
-         ddi = dirdamp(ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -6772,36 +6409,10 @@ c
                   qkyy = rpole(9,kk)
                   qkyz = rpole(10,kk)
                   qkzz = rpole(13,kk)
-                  scale3 = 1.0d0
-                  scale5 = 1.0d0
-                  scale7 = 1.0d0
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(ddi,dirdamp(kk))
-                     if (pgamma .ne. 0.0d0) then
-                        damp = pgamma * (r/damp)**(1.5d0)
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp) 
-                           scale3 = 1.0d0 - expdamp 
-                           scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                         +0.15d0*damp**2)
-                        end if
-                     else
-                        pgamma = min(pti,thole(kk))
-                        damp = pgamma * (r/damp)**3
-                        if (damp .lt. 50.0d0) then
-                           expdamp = exp(-damp)
-                           scale3 = 1.0d0 - expdamp
-                           scale5 = 1.0d0 - expdamp*(1.0d0+damp)
-                           scale7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                         +0.6d0*damp**2)
-                        end if
-                     end if
-                  end if
-                  rr3 = scale3 / (r*r2)
-                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
-                  rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
+                  call dampthole (ii,kk,7,r,dmpik)
+                  rr3 = dmpik(3) / (r*r2)
+                  rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
+                  rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
                   dir = dix*xr + diy*yr + diz*zr
                   qix = qixx*xr + qixy*yr + qixz*zr
                   qiy = qixy*xr + qiyy*yr + qiyz*zr
@@ -6923,7 +6534,7 @@ c
       use polgrp
       use polpot
       use shunt
-      use solute
+      use solpot
       implicit none
       integer i,j,k
       integer ii,kk
@@ -6943,13 +6554,11 @@ c
       real*8 pukxs,pukys,pukzs
       real*8 duirs,puirs
       real*8 dukrs,pukrs
-      real*8 damp,expdamp
-      real*8 scale3,scale5
-      real*8 pdi,pti,pgamma
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 fids(3),fkds(3)
       real*8 fips(3),fkps(3)
+      real*8 dmpik(5)
       real*8 field(3,*)
       real*8 fieldp(3,*)
       real*8 fields(3,*)
@@ -6998,8 +6607,6 @@ c
          puixs = uinps(1,ii)
          puiys = uinps(2,ii)
          puizs = uinps(3,ii)
-         pdi = pdamp(ii)
-         pti = thole(ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -7044,20 +6651,11 @@ c
                   pukxs = uinps(1,kk)
                   pukys = uinps(2,kk)
                   pukzs = uinps(3,kk)
-                  scale3 = uscale(k)
-                  scale5 = uscale(k)
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = pgamma * (r/damp)**3
-                     if (damp .lt. 50.0d0) then
-                        expdamp = exp(-damp)
-                        scale3 = scale3 * (1.0d0-expdamp)
-                        scale5 = scale5 * (1.0d0-expdamp*(1.0d0+damp))
-                     end if
-                  end if
-                  rr3 = -scale3 / (r*r2)
-                  rr5 = 3.0d0 * scale5 / (r*r2*r2)
+                  call dampthole2 (ii,kk,5,r,dmpik)
+                  dmpik(3) = uscale(k) * dmpik(3)
+                  dmpik(5) = uscale(k) * dmpik(5)
+                  rr3 = -dmpik(3) / (r*r2)
+                  rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   duir = xr*duix + yr*duiy + zr*duiz
                   dukr = xr*dukx + yr*duky + zr*dukz
                   puir = xr*puix + yr*puiy + zr*puiz
@@ -7182,14 +6780,20 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ulspred" uses standard extrapolation or a least squares fit
-c     to set coefficients of an induced dipole predictor polynomial
+c     "ulspred" uses an ASPC or Gear extrapolation method, or a least
+c     squares fit, to set coefficients of an induced dipole predictor
+c     polynomial
 c
 c     literature references:
 c
 c     J. Kolafa, "Time-Reversible Always Stable Predictor-Corrector
 c     Method for Molecular Dynamics of Polarizable Molecules", Journal
 c     of Computational Chemistry, 25, 335-342 (2004)
+c
+c     D. Nocito and G. J. O. Beran, Reduced Computational Cost
+c     of Polarizable Force Fields by a Modification of the Always
+c     Stable Predictor-Corrector, Journal of Chemical Physics, 150,
+c     151103 (2019)
 c
 c     W. Wang and R. D. Skeel, "Fast Evaluation of Polarizable Forces",
 c     Journal of Chemical Physics, 123, 164107 (2005)
@@ -7210,20 +6814,9 @@ c
       real*8 cp(maxualt,maxualt)
 c
 c
-c     set the Gear predictor binomial coefficients
-c
-      if (polpred .eq. 'GEAR') then
-         do i = 1, nualt
-            coeff = gear(i)
-            bpred(i) = coeff
-            bpredp(i) = coeff
-            bpreds(i) = coeff
-            bpredps(i) = coeff
-         end do
-c
 c     set always stable predictor-corrector (ASPC) coefficients
 c
-      else if (polpred .eq. 'ASPC') then
+      if (polpred .eq. 'ASPC') then
          do i = 1, nualt
             coeff = aspc(i)
             bpred(i) = coeff
@@ -7232,9 +6825,20 @@ c
             bpredps(i) = coeff
          end do
 c
+c     set the Gear predictor binomial coefficients
+c
+      else if (polpred .eq. 'GEAR') then
+         do i = 1, nualt
+            coeff = gear(i)
+            bpred(i) = coeff
+            bpredp(i) = coeff
+            bpreds(i) = coeff
+            bpredps(i) = coeff
+         end do
+c
 c     derive normal equations corresponding to least squares fit
 c
-      else
+      else if (polpred .eq. 'LSQR') then
          do k = 1, nualt
             b(k) = 0.0d0
             bp(k) = 0.0d0
@@ -7266,7 +6870,7 @@ c
             end do
          end do
 c
-c     check for nonzero coefficients and solve normal equations
+c     check for nonzero coefficients of the normal equations
 c
          k = nualt - 1
          amax = 0.0d0
@@ -7275,8 +6879,11 @@ c
             amax = max(amax,a(i))
             apmax = max(apmax,ap(i))
          end do
-         if (amax .ne. 0.0d0)  call cholesky (k,a,b)
-         if (apmax .ne. 0.0d0)  call cholesky (k,ap,bp)
+c
+c     solve the normal equations via LU matrix factorization
+c
+         if (amax .ne. 0.0d0)  call lusolve (k,a,b)
+         if (apmax .ne. 0.0d0)  call lusolve (k,ap,bp)
 c
 c     transfer the final solution to the coefficient vector
 c
@@ -7323,15 +6930,10 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
-      real*8 pdi,pti
       real*8 polmin
       real*8 poli,polik
-      real*8 corei,corek
-      real*8 vali,valk
       real*8 alphai,alphak
-      real*8 damp,expdamp
-      real*8 pgamma,off2
-      real*8 scale3,scale5
+      real*8 off2
       real*8 m1,m2,m3
       real*8 m4,m5,m6
       real*8 dmpik(5)
@@ -7434,14 +7036,7 @@ c
             yi = y(i)
             zi = z(i)
             poli = polarity(ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-            else if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
-            end if
+            if (use_chgpen)  alphai = palpha(ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -7482,30 +7077,18 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   if (use_thole) then
-                     scale3 = uscale(k)
-                     scale5 = uscale(k)
-                     damp = pdi * pdamp(kk)
-                     if (damp .ne. 0.0d0) then
-                        pgamma = min(pti,thole(kk))
-                        damp = -pgamma * (r/damp)**3
-                        if (damp .gt. -50.0d0) then
-                           expdamp = exp(damp)
-                           scale3 = scale3 * (1.0d0-expdamp)
-                           scale5 = scale5 * (1.0d0-expdamp
-     &                                           *(1.0d0-damp))
-                        end if
-                     end if
+                     call dampthole2 (ii,kk,5,r,dmpik)
+                     dmpik(3) = uscale(k) * dmpik(3)
+                     dmpik(5) = uscale(k) * dmpik(5)
                   else if (use_chgpen) then
-                     corek = pcore(kk)
-                     valk = pval(kk)
                      alphak = palpha(kk)
                      call dampmut (r,alphai,alphak,dmpik)
-                     scale3 = wscale(k) * dmpik(3)
-                     scale5 = wscale(k) * dmpik(5)
+                     dmpik(3) = wscale(k) * dmpik(3)
+                     dmpik(5) = wscale(k) * dmpik(5)
                   end if
                   polik = poli * polarity(kk)
-                  rr3 = scale3 * polik / (r*r2)
-                  rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
+                  rr3 = dmpik(3) * polik / (r*r2)
+                  rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
                   minv(m+1) = rr5*xr*xr - rr3
                   minv(m+2) = rr5*xr*yr
                   minv(m+3) = rr5*xr*zr
@@ -7581,15 +7164,9 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
-      real*8 pdi,pti
       real*8 polmin
       real*8 poli,polik
-      real*8 corei,corek
-      real*8 vali,valk
       real*8 alphai,alphak
-      real*8 damp,expdamp
-      real*8 pgamma
-      real*8 scale3,scale5
       real*8 m1,m2,m3
       real*8 m4,m5,m6
       real*8 dmpik(5)
@@ -7711,10 +7288,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,polarity,
-!$OMP& pdamp,thole,pcore,pval,palpha,u1scale,u2scale,u3scale,u4scale,
-!$OMP& w2scale,w3scale,w4scale,w5scale,n12,i12,n13,i13,n14,i14,n15,i15,
-!$OMP& np11,ip11,np12,ip12,np13,ip13,np14,ip14,use_thole,use_chgpen,
-!$OMP& nulst,ulst,mindex,minv)
+!$OMP& palpha,u1scale,u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,
+!$OMP& w5scale,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
+!$OMP& np13,ip13,np14,ip14,use_thole,use_chgpen,nulst,ulst,mindex,minv)
 !$OMP& firstprivate (uscale,wscale)
 c
 c     determine the off-diagonal elements of the preconditioner
@@ -7726,14 +7302,7 @@ c
             yi = y(i)
             zi = z(i)
             poli = polarity(ii)
-            if (use_thole) then
-               pdi = pdamp(ii)
-               pti = thole(ii)
-            else if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
-            end if
+            if (use_chgpen)  alphai = palpha(ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -7775,30 +7344,18 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                r = sqrt(r2)
                if (use_thole) then
-                  scale3 = uscale(k)
-                  scale5 = uscale(k)
-                  damp = pdi * pdamp(kk)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
-                     damp = -pgamma * (r/damp)**3
-                     if (damp .gt. -50.0d0) then
-                        expdamp = exp(damp)
-                        scale3 = scale3 * (1.0d0-expdamp)
-                        scale5 = scale5 * (1.0d0-expdamp
-     &                                        *(1.0d0-damp))
-                     end if
-                  end if
+                  call dampthole2 (ii,kk,5,r,dmpik)
+                  dmpik(3) = uscale(k) * dmpik(3)
+                  dmpik(5) = uscale(k) * dmpik(5)
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
                   alphak = palpha(kk)
                   call dampmut (r,alphai,alphak,dmpik)
-                  scale3 = wscale(k) * dmpik(3)
-                  scale5 = wscale(k) * dmpik(5)
+                  dmpik(3) = wscale(k) * dmpik(3)
+                  dmpik(5) = wscale(k) * dmpik(5)
                end if
                polik = poli * polarity(kk)
-               rr3 = scale3 * polik / (r*r2)
-               rr5 = 3.0d0 * scale5 * polik / (r*r2*r2)
+               rr3 = dmpik(3) * polik / (r*r2)
+               rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
                minv(m+1) = rr5*xr*xr - rr3
                minv(m+2) = rr5*xr*yr
                minv(m+3) = rr5*xr*zr

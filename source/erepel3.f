@@ -24,8 +24,18 @@ c
 c
       subroutine erepel3
       use limits
+      use potent
+      use reppot
       implicit none
 c
+c
+c     compute the induced dipoles at each polarizable atom
+c
+      if (reppolar .and. .not.use_polar) then
+         use_polar = .true.
+         call induce
+         use_polar = .false.
+      end if
 c
 c     choose the method for summing over pairwise interactions
 c
@@ -64,6 +74,8 @@ c
       use iounit
       use molcul
       use mpole
+      use mutant
+      use polar
       use potent
       use repel
       use reppot
@@ -98,6 +110,7 @@ c
       real*8 dmpik(9)
       real*8, allocatable :: rscale(:)
       logical proceed,usei
+      logical muti,mutk,mutik
       logical header,huge
       character*6 mode
 c
@@ -145,7 +158,7 @@ c
      &              8x,'Energy',/)
       end if
 c
-c     calculate the multipole interaction energy term
+c     calculate the Pauli repulsion interaction energy term
 c
       do ii = 1, npole-1
          i = ipole(ii)
@@ -159,6 +172,11 @@ c
          dix = rpole(2,ii)
          diy = rpole(3,ii)
          diz = rpole(4,ii)
+         if (reppolar) then
+            dix = dix + uind(1,ii)
+            diy = diy + uind(2,ii)
+            diz = diz + uind(3,ii)
+         end if
          qixx = rpole(5,ii)
          qixy = rpole(6,ii)
          qixz = rpole(7,ii)
@@ -166,6 +184,7 @@ c
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -186,6 +205,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -205,6 +225,11 @@ c
                   dkx = rpole(2,kk)
                   dky = rpole(3,kk)
                   dkz = rpole(4,kk)
+                  if (reppolar) then
+                     dkx = dkx + uind(1,kk)
+                     dky = dky + uind(2,kk)
+                     dkz = dkz + uind(3,kk)
+                  end if
                   qkxx = rpole(5,kk)
                   qkxy = rpole(6,kk)
                   qkxz = rpole(7,kk)
@@ -256,7 +281,26 @@ c
      &                       + term3*dmpik(5) + term4*dmpik(7)
      &                       + term5*dmpik(9)
                   sizik = sizi * sizk
-                  e = sizik * rscale(k) * eterm * rr1
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     e = vlambda * sizik * rscale(k) * eterm
+     &                      / sqrt(1.0d0-vlambda+r2)
+                  else
+                     e = sizik * rscale(k) * eterm * rr1
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -344,6 +388,11 @@ c
             dix = rpole(2,ii)
             diy = rpole(3,ii)
             diz = rpole(4,ii)
+            if (reppolar) then
+               dix = dix + uind(1,ii)
+               diy = diy + uind(2,ii)
+               diz = diz + uind(3,ii)
+            end if
             qixx = rpole(5,ii)
             qixy = rpole(6,ii)
             qixz = rpole(7,ii)
@@ -380,7 +429,7 @@ c
                      xr = x(k) - xi
                      yr = y(k) - yi
                      zr = z(k) - zi
-                     if (use_bounds)  call image (xr,yr,zr)
+                     call imager (xr,yr,zr,jcell)
                      r2 = xr*xr + yr* yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
@@ -391,6 +440,11 @@ c
                         dkx = rpole(2,kk)
                         dky = rpole(3,kk)
                         dkz = rpole(4,kk)
+                        if (reppolar) then
+                           dkx = dkx + uind(1,kk)
+                           dky = dky + uind(2,kk)
+                           dkz = dkz + uind(3,kk)
+                        end if
                         qkxx = rpole(5,kk)
                         qkxy = rpole(6,kk)
                         qkxz = rpole(7,kk)
@@ -492,8 +546,8 @@ c
      &                                   15x,'Distance',8x,'Energy',/)
                            end if
                            write (iout,50)  i,name(i),k,name(k),r,e
-   50                      format (' Repuls',4x,2(i7,'-',a3),
-     &                                9x,f10.4,2x,f12.4)
+   50                      format (' Repuls',4x,2(i7,'-',a3),1x,
+     &                                '(XTAL)',2x,f10.4,2x,f12.4)
                         end if
                      end if
                   end do
@@ -550,6 +604,7 @@ c
       use molcul
       use mpole
       use neigh
+      use polar
       use repel
       use reppot
       use shunt
@@ -632,15 +687,15 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,cut2,off2,
-!$OMP& molcule,name,verbose,debug,header,iout)
+!$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,uind,n12,
+!$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,reppolar,cut2,
+!$OMP& off2,c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
 !$OMP DO reduction(+:er,ner,aer,einter) schedule(guided)
 c
-c     compute the real space portion of the Ewald summation
+c     calculate the Pauli repulsion interaction energy term
 c
       do ii = 1, npole
          i = ipole(ii)
@@ -654,6 +709,11 @@ c
          dix = rpole(2,ii)
          diy = rpole(3,ii)
          diz = rpole(4,ii)
+         if (reppolar) then
+            dix = dix + uind(1,ii)
+            diy = diy + uind(2,ii)
+            diz = diz + uind(3,ii)
+         end if
          qixx = rpole(5,ii)
          qixy = rpole(6,ii)
          qixz = rpole(7,ii)
@@ -701,6 +761,11 @@ c
                   dkx = rpole(2,kk)
                   dky = rpole(3,kk)
                   dkz = rpole(4,kk)
+                  if (reppolar) then
+                     dkx = dkx + uind(1,kk)
+                     dky = dky + uind(2,kk)
+                     dkz = dkz + uind(3,kk)
+                  end if
                   qkxx = rpole(5,kk)
                   qkxy = rpole(6,kk)
                   qkxz = rpole(7,kk)

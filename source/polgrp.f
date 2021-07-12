@@ -31,10 +31,10 @@ c
       implicit none
       integer maxp11,maxp12
       integer maxp13,maxp14
-      parameter (maxp11=120)
-      parameter (maxp12=120)
-      parameter (maxp13=120)
-      parameter (maxp14=120)
+      parameter (maxp11=200)
+      parameter (maxp12=200)
+      parameter (maxp13=200)
+      parameter (maxp14=200)
       integer, allocatable :: np11(:)
       integer, allocatable :: np12(:)
       integer, allocatable :: np13(:)

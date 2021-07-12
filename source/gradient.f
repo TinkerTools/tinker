@@ -189,7 +189,11 @@ c     many implicit solvation models require Born radii
 c
       if (use_born)  call born
 c
-c     alter bond and torsion constants for pisystem
+c     alter partial charges and multipoles for charge flux
+c
+      if (use_chgflx)  call alterchg
+c
+c     modify bond and torsion constants for pisystem
 c
       if (use_orbit)  call picalc
 c
@@ -210,6 +214,16 @@ c
       if (use_angtor)  call eangtor1
       if (use_tortor)  call etortor1
 c
+c     call the electrostatic energy and gradient routines
+c
+      if (use_charge)  call echarge1
+      if (use_chgdpl)  call echgdpl1
+      if (use_dipole)  call edipole1
+      if (use_mpole)  call empole1
+      if (use_polar)  call epolar1
+      if (use_chgtrn)  call echgtrn1
+      if (use_rxnfld)  call erxnfld1
+c
 c     call the van der Waals energy and gradient routines
 c
       if (use_vdw) then
@@ -221,16 +235,6 @@ c
       end if
       if (use_repuls)  call erepel1
       if (use_disp)  call edisp1
-c
-c     call the electrostatic energy and gradient routines
-c
-      if (use_charge)  call echarge1
-      if (use_chgdpl)  call echgdpl1
-      if (use_dipole)  call edipole1
-      if (use_mpole)  call empole1
-      if (use_polar)  call epolar1
-      if (use_chgtrn)  call echgtrn1
-      if (use_rxnfld)  call erxnfld1
 c
 c     call any miscellaneous energy and gradient routines
 c

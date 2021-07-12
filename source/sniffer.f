@@ -41,7 +41,7 @@ c
       use scales
       use usage
       implicit none
-      integer i,j,imin
+      integer i,j,k,imin
       integer nvar,niter
       integer start,stop
       integer freeunit
@@ -139,13 +139,11 @@ c
       set_scale = .true.
       scaler = 1.0d0
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               nvar = nvar + 1
-               scale(nvar) = scaler
-            end do
-         end if
+      do i = 1, nuse
+         do j = 1, 3
+            nvar = nvar + 1
+            scale(nvar) = scaler
+         end do
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -158,15 +156,14 @@ c
 c     scale the coordinates of each active atom
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            xx(nvar) = x(i) * scale(nvar)
-            nvar = nvar + 1
-            xx(nvar) = y(i) * scale(nvar)
-            nvar = nvar + 1
-            xx(nvar) = z(i) * scale(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k) * scale(nvar)
+         nvar = nvar + 1
+         xx(nvar) = y(k) * scale(nvar)
+         nvar = nvar + 1
+         xx(nvar) = z(k) * scale(nvar)
       end do
 c
 c     set initial values for the control parameters
@@ -239,15 +236,14 @@ c     if current energy is lowest yet, save the coordinates
 c
             if (f .lt. fmin) then
                nvar = 0
-               do i = 1, n
-                  if (use(i)) then
-                     nvar = nvar + 1
-                     x(i) = xx(nvar) / scale(nvar)
-                     nvar = nvar + 1
-                     y(i) = xx(nvar) / scale(nvar)
-                     nvar = nvar + 1
-                     z(i) = xx(nvar) / scale(nvar)
-                  end if
+               do i = 1, nuse
+                  k = iuse(i)
+                  nvar = nvar + 1
+                  x(k) = xx(nvar) / scale(nvar)
+                  nvar = nvar + 1
+                  y(k) = xx(nvar) / scale(nvar)
+                  nvar = nvar + 1
+                  z(k) = xx(nvar) / scale(nvar)
                end do
                call makeref (1)
                imin = freeunit ()
@@ -367,12 +363,11 @@ c     compute the final function and RMS gradient values
 c
       call gradient (minimum,derivs)
       gnorm = 0.0d0
-      do i = 1, n
-         if (use(i)) then
-            do j = 1, 3
-               gnorm = gnorm + derivs(j,i)**2
-            end do
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            gnorm = gnorm + derivs(j,k)**2
+         end do
       end do
       gnorm = sqrt(gnorm)
       grms = gnorm / rms
@@ -428,7 +423,7 @@ c
       use scales
       use usage
       implicit none
-      integer i,nvar
+      integer i,k,nvar
       real*8 sniffer1,e
       real*8 xx(*)
       real*8 g(*)
@@ -438,15 +433,14 @@ c
 c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar) / scale(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar) / scale(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar) / scale(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar) / scale(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar) / scale(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar) / scale(nvar)
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -461,15 +455,14 @@ c
 c     convert gradient components to optimization parameters
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            g(nvar) = derivs(1,i) / scale(nvar)
-            nvar = nvar + 1
-            g(nvar) = derivs(2,i) / scale(nvar)
-            nvar = nvar + 1
-            g(nvar) = derivs(3,i) / scale(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         g(nvar) = derivs(1,k) / scale(nvar)
+         nvar = nvar + 1
+         g(nvar) = derivs(2,k) / scale(nvar)
+         nvar = nvar + 1
+         g(nvar) = derivs(3,k) / scale(nvar)
       end do
 c
 c     perform deallocation of some local arrays

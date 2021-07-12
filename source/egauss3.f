@@ -400,7 +400,7 @@ c
                         write (iout,50)  i,name(i),k,name(k),
      &                                   rad,sqrt(rik2),e
    50                   format (' VDW-Gauss',1x,2(i7,'-',a3),
-     &                             3x,'(XTAL)',4x,2f10.4,f12.4)
+     &                             1x,'(XTAL)',6x,2f10.4,f12.4)
                      end if
                   end if
                end do
@@ -720,7 +720,7 @@ c
                         write (iout,50)  ikmin,name(ikmin),ikmax,
      &                                   name(ikmax),rad,sqrt(rik2),e
    50                   format (' VDW-Gauss',1x,2(i7,'-',a3),
-     &                             3x,'(XTAL)',4x,2f10.4,f12.4)
+     &                             1x,'(XTAL)',6x,2f10.4,f12.4)
                      end if
                   end if
                end if
@@ -865,8 +865,9 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
 !$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
-!$OMP& off2,radmin,epsilon,radmin4,epsilon4,ngauss,igauss,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
+!$OMP& off2,radmin,epsilon,radmin4,epsilon4,ngauss,igauss,
+!$OMP& expcut,cut2,c0,c1,c2,c3,c4,c5,molcule,name,verbose,
+!$OMP& debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c
@@ -1203,7 +1204,7 @@ c
                         expterm2 = 0.0d0
                      end if
                      term = broot * (expterm-expterm2)
-                     term = term + sqrtpi*b(j)*rik
+                     term = term + rootpi*b(j)*rik
      &                         * (erf(broot*(rik+width))
      &                           +erf(broot*(width-rik)))
                      e = e + term*a(j)/(b(j)*b(j)*broot)
