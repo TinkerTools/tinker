@@ -60,7 +60,7 @@ mutual-14-scale         1.0
 
 
 This file contains the 2017 version of the AMOEBA nucleic acids force field
-as per the J. Chem. Theory Comput. article listed immediately below
+as per the J. Chem. Theory Comput. article listed immediately below:
 
 C. Zhang, C. Lu, Z. Jing, C. Wu, J.-P. Piquemal, J. W. Ponder and P. Ren,
 "AMOEBA Polarizable Atomic Multipole Force Field for Nucleic Acids",
@@ -69,6 +69,11 @@ J. Chem. Theory Comput., 14, 2084-2108 (2018)
 Monovalent ion parameters taken from Zhi Wang, Ph.D. thesis, Department
 of Chemistry, Washington University in St. Louis, May 2018; available
 from https://dasher.wustl.edu/ponder/
+
+R. A. Corrigan, G. Qi, A. C. Thiel, J. R. Lynn, B. D. Walker, T. L. Casavant,
+L. Lagardere, J.-P. Piquemal, J. W. Ponder, P. Ren and M. J. Schnieders,
+"Implicit Solvents for the Polarizable Atomic Multipole AMOEBA Force Field",
+J. Chem. Theory Comput., 17, 2323-2341 (2021) 
 
 
       #############################

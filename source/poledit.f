@@ -136,6 +136,8 @@ c
          if (atn .ne. 0)  rad(i) = covrad(atn)
          if (atn .eq. 1) then
             rad(i) = 1.25d0 * rad(i)
+         else if (atn .eq. 9) then
+            rad(i) = 1.25d0 * rad(i)
          else
             rad(i) = 1.15d0 * rad(i)
          end if

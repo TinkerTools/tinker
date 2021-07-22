@@ -61,7 +61,7 @@ mutual-14-scale         1.0
 
 
 This file contains the 2013 version of the AMOEBA protein force field as
-per the J. Chem. Theory Comput. article listed immediately below
+per the J. Chem. Theory Comput. article listed immediately below:
 
 Y. Shi, Z. Xia, J. Zhang, R. Best, J. W. Ponder and P. Ren, "Polarizable
 Atomic Multipole-Based AMOEBA Force Field for Proteins", J. Chem. Theory

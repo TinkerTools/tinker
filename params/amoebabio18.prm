@@ -62,7 +62,7 @@ mutual-14-scale         1.0
 
 This file contains the 2018 AMOEBA biopolymer force field, with contents
 combined from the 2013 AMOEBA protein parameters and the 2017 AMOEBA nucleic
-acid parameters as described previously
+acid parameters as described in the two articles listed immediately below:
 
 Y. Shi, Z. Xia, J. Zhang, R. Best, J. W. Ponder and P. Ren, "Polarizable
 Atomic Multipole-Based AMOEBA Force Field for Proteins", J. Chem. Theory
