@@ -13,12 +13,14 @@ c     ###############################################################
 c
 c
 c     doffset   dielectric offset to continuum solvation atomic radii
+c     onipr     probe radius to use with onion Born radius method
 c     p1        single-atom scale factor for analytical Still radii
 c     p2        1-2 interaction scale factor for analytical Still radii
 c     p3        1-3 interaction scale factor for analytical Still radii
 c     p4        nonbonded scale factor for analytical Still radii
 c     p5        soft cutoff parameter for analytical Still radii
 c     rsolv     atomic radius of each atom for continuum solvation
+c     rdescr    atomic radius of each atom for descreening
 c     asolv     atomic surface area solvation parameters
 c     rborn     Born radius of each atom for GB/SA solvation
 c     drb       solvation derivatives with respect to Born radii
@@ -37,9 +39,10 @@ c
 c
       module solute
       implicit none
-      real*8 doffset
+      real*8 doffset,onipr
       real*8 p1,p2,p3,p4,p5
       real*8, allocatable :: rsolv(:)
+      real*8, allocatable :: rdescr(:)
       real*8, allocatable :: asolv(:)
       real*8, allocatable :: rborn(:)
       real*8, allocatable :: drb(:)

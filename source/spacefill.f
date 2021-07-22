@@ -154,8 +154,9 @@ c     set atomic radii based on force field or Bondi values
 c
       do i = 1, n
          if (use(i)) then
+            radius(i) = rad(class(i))
 c           radius(i) = rad(class(i)) / twosix
-            radius(i) = vdwrad(atomic(i))
+c           radius(i) = vdwrad(atomic(i))
          else
             radius(i) = 0.0d0
          end if

@@ -32,6 +32,9 @@ c
       use solpot
       use solute
       use warp
+c
+      use gkstuf
+      use pbstuf
       implicit none
       integer i,nehp
       real*8 e,ai,ri,rb
@@ -643,9 +646,11 @@ c
 c
 c     setup the multipoles for solvation only calculations
 c
-      if (.not.use_mpole .and. .not.use_polar) then
+      if (.not. use_mpole) then
          call chkpole
          call rotpole
+      end if
+      if (.not. use_polar) then
          call induce
       end if
 c
@@ -653,9 +658,11 @@ c     compute the generalized Kirkwood energy and analysis
 c
       call egk3a
 c
-c     correct the solvation energy for vacuum to polarized state
+c     correct solvation energy for vacuum to polarized state
 c
-      call ediff3
+      if (use_polar) then
+         call ediff3
+      end if
       return
       end
 c
@@ -747,7 +754,7 @@ c
       allocate (eself(n))
       allocate (ecross(n))
 c
-c     initialize local variables for OpenMP calculation
+c     initialize variables to accumulate self- and cross-energies
 c
       do i = 1, n
          eself(i) = 0.0d0
@@ -1128,17 +1135,101 @@ c
       if (debug) then
          write (iout,10)
    10    format (/,' Generalized Kirkwood Self-Energies and',
-     &              ' Cross-Energies :',/)
+     &              ' Cross-Energies :',
+     &           //,' Type',12x,'Atom Name',24x,'Self',7x,'Cross',/)
          do i = 1, n
-            write (iout,20)  i,eself(i),ecross(i)
-   20       format (i8,1x,2f15.4)
+            write (iout,20)  i,name(i),eself(i),ecross(i)
+   20       format (' Solv-GK',5x,i8,'-',a3,17x,2f12.4)
+            if (i .gt. 1) then
+               eself(1) = eself(1) + eself(i)
+               ecross(1) = ecross(1) + ecross(i)
+            end if
          end do
+         write (iout,30) eself(1),ecross(1)
+   30    format (/,' Solv-GK',11x,'Total',18x,2f12.4)
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (eself)
       deallocate (ecross)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine epb3  --  PB polarization energy & analysis  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "epb3" calculates the implicit solvation energy via the
+c     Poisson-Boltzmann model; also partitions the energy among
+c     the atoms
+c
+c
+      subroutine epb3
+      use analyz
+      use atomid
+      use atoms
+      use chgpot
+      use energi
+      use inform
+      use iounit
+      use mpole
+      use pbstuf
+      use polar
+      use potent
+      implicit none
+      integer i,ii
+      real*8 e,etot
+c
+c
+c     compute the electrostatic energy via Poisson-Boltzmann
+c
+      if (use_polar) then
+         e = 0.0d0
+         etot = 0.0d0
+         do i = 1, npole
+            ii = ipole(i)
+            e = uinds(1,i)*pbep(1,ii) + uinds(2,i)*pbep(2,ii)
+     &             + uinds(3,i)*pbep(3,ii)
+            e = -0.5d0 * electric * e
+            apbe(ii) = apbe(ii) + e
+            etot = etot + e
+         end do
+         pbe = pbe + etot
+      else
+         call pbempole
+      end if
+c
+c     increment solvation energy and analysis by PB results
+c
+      es = es + pbe
+      do i = 1, npole
+         ii = ipole(i)
+         aes(ii) = aes(ii) + apbe(ii)
+      end do
+c
+c     print the Poisson-Boltzmann solvation energy over atoms
+c
+      if (debug) then
+         write (iout,10)
+   10    format (/,' Poisson-Boltzmann Solvation Energies :',
+     &           //,' Type',12x,'Atom Name',22x,'Energy',/)
+         do i = 1, npole
+            ii = ipole(i)
+            write (iout,20)  ii,name(ii),apbe(ii)
+   20       format (' Solv-PB',5x,i8,'-',a3,17x,f12.4)
+         end do
+         write (iout,30) pbe
+   30    format (/,' Solv-PB',11x,'Total',18x,f12.4)
+      end if
+c
+c     correct solvation energy for vacuum to polarized state
+c
+      call ediff3
       return
       end
 c
@@ -1150,19 +1241,22 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "ediff3" calculates the energy of polarizing the vacuum induced
+c     "ediff3" calculates the energy of polarizing vacuum induced
 c     dipoles to their generalized Kirkwood values with energy analysis
 c
 c
       subroutine ediff3
       use action
       use analyz
+      use atomid
       use atoms
       use bound
       use chgpot
       use couple
       use energi
       use group
+      use inform
+      use iounit
       use mpole
       use polar
       use polgrp
@@ -1194,6 +1288,7 @@ c
       real*8 gli(3)
       real*8 dmpik(7)
       real*8, allocatable :: pscale(:)
+      real*8, allocatable :: epvac(:)
       logical proceed,usei,usek
       character*6 mode
 c
@@ -1208,11 +1303,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pscale(n))
+      allocate (epvac(n))
 c
-c     set array needed to scale connected atom interactions
+c     set arrays for interaction scaling and vacuum polarization
 c
       do i = 1, n
          pscale(i) = 1.0d0
+         epvac(i) = 0.0d0
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1221,8 +1318,8 @@ c
 !$OMP& zaxis,rpole,uind,uinds,use,n12,n13,n14,n15,np11,i12,i13,i14,i15,
 !$OMP& ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,use_group,use_intra,off2,f)
-!$OMP& firstprivate(pscale) shared(es,nes,aes)
-!$OMP DO reduction(+:es,nes,aes) schedule(guided)
+!$OMP& firstprivate(pscale) shared(es,nes,aes,epvac)
+!$OMP DO reduction(+:es,nes,aes,epvac) schedule(guided)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1367,16 +1464,18 @@ c
 c     scale the interaction based on its group membership;
 c     polarization cannot be group scaled as it is not pairwise
 c
-                  if (use_group) then
+c                 if (use_group) then
 c                    ei = ei * fgrp
-                  end if
+c                 end if
 c
 c     increment the total GK electrostatic solvation energy
 c
-                  es = es + ei
                   nes = nes + 1
+                  es = es + ei
                   aes(ii) = aes(ii) + 0.5d0*ei
                   aes(kk) = aes(kk) + 0.5d0*ei
+                  epvac(ii) = epvac(ii) + 0.5d0*ei
+                  epvac(kk) = epvac(kk) + 0.5d0*ei
                end if
             end if
          end do
@@ -1402,64 +1501,28 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     print the energy of polarization of vacuum dipoles
+c
+      if (debug) then
+         write (iout,10)
+   10    format (/,' Implicit Solvation Vacuum Polarization',
+     &              ' Energies :',
+     &           //,' Type',12x,'Atom Name',22x,'Vacuum',/)
+         do i = 1, n
+            write (iout,20)  i,name(i),epvac(i)
+   20       format (' Solv-Vac',4x,i8,'-',a3,17x,f12.4)
+            if (i .gt. 1) then
+               epvac(1) = epvac(1) + epvac(i)
+            end if
+         end do
+         write (iout,30) epvac(1)
+   30    format (/,' Solv-Vac',10x,'Total',18x,f12.4)
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine epb3  --  PB polarization energy & analysis  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "epb3" calculates the implicit solvation energy via the
-c     Poisson-Boltzmann model; also partitions the energy among
-c     the atoms
-c
-c
-      subroutine epb3
-      use analyz
-      use atoms
-      use chgpot
-      use energi
-      use mpole
-      use pbstuf
-      use polar
-      use potent
-      implicit none
-      integer i,ii
-      real*8 e
-c
-c
-c     compute the electrostatic energy via Poisson-Boltzmann
-c
-      if (use_polar) then
-         e = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            e = e + uinds(1,i)*pbep(1,ii) + uinds(2,i)*pbep(2,ii)
-     &               + uinds(3,i)*pbep(3,ii)
-         end do
-         e = -0.5d0 * electric * e
-         pbe = pbe + e
-      else
-         call pbempole
-      end if
-c
-c     increment solvation energy and analysis by PB results
-c
-      es = es + pbe
-      do i = 1, n
-         aes(i) = aes(i) + apbe(i)
-      end do
-c
-c     correct the solvation energy for vacuum to polarized state
-c
-      call ediff3
+      deallocate (epvac)
       return
       end
 c
@@ -1529,7 +1592,7 @@ c
          aevol = evol / dble(n)
       end if
 c
-c     find cavity energy from only the solvent excluded volume
+c     include the full SEV term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -1537,9 +1600,9 @@ c
             aecav(i) = aevol
          end do
 c
-c     find cavity energy from only a tapered volume term
+c     include a tapered SEV term
 c
-      else if (reff.gt.spcut .and. reff.le.stoff) then
+      else if (reff .le. spoff) then
          mode = 'GKV'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -1548,15 +1611,19 @@ c
          do i = 1, n
             aecav(i) = taper * aevol
          end do
+      end if
 c
-c     find cavity energy using both volume and SASA terms
+c     include a full SASA term
 c
-      else if (reff .gt. stoff .and. reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
+      if (reff .gt. stcut) then
+         ecav = esurf
+         do i = 1, n
+            aecav(i) = aesurf(i)
+         end do
+c
+c     include a tapered SASA term
+c
+      else if (reff .gt. stoff) then
          mode = 'GKSA'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -1565,27 +1632,6 @@ c
          ecav = ecav + taper*esurf
          do i = 1, n
             aecav(i) = taper * (aevol+aesurf(i))
-         end do
-c
-c     find cavity energy from only a tapered SASA term
-c
-      else if (reff.gt.spoff .and. reff.le.stcut) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = taper * esurf
-         do i = 1, n
-            aecav(i) = taper * aesurf(i)
-         end do
-c
-c     find cavity energy from only a SASA-based term
-c
-      else
-         ecav = esurf
-         do i = 1, n
-            aecav(i) = aesurf(i)
          end do
       end if
 c
@@ -1630,9 +1676,9 @@ c
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
-      real*8 sum,term,shctd
-      real*8 iwca,irep,offset
-      real*8 epsi,rmini,ri,rmax
+      real*8 sum,term
+      real*8 iwca,irep
+      real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
       real*8 lik,lik2,lik3,lik4
@@ -1652,10 +1698,8 @@ c
 c
 c     set overlap scale factor for HCT descreening method
 c
-      shctd = 0.81d0
-      offset = 0.0d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
+         rdisp(i) = rad(class(i))
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -1671,7 +1715,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,cdisp)
 !$OMP& shared(edisp,aedispo)
 !$OMP DO reduction(+:edisp,aedispo) schedule(guided)
 c
@@ -1691,7 +1735,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ri = rdisp(i)
+         rio = rmixo / 2.0d0 + dispoff
+         rih = rmixh / 2.0d0 + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -1703,17 +1748,16 @@ c
                zr = z(k) - zi
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
-               rk = rdisp(k)
-c              sk = rk * shct(k)
+               rk = rad(class(k))
                sk = rk * shctd
                sk2 = sk * sk
-               if (ri .lt. r+sk) then
-                  rmax = max(ri,r-sk)
+               if (rio .lt. r+sk) then
+                  rmax = max(rio,r-sk)
                   lik = rmax
-                  lik2 = lik * lik
-                  lik3 = lik2 * lik
-                  lik4 = lik3 * lik
                   if (lik .lt. rmixo) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixo)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -1724,26 +1768,15 @@ c              sk = rk * shct(k)
                      iwca = -emixo * term
                      sum = sum + iwca
                   end if
-                  if (lik .lt. rmixh) then
-                     uik = min(r+sk,rmixh)
+                  uik = r + sk
+                  if (uik .gt. rmixo) then
                      uik2 = uik * uik
                      uik3 = uik2 * uik
                      uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -2.0d0 * emixh * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  uik2 = uik * uik
-                  uik3 = uik2 * uik
-                  uik4 = uik3 * uik
-                  uik5 = uik4 * uik
-                  uik10 = uik5 * uik5
-                  uik11 = uik10 * uik
-                  uik12 = uik11 * uik
-                  if (uik .gt. rmixo) then
+                     uik5 = uik4 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
                      lik = max(rmax,rmixo)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -1764,7 +1797,33 @@ c              sk = rk * shct(k)
                      irep = ao * rmixo7 * term
                      sum = sum + irep + idisp
                   end if
+               end if
+               if (rih .lt. r+sk) then
+                  rmax = max(rih,r-sk)
+                  lik = rmax
+                  if (lik .lt. rmixh) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
+                     uik = min(r+sk,rmixh)
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     term = 4.0d0 * pi / (48.0d0*r)
+     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
+     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
+                     iwca = -2.0d0 * emixh * term
+                     sum = sum + iwca
+                  end if
+                  uik = r + sk
                   if (uik .gt. rmixh) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
                      lik = max(rmax,rmixh)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -1811,13 +1870,14 @@ c     print the total dispersion energy and energy for each atom
 c
       if (debug) then
          write (iout,10)
-   10    format (/,' HCT Implicit Solvation Dispersion :',/)
+   10    format (/,' HCT Implicit Solvation Dispersion :',
+     &           //,' Type',12x,'Atom Name',22x,'Energy',/)
          do i = 1, n
-            write (iout,20)  i,aedisp(i)
-   20       format (' Dispersion Energy for Atom',i6,' :',2x,f12.4)
+            write (iout,20)  i,name(i),aedisp(i)
+   20       format (' Disp-HCT',5x,i7,'-',a3,17x,f12.4)
          end do
          write (iout,30)  edisp
-   30    format (/,' Total HCT Dispersion Energy :',7x,f12.4)
+   30    format (/,' Disp-HCT',10x,'Total',18x,f12.4)
       end if
       return
       end
@@ -1875,19 +1935,19 @@ c
 c
 c     set parameters for high accuracy numerical shells
 c
-c     tinit = 0.2d0
-c     rinit = 1.0d0
-c     rmult = 1.5d0
-c     rswitch = 7.0d0
-c     rmax = 12.0d0
+      tinit = 0.2d0
+      rinit = 1.0d0
+      rmult = 1.5d0
+      rswitch = 7.0d0
+      rmax = 12.0d0
 c
 c     set parameters for medium accuracy numerical shells
 c
-      tinit = 1.0d0
-      rinit = 1.0d0
-      rmult = 2.0d0
-      rswitch = 5.0d0
-      rmax = 9.0d0
+c     tinit = 1.0d0
+c     rinit = 1.0d0
+c     rmult = 2.0d0
+c     rswitch = 5.0d0
+c     rmax = 9.0d0
 c
 c     set parameters for low accuracy numerical shells
 c
@@ -1903,8 +1963,8 @@ c
 c
 c     set parameters for atomic radii and probe radii
 c
-      delta = 0.55d0
-      offset = 0.27d0
+      delta = 0.00d0
+      offset = 0.00d0
       do i = 1, n
          rdisp(i) = rad(class(i)) + offset
          roff(i) = rdisp(i) + delta
@@ -1914,7 +1974,8 @@ c     print header for output of the detailed energy components
 c
       if (debug) then
          write (iout,10)
-   10    format (/,' Onion Shell Implicit Solvation Dispersion :',/)
+   10    format (/,' Onion Shell Implicit Solvation Dispersion :',
+     &           //,' Type',12x,'Atom Name',22x,'Energy',/)
       end if
 c
 c     compute the dispersion energy for each atom in the system
@@ -1933,7 +1994,7 @@ c
 c
 c     alter radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i)
+         roff(i) = rminhi / 2.0 + dispoff
          do j = 1, n12(i)
             k = i12(j,i)
             roff(k) = rdisp(k)
@@ -1963,21 +2024,23 @@ c
             roff(i) = 0.5d0 * (inner+outer)
             call surfatom (i,area,roff)
             fraction = area / (4.0d0*pi*roff(i)**2)
-            if (outer .lt. rminoi) then
-               shell = (outer**3-inner**3)/3.0d0
-               e = e - epsoi*fraction*shell
-            else if (inner .gt. rminoi) then
-               shell = (1.0d0/(inner**4)-1.0d0/(outer**4)) / 4.0d0
-               e = e - 2.0d0*oer7*fraction*shell
-               shell = (1.0d0/(inner**11)-1.0d0/(outer**11)) / 11.0d0
-               e = e + oer14*fraction*shell
-            else
-               shell = (rminoi**3-inner**3)/3.0d0
-               e = e - epsoi*fraction*shell
-               shell = (1.0d0/(rminoi**4)-1.0d0/(outer**4)) / 4.0d0
-               e = e - 2.0d0*oer7*fraction*shell
-               shell = (1.0d0/(rminoi**11)-1.0d0/(outer**11)) / 11.0d0
-               e = e + oer14*fraction*shell
+            if (roff(i) .gt. rminoi / 2.0 + dispoff) then
+               if (outer .lt. rminoi) then
+                  shell = (outer**3-inner**3)/3.0d0
+                  e = e - epsoi*fraction*shell
+               else if (inner .gt. rminoi) then
+                  shell = (1.0d0/(inner**4)-1.0d0/(outer**4))/4.0d0
+                  e = e - 2.0d0*oer7*fraction*shell
+                  shell = (1.0d0/(inner**11)-1.0d0/(outer**11))/11.0d0
+                  e = e + oer14*fraction*shell
+               else
+                  shell = (rminoi**3-inner**3)/3.0d0
+                  e = e - epsoi*fraction*shell
+                  shell = (1.0d0/(rminoi**4)-1.0d0/(outer**4))/4.0d0
+                  e = e - 2.0d0*oer7*fraction*shell
+                  shell = (1.0d0/(rminoi**11)-1.0d0/(outer**11))/11.0d0
+                  e = e + oer14*fraction*shell
+               end if
             end if
             if (outer .lt. rminhi) then
                shell = (outer**3-inner**3)/3.0d0
@@ -2054,10 +2117,10 @@ c
    30    format ()
          do i = 1, n
             write (iout,40)  i,aedisp(i)
-   40       format (' Dispersion Energy for Atom',i6,' :',2x,f12.4)
+   40       format (' Disp-Onion',3x,i7,'-',a3,17x,f12.4)
          end do
          write (iout,50)  edisp
-   50    format (/,' Total Onion Dispersion Energy :',5x,f12.4)
+   50    format (/,' Disp-Onion',8x,'Total',18x,f12.4)
       end if
       return
       end

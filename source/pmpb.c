@@ -444,7 +444,7 @@ void apbsempole_ (int *natom, double x[maxatm][3],
       }
 
       /* Set partition information for observables and I/O */
-      /* Note - parallel operation has NOT been tested. */
+      /* Note that parallel operation has NOT been tested */
       if (setPartMG(nosh, mgparm, pmg[i]) != 1) {
           Vnm_tprint(2, "Error setting partition info!\n");
           return;
@@ -563,9 +563,9 @@ void apbsempole_ (int *natom, double x[maxatm][3],
    printf("Energy (volume)    %f Kcal/mol\n", evol * 0.5 * kT);
    */
 
-   // Convert results into kcal/mol units
+   /* Convert results into kcal/mol units */
    kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 * 1.0/4.184;
-   // Electric converts from electron**2/Angstrom to kcal/mol
+   /* Electric converts from electron**2/Angstrom to kcal/mol */
    electric = 332.063709;
    *total = 0.0;
    for (i=0; i<alist[0]->number; i++){
@@ -708,10 +708,10 @@ void apbsinduce_ (double uind[maxatm][3], double fld[maxatm][3]){
       }
    }
 
-   /* load results into the return arrays in electron**2/Ang
-   /* kT in kcal/mol */
+   /* load results into the return arrays in electron**2/Ang */
+   /* value of kT is in kcal/mol */
    kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 / 4.184;
-   // electric: conversion from electron**2/Ang to Kcal/mol
+   /* electric is conversion from electron**2/Ang to Kcal/mol */
    electric = 332.063713;
    for (i=0; i<alist[0]->number; i++){
       // starting with the field in KT/e/Ang^2 multiply by Kcal/mol/KT
@@ -843,10 +843,10 @@ void apbsnlinduce_ (double uinp[maxatm][3], double fld[maxatm][3]){
       }
    }
 
-   /* load results into the return arrays in electron**2/Angstrom
-   /* kT in kcal/mol */
+   /* load results into the return arrays in electron**2/Angstrom */
+   /* value of kT is in kcal/mol */
    kT = Vunit_kb * (1e-3) * Vunit_Na * 298.15 / 4.184;
-   // electric: conversion from electron**2/Angstrom to Kcal/mol
+   /* electric is conversion from electron**2/Angstrom to Kcal/mol */
    electric = 332.063713;
    for (i=0; i<alist[0]->number; i++){
       fld[i][0] *= kT / electric;

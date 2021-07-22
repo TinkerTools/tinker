@@ -50,6 +50,7 @@ c
       use kvdwpr
       use merck
       use params
+      use solute
       implicit none
       integer i,j,iprm
       integer ia,ib,ic,id
@@ -71,7 +72,8 @@ c
       integer nx,ny,nxy
       integer bt,at,sbt,tt
       integer ft(6),pg(maxval)
-      real*8 wght,rd,ep,rdn
+      real*8 wght,rd
+      real*8 ep,rdn
       real*8 spr,apr,epr
       real*8 cdp,adp
       real*8 an1,an2,an3
@@ -90,6 +92,7 @@ c
       real*8 ctrn,atrn
       real*8 cfb,cfb1,cfb2
       real*8 cfa1,cfa2,srd
+      real*8 pbrd,csrd,gkrd
       real*8 el,iz,rp
       real*8 ss,ts
       real*8 abc,cba
@@ -1369,12 +1372,16 @@ c     implicit solvation parameters
 c
          else if (keyword(1:7) .eq. 'SOLUTE ') then
             ia = 0
-            srd = 0.0d0
+            pbrd = 0.0d0
+            csrd = 0.0d0
+            gkrd = 0.0d0
             string = record(next:240)
-            read (string,*,err=530,end=530)  ia,srd
+            read (string,*,err=530,end=530) ia,pbrd,csrd,gkrd
   530       continue
             if (ia .ne. 0) then
-               solrad(ia) = srd
+               pbr(ia) = 0.5d0 * pbrd
+               csr(ia) = 0.5d0 * csrd
+               gkr(ia) = 0.5d0 * gkrd
             end if
 c
 c     conjugated pisystem atom parameters

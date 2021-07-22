@@ -33,9 +33,9 @@ c
       parameter (maxline=1000)
       parameter (maxunit=10000)
       parameter (maxword=10000)
-      parameter (maxfunc=76)
+      parameter (maxfunc=75)
       integer i,j,k,mode
-      integer idoc,isrc,next
+      integer isrc,itxt,next
       integer nkey,nunit
       integer leng,size
       integer start,last
@@ -51,8 +51,8 @@ c
       character*20 fname1,fname2
       character*20 fname(maxfunc)
       character*20, allocatable :: key(:)
-      character*240 docfile
       character*240 srcfile
+      character*240 txtfile
       character*240 record
       character*240 string
       character*230, allocatable :: routine(:)
@@ -76,10 +76,10 @@ c
      &             'PROPERTY',  'PSS1',      'PSSRGD1',   'PSSROT1',
      &             'PTINCY',    'RANDOM',    'RMSFIT',    'ROTANG',
      &             'ROTCHECK',  'SADDLE1',   'SCAN1',     'SIGMOID',
-     &             'SIMPLEX1',  'SNIFFER1',  'TORFIT1',   'TORSER',
-     &             'TOTERR',    'TRANSIT',   'TRIMTEXT',  'TRIPLE',
-     &             'URYGUESS',  'VALFIT1',   'VALMIN1',   'VALRMS',
-     &             'VDWERR',    'VECANG',    'WATSON1',   'XTALMIN1' /
+     &             'SNIFFER1',  'TORFIT1',   'TORSER',    'TOTERR',
+     &             'TRANSIT',   'TRIMTEXT',  'TRIPLE',    'URYGUESS',
+     &             'VALFIT1',   'VALMIN1',   'VALRMS',    'VDWERR',
+     &             'VECANG',    'WATSON1',   'XTALMIN1' /
 c
 c
 c     select the type of documentation that is to be generated
@@ -178,18 +178,18 @@ c
   100    continue
          close (unit=isrc)
          call sort7 (nunit,routine,link)
-         idoc = freeunit ()
-         docfile = 'routines.doc'
-         call version (docfile,'new')
-         open (unit=idoc,file=docfile,status='new')
+         itxt = freeunit ()
+         txtfile = 'routines.doc'
+         call version (txtfile,'new')
+         open (unit=itxt,file=txtfile,status='new')
          do i = 1, nunit
             string = routine(i)
             leng = trimtext (string)
             if (sphinx) then
-               write (idoc,110)  string(1:leng)
+               write (itxt,110)  string(1:leng)
   110          format ('**',a,'**',/)
             else
-               write (idoc,120)  string(1:leng)
+               write (itxt,120)  string(1:leng)
   120          format (a,/)
             end if
             last = 0
@@ -197,16 +197,16 @@ c
             do k = 1, nline(j)
                string = info(k,j)
                leng = trimtext (string)
-               write (idoc,130)  string(1:leng)
+               write (itxt,130)  string(1:leng)
   130          format (a)
             end do
             if (nline(j) .ne. 0) then
-               write (idoc,140)
+               write (itxt,140)
   140          format ()
             end if
          end do
-         close (unit=idoc)
-         write (iout,150)  docfile(1:trimtext(docfile))
+         close (unit=itxt)
+         write (iout,150)  txtfile(1:trimtext(txtfile))
   150    format (/,' Source Documentation Written To :  ',a)
       end if
 c
@@ -251,26 +251,26 @@ c
   170    continue
          close (unit=isrc)
          call sort7 (nunit,routine,link)
-         idoc = freeunit ()
-         docfile = 'calls.doc'
-         call version (docfile,'new')
-         open (unit=idoc,file=docfile,status='new')
+         itxt = freeunit ()
+         txtfile = 'calls.doc'
+         call version (txtfile,'new')
+         open (unit=itxt,file=txtfile,status='new')
          do i = 1, nunit
             string = routine(i)
             leng = trimtext (string)
             j = link(i)
             call sort10 (nline(j),info(1,j))
-            write (idoc,180)  string(1:leng)
+            write (itxt,180)  string(1:leng)
   180       format (a)
             do k = 1, nline(j)
                string = info(k,j)
                leng = trimtext (string)
-               write (idoc,190)  string(1:leng)
+               write (itxt,190)  string(1:leng)
   190          format (5x,a)
             end do
          end do
-         close (unit=idoc)
-         write (iout,200)  docfile(1:trimtext(docfile))
+         close (unit=itxt)
+         write (iout,200)  txtfile(1:trimtext(txtfile))
   200    format (/,' Source Documentation Written To :  ',a)
       end if
 c
@@ -321,21 +321,21 @@ c
   240    continue
          close (unit=isrc)
          call sort7 (nunit,routine,link)
-         idoc = freeunit ()
-         docfile = 'modules.doc'
-         call version (docfile,'new')
-         open (unit=idoc,file=docfile,status='new')
+         itxt = freeunit ()
+         txtfile = 'modules.doc'
+         call version (txtfile,'new')
+         open (unit=itxt,file=txtfile,status='new')
          do i = 1, nunit
             string = routine(i)
             leng = trimtext (string)
             if (sphinx) then
                size = trimtext(string(8:16))
-               write (idoc,250)  string(8:7+size),
+               write (itxt,250)  string(8:7+size),
      &                           string(17:leng)//'**'
   250          format (/,'**',a,' Module','^^^^^^^^',a,
      &                 //,'.. code-block:: text',/)
             else
-               write (idoc,260)  string(1:leng)
+               write (itxt,260)  string(1:leng)
   260          format (/,a)
             end if
             j = link(i)
@@ -343,16 +343,16 @@ c
                string = info(k,j)
                leng = trimtext (string)
                if (sphinx) then
-                  write (idoc,270)  string(1:leng)
+                  write (itxt,270)  string(1:leng)
   270             format (' ',a)
                else
-                  write (idoc,280)  string(1:leng)
+                  write (itxt,280)  string(1:leng)
   280             format (a)
                end if
             end do
          end do
-         close (unit=idoc)
-         write (iout,290)  docfile(1:trimtext(docfile))
+         close (unit=itxt)
+         write (iout,290)  txtfile(1:trimtext(txtfile))
   290    format (/,' Source Documentation Written To :  ',a)
       end if
 c
@@ -393,21 +393,21 @@ c
          close (unit=isrc)
          call sort6 (nkey,key)
          keylast = '                    '
-         idoc = freeunit ()
-         docfile = 'keyword.doc'
-         call version (docfile,'new')
-         open (unit=idoc,file=docfile,status='new')
+         itxt = freeunit ()
+         txtfile = 'keyword.doc'
+         call version (txtfile,'new')
+         open (unit=itxt,file=txtfile,status='new')
          do i = 1, nkey
             keyword = key(i)
             leng = trimtext (keyword)
             if (keyword .ne. keylast) then
-               write (idoc,320)  keyword(1:leng)
+               write (itxt,320)  keyword(1:leng)
   320          format (a)
                keylast = keyword
             end if
          end do
-         close (unit=idoc)
-         write (iout,330)  docfile(1:trimtext(docfile))
+         close (unit=itxt)
+         write (iout,330)  txtfile(1:trimtext(txtfile))
   330    format (/,' Keyword Listing Written To :  ',a)
       end if
 c
@@ -457,13 +457,13 @@ c     get a force field parameter file and write a listing
 c
       if (mode .eq. 6) then
          call getprm
-         idoc = freeunit ()
-         docfile = 'parameter.doc'
-         call version (docfile,'new')
-         open (unit=idoc,file=docfile,status='new')
-         call prtprm (idoc)
-         close (unit=idoc)
-         write (iout,380)  docfile(1:trimtext(docfile))
+         itxt = freeunit ()
+         txtfile = 'parameter.txt'
+         call version (txtfile,'new')
+         open (unit=itxt,file=txtfile,status='new')
+         call prtprm (itxt)
+         close (unit=itxt)
+         write (iout,380)  txtfile(1:trimtext(txtfile))
   380    format (/,' Parameter Listing Written To :  ',a)
       end if
 c

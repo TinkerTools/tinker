@@ -224,7 +224,9 @@ c
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
       if (.not. allocated(ctchg))  allocate (ctchg(maxclass))
       if (.not. allocated(ctdmp))  allocate (ctdmp(maxclass))
-      if (.not. allocated(solrad))  allocate (solrad(maxclass))
+      if (.not. allocated(pbr))  allocate (pbr(maxtyp))
+      if (.not. allocated(csr))  allocate (csr(maxtyp))
+      if (.not. allocated(gkr))  allocate (gkr(maxtyp))
       if (.not. allocated(electron))  allocate (electron(maxclass))
       if (.not. allocated(ionize))  allocate (ionize(maxclass))
       if (.not. allocated(repulse))  allocate (repulse(maxclass))
@@ -252,6 +254,9 @@ c
          do j = 1, maxval
             pgrp(j,i) = 0
          end do
+         pbr(i) = 0.0d0
+         csr(i) = 0.0d0
+         gkr(i) = 0.0d0
       end do
       do i = 1, maxclass
          do j = 1, 2
@@ -269,7 +274,6 @@ c
          cpalp(i) = 0.0d0
          ctchg(i) = 0.0d0
          ctdmp(i) = 0.0d0
-         solrad(i) = 0.d0
          electron(i) = 0.0d0
          ionize(i) = 0.0d0
          repulse(i) = 0.0d0

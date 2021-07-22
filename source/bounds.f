@@ -83,7 +83,7 @@ c
             yfrac = yfrac - ybox*nint(yfrac/ybox)
             zfrac = zfrac - zbox*nint(zfrac/zbox)
             corr = box23 * int(abs(xfrac/xbox)+abs(yfrac/ybox)
-     &                                +abs(zfrac/zbox))
+     &                               +abs(zfrac/zbox))
             xfrac = xfrac - sign(corr,xfrac)
             yfrac = yfrac - sign(corr,yfrac)
             zfrac = zfrac - sign(corr,zfrac)

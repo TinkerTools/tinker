@@ -496,7 +496,9 @@ c
 c
 c     deallocation of global arrays from module ksolut
 c
-      if (allocated(solrad))  deallocate (solrad)
+      if (allocated(pbr))  deallocate (pbr)
+      if (allocated(csr))  deallocate (csr)
+      if (allocated(gkr))  deallocate (gkr)
 c
 c     deallocation of global arrays from module kvdws
 c
@@ -668,7 +670,6 @@ c
 c     deallocation of global arrays from module pbstuf
 c
       if (allocated(apbe))  deallocate (apbe)
-      if (allocated(pbr))  deallocate (pbr)
       if (allocated(pbep))  deallocate (pbep)
       if (allocated(pbfp))  deallocate (pbfp)
       if (allocated(pbtp))  deallocate (pbtp)

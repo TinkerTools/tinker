@@ -42,6 +42,7 @@ c
       use kpitor
       use kpolr
       use krepl
+      use ksolut
       use kstbnd
       use ksttor
       use ktorsn
@@ -119,7 +120,7 @@ c
             k1 = number(kb(i)(1:4))
             k2 = number(kb(i)(5:8))
             write (itxt,60)  i,k1,k2,bcon(i),blen(i)
-   60       format (10x,i5,5x,i4,'-',i4,6x,f12.3,f12.4)
+   60       format (8x,i7,5x,i4,'-',i4,6x,f12.3,f12.4)
          end do
    70    continue
       end if
@@ -135,7 +136,7 @@ c
             k1 = number(kb5(i)(1:4))
             k2 = number(kb5(i)(5:8))
             write (itxt,90)  i,k1,k2,bcon5(i),blen5(i)
-   90       format (10x,i5,5x,i4,'-',i4,6x,f12.3,f12.4)
+   90       format (8x,i7,5x,i4,'-',i4,6x,f12.3,f12.4)
          end do
   100    continue
       end if
@@ -151,7 +152,7 @@ c
             k1 = number(kb4(i)(1:4))
             k2 = number(kb4(i)(5:8))
             write (itxt,120)  i,k1,k2,bcon4(i),blen4(i)
-  120       format (10x,i5,5x,i4,'-',i4,6x,f12.3,f12.4)
+  120       format (8x,i7,5x,i4,'-',i4,6x,f12.3,f12.4)
          end do
   130    continue
       end if
@@ -167,7 +168,7 @@ c
             k1 = number(kb3(i)(1:4))
             k2 = number(kb3(i)(5:8))
             write (itxt,150)  i,k1,k2,bcon3(i),blen3(i)
-  150       format (10x,i5,5x,i4,'-',i4,6x,f12.3,f12.4)
+  150       format (8x,i7,5x,i4,'-',i4,6x,f12.3,f12.4)
          end do
   160    continue
       end if
@@ -192,7 +193,7 @@ c
             k2 = number(kel(i)(5:8))
             k3 = number(kel(i)(9:12))
             write (itxt,190)  i,k1,k2,k3,dlen(i)
-  190       format (10x,i5,5x,i4,'-',i4,'-',i4,14x,f12.4)
+  190       format (8x,i7,5x,i4,'-',i4,'-',i4,14x,f12.4)
          end do
   200    continue
       end if
@@ -407,7 +408,7 @@ c
      &               .or. anan(3,i).ne.0.0d0) then
                k = k + 1
                write (itxt,560)  k,i,(anan(j,i),j=1,3)
-  560          format (8x,i5,7x,i4,3x,3f12.3)
+  560          format (6x,i7,4x,i7,3x,3f12.3)
             end if
          end do
       end if
@@ -427,7 +428,7 @@ c
             k3 = number(kopb(i)(9:12))
             k4 = number(kopb(i)(13:16))
             write (itxt,590)  i,k1,k2,k3,k4,opbn(i)
-  590       format (8x,i5,5x,i4,'-',i4,'-',i4,'-',i4,f12.3)
+  590       format (6x,i7,5x,i4,'-',i4,'-',i4,'-',i4,f12.3)
          end do
   600    continue
       end if
@@ -447,7 +448,7 @@ c
             k3 = number(kopd(i)(9:12))
             k4 = number(kopd(i)(13:16))
             write (itxt,630)  i,k1,k2,k3,k4,opds(i)
-  630       format (8x,i5,5x,i4,'-',i4,'-',i4,'-',i4,f12.3)
+  630       format (6x,i7,5x,i4,'-',i4,'-',i4,'-',i4,f12.3)
          end do
   640    continue
       end if
@@ -695,7 +696,7 @@ c
             k1 = number(kpt(i)(1:4))
             k2 = number(kpt(i)(5:8))
             write (itxt,850)  i,k1,k2,ptcon(i)
-  850       format (6x,i5,5x,i4,'-',i4,6x,f12.3)
+  850       format (4x,i7,5x,i4,'-',i4,6x,f12.3)
          end do
   860    continue
       end if
@@ -780,12 +781,12 @@ c
          if (vdwindex .eq. 'CLASS') then
             write (itxt,1010)
  1010       format (//,15x,'Van der Waals Parameters',
-     &              ///,20x,'Class',7x,'Radius',6x,'Epsilon',
+     &              ///,21x,'Class',6x,'Radius',6x,'Epsilon',
      &                    4x,'Reduction',/)
          else
             write (itxt,1020)
  1020       format (//,15x,'Van der Waals Parameters',
-     &              ///,20x,'Type',8x,'Radius',6x,'Epsilon',
+     &              ///,22x,'Type',6x,'Radius',6x,'Epsilon',
      &                    4x,'Reduction',/)
          end if
          k = 0
@@ -793,7 +794,7 @@ c
             if (rad(i) .ne. 0.0d0) then
                k = k + 1
                write (itxt,1030)  k,i,rad(i),eps(i),reduct(i)
- 1030          format (10x,i5,5x,i4,2x,3f12.3)
+ 1030          format (8x,i7,4x,i7,3f12.3)
             end if
          end do
 c
@@ -828,7 +829,7 @@ c
             if (rad4(i) .ne. 0.0d0) then
                k = k + 1
                write (itxt,1070)  k,i,rad4(i),eps4(i)
- 1070          format (10x,i5,5x,i4,2x,2f12.3)
+ 1070          format (8x,i7,2x,i7,2x,2f12.3)
             end if
          end do
       end if
@@ -850,7 +851,7 @@ c
             k1 = number(kvpr(i)(1:4))
             k2 = number(kvpr(i)(5:8))
             write (itxt,1100)  i,k1,k2,radpr(i),epspr(i)
- 1100       format (10x,i5,5x,i4,'-',i4,2x,2f12.3)
+ 1100       format (8x,i7,5x,i4,'-',i4,2x,2f12.3)
          end do
  1110    continue
       end if
@@ -872,7 +873,7 @@ c
             k1 = number(khb(i)(1:4))
             k2 = number(khb(i)(5:8))
             write (itxt,1140)  i,k1,k2,radhb(i),epshb(i)
- 1140       format (10x,i5,5x,i4,'-',i4,2x,2f12.3)
+ 1140       format (8x,i7,5x,i4,'-',i4,2x,2f12.3)
          end do
  1150    continue
       end if
@@ -894,7 +895,7 @@ c
             if (dspsix(i) .ne. 0.0d0) then
                k = k + 1
                write (itxt,1180)  k,i,prsiz(i),prdmp(i),prele(i)
- 1180          format (12x,i5,6x,i4,8x,2f12.4,f12.3)
+ 1180          format (10x,i7,3x,i7,8x,2f12.4,f12.3)
             end if
          end do
       end if
@@ -916,7 +917,7 @@ c
             if (dspsix(i) .ne. 0.0d0) then
                k = k + 1
                write (itxt,1210)  k,i,dspsix(i),dspdmp(i)
- 1210          format (12x,i5,6x,i4,8x,2f12.4)
+ 1210          format (10x,i7,3x,i7,8x,2f12.4)
             end if
          end do
       end if
@@ -938,7 +939,7 @@ c
             if (chg(i) .ne. 0.0d0) then
                k = k + 1
                write (itxt,1240)  k,i,chg(i)
- 1240          format (12x,i5,6x,i4,6x,f12.3)
+ 1240          format (10x,i7,3x,i7,6x,f12.3)
             end if
          end do
 c
@@ -964,7 +965,7 @@ c
             k1 = number(kd(i)(1:4))
             k2 = number(kd(i)(5:8))
             write (itxt,1280)  i,k1,k2,dpl(i),pos(i)
- 1280       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+ 1280       format (10x,i7,5x,i4,'-',i4,6x,2f12.3)
          end do
  1290    continue
       end if
@@ -980,7 +981,7 @@ c
             k1 = number(kd5(i)(1:4))
             k2 = number(kd5(i)(5:8))
             write (itxt,1310)  i,k1,k2,dpl5(i),pos5(i)
- 1310       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+ 1310       format (10x,i7,5x,i4,'-',i4,6x,2f12.3)
          end do
  1320    continue
       end if
@@ -996,7 +997,7 @@ c
             k1 = number(kd4(i)(1:4))
             k2 = number(kd4(i)(5:8))
             write (itxt,1340)  i,k1,k2,dpl4(i),pos4(i)
- 1340       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+ 1340       format (10x,i7,5x,i4,'-',i4,6x,2f12.3)
          end do
  1350    continue
       end if
@@ -1012,7 +1013,7 @@ c
             k1 = number(kd3(i)(1:4))
             k2 = number(kd3(i)(5:8))
             write (itxt,1370)  i,k1,k2,dpl3(i),pos3(i)
- 1370       format (12x,i5,5x,i4,'-',i4,6x,2f12.3)
+ 1370       format (10x,i7,5x,i4,'-',i4,6x,2f12.3)
          end do
  1380    continue
       end if
@@ -1068,7 +1069,7 @@ c
             if (cpele(i).ne.0.0d0 .or. cpalp(i).ne.0.0d0) then
                k = k + 1
                write (itxt,1460)  k,i,cpele(i),cpalp(i)
- 1460          format (12x,i5,6x,i4,8x,2f12.4)
+ 1460          format (10x,i7,3x,i7,8x,2f12.4)
             end if
          end do
       end if
@@ -1089,17 +1090,17 @@ c
          if (use_dirdamp) then
             write (itxt,1480)
  1480       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,23x,'Type',7x,'Alpha',5x,'Thole',6x,'Damp',
+     &              ///,22x,'Type',8x,'Alpha',5x,'Thole',6x,'Damp',
      &                 6x,'Group Types',/)
          else if (use_thole) then
             write (itxt,1490)
  1490       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,23x,'Type',7x,'Alpha',5x,'Thole',
+     &              ///,22x,'Type',8x,'Alpha',5x,'Thole',
      &                 6x,'Group Atom Types',/)
          else
             write (itxt,1500)
  1500       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,23x,'Type',7x,'Alpha',6x,'Group Atom Types',/)
+     &              ///,22x,'Type',8x,'Alpha',6x,'Group Atom Types',/)
          end if
          k = 0
          do i = 1, maxtyp
@@ -1112,28 +1113,28 @@ c
                if (use_dirdamp) then
                   if (npg .eq. 0) then
                      write (itxt,1510)  k,i,polr(i),athl(i),ddir(i)
- 1510                format (10x,i5,7x,i4,3x,3f10.3)
+ 1510                format (8x,i7,4x,i7,3x,3f10.3)
                   else
                      write (itxt,1520)  k,i,polr(i),athl(i),ddir(i),
      &                                  (pgrp(j,i),j=1,npg)
- 1520                format (10x,i5,7x,i4,3x,3f10.3,4x,6i5)
+ 1520                format (8x,i7,4x,i7,3x,3f10.3,4x,6i5)
                   end if
                else if (use_thole) then
                   if (npg .eq. 0) then
                      write (itxt,1530)  k,i,polr(i),athl(i)
- 1530                format (10x,i5,7x,i4,3x,2f10.3)
+ 1530                format (8x,i7,4x,i7,3x,2f10.3)
                   else
                      write (itxt,1540)  k,i,polr(i),athl(i),
      &                                  (pgrp(j,i),j=1,npg)
- 1540                format (10x,i5,7x,i4,3x,2f10.3,4x,6i5)
+ 1540                format (8x,i7,4x,i7,3x,2f10.3,4x,6i5)
                   end if
                else
                   if (npg .eq. 0) then
                      write (itxt,1550)  k,i,polr(i)
- 1550                format (10x,i5,7x,i4,3x,f10.3)
+ 1550                format (8x,i7,4x,i7,3x,f10.3)
                   else
                      write (itxt,1560)  k,i,polr(i),(pgrp(j,i),j=1,npg)
- 1560                format (10x,i5,7x,i4,3x,f10.3,4x,6i4)
+ 1560                format (8x,i7,4x,i7,3x,f10.3,4x,6i4)
                   end if
                end if
             end if
@@ -1181,7 +1182,7 @@ c
             if (ctchg(i).ne.0.0d0 .or. ctdmp(i).ne.0.0d0) then
                k = k + 1
                write (itxt,1640)  k,i,ctchg(i),ctdmp(i)
- 1640          format (12x,i5,6x,i4,8x,2f12.4)
+ 1640          format (10x,i7,3x,i7,8x,2f12.4)
             end if
          end do
       end if
@@ -1199,7 +1200,7 @@ c
             k1 = number(kcfb(i)(1:4))
             k2 = number(kcfb(i)(5:8))
             write (itxt,1670)  i,k1,k2,cflb(i)
- 1670       format (10x,i5,5x,i4,'-',i4,6x,f12.4)
+ 1670       format (8x,i7,5x,i4,'-',i4,6x,f12.4)
          end do
  1680    continue
       end if
@@ -1220,9 +1221,35 @@ c
             k3 = number(kcfa(i)(9:12))
             write (itxt,1710)  i,k1,k2,k3,cfla(1,i),cfla(2,i),
      &                        cflab(1,i),cflab(2,i)
- 1710       format (3x,i5,5x,i4,'-',i4,'-',i4,1x,4f12.4)
+ 1710       format (1x,i7,5x,i4,'-',i4,'-',i4,1x,4f12.4)
          end do
  1720    continue
+      end if
+c
+c     implicit solvation parameters
+c
+      exist = .false.
+      do i = 1, maxtyp
+         if (pbr(i).ne.0.0d0 .or. csr(i).ne.0.0d0
+     &          .or. gkr(i).ne.0.0d0)  exist = .true.
+      end do
+      if (exist) then
+         write (itxt,1730)  formfeed,forcefield
+ 1730    format (a1,//,15x,'Tinker Force Field Parameters for ',a2
+     &0)
+         write (itxt,1740)
+ 1740    format (//,15x,'Implicit Solvation Parameters',
+     &           ///,22x,'Type',6x,'PB Size',
+     &              5x,'ddCOSMO',5x,'GK Size',/)
+         k = 0
+         do i = 1, maxtyp
+            if (pbr(i).ne.0.0d0 .or. csr(i).ne.0.0d0
+     &             .or. gkr(i).ne.0.0d0) then
+               k = k + 1
+               write (itxt,1750)  k,i,pbr(i),csr(i),gkr(i)
+ 1750          format (8x,i7,4x,i7,1x,3f12.4)
+            end if
+         end do
       end if
 c
 c     conjugated pisystem atom parameters
@@ -1232,20 +1259,19 @@ c
          if (ionize(i) .ne. 0.0d0)  exist = .true.
       end do
       if (exist) then
-         write (itxt,1730)  formfeed,forcefield
- 1730    format (a1,//,15x,'Tinker Force Field Parameters for ',a2
+         write (itxt,1760)  formfeed,forcefield
+ 1760    format (a1,//,15x,'Tinker Force Field Parameters for ',a2
      &0)
-         write (itxt,1740)
- 1740    format (//,15x,'Conjugated Pisystem Atom Parameters',
+         write (itxt,1770)
+ 1770    format (//,15x,'Conjugated Pisystem Atom Parameters',
      &           ///,20x,'Class',3x,'Electron',
      &              3x,'Ionization',3x,'Repulsion',/)
          k = 0
          do i = 1, maxclass
             if (ionize(i) .ne. 0.0d0) then
                k = k + 1
-               write (itxt,1750)  k,i,electron(i),ionize(i),repuls
-     &e(i)
- 1750          format (8x,i5,7x,i4,f10.1,2x,2f12.3)
+               write (itxt,1780)  k,i,electron(i),ionize(i),repulse(i)
+ 1780          format (6x,i7,4x,i7,f10.1,2x,2f12.3)
             end if
          end do
       end if
@@ -1253,49 +1279,49 @@ c
 c     conjugated pisystem bond parameters
 c
       if (kpi(1) .ne. blank8) then
-         write (itxt,1760)
- 1760    format (//,15x,'Conjugated Pisystem Bond Parameters',
+         write (itxt,1790)
+ 1790    format (//,15x,'Conjugated Pisystem Bond Parameters',
      &           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi
-            if (kpi(i) .eq. blank8)  goto 1780
+            if (kpi(i) .eq. blank8)  goto 1810
             k1 = number(kpi(i)(1:4))
             k2 = number(kpi(i)(5:8))
-            write (itxt,1770)  i,k1,k2,sslope(i),tslope(i)
- 1770       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1800)  i,k1,k2,sslope(i),tslope(i)
+ 1800       format (6x,i7,5x,i4,'-',i4,3x,2f12.3)
          end do
- 1780    continue
+ 1810    continue
       end if
 c
 c     conjugated pisystem bond parameters for 5-membered rings
 c
       if (kpi5(1) .ne. blank8) then
-         write (itxt,1790)
- 1790    format (//,15x,'5-Membered Ring Pisystem Bond Parameters'
+         write (itxt,1820)
+ 1820    format (//,15x,'5-Membered Ring Pisystem Bond Parameters'
      &,           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi5
-            if (kpi5(i) .eq. blank8)  goto 1810
+            if (kpi5(i) .eq. blank8)  goto 1840
             k1 = number(kpi5(i)(1:4))
             k2 = number(kpi5(i)(5:8))
-            write (itxt,1800)  i,k1,k2,sslope5(i),tslope5(i)
- 1800       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1830)  i,k1,k2,sslope5(i),tslope5(i)
+ 1830       format (6x,i7,5x,i4,'-',i4,3x,2f12.3)
          end do
- 1810    continue
+ 1840    continue
       end if
 c
 c     conjugated pisystem bond parameters for 4-membered rings
 c
       if (kpi4(1) .ne. blank8) then
-         write (itxt,1820)
- 1820    format (//,15x,'4-Membered Ring Pisystem Bond Parameters'
+         write (itxt,1850)
+ 1850    format (//,15x,'4-Membered Ring Pisystem Bond Parameters'
      &,           ///,20x,'Classes',8x,'d Force',4x,'d Length',/)
          do i = 1, maxnpi4
-            if (kpi4(i) .eq. blank8)  goto 1840
+            if (kpi4(i) .eq. blank8)  goto 1870
             k1 = number(kpi4(i)(1:4))
             k2 = number(kpi4(i)(5:8))
-            write (itxt,1830)  i,k1,k2,sslope4(i),tslope4(i)
- 1830       format (8x,i5,5x,i4,'-',i4,3x,f12.3,f12.3)
+            write (itxt,1860)  i,k1,k2,sslope4(i),tslope4(i)
+ 1860       format (6x,i7,5x,i4,'-',i4,3x,2f12.3)
          end do
- 1840    continue
+ 1870    continue
       end if
       return
       end

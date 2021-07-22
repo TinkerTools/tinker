@@ -66,7 +66,6 @@ c              atom and the grid boundary (A)
 c
 c     pbe      Poisson-Boltzmann permanent multipole solvation energy
 c     apbe     Poisson-Boltzmann permanent multipole energy over atoms
-c     pbr      Poisson-Boltzmann cavity radii for atom types
 c     pbep     Poisson-Boltzmann energies on permanent multipoles
 c     pbfp     Poisson-Boltzmann forces on permanent multipoles
 c     pbtp     Poisson-Boltzmann torques on permanent multipoles
@@ -94,7 +93,6 @@ c
       real*8 ionr(maxion)
       real*8 ionc(maxion)
       real*8, allocatable :: apbe(:)
-      real*8, allocatable :: pbr(:)
       real*8, allocatable :: pbep(:,:)
       real*8, allocatable :: pbfp(:,:)
       real*8, allocatable :: pbtp(:,:)

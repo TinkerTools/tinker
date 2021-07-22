@@ -721,9 +721,11 @@ c
 c
 c     setup the multipoles for solvation only calculations
 c
-      if (.not.use_mpole .and. .not.use_polar) then
-         call chkpole
-         call rotpole
+      if (.not. use_mpole) then
+          call chkpole
+          call rotpole
+      end if
+      if (.not. use_polar) then
          call induce
       end if
 c
@@ -734,10 +736,12 @@ c
 c
 c     correct energy and derivatives for vacuum to polarized state
 c
-      if (use_mlist) then
-         call ediff1b
-      else
-         call ediff1a
+      if (use_polar) then
+         if (use_mlist) then
+            call ediff1b
+         else
+            call ediff1a
+         end if
       end if
       return
       end
@@ -2297,6 +2301,218 @@ c     perform deallocation of some local arrays
 c
       deallocate (trq)
       deallocate (trqi)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine epb1  --  Poisson-Boltzmann energy and derivs  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "epb1" calculates the implicit solvation energy and derivatives
+c     via the Poisson-Boltzmann plus nonpolar implicit solvation
+c
+c
+      subroutine epb1
+      implicit none
+c
+c
+c     compute the energy and gradients via Poisson-Boltzmann
+c
+      call epb1a
+c
+c     correct energy and derivatives for vacuum to polarized state
+c
+      call ediff1a
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epb1a  --  PB solvation energy and derivatives  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "epb1a" calculates the solvation energy and gradients for the
+c     PB/NP solvation model
+c
+c
+      subroutine epb1a
+      use atoms
+      use chgpot
+      use deriv
+      use energi
+      use mpole
+      use pbstuf
+      use polar
+      use polpot
+      use potent
+      implicit none
+      integer i,j,ii
+      real*8 etot
+      real*8 fix(3),fiy(3),fiz(3)
+      real*8, allocatable :: indpole(:,:)
+      real*8, allocatable :: inppole(:,:)
+      real*8, allocatable :: directf(:,:)
+      real*8, allocatable :: directt(:,:)
+      real*8, allocatable :: mutualf(:,:)
+      real*8, allocatable :: polgrd(:,:)
+      real*8, allocatable :: detor(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (indpole(3,n))
+      allocate (inppole(3,n))
+      allocate (directf(3,n))
+      allocate (directt(3,n))
+      allocate (mutualf(3,n))
+      allocate (polgrd(3,n))
+c
+c     induced dipole implicit energy via their
+c     interaction with the permanent multipoles
+c
+      if (use_polar) then
+         etot = 0.0d0
+         do i = 1, npole
+            ii = ipole(i)
+            etot = etot + uinds(1,i)*pbep(1,ii) + uinds(2,i)*pbep(2,ii)
+     &                + uinds(3,i)*pbep(3,ii)
+         end do
+         etot = -0.5d0 * electric * etot
+         pbe = pbe + etot
+c
+c     initialize induced dipole implicit energy gradients
+c
+         do i = 1, n
+            do j = 1, 3
+               indpole(j,i) = 0.0d0
+               inppole(j,i) = 0.0d0
+               directf(j,i) = 0.0d0
+               directt(j,i) = 0.0d0
+               mutualf(j,i) = 0.0d0
+               polgrd(j,i) = 0.0d0
+             end do
+         end do
+c
+c     copy induced electrostatics into atom-based arrays
+c
+         do i = 1, npole
+            ii = ipole(i)
+            do j = 1, 3
+               indpole(j,ii) = uinds(j,i)
+               inppole(j,ii) = uinps(j,i)
+            end do
+         end do
+c
+c     perform dynamic allocation of some global arrays
+c
+         if (poltyp .eq. 'DIRECT') then
+            if (.not. allocated(pbeuind))  allocate (pbeuind(3,n))
+            if (.not. allocated(pbeuinp))  allocate (pbeuinp(3,n))
+c
+c     for direct polarization, the reaction field due to the
+c     induced dipoles still needs to be computed because
+c     the mutual portion of "apbsinduce" was not called
+c
+            do i = 1, n
+               do j = 1, 3
+                  pbeuind(j,i) = 0.0d0
+                  pbeuinp(j,i) = 0.0d0
+               end do
+            end do
+            call apbsinduce (indpole,pbeuind)
+            call apbsnlinduce (inppole,pbeuinp)
+         end if
+c
+c     compute direct induced dipole implicit solvation energy
+c     gradients using potentials saved during the SCRF convergence
+c
+         call pbdirectpolforce (indpole,inppole,directf,directt)
+c
+c     convert torques due to induced dipole reaction field acting
+c     on permanent multipoles into forces on adjacent atoms
+c
+         do i = 1, npole
+            call torque (i,directt(1,i),fix,fiy,fiz,polgrd)
+         end do
+         do i = 1, n
+            polgrd(1,i) = polgrd(1,i) - directf(1,i)
+            polgrd(2,i) = polgrd(2,i) - directf(2,i)
+            polgrd(3,i) = polgrd(3,i) - directf(3,i)
+         end do
+c
+c     compute mutual induced dipole solvation energy gradients
+c
+         if (poltyp .eq. 'MUTUAL') then
+            call pbmutualpolforce (indpole,inppole,mutualf)
+            do i = 1, n
+               polgrd(1,i) = polgrd(1,i) - mutualf(1,i)
+               polgrd(2,i) = polgrd(2,i) - mutualf(2,i)
+               polgrd(3,i) = polgrd(3,i) - mutualf(3,i)
+            end do
+         end if
+c
+c     add induced dipole implicit solvation energy gradients
+c     to overall polarization energy gradients
+c
+         do i = 1, n
+            des(1,i) = des(1,i) + polgrd(1,i)
+            des(2,i) = des(2,i) + polgrd(2,i)
+            des(3,i) = des(3,i) + polgrd(3,i)
+         end do
+c
+c     if polarization is off, get the permanent reaction field
+c
+      else
+         call pbempole
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (indpole)
+      deallocate (inppole)
+      deallocate (directf)
+      deallocate (directt)
+      deallocate (mutualf)
+      deallocate (polgrd)
+c
+c     increment solvation energy by Poisson-Boltzmann results
+c
+      es = es + pbe
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (detor(3,n))
+c
+c     convert torques on permanent moments due to their own reaction
+c     field into forces on adjacent atoms
+c
+      do i = 1, n
+         do j = 1, 3
+            detor(j,i) = 0.0d0
+          end do
+      end do
+      do i = 1, npole
+         call torque (i,pbtp(1,i),fix,fiy,fiz,detor)
+      end do
+c
+c     add permanent reaction field forces to the torque results
+c
+      do i = 1, n
+         des(1,i) = des(1,i) - pbfp(1,i) + detor(1,i)
+         des(2,i) = des(2,i) - pbfp(2,i) + detor(2,i)
+         des(3,i) = des(3,i) - pbfp(3,i) + detor(3,i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (detor)
       return
       end
 c
@@ -4360,218 +4576,6 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine epb1  --  Poisson-Boltzmann energy and derivs  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "epb1" calculates the implicit solvation energy and derivatives
-c     via the Poisson-Boltzmann plus nonpolar implicit solvation
-c
-c
-      subroutine epb1
-      implicit none
-c
-c
-c     compute the energy and gradients via Poisson-Boltzmann
-c
-      call epb1a
-c
-c     correct energy and derivatives for vacuum to polarized state
-c
-      call ediff1a
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine epb1a  --  PB solvation energy and derivatives  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "epb1a" calculates the solvation energy and gradients for the
-c     PB/NP solvation model
-c
-c
-      subroutine epb1a
-      use atoms
-      use chgpot
-      use deriv
-      use energi
-      use mpole
-      use pbstuf
-      use polar
-      use polpot
-      use potent
-      implicit none
-      integer i,j,ii
-      real*8 sum
-      real*8 fix(3),fiy(3),fiz(3)
-      real*8, allocatable :: indpole(:,:)
-      real*8, allocatable :: inppole(:,:)
-      real*8, allocatable :: directf(:,:)
-      real*8, allocatable :: directt(:,:)
-      real*8, allocatable :: mutualf(:,:)
-      real*8, allocatable :: polgrd(:,:)
-      real*8, allocatable :: detor(:,:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (indpole(3,n))
-      allocate (inppole(3,n))
-      allocate (directf(3,n))
-      allocate (directt(3,n))
-      allocate (mutualf(3,n))
-      allocate (polgrd(3,n))
-c
-c     induced dipole implicit energy via their
-c     interaction with the permanent multipoles
-c
-      if (use_polar) then
-         sum = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            sum = sum + uinds(1,i)*pbep(1,ii) + uinds(2,i)*pbep(2,ii)
-     &               + uinds(3,i)*pbep(3,ii)
-         end do
-         sum = -0.5d0 * electric * sum
-         pbe = pbe + sum
-c
-c     initialize induced dipole implicit energy gradients
-c
-         do i = 1, n
-            do j = 1, 3
-               indpole(j,i) = 0.0d0
-               inppole(j,i) = 0.0d0
-               directf(j,i) = 0.0d0
-               directt(j,i) = 0.0d0
-               mutualf(j,i) = 0.0d0
-               polgrd(j,i) = 0.0d0
-             end do
-         end do
-c
-c     copy induced electrostatics into atom-based arrays
-c
-         do i = 1, npole
-            ii = ipole(i)
-            do j = 1, 3
-               indpole(j,ii) = uinds(j,i)
-               inppole(j,ii) = uinps(j,i)
-            end do
-         end do
-c
-c     perform dynamic allocation of some global arrays
-c
-         if (poltyp .eq. 'DIRECT') then
-            if (.not. allocated(pbeuind))  allocate (pbeuind(3,n))
-            if (.not. allocated(pbeuinp))  allocate (pbeuinp(3,n))
-c
-c     for direct polarization, the reaction field due to the
-c     induced dipoles still needs to be computed because
-c     the mutual portion of "apbsinduce" was not called
-c
-            do i = 1, n
-               do j = 1, 3
-                  pbeuind(j,i) = 0.0d0
-                  pbeuinp(j,i) = 0.0d0
-               end do
-            end do
-            call apbsinduce (indpole,pbeuind)
-            call apbsnlinduce (inppole,pbeuinp)
-         end if
-c
-c     compute direct induced dipole implicit solvation energy
-c     gradients using potentials saved during the SCRF convergence
-c
-         call pbdirectpolforce (indpole,inppole,directf,directt)
-c
-c     convert torques due to induced dipole reaction field acting
-c     on permanent multipoles into forces on adjacent atoms
-c
-         do i = 1, npole
-            call torque (i,directt(1,i),fix,fiy,fiz,polgrd)
-         end do
-         do i = 1, n
-            polgrd(1,i) = polgrd(1,i) - directf(1,i)
-            polgrd(2,i) = polgrd(2,i) - directf(2,i)
-            polgrd(3,i) = polgrd(3,i) - directf(3,i)
-         end do
-c
-c     compute mutual induced dipole solvation energy gradients
-c
-         if (poltyp .eq. 'MUTUAL') then
-            call pbmutualpolforce (indpole,inppole,mutualf)
-            do i = 1, n
-               polgrd(1,i) = polgrd(1,i) - mutualf(1,i)
-               polgrd(2,i) = polgrd(2,i) - mutualf(2,i)
-               polgrd(3,i) = polgrd(3,i) - mutualf(3,i)
-            end do
-         end if
-c
-c     add induced dipole implicit solvation energy gradients
-c     to overall polarization energy gradients
-c
-         do i = 1, n
-            des(1,i) = des(1,i) + polgrd(1,i)
-            des(2,i) = des(2,i) + polgrd(2,i)
-            des(3,i) = des(3,i) + polgrd(3,i)
-         end do
-c
-c     if polarization is off, get the permanent reaction field
-c
-      else
-         call pbempole
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (indpole)
-      deallocate (inppole)
-      deallocate (directf)
-      deallocate (directt)
-      deallocate (mutualf)
-      deallocate (polgrd)
-c
-c     increment solvation energy by Poisson-Boltzmann results
-c
-      es = es + pbe
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (detor(3,n))
-c
-c     convert torques on permanent moments due to their own reaction
-c     field into forces on adjacent atoms
-c
-      do i = 1, n
-         do j = 1, 3
-            detor(j,i) = 0.0d0
-          end do
-      end do
-      do i = 1, npole
-         call torque (i,pbtp(1,i),fix,fiy,fiz,detor)
-      end do
-c
-c     add permanent reaction field forces to the torque results
-c
-      do i = 1, n
-         des(1,i) = des(1,i) - pbfp(1,i) + detor(1,i)
-         des(2,i) = des(2,i) - pbfp(2,i) + detor(2,i)
-         des(3,i) = des(3,i) - pbfp(3,i) + detor(3,i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (detor)
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
 c     ##  subroutine enp1  --  cavity/dispersion energy and derivs  ##
 c     ##                                                            ##
 c     ################################################################
@@ -4640,7 +4644,7 @@ c
          end do
       end if
 c
-c     find cavity energy from only the solvent excluded volume
+c     include cavity energy from a full SEV term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -4650,9 +4654,9 @@ c
             des(3,i) = des(3,i) + dvol(3,i)
          end do
 c
-c     find cavity energy from only a tapered volume term
+c     include cavity energy from a tapered SEV term
 c
-      else if (reff.gt.spcut .and. reff.le.stoff) then
+      else if (reff .le. spoff) then
          mode = 'GKV'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -4668,25 +4672,21 @@ c
             des(3,i) = des(3,i) + taper*dvol(3,i)
      &                    + evol*dtaper*dsurf(3,i)
          end do
+      end if
 c
-c     find cavity energy using both volume and SASA terms
+c     include a full SASA term
 c
-      else if (reff.gt.stoff .and. reff.le.spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                +2.0d0*c2*reff+c1) * dreff
-         ecav = evol * taper
+      if (reff .gt. stcut) then
+         ecav = ecav + esurf
          do i = 1, n
-            des(1,i) = des(1,i) + taper*dvol(1,i)
-     &                    + evol*dtaper*dsurf(1,i)
-            des(2,i) = des(2,i) + taper*dvol(2,i)
-     &                    + evol*dtaper*dsurf(2,i)
-            des(3,i) = des(3,i) + taper*dvol(3,i)
-     &                    + evol*dtaper*dsurf(3,i)
+            des(1,i) = des(1,i) + dsurf(1,i)
+            des(2,i) = des(2,i) + dsurf(2,i)
+            des(3,i) = des(3,i) + dsurf(3,i)
          end do
+c
+c     include cavity energy from a tapered SASA term
+c
+      else if (reff .gt. stoff) then
          mode = 'GKSA'
          call switch (mode)
          taper = c5*reff5 + c4*reff4 + c3*reff3
@@ -4700,34 +4700,6 @@ c
             des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
             des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
             des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
-         end do
-c
-c     find cavity energy from only a tapered SASA term
-c
-      else if (reff.gt.spoff .and. reff.le.stcut) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                +2.0d0*c2*reff+c1) * dreff
-         dtaper = -dtaper
-         ecav = taper * esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
-            des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
-            des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
-         end do
-c
-c     find cavity energy from only a SASA-based term
-c
-      else
-         ecav = esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + dsurf(1,i)
-            des(2,i) = des(2,i) + dsurf(2,i)
-            des(3,i) = des(3,i) + dsurf(3,i)
          end do
       end if
 c
@@ -4771,9 +4743,9 @@ c
       real*8 rk,sk,sk2
       real*8 xr,yr,zr
       real*8 r,r2,r3
-      real*8 sum,term,shctd
-      real*8 iwca,irep,offset
-      real*8 epsi,rmini,ri,rmax
+      real*8 sum,term
+      real*8 iwca,irep
+      real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
       real*8 lik,lik2,lik3,lik4
@@ -4790,18 +4762,10 @@ c     zero out the Weeks-Chandler-Andersen dispersion energy
 c
       edisp = 0.0d0
 c
-c     set overlap scale factor for HCT descreening method
-c
-      shctd = 0.81d0
-      offset = 0.0d0
-      do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
-      end do
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,rdisp,x,y,z,shctd,cdisp)
+!$OMP& rad,x,y,z,cdisp)
 !$OMP& shared(edisp,des)
 !$OMP DO reduction(+:edisp,des) schedule(guided)
 c
@@ -4818,7 +4782,8 @@ c
          rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
          rmixh7 = rmixh**7
          ah = emixh * rmixh7
-         ri = rdisp(i)
+         rio = rmixo / 2.0d0 + dispoff
+         rih = rmixh / 2.0d0 + dispoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -4834,18 +4799,17 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
                r3 = r * r2
-               rk = rdisp(k)
-c              sk = rk * shct(k)
+               rk = rad(class(k))
                sk = rk * shctd
                sk2 = sk * sk
-               if (ri .lt. r+sk) then
-                  de = 0.0d0
-                  rmax = max(ri,r-sk)
+               de = 0.0d0
+               if (rio .lt. r+sk) then
+                  rmax = max(rio,r-sk)
                   lik = rmax
-                  lik2 = lik * lik
-                  lik3 = lik2 * lik
-                  lik4 = lik3 * lik
                   if (lik .lt. rmixo) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixo)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -4853,7 +4817,7 @@ c              sk = rk * shct(k)
                      term = 4.0d0 * pi / (48.0d0*r)
      &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
      &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (ri .gt. r-sk) then
+                     if (rio .gt. r-sk) then
                         dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
                         dl = dl * lik2
                      else
@@ -4873,7 +4837,71 @@ c              sk = rk * shct(k)
                      de = de - emixo*pi*(dl+du)/(4.0d0*r2)
                      sum = sum + iwca
                   end if
+                  uik = r + sk
+                  if (uik .gt. rmixo) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik6 = uik5 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
+                     uik13 = uik12 * uik
+                     lik = max(rmax,rmixo)
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
+                     lik5 = lik4 * lik
+                     lik6 = lik5 * lik
+                     lik10 = lik5 * lik5
+                     lik11 = lik10 * lik
+                     lik12 = lik11 * lik
+                     lik13 = lik12 * lik
+                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
+     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
+     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
+     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
+                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
+                        dl = -dl / lik5
+                     else
+                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
+     &                          + 15.0d0*(lik2*r+r3-r*sk2)
+                        dl = dl / lik6
+                     end if
+                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
+     &                       + 15.0d0*(uik2*r+r3-r*sk2)
+                     du = -du / uik6
+                     idisp = -2.0d0 * ao * term
+                     de = de -2.0d0*ao*pi*(dl + du)/(15.0d0*r2)
+                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
+     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
+     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
+     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
+                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
+                        dl = -dl / lik12
+                     else
+                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
+     &                          + 60.0d0*(lik2*r+r3-r*sk2)
+                        dl = dl / lik13
+                     end if
+                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
+     &                       + 60.0d0*(uik2*r+r3-r*sk2)
+                     du = -du / uik13
+                     irep = ao * rmixo7 * term
+                     de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
+                     sum = sum + irep + idisp
+                  end if
+               end if
+               if (rih .lt. r+sk) then
+                  rmax = max(rih,r-sk)
+                  lik = rmax
                   if (lik .lt. rmixh) then
+                     lik2 = lik * lik
+                     lik3 = lik2 * lik
+                     lik4 = lik3 * lik
                      uik = min(r+sk,rmixh)
                      uik2 = uik * uik
                      uik3 = uik2 * uik
@@ -4881,7 +4909,7 @@ c              sk = rk * shct(k)
                      term = 4.0d0 * pi / (48.0d0*r)
      &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
      &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (ri .gt. r-sk) then
+                     if (rih .gt. r-sk) then
                         dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
                         dl = dl * lik2
                      else
@@ -4902,63 +4930,16 @@ c              sk = rk * shct(k)
                      sum = sum + iwca
                   end if
                   uik = r + sk
-                  uik2 = uik * uik
-                  uik3 = uik2 * uik
-                  uik4 = uik3 * uik
-                  uik5 = uik4 * uik
-                  uik6 = uik5 * uik
-                  uik10 = uik5 * uik5
-                  uik11 = uik10 * uik
-                  uik12 = uik11 * uik
-                  uik13 = uik12 * uik
-                  if (uik .gt. rmixo) then
-                     lik = max(rmax,rmixo)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik6 = lik5 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     lik13 = lik12 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
-                        dl = -dl / lik5
-                     else
-                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
-     &                          + 15.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik6
-                     end if
-                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
-     &                       + 15.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik6
-                     idisp = -2.0d0 * ao * term
-                     de = de -2.0d0*ao*pi*(dl + du)/(15.0d0*r2)
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
-                        dl = -dl / lik12
-                     else
-                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
-     &                          + 60.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik13
-                     end if
-                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
-     &                       + 60.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik13
-                     irep = ao * rmixo7 * term
-                     de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
-                     sum = sum + irep + idisp
-                  end if
                   if (uik .gt. rmixh) then
+                     uik2 = uik * uik
+                     uik3 = uik2 * uik
+                     uik4 = uik3 * uik
+                     uik5 = uik4 * uik
+                     uik6 = uik5 * uik
+                     uik10 = uik5 * uik5
+                     uik11 = uik10 * uik
+                     uik12 = uik11 * uik
+                     uik13 = uik12 * uik
                      lik = max(rmax,rmixh)
                      lik2 = lik * lik
                      lik3 = lik2 * lik
@@ -4973,7 +4954,7 @@ c              sk = rk * shct(k)
      &                      * (15.0d0*uik*lik*r*(uik4-lik4)
      &                         - 10.0d0*uik2*lik2*(uik3-lik3)
      &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixh) then
+                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
                         dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
                         dl = -dl / lik5
                      else
@@ -4990,7 +4971,7 @@ c              sk = rk * shct(k)
      &                      * (120.0d0*uik*lik*r*(uik11-lik11)
      &                         - 66.0d0*uik2*lik2*(uik10-lik10)
      &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (ri.gt.r-sk .or. rmax.lt.rmixh) then
+                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
                         dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
                         dl = -dl / lik12
                      else
@@ -5005,20 +4986,20 @@ c              sk = rk * shct(k)
                      de = de + ah*rmixh7*pi*(dl+du)/(30.0d0*r2)
                      sum = sum + irep + idisp
                   end if
+               end if
 c
 c     increment the individual dispersion gradient components
 c
-                  de = -de/r * slevy * awater
-                  dedx = de * xr
-                  dedy = de * yr
-                  dedz = de * zr
-                  des(1,i) = des(1,i) + dedx
-                  des(2,i) = des(2,i) + dedy
-                  des(3,i) = des(3,i) + dedz
-                  des(1,k) = des(1,k) - dedx
-                  des(2,k) = des(2,k) - dedy
-                  des(3,k) = des(3,k) - dedz
-               end if
+               de = -de/r * slevy * awater
+               dedx = de * xr
+               dedy = de * yr
+               dedz = de * zr
+               des(1,i) = des(1,i) + dedx
+               des(2,i) = des(2,i) + dedy
+               des(3,i) = des(3,i) + dedz
+               des(1,k) = des(1,k) - dedx
+               des(2,k) = des(2,k) - dedy
+               des(3,k) = des(3,k) - dedz
             end if
          end do
 c

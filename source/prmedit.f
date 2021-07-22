@@ -184,6 +184,7 @@ c
       real*8 cfb,cfa1,cfa2
       real*8 cfb1,cfb2
       real*8 el,iz,rp
+      real*8 pbrd,csrd,gkrd
       real*8 ss,ts
       real*8 vt(6),st(6)
       character*3 sym
@@ -884,25 +885,25 @@ c
  1260       continue
             write (iprm,1270)  ia,ib,cfa1,cfa2,cfb1,cfb2
  1270       format ('angcflux',2x,2i5,9x,4f11.5)
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
+            ia = 0
+            pbrd = 0.0d0
+            csrd = 0.0d0
+            gkrd = 0.0d0
+            read (string,*,err=1280,end=1280)  ia,pbrd,csrd,gkrd
+ 1280       continue
+            write (iprm,1290)  ia,pbrd,csrd,gkrd
+ 1290       format ('solute',4x,i5,5x,3f11.4)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             el = 0.0d0
             iz = 0.0d0
             rp = 0.0d0
-            read (string,*,err=1280,end=1280)  ia,el,iz,rp
- 1280       continue
-            write (iprm,1290)  ia,el,iz,rp
- 1290       format ('piatom',4x,i5,10x,f11.1,2f11.3)
-         else if (keyword(1:7) .eq. 'PIBOND ') then
-            ia = 0
-            ib = 0
-            ss = 0.0d0
-            ts = 0.0d0
-            read (string,*,err=1300,end=1300)  ia,ib,ss,ts
+            read (string,*,err=1300,end=1300)  ia,el,iz,rp
  1300       continue
-            write (iprm,1310)  ia,ib,ss,ts
- 1310       format ('pibond',4x,2i5,5x,f11.3,f11.4)
-         else if (keyword(1:8) .eq. 'PIBOND5 ') then
+            write (iprm,1310)  ia,el,iz,rp
+ 1310       format ('piatom',4x,i5,10x,f11.1,2f11.3)
+         else if (keyword(1:7) .eq. 'PIBOND ') then
             ia = 0
             ib = 0
             ss = 0.0d0
@@ -910,8 +911,8 @@ c
             read (string,*,err=1320,end=1320)  ia,ib,ss,ts
  1320       continue
             write (iprm,1330)  ia,ib,ss,ts
- 1330       format ('pibond5',3x,2i5,5x,f11.3,f11.4)
-         else if (keyword(1:8) .eq. 'PIBOND4 ') then
+ 1330       format ('pibond',4x,2i5,5x,f11.3,f11.4)
+         else if (keyword(1:8) .eq. 'PIBOND5 ') then
             ia = 0
             ib = 0
             ss = 0.0d0
@@ -919,33 +920,42 @@ c
             read (string,*,err=1340,end=1340)  ia,ib,ss,ts
  1340       continue
             write (iprm,1350)  ia,ib,ss,ts
- 1350       format ('pibond4',3x,2i5,5x,f11.3,f11.4)
+ 1350       format ('pibond5',3x,2i5,5x,f11.3,f11.4)
+         else if (keyword(1:8) .eq. 'PIBOND4 ') then
+            ia = 0
+            ib = 0
+            ss = 0.0d0
+            ts = 0.0d0
+            read (string,*,err=1360,end=1360)  ia,ib,ss,ts
+ 1360       continue
+            write (iprm,1370)  ia,ib,ss,ts
+ 1370       format ('pibond4',3x,2i5,5x,f11.3,f11.4)
          else if (keyword(1:6) .eq. 'METAL ') then
             ia = 0
             call getnumb (record,ia,next)
-            write (iprm,1360)  ia,record(next:length)
- 1360       format ('metal',5x,i5,a)
+            write (iprm,1380)  ia,record(next:length)
+ 1380       format ('metal',5x,i5,a)
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
             sym = '   '
             note = '                        '
-            read (string,*,err=1370,end=1370)  ia
+            read (string,*,err=1390,end=1390)  ia
             call getword (record,sym,next)
             call getstring (record,note,next)
             string = record(next:240)
-            read (string,*,err=1370,end=1370)  ib
- 1370       continue
+            read (string,*,err=1390,end=1390)  ib
+ 1390       continue
             length = trimtext(note)
             string = '"'//note(1:length)//'"'//blank
-            write (iprm,1380)  ia,sym,string(1:30),ib
- 1380       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
+            write (iprm,1400)  ia,sym,string(1:30),ib
+ 1400       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
          else if (length .eq. 0) then
-            write (iprm,1390)
- 1390       format ()
+            write (iprm,1410)
+ 1410       format ()
          else
-            write (iprm,1400)  record(1:length)
- 1400       format (a)
+            write (iprm,1420)  record(1:length)
+ 1420       format (a)
          end if
       end do
       return

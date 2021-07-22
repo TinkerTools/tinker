@@ -13,13 +13,11 @@ c     ################################################################
 c
 c
 c     gkc      tuning parameter exponent in the f(GB) function
-c     gkr      generalized Kirkwood cavity radii for atom types
 c
 c
       module gkstuf
       use sizes
       implicit none
       real*8 gkc
-      real*8 gkr(maxtyp)
       save
       end
