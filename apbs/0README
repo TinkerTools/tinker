@@ -5,7 +5,7 @@
 
       This directory contains static libraries and other files needed to
       interface the Tinker package with the APBS 1.3 Poisson-Boltzmann
-      solver developed by Nathan Baker's group. To build APBS-capable
+      code written by Nathan Baker and coworkers. To build APBS-capable
       Tinker executables, use the Tinker source "pmpb.c" in place of the
       stub file "pmpb.f", then link with the APBS libraries found here.
       All of the libraries were built with the GNU compilers.

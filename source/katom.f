@@ -68,14 +68,14 @@ c
             wght = 0.0d0
             lig = 0
             call getnumb (record,k,next)
-            call getnumb (record,cls,next)
-            if (cls .eq. 0)  cls = k
-            atmcls(k) = cls
-            call gettext (record,symb,next)
-            call getstring (record,notice,next)
-            string = record(next:240)
-            read (string,*,err=40,end=40)  atn,wght,lig
-            if (k.ge.1 .and. k.le.maxtyp) then
+            if (k.gt.0 .and. k.le.maxtyp) then
+               call getnumb (record,cls,next)
+               if (cls .eq. 0)  cls = k
+               atmcls(k) = cls
+               call gettext (record,symb,next)
+               call getstring (record,notice,next)
+               string = record(next:240)
+               read (string,*,err=40,end=40)  atn,wght,lig
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,10)
@@ -92,7 +92,7 @@ c
                   write (iout,20)  k,cls,symb,notice,atn,wght,lig
    20             format (1x,i8,i6,5x,a3,3x,a24,i6,f11.3,i6)
                end if
-            else if (k .ge. maxtyp) then
+            else if (k .gt. maxtyp) then
                write (iout,30)
    30          format (/,' KATOM   --  Too many Atom Types;',
      &                    ' Increase MAXTYP')
@@ -200,12 +200,12 @@ c
             wght = 0.0d0
             lig = 0
             call getnumb (record,k,next)
-            call getnumb (record,cls,next)
-            call gettext (record,symb,next)
-            call getstring (record,notice,next)
-            string = record(next:240)
-            read (string,*,err=90,end=90)  atn,wght,lig
             if (k.lt.0 .and. k.ge.-n) then
+               call getnumb (record,cls,next)
+               call gettext (record,symb,next)
+               call getstring (record,notice,next)
+               string = record(next:240)
+               read (string,*,err=90,end=90)  atn,wght,lig
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,70)
