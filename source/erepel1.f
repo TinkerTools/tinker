@@ -63,6 +63,7 @@ c
       use energi
       use group
       use mpole
+      use mutant
       use potent
       use repel
       use reppot
@@ -123,6 +124,7 @@ c
       real*8, allocatable :: rscale(:)
       real*8, allocatable :: ter(:,:)
       logical proceed,usei
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -184,6 +186,7 @@ c
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -204,6 +207,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -332,7 +336,26 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                   sizik = sizi * sizk * rscale(k)
-                  e = sizik * eterm * rr1
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     e = vlambda * sizik * rscale(k) * eterm
+     &                      / sqrt(1.0d0-vlambda+r2)
+                  else
+                     e = sizik * rscale(k) * eterm * rr1
+                  end if
 c
 c     calculate intermediate terms for force and torque
 c
@@ -514,6 +537,7 @@ c
             qiyz = rpole(10,ii)
             qizz = rpole(13,ii)
             usei = use(i)
+            muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -534,6 +558,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
+               mutk = mut(k)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                if (.not. use_intra)  proceed = .true.
@@ -663,7 +688,26 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                         sizik = sizi * sizk
-                        e = sizik * rscale(k) * eterm * rr1
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                        mutik = .false.
+                        if (muti .or. mutk) then
+                           if (vcouple .eq. 1) then
+                              mutik = .true.
+                           else if (.not.muti .or. .not.mutk) then
+                              mutik = .true.
+                           end if
+                        end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                        if (mutik) then
+                           e = vlambda * sizik * rscale(k) * eterm
+     &                            / sqrt(1.0d0-vlambda+r2)
+                        else
+                           e = sizik * rscale(k) * eterm * rr1
+                        end if
 c
 c     calculate intermediate terms for force and torque
 c
@@ -900,6 +944,7 @@ c
       use group
       use inform
       use mpole
+      use mutant
       use neigh
       use repel
       use reppot
@@ -960,6 +1005,7 @@ c
       real*8, allocatable :: rscale(:)
       real*8, allocatable :: ter(:,:)
       logical proceed,usei
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -1004,8 +1050,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,cut2,off2,
-!$OMP& xaxis,yaxis,zaxis,c0,c1,c2,c3,c4,c5)
+!$OMP& nelst,elst,use,mut,use_group,use_intra,use_bounds,vcouple,
+!$OMP& vlambda,cut2,off2,xaxis,yaxis,zaxis,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale) shared (er,der,ter,vir)
 !$OMP DO reduction(+:er,der,ter,vir) schedule(guided)
 c
@@ -1030,6 +1076,7 @@ c
          qiyz = rpole(10,ii)
          qizz = rpole(13,ii)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1179,7 +1226,26 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                   sizik = sizi * sizk * rscale(k)
-                  e = sizik * eterm * rr1
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     e = vlambda * sizik * rscale(k) * eterm
+     &                      / sqrt(1.0d0-vlambda+r2)
+                  else
+                     e = sizik * rscale(k) * eterm * rr1
+                  end if
 c
 c     calculate intermediate terms for force and torque
 c

@@ -914,6 +914,7 @@ c
       use energi
       use ewald
       use group
+      use mutant
       use shunt
       use usage
       use virial
@@ -944,6 +945,7 @@ c
       real*8 vyy,vzy,vzz
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -972,6 +974,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -994,6 +997,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1063,18 +1067,30 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
-                  rterm = -(ralpha2**3) * expterm / r
-                  de = -6.0d0*e/r2 - ci*ck*rterm/r7
-     &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        scale = scale * vlambda
+                        ddamp = ddamp * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        scale = scale * vlambda
+                        ddamp = ddamp * vlambda
+                     end if
+                  end if
 c
 c     increment the overall damped dispersion energy component
 c
+                  scale = scale - 1.0d0
+                  e = e * (expa+scale)
                   edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
 c
+                  rterm = -(ralpha2**3) * expterm / r
+                  de = -6.0d0*e/r2 - ci*ck*rterm/r7
+     &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -1137,6 +1153,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1159,6 +1176,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1229,6 +1247,21 @@ c     apply damping and scaling factors for this interaction
 c
                      scale = dspscale(k) * damp**2
                      if (use_group)  scale = scale * fgrp
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     if (muti .or. mutk) then
+                        if (vcouple .eq. 1) then
+                           scale = scale * vlambda
+                           ddamp = ddamp * vlambda
+                        else if (.not.muti .or. .not.mutk) then
+                           scale = scale * vlambda
+                           ddamp = ddamp * vlambda
+                        end if
+                     end if
+c
+c     increment the overall damped dispersion energy component
+c
                      scale = scale - 1.0d0
                      e = e * (expa+scale)
                      rterm = -(ralpha2**3) * expterm / r
@@ -1238,9 +1271,6 @@ c
                         e = 0.5d0 * e
                         de = 0.5d0 * de
                      end if
-c
-c     increment the overall damped dispersion energy component
-c
                      edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
@@ -1385,6 +1415,7 @@ c
       use energi
       use ewald
       use group
+      use mutant
       use neigh
       use shunt
       use usage
@@ -1415,6 +1446,7 @@ c
       real*8 vyy,vzy,vzz
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -1437,7 +1469,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,off2,aewald)
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
+!$OMP& vcouple,vlambda)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
 !$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
 c
@@ -1451,6 +1484,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1474,6 +1508,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1543,18 +1578,30 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
-                  rterm = -(ralpha2**3) * expterm / r
-                  de = -6.0d0*e/r2 - ci*ck*rterm/r7
-     &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        scale = scale * vlambda
+                        ddamp = ddamp * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        scale = scale * vlambda
+                        ddamp = ddamp * vlambda
+                     end if
+                  end if
 c
 c     increment the overall damped dispersion energy component
 c
+                  scale = scale - 1.0d0
+                  e = e * (expa+scale)
                   edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
 c
+                  rterm = -(ralpha2**3) * expterm / r
+                  de = -6.0d0*e/r2 - ci*ck*rterm/r7
+     &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr

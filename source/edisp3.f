@@ -262,6 +262,11 @@ c
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
+c     apply damping and scaling factors for this interaction
+c
+                  e = e * dspscale(k) * damp**2
+                  if (use_group)  e = e * fgrp
+c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   if (muti .or. mutk) then
@@ -271,11 +276,6 @@ c
                         e = e * vlambda
                      end if
                   end if
-c
-c     apply damping and scaling factors for this interaction
-c
-                  e = e * damp**2 * dspscale(k)
-                  if (use_group)  e = e * fgrp
 c
 c     use energy switching if near the cutoff distance
 c
@@ -434,6 +434,15 @@ c
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
 c
+c     apply damping and scaling factors for this interaction
+c
+                     e = e * damp**2
+                     if (use_polymer) then
+                        if (r2 .le. polycut2)  e = e * dspscale(k)
+                     end if
+                     if (use_group)  e = e * fgrp
+                     if (ii .eq. kk)  e = 0.5d0 * e
+c
 c     set use of lambda scaling for decoupling or annihilation
 c
                      if (muti .or. mutk) then
@@ -443,15 +452,6 @@ c
                            e = e * vlambda
                         end if
                      end if
-c
-c     apply damping and scaling factors for this interaction
-c
-                     e = e * damp**2
-                     if (use_polymer) then
-                        if (r2 .le. polycut2)  e = e * dspscale(k)
-                     end if
-                     if (use_group)  e = e * fgrp
-                     if (ii .eq. kk)  e = 0.5d0 * e
 c
 c     use energy switching if near the cutoff distance
 c
@@ -709,6 +709,11 @@ c
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
+c     apply damping and scaling factors for this interaction
+c
+                  e = e * dspscale(k) * damp**2
+                  if (use_group)  e = e * fgrp
+c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   if (muti .or. mutk) then
@@ -718,11 +723,6 @@ c
                         e = e * vlambda
                      end if
                   end if
-c
-c     apply damping and scaling factors for this interaction
-c
-                  e = e * damp**2 * dspscale(k)
-                  if (use_group)  e = e * fgrp
 c
 c     use energy switching if near the cutoff distance
 c
@@ -890,6 +890,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use shunt
       use usage
       implicit none
@@ -915,6 +916,7 @@ c
       real*8 damp,scale
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -955,6 +957,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -977,6 +980,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1038,6 +1042,16 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        scale = scale * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        scale = scale * vlambda
+                     end if
+                  end if
 c     
 c     compute the full undamped energy for this interaction
 c
@@ -1051,7 +1065,7 @@ c
                      end if
                   end if
 c
-c     compute the energy contribution for this interaction
+c     increment the overall dispersion energy component
 c
                   scale = scale - 1.0d0
                   e = e * (expa+scale)
@@ -1109,6 +1123,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1131,6 +1146,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1197,6 +1213,16 @@ c
                            scale = scale * dspscale(k)
                         end if
                      end if
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     if (muti .or. mutk) then
+                        if (vcouple .eq. 1) then
+                           scale = scale * vlambda
+                        else if (.not.muti .or. .not.mutk) then
+                           scale = scale * vlambda
+                        end if
+                     end if
 c     
 c     compute the full undamped energy for this interaction
 c
@@ -1211,7 +1237,7 @@ c
                         end if
                      end if
 c
-c     compute the energy contribution for this interaction
+c     increment the overall dispersion energy component
 c
                      scale = scale - 1.0d0
                      e = e * (expa+scale)
@@ -1353,6 +1379,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use neigh
       use shunt
       use usage
@@ -1378,6 +1405,7 @@ c
       real*8 damp,scale
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -1412,8 +1440,8 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,aewald,off2,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
+!$OMP& molcule,vcouple,vlambda,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
 c
@@ -1427,6 +1455,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1450,6 +1479,7 @@ c
             k = idisp(kk)
             ck = csix(kk)
             ak = adisp(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1511,6 +1541,16 @@ c     apply damping and scaling factors for this interaction
 c
                   scale = dspscale(k) * damp**2
                   if (use_group)  scale = scale * fgrp
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        scale = scale * vlambda
+                     else if (.not.muti .or. .not.mutk) then
+                        scale = scale * vlambda
+                     end if
+                  end if
 c     
 c     compute the full undamped energy for this interaction
 c
@@ -1524,7 +1564,7 @@ c
                      end if
                   end if
 c
-c     compute the energy contribution for this interaction
+c     increment the overall dispersion energy component
 c
                   scale = scale - 1.0d0
                   e = e * (expa+scale)

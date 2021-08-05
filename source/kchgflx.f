@@ -247,5 +247,7 @@ c
 c     turn off bond and angle charge flux term if not used
 c
       if (nbflx.eq.0 .and. naflx.eq.0)  use_chgflx = .false.
+      if (.not.use_charge .and. .not.use_mpole
+     &        .and. .not.use_polar)  use_chgflx = .false.
       return
       end
