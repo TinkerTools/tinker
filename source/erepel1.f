@@ -115,6 +115,7 @@ c
       real*8 vali,valk
       real*8 dmpi,dmpk
       real*8 frcx,frcy,frcz
+      real*8 term,soft,dsoft
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -336,26 +337,7 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                   sizik = sizi * sizk * rscale(k)
-c
-c     set use of lambda scaling for decoupling or annihilation
-c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
-c
-c     get interaction energy, via soft core lambda scaling as needed
-c
-                  if (mutik) then
-                     e = vlambda * sizik * rscale(k) * eterm
-     &                      / sqrt(1.0d0-vlambda+r2)
-                  else
-                     e = sizik * rscale(k) * eterm * rr1
-                  end if
+                  e = sizik * rscale(k) * eterm * rr1
 c
 c     calculate intermediate terms for force and torque
 c
@@ -429,6 +411,34 @@ c
                         ttri(j) = fgrp * ttri(j)
                         ttrk(j) = fgrp * ttrk(j)
                      end do
+                  end if
+c
+c     set lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get energy and force via soft core lambda scaling
+c
+                  if (mutik) then
+                     term = 1.0d0 - vlambda + r2
+                     soft = vlambda * r / sqrt(term)
+                     dsoft = soft * (rr1-r/term)
+                     dsoft = dsoft * rr1 * e
+                     frcx = frcx*soft - dsoft*xr
+                     frcy = frcy*soft - dsoft*yr
+                     frcz = frcz*soft - dsoft*zr
+                     do j = 1, 3
+                        ttri(j) = ttri(j) * soft
+                        ttrk(j) = ttrk(j) * soft
+                     end do
+                     e = soft * e
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -688,26 +698,7 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                         sizik = sizi * sizk
-c
-c     set use of lambda scaling for decoupling or annihilation
-c
-                        mutik = .false.
-                        if (muti .or. mutk) then
-                           if (vcouple .eq. 1) then
-                              mutik = .true.
-                           else if (.not.muti .or. .not.mutk) then
-                              mutik = .true.
-                           end if
-                        end if
-c
-c     get interaction energy, via soft core lambda scaling as needed
-c
-                        if (mutik) then
-                           e = vlambda * sizik * rscale(k) * eterm
-     &                            / sqrt(1.0d0-vlambda+r2)
-                        else
-                           e = sizik * rscale(k) * eterm * rr1
-                        end if
+                        e = sizik * rscale(k) * eterm * rr1
 c
 c     calculate intermediate terms for force and torque
 c
@@ -781,6 +772,34 @@ c
                               ttri(j) = fgrp * ttri(j)
                               ttrk(j) = fgrp * ttrk(j)
                            end do
+                        end if
+c
+c     set lambda scaling for decoupling or annihilation
+c
+                        mutik = .false.
+                        if (muti .or. mutk) then
+                           if (vcouple .eq. 1) then
+                              mutik = .true.
+                           else if (.not.muti .or. .not.mutk) then
+                              mutik = .true.
+                           end if
+                        end if
+c
+c     get energy and force via soft core lambda scaling
+c
+                        if (mutik) then
+                           term = 1.0d0 - vlambda + r2
+                           soft = vlambda * r / sqrt(term)
+                           dsoft = soft * (rr1-r/term)
+                           dsoft = dsoft * rr1 * e
+                           frcx = frcx*soft - dsoft*xr
+                           frcy = frcy*soft - dsoft*yr
+                           frcz = frcz*soft - dsoft*zr
+                           do j = 1, 3
+                              ttri(j) = ttri(j) * soft
+                              ttrk(j) = ttrk(j) * soft
+                           end do
+                           e = soft * e
                         end if
 c
 c     use energy switching if near the cutoff distance
@@ -996,6 +1015,7 @@ c
       real*8 vali,valk
       real*8 dmpi,dmpk
       real*8 frcx,frcy,frcz
+      real*8 term,soft,dsoft
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -1098,6 +1118,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -1226,26 +1247,7 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                   sizik = sizi * sizk * rscale(k)
-c
-c     set use of lambda scaling for decoupling or annihilation
-c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
-c
-c     get interaction energy, via soft core lambda scaling as needed
-c
-                  if (mutik) then
-                     e = vlambda * sizik * rscale(k) * eterm
-     &                      / sqrt(1.0d0-vlambda+r2)
-                  else
-                     e = sizik * rscale(k) * eterm * rr1
-                  end if
+                  e = sizik * rscale(k) * eterm * rr1
 c
 c     calculate intermediate terms for force and torque
 c
@@ -1319,6 +1321,34 @@ c
                         ttri(j) = fgrp * ttri(j)
                         ttrk(j) = fgrp * ttrk(j)
                      end do
+                  end if
+c
+c     set lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get energy and force via soft core lambda scaling
+c
+                  if (mutik) then
+                     term = 1.0d0 - vlambda + r2
+                     soft = vlambda * r / sqrt(term)
+                     dsoft = soft * (rr1-r/term)
+                     dsoft = dsoft * rr1 * e
+                     frcx = frcx*soft - dsoft*xr
+                     frcy = frcy*soft - dsoft*yr
+                     frcz = frcz*soft - dsoft*zr
+                     do j = 1, 3
+                        ttri(j) = ttri(j) * soft
+                        ttrk(j) = ttrk(j) * soft
+                     end do
+                     e = soft * e
                   end if
 c
 c     use energy switching if near the cutoff distance
