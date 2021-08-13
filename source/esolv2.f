@@ -117,7 +117,6 @@ c
          biglist = .true.
          if (use_born)  reborn = .true.
          if (use_mpole .or. use_polar)  reinduce = .true.
-         reborn = .true.
       end if
 c
 c     perform dynamic allocation of some local arrays
