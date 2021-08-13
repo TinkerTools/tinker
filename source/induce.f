@@ -82,7 +82,8 @@ c
             if (polarity(ii) .ne. 0.0d0) then
                if (header) then
                   header = .false.
-                  if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
+                  if (solvtyp(1:2).eq.'GK' .or.
+     &                solvtyp(1:2).eq.'PB') then
                      write (iout,10)
    10                format (/,' Vacuum Induced Dipole Moments',
      &                          ' (Debye) :')
@@ -100,7 +101,7 @@ c
             end if
          end do
          header = .true.
-         if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
+         if (solvtyp(1:2).eq.'GK' .or. solvtyp(1:2).eq.'PB') then
             do ii = 1, npole
                i = ipole(ii)
                if (polarity(ii) .ne. 0.0d0) then

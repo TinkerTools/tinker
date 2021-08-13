@@ -78,9 +78,20 @@ c
          call surface (es,aes,rsolv,asolv,probe)
          nes = nes + n
 c
+c     nonpolar energy as hydrophobic potential of mean force
+c
+      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
+     &            .or. solvtyp.eq.'PB-HPMF') then
+         call ehpmf3 (ehp,nehp,aehp)
+         es = ehp
+         nes = nes + nehp
+         do i = 1, n
+            aes(i) = aes(i) + aehp(i)
+         end do
+c
 c     nonpolar energy for Onion GB method via exact area
 c
-      else if (solvtyp .eq. 'ONION') then
+      else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
          call surface (esurf,aes,rsolv,asolv,probe)
          es = esurf
          nes = nes + n
@@ -93,17 +104,6 @@ c
          nes = nes + 2*n
          do i = 1, n
             aes(i) = aecav(i) + aedisp(i)
-         end do
-c
-c     nonpolar energy as hydrophobic potential of mean force
-c
-      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
-     &            .or. solvtyp.eq.'PB-HPMF') then
-         call ehpmf3 (ehp,nehp,aehp)
-         es = ehp
-         nes = nes + nehp
-         do i = 1, n
-            aes(i) = aes(i) + aehp(i)
          end do
 c
 c     nonpolar energy via ACE surface area approximation

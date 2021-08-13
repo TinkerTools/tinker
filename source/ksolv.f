@@ -68,31 +68,40 @@ c
                solvtyp = 'SASA'
             else if (value(1:5) .eq. 'ONION') then
                use_born = .true.
-               solvtyp = 'ONION'
+               solvtyp = 'GB'
+               borntyp = 'ONION'
             else if (value(1:5) .eq. 'STILL') then
                use_born = .true.
-               solvtyp = 'STILL'
+               solvtyp = 'GB'
+               borntyp = 'STILL'
             else if (value(1:3) .eq. 'HCT') then
                use_born = .true.
-               solvtyp = 'HCT'
+               solvtyp = 'GB'
+               borntyp = 'HCT'
             else if (value(1:3) .eq. 'OBC') then
                use_born = .true.
-               solvtyp = 'OBC'
+               solvtyp = 'GB'
+               borntyp = 'OBC'
             else if (value(1:3) .eq. 'ACE') then
                use_born = .true.
-               solvtyp = 'ACE'
+               solvtyp = 'GB'
+               borntyp = 'ACE'
             else if (value(1:7) .eq. 'GB-HPMF') then
                use_born = .true.
                solvtyp = 'GB-HPMF'
+               borntyp = 'STILL'
             else if (value(1:2) .eq. 'GB') then
                use_born = .true.
-               solvtyp = 'STILL'
+               solvtyp = 'GB'
+               borntyp = 'STILL'
             else if (value(1:7) .eq. 'GK-HPMF') then
                use_born = .true.
                solvtyp = 'GK-HPMF'
+               borntyp = 'GRYCUK'
             else if (value(1:2) .eq. 'GK') then
                use_born = .true.
                solvtyp = 'GK'
+               borntyp = 'GRYCUK'
             else if (value(1:7) .eq. 'PB-HPMF') then
                solvtyp = 'PB-HPMF'
             else if (value(1:2) .eq. 'PB') then
@@ -167,21 +176,12 @@ c
          end if
       end do
 c
-c     set a default if no Born radius method was assigned
-c
-      if (use_born .and. borntyp.eq.'       ') then
-         borntyp = solvtyp
-         if (solvtyp .eq. 'GB-HPMF')  borntyp = 'STILL'
-         if (solvtyp .eq. 'GK')  borntyp = 'GRYCUK'
-         if (solvtyp .eq. 'GK-HPMF')  borntyp = 'GRYCUK'
-      end if
-c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(rsolv))  deallocate (rsolv)
       allocate (rsolv(n))
 c
-c     invoke the setup needed for specific Born radius models
+c     invoke the setup needed for perfect Born radius model
 c
       if (borntyp .eq. 'PERFECT')  call kpb
 c
@@ -192,6 +192,8 @@ c
       else if (solvtyp .eq. 'GB-HPMF') then
          call kgb
          call khpmf
+      else if (solvtyp .eq. 'GB') then
+         call kgb
       else if (solvtyp .eq. 'GK-HPMF') then
          call kgk
          call khpmf
@@ -204,8 +206,6 @@ c
       else if (solvtyp .eq. 'PB') then
          call kpb
          call knp
-      else
-         call kgb
       end if
       return
       end

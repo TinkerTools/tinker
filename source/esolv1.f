@@ -74,9 +74,16 @@ c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
          call surface1 (es,aes,des,rsolv,asolv,probe)
 c
+c     nonpolar energy and derivs as hydrophobic PMF term
+c
+      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
+     &            .or. solvtyp.eq.'PB-HPMF') then
+         call ehpmf1 (ehp)
+         es = ehp
+c
 c     nonpolar energy and derivs for Onion method via exact area
 c
-      else if (solvtyp .eq. 'ONION') then
+      else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
          call surface1 (esurf,aes,des,rsolv,asolv,probe)
          es = esurf
 c
@@ -85,13 +92,6 @@ c
       else if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
          call enp1 (ecav,edisp)
          es = ecav + edisp
-c
-c     nonpolar energy and derivs as hydrophobic PMF term
-c
-      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
-     &            .or. solvtyp.eq.'PB-HPMF') then
-         call ehpmf1 (ehp)
-         es = ehp
 c
 c     nonpolar energy and derivs via ACE area approximation
 c

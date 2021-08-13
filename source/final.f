@@ -117,7 +117,7 @@ c
 c
 c     free memory used by the APBS Poisson-Boltzmann solver
 c
-      if (solvtyp .eq. 'PB') then
+      if (solvtyp(1:2) .eq. 'PB') then
          call apbsfinal
       end if
 c
