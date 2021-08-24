@@ -158,13 +158,13 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=180,end=180)  kelvin
   180       continue
-            do while (kelvin .lt. 0.0d0)
+            do while (kelvin .eq. -1.0d0)
                write (iout,190)
   190          format (/,' Enter the Desired Temperature in Degrees',
      &                    ' K [298] :  ',$)
                read (input,200,err=210)  kelvin
   200          format (f20.0)
-               if (kelvin .le. 0.0d0)  kelvin = 298.0d0
+               if (kelvin .eq. -1.0d0)  kelvin = 298.0d0
   210          continue
             end do
          end if
@@ -174,13 +174,13 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=220,end=220)  atmsph
   220       continue
-            do while (atmsph .lt. 0.0d0)
+            do while (atmsph .eq. -1.0d0)
                write (iout,230)
   230          format (/,' Enter the Desired Pressure in Atm',
      &                    ' [1.0] :  ',$)
                read (input,240,err=250)  atmsph
   240          format (f20.0)
-               if (atmsph .le. 0.0d0)  atmsph = 1.0d0
+               if (atmsph .eq. -1.0d0)  atmsph = 1.0d0
   250          continue
             end do
          end if
