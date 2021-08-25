@@ -158,13 +158,13 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=180,end=180)  kelvin
   180       continue
-            do while (kelvin .eq. -1.0d0)
+            do while (kelvin .le. 0.0d0)
                write (iout,190)
   190          format (/,' Enter the Desired Temperature in Degrees',
      &                    ' K [298] :  ',$)
                read (input,200,err=210)  kelvin
   200          format (f20.0)
-               if (kelvin .eq. -1.0d0)  kelvin = 298.0d0
+               if (kelvin .le. 0.0d0)  kelvin = 298.0d0
   210          continue
             end do
          end if
@@ -211,13 +211,13 @@ c
             call nextarg (string,exist)
             if (exist)  read (string,*,err=300,end=300)  kelvin
   300       continue
-            do while (kelvin .eq. -1.0d0)
+            do while (kelvin .le. 0.0d0)
                write (iout,310)
   310          format (/,' Enter the Desired Temperature in Degrees',
      &                    ' K [298] :  ',$)
                read (input,320,err=330)  kelvin
   320          format (f20.0)
-               if (kelvin .eq. -1.0d0)  kelvin = 298.0d0
+               if (kelvin .le. 0.0d0)  kelvin = 298.0d0
   330          continue
             end do
          end if
