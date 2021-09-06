@@ -33,6 +33,7 @@ c
       character*20 keyword
       character*240 record
       character*240 string
+      logical header
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -141,9 +142,29 @@ c
 c
 c     remove active or inactive atoms not in the system
 c
+      header = .true.
       do i = 1, n
-         if (abs(fixed(i)) .gt. n)  fixed(i) = 0
-         if (abs(mobile(i)) .gt. n)  mobile(i) = 0
+         if (abs(mobile(i)) .gt. n) then
+            mobile(i) = 0
+            if (header) then
+               header = .false.
+               write (iout,70)
+   70          format (/,' ACTIVE  --  Warning, Illegal Atom Number',
+     &                    ' in ACTIVE Atom List')
+            end if
+         end if
+      end do
+      header = .true.
+      do i = 1, n
+         if (abs(fixed(i)) .gt. n) then
+            fixed(i) = 0
+            if (header) then
+               header = .false.
+               write (iout,80)
+   80          format (/,' ACTIVE  --  Warning, Illegal Atom Number',
+     &                    ' in INACTIVE Atom List')
+            end if
+         end if
       end do
 c
 c     set active atoms to those marked as not inactive
@@ -209,11 +230,11 @@ c
 c     output the final list of the active atoms
 c
       if (debug .and. nuse.gt.0 .and. nuse.lt.n) then
-         write (iout,70)
-   70    format (/,' List of Active Atoms for Energy',
+         write (iout,90)
+   90    format (/,' List of Active Atoms for Energy',
      &              ' Calculations :',/)
-         write (iout,80)  (iuse(i),i=1,nuse)
-   80    format (3x,10i7)
+         write (iout,100)  (iuse(i),i=1,nuse)
+  100    format (3x,10i7)
       end if
 c
 c     perform deallocation of some local arrays
