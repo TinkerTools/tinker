@@ -78,7 +78,6 @@ c
    10       continue
             do while (mobile(nmobile+1) .ne. 0)
                nmobile = nmobile + 1
-               mobile(nmobile) = max(-n,min(n,mobile(nmobile)))
             end do
 c
 c     get any lists of atoms whose coordinates are inactive
@@ -88,7 +87,6 @@ c
    20       continue
             do while (fixed(nfixed+1) .ne. 0)
                nfixed = nfixed + 1
-               fixed(nfixed) = max(-n,min(n,fixed(nfixed)))
             end do
 c
 c     get the center and radius of the sphere of active atoms
@@ -139,6 +137,13 @@ c
             end if
    60       continue
          end if
+      end do
+c
+c     remove active or inactive atoms not in the system
+c
+      do i = 1, n
+         if (abs(fixed(i)) .gt. n)  fixed(i) = 0
+         if (abs(mobile(i)) .gt. n)  mobile(i) = 0
       end do
 c
 c     set active atoms to those marked as not inactive
