@@ -21,7 +21,7 @@ c     gamma       angle between a- and b-axes of box in degrees
 c     xbox2       half of the a-axis length of periodic box
 c     ybox2       half of the b-axis length of periodic box
 c     zbox2       half of the c-axis length of periodic box
-c     box23       two-thirds axis length for truncated octahedron
+c     box34       three-fourths axis length of truncated octahedron
 c     volbox      volume in Ang**3 of the periodic box
 c     beta_sin    sine of the beta periodic box angle
 c     beta_cos    cosine of the beta periodic box angle
@@ -45,7 +45,7 @@ c
       real*8 xbox,ybox,zbox
       real*8 alpha,beta,gamma
       real*8 xbox2,ybox2,zbox2
-      real*8 box23,volbox
+      real*8 box34,volbox
       real*8 beta_sin
       real*8 beta_cos
       real*8 gamma_sin

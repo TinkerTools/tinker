@@ -34,7 +34,7 @@ c
       xbox2 = 0.5d0 * xbox
       ybox2 = 0.5d0 * ybox
       zbox2 = 0.5d0 * zbox
-      if (octahedron)  box23 = third2 * xbox
+      if (octahedron)  box34 = 0.75d0 * xbox
 c
 c     set replicated cell dimensions equal to the unit cell
 c

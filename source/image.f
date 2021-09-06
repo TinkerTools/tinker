@@ -104,10 +104,11 @@ c
          do while (abs(zr) .gt. zbox2)
             zr = zr - sign(zbox,zr)
          end do
-         corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
-         xr = xr - sign(corr,xr)
-         yr = yr - sign(corr,yr)
-         zr = zr - sign(corr,zr)
+         if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
+            xr = xr - sign(xbox2,xr)
+            yr = yr - sign(ybox2,yr)
+            zr = zr - sign(zbox2,zr)
+         end if
 c
 c     for rhombic dodecahedron, align along the x- and y-axes
 c
@@ -230,10 +231,11 @@ c
          do while (abs(zr) .gt. zbox2)
             zr = zr - sign(zbox,zr)
          end do
-         corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
-         xr = xr - sign(corr,xr)
-         yr = yr - sign(corr,yr)
-         zr = zr - sign(corr,zr)
+         if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
+            xr = xr - sign(xbox2,xr)
+            yr = yr - sign(ybox2,yr)
+            zr = zr - sign(zbox2,zr)
+         end if
 c
 c     for rhombic dodecahedron, align along the x- and y-axes
 c
@@ -317,10 +319,11 @@ c
          xr = xr - xbox*nint(xr/xbox)
          yr = yr - ybox*nint(yr/ybox)
          zr = zr - zbox*nint(zr/zbox)
-         corr = box23 * int(abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox))
-         xr = xr - sign(corr,xr)
-         yr = yr - sign(corr,yr)
-         zr = zr - sign(corr,zr)
+         if (abs(xr)+abs(yr)+abs(zr) .gt. box34) then
+            xr = xr - sign(xbox2,xr)
+            yr = yr - sign(ybox2,yr)
+            zr = zr - sign(zbox2,zr)
+         end if
 c
 c     for rhombic dodecahedron, align along the x- and y-axes
 c

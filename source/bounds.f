@@ -82,12 +82,12 @@ c
             xfrac = xfrac - xbox*nint(xfrac/xbox)
             yfrac = yfrac - ybox*nint(yfrac/ybox)
             zfrac = zfrac - zbox*nint(zfrac/zbox)
-            corr = box23 * int(abs(xfrac/xbox)+abs(yfrac/ybox)
-     &                               +abs(zfrac/zbox))
-            xfrac = xfrac - sign(corr,xfrac)
-            yfrac = yfrac - sign(corr,yfrac)
-            zfrac = zfrac - sign(corr,zfrac)
-         else
+            if (abs(xfrac)+abs(yfrac)+abs(zfrac) .gt. box34) then
+               xfrac = xfrac - sign(xbox2,xfrac)
+               yfrac = yfrac - sign(ybox2,yfrac)
+               zfrac = zfrac - sign(zbox2,zfrac)
+            end if
+         else 
             xfrac = xfrac - xbox*nint(xfrac/xbox)
             yfrac = yfrac - ybox*nint(yfrac/ybox)
             zfrac = zfrac - zbox*nint(zfrac/zbox)
