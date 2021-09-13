@@ -1711,8 +1711,8 @@ c
 c     "setpolar" assigns atomic polarizabilities, Thole damping or
 c     charge penetration parameters, and allows user modification
 c
-c     note this routine contains directly coded Thole and charge
-c     penetration values for elements and atom classes that should
+c     note this routine contains directly coded scale factors, and
+c     Thole and charge penetration values for atom types that should
 c     be updated if the default force field values are modified
 c
 c
@@ -1798,6 +1798,60 @@ c
          palpha(i) = 0.0d0
       end do
 c
+c     set multipole and polarization scale factors for AMOEBA
+c
+      if (forcefield .eq. 'AMOEBA') then
+         m2scale = 0.0d0
+         m3scale = 0.0d0
+         m4scale = 0.4d0
+         m5scale = 0.8d0
+         p2scale = 0.0d0
+         p3scale = 0.0d0
+         p4scale = 1.0d0
+         p5scale = 1.0d0
+         p2iscale = 0.0d0
+         p3iscale = 0.0d0
+         p4iscale = 0.5d0
+         p5iscale = 1.0d0
+         d1scale = 0.0d0
+         d2scale = 1.0d0
+         d3scale = 1.0d0
+         d4scale = 1.0d0
+         u1scale = 1.0d0
+         u2scale = 1.0d0
+         u3scale = 1.0d0
+         u4scale = 1.0d0
+      end if
+c
+c     set multipole and polarization scale factors for HIPPO
+c
+      if (forcefield .eq. 'HIPPO') then
+         m2scale = 0.0d0
+         m3scale = 0.0d0
+         m4scale = 0.4d0
+         m5scale = 0.8d0
+         p2scale = 0.0d0
+         p3scale = 0.5d0
+         p4scale = 1.0d0
+         p5scale = 1.0d0
+         p2iscale = 0.0d0
+         p3iscale = 0.0d0
+         p4iscale = 0.0d0
+         p5iscale = 0.5d0
+         d1scale = 0.0d0
+         d2scale = 1.0d0
+         d3scale = 1.0d0
+         d4scale = 1.0d0
+         u1scale = 1.0d0
+         u2scale = 1.0d0
+         u3scale = 1.0d0
+         u4scale = 1.0d0
+         w2scale = 0.2d0
+         w3scale = 1.0d0
+         w4scale = 1.0d0
+         w5scale = 1.0d0
+      end if
+c
 c     assign default atomic polarizabilities for AMOEBA model
 c
       if (forcefield .eq. 'AMOEBA') then
@@ -1816,6 +1870,8 @@ c
                polarity(i) = 0.837d0
             else if (atn .eq. 9) then
                polarity(i) = 0.507d0
+            else if (atn .eq. 14) then
+               polarity(i) = 3.640d0
             else if (atn .eq. 15) then
                polarity(i) = 1.828d0
             else if (atn .eq. 16) then
@@ -1856,10 +1912,11 @@ c
                end if
             end if
          end do
+      end if
 c
 c     assign default atom-based parameters for HIPPO model
 c
-      else if (forcefield .eq. 'HIPPO') then
+      if (forcefield .eq. 'HIPPO') then
          do i = 1, n
             atn = atomic(i)
             if (atn .eq. 1) then
