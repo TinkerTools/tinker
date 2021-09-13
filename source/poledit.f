@@ -1750,6 +1750,7 @@ c
       use_thole = .true.
       use_dirdamp = .false.
       use_chgpen = .false.
+      dpequal = .false.
       query = .true.
       answer = ' '
       call nextarg (string,exist)
@@ -1774,6 +1775,7 @@ c
          forcefield = 'HIPPO'
          use_thole = .false.
          use_chgpen = .true.
+         dpequal = .true.
       end if
 c
 c     perform dynamic allocation of some global arrays
