@@ -3688,6 +3688,7 @@ c
       integer size,numtyp
       integer priority
       integer nlist,nave
+      integer tmin,tmax
       integer xaxe,yaxe,zaxe
       integer indx(4)
       integer, allocatable :: ci(:)
@@ -3806,7 +3807,11 @@ c
    40                   continue
                      end do
                      if (match) then
-                        type(j) = type(i)
+                        tmin = min(type(i),type(j))
+                        tmax = max(type(i),type(j))
+                        do k = 1, n
+                           if (type(k) .eq. tmax)  type(k) = tmin
+                        end do
                         if (list(i).eq.0 .or. list(j).eq.0) then
                            if (header) then
                               header = .false.
@@ -3863,16 +3868,25 @@ c     add or remove the equivalence of specified sets of atoms
 c
             diff = .false.
             nlist = 1
+            k = type(list(1))
             dowhile (list(nlist) .ne. 0)
-               if (type(list(nlist)) .ne. type(list(1)))  diff = .true.
+               if (type(list(nlist)) .ne. k)  diff = .true.
                nlist = nlist + 1
             end do
             nlist = nlist - 1
             if (nlist .eq. 0) then
                done = .true.
             else if (diff) then
-               do i = 2, nlist
-                  type(list(i)) = type(list(1))
+               tmin = n + 1
+               do i = 1, nlist
+                  tmin = min(tmin,type(list(i)))
+               end do
+               do i = 1, nlist
+                  k = type(list(i))
+                  if (k .ne. tmin)  tmax = k
+                  do k = 1, n
+                     if (type(k) .eq. tmax)  type(k) = tmin
+                  end do
                end do
             else
                do i = 2, nlist
