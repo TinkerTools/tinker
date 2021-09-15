@@ -517,12 +517,12 @@ c
          write (iout,350)
   350    format (/,' Next, run the Gaussian CUBEGEN program; for',
      &              ' example:',
-     &           /,' cubegen 0 potential=MP2 xxx.fchk',
-     &              ' xxx.cube -5 h < xxx.grid',
-     &           //,' See the Gaussian documentation for additional',
-     &              ' details;',
-     &           /,' After CUBEGEN, rerun Tinker POTENTIAL using',
-     &              ' Option 2')
+     &           //,' cubegen 0 potential=MP2 FILE.fchk FILE.cube',
+     &              ' -5 h < FILE.grid',
+     &           //,' Replace FILE with base file name and MP2 with',
+     &              ' density label;',
+     &           /,' After CUBEGEN, rerun Tinker POTENTIAL program',
+     &              ' using Option 2')
       end if
 c
 c     get termination criterion for fitting as RMS gradient

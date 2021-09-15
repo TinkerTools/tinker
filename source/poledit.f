@@ -3883,10 +3883,12 @@ c
                end do
                do i = 1, nlist
                   k = type(list(i))
-                  if (k .ne. tmin)  tmax = k
-                  do k = 1, n
-                     if (type(k) .eq. tmax)  type(k) = tmin
-                  end do
+                  if (k .ne. tmin) then
+                     tmax = k
+                     do k = 1, n
+                        if (type(k) .eq. tmax)  type(k) = tmin
+                     end do
+                  end if
                end do
             else
                do i = 2, nlist
@@ -3895,7 +3897,6 @@ c
                end do
             end if
          end do
-c
 c     renumber the atom types to give consecutive ordering
 c
          do i = 1, n
