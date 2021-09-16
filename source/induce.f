@@ -277,7 +277,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         miniter = 3
+         miniter = min(3,npole)
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0
@@ -4615,7 +4615,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         miniter = 3
+         miniter = min(3,npole)
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0
@@ -5938,7 +5938,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         miniter = 3
+         miniter = min(3,npole)
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0

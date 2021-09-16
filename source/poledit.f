@@ -3891,7 +3891,7 @@ c
                   end if
                end do
             else
-               do i = 2, nlist
+               do i = 1, nlist
                   numtyp = numtyp + 1
                   type(list(i)) = numtyp
                end do
