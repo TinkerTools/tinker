@@ -86,9 +86,9 @@ c
             ycut = (ycut + zcut*abs(beta_term)) / gamma_sin
             xcut = xcut + ycut*abs(gamma_cos) + zcut*abs(beta_cos)
          end if
-         xcut = min(xcut,xcell2)
-         ycut = min(ycut,ycell2)
-         zcut = min(zcut,zcell2)
+         xcut = min(xcut,cutoff)
+         ycut = min(ycut,cutoff)
+         zcut = min(zcut,cutoff)
       end if
 c
 c     perform dynamic allocation of some local arrays
