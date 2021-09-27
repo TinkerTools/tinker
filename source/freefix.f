@@ -12,9 +12,9 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "freefix" computes a restraint correction term for either a
+c     "freefix" computes a restraint correction term for a single
 c     flat-bottomed harmonic or six translation-rotation restraints
-c     used to keep a ligand bound during decoupling simulations
+c     used to keep a ligand bound during free energy simulations
 c
 c
       program freefix
