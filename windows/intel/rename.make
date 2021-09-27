@@ -20,6 +20,7 @@ mv DIFFUSE.ZIP   diffuse.zip
 mv DISTGEOM.ZIP  distgeom.zip
 mv DOCUMENT.ZIP  document.zip
 mv DYNAMIC.ZIP   dynamic.zip
+mv FREEFIX.ZIP   freefix.zip
 mv GDA.ZIP       gda.zip
 mv INTEDIT.ZIP   intedit.zip
 mv INTXYZ.ZIP    intxyz.zip

@@ -1,10 +1,10 @@
 
-                ###############################################
-                Building the Tinker & Tinker-OpenMM Using CMake
-                ###############################################
+                  ###########################################
+                  Building Tinker & Tinker-OpenMM Using CMake
+                  ###########################################
 
       The Tinker and Tinker-OpenMM packages can be built using the CMake
-      compilation utility. CMake works on Linux, MacOS and Windows. It
+      compilation utility. CMake works on Linux, macOS and Windows. It
       requires the pkg-config and cmake-data packages, as well as cmake.
 
       "cmake" is a command-line utility, and can be replaced in step 3 by

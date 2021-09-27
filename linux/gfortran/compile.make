@@ -368,6 +368,7 @@ gfortran -c -Ofast -mavx -fopenmp fftpack.f
 gfortran -c -Ofast -mavx -fopenmp field.f
 gfortran -c -Ofast -mavx -fopenmp final.f
 gfortran -c -Ofast -mavx -fopenmp flatten.f
+gfortran -c -Ofast -mavx -fopenmp freefix.f
 gfortran -c -Ofast -mavx -fopenmp freeunit.f
 gfortran -c -Ofast -mavx -fopenmp gda.f
 gfortran -c -Ofast -mavx -fopenmp geometry.f

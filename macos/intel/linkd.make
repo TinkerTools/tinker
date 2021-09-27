@@ -20,6 +20,7 @@ ifort -g -Wl,-no_pie -o diffuse.x diffuse.o libtinker.a
 ifort -g -Wl,-no_pie -o distgeom.x distgeom.o libtinker.a
 ifort -g -Wl,-no_pie -o document.x document.o libtinker.a
 ifort -g -Wl,-no_pie -o dynamic.x dynamic.o libtinker.a
+ifort -g -Wl,-no_pie -o freefix.x freefix.o libtinker.a
 ifort -g -Wl,-no_pie -o gda.x gda.o libtinker.a
 ifort -g -Wl,-no_pie -o intedit.x intedit.o libtinker.a
 ifort -g -Wl,-no_pie -o intxyz.x intxyz.o libtinker.a

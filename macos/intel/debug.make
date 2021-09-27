@@ -368,6 +368,7 @@ ifort -c -g -warn all -check all fftpack.f
 ifort -c -g -warn all -check all field.f
 ifort -c -g -warn all -check all final.f
 ifort -c -g -warn all -check all flatten.f
+ifort -c -g -warn all -check all freefix.f
 ifort -c -g -warn all -check all freeunit.f
 ifort -c -g -warn all -check all gda.f
 ifort -c -g -warn all -check all geometry.f

@@ -369,6 +369,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp fftpack.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp field.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp final.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp flatten.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp freefix.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp freeunit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp gda.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp geometry.f

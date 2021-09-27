@@ -79,16 +79,13 @@ c
       zcut = cutoff
       if (use_bounds) then
          if (monoclinic) then
-            zcut = zcut / beta_sin
             xcut = xcut / beta_sin
+            zcut = zcut / beta_sin
          else if (triclinic) then
-            zcut = zcut / gamma_term
-            ycut = (ycut + zcut*abs(beta_term)) / gamma_sin
-            xcut = xcut + ycut*abs(gamma_cos) + zcut*abs(beta_cos)
+            xcut = xcut / (beta_sin*gamma_sin)
+            ycut = ycut / gamma_sin
+            zcut = zcut / beta_sin
          end if
-         xcut = min(xcut,xcell2)
-         ycut = min(ycut,ycell2)
-         zcut = min(zcut,zcell2)
       end if
 c
 c     perform dynamic allocation of some local arrays

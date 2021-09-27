@@ -19,6 +19,7 @@ mv diffuse.x   ../bin/diffuse
 mv distgeom.x  ../bin/distgeom
 mv document.x  ../bin/document
 mv dynamic.x   ../bin/dynamic
+mv freefix.x   ../bin/freefix
 mv gda.x       ../bin/gda
 mv intedit.x   ../bin/intedit
 mv intxyz.x    ../bin/intxyz

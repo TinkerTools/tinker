@@ -20,6 +20,7 @@ gfortran -Og -g -fbacktrace -static-libgcc -o diffuse.x diffuse.o -L. libtinker.
 gfortran -Og -g -fbacktrace -static-libgcc -o distgeom.x distgeom.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o document.x document.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o dynamic.x dynamic.o -L. libtinker.a libfftw3_threads.a libfftw3.a
+gfortran -Og -g -fbacktrace -static-libgcc -o freefix.x freefix.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o gda.x gda.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o intedit.x intedit.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o intxyz.x intxyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a

@@ -368,6 +368,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 fftpack.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 field.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 final.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 flatten.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 freefix.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 freeunit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 gda.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 geometry.f

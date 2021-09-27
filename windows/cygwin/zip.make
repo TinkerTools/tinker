@@ -20,6 +20,7 @@ zip diffuse.zip diffuse.exe
 zip distgeom.zip distgeom.exe
 zip document.zip document.exe
 zip dynamic.zip dynamic.exe
+zip freefix.zip freefix.exe
 zip gda.zip gda.exe
 zip intedit.zip intedit.exe
 zip intxyz.zip intxyz.exe

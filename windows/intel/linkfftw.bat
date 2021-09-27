@@ -21,6 +21,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static diffuse.obj tinker.lib li
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static distgeom.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static document.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static dynamic.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static freefix.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static gda.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intedit.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intxyz.obj tinker.lib libfftw-3.3.lib

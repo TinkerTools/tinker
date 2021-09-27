@@ -368,6 +368,7 @@ gfortran -c -Wall fftpack.f
 gfortran -c -Wall field.f
 gfortran -c -Wall final.f
 gfortran -c -Wall flatten.f
+gfortran -c -Wall freefix.f
 gfortran -c -Wall freeunit.f
 gfortran -c -Wall gda.f
 gfortran -c -Wall geometry.f

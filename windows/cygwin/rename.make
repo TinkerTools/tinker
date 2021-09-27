@@ -19,6 +19,7 @@ mv diffuse.x   ../bin/diffuse.exe
 mv distgeom.x  ../bin/distgeom.exe
 mv document.x  ../bin/document.exe
 mv dynamic.x   ../bin/dynamic.exe
+mv freefix.x   ../bin/freefix.exe
 mv gda.x       ../bin/gda.exe
 mv intedit.x   ../bin/intedit.exe
 mv intxyz.x    ../bin/intxyz.exe

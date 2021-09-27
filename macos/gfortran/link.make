@@ -27,6 +27,7 @@ gfortran -Ofast -fopenmp -static-libgcc -o diffuse.x diffuse.o -L. libtinker.a l
 gfortran -Ofast -fopenmp -static-libgcc -o distgeom.x distgeom.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip distgeom.x
 gfortran -Ofast -fopenmp -static-libgcc -o document.x document.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip document.x
 gfortran -Ofast -fopenmp -static-libgcc -o dynamic.x dynamic.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip dynamic.x
+gfortran -Ofast -fopenmp -static-libgcc -o freefix.x freefix.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip freefix.x
 gfortran -Ofast -fopenmp -static-libgcc -o gda.x gda.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip gda.x
 gfortran -Ofast -fopenmp -static-libgcc -o intedit.x intedit.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip intedit.x
 gfortran -Ofast -fopenmp -static-libgcc -o intxyz.x intxyz.o -L. libtinker.a libfftw3_threads.a libfftw3.a ; strip intxyz.x

@@ -26,6 +26,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o diffus
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o distgeom.x distgeom.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip distgeom.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o document.x document.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip document.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o dynamic.x dynamic.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip dynamic.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o freefix.x freefix.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip freefix.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o gda.x gda.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip gda.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intedit.x intedit.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip intedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intxyz.x intxyz.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip intxyz.x

@@ -170,13 +170,13 @@ install(
 
 set(_BINS
     alchemy analyze anneal archive bar correlate critical crystal
-    diffuse distgeom document dynamic gda intedit intxyz minimize
-    minirot minrigid mol2xyz molxyz monte newton newtrot nucleic
-    optimize optirot optrigid path pdbxyz polarize poledit potential
-    prmedit protein pss pssrigid pssrot radial saddle scan sniffer
-    spacefill spectrum superpose testgrad testhess testpair testpol
-    testrot testvir timer timerot torsfit valence vibbig vibrate
-    vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb
+    diffuse distgeom document dynamic freefix gda intedit intxyz
+    minimize minirot minrigid mol2xyz molxyz monte newton newtrot
+    nucleic optimize optirot optrigid path pdbxyz polarize poledit
+    potential prmedit protein pss pssrigid pssrot radial saddle scan
+    sniffer spacefill spectrum superpose testgrad testhess testpair
+    testpol testrot testvir timer timerot torsfit valence vibbig
+    vibrate vibrot xtalfit xtalmin xyzedit xyzint xyzmol2 xyzpdb
 )
 
 foreach(_BIN IN LISTS _BINS)

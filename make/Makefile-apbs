@@ -396,6 +396,7 @@ OBJS =	action.o \
 	final.o \
 	flatten.o \
 	fracs.o \
+	freefix.o \
 	freeunit.o \
 	freeze.o \
 	gda.o \
@@ -752,6 +753,7 @@ EXEFILES = alchemy.x \
 	    distgeom.x \
 	    document.x \
 	    dynamic.x \
+	    freefix.x \
 	    gda.x \
 	    intedit.x \
 	    intxyz.x \
@@ -836,6 +838,7 @@ rename_bin:
 	mv  distgeom.x   $(BINDIR)/distgeom
 	mv  document.x   $(BINDIR)/document
 	mv  dynamic.x    $(BINDIR)/dynamic
+	mv  freefix.x    $(BINDIR)/freefix
 	mv  gda.x        $(BINDIR)/gda
 	mv  intedit.x    $(BINDIR)/intedit
 	mv  intxyz.x     $(BINDIR)/intxyz
@@ -901,6 +904,7 @@ rename_exe:
 	mv  distgeom.x   $(BINDIR)/distgeom.exe
 	mv  document.x   $(BINDIR)/document.exe
 	mv  dynamic.x    $(BINDIR)/dynamic.exe
+	mv  freefix.x    $(BINDIR)/freefix.exe
 	mv  gda.x        $(BINDIR)/gda.exe
 	mv  intedit.x    $(BINDIR)/intedit.exe
 	mv  intxyz.x     $(BINDIR)/intxyz.exe
@@ -966,6 +970,7 @@ remove_links:
 	rm -f $(LINKDIR)/distgeom
 	rm -f $(LINKDIR)/document
 	rm -f $(LINKDIR)/dynamic
+	rm -f $(LINKDIR)/freefix
 	rm -f $(LINKDIR)/gda
 	rm -f $(LINKDIR)/intedit
 	rm -f $(LINKDIR)/intxyz
@@ -1031,6 +1036,7 @@ create_links:
 	ln -s $(BINDIR)/distgeom   $(LINKDIR)/distgeom
 	ln -s $(BINDIR)/document   $(LINKDIR)/document
 	ln -s $(BINDIR)/dynamic    $(LINKDIR)/dynamic
+	ln -s $(BINDIR)/freefix    $(LINKDIR)/freefix
 	ln -s $(BINDIR)/gda        $(LINKDIR)/gda
 	ln -s $(BINDIR)/intedit    $(LINKDIR)/intedit
 	ln -s $(BINDIR)/intxyz     $(LINKDIR)/intxyz
@@ -1823,6 +1829,7 @@ files.o:
 final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o cflux.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fft.o fields.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o katoms.o kchrge.o kcpen.o kctrn.o kdsp.o korbs.o kpolr.o krepl.o ksolut.o kvdws.o light.o limits.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solpot.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o warp.o
 fracs.o:
+freefix.o: iounit.o math.o units.o
 freeunit.o: iounit.o
 freeze.o:
 gda.o: atoms.o files.o iounit.o minima.o potent.o vdwpot.o warp.o

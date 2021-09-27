@@ -368,6 +368,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp fftpack.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp field.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp final.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp flatten.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp freefix.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp freeunit.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp gda.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp geometry.f

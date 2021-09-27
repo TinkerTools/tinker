@@ -28,6 +28,7 @@ ifort /libs:static diffuse.obj tinker.lib %javalib%
 ifort /libs:static distgeom.obj tinker.lib %javalib%
 ifort /libs:static document.obj tinker.lib %javalib%
 ifort /libs:static dynamic.obj tinker.lib %javalib%
+ifort /libs:static freefix.obj tinker.lib %javalib%
 ifort /libs:static gda.obj tinker.lib %javalib%
 ifort /libs:static intedit.obj tinker.lib %javalib%
 ifort /libs:static intxyz.obj tinker.lib %javalib%

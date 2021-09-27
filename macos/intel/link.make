@@ -20,6 +20,7 @@ ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o distgeom.x distgeom.o libtinker.a libfftw3_threads.a libfftw3.a ; strip distgeom.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o document.x document.o libtinker.a libfftw3_threads.a libfftw3.a ; strip document.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o dynamic.x dynamic.o libtinker.a libfftw3_threads.a libfftw3.a ; strip dynamic.x
+ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o freefix.x freefix.o libtinker.a libfftw3_threads.a libfftw3.a ; strip freefix.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o gda.x gda.o libtinker.a libfftw3_threads.a libfftw3.a ; strip gda.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o intedit.x intedit.o libtinker.a libfftw3_threads.a libfftw3.a ; strip intedit.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o intxyz.x intxyz.o libtinker.a libfftw3_threads.a libfftw3.a ; strip intxyz.x

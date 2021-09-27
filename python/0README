@@ -1,0 +1,10 @@
+
+                    #######################################
+                    Python Directory for the Tinker Package
+                    #######################################
+
+      This directory contains Python programs and utilities for use with
+      the Tinker package. At the moment the only contents is a Python free
+      energy analysis tool similar to the Tinker BAR program. This Python
+      version is by Francis Jing in the Ren lab at Univ Texas at Austin.
+

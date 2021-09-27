@@ -20,6 +20,7 @@ ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o diffuse.x diffuse.o 
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o distgeom.x distgeom.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o document.x document.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o dynamic.x dynamic.o libtinker.a libfftw3_threads.a libfftw3.a
+ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o freefix.x freefix.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o gda.x gda.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o intedit.x intedit.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o intxyz.x intxyz.o libtinker.a libfftw3_threads.a libfftw3.a

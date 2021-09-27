@@ -20,6 +20,7 @@ editbin /STACK:60000000 diffuse.exe
 editbin /STACK:60000000 distgeom.exe
 editbin /STACK:60000000 document.exe
 editbin /STACK:60000000 dynamic.exe
+editbin /STACK:60000000 freefix.exe
 editbin /STACK:60000000 gda.exe
 editbin /STACK:60000000 intedit.exe
 editbin /STACK:60000000 intxyz.exe
