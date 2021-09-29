@@ -46,9 +46,9 @@ c
          ylimit = ybox2
          zlimit = zbox2 * beta_sin
       else if (triclinic) then
-         xlimit = xbox2 * beta_sin * gamma_sin
-         ylimit = ybox2 * gamma_sin
-         zlimit = zbox2 * beta_sin
+         xlimit = 0.5d0 * volbox / (ybox*zbox*alpha_sin)
+         ylimit = 0.5d0 * volbox / (xbox*zbox*beta_sin)
+         zlimit = 0.5d0 * volbox / (xbox*ybox*gamma_sin)
       else if (octahedron) then
          xlimit = (sqrt(3.0d0)/4.0d0) * xbox
          ylimit = xlimit

@@ -20,11 +20,16 @@ c     of the negative x-coordinate boundaries, or it can optionally
 c     include each pair in both directions, ie, both (A,B) and (B,A);
 c     inclusion of one vs both directions is controlled by "unique"
 c
-c     literature reference:
+c     literature references:
 c
 c     F. Sullivan, R. D. Mountain and J. O'Connell, "Molecular
 c     Dynamics on Vector Computers", Journal of Computational
 c     Physics, 61, 138-153 (1985)
+c
+c     W. Dzwinel, M. Bargiel, J. Kitowski and J. Moscinski, "Linked
+c     Lists and the Method of Lights in Molecular Dynamics Simulation-
+c     Search for the Best Method of Forces Evaluation in Sequential
+c     MD Codes", Molecular Simulation, 4, 229-239 (1989)
 c
 c
       subroutine lights (cutoff,nsite,xsort,ysort,zsort,unique)
@@ -37,7 +42,7 @@ c
       integer i,j,k
       integer nsite
       integer extent
-      real*8 cutoff,box
+      real*8 cutoff,term,box
       real*8 xcut,ycut,zcut
       real*8 xmove,ymove,zmove
       real*8 xsort(*)
@@ -82,9 +87,10 @@ c
             xcut = xcut / beta_sin
             zcut = zcut / beta_sin
          else if (triclinic) then
-            xcut = xcut / (beta_sin*gamma_sin)
-            ycut = ycut / gamma_sin
-            zcut = zcut / beta_sin
+            term = xbox * ybox * zbox / volbox
+            xcut = xcut * alpha_sin * term
+            ycut = ycut * beta_sin * term
+            zcut = zcut * gamma_sin * term
          end if
       end if
 c

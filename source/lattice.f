@@ -23,7 +23,6 @@ c
       use iounit
       use math
       implicit none
-      real*8 alpha_cos
       real*8 ar1,ar2,ar3
       real*8 br1,br2,br3
       real*8 cr1,cr2,cr3
@@ -48,6 +47,7 @@ c
 c     get values needed for fractional coordinate computations
 c
       if (triclinic) then
+         alpha_sin = sin(alpha/radian)
          alpha_cos = cos(alpha/radian)
          beta_sin = sin(beta/radian)
          beta_cos = cos(beta/radian)
@@ -56,6 +56,7 @@ c
          beta_term = (alpha_cos - beta_cos*gamma_cos) / gamma_sin
          gamma_term = sqrt(beta_sin**2 - beta_term**2)
       else if (monoclinic) then
+         alpha_sin = 1.0d0
          alpha_cos = 0.0d0
          beta_sin = sin(beta/radian)
          beta_cos = cos(beta/radian)
@@ -64,6 +65,7 @@ c
          beta_term = 0.0d0
          gamma_term = beta_sin
       else
+         alpha_sin = 1.0d0
          alpha_cos = 0.0d0
          beta_sin = 1.0d0
          beta_cos = 0.0d0
