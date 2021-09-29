@@ -195,6 +195,8 @@ struct {
    double* zbox2;
    double box34;
    double volbox;
+   double alpha_sin;
+   double alpha_cos;
    double beta_sin;
    double beta_cos;
    double gamma_sin;
@@ -1029,12 +1031,13 @@ void set_bound_data_ (double* polycut, double* polycut2, int* use_bounds,
 void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
                       double* alpha, double* beta, double* gamma,
                       double* xbox2, double* ybox2, double* zbox2,
-                      double* box34, double* volbox, double* beta_sin,
-                      double* beta_cos, double* gamma_sin, double* gamma_cos,
-                      double* beta_term, double* gamma_term, double* lvec,
-                      double* recip, int* orthogonal, int* monoclinic,
-                      int* triclinic, int* octahedron, int* dodecadron,
-                      int* nonprism, char* spacegrp) {
+                      double* box34, double* volbox, double* alpha_sin,
+                      double* alpha_cos, double* beta_sin, double* beta_cos,
+                      double* gamma_sin, double* gamma_cos, double* beta_term,
+                      double* gamma_term, double* lvec, double* recip,
+                      int* orthogonal, int* monoclinic, int* triclinic,
+                      int* octahedron, int* dodecadron, int* nonprism,
+                      char* spacegrp) {
 
    boxes__.xbox = xbox;
    boxes__.ybox = ybox;
@@ -1047,6 +1050,8 @@ void set_boxes_data_ (double* xbox, double* ybox, double* zbox,
    boxes__.zbox2 = zbox2;
    boxes__.box34 = *box34;
    boxes__.volbox = *volbox;
+   boxes__.alpha_sin = *alpha_sin;
+   boxes__.alpha_cos = *alpha_cos;
    boxes__.beta_sin = *beta_sin;
    boxes__.beta_cos = *beta_cos;
    boxes__.gamma_sin = *gamma_sin;
