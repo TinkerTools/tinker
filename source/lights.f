@@ -88,9 +88,9 @@ c
             zcut = zcut / beta_sin
          else if (triclinic) then
             term = xbox * ybox * zbox / volbox
-            xcut = xcut * alpha_sin * term
-            ycut = ycut * beta_sin * term
-            zcut = zcut * gamma_sin * term
+            xcut = xcut * term * alpha_sin
+            ycut = ycut * term * beta_sin
+            zcut = zcut * term * gamma_sin
          end if
       end if
 c
