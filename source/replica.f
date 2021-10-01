@@ -23,6 +23,7 @@ c
       use cell
       use inform
       use iounit
+      use math
       implicit none
       integer i,j,k
       integer nx,ny,nz
@@ -50,7 +51,7 @@ c
          ylimit = volbox / (2.0d0*xbox*zbox*beta_sin)
          zlimit = volbox / (2.0d0*xbox*ybox*gamma_sin)
       else if (octahedron) then
-         xlimit = (sqrt(3.0d0)/4.0d0) * xbox
+         xlimit = 0.5d0 * root3 * xbox2
          ylimit = xlimit
          zlimit = xlimit
       else if (dodecadron) then

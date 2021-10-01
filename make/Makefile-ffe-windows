@@ -2110,7 +2110,7 @@ readseq.o: files.o iounit.o resdue.o sequen.o
 readxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o titles.o
 refer.o: sizes.o
 repel.o:
-replica.o: bound.o boxes.o cell.o inform.o iounit.o
+replica.o: bound.o boxes.o cell.o inform.o iounit.o math.o
 reppot.o:
 resdue.o:
 respa.o: atomid.o atoms.o freeze.o ielscf.o limits.o mdstuf.o moldyn.o polar.o potent.o units.o usage.o virial.o
