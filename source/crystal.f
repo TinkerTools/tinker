@@ -29,6 +29,7 @@ c
       integer i,ixyz,mode
       integer na,nb,nc
       integer next,freeunit
+      real*8 boxmax
       logical exist,query
       character*1 answer
       character*8 sgroup(maxspace)
@@ -172,9 +173,11 @@ c
   140    format (a240)
          read (record,*,err=150,end=150)  xbox,ybox,zbox
   150    continue
-         if (ybox .eq. 0.0d0)  ybox = xbox
-         if (zbox .eq. 0.0d0)  zbox = xbox
-         use_bounds = .true.
+         boxmax = max(xbox,ybox,zbox)
+         if (boxmax .ne. 0.0d0)  use_bounds = .true.
+         if (xbox .eq. 0.0d0)  xbox = boxmax
+         if (ybox .eq. 0.0d0)  ybox = boxmax
+         if (zbox .eq. 0.0d0)  zbox = boxmax
       end do
 c
 c     if not in keyfile, get the unit cell angle values

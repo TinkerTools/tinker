@@ -36,6 +36,7 @@ c
       integer, allocatable :: list(:)
       real*8 xlen,ylen,zlen
       real*8 aang,bang,gang
+      real*8 boxmax
       logical exist,opened
       logical quit,reorder
       logical clash
@@ -149,7 +150,14 @@ c
                alpha = aang
                beta = bang
                gamma = gang
-               use_bounds = .true.
+               boxmax = max(xbox,ybox,zbox)
+               if (boxmax .ne. 0.0d0)  use_bounds = .true.
+               if (xbox .eq. 0.0d0)  xbox = boxmax
+               if (ybox .eq. 0.0d0)  ybox = boxmax
+               if (zbox .eq. 0.0d0)  zbox = boxmax
+               if (alpha .eq. 0.0d0)  alpha = 90.0d0
+               if (beta .eq. 0.0d0)  beta = 90.0d0
+               if (gamma .eq. 0.0d0)  gamma = 90.0d0
                call lattice
             end if
    60       continue

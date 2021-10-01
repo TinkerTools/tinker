@@ -73,7 +73,7 @@ c
       call initial
       opened = .false.
       multi = .false.
-      nmode = 23
+      nmode = 24
       offset = 0
 c
 c     try to get a filename from the command line arguments
@@ -122,21 +122,22 @@ c
      &        /,4x,'(6) Replace Old Atom Type with a New Type',
      &        /,4x,'(7) Assign Connectivities for Linear Chain',
      &        /,4x,'(8) Assign Connectivities Based on Distance',
-     &        /,4x,'(9) Convert Units from Bohrs to Angstroms',
-     &        /,3x,'(10) Invert thru Origin to Give Mirror Image',
-     &        /,3x,'(11) Translate All Atoms by an X,Y,Z-Vector',
-     &        /,3x,'(12) Translate Center of Mass to the Origin',
-     &        /,3x,'(13) Translate a Specified Atom to the Origin',
-     &        /,3x,'(14) Translate and Rotate to Inertial Frame',
-     &        /,3x,'(15) Move to Specified Rigid Body Coordinates',
-     &        /,3x,'(16) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(17) Trim a Periodic Box to a Smaller Size',
-     &        /,3x,'(18) Make Truncated Octahedron from Cubic Box',
-     &        /,3x,'(19) Make Rhombic Dodecahedron from Cubic Box',
-     &        /,3x,'(20) Append a Second XYZ File to Current One',
-     &        /,3x,'(21) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(22) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(23) Place Monoatomic Ions around a Solute')
+     &        /,4x,'(9) Assign Atom Types for BASIC Force Field',
+     &        /,3x,'(10) Convert Units from Bohrs to Angstroms',
+     &        /,3x,'(11) Invert thru Origin to Give Mirror Image',
+     &        /,3x,'(12) Translate All Atoms by an X,Y,Z-Vector',
+     &        /,3x,'(13) Translate Center of Mass to the Origin',
+     &        /,3x,'(14) Translate a Specified Atom to the Origin',
+     &        /,3x,'(15) Translate and Rotate to Inertial Frame',
+     &        /,3x,'(16) Move to Specified Rigid Body Coordinates',
+     &        /,3x,'(17) Move Stray Molecules into Periodic Box',
+     &        /,3x,'(18) Trim a Periodic Box to a Smaller Size',
+     &        /,3x,'(19) Make Truncated Octahedron from Cubic Box',
+     &        /,3x,'(20) Make Rhombic Dodecahedron from Cubic Box',
+     &        /,3x,'(21) Append a Second XYZ File to Current One',
+     &        /,3x,'(22) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(23) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(24) Place Monoatomic Ions around a Solute')
 c
 c     get the desired type of coordinate file modification
 c
@@ -547,9 +548,32 @@ c
          end if
       end if
 c
-c     convert the coordinate units from Bohrs to Angstroms
+c     assign atom types for the Tinker BASIC force field
 c
       if (mode .eq. 9) then
+         do while (.not. abort)
+            do i = 1, n
+               type(i) = 10*atomic(i) + n12(i)
+            end do
+            call makeref (1)
+            call readxyz (ixyz)
+            if (.not. abort)  multi = .true.
+            if (multi) then
+               call makeref (2)
+               call getref (1)
+               call prtmod (imod,offset)
+               call getref (2)
+            end if
+         end do
+         if (.not. multi) then
+            call getref (1)
+            goto 40
+         end if
+      end if
+c
+c     convert the coordinate units from Bohrs to Angstroms
+c
+      if (mode .eq. 10) then
          do while (.not. abort)
             do i = 1, n
                x(i) = x(i) * bohr
@@ -574,7 +598,7 @@ c
 c
 c     get mirror image by inverting coordinates through origin
 c
-      if (mode .eq. 10) then
+      if (mode .eq. 11) then
          do while (.not. abort)
             do i = 1, n
                x(i) = -x(i)
@@ -599,7 +623,7 @@ c
 c
 c     translate the entire system by a specified x,y,z-vector
 c
-      if (mode .eq. 11) then
+      if (mode .eq. 12) then
          xr = 0.0d0
          yr = 0.0d0
          zr = 0.0d0
@@ -642,7 +666,7 @@ c
 c
 c     translate the center of mass to the coordinate origin
 c
-      if (mode .eq. 12) then
+      if (mode .eq. 13) then
          do while (.not. abort)
             xcm = 0.0d0
             ycm = 0.0d0
@@ -681,7 +705,7 @@ c
 c
 c     translate to place a specified atom at the origin
 c
-      if (mode .eq. 13) then
+      if (mode .eq. 14) then
          origin = 0
          call nextarg (string,exist)
          if (exist)  read (string,*,err=320,end=320)  origin
@@ -720,7 +744,7 @@ c
 c
 c     translate and rotate into standard orientation
 c
-      if (mode .eq. 14) then
+      if (mode .eq. 15) then
          do while (.not. abort)
             call inertia (2)
             call makeref (1)
@@ -741,7 +765,7 @@ c
 c
 c     translate and rotate to specified rigid body coordinates
 c
-      if (mode .eq. 15) then
+      if (mode .eq. 16) then
          xcm = 0.0d0
          ycm = 0.0d0
          zcm = 0.0d0
@@ -816,7 +840,7 @@ c
 c
 c     move stray molecules back into original periodic box
 c
-      if (mode .eq. 16) then
+      if (mode .eq. 17) then
          do while (.not. abort)
             call unitcell
             if (use_bounds) then
@@ -842,7 +866,7 @@ c
 c
 c     remove molecules to trim periodic box to smaller size
 c
-      if (mode .eq. 17) then
+      if (mode .eq. 18) then
          xnew = 0.0d0
          ynew = 0.0d0
          znew = 0.0d0
@@ -947,7 +971,7 @@ c
 c
 c     trim cube to truncated octahedron or rhombic dodecahedron
 c
-      if (mode.eq.18 .or. mode.eq.19) then
+      if (mode.eq.19 .or. mode.eq.20) then
          call unitcell
          dowhile (xbox .eq. 0.0d0)
             write (iout,430)
@@ -1046,7 +1070,7 @@ c
 c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 20) then
+      if (mode .eq. 21) then
          append = .false.
          do while (.not. abort)
             call makeref (1)
@@ -1076,19 +1100,19 @@ c
 c
 c     create random box full of the current coordinates file
 c
-      if (mode .eq. 21) then
+      if (mode .eq. 22) then
          call makebox
       end if
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 22) then
+      if (mode .eq. 23) then
          call soak
       end if
 c
 c     replace random solvent molecules outside solute with ions
 c
-      if (mode .eq. 23) then
+      if (mode .eq. 24) then
          call molecule
          call addions
       end if
@@ -1376,7 +1400,7 @@ c
 c     optionally perform excluded volume coordinate refinement
 c
       if (refine) then
-         call boxmin
+         call boxfix
          call bounds
       else
          call lattice
@@ -1389,17 +1413,17 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine boxmin  --  expand molecules into periodic box  ##
+c     ##  subroutine boxfix  --  expand molecules into periodic box  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "boxmin" uses minimization of valence and vdw potential energy
+c     "boxfix" uses minimization of valence and vdw potential energy
 c     to expand and refine a collection of solvent molecules in a
 c     periodic box
 c
 c
-      subroutine boxmin
+      subroutine boxfix
       use atomid
       use atoms
       use boxes
@@ -1417,11 +1441,11 @@ c
       integer i,j,k,nvar
       integer ii,kk
       real*8 minimum
-      real*8 boxmin1
+      real*8 boxfix1
       real*8 grdmin
       real*8 boxsiz
       real*8, allocatable :: xx(:)
-      external boxmin1
+      external boxfix1
       external optsave
 c
 c
@@ -1540,7 +1564,7 @@ c
       stpmax = 10.0d0
       grdmin = 1.0d0
       coordtype = 'NONE'
-      call lbfgs (nvar,xx,minimum,grdmin,boxmin1,optsave)
+      call lbfgs (nvar,xx,minimum,grdmin,boxfix1,optsave)
 c
 c     unscale the final coordinates for active atoms
 c
@@ -1563,16 +1587,16 @@ c
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  function boxmin1  --  energy and gradient for boxmin  ##
+c     ##  function boxfix1  --  energy and gradient for boxfix  ##
 c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "boxmin1" is a service routine that computes the energy and
+c     "boxfix1" is a service routine that computes the energy and
 c     gradient during refinement of a periodic box
 c
 c
-      function boxmin1 (xx,g)
+      function boxfix1 (xx,g)
       use atoms
 
       use energi
@@ -1582,7 +1606,7 @@ c
       use scales
       implicit none
       integer i,nvar
-      real*8 e,boxmin1
+      real*8 e,boxfix1
       real*8 xx(*)
       real*8 g(*)
       real*8, allocatable :: derivs(:,:)
@@ -1607,7 +1631,7 @@ c
 c     compute and store the energy and gradient
 c
       call gradient (e,derivs)
-      boxmin1 = e
+      boxfix1 = e
 c
 c     convert gradient components to optimization parameters
 c

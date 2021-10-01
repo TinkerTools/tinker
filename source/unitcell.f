@@ -93,8 +93,8 @@ c     set unspecified periodic boundary box lengths and angles
 c
       if (use_bounds) then
          if (xbox .eq. 0.0d0)  xbox = boxmax
-         if (ybox .eq. 0.0d0)  ybox = xbox
-         if (zbox .eq. 0.0d0)  zbox = xbox
+         if (ybox .eq. 0.0d0)  ybox = boxmax
+         if (zbox .eq. 0.0d0)  zbox = boxmax
          if (alpha .eq. 0.0d0)  alpha = 90.0d0
          if (beta .eq. 0.0d0)  beta = 90.0d0
          if (gamma .eq. 0.0d0)  gamma = 90.0d0
