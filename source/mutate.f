@@ -15,6 +15,20 @@ c
 c     "mutate" constructs the hybrid hamiltonian for a specified
 c     initial state, final state and mutation parameter "lambda"
 c
+c     note torsional and electrostatics-related terms apply "lambda"
+c     by directly scaling parameters, while vdw and repulsion energy
+c     terms use soft core functions from the references cited below
+c
+c     literature references:
+c
+c     T. Steinbrecher, D. L. Mobley and D. A. Case, "Nonlinear Scaling
+c     Schemes for Lennard-Jones Interactions in Free Energy
+c     Calculations", Journal of Chemical Physics, 127, 214108 (2007)
+c
+c     D. Jiao, P. A. Golubkov, T. A. Darden and P. Ren, "Calculation
+c     of Protein-Ligand Binding Free Energy by Using a Polarizable
+c     Potential", PNAS, 105, 6290-6295 (2008)
+c
 c
       subroutine mutate
       use atomid

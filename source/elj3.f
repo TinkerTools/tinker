@@ -98,6 +98,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use shunt
       use usage
       use vdw
@@ -107,7 +108,8 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      real*8 e,p6,p12,eps
+      real*8 e,p6,p12
+      real*8 eps,sc,term
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -116,6 +118,7 @@ c
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical header,huge
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -177,6 +180,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -199,6 +203,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -223,9 +228,30 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  p6 = rv**6 / rik2**3
-                  p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     p6 = 2.0d0 * rik2**3 / rv**6
+                     sc = p6 + 0.5d0*(1.0d0-vlambda)
+                     term = 4.0d0 * vlambda * eps / (sc*sc)
+                     e = term * (1.0d0-sc)
+                  else
+                     p6 = rv**6 / rik2**3
+                     p12 = p6 * p6
+                     e = eps * (p12 - 2.0d0*p6)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -312,6 +338,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -334,6 +361,7 @@ c
          do kk = ii, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -363,9 +391,30 @@ c
                            eps = eps * vscale(k)
                         end if
                      end if
-                     p6 = rv**6 / rik2**3
-                     p12 = p6 * p6
-                     e = eps * (p12 - 2.0d0*p6)
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     mutik = .false.
+                     if (muti .or. mutk) then
+                        if (vcouple .eq. 1) then
+                           mutik = .true.
+                        else if (.not.muti .or. .not.mutk) then
+                           mutik = .true.
+                        end if
+                     end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                     if (mutik) then
+                        p6 = 2.0d0 * rik2**3 / rv**6
+                        sc = p6 + 0.5d0*(1.0d0-vlambda)
+                        term = 4.0d0 * vlambda * eps / (sc*sc)
+                        e = term * (1.0d0-sc)
+                     else
+                        p6 = rv**6 / rik2**3
+                        p12 = p6 * p6
+                        e = eps * (p12 - 2.0d0*p6)
+                     end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -477,6 +526,7 @@ c
       use iounit
       use light
       use molcul
+      use mutant
       use shunt
       use usage
       use vdw
@@ -489,7 +539,8 @@ c
       integer start,stop
       integer ikmin,ikmax
       integer, allocatable :: iv14(:)
-      real*8 e,p6,p12,eps
+      real*8 e,p6,p12
+      real*8 eps,sc,term
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -502,6 +553,7 @@ c
       logical proceed,usei,prime
       logical unique,repeat
       logical header,huge
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -579,6 +631,7 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -624,6 +677,7 @@ c
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kv = ired(k)
+            mutk = mut(k)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -666,9 +720,30 @@ c
                      end if
                      eps = eps * vscale(k)
                   end if
-                  p6 = rv**6 / rik2**3
-                  p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     p6 = 2.0d0 * rik2**3 / rv**6
+                     sc = p6 + 0.5d0*(1.0d0-vlambda)
+                     term = 4.0d0 * vlambda * eps / (sc*sc)
+                     e = term * (1.0d0-sc)
+                  else
+                     p6 = rv**6 / rik2**3
+                     p12 = p6 * p6
+                     e = eps * (p12 - 2.0d0*p6)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -792,6 +867,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use neigh
       use shunt
       use usage
@@ -802,7 +878,8 @@ c
       integer ii,iv,it
       integer kk,kv,kt
       integer, allocatable :: iv14(:)
-      real*8 e,p6,p12,eps
+      real*8 e,p6,p12
+      real*8 eps,sc,term
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -811,6 +888,7 @@ c
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical header,huge
+      logical muti,mutk,mutik
       character*6 mode
 c
 c
@@ -864,11 +942,11 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
-!$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
-!$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,kred,
+!$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,i14,
+!$OMP& i15,v2scale,v3scale,v4scale,v5scale,use_group,off2,radmin,
+!$OMP& epsilon,radmin4,epsilon4,vcouple,vlambda,mut,cut2,c0,c1,
+!$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c
@@ -882,6 +960,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -904,6 +983,7 @@ c
          do kk = 1, nvlst(ii)
             k = ivdw(vlst(kk,ii))
             kv = ired(k)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -928,9 +1008,30 @@ c
                      eps = epsilon4(kt,it)
                   end if
                   eps = eps * vscale(k)
-                  p6 = rv**6 / rik2**3
-                  p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = .false.
+                  if (muti .or. mutk) then
+                     if (vcouple .eq. 1) then
+                        mutik = .true.
+                     else if (.not.muti .or. .not.mutk) then
+                        mutik = .true.
+                     end if
+                  end if
+c
+c     get interaction energy, via soft core lambda scaling as needed
+c
+                  if (mutik) then
+                     p6 = 2.0d0 * rik2**3 / rv**6
+                     sc = p6 + 0.5d0*(1.0d0-vlambda)
+                     term = 4.0d0 * vlambda * eps / (sc*sc)
+                     e = term * (1.0d0-sc)
+                  else
+                     p6 = rv**6 / rik2**3
+                     p12 = p6 * p6
+                     e = eps * (p12 - 2.0d0*p6)
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
