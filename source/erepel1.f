@@ -1070,8 +1070,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,mut,use_group,use_intra,use_bounds,vcouple,
-!$OMP& vlambda,cut2,off2,xaxis,yaxis,zaxis,c0,c1,c2,c3,c4,c5)
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,
+!$OMP& vlambda,mut,cut2,off2,xaxis,yaxis,zaxis,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale) shared (er,der,ter,vir)
 !$OMP DO reduction(+:er,der,ter,vir) schedule(guided)
 c

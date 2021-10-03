@@ -712,9 +712,9 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,uind,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,mut,use_group,use_intra,use_bounds,reppolar,
-!$OMP& vcouple,vlambda,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,name,
-!$OMP& verbose,debug,header,iout)
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,reppolar,
+!$OMP& vcouple,vlambda,mut,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
 !$OMP DO reduction(+:er,ner,aer,einter) schedule(guided)
