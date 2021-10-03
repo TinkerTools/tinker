@@ -61,6 +61,7 @@ c
       logical exist,query
       logical opened,multi
       logical append
+      character*3 symb
       character*240 xyzfile
       character*240 modfile
       character*240 record
@@ -553,7 +554,20 @@ c
       if (mode .eq. 9) then
          do while (.not. abort)
             do i = 1, n
-               type(i) = 10*atomic(i) + n12(i)
+               k = atomic(i)
+               if (k .eq. 0) then
+                  symb = name(i)
+                  call upcase (symb(1:1))
+                  call lowcase (symb(2:3))
+                  do j = 1, maxele
+                     if (symb .eq. elemnt(j)) then
+                        k = j
+                        goto 280
+                     end if
+                  end do
+  280             continue
+               end if
+               type(i) = 10*k + n12(i)
             end do
             call makeref (1)
             call readxyz (ixyz)
@@ -628,19 +642,19 @@ c
          yr = 0.0d0
          zr = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=280,end=280)  xr
+         if (exist)  read (string,*,err=290,end=290)  xr
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=280,end=280)  yr
+         if (exist)  read (string,*,err=290,end=290)  yr
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=280,end=280)  zr
-  280    continue
+         if (exist)  read (string,*,err=290,end=290)  zr
+  290    continue
          if (xr.eq.0.0d0 .and. yr.eq.0.0d0 .and. zr.eq.0.0d0) then
-            write (iout,290)
-  290       format (/,' Enter Translation Vector Components :  ',$)
-            read (input,300)  record
-  300       format (a240)
-            read (record,*,err=310,end=310)  xr,yr,zr
-  310       continue
+            write (iout,300)
+  300       format (/,' Enter Translation Vector Components :  ',$)
+            read (input,310)  record
+  310       format (a240)
+            read (record,*,err=320,end=320)  xr,yr,zr
+  320       continue
          end if
          do while (.not. abort)
             do i = 1, n
@@ -708,14 +722,14 @@ c
       if (mode .eq. 14) then
          origin = 0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=320,end=320)  origin
-  320    continue
+         if (exist)  read (string,*,err=330,end=330)  origin
+  330    continue
          if (origin .eq. 0) then
-            write (iout,330)
-  330       format (/,' Number of the Atom to Move to the Origin',
+            write (iout,340)
+  340       format (/,' Number of the Atom to Move to the Origin',
      &                 ' :  ',$)
-            read (input,340)  origin
-  340       format (i10)
+            read (input,350)  origin
+  350       format (i10)
          end if
          do while (.not. abort)
             xorig = x(origin)
@@ -773,26 +787,26 @@ c
          theta = 0.0d0
          psi = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=350,end=350)  xcm
+         if (exist)  read (string,*,err=360,end=360)  xcm
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=350,end=350)  ycm
+         if (exist)  read (string,*,err=360,end=360)  ycm
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=350,end=350)  zcm
+         if (exist)  read (string,*,err=360,end=360)  zcm
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=350,end=350)  phi
+         if (exist)  read (string,*,err=360,end=360)  phi
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=350,end=350)  theta
+         if (exist)  read (string,*,err=360,end=360)  theta
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=350,end=350)  psi
-  350    continue
+         if (exist)  read (string,*,err=360,end=360)  psi
+  360    continue
          if (min(xcm,ycm,zcm,phi,theta,psi).eq.0.0d0 .and.
      &       max(xcm,ycm,zcm,phi,theta,psi).eq.0.0d0) then
-            write (iout,360)
-  360       format (/,' Enter Rigid Body Coordinates :  ',$)
-            read (input,370)  record
-  370       format (a240)
-            read (record,*,err=380,end=380)  xcm,ycm,zcm,phi,theta,psi
-  380       continue
+            write (iout,370)
+  370       format (/,' Enter Rigid Body Coordinates :  ',$)
+            read (input,380)  record
+  380       format (a240)
+            read (record,*,err=390,end=390)  xcm,ycm,zcm,phi,theta,psi
+  390       continue
          end if
          call inertia (2)
          phi = phi / radian
@@ -871,19 +885,19 @@ c
          ynew = 0.0d0
          znew = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  xnew
+         if (exist)  read (string,*,err=400,end=400)  xnew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  ynew
+         if (exist)  read (string,*,err=400,end=400)  ynew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=390,end=390)  znew
-  390    continue
+         if (exist)  read (string,*,err=400,end=400)  znew
+  400    continue
          do while (xnew .eq. 0.0d0)
-            write (iout,400)
-  400       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,410)  record
-  410       format (a240)
-            read (record,*,err=420,end=420)  xnew,ynew,znew
-  420       continue
+            write (iout,410)
+  410       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,420)  record
+  420       format (a240)
+            read (record,*,err=430,end=430)  xnew,ynew,znew
+  430       continue
          end do
          if (ynew .eq. 0.0d0)  ynew = xnew
          if (znew .eq. 0.0d0)  znew = xnew
@@ -974,12 +988,12 @@ c
       if (mode.eq.19 .or. mode.eq.20) then
          call unitcell
          dowhile (xbox .eq. 0.0d0)
-            write (iout,430)
-  430       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
-            read (input,440)  record
-  440       format (a240)
-            read (record,*,err=450,end=450)  xbox
-  450       continue
+            write (iout,440)
+  440       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
+            read (input,450)  record
+  450       format (a240)
+            read (record,*,err=460,end=460)  xbox
+  460       continue
          end do
          if (mode .eq. 18)  octahedron = .true.
          if (mode .eq. 19)  dodecadron = .true.
@@ -1124,8 +1138,8 @@ c
       end if
       if (opened) then
          close (unit=imod)
-         write (iout,460)  modfile(1:trimtext(modfile))
-  460    format (/,' New Coordinates Written To :  ',a)
+         write (iout,470)  modfile(1:trimtext(modfile))
+  470    format (/,' New Coordinates Written To :  ',a)
       end if
       close (unit=ixyz)
 c
@@ -1598,11 +1612,9 @@ c
 c
       function boxfix1 (xx,g)
       use atoms
-
       use energi
       use potent
       use repel
-
       use scales
       implicit none
       integer i,nvar

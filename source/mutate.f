@@ -283,6 +283,7 @@ c
       use charge
       use chgpen
       use chgtrn
+      use dipole
       use mplpot
       use mpole
       use mutant
@@ -290,6 +291,7 @@ c
       use potent
       implicit none
       integer i,j,k
+      integer k1,k2
       integer ia,ib,ic
 c
 c
@@ -302,6 +304,18 @@ c
                pchg(i) = pchg(i) * elambda
             end if
             pchg0(i) = pchg(i)
+         end do
+      end if
+c
+c     set scaled parameters for bond dipole models
+c
+      if (use_dipole) then
+         do i = 1, ndipole
+            k1 = idpl(1,k)
+            k2 = idpl(2,k)
+            if (mut(k1) .or. mut(k2)) then
+               bdpl(i) = bdpl(i) * elambda
+            end if
          end do
       end if
 c
