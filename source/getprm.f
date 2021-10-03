@@ -96,13 +96,16 @@ c
       do while (.not.exist .and. nask.lt.maxask)
          nask = nask + 1
          write (iout,10)
-   10    format (/,' Enter Potential Parameter File Name :  ',$)
+   10    format (/,' Enter Parameter File Name [<Enter>=NONE] :  ',$)
          read (input,20)  prmfile
    20    format (a240)
          next = 1
          call getword (prmfile,none,next)
          call upcase (none)
-         if (none.eq.'NONE' .and. next.eq.5) then
+         if (next .eq. 1) then
+            exist = .true.
+            useprm = .false.
+         else if (none.eq.'NONE' .and. next.eq.5) then
             exist = .true.
             useprm = .false.
          else
