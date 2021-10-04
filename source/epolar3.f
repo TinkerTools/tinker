@@ -2019,8 +2019,8 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "epolar3e" calculates the dipole polarizability interaction
-c     from the induced dipoles times the electric field
+c     "epreal3e" calculates the induced dipole polarization energy
+c     and analysis from the induced dipoles times the electric field
 c
 c
       subroutine epolar3e

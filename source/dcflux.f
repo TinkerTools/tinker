@@ -40,7 +40,6 @@ c
       real*8 rab,rab2,rab3
       real*8 rcb,rcb2,rcb3
       real*8 dpot,dpota,dpotc
-      real*8 ddqdx,ddqdy,ddqdz
       real*8 fx,fy,fz
       real*8 fxa1,fya1,fza1
       real*8 fxb1,fyb1,fzb1
@@ -51,6 +50,7 @@ c
       real*8 pb,pb1,pb2
       real*8 pa1,pa2
       real*8 eps,dot
+      real*8 rabc,dra3,drc3
       real*8 term,fterm
       real*8 termxa,termxc
       real*8 termya,termyc
@@ -90,14 +90,11 @@ c
          zab = za - zb
          if (use_polymer)  call image (xab,yab,zab)
          rab2 = max(xab*xab+yab*yab+zab*zab,eps)
-         pb = pb / sqrt(rab2)
          dpot = pot(ib) - pot(ia)
-         ddqdx = pb * (xa-xb)
-         ddqdy = pb * (ya-yb)
-         ddqdz = pb * (za-zb)
-         fx = dpot * ddqdx
-         fy = dpot * ddqdy
-         fz = dpot * ddqdz
+         pb = pb * dpot / sqrt(rab2)
+         fx = pb * xab
+         fy = pb * yab
+         fz = pb * zab
          dcfx(ia) = dcfx(ia) + fx
          dcfy(ia) = dcfy(ia) + fy
          dcfz(ia) = dcfz(ia) + fz
@@ -138,9 +135,7 @@ c
          rab2 = max(xab*xab+yab*yab+zab*zab,eps)
          rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
          rab  = sqrt(rab2)
-         rab3 = rab2 * rab
          rcb  = sqrt(rcb2)
-         rcb3 = rcb2 * rcb
 c
 c     get terms corresponding to asymmetric bond stretches
 c
@@ -160,15 +155,20 @@ c
 c
 c     get terms corresponding to bond angle bending
 c
+         rabc = rab * rcb
+         rab3 = rab2 * rab
+         rcb3 = rcb2 * rcb
          dot = xab*xcb + yab*ycb + zab*zcb
-         term = -rab*rcb / max(sqrt(rab2*rcb2-dot*dot),eps)
+         dra3 = dot / (rab3*rcb)
+         drc3 = dot / (rab*rcb3)
+         term = -rabc / max(sqrt(rab2*rcb2-dot*dot),eps)
          fterm = term * (dpota*pa1+dpotc*pa2)
-         termxa = xcb/(rab*rcb) - xab*dot/(rab3*rcb)
-         termya = ycb/(rab*rcb) - yab*dot/(rab3*rcb)
-         termza = zcb/(rab*rcb) - zab*dot/(rab3*rcb)
-         termxc = xab/(rab*rcb) - xcb*dot/(rab*rcb3)
-         termyc = yab/(rab*rcb) - ycb*dot/(rab*rcb3)
-         termzc = zab/(rab*rcb) - zcb*dot/(rab*rcb3)
+         termxa = xcb/rabc - xab*dra3
+         termya = ycb/rabc - yab*dra3
+         termza = zcb/rabc - zab*dra3
+         termxc = xab/rabc - xcb*drc3
+         termyc = yab/rabc - ycb*drc3
+         termzc = zab/rabc - zcb*drc3
          fxa2 = fterm * termxa
          fya2 = fterm * termya
          fza2 = fterm * termza

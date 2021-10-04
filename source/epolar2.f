@@ -572,7 +572,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -604,7 +604,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -1011,7 +1011,7 @@ c
                      rc5(j) = 0.0d0
                      rc7(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(k)
+                  damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(kk))
                      damp = pgamma * (r/damp)**3
@@ -1641,7 +1641,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -1673,7 +1673,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -2080,7 +2080,7 @@ c
                      rc5(j) = 0.0d0
                      rc7(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(k)
+                  damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(kk))
                      damp = pgamma * (r/damp)**3

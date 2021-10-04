@@ -1724,7 +1724,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "epolar0e" calculates the dipole polarizability interaction
+c     "epreal0e" calculates the induced dipole polarization energy
 c     from the induced dipoles times the electric field
 c
 c

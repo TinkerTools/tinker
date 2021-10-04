@@ -451,7 +451,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -483,7 +483,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -890,7 +890,7 @@ c
                      rc5(j) = 0.0d0
                      rc7(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(k)
+                  damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(kk))
                      damp = pgamma * (r/damp)**3
@@ -1536,7 +1536,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -1568,7 +1568,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -1975,7 +1975,7 @@ c
                      rc5(j) = 0.0d0
                      rc7(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(k)
+                  damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(kk))
                      damp = pgamma * (r/damp)**3
@@ -2931,7 +2931,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -2963,7 +2963,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -3370,7 +3370,7 @@ c
                      rc5(j) = 0.0d0
                      rc7(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(k)
+                  damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
                      pgamma = min(pti,thole(kk))
                      damp = pgamma * (r/damp)**3
@@ -4527,7 +4527,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -4554,7 +4554,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -4578,33 +4578,33 @@ c
                            rc7(3) = rc5(3) * temp7
                         end if
                      end if
-                     psc3 = 1.0d0 - sc3*pscale(k)
-                     psc5 = 1.0d0 - sc5*pscale(k)
-                     psc7 = 1.0d0 - sc7*pscale(k)
-                     dsc3 = 1.0d0 - sc3*dscale(k)
-                     dsc5 = 1.0d0 - sc5*dscale(k)
-                     dsc7 = 1.0d0 - sc7*dscale(k)
-                     usc3 = 1.0d0 - sc3*uscale(k)
-                     usc5 = 1.0d0 - sc5*uscale(k)
-                     psr3 = dmpe(3) - psc3*rr3
-                     psr5 = dmpe(5) - psc5*rr5
-                     psr7 = dmpe(7) - psc7*rr7
-                     dsr3 = dmpe(3) - dsc3*rr3
-                     dsr5 = dmpe(5) - dsc5*rr5
-                     dsr7 = dmpe(7) - dsc7*rr7
-                     usr3 = dmpe(3) - usc3*rr3
-                     usr5 = dmpe(5) - usc5*rr5
-                     do j = 1, 3
-                        prc3(j) = rc3(j) * pscale(k)
-                        prc5(j) = rc5(j) * pscale(k)
-                        prc7(j) = rc7(j) * pscale(k)
-                        drc3(j) = rc3(j) * dscale(k)
-                        drc5(j) = rc5(j) * dscale(k)
-                        drc7(j) = rc7(j) * dscale(k)
-                        urc3(j) = rc3(j) * uscale(k)
-                        urc5(j) = rc5(j) * uscale(k)
-                     end do
                   end if
+                  psc3 = 1.0d0 - sc3*pscale(k)
+                  psc5 = 1.0d0 - sc5*pscale(k)
+                  psc7 = 1.0d0 - sc7*pscale(k)
+                  dsc3 = 1.0d0 - sc3*dscale(k)
+                  dsc5 = 1.0d0 - sc5*dscale(k)
+                  dsc7 = 1.0d0 - sc7*dscale(k)
+                  usc3 = 1.0d0 - sc3*uscale(k)
+                  usc5 = 1.0d0 - sc5*uscale(k)
+                  psr3 = dmpe(3) - psc3*rr3
+                  psr5 = dmpe(5) - psc5*rr5
+                  psr7 = dmpe(7) - psc7*rr7
+                  dsr3 = dmpe(3) - dsc3*rr3
+                  dsr5 = dmpe(5) - dsc5*rr5
+                  dsr7 = dmpe(7) - dsc7*rr7
+                  usr3 = dmpe(3) - usc3*rr3
+                  usr5 = dmpe(5) - usc5*rr5
+                  do j = 1, 3
+                     prc3(j) = rc3(j) * pscale(k)
+                     prc5(j) = rc5(j) * pscale(k)
+                     prc7(j) = rc7(j) * pscale(k)
+                     drc3(j) = rc3(j) * dscale(k)
+                     drc5(j) = rc5(j) * dscale(k)
+                     drc7(j) = rc7(j) * dscale(k)
+                     urc3(j) = rc3(j) * uscale(k)
+                     urc5(j) = rc5(j) * uscale(k)
+                  end do
 c
 c     apply charge penetration damping to scale factors
 c
@@ -5065,13 +5065,13 @@ c
                         rc7(3) = rc5(3) * temp7
                      end if
                   end if
-                  usc3 = 1.0d0 - sc3*uscale(kk)
-                  usc5 = 1.0d0 - sc5*uscale(kk)
+                  usc3 = 1.0d0 - sc3*uscale(k)
+                  usc5 = 1.0d0 - sc5*uscale(k)
                   usr3 = dmpe(3) - usc3*rr3
                   usr5 = dmpe(5) - usc5*rr5
                   do j = 1, 3
-                     urc3(j) = rc3(j) * uscale(kk)
-                     urc5(j) = rc5(j) * uscale(kk)
+                     urc3(j) = rc3(j) * uscale(k)
+                     urc5(j) = rc5(j) * uscale(k)
                   end do
                end if
 c
@@ -5711,7 +5711,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -5738,7 +5738,7 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
@@ -5762,33 +5762,33 @@ c
                            rc7(3) = rc5(3) * temp7
                         end if
                      end if
-                     psc3 = 1.0d0 - sc3*pscale(k)
-                     psc5 = 1.0d0 - sc5*pscale(k)
-                     psc7 = 1.0d0 - sc7*pscale(k)
-                     dsc3 = 1.0d0 - sc3*dscale(k)
-                     dsc5 = 1.0d0 - sc5*dscale(k)
-                     dsc7 = 1.0d0 - sc7*dscale(k)
-                     usc3 = 1.0d0 - sc3*uscale(k)
-                     usc5 = 1.0d0 - sc5*uscale(k)
-                     psr3 = dmpe(3) - psc3*rr3
-                     psr5 = dmpe(5) - psc5*rr5
-                     psr7 = dmpe(7) - psc7*rr7
-                     dsr3 = dmpe(3) - dsc3*rr3
-                     dsr5 = dmpe(5) - dsc5*rr5
-                     dsr7 = dmpe(7) - dsc7*rr7
-                     usr3 = dmpe(3) - usc3*rr3
-                     usr5 = dmpe(5) - usc5*rr5
-                     do j = 1, 3
-                        prc3(j) = rc3(j) * pscale(k)
-                        prc5(j) = rc5(j) * pscale(k)
-                        prc7(j) = rc7(j) * pscale(k)
-                        drc3(j) = rc3(j) * dscale(k)
-                        drc5(j) = rc5(j) * dscale(k)
-                        drc7(j) = rc7(j) * dscale(k)
-                        urc3(j) = rc3(j) * uscale(k)
-                        urc5(j) = rc5(j) * uscale(k)
-                     end do
                   end if
+                  psc3 = 1.0d0 - sc3*pscale(k)
+                  psc5 = 1.0d0 - sc5*pscale(k)
+                  psc7 = 1.0d0 - sc7*pscale(k)
+                  dsc3 = 1.0d0 - sc3*dscale(k)
+                  dsc5 = 1.0d0 - sc5*dscale(k)
+                  dsc7 = 1.0d0 - sc7*dscale(k)
+                  usc3 = 1.0d0 - sc3*uscale(k)
+                  usc5 = 1.0d0 - sc5*uscale(k)
+                  psr3 = dmpe(3) - psc3*rr3
+                  psr5 = dmpe(5) - psc5*rr5
+                  psr7 = dmpe(7) - psc7*rr7
+                  dsr3 = dmpe(3) - dsc3*rr3
+                  dsr5 = dmpe(5) - dsc5*rr5
+                  dsr7 = dmpe(7) - dsc7*rr7
+                  usr3 = dmpe(3) - usc3*rr3
+                  usr5 = dmpe(5) - usc5*rr5
+                  do j = 1, 3
+                     prc3(j) = rc3(j) * pscale(k)
+                     prc5(j) = rc5(j) * pscale(k)
+                     prc7(j) = rc7(j) * pscale(k)
+                     drc3(j) = rc3(j) * dscale(k)
+                     drc5(j) = rc5(j) * dscale(k)
+                     drc7(j) = rc7(j) * dscale(k)
+                     urc3(j) = rc3(j) * uscale(k)
+                     urc5(j) = rc5(j) * uscale(k)
+                  end do
 c
 c     apply charge penetration damping to scale factors
 c
@@ -6249,13 +6249,13 @@ c
                         rc7(3) = rc5(3) * temp7
                      end if
                   end if
-                  usc3 = 1.0d0 - sc3*uscale(kk)
-                  usc5 = 1.0d0 - sc5*uscale(kk)
+                  usc3 = 1.0d0 - sc3*uscale(k)
+                  usc5 = 1.0d0 - sc5*uscale(k)
                   usr3 = dmpe(3) - usc3*rr3
                   usr5 = dmpe(5) - usc5*rr5
                   do j = 1, 3
-                     urc3(j) = rc3(j) * uscale(kk)
-                     urc5(j) = rc5(j) * uscale(kk)
+                     urc3(j) = rc3(j) * uscale(k)
+                     urc5(j) = rc5(j) * uscale(k)
                   end do
                end if
 c
@@ -7401,7 +7401,7 @@ c     calculate real space Ewald error function damping
 c
                call dampewald (9,r,r2,f,dmpe)
 c
-c     apply Thole polarization damping to scale factors
+c     set initial values for tha damping scale factors
 c
                sc3 = 1.0d0
                sc5 = 1.0d0
@@ -7419,7 +7419,7 @@ c
                   if (use_dirdamp) then
                      pgamma = min(ddi,dirdamp(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(k))
+                        pgamma = max(ddi,dirdamp(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -7446,16 +7446,16 @@ c
                   else
                      pgamma = min(pti,thole(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(k))
+                        pgamma = max(pti,thole(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
                            expdamp = exp(-damp)
                            sc3 = 1.0d0 - expdamp
-                           sc5 = 1.0d0 - (1.0d0+damp)*expdamp
-                           sc7 = 1.0d0 - (1.0d0+damp+0.6d0*damp**2)
-     &                                          *expdamp
+                           sc5 = 1.0d0 - expdamp*(1.0d0+damp)
+                           sc7 = 1.0d0 - expdamp*(1.0d0+damp
+     &                                      +0.6d0*damp**2)
                            temp3 = 3.0d0 * damp * expdamp / r2
                            temp5 = damp
                            temp7 = -0.2d0 + 0.6d0*damp
@@ -7470,33 +7470,33 @@ c
                            rc7(3) = rc5(3) * temp7
                         end if
                      end if
-                     psc3 = 1.0d0 - sc3*pscale(k)
-                     psc5 = 1.0d0 - sc5*pscale(k)
-                     psc7 = 1.0d0 - sc7*pscale(k)
-                     dsc3 = 1.0d0 - sc3*dscale(k)
-                     dsc5 = 1.0d0 - sc5*dscale(k)
-                     dsc7 = 1.0d0 - sc7*dscale(k)
-                     usc3 = 1.0d0 - sc3*uscale(k)
-                     usc5 = 1.0d0 - sc5*uscale(k)
-                     psr3 = dmpe(3) - psc3*rr3
-                     psr5 = dmpe(5) - psc5*rr5
-                     psr7 = dmpe(7) - psc7*rr7
-                     dsr3 = dmpe(3) - dsc3*rr3
-                     dsr5 = dmpe(5) - dsc5*rr5
-                     dsr7 = dmpe(7) - dsc7*rr7
-                     usr3 = dmpe(3) - usc3*rr3
-                     usr5 = dmpe(5) - usc5*rr5
-                     do j = 1, 3
-                        prc3(j) = rc3(j) * pscale(k)
-                        prc5(j) = rc5(j) * pscale(k)
-                        prc7(j) = rc7(j) * pscale(k)
-                        drc3(j) = rc3(j) * dscale(k)
-                        drc5(j) = rc5(j) * dscale(k)
-                        drc7(j) = rc7(j) * dscale(k)
-                        urc3(j) = rc3(j) * uscale(k)
-                        urc5(j) = rc5(j) * uscale(k)
-                     end do
                   end if
+                  psc3 = 1.0d0 - sc3*pscale(k)
+                  psc5 = 1.0d0 - sc5*pscale(k)
+                  psc7 = 1.0d0 - sc7*pscale(k)
+                  dsc3 = 1.0d0 - sc3*dscale(k)
+                  dsc5 = 1.0d0 - sc5*dscale(k)
+                  dsc7 = 1.0d0 - sc7*dscale(k)
+                  usc3 = 1.0d0 - sc3*uscale(k)
+                  usc5 = 1.0d0 - sc5*uscale(k)
+                  psr3 = dmpe(3) - psc3*rr3
+                  psr5 = dmpe(5) - psc5*rr5
+                  psr7 = dmpe(7) - psc7*rr7
+                  dsr3 = dmpe(3) - dsc3*rr3
+                  dsr5 = dmpe(5) - dsc5*rr5
+                  dsr7 = dmpe(7) - dsc7*rr7
+                  usr3 = dmpe(3) - usc3*rr3
+                  usr5 = dmpe(5) - usc5*rr5
+                  do j = 1, 3
+                     prc3(j) = rc3(j) * pscale(k)
+                     prc5(j) = rc5(j) * pscale(k)
+                     prc7(j) = rc7(j) * pscale(k)
+                     drc3(j) = rc3(j) * dscale(k)
+                     drc5(j) = rc5(j) * dscale(k)
+                     drc7(j) = rc7(j) * dscale(k)
+                     urc3(j) = rc3(j) * uscale(k)
+                     urc5(j) = rc5(j) * uscale(k)
+                  end do
 c
 c     apply charge penetration damping to scale factors
 c
@@ -7957,13 +7957,13 @@ c
                         rc7(3) = rc5(3) * temp7
                      end if
                   end if
-                  usc3 = 1.0d0 - sc3*uscale(kk)
-                  usc5 = 1.0d0 - sc5*uscale(kk)
+                  usc3 = 1.0d0 - sc3*uscale(k)
+                  usc5 = 1.0d0 - sc5*uscale(k)
                   usr3 = dmpe(3) - usc3*rr3
                   usr5 = dmpe(5) - usc5*rr5
                   do j = 1, 3
-                     urc3(j) = rc3(j) * uscale(kk)
-                     urc5(j) = rc5(j) * uscale(kk)
+                     urc3(j) = rc3(j) * uscale(k)
+                     urc5(j) = rc5(j) * uscale(k)
                   end do
                end if
 c
@@ -8500,7 +8500,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "epolar1e" calculates the dipole polarizability interaction
+c     "epreal1e" calculates the induced dipole polarization energy
 c     from the induced dipoles times the electric field
 c
 c
