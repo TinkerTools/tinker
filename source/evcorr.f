@@ -5,15 +5,15 @@ c     ##  COPYRIGHT (C) 2010 by Chuanjie Wu and Jay William Ponder  ##
 c     ##                    All Rights Reserved                     ##
 c     ################################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine evcorr  --  long range vdw energy correction  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine evcorr  --  long range correction to energy  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "evcorr" computes the long range van der Waals correction
-c     to the energy via numerical integration
+c     "evcorr" computes a long range correction for van der Waals
+c     or dispersion energy via numerical integration
 c
 c     literature reference:
 c
@@ -179,15 +179,15 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine evcorr1  --  long range vdw energy & virial  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine evcorr1  --  long range energy & virial term  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "evcorr1" computes the long range van der Waals correction
-c     to the energy and virial via numerical integration
+c     "evcorr1" computes a long range correction for van der Waals
+c     or dispersion energy and virial via numerical integration
 c
 c     literature reference:
 c

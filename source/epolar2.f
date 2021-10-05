@@ -1000,16 +1000,14 @@ c
                   frcz = 2.0d0*dscale(k)*depz
                end if
 c
-c     reset Thole values when alternate direct damping is used
+c     reset Thole values if alternate direct damping was used
 c
                if (use_dirdamp) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
-                  sc7 = 1.0d0
                   do j = 1, 3
                      rc3(j) = 0.0d0
                      rc5(j) = 0.0d0
-                     rc7(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
@@ -1019,20 +1017,14 @@ c
                         expdamp = exp(-damp)
                         sc3 = 1.0d0 - expdamp
                         sc5 = 1.0d0 - expdamp*(1.0d0+damp)
-                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                   +0.6d0*damp**2)
                         temp3 = damp * expdamp * rr5
                         temp5 = 3.0d0 * damp / r2
-                        temp7 = (-1.0d0+3.0d0*damp) / r2
                         rc3(1) = xr * temp3
                         rc3(2) = yr * temp3
                         rc3(3) = zr * temp3
                         rc5(1) = rc3(1) * temp5
                         rc5(2) = rc3(2) * temp5
                         rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
                      end if
                   end if
                end if
@@ -2069,16 +2061,14 @@ c
                   frcz = 2.0d0*dscale(k)*depz
                end if
 c
-c     reset Thole values when alternate direct damping is used
+c     reset Thole values if alternate direct damping was used
 c
                if (use_dirdamp) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
-                  sc7 = 1.0d0
                   do j = 1, 3
                      rc3(j) = 0.0d0
                      rc5(j) = 0.0d0
-                     rc7(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(kk)
                   if (damp .ne. 0.0d0) then
@@ -2088,20 +2078,14 @@ c
                         expdamp = exp(-damp)
                         sc3 = 1.0d0 - expdamp
                         sc5 = 1.0d0 - expdamp*(1.0d0+damp)
-                        sc7 = 1.0d0 - expdamp*(1.0d0+damp
-     &                                   +0.6d0*damp**2)
                         temp3 = damp * expdamp * rr5
                         temp5 = 3.0d0 * damp / r2
-                        temp7 = (-1.0d0+3.0d0*damp) / r2
                         rc3(1) = xr * temp3
                         rc3(2) = yr * temp3
                         rc3(3) = zr * temp3
                         rc5(1) = rc3(1) * temp5
                         rc5(2) = rc3(2) * temp5
                         rc5(3) = rc3(3) * temp5
-                        rc7(1) = rc5(1) * temp7
-                        rc7(2) = rc5(2) * temp7
-                        rc7(3) = rc5(3) * temp7
                      end if
                   end if
                end if
