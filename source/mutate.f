@@ -39,6 +39,7 @@ c
       use katoms
       use keys
       use mutant
+      use potent
       implicit none
       integer i,j,k,ihyb
       integer it0,it1
@@ -190,9 +191,14 @@ c
          call altelec
       end if
 c
-c     write the status of the current free energy perturbation step
+c     turn off hybrid potentials if no sites are mutated
 c
-      if (nmut.ne.0 .and. .not.silent) then
+      use_mutate = .true.
+      if (nmut .eq. 0)  use_mutate = .false.
+c
+c     write status of current hybrid potential lambda values
+c
+      if (use_mutate .and. .not.silent) then
          write (iout,40)  tlambda
    40    format (/,' Free Energy Perturbation :',f15.3,
      &              ' Lambda for Torsional Angles')

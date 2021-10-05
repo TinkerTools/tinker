@@ -43,6 +43,7 @@ c     use_geom    logical flag governing use of geometric restraints
 c     use_extra   logical flag governing use of extra potential term
 c     use_born    logical flag governing use of Born radii values
 c     use_orbit   logical flag governing use of pisystem computation
+c     use_mutate  logical flag governing use of hybrid potential terms
 c
 c
       module potent
@@ -62,6 +63,6 @@ c
       logical use_rxnfld,use_solv
       logical use_metal,use_geom
       logical use_extra,use_born
-      logical use_orbit
+      logical use_orbit,use_mutate
       save
       end
