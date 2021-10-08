@@ -1,0 +1,169 @@
+ 
+               #################################################
+               Benchmark Results for Tinker 8.10  (October 2021)
+               #################################################
+
+ Benchmark #1: Calmodulin Energy Evaluation (Serial)
+
+ Gas-Phase Calmodulin Molecule, 2264 Atoms, Amber ff94 Force Field,
+ No Nonbonded Cutoffs, 100 Evaluations
+
+ MACHINE TYPE (OS, Compiler)                   CPU    ENERGY     GRAD  HESSIAN
+ ---------------------------                   ---    ------     ----  -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670      7.9     17.7     54.1
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ      7.6     17.1     52.0
+ Razer Blade 15 (Ubuntu 18.04, GNU 7.5)       9750H      5.6     10.8     36.8
+
+ Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
+
+ Crambin Unit Cell, 1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
+ with PME Electrostatics, 9.0 Ang vdw Cutoff, 1000 Evaluations
+
+ MACHINE TYPE (OS, Compiler)                   CPU    ENERGY     GRAD  HESSIAN
+ ---------------------------                   ---    ------     ----  -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670     18.6     25.0     85.0
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ     19.0     25.4     87.5
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H     11.4     18.4     69.3
+
+ Benchmark #3: Crambin Normal Mode Calculation (Serial)
+
+ Hessian Eigenvalues, Normal Modes and Vibrational Freqencies for the
+ 42-Amino Acid, 642-Atom Protein Crambin, CHARMM-22 Force Field with Cutoffs
+
+ MACHINE TYPE (OS, Compiler)                   CPU             SECONDS
+ ---------------------------                   ---             -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670               16.1
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ               15.2
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H               11.0
+
+ Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
+
+ MD run of 10000 Steps for 216 TIP3P Waters in 18.643 Ang Periodic Box,
+ 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
+ Step with Modified Beeman Integrator
+
+ MACHINE TYPE (OS, Compiler)                   CPU             SECONDS
+ ---------------------------                   ---             -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670               80.6
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ               81.5
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H               58.5
+
+ Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
+
+ MD run of 1000 Steps for 216 AMOEBA Waters in a 18.643 Ang Box, Neighbor
+ Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff, 9.0 Ang vdW
+ Cutoff with Correction, 1.0 fs Time Step with Modified Beeman Integrator,
+ and 0.00001 RMS Induced Dipole Convergence
+
+ MACHINE TYPE (OS, Compiler)                   CPU             SECONDS
+ ---------------------------                   ---             -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670               50.6
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ               51.7
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H               39.4
+
+ Benchmark #6: MD on DHFR in Water using CHARMM (OpenMP Parallel)
+
+ MD run of 100 Steps for CHARMM DHFR in Water (23558 Atoms, 62.23 Ang Box),
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integrator;
+ OpenMP timings as "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                   CPU    CORE/THREAD      SECONDS
+ ---------------------------                   ---    -----------      -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/1      46.5 (1.00)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/2      34.1 (1.36)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/4      26.7 (1.74)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/1      47.3 (1.00)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/2      35.8 (1.32)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/4      27.6 (1.71)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/8      23.3 (2.05)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/1      33.4 (1.00)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/2      23.2 (1.44)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/4      16.3 (2.05)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/6      14.1 (2.37)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H      6/12      13.7 (2.44)
+
+ Benchmark #7: MD on DHFR in Water using AMOEBA (OpenMP Parallel)
+
+ MD run of 100 Steps for AMOEBA DHFR in Water (23558 Atoms, 62.23 Ang Box),
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
+ Integrator, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
+ reported as "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                   CPU    CORE/THREAD      SECONDS
+ ---------------------------                   ---    -----------      -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/1     202.6 (1.00)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/2     130.3 (1.55)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/4      84.5 (2.40)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/1     205.6 (1.00)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/2     138.7 (1.48)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/4      89.6 (2.29)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/8      79.8 (2.58)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/1     145.1 (1.00)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/2      93.8 (1.55)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/4      64.2 (2.26)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/6      53.3 (2.72)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H      6/12      56.1 (2.59)
+
+ Benchmark #8: MD on COX-2 in Water using OPLS-AA (OpenMP Parallel)
+
+ MD run of 100 Steps for OPLS-AA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integrator;
+ RATTLE for all X-H bonds and rigid TIP3P Water; OpenMP timings reported as
+ "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                   CPU    CORE/THREAD      SECONDS
+ ---------------------------                   ---    -----------      -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/1     357.0 (1.00)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/2     280.5 (1.27)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/4     194.8 (1.83)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/1     356.0 (1.00)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/2     281.9 (1.26)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/4     190.2 (1.87)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/8     170.0 (2.09)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/1     253.8 (1.00)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/2     196.4 (1.29)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/4     142.8 (1.78)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/6     127.8 (1.99)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H      6/12     122.1 (2.08)
+
+ Benchmark #9: MD on COX-2 in Water using AMOEBA (OpenMP Parallel)
+
+ MD run of 100 Steps for AMOEBA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
+ Integrator, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
+ reported as "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                   CPU    CORE/THREAD      SECONDS
+ ---------------------------                   ---    -----------      -------
+
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/1    2335.0 (1.00)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/2    1559.2 (1.50)
+ iMac 14.2 (MacOS 10.13, GNU 8.1)              4670       4/4     951.5 (2.45)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/1    2363.4 (1.00)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/2    1588.3 (1.49)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/4     906.8 (2.61)
+ MacBook Pro 11.3 (MacOS 10.13, GNU 8.1)     4960HQ       4/8     769.2 (3.07)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/1    1640.1 (1.00)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/2    1117.4 (1.47)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/4     709.2 (2.31)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H       6/6     585.5 (2.80)
+ Razer Blade 15 (Ubuntu 20.04, GNU 9.3)       9750H      6/12     554.9 (2.96)
+
+ ----------------------
+ Times are measured with Tinker Version 8.10 and reported in total seconds,
+ dimensioned to MAXATM=1000000. Each benchmark was run on an unloaded machine
+ and is the fastest time obtained for that particular machine. The first five
+ benchmarks are run serial on a single thread, while the last four benchmarks
+ reflect OpenMP parallel performance.
