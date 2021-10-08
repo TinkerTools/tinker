@@ -1983,7 +1983,7 @@ optimize.o: atoms.o bound.o files.o inform.o iounit.o scales.o usage.o
 optinit.o: inform.o keys.o output.o potent.o
 optirot.o: files.o inform.o iounit.o math.o omega.o scales.o zcoord.o
 optrigid.o: files.o group.o inform.o iounit.o math.o output.o rigid.o
-optsave.o: atomid.o atoms.o bound.o deriv.o files.o iounit.o math.o mpole.o omega.o output.o polar.o potent.o scales.o socket.o titles.o units.o usage.o zcoord.o
+optsave.o: atomid.o atoms.o bound.o deriv.o files.o group.o iounit.o math.o mpole.o omega.o output.o polar.o potent.o scales.o socket.o titles.o units.o usage.o zcoord.o
 orbital.o: atomid.o atoms.o bndstr.o couple.o iounit.o keys.o piorbs.o potent.o tors.o
 orbits.o:
 orient.o: atomid.o atoms.o group.o math.o rigid.o

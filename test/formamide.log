@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                         Version 8.9.1  June 2021                         ##
+ ##                       Version 8.10.1  October 2021                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
@@ -25,7 +25,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                         Version 8.9.1  June 2021                         ##
+ ##                       Version 8.10.1  October 2021                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
@@ -48,7 +48,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                         Version 8.9.1  June 2021                         ##
+ ##                       Version 8.10.1  October 2021                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
@@ -68,28 +68,27 @@
      2     -158.7605     6.5451      0.6125   0.1077       7   TruncNewt      5
      3     -159.8144     3.2380      1.0539   0.0977       8   TruncNewt      8
      4     -160.0436     0.2895      0.2293   0.0318      10   TruncNewt      9
-     5     -160.0509     0.0464      0.0073   0.0111      13   TruncNewt     13
+     5     -160.0509     0.0465      0.0073   0.0111      13   TruncNewt     13
      6     -160.0512     0.0010      0.0002   0.0024      19   TruncNewt     20
-     7     -160.0512     0.0064      0.0000   0.0147      25    NegCurve     27
-     8     -160.0513     0.0493      0.0002   0.0748      36    NegCurve     42
-     9     -160.0519     0.0500      0.0006   0.1169      48    NegCurve     57
-    10     -160.0522     0.0017      0.0003   0.0026      53   TruncNewt     63
-    11     -160.0522     0.0054      0.0000   0.4029      84    NegCurve     96
-    12     -160.0523     0.0001      0.0000   0.0275     110   TruncNewt    125
-    13     -160.0523     0.0000      0.0000   0.0003     145    NegCurve    161
+     7     -160.0512     0.0065      0.0000   0.0150      25    NegCurve     27
+     8     -160.0513     0.0490      0.0001   0.0581      36    NegCurve     42
+     9     -160.0518     0.0568      0.0005   0.1219      48    NegCurve     57
+    10     -160.0522     0.0016      0.0004   0.0027      53   TruncNewt     63
+    11     -160.0523     0.0048      0.0001   0.1111      85    NegCurve     97
+    12     -160.0523     0.0000      0.0000   0.0026     101   TruncNewt    114
 
  TNCG  --  Normal Termination due to SmallGrad
 
  Final Function Value :         -160.0523
- Final RMS Gradient :          0.1869D-04
- Final Gradient Norm :         0.9156D-04
+ Final RMS Gradient :          0.1273D-04
+ Final Gradient Norm :         0.6237D-04
 
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                         Version 8.9.1  June 2021                         ##
+ ##                       Version 8.10.1  October 2021                       ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2021               ##
  ###                           All Rights Reserved                          ###
@@ -128,89 +127,89 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0     1559.1556   19968.7455   19968.7455         2         3
+     0     1559.0391   19970.8687   19970.8687         2         3
 
  Parameters and Scaled Derivatives at Iteration   0 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.6612   -28154.6498
-   ( 2)  Well Depth          Atom Type   178          0.2100    -2194.8314
+   ( 1)  Atomic Radius       Atom Type   178          1.6612   -28157.6439
+   ( 2)  Well Depth          Atom Type   178          0.2100    -2195.0593
 
  Residual Error Function Values at Iteration   0 :
 
-   ( 1)  Force a-Axis          Structure   1         19.2193
-   ( 2)  Force b-Axis          Structure   1         21.2366
-   ( 3)  Force c-Axis          Structure   1         24.1095
-   ( 4)  Force Alpha           Structure   1         20.8007
-   ( 5)  Force Beta            Structure   1         29.1761
-   ( 6)  Force Gamma           Structure   1         20.8007
+   ( 1)  Force a-Axis          Structure   1         19.2183
+   ( 2)  Force b-Axis          Structure   1         21.2356
+   ( 3)  Force c-Axis          Structure   1         24.1087
+   ( 4)  Force Alpha           Structure   1         20.7998
+   ( 5)  Force Beta            Structure   1         29.1754
+   ( 6)  Force Gamma           Structure   1         20.7998
    ( 7)  Lattice Energy        Structure   1          0.2881
 
-     1       62.3121    3452.7354    4865.0743         1         6
+     1       62.3066    3454.4348    4867.4713         1         6
 
  Parameters and Scaled Derivatives at Iteration   1 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.7363    -4865.0743
-   ( 2)  Well Depth          Atom Type   178          0.3150     -416.9131
+   ( 1)  Atomic Radius       Atom Type   178          1.7363    -4867.4713
+   ( 2)  Well Depth          Atom Type   178          0.3150     -417.0878
 
  Residual Error Function Values at Iteration   1 :
 
-   ( 1)  Force a-Axis          Structure   1          0.8965
-   ( 2)  Force b-Axis          Structure   1         -1.0706
-   ( 3)  Force c-Axis          Structure   1          3.9614
-   ( 4)  Force Alpha           Structure   1          7.1185
-   ( 5)  Force Beta            Structure   1          1.8713
-   ( 6)  Force Gamma           Structure   1          7.1185
-   ( 7)  Lattice Energy        Structure   1          1.4602
+   ( 1)  Force a-Axis          Structure   1          0.8973
+   ( 2)  Force b-Axis          Structure   1         -1.0694
+   ( 3)  Force c-Axis          Structure   1          3.9625
+   ( 4)  Force Alpha           Structure   1          7.1177
+   ( 5)  Force Beta            Structure   1          1.8736
+   ( 6)  Force Gamma           Structure   1          7.1177
+   ( 7)  Lattice Energy        Structure   1          1.4592
 
-     2       43.3443      82.8562     112.6253         1         9
+     2       43.3228      82.9040     112.7002         1         9
 
  Parameters and Scaled Derivatives at Iteration   2 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.7499      112.6253
-   ( 2)  Well Depth          Atom Type   178          0.3150      -32.3397
+   ( 1)  Atomic Radius       Atom Type   178          1.7499      112.7002
+   ( 2)  Well Depth          Atom Type   178          0.3150      -32.3233
 
  Residual Error Function Values at Iteration   2 :
 
-   ( 1)  Force a-Axis          Structure   1         -1.7302
+   ( 1)  Force a-Axis          Structure   1         -1.7305
    ( 2)  Force b-Axis          Structure   1         -3.9969
    ( 3)  Force c-Axis          Structure   1          1.2659
-   ( 4)  Force Alpha           Structure   1          5.4674
-   ( 5)  Force Beta            Structure   1         -1.4284
-   ( 6)  Force Gamma           Structure   1          5.4674
-   ( 7)  Lattice Energy        Structure   1          2.0718
+   ( 4)  Force Alpha           Structure   1          5.4657
+   ( 5)  Force Beta            Structure   1         -1.4274
+   ( 6)  Force Gamma           Structure   1          5.4657
+   ( 7)  Lattice Energy        Structure   1          2.0709
 
-     3       43.3350      29.0655       0.5456         1        12
+     3       43.3134      29.0580       0.5456         1        12
 
  Parameters and Scaled Derivatives at Iteration   3 :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.7497       -0.5456
-   ( 2)  Well Depth          Atom Type   178          0.3150      -41.1012
+   ( 1)  Atomic Radius       Atom Type   178          1.7496       -0.5456
+   ( 2)  Well Depth          Atom Type   178          0.3150      -41.0906
 
  Residual Error Function Values at Iteration   3 :
 
-   ( 1)  Force a-Axis          Structure   1         -1.6726
+   ( 1)  Force a-Axis          Structure   1         -1.6729
    ( 2)  Force b-Axis          Structure   1         -3.9329
    ( 3)  Force c-Axis          Structure   1          1.3248
-   ( 4)  Force Alpha           Structure   1          5.5033
-   ( 5)  Force Beta            Structure   1         -1.3564
-   ( 6)  Force Gamma           Structure   1          5.5033
-   ( 7)  Lattice Energy        Structure   1          2.0582
+   ( 4)  Force Alpha           Structure   1          5.5016
+   ( 5)  Force Beta            Structure   1         -1.3554
+   ( 6)  Force Gamma           Structure   1          5.5016
+   ( 7)  Lattice Energy        Structure   1          2.0573
 
-     4       43.3350      29.0329       0.0028         1        15
+     4       43.3134      29.0254       0.0029         1        15
 
  SQUARE  --  Normal Termination of Least Squares
 
  Final Values of Parameters and Scaled Derivatives :
 
-   ( 1)  Atomic Radius       Atom Type   178          1.7497        0.0016
-   ( 2)  Well Depth          Atom Type   178          0.3150     -130.3451
+   ( 1)  Atomic Radius       Atom Type   178          1.7496        0.0016
+   ( 2)  Well Depth          Atom Type   178          0.3150     -130.3114
 
  Final Residual Error Function Values :
 
-   ( 1)  Force a-Axis          Structure   1         -1.6729
-   ( 2)  Force b-Axis          Structure   1         -3.9333
+   ( 1)  Force a-Axis          Structure   1         -1.6732
+   ( 2)  Force b-Axis          Structure   1         -3.9332
    ( 3)  Force c-Axis          Structure   1          1.3245
-   ( 4)  Force Alpha           Structure   1          5.5032
-   ( 5)  Force Beta            Structure   1         -1.3567
-   ( 6)  Force Gamma           Structure   1          5.5032
-   ( 7)  Lattice Energy        Structure   1          2.0583
+   ( 4)  Force Alpha           Structure   1          5.5015
+   ( 5)  Force Beta            Structure   1         -1.3558
+   ( 6)  Force Gamma           Structure   1          5.5015
+   ( 7)  Lattice Energy        Structure   1          2.0573

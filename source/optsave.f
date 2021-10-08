@@ -23,6 +23,7 @@ c
       use bound
       use deriv
       use files
+      use group
       use iounit
       use math
       use mpole
@@ -68,6 +69,11 @@ c
          else if (coordtype .eq. 'INTERNAL') then
             if (.not. allocated(scale))  allocate (scale(nomega))
             do i = 1, nomega
+               scale(i) = 1.0d0
+            end do
+         else if (coordtype .eq. 'RIGIDBODY') then
+            if (.not. allocated(scale))  allocate (scale(6*ngrp))
+            do i = 1, 6*ngrp
                scale(i) = 1.0d0
             end do
          end if
