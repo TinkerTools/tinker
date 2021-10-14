@@ -284,7 +284,7 @@ c
 c
 c     set true if pyramidal trivalent nitrogen cannot invert
 c
-      noinvert = .false.
+      noinvert = .true.
 c
 c     assign the local frame definition for an isolated atom
 c
@@ -400,6 +400,9 @@ c
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ib
                   yaxis(i) = ic
+               else if (ki.eq.7 .and. .not.pyramid) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ib
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ib
@@ -427,6 +430,9 @@ c
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
                   yaxis(i) = ic
+               else if (ki.eq.7 .and. .not.pyramid) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
@@ -450,10 +456,13 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki .eq. 7) then
+               else if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
                   yaxis(i) = ib
+               else if (ki.eq.7 .and. .not.pyramid) then
+                  polaxe(i) = 'Z-then-X'
+                  xaxis(i) = ia
                else if (ki.eq.15 .or. ki.eq.16) then
                   polaxe(i) = 'Z-Bisect'
                   xaxis(i) = ia
