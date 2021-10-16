@@ -845,12 +845,10 @@ c
          else if (ka .eq. 6) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-         else if (ka.eq.7 .and. pyramid) then
-            if (noinvert) then
-               polaxe(i) = 'Z-Bisect'
-               xaxis(i) = ib
-               yaxis(i) = ic
-            end if
+         else if (ka.eq.7 .and. pyramid .and. noinvert) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
          else if (ka.eq.7 .and. .not.pyramid) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib

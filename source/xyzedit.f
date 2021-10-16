@@ -38,7 +38,7 @@ c
       integer init,stop
       integer nmode,mode
       integer natom,atmnum
-      integer nlist
+      integer nlist,next
       integer offset,origin
       integer oldtype,newtype
       integer freeunit
@@ -61,6 +61,7 @@ c
       logical exist,query
       logical opened,multi
       logical append
+      character*1 axis
       character*3 symb
       character*240 xyzfile
       character*240 modfile
@@ -74,7 +75,7 @@ c
       call initial
       opened = .false.
       multi = .false.
-      nmode = 24
+      nmode = 25
       offset = 0
 c
 c     try to get a filename from the command line arguments
@@ -130,15 +131,16 @@ c
      &        /,3x,'(13) Translate Center of Mass to the Origin',
      &        /,3x,'(14) Translate a Specified Atom to the Origin',
      &        /,3x,'(15) Translate and Rotate to Inertial Frame',
-     &        /,3x,'(16) Move to Specified Rigid Body Coordinates',
-     &        /,3x,'(17) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(18) Trim a Periodic Box to a Smaller Size',
-     &        /,3x,'(19) Make Truncated Octahedron from Cubic Box',
-     &        /,3x,'(20) Make Rhombic Dodecahedron from Cubic Box',
-     &        /,3x,'(21) Append a Second XYZ File to Current One',
-     &        /,3x,'(22) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(23) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(24) Place Monoatomic Ions around a Solute')
+     &        /,3x,'(16) Make a Rotation Around a Specified Axis',
+     &        /,3x,'(17) Move to Specified Rigid Body Coordinates',
+     &        /,3x,'(18) Move Stray Molecules into Periodic Box',
+     &        /,3x,'(19) Trim a Periodic Box to a Smaller Size',
+     &        /,3x,'(20) Make Truncated Octahedron from Cubic Box',
+     &        /,3x,'(21) Make Rhombic Dodecahedron from Cubic Box',
+     &        /,3x,'(22) Append a Second XYZ File to Current One',
+     &        /,3x,'(23) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(24) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(25) Place Monoatomic Ions around a Solute')
 c
 c     get the desired type of coordinate file modification
 c
@@ -777,9 +779,81 @@ c
          end if
       end if
 c
-c     translate and rotate to specified rigid body coordinates
+c     rotate about a coordinate axis by a specified amount
 c
       if (mode .eq. 16) then
+         axis = ' '
+         theta = 0.0d0
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=360,end=360)  axis
+         call nextarg (string,exist)
+         if (exist)  read (string,*,err=360,end=360)  theta
+  360    continue
+         if (axis .eq. ' ') then
+            write (iout,370)
+  370       format (/,' Enter Axis (X,Y,Z) and Rotation [0 deg] :  ',$)
+            read (input,380)  string
+  380       format (a240)
+            next = 1
+            call getword (string,axis,next)
+            call upcase (axis)
+            string = string(next:240)
+            read (string,*,err=390,end=390)  theta
+  390       continue
+         end if
+         theta = theta / radian
+         ctheta = cos(theta)
+         stheta = sin(theta)
+         do i = 1, 3
+            do j = 1, 3
+               a(j,i) = 0.0d0
+            end do
+            a(i,i) = 1.0d0
+         end do
+         if (axis .eq. 'X') then
+            a(2,2) = ctheta
+            a(3,2) = stheta
+            a(2,3) = -stheta
+            a(3,3) = ctheta
+         else if (axis .eq. 'Y') then
+            a(1,1) = ctheta
+            a(3,1) = -stheta
+            a(1,3) = stheta
+            a(3,3) = ctheta
+         else if (axis .eq. 'Z') then
+            a(1,1) = ctheta
+            a(2,1) = stheta
+            a(1,2) = -stheta
+            a(2,2) = ctheta
+         end if
+         do while (.not. abort)
+            do i = 1, n
+               xorig = x(i)
+               yorig = y(i)
+               zorig = z(i)
+               x(i) = a(1,1)*xorig + a(2,1)*yorig + a(3,1)*zorig + xcm
+               y(i) = a(1,2)*xorig + a(2,2)*yorig + a(3,2)*zorig + ycm
+               z(i) = a(1,3)*xorig + a(2,3)*yorig + a(3,3)*zorig + zcm
+            end do
+            call makeref (1)
+            call readxyz (ixyz)
+            if (.not. abort)  multi = .true.
+            if (multi) then
+               call makeref (2)
+               call getref (1)
+               call prtmod (imod,offset)
+               call getref (2)
+            end if
+         end do
+         if (.not. multi) then
+            call getref (1)
+            goto 40
+         end if
+      end if
+c
+c     translate and rotate to specified rigid body coordinates
+c
+      if (mode .eq. 17) then
          xcm = 0.0d0
          ycm = 0.0d0
          zcm = 0.0d0
@@ -787,26 +861,26 @@ c
          theta = 0.0d0
          psi = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  xcm
+         if (exist)  read (string,*,err=400,end=400)  xcm
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  ycm
+         if (exist)  read (string,*,err=400,end=400)  ycm
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  zcm
+         if (exist)  read (string,*,err=400,end=400)  zcm
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  phi
+         if (exist)  read (string,*,err=400,end=400)  phi
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  theta
+         if (exist)  read (string,*,err=400,end=400)  theta
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  psi
-  360    continue
+         if (exist)  read (string,*,err=400,end=400)  psi
+  400    continue
          if (min(xcm,ycm,zcm,phi,theta,psi).eq.0.0d0 .and.
      &       max(xcm,ycm,zcm,phi,theta,psi).eq.0.0d0) then
-            write (iout,370)
-  370       format (/,' Enter Rigid Body Coordinates :  ',$)
-            read (input,380)  record
-  380       format (a240)
-            read (record,*,err=390,end=390)  xcm,ycm,zcm,phi,theta,psi
-  390       continue
+            write (iout,410)
+  410       format (/,' Enter Rigid Body Coordinates :  ',$)
+            read (input,420)  record
+  420       format (a240)
+            read (record,*,err=430,end=430)  xcm,ycm,zcm,phi,theta,psi
+  430       continue
          end if
          call inertia (2)
          phi = phi / radian
@@ -854,7 +928,7 @@ c
 c
 c     move stray molecules back into original periodic box
 c
-      if (mode .eq. 17) then
+      if (mode .eq. 18) then
          do while (.not. abort)
             call unitcell
             if (use_bounds) then
@@ -880,24 +954,24 @@ c
 c
 c     remove molecules to trim periodic box to smaller size
 c
-      if (mode .eq. 18) then
+      if (mode .eq. 19) then
          xnew = 0.0d0
          ynew = 0.0d0
          znew = 0.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=400,end=400)  xnew
+         if (exist)  read (string,*,err=440,end=440)  xnew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=400,end=400)  ynew
+         if (exist)  read (string,*,err=440,end=440)  ynew
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=400,end=400)  znew
-  400    continue
+         if (exist)  read (string,*,err=440,end=440)  znew
+  440    continue
          do while (xnew .eq. 0.0d0)
-            write (iout,410)
-  410       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
-            read (input,420)  record
-  420       format (a240)
-            read (record,*,err=430,end=430)  xnew,ynew,znew
-  430       continue
+            write (iout,450)
+  450       format (/,' Enter Periodic Box Dimensions (X,Y,Z) :  ',$)
+            read (input,460)  record
+  460       format (a240)
+            read (record,*,err=470,end=470)  xnew,ynew,znew
+  470       continue
          end do
          if (ynew .eq. 0.0d0)  ynew = xnew
          if (znew .eq. 0.0d0)  znew = xnew
@@ -985,15 +1059,15 @@ c
 c
 c     trim cube to truncated octahedron or rhombic dodecahedron
 c
-      if (mode.eq.19 .or. mode.eq.20) then
+      if (mode.eq.20 .or. mode.eq.21) then
          call unitcell
          dowhile (xbox .eq. 0.0d0)
-            write (iout,440)
-  440       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
-            read (input,450)  record
-  450       format (a240)
-            read (record,*,err=460,end=460)  xbox
-  460       continue
+            write (iout,480)
+  480       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
+            read (input,490)  record
+  490       format (a240)
+            read (record,*,err=500,end=500)  xbox
+  500       continue
          end do
          if (mode .eq. 18)  octahedron = .true.
          if (mode .eq. 19)  dodecadron = .true.
@@ -1084,7 +1158,7 @@ c
 c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 21) then
+      if (mode .eq. 22) then
          append = .false.
          do while (.not. abort)
             call makeref (1)
@@ -1114,19 +1188,19 @@ c
 c
 c     create random box full of the current coordinates file
 c
-      if (mode .eq. 22) then
+      if (mode .eq. 23) then
          call makebox
       end if
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 23) then
+      if (mode .eq. 24) then
          call soak
       end if
 c
 c     replace random solvent molecules outside solute with ions
 c
-      if (mode .eq. 24) then
+      if (mode .eq. 25) then
          call molecule
          call addions
       end if
@@ -1138,8 +1212,8 @@ c
       end if
       if (opened) then
          close (unit=imod)
-         write (iout,470)  modfile(1:trimtext(modfile))
-  470    format (/,' New Coordinates Written To :  ',a)
+         write (iout,510)  modfile(1:trimtext(modfile))
+  510    format (/,' New Coordinates Written To :  ',a)
       end if
       close (unit=ixyz)
 c

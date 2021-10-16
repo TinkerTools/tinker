@@ -48,7 +48,8 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:11) .eq. 'PARAMETERS ') then
+         if (keyword(1:11).eq.'PARAMETERS '
+     &          .or. keyword(1:10).eq.'PARAMETER ') then
             string = record(next:240)
             next = 1
             call getstring (string,prmfile,next)
