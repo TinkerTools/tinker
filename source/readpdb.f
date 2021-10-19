@@ -1102,12 +1102,15 @@ c
          if (atmname .eq. ' OY ')  atmname = ' O  '
          if (atmname .eq. '1H  ')  atmname = ' H1 '
          if (atmname .eq. ' HY1')  atmname = ' H1 '
+         if (atmname .eq. '1HH3')  atmname = ' H1 '
          if (atmname .eq. 'HH31')  atmname = ' H1 '
          if (atmname .eq. '2H  ')  atmname = ' H2 '
          if (atmname .eq. ' HY2')  atmname = ' H2 '
+         if (atmname .eq. '2HH3')  atmname = ' H2 '
          if (atmname .eq. 'HH32')  atmname = ' H2 '
          if (atmname .eq. '3H  ')  atmname = ' H3 '
          if (atmname .eq. ' HY3')  atmname = ' H3 '
+         if (atmname .eq. '3HH3')  atmname = ' H3 '
          if (atmname .eq. 'HH33')  atmname = ' H3 '
 c
 c     N-terminal formyl residue  (FOR)
@@ -1128,14 +1131,17 @@ c
          if (atmname .eq. '1H  ')  atmname = ' H1 '
          if (atmname .eq. '1HA ')  atmname = ' H1 '
          if (atmname .eq. ' HT1')  atmname = ' H1 '
+         if (atmname .eq. '1HH3')  atmname = ' H1 '
          if (atmname .eq. 'HH31')  atmname = ' H1 '
          if (atmname .eq. '2H  ')  atmname = ' H2 '
          if (atmname .eq. '2HA ')  atmname = ' H2 '
          if (atmname .eq. ' HT2')  atmname = ' H2 '
+         if (atmname .eq. '2HH3')  atmname = ' H2 '
          if (atmname .eq. 'HH32')  atmname = ' H2 '
          if (atmname .eq. '3H  ')  atmname = ' H3 '
          if (atmname .eq. '3HA ')  atmname = ' H3 '
          if (atmname .eq. ' HT3')  atmname = ' H3 '
+         if (atmname .eq. '3HH3')  atmname = ' H3 '
          if (atmname .eq. 'HH33')  atmname = ' H3 '
 c
 c     C-terminal amide residue  (NH2)

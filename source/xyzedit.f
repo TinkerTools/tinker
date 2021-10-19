@@ -131,7 +131,7 @@ c
      &        /,3x,'(13) Translate Center of Mass to the Origin',
      &        /,3x,'(14) Translate a Specified Atom to the Origin',
      &        /,3x,'(15) Translate and Rotate to Inertial Frame',
-     &        /,3x,'(16) Make a Rotation Around a Specified Axis',
+     &        /,3x,'(16) Rotate All Atoms Around a Specified Axis',
      &        /,3x,'(17) Move to Specified Rigid Body Coordinates',
      &        /,3x,'(18) Move Stray Molecules into Periodic Box',
      &        /,3x,'(19) Trim a Periodic Box to a Smaller Size',
