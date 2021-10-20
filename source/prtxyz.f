@@ -26,7 +26,7 @@ c
       use inform
       use titles
       implicit none
-      integer i,k,ixyz
+      integer i,j,k,ixyz
       integer size,crdsiz
       real*8 crdmin,crdmax
       logical opened
@@ -95,8 +95,13 @@ c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
       do i = 1, n
-         write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i),
-     &                      (i12(k,i),k=1,n12(i))
+         k = n12(i)
+         if (k .eq. 0) then
+            write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i)
+         else
+            write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i),
+     &                         (i12(j,i),j=1,k)
+         end if
       end do
 c
 c     close the output unit if opened by this routine

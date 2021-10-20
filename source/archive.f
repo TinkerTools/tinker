@@ -466,7 +466,7 @@ c
       use titles
       use usage
       implicit none
-      integer i,k,iarc
+      integer i,j,k,iarc
       integer size,crdsiz
       real*8 crdmin,crdmax
       logical opened
@@ -536,8 +536,14 @@ c
      &          '.'//digc//',i6,8'//atmc//')'
       do i = 1, n
          if (use(i)) then
-            write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),type(i),
-     &                         (iuse(i12(k,i)),k=1,n12(i))
+            k = n12(i)
+            if (k .eq. 0) then
+               write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),
+     &                            type(i)
+            else
+               write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),
+     &                            type(i),(iuse(i12(j,i)),j=1,k)
+            end if
          end if
       end do
 c

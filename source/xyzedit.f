@@ -1243,7 +1243,7 @@ c
       use inform
       use titles
       implicit none
-      integer i,k,imod
+      integer i,j,k,imod
       integer offset
       integer size,crdsiz
       real*8 crdmin,crdmax
@@ -1302,8 +1302,13 @@ c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
       do i = 1, n
-         write (imod,fstr)  i+offset,name(i),x(i),y(i),z(i),type(i),
-     &                      (i12(k,i)+offset,k=1,n12(i))
+         k = n12(i)
+         if (k .eq. 0) then
+            write (imod,fstr)  i+offset,name(i),x(i),y(i),z(i),type(i)
+         else
+            write (imod,fstr)  i+offset,name(i),x(i),y(i),z(i),type(i),
+     &                         (i12(j,i)+offset,j=1,k)
+         end if
       end do
       return
       end
