@@ -791,6 +791,12 @@ c
          if (atmname .eq. '1H5*')  atmname = ' H5'''
          if (atmname .eq. '2H5*')  atmname = 'H5'''''
          if (atmname .eq. '2HO*')  atmname = 'HO2'''
+      end if
+c
+c     convert unusual names in terminal nucleotides
+c
+      if (restype .eq. 'NUCLEIC') then
+         if (atmname .eq. ' H5T')  atmname = 'HO5'''
          if (atmname .eq. ' H3T')  atmname = 'HO3'''
       end if
 c

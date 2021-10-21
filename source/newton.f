@@ -213,9 +213,12 @@ c
          end if
       end if
 c
+c     move stray molecules into periodic box if desired
+c
+c     if (use_bounds)  call bounds
+c
 c     write the final coordinates into a file
 c
-      if (use_bounds)  call bounds
       imin = freeunit ()
       open (unit=imin,file=minfile,status='old')
       rewind (unit=imin)

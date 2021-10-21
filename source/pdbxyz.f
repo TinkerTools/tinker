@@ -591,6 +591,7 @@ c
      &                         ci(i),-60.0d0,0)
             else
                call findatm (' H1 ',start,stop,k)
+               if (k .eq. 0)  call findatm (' H  ',start,stop,k)
                call newatm (k,j,ni(i),1.01d0,cai(i),109.5d0,
      &                         ci(i),180.0d0,0)
                call findatm (' H2 ',start,stop,k)
@@ -608,6 +609,7 @@ c
      &                         cai(i-1),180.0d0,0)
             else if (resname .eq. 'NH2') then
                call findatm (' H1 ',start,stop,k)
+               if (k .eq. 0)  call findatm (' H  ',start,stop,k)
                call newatm (k,j,ni(i),1.01d0,ci(i-1),120.9d0,
      &                         cai(i-1),0.0d0,0)
                call findatm (' H2 ',start,stop,k)
@@ -642,6 +644,7 @@ c
                call newatm (k,j,ci(i),1.12d0,oi(i),0.0d0,0,0.0d0,0)
             else if (resname .eq. 'ACE') then
                call findatm (' H1 ',start,stop,k)
+               if (k .eq. 0)  call findatm (' H  ',start,stop,k)
                call newatm (k,j,cai(i),1.10d0,ci(i),109.5d0,
      &                         oi(i),180.0d0,0)
                call findatm (' H2 ',start,stop,k)
@@ -658,6 +661,7 @@ c
             j = hactyp(ityp)
             if (resname .eq. 'NME') then
                call findatm (' H1 ',start,stop,k)
+               if (k .eq. 0)  call findatm (' H  ',start,stop,k)
                call newatm (k,j,cai(i),1.10d0,ni(i),109.5d0,
      &                         ci(i-1),180.0d0,0)
                call findatm (' H2 ',start,stop,k)
@@ -1718,7 +1722,7 @@ c
 c     build the hydrogen atoms of the current residue
 c
          if (newchain) then
-            call findatm (' H5T',start,stop,k)
+            call findatm ('HO5''',start,stop,k)
             j = h5ttyp(ityp)
             call newatm (k,j,o5i,1.00d0,c5i,109.5d0,c4i,180.0d0,0)
          end if
@@ -1753,7 +1757,7 @@ c
          j = h1typ(ityp)
          call newatm (k,j,c1i,1.09d0,o4i,109.5d0,c2i,109.5d0,-1)
          if (endchain) then
-            call findatm (' H3T',start,stop,k)
+            call findatm ('HO3''',start,stop,k)
             j = h3ttyp(ityp)
             call newatm (k,j,o3i,1.00d0,c3i,109.5d0,c4i,180.0d0,0)
          end if

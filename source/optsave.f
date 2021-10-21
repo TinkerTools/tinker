@@ -92,12 +92,17 @@ c
             nvar = nvar + 1
             z(k) = xx(nvar) / scale(nvar)
          end do
-         if (use_bounds)  call bounds
       else if (coordtype .eq. 'INTERNAL') then
          do i = 1, nomega
             dihed(i) = xx(i) / scale(i)
             ztors(zline(i)) = dihed(i) * radian
          end do
+      end if
+c
+c     move stray molecules into periodic box if desired
+c
+      if (coordtype .eq. 'CARTESIAN') then
+         if (use_bounds)  call bounds
       end if
 c
 c     get name of archive or intermediate coordinates file

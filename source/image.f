@@ -28,8 +28,8 @@ c     do while (abs(xr) .gt. xbox2)
 c        xr = xr - sign(xbox,xr)    vs.  xr = xr - xbox*nint(xr/xbox)
 c     end do
 c
-c     which is faster depends on the specific machine and compiler
-c     combination, and other implementations are also possible
+c     which one is faster depends upon specific machine and compiler
+c     combinations, and other implementations are also possible
 c
 c
       subroutine image (xr,yr,zr)

@@ -123,6 +123,10 @@ c
          end if
       end if
 c
+c     move stray molecules into periodic box if desired
+c
+      if (use_bounds)  call bounds
+c
 c     save coordinates to an archive or numbered structure file
 c
       ixyz = freeunit ()
@@ -140,7 +144,6 @@ c
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
       end if
-      if (use_bounds)  call bounds
       call prtxyz (ixyz)
       close (unit=ixyz)
       write (iout,170)  isave
