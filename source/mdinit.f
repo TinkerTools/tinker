@@ -59,6 +59,7 @@ c
 c
 c     set default parameters for the dynamics trajectory
 c
+      mdstep = 0
       integrate = 'BEEMAN'
       bmnmix = 8
       arespa = 0.00025d0
@@ -342,7 +343,7 @@ c
                lm(j,i) = 0.0d0
             end do
          end do
-         if (nuse .eq. n)  call mdrest (0)
+         if (nuse .eq. n)  call mdrest
 c
 c     set velocities and fast/slow accelerations for RESPA method
 c
@@ -377,7 +378,7 @@ c
                end do
             end if
          end do
-         if (nuse .eq. n)  call mdrest (0)
+         if (nuse .eq. n)  call mdrest
 c
 c     set velocities and accelerations for Cartesian dynamics
 c
@@ -401,7 +402,7 @@ c
                end do
             end if
          end do
-         if (nuse .eq. n)  call mdrest (0)
+         if (nuse .eq. n)  call mdrest
       end if
 c
 c     perform deallocation of some local arrays

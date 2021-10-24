@@ -12,6 +12,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
+c     mdstep      step number of the current molecular dynamics step
 c     nfree       total number of degrees of freedom for a system
 c     irest       steps between removal of COM motion (0=no removal)
 c     bmnmix      mixing coefficient for use with Beeman integrator
@@ -22,6 +23,7 @@ c
 c
       module mdstuf
       implicit none
+      integer mdstep
       integer nfree
       integer irest
       integer bmnmix

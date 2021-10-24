@@ -31,8 +31,8 @@ c
       use usage
       use warp
       implicit none
-      integer i,nequil,next
-      integer nstep,istep
+      integer i,next
+      integer nequil,nstep
       real*8 logmass,factor
       real*8 ratio,sigmoid
       real*8 dt,dtsave
@@ -225,23 +225,27 @@ c
 c
 c     take the dynamics steps for the equilibration phase
 c
-      do istep = 1, nequil
+      mdstep = 0
+      do i = 1, nequil
+         mdstep = mdstep + 1
          if (integrate .eq. 'VERLET') then
-            call verlet (istep,dt)
-         else if (integrate .eq. 'STOCHASTIC') then
-            call sdstep (istep,dt)
+            call verlet (dt)
+         else if (integrate .eq. 'BEEMAN') then
+            call beeman (dt)
          else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
+            call bussi (dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
-            call nose (istep,dt)
+            call nose (dt)
+         else if (integrate .eq. 'STOCHASTIC') then
+            call sdstep (dt)
          else if (integrate .eq. 'GHMC') then
-            call ghmcstep (istep,dt)
+            call ghmcstep (dt)
          else if (integrate .eq. 'RIGIDBODY') then
-            call rgdstep (istep,dt)
+            call rgdstep (dt)
          else if (integrate .eq. 'RESPA') then
-            call respa (istep,dt)
+            call respa (dt)
          else
-            call beeman (istep,dt)
+            call beeman (dt)
          end if
       end do
 c
@@ -260,8 +264,9 @@ c
 c
 c     set target temperature using the desired cooling protocol
 c
-      do istep = 1, nstep
-         ratio = dble(istep) / dble(nstep)
+      do i = 1, nstep
+         mdstep = mdstep + 1
+         ratio = dble(i) / dble(nstep)
          if (cooltyp .eq. 'SIGMOID') then
             ratio = sigmoid (3.5d0,ratio)
          else if (cooltyp .eq. 'EXPONENT') then
@@ -273,28 +278,32 @@ c
 c     set the deformation value if potential smoothing is used
 c
          if (use_smooth) then
-            ratio = (1.0d0-dble(istep)/dble(nstep))**3
+            ratio = (1.0d0-dble(i)/dble(nstep))**3
             deform = sharp + ratio*fuzzy
          end if
 c
 c     integrate equations of motion to take a time step
 c
          if (integrate .eq. 'VERLET') then
-            call verlet (istep,dt)
-         else if (integrate .eq. 'STOCHASTIC') then
-            call sdstep (istep,dt)
+            call verlet (dt)
+         else if (integrate .eq. 'BEEMAN') then
+            call beeman (dt)
+         else if (integrate .eq. 'BAOAB') then
+            call baoab (dt)
          else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
+            call bussi (dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
-            call nose (istep,dt)
+            call nose (dt)
+         else if (integrate .eq. 'STOCHASTIC') then
+            call sdstep (dt)
          else if (integrate .eq. 'GHMC') then
-            call ghmcstep (istep,dt)
+            call ghmcstep (dt)
          else if (integrate .eq. 'RIGIDBODY') then
-            call rgdstep (istep,dt)
+            call rgdstep (dt)
          else if (integrate .eq. 'RESPA') then
-            call respa (istep,dt)
+            call respa (dt)
          else
-            call beeman (istep,dt)
+            call beeman (dt)
          end if
       end do
 c

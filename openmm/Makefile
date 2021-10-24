@@ -1779,7 +1779,7 @@ resdue.o:
 respa.o: atomid.o atoms.o freeze.o ielscf.o limits.o mdstuf.o moldyn.o polar.o potent.o units.o usage.o virial.o
 restrn.o:
 rgddyn.o:
-rgdstep.o: atomid.o atoms.o bound.o group.o iounit.o rgddyn.o units.o virial.o
+rgdstep.o: atomid.o atoms.o bound.o group.o iounit.o mdstuf.o rgddyn.o units.o virial.o
 rigid.o:
 ring.o:
 rings.o: angbnd.o atoms.o bitor.o bndstr.o couple.o inform.o iounit.o ring.o tors.o

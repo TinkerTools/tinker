@@ -25,7 +25,7 @@ c     Method: Mixed Monte Carlo/Stochastic Dynamics", Journal of
 c     Computational Chemistry, 15, 1302-1310 (1994)
 c
 c
-      subroutine sdstep (istep,dt)
+      subroutine sdstep (dt)
       use atoms
       use atomid
       use freeze
@@ -36,7 +36,6 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer istep
       real*8 dt,term
       real*8 epot,etot
       real*8 eksum
@@ -70,7 +69,7 @@ c
 c
 c     get frictional and random terms for position and velocity
 c
-      call sdterm (istep,dt,pfric,vfric,afric,prand,vrand)
+      call sdterm (dt,pfric,vfric,afric,prand,vrand)
 c
 c     store the current atom positions, then find full-step
 c     positions and half-step velocities via modified Verlet
@@ -156,8 +155,8 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
-      call mdsave (istep,dt,epot,eksum)
+      call mdstat (dt,etot,epot,eksum,temp,pres)
+      call mdsave (dt,epot,eksum)
       return
       end
 c
@@ -173,7 +172,7 @@ c     "sdterm" finds the frictional and random terms needed to
 c     update positions and velocities during stochastic dynamics
 c
 c
-      subroutine sdterm (istep,dt,pfric,vfric,afric,prand,vrand)
+      subroutine sdterm (dt,pfric,vfric,afric,prand,vrand)
       use atoms
       use atomid
       use bath
@@ -182,7 +181,6 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer istep
       real*8 dt,ktm
       real*8 gdt,egdt
       real*8 gdt2,gdt3
@@ -220,7 +218,7 @@ c
 c
 c     set the value of the friction coefficient for each atom
 c
-      if (use_sdarea)  call sdarea (istep)
+      if (use_sdarea)  call sdarea
 c
 c     get the frictional and random terms for stochastic dynamics
 c
@@ -321,17 +319,19 @@ c     Cyclosporin A by Stochastic Dynamics Simulation Techniques",
 c     Molecular Simulation, 1, 369-383 (1988)
 c
 c
-      subroutine sdarea (istep)
+      subroutine sdarea
       use atoms
       use atomid
       use couple
       use kvdws
       use math
+      use mdstuf
       use stodyn
       use usage
       implicit none
-      integer i,k,istep
-      integer resurf,modstep
+      integer i,k
+      integer resurf
+      integer modstep
       real*8 probe,ratio,area
       real*8, allocatable :: radius(:)
 c
@@ -339,7 +339,7 @@ c
 c     determine new friction coefficients every few SD steps
 c
       resurf = 100
-      modstep = mod(istep,resurf)
+      modstep = mod(mdstep,resurf)
       if (modstep .ne. 1)  return
 c
 c     perform dynamic allocation of some local arrays

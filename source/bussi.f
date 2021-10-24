@@ -204,8 +204,8 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
-      call mdsave (istep,dt,epot,eksum)
-      call mdrest (istep)
+      call mdstat (dt,etot,epot,eksum,temp,pres)
+      call mdsave (dt,epot,eksum)
+      call mdrest
       return
       end

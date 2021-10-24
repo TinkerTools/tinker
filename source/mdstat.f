@@ -17,7 +17,7 @@ c     form statistics on various average values and fluctuations,
 c     and to periodically save the state of the trajectory
 c
 c
-      subroutine mdstat (istep,dt,etot,epot,ekin,temp,pres)
+      subroutine mdstat (dt,etot,epot,ekin,temp,pres)
       use atoms
       use bath
       use bound
@@ -31,7 +31,7 @@ c
       use usage
       use warp
       implicit none
-      integer istep,modstep
+      integer modstep
       real*8 dt,temp,pres
       real*8 etot,epot,ekin
       real*8 pico,dens
@@ -62,7 +62,7 @@ c
 c
 c     set number of steps for block averages of properties
 c
-      modstep = mod(istep,iprint)
+      modstep = mod(mdstep,iprint)
 c
 c     zero out summation variables for new averaging period
 c
@@ -96,10 +96,10 @@ c
             end if
          end if
          if (use_bounds .and. integrate.ne.'STOCHASTIC') then
-            write (iout,30)  istep,etot,epot,ekin,temp,pres
+            write (iout,30)  mdstep,etot,epot,ekin,temp,pres
    30       format (i10,3f15.4,2f11.2)
          else
-            write (iout,40)  istep,etot,epot,ekin,temp
+            write (iout,40)  mdstep,etot,epot,ekin,temp
    40       format (i10,3f15.4,f11.2)
          end if
          flush (iout)
@@ -108,8 +108,8 @@ c
 c     print header for the averages over a group of recent steps
 c
       if (modstep .eq. 0) then
-         pico = dble(istep) * dt
-         write (iout,50)  iprint,istep
+         pico = dble(mdstep) * dt
+         write (iout,50)  iprint,mdstep
    50    format (/,' Average Values for the Last',i6,' Out of',
      &              i9,' Dynamics Steps')
          if (digits .ge. 8) then

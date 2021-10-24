@@ -16,7 +16,7 @@ c     "mdrest" finds and removes any translational or rotational
 c     kinetic energy of the overall system center of mass
 c
 c
-      subroutine mdrest (istep)
+      subroutine mdrest
       use atomid
       use atoms
       use bound
@@ -28,7 +28,7 @@ c
       use rgddyn
       use units
       implicit none
-      integer i,j,k,istep
+      integer i,j,k
       real*8 etrans,erot
       real*8 weigh,totmass,eps
       real*8 xx,yy,zz,xy,xz,yz
@@ -44,7 +44,7 @@ c
 c     check steps between center of mass motion removal
 c
       if (.not.dorest)  return
-      if (mod(istep,irest) .ne. 0)  return
+      if (mod(mdstep,irest) .ne. 0)  return
 c
 c     zero out the total mass and overall linear velocity
 c

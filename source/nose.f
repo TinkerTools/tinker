@@ -24,7 +24,7 @@ c
 c     original version written by Teresa Head-Gordon, November 2011
 c
 c
-      subroutine nose (istep,dt)
+      subroutine nose (dt)
       use atomid
       use atoms
       use bath
@@ -37,7 +37,6 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer istep
       real*8 dt,dt_2
       real*8 epot,etot
       real*8 eksum,temp
@@ -55,7 +54,7 @@ c
 c     set some time values for the dynamics integration
 c
       dt_2 = 0.5d0 * dt
-      if (istep .eq. 1)  press = atmsph
+      if (mdstep .eq. 1)  press = atmsph
 c
 c     update thermostat and barostat values, scale atomic velocities
 c
@@ -157,9 +156,9 @@ c
 c     get the instantaneous temperature from the kinetic energy
 c
       etot = epot + eksum
-      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
-      call mdsave (istep,dt,epot,eksum)
-      call mdrest (istep)
+      call mdstat (dt,etot,epot,eksum,temp,pres)
+      call mdsave (dt,epot,eksum)
+      call mdrest
       return
       end
 c

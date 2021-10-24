@@ -22,7 +22,7 @@ c     Using Geodesic Integration and Solvent-Solute Splitting",
 c     Proceedings of the Royal Society A, 472, 20160138 (2016)
 c
 c
-      subroutine baoab (istep,dt)
+      subroutine baoab (dt)
       use atomid
       use atoms
       use freeze
@@ -35,7 +35,6 @@ c
       use potent
       implicit none
       integer i,j,k
-      integer istep
       integer nrattle
       real*8 dt,dtr
       real*8 dt_2,dt_4
@@ -107,7 +106,7 @@ c
 c
 c     update velocities with frictional and random components
 c
-      call oprep (istep,dt,vfric,vrand)
+      call oprep (dt,vfric,vrand)
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3 
@@ -172,9 +171,9 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
-      call mdsave (istep,dt,epot,eksum)
-      call mdrest (istep)
+      call mdstat (dt,etot,epot,eksum,temp,pres)
+      call mdsave (dt,epot,eksum)
+      call mdrest
       return
       end
 c
@@ -190,7 +189,7 @@ c     "oprep" sets up the frictional and random terms needed to
 c     update positions and velocities for the BAOAB integrator
 c
 c
-      subroutine oprep (istep,dt,vfric,vrand)
+      subroutine oprep (dt,vfric,vrand)
       use atoms
       use atomid
       use bath
@@ -199,7 +198,6 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer istep
       real*8 dt,ktm
       real*8 egdt,normal
       real*8 vsig,vnorm

@@ -30,7 +30,7 @@ c     original version written by John D. Chodera, University of
 c     California, Berkeley, November 2010
 c
 c
-      subroutine ghmcstep (istep,dt)
+      subroutine ghmcstep (dt)
       use atoms
       use atomid
       use bath
@@ -43,7 +43,7 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer istep,nrej
+      integer nrej
       real*8 dt,dt_2
       real*8 epot,etot
       real*8 epold,etold
@@ -74,7 +74,7 @@ c
 c
 c     evolve velocities according to midpoint Euler for half-step
 c
-      call ghmcterm (istep,dt,alpha,beta)
+      call ghmcterm (dt,alpha,beta)
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
@@ -124,7 +124,7 @@ c
 c
 c     use current values as previous energies for first step
 c
-      if (istep .eq. 1) then
+      if (mdstep .eq. 1) then
          nrej = 0
          epold = epot
          etold = eksum + epot
@@ -156,7 +156,7 @@ c
       de = (etot-etold) / (gasconst*kelvin)
       if (de.gt.0.0d0 .and. random().gt.exp(-de)) then
          nrej = nrej + 1
-         ratio = 1.0d0 - dble(nrej)/dble(istep)
+         ratio = 1.0d0 - dble(nrej)/dble(mdstep)
          write (iout,10)  ratio
    10    format (' GHMC Step Rejected',6x,'Acceptance Ratio',f8.3)
          epot = epold
@@ -174,7 +174,7 @@ c
 c
 c     evolve velocities according to midpoint Euler for half-step
 c
-      call ghmcterm (istep,dt,alpha,beta)
+      call ghmcterm (dt,alpha,beta)
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
@@ -207,8 +207,8 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
-      call mdsave (istep,dt,epot,eksum)
+      call mdstat (dt,etot,epot,eksum,temp,pres)
+      call mdsave (dt,epot,eksum)
       return
       end
 c
@@ -224,7 +224,7 @@ c     "ghmcterm" finds the friction and fluctuation terms needed
 c     to update velocities during GHMC stochastic dynamics
 c
 c
-      subroutine ghmcterm (istep,dt,alpha,beta)
+      subroutine ghmcterm (dt,alpha,beta)
       use atoms
       use atomid
       use bath
@@ -233,7 +233,6 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer istep
       real*8 dt,dt_2,dt_4
       real*8 gamma,sigma
       real*8 normal
@@ -260,7 +259,7 @@ c
 c
 c     set the value of the friction coefficient for each atom
 c
-      if (use_sdarea)  call sdarea (istep)
+      if (use_sdarea)  call sdarea
 c
 c     get the viscous friction and fluctuation terms for GHMC
 c

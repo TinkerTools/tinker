@@ -30,7 +30,7 @@ c
       use stodyn
       use usage
       implicit none
-      integer i,istep,nstep
+      integer i,nstep
       integer mode,next
       real*8 dt,dtsave
       logical exist
@@ -233,10 +233,10 @@ c
          write (iout,340)
   340    format (/,' Molecular Dynamics Trajectory via',
      &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'STOCHASTIC') then
+      else if (integrate .eq. 'BEEMAN') then
          write (iout,350)
-  350    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
+  350    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Modified Beeman Algorithm')
       else if (integrate .eq. 'BAOAB') then
          write (iout,360)
   360    format (/,' Constrained Stochastic Dynamics Trajectory',
@@ -249,46 +249,54 @@ c
          write (iout,380)
   380    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
-      else if (integrate .eq. 'GHMC') then
+      else if (integrate .eq. 'STOCHASTIC') then
          write (iout,390)
   390    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'GHMC') then
+         write (iout,400)
+  400    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,400)
-  400    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
          write (iout,410)
   410    format (/,' Molecular Dynamics Trajectory via',
-     &              ' r-RESPA MTS Algorithm')
-      else
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'RESPA') then
          write (iout,420)
   420    format (/,' Molecular Dynamics Trajectory via',
+     &              ' r-RESPA MTS Algorithm')
+      else
+         write (iout,430)
+  430    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
 c
 c     integrate equations of motion to take a time step
 c
-      do istep = 1, nstep
+      mdstep = 0
+      do i = 1, nstep
+         mdstep = mdstep + 1
          if (integrate .eq. 'VERLET') then
-            call verlet (istep,dt)
-         else if (integrate .eq. 'STOCHASTIC') then
-            call sdstep (istep,dt)
+            call verlet (dt)
+         else if (integrate .eq. 'BEEMAN') then
+            call beeman (dt)
          else if (integrate .eq. 'BAOAB') then
-            call baoab (istep,dt)
+            call baoab (dt)
          else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
+            call bussi (dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
-            call nose (istep,dt)
+            call nose (dt)
+         else if (integrate .eq. 'STOCHASTIC') then
+            call sdstep (dt)
          else if (integrate .eq. 'GHMC') then
-            call ghmcstep (istep,dt)
+            call ghmcstep (dt)
          else if (integrate .eq. 'RIGIDBODY') then
-            call rgdstep (istep,dt)
+            call rgdstep (dt)
          else if (integrate .eq. 'RESPA') then
-            call respa (istep,dt)
+            call respa (dt)
          else
-            call beeman (istep,dt)
+            call beeman (dt)
          end if
       end do
 c
