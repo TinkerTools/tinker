@@ -428,7 +428,7 @@ c
 c
 c     find the perfect radii and optional self-energies
 c
-         if (debug) then
+         if (debug .ne. 0) then
             call chkpole
             call rotpole
             write (iout,10)
@@ -439,7 +439,7 @@ c
             call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
-            if (debug) then
+            if (debug .ne. 0) then
                ii = ipole(i)
                pbpole(1,ii) = rpole(1,i)
                do j = 2, 4
@@ -462,7 +462,7 @@ c
 c
 c     find the perfect permanent pair energy values
 c
-         if (debug) then
+         if (debug .ne. 0) then
             write (iout,30)
    30       format (/,' Perfect Pair Energy Values :',/)
             do i = 1, npole
@@ -551,7 +551,7 @@ c
 c
 c     write out the final Born radius value for each atom
 c
-      if (debug) then
+      if (debug .ne. 0) then
          write (iout,80)
    80    format (/,' Born Radii for Individual Atoms :',/)
          k = 1

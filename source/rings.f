@@ -394,7 +394,7 @@ c
 c
 c     print out lists of the small rings in the structure
 c
-      if (debug) then
+      if (debug .ne. 0) then
          if (nring3 .gt. 0) then
             write (iout,110)
   110       format (/,' Three-Membered Rings in the Structure :',

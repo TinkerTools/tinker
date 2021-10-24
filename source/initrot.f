@@ -249,7 +249,7 @@ c
          do i = 1, n
             if (use(i))  nuse = nuse + 1
          end do
-         if (debug .and. nuse.gt.0 .and. nuse.lt.n) then
+         if (debug.ne.0 .and. nuse.gt.0 .and. nuse.lt.n) then
             nlist = 0
             do i = 1, n
                if (use(i)) then

@@ -861,10 +861,10 @@ c
 c
 c     initialize some parameters for the upcoming optimization
 c
-      if (debug) then
-         iprint = 1
-      else
+      if (debug .eq. 0) then
          iprint = 0
+      else
+         iprint = 1
       end if
       iwrite = 0
       maxiter = 1000

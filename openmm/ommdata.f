@@ -122,7 +122,7 @@ c
      &                     use_group,use_intra,use_inter)
       call set_imptor_data (nitors,iitors,itors1,itors2,itors3)
       call set_inform_data (maxask,digits,iprint,iwrite,isend,
-     &                      silent,verbose,debug,holdup,abort)
+     &                      debug,verbose,silent,holdup,abort)
       call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
      &                      ttx,tty,tbf,tbx,tby,tbxy,ktt)
       call set_kvdwpr_data (maxnvp,radpr,epspr,kvpr)

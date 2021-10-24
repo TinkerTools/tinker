@@ -174,7 +174,7 @@ c
             a = a / c
             b = b / c
             c = 0.0d0
-            if (debug) then
+            if (debug .ne. 0) then
                write (iout,30)  ia
    30          format (/,' XYZATM  --  Warning, Sum of Bond Angles',
      &                    ' Too Large at Atom',i6)

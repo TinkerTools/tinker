@@ -81,7 +81,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nion.ne.0 .and. ndipole.ne.0) then
+      if (debug.ne.0 .and. nion.ne.0 .and. ndipole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Charge-Dipole Interactions :',
@@ -164,7 +164,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 25.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if (debug.ne.0 .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)
@@ -266,7 +266,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                      huge = (abs(e) .gt. 25.0d0)
-                     if ((debug.and.e.ne.0.0d0)
+                     if ((debug.ne.0 .and. e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.

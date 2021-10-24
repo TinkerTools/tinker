@@ -135,7 +135,7 @@ c
 c
 c     print a final status message before exiting Tinker
 c
-      if (debug) then
+      if (debug .ne. 0) then
          write (iout,10)
    10    format (/,' Tinker is Exiting following Normal Termination')
       end if

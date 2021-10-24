@@ -129,7 +129,7 @@ c
 c
 c     print a message indicating the number of replicates used
 c
-      if (debug .and. ncell.gt.1) then
+      if (debug.ne.0 .and. ncell.gt.1) then
          if (max(nx,ny,nz) .lt. 10) then
             write (iout,20)  nx,ny,nz
    20       format (/,' REPLICA  --  Period Boundaries via',i2,' x',

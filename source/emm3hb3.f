@@ -170,7 +170,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nvdw.ne.0) then
+      if (debug.ne.0 .and. nvdw.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual van der Waals Interactions :',
@@ -336,7 +336,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 10.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  if ((debug.ne.0 .and. e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -526,7 +526,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                      huge = (e .gt. 10.0d0)
-                     if ((debug.and.e.ne.0.0d0)
+                     if ((debug.ne.0 .and. e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -675,7 +675,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nvdw.ne.0) then
+      if (debug.ne.0 .and. nvdw.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual van der Waals Interactions :',
@@ -908,7 +908,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 10.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  if ((debug.ne.0 .and. e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1063,7 +1063,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nvdw.ne.0) then
+      if (debug.ne.0 .and. nvdw.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual van der Waals Interactions :',
@@ -1097,7 +1097,7 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
 !$OMP& off2,radmin,epsilon,radmin4,epsilon4,radhbnd,epshbnd,
 !$OMP& dielec,atomic,bl,bndlist,abuck,bbuck,cbuck,cut2,c0,c1,
-!$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
+!$OMP& c2,c3,c4,c5,molcule,name,debug,verbose,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c
@@ -1240,7 +1240,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 10.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  if ((debug.ne.0 .and. e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.

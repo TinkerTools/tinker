@@ -51,7 +51,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nbond.ne.0) then
+      if (debug.ne.0 .and. nbond.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Bond Stretching Interactions :',
@@ -63,7 +63,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& name,debug,verbose,header,iout)
 !$OMP& shared(eb,neb,aeb)
 !$OMP DO reduction(+:eb,neb,aeb) schedule(guided)
 c
@@ -122,7 +122,7 @@ c
 c     print a message if the energy of this interaction is large
 c
             huge = (e .gt. 5.0d0)
-            if (debug .or. (verbose.and.huge)) then
+            if (debug.ne.0 .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,20)

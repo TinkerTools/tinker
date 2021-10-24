@@ -36,7 +36,7 @@ c
 c
 c     set option control flags based desired analysis types
 c
-      debug = .false.
+      debug = 0
       allocate (derivs(3,n))
       call gradient (energy,derivs)
       deallocate (derivs)

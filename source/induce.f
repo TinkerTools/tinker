@@ -75,7 +75,7 @@ c
 c
 c     print out a list of the final induced dipole moments
 c
-      if (debug .and. use_polar) then
+      if (use_polar .and. debug.ne.0) then
          header = .true.
          do ii = 1, npole
             i = ipole(ii)
@@ -489,7 +489,7 @@ c
             epsold = eps
             eps = max(epsd,epsp)
             eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
+            if (debug .ne. 0) then
                if (iter .eq. 1) then
                   write (iout,10)
    10             format (/,' Determination of SCF Induced Dipole',
@@ -533,7 +533,7 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (debug .or. polprt) then
+         if (polprt .or. debug.ne.0) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
      &                 7x,'RMS Residual',f15.10)
@@ -4810,7 +4810,7 @@ c
             epsold = eps
             eps = max(epsd,epsp,epsds,epsps)
             eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
+            if (debug .ne. 0) then
                if (iter .eq. 1) then
                   write (iout,10)
    10             format (/,' Determination of Induced Dipole',
@@ -4863,7 +4863,7 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (debug) then
+         if (debug .ne. 0) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)
@@ -6133,7 +6133,7 @@ c
             epsold = eps
             eps = max(epsd,epsp,epsds,epsps)
             eps = debye * sqrt(eps/dble(npolar))
-            if (debug) then
+            if (debug .ne. 0) then
                if (iter .eq. 1) then
                   write (iout,10)
    10             format (/,' Determination of Induced Dipole',
@@ -6186,7 +6186,7 @@ c
 c
 c     print the results from the conjugate gradient iteration
 c
-         if (debug) then
+         if (debug .ne. 0) then
             write (iout,30)  iter,eps
    30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)

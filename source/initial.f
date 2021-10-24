@@ -147,9 +147,9 @@ c
 c
 c     flags for information levels within the program
 c
-      silent = .false.
+      debug = 0
       verbose = .false.
-      debug = .false.
+      silent = .false.
       abort = .false.
 c
 c     flag for use of atom groups

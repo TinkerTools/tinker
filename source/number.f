@@ -78,7 +78,7 @@ c
          else if (letter .eq. '9') then
             digit = 9
          else
-            if (debug) then
+            if (debug .ne. 0) then
                write (iout,30)
    30          format (/,' NUMBER  --  Non-Numeric Characters Found',
      &                    ' in Numeral String')

@@ -77,7 +77,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nangle.ne.0) then
+      if (debug.ne.0 .and. nangle.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Angle Bending Interactions :',
@@ -89,8 +89,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nangle,iang,anat,ak,afld,
 !$OMP& use,x,y,z,cang,qang,pang,sang,angtyp,angunit,eps,use_group,
-!$OMP& use_polymer,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& use_polymer,name,debug,verbose,header,iout)
 !$OMP& shared(ea,nea,aea)
 !$OMP DO reduction(+:ea,nea,aea) schedule(guided)
 c
@@ -178,7 +177,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                huge = (e .gt. 5.0d0)
-               if (debug .or. (verbose.and.huge)) then
+               if (debug.ne.0 .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,20)
@@ -266,7 +265,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                huge = (e .gt. 5.0d0)
-               if (debug .or. (verbose.and.huge)) then
+               if (debug.ne.0 .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,40)

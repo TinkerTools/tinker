@@ -33,8 +33,8 @@ c     set default values for information and output variables
 c
       digits = 4
       abort = .false.
+      debug = 0
       verbose = .false.
-      debug = .false.
       holdup = .false.
       archive = .true.
       noversion = .false.
@@ -47,10 +47,10 @@ c
       do i = 1, narg-1
          string = arg(i)
          call upcase (string)
-         if (string(1:2) .eq. '-V') then
+         if (string(1:2) .eq. '-D') then
             verbose = .true.
-         else if (string(1:2) .eq. '-D') then
-            debug = .true.
+            debug = 1
+         else if (string(1:2) .eq. '-V') then
             verbose = .true.
          end if
       end do
@@ -64,11 +64,12 @@ c
          call upcase (keyword)
          if (keyword(1:7) .eq. 'DIGITS ') then
             string = record(next:240)
-            read (string,*,err=10)  digits
-         else if (keyword(1:8) .eq. 'VERBOSE ') then
-            verbose = .true.
+            read (string,*,err=10,end=10)  digits
          else if (keyword(1:6) .eq. 'DEBUG ') then
-            debug = .true.
+            verbose = .true.
+            string = record(next:240)
+            read (string,*,err=10,end=10)  debug
+         else if (keyword(1:8) .eq. 'VERBOSE ') then
             verbose = .true.
          else if (keyword(1:11) .eq. 'EXIT-PAUSE ') then
             holdup = .true.

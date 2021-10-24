@@ -151,7 +151,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. npole.ne.0) then
+      if (debug.ne.0 .and. npole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Atomic Multipole Interactions :',
@@ -327,7 +327,7 @@ c
 c     print message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  if ((debug.ne.0 .and. e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -535,7 +535,7 @@ c
 c     print message if the energy of this interaction is large
 c
                         huge = (abs(e) .gt. 100.0d0)
-                        if ((debug.and.e.ne.0.0d0)
+                        if ((debug.ne.0 .and. e.ne.0.0d0)
      &                        .or. (verbose.and.huge)) then
                            if (header) then
                               header = .false.
@@ -688,7 +688,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. npole.ne.0) then
+      if (debug.ne.0 .and. npole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Atomic Multipole Interactions :',
@@ -702,7 +702,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,pval,
 !$OMP& palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,
 !$OMP& m4scale,m5scale,f,nelst,elst,use_chgpen,use_group,use_intra,
-!$OMP& use_bounds,off2,molcule,name,verbose,debug,header,iout)
+!$OMP& use_bounds,off2,molcule,name,debug,verbose,header,iout)
 !$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
 !$OMP DO reduction(+:em,nem,aem,einter) schedule(guided)
 c
@@ -875,7 +875,7 @@ c
 c     print message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 100.0d0)
-                  if ((debug.and.e.ne.0.0d0)
+                  if ((debug.ne.0 .and. e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1143,7 +1143,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. npole.ne.0) then
+      if (debug.ne.0 .and. npole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Atomic Multipole Interactions :',
@@ -1342,7 +1342,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                huge = (abs(efull) .gt. 100.0d0)
-               if ((debug.and.efull.ne.0.0d0)
+               if ((debug.ne.0 .and. efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
@@ -1578,7 +1578,7 @@ c
 c     print message if the energy of this interaction is large
 c
                      huge = (abs(efull) .gt. 100.0d0)
-                     if ((debug.and.efull.ne.0.0d0)
+                     if ((debug.ne.0 .and. efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -1841,7 +1841,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. npole.ne.0) then
+      if (debug.ne.0 .and. npole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Atomic Multipole Interactions :',
@@ -1855,7 +1855,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_bounds,f,off2,molcule,name,
-!$OMP& verbose,debug,header,iout)
+!$OMP& debug,verbose,header,iout)
 !$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
 !$OMP DO reduction(+:em,nem,aem,einter) schedule(guided)
 c
@@ -2051,7 +2051,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                huge = (abs(efull) .gt. 100.0d0)
-               if ((debug.and.efull.ne.0.0d0)
+               if ((debug.ne.0 .and. efull.ne.0.0d0)
      &               .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.

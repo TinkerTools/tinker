@@ -59,7 +59,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. npole.ne.0) then
+      if (debug.ne.0 .and. npole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Reaction Field Interactions :',
@@ -119,7 +119,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (eik .gt. 10.0d0)
-                  if (debug .or. (verbose.and.huge)) then
+                  if (debug.ne.0 .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,20)

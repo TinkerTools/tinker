@@ -143,7 +143,7 @@ c
      &              ' not Satisfied')
          call prterr
          call fatal
-      else if (debug) then
+      else if (debug .ne. 0) then
          write (iout,20)  niter
    20    format (' RATTLE   --  Distance Constraints met at',i6,
      &              ' Iterations')
@@ -333,7 +333,7 @@ c
      &              ' not Satisfied')
          call prterr
          call fatal
-      else if (debug) then
+      else if (debug .ne. 0) then
          write (iout,20)  niter
    20    format (' RATTLE2  --  Velocity Constraints met at',i6,
      &              ' Iterations')
@@ -500,7 +500,7 @@ c
      &              ' not Satisfied')
          call prterr
          call fatal
-      else if (debug) then
+      else if (debug .ne. 0) then
          write (iout,20)  niter
    20    format (' SHAKE   --  Distance Constraints met at',i6,
      &              ' Iterations')
@@ -654,7 +654,7 @@ c
      &              ' not Satisfied')
          call prterr
          call fatal
-      else if (debug) then
+      else if (debug .ne. 0) then
          write (iout,20)  niter
    20    format (' SHAKE2  --  Gradient Constraints met at',i6,
      &              ' Iterations')

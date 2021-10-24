@@ -78,7 +78,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug .and. nangtor.ne.0) then
+      if (debug.ne.0 .and. nangtor.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Angle-Torsion Interactions :',
@@ -88,9 +88,9 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
-!$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,eps,use_group,use_polymer,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,
+!$OMP& anat,tors1,tors2,tors3,use,x,y,z,atorunit,eps,use_group,
+!$OMP& use_polymer,name,debug,verbose,header,iout)
 !$OMP& shared(eat,neat,aeat)
 !$OMP DO reduction(+:eat,neat,aeat) schedule(guided)
 c
@@ -219,7 +219,7 @@ c
 c     print a message if the energy of this interaction is large
 c
             huge = (e .gt. 3.0d0)
-            if (debug .or. (verbose.and.huge)) then
+            if (debug.ne.0 .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,20)

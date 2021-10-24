@@ -172,10 +172,10 @@ c     setup to write out all of the individual energy terms
 c
       if (dodetail) then
          doenergy = .true.
-         debug = .true.
+         debug = 1
          verbose = .true.
       else
-         debug = .false.
+         debug = 0
       end if
 c
 c     reopen the coordinates file and read the first structure
@@ -231,9 +231,9 @@ c
 c     get the various electrostatic and inertial moments
 c
          if (domoment) then
-            debug = .false.
+            debug = 0
             call momyze
-            if (dodetail)  debug = .true.
+            if (dodetail)  debug = 1
          end if
 c
 c     energy partitioning over the individual atoms
@@ -251,9 +251,9 @@ c
 c     get and test the internal virial and pressure values
 c
          if (dovirial) then
-            debug = .false.
+            debug = 0
             call viriyze
-            if (dodetail)  debug = .true.
+            if (dodetail)  debug = 1
          end if
 c
 c     save output files with forces or induced dipoles
@@ -274,7 +274,7 @@ c
 c     perform any final tasks before program exit
 c
       close (unit=ixyz)
-      if (dodetail)  debug = .false.
+      if (dodetail)  debug = 0
       call final
       end
 c

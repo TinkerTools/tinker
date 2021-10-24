@@ -138,7 +138,7 @@ c
       itercut = politer
       epscut = poleps
       poleps = 0.0000000001d0
-      debug = .false.
+      debug = 0
       call chkpole
       call rotpole
 c
