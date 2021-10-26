@@ -86,7 +86,7 @@ c
 c!$   call kmp_set_stacksize_s (268435456)
 c!$   call kmp_set_blocktime (0)
 c
-c     atomic symbols for elements
+c     atomic symbols, weights and radii
 c
       call initatom
 c
@@ -145,7 +145,7 @@ c
       planf = 0
       planb = 0
 c
-c     flags for information levels within the program
+c     information levels within the program
 c
       debug = 0
       verbose = .false.

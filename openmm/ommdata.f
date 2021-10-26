@@ -97,7 +97,7 @@ c
       call set_bound_data (polycut,polycut2,use_bounds,use_replica,
      &                     use_polymer)
       call set_boxes_data (xbox,ybox,zbox,alpha,beta,gamma,xbox2,
-     &                     ybox2,zbox2,box23,volbox,alpha_sin,alpha_cos,
+     &                     ybox2,zbox2,box34,volbox,alpha_sin,alpha_cos,
      &                     beta_sin,beta_cos,gamma_sin,gamma_cos,
      &                     beta_term,gamma_term,lvec,recip,orthogonal,
      &                     monoclinic,triclinic,octahedron,dodecadron,
