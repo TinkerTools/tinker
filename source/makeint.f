@@ -319,7 +319,7 @@ c
                ndel = ndel + 1
                idel(1,ndel) = adjacent
                idel(2,ndel) = i1
-               if (debug .ne. 0) then
+               if (debug) then
                   write (iout,20)  i1
    20             format (/,' ADJACENT  --  Atom',i6,' not Attached',
      &                       ' to any Prior Atom')
@@ -351,7 +351,7 @@ c     if only one directly bonded atom is eligible, then use it
 c
       else if (nc .eq. 1) then
          adjacent = ic(1)
-         if (mode.eq.1 .or. debug.ne.0) then
+         if (mode.eq.1 .or. debug) then
             write (iout,40)  ic(1)
    40       format (/,' ADJACENT  --  Atom',i6,' is the only',
      &                 ' Connected Atom')

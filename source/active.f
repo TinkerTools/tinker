@@ -229,7 +229,7 @@ c
 c
 c     output the final list of the active atoms
 c
-      if (debug.ne.0 .and. nuse.gt.0 .and. nuse.lt.n) then
+      if (debug .and. nuse.gt.0 .and. nuse.lt.n) then
          write (iout,90)
    90    format (/,' List of Active Atoms for Energy',
      &              ' Calculations :',/)

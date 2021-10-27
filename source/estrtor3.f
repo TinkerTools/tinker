@@ -77,7 +77,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. nstrtor.ne.0) then
+      if (debug .and. nstrtor.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Stretch-Torsion Interactions :',
@@ -88,7 +88,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,eps,use_group,use_polymer,
-!$OMP& name,debug,verbose,header,iout)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ebt,nebt,aebt)
 !$OMP DO reduction(+:ebt,nebt,aebt) schedule(guided)
 c
@@ -225,7 +225,7 @@ c
 c     print a message if the energy of this interaction is large
 c
             huge = (abs(e) .gt. 3.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,20)

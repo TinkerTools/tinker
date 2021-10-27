@@ -122,7 +122,7 @@ c
      &                     use_group,use_intra,use_inter)
       call set_imptor_data (nitors,iitors,itors1,itors2,itors3)
       call set_inform_data (maxask,digits,iprint,iwrite,isend,
-     &                      debug,verbose,silent,holdup,abort)
+     &                      verbose,debug,silent,holdup,abort)
       call set_ktrtor_data (maxntt,maxtgrd,maxtgrd2,tnx,tny,
      &                      ttx,tty,tbf,tbx,tby,tbxy,ktt)
       call set_kvdwpr_data (maxnvp,radpr,epspr,kvpr)
@@ -139,9 +139,8 @@ c
       call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)
       call set_mplpot_data (m2scale,m3scale,m4scale,m5scale,use_chgpen)
-      call set_mpole_data (maxpole,npole,ipole,polsiz,pollist,
-     &                     zaxis,xaxis,yaxis,pole,rpole,spole,
-     &                     srpole,polaxe)
+      call set_mpole_data (maxpole,npole,ipole,polsiz,pollist,zaxis,
+     &                     xaxis,yaxis,pole,rpole,mono0,polaxe)
       call set_mutant_data (nmut,vcouple,imut,type0,class0,type1,
      &                      class1,lambda,tlambda,vlambda,elambda,
      &                      scexp,scalpha,mut)

@@ -219,8 +219,6 @@ c
       if (allocated(yaxis))  deallocate (yaxis)
       if (allocated(pole))  deallocate (pole)
       if (allocated(rpole))  deallocate (rpole)
-      if (allocated(spole))  deallocate (spole)
-      if (allocated(srpole))  deallocate (srpole)
       if (allocated(mono0))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
       if (allocated(np11))  deallocate (np11)
@@ -235,8 +233,6 @@ c
       allocate (yaxis(n))
       allocate (pole(maxpole,n))
       allocate (rpole(maxpole,n))
-      allocate (spole(maxpole,n))
-      allocate (srpole(maxpole,n))
       allocate (mono0(n))
       allocate (polaxe(n))
       allocate (np11(n))
@@ -522,22 +518,6 @@ c
          do k = 5, 13
             pole(k,i) = pole(k,i) * bohr**2 / 3.0d0
          end do
-      end do
-c
-c     compute and store the multipoles in spherical harmonics
-c     (q -> Q_00, z -> Q_10, x -> Q_11c, y -> Q_11s, zz -> Q_20,
-c     xz -> Q_21c, xz -> Q_21c, xx-yy -> Q_22c, xy -> Q_22s)
-c
-      do i = 1, n
-         spole(1,i) = pole(1,i)
-         spole(2,i) = pole(4,i)
-         spole(3,i) = pole(2,i)
-         spole(4,i) = pole(3,i)
-         spole(5,i) = pole(13,i)
-         spole(6,i) = 2.0d0 * root3 * pole(7,i)
-         spole(7,i) = 2.0d0 * root3 * pole(10,i)
-         spole(8,i) = root3 * (pole(5,i)-pole(9,i))
-         spole(9,i) = 2.0d0 * root3 * pole(6,i)
       end do
 c
 c     get the order of the multipole expansion at each site

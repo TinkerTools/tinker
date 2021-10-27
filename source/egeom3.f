@@ -134,7 +134,7 @@ c
             eg = eg + e
             aeg(ia) = aeg(ia) + e
             huge = (e .gt. 10.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,10)
@@ -199,7 +199,7 @@ c
                einter = einter + e
             end if
             huge = (e .gt. 10.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,60)
@@ -266,7 +266,7 @@ c
                einter = einter + e
             end if
             huge = (e .gt. 10.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,80)
@@ -381,7 +381,7 @@ c
                einter = einter + e
             end if
             huge = (e .gt. 10.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,100)
@@ -459,7 +459,7 @@ c
             einter = einter + e
          end if
          huge = (e .gt. 10.0d0)
-         if (debug.ne.0 .or. (verbose.and.huge)) then
+         if (debug .or. (verbose.and.huge)) then
             if (header) then
                header = .false.
                write (iout,120)
@@ -516,7 +516,7 @@ c
             aeg(ic) = aeg(ic) + 0.25d0*e
             aeg(id) = aeg(id) + 0.25d0*e
             huge = (e .gt. 10.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,140)
@@ -557,7 +557,7 @@ c
                   aeg(i) = aeg(i) + 0.5d0*e
                   aeg(k) = aeg(k) + 0.5d0*e
                   huge = (e .gt. 10.0d0)
-                  if (debug.ne.0 .or. (verbose.and.huge)) then
+                  if (debug .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
                         write (iout,160)
@@ -602,7 +602,7 @@ c
                eg = eg + e
                aeg(i) = aeg(i) + e
                huge = (e .gt. 10.0d0)
-               if (debug.ne.0 .or. (verbose.and.huge)) then
+               if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,180)

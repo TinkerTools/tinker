@@ -100,7 +100,7 @@ c
 c
 c     print a header for the molecular orbital calculation
 c
-         if (debug .ne. 0) then
+         if (debug) then
             if (nconj .eq. 1) then
                write (iout,30)
    30          format (/,' Modified Pariser-Parr-Pople Molecular',
@@ -445,7 +445,7 @@ c
 c
 c     print out results for the SCF computation
 c
-         if (debug .ne. 0) then
+         if (debug) then
             if (mode .eq. 'PLANAR') then
                write (iout,20)
    20          format (/,' SCF-MO Calculation for Planar System :')
@@ -502,7 +502,7 @@ c
 c
 c     now, get the bond orders (compute p and p*b)
 c
-         if (debug .ne. 0) then
+         if (debug) then
             write (iout,180)
   180       format (/,' Pisystem Bond Orders')
          end if
@@ -518,7 +518,7 @@ c
             else if (mode .eq. 'NONPLN') then
                pnpl(k) = p
             end if
-            if (debug .ne. 0) then
+            if (debug) then
                i = ibnd(1,ibpi(1,k))
                j = ibnd(2,ibpi(1,k))
                write (iout,190)  i,j,p
@@ -780,7 +780,7 @@ c
 c
 c     modify the stretching constants and natural bond lengths
 c
-      if (debug.ne.0 .and. nbpi.ne.0) then
+      if (debug .and. nbpi.ne.0) then
          write (iout,10)
    10    format (/,' Altered Bond Stretching Parameters',
      &              ' for Pi-System :',
@@ -793,7 +793,7 @@ c
          ib = ibnd(2,j)
          bk(j) = bkpi(j) - kslope(j) * (1.0d0-pnpl(i))
          bl(j) = blpi(j) + lslope(j) * (1.0d0-pnpl(i))
-         if (debug .ne. 0) then
+         if (debug) then
             write (iout,20)  ia,name(ia),ib,name(ib),bkpi(j),
      &                       blpi(j),bk(j),bl(j)
    20       format (' Bond',6x,2(i7,'-',a3),6x,
@@ -803,7 +803,7 @@ c
 c
 c     modify the 2-fold torsional constants across pibonds
 c
-      if (debug.ne.0 .and. ntpi.ne.0) then
+      if (debug .and. ntpi.ne.0) then
          write (iout,30)
    30    format (/,' Altered 2-Fold Torsional Parameters',
      &              ' for Pi-System :',
@@ -818,7 +818,7 @@ c
          ic = itors(3,j)
          id = itors(4,j)
          tors2(1,j) = pbpl(k) * torsp2(j)
-         if (debug .ne. 0) then
+         if (debug) then
             write (iout,40)  ia,name(ia),ib,name(ib),ic,name(ic),
      &                       id,name(id),torsp2(j),tors2(1,j)
    40       format (' Torsion',3x,4(i7,'-',a3),2x,f8.3,2x,'-->',f8.3)

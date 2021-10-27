@@ -235,7 +235,7 @@ c
          dphids = -trq(1)*s(1) - trq(2)*s(2) - trq(3)*s(3)
       end if
 c
-c     force distribution for the Z-Only local coordinate method
+c     force distribution for the Z-Only local frame method
 c
       if (axetyp .eq. 'Z-Only') then
          do j = 1, 3
@@ -245,7 +245,7 @@ c
             frcz(j) = frcz(j) + du
          end do
 c
-c     force distribution for the Z-then-X local coordinate method
+c     force distribution for the Z-then-X local frame method
 c
       else if (axetyp .eq. 'Z-then-X') then
          do j = 1, 3
@@ -258,7 +258,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Bisector local coordinate method
+c     force distribution for the Bisector local frame method
 c
       else if (axetyp .eq. 'Bisector') then
          do j = 1, 3
@@ -271,7 +271,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Z-Bisect local coordinate method
+c     force distribution for the Z-Bisect local frame method
 c
       else if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -289,7 +289,7 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for the 3-Fold local coordinate method
+c     force distribution for the 3-Fold local frame method
 c
       else if (axetyp .eq. '3-Fold') then
          p(1) = u(1) + v(1) + w(1)

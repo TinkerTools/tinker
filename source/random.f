@@ -126,7 +126,7 @@ c
 c
 c     print the value of the current random number
 c
-c     if (debug .ne. 0) then
+c     if (debug) then
 c        write (iout,30)  random
 c  30    format (' RANDOM  --  The Random Number Value is',f12.8)
 c     end if
@@ -180,7 +180,7 @@ c
 c
 c     print the value of the current random number
 c
-c     if (debug .ne. 0) then
+c     if (debug) then
 c        write (iout,20)  normal
 c  20    format (' NORMAL  --  The Random Number Value is',f12.8)
 c     end if
@@ -234,7 +234,7 @@ c
 c
 c     print the components of the random unit vector
 c
-c     if (debug .ne. 0) then
+c     if (debug) then
 c        write (iout,10)  vector(1),vector(2),vector(3)
 c  10    format (' RANVEC  --  The Random Vector is',3f10.4)
 c     end if

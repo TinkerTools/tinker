@@ -238,7 +238,7 @@ c
 c
 c     output the final list of atoms in each group
 c
-      if (use_group .and. debug.ne.0) then
+      if (use_group .and. debug) then
          do i = 1, ngrp
             size = igrp(2,i) - igrp(1,i) + 1
             if (size .ne. 0) then
@@ -252,7 +252,7 @@ c
 c
 c     output the weights for intragroup and intergroup interactions
 c
-      if (use_group .and. debug.ne.0) then
+      if (use_group .and. debug) then
          header = .true.
          do i = 0, ngrp
             do j = i, ngrp

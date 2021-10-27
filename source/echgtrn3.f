@@ -116,7 +116,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. nct.ne.0) then
+      if (debug .and. nct.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Charge Transfer Interactions :',
@@ -214,7 +214,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 10.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -349,7 +349,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                         huge = (e .gt. 10.0d0)
-                        if ((debug.ne.0 .and. e.ne.0.0d0)
+                        if ((debug.and.e.ne.0.0d0)
      &                        .or. (verbose.and.huge)) then
                            if (header) then
                               header = .false.
@@ -484,7 +484,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. nct.ne.0) then
+      if (debug .and. nct.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Charge Transfer Interactions :',
@@ -634,7 +634,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 10.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -766,7 +766,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. nct.ne.0) then
+      if (debug .and. nct.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Charge Transfer Interactions :',
@@ -780,7 +780,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
 !$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,off2,
-!$OMP& cut2,molcule,c0,c1,c2,c3,c4,c5,name,debug,verbose,
+!$OMP& cut2,molcule,c0,c1,c2,c3,c4,c5,name,verbose,debug,
 !$OMP& header,iout)
 !$OMP& firstprivate(mscale) shared(ect,nect,aect,einter)
 !$OMP DO reduction(+:ect,nect,aect,einter) schedule(guided)
@@ -876,7 +876,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 10.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.

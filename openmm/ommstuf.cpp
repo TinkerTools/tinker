@@ -366,8 +366,8 @@ struct {
    int iprint;
    int iwrite;
    int isend;
-   int debug;
    int verbose;
+   int debug;
    int silent;
    int holdup;
    int abort;
@@ -476,8 +476,7 @@ struct {
    int* yaxis;
    double* pole;
    double* rpole;
-   double* spole;
-   double* srpole;
+   double* mono0;
    char* polaxe;
 } mpole__;
 
@@ -1257,7 +1256,7 @@ void set_imptor_data_ (int* nitors, int* iitors, double* itors1,
 }
 
 void set_inform_data_ (int* maxask, int* digits, int* iprint, int* iwrite,
-                       int* isend, int* debug, int* verbose, int* silent,
+                       int* isend, int* verbose, int* debug, int* silent,
                        int* holdup, int* abort) {
 
    inform__.maxask = *maxask;
@@ -1265,8 +1264,8 @@ void set_inform_data_ (int* maxask, int* digits, int* iprint, int* iwrite,
    inform__.iprint = *iprint;
    inform__.iwrite = *iwrite;
    inform__.isend = *isend;
-   inform__.debug = *debug;
    inform__.verbose = *verbose;
+   inform__.debug = *debug;
    inform__.silent = *silent;
    inform__.holdup = *holdup;
    inform__.abort = *abort;
@@ -1390,8 +1389,8 @@ void set_mplpot_data_ (double* m2scale, double* m3scale, double* m4scale,
 
 void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
                       int* pollist, int* zaxis, int* xaxis, int* yaxis,
-                      double* pole, double* rpole, double* spole,
-                      double* srpole, char* polaxe ) {
+                      double* pole, double* rpole, double* mono0,
+                      char* polaxe ) {
 
    mpole__.maxpole = *maxpole;
    mpole__.npole = *npole;
@@ -1403,8 +1402,7 @@ void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
    mpole__.yaxis = yaxis;
    mpole__.pole = pole;
    mpole__.rpole = rpole;
-   mpole__.spole = spole;
-   mpole__.srpole = srpole;
+   mpole__.mono0 = mono0;
    mpole__.polaxe = polaxe;
 }
 

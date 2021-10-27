@@ -276,7 +276,7 @@ c
 c     check for a nonzero number of degrees of freedom
 c
       if (nfree .lt. 0)  nfree = 0
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,50)  nfree
    50    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
       end if

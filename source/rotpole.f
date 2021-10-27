@@ -21,34 +21,15 @@ c
       implicit none
       integer i
       real*8 a(3,3)
-c     real*8 d1(3,3)
-c     real*8 d2(5,5)
-c     logical use_qi
+      logical planar
 c
 c
 c     rotate the atomic multipoles at each site in turn
 c
       do i = 1, npole
-         call rotmat (i,a)
-         call rotsite (i,a)
+         call rotmat (i,a,planar)
+         call rotsite (i,a,planar)
       end do
-c
-c     set QI dipole rotation matrix by permuting the Cartesian
-c     rotation matrix to adhere to spherical harmonic ordering
-c
-c     do i = 1, npole
-c        d1(1,1) = a(3,3)
-c        d1(2,1) = a(3,1)
-c        d1(3,1) = a(3,2)
-c        d1(1,2) = a(1,3)
-c        d1(2,2) = a(1,1)
-c        d1(3,2) = a(1,2)
-c        d1(1,3) = a(2,3)
-c        d1(2,3) = a(2,1)
-c        d1(3,3) = a(2,2)
-c        call shrotmat (d1,d2)
-c        call shrotsite (i,d1,d2)
-c     end do
       return
       end
 c
@@ -64,19 +45,21 @@ c     "rotmat" finds the rotation matrix that rotates the local
 c     coordinate system into the global frame at a multipole site
 c
 c
-      subroutine rotmat (i,a)
+      subroutine rotmat (i,a,planar)
       use atoms
       use mpole
       implicit none
       integer i,ii
       integer ix,iy,iz
-      real*8 r,dot
+      real*8 r,dot,eps
       real*8 xi,yi,zi
       real*8 dx,dy,dz
       real*8 dx1,dy1,dz1
       real*8 dx2,dy2,dz2
       real*8 dx3,dy3,dz3
       real*8 a(3,3)
+      real*8 geometry
+      logical planar
 c
 c
 c     get coordinates and frame definition for the multipole site
@@ -89,6 +72,11 @@ c
       ix = xaxis(i)
       iy = abs(yaxis(i))
 c
+c     set values to mark planarity at Z-Bisect and 3-Fold sites
+c
+      planar = .false.
+      eps = -0.99d0
+c
 c     use the identity matrix as the default rotation matrix
 c
       a(1,1) = 1.0d0
@@ -98,7 +86,7 @@ c
       a(2,3) = 0.0d0
       a(3,3) = 1.0d0
 c
-c     z-only frame rotation matrix elements for z-axis only
+c     get Z-Only rotation matrix elements for z-axis only
 c
       if (polaxe(i) .eq. 'Z-Only') then
          dx = x(iz) - xi
@@ -125,7 +113,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     z-then-x frame rotation matrix elements for z- and x-axes
+c     get Z-then-X rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Z-then-X') then
          dx = x(iz) - xi
@@ -147,7 +135,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     bisector frame rotation matrix elements for z- and x-axes
+c     get Bisector rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. 'Bisector') then
          dx = x(iz) - xi
@@ -180,7 +168,8 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     z-bisect frame rotation matrix elements for z- and x-axes
+c     get Z-Bisect rotation matrix elements for z- and x-axes;
+c     use alternate x-axis if central atom is close to planar
 c
       else if (polaxe(i) .eq. 'Z-Bisect') then
          dx = x(iz) - xi
@@ -212,6 +201,13 @@ c
          dy = dy / r
          dz = dz / r
          dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
+c        if (dot .lt. eps) then
+c           planar = .true.
+c           dx = dy1*dz2 - dz1*dy2
+c           dy = dz1*dx2 - dx1*dz2
+c           dz = dx1*dy2 - dy1*dx2
+c           dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
+c        end if
          dx = dx - dot*a(1,3)
          dy = dy - dot*a(2,3)
          dz = dz - dot*a(3,3)
@@ -220,7 +216,7 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     3-fold frame rotation matrix elements for z- and x-axes
+c     get 3-Fold rotation matrix elements for z- and x-axes
 c
       else if (polaxe(i) .eq. '3-Fold') then
          dx = x(iz) - xi
@@ -282,7 +278,7 @@ c     specified site into the global coordinate frame by applying
 c     a rotation matrix
 c
 c
-      subroutine rotsite (isite,a)
+      subroutine rotsite (isite,a,planar)
       use atoms
       use mpole
       implicit none
@@ -291,6 +287,7 @@ c
       real*8 a(3,3)
       real*8 mp(3,3)
       real*8 rp(3,3)
+      logical planar
 c
 c
 c     monopoles have the same value in any coordinate frame
@@ -336,170 +333,15 @@ c
             k = k + 1
          end do
       end do
-      return
-      end
 c
+c     modify multipoles at near planar sites using Z-Bisect frame
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine shrotmat  --  QI quadrupole rotation matrix  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "shrotmat" finds the rotation matrix that converts spherical
-c     harmonic quadrupoles from the local to the global frame given
-c     the required dipole rotation matrix
-c
-c
-      subroutine shrotmat (d1,d2)
-      use math
-      implicit none
-      real*8 d1(3,3)
-      real*8 d2(5,5)
-c
-c
-c     build the quadrupole rotation matrix
-c
-      d2(1,1) = 0.5d0*(3.0d0*d1(1,1)*d1(1,1) - 1.0d0)
-      d2(2,1) = root3*d1(1,1)*d1(2,1)
-      d2(3,1) = root3*d1(1,1)*d1(3,1)
-      d2(4,1) = 0.5d0*root3*(d1(2,1)*d1(2,1) - d1(3,1)*d1(3,1))
-      d2(5,1) = root3*d1(2,1)*d1(3,1)
-      d2(1,2) = root3*d1(1,1)*d1(1,2)
-      d2(2,2) = d1(2,1)*d1(1,2) + d1(1,1)*d1(2,2)
-      d2(3,2) = d1(3,1)*d1(1,2) + d1(1,1)*d1(3,2)
-      d2(4,2) = d1(2,1)*d1(2,2) - d1(3,1)*d1(3,2)
-      d2(5,2) = d1(3,1)*d1(2,2) + d1(2,1)*d1(3,2)
-      d2(1,3) = root3*d1(1,1)*d1(1,3)
-      d2(2,3) = d1(2,1)*d1(1,3) + d1(1,1)*d1(2,3)
-      d2(3,3) = d1(3,1)*d1(1,3) + d1(1,1)*d1(3,3)
-      d2(4,3) = d1(2,1)*d1(2,3) - d1(3,1)*d1(3,3)
-      d2(5,3) = d1(3,1)*d1(2,3) + d1(2,1)*d1(3,3)
-      d2(1,4) = 0.5d0*root3*(d1(1,2)*d1(1,2) - d1(1,3)*d1(1,3))
-      d2(2,4) = d1(1,2)*d1(2,2) - d1(1,3)*d1(2,3)
-      d2(3,4) = d1(1,2)*d1(3,2) - d1(1,3)*d1(3,3)
-      d2(4,4) = 0.5d0*(d1(2,2)*d1(2,2) - d1(3,2)*d1(3,2)
-     &             - d1(2,3)*d1(2,3) + d1(3,3)*d1(3,3))
-      d2(5,4) = d1(2,2)*d1(3,2) - d1(2,3)*d1(3,3)
-      d2(1,5) = root3*d1(1,2)*d1(1,3)
-      d2(2,5) = d1(2,2)*d1(1,3) + d1(1,2)*d1(2,3)
-      d2(3,5) = d1(3,2)*d1(1,3) + d1(1,2)*d1(3,3)
-      d2(4,5) = d1(2,2)*d1(2,3) - d1(3,2)*d1(3,3)
-      d2(5,5) = d1(3,2)*d1(2,3) + d1(2,2)*d1(3,3)
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine shrotsite  --  rotate SH mpoles local to global  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "shrotsite" converts spherical harmonic multipoles from the
-c     local to the global frame given required rotation matrices
-c
-c
-      subroutine shrotsite (i,d1,d2)
-      use mpole
-      implicit none
-      integer i
-      real*8 d1(3,3)
-      real*8 d2(5,5)
-c
-c
-c     find the global frame spherical harmonic multipoles
-c
-      srpole(1,i) = spole(1,i)
-      srpole(2,i) = spole(2,i)*d1(1,1) + spole(3,i)*d1(2,1)
-     &                 + spole(4,i)*d1(3,1)
-      srpole(3,i) = spole(2,i)*d1(1,2) + spole(3,i)*d1(2,2)
-     &                 + spole(4,i)*d1(3,2)
-      srpole(4,i) = spole(2,i)*d1(1,3) + spole(3,i)*d1(2,3)
-     &                 + spole(4,i)*d1(3,3)
-      srpole(5,i) = spole(5,i)*d2(1,1) + spole(6,i)*d2(2,1)
-     &                 + spole(7,i)*d2(3,1) + spole(8,i)*d2(4,1)
-     &                 + spole(9,i)*d2(5,1)
-      srpole(6,i) = spole(5,i)*d2(1,2) + spole(6,i)*d2(2,2)
-     &                 + spole(7,i)*d2(3,2) + spole(8,i)*d2(4,2)
-     &                 + spole(9,i)*d2(5,2)
-      srpole(7,i) = spole(5,i)*d2(1,3) + spole(6,i)*d2(2,3)
-     &                 + spole(7,i)*d2(3,3) + spole(8,i)*d2(4,3)
-     &                 + spole(9,i)*d2(5,3)
-      srpole(8,i) = spole(5,i)*d2(1,4) + spole(6,i)*d2(2,4)
-     &                 + spole(7,i)*d2(3,4) + spole(8,i)*d2(4,4)
-     &                 + spole(9,i)*d2(5,4)
-      srpole(9,i) = spole(5,i)*d2(1,5) + spole(6,i)*d2(2,5)
-     &                 + spole(7,i)*d2(3,5) + spole(8,i)*d2(4,5)
-     &                 + spole(9,i)*d2(5,5)
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine qirotmat  --  QI interatomic rotation matrix  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "qirotmat" finds a rotation matrix that describes the
-c     interatomic vector
-c
-c
-      subroutine qirotmat (i,k,rinv,d1)
-      use atoms
-      use mpole
-      implicit none
-      integer i,k
-      real*8 rinv,r,dot
-      real*8 dx,dy,dz
-      real*8 a(3,3)
-      real*8 d1(3,3)
-c
-c     set the z-axis to be the interatomic vector
-c
-      dx = x(k) - x(i)
-      dy = y(k) - y(i)
-      dz = z(k) - z(i)
-      a(1,3) = dx * rinv
-      a(2,3) = dy * rinv
-      a(3,3) = dz * rinv
-c
-c     find an x-axis that is orthogonal to the z-axis
-c
-      if (y(i).ne.y(k) .or. z(i).ne.z(k)) then
-        dx = dx + 1.0d0 
-      else
-        dy = dy + 1.0d0 
+      if (planar) then
+         rpole(2,isite) = 0.0d0
+         rpole(7,isite) = 0.0d0
+         rpole(11,isite) = 0.0d0
+         rpole(5,isite) = 0.5d0 * (rpole(5,isite)+rpole(9,isite))
+         rpole(9,isite) = rpole(5,isite)
       end if
-      dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
-      dx = dx - dot*a(1,3)
-      dy = dy - dot*a(2,3)
-      dz = dz - dot*a(3,3)
-      r = 1.d0 / sqrt(dx*dx + dy*dy + dz*dz)
-      a(1,1) = dx * r
-      a(2,1) = dy * r
-      a(3,1) = dz * r
-c
-c     get rotation matrix elements for the y-axis
-c
-      a(1,2) = a(3,1)*a(2,3) - a(2,1)*a(3,3)
-      a(2,2) = a(1,1)*a(3,3) - a(3,1)*a(1,3)
-      a(3,2) = a(2,1)*a(1,3) - a(1,1)*a(2,3)
-c
-c     reorder to account for spherical harmonics
-c
-      d1(1,1) = a(3,3)
-      d1(2,1) = a(1,3)
-      d1(3,1) = a(2,3)
-      d1(1,2) = a(3,1)
-      d1(2,2) = a(1,1)
-      d1(3,2) = a(2,1)
-      d1(1,3) = a(3,2)
-      d1(2,3) = a(1,2)
-      d1(3,3) = a(2,2)
       return
       end

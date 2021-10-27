@@ -159,7 +159,7 @@ c
 c
 c     write out the unrefined embedded atomic coordinate set
 c
-      if (debug .ne. 0) then
+      if (debug) then
          i = 0
          exist = .true.
          do while (exist)
@@ -296,7 +296,7 @@ c
 c
 c     print the normalized fractional distance distribution
 c
-      if (debug .ne. 0) then
+      if (debug) then
          title = 'after Refinement :'
          call fracdist (title)
       end if
@@ -883,7 +883,7 @@ c
 c
 c     output the atoms updated and amount of work required
 c
-c     if (debug .ne. 0) then
+c     if (debug) then
 c        write (iout,10)  p,q,np*nq
 c  10    format (' TRIFIX  --  Bounds Update for Atoms',2i6,
 c    &              ' with',i8,' Searches')
@@ -1615,7 +1615,7 @@ c
          write (iout,20)  (evl(i),i=1,neigen)
    20    format (5f15.4)
       end if
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,30)
    30    format (/,' Eigenvectors from Metric Matrix :',/)
          do i = 1, n

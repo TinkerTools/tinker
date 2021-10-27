@@ -166,7 +166,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. ndisp.ne.0) then
+      if (debug .and. ndisp.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Dispersion Interactions :',
@@ -306,7 +306,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 4.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -482,7 +482,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                      huge = (abs(e) .gt. 4.0d0)
-                     if ((debug.ne.0 .and. e.ne.0.0d0)
+                     if ((debug.and.e.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -606,7 +606,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. ndisp.ne.0) then
+      if (debug .and. ndisp.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Dispersion Interactions :',
@@ -619,7 +619,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,c0,c1,c2,
-!$OMP& c3,c4,c5,vcouple,vlambda,molcule,name,debug,verbose,header,iout)
+!$OMP& c3,c4,c5,vcouple,vlambda,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
 c
@@ -753,7 +753,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(e) .gt. 4.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -939,7 +939,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. ndisp.ne.0) then
+      if (debug .and. ndisp.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Dispersion Interactions :',
@@ -1074,7 +1074,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(efull) .gt. 4.0d0)
-                  if ((debug.ne.0 .and. efull.ne.0.0d0)
+                  if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -1246,7 +1246,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                      huge = (abs(efull) .gt. 4.0d0)
-                     if ((debug.ne.0 .and. efull.ne.0.0d0)
+                     if ((debug.and.efull.ne.0.0d0)
      &                     .or. (verbose.and.huge)) then
                         if (header) then
                            header = .false.
@@ -1428,7 +1428,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. ndisp.ne.0) then
+      if (debug .and. ndisp.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Dispersion Interactions :',
@@ -1441,7 +1441,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
-!$OMP& molcule,vcouple,vlambda,name,debug,verbose,header,iout)
+!$OMP& molcule,vcouple,vlambda,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
 c
@@ -1573,7 +1573,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (abs(efull) .gt. 4.0d0)
-                  if ((debug.ne.0 .and. efull.ne.0.0d0)
+                  if ((debug.and.efull.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.

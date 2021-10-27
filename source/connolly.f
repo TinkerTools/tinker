@@ -2749,7 +2749,7 @@ c
 c
 c     print out the decomposition of the area and volume
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,150)
   150    format (/,' Convex Surface Area for Individual Atoms :',/)
          k = 1

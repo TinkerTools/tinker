@@ -72,7 +72,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. npitors.ne.0) then
+      if (debug .and. npitors.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Pi-System Torsion Interactions :',
@@ -84,7 +84,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npitors,ipit,
 !$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer,
-!$OMP& name,debug,verbose,header,iout)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ept,nept,aept)
 !$OMP DO reduction(+:ept,nept,aept) schedule(guided)
 c
@@ -216,7 +216,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                huge = (e .gt. 5.0d0)
-               if (debug.ne.0 .or. (verbose.and.huge)) then
+               if (debug .or. (verbose.and.huge)) then
                   if (header) then
                      header = .false.
                      write (iout,20)

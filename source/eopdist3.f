@@ -58,7 +58,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. nopdist.ne.0) then
+      if (debug .and. nopdist.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Out-of-Plane Distance Interactions :',
@@ -70,7 +70,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer,
-!$OMP& name,debug,verbose,header,iout)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eopd,neopd,aeopd)
 !$OMP DO reduction(+:eopd,neopd,aeopd) schedule(guided)
 c
@@ -149,7 +149,7 @@ c
 c     print a message if the energy of this interaction is large
 c
             huge = (e .gt. 5.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,20)

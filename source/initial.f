@@ -147,8 +147,8 @@ c
 c
 c     information levels within the program
 c
-      debug = 0
       verbose = .false.
+      debug = .false.
       silent = .false.
       abort = .false.
 c

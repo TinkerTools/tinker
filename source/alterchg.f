@@ -57,7 +57,7 @@ c
       do i = 1, nion
          k = iion(i)
          pchg(i) = pchg0(i) + pdelta(k)
-         if (debug.ne.0 .and. pdelta(k).ne.0.0d0) then
+         if (debug .and. pdelta(k).ne.0.0d0) then
             if (header) then
                header = .false.
                write (iout,10)
@@ -77,7 +77,7 @@ c
          k = ipole(i)
          pole(1,i) = mono0(i) + pdelta(k)
          if (use_chgpen)  pval(i) = pval0(i) + pdelta(k)
-         if (debug.ne.0 .and. pdelta(k).ne.0.0d0) then
+         if (debug .and. pdelta(k).ne.0.0d0) then
             if (header) then
                header = .false.
                write (iout,30)

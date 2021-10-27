@@ -60,7 +60,7 @@ c     initialize random numbers and turn on extra printing
 c
       verbose = .false.
       value = random ()
-      debug = 1
+      debug = .true.
 c
 c     select either vdw, excluded or molecular volume and area
 c
@@ -131,7 +131,7 @@ c
 c     decide whether to provide full output for large systems
 c
       if (n .gt. 100) then
-         debug = 0
+         debug = .false.
          call nextarg (answer,exist)
          if (.not. exist) then
             write (iout,100)
@@ -143,7 +143,7 @@ c
             call gettext (record,answer,next)
          end if
          call upcase (answer)
-         if (answer .eq. 'Y')  debug = 1
+         if (answer .eq. 'Y')  debug = .true.
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -214,6 +214,5 @@ c
 c     perform any final tasks before program exit
 c
       close (unit=ixyz)
-      debug = 0
       call final
       end

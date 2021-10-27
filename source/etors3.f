@@ -102,7 +102,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. ntors.ne.0) then
+      if (debug .and. ntors.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Torsional Angle Interactions :',
@@ -114,7 +114,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,eps,use_group,use_polymer,
-!$OMP& name,debug,verbose,header,iout)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(et,net,aet)
 !$OMP DO reduction(+:et,net,aet) schedule(guided)
 c
@@ -240,7 +240,7 @@ c
 c     print a message if the energy of this interaction is large
 c
             huge = (e .gt. 5.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,20)
@@ -336,7 +336,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. ntors.ne.0) then
+      if (debug .and. ntors.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Torsional Angle Interactions :',
@@ -518,7 +518,7 @@ c
 c     print a message if the energy of this interaction is large
 c
             huge = (e .gt. 5.0d0)
-            if (debug.ne.0 .or. (verbose.and.huge)) then
+            if (debug .or. (verbose.and.huge)) then
                if (header) then
                   header = .false.
                   write (iout,20)

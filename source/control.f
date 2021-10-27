@@ -32,10 +32,10 @@ c
 c     set default values for information and output variables
 c
       digits = 4
-      abort = .false.
-      debug = 0
       verbose = .false.
+      debug = .false.
       holdup = .false.
+      abort = .false.
       archive = .true.
       noversion = .false.
       overwrite = .false.
@@ -48,8 +48,8 @@ c
          string = arg(i)
          call upcase (string)
          if (string(1:2) .eq. '-D') then
+            debug = .true.
             verbose = .true.
-            debug = 1
          else if (string(1:2) .eq. '-V') then
             verbose = .true.
          end if
@@ -66,9 +66,8 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  digits
          else if (keyword(1:6) .eq. 'DEBUG ') then
+            debug = .true.
             verbose = .true.
-            string = record(next:240)
-            read (string,*,err=10,end=10)  debug
          else if (keyword(1:8) .eq. 'VERBOSE ') then
             verbose = .true.
          else if (keyword(1:11) .eq. 'EXIT-PAUSE ') then

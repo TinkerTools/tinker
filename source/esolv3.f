@@ -156,7 +156,7 @@ c
       header = .true.
       do i = 1, n
          huge = (abs(aes(i)) .gt. 25.0d0)
-         if (debug.ne.0 .or. (verbose.and.huge)) then
+         if (debug .or. (verbose.and.huge)) then
             if (header) then
                header = .false.
                write (iout,10)
@@ -1132,7 +1132,7 @@ c
 c
 c     print the self-energy and cross-energy terms
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,10)
    10    format (/,' Generalized Kirkwood Self-Energies and',
      &              ' Cross-Energies :',
@@ -1214,7 +1214,7 @@ c
 c
 c     print the Poisson-Boltzmann solvation energy over atoms
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,10)
    10    format (/,' Poisson-Boltzmann Solvation Energies :',
      &           //,' Type',12x,'Atom Name',22x,'Energy',/)
@@ -1503,7 +1503,7 @@ c
 c
 c     print the energy of polarization of vacuum dipoles
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,10)
    10    format (/,' Implicit Solvation Vacuum Polarization',
      &              ' Energies :',
@@ -1868,7 +1868,7 @@ c
 c
 c     print the total dispersion energy and energy for each atom
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,10)
    10    format (/,' HCT Implicit Solvation Dispersion :',
      &           //,' Type',12x,'Atom Name',22x,'Energy',/)
@@ -1972,7 +1972,7 @@ c
 c
 c     print header for output of the detailed energy components
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,10)
    10    format (/,' Onion Shell Implicit Solvation Dispersion :',
      &           //,' Type',12x,'Atom Name',22x,'Energy',/)
@@ -2072,7 +2072,7 @@ c
 c
 c     print the dispersion energy for the current shell
 c
-c           if (debug .ne. 0) then
+c           if (debug) then
 c              write (iout,20)  i,inner,outer,fraction,
 c    &                          4.0d0*pi*awater*e
 c 20          format (' Onion Shell :',4x,i8,2f9.2,2f12.4)
@@ -2112,7 +2112,7 @@ c
 c
 c     print the total dispersion energy and energy for each atom
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,30)
    30    format ()
          do i = 1, n

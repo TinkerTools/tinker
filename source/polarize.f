@@ -365,7 +365,7 @@ c
             end do
             eps = debye * sqrt(eps/dble(npolar))
             epsold = eps
-            if (debug .ne. 0) then
+            if (debug) then
                if (iter .eq. 1) then
                   write (iout,10)
    10             format (/,' Determination of Induced Dipole',

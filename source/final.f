@@ -135,7 +135,7 @@ c
 c
 c     print a final status message before exiting Tinker
 c
-      if (debug .ne. 0) then
+      if (debug) then
          write (iout,10)
    10    format (/,' Tinker is Exiting following Normal Termination')
       end if
@@ -591,8 +591,6 @@ c
       if (allocated(yaxis))  deallocate (yaxis)
       if (allocated(pole))  deallocate (pole)
       if (allocated(rpole))  deallocate (rpole)
-      if (allocated(spole))  deallocate (spole)
-      if (allocated(srpole))  deallocate (srpole)
       if (allocated(mono0))  deallocate (mono0)
       if (allocated(polaxe))  deallocate (polaxe)
 c

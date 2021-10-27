@@ -150,7 +150,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. nrep.ne.0) then
+      if (debug .and. nrep.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Pauli Repulsion Interactions :',
@@ -335,7 +335,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 20.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.
@@ -556,7 +556,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                         huge = (e .gt. 20.0d0)
-                        if ((debug.ne.0 .and. e.ne.0.0d0)
+                        if ((debug.and.e.ne.0.0d0)
      &                        .or. (verbose.and.huge)) then
                            if (header) then
                               header = .false.
@@ -699,7 +699,7 @@ c
 c     print header information if debug output was requested
 c
       header = .true.
-      if (debug.ne.0 .and. npole.ne.0) then
+      if (debug .and. npole.ne.0) then
          header = .false.
          write (iout,10)
    10    format (/,' Individual Pauli Repulsion Interactions :',
@@ -714,7 +714,7 @@ c
 !$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
 !$OMP& nelst,elst,use,use_group,use_intra,use_bounds,reppolar,
 !$OMP& vcouple,vlambda,mut,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,
-!$OMP& name,debug,verbose,header,iout)
+!$OMP& name,verbose,debug,header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
 !$OMP DO reduction(+:er,ner,aer,einter) schedule(guided)
@@ -897,7 +897,7 @@ c
 c     print a message if the energy of this interaction is large
 c
                   huge = (e .gt. 20.0d0)
-                  if ((debug.ne.0 .and. e.ne.0.0d0)
+                  if ((debug.and.e.ne.0.0d0)
      &                  .or. (verbose.and.huge)) then
                      if (header) then
                         header = .false.

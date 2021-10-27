@@ -861,7 +861,7 @@ c
 c
 c     initialize some parameters for the upcoming optimization
 c
-      if (debug .eq. 0) then
+      if (debug) then
          iprint = 0
       else
          iprint = 1

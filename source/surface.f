@@ -562,7 +562,7 @@ c
 c
 c     print out the surface area values for each atom
 c
-c     if (debug .ne. 0) then
+c     if (debug) then
 c        write (iout,190)
 c 190    format (/,' Weighted Atomic Surface Areas Values :',
 c    &           //,4x,'Atom',7x,'Area Term',6x,'Weight',/)
@@ -1247,7 +1247,7 @@ c
 c
 c     print out the surface area and derivatives for each atom
 c
-c     if (debug .ne. 0) then
+c     if (debug) then
 c        write (iout,190)
 c 190    format (/,' Weighted Atomic Surface Areas and Derivatives :',
 c    &           //,4x,'Atom',7x,'Area Term',10x,'dA/dx',
