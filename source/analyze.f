@@ -1401,7 +1401,7 @@ c
                else if (angtyp(i) .eq. 'IN-PLANE') then
                   write (iout,360)  i,ia,ib,ic,ak(i),anat(i)
   360             format (i6,3x,3i6,13x,2f10.3,9x,'In-Plane')
-               else if (angtyp(i) .eq. 'IN-PLANE') then
+               else if (angtyp(i) .eq. 'LINEAR') then
                   write (iout,370)  i,ia,ib,ic,ak(i),anat(i)
   370             format (i6,3x,3i6,13x,2f10.3,9x,'Linear')
                else if (angtyp(i) .eq. 'FOURIER ') then

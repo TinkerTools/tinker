@@ -20,6 +20,7 @@ c
       use mpole
       implicit none
       integer i
+      real*8 angle
       real*8 a(3,3)
       logical planar
 c
@@ -27,8 +28,8 @@ c
 c     rotate the atomic multipoles at each site in turn
 c
       do i = 1, npole
-         call rotmat (i,a,planar)
-         call rotsite (i,a,planar)
+         call rotmat (i,a,planar,angle)
+         call rotsite (i,a,planar,angle)
       end do
       return
       end
@@ -45,20 +46,21 @@ c     "rotmat" finds the rotation matrix that rotates the local
 c     coordinate system into the global frame at a multipole site
 c
 c
-      subroutine rotmat (i,a,planar)
+      subroutine rotmat (i,a,planar,ratio)
       use atoms
+      use math
       use mpole
       implicit none
       integer i,ii
       integer ix,iy,iz
-      real*8 r,dot,eps
+      real*8 r,dot
+      real*8 eps,ratio
       real*8 xi,yi,zi
       real*8 dx,dy,dz
       real*8 dx1,dy1,dz1
       real*8 dx2,dy2,dz2
       real*8 dx3,dy3,dz3
       real*8 a(3,3)
-      real*8 geometry
       logical planar
 c
 c
@@ -74,8 +76,9 @@ c
 c
 c     set values to mark planarity at Z-Bisect and 3-Fold sites
 c
+      eps = 25.0d0
       planar = .false.
-      eps = -0.99d0
+      ratio = 1.0d0
 c
 c     use the identity matrix as the default rotation matrix
 c
@@ -201,12 +204,19 @@ c
          dy = dy / r
          dz = dz / r
          dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
-c        if (dot .lt. eps) then
+c        ratio = (180.0d0-radian*acos(dot)) / eps
+c        if (ratio .lt. 1.0d0) then
 c           planar = .true.
 c           dx = dy1*dz2 - dz1*dy2
 c           dy = dz1*dx2 - dx1*dz2
 c           dz = dx1*dy2 - dy1*dx2
 c           dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
+c           if (dot .lt. 0.0d0) then
+c              dx = -dx
+c              dy = -dy
+c              dz = -dz
+c              dot = -dot
+c           end if
 c        end if
          dx = dx - dot*a(1,3)
          dy = dy - dot*a(2,3)
@@ -278,17 +288,37 @@ c     specified site into the global coordinate frame by applying
 c     a rotation matrix
 c
 c
-      subroutine rotsite (isite,a,planar)
+      subroutine rotsite (isite,a,planar,ratio)
       use atoms
       use mpole
       implicit none
       integer i,j,k,m
       integer isite
+      real*8 ratio
+      real*8 sigmoid
+      real*8 spole(13)
       real*8 a(3,3)
       real*8 mp(3,3)
       real*8 rp(3,3)
       logical planar
 c
+c
+c     store and modify multipoles for planar Z-Bisect sites
+c
+      if (planar) then
+         do i = 1, 13
+            spole(i) = pole(i,isite)
+         end do
+c        pole(2,isite) = 0.0d0
+c        pole(7,isite) = 0.0d0
+c        pole(11,isite) = 0.0d0
+c        ratio = sigmoid(3.5d0,ratio)
+c        pole(2,isite) = ratio * pole(2,isite)
+c        pole(7,isite) = ratio * pole(7,isite)
+c        pole(11,isite) = ratio * pole(11,isite)
+c        pole(5,isite) = 0.5d0 * (pole(5,isite)+pole(9,isite))
+c        pole(9,isite) = pole(5,isite)
+      end if
 c
 c     monopoles have the same value in any coordinate frame
 c
@@ -334,14 +364,12 @@ c
          end do
       end do
 c
-c     modify multipoles at near planar sites using Z-Bisect frame
+c     restore multipoles to original at planar Z-Bisect sites
 c
       if (planar) then
-         rpole(2,isite) = 0.0d0
-         rpole(7,isite) = 0.0d0
-         rpole(11,isite) = 0.0d0
-         rpole(5,isite) = 0.5d0 * (rpole(5,isite)+rpole(9,isite))
-         rpole(9,isite) = rpole(5,isite)
+         do i = 1, 13
+            pole(i,isite) = spole(i)
+         end do
       end if
       return
       end

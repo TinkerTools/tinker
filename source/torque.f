@@ -127,7 +127,7 @@ c
          w(j) = w(j) / wsiz
       end do
 c
-c     build some additional axes needed for the Z-Bisect method
+c     build some additional axes for the Z-Bisect local frame
 c
       if (axetyp .eq. 'Z-Bisect') then
          r(1) = v(1) + w(1)
@@ -142,6 +142,17 @@ c
             r(j) = r(j) / rsiz
             s(j) = s(j) / ssiz
          end do
+      end if
+c
+c     negative of dot product of torque with unit vectors gives
+c     result of infinitesimal rotation around these vectors
+c
+      dphidu = -trq(1)*u(1) - trq(2)*u(2) - trq(3)*u(3)
+      dphidv = -trq(1)*v(1) - trq(2)*v(2) - trq(3)*v(3)
+      dphidw = -trq(1)*w(1) - trq(2)*w(2) - trq(3)*w(3)
+      if (axetyp .eq. 'Z-Bisect') then
+         dphidr = -trq(1)*r(1) - trq(2)*r(2) - trq(3)*r(3)
+         dphids = -trq(1)*s(1) - trq(2)*s(2) - trq(3)*s(3)
       end if
 c
 c     find the perpendicular and angle for each pair of axes
@@ -188,7 +199,7 @@ c
          end do
       end if
 c
-c     get sine and cosine of angles between the rotation axes
+c     find sine and cosine of angles between the rotation axes
 c
       uvcos = u(1)*v(1) + u(2)*v(2) + u(3)*v(3)
       uvsin = sqrt(1.0d0 - uvcos*uvcos)
@@ -205,7 +216,7 @@ c
          wssin = sqrt(1.0d0 - wscos*wscos)
       end if
 c
-c     compute the projection of v and w onto the ru-plane
+c     get projection of v and w onto the ru-plane for Z-Bisect
 c
       if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -224,18 +235,7 @@ c
          ut2sin = sqrt(1.0d0 - ut2cos*ut2cos)
       end if
 c
-c     negative of dot product of torque with unit vectors gives
-c     result of infinitesimal rotation along these vectors
-c
-      dphidu = -trq(1)*u(1) - trq(2)*u(2) - trq(3)*u(3)
-      dphidv = -trq(1)*v(1) - trq(2)*v(2) - trq(3)*v(3)
-      dphidw = -trq(1)*w(1) - trq(2)*w(2) - trq(3)*w(3)
-      if (axetyp .eq. 'Z-Bisect') then
-         dphidr = -trq(1)*r(1) - trq(2)*r(2) - trq(3)*r(3)
-         dphids = -trq(1)*s(1) - trq(2)*s(2) - trq(3)*s(3)
-      end if
-c
-c     force distribution for the Z-Only local frame method
+c     force distribution for Z-Only local coordinate frame
 c
       if (axetyp .eq. 'Z-Only') then
          do j = 1, 3
@@ -245,7 +245,7 @@ c
             frcz(j) = frcz(j) + du
          end do
 c
-c     force distribution for the Z-then-X local frame method
+c     force distribution for Z-then-X local coordinate frame
 c
       else if (axetyp .eq. 'Z-then-X') then
          do j = 1, 3
@@ -258,7 +258,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Bisector local frame method
+c     force distribution for Bisector local coordinate frame
 c
       else if (axetyp .eq. 'Bisector') then
          do j = 1, 3
@@ -271,7 +271,7 @@ c
             frcx(j) = frcx(j) + dv
          end do
 c
-c     force distribution for the Z-Bisect local frame method
+c     force distribution for Z-Bisect local coordinate frame
 c
       else if (axetyp .eq. 'Z-Bisect') then
          do j = 1, 3
@@ -289,7 +289,7 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for the 3-Fold local frame method
+c     force distribution for 3-Fold local coordinate frame
 c
       else if (axetyp .eq. '3-Fold') then
          p(1) = u(1) + v(1) + w(1)
