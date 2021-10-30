@@ -797,7 +797,7 @@ c
             ri2 = ri * ri
             do k = 1, n
                kc = class(k)
-               rk = rsolv(kc)
+               rk = rsolv(k)
                vk = vsolv(kc)
                rk2 = rk * rk
                alpha = max(width,ri/rk)

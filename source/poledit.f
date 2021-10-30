@@ -1342,7 +1342,6 @@ c
       real*8 xbd,ybd,zbd
       real*8 xcd,ycd,zcd
       real*8 c1,c2,c3,vol
-      real*8 a(3,3)
       logical check
 c
 c
@@ -1351,29 +1350,9 @@ c
       if (.not. allocated(pole))  allocate (pole(maxpole,n))
       if (.not. allocated(rpole))  allocate (rpole(maxpole,n))
 c
-c     store the global multipoles in the local frame array
-c
-      do i = 1, npole
-         do j = 1, 13
-            pole(j,i) = rpole(j,i)
-         end do
-      end do
-c
 c     rotate the multipoles from global frame to local frame
 c
-      do i = 1, npole
-         call rotmat (i,a)
-         call invert (3,a)
-         call rotsite (i,a)
-      end do
-c
-c     copy the rotated multipoles back to local frame array
-c
-      do i = 1, npole
-         do j = 1, 13
-            pole(j,i) = rpole(j,i)
-         end do
-      end do
+      call rotrpole
 c
 c     check the sign of multipole components at chiral sites;
 c     note "yaxis" sign is not flipped based on signed volume
@@ -1492,7 +1471,6 @@ c
       integer zaxe
       real*8 eps,ci,cj
       real*8 big,sum
-      real*8 a(3,3)
       logical query,change
       character*240 record
 c
@@ -1583,29 +1561,9 @@ c
          end do
       end if
 c
-c     store the global multipoles in the local frame array
-c
-      do i = 1, npole
-         do j = 1, 13
-            pole(j,i) = rpole(j,i)
-         end do
-      end do
-c
 c     rotate the multipoles from global frame to local frame
 c
-      do i = 1, npole
-         call rotmat (i,a)
-         call invert (3,a)
-         call rotsite (i,a)
-      end do
-c
-c     copy the rotated multipoles back to local frame array
-c
-      do i = 1, npole
-         do j = 1, 13
-            pole(j,i) = rpole(j,i)
-         end do
-      end do
+      call rotrpole
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -2778,6 +2736,7 @@ c
       real*8, allocatable :: conj(:,:)
       real*8, allocatable :: vec(:,:)
       logical done
+      logical planar
       character*5 truth
 c
 c
@@ -2966,7 +2925,7 @@ c
 c     rotate the induced dipoles into local coordinate frame
 c
       do i = 1, npole
-         call rotmat (i,rmt)
+         call rotmat (i,rmt,planar)
          call invert (3,rmt)
          do j = 1, 3
             utmp(j) = 0.0d0
