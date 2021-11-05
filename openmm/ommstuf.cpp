@@ -437,6 +437,7 @@ struct {
    int nfree;
    int irest;
    int bmnmix;
+   int nrespa;
    double arespa;
    int dorest;
    char integrate[MAX_STRING];
@@ -1348,12 +1349,14 @@ void set_limits_data_ (double* vdwcut, double* repcut, double* dispcut,
 }
 
 void set_mdstuf_data_ (int* mdstep, int* nfree, int* irest, int* bmnmix,
-                       double* arespa, int* dorest, char* integrate) {
+                       int* bmnmix, double* arespa, int* dorest,
+                       char* integrate) {
 
    mdstuf__.mdstep = *mdstep;
    mdstuf__.nfree = *nfree;
    mdstuf__.irest = *irest;
    mdstuf__.bmnmix = *bmnmix;
+   mdstuf__.nrespa = *nrespa;
    mdstuf__.arespa = *arespa;
    mdstuf__.dorest = *dorest;
    setNullTerminator (integrate, 11, mdstuf__.integrate);
