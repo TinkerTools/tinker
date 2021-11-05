@@ -225,7 +225,7 @@ c
 c
 c     perform the setup functions needed to run dynamics
 c
-      call mdinit
+      call mdinit (dt)
 c
 c     print out a header line for the dynamics computation
 c

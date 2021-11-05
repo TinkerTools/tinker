@@ -16,7 +16,7 @@ c     "mdinit" initializes the velocities and accelerations
 c     for a molecular dynamics trajectory, including restarts
 c
 c
-      subroutine mdinit
+      subroutine mdinit (dt)
       use atomid
       use atoms
       use bath
@@ -44,6 +44,7 @@ c
       integer idyn,lext
       integer size,next
       integer freeunit
+      real*8 dt,eps
       real*8 e,ekt,qterm
       real*8 maxwell,speed
       real*8 amass,gmass
@@ -311,6 +312,11 @@ c
       if (integrate .eq. 'BAOAB')  dorest = .false.
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
+c
+c     set inner steps per outer step for RESPA integrator
+c
+      eps =  0.00000001d0
+      nrespa = int(dt/(arespa+eps)) + 1
 c
 c     perform dynamic allocation of some local arrays
 c

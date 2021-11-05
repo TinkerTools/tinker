@@ -369,9 +369,9 @@ c
          end do
          fcnorm = fpnorm
 c
-c     update the active vs inactive status of the variables; in a
-c     true active set strategy, at most one constraint is added to
-c     the active set per iteration (via goto statements below)
+c     check for active variables to be made inactive; in a true
+c     active set strategy, variables are removed one at a time
+c     from the current active set (via goto statements below)
 c
          do j = 1, n
             if (iactive(j) .eq. 0) then
@@ -465,9 +465,9 @@ c
          stpnorm = sqrt(stpnorm/dble(n))
          if (stpnorm .le. stpmin)  done = .true.
 c
-c     check for inactive variables that can be made active; in a true
-c     active set strategy, variables are released one at a time at a
-c     minimum of the current active set (via goto statements below)
+c     check for inactive variables to be made active; in a true
+c     active set strategy, variables are added one at a time to
+c     the current active set (via goto statements below)
 c
 c        if (done) then
             if (nactive .ne. n) then

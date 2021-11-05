@@ -237,7 +237,8 @@ c
          dz = dz / r
          dot = dx*a(1,3) + dy*a(2,3) + dz*a(3,3)
          angle = 180.0d0 - radian*acos(dot)
-         eps = 15.0d0
+c        eps = 15.0d0
+         eps = 0.0d0
          if (angle .lt. eps) then
             planar = .true.
             dx = dy1*dz2 - dz1*dy2
@@ -259,7 +260,8 @@ c
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     get 3-Fold rotation matrix elements for z- and x-axes
+c     get 3-Fold rotation matrix elements for z- and x-axes;
+c     use alternate z-axis if central atom is close to planar
 c
       else if (polaxe(i) .eq. '3-Fold') then
          dx = x(iz) - xi
@@ -287,7 +289,8 @@ c
          dy = dy1 + dy2 + dy3
          dz = dz1 + dz2 + dz3
          r = sqrt(dx*dx + dy*dy + dz*dz)
-         eps = 0.15d0
+c        eps = 0.15d0
+         eps = 0.0d0
          if (r .lt. eps) then
             planar = .true.
             dx2 = x(ix) - x(iz)
@@ -357,7 +360,7 @@ c
       logical planar
 c
 c
-c     copy local frame multipoles and make needed changes
+c     copy local frame multipoles and make any needed changes
 c
       do i = 1, 13
          spole(i) = pole(i,isite)
@@ -446,7 +449,7 @@ c
       real*8 rp(3,3)
 c
 c
-c     copy global frame multipoles and make needed changes
+c     copy global frame multipoles and make any needed changes
 c
       do i = 1, 13
          spole(i) = rpole(i,isite)

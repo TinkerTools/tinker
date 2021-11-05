@@ -42,17 +42,17 @@ c
       use virial
       implicit none
       integer i,j,k,m
-      integer nalt
       real*8 dt,dt_2
       real*8 dta,dta_2
       real*8 epot,etot
-      real*8 eksum,eps
+      real*8 eksum
       real*8 temp,pres
-      real*8 ealt,dalt
+      real*8 drespa
+      real*8 erespa
       real*8 term
       real*8 ekin(3,3)
       real*8 stress(3,3)
-      real*8 viralt(3,3)
+      real*8 vrespa(3,3)
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
@@ -61,12 +61,9 @@ c
 c
 c     set some time values for the dynamics integration
 c
-      eps =  0.00000001d0
-      dalt = arespa
-      nalt = int(dt/(dalt+eps)) + 1
-      dalt = dble(nalt)
+      drespa = dble(nrespa)
       dt_2 = 0.5d0 * dt
-      dta = dt / dalt
+      dta = dt / drespa
       dta_2 = 0.5d0 * dta
 c
 c     store the current atom positions, then find half-step
@@ -83,7 +80,7 @@ c     initialize virial from fast-evolving potential energy terms
 c
       do i = 1, 3
          do j = 1, 3
-            viralt(j,i) = 0.0d0
+            vrespa(j,i) = 0.0d0
          end do
       end do
 c
@@ -96,7 +93,7 @@ c
 c
 c     find fast-evolving velocities and positions via Verlet recursion
 c
-      do k = 1, nalt
+      do k = 1, nrespa
          do i = 1, nuse
             m = iuse(i)
             do j = 1, 3
@@ -113,7 +110,7 @@ c
 c
 c     get the fast-evolving potential energy and atomic forces
 c
-         call gradfast (ealt,derivs)
+         call gradfast (erespa,derivs)
 c
 c     use Newton's second law to get fast-evolving accelerations;
 c     update fast-evolving velocities using the Verlet recursion
@@ -131,7 +128,7 @@ c     find average virial from fast-evolving potential terms
 c
          do i = 1, 3
             do j = 1, 3
-               viralt(j,i) = viralt(j,i) + vir(j,i)/dalt
+               vrespa(j,i) = vrespa(j,i) + vir(j,i)/drespa
             end do
          end do
       end do
@@ -153,7 +150,7 @@ c
 c     get the slow-evolving potential energy and atomic forces
 c
       call gradslow (epot,derivs)
-      epot = epot + ealt
+      epot = epot + erespa
 c
 c     make half-step temperature and pressure corrections
 c
@@ -201,7 +198,7 @@ c     increment total virial from sum of fast and slow parts
 c
       do i = 1, 3
          do j = 1, 3
-            vir(j,i) = vir(j,i) + viralt(j,i)
+            vir(j,i) = vir(j,i) + vrespa(j,i)
          end do
       end do
 c

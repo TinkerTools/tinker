@@ -210,7 +210,7 @@ c
 c
 c     perform the setup functions needed to run dynamics
 c
-      call mdinit
+      call mdinit (dt)
 c
 c     print out a header lines for the equilibration phase
 c
@@ -251,7 +251,7 @@ c
 c
 c     start the cooling phase from the end of equilibration phase
 c
-      if (nequil .ne. 0)  call mdinit
+      if (nequil .ne. 0)  call mdinit (dt)
 c
 c     print out a header lines for the cooling protocol
 c
