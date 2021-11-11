@@ -433,7 +433,6 @@ struct {
 } limits__;
 
 struct {
-   int mdstep;
    int nfree;
    int irest;
    int bmnmix;
@@ -1348,11 +1347,9 @@ void set_limits_data_ (double* vdwcut, double* repcut, double* dispcut,
    limits__.use_ulist = *use_ulist;
 }
 
-void set_mdstuf_data_ (int* mdstep, int* nfree, int* irest, int* bmnmix,
-                       int* bmnmix, double* arespa, int* dorest,
-                       char* integrate) {
+void set_mdstuf_data_ (int* nfree, int* irest, int* bmnmix, int* nrespa,
+                       double* arespa, int* dorest, char* integrate) {
 
-   mdstuf__.mdstep = *mdstep;
    mdstuf__.nfree = *nfree;
    mdstuf__.irest = *irest;
    mdstuf__.bmnmix = *bmnmix;

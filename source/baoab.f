@@ -22,7 +22,7 @@ c     Using Geodesic Integration and Solvent-Solute Splitting",
 c     Proceedings of the Royal Society A, 472, 20160138 (2016)
 c
 c
-      subroutine baoab (dt)
+      subroutine baoab (istep,dt)
       use atomid
       use atoms
       use freeze
@@ -35,6 +35,7 @@ c
       use potent
       implicit none
       integer i,j,k
+      integer istep
       integer nrattle
       real*8 dt,dtr
       real*8 dt_2,dt_4
@@ -84,7 +85,7 @@ c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     take an A step
+c     take first A step according to the BAOAB sequence
 c
       do j = 1, nrattle
          do i = 1, nuse
@@ -115,7 +116,7 @@ c
       end do
       if (use_rattle)  call rattle2 (dt)
 c
-c     take an A step
+c     take second A step according to the BAOAB sequence
 c
       do j = 1, nrattle
          do i = 1, nuse
@@ -171,9 +172,9 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (dt,etot,epot,eksum,temp,pres)
-      call mdsave (dt,epot,eksum)
-      call mdrest
+      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
+      call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
       return
       end
 c

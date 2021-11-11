@@ -31,8 +31,8 @@ c
       use usage
       use warp
       implicit none
-      integer i,next
-      integer nequil,nstep
+      integer i,next,nequil
+      integer istep,nstep
       real*8 logmass,factor
       real*8 ratio,sigmoid
       real*8 dt,dtsave
@@ -225,27 +225,27 @@ c
 c
 c     take the dynamics steps for the equilibration phase
 c
-      mdstep = 0
+      istep = 0
       do i = 1, nequil
-         mdstep = mdstep + 1
+         istep = istep + 1
          if (integrate .eq. 'VERLET') then
-            call verlet (dt)
+            call verlet (istep,dt)
          else if (integrate .eq. 'BEEMAN') then
-            call beeman (dt)
+            call beeman (istep,dt)
          else if (integrate .eq. 'BUSSI') then
-            call bussi (dt)
+            call bussi (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
-            call nose (dt)
+            call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
-            call sdstep (dt)
+            call sdstep (istep,dt)
          else if (integrate .eq. 'GHMC') then
-            call ghmcstep (dt)
+            call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
-            call rgdstep (dt)
+            call rgdstep (istep,dt)
          else if (integrate .eq. 'RESPA') then
-            call respa (dt)
+            call respa (istep,dt)
          else
-            call beeman (dt)
+            call beeman (istep,dt)
          end if
       end do
 c
@@ -265,7 +265,7 @@ c
 c     set target temperature using the desired cooling protocol
 c
       do i = 1, nstep
-         mdstep = mdstep + 1
+         istep = istep + 1
          ratio = dble(i) / dble(nstep)
          if (cooltyp .eq. 'SIGMOID') then
             ratio = sigmoid (3.5d0,ratio)

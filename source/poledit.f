@@ -3832,7 +3832,7 @@ c     add or remove the equivalence of specified sets of atoms
 c
             diff = .false.
             nlist = 1
-            k = type(list(1))
+            if (list(1) .ne. 0)  k = type(list(1))
             dowhile (list(nlist) .ne. 0)
                if (type(list(nlist)) .ne. k)  diff = .true.
                nlist = nlist + 1
@@ -3861,6 +3861,7 @@ c
                end do
             end if
          end do
+c
 c     renumber the atom types to give consecutive ordering
 c
          do i = 1, n
@@ -3897,8 +3898,7 @@ c     atoms with equivalent local frame defining atom types
 c
          useframe = .false.
          do i = 1, npole
-            k = ipole(i)
-            it = type(k)
+            it = type(ipole(i))
             zaxe = 0
             xaxe = 0
             yaxe = 0

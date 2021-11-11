@@ -134,7 +134,7 @@ c
      &                      use_ewald,use_dewald,use_lights,use_list,
      &                      use_vlist,use_dlist,use_clist,use_mlist,
      &                      use_ulist)
-      call set_mdstuf_data (mdstep,nfree,irest,bmnmix,nrespa,
+      call set_mdstuf_data (nfree,irest,bmnmix,nrespa,
      &                      arespa,dorest,integrate)
       call set_molcul_data (nmol,imol,kmol,molcule,totmass,molmass)
       call set_moldyn_data (v,a,aalt)

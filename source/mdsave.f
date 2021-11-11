@@ -17,7 +17,7 @@ c     auxiliary files with velocity, force or induced dipole data;
 c     also checks for user requested termination of a simulation
 c
 c
-      subroutine mdsave (dt,epot,eksum)
+      subroutine mdsave (istep,dt,epot,eksum)
       use atomid
       use atoms
       use bound
@@ -39,6 +39,7 @@ c
       use units
       implicit none
       integer i,j,k
+      integer istep
       integer ixyz,iind
       integer ivel,ifrc
       integer iend,isave,lext
@@ -57,23 +58,23 @@ c
 c
 c     send data via external socket communication if desired
 c
-      if (.not.sktstart .or. use_socket)  call sktdyn (mdstep,dt,epot)
+      if (.not.sktstart .or. use_socket)  call sktdyn (istep,dt,epot)
 c
 c     check number of steps between trajectory file saves
 c
-      modsave = mod(mdstep,iwrite)
+      modsave = mod(istep,iwrite)
       if (modsave .ne. 0)  return
 c
 c     get the sequence number of the current trajectory frame
 c
-      isave = nprior + mdstep/iwrite
+      isave = nprior + istep/iwrite
       lext = 3
       call numeral (isave,ext,lext)
 c
 c     print header for the instantaneous values at current step
 c
-      pico = dble(mdstep) * dt
-      write (iout,10)  mdstep
+      pico = dble(istep) * dt
+      write (iout,10)  istep
    10 format (/,' Instantaneous Values for Frame Saved at',
      &           i10,' Dynamics Steps')
 c
@@ -280,7 +281,7 @@ c
 c
 c     skip an extra line to keep the output formating neat
 c
-      modsave = mod(mdstep,iprint)
+      modsave = mod(istep,iprint)
       if (verbose .and. modsave.ne.0) then
          write (iout,320)
   320    format ()

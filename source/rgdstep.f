@@ -26,18 +26,18 @@ c     and Marina A. Vorobieva, VNIITF, Russian Federal Nuclear
 c     Center, Chelyabinsk, Russia, February 2001
 c
 c
-      subroutine rgdstep (dt)
+      subroutine rgdstep (istep,dt)
       use atomid
       use atoms
       use bound
       use group
       use iounit
-      use mdstuf
       use rgddyn
       use units
       use virial
       implicit none
-      integer i,j,k,size
+      integer i,j,k
+      integer istep,size
       integer start,stop
       integer iter,maxiter
       real*8 dt,epot,etot
@@ -99,7 +99,7 @@ c
 c
 c     find center of mass offsets only for first step
 c
-         if (mdstep .eq. 1) then
+         if (istep .eq. 1) then
             do j = start, stop
                k = kgrp(j)
                xcmo(k) = x(k) - rc(1)
@@ -294,9 +294,9 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (dt,etot,epot,eksum,temp,pres)
-      call mdsave (dt,epot,eksum)
-      call mdrest
+      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
+      call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
       return
       end
 c

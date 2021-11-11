@@ -1545,7 +1545,7 @@ getstring.o: ascii.o
 gettext.o: ascii.o
 getword.o: ascii.o
 getxyz.o: inform.o iounit.o output.o
-ghmcstep.o: atomid.o atoms.o bath.o freeze.o iounit.o mdstuf.o moldyn.o stodyn.o units.o usage.o virial.o
+ghmcstep.o: atomid.o atoms.o bath.o freeze.o iounit.o moldyn.o stodyn.o units.o usage.o virial.o
 gkstuf.o: sizes.o
 gradient.o: atoms.o couple.o deriv.o energi.o inter.o iounit.o limits.o potent.o rigid.o vdwpot.o virial.o
 gradrgd.o: atoms.o group.o rigid.o
@@ -1779,7 +1779,7 @@ resdue.o:
 respa.o: atomid.o atoms.o freeze.o ielscf.o limits.o mdstuf.o moldyn.o polar.o potent.o units.o usage.o virial.o
 restrn.o:
 rgddyn.o:
-rgdstep.o: atomid.o atoms.o bound.o group.o iounit.o mdstuf.o rgddyn.o units.o virial.o
+rgdstep.o: atomid.o atoms.o bound.o group.o iounit.o rgddyn.o units.o virial.o
 rigid.o:
 ring.o:
 rings.o: angbnd.o atoms.o bitor.o bndstr.o couple.o inform.o iounit.o ring.o tors.o
@@ -1792,7 +1792,7 @@ rxnpot.o:
 saddle.o: atoms.o inform.o iounit.o keys.o linmin.o minima.o syntrn.o titles.o zcoord.o
 scales.o:
 scan.o: atoms.o files.o inform.o iounit.o math.o minima.o omega.o output.o potent.o scales.o zcoord.o
-sdstep.o: atomid.o atoms.o bath.o couple.o freeze.o kvdws.o math.o mdstuf.o moldyn.o stodyn.o units.o usage.o virial.o
+sdstep.o: atomid.o atoms.o bath.o couple.o freeze.o kvdws.o math.o moldyn.o stodyn.o units.o usage.o virial.o
 search.o: linmin.o math.o
 sequen.o: sizes.o
 server.o:

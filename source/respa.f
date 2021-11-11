@@ -29,7 +29,7 @@ c     Molecular Dynamics Simulations", Journal of Chemical Physics,
 c     115, 4019-4029 (2001)
 c
 c
-      subroutine respa (dt)
+      subroutine respa (istep,dt)
       use atomid
       use atoms
       use freeze
@@ -42,6 +42,7 @@ c
       use virial
       implicit none
       integer i,j,k,m
+      integer istep
       real*8 dt,dt_2
       real*8 dta,dta_2
       real*8 epot,etot
@@ -213,9 +214,9 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
-      call mdstat (dt,etot,epot,eksum,temp,pres)
-      call mdsave (dt,epot,eksum)
-      call mdrest
+      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
+      call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
       return
       end
 c

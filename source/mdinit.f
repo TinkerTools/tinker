@@ -40,7 +40,7 @@ c
       use units
       use usage
       implicit none
-      integer i,j
+      integer i,j,istep
       integer idyn,lext
       integer size,next
       integer freeunit
@@ -60,7 +60,6 @@ c
 c
 c     set default parameters for the dynamics trajectory
 c
-      mdstep = 0
       integrate = 'BEEMAN'
       bmnmix = 8
       arespa = 0.00025d0
@@ -349,7 +348,10 @@ c
                lm(j,i) = 0.0d0
             end do
          end do
-         if (nuse .eq. n)  call mdrest
+         if (nuse .eq. n) then
+            istep = 0
+            call mdrest (istep)
+         end if
 c
 c     set velocities and fast/slow accelerations for RESPA method
 c
@@ -384,7 +386,10 @@ c
                end do
             end if
          end do
-         if (nuse .eq. n)  call mdrest
+         if (nuse .eq. n) then
+            istep = 0
+            call mdrest (istep)
+         end if
 c
 c     set velocities and accelerations for Cartesian dynamics
 c
@@ -408,7 +413,10 @@ c
                end do
             end if
          end do
-         if (nuse .eq. n)  call mdrest
+         if (nuse .eq. n) then
+            istep = 0
+            call mdrest (istep)
+         end if
       end if
 c
 c     perform deallocation of some local arrays

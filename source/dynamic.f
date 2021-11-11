@@ -30,8 +30,8 @@ c
       use stodyn
       use usage
       implicit none
-      integer i,nstep
-      integer mode,next
+      integer i,next,mode
+      integer istep,nstep
       real*8 dt,dtsave
       logical exist
       character*20 keyword
@@ -274,29 +274,29 @@ c
 c
 c     integrate equations of motion to take a time step
 c
-      mdstep = 0
+      istep = 0
       do i = 1, nstep
-         mdstep = mdstep + 1
+         istep = istep + 1
          if (integrate .eq. 'VERLET') then
-            call verlet (dt)
+            call verlet (istep,dt)
          else if (integrate .eq. 'BEEMAN') then
-            call beeman (dt)
+            call beeman (istep,dt)
          else if (integrate .eq. 'BAOAB') then
-            call baoab (dt)
+            call baoab (istep,dt)
          else if (integrate .eq. 'BUSSI') then
-            call bussi (dt)
+            call bussi (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
-            call nose (dt)
+            call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
-            call sdstep (dt)
+            call sdstep (istep,dt)
          else if (integrate .eq. 'GHMC') then
-            call ghmcstep (dt)
+            call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
-            call rgdstep (dt)
+            call rgdstep (istep,dt)
          else if (integrate .eq. 'RESPA') then
-            call respa (dt)
+            call respa (istep,dt)
          else
-            call beeman (dt)
+            call beeman (istep,dt)
          end if
       end do
 c
