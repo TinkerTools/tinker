@@ -274,9 +274,7 @@ c
 c
 c     integrate equations of motion to take a time step
 c
-      istep = 0
-      do i = 1, nstep
-         istep = istep + 1
+      do istep = 1, nstep
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
          else if (integrate .eq. 'BEEMAN') then
