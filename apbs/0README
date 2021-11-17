@@ -3,10 +3,19 @@
                      APBS Directory for the Tinker Package
                      #####################################
 
-      This directory contains static libraries and other files needed to
-      interface the Tinker package with the APBS 1.3 Poisson-Boltzmann
+      This directory contains static libraries and header files required
+      to interface the Tinker package with the APBS 1.3 Poisson-Boltzmann
       code written by Nathan Baker and coworkers. To build APBS-capable
-      Tinker executables, use the Tinker source "pmpb.c" in place of the
-      stub file "pmpb.f", then link with the APBS libraries found here.
-      All of the libraries were built with the GNU compilers.
+      Tinker executables, use the Tinker source file "pmpb.c" in place of
+      the stub file "pmpb.f", then link with APBS libraries found here.
 
+      Any supplied libraries were built with the GNU compilers. Libraries
+      are not supplied with some versions of the Tinker distribution. In
+      that case, you should obtain APBS 1.3 from the internet, and build
+      your own APBS libraries for your desired operating system.
+
+      Note that APBS 1.3 is the earliest version of APBS compatible with
+      Tinker. Later versions of APBS should work as well, but we have not
+      tested them. The header/include files supplied with Tinker are from
+      APBS 1.3 as well.
+      

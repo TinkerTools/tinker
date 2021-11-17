@@ -1,5 +1,6 @@
-apbs/include
-apbs/lib
+apbs/lib/linux/*.a
+apbs/lib/macos/*.a
+apbs/lib/windows/*.a
 bin/*
 !bin/0README
 doc/amoeba
