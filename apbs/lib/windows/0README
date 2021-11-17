@@ -1,0 +1,13 @@
+
+                     #####################################
+                     APBS Libraries for the Tinker Package
+                     #####################################
+
+      This directory contains static APBS libraries required to interface
+      the Tinker package with the APBS 1.3 Poisson-Boltzmann code written
+      by Nathan Baker and coworkers.
+
+      If the libraries are not present here, then you should obtain the
+      APBS 1.3 code and build your own libraries by following the protocol
+      in the file /apbs/0README.
+

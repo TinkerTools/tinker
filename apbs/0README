@@ -9,13 +9,41 @@
       Tinker executables, use the Tinker source file "pmpb.c" in place of
       the stub file "pmpb.f", then link with APBS libraries found here.
 
-      Any supplied libraries were built with the GNU compilers. Libraries
+      Supplied APBS libraries are built with the GNU compilers. Libraries
       are not supplied with some versions of the Tinker distribution. In
       that case, you should obtain APBS 1.3 from the internet, and build
-      your own APBS libraries for your desired operating system.
+      your own APBS libraries for your desired operating system. The full
+      instruction for building APBS libraries are provided below.
 
       Note that APBS 1.3 is the earliest version of APBS compatible with
       Tinker. Later versions of APBS should work as well, but we have not
-      tested them. The header/include files supplied with Tinker are from
-      APBS 1.3 as well.
-      
+      tested them. The header/include files distributed with Tinker are
+      taken from the original APBS 1.3 distribution.
+
+      The /apbs/test directory contains benchmarks tests and results for
+      several small proteins when run from within Tinker.
+
+               #################################################
+               Building APBS Libraries Needed for Tinker Support
+               #################################################
+
+      To build the APBS libraries needed for Tinker, first obtain the
+      APBS 1.3 version from the internet, then follow this procedure:
+
+      Use the following "configure" command to build an APBS with the
+      libraries needed to link with TINKER. Please be sure to change the
+      directory (ie, /Users/ponder/apbs-1.3) to an appropriate directory.
+
+            ./configure --enable-tinker --disable-zlib \
+            --prefix=/Users/ponder/apbs-1.3 CFLAGS=-DVAPBSQUIET \
+            CXXFLAGS=-DVAPBSQUIET FFLAGS=-DVAPBSQUIET
+
+      The libraries for APBS support in TINKER will be in the /lib and
+      /contrib/lib sibdirectories of the APBS distribution, and consist
+      of libapbsmainroutines.a, libapbs.a, libmaloc.a and libapbsblas.a.
+      These libraries should be moved under the /apbs/lib directory of
+      the Tinker distribution.
+
+      You can then build a Tinker version with APBS capability by using
+      Makefile-apbs from the /make area of the Tinker distirbution.
+
