@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+# Attempt to update to the most recent version from GitHub then generate the interface code.
+# Usage:
+# bash export update
+# bash export c cpp
+
+
+src_dir=$PWD/../source
+export LC_COLLATE=C
+
+
+check_from_github() {
+    echo "Checking updates on GitHub..."
+    url_base="https://raw.githubusercontent.com/TinkerTools/tinker9/master/ext/interface"
+    vnum=$(curl -s "$url_base/version.txt")
+    if [[ $vnum =~ ^-?[0-9]+$ ]]; then
+        # If vnum is a valid integer, compare it to the local version number.
+        lnum=0
+        if [ -f version.txt ]; then
+            lnum=$(cat version.txt)
+        fi
+        if [ $lnum -lt $vnum ]; then
+            echo Updating from GitHub...
+            curl -O "$url_base/export"
+            curl -O "$url_base/parse.py"
+            curl -O "$url_base/version.txt"
+            mkdir -p include/tinker/{gfortran,ifort}
+            curl -o include/tinker/gfortran/macro.hh "$url_base/include/tinker/gfortran/macro.hh"
+            curl -o include/tinker/ifort/macro.hh    "$url_base/include/tinker/ifort/macro.hh"
+            echo "Update completed. Please run this command again."
+            exit 0
+        else
+            echo "Already the newest."
+        fi
+    else
+        echo Cannot check the version on GitHub. Skipping the update...
+    fi
+}
+
+
+export_c() {
+    mkdir -p c
+    rm -rf c/*
+    mkdir -p c/tinker/detail
+
+    cd c/tinker
+    python3 ../../parse.py --lang=c $src_dir/*.f | bash
+    cd ../..
+}
+
+
+export_cpp() {
+    mkdir -p cpp
+    rm -rf cpp/*
+    mkdir -p cpp/tinker/detail
+
+    cd cpp/tinker
+    python3 ../../parse.py --lang=cpp $src_dir/*.f | bash
+    cd ../..
+}
+
+
+for a in "$@"; do
+    if [ "$a" = update ]; then
+        check_from_github
+    elif [ "$a" = c ]; then
+        echo "Exporting the C interface..."
+        export_c
+    elif [ "$a" = cpp ]; then
+        echo "Exporting the C++ interface..."
+        export_cpp
+    fi
+done

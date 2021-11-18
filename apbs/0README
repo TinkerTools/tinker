@@ -1,49 +1,35 @@
 
-                     #####################################
-                     APBS Directory for the Tinker Package
-                     #####################################
+           #########################################################
+           Tinker-APBS Poisson-Boltzmann Solvation Energy Test Cases
+           #########################################################
 
-      This directory contains static libraries and header files required
-      to interface the Tinker package with the APBS 1.3 Poisson-Boltzmann
-      code written by Nathan Baker and coworkers. To build APBS-capable
-      Tinker executables, use the Tinker source file "pmpb.c" in place of
-      the stub file "pmpb.f", then link with APBS libraries found here.
+         This directory contains five protein structures used for APBS
+         implicit solvent calculations in Schnieders' published paper.
+         See Table VI in JCP, 126, 124114 (2007). To get approximately
+         the electrostatic energy values reported in the paper, use the
+         tinker.key file provided here and make sure AMOEBA Rmin values
+         are used for PB radii (ie, APBS-RADII VDW). The values below
+         are in kcal/mol and computed using Tinker 8 and APBS 1.3.
 
-      Supplied APBS libraries are built with the GNU compilers. Libraries
-      are not supplied with some versions of the Tinker distribution. In
-      that case, you should obtain APBS 1.3 from the internet, and build
-      your own APBS libraries for your desired operating system. The full
-      instruction for building APBS libraries are provided below.
+         PROTEIN    SPACING       GRID SIZE          JCP       TINKER
 
-      Note that APBS 1.3 is the earliest version of APBS compatible with
-      Tinker. Later versions of APBS should work as well, but we have not
-      tested them. The header/include files distributed with Tinker are
-      taken from the original APBS 1.3 distribution.
+          CRN         0.61         65x65x65       -679.1       -683.3
+          CRN         0.31      129x129x129       -641.3       -643.0
+          CRN         0.18      225x225x225       -632.1       -633.3
 
-      The /apbs/test directory contains benchmarks tests and results for
-      several small proteins when run from within Tinker.
+          ENH         0.61         65x65x65      -2055.1      -2056.8
+          ENH         0.31      129x129x129      -2008.8      -2009.3
+          ENH         0.18      225x225x225      -1991.1      -1992.4
 
-               #################################################
-               Building APBS Libraries Needed for Tinker Support
-               #################################################
+          FSV         0.61         65x65x65      -1293.8      -1302.2
+          FSV         0.31      129x129x129      -1269.3      -1268.4
+          FSV         0.18      225x225x225      -1257.1      -1257.7
 
-      To build the APBS libraries needed for Tinker, first obtain the
-      APBS 1.3 version from the internet, then follow this procedure:
+          PGB         0.61         65x65x65      -1453.5      -1450.7
+          PGB         0.31      129x129x129      -1400.5      -1394.4
+          PGB         0.18      225x225x225      -1380.3      -1380.8
 
-      Use the following "configure" command to build an APBS with the
-      libraries needed to link with TINKER. Please be sure to change the
-      directory (ie, /Users/ponder/apbs-1.3) to an appropriate directory.
-
-            ./configure --enable-tinker --disable-zlib \
-            --prefix=/Users/ponder/apbs-1.3 CFLAGS=-DVAPBSQUIET \
-            CXXFLAGS=-DVAPBSQUIET FFLAGS=-DVAPBSQUIET
-
-      The libraries for APBS support in TINKER will be in the /lib and
-      /contrib/lib sibdirectories of the APBS distribution, and consist
-      of libapbsmainroutines.a, libapbs.a, libmaloc.a and libapbsblas.a.
-      These libraries should be moved under the /apbs/lib directory of
-      the Tinker distribution.
-
-      You can then build a Tinker version with APBS capability by using
-      Makefile-apbs from the /make area of the Tinker distirbution.
+          VII         0.61         65x65x65      -1009.8      -1010.3
+          VII         0.31      129x129x129       -970.6       -973.0
+          VII         0.18      225x225x225       -962.0       -963.8
 

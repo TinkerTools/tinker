@@ -51,8 +51,8 @@ FFTW_LIBDIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
 
 APBSDIR = $(TINKERDIR)/apbs
-#APBS_INCDIR = -I$(APBSDIR)/include
-#APBS_LIBDIR = -L$(APBSDIR)/lib
+APBS_INCDIR = -I$(APBSDIR)/include
+APBS_LIBDIR = -L$(APBSDIR)/lib
 APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 ####################################################################
@@ -66,21 +66,21 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Compiler:  GNU gfortran 9.3
 ##  Parallel:  OpenMP
 
-#CC = gcc
-#F77 = gfortran
-#CCFLAGS = -c
-#F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+CC = gcc
+F77 = gfortran
+CCFLAGS = -c
+F77FLAGS = -c
+OPTFLAGS = -Ofast -march=native -fopenmp
 #OPTFLAGS = -Ofast -msse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
-#LIBS = 
-#LIBFLAGS = -crusv
-#APBS_INCDIR = -I$(APBSDIR)/include/linux
-#APBS_LIBDIR = -L$(APBSDIR)/lib/linux
-#RANLIB = ranlib
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
-#RENAME = rename_bin
+LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
+LIBS = 
+LIBFLAGS = -crusv
+APBS_INCDIR = -I$(APBSDIR)/include -I$(APBSDIR)/include/linux
+APBS_LIBDIR = -L$(APBSDIR)/lib -L$(APBSDIR)/lib/linux
+RANLIB = ranlib
+LINKFLAGS = $(OPTFLAGS) -static-libgcc
+RENAME = rename_bin
 
 ##  Build:     Tinker
 ##  OS Type:   Apple macOS
@@ -88,21 +88,21 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Compiler:  GNU gfortran 8.1
 ##  Parallel:  OpenMP
 
-CC = gcc
-F77 = gfortran
-CCFLAGS = -c
-F77FLAGS = -c
+#CC = gcc
+#F77 = gfortran
+#CCFLAGS = -c
+#F77FLAGS = -c
 #OPTFLAGS = -Ofast -march=native -fopenmp
-OPTFLAGS = -Ofast -mssse3 -fopenmp
+#OPTFLAGS = -Ofast -mssse3 -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-LIBS = 
-LIBFLAGS = -crusv
-APBS_INCDIR = -I$(APBSDIR)/include/macos
-APBS_LIBDIR = -L$(APBSDIR)/lib/macos
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-libgcc
-RENAME = rename_bin
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+#LIBS = 
+#LIBFLAGS = -crusv
+#APBS_INCDIR = -I$(APBSDIR)/include -I$(APBSDIR)/include/macos
+#APBS_LIBDIR = -L$(APBSDIR)/lib -L$(APBSDIR)/lib/macos
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+#RENAME = rename_bin
 
 ##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
@@ -119,8 +119,8 @@ RENAME = rename_bin
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 #LIBS = 
 #LIBFLAGS = -crusv
-#APBS_INCDIR = -I$(APBSDIR)/include/windows
-#APBS_LIBDIR = -L$(APBSDIR)/lib/windows
+#APBS_INCDIR = -I$(APBSDIR)/include -I$(APBSDIR)/include/windows
+#APBS_LIBDIR = -L$(APBSDIR)/lib -L$(APBSDIR)/lib/windows
 #RANLIB = ranlib
 #LINKFLAGS = $(OPTFLAGS) -static
 #RENAME = rename_exe
@@ -139,8 +139,8 @@ RENAME = rename_bin
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
 #LIBS = 
 #LIBFLAGS = -crusv
-#APBS_INCDIR = -I$(APBSDIR)/include/linux
-#APBS_LIBDIR = -L$(APBSDIR)/lib/linux
+#APBS_INCDIR = -I$(APBSDIR)/include -I$(APBSDIR)/include/linux
+#APBS_LIBDIR = -L$(APBSDIR)/lib -L$(APBSDIR)/lib/linux
 #RANLIB = echo
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
 #RENAME = rename_bin
@@ -159,8 +159,8 @@ RENAME = rename_bin
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 #LIBS = 
 #LIBFLAGS = -crusv
-#APBS_INCDIR = -I$(APBSDIR)/include/macos
-#APBS_LIBDIR = -L$(APBSDIR)/lib/macos
+#APBS_INCDIR = -I$(APBSDIR)/include -I$(APBSDIR)/include/macos
+#APBS_LIBDIR = -L$(APBSDIR)/lib -L$(APBSDIR)/lib/macos
 #RANLIB = ranlib -c
 #LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
 #RENAME = rename_bin
@@ -806,9 +806,6 @@ EXEFILES = alchemy.x \
 	    xyzmol2.x \
 	    xyzpdb.x
 
-%.o: %.c
-	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${APBS_INCDIR} ${OPTFLAGS} $<
-
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
@@ -824,6 +821,9 @@ clean:
 
 listing:
 	cat *.f *.c > tinker.txt
+
+pmpb.o: pmpb.c
+	${CC} ${CCFLAGS} ${APBS_INCDIR} ${OPTFLAGS} pmpb.c
 
 rename_bin:
 	mv  alchemy.x    $(BINDIR)/alchemy
