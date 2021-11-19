@@ -32,11 +32,14 @@
 
       Use the following "configure" command to build an APBS with the
       libraries needed to link with TINKER. Please be sure to change the
-      directory (ie, /Users/ponder/apbs-1.3) to an appropriate directory.
+      --prefix directory to the APBS 1.3 installation and --with-python
+      option to the system Python 2 executable.
 
             ./configure --enable-tinker --disable-zlib \
-            --prefix=/Users/ponder/apbs-1.3 CFLAGS=-DVAPBSQUIET \
-            CXXFLAGS=-DVAPBSQUIET FFLAGS=-DVAPBSQUIET
+            --prefix=/Users/ponder/apbs-1.3 \
+            --with-python=/usr/bin/python2 \
+            CFLAGS=-DVAPBSQUIET CXXFLAGS=-DVAPBSQUIET \
+            FFLAGS=-DVAPBSQUIET
 
       The libraries for APBS support in TINKER will be in the /lib and
       /contrib/lib sibdirectories of the APBS distribution, and consist
