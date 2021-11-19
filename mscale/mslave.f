@@ -12,7 +12,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "mslave" is a simple TINKER client/slave program for use with
+c     "mslave" is a simple Tinker client/slave program for use with
 c     the CHARMM MSCALE master
 c
 c     note use of the "mpif.h" header file is deprecated in MPI and

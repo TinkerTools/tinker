@@ -31,7 +31,7 @@
       APBS 1.3 version from the internet, then follow this procedure:
 
       Use the following "configure" command to build an APBS with the
-      libraries needed to link with TINKER. Please be sure to change the
+      libraries needed to link with Tinker. Please be sure to change the
       --prefix directory to the APBS 1.3 installation and --with-python
       option to the system Python 2 executable.
 
@@ -41,7 +41,7 @@
             CFLAGS=-DVAPBSQUIET CXXFLAGS=-DVAPBSQUIET \
             FFLAGS=-DVAPBSQUIET
 
-      The libraries for APBS support in TINKER will be in the /lib and
+      The libraries for APBS support in Tinker will be in the /lib and
       /contrib/lib sibdirectories of the APBS distribution, and consist
       of libapbsmainroutines.a, libapbs.a, libmaloc.a and libapbsblas.a.
       These libraries should be moved under the /apbs/lib directory of
