@@ -75,7 +75,7 @@ c
 c     set default values for temperature and pressure control
 c
       thermostat = 'BUSSI'
-      tautemp = 0.2d0
+      tautemp = -1.0d0
       collide = 0.1d0
       do i = 1, maxnose
          vnh(i) = 0.0d0
@@ -84,7 +84,7 @@ c
       end do
       barostat = 'BERENDSEN'
       anisotrop = .false.
-      taupres = 2.0d0
+      taupres = -1.0d0
       compress = 0.000046d0
       vbar = 0.0d0
       qbar = 0.0d0
@@ -210,6 +210,17 @@ c
       else if (thermostat.eq.'NOSE-HOOVER' .and.
      &         barostat.eq.'NOSE-HOOVER') then
          integrate = 'NOSE-HOOVER'
+      end if
+c
+c     apply default values for thermostat and barostat coupling
+c
+      if (tautemp .lt. 0.0d0) then
+         tautemp = 0.2d0
+         if (thermostat .eq. 'NOSE-HOOVER')  tautemp = 1.0d0
+      end if
+      if (taupres .lt. 0.0d0) then
+         taupres = 2.0d0
+         if (barostat .eq. 'NOSE-HOOVER')  taupres = 10.0d0
       end if
 c
 c     check for use of Monte Carlo barostat with constraints
