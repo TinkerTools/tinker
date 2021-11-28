@@ -3,10 +3,11 @@
                      FFTW Directory for the Tinker Package
                      #####################################
 
-      This directory contains FFTW-3.3.8 which is the preferred FFT
-      package for use with the OpenMP version of Tinker. The FFTPACK
-      code provided by Tinker can be used instead (via modifications
-      to fft3d.f), but FFTPACK is a serial only code.
+      This directory contains FFTW-3.3.8 which is the preferred Fast
+      Fourier Transform (FFT) package for use with the OpenMP version
+      of Tinker. The FFTPACK code provided as part of the Tinker source
+      code can be used in place of FFTW via modifications to "fft3d.f".
+      However FFTPACK is a serial code, and is not OpenMP parallel.
 
       ###################################
       Building FFTW on Linux and on macOS
@@ -15,8 +16,8 @@
       Under Linux and macOS, Tinker requires the two FFTW static object
       libraries, libfftw3.a and libfftw3_threads.a. To build FFTW using
       the GNU compilers, issue each of the commands indicated below.
-      Note that the "setenv" syntax is for csh/tcsh shells, and should
-      be modified for other shells. The --prefix flag in the "configure"
+      Note the "export" syntax is for use with bash shells, and must be
+      modified for csh/tcsh shells. The --prefix flag in the "configure"
       command below should be changed to the correct path on your local
       machine (ie, the current /fftw area under the Tinker tree).
 
@@ -28,7 +29,7 @@
       make
       make install
 
-      The above "setenv" commands are for use of the GNU compilers. To
+      The above "export" commands are for use with GNU compilers. To
       use the Intel or PGI compilers, substitute "icc" or "pgcc" for
       "gcc", and "ifort" or "pgf95" for "gfortran".
 

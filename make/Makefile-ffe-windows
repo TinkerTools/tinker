@@ -139,7 +139,7 @@ JAVA_LIBS = -ljvm
 ##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 9.2
+##  Compiler:  MinGW GNU gfortran 11.2
 ##  Parallel:  OpenMP
 
 CC = gcc
@@ -848,7 +848,7 @@ tncg.o:
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} ${LIBDIR} $^ ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${JAVA_LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${JAVA_LIBS} ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
 
 all: ${EXEFILES}
 

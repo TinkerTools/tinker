@@ -99,7 +99,7 @@ RENAME = rename_bin
 ##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 9.2
+##  Compiler:  MinGW GNU gfortran 11.2
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
@@ -790,7 +790,7 @@ EXEFILES = alchemy.x \
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${LIBS} ${FFTW_LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${FFTW_LIBS} ${LIBS}; strip $@
 
 all: ${EXEFILES}
 
