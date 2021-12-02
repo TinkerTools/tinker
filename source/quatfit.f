@@ -7,13 +7,14 @@ c     ###################################################
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine quatfit  --  quaternion superposition of coords  ##
+c     ##  subroutine quatfit  --  optimal rotation for superposition  ##
 c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "quatfit" uses a quaternion-based method to achieve the best
-c     fit superposition of two sets of coordinates
+c     "quatfit" uses a quaternion-based method to find the optimal
+c     rotation to achieve the best fit superposition of two sets of
+c     coordinates, assuming the centroids are already superimposed
 c
 c     literature reference:
 c

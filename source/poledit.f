@@ -1967,8 +1967,8 @@ c
                   end do
                end if
                if (n12(i) .eq. 2) then
-                  polarity(i) = 1.0d0    !! missing parameter
-                  palpha(i) = 0.0d0      !! missing parameter
+                  polarity(i) = 0.9354d0    !! generic value
+                  palpha(i) = 4.5439d0      !! generic value
                end if
             else if (atn .eq. 7) then
                pcore(i) = 5.0d0
