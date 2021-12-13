@@ -549,9 +549,11 @@ c
             if (use_ulist) then
                use_ulist = .false.
                usolvcut = 0.0d0
-               write (iout,50)
-   50          format (/,' INDUCE  --  Switching to Diagonal',
-     &                    ' PCG Preconditioner')
+               if (verbose) then
+                  write (iout,50)
+   50             format (/,' INDUCE  --  Switching to Diagonal',
+     &                       ' PCG Preconditioner')
+               end if
                goto 10
             else
                write (iout,60)
@@ -4893,9 +4895,11 @@ c
             if (use_ulist) then
                use_ulist = .false.
                usolvcut = 0.0d0
-               write (iout,50)
-   50          format (/,' INDUCE  --  Switching to Diagonal',
-     &                    ' PCG Preconditioner')
+               if (verbose) then
+                  write (iout,50)
+   50             format (/,' INDUCE  --  Switching to Diagonal',
+     &                       ' PCG Preconditioner')
+               end if
                goto 10
             else
                write (iout,60)
@@ -6230,9 +6234,11 @@ c
             if (use_ulist) then
                use_ulist = .false.
                usolvcut = 0.0d0
-               write (iout,50)
-   50          format (/,' INDUCE  --  Switching to Diagonal',
-     &                    ' PCG Preconditioner')
+               if (verbose) then
+                  write (iout,50)
+   50             format (/,' INDUCE  --  Switching to Diagonal',
+     &                       ' PCG Preconditioner')
+               end if
                goto 10
             else
                write (iout,60)
