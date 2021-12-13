@@ -408,8 +408,8 @@ c
          read (string,*,err=10,end=10)  politer
       else if (keyword(1:10) .eq. 'POLAR-EPS ') then
          read (string,*,err=10,end=10)  poleps
-      else if (keyword(1:12) .eq. 'USOLVE-DIAG ') then
-         read (string,*,err=10,end=10)  udiag
+      else if (keyword(1:13) .eq. 'USOLVE-ACCEL ') then
+         read (string,*,err=10,end=10)  uaccel
       else if (keyword(1:11) .eq. 'D-EQUALS-P ') then
          dpequal = .true.
       else if (keyword(1:15) .eq. 'POLAR-12-SCALE ') then

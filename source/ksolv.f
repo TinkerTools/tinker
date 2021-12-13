@@ -29,7 +29,7 @@ c
       use solpot
       use solute
       implicit none
-      integer i,k,next,it
+      integer i,k,next
       real*8 pbrd,csrd,gkrd
       logical header
       character*20 keyword
@@ -856,10 +856,8 @@ c
       use solute
       use vdw
       implicit none
-      integer i,j,k,l,m
-      integer atmnum,next
-      real*8 rscale
-      real*8 offset
+      integer i,next
+      integer atmnum
       real*8 dhct
       character*10 radtyp
       character*20 keyword
@@ -1021,15 +1019,14 @@ c
       use ptable
       use solute
       implicit none
-      integer i,j,k,l,m
+      integer i,j
       integer nx,ny,nz
       integer maxgrd,next
-      integer atmnum,trimtext
       integer pbtyplen,pbsolnlen
       integer bcfllen,chgmlen
       integer srfmlen,pbionq
-      real*8 ri,rscale
-      real*8 spacing,offset
+      integer trimtext
+      real*8 ri,spacing
       real*8 gx,gy,gz
       real*8 xcm,ycm,zcm
       real*8 total,weigh

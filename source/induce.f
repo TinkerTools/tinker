@@ -195,6 +195,10 @@ c
       allocate (field(3,npole))
       allocate (fieldp(3,npole))
 c
+c     compute induced dipoles based on direct and mutual fields
+c
+   10 continue
+c
 c     get the electrostatic field due to permanent multipoles
 c
       if (use_ewald) then
@@ -491,13 +495,13 @@ c
             eps = debye * sqrt(eps/dble(npolar))
             if (debug) then
                if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of SCF Induced Dipole',
+                  write (iout,20)
+   20             format (/,' Determination of SCF Induced Dipole',
      &                       ' Moments :',
      &                    //,4x,'Iter',7x,'RMS Residual (Debye)',/)
                end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
+               write (iout,30)  iter,eps
+   30          format (i8,7x,f16.10)
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
@@ -534,19 +538,28 @@ c
 c     print the results from the conjugate gradient iteration
 c
          if (polprt .or. debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',4x,'Iterations',i5,
+            write (iout,40)  iter,eps
+   40       format (/,' Induced Dipoles :',4x,'Iterations',i5,
      &                 7x,'RMS Residual',f15.10)
          end if
 c
 c     terminate the calculation if dipoles fail to converge
 c
          if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
+            if (use_ulist) then
+               use_ulist = .false.
+               usolvcut = 0.0d0
+               write (iout,50)
+   50          format (/,' INDUCE  --  Switching to Diagonal',
+     &                    ' PCG Preconditioner')
+               goto 10
+            else
+               write (iout,60)
+   60          format (/,' INDUCE  --  Warning, Induced Dipoles',
+     &                    ' are not Converged')
+               call prterr
+               call fatal
+            end if
          end if
       end if
 c
@@ -4448,6 +4461,7 @@ c
       use atoms
       use inform
       use iounit
+      use limits
       use mpole
       use polar
       use polopt
@@ -4522,6 +4536,10 @@ c
       allocate (fieldp(3,npole))
       allocate (fields(3,npole))
       allocate (fieldps(3,npole))
+c
+c     compute induced dipoles based on direct and mutual fields
+c
+   10 continue
 c
 c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
@@ -4812,13 +4830,13 @@ c
             eps = debye * sqrt(eps/dble(npolar))
             if (debug) then
                if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
+                  write (iout,20)
+   20             format (/,' Determination of Induced Dipole',
      &                       ' Moments :',
      &                    //,4x,'Iter',8x,'RMS Change (Debye)',/)
                end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
+               write (iout,30)  iter,eps
+   30          format (i8,7x,f16.10)
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
@@ -4864,19 +4882,28 @@ c
 c     print the results from the conjugate gradient iteration
 c
          if (debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+            write (iout,40)  iter,eps
+   40       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge
 c
          if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
+            if (use_ulist) then
+               use_ulist = .false.
+               usolvcut = 0.0d0
+               write (iout,50)
+   50          format (/,' INDUCE  --  Switching to Diagonal',
+     &                    ' PCG Preconditioner')
+               goto 10
+            else
+               write (iout,60)
+   60          format (/,' INDUCE  --  Warning, Induced Dipoles',
+     &                    ' are not Converged')
+               call prterr
+               call fatal
+            end if
          end if
       end if
 c
@@ -5771,6 +5798,7 @@ c
       use atoms
       use inform
       use iounit
+      use limits
       use mpole
       use polar
       use polopt
@@ -5845,6 +5873,10 @@ c
       allocate (fieldp(3,npole))
       allocate (fields(3,npole))
       allocate (fieldps(3,npole))
+c
+c     compute induced dipoles based on direct and mutual fields
+c
+   10 continue
 c
 c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
@@ -6135,13 +6167,13 @@ c
             eps = debye * sqrt(eps/dble(npolar))
             if (debug) then
                if (iter .eq. 1) then
-                  write (iout,10)
-   10             format (/,' Determination of Induced Dipole',
+                  write (iout,20)
+   20             format (/,' Determination of Induced Dipole',
      &                       ' Moments :',
      &                    //,4x,'Iter',8x,'RMS Change (Debye)',/)
                end if
-               write (iout,20)  iter,eps
-   20          format (i8,7x,f16.10)
+               write (iout,30)  iter,eps
+   30          format (i8,7x,f16.10)
             end if
             if (eps .lt. poleps)  done = .true.
             if (eps .gt. epsold)  done = .true.
@@ -6187,19 +6219,28 @@ c
 c     print the results from the conjugate gradient iteration
 c
          if (debug) then
-            write (iout,30)  iter,eps
-   30       format (/,' Induced Dipoles :',6x,'Iterations',i5,
+            write (iout,40)  iter,eps
+   40       format (/,' Induced Dipoles :',6x,'Iterations',i5,
      &                 6x,'RMS Change',f15.10)
          end if
 c
 c     terminate the calculation if dipoles failed to converge
 c
          if (iter.ge.maxiter .or. eps.gt.epsold) then
-            write (iout,40)
-   40       format (/,' INDUCE  --  Warning, Induced Dipoles',
-     &                 ' are not Converged')
-            call prterr
-            call fatal
+            if (use_ulist) then
+               use_ulist = .false.
+               usolvcut = 0.0d0
+               write (iout,50)
+   50          format (/,' INDUCE  --  Switching to Diagonal',
+     &                    ' PCG Preconditioner')
+               goto 10
+            else
+               write (iout,60)
+   60          format (/,' INDUCE  --  Warning, Induced Dipoles',
+     &                    ' are not Converged')
+               call prterr
+               call fatal
+            end if
          end if
       end if
 c
@@ -6949,7 +6990,7 @@ c     use diagonal preconditioner elements as first approximation
 c
          polmin = 0.00000001d0
          do ii = 1, npole
-            poli = udiag * max(polmin,polarity(ii))
+            poli = uaccel * max(polmin,polarity(ii))
             do j = 1, 3
                zrsd(j,ii) = poli * rsd(j,ii)
                zrsdp(j,ii) = poli * rsdp(j,ii)
@@ -6958,56 +6999,58 @@ c
 c
 c     use the off-diagonal preconditioner elements in second phase
 c
-         off2 = usolvcut * usolvcut
-         j = 0
-         do ii = 1, npole-1
-            i = ipole(ii)
-            do kk = ii+1, npole
-               k = ipole(kk)
-               xr = x(k) - x(i)
-               yr = y(k) - y(i)
-               zr = z(k) - z(i)
-               call image (xr,yr,zr)
-               r2 = xr*xr + yr* yr + zr*zr
-               if (r2 .le. off2) then
-                  m1 = minv(j+1)
-                  m2 = minv(j+2)
-                  m3 = minv(j+3)
-                  m4 = minv(j+4)
-                  m5 = minv(j+5)
-                  m6 = minv(j+6)
-                  j = j + 6
-                  zrsd(1,ii) = zrsd(1,ii) + m1*rsd(1,kk)
-     &                            + m2*rsd(2,kk) + m3*rsd(3,kk)
-                  zrsd(2,ii) = zrsd(2,ii) + m2*rsd(1,kk)
-     &                            + m4*rsd(2,kk) + m5*rsd(3,kk)
-                  zrsd(3,ii) = zrsd(3,ii) + m3*rsd(1,kk)
-     &                            + m5*rsd(2,kk) + m6*rsd(3,kk)
-                  zrsd(1,kk) = zrsd(1,kk) + m1*rsd(1,ii)
-     &                            + m2*rsd(2,ii) + m3*rsd(3,ii)
-                  zrsd(2,kk) = zrsd(2,kk) + m2*rsd(1,ii)
-     &                            + m4*rsd(2,ii) + m5*rsd(3,ii)
-                  zrsd(3,kk) = zrsd(3,kk) + m3*rsd(1,ii)
-     &                            + m5*rsd(2,ii) + m6*rsd(3,ii)
-                  zrsdp(1,ii) = zrsdp(1,ii) + m1*rsdp(1,kk)
-     &                             + m2*rsdp(2,kk) + m3*rsdp(3,kk)
-                  zrsdp(2,ii) = zrsdp(2,ii) + m2*rsdp(1,kk)
-     &                             + m4*rsdp(2,kk) + m5*rsdp(3,kk)
-                  zrsdp(3,ii) = zrsdp(3,ii) + m3*rsdp(1,kk)
-     &                             + m5*rsdp(2,kk) + m6*rsdp(3,kk)
-                  zrsdp(1,kk) = zrsdp(1,kk) + m1*rsdp(1,ii)
-     &                             + m2*rsdp(2,ii) + m3*rsdp(3,ii)
-                  zrsdp(2,kk) = zrsdp(2,kk) + m2*rsdp(1,ii)
-     &                             + m4*rsdp(2,ii) + m5*rsdp(3,ii)
-                  zrsdp(3,kk) = zrsdp(3,kk) + m3*rsdp(1,ii)
-     &                             + m5*rsdp(2,ii) + m6*rsdp(3,ii)
-               end if
+         if (use_ulist) then
+            off2 = usolvcut * usolvcut
+            j = 0
+            do ii = 1, npole-1
+               i = ipole(ii)
+               do kk = ii+1, npole
+                  k = ipole(kk)
+                  xr = x(k) - x(i)
+                  yr = y(k) - y(i)
+                  zr = z(k) - z(i)
+                  call image (xr,yr,zr)
+                  r2 = xr*xr + yr* yr + zr*zr
+                  if (r2 .le. off2) then
+                     m1 = minv(j+1)
+                     m2 = minv(j+2)
+                     m3 = minv(j+3)
+                     m4 = minv(j+4)
+                     m5 = minv(j+5)
+                     m6 = minv(j+6)
+                     j = j + 6
+                     zrsd(1,ii) = zrsd(1,ii) + m1*rsd(1,kk)
+     &                               + m2*rsd(2,kk) + m3*rsd(3,kk)
+                     zrsd(2,ii) = zrsd(2,ii) + m2*rsd(1,kk)
+     &                               + m4*rsd(2,kk) + m5*rsd(3,kk)
+                     zrsd(3,ii) = zrsd(3,ii) + m3*rsd(1,kk)
+     &                               + m5*rsd(2,kk) + m6*rsd(3,kk)
+                     zrsd(1,kk) = zrsd(1,kk) + m1*rsd(1,ii)
+     &                               + m2*rsd(2,ii) + m3*rsd(3,ii)
+                     zrsd(2,kk) = zrsd(2,kk) + m2*rsd(1,ii)
+     &                               + m4*rsd(2,ii) + m5*rsd(3,ii)
+                     zrsd(3,kk) = zrsd(3,kk) + m3*rsd(1,ii)
+     &                               + m5*rsd(2,ii) + m6*rsd(3,ii)
+                     zrsdp(1,ii) = zrsdp(1,ii) + m1*rsdp(1,kk)
+     &                                + m2*rsdp(2,kk) + m3*rsdp(3,kk)
+                     zrsdp(2,ii) = zrsdp(2,ii) + m2*rsdp(1,kk)
+     &                                + m4*rsdp(2,kk) + m5*rsdp(3,kk)
+                     zrsdp(3,ii) = zrsdp(3,ii) + m3*rsdp(1,kk)
+     &                                + m5*rsdp(2,kk) + m6*rsdp(3,kk)
+                     zrsdp(1,kk) = zrsdp(1,kk) + m1*rsdp(1,ii)
+     &                                + m2*rsdp(2,ii) + m3*rsdp(3,ii)
+                     zrsdp(2,kk) = zrsdp(2,kk) + m2*rsdp(1,ii)
+     &                                + m4*rsdp(2,ii) + m5*rsdp(3,ii)
+                     zrsdp(3,kk) = zrsdp(3,kk) + m3*rsdp(1,ii)
+     &                                + m5*rsdp(2,ii) + m6*rsdp(3,ii)
+                  end if
+               end do
             end do
-         end do
+         end if
 c
 c     construct off-diagonal elements of preconditioning matrix
 c
-      else if (mode .eq. 'BUILD') then
+      else if (mode.eq.'BUILD' .and. use_ulist) then
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -7146,6 +7189,7 @@ c
       use atoms
       use chgpen
       use couple
+      use limits
       use mplpot
       use mpole
       use neigh
@@ -7189,7 +7233,7 @@ c     use diagonal preconditioner elements as first approximation
 c
          polmin = 0.00000001d0
          do ii = 1, npole
-            poli = udiag * max(polmin,polarity(ii))
+            poli = uaccel * max(polmin,polarity(ii))
             do j = 1, 3
                zrsd(j,ii) = poli * rsd(j,ii)
                zrsdp(j,ii) = poli * rsdp(j,ii)
@@ -7200,59 +7244,61 @@ c
 c
 c     use the off-diagonal preconditioner elements in second phase
 c
+         if (use_ulist) then
 !$OMP PARALLEL default(private) shared(npole,mindex,minv,nulst,ulst,
 !$OMP& rsd,rsdp,zrsd,zrsdp,zrsdt,zrsdtp)
 !$OMP DO reduction(+:zrsdt,zrsdtp) schedule(guided)
-         do ii = 1, npole
-            m = mindex(ii)
-            do kkk = 1, nulst(ii)
-               kk = ulst(kkk,ii)
-               m1 = minv(m+1)
-               m2 = minv(m+2)
-               m3 = minv(m+3)
-               m4 = minv(m+4)
-               m5 = minv(m+5)
-               m6 = minv(m+6)
-               m = m + 6
-               zrsdt(1,ii) = zrsdt(1,ii) + m1*rsd(1,kk)
-     &                          + m2*rsd(2,kk) + m3*rsd(3,kk)
-               zrsdt(2,ii) = zrsdt(2,ii) + m2*rsd(1,kk)
-     &                          + m4*rsd(2,kk) + m5*rsd(3,kk)
-               zrsdt(3,ii) = zrsdt(3,ii) + m3*rsd(1,kk)
-     &                          + m5*rsd(2,kk) + m6*rsd(3,kk)
-               zrsdt(1,kk) = zrsdt(1,kk) + m1*rsd(1,ii)
-     &                          + m2*rsd(2,ii) + m3*rsd(3,ii)
-               zrsdt(2,kk) = zrsdt(2,kk) + m2*rsd(1,ii)
-     &                          + m4*rsd(2,ii) + m5*rsd(3,ii)
-               zrsdt(3,kk) = zrsdt(3,kk) + m3*rsd(1,ii)
-     &                          + m5*rsd(2,ii) + m6*rsd(3,ii)
-               zrsdtp(1,ii) = zrsdtp(1,ii) + m1*rsdp(1,kk)
-     &                           + m2*rsdp(2,kk) + m3*rsdp(3,kk)
-               zrsdtp(2,ii) = zrsdtp(2,ii) + m2*rsdp(1,kk)
-     &                           + m4*rsdp(2,kk) + m5*rsdp(3,kk)
-               zrsdtp(3,ii) = zrsdtp(3,ii) + m3*rsdp(1,kk)
-     &                           + m5*rsdp(2,kk) + m6*rsdp(3,kk)
-               zrsdtp(1,kk) = zrsdtp(1,kk) + m1*rsdp(1,ii)
-     &                           + m2*rsdp(2,ii) + m3*rsdp(3,ii)
-               zrsdtp(2,kk) = zrsdtp(2,kk) + m2*rsdp(1,ii)
-     &                           + m4*rsdp(2,ii) + m5*rsdp(3,ii)
-               zrsdtp(3,kk) = zrsdtp(3,kk) + m3*rsdp(1,ii)
-     &                           + m5*rsdp(2,ii) + m6*rsdp(3,ii)
+            do ii = 1, npole
+               m = mindex(ii)
+               do kkk = 1, nulst(ii)
+                  kk = ulst(kkk,ii)
+                  m1 = minv(m+1)
+                  m2 = minv(m+2)
+                  m3 = minv(m+3)
+                  m4 = minv(m+4)
+                  m5 = minv(m+5)
+                  m6 = minv(m+6)
+                  m = m + 6
+                  zrsdt(1,ii) = zrsdt(1,ii) + m1*rsd(1,kk)
+     &                             + m2*rsd(2,kk) + m3*rsd(3,kk)
+                  zrsdt(2,ii) = zrsdt(2,ii) + m2*rsd(1,kk)
+     &                             + m4*rsd(2,kk) + m5*rsd(3,kk)
+                  zrsdt(3,ii) = zrsdt(3,ii) + m3*rsd(1,kk)
+     &                             + m5*rsd(2,kk) + m6*rsd(3,kk)
+                  zrsdt(1,kk) = zrsdt(1,kk) + m1*rsd(1,ii)
+     &                             + m2*rsd(2,ii) + m3*rsd(3,ii)
+                  zrsdt(2,kk) = zrsdt(2,kk) + m2*rsd(1,ii)
+     &                             + m4*rsd(2,ii) + m5*rsd(3,ii)
+                  zrsdt(3,kk) = zrsdt(3,kk) + m3*rsd(1,ii)
+     &                             + m5*rsd(2,ii) + m6*rsd(3,ii)
+                  zrsdtp(1,ii) = zrsdtp(1,ii) + m1*rsdp(1,kk)
+     &                              + m2*rsdp(2,kk) + m3*rsdp(3,kk)
+                  zrsdtp(2,ii) = zrsdtp(2,ii) + m2*rsdp(1,kk)
+     &                              + m4*rsdp(2,kk) + m5*rsdp(3,kk)
+                  zrsdtp(3,ii) = zrsdtp(3,ii) + m3*rsdp(1,kk)
+     &                              + m5*rsdp(2,kk) + m6*rsdp(3,kk)
+                  zrsdtp(1,kk) = zrsdtp(1,kk) + m1*rsdp(1,ii)
+     &                              + m2*rsdp(2,ii) + m3*rsdp(3,ii)
+                  zrsdtp(2,kk) = zrsdtp(2,kk) + m2*rsdp(1,ii)
+     &                              + m4*rsdp(2,ii) + m5*rsdp(3,ii)
+                  zrsdtp(3,kk) = zrsdtp(3,kk) + m3*rsdp(1,ii)
+     &                              + m5*rsdp(2,ii) + m6*rsdp(3,ii)
+               end do
             end do
-         end do
 !$OMP END DO
 c
 c     transfer the results from local to global arrays
 c
 !$OMP DO
-         do ii = 1, npole
-            do j = 1, 3
-               zrsd(j,ii) = zrsd(j,ii) + zrsdt(j,ii)
-               zrsdp(j,ii) = zrsdp(j,ii) + zrsdtp(j,ii)
+            do ii = 1, npole
+               do j = 1, 3
+                  zrsd(j,ii) = zrsd(j,ii) + zrsdt(j,ii)
+                  zrsdp(j,ii) = zrsdp(j,ii) + zrsdtp(j,ii)
+               end do
             end do
-         end do
 !$OMP END DO
 !$OMP END PARALLEL
+         end if
 c
 c     perform deallocation of some local arrays
 c
@@ -7261,7 +7307,7 @@ c
 c
 c     build the off-diagonal elements of preconditioning matrix
 c
-      else if (mode .eq. 'BUILD') then
+      else if (mode.eq.'BUILD' .and. use_ulist) then
          m = 0
          do ii = 1, npole
             mindex(ii) = m

@@ -892,7 +892,7 @@ c
       use atomid
       use couple
       implicit none
-      integer i,j,m
+      integer i,j
       integer nlink
       integer ia,ib,ic
       integer ja,jb,jc
@@ -1691,8 +1691,7 @@ c
       use polar
       use polpot
       implicit none
-      integer i,j,k,m
-      integer jj,ia,ib
+      integer i,j,k,m,jj
       integer atn,next
       real*8 pol,thl
       real*8 pel,pal
@@ -3647,14 +3646,11 @@ c
       implicit none
       integer i,j,k,m
       integer it,mt
-      integer ix,iy,iz
       integer in,jn,ni,nj
       integer size,numtyp
-      integer priority
       integer nlist,nave
       integer tmin,tmax
       integer xaxe,yaxe,zaxe
-      integer indx(4)
       integer, allocatable :: ci(:)
       integer, allocatable :: cj(:)
       integer, allocatable :: list(:)
@@ -3662,12 +3658,10 @@ c
       integer, allocatable :: pkey(:)
       integer, allocatable :: pgrt(:,:)
       real*8 pave(13)
-      logical done,repeat
-      logical header,exist
+      logical done,header,exist
       logical query,condense
       logical match,diff
-      logical useframe
-      logical symm
+      logical useframe,symm
       logical yzero,xyzero
       character*1 answer
       character*4 pa,pb,pc,pd

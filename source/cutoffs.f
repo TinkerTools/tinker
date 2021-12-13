@@ -115,7 +115,11 @@ c
 c     get cutoff for preconditioner of dipole solver
 c
          else if (keyword(1:14) .eq. 'USOLVE-CUTOFF ') then
-            read (string,*,err=10,end=10)  usolvcut
+            if (usolvcut .ne. 0.0d0) then
+               read (string,*,err=10,end=10)  usolvcut
+            end if
+         else if (keyword(1:16) .eq. 'USOLVE-DIAGONAL ') then
+            usolvcut = 0.0d0
 c
 c     get values for the tapering style and neighbor method
 c
@@ -213,9 +217,10 @@ c
    10    continue
       end do
 c
-c     preconditioner list only needed for mutual polarization
+c     check to see if preconditioner list should be disabled
 c
       if (poltyp .eq. 'DIRECT')  use_ulist = .false.
+      if (usolvcut .le. 0.0d0)  use_ulist = .false.
       if (use_list)  usolvcut = usolvcut - pbuffer
 c
 c     apply any Ewald cutoff to dispersion and electrostatics

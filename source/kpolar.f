@@ -51,7 +51,7 @@ c
       integer pg(maxval)
       integer, allocatable :: list(:)
       real*8 pol,thl,ddp
-      real*8 sixth,thole0
+      real*8 sixth
       logical header
       character*20 keyword
       character*20 text

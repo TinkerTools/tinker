@@ -35,19 +35,18 @@ c
       use potent
       use usage
       implicit none
-      integer i,j,k
+      integer i,j
       integer ia,ib,ic
       integer ita,itb,itc
       integer na,nb
       integer size,next
-      real*8 fc,bd,cfb
+      real*8 cfb
       real*8 cfa1,cfa2
       real*8 cfb1,cfb2
       logical headerb
       logical headera
       character*4 pa,pb,pc
-      character*8 blank8
-      character*8 pt,pt2
+      character*8 blank8,pt2
       character*8 ptab,ptbc
       character*12 blank12,pt3
       character*20 keyword

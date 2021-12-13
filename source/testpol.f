@@ -63,7 +63,9 @@ c
       real*8, allocatable :: uxpt(:,:)
       real*8, allocatable :: utcg(:,:)
       real*8, allocatable :: ustore(:,:,:)
-      logical exist,dofull,done
+      logical exist,done
+      logical dofull
+      logical dofitopt
       character*1 answer
       character*1 digit
       character*6 savetyp
@@ -104,6 +106,22 @@ c
          call upcase (answer)
          if (answer .eq. 'Y')  dofull = .true.
       end if
+c
+c     decide whether to output results by gradient component
+c
+      dofitopt = .false.
+      call nextarg (answer,exist)
+      if (.not. exist) then
+         write (iout,40)
+   40    format (/,' Optimize OPT Coefficients for Current System',
+     &              ' [N] :  ',$)
+         read (input,50)  record
+   50    format (a240)
+         next = 1
+         call gettext (record,answer,next)
+      end if
+      call upcase (answer)
+      if (answer .eq. 'Y')  dofitopt = .true.
 c
 c     maintain any periodic boundary conditions
 c
@@ -194,9 +212,9 @@ c
                end do
             end if
          end if
-         if (drms(k) .lt. 0.5d0*poleps)  goto 40
+         if (drms(k) .lt. 0.5d0*poleps)  goto 60
       end do
-   40 continue
+   60 continue
       maxiter = politer
       do i = 1, n
          do j = 1, 3
@@ -207,8 +225,8 @@ c
 c     print the fully converged SCF induced dipole moments
 c
       if (dofull) then
-         write (iout,50)
-   50    format (/,' Exact SCF Induced Dipole Moments :',
+         write (iout,70)
+   70    format (/,' Exact SCF Induced Dipole Moments :',
      &           //,4x,'Atom',14x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i) .and. douind(i)) then
@@ -216,8 +234,8 @@ c
                uy = uexact(2,i)
                uz = uexact(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,60)  i,ux,uy,uz,u2
-   60          format (i8,4x,4f14.6)
+               write (iout,80)  i,ux,uy,uz,u2
+   80          format (i8,4x,4f14.6)
             end if
          end do
       end if
@@ -225,8 +243,8 @@ c
 c     print the iterative PCG induced dipole moments
 c
       if (dofull) then
-         write (iout,70)  kpcg
-   70    format (/,' Iterative PCG Induced Dipole Moments :',
+         write (iout,90)  kpcg
+   90    format (/,' Iterative PCG Induced Dipole Moments :',
      &              4x,'(',i3,' Iterations)',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
@@ -235,8 +253,8 @@ c
                uy = upcg(2,i)
                uz = upcg(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,80)  i,ux,uy,uz,u2
-   80          format (i8,4x,4f14.6)
+               write (iout,100)  i,ux,uy,uz,u2
+  100          format (i8,4x,4f14.6)
             end if
          end do
       end if
@@ -255,8 +273,8 @@ c
 c     print the direct polarization induced dipole moments
 c
       if (dofull) then
-         write (iout,90)
-   90    format (/,' Direct Induced Dipole Moments :',
+         write (iout,110)
+  110    format (/,' Direct Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i) .and. douind(i)) then
@@ -264,8 +282,8 @@ c
                uy = udirect(2,i)
                uz = udirect(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,100)  i,ux,uy,uz,u2
-  100          format (i8,4x,4f14.6)
+               write (iout,120)  i,ux,uy,uz,u2
+  120          format (i8,4x,4f14.6)
             end if
          end do
       end if
@@ -285,8 +303,8 @@ c
 c     print the OPT extrapolation induced dipole moments
 c
       if (dofull) then
-         write (iout,110)  optorder
-  110    format (/,' Analytical OPT',i1,' Induced Dipole Moments :',
+         write (iout,130)  optorder
+  130    format (/,' Analytical OPT',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i) .and. douind(i)) then
@@ -294,8 +312,8 @@ c
                uy = uxpt(2,i)
                uz = uxpt(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,120)  i,ux,uy,uz,u2
-  120          format (i8,4x,4f14.6)
+               write (iout,140)  i,ux,uy,uz,u2
+  140          format (i8,4x,4f14.6)
             end if
          end do
       end if
@@ -315,8 +333,8 @@ c
 c     print the TCG analytical induced dipole moments
 c
       if (dofull) then
-         write (iout,130)  tcgorder
-  130    format (/,' Analytical TCG',i1,' Induced Dipole Moments :',
+         write (iout,150)  tcgorder
+  150    format (/,' Analytical TCG',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
          do i = 1, n
             if (use(i) .and. douind(i)) then
@@ -324,8 +342,8 @@ c
                uy = utcg(2,i)
                uz = utcg(3,i)
                u2 = sqrt(ux*ux+uy*uy+uz*uz)
-               write (iout,140)  i,ux,uy,uz,u2
-  140          format (i8,4x,4f14.6)
+               write (iout,160)  i,ux,uy,uz,u2
+  160          format (i8,4x,4f14.6)
             end if
          end do
       end if
@@ -364,22 +382,22 @@ c
 c
 c     print the RMS between approximate and exact dipoles
 c
-      write (iout,150)  saveopt,savetcg
-  150 format (/,' Approximate vs. Exact Induced Dipoles :',
+      write (iout,170)  saveopt,savetcg
+  170 format (/,' Approximate vs. Exact Induced Dipoles :',
      &        //,4x,'Atom',14x,'Direct',12x,'PCG',12x,'OPT',i1,
      &           12x,'TCG',i1)
       if (dofull) then
-         write (iout,160)
-  160    format ()
+         write (iout,180)
+  180    format ()
          do i = 1, n
             if (use(i) .and. douind(i)) then
-               write (iout,170)  i,tdirect(i),tpcg(i),txpt(i),ttcg(i)
-  170          format (i8,6x,4f16.10)
+               write (iout,190)  i,tdirect(i),tpcg(i),txpt(i),ttcg(i)
+  190          format (i8,6x,4f16.10)
             end if
          end do
       end if
-      write (iout,180)  rdirect,rpcg,rxpt,rtcg
-  180 format (/,5x,'RMS',6x,4f16.10)
+      write (iout,200)  rdirect,rpcg,rxpt,rtcg
+  200 format (/,5x,'RMS',6x,4f16.10)
 c
 c     find the RMS of each iteration from the exact dipoles
 c
@@ -399,69 +417,70 @@ c
 c
 c     print the RMS between iterations and versus exact dipoles
 c
-      write (iout,190)
-  190 format (/,' Iterative PCG Induced Dipole Convergence :',
+      write (iout,210)
+  210 format (/,' Iterative PCG Induced Dipole Convergence :',
      &        //,4x,'Iter',12x,'RMS Change',11x,'RMS vs Exact')
-      write (iout,200)  0,rms(0)
-  200 format (/,i8,15x,'----',6x,f20.10)
+      write (iout,220)  0,rms(0)
+  220 format (/,i8,15x,'----',6x,f20.10)
       do k = 1, maxiter
-         write (iout,210)  k,drms(k),rms(k)
-  210    format (i8,2x,f20.10,3x,f20.10)
-         if (rms(k) .lt. 0.5d0*poleps)  goto 220
+         write (iout,230)  k,drms(k),rms(k)
+  230    format (i8,2x,f20.10,3x,f20.10)
+         if (rms(k) .lt. 0.5d0*poleps)  goto 240
       end do
-  220 continue
+  240 continue
 c
 c     refine the extrapolated OPT coefficients via optimization
 c
-      poltyp = savetyp
-      if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT   '
-      call kpolar
-      write (iout,230)  optorder
-  230 format (/,' Analytical OPT',i1,' Coefficient Refinement :',
-     &        //,4x,'Iter',7x,'C0',5x,'C1',5x,'C2',5x,'C3',
-     &           5x,'C4',5x,'C5',5x,'C6',5x,'RMS vs Exact',/)
+      if (dofitopt) then
+         poltyp = savetyp
+         if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT   '
+         call kpolar
+         write (iout,250)  optorder
+  250    format (/,' Analytical OPT',i1,' Coefficient Refinement :',
+     &           //,4x,'Iter',7x,'C0',5x,'C1',5x,'C2',5x,'C3',
+     &              5x,'C4',5x,'C5',5x,'C6',5x,'RMS vs Exact',/)
 c
 c     perform dynamic allocation of some local arrays
 c
-      nvar = 0
-      do i = 0, optorder
-         if (copt(i) .ne. 0.0d0)  nvar = nvar + 1
-      end do
-      allocate (var(nvar))
+         nvar = 0
+         do i = 0, optorder
+            if (copt(i) .ne. 0.0d0)  nvar = nvar + 1
+         end do
+         allocate (var(nvar))
 c
 c     count number of variables and define the initial simplex
 c
-      nvar = 0
-      do i = 0, optorder
-         if (copt(i) .ne. 0.0d0) then
-            nvar = nvar + 1
-            var(nvar) = copt(i)
-         end if
-      end do
+         nvar = 0
+         do i = 0, optorder
+            if (copt(i) .ne. 0.0d0) then
+               nvar = nvar + 1
+               var(nvar) = copt(i)
+            end if
+         end do
 c
 c     optimize OPT coefficients, then print refined values
 c
-      iter = 0
-      maxiter = 3000
-      iprint = 0
-      ntest = 200
-      step = 0.03d0
-      delta = 0.0001d0
-      rxpt = 1000.0d0
-      call simplex (nvar,iter,ntest,var,rxpt,step,delta,optfit)
-      nvar = 0
-      do i = 0, optorder
-         if (copt(i) .ne. 0.0d0) then
-            nvar = nvar + 1
-            copt(i) = var(nvar)
-         end if
-      end do
-      write (iout,240)  iter,(copt(i),i=0,6),rxpt
-  240 format (i8,3x,7f7.3,f16.10)
+         iter = 0
+         maxiter = 3000
+         iprint = 0
+         ntest = 200
+         step = 0.03d0
+         delta = 0.0001d0
+         rxpt = 1000.0d0
+         call simplex (nvar,iter,ntest,var,rxpt,step,delta,optfit)
+         nvar = 0
+         do i = 0, optorder
+            if (copt(i) .ne. 0.0d0) then
+               nvar = nvar + 1
+               copt(i) = var(nvar)
+            end if
+         end do
+         write (iout,260)  iter,(copt(i),i=0,6),rxpt
+  260    format (i8,3x,7f7.3,f16.10)
+      end if
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (var)
       deallocate (rms)
       deallocate (drms)
       deallocate (tdirect)
@@ -477,6 +496,7 @@ c
       deallocate (uxpt)
       deallocate (utcg)
       deallocate (ustore)
+      if (dofitopt)  deallocate (var)
 c
 c     perform any final tasks before program exit
 c

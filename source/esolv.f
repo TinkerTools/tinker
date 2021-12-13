@@ -1457,8 +1457,7 @@ c
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
-      real*8 sum,term
-      real*8 iwca,irep,offset
+      real*8 sum,term,iwca,irep
       real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7

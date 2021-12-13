@@ -384,7 +384,7 @@ c
       poltyp = 'MUTUAL'
       politer = 100
       poleps = 0.000001d0
-      udiag = 2.0d0
+      uaccel = 2.0d0
       p2scale = 0.0d0
       p3scale = 0.0d0
       p4scale = 1.0d0

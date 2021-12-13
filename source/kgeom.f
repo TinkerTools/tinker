@@ -45,7 +45,6 @@ c
       real*8 vol,ratio
       logical exist,keep
       logical intermol
-      logical first
       character*1 letter
       character*20 keyword
       character*240 record

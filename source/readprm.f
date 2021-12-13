@@ -91,7 +91,7 @@ c
       real*8 pol,thl,ddp
       real*8 ctrn,atrn
       real*8 cfb,cfb1,cfb2
-      real*8 cfa1,cfa2,srd
+      real*8 cfa1,cfa2
       real*8 pbrd,csrd,gkrd
       real*8 el,iz,rp
       real*8 ss,ts

@@ -1502,7 +1502,7 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer ii,it,kt
+      integer ii,it
       integer ktype
       integer nvar
       integer, allocatable :: equiv(:)
