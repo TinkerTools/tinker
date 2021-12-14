@@ -169,14 +169,14 @@ c
    20       format (/,' Steepest Descent Gradient Optimization :')
             write (iout,30)
    30       format (/,' SD Iter     F Value      G RMS      F Move',
-     &                 '   X Move   Angle  FG Call  Comment',/)
+     &                 '   X Move   Angle  FG Call  Comment')
          else
             write (iout,40)
    40       format (/,' Limited Memory BFGS Quasi-Newton',
      &                 ' Optimization :')
             write (iout,50)
    50       format (/,' QN Iter     F Value      G RMS      F Move',
-     &                 '   X Move   Angle  FG Call  Comment',/)
+     &                 '   X Move   Angle  FG Call  Comment')
          end if
          flush (iout)
       end if
@@ -221,10 +221,10 @@ c
       if (iprint .gt. 0) then
          if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and. g_rms.lt.1.0d5) then
             write (iout,60)  niter,f,g_rms,ncalls
-   60       format (i6,f14.4,f11.4,29x,i7)
+   60       format (/,i6,f14.4,f11.4,29x,i7)
          else
             write (iout,70)  niter,f,g_rms,ncalls
-   70       format (i6,d14.4,d11.4,29x,i7)
+   70       format (/,i6,d14.4,d11.4,29x,i7)
          end if
          flush (iout)
       end if

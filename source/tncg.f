@@ -242,7 +242,7 @@ c
      &              ' RMS Grad :',d9.2)
          write (iout,70)
    70    format (/,' TN Iter     F Value      G RMS      F Move',
-     &              '   X Move   CG Iter  Solve   FG Call',/)
+     &              '   X Move   CG Iter  Solve   FG Call')
          flush (iout)
       end if
 c
@@ -278,10 +278,10 @@ c
       if (iprint .gt. 0) then
          if (f.lt.1.0d8 .and. f.gt.-1.0d7 .and. g_rms.lt.1.0d5) then
             write (iout,80)  iter_tn,f,g_rms,fg_call
-   80       format (i6,f14.4,f11.4,41x,i7)
+   80       format (/,i6,f14.4,f11.4,41x,i7)
          else
             write (iout,90)  iter_tn,f,g_rms,fg_call
-   90       format (i6,d14.4,d11.4,41x,i7)
+   90       format (/,i6,d14.4,d11.4,41x,i7)
          end if
          flush (iout)
       end if

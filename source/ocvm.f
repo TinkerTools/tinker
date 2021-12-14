@@ -165,7 +165,7 @@ c
      &             ' Optimization :')
          write (iout,30)
    30    format (/,' VM Iter     F Value       G RMS      F Move',
-     &              '   X Move      Angle   FG Call',/)
+     &              '   X Move      Angle   FG Call')
          flush (iout)
       end if
 c
@@ -252,10 +252,10 @@ c
                if (f0.lt.1.0d8 .and. f0.gt.-1.0d7 .and.
      &                    grms.lt.1.0d6) then
                   write (iout,40)  niter,f0,grms,ncalls
-   40             format (i6,f14.4,f12.4,32x,i9)
+   40             format (/,i6,f14.4,f12.4,32x,i9)
                else
                   write (iout,50)  niter,f0,grms,ncalls
-   50             format (i6,d14.4,d12.4,32x,i9)
+   50             format (/,i6,d14.4,d12.4,32x,i9)
                end if
             else if (mod(niter,iprint) .eq. 0) then
                if (f0.lt.1.0d8 .and. f0.gt.-1.0d7 .and.

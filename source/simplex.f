@@ -92,7 +92,7 @@ c
    20    format (/,' Nelder-Mead Simplex Optimization :')
          write (iout,30)
    30    format (/,' NM Iter     F Value      G RMS      F Move',
-     &              '   X Move    Comment',/)
+     &              '   X Move    Comment')
          flush (iout)
       end if
 c
