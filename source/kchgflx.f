@@ -47,7 +47,6 @@ c
       logical headera
       character*4 pa,pb,pc
       character*8 blank8,pt2
-      character*8 ptab,ptbc
       character*12 blank12,pt3
       character*20 keyword
       character*240 record
@@ -225,16 +224,6 @@ c
          else
             pt3 = pc//pb//pa
          end if
-         if (ita .le. itb) then
-            ptab = pa//pb
-         else
-            ptab = pb//pa
-         end if
-         if (itb .le. itc) then
-            ptbc = pb//pc
-         else
-            ptbc = pc//pb
-         end if
          aflx(1,i) = 0.0d0
          aflx(2,i) = 0.0d0
          abflx(1,i) = 0.0d0
@@ -242,10 +231,17 @@ c
          do j = 1, na
             if (kcfa(j) .eq. pt3) then
                naflx = naflx + 1
-               aflx(1,i) = cfla(1,j)
-               aflx(2,i) = cfla(2,j)
-               abflx(1,i) = cflab(1,j)
-               abflx(2,i) = cflab(2,j)
+               if (ita .le. itc) then
+                  aflx(1,i) = cfla(1,j)
+                  aflx(2,i) = cfla(2,j)
+                  abflx(1,i) = cflab(1,j)
+                  abflx(2,i) = cflab(2,j)
+               else
+                  aflx(1,i) = cfla(2,j)
+                  aflx(2,i) = cfla(1,j)
+                  abflx(1,i) = cflab(2,j)
+                  abflx(2,i) = cflab(1,j)
+               end if
             end if
          end do
       end do
