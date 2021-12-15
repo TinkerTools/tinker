@@ -1360,13 +1360,17 @@ c
             ncfa = ncfa + 1
             if (ia .le. ic) then
                kcfa(ncfa) = pa//pb//pc
+               cfla(1,ncfa) = cfa1
+               cfla(2,ncfa) = cfa2
+               cflab(1,ncfa) = cfb1
+               cflab(2,ncfa) = cfb2
             else
                kcfa(ncfa) = pc//pb//pa
+               cfla(1,ncfa) = cfa2
+               cfla(2,ncfa) = cfa1
+               cflab(1,ncfa) = cfb2
+               cflab(2,ncfa) = cfb1
             end if
-            cfla(1,ncfa) = cfa1
-            cfla(2,ncfa) = cfa2
-            cflab(1,ncfa) = cfb1
-            cflab(2,ncfa) = cfb2
 c
 c     implicit solvation parameters
 c
