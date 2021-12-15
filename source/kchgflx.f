@@ -144,6 +144,17 @@ c
                   cfla(2,j) = cfa2
                   cflab(1,j) = cfb1
                   cflab(2,j) = cfb2
+                  if (ia .le. ic) then
+                     cfla(1,j) = cfa1
+                     cfla(2,j) = cfa2
+                     cflab(1,j) = cfb1
+                     cflab(2,j) = cfb2
+                  else
+                     cfla(1,j) = cfa2
+                     cfla(2,j) = cfa1
+                     cflab(1,j) = cfb2
+                     cflab(2,j) = cfb1
+                  end if
                   goto 90
                end if
             end do
