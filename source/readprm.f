@@ -1358,7 +1358,6 @@ c
             call numeral (ib,pb,size)
             call numeral (ic,pc,size)
             ncfa = ncfa + 1
-            
             if (ia .le. ic) then
                kcfa(ncfa) = pa//pb//pc
                cfla(1,ncfa) = cfa1
