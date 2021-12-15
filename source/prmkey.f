@@ -165,6 +165,11 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_chgtrn = .true.
          if (value .eq. 'NONE')  use_chgtrn = .false.
+      else if (keyword(1:11) .eq. 'CHGFLXTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call potoff
+         use_chgflx = .true.
+         if (value .eq. 'NONE')  use_chgflx = .false.
       else if (keyword(1:13) .eq. 'RXNFIELDTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -532,6 +537,7 @@ c
       use_mpole = .false.
       use_polar = .false.
       use_chgtrn = .false.
+      use_chgflx = .false.
       use_rxnfld = .false.
       use_solv = .false.
       use_metal = .false.
