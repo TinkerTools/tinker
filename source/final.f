@@ -779,8 +779,10 @@ c
       if (allocated(epot))  deallocate (epot)
       if (allocated(fitchg))  deallocate (fitchg)
       if (allocated(fitpol))  deallocate (fitpol)
+      if (allocated(fitpol))  deallocate (fitcpen)
       if (allocated(gatm))  deallocate (gatm)
       if (allocated(fatm))  deallocate (fatm)
+      if (allocated(varpot))  deallocate (varpot)
 c
 c     deallocation of global arrays from module qmstuf
 c

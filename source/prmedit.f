@@ -282,7 +282,7 @@ c
             read (string,*,err=140,end=140)  ia,spr,apr,epr
   140       continue
             write (iprm,150)  ia,spr,apr,epr
-  150       format ('repulsion',1x,i5,5x,2f11.4,f11.3)
+  150       format ('repulsion',6x,i5,5x,2f11.4,f11.3)
          else if (keyword(1:11) .eq. 'DISPERSION ') then
             ia = 0
             cdp = 0.0d0
@@ -290,7 +290,7 @@ c
             read (string,*,err=160,end=160)  ia,cdp,adp
   160       continue
             write (iprm,170)  ia,cdp,adp
-  170       format ('dispersion',i5,5x,2f11.4)
+  170       format ('dispersion',5x,i5,5x,2f11.4)
          else if (keyword(1:5) .eq. 'BOND ') then
             ia = 0
             ib = 0
@@ -837,7 +837,7 @@ c
             read (string,*,err=1180,end=1180)  ia,pel,pal
  1180       continue
             write (iprm,1190)  ia,pel,pal
- 1190       format ('chgpen',4x,i5,5x,2f11.4)
+ 1190       format ('chgpen',9x,i5,5x,2f11.4)
          else if (keyword(1:9) .eq. 'POLARIZE ') then
             ia = 0
             pol = 0.0d0
@@ -864,7 +864,7 @@ c
             read (string,*,err=1220,end=1220)  ia,ctrn,atrn
  1220       continue
             write (iprm,1230)  ia,ctrn,atrn
- 1230       format ('chgtrn',4x,i5,5x,2f11.4)
+ 1230       format ('chgtrn',9x,i5,5x,2f11.4)
          else if (keyword(1:9) .eq. 'BNDCFLUX ') then
             ia = 0
             ib = 0

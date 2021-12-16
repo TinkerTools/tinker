@@ -21,8 +21,8 @@ c     ivary        index for the types of potential parameters
 c     iresid       structure to which each residual function refers
 c     vary         atom numbers involved in potential parameters
 c     e0_lattice   ideal lattice energy for the current crystal
-c     vartyp       type of each potential parameter to be optimized
-c     rsdtyp       experimental variable for each of the residuals
+c     varxtl       type of each potential parameter to be optimized
+c     rsdxtl       experimental variable for each of the residuals
 c
 c
       module xtals
@@ -35,7 +35,7 @@ c
       integer iresid(maxrsd)
       integer vary(2,maxlsq)
       real*8 e0_lattice
-      character*16 vartyp(maxlsq)
-      character*16 rsdtyp(maxrsd)
+      character*16 varxtl(maxlsq)
+      character*16 rsdxtl(maxrsd)
       save
       end

@@ -177,19 +177,19 @@ c
             iresid(nresid+i) = ixtal
          end do
          if (use_bounds) then
-            rsdtyp(nresid+1) = 'Force a-Axis'
-            rsdtyp(nresid+2) = 'Force b-Axis'
-            rsdtyp(nresid+3) = 'Force c-Axis'
-            rsdtyp(nresid+4) = 'Force Alpha'
-            rsdtyp(nresid+5) = 'Force Beta'
-            rsdtyp(nresid+6) = 'Force Gamma'
+            rsdxtl(nresid+1) = 'Force a-Axis'
+            rsdxtl(nresid+2) = 'Force b-Axis'
+            rsdxtl(nresid+3) = 'Force c-Axis'
+            rsdxtl(nresid+4) = 'Force Alpha'
+            rsdxtl(nresid+5) = 'Force Beta'
+            rsdxtl(nresid+6) = 'Force Gamma'
          else
-            rsdtyp(nresid+1) = 'Force Mol1 X'
-            rsdtyp(nresid+2) = 'Force Mol1 Y'
-            rsdtyp(nresid+3) = 'Force Mol1 Z'
-            rsdtyp(nresid+4) = 'Force Mol2 X'
-            rsdtyp(nresid+5) = 'Force Mol2 Y'
-            rsdtyp(nresid+6) = 'Force Mol2 Z'
+            rsdxtl(nresid+1) = 'Force Mol1 X'
+            rsdxtl(nresid+2) = 'Force Mol1 Y'
+            rsdxtl(nresid+3) = 'Force Mol1 Z'
+            rsdxtl(nresid+4) = 'Force Mol2 X'
+            rsdxtl(nresid+5) = 'Force Mol2 Y'
+            rsdxtl(nresid+6) = 'Force Mol2 Z'
          end if
          nresid = nresid + 6
 c
@@ -202,9 +202,9 @@ c
             nresid = nresid + 1
             iresid(nresid) = ixtal
             if (use_bounds) then
-               rsdtyp(nresid) = 'Lattice Energy'
+               rsdxtl(nresid) = 'Lattice Energy'
             else
-               rsdtyp(nresid) = 'E Intermolecular'
+               rsdxtl(nresid) = 'E Intermolecular'
             end if
             write (iout,170)  e0_lattice
   170       format (' Target E-Lattice or E-Inter Value :  ',f13.2)
@@ -235,7 +235,7 @@ c
       label(6) = 'Dipole Position'
       label(7) = 'Polarizability'
       do i = 1, nvary
-         vartyp(i) = label(ivary(i))
+         varxtl(i) = label(ivary(i))
       end do
       vindex = 'Class'
       if (vdwindex .eq. 'TYPE ')  vindex = 'Type '
@@ -246,13 +246,13 @@ c
   180 format (/,' Initial Values of the Parameters :',/)
       do i = 1, nvary
          if (ivary(i) .le. 3) then
-            write (iout,190)  i,vartyp(i),vindex,vary(1,i),xx(i)
+            write (iout,190)  i,varxtl(i),vindex,vary(1,i),xx(i)
   190       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,4x,f12.4)
          else if (ivary(i) .ne. 6) then
-            write (iout,200)  i,vartyp(i),vary(1,i),xx(i)
+            write (iout,200)  i,varxtl(i),vary(1,i),xx(i)
   200       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,4x,f12.4)
          else
-            write (iout,210)  i,vartyp(i),vary(1,i),vary(2,i),xx(i)
+            write (iout,210)  i,varxtl(i),vary(1,i),vary(2,i),xx(i)
   210       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,f12.4)
          end if
       end do
@@ -295,13 +295,13 @@ c
      &           ' Derivatives :',/)
       do i = 1, nvary
          if (ivary(i) .le. 3) then
-            write (iout,230)  i,vartyp(i),vindex,vary(1,i),xx(i),g(i)
+            write (iout,230)  i,varxtl(i),vindex,vary(1,i),xx(i),g(i)
   230       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,2x,2f14.4)
          else if (ivary(i) .ne. 6) then
-            write (iout,240)  i,vartyp(i),vary(1,i),xx(i),g(i)
+            write (iout,240)  i,varxtl(i),vary(1,i),xx(i),g(i)
   240       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,2x,2f14.4)
          else
-            write (iout,250)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),g(i)
+            write (iout,250)  i,varxtl(i),vary(1,i),vary(2,i),xx(i),g(i)
   250       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,
      &                 f11.4,f14.4)
          end if
@@ -313,10 +313,10 @@ c
   260 format (/,' Final Residual Error Function Values :',/)
       do i = 1, nresid
          if (i .lt. 100) then
-            write (iout,270)  i,rsdtyp(i),iresid(i),resid(i)
+            write (iout,270)  i,rsdxtl(i),iresid(i),resid(i)
   270       format (3x,'(',i2,')',2x,a16,6x,'Structure',i4,4x,f12.4)
          else
-            write (iout,280)  i,rsdtyp(i),iresid(i),resid(i)
+            write (iout,280)  i,rsdxtl(i),iresid(i),resid(i)
   280       format (2x,'(',i3,')',2x,a16,6x,'Structure',i4,4x,f12.4)
          end if
       end do
@@ -933,13 +933,13 @@ c
      &          ' Iteration',i4,' :',/)
       do i = 1, nvary
          if (ivary(i) .le. 3) then
-            write (iout,20)  i,vartyp(i),vindex,vary(1,i),xx(i),gs(i)
+            write (iout,20)  i,varxtl(i),vindex,vary(1,i),xx(i),gs(i)
    20       format (3x,'(',i2,')',2x,a16,4x,'Atom ',a5,i5,2x,2f14.4)
          else if (ivary(i) .ne. 6) then
-            write (iout,30)  i,vartyp(i),vary(1,i),xx(i),gs(i)
+            write (iout,30)  i,varxtl(i),vary(1,i),xx(i),gs(i)
    30       format (3x,'(',i2,')',2x,a16,4x,'Atom Type ',i5,2x,2f14.4)
          else
-            write (iout,40)  i,vartyp(i),vary(1,i),vary(2,i),xx(i),gs(i)
+            write (iout,40)  i,varxtl(i),vary(1,i),vary(2,i),xx(i),gs(i)
    40       format (3x,'(',i2,')',2x,a16,4x,'Bond Type ',2i5,
      &                 f11.4,f14.4)
          end if
@@ -952,10 +952,10 @@ c
      &           i4,' :',/)
       do i = 1, nresid
          if (i .lt. 100) then
-            write (iout,60)  i,rsdtyp(i),iresid(i),resid(i)
+            write (iout,60)  i,rsdxtl(i),iresid(i),resid(i)
    60       format (3x,'(',i2,')',2x,a16,6x,'Structure',i4,4x,f12.4)
          else
-            write (iout,70)  i,rsdtyp(i),iresid(i),resid(i)
+            write (iout,70)  i,rsdxtl(i),iresid(i),resid(i)
    70       format (2x,'(',i3,')',2x,a16,6x,'Structure',i4,4x,f12.4)
          end if
       end do

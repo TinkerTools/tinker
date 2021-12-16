@@ -61,6 +61,7 @@ c
       logical dofull
       logical, allocatable :: tmpchg(:)
       logical, allocatable :: tmppol(:)
+      logical, allocatable :: tmpcpen(:)
       character*1 answer
       character*20 keyword
       character*240 record
@@ -101,6 +102,7 @@ c
       fit_mpl = .true.
       fit_dpl = .true.
       fit_qpl = .true.
+      fit_chgpen = .true.
       do i = 1, maxref
          xdpl0(i) = 0.0d0
          ydpl0(i) = 0.0d0
@@ -310,6 +312,8 @@ c
             fit_dpl = .false.
          else if (keyword(1:15) .eq. 'FIX-QUADRUPOLE ') then
             fit_qpl = .false.
+         else if (keyword(1:15) .eq. 'FIX-CHGPEN ') then
+            fit_chgpen = .false.
          else if (keyword(1:14) .eq. 'TARGET-DIPOLE ') then
             use_dpl = .true.
             k = 1
@@ -604,10 +608,13 @@ c     perform dynamic allocation of some global arrays
 c
       if (dofit) then
          allocate (fit0(12*nconf*namax))
+         allocate (varpot(12*nconf*namax))
          allocate (fchg(maxtyp))
          allocate (fpol(13,maxtyp))
+         allocate (fcpen(maxtyp))
          allocate (fitchg(maxtyp))
          allocate (fitpol(maxtyp))
+         allocate (fitcpen(maxtyp))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -616,6 +623,7 @@ c
          allocate (xhi(12*nconf*namax))
          allocate (tmpchg(maxtyp))
          allocate (tmppol(maxtyp))
+         allocate (tmpcpen(maxtyp))
 c
 c     zero the keyfile length to avoid parameter reprocessing
 c
@@ -626,6 +634,7 @@ c
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
+            fitcpen(j) = .false.
          end do
          nvar = 0
          nresid = 0
@@ -662,6 +671,7 @@ c
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
+            fitcpen(j) = .false.
          end do
          do j = 1, nconf
             call getref (j)
@@ -670,12 +680,14 @@ c
             do k = 1, maxtyp
                tmpchg(k) = fitchg(k)
                tmppol(k) = fitpol(k)
+               tmpcpen(k) = fitcpen(k)
             end do
             call varprm (nvar,xx)
             nvar = next
             do k = 1, maxtyp
                fitchg(k) = tmpchg(k)
                fitpol(k) = tmppol(k)
+               fitcpen(k) = tmpcpen(k)
             end do
             call prmvar (nvar,xx)
          end do
@@ -686,6 +698,7 @@ c
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
+            fitcpen(j) = .false.
          end do
          do j = 1, nconf
             call getref (j)
@@ -727,6 +740,7 @@ c
          deallocate (pjac)
          deallocate (tmpchg)
          deallocate (tmppol)
+         deallocate (tmpcpen)
       end if
 c
 c     perform any final tasks before program exit
@@ -1260,6 +1274,7 @@ c
       do j = 1, maxtyp
          fitchg(j) = .false.
          fitpol(j) = .false.
+         fitcpen(j) = .false.
       end do
 c
 c     find least squares residuals via loop over conformations
@@ -1325,17 +1340,16 @@ c
 c
 c     get residuals due to deviation of initial parameters
 c
-      if (resptyp .eq. 'ORIG') then
-         do i = 1, nvar
-            iresid = iresid + 1
+      do i = 1, nvar
+         iresid = iresid + 1
+         if (varpot(i) .eq. 'CHGPEN') then
+            resid(iresid) = 0.0d0
+         else if (resptyp .eq. 'ORIG') then
             resid(iresid) = (xx(i)-fit0(i)) * rscale
-         end do
-      else if (resptyp .eq. 'ZERO') then
-         do i = 1, nvar
-            iresid = iresid + 1
+         else if (resptyp .eq. 'ZERO') then
             resid(iresid) = xx(i) * rscale
-         end do
-      end if
+         end if
+      end do
       return
       end
 c
@@ -1354,6 +1368,7 @@ c
       subroutine varprm (nvar,xx)
       use atoms
       use charge
+      use chgpen
       use mpole
       use potent
       use potfit
@@ -1383,6 +1398,7 @@ c
          if (.not. done) then
             if (pchg(i) .ne. 0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'CHARGE'
                pchg(i) = xx(nvar)
             end if
             fitchg(it) = .true.
@@ -1413,50 +1429,60 @@ c
          if (.not. done) then
             if (fit_mpl .and. pole(1,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'MONOPL'
                pole(1,i) = xx(nvar)
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'DIPOLE'
                pole(2,i) = dterm * xx(nvar)
             end if
             if (fit_dpl .and. pole(3,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'DIPOLE'
                pole(3,i) = dterm * xx(nvar)
             end if
             if (fit_dpl .and. pole(4,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'DIPOLE'
                pole(4,i) = dterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(5,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
+                  varpot(nvar) = 'QUADPL'
                   pole(5,i) = qterm * xx(nvar)
                end if
             end if
             if (fit_qpl .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'QUADPL'
                pole(6,i) = qterm * xx(nvar)
                pole(8,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'QUADPL'
                pole(7,i) = qterm * xx(nvar)
                pole(11,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(9,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
+                  varpot(nvar) = 'QUADPL'
                   pole(9,i) = qterm * xx(nvar)
                end if
             end if
             if (fit_qpl .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'QUADPL'
                pole(10,i) = qterm * xx(nvar)
                pole(12,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(13,i).ne.0.0d0) then
                if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
+                  varpot(nvar) = 'QUADPL'
                   pole(13,i) = qterm * xx(nvar)
                   pole(5,i) = -0.5d0 * pole(13,i)
                   pole(9,i) = pole(5,i)
@@ -1470,6 +1496,32 @@ c
             end do
          end if
       end do
+c
+c     translate optimization values back to charge penetration
+c
+      if (fit_chgpen) then
+         do i = 1, ncp
+            done = .true.
+            ii = ipole(i)
+            it = type(ii)
+            if (fatm(ii))  done = .false.
+            if (.not. done) then
+               if (fitcpen(it)) then
+                  done = .true.
+                  palpha(i) = fcpen(it)
+               end if
+            end if
+            if (.not. done) then
+               if (palpha(i) .ne. 0.0d0) then
+                  nvar = nvar + 1
+                  varpot(nvar) = 'CHGPEN'
+                  palpha(i) = xx(nvar)
+               end if
+               fitcpen(it) = .true.
+               fcpen(it) = palpha(i)
+            end if
+         end do
+      end if
 c
 c     check chiral multipoles and rotate into global frame
 c
@@ -1496,6 +1548,7 @@ c
       use atomid
       use atoms
       use charge
+      use chgpen
       use iounit
       use mpole
       use potfit
@@ -1511,7 +1564,7 @@ c
       real*8 ival,kval
       real*8 xx(*)
       logical done
-      character*17 prmtyp
+      character*18 prmtyp
 c
 c
 c     conversion factors for dipole and quadrupole moments
@@ -1545,7 +1598,7 @@ c
       sum = 0.0d0
       do i = 1, nion
          it = type(iion(i))
-         equiv(it) = equiv(it) + 1 
+         equiv(it) = equiv(it) + 1
          sum = sum + pchg(i)
       end do
       sum = sum - dble(nint(sum))
@@ -1590,7 +1643,7 @@ c
       sum = 0.0d0
       do i = 1, npole
          it = type(ipole(i))
-         equiv(it) = equiv(it) + 1 
+         equiv(it) = equiv(it) + 1
          sum = sum + pole(1,i)
       end do
       sum = sum - dble(nint(sum))
@@ -1671,13 +1724,24 @@ c
    50          format (i6,15x,a3,10x,i6,13x,a)
             end if
          end do
+         if (fit_chgpen) then
+            do i = 1, ncp
+               ii = ipole(i)
+               if (fatm(ii)) then
+                  it = type(ii)
+                  prmtyp = 'Charge Penetration'
+                  write (iout,60)  ii,name(ii),it,prmtyp
+   60             format (i6,15x,a3,10x,i6,13x,a)
+               end if
+            end do
+         end if
       end if
 c
 c     print header information for electrostatic parameters
 c
       if (nvar .eq. 0) then
-         write (iout,60)
-   60    format (/,' Potential Fitting of Electrostatic Parameters :',
+         write (iout,70)
+   70    format (/,' Potential Fitting of Electrostatic Parameters :',
      &           //,1x,'Parameter',6x,'Atom Type',9x,'Category',
      &              12x,'Value',9x,'Fixed',/)
       end if
@@ -1696,12 +1760,13 @@ c
          if (.not. done) then
             if (pchg(i) .ne. 0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'CHARGE'
                xx(nvar) = pchg(i)
-               write (iout,70)  nvar,it,'Charge  ',xx(nvar)
-   70          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,80)  nvar,it,'Charge  ',xx(nvar)
+   80          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,80)  it,'Charge  ',pchg(i)
-   80          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,90)  it,'Charge  ',pchg(i)
+   90          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
          end if
       end do
@@ -1720,111 +1785,148 @@ c
          if (.not. done) then
             if (fit_mpl .and. pole(1,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'MONOPL'
                xx(nvar) = pole(1,i)
-               write (iout,90)  nvar,it,'Monopole',xx(nvar)
-   90          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,100)  nvar,it,'Monopole',xx(nvar)
+  100          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,100)  it,'Monopole',pole(1,i)
-  100          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,110)  it,'Monopole',pole(1,i)
+  110          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(2,i)
-               write (iout,110)  nvar,it,'X-Dipole',xx(nvar)
-  110          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,120)  nvar,it,'X-Dipole',xx(nvar)
+  120          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,120)  it,'X-Dipole',dterm*pole(2,i)
-  120          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,130)  it,'X-Dipole',dterm*pole(2,i)
+  130          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(3,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(3,i)
-               write (iout,130)  nvar,it,'Y-Dipole',xx(nvar)
-  130          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,140)  nvar,it,'Y-Dipole',xx(nvar)
+  140          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,140)  it,'Y-Dipole',dterm*pole(3,i)
-  140          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,150)  it,'Y-Dipole',dterm*pole(3,i)
+  150          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(4,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(4,i)
-               write (iout,150)  nvar,it,'Z-Dipole',xx(nvar)
-  150          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,160)  nvar,it,'Z-Dipole',xx(nvar)
+  160          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,160)  it,'Z-Dipole',dterm*pole(4,i)
-  160          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,170)  it,'Z-Dipole',dterm*pole(4,i)
+  170          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(5,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
+                  varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(5,i)
-                  write (iout,170)  nvar,it,'XX-Quad ',xx(nvar)
-  170             format (i6,7x,i8,13x,a8,6x,f12.5)
+                  write (iout,180)  nvar,it,'XX-Quad ',xx(nvar)
+  180             format (i6,7x,i8,13x,a8,6x,f12.5)
                else
-                  write (iout,180)    it,'XX-Quad ',qterm*pole(5,i)
-  180             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
+                  write (iout,190)    it,'XX-Quad ',qterm*pole(5,i)
+  190             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
                end if
             else
-               write (iout,190)  it,'XX-Quad ',qterm*pole(5,i)
-  190          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,200)  it,'XX-Quad ',qterm*pole(5,i)
+  200          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(6,i)
-               write (iout,200)  nvar,it,'XY-Quad ',xx(nvar)
-  200          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,210)  nvar,it,'XY-Quad ',xx(nvar)
+  210          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,210)  it,'XY-Quad ',qterm*pole(6,i)
-  210          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,220)  it,'XY-Quad ',qterm*pole(6,i)
+  220          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(7,i)
-               write (iout,220)  nvar,it,'XZ-Quad ',xx(nvar)
-  220          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,230)  nvar,it,'XZ-Quad ',xx(nvar)
+  230          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,230)  it,'XZ-Quad ',qterm*pole(7,i)
-  230          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,240)  it,'XZ-Quad ',qterm*pole(7,i)
+  240          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(9,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
+                  varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(9,i)
-                  write (iout,240)  nvar,it,'YY-Quad ',xx(nvar)
-  240             format (i6,7x,i8,13x,a8,6x,f12.5)
+                  write (iout,250)  nvar,it,'YY-Quad ',xx(nvar)
+  250             format (i6,7x,i8,13x,a8,6x,f12.5)
                else
-                  write (iout,250)  it,'YY-Quad ',qterm*pole(9,i)
-  250             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
+                  write (iout,260)  it,'YY-Quad ',qterm*pole(9,i)
+  260             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
                end if
             else
-               write (iout,260)  it,'YY-Quad ',qterm*pole(9,i)
-  260          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,270)  it,'YY-Quad ',qterm*pole(9,i)
+  270          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
+               varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(10,i)
-               write (iout,270)  nvar,it,'YZ-Quad ',xx(nvar)
-  270          format (i6,7x,i8,13x,a8,6x,f12.5)
+               write (iout,280)  nvar,it,'YZ-Quad ',xx(nvar)
+  280          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,280)  it,'YZ-Quad ',qterm*pole(10,i)
-  280          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,290)  it,'YZ-Quad ',qterm*pole(10,i)
+  290          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(13,i).ne.0.0d0) then
                if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
+                  varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(13,i)
-                  write (iout,290)  nvar,it,'ZZ-Quad ',xx(nvar)
-  290             format (i6,7x,i8,13x,a8,6x,f12.5)
+                  write (iout,300)  nvar,it,'ZZ-Quad ',xx(nvar)
+  300             format (i6,7x,i8,13x,a8,6x,f12.5)
                else
-                  write (iout,300)  it,'ZZ-Quad ',qterm*pole(13,i)
-  300             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
+                  write (iout,310)  it,'ZZ-Quad ',qterm*pole(13,i)
+  310             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
                end if
             else
-               write (iout,310)  it,'ZZ-Quad ',qterm*pole(13,i)
-  310          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               write (iout,320)  it,'ZZ-Quad ',qterm*pole(13,i)
+  320          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
          end if
       end do
+c
+c     get optimization parameters from charge penetration values
+c
+      if (fit_chgpen) then
+         do i = 1, ncp
+            done = .true.
+            ii = ipole(i)
+            it = type(ii)
+            if (fatm(ii))  done = .false.
+            if (.not. done) then
+               if (fitcpen(it))  done = .true.
+               fitcpen(it) = .true.
+            end if
+            if (.not. done) then
+               if (palpha(i) .ne. 0.0d0) then
+                  nvar = nvar + 1
+                  varpot(nvar) = 'CHGPEN'
+                  xx(nvar) = palpha(i)
+                  write (iout,330)  nvar,it,'ChgPen  ',xx(nvar)
+  330             format (i6,7x,i8,13x,a8,6x,f12.5)
+               else
+                  write (iout,340)  it,'ChgPen  ',palpha(i)
+  340             format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+               end if
+            end if
+         end do
+      end if
       return
       end
 c
@@ -2064,6 +2166,7 @@ c
       subroutine prtfit
       use atoms
       use charge
+      use chgpen
       use files
       use keys
       use mpole
@@ -2259,6 +2362,41 @@ c
             end if
          end do
       end do
+c
+c     output optimized charge penetration values to the keyfile
+c
+      if (fit_chgpen) then
+         header = .true.
+         do i = 1, maxtyp
+            fitcpen(i) = .false.
+         end do
+         do k = 1, nconf
+            call getref (k)
+            call setelect
+            do i = 1, ncp
+               done = .true.
+               ii = ipole(i)
+               it = type(ii)
+               if (fatm(ii))  done = .false.
+               if (.not. done) then
+                  if (fitcpen(it))  done = .true.
+                  fitcpen(it) = .true.
+               end if
+               if (.not. done) then
+                  palpha(i) = fcpen(it)
+                  if (header) then
+                     header = .false.
+                     write (ikey,180)
+  180                format (/,'#',/,'# Charge Penetration from',
+     &                          ' Electrostatic Potential Fitting',
+     &                       /,'#',/)
+                  end if
+                  write (ikey,190)  it,pcore(i),palpha(i)
+  190             format ('chgpen',9x,i5,5x,f11.4,f11.5)
+               end if
+            end do
+         end do
+      end if
       close (unit=ikey)
 c
 c     perform deallocation of some local arrays

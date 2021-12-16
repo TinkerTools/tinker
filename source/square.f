@@ -378,15 +378,15 @@ c
                if (abs(xc(j)-xlo(j)) .le. eps) then
                   nactive = nactive - 1
                   iactive(j) = -1
-c                 goto 60
+                  goto 60
                else if (abs(xc(j)-xhi(j)) .le. eps) then
                   nactive = nactive - 1
                   iactive(j) = 1
-c                 goto 60
+                  goto 60
                end if
             end if
          end do
-c  60    continue
+   60    continue
 c
 c     evaluate the Jacobian at the new point using finite
 c     differences; replace loop with user routine if desired
@@ -463,30 +463,30 @@ c
             stpnorm = stpnorm + (sc(j)/temp)**2
          end do
          stpnorm = sqrt(stpnorm/dble(n))
-         if (stpnorm .le. stpmin)  done = .true.
+c        if (stpnorm .le. stpmin)  done = .true.
 c
 c     check for inactive variables to be made active; in a true
 c     active set strategy, variables are added one at a time to
 c     the current active set (via goto statements below)
 c
-c        if (done) then
+         if (done) then
             if (nactive .ne. n) then
                do j = 1, n
                   if (iactive(j).eq.-1 .and. gc(j).lt.0.0d0) then
                      nactive = nactive + 1
                      iactive(j) = 0
                      done = .false.
-c                    goto 90
+                     goto 90
                   else if (iactive(j).eq.1 .and. gc(j).gt.0.0d0) then
                      nactive = nactive + 1
                      iactive(j) = 0
                      done = .false.
-c                    goto 90
+                     goto 90
                   end if
                end do
-c  90          continue
+   90          continue
             end if
-c        end if
+         end if
 c
 c     if still done, then normal termination has been achieved
 c
@@ -508,23 +508,29 @@ c
          else if (icode .eq. 2) then
             done = .true.
             write (iout,120)
-  120       format (/,' SQUARE  --  Relative Function Convergence',
-     &              //,' Both the scaled actual and predicted',
-     &                 ' reductions in the function',
-     &              /,' are less than or equal to the relative',
-     &                 ' convergence tolerance')
+  120       format (/,' SQUARE  --  Relative Function Convergence')
+            if (verbose) then
+               write (iout,130)
+  130          format (/,' Both the scaled actual and predicted',
+     &                    ' reductions in the function',
+     &                 /,' are less than or equal to the relative',
+     &                    ' convergence tolerance')
+            end if
 c
 c     check for termination due to false convergence
 c
          else if (icode .eq. 3) then
             done = .true.
-            write (iout,130)
-  130       format (/,' SQUARE  --  Possible False Convergence',
-     &              //,' The iterates appear to be converging to',
-     &                 ' a noncritical point due',
-     &              /,' to bad gradient information, discontinuous',
-     &                 ' function, or stopping',
-     &              /,' tolerances being too tight')
+            write (iout,140)
+  140       format (/,' SQUARE  --  Possible False Convergence')
+            if (verbose) then
+               write (iout,150)
+  150          format (/,' The iterates appear to be converging to',
+     &                    ' a noncritical point due',
+     &                 /,' to bad gradient information, discontinuous',
+     &                    ' function, or stopping',
+     &                 /,' tolerances being too tight')
+            end if
 c
 c     check for several consecutive maximum steps taken
 c
@@ -532,13 +538,16 @@ c
             nbigstp = nbigstp + 1
             if (nbigstp .eq. 5) then
                done = .true.
-               write (iout,140)
-  140          format (/,' SQUARE  --  Five Consecutive Maximum',
-     &                    ' Length Steps',
-     &                 //,' Either the function is unbounded below,',
-     &                    ' or has a finite',
-     &                 /,' asymptote in some direction, or STEPMAX',
-     &                    ' is too small')
+               write (iout,160)
+  160          format (/,' SQUARE  --  Five Consecutive Maximum',
+     &                    ' Length Steps')
+               if (verbose) then
+                  write (iout,170)
+  170             format (/,' Either the function is unbounded below,',
+     &                       ' or has a finite',
+     &                    /,' asymptote in some direction, or STEPMAX',
+     &                       ' is too small')
+               end if
             end if
 c
 c     no reason to quit, so prepare to take another step

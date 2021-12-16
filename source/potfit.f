@@ -12,37 +12,41 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     nconf     total number of configurations to be analyzed
-c     namax     maximum number of atoms in the largest configuration
-c     ngatm     total number of atoms with active potential grid points
-c     nfatm     total number of atoms in electrostatic potential fit
-c     npgrid    total number of electrostatic potential grid points
-c     ipgrid    atom associated with each potential grid point
-c     wresp     weight used to restrain electrostatic parameters
-c     xdpl0     target x-component of the molecular dipole moment
-c     ydpl0     target y-component of the molecular dipole moment
-c     zdpl0     target z-component of the molecular dipole moment
-c     xxqpl0    target xx-component of the molecular quadrupole moment
-c     xyqpl0    target xy-component of the molecular quadrupole moment
-c     xzqpl0    target xz-component of the molecular quadrupole moment
-c     yyqpl0    target yy-component of the molecular quadrupole moment
-c     yzqpl0    target yz-component of the molecular quadrupole moment
-c     zzqpl0    target zz-component of the molecular quadrupole moment
-c     fit0      initial value of each parameter used in potential fit      
-c     fchg      partial charges by atom type during potential fit
-c     fpol      atomic multipoles by atom type during potential fit
-c     pgrid     Cartesian coordinates of potential grid points
-c     epot      values of electrostatic potential at grid points
-c     use_dpl   flag to include molecular dipole in potential fit
-c     use_qpl   flag to include molecular quadrupole in potential fit
-c     fit_mpl   flag for atomic monopoles to vary in potential fit
-c     fit_dpl   flag for atomic dipoles to vary in potential fit
-c     fit_qpl   flag for atomic quadrupoles to vary in potential fit
-c     fitchg    flag marking atom types for use in partial charge fit
-c     fitpol    flag marking atom types for use in atomic multipole fit
-c     gatm      flag to use potential grid points around each atom
-c     fatm      flag to use each atom in electrostatic potential fit
-c     resptyp   electrostatic restraint target (ORIG, ZERO or NONE)
+c     nconf       total number of configurations to be analyzed
+c     namax       maximum number of atoms in the largest configuration
+c     ngatm       total atom number with active potential grid points
+c     nfatm       total atom number in electrostatic potential fit
+c     npgrid      total number of electrostatic potential grid points
+c     ipgrid      atom associated with each potential grid point
+c     wresp       weight used to restrain electrostatic parameters
+c     xdpl0       target x-component of molecular dipole moment
+c     ydpl0       target y-component of molecular dipole moment
+c     zdpl0       target z-component of molecular dipole moment
+c     xxqpl0      target xx-component of molecular quadrupole moment
+c     xyqpl0      target xy-component of molecular quadrupole moment
+c     xzqpl0      target xz-component of molecular quadrupole moment
+c     yyqpl0      target yy-component of molecular quadrupole moment
+c     yzqpl0      target yz-component of molecular quadrupole moment
+c     zzqpl0      target zz-component of molecular quadrupole moment
+c     fit0        initial value of each parameter used in potential fit      
+c     fchg        partial charges by atom type during potential fit
+c     fpol        atomic multipoles by atom type during potential fit
+c     fcpen       charge penetration by atom type during potential fit
+c     pgrid       Cartesian coordinates of potential grid points
+c     epot        values of electrostatic potential at grid points
+c     use_dpl     flag to include molecular dipole in potential fit
+c     use_qpl     flag to include molecular quadrupole in potential fit
+c     fit_mpl     flag for atomic monopoles to vary in potential fit
+c     fit_dpl     flag for atomic dipoles to vary in potential fit
+c     fit_qpl     flag for atomic quadrupoles to vary in potential fit
+c     fit_chgpen  flag for atomic quadrupoles to vary in potential fit
+c     fitchg      flag marking atom types used in partial charge fit
+c     fitpol      flag marking atom types used in atomic multipole fit
+c     fitcpen     flag marking atom types used in charge penetration
+c     gatm        flag to use potential grid points around each atom
+c     fatm        flag to use each atom in electrostatic potential fit
+c     resptyp     electrostatic restraint target (ORIG, ZERO or NONE)
+c     varpot      descriptive name for each variable in potential fit
 c
 c
       module potfit
@@ -65,15 +69,18 @@ c
       real*8, allocatable :: fit0(:)
       real*8, allocatable :: fchg(:)
       real*8, allocatable :: fpol(:,:)
+      real*8, allocatable :: fcpen(:)
       real*8, allocatable :: pgrid(:,:,:)
       real*8, allocatable :: epot(:,:,:)
       logical use_dpl,use_qpl
       logical fit_mpl,fit_dpl
-      logical fit_qpl
+      logical fit_qpl,fit_chgpen
       logical, allocatable :: fitchg(:)
       logical, allocatable :: fitpol(:)
+      logical, allocatable :: fitcpen(:)
       logical, allocatable :: gatm(:)
       logical, allocatable :: fatm(:)
       character*4 resptyp
+      character*6, allocatable :: varpot(:)
       save
       end

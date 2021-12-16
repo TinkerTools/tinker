@@ -101,6 +101,10 @@ c
          zcm(i) = z(i) - zmid
       end do
 c
+c     alter partial charges and monopoles via charge flux
+c
+      if (use_chgflx)  call alterchg
+c
 c     set the multipole moment components due to partial charges
 c
       do i = 1, nion
