@@ -1348,6 +1348,8 @@ c
             resid(iresid) = (xx(i)-fit0(i)) * rscale
          else if (resptyp .eq. 'ZERO') then
             resid(iresid) = xx(i) * rscale
+         else
+            resid(iresid) = 0.0d0
          end if
       end do
       return
