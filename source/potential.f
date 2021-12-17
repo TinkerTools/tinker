@@ -1342,14 +1342,15 @@ c     get residuals due to deviation of initial parameters
 c
       do i = 1, nvar
          iresid = iresid + 1
-         if (varpot(i) .eq. 'CHGPEN') then
-            resid(iresid) = 0.0d0
-         else if (resptyp .eq. 'ORIG') then
+         if (resptyp .eq. 'ORIG') then
             resid(iresid) = (xx(i)-fit0(i)) * rscale
          else if (resptyp .eq. 'ZERO') then
             resid(iresid) = xx(i) * rscale
          else
             resid(iresid) = 0.0d0
+         end if
+         if (varpot(i) .eq. 'CHGPEN') then
+            resid(iresid) = 0.01d0 * resid(iresid)
          end if
       end do
       return

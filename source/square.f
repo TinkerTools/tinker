@@ -463,7 +463,7 @@ c
             stpnorm = stpnorm + (sc(j)/temp)**2
          end do
          stpnorm = sqrt(stpnorm/dble(n))
-c        if (stpnorm .le. stpmin)  done = .true.
+         if (stpnorm.gt.eps .and. stpnorm.le.stpmin)  done = .true.
 c
 c     check for inactive variables to be made active; in a true
 c     active set strategy, variables are added one at a time to
@@ -657,7 +657,13 @@ c
       save phi,phip,phipi
 c
 c
-c     set minima for floating point magnitude and spacing
+c     initialize the Levenberg-Marquardt step length
+c
+      do i = 1, n
+         sa(i) = 0.0d0
+      end do
+c
+c     set values for floating point magnitude and spacing
 c
       gamma = 0.00000001d0
       eps = 0.00000001d0
