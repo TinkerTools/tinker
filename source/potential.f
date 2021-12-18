@@ -1350,7 +1350,7 @@ c
             resid(iresid) = 0.0d0
          end if
          if (varpot(i) .eq. 'CHGPEN') then
-            resid(iresid) = 0.01d0 * resid(iresid)
+            resid(iresid) = 0.001d0 * resid(iresid)
          end if
       end do
       return
