@@ -1069,8 +1069,17 @@ c
             read (record,*,err=500,end=500)  xbox
   500       continue
          end do
-         if (mode .eq. 18)  octahedron = .true.
-         if (mode .eq. 19)  dodecadron = .true.
+         ybox = xbox
+         zbox = xbox
+         nonprism = .false.
+         octahedron = .false.
+         dodecadron = .false.
+         call bounds
+         nonprism = .true.
+         if (mode .eq. 20)  octahedron = .true.
+         if (mode .eq. 21)  dodecadron = .true.
+         if (dodecadron)  zbox = xbox * root2
+         call lattice
          call molecule
          allocate (list(n))
          allocate (keep(n))
@@ -1099,7 +1108,7 @@ c
                   xcm = xcm - xbox*nint(xcm/xbox)
                   ycm = ycm - ybox*nint(ycm/ybox)
                   zcm = zcm - zbox*nint(zcm/zbox)
-                  if (abs(xcm)+abs(ycm)+abs(zcm) .gt. 0.75*xbox) then
+                  if (abs(xcm)+abs(ycm)+abs(zcm) .gt. box34) then
                      do j = init, stop
                         k = kmol(j)
                         list(k) = 0

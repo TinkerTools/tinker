@@ -1401,7 +1401,6 @@ c
          if (.not. done) then
             if (pchg(i) .ne. 0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'CHARGE'
                pchg(i) = xx(nvar)
             end if
             fitchg(it) = .true.
@@ -1432,60 +1431,50 @@ c
          if (.not. done) then
             if (fit_mpl .and. pole(1,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'MONOPL'
                pole(1,i) = xx(nvar)
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'DIPOLE'
                pole(2,i) = dterm * xx(nvar)
             end if
             if (fit_dpl .and. pole(3,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'DIPOLE'
                pole(3,i) = dterm * xx(nvar)
             end if
             if (fit_dpl .and. pole(4,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'DIPOLE'
                pole(4,i) = dterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(5,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
-                  varpot(nvar) = 'QUADPL'
                   pole(5,i) = qterm * xx(nvar)
                end if
             end if
             if (fit_qpl .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'QUADPL'
                pole(6,i) = qterm * xx(nvar)
                pole(8,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'QUADPL'
                pole(7,i) = qterm * xx(nvar)
                pole(11,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(9,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
-                  varpot(nvar) = 'QUADPL'
                   pole(9,i) = qterm * xx(nvar)
                end if
             end if
             if (fit_qpl .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
-               varpot(nvar) = 'QUADPL'
                pole(10,i) = qterm * xx(nvar)
                pole(12,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. pole(13,i).ne.0.0d0) then
                if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
-                  varpot(nvar) = 'QUADPL'
                   pole(13,i) = qterm * xx(nvar)
                   pole(5,i) = -0.5d0 * pole(13,i)
                   pole(9,i) = pole(5,i)
@@ -1517,7 +1506,6 @@ c
             if (.not. done) then
                if (palpha(i) .ne. 0.0d0) then
                   nvar = nvar + 1
-                  varpot(nvar) = 'CHGPEN'
                   palpha(i) = xx(nvar)
                end if
                fitcpen(it) = .true.

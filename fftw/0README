@@ -37,7 +37,7 @@
       by Tinker will be in the /lib subdirectory.
 
       Modified versions of the configure script are used to enforce
-      processor-specific compiler flags. In particular, there are MacOS
+      processor-specific compiler flags. In particular, there are macOS
       and Linux versions for the Intel compiler that use -axssse3 and
       -msse3, respectively, along with other optimization flags. The
       original file is available as "configure-orig".
