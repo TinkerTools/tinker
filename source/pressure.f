@@ -133,11 +133,9 @@ c
       real*8 kt,step,scale
       real*8 eold,rnd6
       real*8 xcm,ycm,zcm
-      real*8 vxcm,vycm,vzcm
       real*8 volold,cosine
       real*8 dpot,dpv,dkin
       real*8 xmove,ymove,zmove
-      real*8 vxmove,vymove,vzmove
       real*8 xboxold,yboxold,zboxold
       real*8 alphaold,betaold,gammaold
       real*8 temp3(3,3)
@@ -146,7 +144,6 @@ c
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
-      real*8, allocatable :: vold(:,:)
       logical dotrial
       logical isotropic
       external random
@@ -170,7 +167,6 @@ c
          allocate (xold(n))
          allocate (yold(n))
          allocate (zold(n))
-         allocate (vold(3,n))
 c
 c     save the system state prior to trial box size change
 c
@@ -182,22 +178,11 @@ c
          gammaold = gamma
          volold = volbox
          eold = epot
-         if (integrate .eq. 'RIGIDBODY') then
-            do i = 1, n
-               xold(i) = x(i)
-               yold(i) = y(i)
-               zold(i) = z(i)
-            end do
-         else
-            do i = 1, n
-               xold(i) = x(i)
-               yold(i) = y(i)
-               zold(i) = z(i)
-               vold(1,i) = v(1,i)
-               vold(2,i) = v(2,i)
-               vold(3,i) = v(3,i)
-            end do
-         end if
+         do i = 1, n
+            xold(i) = x(i)
+            yold(i) = y(i)
+            zold(i) = z(i)
+         end do
 c
 c     for the isotropic case, change the lattice lengths uniformly
 c
@@ -240,9 +225,6 @@ c
                   xcm = 0.0d0
                   ycm = 0.0d0
                   zcm = 0.0d0
-                  vxcm = 0.0d0
-                  vycm = 0.0d0
-                  vzcm = 0.0d0
                   start = imol(1,i)
                   stop = imol(2,i)
                   do j = start, stop
@@ -251,25 +233,16 @@ c
                      xcm = xcm + x(k)*weigh
                      ycm = ycm + y(k)*weigh
                      zcm = zcm + z(k)*weigh
-                     vxcm = vxcm + v(1,k)*weigh
-                     vycm = vycm + v(2,k)*weigh
-                     vzcm = vzcm + v(3,k)*weigh
                   end do
                   xmove = scale * xcm/molmass(i)
                   ymove = scale * ycm/molmass(i)
                   zmove = scale * zcm/molmass(i)
-                  vxmove = scale * vxcm/molmass(i)
-                  vymove = scale * vycm/molmass(i)
-                  vzmove = scale * vzcm/molmass(i)
                   do j = start, stop
                      k = kmol(j)
                      if (use(k)) then
                         x(k) = x(k) + xmove
                         y(k) = y(k) + ymove
                         z(k) = z(k) + zmove
-                        v(1,k) = v(1,k) - vxmove
-                        v(2,k) = v(2,k) - vymove
-                        v(3,k) = v(3,k) - vzmove
                      end if
                   end do
                end do
@@ -279,9 +252,6 @@ c
                   x(k) = x(k) * scale
                   y(k) = y(k) * scale
                   z(k) = z(k) * scale
-                  v(1,k) = v(1,k) / scale
-                  v(2,k) = v(2,k) / scale
-                  v(3,k) = v(3,k) / scale
                end do
             end if
 c
@@ -411,9 +381,6 @@ c
                   xcm = 0.0d0
                   ycm = 0.0d0
                   zcm = 0.0d0
-                  vxcm = 0.0d0
-                  vycm = 0.0d0
-                  vzcm = 0.0d0
                   start = imol(1,i)
                   stop = imol(2,i)
                   do j = start, stop
@@ -422,37 +389,22 @@ c
                      xcm = xcm + x(k)*weigh
                      ycm = ycm + y(k)*weigh
                      zcm = zcm + z(k)*weigh
-                     vxcm = vxcm + v(1,k)*weigh
-                     vycm = vycm + v(2,k)*weigh
-                     vzcm = vzcm + v(3,k)*weigh
                   end do
                   xcm = xcm / molmass(i)
                   ycm = ycm / molmass(i)
                   zcm = zcm / molmass(i)
-                  vxcm = vxcm / molmass(i)
-                  vycm = vycm / molmass(i)
-                  vzcm = vzcm / molmass(i)
                   xmove = xcm*ascale(1,1) + ycm*ascale(1,2)
      &                       + zcm*ascale(1,3)
                   ymove = xcm*ascale(2,1) + ycm*ascale(2,2)
      &                       + zcm*ascale(2,3)
                   zmove = xcm*ascale(3,1) + ycm*ascale(3,2)
      &                       + zcm*ascale(3,3)
-                  vxmove = vxcm*ascale(1,1) + vycm*ascale(1,2)
-     &                        + vzcm*ascale(1,3)
-                  vymove = vxcm*ascale(2,1) + vycm*ascale(2,2)
-     &                        + vzcm*ascale(2,3)
-                  vzmove = vxcm*ascale(3,1) + vycm*ascale(3,2)
-     &                        + vzcm*ascale(3,3)
                   do j = start, stop
                      k = kmol(j)
                      if (use(k)) then
                         x(k) = x(k) + xmove
                         y(k) = y(k) + ymove
                         z(k) = z(k) + zmove
-                        v(1,k) = v(1,k) - vxmove
-                        v(2,k) = v(2,k) - vymove
-                        v(3,k) = v(3,k) - vzmove
                      end if
                   end do
                end do
@@ -465,12 +417,6 @@ c
      &                      + z(k)*ascale(2,3)
                   z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
      &                      + z(k)*ascale(3,3)
-                  v(1,k) = v(1,k)/ascale(1,1) + v(2,k)/ascale(1,2)
-     &                        + v(3,k)/ascale(1,3)
-                  v(2,k) = v(1,k)/ascale(2,1) + v(2,k)/ascale(2,2)
-     &                        + v(3,k)/ascale(2,3)
-                  v(3,k) = v(1,k)/ascale(3,1) + v(2,k)/ascale(3,2)
-     &                        + v(3,k)/ascale(3,3)
                end do
             end if
          end if
@@ -507,7 +453,6 @@ c           dkin = dkin * dble(ngrp)/dble(nuse)
 c        else if (volscale .eq. 'MOLECULAR') then
 c           dkin = dkin * dble(nmol)/dble(nuse)
 c        else
-c           dkin = dkin * dble(nmol)/dble(nuse)
 c           dkin = dkin * dble(nuse)/dble(nuse)
 c        end if
 c
@@ -535,9 +480,6 @@ c
                   x(i) = xold(i)
                   y(i) = yold(i)
                   z(i) = zold(i)
-                  v(1,i) = vold(1,i)
-                  v(2,i) = vold(2,i)
-                  v(3,i) = vold(3,i)
                end do
             end if
          end if
@@ -547,7 +489,6 @@ c
          deallocate (xold)
          deallocate (yold)
          deallocate (zold)
-         deallocate (vold)
       end if
       return
       end
