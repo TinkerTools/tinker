@@ -1,0 +1,3 @@
+parameters      ../params/water21
+#fix-monopole
+resp-weight     1.0

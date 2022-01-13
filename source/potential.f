@@ -1055,7 +1055,7 @@ c
       call kchgtrn
       call kchgflx
 c
-c     bond and angle parameters are required if using charge flux
+c     bond and angle parameters are needed if using charge flux
 c
       if (use_chgflx) then
          call kbond
@@ -1417,19 +1417,18 @@ c
             end if
          end if
          if (.not. done) then
+            fitchg(it) = .true.
             if (use_chgflx) then
                if (pchg0(i) .ne. 0.0d0) then
                   nvar = nvar + 1
                   pchg0(i) = xx(nvar)
                end if
-               fitchg(it) = .true.
                fchg(it) = pchg0(i)
             else
                if (pchg(i) .ne. 0.0d0) then
                   nvar = nvar + 1
                   pchg(i) = xx(nvar)
                end if
-               fitchg(it) = .true.
                fchg(it) = pchg(i)
             end if
          end if
