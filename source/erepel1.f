@@ -337,7 +337,7 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                   sizik = sizi * sizk * rscale(k)
-                  e = sizik * rscale(k) * eterm * rr1
+                  e = sizik * eterm * rr1
 c
 c     calculate intermediate terms for force and torque
 c
@@ -697,8 +697,8 @@ c
 c
 c     compute the Pauli repulsion energy for this interaction
 c
-                        sizik = sizi * sizk
-                        e = sizik * rscale(k) * eterm * rr1
+                        sizik = sizi * sizk * rscale(k)
+                        e = sizik * eterm * rr1
 c
 c     calculate intermediate terms for force and torque
 c
@@ -1247,7 +1247,7 @@ c
 c     compute the Pauli repulsion energy for this interaction
 c
                   sizik = sizi * sizk * rscale(k)
-                  e = sizik * rscale(k) * eterm * rr1
+                  e = sizik * eterm * rr1
 c
 c     calculate intermediate terms for force and torque
 c

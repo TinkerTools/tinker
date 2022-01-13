@@ -312,7 +312,7 @@ c
             fit_dpl = .false.
          else if (keyword(1:15) .eq. 'FIX-QUADRUPOLE ') then
             fit_qpl = .false.
-         else if (keyword(1:15) .eq. 'FIX-CHGPEN ') then
+         else if (keyword(1:11) .eq. 'FIX-CHGPEN ') then
             fit_chgpen = .false.
          else if (keyword(1:14) .eq. 'TARGET-DIPOLE ') then
             use_dpl = .true.
@@ -578,6 +578,9 @@ c
                call getref (j)
                call field
                call setelect
+               if (use_chgflx) then
+                  call alterchg
+               end if
                if (use_mpole) then
                   call chkpole
                   call rotpole
@@ -1030,6 +1033,7 @@ c     for computation of the electrostatic potential
 c
 c
       subroutine setelect
+      use potent
       implicit none
 c
 c
@@ -1049,6 +1053,14 @@ c
       call kmpole
       call kpolar
       call kchgtrn
+      call kchgflx
+c
+c     bond and angle parameters are required if using charge flux
+c
+      if (use_chgflx) then
+         call kbond
+         call kangle
+      end if
       return
       end
 c
@@ -1189,7 +1201,8 @@ c     compute the potential contributions for this site
 c
          if (use_chgpen) then
             corek = pcore(kk)
-            valk = pval(kk)
+c           valk = pval(kk)
+            valk = -corek + rpole(1,k)
             alphak = palpha(kk)
             call damppot (r,alphak,dmpk)
             rr1k = dmpk(1) * rr1
@@ -1231,6 +1244,7 @@ c
       subroutine fitrsd (nvar,nresid,xx,resid)
       use atoms
       use moment
+      use mpole
       use neigh
       use potent
       use potfit
@@ -1308,7 +1322,7 @@ c
 !$OMP    END PARALLEL
          iresid = iresid + npgrid(j)
 c
-c     find moments if they contribute to the overall residue
+c     find moments if they contribute to the overall residual
 c
          if (fit_mpl .or. use_dpl .or. use_qpl)  call momfull
 c
@@ -1395,16 +1409,29 @@ c
          if (.not. done) then
             if (fitchg(it)) then
                done = .true.
-               pchg(i) = fchg(it)
+               if (use_chgflx) then
+                  pchg0(i) = fchg(it)
+               else
+                  pchg(i) = fchg(it)
+               end if
             end if
          end if
          if (.not. done) then
-            if (pchg(i) .ne. 0.0d0) then
-               nvar = nvar + 1
-               pchg(i) = xx(nvar)
+            if (use_chgflx) then
+               if (pchg0(i) .ne. 0.0d0) then
+                  nvar = nvar + 1
+                  pchg0(i) = xx(nvar)
+               end if
+               fitchg(it) = .true.
+               fchg(it) = pchg0(i)
+            else
+               if (pchg(i) .ne. 0.0d0) then
+                  nvar = nvar + 1
+                  pchg(i) = xx(nvar)
+               end if
+               fitchg(it) = .true.
+               fchg(it) = pchg(i)
             end if
-            fitchg(it) = .true.
-            fchg(it) = pchg(i)
          end if
       end do
 c
@@ -1423,15 +1450,29 @@ c
          if (.not. done) then
             if (fitpol(it)) then
                done = .true.
-               do j = 1, 13
-                  pole(j,i) = fpol(j,it)
-               end do
+               if (use_chgflx) then
+                  mono0(i) = fpol(1,it)
+                  do j = 2, 13
+                     pole(j,i) = fpol(j,it)
+                  end do
+               else
+                  do j = 1, 13
+                     pole(j,i) = fpol(j,it)
+                  end do
+               end if
             end if
          end if
          if (.not. done) then
-            if (fit_mpl .and. pole(1,i).ne.0.0d0) then
-               nvar = nvar + 1
-               pole(1,i) = xx(nvar)
+            if (use_chgflx) then
+               if (fit_mpl .and. mono0(i).ne.0.0d0) then
+                  nvar = nvar + 1
+                  mono0(i) = xx(nvar)
+               end if
+            else
+               if (fit_mpl .and. pole(1,i).ne.0.0d0) then
+                  nvar = nvar + 1
+                  pole(1,i) = xx(nvar)
+               end if
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
@@ -1483,9 +1524,16 @@ c
                end if
             end if
             fitpol(it) = .true.
-            do j = 1, 13
-               fpol(j,it) = pole(j,i)
-            end do
+            if (use_chgflx) then
+               fpol(1,it) = mono0(i)
+               do j = 2, 13
+                  fpol(j,it) = pole(j,i)
+               end do
+            else
+               do j = 1, 13
+                  fpol(j,it) = pole(j,i)
+               end do
+            end if
          end if
       end do
 c
@@ -1520,6 +1568,10 @@ c
          call chkpole
          call rotpole
       end if
+c
+c     modify partial charges and monopoles for charge flux
+c
+      if (use_chgflx)  call alterchg
       return
       end
 c
@@ -1542,6 +1594,7 @@ c
       use chgpen
       use iounit
       use mpole
+      use potent
       use potfit
       use units
       implicit none
@@ -1568,12 +1621,14 @@ c
       eps = 0.00001d0
       do i = 1, nion
          pchg(i) = dble(nint(pchg(i)/eps)) * eps
+         pchg0(i) = dble(nint(pchg0(i)/eps)) * eps
       end do
       do i = 1, npole
          pole(1,i) = dble(nint(pole(1,i)/eps)) * eps
          pole(5,i) = dble(nint(qterm*pole(5,i)/eps)) * eps/qterm
          pole(9,i) = dble(nint(qterm*pole(9,i)/eps)) * eps/qterm
          pole(13,i) = dble(nint(qterm*pole(13,i)/eps)) * eps/qterm
+         mono0(i) = dble(nint(mono0(i)/eps)) * eps
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -1590,7 +1645,11 @@ c
       do i = 1, nion
          it = type(iion(i))
          equiv(it) = equiv(it) + 1
-         sum = sum + pchg(i)
+         if (use_chgflx) then
+            sum = sum + pchg0(i)
+         else
+            sum = sum + pchg(i)
+         end if
       end do
       sum = sum - dble(nint(sum))
       k = nint(abs(sum)/eps)
@@ -1600,7 +1659,11 @@ c
             do i = 1, nion
                it = type(iion(i))
                if (equiv(it) .eq. m) then
-                  ival = abs(pchg(i))
+                  if (use_chgflx) then
+                     ival = abs(pchg0(i))
+                  else
+                     ival = abs(pchg(i))
+                  end if
                   if (ktype .eq. 0) then
                      ktype = it
                      kval = ival
@@ -1619,8 +1682,13 @@ c
          do i = 1, nion
             it = type(iion(i))
             if (it .eq. ktype) then
-               pchg(i) = pchg(i) - sum
-               fchg(it) = pchg(i)
+               if (use_chgflx) then
+                  pchg0(i) = pchg0(i) - sum
+                  fchg(it) = pchg0(i)
+               else
+                  pchg(i) = pchg(i) - sum
+                  fchg(it) = pchg(i)
+               end if
             end if
          end do
       end if
@@ -1635,7 +1703,11 @@ c
       do i = 1, npole
          it = type(ipole(i))
          equiv(it) = equiv(it) + 1
-         sum = sum + pole(1,i)
+         if (use_chgflx) then
+            sum = sum + mono0(i)
+         else
+            sum = sum + pole(1,i)
+         end if
       end do
       sum = sum - dble(nint(sum))
       k = nint(abs(sum)/eps)
@@ -1645,7 +1717,11 @@ c
             do i = 1, npole
                it = type(ipole(i))
                if (equiv(it) .eq. m) then
-                  ival = abs(pole(1,ipole(i)))
+                  if (use_chgflx) then
+                     ival = abs(mono0(ipole(i)))
+                  else
+                     ival = abs(pole(1,ipole(i)))
+                  end if
                   if (ktype .eq. 0) then
                      ktype = it
                      kval = ival
@@ -1664,8 +1740,13 @@ c
          do i = 1, npole
             it = type(ipole(i))
             if (it .eq. ktype) then
-               pole(1,i) = pole(1,i) - sum
-               fpol(1,it) = pole(1,i)
+               if (use_chgflx) then
+                  mono0(i) = mono0(i) - sum
+                  fpol(1,it) = mono0(i)
+               else
+                  pole(1,i) = pole(1,i) - sum
+                  fpol(1,it) = pole(1,i)
+               end if
             end if
          end do
       end if
@@ -1752,11 +1833,15 @@ c
             if (pchg(i) .ne. 0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'CHARGE'
-               xx(nvar) = pchg(i)
+               if (use_chgflx) then
+                  xx(nvar) = pchg0(i)
+               else
+                  xx(nvar) = pchg(i)
+               end if
                write (iout,80)  nvar,it,'Charge  ',xx(nvar)
    80          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,90)  it,'Charge  ',pchg(i)
+               write (iout,90)  it,'Charge  ',pchg0(i)
    90          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
          end if
@@ -1777,11 +1862,15 @@ c
             if (fit_mpl .and. pole(1,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'MONOPL'
-               xx(nvar) = pole(1,i)
+               if (use_chgflx) then
+                  xx(nvar) = mono0(i)
+               else
+                  xx(nvar) = pole(1,i)
+               end if
                write (iout,100)  nvar,it,'Monopole',xx(nvar)
   100          format (i6,7x,i8,13x,a8,6x,f12.5)
             else
-               write (iout,110)  it,'Monopole',pole(1,i)
+               write (iout,110)  it,'Monopole',mono0(i)
   110          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then

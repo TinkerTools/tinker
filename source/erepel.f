@@ -256,7 +256,7 @@ c
                   eterm = term1*dmpik(1) + term2*dmpik(3)
      &                       + term3*dmpik(5) + term4*dmpik(7)
      &                       + term5*dmpik(9)
-                  sizik = sizi * sizk
+                  sizik = sizi * sizk * rscale(k)
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -272,10 +272,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     e = vlambda * sizik * rscale(k) * eterm
+                     e = vlambda * sizik * eterm
      &                      / sqrt(1.0d0-vlambda+r2)
                   else
-                     e = sizik * rscale(k) * eterm * rr1
+                     e = sizik * eterm * rr1
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -444,7 +444,7 @@ c
                         eterm = term1*dmpik(1) + term2*dmpik(3)
      &                             + term3*dmpik(5) + term4*dmpik(7)
      &                             + term5*dmpik(9)
-                        sizik = sizi * sizk
+                        sizik = sizi * sizk * rscale(k)
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -460,10 +460,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                         if (mutik) then
-                           e = vlambda * sizik * rscale(k) * eterm
+                           e = vlambda * sizik * eterm
      &                            / sqrt(1.0d0-vlambda+r2)
                         else
-                           e = sizik * rscale(k) * eterm * rr1
+                           e = sizik * eterm * rr1
                         end if
 c
 c     use energy switching if near the cutoff distance
@@ -736,7 +736,7 @@ c
                   eterm = term1*dmpik(1) + term2*dmpik(3)
      &                       + term3*dmpik(5) + term4*dmpik(7)
      &                       + term5*dmpik(9)
-                  sizik = sizi * sizk
+                  sizik = sizi * sizk * rscale(k)
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -752,10 +752,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     e = vlambda * sizik * rscale(k) * eterm
+                     e = vlambda * sizik * eterm
      &                      / sqrt(1.0d0-vlambda+r2)
                   else
-                     e = sizik * rscale(k) * eterm * rr1
+                     e = sizik * eterm * rr1
                   end if
 c
 c     use energy switching if near the cutoff distance
