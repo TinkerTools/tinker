@@ -39,22 +39,6 @@ c
       character*240 string
 c
 c
-c     set the default values for repulsion variables
-c
-      reppolar = .false.
-c
-c     get keywords containing repulsion-related options
-c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         if (keyword(1:12) .eq. 'REPEL-POLAR ') then
-            reppolar = .true.
-         end if
-      end do
-c
 c     process keywords containing Pauli repulsion parameters
 c
       header = .true.

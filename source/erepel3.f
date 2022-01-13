@@ -24,18 +24,8 @@ c
 c
       subroutine erepel3
       use limits
-      use potent
-      use reppot
       implicit none
 c
-c
-c     compute the induced dipoles at each polarizable atom
-c
-      if (reppolar .and. .not.use_polar) then
-         use_polar = .true.
-         call induce
-         use_polar = .false.
-      end if
 c
 c     choose the method for summing over pairwise interactions
 c
@@ -76,7 +66,6 @@ c
       use mpole
       use mutant
       use polar
-      use potent
       use repel
       use reppot
       use shunt
@@ -172,11 +161,6 @@ c
          dix = rpole(2,ii)
          diy = rpole(3,ii)
          diz = rpole(4,ii)
-         if (reppolar) then
-            dix = dix + uind(1,ii)
-            diy = diy + uind(2,ii)
-            diz = diz + uind(3,ii)
-         end if
          qixx = rpole(5,ii)
          qixy = rpole(6,ii)
          qixz = rpole(7,ii)
@@ -225,11 +209,6 @@ c
                   dkx = rpole(2,kk)
                   dky = rpole(3,kk)
                   dkz = rpole(4,kk)
-                  if (reppolar) then
-                     dkx = dkx + uind(1,kk)
-                     dky = dky + uind(2,kk)
-                     dkz = dkz + uind(3,kk)
-                  end if
                   qkxx = rpole(5,kk)
                   qkxy = rpole(6,kk)
                   qkxz = rpole(7,kk)
@@ -388,11 +367,6 @@ c
             dix = rpole(2,ii)
             diy = rpole(3,ii)
             diz = rpole(4,ii)
-            if (reppolar) then
-               dix = dix + uind(1,ii)
-               diy = diy + uind(2,ii)
-               diz = diz + uind(3,ii)
-            end if
             qixx = rpole(5,ii)
             qixy = rpole(6,ii)
             qixz = rpole(7,ii)
@@ -442,11 +416,6 @@ c
                         dkx = rpole(2,kk)
                         dky = rpole(3,kk)
                         dkz = rpole(4,kk)
-                        if (reppolar) then
-                           dkx = dkx + uind(1,kk)
-                           dky = dky + uind(2,kk)
-                           dkz = dkz + uind(3,kk)
-                        end if
                         qkxx = rpole(5,kk)
                         qkxy = rpole(6,kk)
                         qkxz = rpole(7,kk)
@@ -712,9 +681,9 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,uind,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,reppolar,
-!$OMP& vcouple,vlambda,mut,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,
-!$OMP& name,verbose,debug,header,iout)
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,vlambda,
+!$OMP& mut,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,name,verbose,debug,
+!$OMP& header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
 !$OMP DO reduction(+:er,ner,aer,einter) schedule(guided)
@@ -733,11 +702,6 @@ c
          dix = rpole(2,ii)
          diy = rpole(3,ii)
          diz = rpole(4,ii)
-         if (reppolar) then
-            dix = dix + uind(1,ii)
-            diy = diy + uind(2,ii)
-            diz = diz + uind(3,ii)
-         end if
          qixx = rpole(5,ii)
          qixy = rpole(6,ii)
          qixz = rpole(7,ii)
@@ -787,11 +751,6 @@ c
                   dkx = rpole(2,kk)
                   dky = rpole(3,kk)
                   dkz = rpole(4,kk)
-                  if (reppolar) then
-                     dkx = dkx + uind(1,kk)
-                     dky = dky + uind(2,kk)
-                     dkz = dkz + uind(3,kk)
-                  end if
                   qkxx = rpole(5,kk)
                   qkxy = rpole(6,kk)
                   qkxz = rpole(7,kk)

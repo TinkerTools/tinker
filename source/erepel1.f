@@ -24,16 +24,12 @@ c
 c
       subroutine erepel1
       use limits
-      use potent
-      use reppot
       implicit none
 c
 c
 c     choose the method for summing over pairwise interactions
 c
-      if (reppolar) then
-         call erepel1c
-      else if (use_mlist) then
+      if (use_mlist) then
          call erepel1b
       else
          call erepel1a
@@ -64,7 +60,6 @@ c
       use group
       use mpole
       use mutant
-      use potent
       use repel
       use reppot
       use shunt
@@ -1485,125 +1480,5 @@ c     perform deallocation of some local arrays
 c
       deallocate (rscale)
       deallocate (ter)
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine erepel1c  --  Pauli repulsion numerical derivs  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "erepel1c" calculates the Pauli repulsion energy and finite
-c     difference derivatives with respect to Cartesian coordinates
-c
-c
-      subroutine erepel1c
-      use atoms
-      use deriv
-      use energi
-      use potent
-      use reppot
-      implicit none
-      integer i
-      real*8 e,er0
-      real*8 eps,old
-      logical dopolar
-      logical twosided
-      logical reinduce
-c
-c
-c     set the default stepsize and accuracy control flags
-c
-      eps = 1.0d-5
-      dopolar = use_polar
-      twosided = .false.
-      reinduce = .false.
-      if (n .le. 300) then
-         twosided = .true.
-         if (reppolar)  reinduce = .true.
-      end if
-c
-c     get multipoles and induced dipoles for base structure
-c
-      if (use_chgflx)  call alterchg
-      call chkpole
-      call rotpole
-      if (.not. dopolar) then
-         use_polar = .true.
-         call induce
-      end if
-c
-c     get the repulsion energy for the base structure
-c
-      call erepel
-      e = er
-      er0 = er
-c
-c     find numerical x-components via perturbed structures
-c
-      do i = 1, n
-         old = x(i)
-         if (twosided) then
-            x(i) = x(i) - 0.5d0*eps
-            if (use_chgflx)  call alterchg
-            call rotpole
-            if (reinduce)  call induce
-            call erepel
-            er0 = er
-         end if
-         x(i) = x(i) + eps
-         if (use_chgflx)  call alterchg
-         call rotpole
-         if (reinduce)  call induce
-         call erepel
-         x(i) = old
-         der(1,i) = (er-er0) / eps
-c
-c     find numerical y-components via perturbed structures
-c
-         old = y(i)
-         if (twosided) then
-            y(i) = y(i) - 0.5d0*eps
-            if (use_chgflx)  call alterchg
-            call rotpole
-            if (reinduce)  call induce
-            call erepel
-            er0 = er
-         end if
-         y(i) = y(i) + eps
-         if (use_chgflx)  call alterchg
-         call rotpole
-         if (reinduce)  call induce
-         call erepel
-         y(i) = old
-         der(2,i) = (er-er0) / eps
-c
-c     find numerical z-components via perturbed structures
-c
-         old = z(i)
-         if (twosided) then
-            z(i) = z(i) - 0.5d0*eps
-            if (use_chgflx)  call alterchg
-            call rotpole
-            if (reinduce)  call induce
-            call erepel
-            er0 = er
-         end if
-         z(i) = z(i) + eps
-         if (use_chgflx)  call alterchg
-         call rotpole
-         if (reinduce)  call induce
-         call erepel
-         z(i) = old
-         der(3,i) = (er-er0) / eps
-      end do
-c
-c     set repulsion energy to value for the base structure
-c
-      er = e
-      use_polar = dopolar
       return
       end

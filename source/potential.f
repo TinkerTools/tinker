@@ -1451,14 +1451,12 @@ c
                done = .true.
                if (use_chgflx) then
                   mono0(i) = fpol(1,it)
-                  do j = 2, 13
-                     pole(j,i) = fpol(j,it)
-                  end do
                else
-                  do j = 1, 13
-                     pole(j,i) = fpol(j,it)
-                  end do
+                  pole(1,i) = fpol(1,it)
                end if
+               do j = 2, 13
+                  pole(j,i) = fpol(j,it)
+               end do
             end if
          end if
          if (.not. done) then
@@ -1525,14 +1523,12 @@ c
             fitpol(it) = .true.
             if (use_chgflx) then
                fpol(1,it) = mono0(i)
-               do j = 2, 13
-                  fpol(j,it) = pole(j,i)
-               end do
             else
-               do j = 1, 13
-                  fpol(j,it) = pole(j,i)
-               end do
+               fpol(1,it) = pole(1,i)
             end if
+            do j = 2, 13
+               fpol(j,it) = pole(j,i)
+            end do
          end if
       end do
 c
