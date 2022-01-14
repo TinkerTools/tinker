@@ -1386,6 +1386,7 @@ c
       use atoms
       use charge
       use chgpen
+      use mplpot
       use mpole
       use potent
       use potfit
@@ -1534,7 +1535,7 @@ c
 c
 c     translate optimization values back to charge penetration
 c
-      if (fit_chgpen) then
+      if (use_chgpen) then
          do i = 1, ncp
             done = .true.
             ii = ipole(i)
@@ -1547,7 +1548,7 @@ c
                end if
             end if
             if (.not. done) then
-               if (palpha(i) .ne. 0.0d0) then
+               if (fit_chgpen .and. palpha(i).ne.0.0d0) then
                   nvar = nvar + 1
                   palpha(i) = xx(nvar)
                end if
@@ -1588,6 +1589,7 @@ c
       use charge
       use chgpen
       use iounit
+      use mplpot
       use mpole
       use potent
       use potfit
@@ -1978,7 +1980,7 @@ c
 c
 c     get optimization parameters from charge penetration values
 c
-      if (fit_chgpen) then
+      if (use_chgpen) then
          do i = 1, ncp
             done = .true.
             ii = ipole(i)
@@ -1989,7 +1991,7 @@ c
                fitcpen(it) = .true.
             end if
             if (.not. done) then
-               if (palpha(i) .ne. 0.0d0) then
+               if (fit_chgpen .and. palpha(i).ne.0.0d0) then
                   nvar = nvar + 1
                   varpot(nvar) = 'CHGPEN'
                   xx(nvar) = palpha(i)
