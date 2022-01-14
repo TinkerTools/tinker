@@ -2379,10 +2379,10 @@ c     interaction with the permanent multipoles
 c
       if (use_polar) then
          etot = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            etot = etot + uinds(1,i)*pbep(1,ii) + uinds(2,i)*pbep(2,ii)
-     &                + uinds(3,i)*pbep(3,ii)
+         do ii = 1, npole
+            i = ipole(ii)
+            etot = etot + uinds(1,ii)*pbep(1,i) + uinds(2,ii)*pbep(2,i)
+     &                + uinds(3,ii)*pbep(3,i)
          end do
          etot = -0.5d0 * electric * etot
          pbe = pbe + etot
@@ -2402,11 +2402,11 @@ c
 c
 c     copy induced electrostatics into atom-based arrays
 c
-         do i = 1, npole
-            ii = ipole(i)
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
-               indpole(j,ii) = uinds(j,i)
-               inppole(j,ii) = uinps(j,i)
+               indpole(j,i) = uinds(j,ii)
+               inppole(j,i) = uinps(j,ii)
             end do
          end do
 c

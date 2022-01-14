@@ -98,44 +98,44 @@ c
 c     calculate the damped dispersion energy Hessian elements
 c
       do iii = 1, nlist
-         i = list(iii)
-         ii = idisp(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         ci = csix(i)
-         ai = adisp(i)
-         usei = use(ii)
+         ii = list(iii)
+         i = idisp(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         ci = csix(ii)
+         ai = adisp(ii)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            dspscale(i12(j,ii)) = dsp2scale
+         do j = 1, n12(i)
+            dspscale(i12(j,i)) = dsp2scale
          end do
-         do j = 1, n13(ii)
-            dspscale(i13(j,ii)) = dsp3scale
+         do j = 1, n13(i)
+            dspscale(i13(j,i)) = dsp3scale
          end do
-         do j = 1, n14(ii)
-            dspscale(i14(j,ii)) = dsp4scale
+         do j = 1, n14(i)
+            dspscale(i14(j,i)) = dsp4scale
          end do
-         do j = 1, n15(ii)
-            dspscale(i15(j,ii)) = dsp5scale
+         do j = 1, n15(i)
+            dspscale(i15(j,i)) = dsp5scale
          end do
 c
 c     evaluate all sites within the cutoff distance
 c
-         do k = 1, ndisp
-            kk = idisp(k)
-            ck = csix(k)
-            ak = adisp(k)
+         do kk = 1, ndisp
+            k = idisp(kk)
+            ck = csix(kk)
+            ak = adisp(kk)
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
-            if (proceed)  proceed = (kk .ne. ii)
-            if (proceed)  proceed = (usei .or. use(kk))
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (k .ne. i)
+            if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
-               xr = xi - x(kk)
-               yr = yi - y(kk)
-               zr = zi - z(kk)
+               xr = xi - x(k)
+               yr = yi - y(k)
+               zr = zi - z(k)
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -223,8 +223,8 @@ c
 c
 c     scale the interaction based on its group membership
 c
-                  de = de * dspscale(kk)
-                  d2e = d2e * dspscale(kk)
+                  de = de * dspscale(k)
+                  d2e = d2e * dspscale(k)
                   if (use_group) then
                      de = de * fgrp
                      d2e = d2e * fgrp
@@ -250,12 +250,12 @@ c
 c     increment diagonal and non-diagonal Hessian elements
 c
                   do j = 1, 3
-                     hessx(j,ii) = hessx(j,ii) + term(1,j)
-                     hessy(j,ii) = hessy(j,ii) + term(2,j)
-                     hessz(j,ii) = hessz(j,ii) + term(3,j)
-                     hessx(j,kk) = hessx(j,kk) - term(1,j)
-                     hessy(j,kk) = hessy(j,kk) - term(2,j)
-                     hessz(j,kk) = hessz(j,kk) - term(3,j)
+                     hessx(j,i) = hessx(j,i) + term(1,j)
+                     hessy(j,i) = hessy(j,i) + term(2,j)
+                     hessz(j,i) = hessz(j,i) + term(3,j)
+                     hessx(j,k) = hessx(j,k) - term(1,j)
+                     hessy(j,k) = hessy(j,k) - term(2,j)
+                     hessz(j,k) = hessz(j,k) - term(3,j)
                   end do
                end if
             end if
@@ -263,17 +263,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            dspscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            dspscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            dspscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            dspscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            dspscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            dspscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            dspscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            dspscale(i15(j,i)) = 1.0d0
          end do
       end do
 c
@@ -285,44 +285,44 @@ c
 c     calculate interaction energy with other unit cells
 c
       do iii = 1, nlist
-         i = list(iii)
-         ii = idisp(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         ci = csix(i)
-         ai = adisp(i)
-         usei = use(ii)
+         ii = list(iii)
+         i = idisp(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         ci = csix(ii)
+         ai = adisp(ii)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            dspscale(i12(j,ii)) = dsp2scale
+         do j = 1, n12(i)
+            dspscale(i12(j,i)) = dsp2scale
          end do
-         do j = 1, n13(ii)
-            dspscale(i13(j,ii)) = dsp3scale
+         do j = 1, n13(i)
+            dspscale(i13(j,i)) = dsp3scale
          end do
-         do j = 1, n14(ii)
-            dspscale(i14(j,ii)) = dsp4scale
+         do j = 1, n14(i)
+            dspscale(i14(j,i)) = dsp4scale
          end do
-         do j = 1, n15(ii)
-            dspscale(i15(j,ii)) = dsp5scale
+         do j = 1, n15(i)
+            dspscale(i15(j,i)) = dsp5scale
          end do
 c
 c     evaluate all sites within the cutoff distance
 c
-         do k = 1, ndisp
-            kk = idisp(k)
-            ck = csix(k)
-            ak = adisp(k)
+         do kk = 1, ndisp
+            k = idisp(kk)
+            ck = csix(kk)
+            ak = adisp(kk)
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
-            if (proceed)  proceed = (usei .or. use(kk))
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                do jcell = 2, ncell
-                  xr = xi - x(kk)
-                  yr = yi - y(kk)
-                  zr = zi - z(kk)
+                  xr = xi - x(k)
+                  yr = yi - y(k)
+                  zr = zi - z(k)
                   call image (xr,yr,zr)
                   r2 = xr*xr + yr* yr + zr*zr
                   if (r2 .le. off2) then
@@ -459,17 +459,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            dspscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            dspscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            dspscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            dspscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            dspscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            dspscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            dspscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            dspscale(i15(j,i)) = 1.0d0
          end do
       end do
 c

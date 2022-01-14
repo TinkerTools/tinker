@@ -675,7 +675,7 @@ c
                      expik = exp(-0.5d0*(alphai+alphak)*r)
                      e = -chgik * expik
                   end if
-                  e = f * e * mscale(kk)
+                  e = f * e * mscale(k)
 c
 c     use energy switching if near the cutoff distance
 c

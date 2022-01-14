@@ -943,9 +943,9 @@ c
      &                      + tkxy*uixp + tkyy*uiyp + tkyz*uizp
                   depz = tixz*ukxp + tiyz*ukyp + tizz*ukzp
      &                      + tkxz*uixp + tkyz*uiyp + tkzz*uizp
-                  frcx = frcx + uscale(kk)*depx
-                  frcy = frcy + uscale(kk)*depy
-                  frcz = frcz + uscale(kk)*depz
+                  frcx = frcx + uscale(k)*depx
+                  frcy = frcy + uscale(k)*depy
+                  frcz = frcz + uscale(k)*depz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -982,9 +982,9 @@ c
      &                      + tkxy*uixp + tkyy*uiyp + tkyz*uizp
                   depz = tixz*ukxp + tiyz*ukyp + tizz*ukzp
      &                      + tkxz*uixp + tkyz*uiyp + tkzz*uizp
-                  frcx = frcx + wscale(kk)*depx
-                  frcy = frcy + wscale(kk)*depy
-                  frcz = frcz + wscale(kk)*depz
+                  frcx = frcx + wscale(k)*depx
+                  frcy = frcy + wscale(k)*depy
+                  frcz = frcz + wscale(k)*depz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -2020,9 +2020,9 @@ c
      &                      + tkxy*uixp + tkyy*uiyp + tkyz*uizp
                   depz = tixz*ukxp + tiyz*ukyp + tizz*ukzp
      &                      + tkxz*uixp + tkyz*uiyp + tkzz*uizp
-                  frcx = frcx + uscale(kk)*depx
-                  frcy = frcy + uscale(kk)*depy
-                  frcz = frcz + uscale(kk)*depz
+                  frcx = frcx + uscale(k)*depx
+                  frcy = frcy + uscale(k)*depy
+                  frcz = frcz + uscale(k)*depz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -2059,9 +2059,9 @@ c
      &                      + tkxy*uixp + tkyy*uiyp + tkyz*uizp
                   depz = tixz*ukxp + tiyz*ukyp + tizz*ukzp
      &                      + tkxz*uixp + tkyz*uiyp + tkzz*uizp
-                  frcx = frcx + wscale(kk)*depx
-                  frcy = frcy + wscale(kk)*depy
-                  frcz = frcz + wscale(kk)*depz
+                  frcx = frcx + wscale(k)*depx
+                  frcy = frcy + wscale(k)*depy
+                  frcz = frcz + wscale(k)*depz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c
@@ -3407,9 +3407,9 @@ c
      &                      + tkxy*uixp + tkyy*uiyp + tkyz*uizp
                   depz = tixz*ukxp + tiyz*ukyp + tizz*ukzp
      &                      + tkxz*uixp + tkyz*uiyp + tkzz*uizp
-                  frcx = frcx + uscale(kk)*depx
-                  frcy = frcy + uscale(kk)*depy
-                  frcz = frcz + uscale(kk)*depz
+                  frcx = frcx + uscale(k)*depx
+                  frcy = frcy + uscale(k)*depy
+                  frcz = frcz + uscale(k)*depz
 c
 c     get the dtau/dr terms used for mutual polarization force
 c
@@ -3446,9 +3446,9 @@ c
      &                      + tkxy*uixp + tkyy*uiyp + tkyz*uizp
                   depz = tixz*ukxp + tiyz*ukyp + tizz*ukzp
      &                      + tkxz*uixp + tkyz*uiyp + tkzz*uizp
-                  frcx = frcx + wscale(kk)*depx
-                  frcy = frcy + wscale(kk)*depy
-                  frcz = frcz + wscale(kk)*depz
+                  frcx = frcx + wscale(k)*depx
+                  frcy = frcy + wscale(k)*depy
+                  frcz = frcz + wscale(k)*depz
 c
 c     get the dtau/dr terms used for OPT polarization force
 c

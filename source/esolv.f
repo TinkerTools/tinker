@@ -977,10 +977,10 @@ c     compute the electrostatic energy via Poisson-Boltzmann
 c
       if (use_polar) then
          etot = 0.0d0
-         do i = 1, npole
-            ii = ipole(i)
-            etot = etot + uinds(1,i)*pbep(1,ii) + uinds(2,i)*pbep(2,ii)
-     &                + uinds(3,i)*pbep(3,ii)
+         do ii = 1, npole
+            i = ipole(ii)
+            etot = etot + uinds(1,ii)*pbep(1,i) + uinds(2,ii)*pbep(2,i)
+     &                + uinds(3,ii)*pbep(3,i)
          end do
          etot = -0.5d0 * electric * etot
          pbe = pbe + etot
@@ -1080,28 +1080,28 @@ c
 c
 c     calculate the multipole interaction energy term
 c
-      do i = 1, npole-1
-         ii = ipole(i)
+      do ii = 1, npole-1
+         i = ipole(ii)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         ci = rpole(1,i)
-         dix = rpole(2,i)
-         diy = rpole(3,i)
-         diz = rpole(4,i)
-         qixx = rpole(5,i)
-         qixy = rpole(6,i)
-         qixz = rpole(7,i)
-         qiyy = rpole(9,i)
-         qiyz = rpole(10,i)
-         qizz = rpole(13,i)
-         uix = uinds(1,i) - uind(1,i)
-         uiy = uinds(2,i) - uind(2,i)
-         uiz = uinds(3,i) - uind(3,i)
-         usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
+         iz = zaxis(ii)
+         ix = xaxis(ii)
+         iy = abs(yaxis(ii))
+         ci = rpole(1,ii)
+         dix = rpole(2,ii)
+         diy = rpole(3,ii)
+         diz = rpole(4,ii)
+         qixx = rpole(5,ii)
+         qixy = rpole(6,ii)
+         qixz = rpole(7,ii)
+         qiyy = rpole(9,ii)
+         qiyz = rpole(10,ii)
+         qizz = rpole(13,ii)
+         uix = uinds(1,ii) - uind(1,ii)
+         uiy = uinds(2,ii) - uind(2,ii)
+         uiz = uinds(3,ii) - uind(3,ii)
+         usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1136,40 +1136,40 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do k = i+1, npole
-            kk = ipole(k)
-            kz = zaxis(k)
-            kx = xaxis(k)
-            ky = abs(yaxis(k))
-            usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
+         do kk = ii+1, npole
+            k = ipole(kk)
+            kz = zaxis(kk)
+            kx = xaxis(kk)
+            ky = abs(yaxis(kk))
+            usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
 c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               xr = x(kk) - xi
-               yr = y(kk) - yi
-               zr = z(kk) - zi
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,k)
-                  dkx = rpole(2,k)
-                  dky = rpole(3,k)
-                  dkz = rpole(4,k)
-                  qkxx = rpole(5,k)
-                  qkxy = rpole(6,k)
-                  qkxz = rpole(7,k)
-                  qkyy = rpole(9,k)
-                  qkyz = rpole(10,k)
-                  qkzz = rpole(13,k)
-                  ukx = uinds(1,k) - uind(1,k)
-                  uky = uinds(2,k) - uind(2,k)
-                  ukz = uinds(3,k) - uind(3,k)
+                  ck = rpole(1,kk)
+                  dkx = rpole(2,kk)
+                  dky = rpole(3,kk)
+                  dkz = rpole(4,kk)
+                  qkxx = rpole(5,kk)
+                  qkxy = rpole(6,kk)
+                  qkxz = rpole(7,kk)
+                  qkyy = rpole(9,kk)
+                  qkyz = rpole(10,kk)
+                  qkzz = rpole(13,kk)
+                  ukx = uinds(1,kk) - uind(1,kk)
+                  uky = uinds(2,kk) - uind(2,kk)
+                  ukz = uinds(3,kk) - uind(3,kk)
 c
 c     construct some intermediate quadrupole values
 c
@@ -1209,13 +1209,13 @@ c
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  call dampthole2 (i,k,7,r,dmpik)
+                  call dampthole2 (ii,kk,7,r,dmpik)
                   ei = gli(1)*rr3*dmpik(3) + gli(2)*rr5*dmpik(5)
      &                    + gli(3)*rr7*dmpik(7)
 c
 c     make the adjustment for scaled interactions
 c
-                  fikp = f * pscale(kk)
+                  fikp = f * pscale(k)
                   ei = 0.5d0 * fikp * ei
 c
 c     scale the interaction based on its group membership;
@@ -1234,17 +1234,17 @@ c
 c
 c     reset exclusion coefficients for connected atoms
 c
-         do j = 1, n12(ii)
-            pscale(i12(j,ii)) = 1.0d0
+         do j = 1, n12(i)
+            pscale(i12(j,i)) = 1.0d0
          end do
-         do j = 1, n13(ii)
-            pscale(i13(j,ii)) = 1.0d0
+         do j = 1, n13(i)
+            pscale(i13(j,i)) = 1.0d0
          end do
-         do j = 1, n14(ii)
-            pscale(i14(j,ii)) = 1.0d0
+         do j = 1, n14(i)
+            pscale(i14(j,i)) = 1.0d0
          end do
-         do j = 1, n15(ii)
-            pscale(i15(j,ii)) = 1.0d0
+         do j = 1, n15(i)
+            pscale(i15(j,i)) = 1.0d0
          end do
       end do
 c
@@ -1307,14 +1307,14 @@ c
 c
 c     copy the permanent moments into an array for APBS
 c
-      do i = 1, npole
-         ii = ipole(i)
-         pbpole(1,ii) = rpole(1,i)
+      do ii = 1, npole
+         i = ipole(ii)
+         pbpole(1,i) = rpole(1,ii)
          do j = 2, 4
-            pbpole(j,ii) = rpole(j,i)
+            pbpole(j,i) = rpole(j,ii)
          end do
          do j = 5, 13
-            pbpole(j,ii) = 3.0d0 * rpole(j,i)
+            pbpole(j,i) = 3.0d0 * rpole(j,ii)
          end do
       end do
 c
