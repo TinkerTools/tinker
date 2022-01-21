@@ -19,23 +19,23 @@ c     nfatm       total atom number in electrostatic potential fit
 c     npgrid      total number of electrostatic potential grid points
 c     ipgrid      atom associated with each potential grid point
 c     wresp       weight used to restrain electrostatic parameters
-c     xdpl0       target x-component of molecular dipole moment
-c     ydpl0       target y-component of molecular dipole moment
-c     zdpl0       target z-component of molecular dipole moment
-c     xxqpl0      target xx-component of molecular quadrupole moment
-c     xyqpl0      target xy-component of molecular quadrupole moment
-c     xzqpl0      target xz-component of molecular quadrupole moment
-c     yyqpl0      target yy-component of molecular quadrupole moment
-c     yzqpl0      target yz-component of molecular quadrupole moment
-c     zzqpl0      target zz-component of molecular quadrupole moment
+c     xdpl0       target x-component of total dipole moment
+c     ydpl0       target y-component of total dipole moment
+c     zdpl0       target z-component of total dipole moment
+c     xxqpl0      target xx-component of total quadrupole moment
+c     xyqpl0      target xy-component of total quadrupole moment
+c     xzqpl0      target xz-component of total quadrupole moment
+c     yyqpl0      target yy-component of total quadrupole moment
+c     yzqpl0      target yz-component of total quadrupole moment
+c     zzqpl0      target zz-component of total quadrupole moment
 c     fit0        initial value of each parameter used in potential fit      
 c     fchg        partial charges by atom type during potential fit
 c     fpol        atomic multipoles by atom type during potential fit
 c     fcpen       charge penetration by atom type during potential fit
 c     pgrid       Cartesian coordinates of potential grid points
 c     epot        values of electrostatic potential at grid points
-c     use_dpl     flag to include molecular dipole in potential fit
-c     use_qpl     flag to include molecular quadrupole in potential fit
+c     use_dpl     flag to include total dipole in potential fit
+c     use_qpl     flag to include total quadrupole in potential fit
 c     fit_mpl     flag for atomic monopoles to vary in potential fit
 c     fit_dpl     flag for atomic dipoles to vary in potential fit
 c     fit_qpl     flag for atomic quadrupoles to vary in potential fit

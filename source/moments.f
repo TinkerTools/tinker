@@ -12,12 +12,19 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "moments" computes the total electric charge, dipole and
-c     quadrupole moments for the active atoms as a sum over the
-c     partial charges, bond dipoles and atomic multipole moments
+c     "moments" computes the total electric charge, dipole components
+c     and quadrupole components as a sum over the partial charges,
+c     bond dipoles and atomic multipole moments over active atoms or
+c     the full system
+c
+c     literature reference:
+c
+c     C. Gray and K. E. Gubbins, "Theory of Molecular Fluids, Volume 1:
+c     Fundamentals", Oxford University Press, (1984)  [factor of 3/2 in
+c     conversion of traced to traceless quadrupoles; pages 50-51]
 c
 c
-      subroutine moments
+      subroutine moments (mode)
       use atomid
       use atoms
       use bound
@@ -34,15 +41,17 @@ c
       use usage
       implicit none
       integer i,j,k
-      real*8 weigh,qave
       real*8 xc,yc,zc
       real*8 xi,yi,zi,ri
+      real*8 weigh,trace
       real*8 xmid,ymid,zmid
       real*8 xbnd,ybnd,zbnd
       real*8, allocatable :: xcm(:)
       real*8, allocatable :: ycm(:)
       real*8, allocatable :: zcm(:)
       real*8 a(3,3),b(3,3)
+      logical, allocatable :: temp(:)
+      character*6 mode
 c
 c
 c     zero out total charge, dipole and quadrupole components
@@ -64,6 +73,19 @@ c
       zxqpl = 0.0d0
       zyqpl = 0.0d0
       zzqpl = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      if (mode .eq. 'FULL')  allocate (temp(n))
+c
+c     store active atom list, and make all atoms active
+c
+      if (mode.eq.'FULL' .and. nuse.ne.n) then
+         do i = 1, n
+            temp(i) = use(i)
+            use(i) = .true.
+         end do
+      end if
 c
 c     maintain periodic boundaries and neighbor lists
 c
@@ -177,7 +199,7 @@ c
          end do
       end if
 c
-c     set the multipole moment components due to atomic multipoles
+c     set the moment components due to atomic monopoles and dipoles
 c
       do i = 1, npole
          k = ipole(i)
@@ -215,16 +237,16 @@ c
 c
 c     convert the quadrupole from traced to traceless form
 c
-      qave = (xxqpl + yyqpl + zzqpl) / 3.0d0
-      xxqpl = 1.5d0 * (xxqpl-qave)
+      trace = (xxqpl + yyqpl + zzqpl) / 3.0d0
+      xxqpl = 1.5d0 * (xxqpl-trace)
       xyqpl = 1.5d0 * xyqpl
       xzqpl = 1.5d0 * xzqpl
       yxqpl = 1.5d0 * yxqpl
-      yyqpl = 1.5d0 * (yyqpl-qave)
+      yyqpl = 1.5d0 * (yyqpl-trace)
       yzqpl = 1.5d0 * yzqpl
       zxqpl = 1.5d0 * zxqpl
       zyqpl = 1.5d0 * zyqpl
-      zzqpl = 1.5d0 * (zzqpl-qave)
+      zzqpl = 1.5d0 * (zzqpl-trace)
 c
 c     add the traceless atomic quadrupoles to total quadrupole
 c
@@ -242,6 +264,18 @@ c
             zzqpl = zzqpl + 3.0d0*rpole(13,i)
          end if
       end do
+c
+c     revert to the original set of active atoms
+c
+      if (mode.eq.'FULL' .and. nuse.ne.n) then
+         do i = 1, n
+            use(i) = temp(i)
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      if (mode .eq. 'FULL')  deallocate (temp)
 c
 c     convert dipole to Debye and quadrupole to Buckingham
 c
@@ -271,57 +305,5 @@ c
       a(3,2) = zyqpl
       a(3,3) = zzqpl
       call jacobi (3,a,netqpl,b)
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine momfull  --  multipole moments for full system  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "momfull" computes the electric moments for the full system
-c     as a sum over the partial charges, bond dipoles and atomic
-c     multipole moments
-c
-c
-      subroutine momfull
-      use atoms
-      use usage
-      implicit none
-      integer i
-      logical, allocatable :: temp(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (temp(n))
-c
-c     store active atom list, and make all atoms active
-c
-      if (nuse .ne. n) then
-         do i = 1, n
-            temp(i) = use(i)
-            use(i) = .true.
-         end do
-      end if
-c
-c     compute the electric multipole moments for the system
-c
-      call moments
-c
-c     revert to the original set of active atoms
-c
-      if (nuse .ne. n) then
-         do i = 1, n
-            use(i) = temp(i)
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (temp)
       return
       end

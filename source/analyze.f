@@ -743,11 +743,16 @@ c
       use moment
       implicit none
       real*8 rg
+      character*6 mode
 c
 c
-c     get the total charge, dipole and quadrupole moments
+c     get the electrostatic moments over the active atoms
 c
-      call moments
+      mode = 'ACTIVE'
+      call moments (mode)
+c
+c     print the total charge, dipole and quadrupole moments
+c
       write (iout,10)  netchg
    10 format (/,' Total Electric Charge :',12x,f13.5,' Electrons')
       write (iout,20)  netdpl,xdpl,ydpl,zdpl

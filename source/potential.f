@@ -1259,6 +1259,7 @@ c
       real*8 rscale
       real*8 xx(*)
       real*8 resid(*)
+      character*6 mode
 c
 c
 c     initialize least squares residuals and scaling factors
@@ -1324,7 +1325,10 @@ c
 c
 c     find moments if they contribute to the overall residual
 c
-         if (fit_mpl .or. use_dpl .or. use_qpl)  call momfull
+         if (fit_mpl .or. use_dpl .or. use_qpl) then
+            mode = 'FULL'
+            call moments (mode)
+         end if
 c
 c     get residual due to total molecular charge restraint
 c
