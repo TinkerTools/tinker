@@ -108,7 +108,7 @@ c
       character*6 mode
 c
 c
-c     zero out the dispersion interaction
+c     zero out the total damped dispersion energy
 c
       edsp = 0.0d0
       if (ndisp .eq. 0) return
@@ -470,7 +470,7 @@ c
       character*6 mode
 c
 c
-c     zero out the dispersion interaction
+c     zero out the total damped dispersion energy
 c
       edsp = 0.0d0
       if (ndisp .eq. 0) return

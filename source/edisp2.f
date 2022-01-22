@@ -95,7 +95,7 @@ c
       return
    10 continue
 c
-c     calculate the damped dispersion energy Hessian elements
+c     calculate the dispersion energy Hessian elements
 c
       do iii = 1, nlist
          ii = list(iii)

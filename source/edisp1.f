@@ -119,7 +119,7 @@ c
       character*6 mode
 c
 c
-c     zero out the damped dispersion energy and derivatives
+c     zero out the dispersion energy and derivatives
 c
       edsp = 0.0d0
       do i = 1, n
@@ -596,7 +596,7 @@ c
       character*6 mode
 c
 c
-c     zero out the damped dispersion energy and derivatives
+c     zero out the dispersion energy and derivatives
 c
       edsp = 0.0d0
       do i = 1, n
@@ -854,7 +854,7 @@ c
       real*8 term
 c
 c
-c     zero out the damped dispersion energy and derivatives
+c     zero out the dispersion energy and derivatives
 c
       edsp = 0.0d0
       do i = 1, n
@@ -1355,7 +1355,7 @@ c
       real*8 term
 c
 c
-c     zero out the damped dispersion energy and derivatives
+c     zero out the dispersion energy and derivatives
 c
       edsp = 0.0d0
       do i = 1, n

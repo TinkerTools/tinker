@@ -532,7 +532,7 @@ c     #################################################################
 c
 c
 c     "edisp3b" calculates the damped dispersion potential energy
-c     and also partitions the energy among the atomsusing a pairwise
+c     and also partitions the energy among the atoms using a pairwise
 c     neighbor list
 c
 c
@@ -583,10 +583,14 @@ c
       character*6 mode
 c
 c
-c     zero out the dispersion interaction
+c     zero out the dispersion energy and partitioning terms
 c
+      nedsp = 0
       edsp = 0.0d0
-      if (ndisp .eq. 0) return
+      do i = 1, n
+         aedsp(i) = 0.0d0
+      end do
+      if (ndisp .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -823,7 +827,7 @@ c
       real*8 e
 c
 c
-c     zero out the damped dispersion energy and partitioning terms
+c     zero out the dispersion energy and partitioning terms
 c
       nedsp = 0
       edsp = 0.0d0
@@ -1312,7 +1316,7 @@ c
       real*8 e
 c
 c
-c     zero out the damped dispersion energy and partitioning terms
+c     zero out the dispersion energy and partitioning terms
 c
       nedsp = 0
       edsp = 0.0d0
