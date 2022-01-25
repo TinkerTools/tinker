@@ -3694,8 +3694,8 @@ biotype    2002    H       "Water"                          2002
 biotype    2003    LI      "Lithium Ion"                    2003
 biotype    2004    NA      "Sodium Ion"                     2004
 biotype    2005    K       "Potassium Ion"                  2005
-biotype    2005    RB      "Rubidium Ion"                   2006
-biotype    2005    CS      "Cesium Ion"                     2007
+biotype    2006    RB      "Rubidium Ion"                   2006
+biotype    2007    CS      "Cesium Ion"                     2007
 biotype    2008    MG      "Magnesium Ion"                  2008
 biotype    2009    CA      "Calcium Ion"                    2009
 biotype    2010    SR      "Strontium Ion"                  2010

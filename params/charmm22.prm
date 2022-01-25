@@ -1747,12 +1747,9 @@ torsion      50   43   44   15
 torsion      50   43   44   15
 torsion      45   43   44   44
 torsion      45   43   44   44
-torsion      50   43   44   44
 torsion      44   43   45    1
 torsion      50   43   45    1
 torsion      44   43   45   43
-torsion      50   43   45   43
-torsion      44   43   50   43
 torsion      45   43   50   43
 torsion      44   43   50   56
 torsion      45   43   50   56
