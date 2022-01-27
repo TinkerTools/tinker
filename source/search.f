@@ -7,12 +7,12 @@ c     ###################################################
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine search  --  perform unidimensional line search  ##
+c     ##  subroutine search  --  perform unidirectional line search  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "search" is a unidimensional line search based upon parabolic
+c     "search" is a unidirectional line search based upon parabolic
 c     extrapolation and cubic interpolation using both function and
 c     gradient values
 c

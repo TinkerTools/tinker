@@ -27,7 +27,7 @@ extern double TINKER_MOD(polpot, w2scale);
 extern double TINKER_MOD(polpot, w3scale);
 extern double TINKER_MOD(polpot, w4scale);
 extern double TINKER_MOD(polpot, w5scale);
-extern double TINKER_MOD(polpot, udiag);
+extern double TINKER_MOD(polpot, uaccel);
 extern int TINKER_MOD(polpot, polprt);
 extern int TINKER_MOD(polpot, dpequal);
 extern int TINKER_MOD(polpot, use_thole);

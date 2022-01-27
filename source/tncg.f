@@ -499,11 +499,11 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine tnsolve  --  approx linear equation solution   ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine tnsolve  --  approx linear equation solution  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "tnsolve" uses a linear conjugate gradient method to find
