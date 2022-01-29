@@ -1,0 +1,87 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              AMOEBA-NITRATE
+
+bond-cubic              -2.55
+bond-quartic            3.793125
+angle-cubic             -0.014
+angle-quartic           0.000056
+angle-pentic            -0.0000007
+angle-sextic            0.000000022
+opbendtype              ALLINGER
+opbend-cubic            -0.014
+opbend-quartic          0.000056
+opbend-pentic           -0.0000007
+opbend-sextic           0.000000022
+torsionunit             0.5
+vdwtype                 BUFFERED-14-7
+radiusrule              CUBIC-MEAN
+radiustype              R-MIN
+radiussize              DIAMETER
+epsilonrule             HHG
+dielectric              1.0
+polarization            MUTUAL
+vdw-12-scale            0.0
+vdw-13-scale            0.0
+vdw-14-scale            1.0
+vdw-15-scale            1.0
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.0
+polar-14-scale          1.0
+polar-15-scale          1.0
+polar-12-intra          0.0
+polar-13-intra          0.0
+polar-14-intra          0.5
+polar-15-intra          1.0
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
+
+
+      ########################################
+      ##                                    ##
+      ##  Trial Parameters for Nitrate Ion  ##
+      ##                                    ##
+      ########################################
+
+
+atom          1    1    N     "Nitrate N"     7    14.007    3
+atom          2    2    O     "Nitrate O"     8    15.999    1
+
+vdw           1                       3.7100     0.1100
+vdw           2                       3.5100     0.1120
+
+bond          1    2                   390.0     1.2606
+angle         2    1    2             155.00     120.00
+strbnd        2    1    2              18.70      18.70
+opbend        2    1    2    2                   172.00
+
+multipole     1    2    2            1.07363
+                                     0.00000    0.00000    0.00000
+                                     0.14407
+                                     0.00000   -0.28814
+                                     0.00000    0.00000    0.14407
+
+multipole     2    1    2           -0.69121
+                                     0.00000    0.00000    0.04941
+                                    -0.50067
+                                     0.00000   -0.08271
+                                     0.00000    0.00000    0.58338
+
+polarize      1                       1.0730     0.3900      2
+polarize      2                       0.8370     0.3900      1
