@@ -80,6 +80,7 @@ c
       real*8 cf1,cf2,vol
       real*8 c1,c2,c3
       real*8 xi,yi,zi,ri
+      real*8 rflat2
       real*8 a,b,buffer,term
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -702,6 +703,7 @@ c
 c     get energy and derivatives for a Gaussian basin restraint
 c
       if (use_basin) then
+         rflat2 = rflat * rflat
          do i = 1, n-1
             xi = x(i)
             yi = y(i)
@@ -715,6 +717,7 @@ c
                   yr = yi - y(k)
                   zr = zi - z(k)
                   r2 = xr*xr + yr*yr + zr*zr
+                  r2 = max(0.0d0,r2-rflat2)
                   term = -width * r2
                   e = 0.0d0
                   if (term .gt. -50.0d0)  e = depth * exp(term)

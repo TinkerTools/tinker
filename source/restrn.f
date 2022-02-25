@@ -27,6 +27,7 @@ c     igfix      group numbers defining each group distance restraint
 c     ichir      atom numbers defining each chirality restraint
 c     depth      depth of shallow Gaussian basin restraint
 c     width      exponential width coefficient of Gaussian basin
+c     rflat      flat bottom radius for Gaussian basin restraint
 c     rwall      radius of spherical droplet boundary restraint
 c     xpfix      x-coordinate target for each restrained position
 c     ypfix      y-coordinate target for each restrained position
@@ -43,12 +44,9 @@ c
 c
       module restrn
       implicit none
-      integer npfix
-      integer ndfix
-      integer nafix
-      integer ntfix
-      integer ngfix
-      integer nchir
+      integer npfix,ndfix
+      integer nafix,ntfix
+      integer ngfix,nchir
       integer, allocatable :: ipfix(:)
       integer, allocatable :: kpfix(:,:)
       integer, allocatable :: idfix(:,:)
@@ -56,9 +54,8 @@ c
       integer, allocatable :: itfix(:,:)
       integer, allocatable :: igfix(:,:)
       integer, allocatable :: ichir(:,:)
-      real*8 depth
-      real*8 width
-      real*8 rwall
+      real*8 depth,width
+      real*8 rflat,rwall
       real*8, allocatable :: xpfix(:)
       real*8, allocatable :: ypfix(:)
       real*8, allocatable :: zpfix(:)
@@ -68,7 +65,6 @@ c
       real*8, allocatable :: tfix(:,:)
       real*8, allocatable :: gfix(:,:)
       real*8, allocatable :: chir(:,:)
-      logical use_basin
-      logical use_wall
+      logical use_basin,use_wall
       save
       end

@@ -129,6 +129,7 @@ c
       real*8 dedr,d2edr2,expterm
       real*8 xi,yi,zi,ri,ri2
       real*8 r,r2,r6,r12
+      real*8 rflat2
       real*8 a,b,buffer
       real*8 xorig,xorig2
       real*8 yorig,yorig2
@@ -1554,6 +1555,7 @@ c
 c     compute Hessian elements for a Gaussian basin restraint
 c
       if (use_basin) then
+         rflat2 = rflat * rflat
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -1565,6 +1567,7 @@ c
                yr = yi - y(k)
                zr = zi - z(k)
                r2 = xr*xr + yr*yr + zr*zr
+               r2 = max(0.0d0,r2-rflat2)
                term = -width * r2
                expterm = 0.0d0
                if (term .gt. -50.0d0)

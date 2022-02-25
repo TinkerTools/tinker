@@ -61,6 +61,7 @@ c
       nchir = 0
       depth = 0.0d0
       width = 0.0d0
+      rflat = 0.0d0
       rwall = 0.0d0
       use_basin = .false.
       use_wall = .false.
@@ -428,7 +429,8 @@ c
          else if (keyword(1:6) .eq. 'BASIN ') then
             depth = 0.0d0
             width = 0.0d0
-            read (string,*,err=190,end=190)  depth,width
+            rflat = 0.0d0
+            read (string,*,err=190,end=190)  depth,width,rflat
   190       continue
             use_basin = .true.
             if (depth .eq. 0.0d0)  use_basin = .false.
