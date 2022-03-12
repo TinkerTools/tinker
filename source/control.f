@@ -37,9 +37,9 @@ c
       holdup = .false.
       abort = .false.
       archive = .true.
+      cyclesave = .false.
       noversion = .false.
       overwrite = .false.
-      cyclesave = .false.
 c
 c     check for control parameters on the command line
 c
@@ -72,14 +72,18 @@ c
             verbose = .true.
          else if (keyword(1:11) .eq. 'EXIT-PAUSE ') then
             holdup = .true.
+         else if (keyword(1:8) .eq. 'ARCHIVE ') then
+            archive = .true.
+            cyclesave = .false.
          else if (keyword(1:10) .eq. 'NOARCHIVE ') then
             archive = .false.
+         else if (keyword(1:11) .eq. 'SAVE-CYCLE ') then
+            archive = .false.
+            cyclesave = .true.
          else if (keyword(1:10) .eq. 'NOVERSION ') then
             noversion = .true.
          else if (keyword(1:10) .eq. 'OVERWRITE ') then
             overwrite = .true.
-         else if (keyword(1:11) .eq. 'SAVE-CYCLE ') then
-            cyclesave = .true.
          end if
    10    continue
       end do
