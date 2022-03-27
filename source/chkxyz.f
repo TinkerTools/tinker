@@ -27,14 +27,20 @@ c
       logical header
 c
 c
-c     initialize atom collision flag and distance tolerance
+c     initialize distance tolerance and atom collision flag
 c
-      clash = .false.
       eps = 0.000001d0
+      clash = .false.
+      header = .true.
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,x,y,z,eps,clash,header)
+!$OMP DO schedule(guided)
 c
 c     loop over atom pairs testing for identical coordinates
 c
-      header = .true.
       do i = 1, n-1
          xi = x(i)
          yi = y(i)
@@ -54,5 +60,10 @@ c
             end if
          end do
       end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
       return
       end

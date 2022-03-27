@@ -195,6 +195,14 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_extra = .true.
          if (value .eq. 'NONE')  use_extra = .false.
+      else if (keyword(1:12) .eq. 'VALENCETERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call nbondoff
+         if (value .eq. 'NONE')  call valoff
+      else if (keyword(1:12) .eq. 'NONBONDTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call valoff
+         if (value .eq. 'NONE')  call nbondoff
       end if
 c
 c     select the name of the force field parameter set
@@ -543,5 +551,77 @@ c
       use_metal = .false.
       use_geom = .false.
       use_extra = .false.
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine valoff  --  turn off valence potential terms  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "valoff" turns off the use of each of the all valence
+c     potential energy functions
+c
+c
+      subroutine valoff
+      use potent
+      implicit none
+c
+c
+c     turn off the use of each of the valence energy functions
+c
+      use_bond = .false.
+      use_angle = .false.
+      use_strbnd = .false.
+      use_urey = .false.
+      use_angang = .false.
+      use_opbend = .false.
+      use_opdist = .false.
+      use_improp = .false.
+      use_imptor = .false.
+      use_tors = .false.
+      use_pitors = .false.
+      use_strtor = .false.
+      use_angtor = .false.
+      use_tortor = .false.
+      use_chgflx = .false.
+      use_geom = .false.
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine nbondoff  --  turn off nonbond potential terms  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "nbondoff" turns off the use of each of the all nonbonded
+c     potential energy functions
+c
+c
+      subroutine nbondoff
+      use potent
+      implicit none
+c
+c
+c     turn off the use of each of the nonbonded energy functions
+c
+      use_vdw = .false.
+      use_repuls = .false.
+      use_disp = .false.
+      use_charge = .false.
+      use_chgdpl = .false.
+      use_dipole = .false.
+      use_mpole = .false.
+      use_polar = .false.
+      use_chgtrn = .false.
+      use_rxnfld = .false.
+      use_solv = .false.
+      use_metal = .false.
       return
       end

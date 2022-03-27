@@ -242,6 +242,12 @@ c
             rmax(15) = 2.6d0
             rmax(25) = 2.8d0
 c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,x,y,z,row,rmax,n12,i12)
+!$OMP DO schedule(guided)
+c
 c     find and connect atom pairs within bonding distance
 c
             do i = 1, n-1
@@ -259,6 +265,11 @@ c
                   end if
                end do
             end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
 c
