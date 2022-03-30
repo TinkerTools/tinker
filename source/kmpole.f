@@ -42,6 +42,7 @@ c
       integer number
       integer kz,kx,ky
       integer ztyp,xtyp,ytyp
+      integer polmax
       integer, allocatable :: mpt(:)
       integer, allocatable :: mpz(:)
       integer, allocatable :: mpx(:)
@@ -523,6 +524,7 @@ c
 c     get the order of the multipole expansion at each site
 c
       npole = n
+      polmax = 0
       do i = 1, n
          size = 0
          do k = 1, maxpole
@@ -534,7 +536,27 @@ c
             size = 4
          end if
          polsiz(i) = size
+         polmax = max(polmax,size)
       end do
+c
+c     warn if there are sites with no atomic multipole values
+c
+      if (polmax .ne. 0) then
+         header = .true.
+         do i = 1, n
+            if (polsiz(i) .eq. 0) then
+               if (header) then
+                  header = .false.
+                  write (iout,220)
+  220             format (/,' Possible Missing Multipole',
+     &                       ' Parameters :',/)
+               end if 
+               write (iout,230)  i
+  230          format (' KMPOLE  --  Warning, No Atomic',
+     &                    ' Multipoles for Atom',i7)
+            end if
+         end do
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -584,20 +606,20 @@ c
             pel = 0.0d0
             pal = 0.0d0
             string = record(next:240)
-            read (string,*,err=240,end=240)  k,pel,pal
+            read (string,*,err=260,end=260)  k,pel,pal
             cpele(k) = abs(pel)
             cpalp(k) = pal
             if (header .and. .not.silent) then
                header = .false.
-               write (iout,220)
-  220          format (/,' Additional Charge Penetration Parameters :',
+               write (iout,240)
+  240          format (/,' Additional Charge Penetration Parameters :',
      &                 //,5x,'Atom Class',11x,'Core Chg',11x,'Damp',/)
             end if
             if (.not. silent) then
-               write (iout,230)  k,pel,pal
-  230          format (6x,i6,7x,f15.3,f15.4)
+               write (iout,250)  k,pel,pal
+  250          format (6x,i6,7x,f15.3,f15.4)
             end if
-  240       continue
+  260       continue
          end if
       end do
 c
@@ -631,7 +653,7 @@ c
             pel = 0.0d0
             pal = 0.0d0
             string = record(next:240)
-            read (string,*,err=270,end=270)  k,pel,pal
+            read (string,*,err=290,end=290)  k,pel,pal
             if (k.lt.0 .and. k.ge.-n) then
                k = -k
                pcore(k) = abs(pel)
@@ -639,17 +661,17 @@ c
                palpha(k) = pal
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,250)
-  250             format (/,' Additional Charge Penetration',
+                  write (iout,270)
+  270             format (/,' Additional Charge Penetration',
      &                       ' for Specific Atoms :',
      &                    //,5x,'Atom',17x,'Core Chg',11x,'Damp',/)
                end if
                if (.not. silent) then
-                  write (iout,260)  k,pel,pal
-  260             format (6x,i6,7x,f15.3,f15.4)
+                  write (iout,280)  k,pel,pal
+  280             format (6x,i6,7x,f15.3,f15.4)
                end if
             end if
-  270       continue
+  290       continue
          end if
       end do
 c
