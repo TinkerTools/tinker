@@ -295,6 +295,7 @@ c
                         kt = type(ki)
                         if (kt.eq.xtyp .and. ki.ne.ji) then
                            if (ytyp .eq. 0) then
+                              pollist(i) = i
                               zaxis(i) = ji
                               xaxis(i) = ki
                               polaxe(i) = mpaxis(imp)
@@ -308,6 +309,7 @@ c
                               lt = type(li)
                               if (lt.eq.ytyp .and. li.ne.ji
      &                               .and. li.ne.ki) then
+                                 pollist(i) = i
                                  zaxis(i) = ji
                                  xaxis(i) = ki
                                  yaxis(i) = li
@@ -345,6 +347,7 @@ c
                         end do
                         if (kt.eq.xtyp .and. path) then
                            if (ytyp .eq. 0) then
+                              pollist(i) = i
                               zaxis(i) = ji
                               xaxis(i) = ki
                               polaxe(i) = mpaxis(imp)
@@ -362,6 +365,7 @@ c
                               end do
                               if (lt.eq.ytyp .and. li.ne.ki
      &                               .and. path) then
+                                 pollist(i) = i
                                  zaxis(i) = ji
                                  xaxis(i) = ki
                                  yaxis(i) = li
@@ -391,6 +395,7 @@ c
                   jt = type(ji)
                   if (jt .eq. ztyp) then
                      if (xtyp .eq. 0) then
+                        pollist(i) = i
                         zaxis(i) = ji
                         polaxe(i) = mpaxis(imp)
                         do m = 1, 13
@@ -411,6 +416,7 @@ c
                xtyp = mpx(imp)
                ytyp = mpy(imp)
                if (ztyp .eq. 0) then
+                  pollist(i) = i
                   polaxe(i) = mpaxis(imp)
                   do m = 1, 13
                      pole(m,i) = multip(m,imp)
@@ -497,6 +503,7 @@ c
      &                       /,49x,3f9.5,/,49x,f9.5,
      &                       /,49x,2f9.5,/,49x,3f9.5)
                end if
+               pollist(k) = k
                zaxis(k) = kz
                xaxis(k) = kx
                yaxis(k) = ky
@@ -544,17 +551,18 @@ c
       if (polmax .ne. 0) then
          header = .true.
          do i = 1, n
-            if (polsiz(i) .eq. 0) then
+            if (pollist(i) .eq. 0) then
                if (header) then
                   header = .false.
                   write (iout,220)
-  220             format (/,' Possible Missing Multipole',
+  220             format (/,' Undefined Atomic Multipole',
      &                       ' Parameters :',/)
                end if 
                write (iout,230)  i
-  230          format (' KMPOLE  --  Warning, No Atomic',
-     &                    ' Multipoles for Atom',i7)
+  230          format (' Warning, No Multipole Parameters',
+     &                    ' for Atom',i7)
             end if
+            pollist(i) = 0
          end do
       end if
 c
