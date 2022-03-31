@@ -192,6 +192,7 @@ c
       size = min(24,leng)
       do i = 1, n
          type(i) = i
+         class(i) = i
          valence(i) = n12(i)
          story(i) = filename(1:size)
       end do
@@ -4253,15 +4254,15 @@ c
       use sizes
       use units
       implicit none
-      integer i,j,k,it
+      integer i,j,k,m,it
       integer ixyz,ikey
-      integer size,tmax
-      integer xaxe
-      integer yaxe
-      integer zaxe
-      integer freeunit
-      integer trimtext
-      integer, allocatable :: pkey(:)
+      integer size,atlast
+      integer xaxe,yaxe,zaxe
+      integer freeunit,trimtext
+      integer, allocatable :: at(:)
+      integer, allocatable :: atkey(:)
+      integer, allocatable :: ptkey(:)
+      logical done
       character*4 pa,pb,pc,pd
       character*16 ptlast
       character*16, allocatable :: pt(:)
@@ -4294,27 +4295,37 @@ c
    20    format ()
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (at(npole))
+      allocate (atkey(npole))
+      allocate (pt(npole))
+      allocate (ptkey(npole))
+c
+c     locate the equivalently defined atom type sites
+c
+      do i = 1, npole
+         at(i) = type(ipole(i))
+      end do
+      call sort3 (npole,at,atkey)
+c
 c     output the atom definitions to the keyfile as appropriate
 c
-      tmax = 0
-      do i = 1, n
-         it = type(ipole(i))
-         if (it .gt. tmax) then
-            write (ikey,30)  type(i),type(i),name(i),story(i),
+      atlast = 0
+      do k = 1, npole
+         i = atkey(k)
+         it = type(i)
+         if (it .ne. atlast) then
+            atlast = it
+            write (ikey,30)  type(i),class(i),name(i),story(i),
      &                       atomic(i),mass(i),valence(i)
    30       format ('atom',6x,2i5,4x,a3,3x,'"',a20,'"',i10,f10.3,i5)
          end if
-         tmax = max(it,tmax)
       end do
-      if (n .ne. 0) then
+      if (npole .ne. 0) then
          write (ikey,40)
    40    format ()
       end if
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (pt(npole))
-      allocate (pkey(npole))
 c
 c     locate the equivalently defined multipole sites
 c
@@ -4334,13 +4345,13 @@ c
          call numeral (yaxe,pd,size)
          pt(i) = pa//pb//pc//pd
       end do
-      call sort7 (npole,pt,pkey)
+      call sort7 (npole,pt,ptkey)
 c
 c     output the local frame multipole values to the keyfile
 c
       ptlast = '                '
       do k = 1, npole
-         i = pkey(k)
+         i = ptkey(k)
          it = type(ipole(i))
          if (pt(k) .ne. ptlast) then
             ptlast = pt(k)
@@ -4390,11 +4401,6 @@ c
          end if
       end do
 c
-c     perform deallocation of some local arrays
-c
-      deallocate (pt)
-      deallocate (pkey)
-c
 c     output any charge penetration parameters to the keyfile
 c
       if (use_chgpen) then
@@ -4402,14 +4408,15 @@ c
             write (ikey,170)
   170       format ()
          end if
-         tmax = 0
-         do i = 1, npole
-            it = type(ipole(i))
-            if (it .gt. tmax) then
+         atlast = 0
+         do k = 1, npole
+            i = atkey(k)
+            it = type(i)
+            if (it .ne. atlast) then
+               atlast = it
                write (ikey,180)  it,pcore(i),palpha(i)
   180          format ('chgpen',9x,i5,5x,2f11.4)
             end if
-            tmax = max(it,tmax)
          end do
       end if
 c
@@ -4419,26 +4426,34 @@ c
          write (ikey,190)
   190    format ()
       end if
-      tmax = 0
-      do i = 1, npole
-         it = type(ipole(i))
-         if (it .gt. tmax) then
-            k = 0
+      atlast = 0
+      do k = 1, npole
+         i = atkey(k)
+         it = type(i)
+         if (it .ne. atlast) then
+            atlast = it
+            m = 0
             do j = 1, maxval
-               if (pgrp(j,it) .ne. 0)  k = j
+               if (pgrp(j,it) .ne. 0)  m = j
             end do
-            call sort8 (k,pgrp(1,it))
+            call sort8 (m,pgrp(1,it))
             if (use_thole) then
                write (ikey,200)  it,polarity(i),thole(i),
-     &                           (pgrp(j,it),j=1,k)
+     &                           (pgrp(j,it),j=1,m)
   200          format ('polarize',7x,i5,5x,2f11.4,2x,20i5)
             else if (use_chgpen) then
-               write (ikey,210)  it,polarity(i),(pgrp(j,it),j=1,k)
+               write (ikey,210)  it,polarity(i),(pgrp(j,it),j=1,m)
   210          format ('polarize',7x,i5,5x,f11.4,6x,20i7)
             end if
          end if
-         tmax = max(it,tmax)
       end do
       close (unit=ikey)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (at)
+      deallocate (atkey)
+      deallocate (pt)
+      deallocate (ptkey)
       return
       end
