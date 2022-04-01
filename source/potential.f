@@ -614,10 +614,10 @@ c
          allocate (varpot(12*nconf*namax))
          allocate (fchg(maxtyp))
          allocate (fpol(13,maxtyp))
-         allocate (fcpen(maxtyp))
+         allocate (fcpen(maxclass))
          allocate (fitchg(maxtyp))
          allocate (fitpol(maxtyp))
-         allocate (fitcpen(maxtyp))
+         allocate (fitcpen(maxclass))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -626,7 +626,7 @@ c
          allocate (xhi(12*nconf*namax))
          allocate (tmpchg(maxtyp))
          allocate (tmppol(maxtyp))
-         allocate (tmpcpen(maxtyp))
+         allocate (tmpcpen(maxclass))
 c
 c     zero the keyfile length to avoid parameter reprocessing
 c
@@ -1790,15 +1790,15 @@ c
       if (nconf.eq.1 .and. nfatm.ne.n) then
          write (iout,30)
    30    format (/,' Atomic Parameters Included in Potential Fitting :',
-     &           //,3x,'Atom',10x,'Atom Name',9x,'Atom Type',
-     &              9x,'Parameters',/)
+     &           //,3x,'Atom',10x,'Atom Name',6x,'Atom Type/Class',
+     &              6x,'Parameters',/)
          do i = 1, nion
             ii = iion(i)
             if (fatm(ii)) then
                it = type(ii)
                prmtyp = 'Partial Charge'
                write (iout,40)  ii,name(ii),it,prmtyp
-   40          format (i6,15x,a3,10x,i6,13x,a)
+   40          format (i6,15x,a3,7x,i6,' Type',11x,a)
             end if
          end do
          do i = 1, npole
@@ -1807,7 +1807,7 @@ c
                it = type(ii)
                prmtyp = 'Atomic Multipoles'
                write (iout,50)  ii,name(ii),it,prmtyp
-   50          format (i6,15x,a3,10x,i6,13x,a)
+   50          format (i6,15x,a3,7x,i6,' Type',11x,a)
             end if
          end do
          if (fit_chgpen) then
@@ -1817,7 +1817,7 @@ c
                   ic = class(ii)
                   prmtyp = 'Charge Penetration'
                   write (iout,60)  ii,name(ii),ic,prmtyp
-   60             format (i6,15x,a3,10x,i6,13x,a)
+   60             format (i6,15x,a3,7x,i6,' Class',10x,a)
                end if
             end do
          end if
@@ -1828,8 +1828,8 @@ c
       if (nvar .eq. 0) then
          write (iout,70)
    70    format (/,' Potential Fitting of Electrostatic Parameters :',
-     &           //,1x,'Parameter',6x,'Atom Type',9x,'Category',
-     &              12x,'Value',9x,'Fixed',/)
+     &           //,1x,'Parameter',5x,'Atom Type/Class',6x,'Category',
+     &              10x,'Value',9x,'Fixed',/)
       end if
 c
 c     get optimization parameters from partial charge values
@@ -1853,10 +1853,10 @@ c
                   xx(nvar) = pchg(i)
                end if
                write (iout,80)  nvar,it,'Charge  ',xx(nvar)
-   80          format (i6,7x,i8,13x,a8,6x,f12.5)
+   80          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,90)  it,'Charge  ',pchg0(i)
-   90          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+   90          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
          end if
       end do
@@ -1882,40 +1882,40 @@ c
                   xx(nvar) = pole(1,i)
                end if
                write (iout,100)  nvar,it,'Monopole',xx(nvar)
-  100          format (i6,7x,i8,13x,a8,6x,f12.5)
+  100          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,110)  it,'Monopole',mono0(i)
-  110          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  110          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(2,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(2,i)
                write (iout,120)  nvar,it,'X-Dipole',xx(nvar)
-  120          format (i6,7x,i8,13x,a8,6x,f12.5)
+  120          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,130)  it,'X-Dipole',dterm*pole(2,i)
-  130          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  130          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(3,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(3,i)
                write (iout,140)  nvar,it,'Y-Dipole',xx(nvar)
-  140          format (i6,7x,i8,13x,a8,6x,f12.5)
+  140          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,150)  it,'Y-Dipole',dterm*pole(3,i)
-  150          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  150          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_dpl .and. pole(4,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(4,i)
                write (iout,160)  nvar,it,'Z-Dipole',xx(nvar)
-  160          format (i6,7x,i8,13x,a8,6x,f12.5)
+  160          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,170)  it,'Z-Dipole',dterm*pole(4,i)
-  170          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  170          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(5,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
@@ -1923,34 +1923,34 @@ c
                   varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(5,i)
                   write (iout,180)  nvar,it,'XX-Quad ',xx(nvar)
-  180             format (i6,7x,i8,13x,a8,6x,f12.5)
+  180             format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
                else
                   write (iout,190)    it,'XX-Quad ',qterm*pole(5,i)
-  190             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
+  190             format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5)
                end if
             else
                write (iout,200)  it,'XX-Quad ',qterm*pole(5,i)
-  200          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  200          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(6,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(6,i)
                write (iout,210)  nvar,it,'XY-Quad ',xx(nvar)
-  210          format (i6,7x,i8,13x,a8,6x,f12.5)
+  210          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,220)  it,'XY-Quad ',qterm*pole(6,i)
-  220          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  220          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(7,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(7,i)
                write (iout,230)  nvar,it,'XZ-Quad ',xx(nvar)
-  230          format (i6,7x,i8,13x,a8,6x,f12.5)
+  230          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,240)  it,'XZ-Quad ',qterm*pole(7,i)
-  240          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  240          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(9,i).ne.0.0d0) then
                if (polaxe(i) .ne. 'Z-Only') then
@@ -1958,24 +1958,24 @@ c
                   varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(9,i)
                   write (iout,250)  nvar,it,'YY-Quad ',xx(nvar)
-  250             format (i6,7x,i8,13x,a8,6x,f12.5)
+  250             format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
                else
                   write (iout,260)  it,'YY-Quad ',qterm*pole(9,i)
-  260             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
+  260             format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5)
                end if
             else
                write (iout,270)  it,'YY-Quad ',qterm*pole(9,i)
-  270          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  270          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(10,i).ne.0.0d0) then
                nvar = nvar + 1
                varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(10,i)
                write (iout,280)  nvar,it,'YZ-Quad ',xx(nvar)
-  280          format (i6,7x,i8,13x,a8,6x,f12.5)
+  280          format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
             else
                write (iout,290)  it,'YZ-Quad ',qterm*pole(10,i)
-  290          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  290          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. pole(13,i).ne.0.0d0) then
                if (polaxe(i) .eq. 'Z-Only') then
@@ -1983,14 +1983,14 @@ c
                   varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(13,i)
                   write (iout,300)  nvar,it,'ZZ-Quad ',xx(nvar)
-  300             format (i6,7x,i8,13x,a8,6x,f12.5)
+  300             format (i6,7x,i8,' Type',10x,a8,4x,f12.5)
                else
                   write (iout,310)  it,'ZZ-Quad ',qterm*pole(13,i)
-  310             format (4x,'--',7x,i8,13x,a8,6x,f12.5)
+  310             format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5)
                end if
             else
                write (iout,320)  it,'ZZ-Quad ',qterm*pole(13,i)
-  320          format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  320          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
          end if
       end do
@@ -2013,10 +2013,10 @@ c
                   varpot(nvar) = 'CHGPEN'
                   xx(nvar) = palpha(i)
                   write (iout,330)  nvar,ic,'ChgPen  ',xx(nvar)
-  330             format (i6,7x,i8,1x,'(Class)',5x,a8,6x,f12.5)
+  330             format (i6,7x,i8,' Class',9x,a8,4x,f12.5)
                else
                   write (iout,340)  ic,'ChgPen  ',palpha(i)
-  340             format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
+  340             format (4x,'--',7x,i8,' Class',9x,a8,4x,f12.5,10x,'X')
                end if
             end if
          end do
@@ -2462,7 +2462,7 @@ c     output optimized charge penetration values to the keyfile
 c
       if (fit_chgpen) then
          header = .true.
-         do i = 1, maxtyp
+         do i = 1, maxclass
             fitcpen(i) = .false.
          end do
          do k = 1, nconf

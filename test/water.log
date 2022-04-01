@@ -39,28 +39,28 @@
 
  Potential Fitting of Electrostatic Parameters :
 
- Parameter      Atom Type         Category            Value         Fixed
+ Parameter     Atom Type/Class      Category          Value         Fixed
 
-     1              1             Monopole          -0.51966
-    --              1             X-Dipole           0.00000          X
-    --              1             Y-Dipole           0.00000          X
-     2              1             Z-Dipole           0.14279
-     3              1             XX-Quad            0.37928
-    --              1             XY-Quad            0.00000          X
-    --              1             XZ-Quad            0.00000          X
-     4              1             YY-Quad           -0.41809
-    --              1             YZ-Quad            0.00000          X
-    --              1             ZZ-Quad            0.03881
-     5              2             Monopole           0.25983
-     6              2             X-Dipole          -0.03859
-    --              2             Y-Dipole           0.00000          X
-     7              2             Z-Dipole          -0.05818
-     8              2             XX-Quad           -0.03673
-    --              2             XY-Quad            0.00000          X
-     9              2             XZ-Quad           -0.00203
-    10              2             YY-Quad           -0.10739
-    --              2             YZ-Quad            0.00000          X
-    --              2             ZZ-Quad            0.14412
+     1              1 Type          Monopole        -0.51966
+    --              1 Type          X-Dipole         0.00000          X
+    --              1 Type          Y-Dipole         0.00000          X
+     2              1 Type          Z-Dipole         0.14279
+     3              1 Type          XX-Quad          0.37928
+    --              1 Type          XY-Quad          0.00000          X
+    --              1 Type          XZ-Quad          0.00000          X
+     4              1 Type          YY-Quad         -0.41809
+    --              1 Type          YZ-Quad          0.00000          X
+    --              1 Type          ZZ-Quad          0.03881
+     5              2 Type          Monopole         0.25983
+     6              2 Type          X-Dipole        -0.03859
+    --              2 Type          Y-Dipole         0.00000          X
+     7              2 Type          Z-Dipole        -0.05818
+     8              2 Type          XX-Quad         -0.03673
+    --              2 Type          XY-Quad          0.00000          X
+     9              2 Type          XZ-Quad         -0.00203
+    10              2 Type          YY-Quad         -0.10739
+    --              2 Type          YZ-Quad          0.00000          X
+    --              2 Type          ZZ-Quad          0.14412
 
  Levenberg-Marquardt Nonlinear Least Squares :
 
@@ -78,28 +78,28 @@
 
  Potential Fitting of Electrostatic Parameters :
 
- Parameter      Atom Type         Category            Value         Fixed
+ Parameter     Atom Type/Class      Category          Value         Fixed
 
-     1              1             Monopole          -0.55016
-    --              1             X-Dipole           0.00000          X
-    --              1             Y-Dipole           0.00000          X
-     2              1             Z-Dipole           0.11307
-     3              1             XX-Quad            0.38240
-    --              1             XY-Quad            0.00000          X
-    --              1             XZ-Quad            0.00000          X
-     4              1             YY-Quad           -0.50971
-    --              1             YZ-Quad            0.00000          X
-    --              1             ZZ-Quad            0.12731
-     5              2             Monopole           0.27508
-     6              2             X-Dipole          -0.06319
-    --              2             Y-Dipole           0.00000          X
-     7              2             Z-Dipole          -0.08596
-     8              2             XX-Quad            0.03027
-    --              2             XY-Quad            0.00000          X
-     9              2             XZ-Quad           -0.02465
-    10              2             YY-Quad           -0.07131
-    --              2             YZ-Quad            0.00000          X
-    --              2             ZZ-Quad            0.04104
+     1              1 Type          Monopole        -0.55016
+    --              1 Type          X-Dipole         0.00000          X
+    --              1 Type          Y-Dipole         0.00000          X
+     2              1 Type          Z-Dipole         0.11307
+     3              1 Type          XX-Quad          0.38240
+    --              1 Type          XY-Quad          0.00000          X
+    --              1 Type          XZ-Quad          0.00000          X
+     4              1 Type          YY-Quad         -0.50971
+    --              1 Type          YZ-Quad          0.00000          X
+    --              1 Type          ZZ-Quad          0.12731
+     5              2 Type          Monopole         0.27508
+     6              2 Type          X-Dipole        -0.06319
+    --              2 Type          Y-Dipole         0.00000          X
+     7              2 Type          Z-Dipole        -0.08596
+     8              2 Type          XX-Quad          0.03027
+    --              2 Type          XY-Quad          0.00000          X
+     9              2 Type          XZ-Quad         -0.02465
+    10              2 Type          YY-Quad         -0.07131
+    --              2 Type          YZ-Quad          0.00000          X
+    --              2 Type          ZZ-Quad          0.04104
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
@@ -161,30 +161,30 @@
 
  Potential Fitting of Electrostatic Parameters :
 
- Parameter      Atom Type         Category            Value         Fixed
+ Parameter     Atom Type/Class      Category          Value         Fixed
 
-    --              1             Monopole          -0.37484          X
-    --              1             X-Dipole           0.00000          X
-    --              1             Y-Dipole           0.00000          X
-     1              1             Z-Dipole           0.05412
-     2              1             XX-Quad            0.68026
-    --              1             XY-Quad            0.00000          X
-    --              1             XZ-Quad            0.00000          X
-     3              1             YY-Quad           -0.61112
-    --              1             YZ-Quad            0.00000          X
-    --              1             ZZ-Quad           -0.06914
-    --              2             Monopole           0.18742          X
-     4              2             X-Dipole           0.00811
-    --              2             Y-Dipole           0.00000          X
-     5              2             Z-Dipole          -0.20012
-     6              2             XX-Quad            0.06694
-    --              2             XY-Quad            0.00000          X
-     7              2             XZ-Quad            0.00734
-     8              2             YY-Quad            0.04381
-    --              2             YZ-Quad            0.00000          X
-    --              2             ZZ-Quad           -0.11075
-     9              1 (Class)     ChgPen             4.28982
-    10              2 (Class)     ChgPen             5.21764
+    --              1 Type          Monopole        -0.37484          X
+    --              1 Type          X-Dipole         0.00000          X
+    --              1 Type          Y-Dipole         0.00000          X
+     1              1 Type          Z-Dipole         0.05412
+     2              1 Type          XX-Quad          0.68026
+    --              1 Type          XY-Quad          0.00000          X
+    --              1 Type          XZ-Quad          0.00000          X
+     3              1 Type          YY-Quad         -0.61112
+    --              1 Type          YZ-Quad          0.00000          X
+    --              1 Type          ZZ-Quad         -0.06914
+    --              2 Type          Monopole         0.18742          X
+     4              2 Type          X-Dipole         0.00811
+    --              2 Type          Y-Dipole         0.00000          X
+     5              2 Type          Z-Dipole        -0.20012
+     6              2 Type          XX-Quad          0.06694
+    --              2 Type          XY-Quad          0.00000          X
+     7              2 Type          XZ-Quad          0.00734
+     8              2 Type          YY-Quad          0.04381
+    --              2 Type          YZ-Quad          0.00000          X
+    --              2 Type          ZZ-Quad         -0.11075
+     9              1 Class         ChgPen           4.28982
+    10              2 Class         ChgPen           5.21764
 
  Levenberg-Marquardt Nonlinear Least Squares :
 
@@ -204,30 +204,30 @@
 
  Potential Fitting of Electrostatic Parameters :
 
- Parameter      Atom Type         Category            Value         Fixed
+ Parameter     Atom Type/Class      Category          Value         Fixed
 
-    --              1             Monopole          -0.37484          X
-    --              1             X-Dipole           0.00000          X
-    --              1             Y-Dipole           0.00000          X
-     1              1             Z-Dipole           0.05988
-     2              1             XX-Quad            0.67725
-    --              1             XY-Quad            0.00000          X
-    --              1             XZ-Quad            0.00000          X
-     3              1             YY-Quad           -0.59461
-    --              1             YZ-Quad            0.00000          X
-    --              1             ZZ-Quad           -0.08264
-    --              2             Monopole           0.18742          X
-     4              2             X-Dipole           0.00568
-    --              2             Y-Dipole           0.00000          X
-     5              2             Z-Dipole          -0.20093
-     6              2             XX-Quad            0.03992
-    --              2             XY-Quad            0.00000          X
-     7              2             XZ-Quad            0.02673
-     8              2             YY-Quad            0.01662
-    --              2             YZ-Quad            0.00000          X
-    --              2             ZZ-Quad           -0.05654
-     9              1 (Class)     ChgPen             4.38108
-    10              2 (Class)     ChgPen             4.41377
+    --              1 Type          Monopole        -0.37484          X
+    --              1 Type          X-Dipole         0.00000          X
+    --              1 Type          Y-Dipole         0.00000          X
+     1              1 Type          Z-Dipole         0.05988
+     2              1 Type          XX-Quad          0.67725
+    --              1 Type          XY-Quad          0.00000          X
+    --              1 Type          XZ-Quad          0.00000          X
+     3              1 Type          YY-Quad         -0.59461
+    --              1 Type          YZ-Quad          0.00000          X
+    --              1 Type          ZZ-Quad         -0.08264
+    --              2 Type          Monopole         0.18742          X
+     4              2 Type          X-Dipole         0.00568
+    --              2 Type          Y-Dipole         0.00000          X
+     5              2 Type          Z-Dipole        -0.20093
+     6              2 Type          XX-Quad          0.03992
+    --              2 Type          XY-Quad          0.00000          X
+     7              2 Type          XZ-Quad          0.02673
+     8              2 Type          YY-Quad          0.01662
+    --              2 Type          YZ-Quad          0.00000          X
+    --              2 Type          ZZ-Quad         -0.05654
+     9              1 Class         ChgPen           4.38108
+    10              2 Class         ChgPen           4.41377
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
