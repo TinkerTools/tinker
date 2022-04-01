@@ -637,6 +637,8 @@ c
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
+         end do
+         do j = 1, maxclass
             fitcpen(j) = .false.
          end do
          nvar = 0
@@ -674,6 +676,8 @@ c
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
+         end do
+         do j = 1, maxclass
             fitcpen(j) = .false.
          end do
          do j = 1, nconf
@@ -683,6 +687,8 @@ c
             do k = 1, maxtyp
                tmpchg(k) = fitchg(k)
                tmppol(k) = fitpol(k)
+            end do
+            do k = 1, maxclass
                tmpcpen(k) = fitcpen(k)
             end do
             call varprm (nvar,xx)
@@ -690,6 +696,8 @@ c
             do k = 1, maxtyp
                fitchg(k) = tmpchg(k)
                fitpol(k) = tmppol(k)
+            end do
+            do k = 1, maxclass
                fitcpen(k) = tmpcpen(k)
             end do
             call prmvar (nvar,xx)
@@ -701,6 +709,8 @@ c
          do j = 1, maxtyp
             fitchg(j) = .false.
             fitpol(j) = .false.
+         end do
+         do j = 1, maxclass
             fitcpen(j) = .false.
          end do
          do j = 1, nconf
@@ -1289,6 +1299,8 @@ c
       do j = 1, maxtyp
          fitchg(j) = .false.
          fitpol(j) = .false.
+      end do
+      do j = 1, maxclass
          fitcpen(j) = .false.
       end do
 c
@@ -1387,6 +1399,7 @@ c     corresponding electrostatic potential energy parameters
 c
 c
       subroutine varprm (nvar,xx)
+      use atomid
       use atoms
       use charge
       use chgpen
@@ -1396,8 +1409,8 @@ c
       use potfit
       use units
       implicit none
-      integer i,j
-      integer ii,it
+      integer i,j,ii
+      integer it,ic
       integer nvar
       real*8 dterm,qterm
       real*8 xx(*)
@@ -1543,12 +1556,12 @@ c
          do i = 1, ncp
             done = .true.
             ii = ipole(i)
-            it = type(ii)
+            ic = class(ii)
             if (fatm(ii))  done = .false.
             if (.not. done) then
-               if (fitcpen(it)) then
+               if (fitcpen(ic)) then
                   done = .true.
-                  palpha(i) = fcpen(it)
+                  palpha(i) = fcpen(ic)
                end if
             end if
             if (.not. done) then
@@ -1556,8 +1569,8 @@ c
                   nvar = nvar + 1
                   palpha(i) = xx(nvar)
                end if
-               fitcpen(it) = .true.
-               fcpen(it) = palpha(i)
+               fitcpen(ic) = .true.
+               fcpen(ic) = palpha(i)
             end if
          end do
       end if
@@ -1600,7 +1613,7 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer ii,it
+      integer ii,it,ic
       integer ktype
       integer nvar
       integer, allocatable :: equiv(:)
@@ -1801,9 +1814,9 @@ c
             do i = 1, ncp
                ii = ipole(i)
                if (fatm(ii)) then
-                  it = type(ii)
+                  ic = class(ii)
                   prmtyp = 'Charge Penetration'
-                  write (iout,60)  ii,name(ii),it,prmtyp
+                  write (iout,60)  ii,name(ii),ic,prmtyp
    60             format (i6,15x,a3,10x,i6,13x,a)
                end if
             end do
@@ -1988,21 +2001,21 @@ c
          do i = 1, ncp
             done = .true.
             ii = ipole(i)
-            it = type(ii)
+            ic = class(ii)
             if (fatm(ii))  done = .false.
             if (.not. done) then
-               if (fitcpen(it))  done = .true.
-               fitcpen(it) = .true.
+               if (fitcpen(ic))  done = .true.
+               fitcpen(ic) = .true.
             end if
             if (.not. done) then
                if (fit_chgpen .and. palpha(i).ne.0.0d0) then
                   nvar = nvar + 1
                   varpot(nvar) = 'CHGPEN'
                   xx(nvar) = palpha(i)
-                  write (iout,330)  nvar,it,'ChgPen  ',xx(nvar)
-  330             format (i6,7x,i8,13x,a8,6x,f12.5)
+                  write (iout,330)  nvar,ic,'ChgPen  ',xx(nvar)
+  330             format (i6,7x,i8,1x,'(Class)',5x,a8,6x,f12.5)
                else
-                  write (iout,340)  it,'ChgPen  ',palpha(i)
+                  write (iout,340)  ic,'ChgPen  ',palpha(i)
   340             format (4x,'--',7x,i8,13x,a8,6x,f12.5,10x,'X')
                end if
             end if
@@ -2245,6 +2258,7 @@ c     charge or multipole model to an electrostatic potential grid
 c
 c
       subroutine prtfit
+      use atomid
       use atoms
       use charge
       use chgpen
@@ -2255,7 +2269,7 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer ii,it
+      integer ii,it,ic
       integer ix,iy,iz
       integer ikey,size
       integer ntot
@@ -2457,14 +2471,14 @@ c
             do i = 1, ncp
                done = .true.
                ii = ipole(i)
-               it = type(ii)
+               ic = class(ii)
                if (fatm(ii))  done = .false.
                if (.not. done) then
-                  if (fitcpen(it))  done = .true.
-                  fitcpen(it) = .true.
+                  if (fitcpen(ic))  done = .true.
+                  fitcpen(ic) = .true.
                end if
                if (.not. done) then
-                  palpha(i) = fcpen(it)
+                  palpha(i) = fcpen(ic)
                   if (header) then
                      header = .false.
                      write (ikey,180)
@@ -2472,7 +2486,7 @@ c
      &                          ' Electrostatic Potential Fitting',
      &                       /,'#',/)
                   end if
-                  write (ikey,190)  it,pcore(i),palpha(i)
+                  write (ikey,190)  ic,pcore(i),palpha(i)
   190             format ('chgpen',9x,i5,5x,f11.4,f11.5)
                end if
             end do

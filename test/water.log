@@ -183,8 +183,8 @@
      8              2             YY-Quad            0.04381
     --              2             YZ-Quad            0.00000          X
     --              2             ZZ-Quad           -0.11075
-     9              1             ChgPen             4.28982
-    10              2             ChgPen             5.21764
+     9              1 (Class)     ChgPen             4.28982
+    10              2 (Class)     ChgPen             5.21764
 
  Levenberg-Marquardt Nonlinear Least Squares :
 
@@ -226,8 +226,8 @@
      8              2             YY-Quad            0.01662
     --              2             YZ-Quad            0.00000          X
     --              2             ZZ-Quad           -0.05654
-     9              1             ChgPen             4.38108
-    10              2             ChgPen             4.41377
+     9              1 (Class)     ChgPen             4.38108
+    10              2 (Class)     ChgPen             4.41377
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
