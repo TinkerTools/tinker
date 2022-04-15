@@ -9,9 +9,9 @@
       code can be used in place of FFTW via modifications to "fft3d.f".
       However FFTPACK is a serial code, and is not OpenMP parallel.
 
-      ###################################
-      Building FFTW on Linux and on macOS
-      ###################################
+      ###############################
+      Building FFTW on Linux or macOS
+      ###############################
 
       Under Linux and macOS, Tinker requires the two FFTW static object
       libraries, libfftw3.a and libfftw3_threads.a. To build FFTW using

@@ -133,7 +133,7 @@ c
          ku(i) = blank12
       end do
       do i = 1, maxnopb
-         kopb(i) = blank8
+         kopb(i) = blank16
       end do
       do i = 1, maxnopd
          kopd(i) = blank16
