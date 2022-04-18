@@ -51,15 +51,33 @@ c
       use inform
       use iounit
       use kanang
+      use kangs
+      use kantor
       use katoms
+      use kbonds
+      use kcflux
       use kchrge
       use kcpen
       use kctrn
+      use kdipol
       use kdsp
+      use khbond
+      use kiprop
+      use kitors
+      use kmulti
+      use kopbnd
+      use kopdst
       use korbs
+      use kpitor
       use kpolr
       use krepl
       use ksolut
+      use kstbnd
+      use ksttor
+      use ktorsn
+      use ktrtor
+      use kurybr
+      use kvdwpr
       use kvdws
       use light
       use limits
@@ -447,6 +465,32 @@ c     deallocation of global arrays from module kanang
 c
       if (allocated(anan))  deallocate (anan)
 c
+c     deallocation of global arrays from module kangs
+c
+      if (allocated(acon))  deallocate (acon)
+      if (allocated(acon5))  deallocate (acon5)
+      if (allocated(acon4))  deallocate (acon4)
+      if (allocated(acon3))  deallocate (acon3)
+      if (allocated(aconp))  deallocate (aconp)
+      if (allocated(aconf))  deallocate (aconf)
+      if (allocated(ang))  deallocate (ang)
+      if (allocated(ang5))  deallocate (ang5)
+      if (allocated(ang4))  deallocate (ang4)
+      if (allocated(ang3))  deallocate (ang3)
+      if (allocated(angp))  deallocate (angp)
+      if (allocated(angf))  deallocate (angf)
+      if (allocated(ka))  deallocate (ka)
+      if (allocated(ka5))  deallocate (ka5)
+      if (allocated(ka4))  deallocate (ka4)
+      if (allocated(ka3))  deallocate (ka3)
+      if (allocated(kap))  deallocate (kap)
+      if (allocated(kaf))  deallocate (kaf)
+c
+c     deallocation of global arrays from module kantor
+c
+      if (allocated(atcon))  deallocate (atcon)
+      if (allocated(kat))  deallocate (kat)
+c
 c     deallocation of global arrays from module katoms
 c
       if (allocated(atmcls))  deallocate (atmcls)
@@ -455,6 +499,31 @@ c
       if (allocated(weight))  deallocate (weight)
       if (allocated(symbol))  deallocate (symbol)
       if (allocated(describe))  deallocate (describe)
+c
+c     deallocation of global arrays from module kbonds
+c
+      if (allocated(bcon))  deallocate (bcon)
+      if (allocated(bcon5))  deallocate (bcon5)
+      if (allocated(bcon4))  deallocate (bcon4)
+      if (allocated(bcon3))  deallocate (bcon3)
+      if (allocated(blen))  deallocate (blen)
+      if (allocated(blen5))  deallocate (blen5)
+      if (allocated(blen4))  deallocate (blen4)
+      if (allocated(blen3))  deallocate (blen3)
+      if (allocated(dlen))  deallocate (dlen)
+      if (allocated(kb))  deallocate (kb)
+      if (allocated(kb5))  deallocate (kb5)
+      if (allocated(kb4))  deallocate (kb4)
+      if (allocated(kb3))  deallocate (kb3)
+      if (allocated(kel))  deallocate (kel)
+c
+c     deallocation of global arrays from module kcflux
+c
+      if (allocated(cflb))  deallocate (cflb)
+      if (allocated(cfla))  deallocate (cfla)
+      if (allocated(cflab))  deallocate (cflab)
+      if (allocated(kcfb))  deallocate (kcfb)
+      if (allocated(kcfa))  deallocate (kcfa)
 c
 c     deallocation of global arrays from module kchrge
 c
@@ -470,16 +539,80 @@ c
       if (allocated(ctchg))  deallocate (ctchg)
       if (allocated(ctdmp))  deallocate (ctdmp)
 c
+c     deallocation of global arrays from module kdipol
+c
+      if (allocated(dpl))  deallocate (dpl)
+      if (allocated(dpl5))  deallocate (dpl5)
+      if (allocated(dpl4))  deallocate (dpl4)
+      if (allocated(dpl3))  deallocate (dpl3)
+      if (allocated(pos))  deallocate (pos)
+      if (allocated(pos5))  deallocate (pos5)
+      if (allocated(pos4))  deallocate (pos4)
+      if (allocated(pos3))  deallocate (pos3)
+      if (allocated(kd))  deallocate (kd)
+      if (allocated(kd5))  deallocate (kd5)
+      if (allocated(kd4))  deallocate (kd4)
+      if (allocated(kd3))  deallocate (kd3)
+c
 c     deallocation of global arrays from module kdsp
 c
       if (allocated(dspsix))  deallocate (dspsix)
       if (allocated(dspdmp))  deallocate (dspdmp)
+c
+c     deallocation of global arrays from module khbond
+c
+      if (allocated(radhb))  deallocate (radhb)
+      if (allocated(epshb))  deallocate (epshb)
+      if (allocated(khb))  deallocate (khb)
+c
+c     deallocation of global arrays from module kiprop
+c
+      if (allocated(dcon))  deallocate (dcon)
+      if (allocated(tdi))  deallocate (tdi)
+      if (allocated(kdi))  deallocate (kdi)
+c
+c     deallocation of global arrays from module kitors
+c
+      if (allocated(ti1))  deallocate (ti1)
+      if (allocated(ti2))  deallocate (ti2)
+      if (allocated(ti3))  deallocate (ti3)
+      if (allocated(kti))  deallocate (kti)
+c
+c     deallocation of global arrays from module kmulti
+c
+      if (allocated(multip))  deallocate (multip)
+      if (allocated(mpaxis))  deallocate (mpaxis)
+      if (allocated(kmp))  deallocate (kmp)
+c
+c     deallocation of global arrays from module kopbnd
+c
+      if (allocated(opbn))  deallocate (opbn)
+      if (allocated(kopb))  deallocate (kopb)
+c
+c     deallocation of global arrays from module kopdst
+c
+      if (allocated(opds))  deallocate (opds)
+      if (allocated(kopd))  deallocate (kopd)
 c
 c     deallocation of global arrays from module korbs
 c
       if (allocated(electron))  deallocate (electron)
       if (allocated(ionize))  deallocate (ionize)
       if (allocated(repulse))  deallocate (repulse)
+      if (allocated(sslope))  deallocate (sslope)
+      if (allocated(sslope5))  deallocate (sslope5)
+      if (allocated(sslope4))  deallocate (sslope4)
+      if (allocated(tslope))  deallocate (tslope)
+      if (allocated(tslope5))  deallocate (tslope5)
+      if (allocated(tslope4))  deallocate (tslope4)
+      if (allocated(kpi))  deallocate (kpi)
+      if (allocated(kpi5))  deallocate (kpi5)
+      if (allocated(kpi4))  deallocate (kpi4)
+c
+c     deallocation of global arrays from module kpitor
+c
+      if (allocated(ptcon))  deallocate (ptcon)
+      if (allocated(kpt))  deallocate (kpt)
 c
 c     deallocation of global arrays from module kpolr
 c
@@ -499,6 +632,64 @@ c
       if (allocated(pbr))  deallocate (pbr)
       if (allocated(csr))  deallocate (csr)
       if (allocated(gkr))  deallocate (gkr)
+c
+c     deallocation of global arrays from module kstbnd
+c
+      if (allocated(stbn))  deallocate (stbn)
+      if (allocated(ksb))  deallocate (ksb)
+c
+c     deallocation of global arrays from module ksttor
+c
+      if (allocated(btcon))  deallocate (btcon)
+      if (allocated(kbt))  deallocate (kbt)
+c
+c     deallocation of global arrays from module ktorsn
+c
+      if (allocated(t1))  deallocate (t1)
+      if (allocated(t2))  deallocate (t2)
+      if (allocated(t3))  deallocate (t3)
+      if (allocated(t4))  deallocate (t4)
+      if (allocated(t5))  deallocate (t5)
+      if (allocated(t6))  deallocate (t6)
+      if (allocated(t15))  deallocate (t15)
+      if (allocated(t25))  deallocate (t25)
+      if (allocated(t35))  deallocate (t35)
+      if (allocated(t45))  deallocate (t45)
+      if (allocated(t55))  deallocate (t55)
+      if (allocated(t65))  deallocate (t65)
+      if (allocated(t14))  deallocate (t14)
+      if (allocated(t24))  deallocate (t24)
+      if (allocated(t34))  deallocate (t34)
+      if (allocated(t44))  deallocate (t44)
+      if (allocated(t54))  deallocate (t54)
+      if (allocated(t64))  deallocate (t64)
+      if (allocated(kt))  deallocate (kt)
+      if (allocated(kt5))  deallocate (kt5)
+      if (allocated(kt4))  deallocate (kt4)
+c
+c     deallocation of global arrays from module ktrtor
+c
+      if (allocated(tnx))  deallocate (tnx)
+      if (allocated(tny))  deallocate (tny)
+      if (allocated(ttx))  deallocate (ttx)
+      if (allocated(tty))  deallocate (tty)
+      if (allocated(tbf))  deallocate (tbf)
+      if (allocated(tbx))  deallocate (tbx)
+      if (allocated(tby))  deallocate (tby)
+      if (allocated(tbxy))  deallocate (tbxy)
+      if (allocated(ktt))  deallocate (ktt)
+c
+c     deallocation of global arrays from module kurybr
+c
+      if (allocated(ucon))  deallocate (ucon)
+      if (allocated(dst13))  deallocate (dst13)
+      if (allocated(ku))  deallocate (ku)
+c
+c     deallocation of global arrays from module kvdwpr
+c
+      if (allocated(radpr))  deallocate (radpr)
+      if (allocated(epspr))  deallocate (epspr)
+      if (allocated(kvpr))  deallocate (kvpr)
 c
 c     deallocation of global arrays from module kvdws
 c

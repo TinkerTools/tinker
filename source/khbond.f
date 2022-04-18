@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  module khbond  --  H-bonding term forcefield parametersb ##
+c     ##  module khbond  --  H-bonding term forcefield parameters  ##
 c     ##                                                           ##
 c     ###############################################################
 c
@@ -22,9 +22,8 @@ c
       module khbond
       implicit none
       integer maxnhb
-      parameter (maxnhb=500)
-      real*8 radhb(maxnhb)
-      real*8 epshb(maxnhb)
-      character*8 khb(maxnhb)
+      real*8, allocatable :: radhb(:)
+      real*8, allocatable :: epshb(:)
+      character*8, allocatable :: khb(:)
       save
       end

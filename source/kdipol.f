@@ -37,21 +37,17 @@ c
       integer maxnd5
       integer maxnd4
       integer maxnd3
-      parameter (maxnd=1000)
-      parameter (maxnd5=500)
-      parameter (maxnd4=500)
-      parameter (maxnd3=500)
-      real*8 dpl(maxnd)
-      real*8 dpl5(maxnd5)
-      real*8 dpl4(maxnd4)
-      real*8 dpl3(maxnd3)
-      real*8 pos(maxnd)
-      real*8 pos5(maxnd5)
-      real*8 pos4(maxnd4)
-      real*8 pos3(maxnd3)
-      character*8 kd(maxnd)
-      character*8 kd5(maxnd5)
-      character*8 kd4(maxnd4)
-      character*8 kd3(maxnd3)
+      real*8, allocatable :: dpl(:)
+      real*8, allocatable :: dpl5(:)
+      real*8, allocatable :: dpl4(:)
+      real*8, allocatable :: dpl3(:)
+      real*8, allocatable :: pos(:)
+      real*8, allocatable :: pos5(:)
+      real*8, allocatable :: pos4(:)
+      real*8, allocatable :: pos3(:)
+      character*8, allocatable :: kd(:)
+      character*8, allocatable :: kd5(:)
+      character*8, allocatable :: kd4(:)
+      character*8, allocatable :: kd3(:)
       save
       end

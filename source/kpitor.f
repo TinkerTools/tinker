@@ -21,8 +21,7 @@ c
       module kpitor
       implicit none
       integer maxnpt
-      parameter (maxnpt=500)
-      real*8 ptcon(maxnpt)
-      character*8 kpt(maxnpt)
+      real*8, allocatable :: ptcon(:)
+      character*8, allocatable :: kpt(:)
       save
       end

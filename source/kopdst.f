@@ -21,8 +21,7 @@ c
       module kopdst
       implicit none
       integer maxnopd
-      parameter (maxnopd=500)
-      real*8 opds(maxnopd)
-      character*16 kopd(maxnopd)
+      real*8, allocatable :: opds(:)
+      character*16, allocatable :: kopd(:)
       save
       end

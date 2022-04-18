@@ -22,9 +22,8 @@ c
       module kiprop
       implicit none
       integer maxndi
-      parameter (maxndi=500)
-      real*8 dcon(maxndi)
-      real*8 tdi(maxndi)
-      character*16 kdi(maxndi)
+      real*8, allocatable :: dcon(:)
+      real*8, allocatable :: tdi(:)
+      character*16, allocatable :: kdi(:)
       save
       end

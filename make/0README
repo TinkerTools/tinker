@@ -20,6 +20,6 @@
         argument, e.g., "./buildmake.py ../source/*.f > Makefile".
 
         Alternatively, Tinker can be built by running the compile.make,
-        library.make and link.make scripts provided in machine specific
-        directories of the Tinker distribution.
+        library.make and link.make scripts provided in OS and compiler
+        specific directories of the Tinker distribution.
 

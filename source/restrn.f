@@ -12,6 +12,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
+c     maxfix     maximum number of geometric restraint entries
+c
 c     npfix      number of position restraints to be applied
 c     ndfix      number of distance restraints to be applied
 c     nafix      number of angle restraints to be applied
@@ -44,6 +46,7 @@ c
 c
       module restrn
       implicit none
+      integer maxfix
       integer npfix,ndfix
       integer nafix,ntfix
       integer ngfix,nchir

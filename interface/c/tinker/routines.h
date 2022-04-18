@@ -2102,6 +2102,10 @@ inline void tinker_f_prmkey(tinker_fchars text) {
 }
 void potoff_();
 #define tinker_f_potoff potoff_
+void valoff_();
+#define tinker_f_valoff valoff_
+void nbondoff_();
+#define tinker_f_nbondoff nbondoff_
 
 // promo.f
 void promo_();
@@ -2362,6 +2366,10 @@ void setacceleration_(int* n, double* ax, double* ay, double* az);
 #define tinker_f_setacceleration setacceleration_
 void setinduced_(int* n, double* ux, double* uy, double* uz);
 #define tinker_f_setinduced setinduced_
+
+// setprm.f
+void setprm_();
+#define tinker_f_setprm setprm_
 
 // shakeup.f
 void shakeup_();

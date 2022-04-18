@@ -22,9 +22,8 @@ c
       module kurybr
       implicit none
       integer maxnu
-      parameter (maxnu=2000)
-      real*8 ucon(maxnu)
-      real*8 dst13(maxnu)
-      character*12 ku(maxnu)
+      real*8, allocatable :: ucon(:)
+      real*8, allocatable :: dst13(:)
+      character*12, allocatable :: ku(:)
       save
       end

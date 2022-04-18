@@ -26,12 +26,10 @@ c
       implicit none
       integer maxncfb
       integer maxncfa
-      parameter (maxncfb=2000)
-      parameter (maxncfa=2000)
-      real*8 cflb(maxncfb)
-      real*8 cfla(2,maxncfa)
-      real*8 cflab(2,maxncfa)
-      character*8 kcfb(maxncfb)
-      character*12 kcfa(maxncfa)
+      real*8, allocatable :: cflb(:)
+      real*8, allocatable :: cfla(:,:)
+      real*8, allocatable :: cflab(:,:)
+      character*8, allocatable :: kcfb(:)
+      character*12, allocatable :: kcfa(:)
       save
       end

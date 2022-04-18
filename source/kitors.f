@@ -23,10 +23,9 @@ c
       module kitors
       implicit none
       integer maxnti
-      parameter (maxnti=500)
-      real*8 ti1(2,maxnti)
-      real*8 ti2(2,maxnti)
-      real*8 ti3(2,maxnti)
-      character*16 kti(maxnti)
+      real*8, allocatable :: ti1(:,:)
+      real*8, allocatable :: ti2(:,:)
+      real*8, allocatable :: ti3(:,:)
+      character*16, allocatable :: kti(:)
       save
       end

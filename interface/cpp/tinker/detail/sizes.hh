@@ -10,6 +10,5 @@ const int maxval = 8;
 const int maxref = 30;
 const int maxgrp = 1000;
 const int maxres = 10000;
-const int maxfix = 100000;
 const int maxbio = 10000;
 } }

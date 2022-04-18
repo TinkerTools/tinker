@@ -3,15 +3,17 @@
 #include "macro.hh"
 
 namespace tinker { namespace kantor {
-const int maxnat = 500;
-extern double (&atcon)[maxnat][6];
-extern char (&kat)[maxnat][16];
+extern int& maxnat;
+extern double*& atcon;
+extern char (*&kat)[16];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
-extern "C" double TINKER_MOD(kantor, atcon)[maxnat][6];
-extern "C" char TINKER_MOD(kantor, kat)[maxnat][16];
+extern "C" int TINKER_MOD(kantor, maxnat);
+extern "C" double* TINKER_MOD(kantor, atcon);
+extern "C" char (*TINKER_MOD(kantor, kat))[16];
 
-double (&atcon)[maxnat][6] = TINKER_MOD(kantor, atcon);
-char (&kat)[maxnat][16] = TINKER_MOD(kantor, kat);
+int& maxnat = TINKER_MOD(kantor, maxnat);
+double*& atcon = TINKER_MOD(kantor, atcon);
+char (*&kat)[16] = TINKER_MOD(kantor, kat);
 #endif
 } }

@@ -121,10 +121,6 @@ c
       end do
       if (.not. exist)  call fatal
 c
-c     initialize force field control and parameter values
-c
-      call initprm
-c
 c     read the parameter file and store it for latter use
 c
       nprm = 0
@@ -159,6 +155,14 @@ c
          end do
          prmline(i) = record
       end do
+c
+c     count and allocate memory for the parameter values
+c
+      call setprm
+c
+c     initialize force field control and parameter values
+c
+      call initprm
 c
 c     get control and parameter values from the parameter file
 c

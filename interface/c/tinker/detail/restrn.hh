@@ -5,6 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+extern int TINKER_MOD(restrn, maxfix);
 extern int TINKER_MOD(restrn, npfix);
 extern int TINKER_MOD(restrn, ndfix);
 extern int TINKER_MOD(restrn, nafix);
@@ -20,6 +21,7 @@ extern int* TINKER_MOD(restrn, igfix);
 extern int* TINKER_MOD(restrn, ichir);
 extern double TINKER_MOD(restrn, depth);
 extern double TINKER_MOD(restrn, width);
+extern double TINKER_MOD(restrn, rflat);
 extern double TINKER_MOD(restrn, rwall);
 extern double* TINKER_MOD(restrn, xpfix);
 extern double* TINKER_MOD(restrn, ypfix);

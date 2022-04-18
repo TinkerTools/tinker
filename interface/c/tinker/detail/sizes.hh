@@ -12,7 +12,6 @@ extern "C" {
 #define TINKER_MOD__maxref 30
 #define TINKER_MOD__maxgrp 1000
 #define TINKER_MOD__maxres 10000
-#define TINKER_MOD__maxfix 100000
 #define TINKER_MOD__maxbio 10000
 #ifdef __cplusplus
 }

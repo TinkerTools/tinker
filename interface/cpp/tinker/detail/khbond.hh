@@ -3,18 +3,20 @@
 #include "macro.hh"
 
 namespace tinker { namespace khbond {
-const int maxnhb = 500;
-extern double (&radhb)[maxnhb];
-extern double (&epshb)[maxnhb];
-extern char (&khb)[maxnhb][8];
+extern int& maxnhb;
+extern double*& radhb;
+extern double*& epshb;
+extern char (*&khb)[8];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
-extern "C" double TINKER_MOD(khbond, radhb)[maxnhb];
-extern "C" double TINKER_MOD(khbond, epshb)[maxnhb];
-extern "C" char TINKER_MOD(khbond, khb)[maxnhb][8];
+extern "C" int TINKER_MOD(khbond, maxnhb);
+extern "C" double* TINKER_MOD(khbond, radhb);
+extern "C" double* TINKER_MOD(khbond, epshb);
+extern "C" char (*TINKER_MOD(khbond, khb))[8];
 
-double (&radhb)[maxnhb] = TINKER_MOD(khbond, radhb);
-double (&epshb)[maxnhb] = TINKER_MOD(khbond, epshb);
-char (&khb)[maxnhb][8] = TINKER_MOD(khbond, khb);
+int& maxnhb = TINKER_MOD(khbond, maxnhb);
+double*& radhb = TINKER_MOD(khbond, radhb);
+double*& epshb = TINKER_MOD(khbond, epshb);
+char (*&khb)[8] = TINKER_MOD(khbond, khb);
 #endif
 } }

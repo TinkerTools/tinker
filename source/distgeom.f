@@ -160,6 +160,13 @@ c
          if (ngeo .le. 0)  ngeo = 1
       end if
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(ichir))  deallocate(ichir)
+      if (allocated(chir))  deallocate(chir)
+      allocate (ichir(4,n))
+      allocate (chir(3,n))
+c
 c     enforce the original chirality of tetravalent atoms
 c
       nchir = 0

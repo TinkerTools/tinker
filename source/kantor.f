@@ -21,8 +21,7 @@ c
       module kantor
       implicit none
       integer maxnat
-      parameter (maxnat=500)
-      real*8 atcon(6,maxnat)
-      character*16 kat(maxnat)
+      real*8, allocatable :: atcon(:,:)
+      character*16, allocatable :: kat(:)
       save
       end

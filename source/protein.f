@@ -1422,27 +1422,23 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(ipfix))  allocate (ipfix(maxfix))
-      if (.not. allocated(kpfix))  allocate (kpfix(3,maxfix))
-      if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
-      if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
-      if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
-      if (.not. allocated(pfix))  allocate (pfix(2,maxfix))
-      if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
-      if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
-c
-c     set pairwise restraints between the centers of chains
-c
-      do i = 1, ngrp-1
-         do j = i+1, ngrp
-            ngfix = ngfix + 1
-            igfix(1,ngfix) = i
-            igfix(2,ngfix) = j
-            gfix(1,ngfix) = 1.0d0
-            gfix(2,ngfix) = 11.0d0 * dble(j-i)
-            gfix(3,ngfix) = 11.0d0 * dble(j-i)
-         end do
-      end do
+      maxfix = max(n,ngrp*ngrp)
+      if (allocated(ipfix))  deallocate(ipfix)
+      if (allocated(kpfix))  deallocate(kpfix)
+      if (allocated(xpfix))  deallocate(xpfix)
+      if (allocated(ypfix))  deallocate(ypfix)
+      if (allocated(zpfix))  deallocate(zpfix)
+      if (allocated(pfix))  deallocate(pfix)
+      if (allocated(igfix))  deallocate(igfix)
+      if (allocated(gfix))  deallocate(gfix)
+      allocate (ipfix(maxfix))
+      allocate (kpfix(3,maxfix))
+      allocate (xpfix(maxfix))
+      allocate (ypfix(maxfix))
+      allocate (zpfix(maxfix))
+      allocate (pfix(2,maxfix))
+      allocate (igfix(2,maxfix))
+      allocate (gfix(3,maxfix))
 c
 c     set position restraints on alpha carbons of each chain
 c
@@ -1469,6 +1465,19 @@ c
             end do
          end if
    10    continue
+      end do
+c
+c     set pairwise restraints between the centers of chains
+c
+      do i = 1, ngrp-1
+         do j = i+1, ngrp
+            ngfix = ngfix + 1
+            igfix(1,ngfix) = i
+            igfix(2,ngfix) = j
+            gfix(1,ngfix) = 1.0d0
+            gfix(2,ngfix) = 11.0d0 * dble(j-i)
+            gfix(3,ngfix) = 11.0d0 * dble(j-i)
+         end do
       end do
 c
 c     get rigid body reference coordinates for each chain

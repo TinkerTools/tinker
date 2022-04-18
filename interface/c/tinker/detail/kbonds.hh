@@ -5,25 +5,25 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define TINKER_MOD__maxnb 2000
-#define TINKER_MOD__maxnb5 500
-#define TINKER_MOD__maxnb4 500
-#define TINKER_MOD__maxnb3 500
-#define TINKER_MOD__maxnel 500
-extern double TINKER_MOD(kbonds, bcon)[TINKER_MOD__maxnb];
-extern double TINKER_MOD(kbonds, bcon5)[TINKER_MOD__maxnb5];
-extern double TINKER_MOD(kbonds, bcon4)[TINKER_MOD__maxnb4];
-extern double TINKER_MOD(kbonds, bcon3)[TINKER_MOD__maxnb3];
-extern double TINKER_MOD(kbonds, blen)[TINKER_MOD__maxnb];
-extern double TINKER_MOD(kbonds, blen5)[TINKER_MOD__maxnb5];
-extern double TINKER_MOD(kbonds, blen4)[TINKER_MOD__maxnb4];
-extern double TINKER_MOD(kbonds, blen3)[TINKER_MOD__maxnb3];
-extern double TINKER_MOD(kbonds, dlen)[TINKER_MOD__maxnel];
-extern char TINKER_MOD(kbonds, kb)[TINKER_MOD__maxnb][8];
-extern char TINKER_MOD(kbonds, kb5)[TINKER_MOD__maxnb5][8];
-extern char TINKER_MOD(kbonds, kb4)[TINKER_MOD__maxnb4][8];
-extern char TINKER_MOD(kbonds, kb3)[TINKER_MOD__maxnb3][8];
-extern char TINKER_MOD(kbonds, kel)[TINKER_MOD__maxnel][12];
+extern int TINKER_MOD(kbonds, maxnb);
+extern int TINKER_MOD(kbonds, maxnb5);
+extern int TINKER_MOD(kbonds, maxnb4);
+extern int TINKER_MOD(kbonds, maxnb3);
+extern int TINKER_MOD(kbonds, maxnel);
+extern double* TINKER_MOD(kbonds, bcon);
+extern double* TINKER_MOD(kbonds, bcon5);
+extern double* TINKER_MOD(kbonds, bcon4);
+extern double* TINKER_MOD(kbonds, bcon3);
+extern double* TINKER_MOD(kbonds, blen);
+extern double* TINKER_MOD(kbonds, blen5);
+extern double* TINKER_MOD(kbonds, blen4);
+extern double* TINKER_MOD(kbonds, blen3);
+extern double* TINKER_MOD(kbonds, dlen);
+extern char (*TINKER_MOD(kbonds, kb))[8];
+extern char (*TINKER_MOD(kbonds, kb5))[8];
+extern char (*TINKER_MOD(kbonds, kb4))[8];
+extern char (*TINKER_MOD(kbonds, kb3))[8];
+extern char (*TINKER_MOD(kbonds, kel))[12];
 #ifdef __cplusplus
 }
 #endif

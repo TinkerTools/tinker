@@ -22,9 +22,8 @@ c
       module kvdwpr
       implicit none
       integer maxnvp
-      parameter (maxnvp=500)
-      real*8 radpr(maxnvp)
-      real*8 epspr(maxnvp)
-      character*8 kvpr(maxnvp)
+      real*8, allocatable :: radpr(:)
+      real*8, allocatable :: epspr(:)
+      character*8, allocatable :: kvpr(:)
       save
       end

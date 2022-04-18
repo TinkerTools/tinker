@@ -17,9 +17,10 @@
        must be installed on the target machine, as well as a CUDA-capable
        graphics card.
 
-       This version of the Tinker interface code to OpenMM should work
-       correctly when built against the current Github master version of
+       This version of the Tinker interface code to OpenMM only works
+       correctly when built against an obsolete Github master version of
        the OpenMM package, available from https://github.com/openmm/.
+
        Only a limited set of Tinker options are available from within the
        Tinker-OpenMM programs, including Amber and AMOEBA force fields,
        Verlet and RESPA MD integrators, Bussi thermostat and the Monte

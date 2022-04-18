@@ -5,10 +5,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define TINKER_MOD__maxndi 500
-extern double TINKER_MOD(kiprop, dcon)[TINKER_MOD__maxndi];
-extern double TINKER_MOD(kiprop, tdi)[TINKER_MOD__maxndi];
-extern char TINKER_MOD(kiprop, kdi)[TINKER_MOD__maxndi][16];
+extern int TINKER_MOD(kiprop, maxndi);
+extern double* TINKER_MOD(kiprop, dcon);
+extern double* TINKER_MOD(kiprop, tdi);
+extern char (*TINKER_MOD(kiprop, kdi))[16];
 #ifdef __cplusplus
 }
 #endif

@@ -3,6 +3,7 @@
 #include "macro.hh"
 
 namespace tinker { namespace restrn {
+extern int& maxfix;
 extern int& npfix;
 extern int& ndfix;
 extern int& nafix;
@@ -18,6 +19,7 @@ extern int*& igfix;
 extern int*& ichir;
 extern double& depth;
 extern double& width;
+extern double& rflat;
 extern double& rwall;
 extern double*& xpfix;
 extern double*& ypfix;
@@ -32,6 +34,7 @@ extern int& use_basin;
 extern int& use_wall;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
+extern "C" int TINKER_MOD(restrn, maxfix);
 extern "C" int TINKER_MOD(restrn, npfix);
 extern "C" int TINKER_MOD(restrn, ndfix);
 extern "C" int TINKER_MOD(restrn, nafix);
@@ -47,6 +50,7 @@ extern "C" int* TINKER_MOD(restrn, igfix);
 extern "C" int* TINKER_MOD(restrn, ichir);
 extern "C" double TINKER_MOD(restrn, depth);
 extern "C" double TINKER_MOD(restrn, width);
+extern "C" double TINKER_MOD(restrn, rflat);
 extern "C" double TINKER_MOD(restrn, rwall);
 extern "C" double* TINKER_MOD(restrn, xpfix);
 extern "C" double* TINKER_MOD(restrn, ypfix);
@@ -60,6 +64,7 @@ extern "C" double* TINKER_MOD(restrn, chir);
 extern "C" int TINKER_MOD(restrn, use_basin);
 extern "C" int TINKER_MOD(restrn, use_wall);
 
+int& maxfix = TINKER_MOD(restrn, maxfix);
 int& npfix = TINKER_MOD(restrn, npfix);
 int& ndfix = TINKER_MOD(restrn, ndfix);
 int& nafix = TINKER_MOD(restrn, nafix);
@@ -75,6 +80,7 @@ int*& igfix = TINKER_MOD(restrn, igfix);
 int*& ichir = TINKER_MOD(restrn, ichir);
 double& depth = TINKER_MOD(restrn, depth);
 double& width = TINKER_MOD(restrn, width);
+double& rflat = TINKER_MOD(restrn, rflat);
 double& rwall = TINKER_MOD(restrn, rwall);
 double*& xpfix = TINKER_MOD(restrn, xpfix);
 double*& ypfix = TINKER_MOD(restrn, ypfix);

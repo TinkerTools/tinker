@@ -21,8 +21,7 @@ c
       module ksttor
       implicit none
       integer maxnbt
-      parameter (maxnbt=500)
-      real*8 btcon(9,maxnbt)
-      character*16 kbt(maxnbt)
+      real*8, allocatable :: btcon(:,:)
+      character*16, allocatable :: kbt(:)
       save
       end

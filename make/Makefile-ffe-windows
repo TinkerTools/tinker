@@ -691,6 +691,7 @@ OBJS =	action.o \
 	search.o \
 	sequen.o \
 	server.o \
+	setprm.o \
 	shakeup.o \
 	shunt.o \
 	sigmoid.o \
@@ -1581,6 +1582,7 @@ libtinker.a: ${OBJS}
 	search.o \
 	sequen.o \
 	server.o \
+	setprm.o \
 	shakeup.o \
 	shunt.o \
 	sigmoid.o \
@@ -1861,7 +1863,7 @@ fftpack.o: math.o
 field.o: fields.o inform.o iounit.o keys.o potent.o sizes.o
 fields.o:
 files.o:
-final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o cflux.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fft.o fields.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o katoms.o kchrge.o kcpen.o kctrn.o kdsp.o korbs.o kpolr.o krepl.o ksolut.o kvdws.o light.o limits.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solpot.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
+final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o cflux.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o faces.o fft.o fields.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o kangs.o kantor.o katoms.o kbonds.o kcflux.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolr.o krepl.o ksolut.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o light.o limits.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o socket.o solpot.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o warp.o
 fracs.o:
 freefix.o: iounit.o math.o units.o
@@ -2133,6 +2135,7 @@ sdstep.o: atomid.o atoms.o bath.o couple.o freeze.o kvdws.o math.o moldyn.o stod
 search.o: linmin.o math.o
 sequen.o: sizes.o
 server.o:
+setprm.o: kangs.o kantor.o kbonds.o kcflux.o kdipol.o keys.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o params.o
 shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o usage.o
 shunt.o:
 sigmoid.o:

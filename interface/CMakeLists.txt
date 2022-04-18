@@ -488,6 +488,7 @@ add_library (tinkerObjF OBJECT
 ../source/sdstep.f
 ../source/search.f
 ../source/server.f
+../source/setprm.f
 ../source/shakeup.f
 ../source/sigmoid.f
 ../source/simplex.f

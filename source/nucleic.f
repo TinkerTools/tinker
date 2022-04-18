@@ -1205,10 +1205,15 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(idfix))  allocate (idfix(2,maxfix))
-      if (.not. allocated(dfix))  allocate (dfix(3,maxfix))
-      if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
-      if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
+      maxfix = 3 * nbase
+      if (allocated(idfix))  deallocate(idfix)
+      if (allocated(dfix))  deallocate(dfix)
+      if (allocated(itfix))  deallocate(itfix)
+      if (allocated(tfix))  deallocate(tfix)
+      allocate (idfix(2,maxfix))
+      allocate (dfix(3,maxfix))
+      allocate (itfix(4,maxfix))
+      allocate (tfix(3,maxfix))
 c
 c     distance restraints for the base pair hydrogen bonds
 c

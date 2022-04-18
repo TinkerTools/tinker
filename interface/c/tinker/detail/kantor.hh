@@ -5,9 +5,9 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define TINKER_MOD__maxnat 500
-extern double TINKER_MOD(kantor, atcon)[TINKER_MOD__maxnat][6];
-extern char TINKER_MOD(kantor, kat)[TINKER_MOD__maxnat][16];
+extern int TINKER_MOD(kantor, maxnat);
+extern double* TINKER_MOD(kantor, atcon);
+extern char (*TINKER_MOD(kantor, kat))[16];
 #ifdef __cplusplus
 }
 #endif

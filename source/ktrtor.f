@@ -32,17 +32,14 @@ c
       integer maxntt
       integer maxtgrd
       integer maxtgrd2
-      parameter (maxntt=100)
-      parameter (maxtgrd=30)
-      parameter (maxtgrd2=maxtgrd*maxtgrd)
-      integer tnx(maxntt)
-      integer tny(maxntt)
-      real*8 ttx(maxtgrd,maxntt)
-      real*8 tty(maxtgrd,maxntt)
-      real*8 tbf(maxtgrd2,maxntt)
-      real*8 tbx(maxtgrd2,maxntt)
-      real*8 tby(maxtgrd2,maxntt)
-      real*8 tbxy(maxtgrd2,maxntt)
-      character*20 ktt(maxntt)
+      integer, allocatable :: tnx(:)
+      integer, allocatable :: tny(:)
+      real*8, allocatable :: ttx(:,:)
+      real*8, allocatable :: tty(:,:)
+      real*8, allocatable :: tbf(:,:)
+      real*8, allocatable :: tbx(:,:)
+      real*8, allocatable :: tby(:,:)
+      real*8, allocatable :: tbxy(:,:)
+      character*20, allocatable :: ktt(:)
       save
       end

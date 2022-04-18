@@ -3,15 +3,17 @@
 #include "macro.hh"
 
 namespace tinker { namespace kpitor {
-const int maxnpt = 500;
-extern double (&ptcon)[maxnpt];
-extern char (&kpt)[maxnpt][8];
+extern int& maxnpt;
+extern double*& ptcon;
+extern char (*&kpt)[8];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
-extern "C" double TINKER_MOD(kpitor, ptcon)[maxnpt];
-extern "C" char TINKER_MOD(kpitor, kpt)[maxnpt][8];
+extern "C" int TINKER_MOD(kpitor, maxnpt);
+extern "C" double* TINKER_MOD(kpitor, ptcon);
+extern "C" char (*TINKER_MOD(kpitor, kpt))[8];
 
-double (&ptcon)[maxnpt] = TINKER_MOD(kpitor, ptcon);
-char (&kpt)[maxnpt][8] = TINKER_MOD(kpitor, kpt);
+int& maxnpt = TINKER_MOD(kpitor, maxnpt);
+double*& ptcon = TINKER_MOD(kpitor, ptcon);
+char (*&kpt)[8] = TINKER_MOD(kpitor, kpt);
 #endif
 } }

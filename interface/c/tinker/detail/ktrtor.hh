@@ -5,18 +5,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#define TINKER_MOD__maxntt 100
-#define TINKER_MOD__maxtgrd 30
-#define TINKER_MOD__maxtgrd2 maxtgrd*maxtgrd
-extern int TINKER_MOD(ktrtor, tnx)[TINKER_MOD__maxntt];
-extern int TINKER_MOD(ktrtor, tny)[TINKER_MOD__maxntt];
-extern double TINKER_MOD(ktrtor, ttx)[TINKER_MOD__maxntt][TINKER_MOD__maxtgrd];
-extern double TINKER_MOD(ktrtor, tty)[TINKER_MOD__maxntt][TINKER_MOD__maxtgrd];
-extern double TINKER_MOD(ktrtor, tbf)[TINKER_MOD__maxntt][TINKER_MOD__maxtgrd2];
-extern double TINKER_MOD(ktrtor, tbx)[TINKER_MOD__maxntt][TINKER_MOD__maxtgrd2];
-extern double TINKER_MOD(ktrtor, tby)[TINKER_MOD__maxntt][TINKER_MOD__maxtgrd2];
-extern double TINKER_MOD(ktrtor, tbxy)[TINKER_MOD__maxntt][TINKER_MOD__maxtgrd2];
-extern char TINKER_MOD(ktrtor, ktt)[TINKER_MOD__maxntt][20];
+extern int TINKER_MOD(ktrtor, maxntt);
+extern int TINKER_MOD(ktrtor, maxtgrd);
+extern int TINKER_MOD(ktrtor, maxtgrd2);
+extern int* TINKER_MOD(ktrtor, tnx);
+extern int* TINKER_MOD(ktrtor, tny);
+extern double* TINKER_MOD(ktrtor, ttx);
+extern double* TINKER_MOD(ktrtor, tty);
+extern double* TINKER_MOD(ktrtor, tbf);
+extern double* TINKER_MOD(ktrtor, tbx);
+extern double* TINKER_MOD(ktrtor, tby);
+extern double* TINKER_MOD(ktrtor, tbxy);
+extern char (*TINKER_MOD(ktrtor, ktt))[20];
 #ifdef __cplusplus
 }
 #endif

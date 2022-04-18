@@ -147,13 +147,13 @@ set(_FILES
     random rattle readdyn readgau readgdma readint readmol readmol2
     readpdb readprm readseq readxyz refer repel replica reppot resdue
     respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd rotlist
-    rotpole rxnfld rxnpot scales sdstep search sequen server shakeup
-    shunt sigmoid simplex sizes sktstuf socket solpot solute sort square
-    stodyn strbnd strtor suffix surface surfatom switch syntrn tarray
-    tcgstuf temper titles tncg torphase torpot torque tors torsions
-    tortor tree trimtext unitcell units uprior urey urypot usage valfit
-    vdw vdwpot verlet version vibs virial volume warp xtals xyzatm zatom
-    zclose zcoord
+    rotpole rxnfld rxnpot scales sdstep search sequen server setprm
+    shakeup shunt sigmoid simplex sizes sktstuf socket solpot solute
+    sort square stodyn strbnd strtor suffix surface surfatom switch
+    syntrn tarray tcgstuf temper titles tncg torphase torpot torque
+    tors torsions tortor tree trimtext unitcell units uprior urey urypot
+    usage valfit vdw vdwpot verlet version vibs virial volume warp xtals
+    xyzatm zatom zclose zcoord
 )
 
 set(_LIB "")

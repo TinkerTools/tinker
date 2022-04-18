@@ -21,8 +21,7 @@ c
       module kopbnd
       implicit none
       integer maxnopb
-      parameter (maxnopb=500)
-      real*8 opbn(maxnopb)
-      character*16 kopb(maxnopb)
+      real*8, allocatable :: opbn(:)
+      character*16, allocatable :: kopb(:)
       save
       end

@@ -22,9 +22,8 @@ c
       module kmulti
       implicit none
       integer maxnmp
-      parameter (maxnmp=2000)
-      real*8 multip(13,maxnmp)
-      character*8 mpaxis(maxnmp)
-      character*16 kmp(maxnmp)
+      real*8, allocatable :: multip(:,:)
+      character*8, allocatable :: mpaxis(:)
+      character*16, allocatable :: kmp(:)
       save
       end

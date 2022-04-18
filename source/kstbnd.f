@@ -21,8 +21,7 @@ c
       module kstbnd
       implicit none
       integer maxnsb
-      parameter (maxnsb=2000)
-      real*8 stbn(2,maxnsb)
-      character*12 ksb(maxnsb)
+      real*8, allocatable :: stbn(:,:)
+      character*12, allocatable :: ksb(:)
       save
       end

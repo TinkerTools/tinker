@@ -3,18 +3,20 @@
 #include "macro.hh"
 
 namespace tinker { namespace kurybr {
-const int maxnu = 2000;
-extern double (&ucon)[maxnu];
-extern double (&dst13)[maxnu];
-extern char (&ku)[maxnu][12];
+extern int& maxnu;
+extern double*& ucon;
+extern double*& dst13;
+extern char (*&ku)[12];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
-extern "C" double TINKER_MOD(kurybr, ucon)[maxnu];
-extern "C" double TINKER_MOD(kurybr, dst13)[maxnu];
-extern "C" char TINKER_MOD(kurybr, ku)[maxnu][12];
+extern "C" int TINKER_MOD(kurybr, maxnu);
+extern "C" double* TINKER_MOD(kurybr, ucon);
+extern "C" double* TINKER_MOD(kurybr, dst13);
+extern "C" char (*TINKER_MOD(kurybr, ku))[12];
 
-double (&ucon)[maxnu] = TINKER_MOD(kurybr, ucon);
-double (&dst13)[maxnu] = TINKER_MOD(kurybr, dst13);
-char (&ku)[maxnu][12] = TINKER_MOD(kurybr, ku);
+int& maxnu = TINKER_MOD(kurybr, maxnu);
+double*& ucon = TINKER_MOD(kurybr, ucon);
+double*& dst13 = TINKER_MOD(kurybr, dst13);
+char (*&ku)[12] = TINKER_MOD(kurybr, ku);
 #endif
 } }
