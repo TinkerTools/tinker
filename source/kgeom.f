@@ -74,7 +74,6 @@ c
       if (.not. allocated(iafix))  allocate (iafix(3,maxfix))
       if (.not. allocated(itfix))  allocate (itfix(4,maxfix))
       if (.not. allocated(igfix))  allocate (igfix(2,maxfix))
-      if (.not. allocated(ichir))  allocate (ichir(4,maxfix))
       if (.not. allocated(xpfix))  allocate (xpfix(maxfix))
       if (.not. allocated(ypfix))  allocate (ypfix(maxfix))
       if (.not. allocated(zpfix))  allocate (zpfix(maxfix))
@@ -83,7 +82,6 @@ c
       if (.not. allocated(afix))  allocate (afix(3,maxfix))
       if (.not. allocated(tfix))  allocate (tfix(3,maxfix))
       if (.not. allocated(gfix))  allocate (gfix(3,maxfix))
-      if (.not. allocated(chir))  allocate (chir(3,maxfix))
 c
 c     search the keywords for restraint parameters
 c
@@ -375,6 +373,8 @@ c
 c     maintain chirality as found in the original input structure
 c
          else if (keyword(1:18) .eq. 'ENFORCE-CHIRALITY ') then
+            if (.not. allocated(ichir))  allocate (ichir(4,n))
+            if (.not. allocated(chir))  allocate (chir(3,n))
             do j = 1, n
                if (n12(j) .eq. 4) then
                   ia = i12(1,j)
