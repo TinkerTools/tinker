@@ -5,7 +5,7 @@
 namespace tinker { namespace ktrtor {
 extern int& maxntt;
 const int maxtgrd = 30;
-const int maxtgrd2 = maxtgrd*maxtgrd;
+const int maxtgrd2 = (30*30);
 extern int*& tnx;
 extern int*& tny;
 extern double*& ttx;

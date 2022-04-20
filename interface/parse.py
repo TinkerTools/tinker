@@ -330,6 +330,14 @@ def CppKeywords() -> List[str]:
         'xor', 'xor_eq']
 
 
+def strIsFloat(s: str) -> bool:
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
+
 class Variable:
     def __init__(self) -> None:
         self.dimension: List[str] = []
@@ -626,6 +634,22 @@ class ParsedFile:
                     if found:
                         e.value = this_value
                         e.is_const = this_is_const
+                        # parameter (maxtgrd2=maxtgrd*maxtgrd2)
+                        if not strIsFloat(this_value):
+                            vstr2 = this_value
+                            vstr2 = vstr2.replace('*', ' * ')
+                            vstr2 = vstr2.replace('/', ' / ')
+                            vlst2 = vstr2.split() # ['maxtgrd', '*', 'maxtgrd']
+                            vlst3 = ['(']
+                            for vitem2 in vlst2:
+                                found2, e2 = m.find_entry_by_symbol(vitem2)
+                                if found2:
+                                    vitem3 = e2.value
+                                else:
+                                    vitem3 = vitem2
+                                vlst3.append(vitem3)
+                            vlst3.append(')')
+                            e.value = '{}'.format(''.join(vlst3))
             else:
                 # integer a
                 # integer b(3,3)
