@@ -6,8 +6,8 @@
 extern "C" {
 #endif
 extern int TINKER_MOD(ktrtor, maxntt);
-extern int TINKER_MOD(ktrtor, maxtgrd);
-extern int TINKER_MOD(ktrtor, maxtgrd2);
+#define TINKER_MOD__maxtgrd 30
+#define TINKER_MOD__maxtgrd2 maxtgrd*maxtgrd
 extern int* TINKER_MOD(ktrtor, tnx);
 extern int* TINKER_MOD(ktrtor, tny);
 extern double* TINKER_MOD(ktrtor, ttx);

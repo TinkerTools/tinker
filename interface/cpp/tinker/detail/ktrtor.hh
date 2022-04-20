@@ -4,8 +4,8 @@
 
 namespace tinker { namespace ktrtor {
 extern int& maxntt;
-extern int& maxtgrd;
-extern int& maxtgrd2;
+const int maxtgrd = 30;
+const int maxtgrd2 = maxtgrd*maxtgrd;
 extern int*& tnx;
 extern int*& tny;
 extern double*& ttx;
@@ -18,8 +18,6 @@ extern char (*&ktt)[20];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(ktrtor, maxntt);
-extern "C" int TINKER_MOD(ktrtor, maxtgrd);
-extern "C" int TINKER_MOD(ktrtor, maxtgrd2);
 extern "C" int* TINKER_MOD(ktrtor, tnx);
 extern "C" int* TINKER_MOD(ktrtor, tny);
 extern "C" double* TINKER_MOD(ktrtor, ttx);
@@ -31,8 +29,6 @@ extern "C" double* TINKER_MOD(ktrtor, tbxy);
 extern "C" char (*TINKER_MOD(ktrtor, ktt))[20];
 
 int& maxntt = TINKER_MOD(ktrtor, maxntt);
-int& maxtgrd = TINKER_MOD(ktrtor, maxtgrd);
-int& maxtgrd2 = TINKER_MOD(ktrtor, maxtgrd2);
 int*& tnx = TINKER_MOD(ktrtor, tnx);
 int*& tny = TINKER_MOD(ktrtor, tny);
 double*& ttx = TINKER_MOD(ktrtor, ttx);
