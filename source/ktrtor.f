@@ -32,6 +32,8 @@ c
       integer maxntt
       integer maxtgrd
       integer maxtgrd2
+      parameter (maxtgrd=30)
+      parameter (maxtgrd2=maxtgrd*maxtgrd)
       integer, allocatable :: tnx(:)
       integer, allocatable :: tny(:)
       real*8, allocatable :: ttx(:,:)

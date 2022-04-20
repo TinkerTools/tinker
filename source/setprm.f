@@ -406,8 +406,6 @@ c
 c
 c     allocate torsion-torsion forcefield parameters
 c
-      maxtgrd = 30
-      maxtgrd2 = maxtgrd * maxtgrd
       if (allocated(tnx))  deallocate (tnx)
       allocate (tnx(maxntt))
       if (allocated(tny))  deallocate (tny)

@@ -12,9 +12,9 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "sizes" sets values for critical array dimensions used
-c     throughout the software; these parameters fix the size of
-c     the largest systems that can be handled
+c     "sizes" sets values for array dimensions used throughout
+c     the software; these parameters fix the size of the largest
+c     systems that can be handled
 c
 c     parameter:      maximum allowed number of:
 c

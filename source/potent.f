@@ -26,7 +26,7 @@ c     use_pitors  logical flag governing use of pi-system torsion term
 c     use_strtor  logical flag governing use of stretch-torsion term
 c     use_angtor  logical flag governing use of angle-torsion term
 c     use_tortor  logical flag governing use of torsion-torsion term
-c     use_vdw     logical flag governing use of vdw der Waals potential
+c     use_vdw     logical flag governing use of van der Waals potential
 c     use_repuls  logical flag governing use of Pauli repulsion term
 c     use_disp    logical flag governing use of dispersion potential
 c     use_charge  logical flag governing use of charge-charge potential
