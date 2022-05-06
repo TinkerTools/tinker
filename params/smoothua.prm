@@ -8,6 +8,7 @@
 
 forcefield              SMOOTH-UA
 
+vdwindex                CLASS
 vdwtype                 GAUSSIAN
 gausstype               LJ-2
 radiusrule              GEOMETRIC
@@ -16,6 +17,7 @@ radiussize              DIAMETER
 epsilonrule             GEOMETRIC
 vdw-14-scale            8.0
 chg-14-scale            2.0
+electric                332.06
 dielectric              1.0
 
 

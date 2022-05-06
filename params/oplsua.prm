@@ -8,6 +8,7 @@
 
 forcefield              OPLS-UA
 
+vdwindex                CLASS
 vdwtype                 LENNARD-JONES
 radiusrule              GEOMETRIC
 radiustype              SIGMA

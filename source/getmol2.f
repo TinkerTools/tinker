@@ -60,4 +60,3 @@ c
       close (unit=imol2)
       return
       end
-

@@ -545,7 +545,6 @@ c
       use_mpole = .false.
       use_polar = .false.
       use_chgtrn = .false.
-      use_chgflx = .false.
       use_rxnfld = .false.
       use_solv = .false.
       use_metal = .false.
@@ -562,7 +561,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "valoff" turns off the use of each of the all valence
+c     "valoff" turns off the use of each of the valence
 c     potential energy functions
 c
 c
@@ -587,7 +586,6 @@ c
       use_strtor = .false.
       use_angtor = .false.
       use_tortor = .false.
-      use_chgflx = .false.
       use_geom = .false.
       return
       end
@@ -600,7 +598,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "nbondoff" turns off the use of each of the all nonbonded
+c     "nbondoff" turns off the use of each of the nonbonded
 c     potential energy functions
 c
 c

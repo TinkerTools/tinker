@@ -8,6 +8,7 @@
 
 forcefield              OPLS-AA/L
 
+vdwindex                CLASS
 vdwtype                 LENNARD-JONES
 radiusrule              GEOMETRIC
 radiustype              SIGMA
@@ -17,6 +18,7 @@ torsionunit             0.5
 imptorunit              0.5
 vdw-14-scale            2.0
 chg-14-scale            2.0
+electric                332.06
 dielectric              1.0
 
 
