@@ -259,9 +259,6 @@ c
          gkr(i) = 0.0d0
       end do
       do i = 1, maxclass
-         do j = 1, 2
-            stbn(j,i) = 0.0d0
-         end do
          do j = 1, 3
             anan(j,i) = 0.0d0
          end do
