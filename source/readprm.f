@@ -967,11 +967,20 @@ c
             do i = 1, nx
                ttx(i,ntt) = tx(i)
             end do
+            do i = nx+1, maxtgrd
+               ttx(i,ntt) = 0.0d0
+            end do
             do i = 1, ny
                tty(i,ntt) = ty(i)
             end do
+            do i = ny+1, maxtgrd
+               tty(i,ntt) = 0.0d0
+            end do
             do i = 1, nxy
                tbf(i,ntt) = tf(i)
+            end do
+            do i = nxy+1, maxtgrd2
+               tbf(i,ntt) = 0.0d0
             end do
 c
 c     van der Waals parameters for individual atom types
