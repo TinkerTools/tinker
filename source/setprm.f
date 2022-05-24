@@ -18,6 +18,8 @@ c     found in the parameter file and keyfile
 c
 c
       subroutine setprm
+      use atoms
+      use couple
       use kangs
       use kantor
       use kbonds
@@ -41,9 +43,10 @@ c
       use params
       use restrn
       implicit none
-      integer i,next
+      integer i,k,ia,ib,next
       character*20 keyword
       character*240 record
+      character*240 string
 c
 c
 c     zero out the count of each force field parameter type
@@ -129,7 +132,25 @@ c
          if (keyword(1:7) .eq. 'PIBOND ')  maxnpi = maxnpi + 1
          if (keyword(1:8) .eq. 'PIBOND5 ')  maxnpi5 = maxnpi5 + 1
          if (keyword(1:8) .eq. 'PIBOND4 ')  maxnpi4 = maxnpi4 + 1
-         if (keyword(1:9) .eq. 'RESTRAIN-')  maxfix = maxfix + 1
+         if (keyword(1:9) .eq. 'RESTRAIN-') then
+            maxfix = maxfix + 1
+            if (keyword(10:18) .eq. 'POSITION ') then
+               string = record(19:240)
+               next = 1
+               call getnumb (string,ia,next)
+               if (ia.ge.-n .and. ia.le.-1) then
+                  ia = abs(ia)
+                  call getnumb (string,ib,next)
+                  ib = min(abs(ib),n)
+                  maxfix = maxfix + max(0,ib-ia)
+               end if
+            end if
+         end if
+         if (keyword(1:18) .eq. 'ENFORCE-CHIRALITY ') then
+            do k = 1, n
+               if (n12(k) .eq.4)  maxfix = maxfix + 1
+            end do
+         end if
       end do
 c
 c     find additional parameter values found in the keyfile
@@ -175,7 +196,25 @@ c
          if (keyword(1:7) .eq. 'PIBOND ')  maxnpi = maxnpi + 1
          if (keyword(1:8) .eq. 'PIBOND5 ')  maxnpi5 = maxnpi5 + 1
          if (keyword(1:8) .eq. 'PIBOND4 ')  maxnpi4 = maxnpi4 + 1
-         if (keyword(1:9) .eq. 'RESTRAIN-')  maxfix = maxfix + 1
+         if (keyword(1:9) .eq. 'RESTRAIN-') then
+            maxfix = maxfix + 1
+            if (keyword(10:18) .eq. 'POSITION ') then
+               string = record(19:240)
+               next = 1
+               call getnumb (string,ia,next)
+               if (ia.ge.-n .and. ia.le.-1) then
+                  ia = abs(ia)
+                  call getnumb (string,ib,next)
+                  ib = min(abs(ib),n)
+                  maxfix = maxfix + max(0,ib-ia)
+               end if
+            end if
+         end if
+         if (keyword(1:18) .eq. 'ENFORCE-CHIRALITY ') then
+            do k = 1, n
+               if (n12(k) .eq.4)  maxfix = maxfix + 1
+            end do
+         end if
       end do
 c
 c     set the allocated memory for each parameter type

@@ -243,9 +243,9 @@ c
 c     stretch-bend interactions are omitted for linear angles
 c
          if (lin(class(ib)) .eq. 0) then
-            ita = class (ia)
-            itb = class (ib)
-            itc = class (ic)
+            ita = class(ia)
+            itb = class(ib)
+            itc = class(ic)
             ina = atomic(ia)
             inb = atomic(ib)
             inc = atomic(ic)

@@ -4262,7 +4262,6 @@ c
       integer, allocatable :: at(:)
       integer, allocatable :: atkey(:)
       integer, allocatable :: ptkey(:)
-      logical done
       character*4 pa,pb,pc,pd
       character*16 ptlast
       character*16, allocatable :: pt(:)

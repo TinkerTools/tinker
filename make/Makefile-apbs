@@ -2095,7 +2095,7 @@ sdstep.o: atomid.o atoms.o bath.o couple.o freeze.o kvdws.o math.o moldyn.o stod
 search.o: linmin.o math.o
 sequen.o: sizes.o
 server.o:
-setprm.o: kangs.o kantor.o kbonds.o kcflux.o kdipol.o keys.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o params.o
+setprm.o: atoms.o couple.o kangs.o kantor.o kbonds.o kcflux.o kdipol.o keys.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o params.o restrn.o
 shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o usage.o
 shunt.o:
 sigmoid.o:
