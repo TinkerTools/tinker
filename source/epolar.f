@@ -1884,7 +1884,7 @@ c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
-      f = electric / dielec
+      f = 0.5d0 * electric / dielec
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -2044,10 +2044,10 @@ c
       e = 0.0d0
       do i = 1, npole
          do k = 1, 3
-            e = e + fuind(k,i)*fphi(k+1,i)
+            term = f * fuind(k,i) * fphi(k+1,i)
+            e = e + term
          end do
       end do
-      e = 0.5d0 * f * e
       ep = ep + e
 c
 c     perform deallocation of some local arrays

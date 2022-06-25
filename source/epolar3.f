@@ -957,7 +957,7 @@ c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call eprecip
+      call eprecip3
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1272,10 +1272,10 @@ c
 c     compute the energy contribution for this interaction
 c
                ep = ep + e
+               aep(i) = aep(i) + 0.5d0*e
+               aep(k) = aep(k) + 0.5d0*e
                if (efull .ne. 0.0d0) then
                   nep = nep + 1
-                  aep(i) = aep(i) + 0.5d0*efull
-                  aep(k) = aep(k) + 0.5d0*efull
                   if (molcule(i) .ne. molcule(k)) then
                      einter = einter + efull
                   end if
@@ -1499,10 +1499,10 @@ c
                         efull = 0.5d0 * efull
                      end if
                      ep = ep + e
+                     aep(i) = aep(i) + 0.5d0*e
+                     aep(k) = aep(k) + 0.5d0*e
                      if (efull .ne. 0.0d0) then
                         nep = nep + 1
-                        aep(i) = aep(i) + 0.5d0*efull
-                        aep(k) = aep(k) + 0.5d0*efull
                         if (molcule(i) .ne. molcule(k)) then
                            einter = einter + efull
                         end if
@@ -1628,7 +1628,7 @@ c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call eprecip
+      call eprecip3
 c
 c     compute the Ewald self-energy term over all the atoms
 c
@@ -1955,10 +1955,10 @@ c
 c     compute the energy contribution for this interaction
 c
                ep = ep + e
+               aep(i) = aep(i) + 0.5d0*e
+               aep(k) = aep(k) + 0.5d0*e
                if (efull .ne. 0.0d0) then
                   nep = nep + 1
-                  aep(i) = aep(i) + 0.5d0*efull
-                  aep(k) = aep(k) + 0.5d0*efull
                   if (molcule(i) .ne. molcule(k)) then
                      einter = einter + efull
                   end if
@@ -2164,5 +2164,239 @@ c
             end do
          end if
       end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine eprecip3  --  PME recip polarization analysis  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "eprecip3" evaluates the reciprocal space portion of particle
+c     mesh Ewald summation energy due to dipole polarization, and
+c     partitions the energy among the atoms
+c
+c     literature reference:
+c
+c     C. Sagui, L. G. Pedersen and T. A. Darden, "Towards an Accurate
+c     Representation of Electrostatics in Classical Force Fields:
+c     Efficient Implementation of Multipolar Interactions in
+c     Biomolecular Simulations", Journal of Chemical Physics, 120,
+c     73-87 (2004)
+c
+c     modifications for nonperiodic systems suggested by Tom Darden
+c     during May 2007
+c
+c
+      subroutine eprecip3
+      use analyz
+      use atoms
+      use bound
+      use boxes
+      use chgpot
+      use energi
+      use ewald
+      use math
+      use mpole
+      use mrecip
+      use pme
+      use polar
+      use polpot
+      use potent
+      implicit none
+      integer i,j,k
+      integer k1,k2,k3
+      integer m1,m2,m3
+      integer ntot,nff
+      integer nf1,nf2,nf3
+      real*8 e,r1,r2,r3
+      real*8 f,h1,h2,h3
+      real*8 volterm,denom
+      real*8 hsq,expterm
+      real*8 term,pterm
+      real*8 struc2
+      real*8 a(3,3)
+      real*8, allocatable :: fuind(:,:)
+      real*8, allocatable :: fuinp(:,:)
+c
+c
+c     return if the Ewald coefficient is zero
+c
+      if (aewald .lt. 1.0d-6)  return
+      f = 0.5d0 * electric / dielec
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (.not.use_mpole .or. aewald.ne.aeewald) then
+         if (allocated(cmp)) then
+            if (size(cmp) .lt. 10*npole)  deallocate (cmp)
+         end if
+         if (allocated(fmp)) then
+            if (size(fmp) .lt. 10*npole)  deallocate (fmp)
+         end if
+         if (allocated(fphi)) then
+            if (size(fphi) .lt. 20*npole)  deallocate (fphi)
+         end if
+         if (.not. allocated(cmp))  allocate (cmp(10,npole))
+         if (.not. allocated(fmp))  allocate (fmp(10,npole))
+         if (.not. allocated(fphi))  allocate (fphi(20,npole))
+c
+c     perform dynamic allocation of some global arrays
+c
+         ntot = nfft1 * nfft2 * nfft3
+         if (allocated(qgrid)) then
+            if (size(qgrid) .ne. 2*ntot)  call fftclose
+         end if
+         if (allocated(qfac)) then
+            if (size(qfac) .ne. ntot)  deallocate (qfac)
+         end if
+         if (.not. allocated(qgrid))  call fftsetup
+         if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
+c
+c     setup spatial decomposition and B-spline coefficients
+c
+         call getchunk
+         call moduli
+         call bspline_fill
+         call table_fill
+c
+c     assign only the permanent multipoles to the PME grid
+c     and perform the 3-D FFT forward transformation
+c
+         do i = 1, npole
+            cmp(1,i) = rpole(1,i)
+            cmp(2,i) = rpole(2,i)
+            cmp(3,i) = rpole(3,i)
+            cmp(4,i) = rpole(4,i)
+            cmp(5,i) = rpole(5,i)
+            cmp(6,i) = rpole(9,i)
+            cmp(7,i) = rpole(13,i)
+            cmp(8,i) = 2.0d0 * rpole(6,i)
+            cmp(9,i) = 2.0d0 * rpole(7,i)
+            cmp(10,i) = 2.0d0 * rpole(10,i)
+         end do
+         call cmp_to_fmp (cmp,fmp)
+         call grid_mpole (fmp)
+         call fftfront
+c
+c     make the scalar summation over reciprocal lattice
+c
+         qfac(1,1,1) = 0.0d0
+         pterm = (pi/aewald)**2
+         volterm = pi * volbox
+         nf1 = (nfft1+1) / 2
+         nf2 = (nfft2+1) / 2
+         nf3 = (nfft3+1) / 2
+         nff = nfft1 * nfft2
+         ntot = nff * nfft3
+         do i = 1, ntot-1
+            k3 = i/nff + 1
+            j = i - (k3-1)*nff
+            k2 = j/nfft1 + 1
+            k1 = j - (k2-1)*nfft1 + 1
+            m1 = k1 - 1
+            m2 = k2 - 1
+            m3 = k3 - 1
+            if (k1 .gt. nf1)  m1 = m1 - nfft1
+            if (k2 .gt. nf2)  m2 = m2 - nfft2
+            if (k3 .gt. nf3)  m3 = m3 - nfft3
+            r1 = dble(m1)
+            r2 = dble(m2)
+            r3 = dble(m3)
+            h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+            h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+            h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+            hsq = h1*h1 + h2*h2 + h3*h3
+            term = -pterm * hsq
+            expterm = 0.0d0
+            if (term .gt. -50.0d0) then
+               denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+               expterm = exp(term) / denom
+               if (.not. use_bounds) then
+                  expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+               else if (nonprism) then
+                  if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+               end if
+            end if
+            qfac(k1,k2,k3) = expterm
+         end do
+c
+c     account for zeroth grid point for nonperiodic system
+c
+         if (.not. use_bounds) then
+            expterm = 0.5d0 * pi / xbox
+            qfac(1,1,1) = expterm
+         end if
+c
+c     complete the transformation of the PME grid
+c
+         do k = 1, nfft3
+            do j = 1, nfft2
+               do i = 1, nfft1
+                  term = qfac(i,j,k)
+                  qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+                  qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+               end do
+            end do
+         end do
+c
+c     perform 3-D FFT backward transform and get potential
+c
+         call fftback
+         call fphi_mpole (fphi)
+      end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fuind(3,npole))
+      allocate (fuinp(3,npole))
+c
+c     convert Cartesian induced dipoles to fractional coordinates
+c
+      do i = 1, 3
+         a(1,i) = dble(nfft1) * recip(i,1)
+         a(2,i) = dble(nfft2) * recip(i,2)
+         a(3,i) = dble(nfft3) * recip(i,3)
+      end do
+      do i = 1, npole
+         do j = 1, 3
+            fuind(j,i) = a(j,1)*uind(1,i) + a(j,2)*uind(2,i)
+     &                      + a(j,3)*uind(3,i)
+            fuinp(j,i) = a(j,1)*uinp(1,i) + a(j,2)*uinp(2,i)
+     &                      + a(j,3)*uinp(3,i)
+         end do
+      end do
+c
+c     account for zeroth grid point for nonperiodic system
+c
+      if (.not. use_bounds) then
+         call grid_uind (fuind,fuinp)
+         call fftfront
+         expterm = 0.5d0 * pi / xbox
+         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
+         e = f * expterm * struc2
+         ep = ep + e
+      end if
+c
+c     increment the induced dipole polarization energy
+c
+      e = 0.0d0
+      do i = 1, npole
+         j = ipole(i)
+         do k = 1, 3
+            term = f * fuind(k,i) * fphi(k+1,i)
+            e = e + term
+            aep(j) = aep(j) + term
+         end do
+      end do
+      ep = ep + e
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (fuind)
+      deallocate (fuinp)
       return
       end

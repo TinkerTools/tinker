@@ -3822,7 +3822,7 @@ c
          expterm = 0.5d0 * pi / xbox
          qfac(1,1,1) = expterm
          struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = f * expterm * struc2
+         e = 0.5d0 * f * expterm * struc2
          em = em + e
       end if
 c

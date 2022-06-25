@@ -1094,7 +1094,7 @@ c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call ecrecip
+      call ecrecip3
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1272,15 +1272,15 @@ c
                      e = (fik/rb) * (erfterm+scale-1.0d0)
                      if (i .eq. k)  e = 0.5d0 * e
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
                      ec = ec + e
+                     aec(i) = aec(i) + 0.5d0*e
+                     aec(k) = aec(k) + 0.5d0*e
                      efull = (fik/rb) * scale
                      if (i .eq. k)  efull = 0.5d0 * efull
                      if (efull .ne. 0.0d0) then
                         nec = nec + 1
-                        aec(i) = aec(i) + 0.5d0*efull
-                        aec(k) = aec(k) + 0.5d0*efull
                         einter = einter + efull
                      end if
 c
@@ -1474,7 +1474,7 @@ c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call ecrecip
+      call ecrecip3
 c
 c     compute the real space portion of the Ewald summation;
 c     transfer the interaction site coordinates to sorting arrays
@@ -1594,14 +1594,14 @@ c
                   end if
                   e = (fik/rb) * (erfterm+scale-1.0d0)
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
                   ec = ec + e
+                  aec(i) = aec(i) + 0.5d0*e
+                  aec(k) = aec(k) + 0.5d0*e
                   efull = (fik/rb) * scale
                   if (efull .ne. 0.0d0) then
                      nec = nec + 1
-                     aec(i) = aec(i) + 0.5d0*efull
-                     aec(k) = aec(k) + 0.5d0*efull
                      if (.not.prime .or. im.ne.km)
      &                  einter = einter + efull
                   end if
@@ -1802,7 +1802,7 @@ c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call ecrecip
+      call ecrecip3
 c
 c     OpenMP directives for the major loop structure
 c
@@ -1873,14 +1873,14 @@ c
                   if (use_group)  scale = scale * fgrp
                   e = (fik/rb) * (erfterm+scale-1.0d0)
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
                   ec = ec + e
+                  aec(i) = aec(i) + 0.5d0*e
+                  aec(k) = aec(k) + 0.5d0*e
                   efull = (fik/rb) * scale
                   if (efull .ne. 0.0d0) then
                      nec = nec + 1
-                     aec(i) = aec(i) + 0.5d0*efull
-                     aec(k) = aec(k) + 0.5d0*efull
                      if (im .ne. km)  einter = einter + efull
                   end if
 c
@@ -2098,7 +2098,7 @@ c
                   e = fik / (rb+width)
                end if
 c
-c     increment the overall charge-charge energy component
+c     increment the overall charge-charge energy components
 c
                if (e .ne. 0.0d0) then
                   if (use_group)  e = e * fgrp
@@ -2151,5 +2151,167 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (cscale)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ecrecip3  --  PME reciprocal charge analysis  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ecrecip3" evaluates the reciprocal space portion of the
+c     particle mesh Ewald energy due to partial charges, and
+c     partitions the energy among the atoms
+c
+c     literature reference:
+c
+c     U. Essmann, L. Perera, M. L Berkowitz, T. Darden, H. Lee and
+c     L. G. Pedersen, "A Smooth Particle Mesh Ewald Method", Journal
+c     of Chemical Physics, 103, 8577-8593 (1995)
+c
+c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
+c     10, 67-71 (1993)
+c
+c     modifications for nonperiodic systems suggested by Tom Darden
+c     during May 2007
+c
+c
+      subroutine ecrecip3
+      use analyz
+      use bound
+      use boxes
+      use charge
+      use chgpot
+      use energi
+      use ewald
+      use math
+      use mrecip
+      use pme
+      implicit none
+      integer i,j,k
+      integer k1,k2,k3
+      integer m1,m2,m3
+      integer nf1,nf2,nf3
+      integer nff,ntot
+      real*8 e,f,denom
+      real*8 term,expterm
+      real*8 pterm,volterm
+      real*8 hsq,struc2
+      real*8 h1,h2,h3
+      real*8 r1,r2,r3
+c
+c
+c     return if the Ewald coefficient is zero
+c
+      if (aewald .lt. 1.0d-6)  return
+      f = 0.5d0 * electric / dielec
+c
+c     perform dynamic allocation of some global arrays
+c
+      ntot = nfft1 * nfft2 * nfft3
+      if (allocated(qgrid)) then
+         if (size(qgrid) .ne. 2*ntot)  call fftclose
+      end if
+      if (allocated(qfac)) then
+         if (size(qfac) .ne. ntot)  deallocate (qfac)
+      end if
+      if (.not. allocated(qgrid))  call fftsetup
+      if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
+      if (.not. allocated(fphi))  allocate (fphi(20,nion))
+c
+c     setup spatial decomposition and B-spline coefficients
+c
+      call getchunk
+      call moduli
+      call bspline_fill
+      call table_fill
+c
+c     assign PME grid and perform 3-D FFT forward transform
+c
+      call grid_pchg
+      call fftfront
+c
+c     use scalar sum to get the reciprocal space energy
+c
+      pterm = (pi/aewald)**2
+      volterm = pi * volbox
+      nf1 = (nfft1+1) / 2
+      nf2 = (nfft2+1) / 2
+      nf3 = (nfft3+1) / 2
+      nff = nfft1 * nfft2
+      ntot = nff * nfft3
+      do i = 1, ntot-1
+         k3 = i/nff + 1
+         j = i - (k3-1)*nff
+         k2 = j/nfft1 + 1
+         k1 = j - (k2-1)*nfft1 + 1
+         m1 = k1 - 1
+         m2 = k2 - 1
+         m3 = k3 - 1
+         if (k1 .gt. nf1)  m1 = m1 - nfft1
+         if (k2 .gt. nf2)  m2 = m2 - nfft2
+         if (k3 .gt. nf3)  m3 = m3 - nfft3
+         r1 = dble(m1)
+         r2 = dble(m2)
+         r3 = dble(m3)
+         h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+         h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+         h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+         hsq = h1*h1 + h2*h2 + h3*h3
+         term = -pterm * hsq
+         expterm = 0.0d0
+         if (term .gt. -50.0d0) then
+            denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+            expterm = exp(term) / denom
+            if (.not. use_bounds) then
+               expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+            else if (nonprism) then
+               if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+            end if
+         end if
+         qfac(k1,k2,k3) = expterm
+      end do
+c
+c     account for zeroth grid point for nonperiodic system
+c
+      if (.not. use_bounds) then
+         expterm = 0.5d0 * pi / xbox
+         qfac(1,1,1) = expterm
+         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
+         e = f * expterm * struc2
+         ec = ec + e
+      end if
+c
+c     complete the transformation of the PME grid
+c
+      do k = 1, nfft3
+         do j = 1, nfft2
+            do i = 1, nfft1
+               term = qfac(i,j,k)
+               qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
+               qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
+            end do
+         end do
+      end do
+c
+c     perform 3-D FFT backward transform and get potential
+c
+      call fftback
+      call fphi_pchg (fphi)
+c
+c     sum over charges and increment total charge energy
+c
+      e = 0.0d0
+      do i = 1, nion
+         j = iion(i)
+         term = f * pchg(i) * fphi(1,i)
+         e = e + term
+         aec(j) = aec(j) + term
+      end do
+      ec = ec + e
       return
       end
