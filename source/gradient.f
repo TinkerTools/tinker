@@ -24,6 +24,7 @@ c
       use inter
       use iounit
       use limits
+      use polpot
       use potent
       use rigid
       use vdwpot
@@ -221,6 +222,7 @@ c
       if (use_dipole)  call edipole1
       if (use_mpole)  call empole1
       if (use_polar)  call epolar1
+      if (use_expol) call expolar1
       if (use_chgtrn)  call echgtrn1
       if (use_rxnfld)  call erxnfld1
 c
