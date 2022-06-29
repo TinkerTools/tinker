@@ -62,7 +62,7 @@ c
       use kctrn
       use kdipol
       use kdsp
-      use expl
+      use kexpl
       use khbond
       use kiprop
       use kitors
