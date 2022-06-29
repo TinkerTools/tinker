@@ -40,6 +40,7 @@ c     dpequal      flag to set dscale values equal to pscale values
 c     use_thole    flag to use Thole damped polarization interactions
 c     use_dirdamp  flag to use damped direct polarization interactions
 c     poltyp       type of polarization (MUTUAL, DIRECT, OPT or TCG)
+c     use_expol    flag to use exchange polarization
 c
 c
       module polpot
@@ -61,6 +62,7 @@ c
       logical dpequal
       logical use_thole
       logical use_dirdamp
+      logical use_expol
       character*6 poltyp
       save
       end

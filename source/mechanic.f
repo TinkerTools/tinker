@@ -104,6 +104,10 @@ c
       call krepel
       call kdisp
 c
+c     assign exchange polarization parameters
+c
+      call kexpol
+c
 c     assign solvation, metal, pisystem and restraint parameters
 c
       call ksolv
