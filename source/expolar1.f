@@ -225,20 +225,14 @@ c
                   frcxk = 0.0d0
                   frcyk = 0.0d0
                   frczk = 0.0d0
-                  if (epli) then
-                     do j = 1, 3
-                        frcxi = frcxi + ai(j,1)*frcil(j)
-                        frcyi = frcyi + ai(j,2)*frcil(j)
-                        frczi = frczi + ai(j,3)*frcil(j)
-                     end do
-                  end if
-                  if (eplk) then
-                     do j = 1, 3
-                        frcxk = frcxk + ak(j,1)*frckl(j)
-                        frcyk = frcyk + ak(j,2)*frckl(j)
-                        frczk = frczk + ak(j,3)*frckl(j)
-                     end do
-                  end if
+                  do j = 1, 3
+                     frcxi = frcxi + ai(j,1)*frcil(j)
+                     frcyi = frcyi + ai(j,2)*frcil(j)
+                     frczi = frczi + ai(j,3)*frcil(j)
+                     frcxk = frcxk + ak(j,1)*frckl(j)
+                     frcyk = frcyk + ak(j,2)*frckl(j)
+                     frczk = frczk + ak(j,3)*frckl(j)
+                  end do
                   frcx = f*(frcxk-frcxi)
                   frcy = f*(frcyk-frcyi)
                   frcz = f*(frczk-frczi)
@@ -418,20 +412,14 @@ c
                         frcxk = 0.0d0
                         frcyk = 0.0d0
                         frczk = 0.0d0
-                        if (epli) then
-                           do j = 1, 3
-                              frcxi = frcxi + ai(j,1)*frcil(j)
-                              frcyi = frcyi + ai(j,2)*frcil(j)
-                              frczi = frczi + ai(j,3)*frcil(j)
-                           end do
-                        end if
-                        if (eplk) then
-                           do j = 1, 3
-                              frcxk = frcxk + ak(j,1)*frckl(j)
-                              frcyk = frcyk + ak(j,2)*frckl(j)
-                              frczk = frczk + ak(j,3)*frckl(j)
-                           end do
-                        end if
+                        do j = 1, 3
+                           frcxi = frcxi + ai(j,1)*frcil(j)
+                           frcyi = frcyi + ai(j,2)*frcil(j)
+                           frczi = frczi + ai(j,3)*frcil(j)
+                           frcxk = frcxk + ak(j,1)*frckl(j)
+                           frcyk = frcyk + ak(j,2)*frckl(j)
+                           frczk = frczk + ak(j,3)*frckl(j)
+                        end do
                         frcx = f*(frcxk-frcxi)
                         frcy = f*(frcyk-frcyi)
                         frcz = f*(frczk-frczi)
@@ -693,20 +681,14 @@ c
                   frcxk = 0.0d0
                   frcyk = 0.0d0
                   frczk = 0.0d0
-                  if (epli) then
-                     do j = 1, 3
-                        frcxi = frcxi + ai(j,1)*frcil(j)
-                        frcyi = frcyi + ai(j,2)*frcil(j)
-                        frczi = frczi + ai(j,3)*frcil(j)
-                     end do
-                  end if
-                  if (eplk) then
-                     do j = 1, 3
-                        frcxk = frcxk + ak(j,1)*frckl(j)
-                        frcyk = frcyk + ak(j,2)*frckl(j)
-                        frczk = frczk + ak(j,3)*frckl(j)
-                     end do
-                  end if
+                  do j = 1, 3
+                     frcxi = frcxi + ai(j,1)*frcil(j)
+                     frcyi = frcyi + ai(j,2)*frcil(j)
+                     frczi = frczi + ai(j,3)*frcil(j)
+                     frcxk = frcxk + ak(j,1)*frckl(j)
+                     frcyk = frcyk + ak(j,2)*frckl(j)
+                     frczk = frczk + ak(j,3)*frckl(j)
+                  end do
                   frcx = f*(frcxk-frcxi)
                   frcy = f*(frcyk-frcyi)
                   frcz = f*(frczk-frczi)

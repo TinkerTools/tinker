@@ -191,20 +191,12 @@ c
                   p33i = springi*s2*pscale(k)
                   p33k = springk*s2*pscale(k)
                   call exrotate(i,k,xr,yr,zr,p33i,p33k,kS2i,kS2k)
-                  if (epli) then
-                     do j = 1, 3
-                        do m = 1, 3
-                           polscale(j,m,ii) = polscale(j,m,ii)+kS2i(j,m)
-                        end do
+                  do j = 1, 3
+                     do m = 1, 3
+                        polscale(j,m,ii) = polscale(j,m,ii)+kS2i(j,m)
+                        polscale(j,m,kk) = polscale(j,m,kk)+kS2k(j,m)
                      end do
-                  end if
-                  if (eplk) then
-                     do j = 1, 3
-                        do m = 1, 3
-                           polscale(j,m,kk) = polscale(j,m,kk)+kS2k(j,m)
-                        end do
-                     end do
-                  end if
+                  end do
                end if
             end if
          end do
@@ -307,22 +299,14 @@ c
                         p33i = springi*s2*pscale(k)
                         p33k = springk*s2*pscale(k)
                         call exrotate(i,k,xr,yr,zr,p33i,p33k,kS2i,kS2k)
-                        if (epli) then
-                           do j = 1, 3
-                              do m = 1, 3
-                                 polscale(j,m,ii) = polscale(j,m,ii)
+                        do j = 1, 3
+                           do m = 1, 3
+                              polscale(j,m,ii) = polscale(j,m,ii)
      &                                            + kS2i(j,m)
-                              end do
-                           end do
-                        end if
-                        if (eplk) then
-                           do j = 1, 3
-                              do m = 1, 3
-                                 polscale(j,m,kk) = polscale(j,m,kk)
+                              polscale(j,m,kk) = polscale(j,m,kk)
      &                                            + kS2k(j,m)
-                              end do
                            end do
-                        end if
+                        end do
                      end if
                   end do
                end if
@@ -539,20 +523,12 @@ c
                   p33i = springi*s2*pscale(k)
                   p33k = springk*s2*pscale(k)
                   call exrotate(i,k,xr,yr,zr,p33i,p33k,kS2i,kS2k)
-                  if (epli) then
-                     do j = 1, 3
-                        do m = 1, 3
-                           polscale(j,m,ii) = polscale(j,m,ii)+kS2i(j,m)
-                        end do
+                  do j = 1, 3
+                     do m = 1, 3
+                        polscale(j,m,ii) = polscale(j,m,ii) + kS2i(j,m)
+                        polscale(j,m,kk) = polscale(j,m,kk) + kS2k(j,m)
                      end do
-                  end if
-                  if (eplk) then
-                     do j = 1, 3
-                        do m = 1, 3
-                           polscale(j,m,kk) = polscale(j,m,kk)+kS2k(j,m)
-                        end do
-                     end do
-                  end if
+                  end do
                end if
             end if
          end do
