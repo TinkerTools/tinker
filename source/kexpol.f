@@ -54,6 +54,7 @@ c
             ppr = 0.0d0
             apr = 0.0d0
             ilpr = 0
+            lpr = .false.
             call getnumb (record,k,next)
             string = record(next:240)
             read (string,*,err=10,end=10)  kpr,ppr,apr,ilpr
@@ -134,6 +135,7 @@ c
             ppr = 0.0d0
             apr = 0.0d0
             ilpr = 0
+            lpr = .false.
             string = record(next:240)
             read (string,*,err=70,end=70)  ia,kpr,ppr,apr,ilpr
             if (ilpr.ne.0) then
