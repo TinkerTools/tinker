@@ -8766,6 +8766,9 @@ c
 c
 c     account for zeroth grid point for nonperiodic system
 c
+         qfac(1,1,1) = 0.0d0
+         qgrid(1,1,1,1) = 0.0d0
+         qgrid(2,1,1,1) = 0.0d0
          if (.not. use_bounds) then
             expterm = 0.5d0 * pi / xbox
             qfac(1,1,1) = expterm
