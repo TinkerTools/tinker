@@ -2242,8 +2242,8 @@ c     L. G. Pedersen, "A Smooth Particle Mesh Ewald Method", Journal
 c     of Chemical Physics, 103, 8577-8593 (1995)
 c
 c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
-c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
-c     10, 67-71 (1993)
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular
+c     Simulation, 10, 67-71 (1993)
 c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
@@ -2271,9 +2271,12 @@ c
       integer nf1,nf2,nf3
       integer nff,ntot
       integer igrd0,jgrd0,kgrd0
-      real*8 e,term,expterm
+      real*8 e,term,eterm
+      real*8 expterm
       real*8 vterm,pterm
       real*8 volterm
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
       real*8 f,fi,denom
       real*8 hsq,struc2
       real*8 de1,de2,de3
@@ -2282,12 +2285,14 @@ c
       real*8 dt1,dt2,dt3
       real*8 h1,h2,h3
       real*8 r1,r2,r3
+      real*8 f1,f2,f3
+      real*8, allocatable :: fphi(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
 c
       if (aewald .lt. 1.0d-6)  return
-      f = 0.5d0 * electric / dielec
+      f = electric / dielec
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -2308,6 +2313,15 @@ c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_pchg
       call fftfront
+c
+c     zero out the temporary virial accumulation variables
+c
+      vxx = 0.0d0
+      vxy = 0.0d0
+      vxz = 0.0d0
+      vyy = 0.0d0
+      vyz = 0.0d0
+      vzz = 0.0d0
 c
 c     use scalar sum to get reciprocal space energy and virial
 c
@@ -2347,30 +2361,35 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
             struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            e = f * expterm * struc2
-            ec = ec + e
-            vterm = (2.0d0/hsq) * (1.0d0-term) * e
-            vir(1,1) = vir(1,1) + h1*h1*vterm - e
-            vir(2,1) = vir(2,1) + h1*h2*vterm
-            vir(3,1) = vir(3,1) + h1*h3*vterm
-            vir(1,2) = vir(1,2) + h2*h1*vterm
-            vir(2,2) = vir(2,2) + h2*h2*vterm - e
-            vir(3,2) = vir(3,2) + h2*h3*vterm
-            vir(1,3) = vir(1,3) + h3*h1*vterm
-            vir(2,3) = vir(2,3) + h3*h2*vterm
-            vir(3,3) = vir(3,3) + h3*h3*vterm - e
+            eterm = 0.5d0 * f * expterm * struc2
+            vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
+            vxx = vxx + h1*h1*vterm - eterm
+            vxy = vxy + h1*h2*vterm
+            vxz = vxz + h1*h3*vterm
+            vyy = vyy + h2*h2*vterm - eterm
+            vyz = vyz + h2*h3*vterm
+            vzz = vzz + h3*h3*vterm - eterm
          end if
          qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
          qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
       end do
 c
+c     increment the total internal virial tensor components
+c
+      vir(1,1) = vir(1,1) + vxx
+      vir(2,1) = vir(2,1) + vxy
+      vir(3,1) = vir(3,1) + vxz
+      vir(1,2) = vir(1,2) + vxy
+      vir(2,2) = vir(2,2) + vyy
+      vir(3,2) = vir(3,2) + vyz
+      vir(1,3) = vir(1,3) + vxz
+      vir(2,3) = vir(2,3) + vyz
+      vir(3,3) = vir(3,3) + vzz
+c
 c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
-         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = f * expterm * struc2
-         ec = ec + e
          qgrid(1,1,1,1) = expterm * qgrid(1,1,1,1)
          qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
       end if
@@ -2379,52 +2398,32 @@ c     perform the 3-D FFT backward transformation
 c
       call fftback
 c
-c     get first derivatives of the reciprocal space energy
+c     perform dynamic allocation of some local arrays
 c
-      f = electric / dielec
-      dn1 = dble(nfft1)
-      dn2 = dble(nfft2)
-      dn3 = dble(nfft3)
-      do isite = 1, nion
-         iatm = iion(isite)
-         igrd0 = igrid(1,iatm)
-         jgrd0 = igrid(2,iatm)
-         kgrd0 = igrid(3,iatm)
-         fi = f * pchg(isite)
-         de1 = 0.0d0
-         de2 = 0.0d0
-         de3 = 0.0d0
-         k0 = kgrd0
-         do it3 = 1, bsorder
-            k0 = k0 + 1
-            k = k0 + 1 + (nfft3-sign(nfft3,k0))/2
-            t3 = thetai3(1,it3,iatm)
-            dt3 = dn3 * thetai3(2,it3,iatm)
-            j0 = jgrd0
-            do it2 = 1, bsorder
-               j0 = j0 + 1
-               j = j0 + 1 + (nfft2-sign(nfft2,j0))/2
-               t2 = thetai2(1,it2,iatm)
-               dt2 = dn2 * thetai2(2,it2,iatm)
-               i0 = igrd0
-               do it1 = 1, bsorder
-                  i0 = i0 + 1
-                  i = i0 + 1 + (nfft1-sign(nfft1,i0))/2
-                  t1 = thetai1(1,it1,iatm)
-                  dt1 = dn1 * thetai1(2,it1,iatm)
-                  term = qgrid(1,i,j,k)
-                  de1 = de1 + term*dt1*t2*t3
-                  de2 = de2 + term*dt2*t1*t3
-                  de3 = de3 + term*dt3*t1*t2
-               end do
-            end do
-         end do
-         dec(1,iatm) = dec(1,iatm) + fi*(recip(1,1)*de1+recip(1,2)*de2
-     &                                      +recip(1,3)*de3)
-         dec(2,iatm) = dec(2,iatm) + fi*(recip(2,1)*de1+recip(2,2)*de2
-     &                                      +recip(2,3)*de3)
-         dec(3,iatm) = dec(3,iatm) + fi*(recip(3,1)*de1+recip(3,2)*de2
-     &                                      +recip(3,3)*de3)
+      allocate (fphi(4,nion))
+c
+c     extract the partial charge electrostatic potential
+c
+      call fphi_pchg (fphi)
+c
+c     increment partial charge energy and gradient components
+c
+      e = 0.0d0
+      do i = 1, nion
+         j = iion(i)
+         fi = f * pchg(i)
+         e = e + fi*fphi(1,i)
+         f1 = fi * dble(nfft1) * fphi(2,i)
+         f2 = fi * dble(nfft2) * fphi(3,i)
+         f3 = fi * dble(nfft3) * fphi(4,i)
+         h1 = recip(1,1)*f1 + recip(1,2)*f2 + recip(1,3)*f3
+         h2 = recip(2,1)*f1 + recip(2,2)*f2 + recip(2,3)*f3
+         h3 = recip(3,1)*f1 + recip(3,2)*f2 + recip(3,3)*f3
+         dec(1,j) = dec(1,j) + h1
+         dec(2,j) = dec(2,j) + h2
+         dec(3,j) = dec(3,j) + h3
       end do
+      e = 0.5d0 * e
+      ec = ec + e
       return
       end

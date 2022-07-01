@@ -1147,13 +1147,13 @@ c
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  subroutine fphi_pchg  --  charge potential from grid  ##
+c     ##  subroutine fphi_pchg  --  charge potential and field  ##
 c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "fphi_pchg" extracts the partial charge potential from
-c     the particle mesh Ewald grid
+c     "fphi_pchg" extracts the partial charge potential and field
+c     from the particle mesh Ewald grid
 c
 c
       subroutine fphi_pchg (fphi)
@@ -1165,9 +1165,13 @@ c
       integer i0,j0,k0
       integer it1,it2,it3
       integer igrd0,jgrd0,kgrd0
-      real*8 v0,u0,t0,tq
-      real*8 tu00,tuv000
-      real*8 fphi(20,*)
+      real*8 v0,v1
+      real*8 u0,u1
+      real*8 t0,t1,tq
+      real*8 tu00,tu10,tu01
+      real*8 tuv000,tuv100
+      real*8 tuv010,tuv001
+      real*8 fphi(4,*)
 c
 c
 c     OpenMP directives for the major loop structure
@@ -1176,7 +1180,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
 !$OMP DO schedule(guided)
 c
-c     extract the partial charge field at each site
+c     get partial charge potential and field at each site
 c
       do isite = 1, nion
          iatm = iion(isite)
@@ -1184,30 +1188,47 @@ c
          jgrd0 = igrid(2,iatm)
          kgrd0 = igrid(3,iatm)
          tuv000 = 0.0d0
+         tuv001 = 0.0d0
+         tuv010 = 0.0d0
+         tuv100 = 0.0d0
          k0 = kgrd0
          do it3 = 1, bsorder
             k0 = k0 + 1
             k = k0 + 1 + (nfft3-isign(nfft3,k0))/2
             v0 = thetai3(1,it3,iatm)
+            v1 = thetai3(2,it3,iatm)
             tu00 = 0.0d0
+            tu10 = 0.0d0
+            tu01 = 0.0d0
             j0 = jgrd0
             do it2 = 1, bsorder
                j0 = j0 + 1
                j = j0 + 1 + (nfft2-isign(nfft2,j0))/2
                u0 = thetai2(1,it2,iatm)
+               u1 = thetai2(2,it2,iatm)
                t0 = 0.0d0
+               t1 = 0.0d0
                i0 = igrd0
                do it1 = 1, bsorder
                   i0 = i0 + 1
                   i = i0 + 1 + (nfft1-isign(nfft1,i0))/2
                   tq = qgrid(1,i,j,k)
                   t0 = t0 + tq*thetai1(1,it1,iatm)
+                  t1 = t1 + tq*thetai1(2,it1,iatm)
                end do
                tu00 = tu00 + t0*u0
+               tu10 = tu10 + t1*u0
+               tu01 = tu01 + t0*u1
             end do
             tuv000 = tuv000 + tu00*v0
+            tuv100 = tuv100 + tu10*v0
+            tuv010 = tuv010 + tu01*v0
+            tuv001 = tuv001 + tu00*v1
          end do
          fphi(1,isite) = tuv000
+         fphi(2,isite) = tuv100
+         fphi(3,isite) = tuv010
+         fphi(4,isite) = tuv001
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1220,13 +1241,13 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine fphi_mpole  --  multipole potential from grid  ##
+c     ##  subroutine fphi_mpole  --  multipole potential and field  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "fphi_mpole" extracts the permanent multipole potential from
-c     the particle mesh Ewald grid
+c     "fphi_mpole" extracts the permanent multipole potential and
+c     field from the particle mesh Ewald grid
 c
 c
       subroutine fphi_mpole (fphi)
@@ -1257,7 +1278,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
 !$OMP DO schedule(guided)
 c
-c     extract the permanent multipole field at each site
+c     get permanent multipole potential and field at each site
 c
       do isite = 1, npole
          iatm = ipole(isite)
@@ -1388,13 +1409,13 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
-c     ##  subroutine fphi_uind  --  induced potential from grid  ##
+c     ##  subroutine fphi_uind  --  induced potential and field  ##
 c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "fphi_uind" extracts the induced dipole potential from
-c     the particle mesh Ewald grid
+c     "fphi_uind" extracts the induced dipole potential and field
+c     from the particle mesh Ewald grid
 c
 c
       subroutine fphi_uind (fdip_phi1,fdip_phi2,fdip_sum_phi)
@@ -1440,7 +1461,7 @@ c
 !$OMP& fdip_phi2,fdip_sum_phi)
 !$OMP DO schedule(guided)
 c
-c     extract the induced dipole field at each site
+c     get induced dipole potential and field at each site
 c
       do isite = 1, npole
          iatm = ipole(isite)

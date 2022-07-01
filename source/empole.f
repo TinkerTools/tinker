@@ -1757,8 +1757,8 @@ c     Biomolecular Simulations", Journal of Chemical Physics, 120,
 c     73-87 (2004)
 c
 c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
-c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
-c     10, 67-71 (1993)
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular
+c     Simulation, 10, 67-71 (1993)
 c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
@@ -1786,7 +1786,6 @@ c
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
-      real*8 struc2
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1815,11 +1814,7 @@ c
       if (allocated(qgrid)) then
          if (size(qgrid) .ne. 2*ntot)  call fftclose
       end if
-      if (allocated(qfac)) then
-         if (size(qfac) .ne. ntot)  deallocate (qfac)
-      end if
       if (.not. allocated(qgrid))  call fftsetup
-      if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
 c
 c     setup spatial decomposition and B-spline coefficients
 c
@@ -1854,7 +1849,6 @@ c
 c
 c     make the scalar summation over reciprocal lattice
 c
-      qfac(1,1,1) = 0.0d0
       pterm = (pi/aewald)**2
       volterm = pi * volbox
       nf1 = (nfft1+1) / 2
@@ -1891,30 +1885,17 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
          end if
-         qfac(k1,k2,k3) = expterm
+         qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
+         qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
       end do
 c
 c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
-         qfac(1,1,1) = expterm
-         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = f * expterm * struc2
-         em = em + e
+         qgrid(1,1,1,1) = expterm * qgrid(1,1,1,1)
+         qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
       end if
-c
-c     complete the transformation of the PME grid
-c
-      do k = 1, nfft3
-         do j = 1, nfft2
-            do i = 1, nfft1
-               term = qfac(i,j,k)
-               qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
-               qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
-            end do
-         end do
-      end do
 c
 c     perform 3-D FFT backward transform and get potential
 c

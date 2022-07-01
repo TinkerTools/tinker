@@ -2173,8 +2173,8 @@ c     L. G. Pedersen, "A Smooth Particle Mesh Ewald Method", Journal
 c     of Chemical Physics, 103, 8577-8593 (1995)
 c
 c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
-c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
-c     10, 67-71 (1993)
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular
+c     Simulation, 10, 67-71 (1993)
 c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
@@ -2189,7 +2189,6 @@ c
       use energi
       use ewald
       use math
-      use mrecip
       use pme
       implicit none
       integer i,j,k
@@ -2197,12 +2196,12 @@ c
       integer m1,m2,m3
       integer nf1,nf2,nf3
       integer nff,ntot
-      real*8 e,f,denom
+      real*8 e,f,hsq,denom
       real*8 term,expterm
       real*8 pterm,volterm
-      real*8 hsq,struc2
       real*8 h1,h2,h3
       real*8 r1,r2,r3
+      real*8, allocatable :: fphi(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
@@ -2216,12 +2215,7 @@ c
       if (allocated(qgrid)) then
          if (size(qgrid) .ne. 2*ntot)  call fftclose
       end if
-      if (allocated(qfac)) then
-         if (size(qfac) .ne. ntot)  deallocate (qfac)
-      end if
       if (.not. allocated(qgrid))  call fftsetup
-      if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
-      if (.not. allocated(fphi))  allocate (fphi(20,nion))
 c
 c     setup spatial decomposition and B-spline coefficients
 c
@@ -2273,34 +2267,28 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
          end if
-         qfac(k1,k2,k3) = expterm
+         qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
+         qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
       end do
 c
 c     account for zeroth grid point for nonperiodic system
 c
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
-         qfac(1,1,1) = expterm
-         struc2 = qgrid(1,1,1,1)**2 + qgrid(2,1,1,1)**2
-         e = f * expterm * struc2
-         ec = ec + e
+         qgrid(1,1,1,1) = expterm * qgrid(1,1,1,1)
+         qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
       end if
 c
-c     complete the transformation of the PME grid
-c
-      do k = 1, nfft3
-         do j = 1, nfft2
-            do i = 1, nfft1
-               term = qfac(i,j,k)
-               qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
-               qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
-            end do
-         end do
-      end do
-c
-c     perform 3-D FFT backward transform and get potential
+c     perform the 3-D FFT backward transformation
 c
       call fftback
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fphi(4,nion))
+c
+c     extract the partial charge electrostatic potential
+c
       call fphi_pchg (fphi)
 c
 c     sum over charges and increment total charge energy
@@ -2313,5 +2301,9 @@ c
          aec(j) = aec(j) + term
       end do
       ec = ec + e
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (fphi)
       return
       end

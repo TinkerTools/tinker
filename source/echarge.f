@@ -1691,8 +1691,8 @@ c     L. G. Pedersen, "A Smooth Particle Mesh Ewald Method", Journal
 c     of Chemical Physics, 103, 8577-8593 (1995)
 c
 c     W. Smith and D. Fincham, "The Ewald Sum in Truncated Octahedral
-c     and Rhombic Dodecahedral Boundary Conditions", Molecular Physics,
-c     10, 67-71 (1993)
+c     and Rhombic Dodecahedral Boundary Conditions", Molecular
+c     Simulation, 10, 67-71 (1993)
 c
 c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007

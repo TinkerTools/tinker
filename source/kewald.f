@@ -83,11 +83,11 @@ c     estimate optimal values for the Ewald coefficient
 c
       if (use_ewald)  call ewaldcof (aeewald,ewaldcut)
       if (use_dewald)  call ewaldcof (adewald,dewaldcut)
+      if (use_ewald .and. use_polar)  apewald = aeewald
 c
 c     modify Ewald coefficient for small unitcell dimensions
 c
-      if (use_polar) then
-         apewald = aeewald
+      if (use_polar .and. use_bounds) then
          size = min(xbox,ybox,zbox)
          if (size .lt. 6.0d0) then
             slope = (1.0d0-apewald) / 2.0d0
