@@ -50,6 +50,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 domega.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 dsppot.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 energi.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 ewald.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 expol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 faces.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 fft.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 fields.f
@@ -78,6 +79,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kcpen.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kctrn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kdipol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kdsp.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kexpl.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 keys.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 khbond.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kiprop.f
@@ -186,6 +188,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 zcoord.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 active.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 alchemy.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 alterchg.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 alterpol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 analysis.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 analyze.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 angles.f
@@ -224,6 +227,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 damping.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 dcflux.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 deflate.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 delete.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 dexpol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 diagq.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 diffeq.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 diffuse.f
@@ -422,6 +426,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kchgtrn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kdipole.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kdisp.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kewald.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kexpol.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kextra.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kgeom.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kimprop.f
@@ -502,6 +507,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prmedit.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prmkey.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 promo.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 protein.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prtdcd.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prtdyn.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prterr.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 prtint.f

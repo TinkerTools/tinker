@@ -41,6 +41,7 @@ add_library (tinkerObjF OBJECT
 ../source/dsppot.f
 ../source/energi.f
 ../source/ewald.f
+../source/expol.f
 ../source/faces.f
 ../source/fft.f
 ../source/fields.f
@@ -69,6 +70,7 @@ add_library (tinkerObjF OBJECT
 ../source/kctrn.f
 ../source/kdipol.f
 ../source/kdsp.f
+../source/kexpl.f
 ../source/keys.f
 ../source/khbond.f
 ../source/kiprop.f
@@ -174,6 +176,7 @@ add_library (tinkerObjF OBJECT
 ../source/zcoord.f
 ../source/active.f
 ../source/alterchg.f
+../source/alterpol.f
 ../source/analysis.f
 ../source/angles.f
 ../source/attach.f
@@ -205,6 +208,7 @@ add_library (tinkerObjF OBJECT
 ../source/dcflux.f
 ../source/deflate.f
 ../source/delete.f
+../source/dexpol.f
 ../source/diagq.f
 ../source/diffeq.f
 ../source/eangang.f
@@ -395,6 +399,7 @@ add_library (tinkerObjF OBJECT
 ../source/kdipole.f
 ../source/kdisp.f
 ../source/kewald.f
+../source/kexpol.f
 ../source/kextra.f
 ../source/kgeom.f
 ../source/kimprop.f
@@ -456,6 +461,7 @@ add_library (tinkerObjF OBJECT
 ../source/pressure.f
 ../source/prmkey.f
 ../source/promo.f
+../source/prtdcd.f
 ../source/prtdyn.f
 ../source/prterr.f
 ../source/prtint.f

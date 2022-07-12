@@ -98,15 +98,15 @@ else()
 endif()
 
 set(_FILES
-    action active align alterchg analysis analyz angang angbnd angles
-    angpot angtor argue ascii atmlst atomid atoms attach baoab basefile
-    bath beeman bicubic bitor bitors bndpot bndstr bonds born bound
-    bounds boxes bussi calendar cell center cflux charge chgpen chgpot
-    chgtrn chkpole chkring chkxyz cholesky chrono chunks clock cluster
-    column command connect connolly control couple cspline ctrpot cutoffs
-    damping deflate delete deriv dcflux diagq diffeq dipole disgeo disp
-    dma domega dsppot eangang eangang1 eangang2 eangang3 eangle eangle1
-    eangle2 eangle3 eangtor eangtor1 eangtor2 eangtor3 ebond ebond1
+    action active align alterchg alterpol analysis analyz angang angbnd
+    angles angpot angtor argue ascii atmlst atomid atoms attach baoab
+    basefile bath beeman bicubic bitor bitors bndpot bndstr bonds born
+    bound bounds boxes bussi calendar cell center cflux charge chgpen
+    chgpot chgtrn chkpole chkring chkxyz cholesky chrono chunks clock
+    cluster column command connect connolly control couple cspline ctrpot
+    cutoffs damping dcflux deflate delete deriv dexpol diagq diffeq dipole
+    disgeo disp dma domega dsppot eangang eangang1 eangang2 eangang3 eangle
+    eangle1 eangle2 eangle3 eangtor eangtor1 eangtor2 eangtor3 ebond ebond1
     ebond2 ebond3 ebuck ebuck1 ebuck2 ebuck3 echarge echarge1 echarge2
     echarge3 echgdpl echgdpl1 echgdpl2 echgdpl3 echgtrn echgtrn1 echgtrn2
     echgtrn3 edipole edipole1 edipole2 edipole3 edisp edisp1 edisp2
@@ -130,30 +130,30 @@ set(_FILES
     insert inter invbeta invert iounit jacobi kanang kangang kangle
     kangs kangtor kantor katom katoms kbond kbonds kcflux kcharge
     kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp kewald
-    kextra keys kgeom khbond kimprop kimptor kinetic kiprop kitors kmetal
-    kmpole kmulti kopbend kopbnd kopdist kopdst korbit korbs kpitor
-    kpitors kpolar kpolr krepel krepl ksolut ksolv kstbnd kstrbnd kstrtor
-    ksttor ktors ktorsn ktortor ktrtor kurey kurybr kvdw kvdwpr kvdws
-    lattice lbfgs light lights limits linmin lusolve makeint makeref
-    makexyz math maxwell mdinit mdrest mdsave mdstat mdstuf mechanic
-    merck merge minima molcul moldyn molecule moment moments mplpot
-    mpole mrecip mutant mutate nblist neigh nextarg nexttext nonpol
-    nose nspline nucleo number numeral numgrad ocvm omega opbend opdist
-    openend openmp optinit optsave orbital orbits orient orthog output
-    overlap params paths pbstuf pdb phipsi picalc piorbs pistuf pitors
-    pme pmestuf pmpb polar polgrp polopt polpcg polpot poltcg polymer
-    potent potfit predict pressure prmkey promo prtdyn prterr prtint
-    prtmol2 prtpdb prtprm prtseq prtxyz ptable qmstuf qrsolve quatfit
-    random rattle readdyn readgau readgdma readint readmol readmol2
-    readpdb readprm readseq readxyz refer repel replica reppot resdue
-    respa restrn rgddyn rgdstep rigid ring rings rmsfit rotbnd rotlist
-    rotpole rxnfld rxnpot scales sdstep search sequen server setprm
-    shakeup shunt sigmoid simplex sizes sktstuf socket solpot solute
-    sort square stodyn strbnd strtor suffix surface surfatom switch
-    syntrn tarray tcgstuf temper titles tncg torphase torpot torque
-    tors torsions tortor tree trimtext unitcell units uprior urey urypot
-    usage valfit vdw vdwpot verlet version vibs virial volume warp xtals
-    xyzatm zatom zclose zcoord
+    kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic kiprop
+    kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst korbit
+    korbs kpitor kpitors kpolar kpolr krepel krepl ksolut ksolv kstbnd
+    kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor kurey kurybr kvdw
+    kvdwpr kvdws lattice lbfgs light lights limits linmin lusolve makeint
+    makeref makexyz math maxwell mdinit mdrest mdsave mdstat mdstuf
+    mechanic merck merge minima molcul moldyn molecule moment moments
+    mplpot mpole mrecip mutant mutate nblist neigh nextarg nexttext
+    nonpol nose nspline nucleo number numeral numgrad ocvm omega opbend
+    opdist openend openmp optinit optsave orbital orbits orient orthog
+    output overlap params paths pbstuf pdb phipsi picalc piorbs pistuf
+    pitors pme pmestuf pmpb polar polgrp polopt polpcg polpot poltcg
+    polymer potent potfit predict pressure prmkey promo prtdcd prtdyn
+    prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable qmstuf
+    qrsolve quatfit random rattle readdyn readgau readgdma readint
+    readmol readmol2 readpdb readprm readseq readxyz refer repel replica
+    reppot resdue respa restrn rgddyn rgdstep rigid ring rings rmsfit
+    rotbnd rotlist rotpole rxnfld rxnpot scales sdstep search sequen
+    server setprm shakeup shunt sigmoid simplex sizes sktstuf socket
+    solpot solute sort square stodyn strbnd strtor suffix surface
+    surfatom switch syntrn tarray tcgstuf temper titles tncg torphase
+    torpot torque tors torsions tortor tree trimtext unitcell units
+    uprior urey urypot usage valfit vdw vdwpot verlet version vibs virial
+    volume warp xtals xyzatm zatom zclose zcoord
 )
 
 set(_LIB "")

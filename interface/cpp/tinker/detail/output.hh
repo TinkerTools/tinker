@@ -4,6 +4,7 @@
 
 namespace tinker { namespace output {
 extern int& archive;
+extern int& binary;
 extern int& noversion;
 extern int& overwrite;
 extern int& cyclesave;
@@ -14,6 +15,7 @@ extern char (&coordtype)[9];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(output, archive);
+extern "C" int TINKER_MOD(output, binary);
 extern "C" int TINKER_MOD(output, noversion);
 extern "C" int TINKER_MOD(output, overwrite);
 extern "C" int TINKER_MOD(output, cyclesave);
@@ -23,6 +25,7 @@ extern "C" int TINKER_MOD(output, uindsave);
 extern "C" char TINKER_MOD(output, coordtype)[9];
 
 int& archive = TINKER_MOD(output, archive);
+int& binary = TINKER_MOD(output, binary);
 int& noversion = TINKER_MOD(output, noversion);
 int& overwrite = TINKER_MOD(output, overwrite);
 int& cyclesave = TINKER_MOD(output, cyclesave);

@@ -48,6 +48,12 @@ c
             call epolar1a
          end if
       end if
+c
+c     apply a correction to account for exchange polarization
+c
+      if (use_expol) then
+         call dexpol
+      end if
       return
       end
 c

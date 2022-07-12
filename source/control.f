@@ -37,6 +37,7 @@ c
       holdup = .false.
       abort = .false.
       archive = .true.
+      binary = .false.
       cyclesave = .false.
       noversion = .false.
       overwrite = .false.
@@ -74,11 +75,18 @@ c
             holdup = .true.
          else if (keyword(1:8) .eq. 'ARCHIVE ') then
             archive = .true.
+            binary = .false.
+            cyclesave = .false.
+         else if (keyword(1:12) .eq. 'ARCHIVE-DCD ') then
+            archive = .true.
+            binary = .true.
             cyclesave = .false.
          else if (keyword(1:10) .eq. 'NOARCHIVE ') then
             archive = .false.
+            binary = .false.
          else if (keyword(1:11) .eq. 'SAVE-CYCLE ') then
             archive = .false.
+            binary = .false.
             cyclesave = .true.
          else if (keyword(1:10) .eq. 'NOVERSION ') then
             noversion = .true.

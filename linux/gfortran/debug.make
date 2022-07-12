@@ -50,6 +50,7 @@ gfortran -c -Wall domega.f
 gfortran -c -Wall dsppot.f
 gfortran -c -Wall energi.f
 gfortran -c -Wall ewald.f
+gfortran -c -Wall expol.f
 gfortran -c -Wall faces.f
 gfortran -c -Wall fft.f
 gfortran -c -Wall fields.f
@@ -78,6 +79,7 @@ gfortran -c -Wall kcpen.f
 gfortran -c -Wall kctrn.f
 gfortran -c -Wall kdipol.f
 gfortran -c -Wall kdsp.f
+gfortran -c -Wall kexpl.f
 gfortran -c -Wall keys.f
 gfortran -c -Wall khbond.f
 gfortran -c -Wall kiprop.f
@@ -186,6 +188,7 @@ gfortran -c -Wall zcoord.f
 gfortran -c -Wall active.f
 gfortran -c -Wall alchemy.f
 gfortran -c -Wall alterchg.f
+gfortran -c -Wall alterpol.f
 gfortran -c -Wall analysis.f
 gfortran -c -Wall analyze.f
 gfortran -c -Wall angles.f
@@ -224,6 +227,7 @@ gfortran -c -Wall damping.f
 gfortran -c -Wall dcflux.f
 gfortran -c -Wall deflate.f
 gfortran -c -Wall delete.f
+gfortran -c -Wall dexpol.f
 gfortran -c -Wall diagq.f
 gfortran -c -Wall diffeq.f
 gfortran -c -Wall diffuse.f
@@ -422,6 +426,7 @@ gfortran -c -Wall kchgtrn.f
 gfortran -c -Wall kdipole.f
 gfortran -c -Wall kdisp.f
 gfortran -c -Wall kewald.f
+gfortran -c -Wall kexpol.f
 gfortran -c -Wall kextra.f
 gfortran -c -Wall kgeom.f
 gfortran -c -Wall kimprop.f
@@ -502,6 +507,7 @@ gfortran -c -Wall prmedit.f
 gfortran -c -Wall prmkey.f
 gfortran -c -Wall promo.f
 gfortran -c -Wall protein.f
+gfortran -c -Wall prtdcd.f
 gfortran -c -Wall prtdyn.f
 gfortran -c -Wall prterr.f
 gfortran -c -Wall prtint.f

@@ -2219,7 +2219,6 @@ c
       real*8 term,pterm
       real*8 a(3,3)
       real*8, allocatable :: fuind(:,:)
-      real*8, allocatable :: fuinp(:,:)
 c
 c
 c     return if the Ewald coefficient is zero
@@ -2335,36 +2334,29 @@ c
          call fphi_mpole (fphi)
       end if
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (fuind(3,npole))
-      allocate (fuinp(3,npole))
-c
-c     convert Cartesian induced dipoles to fractional coordinates
+c     set matrix for Cartesian to fractional induced dipoles
 c
       do i = 1, 3
          a(1,i) = dble(nfft1) * recip(i,1)
          a(2,i) = dble(nfft2) * recip(i,2)
          a(3,i) = dble(nfft3) * recip(i,3)
       end do
-      do i = 1, npole
-         do j = 1, 3
-            fuind(j,i) = a(j,1)*uind(1,i) + a(j,2)*uind(2,i)
-     &                      + a(j,3)*uind(3,i)
-            fuinp(j,i) = a(j,1)*uinp(1,i) + a(j,2)*uinp(2,i)
-     &                      + a(j,3)*uinp(3,i)
-         end do
-      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fuind(3,npole))
 c
 c     increment the induced dipole polarization energy
 c
       e = 0.0d0
       do i = 1, npole
-         j = ipole(i)
-         do k = 1, 3
-            term = f * fuind(k,i) * fphi(k+1,i)
+         k = ipole(i)
+         do j = 1, 3
+            fuind(j,i) = a(j,1)*uind(1,i) + a(j,2)*uind(2,i)
+     &                      + a(j,3)*uind(3,i)
+            term = f * fuind(j,i) * fphi(j+1,i)
             e = e + term
-            aep(j) = aep(j) + term
+            aep(k) = aep(k) + term
          end do
       end do
       ep = ep + e
@@ -2372,6 +2364,5 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (fuind)
-      deallocate (fuinp)
       return
       end

@@ -140,6 +140,7 @@ c
 c
       subroutine induce0a
       use atoms
+      use expol
       use ielscf
       use inform
       use iounit
@@ -164,6 +165,7 @@ c
       real*8 a,ap,b,bp
       real*8 sum,sump,term
       real*8, allocatable :: poli(:)
+      real*8, allocatable :: expoli(:,:,:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: rsd(:,:)
@@ -194,6 +196,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (field(3,npole))
       allocate (fieldp(3,npole))
+      if (use_expol)  allocate (expoli(3,3,npole))
 c
 c     compute induced dipoles based on direct and mutual fields
 c
@@ -209,16 +212,36 @@ c
          call dfield0a (field,fieldp)
       end if
 c
+c     modify polarizability to account for exchange polarization
+c
+      if (use_expol)  call alterpol
+c
 c     set induced dipoles to polarizability times direct field
 c
       do i = 1, npole
-         if (douind(ipole(i))) then
+         if (douind(ipole(i)) .and. .not.use_expol) then
             do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
                if (pcgguess) then
                   uind(j,i) = udir(j,i)
                   uinp(j,i) = udirp(j,i)
+               end if
+            end do
+         else if (douind(ipole(i)) .and. use_expol) then
+            do j = 1, 3
+               do k = 1, 3
+                  expoli(j,k,i) = polarity(i)*invpolscale(j,k,i)
+               end do
+            end do
+            do j = 1, 3
+               udir(j,i) = polarity(i) * field(j,i)
+               udirp(j,i) = polarity(i) * fieldp(j,i)
+               if (pcgguess) then
+                  do k = 1, 3
+                     uind(j,i) = uind(j,i) + expoli(j,k,i)*field(k,i)
+                     uinp(j,i) = uinp(j,i) + expoli(j,k,i)*fieldp(k,i)
+                  end do
                end if
             end do
          end if
@@ -343,12 +366,30 @@ c
          do i = 1, npole
             if (douind(ipole(i))) then
                poli(i) = max(polmin,polarity(i))
+               if (use_expol) then
+                  do j = 1, 3
+                     do k = 1, 3
+                        expoli(j,k,i) = 1/poli(i)*polscale(j,k,i)
+                     end do
+                  end do
+               end if
                do j = 1, 3
                   if (pcgguess) then
-                     rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                             + field(j,i)
-                     rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                             + fieldp(j,i)
+                     if (use_expol) then
+                        rsd(j,i) = udir(j,i)/poli(i)
+     &                           -uind(1,i)*expoli(j,1,i)
+     &                           -uind(2,i)*expoli(j,2,i)
+     &                           -uind(3,i)*expoli(j,3,i) + field(j,i)
+                        rsdp(j,i) = udirp(j,i)/poli(i)
+     &                           -uinp(1,i)*expoli(j,1,i)
+     &                           -uinp(2,i)*expoli(j,2,i)
+     &                           -uinp(3,i)*expoli(j,3,i) + fieldp(j,i)
+                     else
+	                     rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                              + field(j,i)
+                        rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
+     &                              + fieldp(j,i)
+                     end if
                   else
                      rsd(j,i) = udir(j,i) / poli(i)
                      rsdp(j,i) = udirp(j,i) / poli(i)
@@ -423,8 +464,17 @@ c
                   do j = 1, 3
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
-                     vec(j,i) = conj(j,i)/poli(i) - field(j,i)
-                     vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                     if (use_expol) then
+                        vec(j,i) = conj(1,i)*expoli(j,1,i)
+     &                        + conj(2,i)*expoli(j,2,i)
+     &                        + conj(3,i)*expoli(j,3,i) - field(j,i)
+                        vecp(j,i) = conjp(1,i)*expoli(j,1,i)
+     &                         + conjp(2,i)*expoli(j,2,i)
+     &                         + conjp(3,i)*expoli(j,3,i) - fieldp(j,i)
+                     else
+                        vec(j,i) = conj(j,i)/poli(i) - field(j,i)
+                        vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)
+                     end if
                   end do
                end if
             end do
@@ -504,7 +554,7 @@ c
    30          format (i8,7x,f16.10)
             end if
             if (eps .lt. poleps)  done = .true.
-            if (eps .gt. epsold)  done = .true.
+c            if (eps .gt. epsold)  done = .true.
             if (iter .lt. miniter)  done = .false.
             if (iter .ge. politer)  done = .true.
 c
@@ -569,6 +619,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (field)
       deallocate (fieldp)
+      if (use_expol)  deallocate (expoli)
       return
       end
 c
@@ -2282,7 +2333,7 @@ c
       use pme
       use polpot
       implicit none
-      integer i,j,k,ii
+      integer i,j,ii
       integer k1,k2,k3
       integer m1,m2,m3
       integer ntot,nff
@@ -2316,10 +2367,10 @@ c
       if (allocated(qgrid)) then
          if (size(qgrid) .ne. 2*ntot)  call fftclose
       end if
+      if (.not. allocated(qgrid))  call fftsetup
       if (allocated(qfac)) then
          if (size(qfac) .ne. ntot)  deallocate (qfac)
       end if
-      if (.not. allocated(qgrid))  call fftsetup
       if (.not. allocated(qfac))  allocate (qfac(nfft1,nfft2,nfft3))
 c
 c     setup spatial decomposition and B-spline coefficients
@@ -2355,7 +2406,6 @@ c
 c
 c     make the scalar summation over reciprocal lattice
 c
-      qfac(1,1,1) = 0.0d0
       pterm = (pi/aewald)**2
       volterm = pi * volbox
       nf1 = (nfft1+1) / 2
@@ -2393,26 +2443,21 @@ c
             end if
          end if
          qfac(k1,k2,k3) = expterm
+         qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
+         qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
       end do
 c
 c     account for zeroth grid point for nonperiodic system
 c
+      qfac(1,1,1) = 0.0d0
+      qgrid(1,1,1,1) = 0.0d0
+      qgrid(2,1,1,1) = 0.0d0
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          qfac(1,1,1) = expterm
+         qgrid(1,1,1,1) = expterm * qgrid(1,1,1,1)
+         qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
       end if
-c
-c     complete the transformation of the PME grid
-c
-      do k = 1, nfft3
-         do j = 1, nfft2
-            do i = 1, nfft1
-               term = qfac(i,j,k)
-               qgrid(1,i,j,k) = term * qgrid(1,i,j,k)
-               qgrid(2,i,j,k) = term * qgrid(2,i,j,k)
-            end do
-         end do
-      end do
 c
 c     perform 3-D FFT backward transform and get field
 c

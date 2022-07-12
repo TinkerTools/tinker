@@ -12,6 +12,7 @@ ar -crusv libtinker.a \
 action.o \
 active.o \
 alterchg.o \
+alterpol.o \
 align.o \
 analysis.o \
 analyz.o \
@@ -71,6 +72,7 @@ dcflux.o \
 deflate.o \
 delete.o \
 deriv.o \
+dexpol.o \
 diagq.o \
 diffeq.o \
 dipole.o \
@@ -209,6 +211,7 @@ eurey2.o \
 eurey3.o \
 evcorr.o \
 ewald.o \
+expol.o \
 extra.o \
 extra1.o \
 extra2.o \
@@ -297,6 +300,8 @@ kdipole.o \
 kdisp.o \
 kdsp.o \
 kewald.o \
+kexpl.o \
+kexpol.o \
 kextra.o \
 keys.o \
 kgeom.o \
@@ -417,6 +422,7 @@ predict.o \
 pressure.o \
 prmkey.o \
 promo.o \
+prtdcd.o \
 prtdyn.o \
 prterr.o \
 prtint.o \

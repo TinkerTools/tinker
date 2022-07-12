@@ -902,3 +902,90 @@ c
       end if
       return
       end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine dampexpl  --  exchange polarization damping  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "dampexpl" finds the overlap value for exchange polarization
+c     damping function
+c
+c
+      subroutine dampexpl (r,preik,alphai,alphak,s2,ds2)
+      use polpot
+      implicit none
+      real*8 r,s,s2,ds2
+      real*8 alphai,alphak
+      real*8 alphaik
+      real*8 dmpi2,dmpk2
+      real*8 dmpi22,dmpk22
+      real*8 dmpik2
+      real*8 dampik,dampik2
+      real*8 eps,diff
+      real*8 expi,expk,expik
+      real*8 dampi,dampk,dampi2
+      real*8 pre,term,preik
+c
+c
+      if (scrtyp .eq. 'S2U') then
+         alphaik = sqrt(alphai * alphak)
+         dmpik2 = 0.5d0 * alphaik
+         dampik = dmpik2 * r
+         dampik2 = dampik * dampik
+         expik = exp(-dampik)
+         s =(1+dampik+dampik2/3.0d0)*expik
+         s2 = s*s
+         ds2 = s * (-alphaik/3.0d0)*(dampik+dampik2)*expik
+c
+c     compute tolerance value for overlap-based damping
+c
+      else if (scrtyp .eq. 'S2 ') then
+         eps = 0.001d0
+         diff = abs(alphai-alphak)
+c
+c     treat the case where alpha damping exponents are equal
+c
+         if (diff .lt. eps) then
+            dmpi2 = 0.5d0 * alphai
+            dampi = dmpi2 * r
+            dampi2 = dampi * dampi
+            expi = exp(-dampi)
+            s = (1+dampi+dampi2/3.0d0)*expi
+            ds2 = s * (-alphai/3.0d0)*(dampi+dampi2)*expi
+c
+c     treat the case where alpha damping exponents are unequal
+c
+         else
+            dmpi2 = 0.5d0 * alphai
+            dmpk2 = 0.5d0 * alphak
+            dampi = dmpi2 * r
+            dampk = dmpk2 * r
+            expi = exp(-dampi)
+            expk = exp(-dampk)
+            dmpi22 = dmpi2 * dmpi2
+            dmpk22 = dmpk2 * dmpk2
+            term = dmpi22 - dmpk22
+            pre = sqrt(alphai**3 * alphak**3) / (r * term**3)
+            s = pre*(dmpi2*(r*term - 4*dmpk2) * expk
+     &            + dmpk2*(r*term + 4*dmpi2) * expi)
+            ds2 = 2.0d0*s*pre*dmpi2*dmpk2 *
+     &       ((4.0d0/r-(r*term-4.0d0*dmpk2))*expk -
+     &       ((4.0d0/r+(r*term+4.0d0*dmpi2))*expi))
+         end if
+         s2 = s*s
+c
+c     use simple gaussian-based damping functions
+c
+      else if (scrtyp .eq. 'G  ') then
+         alphaik = sqrt(alphai * alphak)
+         s2 = exp(-alphaik/10.0d0 * r**2)
+         ds2 = (-alphaik/5.0d0)*r*s2
+      end if
+      s2 = preik*s2
+      ds2 = preik*ds2
+      return
+      end

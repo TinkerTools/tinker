@@ -2191,7 +2191,7 @@ c
       use math
       use pme
       implicit none
-      integer i,j,k
+      integer i,j
       integer k1,k2,k3
       integer m1,m2,m3
       integer nf1,nf2,nf3

@@ -2262,15 +2262,11 @@ c
       use pme
       use virial
       implicit none
-      integer i,j,k
-      integer isite,iatm
-      integer i0,j0,k0
-      integer it1,it2,it3
+      integer i,j
       integer k1,k2,k3
       integer m1,m2,m3
       integer nf1,nf2,nf3
       integer nff,ntot
-      integer igrd0,jgrd0,kgrd0
       real*8 e,term,eterm
       real*8 expterm
       real*8 vterm,pterm
@@ -2279,10 +2275,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 f,fi,denom
       real*8 hsq,struc2
-      real*8 de1,de2,de3
-      real*8 dn1,dn2,dn3
-      real*8 t1,t2,t3
-      real*8 dt1,dt2,dt3
       real*8 h1,h2,h3
       real*8 r1,r2,r3
       real*8 f1,f2,f3

@@ -29,6 +29,16 @@ void bndchg_(double* pdelta);
 void angchg_(double* pdelta);
 #define tinker_f_angchg angchg_
 
+// alterpol.f
+void alterpol_();
+#define tinker_f_alterpol alterpol_
+void altpol0a_();
+#define tinker_f_altpol0a altpol0a_
+void altpol0b_();
+#define tinker_f_altpol0b altpol0b_
+void rotexpl_(double* xr, double* yr, double* zr, double* p33i, double* p33k, double* ks2i, double* ks2k);
+#define tinker_f_rotexpl rotexpl_
+
 // analysis.f
 void analysis_(double* energy);
 #define tinker_f_analysis analysis_
@@ -238,6 +248,8 @@ void damppot_(double* r, double* alphak, double* dmpk);
 #define tinker_f_damppot damppot_
 void damprep_(double* r, double* r2, double* rr1, double* rr3, double* rr5, double* rr7, double* rr9, double* rr11, int* rorder, double* dmpi, double* dmpk, double* dmpik);
 #define tinker_f_damprep damprep_
+void dampexpl_(double* r, double* preik, double* alphai, double* alphak, double* s2, double* ds2);
+#define tinker_f_dampexpl dampexpl_
 
 // dcflux.f
 void dcflux_(double* pot, double* dcfx, double* dcfy, double* dcfz);
@@ -250,6 +262,16 @@ void deflate_(int* n, int* nv, double* a, double* ev, double* vec);
 // delete.f
 void delete_(int* iatom);
 #define tinker_f_delete delete_
+
+// dexpol.f
+void dexpol_();
+#define tinker_f_dexpol dexpol_
+void dexpol1a_();
+#define tinker_f_dexpol1a dexpol1a_
+void dexpol1b_();
+#define tinker_f_dexpol1b dexpol1b_
+void rotdexpl_(double* xr, double* yr, double* zr, double* ai, double* ak);
+#define tinker_f_rotdexpl rotdexpl_
 
 // diagq.f
 void diagq_(int* n, int* nv, double* dd, double* ev, double* vec);
@@ -458,6 +480,8 @@ void echarge3f_();
 #define tinker_f_echarge3f echarge3f_
 void echarge3g_();
 #define tinker_f_echarge3g echarge3g_
+void ecrecip3_();
+#define tinker_f_ecrecip3 ecrecip3_
 
 // echgdpl.f
 void echgdpl_();
@@ -928,6 +952,8 @@ void empole3d_();
 #define tinker_f_empole3d empole3d_
 void emreal3d_();
 #define tinker_f_emreal3d emreal3d_
+void emrecip3_();
+#define tinker_f_emrecip3 emrecip3_
 
 // energy.f
 double energy_();
@@ -1048,6 +1074,8 @@ void epreal3d_();
 #define tinker_f_epreal3d epreal3d_
 void epolar3e_();
 #define tinker_f_epolar3e epolar3e_
+void eprecip3_();
+#define tinker_f_eprecip3 eprecip3_
 
 // erepel.f
 void erepel_();
@@ -1697,6 +1725,10 @@ void ewaldcof_(double* alpha, double* cutoff);
 void extent_(double* rmax);
 #define tinker_f_extent extent_
 
+// kexpol.f
+void kexpol_();
+#define tinker_f_kexpol kexpol_
+
 // kextra.f
 void kextra_();
 #define tinker_f_kextra kextra_
@@ -2044,6 +2076,8 @@ void grid_disp_();
 #define tinker_f_grid_disp grid_disp_
 void adjust_(int* offset, int* nfft, int* nchk, int* amin, int* amax, int* cmin, int* cmax);
 #define tinker_f_adjust adjust_
+void fphi_pchg_(double* fphi);
+#define tinker_f_fphi_pchg fphi_pchg_
 void fphi_mpole_(double* fphi);
 #define tinker_f_fphi_mpole fphi_mpole_
 void fphi_uind_(double* fdip_phi1, double* fdip_phi2, double* fdip_sum_phi);
@@ -2110,6 +2144,10 @@ void nbondoff_();
 // promo.f
 void promo_();
 #define tinker_f_promo promo_
+
+// prtdcd.f
+void prtdcd_(int* idcd);
+#define tinker_f_prtdcd prtdcd_
 
 // prtdyn.f
 void prtdyn_();

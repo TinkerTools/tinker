@@ -50,6 +50,7 @@ gfortran -c -O3 -ffast-math -fopenmp domega.f
 gfortran -c -O3 -ffast-math -fopenmp dsppot.f
 gfortran -c -O3 -ffast-math -fopenmp energi.f
 gfortran -c -O3 -ffast-math -fopenmp ewald.f
+gfortran -c -O3 -ffast-math -fopenmp expol.f
 gfortran -c -O3 -ffast-math -fopenmp faces.f
 gfortran -c -O3 -ffast-math -fopenmp fft.f
 gfortran -c -O3 -ffast-math -fopenmp fields.f
@@ -78,6 +79,7 @@ gfortran -c -O3 -ffast-math -fopenmp kcpen.f
 gfortran -c -O3 -ffast-math -fopenmp kctrn.f
 gfortran -c -O3 -ffast-math -fopenmp kdipol.f
 gfortran -c -O3 -ffast-math -fopenmp kdsp.f
+gfortran -c -O3 -ffast-math -fopenmp kexpl.f
 gfortran -c -O3 -ffast-math -fopenmp keys.f
 gfortran -c -O3 -ffast-math -fopenmp khbond.f
 gfortran -c -O3 -ffast-math -fopenmp kiprop.f
@@ -186,6 +188,7 @@ gfortran -c -O3 -ffast-math -fopenmp zcoord.f
 gfortran -c -O3 -ffast-math -fopenmp active.f
 gfortran -c -O3 -ffast-math -fopenmp alchemy.f
 gfortran -c -O3 -ffast-math -fopenmp alterchg.f
+gfortran -c -O3 -ffast-math -fopenmp alterpol.f
 gfortran -c -O3 -ffast-math -fopenmp analysis.f
 gfortran -c -O3 -ffast-math -fopenmp analyze.f
 gfortran -c -O3 -ffast-math -fopenmp angles.f
@@ -224,6 +227,7 @@ gfortran -c -O3 -ffast-math -fopenmp damping.f
 gfortran -c -O3 -ffast-math -fopenmp dcflux.f
 gfortran -c -O3 -ffast-math -fopenmp deflate.f
 gfortran -c -O3 -ffast-math -fopenmp delete.f
+gfortran -c -O3 -ffast-math -fopenmp dexpol.f
 gfortran -c -O3 -ffast-math -fopenmp diagq.f
 gfortran -c -O3 -ffast-math -fopenmp diffeq.f
 gfortran -c -O3 -ffast-math -fopenmp diffuse.f
@@ -422,6 +426,7 @@ gfortran -c -O3 -ffast-math -fopenmp kchgtrn.f
 gfortran -c -O3 -ffast-math -fopenmp kdipole.f
 gfortran -c -O3 -ffast-math -fopenmp kdisp.f
 gfortran -c -O3 -ffast-math -fopenmp kewald.f
+gfortran -c -O3 -ffast-math -fopenmp kexpol.f
 gfortran -c -O3 -ffast-math -fopenmp kextra.f
 gfortran -c -O3 -ffast-math -fopenmp kgeom.f
 gfortran -c -O3 -ffast-math -fopenmp kimprop.f
@@ -502,6 +507,7 @@ gfortran -c -O3 -ffast-math -fopenmp prmedit.f
 gfortran -c -O3 -ffast-math -fopenmp prmkey.f
 gfortran -c -O3 -ffast-math -fopenmp promo.f
 gfortran -c -O3 -ffast-math -fopenmp protein.f
+gfortran -c -O3 -ffast-math -fopenmp prtdcd.f
 gfortran -c -O3 -ffast-math -fopenmp prtdyn.f
 gfortran -c -O3 -ffast-math -fopenmp prterr.f
 gfortran -c -O3 -ffast-math -fopenmp prtint.f

@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 extern int TINKER_MOD(output, archive);
+extern int TINKER_MOD(output, binary);
 extern int TINKER_MOD(output, noversion);
 extern int TINKER_MOD(output, overwrite);
 extern int TINKER_MOD(output, cyclesave);

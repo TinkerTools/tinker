@@ -30,6 +30,8 @@ extern int& polprt;
 extern int& dpequal;
 extern int& use_thole;
 extern int& use_dirdamp;
+extern int& use_expol;
+extern char (&scrtyp)[3];
 extern char (&poltyp)[6];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -60,6 +62,8 @@ extern "C" int TINKER_MOD(polpot, polprt);
 extern "C" int TINKER_MOD(polpot, dpequal);
 extern "C" int TINKER_MOD(polpot, use_thole);
 extern "C" int TINKER_MOD(polpot, use_dirdamp);
+extern "C" int TINKER_MOD(polpot, use_expol);
+extern "C" char TINKER_MOD(polpot, scrtyp)[3];
 extern "C" char TINKER_MOD(polpot, poltyp)[6];
 
 int& politer = TINKER_MOD(polpot, politer);
@@ -89,6 +93,8 @@ int& polprt = TINKER_MOD(polpot, polprt);
 int& dpequal = TINKER_MOD(polpot, dpequal);
 int& use_thole = TINKER_MOD(polpot, use_thole);
 int& use_dirdamp = TINKER_MOD(polpot, use_dirdamp);
+int& use_expol = TINKER_MOD(polpot, use_expol);
+char (&scrtyp)[3] = TINKER_MOD(polpot, scrtyp);
 char (&poltyp)[6] = TINKER_MOD(polpot, poltyp);
 #endif
 } }

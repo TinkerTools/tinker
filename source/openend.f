@@ -39,7 +39,7 @@ c     some Fortran 77 compilers open files for append by default
 c
 c     open (unit=iunit,file=name,status='old')
 c
-c     manually read to the end of file, slow but always correct
+c     read to the end of formatted file, slow but always correct
 c
 c     open (unit=iunit,file=name,status='old')
 c     do while (.true.)

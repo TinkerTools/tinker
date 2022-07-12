@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2018 by Joshua Rackers & Jay W. Ponder  ##
 c     ##                   All Rights Reserved                  ##
 c     ############################################################
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  module disp  --  damped dispersion for current structure  ##        
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  module disp  --  damped dispersion in current structure  ##        
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     ndisp     total number of dispersion sites in the system

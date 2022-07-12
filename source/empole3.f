@@ -2133,7 +2133,6 @@ c
       use mpole
       use mrecip
       use pme
-      use potent
       implicit none
       integer i,j,k
       integer k1,k2,k3
@@ -2263,7 +2262,7 @@ c
       call fftback
       call fphi_mpole (fphi)
 c
-c     sum over multipoles and increment total multipole energy
+c     increment the total permanent atomic multipole energy
 c
       e = 0.0d0
       do i = 1, npole

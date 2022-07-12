@@ -5,15 +5,15 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine prtxyz  --  output of Cartesian coordinates  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine prtxyz  --  output of XYZ-format coordinates  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "prtxyz" writes out a set of Cartesian coordinates
-c     to an external disk file
+c     "prtxyz" writes out a set of Cartesian coordinates to an
+c     external disk file in Tinker XYZ format
 c
 c
       subroutine prtxyz (ixyz)

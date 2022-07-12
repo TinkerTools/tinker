@@ -50,6 +50,7 @@ gfortran -c -Ofast -msse3 -fopenmp domega.f
 gfortran -c -Ofast -msse3 -fopenmp dsppot.f
 gfortran -c -Ofast -msse3 -fopenmp energi.f
 gfortran -c -Ofast -msse3 -fopenmp ewald.f
+gfortran -c -Ofast -msse3 -fopenmp expol.f
 gfortran -c -Ofast -msse3 -fopenmp faces.f
 gfortran -c -Ofast -msse3 -fopenmp fft.f
 gfortran -c -Ofast -msse3 -fopenmp fields.f
@@ -78,6 +79,7 @@ gfortran -c -Ofast -msse3 -fopenmp kcpen.f
 gfortran -c -Ofast -msse3 -fopenmp kctrn.f
 gfortran -c -Ofast -msse3 -fopenmp kdipol.f
 gfortran -c -Ofast -msse3 -fopenmp kdsp.f
+gfortran -c -Ofast -msse3 -fopenmp kexpl.f
 gfortran -c -Ofast -msse3 -fopenmp keys.f
 gfortran -c -Ofast -msse3 -fopenmp khbond.f
 gfortran -c -Ofast -msse3 -fopenmp kiprop.f
@@ -186,6 +188,7 @@ gfortran -c -Ofast -msse3 -fopenmp zcoord.f
 gfortran -c -Ofast -msse3 -fopenmp active.f
 gfortran -c -Ofast -msse3 -fopenmp alchemy.f
 gfortran -c -Ofast -msse3 -fopenmp alterchg.f
+gfortran -c -Ofast -msse3 -fopenmp alterpol.f
 gfortran -c -Ofast -msse3 -fopenmp analysis.f
 gfortran -c -Ofast -msse3 -fopenmp analyze.f
 gfortran -c -Ofast -msse3 -fopenmp angles.f
@@ -224,6 +227,7 @@ gfortran -c -Ofast -msse3 -fopenmp damping.f
 gfortran -c -Ofast -msse3 -fopenmp dcflux.f
 gfortran -c -Ofast -msse3 -fopenmp deflate.f
 gfortran -c -Ofast -msse3 -fopenmp delete.f
+gfortran -c -Ofast -msse3 -fopenmp dexpol.f
 gfortran -c -Ofast -msse3 -fopenmp diagq.f
 gfortran -c -Ofast -msse3 -fopenmp diffeq.f
 gfortran -c -Ofast -msse3 -fopenmp diffuse.f
@@ -422,6 +426,7 @@ gfortran -c -Ofast -msse3 -fopenmp kchgtrn.f
 gfortran -c -Ofast -msse3 -fopenmp kdipole.f
 gfortran -c -Ofast -msse3 -fopenmp kdisp.f
 gfortran -c -Ofast -msse3 -fopenmp kewald.f
+gfortran -c -Ofast -msse3 -fopenmp kexpol.f
 gfortran -c -Ofast -msse3 -fopenmp kextra.f
 gfortran -c -Ofast -msse3 -fopenmp kgeom.f
 gfortran -c -Ofast -msse3 -fopenmp kimprop.f
@@ -502,6 +507,7 @@ gfortran -c -Ofast -msse3 -fopenmp prmedit.f
 gfortran -c -Ofast -msse3 -fopenmp prmkey.f
 gfortran -c -Ofast -msse3 -fopenmp promo.f
 gfortran -c -Ofast -msse3 -fopenmp protein.f
+gfortran -c -Ofast -msse3 -fopenmp prtdcd.f
 gfortran -c -Ofast -msse3 -fopenmp prtdyn.f
 gfortran -c -Ofast -msse3 -fopenmp prterr.f
 gfortran -c -Ofast -msse3 -fopenmp prtint.f

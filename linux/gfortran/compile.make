@@ -50,6 +50,7 @@ gfortran -c -Ofast -mavx -fopenmp domega.f
 gfortran -c -Ofast -mavx -fopenmp dsppot.f
 gfortran -c -Ofast -mavx -fopenmp energi.f
 gfortran -c -Ofast -mavx -fopenmp ewald.f
+gfortran -c -Ofast -mavx -fopenmp expol.f
 gfortran -c -Ofast -mavx -fopenmp faces.f
 gfortran -c -Ofast -mavx -fopenmp fft.f
 gfortran -c -Ofast -mavx -fopenmp fields.f
@@ -78,6 +79,7 @@ gfortran -c -Ofast -mavx -fopenmp kcpen.f
 gfortran -c -Ofast -mavx -fopenmp kctrn.f
 gfortran -c -Ofast -mavx -fopenmp kdipol.f
 gfortran -c -Ofast -mavx -fopenmp kdsp.f
+gfortran -c -Ofast -mavx -fopenmp kexpl.f
 gfortran -c -Ofast -mavx -fopenmp keys.f
 gfortran -c -Ofast -mavx -fopenmp khbond.f
 gfortran -c -Ofast -mavx -fopenmp kiprop.f
@@ -186,6 +188,7 @@ gfortran -c -Ofast -mavx -fopenmp zcoord.f
 gfortran -c -Ofast -mavx -fopenmp active.f
 gfortran -c -Ofast -mavx -fopenmp alchemy.f
 gfortran -c -Ofast -mavx -fopenmp alterchg.f
+gfortran -c -Ofast -mavx -fopenmp alterpol.f
 gfortran -c -Ofast -mavx -fopenmp analysis.f
 gfortran -c -Ofast -mavx -fopenmp analyze.f
 gfortran -c -Ofast -mavx -fopenmp angles.f
@@ -224,6 +227,7 @@ gfortran -c -Ofast -mavx -fopenmp damping.f
 gfortran -c -Ofast -mavx -fopenmp dcflux.f
 gfortran -c -Ofast -mavx -fopenmp deflate.f
 gfortran -c -Ofast -mavx -fopenmp delete.f
+gfortran -c -Ofast -mavx -fopenmp dexpol.f
 gfortran -c -Ofast -mavx -fopenmp diagq.f
 gfortran -c -Ofast -mavx -fopenmp diffeq.f
 gfortran -c -Ofast -mavx -fopenmp diffuse.f
@@ -422,6 +426,7 @@ gfortran -c -Ofast -mavx -fopenmp kchgtrn.f
 gfortran -c -Ofast -mavx -fopenmp kdipole.f
 gfortran -c -Ofast -mavx -fopenmp kdisp.f
 gfortran -c -Ofast -mavx -fopenmp kewald.f
+gfortran -c -Ofast -mavx -fopenmp kexpol.f
 gfortran -c -Ofast -mavx -fopenmp kextra.f
 gfortran -c -Ofast -mavx -fopenmp kgeom.f
 gfortran -c -Ofast -mavx -fopenmp kimprop.f
@@ -502,6 +507,7 @@ gfortran -c -Ofast -mavx -fopenmp prmedit.f
 gfortran -c -Ofast -mavx -fopenmp prmkey.f
 gfortran -c -Ofast -mavx -fopenmp promo.f
 gfortran -c -Ofast -mavx -fopenmp protein.f
+gfortran -c -Ofast -mavx -fopenmp prtdcd.f
 gfortran -c -Ofast -mavx -fopenmp prtdyn.f
 gfortran -c -Ofast -mavx -fopenmp prterr.f
 gfortran -c -Ofast -mavx -fopenmp prtint.f

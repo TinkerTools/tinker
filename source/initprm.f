@@ -22,6 +22,7 @@ c
       use chgpot
       use ctrpot
       use dsppot
+      use expol
       use fields
       use ielscf
       use kanang
@@ -35,6 +36,7 @@ c
       use kctrn
       use kdipol
       use kdsp
+      use kexpl
       use khbond
       use kiprop
       use kitors
@@ -222,6 +224,10 @@ c
       if (.not. allocated(athl))  allocate (athl(maxtyp))
       if (.not. allocated(ddir))  allocate (ddir(maxtyp))
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
+      if (.not. allocated(pepk))  allocate (pepk(maxclass))
+      if (.not. allocated(peppre))  allocate (peppre(maxclass))
+      if (.not. allocated(pepdmp))  allocate (pepdmp(maxclass))
+      if (.not. allocated(pepl))  allocate (pepl(maxclass))
       if (.not. allocated(ctchg))  allocate (ctchg(maxclass))
       if (.not. allocated(ctdmp))  allocate (ctdmp(maxclass))
       if (.not. allocated(pbr))  allocate (pbr(maxtyp))
@@ -269,6 +275,10 @@ c
          dspdmp(i) = 0.0d0
          cpele(i) = 0.0d0
          cpalp(i) = 0.0d0
+         pepk(i) = 0.0d0
+         peppre(i) = 0.0d0
+         pepdmp(i) = 0.0d0
+         pepl(i) = .false.
          ctchg(i) = 0.0d0
          ctdmp(i) = 0.0d0
          electron(i) = 0.0d0
@@ -379,6 +389,7 @@ c
 c     set default control parameters for induced dipole terms
 c
       poltyp = 'MUTUAL'
+      scrtyp = 'S2U'
       politer = 100
       poleps = 0.000001d0
       uaccel = 2.0d0
@@ -403,6 +414,7 @@ c
       use_pred = .false.
       use_ielscf = .false.
       dpequal = .false.
+      use_expol = .false.
 c
 c     set default control parameters for charge transfer terms
 c

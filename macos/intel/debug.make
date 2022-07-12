@@ -50,6 +50,7 @@ ifort -c -g -warn all -check all domega.f
 ifort -c -g -warn all -check all dsppot.f
 ifort -c -g -warn all -check all energi.f
 ifort -c -g -warn all -check all ewald.f
+ifort -c -g -warn all -check all expol.f
 ifort -c -g -warn all -check all faces.f
 ifort -c -g -warn all -check all fft.f
 ifort -c -g -warn all -check all fields.f
@@ -78,6 +79,7 @@ ifort -c -g -warn all -check all kcpen.f
 ifort -c -g -warn all -check all kctrn.f
 ifort -c -g -warn all -check all kdipol.f
 ifort -c -g -warn all -check all kdsp.f
+ifort -c -g -warn all -check all kexpl.f
 ifort -c -g -warn all -check all keys.f
 ifort -c -g -warn all -check all khbond.f
 ifort -c -g -warn all -check all kiprop.f
@@ -186,6 +188,7 @@ ifort -c -g -warn all -check all zcoord.f
 ifort -c -g -warn all -check all active.f
 ifort -c -g -warn all -check all alchemy.f
 ifort -c -g -warn all -check all alterchg.f
+ifort -c -g -warn all -check all alterpol.f
 ifort -c -g -warn all -check all analysis.f
 ifort -c -g -warn all -check all analyze.f
 ifort -c -g -warn all -check all angles.f
@@ -224,6 +227,7 @@ ifort -c -g -warn all -check all damping.f
 ifort -c -g -warn all -check all dcflux.f
 ifort -c -g -warn all -check all deflate.f
 ifort -c -g -warn all -check all delete.f
+ifort -c -g -warn all -check all dexpol.f
 ifort -c -g -warn all -check all diagq.f
 ifort -c -g -warn all -check all diffeq.f
 ifort -c -g -warn all -check all diffuse.f
@@ -422,6 +426,7 @@ ifort -c -g -warn all -check all kchgtrn.f
 ifort -c -g -warn all -check all kdipole.f
 ifort -c -g -warn all -check all kdisp.f
 ifort -c -g -warn all -check all kewald.f
+ifort -c -g -warn all -check all kexpol.f
 ifort -c -g -warn all -check all kextra.f
 ifort -c -g -warn all -check all kgeom.f
 ifort -c -g -warn all -check all kimprop.f
@@ -502,6 +507,7 @@ ifort -c -g -warn all -check all prmedit.f
 ifort -c -g -warn all -check all prmkey.f
 ifort -c -g -warn all -check all promo.f
 ifort -c -g -warn all -check all protein.f
+ifort -c -g -warn all -check all prtdcd.f
 ifort -c -g -warn all -check all prtdyn.f
 ifort -c -g -warn all -check all prterr.f
 ifort -c -g -warn all -check all prtint.f

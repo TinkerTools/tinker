@@ -137,31 +137,31 @@ c
 c
 c     set number of OpenMP threads for parallelization
 c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call upcase (record)
-         call gettext (record,keyword,next)
-         string = record(next:240)
-         if (keyword(1:15) .eq. 'OPENMP-THREADS ') then
+!$    do i = 1, nkey
+!$       next = 1
+!$       record = keyline(i)
+!$       call upcase (record)
+!$       call gettext (record,keyword,next)
+!$       string = record(next:240)
+!$       if (keyword(1:15) .eq. 'OPENMP-THREADS ') then
 !$          read (string,*,err=80,end=80)  nthread
 !$          call omp_set_num_threads (nthread)
-         end if
-   80    continue
-      end do
+!$       end if
+!$ 80    continue
+!$    end do
 c
 c     check for number of OpenMP threads on command line
 c
-      do i = 1, narg-1
-         string = arg(i)
-         call upcase (string)
-         if (string(1:2) .eq. '-T') then
-            next = 1
-            string = arg(i+1)
-            call getnumb (string,nthread,next)
-            if (nthread .eq. 0)  nthread = 1
+!$    do i = 1, narg-1
+!$       string = arg(i)
+!$       call upcase (string)
+!$       if (string(1:2) .eq. '-T') then
+!$          next = 1
+!$          string = arg(i+1)
+!$          call getnumb (string,nthread,next)
+!$          if (nthread .eq. 0)  nthread = 1
 !$          call omp_set_num_threads (nthread)
-         end if
-      end do
+!$       end if
+!$    end do
       return
       end

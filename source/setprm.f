@@ -97,11 +97,13 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:5) .eq. 'BOND ')  maxnb = maxnb + 1
+         if (keyword(1:9) .eq. 'MMFFBOND ')  maxnb = maxnb + 1
          if (keyword(1:6) .eq. 'BOND5 ')  maxnb5 = maxnb5 + 1
          if (keyword(1:6) .eq. 'BOND4 ')  maxnb4 = maxnb4 + 1
          if (keyword(1:6) .eq. 'BOND3 ')  maxnb3 = maxnb3 + 1
          if (keyword(1:9) .eq. 'ELECTNEG ')  maxnel = maxnel + 1
          if (keyword(1:6) .eq. 'ANGLE ')  maxna = maxna + 1
+         if (keyword(1:10) .eq. 'MMFFANGLE ')  maxna = maxna + 1
          if (keyword(1:7) .eq. 'ANGLE5 ')  maxna5 = maxna5 + 1
          if (keyword(1:7) .eq. 'ANGLE4 ')  maxna4 = maxna4 + 1
          if (keyword(1:7) .eq. 'ANGLE3 ')  maxna3 = maxna3 + 1
@@ -114,6 +116,7 @@ c
          if (keyword(1:9) .eq. 'IMPROPER ')  maxndi = maxndi + 1
          if (keyword(1:8) .eq. 'IMPTORS ')  maxnti = maxnti + 1
          if (keyword(1:8) .eq. 'TORSION ')  maxnt = maxnt + 1
+         if (keyword(1:12) .eq. 'MMFFTORSION ')  maxnt = maxnt + 1
          if (keyword(1:9) .eq. 'TORSION5 ')  maxnt5 = maxnt5 + 1
          if (keyword(1:9) .eq. 'TORSION4 ')  maxnt4 = maxnt4 + 1
          if (keyword(1:7) .eq. 'PITORS ')  maxnpt = maxnpt + 1
@@ -161,11 +164,13 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:5) .eq. 'BOND ')  maxnb = maxnb + 1
+         if (keyword(1:9) .eq. 'MMFFBOND ')  maxnb = maxnb + 1
          if (keyword(1:6) .eq. 'BOND5 ')  maxnb5 = maxnb5 + 1
          if (keyword(1:6) .eq. 'BOND4 ')  maxnb4 = maxnb4 + 1
          if (keyword(1:6) .eq. 'BOND3 ')  maxnb3 = maxnb3 + 1
          if (keyword(1:9) .eq. 'ELECTNEG ')  maxnel = maxnel + 1
          if (keyword(1:6) .eq. 'ANGLE ')  maxna = maxna + 1
+         if (keyword(1:10) .eq. 'MMFFANGLE ')  maxna = maxna + 1
          if (keyword(1:7) .eq. 'ANGLE5 ')  maxna5 = maxna5 + 1
          if (keyword(1:7) .eq. 'ANGLE4 ')  maxna4 = maxna4 + 1
          if (keyword(1:7) .eq. 'ANGLE3 ')  maxna3 = maxna3 + 1
@@ -178,6 +183,7 @@ c
          if (keyword(1:9) .eq. 'IMPROPER ')  maxndi = maxndi + 1
          if (keyword(1:8) .eq. 'IMPTORS ')  maxnti = maxnti + 1
          if (keyword(1:8) .eq. 'TORSION ')  maxnt = maxnt + 1
+         if (keyword(1:12) .eq. 'MMFFTORSION ')  maxnt = maxnt + 1
          if (keyword(1:9) .eq. 'TORSION5 ')  maxnt5 = maxnt5 + 1
          if (keyword(1:9) .eq. 'TORSION4 ')  maxnt4 = maxnt4 + 1
          if (keyword(1:7) .eq. 'PITORS ')  maxnpt = maxnpt + 1

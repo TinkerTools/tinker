@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2020 by Chengwen Liu & Jay W. Ponder  ##
 c     ##                 All Rights Reserved                  ##
 c     ##########################################################
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  module cflux  --  charge flux terms in current system  ##
-c     ##                                                         ##
-c     #############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  module cflux  --  charge flux terms in current structure  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     nbflx   total number of bond charge flux interactions

@@ -32,6 +32,7 @@ c
       subroutine kpolar
       use atoms
       use chgpen
+      use expol
       use inform
       use iounit
       use keys
@@ -434,12 +435,17 @@ c
          end if
       end do
 c
+c     setup exchange polarization via variable polarizability
+c
+      call kexpol
+c
 c     remove zero or undefined electrostatic sites from the list
 c
       if ((use_polar .or. use_repuls) .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
          npolar = 0
+         nexpol = 0
          do i = 1, n
             if (polarity(i) .eq. 0.0d0)  douind(i) = .false.
             if (polsiz(i).ne.0 .or. polarity(i).ne.0.0d0) then
@@ -469,6 +475,11 @@ c
                thole(npole) = thole(i)
                dirdamp(npole) = dirdamp(i)
                pdamp(npole) = pdamp(i)
+               if (kpep(i) .ne. 0.0d0)  nexpol = nexpol + 1
+               kpep(npole) = kpep(i)
+               prepep(npole) = prepep(i)
+               dmppep(npole) = dmppep(i)
+               lpep(npole) = lpep(i)
             end if
          end do
       end if
@@ -485,9 +496,10 @@ c     turn off polarizable multipole potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.
       if (ncp .ne. 0)  use_chgpen = .true.
+      if (npolar .eq. 0)  use_polar = .false.
       if (ncp .ne. 0)  use_thole = .false.
       if (use_dirdamp)  use_thole = .true.
-      if (npolar .eq. 0)  use_polar = .false.
+      if (nexpol .ne. 0)  use_expol = .true.
       return
       end
 c

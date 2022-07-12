@@ -37,6 +37,7 @@ c
       use dipole
       use disgeo
       use domega
+      use expol
       use faces
       use fft
       use fields
@@ -61,6 +62,7 @@ c
       use kctrn
       use kdipol
       use kdsp
+      use kexpl
       use khbond
       use kiprop
       use kitors
@@ -350,6 +352,15 @@ c
       if (allocated(teg))  deallocate (teg)
       if (allocated(tex))  deallocate (tex)
 c
+c     deallocation of global arrays from module expol
+c
+      if (allocated(kpep))  deallocate (kpep)
+      if (allocated(prepep))  deallocate (prepep)
+      if (allocated(dmppep))  deallocate (dmppep)
+      if (allocated(lpep))  deallocate (lpep)
+      if (allocated(polscale))  deallocate (polscale)
+      if (allocated(invpolscale))  deallocate (invpolscale)
+c
 c     deallocation of global arrays from module faces
 c
       if (allocated(ar))  deallocate (ar)
@@ -558,6 +569,13 @@ c     deallocation of global arrays from module kdsp
 c
       if (allocated(dspsix))  deallocate (dspsix)
       if (allocated(dspdmp))  deallocate (dspdmp)
+c
+c     deallocation of global arrays from module kexpl
+c
+      if (allocated(pepk))  deallocate (pepk)
+      if (allocated(peppre))  deallocate (peppre)
+      if (allocated(pepdmp))  deallocate (pepdmp)
+      if (allocated(pepl))  deallocate (pepl)
 c
 c     deallocation of global arrays from module khbond
 c

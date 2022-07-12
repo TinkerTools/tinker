@@ -12,8 +12,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "prtint" writes out a set of Z-matrix internal
-c     coordinates to an external disk file
+c     "prtint" writes out a set of Z-matrix internal coordinates
+c     to an external disk file in Tinker INT format
 c
 c
       subroutine prtint (izmt)

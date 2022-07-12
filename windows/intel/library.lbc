@@ -2,6 +2,7 @@ action.obj
 active.obj
 align.obj
 alterchg.obj
+alterpol.obj
 analysis.obj
 analyz.obj
 angang.obj
@@ -60,6 +61,7 @@ dcflux.obj
 deflate.obj
 delete.obj
 deriv.obj
+dexpol.obj
 diagq.obj
 diffeq.obj
 dipole.obj
@@ -198,6 +200,7 @@ eurey2.obj
 eurey3.obj
 evcorr.obj
 ewald.obj
+expol.obj
 extra.obj
 extra1.obj
 extra2.obj
@@ -286,6 +289,8 @@ kdipole.obj
 kdisp.obj
 kdsp.obj
 kewald.obj
+kexpl.obj
+kexpol.obj
 kextra.obj
 keys.obj
 kgeom.obj
@@ -406,6 +411,7 @@ predict.obj
 pressure.obj
 prmkey.obj
 promo.obj
+prtdcd.obj
 prtdyn.obj
 prterr.obj
 prtint.obj
