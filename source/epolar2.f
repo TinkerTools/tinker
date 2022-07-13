@@ -2505,7 +2505,7 @@ c
          call torque (ii,tep,fix,fiy,fiz,dep)
       end do
 c
-c     modify the gradient and virial for charge flux
+c     modify the gradient components for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
@@ -2518,6 +2518,12 @@ c
             dep(2,i) = dep(2,i) + frcy
             dep(3,i) = dep(3,i) + frcz
          end do
+      end if
+c
+c     modify the gradient components for exchange polarization
+c
+      if (use_expol) then
+         call dexpol
       end if
 c
 c     perform deallocation of some local arrays

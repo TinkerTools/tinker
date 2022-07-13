@@ -67,7 +67,6 @@ c
       integer jcell
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
-      real*8 det
       real*8 sizi,sizk,sizik
       real*8 alphai,alphak
       real*8 springi,springk
@@ -76,7 +75,6 @@ c
       real*8 ks2i(3,3)
       real*8 ks2k(3,3)
       real*8 taper
-      real*8 ps(3,3)
       real*8, allocatable :: pscale(:)
       logical epli,eplk
       character*6 mode
@@ -330,26 +328,15 @@ c
          end do
       end if
 c
-c     invert polscale matrix
+c     find inverse of the polarizability scaling matrix
 c
       do ii = 1, npole
          do j = 1, 3
             do m = 1, 3
-               ps(j,m) = polscale(j,m,ii)
+               invpolscale(j,m,ii) = polscale(j,m,ii)
             end do
          end do
-         det = ps(1,1)*(ps(2,2)*ps(3,3) - ps(3,2)*ps(2,3))
-     &       - ps(1,2)*(ps(2,1)*ps(3,3) - ps(2,3)*ps(3,1))
-     &       + ps(1,3)*(ps(2,1)*ps(3,2) - ps(2,2)*ps(3,1))
-         invpolscale(1,1,ii) = (ps(2,2)*ps(3,3)-ps(3,2)*ps(2,3))/det
-         invpolscale(1,2,ii) = (ps(1,3)*ps(3,2)-ps(1,2)*ps(3,3))/det
-         invpolscale(1,3,ii) = (ps(1,2)*ps(2,3)-ps(1,3)*ps(2,2))/det
-         invpolscale(2,1,ii) = (ps(2,3)*ps(3,1)-ps(2,1)*ps(3,3))/det
-         invpolscale(2,2,ii) = (ps(1,1)*ps(3,3)-ps(1,3)*ps(3,1))/det
-         invpolscale(2,3,ii) = (ps(2,1)*ps(1,3)-ps(1,1)*ps(2,3))/det
-         invpolscale(3,1,ii) = (ps(2,1)*ps(3,2)-ps(3,1)*ps(2,2))/det
-         invpolscale(3,2,ii) = (ps(3,1)*ps(1,2)-ps(1,1)*ps(3,2))/det
-         invpolscale(3,3,ii) = (ps(1,1)*ps(2,2)-ps(2,1)*ps(1,2))/det
+         call invert (3,invpolscale(1,1,ii))
       end do
 c
 c     perform deallocation of some local arrays
@@ -385,7 +372,6 @@ c
       integer ii,kk,kkk
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
-      real*8 det
       real*8 sizi,sizk,sizik
       real*8 alphai,alphak
       real*8 springi,springk
@@ -394,7 +380,6 @@ c
       real*8 ks2i(3,3)
       real*8 ks2k(3,3)
       real*8 taper
-      real*8 ps(3,3)
       real*8, allocatable :: pscale(:)
       logical epli,eplk
       character*6 mode
@@ -549,27 +534,16 @@ c
       end do
 !$OMP END DO
 c
-c     invert polscale matrix
+c     find inverse of the polarizability scaling matrix
 c
 !$OMP DO schedule(guided)
       do ii = 1, npole
          do j = 1, 3
             do m = 1, 3
-               ps(j,m) = polscale(j,m,ii)
+               invpolscale(j,m,ii) = polscale(j,m,ii)
             end do
          end do
-         det = ps(1,1)*(ps(2,2)*ps(3,3) - ps(3,2)*ps(2,3))
-     &            - ps(1,2)*(ps(2,1)*ps(3,3) - ps(2,3)*ps(3,1))
-     &            + ps(1,3)*(ps(2,1)*ps(3,2) - ps(2,2)*ps(3,1))
-         invpolscale(1,1,ii) = (ps(2,2)*ps(3,3)-ps(3,2)*ps(2,3))/det
-         invpolscale(1,2,ii) = (ps(1,3)*ps(3,2)-ps(1,2)*ps(3,3))/det
-         invpolscale(1,3,ii) = (ps(1,2)*ps(2,3)-ps(1,3)*ps(2,2))/det
-         invpolscale(2,1,ii) = (ps(2,3)*ps(3,1)-ps(2,1)*ps(3,3))/det
-         invpolscale(2,2,ii) = (ps(1,1)*ps(3,3)-ps(1,3)*ps(3,1))/det
-         invpolscale(2,3,ii) = (ps(2,1)*ps(1,3)-ps(1,1)*ps(2,3))/det
-         invpolscale(3,1,ii) = (ps(2,1)*ps(3,2)-ps(3,1)*ps(2,2))/det
-         invpolscale(3,2,ii) = (ps(3,1)*ps(1,2)-ps(1,1)*ps(3,2))/det
-         invpolscale(3,3,ii) = (ps(1,1)*ps(2,2)-ps(2,1)*ps(1,2))/det
+         call invert (3,invpolscale(1,1,ii))
       end do
 !$OMP END DO
 !$OMP END PARALLEL
