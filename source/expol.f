@@ -12,13 +12,13 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     nexpol       total number of exch polarization sites in system
-c     kpep         exchange polarization spring constant at each site
-c     prepep       exchange polarization prefactor at each site
-c     dmppep       exchange polarization damping alpha at each site
-c     polscale     scale matrix for use in exchange polarization
-c     invpolscale  scale matrix inverse for exchange polarization
-c     lpep         exchange polarization logical at each site
+c     nexpol     total number of exch polarization sites in system
+c     kpep       exchange polarization spring constant at each site
+c     prepep     exchange polarization prefactor at each site
+c     dmppep     exchange polarization damping alpha at each site
+c     polscale   scale matrix for use in exchange polarization
+c     polinv     scale matrix inverse for exchange polarization
+c     lpep       flag to use exchange polarization at each site
 c
 c
       module expol
@@ -28,7 +28,7 @@ c
       real*8, allocatable :: prepep(:)
       real*8, allocatable :: dmppep(:)
       real*8, allocatable :: polscale(:,:,:)
-      real*8, allocatable :: invpolscale(:,:,:)
+      real*8, allocatable :: polinv(:,:,:)
       logical, allocatable :: lpep(:)
       save
       end

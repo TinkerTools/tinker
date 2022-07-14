@@ -231,7 +231,7 @@ c
          else if (douind(ipole(i)) .and. use_expol) then
             do j = 1, 3
                do k = 1, 3
-                  expoli(j,k,i) = polarity(i)*invpolscale(j,k,i)
+                  expoli(j,k,i) = polarity(i) * polinv(j,k,i)
                end do
             end do
             do j = 1, 3
@@ -376,19 +376,19 @@ c
                do j = 1, 3
                   if (pcgguess) then
                      if (use_expol) then
-                        rsd(j,i) = udir(j,i)/poli(i)
-     &                           -uind(1,i)*expoli(j,1,i)
-     &                           -uind(2,i)*expoli(j,2,i)
-     &                           -uind(3,i)*expoli(j,3,i) + field(j,i)
-                        rsdp(j,i) = udirp(j,i)/poli(i)
-     &                           -uinp(1,i)*expoli(j,1,i)
-     &                           -uinp(2,i)*expoli(j,2,i)
-     &                           -uinp(3,i)*expoli(j,3,i) + fieldp(j,i)
+                        rsd(j,i) = udir(j,i)/poli(i) + field(j,i)
+     &                                 - uind(1,i)*expoli(j,1,i)
+     &                                 - uind(2,i)*expoli(j,2,i)
+     &                                 - uind(3,i)*expoli(j,3,i)
+                        rsdp(j,i) = udirp(j,i)/poli(i) + fieldp(j,i)
+     &                                 - uinp(1,i)*expoli(j,1,i)
+     &                                 - uinp(2,i)*expoli(j,2,i)
+     &                                 - uinp(3,i)*expoli(j,3,i)
                      else
-	                     rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
-     &                              + field(j,i)
+	                rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+     &                                 + field(j,i)
                         rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
-     &                              + fieldp(j,i)
+     &                                 + fieldp(j,i)
                      end if
                   else
                      rsd(j,i) = udir(j,i) / poli(i)
@@ -466,11 +466,13 @@ c
                      uinp(j,i) = vecp(j,i)
                      if (use_expol) then
                         vec(j,i) = conj(1,i)*expoli(j,1,i)
-     &                        + conj(2,i)*expoli(j,2,i)
-     &                        + conj(3,i)*expoli(j,3,i) - field(j,i)
+     &                                + conj(2,i)*expoli(j,2,i)
+     &                                + conj(3,i)*expoli(j,3,i)
+     &                                - field(j,i)
                         vecp(j,i) = conjp(1,i)*expoli(j,1,i)
-     &                         + conjp(2,i)*expoli(j,2,i)
-     &                         + conjp(3,i)*expoli(j,3,i) - fieldp(j,i)
+     &                                 + conjp(2,i)*expoli(j,2,i)
+     &                                 + conjp(3,i)*expoli(j,3,i)
+     &                                 - fieldp(j,i)
                      else
                         vec(j,i) = conj(j,i)/poli(i) - field(j,i)
                         vecp(j,i) = conjp(j,i)/poli(i) - fieldp(j,i)

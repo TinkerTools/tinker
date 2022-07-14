@@ -13,21 +13,21 @@ c     ###############################################################
 c
 c
 c     "prtdcd" writes out a set of Cartesian coordinates to an
-c     external disk file in CHARMM/XPLOR DCD binary format compatible
+c     external disk file in CHARMM DCD binary format compatible
 c     with the VMD visualization software and other packages
 c
 c     note the format used is based on the "dcdplugin.c" code from
-c     the NAMD and VMD packages, and tutorial 4.1 from the software
+c     the NAMD and VMD programs, and tutorial 4.1 from the software
 c     package GENESIS: Generalized-Ensemble Simulation System
 c
 c     variables and parameters:
 c
 c     header     type of data (CORD=coordinates, VELD=velocities)
-c     nframe     number of frames stored in the binary file
+c     nframe     number of frames stored in the DCD file
 c     nprev      number of previous integration steps
-c     ncrdsav    frequency for the saving of data frames
+c     ncrdsav    frequency in steps for saving coordinate frames
 c     nstep      number of integration steps in the total run
-c     nvelsav    frequency of coordinate saves in velocity trajectory
+c     nvelsav    frequency of coordinate saves with velocity data
 c     ndfree     number of degrees of freedom for the system
 c     nfixat     number of fixed atoms for the system
 c     usebox     flag for writing box size (1=true, 0=false)
@@ -37,11 +37,12 @@ c     merged     result of merge without checks (1=true, 0=false)
 c     vcharmm    version of CHARMM software for compatibility
 c
 c     in general a value of zero for any of the above indicates that
-c     a particular feature is unused
+c     the particular feature is unused
 c
 c
       subroutine prtdcd (idcd)
       use atoms
+      use bound
       use boxes
       use files
       use titles
@@ -55,7 +56,7 @@ c
       integer use4d,usefq
       integer merged,vcharmm
       integer ntitle
-      real*8 tdelta
+      real*4 tdelta
       logical opened
       character*4 header
       character*240 dcdfile
@@ -83,24 +84,30 @@ c
          nvelsav = zero
          ndfree = zero
          nfixat = zero
-         tdelta = 0.0d0
-         usebox = one
+         tdelta = 0.0
+         usebox = zero
+         if (use_bounds)  usebox = one
          use4d = zero
          usefq = zero
          merged = zero
          vcharmm = 24
          ntitle = one
          write (idcd)  header,nframe,nprev,ncrdsav,nstep,
-     &                 nvelsav,ndfree,nfixat,tdelta,usebox,
-     &                 use4d,usefq,merged,zero,zero,zero,
-     &                 zero,zero,vcharmm
+     &                 nvelsav,zero,zero,ndfree,nfixat,
+     &                 tdelta,usebox,use4d,usefq,merged,
+     &                 zero,zero,zero,zero,zero,vcharmm
          write (idcd)  ntitle,title(1:80)
          write (idcd)  n
       end if
 c
-c     append the periodic cell size and atomic coordinates
+c     append the lattice values based on header flag value
 c
-      write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+      if (use_bounds) then
+         write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+      end if
+c
+c     append the atomic coordinates along each axis in turn
+c
       write (idcd)  (real(x(i)),i=1,n)
       write (idcd)  (real(y(i)),i=1,n)
       write (idcd)  (real(z(i)),i=1,n)

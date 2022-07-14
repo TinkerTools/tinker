@@ -359,7 +359,7 @@ c
       if (allocated(dmppep))  deallocate (dmppep)
       if (allocated(lpep))  deallocate (lpep)
       if (allocated(polscale))  deallocate (polscale)
-      if (allocated(invpolscale))  deallocate (invpolscale)
+      if (allocated(polinv))  deallocate (polinv)
 c
 c     deallocation of global arrays from module faces
 c

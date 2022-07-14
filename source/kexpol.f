@@ -93,13 +93,13 @@ c
       if (allocated(dmppep))  deallocate (dmppep)
       if (allocated(lpep))  deallocate (lpep)
       if (allocated(polscale))  deallocate (polscale)
-      if (allocated(invpolscale))  deallocate (invpolscale)
+      if (allocated(polinv))  deallocate (polinv)
       allocate (kpep(n))
       allocate (prepep(n))
       allocate (dmppep(n))
       allocate (lpep(n))
       allocate (polscale(3,3,n))
-      allocate (invpolscale(3,3,n))
+      allocate (polinv(3,3,n))
 c
 c     assign the spring constant, prefactor and alpha parameters
 c

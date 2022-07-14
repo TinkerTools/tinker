@@ -89,7 +89,7 @@ c
       mode = 'REPULS'
       call switch (mode)
 c
-c     set polscale and invpolscale to the identity matrix
+c     set polarizability tensor scaling to the identity matrix
 c
       do i = 1, npole
          polscale(1,1,i) = 1.0d0
@@ -101,15 +101,15 @@ c
          polscale(1,3,i) = 0.0d0
          polscale(2,3,i) = 0.0d0
          polscale(3,3,i) = 1.0d0
-         invpolscale(1,1,i) = 1.0d0
-         invpolscale(2,1,i) = 0.0d0
-         invpolscale(3,1,i) = 0.0d0
-         invpolscale(1,2,i) = 0.0d0
-         invpolscale(2,2,i) = 1.0d0
-         invpolscale(3,2,i) = 0.0d0
-         invpolscale(1,3,i) = 0.0d0
-         invpolscale(2,3,i) = 0.0d0
-         invpolscale(3,3,i) = 1.0d0
+         polinv(1,1,i) = 1.0d0
+         polinv(2,1,i) = 0.0d0
+         polinv(3,1,i) = 0.0d0
+         polinv(1,2,i) = 0.0d0
+         polinv(2,2,i) = 1.0d0
+         polinv(3,2,i) = 0.0d0
+         polinv(1,3,i) = 0.0d0
+         polinv(2,3,i) = 0.0d0
+         polinv(3,3,i) = 1.0d0
       end do
 c
 c     set array needed to scale atom and group interactions
@@ -133,28 +133,28 @@ c
             pscale(i12(j,i)) = p2scale
             do k = 1, np11(i)
                if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
+     &            pscale(i12(j,i)) = p2iscale
             end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
             do k = 1, np11(i)
                if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
+     &            pscale(i13(j,i)) = p3iscale
             end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
             do k = 1, np11(i)
                if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
+     &            pscale(i15(j,i)) = p5iscale
             end do
          end do
 c
@@ -163,7 +163,7 @@ c
          do kk = ii+1, npole
             k = ipole(kk)
             eplk = lpep(kk)
-            if (epli.or.eplk) then
+            if (epli .or. eplk) then
                xr = x(k) - x(i)
                yr = y(k) - y(i)
                zr = z(k) - z(i)
@@ -174,7 +174,7 @@ c
                   springk = kpep(kk)
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
-                  sizik = sizi*sizk
+                  sizik = sizi * sizk
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -187,13 +187,13 @@ c
      &                          + c2*r2 + c1*r + c0
                      s2 = s2 * taper
                   end if
-                  p33i = springi*s2*pscale(k)
-                  p33k = springk*s2*pscale(k)
+                  p33i = springi * s2 * pscale(k)
+                  p33k = springk * s2 * pscale(k)
                   call rotexpl (xr,yr,zr,p33i,p33k,ks2i,ks2k)
                   do j = 1, 3
                      do m = 1, 3
-                        polscale(j,m,ii) = polscale(j,m,ii)+ks2i(j,m)
-                        polscale(j,m,kk) = polscale(j,m,kk)+ks2k(j,m)
+                        polscale(j,m,ii) = polscale(j,m,ii) + ks2i(j,m)
+                        polscale(j,m,kk) = polscale(j,m,kk) + ks2k(j,m)
                      end do
                   end do
                end if
@@ -266,7 +266,7 @@ c
             do kk = ii, npole
                k = ipole(kk)
                eplk = lpep(kk)
-               if (epli.or.eplk) then
+               if (epli .or. eplk) then
                   do jcell = 2, ncell
                      xr = x(k) - x(i)
                      yr = y(k) - y(i)
@@ -278,7 +278,7 @@ c
                         springk = kpep(kk)
                         sizk = prepep(kk)
                         alphak = dmppep(kk)
-                        sizik = sizi*sizk
+                        sizik = sizi * sizk
                         call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -288,22 +288,22 @@ c
                            r4 = r2 * r2
                            r5 = r2 * r3
                            taper = c5*r5 + c4*r4 + c3*r3
-     &                          + c2*r2 + c1*r + c0
+     &                                + c2*r2 + c1*r + c0
                            s2 = s2 * taper
                         end if
 c
 c     interaction of an atom with its own image counts half
 c
                         if (i .eq. k)  s2 = 0.5d0 * s2
-                        p33i = springi*s2*pscale(k)
-                        p33k = springk*s2*pscale(k)
+                        p33i = springi * s2 * pscale(k)
+                        p33k = springk * s2 * pscale(k)
                         call rotexpl (xr,yr,zr,p33i,p33k,ks2i,ks2k)
                         do j = 1, 3
                            do m = 1, 3
                               polscale(j,m,ii) = polscale(j,m,ii)
-     &                                            + ks2i(j,m)
+     &                                              + ks2i(j,m)
                               polscale(j,m,kk) = polscale(j,m,kk)
-     &                                            + ks2k(j,m)
+     &                                              + ks2k(j,m)
                            end do
                         end do
                      end if
@@ -333,10 +333,10 @@ c
       do ii = 1, npole
          do j = 1, 3
             do m = 1, 3
-               invpolscale(j,m,ii) = polscale(j,m,ii)
+               polinv(j,m,ii) = polscale(j,m,ii)
             end do
          end do
-         call invert (3,invpolscale(1,1,ii))
+         call invert (3,polinv(1,1,ii))
       end do
 c
 c     perform deallocation of some local arrays
@@ -394,7 +394,7 @@ c
       mode = 'REPULS'
       call switch (mode)
 c
-c     set polscale and invpolscale to the identity matrix
+c     set polarizability tensor scaling to the identity matrix
 c
       do i = 1, npole
          polscale(1,1,i) = 1.0d0
@@ -406,15 +406,15 @@ c
          polscale(1,3,i) = 0.0d0
          polscale(2,3,i) = 0.0d0
          polscale(3,3,i) = 1.0d0
-         invpolscale(1,1,i) = 1.0d0
-         invpolscale(2,1,i) = 0.0d0
-         invpolscale(3,1,i) = 0.0d0
-         invpolscale(1,2,i) = 0.0d0
-         invpolscale(2,2,i) = 1.0d0
-         invpolscale(3,2,i) = 0.0d0
-         invpolscale(1,3,i) = 0.0d0
-         invpolscale(2,3,i) = 0.0d0
-         invpolscale(3,3,i) = 1.0d0
+         polinv(1,1,i) = 1.0d0
+         polinv(2,1,i) = 0.0d0
+         polinv(3,1,i) = 0.0d0
+         polinv(1,2,i) = 0.0d0
+         polinv(2,2,i) = 1.0d0
+         polinv(3,2,i) = 0.0d0
+         polinv(1,3,i) = 0.0d0
+         polinv(2,3,i) = 0.0d0
+         polinv(3,3,i) = 1.0d0
       end do
 c
 c     set array needed to scale atom and group interactions
@@ -429,7 +429,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,kpep,prepep,dmppep,lpep,np11,ip11,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,p2scale,p3scale,p4scale,p5scale,
 !$OMP& p2iscale,p3iscale,p4iscale,p5iscale,nelst,elst,use_bounds,
-!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,invpolscale)
+!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv)
 !$OMP& firstprivate(pscale)
 !$OMP& shared (polscale)
 !$OMP DO reduction(+:polscale) schedule(guided)
@@ -480,7 +480,7 @@ c
             kk = elst(kkk,ii)
             k = ipole(kk)
             eplk = lpep(kk)
-            if (epli.or.eplk) then
+            if (epli .or. eplk) then
                xr = x(k) - x(i)
                yr = y(k) - y(i)
                zr = z(k) - z(i)
@@ -491,7 +491,7 @@ c
                   springk = kpep(kk)
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
-                  sizik = sizi*sizk
+                  sizik = sizi * sizk
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -540,10 +540,10 @@ c
       do ii = 1, npole
          do j = 1, 3
             do m = 1, 3
-               invpolscale(j,m,ii) = polscale(j,m,ii)
+               polinv(j,m,ii) = polscale(j,m,ii)
             end do
          end do
-         call invert (3,invpolscale(1,1,ii))
+         call invert (3,polinv(1,1,ii))
       end do
 !$OMP END DO
 !$OMP END PARALLEL

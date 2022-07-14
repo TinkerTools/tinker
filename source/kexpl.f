@@ -12,10 +12,10 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     pepk       exch-polarization spring constant for each atom type
-c     peppre     exch-polarization prefactor for each atom type
-c     pepdmp     exch-polarization damping alpha for each atom type
-c     pepl       exch-polarization logical flag for each atom type
+c     pepk     exchange-polarization spring constant for atom classes
+c     peppre   exchange-polarization prefactor for atom classes
+c     pepdmp   exchange-polarization damping alpha for atom classes
+c     pepl     exchange-polarization logical flag for atom classes
 c
 c
       module kexpl

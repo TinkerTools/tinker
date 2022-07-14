@@ -64,13 +64,12 @@ c
       integer jcell
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
-      real*8 f
       real*8 sizi,sizk,sizik
       real*8 alphai,alphak
       real*8 springi,springk
-      real*8 s2,ds2
-      real*8 s2i, s2k
-      real*8 ds2i, ds2k
+      real*8 f,s2,ds2
+      real*8 s2i,s2k
+      real*8 ds2i,ds2k
       real*8 taper,dtaper
       real*8 uixl,ukxl
       real*8 uiyl,ukyl
@@ -111,7 +110,7 @@ c     find the exchange polarization gradient
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         springi = kpep(ii)/polarity(ii)
+         springi = kpep(ii) / polarity(ii)
          sizi = prepep(ii)
          alphai = dmppep(ii)
          epli = lpep(ii)
@@ -122,28 +121,28 @@ c
             pscale(i12(j,i)) = p2scale
             do k = 1, np11(i)
                if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
+     &            pscale(i12(j,i)) = p2iscale
             end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
             do k = 1, np11(i)
                if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
+     &            pscale(i13(j,i)) = p3iscale
             end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
             do k = 1, np11(i)
                if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
+     &            pscale(i15(j,i)) = p5iscale
             end do
          end do
 c
@@ -152,7 +151,7 @@ c
          do kk = ii+1, npole
             k = ipole(kk)
             eplk = lpep(kk)
-            if (epli.or.eplk) then
+            if (epli .or. eplk) then
                xr = x(k) - x(i)
                yr = y(k) - y(i)
                zr = z(k) - z(i)
@@ -163,7 +162,7 @@ c
                   springk = kpep(kk)/polarity(kk)
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
-                  sizik = sizi*sizk
+                  sizik = sizi * sizk
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -179,10 +178,10 @@ c
                      ds2 = ds2*taper + s2*dtaper
                      s2 = s2 * taper
                   end if
-                  s2i = springi*s2*pscale(k)
-                  s2k = springk*s2*pscale(k)
-                  ds2i = springi*ds2*pscale(k)
-                  ds2k = springk*ds2*pscale(k)
+                  s2i = springi * s2 * pscale(k)
+                  s2k = springk * s2 * pscale(k)
+                  ds2i = springi * ds2 * pscale(k)
+                  ds2k = springk * ds2 * pscale(k)
                   call rotdexpl (xr,yr,zr,ai,ak)
                   uixl = 0.0d0
                   ukxl = 0.0d0
@@ -203,9 +202,9 @@ c
 c
 c     compute torque in local frame
 c
-                  tqxil =  2.0d0 * uiyl * uizl * s2i
+                  tqxil = 2.0d0 * uiyl * uizl * s2i
                   tqyil = -2.0d0 * uixl * uizl * s2i
-                  tqxkl =  2.0d0 * ukyl * ukzl * s2k
+                  tqxkl = 2.0d0 * ukyl * ukzl * s2k
                   tqykl = -2.0d0 * ukxl * ukzl * s2k
 c
 c     convert torque to forces
@@ -231,9 +230,9 @@ c
                      frcyk = frcyk + ak(j,2)*frckl(j)
                      frczk = frczk + ak(j,3)*frckl(j)
                   end do
-                  frcx = f*(frcxk-frcxi)
-                  frcy = f*(frcyk-frcyi)
-                  frcz = f*(frczk-frczi)
+                  frcx = f * (frcxk-frcxi)
+                  frcy = f * (frcyk-frcyi)
+                  frcz = f * (frczk-frczi)
 c
 c     increment force-based gradient on the interaction sites
 c
@@ -290,7 +289,7 @@ c     calculate interaction components with other unit cells
 c
          do ii = 1, npole
             i = ipole(ii)
-            springi = kpep(ii)/polarity(ii)
+            springi = kpep(ii) / polarity(ii)
             sizi = prepep(ii)
             alphai = dmppep(ii)
             epli = lpep(ii)
@@ -331,7 +330,7 @@ c
             do kk = ii, npole
                k = ipole(kk)
                eplk = lpep(kk)
-               if (epli.or.eplk) then
+               if (epli .or. eplk) then
                   do jcell = 2, ncell
                      xr = x(k) - x(i)
                      yr = y(k) - y(i)
@@ -340,10 +339,10 @@ c
                      r2 = xr*xr + yr*yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        springk = kpep(kk)/polarity(kk)
+                        springk = kpep(kk) / polarity(kk)
                         sizk = prepep(kk)
                         alphak = dmppep(kk)
-                        sizik = sizi*sizk
+                        sizik = sizi * sizk
                         call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -353,9 +352,9 @@ c
                            r4 = r2 * r2
                            r5 = r2 * r3
                            taper = c5*r5 + c4*r4 + c3*r3
-     &                          + c2*r2 + c1*r + c0
+     &                                + c2*r2 + c1*r + c0
                            dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
-     &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+     &                                 + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
                            ds2 = ds2*taper + s2*dtaper
                            s2 = s2 * taper
                         end if
@@ -366,10 +365,10 @@ c
                            s2 = 0.5d0 * s2
                            ds2 = 0.5d0 * ds2
                         end if
-                        s2i = springi*s2*pscale(k)
-                        s2k = springk*s2*pscale(k)
-                        ds2i = springi*ds2*pscale(k)
-                        ds2k = springk*ds2*pscale(k)
+                        s2i = springi * s2 * pscale(k)
+                        s2k = springk * s2 * pscale(k)
+                        ds2i = springi * ds2 * pscale(k)
+                        ds2k = springk * ds2 * pscale(k)
                         call rotdexpl (xr,yr,zr,ai,ak)
                         uixl = 0.0d0
                         ukxl = 0.0d0
@@ -390,9 +389,9 @@ c
 c
 c     compute torque in local frame
 c
-                        tqxil =  2.0d0 * uiyl * uizl * s2i
+                        tqxil = 2.0d0 * uiyl * uizl * s2i
                         tqyil = -2.0d0 * uixl * uizl * s2i
-                        tqxkl =  2.0d0 * ukyl * ukzl * s2k
+                        tqxkl = 2.0d0 * ukyl * ukzl * s2k
                         tqykl = -2.0d0 * ukxl * ukzl * s2k
 c
 c     convert torque to forces
@@ -418,9 +417,9 @@ c
                            frcyk = frcyk + ak(j,2)*frckl(j)
                            frczk = frczk + ak(j,3)*frckl(j)
                         end do
-                        frcx = f*(frcxk-frcxi)
-                        frcy = f*(frcyk-frcyi)
-                        frcz = f*(frczk-frczi)
+                        frcx = f * (frcxk-frcxi)
+                        frcy = f * (frcyk-frcyi)
+                        frcz = f * (frczk-frczi)
 c
 c     increment force-based gradient on the interaction sites
 c
@@ -508,9 +507,8 @@ c
       integer ii,kk,kkk
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
-      real*8 f
       real*8 sizi,sizk,sizik
-      real*8 alphai,alphak
+      real*8 f,alphai,alphak
       real*8 springi,springk
       real*8 s2,ds2
       real*8 s2i, s2k
@@ -566,7 +564,7 @@ c     find the exchange polarization gradient
 c
       do ii = 1, npole
          i = ipole(ii)
-         springi = kpep(ii)/polarity(ii)
+         springi = kpep(ii) / polarity(ii)
          sizi = prepep(ii)
          alphai = dmppep(ii)
          epli = lpep(ii)
@@ -577,28 +575,28 @@ c
             pscale(i12(j,i)) = p2scale
             do k = 1, np11(i)
                if (i12(j,i) .eq. ip11(k,i))
-     &               pscale(i12(j,i)) = p2iscale
+     &            pscale(i12(j,i)) = p2iscale
             end do
          end do
          do j = 1, n13(i)
             pscale(i13(j,i)) = p3scale
             do k = 1, np11(i)
                if (i13(j,i) .eq. ip11(k,i))
-     &               pscale(i13(j,i)) = p3iscale
+     &            pscale(i13(j,i)) = p3iscale
             end do
          end do
          do j = 1, n14(i)
             pscale(i14(j,i)) = p4scale
             do k = 1, np11(i)
                if (i14(j,i) .eq. ip11(k,i))
-     &               pscale(i14(j,i)) = p4iscale
+     &            pscale(i14(j,i)) = p4iscale
             end do
          end do
          do j = 1, n15(i)
             pscale(i15(j,i)) = p5scale
             do k = 1, np11(i)
                if (i15(j,i) .eq. ip11(k,i))
-     &               pscale(i15(j,i)) = p5iscale
+     &            pscale(i15(j,i)) = p5iscale
             end do
          end do
 c
@@ -608,7 +606,7 @@ c
             kk = elst(kkk,ii)
             k = ipole(kk)
             eplk = lpep(kk)
-            if (epli.or.eplk) then
+            if (epli .or. eplk) then
                xr = x(k) - x(i)
                yr = y(k) - y(i)
                zr = z(k) - z(i)
@@ -616,10 +614,10 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(kk)/polarity(kk)
+                  springk = kpep(kk) / polarity(kk)
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
-                  sizik = sizi*sizk
+                  sizik = sizi * sizk
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -635,10 +633,10 @@ c
                      ds2 = ds2*taper + s2*dtaper
                      s2 = s2 * taper
                   end if
-                  s2i = springi*s2*pscale(k)
-                  s2k = springk*s2*pscale(k)
-                  ds2i = springi*ds2*pscale(k)
-                  ds2k = springk*ds2*pscale(k)
+                  s2i = springi * s2 * pscale(k)
+                  s2k = springk * s2 * pscale(k)
+                  ds2i = springi * ds2 * pscale(k)
+                  ds2k = springk * ds2 * pscale(k)
                   call rotdexpl (xr,yr,zr,ai,ak)
                   uixl = 0.0d0
                   ukxl = 0.0d0
@@ -659,9 +657,9 @@ c
 c
 c     compute torque in local frame
 c
-                  tqxil =  2.0d0 * uiyl * uizl * s2i
+                  tqxil = 2.0d0 * uiyl * uizl * s2i
                   tqyil = -2.0d0 * uixl * uizl * s2i
-                  tqxkl =  2.0d0 * ukyl * ukzl * s2k
+                  tqxkl = 2.0d0 * ukyl * ukzl * s2k
                   tqykl = -2.0d0 * ukxl * ukzl * s2k
 c
 c     convert torque to forces
@@ -687,9 +685,9 @@ c
                      frcyk = frcyk + ak(j,2)*frckl(j)
                      frczk = frczk + ak(j,3)*frckl(j)
                   end do
-                  frcx = f*(frcxk-frcxi)
-                  frcy = f*(frcyk-frcyi)
-                  frcz = f*(frczk-frczi)
+                  frcx = f * (frcxk-frcxi)
+                  frcy = f * (frcyk-frcyi)
+                  frcz = f * (frczk-frczi)
 c
 c     increment force-based gradient on the interaction sites
 c
@@ -764,9 +762,8 @@ c
       use polpot
       implicit none
       integer i,j
-      real*8 r,dot
-      real*8 eps
       real*8 xr,yr,zr
+      real*8 r,dot,eps
       real*8 dx,dy,dz
       real*8 ai(3,3)
       real*8 ak(3,3)
