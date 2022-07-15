@@ -1263,10 +1263,11 @@ c
       integer npoint
       integer nresid
       integer iresid
-      real*8 xi,yi,zi,pot
+      real*8 xi,yi,zi
+      real*8 pot,pval
       real*8 tscale,cscale
+      real*8 pscale,rscale
       real*8 rconf,ratio
-      real*8 rscale
       real*8 xx(*)
       real*8 resid(*)
       character*6 mode
@@ -1283,6 +1284,7 @@ c
       end do
       tscale = 300.0d0
       cscale = 10000.0d0
+      pscale = 10.0d0
 c
 c     set weight of electrostatic potential vs. parameter restraints
 c
@@ -1372,15 +1374,18 @@ c     get residuals due to deviation of initial parameters
 c
       do i = 1, nvar
          iresid = iresid + 1
-         if (resptyp .eq. 'ORIG') then
-            resid(iresid) = (xx(i)-fit0(i)) * rscale
-         else if (resptyp .eq. 'ZERO') then
-            resid(iresid) = xx(i) * rscale
-         else
-            resid(iresid) = 0.0d0
+         if (varpot(i) .ne. 'CHGPEN') then
+            if (resptyp .eq. 'ORIG') then
+               resid(iresid) = (xx(i)-fit0(i)) * rscale
+            else if (resptyp .eq. 'ZERO') then
+               resid(iresid) = xx(i) * rscale
+            else
+               resid(iresid) = 0.0d0
+            end if
          end if
          if (varpot(i) .eq. 'CHGPEN') then
-            resid(iresid) = 0.001d0 * resid(iresid)
+            pval = max(xx(i)-6.0d0,3.0d0-xx(i),0.0d0)
+            resid(iresid) = pval * pscale
          end if
       end do
       return
@@ -1651,11 +1656,12 @@ c
 c
 c     enforce integer net charge over partial charges
 c
+      ktype = 0
+      kval = 0
+      sum = 0.0d0
       do i = 1, maxtyp
          equiv(i) = 0
       end do
-      ktype = 0
-      sum = 0.0d0
       do i = 1, nion
          it = type(iion(i))
          equiv(it) = equiv(it) + 1
@@ -1709,11 +1715,12 @@ c
 c
 c     enforce integer net charge over atomic multipoles
 c
+      ktype = 0
+      kval = 0
+      sum = 0.0d0
       do i = 1, maxtyp
          equiv(i) = 0
       end do
-      ktype = 0
-      sum = 0.0d0
       do i = 1, npole
          it = type(ipole(i))
          equiv(it) = equiv(it) + 1

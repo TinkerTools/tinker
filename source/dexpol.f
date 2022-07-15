@@ -15,6 +15,13 @@ c
 c     "dexpol" computes the chain rule terms to account for variable
 c     polarizability in exchange polarization
 c
+c     literature reference:
+c
+c     M. K. J. Chung, Z. Wang, J. A. Rackers and J. W. Ponder,
+c     "Classical Exchange Polarization: An Anisotropic Variable
+c     Polarizability Model", Journal of Physical Chemistry B,
+c     submitted, June 2022
+c
 c
       subroutine dexpol
       use limits

@@ -1591,7 +1591,7 @@ c
          end do
       end do
 c
-c     maintain integer net charge over atomic multipoles
+c     enforce integer net charge over atomic multipoles
 c
       k = 0
       big = 0.0d0
@@ -1612,7 +1612,7 @@ c
       sum = sum - dble(nint(sum))
       if (k .ne. 0)  pole(1,k) = pole(1,k) - sum
 c
-c     maintain traceless quadrupole at each multipole site
+c     enforce traceless quadrupole at each multipole site
 c
       do i = 1, npole
          sum = pole(5,i) + pole(9,i) + pole(13,i)
