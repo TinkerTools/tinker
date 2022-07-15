@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -101,7 +101,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -131,7 +131,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -173,7 +173,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -190,55 +190,55 @@
  Path Point :           1
  Initial Point :                 20.8539
  Optimized Point :                9.0902
- Target-Energy Difference :   -0.593D-10
+ Target-Energy Difference :    0.178D-14
  Gradient along Path :            4.7502
 
  Path Point :           2
  Initial Point :                 19.3025
  Optimized Point :               11.6198
- Target-Energy Difference :   -0.895D-10
+ Target-Energy Difference :    0.711D-14
  Gradient along Path :            6.9728
 
  Path Point :           3
  Initial Point :                 18.5254
  Optimized Point :               14.5913
- Target-Energy Difference :   -0.911D-10
+ Target-Energy Difference :    0.000D+00
  Gradient along Path :            6.9556
 
  Path Point :           4
  Initial Point :                 18.6124
  Optimized Point :               17.1806
- Target-Energy Difference :   -0.694D-10
+ Target-Energy Difference :   -0.107D-13
  Gradient along Path :            5.2368
 
  Path Point :           5
  Initial Point :                 19.0138
  Optimized Point :               18.8095
- Target-Energy Difference :   -0.328D-10
+ Target-Energy Difference :   -0.107D-13
  Gradient along Path :            2.4642
 
  Path Point :           6
  Initial Point :                 19.3476
  Optimized Point :               19.1908
- Target-Energy Difference :    0.825D-11
- Gradient along Path :           -0.6223
+ Target-Energy Difference :    0.000D+00
+ Gradient along Path :           -0.6222
 
  Path Point :           7
  Initial Point :                 19.4698
  Optimized Point :               18.3564
- Target-Energy Difference :    0.424D-10
+ Target-Energy Difference :    0.711D-14
  Gradient along Path :           -3.2359
 
  Path Point :           8
  Initial Point :                 19.5348
  Optimized Point :               16.6715
- Target-Energy Difference :    0.586D-10
+ Target-Energy Difference :   -0.107D-13
  Gradient along Path :           -4.5667
 
  Path Point :           9
  Initial Point :                 20.0277
  Optimized Point :               14.8481
- Target-Energy Difference :    0.466D-10
+ Target-Energy Difference :    0.888D-14
  Gradient along Path :           -3.7427
 
      ######################################################################
@@ -246,7 +246,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -271,7 +271,7 @@
  TNCG  --  Normal Termination due to SmallGrad
 
  Final Function Value :           19.2176
- Final RMS Gradient :          0.7657D-04
+ Final RMS Gradient :          0.7658D-04
  Final Gradient Norm :         0.3249D-03
 
      ######################################################################
@@ -279,7 +279,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -293,7 +293,7 @@
     1    -7.247    2     0.000    3     0.000    4     0.000    5     0.000
     6     0.000    7     0.000    8     0.074    9    13.431   10    36.946
    11    52.559   12    63.153   13    83.494   14    88.633   15   105.859
-   16   106.412   17   115.806   18   116.539   19   117.481   20   124.810
+   16   106.412   17   115.806   18   116.539   19   117.481   20   124.811
    21   125.832   22   126.301   23   140.025   24   142.061   25   143.585
    26   159.069   27   171.290   28   210.747   29   219.746   30   242.370
    31   255.597   32   263.207   33   290.734   34   294.632   35   308.932
@@ -304,14 +304,14 @@
 
  Vibrational Frequencies (cm-1) :
 
-    1  -235.516    2     0.001    3     0.001    4     0.001    5     0.170
-    6     0.231    7     0.263    8    22.773    9   304.773   10   416.384
-   11   419.925   12   592.040   13   679.098   14   728.561   15   753.331
-   16   833.986   17   853.785   18   857.305   19   862.020   20   886.441
-   21  1008.327   22  1036.835   23  1066.684   24  1121.666   25  1191.616
-   26  1199.106   27  1228.536   28  1238.316   29  1292.161   30  1322.752
+    1  -235.516    2     0.001    3     0.001    4     0.001    5     0.156
+    6     0.209    7     0.234    8    22.772    9   304.773   10   416.384
+   11   419.925   12   592.040   13   679.098   14   728.560   15   753.331
+   16   833.986   17   853.784   18   857.305   19   862.020   20   886.441
+   21  1008.326   22  1036.835   23  1066.684   24  1121.666   25  1191.616
+   26  1199.106   27  1228.536   28  1238.315   29  1292.161   30  1322.752
    31  1343.021   32  1391.108   33  1403.746   34  1413.556   35  1422.556
    36  1427.099   37  1458.006   38  1465.785   39  1467.569   40  1483.806
-   41  1513.087   42  1522.540   43  2871.329   44  2880.042   45  2885.272
+   41  1513.087   42  1522.540   43  2871.330   44  2880.042   45  2885.272
    46  2893.430   47  2896.362   48  2904.999   49  2923.447   50  2929.674
-   51  2938.022   52  2938.165   53  2948.722   54  2950.474
+   51  2938.022   52  2938.166   53  2948.722   54  2950.474

@@ -1286,7 +1286,7 @@ c
       cscale = 10000.0d0
       pscale = 10.0d0
 c
-c     set weight of electrostatic potential vs. parameter restraints
+c     set electrostatic potential weight vs. parameter restraints
 c
       rconf = dble(nconf)
       ratio = dble(npoint) / dble(nvar*nconf)
@@ -1370,7 +1370,7 @@ c
          end if
       end do
 c
-c     get residuals due to deviation of initial parameters
+c     get residuals due to restraints on parameter values
 c
       do i = 1, nvar
          iresid = iresid + 1
@@ -1384,7 +1384,7 @@ c
             end if
          end if
          if (varpot(i) .eq. 'CHGPEN') then
-            pval = max(xx(i)-6.0d0,3.0d0-xx(i),0.0d0)
+            pval = max(xx(i)-6.0d0,2.5d0-xx(i),0.0d0)
             resid(iresid) = pval * pscale
          end if
       end do

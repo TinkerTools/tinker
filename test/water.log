@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -126,7 +126,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -191,14 +191,14 @@
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
      0      140.5753     725.3294     725.3294        10        11
-     1      118.4603     719.3052     719.3052        10        22
-     2       41.4173     309.4412     309.4412        10        34
-     3       17.2722     107.7582     107.7582        10        46
-     4       11.5837      33.3074      33.3074        10        57
-     5        9.4955      42.8249      42.8249        10        68
-     6        8.7793       1.7950       1.7950        10        79
-     7        8.7772       0.0230       0.0230        10        90
-     8        8.7772       0.0006       0.0006        10       101
+     1      119.4115     723.6750     723.6750        10        22
+     2       41.7725     311.6721     311.6721        10        34
+     3       17.3907     108.8212     108.8212        10        46
+     4       11.6276      33.7243      33.7243        10        57
+     5        9.5140      43.4609      43.4609        10        68
+     6        8.7785       1.8339       1.8339        10        79
+     7        8.7763       0.0235       0.0235        10        90
+     8        8.7763       0.0006       0.0006        10       101
 
  SQUARE  --  Normal Termination of Least Squares
 
@@ -226,8 +226,8 @@
      8              2 Type          YY-Quad          0.01662
     --              2 Type          YZ-Quad          0.00000          X
     --              2 Type          ZZ-Quad         -0.05654
-     9              1 Class         ChgPen           4.38108
-    10              2 Class         ChgPen           4.41377
+     9              1 Class         ChgPen           4.38110
+    10              2 Class         ChgPen           4.41368
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)

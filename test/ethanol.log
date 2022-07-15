@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -67,7 +67,7 @@
 
  Initial Torsional Parameters:
 
- torsion   40  40  36  37  -1.447   0.531   0.317   0.000   0.000   0.000
+ torsion   43  43  39  40  -1.447   0.531   0.317   0.000   0.000   0.000
  Fixed Torsion        1     5     8     9
 
  Fitting Torsion Number    1     Flag    0
@@ -212,4 +212,4 @@
 
  Optimized Torsional Parameters:
 
- torsion   40  40  36  37  -1.801 0.0 1    0.233 180.0 2    0.718 0.0 3
+ torsion   43  43  39  40  -1.801 0.0 1    0.233 180.0 2    0.718 0.0 3

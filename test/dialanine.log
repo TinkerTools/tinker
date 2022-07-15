@@ -4,7 +4,7 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.2   February 2022                      ##
+ ##                        Version 8.10.3   June 2022                        ##
  ##                                                                          ##
  ##               Copyright (c)  Jay William Ponder  1990-2022               ##
  ###                           All Rights Reserved                          ###
@@ -285,7 +285,7 @@
     Potential Surface Map       Minimum     22               -2.5235
 
     Search Direction   4           Step     17               -2.5235
-    Search Direction   5           Step     24              -12.2126
+    Search Direction   5           Step     24               -6.4833
     Search Direction   6                                      ------
     Search Direction   7           Step     12               -2.0823
     Search Direction   8           Step     12               -2.0823
