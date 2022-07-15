@@ -165,7 +165,6 @@ c
       real*8 a,ap,b,bp
       real*8 sum,sump,term
       real*8, allocatable :: poli(:)
-      real*8, allocatable :: expoli(:,:,:)
       real*8, allocatable :: field(:,:)
       real*8, allocatable :: fieldp(:,:)
       real*8, allocatable :: rsd(:,:)
@@ -196,7 +195,6 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (field(3,npole))
       allocate (fieldp(3,npole))
-      if (use_expol)  allocate (expoli(3,3,npole))
 c
 c     compute induced dipoles based on direct and mutual fields
 c
@@ -230,18 +228,15 @@ c
             end do
          else if (douind(ipole(i)) .and. use_expol) then
             do j = 1, 3
-               do k = 1, 3
-                  expoli(j,k,i) = polarity(i) * polinv(j,k,i)
-               end do
-            end do
-            do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
                if (pcgguess) then
-                  do k = 1, 3
-                     uind(j,i) = uind(j,i) + expoli(j,k,i)*field(k,i)
-                     uinp(j,i) = uinp(j,i) + expoli(j,k,i)*fieldp(k,i)
-                  end do
+                  uind(j,i) = polarity(i)*(polinv(j,1,i)*field(1,i)
+     &                                   + polinv(j,2,i)*field(2,i)
+     &                                   + polinv(j,3,i)*field(3,i))
+                  uinp(j,i) = polarity(i)*(polinv(j,1,i)*fieldp(1,i)
+     &                                   + polinv(j,2,i)*fieldp(2,i)
+     &                                   + polinv(j,3,i)*fieldp(3,i))
                end if
             end do
          end if
@@ -366,26 +361,21 @@ c
          do i = 1, npole
             if (douind(ipole(i))) then
                poli(i) = max(polmin,polarity(i))
-               if (use_expol) then
-                  do j = 1, 3
-                     do k = 1, 3
-                        expoli(j,k,i) = 1/poli(i)*polscale(j,k,i)
-                     end do
-                  end do
-               end if
                do j = 1, 3
                   if (pcgguess) then
                      if (use_expol) then
-                        rsd(j,i) = udir(j,i)/poli(i) + field(j,i)
-     &                                 - uind(1,i)*expoli(j,1,i)
-     &                                 - uind(2,i)*expoli(j,2,i)
-     &                                 - uind(3,i)*expoli(j,3,i)
-                        rsdp(j,i) = udirp(j,i)/poli(i) + fieldp(j,i)
-     &                                 - uinp(1,i)*expoli(j,1,i)
-     &                                 - uinp(2,i)*expoli(j,2,i)
-     &                                 - uinp(3,i)*expoli(j,3,i)
+                        rsd(j,i) = (udir(j,i)
+     &                            - uind(1,i)*polscale(j,1,i)
+     &                            - uind(2,i)*polscale(j,2,i)
+     &                            - uind(3,i)*polscale(j,3,i))/poli(i)
+     &                                 + field(j,i)
+                        rsdp(j,i) = (udirp(j,i)
+     &                            - uinp(1,i)*polscale(j,1,i)
+     &                            - uinp(2,i)*polscale(j,2,i)
+     &                            - uinp(3,i)*polscale(j,3,i))/poli(i)
+     &                                 + fieldp(j,i)
                      else
-	                rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
+	                     rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
      &                                 + field(j,i)
                         rsdp(j,i) = (udirp(j,i)-uinp(j,i))/poli(i)
      &                                 + fieldp(j,i)
@@ -465,13 +455,14 @@ c
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
                      if (use_expol) then
-                        vec(j,i) = conj(1,i)*expoli(j,1,i)
-     &                                + conj(2,i)*expoli(j,2,i)
-     &                                + conj(3,i)*expoli(j,3,i)
+                     
+                        vec(j,i) = (conj(1,i)*polscale(j,1,i)
+     &                            + conj(2,i)*polscale(j,2,i)
+     &                            + conj(3,i)*polscale(j,3,i))/poli(i)
      &                                - field(j,i)
-                        vecp(j,i) = conjp(1,i)*expoli(j,1,i)
-     &                                 + conjp(2,i)*expoli(j,2,i)
-     &                                 + conjp(3,i)*expoli(j,3,i)
+                        vecp(j,i) = (conjp(1,i)*polscale(j,1,i)
+     &                             + conjp(2,i)*polscale(j,2,i)
+     &                             + conjp(3,i)*polscale(j,3,i))/poli(i)
      &                                 - fieldp(j,i)
                      else
                         vec(j,i) = conj(j,i)/poli(i) - field(j,i)
@@ -621,7 +612,6 @@ c     perform deallocation of some local arrays
 c
       deallocate (field)
       deallocate (fieldp)
-      if (use_expol)  deallocate (expoli)
       return
       end
 c
