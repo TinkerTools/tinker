@@ -37,6 +37,7 @@ c
       integer next,mode
       integer nvar,nmodel
       integer nresid
+      integer numkey
       integer maxpgrd
       integer nglist,nflist
       integer freeunit
@@ -630,6 +631,7 @@ c
 c
 c     zero the keyfile length to avoid parameter reprocessing
 c
+         numkey = nkey
          nkey = 0
 c
 c     set residual count and optimization parameters with bounds
@@ -667,8 +669,10 @@ c
 c
 c     perform potential fit via least squares optimization
 c
+         nkey = numkey
          call square (nvar,nresid,xlo,xhi,xx,presid,gc,pjac,
      &                      grdmin,fitrsd,potwrt)
+         nkey = 0
 c
 c     set the final electrostatic parameter values
 c
@@ -1253,6 +1257,7 @@ c
 c
       subroutine fitrsd (nvar,nresid,xx,resid)
       use atoms
+      use keys
       use moment
       use mpole
       use neigh
@@ -1260,9 +1265,10 @@ c
       use potfit
       implicit none
       integer i,j,nvar
-      integer npoint
       integer nresid
+      integer npoint
       integer iresid
+      integer numkey
       real*8 xi,yi,zi
       real*8 pot,pval
       real*8 tscale,cscale
@@ -1305,6 +1311,11 @@ c
       do j = 1, maxclass
          fitcpen(j) = .false.
       end do
+c
+c     zero the keyfile length to avoid parameter reprocessing
+c
+      numkey = nkey
+      nkey = 0
 c
 c     find least squares residuals via loop over conformations
 c
@@ -1384,10 +1395,14 @@ c
             end if
          end if
          if (varpot(i) .eq. 'CHGPEN') then
-            pval = max(xx(i)-6.0d0,2.5d0-xx(i),0.0d0)
+            pval = max(xx(i)-6.5d0,2.5d0-xx(i),0.0d0)
             resid(iresid) = pval * pscale
          end if
       end do
+c
+c     reset the keyfile length to its original value
+c
+      nkey = numkey
       return
       end
 c

@@ -495,23 +495,16 @@ c
   100       format (/,' SQUARE  --  Normal Termination of',
      &                 ' Least Squares')
 c
-c     check the limit on the number of iterations
-c
-         else if (niter .ge. maxiter) then
-            done = .true.
-            write (iout,110)
-  110       format (/,' SQUARE  --  Incomplete Convergence due',
-     &                 ' to IterLimit')
-c
 c     check for termination due to relative function convergence
 c
          else if (icode .eq. 2) then
             done = .true.
-            write (iout,120)
-  120       format (/,' SQUARE  --  Relative Function Convergence')
+            write (iout,110)
+  110       format (/,' SQUARE  --  Successful Relative Function',
+     &                 ' Convergence')
             if (verbose) then
-               write (iout,130)
-  130          format (/,' Both the scaled actual and predicted',
+               write (iout,120)
+  120          format (/,' Both the scaled actual and predicted',
      &                    ' reductions in the function',
      &                 /,' are less than or equal to the relative',
      &                    ' convergence tolerance')
@@ -521,11 +514,11 @@ c     check for termination due to false convergence
 c
          else if (icode .eq. 3) then
             done = .true.
-            write (iout,140)
-  140       format (/,' SQUARE  --  Possible False Convergence')
+            write (iout,130)
+  130       format (/,' SQUARE  --  Possible False Convergence')
             if (verbose) then
-               write (iout,150)
-  150          format (/,' The iterates appear to be converging to',
+               write (iout,140)
+  140          format (/,' The iterates appear to be converging to',
      &                    ' a noncritical point due',
      &                 /,' to bad gradient information, discontinuous',
      &                    ' function, or stopping',
@@ -538,17 +531,25 @@ c
             nbigstp = nbigstp + 1
             if (nbigstp .eq. 5) then
                done = .true.
-               write (iout,160)
-  160          format (/,' SQUARE  --  Five Consecutive Maximum',
+               write (iout,150)
+  150          format (/,' SQUARE  --  Five Consecutive Maximum',
      &                    ' Length Steps')
                if (verbose) then
-                  write (iout,170)
-  170             format (/,' Either the function is unbounded below,',
+                  write (iout,160)
+  160             format (/,' Either the function is unbounded below,',
      &                       ' or has a finite',
      &                    /,' asymptote in some direction, or STEPMAX',
      &                       ' is too small')
                end if
             end if
+c
+c     check the limit on the number of iterations
+c
+         else if (niter .ge. maxiter) then
+            done = .true.
+            write (iout,170)
+  170       format (/,' SQUARE  --  Incomplete Convergence due',
+     &                 ' to IterLimit')
 c
 c     no reason to quit, so prepare to take another step
 c
