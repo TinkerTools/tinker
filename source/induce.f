@@ -370,10 +370,10 @@ c
      &                            - uind(3,i)*polscale(j,3,i))/poli(i)
      &                                 + field(j,i)
                         rsdp(j,i) = (udirp(j,i)
-     &                            - uinp(1,i)*polscale(j,1,i)
-     &                            - uinp(2,i)*polscale(j,2,i)
-     &                            - uinp(3,i)*polscale(j,3,i))/poli(i)
-     &                                 + fieldp(j,i)
+     &                            -  uinp(1,i)*polscale(j,1,i)
+     &                            -  uinp(2,i)*polscale(j,2,i)
+     &                            -  uinp(3,i)*polscale(j,3,i))/poli(i)
+     &                                  + fieldp(j,i)
                      else
 	                     rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
      &                                 + field(j,i)
@@ -455,7 +455,6 @@ c
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
                      if (use_expol) then
-                     
                         vec(j,i) = (conj(1,i)*polscale(j,1,i)
      &                            + conj(2,i)*polscale(j,2,i)
      &                            + conj(3,i)*polscale(j,3,i))/poli(i)

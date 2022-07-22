@@ -101,15 +101,6 @@ c
          polscale(1,3,i) = 0.0d0
          polscale(2,3,i) = 0.0d0
          polscale(3,3,i) = 1.0d0
-         polinv(1,1,i) = 1.0d0
-         polinv(2,1,i) = 0.0d0
-         polinv(3,1,i) = 0.0d0
-         polinv(1,2,i) = 0.0d0
-         polinv(2,2,i) = 1.0d0
-         polinv(3,2,i) = 0.0d0
-         polinv(1,3,i) = 0.0d0
-         polinv(2,3,i) = 0.0d0
-         polinv(3,3,i) = 1.0d0
       end do
 c
 c     set array needed to scale atom and group interactions
