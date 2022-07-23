@@ -93,7 +93,7 @@ c
       real*8 ai(3,3)
       real*8 ak(3,3)
       real*8, allocatable :: pscale(:)
-      logical epli,eplk
+      logical epli,eplk,do_g
       character*6 mode
 c
 c
@@ -106,6 +106,10 @@ c
       f = 0.5d0 * electric / dielec
       mode = 'REPULS'
       call switch (mode)
+c
+c     do_gradient set to true
+c
+      do_g = .true.
 c
 c     set array needed to scale atom and group interactions
 c
@@ -170,7 +174,7 @@ c
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
                   sizik = sizi * sizk
-                  call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                  call dampexpl (r,sizik,alphai,alphak,s2,ds2,do_g)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -189,7 +193,7 @@ c
                   s2k = springk * s2 * pscale(k)
                   ds2i = springi * ds2 * pscale(k)
                   ds2k = springk * ds2 * pscale(k)
-                  call rotdexpl (xr,yr,zr,ai,ak)
+                  call rotdexpl (r,xr,yr,zr,ai,ak)
                   uixl = 0.0d0
                   ukxl = 0.0d0
                   uiyl = 0.0d0
@@ -350,7 +354,8 @@ c
                         sizk = prepep(kk)
                         alphak = dmppep(kk)
                         sizik = sizi * sizk
-                        call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                        call dampexpl (r,sizik,alphai,alphak,s2,ds2,
+     &                                    do_g)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -376,7 +381,7 @@ c
                         s2k = springk * s2 * pscale(k)
                         ds2i = springi * ds2 * pscale(k)
                         ds2k = springk * ds2 * pscale(k)
-                        call rotdexpl (xr,yr,zr,ai,ak)
+                        call rotdexpl (r,xr,yr,zr,ai,ak)
                         uixl = 0.0d0
                         ukxl = 0.0d0
                         uiyl = 0.0d0
@@ -536,7 +541,7 @@ c
       real*8 ai(3,3)
       real*8 ak(3,3)
       real*8, allocatable :: pscale(:)
-      logical epli,eplk
+      logical epli,eplk,do_g
       character*6 mode
 c
 c
@@ -550,6 +555,10 @@ c
       mode = 'REPULS'
       call switch (mode)
 c
+c     do_gradient set to true
+c
+      do_g = .true.
+c
 c     set array needed to scale atom and group interactions
 c
       do i = 1, n
@@ -562,7 +571,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,kpep,prepep,dmppep,lpep,np11,ip11,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,p2scale,p3scale,p4scale,p5scale,
 !$OMP& p2iscale,p3iscale,p4iscale,p5iscale,nelst,elst,use_bounds,
-!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polarity,f,uind)
+!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polarity,f,uind,do_g)
 !$OMP& firstprivate(pscale)
 !$OMP& shared (dep,vir)
 !$OMP DO reduction(+:dep,vir) schedule(guided)
@@ -625,7 +634,7 @@ c
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
                   sizik = sizi * sizk
-                  call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                  call dampexpl (r,sizik,alphai,alphak,s2,ds2,do_g)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -644,7 +653,7 @@ c
                   s2k = springk * s2 * pscale(k)
                   ds2i = springi * ds2 * pscale(k)
                   ds2k = springk * ds2 * pscale(k)
-                  call rotdexpl (xr,yr,zr,ai,ak)
+                  call rotdexpl (r,xr,yr,zr,ai,ak)
                   uixl = 0.0d0
                   ukxl = 0.0d0
                   uiyl = 0.0d0
@@ -762,7 +771,7 @@ c     "rotdexpl" finds rotation matrices for variable polarizability
 c     in the exchange polarization gradient
 c
 c
-      subroutine rotdexpl (xr,yr,zr,ai,ak)
+      subroutine rotdexpl (r,xr,yr,zr,ai,ak)
       use atoms
       use math
       use mpole
@@ -776,27 +785,11 @@ c
       real*8 ak(3,3)
 c
 c
-c     use the identity matrix as the default rotation matrix
-c
-      ai(1,1) = 1.0d0
-      ai(2,1) = 0.0d0
-      ai(3,1) = 0.0d0
-      ai(1,2) = 0.0d0
-      ai(2,2) = 1.0d0
-      ai(3,2) = 0.0d0
-      ai(1,3) = 0.0d0
-      ai(2,3) = 0.0d0
-      ai(3,3) = 1.0d0
-c
 c     compute the rotation matrix elements
 c
-      dx = xr
-      dy = yr
-      dz = zr
-      r = sqrt(dx*dx + dy*dy + dz*dz)
-      ai(3,1) = dx / r
-      ai(3,2) = dy / r
-      ai(3,3) = dz / r
+      ai(3,1) = xr / r
+      ai(3,2) = yr / r
+      ai(3,3) = zr / r
       dx = 1.0d0
       dy = 0.0d0
       dz = 0.0d0
@@ -820,16 +813,14 @@ c
       ai(2,1) = ai(1,3)*ai(3,2) - ai(1,2)*ai(3,3)
       ai(2,2) = ai(1,1)*ai(3,3) - ai(1,3)*ai(3,1)
       ai(2,3) = ai(1,2)*ai(3,1) - ai(1,1)*ai(3,2)
-      do i = 1, 3
-         do j = 1, 3
-            ak(j,i) = ai(j,i)
-         end do
-      end do
-      ak(2,1) = -ak(2,1)
-      ak(2,2) = -ak(2,2)
-      ak(2,3) = -ak(2,3)
-      ak(3,1) = -ak(3,1)
-      ak(3,2) = -ak(3,2)
-      ak(3,3) = -ak(3,3)
+      ak(1,1) = ai(1,1)
+      ak(1,2) = ai(1,2)
+      ak(1,3) = ai(1,3)
+      ak(2,1) = -ai(2,1)
+      ak(2,2) = -ai(2,2)
+      ak(2,3) = -ai(2,3)
+      ak(3,1) = -ai(3,1)
+      ak(3,2) = -ai(3,2)
+      ak(3,3) = -ai(3,3)
       return
       end

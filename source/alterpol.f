@@ -76,7 +76,7 @@ c
       real*8 ks2k(3,3)
       real*8 taper
       real*8, allocatable :: pscale(:)
-      logical epli,eplk
+      logical epli,eplk, do_g
       character*6 mode
 c
 c
@@ -102,6 +102,10 @@ c
          polscale(2,3,i) = 0.0d0
          polscale(3,3,i) = 1.0d0
       end do
+c
+c     do_gradient set to false
+c
+      do_g = .false.
 c
 c     set array needed to scale atom and group interactions
 c
@@ -166,7 +170,7 @@ c
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
                   sizik = sizi * sizk
-                  call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                  call dampexpl (r,sizik,alphai,alphak,s2,ds2,do_g)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -180,7 +184,7 @@ c
                   end if
                   p33i = springi * s2 * pscale(k)
                   p33k = springk * s2 * pscale(k)
-                  call rotexpl (xr,yr,zr,p33i,p33k,ks2i,ks2k)
+                  call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
                   do j = 1, 3
                      do m = 1, 3
                         polscale(j,m,ii) = polscale(j,m,ii) + ks2i(j,m)
@@ -270,7 +274,8 @@ c
                         sizk = prepep(kk)
                         alphak = dmppep(kk)
                         sizik = sizi * sizk
-                        call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                        call dampexpl (r,sizik,alphai,alphak,s2,ds2,
+     &                                    do_g)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -288,7 +293,7 @@ c
                         if (i .eq. k)  s2 = 0.5d0 * s2
                         p33i = springi * s2 * pscale(k)
                         p33k = springk * s2 * pscale(k)
-                        call rotexpl (xr,yr,zr,p33i,p33k,ks2i,ks2k)
+                        call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
                         do j = 1, 3
                            do m = 1, 3
                               polscale(j,m,ii) = polscale(j,m,ii)
@@ -372,7 +377,7 @@ c
       real*8 ks2k(3,3)
       real*8 taper
       real*8, allocatable :: pscale(:)
-      logical epli,eplk
+      logical epli,eplk,do_g
       character*6 mode
 c
 c
@@ -397,16 +402,11 @@ c
          polscale(1,3,i) = 0.0d0
          polscale(2,3,i) = 0.0d0
          polscale(3,3,i) = 1.0d0
-         polinv(1,1,i) = 1.0d0
-         polinv(2,1,i) = 0.0d0
-         polinv(3,1,i) = 0.0d0
-         polinv(1,2,i) = 0.0d0
-         polinv(2,2,i) = 1.0d0
-         polinv(3,2,i) = 0.0d0
-         polinv(1,3,i) = 0.0d0
-         polinv(2,3,i) = 0.0d0
-         polinv(3,3,i) = 1.0d0
       end do
+c
+c     do_gradient set to false
+c
+      do_g = .false.
 c
 c     set array needed to scale atom and group interactions
 c
@@ -420,7 +420,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,kpep,prepep,dmppep,lpep,np11,ip11,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,p2scale,p3scale,p4scale,p5scale,
 !$OMP& p2iscale,p3iscale,p4iscale,p5iscale,nelst,elst,use_bounds,
-!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv)
+!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv,do_g)
 !$OMP& firstprivate(pscale)
 !$OMP& shared (polscale)
 !$OMP DO reduction(+:polscale) schedule(guided)
@@ -483,7 +483,7 @@ c
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
                   sizik = sizi * sizk
-                  call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                  call dampexpl (r,sizik,alphai,alphak,s2,ds2,do_g)
 c
 c     use energy switching if near the cutoff distance
 c
@@ -497,7 +497,7 @@ c
                   end if
                   p33i = springi * s2 * pscale(k)
                   p33k = springk * s2 * pscale(k)
-                  call rotexpl (xr,yr,zr,p33i,p33k,ks2i,ks2k)
+                  call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
                   do j = 1, 3
                      do m = 1, 3
                         polscale(j,m,ii) = polscale(j,m,ii) + ks2i(j,m)
@@ -554,10 +554,11 @@ c     ###########################################################
 c
 c
 c     "rotexpl" finds and applies rotation matrices for the
-c     overlap tensor used in computing exchange polarization
+c     overlap tensor used in computing exchange polarization;
+c     only third row of rotation matrix is needed in Z-local frame
 c
 c
-      subroutine rotexpl (xr,yr,zr,p33i,p33k,ks2i,ks2k)
+      subroutine rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
       use atoms
       use math
       use mpole
@@ -567,75 +568,31 @@ c
       real*8 xr,yr,zr
       real*8 p33i,p33k
       real*8 r,dot,eps
-      real*8 dx,dy,dz
-      real*8 ai(3,3)
-      real*8 ak(3,3)
+      real*8 ai(3)
+      real*8 ak(3)
       real*8 ks2i(3,3)
       real*8 ks2k(3,3)
 c
 c
-c     use the identity matrix as the default rotation matrix
+c     compute the third row rotation matrix elements
 c
-      ai(1,1) = 1.0d0
-      ai(2,1) = 0.0d0
-      ai(3,1) = 0.0d0
-      ai(1,2) = 0.0d0
-      ai(2,2) = 1.0d0
-      ai(3,2) = 0.0d0
-      ai(1,3) = 0.0d0
-      ai(2,3) = 0.0d0
-      ai(3,3) = 1.0d0
-c
-c     compute the rotation matrix elements
-c
-      dx = xr
-      dy = yr
-      dz = zr
-      r = sqrt(dx*dx + dy*dy + dz*dz)
-      ai(3,1) = dx / r
-      ai(3,2) = dy / r
-      ai(3,3) = dz / r
-      dx = 1.0d0
-      dy = 0.0d0
-      dz = 0.0d0
-      dot = ai(3,1)
-      eps = 1.0d0 / root2
-      if (abs(dot) .gt. eps) then
-         dx = 0.0d0
-         dy = 1.0d0
-         dot = ai(3,2)
-      end if
-      dx = dx - dot*ai(3,1)
-      dy = dy - dot*ai(3,2)
-      dz = dz - dot*ai(3,3)
-      r = sqrt(dx*dx + dy*dy + dz*dz)
+      ai(1) = xr / r
+      ai(2) = yr / r
+      ai(3) = zr / r
 c
 c     matrix "ai" rotates a vector from global to local frame
 c
-      ai(1,1) = dx / r
-      ai(1,2) = dy / r
-      ai(1,3) = dz / r
-      ai(2,1) = ai(1,3)*ai(3,2) - ai(1,2)*ai(3,3)
-      ai(2,2) = ai(1,1)*ai(3,3) - ai(1,3)*ai(3,1)
-      ai(2,3) = ai(1,2)*ai(3,1) - ai(1,1)*ai(3,2)
-      do i = 1, 3
-         do j = 1, 3
-            ak(j,i) = ai(j,i)
-         end do
-      end do
-      ak(2,1) = -ak(2,1)
-      ak(2,2) = -ak(2,2)
-      ak(2,3) = -ak(2,3)
-      ak(3,1) = -ak(3,1)
-      ak(3,2) = -ak(3,2)
-      ak(3,3) = -ak(3,3)
+
+      ak(1) = -ai(1)
+      ak(2) = -ai(2)
+      ak(3) = -ai(3)
 c
 c     apply rotations from left and right to rotate ks2 matrix
 c
       do i = 1, 3
          do j = 1, 3
-            ks2i(i,j) = p33i * ai(3,i) * ai(3,j)
-            ks2k(i,j) = p33k * ak(3,i) * ak(3,j)
+            ks2i(i,j) = p33i * ai(i) * ai(j)
+            ks2k(i,j) = p33k * ak(i) * ak(j)
          end do
       end do
       return
