@@ -781,6 +781,7 @@ c
       real*8 xr,yr,zr
       real*8 r,dot,eps
       real*8 dx,dy,dz
+      real*8 dr
       real*8 ai(3,3)
       real*8 ak(3,3)
 c
@@ -803,13 +804,13 @@ c
       dx = dx - dot*ai(3,1)
       dy = dy - dot*ai(3,2)
       dz = dz - dot*ai(3,3)
-      r = sqrt(dx*dx + dy*dy + dz*dz)
+      dr = sqrt(dx*dx + dy*dy + dz*dz)
 c
 c     matrix "ai" rotates a vector from global to local frame
 c
-      ai(1,1) = dx / r
-      ai(1,2) = dy / r
-      ai(1,3) = dz / r
+      ai(1,1) = dx / dr
+      ai(1,2) = dy / dr
+      ai(1,3) = dz / dr
       ai(2,1) = ai(1,3)*ai(3,2) - ai(1,2)*ai(3,3)
       ai(2,2) = ai(1,1)*ai(3,3) - ai(1,3)*ai(3,1)
       ai(2,3) = ai(1,2)*ai(3,1) - ai(1,1)*ai(3,2)
