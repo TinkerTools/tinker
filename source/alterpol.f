@@ -65,6 +65,7 @@ c
       integer i,j,k,m
       integer ii,kk
       integer jcell
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
       real*8 sizi,sizk,sizik
@@ -117,6 +118,9 @@ c     find variable polarizability scale matrix at each site
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          springi = kpep(ii)
          sizi = prepep(ii)
          alphai = dmppep(ii)
@@ -159,9 +163,9 @@ c
             k = ipole(kk)
             eplk = lpep(kk)
             if (epli .or. eplk) then
-               xr = x(k) - x(i)
-               yr = y(k) - y(i)
-               zr = z(k) - z(i)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
@@ -220,6 +224,9 @@ c     calculate interaction energy with other unit cells
 c
          do ii = 1, npole
             i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
             springi = kpep(ii)
             sizi = prepep(ii)
             alphai = dmppep(ii)
@@ -263,9 +270,9 @@ c
                eplk = lpep(kk)
                if (epli .or. eplk) then
                   do jcell = 2, ncell
-                     xr = x(k) - x(i)
-                     yr = y(k) - y(i)
-                     zr = z(k) - z(i)
+                     xr = x(k) - xi
+                     yr = y(k) - yi
+                     zr = z(k) - zi
                      call imager (xr,yr,zr,jcell)
                      r2 = xr*xr + yr*yr + zr*zr
                      if (r2 .le. off2) then
@@ -366,6 +373,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,kkk
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
       real*8 sizi,sizk,sizik
@@ -429,6 +437,9 @@ c     find the variable polarizability
 c
       do ii = 1, npole
          i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          springi = kpep(ii)
          sizi = prepep(ii)
          alphai = dmppep(ii)
@@ -472,9 +483,9 @@ c
             k = ipole(kk)
             eplk = lpep(kk)
             if (epli .or. eplk) then
-               xr = x(k) - x(i)
-               yr = y(k) - y(i)
-               zr = z(k) - z(i)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
