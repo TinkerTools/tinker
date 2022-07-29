@@ -76,18 +76,14 @@ c
          else if (keyword(1:8) .eq. 'ARCHIVE ') then
             arcsave = .true.
             dcdsave = .false.
-            cyclesave = .false.
          else if (keyword(1:12) .eq. 'DCD-ARCHIVE ') then
             arcsave = .false.
             dcdsave = .true.
-            cyclesave = .false.
          else if (keyword(1:10) .eq. 'NOARCHIVE ') then
             arcsave = .false.
             dcdsave = .false.
             cyclesave = .false.
          else if (keyword(1:11) .eq. 'SAVE-CYCLE ') then
-            archive = .false.
-            dcdsave = .false.
             cyclesave = .true.
          else if (keyword(1:10) .eq. 'NOVERSION ') then
             noversion = .true.
