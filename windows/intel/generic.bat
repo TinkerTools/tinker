@@ -194,7 +194,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp analysis.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp analyze.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp angles.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp anneal.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp archive.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp arcedit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp attach.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp baoab.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bar.f
@@ -378,6 +378,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp freeunit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp gda.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp geometry.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getarc.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getcart.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getkey.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getmol.f
@@ -508,6 +509,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prmedit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prmkey.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp promo.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp protein.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtarc.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtdcd.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prterr.f
@@ -525,6 +527,8 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp quatfit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp radial.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp random.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp rattle.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readcart.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readdcd.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgau.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgdma.f
@@ -547,6 +551,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp scan.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp sdstep.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp search.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp server.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp setprm.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp shakeup.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp sigmoid.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp simplex.f

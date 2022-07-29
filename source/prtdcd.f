@@ -40,14 +40,15 @@ c     in general a value of zero for any of the above indicates that
 c     the particular feature is unused
 c
 c
-      subroutine prtdcd (idcd)
+      subroutine prtdcd (idcd,first)
       use atoms
       use bound
       use boxes
       use files
       use titles
+      use usage
       implicit none
-      integer i,idcd
+      integer i,k,idcd
       integer zero,one
       integer nframe,nprev
       integer ncrdsav,nstep
@@ -57,7 +58,7 @@ c
       integer merged,vcharmm
       integer ntitle
       real*4 tdelta
-      logical opened
+      logical opened,first
       character*4 header
       character*240 dcdfile
 c
@@ -73,7 +74,8 @@ c
 c
 c     write header info along with title and number of atoms
 c
-      if (.not. opened) then
+      if (first) then
+         first = .false.
          zero = 0
          one = 1
          header = 'CORD'
@@ -97,7 +99,7 @@ c
      &                 tdelta,usebox,use4d,usefq,merged,
      &                 zero,zero,zero,zero,zero,vcharmm
          write (idcd)  ntitle,title(1:80)
-         write (idcd)  n
+         write (idcd)  nuse
       end if
 c
 c     append the lattice values based on header flag value
@@ -106,11 +108,25 @@ c
          write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
       end if
 c
+c     remove unused atoms from the coordinates to write
+c
+      if (nuse .ne. n) then
+         k = 0
+         do i = 1, n
+            if (use(i)) then
+               k = k + 1
+               x(k) = x(i)
+               y(k) = y(i)
+               z(k) = z(i)
+            end if
+         end do
+      end if
+c
 c     append the atomic coordinates along each axis in turn
 c
-      write (idcd)  (real(x(i)),i=1,n)
-      write (idcd)  (real(y(i)),i=1,n)
-      write (idcd)  (real(z(i)),i=1,n)
+      write (idcd)  (real(x(i)),i=1,nuse)
+      write (idcd)  (real(y(i)),i=1,nuse)
+      write (idcd)  (real(z(i)),i=1,nuse)
 c
 c     close the output unit if opened by this routine
 c

@@ -49,7 +49,7 @@ c
       real*8, allocatable :: gr(:)
       real*8, allocatable :: gs(:)
       logical exist,query
-      logical intramol
+      logical first,intramol
       character*1 answer
       character*3 namej,namek
       character*6 labelj,labelk
@@ -207,7 +207,7 @@ c
       rewind (unit=iarc)
       nframe = 0
       do while (.not. abort)
-         call readxyz (iarc)
+         call readcart (iarc,first)
          nframe = nframe + 1
       end do
       nframe = nframe - 1
@@ -246,11 +246,11 @@ c
       skip = start
       do while (iframe.ge.start .and. iframe.le.stop)
          do j = 1, skip-1
-            call readxyz (iarc)
+            call readcart (iarc,first)
          end do
          iframe = iframe + step
          skip = step
-         call readxyz (iarc)
+         call readcart (iarc,first)
          if (.not. abort) then
             nframe = nframe + 1
             if (mod(nframe,100) .eq. 0) then
@@ -289,7 +289,8 @@ c     ensure a valid frame is loaded and report total frames
 c
       if (abort) then
          rewind (unit=iarc)
-         call readxyz (iarc)
+         first = .true.
+         call readcart (iarc,first)
       end if
       close (unit=iarc)
       if (mod(nframe,100) .ne. 0) then

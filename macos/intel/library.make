@@ -231,6 +231,7 @@ freeunit.o \
 freeze.o \
 geometry.o \
 getarc.o \
+getcart.o \
 getint.o \
 getkey.o \
 getmol.o \
@@ -422,6 +423,7 @@ predict.o \
 pressure.o \
 prmkey.o \
 promo.o \
+prtarc.o \
 prtdcd.o \
 prtdyn.o \
 prterr.o \
@@ -437,6 +439,8 @@ qrsolve.o \
 quatfit.o \
 random.o \
 rattle.o \
+readcart.o \
+readdcd.o \
 readdyn.o \
 readgau.o \
 readgdma.o \
@@ -470,6 +474,7 @@ sdstep.o \
 search.o \
 sequen.o \
 server.o \
+setprm.o \
 shakeup.o \
 shunt.o \
 sigmoid.o \

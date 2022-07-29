@@ -11,7 +11,7 @@
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o alchemy.x alchemy.o libtinker.a ; strip alchemy.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o analyze.x analyze.o libtinker.a ; strip analyze.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o anneal.x anneal.o libtinker.a ; strip anneal.x
-ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o archive.x archive.o libtinker.a ; strip archive.x
+ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o arcedit.x arcedit.o libtinker.a ; strip arcedit.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o bar.x bar.o libtinker.a ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o correlate.x correlate.o libtinker.a ; strip correlate.x
 ifort -O3 -no-ipo -no-prec-div -recursive -static-libgcc -static-intel -o critical.x critical.o libtinker.a ; strip critical.x

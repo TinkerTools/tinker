@@ -522,7 +522,7 @@ c
 c     handle conjugation for MOL2 bond_type assignment
 c
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          done = .true.
          do i = 1, ntors
             ia = itors(1,i)

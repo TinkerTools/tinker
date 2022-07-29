@@ -220,6 +220,7 @@ freeunit.obj
 freeze.obj
 geometry.obj
 getarc.obj
+getcart.obj
 getint.obj
 getkey.obj
 getmol.obj
@@ -411,6 +412,7 @@ predict.obj
 pressure.obj
 prmkey.obj
 promo.obj
+prtarc.obj
 prtdcd.obj
 prtdyn.obj
 prterr.obj
@@ -426,6 +428,8 @@ qrsolve.obj
 quatfit.obj
 random.obj
 rattle.obj
+readcart.obj
+readdcd.obj
 readdyn.obj
 readgau.obj
 readgdma.obj
@@ -459,6 +463,7 @@ sdstep.obj
 search.obj
 sequen.obj
 server.obj
+setprm.obj
 shakeup.obj
 shunt.obj
 sigmoid.obj

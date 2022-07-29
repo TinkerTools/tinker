@@ -131,7 +131,12 @@ c
 c     save coordinates to an archive or numbered structure file
 c
       ixyz = freeunit ()
-      if (binary) then
+      if (cyclesave) then
+         xyzfile = filename(1:leng)//'.'//ext(1:lext)
+         call version (xyzfile,'new')
+         open (unit=ixyz,file=xyzfile,status='new')
+         call prtxyz (ixyz)
+      else if (dcdsave) then
          xyzfile = filename(1:leng)
          call suffix (xyzfile,'dcd','old')
          inquire (file=xyzfile,exist=exist)
@@ -140,7 +145,7 @@ c
      &               status='old',position='append')
          end if
          call prtdcd (ixyz)
-      else if (archive) then
+      else
          xyzfile = filename(1:leng)
          call suffix (xyzfile,'arc','old')
          inquire (file=xyzfile,exist=exist)
@@ -149,11 +154,6 @@ c
          else
             open (unit=ixyz,file=xyzfile,status='new')
          end if
-         call prtxyz (ixyz)
-      else
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
-         call version (xyzfile,'new')
-         open (unit=ixyz,file=xyzfile,status='new')
          call prtxyz (ixyz)
       end if
       close (unit=ixyz)

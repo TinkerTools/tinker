@@ -1,4 +1,4 @@
 cp anion.dyn0 anion.dyn
-../bin/dynamic anion 1000 2.0 0.1 2 300.0
+../bin/dynamic anion 5000 2.0 0.5 2 300.0
 ../bin/alchemy < anion.dat
 rm anion.dyn anion.0*

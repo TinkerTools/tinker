@@ -200,8 +200,10 @@ c
       use_tophat = .false.
       use_stophat = .false.
 c
-c     type of coordinates file
+c     format for output of coordinates
 c
+      archive = .true.
+      binary = .false.
       coordtype = 'NONE'
 c
 c     default values for unit cell dimensions

@@ -40,7 +40,7 @@ c
       logical dolarge,dodetail
       logical domoment,dovirial
       logical doconect,dosave
-      logical exist
+      logical exist,first
       logical, allocatable :: active(:)
       character*1 letter
       character*240 record
@@ -51,7 +51,7 @@ c
 c     set up the structure and mechanics calculation
 c
       call initial
-      call getxyz
+      call getcart (ixyz)
       call mechanic
 c
 c     get the desired types of analysis to be performed
@@ -181,12 +181,21 @@ c
 c     reopen the coordinates file and read the first structure
 c
       frame = 0
+      close (unit=ixyz)
       ixyz = freeunit ()
       xyzfile = filename
-      call suffix (xyzfile,'xyz','old')
-      open (unit=ixyz,file=xyzfile,status ='old')
-      rewind (unit=ixyz)
-      call readxyz (ixyz)
+      if (archive) then
+         call suffix (xyzfile,'xyz','old')
+         open (unit=ixyz,file=xyzfile,status ='old')
+         rewind (unit=ixyz)
+         call readxyz (ixyz)
+      else if (binary) then
+         call suffix (xyzfile,'dcd','old')
+         open (unit=ixyz,file=xyzfile,form='unformatted',status ='old')
+         rewind (unit=ixyz)
+         first = .true.
+         call readdcd (ixyz,first)
+      end if
 c
 c     get parameters used for molecular mechanics potentials
 c
@@ -263,7 +272,7 @@ c
 c     attempt to read next structure from the coordinate file
 c
          nold = n
-         call readxyz (ixyz)
+         call readcart (ixyz,first)
       end do
 c
 c     perform deallocation of some local arrays

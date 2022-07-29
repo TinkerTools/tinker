@@ -193,7 +193,7 @@ gfortran -c -Wall analysis.f
 gfortran -c -Wall analyze.f
 gfortran -c -Wall angles.f
 gfortran -c -Wall anneal.f
-gfortran -c -Wall archive.f
+gfortran -c -Wall arcedit.f
 gfortran -c -Wall attach.f
 gfortran -c -Wall baoab.f
 gfortran -c -Wall bar.f
@@ -377,6 +377,7 @@ gfortran -c -Wall freeunit.f
 gfortran -c -Wall gda.f
 gfortran -c -Wall geometry.f
 gfortran -c -Wall getarc.f
+gfortran -c -Wall getcart.f
 gfortran -c -Wall getint.f
 gfortran -c -Wall getkey.f
 gfortran -c -Wall getmol.f
@@ -507,6 +508,7 @@ gfortran -c -Wall prmedit.f
 gfortran -c -Wall prmkey.f
 gfortran -c -Wall promo.f
 gfortran -c -Wall protein.f
+gfortran -c -Wall prtarc.f
 gfortran -c -Wall prtdcd.f
 gfortran -c -Wall prtdyn.f
 gfortran -c -Wall prterr.f
@@ -524,6 +526,8 @@ gfortran -c -Wall quatfit.f
 gfortran -c -Wall radial.f
 gfortran -c -Wall random.f
 gfortran -c -Wall rattle.f
+gfortran -c -Wall readcart.f
+gfortran -c -Wall readdcd.f
 gfortran -c -Wall readdyn.f
 gfortran -c -Wall readgau.f
 gfortran -c -Wall readgdma.f
@@ -546,6 +550,7 @@ gfortran -c -Wall scan.f
 gfortran -c -Wall sdstep.f
 gfortran -c -Wall search.f
 gfortran -c -Wall server.f
+gfortran -c -Wall setprm.f
 gfortran -c -Wall shakeup.f
 gfortran -c -Wall sigmoid.f
 gfortran -c -Wall simplex.f

@@ -3811,7 +3811,7 @@ c
 c     query for more atom sets to condense to a single type
 c
          done = .false.
-         dowhile (.not. done)
+         do while (.not. done)
             do i = 1, size
                list(i) = 0
             end do
@@ -3828,7 +3828,7 @@ c
             diff = .false.
             nlist = 1
             if (list(1) .ne. 0)  k = type(list(1))
-            dowhile (list(nlist) .ne. 0)
+            do while (list(nlist) .ne. 0)
                if (type(list(nlist)) .ne. k)  diff = .true.
                nlist = nlist + 1
             end do

@@ -17,7 +17,7 @@ setenv APBSLIBS "../apbs/macosx/lib/libapbsmainroutines.a ../apbs/macosx/lib/lib
 ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o alchemy.x alchemy.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip alchemy.x
 ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o analyze.x analyze.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip analyze.x
 ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o anneal.x anneal.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip anneal.x
-ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip archive.x
+ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o arcedit.x arcedit.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip arcedit.x
 ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip correlate.x
 ifort -O3 -no-ipo -no-prec-div -qopenmp -static-intel -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a $APBSLIBS ; strip critical.x

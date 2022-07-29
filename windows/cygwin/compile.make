@@ -193,7 +193,7 @@ gfortran -c -O3 -ffast-math -fopenmp analysis.f
 gfortran -c -O3 -ffast-math -fopenmp analyze.f
 gfortran -c -O3 -ffast-math -fopenmp angles.f
 gfortran -c -O3 -ffast-math -fopenmp anneal.f
-gfortran -c -O3 -ffast-math -fopenmp archive.f
+gfortran -c -O3 -ffast-math -fopenmp arcedit.f
 gfortran -c -O3 -ffast-math -fopenmp attach.f
 gfortran -c -O3 -ffast-math -fopenmp baoab.f
 gfortran -c -O3 -ffast-math -fopenmp bar.f
@@ -377,6 +377,7 @@ gfortran -c -O3 -ffast-math -fopenmp freeunit.f
 gfortran -c -O3 -ffast-math -fopenmp gda.f
 gfortran -c -O3 -ffast-math -fopenmp geometry.f
 gfortran -c -O3 -ffast-math -fopenmp getarc.f
+gfortran -c -O3 -ffast-math -fopenmp getcart.f
 gfortran -c -O3 -ffast-math -fopenmp getint.f
 gfortran -c -O3 -ffast-math -fopenmp getkey.f
 gfortran -c -O3 -ffast-math -fopenmp getmol.f
@@ -507,6 +508,7 @@ gfortran -c -O3 -ffast-math -fopenmp prmedit.f
 gfortran -c -O3 -ffast-math -fopenmp prmkey.f
 gfortran -c -O3 -ffast-math -fopenmp promo.f
 gfortran -c -O3 -ffast-math -fopenmp protein.f
+gfortran -c -O3 -ffast-math -fopenmp prtarc.f
 gfortran -c -O3 -ffast-math -fopenmp prtdcd.f
 gfortran -c -O3 -ffast-math -fopenmp prtdyn.f
 gfortran -c -O3 -ffast-math -fopenmp prterr.f
@@ -524,6 +526,8 @@ gfortran -c -O3 -ffast-math -fopenmp quatfit.f
 gfortran -c -O3 -ffast-math -fopenmp radial.f
 gfortran -c -O3 -ffast-math -fopenmp random.f
 gfortran -c -O3 -ffast-math -fopenmp rattle.f
+gfortran -c -O3 -ffast-math -fopenmp readcart.f
+gfortran -c -O3 -ffast-math -fopenmp readdcd.f
 gfortran -c -O3 -ffast-math -fopenmp readdyn.f
 gfortran -c -O3 -ffast-math -fopenmp readgau.f
 gfortran -c -O3 -ffast-math -fopenmp readgdma.f
@@ -546,6 +550,7 @@ gfortran -c -O3 -ffast-math -fopenmp scan.f
 gfortran -c -O3 -ffast-math -fopenmp sdstep.f
 gfortran -c -O3 -ffast-math -fopenmp search.f
 gfortran -c -O3 -ffast-math -fopenmp server.f
+gfortran -c -O3 -ffast-math -fopenmp setprm.f
 gfortran -c -O3 -ffast-math -fopenmp shakeup.f
 gfortran -c -O3 -ffast-math -fopenmp sigmoid.f
 gfortran -c -O3 -ffast-math -fopenmp simplex.f

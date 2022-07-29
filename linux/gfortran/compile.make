@@ -193,7 +193,7 @@ gfortran -c -Ofast -mavx -fopenmp analysis.f
 gfortran -c -Ofast -mavx -fopenmp analyze.f
 gfortran -c -Ofast -mavx -fopenmp angles.f
 gfortran -c -Ofast -mavx -fopenmp anneal.f
-gfortran -c -Ofast -mavx -fopenmp archive.f
+gfortran -c -Ofast -mavx -fopenmp arcedit.f
 gfortran -c -Ofast -mavx -fopenmp attach.f
 gfortran -c -Ofast -mavx -fopenmp baoab.f
 gfortran -c -Ofast -mavx -fopenmp bar.f
@@ -377,6 +377,7 @@ gfortran -c -Ofast -mavx -fopenmp freeunit.f
 gfortran -c -Ofast -mavx -fopenmp gda.f
 gfortran -c -Ofast -mavx -fopenmp geometry.f
 gfortran -c -Ofast -mavx -fopenmp getarc.f
+gfortran -c -Ofast -mavx -fopenmp getcart.f
 gfortran -c -Ofast -mavx -fopenmp getint.f
 gfortran -c -Ofast -mavx -fopenmp getkey.f
 gfortran -c -Ofast -mavx -fopenmp getmol.f
@@ -507,6 +508,7 @@ gfortran -c -Ofast -mavx -fopenmp prmedit.f
 gfortran -c -Ofast -mavx -fopenmp prmkey.f
 gfortran -c -Ofast -mavx -fopenmp promo.f
 gfortran -c -Ofast -mavx -fopenmp protein.f
+gfortran -c -Ofast -mavx -fopenmp prtarc.f
 gfortran -c -Ofast -mavx -fopenmp prtdcd.f
 gfortran -c -Ofast -mavx -fopenmp prtdyn.f
 gfortran -c -Ofast -mavx -fopenmp prterr.f
@@ -524,6 +526,8 @@ gfortran -c -Ofast -mavx -fopenmp quatfit.f
 gfortran -c -Ofast -mavx -fopenmp radial.f
 gfortran -c -Ofast -mavx -fopenmp random.f
 gfortran -c -Ofast -mavx -fopenmp rattle.f
+gfortran -c -Ofast -mavx -fopenmp readcart.f
+gfortran -c -Ofast -mavx -fopenmp readdcd.f
 gfortran -c -Ofast -mavx -fopenmp readdyn.f
 gfortran -c -Ofast -mavx -fopenmp readgau.f
 gfortran -c -Ofast -mavx -fopenmp readgdma.f
@@ -546,6 +550,7 @@ gfortran -c -Ofast -mavx -fopenmp scan.f
 gfortran -c -Ofast -mavx -fopenmp sdstep.f
 gfortran -c -Ofast -mavx -fopenmp search.f
 gfortran -c -Ofast -mavx -fopenmp server.f
+gfortran -c -Ofast -mavx -fopenmp setprm.f
 gfortran -c -Ofast -mavx -fopenmp shakeup.f
 gfortran -c -Ofast -mavx -fopenmp sigmoid.f
 gfortran -c -Ofast -mavx -fopenmp simplex.f

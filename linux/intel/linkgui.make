@@ -16,7 +16,7 @@
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o alchemy.x alchemy.o libtinker.a libjvm.so ; strip alchemy.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o analyze.x analyze.o libtinker.a libjvm.so ; strip analyze.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o anneal.x anneal.o libtinker.a libjvm.so ; strip anneal.x
-ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o archive.x archive.o libtinker.a libjvm.so ; strip archive.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o arcedit.x arcedit.o libtinker.a libjvm.so ; strip arcedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o bar.x bar.o libtinker.a libjvm.so ; strip bar.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o correlate.x correlate.o libtinker.a libjvm.so ; strip correlate.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o critical.x critical.o libtinker.a libjvm.so ; strip critical.x

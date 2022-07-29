@@ -53,6 +53,7 @@ c
       real*8, allocatable :: ycm(:,:)
       real*8, allocatable :: zcm(:,:)
       logical exist,query
+      logical first
       character*240 record
       character*240 string
 c
@@ -195,9 +196,10 @@ c     count the number of coordinate frames in the archive file
 c
       abort = .false.
       rewind (unit=iarc)
+      first= .true.
       nframe = 0
       do while (.not. abort)
-         call readxyz (iarc)
+         call readcart (iarc,first)
          nframe = nframe + 1
       end do
       nframe = nframe - 1
@@ -226,11 +228,11 @@ c
       skip = start
       do while (iframe.ge.start .and. iframe.le.stop)
          do j = 1, skip-1
-            call readxyz (iarc)
+            call readcart (iarc,first)
          end do
          iframe = iframe + step
          skip = step
-         call readxyz (iarc)
+         call readcart (iarc,first)
          if (n .eq. 0)  goto 160
          nframe = nframe + 1
          if (mod(nframe,100) .eq. 0) then

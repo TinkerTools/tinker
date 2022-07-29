@@ -303,7 +303,7 @@ c
 c     store the prior coordinates to start each MCM iteration
 c
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          istep = istep + 1
          do i = 1, n
             xp(i) = x(i)

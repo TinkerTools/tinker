@@ -12,10 +12,12 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     archive     logical flag to save structures as formatted archive
-c     binary      logical flag to save structures as binary archive
+c     archive     logical flag for coordinates in Tinker XYZ format
+c     binary      logical flag for coordinates in DCD binary format
 c     noversion   logical flag governing use of filename versions
 c     overwrite   logical flag to overwrite intermediate files inplace
+c     arcsave     logical flag to save coordinates in Tinker XYZ format
+c     dcdsave     logical flag to save coordinates in DCD binary format
 c     cyclesave   logical flag to mark use of numbered cycle files
 c     velsave     logical flag to save velocity vector components
 c     frcsave     logical flag to save force vector components
@@ -30,6 +32,8 @@ c
       logical noversion
       logical overwrite
       logical cyclesave
+      logical arcsave
+      logical dcdsave
       logical velsave
       logical frcsave
       logical uindsave

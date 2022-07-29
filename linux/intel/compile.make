@@ -193,7 +193,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analysis.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analyze.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angles.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp anneal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp archive.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp arcedit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp attach.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp baoab.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bar.f
@@ -377,6 +377,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp freeunit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gda.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp geometry.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getarc.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getcart.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getkey.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getmol.f
@@ -507,6 +508,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmedit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmkey.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp promo.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp protein.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtarc.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtdcd.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtdyn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prterr.f
@@ -524,6 +526,8 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp quatfit.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp radial.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp random.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rattle.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readcart.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readdcd.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readdyn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readgau.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readgdma.f
@@ -546,6 +550,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp scan.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sdstep.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp search.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp server.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp setprm.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp shakeup.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sigmoid.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp simplex.f

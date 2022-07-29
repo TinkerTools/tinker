@@ -11,7 +11,7 @@
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o alchemy.x alchemy.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o analyze.x analyze.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o anneal.x anneal.o libtinker.a libfftw3_threads.a libfftw3.a
-ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a
+ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o arcedit.x arcedit.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a
 ifort -O3 -g -no-ipo -no-prec-div -qopenmp -static-intel -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a

@@ -11,7 +11,7 @@
 mv ALCHEMY.ZIP   alchemy.zip
 mv ANALYZE.ZIP   analyze.zip
 mv ANNEAL.ZIP    anneal.zip
-mv ARCHIVE.ZIP   archive.zip
+mv ARCEDIT.ZIP   arcedit.zip
 mv BAR.ZIP       bar.zip
 mv CORRELATE.ZIP correlate.zip
 mv CRITICAL.ZIP  critical.zip

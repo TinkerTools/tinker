@@ -11,7 +11,7 @@
 gfortran -Ofast -fopenmp -static-libgcc -o alchemy.x alchemy.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o analyze.x analyze.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o anneal.x anneal.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
-gfortran -Ofast -fopenmp -static-libgcc -o archive.x archive.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
+gfortran -Ofast -fopenmp -static-libgcc -o arcedit.x arcedit.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o bar.x bar.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o correlate.x correlate.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation
 gfortran -Ofast -fopenmp -static-libgcc -o critical.x critical.o -L. libtinker.a libfftw3_threads.a libfftw3.a -framework JavaVM -framework CoreFoundation

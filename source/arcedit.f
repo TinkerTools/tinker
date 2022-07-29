@@ -7,26 +7,27 @@ c     ###################################################
 c
 c     ##############################################################
 c     ##                                                          ##
-c     ##  program archive  --  create or extract from an archive  ##
+c     ##  program arcedit  --  create or extract from an archive  ##
 c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "archive" is a utility program for coordinate files which
+c     "arcedit" is a utility program for coordinate files which
 c     concatenates multiple coordinate sets into a new archive or
 c     performs any of several manipulations on an existing archive
 c
 c
-      program archive
+      program arcedit
       use atoms
       use bound
       use files
       use inform
       use iounit
+      use output
       use usage
       implicit none
-      integer i,j,k
-      integer iarc,ixyz
+      integer i,j,k,nask
+      integer iarc,ixyz,idcd
       integer start,stop
       integer step,size
       integer nmode,mode
@@ -39,9 +40,12 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       logical exist,query
+      logical first,opened
+      character*1 letter
       character*7 ext,modtyp
       character*240 arcfile
       character*240 basename
+      character*240 dcdfile
       character*240 xyzfile
       character*240 record
       character*240 string
@@ -50,73 +54,121 @@ c
 c     initialization and set number of archive modifications
 c
       call initial
-      nmode = 6
+      nmode = 8
 c
-c     get the name to use for the coordinate archive file
+c     try to get a filename from the command line arguments
 c
       call nextarg (arcfile,exist)
-      if (.not. exist) then
+      if (exist) then
+         call basefile (arcfile)
+         call suffix (arcfile,'arc','old')
+         inquire (file=arcfile,exist=exist)
+      end if
+c
+c     ask for the user specified input archive filename
+c
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter the Coordinate Archive File Name :  ',$)
          read (input,20)  arcfile
    20    format (a240)
-      end if
+         call basefile (arcfile)
+         call suffix (arcfile,'arc','old')
+         inquire (file=arcfile,exist=exist)
+      end do
+      if (.not. exist)  call fatal
+c
+c     get file format type by inspection of first character
+c
+      coordtype = 'CARTESIAN'
+      iarc = freeunit ()
+      open (unit=iarc,file=arcfile,status='old')
+      rewind (unit=iarc)
+      read (iarc,30)  letter
+   30 format (a1)
+      archive = .false.
+      if (letter .eq. ' ')  archive = .true.
+      if (letter.ge.'0' .and. letter.le.'9')  archive = .true.
+      binary = (.not. archive)
+      close (unit=iarc)
 c
 c     find out which archive modification to perform
 c
-      mode = 0
+      mode = -1
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=30,end=30)  mode
-         if (mode.ge.1 .and. mode.le.6)  query = .false.
+         read (string,*,err=40,end=40)  mode
+         if (mode.ge.0 .and. mode.le.nmode)  query = .false.
       end if
-   30 continue
+   40 continue
       if (query) then
-         write (iout,40)
-   40    format (/,' The Tinker Archive File Utility Can :',
+         write (iout,50)
+   50    format (/,' The Tinker Archive File Utility Can :',
      &           //,4x,'(1) Create an Archive from Individual Frames',
      &           /,4x,'(2) Extract Individual Frames from an Archive',
      &           /,4x,'(3) Trim an Archive to Remove Atoms or Frames',
      &           /,4x,'(4) Enforce Periodic Boundaries for a Trajectory'
      &           /,4x,'(5) Unfold Periodic Boundaries for a Trajectory',
-     &           /,4x,'(6) Remove Periodic Box Size from a Trajectory')
-         do while (mode.lt.1 .or. mode.gt.nmode)
-            mode = 0
-            write (iout,50)
-   50       format (/,' Enter the Number of the Desired Choice :  ',$)
-            read (input,60,err=70,end=70)  mode
-   60       format (i10)
-   70       continue
+     &           /,4x,'(6) Remove Periodic Box Size from a Trajectory',
+     &           /,4x,'(7) Convert Tinker Archive to Binary DCD File',
+     &           /,4x,'(8) Convert Binary DCD File to Tinker Archive')
+         do while (mode.lt.0 .or. mode.gt.nmode)
+            mode = -1
+            write (iout,60)
+   60       format (/,' Enter the Number of the Desired Choice :  ',$)
+            read (input,70,err=80,end=80)  mode
+   70       format (i10)
+   80       continue
          end do
       end if
 c
 c     set code for the type of procedure to be performed
 c
+      if (mode .eq. 0)  modtyp = 'EXIT'
       if (mode .eq. 1)  modtyp = 'CREATE'
       if (mode .eq. 2)  modtyp = 'EXTRACT'
       if (mode .eq. 3)  modtyp = 'TRIM'
       if (mode .eq. 4)  modtyp = 'FOLD'
       if (mode .eq. 5)  modtyp = 'UNFOLD'
       if (mode .eq. 6)  modtyp = 'UNBOUND'
+      if (mode .eq. 7) then
+         modtyp = 'ARCDCD'
+         archive = .true.
+         binary = .false.
+      end if
+      if (mode .eq. 8) then
+         modtyp = 'DCDARC'
+         archive = .false.
+         binary = .true.
+      end if
 c
-c     create a new archive file or open an existing one
+c     create and open a new Tinker formatted archive file
 c
-      iarc = freeunit ()
-      call basefile (arcfile)
-      basename = arcfile
-      lengb = leng
       if (modtyp .eq. 'CREATE') then
+         iarc = freeunit ()
+         call basefile (arcfile)
+         basename = arcfile
+         lengb = leng
          call suffix (arcfile,'arc','new')
          open (unit=iarc,file=arcfile,status='new')
-      else
+c
+c     open an existing Tinker archive file for processing
+c
+      else if (archive) then
+         iarc = freeunit ()
+         call basefile (arcfile)
+         basename = arcfile
+         lengb = leng
          call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
-            write (iout,80)
-   80       format (/,' Enter the Coordinate Archive File Name :  ',$)
-            read (input,90)  arcfile
-   90       format (a240)
+            write (iout,90)
+   90       format (/,' Enter the Coordinate Archive File Name :  ',$)
+            read (input,100)  arcfile
+  100       format (a240)
             call basefile (arcfile)
             basename = arcfile
             lengb = leng
@@ -127,6 +179,58 @@ c
          rewind (unit=iarc)
          call readxyz (iarc)
          rewind (unit=iarc)
+         call active
+c
+c     open an existing binary DCD trajectory file for processing
+c
+      else if (binary) then
+         idcd = freeunit ()
+         dcdfile = arcfile
+         call basefile (dcdfile)
+         basename = dcdfile
+         lengb = leng
+         call suffix (dcdfile,'dcd','old')
+         inquire (file=dcdfile,exist=exist)
+         do while (.not. exist)
+            write (iout,110)
+  110       format (/,' Enter the DCD Binary Archive File Name :  ',$)
+            read (input,120)  dcdfile
+  120       format (a240)
+            call basefile (dcdfile)
+            basename = dcdfile
+            lengb = leng
+            call suffix (dcdfile,'dcd','old')
+            inquire (file=dcdfile,exist=exist)
+         end do
+         call nextarg (xyzfile,exist)
+         if (exist) then
+            call basefile (xyzfile)
+            call suffix (xyzfile,'xyz','old')
+            inquire (file=xyzfile,exist=exist)
+         end if
+         nask = 0
+         do while (.not.exist .and. nask.lt.maxask)
+            nask = nask + 1
+            write (iout,130)
+  130       format (/,' Enter Formatted Coordinate File Name :  ',$)
+            read (input,140)  xyzfile
+  140       format (a240)
+            call basefile (xyzfile)
+            call suffix (xyzfile,'xyz','old')
+            inquire (file=xyzfile,exist=exist)
+         end do
+         if (.not. exist)  call fatal
+         ixyz = freeunit ()
+         open (unit=ixyz,file=xyzfile,status='old')
+         rewind (unit=ixyz)
+         call readxyz (ixyz)
+         close (unit=ixyz)
+         open (unit=idcd,file=dcdfile,form='unformatted',status='old')
+         rewind (unit=idcd)
+         first = .true.
+         call readdcd (idcd,first)
+         rewind (unit=idcd)
+         first = .true.
          call active
       end if
 c
@@ -140,22 +244,22 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=100,end=100)  start
+            read (string,*,err=150,end=150)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=100,end=100)  stop
+         if (exist)  read (string,*,err=150,end=150)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=100,end=100)  step
-  100    continue
+         if (exist)  read (string,*,err=150,end=150)  step
+  150    continue
          if (query) then
-            write (iout,110)
-  110       format (/,' Numbers of First & Last File and Step',
+            write (iout,160)
+  160       format (/,' Numbers of First & Last File and Step',
      &                 ' Increment :  ',$)
-            read (input,120)  record
-  120       format (a240)
-            read (record,*,err=130,end=130)  start,stop,step
-  130       continue
+            read (input,170)  record
+  170       format (a240)
+            read (record,*,err=180,end=180)  start,stop,step
+  180       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -202,8 +306,10 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      size = 40
-      allocate (list(size))
+      if (modtyp .eq. 'TRIM') then
+         size = 40
+         allocate (list(size))
+      end if
 c
 c     decide whether atoms are to be removed from each frame
 c
@@ -217,22 +323,22 @@ c
             query = .true.
             call nextarg (string,exist)
             if (exist) then
-               dowhile (i .le. size)
-                  read (string,*,err=140,end=140)  list(i)
-                  if (list(i) .eq. 0)  goto 140
+               do while (i .le. size)
+                  read (string,*,err=190,end=190)  list(i)
+                  if (list(i) .eq. 0)  goto 190
                   i = i + 1
                   call nextarg (string,exist)
                end do
-  140          continue
+  190          continue
                query = .false.
             end if
             if (query) then
-               write (iout,150)
-  150          format (/,' Numbers of the Atoms to be Removed :  ',$)
-               read (input,160)  record
-  160          format (a240)
-               read (record,*,err=170,end=170)  (list(i),i=1,size)
-  170          continue
+               write (iout,200)
+  200          format (/,' Numbers of the Atoms to be Removed :  ',$)
+               read (input,210)  record
+  210          format (a240)
+               read (record,*,err=220,end=220)  (list(i),i=1,size)
+  220          continue
             end if
             i = 1
             do while (list(i) .ne. 0)
@@ -256,6 +362,10 @@ c
                end if
             end do
          end if
+c
+c     perform deallocation of some local arrays
+c
+         deallocate (list)
       end if
 c
 c     store index to use in renumbering the untrimmed atoms
@@ -269,11 +379,49 @@ c
          end if
       end do
 c
+c     convert Tinker archive to binary DCD trajectory file
+c
+      if (modtyp .eq. 'ARCDCD') then
+         modtyp = 'EXIT'
+         first = .true.
+         idcd = freeunit ()
+         dcdfile = filename(1:leng)//'.dcd'
+         call version (dcdfile,'new')
+         open (unit=idcd,file=dcdfile,form='unformatted',status='new')
+         do while (.true.)
+            call readxyz (iarc)
+            if (abort)  goto 230
+            call prtdcd (idcd,first)
+         end do
+  230    continue
+         close (unit=idcd)
+      end if
+c
+c     convert binary DCD trajectory file to Tinker archive
+c
+      if (modtyp .eq. 'DCDARC') then
+         modtyp = 'EXIT'
+         first = .true.
+         iarc = freeunit ()
+         arcfile = filename(1:leng)//'.arc'
+         call version (arcfile,'new')
+         open (unit=iarc,file=arcfile,status='new')
+         do while (.true.)
+            call readdcd (idcd,first)
+            if (abort)  goto 240
+            call prtarc (iarc)
+         end do
+  240    continue
+         close (unit=iarc)
+      end if
+c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (xold(n))
-      allocate (yold(n))
-      allocate (zold(n))
+      if (modtyp .ne. 'EXIT') then
+         allocate (xold(n))
+         allocate (yold(n))
+         allocate (zold(n))
+      end if
 c
 c     get the initial and final coordinate frames to process
 c
@@ -297,22 +445,22 @@ c
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=180,end=180)  start
+            read (string,*,err=250,end=250)  start
             query = .false.
          end if
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=180,end=180)  stop
+         if (exist)  read (string,*,err=250,end=250)  stop
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=180,end=180)  step
-  180    continue
+         if (exist)  read (string,*,err=250,end=250)  step
+  250    continue
          if (query) then
-            write (iout,190)
-  190       format (/,' Numbers of First & Last File and Step',
+            write (iout,260)
+  260       format (/,' Numbers of First & Last File and Step',
      &                 ' [<Enter>=Exit] :  ',$)
-            read (input,200)  record
-  200       format (a240)
-            read (record,*,err=210,end=210)  start,stop,step
-  210       continue
+            read (input,270)  record
+  270       format (a240)
+            read (record,*,err=280,end=280)  start,stop,step
+  280       continue
          end if
          if (stop .eq. 0)  stop = start
          if (step .eq. 0)  step = 1
@@ -322,18 +470,20 @@ c
          do while (start .ne. 0)
             if (start .le. now) then
                now = 1
-               rewind (unit=iarc)
+               first = .true.
+               if (archive)  rewind (unit=iarc)
+               if (binary)  rewind (unit=idcd)
             end if
             do k = 1, start-now
-               call readxyz (iarc)
+               call readcart (iarc,first)
             end do
             i = start
             if (modtyp .eq. 'EXTRACT') then
                do while (i.ge.start .and. i.le.stop)
                   lext = 3
                   call numeral (i,ext,lext)
-                  call readxyz (iarc)
-                  if (abort)  goto 220
+                  call readcart (iarc,first)
+                  if (abort)  goto 290
                   nuse = n
                   do j = 1, n
                      use(j) = .true.
@@ -341,22 +491,35 @@ c
                   ixyz = freeunit ()
                   xyzfile = filename(1:leng)//'.'//ext(1:lext)
                   call version (xyzfile,'new')
-                  open (unit=ixyz,file=xyzfile,status='new')
-                  call prtarc (ixyz)
+                  if (archive) then
+                     open (unit=ixyz,file=xyzfile,status='new')
+                  else if (binary) then
+                     open (unit=ixyz,file=xyzfile,form='unformatted',
+     &                        status='new')
+                  end if
+                  first = .true.
+                  if (archive)  call prtarc (ixyz)
+                  if (binary)  call prtdcd (ixyz,first)
                   close (unit=ixyz)
                   i = i + step
                   do k = 1, step-1
-                     call readxyz (iarc)
+                     call readcart (iarc,first)
                   end do
                end do
             else
                ixyz = freeunit ()
                xyzfile = basename
                call suffix (xyzfile,'arc','new')
-               open (unit=ixyz,file=xyzfile,status='new')
+               if (archive) then
+                  open (unit=ixyz,file=xyzfile,status='new')
+               else if (binary) then
+                  open (unit=ixyz,file=xyzfile,form='unformatted',
+     &                     status='new')
+               end if
                do while (i.ge.start .and. i.le.stop)
-                  call readxyz (iarc)
-                  if (abort)  goto 220
+                  if (modtyp .eq. 'UNBOUND')  use_bounds = .true.
+                  call readcart (iarc,first)
+                  if (abort)  goto 290
                   if (modtyp .eq. 'FOLD') then
                      call unitcell
                      if (use_bounds) then
@@ -390,18 +553,19 @@ c
                         yold(j) = y(j)
                         zold(j) = z(j)
                      end do
-                  else if (modtyp .eq. 'UNBOUND') then
-                     use_bounds = .false.
                   end if
-                  call prtarc (ixyz)
+                  if (i .eq. start)  first = .true.
+                  if (modtyp .eq. 'UNBOUND')  use_bounds = .false.
+                  if (archive)  call prtarc (ixyz)
+                  if (binary)  call prtdcd (ixyz,first)
                   i = i + step
                   do k = 1, step-1
-                     call readxyz (iarc)
+                     call readcart (iarc,first)
                   end do
                end do
                close (unit=ixyz)
             end if
-  220       continue
+  290       continue
             now = stop
             start = 0
             stop = 0
@@ -409,146 +573,39 @@ c
             query = .true.
             call nextarg (string,exist)
             if (exist) then
-               read (string,*,err=230,end=230)  start
+               read (string,*,err=300,end=300)  start
                query = .false.
             end if
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=230,end=230)  stop
+            if (exist)  read (string,*,err=300,end=300)  stop
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=230,end=230)  step
-  230       continue
+            if (exist)  read (string,*,err=300,end=300)  step
+  300       continue
             if (query) then
-               write (iout,240)
-  240          format (/,' Numbers of First & Last File and Step',
+               write (iout,310)
+  310          format (/,' Numbers of First & Last File and Step',
      &                    ' [<Enter>=Exit] :  ',$)
-               read (input,250)  record
-  250          format (a240)
-               read (record,*,err=260,end=260)  start,stop,step
-  260          continue
+               read (input,320)  record
+  320          format (a240)
+               read (record,*,err=330,end=330)  start,stop,step
+  330          continue
             end if
             if (stop .eq. 0)  stop = start
             if (step .eq. 0)  step = 1
          end do
-      end if
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xold)
-      deallocate (yold)
-      deallocate (zold)
+         deallocate (xold)
+         deallocate (yold)
+         deallocate (zold)
+      end if
 c
 c     perform any final tasks before program exit
 c
-      close (unit=iarc)
-      call final
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine prtarc  --  output of a Tinker archive file  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "prtarc" writes out a set of Cartesian coordinates for
-c     all active atoms in the Tinker XYZ archive format
-c
-c
-      subroutine prtarc (iarc)
-      use atomid
-      use atoms
-      use bound
-      use boxes
-      use couple
-      use files
-      use inform
-      use titles
-      use usage
-      implicit none
-      integer i,j,k,iarc
-      integer size,crdsiz
-      real*8 crdmin,crdmax
-      logical opened
-      character*2 atmc
-      character*2 crdc
-      character*2 digc
-      character*25 fstr
-      character*240 arcfile
-c
-c
-c     open output unit if not already done
-c
       inquire (unit=iarc,opened=opened)
-      if (.not. opened) then
-         arcfile = filename(1:leng)//'.arc'
-         call version (arcfile,'new')
-         open (unit=iarc,file=arcfile,status='new')
-      end if
-c
-c     check for large systems needing extended formatting
-c
-      atmc = 'i6'
-      if (n .ge. 100000)  atmc = 'i7'
-      if (n .ge. 1000000)  atmc = 'i8'
-      crdmin = 0.0d0
-      crdmax = 0.0d0
-      do i = 1, n
-         crdmin = min(crdmin,x(i),y(i),z(i))
-         crdmax = max(crdmax,x(i),y(i),z(i))
-      end do
-      crdsiz = 6
-      if (crdmin .le. -1000.0d0)  crdsiz = 7
-      if (crdmax .ge. 10000.0d0)  crdsiz = 7
-      if (crdmin .le. -10000.0d0)  crdsiz = 8
-      if (crdmax .ge. 100000.0d0)  crdsiz = 8
-      crdsiz = crdsiz + max(6,digits)
-      size = 0
-      call numeral (crdsiz,crdc,size)
-      if (digits .le. 6) then
-         digc = '6 '
-      else if (digits .le. 8) then
-         digc = '8'
-      else
-         digc = '10'
-      end if
-c
-c     write out the number of atoms and the title
-c
-      if (ltitle .eq. 0) then
-         fstr = '('//atmc//')'
-         write (iarc,fstr(1:4))  nuse
-      else
-         fstr = '('//atmc//',2x,a)'
-         write (iarc,fstr(1:9))  nuse,title(1:ltitle)
-      end if
-c
-c     write out the periodic cell lengths and angles
-c
-      if (use_bounds) then
-         fstr = '(1x,6f'//crdc//'.'//digc//')'
-         write (iarc,fstr)  xbox,ybox,zbox,alpha,beta,gamma
-      end if
-c
-c     write out the coordinate line for each atom
-c
-      fstr = '('//atmc//',2x,a3,3f'//crdc//
-     &          '.'//digc//',i6,8'//atmc//')'
-      do i = 1, n
-         if (use(i)) then
-            k = n12(i)
-            if (k .eq. 0) then
-               write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),
-     &                            type(i)
-            else
-               write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),
-     &                            type(i),(iuse(i12(j,i)),j=1,k)
-            end if
-         end if
-      end do
-c
-c     close the output unit if opened by this routine
-c
-      if (.not. opened)  close (unit=iarc)
-      return
+      if (opened)  close (unit=iarc)
+      inquire (unit=idcd,opened=opened)
+      if (opened)  close (unit=idcd)
+      call final
       end

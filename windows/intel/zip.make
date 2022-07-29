@@ -3,7 +3,7 @@
 #  #############################################################
 #  ##                                                         ##
 #  ##  zip.make  --  compress each of the Tinker executables  ##
-#  ##            (Windows Version; Run under Linux)           ##
+#  ##        (Windows Version; Run under Cygwin/Linux)        ##
 #  ##                                                         ##
 #  #############################################################
 #
@@ -11,7 +11,7 @@
 zip alchemy.zip alchemy.exe
 zip analyze.zip analyze.exe
 zip anneal.zip anneal.exe
-zip archive.zip archive.exe
+zip arcedit.zip arcedit.exe
 zip bar.zip bar.exe
 zip correlate.zip correlate.exe
 zip critical.zip critical.exe

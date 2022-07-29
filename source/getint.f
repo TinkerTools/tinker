@@ -67,7 +67,7 @@ c
       if (abort) then
          write (iout,30)
    30    format (/,' GETINT  --  Internal Coordinates File',
-     &              ' does not Contain Any Atoms')
+     &              ' was not Read Correctly')
          call fatal
       end if
 c

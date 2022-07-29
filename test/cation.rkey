@@ -1,0 +1,22 @@
+parameters       ../params/amoeba09
+verbose
+randomseed       123456789
+
+a-axis           18.643
+integrator       RESPA
+thermostat       BUSSI
+
+neighbor-list
+list-buffer      0.2
+vdw-cutoff       9.0
+ewald
+ewald-cutoff     7.0
+
+polarization     MUTUAL
+polar-eps        0.00001
+polar-predict
+
+# VDW parameters for Rb+ Ion
+
+vdw           9               3.9000     0.3800
+vdw          10               3.9000     0.3800

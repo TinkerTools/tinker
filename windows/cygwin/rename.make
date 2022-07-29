@@ -10,7 +10,7 @@
 mv alchemy.x   ../bin/alchemy.exe
 mv analyze.x   ../bin/analyze.exe
 mv anneal.x    ../bin/anneal.exe
-mv archive.x   ../bin/archive.exe
+mv arcedit.x   ../bin/arcedit.exe
 mv bar.x       ../bin/bar.exe
 mv correlate.x ../bin/correlate.exe
 mv critical.x  ../bin/critical.exe

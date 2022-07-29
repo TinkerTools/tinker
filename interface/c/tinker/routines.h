@@ -1431,6 +1431,14 @@ double geometry_(int* ia, int* ib, int* ic, int* id);
 void getarc_(int* iarc);
 #define tinker_f_getarc getarc_
 
+// getcart.f
+void getcart_(int* ixyz);
+#define tinker_f_getcart getcart_
+
+// getdcd.f
+void getdcd_(int* idcd);
+#define tinker_f_getdcd getdcd_
+
 // getint.f
 void getint_();
 #define tinker_f_getint getint_
@@ -2145,8 +2153,12 @@ void nbondoff_();
 void promo_();
 #define tinker_f_promo promo_
 
+// prtarc.f
+void prtarc_(int* iarc);
+#define tinker_f_prtarc prtarc_
+
 // prtdcd.f
-void prtdcd_(int* idcd);
+void prtdcd_(int* idcd, int* first);
 #define tinker_f_prtdcd prtdcd_
 
 // prtdyn.f
@@ -2214,6 +2226,14 @@ void shake_(double* xold, double* yold, double* zold);
 #define tinker_f_shake shake_
 void shake2_(double* derivs);
 #define tinker_f_shake2 shake2_
+
+// readcart.f
+void readcart_(int* ixyz, int* first);
+#define tinker_f_readcart readcart_
+
+// readdcd.f
+void readdcd_(int* idcd, int* first);
+#define tinker_f_readdcd readdcd_
 
 // readdyn.f
 void readdyn_(int* idyn);

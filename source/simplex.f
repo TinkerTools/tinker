@@ -107,7 +107,7 @@ c
 c
 c     initialize or restart with the base function value
 c
-      dowhile (.not. done)
+      do while (.not. done)
          do i = 1, nvar
             p(i,nvar+1) = x0(i)
          end do
@@ -140,7 +140,7 @@ c
 c
 c     set "y0" to be the current highest function value
 c
-         dowhile (iter .lt. maxiter)
+         do while (iter .lt. maxiter)
             ihi = nvar + 1
             y0 = y(ihi)
             do i = 1, nvar

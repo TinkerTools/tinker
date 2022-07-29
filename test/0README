@@ -13,89 +13,94 @@
       the example runs and should be invoked prior to validating Tinker
       executables against the provided log files.
 
-      (1) ANION       estimates the free energy of hydration of Cl- anion
-                      vs. Br- anion via a 2 picosecond simulation on a
-                      "hybrid" anion in a box of water, followed by free
-                      energy perturbation
+      (1) ANION       estimates the hydration free energy difference for
+                      Cl- vs. Br- anion via a 10 picosecond simulation
+                      of a "hybrid" anion in a box of water, followed by
+                      free energy perturbation
 
       (2) ARGON       minimize, then perform 25 picoseconds of molecular
                       dynamics simulation, on a box with 150 argon atoms
 
-      (3) CLUSTER     performs 10 Gaussian density annealing trials on a
+      (3) CATION      estimates the hydration free energy difference for
+                      Rb+ vs. Cs+ cation via a 2 picosecond simulation
+                      of each cation in a box of water, followed by a BAR
+                      free energy calculation
+
+      (4) CLUSTER     performs 10 Gaussian density annealing trials on a
                       cluster of 13 argon atoms to find the global minimum
                       energy structure
 
-      (4) CRAMBIN     generate a Tinker XYZ file from a PDB file, followed
+      (5) CRAMBIN     generate a Tinker XYZ file from a PDB file, followed
                       by single point energy computation and determination
                       of the molecular volume and surface area
 
-      (5) CYCLOHEX    locate the transition state between chair and boat
+      (6) CYCLOHEX    locate the transition state between chair and boat
                       cyclohexane via two methods: the Muller-Brown saddle
                       point method, and path sampling using the Elber
                       algorithm; vibrational analysis of the results shows
                       the same TS with one negative frequency
 
-      (6) DHFR        run 10 molecular dynamics steps on pre-equilibrated
+      (7) DHFR        run 10 molecular dynamics steps on pre-equilibrated
                       DHFR protein in water using the AMOEBA force field
                       (the so-called Joint Amber-CHARMM benchmark)
 
-      (7) DIALANINE   find all local minima of alanine dipeptide via a
+      (8) DIALANINE   find all local minima of alanine dipeptide via a
                       potential energy surface scan using torsional modes
                       to jump between minima
 
-      (8) ENKEPHALIN  generate coordinates from amino acid sequence and
+      (9) ENKEPHALIN  generate coordinates from amino acid sequence and
                       phi/psi angles, followed by energy minimization and
                       determination of the lowest frequency normal mode
 
-      (9) ETHANOL     fit torsional parameter values for the C-C-O-H bond
+      (10) ETHANOL    fit torsional parameter values for the C-C-O-H bond
                       based on relative quantum mechanical (G09) energies
                       for rotating the C-O bond
 
-      (10) FORMAMIDE  generate a unit cell from fractional coordinates,
+      (11) FORMAMIDE  generate a unit cell from fractional coordinates,
                       followed by full crystal energy minimization and
                       determination of optimal carbonyl oxygen parameters
                       via a fit to lattice energy and structure
 
-      (11) GPCR       find the lowest-frequency bacteriorhodopsin normal
+      (12) GPCR       find the lowest-frequency bacteriorhodopsin normal
                       mode using a sliding block iterative diagonalization
                       (alter gpcr.run script to save the file gpcr.001 if
                       you want to view the mode; this example can require
                       up to an hour to complete)
 
-      (12) HELIX      optimize rigid-body packing of two ideal polyalanine
+      (13) HELIX      optimize rigid-body packing of two ideal polyalanine
                       helices using only van der Waals interactions
 
-      (13) ICE        short MD simulation of the monoclinic ice V crystal
+      (14) ICE        short MD simulation of the monoclinic ice V crystal
                       form using the iAMOEBA water model, neighbor lists
                       and PME electrostatics
 
-      (14) IFABP      generate distance geometry structures for intestinal
+      (15) IFABP      generate distance geometry structures for intestinal
                       fatty acid binding protein from NOE distances and
                       torsional restraints
 
-      (15) LIQUID     print the system setup and compute the force field
+      (16) LIQUID     print the system setup and compute the force field
                       energy components for three small liquid water boxes
                       using the AMOEBA, AMOEBA+ and HIPPO force fields
 
-      (16) METHANOL   process distributed multipole analysis (DMA) output
+      (17) METHANOL   process distributed multipole analysis (DMA) output
                       to extract coordinates and permanent multipoles, set
                       local frames and polarization groups, modify the
                       intramolecular polarization, and average equivalent
                       atomic sites
 
-      (17) NITROGEN   calculate the self-diffusion constant and N-N radial
+      (18) NITROGEN   calculate the self-diffusion constant and N-N radial
                       distribution function for a liquid nitrogen box via
                       analysis of a 50ps MD trajectory
 
-      (18) POLYALA    generate an extended conformation of capped alanine
+      (19) POLYALA    generate an extended conformation of capped alanine
                       octapeptide, then use Monte Carlo Minimization with
                       torsion moves to find the 3/10 helix global minimum
 
-      (19) SALT       convert sodium chloride asymmetric unit to the unit
+      (20) SALT       convert sodium chloride asymmetric unit to the unit
                       cell, then minimize the crystal from the diffraction
                       structure using Ewald summation electrostatics
 
-      (20) WATER      fit the electrostatic potential for an AMOEBA water
+      (21) WATER      fit the electrostatic potential for an AMOEBA water
                       molecule to QM-derived potential (MP2/aug-cc-pVTZ)
                       on a grid of points outside the molecular surface
 

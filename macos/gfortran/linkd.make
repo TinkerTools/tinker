@@ -11,7 +11,7 @@
 gfortran -Og -g -fbacktrace -static-libgcc -o alchemy.x alchemy.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o analyze.x analyze.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o anneal.x anneal.o -L. libtinker.a libfftw3_threads.a libfftw3.a
-gfortran -Og -g -fbacktrace -static-libgcc -o archive.x archive.o -L. libtinker.a libfftw3_threads.a libfftw3.a
+gfortran -Og -g -fbacktrace -static-libgcc -o arcedit.x arcedit.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o bar.x bar.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o correlate.x correlate.o -L. libtinker.a libfftw3_threads.a libfftw3.a
 gfortran -Og -g -fbacktrace -static-libgcc -o critical.x critical.o -L. libtinker.a libfftw3_threads.a libfftw3.a

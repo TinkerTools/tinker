@@ -161,7 +161,7 @@ OBJS =	action.o \
 	angpot.o \
 	angtor.o \
 	anneal.o \
-	archive.o \
+	arcedit.o \
 	argue.o \
 	ascii.o \
 	atmlst.o \
@@ -383,6 +383,8 @@ OBJS =	action.o \
 	gda.o \
 	geometry.o \
 	getarc.o \
+	getcart.o \
+	getdcd.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -599,6 +601,7 @@ OBJS =	action.o \
 	prmkey.o \
 	promo.o \
 	protein.o \
+	prtarc.o \
 	prtdcd.o \
 	prtdyn.o \
 	prterr.o \
@@ -618,6 +621,8 @@ OBJS =	action.o \
 	radial.o \
 	random.o \
 	rattle.o \
+	readcart.o \
+	readdcd.o \
 	readdyn.o \
 	readgau.o \
 	readgdma.o \
@@ -1005,6 +1010,8 @@ libtinker.a: ${OBJS}
 	freeze.o \
 	geometry.o \
 	getarc.o \
+	getcart.o \
+	getdcd.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
@@ -1201,6 +1208,7 @@ libtinker.a: ${OBJS}
 	pressure.o \
 	prmkey.o \
 	promo.o \
+	prtarc.o \
 	prtdcd.o \
 	prtdyn.o \
 	prterr.o \
@@ -1216,6 +1224,8 @@ libtinker.a: ${OBJS}
 	quatfit.o \
 	random.o \
 	rattle.o \
+	readcart.o \
+	readdcd.o \
 	readdyn.o \
 	readgau.o \
 	readgdma.o \
@@ -1331,7 +1341,7 @@ angles.o: angbnd.o atmlst.o atoms.o couple.o iounit.o
 angpot.o:
 angtor.o:
 anneal.o: atomid.o atoms.o bath.o bndstr.o bound.o inform.o iounit.o mdstuf.o potent.o solute.o usage.o warp.o
-archive.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o iounit.o titles.o usage.o
+arcedit.o: atoms.o bound.o files.o inform.o iounit.o output.o usage.o
 argue.o:
 ascii.o:
 atmlst.o:
@@ -1339,7 +1349,7 @@ atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o
 baoab.o: atomid.o atoms.o bath.o freeze.o limits.o mdstuf.o moldyn.o potent.o stodyn.o units.o usage.o virial.o
-bar.o: boxes.o files.o inform.o iounit.o keys.o titles.o units.o
+bar.o: boxes.o files.o inform.o iounit.o keys.o output.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:
 beeman.o: atomid.o atoms.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o units.o usage.o
@@ -1549,7 +1559,9 @@ freeunit.o: iounit.o
 freeze.o:
 gda.o: atoms.o files.o iounit.o minima.o potent.o vdwpot.o warp.o
 geometry.o: atoms.o math.o
-getarc.o: inform.o iounit.o output.o
+getarc.o: files.o inform.o iounit.o output.o
+getcart.o: files.o inform.o iounit.o output.o
+getdcd.o: inform.o iounit.o output.o
 getint.o: atoms.o inform.o iounit.o output.o
 getkey.o: argue.o files.o iounit.o keys.o openmp.o
 getmol.o: files.o inform.o iounit.o
@@ -1762,7 +1774,8 @@ prmedit.o: angpot.o bndpot.o iounit.o math.o params.o sizes.o urypot.o vdwpot.o
 prmkey.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o expol.o fields.o mplpot.o polpot.o potent.o reppot.o rxnpot.o torpot.o urypot.o vdwpot.o
 promo.o: iounit.o
 protein.o: atomid.o atoms.o couple.o files.o group.o inform.o iounit.o katoms.o math.o molcul.o output.o phipsi.o potent.o resdue.o restrn.o rigid.o sequen.o titles.o usage.o
-prtdcd.o: atoms.o boxes.o files.o titles.o
+prtarc.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o titles.o usage.o
+prtdcd.o: atoms.o bound.o boxes.o files.o titles.o usage.o
 prtdyn.o: atoms.o boxes.o files.o group.o mdstuf.o moldyn.o rgddyn.o titles.o
 prterr.o: files.o output.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
@@ -1781,6 +1794,8 @@ quatfit.o: align.o
 radial.o: argue.o atomid.o atoms.o bound.o boxes.o files.o inform.o iounit.o limits.o math.o molcul.o potent.o
 random.o: inform.o iounit.o keys.o math.o
 rattle.o: atomid.o atoms.o freeze.o group.o inform.o iounit.o moldyn.o units.o usage.o virial.o
+readcart.o: output.o
+readdcd.o: atoms.o bound.o boxes.o files.o inform.o iounit.o titles.o
 readdyn.o: atoms.o boxes.o files.o group.o iounit.o mdstuf.o moldyn.o rgddyn.o
 readgau.o: ascii.o iounit.o qmstuf.o units.o
 readgdma.o: atomid.o atoms.o dma.o files.o iounit.o mpole.o units.o

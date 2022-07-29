@@ -122,13 +122,13 @@ set(_FILES
     etors1 etors2 etors3 etortor etortor1 etortor2 etortor3 eurey eurey1
     eurey2 eurey3 evcorr ewald extra extra1 extra2 extra3 faces fatal
     fft fft3d fftpack field fields files final flatten fracs freeunit
-    freeze geometry getarc getint getkey getmol getmol2 getnumb getpdb
-    getprm getref getstring gettext getword getxyz ghmcstep gkstuf
-    gradient gradrgd gradrot group groups grpline gyrate hescut hessian
-    hessn hessrgd hessrot hpmf hybrid ielscf image impose improp imptor
-    induce inertia inform initatom initial initprm initres initrot
-    insert inter invbeta invert iounit jacobi kanang kangang kangle
-    kangs kangtor kantor katom katoms kbond kbonds kcflux kcharge
+    freeze geometry getarc getcart getdcd getint getkey getmol getmol2
+    getnumb getpdb getprm getref getstring gettext getword getxyz
+    ghmcstep gkstuf gradient gradrgd gradrot group groups grpline gyrate
+    hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image impose
+    improp imptor induce inertia inform initatom initial initprm initres
+    initrot insert inter invbeta invert iounit jacobi kanang kangang
+    kangle kangs kangtor kantor katom katoms kbond kbonds kcflux kcharge
     kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp kewald
     kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic kiprop
     kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst korbit
@@ -142,18 +142,18 @@ set(_FILES
     opdist openend openmp optinit optsave orbital orbits orient orthog
     output overlap params paths pbstuf pdb phipsi picalc piorbs pistuf
     pitors pme pmestuf pmpb polar polgrp polopt polpcg polpot poltcg
-    polymer potent potfit predict pressure prmkey promo prtdcd prtdyn
-    prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable qmstuf
-    qrsolve quatfit random rattle readdyn readgau readgdma readint
-    readmol readmol2 readpdb readprm readseq readxyz refer repel replica
-    reppot resdue respa restrn rgddyn rgdstep rigid ring rings rmsfit
-    rotbnd rotlist rotpole rxnfld rxnpot scales sdstep search sequen
-    server setprm shakeup shunt sigmoid simplex sizes sktstuf socket
-    solpot solute sort square stodyn strbnd strtor suffix surface
-    surfatom switch syntrn tarray tcgstuf temper titles tncg torphase
-    torpot torque tors torsions tortor tree trimtext unitcell units
-    uprior urey urypot usage valfit vdw vdwpot verlet version vibs virial
-    volume warp xtals xyzatm zatom zclose zcoord
+    polymer potent potfit predict pressure prmkey promo prtarc prtdcd
+    prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
+    qmstuf qrsolve quatfit random rattle readcart readdcd readdyn readgau
+    readgdma readint readmol readmol2 readpdb readprm readseq readxyz
+    refer repel replica reppot resdue respa restrn rgddyn rgdstep rigid
+    ring rings rmsfit rotbnd rotlist rotpole rxnfld rxnpot scales sdstep
+    search sequen server setprm shakeup shunt sigmoid simplex sizes
+    sktstuf socket solpot solute sort square stodyn strbnd strtor suffix
+    surface surfatom switch syntrn tarray tcgstuf temper titles tncg
+    torphase torpot torque tors torsions tortor tree trimtext unitcell
+    units uprior urey urypot usage valfit vdw vdwpot verlet version vibs
+    virial volume warp xtals xyzatm zatom zclose zcoord
 )
 
 set(_LIB "")
@@ -169,7 +169,7 @@ install(
 )
 
 set(_BINS
-    alchemy analyze anneal archive bar correlate critical crystal
+    alchemy analyze anneal arcedit bar correlate critical crystal
     diffuse distgeom document dynamic freefix gda intedit intxyz
     minimize minirot minrigid mol2xyz molxyz monte newton newtrot
     nucleic optimize optirot optrigid path pdbxyz polarize poledit

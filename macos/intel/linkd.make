@@ -11,7 +11,7 @@
 ifort -g -Wl,-no_pie -o alchemy.x alchemy.o libtinker.a
 ifort -g -Wl,-no_pie -o analyze.x analyze.o libtinker.a
 ifort -g -Wl,-no_pie -o anneal.x anneal.o libtinker.a
-ifort -g -Wl,-no_pie -o archive.x archive.o libtinker.a
+ifort -g -Wl,-no_pie -o arcedit.x arcedit.o libtinker.a
 ifort -g -Wl,-no_pie -o bar.x bar.o libtinker.a
 ifort -g -Wl,-no_pie -o correlate.x correlate.o libtinker.a
 ifort -g -Wl,-no_pie -o critical.x critical.o libtinker.a

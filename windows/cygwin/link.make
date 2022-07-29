@@ -11,7 +11,7 @@
 gfortran -O3 -ffast-math -fopenmp -static -o alchemy.x alchemy.o libtinker.a libfftw3_threads.a libfftw3.a ; strip alchemy.x
 gfortran -O3 -ffast-math -fopenmp -static -o analyze.x analyze.o libtinker.a libfftw3_threads.a libfftw3.a ; strip analyze.x
 gfortran -O3 -ffast-math -fopenmp -static -o anneal.x anneal.o libtinker.a libfftw3_threads.a libfftw3.a ; strip anneal.x
-gfortran -O3 -ffast-math -fopenmp -static -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a ; strip archive.x
+gfortran -O3 -ffast-math -fopenmp -static -o arcedit.x arcedit.o libtinker.a libfftw3_threads.a libfftw3.a ; strip arcedit.x
 gfortran -O3 -ffast-math -fopenmp -static -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a ; strip bar.x
 gfortran -O3 -ffast-math -fopenmp -static -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a ; strip correlate.x
 gfortran -O3 -ffast-math -fopenmp -static -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a ; strip critical.x

@@ -10,7 +10,7 @@
 mv alchemy.x   ../bin/alchemy
 mv analyze.x   ../bin/analyze
 mv anneal.x    ../bin/anneal
-mv archive.x   ../bin/archive
+mv arcedit.x   ../bin/arcedit
 mv bar.x       ../bin/bar
 mv correlate.x ../bin/correlate
 mv critical.x  ../bin/critical

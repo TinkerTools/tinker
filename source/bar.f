@@ -103,6 +103,7 @@ c
       use inform
       use iounit
       use keys
+      use output
       use titles
       implicit none
       integer i,next
@@ -123,7 +124,7 @@ c
       real*8, allocatable :: ub1(:)
       real*8, allocatable :: vola(:)
       real*8, allocatable :: volb(:)
-      logical exist
+      logical exist,first
       logical recompute
       logical use_log
       character*1 answer
@@ -257,7 +258,11 @@ c
       iarc = freeunit ()
       arcfile = filea
       call suffix (arcfile,'arc','old')
-      open (unit=iarc,file=arcfile,status ='old')
+      if (archive) then
+         open (unit=iarc,file=arcfile,status ='old')
+      else if (binary) then
+         open (unit=iarc,file=arcfile,form='unformatted',status ='old')
+      end if
 c
 c     check for log with energies of trajectory A in state 0
 c
@@ -277,7 +282,8 @@ c     reset trajectory A using the parameters for state 0
 c
       if (.not. use_log) then
          rewind (unit=iarc)
-         call readxyz (iarc)
+         first = .true.
+         call readcart (iarc,first)
          nkey = nkey0
          do i = 1, nkey
             keyline(i) = keys0(i)
@@ -294,7 +300,7 @@ c
          i = i + 1
          if (use_log) then
             abort = .true.
-            dowhile (abort)
+            do while (abort)
                read (ilog,130,err=150,end=150)  record
   130          format (a240)
                if (record(1:18) .eq. ' Current Potential') then
@@ -309,7 +315,7 @@ c
          else
             call cutoffs
             ua0(i) = energy ()
-            call readxyz (iarc)
+            call readcart (iarc,first)
          end if
          imod = mod(i,100)
          if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
@@ -323,7 +329,8 @@ c
 c     reset trajectory A using the parameters for state 1
 c
       rewind (unit=iarc)
-      call readxyz (iarc)
+      first = .true.
+      call readcart (iarc,first)
       nkey = nkey1
       do i = 1, nkey
          keyline(i) = keys1(i)
@@ -347,7 +354,7 @@ c
             write (iout,180)  i,ua0(i),ua1(i),ua1(i)-ua0(i)
   180       format (i11,2x,3f16.4)
          end if
-         call readxyz (iarc)
+         call readcart (iarc,first)
          if (i .ge. maxframe)  abort = .true.
       end do
       nfrma = i
@@ -377,7 +384,11 @@ c
       iarc = freeunit ()
       arcfile = fileb
       call suffix (arcfile,'arc','old')
-      open (unit=iarc,file=arcfile,status ='old')
+      if (archive) then
+         open (unit=iarc,file=arcfile,status ='old')
+      else if (binary) then
+         open (unit=iarc,file=arcfile,form='unformatted',status ='old')
+      end if
 c
 c     check for log with energies of trajectory B in state 1
 c
@@ -396,7 +407,8 @@ c
 c     reset trajectory B using the parameters for state 1
 c
       rewind (unit=iarc)
-      call readxyz (iarc)
+      first = .true.
+      call readcart (iarc,first)
       nkey = nkey1
       do i = 1, nkey
          keyline(i) = keys1(i)
@@ -412,7 +424,7 @@ c
          i = i + 1
          if (use_log) then
             abort = .true.
-            dowhile (abort)
+            do while (abort)
                read (ilog,230,err=250,end=250)  record
   230          format (a240)
                if (record(1:18) .eq. ' Current Potential') then
@@ -427,7 +439,7 @@ c
          else
             call cutoffs
             ub1(i) = energy ()
-            call readxyz (iarc)
+            call readcart (iarc,first)
          end if
          imod = mod(i,100)
          if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
@@ -441,7 +453,8 @@ c
 c     reset trajectory B using the parameters for state 0
 c
       rewind (unit=iarc)
-      call readxyz (iarc)
+      first = .true.
+      call readcart (iarc,first)
       nkey = nkey0
       do i = 1, nkey
          keyline(i) = keys0(i)
@@ -465,7 +478,7 @@ c
             write (iout,280)  i,ub0(i),ub1(i),ub0(i)-ub1(i)
   280       format (i11,2x,3f16.4)
          end if
-         call readxyz (iarc)
+         call readcart (iarc,first)
          if (i .ge. maxframe)  abort = .true.
       end do
       nfrmb = i

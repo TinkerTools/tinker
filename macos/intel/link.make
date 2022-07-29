@@ -11,7 +11,7 @@
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o alchemy.x alchemy.o libtinker.a libfftw3_threads.a libfftw3.a ; strip alchemy.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o analyze.x analyze.o libtinker.a libfftw3_threads.a libfftw3.a ; strip analyze.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o anneal.x anneal.o libtinker.a libfftw3_threads.a libfftw3.a ; strip anneal.x
-ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o archive.x archive.o libtinker.a libfftw3_threads.a libfftw3.a ; strip archive.x
+ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o arcedit.x arcedit.o libtinker.a libfftw3_threads.a libfftw3.a ; strip arcedit.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o bar.x bar.o libtinker.a libfftw3_threads.a libfftw3.a ; strip bar.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o correlate.x correlate.o libtinker.a libfftw3_threads.a libfftw3.a ; strip correlate.x
 ifort -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -qopenmp -static-intel -Wl,-stack_size,0x10000000 -o critical.x critical.o libtinker.a libfftw3_threads.a libfftw3.a ; strip critical.x

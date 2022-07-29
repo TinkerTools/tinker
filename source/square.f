@@ -274,7 +274,7 @@ c
 c     beginning of the main least squares iteration loop
 c
       done = .false.
-      dowhile (.not. done)
+      do while (.not. done)
          niter = niter + 1
 c
 c     repack the Jacobian to include only active variables

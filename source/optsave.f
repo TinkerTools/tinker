@@ -45,7 +45,7 @@ c
       integer freeunit
       integer trimtext
       real*8 f,xx(*)
-      logical exist
+      logical exist,first
       character*7 ext
       character*240 optfile
       character*240 frcfile
@@ -109,7 +109,21 @@ c     get name of archive or intermediate coordinates file
 c
       iopt = freeunit ()
       if (cyclesave) then
-         if (archive) then
+         if (dcdsave) then
+            optfile = filename(1:leng)
+            call suffix (optfile,'dcd','old')
+            inquire (file=optfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=iopt,file=optfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=iopt,file=optfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcd (iopt,first)
+         else if (archive) then
             optfile = filename(1:leng)
             call suffix (optfile,'arc','old')
             inquire (file=optfile,exist=exist)
@@ -135,7 +149,7 @@ c
 c     update intermediate file with desired coordinate type
 c
       if (coordtype .eq. 'CARTESIAN') then
-         call prtxyz (iopt)
+         if (.not. dcdsave)  call prtxyz (iopt)
       else if (coordtype .eq. 'INTERNAL') then
          call prtint (iopt)
       else if (coordtype .eq. 'RIGIDBODY') then

@@ -12,7 +12,7 @@ rem
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static alchemy.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static analyze.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static anneal.obj tinker.lib libfftw-3.3.lib
-ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static archive.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static arcedit.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static bar.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static correlate.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static critical.obj tinker.lib libfftw-3.3.lib

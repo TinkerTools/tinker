@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine getxyz  --  get Cartesian coordinate structure  ##
+c     ##  subroutine getxyz  --  get formatted XYZ coordinates file  ##
 c     ##                                                             ##
 c     #################################################################
 c
@@ -64,8 +64,8 @@ c     quit if the Cartesian coordinates file contains no atoms
 c
       if (abort) then
          write (iout,30)
-   30    format (/,' GETXYZ  --  Cartesian Coordinates File',
-     &              ' does not Contain Any Atoms')
+   30    format (/,' GETXYZ  --  Cartesian Coordinate File',
+     &              ' was not Read Correctly')
          call fatal
       end if
       return

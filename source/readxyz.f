@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine readxyz  --  input of Cartesian coordinates  ##
-c     ##                                                          ##
-c     ##############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine readxyz  --  input of formatted XYZ coords  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "readxyz" gets a set of Cartesian coordinates from
@@ -134,6 +134,7 @@ c
       do i = 1, n
          size = 0
          do while (size .eq. 0)
+            call unitcell
             read (ixyz,50,err=80,end=80)  record
    50       format (a240)
             size = trimtext (record)
@@ -158,9 +159,9 @@ c
                if (alpha .eq. 0.0d0)  alpha = 90.0d0
                if (beta .eq. 0.0d0)  beta = 90.0d0
                if (gamma .eq. 0.0d0)  gamma = 90.0d0
-               call lattice
             end if
    60       continue
+            call lattice
          end do
          read (record,*,err=80,end=80)  tag(i)
          next = 1

@@ -60,7 +60,7 @@ c
       real*8 a(3,3)
       logical exist,query
       logical opened,multi
-      logical append
+      logical append,first
       character*1 axis
       character*3 symb
       character*240 xyzfile
@@ -77,34 +77,13 @@ c
       multi = .false.
       nmode = 25
       offset = 0
+c     
+c     find the Cartesian coordinates file to be processed
 c
-c     try to get a filename from the command line arguments
-c
-      call nextarg (xyzfile,exist)
-      if (exist) then
-         call basefile (xyzfile)
-         call suffix (xyzfile,'xyz','old')
-         inquire (file=xyzfile,exist=exist)
-      end if
-c
-c     ask for the user specified input structure filename
-c
-      do while (.not. exist)
-         write (iout,10)
-   10    format (/,' Enter Cartesian Coordinate File Name :  ',$)
-         read (input,20)  xyzfile
-   20    format (a240)
-         call basefile (xyzfile)
-         call suffix (xyzfile,'xyz','old')
-         inquire (file=xyzfile,exist=exist)
-      end do
-c
-c     open and then read the Cartesian coordinates file
-c
-      ixyz = freeunit ()
-      open (unit=ixyz,file=xyzfile,status='old')
-      rewind (unit=ixyz)
-      call readxyz (ixyz)
+      ixyz = 0
+      call getcart (ixyz)
+      xyzfile = filename
+      first = .false.
 c
 c     get the force field definition and assign atom types
 c
@@ -196,7 +175,7 @@ c
          end if
          do while (.not. abort)
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -248,7 +227,7 @@ c
                end if
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -294,7 +273,7 @@ c
   190          continue
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -358,7 +337,7 @@ c
                call delete (list(i))
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -408,7 +387,7 @@ c
                end if
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -450,7 +429,7 @@ c
             end do
             call katom
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -481,7 +460,7 @@ c
                end if
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -535,7 +514,7 @@ c
                call sort (n12(i),i12(1,i))
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -572,7 +551,7 @@ c
                type(i) = 10*k + n12(i)
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -597,7 +576,7 @@ c
                z(i) = z(i) * bohr
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -622,7 +601,7 @@ c
                z(i) = -z(i)
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -665,7 +644,7 @@ c
                z(i) = z(i) + zr
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -704,7 +683,7 @@ c
                z(i) = z(i) - zcm
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -743,7 +722,7 @@ c
                z(i) = z(i) - zorig
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -764,7 +743,7 @@ c
          do while (.not. abort)
             call inertia (2)
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -836,7 +815,7 @@ c
                z(i) = a(1,3)*xorig + a(2,3)*yorig + a(3,3)*zorig + zcm
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -911,7 +890,7 @@ c
                z(i) = a(1,3)*xorig + a(2,3)*yorig + a(3,3)*zorig + zcm
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -937,7 +916,7 @@ c
                call bounds
             end if
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -1033,7 +1012,7 @@ c
                end do
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort) then
                multi = .true.
                xbox = xnew
@@ -1061,7 +1040,7 @@ c     trim cube to truncated octahedron or rhombic dodecahedron
 c
       if (mode.eq.20 .or. mode.eq.21) then
          call unitcell
-         dowhile (xbox .eq. 0.0d0)
+         do while (xbox .eq. 0.0d0)
             write (iout,480)
   480       format (/,' Enter Edge Length of Cubic Periodic Box :  ',$)
             read (input,490)  record
@@ -1148,7 +1127,7 @@ c
                end do
             end do
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -1180,7 +1159,7 @@ c
             end if
             call merge (1)
             call makeref (1)
-            call readxyz (ixyz)
+            call readcart (ixyz,first)
             if (.not. abort)  multi = .true.
             if (multi) then
                call makeref (2)
@@ -1770,14 +1749,18 @@ c
       use bound
       use boxes
       use couple
+      use files
+      use inform
       use iounit
       use molcul
+      use output
       use refer
       implicit none
       integer i,j,k
       integer ii,jj
       integer n12i,n12k
-      integer isolv,icount
+      integer isolv,iaux
+      integer icount,nask
       integer ntot,freeunit
       integer, allocatable :: map(:)
       real*8 xi,yi,zi
@@ -1787,8 +1770,10 @@ c
       real*8 dxh,dxh2
       real*8 dhh,dhh2
       logical exist,header
+      logical first
       logical, allocatable :: remove(:)
       character*240 solvfile
+      character*240 auxfile
       external merge
 c
 c
@@ -1804,23 +1789,61 @@ c
          call suffix (solvfile,'xyz','old')
          inquire (file=solvfile,exist=exist)
       end if
-      do while (.not. exist)
+      nask = 0
+      do while (.not.exist .and. nask.lt.maxask)
          write (iout,10)
    10    format (/,' Enter Name of Solvent Box Coordinates :  ',$)
          read (input,20)  solvfile
    20    format (a240)
          call basefile (solvfile)
-         call suffix (solvfile,'xyz','old')
+         if (archive) then
+            call suffix (solvfile,'xyz','old')
+         else if (binary) then
+            call suffix (solvfile,'dcd','old')
+         end if
          inquire (file=solvfile,exist=exist)
       end do
 c
 c     read the coordinate file containing the solvent atoms
 c
-      isolv = freeunit ()
-      open (unit=isolv,file=solvfile,status='old')
-      rewind (unit=isolv)
-      call readxyz (isolv)
-      close (unit=isolv)
+      if (archive) then
+         isolv = freeunit ()
+         open (unit=isolv,file=solvfile,status='old')
+         rewind (unit=isolv)
+         call readxyz (isolv)
+         close (unit=isolv)
+      else if (binary) then
+         call nextarg (auxfile,exist)
+         if (exist) then
+            call basefile (auxfile)
+            call suffix (auxfile,'xyz','old')
+            inquire (file=auxfile,exist=exist)
+         end if
+         nask = 0
+         do while (.not.exist .and. nask.lt.maxask)
+            nask = nask + 1
+            write (iout,30)
+   30       format (/,' Enter Formatted Coordinate File Name :  ',$)
+            read (input,40)  auxfile
+   40       format (a240)
+            call basefile (auxfile)
+            call suffix (auxfile,'xyz','old')
+            inquire (file=auxfile,exist=exist)
+         end do
+         if (.not. exist)  call fatal
+         iaux = freeunit ()
+         open (unit=iaux,file=auxfile,status='old')
+         rewind (unit=iaux)
+         call readxyz (iaux)
+         close (unit=iaux)
+         filename = solvfile
+         isolv = freeunit ()
+         open (unit=isolv,file=solvfile,form='unformatted',status='old')
+         rewind (unit=isolv)
+         first = .true.
+         call readdcd (isolv,first)
+         close (unit=isolv)
+      end if
 c
 c     combine solute and solvent into a single coordinate set
 c
@@ -1868,8 +1891,8 @@ c
       icount = 0
       header = .true.
       if (n-nref(1) .ge. 10000) then
-         write (iout,30)
-   30    format (/,' Scan for Solvent Molecules to be Removed :')
+         write (iout,50)
+   50    format (/,' Scan for Solvent Molecules to be Removed :')
       end if
 c
 c     OpenMP directives for the major loop structure
@@ -1903,20 +1926,20 @@ c
                end if
                if (rik2 .lt. close2) then
                   remove(molcule(i)) = .true.
-                  goto 40
+                  goto 60
                end if
             end do
-   40       continue
+   60       continue
          end if
          icount = icount + 1
          if (mod(icount,10000) .eq. 0) then
             if (header) then
                header = .false.
-               write (iout,50)
-   50          format ()
+               write (iout,70)
+   70          format ()
             end if
-            write (iout,60)  10000*(icount/10000)
-   60       format (' Solvent Atoms Processed',i15)
+            write (iout,80)  10000*(icount/10000)
+   80       format (' Solvent Atoms Processed',i15)
          end if
       end do
 c
@@ -1929,8 +1952,8 @@ c     print final status when processing large systems
 c
       icount = n - nref(1)
       if (mod(icount,10000).ne.0 .and. icount.gt.10000) then
-         write (iout,70)  icount
-   70    format (' Solvent Atoms Processed',i15)
+         write (iout,90)  icount
+   90    format (' Solvent Atoms Processed',i15)
       end if
 c
 c     delete solvent molecules that are too close to the solute

@@ -352,6 +352,8 @@ add_library (tinkerObjF OBJECT
 ../source/freeunit.f
 ../source/geometry.f
 ../source/getarc.f
+../source/getcart.f
+../source/getdcd.f
 ../source/getint.f
 ../source/getkey.f
 ../source/getmol.f
@@ -461,6 +463,7 @@ add_library (tinkerObjF OBJECT
 ../source/pressure.f
 ../source/prmkey.f
 ../source/promo.f
+../source/prtarc.f
 ../source/prtdcd.f
 ../source/prtdyn.f
 ../source/prterr.f
@@ -474,6 +477,8 @@ add_library (tinkerObjF OBJECT
 ../source/quatfit.f
 ../source/random.f
 ../source/rattle.f
+../source/readcart.f
+../source/readdcd.f
 ../source/readdyn.f
 ../source/readgau.f
 ../source/readgdma.f
