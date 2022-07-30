@@ -179,7 +179,6 @@ c
          rewind (unit=iarc)
          call readxyz (iarc)
          rewind (unit=iarc)
-         call active
 c
 c     open an existing binary DCD trajectory file for processing
 c
@@ -231,8 +230,22 @@ c
          call readdcd (idcd,first)
          rewind (unit=idcd)
          first = .true.
-         call active
       end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(iuse))  deallocate (iuse)
+      if (allocated(use))  deallocate (use)
+      allocate (iuse(n))
+      allocate (use(0:n))
+c
+c     set all atoms in the system to be treated as active 
+c
+      nuse = n
+      do i = 1, n
+         iuse(i) = i
+         use(i) = .true.
+      end do
 c
 c     combine individual files into a single archive file
 c
@@ -293,7 +306,6 @@ c
                rewind (unit=ixyz)
                call readxyz (ixyz)
                close (unit=ixyz)
-               if (i .eq. start)  call active
                nuse = n
                do j = 1, n
                   use(j) = .true.
@@ -314,70 +326,67 @@ c
 c     decide whether atoms are to be removed from each frame
 c
       if (modtyp .eq. 'TRIM') then
-         call active
-         if (nuse .eq. n) then
-            do i = 1, size
-               list(i) = 0
+         do i = 1, size
+            list(i) = 0
+         end do
+         i = 1
+         query = .true.
+         call nextarg (string,exist)
+         if (exist) then
+            do while (i .le. size)
+               read (string,*,err=190,end=190)  list(i)
+               if (list(i) .eq. 0)  goto 190
+               i = i + 1
+               call nextarg (string,exist)
             end do
-            i = 1
-            query = .true.
-            call nextarg (string,exist)
-            if (exist) then
-               do while (i .le. size)
-                  read (string,*,err=190,end=190)  list(i)
-                  if (list(i) .eq. 0)  goto 190
-                  i = i + 1
-                  call nextarg (string,exist)
-               end do
-  190          continue
-               query = .false.
-            end if
-            if (query) then
-               write (iout,200)
-  200          format (/,' Numbers of the Atoms to be Removed :  ',$)
-               read (input,210)  record
-  210          format (a240)
-               read (record,*,err=220,end=220)  (list(i),i=1,size)
-  220          continue
-            end if
-            i = 1
-            do while (list(i) .ne. 0)
-               list(i) = max(-n,min(n,list(i)))
-               if (list(i) .gt. 0) then
-                  k = list(i)
+  190       continue
+            query = .false.
+         end if
+         if (query) then
+            write (iout,200)
+  200       format (/,' Numbers of the Atoms to be Removed :  ',$)
+            read (input,210)  record
+  210       format (a240)
+            read (record,*,err=220,end=220)  (list(i),i=1,size)
+  220       continue
+         end if
+         i = 1
+         do while (list(i) .ne. 0)
+            list(i) = max(-n,min(n,list(i)))
+            if (list(i) .gt. 0) then
+               k = list(i)
+               if (use(k)) then
+                  use(k) = .false.
+                  nuse = nuse - 1
+               end if
+               i = i + 1
+            else
+               list(i+1) = max(-n,min(n,list(i+1)))
+               do k = abs(list(i)), abs(list(i+1))
                   if (use(k)) then
                      use(k) = .false.
                      nuse = nuse - 1
                   end if
-                  i = i + 1
-               else
-                  list(i+1) = max(-n,min(n,list(i+1)))
-                  do k = abs(list(i)), abs(list(i+1))
-                     if (use(k)) then
-                        use(k) = .false.
-                        nuse = nuse - 1
-                     end if
-                  end do
-                  i = i + 2
-               end if
-            end do
-         end if
+               end do
+               i = i + 2
+            end if
+         end do
+c
+c     store index to use in renumbering the untrimmed atoms
+c
+         k = 0
+         do i = 1, n
+            iuse(i) = 0
+            if (use(i)) then
+               k = k + 1
+               iuse(i) = k
+            end if
+         end do
 c
 c     perform deallocation of some local arrays
 c
          deallocate (list)
       end if
-c
-c     store index to use in renumbering the untrimmed atoms
-c
-      k = 0
-      do i = 1, n
-         iuse(i) = 0
-         if (use(i)) then
-            k = k + 1
-            iuse(i) = k
-         end if
-      end do
 c
 c     convert Tinker archive to binary DCD trajectory file
 c

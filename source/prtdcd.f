@@ -30,7 +30,7 @@ c     nstep      number of integration steps in the total run
 c     nvelsav    frequency of coordinate saves with velocity data
 c     ndfree     number of degrees of freedom for the system
 c     nfixat     number of fixed atoms for the system
-c     usebox     flag for writing box size (1=true, 0=false)
+c     usebox     flag for periodic boundaries (1=true, 0=false)
 c     use4d      flag for 4D trajectory (1=true, 0=false)
 c     usefq      flag for fluctuating charges (1=true, 0=false)
 c     merged     result of merge without checks (1=true, 0=false)
@@ -108,7 +108,7 @@ c
          write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
       end if
 c
-c     remove unused atoms from the coordinates to write
+c     remove unused atoms from the coordinates to be output
 c
       if (nuse .ne. n) then
          k = 0
