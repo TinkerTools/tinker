@@ -400,7 +400,7 @@ c
          do while (.true.)
             call readxyz (iarc)
             if (abort)  goto 230
-            call prtdcd (idcd,first)
+            call prtdcd2 (idcd,first)
          end do
   230    continue
          close (unit=idcd)
@@ -508,7 +508,7 @@ c
                   end if
                   first = .true.
                   if (archive)  call prtarc (ixyz)
-                  if (binary)  call prtdcd (ixyz,first)
+                  if (binary)  call prtdcd2 (ixyz,first)
                   close (unit=ixyz)
                   i = i + step
                   do k = 1, step-1
@@ -566,7 +566,7 @@ c
                   if (i .eq. start)  first = .true.
                   if (modtyp .eq. 'UNBOUND')  use_bounds = .false.
                   if (archive)  call prtarc (ixyz)
-                  if (binary)  call prtdcd (ixyz,first)
+                  if (binary)  call prtdcd2 (ixyz,first)
                   i = i + step
                   do k = 1, step-1
                      call readcart (iarc,first)

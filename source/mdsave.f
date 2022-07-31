@@ -47,7 +47,7 @@ c
       integer modsave
       real*8 dt,pico
       real*8 epot,eksum
-      logical exist
+      logical exist,first
       character*7 ext
       character*240 endfile
       character*240 xyzfile
@@ -128,7 +128,7 @@ c     move stray molecules into periodic box if desired
 c
       if (use_bounds)  call bounds
 c
-c     save coordinates to an archive or numbered structure file
+c     save coordinates to archive or numbered structure file
 c
       ixyz = freeunit ()
       if (cyclesave) then
@@ -141,11 +141,16 @@ c
          call suffix (xyzfile,'dcd','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
+            first = .false.
             open (unit=ixyz,file=xyzfile,form='unformatted',
      &               status='old',position='append')
+         else
+            first = .true.
+            open (unit=ixyz,file=xyzfile,form='unformatted',
+     &               status='new')
          end if
-         call prtdcd (ixyz)
-      else
+         call prtdcd (ixyz,first)
+      else if (archive) then
          xyzfile = filename(1:leng)
          call suffix (xyzfile,'arc','old')
          inquire (file=xyzfile,exist=exist)

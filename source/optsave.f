@@ -105,7 +105,7 @@ c
          if (use_bounds)  call bounds
       end if
 c
-c     get name of archive or intermediate coordinates file
+c     save coordinates to archive or numbered structure file
 c
       iopt = freeunit ()
       if (cyclesave) then
