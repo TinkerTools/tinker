@@ -10,7 +10,7 @@
       test case. The resulting output is found in the file argon.log.
 
       The clean.make script will remove any output files generated during
-      the example runs and should be invoked prior to validating Tinker
+      these test runs, and should be invoked prior to validating Tinker
       executables against the provided log files.
 
       (1) ANION       estimates the hydration free energy difference for
