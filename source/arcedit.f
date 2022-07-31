@@ -134,16 +134,8 @@ c
       if (mode .eq. 4)  modtyp = 'FOLD'
       if (mode .eq. 5)  modtyp = 'UNFOLD'
       if (mode .eq. 6)  modtyp = 'UNBOUND'
-      if (mode .eq. 7) then
-         modtyp = 'ARCDCD'
-         archive = .true.
-         binary = .false.
-      end if
-      if (mode .eq. 8) then
-         modtyp = 'DCDARC'
-         archive = .false.
-         binary = .true.
-      end if
+      if (mode .eq. 7)  modtyp = 'ARCDCD'
+      if (mode .eq. 8)  modtyp = 'DCDARC'
 c
 c     create and open a new Tinker formatted archive file
 c
@@ -310,7 +302,8 @@ c
                do j = 1, n
                   use(j) = .true.
                end do
-               call prtarc (iarc)
+               first = .true.
+               call prtarc (iarc,first)
             end if
             i = i + step
          end do
@@ -392,6 +385,8 @@ c     convert Tinker archive to binary DCD trajectory file
 c
       if (modtyp .eq. 'ARCDCD') then
          modtyp = 'EXIT'
+         archive = .false.
+         binary = .true.
          first = .true.
          idcd = freeunit ()
          dcdfile = filename(1:leng)//'.dcd'
@@ -400,7 +395,7 @@ c
          do while (.true.)
             call readxyz (iarc)
             if (abort)  goto 230
-            call prtdcd2 (idcd,first)
+            call prtarc (idcd,first)
          end do
   230    continue
          close (unit=idcd)
@@ -410,6 +405,8 @@ c     convert binary DCD trajectory file to Tinker archive
 c
       if (modtyp .eq. 'DCDARC') then
          modtyp = 'EXIT'
+         archive = .true.
+         binary = .false.
          first = .true.
          iarc = freeunit ()
          arcfile = filename(1:leng)//'.arc'
@@ -418,7 +415,7 @@ c
          do while (.true.)
             call readdcd (idcd,first)
             if (abort)  goto 240
-            call prtarc (iarc)
+            call prtarc (iarc,first)
          end do
   240    continue
          close (unit=iarc)
@@ -507,8 +504,7 @@ c
      &                        status='new')
                   end if
                   first = .true.
-                  if (archive)  call prtarc (ixyz)
-                  if (binary)  call prtdcd2 (ixyz,first)
+                  call prtarc (ixyz,first)
                   close (unit=ixyz)
                   i = i + step
                   do k = 1, step-1
@@ -565,8 +561,7 @@ c
                   end if
                   if (i .eq. start)  first = .true.
                   if (modtyp .eq. 'UNBOUND')  use_bounds = .false.
-                  if (archive)  call prtarc (ixyz)
-                  if (binary)  call prtdcd2 (ixyz,first)
+                  call prtarc (ixyz,first)
                   i = i + step
                   do k = 1, step-1
                      call readcart (iarc,first)
