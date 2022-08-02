@@ -12,7 +12,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     pi         numerical value of the geometric constant
+c     pi         numerical value of the geometric constant Pi
 c     elog       numerical value of the natural logarithm base
 c     radian     conversion factor from radians to degrees
 c     logten     numerical value of the natural log of ten

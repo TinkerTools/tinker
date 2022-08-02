@@ -93,20 +93,19 @@ c             W(x) = exp(-x*x)/[x*sqrt(pi)]
 c
 c
       subroutine erfcore (arg,result,mode)
+      use math
       implicit none
       integer i,mode
       real*8 arg,result
-      real*8 x,y,ysq
-      real*8 del,sqrpi
+      real*8 x,y,ysq,del
       real*8 xnum,xden
       real*8 xtiny,xbig
       real*8 a(5),b(4)
       real*8 c(9),d(8)
       real*8 p(6),q(5)
 c
-c     mathematical and machine-dependent constants
+c     machine-dependent numerical constants
 c
-      data sqrpi  / 5.6418958354775628695d-1 /
       data xtiny  / 1.11d-16 /
       data xbig   / 26.543d0 /
 c
@@ -193,7 +192,7 @@ c
                xden = (xden + q(i)) * ysq
             end do
             result = ysq * (xnum + p(5)) / (xden + q(5))
-            result = (sqrpi - result) / y
+            result = ((1.0d0/rootpi) - result) / y
             ysq = aint(16.0d0*y) / 16.0d0
             del = (y-ysq) * (y+ysq)
 c           result = exp(-ysq*ysq) * exp(-del) * result

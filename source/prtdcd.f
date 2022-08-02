@@ -7,7 +7,7 @@ c     ###################################################
 c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine prtdcd  --  output of DCD-format coordinates  ##
+c     ##  subroutine prtdcd  --  output of DCD coordinate archive  ##
 c     ##                                                           ##
 c     ###############################################################
 c

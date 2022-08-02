@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine getxyz  --  get formatted XYZ coordinates file  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine getxyz  --  get XYZ-format coordinates file  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "getxyz" asks for a Cartesian coordinate file name,

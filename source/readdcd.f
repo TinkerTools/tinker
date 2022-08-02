@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2022 by Zhi Wang & Jay William Ponder  ##
 c     ##                  All Rights Reserved                  ##
 c     ###########################################################
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine readdcd  --  input of binary coords trajectory  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine readdcd  --  input of DCD coordinate archive  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "readdcd" reads in a set of Cartesian coordinates from an

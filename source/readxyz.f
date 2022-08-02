@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine readxyz  --  input of formatted XYZ coords  ##
-c     ##                                                         ##
-c     #############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine readxyz  --  input of XYZ-format coordinates  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "readxyz" gets a set of Cartesian coordinates from

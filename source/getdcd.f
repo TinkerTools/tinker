@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C)  2022  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ################################################################        
-c     ##                                                            ##
-c     ##  subroutine getdcd  --  get binary coords trajectory file  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##############################################################        
+c     ##                                                          ##
+c     ##  subroutine getdcd  --  get DCD coordinate archive file  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "getdcd" asks for a binary DCD trajectory file name and the
@@ -44,7 +44,7 @@ c
       do while (.not.exist .and. nask.lt.maxask)
          nask = nask + 1
          write (iout,10)
-   10    format (/,' Enter the DCD Trajectory Archive File Name :  ',$)
+   10    format (/,' Enter DCD Coordinate Archive File Name :  ',$)
          read (input,20)  dcdfile
    20    format (a240)
          call basefile (dcdfile)
