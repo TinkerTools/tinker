@@ -257,7 +257,8 @@ c
    80       continue
             write (iprm,90)  ia,rd,ep
    90       format ('vdw14',5x,i5,10x,2f11.4)
-         else if (keyword(1:8) .eq. 'VDWPAIR ') then
+         else if (keyword(1:8) .eq. 'VDWPAIR ' .or.
+     &            keyword(1:6) .eq. 'VDWPR ') then
             ia = 0
             ib = 0
             rd = 0.0d0
@@ -1166,7 +1167,8 @@ c
             end if
             write (iprm,80)  ia,record(next:length)
    80       format ('vdw14',5x,i5,a)
-         else if (keyword(1:8) .eq. 'VDWPAIR ') then
+         else if (keyword(1:8) .eq. 'VDWPAIR ' .or.
+     &            keyword(1:6) .eq. 'VDWPR ') then
             ia = 0
             ib = 0
             call getnumb (record,ia,next)

@@ -157,7 +157,8 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:8) .eq. 'VDWPAIR ') then
+         if (keyword(1:8) .eq. 'VDWPAIR ' .or.
+     &       keyword(1:6) .eq. 'VDWPR ') then
             ia = 0
             ib = 0
             rd = 0.0d0
@@ -297,6 +298,7 @@ c     set type or class index into condensed pair matrix
 c
       nlist = n
       do i = 1, n
+         list(i) = 0
          if (vdwindex .eq. 'TYPE') then
             list(i) = type(i)
          else

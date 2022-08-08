@@ -124,6 +124,7 @@ c
          if (keyword(1:8) .eq. 'ANGTORS ')  maxnat = maxnat + 1
          if (keyword(1:8) .eq. 'TORTORS ')  maxntt = maxntt + 1
          if (keyword(1:8) .eq. 'VDWPAIR ')  maxnvp = maxnvp + 1
+         if (keyword(1:6) .eq. 'VDWPR ')  maxnvp = maxnvp + 1
          if (keyword(1:6) .eq. 'HBOND ')  maxnhb = maxnhb + 1
          if (keyword(1:7) .eq. 'DIPOLE ')  maxnd = maxnd + 1
          if (keyword(1:8) .eq. 'DIPOLE5 ')  maxnd5 = maxnd5 + 1
@@ -191,6 +192,7 @@ c
          if (keyword(1:8) .eq. 'ANGTORS ')  maxnat = maxnat + 1
          if (keyword(1:8) .eq. 'TORTORS ')  maxntt = maxntt + 1
          if (keyword(1:8) .eq. 'VDWPAIR ')  maxnvp = maxnvp + 1
+         if (keyword(1:6) .eq. 'VDWPR ')  maxnvp = maxnvp + 1
          if (keyword(1:6) .eq. 'HBOND ')  maxnhb = maxnhb + 1
          if (keyword(1:7) .eq. 'DIPOLE ')  maxnd = maxnd + 1
          if (keyword(1:8) .eq. 'DIPOLE5 ')  maxnd5 = maxnd5 + 1

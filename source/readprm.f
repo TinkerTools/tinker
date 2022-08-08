@@ -1009,7 +1009,8 @@ c
 c
 c     van der Waals parameters for specific atom pairs
 c
-         else if (keyword(1:8) .eq. 'VDWPAIR ') then
+         else if (keyword(1:8) .eq. 'VDWPAIR ' .or.
+     &            keyword(1:6) .eq. 'VDWPR ') then
             ia = 0
             ib = 0
             rd = 0.0d0
