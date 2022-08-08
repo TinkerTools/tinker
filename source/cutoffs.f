@@ -112,15 +112,6 @@ c
          else if (keyword(1:14) .eq. 'DEWALD-CUTOFF ') then
             read (string,*,err=10,end=10)  dewaldcut
 c
-c     get cutoff for preconditioner of dipole solver
-c
-         else if (keyword(1:14) .eq. 'USOLVE-CUTOFF ') then
-            if (usolvcut .ne. 0.0d0) then
-               read (string,*,err=10,end=10)  usolvcut
-            end if
-         else if (keyword(1:16) .eq. 'USOLVE-DIAGONAL ') then
-            usolvcut = 0.0d0
-c
 c     get values for the tapering style and neighbor method
 c
          else if (keyword(1:9) .eq. 'TRUNCATE ') then
@@ -147,6 +138,18 @@ c
             use_list = .true.
             use_mlist = .true.
             use_ulist = .true.
+c
+c     get values for the dipole solver preconditioner
+c
+         else if (keyword(1:12) .eq. 'USOLVE-LIST ') then
+            use_list = .true.
+            use_ulist = .true.
+         else if (keyword(1:14) .eq. 'USOLVE-CUTOFF ') then
+            if (usolvcut .ne. 0.0d0) then
+               read (string,*,err=10,end=10)  usolvcut
+            end if
+         else if (keyword(1:16) .eq. 'USOLVE-DIAGONAL ') then
+            usolvcut = 0.0d0
 c
 c     get cutoff for the magnitude of Hessian elements
 c

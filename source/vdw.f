@@ -14,7 +14,7 @@ c
 c
 c     nvdw       total number van der Waals active sites in the system
 c     ivdw       number of the atom for each van der Waals active site
-c     jvdw       type or class index into vdw parameters for each atom
+c     jvdw       index into the vdw parameter matrix for each atom
 c     ired       attached atom from which reduction factor is applied
 c     kred       value of reduction factor parameter for each atom
 c     xred       reduced x-coordinate for each atom in the system

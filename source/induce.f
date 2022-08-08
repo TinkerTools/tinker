@@ -416,7 +416,7 @@ c
 c     apply a sparse matrix conjugate gradient preconditioner
 c
             mode = 'BUILD'
-            if (use_mlist) then
+            if (use_ulist) then
                call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
                mode = 'APPLY'
                call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
@@ -509,7 +509,7 @@ c
                end if
             end do
             if (pcgprec) then
-               if (use_mlist) then
+               if (use_ulist) then
                   call uscale0b (mode,rsd,rsdp,zrsd,zrsdp)
                else
                   call uscale0a (mode,rsd,rsdp,zrsd,zrsdp)
@@ -7052,58 +7052,56 @@ c
 c
 c     use the off-diagonal preconditioner elements in second phase
 c
-         if (use_ulist) then
-            off2 = usolvcut * usolvcut
-            j = 0
-            do ii = 1, npole-1
-               i = ipole(ii)
-               do kk = ii+1, npole
-                  k = ipole(kk)
-                  xr = x(k) - x(i)
-                  yr = y(k) - y(i)
-                  zr = z(k) - z(i)
-                  call image (xr,yr,zr)
-                  r2 = xr*xr + yr* yr + zr*zr
-                  if (r2 .le. off2) then
-                     m1 = minv(j+1)
-                     m2 = minv(j+2)
-                     m3 = minv(j+3)
-                     m4 = minv(j+4)
-                     m5 = minv(j+5)
-                     m6 = minv(j+6)
-                     j = j + 6
-                     zrsd(1,ii) = zrsd(1,ii) + m1*rsd(1,kk)
-     &                               + m2*rsd(2,kk) + m3*rsd(3,kk)
-                     zrsd(2,ii) = zrsd(2,ii) + m2*rsd(1,kk)
-     &                               + m4*rsd(2,kk) + m5*rsd(3,kk)
-                     zrsd(3,ii) = zrsd(3,ii) + m3*rsd(1,kk)
-     &                               + m5*rsd(2,kk) + m6*rsd(3,kk)
-                     zrsd(1,kk) = zrsd(1,kk) + m1*rsd(1,ii)
-     &                               + m2*rsd(2,ii) + m3*rsd(3,ii)
-                     zrsd(2,kk) = zrsd(2,kk) + m2*rsd(1,ii)
-     &                               + m4*rsd(2,ii) + m5*rsd(3,ii)
-                     zrsd(3,kk) = zrsd(3,kk) + m3*rsd(1,ii)
-     &                               + m5*rsd(2,ii) + m6*rsd(3,ii)
-                     zrsdp(1,ii) = zrsdp(1,ii) + m1*rsdp(1,kk)
-     &                                + m2*rsdp(2,kk) + m3*rsdp(3,kk)
-                     zrsdp(2,ii) = zrsdp(2,ii) + m2*rsdp(1,kk)
-     &                                + m4*rsdp(2,kk) + m5*rsdp(3,kk)
-                     zrsdp(3,ii) = zrsdp(3,ii) + m3*rsdp(1,kk)
-     &                                + m5*rsdp(2,kk) + m6*rsdp(3,kk)
-                     zrsdp(1,kk) = zrsdp(1,kk) + m1*rsdp(1,ii)
-     &                                + m2*rsdp(2,ii) + m3*rsdp(3,ii)
-                     zrsdp(2,kk) = zrsdp(2,kk) + m2*rsdp(1,ii)
-     &                                + m4*rsdp(2,ii) + m5*rsdp(3,ii)
-                     zrsdp(3,kk) = zrsdp(3,kk) + m3*rsdp(1,ii)
-     &                                + m5*rsdp(2,ii) + m6*rsdp(3,ii)
-                  end if
-               end do
+         off2 = usolvcut * usolvcut
+         m = 0
+         do ii = 1, npole-1
+            i = ipole(ii)
+            do kk = ii+1, npole
+               k = ipole(kk)
+               xr = x(k) - x(i)
+               yr = y(k) - y(i)
+               zr = z(k) - z(i)
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr* yr + zr*zr
+               if (r2 .le. off2) then
+                  m1 = minv(m+1)
+                  m2 = minv(m+2)
+                  m3 = minv(m+3)
+                  m4 = minv(m+4)
+                  m5 = minv(m+5)
+                  m6 = minv(m+6)
+                  m = m + 6
+                  zrsd(1,ii) = zrsd(1,ii) + m1*rsd(1,kk)
+     &                            + m2*rsd(2,kk) + m3*rsd(3,kk)
+                  zrsd(2,ii) = zrsd(2,ii) + m2*rsd(1,kk)
+     &                            + m4*rsd(2,kk) + m5*rsd(3,kk)
+                  zrsd(3,ii) = zrsd(3,ii) + m3*rsd(1,kk)
+     &                            + m5*rsd(2,kk) + m6*rsd(3,kk)
+                  zrsd(1,kk) = zrsd(1,kk) + m1*rsd(1,ii)
+     &                            + m2*rsd(2,ii) + m3*rsd(3,ii)
+                  zrsd(2,kk) = zrsd(2,kk) + m2*rsd(1,ii)
+     &                            + m4*rsd(2,ii) + m5*rsd(3,ii)
+                  zrsd(3,kk) = zrsd(3,kk) + m3*rsd(1,ii)
+     &                            + m5*rsd(2,ii) + m6*rsd(3,ii)
+                  zrsdp(1,ii) = zrsdp(1,ii) + m1*rsdp(1,kk)
+     &                             + m2*rsdp(2,kk) + m3*rsdp(3,kk)
+                  zrsdp(2,ii) = zrsdp(2,ii) + m2*rsdp(1,kk)
+     &                             + m4*rsdp(2,kk) + m5*rsdp(3,kk)
+                  zrsdp(3,ii) = zrsdp(3,ii) + m3*rsdp(1,kk)
+     &                             + m5*rsdp(2,kk) + m6*rsdp(3,kk)
+                  zrsdp(1,kk) = zrsdp(1,kk) + m1*rsdp(1,ii)
+     &                             + m2*rsdp(2,ii) + m3*rsdp(3,ii)
+                  zrsdp(2,kk) = zrsdp(2,kk) + m2*rsdp(1,ii)
+     &                             + m4*rsdp(2,ii) + m5*rsdp(3,ii)
+                  zrsdp(3,kk) = zrsdp(3,kk) + m3*rsdp(1,ii)
+     &                             + m5*rsdp(2,ii) + m6*rsdp(3,ii)
+               end if
             end do
-         end if
+         end do
 c
 c     construct off-diagonal elements of preconditioning matrix
 c
-      else if (mode.eq.'BUILD' .and. use_ulist) then
+      else if (mode .eq. 'BUILD') then
 c
 c     perform dynamic allocation of some local arrays
 c

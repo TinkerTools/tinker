@@ -34,9 +34,13 @@ c
       use vdw
       use vdwpot
       implicit none
-      integer i,k,ia,ib
+      integer i,j,k
+      integer ii,kk
+      integer ia,ib
       integer next,size
-      integer number
+      integer nlist,number
+      integer, allocatable :: list(:)
+      integer, allocatable :: rlist(:)
       real*8 rd,ep,rdn,gik
       real*8, allocatable :: srad(:)
       real*8, allocatable :: srad4(:)
@@ -153,7 +157,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:6) .eq. 'VDWPR ') then
+         if (keyword(1:8) .eq. 'VDWPAIR ') then
             ia = 0
             ib = 0
             rd = 0.0d0
@@ -272,12 +276,6 @@ c
       if (allocated(xred))  deallocate (xred)
       if (allocated(yred))  deallocate (yred)
       if (allocated(zred))  deallocate (zred)
-      if (allocated(radmin))  deallocate (radmin)
-      if (allocated(epsilon))  deallocate (epsilon)
-      if (allocated(radmin4))  deallocate (radmin4)
-      if (allocated(epsilon4))  deallocate (epsilon4)
-      if (allocated(radhbnd))  deallocate (radhbnd)
-      if (allocated(epshbnd))  deallocate (epshbnd)
       allocate (ivdw(n))
       allocate (jvdw(n))
       allocate (ired(n))
@@ -285,65 +283,90 @@ c
       allocate (xred(n))
       allocate (yred(n))
       allocate (zred(n))
-      allocate (radmin(maxclass,maxclass))
-      allocate (epsilon(maxclass,maxclass))
-      allocate (radmin4(maxclass,maxclass))
-      allocate (epsilon4(maxclass,maxclass))
-      allocate (radhbnd(maxclass,maxclass))
-      allocate (epshbnd(maxclass,maxclass))
-c
-c     use atom class or type as index into vdw parameters
-c
-      k = 0
-      do i = 1, n
-         jvdw(i) = class(i)
-         if (vdwindex .eq. 'TYPE')  jvdw(i) = type(i)
-         k = max(k,jvdw(i))
-      end do
-      if (vdwindex.eq.'CLASS' .and. k.gt.maxclass) then
-         write (iout,210)
-  210    format (/,' KVDW  --  Unable to Index VDW Parameters;',
-     &              ' Increase MAXCLASS')
-         abort = .true.
-      else if (vdwindex.eq.'TYPE' .and. k.gt.maxtyp) then
-         write (iout,220)
-  220    format (/,' KVDW  --  Unable to Index VDW Parameters;',
-     &              ' Increase MAXTYP')
-         abort = .true.
-      end if
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (list(n))
+      allocate (rlist(maxtyp))
       allocate (srad(maxtyp))
       allocate (srad4(maxtyp))
       allocate (seps(maxtyp))
       allocate (seps4(maxtyp))
 c
+c     set type or class index into condensed pair matrix
+c
+      nlist = n
+      do i = 1, n
+         if (vdwindex .eq. 'TYPE') then
+            list(i) = type(i)
+         else
+            list(i) = class(i)
+         end if
+         jvdw(i) = list(i)
+      end do
+      call sort8 (nlist,list)
+      do i = 1, maxtyp
+         rlist(i) = 0
+      end do
+      do i = 1, n
+         j = jvdw(i)
+         if (rlist(j) .eq. 0) then
+            do k = 1, nlist
+               if (list(k) .eq. j)  rlist(j) = k
+            end do
+         end if
+      end do
+      do i = 1, n
+         if (vdwindex .eq. 'TYPE') then
+            jvdw(i) = rlist(type(i))
+         else
+            jvdw(i) = rlist(class(i))
+         end if
+      end do
+c
 c     get the vdw radii and well depths for each atom type
 c
-      do i = 1, maxtyp
-         if (rad4(i) .eq. 0.0d0)  rad4(i) = rad(i)
-         if (eps4(i) .eq. 0.0d0)  eps4(i) = eps(i)
+      do i = 1, nlist
+         k = list(i)
+         if (rad4(k) .eq. 0.0d0)  rad4(k) = rad(k)
+         if (eps4(k) .eq. 0.0d0)  eps4(k) = eps(k)
          if (radtyp .eq. 'SIGMA') then
-            rad(i) = twosix * rad(i)
-            rad4(i) = twosix * rad4(i)
+            rad(k) = twosix * rad(k)
+            rad4(k) = twosix * rad4(k)
          end if
          if (radsiz .eq. 'DIAMETER') then
-            rad(i) = 0.5d0 * rad(i)
-            rad4(i) = 0.5d0 * rad4(i)
+            rad(k) = 0.5d0 * rad(k)
+            rad4(k) = 0.5d0 * rad4(k)
          end if
-         srad(i) = sqrt(rad(i))
-         eps(i) = abs(eps(i))
-         seps(i) = sqrt(eps(i))
-         srad4(i) = sqrt(rad4(i))
-         eps4(i) = abs(eps4(i))
-         seps4(i) = sqrt(eps4(i))
+         srad(k) = sqrt(rad(k))
+         eps(k) = abs(eps(k))
+         seps(k) = sqrt(eps(k))
+         srad4(k) = sqrt(rad4(k))
+         eps4(k) = abs(eps4(k))
+         seps4(k) = sqrt(eps4(k))
       end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(radmin))  deallocate (radmin)
+      if (allocated(epsilon))  deallocate (epsilon)
+      if (allocated(radmin4))  deallocate (radmin4)
+      if (allocated(epsilon4))  deallocate (epsilon4)
+      if (allocated(radhbnd))  deallocate (radhbnd)
+      if (allocated(epshbnd))  deallocate (epshbnd)
+      allocate (radmin(nlist,nlist))
+      allocate (epsilon(nlist,nlist))
+      allocate (radmin4(nlist,nlist))
+      allocate (epsilon4(nlist,nlist))
+      allocate (radhbnd(nlist,nlist))
+      allocate (epshbnd(nlist,nlist))
 c
 c     use combination rules to set pairwise vdw radii sums
 c
-      do i = 1, maxclass
-         do k = i, maxclass
+      do ii = 1, nlist
+         i = list(ii)
+         do kk = ii, nlist
+            k = list(kk)
             if (radrule(1:6) .eq. 'MMFF94') then
                if (i .ne. k) then
                   rd = 0.5d0 * (rad(i)+rad(k))
@@ -368,22 +391,24 @@ c
             else
                rd = rad(i) + rad(k)
             end if
-            radmin(i,k) = rd
-            radmin(k,i) = rd
+            radmin(ii,kk) = rd
+            radmin(kk,ii) = rd
          end do
       end do
 c
 c     use combination rules to set pairwise well depths
 c
-      do i = 1, maxclass
-         do k = i, maxclass
+      do ii = 1, nlist
+         i = list(ii)
+         do kk = ii, nlist
+            k = list(kk)
             if (epsrule(1:6) .eq. 'MMFF94') then
                ep = 0.0d0
                if (nn(i).ne.0.0d0 .and. nn(k).ne.0.0d0
-     &                .and. radmin(i,k).ne.0.0d0) then
-                  ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
+     &                .and. radmin(ii,kk).ne.0.0d0) then
+                  ep = 181.16d0*g(i)*g(k)*alph(i)*alph(k)
      &                    / ((sqrt(alph(i)/nn(i))+sqrt(alph(k)/nn(k)))
-     &                                 *radmin(i,k)**6)
+     &                                 *radmin(ii,kk)**6)
                end if
                if (i .eq. k)  eps(i) = ep
             else if (eps(i).eq.0.0d0 .and. eps(k).eq.0.0d0) then
@@ -402,15 +427,17 @@ c
             else
                ep = seps(i) * seps(k)
             end if
-            epsilon(i,k) = ep
-            epsilon(k,i) = ep
+            epsilon(ii,kk) = ep
+            epsilon(kk,ii) = ep
          end do
       end do
 c
 c     use combination rules to set pairwise 1-4 vdw radii sums
 c
-      do i = 1, maxclass
-         do k = i, maxclass
+      do ii = 1, nlist
+         i = list(ii)
+         do kk = ii, nlist
+            k = list(kk)
             if (radrule(1:6) .eq. 'MMFF94') then
                if (i .ne. k) then
                   rd = 0.5d0 * (rad(i)+rad(k))
@@ -436,22 +463,24 @@ c
             else
                rd = rad4(i) + rad4(k)
             end if
-            radmin4(i,k) = rd
-            radmin4(k,i) = rd
+            radmin4(ii,kk) = rd
+            radmin4(kk,ii) = rd
          end do
       end do
 c
 c     use combination rules to set pairwise 1-4 well depths
 c
-      do i = 1, maxclass
-         do k = i, maxclass
+      do ii = 1, nlist
+         i = list(ii)
+         do kk = ii, nlist
+            k = list(kk)
             if (epsrule(1:6) .eq. 'MMFF94') then
                ep = 0.0d0
                if (nn(i).ne.0.0d0 .and. nn(k).ne.0.0d0
-     &                .and. radmin4(i,k).ne.0.0d0) then
+     &                .and. radmin4(ii,kk).ne.0.0d0) then
                   ep = 181.16d0*G(i)*G(k)*alph(i)*alph(k)
      &                    / ((sqrt(alph(i)/nn(i))+sqrt(alph(k)/nn(k)))
-     &                                 *radmin4(i,k)**6)
+     &                                 *radmin4(ii,kk)**6)
                end if
                if (i .eq. k)  eps4(i) = ep
             else if (eps4(i).eq.0.0d0 .and. eps4(k).eq.0.0d0) then
@@ -470,33 +499,28 @@ c
             else
                ep = seps4(i) * seps4(k)
             end if
-            epsilon4(i,k) = ep
-            epsilon4(k,i) = ep
+            epsilon4(ii,kk) = ep
+            epsilon4(kk,ii) = ep
          end do
       end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (srad)
-      deallocate (srad4)
-      deallocate (seps)
-      deallocate (seps4)
 c
 c     use reduced values for MMFF donor-acceptor pairs
 c
       if (forcefield .eq. 'MMFF94') then
-         do i = 1, maxclass
-            do k = i, maxclass
+         do ii = 1, nlist
+            i = list(ii)
+            do kk = ii, nlist
+               k = list(kk)
                if ((da(i).eq.'D' .and. da(k).eq.'A') .or.
      &             (da(i).eq.'A' .and. da(k).eq.'D')) then
-                  epsilon(i,k) = epsilon(i,k) * 0.5d0
-                  epsilon(k,i) = epsilon(k,i) * 0.5d0
-                  radmin(i,k) = radmin(i,k) * 0.8d0
-                  radmin(k,i) = radmin(k,i) * 0.8d0
-                  epsilon4(i,k) = epsilon4(i,k) * 0.5d0
-                  epsilon4(k,i) = epsilon4(k,i) * 0.5d0
-                  radmin4(i,k) = radmin4(i,k) * 0.8d0
-                  radmin4(k,i) = radmin4(k,i) * 0.8d0
+                  epsilon(ii,kk) = epsilon(ii,kk) * 0.5d0
+                  epsilon(kk,ii) = epsilon(kk,ii) * 0.5d0
+                  radmin(ii,kk) = radmin(ii,kk) * 0.8d0
+                  radmin(kk,ii) = radmin(kk,ii) * 0.8d0
+                  epsilon4(ii,kk) = epsilon4(ii,kk) * 0.5d0
+                  epsilon4(kk,ii) = epsilon4(kk,ii) * 0.5d0
+                  radmin4(ii,kk) = radmin4(ii,kk) * 0.8d0
+                  radmin4(kk,ii) = radmin4(kk,ii) * 0.8d0
                end if
             end do
          end do
@@ -507,7 +531,11 @@ c
       do i = 1, n
          ired(i) = i
          kred(i) = 0.0d0
-         if (jvdw(i) .ne. 0)  kred(i) = reduct(jvdw(i))
+         if (vdwindex .eq. 'TYPE') then
+            kred(i) = reduct(type(i))
+         else
+            kred(i) = reduct(class(i))
+         end if
          if (n12(i).eq.1 .and. kred(i).ne.0.0d0) then
             ired(i) = i12(1,i)
          end if
@@ -521,23 +549,27 @@ c
          ib = number(kvpr(i)(5:8))
          if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
          if (rad(ib) .eq. 0.0d0)  rad(ib) = 0.001d0
-         if (radtyp .eq. 'SIGMA')  radpr(i) = twosix * radpr(i)
-         radmin(ia,ib) = radpr(i)
-         radmin(ib,ia) = radpr(i)
-         epsilon(ia,ib) = abs(epspr(i))
-         epsilon(ib,ia) = abs(epspr(i))
-         radmin4(ia,ib) = radpr(i)
-         radmin4(ib,ia) = radpr(i)
-         epsilon4(ia,ib) = abs(epspr(i))
-         epsilon4(ib,ia) = abs(epspr(i))
+         ia = rlist(ia)
+         ib = rlist(ib)
+         if (ia.ne.0 .and. ib.ne.0) then
+            if (radtyp .eq. 'SIGMA')  radpr(i) = twosix * radpr(i)
+            radmin(ia,ib) = radpr(i)
+            radmin(ib,ia) = radpr(i)
+            epsilon(ia,ib) = abs(epspr(i))
+            epsilon(ib,ia) = abs(epspr(i))
+            radmin4(ia,ib) = radpr(i)
+            radmin4(ib,ia) = radpr(i)
+            epsilon4(ia,ib) = abs(epspr(i))
+            epsilon4(ib,ia) = abs(epspr(i))
+         end if
       end do
   230 continue
 c
 c     radii and well depths for hydrogen bonding pairs
 c
       if (vdwtyp .eq. 'MM3-HBOND') then
-         do i = 1, maxclass
-            do k = 1, maxclass
+         do i = 1, nlist
+            do k = 1, nlist
                radhbnd(k,i) = 0.0d0
                epshbnd(k,i) = 0.0d0
             end do
@@ -548,14 +580,27 @@ c
             ib = number(khb(i)(5:8))
             if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
             if (rad(ib) .eq. 0.0d0)  rad(ib) = 0.001d0
-            if (radtyp .eq. 'SIGMA')  radhb(i) = twosix * radhb(i)
-            radhbnd(ia,ib) = radhb(i)
-            radhbnd(ib,ia) = radhb(i)
-            epshbnd(ia,ib) = abs(epshb(i))
-            epshbnd(ib,ia) = abs(epshb(i))
+            ia = rlist(ia)
+            ib = rlist(ib)
+            if (ia.ne.0 .and. ib.ne.0) then
+               if (radtyp .eq. 'SIGMA')  radhb(i) = twosix * radhb(i)
+               radhbnd(ia,ib) = radhb(i)
+               radhbnd(ib,ia) = radhb(i)
+               epshbnd(ia,ib) = abs(epshb(i))
+               epshbnd(ib,ia) = abs(epshb(i))
+            end if
          end do
   240    continue
       end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (rlist)
+      deallocate (srad)
+      deallocate (srad4)
+      deallocate (seps)
+      deallocate (seps4)
 c
 c     set coefficients for Gaussian fit to eps=1 and radmin=1
 c

@@ -1080,7 +1080,7 @@ c
       exist = .false.
       use_thole = .false.
       use_dirdamp = .false.
-      do i = 1, maxtyp
+      do i = 1, maxclass
          if (polr(i) .ne. 0.0d0)  exist = .true.
          if (athl(i) .ne. 0.0d0)  use_thole = .true.
          if (ddir(i) .ne. 0.0d0)  use_dirdamp = .true.
@@ -1091,20 +1091,20 @@ c
          if (use_dirdamp) then
             write (itxt,1480)
  1480       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,22x,'Type',8x,'Alpha',5x,'Thole',6x,'Damp',
+     &              ///,22x,'Class',7x,'Alpha',5x,'Thole',6x,'Damp',
      &                 6x,'Group Types',/)
          else if (use_thole) then
             write (itxt,1490)
  1490       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,22x,'Type',8x,'Alpha',5x,'Thole',
+     &              ///,22x,'Class',7x,'Alpha',5x,'Thole',
      &                 6x,'Group Atom Types',/)
          else
             write (itxt,1500)
  1500       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,22x,'Type',8x,'Alpha',6x,'Group Atom Types',/)
+     &              ///,22x,'Class',7x,'Alpha',6x,'Group Atom Types',/)
          end if
          k = 0
-         do i = 1, maxtyp
+         do i = 1, maxclass
             if (polr(i) .ne. 0.0d0) then
                k = k + 1
                npg = 0
