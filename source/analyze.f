@@ -2035,11 +2035,11 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  if (use_dirdamp) then
+                  if (use_tholed) then
                      write (iout,860)
   860                format (/,' Dipole Polarizability Parameters :',
      &                       //,10x,'Atom Number',5x,'Alpha',4x,'Thole',
-     &                          3x,'Direct',6x,'Polarization Group',/)
+     &                          3x,'TholeD',6x,'Polarization Group',/)
                   else if (use_thole) then
                      write (iout,870)
   870                format (/,' Dipole Polarizability Parameters :',
@@ -2052,9 +2052,9 @@ c
      &                          6x,'Polarization Group',/)
                   end if
                end if
-               if (use_dirdamp) then
+               if (use_tholed) then
                   write (iout,890)  i,ia,polarity(i),thole(i),
-     &                              dirdamp(i),(ip11(j,ia),j=1,np11(ia))
+     &                              tholed(i),(ip11(j,ia),j=1,np11(ia))
   890             format (i6,3x,i6,6x,f10.4,2f9.3,3x,120i6)
                else if (use_thole) then
                   write (iout,900)  i,ia,polarity(i),thole(i),

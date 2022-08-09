@@ -1711,7 +1711,7 @@ c     allow the user to select the polarization model
 c
       forcefield = 'AMOEBA'
       use_thole = .true.
-      use_dirdamp = .false.
+      use_tholed = .false.
       use_chgpen = .false.
       dpequal = .false.
       query = .true.
@@ -1745,7 +1745,7 @@ c     perform dynamic allocation of some global arrays
 c
       if (.not. allocated(polarity))  allocate (polarity(n))
       if (.not. allocated(thole))  allocate (thole(n))
-      if (.not. allocated(dirdamp))  allocate (dirdamp(n))
+      if (.not. allocated(tholed))  allocate (tholed(n))
       if (.not. allocated(pdamp))  allocate (pdamp(n))
       if (.not. allocated(pcore))  allocate (pcore(n))
       if (.not. allocated(pval))  allocate (pval(n))
@@ -1756,7 +1756,7 @@ c
       do i = 1, n
          polarity(i) = 0.0d0
          thole(i) = 0.0d0
-         dirdamp(i) = 0.0d0
+         tholed(i) = 0.0d0
          pdamp(i) = 0.0d0
          pcore(i) = 0.0d0
          pval(i) = 0.0d0

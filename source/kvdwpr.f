@@ -7,12 +7,12 @@ c     ###################################################
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  module kvdwpr  --  special vdw term forcefield parameters  ##
+c     ##  module kvdwpr  --  special pair vdw forcefield parameters  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     maxnvp   maximum number of special van der Waals pair entries
+c     maxnvp   maximum number of special pair van der Waals entries
 c
 c     radpr    radius parameter for special van der Waals pairs
 c     epspr    well depth parameter for special van der Waals pairs

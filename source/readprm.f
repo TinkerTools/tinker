@@ -90,7 +90,7 @@ c
       real*8 vd,cg,dp,ps
       real*8 fc,bd,dl
       real*8 pt,pel,pal
-      real*8 pol,thl,ddp
+      real*8 pol,thl,dth
       real*8 kpr,ppr,dpr
       real*8 ctrn,atrn
       real*8 cfb,cfb1,cfb2
@@ -1270,7 +1270,7 @@ c
             ia = 0
             pol = 0.0d0
             thl = 0.0d0
-            ddp = 0.0d0
+            dth = 0.0d0
             do i = 1, maxval
                pg(i) = 0
             end do
@@ -1288,7 +1288,7 @@ c
                call getnumb (text,pg(1),i)
                string = string(next:240)
                if (pg(1) .eq. 0) then
-                  read (text,*,err=490,end=490)  ddp
+                  read (text,*,err=490,end=490)  dth
                   read (string,*,err=490,end=490)  (pg(i),i=1,maxval)
                else
                   read (string,*,err=490,end=490)  (pg(i),i=2,maxval)
@@ -1301,7 +1301,7 @@ c
             if (ia .ne. 0) then
                polr(ia) = pol
                athl(ia) = thl
-               ddir(ia) = ddp
+               dthl(ia) = dth
                do i = 1, maxval
                   pgrp(i,ia) = pg(i)
                end do

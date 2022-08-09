@@ -1209,7 +1209,7 @@ c
                   rr3 = rr1 / r2
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  call dampthole2 (ii,kk,7,r,dmpik)
+                  call dampthole (ii,kk,7,r,dmpik)
                   ei = gli(1)*rr3*dmpik(3) + gli(2)*rr5*dmpik(5)
      &                    + gli(3)*rr7*dmpik(7)
 c

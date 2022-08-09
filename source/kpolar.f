@@ -47,13 +47,18 @@ c
       use potent
       implicit none
       integer i,j,k
-      integer it,next
+      integer ii,kk
+      integer ia,ib,it
+      integer next,size
       integer nlist,npg
       integer pg(maxval)
       integer, allocatable :: list(:)
-      real*8 pol,thl,ddp
+      integer, allocatable :: rlist(:)
+      real*8 pol,thl,thd
       real*8 sixth
       logical header
+      character*4 pa,pb
+      character*8 blank,pt
       character*20 keyword
       character*20 text
       character*240 record
@@ -207,7 +212,7 @@ c
       if (allocated(ipolar))  deallocate (ipolar)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
-      if (allocated(dirdamp))  deallocate (dirdamp)
+      if (allocated(tholed))  deallocate (tholed)
       if (allocated(pdamp))  deallocate (pdamp)
       if (allocated(udir))  deallocate (udir)
       if (allocated(udirp))  deallocate (udirp)
@@ -217,7 +222,7 @@ c
       allocate (ipolar(n))
       allocate (polarity(n))
       allocate (thole(n))
-      allocate (dirdamp(n))
+      allocate (tholed(n))
       allocate (pdamp(n))
       allocate (udir(3,n))
       allocate (udirp(3,n))
@@ -279,7 +284,7 @@ c
             k = 0
             pol = 0.0d0
             thl = -1.0d0
-            ddp = -1.0d0
+            thd = -1.0d0
             do j = 1, maxval
                pg(j) = 0
             end do
@@ -296,7 +301,7 @@ c
                call getnumb (text,pg(1),j)
                string = record(next:240)
                if (pg(1) .eq. 0) then
-                  read (text,*,err=30,end=30) ddp
+                  read (text,*,err=30,end=30)  thd
                   read (string,*,err=30,end=30)  (pg(j),j=1,maxval)
                else
                   read (string,*,err=30,end=30)  (pg(j),j=2,maxval)
@@ -312,10 +317,10 @@ c
                   write (iout,40)
    40             format (/,' Additional Atomic Dipole',
      &                       ' Polarizability Parameters :')
-                  if (ddp .ge. 0.0d0) then
+                  if (thd .ge. 0.0d0) then
                      write (iout,50)
    50                format (/,5x,'Atom Type',11x,'Alpha',7x,
-     &                          'Thole',8x,'Damp',5x,
+     &                          'Thole',6x,'TholeD',5x,
      &                          'Group Atom Types',/)
                   else if (thl .ge. 0.0d0) then
                      write (iout,60)
@@ -330,7 +335,7 @@ c
                if (k .le. maxtyp) then
                   polr(k) = pol
                   athl(k) = max(0.0d0,thl)
-                  ddir(k) = max(0.0d0,ddp)
+                  dthl(k) = max(0.0d0,thd)
                   do j = 1, maxval
                      pgrp(j,k) = pg(j)
                      if (pg(j) .eq. 0) then
@@ -340,8 +345,8 @@ c
                   end do
    80             continue
                   if (.not. silent) then
-                     if (ddp .ge. 0.0d0) then
-                        write (iout,90)  k,pol,thl,ddp,(pg(j),j=1,npg)
+                     if (thd .ge. 0.0d0) then
+                        write (iout,90)  k,pol,thl,thd,(pg(j),j=1,npg)
    90                   format (4x,i8,8x,f10.3,2x,f10.3,2x,f10.3,
      &                             7x,20i5)
                      else if (thl .ge. 0.0d0) then
@@ -362,6 +367,71 @@ c
          end if
       end do
 c
+c     process keywords with specific pair polarization values
+c
+      blank = '        '
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:8) .eq. 'POLPAIR ') then
+            ia = 0
+            ib = 0
+            thl = 0.0d0
+            thd = 0.0d0
+            string = record(next:240)
+            read (string,*,err=130,end=130)  ia,ib,thl,thd
+  130       continue
+            if (header .and. .not.silent) then
+               header = .false.
+               write (iout,140)
+  140          format (/,' Additional Polarization Parameters',
+     &                    ' for Specific Pairs :')
+               if (thd .ge. 0.0d0) then
+                  write (iout,150)
+  150             format (/,5x,'Atom Types',11x,'Thole',
+     &                       8x,'TholeD',/)
+               else if (thl .ge. 0.0d0) then
+                  write (iout,160)
+  160             format (/,5x,'Atom Types',11x,'Thole',/)
+               end if
+            end if
+            if (thd.ge.0.0d0 .and. .not.silent) then
+               write (iout,170)  ia,ib,thl,thd
+  170          format (6x,2i4,5x,2f15.4)
+            else if (thl.ge.0.0d0 .and. .not.silent) then
+               write (iout,180)  ia,ib,thl
+  180          format (6x,2i4,5x,f15.4)
+            end if
+            size = 4
+            call numeral (ia,pa,size)
+            call numeral (ib,pb,size)
+            if (ia .le. ib) then
+               pt = pa//pb
+            else
+               pt = pb//pa
+            end if
+
+c           do k = 1, maxnpp
+c              if (kppr(k).eq.blank .or. kppr(k).eq.pt) then
+c                 kppr(k) = pt
+c                 thlpr(k) = thl
+c                 thdpr(k) = thd
+c                 goto 200
+c              end if
+c           end do
+            goto 200
+
+            write (iout,190)
+  190       format (/,' KPOLAR  --  Too many Special Pair',
+     &                 ' Thole Parameters')
+            abort = .true.
+  200       continue
+         end if
+      end do
+c
 c     find and store the atomic dipole polarizability parameters
 c
       sixth = 1.0d0 / 6.0d0
@@ -369,71 +439,93 @@ c
       do i = 1, n
          polarity(i) = 0.0d0
          thole(i) = 0.0d0
-         dirdamp(i) = 0.0d0
+         tholed(i) = 0.0d0
          pdamp(i) = 0.0d0
          it = type(i)
          if (it .ne. 0) then
             polarity(i) = polr(it)
             thole(i) = athl(it)
-            dirdamp(i) = ddir(it)
+            tholed(i) = dthl(it)
             pdamp(i) = polarity(i)**sixth
          end if
       end do
 c
-c     process keywords containing atom specific polarizabilities
+c     perform dynamic allocation of some global arrays
 c
-      header = .true.
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         if (keyword(1:9) .eq. 'POLARIZE ') then
-            k = 0
-            pol = 0.0d0
-            thl = -1.0d0
-            ddp = -1.0d0
-            call getnumb (record,k,next)
-            if (k.lt.0 .and. k.ge.-n) then
-               k = -k
-               string = record(next:240)
-               read (string,*,err=130,end=130)  pol,thl,ddp
-  130          continue
-               if (header) then
-                  header = .false.
-                  write (iout,140)
-  140             format (/,' Additional Dipole Polarizabilities',
-     &                       ' for Specific Atoms :')
-                  if (ddp .ge. 0.0d0) then
-                     write (iout,150)
-  150                format (/,5x,'Atom',16x,'Alpha',7x,'Thole',
-     &                          8x,'Damp',/)
-                  else if (thl .ge. 0.0d0) then
-                     write (iout,160)
-  160                format (/,5x,'Atom',16x,'Alpha',7x,'Thole',/)
-                  else
-                     write (iout,170)
-  170                format (/,5x,'Atom',16x,'Alpha',/)
-                  end if
-               end if
-               if (.not. silent) then
-                  if (ddp .ge. 0.0d0) then
-                     write (iout,180)  k,pol,thl,ddp
-  180                format (1x,i8,11x,f10.3,2x,f10.3,2x,f10.3)
-                  else if (thl .ge. 0.0d0) then
-                     write (iout,190)  k,pol,thl
-  190                format (1x,i8,11x,f10.3,2x,f10.3)
-                  else
-                     write (iout,200)  k,pol
-  200                format (1x,i8,11x,f10.3)
-                  end if
-               end if
-               polarity(k) = pol
-               thole(k) = max(0.0d0,thl)
-               dirdamp(k) = max(0.0d0,ddp)
-            end if
+      if (allocated(jpolar))  deallocate (jpolar)
+      allocate (jpolar(n))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+      allocate (rlist(maxtyp))
+c
+c     set atom type index into condensed pair Thole matrices
+c
+      nlist = n
+      do i = 1, n
+         list(i) = type(i)
+         jpolar(i) = list(i)
+      end do
+      call sort8 (nlist,list)
+      do i = 1, maxtyp
+         rlist(i) = 0
+      end do
+      do i = 1, n
+         j = jpolar(i)
+         if (rlist(j) .eq. 0) then
+            do k = 1, nlist
+               if (list(k) .eq. j)  rlist(j) = k
+            end do
          end if
       end do
+      do i = 1, n
+         jpolar(i) = rlist(type(i))
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(thlval))  deallocate (thlval)
+      if (allocated(thdval))  deallocate (thdval)
+      allocate (thlval(nlist,nlist))
+      allocate (thdval(nlist,nlist))
+c
+c     use combination rules for pairwise Thole damping values
+c
+      do ii = 1, nlist
+         i = list(ii)
+         do kk = ii, nlist
+            k = list(kk)
+            thl = min(athl(i),athl(k))
+            if (thl .eq. 0.0d0)  thl = max(athl(i),athl(k))
+            thd = min(dthl(i),dthl(k))
+            if (thd .eq. 0.0d0)  thd = max(dthl(i),dthl(k))
+            thlval(ii,kk) = thl
+            thlval(kk,ii) = thl
+            thdval(ii,kk) = thd
+            thdval(kk,ii) = thd
+         end do
+      end do
+c
+c     apply Thole damping values for special atom type pairs
+c
+c     do i = 1, maxnpp
+c        if (kppr(i) .eq. blank)  goto 210
+c        ia = rlist(number(kppr(i)(1:4)))
+c        ib = rlist(number(kppr(i)(5:8)))
+c        if (ia.ne.0 .and. ib.ne.0) then
+c           thlval(ia,ib) = thlpr(i)
+c           thlval(ib,ia) = thlpr(i)
+c           thdval(ia,ib) = thdpr(i)
+c           thdval(ib,ia) = thdpr(i)
+c        end if
+c     end do
+c 210 continue
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (rlist)
 c
 c     setup exchange polarization via variable polarizability
 c
@@ -470,10 +562,10 @@ c
                   ipolar(npolar) = npole
                   douind(i) = .true.
                end if
-               if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
+               if (tholed(i) .ne. 0.0d0)  use_tholed = .true.
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
-               dirdamp(npole) = dirdamp(i)
+               tholed(npole) = tholed(i)
                pdamp(npole) = pdamp(i)
                if (kpep(i) .ne. 0.0d0)  nexpol = nexpol + 1
                kpep(npole) = kpep(i)
@@ -498,7 +590,7 @@ c
       if (ncp .ne. 0)  use_chgpen = .true.
       if (npolar .eq. 0)  use_polar = .false.
       if (ncp .ne. 0)  use_thole = .false.
-      if (use_dirdamp)  use_thole = .true.
+      if (use_tholed)  use_thole = .true.
       if (nexpol .ne. 0)  use_expol = .true.
       return
       end

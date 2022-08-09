@@ -1079,20 +1079,20 @@ c     atomic dipole polarizability parameters
 c
       exist = .false.
       use_thole = .false.
-      use_dirdamp = .false.
+      use_tholed = .false.
       do i = 1, maxclass
          if (polr(i) .ne. 0.0d0)  exist = .true.
          if (athl(i) .ne. 0.0d0)  use_thole = .true.
-         if (ddir(i) .ne. 0.0d0)  use_dirdamp = .true.
+         if (dthl(i) .ne. 0.0d0)  use_tholed = .true.
       end do
       if (exist) then
          write (itxt,1470)  formfeed,forcefield
  1470    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
-         if (use_dirdamp) then
+         if (use_tholed) then
             write (itxt,1480)
  1480       format (//,15x,'Dipole Polarizability Parameters',
-     &              ///,22x,'Class',7x,'Alpha',5x,'Thole',6x,'Damp',
-     &                 6x,'Group Types',/)
+     &              ///,22x,'Class',7x,'Alpha',5x,'Thole',
+     &                 4x,'TholeD',6x,'Group Types',/)
          else if (use_thole) then
             write (itxt,1490)
  1490       format (//,15x,'Dipole Polarizability Parameters',
@@ -1111,12 +1111,12 @@ c
                do j = 1, maxval
                   if (pgrp(j,i) .ne. 0)  npg = npg + 1
                end do
-               if (use_dirdamp) then
+               if (use_tholed) then
                   if (npg .eq. 0) then
-                     write (itxt,1510)  k,i,polr(i),athl(i),ddir(i)
+                     write (itxt,1510)  k,i,polr(i),athl(i),dthl(i)
  1510                format (8x,i7,4x,i7,3x,3f10.3)
                   else
-                     write (itxt,1520)  k,i,polr(i),athl(i),ddir(i),
+                     write (itxt,1520)  k,i,polr(i),athl(i),dthl(i),
      &                                  (pgrp(j,i),j=1,npg)
  1520                format (8x,i7,4x,i7,3x,3f10.3,4x,6i5)
                   end if

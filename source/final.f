@@ -637,7 +637,7 @@ c
       if (allocated(pgrp))  deallocate (pgrp)
       if (allocated(polr))  deallocate (polr)
       if (allocated(athl))  deallocate (athl)
-      if (allocated(ddir))  deallocate (ddir)
+      if (allocated(dthl))  deallocate (dthl)
 c
 c     deallocation of global arrays from module krepl
 c
@@ -937,7 +937,7 @@ c
       if (allocated(ipolar))  deallocate (ipolar)
       if (allocated(polarity))  deallocate (polarity)
       if (allocated(thole))  deallocate (thole)
-      if (allocated(dirdamp))  deallocate (dirdamp)
+      if (allocated(tholed))  deallocate (tholed)
       if (allocated(pdamp))  deallocate (pdamp)
       if (allocated(udir))  deallocate (udir)
       if (allocated(udirp))  deallocate (udirp)

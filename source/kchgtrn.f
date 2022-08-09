@@ -167,10 +167,10 @@ c
                   ipolar(npolar) = npole
                   douind(i) = .true.
                end if
-               if (dirdamp(i) .ne. 0.0d0)  use_dirdamp = .true.
+               if (tholed(i) .ne. 0.0d0)  use_tholed = .true.
                polarity(npole) = polarity(i)
                thole(npole) = thole(i)
-               dirdamp(npole) = dirdamp(i)
+               tholed(npole) = tholed(i)
                pdamp(npole) = pdamp(i)
                if (kpep(i) .ne. 0.0d0)  nexpol = nexpol + 1
                kpep(npole) = kpep(i)
@@ -196,7 +196,7 @@ c
       if (npolar .eq. 0)  use_polar = .false.
       if (ncp .ne. 0)  use_chgpen = .true.
       if (ncp .ne. 0)  use_thole = .false.
-      if (use_dirdamp)  use_thole = .true.
+      if (use_tholed)  use_thole = .true.
       if (nexpol .ne. 0)  use_expol = .true.
       if (nct .eq. 0)  use_chgtrn = .false.
       return

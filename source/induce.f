@@ -842,7 +842,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   rr3 = dmpik(3) / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -1091,7 +1091,7 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole (ii,kk,7,r,dmpik)
+                        call damptholed (ii,kk,7,r,dmpik)
                         rr3 = dmpik(3) / (r*r2)
                         rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                         rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -1370,7 +1370,7 @@ c
 c     find the scale factors for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole2 (ii,kk,5,r,dmpik)
+                  call dampthole (ii,kk,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
 c
@@ -1511,7 +1511,7 @@ c
 c     find the scale factors for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole2 (ii,kk,5,r,dmpik)
+                        call dampthole (ii,kk,5,r,dmpik)
                         dmpik(3) = uscale(k) * dmpik(3)
                         dmpik(5) = uscale(k) * dmpik(5)
 c
@@ -1832,7 +1832,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   rr3 = dmpik(3) / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -2125,7 +2125,7 @@ c
 c     find the scale factors for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole2 (ii,kk,5,r,dmpik)
+                  call dampthole (ii,kk,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
 c
@@ -2712,7 +2712,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   scalek = dscale(k)
                   dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -3016,7 +3016,7 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole (ii,kk,7,r,dmpik)
+                        call damptholed (ii,kk,7,r,dmpik)
                         dsc3 = dmpik(3)
                         dsc5 = dmpik(5)
                         dsc7 = dmpik(7)
@@ -3505,7 +3505,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   scalek = dscale(k)
                   dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -3542,7 +3542,7 @@ c
 c     find terms needed later to compute mutual polarization
 c
                   if (poltyp .ne. 'DIRECT') then
-                     call dampthole2 (ii,kk,5,r,dmpik)
+                     call dampthole (ii,kk,5,r,dmpik)
                      scalek = uscale(k)
                      dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                      dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -4150,7 +4150,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole2 (ii,kk,5,r,dmpik)
+                  call dampthole (ii,kk,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
 c
@@ -4302,7 +4302,7 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole2 (ii,kk,5,r,dmpik)
+                        call dampthole (ii,kk,5,r,dmpik)
                         dmpik(3) = uscale(k) * dmpik(3)
                         dmpik(5) = uscale(k) * dmpik(5)
 c
@@ -5217,7 +5217,7 @@ c
 c     self-interactions for the solute field are skipped
 c
                   if (i .ne. k) then
-                     call dampthole (ii,kk,7,r,dmpik)
+                     call damptholed (ii,kk,7,r,dmpik)
                      rr3 = dmpik(3) / (r*r2)
                      rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                      rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -5690,7 +5690,7 @@ c
                   pukzs = uinps(3,kk)
                   rbk = rborn(k)
                   if (i .ne. k) then
-                     call dampthole2 (ii,kk,5,r,dmpik)
+                     call dampthole (ii,kk,5,r,dmpik)
                      dmpik(3) = uscale(k) * dmpik(3)
                      dmpik(5) = uscale(k) * dmpik(5)
                      rr3 = -dmpik(3) / (r*r2)
@@ -6498,7 +6498,7 @@ c
                   qkyy = rpole(9,kk)
                   qkyz = rpole(10,kk)
                   qkzz = rpole(13,kk)
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   rr3 = dmpik(3) / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -6740,7 +6740,7 @@ c
                   pukxs = uinps(1,kk)
                   pukys = uinps(2,kk)
                   pukzs = uinps(3,kk)
-                  call dampthole2 (ii,kk,5,r,dmpik)
+                  call dampthole (ii,kk,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
                   rr3 = -dmpik(3) / (r*r2)
@@ -7166,7 +7166,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   if (use_thole) then
-                     call dampthole2 (ii,kk,5,r,dmpik)
+                     call dampthole (ii,kk,5,r,dmpik)
                      dmpik(3) = uscale(k) * dmpik(3)
                      dmpik(5) = uscale(k) * dmpik(5)
                   else if (use_chgpen) then
@@ -7436,7 +7436,7 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                r = sqrt(r2)
                if (use_thole) then
-                  call dampthole2 (ii,kk,5,r,dmpik)
+                  call dampthole (ii,kk,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
                else if (use_chgpen) then

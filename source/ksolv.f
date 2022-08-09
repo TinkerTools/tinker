@@ -856,7 +856,7 @@ c
       use solute
       use vdw
       implicit none
-      integer i,next
+      integer i,it,next
       integer atmnum
       real*8 dhct
       character*10 radtyp
@@ -962,7 +962,8 @@ c
          shct(i) = dhct
          rdescr(i) = rsolv(i)
          if (descreenVDW) then
-            rdescr(i) = radmin(class(i),class(i))/2.0d0
+            it = jvdw(i)
+            rdescr(i) = 0.5d0 * radmin(it,it)
          end if
          if (.not. descreenHydrogen) then
             atmnum = atomic(i)
@@ -1672,9 +1673,10 @@ c     assign solute atomic radii from force field vdw values
 c
       if (radtyp .eq. 'VDW') then
          do i = 1, n
+            k = jvdw(i)
             rsolv(i) = 2.0d0
-            if (class(i) .ne. 0) then
-               rsolv(i) = radmin(class(i),class(i))/2.0d0
+            if (k .ne. 0) then
+               rsolv(i) = 0.5d0 * radmin(k,k)
             end if
          end do
 c

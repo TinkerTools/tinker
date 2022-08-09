@@ -263,7 +263,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -462,7 +462,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole (ii,kk,7,r,dmpik)
+                        call damptholed (ii,kk,7,r,dmpik)
                         scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
@@ -785,7 +785,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -1211,7 +1211,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -1434,7 +1434,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole (ii,kk,7,r,dmpik)
+                        call damptholed (ii,kk,7,r,dmpik)
                         scalek = pscale(k)
                         rr3 = f / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
@@ -1894,7 +1894,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,7,r,dmpik)
+                  call damptholed (ii,kk,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2

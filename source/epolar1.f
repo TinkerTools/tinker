@@ -277,7 +277,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -454,10 +454,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -887,7 +887,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
@@ -1348,7 +1348,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -1531,10 +1531,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -1964,7 +1964,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
@@ -2688,12 +2688,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,pdamp,thole,dirdamp,pcore,pval,palpha,n12,i12,n13,i13,n14,
+!$OMP& uinp,pdamp,thole,tholed,pcore,pval,palpha,n12,i12,n13,i13,n14,
 !$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
 !$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
 !$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_dirdamp,use_chgpen,use_chgflx,use_bounds,off2,f,molcule,
+!$OMP& use_tholed,use_chgpen,use_chgflx,use_bounds,off2,f,molcule,
 !$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,
 !$OMP& xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,vir)
@@ -2740,7 +2740,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -2918,10 +2918,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -3351,7 +3351,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
@@ -4325,7 +4325,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -4506,10 +4506,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -5014,7 +5014,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
@@ -5495,7 +5495,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -5682,10 +5682,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -6190,7 +6190,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
@@ -7148,12 +7148,12 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,pdamp,thole,dirdamp,pcore,pval,palpha,n12,i12,n13,i13,n14,
+!$OMP& uinp,pdamp,thole,tholed,pcore,pval,palpha,n12,i12,n13,i13,n14,
 !$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
 !$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
 !$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
 !$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_chgpen,use_chgflx,use_dirdamp,use_bounds,off2,f,aewald,
+!$OMP& use_chgpen,use_chgflx,use_tholed,use_bounds,off2,f,aewald,
 !$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,
 !$OMP& yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,vir)
@@ -7200,7 +7200,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -7382,10 +7382,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -7890,7 +7890,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3

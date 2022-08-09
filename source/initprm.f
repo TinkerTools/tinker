@@ -222,7 +222,7 @@ c
       if (.not. allocated(cpalp))  allocate (cpalp(maxclass))
       if (.not. allocated(polr))  allocate (polr(maxtyp))
       if (.not. allocated(athl))  allocate (athl(maxtyp))
-      if (.not. allocated(ddir))  allocate (ddir(maxtyp))
+      if (.not. allocated(dthl))  allocate (dthl(maxtyp))
       if (.not. allocated(pgrp))  allocate (pgrp(maxval,maxtyp))
       if (.not. allocated(pepk))  allocate (pepk(maxclass))
       if (.not. allocated(peppre))  allocate (peppre(maxclass))
@@ -256,7 +256,7 @@ c
          chg(i) = 0.0d0
          polr(i) = 0.0d0
          athl(i) = 0.0d0
-         ddir(i) = 0.0d0
+         dthl(i) = 0.0d0
          do j = 1, maxval
             pgrp(j,i) = 0
          end do
@@ -410,7 +410,7 @@ c
       w4scale = 1.0d0
       w5scale = 1.0d0
       use_thole = .true.
-      use_dirdamp = .false.
+      use_tholed = .false.
       use_pred = .false.
       use_ielscf = .false.
       dpequal = .false.

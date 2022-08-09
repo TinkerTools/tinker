@@ -56,7 +56,6 @@ c
 c
 c     process keywords containing van der Waals parameters
 c
-      blank = '        '
       header = .true.
       do i = 1, nkey
          next = 1
@@ -151,6 +150,7 @@ c
 c
 c     process keywords containing specific pair vdw parameters
 c
+      blank = '        '
       header = .true.
       do i = 1, nkey
          next = 1
@@ -202,7 +202,7 @@ c
                end if
             end do
             write (iout,140)
-  140       format (/,' KVDW  --  Too many Special VDW Pair',
+  140       format (/,' KVDW  --  Too many Special Pair VDW',
      &                 ' Parameters')
             abort = .true.
   150       continue
@@ -294,7 +294,7 @@ c
       allocate (seps(maxtyp))
       allocate (seps4(maxtyp))
 c
-c     set type or class index into condensed pair matrix
+c     set type or class index into condensed pair matrices
 c
       nlist = n
       do i = 1, n
@@ -543,7 +543,7 @@ c
          end if
       end do
 c
-c     radii and well depths for special atom class pairs
+c     apply radii and well depths for special atom class pairs
 c
       do i = 1, maxnvp
          if (kvpr(i) .eq. blank)  goto 230
@@ -567,7 +567,7 @@ c
       end do
   230 continue
 c
-c     radii and well depths for hydrogen bonding pairs
+c     set radii and well depths for hydrogen bonding pairs
 c
       if (vdwtyp .eq. 'MM3-HBOND') then
          do i = 1, nlist
@@ -649,7 +649,9 @@ c
       nvdw = 0
       do i = 1, n
          if (jvdw(i) .ne. 0) then
-            if (rad(jvdw(i)) .ne. 0.0d0) then
+            k = class(i)
+            if (vdwindex .eq. 'TYPE')  k = type(i)
+            if (rad(k) .ne. 0.0d0) then
                nvdw = nvdw + 1
                ivdw(nvdw) = i
             end if

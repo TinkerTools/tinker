@@ -38,7 +38,7 @@ c     uaccel       acceleration factor for induced dipole SCF iterations
 c     polprt       flag to print summary of induced dipole iterations
 c     dpequal      flag to set dscale values equal to pscale values
 c     use_thole    flag to use Thole damped polarization interactions
-c     use_dirdamp  flag to use damped direct polarization interactions
+c     use_tholed   flag to use alternate Thole for direct polarization
 c     use_expol    flag to use damped exchange polarization correction
 c     scrtyp       type of exchange polarization (S2U, S2 or G)
 c     poltyp       type of polarization (MUTUAL, DIRECT, OPT or TCG)
@@ -62,7 +62,7 @@ c
       logical polprt
       logical dpequal
       logical use_thole
-      logical use_dirdamp
+      logical use_tholed
       logical use_expol
       character*3 scrtyp
       character*6 poltyp

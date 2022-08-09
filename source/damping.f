@@ -57,99 +57,14 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine dampthole  --  find Thole damping coefficients  ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dampthole  --  original Thole damping values  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "dampthole" finds coefficients for the original Thole damping
-c     function used by AMOEBA or for the alternate direct polarization
-c     damping used by AMOEBA+
-c
-c     literature reference:
-c
-c     B. T. Thole, "Molecular Polarizabilities Calculated with a
-c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
-c
-c
-      subroutine dampthole (i,k,rorder,r,dmpik)
-      use polar
-      use polpot
-      implicit none
-      integer i,j,k
-      integer rorder
-      real*8 r,damp
-      real*8 damp2
-      real*8 damp3
-      real*8 expdamp
-      real*8 pgamma
-      real*8 dmpik(*)
-c
-c
-c     initialize the Thole damping factors to a value of one
-c
-      do j = 1, rorder
-         dmpik(j) = 1.0d0
-      end do
-c
-c     use alternate Thole model for AMOEBA+ direct polarization
-c
-      damp = pdamp(i) * pdamp(k)
-      if (use_dirdamp) then
-         pgamma = min(dirdamp(i),dirdamp(k))
-         if (pgamma .eq. 0.0d0)  pgamma = max(dirdamp(i),dirdamp(k))
-         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
-            damp = pgamma * (r/damp)**(1.5d0)
-            if (damp .lt. 50.0d0) then
-               expdamp = exp(-damp)
-               dmpik(3) = 1.0d0 - expdamp
-               dmpik(5) = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
-               if (rorder .ge. 7) then
-                  damp2 = damp * damp
-                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
-     &                                  +0.15d0*damp2)
-               end if
-            end if
-         end if
-c
-c     use original AMOEBA Thole polarization damping factors
-c
-      else
-         pgamma = min(thole(i),thole(k))
-         if (pgamma .eq. 0.0d0)  pgamma = max(thole(i),thole(k))
-         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
-            damp = pgamma * (r/damp)**3
-            if (damp .lt. 50.0d0) then
-               expdamp = exp(-damp)
-               dmpik(3) = 1.0d0 - expdamp
-               dmpik(5) = 1.0d0 - expdamp*(1.0d0+damp)
-               if (rorder .ge. 7) then
-                  damp2 = damp * damp
-                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+damp+0.6d0*damp2)
-                  if (rorder .ge. 9) then
-                     damp3 = damp * damp2
-                     dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
-     &                                     +(18.0d0/35.0d0)*damp2
-     &                                     +(9.0d0/35.0d0)*damp3)
-                  end if
-               end if
-            end if
-         end if
-      end if
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine dampthole2  --  original Thole damping values  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "dampthole2" finds coefficients for the original Thole damping
 c     function used by AMOEBA and for mutual polarization by AMOEBA+
 c
 c     literature reference:
@@ -158,10 +73,13 @@ c     B. T. Thole, "Molecular Polarizabilities Calculated with a
 c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
 c
 c
-      subroutine dampthole2 (i,k,rorder,r,dmpik)
+      subroutine dampthole (i,k,rorder,r,dmpik)
+      use atoms
+      use mpole
       use polar
       implicit none
       integer i,j,k
+      integer it,kt
       integer rorder
       real*8 r,damp
       real*8 damp2
@@ -180,8 +98,9 @@ c
 c     assign original Thole polarization model damping factors
 c
       damp = pdamp(i) * pdamp(k)
-      pgamma = min(thole(i),thole(k))
-      if (pgamma .eq. 0.0d0)  pgamma = max(thole(i),thole(k))
+      it = jpolar(ipole(i))
+      kt = jpolar(ipole(k))
+      pgamma = thlval(it,kt)
       if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
          damp = pgamma * (r/damp)**3
          if (damp .lt. 50.0d0) then
@@ -196,6 +115,96 @@ c
                   dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
      &                                  +(18.0d0/35.0d0)*damp2
      &                                  +(9.0d0/35.0d0)*damp3)
+               end if
+            end if
+         end if
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine damptholed  --  alternate Thole damping values  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "damptholed" finds coefficients for the original Thole damping
+c     function used by AMOEBA or for the alternate direct polarization
+c     damping used by AMOEBA+
+c
+c     literature reference:
+c
+c     B. T. Thole, "Molecular Polarizabilities Calculated with a
+c     Modified Dipole Interaction", Chemical Physics, 59, 341-350 (1981)
+c
+c
+      subroutine damptholed (i,k,rorder,r,dmpik)
+      use atoms
+      use mpole
+      use polar
+      use polpot
+      implicit none
+      integer i,j,k
+      integer it,kt
+      integer rorder
+      real*8 r,damp
+      real*8 damp2
+      real*8 damp3
+      real*8 expdamp
+      real*8 pgamma
+      real*8 dmpik(*)
+c
+c
+c     initialize the Thole damping factors to a value of one
+c
+      do j = 1, rorder
+         dmpik(j) = 1.0d0
+      end do
+c
+c     use alternate Thole model for AMOEBA+ direct polarization
+c
+      damp = pdamp(i) * pdamp(k)
+      if (use_tholed) then
+         it = jpolar(ipole(i))
+         kt = jpolar(ipole(k))
+         pgamma = thdval(it,kt)
+         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
+            damp = pgamma * (r/damp)**(1.5d0)
+            if (damp .lt. 50.0d0) then
+               expdamp = exp(-damp)
+               dmpik(3) = 1.0d0 - expdamp
+               dmpik(5) = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+               if (rorder .ge. 7) then
+                  damp2 = damp * damp
+                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                  +0.15d0*damp2)
+               end if
+            end if
+         end if
+c
+c     use original AMOEBA Thole polarization damping factors
+c
+      else
+         it = jpolar(ipole(i))
+         kt = jpolar(ipole(k))
+         pgamma = thlval(it,kt)
+         if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
+            damp = pgamma * (r/damp)**3
+            if (damp .lt. 50.0d0) then
+               expdamp = exp(-damp)
+               dmpik(3) = 1.0d0 - expdamp
+               dmpik(5) = 1.0d0 - expdamp*(1.0d0+damp)
+               if (rorder .ge. 7) then
+                  damp2 = damp * damp
+                  dmpik(7) = 1.0d0 - expdamp*(1.0d0+damp+0.6d0*damp2)
+                  if (rorder .ge. 9) then
+                     damp3 = damp * damp2
+                     dmpik(9) = 1.0d0 - expdamp*(1.0d0+damp
+     &                                     +(18.0d0/35.0d0)*damp2
+     &                                     +(9.0d0/35.0d0)*damp3)
+                  end if
                end if
             end if
          end if

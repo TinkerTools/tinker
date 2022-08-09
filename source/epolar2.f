@@ -391,7 +391,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -569,10 +569,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -1002,7 +1002,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
@@ -1447,7 +1447,7 @@ c
          if (use_thole) then
             pdi = pdamp(ii)
             pti = thole(ii)
-            ddi = dirdamp(ii)
+            ddi = tholed(ii)
          else if (use_chgpen) then
             corei = pcore(ii)
             vali = pval(ii)
@@ -1630,10 +1630,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
-                  if (use_dirdamp) then
-                     pgamma = min(ddi,dirdamp(kk))
+                  if (use_tholed) then
+                     pgamma = min(ddi,tholed(kk))
                      if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,dirdamp(kk))
+                        pgamma = max(ddi,tholed(kk))
                      end if
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
@@ -2063,7 +2063,7 @@ c
 c
 c     reset Thole values if alternate direct damping was used
 c
-               if (use_dirdamp) then
+               if (use_tholed) then
                   sc3 = 1.0d0
                   sc5 = 1.0d0
                   do j = 1, 3
