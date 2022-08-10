@@ -71,6 +71,7 @@ c
       use kopdst
       use korbs
       use kpitor
+      use kpolpr
       use kpolr
       use krepl
       use ksolut
@@ -631,6 +632,12 @@ c     deallocation of global arrays from module kpitor
 c
       if (allocated(ptcon))  deallocate (ptcon)
       if (allocated(kpt))  deallocate (kpt)
+c
+c     deallocation of global arrays from module kpolpr
+c
+      if (allocated(thlpr))  deallocate (thlpr)
+      if (allocated(thdpr))  deallocate (thdpr)
+      if (allocated(kppr))  deallocate (kppr)
 c
 c     deallocation of global arrays from module kpolr
 c

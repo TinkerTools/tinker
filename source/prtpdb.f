@@ -126,8 +126,10 @@ c
             crdmax = max(crdmax,xpdb(i),ypdb(i),zpdb(i))
          end do
          if (npdb .ge. 100000)  atmc = 'i6'
+         if (npdb .ge. 1000000)  atmc = 'i7'
          if (resmax .ge. 10000)  resc = 'i5'
          if (resmax .ge. 100000)  resc = 'i6'
+         if (resmax .ge. 1000000)  resc = 'i7'
          if (crdmin .le. -100.0d0)  crdc = '3f9.3 '
          if (crdmax .ge. 1000.0d0)  crdc = '3f9.3 '
          if (crdmin .le. -1000.0d0)  crdc = '3f10.3'
@@ -161,8 +163,9 @@ c
 c     check for large values requiring extended formatting
 c
       if (reformat) then
-         if (npdb .ge. 100000)  atmc = 'i7'
          if (npdb .ge. 10000)  atmc = 'i6'
+         if (npdb .ge. 100000)  atmc = 'i7'
+         if (npdb .ge. 1000000)  atmc = 'i8'
       end if
 c
 c     write any connectivity records for PDB atoms

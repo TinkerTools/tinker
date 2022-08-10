@@ -1170,7 +1170,7 @@ c     polarizability parameters for specific atom pairs
 c
       if (kppr(1) .ne. blank8) then
          write (itxt,1620)
- 1620    format (//,15x,'Polarization Parameters for Atom Pairs',
+ 1620    format (//,15x,'Polarizability Parameters for Atom Pairs',
      &           ///,23x,'Types',10x,'Thole',6x,'TholeD',/)
          do i = 1, maxnpp
             if (kppr(i) .eq. blank8)  goto 1640

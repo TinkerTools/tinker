@@ -982,8 +982,8 @@ c
             s = pre*(dmpi2*(r*term - 4*dmpk2) * expk
      &            + dmpk2*(r*term + 4*dmpi2) * expi)
             ds2 = 2.0d0*s*pre*dmpi2*dmpk2 *
-     &       ((4.0d0/r-(r*term-4.0d0*dmpk2))*expk -
-     &       ((4.0d0/r+(r*term+4.0d0*dmpi2))*expi))
+     &               ((4.0d0/r-(r*term-4.0d0*dmpk2))*expk
+     &                  - ((4.0d0/r+(r*term+4.0d0*dmpi2))*expi))
          end if
          s2 = s*s
 c

@@ -69,6 +69,7 @@ c
       integer i,j,k
       integer ii,kk
       integer jcell
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
       real*8 sizi,sizk,sizik
@@ -78,6 +79,8 @@ c
       real*8 s2i,s2k
       real*8 ds2i,ds2k
       real*8 taper,dtaper
+      real*8 uix,uiy,uiz
+      real*8 ukx,uky,ukz
       real*8 uixl,ukxl
       real*8 uiyl,ukyl
       real*8 uizl,ukzl
@@ -117,10 +120,16 @@ c     find the exchange polarization gradient
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          springi = kpep(ii) / polarity(ii)
          sizi = prepep(ii)
          alphai = dmppep(ii)
          epli = lpep(ii)
+         uix = uind(1,ii)
+         uiy = uind(2,ii)
+         uiz = uind(3,ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -159,9 +168,9 @@ c
             k = ipole(kk)
             eplk = lpep(kk)
             if (epli .or. eplk) then
-               xr = x(k) - x(i)
-               yr = y(k) - y(i)
-               zr = z(k) - z(i)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
@@ -170,6 +179,9 @@ c
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
                   sizik = sizi * sizk
+                  ukx = uind(1,kk)
+                  uky = uind(2,kk)
+                  ukz = uind(3,kk)
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -189,39 +201,31 @@ c
                   s2k = springk * s2 * pscale(k)
                   ds2i = springi * ds2 * pscale(k)
                   ds2k = springk * ds2 * pscale(k)
-                  call rotdexpl (xr,yr,zr,ai,ak)
-                  uixl = 0.0d0
-                  ukxl = 0.0d0
-                  uiyl = 0.0d0
-                  ukyl = 0.0d0
-                  uizl = 0.0d0
-                  ukzl = 0.0d0
-                  do j = 1, 3
-                     uixl = uixl + uind(j,ii)*ai(1,j)
-                     ukxl = ukxl - uind(j,kk)*ak(1,j)
-                     uiyl = uiyl + uind(j,ii)*ai(2,j)
-                     ukyl = ukyl - uind(j,kk)*ak(2,j)
-                     uizl = uizl + uind(j,ii)*ai(3,j)
-                     ukzl = ukzl - uind(j,kk)*ak(3,j)
-                  end do
+                  call rotdexpl (r,xr,yr,zr,ai,ak)
+                  uixl = uix*ai(1,1) + uiy*ai(1,2) + uiz*ai(1,3)
+                  uiyl = uix*ai(2,1) + uiy*ai(2,2) + uiz*ai(2,3)
+                  uizl = uix*ai(3,1) + uiy*ai(3,2) + uiz*ai(3,3)
+                  ukxl = -ukx*ak(1,1) - uky*ak(1,2) - ukz*ak(1,3)
+                  ukyl = -ukx*ak(2,1) - uky*ak(2,2) - ukz*ak(2,3)
+                  ukzl = -ukx*ak(3,1) - uky*ak(3,2) - ukz*ak(3,3)
                   frcil(3) = uizl**2 * ds2i
                   frckl(3) = ukzl**2 * ds2k
 c
-c     compute torque in local frame
+c     compute the torque in the local frame
 c
                   tqxil = 2.0d0 * uiyl * uizl * s2i
                   tqyil = -2.0d0 * uixl * uizl * s2i
                   tqxkl = 2.0d0 * ukyl * ukzl * s2k
                   tqykl = -2.0d0 * ukxl * ukzl * s2k
 c
-c     convert torque to forces
+c     convert the torque into force components
 c
                   frcil(1) = -tqyil / r
                   frcil(2) = tqxil / r
                   frckl(1) = -tqykl / r
                   frckl(2) = tqxkl / r
 c
-c     rotate force to global frame
+c     rotate the force components into the global frame
 c
                   frcxi = 0.0d0
                   frcyi = 0.0d0
@@ -296,10 +300,16 @@ c     calculate interaction components with other unit cells
 c
          do ii = 1, npole
             i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
             springi = kpep(ii) / polarity(ii)
             sizi = prepep(ii)
             alphai = dmppep(ii)
             epli = lpep(ii)
+            uix = uind(1,ii)
+            uiy = uind(2,ii)
+            uiz = uind(3,ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -339,9 +349,9 @@ c
                eplk = lpep(kk)
                if (epli .or. eplk) then
                   do jcell = 2, ncell
-                     xr = x(k) - x(i)
-                     yr = y(k) - y(i)
-                     zr = z(k) - z(i)
+                     xr = x(k) - xi
+                     yr = y(k) - yi
+                     zr = z(k) - zi
                      call imager (xr,yr,zr,jcell)
                      r2 = xr*xr + yr*yr + zr*zr
                      if (r2 .le. off2) then
@@ -350,6 +360,9 @@ c
                         sizk = prepep(kk)
                         alphak = dmppep(kk)
                         sizik = sizi * sizk
+                        ukx = uind(1,kk)
+                        uky = uind(2,kk)
+                        ukz = uind(3,kk)
                         call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -376,39 +389,31 @@ c
                         s2k = springk * s2 * pscale(k)
                         ds2i = springi * ds2 * pscale(k)
                         ds2k = springk * ds2 * pscale(k)
-                        call rotdexpl (xr,yr,zr,ai,ak)
-                        uixl = 0.0d0
-                        ukxl = 0.0d0
-                        uiyl = 0.0d0
-                        ukyl = 0.0d0
-                        uizl = 0.0d0
-                        ukzl = 0.0d0
-                        do j = 1, 3
-                           uixl = uixl + uind(j,ii)*ai(1,j)
-                           ukxl = ukxl - uind(j,kk)*ak(1,j)
-                           uiyl = uiyl + uind(j,ii)*ai(2,j)
-                           ukyl = ukyl - uind(j,kk)*ak(2,j)
-                           uizl = uizl + uind(j,ii)*ai(3,j)
-                           ukzl = ukzl - uind(j,kk)*ak(3,j)
-                        end do
+                        call rotdexpl (r,xr,yr,zr,ai,ak)
+                        uixl = uix*ai(1,1) + uiy*ai(1,2) + uiz*ai(1,3)
+                        uiyl = uix*ai(2,1) + uiy*ai(2,2) + uiz*ai(2,3)
+                        uizl = uix*ai(3,1) + uiy*ai(3,2) + uiz*ai(3,3)
+                        ukxl = -ukx*ak(1,1) - uky*ak(1,2) - ukz*ak(1,3)
+                        ukyl = -ukx*ak(2,1) - uky*ak(2,2) - ukz*ak(2,3)
+                        ukzl = -ukx*ak(3,1) - uky*ak(3,2) - ukz*ak(3,3)
                         frcil(3) = uizl**2 * ds2i
                         frckl(3) = ukzl**2 * ds2k
 c
-c     compute torque in local frame
+c     compute the torque in the local frame
 c
                         tqxil = 2.0d0 * uiyl * uizl * s2i
                         tqyil = -2.0d0 * uixl * uizl * s2i
                         tqxkl = 2.0d0 * ukyl * ukzl * s2k
                         tqykl = -2.0d0 * ukxl * ukzl * s2k
 c
-c     convert torque to forces
+c     convert the torque into force components
 c
                         frcil(1) = -tqyil / r
                         frcil(2) = tqxil / r
                         frckl(1) = -tqykl / r
                         frckl(2) = tqxkl / r
 c
-c     rotate force to global frame
+c     rotate the force components into the global frame
 c
                         frcxi = 0.0d0
                         frcyi = 0.0d0
@@ -512,6 +517,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
+      real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,r3,r4,r5
       real*8 sizi,sizk,sizik
@@ -521,6 +527,8 @@ c
       real*8 s2i, s2k
       real*8 ds2i, ds2k
       real*8 taper,dtaper
+      real*8 uix,uiy,uiz
+      real*8 ukx,uky,ukz
       real*8 uixl,ukxl
       real*8 uiyl,ukyl
       real*8 uizl,ukzl
@@ -571,10 +579,16 @@ c     find the exchange polarization gradient
 c
       do ii = 1, npole
          i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          springi = kpep(ii) / polarity(ii)
          sizi = prepep(ii)
          alphai = dmppep(ii)
          epli = lpep(ii)
+         uix = uind(1,ii)
+         uiy = uind(2,ii)
+         uiz = uind(3,ii)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -614,9 +628,9 @@ c
             k = ipole(kk)
             eplk = lpep(kk)
             if (epli .or. eplk) then
-               xr = x(k) - x(i)
-               yr = y(k) - y(i)
-               zr = z(k) - z(i)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
@@ -625,6 +639,9 @@ c
                   sizk = prepep(kk)
                   alphak = dmppep(kk)
                   sizik = sizi * sizk
+                  ukx = uind(1,kk)
+                  uky = uind(2,kk)
+                  ukz = uind(3,kk)
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -644,39 +661,31 @@ c
                   s2k = springk * s2 * pscale(k)
                   ds2i = springi * ds2 * pscale(k)
                   ds2k = springk * ds2 * pscale(k)
-                  call rotdexpl (xr,yr,zr,ai,ak)
-                  uixl = 0.0d0
-                  ukxl = 0.0d0
-                  uiyl = 0.0d0
-                  ukyl = 0.0d0
-                  uizl = 0.0d0
-                  ukzl = 0.0d0
-                  do j = 1, 3
-                     uixl = uixl + uind(j,ii)*ai(1,j)
-                     ukxl = ukxl - uind(j,kk)*ak(1,j)
-                     uiyl = uiyl + uind(j,ii)*ai(2,j)
-                     ukyl = ukyl - uind(j,kk)*ak(2,j)
-                     uizl = uizl + uind(j,ii)*ai(3,j)
-                     ukzl = ukzl - uind(j,kk)*ak(3,j)
-                  end do
+                  call rotdexpl (r,xr,yr,zr,ai,ak)
+                  uixl = uix*ai(1,1) + uiy*ai(1,2) + uiz*ai(1,3)
+                  uiyl = uix*ai(2,1) + uiy*ai(2,2) + uiz*ai(2,3)
+                  uizl = uix*ai(3,1) + uiy*ai(3,2) + uiz*ai(3,3)
+                  ukxl = -ukx*ak(1,1) - uky*ak(1,2) - ukz*ak(1,3)
+                  ukyl = -ukx*ak(2,1) - uky*ak(2,2) - ukz*ak(2,3)
+                  ukzl = -ukx*ak(3,1) - uky*ak(3,2) - ukz*ak(3,3)
                   frcil(3) = uizl**2 * ds2i
                   frckl(3) = ukzl**2 * ds2k
 c
-c     compute torque in local frame
+c     compute the torque in the local frame
 c
                   tqxil = 2.0d0 * uiyl * uizl * s2i
                   tqyil = -2.0d0 * uixl * uizl * s2i
                   tqxkl = 2.0d0 * ukyl * ukzl * s2k
                   tqykl = -2.0d0 * ukxl * ukzl * s2k
 c
-c     convert torque to forces
+c     convert the torque into force components
 c
                   frcil(1) = -tqyil / r
                   frcil(2) = tqxil / r
                   frckl(1) = -tqykl / r
                   frckl(2) = tqxkl / r
 c
-c     rotate force to global frame
+c     rotate the force conponents into the global frame
 c
                   frcxi = 0.0d0
                   frcyi = 0.0d0
@@ -762,41 +771,25 @@ c     "rotdexpl" finds rotation matrices for variable polarizability
 c     in the exchange polarization gradient
 c
 c
-      subroutine rotdexpl (xr,yr,zr,ai,ak)
+      subroutine rotdexpl (r,xr,yr,zr,ai,ak)
       use atoms
       use math
       use mpole
       use polpot
       implicit none
       integer i,j
-      real*8 xr,yr,zr
-      real*8 r,dot,eps
+      real*8 r,xr,yr,zr
+      real*8 dr,dot,eps
       real*8 dx,dy,dz
       real*8 ai(3,3)
       real*8 ak(3,3)
 c
 c
-c     use the identity matrix as the default rotation matrix
-c
-      ai(1,1) = 1.0d0
-      ai(2,1) = 0.0d0
-      ai(3,1) = 0.0d0
-      ai(1,2) = 0.0d0
-      ai(2,2) = 1.0d0
-      ai(3,2) = 0.0d0
-      ai(1,3) = 0.0d0
-      ai(2,3) = 0.0d0
-      ai(3,3) = 1.0d0
-c
 c     compute the rotation matrix elements
 c
-      dx = xr
-      dy = yr
-      dz = zr
-      r = sqrt(dx*dx + dy*dy + dz*dz)
-      ai(3,1) = dx / r
-      ai(3,2) = dy / r
-      ai(3,3) = dz / r
+      ai(3,1) = xr / r
+      ai(3,2) = yr / r
+      ai(3,3) = zr / r
       dx = 1.0d0
       dy = 0.0d0
       dz = 0.0d0
@@ -810,26 +803,24 @@ c
       dx = dx - dot*ai(3,1)
       dy = dy - dot*ai(3,2)
       dz = dz - dot*ai(3,3)
-      r = sqrt(dx*dx + dy*dy + dz*dz)
+      dr = sqrt(dx*dx + dy*dy + dz*dz)
 c
 c     matrix "ai" rotates a vector from global to local frame
 c
-      ai(1,1) = dx / r
-      ai(1,2) = dy / r
-      ai(1,3) = dz / r
+      ai(1,1) = dx / dr
+      ai(1,2) = dy / dr
+      ai(1,3) = dz / dr
       ai(2,1) = ai(1,3)*ai(3,2) - ai(1,2)*ai(3,3)
       ai(2,2) = ai(1,1)*ai(3,3) - ai(1,3)*ai(3,1)
       ai(2,3) = ai(1,2)*ai(3,1) - ai(1,1)*ai(3,2)
-      do i = 1, 3
-         do j = 1, 3
-            ak(j,i) = ai(j,i)
-         end do
-      end do
-      ak(2,1) = -ak(2,1)
-      ak(2,2) = -ak(2,2)
-      ak(2,3) = -ak(2,3)
-      ak(3,1) = -ak(3,1)
-      ak(3,2) = -ak(3,2)
-      ak(3,3) = -ak(3,3)
+      ak(1,1) = ai(1,1)
+      ak(1,2) = ai(1,2)
+      ak(1,3) = ai(1,3)
+      ak(2,1) = -ai(2,1)
+      ak(2,2) = -ai(2,2)
+      ak(2,3) = -ai(2,3)
+      ak(3,1) = -ai(3,1)
+      ak(3,2) = -ai(3,2)
+      ak(3,3) = -ai(3,3)
       return
       end
