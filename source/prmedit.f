@@ -179,7 +179,7 @@ c
       real*8 cg,dp,ps,pl
       real*8 pl1,pl2,pl3
       real*8 pel,pal
-      real*8 pol,thl,ddp
+      real*8 pol,thl,thd
       real*8 ctrn,atrn
       real*8 cfb,cfa1,cfa2
       real*8 cfb1,cfb2
@@ -871,7 +871,7 @@ c
             ia = 0
             pol = 0.0d0
             thl = -1.0d0
-            ddp = -1.0d0
+            thd = -1.0d0
             do j = 1, 20
                ig(j) = 0
             end do
@@ -888,7 +888,7 @@ c
                call getnumb (text,ig(1),j)
                string = record(next:240)
                if (ig(1) .eq. 0) then
-                  read (text,*,err=1250,end=1250)  ddp
+                  read (text,*,err=1250,end=1250)  thd
                   read (string,*,err=1250,end=1250)  (ig(j),j=1,20)
                else
                   read (string,*,err=1250,end=1250)  (ig(j),j=2,20)
@@ -905,8 +905,8 @@ c
                end if
             end do
             call sort (kg,ig)
-            if (ddp .ge. 0.0d0) then
-               write (iprm,1260)  ia,pol,thl,ddp,(ig(j),j=1,kg)
+            if (thd .ge. 0.0d0) then
+               write (iprm,1260)  ia,pol,thl,thd,(ig(j),j=1,kg)
  1260          format ('polarize',2x,i5,5x,3f11.4,2x,20i5)
             else if (thl .ge. 0.0d0) then
                write (iprm,1270)  ia,pol,thl,(ig(j),j=1,kg)
@@ -915,22 +915,31 @@ c
                write (iprm,1280)  ia,pol,(ig(j),j=1,kg)
  1280          format ('polarize',2x,i5,5x,f11.4,2x,20i5)
             end if
+         else if (keyword(1:8) .eq. 'POLPAIR ') then
+            ia = 0
+            ib = 0
+            thl = 0.0d0
+            thd = 0.0d0
+            read (string,*,err=1290,end=1290)  ia,ib,thl,thd
+ 1290       continue
+            write (iprm,1300)  ia,ib,thl,thd
+ 1300       format ('polpair',3x,2i5,5x,2f11.4)
          else if (keyword(1:7) .eq. 'CHGTRN ') then
             ia = 0
             ctrn = 0.0d0
             atrn = 0.0d0
-            read (string,*,err=1290,end=1290)  ia,ctrn,atrn
- 1290       continue
-            write (iprm,1300)  ia,ctrn,atrn
- 1300       format ('chgtrn',9x,i5,5x,2f11.4)
+            read (string,*,err=1310,end=1310)  ia,ctrn,atrn
+ 1310       continue
+            write (iprm,1320)  ia,ctrn,atrn
+ 1320       format ('chgtrn',9x,i5,5x,2f11.4)
          else if (keyword(1:9) .eq. 'BNDCFLUX ') then
             ia = 0
             ib = 0
             cfb = 0.0d0
-            read (string,*,err=1310,end=1310)  ia,ib,cfb
- 1310       continue
-            write (iprm,1320)  ia,ib,cfb
- 1320       format ('bndcflux',2x,2i5,9x,f11.5)
+            read (string,*,err=1330,end=1330)  ia,ib,cfb
+ 1330       continue
+            write (iprm,1340)  ia,ib,cfb
+ 1340       format ('bndcflux',2x,2i5,9x,f11.5)
          else if (keyword(1:9) .eq. 'ANGCFLUX ') then
             ia = 0
             ib = 0
@@ -939,38 +948,29 @@ c
             cfa2 = 0.0d0
             cfb1 = 0.0d0
             cfb2 = 0.0d0
-            read (string,*,err=1330,end=1330)  ia,ib,cfa1,cfa2,cfb1,cfb2
- 1330       continue
-            write (iprm,1340)  ia,ib,cfa1,cfa2,cfb1,cfb2
- 1340       format ('angcflux',2x,2i5,9x,4f11.5)
+            read (string,*,err=1350,end=1350)  ia,ib,cfa1,cfa2,cfb1,cfb2
+ 1350       continue
+            write (iprm,1360)  ia,ib,cfa1,cfa2,cfb1,cfb2
+ 1360       format ('angcflux',2x,2i5,9x,4f11.5)
          else if (keyword(1:7) .eq. 'SOLUTE ') then
             ia = 0
             pbrd = 0.0d0
             csrd = 0.0d0
             gkrd = 0.0d0
-            read (string,*,err=1350,end=1350)  ia,pbrd,csrd,gkrd
- 1350       continue
-            write (iprm,1360)  ia,pbrd,csrd,gkrd
- 1360       format ('solute',4x,i5,5x,3f11.4)
+            read (string,*,err=1370,end=1370)  ia,pbrd,csrd,gkrd
+ 1370       continue
+            write (iprm,1380)  ia,pbrd,csrd,gkrd
+ 1380       format ('solute',4x,i5,5x,3f11.4)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             el = 0.0d0
             iz = 0.0d0
             rp = 0.0d0
-            read (string,*,err=1370,end=1370)  ia,el,iz,rp
- 1370       continue
-            write (iprm,1380)  ia,el,iz,rp
- 1380       format ('piatom',4x,i5,10x,f11.1,2f11.3)
-         else if (keyword(1:7) .eq. 'PIBOND ') then
-            ia = 0
-            ib = 0
-            ss = 0.0d0
-            ts = 0.0d0
-            read (string,*,err=1390,end=1390)  ia,ib,ss,ts
+            read (string,*,err=1390,end=1390)  ia,el,iz,rp
  1390       continue
-            write (iprm,1400)  ia,ib,ss,ts
- 1400       format ('pibond',4x,2i5,5x,f11.3,f11.4)
-         else if (keyword(1:8) .eq. 'PIBOND5 ') then
+            write (iprm,1400)  ia,el,iz,rp
+ 1400       format ('piatom',4x,i5,10x,f11.1,2f11.3)
+         else if (keyword(1:7) .eq. 'PIBOND ') then
             ia = 0
             ib = 0
             ss = 0.0d0
@@ -978,8 +978,8 @@ c
             read (string,*,err=1410,end=1410)  ia,ib,ss,ts
  1410       continue
             write (iprm,1420)  ia,ib,ss,ts
- 1420       format ('pibond5',3x,2i5,5x,f11.3,f11.4)
-         else if (keyword(1:8) .eq. 'PIBOND4 ') then
+ 1420       format ('pibond',4x,2i5,5x,f11.3,f11.4)
+         else if (keyword(1:8) .eq. 'PIBOND5 ') then
             ia = 0
             ib = 0
             ss = 0.0d0
@@ -987,33 +987,42 @@ c
             read (string,*,err=1430,end=1430)  ia,ib,ss,ts
  1430       continue
             write (iprm,1440)  ia,ib,ss,ts
- 1440       format ('pibond4',3x,2i5,5x,f11.3,f11.4)
+ 1440       format ('pibond5',3x,2i5,5x,f11.3,f11.4)
+         else if (keyword(1:8) .eq. 'PIBOND4 ') then
+            ia = 0
+            ib = 0
+            ss = 0.0d0
+            ts = 0.0d0
+            read (string,*,err=1450,end=1450)  ia,ib,ss,ts
+ 1450       continue
+            write (iprm,1460)  ia,ib,ss,ts
+ 1460       format ('pibond4',3x,2i5,5x,f11.3,f11.4)
          else if (keyword(1:6) .eq. 'METAL ') then
             ia = 0
             call getnumb (record,ia,next)
-            write (iprm,1450)  ia,record(next:length)
- 1450       format ('metal',5x,i5,a)
+            write (iprm,1470)  ia,record(next:length)
+ 1470       format ('metal',5x,i5,a)
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
             sym = '   '
             note = '                        '
-            read (string,*,err=1460,end=1460)  ia
+            read (string,*,err=1480,end=1480)  ia
             call getword (record,sym,next)
             call getstring (record,note,next)
             string = record(next:240)
-            read (string,*,err=1460,end=1460)  ib
- 1460       continue
+            read (string,*,err=1480,end=1480)  ib
+ 1480       continue
             length = trimtext(note)
             string = '"'//note(1:length)//'"'//blank
-            write (iprm,1470)  ia,sym,string(1:30),ib
- 1470       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
+            write (iprm,1490)  ia,sym,string(1:30),ib
+ 1490       format ('biotype',3x,i5,4x,a3,5x,a30,2x,i5)
          else if (length .eq. 0) then
-            write (iprm,1480)
- 1480       format ()
+            write (iprm,1500)
+ 1500       format ()
          else
-            write (iprm,1490)  record(1:length)
- 1490       format (a)
+            write (iprm,1510)  record(1:length)
+ 1510       format (a)
          end if
       end do
       return
@@ -1046,7 +1055,7 @@ c
       integer kg,ig(20)
       integer itype(0:maxtyp)
       integer iclass(0:maxclass)
-      real*8 pol,thl,ddp
+      real*8 pol,thl,thd
       logical dotype,doclass
       logical prtclass
       character*20 keyword
@@ -1613,7 +1622,7 @@ c
             ia = 0
             pol = 0.0d0
             thl = -1.0d0
-            ddp = -1.0d0
+            thd = -1.0d0
             do j = 1, 20
                ig(j) = 0
             end do
@@ -1630,7 +1639,7 @@ c
                call getnumb (text,ig(1),j)
                string = record(next:240)
                if (ig(1) .eq. 0) then
-                  read (text,*,err=460,end=460)  ddp
+                  read (text,*,err=460,end=460)  thd
                   read (string,*,err=460,end=460)  (ig(j),j=1,20)
                else
                   read (string,*,err=460,end=460)  (ig(j),j=2,20)
@@ -1649,8 +1658,8 @@ c
                end if
             end do
             call sort (kg,ig)
-            if (ddp .ge. 0.0d0) then
-               write (iprm,470)  ia,pol,thl,ddp,(ig(j),j=1,kg)
+            if (thd .ge. 0.0d0) then
+               write (iprm,470)  ia,pol,thl,thd,(ig(j),j=1,kg)
   470          format ('polarize',2x,i5,5x,3f11.4,2x,20i5)
             else if (thl .ge. 0.0d0) then
                write (iprm,480)  ia,pol,thl,(ig(j),j=1,kg)
@@ -1659,12 +1668,22 @@ c
                write (iprm,490)  ia,pol,(ig(j),j=1,kg)
   490          format ('polarize',2x,i5,5x,f11.4,2x,20i5)
             end if
+         else if (keyword(1:8) .eq. 'VDWPAIR ') then
+            ia = 0
+            ib = 0
+            call getnumb (record,ia,next)
+            call getnumb (record,ib,next)
+            ia = itype(ia)
+            ib = itype(ib)
+            call prmsort (2,ia,ib,0,0,0)
+            write (iprm,500)  ia,ib,record(next:length)
+  500       format ('polpair',3x,2i5,a)
          else if (keyword(1:7) .eq. 'CHGTRN ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,500)  ia,record(next:length)
-  500       format ('chgtrn',4x,i5,a)
+            write (iprm,510)  ia,record(next:length)
+  510       format ('chgtrn',4x,i5,a)
          else if (keyword(1:9) .eq. 'BNDCFLUX ') then
             ia = 0
             ib = 0
@@ -1673,8 +1692,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,510)  ia,ib,record(next:length)
-  510       format ('bndcflux',2x,2i5,a)
+            write (iprm,520)  ia,ib,record(next:length)
+  520       format ('bndcflux',2x,2i5,a)
          else if (keyword(1:9) .eq. 'ANGCFLUX ') then
             ia = 0
             ib = 0
@@ -1686,14 +1705,14 @@ c
             ib = iclass(ib)
             ic = iclass(ic)
             call prmsort (3,ia,ib,ic,0,0)
-            write (iprm,520)  ia,ib,ic,record(next:length)
-  520       format ('angcflux',2x,3i5,a)
+            write (iprm,530)  ia,ib,ic,record(next:length)
+  530       format ('angcflux',2x,3i5,a)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,530)  ia,record(next:length)
-  530       format ('piatom',4x,i5,a)
+            write (iprm,540)  ia,record(next:length)
+  540       format ('piatom',4x,i5,a)
          else if (keyword(1:7) .eq. 'PIBOND ') then
             ia = 0
             ib = 0
@@ -1702,8 +1721,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,540)  ia,ib,record(next:length)
-  540       format ('pibond',4x,2i5,a)
+            write (iprm,550)  ia,ib,record(next:length)
+  550       format ('pibond',4x,2i5,a)
          else if (keyword(1:8) .eq. 'PIBOND5 ') then
             ia = 0
             ib = 0
@@ -1712,8 +1731,8 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,550)  ia,ib,record(next:length)
-  550       format ('pibond5',3x,2i5,a)
+            write (iprm,560)  ia,ib,record(next:length)
+  560       format ('pibond5',3x,2i5,a)
          else if (keyword(1:8) .eq. 'PIBOND4 ') then
             ia = 0
             ib = 0
@@ -1722,34 +1741,34 @@ c
             ia = iclass(ia)
             ib = iclass(ib)
             call prmsort (2,ia,ib,0,0,0)
-            write (iprm,560)  ia,ib,record(next:length)
-  560       format ('pibond4',3x,2i5,a)
+            write (iprm,570)  ia,ib,record(next:length)
+  570       format ('pibond4',3x,2i5,a)
          else if (keyword(1:6) .eq. 'METAL ') then
             ia = 0
             call getnumb (record,ia,next)
             ia = iclass(ia)
-            write (iprm,570)  ia,record(next:length)
-  570       format ('metal',5x,i5,a)
+            write (iprm,580)  ia,record(next:length)
+  580       format ('metal',5x,i5,a)
          else if (keyword(1:8) .eq. 'BIOTYPE ') then
             ia = 0
             ib = 0
             string = record(next:240)
-            read (string,*,err=580,end=580)  ia
+            read (string,*,err=590,end=590)  ia
             call getword (record,string,next)
             call getstring (record,string,next)
             string = record(next:240)
-            read (string,*,err=580,end=580)  ib
-  580       continue
+            read (string,*,err=590,end=590)  ib
+  590       continue
             if (ib .gt. 0)  ib = itype(ib)
             length = min(30,max(1,59-next))
-            write (iprm,590)  record(8:next)//blank(1:length),ib
-  590       format ('biotype',a,i5)
+            write (iprm,600)  record(8:next)//blank(1:length),ib
+  600       format ('biotype',a,i5)
          else if (length .eq. 0) then
-            write (iprm,600)
-  600       format ()
+            write (iprm,610)
+  610       format ()
          else
-            write (iprm,610)  record(1:length)
-  610       format (a)
+            write (iprm,620)  record(1:length)
+  620       format (a)
          end if
       end do
       return

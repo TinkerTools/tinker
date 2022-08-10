@@ -34,6 +34,7 @@ c
       use kopdst
       use korbs
       use kpitor
+      use kpolpr
       use kstbnd
       use ksttor
       use ktorsn
@@ -82,6 +83,7 @@ c
       maxnd4 = 0
       maxnd3 = 0
       maxnmp = 0
+      maxnpp = 0
       maxncfb = 0
       maxncfa = 0
       maxnpi = 0
@@ -131,6 +133,7 @@ c
          if (keyword(1:8) .eq. 'DIPOLE4 ')  maxnd4 = maxnd4 + 1
          if (keyword(1:8) .eq. 'DIPOLE3 ')  maxnd3 = maxnd3 + 1
          if (keyword(1:10) .eq. 'MULTIPOLE ')  maxnmp = maxnmp + 1
+         if (keyword(1:8) .eq. 'POLPAIR ')  maxnpp = maxnpp + 1
          if (keyword(1:9) .eq. 'BNDCFLUX ')  maxncfb = maxncfb + 1
          if (keyword(1:9) .eq. 'ANGCFLUX ')  maxncfa = maxncfa + 1
          if (keyword(1:7) .eq. 'PIBOND ')  maxnpi = maxnpi + 1
@@ -199,6 +202,7 @@ c
          if (keyword(1:8) .eq. 'DIPOLE4 ')  maxnd4 = maxnd4 + 1
          if (keyword(1:8) .eq. 'DIPOLE3 ')  maxnd3 = maxnd3 + 1
          if (keyword(1:10) .eq. 'MULTIPOLE ')  maxnmp = maxnmp + 1
+         if (keyword(1:8) .eq. 'POLPAIR ')  maxnpp = maxnpp + 1
          if (keyword(1:9) .eq. 'BNDCFLUX ')  maxncfb = maxncfb + 1
          if (keyword(1:9) .eq. 'ANGCFLUX ')  maxncfa = maxncfa + 1
          if (keyword(1:7) .eq. 'PIBOND ')  maxnpi = maxnpi + 1
@@ -258,6 +262,7 @@ c
       maxnd4 = max(500,maxnd4+100)
       maxnd3 = max(500,maxnd3+100)
       maxnmp = max(500,maxnmp+100)
+      maxnpp = max(500,maxnpp+100)
       maxncfb = max(500,maxncfb+100)
       maxncfa = max(500,maxncfa+100)
       maxnpi = max(500,maxnpi+100)
@@ -525,6 +530,15 @@ c
       allocate (mpaxis(maxnmp))
       if (allocated(kmp))  deallocate (kmp)
       allocate (kmp(maxnmp))
+c
+c     allocate special Thole forcefield parameters
+c
+      if (allocated(thlpr))  deallocate (thlpr)
+      allocate (thlpr(maxnpp))
+      if (allocated(thdpr))  deallocate (thdpr)
+      allocate (thdpr(maxnpp))
+      if (allocated(kppr))  deallocate (kppr)
+      allocate (kppr(maxnpp))
 c
 c     allocate charge flux term forcefield parameters
 c

@@ -89,6 +89,7 @@ gfortran -c -O3 -ffast-math -fopenmp kopbnd.f
 gfortran -c -O3 -ffast-math -fopenmp kopdst.f
 gfortran -c -O3 -ffast-math -fopenmp korbs.f
 gfortran -c -O3 -ffast-math -fopenmp kpitor.f
+gfortran -c -O3 -ffast-math -fopenmp kpolpr.f
 gfortran -c -O3 -ffast-math -fopenmp kpolr.f
 gfortran -c -O3 -ffast-math -fopenmp krepl.f
 gfortran -c -O3 -ffast-math -fopenmp ksolut.f

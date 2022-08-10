@@ -8,7 +8,7 @@ extern "C" {
 extern int* TINKER_MOD(kpolr, pgrp);
 extern double* TINKER_MOD(kpolr, polr);
 extern double* TINKER_MOD(kpolr, athl);
-extern double* TINKER_MOD(kpolr, ddir);
+extern double* TINKER_MOD(kpolr, dthl);
 #ifdef __cplusplus
 }
 #endif

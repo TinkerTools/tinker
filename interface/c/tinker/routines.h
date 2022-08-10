@@ -236,8 +236,8 @@ void dampewald_(int* rorder, double* r, double* r2, double* scale, double* dmpe)
 #define tinker_f_dampewald dampewald_
 void dampthole_(int* i, int* k, int* rorder, double* r, double* dmpik);
 #define tinker_f_dampthole dampthole_
-void dampthole2_(int* i, int* k, int* rorder, double* r, double* dmpik);
-#define tinker_f_dampthole2 dampthole2_
+void damptholed_(int* i, int* k, int* rorder, double* r, double* dmpik);
+#define tinker_f_damptholed damptholed_
 void damppole_(double* r, int* rorder, double* alphai, double* alphak, double* dmpi, double* dmpk, double* dmpik);
 #define tinker_f_damppole damppole_
 void dampdir_(double* r, double* alphai, double* alphak, double* dmpi, double* dmpk);
@@ -2154,8 +2154,12 @@ void promo_();
 #define tinker_f_promo promo_
 
 // prtarc.f
-void prtarc_(int* iarc);
+void prtarc_(int* iarc, int* first);
 #define tinker_f_prtarc prtarc_
+void prtarcf_(int* iarc);
+#define tinker_f_prtarcf prtarcf_
+void prtarcb_(int* idcd, int* first);
+#define tinker_f_prtarcb prtarcb_
 
 // prtdcd.f
 void prtdcd_(int* idcd, int* first);

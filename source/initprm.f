@@ -45,6 +45,7 @@ c
       use kopdst
       use korbs
       use kpitor
+      use kpolpr
       use kpolr
       use krepl
       use ksolut
@@ -181,6 +182,9 @@ c
       end do
       do i = 1, maxnmp
          kmp(i) = blank12
+      end do
+      do i = 1, maxnpp
+         kppr(i) = blank8
       end do
       do i = 1, maxncfb
          kcfb(i) = blank8

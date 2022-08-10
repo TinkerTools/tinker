@@ -76,6 +76,7 @@
 #include "detail/kopdst.hh"
 #include "detail/korbs.hh"
 #include "detail/kpitor.hh"
+#include "detail/kpolpr.hh"
 #include "detail/kpolr.hh"
 #include "detail/krepl.hh"
 #include "detail/ksolut.hh"

@@ -89,6 +89,7 @@ gfortran -c -Ofast -mavx -fopenmp kopbnd.f
 gfortran -c -Ofast -mavx -fopenmp kopdst.f
 gfortran -c -Ofast -mavx -fopenmp korbs.f
 gfortran -c -Ofast -mavx -fopenmp kpitor.f
+gfortran -c -Ofast -mavx -fopenmp kpolpr.f
 gfortran -c -Ofast -mavx -fopenmp kpolr.f
 gfortran -c -Ofast -mavx -fopenmp krepl.f
 gfortran -c -Ofast -mavx -fopenmp ksolut.f

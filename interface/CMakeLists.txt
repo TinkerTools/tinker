@@ -80,6 +80,7 @@ add_library (tinkerObjF OBJECT
 ../source/kopdst.f
 ../source/korbs.f
 ../source/kpitor.f
+../source/kpolpr.f
 ../source/kpolr.f
 ../source/krepl.f
 ../source/ksolut.f

@@ -31,7 +31,7 @@ extern double TINKER_MOD(polpot, uaccel);
 extern int TINKER_MOD(polpot, polprt);
 extern int TINKER_MOD(polpot, dpequal);
 extern int TINKER_MOD(polpot, use_thole);
-extern int TINKER_MOD(polpot, use_dirdamp);
+extern int TINKER_MOD(polpot, use_tholed);
 extern int TINKER_MOD(polpot, use_expol);
 extern char TINKER_MOD(polpot, scrtyp)[3];
 extern char TINKER_MOD(polpot, poltyp)[6];

@@ -36,6 +36,7 @@ c
       use inform
       use iounit
       use keys
+      use kpolpr
       use kpolr
       use mplpot
       use mpole
@@ -51,6 +52,7 @@ c
       integer ia,ib,it
       integer next,size
       integer nlist,npg
+      integer number
       integer pg(maxval)
       integer, allocatable :: list(:)
       integer, allocatable :: rlist(:)
@@ -379,8 +381,8 @@ c
          if (keyword(1:8) .eq. 'POLPAIR ') then
             ia = 0
             ib = 0
-            thl = 0.0d0
-            thd = 0.0d0
+            thl = -1.0d0
+            thd = -1.0d0
             string = record(next:240)
             read (string,*,err=130,end=130)  ia,ib,thl,thd
   130       continue
@@ -391,11 +393,11 @@ c
      &                    ' for Specific Pairs :')
                if (thd .ge. 0.0d0) then
                   write (iout,150)
-  150             format (/,5x,'Atom Types',11x,'Thole',
-     &                       8x,'TholeD',/)
+  150             format (/,5x,'Atom Types',14x,'Thole',
+     &                       9x,'TholeD',/)
                else if (thl .ge. 0.0d0) then
                   write (iout,160)
-  160             format (/,5x,'Atom Types',11x,'Thole',/)
+  160             format (/,5x,'Atom Types',14x,'Thole',/)
                end if
             end if
             if (thd.ge.0.0d0 .and. .not.silent) then
@@ -413,17 +415,14 @@ c
             else
                pt = pb//pa
             end if
-
-c           do k = 1, maxnpp
-c              if (kppr(k).eq.blank .or. kppr(k).eq.pt) then
-c                 kppr(k) = pt
-c                 thlpr(k) = thl
-c                 thdpr(k) = thd
-c                 goto 200
-c              end if
-c           end do
-            goto 200
-
+            do k = 1, maxnpp
+               if (kppr(k).eq.blank .or. kppr(k).eq.pt) then
+                  kppr(k) = pt
+                  thlpr(k) = max(thl,0.0d0)
+                  thdpr(k) = max(thd,0.0d0)
+                  goto 200
+               end if
+            end do
             write (iout,190)
   190       format (/,' KPOLAR  --  Too many Special Pair',
      &                 ' Thole Parameters')
@@ -509,18 +508,18 @@ c
 c
 c     apply Thole damping values for special atom type pairs
 c
-c     do i = 1, maxnpp
-c        if (kppr(i) .eq. blank)  goto 210
-c        ia = rlist(number(kppr(i)(1:4)))
-c        ib = rlist(number(kppr(i)(5:8)))
-c        if (ia.ne.0 .and. ib.ne.0) then
-c           thlval(ia,ib) = thlpr(i)
-c           thlval(ib,ia) = thlpr(i)
-c           thdval(ia,ib) = thdpr(i)
-c           thdval(ib,ia) = thdpr(i)
-c        end if
-c     end do
-c 210 continue
+      do i = 1, maxnpp
+         if (kppr(i) .eq. blank)  goto 210
+         ia = rlist(number(kppr(i)(1:4)))
+         ib = rlist(number(kppr(i)(5:8)))
+         if (ia.ne.0 .and. ib.ne.0) then
+            thlval(ia,ib) = thlpr(i)
+            thlval(ib,ia) = thlpr(i)
+            thdval(ia,ib) = thdpr(i)
+            thdval(ib,ia) = thdpr(i)
+         end if
+      end do
+  210 continue
 c
 c     perform deallocation of some local arrays
 c

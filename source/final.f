@@ -939,6 +939,8 @@ c
       if (allocated(thole))  deallocate (thole)
       if (allocated(tholed))  deallocate (tholed)
       if (allocated(pdamp))  deallocate (pdamp)
+      if (allocated(thlval))  deallocate (thlval)
+      if (allocated(thdval))  deallocate (thdval)
       if (allocated(udir))  deallocate (udir)
       if (allocated(udirp))  deallocate (udirp)
       if (allocated(udirs))  deallocate (udirs)

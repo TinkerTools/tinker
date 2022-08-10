@@ -7,10 +7,13 @@ extern "C" {
 #endif
 extern int TINKER_MOD(polar, npolar);
 extern int* TINKER_MOD(polar, ipolar);
+extern int* TINKER_MOD(polar, jpolar);
 extern double* TINKER_MOD(polar, polarity);
 extern double* TINKER_MOD(polar, thole);
-extern double* TINKER_MOD(polar, dirdamp);
+extern double* TINKER_MOD(polar, tholed);
 extern double* TINKER_MOD(polar, pdamp);
+extern double* TINKER_MOD(polar, thlval);
+extern double* TINKER_MOD(polar, thdval);
 extern double* TINKER_MOD(polar, udir);
 extern double* TINKER_MOD(polar, udirp);
 extern double* TINKER_MOD(polar, udirs);

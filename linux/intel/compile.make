@@ -89,6 +89,7 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kopbnd.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kopdst.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp korbs.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpitor.f
+ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpolpr.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpolr.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp krepl.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ksolut.f

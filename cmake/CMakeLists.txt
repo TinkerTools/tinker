@@ -132,18 +132,18 @@ set(_FILES
     kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp kewald
     kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic kiprop
     kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst korbit
-    korbs kpitor kpitors kpolar kpolr krepel krepl ksolut ksolv kstbnd
-    kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor kurey kurybr kvdw
-    kvdwpr kvdws lattice lbfgs light lights limits linmin lusolve makeint
-    makeref makexyz math maxwell mdinit mdrest mdsave mdstat mdstuf
-    mechanic merck merge minima molcul moldyn molecule moment moments
-    mplpot mpole mrecip mutant mutate nblist neigh nextarg nexttext
-    nonpol nose nspline nucleo number numeral numgrad ocvm omega opbend
-    opdist openend openmp optinit optsave orbital orbits orient orthog
-    output overlap params paths pbstuf pdb phipsi picalc piorbs pistuf
-    pitors pme pmestuf pmpb polar polgrp polopt polpcg polpot poltcg
-    polymer potent potfit predict pressure prmkey promo prtarc prtdcd
-    prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
+    korbs kpitor kpitors kpolar kpolpr kpolr krepel krepl ksolut ksolv
+    kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor kurey kurybr
+    kvdw kvdwpr kvdws lattice lbfgs light lights limits linmin lusolve
+    makeint makeref makexyz math maxwell mdinit mdrest mdsave mdstat
+    mdstuf mechanic merck merge minima molcul moldyn molecule moment
+    moments mplpot mpole mrecip mutant mutate nblist neigh nextarg
+    nexttext nonpol nose nspline nucleo number numeral numgrad ocvm omega
+    opbend opdist openend openmp optinit optsave orbital orbits orient
+    orthog output overlap params paths pbstuf pdb phipsi picalc piorbs
+    pistuf pitors pme pmestuf pmpb polar polgrp polopt polpcg polpot
+    poltcg polymer potent potfit predict pressure prmkey promo prtarc
+    prtdcd prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
     qmstuf qrsolve quatfit random rattle readcart readdcd readdyn readgau
     readgdma readint readmol readmol2 readpdb readprm readseq readxyz
     refer repel replica reppot resdue respa restrn rgddyn rgdstep rigid

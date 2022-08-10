@@ -89,6 +89,7 @@ ifort -c -g -warn all -check all kopbnd.f
 ifort -c -g -warn all -check all kopdst.f
 ifort -c -g -warn all -check all korbs.f
 ifort -c -g -warn all -check all kpitor.f
+ifort -c -g -warn all -check all kpolpr.f
 ifort -c -g -warn all -check all kpolr.f
 ifort -c -g -warn all -check all krepl.f
 ifort -c -g -warn all -check all ksolut.f

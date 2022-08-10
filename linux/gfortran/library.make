@@ -324,6 +324,7 @@ korbs.o \
 kpitor.o \
 kpitors.o \
 kpolar.o \
+kpolpr.o \
 kpolr.o \
 krepel.o \
 krepl.o \

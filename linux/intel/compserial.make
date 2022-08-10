@@ -89,6 +89,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kopbnd.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kopdst.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 korbs.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kpitor.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kpolpr.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 kpolr.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 krepl.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 ksolut.f

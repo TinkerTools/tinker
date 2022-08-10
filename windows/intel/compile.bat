@@ -90,6 +90,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kopbnd.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kopdst.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp korbs.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kpitor.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kpolpr.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kpolr.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp krepl.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ksolut.f

@@ -89,6 +89,7 @@ gfortran -c -Wall kopbnd.f
 gfortran -c -Wall kopdst.f
 gfortran -c -Wall korbs.f
 gfortran -c -Wall kpitor.f
+gfortran -c -Wall kpolpr.f
 gfortran -c -Wall kpolr.f
 gfortran -c -Wall krepl.f
 gfortran -c -Wall ksolut.f

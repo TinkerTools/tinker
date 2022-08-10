@@ -16,7 +16,7 @@ c     maxnpp   maximum number of special pair polarization entries
 c
 c     thlpr    Thole damping values for special polarization pairs
 c     thdpr    Thole direct damping for special polarization pairs
-c     kppr     string of atom classes for special polarization pairs
+c     kppr     string of atom types for special polarization pairs
 c
 c
       module kpolpr
