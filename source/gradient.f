@@ -182,7 +182,7 @@ c
 c
 c     skip gradient calculation when using GPU coprocessor
 c
-      if (gpucard .eq. 1)  return
+      if (gpucard .ne. 0)  return
 c
 c     update the pairwise interaction neighbor lists
 c
