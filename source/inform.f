@@ -14,6 +14,7 @@ c
 c
 c     maxask    maximum number of queries for interactive input
 c
+c     gpucard   integer flag for GPU use (0=no GPU, 1=GPU present)
 c     digits    decimal places output for energy and coordinates
 c     iprint    steps between status printing (0=no printing)
 c     iwrite    steps between coordinate saves (0=no saves)
@@ -29,8 +30,9 @@ c
       implicit none
       integer maxask
       parameter (maxask=5)
-      integer digits,iprint
-      integer iwrite,isend
+      integer gpucard,digits
+      integer iprint,iwrite
+      integer isend
       logical verbose,debug
       logical silent,holdup
       logical abort

@@ -152,6 +152,10 @@ c
       silent = .false.
       abort = .false.
 c
+c     integer flag for use of GPU coprocessor
+c
+      gpucard = 0
+c
 c     flag for use of atom groups
 c
       use_group = .false.

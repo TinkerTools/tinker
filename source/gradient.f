@@ -21,6 +21,7 @@ c
       use couple
       use deriv
       use energi
+      use inform
       use inter
       use iounit
       use limits
@@ -36,6 +37,7 @@ c
 c
 c     zero out each of the potential energy components
 c
+      esum = 0.0d0
       eb = 0.0d0
       ea = 0.0d0
       eba = 0.0d0
@@ -136,6 +138,8 @@ c     zero out each of the first derivative components
 c
       do i = 1, n
          do j = 1, 3
+            derivs(j,i) = 0.0d0
+            desum(j,i) = 0.0d0
             deb(j,i) = 0.0d0
             dea(j,i) = 0.0d0
             deba(j,i) = 0.0d0
@@ -175,6 +179,10 @@ c
          end do
       end do
       einter = 0.0d0
+c
+c     skip gradient calculation when using GPU coprocessor
+c
+      if (gpucard .eq. 1)  return
 c
 c     update the pairwise interaction neighbor lists
 c

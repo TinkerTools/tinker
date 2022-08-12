@@ -35,6 +35,7 @@ c
 c
 c     zero out each of the potential energy components
 c
+      esum = 0.0d0
       eb = 0.0d0
       ea = 0.0d0
       eba = 0.0d0
@@ -134,6 +135,7 @@ c
 c     zero out energy partitioning components for each atom
 c
       do i = 1, n
+         aesum(i) = 0.0d0
          aeb(i) = 0.0d0
          aea(i) = 0.0d0
          aeba(i) = 0.0d0

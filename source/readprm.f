@@ -1323,9 +1323,9 @@ c
             call numeral (ib,pb,size)
             npp = npp + 1
             if (ia .le. ib) then
-               kppr(nvp) = pa//pb
+               kppr(npp) = pa//pb
             else
-               kppr(nvp) = pb//pa
+               kppr(npp) = pb//pa
             end if
             thlpr(npp) = thl
             thdpr(npp) = thd

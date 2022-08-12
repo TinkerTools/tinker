@@ -104,6 +104,8 @@ c
 c     zero out individual components of torsional derivatives
 c
       do i = 1, nomega
+         derivs(i) = 0.0d0
+         tesum(i) = 0.0d0
          teb(i) = 0.0d0
          tea(i) = 0.0d0
          teba(i) = 0.0d0

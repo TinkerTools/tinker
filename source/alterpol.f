@@ -564,27 +564,23 @@ c
       integer i,j
       real*8 r,xr,yr,zr
       real*8 p33i,p33k
-      real*8 ai(3)
-      real*8 ak(3)
+      real*8 a(3)
       real*8 ks2i(3,3)
       real*8 ks2k(3,3)
 c
 c
-c     compute only the needed rotation matrix elements
+c     compute only needed rotation matrix elements
 c
-      ai(1) = xr / r
-      ai(2) = yr / r
-      ai(3) = zr / r
-      ak(1) = -ai(1)
-      ak(2) = -ai(2)
-      ak(3) = -ai(3)
+      a(1) = xr / r
+      a(2) = yr / r
+      a(3) = zr / r
 c
-c     matrix "ai" rotates a vector from global to local frame
+c     rotate the vector from global to local frame
 c
       do i = 1, 3
          do j = 1, 3
-            ks2i(i,j) = p33i * ai(i) * ai(j)
-            ks2k(i,j) = p33k * ak(i) * ak(j)
+            ks2i(i,j) = p33i * a(i) * a(j)
+            ks2k(i,j) = p33k * a(i) * a(j)
          end do
       end do
       return

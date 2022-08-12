@@ -30,6 +30,7 @@ c
 c
 c     zero out each of the potential energy components
 c
+      esum = 0.0d0
       eb = 0.0d0
       ea = 0.0d0
       eba = 0.0d0
