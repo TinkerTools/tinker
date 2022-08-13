@@ -12,7 +12,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "lbfgs" is a limited memory BFGS quasi-newton nonlinear
+c     "lbfgs" implements a limited memory BFGS quasi-newton nonlinear
 c     optimization routine
 c
 c     literature references:

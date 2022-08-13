@@ -12,8 +12,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ocvm" is an optimally conditioned variable metric nonlinear
-c     optimization routine without line searches
+c     "ocvm" implements an optimally conditioned variable metric
+c     nonlinear optimization routine without line searches
 c
 c     literature references:
 c
