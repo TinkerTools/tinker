@@ -127,10 +127,12 @@ c
 c
 c     convert to periodic box angles and lattice values
 c
-      alpha = acos(alpha_cos)
-      beta = acos(beta_cos)
-      gamma = acos(gamma_cos)
-      call lattice
+      if (use_bounds) then
+         alpha = acos(alpha_cos)
+         beta = acos(beta_cos)
+         gamma = acos(gamma_cos)
+         call lattice
+      end if
 c
 c     close the input unit if opened by this routine
 c
