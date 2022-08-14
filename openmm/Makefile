@@ -1,18 +1,23 @@
 ##
 ###################################################################
 ##                                                               ##
-##  Makefile for Building the Tinker Molecular Modeling Package  ##
+##  Makefile for Building OpenMM-Enabled Tinker GPU Executables  ##
 ##                                                               ##
 ###################################################################
 ##
 ##  Invocation Options:
 ##
-##   1. make all              Build all the Tinker executables
-##   2. make install          Move the executables to BINDIR
-##   3. make create_links     Create soft links in LINKDIR
-##   4. make remove_links     Remove soft links from LINKDIR
-##   5. make listing          Concatenate source to tinker.txt
-##   6. make clean            Delete objects and executables
+##   1. make all              Build Tinker dynamic executable
+##   2. make install          Move the executable to BINDIR
+##   3. make create_links     Create soft link in LINKDIR
+##   4. make remove_links     Remove soft link from LINKDIR
+##   6. make listing          Concatenate source to tinker.txt
+##   5. make clean            Delete objects and executable
+##
+##  Modified from the standard Tinker Makefile in March 2015 by
+##  Jay Ponder by build an OpenMM-accelerated dynamic executable.
+##  Requires that an AMOEBA-capable version of OpenMM is already
+##  built and present
 ##
 ##  Original version of this file is due to Peter Happersberger
 ##  and Jochen Buehler of the University of Konstanz, January 1998.
@@ -36,10 +41,8 @@
 ##  FFTWDIR         FFTW Top-Level Directory
 ##  FFTW_LIBDIR     Directory with FFTW Libraries
 ##  FFTW_LIBS       FFTW Libraries needed to build Tinker
-##  APBSDIR         APBS Top-Level Directory
-##  APBS_INCDIR     Directory with APBS Include Files
-##  APBS_LIBDIR     Directory with APBS Libraries
-##  APBS_LIBS       APBS Libraries needed to build Tinker
+##  OPENMMDIR       OpenMM Installation Directory
+##  CUDA_DIR        CUDA Installation Directory
 
 TINKERDIR = $(HOME)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib
@@ -50,100 +53,93 @@ FFTWDIR = $(TINKERDIR)/fftw
 FFTW_LIBDIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
 
-APBSDIR = $(TINKERDIR)/apbs
-APBS_INCDIR = -I$(APBSDIR)/include
-APBS_LIBDIR = -L$(APBSDIR)/lib
-APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
+OPENMMDIR = /usr/local/openmm
+OPENMM_INCLUDE = $(OPENMMDIR)/include
+OPENMM_LIBDIR = -L$(OPENMMDIR)/lib
+OPENMM_LIBS = -lOpenMM -lOpenMMAmoeba
+
+CUDA_DIR = /usr/local/cuda
+CUDA_INCLUDE = $(CUDA_DIR)/include
+CUDA_LIB = $(CUDA_DIR)/lib
+
+# Uncomment below for 64-bit Linux only
+CUDA_LIB = $(CUDA_DIR)/lib64
+NVML_INCLUDE = /usr/include/nvidia/gdk
+NVML_LIB = /usr/local/cuda/lib64/stubs
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
 ##  May Need Editing to Match Your Desired OS & Compiler Version  ##
 ####################################################################
 
-##  Build:     Tinker
+##  Build:     Tinker-FFE
 ##  OS Type:   Generic Linux
-##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 9.3
-##  Parallel:  OpenMP
+##  CPU Type:  Intel x86 Compatible, Nvidia GPU
+##  Compiler:  GNU gfortran 9.3, g++, nvcc
+##  Parallel:  OpenMP, OpenMM
 
-#F77 = gfortran
-#F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -msse3 -fopenmp
-#OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = ranlib
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
-#RENAME = rename_bin
-
-##  Build:     Tinker
-##  OS Type:   Apple macOS
-##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 8.1
-##  Parallel:  OpenMP
-
+CC = gcc
+CXX = g++
+NVCC = nvcc
 F77 = gfortran
+LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -L$(NVML_LIB) -L$(CUDA_LIB)
+LIBS = -lstdc++ -lnvidia-ml -lfftw3_threads -lfftw3 -lcudart -lcuda -ldl
+CFLAGS = -c
 F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
-OPTFLAGS = -Ofast -mssse3 -fopenmp
-#OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-LIBS = 
+OPTFLAGS = -Ofast -msse3 -fopenmp
+CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
 LIBFLAGS = -crusv
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-libgcc
-RENAME = rename_bin
+RANLIB = ranlib
+LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR)/lib
 
-##  Build:     Tinker
-##  OS Type:   Microsoft Windows 10
-##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 11.2
-##  Parallel:  OpenMP
-
-#F77 = gfortran
-#F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -msse3 -fopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = ranlib
-#LINKFLAGS = $(OPTFLAGS) -static
-#RENAME = rename_exe
-
-##  Build:     Tinker
-##  OS Type:   Generic Linux
-##  CPU Type:  Intel x86 Compatible (also AMD)
-##  Compiler:  Intel Fortran for Linux 15.0
-##  Parallel:  OpenMP
-
-#F77 = ifort
-#F77FLAGS = -c -xHost
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -recursive -qopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = echo
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc -static-intel
-#RENAME = rename_bin
-
-##  Build:     Tinker
+##  Build:     Tinker-FFE
 ##  OS Type:   Apple macOS
-##  CPU Type:  Intel Xeon
-##  Compiler:  Intel Fortran for macOS 15.0
-##  Parallel:  OpenMP
+##  CPU Type:  Intel x86-64, Nvidia GPU
+##  Compiler:  GNU gfortran 8.1, clang, nvcc
+##  Parallel:  OpenMP, OpenMM
 
-#F77 = ifort
-#F77FLAGS = -c -axSSSE3
-#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-#LIBS = 
+#CC = clang
+#CXX = g++
+#NVCC = nvcc
+#OBJECTIVE_CC = clang
+#OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
+#F77 = gfortran
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -L$(CUDA_LIB)
+#LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
+#CFLAGS = -c
+#F77FLAGS = -c
+#OPTFLAGS = -Ofast -mssse3 -fopenmp
+#OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
+#CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
 #LIBFLAGS = -crusv
 #RANLIB = ranlib -c
-#LINKFLAGS = $(OPTFLAGS) -static-intel -Wl,-stack_size,0x10000000
-#RENAME = rename_bin
+#OBJS = gpu_usage.o
+#GPU_USAGE_OBJS = gpu_usage.o
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
+
+##  Build:     Tinker-FFE
+##  OS Type:   Apple macOS
+##  CPU Type:  Intel x86-64, Nvidia GPU
+##  Compiler:  Intel Fortran for macOS 15.0, clang, nvcc
+##  Parallel:  OpenMP, OpenMM
+
+#CC = icc
+#CXX = icpc -stdlib=libstdc++
+#NVCC = nvcc
+#OBJECTIVE_CC = clang
+#OBJECTIVE_CFLAGS = -c -stdlib=libstdc++
+#F77 = ifort
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos -L$(CUDA_LIB)
+#LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
+#CFLAGS = -c
+#F77FLAGS = -c
+#OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
+#CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#OBJS = gpu_usage.o
+#GPU_USAGE_OBJS = gpu_usage.o
+#LINKFLAGS = $(OPTFLAGS) -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
 
 #################################################################
 ##  Should not be Necessary to Change Things Below this Point  ##
@@ -158,6 +154,7 @@ OBJS =	action.o \
 	analysis.o \
 	analyz.o \
 	analyze.o \
+	analyze_omm.o \
 	angang.o \
 	angbnd.o \
 	angles.o \
@@ -171,8 +168,8 @@ OBJS =	action.o \
 	atomid.o \
 	atoms.o \
 	attach.o \
-	baoab.o \
 	bar.o \
+	bar_omm.o \
 	basefile.o \
 	bath.o \
 	beeman.o \
@@ -233,6 +230,7 @@ OBJS =	action.o \
 	domega.o \
 	dsppot.o \
 	dynamic.o \
+	dynamic_omm.o \
 	eangang.o \
 	eangang1.o \
 	eangang2.o \
@@ -401,6 +399,7 @@ OBJS =	action.o \
 	getxyz.o \
 	ghmcstep.o \
 	gkstuf.o \
+	gpu_cards.o \
 	gradient.o \
 	gradrgd.o \
 	gradrot.o \
@@ -476,12 +475,12 @@ OBJS =	action.o \
 	kopbnd.o \
 	kopdist.o \
 	kopdst.o \
+	kopenmm.o \
 	korbit.o \
 	korbs.o \
 	kpitor.o \
 	kpitors.o \
 	kpolar.o \
-	kpolpr.o \
 	kpolr.o \
 	krepel.o \
 	krepl.o \
@@ -556,6 +555,8 @@ OBJS =	action.o \
 	opbend.o \
 	opdist.o \
 	openend.o \
+	openmm.o \
+	ommdata.o \
 	openmp.o \
 	optimize.o \
 	optinit.o \
@@ -734,350 +735,57 @@ OBJS =	action.o \
 	zclose.o \
 	zcoord.o
 
-EXEFILES = alchemy.x \
-	    analyze.x \
-	    anneal.x \
-	    arcedit.x \
-	    bar.x \
-	    correlate.x \
-	    critical.x \
-	    crystal.x \
-	    diffuse.x \
-	    distgeom.x \
-	    document.x \
-	    dynamic.x \
-	    freefix.x \
-	    gda.x \
-	    intedit.x \
-	    intxyz.x \
-	    minimize.x \
-	    minirot.x \
-	    minrigid.x \
-	    mol2xyz.x \
-	    molxyz.x \
-	    monte.x \
-	    newton.x \
-	    newtrot.x \
-	    nucleic.x \
-	    optimize.x \
-	    optirot.x \
-	    optrigid.x \
-	    path.x \
-	    pdbxyz.x \
-	    polarize.x \
-	    poledit.x \
-	    potential.x \
-	    prmedit.x \
-	    protein.x \
-	    pss.x \
-	    pssrigid.x \
-	    pssrot.x \
-	    radial.x \
-	    saddle.x \
-	    scan.x \
-	    sniffer.x \
-	    spacefill.x \
-	    spectrum.x \
-	    superpose.x \
-	    testgrad.x \
-	    testhess.x \
-	    testpair.x \
-	    testpol.x \
-	    testrot.x \
-	    testvir.x \
-	    timer.x \
-	    timerot.x \
-	    torsfit.x \
-	    valence.x \
-	    vibbig.x \
-	    vibrate.x \
-	    vibrot.x \
-	    xtalfit.x \
-	    xtalmin.x \
-	    xyzedit.x \
-	    xyzint.x \
-	    xyzmol2.x \
-	    xyzpdb.x
+EXEFILES = analyze_omm.x bar_omm.x dynamic_omm.x
 
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
+%.o: %.c
+	${CC} ${CFLAGS} ${OPTFLAGS} ${INCLUDEDIR} -O3 $<
+
+%.o: %.cu
+	${NVCC} ${CFLAGS} ${INCLUDEDIR} ${CUDAFLAGS} -Wno-deprecated-gpu-targets $<
+
+%.o: %.m
+	${OBJECTIVE_CC} ${OBJECTIVE_CFLAGS} ${INCLUDEDIR} ${CUDAFLAGS} $< -o $@
+
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${FFTW_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ $^ ${LIBS}; strip $@
 
-all: ${EXEFILES}
-
-install: ${RENAME}
+all:	${EXEFILES}
 
 clean:
 	rm -f *.o *.mod *.a *.x
 
 listing:
-	cat *.f *.c > tinker.txt
+	cat *.f *.cpp > tinker.txt
 
-rename_bin:
-	mv  alchemy.x    $(BINDIR)/alchemy
-	mv  analyze.x    $(BINDIR)/analyze
-	mv  anneal.x     $(BINDIR)/anneal
-	mv  arcedit.x    $(BINDIR)/arcedit
-	mv  bar.x        $(BINDIR)/bar
-	mv  correlate.x  $(BINDIR)/correlate
-	mv  critical.x   $(BINDIR)/critical
-	mv  crystal.x    $(BINDIR)/crystal
-	mv  diffuse.x    $(BINDIR)/diffuse
-	mv  distgeom.x   $(BINDIR)/distgeom
-	mv  document.x   $(BINDIR)/document
-	mv  dynamic.x    $(BINDIR)/dynamic
-	mv  freefix.x    $(BINDIR)/freefix
-	mv  gda.x        $(BINDIR)/gda
-	mv  intedit.x    $(BINDIR)/intedit
-	mv  intxyz.x     $(BINDIR)/intxyz
-	mv  minimize.x   $(BINDIR)/minimize
-	mv  minirot.x    $(BINDIR)/minirot
-	mv  minrigid.x   $(BINDIR)/minrigid
-	mv  mol2xyz.x    $(BINDIR)/mol2xyz
-	mv  molxyz.x     $(BINDIR)/molxyz
-	mv  monte.x      $(BINDIR)/monte
-	mv  newton.x     $(BINDIR)/newton
-	mv  newtrot.x    $(BINDIR)/newtrot
-	mv  nucleic.x    $(BINDIR)/nucleic
-	mv  optimize.x   $(BINDIR)/optimize
-	mv  optirot.x    $(BINDIR)/optirot
-	mv  optrigid.x   $(BINDIR)/optrigid
-	mv  path.x       $(BINDIR)/path
-	mv  pdbxyz.x     $(BINDIR)/pdbxyz
-	mv  polarize.x   $(BINDIR)/polarize
-	mv  poledit.x    $(BINDIR)/poledit
-	mv  potential.x  $(BINDIR)/potential
-	mv  prmedit.x    $(BINDIR)/prmedit
-	mv  protein.x    $(BINDIR)/protein
-	mv  pss.x        $(BINDIR)/pss
-	mv  pssrigid.x   $(BINDIR)/pssrigid
-	mv  pssrot.x     $(BINDIR)/pssrot
-	mv  radial.x     $(BINDIR)/radial
-	mv  saddle.x     $(BINDIR)/saddle
-	mv  scan.x       $(BINDIR)/scan
-	mv  sniffer.x    $(BINDIR)/sniffer
-	mv  spacefill.x  $(BINDIR)/spacefill
-	mv  spectrum.x   $(BINDIR)/spectrum
-	mv  superpose.x  $(BINDIR)/superpose
-	mv  testgrad.x   $(BINDIR)/testgrad
-	mv  testhess.x   $(BINDIR)/testhess
-	mv  testpair.x   $(BINDIR)/testpair
-	mv  testpol.x    $(BINDIR)/testpol
-	mv  testrot.x    $(BINDIR)/testrot
-	mv  testvir.x    $(BINDIR)/testvir
-	mv  timer.x      $(BINDIR)/timer
-	mv  timerot.x    $(BINDIR)/timerot
-	mv  torsfit.x    $(BINDIR)/torsfit
-	mv  valence.x    $(BINDIR)/valence
-	mv  vibbig.x     $(BINDIR)/vibbig
-	mv  vibrate.x    $(BINDIR)/vibrate
-	mv  vibrot.x     $(BINDIR)/vibrot
-	mv  xtalfit.x    $(BINDIR)/xtalfit
-	mv  xtalmin.x    $(BINDIR)/xtalmin
-	mv  xyzedit.x    $(BINDIR)/xyzedit
-	mv  xyzint.x     $(BINDIR)/xyzint
-	mv  xyzmol2.x    $(BINDIR)/xyzmol2
-	mv  xyzpdb.x     $(BINDIR)/xyzpdb
+ommstuf.o: ommstuf.cpp
+	${CXX} ${CFLAGS} ${OPTFLAGS} -I${OPENMM_INCLUDE} ommstuf.cpp
 
-rename_exe:
-	mv  alchemy.x    $(BINDIR)/alchemy.exe
-	mv  analyze.x    $(BINDIR)/analyze.exe
-	mv  anneal.x     $(BINDIR)/anneal.exe
-	mv  arcedit.x    $(BINDIR)/arcedit.exe
-	mv  bar.x        $(BINDIR)/bar.exe
-	mv  correlate.x  $(BINDIR)/correlate.exe
-	mv  critical.x   $(BINDIR)/critical.exe
-	mv  crystal.x    $(BINDIR)/crystal.exe
-	mv  diffuse.x    $(BINDIR)/diffuse.exe
-	mv  distgeom.x   $(BINDIR)/distgeom.exe
-	mv  document.x   $(BINDIR)/document.exe
-	mv  dynamic.x    $(BINDIR)/dynamic.exe
-	mv  freefix.x    $(BINDIR)/freefix.exe
-	mv  gda.x        $(BINDIR)/gda.exe
-	mv  intedit.x    $(BINDIR)/intedit.exe
-	mv  intxyz.x     $(BINDIR)/intxyz.exe
-	mv  minimize.x   $(BINDIR)/minimize.exe
-	mv  minirot.x    $(BINDIR)/minirot.exe
-	mv  minrigid.x   $(BINDIR)/minrigid.exe
-	mv  mol2xyz.x    $(BINDIR)/mol2xyz.exe
-	mv  molxyz.x     $(BINDIR)/molxyz.exe
-	mv  monte.x      $(BINDIR)/monte.exe
-	mv  newton.x     $(BINDIR)/newton.exe
-	mv  newtrot.x    $(BINDIR)/newtrot.exe
-	mv  nucleic.x    $(BINDIR)/nucleic.exe
-	mv  optimize.x   $(BINDIR)/optimize.exe
-	mv  optirot.x    $(BINDIR)/optirot.exe
-	mv  optrigid.x   $(BINDIR)/optrigid.exe
-	mv  path.x       $(BINDIR)/path.exe
-	mv  pdbxyz.x     $(BINDIR)/pdbxyz.exe
-	mv  polarize.x   $(BINDIR)/polarize.exe
-	mv  poledit.x    $(BINDIR)/poledit.exe
-	mv  potential.x  $(BINDIR)/potential.exe
-	mv  prmedit.x    $(BINDIR)/prmedit.exe
-	mv  protein.x    $(BINDIR)/protein.exe
-	mv  pss.x        $(BINDIR)/pss.exe
-	mv  pssrigid.x   $(BINDIR)/pssrigid.exe
-	mv  pssrot.x     $(BINDIR)/pssrot.exe
-	mv  radial.x     $(BINDIR)/radial.exe
-	mv  saddle.x     $(BINDIR)/saddle.exe
-	mv  scan.x       $(BINDIR)/scan.exe
-	mv  sniffer.x    $(BINDIR)/sniffer.exe
-	mv  spacefill.x  $(BINDIR)/spacefill.exe
-	mv  spectrum.x   $(BINDIR)/spectrum.exe
-	mv  superpose.x  $(BINDIR)/superpose.exe
-	mv  testgrad.x   $(BINDIR)/testgrad.exe
-	mv  testhess.x   $(BINDIR)/testhess.exe
-	mv  testpair.x   $(BINDIR)/testpair.exe
-	mv  testpol.x    $(BINDIR)/testpol.exe
-	mv  testrot.x    $(BINDIR)/testrot.exe
-	mv  testvir.x    $(BINDIR)/testvir.exe
-	mv  timer.x      $(BINDIR)/timer.exe
-	mv  timerot.x    $(BINDIR)/timerot.exe
-	mv  torsfit.x    $(BINDIR)/torsfit.exe
-	mv  valence.x    $(BINDIR)/valence.exe
-	mv  vibbig.x     $(BINDIR)/vibbig.exe
-	mv  vibrate.x    $(BINDIR)/vibrate.exe
-	mv  vibrot.x     $(BINDIR)/vibrot.exe
-	mv  xtalfit.x    $(BINDIR)/xtalfit.exe
-	mv  xtalmin.x    $(BINDIR)/xtalmin.exe
-	mv  xyzedit.x    $(BINDIR)/xyzedit.exe
-	mv  xyzint.x     $(BINDIR)/xyzint.exe
-	mv  xyzmol2.x    $(BINDIR)/xyzmol2.exe
-	mv  xyzpdb.x     $(BINDIR)/xyzpdb.exe
+analyze_omm.x: analyze_omm.o ommstuf.o libtinker.a
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${OPENMM_LIBDIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+
+bar_omm.x: bar_omm.o ommstuf.o libtinker.a
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${OPENMM_LIBDIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+
+dynamic_omm.x: dynamic_omm.o ommstuf.o libtinker.a
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${OPENMM_LIBDIR} $^ ${FFTW_LIBS} ${OPENMM_LIBS} ${LIBS}; strip $@
+
+rename:
+	mv analyze_omm.x $(BINDIR)/analyze_omm
+	mv bar_omm.x $(BINDIR)/bar_omm
+	mv dynamic_omm.x $(BINDIR)/dynamic_omm
 
 remove_links:
-	rm -f $(LINKDIR)/alchemy
-	rm -f $(LINKDIR)/analyze
-	rm -f $(LINKDIR)/anneal
-	rm -f $(LINKDIR)/arcedit
-	rm -f $(LINKDIR)/bar
-	rm -f $(LINKDIR)/correlate
-	rm -f $(LINKDIR)/critical
-	rm -f $(LINKDIR)/crystal
-	rm -f $(LINKDIR)/diffuse
-	rm -f $(LINKDIR)/distgeom
-	rm -f $(LINKDIR)/document
-	rm -f $(LINKDIR)/dynamic
-	rm -f $(LINKDIR)/freefix
-	rm -f $(LINKDIR)/gda
-	rm -f $(LINKDIR)/intedit
-	rm -f $(LINKDIR)/intxyz
-	rm -f $(LINKDIR)/minimize
-	rm -f $(LINKDIR)/minirot
-	rm -f $(LINKDIR)/minrigid
-	rm -f $(LINKDIR)/mol2xyz
-	rm -f $(LINKDIR)/molxyz
-	rm -f $(LINKDIR)/monte
-	rm -f $(LINKDIR)/newton
-	rm -f $(LINKDIR)/newtrot
-	rm -f $(LINKDIR)/nucleic
-	rm -f $(LINKDIR)/optimize
-	rm -f $(LINKDIR)/optirot
-	rm -f $(LINKDIR)/optrigid
-	rm -f $(LINKDIR)/path
-	rm -f $(LINKDIR)/pdbxyz
-	rm -f $(LINKDIR)/polarize
-	rm -f $(LINKDIR)/poledit
-	rm -f $(LINKDIR)/potential
-	rm -f $(LINKDIR)/prmedit
-	rm -f $(LINKDIR)/protein
-	rm -f $(LINKDIR)/pss
-	rm -f $(LINKDIR)/pssrigid
-	rm -f $(LINKDIR)/pssrot
-	rm -f $(LINKDIR)/radial
-	rm -f $(LINKDIR)/saddle
-	rm -f $(LINKDIR)/scan
-	rm -f $(LINKDIR)/sniffer
-	rm -f $(LINKDIR)/spacefill
-	rm -f $(LINKDIR)/spectrum
-	rm -f $(LINKDIR)/superpose
-	rm -f $(LINKDIR)/testgrad
-	rm -f $(LINKDIR)/testhess
-	rm -f $(LINKDIR)/testpair
-	rm -f $(LINKDIR)/testpol
-	rm -f $(LINKDIR)/testrot
-	rm -f $(LINKDIR)/testvir
-	rm -f $(LINKDIR)/timer
-	rm -f $(LINKDIR)/timerot
-	rm -f $(LINKDIR)/torsfit
-	rm -f $(LINKDIR)/valence
-	rm -f $(LINKDIR)/vibbig
-	rm -f $(LINKDIR)/vibrate
-	rm -f $(LINKDIR)/vibrot
-	rm -f $(LINKDIR)/xtalfit
-	rm -f $(LINKDIR)/xtalmin
-	rm -f $(LINKDIR)/xyzedit
-	rm -f $(LINKDIR)/xyzint
-	rm -f $(LINKDIR)/xyzmol2
-	rm -f $(LINKDIR)/xyzpdb
+	rm -f $(LINKDIR)/analyze_omm
+	rm -f $(LINKDIR)/bar_omm
+	rm -f $(LINKDIR)/dynamic_omm
 
 create_links:
-	ln -s $(BINDIR)/alchemy    $(LINKDIR)/alchemy
-	ln -s $(BINDIR)/analyze    $(LINKDIR)/analyze
-	ln -s $(BINDIR)/anneal     $(LINKDIR)/anneal
-	ln -s $(BINDIR)/arcedit    $(LINKDIR)/arcedit
-	ln -s $(BINDIR)/bar        $(LINKDIR)/bar
-	ln -s $(BINDIR)/correlate  $(LINKDIR)/correlate
-	ln -s $(BINDIR)/critical   $(LINKDIR)/critical
-	ln -s $(BINDIR)/crystal    $(LINKDIR)/crystal
-	ln -s $(BINDIR)/diffuse    $(LINKDIR)/diffuse
-	ln -s $(BINDIR)/distgeom   $(LINKDIR)/distgeom
-	ln -s $(BINDIR)/document   $(LINKDIR)/document
-	ln -s $(BINDIR)/dynamic    $(LINKDIR)/dynamic
-	ln -s $(BINDIR)/freefix    $(LINKDIR)/freefix
-	ln -s $(BINDIR)/gda        $(LINKDIR)/gda
-	ln -s $(BINDIR)/intedit    $(LINKDIR)/intedit
-	ln -s $(BINDIR)/intxyz     $(LINKDIR)/intxyz
-	ln -s $(BINDIR)/minimize   $(LINKDIR)/minimize
-	ln -s $(BINDIR)/minirot    $(LINKDIR)/minirot
-	ln -s $(BINDIR)/minrigid   $(LINKDIR)/minrigid
-	ln -s $(BINDIR)/mol2xyz    $(LINKDIR)/mol2xyz
-	ln -s $(BINDIR)/molxyz     $(LINKDIR)/molxyz
-	ln -s $(BINDIR)/monte      $(LINKDIR)/monte
-	ln -s $(BINDIR)/newton     $(LINKDIR)/newton
-	ln -s $(BINDIR)/newtrot    $(LINKDIR)/newtrot
-	ln -s $(BINDIR)/nucleic    $(LINKDIR)/nucleic
-	ln -s $(BINDIR)/optimize   $(LINKDIR)/optimize
-	ln -s $(BINDIR)/optirot    $(LINKDIR)/optirot
-	ln -s $(BINDIR)/optrigid   $(LINKDIR)/optrigid
-	ln -s $(BINDIR)/path       $(LINKDIR)/path
-	ln -s $(BINDIR)/pdbxyz     $(LINKDIR)/pdbxyz
-	ln -s $(BINDIR)/polarize   $(LINKDIR)/polarize
-	ln -s $(BINDIR)/poledit    $(LINKDIR)/poledit
-	ln -s $(BINDIR)/potential  $(LINKDIR)/potential
-	ln -s $(BINDIR)/prmedit    $(LINKDIR)/prmedit
-	ln -s $(BINDIR)/protein    $(LINKDIR)/protein
-	ln -s $(BINDIR)/pss        $(LINKDIR)/pss
-	ln -s $(BINDIR)/pssrigid   $(LINKDIR)/pssrigid
-	ln -s $(BINDIR)/pssrot     $(LINKDIR)/pssrot
-	ln -s $(BINDIR)/radial     $(LINKDIR)/radial
-	ln -s $(BINDIR)/saddle     $(LINKDIR)/saddle
-	ln -s $(BINDIR)/scan       $(LINKDIR)/scan
-	ln -s $(BINDIR)/sniffer    $(LINKDIR)/sniffer
-	ln -s $(BINDIR)/spacefill  $(LINKDIR)/spacefill
-	ln -s $(BINDIR)/spectrum   $(LINKDIR)/spectrum
-	ln -s $(BINDIR)/superpose  $(LINKDIR)/superpose
-	ln -s $(BINDIR)/testgrad   $(LINKDIR)/testgrad
-	ln -s $(BINDIR)/testhess   $(LINKDIR)/testhess
-	ln -s $(BINDIR)/testpair   $(LINKDIR)/testpair
-	ln -s $(BINDIR)/testpol    $(LINKDIR)/testpol
-	ln -s $(BINDIR)/testrot    $(LINKDIR)/testrot
-	ln -s $(BINDIR)/testvir    $(LINKDIR)/testvir
-	ln -s $(BINDIR)/timer      $(LINKDIR)/timer
-	ln -s $(BINDIR)/timerot    $(LINKDIR)/timerot
-	ln -s $(BINDIR)/torsfit    $(LINKDIR)/torsfit
-	ln -s $(BINDIR)/valence    $(LINKDIR)/valence
-	ln -s $(BINDIR)/vibbig     $(LINKDIR)/vibbig
-	ln -s $(BINDIR)/vibrate    $(LINKDIR)/vibrate
-	ln -s $(BINDIR)/vibrot     $(LINKDIR)/vibrot
-	ln -s $(BINDIR)/xtalfit    $(LINKDIR)/xtalfit
-	ln -s $(BINDIR)/xtalmin    $(LINKDIR)/xtalmin
-	ln -s $(BINDIR)/xyzedit    $(LINKDIR)/xyzedit
-	ln -s $(BINDIR)/xyzint     $(LINKDIR)/xyzint
-	ln -s $(BINDIR)/xyzmol2    $(LINKDIR)/xyzmol2
-	ln -s $(BINDIR)/xyzpdb     $(LINKDIR)/xyzpdb
+	ln -s $(BINDIR)/analyze_omm $(LINKDIR)/analyze_omm
+	ln -s $(BINDIR)/bar_omm $(LINKDIR)/bar_omm
+	ln -s $(BINDIR)/dynamic_omm $(LINKDIR)/dynamic_omm
 
 libtinker.a: ${OBJS} 
 	ar ${LIBFLAGS} libtinker.a \
@@ -1099,7 +807,6 @@ libtinker.a: ${OBJS}
 	atomid.o \
 	atoms.o \
 	attach.o \
-	baoab.o \
 	basefile.o \
 	bath.o \
 	beeman.o \
@@ -1319,6 +1026,8 @@ libtinker.a: ${OBJS}
 	getxyz.o \
 	ghmcstep.o \
 	gkstuf.o \
+	gpu_cards.o \
+	$(GPU_USAGE_OBJS) \
 	gradient.o \
 	gradrgd.o \
 	gradrot.o \
@@ -1366,9 +1075,9 @@ libtinker.a: ${OBJS}
 	kcharge.o \
 	kchgflx.o \
 	kchgtrn.o \
-	kchrge.o \
 	kcpen.o \
 	kctrn.o \
+	kchrge.o \
 	kdipol.o \
 	kdipole.o \
 	kdisp.o \
@@ -1392,12 +1101,12 @@ libtinker.a: ${OBJS}
 	kopbnd.o \
 	kopdist.o \
 	kopdst.o \
+	kopenmm.o \
 	korbit.o \
 	korbs.o \
 	kpitor.o \
 	kpitors.o \
 	kpolar.o \
-	kpolpr.o \
 	kpolr.o \
 	krepel.o \
 	krepl.o \
@@ -1463,6 +1172,8 @@ libtinker.a: ${OBJS}
 	opbend.o \
 	opdist.o \
 	openend.o \
+	openmm.o \
+	ommdata.o \
 	openmp.o \
 	optinit.o \
 	optsave.o \
@@ -1606,6 +1317,14 @@ libtinker.a: ${OBJS}
 ###############################################################
 ##  Next Section has Explicit Dependencies on Include Files  ##
 ###############################################################
+
+analyze_omm.o: files.o inform.o iounit.o mdstuf.o openmm.o
+bar_omm.o: boxes.o files.o inform.o iounit.o keys.o mdstuf.o openmm.o titles.o units.o
+dynamic_omm.o: atoms.o bath.o bndstr.o bound.o boxes.o inform.o iounit.o keys.o mdstuf.o openmm.o openmp.o potent.o stodyn.o usage.o
+gpu_cards.o: $(GPU_USAGE_OBJS)
+kopenmm.o: ascii.o keys.o openmm.o
+openmm.o:
+ommdata.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o bndstr.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o freeze.o group.o imptor.o inform.o ktrtor.o kvdwpr.o kvdws.o limits.o mdstuf.o molcul.o moldyn.o mplpot.o mpole.o mutant.o nonpol.o opbend.o openmm.o pitors.o pme.o polar.o polgrp.o polopt.o polpot.o potent.o restrn.o sizes.o solpot.o solute.o stodyn.o strbnd.o strtor.o torpot.o tors.o tortor.o units.o urey.o urypot.o usage.o vdw.o vdwpot.o
 
 action.o:
 active.o: atoms.o inform.o iounit.o keys.o usage.o
@@ -2077,7 +1796,7 @@ radial.o: argue.o atomid.o atoms.o bound.o boxes.o files.o inform.o iounit.o lim
 random.o: inform.o iounit.o keys.o math.o
 rattle.o: atomid.o atoms.o freeze.o group.o inform.o iounit.o moldyn.o units.o usage.o virial.o
 readcart.o: output.o
-readdcd.o: atoms.o bound.o boxes.o files.o inform.o iounit.o titles.o
+readdcd.o: atoms.o bound.o boxes.o files.o inform.o iounit.o math.o titles.o
 readdyn.o: atoms.o boxes.o files.o group.o iounit.o mdstuf.o moldyn.o rgddyn.o
 readgau.o: ascii.o iounit.o qmstuf.o units.o
 readgdma.o: atomid.o atoms.o dma.o files.o iounit.o mpole.o units.o

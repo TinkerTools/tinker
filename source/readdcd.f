@@ -23,6 +23,7 @@ c
       use files
       use inform
       use iounit
+      use math
       use titles
       implicit none
       integer i,idcd
@@ -83,8 +84,18 @@ c
 c     read the lattice values based on header flag value
 c
       if (use_bounds) then
+         xbox = 0.0d0
+         ybox = 0.0d0
+         zbox = 0.0d0
+         alpha = 90.0d0
+         beta = 90.0d0
+         gamma = 90.0d0
          read (idcd,err=40,end=40)  xbox,gamma_cos,ybox,beta_cos,
      &                              alpha_cos,zbox
+         if (alpha_cos .ne. 0.0d0)  alpha = radian * acos(alpha_cos)
+         if (beta_cos .ne. 0.0d0)  beta = radian * acos(beta_cos)
+         if (gamma_cos .ne. 0.0d0)  gamma = radian * acos(gamma_cos)
+         call lattice
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -124,15 +135,6 @@ c
       deallocate (xs)
       deallocate (ys)
       deallocate (zs)
-c
-c     convert to periodic box angles and lattice values
-c
-      if (use_bounds) then
-         alpha = acos(alpha_cos)
-         beta = acos(beta_cos)
-         gamma = acos(gamma_cos)
-         call lattice
-      end if
 c
 c     close the input unit if opened by this routine
 c

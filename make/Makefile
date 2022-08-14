@@ -2077,7 +2077,7 @@ radial.o: argue.o atomid.o atoms.o bound.o boxes.o files.o inform.o iounit.o lim
 random.o: inform.o iounit.o keys.o math.o
 rattle.o: atomid.o atoms.o freeze.o group.o inform.o iounit.o moldyn.o units.o usage.o virial.o
 readcart.o: output.o
-readdcd.o: atoms.o bound.o boxes.o files.o inform.o iounit.o titles.o
+readdcd.o: atoms.o bound.o boxes.o files.o inform.o iounit.o math.o titles.o
 readdyn.o: atoms.o boxes.o files.o group.o iounit.o mdstuf.o moldyn.o rgddyn.o
 readgau.o: ascii.o iounit.o qmstuf.o units.o
 readgdma.o: atomid.o atoms.o dma.o files.o iounit.o mpole.o units.o
