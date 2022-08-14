@@ -87,6 +87,9 @@ c
          call unitcell
          read (idcd,err=40,end=40)  xbox,gamma_cos,ybox,beta_cos,
      &                              alpha_cos,zbox
+         alpha = 90.0d0
+         beta = 90.0d0
+         gamma = 90.0d0
          if (alpha_cos .ne. 0.0d0)  alpha = radian * acos(alpha_cos)
          if (beta_cos .ne. 0.0d0)  beta = radian * acos(beta_cos)
          if (gamma_cos .ne. 0.0d0)  gamma = radian * acos(gamma_cos)
