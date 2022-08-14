@@ -17,16 +17,65 @@ c     values to be used in computing fractional coordinates
 c
 c
       subroutine lattice
+      use bound
       use boxes
       use cell
       use inform
       use iounit
       use math
       implicit none
+      real*8 boxmax
       real*8 ar1,ar2,ar3
       real*8 br1,br2,br3
       real*8 cr1,cr2,cr3
 c
+c
+c     use periodic boundary conditions if a cell was defined
+c
+      boxmax = max(xbox,ybox,zbox)
+      if (boxmax .ne. 0.0d0)  use_bounds = .true.
+c
+c     set unspecified periodic boundary box lengths and angles
+c
+      if (use_bounds) then
+         if (xbox .eq. 0.0d0)  xbox = boxmax
+         if (ybox .eq. 0.0d0)  ybox = boxmax
+         if (zbox .eq. 0.0d0)  zbox = boxmax
+         if (alpha .eq. 0.0d0)  alpha = 90.0d0
+         if (beta .eq. 0.0d0)  beta = 90.0d0
+         if (gamma .eq. 0.0d0)  gamma = 90.0d0
+c
+c     determine the general periodic boundary lattice type
+c
+         if (nosymm) then
+            triclinic = .true.
+         else if (alpha.eq.90.0d0 .and. beta.eq.90.0d0
+     &               .and. gamma.eq.90.0d0) then
+            orthogonal = .true.
+         else if (alpha.eq.90.0d0 .and. gamma.eq.90.0d0) then
+            monoclinic = .true.
+         else
+            triclinic = .true.
+         end if
+      end if
+c
+c     check for proper use of non-prism periodic boundaries
+c
+      if (octahedron .or. dodecadron) then
+         orthogonal = .false.
+         monoclinic = .false.
+         triclinic = .false.
+         nonprism = .true.
+         ybox = xbox
+         if (octahedron) then
+            zbox = xbox
+         else if (dodecadron) then
+            zbox = xbox * root2
+         end if         
+         alpha = 90.0d0
+         beta = 90.0d0
+         gamma = 90.0d0
+      end if
 c
 c     compute and store half box lengths and other lengths
 c

@@ -35,7 +35,7 @@ c
       integer use4d,usefq
       integer merged,vcharmm
       integer ntitle
-      real*4 tdelta
+      real*4 tdelta,boxmax
       real*4, allocatable :: xs(:)
       real*4, allocatable :: ys(:)
       real*4, allocatable :: zs(:)
@@ -84,12 +84,7 @@ c
 c     read the lattice values based on header flag value
 c
       if (use_bounds) then
-         xbox = 0.0d0
-         ybox = 0.0d0
-         zbox = 0.0d0
-         alpha = 90.0d0
-         beta = 90.0d0
-         gamma = 90.0d0
+         call unitcell
          read (idcd,err=40,end=40)  xbox,gamma_cos,ybox,beta_cos,
      &                              alpha_cos,zbox
          if (alpha_cos .ne. 0.0d0)  alpha = radian * acos(alpha_cos)

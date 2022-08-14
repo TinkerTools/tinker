@@ -39,6 +39,7 @@ c     triclinic   flag to mark periodic box as triclinic
 c     octahedron  flag to mark box as truncated octahedron
 c     dodecadron  flag to mark box as rhombic dodecahedron
 c     nonprism    flag to mark octahedron or dodecahedron
+c     nosymm      flag to mark use or lack of lattice symmetry
 c     spacegrp    space group symbol for the unit cell type
 c
 c
@@ -64,6 +65,7 @@ c
       logical octahedron
       logical dodecadron
       logical nonprism
+      logical nosymm
       character*10 spacegrp
       save
       end

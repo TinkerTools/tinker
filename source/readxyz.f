@@ -19,7 +19,6 @@ c
       subroutine readxyz (ixyz)
       use atomid
       use atoms
-      use bound
       use boxes
       use couple
       use files
@@ -34,9 +33,6 @@ c
       integer nexttext
       integer trimtext
       integer, allocatable :: list(:)
-      real*8 xlen,ylen,zlen
-      real*8 aang,bang,gang
-      real*8 boxmax
       logical exist,opened
       logical quit,reorder
       logical clash
@@ -142,23 +138,9 @@ c
                next = 1
                call getword (record,name(i),next)
                if (name(i) .ne. '   ')  goto 60
-               read (record,*,err=60,end=60)  xlen,ylen,zlen,
-     &                                        aang,bang,gang
+               read (record,*,err=60,end=60)  xbox,ybox,zbox,
+     &                                        alpha,beta,gamma
                size = 0
-               xbox = xlen
-               ybox = ylen
-               zbox = zlen
-               alpha = aang
-               beta = bang
-               gamma = gang
-               boxmax = max(xbox,ybox,zbox)
-               if (boxmax .ne. 0.0d0)  use_bounds = .true.
-               if (xbox .eq. 0.0d0)  xbox = boxmax
-               if (ybox .eq. 0.0d0)  ybox = boxmax
-               if (zbox .eq. 0.0d0)  zbox = boxmax
-               if (alpha .eq. 0.0d0)  alpha = 90.0d0
-               if (beta .eq. 0.0d0)  beta = 90.0d0
-               if (gamma .eq. 0.0d0)  gamma = 90.0d0
             end if
    60       continue
             call lattice

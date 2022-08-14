@@ -24,7 +24,6 @@ c
       implicit none
       integer i,next
       real*8 boxmax
-      logical nosymm
       character*20 keyword
       character*240 record
       character*240 string
@@ -43,8 +42,8 @@ c
       octahedron = .false.
       dodecadron = .false.
       nonprism = .false.
-      spacegrp = '          '
       nosymm = .false.
+      spacegrp = '          '
 c
 c     get keywords containing crystal lattice dimensions
 c
@@ -76,10 +75,10 @@ c
             octahedron = .true.
          else if (keyword(1:13) .eq. 'DODECAHEDRON ') then
             dodecadron = .true.
-         else if (keyword(1:11) .eq. 'SPACEGROUP ') then
-            call getword (record,spacegrp,next)
          else if (keyword(1:11) .eq. 'NOSYMMETRY ') then
             nosymm = .true.
+         else if (keyword(1:11) .eq. 'SPACEGROUP ') then
+            call getword (record,spacegrp,next)
          end if
    10    continue
       end do
