@@ -35,7 +35,7 @@ c
       integer use4d,usefq
       integer merged,vcharmm
       integer ntitle
-      real*4 tdelta,boxmax
+      real*4 tdelta
       real*4, allocatable :: xs(:)
       real*4, allocatable :: ys(:)
       real*4, allocatable :: zs(:)
@@ -59,8 +59,8 @@ c
             rewind (unit=idcd)
          else
             write (iout,10)
-   10       format (/,' READDCD  --  Unable to Find the DCD Binary',
-     &                 ' Archive File')
+   10       format (/,' READDCD  --  Unable to Find the DCD',
+     &                 ' Binary Archive File')
             call fatal
          end if
       end if
@@ -114,8 +114,8 @@ c
    20 continue
       if (abort) then
          write (iout,30)
-   30    format (/,' READDCD  --  Error Reading Input from Binary',
-     &              ' DCD File')
+   30    format (/,' READDCD  --  Error Reading Header from',
+     &              ' Binary DCD File')
 
          call fatal
       end if

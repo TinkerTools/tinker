@@ -82,7 +82,7 @@ c     diagonalize the quadratic form matrix
 c
       call jacobi (4,c,d,v)
 c
-c     extract the desired quaternion
+c     extract the desired quaternion components
 c
       q(1) = v(1,4)
       q(2) = v(2,4)

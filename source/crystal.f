@@ -252,7 +252,7 @@ c
          if (nc .eq. 0)  nc = na
          if (na*nb*nc*n .gt. maxatm) then
             write (iout,240)  maxatm
-  240       format (/,' CRYSTAL  --  The Maximum of',i8,' Atoms',
+  240       format (/,' CRYSTAL  --  The Maximum of',i9,' Atoms',
      &                 ' has been Exceeded')
             call fatal
          end if

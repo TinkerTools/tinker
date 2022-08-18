@@ -480,7 +480,7 @@ c     check that the maximum allowed atoms is not exceeded
 c
          if (n+25 .gt. maxatm) then
             write (iout,10)  maxatm
-   10       format (/,' RIBOSOME  --  The Maximum of',i8,' Atoms',
+   10       format (/,' RIBOSOME  --  The Maximum of',i9,' Atoms',
      &                 ' has been Exceeded')
             call fatal
          end if
@@ -1635,7 +1635,7 @@ c     check that the maximum allowed atoms is not exceeded
 c
          if (n+25 .gt. maxatm) then
             write (iout,10)  maxatm
-   10       format (/,' LIGASE  --  The Maximum of',i8,' Atoms',
+   10       format (/,' LIGASE  --  The Maximum of',i9,' Atoms',
      &                 ' has been Exceeded')
             call fatal
          end if

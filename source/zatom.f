@@ -145,7 +145,7 @@ c
          n = n + 1
          if (n .gt. maxatm) then
             write (iout,40)  maxatm
-   40       format (/,' ZATOM  --  The Maximum of',i8,' Atoms',
+   40       format (/,' ZATOM  --  The Maximum of',i9,' Atoms',
      &                 ' has been Exceeded')
             call fatal
          end if

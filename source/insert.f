@@ -67,7 +67,7 @@ c     write a message to describe the atom insertion
 c
       if (debug) then
          write (iout,10)  iatom
-   10    format (' INSERT  --  Inserting Atom Number :',i8)
+   10    format (' INSERT  --  Inserting Atom Number :',i9)
       end if
       return
       end

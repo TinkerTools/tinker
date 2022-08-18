@@ -70,21 +70,37 @@ c
          end if
       end if
 c
+c     count the number of atoms in the GDMA output file
+c
+      i = 0
+      rewind (unit=idma)
+      do while (.true.)
+         read (idma,30,err=40,end=40)  record
+   30    format (a240)
+         if (record(12:14) .eq. 'x =') then
+            i = i + 1
+         else if (record(1:16) .eq. 'Total multipoles') then
+            goto 40
+         end if
+      end do
+   40 continue
+      n = i
+c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(mp))  allocate (mp(maxatm))
-      if (.not. allocated(dpx))  allocate (dpx(maxatm))
-      if (.not. allocated(dpy))  allocate (dpy(maxatm))
-      if (.not. allocated(dpz))  allocate (dpz(maxatm))
-      if (.not. allocated(q20))  allocate (q20(maxatm))
-      if (.not. allocated(q21c))  allocate (q21c(maxatm))
-      if (.not. allocated(q21s))  allocate (q21s(maxatm))
-      if (.not. allocated(q22c))  allocate (q22c(maxatm))
-      if (.not. allocated(q22s))  allocate (q22s(maxatm))
+      if (.not. allocated(mp))  allocate (mp(n))
+      if (.not. allocated(dpx))  allocate (dpx(n))
+      if (.not. allocated(dpy))  allocate (dpy(n))
+      if (.not. allocated(dpz))  allocate (dpz(n))
+      if (.not. allocated(q20))  allocate (q20(n))
+      if (.not. allocated(q21c))  allocate (q21c(n))
+      if (.not. allocated(q21s))  allocate (q21s(n))
+      if (.not. allocated(q22c))  allocate (q22c(n))
+      if (.not. allocated(q22s))  allocate (q22s(n))
 c
 c     zero out the atomic coordinates and DMA values
 c
-      do i = 1, maxatm
+      do i = 1, n
          x(i) = 0.0d0
          y(i) = 0.0d0
          z(i) = 0.0d0
@@ -109,8 +125,8 @@ c
       i = 0
       rewind (unit=idma)
       do while (.true.)
-         read (idma,30,err=50,end=50)  record
-   30    format (a240)
+         read (idma,50,err=70,end=70)  record
+   50    format (a240)
          if (i .ne. 0)  call match1 (i,record)
          if (record(12:14) .eq. 'x =') then
             i = i + 1
@@ -119,14 +135,13 @@ c
             read (record(15:24),*)  x(i)
             read (record(30:39),*)  y(i)
             read (record(45:54),*)  z(i)
-            read (idma,40,err=50,end=50)
-   40       format ()
+            read (idma,60,err=70,end=70)
+   60       format ()
          else if (record(1:16) .eq. 'Total multipoles') then
-            goto 50
+            goto 70
          end if
       end do
-   50 continue
-      n = i
+   70 continue
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -156,14 +171,14 @@ c
       use_bohr = .false.
       rewind (unit=idma)
       do while (.true.)
-         read (idma,60,err=70,end=70)  record
-   60    format (a240)
+         read (idma,80,err=90,end=90)  record
+   80    format (a240)
          if (record(1:27) .eq. 'Positions and radii in bohr') then
             use_bohr = .true.
-            goto 70
+            goto 90
          end if
       end do
-   70 continue
+   90 continue
 c
 c     convert coordinates from Bohrs to Angstroms if needed
 c
@@ -180,22 +195,22 @@ c
       done = .false.
       rewind (unit=idma)
       do while (.true.)
-         read (idma,80,err=100,end=100)  record
-   80    format (a240)
+         read (idma,100,err=120,end=120)  record
+  100    format (a240)
          if (record(1:16) .eq. 'Nuclear charges:') then
             k = min(n,20)
-            read (record(17:240),*,err=100,end=100)  (atomic(i),i=1,k)
+            read (record(17:240),*,err=120,end=120)  (atomic(i),i=1,k)
             do while (k .ne. n)
                j = k + 1
                k = min(n,k+20)
-               read (idma,90,err=100,end=100)  record
-   90          format (a240)
-               read (record,*,err=100,end=100)  (atomic(i),i=j,k)
+               read (idma,110,err=120,end=120)  record
+  110          format (a240)
+               read (record,*,err=120,end=120)  (atomic(i),i=j,k)
             end do
             done = .true.
          end if
       end do
-  100 continue
+  120 continue
       close (unit=idma)
 c
 c     attempt to get atomic numbers from GDMA atom names
@@ -230,31 +245,31 @@ c
             else if (atmnam(1:1) .eq. 'I') then
                atomic(i) = 53
             else
-               read (atmnam,*,err=110,end=110)  atomic(i)
-  110          continue
+               read (atmnam,*,err=130,end=130)  atomic(i)
+  130          continue
             end if
          end do
       end if
 c
 c     print the global frame Cartesian atomic multipoles
 c
-      write (iout,120)
-  120 format (/,' Global Frame Cartesian Multipole Moments :')
+      write (iout,140)
+  140 format (/,' Global Frame Cartesian Multipole Moments :')
       do i = 1, n
-         write (iout,130)  i,name(i),atomic(i)
-  130    format (/,' Site:',i8,9x,'Name:',3x,a3,7x,'Atomic Number:',i8)
-         write (iout,140)  x(i),y(i),z(i)
-  140    format (/,' Coordinates:',5x,3f15.6)
-         write (iout,150)  rpole(1,i)
-  150    format (/,' Charge:',10x,f15.5)
-         write (iout,160)  rpole(2,i),rpole(3,i),rpole(4,i)
-  160    format (' Dipole:',10x,3f15.5)
-         write (iout,170)  rpole(5,i)
-  170    format (' Quadrupole:',6x,f15.5)
-         write (iout,180)  rpole(8,i),rpole(9,i)
-  180    format (18x,2f15.5)
-         write (iout,190)  rpole(11,i),rpole(12,i),rpole(13,i)
-  190    format (18x,3f15.5)
+         write (iout,150)  i,name(i),atomic(i)
+  150    format (/,' Site:',i8,9x,'Name:',3x,a3,7x,'Atomic Number:',i8)
+         write (iout,160)  x(i),y(i),z(i)
+  160    format (/,' Coordinates:',5x,3f15.6)
+         write (iout,170)  rpole(1,i)
+  170    format (/,' Charge:',10x,f15.5)
+         write (iout,180)  rpole(2,i),rpole(3,i),rpole(4,i)
+  180    format (' Dipole:',10x,3f15.5)
+         write (iout,190)  rpole(5,i)
+  190    format (' Quadrupole:',6x,f15.5)
+         write (iout,200)  rpole(8,i),rpole(9,i)
+  200    format (18x,2f15.5)
+         write (iout,210)  rpole(11,i),rpole(12,i),rpole(13,i)
+  210    format (18x,3f15.5)
       end do
 c
 c     convert the dipole and quadrupole moments to Angstroms,

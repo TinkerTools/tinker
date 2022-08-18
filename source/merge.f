@@ -34,7 +34,7 @@ c
       ntotal = n + nref(iref)
       if (ntotal .gt. maxatm) then
          write (iout,10)  maxatm
-   10    format (/,' MERGE  --  The Maximum of',i8,' Atoms',
+   10    format (/,' MERGE  --  The Maximum of',i9,' Atoms',
      &              ' has been Exceeded')
          call fatal
       end if
