@@ -19,9 +19,6 @@ c
       subroutine mechanic
       use inform
       use iounit
-      use limits
-      use potent
-      use vdwpot
       implicit none
 c
 c

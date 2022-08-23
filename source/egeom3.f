@@ -35,7 +35,7 @@ c
       use restrn
       use usage
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer ia,ib,ic,id
       real*8 e,eps,fgrp
       real*8 dt,dt2
@@ -64,10 +64,13 @@ c
       real*8 df1,df2
       real*8 af1,af2
       real*8 tf1,tf2,t1,t2
+      real*8 xa,ya,za
+      real*8 xb,yb,zb
+      real*8 xk,yk,zk
+      real*8 xm,ym,zm
       real*8 gf1,gf2
       real*8 weigh,size
       real*8 weigha,weighb
-      real*8 xcm,ycm,zcm
       real*8 cf1,cf2,vol
       real*8 c1,c2,c3
       real*8 xi,yi,zi,ri
@@ -403,34 +406,53 @@ c
       do i = 1, ngfix
          ia = igfix(1,i)
          ib = igfix(2,i)
-         xcm = 0.0d0
-         ycm = 0.0d0
-         zcm = 0.0d0
+         xa = 0.0d0
+         ya = 0.0d0
+         za = 0.0d0
+         m = kgrp(igrp(1,ia))
+         xm = x(m)
+         ym = y(m)
+         zm = z(m)
          do j = igrp(1,ia), igrp(2,ia)
             k = kgrp(j)
             weigh = mass(k)
-            xcm = xcm + x(k)*weigh
-            ycm = ycm + y(k)*weigh
-            zcm = zcm + z(k)*weigh
+            xk = x(k) - xm
+            yk = y(k) - ym
+            zk = z(k) - zm
+            if (use_bounds)  call image (xk,yk,zk)
+            xa = xa + xk*weigh
+            ya = ya + yk*weigh
+            za = za + zk*weigh
          end do
          weigha = max(1.0d0,grpmass(ia))
-         xr = xcm / weigha
-         yr = ycm / weigha
-         zr = zcm / weigha
-         xcm = 0.0d0
-         ycm = 0.0d0
-         zcm = 0.0d0
+         xa = xm + xa/weigha
+         ya = ym + ya/weigha
+         za = zm + za/weigha
+         xb = 0.0d0
+         yb = 0.0d0
+         zb = 0.0d0
+         m = kgrp(igrp(1,ib))
+         xm = x(m)
+         ym = y(m)
+         zm = z(m)
          do j = igrp(1,ib), igrp(2,ib)
             k = kgrp(j)
             weigh = mass(k)
-            xcm = xcm + x(k)*weigh
-            ycm = ycm + y(k)*weigh
-            zcm = zcm + z(k)*weigh
+            xk = x(k) - xm
+            yk = y(k) - ym
+            zk = z(k) - zm
+            if (use_bounds)  call image (xk,yk,zk)
+            xb = xb + xk*weigh
+            yb = yb + yk*weigh
+            zb = zb + zk*weigh
          end do
          weighb = max(1.0d0,grpmass(ib))
-         xr = xr - xcm/weighb
-         yr = yr - ycm/weighb
-         zr = zr - zcm/weighb
+         xb = xm + xb/weighb
+         yb = ym + yb/weighb
+         zb = zm + zb/weighb
+         xr = xa - xb
+         yr = ya - yb
+         zr = za - zb
          intermol = (molcule(kgrp(igrp(1,ia))) .ne.
      &               molcule(kgrp(igrp(1,ib))))
          if (use_bounds .and. intermol)  call image (xr,yr,zr)

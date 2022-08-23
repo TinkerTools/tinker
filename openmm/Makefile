@@ -1692,7 +1692,7 @@ mdrest.o: atomid.o atoms.o bound.o group.o inform.o iounit.o mdstuf.o moldyn.o r
 mdsave.o: atomid.o atoms.o bound.o boxes.o deriv.o files.o group.o inform.o iounit.o mdstuf.o moldyn.o mpole.o output.o polar.o potent.o rgddyn.o socket.o titles.o units.o
 mdstat.o: atoms.o bath.o bound.o boxes.o inform.o iounit.o limits.o mdstuf.o molcul.o units.o usage.o warp.o
 mdstuf.o:
-mechanic.o: inform.o iounit.o limits.o potent.o vdwpot.o
+mechanic.o: inform.o iounit.o
 merck.o: sizes.o
 merge.o: atomid.o atoms.o couple.o iounit.o refer.o
 minima.o:
