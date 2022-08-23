@@ -71,6 +71,7 @@ c
       real*8 gf1,gf2
       real*8 weigh,size
       real*8 weigha,weighb
+      real*8 mola,molb,molk
       real*8 cf1,cf2,vol
       real*8 c1,c2,c3
       real*8 xi,yi,zi,ri
@@ -413,13 +414,16 @@ c
          xm = x(m)
          ym = y(m)
          zm = z(m)
+         mola = molcule(m)
          do j = igrp(1,ia), igrp(2,ia)
             k = kgrp(j)
             weigh = mass(k)
             xk = x(k) - xm
             yk = y(k) - ym
             zk = z(k) - zm
-            if (use_bounds)  call image (xk,yk,zk)
+            molk = molcule(k)
+            intermol = (molk .ne. mola)
+            if (use_bounds .and. intermol)  call image (xk,yk,zk)
             xa = xa + xk*weigh
             ya = ya + yk*weigh
             za = za + zk*weigh
@@ -435,13 +439,16 @@ c
          xm = x(m)
          ym = y(m)
          zm = z(m)
+         molb = molcule(m)
          do j = igrp(1,ib), igrp(2,ib)
             k = kgrp(j)
             weigh = mass(k)
             xk = x(k) - xm
             yk = y(k) - ym
             zk = z(k) - zm
-            if (use_bounds)  call image (xk,yk,zk)
+            molk = molcule(k)
+            intermol = (molk .ne. molb)
+            if (use_bounds .and. intermol)  call image (xk,yk,zk)
             xb = xb + xk*weigh
             yb = yb + yk*weigh
             zb = zb + zk*weigh
@@ -453,8 +460,7 @@ c
          xr = xa - xb
          yr = ya - yb
          zr = za - zb
-         intermol = (molcule(kgrp(igrp(1,ia))) .ne.
-     &               molcule(kgrp(igrp(1,ib))))
+         intermol = (mola .ne. molb)
          if (use_bounds .and. intermol)  call image (xr,yr,zr)
          r = sqrt(xr*xr + yr*yr + zr*zr)
          force = gfix(1,i)
