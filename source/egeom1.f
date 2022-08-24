@@ -33,7 +33,7 @@ c
       use usage
       use virial
       implicit none
-      integer i,j,k,m
+      integer i,j,k
       integer ia,ib,ic,id
       real*8 e,eps,fgrp
       real*8 de,dt,dt2,deddt
@@ -76,7 +76,6 @@ c
       real*8 xa,ya,za
       real*8 xb,yb,zb
       real*8 xk,yk,zk
-      real*8 xm,ym,zm
       real*8 gf1,gf2
       real*8 weigh,ratio
       real*8 weigha,weighb
@@ -527,17 +526,17 @@ c
          xa = 0.0d0
          ya = 0.0d0
          za = 0.0d0
-         m = kgrp(igrp(1,ia))
-         xm = x(m)
-         ym = y(m)
-         zm = z(m)
-         mola = molcule(m)
+         j = kgrp(igrp(1,ia))
+         xr = x(j)
+         yr = y(j)
+         zr = z(j)
+         mola = molcule(j)
          do j = igrp(1,ia), igrp(2,ia)
             k = kgrp(j)
             weigh = mass(k)
-            xk = x(k) - xm
-            yk = y(k) - ym
-            zk = z(k) - zm
+            xk = x(k) - xr
+            yk = y(k) - yr
+            zk = z(k) - zr
             molk = molcule(k)
             intermol = (molk .ne. mola)
             if (use_bounds .and. intermol)  call image (xk,yk,zk)
@@ -546,23 +545,23 @@ c
             za = za + zk*weigh
          end do
          weigha = max(1.0d0,grpmass(ia))
-         xa = xm + xa/weigha
-         ya = ym + ya/weigha
-         za = zm + za/weigha
+         xa = xr + xa/weigha
+         ya = yr + ya/weigha
+         za = zr + za/weigha
          xb = 0.0d0
          yb = 0.0d0
          zb = 0.0d0
-         m = kgrp(igrp(1,ib))
-         xm = x(m)
-         ym = y(m)
-         zm = z(m)
-         molb = molcule(m)
+         j = kgrp(igrp(1,ib))
+         xr = x(j)
+         yr = y(j)
+         zr = z(j)
+         molb = molcule(j)
          do j = igrp(1,ib), igrp(2,ib)
             k = kgrp(j)
             weigh = mass(k)
-            xk = x(k) - xm
-            yk = y(k) - ym
-            zk = z(k) - zm
+            xk = x(k) - xr
+            yk = y(k) - yr
+            zk = z(k) - zr
             molk = molcule(k)
             intermol = (molk .ne. molb)
             if (use_bounds .and. intermol)  call image (xk,yk,zk)
@@ -571,9 +570,9 @@ c
             zb = zb + zk*weigh
          end do
          weighb = max(1.0d0,grpmass(ib))
-         xb = xm + xb/weighb
-         yb = ym + yb/weighb
-         zb = zm + zb/weighb
+         xb = xr + xb/weighb
+         yb = yr + yb/weighb
+         zb = zr + zb/weighb
          xr = xa - xb
          yr = ya - yb
          zr = za - zb
