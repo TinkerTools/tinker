@@ -70,6 +70,11 @@ c
          end if
       end if
 c
+c     first open and then read the GDMA output file
+c
+      idma = freeunit ()
+      open (unit=idma,file=dmafile,status='old')
+c
 c     count the number of atoms in the GDMA output file
 c
       i = 0
@@ -114,11 +119,6 @@ c
          q22c(i) = 0.0d0
          q22s(i) = 0.0d0
       end do
-c
-c     first open and then read the GDMA output file
-c
-      idma = freeunit ()
-      open (unit=idma,file=dmafile,status='old')
 c
 c     get coordinates and multipoles from GDMA output file
 c
