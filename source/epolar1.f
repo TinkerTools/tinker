@@ -94,6 +94,7 @@ c
       integer i,j,k,m
       integer ii,kk,jcell
       integer ix,iy,iz
+      integer it,kt
       real*8 f,pgamma
       real*8 pdi,pti,ddi
       real*8 damp,expdamp
@@ -454,11 +455,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -487,10 +487,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
@@ -1531,11 +1528,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -1564,10 +1560,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
@@ -2542,6 +2535,7 @@ c
       integer i,j,k,m
       integer ii,kk,kkk
       integer ix,iy,iz
+      integer it,kt
       real*8 f,pgamma
       real*8 pdi,pti,ddi
       real*8 damp,expdamp
@@ -2688,14 +2682,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,pdamp,thole,tholed,pcore,pval,palpha,n12,i12,n13,i13,n14,
-!$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
-!$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
-!$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
-!$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_tholed,use_chgpen,use_chgflx,use_bounds,off2,f,molcule,
-!$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,
-!$OMP& xaxis,yaxis,zaxis)
+!$OMP& uinp,jpolar,thole,tholed,pdamp,thlval,thdval,pcore,pval,palpha,
+!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
+!$OMP& np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
+!$OMP& p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,u1scale,
+!$OMP& u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,nelst,
+!$OMP& elst,dpequal,use_thole,use_tholed,use_chgpen,use_chgflx,
+!$OMP& use_bounds,off2,f,molcule,optorder,copm,uopt,uoptp,poltyp,
+!$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
 !$OMP DO reduction(+:dep,ufld,dufld,pot,vir) schedule(guided)
@@ -2918,11 +2912,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -2951,10 +2944,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
@@ -4159,6 +4149,7 @@ c
       integer i,j,k,m
       integer ii,kk,jcell
       integer ix,iy,iz
+      integer it,kt
       real*8 f,pgamma
       real*8 pdi,pti,ddi
       real*8 damp,expdamp
@@ -4506,11 +4497,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -4534,10 +4524,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
@@ -5682,11 +5669,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -5710,10 +5696,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
@@ -7019,6 +7002,7 @@ c
       integer i,j,k,m
       integer ii,kk,kkk
       integer ix,iy,iz
+      integer it,kt
       real*8 f,pgamma
       real*8 pdi,pti,ddi
       real*8 damp,expdamp
@@ -7148,14 +7132,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,pdamp,thole,tholed,pcore,pval,palpha,n12,i12,n13,i13,n14,
-!$OMP& i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,p2scale,
-!$OMP& p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,p5iscale,
-!$OMP& d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,
-!$OMP& w2scale,w3scale,w4scale,w5scale,nelst,elst,dpequal,use_thole,
-!$OMP& use_chgpen,use_chgflx,use_tholed,use_bounds,off2,f,aewald,
-!$OMP& optorder,copm,uopt,uoptp,poltyp,tcgnab,uad,uap,ubd,ubp,xaxis,
-!$OMP& yaxis,zaxis)
+!$OMP& uinp,jpolar,thole,tholed,pdamp,thlval,thdval,pcore,pval,palpha,
+!$OMP& n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
+!$OMP& np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
+!$OMP& p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,u1scale,
+!$OMP& u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,nelst,
+!$OMP& elst,dpequal,use_thole,use_tholed,use_chgpen,use_chgflx,
+!$OMP& use_bounds,off2,f,aewald,optorder,copm,uopt,uoptp,poltyp,
+!$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
 !$OMP DO reduction(+:dep,ufld,dufld,pot,vir) schedule(guided)
@@ -7382,11 +7366,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -7410,10 +7393,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then

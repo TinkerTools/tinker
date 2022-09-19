@@ -206,6 +206,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk,iii
+      integer it,kt
       integer nlist,jcell
       integer list(*)
       real*8 f,pgamma
@@ -569,11 +570,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -602,10 +602,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
@@ -1630,11 +1627,10 @@ c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
                   damp = pdi * pdamp(kk)
+                  it = jpolar(i)
+                  kt = jpolar(k)
                   if (use_tholed) then
-                     pgamma = min(ddi,tholed(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(ddi,tholed(kk))
-                     end if
+                     pgamma = thdval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**(1.5d0)
                         if (damp .lt. 50.0d0) then
@@ -1663,10 +1659,7 @@ c
                         end if
                      end if
                   else
-                     pgamma = min(pti,thole(kk))
-                     if (pgamma .eq. 0.0d0) then
-                        pgamma = max(pti,thole(kk))
-                     end if
+                     pgamma = thlval(it,kt)
                      if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                         damp = pgamma * (r/damp)**3
                         if (damp .lt. 50.0d0) then
