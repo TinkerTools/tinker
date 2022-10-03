@@ -2363,7 +2363,6 @@ c
                   if (ic .ne. ib) then
                      itc = 10*atomic(ic) + n12(ic)
                      if (itc.eq.11 .or. itc.eq.64)  split = .false.
-                     if (itc.eq.63)  split = .false.
                   end if
                end do
             else if (itb.eq.82 .and. ita.eq.64) then
@@ -2372,7 +2371,6 @@ c
                   if (ic .ne. ia) then
                      itc = 10*atomic(ic) + n12(ic)
                      if (itc.eq.11 .or. itc.eq.64)  split = .false.
-                     if (itc.eq.63)  split = .false.
                   end if
                end do
             end if
@@ -2384,12 +2382,14 @@ c
                   ic = i12(i,ib)
                   itc = 10*atomic(ic) + n12(ic)
                   if (itc .eq. 81)  split = .false.
+                  if (aromb)  split = .false. 
                end do
             else if (itb.eq.82 .and. ita.eq.63) then
                do i = 1, n12a
                   ic = i12(i,ia)
                   itc = 10*atomic(ic) + n12(ic)
                   if (itc .eq. 81)  split = .false.
+                  if (aroma)  split = .false.
                end do
             end if
 c
