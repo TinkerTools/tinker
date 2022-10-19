@@ -2382,12 +2382,14 @@ c
                   ic = i12(i,ib)
                   itc = 10*atomic(ic) + n12(ic)
                   if (itc .eq. 81)  split = .false.
+                  if (aromb)  split = .false.
                end do
             else if (itb.eq.82 .and. ita.eq.63) then
                do i = 1, n12a
                   ic = i12(i,ia)
                   itc = 10*atomic(ic) + n12(ic)
                   if (itc .eq. 81)  split = .false.
+                  if (aroma)  split = .false.
                end do
             end if
 c

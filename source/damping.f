@@ -95,7 +95,7 @@ c
          dmpik(j) = 1.0d0
       end do
 c
-c     assign original Thole polarization model damping factors
+c     use original Thole polarization model damping factors
 c
       damp = pdamp(i) * pdamp(k)
       it = jpolar(ipole(i))
@@ -184,7 +184,7 @@ c
             end if
          end if
 c
-c     use original AMOEBA Thole polarization damping factors
+c     use original Thole polarization model damping factors
 c
       else
          it = jpolar(ipole(i))
