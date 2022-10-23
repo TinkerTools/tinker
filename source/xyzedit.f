@@ -34,17 +34,17 @@ c
       use usage
       implicit none
       integer i,j,k,it
-      integer ixyz,imod
       integer init,stop
+      integer ixyz,imod,itmp
       integer nmode,mode
       integer natom,atmnum
-      integer nlist,next
+      integer nlist,next,nask
       integer offset,origin
       integer oldtype,newtype
-      integer freeunit
-      integer trimtext
+      integer freeunit,trimtext
       integer, allocatable :: list(:)
       integer, allocatable :: keep(:)
+      integer, allocatable :: tmptype(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 xcm,ycm,zcm
@@ -65,6 +65,7 @@ c
       character*3 symb
       character*240 xyzfile
       character*240 modfile
+      character*240 tmpfile
       character*240 record
       character*240 string
       external random,merge
@@ -75,9 +76,9 @@ c
       call initial
       opened = .false.
       multi = .false.
-      nmode = 25
+      nmode = 26
       offset = 0
-c     
+c
 c     find the Cartesian coordinates file to be processed
 c
       ixyz = 0
@@ -93,8 +94,8 @@ c
 c
 c     present a list of possible coordinate modifications
 c
-      write (iout,30)
-   30 format (/,' The Tinker XYZ File Editing Utility Can :',
+      write (iout,10)
+   10 format (/,' The Tinker XYZ File Editing Utility Can :',
      &        //,4x,'(1) Offset the Numbers of the Current Atoms',
      &        /,4x,'(2) Remove User Specified Individual Atoms',
      &        /,4x,'(3) Remove User Specified Types of Atoms',
@@ -104,44 +105,45 @@ c
      &        /,4x,'(7) Assign Connectivities for Linear Chain',
      &        /,4x,'(8) Assign Connectivities Based on Distance',
      &        /,4x,'(9) Assign Atom Types for BASIC Force Field',
-     &        /,3x,'(10) Convert Units from Bohrs to Angstroms',
-     &        /,3x,'(11) Invert thru Origin to Give Mirror Image',
-     &        /,3x,'(12) Translate All Atoms by an X,Y,Z-Vector',
-     &        /,3x,'(13) Translate Center of Mass to the Origin',
-     &        /,3x,'(14) Translate a Specified Atom to the Origin',
-     &        /,3x,'(15) Translate and Rotate to Inertial Frame',
-     &        /,3x,'(16) Rotate All Atoms Around a Specified Axis',
-     &        /,3x,'(17) Move to Specified Rigid Body Coordinates',
-     &        /,3x,'(18) Move Stray Molecules into Periodic Box',
-     &        /,3x,'(19) Trim a Periodic Box to a Smaller Size',
-     &        /,3x,'(20) Make Truncated Octahedron from Cubic Box',
-     &        /,3x,'(21) Make Rhombic Dodecahedron from Cubic Box',
-     &        /,3x,'(22) Append a Second XYZ File to Current One',
-     &        /,3x,'(23) Create and Fill a Periodic Boundary Box',
-     &        /,3x,'(24) Soak Current Molecule in Box of Solvent',
-     &        /,3x,'(25) Place Monoatomic Ions around a Solute')
+     &        /,3x,'(10) Transfer Atom Types from Another Structure',
+     &        /,3x,'(11) Convert Units from Bohrs to Angstroms',
+     &        /,3x,'(12) Invert thru Origin to Give Mirror Image',
+     &        /,3x,'(13) Translate All Atoms by an X,Y,Z-Vector',
+     &        /,3x,'(14) Translate Center of Mass to the Origin',
+     &        /,3x,'(15) Translate a Specified Atom to the Origin',
+     &        /,3x,'(16) Translate and Rotate to Inertial Frame',
+     &        /,3x,'(17) Rotate All Atoms Around a Specified Axis',
+     &        /,3x,'(18) Move to Specified Rigid Body Coordinates',
+     &        /,3x,'(19) Move Stray Molecules into Periodic Box',
+     &        /,3x,'(20) Trim a Periodic Box to a Smaller Size',
+     &        /,3x,'(21) Make Truncated Octahedron from Cubic Box',
+     &        /,3x,'(22) Make Rhombic Dodecahedron from Cubic Box',
+     &        /,3x,'(23) Append a Second XYZ File to Current One',
+     &        /,3x,'(24) Create and Fill a Periodic Boundary Box',
+     &        /,3x,'(25) Soak Current Molecule in Box of Solvent',
+     &        /,3x,'(26) Place Monoatomic Ions around a Solute')
 c
 c     get the desired type of coordinate file modification
 c
-   40 continue
+   20 continue
       abort = .false.
       mode = -1
       query = .true.
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=50,end=50)  mode
+         read (string,*,err=30,end=30)  mode
          if (mode.ge.0 .and. mode.le.nmode)  query = .false.
       end if
-   50 continue
+   30 continue
       if (query) then
          do while (mode.lt.0 .or. mode.gt.nmode)
             mode = 0
-            write (iout,60)
-   60       format (/,' Number of the Desired Choice [<Enter>=Exit]',
+            write (iout,40)
+   40       format (/,' Number of the Desired Choice [<Enter>=Exit]',
      &                 ' :  ',$)
-            read (input,70,err=40,end=80)  mode
-   70       format (i10)
-   80       continue
+            read (input,50,err=20,end=60)  mode
+   50       format (i10)
+   60       continue
          end do
       end if
 c
@@ -158,20 +160,20 @@ c
 c     get the offset value to be used in atom renumbering
 c
       if (mode .eq. 1) then
-   90    continue
+   70    continue
          offset = 0
          query = .true.
          call nextarg (string,exist)
          if (exist) then
-            read (string,*,err=100,end=100)  offset
+            read (string,*,err=80,end=80)  offset
             query = .false.
          end if
-  100    continue
+   80    continue
          if (query) then
-            write (iout,110)
-  110       format (/,' Offset used to Renumber the Atoms [0] :  ',$)
-            read (input,120,err=90)  offset
-  120       format (i10)
+            write (iout,90)
+   90       format (/,' Offset used to Renumber the Atoms [0] :  ',$)
+            read (input,100,err=70)  offset
+  100       format (i10)
          end if
          do while (.not. abort)
             call makeref (1)
@@ -186,7 +188,7 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -198,12 +200,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,130)
-  130    format (/,' Numbers of the Atoms to be Removed :  ',$)
-         read (input,140)  record
-  140    format (a240)
-         read (record,*,err=150,end=150)  (list(i),i=1,n)
-  150    continue
+         write (iout,110)
+  110    format (/,' Numbers of the Atoms to be Removed :  ',$)
+         read (input,120)  record
+  120    format (a240)
+         read (record,*,err=130,end=130)  (list(i),i=1,n)
+  130    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -239,7 +241,7 @@ c
          deallocate (list)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -251,12 +253,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,160)
-  160    format (/,' Atom Types to be Removed :  ',$)
-         read (input,170)  record
-  170    format (a240)
-         read (record,*,err=180,end=180)  (list(i),i=1,n)
-  180    continue
+         write (iout,140)
+  140    format (/,' Atom Types to be Removed :  ',$)
+         read (input,150)  record
+  150    format (a240)
+         read (record,*,err=160,end=160)  (list(i),i=1,n)
+  160    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -267,10 +269,10 @@ c
                do j = 1, nlist
                   if (list(j) .eq. it) then
                      call delete (i)
-                     goto 190
+                     goto 170
                   end if
                end do
-  190          continue
+  170          continue
             end do
             call makeref (1)
             call readcart (ixyz,first)
@@ -285,7 +287,7 @@ c
          deallocate (list)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -323,14 +325,14 @@ c
                   zi = z(i)
                   do j = 1, n
                      if (use(j)) then
-                        if (keep(j) .eq. i)  goto 200
+                        if (keep(j) .eq. i)  goto 180
                         dist2 = (x(j)-xi)**2+(y(j)-yi)**2+(z(j)-zi)**2
-                        if (dist2 .le. cut2)  goto 200
+                        if (dist2 .le. cut2)  goto 180
                      end if
                   end do
                   nlist = nlist + 1
                   list(nlist) = i
-  200             continue
+  180             continue
                end if
             end do
             do i = nlist, 1, -1
@@ -350,7 +352,7 @@ c
          deallocate (keep)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -362,12 +364,12 @@ c
          do i = 1, n
             list(i) = 0
          end do
-         write (iout,210)
-  210    format (/,' Numbers of the Atoms to be Inserted :  ',$)
-         read (input,220)  record
-  220    format (a240)
-         read (record,*,err=230,end=230)  (list(i),i=1,n)
-  230    continue
+         write (iout,190)
+  190    format (/,' Numbers of the Atoms to be Inserted :  ',$)
+         read (input,200)  record
+  200    format (a240)
+         read (record,*,err=210,end=210)  (list(i),i=1,n)
+  210    continue
          do while (list(nlist+1) .ne. 0)
             nlist = nlist + 1
          end do
@@ -399,28 +401,28 @@ c
          deallocate (list)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     get an old atom type and new atom type for replacement
 c
       if (mode .eq. 6) then
-  240    continue
+  220    continue
          oldtype = 0
          newtype = 0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=250,end=250)  oldtype
+         if (exist)  read (string,*,err=230,end=230)  oldtype
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=250,end=250)  newtype
-  250    continue
+         if (exist)  read (string,*,err=230,end=230)  newtype
+  230    continue
          if (oldtype.eq.0 .or. newtype.eq.0) then
-            write (iout,260)
-  260       format (/,' Numbers of the Old and New Atom Types :  ',$)
-            read (input,270)  record
-  270       format (a240)
+            write (iout,240)
+  240       format (/,' Numbers of the Old and New Atom Types :  ',$)
+            read (input,250)  record
+  250       format (a240)
          end if
-         read (record,*,err=240,end=240)  oldtype,newtype
+         read (record,*,err=220,end=220)  oldtype,newtype
          do while (.not. abort)
             do i = 1, n
                if (type(i) .eq. oldtype) then
@@ -440,7 +442,7 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -471,7 +473,7 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -526,7 +528,7 @@ c
          deallocate (rad)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
@@ -543,10 +545,10 @@ c
                   do j = 1, maxele
                      if (symb .eq. elemnt(j)) then
                         k = j
-                        goto 280
+                        goto 260
                      end if
                   end do
-  280             continue
+  260             continue
                end if
                type(i) = 10*k + n12(i)
             end do
@@ -562,13 +564,67 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
+         end if
+      end if
+c
+c     transfer atoms types from one structure to another
+c
+      if (mode .eq. 10) then
+         call makeref (1)
+         call nextarg (tmpfile,exist)
+         if (exist) then
+            call basefile (tmpfile)
+            call suffix (tmpfile,'xyz','old')
+            inquire (file=tmpfile,exist=exist)
+         end if
+         nask = 0
+         do while (.not.exist .and. nask.lt.maxask)
+            write (iout,270)
+  270       format (/,' Enter Name of Atom Type Template',
+     &                 ' Structure :  ',$)
+            read (input,280)  tmpfile
+  280       format (a240)
+            call basefile (tmpfile)
+            call suffix (tmpfile,'xyz','old')
+            inquire (file=tmpfile,exist=exist)
+         end do
+         itmp = freeunit ()
+         open (unit=itmp,file=tmpfile,status='old')
+         rewind (unit=itmp)
+         call readxyz (itmp)
+         close (unit=itmp)
+         allocate (tmptype(n))
+         do i = 1, n
+            tmptype(i) = type(i)
+         end do
+         filename = xyzfile
+         call getref (1)
+         do while (.not. abort)
+            do i = 1, n
+               type(i) = tmptype(i)
+            end do
+            call katom
+            call makeref (1)
+            call readcart (ixyz,first)
+            if (.not. abort)  multi = .true.
+            if (multi) then
+               call makeref (2)
+               call getref (1)
+               call prtmod (imod,offset)
+               call getref (2)
+            end if
+         end do
+         deallocate (tmptype)
+         if (.not. multi) then
+            call getref (1)
+            goto 20
          end if
       end if
 c
 c     convert the coordinate units from Bohrs to Angstroms
 c
-      if (mode .eq. 10) then
+      if (mode .eq. 11) then
          do while (.not. abort)
             do i = 1, n
                x(i) = x(i) * bohr
@@ -587,13 +643,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     get mirror image by inverting coordinates through origin
 c
-      if (mode .eq. 11) then
+      if (mode .eq. 12) then
          do while (.not. abort)
             do i = 1, n
                x(i) = -x(i)
@@ -612,13 +668,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     translate the entire system by a specified x,y,z-vector
 c
-      if (mode .eq. 12) then
+      if (mode .eq. 13) then
          xr = 0.0d0
          yr = 0.0d0
          zr = 0.0d0
@@ -655,13 +711,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     translate the center of mass to the coordinate origin
 c
-      if (mode .eq. 13) then
+      if (mode .eq. 14) then
          do while (.not. abort)
             xcm = 0.0d0
             ycm = 0.0d0
@@ -694,13 +750,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     translate to place a specified atom at the origin
 c
-      if (mode .eq. 14) then
+      if (mode .eq. 15) then
          origin = 0
          call nextarg (string,exist)
          if (exist)  read (string,*,err=330,end=330)  origin
@@ -733,13 +789,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     translate and rotate into standard orientation
 c
-      if (mode .eq. 15) then
+      if (mode .eq. 16) then
          do while (.not. abort)
             call inertia (2)
             call makeref (1)
@@ -754,13 +810,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     rotate about a coordinate axis by a specified amount
 c
-      if (mode .eq. 16) then
+      if (mode .eq. 17) then
          axis = ' '
          theta = 0.0d0
          call nextarg (string,exist)
@@ -826,13 +882,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     translate and rotate to specified rigid body coordinates
 c
-      if (mode .eq. 17) then
+      if (mode .eq. 18) then
          xcm = 0.0d0
          ycm = 0.0d0
          zcm = 0.0d0
@@ -901,13 +957,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     move stray molecules back into original periodic box
 c
-      if (mode .eq. 18) then
+      if (mode .eq. 19) then
          do while (.not. abort)
             call unitcell
             if (use_bounds) then
@@ -927,13 +983,13 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     remove molecules to trim periodic box to smaller size
 c
-      if (mode .eq. 19) then
+      if (mode .eq. 20) then
          xnew = 0.0d0
          ynew = 0.0d0
          znew = 0.0d0
@@ -1032,13 +1088,13 @@ c
          deallocate (keep)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     trim cube to truncated octahedron or rhombic dodecahedron
 c
-      if (mode.eq.20 .or. mode.eq.21) then
+      if (mode.eq.21 .or. mode.eq.22) then
          call unitcell
          do while (xbox .eq. 0.0d0)
             write (iout,480)
@@ -1140,13 +1196,13 @@ c
          deallocate (keep)
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     append a second file to the current coordinates file
 c
-      if (mode .eq. 22) then
+      if (mode .eq. 23) then
          append = .false.
          do while (.not. abort)
             call makeref (1)
@@ -1170,25 +1226,25 @@ c
          end do
          if (.not. multi) then
             call getref (1)
-            goto 40
+            goto 20
          end if
       end if
 c
 c     create random box full of the current coordinates file
 c
-      if (mode .eq. 23) then
+      if (mode .eq. 24) then
          call makebox
       end if
 c
 c     solvate the current system by insertion into a solvent box
 c
-      if (mode .eq. 24) then
+      if (mode .eq. 25) then
          call soak
       end if
 c
 c     replace random solvent molecules outside solute with ions
 c
-      if (mode .eq. 25) then
+      if (mode .eq. 26) then
          call molecule
          call addions
       end if
