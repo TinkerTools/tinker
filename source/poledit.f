@@ -262,6 +262,7 @@ c
       logical exist,query
       logical change
       logical noinvert
+      logical planar
       logical pyramid
       character*240 record
       character*240 string
@@ -348,13 +349,14 @@ c
             mac = priority (i,ia,ic,0)
             mbc = priority (i,ib,ic,0)
             mabc = priority (i,ia,ib,ic)
+            planar = (abs(geometry(ic,i,ia,ib)) .gt. 170.0d0)
+            pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
+            pyramid = (pyramid .and. noinvert)
             if (mabc .eq. 0) then
                polaxe(i) = 'None'
                zaxis(i) = 0
                xaxis(i) = 0
                yaxis(i) = 0
-               pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
-               pyramid = (pyramid .and. noinvert)
                if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = '3-Fold'
                   zaxis(i) = ia
@@ -366,17 +368,17 @@ c
                   xaxis(i) = ib
                   yaxis(i) = ic
                end if
-            else if (mab.eq.0 .and. kb.ge.kc) then
+            else if (mab.eq.0 .and. (planar.or.kb.ge.kc)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ib
                yaxis(i) = 0
-            else if (mac.eq.0 .and. ka.ge.kb) then
+            else if (mac.eq.0 .and. (planar.or.ka.ge.kb)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ic
                yaxis(i) = 0
-            else if (mbc.eq.0 .and. kc.ge.ka) then
+            else if (mbc.eq.0 .and. (planar.or.kc.ge.ka)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ib
                xaxis(i) = ic
@@ -386,8 +388,6 @@ c
                zaxis(i) = ia
                xaxis(i) = 0
                yaxis(i) = 0
-               pyramid = (abs(geometry(ia,i,ib,ic)) .lt. 135.0d0)
-               pyramid = (pyramid .and. noinvert)
                if (mbc .eq. ib) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
@@ -416,8 +416,6 @@ c
                zaxis(i) = ib
                xaxis(i) = 0
                yaxis(i) = 0
-               pyramid = (abs(geometry(ib,i,ia,ic)) .lt. 135.0d0)
-               pyramid = (pyramid .and. noinvert)
                if (mac .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
@@ -446,8 +444,6 @@ c
                zaxis(i) = ic
                xaxis(i) = 0
                yaxis(i) = 0
-               pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
-               pyramid = (pyramid .and. noinvert)
                if (mab .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
@@ -3634,8 +3630,8 @@ c     #############################################################
 c
 c
 c     "avgpole" condenses the number of multipole atom types based
-c     upon atoms with equivalent attachments and additional user
-c     specified sets of equivalent atoms
+c     upon atoms equivalent through 1-6 connectivity, and allowing
+c     user modification of sets of equivalent atoms
 c
 c
       subroutine avgpole
@@ -3649,7 +3645,10 @@ c
       implicit none
       integer i,j,k,m
       integer it,mt
-      integer in,jn,ni,nj
+      integer in,jn,kn
+      integer ni,nati
+      integer nj,natj
+      integer k2,k4
       integer size,numtyp
       integer nlist,nave
       integer tmin,tmax
@@ -3663,7 +3662,7 @@ c
       real*8 pave(13)
       logical done,header,exist
       logical query,condense
-      logical match,diff
+      logical keep,match,diff
       logical useframe,symm
       logical yzero,xyzero
       character*1 answer
@@ -3710,53 +3709,85 @@ c
             list(i) = 0
          end do
          do i = 1, n-1
-            ni = n12(i) + n13(i) + n14(i) + n15(i)
+            nati = n12(i) + n13(i) + n14(i) + n15(i)
+            ni = nati
             m = 0
             do k = 1, n12(i)
-               m = m + 1
                in = i12(k,i)
+               m = m + 1
                ci(m) = 2000 + 10*atomic(in) + n12(in)
             end do
             do k = 1, n13(i)
-               m = m + 1
                in = i13(k,i)
+               m = m + 1
                ci(m) = 3000 + 10*atomic(in) + n12(in)
             end do
             do k = 1, n14(i)
-               m = m + 1
                in = i14(k,i)
+               m = m + 1
                ci(m) = 4000 + 10*atomic(in) + n12(in)
             end do
             do k = 1, n15(i)
-               m = m + 1
                in = i15(k,i)
+               m = m + 1
                ci(m) = 5000 + 10*atomic(in) + n12(in)
+            end do
+            do k = 1, n15(i)
+               kn = i15(k,i)
+               do k2 = 1, n12(kn)
+                  in = i12(k2,kn)
+                  keep = .true.
+                  do k4 = 1, n14(i)
+                     if (in .eq. i14(k4,i))  keep = .false.
+                  end do
+                  if (keep) then
+                     ni = ni + 1
+                     m = m + 1
+                     ci(m) = 6000 * 10*atomic(in) + n12(in)
+                  end if
+               end do
             end do
             call sort (ni,ci)
             do j = i+1, n
                if (atomic(i) .eq. atomic(j)) then
-                  nj = n12(j) + n13(j) + n14(j) + n15(j)
-                  if (nj .eq. ni) then
+                  natj = n12(j) + n13(j) + n14(j) + n15(j)
+                  if (natj .eq. nati) then
+                     nj = natj
                      m = 0
                      do k = 1, n12(j)
-                        m = m + 1
                         jn = i12(k,j)
+                        m = m + 1
                         cj(m) = 2000 + 10*atomic(jn) + n12(jn)
                      end do
                      do k = 1, n13(j)
-                        m = m + 1
                         jn = i13(k,j)
+                        m = m + 1
                         cj(m) = 3000 + 10*atomic(jn) + n12(jn)
                      end do
                      do k = 1, n14(j)
-                        m = m + 1
                         jn = i14(k,j)
+                        m = m + 1
                         cj(m) = 4000 + 10*atomic(jn) + n12(jn)
                      end do
                      do k = 1, n15(j)
-                        m = m + 1
                         jn = i15(k,j)
+                        m = m + 1
                         cj(m) = 5000 + 10*atomic(jn) + n12(jn)
+                     end do
+                     do k = 1, n15(j)
+                        kn = i15(k,j)
+                        do k2 = 1, n12(kn)
+                           jn = i12(k2,kn)
+                           keep = .true.
+                           do k4 = 1, n14(j)
+                              if (jn .eq. i14(k4,j))  keep = .false.
+                           end do
+                           if (keep) then
+                              nj = nj + 1
+                              m = m + 1
+                              cj(m) = 6000 * 10*atomic(jn) + n12(jn)
+                           end if
+                        end do
                      end do
                      call sort (nj,cj)
                      match = .true.
