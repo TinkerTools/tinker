@@ -89,6 +89,7 @@ c
 c     get the force field definition and assign atom types
 c
       call attach
+      call active
       call field
       call katom
 c
@@ -294,7 +295,6 @@ c
 c     remove atoms that are inactive and lie outside all cutoffs
 c
       if (mode .eq. 4) then
-         call active
          call cutoffs
          cut2 = 0.0d0
          if (vdwcut .le. 1000.0d0)  cut2 = max(vdwcut**2,cut2)
@@ -425,8 +425,10 @@ c
          read (record,*,err=220,end=220)  oldtype,newtype
          do while (.not. abort)
             do i = 1, n
-               if (type(i) .eq. oldtype) then
-                  type(i) = newtype
+               if (use(i)) then
+                  if (type(i) .eq. oldtype) then
+                     type(i) = newtype
+                  end if
                end if
             end do
             call katom
@@ -602,7 +604,7 @@ c
          call getref (1)
          do while (.not. abort)
             do i = 1, n
-               type(i) = tmptype(i)
+               if (use(i))  type(i) = tmptype(i)
             end do
             call katom
             call makeref (1)
@@ -724,11 +726,13 @@ c
             zcm = 0.0d0
             norm = 0.0d0
             do i = 1, n
-               weigh = mass(i)
-               xcm = xcm + x(i)*weigh
-               ycm = ycm + y(i)*weigh
-               zcm = zcm + z(i)*weigh
-               norm = norm + weigh
+               if (use(i)) then
+                  weigh = mass(i)
+                  xcm = xcm + x(i)*weigh
+                  ycm = ycm + y(i)*weigh
+                  zcm = zcm + z(i)*weigh
+                  norm = norm + weigh
+               end if
             end do
             xcm = xcm / norm
             ycm = ycm / norm

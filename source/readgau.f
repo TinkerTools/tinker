@@ -67,7 +67,7 @@ c
       end if
       do while (.not. exist)
          write (iout,10)
-   10    format (/,' Enter the Name of the Gaussian Output File :  ',$)
+   10    format (/,' Enter the Gaussian Output File Name :  ',$)
          read (input,20)  gaufile
    20    format (a240)
          igau = freeunit ()

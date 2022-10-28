@@ -71,7 +71,7 @@ c
       do while (.not.exist .and. nask.lt.maxask)
          nask = nask + 1
          write (iout,10)
-   10    format (/,' Enter the Coordinate Archive File Name :  ',$)
+   10    format (/,' Enter Coordinate Archive File Name :  ',$)
          read (input,20)  arcfile
    20    format (a240)
          call basefile (arcfile)
@@ -158,7 +158,7 @@ c
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
             write (iout,90)
-   90       format (/,' Enter the Coordinate Archive File Name :  ',$)
+   90       format (/,' Enter Coordinate Archive File Name :  ',$)
             read (input,100)  arcfile
   100       format (a240)
             call basefile (arcfile)
@@ -184,7 +184,7 @@ c
          inquire (file=dcdfile,exist=exist)
          do while (.not. exist)
             write (iout,110)
-  110       format (/,' Enter the DCD Binary Archive File Name :  ',$)
+  110       format (/,' Enter DCD Binary Archive File Name :  ',$)
             read (input,120)  dcdfile
   120       format (a240)
             call basefile (dcdfile)

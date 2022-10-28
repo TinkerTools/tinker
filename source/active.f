@@ -13,7 +13,7 @@ c     ###########################################################
 c
 c
 c     "active" sets the list of atoms that are used during
-c     each potential energy function calculation
+c     coordinate manipulation or potential energy calculations
 c
 c
       subroutine active
