@@ -120,10 +120,10 @@ set(_FILES
     erxnfld1 erxnfld2 erxnfld3 esolv esolv1 esolv2 esolv3 estrbnd
     estrbnd1 estrbnd2 estrbnd3 estrtor estrtor1 estrtor2 estrtor3 etors
     etors1 etors2 etors3 etortor etortor1 etortor2 etortor3 eurey eurey1
-    eurey2 eurey3 evcorr ewald extra extra1 extra2 extra3 faces fatal
-    fft fft3d fftpack field fields files final flatten fracs freeunit
-    freeze geometry getarc getcart getdcd getint getkey getmol getmol2
-    getnumb getpdb getprm getref getstring gettext getword getxyz
+    eurey2 eurey3 evcorr ewald expol extra extra1 extra2 extra3 faces
+    fatal fft fft3d fftpack field fields files final flatten fracs
+    freeunit freeze geometry getarc getcart getdcd getint getkey getmol
+    getmol2 getnumb getpdb getprm getref getstring gettext getword getxyz
     ghmcstep gkstuf gradient gradrgd gradrot group groups grpline gyrate
     hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image impose
     improp imptor induce inertia inform initatom initial initprm initres
