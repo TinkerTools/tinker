@@ -44,6 +44,7 @@ c
       integer idyn,lext
       integer size,next
       integer freeunit
+      integer trimtext
       real*8 dt,eps
       real*8 e,ekt,qterm
       real*8 maxwell,speed
@@ -344,6 +345,8 @@ c
          rewind (unit=idyn)
          call readdyn (idyn)
          close (unit=idyn)
+         write (iout,70)  dynfile(1:trimtext(dynfile))
+   70    format (/,' Restarting Molecular Dynamics Using :  ',a)
 c
 c     set translational velocities for rigid body dynamics
 c
