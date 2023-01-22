@@ -361,7 +361,7 @@ c
    40    format (/,' Lattice Vectors :',
      &           //,3x,'a',3x,3f14.4,
      &           /,3x,'b',3x,3f14.4,
-     &           /,3x,'c',3x,3f14.4,/)
+     &           /,3x,'c',3x,3f14.4)
          if (spacegrp .ne. '          ') then
             value = spacegrp
             call justify (value)

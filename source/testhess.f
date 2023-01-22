@@ -444,7 +444,7 @@ c     write out the full matrix of analytical Hessian elements
 c
          if (doanalyt .and. .not.donumer) then
             ihes = freeunit ()
-            hessfile = filename(1:leng)//'.hes'
+            hessfile = basename(1:leng)//'.hes'
             call version (hessfile,'new')
             open (unit=ihes,file=hessfile,status='new')
             write (iout,360)  hessfile

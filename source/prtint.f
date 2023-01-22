@@ -37,7 +37,7 @@ c     open the output unit if not already done
 c
       inquire (unit=izmt,opened=opened)
       if (.not. opened) then
-         zmtfile = filename(1:leng)//'.int'
+         zmtfile = basename(1:leng)//'.int'
          call version (zmtfile,'new')
          open (unit=izmt,file=zmtfile,status='new')
       end if

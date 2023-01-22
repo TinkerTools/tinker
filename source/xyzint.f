@@ -54,7 +54,7 @@ c
          mode = 1
       else if (answer .eq. 'T') then
          mode = 2
-         intfile = filename(1:leng)//'.int'
+         intfile = basename(1:leng)//'.int'
          call version (intfile,'old')
          inquire (file=intfile,exist=exist)
          if (exist) then

@@ -41,7 +41,7 @@ c     open the output unit if not already done
 c
       inquire (unit=ixyz,opened=opened)
       if (.not. opened) then
-         xyzfile = filename(1:leng)//'.xyz'
+         xyzfile = basename(1:leng)//'.xyz'
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
       end if

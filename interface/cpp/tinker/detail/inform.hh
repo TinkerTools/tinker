@@ -4,6 +4,7 @@
 
 namespace tinker { namespace inform {
 const int maxask = 5;
+extern int& gpucard;
 extern int& digits;
 extern int& iprint;
 extern int& iwrite;
@@ -15,6 +16,7 @@ extern int& holdup;
 extern int& abort;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
+extern "C" int TINKER_MOD(inform, gpucard);
 extern "C" int TINKER_MOD(inform, digits);
 extern "C" int TINKER_MOD(inform, iprint);
 extern "C" int TINKER_MOD(inform, iwrite);
@@ -25,6 +27,7 @@ extern "C" int TINKER_MOD(inform, silent);
 extern "C" int TINKER_MOD(inform, holdup);
 extern "C" int TINKER_MOD(inform, abort);
 
+int& gpucard = TINKER_MOD(inform, gpucard);
 int& digits = TINKER_MOD(inform, digits);
 int& iprint = TINKER_MOD(inform, iprint);
 int& iwrite = TINKER_MOD(inform, iwrite);

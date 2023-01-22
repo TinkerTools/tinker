@@ -27,7 +27,7 @@ c
 c     write the current coordinates to a file after an error
 c
       ierr = freeunit ()
-      errorfile = filename(1:leng)//'.err'
+      errorfile = basename(1:leng)//'.err'
       call version (errorfile,'new')
       open (unit=ierr,file=errorfile,status='new')
       if (coordtype .eq. 'CARTESIAN') then

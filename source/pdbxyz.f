@@ -106,7 +106,7 @@ c
 c     open the Tinker coordinates file to be used for output
 c
       ixyz = freeunit ()
-      xyzfile = filename(1:leng)//'.xyz'
+      xyzfile = basename(1:leng)//'.xyz'
       call version (xyzfile,'new')
       open (unit=ixyz,file=xyzfile,status='new')
 c
@@ -311,7 +311,7 @@ c     write a sequence file for proteins and nucleic acids
 c
       if (biopoly) then
          iseq = freeunit ()
-         seqfile = filename(1:leng)//'.seq'
+         seqfile = basename(1:leng)//'.seq'
          call version (seqfile,'new')
          open (unit=iseq,file=seqfile,status='new')
          call prtseq (iseq)

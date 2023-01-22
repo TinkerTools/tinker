@@ -39,7 +39,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=iseq,opened=opened)
       if (.not. opened) then
-         seqfile = filename(1:leng)//'.seq'
+         seqfile = basename(1:leng)//'.seq'
          call version (seqfile,'old')
          inquire (file=seqfile,exist=exist)
          if (exist) then

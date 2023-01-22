@@ -36,7 +36,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=imdl,opened=opened)
       if (.not. opened) then
-         mdlfile = filename(1:leng)//'.mol'
+         mdlfile = basename(1:leng)//'.mol'
          call version (mdlfile,'old')
          inquire (file=mdlfile,exist=exist)
          if (exist) then

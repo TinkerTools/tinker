@@ -39,7 +39,7 @@ c     open output unit if not already done
 c
       inquire (unit=imol2,opened=opened)
       if (.not. opened) then
-         mol2file = filename(1:leng)//'.mol2'
+         mol2file = basename(1:leng)//'.mol2'
          call version (mol2file,'new')
          open (unit=imol2,file=mol2file,status='new')
       end if

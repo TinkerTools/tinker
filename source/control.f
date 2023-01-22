@@ -36,7 +36,7 @@ c
       debug = .false.
       holdup = .false.
       abort = .false.
-      arcsave = .true.
+      arcsave = .false.
       dcdsave = .false.
       cyclesave = .false.
       noversion = .false.
@@ -84,6 +84,7 @@ c
             dcdsave = .false.
             cyclesave = .false.
          else if (keyword(1:11) .eq. 'SAVE-CYCLE ') then
+            dcdsave = .false.
             cyclesave = .true.
          else if (keyword(1:10) .eq. 'NOVERSION ') then
             noversion = .true.

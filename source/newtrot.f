@@ -111,7 +111,7 @@ c
 c     write out a copy of coordinates for later update
 c
       imin = freeunit ()
-      minfile = filename(1:leng)//'.int'
+      minfile = basename(1:leng)//'.int'
       call version (minfile,'new')
       open (unit=imin,file=minfile,status='new')
       call prtint (imin)

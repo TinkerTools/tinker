@@ -31,9 +31,9 @@ c
       integer start,stop
       integer step,size
       integer nmode,mode
-      integer lext,lengb
       integer leng1,leng2
-      integer now,freeunit
+      integer lext,now
+      integer freeunit
       integer, allocatable :: list(:)
       real*8 xr,yr,zr
       real*8, allocatable :: xold(:)
@@ -44,7 +44,6 @@ c
       character*1 letter
       character*7 ext,modtyp
       character*240 arcfile
-      character*240 basename
       character*240 dcdfile
       character*240 xyzfile
       character*240 record
@@ -142,8 +141,6 @@ c
       if (modtyp .eq. 'CREATE') then
          iarc = freeunit ()
          call basefile (arcfile)
-         basename = arcfile
-         lengb = leng
          call suffix (arcfile,'arc','new')
          open (unit=iarc,file=arcfile,status='new')
 c
@@ -152,8 +149,6 @@ c
       else if (archive) then
          iarc = freeunit ()
          call basefile (arcfile)
-         basename = arcfile
-         lengb = leng
          call suffix (arcfile,'arc','old')
          inquire (file=arcfile,exist=exist)
          do while (.not. exist)
@@ -162,8 +157,6 @@ c
             read (input,100)  arcfile
   100       format (a240)
             call basefile (arcfile)
-            basename = arcfile
-            lengb = leng
             call suffix (arcfile,'arc','old')
             inquire (file=arcfile,exist=exist)
          end do
@@ -178,8 +171,6 @@ c
          idcd = freeunit ()
          dcdfile = arcfile
          call basefile (dcdfile)
-         basename = dcdfile
-         lengb = leng
          call suffix (dcdfile,'dcd','old')
          inquire (file=dcdfile,exist=exist)
          do while (.not. exist)
@@ -188,8 +179,6 @@ c
             read (input,120)  dcdfile
   120       format (a240)
             call basefile (dcdfile)
-            basename = dcdfile
-            lengb = leng
             call suffix (dcdfile,'dcd','old')
             inquire (file=dcdfile,exist=exist)
          end do
@@ -276,20 +265,20 @@ c
             ixyz = freeunit ()
             lext = 3
             call numeral (i,ext,lext)
-            xyzfile = basename(1:lengb)//'.'//ext(1:lext)
+            xyzfile = basename(1:leng)//'.'//ext(1:lext)
             call version (xyzfile,'old')
             inquire (file=xyzfile,exist=exist)
             if (.not.exist .and. i.lt.100) then
                lext = 2
                call numeral (i,ext,lext)
-               xyzfile = basename(1:lengb)//'.'//ext(1:lext)
+               xyzfile = basename(1:leng)//'.'//ext(1:lext)
                call version (xyzfile,'old')
                inquire (file=xyzfile,exist=exist)
             end if
             if (.not.exist .and. i.lt.10) then
                lext = 1
                call numeral (i,ext,lext)
-               xyzfile = basename(1:lengb)//'.'//ext(1:lext)
+               xyzfile = basename(1:leng)//'.'//ext(1:lext)
                call version (xyzfile,'old')
                inquire (file=xyzfile,exist=exist)
             end if
@@ -392,7 +381,7 @@ c
          binary = .true.
          first = .true.
          idcd = freeunit ()
-         dcdfile = filename(1:leng)//'.dcd'
+         dcdfile = basename(1:leng)//'.dcd'
          call version (dcdfile,'new')
          open (unit=idcd,file=dcdfile,form='unformatted',status='new')
          do while (.true.)
@@ -412,7 +401,7 @@ c
          binary = .false.
          first = .true.
          iarc = freeunit ()
-         arcfile = filename(1:leng)//'.arc'
+         arcfile = basename(1:leng)//'.arc'
          call version (arcfile,'new')
          open (unit=iarc,file=arcfile,status='new')
          do while (.true.)
@@ -498,7 +487,7 @@ c
                      use(j) = .true.
                   end do
                   ixyz = freeunit ()
-                  xyzfile = filename(1:leng)//'.'//ext(1:lext)
+                  xyzfile = basename(1:leng)//'.'//ext(1:lext)
                   call version (xyzfile,'new')
                   if (archive) then
                      open (unit=ixyz,file=xyzfile,status='new')

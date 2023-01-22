@@ -32,6 +32,7 @@ extern int TINKER_MOD(boxes, triclinic);
 extern int TINKER_MOD(boxes, octahedron);
 extern int TINKER_MOD(boxes, dodecadron);
 extern int TINKER_MOD(boxes, nonprism);
+extern int TINKER_MOD(boxes, nosymm);
 extern char TINKER_MOD(boxes, spacegrp)[10];
 #ifdef __cplusplus
 }

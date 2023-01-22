@@ -16,50 +16,51 @@ c     "suffix" checks a filename for the presence of an extension,
 c     and appends an extension and version if none is found
 c
 c
-      subroutine suffix (filename,extension,status)
+      subroutine suffix (string,extension,status)
       use ascii
       implicit none
-      integer i,leng,lext
-      integer last,trimtext
+      integer i,k
+      integer leng,lext
+      integer trimtext
       logical exist
       character*1 letter
       character*3 status
-      character*(*) filename
+      character*(*) string
       character*(*) extension
 c
 c
-c     get the length of the current filename
+c     get the full length of the current filename
 c
-      leng = trimtext (filename)
+      leng = trimtext (string)
       lext = trimtext (extension)
 c
 c     check for an extension on the current filename
 c
-      last = leng
+      k = leng
       do i = 1, leng
-         letter = filename(i:i)
-         if (letter .eq. '/')  last = leng
-c        if (letter .eq. '\')  last = leng
-         if (ichar(letter) .eq. backslash)  last = leng
-         if (letter .eq. ']')  last = leng
-         if (letter .eq. ':')  last = leng
-         if (letter .eq. '~')  last = leng
-         if (letter .eq. '.')  last = i - 1
+         letter = string(i:i)
+         if (letter .eq. '/')  k = leng
+c        if (letter .eq. '\')  k = leng
+         if (ichar(letter) .eq. backslash)  k = leng
+         if (letter .eq. ']')  k = leng
+         if (letter .eq. ':')  k = leng
+         if (letter .eq. '~')  k = leng
+         if (letter .eq. '.')  k = i - 1
       end do
 c
 c     append an extension or version as appropriate
 c
-      if (last .eq. leng) then
+      if (k .eq. leng) then
          exist = .false.
          if (leng .ne. 0) then
-            inquire (file=filename(1:leng),exist=exist)
+            inquire (file=string(1:leng),exist=exist)
          end if
          if (.not. exist) then
-            filename = filename(1:leng)//'.'//extension(1:lext)
-            call version (filename,status)
+            string = string(1:leng)//'.'//extension(1:lext)
+            call version (string,status)
          end if
       else if (status .eq. 'new') then
-         call version (filename,status)
+         call version (string,status)
       end if
       return
       end

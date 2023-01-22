@@ -41,7 +41,7 @@ c
 c     open the Protein Data Bank file to be used for output
 c
       ipdb = freeunit ()
-      pdbfile = filename(1:leng)//'.pdb'
+      pdbfile = basename(1:leng)//'.pdb'
       call version (pdbfile,'new')
       open (unit=ipdb,file=pdbfile,status='new')
 c
@@ -156,7 +156,7 @@ c
 c     read the biopolymer sequence file if one exists
 c
       iseq = freeunit ()
-      seqfile = filename(1:leng)//'.seq'
+      seqfile = basename(1:leng)//'.seq'
       call version (seqfile,'old')
       inquire (file=seqfile,exist=exist)
       if (exist) then

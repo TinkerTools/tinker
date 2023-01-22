@@ -110,7 +110,7 @@ c
       iopt = freeunit ()
       if (cyclesave) then
          if (dcdsave) then
-            optfile = filename(1:leng)
+            optfile = basename
             call suffix (optfile,'dcd','old')
             inquire (file=optfile,exist=exist)
             if (exist) then
@@ -123,8 +123,8 @@ c
      &                  status='new')
             end if
             call prtdcd (iopt,first)
-         else if (archive) then
-            optfile = filename(1:leng)
+         else if (arcsave) then
+            optfile = basename
             call suffix (optfile,'arc','old')
             inquire (file=optfile,exist=exist)
             if (exist) then
@@ -135,7 +135,7 @@ c
          else
             lext = 3
             call numeral (ncycle,ext,lext)
-            optfile = filename(1:leng)//'.'//ext(1:lext)
+            optfile = basename(1:leng)//'.'//ext(1:lext)
             call version (optfile,'new')
             open (unit=iopt,file=optfile,status='new')
          end if
@@ -161,19 +161,21 @@ c     save the force vector components for the current step
 c
       if (frcsave .and. coordtype.eq.'CARTESIAN') then
          ifrc = freeunit ()
-         if (archive) then
-            frcfile = filename(1:leng)
-            call suffix (frcfile,'frc','old')
-            inquire (file=frcfile,exist=exist)
-            if (exist) then
-               call openend (ifrc,frcfile)
+         if (cyclesave) then
+            if (arcsave) then
+               frcfile = basename
+               call suffix (frcfile,'frc','old')
+               inquire (file=frcfile,exist=exist)
+               if (exist) then
+                  call openend (ifrc,frcfile)
+               else
+                  open (unit=ifrc,file=frcfile,status='new')
+               end if
             else
+               frcfile = basename(1:leng)//'.'//ext(1:lext)//'f'
+               call version (frcfile,'new')
                open (unit=ifrc,file=frcfile,status='new')
             end if
-         else
-            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
-            call version (frcfile,'new')
-            open (unit=ifrc,file=frcfile,status='new')
          end if
          write (ifrc,10)  n,title(1:ltitle)
    10    format (i6,2x,a)
@@ -190,19 +192,21 @@ c     save the current induced dipole moment at each site
 c
       if (uindsave .and. use_polar .and. coordtype.eq.'CARTESIAN') then
          iind = freeunit ()
-         if (archive) then
-            indfile = filename(1:leng)
-            call suffix (indfile,'uind','old')
-            inquire (file=indfile,exist=exist)
-            if (exist) then
-               call openend (iind,indfile)
+         if (cyclesave) then
+            if (arcsave) then
+               indfile = basename
+               call suffix (indfile,'uind','old')
+               inquire (file=indfile,exist=exist)
+               if (exist) then
+                  call openend (iind,indfile)
+               else
+                  open (unit=iind,file=indfile,status='new')
+               end if
             else
+               indfile = basename(1:leng)//'.'//ext(1:lext)//'u'
+               call version (indfile,'new')
                open (unit=iind,file=indfile,status='new')
             end if
-         else
-            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
-            call version (indfile,'new')
-            open (unit=iind,file=indfile,status='new')
          end if
          write (iind,40)  n,title(1:ltitle)
    40    format (i6,2x,a)
@@ -230,7 +234,7 @@ c
       endfile = 'tinker.end'
       inquire (file=endfile,exist=exist)
       if (.not. exist) then
-         endfile = filename(1:leng)//'.end'
+         endfile = basename(1:leng)//'.end'
          inquire (file=endfile,exist=exist)
          if (exist) then
             iend = freeunit ()

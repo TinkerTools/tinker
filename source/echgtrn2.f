@@ -28,6 +28,7 @@ c
       use hessn
       use mplpot
       use mpole
+      use mutant
       use shunt
       use usage
       implicit none
@@ -54,6 +55,7 @@ c
       real*8 d2e(3,3)
       real*8, allocatable :: mscale(:)
       logical proceed,usei
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -99,6 +101,7 @@ c
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          alphai2 = alphai * alphai
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -119,6 +122,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = 1, npole
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -153,6 +157,13 @@ c
                   e = f * e * mscale(k)
                   dedr = f * dedr * mscale(k)
                   d2edr2 = f * d2edr2 * mscale(k)
+c
+c     apply lambda scaling for interaction annihilation 
+c
+                  if (muti .or. mutk) then
+                     dedr = dedr * elambda
+                     d2edr2 = d2edr2 * elambda
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -247,6 +258,7 @@ c
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             alphai2 = alphai * alphai
             usei = use(i)
+            muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -267,6 +279,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = 1, npole
                k = ipole(kk)
+               mutk = mut(k)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                if (.not. use_intra)  proceed = .true.
@@ -303,6 +316,13 @@ c
                         e = f * e * mscale(k)
                         dedr = f * dedr * mscale(k)
                         d2edr2 = f * d2edr2 * mscale(k)
+c
+c     apply lambda scaling for interaction annihilation 
+c
+                        if (muti .or. mutk) then
+                           dedr = dedr * elambda
+                           d2edr2 = d2edr2 * elambda
+                        end if
 c
 c     use energy switching if near the cutoff distance
 c

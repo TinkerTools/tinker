@@ -310,9 +310,9 @@ c
          nt = nt + 1
          call numeral (i,ext,lext)
          if (mode .eq. 1) then
-            xyzfile = filename(1:leng)//'.'//ext(1:lext)//'v'
+            xyzfile = basename(1:leng)//'.'//ext(1:lext)//'v'
          else if (mode .eq. 2) then
-            xyzfile = filename(1:leng)//'.'//ext(1:lext)
+            xyzfile = basename(1:leng)//'.'//ext(1:lext)
          end if
          inquire (file=xyzfile,exist=exist)
 c

@@ -6,6 +6,7 @@
 extern "C" {
 #endif
 #define TINKER_MOD__maxask 5
+extern int TINKER_MOD(inform, gpucard);
 extern int TINKER_MOD(inform, digits);
 extern int TINKER_MOD(inform, iprint);
 extern int TINKER_MOD(inform, iwrite);

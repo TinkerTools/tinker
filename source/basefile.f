@@ -23,8 +23,8 @@ c
       implicit none
       integer i,k,trimtext
       character*1 letter
-      character*240 string
       character*240 prefix
+      character*(*) string
 c
 c
 c     account for home directory abbreviation in filename
@@ -53,7 +53,11 @@ c        if (letter .eq. '\')  k = leng
          if (letter .eq. '~')  k = leng
          if (letter .eq. '.')  k = i - 1
       end do
+c
+c     set the base filename and length without extension
+c
       leng = min(leng,k)
+      basename = filename(1:leng)
 c
 c     find the length of any directory name prefix
 c

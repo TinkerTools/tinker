@@ -132,12 +132,12 @@ c     save coordinates to archive or numbered structure file
 c
       ixyz = freeunit ()
       if (cyclesave) then
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
+         xyzfile = basename(1:leng)//'.'//ext(1:lext)
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
          call prtxyz (ixyz)
       else if (dcdsave) then
-         xyzfile = filename(1:leng)
+         xyzfile = basename
          call suffix (xyzfile,'dcd','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
@@ -150,8 +150,8 @@ c
      &               status='new')
          end if
          call prtdcd (ixyz,first)
-      else if (archive) then
-         xyzfile = filename(1:leng)
+      else
+         xyzfile = basename
          call suffix (xyzfile,'arc','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
@@ -175,8 +175,12 @@ c     save the velocity vector components at the current step
 c
       if (velsave) then
          ivel = freeunit ()
-         if (archive) then
-            velfile = filename(1:leng)
+         if (cyclesave) then
+            velfile = basename(1:leng)//'.'//ext(1:lext)//'v'
+            call version (velfile,'new')
+            open (unit=ivel,file=velfile,status='new')
+         else
+            velfile = basename
             call suffix (velfile,'vel','old')
             inquire (file=velfile,exist=exist)
             if (exist) then
@@ -184,10 +188,6 @@ c
             else
                open (unit=ivel,file=velfile,status='new')
             end if
-         else
-            velfile = filename(1:leng)//'.'//ext(1:lext)//'v'
-            call version (velfile,'new')
-            open (unit=ivel,file=velfile,status='new')
          end if
          if (integrate .eq. 'RIGIDBODY') then
             write (ivel,190)  ngrp,title(1:ltitle)
@@ -217,8 +217,12 @@ c
       if (frcsave .and. integrate.ne.'RIGIDBODY'
      &       .and. integrate.ne.'RESPA') then
          ifrc = freeunit ()
-         if (archive) then
-            frcfile = filename(1:leng)
+         if (cyclesave) then
+            frcfile = basename(1:leng)//'.'//ext(1:lext)//'f'
+            call version (frcfile,'new')
+            open (unit=ifrc,file=frcfile,status='new')
+         else
+            frcfile = basename
             call suffix (frcfile,'frc','old')
             inquire (file=frcfile,exist=exist)
             if (exist) then
@@ -226,10 +230,6 @@ c
             else
                open (unit=ifrc,file=frcfile,status='new')
             end if
-         else
-            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
-            call version (frcfile,'new')
-            open (unit=ifrc,file=frcfile,status='new')
          end if
          write (ifrc,250)  n,title(1:ltitle)
   250    format (i6,2x,a)
@@ -246,8 +246,12 @@ c     save the current induced dipole moment at each site
 c
       if (uindsave .and. use_polar) then
          iind = freeunit ()
-         if (archive) then
-            indfile = filename(1:leng)
+         if (cyclesave) then
+            indfile = basename(1:leng)//'.'//ext(1:lext)//'u'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+         else
+            indfile = basename
             call suffix (indfile,'uind','old')
             inquire (file=indfile,exist=exist)
             if (exist) then
@@ -255,10 +259,6 @@ c
             else
                open (unit=iind,file=indfile,status='new')
             end if
-         else
-            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
-            call version (indfile,'new')
-            open (unit=iind,file=indfile,status='new')
          end if
          write (iind,280)  n,title(1:ltitle)
   280    format (i6,2x,a)
@@ -279,7 +279,7 @@ c
       endfile = 'tinker.end'
       inquire (file=endfile,exist=exist)
       if (.not. exist) then
-         endfile = filename(1:leng)//'.end'
+         endfile = basename(1:leng)//'.end'
          inquire (file=endfile,exist=exist)
          if (exist) then
             iend = freeunit ()

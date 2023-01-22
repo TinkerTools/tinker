@@ -30,6 +30,7 @@ extern int& triclinic;
 extern int& octahedron;
 extern int& dodecadron;
 extern int& nonprism;
+extern int& nosymm;
 extern char (&spacegrp)[10];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -60,6 +61,7 @@ extern "C" int TINKER_MOD(boxes, triclinic);
 extern "C" int TINKER_MOD(boxes, octahedron);
 extern "C" int TINKER_MOD(boxes, dodecadron);
 extern "C" int TINKER_MOD(boxes, nonprism);
+extern "C" int TINKER_MOD(boxes, nosymm);
 extern "C" char TINKER_MOD(boxes, spacegrp)[10];
 
 double& xbox = TINKER_MOD(boxes, xbox);
@@ -89,6 +91,7 @@ int& triclinic = TINKER_MOD(boxes, triclinic);
 int& octahedron = TINKER_MOD(boxes, octahedron);
 int& dodecadron = TINKER_MOD(boxes, dodecadron);
 int& nonprism = TINKER_MOD(boxes, nonprism);
+int& nosymm = TINKER_MOD(boxes, nosymm);
 char (&spacegrp)[10] = TINKER_MOD(boxes, spacegrp);
 #endif
 } }

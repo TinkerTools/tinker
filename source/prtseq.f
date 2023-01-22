@@ -34,7 +34,7 @@ c     open the output unit if not already done
 c
       inquire (unit=iseq,opened=opened)
       if (.not. opened) then
-         seqfile = filename(1:leng)//'.seq'
+         seqfile = basename(1:leng)//'.seq'
          call version (seqfile,'new')
          open (unit=iseq,file=seqfile,status='new')
       end if

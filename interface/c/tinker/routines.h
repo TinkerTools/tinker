@@ -36,7 +36,7 @@ void altpol0a_();
 #define tinker_f_altpol0a altpol0a_
 void altpol0b_();
 #define tinker_f_altpol0b altpol0b_
-void rotexpl_(double* xr, double* yr, double* zr, double* p33i, double* p33k, double* ks2i, double* ks2k);
+void rotexpl_(double* r, double* xr, double* yr, double* zr, double* p33i, double* p33k, double* ks2i, double* ks2k);
 #define tinker_f_rotexpl rotexpl_
 
 // analysis.f
@@ -270,7 +270,7 @@ void dexpol1a_();
 #define tinker_f_dexpol1a dexpol1a_
 void dexpol1b_();
 #define tinker_f_dexpol1b dexpol1b_
-void rotdexpl_(double* xr, double* yr, double* zr, double* ai, double* ak);
+void rotdexpl_(double* r, double* xr, double* yr, double* zr, double* ai, double* ak);
 #define tinker_f_rotdexpl rotdexpl_
 
 // diagq.f
@@ -2494,9 +2494,9 @@ void trust_(int* n, int* m, double* xc, double* fcnorm, double* gc, double* a, i
 #define tinker_f_trust trust_
 
 // suffix.f
-void suffix_(char* filename, char* extension, char* status, tinker_fchar_len_t filename_cap, tinker_fchar_len_t extension_cap, tinker_fchar_len_t status_cap);
-inline void tinker_f_suffix(tinker_fchars filename, tinker_fchars extension, tinker_fchars status) {
-    return suffix_(filename.string, extension.string, status.string, filename.capacity, extension.capacity, status.capacity);
+void suffix_(char* string, char* extension, char* status, tinker_fchar_len_t string_cap, tinker_fchar_len_t extension_cap, tinker_fchar_len_t status_cap);
+inline void tinker_f_suffix(tinker_fchars string, tinker_fchars extension, tinker_fchars status) {
+    return suffix_(string.string, extension.string, status.string, string.capacity, extension.capacity, status.capacity);
 }
 
 // surface.f
@@ -2606,9 +2606,9 @@ void verlet_(int* istep, double* dt);
 #define tinker_f_verlet verlet_
 
 // version.f
-void version_(char* filename, char* status, tinker_fchar_len_t filename_cap, tinker_fchar_len_t status_cap);
-inline void tinker_f_version(tinker_fchars filename, tinker_fchars status) {
-    return version_(filename.string, status.string, filename.capacity, status.capacity);
+void version_(char* string, char* status, tinker_fchar_len_t string_cap, tinker_fchar_len_t status_cap);
+inline void tinker_f_version(tinker_fchars string, tinker_fchars status) {
+    return version_(string.string, status.string, string.capacity, status.capacity);
 }
 
 // volume.f

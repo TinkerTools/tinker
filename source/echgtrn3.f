@@ -65,6 +65,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use shunt
       use usage
       implicit none
@@ -84,6 +85,7 @@ c
       real*8 taper
       real*8, allocatable :: mscale(:)
       logical proceed,usei
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -135,6 +137,7 @@ c
          alphai = dmpct(ii)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -155,6 +158,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -180,6 +184,12 @@ c
                      e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
+c
+c     apply lambda scaling for interaction annihilation 
+c
+                  if (muti .or. mutk) then
+                     e = e * elambda
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -264,6 +274,7 @@ c
             alphai = dmpct(ii)
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             usei = use(i)
+            muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -284,6 +295,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = i, npole
                k = ipole(kk)
+               mutk = mut(k)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                if (.not. use_intra)  proceed = .true.
@@ -310,6 +322,12 @@ c
                            e = -chgik * expik
                         end if
                         e = f * e * mscale(k)
+c
+c     apply lambda scaling for interaction annihilation 
+c
+                        if (muti .or. mutk) then
+                           e = e * elambda
+                        end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -425,6 +443,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use shunt
       use usage
       implicit none
@@ -449,6 +468,7 @@ c
       real*8, allocatable :: zsort(:)
       logical proceed,usei
       logical unique,repeat
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -517,6 +537,7 @@ c
          alphai = dmpct(ii)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -560,6 +581,7 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 50
             end if
             k = ipole(kk-((kk-1)/npole)*npole)
+            mutk = mut(k)
 c
 c     decide whether to compute the current interaction
 c
@@ -600,6 +622,12 @@ c
                      e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
+c
+c     apply lambda scaling for interaction annihilation 
+c
+                  if (muti .or. mutk) then
+                     e = e * elambda
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c
@@ -716,6 +744,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use neigh
       use shunt
       use usage
@@ -735,6 +764,7 @@ c
       real*8 taper
       real*8, allocatable :: mscale(:)
       logical proceed,usei
+      logical muti,mutk
       logical header,huge
       character*6 mode
 c
@@ -780,8 +810,8 @@ c
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
 !$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,off2,
-!$OMP& cut2,molcule,c0,c1,c2,c3,c4,c5,name,verbose,debug,
-!$OMP& header,iout)
+!$OMP& elambda,mut,cut2,molcule,c0,c1,c2,c3,c4,c5,name,verbose,
+!$OMP& debug,header,iout)
 !$OMP& firstprivate(mscale) shared(ect,nect,aect,einter)
 !$OMP DO reduction(+:ect,nect,aect,einter) schedule(guided)
 c
@@ -796,6 +826,7 @@ c
          alphai = dmpct(ii)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -817,6 +848,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = ipole(kk)
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -842,6 +874,12 @@ c
                      e = -chgik * expik
                   end if
                   e = f * e * mscale(k)
+c
+c     apply lambda scaling for interaction annihilation 
+c
+                  if (muti .or. mutk) then
+                     e = e * elambda
+                  end if
 c
 c     use energy switching if near the cutoff distance
 c

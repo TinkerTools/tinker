@@ -207,7 +207,7 @@ c
 c
 c     write the electrostatic potential to a Tinker POT file
 c
-         potfile = filename(1:leng)
+         potfile = basename(1:leng)
          call suffix (potfile,'pot','new')
          ipot = freeunit ()
          open (unit=ipot,file=potfile,status ='new')
@@ -504,7 +504,7 @@ c     output grid points at which to compute QM potential
 c
       if (dogrid) then
          igrd = freeunit ()
-         gridfile = filename(1:leng)
+         gridfile = basename(1:leng)
          call suffix (gridfile,'grid','new')
          open (unit=igrd,file=gridfile,status='new')
          do j = 1, nconf
@@ -2088,7 +2088,7 @@ c
       if (dofull) then
          if (domodel) then
             ipot = freeunit ()
-            potfile = filename(1:leng)//'.pot'
+            potfile = basename(1:leng)//'.pot'
             call version (potfile,'new')
             open (unit=ipot,file=potfile,status='new')
          end if
@@ -2312,7 +2312,7 @@ c
 c     open a new keyfile to contain the optimized parameters
 c
       ikey = freeunit ()
-      keyfile = filename(1:leng)//'.key'
+      keyfile = basename(1:leng)//'.key'
       call version (keyfile,'new')
       open (unit=ikey,file=keyfile,status='new')
 c

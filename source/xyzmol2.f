@@ -44,7 +44,7 @@ c
 c     open a new version of the Tripos MOL2 file
 c
       imol2 = freeunit ()
-      mol2file = filename(1:leng)//'.mol2'
+      mol2file = basename(1:leng)//'.mol2'
       call version (mol2file,'new')
       open (unit=imol2,file=mol2file,status='new')
 c

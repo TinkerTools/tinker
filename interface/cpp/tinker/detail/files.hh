@@ -6,6 +6,7 @@ namespace tinker { namespace files {
 extern int& nprior;
 extern int& ldir;
 extern int& leng;
+extern char (&basename)[240];
 extern char (&filename)[240];
 extern char (&outfile)[240];
 
@@ -13,12 +14,14 @@ extern char (&outfile)[240];
 extern "C" int TINKER_MOD(files, nprior);
 extern "C" int TINKER_MOD(files, ldir);
 extern "C" int TINKER_MOD(files, leng);
+extern "C" char TINKER_MOD(files, basename)[240];
 extern "C" char TINKER_MOD(files, filename)[240];
 extern "C" char TINKER_MOD(files, outfile)[240];
 
 int& nprior = TINKER_MOD(files, nprior);
 int& ldir = TINKER_MOD(files, ldir);
 int& leng = TINKER_MOD(files, leng);
+char (&basename)[240] = TINKER_MOD(files, basename);
 char (&filename)[240] = TINKER_MOD(files, filename);
 char (&outfile)[240] = TINKER_MOD(files, outfile);
 #endif

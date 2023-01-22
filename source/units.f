@@ -41,7 +41,7 @@ c     is from IUPAC Compendium of Chemical Technology, 2nd Ed. (1997)
 c
 c     The value of "prescon" is based on definition of 1 atmosphere
 c     as 101325 Pa set by the 10th Conference Generale des Poids et
-c     Mesures (1954), where a Pascal (Pa) is equal to a J/m**3
+c     Mesures (Paris, 1954), where a Pascal (Pa) is equal to a J/m**3
 c
 c     avogadro    Avogadro's number (N) in particles/mole
 c     lightspd    speed of light in vacuum (c) in cm/ps

@@ -280,6 +280,9 @@ c
 c     "altelec" constructs mutated electrostatic parameters based
 c     on the lambda mutation parameter "elambda"
 c
+c     note for charge transfer this routine only scales "chgct",
+c     but "dmpct" must also be handled for correct energy scaling
+c
 c
       subroutine altelec
       use angbnd

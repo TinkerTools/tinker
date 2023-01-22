@@ -289,7 +289,7 @@ c     create a name for the vibrational displacement file
 c
          lext = 3
          call numeral (ivib,ext,lext)
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
+         xyzfile = basename(1:leng)//'.'//ext(1:lext)
          ixyz = freeunit ()
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')

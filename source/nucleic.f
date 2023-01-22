@@ -96,7 +96,7 @@ c
 c     write out a nucleic acid sequence file
 c
       iseq = freeunit ()
-      seqfile = filename(1:leng)//'.seq'
+      seqfile = basename(1:leng)//'.seq'
       call version (seqfile,'new')
       open (unit=iseq,file=seqfile,status='new')
       call prtseq (iseq)
@@ -105,7 +105,7 @@ c
 c     write out an internal coordinates file
 c
       izmt = freeunit ()
-      intfile = filename(1:leng)//'.int'
+      intfile = basename(1:leng)//'.int'
       call version (intfile,'new')
       open (unit=izmt,file=intfile,status='new')
       call prtint (izmt)
@@ -114,7 +114,7 @@ c
 c     write out a Cartesian coordinates file
 c
       ixyz = freeunit ()
-      xyzfile = filename(1:leng)//'.xyz'
+      xyzfile = basename(1:leng)//'.xyz'
       call version (xyzfile,'new')
       open (unit=ixyz,file=xyzfile,status='new')
       call prtxyz (ixyz)

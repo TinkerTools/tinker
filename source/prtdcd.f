@@ -66,7 +66,7 @@ c     open the output unit if not already done
 c
       inquire (unit=idcd,opened=opened)
       if (.not. opened) then
-         dcdfile = filename(1:leng)//'.dcd'
+         dcdfile = basename(1:leng)//'.dcd'
          call version (dcdfile,'new')
          open (unit=idcd,file=dcdfile,form='unformatted',status='new')
       end if

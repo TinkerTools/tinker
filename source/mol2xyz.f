@@ -35,7 +35,7 @@ c
 c     write out the Cartesian coordinates file
 c
       ixyz = freeunit ()
-      xyzfile = filename(1:leng)//'.xyz'
+      xyzfile = basename(1:leng)//'.xyz'
       call version (xyzfile,'new')
       open (unit=ixyz,file=xyzfile,status='new')
       call prtxyz (ixyz)

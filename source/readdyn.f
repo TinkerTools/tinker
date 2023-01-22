@@ -36,7 +36,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=idyn,opened=opened)
       if (.not. opened) then
-         dynfile = filename(1:leng)//'.dyn'
+         dynfile = basename(1:leng)//'.dyn'
          call version (dynfile,'old')
          inquire (file=dynfile,exist=exist)
          if (exist) then
