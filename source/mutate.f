@@ -280,8 +280,9 @@ c
 c     "altelec" constructs mutated electrostatic parameters based
 c     on the lambda mutation parameter "elambda"
 c
-c     note for charge transfer this routine only scales "chgct",
-c     but "dmpct" must also be handled for correct energy scaling
+c     note charge transfer electrostatics is not treated by parameter
+c     scaling due to the functional form used, and must be done via
+c     modification of pairwise energy terms in the potential routines
 c
 c
       subroutine altelec
@@ -291,7 +292,6 @@ c
       use cflux
       use charge
       use chgpen
-      use chgtrn
       use dipole
       use mplpot
       use mpole
@@ -355,17 +355,6 @@ c
             if (mut(k)) then
                polarity(i) = polarity(i) * elambda
                if (elambda .eq. 0.0d0)  douind(k) = .false.
-            end if
-         end do
-      end if
-c
-c     set scaled parameters for charge transfer models
-c
-      if (use_chgtrn) then
-         do i = 1, npole
-            k = ipole(i)
-            if (mut(k)) then
-               chgct(i) = chgct(i) * elambda
             end if
          end do
       end if
