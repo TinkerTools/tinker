@@ -142,13 +142,13 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xs)
-      deallocate (ys)
-      deallocate (zs)
+   60 continue
+      if (allocated(xs))  deallocate (xs)
+      if (allocated(ys))  deallocate (ys)
+      if (allocated(zs))  deallocate (zs)
 c
 c     close the input unit if opened by this routine
 c
-   60 continue
       if (.not. opened)  close (unit=idcd)
       return
       end
