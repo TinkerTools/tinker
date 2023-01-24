@@ -239,7 +239,7 @@ c     create and open an output file if using archive mode
 c
       if (archive) then
          ixyz = freeunit ()
-         xyzfile = basename
+         xyzfile = filename(1:leng)
          call suffix (xyzfile,'arc','new')
          open (unit=ixyz,file=xyzfile,status='new')
          close (unit=ixyz)
@@ -270,7 +270,7 @@ c
       call numeral (nmap,ext,lext)
       ixyz = freeunit ()
       if (archive) then
-         xyzfile = basename
+         xyzfile = filename(1:leng)
          call suffix (xyzfile,'arc','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
@@ -279,7 +279,7 @@ c
             open (unit=ixyz,file=xyzfile,status='new')
          end if
       else
-         xyzfile = basename(1:leng)//'.'//ext(1:lext)
+         xyzfile = filename(1:leng)//'.'//ext(1:lext)
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
       end if
@@ -399,7 +399,7 @@ c
             call numeral (nmap,ext,lext)
             ixyz = freeunit ()
             if (archive) then
-               xyzfile = basename
+               xyzfile = filename(1:leng)
                call suffix (xyzfile,'arc','old')
                inquire (file=xyzfile,exist=exist)
                if (exist) then
@@ -408,7 +408,7 @@ c
                   open (unit=ixyz,file=xyzfile,status='new')
                end if
             else
-               xyzfile = basename(1:leng)//'.'//ext(1:lext)
+               xyzfile = filename(1:leng)//'.'//ext(1:lext)
                call version (xyzfile,'new')
                open (unit=ixyz,file=xyzfile,status='new')
             end if

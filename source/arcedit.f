@@ -265,20 +265,20 @@ c
             ixyz = freeunit ()
             lext = 3
             call numeral (i,ext,lext)
-            xyzfile = basename(1:leng)//'.'//ext(1:lext)
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
             call version (xyzfile,'old')
             inquire (file=xyzfile,exist=exist)
             if (.not.exist .and. i.lt.100) then
                lext = 2
                call numeral (i,ext,lext)
-               xyzfile = basename(1:leng)//'.'//ext(1:lext)
+               xyzfile = filename(1:leng)//'.'//ext(1:lext)
                call version (xyzfile,'old')
                inquire (file=xyzfile,exist=exist)
             end if
             if (.not.exist .and. i.lt.10) then
                lext = 1
                call numeral (i,ext,lext)
-               xyzfile = basename(1:leng)//'.'//ext(1:lext)
+               xyzfile = filename(1:leng)//'.'//ext(1:lext)
                call version (xyzfile,'old')
                inquire (file=xyzfile,exist=exist)
             end if
@@ -381,7 +381,7 @@ c
          binary = .true.
          first = .true.
          idcd = freeunit ()
-         dcdfile = basename(1:leng)//'.dcd'
+         dcdfile = filename(1:leng)//'.dcd'
          call version (dcdfile,'new')
          open (unit=idcd,file=dcdfile,form='unformatted',status='new')
          do while (.true.)
@@ -401,7 +401,7 @@ c
          binary = .false.
          first = .true.
          iarc = freeunit ()
-         arcfile = basename(1:leng)//'.arc'
+         arcfile = filename(1:leng)//'.arc'
          call version (arcfile,'new')
          open (unit=iarc,file=arcfile,status='new')
          do while (.true.)
@@ -487,7 +487,7 @@ c
                      use(j) = .true.
                   end do
                   ixyz = freeunit ()
-                  xyzfile = basename(1:leng)//'.'//ext(1:lext)
+                  xyzfile = filename(1:leng)//'.'//ext(1:lext)
                   call version (xyzfile,'new')
                   if (archive) then
                      open (unit=ixyz,file=xyzfile,status='new')
@@ -505,7 +505,7 @@ c
                end do
             else
                ixyz = freeunit ()
-               xyzfile = basename
+               xyzfile = filename(1:leng)
                call suffix (xyzfile,'arc','new')
                if (archive) then
                   open (unit=ixyz,file=xyzfile,status='new')

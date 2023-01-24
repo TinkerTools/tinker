@@ -676,7 +676,7 @@ c     write out the final optimized distance geometry structure
 c
          lext = 3
          call numeral (j,ext,lext)
-         geofile = basename(1:leng)//'.'//ext(1:lext)
+         geofile = filename(1:leng)//'.'//ext(1:lext)
          call version (geofile,'new')
          igeo = freeunit ()
          open (unit=igeo,file=geofile,status='new')

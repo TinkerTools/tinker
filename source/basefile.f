@@ -54,10 +54,9 @@ c        if (letter .eq. '\')  k = leng
          if (letter .eq. '.')  k = i - 1
       end do
 c
-c     set the base filename and length without extension
+c     set the length of the base file name without extension
 c
       leng = min(leng,k)
-      basename = filename(1:leng)
 c
 c     find the length of any directory name prefix
 c

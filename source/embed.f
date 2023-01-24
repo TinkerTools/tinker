@@ -166,7 +166,7 @@ c
             i = i + 1
             lext = 3
             call numeral (i,ext,lext)
-            geofile = basename(1:leng)//'-embed'//'.'//ext(1:lext)
+            geofile = filename(1:leng)//'-embed'//'.'//ext(1:lext)
             inquire (file=geofile,exist=exist)
          end do
          igeo = freeunit ()

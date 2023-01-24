@@ -68,7 +68,7 @@ c
       if (word .eq. 'EXIT') then
          if (changed) then
             izmt = freeunit ()
-            zmtfile = basename(1:leng)//'.int'
+            zmtfile = filename(1:leng)//'.int'
             call version (zmtfile,'new')
             open (unit=izmt,file=zmtfile,status='new')
             call prtint (izmt)

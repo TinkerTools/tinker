@@ -129,7 +129,7 @@ c
       do itrial = 1, ntrial
          lext = 3
          call numeral (itrial,ext,lext)
-         gdafile = basename(1:leng)//'.'//ext(1:lext)
+         gdafile = filename(1:leng)//'.'//ext(1:lext)
          call version (gdafile,'new')
          igda = freeunit ()
          open (unit=igda,file=gdafile,status='new')

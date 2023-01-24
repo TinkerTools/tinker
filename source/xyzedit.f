@@ -153,7 +153,7 @@ c
       if (mode.gt.0 .and. .not.opened) then
          opened = .true.
          imod = freeunit ()
-         modfile = basename(1:leng)//'.xyz'
+         modfile = filename(1:leng)//'.xyz'
          call version (modfile,'new')
          open (unit=imod,file=modfile,status='new')
       end if

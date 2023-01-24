@@ -335,7 +335,7 @@ c
 c
 c     try to restart using prior velocities and accelerations
 c
-      dynfile = basename(1:leng)//'.dyn'
+      dynfile = filename(1:leng)//'.dyn'
       call version (dynfile,'old')
       inquire (file=dynfile,exist=exist)
       if (exist) then
@@ -445,18 +445,18 @@ c
          i = i + 1
          lext = 3
          call numeral (i,ext,lext)
-         dynfile = basename(1:leng)//'.'//ext(1:lext)
+         dynfile = filename(1:leng)//'.'//ext(1:lext)
          inquire (file=dynfile,exist=exist)
          if (.not.exist .and. i.lt.100) then
             lext = 2
             call numeral (i,ext,lext)
-            dynfile = basename(1:leng)//'.'//ext(1:lext)
+            dynfile = filename(1:leng)//'.'//ext(1:lext)
             inquire (file=dynfile,exist=exist)
          end if
          if (.not.exist .and. i.lt.10) then
             lext = 1
             call numeral (i,ext,lext)
-            dynfile = basename(1:leng)//'.'//ext(1:lext)
+            dynfile = filename(1:leng)//'.'//ext(1:lext)
             inquire (file=dynfile,exist=exist)
          end if
       end do

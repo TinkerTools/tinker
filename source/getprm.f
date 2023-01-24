@@ -39,7 +39,7 @@ c
 c     set the default name for the parameter file
 c
       useprm = .true.
-      prmfile = basename(1:leng)//'.prm'
+      prmfile = filename(1:leng)//'.prm'
 c
 c     search the keyword list for the parameter filename
 c

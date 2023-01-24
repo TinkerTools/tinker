@@ -15,7 +15,6 @@ c
 c     nprior     number of previously existing cycle files
 c     ldir       length in characters of the directory name
 c     leng       length in characters of the base filename
-c     basename   base filename used by default for all files
 c     filename   full filename including any extension or version
 c     outfile    output filename used for intermediate results
 c
@@ -24,7 +23,6 @@ c
       implicit none
       integer nprior
       integer ldir,leng
-      character*240 basename
       character*240 filename
       character*240 outfile
       save

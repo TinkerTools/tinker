@@ -46,7 +46,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=izmt,opened=opened)
       if (.not. opened) then
-         intfile = basename(1:leng)//'.int'
+         intfile = filename(1:leng)//'.int'
          open (unit=izmt,file=intfile,status='old')
          rewind (unit=izmt)
          call version (intfile,'old')

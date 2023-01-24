@@ -50,7 +50,7 @@ c     open the output unit if not already done
 c
       inquire (unit=ipdb,opened=opened)
       if (.not. opened) then
-         pdbfile = basename(1:leng)//'.pdb'
+         pdbfile = filename(1:leng)//'.pdb'
          call version (pdbfile,'new')
          open (unit=ipdb,file=pdbfile,status='new')
       end if

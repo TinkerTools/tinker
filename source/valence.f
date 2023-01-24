@@ -3487,7 +3487,7 @@ c
 c     output some definitions and parameters to a keyfile
 c
       ikey = freeunit ()
-      keyfile = basename(1:leng)//'.key'
+      keyfile = filename(1:leng)//'.key'
       call version (keyfile,'new')
       open (unit=ikey,file=keyfile,status='new')
 c

@@ -132,12 +132,12 @@ c     save coordinates to archive or numbered structure file
 c
       ixyz = freeunit ()
       if (cyclesave) then
-         xyzfile = basename(1:leng)//'.'//ext(1:lext)
+         xyzfile = filename(1:leng)//'.'//ext(1:lext)
          call version (xyzfile,'new')
          open (unit=ixyz,file=xyzfile,status='new')
          call prtxyz (ixyz)
       else if (dcdsave) then
-         xyzfile = basename
+         xyzfile = filename(1:leng)
          call suffix (xyzfile,'dcd','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
@@ -151,7 +151,7 @@ c
          end if
          call prtdcd (ixyz,first)
       else
-         xyzfile = basename
+         xyzfile = filename(1:leng)
          call suffix (xyzfile,'arc','old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then
@@ -176,11 +176,11 @@ c
       if (velsave) then
          ivel = freeunit ()
          if (cyclesave) then
-            velfile = basename(1:leng)//'.'//ext(1:lext)//'v'
+            velfile = filename(1:leng)//'.'//ext(1:lext)//'v'
             call version (velfile,'new')
             open (unit=ivel,file=velfile,status='new')
          else
-            velfile = basename
+            velfile = filename(1:leng)
             call suffix (velfile,'vel','old')
             inquire (file=velfile,exist=exist)
             if (exist) then
@@ -218,11 +218,11 @@ c
      &       .and. integrate.ne.'RESPA') then
          ifrc = freeunit ()
          if (cyclesave) then
-            frcfile = basename(1:leng)//'.'//ext(1:lext)//'f'
+            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
             call version (frcfile,'new')
             open (unit=ifrc,file=frcfile,status='new')
          else
-            frcfile = basename
+            frcfile = filename(1:leng)
             call suffix (frcfile,'frc','old')
             inquire (file=frcfile,exist=exist)
             if (exist) then
@@ -247,11 +247,11 @@ c
       if (uindsave .and. use_polar) then
          iind = freeunit ()
          if (cyclesave) then
-            indfile = basename(1:leng)//'.'//ext(1:lext)//'u'
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
          else
-            indfile = basename
+            indfile = filename(1:leng)
             call suffix (indfile,'uind','old')
             inquire (file=indfile,exist=exist)
             if (exist) then
@@ -279,7 +279,7 @@ c
       endfile = 'tinker.end'
       inquire (file=endfile,exist=exist)
       if (.not. exist) then
-         endfile = basename(1:leng)//'.end'
+         endfile = filename(1:leng)//'.end'
          inquire (file=endfile,exist=exist)
          if (exist) then
             iend = freeunit ()

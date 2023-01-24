@@ -40,7 +40,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=imol2,opened=opened)
       if (.not. opened) then
-         mol2file = basename(1:leng)//'.mol2'
+         mol2file = filename(1:leng)//'.mol2'
          call version (mol2file,'old')
          inquire (file=mol2file,exist=exist)
          if (exist) then

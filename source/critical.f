@@ -87,7 +87,7 @@ c
 c     write out a copy of coordinates for later update
 c
       imin = freeunit ()
-      minfile = basename(1:leng)//'.xyz'
+      minfile = filename(1:leng)//'.xyz'
       call version (minfile,'new')
       open (unit=imin,file=minfile,status='new')
       call prtxyz (imin)
@@ -324,7 +324,7 @@ c
       iopt = freeunit ()
       if (cyclesave) then
          if (archive) then
-            optfile = basename(1:leng)
+            optfile = filename(1:leng)
             call suffix (optfile,'arc','old')
             inquire (file=optfile,exist=exist)
             if (exist) then
@@ -335,7 +335,7 @@ c
          else
             lext = 3
             call numeral (niter,ext,lext)
-            optfile = basename(1:leng)//'.'//ext(1:lext)
+            optfile = filename(1:leng)//'.'//ext(1:lext)
             call version (optfile,'new')
             open (unit=iopt,file=optfile,status='new')
          end if
@@ -356,7 +356,7 @@ c
       endfile = 'tinker.end'
       inquire (file=endfile,exist=exist)
       if (.not. exist) then
-         endfile = basename(1:leng)//'.end'
+         endfile = filename(1:leng)//'.end'
          inquire (file=endfile,exist=exist)
          if (exist) then
             iend = freeunit ()

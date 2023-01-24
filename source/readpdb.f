@@ -54,7 +54,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=ipdb,opened=opened)
       if (.not. opened) then
-         pdbfile = basename(1:leng)//'.pdb'
+         pdbfile = filename(1:leng)//'.pdb'
          call version (pdbfile,'old')
          inquire (file=pdbfile,exist=exist)
          if (exist) then

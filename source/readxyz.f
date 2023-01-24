@@ -49,7 +49,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=ixyz,opened=opened)
       if (.not. opened) then
-         xyzfile = basename(1:leng)//'.xyz'
+         xyzfile = filename(1:leng)//'.xyz'
          call version (xyzfile,'old')
          inquire (file=xyzfile,exist=exist)
          if (exist) then

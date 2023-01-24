@@ -118,7 +118,7 @@ c     create and open an output file if using archive mode
 c
       if (archive) then
          ixyz = freeunit ()
-         xyzfile = basename
+         xyzfile = filename(1:leng)
          call suffix (xyzfile,'arc','new')
          open (unit=ixyz,file=xyzfile,status='new')
          close (unit=ixyz)
@@ -141,7 +141,7 @@ c
   110    format (/,' Normal Mode Local Search',7x,'Minimum',i7,/)
          ixyz = freeunit ()
          if (archive) then
-            xyzfile = basename
+            xyzfile = filename(1:leng)
             call suffix (xyzfile,'arc','old')
             open (unit=ixyz,file=xyzfile,status='old')
             do i = 1, niter-1
@@ -150,7 +150,7 @@ c
          else
             lext = 3
             call numeral (niter,ext,lext)
-            xyzfile = basename(1:leng)//'.'//ext(1:lext)
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
             call version (xyzfile,'old')
             open (unit=ixyz,file=xyzfile,status='old')
          end if
@@ -225,7 +225,7 @@ c     write the coordinates of the new minimum to a file
 c
          ixyz = freeunit ()
          if (archive) then
-            xyzfile = basename
+            xyzfile = filename(1:leng)
             call suffix (xyzfile,'arc','old')
             inquire (file=xyzfile,exist=exist)
             if (exist) then
@@ -236,7 +236,7 @@ c
          else
             lext = 3
             call numeral (nmap,ext,lext)
-            xyzfile = basename(1:leng)//'.'//ext(1:lext)
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
             call version (xyzfile,'new')
             open (unit=ixyz,file=xyzfile,status='new')
          end if

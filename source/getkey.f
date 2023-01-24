@@ -57,7 +57,7 @@ c
 c     try to get keyfile from base name of current system
 c
       if (.not. exist) then
-         keyfile = basename(1:leng)//'.key'
+         keyfile = filename(1:leng)//'.key'
          call version (keyfile,'old')
          inquire (file=keyfile,exist=exist)
       end if

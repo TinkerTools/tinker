@@ -37,7 +37,7 @@ c
 c     update an existing restart file or open a new one
 c
       idyn = freeunit ()
-      dynfile = basename(1:leng)//'.dyn'
+      dynfile = filename(1:leng)//'.dyn'
       inquire (file=dynfile,exist=exist)
       if (exist) then
          open (unit=idyn,file=dynfile,status='old')

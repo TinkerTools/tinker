@@ -50,7 +50,7 @@ c     open the input unit if it has not already been done
 c
       inquire (unit=idcd,opened=opened)
       if (.not. opened) then
-         dcdfile = basename(1:leng)//'.dcd'
+         dcdfile = filename(1:leng)//'.dcd'
          call version (dcdfile,'old')
          inquire (file=dcdfile,exist=exist)
          if (exist) then

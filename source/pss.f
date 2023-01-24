@@ -1096,7 +1096,7 @@ c
       lext = 3
       call numeral (i,ext,lext)
       ixyz = freeunit ()
-      xyzfile = basename(1:leng)//'.'//ext(1:lext)
+      xyzfile = filename(1:leng)//'.'//ext(1:lext)
       call version (xyzfile,'new')
       open (unit=ixyz,file=xyzfile,status='new')
       call prtxyz (ixyz)

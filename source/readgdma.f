@@ -45,7 +45,7 @@ c     open the input file if it has not already been done
 c
       inquire (unit=idma,opened=opened)
       if (.not. opened) then
-         dmafile = basename(1:leng)//'.dma'
+         dmafile = filename(1:leng)//'.dma'
          call version (dmafile,'old')
          inquire (file=dmafile,exist=exist)
          if (exist) then

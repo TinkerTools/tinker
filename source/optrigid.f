@@ -72,7 +72,7 @@ c
 c     write out a copy of coordinates for later update
 c
       imin = freeunit ()
-      minfile = basename(1:leng)//'.xyz'
+      minfile = filename(1:leng)//'.xyz'
       call version (minfile,'new')
       open (unit=imin,file=minfile,status='new')
       call prtxyz (imin)

@@ -174,7 +174,7 @@ c
 c     open or create eigenvector file for use during restarts
 c
       ivb1 = freeunit ()
-      datafile = basename(1:leng)//'.vb1'
+      datafile = filename(1:leng)//'.vb1'
       call version (datafile,'old')
       inquire (file=datafile,exist=exist)
       if (exist) then
@@ -186,7 +186,7 @@ c
 c     open or create basis vector file for use during restarts
 c
       ivb2 = freeunit ()
-      datafile = basename(1:leng)//'.vb2'
+      datafile = filename(1:leng)//'.vb2'
       call version (datafile,'old')
       inquire (file=datafile,exist=exist)
       if (exist) then
@@ -264,7 +264,7 @@ c
 c     get number and size of blocks from an external file
 c
       iblock = freeunit ()
-      blockfile = basename(1:leng)//'.blk'
+      blockfile = filename(1:leng)//'.blk'
       call version (blockfile,'old')
       inquire (file=blockfile,exist=exist)
       if (exist) then
@@ -1914,7 +1914,7 @@ c     create a name for the vibrational displacement file
 c
       lext = 3
       call numeral (ivib,ext,lext)
-      xyzfile = basename(1:leng)//'.'//ext(1:lext)
+      xyzfile = filename(1:leng)//'.'//ext(1:lext)
       ixyz = freeunit ()
       call version (xyzfile,'new')
       open (unit=ixyz,file=xyzfile,status='new')
