@@ -15,7 +15,7 @@ c
 c     "mutate" constructs the hybrid hamiltonian for a specified
 c     initial state, final state and mutation parameter "lambda"
 c
-c     note torsional and electrostatics-related terms apply "lambda"
+c     note torsional and most electrostatics terms apply "lambda"
 c     by directly scaling parameters, while vdw and repulsion energy
 c     terms use soft core functions from the references cited below
 c
@@ -76,9 +76,9 @@ c
 c     set defaults for lambda perturbation scaling values
 c
       lambda = 1.0d0
-      tlambda = 1.0d0
       vlambda = 1.0d0
       elambda = 1.0d0
+      tlambda = 1.0d0
 c
 c     set defaults for vdw coupling type and soft core vdw
 c
@@ -108,15 +108,15 @@ c
          if (keyword(1:7) .eq. 'LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  lambda
-         else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
-            string = record(next:240)
-            read (string,*,err=30)  tlambda
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  vlambda
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
+         else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=30)  tlambda
          else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
             vcouple = 1
          else if (keyword(1:7) .eq. 'MUTATE ') then
@@ -179,16 +179,16 @@ c
    30    continue
       end do
 c
-c     scale torsional parameter values based on lambda
-c
-      if (tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
-         if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
-      end if
-c
 c     scale electrostatic parameter values based on lambda
 c
       if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
          call altelec
+      end if
+c
+c     scale torsional parameter values based on lambda
+c
+      if (tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
+         if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
       end if
 c
 c     turn off hybrid potentials if no sites are mutated
@@ -199,73 +199,21 @@ c
 c     write status of current hybrid potential lambda values
 c
       if (use_mutate .and. .not.silent) then
-         write (iout,40)  tlambda
+         write (iout,40)  vlambda
    40    format (/,' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for Torsional Angles')
-         write (iout,50)  vlambda
-   50    format (' Free Energy Perturbation :',f15.3,
      &              ' Lambda for van der Waals')
-         write (iout,60)  elambda
-   60    format (' Free Energy Perturbation :',f15.3,
+         write (iout,50)  elambda
+   50    format (' Free Energy Perturbation :',f15.3,
      &              ' Lambda for Electrostatics')
+         write (iout,60)  tlambda
+   60    format (' Free Energy Perturbation :',f15.3,
+     &              ' Lambda for Torsional Angles')
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (list)
       deallocate (itbnd)
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine alttors  --  mutated torsional parameters  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "alttors" constructs mutated torsional parameters based
-c     on the lambda mutation parameter "tlambda"
-c
-c
-      subroutine alttors (ntbnd,itbnd)
-      use mutant
-      use potent
-      use tors
-      implicit none
-      integer i,j
-      integer ia,ib,ic,id
-      integer kb,kc
-      integer ntbnd
-      integer itbnd(2,*)
-c
-c
-c     set scaled parameters for specified rotatable bonds
-c
-      if (use_tors) then
-         do i = 1, ntors
-            ia = itors(1,i)
-            ib = itors(2,i)
-            ic = itors(3,i)
-            id = itors(4,i)
-            if (mut(ia) .and. mut(ib) .and. mut(ic) .and. mut(id)) then
-               do j = 1, ntbnd
-                  kb = itbnd(1,j)
-                  kc = itbnd(2,j)
-                  if ((kb.eq.ib .and. kc.eq.ic) .or.
-     &                (kb.eq.ic .and. kc.eq.ib)) then
-                     tors1(1,i) = tors1(1,i) * tlambda
-                     tors2(1,i) = tors2(1,i) * tlambda
-                     tors3(1,i) = tors3(1,i) * tlambda
-                     tors4(1,i) = tors4(1,i) * tlambda
-                     tors5(1,i) = tors5(1,i) * tlambda
-                     tors6(1,i) = tors6(1,i) * tlambda
-                  end if
-               end do
-            end if
-         end do
-      end if
       return
       end
 c
@@ -383,6 +331,58 @@ c
                aflx(2,i) = aflx(2,i) * elambda
                abflx(1,i) = abflx(1,i) * elambda
                abflx(2,i) = abflx(2,i) * elambda
+            end if
+         end do
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine alttors  --  mutated torsional parameters  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "alttors" constructs mutated torsional parameters based
+c     on the lambda mutation parameter "tlambda"
+c
+c
+      subroutine alttors (ntbnd,itbnd)
+      use mutant
+      use potent
+      use tors
+      implicit none
+      integer i,j
+      integer ia,ib,ic,id
+      integer kb,kc
+      integer ntbnd
+      integer itbnd(2,*)
+c
+c
+c     set scaled parameters for specified rotatable bonds
+c
+      if (use_tors) then
+         do i = 1, ntors
+            ia = itors(1,i)
+            ib = itors(2,i)
+            ic = itors(3,i)
+            id = itors(4,i)
+            if (mut(ia) .and. mut(ib) .and. mut(ic) .and. mut(id)) then
+               do j = 1, ntbnd
+                  kb = itbnd(1,j)
+                  kc = itbnd(2,j)
+                  if ((kb.eq.ib .and. kc.eq.ic) .or.
+     &                (kb.eq.ic .and. kc.eq.ib)) then
+                     tors1(1,i) = tors1(1,i) * tlambda
+                     tors2(1,i) = tors2(1,i) * tlambda
+                     tors3(1,i) = tors3(1,i) * tlambda
+                     tors4(1,i) = tors4(1,i) * tlambda
+                     tors5(1,i) = tors5(1,i) * tlambda
+                     tors6(1,i) = tors6(1,i) * tlambda
+                  end if
+               end do
             end if
          end do
       end if
