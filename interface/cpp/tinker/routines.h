@@ -1914,10 +1914,10 @@ inline void tinker_f_moments(tinker_fchars mode) {
 // mutate.f
 void mutate_();
 #define tinker_f_mutate mutate_
-void alttors_(int* ntbnd, int* itbnd);
-#define tinker_f_alttors alttors_
 void altelec_();
 #define tinker_f_altelec altelec_
+void alttors_(int* ntbnd, int* itbnd);
+#define tinker_f_alttors alttors_
 
 // nblist.f
 void nblist_();
