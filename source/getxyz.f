@@ -17,6 +17,7 @@ c     then reads in the coordinates file
 c
 c
       subroutine getxyz
+      use files
       use inform
       use iounit
       use output
@@ -53,6 +54,7 @@ c
 c
 c     first open and then read the Cartesian coordinates file
 c
+      filename = xyzfile
       coordtype = 'CARTESIAN'
       ixyz = freeunit ()
       open (unit=ixyz,file=xyzfile,status='old')

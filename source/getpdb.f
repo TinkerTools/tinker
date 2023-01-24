@@ -17,6 +17,7 @@ c     then reads in the coordinates file
 c
 c
       subroutine getpdb
+      use files
       use inform
       use iounit
       implicit none
@@ -52,6 +53,7 @@ c
 c
 c     first open and then read the PDB coordinates file
 c
+      filename = pdbfile
       ipdb = freeunit ()
       open (unit=ipdb,file=pdbfile,status='old')
       rewind (unit=ipdb)

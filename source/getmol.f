@@ -53,6 +53,7 @@ c
 c
 c     first open and then read the MDL MOL coordinates file
 c
+      filename = mdlfile
       imdl = freeunit ()
       open (unit=imdl,file=mdlfile,status='old')
       rewind (unit=imdl)

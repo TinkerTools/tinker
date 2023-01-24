@@ -18,6 +18,7 @@ c
 c
       subroutine getint
       use atoms
+      use files
       use inform
       use iounit
       use output
@@ -55,6 +56,7 @@ c
 c
 c     first open and then read the internal coordinates file
 c
+      filename = intfile
       coordtype = 'INTERNAL'
       izmt = freeunit ()
       open (unit=izmt,file=intfile,status='old')

@@ -57,6 +57,7 @@ c
 c
 c     get file format type by inspection of first character
 c
+      filename = xyzfile
       coordtype = 'CARTESIAN'
       ixyz = freeunit ()
       open (unit=ixyz,file=xyzfile,status='old')

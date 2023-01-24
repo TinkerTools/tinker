@@ -53,6 +53,7 @@ c
 c
 c     first open and then read the Tripos MOL2 coordinates file
 c
+      filename = mol2file
       imol2 = freeunit ()
       open (unit=imol2,file=mol2file,status='old')
       rewind (unit=imol2)

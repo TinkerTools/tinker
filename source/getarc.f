@@ -57,6 +57,7 @@ c
 c
 c     open file the file and read the first set of coordinates
 c
+      filename = arcfile
       coordtype = 'CARTESIAN'
       iarc = freeunit ()
       open (unit=iarc,file=arcfile,status='old')

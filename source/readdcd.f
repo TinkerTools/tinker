@@ -81,11 +81,23 @@ c
          title(1:80) = info(1)
       end if
 c
+c     quit if the binary DCD file was not parsed correctly
+c
+      abort = .false.
+   20 continue
+      if (abort) then
+         write (iout,30)
+   30    format (/,' READDCD  --  Error Reading Header from',
+     &              ' Binary DCD File')
+         call fatal
+      end if
+c
 c     read the lattice values based on header flag value
 c
+      abort = .true.
       if (use_bounds) then
          call unitcell
-         read (idcd,err=40,end=40)  xbox,gamma_cos,ybox,beta_cos,
+         read (idcd,err=40,end=60)  xbox,gamma_cos,ybox,beta_cos,
      &                              alpha_cos,zbox
          alpha = 90.0d0
          beta = 90.0d0
@@ -104,19 +116,19 @@ c
 c
 c     read the atomic coordinates along each axis in turn
 c
-      read (idcd,err=40,end=40)  (xs(i),i=1,n)
+      abort = .true.
+      read (idcd,err=40,end=60)  (xs(i),i=1,n)
       read (idcd,err=40,end=40)  (ys(i),i=1,n)
       read (idcd,err=40,end=40)  (zs(i),i=1,n)
 c
 c     quit if the binary DCD file was not parsed correctly
 c
       abort = .false.
-   20 continue
+   40 continue
       if (abort) then
-         write (iout,30)
-   30    format (/,' READDCD  --  Error Reading Header from',
+         write (iout,50)
+   50    format (/,' READDCD  --  Error Reading Coordinates from',
      &              ' Binary DCD File')
-
          call fatal
       end if
 c
@@ -136,7 +148,7 @@ c
 c
 c     close the input unit if opened by this routine
 c
-   40 continue
+   60 continue
       if (.not. opened)  close (unit=idcd)
       return
       end

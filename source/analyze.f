@@ -272,6 +272,7 @@ c
 c     attempt to read next structure from the coordinate file
 c
          nold = n
+         first = .false.
          call readcart (ixyz,first)
       end do
 c

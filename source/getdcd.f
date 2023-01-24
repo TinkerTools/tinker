@@ -18,6 +18,7 @@ c     set of DCD coordinates
 c
 c
       subroutine getdcd (idcd)
+      use files
       use inform
       use iounit
       use output
@@ -88,6 +89,9 @@ c
 c
 c     next read the initial set of coordinates from the DCD file
 c
+      archive = .false.
+      binary = .true.
+      filename = dcdfile
       idcd = freeunit ()
       open (unit=idcd,file=dcdfile,form='unformatted',status='old')
       rewind (unit=idcd)
