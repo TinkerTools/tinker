@@ -47,6 +47,9 @@ c
 c
 c     determine the general periodic boundary lattice type
 c
+         orthogonal = .false.
+         monoclinic = .false.
+         triclinic = .false.
          if (nosymm) then
             triclinic = .true.
          else if (alpha.eq.90.0d0 .and. beta.eq.90.0d0
