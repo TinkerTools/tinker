@@ -99,7 +99,7 @@ c
 c     set relative volume change for finite-differences
 c
       if (.not. use_bounds)  return
-      eps = 0.000001d0
+      eps = 0.00003d0
 c
 c     set prism lattice type to the general triclinic case
 c
