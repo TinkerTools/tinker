@@ -584,7 +584,7 @@ c
                end if
                if (use_mpole) then
                   call chkpole
-                  call rotpole
+                  call rotpole (pole,rpole)
                end if
                if (use_polar) then
                   domlst = .true.
@@ -724,7 +724,7 @@ c
             call prmvar (nvar,xx)
             if (use_mpole) then
                call chkpole
-               call rotpole
+               call rotpole (pole,rpole)
             end if
             if (use_polar) then
                domlst = .true.
@@ -1323,7 +1323,7 @@ c
          call getref (j)
          call setelect
          call varprm (nvar,xx)
-         if (use_mpole)  call rotpole
+         if (use_mpole)  call rotpole (pole,rpole)
          if (use_polar) then
             domlst = .true.
             doulst = .true.
@@ -1599,7 +1599,7 @@ c     check chiral multipoles and rotate into global frame
 c
       if (use_mpole) then
          call chkpole
-         call rotpole
+         call rotpole (pole,rpole)
       end if
 c
 c     modify partial charges and monopoles for charge flux

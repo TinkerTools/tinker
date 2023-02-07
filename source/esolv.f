@@ -23,6 +23,7 @@ c
       use energi
       use limits
       use math
+      use mpole
       use potent
       use solpot
       use solute
@@ -102,7 +103,7 @@ c
       if (solvtyp(1:2) .eq. 'GK') then
          if (.not.use_mpole .and. .not.use_polar) then
             call chkpole
-            call rotpole
+            call rotpole (pole,rpole)
             call induce
          end if
          call egk
@@ -495,6 +496,7 @@ c     solvation free energy for the GK/NP implicit solvation model
 c
 c
       subroutine egk
+      use mpole
       use potent
       implicit none
 c
@@ -503,7 +505,7 @@ c     setup the multipoles for solvation only calculations
 c
       if (.not. use_mpole) then
           call chkpole
-          call rotpole
+          call rotpole (pole,rpole)
       end if
       if (.not. use_polar) then
          call induce
@@ -1457,7 +1459,7 @@ c
       real*8 xi,yi,zi
       real*8 rk,sk,sk2
       real*8 xr,yr,zr,r,r2
-      real*8 sum,term,iwca,irep
+      real*8 sum,term,iwca,irepl
       real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
@@ -1553,8 +1555,8 @@ c
      &                      * (120.0d0*uik*lik*r*(uik11-lik11)
      &                         - 66.0d0*uik2*lik2*(uik10-lik10)
      &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     irep = ao * rmixo7 * term
-                     sum = sum + irep + idisp
+                     irepl = ao * rmixo7 * term
+                     sum = sum + irepl + idisp
                   end if
                end if
                if (rih .lt. r+sk) then
@@ -1600,8 +1602,8 @@ c
      &                      * (120.0d0*uik*lik*r*(uik11-lik11)
      &                         - 66.0d0*uik2*lik2*(uik10-lik10)
      &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     irep = 2.0d0 * ah * rmixh7 * term
-                     sum = sum + irep + idisp
+                     irepl = 2.0d0 * ah * rmixh7 * term
+                     sum = sum + irepl + idisp
                   end if
                end if
             end if

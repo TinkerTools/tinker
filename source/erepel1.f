@@ -140,7 +140,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (repole,rrepole)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -163,24 +163,24 @@ c
 c
 c     calculate the Pauli repulsion energy and derivatives
 c
-      do ii = 1, npole-1
-         i = ipole(ii)
+      do ii = 1, nrep-1
+         i = irep(ii)
          xi = x(i)
          yi = y(i)
          zi = z(i)
          sizi = sizpr(ii)
          dmpi = dmppr(ii)
          vali = elepr(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rrepole(1,ii)
+         dix = rrepole(2,ii)
+         diy = rrepole(3,ii)
+         diz = rrepole(4,ii)
+         qixx = rrepole(5,ii)
+         qixy = rrepole(6,ii)
+         qixz = rrepole(7,ii)
+         qiyy = rrepole(9,ii)
+         qiyz = rrepole(10,ii)
+         qizz = rrepole(13,ii)
          usei = use(i)
          muti = mut(i)
 c
@@ -201,8 +201,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kk = ii+1, npole
-            k = ipole(kk)
+         do kk = ii+1, nrep
+            k = irep(kk)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -219,16 +219,16 @@ c
                   sizk = sizpr(kk)
                   dmpk = dmppr(kk)
                   valk = elepr(kk)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
+                  ck = rrepole(1,kk)
+                  dkx = rrepole(2,kk)
+                  dky = rrepole(3,kk)
+                  dkz = rrepole(4,kk)
+                  qkxx = rrepole(5,kk)
+                  qkxy = rrepole(6,kk)
+                  qkxz = rrepole(7,kk)
+                  qkyy = rrepole(9,kk)
+                  qkyz = rrepole(10,kk)
+                  qkzz = rrepole(13,kk)
 c
 c     intermediates involving moments and separation distance
 c
@@ -523,24 +523,24 @@ c
 c
 c     calculate interaction components with other unit cells
 c
-         do ii = 1, npole
-            i = ipole(ii)
+         do ii = 1, nrep
+            i = irep(ii)
             xi = x(i)
             yi = y(i)
             zi = z(i)
             sizi = sizpr(ii)
             dmpi = dmppr(ii)
             vali = elepr(ii)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
+            ci = rrepole(1,ii)
+            dix = rrepole(2,ii)
+            diy = rrepole(3,ii)
+            diz = rrepole(4,ii)
+            qixx = rrepole(5,ii)
+            qixy = rrepole(6,ii)
+            qixz = rrepole(7,ii)
+            qiyy = rrepole(9,ii)
+            qiyz = rrepole(10,ii)
+            qizz = rrepole(13,ii)
             usei = use(i)
             muti = mut(i)
 c
@@ -561,8 +561,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            do kk = ii, npole
-               k = ipole(kk)
+            do kk = ii, nrep
+               k = irep(kk)
                mutk = mut(k)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -580,16 +580,16 @@ c
                         sizk = sizpr(kk)
                         dmpk = dmppr(kk)
                         valk = elepr(kk)
-                        ck = rpole(1,kk)
-                        dkx = rpole(2,kk)
-                        dky = rpole(3,kk)
-                        dkz = rpole(4,kk)
-                        qkxx = rpole(5,kk)
-                        qkxy = rpole(6,kk)
-                        qkxz = rpole(7,kk)
-                        qkyy = rpole(9,kk)
-                        qkyz = rpole(10,kk)
-                        qkzz = rpole(13,kk)
+                        ck = rrepole(1,kk)
+                        dkx = rrepole(2,kk)
+                        dky = rrepole(3,kk)
+                        dkz = rrepole(4,kk)
+                        qkxx = rrepole(5,kk)
+                        qkxy = rrepole(6,kk)
+                        qkxz = rrepole(7,kk)
+                        qkyy = rrepole(9,kk)
+                        qkyz = rrepole(10,kk)
+                        qkzz = rrepole(13,kk)
 c
 c     intermediates involving moments and separation distance
 c
@@ -891,8 +891,8 @@ c
 c
 c     resolve site torques then increment forces and virial
 c
-      do ii = 1, npole
-         i = ipole(ii)
+      do ii = 1, nrep
+         i = irep(ii)
          call torque (ii,ter(1,i),fix,fiy,fiz,der)
          iz = zaxis(ii)
          ix = xaxis(ii)
@@ -1039,7 +1039,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (repole,rrepole)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1063,7 +1063,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,sizpr,dmppr,elepr,rpole,n12,i12,
+!$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
 !$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,
 !$OMP& vlambda,mut,cut2,off2,xaxis,yaxis,zaxis,c0,c1,c2,c3,c4,c5)
@@ -1072,24 +1072,24 @@ c
 c
 c     calculate the Pauli repulsion energy and derivatives
 c
-      do ii = 1, npole
-         i = ipole(ii)
+      do ii = 1, nrep
+         i = irep(ii)
          xi = x(i)
          yi = y(i)
          zi = z(i)
          sizi = sizpr(ii)
          dmpi = dmppr(ii)
          vali = elepr(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rrepole(1,ii)
+         dix = rrepole(2,ii)
+         diy = rrepole(3,ii)
+         diz = rrepole(4,ii)
+         qixx = rrepole(5,ii)
+         qixy = rrepole(6,ii)
+         qixz = rrepole(7,ii)
+         qiyy = rrepole(9,ii)
+         qiyz = rrepole(10,ii)
+         qizz = rrepole(13,ii)
          usei = use(i)
          muti = mut(i)
 c
@@ -1112,7 +1112,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
-            k = ipole(kk)
+            k = irep(kk)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -1129,16 +1129,16 @@ c
                   sizk = sizpr(kk)
                   dmpk = dmppr(kk)
                   valk = elepr(kk)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
+                  ck = rrepole(1,kk)
+                  dkx = rrepole(2,kk)
+                  dky = rrepole(3,kk)
+                  dkz = rrepole(4,kk)
+                  qkxx = rrepole(5,kk)
+                  qkxy = rrepole(6,kk)
+                  qkxz = rrepole(7,kk)
+                  qkyy = rrepole(9,kk)
+                  qkyz = rrepole(10,kk)
+                  qkzz = rrepole(13,kk)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1433,8 +1433,8 @@ c
 c
 c     resolve site torques then increment forces and virial
 c
-      do ii = 1, npole
-         i = ipole(ii)
+      do ii = 1, nrep
+         i = irep(ii)
          call torque (ii,ter(1,i),fix,fiy,fiz,der)
          iz = zaxis(ii)
          ix = xaxis(ii)

@@ -152,7 +152,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1120,7 +1120,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1697,7 +1697,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     compute the real space part of the Ewald summation
 c
@@ -2861,7 +2861,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     compute the real space part of the Ewald summation
 c

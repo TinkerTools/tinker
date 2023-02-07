@@ -126,7 +126,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      if (.not. use_mpole)  call rotpole (pole,rpole)
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -636,7 +636,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      if (.not. use_mpole)  call rotpole (pole,rpole)
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -945,7 +945,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      if (.not. use_mpole)  call rotpole (pole,rpole)
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1616,7 +1616,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      if (.not. use_mpole)  call rotpole (pole,rpole)
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2066,7 +2066,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole
+      if (.not. use_mpole)  call rotpole (pole,rpole)
 c
 c     compute the induced dipoles at each polarizable atom
 c

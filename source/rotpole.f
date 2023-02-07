@@ -16,11 +16,13 @@ c     "rotpole" constructs the global atomic multipoles by applying
 c     a rotation matrix to convert from local to global frame
 c
 c
-      subroutine rotpole
+      subroutine rotpole (inpole,outpole)
       use mpole
       implicit none
       integer i
       real*8 a(3,3)
+      real*8 inpole(maxpole,*)
+      real*8 outpole(maxpole,*)
       logical planar
 c
 c
@@ -28,7 +30,7 @@ c     rotate the atomic multipoles at each site in turn
 c
       do i = 1, npole
          call rotmat (i,a,planar)
-         call rotsite (i,a,planar)
+         call rotsite (i,a,planar,inpole,outpole)
       end do
       return
       end
@@ -45,11 +47,13 @@ c     "rotrpole" constructs the local atomic multipoles by applying
 c     a rotation matrix to convert from global to local frame
 c
 c
-      subroutine rotrpole
+      subroutine rotrpole (inpole,outpole)
       use mpole
       implicit none
       integer i
       real*8 a(3,3)
+      real*8 inpole(maxpole,*)
+      real*8 outpole(maxpole,*)
       logical planar
 c
 c
@@ -58,7 +62,8 @@ c
       do i = 1, npole
          call rotmat (i,a,planar)
          call invert (3,a)
-         call rotrsite (i,a)
+         planar = .false.
+         call rotsite (i,a,planar,inpole,outpole)
       end do
       return
       end
@@ -336,18 +341,18 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine rotsite  --  rotate multipole site to global  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine rotsite  --  rotate input multipoles to final  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "rotsite" rotates atomic multipoles from the local to global
+c     "rotsite" rotates atomic multipoles from the input to final
 c     frame at a specified site by applying a rotation matrix
 c
 c
-      subroutine rotsite (isite,a,planar)
+      subroutine rotsite (isite,a,planar,inpole,outpole)
       use atoms
       use mpole
       implicit none
@@ -357,13 +362,15 @@ c
       real*8 a(3,3)
       real*8 mp(3,3)
       real*8 rp(3,3)
+      real*8 inpole(maxpole,*)
+      real*8 outpole(maxpole,*)
       logical planar
 c
 c
-c     copy local frame multipoles and make any needed changes
+c     copy input multipoles and make needed changes
 c
       do i = 1, 13
-         spole(i) = pole(i,isite)
+         spole(i) = inpole(i,isite)
       end do
       if (planar) then
          if (polaxe(i) .eq. 'Z-Bisect') then
@@ -379,20 +386,20 @@ c
          end if
       end if
 c
-c     monopoles have the same value in any coordinate frame
+c     monopoles are the same in any coordinate frame
 c
-      rpole(1,isite) = spole(1)
+      outpole(1,isite) = spole(1)
 c
-c     rotate the dipoles to the global coordinate frame
+c     rotate input dipoles to the final coordinate frame
 c
       do i = 2, 4
-         rpole(i,isite) = 0.0d0
+         outpole(i,isite) = 0.0d0
          do j = 2, 4
-            rpole(i,isite) = rpole(i,isite) + spole(j)*a(i-1,j-1)
+            outpole(i,isite) = outpole(i,isite) + spole(j)*a(i-1,j-1)
          end do
       end do
 c
-c     rotate the quadrupoles to the global coordinate frame
+c     rotate input quadrupoles to the final coordinate frame
 c
       k = 5
       do i = 1, 3
@@ -418,83 +425,7 @@ c
       k = 5
       do i = 1, 3
          do j = 1, 3
-            rpole(k,isite) = rp(i,j)
-            k = k + 1
-         end do
-      end do
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine rotrsite  --  rotate multipole site to local  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "rotrsite" rotates atomic multipoles from the global to local
-c     frame at a specified site by applying a rotation matrix
-c
-c
-      subroutine rotrsite (isite,a)
-      use atoms
-      use mpole
-      implicit none
-      integer i,j,k,m
-      integer isite
-      real*8 spole(13)
-      real*8 a(3,3)
-      real*8 mp(3,3)
-      real*8 rp(3,3)
-c
-c
-c     copy global frame multipoles and make any needed changes
-c
-      do i = 1, 13
-         spole(i) = rpole(i,isite)
-      end do
-c
-c     monopoles have the same value in any coordinate frame
-c
-      pole(1,isite) = spole(1)
-c
-c     rotate the dipoles to the global coordinate frame
-c
-      do i = 2, 4
-         pole(i,isite) = 0.0d0
-         do j = 2, 4
-            pole(i,isite) = pole(i,isite) + spole(j)*a(i-1,j-1)
-         end do
-      end do
-c
-c     rotate the quadrupoles to the global coordinate frame
-c
-      k = 5
-      do i = 1, 3
-         do j = 1, 3
-            mp(i,j) = spole(k)
-            rp(i,j) = 0.0d0
-            k = k + 1
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            if (j .lt. i) then
-               rp(i,j) = rp(j,i)
-            else
-               do k = 1, 3
-                  do m = 1, 3
-                     rp(i,j) = rp(i,j) + a(i,k)*a(j,m)*mp(k,m)
-                  end do
-               end do
-            end if
-         end do
-      end do
-      k = 5
-      do i = 1, 3
-         do j = 1, 3
-            pole(k,isite) = rp(i,j)
+            outpole(k,isite) = rp(i,j)
             k = k + 1
          end do
       end do

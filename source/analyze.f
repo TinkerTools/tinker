@@ -28,12 +28,13 @@ c
       use output
       implicit none
       integer i,j,ixyz
-      integer frame,nold
-      integer size
+      integer frame
+      integer nlist,nold
       integer freeunit
       integer trimtext
       integer, allocatable :: list(:)
       real*8 energy
+      real*8, allocatable :: told(:)
       real*8, allocatable :: derivs(:,:)
       logical dosystem,doparam
       logical doenergy,doatom
@@ -110,18 +111,19 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      size = 40
-      allocate (list(size))
+      nlist = 40
+      allocate (list(nlist))
       allocate (active(n))
+      allocate (told(n))
 c
 c     get the list of atoms for which output is desired
 c
       if (doatom .or. doparam .or. doconect) then
-         do i = 1, size
+         do i = 1, nlist
             list(i) = 0
          end do
          if (exist) then
-            do i = 1, size
+            do i = 1, nlist
                call nextarg (string,exist)
                if (.not. exist)  goto 50
                read (string,*,err=50,end=50)  list(i)
@@ -137,7 +139,7 @@ c
      &                 ' [ALL] :  '/,'    >  ',$)
             read (input,70)  record
    70       format (a240)
-            read (record,*,err=80,end=80)  (list(i),i=1,size)
+            read (record,*,err=80,end=80)  (list(i),i=1,nlist)
    80       continue
          end if
          do i = 1, n
@@ -222,7 +224,17 @@ c
          if (frame .gt. 1) then
             write (iout,90)  frame
    90       format (/,' Analysis for Archive Structure :',8x,i8)
-            if (nold .ne. n)  call mechanic
+            if (nold .ne. n) then
+               call mechanic
+            else
+               do i = 1, n
+                  if (type(i) .ne. told(i)) then
+                     call mechanic
+                     goto 100
+                  end if
+               end do
+  100          continue
+            end if
          end if
 c
 c     get info on the molecular system and force field
@@ -271,7 +283,14 @@ c
 c
 c     attempt to read next structure from the coordinate file
 c
+         if (size(told) .lt. n) then
+            deallocate (told)
+            allocate (told(n))
+         end if
          nold = n
+         do i = 1, nold
+            told(i) = type(i)
+         end do
          first = .false.
          call readcart (ixyz,first)
       end do
@@ -280,6 +299,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (list)
       deallocate (active)
+      deallocate (told)
 c
 c     perform any final tasks before program exit
 c

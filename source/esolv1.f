@@ -24,6 +24,7 @@ c
       use energi
       use limits
       use math
+      use mpole
       use potent
       use solpot
       use solute
@@ -119,7 +120,7 @@ c
       if (solvtyp(1:2) .eq. 'GK') then
          if (.not.use_mpole .and. .not.use_polar) then
             call chkpole
-            call rotpole
+            call rotpole (pole,rpole)
             call induce
          end if
          call egk1
@@ -716,6 +717,7 @@ c
       subroutine egk1
       use energi
       use limits
+      use mpole
       use potent
 c
 c
@@ -723,7 +725,7 @@ c     setup the multipoles for solvation only calculations
 c
       if (.not. use_mpole) then
           call chkpole
-          call rotpole
+          call rotpole (pole,rpole)
       end if
       if (.not. use_polar) then
          call induce
@@ -4743,8 +4745,7 @@ c
       real*8 rk,sk,sk2
       real*8 xr,yr,zr
       real*8 r,r2,r3
-      real*8 sum,term
-      real*8 iwca,irep
+      real*8 sum,term,iwca,irepl
       real*8 epsi,rmini,rio,rih,rmax
       real*8 ao,emixo,rmixo,rmixo7
       real*8 ah,emixh,rmixh,rmixh7
@@ -4890,9 +4891,9 @@ c
                      du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
      &                       + 60.0d0*(uik2*r+r3-r*sk2)
                      du = -du / uik13
-                     irep = ao * rmixo7 * term
+                     irepl = ao * rmixo7 * term
                      de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
-                     sum = sum + irep + idisp
+                     sum = sum + irepl + idisp
                   end if
                end if
                if (rih .lt. r+sk) then
@@ -4982,9 +4983,9 @@ c
                      du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
      &                       + 60.0d0*(uik2*r+r3-r*sk2)
                      du = -du / uik13
-                     irep = 2.0d0 * ah * rmixh7 * term
+                     irepl = 2.0d0 * ah * rmixh7 * term
                      de = de + ah*rmixh7*pi*(dl+du)/(30.0d0*r2)
-                     sum = sum + irep + idisp
+                     sum = sum + irepl + idisp
                   end if
                end if
 c

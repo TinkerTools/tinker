@@ -227,7 +227,7 @@ c
 c     check for chiral multipoles and rotate to global frame
 c
       call chkpole
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     zero out the value of the field at each site
 c

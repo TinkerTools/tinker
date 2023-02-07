@@ -18,6 +18,7 @@ c     generalized Kirkwood and Poisson-Boltzmann solvation models
 c
 c
       subroutine esolv2 (i)
+      use mpole
       use potent
       use solpot
       use warp
@@ -51,7 +52,7 @@ c
       if (solvtyp(1:2) .eq. 'GK') then
          if (.not.use_mpole .and. .not.use_polar) then
             call chkpole
-            call rotpole
+            call rotpole (pole,rpole)
             call induce
          end if
       end if
@@ -266,6 +267,7 @@ c     calculation of the Hessian matrix by finite differences
 c
 c
       subroutine esolv2b (nlist,list,reborn,reinduce)
+      use mpole
       implicit none
       integer nlist
       integer list(*)
@@ -278,7 +280,7 @@ c
       if (reborn)  call born
       if (reinduce) then
          call chkpole
-         call rotpole
+         call rotpole (pole,rpole)
          call induce
       end if     
       call esolv1

@@ -183,7 +183,7 @@ c     find atomic multipoles and induced dipoles in global frame
 c
       if (use_born)  call born
       call chkpole
-      call rotpole
+      call rotpole (pole,rpole)
       call induce
       if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
          do i = 1, npole

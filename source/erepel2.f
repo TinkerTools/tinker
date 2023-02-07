@@ -28,6 +28,7 @@ c
       use hessn
       use mpole
       use potent
+      use repel
       implicit none
       integer i,j,k
       integer nlist
@@ -62,8 +63,8 @@ c     find the multipole definitions involving the current atom;
 c     results in a faster but approximate Hessian calculation
 c
       nlist = 0
-      do k = 1, npole
-         if (ipole(k).eq.i .or. zaxis(k).eq.i
+      do k = 1, nrep
+         if (irep(k).eq.i .or. zaxis(k).eq.i
      &          .or. xaxis(k).eq.i .or. abs(yaxis(k)).eq.i) then
             nlist = nlist + 1
             list(nlist) = k
@@ -249,7 +250,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (repole,rrepole)
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -282,23 +283,23 @@ c     compute the Pauli repulsion first derivatives
 c
       do iii = 1, nlist
          ii = list(iii)
-         i = ipole(ii)
+         i = irep(ii)
          xi = x(i)
          yi = y(i)
          zi = z(i)
          sizi = sizpr(ii)
          dmpi = dmppr(ii)
          vali = elepr(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rrepole(1,ii)
+         dix = rrepole(2,ii)
+         diy = rrepole(3,ii)
+         diz = rrepole(4,ii)
+         qixx = rrepole(5,ii)
+         qixy = rrepole(6,ii)
+         qixz = rrepole(7,ii)
+         qiyy = rrepole(9,ii)
+         qiyz = rrepole(10,ii)
+         qizz = rrepole(13,ii)
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -318,8 +319,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kk = 1, npole
-            k = ipole(kk)
+         do kk = 1, nrep
+            k = irep(kk)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -336,16 +337,16 @@ c
                   sizk = sizpr(kk)
                   dmpk = dmppr(kk)
                   valk = elepr(kk)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
+                  ck = rrepole(1,kk)
+                  dkx = rrepole(2,kk)
+                  dky = rrepole(3,kk)
+                  dkz = rrepole(4,kk)
+                  qkxx = rrepole(5,kk)
+                  qkxy = rrepole(6,kk)
+                  qkxz = rrepole(7,kk)
+                  qkyy = rrepole(9,kk)
+                  qkyz = rrepole(10,kk)
+                  qkzz = rrepole(13,kk)
 c
 c     intermediates involving moments and separation distance
 c
@@ -591,23 +592,23 @@ c     calculate interaction components with other unit cells
 c
          do iii = 1, nlist
             ii = list(iii)
-            i = ipole(ii)
+            i = irep(ii)
             xi = x(i)
             yi = y(i)
             zi = z(i)
             sizi = sizpr(ii)
             dmpi = dmppr(ii)
             vali = elepr(ii)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
+            ci = rrepole(1,ii)
+            dix = rrepole(2,ii)
+            diy = rrepole(3,ii)
+            diz = rrepole(4,ii)
+            qixx = rrepole(5,ii)
+            qixy = rrepole(6,ii)
+            qixz = rrepole(7,ii)
+            qiyy = rrepole(9,ii)
+            qiyz = rrepole(10,ii)
+            qizz = rrepole(13,ii)
             usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -627,8 +628,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            do kk = 1, npole
-               k = ipole(kk)
+            do kk = 1, nrep
+               k = irep(kk)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                if (.not. use_intra)  proceed = .true.
@@ -645,16 +646,16 @@ c
                         sizk = sizpr(kk)
                         dmpk = dmppr(kk)
                         valk = elepr(kk)
-                        ck = rpole(1,kk)
-                        dkx = rpole(2,kk)
-                        dky = rpole(3,kk)
-                        dkz = rpole(4,kk)
-                        qkxx = rpole(5,kk)
-                        qkxy = rpole(6,kk)
-                        qkxz = rpole(7,kk)
-                        qkyy = rpole(9,kk)
-                        qkyz = rpole(10,kk)
-                        qkzz = rpole(13,kk)
+                        ck = rrepole(1,kk)
+                        dkx = rrepole(2,kk)
+                        dky = rrepole(3,kk)
+                        dkz = rrepole(4,kk)
+                        qkxx = rrepole(5,kk)
+                        qkxy = rrepole(6,kk)
+                        qkxz = rrepole(7,kk)
+                        qkyy = rrepole(9,kk)
+                        qkyz = rrepole(10,kk)
+                        qkzz = rrepole(13,kk)
 c
 c     intermediates involving moments and separation distance
 c
@@ -907,8 +908,8 @@ c
 c
 c     resolve site torques then increment forces and virial
 c
-      do ii = 1, npole
-         i = ipole(ii)
+      do ii = 1, nrep
+         i = irep(ii)
          call torque (ii,ter(1,i),fix,fiy,fiz,der)
       end do
 c

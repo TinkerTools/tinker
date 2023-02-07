@@ -112,7 +112,7 @@ c
          end if
       end if
 c
-c     check for proper use of non-prism periodic boundaries
+c     set lattice values for non-prism periodic boundaries
 c
       if (octahedron .or. dodecadron) then
          orthogonal = .false.

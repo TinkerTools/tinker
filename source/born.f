@@ -430,7 +430,7 @@ c     find the perfect radii and optional self-energies
 c
          if (debug) then
             call chkpole
-            call rotpole
+            call rotpole (pole,rpole)
             write (iout,10)
    10       format (/,' Perfect Self Energy Values :',/)
          end if

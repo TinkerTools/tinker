@@ -102,6 +102,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,taper
+      real*8 vterm
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -122,6 +123,12 @@ c
       do i = 1, n
          dspscale(i) = 1.0d0
       end do
+c
+c     set lambda scaling value for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+      end if
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -225,9 +232,9 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
-                        e = e * vlambda
+                        e = e * vterm
                      else if (.not.muti .or. .not.mutk) then
-                        e = e * vlambda
+                        e = e * vterm
                      end if
                   end if
 c
@@ -372,9 +379,9 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                      if (muti .or. mutk) then
                         if (vcouple .eq. 1) then
-                           e = e * vlambda
+                           e = e * vterm
                         else if (.not.muti .or. .not.mutk) then
-                           e = e * vlambda
+                           e = e * vterm
                         end if
                      end if
 c
@@ -464,6 +471,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,taper
+      real*8 vterm
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -485,6 +493,12 @@ c
          dspscale(i) = 1.0d0
       end do
 c
+c     set lambda scaling value for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+      end if
+c
 c     set conversion factor, cutoff and switching coefficients
 c
       mode = 'DISP'
@@ -495,7 +509,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vlambda)
+!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vterm)
 !$OMP& firstprivate(dspscale) shared(edsp)
 !$OMP DO reduction(+:edsp) schedule(guided)
 c
@@ -594,9 +608,9 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
-                        e = e * vlambda
+                        e = e * vterm
                      else if (.not.muti .or. .not.mutk) then
-                        e = e * vlambda
+                        e = e * vterm
                      end if
                   end if
 c
@@ -744,6 +758,7 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
+      real*8 vterm
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -759,6 +774,12 @@ c
       do i = 1, n
          dspscale(i) = 1.0d0
       end do
+c
+c     set lambda scaling value for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+      end if
 c
 c     set conversion factor, cutoff and switching coefficients
 c
@@ -865,9 +886,9 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
-                        scale = scale * vlambda
+                        scale = scale * vterm
                      else if (.not.muti .or. .not.mutk) then
-                        scale = scale * vlambda
+                        scale = scale * vterm
                      end if
                   end if
 c
@@ -1007,9 +1028,9 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                      if (muti .or. mutk) then
                         if (vcouple .eq. 1) then
-                           scale = scale * vlambda
+                           scale = scale * vterm
                         else if (.not.muti .or. .not.mutk) then
-                           scale = scale * vlambda
+                           scale = scale * vterm
                         end if
                      end if
 c
@@ -1145,6 +1166,7 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
+      real*8 vterm
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -1161,6 +1183,12 @@ c
          dspscale(i) = 1.0d0
       end do
 c
+c     set lambda scaling value for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+      end if
+c
 c     set conversion factor, cutoff and switching coefficients
 c
       mode = 'DEWALD'
@@ -1171,7 +1199,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
-!$OMP& vcouple,vlambda)
+!$OMP& vcouple,vterm)
 !$OMP& firstprivate(dspscale) shared(edsp)
 !$OMP DO reduction(+:edsp) schedule(guided)
 c
@@ -1276,9 +1304,9 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
-                        scale = scale * vlambda
+                        scale = scale * vterm
                      else if (.not.muti .or. .not.mutk) then
-                        scale = scale * vlambda
+                        scale = scale * vterm
                      end if
                   end if
 c

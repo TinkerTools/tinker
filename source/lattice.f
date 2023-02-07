@@ -62,22 +62,22 @@ c
          end if
       end if
 c
-c     check for proper use of non-prism periodic boundaries
+c     set lattice values for non-prism periodic boundaries
 c
       if (octahedron .or. dodecadron) then
          orthogonal = .false.
          monoclinic = .false.
          triclinic = .false.
          nonprism = .true.
-         ybox = xbox
-         if (octahedron) then
-            zbox = xbox
-         else if (dodecadron) then
-            zbox = xbox * root2
-         end if         
-         alpha = 90.0d0
-         beta = 90.0d0
-         gamma = 90.0d0
+c        ybox = xbox
+c        if (octahedron) then
+c           zbox = xbox
+c        else if (dodecadron) then
+c           zbox = xbox * root2
+c        end if
+c        alpha = 90.0d0
+c        beta = 90.0d0
+c        gamma = 90.0d0
       end if
 c
 c     compute and store half box lengths and other lengths

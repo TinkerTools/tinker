@@ -289,7 +289,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     compute components of the multipole interaction gradient
 c

@@ -2029,7 +2029,7 @@ c     compute the induced dipoles at polarizable atoms
 c
       if (use_polar) then
          call chkpole
-         call rotpole
+         call rotpole (pole,rpole)
          call induce
       end if
 c

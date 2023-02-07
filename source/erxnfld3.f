@@ -78,7 +78,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     compute the indices used in reaction field calculations
 c

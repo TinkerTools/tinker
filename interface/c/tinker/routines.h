@@ -2334,16 +2334,14 @@ void rotlist_(int* base, int* partner);
 #define tinker_f_rotlist rotlist_
 
 // rotpole.f
-void rotpole_();
+void rotpole_(double* inpole, double* outpole);
 #define tinker_f_rotpole rotpole_
-void rotrpole_();
+void rotrpole_(double* inpole, double* outpole);
 #define tinker_f_rotrpole rotrpole_
 void rotmat_(int* i, double* a, int* planar);
 #define tinker_f_rotmat rotmat_
-void rotsite_(int* isite, double* a, int* planar);
+void rotsite_(int* isite, double* a, int* planar, double* inpole, double* outpole);
 #define tinker_f_rotsite rotsite_
-void rotrsite_(int* isite, double* a);
-#define tinker_f_rotrsite rotrsite_
 
 // sdstep.f
 void sdstep_(int* istep, double* dt);

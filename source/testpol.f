@@ -158,7 +158,7 @@ c
       poleps = 0.0000000001d0
       debug = .false.
       call chkpole
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     perform dynamic allocation of some local arrays
 c

@@ -1349,7 +1349,7 @@ c
 c
 c     rotate the multipoles from global frame to local frame
 c
-      call rotrpole
+      call rotrpole (rpole,pole)
 c
 c     check the sign of multipole components at chiral sites;
 c     note "yaxis" sign is not flipped based on signed volume
@@ -1474,7 +1474,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     list the local frame definition for each multipole site
 c
@@ -1560,7 +1560,7 @@ c
 c
 c     rotate the multipoles from global frame to local frame
 c
-      call rotrpole
+      call rotrpole (rpole,pole)
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -2753,7 +2753,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole
+      call rotpole (pole,rpole)
 c
 c     compute induced dipoles as polarizability times field
 c

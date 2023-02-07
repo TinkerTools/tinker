@@ -30,7 +30,7 @@ c
       use reppot
       use sizes
       implicit none
-      integer i,k,ii
+      integer i,j,k,ii
       integer ia,ic,next
       real*8 spr,apr,epr
       logical header
@@ -85,12 +85,18 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
+      if (allocated(irep))  deallocate (irep)
       if (allocated(sizpr))  deallocate (sizpr)
       if (allocated(dmppr))  deallocate (dmppr)
       if (allocated(elepr))  deallocate (elepr)
+      if (allocated(repole))  deallocate (repole)
+      if (allocated(rrepole))  deallocate (rrepole)
+      allocate (irep(n))
       allocate (sizpr(n))
       allocate (dmppr(n))
       allocate (elepr(n))
+      allocate (repole(maxpole,n))
+      allocate (rrepole(maxpole,n))
 c
 c     assign the repulsion size, alpha and valence parameters 
 c
@@ -147,13 +153,16 @@ c
 c     condense repulsion sites to the list of multipole sites
 c
       if (use_repuls) then
-         nrep = 0
+         nrep = npole
          do ii = 1, npole
             i = ipole(ii)
-            if (sizpr(i) .ne. 0)  nrep = nrep + 1
+            irep(ii) = i
             sizpr(ii) = sizpr(i)
             dmppr(ii) = dmppr(i)
             elepr(ii) = elepr(i)
+            do j = 1, maxpole
+               repole(j,ii) = pole(j,ii)
+            end do
          end do
       end if
 c
