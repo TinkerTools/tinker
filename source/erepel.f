@@ -85,6 +85,8 @@ c
       real*8 diqk,dkqi,qiqk
       real*8 term1,term2,term3
       real*8 term4,term5
+      real*8 vlambda3,vlambda4
+      real*8 vlambda5
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -117,6 +119,14 @@ c
       do i = 1, n
          rscale(i) = 1.0d0
       end do
+c
+c     set lambda scaling values for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vlambda3 = vlambda**3
+         vlambda4 = vlambda3 * vlambda
+         vlambda5 = vlambda4 * vlambda
+      end if
 c
 c     set cutoff distances and switching coefficients
 c
@@ -251,10 +261,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     e = vlambda * sizik * eterm
-     &                      / sqrt(1.0d0-vlambda+r2)
-c                    e = vlambda**5 * sizik * eterm
-c    &                      / sqrt(r2-vlambda**4+vlambda**3)
+                     e = vlambda5 * sizik * eterm
+     &                      / sqrt(vlambda3-vlambda4+r2)
                   else
                      e = sizik * eterm * rr1
                   end if
@@ -431,10 +439,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                         if (mutik) then
-                           e = vlambda * sizik * eterm
-     &                            / sqrt(1.0d0-vlambda+r2)
-c                          e = vlambda**5 * sizik * eterm
-c    &                            / sqrt(r2-vlambda**4+vlambda**3)
+                           e = vlambda5 * sizik * eterm
+     &                            / sqrt(vlambda3-vlambda4+r2)
                         else
                            e = sizik * eterm * rr1
                         end if
@@ -535,6 +541,8 @@ c
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
       real*8 diqk,dkqi,qiqk
+      real*8 vlambda3,vlambda4
+      real*8 vlambda5
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 sizi,sizk,sizik
@@ -564,6 +572,14 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (rscale(n))
 c
+c     set lambda scaling values for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vlambda3 = vlambda**3
+         vlambda4 = vlambda3 * vlambda
+         vlambda5 = vlambda4 * vlambda
+      end if
+c
 c     initialize connected atom exclusion coefficients
 c
       do i = 1, n
@@ -580,8 +596,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,uind,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,vlambda,
-!$OMP& mut,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,vlambda3,
+!$OMP& vlambda4,vlambda5,mut,cut2,off2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er)
 !$OMP DO reduction(+:er) schedule(guided)
@@ -715,8 +731,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     e = vlambda * sizik * eterm
-     &                      / sqrt(1.0d0-vlambda+r2)
+                     e = vlambda5 * sizik * eterm
+     &                      / sqrt(vlambda3-vlambda4+r2)
                   else
                      e = sizik * eterm * rr1
                   end if

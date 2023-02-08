@@ -100,7 +100,6 @@ c
 c
 c     assign the repulsion size, alpha and valence parameters 
 c
-      nrep = n
       do i = 1, n
          sizpr(i) = 0.0d0
          dmppr(i) = 0.0d0
@@ -152,17 +151,20 @@ c
 c
 c     condense repulsion sites to the list of multipole sites
 c
+      nrep = 0
       if (use_repuls) then
-         nrep = npole
          do ii = 1, npole
             i = ipole(ii)
-            irep(ii) = i
-            sizpr(ii) = sizpr(i)
-            dmppr(ii) = dmppr(i)
-            elepr(ii) = elepr(i)
-            do j = 1, maxpole
-               repole(j,ii) = pole(j,ii)
-            end do
+            if (sizpr(i) .ne. 0.0d0) then
+               nrep = nrep + 1
+               irep(nrep) = i
+               sizpr(nrep) = sizpr(i)
+               dmppr(nrep) = dmppr(i)
+               elepr(nrep) = elepr(i)
+               do j = 1, maxpole
+                  repole(j,nrep) = pole(j,ii)
+               end do
+            end if
          end do
       end if
 c

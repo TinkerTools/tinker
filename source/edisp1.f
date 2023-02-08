@@ -140,7 +140,7 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling value for mutated interactions
+c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
@@ -624,7 +624,7 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling value for mutated interactions
+c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
@@ -974,7 +974,7 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling value for mutated interactions
+c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
@@ -1482,7 +1482,7 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling value for mutated interactions
+c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)

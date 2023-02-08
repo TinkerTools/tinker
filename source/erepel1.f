@@ -106,6 +106,8 @@ c
       real*8 dqikx,dqiky,dqikz
       real*8 term1,term2,term3
       real*8 term4,term5,term6
+      real*8 vlambda3,vlambda4
+      real*8 vlambda5
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -155,6 +157,14 @@ c
             ter(j,i) = 0.0d0
          end do
       end do
+c
+c     set lambda scaling values for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vlambda3 = vlambda**3
+         vlambda4 = vlambda3 * vlambda
+         vlambda5 = vlambda4 * vlambda
+      end if
 c
 c     set cutoff distances and switching coefficients
 c
@@ -422,8 +432,8 @@ c
 c     get energy and force via soft core lambda scaling
 c
                   if (mutik) then
-                     term = 1.0d0 - vlambda + r2
-                     soft = vlambda * r / sqrt(term)
+                     term = vlambda3 - vlambda4 + r2
+                     soft = vlambda5 * r / sqrt(term)
                      dsoft = soft * (rr1-r/term)
                      dsoft = dsoft * rr1 * e
                      frcx = frcx*soft - dsoft*xr
@@ -783,8 +793,8 @@ c
 c     get energy and force via soft core lambda scaling
 c
                         if (mutik) then
-                           term = 1.0d0 - vlambda + r2
-                           soft = vlambda * r / sqrt(term)
+                           term = vlambda3 - vlambda4 + r2
+                           soft = vlambda5 * r / sqrt(term)
                            dsoft = soft * (rr1-r/term)
                            dsoft = dsoft * rr1 * e
                            frcx = frcx*soft - dsoft*xr
@@ -1006,6 +1016,8 @@ c
       real*8 dqikx,dqiky,dqikz
       real*8 term1,term2,term3
       real*8 term4,term5,term6
+      real*8 vlambda3,vlambda4
+      real*8 vlambda5
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -1055,6 +1067,14 @@ c
          end do
       end do
 c
+c     set lambda scaling values for mutated interactions
+c
+      if (nmut .ne. 0) then
+         vlambda3 = vlambda**3
+         vlambda4 = vlambda3 * vlambda
+         vlambda5 = vlambda4 * vlambda
+      end if
+c
 c     set cutoff distances and switching coefficients
 c
       mode = 'REPULS'
@@ -1066,7 +1086,8 @@ c
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
 !$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,
-!$OMP& vlambda,mut,cut2,off2,xaxis,yaxis,zaxis,c0,c1,c2,c3,c4,c5)
+!$OMP& vlambda3,vlambda4,vlambda5,mut,cut2,off2,xaxis,yaxis,zaxis,
+!$OMP& c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale) shared (er,der,ter,vir)
 !$OMP DO reduction(+:er,der,ter,vir) schedule(guided)
 c
@@ -1332,8 +1353,8 @@ c
 c     get energy and force via soft core lambda scaling
 c
                   if (mutik) then
-                     term = 1.0d0 - vlambda + r2
-                     soft = vlambda * r / sqrt(term)
+                     term = vlambda3 - vlambda4 + r2
+                     soft = vlambda5 * r / sqrt(term)
                      dsoft = soft * (rr1-r/term)
                      dsoft = dsoft * rr1 * e
                      frcx = frcx*soft - dsoft*xr
