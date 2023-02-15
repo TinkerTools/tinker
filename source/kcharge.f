@@ -97,7 +97,10 @@ c
          pchg(i) = 0.0d0
          pchg0(i) = 0.0d0
          it = type(i)
-         if (it .ne. 0)  pchg(i) = chg(it)
+         if (it .ne. 0) then
+            pchg(i) = chg(it)
+            pchg0(i) = pchg(i)
+         end if
       end do
 c
 c     use special charge parameter assignment method for MMFF
@@ -141,7 +144,7 @@ c
       allocate (list(n))
       allocate (nc12(n))
 c
-c     remove zero partial charges from the list of charges
+c     remove zero or undefined partial charges from the list
 c
       nion = 0
       do i = 1, n
@@ -149,10 +152,8 @@ c
          if (pchg(i) .ne. 0.0d0) then
             nion = nion + 1
             iion(nion) = i
-            jion(nion) = i
-            kion(nion) = i
-            pchg(nion) = pchg(i)
-            pchg0(nion) = pchg(i)
+            jion(i) = i
+            kion(i) = i
             list(i) = nion
          end if
       end do
@@ -173,8 +174,8 @@ c
                do j = 1, n12(k)
                   m = i12(j,k)
                   if (nc12(m) .gt. 1) then
-                     if (neutnbr)  jion(i) = m
-                     if (neutcut)  kion(i) = m
+                     if (neutnbr)  jion(k) = m
+                     if (neutcut)  kion(k) = m
                   end if
                end do
             end if

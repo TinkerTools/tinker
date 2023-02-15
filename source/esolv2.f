@@ -52,7 +52,7 @@ c
       if (solvtyp(1:2) .eq. 'GK') then
          if (.not.use_mpole .and. .not.use_polar) then
             call chkpole
-            call rotpole (pole,rpole)
+            call rotpole ('MPOLE')
             call induce
          end if
       end if
@@ -95,7 +95,7 @@ c
       use potent
       use solpot
       implicit none
-      integer i,j,k
+      integer i,j,k,kk
       integer nlist
       integer, allocatable :: list(:)
       real*8 eps,old
@@ -147,16 +147,18 @@ c
          end do
       else
          if (use_born .and. solvtyp(1:2).ne.'GK') then
-            do k = 1, nion
-               if (iion(k) .eq. i) then
+            do kk = 1, nion
+               k = iion(kk)
+               if (k .eq. i) then
                   nlist = nlist + 1
                   list(nlist) = k
                end if
             end do
          else if (solvtyp(1:2) .eq. 'GK') then
-            do k = 1, npole
-               if (ipole(k).eq.i .or. zaxis(k).eq.i .or.
-     &             xaxis(k).eq.i .or. abs(yaxis(k)).eq.i) then
+            do kk = 1, npole
+               k = ipole(kk)
+               if (k.eq.i .or. zaxis(k).eq.i .or. xaxis(k).eq.i
+     &                .or. abs(yaxis(k)).eq.i) then
                   nlist = nlist + 1
                   list(nlist) = k
                end if
@@ -280,7 +282,7 @@ c
       if (reborn)  call born
       if (reinduce) then
          call chkpole
-         call rotpole (pole,rpole)
+         call rotpole ('MPOLE')
          call induce
       end if     
       call esolv1
@@ -330,8 +332,9 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = pchg(k)
             goto 10
          end if
@@ -366,7 +369,7 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               fik = fi * pchg(kk)
+               fik = fi * pchg(k)
 c
 c     compute chain rule terms for Hessian matrix elements
 c
@@ -486,8 +489,9 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = pchg(k)
             goto 10
          end if
@@ -520,7 +524,7 @@ c
             zr = zi - z(k)
             r2 = xr*xr + yr*yr + zr*zr
             r = sqrt(r2)
-            fik = fi * pchg(kk)
+            fik = fi * pchg(k)
 c
 c     compute chain rule terms for Hessian matrix elements
 c

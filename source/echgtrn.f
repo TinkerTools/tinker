@@ -108,8 +108,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         chgi = chgct(ii)
-         alphai = dmpct(ii)
+         chgi = chgct(i)
+         alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
          muti = mut(i)
@@ -146,8 +146,8 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  chgk = chgct(kk)
-                  alphak = dmpct(kk)
+                  chgk = chgct(k)
+                  alphak = dmpct(k)
                   if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      expi = exp(-alphai*r)
@@ -216,8 +216,8 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            chgi = chgct(ii)
-            alphai = dmpct(ii)
+            chgi = chgct(i)
+            alphai = dmpct(i)
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             usei = use(i)
             muti = mut(i)
@@ -255,8 +255,8 @@ c
                      r2 = xr*xr + yr* yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        chgk = chgct(kk)
-                        alphak = dmpct(kk)
+                        chgk = chgct(k)
+                        alphak = dmpct(k)
                         if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                         if (ctrntyp .eq. 'SEPARATE') then
                            expi = exp(-alphai*r)
@@ -405,9 +405,9 @@ c     transfer the interaction site coordinates to sorting arrays
 c
       do ii = 1, npole
          i = ipole(ii)
-         xsort(i) = x(i)
-         ysort(i) = y(i)
-         zsort(i) = z(i)
+         xsort(ii) = x(i)
+         ysort(ii) = y(i)
+         zsort(ii) = z(i)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -422,8 +422,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         chgi = chgct(ii)
-         alphai = dmpct(ii)
+         chgi = chgct(i)
+         alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
          muti = mut(i)
@@ -498,8 +498,8 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  chgk = chgct(kk)
-                  alphak = dmpct(kk)
+                  chgk = chgct(k)
+                  alphak = dmpct(k)
                   if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      expi = exp(-alphai*r)
@@ -656,8 +656,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         chgi = chgct(ii)
-         alphai = dmpct(ii)
+         chgi = chgct(i)
+         alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
          muti = mut(i)
@@ -695,8 +695,8 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  chgk = chgct(kk)
-                  alphak = dmpct(kk)
+                  chgk = chgct(k)
+                  alphak = dmpct(k)
                   if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      expi = exp(-alphai*r)

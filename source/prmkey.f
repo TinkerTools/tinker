@@ -66,7 +66,7 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_strbnd = .true.
          if (value .eq. 'NONE')  use_strbnd = .false.
-      else if (keyword(1:9) .eq. 'UREYTERM ') then
+      else if (keyword(1:13) .eq. 'UREYBRADTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
          use_urey = .true.
@@ -129,8 +129,8 @@ c
       else if (keyword(1:14) .eq. 'REPULSIONTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
-         use_repuls = .true.
-         if (value .eq. 'NONE')  use_repuls = .false.
+         use_repel = .true.
+         if (value .eq. 'NONE')  use_repel = .false.
       else if (keyword(1:15) .eq. 'DISPERSIONTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -540,7 +540,7 @@ c
       use_angtor = .false.
       use_tortor = .false.
       use_vdw = .false.
-      use_repuls = .false.
+      use_repel = .false.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
@@ -613,7 +613,7 @@ c
 c     turn off the use of each of the nonbonded energy functions
 c
       use_vdw = .false.
-      use_repuls = .false.
+      use_repel = .false.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.

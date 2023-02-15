@@ -400,7 +400,7 @@ c
 c
 c     details of vdw potential energy functional form
 c
-      if (use_vdw .or. use_repuls .or. use_disp) then
+      if (use_vdw .or. use_repel .or. use_disp) then
          write (iout,70)
    70    format ()
       end if
@@ -424,7 +424,7 @@ c
    90       format (' VDW Cutoff',26x,f12.4)
          end if
       end if
-      if (use_repuls) then
+      if (use_repel) then
          value = 'PAULI REPULSION'
          call justify (value)
          write (iout,100)  value
@@ -672,7 +672,7 @@ c
          end if
          write (iout,fstr)  ev,nev
       end if
-      if (use_repuls .and. (ner.ne.0.or.er.ne.0.0d0)) then
+      if (use_repel .and. (ner.ne.0.or.er.ne.0.0d0)) then
          if (abs(er) .lt. 1.0d10) then
             fstr = '('' Repulsion'',18x,'//form1//')'
          else
@@ -964,7 +964,7 @@ c
       use units
       use titles
       implicit none
-      integer i,j,k
+      integer i,j,ii
       integer frame,lext
       integer ifrc,iind
       integer freeunit
@@ -1028,10 +1028,10 @@ c
          end if
          write (iind,40)  n,title(1:ltitle)
    40    format (i6,2x,a)
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             if (polarity(i) .ne. 0.0d0) then
-               k = ipole(i)
-               write (iind,50)  k,name(k),(debye*uind(j,i),j=1,3)
+               write (iind,50)  i,name(i),(debye*uind(j,i),j=1,3)
    50          format (i6,2x,a3,3f12.6)
             end if
          end do
@@ -1326,7 +1326,7 @@ c
          write (iout,170)  nvdw
   170    format (' Van der Waals Sites',14x,i15)
       end if
-      if (use_repuls .and. nrep.ne.0) then
+      if (use_repel .and. nrep.ne.0) then
          write (iout,180)  nrep
   180    format (' Repulsion Sites',18x,i15)
       end if
@@ -1886,10 +1886,10 @@ c
 c
 c     parameters used for Pauli repulsion interactions
 c
-      if (use_repuls) then
+      if (use_repel) then
          header = .true.
-         do i = 1, npole
-            ia = ipole(i)
+         do i = 1, nrep
+            ia = irep(i)
             if (active(ia)) then
                if (header) then
                   header = .false.
@@ -1929,8 +1929,8 @@ c
          header = .true.
          do i = 1, nion
             ia = iion(i)
-            ib = jion(i)
-            ic = kion(i)
+            ib = jion(ia)
+            ic = kion(ia)
             if (active(ia) .or. active(ic)) then
                if (header) then
                   header = .false.
@@ -1941,10 +1941,10 @@ c
      &                       7x,'Site',6x,'Site',/)
                end if
                if (ia.eq.ib .and. ia.eq.ic) then
-                  write (iout,750)  i,ia,pchg(i)
+                  write (iout,750)  i,ia,pchg(ia)
   750             format (i6,3x,i6,15x,f10.4)
                else
-                  write (iout,760)  i,ia,pchg(i),ib,ic
+                  write (iout,760)  i,ia,pchg(ia),ib,ic
   760             format (i6,3x,i6,15x,f10.4,5x,i6,4x,i6)
                end if
             end if
@@ -1987,16 +1987,16 @@ c
      &                       1x,'Y-Axis',2x,
      &                       'Frame',11x,'Multipole Moments',/)
                end if
-               izaxe = zaxis(i)
-               ixaxe = xaxis(i)
-               iyaxe = yaxis(i)
+               izaxe = zaxis(ia)
+               ixaxe = xaxis(ia)
+               iyaxe = yaxis(ia)
                if (iyaxe .lt. 0)  iyaxe = -iyaxe
-               mpl(1) = pole(1,i)
+               mpl(1) = pole(1,ia)
                do j = 2, 4
-                  mpl(j) = pole(j,i) / bohr
+                  mpl(j) = pole(j,ia) / bohr
                end do
                do j = 5, 13
-                  mpl(j) = 3.0d0 * pole(j,i) / bohr**2
+                  mpl(j) = 3.0d0 * pole(j,ia) / bohr**2
                end do
                if (izaxe .eq. 0) then
                   write (iout,800)  i,ia,polaxe(i),
@@ -2041,7 +2041,7 @@ c
      &                    //,10x,'Atom Number',25x,'Core',3x,'Valence',
      &                       6x,'Damp',/)
                end if
-               write (iout,850)  i,ia,pcore(i),pval(i),palpha(i)
+               write (iout,850)  i,ia,pcore(ia),pval(ia),palpha(ia)
   850          format (i6,3x,i6,25x,2f10.3,f10.4)
             end if
          end do
@@ -2074,15 +2074,15 @@ c
                   end if
                end if
                if (use_tholed) then
-                  write (iout,890)  i,ia,polarity(i),thole(i),
-     &                              tholed(i),(ip11(j,ia),j=1,np11(ia))
+                  write (iout,890)  i,ia,polarity(ia),thole(ia),
+     &                              tholed(ia),(ip11(j,ia),j=1,np11(ia))
   890             format (i6,3x,i6,6x,f10.4,2f9.3,3x,120i6)
                else if (use_thole) then
-                  write (iout,900)  i,ia,polarity(i),thole(i),
+                  write (iout,900)  i,ia,polarity(ia),thole(ia),
      &                              (ip11(j,ia),j=1,np11(ia))
   900             format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)
                else
-                  write (iout,910)  i,ia,polarity(i),
+                  write (iout,910)  i,ia,polarity(ia),
      &                              (ip11(j,ia),j=1,np11(ia))
   910             format (i6,3x,i6,6x,f10.4,3x,120i6)
                end if
@@ -2104,7 +2104,7 @@ c
      &                    //,10x,'Atom Number',23x,'Charge',
      &                       6x,'Damp',/)
                end if
-               write (iout,930)  i,ia,chgct(i),dmpct(i)
+               write (iout,930)  i,ia,chgct(ia),dmpct(ia)
   930          format (i6,3x,i6,25x,f10.3,f10.4)
             end if
          end do
@@ -2743,37 +2743,37 @@ c
      &                    //,12x,'Atom',4x,'Coordinate Frame',
      &                       ' Definition',7x,'Multipole Moments',/)
                end if
-               izaxe = zaxis(i)
-               ixaxe = xaxis(i)
-               iyaxe = yaxis(i)
+               izaxe = zaxis(ia)
+               ixaxe = xaxis(ia)
+               iyaxe = yaxis(ia)
                if (iyaxe .lt. 0)  iyaxe = -iyaxe
-               mpl(1) = pole(1,i)
+               mpl(1) = pole(1,ia)
                do j = 2, 4
-                  mpl(j) = pole(j,i) / bohr
+                  mpl(j) = pole(j,ia) / bohr
                end do
                do j = 5, 13
-                  mpl(j) = 3.0d0 * pole(j,i) / bohr**2
+                  mpl(j) = 3.0d0 * pole(j,ia) / bohr**2
                end do
                if (izaxe .eq. 0) then
-                  write (iout,480)  i,ia,0,0,polaxe(i),
+                  write (iout,480)  i,ia,0,0,polaxe(ia),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
   480             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else if (ixaxe .eq. 0) then
-                  write (iout,490)  i,ia,izaxe,0,polaxe(i),
+                  write (iout,490)  i,ia,izaxe,0,polaxe(ia),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
   490             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else  if (iyaxe .eq. 0) then
-                  write (iout,500)  i,ia,izaxe,ixaxe,polaxe(i),
+                  write (iout,500)  i,ia,izaxe,ixaxe,polaxe(ia),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
   500             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else
-                  write (iout,510)  i,ia,izaxe,ixaxe,iyaxe,polaxe(i),
+                  write (iout,510)  i,ia,izaxe,ixaxe,iyaxe,polaxe(ia),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
   510             format (i6,3x,i6,1x,3i7,3x,a8,2x,f9.5,/,50x,3f9.5,
@@ -2797,7 +2797,7 @@ c
      &                    //,10x,'Atom Number',9x,'Alpha',8x,
      &                       'Polarization Group',/)
                end if
-               write (iout,530)  i,ia,polarity(i),
+               write (iout,530)  i,ia,polarity(ia),
      &                           (ip11(j,ia),j=1,np11(ia))
   530          format (i6,3x,i6,10x,f10.4,5x,20i6)
             end if

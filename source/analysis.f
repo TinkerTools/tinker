@@ -227,7 +227,7 @@ c
          if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal3
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss3
       end if
-      if (use_repuls)  call erepel3
+      if (use_repel)  call erepel3
       if (use_disp)  call edisp3
 c
 c     call any miscellaneous energy component routines

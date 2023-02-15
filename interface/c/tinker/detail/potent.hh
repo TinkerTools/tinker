@@ -20,7 +20,7 @@ extern int TINKER_MOD(potent, use_strtor);
 extern int TINKER_MOD(potent, use_angtor);
 extern int TINKER_MOD(potent, use_tortor);
 extern int TINKER_MOD(potent, use_vdw);
-extern int TINKER_MOD(potent, use_repuls);
+extern int TINKER_MOD(potent, use_repel);
 extern int TINKER_MOD(potent, use_disp);
 extern int TINKER_MOD(potent, use_charge);
 extern int TINKER_MOD(potent, use_chgdpl);

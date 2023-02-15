@@ -894,9 +894,9 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      if(poltyp .eq. 'OPT') then
-        allocate (uopts(0:optorder,3,n))
-        allocate (uoptps(0:optorder,3,n))
+      if (poltyp .eq. 'OPT') then
+         allocate (uopts(0:optorder,3,n))
+         allocate (uoptps(0:optorder,3,n))
       end if
 c
 c     set default value for exponent in the GB/GK function

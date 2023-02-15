@@ -77,7 +77,7 @@ c     compute the induced dipoles at polarizable atoms
 c
       if (use_polar) then
          call chkpole
-         call rotpole (pole,rpole)
+         call rotpole ('MPOLE')
          call induce
       end if
 c
@@ -159,7 +159,7 @@ c
                if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal2 (i)
                if (vdwtyp .eq. 'GAUSSIAN')  call egauss2 (i)
             end if
-            if (use_repuls)  call erepel2 (i)
+            if (use_repel)  call erepel2 (i)
             if (use_disp)  call edisp2 (i)
 c
 c     call any miscellaneous Hessian component routines

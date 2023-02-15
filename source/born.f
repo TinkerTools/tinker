@@ -62,7 +62,9 @@ c
       use solpot
       use solute
       implicit none
-      integer i,j,k,it,kt,ii,kk
+      integer i,j,k
+      integer it,kt
+      integer ii,kk
       integer, allocatable :: skip(:)
       real*8 area,rold,t
       real*8 shell,fraction
@@ -430,28 +432,28 @@ c     find the perfect radii and optional self-energies
 c
          if (debug) then
             call chkpole
-            call rotpole (pole,rpole)
+            call rotpole ('MPOLE')
             write (iout,10)
    10       format (/,' Perfect Self Energy Values :',/)
          end if
-         do i = 1, n
+         do ii = 1, npole
+            i = ipole(ii)
             pbpole(1,i) = 1.0d0
             call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
             if (debug) then
-               ii = ipole(i)
-               pbpole(1,ii) = rpole(1,i)
+               pbpole(1,i) = rpole(1,i)
                do j = 2, 4
-                  pbpole(j,ii) = rpole(j,i)
+                  pbpole(j,i) = rpole(j,i)
                end do
                do j = 5, 13
-                  pbpole(j,ii) = 3.0d0 * rpole(j,i)
+                  pbpole(j,i) = 3.0d0 * rpole(j,i)
                end do
                call apbsempole (n,pos,rsolv,pbpole,pbe,
      &                          apbe,pbep,pbfp,pbtp)
                do j = 1, 13
-                  pbpole(j,ii) = 0.0d0
+                  pbpole(j,i) = 0.0d0
                end do
                pbself(i) = pbe
                pbtotal = pbtotal + pbe
@@ -465,66 +467,67 @@ c
          if (debug) then
             write (iout,30)
    30       format (/,' Perfect Pair Energy Values :',/)
-            do i = 1, npole
-               ii = ipole(i)
-               pbpole(1,ii) = rpole(1,i)
+            do ii = 1, npole
+               i = ipole(ii)
+               pbpole(1,i) = rpole(1,i)
                do j = 2, 4
-                  pbpole(j,ii) = rpole(j,i)
+                  pbpole(j,i) = rpole(j,i)
                end do
                do j = 5, 13
-                  pbpole(j,ii) = 3.0d0 * rpole(j,i)
+                  pbpole(j,i) = 3.0d0 * rpole(j,i)
                end do
-               do k = i+1, npole
-                  kk = ipole(k)
-                  pbpole(1,kk) = rpole(1,k)
+               do kk = ii+1, npole
+                  k = ipole(kk)
+                  pbpole(1,k) = rpole(1,k)
                   do j = 2, 4
-                     pbpole(j,kk) = rpole(j,k)
+                     pbpole(j,k) = rpole(j,k)
                   end do
                   do j = 5, 13
-                     pbpole(j,kk) = 3.0d0 * rpole(j,k)
+                     pbpole(j,k) = 3.0d0 * rpole(j,k)
                   end do
                   call apbsempole (n,pos,rsolv,pbpole,pbe,
      &                             apbe,pbep,pbfp,pbtp)
                   pair = pbe - pbself(i) - pbself(k)
-                  write(*,*) i,k,pair
+                  write (iout,40)  i,k,pair
+   40             format (5x,2i8,f12.4)
                   pbtotal = pbtotal + pair
                   pbpair(i) = pbpair(i) + 0.5d0 * pair
                   pbpair(k) = pbpair(k) + 0.5d0 * pair
                   do j = 1, 13
-                     pbpole(j,kk) = 0.0d0
+                     pbpole(j,k) = 0.0d0
                   end do
                end do 
                do j = 1, 13
-                  pbpole(j,ii) = 0.0d0
+                  pbpole(j,i) = 0.0d0
                end do
             end do
-            do i = 1, npole
-               ii = ipole(i)
-               pbpole(1,ii) = rpole(1,i)
+            do ii = 1, npole
+               i = ipole(ii)
+               pbpole(1,i) = rpole(1,i)
                do j = 2, 4
-                  pbpole(j,ii) = rpole(j,i)
+                  pbpole(j,i) = rpole(j,i)
                end do
                do j = 5, 13
-                  pbpole(j,ii) = 3.0d0 * rpole(j,i)
+                  pbpole(j,i) = 3.0d0 * rpole(j,i)
                end do
             end do
             call apbsempole (n,pos,rsolv,pbpole,pbe,
      &                       apbe,pbep,pbfp,pbtp)
-            write(iout,40)  pbe
-   40       format (/,' Single PB Calculation :  ',f12.4) 
-            write(iout,50)  pbtotal
-   50       format (' Sum of Self and Pairs :  ',f12.4)
+            write(iout,50)  pbe
+   50       format (/,' Single PB Calculation :  ',f12.4) 
+            write(iout,60)  pbtotal
+   60       format (' Sum of Self and Pairs :  ',f12.4)
          end if
 c
 c     print the perfect self-energies and cross-energies
 c
-         write (iout,60)
-   60    format (/,' Perfect Self-Energies and Cross-Energies :',
+         write (iout,70)
+   70    format (/,' Perfect Self-Energies and Cross-Energies :',
      &           //,' Type',12x,'Atom Name',24x,'Self',7x,'Cross',/)
-         do i = 1, npole
-            ii = ipole(i)
-            write (iout,70)  ii,name(ii),pbself(i),pbpair(i)
-   70       format (' PB-Perfect',2x,i8,'-',a3,17x,2f12.4)
+         do ii = 1, npole
+            i = ipole(ii)
+            write (iout,80)  i,name(i),pbself(i),pbpair(i)
+   80       format (' PB-Perfect',2x,i8,'-',a3,17x,2f12.4)
          end do
       end if
 c
@@ -552,12 +555,12 @@ c
 c     write out the final Born radius value for each atom
 c
       if (debug) then
-         write (iout,80)
-   80    format (/,' Born Radii for Individual Atoms :',/)
+         write (iout,90)
+   90    format (/,' Born Radii for Individual Atoms :',/)
          k = 1
          do while (k .le. n)
-            write (iout,90)  (i,rborn(i),i=k,min(k+4,n))
-   90       format (1x,5(i7,f8.3))
+            write (iout,100)  (i,rborn(i),i=k,min(k+4,n))
+  100       format (1x,5(i7,f8.3))
             k = k + 5
          end do
       end if

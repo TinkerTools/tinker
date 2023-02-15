@@ -30,7 +30,7 @@ c
       use reppot
       use sizes
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
       integer ia,ic,next
       real*8 spr,apr,epr
       logical header
@@ -86,12 +86,14 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(irep))  deallocate (irep)
+      if (allocated(replist))  deallocate (replist)
       if (allocated(sizpr))  deallocate (sizpr)
       if (allocated(dmppr))  deallocate (dmppr)
       if (allocated(elepr))  deallocate (elepr)
       if (allocated(repole))  deallocate (repole)
       if (allocated(rrepole))  deallocate (rrepole)
       allocate (irep(n))
+      allocate (replist(n))
       allocate (sizpr(n))
       allocate (dmppr(n))
       allocate (elepr(n))
@@ -101,6 +103,8 @@ c
 c     assign the repulsion size, alpha and valence parameters 
 c
       do i = 1, n
+         irep(i) = 0
+         replist(i) = 0
          sizpr(i) = 0.0d0
          dmppr(i) = 0.0d0
          elepr(i) = 0.0d0
@@ -152,24 +156,25 @@ c
 c     condense repulsion sites to the list of multipole sites
 c
       nrep = 0
-      if (use_repuls) then
-         do ii = 1, npole
-            i = ipole(ii)
+      if (use_repel) then
+         do i = 1, n
             if (sizpr(i) .ne. 0.0d0) then
                nrep = nrep + 1
                irep(nrep) = i
-               sizpr(nrep) = sizpr(i)
-               dmppr(nrep) = dmppr(i)
-               elepr(nrep) = elepr(i)
+               replist(i) = nrep
                do j = 1, maxpole
-                  repole(j,nrep) = pole(j,ii)
+                  repole(j,i) = pole(j,i)
                end do
             end if
          end do
       end if
 c
+c     test multipoles at chiral sites and invert if necessary
+c
+      call chkpole
+c
 c     turn off the Pauli repulsion potential if not used
 c
-      if (nrep .eq. 0)  use_repuls = .false.
+      if (nrep .eq. 0)  use_repel = .false.
       return
       end

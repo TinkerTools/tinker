@@ -103,7 +103,7 @@ c
       if (solvtyp(1:2) .eq. 'GK') then
          if (.not.use_mpole .and. .not.use_polar) then
             call chkpole
-            call rotpole (pole,rpole)
+            call rotpole ('MPOLE')
             call induce
          end if
          call egk
@@ -183,7 +183,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
 c
 c     decide whether to compute the current interaction
 c
@@ -201,7 +201,7 @@ c
                zr = zi - z(k)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rb2 = rborn(i) * rborn(k)
                   fgb = sqrt(r2 + rb2*exp(-0.25d0*r2/rb2))
                   e = fik / fgb
@@ -269,8 +269,7 @@ c
       use solute
       use usage
       implicit none
-      integer i,k
-      integer ii,kk,kkk
+      integer i,k,ii,kk
       real*8 e,f,fi,fik
       real*8 dwater,fgrp
       real*8 rbi,rb2,rm2
@@ -311,12 +310,12 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          rbi = rborn(i)
 c
 c     calculate the self-energy term for the current atom
 c
-         fik = fi * pchg(ii)
+         fik = fi * pchg(i)
          rb2 = rbi * rbi
          e = fik / rbi
          rm2 = (0.5d0 * (off+cut))**2
@@ -327,9 +326,8 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = iion(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -342,7 +340,7 @@ c
                zr = zi - z(k)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rb2 = rbi * rborn(k)
                   fgb = sqrt(r2 + rb2*exp(-0.25d0*r2/rb2))
                   e = fik / fgb
@@ -439,7 +437,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
 c
 c     decide whether to compute the current interaction
 c
@@ -456,7 +454,7 @@ c
                yr = yi - y(k)
                zr = zi - z(k)
                r2 = xr*xr + yr*yr + zr*zr
-               fik = fi * pchg(kk)
+               fik = fi * pchg(k)
                rb2 = rborn(i) * rborn(k)
                fgb = sqrt(r2 + rb2*exp(-0.25d0*r2/rb2))
                e = fik / fgb
@@ -505,7 +503,7 @@ c     setup the multipoles for solvation only calculations
 c
       if (.not. use_mpole) then
           call chkpole
-          call rotpole (pole,rpole)
+          call rotpole ('MPOLE')
       end if
       if (.not. use_polar) then
          call induce
@@ -611,19 +609,19 @@ c
          yi = y(i)
          zi = z(i)
          rbi = rborn(i)
-         ci = rpole(1,ii)
-         uxi = rpole(2,ii)
-         uyi = rpole(3,ii)
-         uzi = rpole(4,ii)
-         qxxi = rpole(5,ii)
-         qxyi = rpole(6,ii)
-         qxzi = rpole(7,ii)
-         qyyi = rpole(9,ii)
-         qyzi = rpole(10,ii)
-         qzzi = rpole(13,ii)
-         dxi = uinds(1,ii)
-         dyi = uinds(2,ii)
-         dzi = uinds(3,ii)
+         ci = rpole(1,i)
+         uxi = rpole(2,i)
+         uyi = rpole(3,i)
+         uzi = rpole(4,i)
+         qxxi = rpole(5,i)
+         qxyi = rpole(6,i)
+         qxzi = rpole(7,i)
+         qyyi = rpole(9,i)
+         qyzi = rpole(10,i)
+         qzzi = rpole(13,i)
+         dxi = uinds(1,i)
+         dyi = uinds(2,i)
+         dzi = uinds(3,i)
 c
 c     decide whether to compute the current interaction
 c
@@ -645,19 +643,19 @@ c
                r2 = xr2 + yr2 + zr2
                if (r2 .le. off2) then
                   rbk = rborn(k)
-                  ck = rpole(1,kk)
-                  uxk = rpole(2,kk)
-                  uyk = rpole(3,kk)
-                  uzk = rpole(4,kk)
-                  qxxk = rpole(5,kk)
-                  qxyk = rpole(6,kk)
-                  qxzk = rpole(7,kk)
-                  qyyk = rpole(9,kk)
-                  qyzk = rpole(10,kk)
-                  qzzk = rpole(13,kk)
-                  dxk = uinds(1,kk)
-                  dyk = uinds(2,kk)
-                  dzk = uinds(3,kk)
+                  ck = rpole(1,k)
+                  uxk = rpole(2,k)
+                  uyk = rpole(3,k)
+                  uzk = rpole(4,k)
+                  qxxk = rpole(5,k)
+                  qxyk = rpole(6,k)
+                  qxzk = rpole(7,k)
+                  qyyk = rpole(9,k)
+                  qyzk = rpole(10,k)
+                  qzzk = rpole(13,k)
+                  dxk = uinds(1,k)
+                  dyk = uinds(2,k)
+                  dzk = uinds(3,k)
                   rb2 = rbi * rbk
                   expterm = exp(-r2/(gkc*rb2))
                   expc = expterm / gkc
@@ -981,8 +979,8 @@ c
          etot = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            etot = etot + uinds(1,ii)*pbep(1,i) + uinds(2,ii)*pbep(2,i)
-     &                + uinds(3,ii)*pbep(3,i)
+            etot = etot + uinds(1,i)*pbep(1,i) + uinds(2,i)*pbep(2,i)
+     &                + uinds(3,i)*pbep(3,i)
          end do
          etot = -0.5d0 * electric * etot
          pbe = pbe + etot
@@ -1087,22 +1085,22 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uinds(1,ii) - uind(1,ii)
-         uiy = uinds(2,ii) - uind(2,ii)
-         uiz = uinds(3,ii) - uind(3,ii)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uinds(1,i) - uind(1,i)
+         uiy = uinds(2,i) - uind(2,i)
+         uiz = uinds(3,i) - uind(3,i)
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set exclusion coefficients for connected atoms
@@ -1140,9 +1138,9 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -1159,19 +1157,19 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
-                  ukx = uinds(1,kk) - uind(1,kk)
-                  uky = uinds(2,kk) - uind(2,kk)
-                  ukz = uinds(3,kk) - uind(3,kk)
+                  ck = rpole(1,k)
+                  dkx = rpole(2,k)
+                  dky = rpole(3,k)
+                  dkz = rpole(4,k)
+                  qkxx = rpole(5,k)
+                  qkxy = rpole(6,k)
+                  qkxz = rpole(7,k)
+                  qkyy = rpole(9,k)
+                  qkyz = rpole(10,k)
+                  qkzz = rpole(13,k)
+                  ukx = uinds(1,k) - uind(1,k)
+                  uky = uinds(2,k) - uind(2,k)
+                  ukz = uinds(3,k) - uind(3,k)
 c
 c     construct some intermediate quadrupole values
 c
@@ -1311,12 +1309,12 @@ c     copy the permanent moments into an array for APBS
 c
       do ii = 1, npole
          i = ipole(ii)
-         pbpole(1,i) = rpole(1,ii)
+         pbpole(1,i) = rpole(1,i)
          do j = 2, 4
-            pbpole(j,i) = rpole(j,ii)
+            pbpole(j,i) = rpole(j,i)
          end do
          do j = 5, 13
-            pbpole(j,i) = 3.0d0 * rpole(j,ii)
+            pbpole(j,i) = 3.0d0 * rpole(j,i)
          end do
       end do
 c

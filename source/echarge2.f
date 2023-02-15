@@ -89,8 +89,9 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = electric * pchg(k) / dielec
             in = jion(k)
             ic = kion(k)
@@ -141,8 +142,8 @@ c     calculate the charge interaction energy Hessian elements
 c
       do kk = 1, nion
          k = iion(kk)
-         kn = jion(kk)
-         kc = kion(kk)
+         kn = jion(k)
+         kc = kion(k)
          proceed = .true.
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
          if (proceed)  proceed = (kn .ne. i)
@@ -163,7 +164,7 @@ c
                r = sqrt(r2)
                rb = r + ebuffer
                rb2 = rb * rb
-               fik = fi * pchg(kk) * cscale(kn)
+               fik = fi * pchg(k) * cscale(kn)
 c
 c     compute chain rule terms for Hessian matrix elements
 c
@@ -248,8 +249,8 @@ c     calculate interaction energy with other unit cells
 c
       do kk = 1, nion
          k = iion(kk)
-         kn = jion(kk)
-         kc = kion(kk)
+         kn = jion(k)
+         kc = kion(k)
          proceed = .true.
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
 c
@@ -270,7 +271,7 @@ c
                   r = sqrt(r2)
                   rb = r + ebuffer
                   rb2 = rb * rb
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   if (use_polymer) then
                      if (rc2 .le. polycut2)  fik = fik * cscale(kn)
                   end if
@@ -380,8 +381,7 @@ c
       use neigh
       use shunt
       implicit none
-      integer i,j,k
-      integer ii,kk,kkk
+      integer i,j,k,kk
       integer in,ic,kn,kc
       real*8 e,de,d2e
       real*8 fi,fik,fgrp
@@ -404,10 +404,10 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = electric * pchg(k) / dielec
-            ii = k
             in = jion(k)
             ic = kion(k)
             goto 10
@@ -455,7 +455,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(i,ii,iion,jion,kion,x,y,z,
+!$OMP PARALLEL default(private) shared(i,iion,jion,kion,x,y,z,
 !$OMP& xi,yi,zi,xic,yic,zic,fi,pchg,nelst,elst,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP& ebuffer,cscale)
@@ -464,11 +464,10 @@ c
 c
 c     calculate the charge interaction energy Hessian elements
 c
-      do kkk = 1, nelst(ii)
-         kk = elst(kkk,ii)
-         k = iion(kk)
-         kn = jion(kk)
-         kc = kion(kk)
+      do kk = 1, nelst(i)
+         k = elst(kk,i)
+         kn = jion(k)
+         kc = kion(k)
          proceed = .true.
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
          if (proceed)  proceed = (kn .ne. i)
@@ -489,7 +488,7 @@ c
                r = sqrt(r2)
                rb = r + ebuffer
                rb2 = rb * rb
-               fik = fi * pchg(kk) * cscale(kn)
+               fik = fi * pchg(k) * cscale(kn)
 c
 c     compute chain rule terms for Hessian matrix elements
 c
@@ -759,14 +758,14 @@ c
          zd = 0.0d0
          do ii = 1, nion
             i = iion(ii)
-            xd = xd + pchg(ii)*x(i)
-            yd = yd + pchg(ii)*y(i)
-            zd = zd + pchg(ii)*z(i)
+            xd = xd + pchg(i)*x(i)
+            yd = yd + pchg(i)*y(i)
+            zd = zd + pchg(i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          do ii = 1, nion
             i = iion(ii)
-            de = 2.0d0 * term * pchg(ii)
+            de = 2.0d0 * term * pchg(i)
             dedx = de * xd
             dedy = de * yd
             dedz = de * zd
@@ -829,8 +828,9 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = electric * pchg(k) / dielec
             in = jion(k)
             goto 10
@@ -877,7 +877,7 @@ c     calculate the real space Ewald interaction Hessian elements
 c
       do kk = 1, nion
          k = iion(kk)
-         kn = jion(kk)
+         kn = jion(k)
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
          proceed = .true.
          if (proceed)  proceed = (kn .ne. i)
@@ -894,7 +894,7 @@ c
                r = sqrt(r2)
                rb = r + ebuffer
                rb2 = rb * rb
-               fik = fi * pchg(kk) * cscale(kn)
+               fik = fi * pchg(k) * cscale(kn)
                rew = aewald * r
                erfterm = erfc (rew)
                expterm = exp(-rew**2)
@@ -950,7 +950,7 @@ c     calculate interaction energy with other unit cells
 c
       do kk = 1, nion
          k = iion(kk)
-         kn = jion(kk)
+         kn = jion(k)
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
          proceed = .true.
 c
@@ -967,7 +967,7 @@ c
                   r = sqrt(r2)
                   rb = r + ebuffer
                   rb2 = rb * rb
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rew = aewald * r
                   erfterm = erfc (rew)
                   expterm = exp(-rew**2)
@@ -1053,7 +1053,7 @@ c
       use neigh
       use shunt
       implicit none
-      integer i,j,k,kk,kkk
+      integer i,j,k,kk
       integer ii,in,kn
       real*8 fi,fik,fgrp
       real*8 r,r2,rb,rb2
@@ -1073,10 +1073,10 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = electric * pchg(k) / dielec
-            ii = k
             in = jion(k)
             goto 10
          end if
@@ -1120,17 +1120,16 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(i,ii,iion,jion,x,y,z,fi,
+!$OMP PARALLEL default(private) shared(i,iion,jion,x,y,z,fi,
 !$OMP& pchg,nelst,elst,cscale,use_group,off2,aewald,ebuffer)
 !$OMP& shared (hessx,hessy,hessz)
 !$OMP DO reduction(+:hessx,hessy,hessz) schedule(guided)
 c
 c     calculate the real space Ewald interaction Hessian elements
 c
-      do kkk = 1, nelst(ii)
-         kk = elst(kkk,ii)
-         k = iion(kk)
-         kn = jion(kk)
+      do kk = 1, nelst(i)
+         k = elst(kk,i)
+         kn = jion(k)
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
          proceed = .true.
          if (proceed)  proceed = (kn .ne. i)
@@ -1147,7 +1146,7 @@ c
                r = sqrt(r2)
                rb = r + ebuffer
                rb2 = rb * rb
-               fik = fi * pchg(kk) * cscale(kn)
+               fik = fi * pchg(k) * cscale(kn)
                rew = aewald * r
                erfterm = erfc (rew)
                expterm = exp(-rew**2)
@@ -1248,8 +1247,9 @@ c
 c
 c     first see if the atom of interest carries a charge
 c
-      do k = 1, nion
-         if (iion(k) .eq. i) then
+      do kk = 1, nion
+         k = iion(kk)
+         if (k .eq. i) then
             fi = electric * pchg(k) / dielec
             in = jion(k)
             goto 10
@@ -1306,7 +1306,7 @@ c     calculate the charge interaction energy Hessian elements
 c
       do kk = 1, nion
          k = iion(kk)
-         kn = jion(kk)
+         kn = jion(k)
          proceed = .true.
          if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
          if (proceed)  proceed = (kn .ne. i)
@@ -1321,7 +1321,7 @@ c
             r = sqrt(r2)
             rb = r + ebuffer
             rb2 = rb * rb
-            fik = fi * pchg(kk) * cscale(kn)
+            fik = fi * pchg(k) * cscale(kn)
 c
 c     compute chain rule terms for Hessian matrix elements
 c

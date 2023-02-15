@@ -532,7 +532,7 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      if ((use_polar .or. use_repuls) .and. .not.use_chgtrn) then
+      if ((use_polar .or. use_repel) .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
          npolar = 0
@@ -543,34 +543,15 @@ c
                npole = npole + 1
                ipole(npole) = i
                pollist(i) = npole
-               zaxis(npole) = zaxis(i)
-               xaxis(npole) = xaxis(i)
-               yaxis(npole) = yaxis(i)
-               polaxe(npole) = polaxe(i)
-               do k = 1, maxpole
-                  pole(k,npole) = pole(k,i)
-               end do
-               mono0(npole) = pole(1,i)
+               mono0(i) = pole(1,i)
                if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-               pcore(npole) = pcore(i)
-               pval(npole) = pval(i)
-               pval0(npole) = pval(i)
-               palpha(npole) = palpha(i)
                if (polarity(i) .ne. 0.0d0) then
                   npolar = npolar + 1
-                  ipolar(npolar) = npole
+                  ipolar(npolar) = i
                   douind(i) = .true.
                end if
                if (tholed(i) .ne. 0.0d0)  use_tholed = .true.
-               polarity(npole) = polarity(i)
-               thole(npole) = thole(i)
-               tholed(npole) = tholed(i)
-               pdamp(npole) = pdamp(i)
                if (kpep(i) .ne. 0.0d0)  nexpol = nexpol + 1
-               kpep(npole) = kpep(i)
-               prepep(npole) = prepep(i)
-               dmppep(npole) = dmppep(i)
-               lpep(npole) = lpep(i)
             end if
          end do
       end if
@@ -612,7 +593,6 @@ c
       use couple
       use iounit
       use kpolr
-      use mpole
       use polgrp
       implicit none
       integer i,j,k,m

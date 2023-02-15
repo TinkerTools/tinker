@@ -250,7 +250,7 @@ c
       use iounit
       use mpole
       implicit none
-      integer i,j,m
+      integer i,j,m,ii
       integer ia,ib,ic,id
       integer ka,kb,kc,ki
       integer mab,mac,mbc
@@ -270,14 +270,14 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(zaxis))  allocate (zaxis(npole))
-      if (.not. allocated(xaxis))  allocate (xaxis(npole))
-      if (.not. allocated(yaxis))  allocate (yaxis(npole))
-      if (.not. allocated(polaxe))  allocate (polaxe(npole))
+      if (.not. allocated(zaxis))  allocate (zaxis(n))
+      if (.not. allocated(xaxis))  allocate (xaxis(n))
+      if (.not. allocated(yaxis))  allocate (yaxis(n))
+      if (.not. allocated(polaxe))  allocate (polaxe(n))
 c
 c     initialize the local frame type and defining atoms
 c
-      do i = 1, npole
+      do i = 1, n
          polaxe(i) = 'None'
          zaxis(i) = 0
          xaxis(i) = 0
@@ -290,7 +290,8 @@ c
 c
 c     assign the local frame definition for an isolated atom
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          j = n12(i)
          if (j .eq. 0) then
             polaxe(i) = 'None'
@@ -700,7 +701,8 @@ c
       write (iout,20)
    20 format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',
      &           2x,'X Axis',2x,'Y Axis',/)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          write (iout,30)  i,name(i),polaxe(i),zaxis(i),
      &                    xaxis(i),yaxis(i)
    30    format (i8,6x,a3,7x,a8,2x,3i8)
@@ -753,7 +755,8 @@ c
          write (iout,90)
    90    format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',
      &              2x,'X Axis',2x,'Y Axis',/)
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             write (iout,100)  i,name(i),polaxe(i),zaxis(i),
      &                        xaxis(i),yaxis(i)
   100       format (i8,6x,a3,7x,a8,2x,3i8)
@@ -1332,7 +1335,7 @@ c
       use mpole
       use units
       implicit none
-      integer i,j,k
+      integer i,j,ii
       integer ia,ib,ic,id
       integer xaxe,yaxe,zaxe
       real*8 xad,yad,zad
@@ -1349,17 +1352,18 @@ c
 c
 c     rotate the multipoles from global frame to local frame
 c
-      call rotrpole (rpole,pole)
+      call rotrpole ('MPOLE')
 c
 c     check the sign of multipole components at chiral sites;
 c     note "yaxis" sign is not flipped based on signed volume
 c
-      do i = 1, npole
+      do ii = 1, npole
          check = .true.
+         i = ipole(ii)
          if (polaxe(i) .ne. 'Z-then-X')  check = .false.
          if (yaxis(i) .eq. 0)  check = .false.
          if (check) then
-            ia = ipole(i)
+            ia = i
             ib = zaxis(i)
             ic = xaxis(i)
             id = yaxis(i)
@@ -1388,7 +1392,8 @@ c
 c
 c     convert dipole and quadrupole moments back to atomic units
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          rpole(1,i) = pole(1,i)
          do j = 2, 4
             rpole(j,i) = pole(j,i) / bohr
@@ -1404,32 +1409,32 @@ c
          write (iout,10)
    10    format (/,' Local Frame Cartesian Multipole Moments :')
          do i = 1, n
-            k = pollist(i)
-            if (k .eq. 0) then
+            ii = pollist(i)
+            if (ii .eq. 0) then
                write (iout,20)  i,name(i),atomic(i)
    20          format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
      &                    'Atomic Number:',i8)
                write (iout,30)
    30          format (/,' No Atomic Multipole Moments for this Site')
             else
-               zaxe = zaxis(k)
-               xaxe = xaxis(k)
-               yaxe = yaxis(k)
+               zaxe = zaxis(i)
+               xaxe = xaxis(i)
+               yaxe = yaxis(i)
                if (yaxe .lt. 0)  yaxe = -yaxe
                write (iout,40)  i,name(i),atomic(i)
    40          format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                    7x,'Atomic Number:',i8)
-               write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
+               write (iout,50)  polaxe(i),zaxe,xaxe,yaxe
    50          format (/,' Local Frame:',12x,a8,6x,3i8)
-               write (iout,60)  rpole(1,k)
+               write (iout,60)  rpole(1,i)
    60          format (/,' Charge:',10x,f15.5)
-               write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
+               write (iout,70)  rpole(2,i),rpole(3,i),rpole(4,i)
    70          format (' Dipole:',10x,3f15.5)
-               write (iout,80)  rpole(5,k)
+               write (iout,80)  rpole(5,i)
    80          format (' Quadrupole:',6x,f15.5)
-               write (iout,90)  rpole(8,k),rpole(9,k)
+               write (iout,90)  rpole(8,i),rpole(9,i)
    90          format (18x,2f15.5)
-               write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
+               write (iout,100)  rpole(11,i),rpole(12,i),rpole(13,i)
   100          format (18x,3f15.5)
             end if
          end do
@@ -1462,11 +1467,12 @@ c
       use units
       implicit none
       integer i,j,k
+      integer ii,kk
       integer ia,ib,ic
       integer xaxe
       integer yaxe
       integer zaxe
-      real*8 eps,ci,cj
+      real*8 eps,ci,ck
       real*8 big,sum
       logical query,change
       character*240 record
@@ -1474,7 +1480,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     list the local frame definition for each multipole site
 c
@@ -1484,16 +1490,16 @@ c
    20 format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
      &          'X Axis',2x,'Y Axis',/)
       do i = 1, n
-         k = pollist(i)
-         if (k .eq. 0) then
+         ii = pollist(i)
+         if (ii .eq. 0) then
             write (iout,30)  i,name(i)
    30       format (i8,6x,a3,10x,'--',11x,'--',6x,'--',6x,'--')
          else
-            zaxe = zaxis(k)
-            xaxe = xaxis(k)
-            yaxe = yaxis(k)
+            zaxe = zaxis(i)
+            xaxe = xaxis(i)
+            yaxe = yaxis(i)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,40)  i,name(i),polaxe(k),zaxe,xaxe,yaxe
+            write (iout,40)  i,name(i),polaxe(i),zaxe,xaxe,yaxe
    40       format (i8,6x,a3,7x,a8,2x,3i8)
          end if
       end do
@@ -1504,7 +1510,6 @@ c
       change = .false.
       do while (query)
          i = 0
-         k = 0
          ia = 0
          ib = 0
          ic = 0
@@ -1513,14 +1518,11 @@ c
      &              ' [<Enter>=Exit] :  ',$)
          read (input,60)  record
    60    format (a240)
-         read (record,*,err=70,end=70)  k,ia,ib,ic
+         read (record,*,err=70,end=70)  i,ia,ib,ic
    70    continue
-         if (k .eq. 0) then
+         if (i .eq. 0) then
             query = .false.
          else
-            i = pollist(k)
-         end if
-         if (i .ne. 0) then
             change = .true.
             if (ia .eq. 0)  polaxe(i) = 'None'
             if (ia.ne.0 .and. ib.eq.0)  polaxe(i) = 'Z-Only'
@@ -1542,25 +1544,20 @@ c
          write (iout,90)
    90    format (/,5x,'Atom',5x,'Name',6x,'Axis Type',5x,'Z Axis',2x,
      &             'X Axis',2x,'Y Axis',/)
-         do k = 1, npole
-            i = pollist(k)
-            if (i .eq. 0) then
-               write (iout,100)  k,name(k)
-  100          format (i8,6x,a3,10x,'--',11x,'--',6x,'--',6x,'--')
-            else
-               zaxe = zaxis(i)
-               xaxe = xaxis(i)
-               yaxe = yaxis(i)
-               if (yaxe .lt. 0)  yaxe = -yaxe
-               write (iout,110)  k,name(k),polaxe(i),zaxe,xaxe,yaxe
-  110          format (i8,6x,a3,7x,a8,2x,3i8)
-            end if
+         do ii = 1, npole
+            i = ipole(ii)
+            zaxe = zaxis(i)
+            xaxe = xaxis(i)
+            yaxe = yaxis(i)
+            if (yaxe .lt. 0)  yaxe = -yaxe
+            write (iout,100)  i,name(i),polaxe(i),zaxe,xaxe,yaxe
+  100       format (i8,6x,a3,7x,a8,2x,3i8)
          end do
       end if
 c
 c     rotate the multipoles from global frame to local frame
 c
-      call rotrpole (rpole,pole)
+      call rotrpole ('MPOLE')
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -1568,7 +1565,8 @@ c
 c
 c     convert dipole and quadrupole moments back to atomic units
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          pole(1,i) = pole(1,i)
          do j = 2, 4
             pole(j,i) = pole(j,i) / bohr
@@ -1581,7 +1579,8 @@ c
 c     regularize the multipole moments to desired precision
 c
       eps = 0.00001d0
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 13
             pole(j,i) = dble(nint(pole(j,i)/eps)) * eps
          end do
@@ -1589,28 +1588,31 @@ c
 c
 c     enforce integer net charge over atomic multipoles
 c
-      k = 0
+      j = 0
       big = 0.0d0
       sum = 0.0d0
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          sum = sum + pole(1,i)
          ci = abs(pole(1,i))
          if (ci .gt. big) then
-            do j = 1, npole
-               cj = abs(pole(1,j))
-               if (i.ne.j .and. ci.eq.cj)  goto 120
+            do kk = 1, npole
+               k = ipole(kk)
+               ck = abs(pole(1,k))
+               if (i.ne.k .and. ci.eq.ck)  goto 110
             end do
-            k = i
+            j = i
             big = ci
-  120       continue
+  110       continue
          end if
       end do
       sum = sum - dble(nint(sum))
-      if (k .ne. 0)  pole(1,k) = pole(1,k) - sum
+      if (j .ne. 0)  pole(1,j) = pole(1,j) - sum
 c
 c     enforce traceless quadrupole at each multipole site
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          sum = pole(5,i) + pole(9,i) + pole(13,i)
          big = max(abs(pole(5,i)),abs(pole(9,i)),abs(pole(13,i)))
          k = 0
@@ -1625,36 +1627,36 @@ c
 c
 c     print the altered local frame atomic multipole values
 c
-      write (iout,130)
-  130 format (/,' Multipoles With Altered Local Frame Definition :')
+      write (iout,120)
+  120 format (/,' Multipoles With Altered Local Frame Definition :')
       do i = 1, n
-         k = pollist(i)
-         if (i .eq. 0) then
-            write (iout,140)  i,name(i),atomic(i)
-  140       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
+         ii = pollist(i)
+         if (ii .eq. 0) then
+            write (iout,130)  i,name(i),atomic(i)
+  130       format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,
      &                 'Atomic Number:',i8)
-            write (iout,150)
-  150       format (/,' No Atomic Multipole Moments for this Site')
+            write (iout,140)
+  140       format (/,' No Atomic Multipole Moments for this Site')
          else
-            zaxe = zaxis(k)
-            xaxe = xaxis(k)
-            yaxe = yaxis(k)
+            zaxe = zaxis(i)
+            xaxe = xaxis(i)
+            yaxe = yaxis(i)
             if (yaxe .lt. 0)  yaxe = -yaxe
-            write (iout,160)  i,name(i),atomic(i)
-  160       format (/,' Atom:',i8,9x,'Name:',3x,a3,
+            write (iout,150)  i,name(i),atomic(i)
+  150       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,170)  polaxe(k),zaxe,xaxe,yaxe
-  170       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,180)  pole(1,k)
-  180       format (/,' Charge:',10x,f15.5)
-            write (iout,190)  pole(2,k),pole(3,k),pole(4,k)
-  190       format (' Dipole:',10x,3f15.5)
-            write (iout,200)  pole(5,k)
-  200       format (' Quadrupole:',6x,f15.5)
-            write (iout,210)  pole(8,k),pole(9,k)
-  210       format (18x,2f15.5)
-            write (iout,220)  pole(11,k),pole(12,k),pole(13,k)
-  220       format (18x,3f15.5)
+            write (iout,160)  polaxe(i),zaxe,xaxe,yaxe
+  160       format (/,' Local Frame:',12x,a8,6x,3i8)
+            write (iout,170)  pole(1,i)
+  170       format (/,' Charge:',10x,f15.5)
+            write (iout,180)  pole(2,i),pole(3,i),pole(4,i)
+  180       format (' Dipole:',10x,3f15.5)
+            write (iout,190)  pole(5,i)
+  190       format (' Quadrupole:',6x,f15.5)
+            write (iout,200)  pole(8,i),pole(9,i)
+  200       format (18x,2f15.5)
+            write (iout,210)  pole(11,i),pole(12,i),pole(13,i)
+  210       format (18x,3f15.5)
          end if
       end do
       return
@@ -1688,7 +1690,8 @@ c
       use polar
       use polpot
       implicit none
-      integer i,j,k,m,jj
+      integer i,j,k,m
+      integer ii,jj
       integer atn,next
       real*8 pol,thl
       real*8 pel,pal
@@ -2078,22 +2081,22 @@ c
    80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Core',
      &              5x,'Valence',8x,'Damp',/)
       end if
-      do k = 1, n
-         i = pollist(k)
+      do i = 1, n
+         ii = pollist(i)
          if (use_thole) then
-            if (i .eq. 0) then
-               write (iout,90)  k,name(k)
+            if (ii .eq. 0) then
+               write (iout,90)  i,name(i)
    90          format (i8,6x,a3,12x,'--',13x,'--')
             else
-               write (iout,100)  k,name(k),polarity(i),thole(i)
+               write (iout,100)  i,name(i),polarity(i),thole(i)
   100          format (i8,6x,a3,4x,f12.4,3x,f12.4)
             end if
          else if (use_chgpen) then
-            if (i .eq. 0) then
-               write (iout,110)  k,name(k)
+            if (ii .eq. 0) then
+               write (iout,110)  i,name(i)
   110          format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
             else
-               write (iout,120)  k,name(k),polarity(i),pcore(i),
+               write (iout,120)  i,name(i),polarity(i),pcore(i),
      &                           pval(i),palpha(i)
   120          format (i8,6x,a3,4x,f12.4,3x,3f12.4)
             end if
@@ -2113,7 +2116,6 @@ c
   130 continue
       do while (query)
          i = 0
-         k = 0
          if (use_thole) then
             pol = 0.0d0
             thl = 0.39d0
@@ -2122,10 +2124,9 @@ c
      &                 ' Values :  ',$)
             read (input,150)  record
   150       format (a240)
-            read (record,*,err=160,end=160)  k,pol,thl
+            read (record,*,err=160,end=160)  i,pol,thl
   160       continue
-            if (k .ne. 0) then
-               i = pollist(k)
+            if (i .ne. 0) then
                if (pol .eq. 0.0d0)  pol = polarity(i)
                if (thl .eq. 0.0d0)  thl = thole(i)
             end if
@@ -2138,21 +2139,17 @@ c
      &                 ' Values :  ',$)
             read (input,180)  record
   180       format (a240)
-            read (record,*,err=190,end=190)  k,pol,pel,pal
+            read (record,*,err=190,end=190)  i,pol,pel,pal
   190       continue
-            if (k .ne. 0) then
-               i = pollist(k)
+            if (i .ne. 0) then
                if (pol .eq. 0.0d0)  pol = polarity(i)
                if (pel .eq. 0.0d0)  pel = pcore(i)
                if (pal .eq. 0.0d0)  pal = palpha(i)
             end if
          end if
-         if (k .eq. 0) then
+         if (i .eq. 0) then
             query = .false.
          else
-            i = pollist(k)
-         end if
-         if (i .ne. 0) then
             change = .true.
             polarity(i) = pol
             if (use_thole) then
@@ -2179,22 +2176,22 @@ c
   220       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
      &                 8x,'Damp',/)
          end if
-         do k = 1, n
-            i = pollist(k)
+         do i = 1, n
+            ii = pollist(i)
             if (use_thole) then
-               if (i .eq. 0) then
-                  write (iout,230)  k,name(k)
+               if (ii .eq. 0) then
+                  write (iout,230)  i,name(i)
   230             format (i8,6x,a3,12x,'--',13x,'--')
                else
-                  write (iout,240)  k,name(k),polarity(i),thole(i)
+                  write (iout,240)  i,name(i),polarity(i),thole(i)
   240             format (i8,6x,a3,4x,f12.4,3x,f12.4)
                end if
             else if (use_chgpen) then
-               if (i .eq. 0) then
-                  write (iout,250)  k,name(k)
+               if (ii .eq. 0) then
+                  write (iout,250)  i,name(i)
   250             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
                else
-                  write (iout,260)  k,name(k),polarity(i),pcore(i),
+                  write (iout,260)  i,name(i),polarity(i),pcore(i),
      &                              palpha(i)
   260             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
                end if
@@ -2625,7 +2622,7 @@ c
       use polar
       use units
       implicit none
-      integer i,j,k
+      integer i,j,ii
       integer xaxe
       integer yaxe
       integer zaxe
@@ -2637,7 +2634,8 @@ c
 c
 c     remove intergroup induced dipoles from atomic multipoles
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          pole(2,i) = pole(2,i) - uind(1,i)
          pole(3,i) = pole(3,i) - uind(2,i)
          pole(4,i) = pole(4,i) - uind(3,i)
@@ -2645,7 +2643,8 @@ c
 c
 c     convert dipole and quadrupole moments back to atomic units
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          rpole(1,i) = pole(1,i)
          do j = 2, 4
             rpole(j,i) = pole(j,i) / bohr
@@ -2662,32 +2661,32 @@ c
    10    format (/,' Multipoles after Removal of Intergroup',
      &              ' Polarization :')
          do i = 1, n
-            k = pollist(i)
-            if (i .eq. 0) then
+            ii = pollist(i)
+            if (ii .eq. 0) then
                write (iout,20)  i,name(i),atomic(i)
    20          format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                    7x,'Atomic Number:',i8)
                write (iout,30)
    30          format (/,' No Atomic Multipole Moments for this Site')
             else
-               zaxe = zaxis(k)
-               xaxe = xaxis(k)
-               yaxe = yaxis(k)
+               zaxe = zaxis(i)
+               xaxe = xaxis(i)
+               yaxe = yaxis(i)
                if (yaxe .lt. 0)  yaxe = -yaxe
                write (iout,40)  i,name(i),atomic(i)
    40          format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                    7x,'Atomic Number:',i8)
-               write (iout,50)  polaxe(k),zaxe,xaxe,yaxe
+               write (iout,50)  polaxe(i),zaxe,xaxe,yaxe
    50          format (/,' Local Frame:',12x,a8,6x,3i8)
-               write (iout,60)  rpole(1,k)
+               write (iout,60)  rpole(1,i)
    60          format (/,' Charge:',10x,f15.5)
-               write (iout,70)  rpole(2,k),rpole(3,k),rpole(4,k)
+               write (iout,70)  rpole(2,i),rpole(3,i),rpole(4,i)
    70          format (' Dipole:',10x,3f15.5)
-               write (iout,80)  rpole(5,k)
+               write (iout,80)  rpole(5,i)
    80          format (' Quadrupole:',6x,f15.5)
-               write (iout,90)  rpole(8,k),rpole(9,k)
+               write (iout,90)  rpole(8,i),rpole(9,i)
    90          format (18x,2f15.5)
-               write (iout,100)  rpole(11,k),rpole(12,k),rpole(13,k)
+               write (iout,100)  rpole(11,i),rpole(12,i),rpole(13,i)
   100          format (18x,3f15.5)
             end if
          end do
@@ -2719,7 +2718,8 @@ c
       use polpot
       use units
       implicit none
-      integer i,j,k,iter
+      integer i,j,k
+      integer ii,iter
       integer maxiter
       integer trimtext
       real*8 eps,epsold
@@ -2740,25 +2740,26 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(uind))  allocate (uind(3,npole))
+      if (.not. allocated(uind))  allocate (uind(3,n))
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (poli(npole))
-      allocate (field(3,npole))
-      allocate (rsd(3,npole))
-      allocate (zrsd(3,npole))
-      allocate (conj(3,npole))
-      allocate (vec(3,npole))
+      allocate (poli(n))
+      allocate (field(3,n))
+      allocate (rsd(3,n))
+      allocate (zrsd(3,n))
+      allocate (conj(3,n))
+      allocate (vec(3,n))
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute induced dipoles as polarizability times field
 c
       call dfieldi (field)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             uind(j,i) = polarity(i) * field(j,i)
          end do
@@ -2816,7 +2817,8 @@ c
 c     compute intergroup induced dipole moments via CG algorithm
 c
       call ufieldi (field)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          poli(i) = max(polmin,polarity(i))
          do j = 1, 3
             rsd(j,i) = field(j,i)
@@ -2829,14 +2831,16 @@ c     conjugate gradient iteration of intergroup induced dipoles
 c
       do while (.not. done)
          iter = iter + 1
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                vec(j,i) = uind(j,i)
                uind(j,i) = conj(j,i)
             end do
          end do
          call ufieldi (field)
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                uind(j,i) = vec(j,i)
                vec(j,i) = conj(j,i)/poli(i) - field(j,i)
@@ -2844,21 +2848,24 @@ c
          end do
          a = 0.0d0
          sum = 0.0d0
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                a = a + conj(j,i)*vec(j,i)
                sum = sum + rsd(j,i)*zrsd(j,i)
             end do
          end do
          if (a .ne. 0.0d0)  a = sum / a
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                uind(j,i) = uind(j,i) + a*conj(j,i)
                rsd(j,i) = rsd(j,i) - a*vec(j,i)
             end do
          end do
          b = 0.0d0
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                zrsd(j,i) = rsd(j,i) * poli(i)
                b = b + rsd(j,i)*zrsd(j,i)
@@ -2866,7 +2873,8 @@ c
          end do
          if (sum .ne. 0.0d0)  b = b / sum
          eps = 0.0d0
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                conj(j,i) = zrsd(j,i) + b*conj(j,i)
                eps = eps + rsd(j,i)*rsd(j,i)
@@ -2892,7 +2900,8 @@ c
 c     apply a "peek" iteration to the intergroup induced dipoles
 c
          if (done) then
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                term = poli(i)
                do j = 1, 3
                   uind(j,i) = uind(j,i) + term*rsd(j,i)
@@ -2922,7 +2931,8 @@ c
 c
 c     rotate the induced dipoles into local coordinate frame
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          call rotmat (i,rmt,planar)
          call invert (3,rmt)
          do j = 1, 3
@@ -2943,10 +2953,10 @@ c
      &           ' (Debye) :')
       write (iout,160)
   160 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',9x,'Total',/)
-      do i = 1, npole
-         k = ipole(i)
+      do ii = 1, npole
+         i = ipole(ii)
          norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
-         write (iout,170)  k,(debye*uind(j,i),j=1,3),debye*norm
+         write (iout,170)  i,(debye*uind(j,i),j=1,3),debye*norm
   170    format (i8,5x,4f12.4)
       end do
       return
@@ -3005,9 +3015,10 @@ c
 c     zero out the induced dipole and the field at each site
 c
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            uind(j,ii) = 0.0d0
-            field(j,ii) = 0.0d0
+            uind(j,i) = 0.0d0
+            field(j,i) = 0.0d0
          end do
       end do
 c
@@ -3025,23 +3036,23 @@ c     find the electrostatic field due to permanent multipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
+            pdi = pdamp(i)
+            pti = thole(i)
          else if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -3099,16 +3110,16 @@ c
             zr = z(k) - z(i)
             r2 = xr*xr + yr* yr + zr*zr
             r = sqrt(r2)
-            ck = rpole(1,kk)
-            dkx = rpole(2,kk)
-            dky = rpole(3,kk)
-            dkz = rpole(4,kk)
-            qkxx = rpole(5,kk)
-            qkxy = rpole(6,kk)
-            qkxz = rpole(7,kk)
-            qkyy = rpole(9,kk)
-            qkyz = rpole(10,kk)
-            qkzz = rpole(13,kk)
+            ck = rpole(1,k)
+            dkx = rpole(2,k)
+            dky = rpole(3,k)
+            dkz = rpole(4,k)
+            qkxx = rpole(5,k)
+            qkxy = rpole(6,k)
+            qkxz = rpole(7,k)
+            qkyy = rpole(9,k)
+            qkyz = rpole(10,k)
+            qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -3126,12 +3137,12 @@ c
 c     find the field components for Thole polarization damping
 c
             if (use_thole) then
-               damp = pdi * pdamp(kk)
+               damp = pdi * pdamp(k)
                scale3 = 1.0d0
                scale5 = 1.0d0
                scale7 = 1.0d0
                if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(kk))
+                  pgamma = min(pti,thole(k))
                   damp = pgamma * (r/damp)**3
                   if (damp .lt. 50.0d0) then
                      expdamp = exp(-damp)
@@ -3160,9 +3171,9 @@ c
 c     find the field components for charge penetration damping
 c
             else if (use_chgpen) then
-               corek = pcore(kk)
-               valk = pval(kk)
-               alphak = palpha(kk)
+               corek = pcore(k)
+               valk = pval(k)
+               alphak = palpha(k)
                call dampdir (r,alphai,alphak,dmpi,dmpk)
                rr3 = 1.0d0 / (r*r2)
                rr5 = 3.0d0 * rr3 / r2
@@ -3193,8 +3204,8 @@ c
      &                     - rr3i*diz - 2.0d0*rr5i*qiz
             end if
             do j = 1, 3
-               field(j,ii) = field(j,ii) + fid(j)*dscale(k)
-               field(j,kk) = field(j,kk) + fkd(j)*dscale(k)
+               field(j,i) = field(j,i) + fid(j)*dscale(k)
+               field(j,k) = field(j,k) + fkd(j)*dscale(k)
             end do
          end do
 c
@@ -3288,7 +3299,8 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             field(j,i) = 0.0d0
          end do
@@ -3316,16 +3328,16 @@ c     find the electrostatic field due to induced dipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
+            pdi = pdamp(i)
+            pti = thole(i)
          else if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -3461,9 +3473,9 @@ c
             zr = z(k) - z(i)
             r2 = xr*xr + yr* yr + zr*zr
             r = sqrt(r2)
-            ukx = uind(1,kk)
-            uky = uind(2,kk)
-            ukz = uind(3,kk)
+            ukx = uind(1,k)
+            uky = uind(2,k)
+            ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -3475,9 +3487,9 @@ c
             if (use_thole) then
                scale3 = 1.0d0
                scale5 = 1.0d0
-               damp = pdi * pdamp(kk)
+               damp = pdi * pdamp(k)
                if (damp .ne. 0.0d0) then
-                  pgamma = min(pti,thole(kk))
+                  pgamma = min(pti,thole(k))
                   damp = pgamma * (r/damp)**3
                   if (damp .lt. 50.0d0) then
                      expdamp = exp(-damp)
@@ -3489,9 +3501,9 @@ c
 c     find the field components for charge penetration damping
 c
             else if (use_chgpen) then
-               corek = pcore(kk)
-               valk = pval(kk)
-               alphak = palpha(kk)
+               corek = pcore(k)
+               valk = pval(k)
+               alphak = palpha(k)
                call dampmut (r,alphai,alphak,dmpik)
                scale3 = dmpik(3)
                scale5 = dmpik(5)
@@ -3505,8 +3517,8 @@ c
             fku(2) = rr3*uiy + rr5*uir*yr
             fku(3) = rr3*uiz + rr5*uir*zr
             do j = 1, 3
-               field(j,ii) = field(j,ii) + fiu(j)*gscale(k)
-               field(j,kk) = field(j,kk) + fku(j)*gscale(k)
+               field(j,i) = field(j,i) + fiu(j)*gscale(k)
+               field(j,k) = field(j,k) + fku(j)*gscale(k)
             end do
          end do
 c
@@ -3644,7 +3656,7 @@ c
       use sizes
       implicit none
       integer i,j,k,m
-      integer it,mt
+      integer ii,it,mt
       integer in,jn,kn
       integer ni,nati
       integer nj,natj
@@ -3813,7 +3825,7 @@ c
                            end if
                            write (iout,60)  i,j
    60                      format (' Atoms',i6,2x,'and',i6,2x,
-     &                                'Set to Equivalent Types')
+     &                                'Set to Equivalent Atom Types')
                            list(i) = 1
                            list(j) = 1
                         end if
@@ -3914,10 +3926,10 @@ c
      &              ' for Each Atom :',
      &           //,5x,'Atom',4x,'Type',6x,'Local Frame',10x,
      &              'Frame Defining Atoms',/)
-         do i = 1, n
-            k = pollist(i)
-            write (iout,110)  i,type(i),polaxe(k),zaxis(k),
-     &                        xaxis(k),yaxis(k)
+         do ii = 1, npole
+            i = ipole(ii)
+            write (iout,110)  i,type(i),polaxe(i),zaxis(i),
+     &                        xaxis(i),yaxis(i)
   110       format (2i8,9x,a8,6x,3i8)
          end do
 c
@@ -3925,8 +3937,9 @@ c     identify atoms with the same atom type number, or find
 c     atoms with equivalent local frame defining atom types
 c
          useframe = .false.
-         do i = 1, npole
-            it = type(ipole(i))
+         do ii = 1, npole
+            i = ipole(ii)
+            it = type(i)
             zaxe = 0
             xaxe = 0
             yaxe = 0
@@ -3940,7 +3953,7 @@ c
             call numeral (zaxe,pb,size)
             call numeral (xaxe,pc,size)
             call numeral (yaxe,pd,size)
-            pt(i) = pa//pb//pc//pd
+            pt(ii) = pa//pb//pc//pd
          end do
          call sort7 (npole,pt,pkey)
 c
@@ -3948,14 +3961,14 @@ c     average the multipole values at equivalent atom sites
 c
          nave = 1
          ptlast = '                '
-         do i = 1, npole
-            it = pkey(i)
-            if (pt(i) .eq. ptlast) then
+         do ii = 1, npole
+            it = pkey(ii)
+            if (pt(ii) .eq. ptlast) then
                nave = nave + 1
                do j = 1, 13
                   pave(j) = pave(j) + pole(j,it)
                end do
-               if (i .eq. npole) then
+               if (ii .eq. npole) then
                   do j = 1, 13
                      pave(j) = pave(j) / dble(nave)
                   end do
@@ -3982,7 +3995,7 @@ c
                do j = 1, 13
                   pave(j) = pole(j,it)
                end do
-               ptlast = pt(i)
+               ptlast = pt(ii)
             end if
          end do
 c
@@ -4068,7 +4081,8 @@ c
 c     remove multipole components that are zero by symmetry
 c
       if (symm) then
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             xyzero = .false.
             yzero = .false.
             if (polaxe(i) .eq. 'Bisector')  xyzero = .true.
@@ -4119,32 +4133,32 @@ c
   160 format (/,' Final Atomic Multipole Moments after',
      &           ' Regularization :')
       do i = 1, n
-         k = pollist(i)
-         if (k .eq. 0) then
+         ii = pollist(i)
+         if (ii .eq. 0) then
             write (iout,170)  i,name(i),atomic(i)
   170       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
             write (iout,180)
   180       format (/,' No Atomic Multipole Moments for this Site')
          else
-            zaxe = zaxis(k)
-            xaxe = xaxis(k)
-            yaxe = yaxis(k)
+            zaxe = zaxis(i)
+            xaxe = xaxis(i)
+            yaxe = yaxis(i)
             if (yaxe .lt. 0)  yaxe = -yaxe
             write (iout,190)  i,name(i),atomic(i)
   190       format (/,' Atom:',i8,9x,'Name:',3x,a3,
      &                 7x,'Atomic Number:',i8)
-            write (iout,200)  polaxe(k),zaxe,xaxe,yaxe
+            write (iout,200)  polaxe(i),zaxe,xaxe,yaxe
   200       format (/,' Local Frame:',12x,a8,6x,3i8)
-            write (iout,210)  pole(1,k)
+            write (iout,210)  pole(1,i)
   210       format (/,' Charge:',10x,f15.5)
-            write (iout,220)  pole(2,k),pole(3,k),pole(4,k)
+            write (iout,220)  pole(2,i),pole(3,i),pole(4,i)
   220       format (' Dipole:',10x,3f15.5)
-            write (iout,230)  pole(5,k)
+            write (iout,230)  pole(5,i)
   230       format (' Quadrupole:',6x,f15.5)
-            write (iout,240)  pole(8,k),pole(9,k)
+            write (iout,240)  pole(8,i),pole(9,i)
   240       format (18x,2f15.5)
-            write (iout,250)  pole(11,k),pole(12,k),pole(13,k)
+            write (iout,250)  pole(11,i),pole(12,i),pole(13,i)
   250       format (18x,3f15.5)
          end if
       end do
@@ -4170,7 +4184,7 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer it,ktype
+      integer ii,it,ktype
       integer, allocatable :: equiv(:)
       real*8 eps,sum,big
       real*8 ival,kval
@@ -4178,7 +4192,8 @@ c
 c
 c     convert dipole and quadrupole moments to atomic units
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          pole(1,i) = pole(1,i)
          do j = 2, 4
             pole(j,i) = pole(j,i) / bohr
@@ -4191,7 +4206,8 @@ c
 c     regularize multipole moments to desired precision
 c
       eps = 0.00001d0
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 13
             pole(j,i) = dble(nint(pole(j,i)/eps)) * eps
          end do
@@ -4208,9 +4224,10 @@ c
       end do
       ktype = 0
       sum = 0.0d0
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          it = type(ipole(i))
-         equiv(it) = equiv(it) + 1 
+         equiv(it) = equiv(it) + 1
          sum = sum + pole(1,i)
       end do
       sum = sum - dble(nint(sum))
@@ -4218,10 +4235,11 @@ c
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
-            do i = 1, npole
-               it = type(ipole(i))
+            do ii = 1, npole
+               i = ipole(ii)
+               it = type(i)
                if (equiv(it) .eq. m) then
-                  ival = abs(pole(1,ipole(i)))
+                  ival = abs(pole(1,i))
                   if (ktype .eq. 0) then
                      ktype = it
                      kval = ival
@@ -4237,8 +4255,9 @@ c
    10 continue
       if (ktype .ne. 0) then
          sum = sum / dble(m)
-         do i = 1, npole
-            it = type(ipole(i))
+         do ii = 1, npole
+            i = ipole(ii)
+            it = type(i)
             if (it .eq. ktype)  pole(1,i) = pole(1,i) - sum
          end do
       end if
@@ -4249,7 +4268,8 @@ c
 c
 c     enforce traceless quadrupole at each multipole site
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          sum = pole(5,i) + pole(9,i) + pole(13,i)
          big = max(abs(pole(5,i)),abs(pole(9,i)),abs(pole(13,i)))
          k = 0
@@ -4287,7 +4307,8 @@ c
       use sizes
       use units
       implicit none
-      integer i,j,k,m,it
+      integer i,j,k
+      integer ii,it
       integer ixyz,ikey
       integer size,atlast
       integer xaxe,yaxe,zaxe
@@ -4336,16 +4357,17 @@ c
 c
 c     locate the equivalently defined atom type sites
 c
-      do i = 1, npole
-         at(i) = type(ipole(i))
+      do ii = 1, npole
+         i = ipole(ii)
+         at(ii) = type(i)
       end do
       call sort3 (npole,at,atkey)
 c
 c     output the atom definitions to the keyfile as appropriate
 c
       atlast = 0
-      do k = 1, npole
-         i = atkey(k)
+      do ii = 1, npole
+         i = atkey(ii)
          it = type(i)
          if (it .ne. atlast) then
             atlast = it
@@ -4361,9 +4383,9 @@ c
 c
 c     locate the equivalently defined multipole sites
 c
-      do i = 1, npole
-         k = ipole(i)
-         it = type(k)
+      do ii = 1, npole
+         i = ipole(ii)
+         it = type(i)
          zaxe = 0
          xaxe = 0
          yaxe = 0
@@ -4375,18 +4397,18 @@ c
          call numeral (zaxe,pb,size)
          call numeral (xaxe,pc,size)
          call numeral (yaxe,pd,size)
-         pt(i) = pa//pb//pc//pd
+         pt(ii) = pa//pb//pc//pd
       end do
       call sort7 (npole,pt,ptkey)
 c
 c     output the local frame multipole values to the keyfile
 c
       ptlast = '                '
-      do k = 1, npole
-         i = ptkey(k)
+      do ii = 1, npole
+         i = ptkey(ii)
          it = type(ipole(i))
-         if (pt(k) .ne. ptlast) then
-            ptlast = pt(k)
+         if (pt(ii) .ne. ptlast) then
+            ptlast = pt(ii)
             zaxe = 0
             xaxe = 0
             yaxe = 0
@@ -4441,8 +4463,8 @@ c
   170       format ()
          end if
          atlast = 0
-         do k = 1, npole
-            i = atkey(k)
+         do ii = 1, npole
+            i = atkey(ii)
             it = type(i)
             if (it .ne. atlast) then
                atlast = it
@@ -4459,22 +4481,22 @@ c
   190    format ()
       end if
       atlast = 0
-      do k = 1, npole
-         i = atkey(k)
+      do ii = 1, npole
+         i = atkey(ii)
          it = type(i)
          if (it .ne. atlast) then
             atlast = it
-            m = 0
+            k = 0
             do j = 1, maxval
-               if (pgrp(j,it) .ne. 0)  m = j
+               if (pgrp(j,it) .ne. 0)  k = j
             end do
-            call sort8 (m,pgrp(1,it))
+            call sort8 (k,pgrp(1,it))
             if (use_thole) then
                write (ikey,200)  it,polarity(i),thole(i),
-     &                           (pgrp(j,it),j=1,m)
+     &                           (pgrp(j,it),j=1,k)
   200          format ('polarize',7x,i5,5x,2f11.4,2x,20i5)
             else if (use_chgpen) then
-               write (ikey,210)  it,polarity(i),(pgrp(j,it),j=1,m)
+               write (ikey,210)  it,polarity(i),(pgrp(j,it),j=1,k)
   210          format ('polarize',7x,i5,5x,f11.4,6x,20i7)
             end if
          end if

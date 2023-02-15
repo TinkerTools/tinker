@@ -96,9 +96,9 @@ c
       if (use_polar) then
           do i = 1, npole
              k = ipole(i)
-             px(k) = uind(1,i)
-             py(k) = uind(2,i)
-             pz(k) = uind(3,i)
+             px(k) = uind(1,k)
+             py(k) = uind(2,k)
+             pz(k) = uind(3,k)
           end do
           call setinduced (n,px,py,pz)
       end if
@@ -202,9 +202,9 @@ c
       if (use_polar) then
           do i = 1, npole
              k = ipole(i)
-             px(k) = uind(1,i)
-             py(k) = uind(2,i)
-             pz(k) = uind(3,i)
+             px(k) = uind(1,k)
+             py(k) = uind(2,k)
+             pz(k) = uind(3,k)
           end do
           call setinduced (n,px,py,pz)
       end if

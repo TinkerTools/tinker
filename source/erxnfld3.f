@@ -78,7 +78,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the indices used in reaction field calculations
 c
@@ -88,18 +88,18 @@ c     calculate the reaction field interaction energy term
 c
       do ii = 1, npole
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
-         do j = 1, polsiz(ii)
-            rpi(j) = rpole(j,ii)
+         do j = 1, polsiz(i)
+            rpi(j) = rpole(j,i)
          end do
          do kk = ii, npole
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             if (usei .or. usek) then
                xr = x(k) - x(i)
@@ -107,10 +107,10 @@ c
                zr = z(k) - z(i)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
-                  do j = 1, polsiz(kk)
-                     rpk(j) = rpole(j,kk)
+                  do j = 1, polsiz(k)
+                     rpk(j) = rpole(j,k)
                   end do
-                  call erfik (ii,kk,i,k,rpi,rpk,eik)
+                  call erfik (i,k,rpi,rpk,eik)
                   nerxf = nerxf + 1
                   erxf = erxf + eik
                   aerxf(i) = aerxf(i) + 0.5d0*eik
@@ -130,8 +130,8 @@ c
      &                             6x,'Energy',/)
                      end if
                      r = sqrt(r2)
-                     di = sqrt(x(i)**2 + y(i)**2 + z(i)**2)
-                     dk = sqrt(x(k)**2 + y(k)**2 + z(k)**2)
+                     di = sqrt(x(i)*x(i)+y(i)*y(i)+z(i)*z(i))
+                     dk = sqrt(x(k)*x(k)+y(k)*y(k)+z(k)*z(k))
                      write (iout,30)  i,name(i),k,name(k),di,dk,r,eik
    30                format (' RxnFld',4x,2(i7,'-',a3),3x,3f10.4,f12.4)
                   end if

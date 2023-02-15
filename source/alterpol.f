@@ -92,7 +92,8 @@ c
 c
 c     set polarizability tensor scaling to the identity matrix
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          polscale(1,1,i) = 1.0d0
          polscale(2,1,i) = 0.0d0
          polscale(3,1,i) = 0.0d0
@@ -117,10 +118,10 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         springi = kpep(ii)
-         sizi = prepep(ii)
-         alphai = dmppep(ii)
-         epli = lpep(ii)
+         springi = kpep(i)
+         sizi = prepep(i)
+         alphai = dmppep(i)
+         epli = lpep(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -157,7 +158,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            eplk = lpep(kk)
+            eplk = lpep(k)
             if (epli .or. eplk) then
                xr = x(k) - xi
                yr = y(k) - yi
@@ -166,9 +167,9 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(kk)
-                  sizk = prepep(kk)
-                  alphak = dmppep(kk)
+                  springk = kpep(k)
+                  sizk = prepep(k)
+                  alphak = dmppep(k)
                   sizik = sizi * sizk
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
@@ -187,8 +188,8 @@ c
                   call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
                   do j = 1, 3
                      do m = 1, 3
-                        polscale(j,m,ii) = polscale(j,m,ii) + ks2i(j,m)
-                        polscale(j,m,kk) = polscale(j,m,kk) + ks2k(j,m)
+                        polscale(j,m,i) = polscale(j,m,i) + ks2i(j,m)
+                        polscale(j,m,k) = polscale(j,m,k) + ks2k(j,m)
                      end do
                   end do
                end if
@@ -223,10 +224,10 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            springi = kpep(ii)
-            sizi = prepep(ii)
-            alphai = dmppep(ii)
-            epli = lpep(ii)
+            springi = kpep(i)
+            sizi = prepep(i)
+            alphai = dmppep(i)
+            epli = lpep(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -263,7 +264,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               eplk = lpep(kk)
+               eplk = lpep(k)
                if (epli .or. eplk) then
                   do jcell = 2, ncell
                      xr = x(k) - xi
@@ -273,9 +274,9 @@ c
                      r2 = xr*xr + yr*yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        springk = kpep(kk)
-                        sizk = prepep(kk)
-                        alphak = dmppep(kk)
+                        springk = kpep(k)
+                        sizk = prepep(k)
+                        alphak = dmppep(k)
                         sizik = sizi * sizk
                         call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
@@ -298,10 +299,10 @@ c
                         call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
                         do j = 1, 3
                            do m = 1, 3
-                              polscale(j,m,ii) = polscale(j,m,ii)
-     &                                              + ks2i(j,m)
-                              polscale(j,m,kk) = polscale(j,m,kk)
-     &                                              + ks2k(j,m)
+                              polscale(j,m,i) = polscale(j,m,i)
+     &                                             + ks2i(j,m)
+                              polscale(j,m,k) = polscale(j,m,k)
+     &                                             + ks2k(j,m)
                            end do
                         end do
                      end if
@@ -329,12 +330,13 @@ c
 c     find inverse of the polarizability scaling matrix
 c
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             do m = 1, 3
-               polinv(j,m,ii) = polscale(j,m,ii)
+               polinv(j,m,i) = polscale(j,m,i)
             end do
          end do
-         call invert (3,polinv(1,1,ii))
+         call invert (3,polinv(1,1,i))
       end do
 c
 c     perform deallocation of some local arrays
@@ -395,7 +397,8 @@ c
 c
 c     set polarizability tensor scaling to the identity matrix
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          polscale(1,1,i) = 1.0d0
          polscale(2,1,i) = 0.0d0
          polscale(3,1,i) = 0.0d0
@@ -431,10 +434,10 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         springi = kpep(ii)
-         sizi = prepep(ii)
-         alphai = dmppep(ii)
-         epli = lpep(ii)
+         springi = kpep(i)
+         sizi = prepep(i)
+         alphai = dmppep(i)
+         epli = lpep(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -472,7 +475,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = ipole(kk)
-            eplk = lpep(kk)
+            eplk = lpep(k)
             if (epli .or. eplk) then
                xr = x(k) - xi
                yr = y(k) - yi
@@ -481,9 +484,9 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(kk)
-                  sizk = prepep(kk)
-                  alphak = dmppep(kk)
+                  springk = kpep(k)
+                  sizk = prepep(k)
+                  alphak = dmppep(k)
                   sizik = sizi * sizk
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
@@ -502,8 +505,8 @@ c
                   call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
                   do j = 1, 3
                      do m = 1, 3
-                        polscale(j,m,ii) = polscale(j,m,ii) + ks2i(j,m)
-                        polscale(j,m,kk) = polscale(j,m,kk) + ks2k(j,m)
+                        polscale(j,m,i) = polscale(j,m,i) + ks2i(j,m)
+                        polscale(j,m,k) = polscale(j,m,k) + ks2k(j,m)
                      end do
                   end do
                end if
@@ -531,12 +534,13 @@ c     find inverse of the polarizability scaling matrix
 c
 !$OMP DO schedule(guided)
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             do m = 1, 3
-               polinv(j,m,ii) = polscale(j,m,ii)
+               polinv(j,m,i) = polscale(j,m,i)
             end do
          end do
-         call invert (3,polinv(1,1,ii))
+         call invert (3,polinv(1,1,i))
       end do
 !$OMP END DO
 !$OMP END PARALLEL

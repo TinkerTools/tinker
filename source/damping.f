@@ -98,8 +98,8 @@ c
 c     use original Thole polarization model damping factors
 c
       damp = pdamp(i) * pdamp(k)
-      it = jpolar(ipole(i))
-      kt = jpolar(ipole(k))
+      it = jpolar(i)
+      kt = jpolar(k)
       pgamma = thlval(it,kt)
       if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
          damp = pgamma * (r/damp)**3
@@ -167,8 +167,8 @@ c     use alternate Thole model for AMOEBA+ direct polarization
 c
       damp = pdamp(i) * pdamp(k)
       if (use_tholed) then
-         it = jpolar(ipole(i))
-         kt = jpolar(ipole(k))
+         it = jpolar(i)
+         kt = jpolar(k)
          pgamma = thdval(it,kt)
          if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
             damp = pgamma * (r/damp)**(1.5d0)
@@ -187,8 +187,8 @@ c
 c     use original Thole polarization model damping factors
 c
       else
-         it = jpolar(ipole(i))
-         kt = jpolar(ipole(k))
+         it = jpolar(i)
+         kt = jpolar(k)
          pgamma = thlval(it,kt)
          if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
             damp = pgamma * (r/damp)**3

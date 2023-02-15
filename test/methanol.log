@@ -6,7 +6,7 @@
  ##                                                                          ##
  ##                      Version 8.10.5   February 2023                      ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2022               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2023               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -188,8 +188,8 @@
  Condense Symmetric Atoms to Equivalent Types [Y] :  
  Equivalent Atoms Assigned the Same Atom Type :
 
- Atoms     4  and     5  Set to Equivalent Types
- Atoms     4  and     6  Set to Equivalent Types
+ Atoms     4  and     5  Set to Equivalent Atom Types
+ Atoms     4  and     6  Set to Equivalent Atom Types
 
  Enter Sets of Equivalent or Different Atoms [<Enter>=Exit] :  
  Atom Type and Local Frame Definition for Each Atom :

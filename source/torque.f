@@ -85,7 +85,7 @@ c
       axetyp = polaxe(i)
       if (axetyp .eq. 'None')  return
       ia = zaxis(i)
-      ib = ipole(i)
+      ib = i
       ic = xaxis(i)
       id = abs(yaxis(i))
 c

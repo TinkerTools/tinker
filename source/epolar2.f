@@ -38,7 +38,7 @@ c
       use mpole
       use polpot
       implicit none
-      integer i,j,k
+      integer i,j,k,kk
       integer nlist
       integer, allocatable :: list(:)
       real*8 eps,old
@@ -63,7 +63,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (list(npole))
+      allocate (list(n))
       allocate (d0(3,n))
 c
 c     perform dynamic allocation of some global arrays
@@ -79,8 +79,9 @@ c     find the multipole definition involving the current atom;
 c     results in a faster but approximate Hessian calculation
 c
       nlist = 0
-      do k = 1, npole
-         if (biglist .or. ipole(k).eq.i) then
+      do kk = 1, npole
+         k = ipole(kk)
+         if (biglist .or. k.eq.i) then
             nlist = nlist + 1
             list(nlist) = k
          end if
@@ -310,7 +311,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -359,44 +360,44 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
-         uixp = uinp(1,ii)
-         uiyp = uinp(2,ii)
-         uizp = uinp(3,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
+         uixp = uinp(1,i)
+         uiyp = uinp(2,i)
+         uizp = uinp(3,i)
          do j = 1, tcgnab
-            uax(j) = uad(1,ii,j)
-            uay(j) = uad(2,ii,j)
-            uaz(j) = uad(3,ii,j)
-            uaxp(j) = uap(1,ii,j)
-            uayp(j) = uap(2,ii,j)
-            uazp(j) = uap(3,ii,j)
-            ubx(j) = ubd(1,ii,j)
-            uby(j) = ubd(2,ii,j)
-            ubz(j) = ubd(3,ii,j)
-            ubxp(j) = ubp(1,ii,j)
-            ubyp(j) = ubp(2,ii,j)
-            ubzp(j) = ubp(3,ii,j)
+            uax(j) = uad(1,i,j)
+            uay(j) = uad(2,i,j)
+            uaz(j) = uad(3,i,j)
+            uaxp(j) = uap(1,i,j)
+            uayp(j) = uap(2,i,j)
+            uazp(j) = uap(3,i,j)
+            ubx(j) = ubd(1,i,j)
+            uby(j) = ubd(2,i,j)
+            ubz(j) = ubd(3,i,j)
+            ubxp(j) = ubp(1,i,j)
+            ubyp(j) = ubp(2,i,j)
+            ubzp(j) = ubp(3,i,j)
          end do
          if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = tholed(ii)
+            pdi = pdamp(i)
+            pti = thole(i)
+            ddi = tholed(i)
          else if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -513,22 +514,22 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
-               ukx = uind(1,kk)
-               uky = uind(2,kk)
-               ukz = uind(3,kk)
-               ukxp = uinp(1,kk)
-               ukyp = uinp(2,kk)
-               ukzp = uinp(3,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
+               ukx = uind(1,k)
+               uky = uind(2,k)
+               ukz = uind(3,k)
+               ukxp = uinp(1,k)
+               ukyp = uinp(2,k)
+               ukzp = uinp(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -569,7 +570,7 @@ c
 c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
-                  damp = pdi * pdamp(kk)
+                  damp = pdi * pdamp(k)
                   it = jpolar(i)
                   kt = jpolar(k)
                   if (use_tholed) then
@@ -639,9 +640,9 @@ c
 c     apply charge penetration damping to scale factors
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call damppole (r,9,alphai,alphak,dmpi,dmpk,dmpik)
                   dsr3i = 2.0d0 * rr3 * dmpi(3) * dscale(k)
                   dsr5i = 2.0d0 * rr5 * dmpi(5) * dscale(k)
@@ -1006,9 +1007,9 @@ c
                      rc3(j) = 0.0d0
                      rc5(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(kk)
+                  damp = pdi * pdamp(k)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
+                     pgamma = min(pti,thole(k))
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -1108,11 +1109,11 @@ c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
                   do j = 0, optorder-1
-                     uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
-     &                          + uopt(j,3,ii)*zr
+                     uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
                      do m = 0, optorder-j-1
-                        ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
-     &                             + uopt(m,3,kk)*zr
+                        ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                             + uopt(m,3,k)*zr
                         term1 = (sc3+sc5) * rr5
                         term2 = term1*xr - rc3(1)
                         term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
@@ -1129,31 +1130,31 @@ c
                         term1 = sc5 * rr5 * yr
                         term2 = sc3*rr5*xr - rc3(1)
                         term3 = yr * (sc5*rr7*xr-rc5(1))
-                        tixy = uopt(j,1,ii)*term1 + uopt(j,2,ii)*term2
+                        tixy = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
      &                            - uirm*term3
-                        tkxy = uopt(m,1,kk)*term1 + uopt(m,2,kk)*term2
+                        tkxy = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
      &                            - ukrm*term3
                         term1 = sc5 * rr5 * zr
                         term3 = zr * (sc5*rr7*xr-rc5(1))
-                        tixz = uopt(j,1,ii)*term1 + uopt(j,3,ii)*term2
+                        tixz = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
      &                            - uirm*term3
-                        tkxz = uopt(m,1,kk)*term1 + uopt(m,3,kk)*term2
+                        tkxz = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
      &                            - ukrm*term3
                         term2 = sc3*rr5*yr - rc3(2)
                         term3 = zr * (sc5*rr7*yr-rc5(2))
-                        tiyz = uopt(j,2,ii)*term1 + uopt(j,3,ii)*term2
+                        tiyz = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
      &                            - uirm*term3
-                        tkyz = uopt(m,2,kk)*term1 + uopt(m,3,kk)*term2
+                        tkyz = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                            - ukrm*term3
-                        depx = tixx*uoptp(m,1,kk) + tkxx*uoptp(j,1,ii)
-     &                       + tixy*uoptp(m,2,kk) + tkxy*uoptp(j,2,ii)
-     &                       + tixz*uoptp(m,3,kk) + tkxz*uoptp(j,3,ii)
-                        depy = tixy*uoptp(m,1,kk) + tkxy*uoptp(j,1,ii)
-     &                       + tiyy*uoptp(m,2,kk) + tkyy*uoptp(j,2,ii)
-     &                       + tiyz*uoptp(m,3,kk) + tkyz*uoptp(j,3,ii)
-                        depz = tixz*uoptp(m,1,kk) + tkxz*uoptp(j,1,ii)
-     &                       + tiyz*uoptp(m,2,kk) + tkyz*uoptp(j,2,ii)
-     &                       + tizz*uoptp(m,3,kk) + tkzz*uoptp(j,3,ii)
+                        depx = tixx*uoptp(m,1,k) + tkxx*uoptp(j,1,i)
+     &                       + tixy*uoptp(m,2,k) + tkxy*uoptp(j,2,i)
+     &                       + tixz*uoptp(m,3,k) + tkxz*uoptp(j,3,i)
+                        depy = tixy*uoptp(m,1,k) + tkxy*uoptp(j,1,i)
+     &                       + tiyy*uoptp(m,2,k) + tkyy*uoptp(j,2,i)
+     &                       + tiyz*uoptp(m,3,k) + tkyz*uoptp(j,3,i)
+                        depz = tixz*uoptp(m,1,k) + tkxz*uoptp(j,1,i)
+     &                       + tiyz*uoptp(m,2,k) + tkyz*uoptp(j,2,i)
+     &                       + tizz*uoptp(m,3,k) + tkzz*uoptp(j,3,i)
                         frcx = frcx + copm(j+m+1)*uscale(k)*depx
                         frcy = frcy + copm(j+m+1)*uscale(k)*depy
                         frcz = frcz + copm(j+m+1)*uscale(k)*depz
@@ -1220,12 +1221,12 @@ c     get the dtau/dr terms used for TCG polarization force
 c
                else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
-                     ukx = ubd(1,kk,j)
-                     uky = ubd(2,kk,j)
-                     ukz = ubd(3,kk,j)
-                     ukxp = ubp(1,kk,j)
-                     ukyp = ubp(2,kk,j)
-                     ukzp = ubp(3,kk,j)
+                     ukx = ubd(1,k,j)
+                     uky = ubd(2,k,j)
+                     ukz = ubd(3,k,j)
+                     ukxp = ubp(1,k,j)
+                     ukyp = ubp(2,k,j)
+                     ukzp = ubp(3,k,j)
                      uirt = uax(j)*xr + uay(j)*yr + uaz(j)*zr
                      ukrt = ukx*xr + uky*yr + ukz*zr
                      term1 = (sc3+sc5) * rr5
@@ -1266,12 +1267,12 @@ c
                      frcx = frcx + uscale(k)*depx
                      frcy = frcy + uscale(k)*depy
                      frcz = frcz + uscale(k)*depz
-                     ukx = uad(1,kk,j)
-                     uky = uad(2,kk,j)
-                     ukz = uad(3,kk,j)
-                     ukxp = uap(1,kk,j)
-                     ukyp = uap(2,kk,j)
-                     ukzp = uap(3,kk,j)
+                     ukx = uad(1,k,j)
+                     uky = uad(2,k,j)
+                     ukz = uad(3,k,j)
+                     ukxp = uap(1,k,j)
+                     ukyp = uap(2,k,j)
+                     ukzp = uap(3,k,j)
                      uirt = ubx(j)*xr + uby(j)*yr + ubz(j)*zr
                      ukrt = ukx*xr + uky*yr + ukz*zr
                      term1 = (sc3+sc5) * rr5
@@ -1411,44 +1412,44 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
-         uixp = uinp(1,ii)
-         uiyp = uinp(2,ii)
-         uizp = uinp(3,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
+         uixp = uinp(1,i)
+         uiyp = uinp(2,i)
+         uizp = uinp(3,i)
          do j = 1, tcgnab
-            uax(j) = uad(1,ii,j)
-            uay(j) = uad(2,ii,j)
-            uaz(j) = uad(3,ii,j)
-            uaxp(j) = uap(1,ii,j)
-            uayp(j) = uap(2,ii,j)
-            uazp(j) = uap(3,ii,j)
-            ubx(j) = ubd(1,ii,j)
-            uby(j) = ubd(2,ii,j)
-            ubz(j) = ubd(3,ii,j)
-            ubxp(j) = ubp(1,ii,j)
-            ubyp(j) = ubp(2,ii,j)
-            ubzp(j) = ubp(3,ii,j)
+            uax(j) = uad(1,i,j)
+            uay(j) = uad(2,i,j)
+            uaz(j) = uad(3,i,j)
+            uaxp(j) = uap(1,i,j)
+            uayp(j) = uap(2,i,j)
+            uazp(j) = uap(3,i,j)
+            ubx(j) = ubd(1,i,j)
+            uby(j) = ubd(2,i,j)
+            ubz(j) = ubd(3,i,j)
+            ubxp(j) = ubp(1,i,j)
+            ubyp(j) = ubp(2,i,j)
+            ubzp(j) = ubp(3,i,j)
          end do
          if (use_thole) then
-            pdi = pdamp(ii)
-            pti = thole(ii)
-            ddi = tholed(ii)
+            pdi = pdamp(i)
+            pti = thole(i)
+            ddi = tholed(i)
          else if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1570,22 +1571,22 @@ c
             end if
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
-               ukx = uind(1,kk)
-               uky = uind(2,kk)
-               ukz = uind(3,kk)
-               ukxp = uinp(1,kk)
-               ukyp = uinp(2,kk)
-               ukzp = uinp(3,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
+               ukx = uind(1,k)
+               uky = uind(2,k)
+               ukz = uind(3,k)
+               ukxp = uinp(1,k)
+               ukyp = uinp(2,k)
+               ukzp = uinp(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1626,7 +1627,7 @@ c
 c     apply Thole polarization damping to scale factors
 c
                if (use_thole) then
-                  damp = pdi * pdamp(kk)
+                  damp = pdi * pdamp(k)
                   it = jpolar(i)
                   kt = jpolar(k)
                   if (use_tholed) then
@@ -1696,9 +1697,9 @@ c
 c     apply charge penetration damping to scale factors
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call damppole (r,9,alphai,alphak,dmpi,dmpk,dmpik)
                   dsr3i = 2.0d0 * rr3 * dmpi(3) * dscale(k)
                   dsr5i = 2.0d0 * rr5 * dmpi(5) * dscale(k)
@@ -2063,9 +2064,9 @@ c
                      rc3(j) = 0.0d0
                      rc5(j) = 0.0d0
                   end do
-                  damp = pdi * pdamp(kk)
+                  damp = pdi * pdamp(k)
                   if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(kk))
+                     pgamma = min(pti,thole(k))
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -2165,11 +2166,11 @@ c     get the dtau/dr terms used for OPT polarization force
 c
                else if (poltyp.eq.'OPT' .and. use_thole) then
                   do j = 0, optorder-1
-                     uirm = uopt(j,1,ii)*xr + uopt(j,2,ii)*yr
-     &                          + uopt(j,3,ii)*zr
+                     uirm = uopt(j,1,i)*xr + uopt(j,2,i)*yr
+     &                          + uopt(j,3,i)*zr
                      do m = 0, optorder-j-1
-                        ukrm = uopt(m,1,kk)*xr + uopt(m,2,kk)*yr
-     &                             + uopt(m,3,kk)*zr
+                        ukrm = uopt(m,1,k)*xr + uopt(m,2,k)*yr
+     &                             + uopt(m,3,k)*zr
                         term1 = (sc3+sc5) * rr5
                         term2 = term1*xr - rc3(1)
                         term3 = sc5*(rr5-rr7*xr*xr) + rc5(1)*xr
@@ -2186,31 +2187,31 @@ c
                         term1 = sc5 * rr5 * yr
                         term2 = sc3*rr5*xr - rc3(1)
                         term3 = yr * (sc5*rr7*xr-rc5(1))
-                        tixy = uopt(j,1,ii)*term1 + uopt(j,2,ii)*term2
+                        tixy = uopt(j,1,i)*term1 + uopt(j,2,i)*term2
      &                            - uirm*term3
-                        tkxy = uopt(m,1,kk)*term1 + uopt(m,2,kk)*term2
+                        tkxy = uopt(m,1,k)*term1 + uopt(m,2,k)*term2
      &                            - ukrm*term3
                         term1 = sc5 * rr5 * zr
                         term3 = zr * (sc5*rr7*xr-rc5(1))
-                        tixz = uopt(j,1,ii)*term1 + uopt(j,3,ii)*term2
+                        tixz = uopt(j,1,i)*term1 + uopt(j,3,i)*term2
      &                            - uirm*term3
-                        tkxz = uopt(m,1,kk)*term1 + uopt(m,3,kk)*term2
+                        tkxz = uopt(m,1,k)*term1 + uopt(m,3,k)*term2
      &                            - ukrm*term3
                         term2 = sc3*rr5*yr - rc3(2)
                         term3 = zr * (sc5*rr7*yr-rc5(2))
-                        tiyz = uopt(j,2,ii)*term1 + uopt(j,3,ii)*term2
+                        tiyz = uopt(j,2,i)*term1 + uopt(j,3,i)*term2
      &                            - uirm*term3
-                        tkyz = uopt(m,2,kk)*term1 + uopt(m,3,kk)*term2
+                        tkyz = uopt(m,2,k)*term1 + uopt(m,3,k)*term2
      &                            - ukrm*term3
-                        depx = tixx*uoptp(m,1,kk) + tkxx*uoptp(j,1,ii)
-     &                       + tixy*uoptp(m,2,kk) + tkxy*uoptp(j,2,ii)
-     &                       + tixz*uoptp(m,3,kk) + tkxz*uoptp(j,3,ii)
-                        depy = tixy*uoptp(m,1,kk) + tkxy*uoptp(j,1,ii)
-     &                       + tiyy*uoptp(m,2,kk) + tkyy*uoptp(j,2,ii)
-     &                       + tiyz*uoptp(m,3,kk) + tkyz*uoptp(j,3,ii)
-                        depz = tixz*uoptp(m,1,kk) + tkxz*uoptp(j,1,ii)
-     &                       + tiyz*uoptp(m,2,kk) + tkyz*uoptp(j,2,ii)
-     &                       + tizz*uoptp(m,3,kk) + tkzz*uoptp(j,3,ii)
+                        depx = tixx*uoptp(m,1,k) + tkxx*uoptp(j,1,i)
+     &                       + tixy*uoptp(m,2,k) + tkxy*uoptp(j,2,i)
+     &                       + tixz*uoptp(m,3,k) + tkxz*uoptp(j,3,i)
+                        depy = tixy*uoptp(m,1,k) + tkxy*uoptp(j,1,i)
+     &                       + tiyy*uoptp(m,2,k) + tkyy*uoptp(j,2,i)
+     &                       + tiyz*uoptp(m,3,k) + tkyz*uoptp(j,3,i)
+                        depz = tixz*uoptp(m,1,k) + tkxz*uoptp(j,1,i)
+     &                       + tiyz*uoptp(m,2,k) + tkyz*uoptp(j,2,i)
+     &                       + tizz*uoptp(m,3,k) + tkzz*uoptp(j,3,i)
                         frcx = frcx + copm(j+m+1)*uscale(k)*depx
                         frcy = frcy + copm(j+m+1)*uscale(k)*depy
                         frcz = frcz + copm(j+m+1)*uscale(k)*depz
@@ -2277,12 +2278,12 @@ c     get the dtau/dr terms used for TCG polarization force
 c
                else if (poltyp.eq.'TCG' .and. use_thole) then
                   do j = 1, tcgnab
-                     ukx = ubd(1,kk,j)
-                     uky = ubd(2,kk,j)
-                     ukz = ubd(3,kk,j)
-                     ukxp = ubp(1,kk,j)
-                     ukyp = ubp(2,kk,j)
-                     ukzp = ubp(3,kk,j)
+                     ukx = ubd(1,k,j)
+                     uky = ubd(2,k,j)
+                     ukz = ubd(3,k,j)
+                     ukxp = ubp(1,k,j)
+                     ukyp = ubp(2,k,j)
+                     ukzp = ubp(3,k,j)
                      uirt = uax(j)*xr + uay(j)*yr + uaz(j)*zr
                      ukrt = ukx*xr + uky*yr + ukz*zr
                      term1 = (sc3+sc5) * rr5
@@ -2323,12 +2324,12 @@ c
                      frcx = frcx + uscale(k)*depx
                      frcy = frcy + uscale(k)*depy
                      frcz = frcz + uscale(k)*depz
-                     ukx = uad(1,kk,j)
-                     uky = uad(2,kk,j)
-                     ukz = uad(3,kk,j)
-                     ukxp = uap(1,kk,j)
-                     ukyp = uap(2,kk,j)
-                     ukzp = uap(3,kk,j)
+                     ukx = uad(1,k,j)
+                     uky = uad(2,k,j)
+                     ukz = uad(3,k,j)
+                     ukxp = uap(1,k,j)
+                     ukyp = uap(2,k,j)
+                     ukzp = uap(3,k,j)
                      uirt = ubx(j)*xr + uby(j)*yr + ubz(j)*zr
                      ukrt = ukx*xr + uky*yr + ukz*zr
                      term1 = (sc3+sc5) * rr5
@@ -2474,15 +2475,15 @@ c     torque is induced field and gradient cross permanent moments
 c
       do ii = 1, npole
          i = ipole(ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          tep(1) = diz*ufld(2,i) - diy*ufld(3,i)
      &               + qixz*dufld(2,i) - qixy*dufld(4,i)
      &               + 2.0d0*qiyz*(dufld(3,i)-dufld(6,i))

@@ -16,22 +16,35 @@ c     "rotpole" constructs the global atomic multipoles by applying
 c     a rotation matrix to convert from local to global frame
 c
 c
-      subroutine rotpole (inpole,outpole)
+      subroutine rotpole (poltype)
+      use atoms
       use mpole
+      use repel
       implicit none
       integer i
       real*8 a(3,3)
-      real*8 inpole(maxpole,*)
-      real*8 outpole(maxpole,*)
       logical planar
+      character*5 poltype
 c
 c
-c     rotate the atomic multipoles at each site in turn
+c     rotate local multipoles to global frame at each site
 c
-      do i = 1, npole
-         call rotmat (i,a,planar)
-         call rotsite (i,a,planar,inpole,outpole)
-      end do
+      call upcase (poltype)
+      if (poltype .eq. 'MPOLE') then
+         do i = 1, n
+            if (pollist(i) .ne. 0) then
+               call rotmat (i,a,planar)
+               call rotsite (i,a,planar,pole,rpole)
+            end if
+         end do
+      else if (poltype .eq. 'REPEL') then
+         do i = 1, n
+            if (replist(i) .ne. 0) then
+               call rotmat (i,a,planar)
+               call rotsite (i,a,planar,repole,rrepole)
+            end if
+         end do
+      end if
       return
       end
 c
@@ -47,24 +60,39 @@ c     "rotrpole" constructs the local atomic multipoles by applying
 c     a rotation matrix to convert from global to local frame
 c
 c
-      subroutine rotrpole (inpole,outpole)
+      subroutine rotrpole (poltype)
+      use atoms
       use mpole
+      use repel
       implicit none
       integer i
       real*8 a(3,3)
-      real*8 inpole(maxpole,*)
-      real*8 outpole(maxpole,*)
       logical planar
+      character*5 poltype
 c
 c
-c     rotate the atomic multipoles at each site in turn
+c     rotate global multipoles to local frame at each site
 c
-      do i = 1, npole
-         call rotmat (i,a,planar)
-         call invert (3,a)
-         planar = .false.
-         call rotsite (i,a,planar,inpole,outpole)
-      end do
+      call upcase (poltype)
+      if (poltype .eq. 'MPOLE') then
+         do i = 1, n
+            if (pollist(i) .ne. 0) then
+               call rotmat (i,a,planar)
+               call invert (3,a)
+               planar = .false.
+               call rotsite (i,a,planar,rpole,pole)
+            end if
+         end do
+      else if (poltype .eq. 'REPEL') then
+         do i = 1, n
+            if (replist(i) .ne. 0) then
+               call rotmat (i,a,planar)
+               call invert (3,a)
+               planar = .false.
+               call rotsite (i,a,planar,rrepole,repole)
+            end if
+         end do
+      end if
       return
       end
 c
@@ -77,7 +105,7 @@ c     ##############################################################
 c
 c
 c     "rotmat" finds the rotation matrix that rotates the local
-c     coordinate system into the global frame at a multipole site
+c     coordinate system into the global frame at a specified atom
 c
 c
       subroutine rotmat (i,a,planar)
@@ -85,8 +113,7 @@ c
       use math
       use mpole
       implicit none
-      integer i,ii
-      integer ix,iy,iz
+      integer i,ix,iy,iz
       real*8 r,dot
       real*8 eps,angle
       real*8 xi,yi,zi
@@ -97,20 +124,18 @@ c
       real*8 dx4,dy4,dz4
       real*8 a(3,3)
       logical planar
+      character*8 axetyp
 c
 c
-c     get coordinates and frame definition for the multipole site
+c     get coordinates and frame definition for multipole site
 c
-      ii = ipole(i)
-      xi = x(ii)
-      yi = y(ii)
-      zi = z(ii)
+      xi = x(i)
+      yi = y(i)
+      zi = z(i)
       iz = zaxis(i)
       ix = xaxis(i)
       iy = abs(yaxis(i))
-c
-c     set value for planarity at central atom of Z-Bisect frame
-c
+      axetyp = polaxe(i)
       planar = .false.
 c
 c     use the identity matrix as the default rotation matrix
@@ -127,7 +152,7 @@ c
 c
 c     get Z-Only rotation matrix elements for z-axis only
 c
-      if (polaxe(i) .eq. 'Z-Only') then
+      if (axetyp .eq. 'Z-Only') then
          dx = x(iz) - xi
          dy = y(iz) - yi
          dz = z(iz) - zi
@@ -155,7 +180,7 @@ c
 c
 c     get Z-then-X rotation matrix elements for z- and x-axes
 c
-      else if (polaxe(i) .eq. 'Z-then-X') then
+      else if (axetyp .eq. 'Z-then-X') then
          dx = x(iz) - xi
          dy = y(iz) - yi
          dz = z(iz) - zi
@@ -177,7 +202,7 @@ c
 c
 c     get Bisector rotation matrix elements for z- and x-axes
 c
-      else if (polaxe(i) .eq. 'Bisector') then
+      else if (axetyp .eq. 'Bisector') then
          dx = x(iz) - xi
          dy = y(iz) - yi
          dz = z(iz) - zi
@@ -211,7 +236,7 @@ c
 c     get Z-Bisect rotation matrix elements for z- and x-axes;
 c     use alternate x-axis if central atom is close to planar
 c
-      else if (polaxe(i) .eq. 'Z-Bisect') then
+      else if (axetyp .eq. 'Z-Bisect') then
          dx = x(iz) - xi
          dy = y(iz) - yi
          dz = z(iz) - zi
@@ -268,7 +293,7 @@ c
 c     get 3-Fold rotation matrix elements for z- and x-axes;
 c     use alternate z-axis if central atom is close to planar
 c
-      else if (polaxe(i) .eq. '3-Fold') then
+      else if (axetyp .eq. '3-Fold') then
          dx = x(iz) - xi
          dy = y(iz) - yi
          dz = z(iz) - zi
@@ -349,38 +374,38 @@ c     ################################################################
 c
 c
 c     "rotsite" rotates atomic multipoles from the input to final
-c     frame at a specified site by applying a rotation matrix
+c     frame at a specified atom by applying a rotation matrix
 c
 c
-      subroutine rotsite (isite,a,planar,inpole,outpole)
-      use atoms
+      subroutine rotsite (ii,a,planar,inpole,outpole)
       use mpole
       implicit none
-      integer i,j,k,m
-      integer isite
-      real*8 spole(13)
+      integer i,j,k,m,ii
+      real*8 spole(maxpole)
       real*8 a(3,3)
       real*8 mp(3,3)
       real*8 rp(3,3)
       real*8 inpole(maxpole,*)
       real*8 outpole(maxpole,*)
       logical planar
+      character*8 axetyp
 c
 c
-c     copy input multipoles and make needed changes
+c     copy input multipoles and modify at planar sites
 c
-      do i = 1, 13
-         spole(i) = inpole(i,isite)
+      do i = 1, maxpole
+         spole(i) = inpole(i,ii)
       end do
       if (planar) then
-         if (polaxe(i) .eq. 'Z-Bisect') then
+         axetyp = polaxe(ii)
+         if (axetyp .eq. 'Z-Bisect') then
             spole(2) = 0.0d0
             spole(7) = 0.0d0
             spole(11) = 0.0d0
             spole(5) = 0.5d0 * (spole(5)+spole(9))
             spole(9) = spole(5)
-         else if (polaxe(i) .eq. '3-Fold') then
-            do i = 2, 13
+         else if (axetyp .eq. '3-Fold') then
+            do i = 2, maxpole
                spole(i) = 0.0d0
             end do
          end if
@@ -388,18 +413,18 @@ c
 c
 c     monopoles are the same in any coordinate frame
 c
-      outpole(1,isite) = spole(1)
+      outpole(1,ii) = spole(1)
 c
-c     rotate input dipoles to the final coordinate frame
+c     rotate input dipoles to final coordinate frame
 c
       do i = 2, 4
-         outpole(i,isite) = 0.0d0
+         outpole(i,ii) = 0.0d0
          do j = 2, 4
-            outpole(i,isite) = outpole(i,isite) + spole(j)*a(i-1,j-1)
+            outpole(i,ii) = outpole(i,ii) + spole(j)*a(i-1,j-1)
          end do
       end do
 c
-c     rotate input quadrupoles to the final coordinate frame
+c     rotate input quadrupoles to final coordinate frame
 c
       k = 5
       do i = 1, 3
@@ -425,7 +450,7 @@ c
       k = 5
       do i = 1, 3
          do j = 1, 3
-            outpole(k,isite) = rp(i,j)
+            outpole(k,ii) = rp(i,j)
             k = k + 1
          end do
       end do

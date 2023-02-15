@@ -110,15 +110,15 @@ c     calculate the charge interaction energy term
 c
       do ii = 1, nion-1
          i = iion(ii)
-         in = jion(ii)
-         ic = kion(ii)
+         in = jion(i)
+         ic = kion(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
          xi = x(i) - xic
          yi = y(i) - yic
          zi = z(i) - zic
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
 c
 c     set exclusion coefficients for connected atoms
@@ -141,8 +141,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nion
             k = iion(kk)
-            kn = jion(kk)
-            kc = kion(kk)
+            kn = jion(k)
+            kc = kion(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -162,7 +162,7 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   r = sqrt(r2)
                   rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
+                  fik = fi * pchg(k) * cscale(kn)
                   e = fik / rb
 c
 c     use shifted energy switching if near the cutoff distance
@@ -217,16 +217,16 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, nion
          i = iion(ii)
-         in = jion(ii)
-         ic = kion(ii)
-         usei = (use(i) .or. use(ic))
+         in = jion(i)
+         ic = kion(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
          xi = x(i) - xic
          yi = y(i) - yic
          zi = z(i) - zic
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
+         usei = (use(i) .or. use(ic))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -248,8 +248,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nion
             k = iion(kk)
-            kn = jion(kk)
-            kc = kion(kk)
+            kn = jion(k)
+            kc = kion(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -270,7 +270,7 @@ c
                      r2 = xr*xr + yr*yr + zr*zr
                      r = sqrt(r2)
                      rb = r + ebuffer
-                     fik = fi * pchg(kk)
+                     fik = fi * pchg(k)
                      if (use_polymer) then
                         if (r2 .le. polycut2)  fik = fik * cscale(kn)
                      end if
@@ -404,11 +404,12 @@ c
 c
 c     transfer the interaction site coordinates to sorting arrays
 c
-      do i = 1, nion
-         k = kion(i)
-         xsort(i) = x(k)
-         ysort(i) = y(k)
-         zsort(i) = z(k)
+      do ii = 1, nion
+         i = iion(ii)
+         ic = kion(i)
+         xsort(ii) = x(ic)
+         ysort(ii) = y(ic)
+         zsort(ii) = z(ic)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -420,15 +421,15 @@ c     loop over all atoms computing the interactions
 c
       do ii = 1, nion
          i = iion(ii)
-         in = jion(ii)
-         ic = kion(ii)
+         in = jion(i)
+         ic = kion(i)
          xic = xsort(rgx(ii))
          yic = ysort(rgy(ii))
          zic = zsort(rgz(ii))
          xi = x(i) - x(ic)
          yi = y(i) - y(ic)
          zi = z(i) - z(ic)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
 c
 c     set exclusion coefficients for connected atoms
@@ -475,8 +476,8 @@ c
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
-            kn = jion(kmap)
-            kc = kion(kmap)
+            kn = jion(k)
+            kc = kion(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -512,10 +513,10 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   r = sqrt(r2)
                   rb = r + ebuffer
-                  fik = fi * pchg(kmap)
+                  fik = fi * pchg(k)
                   if (prime)  fik = fik * cscale(kn)
                   if (use_polymer) then
-                     if (r2 .gt. polycut2)  fik = fi * pchg(kmap)
+                     if (r2 .gt. polycut2)  fik = fi * pchg(k)
                   end if
                   e = fik / rb
 c
@@ -602,7 +603,7 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k,kkk
+      integer i,j,k
       integer ii,in,ic
       integer kk,kn,kc
       real*8 e,fgrp
@@ -655,15 +656,15 @@ c     calculate the charge interaction energy term
 c
       do ii = 1, nion
          i = iion(ii)
-         in = jion(ii)
-         ic = kion(ii)
+         in = jion(i)
+         ic = kion(i)
          xic = x(ic)
          yic = y(ic)
          zic = z(ic)
          xi = x(i) - xic
          yi = y(i) - yic
          zi = z(i) - zic
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
 c
 c     set exclusion coefficients for connected atoms
@@ -684,11 +685,10 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = iion(kk)
-            kn = jion(kk)
-            kc = kion(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
+            kn = jion(k)
+            kc = kion(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
@@ -708,7 +708,7 @@ c
                   r2 = xr*xr + yr*yr + zr*zr
                   r = sqrt(r2)
                   rb = r + ebuffer
-                  fik = fi * pchg(kk) * cscale(kn)
+                  fik = fi * pchg(k) * cscale(kn)
                   e = fik / rb
 c
 c     use shifted energy switching if near the cutoff distance
@@ -842,7 +842,8 @@ c     compute the Ewald self-energy term over all the atoms
 c
       fs = -f * aewald / rootpi
       do ii = 1, nion
-         e = fs * pchg(ii)**2
+         i = iion(ii)
+         e = fs * pchg(i)**2
          ec = ec + e
       end do
 c
@@ -854,9 +855,9 @@ c
          zd = 0.0d0
          do ii = 1, nion
             i = iion(ii)
-            xd = xd + pchg(ii)*x(i)
-            yd = yd + pchg(ii)*y(i)
-            zd = zd + pchg(ii)*z(i)
+            xd = xd + pchg(i)*x(i)
+            yd = yd + pchg(i)*y(i)
+            zd = zd + pchg(i)*z(i)
          end do
          e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          ec = ec + e
@@ -870,12 +871,12 @@ c     compute the real space portion of the Ewald summation
 c
       do ii = 1, nion-1
          i = iion(ii)
-         in = jion(ii)
-         usei = use(i)
+         in = jion(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -897,7 +898,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nion
             k = iion(kk)
-            kn = jion(kk)
+            kn = jion(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -913,7 +914,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   rb = r + ebuffer
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rew = aewald * r
                   erfterm = erfc (rew)
                   scale = cscale(kn)
@@ -954,12 +955,12 @@ c     calculate real space portion involving other unit cells
 c
       do ii = 1, nion
          i = iion(ii)
-         in = jion(ii)
-         usei = use(i)
+         in = jion(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -981,7 +982,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nion
             k = iion(kk)
-            kn = jion(kk)
+            kn = jion(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -998,7 +999,7 @@ c
                   if (r2 .le. off2) then
                      r = sqrt(r2)
                      rb = r + ebuffer
-                     fik = fi * pchg(kk)
+                     fik = fi * pchg(k)
                      rew = aewald * r
                      erfterm = erfc (rew)
                      scale = 1.0d0
@@ -1073,7 +1074,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,in,kk,kn
+      integer ii,in,ic
+      integer kk,kn
       integer kgy,kgz,kmap
       integer start,stop
       real*8 e,fs,fgrp
@@ -1130,7 +1132,8 @@ c     compute the Ewald self-energy term over all the atoms
 c
       fs = -f * aewald / rootpi
       do ii = 1, nion
-         e = fs * pchg(ii)**2
+         i = iion(ii)
+         e = fs * pchg(i)**2
          ec = ec + e
       end do
 c
@@ -1142,9 +1145,9 @@ c
          zd = 0.0d0
          do ii = 1, nion
             i = iion(ii)
-            xd = xd + pchg(ii)*x(i)
-            yd = yd + pchg(ii)*y(i)
-            zd = zd + pchg(ii)*z(i)
+            xd = xd + pchg(i)*x(i)
+            yd = yd + pchg(i)*y(i)
+            zd = zd + pchg(i)*z(i)
          end do
          e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          ec = ec + e
@@ -1157,11 +1160,12 @@ c
 c     compute the real space portion of the Ewald summation;
 c     transfer the interaction site coordinates to sorting arrays
 c
-      do i = 1, nion
-         k = iion(i)
-         xsort(i) = x(k)
-         ysort(i) = y(k)
-         zsort(i) = z(k)
+      do ii = 1, nion
+         i = iion(ii)
+         ic = kion(i)
+         xsort(ii) = x(ic)
+         ysort(ii) = y(ic)
+         zsort(ii) = z(ic)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -1173,11 +1177,11 @@ c     loop over all atoms computing the interactions
 c
       do ii = 1, nion
          i = iion(ii)
-         in = jion(ii)
+         in = jion(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          usei = (use(i))
 c
 c     set exclusion coefficients for connected atoms
@@ -1224,7 +1228,7 @@ c
             end if
             kmap = kk - ((kk-1)/nion)*nion
             k = iion(kmap)
-            kn = jion(kmap)
+            kn = jion(k)
             prime = (kk .le. nion)
 c
 c     decide whether to compute the current interaction
@@ -1261,9 +1265,9 @@ c
                   scale = 1.0d0
                   if (prime)  scale = cscale(kn)
                   if (use_group)  scale = scale * fgrp
-                  fik = fi * pchg(kmap)
+                  fik = fi * pchg(k)
                   if (use_polymer) then
-                     if (r2 .gt. polycut2)  fik = fi * pchg(kmap)
+                     if (r2 .gt. polycut2)  fik = fi * pchg(k)
                   end if
                   scale = scale - 1.0d0
                   e = (fik/rb) * (erfterm+scale)
@@ -1385,7 +1389,8 @@ c     compute the Ewald self-energy term over all the atoms
 c
       fs = -f * aewald / rootpi
       do ii = 1, nion
-         e = fs * pchg(ii)**2
+         i = iion(ii)
+         e = fs * pchg(i)**2
          ec = ec + e
       end do
 c
@@ -1397,9 +1402,9 @@ c
          zd = 0.0d0
          do ii = 1, nion
             i = iion(ii)
-            xd = xd + pchg(ii)*x(i)
-            yd = yd + pchg(ii)*y(i)
-            zd = zd + pchg(ii)*z(i)
+            xd = xd + pchg(i)*x(i)
+            yd = yd + pchg(i)*y(i)
+            zd = zd + pchg(i)*z(i)
          end do
          e = (2.0d0/3.0d0) * f * (pi/volbox) * (xd*xd+yd*yd+zd*zd)
          ec = ec + e
@@ -1421,12 +1426,12 @@ c     compute the real space portion of the Ewald summation
 c
       do ii = 1, nion
          i = iion(ii)
-         in = jion(ii)
-         usei = use(i)
+         in = jion(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
+         usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1446,10 +1451,9 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = iion(kk)
-            kn = jion(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
+            kn = jion(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
@@ -1465,7 +1469,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   rb = r + ebuffer
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rew = aewald * r
                   erfterm = erfc (rew)
                   scale = cscale(kn)
@@ -1531,7 +1535,8 @@ c
       use warp
       implicit none
       integer i,j,k
-      integer ii,in,kk,kn
+      integer ii,in
+      integer kk,kn
       real*8 e,fgrp
       real*8 r,r2,rb,rb2
       real*8 f,fi,fik
@@ -1578,12 +1583,12 @@ c     calculate the charge interaction energy term
 c
       do ii = 1, nion-1
          i = iion(ii)
-         in = jion(ii)
-         usei = (use(i))
+         in = jion(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
+         usei = (use(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1605,7 +1610,7 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nion
             k = iion(kk)
-            kn = jion(kk)
+            kn = jion(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1619,7 +1624,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
                rb = r + ebuffer
-               fik = fi * pchg(kk) * cscale(kn)
+               fik = fi * pchg(k) * cscale(kn)
                e = fik / rb
 c
 c     transform the potential function via smoothing

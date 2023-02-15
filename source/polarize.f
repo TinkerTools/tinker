@@ -27,7 +27,7 @@ c
       use polpot
       use potent
       implicit none
-      integer i
+      integer i,ii
       real*8 addu,malpha
       real*8 external
       real*8 exfield(3)
@@ -62,7 +62,8 @@ c
          call fatal
       end if
       addu = 0.0d0
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          addu = polarity(i) + addu
       end do
       fstr = ' Additive Total Polarizability :    '
@@ -194,7 +195,8 @@ c
       use polpot
       use units
       implicit none
-      integer i,j,k,iter
+      integer i,j,k
+      integer ii,iter
       integer maxiter
       real*8 eps,epsold
       real*8 polmin
@@ -216,22 +218,23 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (poli(npole))
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-      allocate (rsd(3,npole))
-      allocate (zrsd(3,npole))
-      allocate (conj(3,npole))
-      allocate (vec(3,npole))
+      allocate (poli(n))
+      allocate (field(3,n))
+      allocate (fieldp(3,n))
+      allocate (rsd(3,n))
+      allocate (zrsd(3,n))
+      allocate (conj(3,n))
+      allocate (vec(3,n))
 c
 c     check for chiral multipoles and rotate to global frame
 c
       call chkpole
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     zero out the value of the field at each site
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             field(j,i) = 0.0d0
             fieldp(j,i) = 0.0d0
@@ -245,7 +248,8 @@ c
 c
 c     set induced dipoles to polarizability times direct field
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             udir(j,i) = polarity(i) * field(j,i)
          end do
@@ -253,7 +257,8 @@ c
 c
 c     increment induced dipoles to account for external field
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             udir(j,i) = udir(j,i) + polarity(i)*exfield(j)
             uind(j,i) = udir(j,i)
@@ -263,8 +268,9 @@ c
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uopt(0,j,i) = udir(j,i)
                end do
@@ -273,8 +279,9 @@ c
          do k = 1, optorder
             optlevel = k - 1
             call ufield0a (field,fieldp)
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uopt(k,j,i) = polarity(i) * field(j,i)
                      uind(j,i) = uopt(k,j,i)
@@ -283,8 +290,9 @@ c
             end do
          end do
          allocate (usum(3,n))
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uind(j,i) = 0.0d0
                   usum(j,i) = 0.0d0
@@ -307,7 +315,8 @@ c
          polmin = 0.00000001d0
          eps = 100.0d0
          call ufield0a (field,fieldp)
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             poli(i) = max(polmin,polarity(i))
             do j = 1, 3
                rsd(j,i) = field(j,i)
@@ -320,14 +329,16 @@ c     iterate the mutual induced dipoles and check convergence
 c
          do while (.not. done)
             iter = iter + 1
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   vec(j,i) = uind(j,i)
                   uind(j,i) = conj(j,i)
                end do
             end do
             call ufield0a (field,fieldp)
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   uind(j,i) = vec(j,i)
                   vec(j,i) = conj(j,i)/poli(i) - field(j,i)
@@ -335,21 +346,24 @@ c
             end do
             a = 0.0d0
             sum = 0.0d0
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   a = a + conj(j,i)*vec(j,i)
                   sum = sum + rsd(j,i)*zrsd(j,i)
                end do
             end do
             if (a .ne. 0.0d0)  a = sum / a
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   uind(j,i) = uind(j,i) + a*conj(j,i)
                   rsd(j,i) = rsd(j,i) - a*vec(j,i)
                end do
             end do
             b = 0.0d0
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   zrsd(j,i) = rsd(j,i) * poli(i)
                   b = b + rsd(j,i)*zrsd(j,i)
@@ -357,7 +371,8 @@ c
             end do
             if (sum .ne. 0.0d0)  b = b / sum
             eps = 0.0d0
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   conj(j,i) = zrsd(j,i) + b*conj(j,i)
                   eps = eps + rsd(j,i)*rsd(j,i)
@@ -382,8 +397,9 @@ c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
             if (done) then
-               do i = 1, npole
-                  if (douind(ipole(i))) then
+               do ii = 1, npole
+                  i = ipole(ii)
+                  if (douind(i)) then
                      term = pcgpeek * poli(i)
                      do j = 1, 3
                         uind(j,i) = uind(j,i) + term*rsd(j,i)
@@ -408,7 +424,8 @@ c
       do j = 1, 3
          umol(j) = 0.0d0
       end do
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          umol(1) = umol(1) + uind(1,i)
          umol(2) = umol(2) + uind(2,i)
          umol(3) = umol(3) + uind(3,i)
@@ -422,7 +439,8 @@ c
             write (iout,40)  (exfield(j),j=1,3)
    40       format (/,' Applied External Field :',//,13x,3f13.4)
             header = .true.
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                if (polarity(i) .ne. 0.0d0) then
                   if (header) then
                      header = .false.
@@ -433,7 +451,7 @@ c
      &                          11x,'Total',/)
                   end if
                   norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
-                  write (iout,70)  ipole(i),(debye*uind(j,i),j=1,3),
+                  write (iout,70)  i,(debye*uind(j,i),j=1,3),
      &                             debye*norm
    70             format (i8,5x,3f13.4,1x,f13.4)
                end if

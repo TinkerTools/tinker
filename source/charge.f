@@ -12,11 +12,11 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     nion      total number of partial charges in system
-c     iion      number of the atom site for each partial charge
-c     jion      neighbor generation site for each partial charge
-c     kion      cutoff switching site for each partial charge
-c     pchg      current atomic partial charge values (e-)
+c     nion      total number of partial charge sites in the system
+c     iion      number of the atom for each partial charge site
+c     jion      neighbor generation site to use for each atom
+c     kion      cutoff switching site to use for each atom
+c     pchg      current partial charge value for each atom (e-)
 c     pchg0     original partial charge values for charge flux
 c
 c

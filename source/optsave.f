@@ -38,7 +38,7 @@ c
       use usage
       use zcoord
       implicit none
-      integer i,j,k,lext
+      integer i,j,ii,lext
       integer iopt,ifrc
       integer iind,iend
       integer ncycle,nvar
@@ -83,14 +83,14 @@ c     convert optimization parameters to atomic coordinates
 c
       if (coordtype .eq. 'CARTESIAN') then
          nvar = 0
-         do i = 1, nuse
-            k = iuse(i)
+         do ii = 1, nuse
+            i = iuse(ii)
             nvar = nvar + 1
-            x(k) = xx(nvar) / scale(nvar)
+            x(i) = xx(nvar) / scale(nvar)
             nvar = nvar + 1
-            y(k) = xx(nvar) / scale(nvar)
+            y(i) = xx(nvar) / scale(nvar)
             nvar = nvar + 1
-            z(k) = xx(nvar) / scale(nvar)
+            z(i) = xx(nvar) / scale(nvar)
          end do
       else if (coordtype .eq. 'INTERNAL') then
          do i = 1, nomega
@@ -210,10 +210,10 @@ c
          end if
          write (iind,40)  n,title(1:ltitle)
    40    format (i6,2x,a)
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             if (polarity(i) .ne. 0.0d0) then
-               k = ipole(i)
-               write (iind,50)  k,name(k),(debye*uind(j,i),j=1,3)
+               write (iind,50)  i,name(i),(debye*uind(j,i),j=1,3)
    50          format (i6,2x,a3,3f12.6)
             end if
          end do

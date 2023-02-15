@@ -671,16 +671,16 @@ c
                abound(5) = nearpt(3) - nlpts
                abound(6) = nearpt(3) + nrpts
                call adjust (offsetx,nfft1,nchk1,abound(1),
-     &                        abound(2),cbound(1),cbound(2))
+     &                         abound(2),cbound(1),cbound(2))
                call adjust (offsety,nfft2,nchk2,abound(3),
-     &                        abound(4),cbound(3),cbound(4))
+     &                         abound(4),cbound(3),cbound(4))
                call adjust (offsetz,nfft3,nchk3,abound(5),
-     &                        abound(6),cbound(5),cbound(6))
+     &                         abound(6),cbound(5),cbound(6))
                do kk = abound(5), abound(6)
                   k = kk
                   m = k + offsetz
                   if (k .lt. 1)  k = k + nfft3
-                  v0 = thetai3(1,m,iatm) * pchg(isite)
+                  v0 = thetai3(1,m,iatm) * pchg(iatm)
                   do jj = abound(3), abound(4)
                      j = jj
                      m = j + offsety
@@ -794,11 +794,11 @@ c
                abound(5) = nearpt(3) - nlpts
                abound(6) = nearpt(3) + nrpts
                call adjust (offsetx,nfft1,nchk1,abound(1),
-     &                        abound(2),cbound(1),cbound(2))
+     &                         abound(2),cbound(1),cbound(2))
                call adjust (offsety,nfft2,nchk2,abound(3),
-     &                        abound(4),cbound(3),cbound(4))
+     &                         abound(4),cbound(3),cbound(4))
                call adjust (offsetz,nfft3,nchk3,abound(5),
-     &                        abound(6),cbound(5),cbound(6))
+     &                         abound(6),cbound(5),cbound(6))
                do kk = abound(5), abound(6)
                   k = kk
                   m = k + offsetz
@@ -813,12 +813,12 @@ c
                      u0 = thetai2(1,m,iatm)
                      u1 = thetai2(2,m,iatm)
                      u2 = thetai2(3,m,iatm)
-                     term0 = fmp(1,isite)*u0*v0 + fmp(3,isite)*u1*v0
-     &                     + fmp(4,isite)*u0*v1 + fmp(6,isite)*u2*v0
-     &                     + fmp(7,isite)*u0*v2 + fmp(10,isite)*u1*v1
-                     term1 = fmp(2,isite)*u0*v0 + fmp(8,isite)*u1*v0
-     &                          + fmp(9,isite)*u0*v1
-                     term2 = fmp(5,isite) * u0 * v0
+                     term0 = fmp(1,iatm)*u0*v0 + fmp(3,iatm)*u1*v0
+     &                     + fmp(4,iatm)*u0*v1 + fmp(6,iatm)*u2*v0
+     &                     + fmp(7,iatm)*u0*v2 + fmp(10,iatm)*u1*v1
+                     term1 = fmp(2,iatm)*u0*v0 + fmp(8,iatm)*u1*v0
+     &                          + fmp(9,iatm)*u0*v1
+                     term2 = fmp(5,iatm) * u0 * v0
                      do ii = abound(1), abound(2)
                         i = ii
                         m = i + offsetx
@@ -930,11 +930,11 @@ c
                abound(5) = nearpt(3) - nlpts
                abound(6) = nearpt(3) + nrpts
                call adjust (offsetx,nfft1,nchk1,abound(1),
-     &                        abound(2),cbound(1),cbound(2))
+     &                         abound(2),cbound(1),cbound(2))
                call adjust (offsety,nfft2,nchk2,abound(3),
-     &                        abound(4),cbound(3),cbound(4))
+     &                         abound(4),cbound(3),cbound(4))
                call adjust (offsetz,nfft3,nchk3,abound(5),
-     &                        abound(6),cbound(5),cbound(6))
+     &                         abound(6),cbound(5),cbound(6))
                do kk = abound(5), abound(6)
                   k = kk
                   m = k + offsetz
@@ -947,12 +947,12 @@ c
                      if (j .lt. 1)  j = j + nfft2
                      u0 = thetai2(1,m,iatm)
                      u1 = thetai2(2,m,iatm)
-                     term01 = fuind(2,isite)*u1*v0
-     &                           + fuind(3,isite)*u0*v1
-                     term11 = fuind(1,isite)*u0*v0
-                     term02 = fuinp(2,isite)*u1*v0
-     &                           + fuinp(3,isite)*u0*v1
-                     term12 = fuinp(1,isite)*u0*v0
+                     term01 = fuind(2,iatm)*u1*v0
+     &                           + fuind(3,iatm)*u0*v1
+                     term11 = fuind(1,iatm)*u0*v0
+                     term02 = fuinp(2,iatm)*u1*v0
+     &                           + fuinp(3,iatm)*u0*v1
+                     term12 = fuinp(1,iatm)*u0*v0
                      do ii = abound(1), abound(2)
                         i = ii
                         m = i + offsetx
@@ -1061,16 +1061,16 @@ c
                abound(5) = nearpt(3) - nlpts
                abound(6) = nearpt(3) + nrpts
                call adjust (offsetx,nfft1,nchk1,abound(1),
-     &                        abound(2),cbound(1),cbound(2))
+     &                         abound(2),cbound(1),cbound(2))
                call adjust (offsety,nfft2,nchk2,abound(3),
-     &                        abound(4),cbound(3),cbound(4))
+     &                         abound(4),cbound(3),cbound(4))
                call adjust (offsetz,nfft3,nchk3,abound(5),
-     &                        abound(6),cbound(5),cbound(6))
+     &                         abound(6),cbound(5),cbound(6))
                do kk = abound(5), abound(6)
                   k = kk
                   m = k + offsetz
                   if (k .lt. 1)  k = k + nfft3
-                  v0 = thetai3(1,m,iatm) * csix(isite)
+                  v0 = thetai3(1,m,iatm) * csix(iatm)
                   do jj = abound(3), abound(4)
                      j = jj
                      m = j + offsety
@@ -1225,10 +1225,10 @@ c
             tuv010 = tuv010 + tu01*v0
             tuv001 = tuv001 + tu00*v1
          end do
-         fphi(1,isite) = tuv000
-         fphi(2,isite) = tuv100
-         fphi(3,isite) = tuv010
-         fphi(4,isite) = tuv001
+         fphi(1,iatm) = tuv000
+         fphi(2,iatm) = tuv100
+         fphi(3,iatm) = tuv010
+         fphi(4,iatm) = tuv001
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1377,26 +1377,26 @@ c
             tuv012 = tuv012 + tu01*v2
             tuv111 = tuv111 + tu11*v1
          end do
-         fphi(1,isite) = tuv000
-         fphi(2,isite) = tuv100
-         fphi(3,isite) = tuv010
-         fphi(4,isite) = tuv001
-         fphi(5,isite) = tuv200
-         fphi(6,isite) = tuv020
-         fphi(7,isite) = tuv002
-         fphi(8,isite) = tuv110
-         fphi(9,isite) = tuv101
-         fphi(10,isite) = tuv011
-         fphi(11,isite) = tuv300
-         fphi(12,isite) = tuv030
-         fphi(13,isite) = tuv003
-         fphi(14,isite) = tuv210
-         fphi(15,isite) = tuv201
-         fphi(16,isite) = tuv120
-         fphi(17,isite) = tuv021
-         fphi(18,isite) = tuv102
-         fphi(19,isite) = tuv012
-         fphi(20,isite) = tuv111
+         fphi(1,iatm) = tuv000
+         fphi(2,iatm) = tuv100
+         fphi(3,iatm) = tuv010
+         fphi(4,iatm) = tuv001
+         fphi(5,iatm) = tuv200
+         fphi(6,iatm) = tuv020
+         fphi(7,iatm) = tuv002
+         fphi(8,iatm) = tuv110
+         fphi(9,iatm) = tuv101
+         fphi(10,iatm) = tuv011
+         fphi(11,iatm) = tuv300
+         fphi(12,iatm) = tuv030
+         fphi(13,iatm) = tuv003
+         fphi(14,iatm) = tuv210
+         fphi(15,iatm) = tuv201
+         fphi(16,iatm) = tuv120
+         fphi(17,iatm) = tuv021
+         fphi(18,iatm) = tuv102
+         fphi(19,iatm) = tuv012
+         fphi(20,iatm) = tuv111
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1630,46 +1630,46 @@ c
             tuv012 = tuv012 + tu01*v2
             tuv111 = tuv111 + tu11*v1
          end do
-         fdip_phi1(1,isite) = 0.0d0
-         fdip_phi1(2,isite) = tuv100_1
-         fdip_phi1(3,isite) = tuv010_1
-         fdip_phi1(4,isite) = tuv001_1
-         fdip_phi1(5,isite) = tuv200_1
-         fdip_phi1(6,isite) = tuv020_1
-         fdip_phi1(7,isite) = tuv002_1
-         fdip_phi1(8,isite) = tuv110_1
-         fdip_phi1(9,isite) = tuv101_1
-         fdip_phi1(10,isite) = tuv011_1
-         fdip_phi2(1,isite) = 0.0d0
-         fdip_phi2(2,isite) = tuv100_2
-         fdip_phi2(3,isite) = tuv010_2
-         fdip_phi2(4,isite) = tuv001_2
-         fdip_phi2(5,isite) = tuv200_2
-         fdip_phi2(6,isite) = tuv020_2
-         fdip_phi2(7,isite) = tuv002_2
-         fdip_phi2(8,isite) = tuv110_2
-         fdip_phi2(9,isite) = tuv101_2
-         fdip_phi2(10,isite) = tuv011_2
-         fdip_sum_phi(1,isite) = tuv000
-         fdip_sum_phi(2,isite) = tuv100
-         fdip_sum_phi(3,isite) = tuv010
-         fdip_sum_phi(4,isite) = tuv001
-         fdip_sum_phi(5,isite) = tuv200
-         fdip_sum_phi(6,isite) = tuv020
-         fdip_sum_phi(7,isite) = tuv002
-         fdip_sum_phi(8,isite) = tuv110
-         fdip_sum_phi(9,isite) = tuv101
-         fdip_sum_phi(10,isite) = tuv011
-         fdip_sum_phi(11,isite) = tuv300
-         fdip_sum_phi(12,isite) = tuv030
-         fdip_sum_phi(13,isite) = tuv003
-         fdip_sum_phi(14,isite) = tuv210
-         fdip_sum_phi(15,isite) = tuv201
-         fdip_sum_phi(16,isite) = tuv120
-         fdip_sum_phi(17,isite) = tuv021
-         fdip_sum_phi(18,isite) = tuv102
-         fdip_sum_phi(19,isite) = tuv012
-         fdip_sum_phi(20,isite) = tuv111
+         fdip_phi1(1,iatm) = 0.0d0
+         fdip_phi1(2,iatm) = tuv100_1
+         fdip_phi1(3,iatm) = tuv010_1
+         fdip_phi1(4,iatm) = tuv001_1
+         fdip_phi1(5,iatm) = tuv200_1
+         fdip_phi1(6,iatm) = tuv020_1
+         fdip_phi1(7,iatm) = tuv002_1
+         fdip_phi1(8,iatm) = tuv110_1
+         fdip_phi1(9,iatm) = tuv101_1
+         fdip_phi1(10,iatm) = tuv011_1
+         fdip_phi2(1,iatm) = 0.0d0
+         fdip_phi2(2,iatm) = tuv100_2
+         fdip_phi2(3,iatm) = tuv010_2
+         fdip_phi2(4,iatm) = tuv001_2
+         fdip_phi2(5,iatm) = tuv200_2
+         fdip_phi2(6,iatm) = tuv020_2
+         fdip_phi2(7,iatm) = tuv002_2
+         fdip_phi2(8,iatm) = tuv110_2
+         fdip_phi2(9,iatm) = tuv101_2
+         fdip_phi2(10,iatm) = tuv011_2
+         fdip_sum_phi(1,iatm) = tuv000
+         fdip_sum_phi(2,iatm) = tuv100
+         fdip_sum_phi(3,iatm) = tuv010
+         fdip_sum_phi(4,iatm) = tuv001
+         fdip_sum_phi(5,iatm) = tuv200
+         fdip_sum_phi(6,iatm) = tuv020
+         fdip_sum_phi(7,iatm) = tuv002
+         fdip_sum_phi(8,iatm) = tuv110
+         fdip_sum_phi(9,iatm) = tuv101
+         fdip_sum_phi(10,iatm) = tuv011
+         fdip_sum_phi(11,iatm) = tuv300
+         fdip_sum_phi(12,iatm) = tuv030
+         fdip_sum_phi(13,iatm) = tuv003
+         fdip_sum_phi(14,iatm) = tuv210
+         fdip_sum_phi(15,iatm) = tuv201
+         fdip_sum_phi(16,iatm) = tuv120
+         fdip_sum_phi(17,iatm) = tuv021
+         fdip_sum_phi(18,iatm) = tuv102
+         fdip_sum_phi(19,iatm) = tuv012
+         fdip_sum_phi(20,iatm) = tuv111
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1694,7 +1694,7 @@ c
       subroutine cmp_to_fmp (cmp,fmp)
       use mpole
       implicit none
-      integer i,j,k
+      integer i,j,k,ii
       real*8 ctf(10,10)
       real*8 cmp(10,*)
       real*8 fmp(10,*)
@@ -1706,7 +1706,8 @@ c
 c
 c     apply the transformation to get the fractional multipoles
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          fmp(1,i) = ctf(1,1) * cmp(1,i)
          do j = 2, 4
             fmp(j,i) = 0.0d0
@@ -1809,7 +1810,7 @@ c
       subroutine fphi_to_cphi (fphi,cphi)
       use mpole
       implicit none
-      integer i,j,k
+      integer i,j,k,ii
       real*8 ftc(10,10)
       real*8 cphi(10,*)
       real*8 fphi(20,*)
@@ -1821,7 +1822,8 @@ c
 c
 c     apply the transformation to get the Cartesian potential
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          cphi(1,i) = ftc(1,1) * fphi(1,i)
          do j = 2, 4
             cphi(j,i) = 0.0d0

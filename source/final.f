@@ -1024,6 +1024,7 @@ c
 c     deallocation of global arrays from module repel
 c
       if (allocated(irep))  deallocate (irep)
+      if (allocated(replist))  deallocate (replist)
       if (allocated(sizpr))  deallocate (sizpr)
       if (allocated(dmppr))  deallocate (dmppr)
       if (allocated(elepr))  deallocate (elepr)

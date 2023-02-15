@@ -21,7 +21,7 @@ c
       implicit none
 c
 c
-c     choose the method for summing over multipole interactions
+c     choose the method to sum over multipole interactions
 c
       if (use_ewald) then
          if (use_mlist) then
@@ -152,7 +152,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -183,26 +183,26 @@ c     compute the multipole interaction energy and gradient
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
@@ -225,9 +225,9 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -241,16 +241,16 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -337,9 +337,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -550,26 +550,26 @@ c     calculate interaction with other unit cells
 c
       do ii = 1, npole
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
@@ -592,9 +592,9 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii, npole
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
@@ -611,16 +611,16 @@ c
             end if
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -707,9 +707,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -927,10 +927,10 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (ii,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          if (iz .eq. 0)  iz = i
          if (ix .eq. 0)  ix = i
          if (iy .eq. 0)  iy = i
@@ -1120,7 +1120,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1161,26 +1161,26 @@ c     compute the multipole interaction energy and gradient
 c
       do ii = 1, npole
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
@@ -1204,9 +1204,9 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -1220,16 +1220,16 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1316,9 +1316,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -1529,10 +1529,10 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (ii,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          if (iz .eq. 0)  iz = i
          if (ix .eq. 0)  ix = i
          if (iy .eq. 0)  iy = i
@@ -1697,7 +1697,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the real space part of the Ewald summation
 c
@@ -1726,16 +1726,16 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
@@ -1793,26 +1793,27 @@ c
          zd = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,ii) + rpole(1,ii)*x(i)
-            yd = yd + rpole(3,ii) + rpole(1,ii)*y(i)
-            zd = zd + rpole(4,ii) + rpole(1,ii)*z(i)
+            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
+            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
+            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
          do ii = 1, npole
             i = ipole(ii)
-            dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,ii)*xd
-            dem(2,i) = dem(2,i) + 2.0d0*term*rpole(1,ii)*yd
-            dem(3,i) = dem(3,i) + 2.0d0*term*rpole(1,ii)*zd
+            dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
+            dem(2,i) = dem(2,i) + 2.0d0*term*rpole(1,i)*yd
+            dem(3,i) = dem(3,i) + 2.0d0*term*rpole(1,i)*zd
          end do
          xdfield = -2.0d0 * term * xd
          ydfield = -2.0d0 * term * yd
          zdfield = -2.0d0 * term * zd
          do ii = 1, npole
-            tem(1) = rpole(3,ii)*zdfield - rpole(4,ii)*ydfield
-            tem(2) = rpole(4,ii)*xdfield - rpole(2,ii)*zdfield
-            tem(3) = rpole(2,ii)*ydfield - rpole(3,ii)*xdfield
-            call torque (ii,tem,frcx,frcy,frcz,dem)
+            i = ipole(ii)
+            tem(1) = rpole(3,i)*zdfield - rpole(4,i)*ydfield
+            tem(2) = rpole(4,i)*xdfield - rpole(2,i)*zdfield
+            tem(3) = rpole(2,i)*ydfield - rpole(3,i)*xdfield
+            call torque (i,tem,frcx,frcy,frcz,dem)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -1825,12 +1826,12 @@ c
          zq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,ii)
-            yd = yd + rpole(3,ii)
-            zd = zd + rpole(4,ii)
-            xq = xq + rpole(1,ii)*x(i)
-            yq = yq + rpole(1,ii)*y(i)
-            zq = zq + rpole(1,ii)*z(i)
+            xd = xd + rpole(2,i)
+            yd = yd + rpole(3,i)
+            zd = zd + rpole(4,i)
+            xq = xq + rpole(1,i)*x(i)
+            yq = yq + rpole(1,i)*y(i)
+            zq = zq + rpole(1,i)*z(i)
          end do
          xv = xd * xq
          yv = yd * yq
@@ -1984,20 +1985,20 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -2026,16 +2027,16 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -2126,9 +2127,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -2338,20 +2339,20 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -2384,16 +2385,16 @@ c
             end if
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -2484,9 +2485,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -2703,10 +2704,10 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (ii,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          if (iz .eq. 0)  iz = i
          if (ix .eq. 0)  ix = i
          if (iy .eq. 0)  iy = i
@@ -2861,7 +2862,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the real space part of the Ewald summation
 c
@@ -2890,16 +2891,16 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
@@ -2957,26 +2958,27 @@ c
          zd = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,ii) + rpole(1,ii)*x(i)
-            yd = yd + rpole(3,ii) + rpole(1,ii)*y(i)
-            zd = zd + rpole(4,ii) + rpole(1,ii)*z(i)
+            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
+            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
+            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
          do ii = 1, npole
             i = ipole(ii)
-            dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,ii)*xd
-            dem(2,i) = dem(2,i) + 2.0d0*term*rpole(1,ii)*yd
-            dem(3,i) = dem(3,i) + 2.0d0*term*rpole(1,ii)*zd
+            dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
+            dem(2,i) = dem(2,i) + 2.0d0*term*rpole(1,i)*yd
+            dem(3,i) = dem(3,i) + 2.0d0*term*rpole(1,i)*zd
          end do
          xdfield = -2.0d0 * term * xd
          ydfield = -2.0d0 * term * yd
          zdfield = -2.0d0 * term * zd
          do ii = 1, npole
-            tem(1) = rpole(3,ii)*zdfield - rpole(4,ii)*ydfield
-            tem(2) = rpole(4,ii)*xdfield - rpole(2,ii)*zdfield
-            tem(3) = rpole(2,ii)*ydfield - rpole(3,ii)*xdfield
-            call torque (ii,tem,frcx,frcy,frcz,dem)
+            i = ipole(ii)
+            tem(1) = rpole(3,i)*zdfield - rpole(4,i)*ydfield
+            tem(2) = rpole(4,i)*xdfield - rpole(2,i)*zdfield
+            tem(3) = rpole(2,i)*ydfield - rpole(3,i)*xdfield
+            call torque (i,tem,frcx,frcy,frcz,dem)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -2989,12 +2991,12 @@ c
          zq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,ii)
-            yd = yd + rpole(3,ii)
-            zd = zd + rpole(4,ii)
-            xq = xq + rpole(1,ii)*x(i)
-            yq = yq + rpole(1,ii)*y(i)
-            zq = zq + rpole(1,ii)*z(i)
+            xd = xd + rpole(2,i)
+            yd = yd + rpole(3,i)
+            zd = zd + rpole(4,i)
+            xq = xq + rpole(1,i)*x(i)
+            yq = yq + rpole(1,i)*y(i)
+            zq = zq + rpole(1,i)*z(i)
          end do
          xv = xd * xq
          yv = yd * yq
@@ -3158,20 +3160,20 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -3201,16 +3203,16 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -3301,9 +3303,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -3510,10 +3512,10 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (ii,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          if (iz .eq. 0)  iz = i
          if (ix .eq. 0)  ix = i
          if (iy .eq. 0)  iy = i
@@ -3688,21 +3690,21 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(cmp)) then
-         if (size(cmp) .lt. 10*npole)  deallocate (cmp)
+         if (size(cmp) .lt. 10*n)  deallocate (cmp)
       end if
       if (allocated(fmp)) then
-         if (size(fmp) .lt. 10*npole)  deallocate (fmp)
+         if (size(fmp) .lt. 10*n)  deallocate (fmp)
       end if
       if (allocated(cphi)) then
-         if (size(cphi) .lt. 10*npole)  deallocate (cphi)
+         if (size(cphi) .lt. 10*n)  deallocate (cphi)
       end if
       if (allocated(fphi)) then
-         if (size(fphi) .lt. 20*npole)  deallocate (fphi)
+         if (size(fphi) .lt. 20*n)  deallocate (fphi)
       end if
-      if (.not. allocated(cmp))  allocate (cmp(10,npole))
-      if (.not. allocated(fmp))  allocate (fmp(10,npole))
-      if (.not. allocated(cphi))  allocate (cphi(10,npole))
-      if (.not. allocated(fphi))  allocate (fphi(20,npole))
+      if (.not. allocated(cmp))  allocate (cmp(10,n))
+      if (.not. allocated(fmp))  allocate (fmp(10,n))
+      if (.not. allocated(cphi))  allocate (cphi(10,n))
+      if (.not. allocated(fphi))  allocate (fphi(20,n))
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -3721,7 +3723,8 @@ c
 c
 c     copy multipole moments and coordinates to local storage
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          cmp(1,i) = rpole(1,i)
          cmp(2,i) = rpole(2,i)
          cmp(3,i) = rpole(3,i)
@@ -3826,7 +3829,8 @@ c     perform 3-D FFT backward transform and get potential
 c
       call fftback
       call fphi_mpole (fphi)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 20
             fphi(j,i) = f * fphi(j,i)
          end do
@@ -3836,7 +3840,8 @@ c
 c     increment the permanent multipole energy and gradient
 c
       e = 0.0d0
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          f1 = 0.0d0
          f2 = 0.0d0
          f3 = 0.0d0
@@ -3852,17 +3857,17 @@ c
          h1 = recip(1,1)*f1 + recip(1,2)*f2 + recip(1,3)*f3
          h2 = recip(2,1)*f1 + recip(2,2)*f2 + recip(2,3)*f3
          h3 = recip(3,1)*f1 + recip(3,2)*f2 + recip(3,3)*f3
-         ii = ipole(i)
-         dem(1,ii) = dem(1,ii) + h1
-         dem(2,ii) = dem(2,ii) + h2
-         dem(3,ii) = dem(3,ii) + h3
+         dem(1,i) = dem(1,i) + h1
+         dem(2,i) = dem(2,i) + h2
+         dem(3,i) = dem(3,i) + h3
       end do
       e = 0.5d0 * e
       em = em + e
 c
 c     increment the permanent multipole virial contributions
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          vxx = vxx - cmp(2,i)*cphi(2,i) - 2.0d0*cmp(5,i)*cphi(5,i)
      &            - cmp(8,i)*cphi(8,i) - cmp(9,i)*cphi(9,i)
          vxy = vxy - 0.5d0*(cmp(3,i)*cphi(2,i)+cmp(2,i)*cphi(3,i))
@@ -3885,7 +3890,8 @@ c
 c
 c     resolve site torques then increment forces and virial
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          tem(1) = cmp(4,i)*cphi(3,i) - cmp(3,i)*cphi(4,i)
      &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphi(10,i)
      &               + cmp(9,i)*cphi(8,i) + cmp(10,i)*cphi(6,i)
@@ -3899,22 +3905,21 @@ c
      &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
      &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
          call torque (i,tem,fix,fiy,fiz,dem)
-         ii = ipole(i)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
          if (iz .eq. 0)  iz = ii
          if (ix .eq. 0)  ix = ii
          if (iy .eq. 0)  iy = ii
-         xiz = x(iz) - x(ii)
-         yiz = y(iz) - y(ii)
-         ziz = z(iz) - z(ii)
-         xix = x(ix) - x(ii)
-         yix = y(ix) - y(ii)
-         zix = z(ix) - z(ii)
-         xiy = x(iy) - x(ii)
-         yiy = y(iy) - y(ii)
-         ziy = z(iy) - z(ii)
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
          vxx = vxx + xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
          vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
      &                        + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
@@ -3939,22 +3944,22 @@ c
          do i = 1, n
             pot(i) = 0.0d0
          end do
-         do i = 1, npole
-            ii = ipole(i)
-            pot(ii) = cphi(1,i)
+         do ii = 1, npole
+            i = ipole(ii)
+            pot(i) = cphi(1,i)
          end do
          call dcflux (pot,decfx,decfy,decfz)
-         do i = 1, npole
-            ii = ipole(i)
-            xi = x(ii)
-            yi = y(ii)
-            zi = z(ii)
-            frcx = decfx(ii)
-            frcy = decfy(ii)
-            frcz = decfz(ii)
-            dem(1,ii) = dem(1,ii) + frcx
-            dem(2,ii) = dem(2,ii) + frcy
-            dem(3,ii) = dem(3,ii) + frcz
+         do ii = 1, npole
+            i = ipole(ii)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            frcx = decfx(i)
+            frcy = decfy(i)
+            frcz = decfz(i)
+            dem(1,i) = dem(1,i) + frcx
+            dem(2,i) = dem(2,i) + frcy
+            dem(3,i) = dem(3,i) + frcz
             vxx = vxx + xi*frcx
             vxy = vxy + yi*frcx
             vxz = vxz + zi*frcx

@@ -38,7 +38,7 @@ c
       use titles
       use units
       implicit none
-      integer i,j,k
+      integer i,j,ii
       integer istep
       integer ixyz,iind
       integer ivel,ifrc
@@ -262,10 +262,10 @@ c
          end if
          write (iind,280)  n,title(1:ltitle)
   280    format (i6,2x,a)
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             if (polarity(i) .ne. 0.0d0) then
-               k = ipole(i)
-               write (iind,290)  k,name(k),(debye*uind(j,i),j=1,3)
+               write (iind,290)  i,name(i),(debye*uind(j,i),j=1,3)
   290          format (i6,2x,a3,3f12.6)
             end if
          end do

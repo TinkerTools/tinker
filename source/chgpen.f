@@ -13,10 +13,10 @@ c     ##################################################################
 c
 c
 c     ncp       total number of charge penetration sites in system
-c     pcore     number of core electrons at each multipole site
-c     pval      number of valence electrons at each multipole site
+c     pcore     number of core electrons assigned to each atom
+c     pval      number of valence electrons assigned to each atom
 c     pval0     original number of valence electrons for charge flux
-c     palpha    charge penetration damping at each multipole site
+c     palpha    charge penetration damping value at each atom
 c
 c
       module chgpen

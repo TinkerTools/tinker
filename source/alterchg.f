@@ -31,7 +31,7 @@ c
       use mplpot
       use mpole
       implicit none
-      integer i,k
+      integer i,ii
       real*8, allocatable :: pdelta(:)
       logical header
 c
@@ -54,10 +54,10 @@ c
 c     alter atomic partial charge values for charge flux
 c
       header = .true.
-      do i = 1, nion
-         k = iion(i)
-         pchg(i) = pchg0(i) + pdelta(k)
-         if (debug .and. pdelta(k).ne.0.0d0) then
+      do ii = 1, nion
+         i = iion(ii)
+         pchg(i) = pchg0(i) + pdelta(i)
+         if (debug .and. pdelta(i).ne.0.0d0) then
             if (header) then
                header = .false.
                write (iout,10)
@@ -65,7 +65,7 @@ c
      &                    ' Charges :',
      &                 //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
             end if
-            write (iout,20)  k,pchg0(i),pchg(i)
+            write (iout,20)  i,pchg0(i),pchg(i)
    20       format (i8,9x,2f14.5)
          end if
       end do
@@ -73,11 +73,11 @@ c
 c     alter monopoles and charge penetration for charge flux
 c
       header = .true.
-      do i = 1, npole
-         k = ipole(i)
-         pole(1,i) = mono0(i) + pdelta(k)
-         if (use_chgpen)  pval(i) = pval0(i) + pdelta(k)
-         if (debug .and. pdelta(k).ne.0.0d0) then
+      do ii = 1, npole
+         i = ipole(ii)
+         pole(1,i) = mono0(i) + pdelta(i)
+         if (use_chgpen)  pval(i) = pval0(i) + pdelta(i)
+         if (debug .and. pdelta(i).ne.0.0d0) then
             if (header) then
                header = .false.
                write (iout,30)
@@ -85,7 +85,7 @@ c
      &                    ' Monopoles :',
      &                 //,4x,'Atom',14x,'Base Value',7x,'Actual',/)
             end if
-            write (iout,40)  k,mono0(i),pole(1,i)
+            write (iout,40)  i,mono0(i),pole(1,i)
    40       format (i8,9x,2f14.5)
          end if
       end do

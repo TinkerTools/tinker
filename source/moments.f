@@ -132,19 +132,19 @@ c
       do i = 1, nion
          k = iion(i)
          if (use(k)) then
-            netchg = netchg + pchg(i)
-            xdpl = xdpl + xcm(k)*pchg(i)
-            ydpl = ydpl + ycm(k)*pchg(i)
-            zdpl = zdpl + zcm(k)*pchg(i)
-            xxqpl = xxqpl + xcm(k)*xcm(k)*pchg(i)
-            xyqpl = xyqpl + xcm(k)*ycm(k)*pchg(i)
-            xzqpl = xzqpl + xcm(k)*zcm(k)*pchg(i)
-            yxqpl = yxqpl + ycm(k)*xcm(k)*pchg(i)
-            yyqpl = yyqpl + ycm(k)*ycm(k)*pchg(i)
-            yzqpl = yzqpl + ycm(k)*zcm(k)*pchg(i)
-            zxqpl = zxqpl + zcm(k)*xcm(k)*pchg(i)
-            zyqpl = zyqpl + zcm(k)*ycm(k)*pchg(i)
-            zzqpl = zzqpl + zcm(k)*zcm(k)*pchg(i)
+            netchg = netchg + pchg(k)
+            xdpl = xdpl + xcm(k)*pchg(k)
+            ydpl = ydpl + ycm(k)*pchg(k)
+            zdpl = zdpl + zcm(k)*pchg(k)
+            xxqpl = xxqpl + xcm(k)*xcm(k)*pchg(k)
+            xyqpl = xyqpl + xcm(k)*ycm(k)*pchg(k)
+            xzqpl = xzqpl + xcm(k)*zcm(k)*pchg(k)
+            yxqpl = yxqpl + ycm(k)*xcm(k)*pchg(k)
+            yyqpl = yyqpl + ycm(k)*ycm(k)*pchg(k)
+            yzqpl = yzqpl + ycm(k)*zcm(k)*pchg(k)
+            zxqpl = zxqpl + zcm(k)*xcm(k)*pchg(k)
+            zyqpl = zyqpl + zcm(k)*ycm(k)*pchg(k)
+            zzqpl = zzqpl + zcm(k)*zcm(k)*pchg(k)
          end if
       end do
 c
@@ -183,19 +183,21 @@ c     find atomic multipoles and induced dipoles in global frame
 c
       if (use_born)  call born
       call chkpole
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
       call induce
       if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
          do i = 1, npole
-            rpole(2,i) = rpole(2,i) + uinds(1,i)
-            rpole(3,i) = rpole(3,i) + uinds(2,i)
-            rpole(4,i) = rpole(4,i) + uinds(3,i)
+            k = ipole(i)
+            rpole(2,k) = rpole(2,k) + uinds(1,k)
+            rpole(3,k) = rpole(3,k) + uinds(2,k)
+            rpole(4,k) = rpole(4,k) + uinds(3,k)
          end do
       else
          do i = 1, npole
-            rpole(2,i) = rpole(2,i) + uind(1,i)
-            rpole(3,i) = rpole(3,i) + uind(2,i)
-            rpole(4,i) = rpole(4,i) + uind(3,i)
+            k = ipole(i)
+            rpole(2,k) = rpole(2,k) + uind(1,k)
+            rpole(3,k) = rpole(3,k) + uind(2,k)
+            rpole(4,k) = rpole(4,k) + uind(3,k)
          end do
       end if
 c
@@ -204,28 +206,28 @@ c
       do i = 1, npole
          k = ipole(i)
          if (use(k)) then
-            netchg = netchg + rpole(1,i)
-            xdpl = xdpl + xcm(k)*rpole(1,i) + rpole(2,i)
-            ydpl = ydpl + ycm(k)*rpole(1,i) + rpole(3,i)
-            zdpl = zdpl + zcm(k)*rpole(1,i) + rpole(4,i)
-            xxqpl = xxqpl + xcm(k)*xcm(k)*rpole(1,i)
-     &                 + 2.0d0*xcm(k)*rpole(2,i)
-            xyqpl = xyqpl + xcm(k)*ycm(k)*rpole(1,i)
-     &                 + xcm(k)*rpole(3,i) + ycm(k)*rpole(2,i)
-            xzqpl = xzqpl + xcm(k)*zcm(k)*rpole(1,i)
-     &                 + xcm(k)*rpole(4,i) + zcm(k)*rpole(2,i)
-            yxqpl = yxqpl + ycm(k)*xcm(k)*rpole(1,i)
-     &                 + ycm(k)*rpole(2,i) + xcm(k)*rpole(3,i)
-            yyqpl = yyqpl + ycm(k)*ycm(k)*rpole(1,i)
-     &                 + 2.0d0*ycm(k)*rpole(3,i)
-            yzqpl = yzqpl + ycm(k)*zcm(k)*rpole(1,i)
-     &                 + ycm(k)*rpole(4,i) + zcm(k)*rpole(3,i)
-            zxqpl = zxqpl + zcm(k)*xcm(k)*rpole(1,i)
-     &                 + zcm(k)*rpole(2,i) + xcm(k)*rpole(4,i)
-            zyqpl = zyqpl + zcm(k)*ycm(k)*rpole(1,i)
-     &                 + zcm(k)*rpole(3,i) + ycm(k)*rpole(4,i)
-            zzqpl = zzqpl + zcm(k)*zcm(k)*rpole(1,i)
-     &                 + 2.0d0*zcm(k)*rpole(4,i)
+            netchg = netchg + rpole(1,k)
+            xdpl = xdpl + xcm(k)*rpole(1,k) + rpole(2,k)
+            ydpl = ydpl + ycm(k)*rpole(1,k) + rpole(3,k)
+            zdpl = zdpl + zcm(k)*rpole(1,k) + rpole(4,k)
+            xxqpl = xxqpl + xcm(k)*xcm(k)*rpole(1,k)
+     &                 + 2.0d0*xcm(k)*rpole(2,k)
+            xyqpl = xyqpl + xcm(k)*ycm(k)*rpole(1,k)
+     &                 + xcm(k)*rpole(3,k) + ycm(k)*rpole(2,k)
+            xzqpl = xzqpl + xcm(k)*zcm(k)*rpole(1,k)
+     &                 + xcm(k)*rpole(4,k) + zcm(k)*rpole(2,k)
+            yxqpl = yxqpl + ycm(k)*xcm(k)*rpole(1,k)
+     &                 + ycm(k)*rpole(2,k) + xcm(k)*rpole(3,k)
+            yyqpl = yyqpl + ycm(k)*ycm(k)*rpole(1,k)
+     &                 + 2.0d0*ycm(k)*rpole(3,k)
+            yzqpl = yzqpl + ycm(k)*zcm(k)*rpole(1,k)
+     &                 + ycm(k)*rpole(4,k) + zcm(k)*rpole(3,k)
+            zxqpl = zxqpl + zcm(k)*xcm(k)*rpole(1,k)
+     &                 + zcm(k)*rpole(2,k) + xcm(k)*rpole(4,k)
+            zyqpl = zyqpl + zcm(k)*ycm(k)*rpole(1,k)
+     &                 + zcm(k)*rpole(3,k) + ycm(k)*rpole(4,k)
+            zzqpl = zzqpl + zcm(k)*zcm(k)*rpole(1,k)
+     &                 + 2.0d0*zcm(k)*rpole(4,k)
          end if
       end do
 c
@@ -253,15 +255,15 @@ c
       do i = 1, npole
          k = ipole(i)
          if (use(k)) then
-            xxqpl = xxqpl + 3.0d0*rpole(5,i)
-            xyqpl = xyqpl + 3.0d0*rpole(6,i)
-            xzqpl = xzqpl + 3.0d0*rpole(7,i)
-            yxqpl = yxqpl + 3.0d0*rpole(8,i)
-            yyqpl = yyqpl + 3.0d0*rpole(9,i)
-            yzqpl = yzqpl + 3.0d0*rpole(10,i)
-            zxqpl = zxqpl + 3.0d0*rpole(11,i)
-            zyqpl = zyqpl + 3.0d0*rpole(12,i)
-            zzqpl = zzqpl + 3.0d0*rpole(13,i)
+            xxqpl = xxqpl + 3.0d0*rpole(5,k)
+            xyqpl = xyqpl + 3.0d0*rpole(6,k)
+            xzqpl = xzqpl + 3.0d0*rpole(7,k)
+            yxqpl = yxqpl + 3.0d0*rpole(8,k)
+            yyqpl = yyqpl + 3.0d0*rpole(9,k)
+            yzqpl = yzqpl + 3.0d0*rpole(10,k)
+            zxqpl = zxqpl + 3.0d0*rpole(11,k)
+            zyqpl = zyqpl + 3.0d0*rpole(12,k)
+            zzqpl = zzqpl + 3.0d0*rpole(13,k)
          end if
       end do
 c

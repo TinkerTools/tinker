@@ -238,7 +238,7 @@ c
       implicit none
       real*8 energy
       real*8 derivs(3,*)
-      logical save_vdw,save_repuls
+      logical save_vdw,save_repel
       logical save_disp,save_charge
       logical save_chgdpl,save_dipole
       logical save_mpole,save_polar
@@ -249,7 +249,7 @@ c
 c     save the original state of slow-evolving potentials
 c
       save_vdw = use_vdw
-      save_repuls = use_repuls
+      save_repel = use_repel
       save_disp = use_disp
       save_charge = use_charge
       save_chgdpl = use_chgdpl
@@ -264,7 +264,7 @@ c
 c     turn off slow-evolving nonbonded potential energy terms
 c
       use_vdw = .false.
-      use_repuls = .false.
+      use_repel = .false.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
@@ -283,7 +283,7 @@ c
 c     restore the original state of slow-evolving potentials
 c
       use_vdw = save_vdw
-      use_repuls = save_repuls
+      use_repel = save_repel
       use_disp = save_disp
       use_charge = save_charge
       use_chgdpl = save_chgdpl

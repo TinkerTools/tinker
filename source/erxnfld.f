@@ -56,7 +56,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the indices used in reaction field calculations
 c
@@ -66,18 +66,18 @@ c     calculate the reaction field interaction energy term
 c
       do ii = 1, npole
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
-         do j = 1, polsiz(ii)
-            rpi(j) = rpole(j,ii)
+         do j = 1, polsiz(i)
+            rpi(j) = rpole(j,i)
          end do
          do kk = ii, npole
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             if (usei .or. usek) then
                xr = x(k) - x(i)
@@ -85,10 +85,10 @@ c
                zr = z(k) - z(i)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
-                  do j = 1, polsiz(kk)
-                     rpk(j) = rpole(j,kk)
+                  do j = 1, polsiz(k)
+                     rpk(j) = rpole(j,k)
                   end do
-                  call erfik (ii,kk,i,k,rpi,rpk,eik)
+                  call erfik (i,k,rpi,rpk,eik)
                   erxf = erxf + eik
                end if
             end if
@@ -109,14 +109,14 @@ c     "erfik" compute the reaction field energy due to a single pair
 c     of atomic multipoles
 c
 c
-      subroutine erfik (ii,kk,i,k,rpi,rpk,eik)
+      subroutine erfik (i,k,rpi,rpk,eik)
       use atoms
       use chgpot
       use mpole
       use rxnfld
       use rxnpot
       implicit none
-      integer i,k,ii,kk
+      integer i,k
       integer isiz,ksiz
       integer m,n1,n2,nn
       integer fii,fi,fj
@@ -135,8 +135,8 @@ c
 c
 c     get numbers of the atoms
 c
-      isiz = polsiz(ii)
-      ksiz = polsiz(kk)
+      isiz = polsiz(i)
+      ksiz = polsiz(k)
       xi = x(i)
       yi = y(i)
       zi = z(i)

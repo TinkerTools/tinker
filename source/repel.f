@@ -14,9 +14,10 @@ c
 c
 c     nrep      total number of repulsion sites in the system
 c     irep      number of the atom for each repulsion site
-c     sizpr     Pauli repulsion size parameter value at each site
-c     dmppr     Pauli repulsion alpha damping value at each site
-c     elepr     Pauli repulsion valence electrons at each site
+c     replist   repulsion multipole site for each atom (0=none)
+c     sizpr     Pauli repulsion size parameter value for each atom
+c     dmppr     Pauli repulsion alpha damping value for each atom
+c     elepr     Pauli repulsion valence electrons for each atom
 c     repole    repulsion Cartesian multipoles in the local frame
 c     rrepole   repulsion Cartesian multipoles in the global frame
 c
@@ -25,6 +26,7 @@ c
       implicit none
       integer nrep
       integer, allocatable :: irep(:)
+      integer, allocatable :: replist(:)
       real*8, allocatable :: sizpr(:)
       real*8, allocatable :: dmppr(:)
       real*8, allocatable :: elepr(:)

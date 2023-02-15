@@ -556,17 +556,19 @@ c
          else if (prmtyp .eq. 7) then
             if (mode .eq. 'STORE') then
                do i = 1, npole
-                  if (type(ipole(i)) .eq. atom1) then
-                     xx(j) = polarity(i)
+                  k = ipole(i)
+                  if (type(k) .eq. atom1) then
+                     xx(j) = polarity(k)
                      goto 10
                   end if
                end do
             else if (mode .eq. 'RESET') then
                sixth = 1.0d0 / 6.0d0
                do i = 1, npole
-                  if (type(ipole(i)) .eq. atom1) then
-                     polarity(i) = xx(j)
-                     if (thole(i) .ne. 0.0d0)  pdamp(i) = xx(j)**sixth
+                  k = ipole(i)
+                  if (type(k) .eq. atom1) then
+                     polarity(k) = xx(j)
+                     if (thole(k) .ne. 0.0d0)  pdamp(k) = xx(j)**sixth
                   end if
                end do
             end if

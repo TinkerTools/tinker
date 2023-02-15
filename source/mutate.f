@@ -258,9 +258,9 @@ c
          do i = 1, nion
             k = iion(i)
             if (mut(k)) then
-               pchg(i) = pchg(i) * elambda
+               pchg(k) = pchg(k) * elambda
             end if
-            pchg0(i) = pchg(i)
+            pchg0(k) = pchg(k)
          end do
       end if
 c
@@ -268,8 +268,8 @@ c     set scaled parameters for bond dipole models
 c
       if (use_dipole) then
          do i = 1, ndipole
-            k1 = idpl(1,k)
-            k2 = idpl(2,k)
+            k1 = idpl(1,i)
+            k2 = idpl(2,i)
             if (mut(k1) .or. mut(k2)) then
                bdpl(i) = bdpl(i) * elambda
             end if
@@ -283,13 +283,13 @@ c
             k = ipole(i)
             if (mut(k)) then
                do j = 1, 13
-                  pole(j,i) = pole(j,i) * elambda
+                  pole(j,k) = pole(j,k) * elambda
                end do
-               mono0(i) = pole(1,i)
+               mono0(k) = pole(1,k)
                if (use_chgpen) then
-                  pcore(i) = pcore(i) * elambda
-                  pval(i) = pval(i) * elambda
-                  pval0(i) = pval(i)
+                  pcore(k) = pcore(k) * elambda
+                  pval(k) = pval(k) * elambda
+                  pval0(k) = pval(k)
                end if
             end if
          end do
@@ -301,7 +301,7 @@ c
          do i = 1, npole
             k = ipole(i)
             if (mut(k)) then
-               polarity(i) = polarity(i) * elambda
+               polarity(k) = polarity(k) * elambda
                if (elambda .eq. 0.0d0)  douind(k) = .false.
             end if
          end do

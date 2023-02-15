@@ -70,7 +70,7 @@ c
 c
 c     zero out the induced dipoles at each site
 c
-      do i = 1, npole
+      do i = 1, n
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
@@ -274,7 +274,7 @@ c
 c
 c     zero out the induced dipoles at each site
 c
-      do i = 1, npole
+      do i = 1, n
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
@@ -539,18 +539,19 @@ c
       use mpole
       use polar
       implicit none
-      integer i,j
+      integer i,j,k
       real*8 sum
       real*8 a(3,*)
       real*8 b(3,*)
 c
 c
       sum = 0.0d0
-!$OMP PARALLEL default(shared) private(i,j)
+!$OMP PARALLEL default(shared) private(i,j,k)
 !$OMP DO reduction(+:sum) schedule(guided)
       do i = 1, npole
+         k = ipole(i)
          do j = 1, 3
-            sum = sum + a(j,i)*b(j,i)*polarity(i)
+            sum = sum + a(j,k)*b(j,k)*polarity(k)
          end do
       end do
 !$OMP END DO
@@ -603,17 +604,18 @@ c
       use mpole
       use polar
       implicit none
-      integer i,j
+      integer i,j,k
       real*8 source1(3,*)
       real*8 source2(3,*)
 c
 c
-!$OMP PARALLEL default(shared) private(i,j)
+!$OMP PARALLEL default(shared) private(i,j,k)
 !$OMP DO schedule(guided)
       do i = 1, npole
+         k = ipole(i)
          do j = 1, 3
-            source1(j,i) = polarity(i) * source1(j,i)
-            source2(j,i) = polarity(i) * source2(j,i)
+            source1(j,k) = polarity(k) * source1(j,k)
+            source2(j,k) = polarity(k) * source2(j,k)
          end do
       end do
 !$OMP END DO
@@ -637,19 +639,20 @@ c
       use mpole
       use polar
       implicit none
-      integer i,j
+      integer i,j,k
       real*8 source1(3,*)
       real*8 source2(3,*)
       real*8 result1(3,*)
       real*8 result2(3,*)
 c
 c
-!$OMP PARALLEL default(shared) private(i,j)
+!$OMP PARALLEL default(shared) private(i,j,k)
 !$OMP DO schedule(guided)
       do i = 1, npole
+         k = ipole(i)
          do j = 1, 3
-            result1(j,i) = polarity(i) * source1(j,i)
-            result2(j,i) = polarity(i) * source2(j,i)
+            result1(j,k) = polarity(k) * source1(j,k)
+            result2(j,k) = polarity(k) * source2(j,k)
          end do
       end do
 !$OMP END DO
@@ -749,8 +752,8 @@ c
       use mpole
       use polar
       implicit none
-      integer i,j
-      real*8 poli,polmin
+      integer i,j,k
+      real*8 polk,polmin
       real*8 ind(3,*)
       real*8 inp(3,*)
       real*8 v3d(3,*)
@@ -764,14 +767,15 @@ c
 c     compute the 1/alpha contribution
 c
       polmin = 0.00000001d0
-!$OMP PARALLEL default(shared) private(i,j,poli)
+!$OMP PARALLEL default(shared) private(i,j,k,polk)
 !$OMP DO schedule(guided)
       do i = 1, npole
-         if (douind(ipole(i))) then
-            poli = max(polmin,polarity(i))
+         k = ipole(i)
+         if (douind(k)) then
+            polk = max(polmin,polarity(k))
             do j = 1, 3
-               v3d(j,i) = ind(j,i)/poli - v3d(j,i)
-               v3p(j,i) = inp(j,i)/poli - v3p(j,i)
+               v3d(j,k) = ind(j,k)/polk - v3d(j,k)
+               v3p(j,k) = inp(j,k)/polk - v3p(j,k)
             end do
          end if
       end do
@@ -795,7 +799,7 @@ c
       subroutine tcgswap (uind1,uinp1,uind2,uinp2)
       use mpole
       implicit none
-      integer i,j
+      integer i,j,k
       real*8 dterm,pterm
       real*8 uind1(3,*)
       real*8 uinp1(3,*)
@@ -805,16 +809,17 @@ c
 c
 c     swap sets of induced dipoles for use with the TCG method
 c
-!$OMP PARALLEL default(shared) private(i,j,dterm,pterm)
+!$OMP PARALLEL default(shared) private(i,j,k,dterm,pterm)
 !$OMP DO schedule(guided)
       do i = 1, npole
+         k = ipole(i)
          do j = 1, 3
-            dterm = uind1(j,i)
-            pterm = uinp1(j,i)
-            uind1(j,i) = uind2(j,i)
-            uinp1(j,i) = uinp2(j,i)
-            uind2(j,i) = dterm
-            uinp2(j,i) = pterm
+            dterm = uind1(j,k)
+            pterm = uinp1(j,k)
+            uind1(j,k) = uind2(j,k)
+            uinp1(j,k) = uinp2(j,k)
+            uind2(j,k) = dterm
+            uinp2(j,k) = pterm
          end do
       end do
 !$OMP END DO
@@ -839,7 +844,7 @@ c
       use polar
       use poltcg
       implicit none
-      integer i,j
+      integer i,j,k
       real*8 beta,alpha
       real*8 pvec(3,*)
       real*8 rvec(3,*)
@@ -847,12 +852,13 @@ c
 c
 c     computes an updated pvec from prior intermediates
 c
-!$OMP PARALLEL default(shared) private(i,j,alpha)
+!$OMP PARALLEL default(shared) private(i,j,k,alpha)
 !$OMP DO schedule(guided)
       do i = 1, npole
-         alpha = polarity(i)
+         k = ipole(i)
+         alpha = polarity(k)
          do j = 1, 3
-            pvec(j,i) = alpha*rvec(j,i) + beta*pvec(j,i)
+            pvec(j,k) = alpha*rvec(j,k) + beta*pvec(j,k)
          end do
       end do
 !$OMP END DO

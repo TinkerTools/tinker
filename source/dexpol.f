@@ -19,8 +19,8 @@ c     literature reference:
 c
 c     M. K. J. Chung, Z. Wang, J. A. Rackers and J. W. Ponder,
 c     "Classical Exchange Polarization: An Anisotropic Variable
-c     Polarizability Model", Journal of Physical Chemistry B,
-c     submitted, June 2022
+c     Polarizability Model", Journal of Physical Chemistry B, 126,
+c     7579-7594 (2022)
 c
 c
       subroutine dexpol
@@ -123,13 +123,13 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         springi = kpep(ii) / polarity(ii)
-         sizi = prepep(ii)
-         alphai = dmppep(ii)
-         epli = lpep(ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         springi = kpep(i) / polarity(i)
+         sizi = prepep(i)
+         alphai = dmppep(i)
+         epli = lpep(i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -166,7 +166,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            eplk = lpep(kk)
+            eplk = lpep(k)
             if (epli .or. eplk) then
                xr = x(k) - xi
                yr = y(k) - yi
@@ -175,13 +175,13 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(kk)/polarity(kk)
-                  sizk = prepep(kk)
-                  alphak = dmppep(kk)
+                  springk = kpep(k) / polarity(k)
+                  sizk = prepep(k)
+                  alphak = dmppep(k)
                   sizik = sizi * sizk
-                  ukx = uind(1,kk)
-                  uky = uind(2,kk)
-                  ukz = uind(3,kk)
+                  ukx = uind(1,k)
+                  uky = uind(2,k)
+                  ukz = uind(3,k)
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -303,13 +303,13 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            springi = kpep(ii) / polarity(ii)
-            sizi = prepep(ii)
-            alphai = dmppep(ii)
-            epli = lpep(ii)
-            uix = uind(1,ii)
-            uiy = uind(2,ii)
-            uiz = uind(3,ii)
+            springi = kpep(i) / polarity(i)
+            sizi = prepep(i)
+            alphai = dmppep(i)
+            epli = lpep(i)
+            uix = uind(1,i)
+            uiy = uind(2,i)
+            uiz = uind(3,i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -346,7 +346,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               eplk = lpep(kk)
+               eplk = lpep(k)
                if (epli .or. eplk) then
                   do jcell = 2, ncell
                      xr = x(k) - xi
@@ -356,13 +356,13 @@ c
                      r2 = xr*xr + yr*yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        springk = kpep(kk) / polarity(kk)
-                        sizk = prepep(kk)
-                        alphak = dmppep(kk)
+                        springk = kpep(k) / polarity(k)
+                        sizk = prepep(k)
+                        alphak = dmppep(k)
                         sizik = sizi * sizk
-                        ukx = uind(1,kk)
-                        uky = uind(2,kk)
-                        ukz = uind(3,kk)
+                        ukx = uind(1,k)
+                        uky = uind(2,k)
+                        ukz = uind(3,k)
                         call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance
@@ -582,13 +582,13 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         springi = kpep(ii) / polarity(ii)
-         sizi = prepep(ii)
-         alphai = dmppep(ii)
-         epli = lpep(ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         springi = kpep(i) / polarity(i)
+         sizi = prepep(i)
+         alphai = dmppep(i)
+         epli = lpep(i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -626,7 +626,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = ipole(kk)
-            eplk = lpep(kk)
+            eplk = lpep(k)
             if (epli .or. eplk) then
                xr = x(k) - xi
                yr = y(k) - yi
@@ -635,13 +635,13 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(kk) / polarity(kk)
-                  sizk = prepep(kk)
-                  alphak = dmppep(kk)
+                  springk = kpep(k) / polarity(k)
+                  sizk = prepep(k)
+                  alphak = dmppep(k)
                   sizik = sizi * sizk
-                  ukx = uind(1,kk)
-                  uky = uind(2,kk)
-                  ukz = uind(3,kk)
+                  ukx = uind(1,k)
+                  uky = uind(2,k)
+                  ukz = uind(3,k)
                   call dampexpl (r,sizik,alphai,alphak,s2,ds2)
 c
 c     use energy switching if near the cutoff distance

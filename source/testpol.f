@@ -78,6 +78,7 @@ c
       call initial
       call getxyz
       call mechanic
+      if (use_solv)  call born
 c
 c     check to make sure mutual polarization is being used
 c
@@ -158,7 +159,7 @@ c
       poleps = 0.0000000001d0
       debug = .false.
       call chkpole
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -181,6 +182,12 @@ c
 c     perform dynamic allocation of some global arrays
 c
       allocate (uexact(3,n))
+      if (use_solv) then
+         if (allocated(uopts))  deallocate (uopts)
+         if (allocated(uoptps))  deallocate (uoptps)
+         allocate (uopts(0:optorder,3,n))
+         allocate (uoptps(0:optorder,3,n))
+      end if
 c
 c     find PCG induced dipoles for increasing iteration counts
 c
@@ -191,7 +198,11 @@ c
          call induce
          do i = 1, n
             do j = 1, 3
-               ustore(j,i,k) = debye * uind(j,i)
+               if (use_solv) then
+                  ustore(j,i,k) = debye * uinds(j,i)
+               else
+                  ustore(j,i,k) = debye * uind(j,i)
+               end if
             end do
          end do
          sum = 0.0d0
@@ -265,7 +276,11 @@ c
       call induce
       do i = 1, n
          do j = 1, 3
-            udirect(j,i) = debye * uind(j,i)
+            if (use_solv) then
+               udirect(j,i) = debye * uinds(j,i)
+            else
+               udirect(j,i) = debye * uind(j,i)
+            end if
             ustore(j,i,0) = udirect(j,i)
          end do
       end do
@@ -296,7 +311,11 @@ c
       call induce
       do i = 1, n
          do j = 1, 3
-            uxpt(j,i) = debye * uind(j,i)
+            if (use_solv) then
+               uxpt(j,i) = debye * uinds(j,i)
+            else
+               uxpt(j,i) = debye * uind(j,i)
+            end if
          end do
       end do
 c
@@ -332,7 +351,7 @@ c
 c
 c     print the TCG analytical induced dipole moments
 c
-      if (dofull) then
+      if (dofull .and. .not.use_solv) then
          write (iout,150)  tcgorder
   150    format (/,' Analytical TCG',i1,' Induced Dipole Moments :',
      &           //,4x,'Atom',15x,'X',13x,'Y',13x,'Z',12x,'Norm',/)
@@ -382,22 +401,42 @@ c
 c
 c     print the RMS between approximate and exact dipoles
 c
-      write (iout,170)  saveopt,savetcg
-  170 format (/,' Approximate vs. Exact Induced Dipoles :',
-     &        //,4x,'Atom',14x,'Direct',12x,'PCG',12x,'OPT',i1,
-     &           12x,'TCG',i1)
-      if (dofull) then
-         write (iout,180)
-  180    format ()
-         do i = 1, n
-            if (use(i) .and. douind(i)) then
-               write (iout,190)  i,tdirect(i),tpcg(i),txpt(i),ttcg(i)
-  190          format (i8,6x,4f16.10)
-            end if
-         end do
+      if (use_solv) then
+         write (iout,170)  saveopt
+  170    format (/,' Approximate vs. Exact Induced Dipoles :',
+     &           //,4x,'Atom',14x,'Direct',12x,'PCG',12x,'OPT',i1)
+      else
+         write (iout,180)  saveopt,savetcg
+  180    format (/,' Approximate vs. Exact Induced Dipoles :',
+     &           //,4x,'Atom',14x,'Direct',12x,'PCG',12x,'OPT',i1,
+     &              12x,'TCG',i1)
       end if
-      write (iout,200)  rdirect,rpcg,rxpt,rtcg
-  200 format (/,5x,'RMS',6x,4f16.10)
+      if (dofull) then
+         write (iout,190)
+  190    format ()
+         if (use_solv) then
+            do i = 1, n
+               if (use(i) .and. douind(i)) then
+                  write (iout,200)  i,tdirect(i),tpcg(i),txpt(i)
+  200             format (i8,6x,3f16.10)
+               end if
+            end do
+         else
+            do i = 1, n
+               if (use(i) .and. douind(i)) then
+                  write (iout,210)  i,tdirect(i),tpcg(i),txpt(i),ttcg(i)
+  210             format (i8,6x,4f16.10)
+               end if
+            end do
+         end if
+      end if
+      if (use_solv) then
+         write (iout,220)  rdirect,rpcg,rxpt
+  220    format (/,5x,'RMS',6x,3f16.10)
+      else
+         write (iout,230)  rdirect,rpcg,rxpt,rtcg
+  230    format (/,5x,'RMS',6x,4f16.10)
+      end if
 c
 c     find the RMS of each iteration from the exact dipoles
 c
@@ -417,17 +456,17 @@ c
 c
 c     print the RMS between iterations and versus exact dipoles
 c
-      write (iout,210)
-  210 format (/,' Iterative PCG Induced Dipole Convergence :',
+      write (iout,240)
+  240 format (/,' Iterative PCG Induced Dipole Convergence :',
      &        //,4x,'Iter',12x,'RMS Change',11x,'RMS vs Exact')
-      write (iout,220)  0,rms(0)
-  220 format (/,i8,15x,'----',6x,f20.10)
+      write (iout,250)  0,rms(0)
+  250 format (/,i8,15x,'----',6x,f20.10)
       do k = 1, maxiter
-         write (iout,230)  k,drms(k),rms(k)
-  230    format (i8,2x,f20.10,3x,f20.10)
-         if (rms(k) .lt. 0.5d0*poleps)  goto 240
+         write (iout,260)  k,drms(k),rms(k)
+  260    format (i8,2x,f20.10,3x,f20.10)
+         if (rms(k) .lt. 0.5d0*poleps)  goto 270
       end do
-  240 continue
+  270 continue
 c
 c     refine the extrapolated OPT coefficients via optimization
 c
@@ -435,8 +474,8 @@ c
          poltyp = savetyp
          if (poltyp(1:3) .ne. 'OPT')  poltyp = 'OPT   '
          call kpolar
-         write (iout,250)  optorder
-  250    format (/,' Analytical OPT',i1,' Coefficient Refinement :',
+         write (iout,280)  optorder
+  280    format (/,' Analytical OPT',i1,' Coefficient Refinement :',
      &           //,4x,'Iter',7x,'C0',5x,'C1',5x,'C2',5x,'C3',
      &              5x,'C4',5x,'C5',5x,'C6',5x,'RMS vs Exact',/)
 c
@@ -475,8 +514,8 @@ c
                copt(i) = var(nvar)
             end if
          end do
-         write (iout,260)  iter,(copt(i),i=0,6),rxpt
-  260    format (i8,3x,7f7.3,f16.10)
+         write (iout,290)  iter,(copt(i),i=0,6),rxpt
+  290    format (i8,3x,7f7.3,f16.10)
       end if
 c
 c     perform deallocation of some local arrays

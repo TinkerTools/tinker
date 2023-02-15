@@ -584,7 +584,7 @@ c
                end if
                if (use_mpole) then
                   call chkpole
-                  call rotpole (pole,rpole)
+                  call rotpole ('MPOLE')
                end if
                if (use_polar) then
                   domlst = .true.
@@ -724,7 +724,7 @@ c
             call prmvar (nvar,xx)
             if (use_mpole) then
                call chkpole
-               call rotpole (pole,rpole)
+               call rotpole ('MPOLE')
             end if
             if (use_polar) then
                domlst = .true.
@@ -1140,11 +1140,11 @@ c
 c
 c     calculate the charge contribution to the potential
 c
-      do k = 1, nion
-         kk = iion(k)
-         xr = x(kk) - xi
-         yr = y(kk) - yi
-         zr = z(kk) - zi
+      do kk = 1, nion
+         k = iion(kk)
+         xr = x(k) - xi
+         yr = y(k) - yi
+         zr = z(k) - zi
          r2 = xr*xr + yr* yr + zr*zr
          r = sqrt(r2)
          e = fi * pchg(k) / r
@@ -1153,30 +1153,30 @@ c
 c
 c     calculate the bond dipole contribution to the potential
 c
-      do k = 1, ndipole
-         k1 = idpl(1,k)
-         k2 = idpl(2,k)
+      do kk = 1, ndipole
+         k1 = idpl(1,kk)
+         k2 = idpl(2,kk)
          xk = x(k2) - x(k1)
          yk = y(k2) - y(k1)
          zk = z(k2) - z(k1)
-         xr = x(k1) + xk*sdpl(k) - xi
-         yr = y(k1) + yk*sdpl(k) - yi
-         zr = z(k1) + zk*sdpl(k) - zi
+         xr = x(k1) + xk*sdpl(kk) - xi
+         yr = y(k1) + yk*sdpl(kk) - yi
+         zr = z(k1) + zk*sdpl(kk) - zi
          r2 = xr*xr + yr* yr + zr*zr
          rk2 = xk*xk + yk*yk + zk*zk
          rkr3 = sqrt(rk2*r2) * r2
          dotk = xk*xr + yk*yr + zk*zr
-         e = (fi/debye) * bdpl(k) * dotk / rkr3
+         e = (fi/debye) * bdpl(kk) * dotk / rkr3
          ed = ed + e
       end do
 c
 c     calculate the multipole contribution to the potential
 c
-      do k = 1, npole
-         kk = ipole(k)
-         xr = x(kk) - xi
-         yr = y(kk) - yi
-         zr = z(kk) - zi
+      do kk = 1, npole
+         k = ipole(kk)
+         xr = x(k) - xi
+         yr = y(k) - yi
+         zr = z(k) - zi
          r2 = xr*xr + yr* yr + zr*zr
          r = sqrt(r2)
          ck = rpole(1,k)
@@ -1214,10 +1214,10 @@ c
 c     compute the potential contributions for this site
 c
          if (use_chgpen) then
-            corek = pcore(kk)
-c           valk = pval(kk)
+            corek = pcore(k)
+c           valk = pval(k)
             valk = -corek + rpole(1,k)
-            alphak = palpha(kk)
+            alphak = palpha(k)
             call damppot (r,alphak,dmpk)
             rr1k = dmpk(1) * rr1
             rr3k = dmpk(3) * rr3
@@ -1323,7 +1323,7 @@ c
          call getref (j)
          call setelect
          call varprm (nvar,xx)
-         if (use_mpole)  call rotpole (pole,rpole)
+         if (use_mpole)  call rotpole ('MPOLE')
          if (use_polar) then
             domlst = .true.
             doulst = .true.
@@ -1439,11 +1439,11 @@ c
 c
 c     translate optimization values back to partial charges
 c
-      do i = 1, nion
+      do ii = 1, nion
          done = .true.
-         ii = iion(i)
-         it = type(ii)
-         if (fatm(ii))  done = .false.
+         i = iion(ii)
+         it = type(i)
+         if (fatm(i))  done = .false.
          if (.not. done) then
             if (fitchg(it)) then
                done = .true.
@@ -1479,11 +1479,11 @@ c
 c
 c     translate optimization values back to atomic multipoles
 c
-      do i = 1, npole
+      do ii = 1, npole
          done = .true.
-         ii = ipole(i)
-         it = type(ii)
-         if (fatm(ii))  done = .false.
+         i = ipole(ii)
+         it = type(i)
+         if (fatm(i))  done = .false.
          if (.not. done) then
             if (fitpol(it)) then
                done = .true.
@@ -1573,11 +1573,11 @@ c
 c     translate optimization values back to charge penetration
 c
       if (use_chgpen) then
-         do i = 1, ncp
+         do ii = 1, npole
             done = .true.
-            ii = ipole(i)
-            ic = class(ii)
-            if (fatm(ii))  done = .false.
+            i = ipole(ii)
+            ic = class(i)
+            if (fatm(i))  done = .false.
             if (.not. done) then
                if (fitcpen(ic)) then
                   done = .true.
@@ -1599,7 +1599,7 @@ c     check chiral multipoles and rotate into global frame
 c
       if (use_mpole) then
          call chkpole
-         call rotpole (pole,rpole)
+         call rotpole ('MPOLE')
       end if
 c
 c     modify partial charges and monopoles for charge flux
@@ -1653,11 +1653,13 @@ c
 c     regularize charges, monopoles and diagonal quadrupoles
 c
       eps = 0.00001d0
-      do i = 1, nion
+      do ii = 1, nion
+         i = iion(ii)
          pchg(i) = dble(nint(pchg(i)/eps)) * eps
          pchg0(i) = dble(nint(pchg0(i)/eps)) * eps
       end do
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          pole(1,i) = dble(nint(pole(1,i)/eps)) * eps
          pole(5,i) = dble(nint(qterm*pole(5,i)/eps)) * eps/qterm
          pole(9,i) = dble(nint(qterm*pole(9,i)/eps)) * eps/qterm
@@ -1677,8 +1679,9 @@ c
       do i = 1, maxtyp
          equiv(i) = 0
       end do
-      do i = 1, nion
-         it = type(iion(i))
+      do ii = 1, nion
+         i = iion(ii)
+         it = type(i)
          equiv(it) = equiv(it) + 1
          if (use_chgflx) then
             sum = sum + pchg0(i)
@@ -1691,8 +1694,9 @@ c
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
-            do i = 1, nion
-               it = type(iion(i))
+            do ii = 1, nion
+               i = iion(ii)
+               it = type(i)
                if (equiv(it) .eq. m) then
                   if (use_chgflx) then
                      ival = abs(pchg0(i))
@@ -1714,8 +1718,9 @@ c
    10 continue
       if (ktype .ne. 0) then
          sum = sum / dble(m)
-         do i = 1, nion
-            it = type(iion(i))
+         do ii = 1, nion
+            i = iion(ii)
+            it = type(i)
             if (it .eq. ktype) then
                if (use_chgflx) then
                   pchg0(i) = pchg0(i) - sum
@@ -1736,8 +1741,9 @@ c
       do i = 1, maxtyp
          equiv(i) = 0
       end do
-      do i = 1, npole
-         it = type(ipole(i))
+      do ii = 1, npole
+         i = ipole(ii)
+         it = type(i)
          equiv(it) = equiv(it) + 1
          if (use_chgflx) then
             sum = sum + mono0(i)
@@ -1750,13 +1756,14 @@ c
       do j = 1, k
          m = k / j
          if (k .eq. m*j) then
-            do i = 1, npole
-               it = type(ipole(i))
+            do ii = 1, npole
+               i = ipole(ii)
+               it = type(i)
                if (equiv(it) .eq. m) then
                   if (use_chgflx) then
-                     ival = abs(mono0(ipole(i)))
+                     ival = abs(mono0(i))
                   else
-                     ival = abs(pole(1,ipole(i)))
+                     ival = abs(pole(1,i))
                   end if
                   if (ktype .eq. 0) then
                      ktype = it
@@ -1773,8 +1780,9 @@ c
    20 continue
       if (ktype .ne. 0) then
          sum = sum / dble(m)
-         do i = 1, npole
-            it = type(ipole(i))
+         do ii = 1, npole
+            i = ipole(ii)
+            it = type(i)
             if (it .eq. ktype) then
                if (use_chgflx) then
                   mono0(i) = mono0(i) - sum
@@ -1793,7 +1801,8 @@ c
 c
 c     enforce traceless quadrupole at each multipole site
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          sum = pole(5,i) + pole(9,i) + pole(13,i)
          big = max(abs(pole(5,i)),abs(pole(9,i)),abs(pole(13,i)))
          k = 0
@@ -1814,31 +1823,31 @@ c
    30    format (/,' Atomic Parameters Included in Potential Fitting :',
      &           //,3x,'Atom',10x,'Atom Name',6x,'Atom Type/Class',
      &              6x,'Parameters',/)
-         do i = 1, nion
-            ii = iion(i)
-            if (fatm(ii)) then
-               it = type(ii)
+         do ii = 1, nion
+            i = iion(ii)
+            if (fatm(i)) then
+               it = type(i)
                prmtyp = 'Partial Charge'
-               write (iout,40)  ii,name(ii),it,prmtyp
+               write (iout,40)  i,name(i),it,prmtyp
    40          format (i6,15x,a3,7x,i6,' Type',11x,a)
             end if
          end do
-         do i = 1, npole
-            ii = ipole(i)
-            if (fatm(ii)) then
-               it = type(ii)
+         do ii = 1, npole
+            i = ipole(ii)
+            if (fatm(i)) then
+               it = type(i)
                prmtyp = 'Atomic Multipoles'
-               write (iout,50)  ii,name(ii),it,prmtyp
+               write (iout,50)  i,name(i),it,prmtyp
    50          format (i6,15x,a3,7x,i6,' Type',11x,a)
             end if
          end do
          if (fit_chgpen) then
-            do i = 1, ncp
-               ii = ipole(i)
-               if (fatm(ii)) then
-                  ic = class(ii)
+            do ii = 1, npole
+               i = ipole(ii)
+               if (fatm(i)) then
+                  ic = class(i)
                   prmtyp = 'Charge Penetration'
-                  write (iout,60)  ii,name(ii),ic,prmtyp
+                  write (iout,60)  i,name(i),ic,prmtyp
    60             format (i6,15x,a3,7x,i6,' Class',10x,a)
                end if
             end do
@@ -1856,11 +1865,11 @@ c
 c
 c     get optimization parameters from partial charge values
 c
-      do i = 1, nion
+      do ii = 1, nion
          done = .true.
-         ii = iion(i)
-         it = type(ii)
-         if (fatm(ii))  done = .false.
+         i = iion(ii)
+         it = type(i)
+         if (fatm(i))  done = .false.
          if (.not. done) then
             if (fitchg(it))  done = .true.
             fitchg(it) = .true.
@@ -1885,11 +1894,11 @@ c
 c
 c     get optimization parameters from atomic multipole values
 c
-      do i = 1, npole
+      do ii = 1, npole
          done = .true.
-         ii = ipole(i)
-         it = type(ii)
-         if (fatm(ii))  done = .false.
+         i = ipole(ii)
+         it = type(i)
+         if (fatm(i))  done = .false.
          if (.not. done) then
             if (fitpol(it))  done = .true.
             fitpol(it) = .true.
@@ -2020,11 +2029,11 @@ c
 c     get optimization parameters from charge penetration values
 c
       if (use_chgpen) then
-         do i = 1, ncp
+         do ii = 1, npole
             done = .true.
-            ii = ipole(i)
-            ic = class(ii)
-            if (fatm(ii))  done = .false.
+            i = ipole(ii)
+            ic = class(i)
+            if (fatm(i))  done = .false.
             if (.not. done) then
                if (fitcpen(ic))  done = .true.
                fitcpen(ic) = .true.
@@ -2338,11 +2347,11 @@ c
       do k = 1, nconf
          call getref (k)
          call setelect
-         do i = 1, nion
+         do ii = 1, nion
             done = .true.
-            ii = iion(i)
-            it = type(ii)
-            if (fatm(ii))  done = .false.
+            i = iion(ii)
+            it = type(i)
+            if (fatm(i))  done = .false.
             if (.not. done) then
                if (fitchg(it))  done = .true.
                fitchg(it) = .true.
@@ -2391,11 +2400,11 @@ c
       do k = 1, nconf
          call getref (k)
          call setelect
-         do i = 1, npole
+         do ii = 1, npole
             done = .true.
-            ii = ipole(i)
-            it = type(ii)
-            if (fatm(ii))  done = .false.
+            i = ipole(ii)
+            it = type(i)
+            if (fatm(i))  done = .false.
             if (.not. done) then
                iz = zaxis(i)
                ix = xaxis(i)
@@ -2490,11 +2499,11 @@ c
          do k = 1, nconf
             call getref (k)
             call setelect
-            do i = 1, ncp
+            do ii = 1, npole
                done = .true.
-               ii = ipole(i)
-               ic = class(ii)
-               if (fatm(ii))  done = .false.
+               i = ipole(ii)
+               ic = class(i)
+               if (fatm(i))  done = .false.
                if (.not. done) then
                   if (fitcpen(ic))  done = .true.
                   fitcpen(ic) = .true.

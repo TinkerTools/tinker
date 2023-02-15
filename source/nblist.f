@@ -42,7 +42,7 @@ c
       if (use_vdw .and. use_vlist)  call vlist
       if (use_disp .and. use_dlist)  call dlist
       if ((use_charge.or.use_solv) .and. use_clist)  call clist
-      if ((use_repuls.or.use_mpole.or.use_polar
+      if ((use_repel.or.use_mpole.or.use_polar
      &       .or.use_chgtrn.or.use_solv) .and. use_mlist)  call mlist
       if (use_polar .and. use_ulist)  call ulist
       return
@@ -69,7 +69,7 @@ c
       use vdw
       implicit none
       integer i,j,k
-      integer ii,iv
+      integer ii,kk,iv
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius
@@ -79,13 +79,13 @@ c
 c
 c     apply reduction factors to find coordinates for each site
 c
-      do i = 1, nvdw
-         ii = ivdw(i)
-         iv = ired(ii)
-         rdn = kred(ii)
-         xred(i) = rdn*(x(ii)-x(iv)) + x(iv)
-         yred(i) = rdn*(y(ii)-y(iv)) + y(iv)
-         zred(i) = rdn*(z(ii)-z(iv)) + z(iv)
+      do ii = 1, nvdw
+         i = ivdw(ii)
+         iv = ired(i)
+         rdn = kred(i)
+         xred(i) = rdn*(x(i)-x(iv)) + x(iv)
+         yred(i) = rdn*(y(i)-y(iv)) + y(iv)
+         zred(i) = rdn*(z(i)-z(iv)) + z(iv)
       end do
 c
 c     neighbor list cannot be used with the replicates method
@@ -117,9 +117,10 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -141,13 +142,15 @@ c
 c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          if (update(i)) then
             xi = xvold(i)
             yi = yvold(i)
             zi = zvold(i)
             nvlst(i) = 0
-            do k = i+1, nvdw
+            do kk = ii+1, nvdw
+               k = ivdw(kk)
                xr = xi - xvold(k)
                yr = yi - yvold(k)
                zr = zi - zvold(k)
@@ -165,12 +168,14 @@ c
 c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          if (update(i)) then
             xi = xvold(i)
             yi = yvold(i)
             zi = zvold(i)
-            do k = 1, i-1
+            do kk = 1, ii-1
+               k = ivdw(kk)
                if (.not. update(k)) then
                   xr = xi - xvold(k)
                   yr = yi - yvold(k)
@@ -207,7 +212,8 @@ c
 c     check to see if any neighbor lists are too long
 c
 !$OMP DO schedule(guided)
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          if (nvlst(i) .ge. maxvlst) then
             write (iout,40)
    40       format (/,' VLIST  --  Too many Neighbors;',
@@ -242,7 +248,7 @@ c
       use neigh
       use vdw
       implicit none
-      integer i,k
+      integer i,k,ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
@@ -254,7 +260,8 @@ c
 c
 c     store coordinates to reflect update of the site
 c
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -265,7 +272,8 @@ c
 c     generate all neighbors for the site being rebuilt
 c
          nvlst(i) = 0
-         do k = i+1, nvdw
+         do kk = ii+1, nvdw
+            k = ivdw(kk)
             xr = xi - xred(k)
             yr = yi - yred(k)
             zr = zi - zred(k)
@@ -316,6 +324,7 @@ c
       use vdw
       implicit none
       integer i,j,k
+      integer ii,kk
       integer kgy,kgz
       integer start,stop
       real*8 xi,yi,zi
@@ -335,14 +344,15 @@ c
 c
 c     transfer interaction site coordinates to sorting arrays
 c
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          nvlst(i) = 0
          xvold(i) = xred(i)
          yvold(i) = yred(i)
          zvold(i) = zred(i)
-         xsort(i) = xred(i)
-         ysort(i) = yred(i)
-         zsort(i) = zred(i)
+         xsort(ii) = xred(i)
+         ysort(ii) = yred(i)
+         zsort(ii) = zred(i)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -359,40 +369,42 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,xi,yi,zi,
-!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,
+!$OMP& xi,yi,zi,xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
 !$OMP DO schedule(guided)
 c
 c     loop over all atoms computing the neighbor lists
 c
-      do i = 1, nvdw
+      do ii = 1, nvdw
+         i = ivdw(ii)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
-         if (kbx(i) .le. kex(i)) then
+         if (kbx(ii) .le. kex(ii)) then
             repeat = .false.
-            start = kbx(i)
-            stop = kex(i)
+            start = kbx(ii)
+            stop = kex(ii)
          else
             repeat = .true.
             start = 1
-            stop = kex(i)
+            stop = kex(ii)
          end if
    10    continue
          do j = start, stop
-            k = locx(j)
-            if (k .le. i)  goto 20
-            kgy = rgy(k)
-            if (kby(i) .le. key(i)) then
-               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            kk = locx(j)
+            if (kk .le. ii)  goto 20
+            k = ivdw(kk)
+            kgy = rgy(kk)
+            if (kby(ii) .le. key(ii)) then
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 20
             else
-               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 20
             end if
-            kgz = rgz(k)
-            if (kbz(i) .le. kez(i)) then
-               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            kgz = rgz(kk)
+            if (kbz(ii) .le. kez(ii)) then
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 20
             else
-               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
             xr = xi - xred(k)
             yr = yi - yred(k)
@@ -407,7 +419,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i)
+            start = kbx(ii)
             stop = nvdw
             goto 10
          end if
@@ -449,7 +461,8 @@ c
       use iounit
       use neigh
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -485,13 +498,13 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
-      do i = 1, ndisp
-         ii = idisp(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, ndisp
+         i = idisp(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          xr = xi - xvold(i)
          yr = yi - yvold(i)
          zr = zi - zvold(i)
@@ -510,13 +523,15 @@ c
 c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, ndisp
+      do ii = 1, ndisp
+         i = idisp(ii)
          if (update(i)) then
             xi = xvold(i)
             yi = yvold(i)
             zi = zvold(i)
             nvlst(i) = 0
-            do k = i+1, ndisp
+            do kk = ii+1, ndisp
+               k = idisp(kk)
                xr = xi - xvold(k)
                yr = yi - yvold(k)
                zr = zi - zvold(k)
@@ -534,7 +549,8 @@ c
 c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, ndisp
+      do ii = 1, ndisp
+         i = idisp(ii)
          if (update(i)) then
             xi = xvold(i)
             yi = yvold(i)
@@ -576,7 +592,8 @@ c
 c     check to see if any neighbor lists are too long
 c
 !$OMP DO schedule(guided)
-      do i = 1, ndisp
+      do ii = 1, ndisp
+         i = idisp(ii)
          if (nvlst(i) .ge. maxvlst) then
             write (iout,40)
    40       format (/,' DLIST  --  Too many Neighbors;',
@@ -624,11 +641,11 @@ c
 c
 c     store new coordinates to reflect update of the site
 c
-      do i = 1, ndisp
-         ii = idisp(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, ndisp
+         i = idisp(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          xvold(i) = xi
          yvold(i) = yi
          zvold(i) = zi
@@ -636,11 +653,11 @@ c
 c     generate all neighbors for the site being rebuilt
 c
          nvlst(i) = 0
-         do k = i+1, ndisp
-            kk = idisp(k)
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+         do kk = ii+1, ndisp
+            k = idisp(kk)
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. dbuf2) then
@@ -708,15 +725,15 @@ c
 c
 c     transfer interaction site coordinates to sorting arrays
 c
-      do i = 1, ndisp
+      do ii = 1, ndisp
+         i = idisp(ii)
          nvlst(i) = 0
-         ii = idisp(i)
-         xvold(i) = x(ii)
-         yvold(i) = y(ii)
-         zvold(i) = z(ii)
-         xsort(i) = x(ii)
-         ysort(i) = y(ii)
-         zsort(i) = z(ii)
+         xvold(i) = x(i)
+         yvold(i) = y(i)
+         zvold(i) = z(i)
+         xsort(ii) = x(i)
+         ysort(ii) = y(i)
+         zsort(ii) = z(i)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -739,40 +756,40 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
-      do i = 1, ndisp
-         ii = idisp(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         if (kbx(i) .le. kex(i)) then
+      do ii = 1, ndisp
+         i = idisp(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         if (kbx(ii) .le. kex(ii)) then
             repeat = .false.
-            start = kbx(i)
-            stop = kex(i)
+            start = kbx(ii)
+            stop = kex(ii)
          else
             repeat = .true.
             start = 1
-            stop = kex(i)
+            stop = kex(ii)
          end if
    10    continue
          do j = start, stop
-            k = locx(j)
-            if (k .le. i)  goto 20
-            kk = idisp(k)
-            kgy = rgy(k)
-            if (kby(i) .le. key(i)) then
-               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            kk = locx(j)
+            if (kk .le. ii)  goto 20
+            k = idisp(kk)
+            kgy = rgy(kk)
+            if (kby(ii) .le. key(ii)) then
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 20
             else
-               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 20
             end if
-            kgz = rgz(k)
-            if (kbz(i) .le. kez(i)) then
-               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            kgz = rgz(kk)
+            if (kbz(ii) .le. kez(ii)) then
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 20
             else
-               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. dbuf2) then
@@ -783,7 +800,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i)
+            start = kbx(ii)
             stop = ndisp
             goto 10
          end if
@@ -825,7 +842,8 @@ c
       use iounit
       use neigh
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk,ic
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -861,13 +879,15 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,ic,
+!$OMP& xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
-      do i = 1, nion
-         ii = kion(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, nion
+         i = iion(ii)
+         ic = kion(i)
+         xi = x(ic)
+         yi = y(ic)
+         zi = z(ic)
          xr = xi - xeold(i)
          yr = yi - yeold(i)
          zr = zi - zeold(i)
@@ -886,13 +906,15 @@ c
 c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, nion
+      do ii = 1, nion
+         i = iion(ii)
          if (update(i)) then
             xi = xeold(i)
             yi = yeold(i)
             zi = zeold(i)
             nelst(i) = 0
-            do k = i+1, nion
+            do kk = ii+1, nion
+               k = iion(kk)
                xr = xi - xeold(k)
                yr = yi - yeold(k)
                zr = zi - zeold(k)
@@ -910,12 +932,14 @@ c
 c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, nion
+      do ii = 1, nion
+         i = iion(ii)
          if (update(i)) then
             xi = xeold(i)
             yi = yeold(i)
             zi = zeold(i)
-            do k = 1, i-1
+            do kk = 1, ii-1
+               k = iion(kk)
                if (.not. update(k)) then
                   xr = xi - xeold(k)
                   yr = yi - yeold(k)
@@ -952,7 +976,8 @@ c
 c     check to see if any neighbor lists are too long
 c
 !$OMP DO schedule(guided)
-      do i = 1, nion
+      do ii = 1, nion
+         i = iion(ii)
          if (nelst(i) .ge. maxelst) then
             write (iout,40)
    40       format (/,' CLIST  --  Too many Neighbors;',
@@ -988,23 +1013,27 @@ c
       use iounit
       use neigh
       implicit none
-      integer i,k,ii,kk
+      integer i,k
+      integer ii,kk
+      integer ic,kc
       real*8 xi,yi,zi
       real*8 xr,yr,zr,r2
 c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,k,ii,kk,ic,kc,
+!$OMP& xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
 c
 c     store new coordinates to reflect update of the site
 c
-      do i = 1, nion
-         ii = kion(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, nion
+         i = iion(ii)
+         ic = kion(i)
+         xi = x(ic)
+         yi = y(ic)
+         zi = z(ic)
          xeold(i) = xi
          yeold(i) = yi
          zeold(i) = zi
@@ -1012,11 +1041,12 @@ c
 c     generate all neighbors for the site being rebuilt
 c
          nelst(i) = 0
-         do k = i+1, nion
-            kk = kion(k)
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+         do kk = ii+1, nion
+            k = iion(kk)
+            kc = kion(k)
+            xr = xi - x(kc)
+            yr = yi - y(kc)
+            zr = zi - z(kc)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. cbuf2) then
@@ -1065,6 +1095,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk
+      integer ic,kc
       integer kgy,kgz
       integer start,stop
       real*8 xi,yi,zi
@@ -1084,15 +1115,16 @@ c
 c
 c     transfer interaction site coordinates to sorting arrays
 c
-      do i = 1, nion
+      do ii = 1, nion
+         i = iion(ii)
+         ic = kion(i)
          nelst(i) = 0
-         ii = kion(i)
-         xeold(i) = x(ii)
-         yeold(i) = y(ii)
-         zeold(i) = z(ii)
-         xsort(i) = x(ii)
-         ysort(i) = y(ii)
-         zsort(i) = z(ii)
+         xeold(i) = x(ic)
+         yeold(i) = y(ic)
+         zeold(i) = z(ic)
+         xsort(ii) = x(ic)
+         ysort(ii) = y(ic)
+         zsort(ii) = z(ic)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -1109,46 +1141,48 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
-!$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,ic,kc,
+!$OMP& xi,yi,zi,xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
 !$OMP DO schedule(guided)
 c
 c     loop over all atoms computing the neighbor lists
 c
-      do i = 1, nion
-         ii = kion(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         if (kbx(i) .le. kex(i)) then
+      do ii = 1, nion
+         i = iion(ii)
+         ic = kion(i)
+         xi = x(ic)
+         yi = y(ic)
+         zi = z(ic)
+         if (kbx(ii) .le. kex(ii)) then
             repeat = .false.
-            start = kbx(i)
-            stop = kex(i)
+            start = kbx(ii)
+            stop = kex(ii)
          else
             repeat = .true.
             start = 1
-            stop = kex(i)
+            stop = kex(ii)
          end if
    10    continue
          do j = start, stop
-            k = locx(j)
-            if (k .le. i)  goto 20
-            kk = kion(k)
-            kgy = rgy(k)
-            if (kby(i) .le. key(i)) then
-               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            kk = locx(j)
+            if (kk .le. ii)  goto 20
+            k = iion(kk)
+            kc = kion(k)
+            kgy = rgy(kk)
+            if (kby(ii) .le. key(ii)) then
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 20
             else
-               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 20
             end if
-            kgz = rgz(k)
-            if (kbz(i) .le. kez(i)) then
-               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            kgz = rgz(kk)
+            if (kbz(ii) .le. kez(ii)) then
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 20
             else
-               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+            xr = xi - x(kc)
+            yr = yi - y(kc)
+            zr = zi - z(kc)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. cbuf2) then
@@ -1159,7 +1193,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i)
+            start = kbx(ii)
             stop = nion
             goto 10
          end if
@@ -1201,7 +1235,8 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -1237,13 +1272,13 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          xr = xi - xeold(i)
          yr = yi - yeold(i)
          zr = zi - zeold(i)
@@ -1262,13 +1297,15 @@ c
 c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          if (update(i)) then
             xi = xeold(i)
             yi = yeold(i)
             zi = zeold(i)
             nelst(i) = 0
-            do k = i+1, npole
+            do kk = ii+1, npole
+               k = ipole(kk)
                xr = xi - xeold(k)
                yr = yi - yeold(k)
                zr = zi - zeold(k)
@@ -1286,12 +1323,14 @@ c
 c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          if (update(i)) then
             xi = xeold(i)
             yi = yeold(i)
             zi = zeold(i)
-            do k = 1, i-1
+            do kk = 1, ii-1
+               k = ipole(kk)
                if (.not. update(k)) then
                   xr = xi - xeold(k)
                   yr = yi - yeold(k)
@@ -1328,7 +1367,8 @@ c
 c     check to see if any neighbor lists are too long
 c
 !$OMP DO schedule(guided)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          if (nelst(i) .ge. maxelst) then
             write (iout,40)
    40       format (/,' MLIST  --  Too many Neighbors;',
@@ -1376,11 +1416,11 @@ c
 c
 c     store new coordinates to reflect update of the site
 c
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          xeold(i) = xi
          yeold(i) = yi
          zeold(i) = zi
@@ -1388,11 +1428,11 @@ c
 c     generate all neighbors for the site being rebuilt
 c
          nelst(i) = 0
-         do k = i+1, npole
-            kk = ipole(k)
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+         do kk = ii+1, npole
+            k = ipole(kk)
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. mbuf2) then
@@ -1460,15 +1500,15 @@ c
 c
 c     transfer interaction site coordinates to sorting arrays
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          nelst(i) = 0
-         ii = ipole(i)
-         xeold(i) = x(ii)
-         yeold(i) = y(ii)
-         zeold(i) = z(ii)
-         xsort(i) = x(ii)
-         ysort(i) = y(ii)
-         zsort(i) = z(ii)
+         xeold(i) = x(i)
+         yeold(i) = y(i)
+         zeold(i) = z(i)
+         xsort(ii) = x(i)
+         ysort(ii) = y(i)
+         zsort(ii) = z(i)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -1491,40 +1531,40 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         if (kbx(i) .le. kex(i)) then
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         if (kbx(ii) .le. kex(ii)) then
             repeat = .false.
-            start = kbx(i)
-            stop = kex(i)
+            start = kbx(ii)
+            stop = kex(ii)
          else
             repeat = .true.
             start = 1
-            stop = kex(i)
+            stop = kex(ii)
          end if
    10    continue
          do j = start, stop
-            k = locx(j)
-            if (k .le. i)  goto 20
-            kk = ipole(k)
-            kgy = rgy(k)
-            if (kby(i) .le. key(i)) then
-               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            kk = locx(j)
+            if (kk .le. ii)  goto 20
+            k = ipole(kk)
+            kgy = rgy(kk)
+            if (kby(ii) .le. key(ii)) then
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 20
             else
-               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 20
             end if
-            kgz = rgz(k)
-            if (kbz(i) .le. kez(i)) then
-               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            kgz = rgz(kk)
+            if (kbz(ii) .le. kez(ii)) then
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 20
             else
-               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. mbuf2) then
@@ -1535,7 +1575,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i)
+            start = kbx(ii)
             stop = npole
             goto 10
          end if
@@ -1577,7 +1617,8 @@ c
       use mpole
       use neigh
       implicit none
-      integer i,j,k,ii
+      integer i,j,k
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 radius,r2
@@ -1613,13 +1654,13 @@ c
 c
 c     test sites for displacement exceeding half the buffer
 c
-!$OMP PARALLEL default(shared) private(i,j,k,ii,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          xr = xi - xuold(i)
          yr = yi - yuold(i)
          zr = zi - zuold(i)
@@ -1638,13 +1679,15 @@ c
 c     rebuild the higher numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          if (update(i)) then
             xi = xuold(i)
             yi = yuold(i)
             zi = zuold(i)
             nulst(i) = 0
-            do k = i+1, npole
+            do kk = ii+1, npole
+               k = ipole(kk)
                xr = xi - xuold(k)
                yr = yi - yuold(k)
                zr = zi - zuold(k)
@@ -1662,12 +1705,14 @@ c
 c     adjust lists for lower numbered neighbors of updated sites
 c
 !$OMP DO schedule(guided)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          if (update(i)) then
             xi = xuold(i)
             yi = yuold(i)
             zi = zuold(i)
-            do k = 1, i-1
+            do kk = 1, ii-1
+               k = ipole(kk)
                if (.not. update(k)) then
                   xr = xi - xuold(k)
                   yr = yi - yuold(k)
@@ -1704,7 +1749,8 @@ c
 c     check to see if any neighbor lists are too long
 c
 !$OMP DO schedule(guided)
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          if (nulst(i) .ge. maxulst) then
             write (iout,40)
    40       format (/,' ULIST  --  Too many Neighbors;',
@@ -1752,11 +1798,11 @@ c
 c
 c     store new coordinates to reflect update of the site
 c
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          xuold(i) = xi
          yuold(i) = yi
          zuold(i) = zi
@@ -1764,11 +1810,11 @@ c
 c     generate all neighbors for the site being rebuilt
 c
          nulst(i) = 0
-         do k = i+1, npole
-            kk = ipole(k)
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+         do kk = ii+1, npole
+            k = ipole(kk)
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. ubuf2) then
@@ -1837,15 +1883,15 @@ c
 c
 c     transfer interaction site coordinates to sorting arrays
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          nulst(i) = 0
-         ii = ipole(i)
-         xuold(i) = x(ii)
-         yuold(i) = y(ii)
-         zuold(i) = z(ii)
-         xsort(i) = x(ii)
-         ysort(i) = y(ii)
-         zsort(i) = z(ii)
+         xuold(i) = x(i)
+         yuold(i) = y(i)
+         zuold(i) = z(i)
+         xsort(ii) = x(i)
+         ysort(ii) = y(i)
+         zsort(ii) = z(i)
       end do
 c
 c     use the method of lights to generate neighbors
@@ -1868,40 +1914,40 @@ c
 c
 c     loop over all atoms computing the neighbor lists
 c
-      do i = 1, npole
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
-         if (kbx(i) .le. kex(i)) then
+      do ii = 1, npole
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         if (kbx(ii) .le. kex(ii)) then
             repeat = .false.
-            start = kbx(i)
-            stop = kex(i)
+            start = kbx(ii)
+            stop = kex(ii)
          else
             repeat = .true.
             start = 1
-            stop = kex(i)
+            stop = kex(ii)
          end if
    10    continue
          do j = start, stop
-            k = locx(j)
-            if (k .le. i)  goto 20
-            kk = ipole(k)
-            kgy = rgy(k)
-            if (kby(i) .le. key(i)) then
-               if (kgy.lt.kby(i) .or. kgy.gt.key(i))  goto 20
+            kk = locx(j)
+            if (kk .le. ii)  goto 20
+            k = ipole(kk)
+            kgy = rgy(kk)
+            if (kby(ii) .le. key(ii)) then
+               if (kgy.lt.kby(ii) .or. kgy.gt.key(ii))  goto 20
             else
-               if (kgy.lt.kby(i) .and. kgy.gt.key(i))  goto 20
+               if (kgy.lt.kby(ii) .and. kgy.gt.key(ii))  goto 20
             end if
-            kgz = rgz(k)
-            if (kbz(i) .le. kez(i)) then
-               if (kgz.lt.kbz(i) .or. kgz.gt.kez(i))  goto 20
+            kgz = rgz(kk)
+            if (kbz(ii) .le. kez(ii)) then
+               if (kgz.lt.kbz(ii) .or. kgz.gt.kez(ii))  goto 20
             else
-               if (kgz.lt.kbz(i) .and. kgz.gt.kez(i))  goto 20
+               if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
-            xr = xi - x(kk)
-            yr = yi - y(kk)
-            zr = zi - z(kk)
+            xr = xi - x(k)
+            yr = yi - y(k)
+            zr = zi - z(k)
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. ubuf2) then
@@ -1912,7 +1958,7 @@ c
          end do
          if (repeat) then
             repeat = .false.
-            start = kbx(i)
+            start = kbx(ii)
             stop = npole
             goto 10
          end if

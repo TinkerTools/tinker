@@ -49,7 +49,7 @@ c
       use_angtor = .true.
       use_tortor = .true.
       use_vdw = .true.
-      use_repuls = .true.
+      use_repel = .true.
       use_disp = .true.
       use_charge = .true.
       use_chgdpl = .true.

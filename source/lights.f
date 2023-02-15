@@ -18,7 +18,7 @@ c
 c     note this routine can include each pair only once via setting
 c     of the negative x-coordinate boundaries, or it can optionally
 c     include each pair in both directions, ie, both (A,B) and (B,A);
-c     inclusion of one vs both directions is controlled by "unique"
+c     inclusion of one or both directions is controlled by "unique"
 c
 c     literature references:
 c
@@ -96,9 +96,11 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (xfrac(nsite))
-      allocate (yfrac(nsite))
-      allocate (zfrac(nsite))
+      if (use_bounds) then
+         allocate (xfrac(nsite))
+         allocate (yfrac(nsite))
+         allocate (zfrac(nsite))
+      end if
 c
 c     find fractional coordinates for the unit cell atoms
 c
@@ -172,9 +174,11 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (xfrac)
-      deallocate (yfrac)
-      deallocate (zfrac)
+      if (use_bounds) then
+         deallocate (xfrac)
+         deallocate (yfrac)
+         deallocate (zfrac)
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c

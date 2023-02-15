@@ -75,13 +75,13 @@ c
       mode = 'CHGTRN'
       call switch (mode)
 c
-c     check to see if the atom of interest is a vdw site
+c     check to see if the atom of interest is a site
 c
       nlist = 0
-      do k = 1, npole
-         if (ipole(k) .eq. iatom) then
+      do ii = 1, npole
+         if (ipole(ii) .eq. iatom) then
             nlist = nlist + 1
-            list(nlist) = k
+            list(nlist) = ii
             goto 10
          end if
       end do
@@ -96,8 +96,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         chgi = chgct(ii)
-         alphai = dmpct(ii)
+         chgi = chgct(i)
+         alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          alphai2 = alphai * alphai
          usei = use(i)
@@ -136,8 +136,8 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   rr1 = 1.0d0 / r
-                  chgk = chgct(kk)
-                  alphak = dmpct(kk)
+                  chgk = chgct(k)
+                  alphak = dmpct(k)
                   if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                   if (ctrntyp .eq. 'SEPARATE') then
                      alphak2 = alphak * alphak
@@ -253,8 +253,8 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            chgi = chgct(ii)
-            alphai = dmpct(ii)
+            chgi = chgct(i)
+            alphai = dmpct(i)
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             alphai2 = alphai * alphai
             usei = use(i)
@@ -294,8 +294,8 @@ c
                      if (r2 .le. off2) then
                         r = sqrt(r2)
                         rr1 = 1.0d0 / r
-                        chgk = chgct(kk)
-                        alphak = dmpct(kk)
+                        chgk = chgct(k)
+                        alphak = dmpct(k)
                         if (alphak .eq. 0.0d0)  alphak = 1000.0d0
                         if (ctrntyp .eq. 'SEPARATE') then
                            alphak2 = alphak * alphak

@@ -120,7 +120,7 @@ c
       if (solvtyp(1:2) .eq. 'GK') then
          if (.not.use_mpole .and. .not.use_polar) then
             call chkpole
-            call rotpole (pole,rpole)
+            call rotpole ('MPOLE')
             call induce
          end if
          call egk1
@@ -215,7 +215,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          rbi = rborn(i)
 c
 c     decide whether to compute the current interaction
@@ -236,7 +236,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   rbk = rborn(k)
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rb2 = rbi * rbk
                   expterm = exp(-0.25d0*r2/rb2)
                   fgb2 = r2 + rb2*expterm
@@ -362,8 +362,7 @@ c
       use usage
       use virial
       implicit none
-      integer i,k
-      integer ii,kk,kkk
+      integer i,k,ii,kk
       real*8 e,de,fgrp
       real*8 f,fi,fik
       real*8 fgb,fgb2,fgm
@@ -411,12 +410,12 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          rbi = rborn(i)
 c
 c     calculate the self-energy term for the current atom
 c
-         fik = fi * pchg(ii)
+         fik = fi * pchg(i)
          rb2 = rbi * rbi
          e = fik / rbi
          derb = -0.5d0 * e / rb2
@@ -430,9 +429,8 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = iion(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -447,7 +445,7 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   rbk = rborn(k)
-                  fik = fi * pchg(kk)
+                  fik = fi * pchg(k)
                   rb2 = rbi * rbk
                   expterm = exp(-0.25d0*r2/rb2)
                   fgb2 = r2 + rb2*expterm
@@ -601,7 +599,7 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         fi = f * pchg(ii)
+         fi = f * pchg(i)
          rbi = rborn(i)
 c
 c     decide whether to compute the current interaction
@@ -621,7 +619,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
                rbk = rborn(k)
-               fik = fi * pchg(kk)
+               fik = fi * pchg(k)
                rb2 = rbi * rbk
                expterm = exp(-0.25d0*r2/rb2)
                fgb2 = r2 + rb2*expterm
@@ -725,7 +723,7 @@ c     setup the multipoles for solvation only calculations
 c
       if (.not. use_mpole) then
           call chkpole
-          call rotpole (pole,rpole)
+          call rotpole ('MPOLE')
       end if
       if (.not. use_polar) then
          call induce
@@ -884,22 +882,22 @@ c
          yi = y(i)
          zi = z(i)
          rbi = rborn(i)
-         ci = rpole(1,ii)
-         uxi = rpole(2,ii)
-         uyi = rpole(3,ii)
-         uzi = rpole(4,ii)
-         qxxi = rpole(5,ii)
-         qxyi = rpole(6,ii)
-         qxzi = rpole(7,ii)
-         qyyi = rpole(9,ii)
-         qyzi = rpole(10,ii)
-         qzzi = rpole(13,ii)
-         dxi = uinds(1,ii)
-         dyi = uinds(2,ii)
-         dzi = uinds(3,ii)
-         pxi = uinps(1,ii)
-         pyi = uinps(2,ii)
-         pzi = uinps(3,ii)
+         ci = rpole(1,i)
+         uxi = rpole(2,i)
+         uyi = rpole(3,i)
+         uzi = rpole(4,i)
+         qxxi = rpole(5,i)
+         qxyi = rpole(6,i)
+         qxzi = rpole(7,i)
+         qyyi = rpole(9,i)
+         qyzi = rpole(10,i)
+         qzzi = rpole(13,i)
+         dxi = uinds(1,i)
+         dyi = uinds(2,i)
+         dzi = uinds(3,i)
+         pxi = uinps(1,i)
+         pyi = uinps(2,i)
+         pzi = uinps(3,i)
          sxi = dxi + pxi
          syi = dyi + pyi
          szi = dzi + pzi
@@ -924,22 +922,22 @@ c
                r2 = xr2 + yr2 + zr2
                if (r2 .le. off2) then
                   rbk = rborn(k)
-                  ck = rpole(1,kk)
-                  uxk = rpole(2,kk)
-                  uyk = rpole(3,kk)
-                  uzk = rpole(4,kk)
-                  qxxk = rpole(5,kk)
-                  qxyk = rpole(6,kk)
-                  qxzk = rpole(7,kk)
-                  qyyk = rpole(9,kk)
-                  qyzk = rpole(10,kk)
-                  qzzk = rpole(13,kk)
-                  dxk = uinds(1,kk)
-                  dyk = uinds(2,kk)
-                  dzk = uinds(3,kk)
-                  pxk = uinps(1,kk)
-                  pyk = uinps(2,kk)
-                  pzk = uinps(3,kk)
+                  ck = rpole(1,k)
+                  uxk = rpole(2,k)
+                  uyk = rpole(3,k)
+                  uzk = rpole(4,k)
+                  qxxk = rpole(5,k)
+                  qxyk = rpole(6,k)
+                  qxzk = rpole(7,k)
+                  qyyk = rpole(9,k)
+                  qyzk = rpole(10,k)
+                  qzzk = rpole(13,k)
+                  dxk = uinds(1,k)
+                  dyk = uinds(2,k)
+                  dzk = uinds(3,k)
+                  pxk = uinps(1,k)
+                  pyk = uinps(2,k)
+                  pzk = uinps(3,k)
                   sxk = dxk + pxk
                   syk = dyk + pyk
                   szk = dzk + pzk
@@ -1773,12 +1771,12 @@ c
      &                +2.0d0*(qxyi*guz(6)+qxzi*guz(7)+qyzi*guz(9))
      &                +ci*gc(4)+qxxi*gqxx(4)+qyyi*gqyy(4)+qzzi*gqzz(4)
      &                +2.0d0*(qxyi*gqxy(4)+qxzi*gqxz(4)+qyzi*gqyz(4)))
-                     trq(1,ii) = trq(1,ii) + uyi*fid(3) - uzi*fid(2)
-                     trq(2,ii) = trq(2,ii) + uzi*fid(1) - uxi*fid(3)
-                     trq(3,ii) = trq(3,ii) + uxi*fid(2) - uyi*fid(1)
-                     trq(1,kk) = trq(1,kk) + uyk*fkd(3) - uzk*fkd(2)
-                     trq(2,kk) = trq(2,kk) + uzk*fkd(1) - uxk*fkd(3)
-                     trq(3,kk) = trq(3,kk) + uxk*fkd(2) - uyk*fkd(1)
+                     trq(1,i) = trq(1,i) + uyi*fid(3) - uzi*fid(2)
+                     trq(2,i) = trq(2,i) + uzi*fid(1) - uxi*fid(3)
+                     trq(3,i) = trq(3,i) + uxi*fid(2) - uyi*fid(1)
+                     trq(1,k) = trq(1,k) + uyk*fkd(3) - uzk*fkd(2)
+                     trq(2,k) = trq(2,k) + uzk*fkd(1) - uxk*fkd(3)
+                     trq(3,k) = trq(3,k) + uxk*fkd(2) - uyk*fkd(1)
 c
 c     torque on quadrupoles due to permanent reaction field gradient
 c
@@ -1872,22 +1870,22 @@ c
                      fkdg(2,1) = fkdg(1,2)
                      fkdg(3,1) = fkdg(1,3)
                      fkdg(3,2) = fkdg(2,3)
-                     trq(1,ii) = trq(1,ii) + 2.0d0*
+                     trq(1,i) = trq(1,i) + 2.0d0*
      &                    (qxyi*fidg(1,3)+qyyi*fidg(2,3)+qyzi*fidg(3,3)
      &                    -qxzi*fidg(1,2)-qyzi*fidg(2,2)-qzzi*fidg(3,2))
-                     trq(2,ii) = trq(2,ii) + 2.0d0*
+                     trq(2,i) = trq(2,i) + 2.0d0*
      &                    (qxzi*fidg(1,1)+qyzi*fidg(2,1)+qzzi*fidg(3,1)
      &                    -qxxi*fidg(1,3)-qxyi*fidg(2,3)-qxzi*fidg(3,3))
-                     trq(3,ii) = trq(3,ii) + 2.0d0*
+                     trq(3,i) = trq(3,i) + 2.0d0*
      &                    (qxxi*fidg(1,2)+qxyi*fidg(2,2)+qxzi*fidg(3,2)
      &                    -qxyi*fidg(1,1)-qyyi*fidg(2,1)-qyzi*fidg(3,1))
-                     trq(1,kk) = trq(1,kk) + 2.0d0*
+                     trq(1,k) = trq(1,k) + 2.0d0*
      &                    (qxyk*fkdg(1,3)+qyyk*fkdg(2,3)+qyzk*fkdg(3,3)
      &                    -qxzk*fkdg(1,2)-qyzk*fkdg(2,2)-qzzk*fkdg(3,2))
-                     trq(2,kk) = trq(2,kk) + 2.0d0*
+                     trq(2,k) = trq(2,k) + 2.0d0*
      &                    (qxzk*fkdg(1,1)+qyzk*fkdg(2,1)+qzzk*fkdg(3,1)
      &                    -qxxk*fkdg(1,3)-qxyk*fkdg(2,3)-qxzk*fkdg(3,3))
-                     trq(3,kk) = trq(3,kk) + 2.0d0*
+                     trq(3,k) = trq(3,k) + 2.0d0*
      &                    (qxxk*fkdg(1,2)+qxyk*fkdg(2,2)+qxzk*fkdg(3,2)
      &                    -qxyk*fkdg(1,1)-qyyk*fkdg(2,1)-qyzk*fkdg(3,1))
                   end if
@@ -2131,12 +2129,12 @@ c
                      fkd(2) = 0.5d0 * fkd(2)
                      fkd(3) = 0.5d0 * fkd(3)
                   end if
-                  trqi(1,ii) = trqi(1,ii) + uyi*fid(3) - uzi*fid(2)
-                  trqi(2,ii) = trqi(2,ii) + uzi*fid(1) - uxi*fid(3)
-                  trqi(3,ii) = trqi(3,ii) + uxi*fid(2) - uyi*fid(1)
-                  trqi(1,kk) = trqi(1,kk) + uyk*fkd(3) - uzk*fkd(2)
-                  trqi(2,kk) = trqi(2,kk) + uzk*fkd(1) - uxk*fkd(3)
-                  trqi(3,kk) = trqi(3,kk) + uxk*fkd(2) - uyk*fkd(1)
+                  trqi(1,i) = trqi(1,i) + uyi*fid(3) - uzi*fid(2)
+                  trqi(2,i) = trqi(2,i) + uzi*fid(1) - uxi*fid(3)
+                  trqi(3,i) = trqi(3,i) + uxi*fid(2) - uyi*fid(1)
+                  trqi(1,k) = trqi(1,k) + uyk*fkd(3) - uzk*fkd(2)
+                  trqi(2,k) = trqi(2,k) + uzk*fkd(1) - uxk*fkd(3)
+                  trqi(3,k) = trqi(3,k) + uxk*fkd(2) - uyk*fkd(1)
 c
 c     torque due to induced reaction field gradient on quadrupoles
 c
@@ -2202,22 +2200,22 @@ c
                      fkdg(3,2) = 0.5d0 * fkdg(3,2)
                      fkdg(3,3) = 0.5d0 * fkdg(3,3)
                   end if
-                  trqi(1,ii) = trqi(1,ii) + 2.0d0*
+                  trqi(1,i) = trqi(1,i) + 2.0d0*
      &                  (qxyi*fidg(1,3)+qyyi*fidg(2,3)+qyzi*fidg(3,3)
      &                  -qxzi*fidg(1,2)-qyzi*fidg(2,2)-qzzi*fidg(3,2))
-                  trqi(2,ii) = trqi(2,ii) + 2.0d0*
+                  trqi(2,i) = trqi(2,i) + 2.0d0*
      &                  (qxzi*fidg(1,1)+qyzi*fidg(2,1)+qzzi*fidg(3,1)
      &                  -qxxi*fidg(1,3)-qxyi*fidg(2,3)-qxzi*fidg(3,3))
-                  trqi(3,ii) = trqi(3,ii) + 2.0d0*
+                  trqi(3,i) = trqi(3,i) + 2.0d0*
      &                  (qxxi*fidg(1,2)+qxyi*fidg(2,2)+qxzi*fidg(3,2)
      &                  -qxyi*fidg(1,1)-qyyi*fidg(2,1)-qyzi*fidg(3,1))
-                  trqi(1,kk) = trqi(1,kk) + 2.0d0*
+                  trqi(1,k) = trqi(1,k) + 2.0d0*
      &                  (qxyk*fkdg(1,3)+qyyk*fkdg(2,3)+qyzk*fkdg(3,3)
      &                  -qxzk*fkdg(1,2)-qyzk*fkdg(2,2)-qzzk*fkdg(3,2))
-                  trqi(2,kk) = trqi(2,kk) + 2.0d0*
+                  trqi(2,k) = trqi(2,k) + 2.0d0*
      &                  (qxzk*fkdg(1,1)+qyzk*fkdg(2,1)+qzzk*fkdg(3,1)
      &                  -qxxk*fkdg(1,3)-qxyk*fkdg(2,3)-qxzk*fkdg(3,3))
-                  trqi(3,kk) = trqi(3,kk) + 2.0d0*
+                  trqi(3,k) = trqi(3,k) + 2.0d0*
      &                  (qxxk*fkdg(1,2)+qxyk*fkdg(2,2)+qxzk*fkdg(3,2)
      &                  -qxyk*fkdg(1,1)-qyyk*fkdg(2,1)-qyzk*fkdg(3,1))
 c
@@ -2292,9 +2290,10 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     convert torque derivative components to Cartesian form
+c     convert torque derivative components to Cartesian forces
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          call torque (i,trq(1,i),fix,fiy,fiz,des)
          call torque (i,trqi(1,i),fix,fiy,fiz,des)
       end do
@@ -2383,8 +2382,8 @@ c
          etot = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            etot = etot + uinds(1,ii)*pbep(1,i) + uinds(2,ii)*pbep(2,i)
-     &                + uinds(3,ii)*pbep(3,i)
+            etot = etot + uinds(1,i)*pbep(1,i) + uinds(2,i)*pbep(2,i)
+     &                + uinds(3,i)*pbep(3,i)
          end do
          etot = -0.5d0 * electric * etot
          pbe = pbe + etot
@@ -2407,8 +2406,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             do j = 1, 3
-               indpole(j,i) = uinds(j,ii)
-               inppole(j,i) = uinps(j,ii)
+               indpole(j,i) = uinds(j,i)
+               inppole(j,i) = uinps(j,i)
             end do
          end do
 c
@@ -2440,7 +2439,8 @@ c
 c     convert torques due to induced dipole reaction field acting
 c     on permanent multipoles into forces on adjacent atoms
 c
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             call torque (i,directt(1,i),fix,fiy,fiz,polgrd)
          end do
          do i = 1, n
@@ -2500,7 +2500,8 @@ c
             detor(j,i) = 0.0d0
           end do
       end do
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          call torque (i,pbtp(1,i),fix,fiy,fiz,detor)
       end do
 c
@@ -2649,11 +2650,11 @@ c
 c
 c     calculate the multipole interaction energy and gradient
 c
-      do i = 1, npole-1
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, npole-1
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -2770,8 +2771,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do k = i+1, npole
-            kk = ipole(k)
+         do kk = ii+1, npole
+            k = ipole(kk)
             kz = zaxis(k)
             kx = xaxis(k)
             ky = abs(yaxis(k))
@@ -2841,17 +2842,17 @@ c
                      ddsc7(3) = (-0.2d0-0.6d0*damp) * ddsc5(3)
                   end if
                end if
-               scale3i = scale3 * uscale(kk)
-               scale5i = scale5 * uscale(kk)
-               scale7i = scale7 * uscale(kk)
-               dsc3 = scale3 * dscale(kk)
-               dsc5 = scale5 * dscale(kk)
-               dsc7 = scale7 * dscale(kk)
-               dsc9 = scale9 * dscale(kk)
-               psc3 = scale3 * pscale(kk)
-               psc5 = scale5 * pscale(kk)
-               psc7 = scale7 * pscale(kk)
-               psc9 = scale9 * pscale(kk)
+               scale3i = scale3 * uscale(k)
+               scale5i = scale5 * uscale(k)
+               scale7i = scale7 * uscale(k)
+               dsc3 = scale3 * dscale(k)
+               dsc5 = scale5 * dscale(k)
+               dsc7 = scale7 * dscale(k)
+               dsc9 = scale9 * dscale(k)
+               psc3 = scale3 * pscale(k)
+               psc5 = scale5 * pscale(k)
+               psc7 = scale7 * pscale(k)
+               psc9 = scale9 * pscale(k)
 c
 c     construct auxiliary vectors for permanent terms
 c
@@ -3443,21 +3444,21 @@ c
 c
 c     update the force components on sites i and k
 c
-               des(1,ii) = des(1,ii) - f*ftm2i(1)
-               des(2,ii) = des(2,ii) - f*ftm2i(2)
-               des(3,ii) = des(3,ii) - f*ftm2i(3)
-               des(1,kk) = des(1,kk) + f*ftm2i(1)
-               des(2,kk) = des(2,kk) + f*ftm2i(2)
-               des(3,kk) = des(3,kk) + f*ftm2i(3)
+               des(1,i) = des(1,i) - f*ftm2i(1)
+               des(2,i) = des(2,i) - f*ftm2i(2)
+               des(3,i) = des(3,i) - f*ftm2i(3)
+               des(1,k) = des(1,k) + f*ftm2i(1)
+               des(2,k) = des(2,k) + f*ftm2i(2)
+               des(3,k) = des(3,k) + f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
-               trqi(1,ii) = trqi(1,ii) - f*ttm2i(1)
-               trqi(2,ii) = trqi(2,ii) - f*ttm2i(2)
-               trqi(3,ii) = trqi(3,ii) - f*ttm2i(3)
-               trqi(1,kk) = trqi(1,kk) - f*ttm3i(1)
-               trqi(2,kk) = trqi(2,kk) - f*ttm3i(2)
-               trqi(3,kk) = trqi(3,kk) - f*ttm3i(3)
+               trqi(1,i) = trqi(1,i) - f*ttm2i(1)
+               trqi(2,i) = trqi(2,i) - f*ttm2i(2)
+               trqi(3,i) = trqi(3,i) - f*ttm2i(3)
+               trqi(1,k) = trqi(1,k) - f*ttm3i(1)
+               trqi(2,k) = trqi(2,k) - f*ttm3i(2)
+               trqi(3,k) = trqi(3,k) - f*ttm3i(3)
             end if
    10       continue
          end do
@@ -3530,9 +3531,10 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     convert torque values into Cartesian forces
+c     convert torque components into Cartesian forces
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          call torque (i,trqi(1,i),fix,fiy,fiz,des)
       end do
 c
@@ -3579,7 +3581,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 ei,f,fgrp
@@ -3678,11 +3680,11 @@ c
 c
 c     calculate the multipole interaction energy and gradient
 c
-      do i = 1, npole-1
-         ii = ipole(i)
-         xi = x(ii)
-         yi = y(ii)
-         zi = z(ii)
+      do ii = 1, npole-1
+         i = ipole(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -3799,15 +3801,14 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(i)
-            k = elst(kkk,i)
-            kk = ipole(k)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             kz = zaxis(k)
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(kk) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,ii,kk,0,0,0,0)
+            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 10
@@ -3824,9 +3825,9 @@ c
             qk(7) = rpole(11,k)
             qk(8) = rpole(12,k)
             qk(9) = rpole(13,k)
-            xr = x(kk) - xi
-            yr = y(kk) - yi
-            zr = z(kk) - zi
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -3871,17 +3872,17 @@ c
                      ddsc7(3) = (-0.2d0-0.6d0*damp) * ddsc5(3)
                   end if
                end if
-               scale3i = scale3 * uscale(kk)
-               scale5i = scale5 * uscale(kk)
-               scale7i = scale7 * uscale(kk)
-               dsc3 = scale3 * dscale(kk)
-               dsc5 = scale5 * dscale(kk)
-               dsc7 = scale7 * dscale(kk)
-               dsc9 = scale9 * dscale(kk)
-               psc3 = scale3 * pscale(kk)
-               psc5 = scale5 * pscale(kk)
-               psc7 = scale7 * pscale(kk)
-               psc9 = scale9 * pscale(kk)
+               scale3i = scale3 * uscale(k)
+               scale5i = scale5 * uscale(k)
+               scale7i = scale7 * uscale(k)
+               dsc3 = scale3 * dscale(k)
+               dsc5 = scale5 * dscale(k)
+               dsc7 = scale7 * dscale(k)
+               dsc9 = scale9 * dscale(k)
+               psc3 = scale3 * pscale(k)
+               psc5 = scale5 * pscale(k)
+               psc7 = scale7 * pscale(k)
+               psc9 = scale9 * pscale(k)
 c
 c     construct auxiliary vectors for permanent terms
 c
@@ -4205,21 +4206,21 @@ c
 c
 c     update the force components on sites i and k
 c
-               des(1,ii) = des(1,ii) + f*ftm2i(1)
-               des(2,ii) = des(2,ii) + f*ftm2i(2)
-               des(3,ii) = des(3,ii) + f*ftm2i(3)
-               des(1,kk) = des(1,kk) - f*ftm2i(1)
-               des(2,kk) = des(2,kk) - f*ftm2i(2)
-               des(3,kk) = des(3,kk) - f*ftm2i(3)
+               des(1,i) = des(1,i) + f*ftm2i(1)
+               des(2,i) = des(2,i) + f*ftm2i(2)
+               des(3,i) = des(3,i) + f*ftm2i(3)
+               des(1,k) = des(1,k) - f*ftm2i(1)
+               des(2,k) = des(2,k) - f*ftm2i(2)
+               des(3,k) = des(3,k) - f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
-               trqi(1,ii) = trqi(1,ii) + f*ttm2i(1)
-               trqi(2,ii) = trqi(2,ii) + f*ttm2i(2)
-               trqi(3,ii) = trqi(3,ii) + f*ttm2i(3)
-               trqi(1,kk) = trqi(1,kk) + f*ttm3i(1)
-               trqi(2,kk) = trqi(2,kk) + f*ttm3i(2)
-               trqi(3,kk) = trqi(3,kk) + f*ttm3i(3)
+               trqi(1,i) = trqi(1,i) + f*ttm2i(1)
+               trqi(2,i) = trqi(2,i) + f*ttm2i(2)
+               trqi(3,i) = trqi(3,i) + f*ttm2i(3)
+               trqi(1,k) = trqi(1,k) + f*ttm3i(1)
+               trqi(2,k) = trqi(2,k) + f*ttm3i(2)
+               trqi(3,k) = trqi(3,k) + f*ttm3i(3)
 c
 c     construct auxiliary vectors for induced terms
 c
@@ -4473,21 +4474,21 @@ c
 c
 c     update the force components on sites i and k
 c
-               des(1,ii) = des(1,ii) - f*ftm2i(1)
-               des(2,ii) = des(2,ii) - f*ftm2i(2)
-               des(3,ii) = des(3,ii) - f*ftm2i(3)
-               des(1,kk) = des(1,kk) + f*ftm2i(1)
-               des(2,kk) = des(2,kk) + f*ftm2i(2)
-               des(3,kk) = des(3,kk) + f*ftm2i(3)
+               des(1,i) = des(1,i) - f*ftm2i(1)
+               des(2,i) = des(2,i) - f*ftm2i(2)
+               des(3,i) = des(3,i) - f*ftm2i(3)
+               des(1,k) = des(1,k) + f*ftm2i(1)
+               des(2,k) = des(2,k) + f*ftm2i(2)
+               des(3,k) = des(3,k) + f*ftm2i(3)
 c
 c     update the torque components on sites i and k
 c
-               trqi(1,ii) = trqi(1,ii) - f*ttm2i(1)
-               trqi(2,ii) = trqi(2,ii) - f*ttm2i(2)
-               trqi(3,ii) = trqi(3,ii) - f*ttm2i(3)
-               trqi(1,kk) = trqi(1,kk) - f*ttm3i(1)
-               trqi(2,kk) = trqi(2,kk) - f*ttm3i(2)
-               trqi(3,kk) = trqi(3,kk) - f*ttm3i(3)
+               trqi(1,i) = trqi(1,i) - f*ttm2i(1)
+               trqi(2,i) = trqi(2,i) - f*ttm2i(2)
+               trqi(3,i) = trqi(3,i) - f*ttm2i(3)
+               trqi(1,k) = trqi(1,k) - f*ttm3i(1)
+               trqi(2,k) = trqi(2,k) - f*ttm3i(2)
+               trqi(3,k) = trqi(3,k) - f*ttm3i(3)
             end if
    10       continue
          end do
@@ -4562,7 +4563,8 @@ c
 c
 c     convert torques into Cartesian forces
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          call torque (i,trqi(1,i),fix,fiy,fiz,des)
       end do
 c

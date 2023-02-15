@@ -22,7 +22,7 @@ c
       logical pairwise
 c
 c
-c     choose the method for summing over polarization interactions
+c     choose the method to sum over polarization interactions
 c
       pairwise = .true.
       if (pairwise) then
@@ -126,7 +126,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole (pole,rpole)
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -166,23 +166,23 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -227,19 +227,19 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
-               ukx = uind(1,kk)
-               uky = uind(2,kk)
-               ukz = uind(3,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
+               ukx = uind(1,k)
+               uky = uind(2,k)
+               ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -263,7 +263,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -279,9 +279,9 @@ c
 c     find the energy value for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
@@ -361,23 +361,23 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
-            uix = uind(1,ii)
-            uiy = uind(2,ii)
-            uiz = uind(3,ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
+            uix = uind(1,i)
+            uiy = uind(2,i)
+            uiz = uind(3,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -426,19 +426,19 @@ c
                   end if
                   if (r2 .le. off2) then
                      r = sqrt(r2)
-                     ck = rpole(1,kk)
-                     dkx = rpole(2,kk)
-                     dky = rpole(3,kk)
-                     dkz = rpole(4,kk)
-                     qkxx = rpole(5,kk)
-                     qkxy = rpole(6,kk)
-                     qkxz = rpole(7,kk)
-                     qkyy = rpole(9,kk)
-                     qkyz = rpole(10,kk)
-                     qkzz = rpole(13,kk)
-                     ukx = uind(1,kk)
-                     uky = uind(2,kk)
-                     ukz = uind(3,kk)
+                     ck = rpole(1,k)
+                     dkx = rpole(2,k)
+                     dky = rpole(3,k)
+                     dkz = rpole(4,k)
+                     qkxx = rpole(5,k)
+                     qkxy = rpole(6,k)
+                     qkxz = rpole(7,k)
+                     qkyy = rpole(9,k)
+                     qkyz = rpole(10,k)
+                     qkzz = rpole(13,k)
+                     ukx = uind(1,k)
+                     uky = uind(2,k)
+                     ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -462,7 +462,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                      if (use_thole) then
-                        call damptholed (ii,kk,7,r,dmpik)
+                        call damptholed (i,k,7,r,dmpik)
                         scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
@@ -478,9 +478,9 @@ c
 c     find the energy value for charge penetration damping
 c
                      else if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         call dampdir (r,alphai,alphak,dmpi,dmpk)
                         scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
@@ -636,7 +636,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole (pole,rpole)
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -687,23 +687,23 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -749,19 +749,19 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
-               ukx = uind(1,kk)
-               uky = uind(2,kk)
-               ukz = uind(3,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
+               ukx = uind(1,k)
+               uky = uind(2,k)
+               ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -785,7 +785,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -801,9 +801,9 @@ c
 c     find the energy value for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
@@ -945,7 +945,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole (pole,rpole)
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -965,12 +965,12 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          uii = dix*uix + diy*uiy + diz*uiz
          e = fterm * term * uii / 3.0d0
          ep = ep + e
@@ -989,12 +989,12 @@ c
          zu = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,ii) + rpole(1,ii)*x(i)
-            yd = yd + rpole(3,ii) + rpole(1,ii)*y(i)
-            zd = zd + rpole(4,ii) + rpole(1,ii)*z(i)
-            xu = xu + uind(1,ii)
-            yu = yu + uind(2,ii)
-            zu = zu + uind(3,ii)
+            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
+            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
+            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
+            xu = xu + uind(1,i)
+            yu = yu + uind(2,i)
+            zu = zu + uind(3,i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
@@ -1110,23 +1110,23 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1171,19 +1171,19 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
-               ukx = uind(1,kk)
-               uky = uind(2,kk)
-               ukz = uind(3,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
+               ukx = uind(1,k)
+               uky = uind(2,k)
+               ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1211,7 +1211,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -1231,9 +1231,9 @@ c
 c     find the energy value for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
@@ -1329,23 +1329,23 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
-            uix = uind(1,ii)
-            uiy = uind(2,ii)
-            uiz = uind(3,ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
+            uix = uind(1,i)
+            uiy = uind(2,i)
+            uiz = uind(3,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1394,19 +1394,19 @@ c
                   end if
                   if (r2 .le. off2) then
                      r = sqrt(r2)
-                     ck = rpole(1,kk)
-                     dkx = rpole(2,kk)
-                     dky = rpole(3,kk)
-                     dkz = rpole(4,kk)
-                     qkxx = rpole(5,kk)
-                     qkxy = rpole(6,kk)
-                     qkxz = rpole(7,kk)
-                     qkyy = rpole(9,kk)
-                     qkyz = rpole(10,kk)
-                     qkzz = rpole(13,kk)
-                     ukx = uind(1,kk)
-                     uky = uind(2,kk)
-                     ukz = uind(3,kk)
+                     ck = rpole(1,k)
+                     dkx = rpole(2,k)
+                     dky = rpole(3,k)
+                     dkz = rpole(4,k)
+                     qkxx = rpole(5,k)
+                     qkxy = rpole(6,k)
+                     qkxz = rpole(7,k)
+                     qkyy = rpole(9,k)
+                     qkyz = rpole(10,k)
+                     qkzz = rpole(13,k)
+                     ukx = uind(1,k)
+                     uky = uind(2,k)
+                     ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1434,7 +1434,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                      if (use_thole) then
-                        call damptholed (ii,kk,7,r,dmpik)
+                        call damptholed (i,k,7,r,dmpik)
                         scalek = pscale(k)
                         rr3 = f / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
@@ -1454,9 +1454,9 @@ c
 c     find the energy value for charge penetration damping
 c
                      else if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         call dampdir (r,alphai,alphak,dmpi,dmpk)
                         scalek = pscale(k)
                         rr3 = f * scalek / (r*r2)
@@ -1616,7 +1616,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole (pole,rpole)
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1636,12 +1636,12 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          uii = dix*uix + diy*uiy + diz*uiz
          e = fterm * term * uii / 3.0d0
          ep = ep + e
@@ -1660,12 +1660,12 @@ c
          zu = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,ii) + rpole(1,ii)*x(i)
-            yd = yd + rpole(3,ii) + rpole(1,ii)*y(i)
-            zd = zd + rpole(4,ii) + rpole(1,ii)*z(i)
-            xu = xu + uind(1,ii)
-            yu = yu + uind(2,ii)
-            zu = zu + uind(3,ii)
+            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
+            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
+            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
+            xu = xu + uind(1,i)
+            yu = yu + uind(2,i)
+            zu = zu + uind(3,i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          ep = ep + term*(xd*xu+yd*yu+zd*zu)
@@ -1792,23 +1792,23 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
-         uix = uind(1,ii)
-         uiy = uind(2,ii)
-         uiz = uind(3,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1854,19 +1854,19 @@ c
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
-               ukx = uind(1,kk)
-               uky = uind(2,kk)
-               ukz = uind(3,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
+               ukx = uind(1,k)
+               uky = uind(2,k)
+               ukz = uind(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1894,7 +1894,7 @@ c
 c     find the energy value for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   scalek = pscale(k)
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -1914,9 +1914,9 @@ c
 c     find the energy value for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = pscale(k)
                   rr3 = f * scalek / (r*r2)
@@ -2066,7 +2066,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole (pole,rpole)
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2094,12 +2094,12 @@ c
 c     get polarization energy via induced dipoles times field
 c
       do ii = 1, npole
-         if (douind(ipole(ii))) then
-            i = ipole(ii)
-            fi = f / polarity(ii)
+         i = ipole(ii)
+         if (douind(i)) then
+            fi = f / polarity(i)
             e = 0.0d0
             do j = 1, 3
-               e = e + fi*uind(j,ii)*udirp(j,ii)
+               e = e + fi*uind(j,i)*udirp(j,i)
             end do
             nep = nep + 1
             ep = ep + e
@@ -2117,7 +2117,7 @@ c
      &                    //,' Type',9x,'Atom Name',24x,'Alpha',
      &                       8x,'Energy',/)
                end if
-               write (iout,30)  i,name(i),polarity(ii),e
+               write (iout,30)  i,name(i),polarity(i),e
    30          format (' Polar',5x,i7,'-',a3,16x,2f14.4)
             end if
          end if
@@ -2141,15 +2141,15 @@ c
             zu = 0.0d0
             do ii = 1, npole
                i = ipole(ii)
-               dix = rpole(2,ii)
-               diy = rpole(3,ii)
-               diz = rpole(4,ii)
-               uix = uind(1,ii)
-               uiy = uind(2,ii)
-               uiz = uind(3,ii)
-               xd = xd + dix + rpole(1,ii)*x(i)
-               yd = yd + diy + rpole(1,ii)*y(i)
-               zd = zd + diz + rpole(1,ii)*z(i)
+               dix = rpole(2,i)
+               diy = rpole(3,i)
+               diz = rpole(4,i)
+               uix = uind(1,i)
+               uiy = uind(2,i)
+               uiz = uind(3,i)
+               xd = xd + dix + rpole(1,i)*x(i)
+               yd = yd + diy + rpole(1,i)*y(i)
+               zd = zd + diz + rpole(1,i)*z(i)
                xu = xu + uix
                yu = yu + uiy
                zu = zu + uiz
@@ -2207,7 +2207,7 @@ c
       use polpot
       use potent
       implicit none
-      integer i,j,k
+      integer i,j,ii
       integer k1,k2,k3
       integer m1,m2,m3
       integer ntot,nff
@@ -2230,17 +2230,17 @@ c     perform dynamic allocation of some global arrays
 c
       if (.not.use_mpole .or. aewald.ne.aeewald) then
          if (allocated(cmp)) then
-            if (size(cmp) .lt. 10*npole)  deallocate (cmp)
+            if (size(cmp) .lt. 10*n)  deallocate (cmp)
          end if
          if (allocated(fmp)) then
-            if (size(fmp) .lt. 10*npole)  deallocate (fmp)
+            if (size(fmp) .lt. 10*n)  deallocate (fmp)
          end if
          if (allocated(fphi)) then
-            if (size(fphi) .lt. 20*npole)  deallocate (fphi)
+            if (size(fphi) .lt. 20*n)  deallocate (fphi)
          end if
-         if (.not. allocated(cmp))  allocate (cmp(10,npole))
-         if (.not. allocated(fmp))  allocate (fmp(10,npole))
-         if (.not. allocated(fphi))  allocate (fphi(20,npole))
+         if (.not. allocated(cmp))  allocate (cmp(10,n))
+         if (.not. allocated(fmp))  allocate (fmp(10,n))
+         if (.not. allocated(fphi))  allocate (fphi(20,n))
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -2260,7 +2260,8 @@ c
 c     assign only the permanent multipoles to the PME grid
 c     and perform the 3-D FFT forward transformation
 c
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             cmp(1,i) = rpole(1,i)
             cmp(2,i) = rpole(2,i)
             cmp(3,i) = rpole(3,i)
@@ -2344,19 +2345,19 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (fuind(3,npole))
+      allocate (fuind(3,n))
 c
 c     increment the induced dipole polarization energy
 c
       e = 0.0d0
-      do i = 1, npole
-         k = ipole(i)
+      do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
             fuind(j,i) = a(j,1)*uind(1,i) + a(j,2)*uind(2,i)
      &                      + a(j,3)*uind(3,i)
             term = f * fuind(j,i) * fphi(j+1,i)
             e = e + term
-            aep(k) = aep(k) + term
+            aep(i) = aep(i) + term
          end do
       end do
       ep = ep + e

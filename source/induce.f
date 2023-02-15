@@ -54,20 +54,21 @@ c
       if (use_pred) then
          nualt = min(nualt+1,maxualt)
          do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                do k = nualt, 2, -1
-                  udalt(k,j,ii) = udalt(k-1,j,ii)
-                  upalt(k,j,ii) = upalt(k-1,j,ii)
+                  udalt(k,j,i) = udalt(k-1,j,i)
+                  upalt(k,j,i) = upalt(k-1,j,i)
                end do
-               udalt(1,j,ii) = uind(j,ii)
-               upalt(1,j,ii) = uinp(j,ii)
+               udalt(1,j,i) = uind(j,i)
+               upalt(1,j,i) = uinp(j,i)
                if (use_solv) then
                   do k = nualt, 2, -1
-                     usalt(k,j,ii) = usalt(k-1,j,ii)
-                     upsalt(k,j,ii) = upsalt(k-1,j,ii)
+                     usalt(k,j,i) = usalt(k-1,j,i)
+                     upsalt(k,j,i) = upsalt(k-1,j,i)
                   end do
-                  usalt(1,j,ii) = uinds(j,ii)
-                  upsalt(1,j,ii) = uinps(j,ii)
+                  usalt(1,j,i) = uinds(j,i)
+                  upsalt(1,j,i) = uinps(j,i)
                end if
             end do
          end do
@@ -79,7 +80,7 @@ c
          header = .true.
          do ii = 1, npole
             i = ipole(ii)
-            if (polarity(ii) .ne. 0.0d0) then
+            if (polarity(i) .ne. 0.0d0) then
                if (header) then
                   header = .false.
                   if (solvtyp(1:2).eq.'GK' .or.
@@ -95,8 +96,8 @@ c
    30             format (/,4x,'Atom',15x,'X',12x,'Y',12x,'Z',
      &                       11x,'Total',/)
                end if
-               norm = sqrt(uind(1,ii)**2+uind(2,ii)**2+uind(3,ii)**2)
-               write (iout,40)  i,(debye*uind(j,ii),j=1,3),debye*norm
+               norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
+               write (iout,40)  i,(debye*uind(j,i),j=1,3),debye*norm
    40          format (i8,5x,3f13.4,1x,f13.4)
             end if
          end do
@@ -104,7 +105,7 @@ c
          if (solvtyp(1:2).eq.'GK' .or. solvtyp(1:2).eq.'PB') then
             do ii = 1, npole
                i = ipole(ii)
-               if (polarity(ii) .ne. 0.0d0) then
+               if (polarity(i) .ne. 0.0d0) then
                   if (header) then
                      header = .false.
                      write (iout,50)
@@ -114,9 +115,9 @@ c
    60                format (/,4x,'Atom',15x,'X',12x,'Y',12x,'Z',
      &                          11x,'Total',/)
                   end if
-                  norm = sqrt(uinds(1,ii)**2+uinds(2,ii)**2
-     &                           +uinds(3,ii)**2)
-                  write (iout,70)  i,(debye*uinds(j,ii),j=1,3),
+                  norm = sqrt(uinds(1,i)**2+uinds(2,i)**2
+     &                           +uinds(3,i)**2)
+                  write (iout,70)  i,(debye*uinds(j,i),j=1,3),
      &                             debye*norm
    70             format (i8,5x,3f13.4,1x,f13.4)
                end if
@@ -155,7 +156,8 @@ c
       use units
       use uprior
       implicit none
-      integer i,j,k,iter
+      integer i,j,k
+      integer ii,iter
       integer miniter
       integer maxiter
       real*8 polmin
@@ -183,7 +185,7 @@ c
 c
 c     zero out the induced dipoles at each site
 c
-      do i = 1, npole
+      do i = 1, n
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
@@ -193,8 +195,8 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
+      allocate (field(3,n))
+      allocate (fieldp(3,n))
 c
 c     compute induced dipoles based on direct and mutual fields
 c
@@ -216,8 +218,9 @@ c
 c
 c     set induced dipoles to polarizability times direct field
 c
-      do i = 1, npole
-         if (douind(ipole(i)) .and. .not.use_expol) then
+      do ii = 1, npole
+         i = ipole(ii)
+         if (douind(i) .and. .not.use_expol) then
             do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
@@ -226,7 +229,7 @@ c
                   uinp(j,i) = udirp(j,i)
                end if
             end do
-         else if (douind(ipole(i)) .and. use_expol) then
+         else if (douind(i) .and. use_expol) then
             do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
@@ -249,8 +252,9 @@ c
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uopt(0,j,i) = udir(j,i)
                   uoptp(0,j,i) = udirp(j,i)
@@ -266,8 +270,9 @@ c
             else
                call ufield0a (field,fieldp)
             end if
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uopt(k,j,i) = polarity(i) * field(j,i)
                      uoptp(k,j,i) = polarity(i) * fieldp(j,i)
@@ -279,8 +284,9 @@ c
          end do
          allocate (usum(3,n))
          allocate (usump(3,n))
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uind(j,i) = 0.0d0
                   uinp(j,i) = 0.0d0
@@ -303,7 +309,7 @@ c     set tolerances for computation of mutual induced dipoles
 c
       if (poltyp .eq. 'MUTUAL') then
          done = .false.
-         miniter = min(3,npole)
+         miniter = min(3,n)
          maxiter = 100
          iter = 0
          polmin = 0.00000001d0
@@ -313,7 +319,8 @@ c     estimate induced dipoles using a polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
             call ulspred
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
@@ -330,7 +337,8 @@ c
 c     estimate induced dipoles via inertial extended Lagrangian
 c
          if (use_ielscf) then
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   uind(j,i) = uaux(j,i)
                   uinp(j,i) = upaux(j,i)
@@ -340,15 +348,15 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (poli(npole))
-         allocate (rsd(3,npole))
-         allocate (rsdp(3,npole))
-         allocate (zrsd(3,npole))
-         allocate (zrsdp(3,npole))
-         allocate (conj(3,npole))
-         allocate (conjp(3,npole))
-         allocate (vec(3,npole))
-         allocate (vecp(3,npole))
+         allocate (poli(n))
+         allocate (rsd(3,n))
+         allocate (rsdp(3,n))
+         allocate (zrsd(3,n))
+         allocate (zrsdp(3,n))
+         allocate (conj(3,n))
+         allocate (conjp(3,n))
+         allocate (vec(3,n))
+         allocate (vecp(3,n))
 c
 c     get the electrostatic field due to induced dipoles
 c
@@ -362,8 +370,9 @@ c
 c
 c     set initial values for the residual vector components
 c
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                poli(i) = max(polmin,polarity(i))
                do j = 1, 3
                   if (pcgguess) then
@@ -404,8 +413,8 @@ c
 c     perform dynamic allocation of some global arrays
 c
          if (pcgprec) then
-            if (.not. allocated(mindex))  allocate (mindex(npole))
-            if (.not. allocated(minv))  allocate (minv(3*maxulst*npole))
+            if (.not. allocated(mindex))  allocate (mindex(n))
+            if (.not. allocated(minv))  allocate (minv(3*maxulst*n))
 c
 c     apply a sparse matrix conjugate gradient preconditioner
 c
@@ -423,8 +432,9 @@ c
 c
 c     set the initial conjugate vector to be the residuals
 c
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   conj(j,i) = zrsd(j,i)
                   conjp(j,i) = zrsdp(j,i)
@@ -436,8 +446,9 @@ c     conjugate gradient iteration of the mutual induced dipoles
 c
          do while (.not. done)
             iter = iter + 1
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      vec(j,i) = uind(j,i)
                      vecp(j,i) = uinp(j,i)
@@ -453,8 +464,9 @@ c
             else
                call ufield0a (field,fieldp)
             end if
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
@@ -478,8 +490,9 @@ c
             ap = 0.0d0
             sum = 0.0d0
             sump = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      a = a + conj(j,i)*vec(j,i)
                      ap = ap + conjp(j,i)*vecp(j,i)
@@ -490,8 +503,9 @@ c
             end do
             if (a .ne. 0.0d0)  a = sum / a
             if (ap .ne. 0.0d0)  ap = sump / ap
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uind(j,i) = uind(j,i) + a*conj(j,i)
                      uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
@@ -511,8 +525,9 @@ c
             end if
             b = 0.0d0
             bp = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      b = b + rsd(j,i)*zrsd(j,i)
                      bp = bp + rsdp(j,i)*zrsdp(j,i)
@@ -523,8 +538,9 @@ c
             if (sump .ne. 0.0d0)  bp = bp / sump
             epsd = 0.0d0
             epsp = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      conj(j,i) = zrsd(j,i) + b*conj(j,i)
                      conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
@@ -557,8 +573,9 @@ c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
             if (done) then
-               do i = 1, npole
-                  if (douind(ipole(i))) then
+               do ii = 1, npole
+                  i = ipole(ii)
+                  if (douind(i)) then
                      term = pcgpeek * poli(i)
                      do j = 1, 3
                         uind(j,i) = uind(j,i) + term*rsd(j,i)
@@ -675,10 +692,10 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
          end do
       end do
 c
@@ -703,20 +720,20 @@ c     find the electrostatic field due to permanent multipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -808,16 +825,16 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -835,7 +852,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   rr3 = dmpik(3) / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -855,9 +872,9 @@ c
 c     find the field components for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   rr3 = 1.0d0 / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -891,10 +908,10 @@ c
 c     increment the direct electrostatic field components
 c
                do j = 1, 3
-                  field(j,ii) = field(j,ii) + fid(j)*dscale(k)
-                  field(j,kk) = field(j,kk) + fkd(j)*dscale(k)
-                  fieldp(j,ii) = fieldp(j,ii) + fid(j)*pscale(k)
-                  fieldp(j,kk) = fieldp(j,kk) + fkd(j)*pscale(k)
+                  field(j,i) = field(j,i) + fid(j)*dscale(k)
+                  field(j,k) = field(j,k) + fkd(j)*dscale(k)
+                  fieldp(j,i) = fieldp(j,i) + fid(j)*pscale(k)
+                  fieldp(j,k) = fieldp(j,k) + fkd(j)*pscale(k)
                end do
             end if
          end do
@@ -951,20 +968,20 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1049,16 +1066,16 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
                do m = 2, ncell
                   xr = x(k) - x(i)
                   yr = y(k) - y(i)
@@ -1084,7 +1101,7 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        call damptholed (ii,kk,7,r,dmpik)
+                        call damptholed (i,k,7,r,dmpik)
                         rr3 = dmpik(3) / (r*r2)
                         rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                         rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -1104,9 +1121,9 @@ c
 c     find the field components for charge penetration damping
 c
                      else if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         call dampdir (r,alphai,alphak,dmpi,dmpk)
                         rr3 = 1.0d0 / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
@@ -1152,11 +1169,11 @@ c
                         end do
                      end if
                      do j = 1, 3
-                        field(j,ii) = field(j,ii) + fid(j)
-                        fieldp(j,ii) = fieldp(j,ii) + fip(j)
+                        field(j,i) = field(j,i) + fid(j)
+                        fieldp(j,i) = fieldp(j,i) + fip(j)
                         if (i .ne. k) then
-                           field(j,kk) = field(j,kk) + fkd(j)
-                           fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                           field(j,k) = field(j,k) + fkd(j)
+                           fieldp(j,k) = fieldp(j,k) + fkp(j)
                         end if
                      end do
                   end if
@@ -1268,10 +1285,10 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
          end do
       end do
 c
@@ -1296,16 +1313,16 @@ c     find the electrostatic field due to mutual induced dipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         dix = uind(1,ii)
-         diy = uind(2,ii)
-         diz = uind(3,ii)
-         pix = uinp(1,ii)
-         piy = uinp(2,ii)
-         piz = uinp(3,ii)
+         dix = uind(1,i)
+         diy = uind(2,i)
+         diz = uind(3,i)
+         pix = uinp(1,i)
+         piy = uinp(2,i)
+         piz = uinp(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1346,12 +1363,12 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               dkx = uind(1,kk)
-               dky = uind(2,kk)
-               dkz = uind(3,kk)
-               pkx = uinp(1,kk)
-               pky = uinp(2,kk)
-               pkz = uinp(3,kk)
+               dkx = uind(1,k)
+               dky = uind(2,k)
+               dkz = uind(3,k)
+               pkx = uinp(1,k)
+               pky = uinp(2,k)
+               pkz = uinp(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1363,16 +1380,16 @@ c
 c     find the scale factors for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,5,r,dmpik)
+                  call dampthole (i,k,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the scale factors for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampmut (r,alphai,alphak,dmpik)
                   dmpik(3) = wscale(k) * dmpik(3)
                   dmpik(5) = wscale(k) * dmpik(5)
@@ -1395,10 +1412,10 @@ c
                fkp(2) = rr3*piy + rr5*pir*yr
                fkp(3) = rr3*piz + rr5*pir*zr
                do j = 1, 3
-                  field(j,ii) = field(j,ii) + fid(j)
-                  field(j,kk) = field(j,kk) + fkd(j)
-                  fieldp(j,ii) = fieldp(j,ii) + fip(j)
-                  fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                  field(j,i) = field(j,i) + fid(j)
+                  field(j,k) = field(j,k) + fkd(j)
+                  fieldp(j,i) = fieldp(j,i) + fip(j)
+                  fieldp(j,k) = fieldp(j,k) + fkp(j)
                end do
             end if
          end do
@@ -1436,16 +1453,16 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
-            dix = uind(1,ii)
-            diy = uind(2,ii)
-            diz = uind(3,ii)
-            pix = uinp(1,ii)
-            piy = uinp(2,ii)
-            piz = uinp(3,ii)
+            dix = uind(1,i)
+            diy = uind(2,i)
+            diz = uind(3,i)
+            pix = uinp(1,i)
+            piy = uinp(2,i)
+            piz = uinp(3,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1479,12 +1496,12 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               dkx = uind(1,kk)
-               dky = uind(2,kk)
-               dkz = uind(3,kk)
-               pkx = uinp(1,kk)
-               pky = uinp(2,kk)
-               pkz = uinp(3,kk)
+               dkx = uind(1,k)
+               dky = uind(2,k)
+               dkz = uind(3,k)
+               pkx = uinp(1,k)
+               pky = uinp(2,k)
+               pkz = uinp(3,k)
                do m = 2, ncell
                   xr = x(k) - x(i)
                   yr = y(k) - y(i)
@@ -1504,16 +1521,16 @@ c
 c     find the scale factors for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole (ii,kk,5,r,dmpik)
+                        call dampthole (i,k,5,r,dmpik)
                         dmpik(3) = uscale(k) * dmpik(3)
                         dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the scale factors for charge penetration damping
 c
                      else if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         call dampmut (r,alphai,alphak,dmpik)
                         dmpik(3) = wscale(k) * dmpik(3)
                         dmpik(5) = wscale(k) * dmpik(5)
@@ -1546,11 +1563,11 @@ c
                         end if
                      end if
                      do j = 1, 3
-                        field(j,ii) = field(j,ii) + fid(j)
-                        fieldp(j,ii) = fieldp(j,ii) + fip(j)
-                        if (ii .ne. kk) then
-                           field(j,kk) = field(j,kk) + fkd(j)
-                           fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                        field(j,i) = field(j,i) + fid(j)
+                        fieldp(j,i) = fieldp(j,i) + fip(j)
+                        if (i .ne. k) then
+                           field(j,k) = field(j,k) + fkd(j)
+                           fieldp(j,k) = fieldp(j,k) + fkp(j)
                         end if
                      end do
                   end if
@@ -1619,7 +1636,7 @@ c
       use shunt
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       real*8 xr,yr,zr
       real*8 r,r2,rr3
       real*8 rr5,rr7
@@ -1658,8 +1675,8 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (dscale(n))
       allocate (pscale(n))
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
+      allocate (fieldt(3,n))
+      allocate (fieldtp(3,n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -1670,10 +1687,10 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            fieldt(j,ii) = 0.0d0
-            fieldtp(j,ii) = 0.0d0
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
          end do
       end do
 c
@@ -1692,20 +1709,20 @@ c     find the electrostatic field due to permanent multipoles
 c
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1788,9 +1805,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)
@@ -1798,16 +1814,16 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1825,7 +1841,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   rr3 = dmpik(3) / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -1845,9 +1861,9 @@ c
 c     find the field components for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   rr3 = 1.0d0 / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
@@ -1881,10 +1897,10 @@ c
 c     increment the direct electrostatic field components
 c
                do j = 1, 3
-                  fieldt(j,ii) = fieldt(j,ii) + fid(j)*dscale(k)
-                  fieldt(j,kk) = fieldt(j,kk) + fkd(j)*dscale(k)
-                  fieldtp(j,ii) = fieldtp(j,ii) + fid(j)*pscale(k)
-                  fieldtp(j,kk) = fieldtp(j,kk) + fkd(j)*pscale(k)
+                  fieldt(j,i) = fieldt(j,i) + fid(j)*dscale(k)
+                  fieldt(j,k) = fieldt(j,k) + fkd(j)*dscale(k)
+                  fieldtp(j,i) = fieldtp(j,i) + fid(j)*pscale(k)
+                  fieldtp(j,k) = fieldtp(j,k) + fkd(j)*pscale(k)
                end do
             end if
          end do
@@ -1941,9 +1957,10 @@ c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = fieldt(j,ii)
-            fieldp(j,ii) = fieldtp(j,ii)
+            field(j,i) = fieldt(j,i)
+            fieldp(j,i) = fieldtp(j,i)
          end do
       end do
 !$OMP END DO
@@ -1984,7 +2001,7 @@ c
       use shunt
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
       real*8 dix,diy,diz
@@ -2017,8 +2034,8 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (uscale(n))
       allocate (wscale(n))
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
+      allocate (fieldt(3,n))
+      allocate (fieldtp(3,n))
 c
 c     set array needed to scale connected atom interactions
 c
@@ -2029,10 +2046,10 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            fieldt(j,ii) = 0.0d0
-            fieldtp(j,ii) = 0.0d0
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
          end do
       end do
 c
@@ -2050,16 +2067,16 @@ c     find the electrostatic field due to mutual induced dipoles
 c
       do ii = 1, npole
          i = ipole(ii)
-         dix = uind(1,ii)
-         diy = uind(2,ii)
-         diz = uind(3,ii)
-         pix = uinp(1,ii)
-         piy = uinp(2,ii)
-         piz = uinp(3,ii)
+         dix = uind(1,i)
+         diy = uind(2,i)
+         diz = uind(3,i)
+         pix = uinp(1,i)
+         piy = uinp(2,i)
+         piz = uinp(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -2091,9 +2108,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)
@@ -2101,12 +2117,12 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               dkx = uind(1,kk)
-               dky = uind(2,kk)
-               dkz = uind(3,kk)
-               pkx = uinp(1,kk)
-               pky = uinp(2,kk)
-               pkz = uinp(3,kk)
+               dkx = uind(1,k)
+               dky = uind(2,k)
+               dkz = uind(3,k)
+               pkx = uinp(1,k)
+               pky = uinp(2,k)
+               pkz = uinp(3,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -2118,16 +2134,16 @@ c
 c     find the scale factors for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,5,r,dmpik)
+                  call dampthole (i,k,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the scale factors for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampmut (r,alphai,alphak,dmpik)
                   dmpik(3) = wscale(k) * dmpik(3)
                   dmpik(5) = wscale(k) * dmpik(5)
@@ -2150,10 +2166,10 @@ c
                fkp(2) = rr3*piy + rr5*pir*yr
                fkp(3) = rr3*piz + rr5*pir*zr
                do j = 1, 3
-                  fieldt(j,ii) = fieldt(j,ii) + fid(j)
-                  fieldt(j,kk) = fieldt(j,kk) + fkd(j)
-                  fieldtp(j,ii) = fieldtp(j,ii) + fip(j)
-                  fieldtp(j,kk) = fieldtp(j,kk) + fkp(j)
+                  fieldt(j,i) = fieldt(j,i) + fid(j)
+                  fieldt(j,k) = fieldt(j,k) + fkd(j)
+                  fieldtp(j,i) = fieldtp(j,i) + fip(j)
+                  fieldtp(j,k) = fieldtp(j,k) + fkp(j)
                end do
             end if
          end do
@@ -2191,9 +2207,10 @@ c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = fieldt(j,ii)
-            fieldp(j,ii) = fieldtp(j,ii)
+            field(j,i) = fieldt(j,i)
+            fieldp(j,i) = fieldtp(j,i)
          end do
       end do
 !$OMP END DO
@@ -2239,10 +2256,10 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
          end do
       end do
 c
@@ -2258,8 +2275,9 @@ c     get the reciprocal space part of the permanent field
 c
       call udirect1 (field)
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            fieldp(j,ii) = field(j,ii)
+            fieldp(j,i) = field(j,i)
          end do
       end do
 c
@@ -2275,9 +2293,10 @@ c     get the self-energy portion of the permanent field
 c
       term = (4.0d0/3.0d0) * aewald**3 / rootpi
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) + term*rpole(j+1,ii)
-            fieldp(j,ii) = fieldp(j,ii) + term*rpole(j+1,ii)
+            field(j,i) = field(j,i) + term*rpole(j+1,i)
+            fieldp(j,i) = fieldp(j,i) + term*rpole(j+1,i)
          end do
       end do
 c
@@ -2289,15 +2308,16 @@ c
          end do
          do ii = 1, npole
             i = ipole(ii)
-            ucell(1) = ucell(1) + rpole(2,ii) + rpole(1,ii)*x(i)
-            ucell(2) = ucell(2) + rpole(3,ii) + rpole(1,ii)*y(i)
-            ucell(3) = ucell(3) + rpole(4,ii) + rpole(1,ii)*z(i)
+            ucell(1) = ucell(1) + rpole(2,i) + rpole(1,i)*x(i)
+            ucell(2) = ucell(2) + rpole(3,i) + rpole(1,i)*y(i)
+            ucell(3) = ucell(3) + rpole(4,i) + rpole(1,i)*z(i)
          end do
          term = (4.0d0/3.0d0) * pi/volbox
          do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
-               field(j,ii) = field(j,ii) - term*ucell(j)
-               fieldp(j,ii) = fieldp(j,ii) - term*ucell(j)
+               field(j,i) = field(j,i) - term*ucell(j)
+               fieldp(j,i) = fieldp(j,i) - term*ucell(j)
             end do
          end do
       end if
@@ -2320,6 +2340,7 @@ c     since corresponding values in empole and epolar are different
 c
 c
       subroutine udirect1 (field)
+      use atoms
       use bound
       use boxes
       use ewald
@@ -2351,10 +2372,10 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (cmp(10,npole))
-      allocate (fmp(10,npole))
-      allocate (cphi(10,npole))
-      allocate (fphi(20,npole))
+      allocate (cmp(10,n))
+      allocate (fmp(10,n))
+      allocate (cphi(10,n))
+      allocate (fphi(20,n))
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -2378,16 +2399,17 @@ c
 c     copy the multipole moments into local storage areas
 c
       do ii = 1, npole
-         cmp(1,ii) = rpole(1,ii)
-         cmp(2,ii) = rpole(2,ii)
-         cmp(3,ii) = rpole(3,ii)
-         cmp(4,ii) = rpole(4,ii)
-         cmp(5,ii) = rpole(5,ii)
-         cmp(6,ii) = rpole(9,ii)
-         cmp(7,ii) = rpole(13,ii)
-         cmp(8,ii) = 2.0d0 * rpole(6,ii)
-         cmp(9,ii) = 2.0d0 * rpole(7,ii)
-         cmp(10,ii) = 2.0d0 * rpole(10,ii)
+         i = ipole(ii)
+         cmp(1,i) = rpole(1,i)
+         cmp(2,i) = rpole(2,i)
+         cmp(3,i) = rpole(3,i)
+         cmp(4,i) = rpole(4,i)
+         cmp(5,i) = rpole(5,i)
+         cmp(6,i) = rpole(9,i)
+         cmp(7,i) = rpole(13,i)
+         cmp(8,i) = 2.0d0 * rpole(6,i)
+         cmp(9,i) = 2.0d0 * rpole(7,i)
+         cmp(10,i) = 2.0d0 * rpole(10,i)
       end do
 c
 c     convert Cartesian multipoles to fractional coordinates
@@ -2466,9 +2488,10 @@ c
 c     increment the field at each multipole site
 c
       do ii = 1, npole
-         field(1,ii) = field(1,ii) - cphi(2,ii)
-         field(2,ii) = field(2,ii) - cphi(3,ii)
-         field(3,ii) = field(3,ii) - cphi(4,ii)
+         i = ipole(ii)
+         field(1,i) = field(1,i) - cphi(2,i)
+         field(2,i) = field(2,i) - cphi(3,i)
+         field(3,i) = field(3,i) - cphi(4,i)
       end do
 c
 c     perform deallocation of some local arrays
@@ -2564,20 +2587,20 @@ c     compute real space Ewald field due to permanent multipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -2674,16 +2697,16 @@ c
                rr3 = rr2 * rr1
                rr5 = 3.0d0 * rr2 * rr3
                rr7 = 5.0d0 * rr2 * rr5
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -2705,7 +2728,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   scalek = dscale(k)
                   dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -2742,9 +2765,9 @@ c
 c     find the field components for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = dscale(k)
                   rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
@@ -2804,10 +2827,10 @@ c
 c     increment the field at each site due to this interaction
 c
                do j = 1, 3
-                  field(j,ii) = field(j,ii) + fid(j)
-                  field(j,kk) = field(j,kk) + fkd(j)
-                  fieldp(j,ii) = fieldp(j,ii) + fip(j)
-                  fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                  field(j,i) = field(j,i) + fid(j)
+                  field(j,k) = field(j,k) + fkd(j)
+                  fieldp(j,i) = fieldp(j,i) + fip(j)
+                  fieldp(j,k) = fieldp(j,k) + fkp(j)
                end do
             end if
          end do
@@ -2864,20 +2887,20 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -2962,16 +2985,16 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
                do m = 2, ncell
                   xr = x(k) - x(i)
                   yr = y(k) - y(i)
@@ -3009,7 +3032,7 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        call damptholed (ii,kk,7,r,dmpik)
+                        call damptholed (i,k,7,r,dmpik)
                         dsc3 = dmpik(3)
                         dsc5 = dmpik(5)
                         dsc7 = dmpik(7)
@@ -3060,9 +3083,9 @@ c
 c     find the field components for charge penetration damping
 c
                      else if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         call dampdir (r,alphai,alphak,dmpi,dmpk)
                         scalek = 1.0d0
                         if (use_polymer) then
@@ -3132,11 +3155,11 @@ c
 c     increment the field at each site due to this interaction
 c
                      do j = 1, 3
-                        field(j,ii) = field(j,ii) + fid(j)
-                        fieldp(j,ii) = fieldp(j,ii) + fid(j)
+                        field(j,i) = field(j,i) + fid(j)
+                        fieldp(j,i) = fieldp(j,i) + fid(j)
                         if (i .ne. k) then
-                           field(j,kk) = field(j,kk) + fkp(j)
-                           fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                           field(j,k) = field(j,k) + fkp(j)
+                           fieldp(j,k) = fieldp(j,k) + fkp(j)
                         end if
                      end do
                   end if
@@ -3229,7 +3252,7 @@ c
       use units
       implicit none
       integer i,j,k,m
-      integer ii,kk,kkk
+      integer ii,kk
       integer nlocal,nchunk
       integer tid,maxlocal
 !$    integer omp_get_thread_num
@@ -3279,8 +3302,8 @@ c
 c
 c     values for storage of mutual polarization intermediates
 c
-      nchunk = int(0.5d0*dble(npole)/dble(nthread)) + 1
-      maxlocal = int(dble(npole)*dble(maxelst)/dble(nthread))
+      nchunk = int(0.5d0*dble(n)/dble(nthread)) + 1
+      maxlocal = int(dble(n)*dble(maxelst)/dble(nthread))
       nlocal = 0
       ntpair = 0
 c
@@ -3290,8 +3313,8 @@ c
       allocate (dscale(n))
       allocate (uscale(n))
       allocate (wscale(n))
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
+      allocate (fieldt(3,n))
+      allocate (fieldtp(3,n))
       allocate (toffset(0:nthread-1))
       if (poltyp .ne. 'DIRECT') then
          allocate (ilocal(2,maxlocal))
@@ -3309,10 +3332,10 @@ c
 c
 c     initialize local variables for OpenMP calculation
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            fieldt(j,ii) = 0.0d0
-            fieldtp(j,ii) = 0.0d0
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
          end do
       end do
 c
@@ -3332,20 +3355,20 @@ c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -3452,9 +3475,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)
@@ -3467,16 +3489,16 @@ c
                rr3 = rr2 * rr1
                rr5 = 3.0d0 * rr2 * rr3
                rr7 = 5.0d0 * rr2 * rr5
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -3498,7 +3520,7 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call damptholed (ii,kk,7,r,dmpik)
+                  call damptholed (i,k,7,r,dmpik)
                   scalek = dscale(k)
                   dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                   dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
@@ -3535,13 +3557,13 @@ c
 c     find terms needed later to compute mutual polarization
 c
                   if (poltyp .ne. 'DIRECT') then
-                     call dampthole (ii,kk,5,r,dmpik)
+                     call dampthole (i,k,5,r,dmpik)
                      scalek = uscale(k)
                      dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                      dmp5 = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
                      nlocal = nlocal + 1
-                     ilocal(1,nlocal) = ii
-                     ilocal(2,nlocal) = kk
+                     ilocal(1,nlocal) = i
+                     ilocal(2,nlocal) = k
                      dlocal(1,nlocal) = -dmp3 + dmp5*xr*xr
                      dlocal(2,nlocal) = dmp5*xr*yr
                      dlocal(3,nlocal) = dmp5*xr*zr
@@ -3553,9 +3575,9 @@ c
 c     find the field components for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampdir (r,alphai,alphak,dmpi,dmpk)
                   scalek = dscale(k)
                   rr3i = dmpe(3) - (1.0d0-scalek*dmpi(3))*rr3
@@ -3620,8 +3642,8 @@ c
                      rr3ik = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
                      rr5ik = dmpe(5) - (1.0d0-scalek*dmpik(5))*rr5
                      nlocal = nlocal + 1
-                     ilocal(1,nlocal) = ii
-                     ilocal(2,nlocal) = kk
+                     ilocal(1,nlocal) = i
+                     ilocal(2,nlocal) = k
                      dlocal(1,nlocal) = -rr3ik + rr5ik*xr*xr
                      dlocal(2,nlocal) = rr5ik*xr*yr
                      dlocal(3,nlocal) = rr5ik*xr*zr
@@ -3634,10 +3656,10 @@ c
 c     increment the field at each site due to this interaction
 c
                do j = 1, 3
-                  fieldt(j,ii) = fieldt(j,ii) + fid(j)
-                  fieldt(j,kk) = fieldt(j,kk) + fkd(j)
-                  fieldtp(j,ii) = fieldtp(j,ii) + fip(j)
-                  fieldtp(j,kk) = fieldtp(j,kk) + fkp(j)
+                  fieldt(j,i) = fieldt(j,i) + fid(j)
+                  fieldt(j,k) = fieldt(j,k) + fkd(j)
+                  fieldtp(j,i) = fieldtp(j,i) + fip(j)
+                  fieldtp(j,k) = fieldtp(j,k) + fkp(j)
                end do
             end if
          end do
@@ -3741,9 +3763,10 @@ c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) + fieldt(j,ii)
-            fieldp(j,ii) = fieldp(j,ii) + fieldtp(j,ii)
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
          end do
       end do
 !$OMP END DO
@@ -3785,7 +3808,7 @@ c
       use pme
       use polar
       implicit none
-      integer ii,j
+      integer i,j,ii
       real*8 term
       real*8 ucell(3)
       real*8 ucellp(3)
@@ -3795,10 +3818,10 @@ c
 c
 c     zero out the electrostatic field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
          end do
       end do
 c
@@ -3826,9 +3849,10 @@ c     get the self-energy portion of the mutual field
 c
       term = (4.0d0/3.0d0) * aewald**3 / rootpi
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) + term*uind(j,ii)
-            fieldp(j,ii) = fieldp(j,ii) + term*uinp(j,ii)
+            field(j,i) = field(j,i) + term*uind(j,i)
+            fieldp(j,i) = fieldp(j,i) + term*uinp(j,i)
          end do
       end do
 c
@@ -3840,16 +3864,18 @@ c
             ucellp(j) = 0.0d0
          end do
          do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
-               ucell(j) = ucell(j) + uind(j,ii)
-               ucellp(j) = ucellp(j) + uinp(j,ii)
+               ucell(j) = ucell(j) + uind(j,i)
+               ucellp(j) = ucellp(j) + uinp(j,i)
             end do
          end do
          term = (4.0d0/3.0d0) * pi/volbox
          do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
-               field(j,ii) = field(j,ii) - term*ucell(j)
-               fieldp(j,ii) = fieldp(j,ii) - term*ucellp(j)
+               field(j,i) = field(j,i) - term*ucell(j)
+               fieldp(j,i) = fieldp(j,i) - term*ucellp(j)
             end do
          end do
       end if
@@ -3869,6 +3895,7 @@ c     induced atomic dipole moments to the field
 c
 c
       subroutine umutual1 (field,fieldp)
+      use atoms
       use boxes
       use ewald
       use math
@@ -3898,13 +3925,13 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (fuind(3,npole))
-      allocate (fuinp(3,npole))
-      allocate (fdip_phi1(10,npole))
-      allocate (fdip_phi2(10,npole))
-      allocate (fdip_sum_phi(20,npole))
-      allocate (dipfield1(3,npole))
-      allocate (dipfield2(3,npole))
+      allocate (fuind(3,n))
+      allocate (fuinp(3,n))
+      allocate (fdip_phi1(10,n))
+      allocate (fdip_phi2(10,n))
+      allocate (fdip_sum_phi(20,n))
+      allocate (dipfield1(3,n))
+      allocate (dipfield2(3,n))
 c
 c     convert Cartesian dipoles to fractional coordinates
 c
@@ -3914,11 +3941,12 @@ c
          a(3,i) = dble(nfft3) * recip(i,3)
       end do
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            fuind(j,ii) = a(j,1)*uind(1,ii) + a(j,2)*uind(2,ii)
-     &                       + a(j,3)*uind(3,ii)
-            fuinp(j,ii) = a(j,1)*uinp(1,ii) + a(j,2)*uinp(2,ii)
-     &                       + a(j,3)*uinp(3,ii)
+            fuind(j,i) = a(j,1)*uind(1,i) + a(j,2)*uind(2,i)
+     &                      + a(j,3)*uind(3,i)
+            fuinp(j,i) = a(j,1)*uinp(1,i) + a(j,2)*uinp(2,i)
+     &                      + a(j,3)*uinp(3,i)
          end do
       end do
 c
@@ -3948,9 +3976,10 @@ c     store fractional reciprocal potentials for OPT method
 c
       if (poltyp .eq. 'OPT') then
          do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 10
-               fopt(optlevel,j,ii) = fdip_phi1(j,ii)
-               foptp(optlevel,j,ii) = fdip_phi2(j,ii)
+               fopt(optlevel,j,i) = fdip_phi1(j,i)
+               foptp(optlevel,j,i) = fdip_phi2(j,i)
             end do
          end do
       end if
@@ -3963,22 +3992,24 @@ c
          a(i,3) = dble(nfft3) * recip(i,3)
       end do
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            dipfield1(j,ii) = a(j,1)*fdip_phi1(2,ii)
-     &                           + a(j,2)*fdip_phi1(3,ii)
-     &                           + a(j,3)*fdip_phi1(4,ii)
-            dipfield2(j,ii) = a(j,1)*fdip_phi2(2,ii)
-     &                           + a(j,2)*fdip_phi2(3,ii)
-     &                           + a(j,3)*fdip_phi2(4,ii)
+            dipfield1(j,i) = a(j,1)*fdip_phi1(2,i)
+     &                          + a(j,2)*fdip_phi1(3,i)
+     &                          + a(j,3)*fdip_phi1(4,i)
+            dipfield2(j,i) = a(j,1)*fdip_phi2(2,i)
+     &                          + a(j,2)*fdip_phi2(3,i)
+     &                          + a(j,3)*fdip_phi2(4,i)
          end do
       end do
 c
 c     increment the field at each multipole site
 c
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) - dipfield1(j,ii)
-            fieldp(j,ii) = fieldp(j,ii) - dipfield2(j,ii)
+            field(j,i) = field(j,i) - dipfield1(j,i)
+            fieldp(j,i) = fieldp(j,i) - dipfield2(j,i)
          end do
       end do
 c
@@ -4068,16 +4099,16 @@ c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         dix = uind(1,ii)
-         diy = uind(2,ii)
-         diz = uind(3,ii)
-         pix = uinp(1,ii)
-         piy = uinp(2,ii)
-         piz = uinp(3,ii)
+         dix = uind(1,i)
+         diy = uind(2,i)
+         diz = uind(3,i)
+         pix = uinp(1,i)
+         piy = uinp(2,i)
+         piz = uinp(3,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -4143,16 +4174,16 @@ c
 c     find the field components for Thole polarization damping
 c
                if (use_thole) then
-                  call dampthole (ii,kk,5,r,dmpik)
+                  call dampthole (i,k,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the field components for charge penetration damping
 c
                else if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   call dampmut (r,alphai,alphak,dmpik)
                   dmpik(3) = wscale(k) * dmpik(3)
                   dmpik(5) = wscale(k) * dmpik(5)
@@ -4178,10 +4209,10 @@ c
 c     increment the field at each site due to this interaction
 c
                do j = 1, 3
-                  field(j,ii) = field(j,ii) + fid(j)
-                  field(j,kk) = field(j,kk) + fkd(j)
-                  fieldp(j,ii) = fieldp(j,ii) + fip(j)
-                  fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                  field(j,i) = field(j,i) + fid(j)
+                  field(j,k) = field(j,k) + fkd(j)
+                  fieldp(j,i) = fieldp(j,i) + fip(j)
+                  fieldp(j,k) = fieldp(j,k) + fkp(j)
                end do
             end if
          end do
@@ -4219,16 +4250,16 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
-            dix = uind(1,ii)
-            diy = uind(2,ii)
-            diz = uind(3,ii)
-            pix = uinp(1,ii)
-            piy = uinp(2,ii)
-            piz = uinp(3,ii)
+            dix = uind(1,i)
+            diy = uind(2,i)
+            diz = uind(3,i)
+            pix = uinp(1,i)
+            piy = uinp(2,i)
+            piz = uinp(3,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -4262,12 +4293,12 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               dkx = uind(1,kk)
-               dky = uind(2,kk)
-               dkz = uind(3,kk)
-               pkx = uinp(1,kk)
-               pky = uinp(2,kk)
-               pkz = uinp(3,kk)
+               dkx = uind(1,k)
+               dky = uind(2,k)
+               dkz = uind(3,k)
+               pkx = uinp(1,k)
+               pky = uinp(2,k)
+               pkz = uinp(3,k)
                do m = 2, ncell
                   xr = x(k) - x(i)
                   yr = y(k) - y(i)
@@ -4295,16 +4326,16 @@ c
 c     find the field components for Thole polarization damping
 c
                      if (use_thole) then
-                        call dampthole (ii,kk,5,r,dmpik)
+                        call dampthole (i,k,5,r,dmpik)
                         dmpik(3) = uscale(k) * dmpik(3)
                         dmpik(5) = uscale(k) * dmpik(5)
 c
 c     find the field components for charge penetration damping
 c
                      else if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         call dampmut (r,alphai,alphak,dmpik)
                         dmpik(3) = wscale(k) * dmpik(3)
                         dmpik(5) = wscale(k) * dmpik(5)
@@ -4330,11 +4361,11 @@ c
 c     increment the field at each site due to this interaction
 c
                      do j = 1, 3
-                        field(j,ii) = field(j,ii) + fid(j)
-                        fieldp(j,ii) = fieldp(j,ii) + fip(j)
-                        if (ii .ne. kk) then
-                           field(j,kk) = field(j,kk) + fkd(j)
-                           fieldp(j,kk) = fieldp(j,kk) + fkp(j)
+                        field(j,i) = field(j,i) + fid(j)
+                        fieldp(j,i) = fieldp(j,i) + fip(j)
+                        if (i .ne. k) then
+                           field(j,k) = field(j,k) + fkd(j)
+                           fieldp(j,k) = fieldp(j,k) + fkp(j)
                         end if
                      end do
                   end if
@@ -4390,6 +4421,7 @@ c     atomic dipole moments to the field via a neighbor list
 c
 c
       subroutine umutual2b (field,fieldp)
+      use atoms
       use mpole
       use polar
       use tarray
@@ -4409,22 +4441,22 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
+      allocate (fieldt(3,n))
+      allocate (fieldtp(3,n))
 c
 c     initialize local variables for OpenMP calculation
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            fieldt(j,ii) = 0.0d0
-            fieldtp(j,ii) = 0.0d0
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
          end do
       end do
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(npole,uind,uinp,ntpair,
-!$OMP& tindex,tdipdip,field,fieldp,fieldt,fieldtp)
+!$OMP PARALLEL default(private) shared(npole,ipole,uind,uinp,
+!$OMP& ntpair,tindex,tdipdip,field,fieldp,fieldt,fieldtp)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
 c
 c     find the field terms for each pairwise interaction
@@ -4472,9 +4504,10 @@ c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) + fieldt(j,ii)
-            fieldp(j,ii) = fieldp(j,ii) + fieldtp(j,ii)
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
          end do
       end do
 !$OMP END DO
@@ -4512,7 +4545,8 @@ c
       use units
       use uprior
       implicit none
-      integer i,j,k,iter
+      integer i,j,k
+      integer ii,iter
       integer miniter
       integer maxiter
       real*8 polmin
@@ -4557,7 +4591,7 @@ c
 c     zero out the induced dipoles at each site; uind and uinp are
 c     vacuum dipoles, uinds and uinps are SCRF dipoles
 c
-      do i = 1, npole
+      do i = 1, n
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
@@ -4574,10 +4608,10 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-      allocate (fields(3,npole))
-      allocate (fieldps(3,npole))
+      allocate (field(3,n))
+      allocate (fieldp(3,n))
+      allocate (fields(3,n))
+      allocate (fieldps(3,n))
 c
 c     compute induced dipoles based on direct and mutual fields
 c
@@ -4592,8 +4626,9 @@ c     set vacuum induced dipoles to polarizability times direct field;
 c     set SCRF induced dipoles to polarizability times direct field
 c     plus the GK reaction field due to permanent multipoles
 c
-      do i = 1, npole
-         if (douind(ipole(i))) then
+      do ii = 1, npole
+         i = ipole(ii)
+         if (douind(i)) then
             do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
@@ -4610,8 +4645,9 @@ c
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uopt(0,j,i) = udir(j,i)
                   uoptp(0,j,i) = udirp(j,i)
@@ -4622,8 +4658,9 @@ c
          end do
          do k = 1, optorder
             call ufield0d (field,fieldp,fields,fieldps)
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uopt(k,j,i) = polarity(i) * field(j,i)
                      uoptp(k,j,i) = polarity(i) * fieldp(j,i)
@@ -4641,8 +4678,9 @@ c
          allocate (usump(3,n))
          allocate (usums(3,n))
          allocate (usumps(3,n))
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uind(j,i) = 0.0d0
                   uinp(j,i) = 0.0d0
@@ -4684,7 +4722,8 @@ c
 c     estimated induced dipoles from polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
@@ -4706,29 +4745,30 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (poli(npole))
-         allocate (rsd(3,npole))
-         allocate (rsdp(3,npole))
-         allocate (rsds(3,npole))
-         allocate (rsdps(3,npole))
-         allocate (zrsd(3,npole))
-         allocate (zrsdp(3,npole))
-         allocate (zrsds(3,npole))
-         allocate (zrsdps(3,npole))
-         allocate (conj(3,npole))
-         allocate (conjp(3,npole))
-         allocate (conjs(3,npole))
-         allocate (conjps(3,npole))
-         allocate (vec(3,npole))
-         allocate (vecp(3,npole))
-         allocate (vecs(3,npole))
-         allocate (vecps(3,npole))
+         allocate (poli(n))
+         allocate (rsd(3,n))
+         allocate (rsdp(3,n))
+         allocate (rsds(3,n))
+         allocate (rsdps(3,n))
+         allocate (zrsd(3,n))
+         allocate (zrsdp(3,n))
+         allocate (zrsds(3,n))
+         allocate (zrsdps(3,n))
+         allocate (conj(3,n))
+         allocate (conjp(3,n))
+         allocate (conjs(3,n))
+         allocate (conjps(3,n))
+         allocate (vec(3,n))
+         allocate (vecp(3,n))
+         allocate (vecs(3,n))
+         allocate (vecps(3,n))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0d (field,fieldp,fields,fieldps)
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                poli(i) = max(polmin,polarity(i))
                do j = 1, 3
                   rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
@@ -4755,8 +4795,9 @@ c     conjugate gradient iteration of the mutual induced dipoles
 c
          do while (.not. done)
             iter = iter + 1
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      vec(j,i) = uind(j,i)
                      vecp(j,i) = uinp(j,i)
@@ -4770,8 +4811,9 @@ c
                end if
             end do
             call ufield0d (field,fieldp,fields,fieldps)
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
@@ -4792,8 +4834,9 @@ c
             sump = 0.0d0
             sums = 0.0d0
             sumps = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      a = a + conj(j,i)*vec(j,i)
                      ap = ap + conjp(j,i)*vecp(j,i)
@@ -4810,8 +4853,9 @@ c
             if (ap .ne. 0.0d0)  ap = sump / ap
             if (as .ne. 0.0d0)  as = sums / as
             if (aps .ne. 0.0d0)  aps = sumps / aps
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uind(j,i) = uind(j,i) + a*conj(j,i)
                      uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
@@ -4828,8 +4872,9 @@ c
             bp = 0.0d0
             bs = 0.0d0
             bps = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      zrsd(j,i) = rsd(j,i) * poli(i)
                      zrsdp(j,i) = rsdp(j,i) * poli(i)
@@ -4850,8 +4895,9 @@ c
             epsp = 0.0d0
             epsds = 0.0d0
             epsps = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      conj(j,i) = zrsd(j,i) + b*conj(j,i)
                      conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
@@ -4888,8 +4934,9 @@ c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
             if (done) then
-               do i = 1, npole
-                  if (douind(ipole(i))) then
+               do ii = 1, npole
+                  i = ipole(ii)
+                  if (douind(i)) then
                      do j = 1, 3
                         uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
                         uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
@@ -5028,12 +5075,12 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
-            fields(j,ii) = 0.0d0
-            fieldps(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+            fields(j,i) = 0.0d0
+            fieldps(j,i) = 0.0d0
          end do
       end do
 c
@@ -5058,19 +5105,19 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
-      allocate (fieldts(3,npole))
-      allocate (fieldtps(3,npole))
+      allocate (fieldt(3,n))
+      allocate (fieldtp(3,n))
+      allocate (fieldts(3,n))
+      allocate (fieldtps(3,n))
 c
 c     initialize local variables for OpenMP calculation
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            fieldt(j,ii) = 0.0d0
-            fieldtp(j,ii) = 0.0d0
-            fieldts(j,ii) = 0.0d0
-            fieldtps(j,ii) = 0.0d0
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+            fieldts(j,i) = 0.0d0
+            fieldtps(j,i) = 0.0d0
          end do
       end do
 c
@@ -5089,16 +5136,16 @@ c     find the field terms for each pairwise interaction
 c
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         uxi = rpole(2,ii)
-         uyi = rpole(3,ii)
-         uzi = rpole(4,ii)
-         qxxi = rpole(5,ii)
-         qxyi = rpole(6,ii)
-         qxzi = rpole(7,ii)
-         qyyi = rpole(9,ii)
-         qyzi = rpole(10,ii)
-         qzzi = rpole(13,ii)
+         ci = rpole(1,i)
+         uxi = rpole(2,i)
+         uyi = rpole(3,i)
+         uzi = rpole(4,i)
+         qxxi = rpole(5,i)
+         qxyi = rpole(6,i)
+         qxzi = rpole(7,i)
+         qyyi = rpole(9,i)
+         qyzi = rpole(10,i)
+         qzzi = rpole(13,i)
          rbi = rborn(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -5195,22 +5242,22 @@ c
                r2 = xr2 + yr2 + zr2
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,kk)
-                  uxk = rpole(2,kk)
-                  uyk = rpole(3,kk)
-                  uzk = rpole(4,kk)
-                  qxxk = rpole(5,kk)
-                  qxyk = rpole(6,kk)
-                  qxzk = rpole(7,kk)
-                  qyyk = rpole(9,kk)
-                  qyzk = rpole(10,kk)
-                  qzzk = rpole(13,kk)
+                  ck = rpole(1,k)
+                  uxk = rpole(2,k)
+                  uyk = rpole(3,k)
+                  uzk = rpole(4,k)
+                  qxxk = rpole(5,k)
+                  qxyk = rpole(6,k)
+                  qxzk = rpole(7,k)
+                  qyyk = rpole(9,k)
+                  qyzk = rpole(10,k)
+                  qzzk = rpole(13,k)
                   rbk = rborn(k)
 c
 c     self-interactions for the solute field are skipped
 c
                   if (i .ne. k) then
-                     call damptholed (ii,kk,7,r,dmpik)
+                     call damptholed (i,k,7,r,dmpik)
                      rr3 = dmpik(3) / (r*r2)
                      rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                      rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -5237,10 +5284,10 @@ c
                      fkd(3) = zr*(rr3*ci+rr5*dir+rr7*qir)
      &                           - rr3*uzi - 2.0d0*rr5*qiz
                      do j = 1, 3
-                        fieldt(j,ii) = fieldt(j,ii) + fid(j)*dscale(k)
-                        fieldt(j,kk) = fieldt(j,kk) + fkd(j)*dscale(k)
-                        fieldtp(j,ii) = fieldtp(j,ii) + fid(j)*pscale(k)
-                        fieldtp(j,kk) = fieldtp(j,kk) + fkd(j)*pscale(k)
+                        fieldt(j,i) = fieldt(j,i) + fid(j)*dscale(k)
+                        fieldt(j,k) = fieldt(j,k) + fkd(j)*dscale(k)
+                        fieldtp(j,i) = fieldtp(j,i) + fid(j)*pscale(k)
+                        fieldtp(j,k) = fieldtp(j,k) + fkd(j)*pscale(k)
                      end do
                   end if
 c
@@ -5407,10 +5454,10 @@ c
                      end do
                   end if
                   do j = 1, 3
-                     fieldts(j,ii) = fieldts(j,ii) + fid(j)
-                     fieldts(j,kk) = fieldts(j,kk) + fkd(j)
-                     fieldtps(j,ii) = fieldtps(j,ii) + fid(j)
-                     fieldtps(j,kk) = fieldtps(j,kk) + fkd(j)
+                     fieldts(j,i) = fieldts(j,i) + fid(j)
+                     fieldts(j,k) = fieldts(j,k) + fkd(j)
+                     fieldtps(j,i) = fieldtps(j,i) + fid(j)
+                     fieldtps(j,k) = fieldtps(j,k) + fkd(j)
                   end do
                end if
             end if
@@ -5468,11 +5515,12 @@ c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) + fieldt(j,ii)
-            fieldp(j,ii) = fieldp(j,ii) + fieldtp(j,ii)
-            fields(j,ii) = fields(j,ii) + fieldts(j,ii)
-            fieldps(j,ii) = fieldps(j,ii) + fieldtps(j,ii)
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
+            fields(j,i) = fields(j,i) + fieldts(j,i)
+            fieldps(j,i) = fieldps(j,i) + fieldtps(j,i)
          end do
       end do
 !$OMP END DO
@@ -5481,9 +5529,10 @@ c     combine permanent multipole field and GK reaction field
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            fields(j,ii) = field(j,ii) + fields(j,ii)
-            fieldps(j,ii) = fieldp(j,ii) + fieldps(j,ii)
+            fields(j,i) = field(j,i) + fields(j,i)
+            fieldps(j,i) = fieldp(j,i) + fieldps(j,i)
          end do
       end do
 !$OMP END DO
@@ -5569,12 +5618,12 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, npole
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
-            fields(j,ii) = 0.0d0
-            fieldps(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+            fields(j,i) = 0.0d0
+            fieldps(j,i) = 0.0d0
          end do
       end do
 c
@@ -5595,19 +5644,19 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (fieldt(3,npole))
-      allocate (fieldtp(3,npole))
-      allocate (fieldts(3,npole))
-      allocate (fieldtps(3,npole))
+      allocate (fieldt(3,n))
+      allocate (fieldtp(3,n))
+      allocate (fieldts(3,n))
+      allocate (fieldtps(3,n))
 c
 c     initialize local variables for OpenMP calculation
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            fieldt(j,ii) = 0.0d0
-            fieldtp(j,ii) = 0.0d0
-            fieldts(j,ii) = 0.0d0
-            fieldtps(j,ii) = 0.0d0
+            fieldt(j,i) = 0.0d0
+            fieldtp(j,i) = 0.0d0
+            fieldts(j,i) = 0.0d0
+            fieldtps(j,i) = 0.0d0
          end do
       end do
 c
@@ -5624,18 +5673,18 @@ c     find the field terms for each pairwise interaction
 c
       do ii = 1, npole
          i = ipole(ii)
-         duix = uind(1,ii)
-         duiy = uind(2,ii)
-         duiz = uind(3,ii)
-         puix = uinp(1,ii)
-         puiy = uinp(2,ii)
-         puiz = uinp(3,ii)
-         duixs = uinds(1,ii)
-         duiys = uinds(2,ii)
-         duizs = uinds(3,ii)
-         puixs = uinps(1,ii)
-         puiys = uinps(2,ii)
-         puizs = uinps(3,ii)
+         duix = uind(1,i)
+         duiy = uind(2,i)
+         duiz = uind(3,i)
+         puix = uinp(1,i)
+         puiy = uinp(2,i)
+         puiz = uinp(3,i)
+         duixs = uinds(1,i)
+         duiys = uinds(2,i)
+         duizs = uinds(3,i)
+         puixs = uinps(1,i)
+         puiys = uinps(2,i)
+         puizs = uinps(3,i)
          rbi = rborn(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -5669,21 +5718,21 @@ c
                r2 = xr2 + yr2 + zr2
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  dukx = uind(1,kk)
-                  duky = uind(2,kk)
-                  dukz = uind(3,kk)
-                  pukx = uinp(1,kk)
-                  puky = uinp(2,kk)
-                  pukz = uinp(3,kk)
-                  dukxs = uinds(1,kk)
-                  dukys = uinds(2,kk)
-                  dukzs = uinds(3,kk)
-                  pukxs = uinps(1,kk)
-                  pukys = uinps(2,kk)
-                  pukzs = uinps(3,kk)
+                  dukx = uind(1,k)
+                  duky = uind(2,k)
+                  dukz = uind(3,k)
+                  pukx = uinp(1,k)
+                  puky = uinp(2,k)
+                  pukz = uinp(3,k)
+                  dukxs = uinds(1,k)
+                  dukys = uinds(2,k)
+                  dukzs = uinds(3,k)
+                  pukxs = uinps(1,k)
+                  pukys = uinps(2,k)
+                  pukzs = uinps(3,k)
                   rbk = rborn(k)
                   if (i .ne. k) then
-                     call dampthole (ii,kk,5,r,dmpik)
+                     call dampthole (i,k,5,r,dmpik)
                      dmpik(3) = uscale(k) * dmpik(3)
                      dmpik(5) = uscale(k) * dmpik(5)
                      rr3 = -dmpik(3) / (r*r2)
@@ -5721,14 +5770,14 @@ c
                      fkps(2) = rr3*puiys + rr5*puirs*yr
                      fkps(3) = rr3*puizs + rr5*puirs*zr
                      do j = 1, 3
-                        fieldt(j,ii) = fieldt(j,ii) + fid(j)
-                        fieldt(j,kk) = fieldt(j,kk) + fkd(j)
-                        fieldtp(j,ii) = fieldtp(j,ii) + fip(j)
-                        fieldtp(j,kk) = fieldtp(j,kk) + fkp(j)
-                        fieldts(j,ii) = fieldts(j,ii) + fids(j)
-                        fieldts(j,kk) = fieldts(j,kk) + fkds(j)
-                        fieldtps(j,ii) = fieldtps(j,ii) + fips(j)
-                        fieldtps(j,kk) = fieldtps(j,kk) + fkps(j)
+                        fieldt(j,i) = fieldt(j,i) + fid(j)
+                        fieldt(j,k) = fieldt(j,k) + fkd(j)
+                        fieldtp(j,i) = fieldtp(j,i) + fip(j)
+                        fieldtp(j,k) = fieldtp(j,k) + fkp(j)
+                        fieldts(j,i) = fieldts(j,i) + fids(j)
+                        fieldts(j,k) = fieldts(j,k) + fkds(j)
+                        fieldtps(j,i) = fieldtps(j,i) + fips(j)
+                        fieldtps(j,k) = fieldtps(j,k) + fkps(j)
                      end do
                   end if
 c
@@ -5776,10 +5825,10 @@ c
                      end do
                   end if
                   do j = 1, 3
-                     fieldts(j,ii) = fieldts(j,ii) + fids(j)
-                     fieldts(j,kk) = fieldts(j,kk) + fkds(j)
-                     fieldtps(j,ii) = fieldtps(j,ii) + fips(j)
-                     fieldtps(j,kk) = fieldtps(j,kk) + fkps(j)
+                     fieldts(j,i) = fieldts(j,i) + fids(j)
+                     fieldts(j,k) = fieldts(j,k) + fkds(j)
+                     fieldtps(j,i) = fieldtps(j,i) + fips(j)
+                     fieldtps(j,k) = fieldtps(j,k) + fkps(j)
                   end do
                end if
             end if
@@ -5806,11 +5855,12 @@ c     add local to global variables for OpenMP calculation
 c
 !$OMP DO
       do ii = 1, npole
+         i = ipole(ii)
          do j = 1, 3
-            field(j,ii) = field(j,ii) + fieldt(j,ii)
-            fieldp(j,ii) = fieldp(j,ii) + fieldtp(j,ii)
-            fields(j,ii) = fields(j,ii) + fieldts(j,ii)
-            fieldps(j,ii) = fieldps(j,ii) + fieldtps(j,ii)
+            field(j,i) = field(j,i) + fieldt(j,i)
+            fieldp(j,i) = fieldp(j,i) + fieldtp(j,i)
+            fields(j,i) = fields(j,i) + fieldts(j,i)
+            fieldps(j,i) = fieldps(j,i) + fieldtps(j,i)
          end do
       end do
 !$OMP END DO
@@ -5851,7 +5901,8 @@ c
       use units
       use uprior
       implicit none
-      integer i,j,k,iter
+      integer i,j,k
+      integer ii,iter
       integer miniter
       integer maxiter
       real*8 polmin
@@ -5896,7 +5947,7 @@ c
 c     zero out the induced dipoles; uind and uinp are vacuum dipoles,
 c     uinds and uinps are Poisson-Boltzmann SCRF dipoles
 c
-      do i = 1, npole
+      do i = 1, n
          do j = 1, 3
             uind(j,i) = 0.0d0
             uinp(j,i) = 0.0d0
@@ -5913,10 +5964,10 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (field(3,npole))
-      allocate (fieldp(3,npole))
-      allocate (fields(3,npole))
-      allocate (fieldps(3,npole))
+      allocate (field(3,n))
+      allocate (fieldp(3,n))
+      allocate (fields(3,n))
+      allocate (fieldps(3,n))
 c
 c     compute induced dipoles based on direct and mutual fields
 c
@@ -5931,8 +5982,9 @@ c     set vacuum induced dipoles to polarizability times direct field;
 c     SCRF induced dipoles are polarizability times direct field
 c     plus the reaction field due to permanent multipoles
 c
-      do i = 1, npole
-         if (douind(ipole(i))) then
+      do ii = 1, npole
+         i = ipole(ii)
+         if (douind(i)) then
             do j = 1, 3
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
@@ -5949,8 +6001,9 @@ c
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uopt(0,j,i) = udir(j,i)
                   uoptp(0,j,i) = udirp(j,i)
@@ -5961,8 +6014,9 @@ c
          end do
          do k = 1, optorder
             call ufield0e (field,fieldp,fields,fieldps)
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uopt(k,j,i) = polarity(i) * field(j,i)
                      uoptp(k,j,i) = polarity(i) * fieldp(j,i)
@@ -5980,8 +6034,9 @@ c
          allocate (usump(3,n))
          allocate (usums(3,n))
          allocate (usumps(3,n))
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                do j = 1, 3
                   uind(j,i) = 0.0d0
                   uinp(j,i) = 0.0d0
@@ -6023,7 +6078,8 @@ c
 c     estimated induced dipoles from polynomial predictor
 c
          if (use_pred .and. nualt.eq.maxualt) then
-            do i = 1, npole
+            do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
                   udsum = 0.0d0
                   upsum = 0.0d0
@@ -6045,29 +6101,30 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (poli(npole))
-         allocate (rsd(3,npole))
-         allocate (rsdp(3,npole))
-         allocate (rsds(3,npole))
-         allocate (rsdps(3,npole))
-         allocate (zrsd(3,npole))
-         allocate (zrsdp(3,npole))
-         allocate (zrsds(3,npole))
-         allocate (zrsdps(3,npole))
-         allocate (conj(3,npole))
-         allocate (conjp(3,npole))
-         allocate (conjs(3,npole))
-         allocate (conjps(3,npole))
-         allocate (vec(3,npole))
-         allocate (vecp(3,npole))
-         allocate (vecs(3,npole))
-         allocate (vecps(3,npole))
+         allocate (poli(n))
+         allocate (rsd(3,n))
+         allocate (rsdp(3,n))
+         allocate (rsds(3,n))
+         allocate (rsdps(3,n))
+         allocate (zrsd(3,n))
+         allocate (zrsdp(3,n))
+         allocate (zrsds(3,n))
+         allocate (zrsdps(3,n))
+         allocate (conj(3,n))
+         allocate (conjp(3,n))
+         allocate (conjs(3,n))
+         allocate (conjps(3,n))
+         allocate (vec(3,n))
+         allocate (vecp(3,n))
+         allocate (vecs(3,n))
+         allocate (vecps(3,n))
 c
 c     set initial conjugate gradient residual and conjugate vector
 c
          call ufield0e (field,fieldp,fields,fieldps)
-         do i = 1, npole
-            if (douind(ipole(i))) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (douind(i)) then
                poli(i) = max(polmin,polarity(i))
                do j = 1, 3
                   rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
@@ -6094,8 +6151,9 @@ c     conjugate gradient iteration of the mutual induced dipoles
 c
          do while (.not. done)
             iter = iter + 1
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      vec(j,i) = uind(j,i)
                      vecp(j,i) = uinp(j,i)
@@ -6109,8 +6167,9 @@ c
                end if
             end do
             call ufield0e (field,fieldp,fields,fieldps)
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uind(j,i) = vec(j,i)
                      uinp(j,i) = vecp(j,i)
@@ -6131,8 +6190,9 @@ c
             sump = 0.0d0
             sums = 0.0d0
             sumps = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      a = a + conj(j,i)*vec(j,i)
                      ap = ap + conjp(j,i)*vecp(j,i)
@@ -6149,8 +6209,9 @@ c
             if (ap .ne. 0.0d0)  ap = sump / ap
             if (as .ne. 0.0d0)  as = sums / as
             if (aps .ne. 0.0d0)  aps = sumps / aps
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      uind(j,i) = uind(j,i) + a*conj(j,i)
                      uinp(j,i) = uinp(j,i) + ap*conjp(j,i)
@@ -6167,8 +6228,9 @@ c
             bp = 0.0d0
             bs = 0.0d0
             bps = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      zrsd(j,i) = rsd(j,i) * poli(i)
                      zrsdp(j,i) = rsdp(j,i) * poli(i)
@@ -6189,8 +6251,9 @@ c
             epsp = 0.0d0
             epsds = 0.0d0
             epsps = 0.0d0
-            do i = 1, npole
-               if (douind(ipole(i))) then
+            do ii = 1, npole
+               i = ipole(ii)
+               if (douind(i)) then
                   do j = 1, 3
                      conj(j,i) = zrsd(j,i) + b*conj(j,i)
                      conjp(j,i) = zrsdp(j,i) + bp*conjp(j,i)
@@ -6227,8 +6290,9 @@ c
 c     apply a "peek" iteration to the mutual induced dipoles
 c
             if (done) then
-               do i = 1, npole
-                  if (douind(ipole(i))) then
+               do ii = 1, npole
+                  i = ipole(ii)
+                  if (douind(i)) then
                      do j = 1, 3
                         uind(j,i) = uind(j,i) + poli(i)*rsd(j,i)
                         uinp(j,i) = uinp(j,i) + poli(i)*rsdp(j,i)
@@ -6351,10 +6415,10 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
          end do
       end do
 c
@@ -6376,16 +6440,16 @@ c     note self-interactions for the solute field are skipped
 c
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -6481,17 +6545,17 @@ c
                r2 = xr2 + yr2 + zr2
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
-                  call damptholed (ii,kk,7,r,dmpik)
+                  ck = rpole(1,k)
+                  dkx = rpole(2,k)
+                  dky = rpole(3,k)
+                  dkz = rpole(4,k)
+                  qkxx = rpole(5,k)
+                  qkxy = rpole(6,k)
+                  qkxz = rpole(7,k)
+                  qkyy = rpole(9,k)
+                  qkyz = rpole(10,k)
+                  qkzz = rpole(13,k)
+                  call damptholed (i,k,7,r,dmpik)
                   rr3 = dmpik(3) / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
                   rr7 = 15.0d0 * dmpik(7) / (r*r2*r2*r2)
@@ -6518,10 +6582,10 @@ c
                   fkd(3) = zr*(rr3*ci+rr5*dir+rr7*qir)
      &                        - rr3*diz - 2.0d0*rr5*qiz
                   do j = 1, 3
-                     field(j,ii) = field(j,ii) + fid(j)*dscale(k)
-                     field(j,kk) = field(j,kk) + fkd(j)*dscale(k)
-                     fieldp(j,ii) = fieldp(j,ii) + fid(j)*pscale(k)
-                     fieldp(j,kk) = fieldp(j,kk) + fkd(j)*pscale(k)
+                     field(j,i) = field(j,i) + fid(j)*dscale(k)
+                     field(j,k) = field(j,k) + fkd(j)*dscale(k)
+                     fieldp(j,i) = fieldp(j,i) + fid(j)*pscale(k)
+                     fieldp(j,k) = fieldp(j,k) + fkd(j)*pscale(k)
                   end do
                end if
             end if
@@ -6588,8 +6652,8 @@ c
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 3
-            fields(j,ii) = field(j,ii) + pbep(j,i)
-            fieldps(j,ii) = fieldp(j,ii) + pbep(j,i)
+            fields(j,i) = field(j,i) + pbep(j,i)
+            fieldps(j,i) = fieldp(j,i) + pbep(j,i)
          end do
       end do
       return
@@ -6653,12 +6717,12 @@ c
 c
 c     zero out the value of the field at each site
 c
-      do ii = 1, npole
+      do i = 1, n
          do j = 1, 3
-            field(j,ii) = 0.0d0
-            fieldp(j,ii) = 0.0d0
-            fields(j,ii) = 0.0d0
-            fieldps(j,ii) = 0.0d0
+            field(j,i) = 0.0d0
+            fieldp(j,i) = 0.0d0
+            fields(j,i) = 0.0d0
+            fieldps(j,i) = 0.0d0
          end do
       end do
 c
@@ -6677,18 +6741,18 @@ c     and another field including RF due to induced dipoles
 c
       do ii = 1, npole
          i = ipole(ii)
-         duix = uind(1,ii)
-         duiy = uind(2,ii)
-         duiz = uind(3,ii)
-         puix = uinp(1,ii)
-         puiy = uinp(2,ii)
-         puiz = uinp(3,ii)
-         duixs = uinds(1,ii)
-         duiys = uinds(2,ii)
-         duizs = uinds(3,ii)
-         puixs = uinps(1,ii)
-         puiys = uinps(2,ii)
-         puizs = uinps(3,ii)
+         duix = uind(1,i)
+         duiy = uind(2,i)
+         duiz = uind(3,i)
+         puix = uinp(1,i)
+         puiy = uinp(2,i)
+         puiz = uinp(3,i)
+         duixs = uinds(1,i)
+         duiys = uinds(2,i)
+         duizs = uinds(3,i)
+         puixs = uinps(1,i)
+         puiys = uinps(2,i)
+         puizs = uinps(3,i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -6721,19 +6785,19 @@ c
                r2 = xr2 + yr2 + zr2
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  dukx = uind(1,kk)
-                  duky = uind(2,kk)
-                  dukz = uind(3,kk)
-                  pukx = uinp(1,kk)
-                  puky = uinp(2,kk)
-                  pukz = uinp(3,kk)
-                  dukxs = uinds(1,kk)
-                  dukys = uinds(2,kk)
-                  dukzs = uinds(3,kk)
-                  pukxs = uinps(1,kk)
-                  pukys = uinps(2,kk)
-                  pukzs = uinps(3,kk)
-                  call dampthole (ii,kk,5,r,dmpik)
+                  dukx = uind(1,k)
+                  duky = uind(2,k)
+                  dukz = uind(3,k)
+                  pukx = uinp(1,k)
+                  puky = uinp(2,k)
+                  pukz = uinp(3,k)
+                  dukxs = uinds(1,k)
+                  dukys = uinds(2,k)
+                  dukzs = uinds(3,k)
+                  pukxs = uinps(1,k)
+                  pukys = uinps(2,k)
+                  pukzs = uinps(3,k)
+                  call dampthole (i,k,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
                   rr3 = -dmpik(3) / (r*r2)
@@ -6771,14 +6835,14 @@ c
                   fkps(2) = rr3*puiys + rr5*puirs*yr
                   fkps(3) = rr3*puizs + rr5*puirs*zr
                   do j = 1, 3
-                     field(j,ii) = field(j,ii) + fid(j)
-                     field(j,kk) = field(j,kk) + fkd(j)
-                     fieldp(j,ii) = fieldp(j,ii) + fip(j)
-                     fieldp(j,kk) = fieldp(j,kk) + fkp(j)
-                     fields(j,ii) = fields(j,ii) + fids(j)
-                     fields(j,kk) = fields(j,kk) + fkds(j)
-                     fieldps(j,ii) = fieldps(j,ii) + fips(j)
-                     fieldps(j,kk) = fieldps(j,kk) + fkps(j)
+                     field(j,i) = field(j,i) + fid(j)
+                     field(j,k) = field(j,k) + fkd(j)
+                     fieldp(j,i) = fieldp(j,i) + fip(j)
+                     fieldp(j,k) = fieldp(j,k) + fkp(j)
+                     fields(j,i) = fields(j,i) + fids(j)
+                     fields(j,k) = fields(j,k) + fkds(j)
+                     fieldps(j,i) = fieldps(j,i) + fips(j)
+                     fieldps(j,k) = fieldps(j,k) + fkps(j)
                   end do
                end if
             end if
@@ -6830,8 +6894,8 @@ c
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 3
-            indpole(j,i) = uinds(j,ii)
-            inppole(j,i) = uinps(j,ii)
+            indpole(j,i) = uinds(j,i)
+            inppole(j,i) = uinps(j,i)
          end do
       end do
       call apbsinduce (indpole,pbeuind)
@@ -6847,8 +6911,8 @@ c
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 3
-            fields(j,ii) = fields(j,ii) + pbeuind(j,i)
-            fieldps(j,ii) = fieldps(j,ii) + pbeuinp(j,i)
+            fields(j,i) = fields(j,i) + pbeuind(j,i)
+            fieldps(j,i) = fieldps(j,i) + pbeuinp(j,i)
          end do
       end do
       return
@@ -6885,7 +6949,7 @@ c
       use mpole
       use uprior
       implicit none
-      integer i,j,k,m
+      integer i,j,k,m,ii
       real*8 coeff,udk,upk
       real*8 amax,apmax
       real*8 b(maxualt)
@@ -6929,7 +6993,8 @@ c
                cp(k,m) = 0.0d0
             end do
          end do
-         do i = 1, npole
+         do ii = 1, npole
+            i = ipole(ii)
             do j = 1, 3
                do k = 1, nualt
                   udk = udalt(k,j,i)
@@ -7036,10 +7101,11 @@ c     use diagonal preconditioner elements as first approximation
 c
          polmin = 0.00000001d0
          do ii = 1, npole
-            poli = uaccel * max(polmin,polarity(ii))
+            i = ipole(ii)
+            poli = uaccel * max(polmin,polarity(i))
             do j = 1, 3
-               zrsd(j,ii) = poli * rsd(j,ii)
-               zrsdp(j,ii) = poli * rsdp(j,ii)
+               zrsd(j,i) = poli * rsd(j,i)
+               zrsdp(j,i) = poli * rsdp(j,i)
             end do
          end do
 c
@@ -7064,30 +7130,30 @@ c
                   m5 = minv(m+5)
                   m6 = minv(m+6)
                   m = m + 6
-                  zrsd(1,ii) = zrsd(1,ii) + m1*rsd(1,kk)
-     &                            + m2*rsd(2,kk) + m3*rsd(3,kk)
-                  zrsd(2,ii) = zrsd(2,ii) + m2*rsd(1,kk)
-     &                            + m4*rsd(2,kk) + m5*rsd(3,kk)
-                  zrsd(3,ii) = zrsd(3,ii) + m3*rsd(1,kk)
-     &                            + m5*rsd(2,kk) + m6*rsd(3,kk)
-                  zrsd(1,kk) = zrsd(1,kk) + m1*rsd(1,ii)
-     &                            + m2*rsd(2,ii) + m3*rsd(3,ii)
-                  zrsd(2,kk) = zrsd(2,kk) + m2*rsd(1,ii)
-     &                            + m4*rsd(2,ii) + m5*rsd(3,ii)
-                  zrsd(3,kk) = zrsd(3,kk) + m3*rsd(1,ii)
-     &                            + m5*rsd(2,ii) + m6*rsd(3,ii)
-                  zrsdp(1,ii) = zrsdp(1,ii) + m1*rsdp(1,kk)
-     &                             + m2*rsdp(2,kk) + m3*rsdp(3,kk)
-                  zrsdp(2,ii) = zrsdp(2,ii) + m2*rsdp(1,kk)
-     &                             + m4*rsdp(2,kk) + m5*rsdp(3,kk)
-                  zrsdp(3,ii) = zrsdp(3,ii) + m3*rsdp(1,kk)
-     &                             + m5*rsdp(2,kk) + m6*rsdp(3,kk)
-                  zrsdp(1,kk) = zrsdp(1,kk) + m1*rsdp(1,ii)
-     &                             + m2*rsdp(2,ii) + m3*rsdp(3,ii)
-                  zrsdp(2,kk) = zrsdp(2,kk) + m2*rsdp(1,ii)
-     &                             + m4*rsdp(2,ii) + m5*rsdp(3,ii)
-                  zrsdp(3,kk) = zrsdp(3,kk) + m3*rsdp(1,ii)
-     &                             + m5*rsdp(2,ii) + m6*rsdp(3,ii)
+                  zrsd(1,i) = zrsd(1,i) + m1*rsd(1,k)
+     &                           + m2*rsd(2,k) + m3*rsd(3,k)
+                  zrsd(2,i) = zrsd(2,i) + m2*rsd(1,k)
+     &                           + m4*rsd(2,k) + m5*rsd(3,k)
+                  zrsd(3,i) = zrsd(3,i) + m3*rsd(1,k)
+     &                           + m5*rsd(2,k) + m6*rsd(3,k)
+                  zrsd(1,k) = zrsd(1,k) + m1*rsd(1,i)
+     &                           + m2*rsd(2,i) + m3*rsd(3,i)
+                  zrsd(2,k) = zrsd(2,k) + m2*rsd(1,i)
+     &                           + m4*rsd(2,i) + m5*rsd(3,i)
+                  zrsd(3,k) = zrsd(3,k) + m3*rsd(1,i)
+     &                           + m5*rsd(2,i) + m6*rsd(3,i)
+                  zrsdp(1,i) = zrsdp(1,i) + m1*rsdp(1,k)
+     &                            + m2*rsdp(2,k) + m3*rsdp(3,k)
+                  zrsdp(2,i) = zrsdp(2,i) + m2*rsdp(1,k)
+     &                            + m4*rsdp(2,k) + m5*rsdp(3,k)
+                  zrsdp(3,i) = zrsdp(3,i) + m3*rsdp(1,k)
+     &                            + m5*rsdp(2,k) + m6*rsdp(3,k)
+                  zrsdp(1,k) = zrsdp(1,k) + m1*rsdp(1,i)
+     &                            + m2*rsdp(2,i) + m3*rsdp(3,i)
+                  zrsdp(2,k) = zrsdp(2,k) + m2*rsdp(1,i)
+     &                            + m4*rsdp(2,i) + m5*rsdp(3,i)
+                  zrsdp(3,k) = zrsdp(3,k) + m3*rsdp(1,i)
+     &                            + m5*rsdp(2,i) + m6*rsdp(3,i)
                end if
             end do
          end do
@@ -7117,8 +7183,8 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            poli = polarity(ii)
-            if (use_chgpen)  alphai = palpha(ii)
+            poli = polarity(i)
+            if (use_chgpen)  alphai = palpha(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -7159,16 +7225,16 @@ c
                if (r2 .le. off2) then
                   r = sqrt(r2)
                   if (use_thole) then
-                     call dampthole (ii,kk,5,r,dmpik)
+                     call dampthole (i,k,5,r,dmpik)
                      dmpik(3) = uscale(k) * dmpik(3)
                      dmpik(5) = uscale(k) * dmpik(5)
                   else if (use_chgpen) then
-                     alphak = palpha(kk)
+                     alphak = palpha(k)
                      call dampmut (r,alphai,alphak,dmpik)
                      dmpik(3) = wscale(k) * dmpik(3)
                      dmpik(5) = wscale(k) * dmpik(5)
                   end if
-                  polik = poli * polarity(kk)
+                  polik = poli * polarity(k)
                   rr3 = dmpik(3) * polik / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
                   minv(m+1) = rr5*xr*xr - rr3
@@ -7243,7 +7309,7 @@ c
       use polpot
       implicit none
       integer i,j,k,m
-      integer ii,kk,kkk
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
@@ -7270,32 +7336,34 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (zrsdt(3,npole))
-         allocate (zrsdtp(3,npole))
+         allocate (zrsdt(3,n))
+         allocate (zrsdtp(3,n))
 c
 c     use diagonal preconditioner elements as first approximation
 c
          polmin = 0.00000001d0
          do ii = 1, npole
-            poli = uaccel * max(polmin,polarity(ii))
+            i = ipole(ii)
+            poli = uaccel * max(polmin,polarity(i))
             do j = 1, 3
-               zrsd(j,ii) = poli * rsd(j,ii)
-               zrsdp(j,ii) = poli * rsdp(j,ii)
-               zrsdt(j,ii) = 0.0d0
-               zrsdtp(j,ii) = 0.0d0
+               zrsd(j,i) = poli * rsd(j,i)
+               zrsdp(j,i) = poli * rsdp(j,i)
+               zrsdt(j,i) = 0.0d0
+               zrsdtp(j,i) = 0.0d0
             end do
          end do
 c
 c     use the off-diagonal preconditioner elements in second phase
 c
          if (use_ulist) then
-!$OMP PARALLEL default(private) shared(npole,mindex,minv,nulst,ulst,
-!$OMP& rsd,rsdp,zrsd,zrsdp,zrsdt,zrsdtp)
+!$OMP PARALLEL default(private) shared(npole,ipole,mindex,
+!$OMP& minv,nulst,ulst,rsd,rsdp,zrsd,zrsdp,zrsdt,zrsdtp)
 !$OMP DO reduction(+:zrsdt,zrsdtp) schedule(guided)
             do ii = 1, npole
-               m = mindex(ii)
-               do kkk = 1, nulst(ii)
-                  kk = ulst(kkk,ii)
+               i = ipole(ii)
+               m = mindex(i)
+               do kk = 1, nulst(i)
+                  k = ulst(kk,i)
                   m1 = minv(m+1)
                   m2 = minv(m+2)
                   m3 = minv(m+3)
@@ -7303,30 +7371,30 @@ c
                   m5 = minv(m+5)
                   m6 = minv(m+6)
                   m = m + 6
-                  zrsdt(1,ii) = zrsdt(1,ii) + m1*rsd(1,kk)
-     &                             + m2*rsd(2,kk) + m3*rsd(3,kk)
-                  zrsdt(2,ii) = zrsdt(2,ii) + m2*rsd(1,kk)
-     &                             + m4*rsd(2,kk) + m5*rsd(3,kk)
-                  zrsdt(3,ii) = zrsdt(3,ii) + m3*rsd(1,kk)
-     &                             + m5*rsd(2,kk) + m6*rsd(3,kk)
-                  zrsdt(1,kk) = zrsdt(1,kk) + m1*rsd(1,ii)
-     &                             + m2*rsd(2,ii) + m3*rsd(3,ii)
-                  zrsdt(2,kk) = zrsdt(2,kk) + m2*rsd(1,ii)
-     &                             + m4*rsd(2,ii) + m5*rsd(3,ii)
-                  zrsdt(3,kk) = zrsdt(3,kk) + m3*rsd(1,ii)
-     &                             + m5*rsd(2,ii) + m6*rsd(3,ii)
-                  zrsdtp(1,ii) = zrsdtp(1,ii) + m1*rsdp(1,kk)
-     &                              + m2*rsdp(2,kk) + m3*rsdp(3,kk)
-                  zrsdtp(2,ii) = zrsdtp(2,ii) + m2*rsdp(1,kk)
-     &                              + m4*rsdp(2,kk) + m5*rsdp(3,kk)
-                  zrsdtp(3,ii) = zrsdtp(3,ii) + m3*rsdp(1,kk)
-     &                              + m5*rsdp(2,kk) + m6*rsdp(3,kk)
-                  zrsdtp(1,kk) = zrsdtp(1,kk) + m1*rsdp(1,ii)
-     &                              + m2*rsdp(2,ii) + m3*rsdp(3,ii)
-                  zrsdtp(2,kk) = zrsdtp(2,kk) + m2*rsdp(1,ii)
-     &                              + m4*rsdp(2,ii) + m5*rsdp(3,ii)
-                  zrsdtp(3,kk) = zrsdtp(3,kk) + m3*rsdp(1,ii)
-     &                              + m5*rsdp(2,ii) + m6*rsdp(3,ii)
+                  zrsdt(1,i) = zrsdt(1,i) + m1*rsd(1,k)
+     &                             + m2*rsd(2,k) + m3*rsd(3,k)
+                  zrsdt(2,i) = zrsdt(2,i) + m2*rsd(1,k)
+     &                             + m4*rsd(2,k) + m5*rsd(3,k)
+                  zrsdt(3,i) = zrsdt(3,i) + m3*rsd(1,k)
+     &                             + m5*rsd(2,k) + m6*rsd(3,k)
+                  zrsdt(1,k) = zrsdt(1,k) + m1*rsd(1,i)
+     &                             + m2*rsd(2,i) + m3*rsd(3,i)
+                  zrsdt(2,k) = zrsdt(2,k) + m2*rsd(1,i)
+     &                             + m4*rsd(2,i) + m5*rsd(3,i)
+                  zrsdt(3,k) = zrsdt(3,k) + m3*rsd(1,i)
+     &                             + m5*rsd(2,i) + m6*rsd(3,i)
+                  zrsdtp(1,i) = zrsdtp(1,i) + m1*rsdp(1,k)
+     &                              + m2*rsdp(2,k) + m3*rsdp(3,k)
+                  zrsdtp(2,i) = zrsdtp(2,i) + m2*rsdp(1,k)
+     &                              + m4*rsdp(2,k) + m5*rsdp(3,k)
+                  zrsdtp(3,i) = zrsdtp(3,i) + m3*rsdp(1,k)
+     &                              + m5*rsdp(2,k) + m6*rsdp(3,k)
+                  zrsdtp(1,k) = zrsdtp(1,k) + m1*rsdp(1,i)
+     &                              + m2*rsdp(2,i) + m3*rsdp(3,i)
+                  zrsdtp(2,k) = zrsdtp(2,k) + m2*rsdp(1,i)
+     &                              + m4*rsdp(2,i) + m5*rsdp(3,i)
+                  zrsdtp(3,k) = zrsdtp(3,k) + m3*rsdp(1,i)
+     &                              + m5*rsdp(2,i) + m6*rsdp(3,i)
                end do
             end do
 !$OMP END DO
@@ -7335,9 +7403,10 @@ c     transfer the results from local to global arrays
 c
 !$OMP DO
             do ii = 1, npole
+               i = ipole(ii)
                do j = 1, 3
-                  zrsd(j,ii) = zrsd(j,ii) + zrsdt(j,ii)
-                  zrsdp(j,ii) = zrsdp(j,ii) + zrsdtp(j,ii)
+                  zrsd(j,i) = zrsd(j,i) + zrsdt(j,i)
+                  zrsdp(j,i) = zrsdp(j,i) + zrsdtp(j,i)
                end do
             end do
 !$OMP END DO
@@ -7354,8 +7423,9 @@ c
       else if (mode.eq.'BUILD' .and. use_ulist) then
          m = 0
          do ii = 1, npole
-            mindex(ii) = m
-            m = m + 6*nulst(ii)
+            i = ipole(ii)
+            mindex(i) = m
+            m = m + 6*nulst(i)
          end do
 c
 c     perform dynamic allocation of some local arrays
@@ -7372,7 +7442,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,npole,ipole,x,y,z,polarity,
+!$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,polarity,
 !$OMP& palpha,u1scale,u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,
 !$OMP& w5scale,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,use_thole,use_chgpen,nulst,ulst,mindex,minv)
@@ -7386,8 +7456,8 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            poli = polarity(ii)
-            if (use_chgpen)  alphai = palpha(ii)
+            poli = polarity(i)
+            if (use_chgpen)  alphai = palpha(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -7418,10 +7488,9 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-            m = mindex(ii)
-            do kkk = 1, nulst(ii)
-               kk = ulst(kkk,ii)
-               k = ipole(kk)
+            m = mindex(i)
+            do kk = 1, nulst(i)
+               k = ulst(kk,i)
                xr = x(k) - xi
                yr = y(k) - yi
                zr = z(k) - zi
@@ -7429,16 +7498,16 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                r = sqrt(r2)
                if (use_thole) then
-                  call dampthole (ii,kk,5,r,dmpik)
+                  call dampthole (i,k,5,r,dmpik)
                   dmpik(3) = uscale(k) * dmpik(3)
                   dmpik(5) = uscale(k) * dmpik(5)
                else if (use_chgpen) then
-                  alphak = palpha(kk)
+                  alphak = palpha(k)
                   call dampmut (r,alphai,alphak,dmpik)
                   dmpik(3) = wscale(k) * dmpik(3)
                   dmpik(5) = wscale(k) * dmpik(5)
                end if
-               polik = poli * polarity(kk)
+               polik = poli * polarity(k)
                rr3 = dmpik(3) * polik / (r*r2)
                rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
                minv(m+1) = rr5*xr*xr - rr3

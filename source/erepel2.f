@@ -30,7 +30,7 @@ c
       use potent
       use repel
       implicit none
-      integer i,j,k
+      integer i,j,k,kk
       integer nlist
       integer, allocatable :: list(:)
       real*8 eps,old
@@ -47,7 +47,7 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (list(npole))
+      allocate (list(n))
       allocate (d0(3,n))
 c
 c     perform dynamic allocation of some global arrays
@@ -63,9 +63,10 @@ c     find the multipole definitions involving the current atom;
 c     results in a faster but approximate Hessian calculation
 c
       nlist = 0
-      do k = 1, nrep
-         if (irep(k).eq.i .or. zaxis(k).eq.i
-     &          .or. xaxis(k).eq.i .or. abs(yaxis(k)).eq.i) then
+      do kk = 1, nrep
+         k = irep(kk)
+         if (k.eq.i .or. zaxis(k).eq.i .or. xaxis(k).eq.i
+     &          .or. abs(yaxis(k)).eq.i) then
             nlist = nlist + 1
             list(nlist) = k
          end if
@@ -250,7 +251,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (repole,rrepole)
+      call rotpole ('REPEL')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -287,19 +288,19 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         sizi = sizpr(ii)
-         dmpi = dmppr(ii)
-         vali = elepr(ii)
-         ci = rrepole(1,ii)
-         dix = rrepole(2,ii)
-         diy = rrepole(3,ii)
-         diz = rrepole(4,ii)
-         qixx = rrepole(5,ii)
-         qixy = rrepole(6,ii)
-         qixz = rrepole(7,ii)
-         qiyy = rrepole(9,ii)
-         qiyz = rrepole(10,ii)
-         qizz = rrepole(13,ii)
+         sizi = sizpr(i)
+         dmpi = dmppr(i)
+         vali = elepr(i)
+         ci = rrepole(1,i)
+         dix = rrepole(2,i)
+         diy = rrepole(3,i)
+         diz = rrepole(4,i)
+         qixx = rrepole(5,i)
+         qixy = rrepole(6,i)
+         qixz = rrepole(7,i)
+         qiyy = rrepole(9,i)
+         qiyz = rrepole(10,i)
+         qizz = rrepole(13,i)
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -334,19 +335,19 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  sizk = sizpr(kk)
-                  dmpk = dmppr(kk)
-                  valk = elepr(kk)
-                  ck = rrepole(1,kk)
-                  dkx = rrepole(2,kk)
-                  dky = rrepole(3,kk)
-                  dkz = rrepole(4,kk)
-                  qkxx = rrepole(5,kk)
-                  qkxy = rrepole(6,kk)
-                  qkxz = rrepole(7,kk)
-                  qkyy = rrepole(9,kk)
-                  qkyz = rrepole(10,kk)
-                  qkzz = rrepole(13,kk)
+                  sizk = sizpr(k)
+                  dmpk = dmppr(k)
+                  valk = elepr(k)
+                  ck = rrepole(1,k)
+                  dkx = rrepole(2,k)
+                  dky = rrepole(3,k)
+                  dkz = rrepole(4,k)
+                  qkxx = rrepole(5,k)
+                  qkxy = rrepole(6,k)
+                  qkxz = rrepole(7,k)
+                  qkyy = rrepole(9,k)
+                  qkyz = rrepole(10,k)
+                  qkzz = rrepole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -596,19 +597,19 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            sizi = sizpr(ii)
-            dmpi = dmppr(ii)
-            vali = elepr(ii)
-            ci = rrepole(1,ii)
-            dix = rrepole(2,ii)
-            diy = rrepole(3,ii)
-            diz = rrepole(4,ii)
-            qixx = rrepole(5,ii)
-            qixy = rrepole(6,ii)
-            qixz = rrepole(7,ii)
-            qiyy = rrepole(9,ii)
-            qiyz = rrepole(10,ii)
-            qizz = rrepole(13,ii)
+            sizi = sizpr(i)
+            dmpi = dmppr(i)
+            vali = elepr(i)
+            ci = rrepole(1,i)
+            dix = rrepole(2,i)
+            diy = rrepole(3,i)
+            diz = rrepole(4,i)
+            qixx = rrepole(5,i)
+            qixy = rrepole(6,i)
+            qixz = rrepole(7,i)
+            qiyy = rrepole(9,i)
+            qiyz = rrepole(10,i)
+            qizz = rrepole(13,i)
             usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -643,19 +644,19 @@ c
                      r2 = xr*xr + yr* yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        sizk = sizpr(kk)
-                        dmpk = dmppr(kk)
-                        valk = elepr(kk)
-                        ck = rrepole(1,kk)
-                        dkx = rrepole(2,kk)
-                        dky = rrepole(3,kk)
-                        dkz = rrepole(4,kk)
-                        qkxx = rrepole(5,kk)
-                        qkxy = rrepole(6,kk)
-                        qkxz = rrepole(7,kk)
-                        qkyy = rrepole(9,kk)
-                        qkyz = rrepole(10,kk)
-                        qkzz = rrepole(13,kk)
+                        sizk = sizpr(k)
+                        dmpk = dmppr(k)
+                        valk = elepr(k)
+                        ck = rrepole(1,k)
+                        dkx = rrepole(2,k)
+                        dky = rrepole(3,k)
+                        dkz = rrepole(4,k)
+                        qkxx = rrepole(5,k)
+                        qkxy = rrepole(6,k)
+                        qkxz = rrepole(7,k)
+                        qkyy = rrepole(9,k)
+                        qkyz = rrepole(10,k)
+                        qkzz = rrepole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -910,7 +911,7 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, nrep
          i = irep(ii)
-         call torque (ii,ter(1,i),fix,fiy,fiz,der)
+         call torque (i,ter(1,i),fix,fiy,fiz,der)
       end do
 c
 c     perform deallocation of some local arrays

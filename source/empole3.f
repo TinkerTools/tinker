@@ -21,7 +21,7 @@ c
       implicit none
 c
 c
-c     choose the method for summing over multipole interactions
+c     choose the method to sum over multipole interactions
 c
       if (use_ewald) then
          if (use_mlist) then
@@ -130,7 +130,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -163,26 +163,26 @@ c     calculate the multipole interaction energy term
 c
       do ii = 1, npole-1
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
@@ -205,9 +205,9 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -221,16 +221,16 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
+                  ck = rpole(1,k)
+                  dkx = rpole(2,k)
+                  dky = rpole(3,k)
+                  dkz = rpole(4,k)
+                  qkxx = rpole(5,k)
+                  qkxy = rpole(6,k)
+                  qkxz = rpole(7,k)
+                  qkyy = rpole(9,k)
+                  qkyz = rpole(10,k)
+                  qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -262,9 +262,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                   if (use_chgpen) then
-                     corek = pcore(kk)
-                     valk = pval(kk)
-                     alphak = palpha(kk)
+                     corek = pcore(k)
+                     valk = pval(k)
+                     alphak = palpha(k)
                      term1 = corei*corek
                      term1i = corek*vali
                      term2i = corek*dir
@@ -370,26 +370,26 @@ c     calculate interaction energy with other unit cells
 c
          do ii = 1, npole
             i = ipole(ii)
-            iz = zaxis(ii)
-            ix = xaxis(ii)
-            iy = abs(yaxis(ii))
+            iz = zaxis(i)
+            ix = xaxis(i)
+            iy = abs(yaxis(i))
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
             usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
@@ -412,9 +412,9 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               kz = zaxis(kk)
-               kx = xaxis(kk)
-               ky = abs(yaxis(kk))
+               kz = zaxis(k)
+               kx = xaxis(k)
+               ky = abs(yaxis(k))
                usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                proceed = .true.
@@ -430,16 +430,16 @@ c
      &                  mscale(k) = 1.0d0
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        ck = rpole(1,kk)
-                        dkx = rpole(2,kk)
-                        dky = rpole(3,kk)
-                        dkz = rpole(4,kk)
-                        qkxx = rpole(5,kk)
-                        qkxy = rpole(6,kk)
-                        qkxz = rpole(7,kk)
-                        qkyy = rpole(9,kk)
-                        qkyz = rpole(10,kk)
-                        qkzz = rpole(13,kk)
+                        ck = rpole(1,k)
+                        dkx = rpole(2,k)
+                        dky = rpole(3,k)
+                        dkz = rpole(4,k)
+                        qkxx = rpole(5,k)
+                        qkxy = rpole(6,k)
+                        qkxz = rpole(7,k)
+                        qkyy = rpole(9,k)
+                        qkyz = rpole(10,k)
+                        qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -471,9 +471,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                         if (use_chgpen) then
-                           corek = pcore(kk)
-                           valk = pval(kk)
-                           alphak = palpha(kk)
+                           corek = pcore(k)
+                           valk = pval(k)
+                           alphak = palpha(k)
                            term1 = corei*corek
                            term1i = corek*vali
                            term2i = corek*dir
@@ -613,7 +613,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,f,fgrp
@@ -667,7 +667,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -710,26 +710,26 @@ c     calculate the multipole interaction energy term
 c
       do ii = 1, npole
          i = ipole(ii)
-         iz = zaxis(ii)
-         ix = xaxis(ii)
-         iy = abs(yaxis(ii))
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
 c
@@ -750,12 +750,11 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
-            kz = zaxis(kk)
-            kx = xaxis(kk)
-            ky = abs(yaxis(kk))
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
+            kz = zaxis(k)
+            kx = xaxis(k)
+            ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -769,16 +768,16 @@ c
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  ck = rpole(1,kk)
-                  dkx = rpole(2,kk)
-                  dky = rpole(3,kk)
-                  dkz = rpole(4,kk)
-                  qkxx = rpole(5,kk)
-                  qkxy = rpole(6,kk)
-                  qkxz = rpole(7,kk)
-                  qkyy = rpole(9,kk)
-                  qkyz = rpole(10,kk)
-                  qkzz = rpole(13,kk)
+                  ck = rpole(1,k)
+                  dkx = rpole(2,k)
+                  dky = rpole(3,k)
+                  dkz = rpole(4,k)
+                  qkxx = rpole(5,k)
+                  qkxy = rpole(6,k)
+                  qkxz = rpole(7,k)
+                  qkyy = rpole(9,k)
+                  qkyz = rpole(10,k)
+                  qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -810,9 +809,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                   if (use_chgpen) then
-                     corek = pcore(kk)
-                     valk = pval(kk)
-                     alphak = palpha(kk)
+                     corek = pcore(k)
+                     valk = pval(k)
+                     alphak = palpha(k)
                      term1 = corei*corek
                      term1i = corek*vali
                      term2i = corek*dir
@@ -982,7 +981,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the real space part of the Ewald summation
 c
@@ -998,16 +997,16 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
@@ -1026,12 +1025,12 @@ c
          zd = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            xd = xd + dix + rpole(1,ii)*x(i)
-            yd = yd + diy + rpole(1,ii)*y(i)
-            zd = zd + diz + rpole(1,ii)*z(i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            xd = xd + dix + rpole(1,i)*x(i)
+            yd = yd + diy + rpole(1,i)*y(i)
+            zd = zd + diz + rpole(1,i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          e = term * (xd*xd+yd*yd+zd*zd)
@@ -1158,20 +1157,20 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1200,16 +1199,16 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1245,9 +1244,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -1387,20 +1386,20 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            ci = rpole(1,ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            qixx = rpole(5,ii)
-            qixy = rpole(6,ii)
-            qixz = rpole(7,ii)
-            qiyy = rpole(9,ii)
-            qiyz = rpole(10,ii)
-            qizz = rpole(13,ii)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            qixx = rpole(5,i)
+            qixy = rpole(6,i)
+            qixz = rpole(7,i)
+            qiyy = rpole(9,i)
+            qiyz = rpole(10,i)
+            qizz = rpole(13,i)
             if (use_chgpen) then
-               corei = pcore(ii)
-               vali = pval(ii)
-               alphai = palpha(ii)
+               corei = pcore(i)
+               vali = pval(i)
+               alphai = palpha(i)
             end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1432,16 +1431,16 @@ c
      &               mscale(k) = 1.0d0
                   if (r2 .le. off2) then
                      r = sqrt(r2)
-                     ck = rpole(1,kk)
-                     dkx = rpole(2,kk)
-                     dky = rpole(3,kk)
-                     dkz = rpole(4,kk)
-                     qkxx = rpole(5,kk)
-                     qkxy = rpole(6,kk)
-                     qkxz = rpole(7,kk)
-                     qkyy = rpole(9,kk)
-                     qkyz = rpole(10,kk)
-                     qkzz = rpole(13,kk)
+                     ck = rpole(1,k)
+                     dkx = rpole(2,k)
+                     dky = rpole(3,k)
+                     dkz = rpole(4,k)
+                     qkxx = rpole(5,k)
+                     qkxy = rpole(6,k)
+                     qkxz = rpole(7,k)
+                     qkyy = rpole(9,k)
+                     qkyz = rpole(10,k)
+                     qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1477,9 +1476,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                      if (use_chgpen) then
-                        corek = pcore(kk)
-                        valk = pval(kk)
-                        alphak = palpha(kk)
+                        corek = pcore(k)
+                        valk = pval(k)
+                        alphak = palpha(k)
                         term1 = corei*corek
                         term1i = corek*vali
                         term2i = corek*dir
@@ -1680,7 +1679,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole (pole,rpole)
+      call rotpole ('MPOLE')
 c
 c     compute the real space part of the Ewald summation
 c
@@ -1696,16 +1695,16 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          cii = ci*ci
          dii = dix*dix + diy*diy + diz*diz
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
@@ -1724,12 +1723,12 @@ c
          zd = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            dix = rpole(2,ii)
-            diy = rpole(3,ii)
-            diz = rpole(4,ii)
-            xd = xd + dix + rpole(1,ii)*x(i)
-            yd = yd + diy + rpole(1,ii)*y(i)
-            zd = zd + diz + rpole(1,ii)*z(i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            xd = xd + dix + rpole(1,i)*x(i)
+            yd = yd + diy + rpole(1,i)*y(i)
+            zd = zd + diz + rpole(1,i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          e = term * (xd*xd+yd*yd+zd*zd)
@@ -1784,7 +1783,7 @@ c
       use shunt
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       real*8 e,efull,f
       real*8 scalek
       real*8 xi,yi,zi
@@ -1865,20 +1864,20 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = rpole(1,ii)
-         dix = rpole(2,ii)
-         diy = rpole(3,ii)
-         diz = rpole(4,ii)
-         qixx = rpole(5,ii)
-         qixy = rpole(6,ii)
-         qixz = rpole(7,ii)
-         qiyy = rpole(9,ii)
-         qiyz = rpole(10,ii)
-         qizz = rpole(13,ii)
+         ci = rpole(1,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(ii)
-            vali = pval(ii)
-            alphai = palpha(ii)
+            corei = pcore(i)
+            vali = pval(i)
+            alphai = palpha(i)
          end if
 c
 c     set exclusion coefficients for connected atoms
@@ -1898,9 +1897,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kk = 1, nelst(i)
+            k = elst(kk,i)
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
@@ -1908,16 +1906,16 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             if (r2 .le. off2) then
                r = sqrt(r2)
-               ck = rpole(1,kk)
-               dkx = rpole(2,kk)
-               dky = rpole(3,kk)
-               dkz = rpole(4,kk)
-               qkxx = rpole(5,kk)
-               qkxy = rpole(6,kk)
-               qkxz = rpole(7,kk)
-               qkyy = rpole(9,kk)
-               qkyz = rpole(10,kk)
-               qkzz = rpole(13,kk)
+               ck = rpole(1,k)
+               dkx = rpole(2,k)
+               dky = rpole(3,k)
+               dkz = rpole(4,k)
+               qkxx = rpole(5,k)
+               qkxy = rpole(6,k)
+               qkxz = rpole(7,k)
+               qkyy = rpole(9,k)
+               qkyz = rpole(10,k)
+               qkzz = rpole(13,k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1953,9 +1951,9 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(kk)
-                  valk = pval(kk)
-                  alphak = palpha(kk)
+                  corek = pcore(k)
+                  valk = pval(k)
+                  alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
                   term2i = corek*dir
@@ -2124,6 +2122,7 @@ c
 c
       subroutine emrecip3
       use analyz
+      use atoms
       use bound
       use boxes
       use chgpot
@@ -2134,7 +2133,7 @@ c
       use mrecip
       use pme
       implicit none
-      integer i,j,k
+      integer i,j,k,ii
       integer k1,k2,k3
       integer m1,m2,m3
       integer ntot,nff
@@ -2154,17 +2153,17 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(cmp)) then
-         if (size(cmp) .lt. 10*npole)  deallocate (cmp)
+         if (size(cmp) .lt. 10*n)  deallocate (cmp)
       end if
       if (allocated(fmp)) then
-         if (size(fmp) .lt. 10*npole)  deallocate (fmp)
+         if (size(fmp) .lt. 10*n)  deallocate (fmp)
       end if
       if (allocated(fphi)) then
-         if (size(fphi) .lt. 20*npole)  deallocate (fphi)
+         if (size(fphi) .lt. 20*n)  deallocate (fphi)
       end if
-      if (.not. allocated(cmp))  allocate (cmp(10,npole))
-      if (.not. allocated(fmp))  allocate (fmp(10,npole))
-      if (.not. allocated(fphi))  allocate (fphi(20,npole))
+      if (.not. allocated(cmp))  allocate (cmp(10,n))
+      if (.not. allocated(fmp))  allocate (fmp(10,n))
+      if (.not. allocated(fphi))  allocate (fphi(20,n))
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -2183,7 +2182,8 @@ c
 c
 c     copy the multipole moments into local storage areas
 c
-      do i = 1, npole
+      do ii = 1, npole
+         i = ipole(ii)
          cmp(1,i) = rpole(1,i)
          cmp(2,i) = rpole(2,i)
          cmp(3,i) = rpole(3,i)
@@ -2265,12 +2265,12 @@ c
 c     increment the total permanent atomic multipole energy
 c
       e = 0.0d0
-      do i = 1, npole
-         j = ipole(i)
+      do ii = 1, npole
+         i = ipole(ii)
          do k = 1, 10
             term = f * fmp(k,i) * fphi(k,i)
             e = e + term
-            aem(j) = aem(j) + term
+            aem(i) = aem(i) + term
          end do
       end do
       em = em + e

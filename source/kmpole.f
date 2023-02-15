@@ -685,7 +685,7 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      if ((use_mpole .or. use_repuls) .and.
+      if ((use_mpole .or. use_repel) .and.
      &      .not.use_polar .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
@@ -694,19 +694,8 @@ c
                npole = npole + 1
                ipole(npole) = i
                pollist(i) = npole
-               zaxis(npole) = zaxis(i)
-               xaxis(npole) = xaxis(i)
-               yaxis(npole) = yaxis(i)
-               polaxe(npole) = polaxe(i)
-               do j = 1, maxpole
-                  pole(j,npole) = pole(j,i)
-               end do
-               mono0(npole) = pole(1,i)
+               mono0(i) = pole(1,i)
                if (palpha(i) .ne. 0.0d0)  ncp = ncp + 1
-               pcore(npole) = pcore(i)
-               pval(npole) = pval(i)
-               pval0(npole) = pval(i)
-               palpha(npole) = palpha(i)
             end if
          end do
       end if
