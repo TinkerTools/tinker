@@ -556,6 +556,7 @@ c
       use polar
       use polopt
       use polpot
+      use potent
       use units
       use usage
       implicit none
@@ -602,7 +603,11 @@ c
          if (use(i) .and. douind(i)) then
             k = k + 1
             do j = 1, 3
-               uxpt(j,i) = debye * uind(j,i)
+               if (use_solv) then
+                  uxpt(j,i) = debye * uinds(j,i)
+               else
+                  uxpt(j,i) = debye * uind(j,i)
+               end if
                rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**2
 c              rxpt = rxpt + (uxpt(j,i)-uexact(j,i))**6
             end do
