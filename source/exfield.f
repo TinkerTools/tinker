@@ -274,8 +274,8 @@ c
       if (mode .eq. 'CHARGE') then
          nec = nec + nion
          do ii = 1, nion
+            i = iion(ii)
             if (use(i)) then
-               i = iion(ii)
                xi = x(i)
                yi = y(i)
                zi = z(i)
