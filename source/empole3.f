@@ -17,8 +17,14 @@ c     multipole interactions, and partitions the energy among atoms
 c
 c
       subroutine empole3
+      use energi
+      use extfld
+      use inform
+      use iounit
       use limits
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
@@ -34,6 +40,26 @@ c
             call empole3b
          else
             call empole3a
+         end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield3 (mode,exf)
+         em = em + exf
+         if (verbose .and. exf.ne.0.0d0) then
+            if (digits .ge. 8) then
+               write (iout,10)  exf
+   10          format (/,' External Electric Field :',7x,f16.8)
+            else if (digits .ge. 6) then
+               write (iout,20)  exf
+   20          format (/,' External Electric Field :',7x,f16.6)
+            else
+               write (iout,30)  exf
+   30          format (/,' External Electric Field :',7x,f16.4)
+            end if
          end if
       end if
       return

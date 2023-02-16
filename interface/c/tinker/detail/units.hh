@@ -20,6 +20,7 @@ extern "C" {
 #define TINKER_MOD__evolt 27.21138602e0
 #define TINKER_MOD__efreq 2.194746314e+5
 #define TINKER_MOD__coulomb 332.063713e0
+#define TINKER_MOD__elefield 1439.96455e0
 #define TINKER_MOD__debye 4.80321e0
 #define TINKER_MOD__prescon 6.85684112e+4
 #ifdef __cplusplus

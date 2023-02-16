@@ -16,9 +16,13 @@ c     "echarge" calculates the charge-charge interaction energy
 c
 c
       subroutine echarge
+      use energi
+      use extfld
       use limits
       use warp
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -39,6 +43,14 @@ c
          call echarge0b
       else
          call echarge0a
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'CHARGE'
+         call exfield (mode,exf)
+         ec = ec + exf
       end if
       return
       end

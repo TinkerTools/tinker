@@ -23,6 +23,7 @@ c
       use ctrpot
       use dsppot
       use expol
+      use extfld
       use fields
       use ielscf
       use kanang
@@ -242,7 +243,7 @@ c
       if (.not. allocated(repulse))  allocate (repulse(maxclass))
       if (.not. allocated(biotyp))  allocate (biotyp(maxbio))
 c
-c     initialize values of some force field parameters
+c     initialize values of force field model parameters
 c
       forcefield = blank20
       do i = 1, maxtyp
@@ -376,6 +377,10 @@ c
       c5scale = 1.0d0
       neutnbr = .false.
       neutcut = .false.
+      use_exfld = .false.
+      do i = 1, 3
+         exfld(i) = 0.0d0
+      end do
 c
 c     set default control parameters for atomic multipole terms
 c
@@ -390,7 +395,7 @@ c
       d4scale = 1.0d0
       use_chgpen = .false.
 c
-c     set default control parameters for induced dipole terms
+c     set default control parameters for polarization terms
 c
       poltyp = 'MUTUAL'
       scrtyp = 'S2U'

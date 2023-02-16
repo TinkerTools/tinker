@@ -17,8 +17,12 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
+      use energi
+      use extfld
       use limits
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
@@ -35,6 +39,14 @@ c
          else
             call empole1a
          end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield1 (mode,exf)
+         em = em + exf
       end if
       return
       end

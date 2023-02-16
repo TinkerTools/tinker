@@ -17,9 +17,13 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine echarge1
+      use energi
+      use extfld
       use limits
       use warp
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -40,6 +44,14 @@ c
          call echarge1b
       else
          call echarge1a
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'CHARGE'
+         call exfield1 (mode,exf)
+         ec = ec + exf
       end if
       return
       end

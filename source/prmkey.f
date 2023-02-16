@@ -23,6 +23,7 @@ c
       use ctrpot
       use dsppot
       use expol
+      use extfld
       use fields
       use mplpot
       use polpot
@@ -30,10 +31,11 @@ c
       use reppot
       use rxnpot
       use torpot
+      use units
       use urypot
       use vdwpot
       implicit none
-      integer next
+      integer i,next
       character*4 value
       character*20 keyword
       character*240 text
@@ -396,6 +398,12 @@ c
          neutnbr = .true.
       else if (keyword(1:15) .eq. 'NEUTRAL-GROUPS ') then
          neutcut = .true.
+      else if (keyword(1:15) .eq. 'EXTERNAL-FIELD ') then
+         read (string,*,err=10,end=10)  (exfld(i),i=1,3)
+         use_exfld = .true.
+         do i = 1, 3
+            exfld(i) = exfld(i) / elefield
+         end do
 c
 c     set control parameters for atomic multipole potentials
 c

@@ -43,7 +43,7 @@ c
          call ebuck0a
       end if
 c
-c     apply long range van der Waals correction if desired
+c     apply the long range van der Waals correction if used
 c
       if (use_vcorr) then
          mode = 'VDW'

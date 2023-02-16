@@ -58,6 +58,7 @@ c     hartree     conversion from Hartree to kcal/mole
 c     evolt       conversion from Hartree to electron-volt
 c     efreq       conversion from Hartree to cm-1
 c     coulomb     conversion from electron**2/Ang to kcal/mole
+c     elefield    conversion from electron**2/Ang to megavolt/cm
 c     debye       conversion from electron-Ang to Debye
 c     prescon     conversion from kcal/mole/Ang**3 to Atm
 c
@@ -74,8 +75,9 @@ c
       real*8 joule,ekcal
       real*8 bohr,hartree
       real*8 evolt,efreq
-      real*8 coulomb,debye
-      real*8 prescon
+      real*8 coulomb
+      real*8 elefield
+      real*8 debye,prescon
       parameter (avogadro=6.02214076d+23)
       parameter (lightspd=2.99792458d-2)
       parameter (boltzmann=0.831446262d0)
@@ -91,6 +93,7 @@ c
       parameter (evolt=27.21138602d0)
       parameter (efreq=2.194746314d+5)
       parameter (coulomb=332.063713d0)
+      parameter (elefield=1439.96455d0)
       parameter (debye=4.80321d0)
       parameter (prescon=6.85684112d+4)
       save

@@ -17,9 +17,15 @@ c     and partitions the energy among the atoms
 c
 c
       subroutine echarge3
+      use energi
+      use extfld
+      use inform
+      use iounit
       use limits
       use warp
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -40,6 +46,26 @@ c
          call echarge3b
       else
          call echarge3a
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'CHARGE'
+         call exfield3 (mode,exf)
+         ec = ec + exf
+         if (verbose .and. exf.ne.0.0d0) then
+            if (digits .ge. 8) then
+               write (iout,10)  exf
+   10          format (/,' External Electric Field :',7x,f16.8)
+            else if (digits .ge. 6) then
+               write (iout,20)  exf
+   20          format (/,' External Electric Field :',7x,f16.6)
+            else
+               write (iout,30)  exf
+   30          format (/,' External Electric Field :',7x,f16.4)
+            end if
+         end if
       end if
       return
       end

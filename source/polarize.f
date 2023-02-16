@@ -89,25 +89,22 @@ c
 c     compute each column of the polarizability tensor
 c
       external = 0.01d0
-      do i = 1, 3
-         exfield(i) = 0.0d0
-      end do
       exfield(1) = external
+      exfield(2) = 0.0d0
+      exfield(3) = 0.0d0
       call moluind (exfield,umol)
       alpha(1,1) = (umol(1)-umol0(1)) / exfield(1)
       alpha(2,1) = (umol(2)-umol0(2)) / exfield(1)
       alpha(3,1) = (umol(3)-umol0(3)) / exfield(1)
-      do i = 1, 3
-         exfield(i) = 0.0d0
-      end do
+      exfield(1) = 0.0d0
       exfield(2) = external
+      exfield(3) = 0.0d0
       call moluind (exfield,umol)
       alpha(1,2) = (umol(1)-umol0(1)) / exfield(2)
       alpha(2,2) = (umol(2)-umol0(2)) / exfield(2)
       alpha(3,2) = (umol(3)-umol0(3)) / exfield(2)
-      do i = 1, 3
-         exfield(i) = 0.0d0
-      end do
+      exfield(1) = 0.0d0
+      exfield(2) = 0.0d0
       exfield(3) = external
       call moluind (exfield,umol)
       alpha(1,3) = (umol(1)-umol0(1)) / exfield(3)

@@ -42,6 +42,7 @@ add_library (tinkerObjF OBJECT
 ../source/energi.f
 ../source/ewald.f
 ../source/expol.f
+../source/extfld.f
 ../source/faces.f
 ../source/fft.f
 ../source/fields.f
@@ -340,6 +341,7 @@ add_library (tinkerObjF OBJECT
 ../source/eurey2.f
 ../source/eurey3.f
 ../source/evcorr.f
+../source/exfield.f
 ../source/extra.f
 ../source/extra1.f
 ../source/extra2.f

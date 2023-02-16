@@ -18,6 +18,7 @@ const double hartree = 627.5094736e0;
 const double evolt = 27.21138602e0;
 const double efreq = 2.194746314e+5;
 const double coulomb = 332.063713e0;
+const double elefield = 1439.96455e0;
 const double debye = 4.80321e0;
 const double prescon = 6.85684112e+4;
 } }

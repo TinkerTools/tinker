@@ -142,6 +142,7 @@ c
       subroutine induce0a
       use atoms
       use expol
+      use extfld
       use ielscf
       use inform
       use iounit
@@ -210,6 +211,18 @@ c
          call dfield0b (field,fieldp)
       else
          call dfield0a (field,fieldp)
+      end if
+c
+c     add external electric field to the direct field values
+c
+      if (use_exfld) then
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 3
+               field(j,i) = field(j,i) + exfld(j)
+               fieldp(j,i) = fieldp(j,i) + exfld(j)
+            end do
+         end do
       end if
 c
 c     modify polarizability to account for exchange polarization
@@ -4534,6 +4547,7 @@ c
 c
       subroutine induce0c
       use atoms
+      use extfld
       use inform
       use iounit
       use limits
@@ -4621,6 +4635,20 @@ c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
 c
       call dfield0d (field,fieldp,fields,fieldps)
+c
+c     add external electric field to the direct field values
+c
+      if (use_exfld) then
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 3
+               field(j,i) = field(j,i) + exfld(j)
+               fieldp(j,i) = fieldp(j,i) + exfld(j)
+               fields(j,i) = fields(j,i) + exfld(j)
+               fieldps(j,i) = fieldps(j,i) + exfld(j)
+            end do
+         end do
+      end if
 c
 c     set vacuum induced dipoles to polarizability times direct field;
 c     set SCRF induced dipoles to polarizability times direct field
@@ -5890,6 +5918,7 @@ c
 c
       subroutine induce0d
       use atoms
+      use extfld
       use inform
       use iounit
       use limits
@@ -5977,6 +6006,20 @@ c     compute the direct induced dipole moment at each atom, and
 c     another set that also includes RF due to permanent multipoles
 c
       call dfield0e (field,fieldp,fields,fieldps)
+c
+c     add external electric field to the direct field values
+c
+      if (use_exfld) then
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 3
+               field(j,i) = field(j,i) + exfld(j)
+               fieldp(j,i) = fieldp(j,i) + exfld(j)
+               fields(j,i) = fields(j,i) + exfld(j)
+               fieldps(j,i) = fieldps(j,i) + exfld(j)
+            end do
+         end do
+      end if
 c
 c     set vacuum induced dipoles to polarizability times direct field;
 c     SCRF induced dipoles are polarizability times direct field

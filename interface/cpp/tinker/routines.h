@@ -1343,6 +1343,20 @@ inline void tinker_f_evcorr1(tinker_fchars mode, double* elrc, double* vlrc) {
     return evcorr1_(mode.string, elrc, vlrc, mode.capacity);
 }
 
+// exfield.f
+void exfield_(char* mode, double* exf, tinker_fchar_len_t mode_cap);
+inline void tinker_f_exfield(tinker_fchars mode, double* exf) {
+    return exfield_(mode.string, exf, mode.capacity);
+}
+void exfield1_(char* mode, double* exf, tinker_fchar_len_t mode_cap);
+inline void tinker_f_exfield1(tinker_fchars mode, double* exf) {
+    return exfield1_(mode.string, exf, mode.capacity);
+}
+void exfield3_(char* mode, double* exf, tinker_fchar_len_t mode_cap);
+inline void tinker_f_exfield3(tinker_fchars mode, double* exf) {
+    return exfield3_(mode.string, exf, mode.capacity);
+}
+
 // extra.f
 void extra_();
 #define tinker_f_extra extra_

@@ -409,7 +409,9 @@ OBJS =	action.o \
 	eurey3.o \
 	evcorr.o \
 	ewald.o \
+	exfield.o \
 	expol.o \
+	extfld.o \
 	extra.o \
 	extra1.o \
 	extra2.o \
@@ -527,6 +529,7 @@ OBJS =	action.o \
 	kpitor.o \
 	kpitors.o \
 	kpolar.o \
+	kpolpr.o \
 	kpolr.o \
 	krepel.o \
 	krepl.o \
@@ -1340,7 +1343,9 @@ libtinker.a: ${OBJS}
 	eurey3.o \
 	evcorr.o \
 	ewald.o \
+	exfield.o \
 	expol.o \
+	extfld.o \
 	extra.o \
 	extra1.o \
 	extra2.o \
@@ -1454,6 +1459,7 @@ libtinker.a: ${OBJS}
 	kpitor.o \
 	kpitors.o \
 	kpolar.o \
+	kpolpr.o \
 	kpolr.o \
 	krepel.o \
 	krepl.o \
@@ -1765,10 +1771,10 @@ ebuck.o: atomid.o atoms.o bound.o boxes.o cell.o couple.o energi.o group.o iouni
 ebuck1.o: atomid.o atoms.o bound.o boxes.o cell.o couple.o deriv.o energi.o group.o iounit.o light.o limits.o math.o neigh.o shunt.o usage.o vdw.o vdwpot.o virial.o warp.o
 ebuck2.o: atomid.o atoms.o bound.o cell.o couple.o group.o hessn.o iounit.o math.o shunt.o vdw.o vdwpot.o warp.o
 ebuck3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o couple.o energi.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o shunt.o usage.o vdw.o vdwpot.o warp.o
-echarge.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o group.o iounit.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o warp.o
-echarge1.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o group.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o virial.o warp.o
+echarge.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o extfld.o group.o iounit.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o warp.o
+echarge1.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o energi.o ewald.o extfld.o group.o light.o limits.o math.o neigh.o pme.o shunt.o usage.o virial.o warp.o
 echarge2.o: atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o deriv.o ewald.o group.o hessn.o limits.o math.o neigh.o pme.o shunt.o warp.o
-echarge3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o pme.o shunt.o usage.o warp.o
+echarge3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o charge.o chgpot.o couple.o energi.o ewald.o extfld.o group.o inform.o inter.o iounit.o light.o limits.o math.o molcul.o neigh.o pme.o shunt.o usage.o warp.o
 echgdpl.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o energi.o group.o shunt.o units.o usage.o
 echgdpl1.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o deriv.o dipole.o energi.o group.o shunt.o units.o usage.o virial.o
 echgdpl2.o: atoms.o bound.o cell.o charge.o chgpot.o couple.o dipole.o group.o hessn.o shunt.o units.o
@@ -1818,10 +1824,10 @@ emm3hb.o: atmlst.o atomid.o atoms.o bndstr.o bound.o boxes.o cell.o chgpot.o cou
 emm3hb1.o: atmlst.o atomid.o atoms.o bndstr.o bound.o boxes.o cell.o chgpot.o couple.o deriv.o energi.o group.o light.o limits.o neigh.o shunt.o usage.o vdw.o vdwpot.o virial.o
 emm3hb2.o: atmlst.o atomid.o atoms.o bndstr.o bound.o cell.o chgpot.o couple.o group.o hessn.o shunt.o vdw.o vdwpot.o
 emm3hb3.o: action.o analyz.o atmlst.o atomid.o atoms.o bndstr.o bound.o boxes.o cell.o chgpot.o couple.o energi.o group.o inform.o inter.o iounit.o light.o limits.o molcul.o neigh.o shunt.o usage.o vdw.o vdwpot.o
-empole.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o group.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o polpot.o shunt.o usage.o
-empole1.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o energi.o ewald.o group.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o usage.o virial.o
+empole.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o extfld.o group.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o polpot.o shunt.o usage.o
+empole1.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o energi.o ewald.o extfld.o group.o limits.o math.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o usage.o virial.o
 empole2.o: atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o deriv.o energi.o group.o hessn.o limits.o molcul.o mplpot.o mpole.o potent.o shunt.o usage.o
-empole3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o group.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o usage.o
+empole3.o: action.o analyz.o atomid.o atoms.o bound.o boxes.o cell.o chgpen.o chgpot.o couple.o energi.o ewald.o extfld.o group.o inform.o inter.o iounit.o limits.o math.o molcul.o mplpot.o mpole.o mrecip.o neigh.o pme.o potent.o shunt.o usage.o
 energi.o:
 energy.o: energi.o iounit.o limits.o potent.o rigid.o vdwpot.o
 eopbend.o: angbnd.o angpot.o atoms.o bound.o energi.o fields.o group.o math.o opbend.o usage.o
@@ -1875,7 +1881,9 @@ eurey2.o: atoms.o bound.o couple.o group.o hessn.o urey.o urypot.o
 eurey3.o: action.o analyz.o atomid.o atoms.o bound.o energi.o group.o inform.o iounit.o urey.o urypot.o usage.o
 evcorr.o: atomid.o atoms.o bound.o boxes.o kdsp.o limits.o math.o mutant.o potent.o shunt.o vdw.o vdwpot.o
 ewald.o:
+exfield.o: action.o analyz.o atoms.o charge.o chgpot.o deriv.o energi.o extfld.o mpole.o usage.o virial.o
 expol.o:
+extfld.o:
 extra.o: energi.o
 extra1.o: atoms.o deriv.o energi.o
 extra2.o: atoms.o hessn.o
@@ -1932,12 +1940,12 @@ image.o: boxes.o cell.o math.o
 impose.o: align.o inform.o iounit.o
 improp.o:
 imptor.o:
-induce.o: atoms.o bound.o boxes.o cell.o chgpen.o couple.o ewald.o expol.o gkstuf.o group.o ielscf.o inform.o iounit.o limits.o math.o mplpot.o mpole.o neigh.o openmp.o pbstuf.o pme.o polar.o polgrp.o polopt.o polpcg.o polpot.o potent.o shunt.o solpot.o solute.o tarray.o units.o uprior.o
+induce.o: atoms.o bound.o boxes.o cell.o chgpen.o couple.o ewald.o expol.o extfld.o gkstuf.o group.o ielscf.o inform.o iounit.o limits.o math.o mplpot.o mpole.o neigh.o openmp.o pbstuf.o pme.o polar.o polgrp.o polopt.o polpcg.o polpot.o potent.o shunt.o solpot.o solute.o tarray.o units.o uprior.o
 inertia.o: atomid.o atoms.o iounit.o math.o
 inform.o:
 initatom.o: ptable.o
 initial.o: align.o atoms.o bath.o bound.o boxes.o cell.o fft.o files.o group.o inform.o iounit.o keys.o linmin.o minima.o molcul.o mutant.o neigh.o openmp.o output.o params.o pdb.o rigid.o scales.o sequen.o socket.o virial.o warp.o zclose.o
-initprm.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o expol.o fields.o ielscf.o kanang.o kangs.o kantor.o katoms.o kbonds.o kcflux.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o kexpl.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolpr.o kpolr.o krepl.o ksolut.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o reppot.o rxnpot.o sizes.o solpot.o solute.o torpot.o units.o uprior.o urypot.o vdwpot.o
+initprm.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o expol.o extfld.o fields.o ielscf.o kanang.o kangs.o kantor.o katoms.o kbonds.o kcflux.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o kexpl.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolpr.o kpolr.o krepl.o ksolut.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o math.o merck.o mplpot.o polpot.o reppot.o rxnpot.o sizes.o solpot.o solute.o torpot.o units.o uprior.o urypot.o vdwpot.o
 initres.o: resdue.o
 initrot.o: atoms.o couple.o group.o inform.o iounit.o math.o omega.o potent.o restrn.o rotbnd.o usage.o zcoord.o
 insert.o: atomid.o atoms.o couple.o inform.o iounit.o
@@ -2109,7 +2117,7 @@ potfit.o: sizes.o
 predict.o: atomid.o atoms.o ielscf.o keys.o polar.o uprior.o
 pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o math.o mdstuf.o molcul.o moldyn.o units.o usage.o virial.o
 prmedit.o: angpot.o bndpot.o iounit.o math.o params.o sizes.o urypot.o vdwpot.o
-prmkey.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o expol.o fields.o mplpot.o polpot.o potent.o reppot.o rxnpot.o torpot.o urypot.o vdwpot.o
+prmkey.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o expol.o extfld.o fields.o mplpot.o polpot.o potent.o reppot.o rxnpot.o torpot.o units.o urypot.o vdwpot.o
 promo.o: iounit.o
 protein.o: atomid.o atoms.o couple.o files.o group.o inform.o iounit.o katoms.o math.o molcul.o output.o phipsi.o potent.o resdue.o restrn.o rigid.o sequen.o titles.o usage.o
 prtarc.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o output.o titles.o usage.o

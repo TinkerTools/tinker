@@ -120,24 +120,24 @@ set(_FILES
     erxnfld1 erxnfld2 erxnfld3 esolv esolv1 esolv2 esolv3 estrbnd
     estrbnd1 estrbnd2 estrbnd3 estrtor estrtor1 estrtor2 estrtor3 etors
     etors1 etors2 etors3 etortor etortor1 etortor2 etortor3 eurey eurey1
-    eurey2 eurey3 evcorr ewald expol extra extra1 extra2 extra3 faces
-    fatal fft fft3d fftpack field fields files final flatten fracs
-    freeunit freeze geometry getarc getcart getdcd getint getkey getmol
-    getmol2 getnumb getpdb getprm getref getstring gettext getword getxyz
-    ghmcstep gkstuf gradient gradrgd gradrot group groups grpline gyrate
-    hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image impose
-    improp imptor induce inertia inform initatom initial initprm initres
-    initrot insert inter invbeta invert iounit jacobi kanang kangang
-    kangle kangs kangtor kantor katom katoms kbond kbonds kcflux kcharge
-    kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp kewald
-    kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic kiprop
-    kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst korbit
-    korbs kpitor kpitors kpolar kpolpr kpolr krepel krepl ksolut ksolv
-    kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor kurey kurybr
-    kvdw kvdwpr kvdws lattice lbfgs light lights limits linmin lusolve
-    makeint makeref makexyz math maxwell mdinit mdrest mdsave mdstat
-    mdstuf mechanic merck merge minima molcul moldyn molecule moment
-    moments mplpot mpole mrecip mutant mutate nblist neigh nextarg
+    eurey2 eurey3 evcorr ewald exfield expol extfld extra extra1 extra2
+    extra3 faces fatal fft fft3d fftpack field fields files final flatten
+    fracs freeunit freeze geometry getarc getcart getdcd getint getkey
+    getmol getmol2 getnumb getpdb getprm getref getstring gettext getword
+    getxyz ghmcstep gkstuf gradient gradrgd gradrot group groups grpline
+    gyrate hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image
+    impose improp imptor induce inertia inform initatom initial initprm
+    initres initrot insert inter invbeta invert iounit jacobi kanang
+    kangang kangle kangs kangtor kantor katom katoms kbond kbonds kcflux
+    kcharge kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp
+    kewald kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic
+    kiprop kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst
+    korbit korbs kpitor kpitors kpolar kpolpr kpolr krepel krepl ksolut
+    ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor kurey
+    kurybr kvdw kvdwpr kvdws lattice lbfgs light lights limits linmin
+    lusolve makeint makeref makexyz math maxwell mdinit mdrest mdsave
+    mdstat mdstuf mechanic merck merge minima molcul moldyn molecule
+    moment moments mplpot mpole mrecip mutant mutate nblist neigh nextarg
     nexttext nonpol nose nspline nucleo number numeral numgrad ocvm omega
     opbend opdist openend openmp optinit optsave orbital orbits orient
     orthog output overlap params paths pbstuf pdb phipsi picalc piorbs
