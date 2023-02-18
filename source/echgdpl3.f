@@ -38,7 +38,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer i1,k1,k2
+      integer ii,k1,k2
       integer, allocatable :: skip(:)
       real*8 e,rk2,rkr3,dotk
       real*8 taper,fgrp
@@ -91,15 +91,15 @@ c
 c
 c     get the total energy by looping over each charge-dipole pair
 c
-      do i = 1, nion
-         i1 = iion(i)
-         skip(i1) = i1
-         do k = 1, n12(i1)
-            skip(i12(k,i1)) = i1
+      do ii = 1, nion
+         i = iion(ii)
+         skip(i) = i
+         do k = 1, n12(i)
+            skip(i12(k,i)) = i
          end do
-         xi = x(i1)
-         yi = y(i1)
-         zi = z(i1)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          fi = f * pchg(i)
 c
 c     decide whether to compute the current interaction
@@ -108,10 +108,10 @@ c
             k1 = idpl(1,k)
             k2 = idpl(2,k)
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i1,k1,k2,0,0,0)
-            if (proceed)  proceed = (use(i1) .or. use(k1) .or. use(k2))
-            if (proceed)  proceed = (skip(k1).ne.i1 .and.
-     &                                 skip(k2).ne.i1)
+            if (use_group)  call groups (proceed,fgrp,i,k1,k2,0,0,0)
+            if (proceed)  proceed = (use(i) .or. use(k1) .or. use(k2))
+            if (proceed)  proceed = (skip(k1).ne.i .and.
+     &                                 skip(k2).ne.i)
 c
 c     compute the energy contribution for this interaction
 c
@@ -151,13 +151,13 @@ c     increment the overall charge-dipole energy component
 c
                   necd = necd + 1
                   ecd = ecd + e
-                  aecd(i1) = aecd(i1) + 0.5d0*e
+                  aecd(i) = aecd(i) + 0.5d0*e
                   aecd(k1) = aecd(k1) + 0.25d0*e
                   aecd(k2) = aecd(k2) + 0.25d0*e
 c
 c     increment the total intermolecular energy
 c
-                  if (molcule(i1) .ne. molcule(k1)) then
+                  if (molcule(i) .ne. molcule(k1)) then
                      einter = einter + e
                   end if
 c
@@ -173,7 +173,7 @@ c
      &                          //,' Type',11x,'Charge',10x,'Dipole',
      &                             20x,'Distance',6x,'Energy',/)
                      end if
-                     write (iout,30)  i1,name(i1),k1,name(k1),
+                     write (iout,30)  i,name(i),k1,name(k1),
      &                                k2,name(k2),sqrt(r2),e
    30                format (' Chg-Dpl',3x,3(i7,'-',a3),
      &                          11x,f11.4,f12.4)
@@ -190,15 +190,15 @@ c
 c
 c     calculate interaction energy with other unit cells
 c
-      do i = 1, nion
-         i1 = iion(i)
-         skip(i1) = i1
-         do k = 1, n12(i1)
-            skip(i12(k,i1)) = i1
+      do ii = 1, nion
+         i = iion(ii)
+         skip(i) = i
+         do k = 1, n12(i)
+            skip(i12(k,i)) = i
          end do
-         xi = x(i1)
-         yi = y(i1)
-         zi = z(i1)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          fi = f * pchg(i)
 c
 c     decide whether to compute the current interaction
@@ -207,8 +207,8 @@ c
             k1 = idpl(1,k)
             k2 = idpl(2,k)
             proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i1,k1,k2,0,0,0)
-            if (proceed)  proceed = (use(i1) .or. use(k1) .or. use(k2))
+            if (use_group)  call groups (proceed,fgrp,i,k1,k2,0,0,0)
+            if (proceed)  proceed = (use(i) .or. use(k1) .or. use(k2))
 c
 c     compute the energy contribution for this interaction
 c
@@ -226,7 +226,7 @@ c
                      fik = fi * bdpl(k)
                      if (use_polymer) then
                         if (r2 .lt. polycut2) then
-                           if (skip(k1).eq.i1 .or. skip(k2).ne.i1)
+                           if (skip(k1).eq.i .or. skip(k2).ne.i)
      &                        fik = 0.0d0
                         end if
                      end if
@@ -255,7 +255,7 @@ c     increment the overall charge-dipole energy component
 c
                      if (e .ne. 0.0d0)  necd = necd + 1
                      ecd = ecd + e
-                     aecd(i1) = aecd(i1) + 0.5d0*e
+                     aecd(i) = aecd(i) + 0.5d0*e
                      aecd(k1) = aecd(k1) + 0.25d0*e
                      aecd(k2) = aecd(k2) + 0.25d0*e
 c
@@ -276,7 +276,7 @@ c
      &                             //,' Type',11x,'Charge',10x,'Dipole',
      &                                20x,'Distance',6x,'Energy',/)
                         end if
-                        write (iout,50)  i1,name(i1),k1,name(k1),
+                        write (iout,50)  i,name(i),k1,name(k1),
      &                                   k2,name(k2),sqrt(r2),e
    50                   format (' Chg-Dpl',3x,3(i7,'-',a3),
      &                             2x,'(XTAL)',3x,f11.4,f12.4)

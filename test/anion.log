@@ -61,9 +61,11 @@
            4                4.5350         0.0985          0.000
            5                4.6237         0.0900          0.000
 
- Free Energy Perturbation :          1.000 Lambda for Torsional Angles
  Free Energy Perturbation :          1.000 Lambda for van der Waals
  Free Energy Perturbation :          1.000 Lambda for Electrostatics
+ Free Energy Perturbation :          1.000 Lambda for Torsional Angles
+
+ Restarting Molecular Dynamics Using :  anion.dyn
 
  Molecular Dynamics Trajectory via Velocity Verlet Algorithm
 
@@ -5592,9 +5594,9 @@
            4                4.5350         0.0985          0.000
            5                4.6237         0.0900          0.000
 
- Free Energy Perturbation :          1.000 Lambda for Torsional Angles
  Free Energy Perturbation :          1.000 Lambda for van der Waals
  Free Energy Perturbation :          1.000 Lambda for Electrostatics
+ Free Energy Perturbation :          1.000 Lambda for Torsional Angles
 
  Numbers of First and Last File to Analyze :  
  Enter the Lambda Increment for FEP :  
@@ -5607,14 +5609,15 @@
 
  Hybrid van der Waals Parameters :
 
-       Atom Number    Radius     Epsilon
-             1        4.5350      0.0985
+     Atom Number              Size        Epsilon
+
+           1                4.5350         0.0985
 
  Hybrid Atomic Partial Charge Parameters :
 
-       Atom Number       Charge
+     Atom Number            Charge
 
-             1           -1.000
+           1               -1.0000
 
   Step       EB         EA        EIT         ET          EV          EC
 
@@ -5643,14 +5646,15 @@
 
  Hybrid van der Waals Parameters :
 
-       Atom Number    Radius     Epsilon
-             1        4.6237      0.0900
+     Atom Number              Size        Epsilon
+
+           1                4.6237         0.0900
 
  Hybrid Atomic Partial Charge Parameters :
 
-       Atom Number       Charge
+     Atom Number            Charge
 
-             1           -1.000
+           1               -1.0000
 
   Step       EB         EA        EIT         ET          EV          EC
 
@@ -5679,14 +5683,15 @@
 
  Hybrid van der Waals Parameters :
 
-       Atom Number    Radius     Epsilon
-             1        4.4463      0.1070
+     Atom Number              Size        Epsilon
+
+           1                4.4463         0.1070
 
  Hybrid Atomic Partial Charge Parameters :
 
-       Atom Number       Charge
+     Atom Number            Charge
 
-             1           -1.000
+           1               -1.0000
 
   Step       EB         EA        EIT         ET          EV          EC
 

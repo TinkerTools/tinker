@@ -177,7 +177,7 @@ c
          h1 = 0.01d0
          hmin = 0.0d0
          write (iout,100)
-  100    format (//,' Gaussian Density Annealing Global Optimization :',
+  100    format (/,' Gaussian Density Annealing Global Optimization :',
      &           //,' BS Step',5x,'Log(Beta)',6x,'Energy',
      &              9x,'Rg',8x,'Log(M2)',7x,'Status',/)
          call gdastat (nstep,bstart,xx,status)

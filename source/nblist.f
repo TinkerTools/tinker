@@ -255,7 +255,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(i,k,xi,yi,zi,xr,yr,zr,r2)
+!$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
 !$OMP DO schedule(guided)
 c
 c     store coordinates to reflect update of the site

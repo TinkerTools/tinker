@@ -113,7 +113,7 @@ c
          xi = x(i1)
          yi = y(i1)
          zi = z(i1)
-         fi = f * pchg(ii)
+         fi = f * pchg(i1)
 c
 c     decide whether to compute the current interaction
 c
@@ -395,7 +395,7 @@ c
                if (r2 .le. off2) then
                   rkr3 = sqrt(rk2*r2) * r2
                   dotk = xk*xr + yk*yr + zk*zr
-                  fik = fk * pchg(ii)
+                  fik = fk * pchg(i1)
 c
 c     scale the interaction based on its group membership
 c
@@ -772,7 +772,7 @@ c
          xi = x(i1)
          yi = y(i1)
          zi = z(i1)
-         fi = f * pchg(ii)
+         fi = f * pchg(i1)
 c
 c     decide whether to compute the current interaction
 c
@@ -1060,7 +1060,7 @@ c
                   if (r2 .le. off2) then
                      rkr3 = sqrt(rk2*r2) * r2
                      dotk = xk*xr + yk*yr + zk*zr
-                     fik = fk * pchg(ii)
+                     fik = fk * pchg(i1)
                      if (use_polymer) then
                         if (r2 .lt. polycut2) then
                            if (omit(i1) .ne. k)  fik = 0.0d0

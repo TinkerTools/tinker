@@ -123,7 +123,7 @@
  TNCG  --  Normal Termination due to SmallGrad
 
  Final Function Value :           19.2176
- Final RMS Gradient :          0.7349D-05
+ Final RMS Gradient :          0.7350D-05
  Final Gradient Norm :         0.3118D-04
 
      ######################################################################
@@ -190,55 +190,55 @@
  Path Point :           1
  Initial Point :                 20.8539
  Optimized Point :                9.0902
- Target-Energy Difference :    0.178D-14
+ Target-Energy Difference :   -0.178D-14
  Gradient along Path :            4.7502
 
  Path Point :           2
  Initial Point :                 19.3025
  Optimized Point :               11.6198
- Target-Energy Difference :    0.711D-14
+ Target-Energy Difference :   -0.533D-14
  Gradient along Path :            6.9728
 
  Path Point :           3
  Initial Point :                 18.5254
  Optimized Point :               14.5913
- Target-Energy Difference :    0.000D+00
+ Target-Energy Difference :   -0.178D-14
  Gradient along Path :            6.9556
 
  Path Point :           4
  Initial Point :                 18.6124
  Optimized Point :               17.1806
- Target-Energy Difference :   -0.107D-13
+ Target-Energy Difference :    0.000D+00
  Gradient along Path :            5.2368
 
  Path Point :           5
  Initial Point :                 19.0138
  Optimized Point :               18.8095
- Target-Energy Difference :   -0.107D-13
+ Target-Energy Difference :   -0.711D-14
  Gradient along Path :            2.4642
 
  Path Point :           6
  Initial Point :                 19.3476
  Optimized Point :               19.1908
  Target-Energy Difference :    0.000D+00
- Gradient along Path :           -0.6222
+ Gradient along Path :           -0.6223
 
  Path Point :           7
  Initial Point :                 19.4698
  Optimized Point :               18.3564
- Target-Energy Difference :    0.711D-14
+ Target-Energy Difference :    0.178D-13
  Gradient along Path :           -3.2359
 
  Path Point :           8
  Initial Point :                 19.5348
  Optimized Point :               16.6715
- Target-Energy Difference :   -0.107D-13
+ Target-Energy Difference :    0.249D-13
  Gradient along Path :           -4.5667
 
  Path Point :           9
  Initial Point :                 20.0277
  Optimized Point :               14.8481
- Target-Energy Difference :    0.888D-14
+ Target-Energy Difference :    0.249D-13
  Gradient along Path :           -3.7427
 
      ######################################################################

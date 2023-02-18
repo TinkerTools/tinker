@@ -82,13 +82,13 @@ c
       mode = 'DISP'
       call switch (mode)
 c
-c     check to see if the atom of interest is a vdw site
+c     check to see if atom of interest is a dispersion site
 c
       nlist = 0
       do k = 1, ndisp
          if (idisp(k) .eq. iatom) then
             nlist = nlist + 1
-            list(nlist) = k
+            list(nlist) = iatom
             goto 10
          end if
       end do
@@ -97,14 +97,13 @@ c
 c
 c     calculate the dispersion energy Hessian elements
 c
-      do iii = 1, nlist
-         ii = list(iii)
-         i = idisp(ii)
+      do ii = 1, nlist
+         i = list(ii)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -126,8 +125,8 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = 1, ndisp
             k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+            ck = csix(k)
+            ak = adisp(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (k .ne. i)
@@ -284,14 +283,13 @@ c
 c
 c     calculate interaction energy with other unit cells
 c
-      do iii = 1, nlist
-         ii = list(iii)
-         i = idisp(ii)
+      do ii = 1, nlist
+         i = list(ii)
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          usei = use(i)
 c
 c     set exclusion coefficients for connected atoms
@@ -313,8 +311,8 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = 1, ndisp
             k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+            ck = csix(k)
+            ak = adisp(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -420,7 +418,7 @@ c
                         de = de * fgrp
                         d2e = d2e * fgrp
                      end if
-                     if (ii .eq. kk) then
+                     if (i .eq. k) then
                         de = 0.5d0 * de
                         d2e = 0.5d0 * d2e
                      end if

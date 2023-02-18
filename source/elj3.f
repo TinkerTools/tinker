@@ -203,6 +203,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -211,7 +212,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)
@@ -361,6 +361,7 @@ c
          do kk = ii, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -369,7 +370,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                do j = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
@@ -677,6 +677,7 @@ c
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kv = ired(k)
+            kt = jvdw(k)
             mutk = mut(k)
             prime = (kk .le. nvdw)
 c
@@ -689,7 +690,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xsort(j)
                yr = yi - ysort(kgy)
                zr = zi - zsort(kgz)
@@ -942,7 +942,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,kred,
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,v2scale,v3scale,v4scale,v5scale,use_group,off2,radmin,
 !$OMP& epsilon,radmin4,epsilon4,vcouple,vlambda,mut,cut2,c0,c1,
@@ -980,9 +980,10 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kk = 1, nvlst(ii)
-            k = ivdw(vlst(kk,ii))
+         do kk = 1, nvlst(i)
+            k = vlst(kk,i)
             kv = ired(k)
+            kt = jvdw(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -991,7 +992,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)
@@ -1280,6 +1280,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -1287,7 +1288,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)

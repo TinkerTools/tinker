@@ -369,7 +369,9 @@ c
       integer i,j,k
       integer init,stop
       integer ixtal,prmtyp
-      integer atom1,atom2
+      integer it,kt,itm,ktm
+      integer nlist
+      integer, allocatable :: list(:)
       real*8 rd,ep
       real*8 sixth,weigh
       real*8 xmid,ymid,zmid
@@ -443,121 +445,143 @@ c
          e0_lattice = e0_lattices(ixtal)
       end if
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (list(n))
+c
+c     set type or class index into condensed pair matrices
+c
+      nlist = n
+      do i = 1, n
+         list(i) = 0
+         if (vdwindex .eq. 'TYPE') then
+            list(i) = type(i)
+         else
+            list(i) = class(i)
+         end if
+      end do
+      call sort8 (nlist,list)
+c
 c     store or reset values of the optimization variables
 c
       do j = 1, nvary
          prmtyp = ivary(j)
-         atom1 = vary(1,j)
+         it = vary(1,j)
          if (prmtyp .eq. 1) then
             if (mode .eq. 'STORE') then
-               xx(j) = rad(atom1)
+               xx(j) = rad(it)
             else if (mode .eq. 'RESET') then
-               rad(atom1) = xx(j)
-               do i = 1, maxclass
-                  if (rad(i).eq.0.0d0 .and. rad(atom1).eq.0.0d0) then
+               itm = mvdw(it)
+               rad(it) = xx(j)
+               do k = 1, nlist
+                  kt = list(k)
+                  ktm = mvdw(kt)
+                  if (rad(it).eq.0.0d0 .and. rad(kt).eq.0.0d0) then
                      rd = 0.0d0
                   else if (radrule(1:10) .eq. 'ARITHMETIC') then
-                     rd = rad(i) + rad(atom1)
+                     rd = rad(it) + rad(kt)
                   else if (radrule(1:9) .eq. 'GEOMETRIC') then
-                     rd = 2.0d0 * sqrt(rad(i) * rad(atom1))
+                     rd = 2.0d0 * sqrt(rad(it) * rad(kt))
                   else if (radrule(1:10) .eq. 'CUBIC-MEAN') then
-                     rd = 2.0d0 * (rad(i)**3+rad(atom1)**3)
-     &                       / (rad(i)**2+rad(atom1)**2)
+                     rd = 2.0d0 * (rad(it)**3+rad(kt)**3)
+     &                       / (rad(it)**2+rad(kt)**2)
                   else
-                     rd = rad(i) + rad(atom1)
+                     rd = rad(it) + rad(kt)
                   end if
-                  radmin(i,atom1) = rd
-                  radmin(atom1,i) = rd
+                  radmin(itm,ktm) = rd
+                  radmin(ktm,itm) = rd
                end do
             end if
          else if (prmtyp .eq. 2) then
             if (mode .eq. 'STORE') then
-               xx(j) = eps(atom1)
+               xx(j) = eps(it)
             else if (mode .eq. 'RESET') then
-               eps(atom1) = abs(xx(j))
-               do i = 1, maxclass
-                  if (eps(i).eq.0.0d0 .and. eps(atom1).eq.0.0d0) then
+               itm = mvdw(it)
+               eps(it) = abs(xx(j))
+               do k = 1, nlist
+                  kt = list(k)
+                  ktm = mvdw(kt)
+                  if (eps(it).eq.0.0d0 .and. eps(kt).eq.0.0d0) then
                      ep = 0.0d0
                   else if (epsrule(1:10) .eq. 'ARITHMETIC') then
-                     ep = 0.5d0 * (eps(i) + eps(atom1))
+                     ep = 0.5d0 * (eps(it) + eps(kt))
                   else if (epsrule(1:9) .eq. 'GEOMETRIC') then
-                     ep = sqrt(eps(i) * eps(atom1))
+                     ep = sqrt(eps(it) * eps(kt))
                   else if (epsrule(1:8) .eq. 'HARMONIC') then
-                     ep = 2.0d0 * (eps(i)*eps(atom1))
-     &                       / (eps(i)+eps(atom1))
+                     ep = 2.0d0 * (eps(it)*eps(kt)) / (eps(it)+eps(kt))
                   else if (epsrule(1:3) .eq. 'HHG') then
-                     ep = 4.0d0 * (eps(i)*eps(atom1))
-     &                      / (sqrt(eps(i))+sqrt(eps(atom1)))**2
+                     ep = 4.0d0 * (eps(it)*eps(kt))
+     &                      / (sqrt(eps(it))+sqrt(eps(kt)))**2
                   else
-                     ep = sqrt(eps(i) * eps(atom1))
+                     ep = sqrt(eps(it) * eps(kt))
                   end if
-                  epsilon(i,atom1) = ep
-                  epsilon(atom1,i) = ep
+                  epsilon(itm,ktm) = ep
+                  epsilon(ktm,itm) = ep
                end do
             end if
          else if (prmtyp .eq. 3) then
             if (mode .eq. 'STORE') then
                do i = 1, n
-                  if (class(i) .eq. atom1) then
+                  if (class(i) .eq. it) then
                      xx(j) = kred(i)
                      goto 10
                   end if
                end do
             else if (mode .eq. 'RESET') then
                do i = 1, n
-                  if (class(i) .eq. atom1)  kred(i) = xx(j)
+                  if (class(i) .eq. it)  kred(i) = xx(j)
                end do
             end if
          else if (prmtyp .eq. 4) then
             if (mode .eq. 'STORE') then
                do i = 1, nion
-                  if (type(iion(i)) .eq. atom1) then
+                  if (type(iion(i)) .eq. it) then
                      xx(j) = pchg(i)
                      goto 10
                   end if
                end do
             else if (mode .eq. 'RESET') then
                do i = 1, nion
-                  if (type(iion(i)) .eq. atom1)  pchg(i) = xx(j)
+                  if (type(iion(i)) .eq. it)  pchg(i) = xx(j)
                end do
             end if
          else if (prmtyp .eq. 5) then
-            atom2 = vary(2,j)
+            kt = vary(2,j)
             if (mode .eq. 'STORE') then
                do i = 1, ndipole
-                  if (type(idpl(1,i)).eq.atom1 .and.
-     &                type(idpl(2,i)).eq.atom2) then
+                  if (type(idpl(1,i)).eq.it .and.
+     &                type(idpl(2,i)).eq.kt) then
                      xx(j) = bdpl(i)
                      goto 10
                   end if
                end do
             else if (mode .eq. 'RESET') then
                do i = 1, ndipole
-                  if (type(idpl(1,i)).eq.atom1 .and.
-     &                type(idpl(2,i)).eq.atom2)  bdpl(i) = xx(j)
+                  if (type(idpl(1,i)).eq.it .and.
+     &                type(idpl(2,i)).eq.kt)  bdpl(i) = xx(j)
                end do
             end if
          else if (prmtyp .eq. 6) then
-            atom2 = vary(2,j)
+            kt = vary(2,j)
             if (mode .eq. 'STORE') then
                do i = 1, ndipole
-                  if (type(idpl(1,i)).eq.atom1 .and.
-     &                type(idpl(2,i)).eq.atom2) then
+                  if (type(idpl(1,i)).eq.it .and.
+     &                type(idpl(2,i)).eq.kt) then
                      xx(j) = sdpl(i)
                      goto 10
                   end if
                end do
             else if (mode .eq. 'RESET') then
                do i = 1, ndipole
-                  if (type(idpl(1,i)).eq.atom1 .and.
-     &                type(idpl(2,i)).eq.atom2)  sdpl(i) = xx(j)
+                  if (type(idpl(1,i)).eq.it .and.
+     &                type(idpl(2,i)).eq.kt)  sdpl(i) = xx(j)
                end do
             end if
          else if (prmtyp .eq. 7) then
             if (mode .eq. 'STORE') then
                do i = 1, npole
                   k = ipole(i)
-                  if (type(k) .eq. atom1) then
+                  if (type(k) .eq. it) then
                      xx(j) = polarity(k)
                      goto 10
                   end if
@@ -566,7 +590,7 @@ c
                sixth = 1.0d0 / 6.0d0
                do i = 1, npole
                   k = ipole(i)
-                  if (type(k) .eq. atom1) then
+                  if (type(k) .eq. it) then
                      polarity(k) = xx(j)
                      if (thole(k) .ne. 0.0d0)  pdamp(k) = xx(j)**sixth
                   end if
@@ -575,6 +599,10 @@ c
          end if
    10    continue
       end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
       return
       end
 c

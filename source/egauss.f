@@ -144,6 +144,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -151,7 +152,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)
@@ -255,6 +255,7 @@ c
          do kk = ii, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -262,7 +263,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                do m = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)
@@ -500,6 +500,7 @@ c
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kv = ired(k)
+            kt = jvdw(k)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -511,7 +512,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xsort(m)
                yr = yi - ysort(kgy)
                zr = zi - zsort(kgz)
@@ -688,11 +688,11 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
-!$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,
+!$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
-!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ngauss,
-!$OMP& igauss,expcut,cut2,c0,c1,c2,c3,c4,c5)
+!$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
+!$OMP& ngauss,igauss,expcut,cut2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev)
 !$OMP DO reduction(+:ev) schedule(guided)
 c
@@ -725,9 +725,10 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kk = 1, nvlst(ii)
-            k = ivdw(vlst(kk,ii))
+         do kk = 1, nvlst(i)
+            k = vlst(kk,i)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -735,7 +736,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)
@@ -928,6 +928,7 @@ c
          do kk = ii+1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -935,7 +936,6 @@ c
 c     compute the energy contribution for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)

@@ -8,6 +8,7 @@ extern "C" {
 extern int TINKER_MOD(vdw, nvdw);
 extern int* TINKER_MOD(vdw, ivdw);
 extern int* TINKER_MOD(vdw, jvdw);
+extern int* TINKER_MOD(vdw, mvdw);
 extern int* TINKER_MOD(vdw, ired);
 extern double* TINKER_MOD(vdw, kred);
 extern double* TINKER_MOD(vdw, xred);

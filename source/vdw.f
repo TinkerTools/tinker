@@ -12,9 +12,10 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     nvdw       total number van der Waals active sites in the system
-c     ivdw       number of the atom for each van der Waals active site
+c     nvdw       total number van der Waals sites in the system
+c     ivdw       number of the atom for each van der Waals site
 c     jvdw       index into the vdw parameter matrix for each atom
+c     mvdw       index into the vdw parameter matrix for each class
 c     ired       attached atom from which reduction factor is applied
 c     kred       value of reduction factor parameter for each atom
 c     xred       reduced x-coordinate for each atom in the system
@@ -33,6 +34,7 @@ c
       integer nvdw
       integer, allocatable :: ivdw(:)
       integer, allocatable :: jvdw(:)
+      integer, allocatable :: mvdw(:)
       integer, allocatable :: ired(:)
       real*8, allocatable :: kred(:)
       real*8, allocatable :: xred(:)

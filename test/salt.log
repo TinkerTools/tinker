@@ -99,10 +99,10 @@
  OCVM  --  Normal Termination due to SmallGrad
 
  Final Potential Function Value :       -754.4065
- Final RMS Coordinate Gradient :       0.3991D-12
- Final Coordinate Gradient Norm :      0.1129D-11
- Final RMS Lattice Gradient :          0.2057D-04
- Final Lattice Gradient Norm :         0.5039D-04
+ Final RMS Coordinate Gradient :       0.2139D-12
+ Final Coordinate Gradient Norm :      0.6051D-12
+ Final RMS Lattice Gradient :          0.2063D-04
+ Final Lattice Gradient Norm :         0.5054D-04
 
  Final Lattice Dimensions :      a         5.7660
                                  b         5.7660

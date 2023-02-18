@@ -30,7 +30,7 @@ c
       use potent
       use sizes
       implicit none
-      integer i,k
+      integer i,k,ii,kk
       integer ia,ic,next
       real*8 cs,adsp
       real*8 csixi
@@ -143,8 +143,6 @@ c
          if (csix(i) .ne. 0.0d0) then 
             ndisp = ndisp + 1
             idisp(ndisp) = i
-            csix(ndisp) = csix(i)
-            adisp(ndisp) = adisp(i)
          end if
       end do
 c
@@ -152,9 +150,11 @@ c     compute pairwise sum of C6 coefficients needed for PME
 c
       csixpr = 0.0d0
       if (use_dewald) then
-         do i = 1, ndisp
+         do ii = 1, ndisp
+            i = idisp(ii)
             csixi = csix(i)
-            do k = 1, ndisp
+            do kk = 1, ndisp
+               k = idisp(kk)
                csixpr = csixpr + csixi*csix(k)
             end do
          end do

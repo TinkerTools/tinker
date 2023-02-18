@@ -38,6 +38,7 @@ c
       integer ii,kk
       integer ia,ib
       integer next,size
+      integer maxdim
       integer nlist,number
       integer, allocatable :: list(:)
       integer, allocatable :: rlist(:)
@@ -272,6 +273,7 @@ c     perform dynamic allocation of some global arrays
 c
       if (allocated(ivdw))  deallocate (ivdw)
       if (allocated(jvdw))  deallocate (jvdw)
+      if (allocated(mvdw))  deallocate (mvdw)
       if (allocated(ired))  deallocate (ired)
       if (allocated(kred))  deallocate (kred)
       if (allocated(xred))  deallocate (xred)
@@ -279,6 +281,7 @@ c
       if (allocated(zred))  deallocate (zred)
       allocate (ivdw(n))
       allocate (jvdw(n))
+      allocate (mvdw(maxtyp))
       allocate (ired(n))
       allocate (kred(n))
       allocate (xred(n))
@@ -309,6 +312,7 @@ c
       call sort8 (nlist,list)
       do i = 1, maxtyp
          rlist(i) = 0
+         mvdw(i) = 0
       end do
       do i = 1, n
          j = jvdw(i)
@@ -320,32 +324,37 @@ c
       end do
       do i = 1, n
          if (vdwindex .eq. 'TYPE') then
-            jvdw(i) = rlist(type(i))
+            k = type(i)
+            jvdw(i) = rlist(k)
+            mvdw(k) = rlist(k)
          else
-            jvdw(i) = rlist(class(i))
+            k = class(i)
+            jvdw(i) = rlist(k)
+            mvdw(k) = rlist(k)
          end if
       end do
 c
 c     get the vdw radii and well depths for each atom type
 c
-      do i = 1, nlist
-         k = list(i)
-         if (rad4(k) .eq. 0.0d0)  rad4(k) = rad(k)
-         if (eps4(k) .eq. 0.0d0)  eps4(k) = eps(k)
+      maxdim = maxclass
+      if (vdwindex .eq. 'TYPE')  maxdim = maxtyp
+      do i = 1, maxdim
+         if (rad4(i) .eq. 0.0d0)  rad4(i) = rad(i)
+         if (eps4(i) .eq. 0.0d0)  eps4(i) = eps(i)
          if (radtyp .eq. 'SIGMA') then
-            rad(k) = twosix * rad(k)
-            rad4(k) = twosix * rad4(k)
+            rad(i) = twosix * rad(i)
+            rad4(i) = twosix * rad4(i)
          end if
          if (radsiz .eq. 'DIAMETER') then
-            rad(k) = 0.5d0 * rad(k)
-            rad4(k) = 0.5d0 * rad4(k)
+            rad(i) = 0.5d0 * rad(i)
+            rad4(i) = 0.5d0 * rad4(i)
          end if
-         srad(k) = sqrt(rad(k))
-         eps(k) = abs(eps(k))
-         seps(k) = sqrt(eps(k))
-         srad4(k) = sqrt(rad4(k))
-         eps4(k) = abs(eps4(k))
-         seps4(k) = sqrt(eps4(k))
+         srad(i) = sqrt(rad(i))
+         eps(i) = abs(eps(i))
+         seps(i) = sqrt(eps(i))
+         srad4(i) = sqrt(rad4(i))
+         eps4(i) = abs(eps4(i))
+         seps4(i) = sqrt(eps4(i))
       end do
 c
 c     perform dynamic allocation of some global arrays

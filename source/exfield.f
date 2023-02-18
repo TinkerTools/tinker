@@ -32,11 +32,21 @@ c
       character*6 mode
 c
 c
-c     find energy for partial charges and atomic multipoles
+c     zero out the external electric field energy
 c
-      f = electric / dielec
       exf = 0.0d0
+      f = electric / dielec
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,npole,ipole,
+!$OMP& use,x,y,z,f,pchg,rpole,exfld)
+!$OMP& shared(exf)
+c
+c     calculate the energy due to external electric field
+c
       if (mode .eq. 'CHARGE') then
+!$OMP    DO reduction(+:exf) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
             if (use(i)) then
@@ -49,8 +59,10 @@ c
                exf = exf + e
             end if
          end do
+!$OMP    END DO
       end if
       if (mode .eq. 'MPOLE') then
+!$OMP    DO reduction(+:exf) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
             if (use(i)) then
@@ -67,7 +79,12 @@ c
                exf = exf + e
             end if
          end do
+!$OMP    END DO
       end if
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END PARALLEL
       return
       end
 c
@@ -97,8 +114,8 @@ c
       integer i,ii
       integer ix,iy,iz
       real*8 exf,e,f,phi
-      real*8 ci,dix,diy,diz
       real*8 xi,yi,zi
+      real*8 ci,dix,diy,diz
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
@@ -110,10 +127,21 @@ c
       character*6 mode
 c
 c
-c     find energy and derivatives for partial charges
+c     zero out the external electric field energy
 c
+      exf = 0.0d0
       f = electric / dielec
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,npole,ipole,
+!$OMP& use,x,y,z,f,pchg,rpole,exfld)
+!$OMP& shared(exf,dec,dem,vir)
+c
+c     calculate energy and derivatives over partial charges
+c
       if (mode .eq. 'CHARGE') then
+!$OMP    DO reduction(+:exf,dec,vir) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
             if (use(i)) then
@@ -153,11 +181,13 @@ c
                vir(3,3) = vir(3,3) + vzz
             end if
          end do
+!$OMP    END DO
       end if
 c
-c     find energy and derivatives for atomic multipoles
+c     calculate energy and derivatives over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
+!$OMP    DO reduction(+:exf,dem,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
             if (use(i)) then
@@ -232,7 +262,12 @@ c
                vir(3,3) = vir(3,3) + vzz
             end if
          end do
+!$OMP    END DO
       end if
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END PARALLEL
       return
       end
 c
@@ -267,12 +302,21 @@ c
       character*6 mode
 c
 c
-c     find energy for partial charges and atomic multipoles
+c     zero out the external electric field energy
 c
-      f = electric / dielec
       exf = 0.0d0
+      f = electric / dielec
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,npole,ipole,
+!$OMP& use,x,y,z,f,pchg,rpole,exfld)
+!$OMP& shared(exf,nec,aec,nem,aem)
+c
+c     calculate energy and partitioning due to external field
+c
       if (mode .eq. 'CHARGE') then
-         nec = nec + nion
+!$OMP    DO reduction(+:exf,nec,aec) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
             if (use(i)) then
@@ -283,12 +327,14 @@ c
                phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
                e = -f * ci * phi
                exf = exf + e
+               nec = nec + 1
                aec(i) = aec(i) + e
             end if
          end do
+!$OMP    END DO
       end if
       if (mode .eq. 'MPOLE') then
-         nem = nem + npole
+!$OMP    DO reduction(+:exf,nem,aem) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
             if (use(i)) then
@@ -303,9 +349,15 @@ c
                e = -f * (ci*phi + dix*exfld(1)
      &                      + diy*exfld(2) + diz*exfld(3))
                exf = exf + e
+               nem = nem + 1
                aem(i) = aem(i) + e
             end if
          end do
+!$OMP    END DO
       end if
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END PARALLEL
       return
       end

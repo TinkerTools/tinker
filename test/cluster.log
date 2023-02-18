@@ -35,7 +35,6 @@
 
  Enter Number of Annealing Trials [1] :  
  Enter Initial and Final Beta [0.01, 10**10] :  
-
  Gaussian Density Annealing Global Optimization :
 
  BS Step     Log(Beta)      Energy         Rg        Log(M2)       Status
@@ -136,15 +135,14 @@
     83      -11.6665     0.2395      0.2722   0.3271       2    NegCurve     10
     84      -11.8287     0.2092      0.1622   0.3051       4    NegCurve     15
     85      -12.1761     0.3610      0.3475   0.5637       5    NegCurve     21
-    86      -12.4055     0.2502      0.2294   0.3082      14   TruncNewt     33
-    87      -12.5157     0.0343      0.1102   0.1266      20   TruncNewt     41
-    88      -12.5179     0.0014      0.0022   0.0187      24   TruncNewt     46
-    89      -12.5179     0.0000      0.0000   0.0005      30   TruncNewt     53
+    86      -12.4056     0.2501      0.2294   0.3082      15   TruncNewt     34
+    87      -12.5157     0.0343      0.1101   0.1265      21   TruncNewt     42
+    88      -12.5179     0.0014      0.0022   0.0186      25   TruncNewt     47
+    89      -12.5179     0.0000      0.0000   0.0005      31   TruncNewt     54
 
  TNCG  --  Normal Termination due to SmallGrad
 
  Global Energy Minimum for Trial   1 :       -12.5179
-
 
  Gaussian Density Annealing Global Optimization :
 
@@ -212,7 +210,7 @@
     59         7.2296     -10.9717       3.6924      -7.1960      Success
     60         7.4475     -10.9915       3.6908      -7.4141      Success
     61         7.6655     -11.0110       3.6893      -7.6323      Success
-    62         7.8834     -11.0303       3.6879      -7.8504      Success
+    62         7.8835     -11.0303       3.6879      -7.8504      Success
     63         8.1013     -11.0492       3.6865      -8.0684      Success
     64         8.3192     -11.0677       3.6851      -8.2865      Success
     65         8.5370     -11.0856       3.6838      -8.5045      Success
@@ -248,7 +246,6 @@
  TNCG  --  Normal Termination due to SmallGrad
 
  Global Energy Minimum for Trial   2 :       -11.7040
-
 
  Gaussian Density Annealing Global Optimization :
 
@@ -356,7 +353,6 @@
 
  Global Energy Minimum for Trial   3 :       -11.2663
 
-
  Gaussian Density Annealing Global Optimization :
 
  BS Step     Log(Beta)      Energy         Rg        Log(M2)       Status
@@ -461,7 +457,6 @@
 
  Global Energy Minimum for Trial   4 :       -12.5179
 
-
  Gaussian Density Annealing Global Optimization :
 
  BS Step     Log(Beta)      Energy         Rg        Log(M2)       Status
@@ -506,7 +501,7 @@
     37         2.2612      -8.2266       4.0762      -1.2561      Success
     38         2.3164      -8.7073       3.9980      -1.4927      Success
     39         2.3859      -9.0266       3.9447      -1.7234      Success
-    40         2.4748      -9.2464       3.9071      -1.9533      Success
+    40         2.4748      -9.2465       3.9071      -1.9533      Success
     41         2.5851      -9.4023       3.8802      -2.1807      Success
     42         2.7175      -9.5207       3.8604      -2.4061      Success
     43         2.8697      -9.6181       3.8455      -2.6288      Success
@@ -569,16 +564,15 @@
     90      -11.3016     0.2392      0.1666   0.2627       4    NegCurve     21
     91      -11.7229     0.3768      0.4212   0.5752       5    NegCurve     27
     92      -12.1980     0.3262      0.4751   0.2249       6    NegCurve     31
-    93      -12.3678     0.2740      0.1698   0.2958      14    ReSearch     50
-    94      -12.4069     0.2307      0.0391   0.3286      23    NegCurve     64
-    95      -12.5146     0.0441      0.1077   0.0892      27   TruncNewt     71
-    96      -12.5179     0.0020      0.0033   0.0172      31   TruncNewt     76
-    97      -12.5179     0.0000      0.0000   0.0008      36   TruncNewt     82
+    93      -12.3879     0.2689      0.1899   0.1896      14    NegCurve     42
+    94      -12.3992     0.2521      0.0113   0.2471      20    NegCurve     56
+    95      -12.5121     0.0677      0.1129   0.1106      26   TruncNewt     66
+    96      -12.5179     0.0036      0.0058   0.0204      29   TruncNewt     70
+    97      -12.5179     0.0000      0.0000   0.0013      34   TruncNewt     76
 
  TNCG  --  Normal Termination due to SmallGrad
 
  Global Energy Minimum for Trial   5 :       -12.5179
-
 
  Gaussian Density Annealing Global Optimization :
 
@@ -688,7 +682,6 @@
  TNCG  --  Normal Termination due to SmallGrad
 
  Global Energy Minimum for Trial   6 :       -11.2862
-
 
  Gaussian Density Annealing Global Optimization :
 
@@ -801,7 +794,6 @@
 
  Global Energy Minimum for Trial   7 :       -12.5179
 
-
  Gaussian Density Annealing Global Optimization :
 
  BS Step     Log(Beta)      Energy         Rg        Log(M2)       Status
@@ -900,20 +892,19 @@
  TN Iter     F Value      G RMS      F Move   X Move   CG Iter  Solve   FG Call
 
     82      -11.4230     0.0361                                               1
-    83      -11.4268     0.0332      0.0038   0.1116       6    NegCurve     11
-    84      -11.4878     0.1771      0.0610   0.3415      11    NegCurve     20
-    85      -11.6951     0.3059      0.2073   0.3266      12    NegCurve     25
-    86      -11.9115     0.2730      0.2164   0.2388      14    NegCurve     31
-    87      -12.1686     0.3019      0.2570   0.2982      15    NegCurve     35
-    88      -12.4282     0.1890      0.2597   0.3160      19    NegCurve     42
-    89      -12.5079     0.0702      0.0797   0.1086      25    NegCurve     50
-    90      -12.5178     0.0065      0.0099   0.0291      28   TruncNewt     54
-    91      -12.5179     0.0001      0.0001   0.0028      32   TruncNewt     59
+    83      -11.4268     0.0332      0.0038   0.1117       6    NegCurve     11
+    84      -11.4876     0.1771      0.0608   0.3413      11    NegCurve     20
+    85      -11.6935     0.3055      0.2059   0.3253      12    NegCurve     25
+    86      -11.9153     0.2719      0.2218   0.2419      14    NegCurve     31
+    87      -12.1728     0.3021      0.2574   0.2985      15    NegCurve     35
+    88      -12.4302     0.1880      0.2574   0.3141      19    NegCurve     42
+    89      -12.5083     0.0688      0.0781   0.1126      25    NegCurve     50
+    90      -12.5178     0.0063      0.0095   0.0286      28   TruncNewt     54
+    91      -12.5179     0.0001      0.0001   0.0027      32   TruncNewt     59
 
  TNCG  --  Normal Termination due to SmallGrad
 
  Global Energy Minimum for Trial   8 :       -12.5179
-
 
  Gaussian Density Annealing Global Optimization :
 
@@ -1020,7 +1011,6 @@
 
  Global Energy Minimum for Trial   9 :       -11.4667
 
-
  Gaussian Density Annealing Global Optimization :
 
  BS Step     Log(Beta)      Energy         Rg        Log(M2)       Status
@@ -1118,16 +1108,16 @@
 
     81      -11.2476     0.1031                                               1
     82      -11.3583     0.1297      0.1107   0.2917       2   ScaleStep      8
-    83      -11.4260     0.0501      0.0677   0.2189      16   TruncNewt     24
-    84      -11.4389     0.0428      0.0130   0.2036      28    NegCurve     38
-    85      -11.4462     0.0382      0.0073   0.1728      44   TruncNewt     58
-    86      -11.4528     0.0148      0.0065   0.1130      53   TruncNewt     70
-    87      -11.4529     0.0118      0.0001   0.0780      61    ReSearch     90
-    88      -11.4745     0.1150      0.0217   0.3357      70    NegCurve    104
-    89      -11.6133     0.1931      0.1388   0.3151      71    NegCurve    110
-    90      -11.7037     0.0669      0.0903   0.1660      82   TruncNewt    123
-    91      -11.7117     0.0049      0.0080   0.0348      86   TruncNewt    128
-    92      -11.7117     0.0000      0.0000   0.0014      91   TruncNewt    134
+    83      -11.4261     0.0501      0.0678   0.2195      18    NegCurve     26
+    84      -11.4397     0.0433      0.0136   0.1965      30    NegCurve     40
+    85      -11.4461     0.0396      0.0064   0.1808      47   TruncNewt     61
+    86      -11.4527     0.0141      0.0066   0.1112      56   TruncNewt     73
+    87      -11.4582     0.0418      0.0054   0.2258      64    NegCurve     84
+    88      -11.5704     0.1843      0.1122   0.3414      65    NegCurve     90
+    89      -11.6832     0.1165      0.1128   0.2844      79   TruncNewt    107
+    90      -11.7115     0.0107      0.0283   0.0666      84   TruncNewt    114
+    91      -11.7117     0.0001      0.0002   0.0055      89   TruncNewt    120
+    92      -11.7117     0.0000      0.0000   0.0001      96   TruncNewt    128
 
  TNCG  --  Normal Termination due to SmallGrad
 

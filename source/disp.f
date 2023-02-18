@@ -15,8 +15,8 @@ c
 c     ndisp     total number of dispersion sites in the system
 c     idisp     number of the atom for each dispersion site
 c     csixpr    pairwise sum of C6 dispersion coefficients
-c     csix      C6 dispersion coefficient value at each site
-c     adisp     alpha dispersion damping value at each site
+c     csix      C6 dispersion coefficient value for each atom
+c     adisp     alpha dispersion damping value for each atom
 c
 c
       module disp

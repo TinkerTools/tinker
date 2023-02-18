@@ -1160,6 +1160,7 @@ c     deallocation of global arrays from module vdw
 c
       if (allocated(ivdw))  deallocate (ivdw)
       if (allocated(jvdw))  deallocate (jvdw)
+      if (allocated(mvdw))  deallocate (mvdw)
       if (allocated(ired))  deallocate (ired)
       if (allocated(kred))  deallocate (kred)
       if (allocated(radmin))  deallocate (radmin)

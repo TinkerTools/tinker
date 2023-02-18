@@ -189,6 +189,7 @@ c
          do kk = 1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (k .ne. i)
@@ -196,7 +197,6 @@ c
 c     compute the Hessian elements for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                xr = xi - xred(k)
                yr = yi - yred(k)
                zr = zi - zred(k)
@@ -426,13 +426,13 @@ c
          do kk = 1, nvdw
             k = ivdw(kk)
             kv = ired(k)
+            kt = jvdw(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
 c
 c     compute the Hessian elements for this interaction
 c
             if (proceed) then
-               kt = jvdw(k)
                do jcell = 2, ncell
                   xr = xi - xred(k)
                   yr = yi - yred(k)

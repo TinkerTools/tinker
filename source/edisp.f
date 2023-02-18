@@ -139,8 +139,8 @@ c     find the damped dispersion energy via double loop search
 c
       do ii = 1, ndisp-1
          i = idisp(ii)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -166,8 +166,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, ndisp
             k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+            ck = csix(k)
+            ak = adisp(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -281,8 +281,8 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -308,8 +308,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, ndisp
             k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+            ck = csix(k)
+            ak = adisp(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -373,7 +373,7 @@ c
                         if (r2 .le. polycut2)  e = e * dspscale(k)
                      end if
                      if (use_group)  e = e * fgrp
-                     if (ii .eq. kk)  e = 0.5d0 * e
+                     if (i .eq. k)  e = 0.5d0 * e
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -454,7 +454,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 e,fgrp
@@ -517,8 +517,8 @@ c     find the damped dispersion energy via neighbor list search
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -542,11 +542,10 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kkk = 1, nvlst(ii)
-            kk = vlst(kkk,ii)
-            k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+         do kk = 1, nvlst(i)
+            k = vlst(kk,i)
+            ck = csix(k)
+            ak = adisp(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -677,7 +676,7 @@ c
       use ewald
       use pme
       implicit none
-      integer i
+      integer i,ii
       real*8 term
 c
 c
@@ -704,7 +703,8 @@ c
 c
 c     compute the self-energy portion of the Ewald summation
 c
-      do i = 1, ndisp
+      do ii = 1, ndisp
+         i = idisp(i)
          term = aewald**6 / 12.0d0
          edsp = edsp + term*csix(i)*csix(i)
       end do
@@ -790,8 +790,8 @@ c     compute the real space portion of the Ewald summation
 c
       do ii = 1, ndisp-1
          i = idisp(ii)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -817,8 +817,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, ndisp
             k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+            ck = csix(k)
+            ak = adisp(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -926,8 +926,8 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -953,8 +953,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, ndisp
             k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+            ck = csix(k)
+            ak = adisp(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -1038,7 +1038,7 @@ c     increment the overall dispersion energy component
 c
                      scale = scale - 1.0d0
                      e = e * (expa+scale)
-                     if (ii .eq. kk)  e = 0.5d0 * e
+                     if (i .eq. k)  e = 0.5d0 * e
                      edsp = edsp + e
                   end if
                end do
@@ -1085,7 +1085,7 @@ c
       use ewald
       use pme
       implicit none
-      integer i
+      integer i,ii
       real*8 term
 c
 c
@@ -1112,7 +1112,8 @@ c
 c
 c     compute the self-energy portion of the Ewald summation
 c
-      do i = 1, ndisp
+      do ii = 1, ndisp
+         i = idisp(ii)
          term = aewald**6 / 12.0d0
          edsp = edsp + term*csix(i)*csix(i)
       end do
@@ -1148,7 +1149,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 e,fgrp
@@ -1207,8 +1208,8 @@ c     compute the real space portion of the Ewald summation
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         ci = csix(ii)
-         ai = adisp(ii)
+         ci = csix(i)
+         ai = adisp(i)
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -1232,11 +1233,10 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kkk = 1, nvlst(ii)
-            kk = vlst(kkk,ii)
-            k = idisp(kk)
-            ck = csix(kk)
-            ak = adisp(kk)
+         do kk = 1, nvlst(i)
+            k = vlst(kk,i)
+            ck = csix(k)
+            ak = adisp(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)

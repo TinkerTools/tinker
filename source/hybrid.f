@@ -1209,7 +1209,11 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer it,it0,it1
+      integer it,kt
+      integer itm,ktm
+      integer it0,it1
+      integer nlist
+      integer, allocatable :: list(:)
       real*8 radius,rd,ep
       real*8, allocatable :: srad(:)
       real*8, allocatable :: seps(:)
@@ -1220,17 +1224,24 @@ c     assign the hybrid van der Waals parameters
 c
       do j = 1, nmut
          i = imut(j)
-         it = class(i)
-         it0 = class0(j)
-         it1 = class1(j)
+         if (vdwindex .eq. 'TYPE') then
+            it = type(i)
+            it0 = type0(j)
+            it1 = type1(j)
+         else
+            it = class(i)
+            it0 = class0(j)
+            it1 = class1(j)
+         end if
          rad(it) = lambda*rad(it1) + (1.0d0-lambda)*rad(it0)
          eps(it) = lambda*eps(it1) + (1.0d0-lambda)*eps(it0)
       end do
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (srad(maxclass))
-      allocate (seps(maxclass))
+      allocate (srad(maxtyp))
+      allocate (seps(maxtyp))
+      allocate (list(n))
 c
 c     get the square roots of the vdw radii and well depths
 c
@@ -1239,25 +1250,48 @@ c
          seps(i) = sqrt(eps(i))
       end do
 c
+c     set type or class index into condensed pair matrices
+c
+      nlist = n
+      do i = 1, n
+         list(i) = 0
+         if (vdwindex .eq. 'TYPE') then
+            list(i) = type(i)
+         else
+            list(i) = class(i)
+         end if
+      end do
+      call sort8 (nlist,list)
+c
 c     use combination rules to set pairwise vdw radii sums
 c
       do j = 1, nmut
          i = imut(j)
-         it = class(i)
-         do k = 1, maxclass
-            if (rad(it).eq.0.0d0 .and. rad(k).eq.0.0d0) then
-               rd = 0.0d0
-            else if (radrule(1:10) .eq. 'ARITHMETIC') then
-               rd = rad(it) + rad(k)
-            else if (radrule(1:9) .eq. 'GEOMETRIC') then
-               rd = 2.0d0*(srad(it)*srad(k))
-            else if (radrule(1:10) .eq. 'CUBIC-MEAN') then
-               rd = 2.0d0*(rad(it)**3+rad(k)**3)/(rad(it)**2+rad(k)**2)
-            else
-               rd = rad(it) + rad(k)
+         if (vdwindex .eq. 'TYPE') then
+            it = type(i)
+         else
+            it = class(i)
+         end if
+         itm = mvdw(it)
+         do k = 1, nlist
+            kt = list(k)
+            ktm = mvdw(kt)
+            if (kt .ne. 0) then
+               if (rad(it).eq.0.0d0 .and. rad(kt).eq.0.0d0) then
+                  rd = 0.0d0
+               else if (radrule(1:10) .eq. 'ARITHMETIC') then
+                  rd = rad(it) + rad(kt)
+               else if (radrule(1:9) .eq. 'GEOMETRIC') then
+                  rd = 2.0d0*(srad(it)*srad(kt))
+               else if (radrule(1:10) .eq. 'CUBIC-MEAN') then
+                  rd = 2.0d0*(rad(it)**3+rad(kt)**3)
+     &                    / (rad(it)**2+rad(kt)**2)
+               else
+                  rd = rad(it) + rad(kt)
+               end if
             end if
-            radmin(it,k) = rd
-            radmin(k,it) = rd
+            radmin(itm,ktm) = rd
+            radmin(ktm,itm) = rd
          end do
       end do
 c
@@ -1265,23 +1299,33 @@ c     use combination rules to set pairwise well depths
 c
       do j = 1, nmut
          i = imut(j)
-         it = class(i)
-         do k = 1, maxclass
-            if (eps(it).eq.0.0d0 .and. eps(k).eq.0.0d0) then
-               ep = 0.0d0
-            else if (epsrule(1:10) .eq. 'ARITHMETIC') then
-               ep = 0.5d0 * (eps(it) + eps(k))
-            else if (epsrule(1:9) .eq. 'GEOMETRIC') then
-               ep = seps(it) * seps(k)
-            else if (epsrule(1:8) .eq. 'HARMONIC') then
-               ep = 2.0d0 * (eps(it)*eps(k)) / (eps(it)+eps(k))
-            else if (epsrule(1:3) .eq. 'HHG') then
-               ep = 4.0d0 * (eps(it)*eps(k)) / (seps(it)+seps(k))**2
-            else
-               ep = seps(it) * seps(k)
+         if (vdwindex .eq. 'TYPE') then
+            it = type(i)
+         else
+            it = class(i)
+         end if
+         itm = mvdw(it)
+         do k = 1, nlist
+            kt = list(k)
+            ktm = mvdw(kt)
+            if (kt .ne. 0) then
+               if (eps(it).eq.0.0d0 .and. eps(kt).eq.0.0d0) then
+                  ep = 0.0d0
+               else if (epsrule(1:10) .eq. 'ARITHMETIC') then
+                  ep = 0.5d0 * (eps(it) + eps(kt))
+               else if (epsrule(1:9) .eq. 'GEOMETRIC') then
+                  ep = seps(it) * seps(kt)
+               else if (epsrule(1:8) .eq. 'HARMONIC') then
+                  ep = 2.0d0 * (eps(it)*eps(kt)) / (eps(it)+eps(kt))
+               else if (epsrule(1:3) .eq. 'HHG') then
+                  ep = 4.0d0 * (eps(it)*eps(kt))
+     &                    / (seps(it)+seps(kt))**2
+               else
+                  ep = seps(it) * seps(kt)
+               end if
             end if
-            epsilon(it,k) = ep
-            epsilon(k,it) = ep
+            epsilon(itm,ktm) = ep
+            epsilon(ktm,itm) = ep
          end do
       end do
 c
@@ -1289,18 +1333,24 @@ c     print the van der Waals parameters for hybrid atoms
 c
       header = .true.
       do j = 1, nmut
+         i = imut(j)
+         if (vdwindex .eq. 'TYPE') then
+            it = type(i)
+         else
+            it = class(i)
+         end if
          if (verbose) then
             if (header) then
                header = .false.
                write (iout,10)
    10          format (/,' Hybrid van der Waals Parameters :',
-     &                 //,7x,'Atom Number    Radius     Epsilon')
+     &                 //,5x,'Atom Number',14x,'Size',8x,'Epsilon',/)
             end if
             radius = rad(it)
             if (radsiz .eq. 'DIAMETER')  radius = 2.0d0 * radius
             if (radtyp .eq. 'SIGMA')  radius = radius / twosix
             write (iout,20)  i,radius,eps(it)
-   20       format (6x,i8,f14.4,f12.4)
+   20       format (6x,i6,7x,2f15.4)
          end if
       end do
 c
@@ -1308,6 +1358,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (srad)
       deallocate (seps)
+      deallocate (list)
       return
       end
 c
@@ -1331,7 +1382,7 @@ c
       use kchrge
       use mutant
       implicit none
-      integer i,j,k
+      integer i,j,k,kk
       integer it,it0,it1
       real*8 chg0,chg1
       real*8 hybchg
@@ -1350,8 +1401,9 @@ c
          chg0 = chg(it0)
          chg1 = chg(it1)
          hybchg = lambda*chg1 + (1.0d0-lambda)*chg0
-         do k = 1, nion
-            if (iion(k) .eq. i) then
+         do kk = 1, nion
+            k = iion(kk)
+            if (k .eq. i) then
                used = .true.
                pchg(k) = hybchg
                goto 10
@@ -1361,8 +1413,8 @@ c
             used = .true.
             nion = nion + 1
             iion(nion) = i
-            kion(nion) = i
-            pchg(nion) = hybchg
+            kion(i) = i
+            pchg(i) = hybchg
          end if
    10    continue
          if (verbose .and. used) then
@@ -1370,10 +1422,10 @@ c
                header = .false.
                write (iout,20)
    20          format (/,' Hybrid Atomic Partial Charge Parameters :',
-     &                 //,7x,'Atom Number',7x,'Charge',/)
+     &                 //,5x,'Atom Number',12x,'Charge',/)
             end if
             write (iout,30)  i,hybchg
-   30       format (6x,i8,5x,f12.3)
+   30       format (6x,i6,7x,f15.4)
          end if
       end do
       return
