@@ -41,7 +41,6 @@ c
       integer maxdim
       integer nlist,number
       integer, allocatable :: list(:)
-      integer, allocatable :: rlist(:)
       real*8 rd,ep,rdn,gik
       real*8, allocatable :: srad(:)
       real*8, allocatable :: srad4(:)
@@ -291,7 +290,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (list(n))
-      allocate (rlist(maxtyp))
       allocate (srad(maxtyp))
       allocate (srad4(maxtyp))
       allocate (seps(maxtyp))
@@ -311,26 +309,23 @@ c
       end do
       call sort8 (nlist,list)
       do i = 1, maxtyp
-         rlist(i) = 0
          mvdw(i) = 0
       end do
       do i = 1, n
          j = jvdw(i)
-         if (rlist(j) .eq. 0) then
+         if (mvdw(j) .eq. 0) then
             do k = 1, nlist
-               if (list(k) .eq. j)  rlist(j) = k
+               if (list(k) .eq. j)  mvdw(j) = k
             end do
          end if
       end do
       do i = 1, n
          if (vdwindex .eq. 'TYPE') then
             k = type(i)
-            jvdw(i) = rlist(k)
-            mvdw(k) = rlist(k)
+            jvdw(i) = mvdw(k)
          else
             k = class(i)
-            jvdw(i) = rlist(k)
-            mvdw(k) = rlist(k)
+            jvdw(i) = mvdw(k)
          end if
       end do
 c
@@ -560,8 +555,8 @@ c
          ib = number(kvpr(i)(5:8))
          if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
          if (rad(ib) .eq. 0.0d0)  rad(ib) = 0.001d0
-         ia = rlist(ia)
-         ib = rlist(ib)
+         ia = mvdw(ia)
+         ib = mvdw(ib)
          if (ia.ne.0 .and. ib.ne.0) then
             if (radtyp .eq. 'SIGMA')  radpr(i) = twosix * radpr(i)
             radmin(ia,ib) = radpr(i)
@@ -591,8 +586,8 @@ c
             ib = number(khb(i)(5:8))
             if (rad(ia) .eq. 0.0d0)  rad(ia) = 0.001d0
             if (rad(ib) .eq. 0.0d0)  rad(ib) = 0.001d0
-            ia = rlist(ia)
-            ib = rlist(ib)
+            ia = mvdw(ia)
+            ib = mvdw(ib)
             if (ia.ne.0 .and. ib.ne.0) then
                if (radtyp .eq. 'SIGMA')  radhb(i) = twosix * radhb(i)
                radhbnd(ia,ib) = radhb(i)
@@ -607,7 +602,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (list)
-      deallocate (rlist)
       deallocate (srad)
       deallocate (srad4)
       deallocate (seps)

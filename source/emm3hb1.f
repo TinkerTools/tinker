@@ -92,8 +92,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer ia,ib,ic
       integer, allocatable :: iv14(:)
       real*8 e,de,rv,eps
@@ -181,10 +181,10 @@ c     find van der Waals energy and derivatives via double loop
 c
       do ii = 1, nvdw-1
          i = ivdw(ii)
+         it = jvdw(i)
          iv = ired(i)
          redi = kred(i)
          rediv = 1.0d0 - redi
-         it = jvdw(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -210,8 +210,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -452,10 +452,10 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, nvdw
          i = ivdw(ii)
+         it = jvdw(i)
          iv = ired(i)
          redi = kred(i)
          rediv = 1.0d0 - redi
-         it = jvdw(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -481,8 +481,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -766,8 +766,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer ia,ib,ic
       integer kgy,kgz
       integer start,stop
@@ -878,10 +878,10 @@ c     now, loop over all atoms computing the interactions
 c
       do ii = 1, nvdw
          i = ivdw(ii)
+         it = jvdw(i)
          iv = ired(i)
          redi = kred(i)
          rediv = 1.0d0 - redi
-         it = jvdw(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
@@ -930,8 +930,8 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -1244,8 +1244,8 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer ia,ib,ic
       integer, allocatable :: iv14(:)
       real*8 e,de,rv,eps
@@ -1331,8 +1331,8 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,
-!$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
+!$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,
 !$OMP& radhbnd,epshbnd,dielec,atomic,bl,bndlist,abuck,
@@ -1344,10 +1344,10 @@ c     find van der Waals energy and derivatives via neighbor list
 c
       do ii = 1, nvdw
          i = ivdw(ii)
+         it = jvdw(i)
          iv = ired(i)
          redi = kred(i)
          rediv = 1.0d0 - redi
-         it = jvdw(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -1373,8 +1373,8 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(i)
             k = vlst(kk,i)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))

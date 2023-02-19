@@ -113,8 +113,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer ia,ib,ic
       integer, allocatable :: iv14(:)
       real*8 e,rv,eps
@@ -201,8 +201,8 @@ c     find the van der Waals energy via double loop search
 c
       do ii = 1, nvdw-1
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -228,8 +228,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -381,8 +381,8 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, nvdw
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -408,8 +408,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -608,8 +608,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer ia,ib,ic
       integer kgy,kgz
       integer start,stop
@@ -719,8 +719,8 @@ c     now, loop over all atoms computing the interactions
 c
       do ii = 1, nvdw
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
@@ -769,8 +769,8 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -1006,8 +1006,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer ia,ib,ic
       integer, allocatable :: iv14(:)
       real*8 e,rv,eps
@@ -1092,12 +1092,12 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,
-!$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,
-!$OMP& i13,i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
-!$OMP& off2,radmin,epsilon,radmin4,epsilon4,radhbnd,epshbnd,
-!$OMP& dielec,atomic,bl,bndlist,abuck,bbuck,cbuck,cut2,c0,c1,
-!$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
+!$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
+!$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,
+!$OMP& i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,off2,
+!$OMP& radmin,epsilon,radmin4,epsilon4,radhbnd,epshbnd,dielec,
+!$OMP& atomic,bl,bndlist,abuck,bbuck,cbuck,cut2,c0,c1,c2,c3,
+!$OMP& c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
 c
@@ -1105,8 +1105,8 @@ c     find the van der Waals energy via neighbor list search
 c
       do ii = 1, nvdw
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -1132,8 +1132,8 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(i)
             k = vlst(kk,i)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))

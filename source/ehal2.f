@@ -29,8 +29,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer iatom,jcell
       integer nlist,list(5)
       integer, allocatable :: iv14(:)
@@ -114,6 +114,7 @@ c     find van der Waals Hessian elements for involved atoms
 c
       do ii = 1, nlist
          i = list(ii)
+         it = jvdw(i)
          iv = ired(i)
          redi = kred(i)
          if (i .ne. iv) then
@@ -122,7 +123,6 @@ c
             rediv2 = rediv * rediv
             rediiv = redi * rediv
          end if
-         it = jvdw(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -147,8 +147,8 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (k .ne. i)
@@ -347,6 +347,7 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, nlist
          i = list(ii)
+         it = jvdw(i)
          iv = ired(i)
          redi = kred(i)
          if (i .ne. iv) then
@@ -355,7 +356,6 @@ c
             rediv2 = rediv * rediv
             rediiv = redi * rediv
          end if
-         it = jvdw(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -380,8 +380,8 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
 c

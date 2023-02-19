@@ -100,8 +100,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer, allocatable :: iv14(:)
       real*8 e,rv,rv7
       real*8 eps,rdn,fgrp
@@ -170,8 +170,8 @@ c     find the van der Waals energy via double loop search
 c
       do ii = 1, nvdw-1
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -198,8 +198,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii+1, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -334,8 +334,8 @@ c     calculate interaction energy with other unit cells
 c
       do ii = 1, nvdw
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -362,8 +362,8 @@ c     decide whether to compute the current interaction
 c
          do kk = ii, nvdw
             k = ivdw(kk)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
@@ -541,8 +541,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer kgy,kgz
       integer start,stop
       integer ikmin,ikmax
@@ -634,8 +634,8 @@ c     loop over all atoms computing the interactions
 c
       do ii = 1, nvdw
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xsort(rgx(ii))
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
@@ -685,8 +685,8 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 60
             end if
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             mutk = mut(k)
             prime = (kk .le. nvdw)
 c
@@ -889,8 +889,8 @@ c
       use vdwpot
       implicit none
       integer i,j,k
-      integer ii,iv,it
-      integer kk,kv,kt
+      integer ii,it,iv
+      integer kk,kt,kv
       integer, allocatable :: iv14(:)
       real*8 e,eps,rdn
       real*8 fgrp,rv,rv7
@@ -970,8 +970,8 @@ c     find the van der Waals energy via neighbor list search
 c
       do ii = 1, nvdw
          i = ivdw(ii)
-         iv = ired(i)
          it = jvdw(i)
+         iv = ired(i)
          xi = xred(i)
          yi = yred(i)
          zi = zred(i)
@@ -998,8 +998,8 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(i)
             k = vlst(kk,i)
-            kv = ired(k)
             kt = jvdw(k)
+            kv = ired(k)
             mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)

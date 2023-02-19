@@ -551,21 +551,23 @@ c
 c
 c     print the total gradient components for each atom
 c
-         write (iout,310)
-  310    format (/,' Cartesian Gradient Breakdown over Individual',
-     &              ' Atoms :')
-         if (digits .ge. 8) then
-            write (iout,320)
-  320       format (/,2x,'Type',4x,'Atom',10x,'dE/dX',11x,'dE/dY',
-     &                 11x,'dE/dZ',11x,'Norm',/)
-         else if (digits .ge. 6) then
-            write (iout,330)
-  330       format (/,2x,'Type',6x,'Atom',11x,'dE/dX',9x,'dE/dY',
-     &                 9x,'dE/dZ',11x,'Norm',/)
-         else
-            write (iout,340)
-  340       format (/,2x,'Type',6x,'Atom',14x,'dE/dX',7x,'dE/dY',
-     &                 7x,'dE/dZ',10x,'Norm',/)
+         if (doanalyt .or. donumer) then
+            write (iout,310)
+  310       format (/,' Cartesian Gradient Breakdown over Individual',
+     &                 ' Atoms :')
+            if (digits .ge. 8) then
+               write (iout,320)
+  320          format (/,2x,'Type',4x,'Atom',10x,'dE/dX',11x,'dE/dY',
+     &                    11x,'dE/dZ',11x,'Norm',/)
+            else if (digits .ge. 6) then
+               write (iout,330)
+  330          format (/,2x,'Type',6x,'Atom',11x,'dE/dX',9x,'dE/dY',
+     &                    9x,'dE/dZ',11x,'Norm',/)
+            else
+               write (iout,340)
+  340          format (/,2x,'Type',6x,'Atom',14x,'dE/dX',7x,'dE/dY',
+     &                    7x,'dE/dZ',10x,'Norm',/)
+            end if
          end if
          totnorm = 0.0d0
          ntotnorm = 0.0d0
@@ -606,8 +608,11 @@ c
 c
 c     print the total norm for the analytical gradient
 c
-         write (iout,410)
-  410    format (/,' Total Gradient Norm and RMS Gradient per Atom :')
+         if (doanalyt .or. donumer) then
+            write (iout,410)
+  410       format (/,' Total Gradient Norm and RMS Gradient',
+     &                 ' per Atom :')
+         end if
          if (doanalyt) then
             totnorm = sqrt(totnorm)
             if (digits .ge. 8) then
