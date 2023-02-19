@@ -41,8 +41,7 @@ c     calculate external field energy over partial charges
 c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
-!$OMP&    x,y,z,f,pchg,exfld)
-!$OMP&    shared(exf)
+!$OMP&    x,y,z,f,pchg,exfld,exf)
 !$OMP    DO reduction(+:exf) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
@@ -64,8 +63,7 @@ c     calculate external field energy over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,f,rpole,exfld)
-!$OMP&    shared(exf)
+!$OMP&    x,y,z,f,rpole,exfld,exf)
 !$OMP    DO reduction(+:exf) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -137,8 +135,7 @@ c     calculate energy and derivatives over partial charges
 c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
-!$OMP&    x,y,z,f,pchg,exfld)
-!$OMP&    shared(exf,dec,vir)
+!$OMP&    x,y,z,f,pchg,exfld,exf,dec,vir)
 !$OMP    DO reduction(+:exf,dec,vir) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
@@ -187,8 +184,7 @@ c     calculate energy and derivatives over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,f,rpole,exfld)
-!$OMP&    shared(exf,dem,vir)
+!$OMP&    x,y,z,f,rpole,exfld,exf,dem,vir)
 !$OMP    DO reduction(+:exf,dem,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -310,8 +306,7 @@ c     calculate energy and partitioning over partial charges
 c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
-!$OMP&    x,y,z,f,pchg,exfld)
-!$OMP&    shared(exf,nec,aec,nem,aem)
+!$OMP&    x,y,z,f,pchg,exfld,exf,nec,aec)
 !$OMP    DO reduction(+:exf,nec,aec) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
@@ -335,8 +330,7 @@ c     calculate energy and partitioning over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,f,rpole,exfld)
-!$OMP&    shared(exf,nec,nem,aem)
+!$OMP&    x,y,z,f,rpole,exfld,exf,nem,aem)
 !$OMP    DO reduction(+:exf,nem,aem) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
