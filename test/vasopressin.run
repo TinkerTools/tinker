@@ -1,0 +1,4 @@
+../bin/xyzint vasopressin a
+../bin/testgrad vasopressin.xyz y y 0.00001 n
+../bin/testrot vasopressin 0 0.001
+rm vasopressin.int

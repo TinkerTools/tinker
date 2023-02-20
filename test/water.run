@@ -1,3 +1,5 @@
+../bin/potential -k water.tip3p 6 water water n 0.001
+rm water.key
 ../bin/potential -k water.amoeba 6 water water n 0.001
 rm water.key
 ../bin/potential -k water.hippo 6 water water n 0.001

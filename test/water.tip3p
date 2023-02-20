@@ -1,0 +1,6 @@
+parameters                     NONE
+dielectric                      1.0
+atom         1    O     "O Water (TIP3P)"      8     15.999     2
+atom         2    H     "H Water (TIP3P)"      1      1.008     1
+charge       1               -0.834
+charge       2                0.417
