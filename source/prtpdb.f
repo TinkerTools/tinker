@@ -16,7 +16,7 @@ c     "prtpdb" writes out a set of Protein Data Bank coordinates
 c     to an external disk file
 c
 c
-      subroutine prtpdb (ipdb)
+      subroutine prtpdb (ipdb,imdl)
       use bound
       use boxes
       use files
@@ -24,7 +24,8 @@ c
       use sequen
       use titles
       implicit none
-      integer i,k,ipdb
+      integer i,k
+      integer ipdb,imdl
       integer start,stop
       integer resmax,resnumb
       integer, allocatable :: resid(:)
@@ -70,6 +71,13 @@ c
       if (use_bounds) then
          fstr = '(''CRYST1'',3f9.3,3f7.2)'
          write (ipdb,fstr(1:22)) xbox,ybox,zbox,alpha,beta,gamma
+      end if
+c
+c     write record to initiate the current PDB model
+c
+      if (imdl .ne. 0) then
+         fstr = '(''MODEL '',i8)'
+         write (ipdb,fstr(1:13))  imdl
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -176,8 +184,13 @@ c
             write (ipdb,fstr(1:14))  i,(ipdb12(k,i),k=1,npdb12(i))
          end if
       end do
-      fstr = '(''END'')'
-      write (ipdb,fstr(1:7))
+c
+c     write record to close the current PDB model
+c
+      if (imdl .ne. 0) then
+         fstr = '(''ENDMDL'')'
+         write (ipdb,fstr(1:10))
+      end if
 c
 c     close the output unit if opened by this routine
 c

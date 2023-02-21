@@ -20,8 +20,10 @@ c
       use files
       use inform
       implicit none
-      integer ipdb,ixyz
+      integer i,ipdb,ixyz
       integer freeunit
+      logical multi
+      character*7 fstr
       character*240 pdbfile
       character*240 xyzfile
 c
@@ -38,14 +40,7 @@ c
       call katom
       call molecule
 c
-c     open the Protein Data Bank file to be used for output
-c
-      ipdb = freeunit ()
-      pdbfile = filename(1:leng)//'.pdb'
-      call version (pdbfile,'new')
-      open (unit=ipdb,file=pdbfile,status='new')
-c
-c     reopen the coordinates file and read the first structure
+c     check for multiple coordinate sets and get first structure
 c
       ixyz = freeunit ()
       xyzfile = filename
@@ -53,14 +48,33 @@ c
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)
+      call readxyz (ixyz)
+      multi = .true.
+      if (abort)  multi = .false.
+      rewind (unit=ixyz)
+      call readxyz (ixyz)
+c
+c     open the Protein Data Bank file to be used for output
+c
+      ipdb = freeunit ()
+      pdbfile = filename(1:leng)//'.pdb'
+      call version (pdbfile,'new')
+      open (unit=ipdb,file=pdbfile,status='new')
 c
 c     add each successive coordinate frame to the PDB file
 c
+      i = 0
       do while (.not. abort)
+         if (multi)  i = i + 1
          call makepdb
-         call prtpdb (ipdb)
+         call prtpdb (ipdb,i)
          call readxyz (ixyz)
       end do
+c
+c     append a termination record to end the PDB file
+c
+      fstr = '(''END'')'
+      write (ipdb,fstr(1:7))
 c
 c     perform any final tasks before program exit
 c

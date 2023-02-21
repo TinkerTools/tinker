@@ -82,6 +82,7 @@ c
          done = .false.
          do while (.not. done)
             call getword (record,word,next)
+            call justify (word)
             if (word .eq. '   ') then
                done = .true.
             else
