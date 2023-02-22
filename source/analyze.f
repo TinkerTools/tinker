@@ -543,7 +543,6 @@ c
       use inform
       use inter
       use iounit
-      use limits
       use molcul
       implicit none
       real*8 energy
@@ -560,7 +559,7 @@ c
       if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
       if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
       if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
-      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald) then
+      if (nmol.gt.1 .and. nmol.lt.n) then
          write (iout,fstr)  einter
       end if
 c
