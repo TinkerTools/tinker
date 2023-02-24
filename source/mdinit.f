@@ -22,6 +22,7 @@ c
       use bath
       use bound
       use couple
+      use extfld
       use files
       use freeze
       use group
@@ -273,13 +274,16 @@ c
                nfree = nfree - kratx(i)
             end do
          end if
-         if (isothermal .and. thermostat.ne.'ANDERSEN' .and.
-     &       integrate.ne.'STOCHASTIC' .and. integrate.ne.'BAOAB' .and.
-     &       integrate.ne.'GHMC') then
-            if (use_bounds) then
-               nfree = nfree - 3
-            else
-               nfree = nfree - 6
+         if (isothermal .and. thermostat.ne.'ANDERSEN'
+     &         .and. integrate.ne.'STOCHASTIC'
+     &         .and. integrate.ne.'BAOAB'
+     &         .and. integrate.ne.'GHMC') then
+            if (.not. use_exfld) then
+               if (use_bounds) then
+                  nfree = nfree - 3
+               else
+                  nfree = nfree - 6
+               end if
             end if
          end if
          if (barostat .eq. 'BUSSI')  nfree = nfree + 1
