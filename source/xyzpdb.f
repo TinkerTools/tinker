@@ -71,7 +71,7 @@ c
          call readxyz (ixyz)
       end do
 c
-c     append a termination record to end the PDB file
+c     append termination record to the end of the PDB file
 c
       fstr = '(''END'')'
       write (ipdb,fstr(1:7))

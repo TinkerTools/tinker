@@ -196,14 +196,13 @@ c     count the number of coordinate frames in the archive file
 c
       abort = .false.
       rewind (unit=iarc)
-      first= .true.
+      first = .true.
       nframe = 0
       do while (.not. abort)
          call readcart (iarc,first)
          nframe = nframe + 1
       end do
       nframe = nframe - 1
-      rewind (unit=iarc)
       stop = min(nframe,stop)
       nframe = (stop-start)/step + 1
       write (iout,130)  nframe
@@ -223,6 +222,8 @@ c     get the archived coordinates for each frame in turn
 c
       write (iout,140)
   140 format (/,' Reading the Coordinates Archive File :',/)
+      rewind (unit=iarc)
+      first = .true.
       nframe = 0
       iframe = start
       skip = start
