@@ -547,7 +547,7 @@ c
       use molcul
       implicit none
       real*8 energy
-      character*240 fstr
+      character*56 fstr
 c
 c
 c     perform the energy analysis by atom and component
@@ -560,8 +560,7 @@ c
       if (digits .ge. 6)  fstr(31:38) = '7x,f18.6'
       if (digits .ge. 8)  fstr(31:38) = '5x,f20.8'
       if (abs(einter) .ge. 1.0d10)  fstr(34:34) = 'd'
-      if (use_ewald)  fstr(51:62) = ' (approx.)'')'
-      if (verbose .and. nmol.gt.1 .and. nmol.lt.n) then
+      if (nmol.gt.1 .and. nmol.lt.n .and. .not.use_ewald) then
          write (iout,fstr)  einter
       end if
 c
@@ -607,7 +606,7 @@ c
       if (digits .ge. 8)  form1 = '1x,f20.8,i17'
       form2 = form1(1:3)//'d'//form1(5:12)
       fstr = '(/,'' Energy Component Breakdown :'',
-     &          11x,''Kcal/mole'',8x,''Interactions''/)'
+     &          11x,''Kcal/mole'',8x,''Interactions'',/)'
       write (iout,fstr)
       if (use_bond .and. (neb.ne.0.or.eb.ne.0.0d0)) then
          fstr = '('' Bond Stretching'',12x,'//form1//')'
