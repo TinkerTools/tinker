@@ -21,7 +21,7 @@ c
       use mpole
       use repel
       implicit none
-      integer i,k,ii
+      integer i,k
       integer ia,ib,ic,id
       real*8 xad,yad,zad
       real*8 xbd,ybd,zbd

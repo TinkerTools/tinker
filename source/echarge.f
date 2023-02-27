@@ -806,7 +806,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,in,kk,kn
+      integer ii,in
+      integer kk,kn
       real*8 e,fs,fgrp
       real*8 f,fi,fik
       real*8 r,r2,rb,rew
@@ -1352,8 +1353,9 @@ c
       use shunt
       use usage
       implicit none
-      integer i,j,k,kkk
-      integer ii,in,kk,kn
+      integer i,j,k
+      integer ii,in
+      integer kk,kn
       real*8 e,fs,fgrp
       real*8 f,fi,fik
       real*8 r,r2,rb,rew

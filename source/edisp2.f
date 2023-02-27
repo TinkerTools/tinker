@@ -35,7 +35,7 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,iii
+      integer ii,kk
       integer iatom,jcell
       integer nlist,list(5)
       real*8 xi,yi,zi

@@ -777,7 +777,6 @@ c
       use mpole
       use polpot
       implicit none
-      integer i,j
       real*8 r,xr,yr,zr
       real*8 dr,dot,eps
       real*8 dx,dy,dz

@@ -1053,8 +1053,8 @@ c
       use neigh
       use shunt
       implicit none
-      integer i,j,k,kk
-      integer ii,in,kn
+      integer i,j,k
+      integer in,kn,kk
       real*8 fi,fik,fgrp
       real*8 r,r2,rb,rb2
       real*8 de,d2e
@@ -1227,8 +1227,8 @@ c
       use math
       use warp
       implicit none
-      integer i,j,k,kk
-      integer in,kn
+      integer i,j,k
+      integer in,kn,kk
       real*8 fi,fik,fgrp
       real*8 r,r2,rb,rb2
       real*8 de,d2e

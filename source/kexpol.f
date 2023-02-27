@@ -27,9 +27,8 @@ c
       use keys
       use sizes
       implicit none
-      integer i,k,ii
-      integer ia,ic,next
-      integer ilpr
+      integer i,k,ia,ic
+      integer ilpr,next
       real*8 kpr,ppr,apr
       logical header
       logical lpr
