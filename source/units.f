@@ -18,13 +18,13 @@ c     M. Stock, R. Davis, E. de Mirandes and M. J. T. Milton, "The
 c     Revision of the SI - The Result of Three Decades of Progress
 c     in Metrology", Metrologia, 56, 022001 (2019)
 c
-c     P. J. Mohr, D. B. Newell and B. N. Taylor, "CODATA Recommended
-c     Values of the Fundamental Physical Constants: 2014", Journal of
-c     Physical and Chemical Reference Data, 45, 043102 (2016)
+c     E. Teisinga, P. J. Mohr, D. B. Newell and B. N. Taylor, "CODATA
+c     Recommended Values of the Fundamental Physical Constants: 2018",
+c     Journal of Physical and Chemical Reference Data, 50, 033105 (2021)
 c
 c     Where appropriate, values are from the November 2018 revision
 c     of SI units to fixed values by the 26th General Conference on
-c     Weights and Measures; other values are taken from 2014 CODATA
+c     Weights and Measures; other values are taken from 2018 CODATA
 c     reference constants or are described below
 c
 c     The conversion from calorie to Joule is the definition of the
@@ -83,16 +83,16 @@ c
       parameter (boltzmann=0.831446262d0)
       parameter (gasconst=1.987204259d-3)
       parameter (elemchg=1.602176634d-19)
-      parameter (vacperm=8.854187817d-12)
-      parameter (emass=5.4857990907d-4)
+      parameter (vacperm=8.8541878128d-12)
+      parameter (emass=5.48579909065d-4)
       parameter (planck=6.62607015d-34)
       parameter (joule=4.1840d0)
       parameter (ekcal=4.1840d+2)
-      parameter (bohr=0.52917721067d0)
+      parameter (bohr=0.529177210903d0)
       parameter (hartree=627.5094736d0)
       parameter (evolt=27.21138602d0)
       parameter (efreq=2.194746314d+5)
-      parameter (coulomb=332.063713d0)
+      parameter (coulomb=332.0637133d0)
       parameter (elefield=1439.96455d0)
       parameter (debye=4.80321d0)
       parameter (prescon=6.85684112d+4)
