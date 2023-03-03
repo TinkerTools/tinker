@@ -34,7 +34,7 @@
                       by single point energy computation and determination
                       of the molecular volume and surface area
 
-    (6) CYCLOHEX      locate the transition state between chair and boat
+    (6) CYCLOHEXANE   locate the transition state between chair and boat
                       cyclohexane via two methods: the Muller-Brown saddle
                       point method, and path sampling using the Elber
                       algorithm; vibrational analysis of the results shows

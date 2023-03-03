@@ -1263,6 +1263,7 @@ c
       use neigh
       use potent
       use potfit
+      use units
       implicit none
       integer i,j,nvar
       integer nresid
@@ -1274,6 +1275,7 @@ c
       real*8 tscale,cscale
       real*8 pscale,rscale
       real*8 rconf,ratio
+      real*8 dterm,qterm
       real*8 xx(*)
       real*8 resid(*)
       character*6 mode
@@ -1296,9 +1298,9 @@ c     set electrostatic potential weight vs. parameter restraints
 c
       rconf = dble(nconf)
       ratio = dble(npoint) / dble(nvar*nconf)
-c     rscale = 1.0d0 * sqrt(wresp) * rconf * sqrt(ratio)
-c     rscale = 0.1d0 * sqrt(wresp) * rconf * ratio
-      rscale = 0.006d0 * sqrt(wresp) * rconf * sqrt(ratio**3)
+      rscale = 2.2d0 * sqrt(wresp) * rconf * sqrt(ratio)
+c     rscale = 0.18d0 * sqrt(wresp) * rconf * ratio
+c     rscale = 0.015d0 * sqrt(wresp) * rconf * sqrt(ratio**3)
 c
 c     initialize counters for parameters and residual components
 c
@@ -1381,6 +1383,13 @@ c
          end if
       end do
 c
+c     scaling factors for dipole and quadrupole residuals
+c
+      dterm = 1.0d0
+      qterm = 1.0d0
+c     dterm = 1.0d0 / bohr
+c     qterm = 3.0d0 / bohr**2
+c
 c     get residuals due to restraints on parameter values
 c
       do i = 1, nvar
@@ -1392,6 +1401,11 @@ c
                resid(iresid) = xx(i) * rscale
             else
                resid(iresid) = 0.0d0
+            end if
+            if (varpot(i) .eq. 'DIPOLE') then
+               resid(iresid) = resid(iresid) / dterm
+            else if (varpot(i) .eq. 'QUADPL') then
+               resid(iresid) = resid(iresid) / qterm
             end if
          end if
          if (varpot(i) .eq. 'CHGPEN') then
