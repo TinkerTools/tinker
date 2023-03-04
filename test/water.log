@@ -69,9 +69,9 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0    18299.3952   56299.3554   56299.3554         2         3
-     1    13495.7727   28830.6044   28830.6044         2         6
-     2    11493.5725       0.0000       0.0000         2         9
+     0    18299.3953   56299.3557   56299.3557         2         3
+     1    11686.9544   31131.8591   31131.8591         2         6
+     2     8020.9430       0.0000       0.0000         2         9
 
  SQUARE  --  Normal Termination of Least Squares
 
@@ -79,28 +79,28 @@
 
  Parameter     Atom Type/Class      Category          Value         Fixed
 
-     1              1 Type          Charge          -0.73308
-     2              2 Type          Charge           0.36654
+     1              1 Type          Charge          -0.68166
+     2              2 Type          Charge           0.34083
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
 
    Structure   Atom      Points      Potential        Target        RMS Diff
 
-        1        1        1887        -9.3730        -9.1967         2.2506
-        1        2        1237         7.1112         7.0521         1.8519
-        1        3        1233         7.1213         7.0503         1.8996
+        1        1        1887        -8.7156        -9.1967         2.0368
+        1        2        1237         6.6124         7.0521         1.7677
+        1        3        1233         6.6218         7.0503         1.8107
 
  Electrostatic Potential over all Grid Points :
 
- Average Potential Value for Model :                 -0.0252
- Average Potential Magnitude for Model :              8.5914
+ Average Potential Value for Model :                 -0.0234
+ Average Potential Magnitude for Model :              7.9888
  Average Potential Value for Target :                 0.0143
  Average Potential Magnitude for Target :             8.1777
 
- Average Signed Potential Difference :               -0.0395
- Average Unsigned Potential Difference :              1.5960
- Root Mean Square Potential Difference :              2.0466
+ Average Signed Potential Difference :               -0.0377
+ Average Unsigned Potential Difference :              1.4265
+ Root Mean Square Potential Difference :              1.9004
 
      ######################################################################
    ##########################################################################
@@ -144,24 +144,24 @@
 
  Parameter     Atom Type/Class      Category          Value         Fixed
 
-     1              1 Type          Monopole        -0.51966
+    --              1 Type          Monopole        -0.51966          X
     --              1 Type          X-Dipole         0.00000          X
     --              1 Type          Y-Dipole         0.00000          X
-     2              1 Type          Z-Dipole         0.14279
-     3              1 Type          XX-Quad          0.37928
+     1              1 Type          Z-Dipole         0.14279
+     2              1 Type          XX-Quad          0.37928
     --              1 Type          XY-Quad          0.00000          X
     --              1 Type          XZ-Quad          0.00000          X
-     4              1 Type          YY-Quad         -0.41809
+     3              1 Type          YY-Quad         -0.41809
     --              1 Type          YZ-Quad          0.00000          X
     --              1 Type          ZZ-Quad          0.03881
-     5              2 Type          Monopole         0.25983
-     6              2 Type          X-Dipole        -0.03859
+    --              2 Type          Monopole         0.25983          X
+     4              2 Type          X-Dipole        -0.03859
     --              2 Type          Y-Dipole         0.00000          X
-     7              2 Type          Z-Dipole        -0.05818
-     8              2 Type          XX-Quad         -0.03673
+     5              2 Type          Z-Dipole        -0.05818
+     6              2 Type          XX-Quad         -0.03673
     --              2 Type          XY-Quad          0.00000          X
-     9              2 Type          XZ-Quad         -0.00203
-    10              2 Type          YY-Quad         -0.10739
+     7              2 Type          XZ-Quad         -0.00203
+     8              2 Type          YY-Quad         -0.10739
     --              2 Type          YZ-Quad          0.00000          X
     --              2 Type          ZZ-Quad          0.14412
 
@@ -169,13 +169,10 @@
 
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
-     0      621.1492   16251.1957   16251.1957        10        11
-     1      192.2235     437.9018     437.9018        10        22
-     2      175.9392      32.7195      32.7195        10        33
-     3      172.2308      17.0624      17.0624        10        44
-     4      171.5970      14.0605      14.0605        10        55
-     5      170.7544       8.5192       8.5192        10        66
-     6      170.2904       0.0000       0.0000        10        77
+     0      621.1492     573.4085     573.4085         8         9
+     1      252.4563     175.9285     175.9285         8        18
+     2      208.5089      32.6576      32.6576         8        27
+     3      186.9054       0.0000       0.0000         8        36
 
  SQUARE  --  Normal Termination of Least Squares
 
@@ -183,46 +180,46 @@
 
  Parameter     Atom Type/Class      Category          Value         Fixed
 
-     1              1 Type          Monopole        -0.55016
+    --              1 Type          Monopole        -0.51966          X
     --              1 Type          X-Dipole         0.00000          X
     --              1 Type          Y-Dipole         0.00000          X
-     2              1 Type          Z-Dipole         0.11307
-     3              1 Type          XX-Quad          0.38240
+     1              1 Type          Z-Dipole         0.12661
+     2              1 Type          XX-Quad          0.38889
     --              1 Type          XY-Quad          0.00000          X
     --              1 Type          XZ-Quad          0.00000          X
-     4              1 Type          YY-Quad         -0.50971
+     3              1 Type          YY-Quad         -0.51567
     --              1 Type          YZ-Quad          0.00000          X
-    --              1 Type          ZZ-Quad          0.12731
-     5              2 Type          Monopole         0.27508
-     6              2 Type          X-Dipole        -0.06319
+    --              1 Type          ZZ-Quad          0.12678
+    --              2 Type          Monopole         0.25983          X
+     4              2 Type          X-Dipole        -0.06237
     --              2 Type          Y-Dipole         0.00000          X
-     7              2 Type          Z-Dipole        -0.08596
-     8              2 Type          XX-Quad          0.03027
+     5              2 Type          Z-Dipole        -0.10118
+     6              2 Type          XX-Quad          0.03684
     --              2 Type          XY-Quad          0.00000          X
-     9              2 Type          XZ-Quad         -0.02465
-    10              2 Type          YY-Quad         -0.07131
+     7              2 Type          XZ-Quad         -0.02350
+     8              2 Type          YY-Quad         -0.06474
     --              2 Type          YZ-Quad          0.00000          X
-    --              2 Type          ZZ-Quad          0.04104
+    --              2 Type          ZZ-Quad          0.02790
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
 
    Structure   Atom      Points      Potential        Target        RMS Diff
 
-        1        1        1887        -9.2899        -9.1967         0.2934
-        1        2        1237         6.9153         7.0521         0.2471
-        1        3        1233         6.9081         7.0503         0.2605
+        1        1        1887        -9.2854        -9.1967         0.2911
+        1        2        1237         6.9127         7.0521         0.2489
+        1        3        1233         6.9055         7.0503         0.2619
 
  Electrostatic Potential over all Grid Points :
 
- Average Potential Value for Model :                 -0.1052
- Average Potential Magnitude for Model :              8.1501
+ Average Potential Value for Model :                 -0.1047
+ Average Potential Magnitude for Model :              8.1467
  Average Potential Value for Target :                 0.0143
  Average Potential Magnitude for Target :             8.1777
 
- Average Signed Potential Difference :               -0.1195
- Average Unsigned Potential Difference :              0.1603
- Root Mean Square Potential Difference :              0.2717
+ Average Signed Potential Difference :               -0.1190
+ Average Unsigned Potential Difference :              0.1618
+ Root Mean Square Potential Difference :              0.2715
 
      ######################################################################
    ##########################################################################
@@ -294,14 +291,13 @@
  LS Iter     F Value      Total G     Active G    N Active   F Calls
 
      0      140.5753     725.3294     725.3294        10        11
-     1      119.4115     723.6750     723.6750        10        22
-     2       41.7725     311.6721     311.6721        10        34
-     3       17.3907     108.8212     108.8212        10        46
-     4       11.6276      33.7243      33.7243        10        57
-     5        9.5140      43.4609      43.4609        10        68
-     6        8.7785       1.8339       1.8339        10        79
-     7        8.7763       0.0235       0.0235        10        90
-     8        8.7763       0.0006       0.0006        10       101
+     1      138.9760     817.2147     817.2147        10        22
+     2       48.4783     360.0965     360.0965        10        33
+     3       12.2416     101.8414     101.8414        10        44
+     4        7.8589      12.7785      12.7785        10        55
+     5        7.7690       0.4958       0.4958        10        66
+     6        7.7688       0.0063       0.0063        10        77
+     7        7.7688       0.0002       0.0002        10        88
 
  SQUARE  --  Normal Termination of Least Squares
 
@@ -312,42 +308,42 @@
     --              1 Type          Monopole        -0.37484          X
     --              1 Type          X-Dipole         0.00000          X
     --              1 Type          Y-Dipole         0.00000          X
-     1              1 Type          Z-Dipole         0.05988
-     2              1 Type          XX-Quad          0.67725
+     1              1 Type          Z-Dipole         0.06133
+     2              1 Type          XX-Quad          0.67670
     --              1 Type          XY-Quad          0.00000          X
     --              1 Type          XZ-Quad          0.00000          X
-     3              1 Type          YY-Quad         -0.59461
+     3              1 Type          YY-Quad         -0.59388
     --              1 Type          YZ-Quad          0.00000          X
-    --              1 Type          ZZ-Quad         -0.08264
+    --              1 Type          ZZ-Quad         -0.08282
     --              2 Type          Monopole         0.18742          X
-     4              2 Type          X-Dipole         0.00568
+     4              2 Type          X-Dipole         0.00596
     --              2 Type          Y-Dipole         0.00000          X
-     5              2 Type          Z-Dipole        -0.20093
-     6              2 Type          XX-Quad          0.03992
+     5              2 Type          Z-Dipole        -0.19931
+     6              2 Type          XX-Quad          0.03922
     --              2 Type          XY-Quad          0.00000          X
-     7              2 Type          XZ-Quad          0.02673
-     8              2 Type          YY-Quad          0.01662
+     7              2 Type          XZ-Quad          0.02825
+     8              2 Type          YY-Quad          0.01353
     --              2 Type          YZ-Quad          0.00000          X
-    --              2 Type          ZZ-Quad         -0.05654
-     9              1 Class         ChgPen           4.38110
-    10              2 Class         ChgPen           4.41368
+    --              2 Type          ZZ-Quad         -0.05275
+     9              1 Class         ChgPen           4.38658
+    10              2 Class         ChgPen           4.39985
 
  Average Electrostatic Potential over Atoms :
       (Kcal/mole per unit charge)
 
    Structure   Atom      Points      Potential        Target        RMS Diff
 
-        1        1        1887        -9.2072        -9.1967         0.0610
-        1        2        1237         7.0443         7.0521         0.0399
-        1        3        1233         7.0424         7.0503         0.0413
+        1        1        1887        -9.2060        -9.1967         0.0586
+        1        2        1237         7.0434         7.0521         0.0386
+        1        3        1233         7.0415         7.0503         0.0398
 
  Electrostatic Potential over all Grid Points :
 
  Average Potential Value for Model :                  0.0053
- Average Potential Magnitude for Model :              8.1794
+ Average Potential Magnitude for Model :              8.1787
  Average Potential Value for Target :                 0.0143
  Average Potential Magnitude for Target :             8.1777
 
  Average Signed Potential Difference :               -0.0090
- Average Unsigned Potential Difference :              0.0353
- Root Mean Square Potential Difference :              0.0505
+ Average Unsigned Potential Difference :              0.0343
+ Root Mean Square Potential Difference :              0.0486

@@ -184,7 +184,7 @@ c     calculate energy and derivatives over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,f,rpole,exfld,exf,dem,vir)
+!$OMP&    x,y,z,xaxis,yaxis,zaxis,f,rpole,exfld,exf,dem,vir)
 !$OMP    DO reduction(+:exf,dem,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
