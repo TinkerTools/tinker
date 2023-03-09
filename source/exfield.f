@@ -156,12 +156,12 @@ c
                dec(1,i) = dec(1,i) + frx
                dec(2,i) = dec(2,i) + fry
                dec(3,i) = dec(3,i) + frz
-               vxx = vxx + xi*frx
-               vyy = vyy + yi*fry
-               vzz = vzz + zi*frz
-               vxy = vxy + yi*frx + xi*fry
-               vxz = vxz + zi*frx + xi*frz
-               vyz = vyz + zi*fry + yi*frz
+               vxx = xi * frx
+               vyy = yi * fry
+               vzz = zi * frz
+               vxy = 0.5d0 * (yi*frx+xi*fry)
+               vxz = 0.5d0 * (zi*frx+xi*frz)
+               vyz = 0.5d0 * (zi*fry+yi*frz)
 c
 c     increment the total internal virial tensor components
 c
@@ -243,9 +243,9 @@ c
                vxx = vxx + xi*frx
                vyy = vyy + yi*fry
                vzz = vzz + zi*frz
-               vxy = vxy + yi*frx + xi*fry
-               vxz = vxz + zi*frx + xi*frz
-               vyz = vyz + zi*fry + yi*frz
+               vxy = vxy + 0.5d0*(yi*frx+xi*fry)
+               vxz = vxz + 0.5d0*(zi*frx+xi*frz)
+               vyz = vyz + 0.5d0*(zi*fry+yi*frz)
 c
 c     increment the total internal virial tensor components
 c

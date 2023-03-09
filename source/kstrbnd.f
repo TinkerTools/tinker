@@ -167,6 +167,56 @@ c
          end do
       end if
 c
+c     process keywords containing stretch-bend specific parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'STRBND ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            sb1 = 0.0d0
+            sb2 = 0.0d0
+            string = record(next:240)
+            read (string,*,err=90,end=90)  ia,ib,ic,sb1,sb2
+            if (min(ia,ib,ic) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,70)
+   70             format (/,' Additional Stretch-Bend Parameters :',
+     &                       ' for Specific Angles :',
+     &                    //,8x,'Atoms',14x,'K(SB)-1',8x,'K(SB)-2',/)
+               end if
+               if (.not. silent) then
+                  write (iout,80)  ia,ib,ic,sb1,sb2
+   80             format (4x,3i4,3x,2f15.3)
+               end if
+               if (ia .gt. ic) then
+                  ita = ia
+                  ia = ic
+                  ic = ita
+               end if
+               do j = 1, nstrbnd
+                  k = isb(1,j)
+                  if (ia.eq.iang(1,k) .and. ib.eq.iang(2,k)
+     &                   .and. ic.eq.iang(3,k)) then
+                     sbk(1,j) = sb1
+                     sbk(2,j) = sb2
+                     goto 90
+                  end if
+               end do
+            end if
+   90       continue
+         end if
+      end do
+c
 c     turn off the stretch-bend potential if it is not used
 c
       if (nstrbnd .eq. 0)  use_strbnd = .false.

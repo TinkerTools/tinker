@@ -69,15 +69,6 @@ c
          monoclinic = .false.
          triclinic = .false.
          nonprism = .true.
-c        ybox = xbox
-c        if (octahedron) then
-c           zbox = xbox
-c        else if (dodecadron) then
-c           zbox = xbox * root2
-c        end if
-c        alpha = 90.0d0
-c        beta = 90.0d0
-c        gamma = 90.0d0
       end if
 c
 c     compute and store half box lengths and other lengths

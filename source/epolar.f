@@ -65,6 +65,7 @@ c
       use chgpot
       use couple
       use energi
+      use extfld
       use mplpot
       use mpole
       use polar
@@ -476,6 +477,18 @@ c
          end do
       end if
 c
+c     increment polarization energy due to external field
+c
+      if (use_exfld) then
+         do i = 1, npole
+            e = 0.0d0
+            do j = 1, 3
+               e = e - f*uind(j,i)*exfld(j)
+            end do
+            ep = ep + e
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
@@ -501,6 +514,7 @@ c
       use chgpot
       use couple
       use energi
+      use extfld
       use mplpot
       use mpole
       use neigh
@@ -579,7 +593,7 @@ c
 !$OMP& shared(npole,ipole,rpole,x,y,z,pcore,pval,palpha,uind,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
-!$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,f,off2)
+!$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,f,off2,exfld)
 !$OMP& firstprivate(pscale) shared (ep)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
@@ -751,6 +765,23 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+c
+c     increment polarization energy due to external field
+c
+      if (use_exfld) then
+!$OMP    DO reduction(+:ep) schedule(guided)
+         do i = 1, npole
+            e = 0.0d0
+            do j = 1, 3
+               e = e - f*uind(j,i)*exfld(j)
+            end do
+            ep = ep + e
+         end do
+!$OMP    END DO
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays
@@ -891,6 +922,7 @@ c
       use chgpot
       use couple
       use energi
+      use extfld
       use math
       use mplpot
       use mpole
@@ -1321,6 +1353,18 @@ c
          end do
       end if
 c
+c     increment polarization energy due to external field
+c
+      if (use_exfld) then
+         do i = 1, npole
+            e = 0.0d0
+            do j = 1, 3
+               e = e - f*uind(j,i)*exfld(j)
+            end do
+            ep = ep + e
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
@@ -1458,6 +1502,7 @@ c
       use chgpot
       use couple
       use energi
+      use extfld
       use math
       use mplpot
       use mpole
@@ -1521,7 +1566,7 @@ c
 !$OMP& shared(npole,ipole,rpole,uind,x,y,z,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
-!$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f)
+!$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,exfld)
 !$OMP& firstprivate(pscale) shared (ep)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
@@ -1710,6 +1755,23 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+c
+c     increment polarization energy due to external field
+c
+      if (use_exfld) then
+!$OMP    DO reduction(+:ep) schedule(guided)
+         do i = 1, npole
+            e = 0.0d0
+            do j = 1, 3
+               e = e - f*uind(j,i)*exfld(j)
+            end do
+            ep = ep + e
+         end do
+!$OMP    END DO
+      end if
+c
+c     OpenMP directives for the major loop structure
+c
 !$OMP END PARALLEL
 c
 c     perform deallocation of some local arrays

@@ -146,6 +146,55 @@ c
          end do
       end if
 c
+c     process keywords containing Urey-Bradley specific parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:9) .eq. 'UREYBRAD ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            bb = 0.0d0
+            tt = 0.0d0
+            string = record(next:240)
+            read (string,*,err=90,end=90)  ia,ib,ic,bb,tt
+            if (min(ia,ib,ic) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,70)
+   70             format (/,' Additional Urey-Bradley Parameters',
+     &                       ' for Specific Angles :',
+     &                    //,8x,'Atoms',17x,'K(UB)',7x,'Distance',/)
+               end if
+               if (.not. silent) then
+                  write (iout,80)  ia,ib,ic,bb,tt
+   80             format (6x,2i4,5x,f15.3,f15.4)
+               end if
+               if (ia .gt. ic) then
+                  ita = ia
+                  ia = ic
+                  ic = ita
+               end if
+               do j = 1, nurey
+                  if (ia.eq.iury(1,j) .and. ib.eq.iury(2,j)
+     &                   .and. ic.eq.iury(3,j)) then
+                     uk(j) = bb
+                     ul(j) = tt
+                     goto 90
+                  end if
+               end do
+            end if
+   90       continue
+         end if
+      end do
+c
 c     turn off the Urey-Bradley potential if it is not used
 c
       if (nurey .eq. 0)  use_urey = .false.

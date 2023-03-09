@@ -80,9 +80,9 @@ c
                ft(j) = 0
             end do
             string = record(next:240)
-            read (string,*,err=10,end=10)  ia,ib,ic,id,
+            read (string,*,err=100,end=100)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,6)
-   10       continue
+            if (min(ia,ib,ic,ic) .le. 0)  goto 100
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -101,22 +101,22 @@ c
             if (.not. silent) then
                if (header) then
                   header = .false.
-                  write (iout,20)
-   20             format (/,' Additional Torsional Parameters :',
+                  write (iout,10)
+   10             format (/,' Additional Torsional Parameters :',
      &                    //,5x,'Atom Classes',5x,'1-Fold',4x,'2-Fold',
      &                       4x,'3-Fold',4x,'4-Fold',4x,'5-Fold',
      &                       4x,'6-Fold',/)
                end if
                if (iring .eq. 0) then
-                  write (iout,30)  ia,ib,ic,id,
+                  write (iout,20)  ia,ib,ic,id,
      &                             (vt(j),nint(st(j)),j=1,6)
-   30             format (2x,4i4,1x,6(f6.2,i4))
+   20             format (2x,4i4,1x,6(f6.2,i4))
                else
                   if (iring .eq. 5)  label = '5-Ring '
                   if (iring .eq. 4)  label = '4-Ring '
-                  write (iout,40)  ia,ib,ic,id,
+                  write (iout,30)  ia,ib,ic,id,
      &                             (vt(j),nint(st(j)),j=1,6),label(1:6)
-   40             format (2x,4i4,1x,6(f6.2,i4),3x,a6)
+   30             format (2x,4i4,1x,6(f6.2,i4),3x,a6)
                end if
             end if
             if (iring .eq. 0) then
@@ -135,14 +135,14 @@ c
                      t5(2,j) = st(5)
                      t6(1,j) = vt(6)
                      t6(2,j) = st(6)
-                     goto 60
+                     goto 50
                   end if
                end do
-               write (iout,50)
-   50          format (/,' KTORS  --  Too many Torsional Angle',
+               write (iout,40)
+   40          format (/,' KTORS  --  Too many Torsional Angle',
      &                    ' Parameters')
                abort = .true.
-   60          continue
+   50          continue
             else if (iring .eq. 5) then
                do j = 1, maxnt5
                   if (kt5(j).eq.blank .or. kt5(j).eq.pt) then
@@ -159,14 +159,14 @@ c
                      t55(2,j) = st(5)
                      t65(1,j) = vt(6)
                      t65(2,j) = st(6)
-                     goto 80
+                     goto 70
                   end if
                end do
-               write (iout,70)
-   70          format (/,' KTORS  --  Too many 5-Ring Torsional',
+               write (iout,60)
+   60          format (/,' KTORS  --  Too many 5-Ring Torsional',
      &                    ' Parameters')
                abort = .true.
-   80          continue
+   70          continue
             else if (iring .eq. 4) then
                do j = 1, maxnt4
                   if (kt4(j).eq.blank .or. kt4(j).eq.pt) then
@@ -183,15 +183,16 @@ c
                      t54(2,j) = st(5)
                      t64(1,j) = vt(6)
                      t64(2,j) = st(6)
-                     goto 100
+                     goto 90
                   end if
                end do
-               write (iout,90)
-   90          format (/,' KTORS  --  Too many 4-Ring Torsional',
+               write (iout,80)
+   80          format (/,' KTORS  --  Too many 4-Ring Torsional',
      &                    ' Parameters')
                abort = .true.
-  100          continue
+   90          continue
             end if
+  100       continue
          end if
       end do
 c
@@ -520,6 +521,82 @@ c     perform deallocation of some local arrays
 c
       deallocate (kindex)
       deallocate (klist)
+c
+c     process keywords containing torsion specific parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         iring = -1
+         if (keyword(1:8) .eq. 'TORSION ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            do j = 1, 6
+               vt(j) = 0.0d0
+               st(j) = 0.0d0
+               ft(j) = 0
+            end do
+            string = record(next:240)
+            read (string,*,err=160,end=160)  ia,ib,ic,id,
+     &                                       (vt(j),st(j),ft(j),j=1,6)
+            if (min(ia,ib,ic,id) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               id = abs(id)
+               call torphase (ft,vt,st)
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,140)
+  140             format (/,' Additional Torsion Specific Parameters :',
+     &                    //,8x,'Atoms',9x,'1-Fold',4x,'2-Fold',
+     &                       4x,'3-Fold',4x,'4-Fold',4x,'5-Fold',
+     &                       4x,'6-Fold',/)
+               end if
+               if (.not. silent) then
+                  write (iout,150)  ia,ib,ic,id,
+     &                              (vt(j),nint(st(j)),j=1,6)
+  150             format (2x,4i4,1x,6(f6.2,i4))
+               end if
+               if (ib .gt. ic) then
+                  ita = ia
+                  itb = ib
+                  ia = id
+                  ib = ic
+                  ic = itb
+                  id = ita
+               else if (ib.eq.ic .and. ia.gt.id) then
+                  ita = ia
+                  ia = id
+                  id = ita
+               end if
+               do j = 1, ntors
+                  if (ia.eq.itors(1,j) .and. ib.eq.itors(2,j) .and.
+     &                ic.eq.itors(3,j) .and. id.eq.itors(4,j)) then
+                     tors1(1,i) = vt(1)
+                     tors1(2,i) = st(1)
+                     tors2(1,i) = vt(2)
+                     tors2(2,i) = st(2)
+                     tors3(1,i) = vt(3)
+                     tors3(2,i) = st(3)
+                     tors4(1,i) = vt(4)
+                     tors4(2,i) = st(4)
+                     tors5(1,i) = vt(5)
+                     tors5(2,i) = st(5)
+                     tors6(1,i) = vt(6)
+                     tors6(2,i) = st(6)
+                     goto 160
+                  end if
+               end do
+            end if
+  160       continue
+         end if
+      end do
 c
 c     find the cosine and sine of phase angle for each torsion
 c
