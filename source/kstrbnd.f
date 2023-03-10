@@ -182,21 +182,22 @@ c
             sb1 = 0.0d0
             sb2 = 0.0d0
             string = record(next:240)
-            read (string,*,err=90,end=90)  ia,ib,ic,sb1,sb2
+            read (string,*,err=70,end=70)  ia,ib,ic,sb1,sb2
+   70       continue
             if (min(ia,ib,ic) .lt. 0) then
                ia = abs(ia)
                ib = abs(ib)
                ic = abs(ic)
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,70)
-   70             format (/,' Additional Stretch-Bend Parameters :',
+                  write (iout,80)
+   80             format (/,' Additional Stretch-Bend Parameters :',
      &                       ' for Specific Angles :',
      &                    //,8x,'Atoms',14x,'K(SB)-1',8x,'K(SB)-2',/)
                end if
                if (.not. silent) then
-                  write (iout,80)  ia,ib,ic,sb1,sb2
-   80             format (4x,3i4,3x,2f15.3)
+                  write (iout,90)  ia,ib,ic,sb1,sb2
+   90             format (4x,3i4,3x,2f15.3)
                end if
                if (ia .gt. ic) then
                   ita = ia
@@ -209,11 +210,11 @@ c
      &                   .and. ic.eq.iang(3,k)) then
                      sbk(1,j) = sb1
                      sbk(2,j) = sb2
-                     goto 90
+                     goto 100
                   end if
                end do
             end if
-   90       continue
+  100       continue
          end if
       end do
 c
@@ -616,7 +617,7 @@ c
                   sbk(2,nstrbnd) = defstbn_cba(ira,irb,irc)
                end if
             else if (stbnt .eq. 2) then
-              if ((stbn_abc2(ita,itb,itc).ne.1000.0d0) .and.
+               if ((stbn_abc2(ita,itb,itc).ne.1000.0d0) .and.
      &            (stbn_cba2(ita,itb,itc).ne.1000.0d0)) then
                   nstrbnd = nstrbnd + 1
                   isb(1,nstrbnd) = i

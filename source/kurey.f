@@ -161,21 +161,22 @@ c
             bb = 0.0d0
             tt = 0.0d0
             string = record(next:240)
-            read (string,*,err=90,end=90)  ia,ib,ic,bb,tt
+            read (string,*,err=70,end=70)  ia,ib,ic,bb,tt
+   70       continue
             if (min(ia,ib,ic) .lt. 0) then
                ia = abs(ia)
                ib = abs(ib)
                ic = abs(ic)
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,70)
-   70             format (/,' Additional Urey-Bradley Parameters',
+                  write (iout,80)
+   80             format (/,' Additional Urey-Bradley Parameters',
      &                       ' for Specific Angles :',
      &                    //,8x,'Atoms',17x,'K(UB)',7x,'Distance',/)
                end if
                if (.not. silent) then
-                  write (iout,80)  ia,ib,ic,bb,tt
-   80             format (6x,2i4,5x,f15.3,f15.4)
+                  write (iout,90)  ia,ib,ic,bb,tt
+   90             format (6x,2i4,5x,f15.3,f15.4)
                end if
                if (ia .gt. ic) then
                   ita = ia
@@ -187,11 +188,11 @@ c
      &                   .and. ic.eq.iury(3,j)) then
                      uk(j) = bb
                      ul(j) = tt
-                     goto 90
+                     goto 100
                   end if
                end do
             end if
-   90       continue
+  100       continue
          end if
       end do
 c

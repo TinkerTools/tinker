@@ -66,24 +66,25 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=120,end=120)  ia,ib,fc,bd
-            if (ia.le.0 .or. ib.le.0)  goto 120
+            read (string,*,err=10,end=10)  ia,ib,fc,bd
+   10       continue
+            if (ia.le.0 .or. ib.le.0)  goto 130
             if (.not. silent) then
                if (header) then
                   header = .false.
-                  write (iout,10)
-   10             format (/,' Additional Bond Stretching Parameters :',
+                  write (iout,20)
+   20             format (/,' Additional Bond Stretching Parameters :',
      &                    //,5x,'Atom Classes',13x,'K(S)',9x,'Length',/)
                end if
                if (iring .eq. 0) then
-                  write (iout,20)  ia,ib,fc,bd
-   20             format (6x,2i4,5x,f15.3,f15.4)
+                  write (iout,30)  ia,ib,fc,bd
+   30             format (6x,2i4,5x,f15.3,f15.4)
                else
                   if (iring .eq. 5)  label = '5-Ring'
                   if (iring .eq. 4)  label = '4-Ring'
                   if (iring .eq. 3)  label = '3-Ring'
-                  write (iout,30)  ia,ib,fc,bd,label
-   30             format (6x,2i4,5x,f15.3,f15.4,3x,a6)
+                  write (iout,40)  ia,ib,fc,bd,label
+   40             format (6x,2i4,5x,f15.3,f15.4,3x,a6)
                end if
             end if
             size = 4
@@ -100,58 +101,58 @@ c
                      kb(j) = pt
                      bcon(j) = fc
                      blen(j) = bd
-                     goto 50
+                     goto 60
                   end if
                end do
-               write (iout,40)
-   40          format (/,' KBOND  --  Too many Bond Stretching',
+               write (iout,50)
+   50          format (/,' KBOND  --  Too many Bond Stretching',
      &                       ' Parameters')
                abort = .true.
-   50          continue
+   60          continue
             else if (iring .eq. 5) then
                do j = 1, maxnb5
                   if (kb5(j).eq.blank .or. kb5(j).eq.pt) then
                      kb5(j) = pt
                      bcon5(j) = fc
                      blen5(j) = bd
-                     goto 70
+                     goto 80
                   end if
                end do
-               write (iout,60)
-   60          format (/,' KBOND  --  Too many 5-Ring Stretching',
+               write (iout,70)
+   70          format (/,' KBOND  --  Too many 5-Ring Stretching',
      &                       ' Parameters')
                abort = .true.
-   70          continue
+   80          continue
             else if (iring .eq. 4) then
                do j = 1, maxnb4
                   if (kb4(j).eq.blank .or. kb4(j).eq.pt) then
                      kb4(j) = pt
                      bcon4(j) = fc
                      blen4(j) = bd
-                     goto 90
+                     goto 100
                   end if
                end do
-               write (iout,80)
-   80          format (/,' KBOND  --  Too many 4-Ring Stretching',
+               write (iout,90)
+   90          format (/,' KBOND  --  Too many 4-Ring Stretching',
      &                       ' Parameters')
                abort = .true.
-   90          continue
+  100          continue
             else if (iring .eq. 3) then
                do j = 1, maxnb3
                   if (kb3(j).eq.blank .or. kb3(j).eq.pt) then
                      kb3(j) = pt
                      bcon3(j) = fc
                      blen3(j) = bd
-                     goto 110
+                     goto 120
                   end if
                end do
-               write (iout,100)
-  100          format (/,' KBOND  --  Too many 3-Ring Stretching',
+               write (iout,110)
+  110          format (/,' KBOND  --  Too many 3-Ring Stretching',
      &                       ' Parameters')
                abort = .true.
-  110          continue
+  120          continue
             end if
-  120       continue
+  130       continue
          end if
       end do
 c
@@ -229,7 +230,7 @@ c
                   bk(i) = bcon(j)
                   bl(i) = blen(j)
                   done = .true.
-                  goto 130
+                  goto 140
                end if
             end do
 c
@@ -241,7 +242,7 @@ c
                   bk(i) = bcon5(j)
                   bl(i) = blen5(j)
                   done = .true.
-                  goto 130
+                  goto 140
                end if
             end do
 c
@@ -253,7 +254,7 @@ c
                   bk(i) = bcon4(j)
                   bl(i) = blen4(j)
                   done = .true.
-                  goto 130
+                  goto 140
                end if
             end do
 c
@@ -265,22 +266,22 @@ c
                   bk(i) = bcon3(j)
                   bl(i) = blen3(j)
                   done = .true.
-                  goto 130
+                  goto 140
                end if
             end do
          end if
 c
 c     warning if suitable bond stretching parameter not found
 c
-  130    continue
+  140    continue
          minat = min(atomic(ia),atomic(ib))
          if (minat .eq. 0)  done = .true.
          if (use_bond .and. .not.done) then
             if (use(ia) .or. use(ib))  abort = .true.
             if (header) then
                header = .false.
-               write (iout,140)
-  140          format (/,' Undefined Bond Stretching Parameters :',
+               write (iout,150)
+  150          format (/,' Undefined Bond Stretching Parameters :',
      &                 //,' Type',13x,'Atom Names',11x,
      &                    'Atom Classes',/)
             end if
@@ -288,8 +289,8 @@ c
             if (iring .eq. 5)  label = '5-Ring'
             if (iring .eq. 4)  label = '4-Ring'
             if (iring .eq. 3)  label = '3-Ring'
-            write (iout,150)  label,ia,name(ia),ib,name(ib),ita,itb
-  150       format (1x,a6,5x,i6,'-',a3,i6,'-',a3,7x,2i5)
+            write (iout,160)  label,ia,name(ia),ib,name(ib),ita,itb
+  160       format (1x,a6,5x,i6,'-',a3,i6,'-',a3,7x,2i5)
          end if
       end do
 c
@@ -307,20 +308,21 @@ c
             fc = 0.0d0
             bd = 0.0d0
             string = record(next:240)
-            read (string,*,err=180,end=180)  ia,ib,fc,bd
+            read (string,*,err=170,end=170)  ia,ib,fc,bd
+  170       continue
             if (min(ia,ib) .lt. 0) then
                ia = abs(ia)
                ib = abs(ib)
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,160)
-  160             format (/,' Additional Bond Parameters for',
+                  write (iout,180)
+  180             format (/,' Additional Bond Parameters for',
      &                       ' Specific Bonds :',
      &                    //,8x,'Atoms',17x,'K(S)',9x,'Length',/)
                end if
                if (.not. silent) then
-                  write (iout,170)  ia,ib,fc,bd
-  170             format (6x,2i4,5x,f15.3,f15.4)
+                  write (iout,190)  ia,ib,fc,bd
+  190             format (6x,2i4,5x,f15.3,f15.4)
                end if
                if (ia .gt. ib) then
                   ita = ia
@@ -331,11 +333,11 @@ c
                   if (ia.eq.ibnd(1,j) .and. ib.eq.ibnd(2,j)) then
                      bk(j) = fc
                      bl(j) = bd
-                     goto 180
+                     goto 200
                   end if
                end do
             end if
-  180       continue
+  200       continue
          end if
       end do
 c

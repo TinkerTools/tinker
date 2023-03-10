@@ -80,9 +80,10 @@ c
                ft(j) = 0
             end do
             string = record(next:240)
-            read (string,*,err=100,end=100)  ia,ib,ic,id,
+            read (string,*,err=10,end=10)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,6)
-            if (min(ia,ib,ic,ic) .le. 0)  goto 100
+   10       continue
+            if (min(ia,ib,ic,ic) .le. 0)  goto 110
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -101,22 +102,22 @@ c
             if (.not. silent) then
                if (header) then
                   header = .false.
-                  write (iout,10)
-   10             format (/,' Additional Torsional Parameters :',
+                  write (iout,20)
+   20             format (/,' Additional Torsional Parameters :',
      &                    //,5x,'Atom Classes',5x,'1-Fold',4x,'2-Fold',
      &                       4x,'3-Fold',4x,'4-Fold',4x,'5-Fold',
      &                       4x,'6-Fold',/)
                end if
                if (iring .eq. 0) then
-                  write (iout,20)  ia,ib,ic,id,
+                  write (iout,30)  ia,ib,ic,id,
      &                             (vt(j),nint(st(j)),j=1,6)
-   20             format (2x,4i4,1x,6(f6.2,i4))
+   30             format (2x,4i4,1x,6(f6.2,i4))
                else
                   if (iring .eq. 5)  label = '5-Ring '
                   if (iring .eq. 4)  label = '4-Ring '
-                  write (iout,30)  ia,ib,ic,id,
+                  write (iout,40)  ia,ib,ic,id,
      &                             (vt(j),nint(st(j)),j=1,6),label(1:6)
-   30             format (2x,4i4,1x,6(f6.2,i4),3x,a6)
+   40             format (2x,4i4,1x,6(f6.2,i4),3x,a6)
                end if
             end if
             if (iring .eq. 0) then
@@ -135,14 +136,14 @@ c
                      t5(2,j) = st(5)
                      t6(1,j) = vt(6)
                      t6(2,j) = st(6)
-                     goto 50
+                     goto 60
                   end if
                end do
-               write (iout,40)
-   40          format (/,' KTORS  --  Too many Torsional Angle',
+               write (iout,50)
+   50          format (/,' KTORS  --  Too many Torsional Angle',
      &                    ' Parameters')
                abort = .true.
-   50          continue
+   60          continue
             else if (iring .eq. 5) then
                do j = 1, maxnt5
                   if (kt5(j).eq.blank .or. kt5(j).eq.pt) then
@@ -159,14 +160,14 @@ c
                      t55(2,j) = st(5)
                      t65(1,j) = vt(6)
                      t65(2,j) = st(6)
-                     goto 70
+                     goto 80
                   end if
                end do
-               write (iout,60)
-   60          format (/,' KTORS  --  Too many 5-Ring Torsional',
+               write (iout,70)
+   70          format (/,' KTORS  --  Too many 5-Ring Torsional',
      &                    ' Parameters')
                abort = .true.
-   70          continue
+   80          continue
             else if (iring .eq. 4) then
                do j = 1, maxnt4
                   if (kt4(j).eq.blank .or. kt4(j).eq.pt) then
@@ -183,16 +184,16 @@ c
                      t54(2,j) = st(5)
                      t64(1,j) = vt(6)
                      t64(2,j) = st(6)
-                     goto 90
+                     goto 100
                   end if
                end do
-               write (iout,80)
-   80          format (/,' KTORS  --  Too many 4-Ring Torsional',
+               write (iout,90)
+   90          format (/,' KTORS  --  Too many 4-Ring Torsional',
      &                    ' Parameters')
                abort = .true.
-   90          continue
+  100          continue
             end if
-  100       continue
+  110       continue
          end if
       end do
 c
@@ -315,7 +316,7 @@ c
                   tors6(1,i) = tors6(1,ilist)
                   tors6(2,i) = tors6(2,ilist)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt
@@ -336,7 +337,7 @@ c
                   tors6(1,i) = t6(1,j)
                   tors6(2,i) = t6(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt
@@ -354,7 +355,7 @@ c
                   tors6(1,i) = t6(1,j)
                   tors6(2,i) = t6(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt
@@ -372,7 +373,7 @@ c
                   tors6(1,i) = t6(1,j)
                   tors6(2,i) = t6(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
 c
@@ -394,7 +395,7 @@ c
                   tors6(1,i) = t65(1,j)
                   tors6(2,i) = t65(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt5
@@ -412,7 +413,7 @@ c
                   tors6(1,i) = t65(1,j)
                   tors6(2,i) = t65(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt5
@@ -430,7 +431,7 @@ c
                   tors6(1,i) = t65(1,j)
                   tors6(2,i) = t65(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
 c
@@ -452,7 +453,7 @@ c
                   tors6(1,i) = t64(1,j)
                   tors6(2,i) = t64(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt4
@@ -470,7 +471,7 @@ c
                   tors6(1,i) = t64(1,j)
                   tors6(2,i) = t64(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
             do j = 1, nt4
@@ -488,14 +489,14 @@ c
                   tors6(1,i) = t64(1,j)
                   tors6(2,i) = t64(2,j)
                   done = .true.
-                  goto 110
+                  goto 120
                end if
             end do
          end if
 c
 c     warning if suitable torsional parameter not found
 c
-  110    continue
+  120    continue
          minat = min(atomic(ia),atomic(ib),atomic(ic),atomic(id))
          if (minat .eq. 0)  done = .true.
          if (use_tors .and. .not.done) then
@@ -503,17 +504,17 @@ c
      &         abort = .true.
             if (header) then
                header = .false.
-               write (iout,120)
-  120          format (/,' Undefined Torsional Parameters :',
+               write (iout,130)
+  130          format (/,' Undefined Torsional Parameters :',
      &                 //,' Type',24x,'Atom Names',24x,
      &                    'Atom Classes',/)
             end if
             label = 'Torsion'
             if (iring .eq. 5)  label = '5-Ring '
             if (iring .eq. 4)  label = '4-Ring '
-            write (iout,130)  label,ia,name(ia),ib,name(ib),ic,
+            write (iout,140)  label,ia,name(ia),ib,name(ib),ic,
      &                        name(ic),id,name(id),ita,itb,itc,itd
-  130       format (1x,a7,4x,4(i6,'-',a3),5x,4i5)
+  140       format (1x,a7,4x,4(i6,'-',a3),5x,4i5)
          end if
       end do
 c
@@ -542,8 +543,9 @@ c
                ft(j) = 0
             end do
             string = record(next:240)
-            read (string,*,err=160,end=160)  ia,ib,ic,id,
+            read (string,*,err=150,end=150)  ia,ib,ic,id,
      &                                       (vt(j),st(j),ft(j),j=1,6)
+  150       continue
             if (min(ia,ib,ic,id) .lt. 0) then
                ia = abs(ia)
                ib = abs(ib)
@@ -552,16 +554,16 @@ c
                call torphase (ft,vt,st)
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,140)
-  140             format (/,' Additional Torsion Specific Parameters :',
+                  write (iout,160)
+  160             format (/,' Additional Torsion Specific Parameters :',
      &                    //,8x,'Atoms',9x,'1-Fold',4x,'2-Fold',
      &                       4x,'3-Fold',4x,'4-Fold',4x,'5-Fold',
      &                       4x,'6-Fold',/)
                end if
                if (.not. silent) then
-                  write (iout,150)  ia,ib,ic,id,
+                  write (iout,170)  ia,ib,ic,id,
      &                              (vt(j),nint(st(j)),j=1,6)
-  150             format (2x,4i4,1x,6(f6.2,i4))
+  170             format (2x,4i4,1x,6(f6.2,i4))
                end if
                if (ib .gt. ic) then
                   ita = ia
@@ -590,11 +592,11 @@ c
                      tors5(2,i) = st(5)
                      tors6(1,i) = vt(6)
                      tors6(2,i) = st(6)
-                     goto 160
+                     goto 180
                   end if
                end do
             end if
-  160       continue
+  180       continue
          end if
       end do
 c

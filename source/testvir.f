@@ -132,8 +132,7 @@ c
 c     get energy derivatives with respect to lattice vectors
 c
       do i = 1, 3
-c        do j = i, 3
-         do j = 1, 3
+         do j = i, 3
             lorig = lvec(j,i)
             lvec(j,i) = lorig - eps
             call cellang (xf,yf,zf)
@@ -161,34 +160,15 @@ c
 c
 c     compute and print numerical virial tensor components
 c
-
-c     do i = 1, 3
-c        do j = 1, i
-c           virn(j,i) = 0.0d0
-c           do k = 1, 3
-c              virn(j,i) = virn(j,i) + dedl(k,j)*lvec(k,i)
-c           end do
-c           virn(i,j) = virn(j,i)
-c        end do
-c     end do
-
       do i = 1, 3
-         do j = 1, 3
+         do j = 1, i
             virn(j,i) = 0.0d0
             do k = 1, 3
-c              virn(j,i) = virn(j,i) + dedl(k,j)*lvec(k,i)
-               virn(j,i) = virn(j,i) + dedl(j,k)*lvec(k,i)
+               virn(j,i) = virn(j,i) + dedl(k,j)*lvec(k,i)
             end do
+            virn(i,j) = virn(j,i)
          end do
       end do
-
-      write (*,98)  dedl(1,1),dedl(2,1),dedl(3,1),dedl(1,2),dedl(2,2),
-     &              dedl(3,2),dedl(1,3),dedl(2,3),dedl(3,3)
-   98 format (/,' TESTVIR :  ',9f12.3)
-      write (*,99)  lvec(1,1),lvec(2,1),lvec(3,1),lvec(1,2),lvec(2,2),
-     &              lvec(3,2),lvec(1,3),lvec(2,3),lvec(3,3)
-   99 format (/,' TESTVIR :  ',9f12.3)
-
       if (nonprism) then
          write (iout,30)  virn(1,1),virn(2,2),virn(3,3)
    30    format (/,' Numerical Virial Diagonal :',8x,3f13.3)
