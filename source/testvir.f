@@ -133,6 +133,11 @@ c     get energy derivatives with respect to lattice vectors
 c
       do i = 1, 3
          do j = i, 3
+            dedl(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = i, 3
             lorig = lvec(j,i)
             lvec(j,i) = lorig - eps
             call cellang (xf,yf,zf)
@@ -141,9 +146,8 @@ c
             call cellang (xf,yf,zf)
             epos = energy ()
             lvec(j,i) = lorig
-            dedl(j,i) = 0.5d0 * (epos-eneg) / eps
             call cellang (xf,yf,zf)
-            dedl(i,j) = dedl(j,i)
+            dedl(j,i) = 0.5d0 * (epos-eneg) / eps
          end do
       end do
 c
@@ -162,10 +166,10 @@ c
 c     compute and print numerical virial tensor components
 c
       do i = 1, 3
-         do j = i, 3
+         do j = 1, i
             virn(j,i) = 0.0d0
             do k = 1, 3
-               virn(j,i) = virn(j,i) + dedl(j,k)*lvec(k,i)
+               virn(j,i) = virn(j,i) + dedl(k,j)*lvec(k,i)
             end do
             virn(i,j) = virn(j,i)
          end do
