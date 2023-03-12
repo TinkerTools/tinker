@@ -197,6 +197,71 @@ c
          end do
       end if
 c
+c     get keywords with out-of-plane distance specific params
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'OPDIST ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            fopd = 0.0d0
+            string = record(next:240)
+            read (string,*,err=70,end=70)  ia,ib,ic,id,fopd
+   70       continue
+            if (min(ia,ib,ic,id) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               id = abs(id)
+               if (.not.silent .and. header) then
+                  header = .false.
+                  write (iout,80)
+   80             format (/,' Additional Out-of-Plane Distance',
+     &                       ' Parameters for Specific Atoms :',
+     &                    //,8x,'Atoms',23x,'K(OPD)',/)
+               end if
+               if (.not. silent) then
+                  write (iout,90)  ia,ib,ic,id,fopd
+   90             format (4x,4i4,10x,2f12.3)
+               end if
+               do j = 1, nopdist
+                  ita = iopd(1,j)
+                  itb = iopd(2,j)
+                  itc = iopd(3,j)
+                  itd = iopd(4,j)
+                  if (ia .eq. ita) then
+                     if (ib .eq. itb) then
+                        if ((ic.eq.itc.and.id.eq.itd) .or.
+     &                      (ic.eq.itd.and.id.eq.itc)) then
+                           opdk(j) = fopd
+                           goto 100
+                        end if
+                     else if (ic .eq. itb) then
+                        if ((ib.eq.itc.and.id.eq.itd) .or.
+     &                      (ib.eq.itd.and.id.eq.itc)) then
+                           opdk(j) = fopd
+                           goto 100
+                        end if
+                     else if (id .eq. itb) then
+                        if ((ib.eq.itc.and.ic.eq.itd) .or.
+     &                      (ib.eq.itd.and.ic.eq.itc)) then
+                           opdk(j) = fopd
+                           goto 100
+                        end if
+                     end if
+                  end if
+               end do
+            end if
+  100       continue
+         end if
+      end do
+c
 c     turn off out-of-plane distance potential if it is not used
 c
       if (nopdist .eq. 0)  use_opdist = .false.

@@ -31,7 +31,7 @@ c
       use potent
       use usage
       implicit none
-      integer i,j,it
+      integer i,j,k,it
       integer ia,ib,ic,id
       integer ita,itb,itc,itd
       integer nopb,size
@@ -223,6 +223,58 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (jopb)
+c
+c     get keywords with out-of-plane bending specific params
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:7) .eq. 'OPBEND ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            fopb = 0.0d0
+            string = record(next:240)
+            read (string,*,err=100,end=100)  ia,ib,ic,id,fopb
+  100       continue
+            if (min(ia,ib,ic,id) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               id = abs(id)
+               if (.not.silent .and. header) then
+                  header = .false.
+                  write (iout,110)
+  110             format (/,' Additional Out-of-Plane Bending',
+     &                       ' Parameters for Specific Atoms :',
+     &                    //,8x,'Atoms',23x,'K(OPB)',/)
+               end if
+               if (.not. silent) then
+                  write (iout,120)  ia,ib,ic,id,fopb
+  120             format (4x,4i4,10x,2f12.3)
+               end if
+               do j = 1, nopbend
+                  k = iopb(j)
+                  ita = iang(1,k)
+                  itb = iang(2,k)
+                  itc = iang(3,k)
+                  itd = iang(4,k)
+                  if (ia.eq.itd .and. ib.eq.itb) then
+                     if ((ic.eq.ita.and.id.eq.itc) .or.
+     &                   (ic.eq.itc.and.id.eq.ita)) then
+                        opbk(j) = fopb
+                        goto 130
+                     end if
+                  end if
+               end do
+            end if
+  130       continue
+         end if
+      end do
 c
 c     turn off the out-of-plane bending term if it is not used
 c

@@ -178,17 +178,17 @@ c
                   write (iout,90)  ia,ib,ic,bb,tt
    90             format (6x,2i4,5x,f15.3,f15.4)
                end if
-               if (ia .gt. ic) then
-                  ita = ia
-                  ia = ic
-                  ic = ita
-               end if
                do j = 1, nurey
-                  if (ia.eq.iury(1,j) .and. ib.eq.iury(2,j)
-     &                   .and. ic.eq.iury(3,j)) then
-                     uk(j) = bb
-                     ul(j) = tt
-                     goto 100
+                  ita = iury(1,j)
+                  itb = iury(2,j)
+                  itc = iury(3,j)
+                  if (ib .eq. itb) then
+                     if ((ia.eq.ita .and. ic.eq.itc) .or.
+     &                   (ia.eq.itc .and. ic.eq.ita)) then
+                        uk(j) = bb
+                        ul(j) = tt
+                        goto 100
+                     end if
                   end if
                end do
             end if

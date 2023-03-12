@@ -324,13 +324,11 @@ c
                   write (iout,190)  ia,ib,fc,bd
   190             format (6x,2i4,5x,f15.3,f15.4)
                end if
-               if (ia .gt. ib) then
-                  ita = ia
-                  ia = ib
-                  ib = ita
-               end if
                do j = 1, nbond
-                  if (ia.eq.ibnd(1,j) .and. ib.eq.ibnd(2,j)) then
+                  ita = ibnd(1,j)
+                  itb = ibnd(2,j)
+                  if ((ia.eq.ita .and. ib.eq.itb) .or.
+     &                (ib.eq.itb .and. ib.eq.ita)) then
                      bk(j) = fc
                      bl(j) = bd
                      goto 200

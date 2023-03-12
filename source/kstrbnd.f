@@ -199,18 +199,18 @@ c
                   write (iout,90)  ia,ib,ic,sb1,sb2
    90             format (4x,3i4,3x,2f15.3)
                end if
-               if (ia .gt. ic) then
-                  ita = ia
-                  ia = ic
-                  ic = ita
-               end if
                do j = 1, nstrbnd
                   k = isb(1,j)
-                  if (ia.eq.iang(1,k) .and. ib.eq.iang(2,k)
-     &                   .and. ic.eq.iang(3,k)) then
-                     sbk(1,j) = sb1
-                     sbk(2,j) = sb2
-                     goto 100
+                  ita = iang(1,k)
+                  itb = iang(2,k)
+                  itc = iang(3,k)
+                  if (ib .eq. itb) then
+                     if ((ia.eq.ita .and. ic.eq.itc) .or.
+     &                   (ia.eq.itc .and. ic.eq.ita)) then
+                        sbk(1,j) = sb1
+                        sbk(2,j) = sb2
+                        goto 100
+                     end if
                   end if
                end do
             end if

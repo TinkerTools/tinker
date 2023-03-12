@@ -565,21 +565,15 @@ c
      &                              (vt(j),nint(st(j)),j=1,6)
   170             format (2x,4i4,1x,6(f6.2,i4))
                end if
-               if (ib .gt. ic) then
-                  ita = ia
-                  itb = ib
-                  ia = id
-                  ib = ic
-                  ic = itb
-                  id = ita
-               else if (ib.eq.ic .and. ia.gt.id) then
-                  ita = ia
-                  ia = id
-                  id = ita
-               end if
                do j = 1, ntors
-                  if (ia.eq.itors(1,j) .and. ib.eq.itors(2,j) .and.
-     &                ic.eq.itors(3,j) .and. id.eq.itors(4,j)) then
+                  ita = itors(1,j)
+                  itb = itors(2,j)
+                  itc = itors(3,j)
+                  itd = itors(4,j)
+                  if ((ia.eq.ita .and. ib.eq.itb .and.
+     &                 ic.eq.itc .and. id.eq.itd) .or.
+     &                (ia.eq.itd .and. ib.eq.itc .and.
+     &                 ic.eq.itb .and. id.eq.ita)) then
                      tors1(1,i) = vt(1)
                      tors1(2,i) = st(1)
                      tors2(1,i) = vt(2)

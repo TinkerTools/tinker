@@ -580,18 +580,18 @@ c
                   write (iout,370)  ia,ib,ic,fc,an1
   370             format (4x,3i4,3x,2f15.3)
                end if
-               if (ia .gt. ic) then
-                  ita = ia
-                  ia = ic
-                  ic = ita
-               end if
                do j = 1, nangle
-                  if (ia.eq.iang(1,j) .and. ib.eq.iang(2,j)
-     &                   .and. ic.eq.iang(3,j)) then
-                     ak(j) = fc
-                     anat(j) = an1
-                     angtyp(j) = 'HARMONIC'
-                     goto 380
+                  ita = iang(1,j)
+                  itb = iang(2,j)
+                  itc = iang(3,j)
+                  if (ib .eq. itb) then
+                     if ((ia.eq.ita .and. ic.eq.itc) .or.
+     &                   (ia.eq.itc .and. ic.eq.ita)) then
+                        ak(j) = fc
+                        anat(j) = an1
+                        angtyp(j) = 'HARMONIC'
+                        goto 380
+                     end if
                   end if
                end do
             end if
