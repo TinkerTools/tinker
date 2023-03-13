@@ -67,6 +67,7 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,tk,tv
    10       continue
+            if (min(ia,ib,ic,id) .le. 0)  goto 50
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -289,6 +290,57 @@ c
             end if
          end do
       end if
+c
+c     process keywords with improper dihedral specific parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:9) .eq. 'IMPROPER ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            tk = 0.0d0
+            tv = 0.0d0
+            string = record(next:240)
+            read (string,*,err=60,end=60)  ia,ib,ic,id,tk,tv
+   60       continue
+            if (min(ia,ib,ic,id) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               id = abs(id)
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,70)
+   70             format (/,' Additional Improper Dihedral Specific',
+     &                       ' Parameters :',
+     &                    //,8x,'Atoms',16x,'K(ID)',10x,'Angle',/)
+               end if
+               if (.not. silent) then
+                  write (iout,80)  ia,ib,ic,id,tk,tv
+   80             format (2x,4i4,4x,f12.3,f15.3)
+               end if
+               do j = 1, niprop
+                  ita = iiprop(1,j)
+                  itb = iiprop(2,j)
+                  itc = iiprop(3,j)
+                  itd = iiprop(4,j)
+                  if (ia.eq.ita .and. ib.eq.itb .and.
+     &                ic.eq.itc .and. id.eq.itd) then
+                     kprop(j) = tk
+                     vprop(j) = tv
+                     goto 90
+                  end if
+               end do
+            end if
+   90       continue
+         end if
+      end do
 c
 c     turn off the improper dihedral potential if it is not used
 c

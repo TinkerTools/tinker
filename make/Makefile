@@ -66,17 +66,17 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Compiler:  GNU gfortran 9.3
 ##  Parallel:  OpenMP
 
-#F77 = gfortran
-#F77FLAGS = -c
+F77 = gfortran
+F77FLAGS = -c
 #OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -msse3 -fopenmp
+OPTFLAGS = -Ofast -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = ranlib
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
-#RENAME = rename_bin
+LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
+LIBS = 
+LIBFLAGS = -crusv
+RANLIB = ranlib
+LINKFLAGS = $(OPTFLAGS) -static-libgcc
+RENAME = rename_bin
 
 ##  Build:     Tinker
 ##  OS Type:   Apple macOS
@@ -84,17 +84,17 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Compiler:  GNU gfortran 8.1
 ##  Parallel:  OpenMP
 
-F77 = gfortran
-F77FLAGS = -c
+#F77 = gfortran
+#F77FLAGS = -c
 #OPTFLAGS = -Ofast -march=native -fopenmp
-OPTFLAGS = -Ofast -mssse3 -fopenmp
+#OPTFLAGS = -Ofast -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
-LIBS = 
-LIBFLAGS = -crusv
-RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-libgcc
-RENAME = rename_bin
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+#LIBS = 
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+#RENAME = rename_bin
 
 ##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
@@ -105,7 +105,7 @@ RENAME = rename_bin
 #F77 = gfortran
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -msse3 -fopenmp
+#OPTFLAGS = -Ofast -fopenmp
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 #LIBS = 
 #LIBFLAGS = -crusv

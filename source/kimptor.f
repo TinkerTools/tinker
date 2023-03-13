@@ -72,6 +72,7 @@ c
             read (string,*,err=10,end=10)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,3)
    10       continue
+            if (min(ia,ib,ic,id) .le. 0)  goto 50
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -128,7 +129,7 @@ c
       allocate (itors2(4,6*n))
       allocate (itors3(4,6*n))
 c
-c     assign improper torsional parameters for each improper torsion;
+c     assign improper torsion parameters for each improper torsion;
 c     multiple symmetrical parameters are given partial weights
 c
       nitors = 0
@@ -321,6 +322,67 @@ c
          end do
       end if
 c
+c     process keywords with improper torsion specific parameters
+c
+      header = .true.
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:8) .eq. 'IMPTORS ') then
+            ia = 0
+            ib = 0
+            ic = 0
+            id = 0
+            do j = 1, 6
+               vt(j) = 0.0d0
+               st(j) = 0.0d0
+               ft(j) = 0
+            end do
+            string = record(next:240)
+            read (string,*,err=60,end=60)  ia,ib,ic,id,
+     &                                     (vt(j),st(j),ft(j),j=1,3)
+   60       continue
+            if (min(ia,ib,ic,id) .lt. 0) then
+               ia = abs(ia)
+               ib = abs(ib)
+               ic = abs(ic)
+               id = abs(id)
+               call torphase (ft,vt,st)
+               if (header .and. .not.silent) then
+                  header = .false.
+                  write (iout,70)
+   70             format (/,' Additional Improper Torsion Specific',
+     &                       ' Parameters :',
+     &                    //,8x,'Atoms',15x,'1-Fold',9x,'2-Fold',
+     &                       9x,'3-Fold',/)
+               end if
+               if (.not. silent) then
+                  write (iout,80)  ia,ib,ic,id,(vt(j),st(j),j=1,3)
+   80             format (2x,4i4,3x,3(f9.3,f6.1))
+               end if
+               do j = 1, nitors
+                  ita = iitors(1,j)
+                  itb = iitors(2,j)
+                  itc = iitors(3,j)
+                  itd = iitors(4,j)
+                  if (ia.eq.ita .and. ib.eq.itb .and.
+     &                ic.eq.itc .and. id.eq.itd) then
+                     itors1(1,j) = vt(1)
+                     itors1(2,j) = st(1)
+                     itors2(1,j) = vt(2)
+                     itors2(2,j) = st(2)
+                     itors3(1,j) = vt(3)
+                     itors3(2,i) = st(3)
+                     goto 90
+                  end if
+               end do
+            end if
+   90       continue
+         end if
+      end do
+c
 c     find the cosine and sine of the phase angle for each torsion
 c
       do i = 1, nitors
@@ -335,7 +397,7 @@ c
          itors3(4,i) = sin(angle)
       end do
 c
-c     turn off the improper torsional potential if it is not used
+c     turn off the improper torsion potential if it is not used
 c
       if (nitors .eq. 0)  use_imptor = .false.
       return

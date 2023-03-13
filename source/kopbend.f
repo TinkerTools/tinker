@@ -69,6 +69,7 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,id,fopb
    10       continue
+            if (min(ia,ib,ic,id) .le. 0)  goto 50
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

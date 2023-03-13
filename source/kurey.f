@@ -59,6 +59,7 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,ic,bb,tt
    10       continue
+            if (min(ia,ib,ic) .le. 0)  goto 50
             if (.not. silent) then
                if (header) then
                   header = .false.
@@ -172,11 +173,11 @@ c
                   write (iout,80)
    80             format (/,' Additional Urey-Bradley Parameters',
      &                       ' for Specific Angles :',
-     &                    //,8x,'Atoms',17x,'K(UB)',7x,'Distance',/)
+     &                    //,8x,'Atoms',16x,'K(UB)',7x,'Distance',/)
                end if
                if (.not. silent) then
                   write (iout,90)  ia,ib,ic,bb,tt
-   90             format (6x,2i4,5x,f15.3,f15.4)
+   90             format (4x,3i4,3x,f15.3,f15.4)
                end if
                do j = 1, nurey
                   ita = iury(1,j)

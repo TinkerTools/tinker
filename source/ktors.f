@@ -83,7 +83,7 @@ c
             read (string,*,err=10,end=10)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,6)
    10       continue
-            if (min(ia,ib,ic,ic) .le. 0)  goto 110
+            if (min(ia,ib,ic,id) .le. 0)  goto 110
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)
@@ -574,18 +574,18 @@ c
      &                 ic.eq.itc .and. id.eq.itd) .or.
      &                (ia.eq.itd .and. ib.eq.itc .and.
      &                 ic.eq.itb .and. id.eq.ita)) then
-                     tors1(1,i) = vt(1)
-                     tors1(2,i) = st(1)
-                     tors2(1,i) = vt(2)
-                     tors2(2,i) = st(2)
-                     tors3(1,i) = vt(3)
-                     tors3(2,i) = st(3)
-                     tors4(1,i) = vt(4)
-                     tors4(2,i) = st(4)
-                     tors5(1,i) = vt(5)
-                     tors5(2,i) = st(5)
-                     tors6(1,i) = vt(6)
-                     tors6(2,i) = st(6)
+                     tors1(1,j) = vt(1)
+                     tors1(2,j) = st(1)
+                     tors2(1,j) = vt(2)
+                     tors2(2,j) = st(2)
+                     tors3(1,j) = vt(3)
+                     tors3(2,j) = st(3)
+                     tors4(1,j) = vt(4)
+                     tors4(2,j) = st(4)
+                     tors5(1,j) = vt(5)
+                     tors5(2,j) = st(5)
+                     tors6(1,j) = vt(6)
+                     tors6(2,j) = st(6)
                      goto 180
                   end if
                end do

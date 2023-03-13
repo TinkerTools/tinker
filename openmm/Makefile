@@ -86,7 +86,7 @@ LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -L$(NVML_LIB) -L$(CUDA_LIB)
 LIBS = -lstdc++ -lnvidia-ml -lfftw3_threads -lfftw3 -lcudart -lcuda -ldl
 CFLAGS = -c
 F77FLAGS = -c
-OPTFLAGS = -Ofast -msse3 -fopenmp
+OPTFLAGS = -Ofast -fopenmp
 CUDAFLAGS = -O3 -I $(CUDA_INCLUDE) -I$(NVML_INCLUDE)
 LIBFLAGS = -crusv
 RANLIB = ranlib
@@ -108,7 +108,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR
 #LIBS = -lstdc++ -lfftw3_threads -lfftw3 -lcudart -lcuda
 #CFLAGS = -c
 #F77FLAGS = -c
-#OPTFLAGS = -Ofast -mssse3 -fopenmp
+#OPTFLAGS = -Ofast -fopenmp
 #OPTFLAGS = -Og -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
 #LIBFLAGS = -crusv
