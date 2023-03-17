@@ -123,6 +123,10 @@ c
       end do
       if (nrep .eq. 0)  return
 c
+c     check the sign of multipole components at chiral sites
+c
+      call chkpole
+c
 c     determine pseudo orbital coefficients
 c
       call solvcoeff
@@ -740,7 +744,7 @@ c
          kappap2 = kappap**2
          expA = exp(-rhoA)
          expB = exp(-rhoB)
-         pre = 1.0d0 / (sqrt(1. - tau**2) * tau * rho3)
+         pre = 1.0d0 / (sqrt(1.0d0 - tau**2) * tau * rho3)
          term1 =-kappam2 * (48.0d0 * kappap2 * (1.0d0 + rhoA
      &      + 0.5d0 * rhoA2) + 2.0d0 * (5.0d0 + 6.0d0 * kappa) * rhoA3
      &      + 2.0d0 * rhoA4) * expA

@@ -68,5 +68,29 @@ c
       use xrepel
       implicit none
       integer i,j,k
+c
+c
+c     zero out the repulsion energy and derivatives
+c
+      er = 0.0d0
+      do i = 1, n
+         der(1,i) = 0.0d0
+         der(2,i) = 0.0d0
+         der(3,i) = 0.0d0
+      end do
+c
+c     check the sign of multipole components at chiral sites
+c
+      call chkpole
+c
+c     determine pseudo orbital coefficients
+c
+      call solvcoeff
+c
+c     rotate the coefficient components into the global frame
+c
+      call rotcoeff
+
+      if (nrep .eq. 0)  return
       return
       end
