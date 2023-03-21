@@ -974,8 +974,8 @@ c
             ndot = int(density*rad2(i))
             if (ndot .gt. maxdot) then
                write (iout,20)
-   20          format (/,' POTGRID  --  Too many Surface Grid Points;',
-     &                    ' Increase MAXDOT')
+   20          format (/,' POTGRID  --  Too many Surface Grid',
+     &                    ' Points; Increase MAXDOT')
                call fatal
             end if
             call sphere (ndot,dot)
