@@ -73,15 +73,14 @@ c
       integer i,j,k
       integer ii,kk
       integer ind1,ind2,ind3
-      real*8 e,eterm
-      real*8 fgrp,taper
+      real*8 e,fgrp
+      real*8 eterm
       real*8 xi,yi,zi
-      real*8 xk,yk,zk
       real*8 xr,yr,zr
       real*8 r,r2
       real*8 normi
       real*8 zxri,zxrk
-      real*8 vali,valk,valik
+      real*8 vali,valk
       real*8 dmpi,dmpk
       real*8 dis,dks
       real*8 dmpip,dmpkp
@@ -92,26 +91,23 @@ c
       real*8 rcix,rckx
       real*8 rciy,rcky
       real*8 rciz,rckz
+      real*8 cscs,cxcx,cycy
+      real*8 czcz,cscz,czcs
+      real*8 SS,SPz,PzS
+      real*8 PxPx,PyPy,PzPz
+      real*8 dSS,dSPz,dPzS
+      real*8 dPxPx,dPyPy,dPzPz
       real*8 intS,intS2
-      real*8 intK,intJ
-      real*8 intaAb,intbBa
-      real*8 intbAb,intaBa
-      real*8 overlapTotal
-      real*8 NEaAbTotal,NEaBbTotal,NEbAbTotal,NEaBaTotal
-      real*8 coulombTotal,exchangeTotal
-      real*8 pre,termS0
-      real*8 termS1,termS2
+      real*8 dintS
       real*8 bi(3)
       real*8 bj(3)
       real*8 bk(3)
-      real*8 coeffi(4),coeffk(4)
       real*8, allocatable :: rscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
       logical header,huge
+      logical grad
       character*6 mode
-      character*8 example
-c
 c
 c
 c     zero out the repulsion energy and partitioning terms
@@ -145,6 +141,10 @@ c
          rscale(i) = 1.0d0
       end do
 c
+c     set gradient mode to false
+c
+      grad = .false.
+c
 c     calculate the exchange repulsion interaction energy term
 c
       do ii = 1, nrep-1
@@ -161,8 +161,6 @@ c
          cix = rcpxr(2,i)
          ciy = rcpxr(3,i)
          ciz = rcpxr(4,i)
-         usei = use(i)
-         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -189,12 +187,9 @@ c
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
-               xk = x(k)
-               yk = y(k)
-               zk = z(k)
-               xr = xk - xi
-               yr = yk - yi
-               zr = zk - zi
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr * xr + yr * yr + zr * zr
                if (r2 .le. off2) then
@@ -236,11 +231,17 @@ c
                   rckx = bi(1)*ckx + bi(2)*cky + bi(3)*ckz
                   rcky = bj(1)*ckx + bj(2)*cky + bj(3)*ckz
                   rckz = bk(1)*ckx + bk(2)*cky + bk(3)*ckz
-                  coeffi = (/ cis, rcix, rciy, rciz /)
-                  coeffk = (/ cks, rckx, rcky, rckz /)
-                  valik = vali * valk
-                  intS = overlapTotal (coeffi, coeffk, dmpi, dmpk,
-     &                                           dmpip, dmpkp, 0.0d0, r)
+                  cscs = cis * cks
+                  cxcx = rcix * rckx
+                  cycy = rciy * rcky
+                  czcz = rciz * rckz
+                  cscz = cis * rckz
+                  czcs = rciz * cks
+                  call computeOverlap (dmpi, dmpk, dmpip, dmpkp, 0.0d0,
+     &                           r, grad, SS, dSS, SPz, dSPz, PzS, dPzS,
+     &                           PxPx, dPxPx, PyPy, dPyPy, PzPz, dPzPz)
+                  intS = cscs * SS + cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
                   intS2 = intS * intS
                   e = hartree*(zxri*valk+zxrk*vali)*intS2/r*rscale(k)
 c
@@ -382,6 +383,7 @@ c     to global coordinates
 c
 c
       subroutine rotcoeff
+      use mpole
       use repel
       use xrepel
       implicit none
@@ -390,6 +392,7 @@ c
       real*8 a(3,3)
       real*8 cpole(4)
       logical planar
+      character*8 axetyp
 c
 c
 c     rotate pseudo orbital coefficients
@@ -405,6 +408,16 @@ c
          do i = 1, 4
             cpole(i) = cpxr(i,isite)
          end do
+         if (planar) then
+            axetyp = polaxe(isite)
+            if (axetyp .eq. 'Z-Bisect') then
+               cpole(2) = 0.0d0
+            else if (axetyp .eq. '3-Fold') then
+               do i = 2, 4
+                  cpole(i) = 0.0d0
+               end do
+            end if
+         end if
 c
 c     s orbital coefficients have the same value in any coordinate frame
 c
@@ -423,63 +436,216 @@ c
       end
 c
 c
-c     #########################################################
-c     ##                                                     ##
-c     ##  function overlapTotal  --  total overlap integral  ##
-c     ##                                                     ##
-c     #########################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine computeOverlap  --  computes overlap integrals  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "overlapTotal" computes the total overlap integral
+c     "computeOverlap" computes overlap integrals
 c
 c
-      function overlapTotal (coeff1, coeff2, a, b, ap, bp, z1, z2)
+      subroutine computeOverlap (a, b, ap, bp, z1, z2, grad, SS, dSS,
+     &      SPz, dSPz, PzS, dPzS, PxPx, dPxPx, PyPy, dPyPy, PzPz, dPzPz)
       implicit none
-      real*8 overlapTotal
       real*8 a,b,ap,bp
       real*8 z1,z2
-      real*8 cscs,cxcx,cycy
-      real*8 czcz,cscz,czcs
       real*8 SS,SPz,PzS
       real*8 PxPx,PyPy,PzPz
-      real*8 stoOSS,stoOSPz,stoOPzS
-      real*8 stoOPxPx,stoOPzPz
-      real*8 overlapSS,overlapSPz,overlapPzS
-      real*8 overlapPxPx,overlapPzPz
-      real*8 coeff1(4),coeff2(4)
+      real*8 dSS,dSPz,dPzS
+      real*8 dPxPx,dPyPy,dPzPz
+      real*8 eps, diffa, diffb
+      logical grad
 c
 c
-      cscs = coeff1(1) * coeff2(1)
-      cxcx = coeff1(2) * coeff2(2)
-      cycy = coeff1(3) * coeff2(3)
-      czcz = coeff1(4) * coeff2(4)
-      cscz = coeff1(1) * coeff2(4)
-      czcs = coeff1(4) * coeff2(1)
-      SS = overlapSS(a, b, z1, z2)
-      SPz = overlapSPz(a, bp, z1, z2)
-      PzS = overlapPzS(ap, b, z1, z2)
-      PxPx = overlapPxPx(ap, bp, z1, z2)
+      eps = 1.0d-10
+      diffa = abs(a - ap)
+      diffb = abs(b - bp)
+      if (diffa.lt.eps .and. diffb.lt.eps) then
+         call overlapAll(a, b, z1, z2, grad, SS, dSS, SPz, dSPz,
+     &                              PzS, dPzS, PxPx, dPxPx, PzPz, dPzPz)
+      else
+         call overlapSS(a, b, z1, z2, grad, SS, dSS)
+         call overlapSPz(a, bp, z1, z2, grad, SPz, dSPz)
+         call overlapPzS(ap, b, z1, z2, grad, PzS, dPzS)
+         call overlapPxPx(ap, bp, z1, z2, grad, PxPx, dPxPx)
+         call overlapPzPz(ap, bp, z1, z2, grad, PzPz, dPzPz)
+      end if
       PyPy = PxPx
-      PzPz = overlapPzPz(ap, bp, z1, z2)
-      overlapTotal = cscs * SS + cxcx * PxPx + cycy * PyPy + czcz * PzPz
-     &        + cscz * SPz + czcs * PzS
+      dPyPy = dPxPx
       return
       end
 c
 c
-c     ###################################################
-c     ##                                               ##
-c     ##  function overlapSS  --  SS overlap integral  ##
-c     ##                                               ##
-c     ###################################################
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine overlapAll  --  all overlap integrals  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+c     "overlapAll" computes all the overlap integrals
+c
+c
+      subroutine overlapAll (a, b, z1, z2, grad, SS, dSS, SPz, dSPz,
+     &                              PzS, dPzS, PxPx, dPxPx, PzPz, dPzPz)
+      implicit none
+      real*8 over,dover
+      real*8 SS,SPz,PzS
+      real*8 PxPx,PzPz
+      real*8 dSS,dSPz,dPzS
+      real*8 dPxPx,dPzPz
+      real*8 a,b,z1,z2
+      real*8 diff,eps,zr,r
+      real*8 rho,rho2,rho3,rho4
+      real*8 exp1
+      real*8 alpha,tau,rhoA,rhoB
+      real*8 a2,b2,kappa
+      real*8 pre,term1,term2
+      real*8 rhoA2,rhoA3,rhoA4,rhoA5
+      real*8 rhoB2,rhoB3,rhoB4,rhoB5
+      real*8 kappam,kappam2
+      real*8 kappap,kappap2
+      real*8 expA,expB
+      logical grad
+c
+c
+      diff = abs(a - b)
+      eps = 0.001d0
+      zr = z2 - z1
+      r = abs(zr)
+      if (diff .lt. eps) then
+         rho = a * r
+         rho2 = rho * rho
+         rho3 = rho2 * rho
+         rho4 = rho3 * rho
+         exp1 = exp(-rho)
+         SS = (1.0d0 + rho + rho2 / 3.0d0) * exp1
+         SPz = -0.5d0 * rho * (1.0d0 + rho + rho2 / 3.0d0) * exp1
+         PzS = -SPz
+         PxPx = (1.0d0 + rho + 2.0d0/5.0d0 * rho2 + rho3/15.0d0) * exp1
+         PzPz = -(-1.0d0 - rho - rho2 / 5.0d0 + 2.0d0/15.0d0 * rho3
+     &                                           + rho4 / 15.0d0) * exp1
+         if (grad) then
+         dSS = -1.0d0/3.0d0 * a * rho * (1.0d0 + rho) * exp1
+         dSPz = -0.5d0 * a * (1.0d0 + rho - rho3 / 3.0d0) * exp1
+         dPzS = -dSPz
+         dPxPx = -0.2d0 * a * rho * (1.0d0 + rho + rho2 / 3.0d0)
+     &                                                            * exp1
+         dPzPz = -0.6d0 * a * rho * (1.0d0 + rho + 2.0d0/9.0d0 * rho2
+     &                                            - rho3 / 9.0d0) * exp1
+         end if
+      else
+         alpha = 1.0d0 / 2.0d0 * (a + b)
+         tau = (a - b) / (a + b)
+         rho = alpha * r
+         rhoA = a * r
+         rhoB = b * r
+         a2 = a * a
+         b2 = b * b
+         kappa = (a2 + b2) / (a2 - b2)
+         rho2 = rho * rho
+         rho3 = rho2 * rho
+         rhoA2 = rhoA * rhoA
+         rhoA3 = rhoA2 * rhoA
+         rhoA4 = rhoA3 * rhoA
+         rhoB2 = rhoB * rhoB
+         rhoB3 = rhoB2 * rhoB
+         rhoB4 = rhoB3 * rhoB
+         kappam = 1.0d0 - kappa
+         kappap = 1.0d0 + kappa
+         kappam2 = kappam**2
+         kappap2 = kappap**2
+         expA = exp(-rhoA)
+         expB = exp(-rhoB)
+         pre = sqrt(1.0d0 - tau**2) / (tau * rho)
+         term1 =-kappam * (2.0d0 * kappap + rhoA) * expA
+         term2 = kappap * (2.0d0 * kappam + rhoB) * expB
+         SS = pre * (term1 + term2)
+         pre = sqrt((1.0d0 + tau) / (1.0d0 - tau)) / (tau * rho2)
+         term1 =-kappam2 * (6.0d0 * kappap * (1.0d0 + rhoA)
+     &      + 2.0d0 * rhoA2) * expA
+         term2 = kappap * (6.0d0 * kappam2 * (1.0d0 + rhoB)
+     &      + 4.0d0 * kappam * rhoB2 + rhoB3) * expB
+         SPz = -pre * (term1 + term2)
+         pre = sqrt((1.0d0 - tau) / (1.0d0 + tau)) / (-tau * rho2)
+         term1 =-kappap2 * (6.0d0 * kappam * (1.0d0 + rhoB)
+     &      + 2.0d0 * rhoB2) * expB
+         term2 = kappam * (6.0d0 * kappap2 * (1.0d0 + rhoA)
+     &      + 4.0d0 * kappap * rhoA2 + rhoA3) * expA
+         PzS = pre * (term1 + term2)
+         pre = 1.0d0 / (sqrt(1.0d0 - tau**2) * tau * rho3)
+         term1 =-kappam2 * (24.0d0 * kappap2 * (1.0d0 + rhoA)
+     &      + 12.0d0 * kappap * rhoA2 + 2.0d0 * rhoA3) * expA
+         term2 = kappap2 * (24.0d0 * kappam2 * (1.0d0 + rhoB)
+     &      + 12.0d0 * kappam * rhoB2 + 2.0d0 * rhoB3) * expB
+         PxPx = pre * (term1 + term2)
+         term1 =-kappam2 * (48.0d0 * kappap2 * (1.0d0 + rhoA
+     &      + 0.5d0 * rhoA2) + 2.0d0 * (5.0d0 + 6.0d0 * kappa) * rhoA3
+     &      + 2.0d0 * rhoA4) * expA
+         term2 = kappap2 * (48.0d0 * kappam2 * (1.0d0 + rhoB
+     &      + 0.5d0 * rhoB2) + 2.0d0 * (5.0d0 - 6.0d0 * kappa) * rhoB3
+     &      + 2.0d0 * rhoB4) * expB
+         PzPz = -pre * (term1 + term2)
+         if (grad) then
+            rhoA5 = rhoA4 * rhoA
+            rhoB5 = rhoB4 * rhoB
+            pre = sqrt(1.0d0 - tau**2) / (tau * rho)
+            term1 = kappam * (2.0d0 * kappap * (1.0d0 + rhoA) + rhoA2)
+     &                                                            * expA
+            term2 =-kappap * (2.0d0 * kappam * (1.0d0 + rhoB) + rhoB2)
+     &                                                            * expB
+            dSS = pre / r * (term1 + term2)
+            pre = sqrt((1.0d0 + tau) / (1.0d0 - tau)) / (tau * rho2)
+            term1 = 2.0d0 * kappam2 * (6.0d0 * kappap * (1.0d0 + rhoA
+     &         + 0.5d0 * rhoA2) + rhoA3) * expA
+            term2 = kappap * (-12.0d0 * kappam2 * (1.0d0 + rhoB + 0.5d0
+     &         * rhoB2) + (1.0d0 - 4.0d0 * kappam) * rhoB3 - rhoB4)
+     &         * expB
+            dSPz = -pre / r * (term1 + term2)
+            pre = sqrt((1.0d0 - tau) / (1.0d0 + tau)) / (-tau * rho2)
+            term1 = 2.0d0 * kappap2 * (6.0d0 * kappam * (1.0d0 + rhoB
+     &         + 0.5d0 * rhoB2) + rhoB3) * expB
+            term2 = kappam * (-12.0d0 * kappap2 * (1.0d0 + rhoA + 0.5d0
+     &         * rhoA2) + (1.0d0 - 4.0d0 * kappap) * rhoA3 - rhoA4)
+     &         * expA
+            dPzS = pre / r * (term1 + term2)
+            pre = 1.0d0 / (sqrt(1.0d0 - tau**2) * tau * rho3)
+            term1 = 2.0d0 * kappam2 * (36.0d0 * kappap2 * (1.0d0 + rhoA)
+     &         + 6.0d0 * kappap * (1.0d0 + 2.0d0 * kappap) * rhoA2
+     &         + 6.0d0 * kappap * rhoA3 + rhoA4) * expA
+            term2 =-2.0d0 * kappap2 * (36.0d0 * kappam2 * (1.0d0 + rhoB)
+     &         + 6.0d0 * kappam * (1.0d0 + 2.0d0 * kappam) * rhoB2
+     &         + 6.0d0 * kappam * rhoB3 + rhoB4) * expB
+            dPxPx = pre / r * (term1 + term2)
+            term1 = kappam2 * (72.0d0 * kappap2 * (1.0d0 + rhoA
+     &         + 0.5d0 * rhoA2 + rhoA3 / 6.0d0) + 2.0d0 * (2.0d0
+     &         + 3.0d0 * kappa) * rhoA4 + rhoA5) * expA
+            term2 =-kappap2 * (72.0d0 * kappam2 * (1.0d0 + rhoB
+     &         + 0.5d0 * rhoB2 + rhoB3 / 6.0d0) + 2.0d0 * (2.0d0
+     &         - 3.0d0 * kappa) * rhoB4 + rhoB5) * expB
+            dPzPz = -2.0d0 * pre / r * (term1 + term2)
+         end if
+      end if
+      return
+      end
+c
+c
+c     #####################################################
+c     ##                                                 ##
+c     ##  subroutine overlapSS  --  SS overlap integral  ##
+c     ##                                                 ##
+c     #####################################################
 c
 c
 c     "overlapSS" computes the overlap integral
 c
 c
-      function overlapSS (a, b, z1, z2)
+      subroutine overlapSS (a, b, z1, z2, grad, SS, dSS)
       implicit none
-      real*8 overlapSS,over
+      real*8 over,dover
+      real*8 SS,dSS
       real*8 a,b,z1,z2
       real*8 diff,eps,zr,r
       real*8 rho,rho2
@@ -487,8 +653,10 @@ c
       real*8 alpha,tau,rhoA,rhoB
       real*8 a2,b2,kappa
       real*8 pre,term1,term2
+      real*8 rhoA2,rhoB2
       real*8 kappam,kappap
       real*8 expA,expB
+      logical grad
 c
 c
       diff = abs(a - b)
@@ -500,6 +668,9 @@ c
          rho2 = rho * rho
          exp1 = exp(-rho)
          over = (1.0d0 + rho + rho2 / 3.0d0) * exp1
+         if (grad) then
+            dover = -1.0d0/3.0d0 * a * rho * (1.0d0 + rho) * exp1
+         end if
       else
          alpha = 1.0d0 / 2.0d0 * (a + b)
          tau = (a - b) / (a + b)
@@ -517,37 +688,49 @@ c
          term1 =-kappam * (2.0d0 * kappap + rhoA) * expA
          term2 = kappap * (2.0d0 * kappam + rhoB) * expB
          over = pre * (term1 + term2)
+         if (grad) then
+            rhoA2 = rhoA * rhoA
+            rhoB2 = rhoB * rhoB
+            term1 = kappam * (2.0d0 * kappap * (1.0d0 + rhoA) + rhoA2)
+     &                                                            * expA
+            term2 =-kappap * (2.0d0 * kappam * (1.0d0 + rhoB) + rhoB2)
+     &                                                            * expB
+            dover = pre / r * (term1 + term2)
          end if
-      overlapSS = over
+      end if
+      SS = over
+      dSS = dover
       return
       end
 c
 c
-c     #####################################################
-c     ##                                                 ##
-c     ##  function overlapSPz  --  SPz overlap integral  ##
-c     ##                                                 ##
-c     #####################################################
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine overlapSPz  --  SPz overlap integral  ##
+c     ##                                                   ##
+c     #######################################################
 c
 c
 c     "overlapSPz" computes the overlap integral
 c
 c
-      function overlapSPz (a, b, z1, z2)
+      subroutine overlapSPz (a, b, z1, z2, grad, SPz, dSPz)
       implicit none
-      real*8 overlapSPz,over
+      real*8 over,dover
+      real*8 SPz,dSPz
       real*8 a,b,z1,z2
       real*8 diff,eps,zr,r
-      real*8 rho,rho2
+      real*8 rho,rho2,rho3
       real*8 exp1
       real*8 alpha,tau,rhoA,rhoB
       real*8 a2,b2,kappa
       real*8 pre,term1,term2
-      real*8 rhoA2
-      real*8 rhoB2,rhoB3
+      real*8 rhoA2,rhoA3
+      real*8 rhoB2,rhoB3,rhoB4
       real*8 kappam,kappam2
       real*8 kappap,kappap2
       real*8 expA,expB
+      logical grad
 c
 c
       diff = abs(a - b)
@@ -559,6 +742,10 @@ c
          rho2 = rho * rho
          exp1 = exp(-rho)
          over = 0.5d0 * rho * (1.0d0 + rho + rho2 / 3.0d0) * exp1
+         if (grad) then
+            rho3 = rho2 * rho
+            dover = 0.5d0 * a * (1.0d0 + rho - rho3 / 3.0d0) * exp1
+         end if
       else
          alpha = 1.0d0 / 2.0d0 * (a + b)
          tau = (a - b) / (a + b)
@@ -584,49 +771,63 @@ c
          term2 = kappap * (6.0d0 * kappam2 * (1.0d0 + rhoB)
      &      + 4.0d0 * kappam * rhoB2 + rhoB3) * expB
          over = pre * (term1 + term2)
+         if (grad) then
+            rhoA3 = rhoA2 * rhoA
+            rhoB4 = rhoB3 * rhoB
+            term1 = 2.0d0 * kappam2 * (6.0d0 * kappap * (1.0d0 + rhoA
+     &         + 0.5d0 * rhoA2) + rhoA3) * expA
+            term2 = kappap * (-12.0d0 * kappam2 * (1.0d0 + rhoB + 0.5d0
+     &         * rhoB2) + (1.0d0 - 4.0d0 * kappam) * rhoB3 - rhoB4)
+     &         * expB
+            dover = pre / r * (term1 + term2)
          end if
-      overlapSPz = -over
+      end if
+      SPz = -over
+      dSPz = -dover
       if (z1 > z2) then
-         overlapSPz = -overlapSPz
+         SPz = -SPz
+         dSPz = -dSPz
       end if
       return
       end
 c
 c
-c     #####################################################
-c     ##                                                 ##
-c     ##  function overlapPzS  --  PzS overlap integral  ##
-c     ##                                                 ##
-c     #####################################################
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine overlapPzS  --  PzS overlap integral  ##
+c     ##                                                   ##
+c     #######################################################
 c
 c
 c     "overlapPzS" computes the overlap integral
 c
 c
-      function overlapPzS (a, b, z1, z2)
+      subroutine overlapPzS (a, b, z1, z2, grad, PzS, dPzS)
       implicit none
-      real*8 overlapPzS,overlapSPz
+      real*8 PzS,dPzS
       real*8 a,b,z1,z2
+      logical grad
 c
 c
-      overlapPzS = overlapSPz(b,a,z2,z1)
+      call overlapSPz(b, a, z2, z1, grad, PzS, dPzS)
       return
       end
 c
 c
-c     #######################################################
-c     ##                                                   ##
-c     ##  function overlapPxPx  --  PxPx overlap integral  ##
-c     ##                                                   ##
-c     #######################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine overlapPxPx  --  PxPx overlap integral  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
 c     "overlapPxPx" computes the overlap integral
 c
 c
-      function overlapPxPx (a, b, z1, z2)
+      subroutine overlapPxPx (a, b, z1, z2, grad, PxPx, dPxPx)
       implicit none
-      real*8 overlapPxPx,over
+      real*8 over,dover
+      real*8 PxPx,dPxPx
       real*8 a,b,z1,z2
       real*8 diff,eps,zr,r
       real*8 rho,rho2,rho3
@@ -634,11 +835,12 @@ c
       real*8 alpha,tau,rhoA,rhoB
       real*8 a2,b2,kappa
       real*8 pre,term1,term2
-      real*8 rhoA2,rhoA3
-      real*8 rhoB2,rhoB3
+      real*8 rhoA2,rhoA3,rhoA4
+      real*8 rhoB2,rhoB3,rhoB4
       real*8 kappam,kappam2
       real*8 kappap,kappap2
       real*8 expA,expB
+      logical grad
 c
 c
       diff = abs(a - b)
@@ -651,6 +853,10 @@ c
          rho3 = rho2 * rho
          exp1 = exp(-rho)
          over = (1.0d0 + rho + 2.0d0/5.0d0 * rho2 + rho3/15.0d0) * exp1
+         if (grad) then
+            dover = -0.2d0 * a * rho * (1.0d0 + rho + rho2 / 3.0d0)
+     &                                                            * exp1
+         end if
       else
          alpha = 1.0d0 / 2.0d0 * (a + b)
          tau = (a - b) / (a + b)
@@ -677,25 +883,38 @@ c
          term2 = kappap2 * (24.0d0 * kappam2 * (1.0d0 + rhoB)
      &      + 12.0d0 * kappam * rhoB2 + 2.0d0 * rhoB3) * expB
          over = pre * (term1 + term2)
+         if (grad) then
+            rhoA4 = rhoA3 * rhoA
+            rhoB4 = rhoB3 * rhoB
+            term1 = 2.0d0 * kappam2 * (36.0d0 * kappap2 * (1.0d0 + rhoA)
+     &         + 6.0d0 * kappap * (1.0d0 + 2.0d0 * kappap) * rhoA2
+     &         + 6.0d0 * kappap * rhoA3 + rhoA4) * expA
+            term2 =-2.0d0 * kappap2 * (36.0d0 * kappam2 * (1.0d0 + rhoB)
+     &         + 6.0d0 * kappam * (1.0d0 + 2.0d0 * kappam) * rhoB2
+     &         + 6.0d0 * kappam * rhoB3 + rhoB4) * expB
+            dover = pre / r * (term1 + term2)
          end if
-      overlapPxPx = over
+      end if
+      PxPx = over
+      dPxPx = dover
       return
       end
 c
 c
-c     #######################################################
-c     ##                                                   ##
-c     ##  function overlapPzPz  --  PzPz overlap integral  ##
-c     ##                                                   ##
-c     #######################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine overlapPzPz  --  PzPz overlap integral  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
 c     "overlapPzPz" computes the overlap integral
 c
 c
-      function overlapPzPz (a, b, z1, z2)
+      subroutine overlapPzPz (a, b, z1, z2, grad, PzPz, dPzPz)
       implicit none
-      real*8 overlapPzPz,over
+      real*8 over,dover
+      real*8 PzPz,dPzPz
       real*8 a,b,z1,z2
       real*8 diff,eps,zr,r
       real*8 rho,rho2,rho3,rho4
@@ -703,11 +922,12 @@ c
       real*8 alpha,tau,rhoA,rhoB
       real*8 a2,b2,kappa
       real*8 pre,term1,term2
-      real*8 rhoA2,rhoA3,rhoA4
-      real*8 rhoB2,rhoB3,rhoB4
+      real*8 rhoA2,rhoA3,rhoA4,rhoA5
+      real*8 rhoB2,rhoB3,rhoB4,rhoB5
       real*8 kappam,kappam2
       real*8 kappap,kappap2
       real*8 expA,expB
+      logical grad
 c
 c
       diff = abs(a - b)
@@ -722,6 +942,10 @@ c
          exp1 = exp(-rho)
          over = (-1.0d0 - rho - rho2 / 5.0d0 + 2.0d0/15.0d0 * rho3
      &                                           + rho4 / 15.0d0) * exp1
+         if (grad) then
+         dover = 0.6d0 * a * rho * (1.0d0 + rho + 2.0d0/9.0d0 * rho2
+     &                                            - rho3 / 9.0d0) * exp1
+         end if
       else
          alpha = 1.0d0 / 2.0d0 * (a + b)
          tau = (a - b) / (a + b)
@@ -752,7 +976,19 @@ c
      &      + 0.5d0 * rhoB2) + 2.0d0 * (5.0d0 - 6.0d0 * kappa) * rhoB3
      &      + 2.0d0 * rhoB4) * expB
          over = pre * (term1 + term2)
+         if (grad) then
+            rhoA5 = rhoA4 * rhoA
+            rhoB5 = rhoB4 * rhoB
+            term1 = kappam2 * (72.0d0 * kappap2 * (1.0d0 + rhoA
+     &         + 0.5d0 * rhoA2 + rhoA3 / 6.0d0) + 2.0d0 * (2.0d0
+     &         + 3.0d0 * kappa) * rhoA4 + rhoA5) * expA
+            term2 =-kappap2 * (72.0d0 * kappam2 * (1.0d0 + rhoB
+     &         + 0.5d0 * rhoB2 + rhoB3 / 6.0d0) + 2.0d0 * (2.0d0
+     &         - 3.0d0 * kappa) * rhoB4 + rhoB5) * expB
+            dover = 2.0d0 * pre / r * (term1 + term2)
          end if
-      overlapPzPz = -over
+      end if
+      PzPz = -over
+      dPzPz = -dover
       return
       end
