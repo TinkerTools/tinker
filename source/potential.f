@@ -611,20 +611,23 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (dofit) then
-         allocate (fit0(12*nconf*namax))
-         allocate (varpot(12*nconf*namax))
+         allocate (fit0(12*namax*nconf))
          allocate (fchg(maxtyp))
          allocate (fpol(13,maxtyp))
          allocate (fcpen(maxclass))
          allocate (fitchg(maxtyp))
          allocate (fitpol(maxtyp))
          allocate (fitcpen(maxclass))
+         allocate (vchg(namax,nconf))
+         allocate (vpol(13,namax,nconf))
+         allocate (vcpen(namax,nconf))
+         allocate (varpot(12*namax*nconf))
 c
 c     perform dynamic allocation of some local arrays
 c
-         allocate (xx(12*nconf*namax))
-         allocate (xlo(12*nconf*namax))
-         allocate (xhi(12*nconf*namax))
+         allocate (xx(12*namax*nconf))
+         allocate (xlo(12*namax*nconf))
+         allocate (xhi(12*namax*nconf))
          allocate (tmpchg(maxtyp))
          allocate (tmppol(maxtyp))
          allocate (tmpcpen(maxclass))
@@ -648,7 +651,8 @@ c
          do j = 1, nconf
             call getref (j)
             call setelect
-            call prmvar (nvar,xx)
+            call setvars (j)
+            call prmvar (nvar,xx,j)
             nresid = nresid + npgrid(j)
             if (fit_mpl)  nresid = nresid + 1
             if (use_dpl)  nresid = nresid + 3
@@ -695,7 +699,7 @@ c
             do k = 1, maxclass
                tmpcpen(k) = fitcpen(k)
             end do
-            call varprm (nvar,xx)
+            call varprm (nvar,xx,j)
             nvar = next
             do k = 1, maxtyp
                fitchg(k) = tmpchg(k)
@@ -704,7 +708,7 @@ c
             do k = 1, maxclass
                fitcpen(k) = tmpcpen(k)
             end do
-            call prmvar (nvar,xx)
+            call prmvar (nvar,xx,j)
          end do
 c
 c     get potential for each structure and print statistics
@@ -720,8 +724,8 @@ c
          do j = 1, nconf
             call getref (j)
             call setelect
-            call varprm (nvar,xx)
-            call prmvar (nvar,xx)
+            call varprm (nvar,xx,j)
+            call prmvar (nvar,xx,j)
             if (use_mpole) then
                call chkpole
                call rotpole ('MPOLE')
@@ -1081,6 +1085,90 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
+c     ##  subroutine setvars  --  find nonzero parameters for atoms  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "setvars" finds and stores nonzero partial charge, atomic
+c     multipole and charge penetration parameters for each atom of
+c     the current structure
+c
+c
+      subroutine setvars (iconf)
+      use atoms
+      use charge
+      use chgpen
+      use mplpot
+      use mpole
+      use potent
+      use potfit
+      implicit none
+      integer i,j,ii
+      integer iconf
+c
+c
+c     initialize use of electrostatic parameter types for atoms
+c
+      do i = 1, n
+         vchg(i,iconf) = .false.
+         do j = 1, 13
+            vpol(j,i,iconf) = .false.
+         end do
+         vcpen(i,iconf) = .false.
+      end do
+c
+c     set nonzero partial charges as fitting variables
+c
+      do ii = 1, nion
+         i = iion(ii)
+         if (use_chgflx) then
+            if (pchg0(i) .ne. 0.0d0) then
+               vchg(i,iconf) = .true.
+            end if
+         else
+            if (pchg(i) .ne. 0.0d0) then
+               vchg(i,iconf) = .true.
+            end if
+         end if
+      end do
+c
+c     set nonzero atomic multipoles as fitting variables
+c
+      do ii = 1, npole
+         i = ipole(ii)
+         if (use_chgflx) then
+            if (mono0(i) .ne. 0.0d0) then
+               vpol(1,i,iconf) = .true.
+            end if
+         else
+            if (pole(1,i) .ne. 0.0d0) then
+               vpol(1,i,iconf) = .true.
+            end if
+         end if
+         do j = 2, 13
+            if (pole(j,i) .ne. 0.0d0) then
+               vpol(j,i,iconf) = .true.
+            end if
+         end do
+      end do
+c
+c     set nonzero charge penetration values as fitting variables
+c
+      if (use_chgpen) then
+         do ii = 1, npole
+            i = ipole(ii)
+            if (palpha(i) .ne. 0.0d0) then
+               vcpen(i,iconf) = .true.
+            end if
+         end do
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
 c     ##  subroutine potpoint  --  electrostatic potential at point  ##
 c     ##                                                             ##
 c     #################################################################
@@ -1324,7 +1412,7 @@ c
       do j = 1, nconf
          call getref (j)
          call setelect
-         call varprm (nvar,xx)
+         call varprm (nvar,xx,j)
          if (use_mpole)  call rotpole ('MPOLE')
          if (use_polar) then
             domlst = .true.
@@ -1432,7 +1520,7 @@ c     "varprm" copies the current optimization values into the
 c     corresponding electrostatic potential energy parameters
 c
 c
-      subroutine varprm (nvar,xx)
+      subroutine varprm (nvar,xx,iconf)
       use atomid
       use atoms
       use charge
@@ -1445,7 +1533,7 @@ c
       implicit none
       integer i,j,ii
       integer it,ic
-      integer nvar
+      integer nvar,iconf
       real*8 dterm,qterm
       real*8 xx(*)
       logical done
@@ -1471,13 +1559,13 @@ c
          if (.not. done) then
             fitchg(it) = .true.
             if (use_chgflx) then
-               if (pchg0(i) .ne. 0.0d0) then
+               if (vchg(i,iconf)) then
                   nvar = nvar + 1
                   pchg0(i) = xx(nvar)
                end if
                fchg(it) = pchg0(i)
             else
-               if (pchg(i) .ne. 0.0d0) then
+               if (vchg(i,iconf)) then
                   nvar = nvar + 1
                   pchg(i) = xx(nvar)
                end if
@@ -1513,56 +1601,56 @@ c
          end if
          if (.not. done) then
             if (use_chgflx) then
-               if (fit_mpl .and. mono0(i).ne.0.0d0) then
+               if (fit_mpl .and. vpol(1,i,iconf)) then
                   nvar = nvar + 1
                   mono0(i) = xx(nvar)
                end if
             else
-               if (fit_mpl .and. pole(1,i).ne.0.0d0) then
+               if (fit_mpl .and. vpol(1,i,iconf)) then
                   nvar = nvar + 1
                   pole(1,i) = xx(nvar)
                end if
             end if
-            if (fit_dpl .and. pole(2,i).ne.0.0d0) then
+            if (fit_dpl .and. vpol(2,i,iconf)) then
                nvar = nvar + 1
                pole(2,i) = dterm * xx(nvar)
             end if
-            if (fit_dpl .and. pole(3,i).ne.0.0d0) then
+            if (fit_dpl .and. vpol(3,i,iconf)) then
                nvar = nvar + 1
                pole(3,i) = dterm * xx(nvar)
             end if
-            if (fit_dpl .and. pole(4,i).ne.0.0d0) then
+            if (fit_dpl .and. vpol(4,i,iconf)) then
                nvar = nvar + 1
                pole(4,i) = dterm * xx(nvar)
             end if
-            if (fit_qpl .and. pole(5,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(5,i,iconf)) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   pole(5,i) = qterm * xx(nvar)
                end if
             end if
-            if (fit_qpl .and. pole(6,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(6,i,iconf)) then
                nvar = nvar + 1
                pole(6,i) = qterm * xx(nvar)
                pole(8,i) = qterm * xx(nvar)
             end if
-            if (fit_qpl .and. pole(7,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(7,i,iconf)) then
                nvar = nvar + 1
                pole(7,i) = qterm * xx(nvar)
                pole(11,i) = qterm * xx(nvar)
             end if
-            if (fit_qpl .and. pole(9,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(9,i,iconf)) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   pole(9,i) = qterm * xx(nvar)
                end if
             end if
-            if (fit_qpl .and. pole(10,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(10,i,iconf)) then
                nvar = nvar + 1
                pole(10,i) = qterm * xx(nvar)
                pole(12,i) = qterm * xx(nvar)
             end if
-            if (fit_qpl .and. pole(13,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(13,i,iconf)) then
                if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
                   pole(13,i) = qterm * xx(nvar)
@@ -1599,7 +1687,7 @@ c
                end if
             end if
             if (.not. done) then
-               if (fit_chgpen .and. palpha(i).ne.0.0d0) then
+               if (fit_chgpen .and. vcpen(i,iconf)) then
                   nvar = nvar + 1
                   palpha(i) = xx(nvar)
                end if
@@ -1634,7 +1722,7 @@ c     "prmvar" determines the optimization values from the
 c     corresponding electrostatic potential energy parameters
 c
 c
-      subroutine prmvar (nvar,xx)
+      subroutine prmvar (nvar,xx,iconf)
       use atomid
       use atoms
       use charge
@@ -1649,7 +1737,7 @@ c
       integer i,j,k,m
       integer ii,it,ic
       integer ktype
-      integer nvar
+      integer nvar,iconf
       integer, allocatable :: equiv(:)
       real*8 dterm,qterm
       real*8 eps,sum,big
@@ -1889,7 +1977,7 @@ c
             fitchg(it) = .true.
          end if
          if (.not. done) then
-            if (pchg(i) .ne. 0.0d0) then
+            if (vchg(i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'CHARGE'
                if (use_chgflx) then
@@ -1918,7 +2006,7 @@ c
             fitpol(it) = .true.
          end if
          if (.not. done) then
-            if (fit_mpl .and. pole(1,i).ne.0.0d0) then
+            if (fit_mpl .and. vpol(1,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'MONOPL'
                if (use_chgflx) then
@@ -1932,7 +2020,7 @@ c
                write (iout,110)  it,'Monopole',mono0(i)
   110          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_dpl .and. pole(2,i).ne.0.0d0) then
+            if (fit_dpl .and. vpol(2,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(2,i)
@@ -1942,7 +2030,7 @@ c
                write (iout,130)  it,'X-Dipole',dterm*pole(2,i)
   130          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_dpl .and. pole(3,i).ne.0.0d0) then
+            if (fit_dpl .and. vpol(3,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(3,i)
@@ -1952,7 +2040,7 @@ c
                write (iout,150)  it,'Y-Dipole',dterm*pole(3,i)
   150          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_dpl .and. pole(4,i).ne.0.0d0) then
+            if (fit_dpl .and. vpol(4,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(4,i)
@@ -1962,7 +2050,7 @@ c
                write (iout,170)  it,'Z-Dipole',dterm*pole(4,i)
   170          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_qpl .and. pole(5,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(5,i,iconf)) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   varpot(nvar) = 'QUADPL'
@@ -1977,7 +2065,7 @@ c
                write (iout,200)  it,'XX-Quad ',qterm*pole(5,i)
   200          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_qpl .and. pole(6,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(6,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(6,i)
@@ -1987,7 +2075,7 @@ c
                write (iout,220)  it,'XY-Quad ',qterm*pole(6,i)
   220          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_qpl .and. pole(7,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(7,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(7,i)
@@ -1997,7 +2085,7 @@ c
                write (iout,240)  it,'XZ-Quad ',qterm*pole(7,i)
   240          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_qpl .and. pole(9,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(9,i,iconf)) then
                if (polaxe(i) .ne. 'Z-Only') then
                   nvar = nvar + 1
                   varpot(nvar) = 'QUADPL'
@@ -2012,7 +2100,7 @@ c
                write (iout,270)  it,'YY-Quad ',qterm*pole(9,i)
   270          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_qpl .and. pole(10,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(10,i,iconf)) then
                nvar = nvar + 1
                varpot(nvar) = 'QUADPL'
                xx(nvar) = qterm * pole(10,i)
@@ -2022,7 +2110,7 @@ c
                write (iout,290)  it,'YZ-Quad ',qterm*pole(10,i)
   290          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_qpl .and. pole(13,i).ne.0.0d0) then
+            if (fit_qpl .and. vpol(13,i,iconf)) then
                if (polaxe(i) .eq. 'Z-Only') then
                   nvar = nvar + 1
                   varpot(nvar) = 'QUADPL'
@@ -2053,7 +2141,7 @@ c
                fitcpen(ic) = .true.
             end if
             if (.not. done) then
-               if (fit_chgpen .and. palpha(i).ne.0.0d0) then
+               if (fit_chgpen .and. vcpen(i,iconf)) then
                   nvar = nvar + 1
                   varpot(nvar) = 'CHGPEN'
                   xx(nvar) = palpha(i)

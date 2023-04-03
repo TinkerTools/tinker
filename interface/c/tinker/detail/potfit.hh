@@ -39,6 +39,9 @@ extern int* TINKER_MOD(potfit, fitpol);
 extern int* TINKER_MOD(potfit, fitcpen);
 extern int* TINKER_MOD(potfit, gatm);
 extern int* TINKER_MOD(potfit, fatm);
+extern int* TINKER_MOD(potfit, vchg);
+extern int* TINKER_MOD(potfit, vpol);
+extern int* TINKER_MOD(potfit, vcpen);
 extern char TINKER_MOD(potfit, resptyp)[4];
 extern char (*TINKER_MOD(potfit, varpot))[6];
 #ifdef __cplusplus

@@ -1000,6 +1000,9 @@ c
       if (allocated(fitpol))  deallocate (fitcpen)
       if (allocated(gatm))  deallocate (gatm)
       if (allocated(fatm))  deallocate (fatm)
+      if (allocated(vchg))  deallocate (vchg)
+      if (allocated(vpol))  deallocate (vpol)
+      if (allocated(vcpen))  deallocate (vcpen)
       if (allocated(varpot))  deallocate (varpot)
 c
 c     deallocation of global arrays from module qmstuf

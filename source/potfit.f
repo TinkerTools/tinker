@@ -45,6 +45,9 @@ c     fitpol      flag marking atom types used in atomic multipole fit
 c     fitcpen     flag marking atom types used in charge penetration
 c     gatm        flag to use potential grid points around each atom
 c     fatm        flag to use each atom in electrostatic potential fit
+c     vchg        flag for partial charge in fitting at each atom
+c     vpol        flag for atomic multipoles in fitting at each atom
+c     vcpen       flag for charge penetration in fitting at each atom
 c     resptyp     electrostatic restraint target (ORIG, ZERO or NONE)
 c     varpot      descriptive name for each variable in potential fit
 c
@@ -80,6 +83,9 @@ c
       logical, allocatable :: fitcpen(:)
       logical, allocatable :: gatm(:)
       logical, allocatable :: fatm(:)
+      logical, allocatable :: vchg(:,:)
+      logical, allocatable :: vpol(:,:,:)
+      logical, allocatable :: vcpen(:,:)
       character*4 resptyp
       character*6, allocatable :: varpot(:)
       save

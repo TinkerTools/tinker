@@ -2200,7 +2200,7 @@ inline void tinker_f_setmol2(tinker_fchars atmnam, tinker_fchars atmtyp, double*
 }
 
 // prtpdb.f
-void prtpdb_(int* ipdb);
+void prtpdb_(int* ipdb, int* imdl);
 #define tinker_f_prtpdb prtpdb_
 
 // prtprm.f
