@@ -1835,7 +1835,7 @@ c
          end do
       end if
 c
-c     enforce integer net charge over atomic multipoles
+c     enforce integer net charge over atomic monopoles
 c
       ktype = 0
       kval = 0

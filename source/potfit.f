@@ -45,9 +45,9 @@ c     fitpol      flag marking atom types used in atomic multipole fit
 c     fitcpen     flag marking atom types used in charge penetration
 c     gatm        flag to use potential grid points around each atom
 c     fatm        flag to use each atom in electrostatic potential fit
-c     vchg        flag for partial charge in fitting at each atom
-c     vpol        flag for atomic multipoles in fitting at each atom
-c     vcpen       flag for charge penetration in fitting at each atom
+c     vchg        flag for partial charge at each atom in fitting
+c     vpol        flag for atomic multipoles at each atom in fitting
+c     vcpen       flag for charge penetration at each atom in fitting
 c     resptyp     electrostatic restraint target (ORIG, ZERO or NONE)
 c     varpot      descriptive name for each variable in potential fit
 c

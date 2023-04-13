@@ -1902,7 +1902,7 @@ c
                   polarity(i) = 0.504d0
                   palpha(i) = 4.9530d0
    40             continue
-                  aromatic = chkarom (k)
+                  aromatic = chkarom (i)
                   if (aromatic) then
                      polarity(i) = 0.1106d0
                      palpha(i) = 4.9530d0
