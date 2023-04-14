@@ -264,8 +264,10 @@ c
       logical noinvert
       logical planar
       logical pyramid
+      logical chkarom
       character*240 record
       character*240 string
+      external chkarom
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -352,6 +354,12 @@ c
             mabc = priority (i,ia,ib,ic)
             planar = (abs(geometry(ic,i,ia,ib)) .gt. 170.0d0)
             pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
+            if (ki .eq. 7) then
+               if (chkarom(i))  pyramid = .false.
+               if (chkarom(ia))  pyramid = .false.
+               if (chkarom(ib))  pyramid = .false.
+               if (chkarom(ic))  pyramid = .false.
+            end if
             pyramid = (pyramid .and. noinvert)
             if (mabc .eq. 0) then
                polaxe(i) = 'None'
