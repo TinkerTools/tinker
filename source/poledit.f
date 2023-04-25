@@ -430,7 +430,15 @@ c
                zaxis(i) = ia
                xaxis(i) = 0
                yaxis(i) = 0
-               if (mbc .eq. ib) then
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (mbc .eq. ib) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
                else if (mbc .eq. ic) then
@@ -439,17 +447,9 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-               else if (ki.eq.7 .and. pyramid) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ib
-                  yaxis(i) = ic
                else if (ki.eq.7 .and. .not.pyramid) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-               else if (ki.eq.15 .or. ki.eq.16) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ib
-                  yaxis(i) = ic
                else
                   call frame13 (i,ia,noinvert)
                end if
@@ -458,7 +458,15 @@ c
                zaxis(i) = ib
                xaxis(i) = 0
                yaxis(i) = 0
-               if (mac .eq. ia) then
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (mac .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
                else if (mac .eq. ic) then
@@ -467,17 +475,9 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.7 .and. pyramid) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ic
                else if (ki.eq.7 .and. .not.pyramid) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.15 .or. ki.eq.16) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ic
                else
                   call frame13 (i,ib,noinvert)
                end if
@@ -486,7 +486,15 @@ c
                zaxis(i) = ic
                xaxis(i) = 0
                yaxis(i) = 0
-               if (mab .eq. ia) then
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (mab .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
                else if (mab .eq. ib) then
@@ -495,17 +503,9 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.7 .and. pyramid) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ib
                else if (ki.eq.7 .and. .not.pyramid) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.15 .or. ki.eq.16) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ib
                else
                   call frame13 (i,ic,noinvert)
                end if
