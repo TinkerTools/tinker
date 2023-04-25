@@ -382,16 +382,49 @@ c
                zaxis(i) = ia
                xaxis(i) = ib
                yaxis(i) = 0
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ic
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ic
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               end if
             else if (mac.eq.0 .and. (planar.or.ka.ge.kb)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ic
                yaxis(i) = 0
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ib
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ib
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               end if
             else if (mbc.eq.0 .and. (planar.or.kc.ge.ka)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ib
                xaxis(i) = ic
                yaxis(i) = 0
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               end if
             else if (mabc .eq. ia) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ia
@@ -2129,7 +2162,7 @@ c
             thl = 0.39d0
             write (iout,140)
   140       format (/,' Enter Atom Number, Polarizability & Thole',
-     &                 ' Values :  ',$)
+     &                 ' Value :  ',$)
             read (input,150)  record
   150       format (a240)
             read (record,*,err=160,end=160)  i,pol,thl
@@ -2144,7 +2177,7 @@ c
             pal = 0.0d0
             write (iout,170)
   170       format (/,' Enter Atom Number, Polarize, Core & Damp',
-     &                 ' Values :  ',$)
+     &                 ' Value :  ',$)
             read (input,180)  record
   180       format (a240)
             read (record,*,err=190,end=190)  i,pol,pel,pal
@@ -3664,7 +3697,7 @@ c
       use sizes
       implicit none
       integer i,j,k,m
-      integer ii,it,mt
+      integer ii,it
       integer in,jn,kn
       integer ni,nati
       integer nj,natj
@@ -3970,20 +4003,20 @@ c
          nave = 1
          ptlast = '                '
          do ii = 1, npole
-            it = pkey(ii)
+            i = pkey(ii)
             if (pt(ii) .eq. ptlast) then
                nave = nave + 1
                do j = 1, 13
-                  pave(j) = pave(j) + pole(j,it)
+                  pave(j) = pave(j) + pole(j,i)
                end do
                if (ii .eq. npole) then
                   do j = 1, 13
                      pave(j) = pave(j) / dble(nave)
                   end do
-                  do m = 1, nave
-                     mt = pkey(i-m+1)
+                  do k = 1, nave
+                     m = pkey(ii-k+1)
                      do j = 1, 13
-                        pole(j,mt) = pave(j)
+                        pole(j,m) = pave(j)
                      end do
                   end do
                end if
@@ -3992,16 +4025,16 @@ c
                   do j = 1, 13
                      pave(j) = pave(j) / dble(nave)
                   end do
-                  do m = 1, nave
-                     mt = pkey(i-m)
+                  do k = 1, nave
+                     m = pkey(ii-k)
                      do j = 1, 13
-                        pole(j,mt) = pave(j)
+                        pole(j,m) = pave(j)
                      end do
                   end do
                end if
                nave = 1
                do j = 1, 13
-                  pave(j) = pole(j,it)
+                  pave(j) = pole(j,i)
                end do
                ptlast = pt(ii)
             end if
