@@ -823,23 +823,28 @@ c
       use couple
       use mpole
       implicit none
-      integer i,ia
+      integer i,j,ia
       integer ib,ic,id
-      integer k,ka,m
+      integer ka,m
       integer priority
       real*8 geometry
       logical noinvert
+      logical monoval
       logical pyramid
 c
 c
-c     get atoms directly adjacent to the primary connected atom
+c     initialize 1-2 and 1-3 connected atoms
 c
       ib = 0
       ic = 0
       id = 0
       ka = atomic(ia)
-      do k = 1, n12(ia)
-         m = i12(k,ia)
+      monoval = (n12(i) .eq. 1)
+c
+c     get atoms directly adjacent to the primary connected atom
+c
+      do j = 1, n12(ia)
+         m = i12(j,ia)
          if (m .ne. i) then
             if (ib .eq. 0) then
                ib = m
@@ -880,23 +885,23 @@ c
          yaxis(i) = 0
          pyramid = (abs(geometry(i,ia,ib,ic)) .lt. 135.0d0)
          m = priority (ia,ib,ic,0)
-         if (m .ne. 0) then
+         if (ka.eq.7 .and. pyramid .and. noinvert .and. monoval) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
+         else if ((ka.eq.15.or.ka.eq.16) .and. monoval) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
+         else if (m .ne. 0) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = m
          else if (ka .eq. 6) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-         else if (ka.eq.7 .and. pyramid .and. noinvert) then
-            polaxe(i) = 'Z-Bisect'
-            xaxis(i) = ib
-            yaxis(i) = ic
          else if (ka.eq.7 .and. .not.pyramid) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-         else if (ka.eq.15 .or. ka.eq.16) then
-            polaxe(i) = 'Z-Bisect'
-            xaxis(i) = ib
-            yaxis(i) = ic
          end if
 c
 c     three atoms are attached 1-3 through primary connection
