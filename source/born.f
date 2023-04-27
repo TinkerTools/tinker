@@ -71,11 +71,15 @@ c
       real*8 inner,outer,tinit
       real*8 ratio,total
       real*8 xi,yi,zi,ri
+      real*8 rsi,rdi,rsk,rdk
       real*8 rk,sk,sk2
+      real*8 rmi,rmk
+      real*8 si,si2
       real*8 lik,lik2
       real*8 uik,uik2
       real*8 tsum,tchain
       real*8 sum,sum2,sum3
+      real*8 shcti,shctk
       real*8 alpha,beta,gamma
       real*8 xr,yr,zr,rvdw
       real*8 r,r2,r3,r4
@@ -86,6 +90,7 @@ c
       real*8 expterm,rmu
       real*8 b0,gself,pi43
       real*8 bornmax
+      real*8 rborni,rbornk
       real*8 pair,pbtotal
       real*8 probe,areatotal
       real*8, allocatable :: roff(:)
@@ -96,6 +101,7 @@ c
       real*8, allocatable :: pbself(:)
       real*8, allocatable :: pbpair(:)
       logical done
+      logical computei,computek
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -326,56 +332,105 @@ c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
          do i = 1, n
-            rborn(i) = 0.0d0
+            ri = rsolv(i)
+            sum = 0.0d0
+            if (ri .gt. 0.0d0) then
+               sum = pi43 / ri**3
+            end if
+            rborn(i) = sum
+         end do
+         do i = 1, n-1
+            rsi = rsolv(i)
+            rdi = rdescr(i)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            shcti = shct(i)
+            rmi = max(rsi,rdi)
+            do k = i+1, n
+               rsk = rsolv(k)
+               rdk = rdescr(k)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               r2 = xr**2 + yr**2 + zr**2
+               r = sqrt(r2)
+               shctk = shct(k)
+               rmk = max(rsk,rdk)
+               computei = rsi.gt.0.0d0 .and. rdk.gt.0.0d0
+               computek = rdi.gt.0.0d0 .and. rsk.gt.0.0d0
+               if (computei) then
+                  sk = rdk * shctk
+                  if (rmi .lt. r+sk) then
+                     sk2 = sk * sk
+                     rborni = 0.0d0
+                     if (rmi+r .lt. sk) then
+                        lik = rmi
+                        uik = sk - r
+                        rborni = pi43*(1.0d0/uik**3-1.0d0/lik**3)
+                     end if
+                     uik = r + sk
+                     if (rmi+r .lt. sk) then
+                        lik = sk - r
+                     else if (r .lt. rmi+sk) then
+                        lik = rmi
+                     else
+                        lik = r - sk
+                     end if
+                     l2 = lik * lik
+                     l4 = l2 * l2
+                     lr = lik * r
+                     l4r = l4 * r
+                     u2 = uik * uik
+                     u4 = u2 * u2
+                     ur = uik * r
+                     u4r = u4 * r
+                     term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
+     &                      - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
+                     rborn(i) = rborn(i) + rborni - pi*term/12.0d0
+                  end if
+               end if
+               if (computek) then
+                  si = rdi * shcti
+                  if (rmk .lt. r+si) then
+                     si2 = si * si
+                     rbornk = 0.0d0
+                     if (rmk+r .lt. si) then
+                        lik = rmk
+                        uik = si - r
+                        rbornk = pi43*(1.0d0/uik**3-1.0d0/lik**3)
+                     end if
+                     uik = r + si
+                     if (rmk+r .lt. si) then
+                        lik = si - r
+                     else if (r .lt. rmk+si) then
+                        lik = rmk
+                     else
+                        lik = r - si
+                     end if
+                     l2 = lik * lik
+                     l4 = l2 * l2
+                     lr = lik * r
+                     l4r = l4 * r
+                     u2 = uik * uik
+                     u4 = u2 * u2
+                     ur = uik * r
+                     u4r = u4 * r
+                     term = (3.0d0*(r2-si2)+6.0d0*u2-8.0d0*ur)/u4r
+     &                      - (3.0d0*(r2-si2)+6.0d0*l2-8.0d0*lr)/l4r
+                     rborn(k) = rborn(k) + rbornk - pi*term/12.0d0
+                  end if
+               end if
+            end do
+         end do
+         do i = 1, n
             ri = rsolv(i)
             if (ri .gt. 0.0d0) then
-               xi = x(i)
-               yi = y(i)
-               zi = z(i)
-               sum = pi43 / ri**3
-               ri = max(rsolv(i),rdescr(i)) 
-               do k = 1, n
-                  rk = rdescr(k)
-                  if (i.ne.k .and. rk.gt.0.0d0) then
-                     xr = x(k) - xi
-                     yr = y(k) - yi
-                     zr = z(k) - zi
-                     r2 = xr**2 + yr**2 + zr**2
-                     r = sqrt(r2)
-                     sk = rk * shct(k)
-                     if (ri .lt. r+sk) then
-                        sk2 = sk * sk
-                        if (ri+r .lt. sk) then
-                           lik = ri
-                           uik = sk - r
-                           sum = sum + pi43*(1.0d0/uik**3-1.0d0/lik**3)
-                        end if
-                        uik = r + sk
-                        if (ri+r .lt. sk) then
-                           lik = sk - r
-                        else if (r .lt. ri+sk) then
-                           lik = ri
-                        else
-                           lik = r - sk
-                        end if
-                        l2 = lik * lik
-                        l4 = l2 * l2
-                        lr = lik * r
-                        l4r = l4 * r
-                        u2 = uik * uik
-                        u4 = u2 * u2
-                        ur = uik * r
-                        u4r = u4 * r
-                        term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
-     &                         - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
-                        sum = sum - pi*term/12.0d0
-                     end if
-                  end if
-               end do
-               rborn(i) = (sum/pi43)**third
+               rborn(i) = (rborn(i)/pi43)**third
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
             end if
+            print*, rborn(i)
          end do
 c
 c     get the Born radii via analytical continuum electrostatics
