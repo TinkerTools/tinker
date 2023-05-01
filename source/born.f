@@ -71,7 +71,9 @@ c
       real*8 inner,outer,tinit
       real*8 ratio,total
       real*8 xi,yi,zi,ri
-      real*8 rsi,rdi,rsk,rdk
+      real*8 rsi,rdi
+      real*8 rsk,rdk
+      real*8 roi
       real*8 rk,sk,sk2
       real*8 rmi,rmk
       real*8 si,si2
@@ -247,84 +249,126 @@ c     get the Born radii via the Hawkins-Cramer-Truhlar method
 c
       else if (borntyp .eq. 'HCT') then
          do i = 1, n
+            rborn(i) = 1.0d0 / roff(i)
+         end do
+         do i = 1, n-1
             xi = x(i)
             yi = y(i)
             zi = z(i)
             ri = roff(i)
-            sum = 1.0d0 / ri
-            do k = 1, n
-               if (i .ne. k) then
-                  xr = x(k) - xi
-                  yr = y(k) - yi
-                  zr = z(k) - zi
-                  r2 = xr**2 + yr**2 + zr**2
-                  r = sqrt(r2)
-                  rk = roff(k)
-                  sk = rk * shct(k)
-                  if (ri .lt. r+sk) then
-                     sk2 = sk * sk
-                     lik = 1.0d0 / max(ri,abs(r-sk))
-                     uik = 1.0d0 / (r+sk)
-                     lik2 = lik * lik
-                     uik2 = uik * uik
-                     term = lik - uik + 0.25d0*r*(uik2-lik2)
+            si = ri * shct(i)
+            do k = i+1, n
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               r2 = xr**2 + yr**2 + zr**2
+               r = sqrt(r2)
+               rk = roff(k)
+               sk = rk * shct(k)
+               computei = ri .lt. r+sk
+               computek = rk .lt. r+si
+               if (computei) then
+                  sk2 = sk * sk
+                  lik = 1.0d0 / max(ri,abs(r-sk))
+                  uik = 1.0d0 / (r+sk)
+                  lik2 = lik * lik
+                  uik2 = uik * uik
+                  rborni = lik - uik + 0.25d0*r*(uik2-lik2)
      &                         + (0.5d0/r)*log(uik/lik)
      &                         + (0.25d0*sk2/r)*(lik2-uik2)
-                     if (ri .lt. sk-r) then
-                        term = term + 2.0d0*(1.0d0/ri-lik)
-                     end if
-                     sum = sum - 0.5d0*term
+                  if (ri .lt. sk-r) then
+                     rborni = rborni + 2.0d0*(1.0d0/ri-lik)
                   end if
+                  rborn(i) = rborn(i) - 0.5d0*rborni
+               end if
+               if (computek) then
+                  si2 = si * si
+                  lik = 1.0d0 / max(rk,abs(r-si))
+                  uik = 1.0d0 / (r+si)
+                  lik2 = lik * lik
+                  uik2 = uik * uik
+                  rbornk = lik - uik + 0.25d0*r*(uik2-lik2)
+     &                         + (0.5d0/r)*log(uik/lik)
+     &                         + (0.25d0*si2/r)*(lik2-uik2)
+                  if (rk .lt. si-r) then
+                     rbornk = rbornk + 2.0d0*(1.0d0/rk-lik)
+                  end if
+                  rborn(k) = rborn(k) - 0.5d0*rbornk
                end if
             end do
-            rborn(i) = 1.0d0 / sum
+         end do
+         do i = 1, n
+            rborn(i) = 1.0d0 / rborn(i)
+            print*, "implicitsolvent", rborn(i)
          end do
 c
 c     get the Born radii via the Onufriev-Bashford-Case method
 c
       else if (borntyp .eq. 'OBC') then
          do i = 1, n
+            rborn(i) = 0.0d0
+         end do
+         do i = 1, n-1
             xi = x(i)
             yi = y(i)
             zi = z(i)
             ri = roff(i)
-            sum = 0.0d0
-            do k = 1, n
-               if (i .ne. k) then
-                  xr = x(k) - xi
-                  yr = y(k) - yi
-                  zr = z(k) - zi
-                  r2 = xr**2 + yr**2 + zr**2
-                  r = sqrt(r2)
-                  rk = roff(k)
-                  sk = rk * shct(k)
-                  if (ri .lt. r+sk) then
-                     sk2 = sk * sk
-                     lik = 1.0d0 / max(ri,abs(r-sk))
-                     uik = 1.0d0 / (r+sk)
-                     lik2 = lik * lik
-                     uik2 = uik * uik
-                     term = lik - uik + 0.25d0*r*(uik2-lik2)
+            si = ri * shct(i)
+            do k = i+1, n
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               r2 = xr**2 + yr**2 + zr**2
+               r = sqrt(r2)
+               rk = roff(k)
+               sk = rk * shct(k)
+               computei = ri .lt. r+sk
+               computek = rk .lt. r+si
+               if (computei) then
+                  sk2 = sk * sk
+                  lik = 1.0d0 / max(ri,abs(r-sk))
+                  uik = 1.0d0 / (r+sk)
+                  lik2 = lik * lik
+                  uik2 = uik * uik
+                  rborni = lik - uik + 0.25d0*r*(uik2-lik2)
      &                         + (0.5d0/r)*log(uik/lik)
      &                         + (0.25d0*sk2/r)*(lik2-uik2)
-                     if (ri .lt. sk-r) then
-                        term = term + 2.0d0*(1.0d0/ri-lik)
-                     end if
-                     sum = sum + 0.5d0*term
+                  if (ri .lt. sk-r) then
+                     rborni = rborni + 2.0d0*(1.0d0/ri-lik)
                   end if
+                  rborn(i) = rborn(i) - 0.5d0*rborni
+               end if
+               if (computek) then
+                  si2 = si * si
+                  lik = 1.0d0 / max(rk,abs(r-si))
+                  uik = 1.0d0 / (r+si)
+                  lik2 = lik * lik
+                  uik2 = uik * uik
+                  rbornk = lik - uik + 0.25d0*r*(uik2-lik2)
+     &                         + (0.5d0/r)*log(uik/lik)
+     &                         + (0.25d0*si2/r)*(lik2-uik2)
+                  if (rk .lt. si-r) then
+                     rbornk = rbornk + 2.0d0*(1.0d0/rk-lik)
+                  end if
+                  rborn(k) = rborn(k) - 0.5d0*rbornk
                end if
             end do
+         end do
+         do i = 1, n
+            roi = roff(i)
+            rsi = rsolv(i)
             alpha = aobc(i)
             beta = bobc(i)
             gamma = gobc(i)
-            sum = ri * sum
+            sum = roi * (-rborn(i))
             sum2 = sum * sum
             sum3 = sum * sum2
             tsum = tanh(alpha*sum - beta*sum2 + gamma*sum3)
-            rborn(i) = 1.0d0/ri - tsum/rsolv(i)
-            rborn(i) = 1.0d0 / rborn(i)
-            tchain = ri * (alpha-2.0d0*beta*sum+3.0d0*gamma*sum2)
-            drobc(i) = (1.0d0-tsum*tsum) * tchain / rsolv(i)
+            rborni = 1.0d0/roi - tsum/rsi
+            rborn(i) = 1.0d0 / rborni
+            tchain = roi * (alpha-2.0d0*beta*sum+3.0d0*gamma*sum2)
+            drobc(i) = (1.0d0-tsum*tsum) * tchain / rsi
+            print*, "implicitsolvent", rborn(i)
          end do
 c
 c     get the Born radii via Grycuk's modified HCT method
@@ -430,7 +474,7 @@ c
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
             end if
-            print*, rborn(i)
+            print*, "implicitsolvent", rborn(i)
          end do
 c
 c     get the Born radii via analytical continuum electrostatics
