@@ -90,7 +90,7 @@ c
       real*8 l2,l4,lr,l4r
       real*8 u2,u4,ur,u4r
       real*8 expterm,rmu
-      real*8 b0,gself,pi43
+      real*8 b0,gself
       real*8 bornmax
       real*8 rborni,rbornk
       real*8 pair,pbtotal
@@ -249,7 +249,7 @@ c     get the Born radii via the Hawkins-Cramer-Truhlar method
 c
       else if (borntyp .eq. 'HCT') then
          do i = 1, n
-            rborn(i) = 1.0d0 / roff(i)
+            rborn(i) = 0.0d0
          end do
          do i = 1, n-1
             xi = x(i)
@@ -298,7 +298,8 @@ c
             end do
          end do
          do i = 1, n
-            rborn(i) = 1.0d0 / rborn(i)
+            rborni = rborn(i) + 1.0d0/roff(i)
+            rborn(i) = 1.0d0 / rborni
             print*, "implicitsolvent", rborn(i)
          end do
 c
@@ -374,14 +375,8 @@ c
 c     get the Born radii via Grycuk's modified HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
-         pi43 = 4.0d0 * third * pi
          do i = 1, n
-            ri = rsolv(i)
-            sum = 0.0d0
-            if (ri .gt. 0.0d0) then
-               sum = pi43 / ri**3
-            end if
-            rborn(i) = sum
+            rborn(i) = 0.0d0
          end do
          do i = 1, n-1
             rsi = rsolv(i)
@@ -411,7 +406,7 @@ c
                      if (rmi+r .lt. sk) then
                         lik = rmi
                         uik = sk - r
-                        rborni = pi43*(1.0d0/uik**3-1.0d0/lik**3)
+                        rborni = 1.0d0/uik**3-1.0d0/lik**3
                      end if
                      uik = r + sk
                      if (rmi+r .lt. sk) then
@@ -431,7 +426,7 @@ c
                      u4r = u4 * r
                      term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
      &                      - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
-                     rborn(i) = rborn(i) + rborni - pi*term/12.0d0
+                     rborn(i) = rborn(i) + rborni - term/16.0d0
                   end if
                end if
                if (computek) then
@@ -442,7 +437,7 @@ c
                      if (rmk+r .lt. si) then
                         lik = rmk
                         uik = si - r
-                        rbornk = pi43*(1.0d0/uik**3-1.0d0/lik**3)
+                        rbornk = 1.0d0/uik**3-1.0d0/lik**3
                      end if
                      uik = r + si
                      if (rmk+r .lt. si) then
@@ -462,7 +457,7 @@ c
                      u4r = u4 * r
                      term = (3.0d0*(r2-si2)+6.0d0*u2-8.0d0*ur)/u4r
      &                      - (3.0d0*(r2-si2)+6.0d0*l2-8.0d0*lr)/l4r
-                     rborn(k) = rborn(k) + rbornk - pi*term/12.0d0
+                     rborn(k) = rborn(k) + rbornk - term/16.0d0
                   end if
                end if
             end do
@@ -470,9 +465,9 @@ c
          do i = 1, n
             ri = rsolv(i)
             if (ri .gt. 0.0d0) then
-               rborn(i) = (rborn(i)/pi43)**third
-               if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
-               rborn(i) = 1.0d0 / rborn(i)
+               rborni = (rborn(i) + 1.0d0/ri**3)**third
+               if (rborni .le. 0.0d0)  rborni = 0.0001d0
+               rborn(i) = 1.0d0 / rborni
             end if
             print*, "implicitsolvent", rborn(i)
          end do
