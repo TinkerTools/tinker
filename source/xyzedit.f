@@ -1635,7 +1635,7 @@ c
       nvdw = n
       do i = 1, n
          ivdw(i) = i
-         jvdw(i) = class(i)
+         jvdw(i) = mvdw(class(i))
          ired(i) = i
       end do
       do i = 1, n-1
