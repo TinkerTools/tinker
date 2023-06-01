@@ -164,6 +164,11 @@ c
          end do
       end do
 c
+c     set cutoff distances and switching coefficients
+c
+      mode = 'REPULS'
+      call switch (mode)
+c
 c     set gradient mode to true
 c
       grad = .true.

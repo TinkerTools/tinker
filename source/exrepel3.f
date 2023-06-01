@@ -141,6 +141,11 @@ c
          rscale(i) = 1.0d0
       end do
 c
+c     set cutoff distances and switching coefficients
+c
+      mode = 'REPULS'
+      call switch (mode)
+c
 c     set gradient mode to false
 c
       grad = .false.
