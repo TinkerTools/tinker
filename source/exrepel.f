@@ -67,7 +67,6 @@ c
       integer ii,kk
       integer ind1,ind2,ind3
       real*8 e,fgrp
-      real*8 eterm
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2
@@ -91,7 +90,6 @@ c
       real*8 dSS,dSPz,dPzS
       real*8 dPxPx,dPyPy,dPzPz
       real*8 intS,intS2
-      real*8 dintS
       real*8 bi(3)
       real*8 bj(3)
       real*8 bk(3)
@@ -154,6 +152,8 @@ c
          cix = rcpxr(2,i)
          ciy = rcpxr(3,i)
          ciz = rcpxr(4,i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c

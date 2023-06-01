@@ -74,7 +74,6 @@ c
       integer ii,kk
       integer ind1,ind2,ind3
       real*8 e,fgrp
-      real*8 eterm
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2
@@ -98,7 +97,6 @@ c
       real*8 dSS,dSPz,dPzS
       real*8 dPxPx,dPyPy,dPzPz
       real*8 intS,intS2
-      real*8 dintS
       real*8 bi(3)
       real*8 bj(3)
       real*8 bk(3)
@@ -166,6 +164,8 @@ c
          cix = rcpxr(2,i)
          ciy = rcpxr(3,i)
          ciz = rcpxr(4,i)
+         usei = use(i)
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -309,7 +309,7 @@ c
       use repel
       use xrepel
       implicit none
-      integer ii,k,jj
+      integer ii,k
       integer ind1,ind2,ind3
       real*8 cr,cs
       real*8 pcoeff(3)
@@ -393,7 +393,7 @@ c
       use xrepel
       implicit none
       integer isite
-      integer i,j,k
+      integer i,j
       real*8 a(3,3)
       real*8 cpole(4)
       logical planar
@@ -496,7 +496,6 @@ c
       subroutine overlapAll (a, b, z1, z2, grad, SS, dSS, SPz, dSPz,
      &                              PzS, dPzS, PxPx, dPxPx, PzPz, dPzPz)
       implicit none
-      real*8 over,dover
       real*8 SS,SPz,PzS
       real*8 PxPx,PzPz
       real*8 dSS,dSPz,dPzS
