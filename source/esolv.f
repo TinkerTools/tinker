@@ -1373,7 +1373,7 @@ c
 c     compute SASA and effective radius needed for cavity term
 c
       exclude = 1.4d0
-      call surface (esurf,aesurf,rcav,asolv,exclude)
+      call surface (esurf,aesurf,radcav,asolv,exclude)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
       reff3 = reff2 * reff
@@ -1383,7 +1383,7 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,rcav,exclude)
+         call volume (evol,radcav,exclude)
          evol = evol * solvprs
       end if
 c
@@ -1473,16 +1473,16 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,x,y,z,cdisp)
+!$OMP PARALLEL default(private) shared(n,class,epsdsp,
+!$OMP& raddsp,x,y,z,cdsp)
 !$OMP& shared(edisp)
 !$OMP DO reduction(+:edisp) schedule(guided)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
       do i = 1, n
-         epsi = eps(class(i))
-         rmini = rad(class(i))
+         epsi = epsdsp(i)
+         rmini = raddsp(i)
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
          rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
          rmixo7 = rmixo**7
@@ -1494,8 +1494,8 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         rio = rmixo / 2.0d0 + dispoff
-         rih = rmixh / 2.0d0 + dispoff
+         rio = 0.5d0*rmixo + dspoff
+         rih = 0.5d0*rmixh + dspoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -1507,7 +1507,7 @@ c
                zr = z(k) - zi
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
-               rk = rad(class(k))
+               rk = raddsp(k)
                sk = rk * shctd
                sk2 = sk * sk
                if (rio .lt. r+sk) then
@@ -1609,7 +1609,7 @@ c
 c
 c     increment the overall dispersion energy component
 c
-         e = cdisp(i) - slevy*awater*sum
+         e = cdsp(i) - slevy*awater*sum
          edisp = edisp + e
       end do
 c
@@ -1694,18 +1694,17 @@ c
 c
 c     set parameters for atomic radii and probe radii
 c
-      delta = 0.55d0
       offset = 0.27d0
+      delta = offset + 0.55d0
       do i = 1, n
-         rdisp(i) = rad(class(i)) + offset
-         roff(i) = rdisp(i) + delta
+         roff(i) = raddsp(i) + delta
       end do
 c
 c     compute the dispersion energy for each atom in the system
 c
       do i = 1, n
-         epsi = eps(class(i))
-         rmini = rad(class(i))
+         epsi = epsdsp(i)
+         rmini = raddsp(i)
          epsoi = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
          rminoi = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
          epshi = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
@@ -1717,22 +1716,22 @@ c
 c
 c     alter radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i)
+         roff(i) = raddsp(i) + offset
          do j = 1, n12(i)
             k = i12(j,i)
-            roff(k) = rdisp(k)
+            roff(k) = raddsp(k) + offset
          end do
          do j = 1, n13(i)
             k = i13(j,i)
-            roff(k) = rdisp(k)
+            roff(k) = raddsp(k) + offset
          end do
          do j = 1, n14(i)
             k = i14(j,i)
-            roff(k) = rdisp(k)
+            roff(k) = raddsp(k) + offset
          end do
          do j = 1, n15(i)
             k = i15(j,i)
-            roff(k) = rdisp(k)
+            roff(k) = raddsp(k) + offset
          end do
 c
 c     get the dispersion energy via a series of "onion" shells
@@ -1799,22 +1798,22 @@ c
 c
 c     reset the radii values for atoms attached to current atom
 c
-         roff(i) = rdisp(i) + delta
+         roff(i) = raddsp(i) + delta
          do j = 1, n12(i)
             k = i12(j,i)
-            roff(k) = rdisp(k) + delta
+            roff(k) = raddsp(k) + delta
          end do
          do j = 1, n13(i)
             k = i13(j,i)
-            roff(k) = rdisp(k) + delta
+            roff(k) = raddsp(k) + delta
          end do
          do j = 1, n14(i)
             k = i14(j,i)
-            roff(k) = rdisp(k) + delta
+            roff(k) = raddsp(k) + delta
          end do
          do j = 1, n15(i)
             k = i15(j,i)
-            roff(k) = rdisp(k) + delta
+            roff(k) = raddsp(k) + delta
          end do
       end do
 c

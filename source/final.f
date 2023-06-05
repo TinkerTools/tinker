@@ -846,9 +846,10 @@ c
 c
 c     deallocation of global arrays from module nonpol
 c
-      if (allocated(rcav))  deallocate (rcav)
-      if (allocated(rdisp))  deallocate (rdisp)
-      if (allocated(cdisp))  deallocate (cdisp)
+      if (allocated(radcav))  deallocate (radcav)
+      if (allocated(raddsp))  deallocate (raddsp)
+      if (allocated(epsdsp))  deallocate (epsdsp)
+      if (allocated(cdsp))  deallocate (cdsp)
 c
 c     deallocation of global arrays from module omega
 c

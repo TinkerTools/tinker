@@ -1997,7 +1997,7 @@ kpolr.o:
 krepel.o: atomid.o atoms.o inform.o iounit.o keys.o krepl.o mpole.o potent.o repel.o reppot.o sizes.o
 krepl.o:
 ksolut.o:
-ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o ksolut.o kvdws.o math.o nonpol.o pbstuf.o polar.o polopt.o polpot.o potent.o ptable.o sizes.o solpot.o solute.o vdw.o
+ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o ksolut.o kvdws.o math.o nonpol.o pbstuf.o polar.o polopt.o polpot.o potent.o ptable.o sizes.o solpot.o solute.o vdw.o vdwpot.o
 kstbnd.o:
 kstrbnd.o: angbnd.o angpot.o atmlst.o atomid.o atoms.o couple.o fields.o inform.o iounit.o keys.o kstbnd.o merck.o potent.o ring.o strbnd.o
 kstrtor.o: atmlst.o atomid.o atoms.o couple.o inform.o iounit.o keys.o ksttor.o potent.o strtor.o tors.o

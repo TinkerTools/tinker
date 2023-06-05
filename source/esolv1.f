@@ -4627,7 +4627,7 @@ c
 c     compute SASA and effective radius needed for cavity term
 c
       exclude = 1.4d0
-      call surface1 (esurf,aesurf,dsurf,rcav,asolv,exclude)
+      call surface1 (esurf,aesurf,dsurf,radcav,asolv,exclude)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       dreff = reff / (2.0d0*esurf)
       reff2 = reff * reff
@@ -4638,9 +4638,9 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,rcav,exclude)
+         call volume (evol,radcav,exclude)
          evol = evol * solvprs
-         call volume1 (rcav,exclude,dvol)
+         call volume1 (radcav,exclude,dvol)
          do i = 1, n
             dvol(1,i) = dvol(1,i) * solvprs
             dvol(2,i) = dvol(2,i) * solvprs
@@ -4767,16 +4767,16 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,x,y,z,cdisp)
+!$OMP PARALLEL default(private) shared(n,class,epsdsp,
+!$OMP& raddsp,x,y,z,cdsp)
 !$OMP& shared(edisp,des)
 !$OMP DO reduction(+:edisp,des) schedule(guided)
 c
 c     find the WCA dispersion energy and gradient components
 c
       do i = 1, n
-         epsi = eps(class(i))
-         rmini = rad(class(i))
+         epsi = epsdsp(i)
+         rmini = raddsp(i)
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
          rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
          rmixo7 = rmixo**7
@@ -4785,8 +4785,8 @@ c
          rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
          rmixh7 = rmixh**7
          ah = emixh * rmixh7
-         rio = rmixo / 2.0d0 + dispoff
-         rih = rmixh / 2.0d0 + dispoff
+         rio = 0.5d0*rmixo + dspoff
+         rih = 0.5d0*rmixh + dspoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -4802,7 +4802,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
                r3 = r * r2
-               rk = rad(class(k))
+               rk = raddsp(k)
                sk = rk * shctd
                sk2 = sk * sk
                de = 0.0d0
@@ -5008,7 +5008,7 @@ c
 c
 c     increment the overall dispersion energy component
 c
-         e = cdisp(i) - slevy*awater*sum
+         e = cdsp(i) - slevy*awater*sum
          edisp = edisp + e
       end do
 c

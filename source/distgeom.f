@@ -127,7 +127,13 @@ c
 c     optionally, assign atomic radii from force field vdw radii
 c
 c     do i = 1, n
-c        if (type(i) .ne. 0)  georad(i) = rad(type(i))
+c        if (type(i) .ne. 0) then
+c           if (vdwindex .eq. 'CLASS') then
+c              georad(i) = rad(class(i))
+c           else
+c              georad(i) = rad(type(i))
+c           end if
+c        end if
 c     end do
 c
 c     find maximum value of vdw radii sum for an atom pair
