@@ -679,6 +679,13 @@ c
             fstr = '('' Repulsion'',18x,'//form2//')'
          end if
          write (iout,fstr)  er,ner
+      else if (use_xrepel .and. (ner.ne.0.or.er.ne.0.0d0)) then
+         if (abs(er) .lt. 1.0d10) then
+            fstr = '('' Repulsion'',18x,'//form1//')'
+         else
+            fstr = '('' Repulsion'',18x,'//form2//')'
+         end if
+         write (iout,fstr)  er,ner
       end if
       if (use_disp .and. (nedsp.ne.0.or.edsp.ne.0.0d0)) then
          fstr = '('' Dispersion'',17x,'//form1//')'

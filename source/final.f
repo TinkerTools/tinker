@@ -1041,11 +1041,14 @@ c
 c
 c     deallocation of global arrays from module xrepel
 c
+      if (allocated(ixrep))  deallocate (ixrep)
+      if (allocated(xreplist))  deallocate (xreplist)
       if (allocated(zpxr))  deallocate (zpxr)
       if (allocated(dmppxr))  deallocate (dmppxr)
       if (allocated(crpxr))  deallocate (crpxr)
       if (allocated(cpxr))  deallocate (cpxr)
       if (allocated(rcpxr))  deallocate (rcpxr)
+      if (allocated(xrepole))  deallocate (xrepole)
 c
 c     deallocation of global arrays from module restrn
 c

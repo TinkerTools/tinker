@@ -243,8 +243,9 @@ c
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
       end if
       if (use_repel) then
-         if (reptyp .eq. 'PAULI') call erepel1
-         if (reptyp .eq. 'EXCHANGE') call exrepel1
+         call erepel1
+      else if (use_xrepel) then
+         call exrepel1
       end if
       if (use_disp)  call edisp1
 c

@@ -28,6 +28,7 @@ c     use_angtor  logical flag governing use of angle-torsion term
 c     use_tortor  logical flag governing use of torsion-torsion term
 c     use_vdw     logical flag governing use of van der Waals potential
 c     use_repel   logical flag governing use of Pauli repulsion term
+c     use_xrepel  logical flag governing use of exchange repulsion term
 c     use_disp    logical flag governing use of dispersion potential
 c     use_charge  logical flag governing use of charge-charge potential
 c     use_chgdpl  logical flag governing use of charge-dipole potential
@@ -56,6 +57,7 @@ c
       logical use_pitors,use_strtor
       logical use_angtor,use_tortor
       logical use_vdw,use_repel
+      logical use_xrepel
       logical use_disp,use_charge
       logical use_chgdpl,use_dipole
       logical use_mpole,use_polar

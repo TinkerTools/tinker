@@ -27,8 +27,6 @@ c
       use mpole
       use potent
       use xrepel
-      use repel
-      use reppot
       use sizes
       implicit none
       integer i,j,k
@@ -41,11 +39,6 @@ c
       character*240 record
       character*240 string
 c
-c
-c     exit if using "Pauli" repulsion
-c
-      if (use_repel) return
-      use_repel = .true.
 c
 c     process keywords containing exch repulsion parameters
 c
@@ -93,30 +86,28 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(irep))  deallocate (irep)
-      if (allocated(replist))  deallocate (replist)
+      if (allocated(ixrep))  deallocate (ixrep)
+      if (allocated(xreplist))  deallocate (xreplist)
       if (allocated(zpxr))  deallocate (zpxr)
       if (allocated(dmppxr))  deallocate (dmppxr)
       if (allocated(crpxr))  deallocate (crpxr)
       if (allocated(cpxr))  deallocate (cpxr)
       if (allocated(rcpxr))  deallocate (rcpxr)
-      if (allocated(repole))  deallocate (repole)
-      if (allocated(rrepole))  deallocate (rrepole)
-      allocate (irep(n))
-      allocate (replist(n))
+      if (allocated(xrepole))  deallocate (xrepole)
+      allocate (ixrep(n))
+      allocate (xreplist(n))
       allocate (zpxr(n))
       allocate (dmppxr(n))
       allocate (crpxr(n))
       allocate (cpxr(4,n))
       allocate (rcpxr(4,n))
-      allocate (repole(maxpole,n))
-      allocate (rrepole(maxpole,n))
+      allocate (xrepole(4,n))
 c
 c     assign the core, alpha, and coefficient ratio parameters 
 c
       do i = 1, n
-         irep(i) = 0
-         replist(i) = 0
+         ixrep(i) = 0
+         xreplist(i) = 0
          zpxr(i) = 0.0d0
          dmppxr(i) = 0.0d0
          crpxr(i) = 0.0d0
@@ -167,15 +158,15 @@ c
 c
 c     condense repulsion sites to the list of multipole sites
 c
-      nrep = 0
-      if (use_repel) then
+      nxrep = 0
+      if (use_xrepel) then
          do i = 1, n
             if (zpxr(i) .ne. 0) then
-               nrep = nrep + 1
-               irep(nrep) = i
-               replist(i) = nrep
-               do j = 1, maxpole
-                  repole(j,i) = pole(j,i)
+               nxrep = nxrep + 1
+               ixrep(nxrep) = i
+               xreplist(i) = nxrep
+               do j = 1, 4
+                  xrepole(j,i) = pole(j,i)
                end do
             end if
          end do
@@ -187,10 +178,6 @@ c
 c
 c     turn off the exchange repulsion potential if not used
 c
-      if (nrep .eq. 0)  use_repel = .false.
-c
-c     set repulsion type
-c
-      if (use_repel) reptyp = 'EXCHANGE'
+      if (nxrep .eq. 0)  use_xrepel = .false.
       return
       end
