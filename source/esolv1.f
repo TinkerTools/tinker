@@ -725,9 +725,6 @@ c
           call chkpole
           call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood energy and gradient
 c
@@ -737,6 +734,12 @@ c
 c     correct energy and derivatives for vacuum to polarized state
 c
       if (use_polar) then
+         if (use_mlist) then
+            call ediff1b
+         else
+            call ediff1a
+         end if
+      else if (.not.use_mpole .and. .not.use_polar) then
          if (use_mlist) then
             call ediff1b
          else
@@ -4613,8 +4616,10 @@ c
       character*6 mode
 c
 c
-c     zero out the nonpolar solvation energy and first derivatives
+c     zero out the nonpolar solvation energy contributions
 c
+      esurf = 0.0d0
+      evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
 c
@@ -4623,6 +4628,17 @@ c
       allocate (aesurf(n))
       allocate (dsurf(3,n))
       allocate (dvol(3,n))
+c
+c     zero out the nonpolar solvation first derivatives
+c
+      do i = 1, n
+         dsurf(1,i) = 0.0d0
+         dsurf(2,i) = 0.0d0
+         dsurf(3,i) = 0.0d0
+         dvol(1,i) = 0.0d0
+         dvol(2,i) = 0.0d0
+         dvol(3,i) = 0.0d0
+      end do
 c
 c     compute SASA and effective radius needed for cavity term
 c
@@ -4648,7 +4664,7 @@ c
          end do
       end if
 c
-c     include cavity energy from a full SEV term
+c     include a full solvent excluded volume cavity term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -4658,7 +4674,7 @@ c
             des(3,i) = des(3,i) + dvol(3,i)
          end do
 c
-c     include cavity energy from a tapered SEV term
+c     include a tapered solvent excluded volume cavity term
 c
       else if (reff .le. spoff) then
          mode = 'GKV'
@@ -4678,7 +4694,7 @@ c
          end do
       end if
 c
-c     include a full SASA term
+c     include a full solvent accessible surface area term
 c
       if (reff .gt. stcut) then
          ecav = ecav + esurf
@@ -4688,7 +4704,7 @@ c
             des(3,i) = des(3,i) + dsurf(3,i)
          end do
 c
-c     include cavity energy from a tapered SASA term
+c     include a tapered solvent accessible surface area term
 c
       else if (reff .gt. stoff) then
          mode = 'GKSA'

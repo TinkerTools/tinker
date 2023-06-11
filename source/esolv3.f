@@ -646,9 +646,6 @@ c
          call chkpole
          call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood energy and analysis
 c
@@ -657,6 +654,8 @@ c
 c     correct solvation energy for vacuum to polarized state
 c
       if (use_polar) then
+         call ediff3
+      else if (.not.use_mpole .and. .not.use_polar) then
          call ediff3
       end if
       return
@@ -1556,18 +1555,25 @@ c
       character*6 mode
 c
 c
-c     zero out the nonpolar solvation energy and partitioning
+c     zero out the nonpolar solvation energy contributions
 c
+      esurf = 0.0d0
+      evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
-      do i = 1, n
-         aecav(i) = 0.0d0
-         aedisp(i) = 0.0d0
-      end do
+      aevol = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+c
+c     zero out the nonpolar solvation energy partitioning
+c
+      do i = 1, n
+         aesurf(i) = 0.0d0
+         aecav(i) = 0.0d0
+         aedisp(i) = 0.0d0
+      end do
 c
 c     compute SASA and effective radius needed for cavity term
 c
@@ -1587,7 +1593,7 @@ c
          aevol = evol / dble(n)
       end if
 c
-c     include the full SEV term
+c     include a full solvent excluded volume cavity term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -1595,7 +1601,7 @@ c
             aecav(i) = aevol
          end do
 c
-c     include a tapered SEV term
+c     include a tapered solvent excluded volume cavity term
 c
       else if (reff .le. spoff) then
          mode = 'GKV'
@@ -1608,7 +1614,7 @@ c
          end do
       end if
 c
-c     include a full SASA term
+c     include a full solvent accessible surface area term
 c
       if (reff .gt. stcut) then
          ecav = esurf
@@ -1616,7 +1622,7 @@ c
             aecav(i) = aesurf(i)
          end do
 c
-c     include a tapered SASA term
+c     include a tapered solvent accessible surface area term
 c
       else if (reff .gt. stoff) then
          mode = 'GKSA'

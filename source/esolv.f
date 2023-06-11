@@ -505,9 +505,6 @@ c
           call chkpole
           call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood electrostatic energy
 c
@@ -516,6 +513,8 @@ c
 c     correct solvation energy for vacuum to polarized state
 c
       if (use_polar) then
+         call ediff
+      else if (.not.use_mpole .and. .not.use_polar) then
          call ediff
       end if
       return
@@ -1363,6 +1362,8 @@ c
 c
 c     zero out the nonpolar implicit solvation energy terms
 c
+      esurf = 0.0d0
+      evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
 c
@@ -1387,12 +1388,12 @@ c
          evol = evol * solvprs
       end if
 c
-c     include full solvent excluded volume
+c     include a full solvent excluded volume cavity term
 c
       if (reff .le. spcut) then
          ecav = evol
 c
-c     include a tapered volume term
+c     include a tapered solvent excluded volume cavity term
 c
       else if (reff .le. spoff) then
          mode = 'GKV'
@@ -1402,12 +1403,12 @@ c
          ecav = evol * taper
       end if
 c
-c     include a full SASA-based term
+c     include a full solvent accessible surface area term
 c
       if (reff .gt. stcut) then
          ecav = esurf
 c
-c     include a tapered SASA term
+c     include a tapered solvent accessible surface area term
 c
       else if (reff .gt. stoff) then
          mode = 'GKSA'
