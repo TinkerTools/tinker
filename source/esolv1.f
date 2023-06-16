@@ -779,9 +779,13 @@ c
       use virial
       implicit none
       integer i,j,k,ii,kk
+      integer ix,iy,iz
       real*8 e,ei,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
+      real*8 xiz,yiz,ziz
       real*8 xr2,yr2,zr2
       real*8 ci,ck
       real*8 uxi,uyi,uzi
@@ -803,6 +807,7 @@ c
       real*8 dpbi,dpbk
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 vxy,vxz,vyz
       real*8 dwater
       real*8 fc,fd,fq
       real*8 rbi,rbk
@@ -2293,12 +2298,78 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     convert torque derivative components to Cartesian forces
+c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,trq(1,i),fix,fiy,fiz,des)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
          call torque (i,trqi(1,i),fix,fiy,fiz,des)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     perform deallocation of some local arrays
