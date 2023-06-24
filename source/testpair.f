@@ -91,7 +91,7 @@ c
       if (use_vdw)  nterm = nterm + 1
       if (use_repel) then
          nterm = nterm + 1
-      else if (use_xrepel)
+      else if (use_xrepel) then
          nterm = nterm + 1
       end if
       if (use_disp)  nterm = nterm + 1
