@@ -725,9 +725,6 @@ c
           call chkpole
           call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood energy and gradient
 c
@@ -737,6 +734,12 @@ c
 c     correct energy and derivatives for vacuum to polarized state
 c
       if (use_polar) then
+         if (use_mlist) then
+            call ediff1b
+         else
+            call ediff1a
+         end if
+      else if (.not.use_mpole .and. .not.use_polar) then
          if (use_mlist) then
             call ediff1b
          else
@@ -776,6 +779,10 @@ c
       use virial
       implicit none
       integer i,j,k,ii,kk
+      integer ix,iy,iz
+      real*8 xiz,yiz,ziz
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
       real*8 e,ei,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -800,6 +807,7 @@ c
       real*8 dpbi,dpbk
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 vxy,vxz,vyz
       real*8 dwater
       real*8 fc,fd,fq
       real*8 rbi,rbk
@@ -2129,12 +2137,12 @@ c
                      fkd(2) = 0.5d0 * fkd(2)
                      fkd(3) = 0.5d0 * fkd(3)
                   end if
-                  trqi(1,i) = trqi(1,i) + uyi*fid(3) - uzi*fid(2)
-                  trqi(2,i) = trqi(2,i) + uzi*fid(1) - uxi*fid(3)
-                  trqi(3,i) = trqi(3,i) + uxi*fid(2) - uyi*fid(1)
-                  trqi(1,k) = trqi(1,k) + uyk*fkd(3) - uzk*fkd(2)
-                  trqi(2,k) = trqi(2,k) + uzk*fkd(1) - uxk*fkd(3)
-                  trqi(3,k) = trqi(3,k) + uxk*fkd(2) - uyk*fkd(1)
+                  trq(1,i) = trq(1,i) + uyi*fid(3) - uzi*fid(2)
+                  trq(2,i) = trq(2,i) + uzi*fid(1) - uxi*fid(3)
+                  trq(3,i) = trq(3,i) + uxi*fid(2) - uyi*fid(1)
+                  trq(1,k) = trq(1,k) + uyk*fkd(3) - uzk*fkd(2)
+                  trq(2,k) = trq(2,k) + uzk*fkd(1) - uxk*fkd(3)
+                  trq(3,k) = trq(3,k) + uxk*fkd(2) - uyk*fkd(1)
 c
 c     torque due to induced reaction field gradient on quadrupoles
 c
@@ -2200,22 +2208,22 @@ c
                      fkdg(3,2) = 0.5d0 * fkdg(3,2)
                      fkdg(3,3) = 0.5d0 * fkdg(3,3)
                   end if
-                  trqi(1,i) = trqi(1,i) + 2.0d0*
+                  trq(1,i) = trq(1,i) + 2.0d0*
      &                  (qxyi*fidg(1,3)+qyyi*fidg(2,3)+qyzi*fidg(3,3)
      &                  -qxzi*fidg(1,2)-qyzi*fidg(2,2)-qzzi*fidg(3,2))
-                  trqi(2,i) = trqi(2,i) + 2.0d0*
+                  trq(2,i) = trq(2,i) + 2.0d0*
      &                  (qxzi*fidg(1,1)+qyzi*fidg(2,1)+qzzi*fidg(3,1)
      &                  -qxxi*fidg(1,3)-qxyi*fidg(2,3)-qxzi*fidg(3,3))
-                  trqi(3,i) = trqi(3,i) + 2.0d0*
+                  trq(3,i) = trq(3,i) + 2.0d0*
      &                  (qxxi*fidg(1,2)+qxyi*fidg(2,2)+qxzi*fidg(3,2)
      &                  -qxyi*fidg(1,1)-qyyi*fidg(2,1)-qyzi*fidg(3,1))
-                  trqi(1,k) = trqi(1,k) + 2.0d0*
+                  trq(1,k) = trq(1,k) + 2.0d0*
      &                  (qxyk*fkdg(1,3)+qyyk*fkdg(2,3)+qyzk*fkdg(3,3)
      &                  -qxzk*fkdg(1,2)-qyzk*fkdg(2,2)-qzzk*fkdg(3,2))
-                  trqi(2,k) = trqi(2,k) + 2.0d0*
+                  trq(2,k) = trq(2,k) + 2.0d0*
      &                  (qxzk*fkdg(1,1)+qyzk*fkdg(2,1)+qzzk*fkdg(3,1)
      &                  -qxxk*fkdg(1,3)-qxyk*fkdg(2,3)-qxzk*fkdg(3,3))
-                  trqi(3,k) = trqi(3,k) + 2.0d0*
+                  trq(3,k) = trq(3,k) + 2.0d0*
      &                  (qxxk*fkdg(1,2)+qxyk*fkdg(2,2)+qxzk*fkdg(3,2)
      &                  -qxyk*fkdg(1,1)-qyyk*fkdg(2,1)-qyzk*fkdg(3,1))
 c
@@ -2295,7 +2303,40 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,trq(1,i),fix,fiy,fiz,des)
-         call torque (i,trqi(1,i),fix,fiy,fiz,des)
+c         call torque (i,trqi(1,i),fix,fiy,fiz,des)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     perform deallocation of some local arrays
@@ -2557,19 +2598,24 @@ c
       integer kx,ky,kz
       real*8 ei,f,fgrp
       real*8 damp,gfd
-      real*8 scale3,scale5
-      real*8 scale7,scale9
+      real*8 scale3,scale5,scale7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 psc3,psc5,psc7,psc9
-      real*8 dsc3,dsc5,dsc7,dsc9
+      real*8 psc3,psc5,psc7
+      real*8 dsc3,dsc5,dsc7
       real*8 scale3i,scale5i
       real*8 scale7i
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
       real*8 pdi,pti,pgamma
-      real*8 ci,di(3),qi(9)
-      real*8 ck,dk(3),qk(9)
+      real*8 ci,dix,diy,diz
+      real*8 qixx,qixy,qixz,qiyy,qiyz,qizz
+      real*8 uix,uiy,uiz,uixp,uiyp,uizp
+      real*8 uixs,uiys,uizs,uixps,uiyps,uizps
+      real*8 ck,dkx,dky,dkz
+      real*8 qkxx,qkxy,qkxz,qkyy,qkyz,qkzz
+      real*8 ukx,uky,ukz,ukxp,ukyp,ukzp
+      real*8 ukxs,ukys,ukzs,ukxps,ukyps,ukzps
       real*8 fridmp(3),findmp(3)
       real*8 ftm2i(3)
       real*8 ttm2i(3),ttm3i(3)
@@ -2661,18 +2707,27 @@ c
          pdi = pdamp(i)
          pti = thole(i)
          ci = rpole(1,i)
-         di(1) = rpole(2,i)
-         di(2) = rpole(3,i)
-         di(3) = rpole(4,i)
-         qi(1) = rpole(5,i)
-         qi(2) = rpole(6,i)
-         qi(3) = rpole(7,i)
-         qi(4) = rpole(8,i)
-         qi(5) = rpole(9,i)
-         qi(6) = rpole(10,i)
-         qi(7) = rpole(11,i)
-         qi(8) = rpole(12,i)
-         qi(9) = rpole(13,i)
+         dix = rpole(2,i)
+         diy = rpole(3,i)
+         diz = rpole(4,i)
+         qixx = rpole(5,i)
+         qixy = rpole(6,i)
+         qixz = rpole(7,i)
+         qiyy = rpole(9,i)
+         qiyz = rpole(10,i)
+         qizz = rpole(13,i)
+         uix = uind(1,i)
+         uiy = uind(2,i)
+         uiz = uind(3,i)
+         uixp = uinp(1,i)
+         uiyp = uinp(2,i)
+         uizp = uinp(3,i)
+         uixs = uinds(1,i)
+         uiys = uinds(2,i)
+         uizs = uinds(3,i)
+         uixps = uinps(1,i)
+         uiyps = uinps(2,i)
+         uizps = uinps(3,i)
          usei = (use(ii) .or. use(iz) .or. use(ix) .or. use(iy))
 c
 c     set exclusion coefficients for connected atoms
@@ -2783,18 +2838,30 @@ c
             if (proceed)  proceed = (usei .or. usek)
             if (.not. proceed)  goto 10
             ck = rpole(1,k)
-            dk(1) = rpole(2,k)
-            dk(2) = rpole(3,k)
-            dk(3) = rpole(4,k)
-            qk(1) = rpole(5,k)
-            qk(2) = rpole(6,k)
-            qk(3) = rpole(7,k)
-            qk(4) = rpole(8,k)
-            qk(5) = rpole(9,k)
-            qk(6) = rpole(10,k)
-            qk(7) = rpole(11,k)
-            qk(8) = rpole(12,k)
-            qk(9) = rpole(13,k)
+            dkx = rpole(2,k)
+            dky = rpole(3,k)
+            dkz = rpole(4,k)
+            qkxx = rpole(5,k)
+            qkxy = rpole(6,k)
+            qkxz = rpole(7,k)
+            qkxy = rpole(8,k)
+            qkyy = rpole(9,k)
+            qkyz = rpole(10,k)
+            qkxz = rpole(11,k)
+            qkyz = rpole(12,k)
+            qkzz = rpole(13,k)
+            ukx = uind(1,k)
+            uky = uind(2,k)
+            ukz = uind(3,k)
+            ukxp = uinp(1,k)
+            ukyp = uinp(2,k)
+            ukzp = uinp(3,k)
+            ukxs = uinds(1,k)
+            ukys = uinds(2,k)
+            ukzs = uinds(3,k)
+            ukxps = uinps(1,k)
+            ukyps = uinps(2,k)
+            ukzps = uinps(3,k)
             xr = x(kk) - xi
             yr = y(kk) - yi
             zr = z(kk) - zi
@@ -2810,7 +2877,6 @@ c
                scale3 = 1.0d0
                scale5 = 1.0d0
                scale7 = 1.0d0
-               scale9 = 1.0d0
                do j = 1, 3
                   ddsc3(j) = 0.0d0
                   ddsc5(j) = 0.0d0
@@ -2829,8 +2895,6 @@ c
                      scale5 = 1.0d0 - (1.0d0-damp)*exp(damp)
                      scale7 = 1.0d0 - (1.0d0-damp+0.6d0*damp**2)
      &                                       *exp(damp)
-                     scale9 = 1.0d0 - (1.0d0-damp+(18.0d0*damp**2
-     &                                 -9.0d0*damp**3)/35.0d0)*exp(damp)
                      ddsc3(1) = -3.0d0*damp*exp(damp) * xr/r2
                      ddsc3(2) = -3.0d0*damp*exp(damp) * yr/r2
                      ddsc3(3) = -3.0d0*damp*exp(damp) * zr/r2
@@ -2848,41 +2912,39 @@ c
                dsc3 = scale3 * dscale(k)
                dsc5 = scale5 * dscale(k)
                dsc7 = scale7 * dscale(k)
-               dsc9 = scale9 * dscale(k)
                psc3 = scale3 * pscale(k)
                psc5 = scale5 * pscale(k)
                psc7 = scale7 * pscale(k)
-               psc9 = scale9 * pscale(k)
 c
 c     construct auxiliary vectors for permanent terms
 c
-               dixdk(1) = di(2)*dk(3) - di(3)*dk(2)
-               dixdk(2) = di(3)*dk(1) - di(1)*dk(3)
-               dixdk(3) = di(1)*dk(2) - di(2)*dk(1)
-               dixr(1) = di(2)*zr - di(3)*yr
-               dixr(2) = di(3)*xr - di(1)*zr
-               dixr(3) = di(1)*yr - di(2)*xr
-               dkxr(1) = dk(2)*zr - dk(3)*yr
-               dkxr(2) = dk(3)*xr - dk(1)*zr
-               dkxr(3) = dk(1)*yr - dk(2)*xr
-               qir(1) = qi(1)*xr + qi(4)*yr + qi(7)*zr
-               qir(2) = qi(2)*xr + qi(5)*yr + qi(8)*zr
-               qir(3) = qi(3)*xr + qi(6)*yr + qi(9)*zr
-               qkr(1) = qk(1)*xr + qk(4)*yr + qk(7)*zr
-               qkr(2) = qk(2)*xr + qk(5)*yr + qk(8)*zr
-               qkr(3) = qk(3)*xr + qk(6)*yr + qk(9)*zr
-               qiqkr(1) = qi(1)*qkr(1) + qi(4)*qkr(2) + qi(7)*qkr(3)
-               qiqkr(2) = qi(2)*qkr(1) + qi(5)*qkr(2) + qi(8)*qkr(3)
-               qiqkr(3) = qi(3)*qkr(1) + qi(6)*qkr(2) + qi(9)*qkr(3)
-               qkqir(1) = qk(1)*qir(1) + qk(4)*qir(2) + qk(7)*qir(3)
-               qkqir(2) = qk(2)*qir(1) + qk(5)*qir(2) + qk(8)*qir(3)
-               qkqir(3) = qk(3)*qir(1) + qk(6)*qir(2) + qk(9)*qir(3)
-               qixqk(1) = qi(2)*qk(3) + qi(5)*qk(6) + qi(8)*qk(9)
-     &                       - qi(3)*qk(2) - qi(6)*qk(5) - qi(9)*qk(8)
-               qixqk(2) = qi(3)*qk(1) + qi(6)*qk(4) + qi(9)*qk(7)
-     &                       - qi(1)*qk(3) - qi(4)*qk(6) - qi(7)*qk(9)
-               qixqk(3) = qi(1)*qk(2) + qi(4)*qk(5) + qi(7)*qk(8)
-     &                       - qi(2)*qk(1) - qi(5)*qk(4) - qi(8)*qk(7)
+               dixdk(1) = diy*dkz - diz*dky
+               dixdk(2) = diz*dkx - dix*dkz
+               dixdk(3) = dix*dky - diy*dkx
+               dixr(1) = diy*zr - diz*yr
+               dixr(2) = diz*xr - dix*zr
+               dixr(3) = dix*yr - diy*xr
+               dkxr(1) = dky*zr - dkz*yr
+               dkxr(2) = dkz*xr - dkx*zr
+               dkxr(3) = dkx*yr - dky*xr
+               qir(1) = qixx*xr + qixy*yr + qixz*zr
+               qir(2) = qixy*xr + qiyy*yr + qiyz*zr
+               qir(3) = qixz*xr + qiyz*yr + qizz*zr
+               qkr(1) = qkxx*xr + qkxy*yr + qkxz*zr
+               qkr(2) = qkxy*xr + qkyy*yr + qkyz*zr
+               qkr(3) = qkxz*xr + qkyz*yr + qkzz*zr
+               qiqkr(1) = qixx*qkr(1) + qixy*qkr(2) + qixz*qkr(3)
+               qiqkr(2) = qixy*qkr(1) + qiyy*qkr(2) + qiyz*qkr(3)
+               qiqkr(3) = qixz*qkr(1) + qiyz*qkr(2) + qizz*qkr(3)
+               qkqir(1) = qkxx*qir(1) + qkxy*qir(2) + qkxz*qir(3)
+               qkqir(2) = qkxy*qir(1) + qkyy*qir(2) + qkyz*qir(3)
+               qkqir(3) = qkxz*qir(1) + qkyz*qir(2) + qkzz*qir(3)
+               qixqk(1) = qixy*qkxz + qiyy*qkyz + qiyz*qkzz
+     &                       - qixz*qkxy - qiyz*qkyy - qizz*qkyz
+               qixqk(2) = qixz*qkxx + qiyz*qkxy + qizz*qkxz
+     &                       - qixx*qkxz - qixy*qkyz - qixz*qkzz
+               qixqk(3) = qixx*qkxy + qixy*qkyy + qixz*qkyz
+     &                       - qixy*qkxx - qiyy*qkxy - qiyz*qkxz
                rxqir(1) = yr*qir(3) - zr*qir(2)
                rxqir(2) = zr*qir(1) - xr*qir(3)
                rxqir(3) = xr*qir(2) - yr*qir(1)
@@ -2898,18 +2960,18 @@ c
                qkrxqir(1) = qkr(2)*qir(3) - qkr(3)*qir(2)
                qkrxqir(2) = qkr(3)*qir(1) - qkr(1)*qir(3)
                qkrxqir(3) = qkr(1)*qir(2) - qkr(2)*qir(1)
-               qidk(1) = qi(1)*dk(1) + qi(4)*dk(2) + qi(7)*dk(3)
-               qidk(2) = qi(2)*dk(1) + qi(5)*dk(2) + qi(8)*dk(3)
-               qidk(3) = qi(3)*dk(1) + qi(6)*dk(2) + qi(9)*dk(3)
-               qkdi(1) = qk(1)*di(1) + qk(4)*di(2) + qk(7)*di(3)
-               qkdi(2) = qk(2)*di(1) + qk(5)*di(2) + qk(8)*di(3)
-               qkdi(3) = qk(3)*di(1) + qk(6)*di(2) + qk(9)*di(3)
-               dixqkr(1) = di(2)*qkr(3) - di(3)*qkr(2)
-               dixqkr(2) = di(3)*qkr(1) - di(1)*qkr(3)
-               dixqkr(3) = di(1)*qkr(2) - di(2)*qkr(1)
-               dkxqir(1) = dk(2)*qir(3) - dk(3)*qir(2)
-               dkxqir(2) = dk(3)*qir(1) - dk(1)*qir(3)
-               dkxqir(3) = dk(1)*qir(2) - dk(2)*qir(1)
+               qidk(1) = qixx*dkx + qixy*dky + qixz*dkz
+               qidk(2) = qixy*dkx + qiyy*dky + qiyz*dkz
+               qidk(3) = qixz*dkx + qiyz*dky + qizz*dkz
+               qkdi(1) = qkxx*dix + qkxy*diy + qkxz*diz
+               qkdi(2) = qkxy*dix + qkyy*diy + qkyz*diz
+               qkdi(3) = qkxz*dix + qkyz*diy + qkzz*diz
+               dixqkr(1) = diy*qkr(3) - diz*qkr(2)
+               dixqkr(2) = diz*qkr(1) - dix*qkr(3)
+               dixqkr(3) = dix*qkr(2) - diy*qkr(1)
+               dkxqir(1) = dky*qir(3) - dkz*qir(2)
+               dkxqir(2) = dkz*qir(1) - dkx*qir(3)
+               dkxqir(3) = dkx*qir(2) - dky*qir(1)
                rxqidk(1) = yr*qidk(3) - zr*qidk(2)
                rxqidk(2) = zr*qidk(1) - xr*qidk(3)
                rxqidk(3) = xr*qidk(2) - yr*qidk(1)
@@ -2919,61 +2981,61 @@ c
 c
 c     get intermediate variables for permanent energy terms
 c
-               sc(3) = di(1)*xr + di(2)*yr + di(3)*zr
-               sc(4) = dk(1)*xr + dk(2)*yr + dk(3)*zr
+               sc(3) = dix*xr + diy*yr + diz*zr
+               sc(4) = dkx*xr + dky*yr + dkz*zr
                sc(5) = qir(1)*xr + qir(2)*yr + qir(3)*zr
                sc(6) = qkr(1)*xr + qkr(2)*yr + qkr(3)*zr
 c
 c     construct auxiliary vectors for induced terms
 c
-               dixuk(1) = di(2)*uinds(3,k) - di(3)*uinds(2,k)
-               dixuk(2) = di(3)*uinds(1,k) - di(1)*uinds(3,k)
-               dixuk(3) = di(1)*uinds(2,k) - di(2)*uinds(1,k)
-               dkxui(1) = dk(2)*uinds(3,i) - dk(3)*uinds(2,i)
-               dkxui(2) = dk(3)*uinds(1,i) - dk(1)*uinds(3,i)
-               dkxui(3) = dk(1)*uinds(2,i) - dk(2)*uinds(1,i)
-               dixukp(1) = di(2)*uinps(3,k) - di(3)*uinps(2,k)
-               dixukp(2) = di(3)*uinps(1,k) - di(1)*uinps(3,k)
-               dixukp(3) = di(1)*uinps(2,k) - di(2)*uinps(1,k)
-               dkxuip(1) = dk(2)*uinps(3,i) - dk(3)*uinps(2,i)
-               dkxuip(2) = dk(3)*uinps(1,i) - dk(1)*uinps(3,i)
-               dkxuip(3) = dk(1)*uinps(2,i) - dk(2)*uinps(1,i)
-               qiuk(1) = qi(1)*uinds(1,k) + qi(4)*uinds(2,k)
-     &                      + qi(7)*uinds(3,k)
-               qiuk(2) = qi(2)*uinds(1,k) + qi(5)*uinds(2,k)
-     &                      + qi(8)*uinds(3,k)
-               qiuk(3) = qi(3)*uinds(1,k) + qi(6)*uinds(2,k)
-     &                      + qi(9)*uinds(3,k)
-               qkui(1) = qk(1)*uinds(1,i) + qk(4)*uinds(2,i)
-     &                      + qk(7)*uinds(3,i)
-               qkui(2) = qk(2)*uinds(1,i) + qk(5)*uinds(2,i)
-     &                      + qk(8)*uinds(3,i)
-               qkui(3) = qk(3)*uinds(1,i) + qk(6)*uinds(2,i)
-     &                      + qk(9)*uinds(3,i)
-               qiukp(1) = qi(1)*uinps(1,k) + qi(4)*uinps(2,k)
-     &                       + qi(7)*uinps(3,k)
-               qiukp(2) = qi(2)*uinps(1,k) + qi(5)*uinps(2,k)
-     &                       + qi(8)*uinps(3,k)
-               qiukp(3) = qi(3)*uinps(1,k) + qi(6)*uinps(2,k)
-     &                       + qi(9)*uinps(3,k)
-               qkuip(1) = qk(1)*uinps(1,i) + qk(4)*uinps(2,i)
-     &                       + qk(7)*uinps(3,i)
-               qkuip(2) = qk(2)*uinps(1,i) + qk(5)*uinps(2,i)
-     &                       + qk(8)*uinps(3,i)
-               qkuip(3) = qk(3)*uinps(1,i) + qk(6)*uinps(2,i)
-     &                       + qk(9)*uinps(3,i)
-               uixqkr(1) = uinds(2,i)*qkr(3) - uinds(3,i)*qkr(2)
-               uixqkr(2) = uinds(3,i)*qkr(1) - uinds(1,i)*qkr(3)
-               uixqkr(3) = uinds(1,i)*qkr(2) - uinds(2,i)*qkr(1)
-               ukxqir(1) = uinds(2,k)*qir(3) - uinds(3,k)*qir(2)
-               ukxqir(2) = uinds(3,k)*qir(1) - uinds(1,k)*qir(3)
-               ukxqir(3) = uinds(1,k)*qir(2) - uinds(2,k)*qir(1)
-               uixqkrp(1) = uinps(2,i)*qkr(3) - uinps(3,i)*qkr(2)
-               uixqkrp(2) = uinps(3,i)*qkr(1) - uinps(1,i)*qkr(3)
-               uixqkrp(3) = uinps(1,i)*qkr(2) - uinps(2,i)*qkr(1)
-               ukxqirp(1) = uinps(2,k)*qir(3) - uinps(3,k)*qir(2)
-               ukxqirp(2) = uinps(3,k)*qir(1) - uinps(1,k)*qir(3)
-               ukxqirp(3) = uinps(1,k)*qir(2) - uinps(2,k)*qir(1)
+               dixuk(1) = diy*ukzs - diz*ukys
+               dixuk(2) = diz*ukxs - dix*ukzs
+               dixuk(3) = dix*ukys - diy*ukxs
+               dkxui(1) = dky*uizs - dkz*uiys
+               dkxui(2) = dkz*uixs - dkx*uizs
+               dkxui(3) = dkx*uiys - dky*uixs
+               dixukp(1) = diy*ukzps - diz*ukyps
+               dixukp(2) = diz*ukxps - dix*ukzps
+               dixukp(3) = dix*ukyps - diy*ukxps
+               dkxuip(1) = dky*uizps - dkz*uiyps
+               dkxuip(2) = dkz*uixps - dkx*uizps
+               dkxuip(3) = dkx*uiyps - dky*uixps
+               qiuk(1) = qixx*ukxs + qixy*ukys
+     &                      + qixz*ukzs
+               qiuk(2) = qixy*ukxs + qiyy*ukys
+     &                      + qiyz*ukzs
+               qiuk(3) = qixz*ukxs + qiyz*ukys
+     &                      + qizz*ukzs
+               qkui(1) = qkxx*uixs + qkxy*uiys
+     &                      + qkxz*uizs
+               qkui(2) = qkxy*uixs + qkyy*uiys
+     &                      + qkyz*uizs
+               qkui(3) = qkxz*uixs + qkyz*uiys
+     &                      + qkzz*uizs
+               qiukp(1) = qixx*ukxps + qixy*ukyps
+     &                       + qixz*ukzps
+               qiukp(2) = qixy*ukxps + qiyy*ukyps
+     &                       + qiyz*ukzps
+               qiukp(3) = qixz*ukxps + qiyz*ukyps
+     &                       + qizz*ukzps
+               qkuip(1) = qkxx*uixps + qkxy*uiyps
+     &                       + qkxz*uizps
+               qkuip(2) = qkxy*uixps + qkyy*uiyps
+     &                       + qkyz*uizps
+               qkuip(3) = qkxz*uixps + qkyz*uiyps
+     &                       + qkzz*uizps
+               uixqkr(1) = uiys*qkr(3) - uizs*qkr(2)
+               uixqkr(2) = uizs*qkr(1) - uixs*qkr(3)
+               uixqkr(3) = uixs*qkr(2) - uiys*qkr(1)
+               ukxqir(1) = ukys*qir(3) - ukzs*qir(2)
+               ukxqir(2) = ukzs*qir(1) - ukxs*qir(3)
+               ukxqir(3) = ukxs*qir(2) - ukys*qir(1)
+               uixqkrp(1) = uiyps*qkr(3) - uizps*qkr(2)
+               uixqkrp(2) = uizps*qkr(1) - uixps*qkr(3)
+               uixqkrp(3) = uixps*qkr(2) - uiyps*qkr(1)
+               ukxqirp(1) = ukyps*qir(3) - ukzps*qir(2)
+               ukxqirp(2) = ukzps*qir(1) - ukxps*qir(3)
+               ukxqirp(3) = ukxps*qir(2) - ukyps*qir(1)
                rxqiuk(1) = yr*qiuk(3) - zr*qiuk(2)
                rxqiuk(2) = zr*qiuk(1) - xr*qiuk(3)
                rxqiuk(3) = xr*qiuk(2) - yr*qiuk(1)
@@ -2989,29 +3051,29 @@ c
 c
 c     get intermediate variables for induction energy terms
 c
-               sci(1) = uinds(1,i)*dk(1) + uinds(2,i)*dk(2)
-     &                     + uinds(3,i)*dk(3) + di(1)*uinds(1,k)
-     &                     + di(2)*uinds(2,k) + di(3)*uinds(3,k)
-               sci(2) = uinds(1,i)*uinds(1,k) + uinds(2,i)*uinds(2,k)
-     &                     + uinds(3,i)*uinds(3,k)
-               sci(3) = uinds(1,i)*xr + uinds(2,i)*yr + uinds(3,i)*zr
-               sci(4) = uinds(1,k)*xr + uinds(2,k)*yr + uinds(3,k)*zr
-               sci(7) = qir(1)*uinds(1,k) + qir(2)*uinds(2,k)
-     &                     + qir(3)*uinds(3,k)
-               sci(8) = qkr(1)*uinds(1,i) + qkr(2)*uinds(2,i)
-     &                     + qkr(3)*uinds(3,i)
-               scip(1) = uinps(1,i)*dk(1) + uinps(2,i)*dk(2)
-     &                      + uinps(3,i)*dk(3) + di(1)*uinps(1,k)
-     &                      + di(2)*uinps(2,k) + di(3)*uinps(3,k)
-               scip(2) = uinds(1,i)*uinps(1,k) + uinds(2,i)*uinps(2,k)
-     &                 + uinds(3,i)*uinps(3,k) + uinps(1,i)*uinds(1,k)
-     &                 + uinps(2,i)*uinds(2,k) + uinps(3,i)*uinds(3,k)
-               scip(3) = uinps(1,i)*xr + uinps(2,i)*yr + uinps(3,i)*zr
-               scip(4) = uinps(1,k)*xr + uinps(2,k)*yr + uinps(3,k)*zr
-               scip(7) = qir(1)*uinps(1,k) + qir(2)*uinps(2,k)
-     &                      + qir(3)*uinps(3,k)
-               scip(8) = qkr(1)*uinps(1,i) + qkr(2)*uinps(2,i)
-     &                      + qkr(3)*uinps(3,i)
+               sci(1) = uixs*dkx + uiys*dky
+     &                     + uizs*dkz + dix*ukxs
+     &                     + diy*ukys + diz*ukzs
+               sci(2) = uixs*ukxs + uiys*ukys
+     &                     + uizs*ukzs
+               sci(3) = uixs*xr + uiys*yr + uizs*zr
+               sci(4) = ukxs*xr + ukys*yr + ukzs*zr
+               sci(7) = qir(1)*ukxs + qir(2)*ukys
+     &                     + qir(3)*ukzs
+               sci(8) = qkr(1)*uixs + qkr(2)*uiys
+     &                     + qkr(3)*uizs
+               scip(1) = uixps*dkx + uiyps*dky
+     &                      + uizps*dkz + dix*ukxps
+     &                      + diy*ukyps + diz*ukzps
+               scip(2) = uixs*ukxps + uiys*ukyps
+     &                 + uizs*ukzps + uixps*ukxs
+     &                 + uiyps*ukys + uizps*ukzs
+               scip(3) = uixps*xr + uiyps*yr + uizps*zr
+               scip(4) = ukxps*xr + ukyps*yr + ukzps*zr
+               scip(7) = qir(1)*ukxps + qir(2)*ukyps
+     &                      + qir(3)*ukzps
+               scip(8) = qkr(1)*uixps + qkr(2)*uiyps
+     &                      + qkr(3)*uizps
 c
 c     calculate the gl functions for potential energy
 c
@@ -3051,44 +3113,44 @@ c
 c     get the induced force
 c
                ftm2i(1) = gfi(1)*xr + 0.5d0*
-     &            (- rr3*ck*(uinds(1,i)*psc3+uinps(1,i)*dsc3)
-     &             + rr5*sc(4)*(uinds(1,i)*psc5+uinps(1,i)*dsc5)
-     &             - rr7*sc(6)*(uinds(1,i)*psc7+uinps(1,i)*dsc7))
-     &             +(rr3*ci*(uinds(1,k)*psc3+uinps(1,k)*dsc3)
-     &             + rr5*sc(3)*(uinds(1,k)*psc5+uinps(1,k)*dsc5)
-     &             + rr7*sc(5)*(uinds(1,k)*psc7+uinps(1,k)*dsc7))*0.5d0
-     &             + rr5*scale5i*(sci(4)*uinps(1,i)+scip(4)*uinds(1,i)
-     &             + sci(3)*uinps(1,k)+scip(3)*uinds(1,k))*0.5d0
-     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(1)
-     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(1)
+     &            (- rr3*ck*(uixs*psc3+uixps*dsc3)
+     &             + rr5*sc(4)*(uixs*psc5+uixps*dsc5)
+     &             - rr7*sc(6)*(uixs*psc7+uixps*dsc7))
+     &             +(rr3*ci*(ukxs*psc3+ukxps*dsc3)
+     &             + rr5*sc(3)*(ukxs*psc5+ukxps*dsc5)
+     &             + rr7*sc(5)*(ukxs*psc7+ukxps*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uixps+scip(4)*uixs
+     &             + sci(3)*ukxps+scip(3)*ukxs)*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*dix
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dkx
      &             + 0.5d0*gfi(4)*((qkui(1)-qiuk(1))*psc5
      &             + (qkuip(1)-qiukp(1))*dsc5)
      &             + gfi(5)*qir(1) + gfi(6)*qkr(1)
                ftm2i(2) = gfi(1)*yr + 0.5d0*
-     &            (- rr3*ck*(uinds(2,i)*psc3+uinps(2,i)*dsc3)
-     &             + rr5*sc(4)*(uinds(2,i)*psc5+uinps(2,i)*dsc5)
-     &             - rr7*sc(6)*(uinds(2,i)*psc7+uinps(2,i)*dsc7))
-     &             +(rr3*ci*(uinds(2,k)*psc3+uinps(2,k)*dsc3)
-     &             + rr5*sc(3)*(uinds(2,k)*psc5+uinps(2,k)*dsc5)
-     &             + rr7*sc(5)*(uinds(2,k)*psc7+uinps(2,k)*dsc7))*0.5d0
-     &             + rr5*scale5i*(sci(4)*uinps(2,i)+scip(4)*uinds(2,i)
-     &             + sci(3)*uinps(2,k)+scip(3)*uinds(2,k))*0.5d0
-     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(2)
-     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(2)
+     &            (- rr3*ck*(uiys*psc3+uiyps*dsc3)
+     &             + rr5*sc(4)*(uiys*psc5+uiyps*dsc5)
+     &             - rr7*sc(6)*(uiys*psc7+uiyps*dsc7))
+     &             +(rr3*ci*(ukys*psc3+ukyps*dsc3)
+     &             + rr5*sc(3)*(ukys*psc5+ukyps*dsc5)
+     &             + rr7*sc(5)*(ukys*psc7+ukyps*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uiyps+scip(4)*uiys
+     &             + sci(3)*ukyps+scip(3)*ukys)*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*diy
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dky
      &             + 0.5d0*gfi(4)*((qkui(2)-qiuk(2))*psc5
      &             + (qkuip(2)-qiukp(2))*dsc5)
      &             + gfi(5)*qir(2) + gfi(6)*qkr(2)
                ftm2i(3) = gfi(1)*zr  + 0.5d0*
-     &            (- rr3*ck*(uinds(3,i)*psc3+uinps(3,i)*dsc3)
-     &             + rr5*sc(4)*(uinds(3,i)*psc5+uinps(3,i)*dsc5)
-     &             - rr7*sc(6)*(uinds(3,i)*psc7+uinps(3,i)*dsc7))
-     &             +(rr3*ci*(uinds(3,k)*psc3+uinps(3,k)*dsc3)
-     &             + rr5*sc(3)*(uinds(3,k)*psc5+uinps(3,k)*dsc5)
-     &             + rr7*sc(5)*(uinds(3,k)*psc7+uinps(3,k)*dsc7))*0.5d0
-     &             + rr5*scale5i*(sci(4)*uinps(3,i)+scip(4)*uinds(3,i)
-     &             + sci(3)*uinps(3,k)+scip(3)*uinds(3,k))*0.5d0
-     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(3)
-     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(3)
+     &            (- rr3*ck*(uizs*psc3+uizps*dsc3)
+     &             + rr5*sc(4)*(uizs*psc5+uizps*dsc5)
+     &             - rr7*sc(6)*(uizs*psc7+uizps*dsc7))
+     &             +(rr3*ci*(ukzs*psc3+ukzps*dsc3)
+     &             + rr5*sc(3)*(ukzs*psc5+ukzps*dsc5)
+     &             + rr7*sc(5)*(ukzs*psc7+ukzps*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uizps+scip(4)*uizs
+     &             + sci(3)*ukzps+scip(3)*ukzs)*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*diz
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dkz
      &             + 0.5d0*gfi(4)*((qkui(3)-qiuk(3))*psc5
      &             + (qkuip(3)-qiukp(3))*dsc5)
      &             + gfi(5)*qir(3) + gfi(6)*qkr(3)
@@ -3132,14 +3194,14 @@ c
                   gfd = 0.5d0 * (rr5*scip(2)*scale3i
      &                  - rr7*(scip(3)*sci(4)+sci(3)*scip(4))*scale5i)
                   fdir(1) = gfd*xr + 0.5d0*rr5*scale5i
-     &                         * (sci(4)*uinps(1,i)+scip(4)*uinds(1,i)
-     &                           +sci(3)*uinps(1,k)+scip(3)*uinds(1,k))
+     &                         * (sci(4)*uixps+scip(4)*uixs
+     &                           +sci(3)*ukxps+scip(3)*ukxs)
                   fdir(2) = gfd*yr + 0.5d0*rr5*scale5i
-     &                         * (sci(4)*uinps(2,i)+scip(4)*uinds(2,i)
-     &                           +sci(3)*uinps(2,k)+scip(3)*uinds(2,k))
+     &                         * (sci(4)*uiyps+scip(4)*uiys
+     &                           +sci(3)*ukyps+scip(3)*ukys)
                   fdir(3) = gfd*zr + 0.5d0*rr5*scale5i
-     &                         * (sci(4)*uinps(3,i)+scip(4)*uinds(3,i)
-     &                           +sci(3)*uinps(3,k)+scip(3)*uinds(3,k))
+     &                         * (sci(4)*uizps+scip(4)*uizs
+     &                           +sci(3)*ukzps+scip(3)*ukzs)
                   ftm2i(1) = ftm2i(1) - fdir(1) + findmp(1)
                   ftm2i(2) = ftm2i(2) - fdir(2) + findmp(2)
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
@@ -3194,54 +3256,54 @@ c
 c
 c     construct auxiliary vectors for induced terms
 c
-               dixuk(1) = di(2)*uind(3,k) - di(3)*uind(2,k)
-               dixuk(2) = di(3)*uind(1,k) - di(1)*uind(3,k)
-               dixuk(3) = di(1)*uind(2,k) - di(2)*uind(1,k)
-               dkxui(1) = dk(2)*uind(3,i) - dk(3)*uind(2,i)
-               dkxui(2) = dk(3)*uind(1,i) - dk(1)*uind(3,i)
-               dkxui(3) = dk(1)*uind(2,i) - dk(2)*uind(1,i)
-               dixukp(1) = di(2)*uinp(3,k) - di(3)*uinp(2,k)
-               dixukp(2) = di(3)*uinp(1,k) - di(1)*uinp(3,k)
-               dixukp(3) = di(1)*uinp(2,k) - di(2)*uinp(1,k)
-               dkxuip(1) = dk(2)*uinp(3,i) - dk(3)*uinp(2,i)
-               dkxuip(2) = dk(3)*uinp(1,i) - dk(1)*uinp(3,i)
-               dkxuip(3) = dk(1)*uinp(2,i) - dk(2)*uinp(1,i)
-               qiuk(1) = qi(1)*uind(1,k) + qi(4)*uind(2,k)
-     &                      + qi(7)*uind(3,k)
-               qiuk(2) = qi(2)*uind(1,k) + qi(5)*uind(2,k)
-     &                      + qi(8)*uind(3,k)
-               qiuk(3) = qi(3)*uind(1,k) + qi(6)*uind(2,k)
-     &                      + qi(9)*uind(3,k)
-               qkui(1) = qk(1)*uind(1,i) + qk(4)*uind(2,i)
-     &                      + qk(7)*uind(3,i)
-               qkui(2) = qk(2)*uind(1,i) + qk(5)*uind(2,i)
-     &                      + qk(8)*uind(3,i)
-               qkui(3) = qk(3)*uind(1,i) + qk(6)*uind(2,i)
-     &                      + qk(9)*uind(3,i)
-               qiukp(1) = qi(1)*uinp(1,k) + qi(4)*uinp(2,k)
-     &                       + qi(7)*uinp(3,k)
-               qiukp(2) = qi(2)*uinp(1,k) + qi(5)*uinp(2,k)
-     &                       + qi(8)*uinp(3,k)
-               qiukp(3) = qi(3)*uinp(1,k) + qi(6)*uinp(2,k)
-     &                       + qi(9)*uinp(3,k)
-               qkuip(1) = qk(1)*uinp(1,i) + qk(4)*uinp(2,i)
-     &                       + qk(7)*uinp(3,i)
-               qkuip(2) = qk(2)*uinp(1,i) + qk(5)*uinp(2,i)
-     &                       + qk(8)*uinp(3,i)
-               qkuip(3) = qk(3)*uinp(1,i) + qk(6)*uinp(2,i)
-     &                       + qk(9)*uinp(3,i)
-               uixqkr(1) = uind(2,i)*qkr(3) - uind(3,i)*qkr(2)
-               uixqkr(2) = uind(3,i)*qkr(1) - uind(1,i)*qkr(3)
-               uixqkr(3) = uind(1,i)*qkr(2) - uind(2,i)*qkr(1)
-               ukxqir(1) = uind(2,k)*qir(3) - uind(3,k)*qir(2)
-               ukxqir(2) = uind(3,k)*qir(1) - uind(1,k)*qir(3)
-               ukxqir(3) = uind(1,k)*qir(2) - uind(2,k)*qir(1)
-               uixqkrp(1) = uinp(2,i)*qkr(3) - uinp(3,i)*qkr(2)
-               uixqkrp(2) = uinp(3,i)*qkr(1) - uinp(1,i)*qkr(3)
-               uixqkrp(3) = uinp(1,i)*qkr(2) - uinp(2,i)*qkr(1)
-               ukxqirp(1) = uinp(2,k)*qir(3) - uinp(3,k)*qir(2)
-               ukxqirp(2) = uinp(3,k)*qir(1) - uinp(1,k)*qir(3)
-               ukxqirp(3) = uinp(1,k)*qir(2) - uinp(2,k)*qir(1)
+               dixuk(1) = diy*ukz - diz*uky
+               dixuk(2) = diz*ukx - dix*ukz
+               dixuk(3) = dix*uky - diy*ukx
+               dkxui(1) = dky*uiz - dkz*uiy
+               dkxui(2) = dkz*uix - dkx*uiz
+               dkxui(3) = dkx*uiy - dky*uix
+               dixukp(1) = diy*ukzp - diz*ukyp
+               dixukp(2) = diz*ukxp - dix*ukzp
+               dixukp(3) = dix*ukyp - diy*ukxp
+               dkxuip(1) = dky*uizp - dkz*uiyp
+               dkxuip(2) = dkz*uixp - dkx*uizp
+               dkxuip(3) = dkx*uiyp - dky*uixp
+               qiuk(1) = qixx*ukx + qixy*uky
+     &                      + qixz*ukz
+               qiuk(2) = qixy*ukx + qiyy*uky
+     &                      + qiyz*ukz
+               qiuk(3) = qixz*ukx + qiyz*uky
+     &                      + qizz*ukz
+               qkui(1) = qkxx*uix + qkxy*uiy
+     &                      + qkxz*uiz
+               qkui(2) = qkxy*uix + qkyy*uiy
+     &                      + qkyz*uiz
+               qkui(3) = qkxz*uix + qkyz*uiy
+     &                      + qkzz*uiz
+               qiukp(1) = qixx*ukxp + qixy*ukyp
+     &                       + qixz*ukzp
+               qiukp(2) = qixy*ukxp + qiyy*ukyp
+     &                       + qiyz*ukzp
+               qiukp(3) = qixz*ukxp + qiyz*ukyp
+     &                       + qizz*ukzp
+               qkuip(1) = qkxx*uixp + qkxy*uiyp
+     &                       + qkxz*uizp
+               qkuip(2) = qkxy*uixp + qkyy*uiyp
+     &                       + qkyz*uizp
+               qkuip(3) = qkxz*uixp + qkyz*uiyp
+     &                       + qkzz*uizp
+               uixqkr(1) = uiy*qkr(3) - uiz*qkr(2)
+               uixqkr(2) = uiz*qkr(1) - uix*qkr(3)
+               uixqkr(3) = uix*qkr(2) - uiy*qkr(1)
+               ukxqir(1) = uky*qir(3) - ukz*qir(2)
+               ukxqir(2) = ukz*qir(1) - ukx*qir(3)
+               ukxqir(3) = ukx*qir(2) - uky*qir(1)
+               uixqkrp(1) = uiyp*qkr(3) - uizp*qkr(2)
+               uixqkrp(2) = uizp*qkr(1) - uixp*qkr(3)
+               uixqkrp(3) = uixp*qkr(2) - uiyp*qkr(1)
+               ukxqirp(1) = ukyp*qir(3) - ukzp*qir(2)
+               ukxqirp(2) = ukzp*qir(1) - ukxp*qir(3)
+               ukxqirp(3) = ukxp*qir(2) - ukyp*qir(1)
                rxqiuk(1) = yr*qiuk(3) - zr*qiuk(2)
                rxqiuk(2) = zr*qiuk(1) - xr*qiuk(3)
                rxqiuk(3) = xr*qiuk(2) - yr*qiuk(1)
@@ -3257,29 +3319,29 @@ c
 c
 c     get intermediate variables for induction energy terms
 c
-               sci(1) = uind(1,i)*dk(1) + uind(2,i)*dk(2)
-     &                     + uind(3,i)*dk(3) + di(1)*uind(1,k)
-     &                     + di(2)*uind(2,k) + di(3)*uind(3,k)
-               sci(2) = uind(1,i)*uind(1,k) + uind(2,i)*uind(2,k)
-     &                     + uind(3,i)*uind(3,k)
-               sci(3) = uind(1,i)*xr + uind(2,i)*yr + uind(3,i)*zr
-               sci(4) = uind(1,k)*xr + uind(2,k)*yr + uind(3,k)*zr
-               sci(7) = qir(1)*uind(1,k) + qir(2)*uind(2,k)
-     &                     + qir(3)*uind(3,k)
-               sci(8) = qkr(1)*uind(1,i) + qkr(2)*uind(2,i)
-     &                     + qkr(3)*uind(3,i)
-               scip(1) = uinp(1,i)*dk(1) + uinp(2,i)*dk(2)
-     &                      + uinp(3,i)*dk(3) + di(1)*uinp(1,k)
-     &                      + di(2)*uinp(2,k) + di(3)*uinp(3,k)
-               scip(2) = uind(1,i)*uinp(1,k)+uind(2,i)*uinp(2,k)
-     &                      + uind(3,i)*uinp(3,k)+uinp(1,i)*uind(1,k)
-     &                      + uinp(2,i)*uind(2,k)+uinp(3,i)*uind(3,k)
-               scip(3) = uinp(1,i)*xr + uinp(2,i)*yr + uinp(3,i)*zr
-               scip(4) = uinp(1,k)*xr + uinp(2,k)*yr + uinp(3,k)*zr
-               scip(7) = qir(1)*uinp(1,k) + qir(2)*uinp(2,k)
-     &                      + qir(3)*uinp(3,k)
-               scip(8) = qkr(1)*uinp(1,i) + qkr(2)*uinp(2,i)
-     &                      + qkr(3)*uinp(3,i)
+               sci(1) = uix*dkx + uiy*dky
+     &                     + uiz*dkz + dix*ukx
+     &                     + diy*uky + diz*ukz
+               sci(2) = uix*ukx + uiy*uky
+     &                     + uiz*ukz
+               sci(3) = uix*xr + uiy*yr + uiz*zr
+               sci(4) = ukx*xr + uky*yr + ukz*zr
+               sci(7) = qir(1)*ukx + qir(2)*uky
+     &                     + qir(3)*ukz
+               sci(8) = qkr(1)*uix + qkr(2)*uiy
+     &                     + qkr(3)*uiz
+               scip(1) = uixp*dkx + uiyp*dky
+     &                      + uizp*dkz + dix*ukxp
+     &                      + diy*ukyp + diz*ukzp
+               scip(2) = uix*ukxp+uiy*ukyp
+     &                      + uiz*ukzp+uixp*ukx
+     &                      + uiyp*uky+uizp*ukz
+               scip(3) = uixp*xr + uiyp*yr + uizp*zr
+               scip(4) = ukxp*xr + ukyp*yr + ukzp*zr
+               scip(7) = qir(1)*ukxp + qir(2)*ukyp
+     &                      + qir(3)*ukzp
+               scip(8) = qkr(1)*uixp + qkr(2)*uiyp
+     &                      + qkr(3)*uizp
 c
 c     calculate the gl functions for potential energy
 c
@@ -3319,44 +3381,44 @@ c
 c     get the induced force
 c
                ftm2i(1) = gfi(1)*xr + 0.5d0*
-     &            (- rr3*ck*(uind(1,i)*psc3+uinp(1,i)*dsc3)
-     &             + rr5*sc(4)*(uind(1,i)*psc5+uinp(1,i)*dsc5)
-     &             - rr7*sc(6)*(uind(1,i)*psc7+uinp(1,i)*dsc7))
-     &             +(rr3*ci*(uind(1,k)*psc3+uinp(1,k)*dsc3)
-     &             + rr5*sc(3)*(uind(1,k)*psc5+uinp(1,k)*dsc5)
-     &             + rr7*sc(5)*(uind(1,k)*psc7+uinp(1,k)*dsc7))*0.5d0
-     &             + rr5*scale5i*(sci(4)*uinp(1,i)+scip(4)*uind(1,i)
-     &             + sci(3)*uinp(1,k)+scip(3)*uind(1,k))*0.5d0
-     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(1)
-     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(1)
+     &            (- rr3*ck*(uix*psc3+uixp*dsc3)
+     &             + rr5*sc(4)*(uix*psc5+uixp*dsc5)
+     &             - rr7*sc(6)*(uix*psc7+uixp*dsc7))
+     &             +(rr3*ci*(ukx*psc3+ukxp*dsc3)
+     &             + rr5*sc(3)*(ukx*psc5+ukxp*dsc5)
+     &             + rr7*sc(5)*(ukx*psc7+ukxp*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uixp+scip(4)*uix
+     &             + sci(3)*ukxp+scip(3)*ukx)*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*dix
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dkx
      &             + 0.5d0*gfi(4)*((qkui(1)-qiuk(1))*psc5
      &             + (qkuip(1)-qiukp(1))*dsc5)
      &             + gfi(5)*qir(1) + gfi(6)*qkr(1)
                ftm2i(2) = gfi(1)*yr + 0.5d0*
-     &            (- rr3*ck*(uind(2,i)*psc3+uinp(2,i)*dsc3)
-     &             + rr5*sc(4)*(uind(2,i)*psc5+uinp(2,i)*dsc5)
-     &             - rr7*sc(6)*(uind(2,i)*psc7+uinp(2,i)*dsc7))
-     &             +(rr3*ci*(uind(2,k)*psc3+uinp(2,k)*dsc3)
-     &             + rr5*sc(3)*(uind(2,k)*psc5+uinp(2,k)*dsc5)
-     &             + rr7*sc(5)*(uind(2,k)*psc7+uinp(2,k)*dsc7))*0.5d0
-     &             + rr5*scale5i*(sci(4)*uinp(2,i)+scip(4)*uind(2,i)
-     &             + sci(3)*uinp(2,k)+scip(3)*uind(2,k))*0.5d0
-     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(2)
-     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(2)
+     &            (- rr3*ck*(uiy*psc3+uiyp*dsc3)
+     &             + rr5*sc(4)*(uiy*psc5+uiyp*dsc5)
+     &             - rr7*sc(6)*(uiy*psc7+uiyp*dsc7))
+     &             +(rr3*ci*(uky*psc3+ukyp*dsc3)
+     &             + rr5*sc(3)*(uky*psc5+ukyp*dsc5)
+     &             + rr7*sc(5)*(uky*psc7+ukyp*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uiyp+scip(4)*uiy
+     &             + sci(3)*ukyp+scip(3)*uky)*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*diy
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dky
      &             + 0.5d0*gfi(4)*((qkui(2)-qiuk(2))*psc5
      &             + (qkuip(2)-qiukp(2))*dsc5)
      &             + gfi(5)*qir(2) + gfi(6)*qkr(2)
                ftm2i(3) = gfi(1)*zr  + 0.5d0*
-     &            (- rr3*ck*(uind(3,i)*psc3+uinp(3,i)*dsc3)
-     &             + rr5*sc(4)*(uind(3,i)*psc5+uinp(3,i)*dsc5)
-     &             - rr7*sc(6)*(uind(3,i)*psc7+uinp(3,i)*dsc7))
-     &             +(rr3*ci*(uind(3,k)*psc3+uinp(3,k)*dsc3)
-     &             + rr5*sc(3)*(uind(3,k)*psc5+uinp(3,k)*dsc5)
-     &             + rr7*sc(5)*(uind(3,k)*psc7+uinp(3,k)*dsc7))*0.5d0
-     &             + rr5*scale5i*(sci(4)*uinp(3,i)+scip(4)*uind(3,i)
-     &             + sci(3)*uinp(3,k)+scip(3)*uind(3,k))*0.5d0
-     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*di(3)
-     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dk(3)
+     &            (- rr3*ck*(uiz*psc3+uizp*dsc3)
+     &             + rr5*sc(4)*(uiz*psc5+uizp*dsc5)
+     &             - rr7*sc(6)*(uiz*psc7+uizp*dsc7))
+     &             +(rr3*ci*(ukz*psc3+ukzp*dsc3)
+     &             + rr5*sc(3)*(ukz*psc5+ukzp*dsc5)
+     &             + rr7*sc(5)*(ukz*psc7+ukzp*dsc7))*0.5d0
+     &             + rr5*scale5i*(sci(4)*uizp+scip(4)*uiz
+     &             + sci(3)*ukzp+scip(3)*ukz)*0.5d0
+     &             + 0.5d0*(sci(4)*psc5+scip(4)*dsc5)*rr5*diz
+     &             + 0.5d0*(sci(3)*psc5+scip(3)*dsc5)*rr5*dkz
      &             + 0.5d0*gfi(4)*((qkui(3)-qiuk(3))*psc5
      &             + (qkuip(3)-qiukp(3))*dsc5)
      &             + gfi(5)*qir(3) + gfi(6)*qkr(3)
@@ -3400,14 +3462,14 @@ c
                   gfd = 0.5d0 * (rr5*scip(2)*scale3i
      &                  - rr7*(scip(3)*sci(4)+sci(3)*scip(4))*scale5i)
                   fdir(1) = gfd*xr + 0.5d0*rr5*scale5i
-     &                         * (sci(4)*uinp(1,i)+scip(4)*uind(1,i)
-     &                           +sci(3)*uinp(1,k)+scip(3)*uind(1,k))
+     &                         * (sci(4)*uixp+scip(4)*uix
+     &                           +sci(3)*ukxp+scip(3)*ukx)
                   fdir(2) = gfd*yr + 0.5d0*rr5*scale5i
-     &                         * (sci(4)*uinp(2,i)+scip(4)*uind(2,i)
-     &                           +sci(3)*uinp(2,k)+scip(3)*uind(2,k))
+     &                         * (sci(4)*uiyp+scip(4)*uiy
+     &                           +sci(3)*ukyp+scip(3)*uky)
                   fdir(3) = gfd*zr + 0.5d0*rr5*scale5i
-     &                         * (sci(4)*uinp(3,i)+scip(4)*uind(3,i)
-     &                           +sci(3)*uinp(3,k)+scip(3)*uind(3,k))
+     &                         * (sci(4)*uizp+scip(4)*uiz
+     &                           +sci(3)*ukzp+scip(3)*ukz)
                   ftm2i(1) = ftm2i(1) - fdir(1) + findmp(1)
                   ftm2i(2) = ftm2i(2) - fdir(2) + findmp(2)
                   ftm2i(3) = ftm2i(3) - fdir(3) + findmp(3)
@@ -4617,101 +4679,101 @@ c     zero out the nonpolar solvation energy and first derivatives
 c
       ecav = 0.0d0
       edisp = 0.0d0
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aesurf(n))
-      allocate (dsurf(3,n))
-      allocate (dvol(3,n))
-c
-c     compute SASA and effective radius needed for cavity term
-c
-      exclude = 1.4d0
-      call surface1 (esurf,aesurf,dsurf,rcav,asolv,exclude)
-      reff = 0.5d0 * sqrt(esurf/(pi*surften))
-      dreff = reff / (2.0d0*esurf)
-      reff2 = reff * reff
-      reff3 = reff2 * reff
-      reff4 = reff3 * reff
-      reff5 = reff4 * reff
-c
-c     compute solvent excluded volume needed for small solutes
-c
-      if (reff .lt. spoff) then
-         call volume (evol,rcav,exclude)
-         evol = evol * solvprs
-         call volume1 (rcav,exclude,dvol)
-         do i = 1, n
-            dvol(1,i) = dvol(1,i) * solvprs
-            dvol(2,i) = dvol(2,i) * solvprs
-            dvol(3,i) = dvol(3,i) * solvprs
-         end do
-      end if
-c
-c     include cavity energy from a full SEV term
-c
-      if (reff .le. spcut) then
-         ecav = evol
-         do i = 1, n
-            des(1,i) = des(1,i) + dvol(1,i)
-            des(2,i) = des(2,i) + dvol(2,i)
-            des(3,i) = des(3,i) + dvol(3,i)
-         end do
-c
-c     include cavity energy from a tapered SEV term
-c
-      else if (reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                +2.0d0*c2*reff+c1) * dreff
-         ecav = evol * taper
-         do i = 1, n
-            des(1,i) = des(1,i) + taper*dvol(1,i)
-     &                    + evol*dtaper*dsurf(1,i)
-            des(2,i) = des(2,i) + taper*dvol(2,i)
-     &                    + evol*dtaper*dsurf(2,i)
-            des(3,i) = des(3,i) + taper*dvol(3,i)
-     &                    + evol*dtaper*dsurf(3,i)
-         end do
-      end if
-c
-c     include a full SASA term
-c
-      if (reff .gt. stcut) then
-         ecav = ecav + esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + dsurf(1,i)
-            des(2,i) = des(2,i) + dsurf(2,i)
-            des(3,i) = des(3,i) + dsurf(3,i)
-         end do
-c
-c     include cavity energy from a tapered SASA term
-c
-      else if (reff .gt. stoff) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
-     &                +2.0d0*c2*reff+c1) * dreff
-         dtaper = -dtaper
-         ecav = ecav + taper*esurf
-         do i = 1, n
-            des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
-            des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
-            des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aesurf)
-      deallocate (dsurf)
-      deallocate (dvol)
+cc
+cc     perform dynamic allocation of some local arrays
+cc
+c      allocate (aesurf(n))
+c      allocate (dsurf(3,n))
+c      allocate (dvol(3,n))
+cc
+cc     compute SASA and effective radius needed for cavity term
+cc
+c      exclude = 1.4d0
+c      call surface1 (esurf,aesurf,dsurf,rcav,asolv,exclude)
+c      reff = 0.5d0 * sqrt(esurf/(pi*surften))
+c      dreff = reff / (2.0d0*esurf)
+c      reff2 = reff * reff
+c      reff3 = reff2 * reff
+c      reff4 = reff3 * reff
+c      reff5 = reff4 * reff
+cc
+cc     compute solvent excluded volume needed for small solutes
+cc
+c      if (reff .lt. spoff) then
+c         call volume (evol,rcav,exclude)
+c         evol = evol * solvprs
+c         call volume1 (rcav,exclude,dvol)
+c         do i = 1, n
+c            dvol(1,i) = dvol(1,i) * solvprs
+c            dvol(2,i) = dvol(2,i) * solvprs
+c            dvol(3,i) = dvol(3,i) * solvprs
+c         end do
+c      end if
+cc
+cc     include cavity energy from a full SEV term
+cc
+c      if (reff .le. spcut) then
+c         ecav = evol
+c         do i = 1, n
+c            des(1,i) = des(1,i) + dvol(1,i)
+c            des(2,i) = des(2,i) + dvol(2,i)
+c            des(3,i) = des(3,i) + dvol(3,i)
+c         end do
+cc
+cc     include cavity energy from a tapered SEV term
+cc
+c      else if (reff .le. spoff) then
+c         mode = 'GKV'
+c         call switch (mode)
+c         taper = c5*reff5 + c4*reff4 + c3*reff3
+c     &              + c2*reff2 + c1*reff + c0
+c         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
+c     &                +2.0d0*c2*reff+c1) * dreff
+c         ecav = evol * taper
+c         do i = 1, n
+c            des(1,i) = des(1,i) + taper*dvol(1,i)
+c     &                    + evol*dtaper*dsurf(1,i)
+c            des(2,i) = des(2,i) + taper*dvol(2,i)
+c     &                    + evol*dtaper*dsurf(2,i)
+c            des(3,i) = des(3,i) + taper*dvol(3,i)
+c     &                    + evol*dtaper*dsurf(3,i)
+c         end do
+c      end if
+cc
+cc     include a full SASA term
+cc
+c      if (reff .gt. stcut) then
+c         ecav = ecav + esurf
+c         do i = 1, n
+c            des(1,i) = des(1,i) + dsurf(1,i)
+c            des(2,i) = des(2,i) + dsurf(2,i)
+c            des(3,i) = des(3,i) + dsurf(3,i)
+c         end do
+cc
+cc     include cavity energy from a tapered SASA term
+cc
+c      else if (reff .gt. stoff) then
+c         mode = 'GKSA'
+c         call switch (mode)
+c         taper = c5*reff5 + c4*reff4 + c3*reff3
+c     &              + c2*reff2 + c1*reff + c0
+c         taper = 1.0d0 - taper
+c         dtaper = (5.0d0*c5*reff4+4.0d0*c4*reff3+3.0d0*c3*reff2
+c     &                +2.0d0*c2*reff+c1) * dreff
+c         dtaper = -dtaper
+c         ecav = ecav + taper*esurf
+c         do i = 1, n
+c            des(1,i) = des(1,i) + (taper+esurf*dtaper)*dsurf(1,i)
+c            des(2,i) = des(2,i) + (taper+esurf*dtaper)*dsurf(2,i)
+c            des(3,i) = des(3,i) + (taper+esurf*dtaper)*dsurf(3,i)
+c         end do
+c      end if
+cc
+cc     perform deallocation of some local arrays
+cc
+c      deallocate (aesurf)
+c      deallocate (dsurf)
+c      deallocate (dvol)
 c
 c     find the implicit dispersion solvation energy
 c
@@ -4731,6 +4793,120 @@ c     "ewca1" finds the Weeks-Chandler-Anderson dispersion energy
 c     and derivatives of a solute
 c
 c
+      subroutine pairewca1 (r, r2, r3, rio, rmixo, rmixo7, sk, sk2, aoi,
+     &                     emixo, sum, de, ifo)
+      use math
+      implicit none
+      real*8 rio, r, sk, rmax, lik, lik2, lik3, lik4, uik, uik2, uik3
+      real*8 uik4, term, iwca, sum, de, dl, du
+      real*8 r2, sk2, rmixo, emixo, uik5, uik10, uik11, uik12, lik5
+      real*8 uik6, uik13, lik6, lik13
+      real*8 lik10, lik11, lik12, idisp, aoi, rmixo7, irepl, r3
+      real*8 scale
+      logical ifo
+      sum = 0.0d0
+      de = 0.0d0
+      if (ifo) then
+         scale = 1.0d0
+      else
+         scale = 2.0d0
+      end if
+      if (rio .lt. r+sk) then
+         rmax = max(rio,r-sk)
+         lik = rmax
+         if (lik .lt. rmixo) then
+            lik2 = lik * lik
+            lik3 = lik2 * lik
+            lik4 = lik3 * lik
+            uik = min(r+sk,rmixo)
+            uik2 = uik * uik
+            uik3 = uik2 * uik
+            uik4 = uik3 * uik
+            term = 4.0d0 * pi / (48.0d0*r)
+     &                     * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
+     &                           + 6.0d0*(r2-sk2)*(lik2-uik2))
+            if (rio .gt. r-sk) then
+               dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
+               dl = dl * lik2
+            else
+               dl = -lik3 + 4.0d0*lik2*r - 6.0d0*lik*r2
+     &                          + 2.0d0*lik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
+               dl = dl * lik
+            end if
+            if (r+sk .gt. rmixo) then
+               du = -uik2 + 2.0d0*r2 + 2.0d0*sk2
+               du = -du * uik2
+            else
+               du = -uik3 + 4.0d0*uik2*r - 6.0d0*uik*r2
+     &                          + 2.0d0*uik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
+               du = -du * uik
+            end if
+            iwca = -emixo * term
+            de = de - emixo*pi*(dl+du)/(4.0d0*r2)
+            sum = sum + iwca
+         end if
+         uik = r + sk
+         if (uik .gt. rmixo) then
+            uik2 = uik * uik
+            uik3 = uik2 * uik
+            uik4 = uik3 * uik
+            uik5 = uik4 * uik
+            uik6 = uik5 * uik
+            uik10 = uik5 * uik5
+            uik11 = uik10 * uik
+            uik12 = uik11 * uik
+            uik13 = uik12 * uik
+            lik = max(rmax,rmixo)
+            lik2 = lik * lik
+            lik3 = lik2 * lik
+            lik4 = lik3 * lik
+            lik5 = lik4 * lik
+            lik6 = lik5 * lik
+            lik10 = lik5 * lik5
+            lik11 = lik10 * lik
+            lik12 = lik11 * lik
+            lik13 = lik12 * lik
+            term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
+     &                       * (15.0d0*uik*lik*r*(uik4-lik4)
+     &                          - 10.0d0*uik2*lik2*(uik3-lik3)
+     &                          + 6.0d0*(sk2-r2)*(uik5-lik5))
+            if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+               dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
+               dl = -dl / lik5
+            else
+               dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
+     &                          + 15.0d0*(lik2*r+r3-r*sk2)
+               dl = dl / lik6
+            end if
+            du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
+     &                       + 15.0d0*(uik2*r+r3-r*sk2)
+            du = -du / uik6
+            idisp = -2.0d0 * aoi * term
+            de = de -2.0d0*aoi*pi*(dl + du)/(15.0d0*r2)
+            term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
+     &                       * (120.0d0*uik*lik*r*(uik11-lik11)
+     &                          - 66.0d0*uik2*lik2*(uik10-lik10)
+     &                          + 55.0d0*(sk2-r2)*(uik12-lik12))
+            if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+               dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
+               dl = -dl / lik12
+            else
+               dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
+     &                          + 60.0d0*(lik2*r+r3-r*sk2)
+               dl = dl / lik13
+            end if
+            du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
+     &                       + 60.0d0*(uik2*r+r3-r*sk2)
+            du = -du / uik13
+            irepl = aoi * rmixo7 * term
+            de = de + aoi*rmixo7*pi*(dl + du)/(60.0d0*r2)
+            sum = sum + irepl + idisp
+         end if
+      end if
+      sum = sum * scale
+      de = de * scale
+      return
+      end
       subroutine ewca1 (edisp)
       use atoms
       use atomid
@@ -4748,274 +4924,117 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,r3
       real*8 sum,term,iwca,irepl
-      real*8 epsi,rmini,rio,rih,rmax
-      real*8 ao,emixo,rmixo,rmixo7
-      real*8 ah,emixh,rmixh,rmixh7
+      real*8 epsi,rmin,rio,rih,rmax
+      real*8 aoi,emixo,rmixo,rmixo7
+      real*8 ahi,emixh,rmixh,rmixh7
+      real*8 epsk,rmkn,rko,rkh
+      real*8 aok,emkxo,rmkxo,rmkxo7
+      real*8 ahk,emkxh,rmkxh,rmkxh7
       real*8 lik,lik2,lik3,lik4
       real*8 lik5,lik6,lik10
       real*8 lik11,lik12,lik13
       real*8 uik,uik2,uik3,uik4
       real*8 uik5,uik6,uik10
       real*8 uik11,uik12,uik13
-      real*8 de,dl,du
+      real*8 de,dl,du,de1,de2,de11,de22
       real*8 dedx,dedy,dedz
+      real*8 si,si2
+      real*8 sum1,sum2
+      real*8, allocatable :: edisparray(:)
 c
 c
 c     zero out the Weeks-Chandler-Andersen dispersion energy
 c
       edisp = 0.0d0
+      allocate (edisparray(n))
+      do i = 1, n
+         edisparray(i) = 0.0d0
+      end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,class,eps,
 !$OMP& rad,x,y,z,cdisp)
-!$OMP& shared(edisp,des)
-!$OMP DO reduction(+:edisp,des) schedule(guided)
+!$OMP& shared(edisparray,des)
+!$OMP DO reduction(+:edisparray,des) schedule(guided)
 c
 c     find the WCA dispersion energy and gradient components
 c
-      do i = 1, n
+      do i = 1, n-1
          epsi = eps(class(i))
-         rmini = rad(class(i))
+         rmin = rad(class(i))
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
-         rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
+         rmixo = 2.0d0 * (rmino**3+rmin**3) / (rmino**2+rmin**2)
          rmixo7 = rmixo**7
-         ao = emixo * rmixo7
+         aoi = emixo * rmixo7
          emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
-         rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
+         rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
          rmixh7 = rmixh**7
-         ah = emixh * rmixh7
+         ahi = emixh * rmixh7
          rio = rmixo / 2.0d0 + dispoff
          rih = rmixh / 2.0d0 + dispoff
+         si = rmin * shctd
+         si2 = si * si
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         sum = 0.0d0
-         do k = 1, n
-            if (i .ne. k) then
-               xr = xi - x(k)
-               yr = yi - y(k)
-               zr = zi - z(k)
-               r2 = xr*xr + yr*yr + zr*zr
-               r = sqrt(r2)
-               r3 = r * r2
-               rk = rad(class(k))
-               sk = rk * shctd
-               sk2 = sk * sk
-               de = 0.0d0
-               if (rio .lt. r+sk) then
-                  rmax = max(rio,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixo) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixo)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (rio .gt. r-sk) then
-                        dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
-                        dl = dl * lik2
-                     else
-                        dl = -lik3 + 4.0d0*lik2*r - 6.0d0*lik*r2
-     &                          + 2.0d0*lik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        dl = dl * lik
-                     end if
-                     if (r+sk .gt. rmixo) then
-                        du = -uik2 + 2.0d0*r2 + 2.0d0*sk2
-                        du = -du * uik2
-                     else
-                        du = -uik3 + 4.0d0*uik2*r - 6.0d0*uik*r2
-     &                          + 2.0d0*uik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        du = -du * uik
-                     end if
-                     iwca = -emixo * term
-                     de = de - emixo*pi*(dl+du)/(4.0d0*r2)
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixo) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik6 = uik5 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     uik13 = uik12 * uik
-                     lik = max(rmax,rmixo)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik6 = lik5 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     lik13 = lik12 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
-                        dl = -dl / lik5
-                     else
-                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
-     &                          + 15.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik6
-                     end if
-                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
-     &                       + 15.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik6
-                     idisp = -2.0d0 * ao * term
-                     de = de -2.0d0*ao*pi*(dl + du)/(15.0d0*r2)
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
-                        dl = -dl / lik12
-                     else
-                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
-     &                          + 60.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik13
-                     end if
-                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
-     &                       + 60.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik13
-                     irepl = ao * rmixo7 * term
-                     de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
-                     sum = sum + irepl + idisp
-                  end if
-               end if
-               if (rih .lt. r+sk) then
-                  rmax = max(rih,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixh) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixh)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (rih .gt. r-sk) then
-                        dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
-                        dl = dl * lik2
-                     else
-                        dl = -lik3 + 4.0d0*lik2*r - 6.0d0*lik*r2
-     &                          + 2.0d0*lik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        dl = dl * lik
-                     end if
-                     if (r+sk .gt. rmixh) then
-                        du = -uik2 + 2.0d0*r2 + 2.0d0*sk2
-                        du = -du * uik2
-                     else
-                        du = -uik3 + 4.0d0*uik2*r - 6.0d0*uik*r2
-     &                          + 2.0d0*uik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        du = -du * uik
-                     end if
-                     iwca = -2.0d0 * emixh * term
-                     de = de - 2.0d0*emixh*pi*(dl+du)/(4.0d0*r2)
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixh) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik6 = uik5 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     uik13 = uik12 * uik
-                     lik = max(rmax,rmixh)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik6 = lik5 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     lik13 = lik12 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
-                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
-                        dl = -dl / lik5
-                     else
-                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
-     &                          + 15.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik6
-                     end if
-                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
-     &                       + 15.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik6
-                     idisp = -4.0d0 * ah * term
-                     de = de - 4.0d0*ah*pi*(dl + du)/(15.0d0*r2)
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
-                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
-                        dl = -dl / lik12
-                     else
-                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
-     &                          + 60.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik13
-                     end if
-                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
-     &                       + 60.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik13
-                     irepl = 2.0d0 * ah * rmixh7 * term
-                     de = de + ah*rmixh7*pi*(dl+du)/(30.0d0*r2)
-                     sum = sum + irepl + idisp
-                  end if
-               end if
-c
-c     increment the individual dispersion gradient components
-c
-               de = -de/r * slevy * awater
-               dedx = de * xr
-               dedy = de * yr
-               dedz = de * zr
-               des(1,i) = des(1,i) + dedx
-               des(2,i) = des(2,i) + dedy
-               des(3,i) = des(3,i) + dedz
-               des(1,k) = des(1,k) - dedx
-               des(2,k) = des(2,k) - dedy
-               des(3,k) = des(3,k) - dedz
-            end if
+         do k = i+1, n
+            epsk = eps(class(k))
+            rmkn = rad(class(k))
+            emkxo = 4.0d0*epso * epsk / ((sqrt(epso)+sqrt(epsk))**2)
+            rmkxo = 2.0d0 * (rmino**3+rmkn**3) / (rmino**2+rmkn**2)
+            rmkxo7 = rmkxo**7
+            aok = emkxo * rmkxo7
+            emkxh = 4.0d0*epsh * epsk / ((sqrt(epsh)+sqrt(epsk))**2)
+            rmkxh = 2.0d0 * (rminh**3+rmkn**3) / (rminh**2+rmkn**2)
+            rmkxh7 = rmkxh**7
+            ahk = emkxh * rmkxh7
+            rko = rmkxo / 2.0d0 + dispoff
+            rkh = rmkxh / 2.0d0 + dispoff
+            sk = rmkn * shctd
+            sk2 = sk * sk
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
+            r2 = xr*xr + yr*yr + zr*zr
+            r = sqrt(r2)
+            r3 = r2 * r
+            call pairewca1 (r,r2,r3,rio,rmixo,rmixo7,sk,sk2,aoi,emixo,
+     &                     sum1,de11,.true.)
+            call pairewca1 (r,r2,r3,rih,rmixh,rmixh7,sk,sk2,ahi,emixh,
+     &                     sum2,de22,.false.)
+            edisparray(i) = edisparray(i) + sum1 + sum2
+            de = de11 + de22
+            call pairewca1 (r,r2,r3,rko,rmkxo,rmkxo7,si,si2,aok,emkxo,
+     &                     sum1,de11,.true.)
+            call pairewca1 (r,r2,r3,rkh,rmkxh,rmkxh7,si,si2,ahk,emkxh,
+     &                     sum2,de22,.false.)
+            edisparray(k) = edisparray(k) + sum1 + sum2
+            de = de + de11 + de22
+            de = de/r * slevy * awater
+            dedx = de * xr
+            dedy = de * yr
+            dedz = de * zr
+            des(1,i) = des(1,i) + dedx
+            des(2,i) = des(2,i) + dedy
+            des(3,i) = des(3,i) + dedz
+            des(1,k) = des(1,k) - dedx
+            des(2,k) = des(2,k) - dedy
+            des(3,k) = des(3,k) - dedz
          end do
-c
-c     increment the overall dispersion energy component
-c
-         e = cdisp(i) - slevy*awater*sum
-         edisp = edisp + e
       end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
+      do i = 1, n
+         e = cdisp(i) - slevy*awater*edisparray(i)
+         edisp = edisp + e
+      end do
       return
       end
 c

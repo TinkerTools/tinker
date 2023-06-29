@@ -505,9 +505,6 @@ c
           call chkpole
           call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood electrostatic energy
 c
@@ -516,6 +513,8 @@ c
 c     correct solvation energy for vacuum to polarized state
 c
       if (use_polar) then
+         call ediff
+      else if (.not.use_mpole .and. .not.use_polar) then
          call ediff
       end if
       return
@@ -1365,62 +1364,62 @@ c     zero out the nonpolar implicit solvation energy terms
 c
       ecav = 0.0d0
       edisp = 0.0d0
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aesurf(n))
-c
-c     compute SASA and effective radius needed for cavity term
-c
-      exclude = 1.4d0
-      call surface (esurf,aesurf,rcav,asolv,exclude)
-      reff = 0.5d0 * sqrt(esurf/(pi*surften))
-      reff2 = reff * reff
-      reff3 = reff2 * reff
-      reff4 = reff3 * reff
-      reff5 = reff4 * reff
-c
-c     compute solvent excluded volume needed for small solutes
-c
-      if (reff .lt. spoff) then
-         call volume (evol,rcav,exclude)
-         evol = evol * solvprs
-      end if
-c
-c     include full solvent excluded volume
-c
-      if (reff .le. spcut) then
-         ecav = evol
-c
-c     include a tapered volume term
-c
-      else if (reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = evol * taper
-      end if
-c
-c     include a full SASA-based term
-c
-      if (reff .gt. stcut) then
-         ecav = esurf
-c
-c     include a tapered SASA term
-c
-      else if (reff .gt. stoff) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = ecav + taper*esurf
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aesurf)
+cc
+cc     perform dynamic allocation of some local arrays
+cc
+c      allocate (aesurf(n))
+cc
+cc     compute SASA and effective radius needed for cavity term
+cc
+c      exclude = 1.4d0
+c      call surface (esurf,aesurf,rcav,asolv,exclude)
+c      reff = 0.5d0 * sqrt(esurf/(pi*surften))
+c      reff2 = reff * reff
+c      reff3 = reff2 * reff
+c      reff4 = reff3 * reff
+c      reff5 = reff4 * reff
+cc
+cc     compute solvent excluded volume needed for small solutes
+cc
+c      if (reff .lt. spoff) then
+c         call volume (evol,rcav,exclude)
+c         evol = evol * solvprs
+c      end if
+cc
+cc     include full solvent excluded volume
+cc
+c      if (reff .le. spcut) then
+c         ecav = evol
+cc
+cc     include a tapered volume term
+cc
+c      else if (reff .le. spoff) then
+c         mode = 'GKV'
+c         call switch (mode)
+c         taper = c5*reff5 + c4*reff4 + c3*reff3
+c     &              + c2*reff2 + c1*reff + c0
+c         ecav = evol * taper
+c      end if
+cc
+cc     include a full SASA-based term
+cc
+c      if (reff .gt. stcut) then
+c         ecav = esurf
+cc
+cc     include a tapered SASA term
+cc
+c      else if (reff .gt. stoff) then
+c         mode = 'GKSA'
+c         call switch (mode)
+c         taper = c5*reff5 + c4*reff4 + c3*reff3
+c     &              + c2*reff2 + c1*reff + c0
+c         taper = 1.0d0 - taper
+c         ecav = ecav + taper*esurf
+c      end if
+cc
+cc     perform deallocation of some local arrays
+cc
+c      deallocate (aesurf)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c

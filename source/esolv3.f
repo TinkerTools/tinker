@@ -646,9 +646,6 @@ c
          call chkpole
          call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood energy and analysis
 c
@@ -657,6 +654,8 @@ c
 c     correct solvation energy for vacuum to polarized state
 c
       if (use_polar) then
+         call ediff3
+      else if (.not.use_mpole .and. .not.use_polar) then
          call ediff3
       end if
       return
@@ -1564,75 +1563,75 @@ c
          aecav(i) = 0.0d0
          aedisp(i) = 0.0d0
       end do
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aesurf(n))
-c
-c     compute SASA and effective radius needed for cavity term
-c
-      exclude = 1.4d0
-      call surface (esurf,aesurf,rcav,asolv,exclude)
-      reff = 0.5d0 * sqrt(esurf/(pi*surften))
-      reff2 = reff * reff
-      reff3 = reff2 * reff
-      reff4 = reff3 * reff
-      reff5 = reff4 * reff
-c
-c     compute solvent excluded volume needed for small solutes
-c
-      if (reff .lt. spoff) then
-         call volume (evol,rcav,exclude)
-         evol = evol * solvprs
-         aevol = evol / dble(n)
-      end if
-c
-c     include the full SEV term
-c
-      if (reff .le. spcut) then
-         ecav = evol
-         do i = 1, n
-            aecav(i) = aevol
-         end do
-c
-c     include a tapered SEV term
-c
-      else if (reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
-         do i = 1, n
-            aecav(i) = taper * aevol
-         end do
-      end if
-c
-c     include a full SASA term
-c
-      if (reff .gt. stcut) then
-         ecav = esurf
-         do i = 1, n
-            aecav(i) = aesurf(i)
-         end do
-c
-c     include a tapered SASA term
-c
-      else if (reff .gt. stoff) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = ecav + taper*esurf
-         do i = 1, n
-            aecav(i) = taper * (aevol+aesurf(i))
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aesurf)
+cc
+cc     perform dynamic allocation of some local arrays
+cc
+c      allocate (aesurf(n))
+cc
+cc     compute SASA and effective radius needed for cavity term
+cc
+c      exclude = 1.4d0
+c      call surface (esurf,aesurf,rcav,asolv,exclude)
+c      reff = 0.5d0 * sqrt(esurf/(pi*surften))
+c      reff2 = reff * reff
+c      reff3 = reff2 * reff
+c      reff4 = reff3 * reff
+c      reff5 = reff4 * reff
+cc
+cc     compute solvent excluded volume needed for small solutes
+cc
+c      if (reff .lt. spoff) then
+c         call volume (evol,rcav,exclude)
+c         evol = evol * solvprs
+c         aevol = evol / dble(n)
+c      end if
+cc
+cc     include the full SEV term
+cc
+c      if (reff .le. spcut) then
+c         ecav = evol
+c         do i = 1, n
+c            aecav(i) = aevol
+c         end do
+cc
+cc     include a tapered SEV term
+cc
+c      else if (reff .le. spoff) then
+c         mode = 'GKV'
+c         call switch (mode)
+c         taper = c5*reff5 + c4*reff4 + c3*reff3
+c     &              + c2*reff2 + c1*reff + c0
+c         ecav = taper * evol
+c         do i = 1, n
+c            aecav(i) = taper * aevol
+c         end do
+c      end if
+cc
+cc     include a full SASA term
+cc
+c      if (reff .gt. stcut) then
+c         ecav = esurf
+c         do i = 1, n
+c            aecav(i) = aesurf(i)
+c         end do
+cc
+cc     include a tapered SASA term
+cc
+c      else if (reff .gt. stoff) then
+c         mode = 'GKSA'
+c         call switch (mode)
+c         taper = c5*reff5 + c4*reff4 + c3*reff3
+c     &              + c2*reff2 + c1*reff + c0
+c         taper = 1.0d0 - taper
+c         ecav = ecav + taper*esurf
+c         do i = 1, n
+c            aecav(i) = taper * (aevol+aesurf(i))
+c         end do
+c      end if
+cc
+cc     perform deallocation of some local arrays
+cc
+c      deallocate (aesurf)
 c
 c     find the implicit dispersion solvation energy
 c
@@ -1653,6 +1652,70 @@ c     "ewca3" find the Weeks-Chandler-Andersen dispersion energy
 c     of a solute; also partitions the energy among the atoms
 c
 c
+      subroutine pairewca (r, r2, rio, rmixo, rmixo7, sk, sk2, aoi,
+     &                     emixo, sum, ifo)
+      use math
+      real*8 rio, r, sk, rmax, lik, lik2, lik3, lik4, uik, uik2, uik3
+      real*8 uik4, term, iwca, sum
+      real*8 r2, sk2, rmixo, emixo, uik5, uik10, uik11, uik12, lik5
+      real*8 lik10, lik11, lik12, idisp, aoi, rmixo7, irepl
+      logical ifo
+      sum = 0.0d0
+      if (ifo) then
+         scale = 1.0d0
+      else
+         scale = 2.0d0
+      end if
+      if (rio .lt. r+sk) then
+         rmax = max(rio,r-sk)
+         lik = rmax
+         if (lik .lt. rmixo) then
+            lik2 = lik * lik
+            lik3 = lik2 * lik
+            lik4 = lik3 * lik
+            uik = min(r+sk,rmixo)
+            uik2 = uik * uik
+            uik3 = uik2 * uik
+            uik4 = uik3 * uik
+            term = 4.0d0 * pi / (48.0d0*r)
+     &                     * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
+     &                           + 6.0d0*(r2-sk2)*(lik2-uik2))
+            iwca = -emixo * term
+            sum = sum + iwca
+         end if
+         uik = r + sk
+         if (uik .gt. rmixo) then
+            uik2 = uik * uik
+            uik3 = uik2 * uik
+            uik4 = uik3 * uik
+            uik5 = uik4 * uik
+            uik10 = uik5 * uik5
+            uik11 = uik10 * uik
+            uik12 = uik11 * uik
+            lik = max(rmax,rmixo)
+            lik2 = lik * lik
+            lik3 = lik2 * lik
+            lik4 = lik3 * lik
+            lik5 = lik4 * lik
+            lik10 = lik5 * lik5
+            lik11 = lik10 * lik
+            lik12 = lik11 * lik
+            term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
+     &                       * (15.0d0*uik*lik*r*(uik4-lik4)
+     &                          - 10.0d0*uik2*lik2*(uik3-lik3)
+     &                          + 6.0d0*(sk2-r2)*(uik5-lik5))
+            idisp = -2.0d0 * aoi * term
+            term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
+     &                       * (120.0d0*uik*lik*r*(uik11-lik11)
+     &                          - 66.0d0*uik2*lik2*(uik10-lik10)
+     &                          + 55.0d0*(sk2-r2)*(uik12-lik12))
+            irepl = aoi * rmixo7 * term
+            sum = sum + irepl + idisp
+         end if
+      end if
+      sum = sum * scale
+      return
+      end
       subroutine ewca3 (edisp,aedisp)
       use atoms
       use atomid
@@ -1669,18 +1732,23 @@ c
       real*8 edisp
       real*8 e,idisp
       real*8 xi,yi,zi
-      real*8 rk,sk,sk2
+      real*8 si,si2
+      real*8 sk,sk2
       real*8 xr,yr,zr,r,r2
-      real*8 sum,term,iwca,irepl
-      real*8 epsi,rmini,rio,rih,rmax
-      real*8 ao,emixo,rmixo,rmixo7
-      real*8 ah,emixh,rmixh,rmixh7
+      real*8 sum1,sum2,term,iwca,irepl
+      real*8 epsi,rmin,rio,rih,rmax
+      real*8 aoi,emixo,rmixo,rmixo7
+      real*8 ahi,emixh,rmixh,rmixh7
+      real*8 epsk,rmkn,rko,rkh
+      real*8 aok,emkxo,rmkxo,rmkxo7
+      real*8 ahk,emkxh,rmkxh,rmkxh7
       real*8 lik,lik2,lik3,lik4
       real*8 lik5,lik10,lik11,lik12
       real*8 uik,uik2,uik3,uik4
-      real*8 uik5,uik10,uik11,uik12
+      real*8 uik5,uik10,uik11,uik12,blank
       real*8 aedisp(*)
       real*8, allocatable :: aedispo(:)
+      real*8, allocatable :: edisparray(:)
 c
 c
 c     zero out the WCA dispersion energy and partitioning
@@ -1699,160 +1767,90 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aedispo(n))
+      allocate (edisparray(n))
 c
 c     transfer global to local copies for OpenMP calculation
 c
       do i = 1, n
          aedispo(i) = aedisp(i)
+         edisparray(i) = 0.0d0
       end do
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,x,y,z,cdisp)
-!$OMP& shared(edisp,aedispo)
-!$OMP DO reduction(+:edisp,aedispo) schedule(guided)
+!$OMP PARALLEL default(private) shared(n,epsvdw,
+!$OMP& radvdw,x,y,z,cdisp)
+!$OMP& shared(edisparray,aedispo)
+!$OMP DO reduction(+:edisparray,aedispo) schedule(guided)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
-      do i = 1, n
-         epsi = eps(class(i))
-         rmini = rad(class(i))
+      do i = 1, n-1
+         epsi = epsvdw(i)
+         rmin = radvdw(i)
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
-         rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
+         rmixo = 2.0d0 * (rmino**3+rmin**3) / (rmino**2+rmin**2)
          rmixo7 = rmixo**7
-         ao = emixo * rmixo7
+         aoi = emixo * rmixo7
          emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
-         rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
+         rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
          rmixh7 = rmixh**7
-         ah = emixh * rmixh7
+         ahi = emixh * rmixh7
          xi = x(i)
          yi = y(i)
          zi = z(i)
          rio = rmixo / 2.0d0 + dispoff
          rih = rmixh / 2.0d0 + dispoff
+         si = rmin * shctd
+         si2 = si * si
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
-         sum = 0.0d0
-         do k = 1, n
-            if (i .ne. k) then
-               xr = x(k) - xi
-               yr = y(k) - yi
-               zr = z(k) - zi
-               r2 = xr*xr + yr*yr + zr*zr
-               r = sqrt(r2)
-               rk = rad(class(k))
-               sk = rk * shctd
-               sk2 = sk * sk
-               if (rio .lt. r+sk) then
-                  rmax = max(rio,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixo) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixo)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -emixo * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixo) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     lik = max(rmax,rmixo)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     idisp = -2.0d0 * ao * term
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     irepl = ao * rmixo7 * term
-                     sum = sum + irepl + idisp
-                  end if
-               end if
-               if (rih .lt. r+sk) then
-                  rmax = max(rih,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixh) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixh)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -2.0d0 * emixh * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixh) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     lik = max(rmax,rmixh)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     idisp = -4.0d0 * ah * term
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     irepl = 2.0d0 * ah * rmixh7 * term
-                     sum = sum + irepl + idisp
-                  end if
-               end if
-            end if
+         do k = i+1, n
+            epsk = epsvdw(k)
+            rmkn = radvdw(k)
+            emkxo = 4.0d0*epso * epsk / ((sqrt(epso)+sqrt(epsk))**2)
+            rmkxo = 2.0d0 * (rmino**3+rmkn**3) / (rmino**2+rmkn**2)
+            rmkxo7 = rmkxo**7
+            aok = emkxo * rmkxo7
+            emkxh = 4.0d0*epsh * epsk / ((sqrt(epsh)+sqrt(epsk))**2)
+            rmkxh = 2.0d0 * (rminh**3+rmkn**3) / (rminh**2+rmkn**2)
+            rmkxh7 = rmkxh**7
+            ahk = emkxh * rmkxh7
+            rko = rmkxo / 2.0d0 + dispoff
+            rkh = rmkxh / 2.0d0 + dispoff
+            sk = rmkn * shctd
+            sk2 = sk * sk
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
+            r2 = xr*xr + yr*yr + zr*zr
+            r = sqrt(r2)
+            call pairewca (r,r2,rio,rmixo,rmixo7,sk,sk2,aoi,emixo,sum1,
+     &                     .true.)
+            call pairewca (r,r2,rih,rmixh,rmixh7,sk,sk2,ahi,emixh,sum2,
+     &                     .false.)
+            edisparray(i) = edisparray(i) + sum1 + sum2
+            call pairewca (r,r2,rko,rmkxo,rmkxo7,si,si2,aok,emkxo,sum1,
+     &                     .true.)
+            call pairewca (r,r2,rkh,rmkxh,rmkxh7,si,si2,ahk,emkxh,sum2,
+     &                     .false.)
+            edisparray(k) = edisparray(k) + sum1 + sum2
          end do
-c
-c     increment the overall dispersion energy component
-c
-         e = cdisp(i) - slevy*awater*sum
-         edisp = edisp + e
-         aedispo(i) = e
       end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
+c
+c     increment the overall dispersion energy component
+c
+      do i = 1, n
+         e = cdisp(i) - slevy*awater*edisparray(i)
+         edisp = edisp + e
+         aedispo(i) = e
+      end do
 c
 c     transfer local to global copies for OpenMP calculation
 c

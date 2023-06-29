@@ -300,7 +300,6 @@ c
          do i = 1, n
             rborni = rborn(i) + 1.0d0/roff(i)
             rborn(i) = 1.0d0 / rborni
-            print*, "implicitsolvent", rborn(i)
          end do
 c
 c     get the Born radii via the Onufriev-Bashford-Case method
@@ -369,7 +368,6 @@ c
             rborn(i) = 1.0d0 / rborni
             tchain = roi * (alpha-2.0d0*beta*sum+3.0d0*gamma*sum2)
             drobc(i) = (1.0d0-tsum*tsum) * tchain / rsi
-            print*, "implicitsolvent", rborn(i)
          end do
 c
 c     get the Born radii via Grycuk's modified HCT method
@@ -386,6 +384,7 @@ c
             zi = z(i)
             shcti = shct(i)
             rmi = max(rsi,rdi)
+            si = rdi * shcti
             do k = i+1, n
                rsk = rsolv(k)
                rdk = rdescr(k)
@@ -396,69 +395,66 @@ c
                r = sqrt(r2)
                shctk = shct(k)
                rmk = max(rsk,rdk)
-               computei = rsi.gt.0.0d0 .and. rdk.gt.0.0d0
-               computek = rdi.gt.0.0d0 .and. rsk.gt.0.0d0
+               sk = rdk * shctk
+               computei = (rsi.gt.0.0d0) .and. (rdk.gt.0.0d0) .and. 
+     &                    (rmi.lt.r+sk)
+               computek = (rdi.gt.0.0d0) .and. (rsk.gt.0.0d0) .and. 
+     &                    (rmk.lt.r+si)
                if (computei) then
-                  sk = rdk * shctk
-                  if (rmi .lt. r+sk) then
-                     sk2 = sk * sk
-                     rborni = 0.0d0
-                     if (rmi+r .lt. sk) then
-                        lik = rmi
-                        uik = sk - r
-                        rborni = 1.0d0/uik**3-1.0d0/lik**3
-                     end if
-                     uik = r + sk
-                     if (rmi+r .lt. sk) then
-                        lik = sk - r
-                     else if (r .lt. rmi+sk) then
-                        lik = rmi
-                     else
-                        lik = r - sk
-                     end if
-                     l2 = lik * lik
-                     l4 = l2 * l2
-                     lr = lik * r
-                     l4r = l4 * r
-                     u2 = uik * uik
-                     u4 = u2 * u2
-                     ur = uik * r
-                     u4r = u4 * r
-                     term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
-     &                      - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
-                     rborn(i) = rborn(i) + rborni - term/16.0d0
+                  sk2 = sk * sk
+                  rborni = 0.0d0
+                  if (rmi+r .lt. sk) then
+                     lik = rmi
+                     uik = sk - r
+                     rborni = 1.0d0/uik**3-1.0d0/lik**3
                   end if
+                  uik = r + sk
+                  if (rmi+r .lt. sk) then
+                     lik = sk - r
+                  else if (r .lt. rmi+sk) then
+                     lik = rmi
+                  else
+                     lik = r - sk
+                  end if
+                  l2 = lik * lik
+                  l4 = l2 * l2
+                  lr = lik * r
+                  l4r = l4 * r
+                  u2 = uik * uik
+                  u4 = u2 * u2
+                  ur = uik * r
+                  u4r = u4 * r
+                  term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
+     &                 - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
+                  rborn(i) = rborn(i) + rborni - term/16.0d0
                end if
                if (computek) then
-                  si = rdi * shcti
-                  if (rmk .lt. r+si) then
-                     si2 = si * si
-                     rbornk = 0.0d0
-                     if (rmk+r .lt. si) then
-                        lik = rmk
-                        uik = si - r
-                        rbornk = 1.0d0/uik**3-1.0d0/lik**3
-                     end if
-                     uik = r + si
-                     if (rmk+r .lt. si) then
-                        lik = si - r
-                     else if (r .lt. rmk+si) then
-                        lik = rmk
-                     else
-                        lik = r - si
-                     end if
-                     l2 = lik * lik
-                     l4 = l2 * l2
-                     lr = lik * r
-                     l4r = l4 * r
-                     u2 = uik * uik
-                     u4 = u2 * u2
-                     ur = uik * r
-                     u4r = u4 * r
-                     term = (3.0d0*(r2-si2)+6.0d0*u2-8.0d0*ur)/u4r
-     &                      - (3.0d0*(r2-si2)+6.0d0*l2-8.0d0*lr)/l4r
-                     rborn(k) = rborn(k) + rbornk - term/16.0d0
+                  si2 = si * si
+                  rbornk = 0.0d0
+                  if (rmk+r .lt. si) then
+                     lik = rmk
+                     uik = si - r
+                     rbornk = 1.0d0/uik**3-1.0d0/lik**3
                   end if
+                  uik = r + si
+                  if (rmk+r .lt. si) then
+                     lik = si - r
+                  else if (r .lt. rmk+si) then
+                     lik = rmk
+                  else
+                     lik = r - si
+                  end if
+                  l2 = lik * lik
+                  l4 = l2 * l2
+                  lr = lik * r
+                  l4r = l4 * r
+                  u2 = uik * uik
+                  u4 = u2 * u2
+                  ur = uik * r
+                  u4r = u4 * r
+                  term = (3.0d0*(r2-si2)+6.0d0*u2-8.0d0*ur)/u4r
+     &                 - (3.0d0*(r2-si2)+6.0d0*l2-8.0d0*lr)/l4r
+                  rborn(k) = rborn(k) + rbornk - term/16.0d0
                end if
             end do
          end do
@@ -469,7 +465,6 @@ c
                if (rborni .le. 0.0d0)  rborni = 0.0001d0
                rborn(i) = 1.0d0 / rborni
             end if
-            print*, "implicitsolvent", rborn(i)
          end do
 c
 c     get the Born radii via analytical continuum electrostatics
@@ -662,6 +657,41 @@ c
       end
 c
 c
+c
+      subroutine pair_dgrycuk (r,r2,ri,sk,de,drbi,drbpi,term,use_gk)
+      use math
+      implicit none
+      real*8 r,r2,ri,sk,de
+      real*8 drbi,drbpi,term
+      real*8 sk2
+      real*8 uik,lik
+      real*8 dbr,dborn
+      logical use_gk
+      sk2 = sk * sk
+      if (ri+r .lt. sk) then
+         uik = sk - r
+         de = -4.0d0 * pi / uik**4
+      end if
+      if (ri+r .lt. sk) then
+         lik = sk - r
+         de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+17.0d0*r2) / (r2*lik**4)
+      else if (r .lt. ri+sk) then
+         lik = ri
+         de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2) / (r2*lik**4)
+      else
+         lik = r - sk
+         de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2) / (r2*lik**4)
+      end if
+      uik = r + sk
+      de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2) / (r2*uik**4)
+      dbr = term * de/r
+      dborn = drbi
+      if (use_gk)  dborn = dborn + drbpi
+      de = dbr * dborn
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine born1  --  Born radii chain rule derivatives  ##
@@ -697,20 +727,25 @@ c
       real*8 sinq,theta
       real*8 factor,term
       real*8 rb2,ri,rk
+      real*8 si,si2
       real*8 sk,sk2
       real*8 lik,lik2,lik3
       real*8 uik,uik2,uik3
       real*8 dlik,duik
       real*8 t1,t2,t3
       real*8 rbi,rbi2,vi
+      real*8 rbk
       real*8 ws2,s2ik,uik4
       real*8 dbr,dborn,pi43
       real*8 expterm,rusum
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 rsi,rdi,shcti,rmi,termi,drbi,drbpi,dei
+      real*8 rsk,rdk,shctk,rmk,termk,drbk,drbpk,dek
       real*8, allocatable :: roff(:)
       logical use_gk
+      logical computei,computek
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -956,86 +991,74 @@ c
 c     get Born radius chain rule components for Grycuk's HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
-         pi43 = 4.0d0 * third * pi
-         factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
-         do i = 1, n
-            ri = max(rsolv(i),rdescr(i))
-            if (ri .gt. 0.0d0) then
-               xi = x(i)
-               yi = y(i)
-               zi = z(i)
-               term = pi43 / rborn(i)**3.0d0
-               term = factor / term**(4.0d0*third)
-               do k = 1, n
-                  rk = rdescr(k)
-                  if (k.ne.i .and. rk.gt.0.0d0) then
-                     xr = x(k) - xi
-                     yr = y(k) - yi
-                     zr = z(k) - zi
-                     r2 = xr**2 + yr**2 + zr**2
-                     r = sqrt(r2)
-                     sk = rk * shct(k)
-                     if (ri .lt. r+sk) then
-                        sk2 = sk * sk
-                        de = 0.0d0
-                        if (ri+r .lt. sk) then
-                           uik = sk - r
-                           de = -4.0d0 * pi / uik**4
-                        end if
-                        if (ri+r .lt. sk) then
-                           lik = sk - r
-                           de = de + 0.25d0*pi*(sk2-4.0d0*sk*r
-     &                                  +17.0d0*r2) / (r2*lik**4)
-                        else if (r .lt. ri+sk) then
-                           lik = ri
-                           de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2)
-     &                                  / (r2*lik**4)
-                        else
-                           lik = r - sk
-                           de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2)
-     &                                  / (r2*lik**4)
-                        end if
-                        uik = r + sk
-                        de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
-     &                               / (r2*uik**4)
-                        dbr = term * de/r
-                        dborn = drb(i)
-                        if (use_gk)  dborn = dborn + drbp(i)
-                        de = dbr * dborn
-c
-c     increment the overall permanent solvation derivatives
-c
-                        dedx = de * xr
-                        dedy = de * yr
-                        dedz = de * zr
-                        des(1,i) = des(1,i) + dedx
-                        des(2,i) = des(2,i) + dedy
-                        des(3,i) = des(3,i) + dedz
-                        des(1,k) = des(1,k) - dedx
-                        des(2,k) = des(2,k) - dedy
-                        des(3,k) = des(3,k) - dedz
-c
-c     increment the internal virial tensor components
-c
-                        vxx = xr * dedx
-                        vyx = yr * dedx
-                        vzx = zr * dedx
-                        vyy = yr * dedy
-                        vzy = zr * dedy
-                        vzz = zr * dedz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vyx
-                        vir(3,1) = vir(3,1) + vzx
-                        vir(1,2) = vir(1,2) + vyx
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vzy
-                        vir(1,3) = vir(1,3) + vzx
-                        vir(2,3) = vir(2,3) + vzy
-                        vir(3,3) = vir(3,3) + vzz
-                     end if
-                  end if
-               end do
-            end if
+         do i = 1, n-1
+            rsi = rsolv(i)
+            rdi = rdescr(i)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            shcti = shct(i)
+            rmi = max(rsi,rdi)
+            rbi = rborn(i)
+            si = rdi * shcti
+            termi = -rbi**4.0d0 / (4.0d0 * pi)
+            drbi = drb(i)
+            drbpi = drbp(i)
+            do k = i+1, n
+               rsk = rsolv(k)
+               rdk = rdescr(k)
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               r2 = xr**2 + yr**2 + zr**2
+               r = sqrt(r2)
+               shctk = shct(k)
+               rmk = max(rsk,rdk)
+               rbk = rborn(k)
+               sk = rdk * shctk
+               termk = -rbk**4.0d0 / (4.0d0 * pi)
+               drbk = drb(k)
+               drbpk = drbp(k)
+               computei = (rmi.gt.0.0d0) .and. (rdk.gt.0.0d0) .and.
+     &                    (rmi.lt.r+sk)
+               computek = (rmk.gt.0.0d0) .and. (rdi.gt.0.0d0) .and.
+     &                    (rmk.lt.r+si)
+               dei = 0.0d0
+               dek = 0.0d0
+               if (computei) then
+                  call pair_dgrycuk (r,r2, rmi,sk,dei,drbi,drbpi,termi,
+     &                               use_gk)
+               end if
+               if (computek) then
+                  call pair_dgrycuk (r,r2, rmk,si,dek,drbk,drbpk,termk,
+     &                               use_gk)
+               end if
+               de = dei + dek
+               dedx = de * xr
+               dedy = de * yr
+               dedz = de * zr
+               des(1,i) = des(1,i) + dedx
+               des(2,i) = des(2,i) + dedy
+               des(3,i) = des(3,i) + dedz
+               des(1,k) = des(1,k) - dedx
+               des(2,k) = des(2,k) - dedy
+               des(3,k) = des(3,k) - dedz
+               vxx = xr * dedx
+               vyx = yr * dedx
+               vzx = zr * dedx
+               vyy = yr * dedy
+               vzy = zr * dedy
+               vzz = zr * dedz
+               vir(1,1) = vir(1,1) + vxx
+               vir(2,1) = vir(2,1) + vyx
+               vir(3,1) = vir(3,1) + vzx
+               vir(1,2) = vir(1,2) + vyx
+               vir(2,2) = vir(2,2) + vyy
+               vir(3,2) = vir(3,2) + vzy
+               vir(1,3) = vir(1,3) + vzx
+               vir(2,3) = vir(2,3) + vzy
+               vir(3,3) = vir(3,3) + vzz
+            end do
          end do
 c
 c     get Born radius chain rule components for the ACE method

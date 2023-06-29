@@ -1166,6 +1166,8 @@ c
       if (allocated(mvdw))  deallocate (mvdw)
       if (allocated(ired))  deallocate (ired)
       if (allocated(kred))  deallocate (kred)
+      if (allocated(radvdw))  deallocate (radvdw)
+      if (allocated(epsvdw))  deallocate (epsvdw)
       if (allocated(radmin))  deallocate (radmin)
       if (allocated(epsilon))  deallocate (epsilon)
       if (allocated(radmin4))  deallocate (radmin4)

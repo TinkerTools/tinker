@@ -21,6 +21,8 @@ c     kred       value of reduction factor parameter for each atom
 c     xred       reduced x-coordinate for each atom in the system
 c     yred       reduced y-coordinate for each atom in the system
 c     zred       reduced z-coordinate for each atom in the system
+c     radvdw     van der Waals radius for each atom in the system
+c     epsvdw     van der Waals well depth for each atom in the system
 c     radmin     minimum energy distance for each atom class pair
 c     epsilon    well depth parameter for each atom class pair
 c     radmin4    minimum energy distance for 1-4 interaction pairs
@@ -40,6 +42,8 @@ c
       real*8, allocatable :: xred(:)
       real*8, allocatable :: yred(:)
       real*8, allocatable :: zred(:)
+      real*8, allocatable :: radvdw(:)
+      real*8, allocatable :: epsvdw(:)
       real*8, allocatable :: radmin(:,:)
       real*8, allocatable :: epsilon(:,:)
       real*8, allocatable :: radmin4(:,:)
