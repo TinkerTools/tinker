@@ -211,7 +211,9 @@ eurey2.o \
 eurey3.o \
 evcorr.o \
 ewald.o \
+exfield.o \
 expol.o \
+extfld.o \
 extra.o \
 extra1.o \
 extra2.o \

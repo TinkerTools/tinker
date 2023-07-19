@@ -51,6 +51,7 @@ gfortran -c -Ofast -mavx -fopenmp dsppot.f
 gfortran -c -Ofast -mavx -fopenmp energi.f
 gfortran -c -Ofast -mavx -fopenmp ewald.f
 gfortran -c -Ofast -mavx -fopenmp expol.f
+gfortran -c -Ofast -mavx -fopenmp extfld.f
 gfortran -c -Ofast -mavx -fopenmp faces.f
 gfortran -c -Ofast -mavx -fopenmp fft.f
 gfortran -c -Ofast -mavx -fopenmp fields.f
@@ -363,6 +364,7 @@ gfortran -c -Ofast -mavx -fopenmp eurey1.f
 gfortran -c -Ofast -mavx -fopenmp eurey2.f
 gfortran -c -Ofast -mavx -fopenmp eurey3.f
 gfortran -c -Ofast -mavx -fopenmp evcorr.f
+gfortran -c -Ofast -mavx -fopenmp exfield.f
 gfortran -c -Ofast -mavx -fopenmp extra.f
 gfortran -c -Ofast -mavx -fopenmp extra1.f
 gfortran -c -Ofast -mavx -fopenmp extra2.f
