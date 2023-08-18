@@ -27,13 +27,14 @@ c
       use math
       use ptable
       use usage
+      use gaussvolmodule
       implicit none
       integer i,ixyz,next
       integer mode,frame
       integer freeunit
-      real*8 volume,area
+      real*8 volume,area,energy,volume2
       real*8 random,value
-      real*8 probe,exclude
+      real*8 probe,exclude,rad_offset
       real*8, allocatable :: radius(:)
       logical exist,query
       character*1 answer
@@ -41,6 +42,13 @@ c
       character*240 record
       character*240 string
       external random
+      type(GaussVol) gvol
+      integer, allocatable :: ishydrogen(:)
+      real*8, allocatable :: pos(:,:)
+      real*8, allocatable :: vol(:), radius2(:), vol2(:)
+      real*8, allocatable :: dr(:,:)
+      real*8, allocatable :: dv(:), free_volume(:)
+      real*8, allocatable :: self_volume(:)
 c
 c
 c     get the Cartesian coordinates for the system
@@ -149,16 +157,39 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (radius(n))
+      allocate (radius2(n))
+      allocate (ishydrogen(n))
+      allocate (pos(3,n))
+      allocate (vol(n))
+      allocate (vol2(n))
+      allocate (dr(3,n))
+      allocate (dv(n))
+      allocate (free_volume(n))
+      allocate (self_volume(n))
+      do i = 1, n
+         ishydrogen(i) = 0
+         if (atomic(i) .eq. 1)  ishydrogen(i) = 1
+         pos(1,i) = x(i)
+         pos(2,i) = y(i)
+         pos(3,i) = z(i)
+      end do
 c
 c     set atomic radii based on force field or Bondi values
 c
+      rad_offset = 0.005d0
       do i = 1, n
          if (use(i)) then
             radius(i) = rad(class(i))
+            vol(i) = 4.0d0/3.0d0*PI*radius(i)**3
+            radius2(i) = rad(class(i)) + rad_offset
+            vol2(i) = 4.0d0/3.0d0*PI*radius2(i)**3
 c           radius(i) = rad(class(i)) / twosix
 c           radius(i) = vdwrad(atomic(i))
          else
             radius(i) = 0.0d0
+            vol(i) = 0.0d0
+            radius2(i) = 0.0d0
+            vol2(i) = 0.0d0
          end if
       end do
 c
@@ -171,6 +202,23 @@ c
       open (unit=ixyz,file=xyzfile,status ='old')
       rewind (unit=ixyz)
       call readxyz (ixyz)
+c
+c     Init GaussVol
+c
+      call gvol%init(n, ishydrogen)
+      call gvol%setRadii(radius)
+      call gvol%setVolumes(vol)
+      call gvol%compute_tree(pos)
+c     call gvol%GaussVol_print_tree()
+      call gvol%compute_volume(pos, volume, energy, dr, dv,
+     &      free_volume, self_volume)
+      write(*,*) "GaussVol Volume:  ", volume
+      call gvol%setRadii(radius2)
+      call gvol%setVolumes(vol2)
+      call gvol%rescan_tree_volumes(pos)
+      call gvol%compute_volume(pos, volume2, energy, dr, dv,
+     &      free_volume, self_volume)
+      write(*,*) "GaussVol Area:    ", (volume2 - volume)/rad_offset
 c
 c     get area and volume for successive coordinate structures
 c

@@ -101,7 +101,7 @@ endif
 ifeq ($(use_gfortran__), true)
   ifeq ($(os__), Linux)
     ifeq ($(opt), release)
-      OPTFLAGS := -Ofast -msse3 -fopenmp
+      OPTFLAGS := -Ofast -fopenmp
     else ifeq ($(opt), profile)
       OPTFLAGS :=
     else
@@ -119,7 +119,7 @@ ifeq ($(use_gfortran__), true)
 
   ifeq ($(os__), Darwin)
     ifeq ($(opt), release)
-      OPTFLAGS := -Ofast -mssse3 -fopenmp
+      OPTFLAGS := -Ofast -fopenmp
     else ifeq ($(opt), profile)
       OPTFLAGS :=
     else
@@ -137,7 +137,7 @@ ifeq ($(use_gfortran__), true)
 
   ifeq ($(shell echo $(os__) | cut -c 1-9), CYGWIN_NT)
     ifeq ($(opt), release)
-      OPTFLAGS := -Ofast -msse3 -fopenmp
+      OPTFLAGS := -Ofast -fopenmp
     else ifeq ($(opt), profile)
       OPTFLAGS :=
     else
