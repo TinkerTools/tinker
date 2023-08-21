@@ -1,5 +1,5 @@
       module gaussianvcamodule
-        use gaussvolconst
+        use constantsmodule
         use math
         type :: GaussianVca
           real*8 :: v ! Gaussian volume
@@ -55,7 +55,7 @@
           g12%a = a12
           g12%v = gvol
 
-          s = pol_switchfunc(gvol, VOLMINA, VOLMINB, sp)
+          s = pol_switchfunc(gvol, volmina, volminb, sp)
           sfp = sp * gvol + s
           dVdr = dgvol
           dVdV = dgvolv
@@ -71,6 +71,8 @@
         real*8, intent(out) :: sp
         real*8 :: swf, swfp, swd, swu, swu2, swu3, s
 
+        swf = 0.0d0
+        swfp = 1.0d0
         if (gvol > volminb) then
           swf = 1.0d0
           swfp = 0.0d0

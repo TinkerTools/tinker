@@ -16,7 +16,7 @@
           integer, dimension(:), allocatable :: ishydrogen
         contains
           ! Creates/Initializes a GaussVol instance
-          procedure, pass(this) :: init => GaussVol_init
+          procedure, pass(this) :: GaussVol_init
 
           ! Destructor
           procedure, pass(this) :: destroy
@@ -40,7 +40,6 @@
            class(GaussVol), intent(inout) :: this
            integer, intent(in) :: natoms
            integer, dimension(:), intent(in) :: ishydrogen
- 
            this%natoms = natoms
            call this%tree%create_GOverlap_Tree(natoms)
    
@@ -113,7 +112,7 @@
      &       this%volumes, this%gammas, this%ishydrogen)
         end subroutine compute_tree
 
-      ! Computes the volume, energy, and forces of the GaussVol
+        ! Computes the volume, energy, and forces of the GaussVol
         subroutine compute_volume(this, positions, volume, energy, 
      &     force, gradV, free_volume, self_volume)
           class(GaussVol), intent(inout) :: this
@@ -123,7 +122,6 @@
           real*8, dimension(:), intent(out) :: gradV, free_volume
           real*8, dimension(:), intent(out) :: self_volume
           integer :: ret
-
           ret = this%tree%compute_volume2_r(positions, volume, energy,
      &      force, gradV, free_volume, self_volume)
         end subroutine compute_volume
@@ -169,4 +167,4 @@
           call this%tree%print_tree()
         end subroutine GaussVol_print_tree
 
-      end module GaussVolModule
+      end module gaussvolmodule

@@ -1,5 +1,5 @@
       module goverlaptreemodule
-        use gaussvolconst
+        use constantsmodule
         use gaussianvcamodule
         use goverlapmodule
         use vectormodule
@@ -33,7 +33,7 @@
             integer, intent(in) :: natoms
 
             this%natoms = natoms
-            call this%overlaps%create_vector()  ! Use create_vector subroutine from VectorModule
+            call this%overlaps%create_vector()  ! Use create_vector subroutine from vectormodule
 
             ! The root is at index 0, atoms are at 1..natoms
             call this%overlaps%push_back(GOverlap(level=0,
@@ -77,13 +77,8 @@
           do iat = 1, this%natoms
             allocate(overlap)
             overlap%level = 1
-            a = KFC / (radius(iat) * radius(iat))
-            if (ishydrogen(iat) > 0) then
-              a = 0.0d0
-              vol = 0.0d0
-            else
-              vol = volume(iat)
-            end if
+            a = kfc / (radius(iat) * radius(iat))
+            vol = merge(0.0d0, volume(iat), ishydrogen(iat) > 0)
             overlap%g%v = vol
             overlap%g%a = a
             overlap%g%c = pos(:, iat)
@@ -174,7 +169,7 @@
             ret = 1 ! master root? can't compute children
             return
           end if
-          if (root%level >= MAX_ORDER) then
+          if (root%level >= max_order) then
             write(*,*) "Reached max level", root%level
             ret = 1
             return
@@ -207,9 +202,15 @@
             ov2 = overlaps%get_element(atom2)
             g2 = ov2%g
             gvol = ogauss_alpha(g1, g2, g12, dVdr, dVdV, sfp)
+            print*, "sfp, gvol", sfp, gvol
+            print*, "g1v g1a g1c",  g1%v, g1%a, g1%c(1),g1%c(2),g1%c(3)
+            print*, "g2v g2a g2c",  g2%v, g2%a, g2%c(1),g2%c(2),g2%c(3)
+            print*, "g12v g12a g12c",  g12%v, g12%a, g12%c(1), g12%c(2),
+     &                                                         g12%c(3)
+            print*, ""
 
             ! Create child if overlap volume is not zero
-            if (gvol > MIN_GVOL) then
+            if (gvol > min_gvol) then
               allocate(ov)
               ov%g = g12
               ov%volume = gvol
@@ -392,13 +393,15 @@
           integer :: ret, slot, i, j
           real*8 :: psi1i, f1i, psip1i, fp1i, energy1i, fenergy1i
           real*8, dimension(3) :: p1i, pp1i, penergy1i
-          real*8, dimension(3) :: zero3
 
           slot = 0
 
           ! Reset volumes, gradients
-          zero3 = [0.0d0, 0.0d0, 0.0d0]
-          dr = reshape(zero3, shape(dr))
+          do i = 1, this%natoms
+            dr(1,i) = 0.0d0
+            dr(2,i) = 0.0d0
+            dr(3,i) = 0.0d0
+          end do
           dv = 0.0d0
           free_volume = 0.0d0
           self_volume = 0.0d0
@@ -477,7 +480,7 @@
 
           do iat = 1, this%natoms
             ov = this%overlaps%get_element(iat)
-            a = KFC / (radius(iat) * radius(iat))
+            a = kfc / (radius(iat) * radius(iat))
             vol = merge(0.0d0, volume(iat), ishydrogen(iat) > 0)
             ov%level = 1
             ov%g%v = vol
@@ -558,9 +561,10 @@
         subroutine print_tree(this)
           class(GOverlap_Tree), intent(in) :: this
           integer :: i
-
-          write(*, '(A)', advance='no') "slot level LastAtom parent 
-     &      ChStart ChCount SelfV V gamma a x y z dedx dedy dedz sfp"
+          write(*, '(A)', advance='no') "      slot  level   Atom parent
+     & ChStart ChCount          V      gamma          a          v
+     &    x          y          z       dedx       dedy       dedz
+     &  sfp"
           write(*, '(A)', advance='no') new_line('A')
   
           call print_tree_r(this, 0)
@@ -578,7 +582,7 @@
 
           ov = this%overlaps%get_element(slot)
 
-          write(*, '(A,I6,A)', advance='no') "tg: ", slot, " "
+          write(*, '(A,I6,A)', advance='yes') "tg: ", slot, " "
           call ov%print_overlap()
 
           do i = ov%children_startindex, 

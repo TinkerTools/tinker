@@ -178,17 +178,17 @@ c     set atomic radii based on force field or Bondi values
 c
       rad_offset = 0.005d0
       do i = 1, n
+         radius(i) = rad(class(i))
+         radius2(i) = rad(class(i)) + rad_offset
+c         radius(i) = rad(class(i)) / twosix
+c         radius(i) = vdwrad(atomic(i))
+      end do
+      do i = 1, n
          if (use(i)) then
-            radius(i) = rad(class(i))
             vol(i) = 4.0d0/3.0d0*PI*radius(i)**3
-            radius2(i) = rad(class(i)) + rad_offset
             vol2(i) = 4.0d0/3.0d0*PI*radius2(i)**3
-c           radius(i) = rad(class(i)) / twosix
-c           radius(i) = vdwrad(atomic(i))
          else
-            radius(i) = 0.0d0
             vol(i) = 0.0d0
-            radius2(i) = 0.0d0
             vol2(i) = 0.0d0
          end if
       end do
@@ -205,11 +205,11 @@ c
 c
 c     Init GaussVol
 c
-      call gvol%init(n, ishydrogen)
+      call gvol%GaussVol_init(n, ishydrogen)
       call gvol%setRadii(radius)
       call gvol%setVolumes(vol)
       call gvol%compute_tree(pos)
-c     call gvol%GaussVol_print_tree()
+      call gvol%GaussVol_print_tree()
       call gvol%compute_volume(pos, volume, energy, dr, dv,
      &      free_volume, self_volume)
       write(*,*) "GaussVol Volume:  ", volume

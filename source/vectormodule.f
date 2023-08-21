@@ -120,7 +120,7 @@
           do j = low, high - 1
             temp1 = vec%get_element(j)
             temp2 = vec%get_element(pivot_index)
-            if (temp1%volume >= temp2%volume) then
+            if (temp1%volume < temp2%volume) then
               i = i + 1
               temp1 = vec%get_element(i)
               temp2 = vec%get_element(j)
