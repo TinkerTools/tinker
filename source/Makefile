@@ -259,8 +259,8 @@ LIBOBJS := action.o active.o align.o alterchg.o alterpol.o analysis.o \
  torque.o tors.o torsions.o tortor.o tree.o trimtext.o unitcell.o \
  units.o uprior.o urey.o urypot.o usage.o valfit.o vdw.o vdwpot.o \
  verlet.o version.o vibs.o virial.o volume.o warp.o xtals.o xyzatm.o \
- zatom.o zclose.o zcoord.o constantsmodule.o gaussianvcamodule.o \
- goverlapmodule.o vectormodule.o goverlaptreemodule.o gaussvolmodule.o \
+ zatom.o zclose.o zcoord.o gaussvolconst.o gaussianvcamodule.o \
+ goverlapmodule.o vectormodule.o goverlaptreemodule.o gaussvolmodule.o
 
 EXEOBJS := alchemy.o analyze.o anneal.o arcedit.o bar.o correlate.o \
  critical.o crystal.o diffuse.o distgeom.o document.o dynamic.o \
@@ -1160,9 +1160,9 @@ xyzpdb.o: atomid.o atoms.o couple.o fields.o files.o inform.o molcul.o pdb.o res
 zatom.o: angbnd.o atomid.o atoms.o bndstr.o fields.o iounit.o kangs.o katoms.o kbonds.o sizes.o zclose.o zcoord.o
 zclose.o: sizes.o
 zcoord.o: sizes.o
-constantsmodule.o:
-gaussianvcamodule.o: constantsmodule.o math.o
+gaussvolconst.o:
+gaussianvcamodule.o:
 goverlapmodule.o: gaussianvcamodule.o
 vectormodule.o: goverlapmodule.o
-goverlaptreemodule.o: constantsmodule.o gaussianvcamodule.o goverlapmodule.o math.o vectormodule.o
-gaussvolmodule.o: gaussianvcamodule.o goverlapmodule.o goverlaptreemodule.o
+goverlaptreemodule.o: gaussianvcamodule.o gaussvolconst.o math.o vectormodule.o
+gaussvolmodule.o: goverlapmodule.o goverlaptreemodule.o

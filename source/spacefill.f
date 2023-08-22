@@ -209,16 +209,16 @@ c
       call gvol%setRadii(radius)
       call gvol%setVolumes(vol)
       call gvol%compute_tree(pos)
-      call gvol%GaussVol_print_tree()
+c       call gvol%GaussVol_print_tree()
       call gvol%compute_volume(pos, volume, energy, dr, dv,
      &      free_volume, self_volume)
       write(*,*) "GaussVol Volume:  ", volume
-      call gvol%setRadii(radius2)
-      call gvol%setVolumes(vol2)
-      call gvol%rescan_tree_volumes(pos)
-      call gvol%compute_volume(pos, volume2, energy, dr, dv,
-     &      free_volume, self_volume)
-      write(*,*) "GaussVol Area:    ", (volume2 - volume)/rad_offset
+c       call gvol%setRadii(radius2)
+c       call gvol%setVolumes(vol2)
+c       call gvol%rescan_tree_volumes(pos)
+c       call gvol%compute_volume(pos, volume2, energy, dr, dv,
+c      &      free_volume, self_volume)
+c       write(*,*) "GaussVol Area:    ", (volume2 - volume)/rad_offset
 c
 c     get area and volume for successive coordinate structures
 c
