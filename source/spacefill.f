@@ -32,23 +32,23 @@ c
       integer i,ixyz,next
       integer mode,frame
       integer freeunit
+      integer, allocatable :: ishydrogen(:)
       real*8 volume,area,energy,volume2
       real*8 random,value
       real*8 probe,exclude,rad_offset
       real*8, allocatable :: radius(:)
-      logical exist,query
+      real*8, allocatable :: vol(:), radius2(:), vol2(:)
+      real*8, allocatable :: dv(:), free_volume(:)
+      real*8, allocatable :: self_volume(:)
+      real*8, allocatable :: dr(:,:)
+      real*8, allocatable :: pos(:,:)
+      logical exist,query,use_hydrogen
       character*1 answer
       character*240 xyzfile
       character*240 record
       character*240 string
       external random
       type(GaussVol) gvol
-      integer, allocatable :: ishydrogen(:)
-      real*8, allocatable :: pos(:,:)
-      real*8, allocatable :: vol(:), radius2(:), vol2(:)
-      real*8, allocatable :: dr(:,:)
-      real*8, allocatable :: dv(:), free_volume(:)
-      real*8, allocatable :: self_volume(:)
 c
 c
 c     get the Cartesian coordinates for the system
@@ -129,8 +129,10 @@ c
          next = 1
          call gettext (record,answer,next)
       end if
+      use_hydrogen = .true.
       call upcase (answer)
       if (answer .ne. 'Y') then
+         use_hydrogen = .false.
          do i = 1, n
             if (atomic(i) .eq. 1)  use(i) = .false.
          end do
@@ -168,7 +170,7 @@ c
       allocate (self_volume(n))
       do i = 1, n
          ishydrogen(i) = 0
-         if (atomic(i) .eq. 1)  ishydrogen(i) = 1
+         if (atomic(i) .eq. 1 .and. .not.use_hydrogen) ishydrogen(i) = 1
          pos(1,i) = x(i)
          pos(2,i) = y(i)
          pos(3,i) = z(i)
@@ -209,16 +211,17 @@ c
       call gvol%setRadii(radius)
       call gvol%setVolumes(vol)
       call gvol%compute_tree(pos)
-c       call gvol%GaussVol_print_tree()
+c      call gvol%GaussVol_print_tree()
       call gvol%compute_volume(pos, volume, energy, dr, dv,
      &      free_volume, self_volume)
       write(*,*) "GaussVol Volume:  ", volume
-c       call gvol%setRadii(radius2)
-c       call gvol%setVolumes(vol2)
-c       call gvol%rescan_tree_volumes(pos)
-c       call gvol%compute_volume(pos, volume2, energy, dr, dv,
-c      &      free_volume, self_volume)
-c       write(*,*) "GaussVol Area:    ", (volume2 - volume)/rad_offset
+      call gvol%setRadii(radius2)
+      call gvol%setVolumes(vol2)
+      call gvol%rescan_tree_volumes(pos)
+c       call gvol%GaussVol_print_tree()
+      call gvol%compute_volume(pos, volume2, energy, dr, dv,
+     &          free_volume, self_volume)
+      write(*,*) "GaussVol Area:    ", (volume2 - volume)/rad_offset
 c
 c     get area and volume for successive coordinate structures
 c

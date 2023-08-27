@@ -1,171 +1,340 @@
+c
+c
+c     ##################################################################
+c     ##  COPYRIGHT (C) 2023 by MKJ Chung, MJ Schnieders & JW Ponder  ##
+c     ##                     All Rights Reserved                      ##
+c     ##################################################################
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  module gaussvolmodule  --  module to compute GaussVol  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     tree         GOverlap_Tree object
+c     natoms       number of atoms in the system
+c     ishydrogen   d
+c     radii        atomic radii
+c     volumes      atomic volume
+c     gammas       atomic gamma
+c
+c
       module gaussvolmodule
-         use goverlapmodule
-         use goverlaptreemodule
-         implicit none
-
-         ! A class that implements the Gaussian description of an object
-         ! (molecule) made of overlapping spheres
-         type :: GaussVol
-            private
-            integer :: natoms
-            type(GOverlap_Tree) :: tree
-            real*8, dimension(:), allocatable :: radii
-            real*8, dimension(:), allocatable :: volumes
-            real*8, dimension(:), allocatable :: gammas
-            integer, dimension(:), allocatable :: ishydrogen
-
-            contains
-
-            ! Creates/Initializes a GaussVol instance
-            procedure, pass(this) :: GaussVol_init
-
-c            ! Destructor
-c            procedure, pass(this) :: destroy
-c   
-            ! Public methods
-            procedure, pass(this) :: setRadii
-            procedure, pass(this) :: setVolumes
-c            procedure, pass(this) :: setGammas
-            procedure, pass(this) :: compute_tree
-            procedure, pass(this) :: compute_volume
-c            procedure, pass(this) :: rescan_tree_volumes
-c            procedure, pass(this) :: rescan_tree_gammas
-c            procedure, pass(this) :: getstat
-c            procedure, pass(this) :: GaussVol_print_tree
-         end type GaussVol
-
-         contains
-
-         ! GaussVol initialization
-         subroutine GaussVol_init(this, natoms, ishydrogen)
-            class(GaussVol), intent(inout) :: this
-            integer, intent(in) :: natoms
-            integer, dimension(:), intent(in) :: ishydrogen
-            this%natoms = natoms
-            call this%tree%create_GOverlap_Tree(natoms)
-
-            allocate(this%radii(natoms))
-            this%radii = 1.0d0
-      
-            allocate(this%volumes(natoms))
-            this%volumes = 0.0d0
-      
-            allocate(this%gammas(natoms))
-            this%gammas = 1.0d0
-      
-            allocate(this%ishydrogen(natoms))
-            this%ishydrogen = ishydrogen
-         end subroutine GaussVol_init
+      use goverlapmodule
+      use goverlaptreemodule
+      implicit none
 c
-c        ! GaussVol destructor
-c        subroutine destroy(this)
-c          class(GaussVol), intent(inout) :: this
-c          call this%tree%overlaps%clear() 
-c          deallocate(this%radii)
-c          deallocate(this%volumes)
-c          deallocate(this%gammas)
-c          deallocate(this%ishydrogen)
-c        end subroutine destroy
 c
-         ! Sets the radii of the GaussVol
-         subroutine setRadii(this, radii)
-            class(GaussVol), intent(inout) :: this
-            real*8, dimension(:), intent(in) :: radii
-
-            if (this%natoms == size(radii)) then
-               this%radii = radii
-            else
-               error stop "setRadii: number of atoms does not match"
-            end if
-         end subroutine setRadii
-
-         ! Sets the volumes of the GaussVol
-         subroutine setVolumes(this, volumes)
-            class(GaussVol), intent(inout) :: this
-            real*8, dimension(:), intent(in) :: volumes
-
-            if (this%natoms == size(volumes)) then
-               this%volumes = volumes
-            else
-               error stop "setVolumes: number of atoms does not match"
-            end if
-         end subroutine setVolumes
+c     A class that implements the Gaussian description of an object
+c     (molecule) made of overlapping spheres
 c
-c        ! Sets the gammas of the GaussVol
-c        subroutine setGammas(this, gammas)
-c          class(GaussVol), intent(inout) :: this
-c          real*8, dimension(:), intent(in) :: gammas
-c  
-c          if (this%natoms == size(gammas)) then
-c            this%gammas = gammas
-c          else
-c            error stop "setGammas: number of atoms does not match"
-c          end if
-c        end subroutine setGammas
+      type GaussVol
+      private
+      type(GOverlap_Tree) tree
+      integer natoms
+      integer, allocatable :: ishydrogen(:)
+      real*8, allocatable :: radii(:)
+      real*8, allocatable :: volumes(:)
+      real*8, allocatable :: gammas(:)
+      contains
 c
-         ! Constructs the tree
-         subroutine compute_tree(this, positions)
-            class(GaussVol), intent(inout) :: this
-            real*8, dimension(:,:), intent(in) :: positions
-            integer :: ret
-            ret = this%tree%compute_overlap_tree_r(positions,this%radii,
+c     Creates/Initializes a GaussVol instance
+c
+      procedure, pass(this) :: GaussVol_init
+
+c
+c     Destructor of GaussVol object
+c
+      procedure, pass(this) :: destroy
+c
+c     Public methods of GaussVol object
+c
+      procedure, pass(this) :: setRadii
+      procedure, pass(this) :: setVolumes
+      procedure, pass(this) :: setGammas
+      procedure, pass(this) :: compute_tree
+      procedure, pass(this) :: compute_volume
+      procedure, pass(this) :: rescan_tree_volumes
+      procedure, pass(this) :: rescan_tree_gammas
+      procedure, pass(this) :: getstat
+      procedure, pass(this) :: GaussVol_print_tree
+      end type GaussVol
+      contains
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine GaussVol_init  --  initialize GaussVol object  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "GaussVol_init" initializes attributes of a GaussVol class object
+c
+c
+      subroutine GaussVol_init(this, natoms, ishydrogen)
+      class(GaussVol) this
+      integer natoms, i
+      integer ishydrogen(*)
+c
+c
+c     set number of atoms and root of GOverlap_Tree class object
+c
+      this%natoms = natoms
+      call this%tree%create_GOverlap_Tree(natoms)
+c
+c     perform dynamic allocation of GaussVol arrays
+c
+      allocate(this%radii(natoms))
+      allocate(this%volumes(natoms))
+      allocate(this%gammas(natoms))
+      allocate(this%ishydrogen(natoms))
+c
+c     initialize GaussVol radii, volumes, gammas, and ishydrogen
+c
+      do i = 1, natoms
+         this%radii(i) = 1.0d0
+         this%volumes(i) = 0.0d0
+         this%gammas(i) = 1.0d0
+         this%ishydrogen(i) = ishydrogen(i)
+      end do
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine destroy  --  deallocate GaussVol object  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "destroy" deallocates GaussVol object
+c
+c
+      subroutine destroy(this)
+      class(GaussVol) this
+      call this%tree%overlaps%clear() 
+      deallocate(this%radii)
+      deallocate(this%volumes)
+      deallocate(this%gammas)
+      deallocate(this%ishydrogen)
+      return
+      end
+c
+c
+c     ###################################################
+c     ##                                               ##
+c     ##  subroutine setRadii  --  set GaussVol radii  ##
+c     ##                                               ##
+c     ###################################################
+c
+c
+c     "setRadii" sets GaussVol radii
+c
+c
+      subroutine setRadii(this, radii)
+      class(GaussVol) this
+      integer i
+      real*8 radii(*)
+c
+c
+c     copy radii into GaussVol%radii
+c
+      do i = 1, this%natoms
+         this%radii(i) = radii(i)
+      end do
+      return
+      end
+c
+c
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine setVolumes  --  set GaussVol volumes  ##
+c     ##                                                   ##
+c     #######################################################
+c
+c
+c     "setVolumes" sets GaussVol volumes
+c
+c
+      subroutine setVolumes(this, volumes)
+      class(GaussVol) this
+      integer i
+      real*8 volumes(*)
+c
+c
+c     copy volumes into GaussVol%volumes
+c
+      do i = 1, this%natoms
+         this%volumes(i) = volumes(i)
+      end do
+      return
+      end
+c
+c
+c     #####################################################
+c     ##                                                 ##
+c     ##  subroutine setGammas  --  set GaussVol gammas  ##
+c     ##                                                 ##
+c     #####################################################
+c
+c
+c     "setGammas" sets GaussVol gammas
+c
+c
+      subroutine setGammas(this, gammas)
+      class(GaussVol) this
+      integer i
+      real*8 gammas(*)
+c
+c
+c     copy gammas into GaussVol%gammas
+c
+      do i = 1, this%natoms
+         this%gammas(i) = gammas(i)
+      end do
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine compute_tree  --  constructs GOverlap_Tree  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "compute_tree" constructs the GOverlap_Tree object
+c
+c
+      subroutine compute_tree(this, positions)
+      class(GaussVol) this
+      integer ret
+      real*8 positions(3,*)
+c
+c
+c     call recursive overlap tree method in GOverlap_Tree object
+c
+      ret = this%tree%compute_overlap_tree_r(positions,this%radii,
      &                 this%volumes, this%gammas, this%ishydrogen)
-         end subroutine compute_tree
-
-         ! Computes the volume, energy, and forces of the GaussVol
-         subroutine compute_volume(this, positions, volume, energy, 
-     &          force, gradV, free_volume, self_volume)
-            class(GaussVol), intent(inout) :: this
-            real*8, dimension(:,:), intent(in) :: positions
-            real*8, intent(out) :: volume, energy
-            real*8, dimension(:,:), intent(out) :: force
-            real*8, dimension(:), intent(out) :: gradV, free_volume
-            real*8, dimension(:), intent(out) :: self_volume
-            integer :: ret
-
-            ret = this%tree%compute_volume2_r(positions, volume, energy,
-     &              force, gradV, free_volume, self_volume)
-         end subroutine compute_volume
+      return
+      end
 c
-c        ! Rescans the tree after resetting volumes
-c        subroutine rescan_tree_volumes(this, positions)
-c          class(GaussVol), intent(inout) :: this
-c          real*8, dimension(:,:), intent(in) :: positions
-c          integer :: ret
 c
-c          ret = this%tree%rescan_tree_v(positions, this%radii,
-c     &     this%volumes, this%gammas, this%ishydrogen)
-c        end subroutine rescan_tree_volumes
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine compute_volume  --  compute GaussVol volume  ##
+c     ##                                                          ##
+c     ##############################################################
 c
-c        ! Rescans the tree after resetting gammas
-c        subroutine rescan_tree_gammas(this)
-c          class(GaussVol), intent(inout) :: this
-c          integer :: ret
 c
-c          ret = this%tree%rescan_tree_g(this%gammas)
-c        end subroutine rescan_tree_gammas
+c     "compute_volume" computes the volume, energy, and forces of
+c     the GaussVol object
 c
-c        ! Returns the number of overlaps for each atom
-c        subroutine getstat(this, nov)
-c          class(GaussVol), intent(inout) :: this
-c          integer, intent(inout), allocatable :: nov(:)
-c          integer :: atom, slot
 c
-c          allocate(nov(this%natoms))
-c          nov = 0
+      subroutine compute_volume(this, positions, volume, energy, 
+     &                  force, gradV, free_volume, self_volume)
+      class(GaussVol) this
+      integer ret
+      real*8 volume, energy
+      real*8 free_volume(*)
+      real*8 gradV(*)
+      real*8 self_volume(*)
+      real*8 force(3,*)
+      real*8 positions(3,*)
 c
-c          do atom = 0, this%natoms - 1
-c            slot = atom + 1
-c            nov(atom) = nchildren_under_slot_r(this%tree, slot)
-c          end do
 c
-c        end subroutine getstat
+c     call recursive volume method in GOverlap_Tree object
 c
-c        ! Prints the tree
-c        subroutine GaussVol_print_tree(this)
-c          class(GaussVol), intent(inout) :: this
+      ret = this%tree%compute_volume2_r(positions, volume, energy,
+     &                    force, gradV, free_volume, self_volume)
+      return
+      end
 c
-c          call this%tree%print_tree()
-c        end subroutine GaussVol_print_tree
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine rescan_tree_volumes  --  rescans tree volumes  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "rescan_tree_volumes" rescans the tree after resetting volumes
+c
+c
+      subroutine rescan_tree_volumes(this, positions)
+      class(GaussVol) this
+      real*8 positions(3,*)
+      integer ret
+c
+c
+c     call recursive rescan tree volume method in GOverlap_Tree object
+c
+      ret = this%tree%rescan_tree_v(positions, this%radii,
+     &               this%volumes, this%gammas, this%ishydrogen)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine rescan_tree_gammas  --  rescans tree gammas  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "rescan_tree_gammas" rescans the tree after resetting gammas
+c
+c
+      subroutine rescan_tree_gammas(this)
+      class(GaussVol) this
+      integer ret
+c
+c
+c     call recursive rescan tree gamma method in GOverlap_Tree object
+c
+      ret = this%tree%rescan_tree_g(this%gammas)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine getstat  --  returns the number of overlaps  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "getstat" returns the number of overlaps for each atom
+c
+c
+      subroutine getstat(this, nov)
+      class(GaussVol) this
+      integer atom
+      integer nov(*)
+      do atom = 1, this%natoms
+         nov(atom) = 0
+         nov(atom) = nchildren_under_slot_r(this%tree, atom)
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine GaussVol_print_tree  --  print GaussVol tree  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "GaussVol_print_tree" prints GaussVol tree
+c
+c
+      subroutine GaussVol_print_tree(this)
+      class(GaussVol) this
+      call this%tree%print_tree()
+      return
+      end
       end module gaussvolmodule
