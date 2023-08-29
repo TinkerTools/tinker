@@ -83,17 +83,19 @@ c     "init_overlap_tree" initializes the overlap tree by appending
 c     atomic gaussian volumes to the tree
 c
 c
-      subroutine init_overlap_tree(this, pos, radius, volume, gamma,
-     &                             ishydrogen)
+      subroutine init_overlap_tree(this, x, y, z, radius, volume, gamma,
+     &                             use)
       class(GOverlap_Tree) this
       type(GOverlap), pointer :: overlap
       integer :: iat
-      integer ishydrogen(*)
       real*8 :: a, vol
       real*8 gamma(*)
       real*8 radius(*)
       real*8 volume(*)
-      real*8 pos(3,*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      logical use(*)
 c
 c
 c     reset tree
@@ -120,7 +122,8 @@ c
 c
 c     add the root overlap to the vector
 c
-      call this%overlaps%push_back(overlap) 
+      call this%overlaps%push_back(overlap)
+      deallocate(overlap)
 c
 c     add all atoms to the tree, where list of atoms start at slot 1
 c
@@ -129,12 +132,12 @@ c
          overlap%level = 1
          a = kfc / (radius(iat) * radius(iat))
          vol = volume(iat)
-         if (ishydrogen(iat) > 0) vol = 0.0d0
+         if (.not. use(iat)) vol = 0.0d0
          overlap%g%v = vol
          overlap%g%a = a
-         overlap%g%c(1) = pos(1, iat)
-         overlap%g%c(2) = pos(2, iat)
-         overlap%g%c(3) = pos(3, iat)
+         overlap%g%c(1) = x(iat)
+         overlap%g%c(2) = y(iat)
+         overlap%g%c(3) = z(iat)
          overlap%volume = vol
          overlap%dv1(1) = 0.0d0
          overlap%dv1(2) = 0.0d0
@@ -151,6 +154,7 @@ c
 c     add the atom to the vector
 c
          call this%overlaps%push_back(overlap)
+         deallocate(overlap)
       end do
       return
       end
@@ -333,6 +337,7 @@ c
             ov%sfp = sfp
             ov%gamma1i = root%gamma1i + ov2%gamma1i
             call children_overlaps%push_back(ov)
+            deallocate(ov)
          end if
       end do
       ret = 1
@@ -397,20 +402,22 @@ c     "compute_overlap_tree_r" generates an overlap tree structure
 c     object by recursively computing atomic sphere overlaps
 c
 c
-      function compute_overlap_tree_r(this, pos, radius, volume,
-     &                                gamma, ishydrogen) result(ret)
+      function compute_overlap_tree_r(this, x, y, z, radius, volume,
+     &                                gamma, use) result(ret)
       class(GOverlap_Tree) this
       integer ret, slot
-      integer ishydrogen(*)
-      real*8 pos(3,*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
       real*8 radius(*)
       real*8 volume(*)
       real*8 gamma(*)
+      logical use(*)
 c
 c
 c     initialize overlap tree
 c
-      call this%init_overlap_tree(pos,radius,volume,gamma,ishydrogen)
+      call this%init_overlap_tree(x, y, z, radius,volume,gamma,use)
 c
 c     compute and add children overlaps recursively for each atom
 c
@@ -447,9 +454,9 @@ c
       real*8 ai, a1i, a1, c1, c1p, c2
       real*8 psi1it, f1it, psip1it, fp1it
       real*8 energy1it, fenergy1it
-      real*8  p1i(3), pp1i(3)
-      real*8  penergy1i(3)
-      real*8p1it(3), pp1it(3), penergy1it(3)
+      real*8 p1i(3), pp1i(3)
+      real*8 penergy1i(3)
+      real*8 p1it(3), pp1it(3), penergy1it(3)
       real*8 dr(3,*)
       real*8 dv(*)
       real*8 free_volume(*)
@@ -561,7 +568,7 @@ c
 c     "compute_volume2_r" traverses tree and computes volumes
 c
 c
-      function compute_volume2_r(this, pos, volume, energy, dr, dv,
+      function compute_volume2_r(this, x, y, z, volume, energy, dr, dv,
      &                     free_volume, self_volume) result(ret)
       class(GOverlap_Tree) this
       integer ret, slot, i, j
@@ -571,7 +578,9 @@ c
       real*8 dv(*)
       real*8 free_volume(*)
       real*8 self_volume(*)
-      real*8 pos(3,*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
       real*8 dr(3,*)
 c
 c
@@ -670,17 +679,19 @@ c     "rescan_tree_v" rescan the tree to recompute the volumes,
 c     does not modify the tree
 c
 c
-      recursive function rescan_tree_v(this, pos, radius, volume, 
-     &                                gamma, ishydrogen) result(ret)
+      recursive function rescan_tree_v(this, x, y, z, radius, volume, 
+     &                                gamma, use) result(ret)
       class(GOverlap_Tree) this
       type(GOverlap) :: ov
       integer iat
-      integer ishydrogen(*)
       real*8 a, vol, ret
       real*8 radius(*)
       real*8 volume(*)
       real*8 gamma(*)
-      real*8 pos(3,*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      logical use(*)
 c
 c
 c     initialize root tree
@@ -706,13 +717,13 @@ c
          ov = this%overlaps%get_element(iat)
          a = kfc / (radius(iat) * radius(iat))
          vol = volume(iat)
-         if (ishydrogen(iat) > 0) vol = 0.0d0
+         if (.not. use(iat)) vol = 0.0d0
          ov%level = 1
          ov%g%v = vol
          ov%g%a = a
-         ov%g%c(1) = pos(1, iat)
-         ov%g%c(2) = pos(2, iat)
-         ov%g%c(3) = pos(3, iat)
+         ov%g%c(1) = x(iat)
+         ov%g%c(2) = y(iat)
+         ov%g%c(3) = z(iat)
          ov%volume = vol
          ov%dv1(1) = 0.0d0
          ov%dv1(2) = 0.0d0

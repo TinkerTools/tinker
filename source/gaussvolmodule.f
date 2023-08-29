@@ -12,17 +12,19 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     tree         GOverlap_Tree object
-c     natoms       number of atoms in the system
-c     ishydrogen   d
-c     radii        atomic radii
-c     volumes      atomic volume
-c     gammas       atomic gamma
+c     tree       GOverlap_Tree object
+c     natoms     number of atoms in the system
+c     radii      atomic radii
+c     volumes    atomic volume
+c     gammas     atomic gamma
+c     use        true if include in calculation
 c
 c
       module gaussvolmodule
+      use atoms
       use goverlapmodule
       use goverlaptreemodule
+      use usage
       implicit none
 c
 c
@@ -33,10 +35,10 @@ c
       private
       type(GOverlap_Tree) tree
       integer natoms
-      integer, allocatable :: ishydrogen(:)
       real*8, allocatable :: radii(:)
       real*8, allocatable :: volumes(:)
       real*8, allocatable :: gammas(:)
+      logical, allocatable :: use(:)
       contains
 c
 c     Creates/Initializes a GaussVol instance
@@ -73,10 +75,9 @@ c
 c     "GaussVol_init" initializes attributes of a GaussVol class object
 c
 c
-      subroutine GaussVol_init(this, natoms, ishydrogen)
+      subroutine GaussVol_init(this, natoms)
       class(GaussVol) this
       integer natoms, i
-      integer ishydrogen(*)
 c
 c
 c     set number of atoms and root of GOverlap_Tree class object
@@ -89,15 +90,15 @@ c
       allocate(this%radii(natoms))
       allocate(this%volumes(natoms))
       allocate(this%gammas(natoms))
-      allocate(this%ishydrogen(natoms))
+      allocate(this%use(natoms))
 c
-c     initialize GaussVol radii, volumes, gammas, and ishydrogen
+c     initialize GaussVol radii, volumes, gammas, and use
 c
       do i = 1, natoms
          this%radii(i) = 1.0d0
          this%volumes(i) = 0.0d0
          this%gammas(i) = 1.0d0
-         this%ishydrogen(i) = ishydrogen(i)
+         this%use(i) = use(i)
       end do
       return
       end
@@ -119,7 +120,7 @@ c
       deallocate(this%radii)
       deallocate(this%volumes)
       deallocate(this%gammas)
-      deallocate(this%ishydrogen)
+      deallocate(this%use)
       return
       end
 c
@@ -209,16 +210,15 @@ c
 c     "compute_tree" constructs the GOverlap_Tree object
 c
 c
-      subroutine compute_tree(this, positions)
+      subroutine compute_tree(this)
       class(GaussVol) this
       integer ret
-      real*8 positions(3,*)
 c
 c
 c     call recursive overlap tree method in GOverlap_Tree object
 c
-      ret = this%tree%compute_overlap_tree_r(positions,this%radii,
-     &                 this%volumes, this%gammas, this%ishydrogen)
+      ret = this%tree%compute_overlap_tree_r(x, y, z, this%radii,
+     &                 this%volumes, this%gammas, this%use)
       return
       end
 c
@@ -234,7 +234,7 @@ c     "compute_volume" computes the volume, energy, and forces of
 c     the GaussVol object
 c
 c
-      subroutine compute_volume(this, positions, volume, energy, 
+      subroutine compute_volume(this, volume, energy, 
      &                  force, gradV, free_volume, self_volume)
       class(GaussVol) this
       integer ret
@@ -243,12 +243,11 @@ c
       real*8 gradV(*)
       real*8 self_volume(*)
       real*8 force(3,*)
-      real*8 positions(3,*)
 c
 c
 c     call recursive volume method in GOverlap_Tree object
 c
-      ret = this%tree%compute_volume2_r(positions, volume, energy,
+      ret = this%tree%compute_volume2_r(x, y, z, volume, energy,
      &                    force, gradV, free_volume, self_volume)
       return
       end
@@ -264,16 +263,15 @@ c
 c     "rescan_tree_volumes" rescans the tree after resetting volumes
 c
 c
-      subroutine rescan_tree_volumes(this, positions)
+      subroutine rescan_tree_volumes(this)
       class(GaussVol) this
-      real*8 positions(3,*)
       integer ret
 c
 c
 c     call recursive rescan tree volume method in GOverlap_Tree object
 c
-      ret = this%tree%rescan_tree_v(positions, this%radii,
-     &               this%volumes, this%gammas, this%ishydrogen)
+      ret = this%tree%rescan_tree_v(x, y, z, this%radii,
+     &               this%volumes, this%gammas, this%use)
       return
       end
 c

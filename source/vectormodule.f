@@ -54,7 +54,7 @@ c
 c
 c     set initial capacity and length
 c
-      vec%capacity = 10
+      vec%capacity = 50
       vec%length = 0
 c
 c     allocate vector whose index starts at 0
@@ -98,6 +98,7 @@ c
 c     deallocate old array, point data pointer to new array
 c
          deallocate(vec%data)
+         allocate(vec%data(0:vec%capacity-1))
          vec%data = newData
       end if
 c
@@ -291,7 +292,7 @@ c
       do j = low, high - 1
          temp1 = vec%get_element(j)
          temp2 = vec%get_element(pivot_index)
-         if (temp1%volume <= temp2%volume) then
+         if (temp1%volume < temp2%volume) then
             i = i + 1
             temp1 = vec%get_element(i)
             temp2 = vec%get_element(j)

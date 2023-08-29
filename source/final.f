@@ -44,6 +44,7 @@ c
       use fracs
       use freeze
       use group
+      use gssvol
       use hessn
       use hpmf
       use ielscf
@@ -438,6 +439,17 @@ c
       if (allocated(igrp))  deallocate (igrp)
       if (allocated(grpmass))  deallocate (grpmass)
       if (allocated(wgrp))  deallocate (wgrp)
+c
+c     deallocation of global arrays from module gssvol
+c
+      if (allocated(gvradius))  deallocate (gvradius)
+      if (allocated(gvradius2))  deallocate (gvradius2)
+      if (allocated(gvvol))  deallocate (gvvol)
+      if (allocated(gvvol2))  deallocate (gvvol2)
+      if (allocated(gvdr))  deallocate (gvdr)
+      if (allocated(gvdv))  deallocate (gvdv)
+      if (allocated(gvfree_volume))  deallocate (gvfree_volume)
+      if (allocated(gvself_volume))  deallocate (gvself_volume)
 c
 c     deallocation of global arrays from module hessn
 c
