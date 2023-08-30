@@ -14,11 +14,13 @@ c
 c
 c     solvtyp   type of continuum solvation energy model in use
 c     borntyp   method to be used for the Born radius computation
+c     cavtyp    method to be used for cavity term computation
 c
 c
       module solpot
       implicit none
       character*8 solvtyp
       character*8 borntyp
+      character*10 cavtyp
       save
       end

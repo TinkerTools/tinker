@@ -18,9 +18,24 @@ c     collection of spherical atoms described as gaussians
 c
 c     literature references:
 c
-c     first GaussVol paper
+c     J.A. Grant and B.T. Pickup, "A Gaussian Description of Molecular
+c     Shape", Journal of Physical Chemistry, 99, 3503-3510 (1995).
 c
-c     second GaussVol paper
+c     E. Gallicchio, and R.M. Levy, "AGBNP, An Analytic Implicit Solvent
+c     Model Suitable for Molecular Dynamics Simulations and
+c     High-Resolution Modeling", Journal of Computational Chememistry,
+c     25, 479-499 (2004).
+c
+c     B. Zhang, D. Kilburg, P. Eastman, V.S. Pande, E. Gallicchio,
+c     "Efficient Gaussian Density Formulation of Volume and Surface
+c     Areas of Macromolecules on Graphical Processing Units", Journal 
+c     of Computational Chemistry, 38, 740-752 (2017).
+c
+c     TODO:
+c
+c     1. Neighborlist implementation
+c     2. Cutoff implementation
+c     3. OpenMP parallelization
 c
 c
       subroutine egaussvol (volume,area)
@@ -52,9 +67,9 @@ c       call gvol%GaussVol_print_tree()
       call gvol%compute_volume(volume2, energy, gvdr, gvdv,	
      &          gvfree_volume, gvself_volume)	
       area = (volume2 - volume)/rad_offset
-      write(*,*) "GaussVol Volume:  ", volume
-      write(*,*) "GaussVol Volume2:  ", volume2
-      write(*,*) "GaussVol Area:    ", area
+c      write(*,*) "GaussVol Volume:  ", volume
+c      write(*,*) "GaussVol Volume2:  ", volume2
+c      write(*,*) "GaussVol Area:    ", area
 c
 c     perform deallocation of gaussvol objects
 c

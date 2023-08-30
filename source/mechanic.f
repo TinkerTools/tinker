@@ -101,6 +101,10 @@ c
       call krepel
       call kdisp
 c
+c     assign gaussvol parameters
+c
+      call kgaussvol
+c
 c     assign solvation, metal, pisystem and restraint parameters
 c
       call ksolv

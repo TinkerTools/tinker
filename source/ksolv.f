@@ -132,6 +132,12 @@ c
          else if (keyword(1:18) .eq. 'DIELECTRIC-OFFSET ') then
             read (string,*,err=10,end=10)  doffset
             if (doffset .lt. 0.0d0)  doffset = -doffset
+         else if (keyword(1:9) .eq. 'CAVMODEL ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:10) .eq. 'GAUSS-DISP') then
+               cavtyp = 'GAUSS-DISP'
+            end if
          end if
    10    continue
       end do

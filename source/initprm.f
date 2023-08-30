@@ -74,6 +74,7 @@ c
       integer i,j
       character*3 blank3
       character*8 blank8
+      character*10 blank10
       character*12 blank12
       character*16 blank16
       character*20 blank20
@@ -84,6 +85,7 @@ c     define blank character strings of various lengths
 c
       blank3 = '   '
       blank8 = '        '
+      blank10 = '          '
       blank12 = '            '
       blank16 = '                '
       blank20 = '                    '
@@ -433,6 +435,7 @@ c     set default control parameters for implicit solvation
 c
       solvtyp = blank8
       borntyp = blank8
+      cavtyp = blank10
 c
 c     set default control parameters for reaction field
 c

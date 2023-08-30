@@ -26,10 +26,6 @@ c
       integer i
 c
 c
-c     return if not using gaussvol
-c
-
-c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(gvradius))  deallocate (gvradius)
@@ -59,7 +55,7 @@ c
 c     set atomic volume
 c
       do i = 1, n
-         if (use(i)) then
+         if (use(i) .and. atomic(i) .ne. 1) then
             gvvol(i) = 4.0d0/3.0d0*PI*gvradius(i)**3
             gvvol2(i) = 4.0d0/3.0d0*PI*gvradius2(i)**3
          else

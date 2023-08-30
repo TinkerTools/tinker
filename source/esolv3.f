@@ -1541,6 +1541,7 @@ c
       use mpole
       use nonpol
       use shunt
+      use solpot
       use solute
       implicit none
       integer i
@@ -1575,65 +1576,116 @@ c
          aedisp(i) = 0.0d0
       end do
 c
-c     compute SASA and effective radius needed for cavity term
+c     volume and surface computation via GaussVol
 c
-      exclude = 1.4d0
-      call surface (esurf,aesurf,radcav,asolv,exclude)
-      reff = 0.5d0 * sqrt(esurf/(pi*surften))
-      reff2 = reff * reff
-      reff3 = reff2 * reff
-      reff4 = reff3 * reff
-      reff5 = reff4 * reff
-c
-c     compute solvent excluded volume needed for small solutes
-c
-      if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
+      if (cavtyp .eq. 'GAUSS-DISP') then
+         call egaussvol (evol,esurf)
          evol = evol * solvprs
-         aevol = evol / dble(n)
-      end if
+         esurf = esurf * surften
+c
+c     compute effective radius needed for cavity term
+c
+         reff = 0.5d0 * sqrt(esurf / (pi*surften))
+         reff2 = reff * reff
+         reff3 = reff2 * reff
+         reff4 = reff3 * reff
+         reff5 = reff4 * reff
 c
 c     include a full solvent excluded volume cavity term
 c
-      if (reff .le. spcut) then
-         ecav = evol
-         do i = 1, n
-            aecav(i) = aevol
-         end do
+         if (reff .lt. spcut) then
+            ecav = evol
 c
 c     include a tapered solvent excluded volume cavity term
 c
-      else if (reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
-         do i = 1, n
-            aecav(i) = taper * aevol
-         end do
-      end if
+         else if (reff .le. spoff) then
+            mode = 'GKV'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            ecav = taper * evol
+         end if
 c
 c     include a full solvent accessible surface area term
 c
-      if (reff .gt. stcut) then
-         ecav = esurf
-         do i = 1, n
-            aecav(i) = aesurf(i)
-         end do
+         if (reff .gt. stcut) then
+            ecav = esurf
 c
 c     include a tapered solvent accessible surface area term
 c
-      else if (reff .gt. stoff) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = ecav + taper*esurf
-         do i = 1, n
-            aecav(i) = taper * (aevol+aesurf(i))
-         end do
+         else if (reff .ge. stoff) then
+            mode = 'GKSA'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            taper = 1.0d0 - taper
+            ecav = ecav + taper*esurf
+         end if
+c
+c     volume and surface computation via Connolly
+c
+      else
+c
+c     compute SASA and effective radius needed for cavity term
+c
+         exclude = 1.4d0
+         call surface (esurf,aesurf,radcav,asolv,exclude)
+         reff = 0.5d0 * sqrt(esurf/(pi*surften))
+         reff2 = reff * reff
+         reff3 = reff2 * reff
+         reff4 = reff3 * reff
+         reff5 = reff4 * reff
+c
+c     compute solvent excluded volume needed for small solutes
+c
+         if (reff .lt. spoff) then
+            call volume (evol,radcav,exclude)
+            evol = evol * solvprs
+            aevol = evol / dble(n)
+         end if
+c
+c     include a full solvent excluded volume cavity term
+c
+         if (reff .le. spcut) then
+            ecav = evol
+            do i = 1, n
+               aecav(i) = aevol
+            end do
+c
+c     include a tapered solvent excluded volume cavity term
+c
+         else if (reff .le. spoff) then
+            mode = 'GKV'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            ecav = taper * evol
+            do i = 1, n
+               aecav(i) = taper * aevol
+            end do
+         end if
+c
+c     include a full solvent accessible surface area term
+c
+         if (reff .gt. stcut) then
+            ecav = esurf
+            do i = 1, n
+               aecav(i) = aesurf(i)
+            end do
+c
+c     include a tapered solvent accessible surface area term
+c
+         else if (reff .gt. stoff) then
+            mode = 'GKSA'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            taper = 1.0d0 - taper
+            ecav = ecav + taper*esurf
+            do i = 1, n
+               aecav(i) = taper * (aevol+aesurf(i))
+            end do
+         end if
       end if
 c
 c     perform deallocation of some local arrays
