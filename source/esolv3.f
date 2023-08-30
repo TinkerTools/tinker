@@ -1925,6 +1925,7 @@ c
          write (iout,30)  edisp
    30    format (/,' Disp-HCT',10x,'Total',18x,f12.4)
       end if
+      deallocate (aedispo)
       return
       end
 c
