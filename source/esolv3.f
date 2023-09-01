@@ -1547,12 +1547,13 @@ c
       integer i
       real*8 ecav,edisp
       real*8 exclude,taper
-      real*8 evol,esurf,aevol
+      real*8 evol,esurf,aaevol
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8 aecav(*)
       real*8 aedisp(*)
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
       character*6 mode
 c
 c
@@ -1562,16 +1563,18 @@ c
       evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
-      aevol = 0.0d0
+      aaevol = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
 c
 c     zero out the nonpolar solvation energy partitioning
 c
       do i = 1, n
          aesurf(i) = 0.0d0
+         aevol(i) = 0.0d0
          aecav(i) = 0.0d0
          aedisp(i) = 0.0d0
       end do
@@ -1579,22 +1582,29 @@ c
 c     volume and surface computation via GaussVol
 c
       if (cavtyp .eq. 'GAUSS-DISP') then
-         call egaussvol (evol,esurf)
-         evol = evol * solvprs
-         esurf = esurf * surften
+         call egaussvol3 (evol,esurf,aevol,aesurf)
 c
 c     compute effective radius needed for cavity term
 c
-         reff = 0.5d0 * sqrt(esurf / (pi*surften))
+         reff = 0.5d0 * sqrt(esurf / (pi))
          reff2 = reff * reff
          reff3 = reff2 * reff
          reff4 = reff3 * reff
          reff5 = reff4 * reff
+         evol = evol * solvprs
+         esurf = esurf * surften
+         do i = 1, n
+            aevol(i) = aevol(i) * solvprs
+            aesurf(i) = aesurf(i) * surften
+         end do
 c
 c     include a full solvent excluded volume cavity term
 c
          if (reff .lt. spcut) then
             ecav = evol
+            do i = 1, n
+               aecav(i) = aevol(i)
+            end do
 c
 c     include a tapered solvent excluded volume cavity term
 c
@@ -1604,12 +1614,18 @@ c
             taper = c5*reff5 + c4*reff4 + c3*reff3
      &                 + c2*reff2 + c1*reff + c0
             ecav = taper * evol
+            do i = 1, n
+               aecav(i) = taper * aevol(i)
+            end do
          end if
 c
 c     include a full solvent accessible surface area term
 c
          if (reff .gt. stcut) then
             ecav = esurf
+            do i = 1, n
+               aecav(i) = aesurf(i)
+            end do
 c
 c     include a tapered solvent accessible surface area term
 c
@@ -1620,6 +1636,9 @@ c
      &                 + c2*reff2 + c1*reff + c0
             taper = 1.0d0 - taper
             ecav = ecav + taper*esurf
+            do i = 1, n
+               aecav(i) = aecav(i) + taper*(aesurf(i))
+            end do
          end if
 c
 c     volume and surface computation via Connolly
@@ -1641,7 +1660,7 @@ c
          if (reff .lt. spoff) then
             call volume (evol,radcav,exclude)
             evol = evol * solvprs
-            aevol = evol / dble(n)
+            aaevol = evol / dble(n)
          end if
 c
 c     include a full solvent excluded volume cavity term
@@ -1649,7 +1668,7 @@ c
          if (reff .le. spcut) then
             ecav = evol
             do i = 1, n
-               aecav(i) = aevol
+               aecav(i) = aaevol
             end do
 c
 c     include a tapered solvent excluded volume cavity term
@@ -1661,7 +1680,7 @@ c
      &                 + c2*reff2 + c1*reff + c0
             ecav = taper * evol
             do i = 1, n
-               aecav(i) = taper * aevol
+               aecav(i) = taper * aaevol
             end do
          end if
 c
@@ -1683,7 +1702,7 @@ c
             taper = 1.0d0 - taper
             ecav = ecav + taper*esurf
             do i = 1, n
-               aecav(i) = taper * (aevol+aesurf(i))
+               aecav(i) = aecav(i) + taper * (aesurf(i))
             end do
          end if
       end if

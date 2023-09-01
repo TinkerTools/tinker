@@ -5,16 +5,17 @@ c     ##  COPYRIGHT (C) 2023 by MKJ Chung, MJ Schnieders & JW Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     #################################################
-c     ##                                             ##
-c     ##  subroutine egaussvol  --  gaussvol volume  ##
-c     ##                                             ##
-c     #################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine egaussvol1  --  gaussvol volume and gradient  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "gaussvol" uses the tree algorithms from Emilio Gallicchio's
 c     group to compute the molecular surface area and volume of a
-c     collection of spherical atoms described as gaussians
+c     collection of spherical atoms described as gaussians; also
+c     computes volume and surface area gradients
 c
 c     literature references:
 c
@@ -38,7 +39,7 @@ c     2. Cutoff implementation
 c     3. OpenMP parallelization
 c
 c
-      subroutine egaussvol (volume, area)
+      subroutine egaussvol1 (volume, area, dvol, dsurf)
       use atoms
       use gaussvolconst
       use gssvol
@@ -46,6 +47,9 @@ c
       real*8 area
       real*8 energy
       real*8 volume,volume2
+      real*8 dvol(3,*)
+      real*8 dsurf(3,*)
+      integer i
 c
 c
 c     initialize gaussvol
@@ -61,6 +65,17 @@ c      call gvol%GaussVol_print_tree()
       call gvol%compute_volume(volume, energy, gvdr, gvdv,
      &          gvfree_volume, gvself_volume)
 c
+c     copy volume gradient
+c
+      do i = 1, n
+         dvol(1,i) = gvdr(1,i)
+         dvol(2,i) = gvdr(2,i)
+         dvol(3,i) = gvdr(3,i)
+         dsurf(1,i) = gvdr(1,i)
+         dsurf(2,i) = gvdr(2,i)
+         dsurf(3,i) = gvdr(3,i)
+      end do
+c
 c     compute volume with offset
 c
       call gvol%setRadii(gvradius2)
@@ -70,9 +85,14 @@ c       call gvol%GaussVol_print_tree()
       call gvol%compute_volume(volume2, energy, gvdr, gvdv,
      &          gvfree_volume, gvself_volume)
 c
-c     compute surface area via finite difference
+c     compute surface area gradient via finite difference
 c
       area = (volume2 - volume)/rad_offset
+      do i = 1, n
+         dsurf(1,i) = (gvdr(1,i) - dsurf(1,i)) / rad_offset
+         dsurf(2,i) = (gvdr(2,i) - dsurf(2,i)) / rad_offset
+         dsurf(3,i) = (gvdr(3,i) - dsurf(3,i)) / rad_offset
+      end do
 c      write(*,*) "GaussVol Volume:  ", volume
 c      write(*,*) "GaussVol Area:    ", area
 c

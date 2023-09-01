@@ -37,6 +37,8 @@ c
       real*8 random,value
       real*8 probe,exclude
       real*8, allocatable :: radius(:)
+      real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
       logical exist,query
       character*1 answer
       character*240 xyzfile
@@ -134,7 +136,7 @@ c
 c
 c     decide whether to provide full output for large systems
 c
-      if (n .gt. 100 .and. mode .ne. 4) then
+      if (n .gt. 100) then
          debug = .false.
          call nextarg (answer,exist)
          if (.not. exist) then
@@ -153,6 +155,8 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (radius(n))
+      allocate (aesurf(n))
+      allocate (aevol(n))
 c
 c     set atomic radii based on force field or Bondi values
 c
@@ -174,8 +178,8 @@ c
       end do
       do i = 1, n
          if (use(i)) then
-            gvvol(i) = 4.0d0/3.0d0*PI*gvradius(i)**3
-            gvvol2(i) = 4.0d0/3.0d0*PI*gvradius2(i)**3
+            gvvol(i) = 4.0d0/3.0d0*pi*gvradius(i)**3
+            gvvol2(i) = 4.0d0/3.0d0*pi*gvradius2(i)**3
          else
             gvvol(i) = 0.0d0
             gvvol2(i) = 0.0d0
@@ -201,7 +205,7 @@ c
   120       format (/,' Area and Volume for Archive Structure :',5x,i8)
          end if
          if (mode .eq. 4) then
-            call egaussvol (volume, area)
+            call egaussvol3 (volume, area,aevol,aesurf)
 c
 c     use the Connolly routines to find the area and volume
 c
@@ -237,6 +241,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (radius)
+      deallocate (aesurf)
+      deallocate (aevol)
 c
 c     perform any final tasks before program exit
 c

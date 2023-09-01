@@ -324,7 +324,7 @@ c
             allocate(ov)
             ov%g = g12
             ov%volume = gvol
-            ov%self_volume = 0
+            ov%self_volume = 0.0d0
             ov%atom = atom2
 c
 c     dv1 is the gradient of V(123..)n with respect to the position of 1
@@ -698,12 +698,12 @@ c     initialize root tree
 c
       ov = this%overlaps%get_element(0)
       ov%level = 0
-      ov%volume = 0
+      ov%volume = 0.0d0
       ov%dv1(1) = 0.0d0
       ov%dv1(2) = 0.0d0
       ov%dv1(3) = 0.0d0
       ov%dvv1 = 0.0d0
-      ov%self_volume = 0
+      ov%self_volume = 0.0d0
       ov%sfp = 1.0d0
       ov%gamma1i = 0.0d0
 c
