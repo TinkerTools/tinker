@@ -96,7 +96,8 @@ c
       real*8 ctrn,atrn
       real*8 cfb,cfb1,cfb2
       real*8 cfa1,cfa2
-      real*8 pbrd,csrd,gkrd
+      real*8 pbrd,csrd
+      real*8 gkrd,snek
       real*8 el,iz,rp
       real*8 ss,ts
       real*8 abc,cba
@@ -1428,13 +1429,22 @@ c
             pbrd = 0.0d0
             csrd = 0.0d0
             gkrd = 0.0d0
+            snek = -1.0d0
             string = record(next:240)
-            read (string,*,err=550,end=550) ia,pbrd,csrd,gkrd
+            read (string,*,err=550,end=550) ia,pbrd,csrd,gkrd,snek
   550       continue
             if (ia .ne. 0) then
+               if (snek .lt. -1.0d0) then
+                  snek = gkrd
+                  gkrd = csrd
+                  csrd = pbrd
+                  read (keyword,*,err=555,end=555) pbrd
+  555             continue
+               end if
                pbr(ia) = 0.5d0 * pbrd
                csr(ia) = 0.5d0 * csrd
                gkr(ia) = 0.5d0 * gkrd
+               sneck(ia) = snek
             end if
 c
 c     conjugated pisystem atom parameters

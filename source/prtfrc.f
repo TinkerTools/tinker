@@ -1,32 +1,33 @@
 c
 c
 c     ###################################################
-c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
+c     ##  COPYRIGHT (C)  2023  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine prtxyz  --  output of XYZ atomic coordinates  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine prtfrc  --  output of atom force components  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "prtxyz" writes out a set of Cartesian atomic coordinates
+c     "prtfrc" writes out a set of atom force components
 c     to an external disk file in Tinker XYZ format
 c
 c
-      subroutine prtxyz (ixyz)
+      subroutine prtfrc (ifrc)
       use atomid
       use atoms
       use bound
       use boxes
       use couple
+      use deriv
       use files
       use inform
       use titles
       implicit none
-      integer i,j,k,ixyz
+      integer i,j,k,ifrc
       integer size,crdsiz
       real*8 crdmin,crdmax
       logical opened
@@ -34,16 +35,16 @@ c
       character*2 crdc
       character*2 digc
       character*25 fstr
-      character*240 xyzfile
+      character*240 frcfile
 c
 c
 c     open the output unit if not already done
 c
-      inquire (unit=ixyz,opened=opened)
+      inquire (unit=ifrc,opened=opened)
       if (.not. opened) then
-         xyzfile = filename(1:leng)//'.xyz'
-         call version (xyzfile,'new')
-         open (unit=ixyz,file=xyzfile,status='new')
+         frcfile = filename(1:leng)//'.frc'
+         call version (frcfile,'new')
+         open (unit=ifrc,file=frcfile,status='new')
       end if
 c
 c     check for large systems needing extended formatting
@@ -77,48 +78,48 @@ c     write out the number of atoms and the title
 c
       if (ltitle .eq. 0) then
          fstr = '('//atmc//')'
-         write (ixyz,fstr(1:4))  n
+         write (ifrc,fstr(1:4))  n
       else
          fstr = '('//atmc//',2x,a)'
-         write (ixyz,fstr(1:9))  n,title(1:ltitle)
+         write (ifrc,fstr(1:9))  n,title(1:ltitle)
       end if
 c
 c     write out the periodic cell lengths and angles
 c
       if (use_bounds) then
          fstr = '(1x,6f'//crdc//'.'//digc//')'
-         write (ixyz,fstr)  xbox,ybox,zbox,alpha,beta,gamma
+         write (ifrc,fstr)  xbox,ybox,zbox,alpha,beta,gamma
       end if
 c
-c     write out the atomic coordinates for each atom
+c     write out the atom force components for each atom
 c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
       do i = 1, n
          k = n12(i)
          if (k .eq. 0) then
-            write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i)
+            write (ifrc,fstr)  i,name(i),(-desum(j,i),j=1,3),type(i)
          else
-            write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i),
+            write (ifrc,fstr)  i,name(i),(-desum(j,i),j=1,3),type(i),
      &                         (i12(j,i),j=1,k)
          end if
       end do
 c
 c     close the output unit if opened by this routine
 c
-      if (.not. opened)  close (unit=ixyz)
+      if (.not. opened)  close (unit=ifrc)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine prtdcd  --  output of DCD atomic coordinates  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine prtdcdf  --  output of DCD force components  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "prtdcd" writes out a set of Cartesian atomic coordinates to
+c     "prtdcdf" writes out a set of atomic force components to
 c     a file in CHARMM DCD binary format compatible with the VMD
 c     visualization software and other packages
 c
@@ -146,10 +147,11 @@ c     in general a value of zero for any of the above indicates that
 c     the particular feature is unused
 c
 c
-      subroutine prtdcd (idcd,first)
+      subroutine prtdcdf (idcd,first)
       use atoms
       use bound
       use boxes
+      use deriv
       use files
       use titles
       implicit none
@@ -172,7 +174,7 @@ c     open the output unit if not already done
 c
       inquire (unit=idcd,opened=opened)
       if (.not. opened) then
-         dcdfile = filename(1:leng)//'.dcd'
+         dcdfile = filename(1:leng)//'.dcdf'
          call version (dcdfile,'new')
          open (unit=idcd,file=dcdfile,form='unformatted',status='new')
       end if
@@ -213,11 +215,11 @@ c
          write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
       end if
 c
-c     append the atomic coordinates along each axis in turn
+c     append the force components along each axis in turn
 c
-      write (idcd)  (real(x(i)),i=1,n)
-      write (idcd)  (real(y(i)),i=1,n)
-      write (idcd)  (real(z(i)),i=1,n)
+      write (idcd)  (real(-desum(1,i)),i=1,n)
+      write (idcd)  (real(-desum(2,i)),i=1,n)
+      write (idcd)  (real(-desum(3,i)),i=1,n)
 c
 c     close the output unit if opened by this routine
 c

@@ -1,9 +1,9 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  1996  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ##########################################################
+c     ##  COPYRIGHT (C) 2023 by Rae Corrigan & Jay W. Ponder  ##
+c     ##                 All Rights Reserved                  ##
+c     ##########################################################
 c
 c     ##############################################################
 c     ##                                                          ##
@@ -76,6 +76,7 @@ c
       real*8 uik,uik2
       real*8 tsum,tchain
       real*8 sum,sum2,sum3
+      real*8 soluteint
       real*8 alpha,beta,gamma
       real*8 xr,yr,zr,rvdw
       real*8 r,r2,r3,r4
@@ -88,6 +89,8 @@ c
       real*8 bornmax
       real*8 pair,pbtotal
       real*8 probe,areatotal
+      real*8 descreenoffset
+      real*8 mixedsn,neckval
       real*8, allocatable :: roff(:)
       real*8, allocatable :: weight(:)
       real*8, allocatable :: garea(:)
@@ -333,9 +336,11 @@ c
                yi = y(i)
                zi = z(i)
                sum = pi43 / ri**3
-               ri = max(rsolv(i),rdescr(i)) 
+               soluteint = 0.0d0
+               ri = max(rsolv(i),rdescr(i)) + descoffset
                do k = 1, n
                   rk = rdescr(k)
+                  mixedsn = 0.5d0 * (sneck(i)+sneck(k))
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -343,35 +348,48 @@ c
                      r2 = xr**2 + yr**2 + zr**2
                      r = sqrt(r2)
                      sk = rk * shct(k)
-                     if (ri .lt. r+sk) then
-                        sk2 = sk * sk
-                        if (ri+r .lt. sk) then
-                           lik = ri
-                           uik = sk - r
-                           sum = sum + pi43*(1.0d0/uik**3-1.0d0/lik**3)
+                     if (sk .gt. 0.0d0) then
+                        if (ri .lt. r+sk) then
+                           sk2 = sk * sk
+                           if (ri+r .lt. sk) then
+                              lik = ri
+                              uik = sk - r
+                              soluteint = soluteint + pi43*(1.0d0/uik**3
+     &                                                   -1.0d0/lik**3)
+                           end if
+                           uik = r + sk
+                           if (ri+r .lt. sk) then
+                              lik = sk - r
+                           else if (r .lt. ri+sk) then
+                              lik = ri
+                           else
+                              lik = r - sk
+                           end if
+                           l2 = lik * lik
+                           l4 = l2 * l2
+                           lr = lik * r
+                           l4r = l4 * r
+                           u2 = uik * uik
+                           u4 = u2 * u2
+                           ur = uik * r
+                           u4r = u4 * r
+                           term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
+     &                               - (3.0d0*(r2-sk2)+6.0d0*l2
+     &                                    -8.0d0*lr)/l4r
+                           soluteint = soluteint - pi*term/12.0d0
                         end if
-                        uik = r + sk
-                        if (ri+r .lt. sk) then
-                           lik = sk - r
-                        else if (r .lt. ri+sk) then
-                           lik = ri
-                        else
-                           lik = r - sk
+                        if (useneck) then
+                           call neck (r,ri,rk,mixedsn,neckval)
+                           soluteint = soluteint - neckval
                         end if
-                        l2 = lik * lik
-                        l4 = l2 * l2
-                        lr = lik * r
-                        l4r = l4 * r
-                        u2 = uik * uik
-                        u4 = u2 * u2
-                        ur = uik * r
-                        u4r = u4 * r
-                        term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
-     &                         - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
-                        sum = sum - pi*term/12.0d0
                      end if
                   end if
                end do
+               if (usetanh) then
+                  unscbornint(i) = soluteint
+                  call tanhrsc (soluteint,rsolv(i))
+               end if
+               sum = sum + soluteint
                rborn(i) = (sum/pi43)**third
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
@@ -610,6 +628,7 @@ c
       real*8 t1,t2,t3
       real*8 rbi,rbi2,vi
       real*8 ws2,s2ik,uik4
+      real*8 mixedsn,neckderi,tcr
       real*8 dbr,dborn,pi43
       real*8 expterm,rusum
       real*8 dedx,dedy,dedz
@@ -865,15 +884,20 @@ c
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n
-            ri = max(rsolv(i),rdescr(i))
+            ri = max(rsolv(i),rdescr(i)) + descoffset
             if (ri .gt. 0.0d0) then
                xi = x(i)
                yi = y(i)
                zi = z(i)
                term = pi43 / rborn(i)**3.0d0
                term = factor / term**(4.0d0*third)
+               if (usetanh) then
+                  call tanhrscchr (unscbornint(i),rsolv(i),tcr)
+                  term = term * tcr
+               end if
                do k = 1, n
                   rk = rdescr(k)
+                  mixedsn = 0.5d0 * (sneck(i)+sneck(k))
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -881,63 +905,66 @@ c
                      r2 = xr**2 + yr**2 + zr**2
                      r = sqrt(r2)
                      sk = rk * shct(k)
-                     if (ri .lt. r+sk) then
-                        sk2 = sk * sk
-                        de = 0.0d0
-                        if (ri+r .lt. sk) then
-                           uik = sk - r
-                           de = -4.0d0 * pi / uik**4
-                        end if
-                        if (ri+r .lt. sk) then
-                           lik = sk - r
-                           de = de + 0.25d0*pi*(sk2-4.0d0*sk*r
-     &                                  +17.0d0*r2) / (r2*lik**4)
-                        else if (r .lt. ri+sk) then
-                           lik = ri
-                           de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2)
-     &                                  / (r2*lik**4)
-                        else
-                           lik = r - sk
-                           de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2)
-     &                                  / (r2*lik**4)
-                        end if
-                        uik = r + sk
-                        de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
-     &                               / (r2*uik**4)
-                        dbr = term * de/r
-                        dborn = drb(i)
-                        if (use_gk)  dborn = dborn + drbp(i)
-                        de = dbr * dborn
-c
-c     increment the overall permanent solvation derivatives
-c
-                        dedx = de * xr
-                        dedy = de * yr
-                        dedz = de * zr
-                        des(1,i) = des(1,i) + dedx
-                        des(2,i) = des(2,i) + dedy
-                        des(3,i) = des(3,i) + dedz
-                        des(1,k) = des(1,k) - dedx
-                        des(2,k) = des(2,k) - dedy
-                        des(3,k) = des(3,k) - dedz
+                     if (sk .gt. 0.0d0) then
+                        if (ri .lt. r+sk) then
+                           sk2 = sk * sk
+                           de = 0.0d0
+                           if (ri+r .lt. sk) then
+                              uik = sk - r
+                              de = -4.0d0 * pi / uik**4
+                           end if
+                           if (ri+r .lt. sk) then
+                              lik = sk - r
+                              de = de + 0.25d0*pi*(sk2-4.0d0*sk*r
+     &                                     +17.0d0*r2) / (r2*lik**4)
+                           else if (r .lt. ri+sk) then
+                              lik = ri
+                              de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2)
+     &                                     / (r2*lik**4)
+                           else
+                              lik = r - sk
+                              de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2)
+     &                                     / (r2*lik**4)
+                           end if
+                           uik = r + sk
+                           de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
+     &                                  / (r2*uik**4)
+                           if (useneck) then
+                              call neckder (r,ri,rk,mixedsn,neckderi)
+                              de = de + neckderi
+                           end if
+                           dbr = term * de/r
+                           dborn = drb(i)
+                           if (use_gk)  dborn = dborn + drbp(i)
+                           de = dbr * dborn
+                           dedx = de * xr
+                           dedy = de * yr
+                           dedz = de * zr
+                           des(1,i) = des(1,i) + dedx
+                           des(2,i) = des(2,i) + dedy
+                           des(3,i) = des(3,i) + dedz
+                           des(1,k) = des(1,k) - dedx
+                           des(2,k) = des(2,k) - dedy
+                           des(3,k) = des(3,k) - dedz
 c
 c     increment the internal virial tensor components
 c
-                        vxx = xr * dedx
-                        vyx = yr * dedx
-                        vzx = zr * dedx
-                        vyy = yr * dedy
-                        vzy = zr * dedy
-                        vzz = zr * dedz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vyx
-                        vir(3,1) = vir(3,1) + vzx
-                        vir(1,2) = vir(1,2) + vyx
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vzy
-                        vir(1,3) = vir(1,3) + vzx
-                        vir(2,3) = vir(2,3) + vzy
-                        vir(3,3) = vir(3,3) + vzz
+                           vxx = xr * dedx
+                           vyx = yr * dedx
+                           vzx = zr * dedx
+                           vyy = yr * dedy
+                           vzy = zr * dedy
+                           vzz = zr * dedz
+                           vir(1,1) = vir(1,1) + vxx
+                           vir(2,1) = vir(2,1) + vyx
+                           vir(3,1) = vir(3,1) + vzx
+                           vir(1,2) = vir(1,2) + vyx
+                           vir(2,2) = vir(2,2) + vyy
+                           vir(3,2) = vir(3,2) + vzy
+                           vir(1,3) = vir(1,3) + vzx
+                           vir(2,3) = vir(2,3) + vzy
+                           vir(3,3) = vir(3,3) + vzz
+                        end if
                      end if
                   end if
                end do
@@ -1017,5 +1044,125 @@ c     perform deallocation of some local arrays
 c
       if (borntyp .eq. 'STILL')  deallocate (skip)
       deallocate (roff)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine tanhrsc  --  tanh rescaling of effective radii  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "tanhrsc" calculates the rescaled descreening correction for 
+c     effective Born radius calculations
+c
+c     literature references:
+c
+c     A. Onufriev, D. Bashford, and D. Case, "Exploring Protein Native
+c     States and Large-Scale Conformational Changes with a Modified 
+c     Generalized Born Model", Proteins 55, 383-394 (2004)
+c
+c     B. Aguilar, R. Shadrach, and A. V. Onufriev, "Reducing the 
+c     Secondary Structure Bias in the Generalized Born Model via 
+c     R6 Effective Radii", Journal of Chemical Theory and Computation,
+c     6, 3613-3630, (2010)
+c
+c     variables and parameters:
+c
+c     ii    total integral of 1/r^6 over atoms and pairwise necks
+c     rhoi  base radius for the atom being descreened
+c
+c
+      subroutine tanhrsc (ii,rhoi)
+      use math
+      use solute
+      implicit none
+      real*8 ii,rhoi
+      real*8 maxborn
+      real*8 recipmaxborn3
+      real*8 b0,b1,b2,pi43
+      real*8 rho3,rho3psi,rho6psi2
+      real*8 rho9psi3,tanhconst
+c
+c
+c     assign constants
+c
+      pi43 = 4.0d0 * third * pi 
+      maxborn = 30.0d0
+      recipmaxborn3 = maxborn**(-3.0d0)
+      b0 = 0.9563d0
+      b1 = 0.2578d0
+      b2 = 0.0810d0
+c
+c     calculate tanh components
+c
+      rho3 = rhoi * rhoi * rhoi
+      rho3psi = rho3 * (-1.0d0*ii)
+      rho6psi2 = rho3psi * rho3psi
+      rho9psi3 = rho6psi2 * rho3psi
+c
+c     if tanh function is 1, then effective radius is max radius
+c
+      tanhconst = pi43 * ((1.0d0/rho3)-recipmaxborn3)
+      ii = -tanhconst * tanh(b0*rho3psi-b1*rho6psi2+b2*rho9psi3)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine tanhrscchr  --  get tanh rescaling derivatives  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "tanhrscchr" returns the derivative of the tanh rescaling
+c     for the Born radius chain rule term  
+c
+c     variables and parameters:
+c
+c     ii       total integral of 1/r^6 over atoms and pairwise necks
+c     rhoi     base radius for the atom being descreened
+c     derival  tanh chain rule derivative term
+c
+c
+      subroutine tanhrscchr (ii,rhoi,derival)
+      use math
+      use solute
+      implicit none
+      real*8 ii,rhoi
+      real*8 maxborn
+      real*8 recipmaxborn3
+      real*8 b0,b1,b2,pi43
+      real*8 rho3,rho3psi,rho6psi2
+      real*8 rho9psi3,rho6psi,rho9psi2
+      real*8 tanhconst,tanhterm,tanh2
+      real*8 chainrule,derival
+c
+c
+c     assign the constant values
+c
+      pi43 = 4.0d0 * third * pi 
+      maxborn = 30.0d0
+      recipmaxborn3 = maxborn**(-3.0d0)
+      b0 = 0.9563d0
+      b1 = 0.2578d0
+      b2 = 0.0810d0
+c
+c     calculate tanh chain rule components
+c
+      rho3 = rhoi * rhoi * rhoi
+      rho3psi = rho3 * (-1.0d0*ii)
+      rho6psi2 = rho3psi * rho3psi
+      rho9psi3 = rho6psi2 * rho3psi
+      rho6psi = rho3 * rho3 * (-1.0d0*ii)
+      rho9psi2 = rho6psi2 * rho3
+      tanhterm = tanh(b0*rho3psi-b1*rho6psi2+b2*rho9psi3)
+      tanh2 = tanhterm * tanhterm
+      chainrule = b0*rho3 - 2.0d0*b1*rho6psi + 3.0d0*b2*rho9psi2 
+      tanhconst = pi43 * ((1.0d0/rho3)-recipmaxborn3)
+      derival = tanhconst * chainrule * (1.0d0-tanh2)
       return
       end

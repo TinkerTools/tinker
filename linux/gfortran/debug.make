@@ -51,6 +51,7 @@ gfortran -c -Wall dsppot.f
 gfortran -c -Wall energi.f
 gfortran -c -Wall ewald.f
 gfortran -c -Wall expol.f
+gfortran -c -Wall extfld.f
 gfortran -c -Wall faces.f
 gfortran -c -Wall fft.f
 gfortran -c -Wall fields.f
@@ -363,6 +364,7 @@ gfortran -c -Wall eurey1.f
 gfortran -c -Wall eurey2.f
 gfortran -c -Wall eurey3.f
 gfortran -c -Wall evcorr.f
+gfortran -c -Wall exfield.f
 gfortran -c -Wall extra.f
 gfortran -c -Wall extra1.f
 gfortran -c -Wall extra2.f
@@ -473,6 +475,7 @@ gfortran -c -Wall moments.f
 gfortran -c -Wall monte.f
 gfortran -c -Wall mutate.f
 gfortran -c -Wall nblist.f
+gfortran -c -Wall neck.f
 gfortran -c -Wall newton.f
 gfortran -c -Wall newtrot.f
 gfortran -c -Wall nextarg.f
@@ -510,14 +513,16 @@ gfortran -c -Wall prmkey.f
 gfortran -c -Wall promo.f
 gfortran -c -Wall protein.f
 gfortran -c -Wall prtarc.f
-gfortran -c -Wall prtdcd.f
 gfortran -c -Wall prtdyn.f
 gfortran -c -Wall prterr.f
+gfortran -c -Wall prtfrc.f
 gfortran -c -Wall prtint.f
 gfortran -c -Wall prtmol2.f
 gfortran -c -Wall prtpdb.f
 gfortran -c -Wall prtprm.f
 gfortran -c -Wall prtseq.f
+gfortran -c -Wall prtuind.f
+gfortran -c -Wall prtvel.f
 gfortran -c -Wall prtxyz.f
 gfortran -c -Wall pss.f
 gfortran -c -Wall pssrigid.f

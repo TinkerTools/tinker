@@ -758,7 +758,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
-!$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
+!$OMP& rborn,rpole,uinds,use_group,off2,molcule,gkc,fc,fd,fq)
 !$OMP& shared(es,nes,aes,eself,ecross,einter)
 !$OMP DO reduction(+:es,nes,aes,eself,ecross,einter) schedule(guided)
 c

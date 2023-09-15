@@ -51,6 +51,7 @@ gfortran -c -Ofast -mssse3 -fopenmp dsppot.f
 gfortran -c -Ofast -mssse3 -fopenmp energi.f
 gfortran -c -Ofast -mssse3 -fopenmp ewald.f
 gfortran -c -Ofast -mssse3 -fopenmp expol.f
+gfortran -c -Ofast -mssse3 -fopenmp extfld.f
 gfortran -c -Ofast -mssse3 -fopenmp faces.f
 gfortran -c -Ofast -mssse3 -fopenmp fft.f
 gfortran -c -Ofast -mssse3 -fopenmp fields.f
@@ -363,6 +364,7 @@ gfortran -c -Ofast -mssse3 -fopenmp eurey1.f
 gfortran -c -Ofast -mssse3 -fopenmp eurey2.f
 gfortran -c -Ofast -mssse3 -fopenmp eurey3.f
 gfortran -c -Ofast -mssse3 -fopenmp evcorr.f
+gfortran -c -Ofast -mssse3 -fopenmp exfield.f
 gfortran -c -Ofast -mssse3 -fopenmp extra.f
 gfortran -c -Ofast -mssse3 -fopenmp extra1.f
 gfortran -c -Ofast -mssse3 -fopenmp extra2.f
@@ -473,6 +475,7 @@ gfortran -c -Ofast -mssse3 -fopenmp moments.f
 gfortran -c -Ofast -mssse3 -fopenmp monte.f
 gfortran -c -Ofast -mssse3 -fopenmp mutate.f
 gfortran -c -Ofast -mssse3 -fopenmp nblist.f
+gfortran -c -Ofast -mssse3 -fopenmp neck.f
 gfortran -c -Ofast -mssse3 -fopenmp newton.f
 gfortran -c -Ofast -mssse3 -fopenmp newtrot.f
 gfortran -c -Ofast -mssse3 -fopenmp nextarg.f
@@ -510,14 +513,16 @@ gfortran -c -Ofast -mssse3 -fopenmp prmkey.f
 gfortran -c -Ofast -mssse3 -fopenmp promo.f
 gfortran -c -Ofast -mssse3 -fopenmp protein.f
 gfortran -c -Ofast -mssse3 -fopenmp prtarc.f
-gfortran -c -Ofast -mssse3 -fopenmp prtdcd.f
 gfortran -c -Ofast -mssse3 -fopenmp prtdyn.f
 gfortran -c -Ofast -mssse3 -fopenmp prterr.f
+gfortran -c -Ofast -mssse3 -fopenmp prtfrc.f
 gfortran -c -Ofast -mssse3 -fopenmp prtint.f
 gfortran -c -Ofast -mssse3 -fopenmp prtmol2.f
 gfortran -c -Ofast -mssse3 -fopenmp prtpdb.f
 gfortran -c -Ofast -mssse3 -fopenmp prtprm.f
 gfortran -c -Ofast -mssse3 -fopenmp prtseq.f
+gfortran -c -Ofast -mssse3 -fopenmp prtuind.f
+gfortran -c -Ofast -mssse3 -fopenmp prtvel.f
 gfortran -c -Ofast -mssse3 -fopenmp prtxyz.f
 gfortran -c -Ofast -mssse3 -fopenmp pss.f
 gfortran -c -Ofast -mssse3 -fopenmp pssrigid.f

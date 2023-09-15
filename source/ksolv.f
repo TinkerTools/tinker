@@ -30,7 +30,8 @@ c
       use solute
       implicit none
       integer i,k,next
-      real*8 pbrd,csrd,gkrd
+      real*8 pbrd,csrd
+      real*8 gkrd,snek
       logical header
       character*20 keyword
       character*20 value
@@ -150,8 +151,9 @@ c
                pbrd = 0.0d0
                csrd = 0.0d0
                gkrd = 0.0d0
+               snek = -1.0d0
                string = record(next:240)
-               read (string,*,err=20,end=20)  pbrd,csrd,gkrd
+               read (string,*,err=20,end=20)  pbrd,csrd,gkrd,snek
    20          continue
                if (header .and. .not.silent) then
                   header = .false.
@@ -160,11 +162,22 @@ c
      &                    //,5x,'Atom Type',16x,'PB Size',
      &                       5x,'CS Size',5x,'GK Size',/)
                end if
+c
+c    If there is no text descriptor, then read pbrd from keyword
+c
+               if (snek .le. -1.0d0) then
+                  snek = gkrd
+                  gkrd = csrd
+                  csrd = pbrd
+                  read (keyword,*,err=35,end=35) pbrd
+   35             continue
+               end if
                pbr(k) = pbrd
                gkr(k) = csrd
                pbr(k) = gkrd
+               sneck(k) = snek
                if (.not. silent) then
-                  write (iout,40)  k,pbrd,csrd,gkrd
+                  write (iout,40)  k,pbrd,csrd,gkrd,snek
    40             format (6x,i6,7x,3f12.4)
                end if
             else if (k .gt. maxtyp) then
@@ -859,11 +872,12 @@ c
       integer i,it,next
       integer atmnum
       real*8 dhct
+      logical descreen
+      logical descreenHydrogen
+      logical elementHCTscale
       character*10 radtyp
       character*20 keyword
       character*20 value
-      logical descreenVDW
-      logical descreenHydrogen
       character*240 record
       character*240 string
 c
@@ -883,6 +897,7 @@ c
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
+      if (allocated(unscbornint))  deallocate (unscbornint)
       allocate (rsolv(n))
       allocate (rdescr(n))
       allocate (rborn(n))
@@ -894,6 +909,7 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
+      allocate (unscbornint(n))
       if (poltyp .eq. 'OPT') then
          allocate (uopts(0:optorder,3,n))
          allocate (uoptps(0:optorder,3,n))
@@ -903,9 +919,14 @@ c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
       dhct = 0.72d0
+      descoffset = 0.00d0
       radtyp = 'SOLUTE'
-      descreenVDW = .true.
+      descreen = .true.
       descreenHydrogen = .false.
+      elementHCTscale = .true.
+      useneck = .true.
+      chemasn = .true.
+      usetanh = .true.
 c
 c     get any altered generalized Kirkwood values from keyfile
 c
@@ -934,11 +955,11 @@ c
             else if (value(1:6) .eq. 'SOLUTE') then
                radtyp = 'SOLUTE'
             end if
-         else if (keyword(1:13) .eq. 'DESCREEN-VDW ') then
+         else if (keyword(1:9) .eq. 'DESCREEN ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:4) .eq. 'TRUE') then
-               descreenVDW = .true.
+               descreen = .true.
             end if
          else if (keyword(1:18) .eq. 'DESCREEN-HYDROGEN ') then
             call getword (record,value,next)
@@ -949,6 +970,33 @@ c
          else if (keyword(1:10) .eq. 'HCT-SCALE ') then
             read (string,*,err=20,end=20)  dhct
    20       continue
+         else if (keyword(1:18) .eq. 'ELEMENT-HCT-SCALE ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:5) .eq. 'FALSE') then
+               elementHCTscale = .false.
+            end if
+         else if (keyword(1:16) .eq. 'DESCREEN-OFFSET ') then
+            read (string,*,err=30,end=30)  descoffset
+   30       continue
+         else if (keyword(1:16) .eq. 'NECK-CORRECTION ') then
+            call getword (record,value,next)
+            call upcase(value)
+            if (value(1:5) .eq. 'FALSE') then
+               useneck = .false.
+            end if
+         else if (keyword(1:20) .eq. 'BONDING-AWARE-SNECK ') then
+            call getword (record,value,next)
+            call upcase(value)
+            if (value(1:5) .eq. 'FALSE') then
+               chemasn = .false.
+            end if
+         else if (keyword(1:16) .eq. 'TANH-CORRECTION ') then
+            call getword (record,value,next)
+            call upcase(value)
+            if (value(1:5) .eq. 'FALSE') then
+               usetanh = .false.
+            end if
          end if
       end do
 c
@@ -956,20 +1004,38 @@ c     determine the solute atomic radii values to be used
 c
       call setrad (radtyp)
 c
-c     assign generic value for the HCT overlap scale factor
+c     assign generic value for the overlap scale factor
 c
       do i = 1, n
          shct(i) = dhct
          rdescr(i) = rsolv(i)
-         if (descreenVDW) then
+         if (descreen) then
             it = jvdw(i)
             rdescr(i) = 0.5d0 * radmin(it,it)
          end if
+c
+c     use overlap scale factors for specific elements
+c
+         if (elementHCTscale) then
+            atmnum = atomic(i)
+            if (atmnum .eq. 1)  shct(i) = 0.72d0
+            if (atmnum .eq. 6)  shct(i) = 0.695d0
+            if (atmnum .eq. 7)  shct(i) = 0.7673d0
+            if (atmnum .eq. 8)  shct(i) = 0.7965d0
+            if (atmnum .eq. 15)  shct(i) = 0.6117d0
+            if (atmnum .eq. 16)  shct(i) = 0.7204d0
+         end if
+c
+c     remove hydrogen descreening if it is not to be used
+c
          if (.not. descreenHydrogen) then
             atmnum = atomic(i)
             if (atmnum .eq. 1) shct(i) = 0.0d0
          end if
       end do
+c
+c     set optimal overlap scale factors for Macromodel radii
+c
       if (radtyp .eq. 'MACROMODEL') then
          do i = 1, n
             shct(i) = 0.80d0
@@ -1639,8 +1705,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "setrad" chooses a set of atomic radii to solute atoms for use
-c     during Poission-Boltzmann and Generalized Kirkwood implicit
+c     "setrad" chooses a set of solute atom atomic radii to use
+c     during Generalized Kirkwood and Poission-Boltzmann implicit
 c     solvation calculations
 c
 c
@@ -1666,6 +1732,7 @@ c
       implicit none
       integer i,j,k,l,m
       integer atmnum
+      integer nheavy
       real*8 rscale
       real*8 offset
       character*10 radtyp
@@ -1707,6 +1774,35 @@ c
                   if (pbr(type(i)) .ne. 0.0d0) then
                      rsolv(i) = pbr(type(i))
                   end if
+               end if
+            end do
+         end if
+c
+c     set neck correction via a bonded connectivity scheme
+c
+         if (useneck .and. chemasn) then
+            do i = 1, n
+               atmnum = atomic(i)
+               if (atmnum .gt. 1) then
+                  nheavy = 0
+                  do j = 1, n12(i)
+                     if (atomic(i12(j,i)) .gt. 1) then
+                        nheavy = nheavy + 1
+                     end if
+                  end do
+                  if (nheavy .eq. 0) then
+                     sneck(i) = 1.0
+                  else
+                     sneck(i) = sneck(i) * (5.0d0-nheavy)/4.0d0
+                  end if
+c
+c     hydrogen neck contribution same as bound heavy atom
+c
+                  do k = 1, n12(i)
+                     if (atomic(i12(k,i)) .eq. 1) then
+                        sneck(i12(k,i)) = sneck(i)
+                     end if
+                  end do
                end if
             end do
          end if
