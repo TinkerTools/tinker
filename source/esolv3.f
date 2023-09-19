@@ -1541,17 +1541,19 @@ c
       use mpole
       use nonpol
       use shunt
+      use solpot
       use solute
       implicit none
       integer i
       real*8 ecav,edisp
       real*8 exclude,taper
-      real*8 evol,esurf,aevol
+      real*8 evol,esurf,aaevol
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8 aecav(*)
       real*8 aedisp(*)
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
       character*6 mode
 c
 c
@@ -1561,79 +1563,148 @@ c
       evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
-      aevol = 0.0d0
+      aaevol = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
 c
 c     zero out the nonpolar solvation energy partitioning
 c
       do i = 1, n
          aesurf(i) = 0.0d0
+         aevol(i) = 0.0d0
          aecav(i) = 0.0d0
          aedisp(i) = 0.0d0
       end do
 c
-c     compute SASA and effective radius needed for cavity term
+c     volume and surface computation via GaussVol
 c
-      exclude = 1.4d0
-      call surface (esurf,aesurf,radcav,asolv,exclude)
-      reff = 0.5d0 * sqrt(esurf/(pi*surften))
-      reff2 = reff * reff
-      reff3 = reff2 * reff
-      reff4 = reff3 * reff
-      reff5 = reff4 * reff
+      if (cavtyp .eq. 'GAUSS-DISP') then
+         call egaussvol3 (evol,esurf,aevol,aesurf)
 c
-c     compute solvent excluded volume needed for small solutes
+c     compute effective radius needed for cavity term
 c
-      if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
+         reff = 0.5d0 * sqrt(esurf / (pi))
+         reff2 = reff * reff
+         reff3 = reff2 * reff
+         reff4 = reff3 * reff
+         reff5 = reff4 * reff
          evol = evol * solvprs
-         aevol = evol / dble(n)
-      end if
+         esurf = esurf * surften
+         do i = 1, n
+            aevol(i) = aevol(i) * solvprs
+            aesurf(i) = aesurf(i) * surften
+         end do
 c
 c     include a full solvent excluded volume cavity term
 c
-      if (reff .le. spcut) then
-         ecav = evol
-         do i = 1, n
-            aecav(i) = aevol
-         end do
+         if (reff .lt. spcut) then
+            ecav = evol
+            do i = 1, n
+               aecav(i) = aevol(i)
+            end do
 c
 c     include a tapered solvent excluded volume cavity term
 c
-      else if (reff .le. spoff) then
-         mode = 'GKV'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         ecav = taper * evol
-         do i = 1, n
-            aecav(i) = taper * aevol
-         end do
-      end if
+         else if (reff .le. spoff) then
+            mode = 'GKV'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            ecav = taper * evol
+            do i = 1, n
+               aecav(i) = taper * aevol(i)
+            end do
+         end if
 c
 c     include a full solvent accessible surface area term
 c
-      if (reff .gt. stcut) then
-         ecav = esurf
-         do i = 1, n
-            aecav(i) = aesurf(i)
-         end do
+         if (reff .gt. stcut) then
+            ecav = esurf
+            do i = 1, n
+               aecav(i) = aesurf(i)
+            end do
 c
 c     include a tapered solvent accessible surface area term
 c
-      else if (reff .gt. stoff) then
-         mode = 'GKSA'
-         call switch (mode)
-         taper = c5*reff5 + c4*reff4 + c3*reff3
-     &              + c2*reff2 + c1*reff + c0
-         taper = 1.0d0 - taper
-         ecav = ecav + taper*esurf
-         do i = 1, n
-            aecav(i) = taper * (aevol+aesurf(i))
-         end do
+         else if (reff .ge. stoff) then
+            mode = 'GKSA'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            taper = 1.0d0 - taper
+            ecav = ecav + taper*esurf
+            do i = 1, n
+               aecav(i) = aecav(i) + taper*(aesurf(i))
+            end do
+         end if
+c
+c     volume and surface computation via Connolly
+c
+      else
+c
+c     compute SASA and effective radius needed for cavity term
+c
+         exclude = 1.4d0
+         call surface (esurf,aesurf,radcav,asolv,exclude)
+         reff = 0.5d0 * sqrt(esurf/(pi*surften))
+         reff2 = reff * reff
+         reff3 = reff2 * reff
+         reff4 = reff3 * reff
+         reff5 = reff4 * reff
+c
+c     compute solvent excluded volume needed for small solutes
+c
+         if (reff .lt. spoff) then
+            call volume (evol,radcav,exclude)
+            evol = evol * solvprs
+            aaevol = evol / dble(n)
+         end if
+c
+c     include a full solvent excluded volume cavity term
+c
+         if (reff .le. spcut) then
+            ecav = evol
+            do i = 1, n
+               aecav(i) = aaevol
+            end do
+c
+c     include a tapered solvent excluded volume cavity term
+c
+         else if (reff .le. spoff) then
+            mode = 'GKV'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            ecav = taper * evol
+            do i = 1, n
+               aecav(i) = taper * aaevol
+            end do
+         end if
+c
+c     include a full solvent accessible surface area term
+c
+         if (reff .gt. stcut) then
+            ecav = esurf
+            do i = 1, n
+               aecav(i) = aesurf(i)
+            end do
+c
+c     include a tapered solvent accessible surface area term
+c
+         else if (reff .gt. stoff) then
+            mode = 'GKSA'
+            call switch (mode)
+            taper = c5*reff5 + c4*reff4 + c3*reff3
+     &                 + c2*reff2 + c1*reff + c0
+            taper = 1.0d0 - taper
+            ecav = ecav + taper*esurf
+            do i = 1, n
+               aecav(i) = aecav(i) + taper * (aesurf(i))
+            end do
+         end if
       end if
 c
 c     perform deallocation of some local arrays
@@ -1873,6 +1944,7 @@ c
          write (iout,30)  edisp
    30    format (/,' Disp-HCT',10x,'Total',18x,f12.4)
       end if
+      deallocate (aedispo)
       return
       end
 c

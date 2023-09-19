@@ -21,6 +21,8 @@ c
       use atomid
       use atoms
       use files
+      use gaussvolconst
+      use gssvol
       use inform
       use iounit
       use kvdws
@@ -35,6 +37,8 @@ c
       real*8 random,value
       real*8 probe,exclude
       real*8, allocatable :: radius(:)
+      real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
       logical exist,query
       character*1 answer
       character*240 xyzfile
@@ -55,6 +59,7 @@ c
       call active
       call katom
       call kvdw
+      call kgaussvol
 c
 c     initialize random numbers and turn on extra printing
 c
@@ -76,13 +81,14 @@ c
    20    format (/,' Three Types of Area and Volume can be Computed :',
      &           //,4x,'(1) Van der Waals Area and Volume',
      &           /,4x,'(2) Accessible Area and Excluded Volume',
-     &           /,4x,'(3) Contact-Reentrant Area and Volume')
+     &           /,4x,'(3) Contact-Reentrant Area and Volume',
+     &           /,4x,'(4) GaussVol Area and Volume')
          write (iout,30)
    30    format (/,' Enter the Number of your Choice [1] :  ',$)
          read (input,40)  mode
    40    format (i10)
       end if
-      if (mode.ne.2 .and. mode.ne.3)  mode = 1
+      if (mode.ne.2 .and. mode.ne.3 .and. mode.ne.4)  mode = 1
 c
 c     set the excluded/accessible and contact/reentrant probes
 c
@@ -149,16 +155,34 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (radius(n))
+      allocate (aesurf(n))
+      allocate (aevol(n))
 c
 c     set atomic radii based on force field or Bondi values
 c
-      do i = 1, n
+	   do i = 1, n
          if (use(i)) then
             radius(i) = rad(class(i))
 c           radius(i) = rad(class(i)) / twosix
 c           radius(i) = vdwrad(atomic(i))
          else
             radius(i) = 0.0d0
+         end if
+      end do
+c
+c     update gaussvol radii
+c
+      do i = 1, n
+         gvradius(i) = rad(class(i))
+         gvradius2(i) = rad(class(i)) + rad_offset
+      end do
+      do i = 1, n
+         if (use(i)) then
+            gvvol(i) = 4.0d0/3.0d0*pi*gvradius(i)**3
+            gvvol2(i) = 4.0d0/3.0d0*pi*gvradius2(i)**3
+         else
+            gvvol(i) = 0.0d0
+            gvvol2(i) = 0.0d0
          end if
       end do
 c
@@ -180,10 +204,14 @@ c
             write (iout,120)  frame
   120       format (/,' Area and Volume for Archive Structure :',5x,i8)
          end if
+         if (mode .eq. 4) then
+            call egaussvol3 (volume, area,aevol,aesurf)
 c
 c     use the Connolly routines to find the area and volume
 c
-         call connolly (volume,area,radius,probe,exclude)
+         else
+            call connolly (volume,area,radius,probe,exclude)
+         end if
 c
 c     print out the values of the total surface area and volume
 c
@@ -196,11 +224,14 @@ c
          else if (mode .eq. 3) then
             write (iout,150)
   150       format (/,' Contact-Reentrant Surface Area and Volume :')
+         else if (mode .eq. 4) then
+            write (iout,160)
+  160       format (/,' GaussVol Surface Area and Volume :')
          end if
-         write (iout,160)  area
-  160    format (/,' Total Area :',f20.3,' Square Angstroms')
-         write (iout,170)  volume
-  170    format (' Total Volume :',f18.3,' Cubic Angstroms')
+         write (iout,170)  area
+  170    format (/,' Total Area :',f20.3,' Square Angstroms')
+         write (iout,180)  volume
+  180    format (' Total Volume :',f18.3,' Cubic Angstroms')
 c
 c     attempt to read next structure from the coordinate file
 c
@@ -210,6 +241,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (radius)
+      deallocate (aesurf)
+      deallocate (aevol)
 c
 c     perform any final tasks before program exit
 c
