@@ -138,8 +138,8 @@ c
 c     variables and parameters:
 c
 c     rho     input radius
-c     below   radarray index for radius next smaller than rho
-c     above   radarray index for radius next larger than rho
+c     below   radsize index for radius next smaller than rho
+c     above   radsize index for radius next larger than rho
 c
 c
       subroutine getbounds (rho,below,above)
@@ -184,10 +184,10 @@ c     benchmark tables derived from Poisson-Boltzmann calculations
 c
 c     variables and parameters:
 c
-c     x1      radarray radius immediately smaller than descreened atom
-c     x2      radarray radius immediately larger than descreened atom
-c     y1      radarray radius immediately smaller than descreening atom
-c     y2      radarray radius immediately larger than descreening atom
+c     x1      radsize radius immediately smaller than descreened atom
+c     x2      radsize radius immediately larger than descreened atom
+c     y1      radsize radius immediately smaller than descreening atom
+c     y2      radsize radius immediately larger than descreening atom
 c     x       descreened atom radius + descreening offset, if used
 c     y       descreening atom radius
 c     fx1y1   constant for interacting atoms with radii x1 and y1
@@ -262,10 +262,10 @@ c     find Aij and Bij values via the rad array
 c
       call getbounds (rhdsd,lowi,highi)
       call getbounds (rhdsg,lowj,highj)
-      rli = radarray(lowi)
-      rhi = radarray(highi)
-      rlj = radarray(lowj)
-      rhj = radarray(highj)
+      rli = radsize(lowi)
+      rhi = radsize(highi)
+      rlj = radsize(lowj)
+      rhj = radsize(highj)
       lla = aij(lowi,lowj)
       hla = aij(highi,lowj)
       lha = aij(lowi,highj)

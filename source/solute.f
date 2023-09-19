@@ -40,7 +40,7 @@ c     sneck       neck correction scale factor for each atom type
 c     bornint     unscaled 1/r^6 corrections for tanh chain rule term
 c     aij         constants to use in calculating neck values
 c     bij         constants to use in calculating neck values
-c     radarray    all discrete radii used to determine Aij/Bij constants
+c     radsize     atom radius bins used to determine Aij/Bij constants
 c     useneck     logical flag to use neck interstitial space correction
 c     chemasn     logical flag to make neck correction bonded-atom aware
 c     usetanh     logical flag to use tanh interstitial space correction
@@ -70,7 +70,7 @@ c
       real*8, allocatable :: uace(:,:)
       real*8, allocatable :: sneck(:)
       real*8, allocatable :: bornint(:)
-      real*8 radarray(45)
+      real*8 radsize(45)
       real*8 aij(45,45)
       real*8 bij(45,45)
       logical useneck
@@ -79,14 +79,16 @@ c
       save
 c
 c
-      data radarray  / 0.80d0, 0.85d0, 0.90d0, 0.95d0, 1.00d0, 1.05d0,
-     &                 1.10d0, 1.15d0, 1.20d0, 1.25d0, 1.30d0, 1.35d0,
-     &                 1.40d0, 1.45d0, 1.50d0, 1.55d0, 1.60d0, 1.65d0,
-     &                 1.70d0, 1.75d0, 1.80d0, 1.85d0, 1.90d0, 1.95d0,
-     &                 2.00d0, 2.05d0, 2.10d0, 2.15d0, 2.20d0, 2.25d0,
-     &                 2.30d0, 2.35d0, 2.40d0, 2.45d0, 2.50d0, 2.55d0,
-     &                 2.60d0, 2.65d0, 2.70d0, 2.75d0, 2.80d0, 2.85d0,
-     &                 2.90d0, 2.95d0, 3.00d0 /
+c     atom radius size bins
+c
+      data radsize  / 0.80d0, 0.85d0, 0.90d0, 0.95d0, 1.00d0, 1.05d0,
+     &                1.10d0, 1.15d0, 1.20d0, 1.25d0, 1.30d0, 1.35d0,
+     &                1.40d0, 1.45d0, 1.50d0, 1.55d0, 1.60d0, 1.65d0,
+     &                1.70d0, 1.75d0, 1.80d0, 1.85d0, 1.90d0, 1.95d0,
+     &                2.00d0, 2.05d0, 2.10d0, 2.15d0, 2.20d0, 2.25d0,
+     &                2.30d0, 2.35d0, 2.40d0, 2.45d0, 2.50d0, 2.55d0,
+     &                2.60d0, 2.65d0, 2.70d0, 2.75d0, 2.80d0, 2.85d0,
+     &                2.90d0, 2.95d0, 3.00d0 /
 c
 c     Aij neck correction constants
 c
