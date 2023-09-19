@@ -89,8 +89,7 @@ c
       real*8 bornmax
       real*8 pair,pbtotal
       real*8 probe,areatotal
-      real*8 descreenoffset
-      real*8 mixedsn,neckval
+      real*8 mixsn,neckval
       real*8, allocatable :: roff(:)
       real*8, allocatable :: weight(:)
       real*8, allocatable :: garea(:)
@@ -337,10 +336,10 @@ c
                zi = z(i)
                sum = pi43 / ri**3
                soluteint = 0.0d0
-               ri = max(rsolv(i),rdescr(i)) + descoffset
+               ri = max(rsolv(i),rdescr(i)) + descoff
                do k = 1, n
                   rk = rdescr(k)
-                  mixedsn = 0.5d0 * (sneck(i)+sneck(k))
+                  mixsn = 0.5d0 * (sneck(i)+sneck(k))
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -379,14 +378,14 @@ c
                            soluteint = soluteint - pi*term/12.0d0
                         end if
                         if (useneck) then
-                           call neck (r,ri,rk,mixedsn,neckval)
+                           call neck (r,ri,rk,mixsn,neckval)
                            soluteint = soluteint - neckval
                         end if
                      end if
                   end if
                end do
                if (usetanh) then
-                  unscbornint(i) = soluteint
+                  bornint(i) = soluteint
                   call tanhrsc (soluteint,rsolv(i))
                end if
                sum = sum + soluteint
@@ -628,7 +627,7 @@ c
       real*8 t1,t2,t3
       real*8 rbi,rbi2,vi
       real*8 ws2,s2ik,uik4
-      real*8 mixedsn,neckderi,tcr
+      real*8 mixsn,neckderi,tcr
       real*8 dbr,dborn,pi43
       real*8 expterm,rusum
       real*8 dedx,dedy,dedz
@@ -884,7 +883,7 @@ c
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n
-            ri = max(rsolv(i),rdescr(i)) + descoffset
+            ri = max(rsolv(i),rdescr(i)) + descoff
             if (ri .gt. 0.0d0) then
                xi = x(i)
                yi = y(i)
@@ -892,12 +891,12 @@ c
                term = pi43 / rborn(i)**3.0d0
                term = factor / term**(4.0d0*third)
                if (usetanh) then
-                  call tanhrscchr (unscbornint(i),rsolv(i),tcr)
+                  call tanhrscchr (bornint(i),rsolv(i),tcr)
                   term = term * tcr
                end if
                do k = 1, n
                   rk = rdescr(k)
-                  mixedsn = 0.5d0 * (sneck(i)+sneck(k))
+                  mixsn = 0.5d0 * (sneck(i)+sneck(k))
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -930,7 +929,7 @@ c
                            de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
      &                                  / (r2*uik**4)
                            if (useneck) then
-                              call neckder (r,ri,rk,mixedsn,neckderi)
+                              call neckder (r,ri,rk,mixsn,neckderi)
                               de = de + neckderi
                            end if
                            dbr = term * de/r

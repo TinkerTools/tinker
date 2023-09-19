@@ -41,7 +41,7 @@ c
       real*8 usea,useb
       real*8 rhow,pi43
       real*8 rminb,radminr
-      real*8 pow1,pow2
+      real*8 rminb4,radminr4
 c
 c
 c     assign and initialize probe radius and constants
@@ -55,16 +55,16 @@ c
       if (r .gt. intstarti+desck+2.0d0*rhow) then
           neckval = 0.0d0
 c
-c     if atoms form a neck then calculation neck contribution
+c     if atoms form a neck then calculate neck contribution
 c
       else
          call neckcon (intstarti,desck,usea,useb)
          pi43 = 4.0d0 * third * pi 
          rminb = r - useb
+         rminb4 = rminb**4
          radminr = intstarti + desck + 2.0d0*rhow - r
-         pow1 = rminb * rminb * rminb * rminb
-         pow2 = radminr * radminr * radminr * radminr
-         neckval = pi43 * mixsn * usea * pow1 * pow2
+         radminr4 = radminr**4
+         neckval = pi43 * mixsn * usea * rminb4 * radminr4
       end if
       return
       end
@@ -92,12 +92,11 @@ c
       real*8 usea,useb
       real*8 rhow,pi43
       real*8 rminb,radminr
-      real*8 rminb3,rminb4
-      real*8 radminr3
-      real*8 radminr4
+      real*8 rminb3,radminr3
+      real*8 rminb4,radminr4
 
 c
-c     assign constants
+c     assign and initialize probe radius and constants
 c
       rhow = 1.4d0
       usea = 0.0d0
@@ -108,19 +107,19 @@ c
       if (r .gt. intstarti+desck+2.0d0*rhow) then
          neckderi = 0.0d0
 c
-c     if atoms form a neck then calculation neck contribution
+c     if atoms form a neck then calculate neck contribution
 c
       else
          call neckcon (intstarti,desck,usea,useb)
          pi43 = 4.0d0 * third * pi 
          rminb = r - useb
-         radminr = intstarti + desck + 2.0d0*rhow - r
-         rminb3 = rminb * rminb * rminb
+         rminb3 = rminb**3
          rminb4 = rminb3 * rminb
-         radminr3 = radminr * radminr * radminr
+         radminr = intstarti + desck + 2.0d0*rhow - r
+         radminr3 = radminr**3
          radminr4 = radminr3 * radminr
-         neckderi = 4.0d0*pi43*(mixsn*usea*rminb3*radminr4
-     &                 - mixsn*usea*rminb4*radminr3)
+         neckderi = 4.0d0 * pi43 * (mixsn*usea*rminb3*radminr4
+     &                            - mixsn*usea*rminb4*radminr3)
       end if
       return
       end
@@ -159,7 +158,7 @@ c
       calcindex = 0.0d0
       below = 0
       above = 0
-      calcindex = (rho-minrad)/space
+      calcindex = (rho-minrad) / space
       below = floor(calcindex) + 1
       above = below + 1
       if (above .ge. numpoints) then
@@ -209,9 +208,9 @@ c
 c
 c     perform 2D interpolation of neck correction constant
 c
-      fxy1 = (x2-x)/(x2-x1)*fx1y1+(x-x1)/(x2-x1)*fx2y1
-      fxy2 = (x2-x)/(x2-x1)*fx1y2+(x-x1)/(x2-x1)*fx2y2
-      val = (y2-y)/(y2-y1)*fxy1+(y-y1)/(y2-y1)*fxy2
+      fxy1 = (x2-x)/(x2-x1)*fx1y1 + (x-x1)/(x2-x1)*fx2y1
+      fxy2 = (x2-x)/(x2-x1)*fx1y2 + (x-x1)/(x2-x1)*fx2y2
+      val = (y2-y)/(y2-y1)*fxy1 + (y-y1)/(y2-y1)*fxy2
       return
       end
 c

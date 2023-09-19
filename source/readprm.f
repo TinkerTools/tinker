@@ -1429,18 +1429,11 @@ c
             pbrd = 0.0d0
             csrd = 0.0d0
             gkrd = 0.0d0
-            snek = -1.0d0
+            snek = 0.0d0
             string = record(next:240)
             read (string,*,err=550,end=550) ia,pbrd,csrd,gkrd,snek
   550       continue
             if (ia .ne. 0) then
-               if (snek .lt. -1.0d0) then
-                  snek = gkrd
-                  gkrd = csrd
-                  csrd = pbrd
-                  read (keyword,*,err=555,end=555) pbrd
-  555             continue
-               end if
                pbr(ia) = 0.5d0 * pbrd
                csr(ia) = 0.5d0 * csrd
                gkr(ia) = 0.5d0 * gkrd

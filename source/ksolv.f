@@ -897,7 +897,7 @@ c
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
-      if (allocated(unscbornint))  deallocate (unscbornint)
+      if (allocated(bornint))  deallocate (bornint)
       allocate (rsolv(n))
       allocate (rdescr(n))
       allocate (rborn(n))
@@ -909,7 +909,7 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
-      allocate (unscbornint(n))
+      allocate (bornint(n))
       if (poltyp .eq. 'OPT') then
          allocate (uopts(0:optorder,3,n))
          allocate (uoptps(0:optorder,3,n))
@@ -919,7 +919,7 @@ c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
       dhct = 0.72d0
-      descoffset = 0.00d0
+      descoff = 0.30d0
       radtyp = 'SOLUTE'
       descreen = .true.
       descreenHydrogen = .false.
@@ -977,7 +977,7 @@ c
                elementHCTscale = .false.
             end if
          else if (keyword(1:16) .eq. 'DESCREEN-OFFSET ') then
-            read (string,*,err=30,end=30)  descoffset
+            read (string,*,err=30,end=30)  descoff
    30       continue
          else if (keyword(1:16) .eq. 'NECK-CORRECTION ') then
             call getword (record,value,next)

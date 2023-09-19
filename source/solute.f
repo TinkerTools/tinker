@@ -19,7 +19,7 @@ c     p2          1-2 interaction scale factor for analytical Still radii
 c     p3          1-3 interaction scale factor for analytical Still radii
 c     p4          nonbonded scale factor for analytical Still radii
 c     p5          soft cutoff parameter for analytical Still radii
-c     descoffset  offset for pairwise descreening at small separation
+c     descoff     offset for pairwise descreening at small separation
 c     rsolv       atomic radius of each atom for continuum solvation
 c     rdescr      atomic radius of each atom for descreening
 c     asolv       atomic surface area solvation parameters
@@ -37,7 +37,7 @@ c     wace        "omega" values for atom class pairs for use with ACE
 c     s2ace       "sigma^2" values for atom class pairs for use with ACE
 c     uace        "mu" values for atom class pairs for use with ACE
 c     sneck       neck correction scale factor for each atom type
-c     unscbornint unscaled 1/r^6 corrections for tanh chain rule term
+c     bornint     unscaled 1/r^6 corrections for tanh chain rule term
 c     aij         constants to use in calculating neck values
 c     bij         constants to use in calculating neck values
 c     radarray    all discrete radii used to determine Aij/Bij constants
@@ -51,7 +51,7 @@ c
       implicit none
       real*8 doffset,onipr
       real*8 p1,p2,p3,p4,p5
-      real*8 descoffset
+      real*8 descoff
       real*8, allocatable :: rsolv(:)
       real*8, allocatable :: rdescr(:)
       real*8, allocatable :: asolv(:)
@@ -69,7 +69,7 @@ c
       real*8, allocatable :: s2ace(:,:)
       real*8, allocatable :: uace(:,:)
       real*8, allocatable :: sneck(:)
-      real*8, allocatable :: unscbornint(:)
+      real*8, allocatable :: bornint(:)
       real*8 radarray(45)
       real*8 aij(45,45)
       real*8 bij(45,45)

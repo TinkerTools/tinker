@@ -1103,7 +1103,7 @@ c
       if (allocated(s2ace))  deallocate (s2ace)
       if (allocated(uace))  deallocate (uace)
       if (allocated(sneck))  deallocate (sneck)
-      if (allocated(unscbornint))  deallocate (unscbornint)
+      if (allocated(bornint))  deallocate (bornint)
 c
 c     deallocation of global arrays from module stodyn
 c
