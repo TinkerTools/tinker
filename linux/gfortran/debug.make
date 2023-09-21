@@ -410,6 +410,7 @@ gfortran -c -Wall induce.f
 gfortran -c -Wall inertia.f
 gfortran -c -Wall initatom.f
 gfortran -c -Wall initial.f
+gfortran -c -Wall initneck.f
 gfortran -c -Wall initprm.f
 gfortran -c -Wall initres.f
 gfortran -c -Wall initrot.f

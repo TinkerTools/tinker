@@ -410,6 +410,7 @@ ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 induce.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 inertia.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 initatom.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 initial.f
+ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 initneck.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 initprm.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 initres.f
 ifort -c -O3 -axSSSE3 -no-ipo -no-prec-div -vec-report0 initrot.f

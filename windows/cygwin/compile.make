@@ -410,6 +410,7 @@ gfortran -c -O3 -ffast-math -fopenmp induce.f
 gfortran -c -O3 -ffast-math -fopenmp inertia.f
 gfortran -c -O3 -ffast-math -fopenmp initatom.f
 gfortran -c -O3 -ffast-math -fopenmp initial.f
+gfortran -c -O3 -ffast-math -fopenmp initneck.f
 gfortran -c -O3 -ffast-math -fopenmp initprm.f
 gfortran -c -O3 -ffast-math -fopenmp initres.f
 gfortran -c -O3 -ffast-math -fopenmp initrot.f

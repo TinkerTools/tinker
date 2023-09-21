@@ -410,6 +410,7 @@ ifort -c -g -warn all -check all induce.f
 ifort -c -g -warn all -check all inertia.f
 ifort -c -g -warn all -check all initatom.f
 ifort -c -g -warn all -check all initial.f
+ifort -c -g -warn all -check all initneck.f
 ifort -c -g -warn all -check all initprm.f
 ifort -c -g -warn all -check all initres.f
 ifort -c -g -warn all -check all initrot.f

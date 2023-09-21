@@ -1,9 +1,9 @@
 c
 c
-c     ############################################################
-c     ##  COPYRIGHT (C)  2023  by Rae Corrigan & Jay W. Ponder  ##
-c     ##                   All Rights Reserved                  ##
-c     ############################################################
+c     ##########################################################
+c     ##  COPYRIGHT (C) 2023 by Rae Corrigan & Jay W. Ponder  ##
+c     ##                  All Rights Reserved                 ##
+c     ##########################################################
 c
 c     #################################################################
 c     ##                                                             ##
@@ -137,9 +137,9 @@ c     to use for interpolation of Aij and Bij values
 c
 c     variables and parameters:
 c
-c     rho     input radius
-c     below   radsize index for radius next smaller than rho
-c     above   radsize index for radius next larger than rho
+c     rho     value of the input atom radius
+c     below   radius bin index for radius next smaller than rho
+c     above   radius bin index for radius next larger than rho
 c
 c
       subroutine getbounds (rho,below,above)
@@ -184,10 +184,10 @@ c     benchmark tables derived from Poisson-Boltzmann calculations
 c
 c     variables and parameters:
 c
-c     x1      radsize radius immediately smaller than descreened atom
-c     x2      radsize radius immediately larger than descreened atom
-c     y1      radsize radius immediately smaller than descreening atom
-c     y2      radsize radius immediately larger than descreening atom
+c     x1      radius bin immediately smaller than descreened atom
+c     x2      radius bin immediately larger than descreened atom
+c     y1      radius bin immediately smaller than descreening atom
+c     y2      radius bin immediately larger than descreening atom
 c     x       descreened atom radius + descreening offset, if used
 c     y       descreening atom radius
 c     fx1y1   constant for interacting atoms with radii x1 and y1
@@ -222,25 +222,23 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
-c     "neckcon" returns the Aij and Bij values for a particular
+c     "neckcon" returns the neck correction values for a specific
 c     pair of input radii
 c
 c     variables and parameters:
 c
-c     rhdsd    rho descreened - radius of descreened atom
-c     rhdsg    rho descreening - radius of descreening atom
-c     aijloc   returned value of Aij constant
-c     bijloc   returned value of Bij constant
+c     rhdsd    rho descreened, radius of descreened atom
+c     rhdsg    rho descreening, radius of descreening atom
+c     aloc     returned value of "aneck" parameter value
+c     bloc     returned value of "bneck" parameter value
 c
 c
-      subroutine neckcon (rhdsd,rhdsg,aijloc,bijloc)
+      subroutine neckcon (rhdsd,rhdsg,aloc,bloc)
       use solute
       integer lowi,highi
       integer lowj,highj
-      real*8 rhdsd
-      real*8 rhdsg
-      real*8 aijloc
-      real*8 bijloc
+      real*8 rhdsd,rhdsg
+      real*8 aloc,bloc
       real*8 rli,rhi
       real*8 rlj,rhj
       real*8 lla,hla
@@ -255,29 +253,29 @@ c
       lowj = 0
       highi = 0
       highj = 0
-      aijloc = 0.0d0
-      bijloc = 0.0d0
+      aloc = 0.0d0
+      bloc = 0.0d0
 c
-c     find Aij and Bij values via the rad array
+c     find neck correction values via the bin index array
 c
       call getbounds (rhdsd,lowi,highi)
       call getbounds (rhdsg,lowj,highj)
-      rli = radsize(lowi)
-      rhi = radsize(highi)
-      rlj = radsize(lowj)
-      rhj = radsize(highj)
-      lla = aij(lowi,lowj)
-      hla = aij(highi,lowj)
-      lha = aij(lowi,highj)
-      hha = aij(highi,highj)
-      llb = bij(lowi,lowj)
-      hlb = bij(highi,lowj)
-      lhb = bij(lowi,highj)
-      hhb = bij(highi,highj)
-      call interp2d (rli,rhi,rlj,rhj,rhdsd,rhdsg,lla,hla,lha,hha,aijloc)
-      call interp2d (rli,rhi,rlj,rhj,rhdsd,rhdsg,llb,hlb,lhb,hhb,bijloc)
-      if (aijloc .lt. 0.0d0) then
-         aijloc = 0.0d0
+      rli = rneck(lowi)
+      rhi = rneck(highi)
+      rlj = rneck(lowj)
+      rhj = rneck(highj)
+      lla = aneck(lowi,lowj)
+      hla = aneck(highi,lowj)
+      lha = aneck(lowi,highj)
+      hha = aneck(highi,highj)
+      llb = bneck(lowi,lowj)
+      hlb = bneck(highi,lowj)
+      lhb = bneck(lowi,highj)
+      hhb = bneck(highi,highj)
+      call interp2d (rli,rhi,rlj,rhj,rhdsd,rhdsg,lla,hla,lha,hha,aloc)
+      call interp2d (rli,rhi,rlj,rhj,rhdsd,rhdsg,llb,hlb,lhb,hhb,bloc)
+      if (aloc .lt. 0.0d0) then
+         aloc = 0.0d0
       end if
       return
       end

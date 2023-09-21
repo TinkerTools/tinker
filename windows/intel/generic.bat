@@ -409,6 +409,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp induce.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp inertia.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp initatom.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp initial.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp initneck.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp initprm.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp initres.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp initrot.f

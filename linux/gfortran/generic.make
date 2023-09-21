@@ -410,6 +410,7 @@ gfortran -c -Ofast -msse3 -fopenmp induce.f
 gfortran -c -Ofast -msse3 -fopenmp inertia.f
 gfortran -c -Ofast -msse3 -fopenmp initatom.f
 gfortran -c -Ofast -msse3 -fopenmp initial.f
+gfortran -c -Ofast -msse3 -fopenmp initneck.f
 gfortran -c -Ofast -msse3 -fopenmp initprm.f
 gfortran -c -Ofast -msse3 -fopenmp initres.f
 gfortran -c -Ofast -msse3 -fopenmp initrot.f

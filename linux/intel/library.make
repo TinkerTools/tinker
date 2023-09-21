@@ -272,6 +272,7 @@ inertia.o \
 inform.o \
 initatom.o \
 initial.o \
+initneck.o \
 initprm.o \
 initres.o \
 initrot.o \

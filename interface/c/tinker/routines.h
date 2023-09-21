@@ -90,6 +90,10 @@ void born_();
 #define tinker_f_born born_
 void born1_();
 #define tinker_f_born1 born1_
+void tanhrsc_(double* ii, double* rhoi);
+#define tinker_f_tanhrsc tanhrsc_
+void tanhrscchr_(double* ii, double* rhoi, double* derival);
+#define tinker_f_tanhrscchr tanhrscchr_
 
 // bounds.f
 void bounds_();
@@ -1653,6 +1657,10 @@ void initatom_();
 void initial_();
 #define tinker_f_initial initial_
 
+// initneck.f
+void initneck_();
+#define tinker_f_initneck initneck_
+
 // initprm.f
 void initprm_();
 #define tinker_f_initprm initprm_
@@ -1967,6 +1975,18 @@ void ubuild_();
 void ulight_();
 #define tinker_f_ulight ulight_
 
+// neck.f
+void neck_(double* r, double* intstarti, double* desck, double* mixsn, double* neckval);
+#define tinker_f_neck neck_
+void neckder_(double* r, double* intstarti, double* desck, double* mixsn, double* neckderi);
+#define tinker_f_neckder neckder_
+void getbounds_(double* rho, int* below, int* above);
+#define tinker_f_getbounds getbounds_
+void interp2d_(double* x1, double* x2, double* y1, double* y2, double* x, double* y, double* fx1y1, double* fx2y1, double* fx1y2, double* fx2y2, double* val);
+#define tinker_f_interp2d interp2d_
+void neckcon_(double* rhdsd, double* rhdsg, double* aloc, double* bloc);
+#define tinker_f_neckcon neckcon_
+
 // nextarg.f
 void nextarg_(char* string, int* exist, tinker_fchar_len_t string_cap);
 inline void tinker_f_nextarg(tinker_fchars string, int* exist) {
@@ -2175,10 +2195,6 @@ void prtarcf_(int* iarc);
 void prtarcb_(int* idcd, int* first);
 #define tinker_f_prtarcb prtarcb_
 
-// prtdcd.f
-void prtdcd_(int* idcd, int* first);
-#define tinker_f_prtdcd prtdcd_
-
 // prtdyn.f
 void prtdyn_();
 #define tinker_f_prtdyn prtdyn_
@@ -2186,6 +2202,12 @@ void prtdyn_();
 // prterr.f
 void prterr_();
 #define tinker_f_prterr prterr_
+
+// prtfrc.f
+void prtfrc_(int* ifrc);
+#define tinker_f_prtfrc prtfrc_
+void prtdcdf_(int* idcd, int* first);
+#define tinker_f_prtdcdf prtdcdf_
 
 // prtint.f
 void prtint_(int* izmt);
@@ -2211,9 +2233,23 @@ void prtprm_(int* itxt);
 void prtseq_(int* iseq);
 #define tinker_f_prtseq prtseq_
 
+// prtuind.f
+void prtuind_(int* iind);
+#define tinker_f_prtuind prtuind_
+void prtdcdu_(int* idcd, int* first);
+#define tinker_f_prtdcdu prtdcdu_
+
+// prtvel.f
+void prtvel_(int* ivel);
+#define tinker_f_prtvel prtvel_
+void prtdcdv_(int* idcd, int* first);
+#define tinker_f_prtdcdv prtdcdv_
+
 // prtxyz.f
 void prtxyz_(int* ixyz);
 #define tinker_f_prtxyz prtxyz_
+void prtdcd_(int* idcd, int* first);
+#define tinker_f_prtdcd prtdcd_
 
 // qrsolve.f
 void qrfact_(int* n, int* m, double* a, int* pivot, int* ipvt, double* rdiag);

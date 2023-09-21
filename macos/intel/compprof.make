@@ -410,6 +410,7 @@ ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp induc
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp inertia.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp initatom.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp initial.f
+ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp initneck.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp initprm.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp initres.f
 ifort -c -O3 -g -axSSSE3 -no-ipo -no-prec-div -mdynamic-no-pic -w -qopenmp initrot.f

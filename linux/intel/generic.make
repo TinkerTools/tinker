@@ -410,6 +410,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp induce.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp inertia.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initatom.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initial.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initneck.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initprm.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initres.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initrot.f

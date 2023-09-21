@@ -1778,7 +1778,11 @@ c
             end do
          end if
 c
-c     set neck correction via a bonded connectivity scheme
+c     set and store neck correction ranges and parameters
+c
+         call initneck
+c
+c     get neck correction via a bonded connectivity scheme
 c
          if (useneck .and. chemasn) then
             do i = 1, n

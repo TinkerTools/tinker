@@ -261,6 +261,7 @@ inertia.obj
 inform.obj
 initatom.obj
 initial.obj
+initneck.obj
 initprm.obj
 initres.obj
 initrot.obj

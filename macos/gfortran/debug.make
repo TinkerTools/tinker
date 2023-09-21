@@ -410,6 +410,7 @@ gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized ind
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized inertia.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized initatom.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized initial.f
+gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized initneck.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized initprm.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized initres.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized initrot.f
