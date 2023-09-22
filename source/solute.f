@@ -44,7 +44,6 @@ c     uace        "mu" values for atom class pairs for use with ACE
 c     sneck       neck correction scale factor for each atom type
 c     bornint     unscaled 1/r^6 corrections for tanh chain rule term
 c     useneck     logical flag to use neck interstitial space correction
-c     chemasn     logical flag to make neck correction bonded-atom aware
 c     usetanh     logical flag to use tanh interstitial space correction
 c     
 c
@@ -78,7 +77,6 @@ c
       real*8, allocatable :: sneck(:)
       real*8, allocatable :: bornint(:)
       logical useneck
-      logical chemasn
       logical usetanh
       save
       end

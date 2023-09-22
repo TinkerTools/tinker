@@ -63,7 +63,7 @@ c
       logical, allocatable :: tmpchg(:)
       logical, allocatable :: tmppol(:)
       logical, allocatable :: tmpcpen(:)
-      character*1 answer
+      character*1 answer,ax
       character*20 keyword
       character*240 record
       character*240 string
@@ -225,7 +225,7 @@ c
          close (unit=ipot)
          write (iout,160)  potfile(1:trimtext(potfile))
   160    format (/,' Electrostatic Potential Written To :  ',a)
-         goto 400
+         goto 410
       end if
 c
 c     read the first structure and setup atom definitions
@@ -260,6 +260,9 @@ c     perform dynamic allocation of some global arrays
 c
       allocate (gatm(namax))
       allocate (fatm(namax))
+      allocate (fxdpl(namax))
+      allocate (fydpl(namax))
+      allocate (fzdpl(namax))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -277,6 +280,9 @@ c
          flist(i) = 0
          gatm(i) = .true.
          fatm(i) = .true.
+         fxdpl(i) = .true.
+         fydpl(i) = .true.
+         fzdpl(i) = .true.
       end do
 c
 c     get control parameters and target values from keyfile
@@ -311,6 +317,17 @@ c
             fit_mpl = .false.
          else if (keyword(1:11) .eq. 'FIX-DIPOLE ') then
             fit_dpl = .false.
+         else if (keyword(1:16) .eq. 'FIX-ATOM-DIPOLE ') then
+            read (string,*,err=210,end=210)  k,ax
+            call upcase (ax)
+  210       continue
+            if (ax .eq. 'X') then
+               fxdpl(k) = .false.
+            else if (ax .eq. 'Y') then
+               fydpl(k) = .false.
+            else if (ax .eq. 'Z') then
+               fzdpl(k) = .false.
+            end if
          else if (keyword(1:15) .eq. 'FIX-QUADRUPOLE ') then
             fit_qpl = .false.
          else if (keyword(1:11) .eq. 'FIX-CHGPEN ') then
@@ -318,16 +335,16 @@ c
          else if (keyword(1:14) .eq. 'TARGET-DIPOLE ') then
             use_dpl = .true.
             k = 1
-            read (string,*,err=210,end=210)  x0,y0,z0,k
-  210       continue
+            read (string,*,err=220,end=220)  x0,y0,z0,k
+  220       continue
             xdpl0(k) = x0
             ydpl0(k) = y0
             zdpl0(k) = z0
          else if (keyword(1:18) .eq. 'TARGET-QUADRUPOLE ') then
             use_qpl = .true.
             k = 1
-            read (string,*,err=220,end=220)  xx0,xy0,xz0,yy0,yz0,zz0,k
-  220       continue
+            read (string,*,err=230,end=230)  xx0,xy0,xz0,yy0,yz0,zz0,k
+  230       continue
             xxqpl0(k) = xx0
             xyqpl0(k) = xy0
             xzqpl0(k) = xz0
@@ -417,10 +434,10 @@ c
             inquire (file=xyz2file,exist=exist)
          end if
          do while (.not. exist)
-            write (iout,230)
-  230       format (/,' Enter Name of Second Coordinate File :  ',$)
-            read (input,240)  xyz2file
-  240       format (a240)
+            write (iout,240)
+  240       format (/,' Enter Name of Second Coordinate File :  ',$)
+            read (input,250)  xyz2file
+  250       format (a240)
             call basefile (xyz2file)
             call suffix (xyz2file,'xyz','old')
             inquire (file=xyz2file,exist=exist)
@@ -437,10 +454,10 @@ c
             inquire (file=potfile,exist=exist)
          end if
          do while (.not. exist)
-            write (iout,250)
-  250       format (/,' Enter Target Grid/Potential File Name :  ',$)
-            read (input,260)  potfile
-  260       format (a240)
+            write (iout,260)
+  260       format (/,' Enter Target Grid/Potential File Name :  ',$)
+            read (input,270)  potfile
+  270       format (a240)
             call basefile (potfile)
             call suffix (potfile,'pot','old')
             inquire (file=potfile,exist=exist)
@@ -453,11 +470,11 @@ c
       if (domodel .or. dopair .or. dotarget) then
          call nextarg (answer,exist)
          if (.not. exist) then
-            write (iout,270)
-  270       format (/,' Output Potential Value at Each Grid Point',
+            write (iout,280)
+  280       format (/,' Output Potential Value at Each Grid Point',
      &                 ' [N] :  ',$)
-            read (input,280)  record
-  280       format (a240)
+            read (input,290)  record
+  290       format (a240)
             next = 1
             call gettext (record,answer,next)
          end if
@@ -482,20 +499,20 @@ c     output the number of potential grid points to be used
 c
       do i = 1, nconf
          if (i .eq. 1) then
-            write (iout,290)
-  290       format ()
+            write (iout,300)
+  300       format ()
          end if
          if (npgrid(i) .gt. maxpgrd) then
-            write (iout,300)
-  300       format (' POTENTIAL  --  Too many Grid Points;',
+            write (iout,310)
+  310       format (' POTENTIAL  --  Too many Grid Points;',
      &                 ' Increase MAXGRID')
             call fatal
          else if (nconf .eq. 1) then
-            write (iout,310)  npgrid(1)
-  310       format (' Electrostatic Potential Grid Points :',6x,i16)
+            write (iout,320)  npgrid(1)
+  320       format (' Electrostatic Potential Grid Points :',6x,i16)
          else
-            write (iout,320)  i,npgrid(i)
-  320       format (' Potential Grid Points for Structure',i4,' :',
+            write (iout,330)  i,npgrid(i)
+  330       format (' Potential Grid Points for Structure',i4,' :',
      &                 2x,i16)
          end if
       end do
@@ -512,15 +529,15 @@ c
                xi = pgrid(1,i,j)
                yi = pgrid(2,i,j)
                zi = pgrid(3,i,j)
-               write (igrd,330)  xi,yi,zi
-  330          format (3f15.8)
+               write (igrd,340)  xi,yi,zi
+  340          format (3f15.8)
             end do
          end do
          close (unit=igrd)
-         write (iout,340)  gridfile(1:trimtext(gridfile))
-  340    format (/,' Gaussian CUBEGEN Input Written To :   ',a)
-         write (iout,350)
-  350    format (/,' Next, run the Gaussian CUBEGEN program; for',
+         write (iout,350)  gridfile(1:trimtext(gridfile))
+  350    format (/,' Gaussian CUBEGEN Input Written To :   ',a)
+         write (iout,360)
+  360    format (/,' Next, run the Gaussian CUBEGEN program; for',
      &              ' example:',
      &           //,' cubegen 0 potential=MP2 FILE.fchk FILE.cube',
      &              ' -5 h < FILE.grid',
@@ -535,14 +552,14 @@ c
       if (dofit) then
          grdmin = -1.0d0
          call nextarg (string,exist)
-         if (exist)  read (string,*,err=360,end=360)  grdmin
-  360    continue
+         if (exist)  read (string,*,err=370,end=370)  grdmin
+  370    continue
          if (grdmin .le. 0.0d0) then
-            write (iout,370)
-  370       format (/,' Enter RMS Gradient Termination Criterion',
+            write (iout,380)
+  380       format (/,' Enter RMS Gradient Termination Criterion',
      &                 ' [0.01] :  ',$)
-            read (input,380)  grdmin
-  380       format (f20.0)
+            read (input,390)  grdmin
+  390       format (f20.0)
          end if
          if (grdmin .le. 0.0d0)  grdmin = 0.01d0
       end if
@@ -550,8 +567,8 @@ c
 c     print the parameter restraint value to be used in fitting
 c
       if (dofit) then
-         write (iout,390)  wresp
-  390    format (/,' Electrostatic Parameter Restraint Value :',f18.4)
+         write (iout,400)  wresp
+  400    format (/,' Electrostatic Parameter Restraint Value :',f18.4)
       end if
 c
 c     setup the potential computation for alternative models
@@ -766,7 +783,7 @@ c
 c
 c     perform any final tasks before program exit
 c
-  400 continue
+  410 continue
       call final
       end
 c
@@ -1611,15 +1628,15 @@ c
                   pole(1,i) = xx(nvar)
                end if
             end if
-            if (fit_dpl .and. vpol(2,i,iconf)) then
+            if (fit_dpl .and. vpol(2,i,iconf) .and. fxdpl(i)) then
                nvar = nvar + 1
                pole(2,i) = dterm * xx(nvar)
             end if
-            if (fit_dpl .and. vpol(3,i,iconf)) then
+            if (fit_dpl .and. vpol(3,i,iconf) .and. fydpl(i)) then
                nvar = nvar + 1
                pole(3,i) = dterm * xx(nvar)
             end if
-            if (fit_dpl .and. vpol(4,i,iconf)) then
+            if (fit_dpl .and. vpol(4,i,iconf) .and. fzdpl(i)) then
                nvar = nvar + 1
                pole(4,i) = dterm * xx(nvar)
             end if
@@ -2020,7 +2037,7 @@ c
                write (iout,110)  it,'Monopole',mono0(i)
   110          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_dpl .and. vpol(2,i,iconf)) then
+            if (fit_dpl .and. vpol(2,i,iconf) .and. fxdpl(i)) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(2,i)
@@ -2030,7 +2047,7 @@ c
                write (iout,130)  it,'X-Dipole',dterm*pole(2,i)
   130          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_dpl .and. vpol(3,i,iconf)) then
+            if (fit_dpl .and. vpol(3,i,iconf) .and. fydpl(i)) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(3,i)
@@ -2040,7 +2057,7 @@ c
                write (iout,150)  it,'Y-Dipole',dterm*pole(3,i)
   150          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
-            if (fit_dpl .and. vpol(4,i,iconf)) then
+            if (fit_dpl .and. vpol(4,i,iconf) .and. fzdpl(i)) then
                nvar = nvar + 1
                varpot(nvar) = 'DIPOLE'
                xx(nvar) = dterm * pole(4,i)

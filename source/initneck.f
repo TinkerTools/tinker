@@ -5,15 +5,16 @@ c     ##  COPYRIGHT (C) 2023 by Rae Corrigan & Jay W. Ponder  ##
 c     ##                  All Rights Reserved                 ##
 c     ##########################################################
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine initneck  --  setup neck contributions for GK  ##
-c     ##                                                            ##
-c     ################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine initneck  --  set implicit solvent neck values  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "initneck" sets the atom radius ranges as well as the neck
-c     correction values for neck regions formed between atom pairs
+c     correction values for interstitial regions between atom pairs,
+c     as used in implicit solvation models
 c
 c     literature reference:
 c

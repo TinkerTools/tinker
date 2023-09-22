@@ -873,8 +873,8 @@ c
       integer atmnum
       real*8 dhct
       logical descreen
-      logical descreenHydrogen
-      logical elementHCTscale
+      logical omithyd
+      logical atomhct
       character*10 radtyp
       character*20 keyword
       character*20 value
@@ -922,10 +922,9 @@ c
       descoff = 0.30d0
       radtyp = 'SOLUTE'
       descreen = .true.
-      descreenHydrogen = .false.
-      elementHCTscale = .true.
+      omithyd = .true.
+      atomhct = .true.
       useneck = .true.
-      chemasn = .true.
       usetanh = .true.
 c
 c     get any altered generalized Kirkwood values from keyfile
@@ -955,41 +954,27 @@ c
             else if (value(1:6) .eq. 'SOLUTE') then
                radtyp = 'SOLUTE'
             end if
-         else if (keyword(1:9) .eq. 'DESCREEN ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:4) .eq. 'TRUE') then
-               descreen = .true.
-            end if
+         else if (keyword(1:12) .eq. 'NO-DESCREEN ') then
+            descreen = .false.
          else if (keyword(1:18) .eq. 'DESCREEN-HYDROGEN ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:5) .eq. 'FALSE') then
-               descreenHydrogen = .false.
-            end if
-         else if (keyword(1:10) .eq. 'HCT-SCALE ') then
-            read (string,*,err=20,end=20)  dhct
-   20       continue
-         else if (keyword(1:18) .eq. 'ELEMENT-HCT-SCALE ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:5) .eq. 'FALSE') then
-               elementHCTscale = .false.
-            end if
+            omithyd = .false.
          else if (keyword(1:16) .eq. 'DESCREEN-OFFSET ') then
-            read (string,*,err=30,end=30)  descoff
+            read (string,*,err=20,end=20)  descoff
+   20       continue
+         else if (keyword(1:10) .eq. 'HCT-SCALE ') then
+            read (string,*,err=30,end=30)  dhct
    30       continue
+         else if (keyword(1:12) .eq. 'HCT-ELEMENT ') then
+            call getword (record,value,next)
+            call upcase (value)
+            if (value(1:5) .eq. 'FALSE') then
+               atomhct = .false.
+            end if
          else if (keyword(1:16) .eq. 'NECK-CORRECTION ') then
             call getword (record,value,next)
             call upcase(value)
             if (value(1:5) .eq. 'FALSE') then
                useneck = .false.
-            end if
-         else if (keyword(1:20) .eq. 'BONDING-AWARE-SNECK ') then
-            call getword (record,value,next)
-            call upcase(value)
-            if (value(1:5) .eq. 'FALSE') then
-               chemasn = .false.
             end if
          else if (keyword(1:16) .eq. 'TANH-CORRECTION ') then
             call getword (record,value,next)
@@ -1016,7 +1001,7 @@ c
 c
 c     use overlap scale factors for specific elements
 c
-         if (elementHCTscale) then
+         if (atomhct) then
             atmnum = atomic(i)
             if (atmnum .eq. 1)  shct(i) = 0.72d0
             if (atmnum .eq. 6)  shct(i) = 0.695d0
@@ -1028,7 +1013,7 @@ c
 c
 c     remove hydrogen descreening if it is not to be used
 c
-         if (.not. descreenHydrogen) then
+         if (omithyd) then
             atmnum = atomic(i)
             if (atmnum .eq. 1) shct(i) = 0.0d0
          end if
@@ -1784,7 +1769,7 @@ c
 c
 c     get neck correction via a bonded connectivity scheme
 c
-         if (useneck .and. chemasn) then
+         if (useneck) then
             do i = 1, n
                atmnum = atomic(i)
                if (atmnum .gt. 1) then

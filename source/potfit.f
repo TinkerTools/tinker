@@ -45,6 +45,9 @@ c     fitpol      flag marking atom types used in atomic multipole fit
 c     fitcpen     flag marking atom types used in charge penetration
 c     gatm        flag to use potential grid points around each atom
 c     fatm        flag to use each atom in electrostatic potential fit
+c     fxdpl       flag to use each atom x-dipole in electrostatic fit
+c     fydpl       flag to use each atom y-dipole in electrostatic fit
+c     fzdpl       flag to use each atom z-dipole in electrostatic fit
 c     vchg        flag for partial charge at each atom in fitting
 c     vpol        flag for atomic multipoles at each atom in fitting
 c     vcpen       flag for charge penetration at each atom in fitting
@@ -83,6 +86,9 @@ c
       logical, allocatable :: fitcpen(:)
       logical, allocatable :: gatm(:)
       logical, allocatable :: fatm(:)
+      logical, allocatable :: fxdpl(:)
+      logical, allocatable :: fydpl(:)
+      logical, allocatable :: fzdpl(:)
       logical, allocatable :: vchg(:,:)
       logical, allocatable :: vpol(:,:,:)
       logical, allocatable :: vcpen(:,:)
