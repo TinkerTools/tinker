@@ -175,7 +175,7 @@ c
                pbr(k) = pbrd
                gkr(k) = csrd
                pbr(k) = gkrd
-               sneck(k) = snek
+               snk(k) = snek
                if (.not. silent) then
                   write (iout,40)  k,pbrd,csrd,gkrd,snek
    40             format (6x,i6,7x,3f12.4)
@@ -897,6 +897,7 @@ c
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
+      if (allocated(sneck))  deallocate (sneck)
       if (allocated(bornint))  deallocate (bornint)
       allocate (rsolv(n))
       allocate (rdescr(n))
@@ -909,6 +910,7 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
+      allocate (sneck(n))
       allocate (bornint(n))
       if (poltyp .eq. 'OPT') then
          allocate (uopts(0:optorder,3,n))
@@ -1716,6 +1718,7 @@ c
       use solute
       implicit none
       integer i,j,k,l,m
+      integer it
       integer atmnum
       integer nheavy
       real*8 rscale
@@ -1747,16 +1750,18 @@ c
       else if (radtyp .eq. 'SOLUTE') then
          if (solvtyp(1:2) .eq. 'GK') then     
             do i = 1, n
-               if (type(i) .ne. 0) then
-                  if (gkr(type(i)) .ne. 0.0d0) then
+               it = type(i)
+               if (it .ne. 0) then
+                  if (gkr(it) .ne. 0.0d0) then
                      rsolv(i) = gkr(type(i))
                   end if
                end if
             end do
          else if (solvtyp(1:2) .eq. 'PB') then
             do i = 1, n
-               if (type(i) .ne. 0) then
-                  if (pbr(type(i)) .ne. 0.0d0) then
+               it = type(i)
+               if (it .ne. 0) then
+                  if (pbr(it) .ne. 0.0d0) then
                      rsolv(i) = pbr(type(i))
                   end if
                end if
@@ -1771,6 +1776,7 @@ c     get neck correction via a bonded connectivity scheme
 c
          if (useneck) then
             do i = 1, n
+               it = type(i)
                atmnum = atomic(i)
                if (atmnum .gt. 1) then
                   nheavy = 0
@@ -1780,19 +1786,21 @@ c
                      end if
                   end do
                   if (nheavy .eq. 0) then
-                     sneck(i) = 1.0
+                     sneck(it) = 1.0
                   else
-                     sneck(i) = sneck(i) * (5.0d0-nheavy)/4.0d0
+                     sneck(i) = snk(it) * (5.0d0-nheavy)/4.0d0
                   end if
+               end if
+            end do
 c
 c     hydrogen neck contribution same as bound heavy atom
 c
-                  do k = 1, n12(i)
-                     if (atomic(i12(k,i)) .eq. 1) then
-                        sneck(i12(k,i)) = sneck(i)
-                     end if
-                  end do
-               end if
+            do i = 1, n
+               do k = 1, n12(i)
+                  if (atomic(i12(k,i)) .eq. 1) then
+                     sneck(i12(k,i)) = sneck(i)
+                  end if
+               end do
             end do
          end if
 c

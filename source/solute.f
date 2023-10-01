@@ -27,7 +27,7 @@ c     aneck       constants to use in calculating neck values
 c     bneck       constants to use in calculating neck values
 c     rsolv       atomic radius of each atom for continuum solvation
 c     rdescr      atomic radius of each atom for descreening
-c     asolv       atomic surface area solvation parameters
+c     asolv       atomic surface area solvation weight parameters
 c     rborn       Born radius of each atom for GB/SA solvation
 c     drb         solvation derivatives with respect to Born radii
 c     drbp        GK polarization derivatives with respect to Born radii
@@ -41,7 +41,7 @@ c     vsolv       atomic volume of each atom for use with ACE
 c     wace        "omega" values for atom class pairs for use with ACE
 c     s2ace       "sigma^2" values for atom class pairs for use with ACE
 c     uace        "mu" values for atom class pairs for use with ACE
-c     sneck       neck correction scale factor for each atom type
+c     sneck       pairwise neck correction scale factor for each atom
 c     bornint     unscaled 1/r^6 corrections for tanh chain rule term
 c     useneck     logical flag to use neck interstitial space correction
 c     usetanh     logical flag to use tanh interstitial space correction

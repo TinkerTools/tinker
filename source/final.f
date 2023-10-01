@@ -657,6 +657,7 @@ c
       if (allocated(pbr))  deallocate (pbr)
       if (allocated(csr))  deallocate (csr)
       if (allocated(gkr))  deallocate (gkr)
+      if (allocated(snk))  deallocate (snk)
 c
 c     deallocation of global arrays from module kstbnd
 c

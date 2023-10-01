@@ -1349,6 +1349,7 @@ c
       use mpole
       use nonpol
       use shunt
+      use solpot
       use solute
       implicit none
       real*8 ecav,edisp
@@ -1371,9 +1372,10 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
 c
-c     compute SASA and effective radius needed for cavity term
+c     compute surface area and effective radius for cavity
 c
       exclude = 1.4d0
+      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
       call surface (esurf,aesurf,radcav,asolv,exclude)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff

@@ -52,7 +52,6 @@ c
       use kvdwpr
       use merck
       use params
-      use solute
       implicit none
       integer i,j,iprm
       integer ia,ib,ic,id
@@ -1437,7 +1436,7 @@ c
                pbr(ia) = 0.5d0 * pbrd
                csr(ia) = 0.5d0 * csrd
                gkr(ia) = 0.5d0 * gkrd
-               sneck(ia) = snek
+               snk(ia) = snek
             end if
 c
 c     conjugated pisystem atom parameters

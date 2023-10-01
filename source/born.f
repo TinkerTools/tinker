@@ -608,7 +608,8 @@ c
       use solute
       use virial
       implicit none
-      integer i,j,k,it,kt
+      integer i,j,k
+      integer it,kt
       integer, allocatable :: skip(:)
       real*8 xi,yi,zi
       real*8 xr,yr,zr

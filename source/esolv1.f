@@ -4672,6 +4672,7 @@ c
       use mpole
       use nonpol
       use shunt
+      use solpot
       use solute
       implicit none
       integer i
@@ -4711,9 +4712,10 @@ c
          dvol(3,i) = 0.0d0
       end do
 c
-c     compute SASA and effective radius needed for cavity term
+c     compute surface area and effective radius for cavity
 c
       exclude = 1.4d0
+      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
       call surface1 (esurf,aesurf,dsurf,radcav,asolv,exclude)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       dreff = reff / (2.0d0*esurf)

@@ -149,7 +149,7 @@ c
          end if
       end do
 c
-c     compute the area and derivatives of current "ir" sphere
+c     compute the accessible surface area of current "ir" sphere
 c
       do ir = 1, n
          if (skip(ir))  goto 180

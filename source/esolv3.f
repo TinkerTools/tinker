@@ -1541,6 +1541,7 @@ c
       use mpole
       use nonpol
       use shunt
+      use solpot
       use solute
       implicit none
       integer i
@@ -1575,7 +1576,7 @@ c
          aedisp(i) = 0.0d0
       end do
 c
-c     compute SASA and effective radius needed for cavity term
+c     compute surface area and effective radius for cavity
 c
       exclude = 1.4d0
       call surface (esurf,aesurf,radcav,asolv,exclude)
