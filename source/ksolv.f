@@ -956,7 +956,7 @@ c
             else if (value(1:6) .eq. 'SOLUTE') then
                radtyp = 'SOLUTE'
             end if
-         else if (keyword(1:12) .eq. 'NO-DESCREEN ') then
+         else if (keyword(1:11) .eq. 'NODESCREEN ') then
             descreen = .false.
          else if (keyword(1:18) .eq. 'DESCREEN-HYDROGEN ') then
             omithyd = .false.

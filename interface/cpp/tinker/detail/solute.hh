@@ -34,7 +34,6 @@ extern double*& uace;
 extern double*& sneck;
 extern double*& bornint;
 extern int& useneck;
-extern int& chemasn;
 extern int& usetanh;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -68,7 +67,6 @@ extern "C" double* TINKER_MOD(solute, uace);
 extern "C" double* TINKER_MOD(solute, sneck);
 extern "C" double* TINKER_MOD(solute, bornint);
 extern "C" int TINKER_MOD(solute, useneck);
-extern "C" int TINKER_MOD(solute, chemasn);
 extern "C" int TINKER_MOD(solute, usetanh);
 
 double& doffset = TINKER_MOD(solute, doffset);
@@ -101,7 +99,6 @@ double*& uace = TINKER_MOD(solute, uace);
 double*& sneck = TINKER_MOD(solute, sneck);
 double*& bornint = TINKER_MOD(solute, bornint);
 int& useneck = TINKER_MOD(solute, useneck);
-int& chemasn = TINKER_MOD(solute, chemasn);
 int& usetanh = TINKER_MOD(solute, usetanh);
 #endif
 } }

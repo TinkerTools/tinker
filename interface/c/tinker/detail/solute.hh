@@ -36,7 +36,6 @@ extern double* TINKER_MOD(solute, uace);
 extern double* TINKER_MOD(solute, sneck);
 extern double* TINKER_MOD(solute, bornint);
 extern int TINKER_MOD(solute, useneck);
-extern int TINKER_MOD(solute, chemasn);
 extern int TINKER_MOD(solute, usetanh);
 #ifdef __cplusplus
 }
