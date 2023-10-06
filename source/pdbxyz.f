@@ -293,7 +293,7 @@ c
          clash = .false.
          call chkxyz (clash)
 c
-c     write the Tinker coordinates and reset the connectivities
+c     write the coordinates file and reset the connectivities
 c
          ltitle = pdbleng
          title = pdbtitle(1:ltitle)
@@ -363,9 +363,9 @@ c
       real*8, allocatable :: xcys(:)
       real*8, allocatable :: ycys(:)
       real*8, allocatable :: zcys(:)
-      logical newchain
-      logical midchain
-      logical endchain
+      logical newchn
+      logical midchn
+      logical endchn
       logical cyclic
       character*3 resname
       character*4 atmname
@@ -487,12 +487,12 @@ c
 c
 c     test location of residue within the current chain
 c
-         newchain = .false.
-         midchain = .false.
-         endchain = .false.
-         if (i .eq. jres)  newchain = .true.
-         if (i .eq. kres)  endchain = .true.
-         if (.not.newchain .and. .not.endchain)  midchain = .true.
+         newchn = .false.
+         midchn = .false.
+         endchn = .false.
+         if (i .eq. jres)  newchn = .true.
+         if (i .eq. kres)  endchn = .true.
+         if (.not.newchn .and. .not.endchn)  midchn = .true.
 c
 c     build the amide nitrogen of the current residue
 c
@@ -500,17 +500,17 @@ c
          if (resname .eq. 'COH')  atmname = ' OH '
          call findatm (atmname,start,stop,k)
          if (k .ne. 0)  ni(i) = n
-         if (midchain) then
+         if (midchn) then
             j = ntyp(ityp)
             call oldatm (k,j,ci(i-1),i)
-         else if (newchain) then
+         else if (newchn) then
             if (cyclic) then
                j = ntyp(ityp)
             else
                j = nntyp(ityp)
             end if
             call oldatm (k,j,0,i)
-         else if (endchain) then
+         else if (endchn) then
             if (cyclic) then
                j = ntyp(ityp)
             else
@@ -526,13 +526,13 @@ c
          if (resname .eq. 'NME')  atmname = ' CH3'
          call findatm (atmname,start,stop,k)
          if (k .ne. 0)  cai(i) = n
-         if (midchain .or. cyclic .or. nres.eq.1) then
+         if (midchn .or. cyclic .or. nres.eq.1) then
             j = catyp(ityp)
             call oldatm (k,j,ni(i),i)
-         else if (newchain) then
+         else if (newchn) then
             j = cantyp(ityp)
             call oldatm (k,j,ni(i),i)
-         else if (endchain) then
+         else if (endchn) then
             j = cactyp(ityp)
             call oldatm (k,j,ni(i),i)
          end if
@@ -541,13 +541,13 @@ c     build the carbonyl carbon of the current residue
 c
          call findatm (' C  ',start,stop,k)
          if (k .ne. 0)  ci(i) = n
-         if (midchain .or. cyclic) then
+         if (midchn .or. cyclic) then
             j = ctyp(ityp)
             call oldatm (k,j,cai(i),i)
-         else if (newchain) then
+         else if (newchn) then
             j = cntyp(ityp)
             call oldatm (k,j,cai(i),i)
-         else if (endchain) then
+         else if (endchn) then
             j = cctyp(ityp)
             if (resname .eq. 'COH') then
                type(ci(i-1)) = biotyp(j)
@@ -560,13 +560,13 @@ c     build the carbonyl oxygen of the current residue
 c
          call findatm (' O  ',start,stop,k)
          if (k .ne. 0)  oi(i) = n
-         if (midchain .or. cyclic) then
+         if (midchn .or. cyclic) then
             j = otyp(ityp)
             call oldatm (k,j,ci(i),i)
-         else if (newchain) then
+         else if (newchn) then
             j = ontyp(ityp)
             call oldatm (k,j,ci(i),i)
-         else if (endchain) then
+         else if (endchn) then
             j = octyp(ityp)
             if (resname .eq. 'COH') then
                type(oi(i-1)) = biotyp(j)
@@ -577,17 +577,17 @@ c
 c
 c     build the amide hydrogens of the current residue
 c
-         if (midchain .or. (endchain.and.cyclic)) then
+         if (midchn .or. (endchn.and.cyclic)) then
             j = hntyp(ityp)
             call findatm (' H  ',start,stop,k)
             call newatm (k,j,ni(i),1.01d0,ci(i-1),119.0d0,
      &                      cai(i),119.0d0,1)
-         else if (newchain .and. cyclic) then
+         else if (newchn .and. cyclic) then
             j = hntyp(ityp)
             call findatm (' H  ',start,stop,k)
             call newatm (k,j,ni(i),1.01d0,ci(kres),119.0d0,
      &                      cai(i),119.0d0,1)
-         else if (newchain) then
+         else if (newchn) then
             j = hnntyp(ityp)
             if (resname .eq. 'PRO') then
                call findatm (' H2 ',start,stop,k)
@@ -612,7 +612,7 @@ c
                call newatm (k,j,ni(i),1.01d0,cai(i),109.5d0,
      &                         ci(i),-60.0d0,0)
             end if
-         else if (endchain) then
+         else if (endchn) then
             j = hnctyp(ityp)
             if (resname .eq. 'COH') then
                call findatm (' HO ',start,stop,k)
@@ -644,11 +644,11 @@ c
          else
             call findatm (' HA ',start,stop,k)
          end if
-         if (midchain .or. cyclic) then
+         if (midchn .or. cyclic) then
             j = hatyp(ityp)
             call newatm (k,j,cai(i),1.10d0,ni(i),109.5d0,
      &                      ci(i),109.5d0,-1)
-         else if (newchain) then
+         else if (newchn) then
             j = hantyp(ityp)
             if (resname .eq. 'FOR') then
                call findatm (' H  ',start,stop,k)
@@ -668,7 +668,7 @@ c
                call newatm (k,j,cai(i),1.10d0,ni(i),109.5d0,
      &                         ci(i),109.5d0,-1)
             end if
-         else if (endchain) then
+         else if (endchn) then
             j = hactyp(ityp)
             if (resname .eq. 'NME') then
                call findatm (' H1 ',start,stop,k)
@@ -689,11 +689,12 @@ c
 c
 c     build the side chain atoms of the current residue
 c
-         call addside (resname,i,start,stop,cai(i),ni(i),ci(i),si(i))
+         call addside (resname,i,newchn,start,stop,
+     &                    cai(i),ni(i),ci(i),si(i))
 c
 c     build the terminal oxygen at the end of a peptide chain
 c
-         if (endchain .and. .not.cyclic .and. resname.ne.'COH') then
+         if (endchn .and. .not.cyclic .and. resname.ne.'COH') then
             call findatm (' OXT',start,stop,k)
             if (k .eq. 0)  call findatm (' OT2',start,stop,k)
             j = octyp(ityp)
@@ -759,17 +760,20 @@ c     Bank file or found from internal coordinates, then atom types
 c     are assigned and connectivity data generated
 c
 c     note biotypes of CD and HD atoms for N-terminal proline are
-c     set as absolute values, not relative to the CB atom
+c     set as absolute values, not relative to the CB atom; this may
+c     need updating if the list of biotypes changes in the future
 c
 c
-      subroutine addside (resname,ires,start,stop,cai,ni,ci,si)
+      subroutine addside (resname,ires,newchn,start,stop,cai,ni,ci,si)
       use atoms
       use resdue
       use sequen
       implicit none
-      integer i,k,ires
+      integer i,k
+      integer ires,ichn
       integer start,stop
       integer cai,ni,ci,si
+      logical newchn
       character*3 resname
 c
 c
@@ -965,7 +969,7 @@ c
          call findatm (' CG ',start,stop,i)
          call oldatm (i,k+2,n-1,ires)
          call findatm (' CD ',start,stop,i)
-         if (ires .eq. 1) then
+         if (newchn) then
             call oldatm (i,469,n-1,ires)
          else
             call oldatm (i,k+4,n-1,ires)
@@ -979,7 +983,7 @@ c
          call newatm (i,k+3,n-4,1.10d0,n-5,111.2d0,n-3,111.2d0,1)
          call findatm (' HG3',start,stop,i)
          call newatm (i,k+3,n-5,1.10d0,n-6,111.2d0,n-4,111.2d0,-1)
-         if (ires .eq. 1) then
+         if (newchn) then
             call findatm (' HD2',start,stop,i)
             call newatm (i,470,n-5,1.10d0,n-6,111.2d0,ni,111.2d0,1)
             call findatm (' HD3',start,stop,i)
@@ -1588,7 +1592,7 @@ c
       integer poi,o5i,c5i
       integer c4i,o4i,c1i
       integer c3i,c2i,o3i,o2i
-      logical newchain,endchain
+      logical newchn,endchn
       logical, allocatable :: deoxy(:)
       character*3 resname
 c
@@ -1642,15 +1646,15 @@ c
 c
 c     test for initial or final residue of a nucleotide chain
 c
-         newchain = .false.
-         endchain = .false.
+         newchn = .false.
+         endchn = .false.
          do j = 1, nchain
             if (i .eq. ichain(1,j)) then
-               newchain = .true.
+               newchn = .true.
                poi = 0
                o3i = 0
             end if
-            if (i .eq. ichain(2,j))  endchain = .true.
+            if (i .eq. ichain(2,j))  endchn = .true.
          end do
 c
 c     build the phosphate atoms of the current residue
@@ -1661,7 +1665,7 @@ c
 
          else if (resname .eq. ' MP') then
 
-         else if (.not. newchain) then
+         else if (.not. newchn) then
             call findatm (' P  ',start,stop,k)
             if (k .ne. 0)  poi = n
             j = ptyp(ityp)
@@ -1679,7 +1683,7 @@ c
          call findatm (' O5''',start,stop,k)
          if (k .ne. 0)  o5i = n
          j = o5typ(ityp)
-         if (newchain) then
+         if (newchn) then
             if (deoxy(i)) then
                j = 1244
             else
@@ -1715,7 +1719,7 @@ c
          call findatm (' O3''',start,stop,k)
          if (k .ne. 0)  o3i = n
          j = o3typ(ityp)
-         if (endchain) then
+         if (endchn) then
             if (deoxy(i)) then
                j = 1249
             else
@@ -1732,7 +1736,7 @@ c
 c
 c     build the hydrogen atoms of the current residue
 c
-         if (newchain) then
+         if (newchn) then
             call findatm ('HO5''',start,stop,k)
             j = h5ttyp(ityp)
             call newatm (k,j,o5i,1.00d0,c5i,109.5d0,c4i,180.0d0,0)
@@ -1767,7 +1771,7 @@ c
          call findatm (' H1''',start,stop,k)
          j = h1typ(ityp)
          call newatm (k,j,c1i,1.09d0,o4i,109.5d0,c2i,109.5d0,-1)
-         if (endchain) then
+         if (endchn) then
             call findatm ('HO3''',start,stop,k)
             j = h3ttyp(ityp)
             call newatm (k,j,o3i,1.00d0,c3i,109.5d0,c4i,180.0d0,0)
