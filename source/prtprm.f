@@ -1272,8 +1272,8 @@ c     implicit solvation parameters
 c
       exist = .false.
       do i = 1, maxtyp
-         if (pbr(i).ne.0.0d0 .or. csr(i).ne.0.0d0
-     &          .or. gkr(i).ne.0.0d0)  exist = .true.
+         if (pbr(i).ne.0.0d0 .or. csr(i).ne.0.0d0 .or.
+     &          gkr(i).ne.0.0d0 .or. snk(i).ne.0.0d0)  exist = .true.
       end do
       if (exist) then
          write (itxt,1790)  formfeed,forcefield
@@ -1281,15 +1281,15 @@ c
      &0)
          write (itxt,1800)
  1800    format (//,15x,'Implicit Solvation Parameters',
-     &           ///,22x,'Type',6x,'PB Size',
-     &              5x,'ddCOSMO',5x,'GK Size',/)
+     &           ///,22x,'Type',6x,'PB Size',5x,'CS Size',
+     &              5x,'GK Size',6x,'S-Neck',/)
          k = 0
          do i = 1, maxtyp
-            if (pbr(i).ne.0.0d0 .or. csr(i).ne.0.0d0
-     &             .or. gkr(i).ne.0.0d0) then
+            if (pbr(i).ne.0.0d0 .or. csr(i).ne.0.0d0 .or.
+     &             gkr(i).ne.0.0d0 .or. snk(i).ne.0.0d0) then
                k = k + 1
-               write (itxt,1810)  k,i,pbr(i),csr(i),gkr(i)
- 1810          format (8x,i7,4x,i7,1x,3f12.4)
+               write (itxt,1810)  k,i,pbr(i),csr(i),gkr(i),snk(i)
+ 1810          format (8x,i7,4x,i7,1x,4f12.4)
             end if
          end do
       end if

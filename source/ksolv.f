@@ -151,7 +151,7 @@ c
                pbrd = 0.0d0
                csrd = 0.0d0
                gkrd = 0.0d0
-               snek = -1.0d0
+               snek = 0.0d0
                string = record(next:240)
                read (string,*,err=20,end=20)  pbrd,csrd,gkrd,snek
    20          continue
@@ -159,18 +159,8 @@ c
                   header = .false.
                   write (iout,30)
    30             format (/,' Additional Solvation Parameters :',
-     &                    //,5x,'Atom Type',16x,'PB Size',
-     &                       5x,'CS Size',5x,'GK Size',/)
-               end if
-c
-c    If there is no text descriptor, then read pbrd from keyword
-c
-               if (snek .le. -1.0d0) then
-                  snek = gkrd
-                  gkrd = csrd
-                  csrd = pbrd
-                  read (keyword,*,err=35,end=35) pbrd
-   35             continue
+     &                    //,5x,'Atom Type',16x,'PB Size',5x,'CS Size',
+     &                       5x,'GK Size',6x,'S-Neck',/)
                end if
                pbr(k) = pbrd
                gkr(k) = csrd
@@ -178,7 +168,7 @@ c
                snk(k) = snek
                if (.not. silent) then
                   write (iout,40)  k,pbrd,csrd,gkrd,snek
-   40             format (6x,i6,7x,3f12.4)
+   40             format (6x,i6,7x,4f12.4)
                end if
             else if (k .gt. maxtyp) then
                write (iout,50)  maxtyp

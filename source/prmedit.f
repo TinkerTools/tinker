@@ -184,7 +184,8 @@ c
       real*8 cfb,cfa1,cfa2
       real*8 cfb1,cfb2
       real*8 el,iz,rp
-      real*8 pbrd,csrd,gkrd
+      real*8 pbrd,csrd
+      real*8 gkrd,snek
       real*8 ss,ts
       real*8 vt(6),st(6)
       character*3 sym
@@ -957,10 +958,11 @@ c
             pbrd = 0.0d0
             csrd = 0.0d0
             gkrd = 0.0d0
-            read (string,*,err=1370,end=1370)  ia,pbrd,csrd,gkrd
+            snek = 0.0d0
+            read (string,*,err=1370,end=1370)  ia,pbrd,csrd,gkrd,snek
  1370       continue
-            write (iprm,1380)  ia,pbrd,csrd,gkrd
- 1380       format ('solute',4x,i5,5x,3f11.4)
+            write (iprm,1380)  ia,pbrd,csrd,gkrd,snek
+ 1380       format ('solute',4x,i5,5x,4f11.4)
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
             el = 0.0d0
