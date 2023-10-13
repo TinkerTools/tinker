@@ -219,7 +219,7 @@ c
          header = 'CORD'
          nframe = zero
          nprev = zero
-         ncrdsav = zero
+         ncrdsav = one
          nstep = zero
          nvelsav = zero
          ndfree = zero
