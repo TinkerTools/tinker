@@ -1345,6 +1345,7 @@ c
       use atoms
       use energi
       use kvdws
+      use limits
       use math
       use mpole
       use nonpol
@@ -1425,32 +1426,37 @@ c     perform deallocation of some local arrays
 c
       deallocate (aesurf)
 c
-c     find the Weeks-Chandler-Andersen dispersion energy
+c     find the implicit dispersion solvation energy
 c
-      call ewca (edisp)
+      if (use_vlist) then
+         call ewcab (edisp)
+      else
+         call ewcaa (edisp)
+      end if
 c     call ewcax (edisp)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ewca  --  Weeks-Chandler-Andersen dispersion  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ewcaa  --  WCA dispersion energy via loop  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "ewca" find the Weeks-Chandler-Andersen dispersion energy
-c     of a solute using an HCT-like method
+c     "ewcaa" find the Weeks-Chandler-Andersen dispersion energy
+c     using a double loop
 c
 c
-      subroutine ewca (edisp)
+      subroutine ewcaa (edisp)
       use atoms
       use atomid
       use deriv
       use kvdws
       use math
       use nonpol
+      use shunt
       use solute
       use vdw
       implicit none
@@ -1458,168 +1464,308 @@ c
       real*8 edisp
       real*8 e,idisp
       real*8 xi,yi,zi
-      real*8 rk,sk,sk2
-      real*8 xr,yr,zr,r,r2
-      real*8 sum,term,iwca,irepl
-      real*8 epsi,rmini,rio,rih,rmax
-      real*8 ao,emixo,rmixo,rmixo7
-      real*8 ah,emixh,rmixh,rmixh7
-      real*8 lik,lik2,lik3,lik4
-      real*8 lik5,lik10,lik11,lik12
-      real*8 uik,uik2,uik3,uik4
-      real*8 uik5,uik10,uik11,uik12
+      real*8 si,si2
+      real*8 sk,sk2
+      real*8 xr,yr,zr
+      real*8 r,r2,r3,r4,r5
+      real*8 taper
+      real*8 sumi,sumk
+      real*8 sum1i,sum2i
+      real*8 sum1k,sum2k
+      real*8 epsi,rmin,rio,rih
+      real*8 aoi,emixo,rmixo,rmixo7
+      real*8 ahi,emixh,rmixh,rmixh7
+      real*8 epsk,rmkn,rko,rkh
+      real*8 aok,emkxo,rmkxo,rmkxo7
+      real*8 ahk,emkxh,rmkxh,rmkxh7
+      real*8, allocatable :: edisparray(:)
+      character*6 mode
 c
 c
-c     zero out the Weeks-Chandler-Andersen dispersion energy
+c     zero out the WCA dispersion energy
 c
       edisp = 0.0d0
 c
-c     OpenMP directives for the major loop structure
+c     perform dynamic allocation of some local arrays
 c
-!$OMP PARALLEL default(private) shared(n,class,epsdsp,
-!$OMP& raddsp,x,y,z,cdsp)
-!$OMP& shared(edisp)
-!$OMP DO reduction(+:edisp) schedule(guided)
+      allocate (edisparray(n))
 c
-c     find the Weeks-Chandler-Andersen dispersion energy
+c     zero out the atomic WCA dispersion energy
 c
       do i = 1, n
-         epsi = epsdsp(i)
-         rmini = raddsp(i)
-         emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
-         rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
-         rmixo7 = rmixo**7
-         ao = emixo * rmixo7
-         emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
-         rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
-         rmixh7 = rmixh**7
-         ah = emixh * rmixh7
+         edisparray(i) = 0.0d0
+      end do
+c
+c     set the coefficients for the switching function
+c
+      mode = 'VDW'
+      call switch (mode)
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(n,epsdsp,
+!$OMP& raddsp,x,y,z,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& shared(edisparray)
+!$OMP DO reduction(+:edisparray) schedule(guided)
+      do i = 1, n-1
          xi = x(i)
          yi = y(i)
          zi = z(i)
+         epsi = epsdsp(i)
+         rmin = raddsp(i)
+         emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
+         rmixo = 2.0d0 * (rmino**3+rmin**3) / (rmino**2+rmin**2)
+         rmixo7 = rmixo**7
+         aoi = emixo * rmixo7
+         emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
+         rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
+         rmixh7 = rmixh**7
+         ahi = emixh * rmixh7
          rio = 0.5d0*rmixo + dspoff
          rih = 0.5d0*rmixh + dspoff
+         si = rmin * shctd
+         si2 = si * si
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
-         sum = 0.0d0
-         do k = 1, n
-            if (i .ne. k) then
-               xr = x(k) - xi
-               yr = y(k) - yi
-               zr = z(k) - zi
-               r2 = xr*xr + yr*yr + zr*zr
+         do k = i+1, n
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. off2) then
                r = sqrt(r2)
-               rk = raddsp(k)
-               sk = rk * shctd
+               epsk = epsdsp(k)
+               rmkn = raddsp(k)
+               emkxo = 4.0d0*epso * epsk / ((sqrt(epso)+sqrt(epsk))**2)
+               rmkxo = 2.0d0 * (rmino**3+rmkn**3) / (rmino**2+rmkn**2)
+               rmkxo7 = rmkxo**7
+               aok = emkxo * rmkxo7
+               emkxh = 4.0d0*epsh * epsk / ((sqrt(epsh)+sqrt(epsk))**2)
+               rmkxh = 2.0d0 * (rminh**3+rmkn**3) / (rminh**2+rmkn**2)
+               rmkxh7 = rmkxh**7
+               ahk = emkxh * rmkxh7
+               rko = rmkxo / 2.0d0 + dspoff
+               rkh = rmkxh / 2.0d0 + dspoff
+               sk = rmkn * shctd
                sk2 = sk * sk
-               if (rio .lt. r+sk) then
-                  rmax = max(rio,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixo) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixo)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -emixo * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixo) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     lik = max(rmax,rmixo)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     idisp = -2.0d0 * ao * term
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     irepl = ao * rmixo7 * term
-                     sum = sum + irepl + idisp
-                  end if
+               call pairewca (r,r2,rio,rmixo,rmixo7,sk,sk2,aoi,emixo,
+     &                     sum1i,.true.)
+               call pairewca (r,r2,rih,rmixh,rmixh7,sk,sk2,ahi,emixh,
+     &                     sum2i,.false.)
+               sumi = sum1i + sum2i
+               call pairewca (r,r2,rko,rmkxo,rmkxo7,si,si2,aok,emkxo,
+     &                     sum1k,.true.)
+               call pairewca (r,r2,rkh,rmkxh,rmkxh7,si,si2,ahk,emkxh,
+     &                     sum2k,.false.)
+               sumk = sum1k + sum2k
+c
+c     use energy switching if near the cutoff distance
+c
+               if (r2 .gt. cut2) then
+                  r3 = r2 * r
+                  r4 = r2 * r2
+                  r5 = r2 * r3
+                  taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
+                  sumi = sumi * taper
+                  sumk = sumk * taper
                end if
-               if (rih .lt. r+sk) then
-                  rmax = max(rih,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixh) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixh)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                    * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     iwca = -2.0d0 * emixh * term
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixh) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     lik = max(rmax,rmixh)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     idisp = -4.0d0 * ah * term
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     irepl = 2.0d0 * ah * rmixh7 * term
-                     sum = sum + irepl + idisp
-                  end if
+c
+c     increment the overall Weeks-Chandler-Andersen energy component
+c
+               if (sumi .ne. 0.0d0 .or. sumk .ne. 0.0d0) then
+                  edisparray(i) = edisparray(i) + sumi
+                  edisparray(k) = edisparray(k) + sumk
                end if
             end if
          end do
-c
-c     increment the overall dispersion energy component
-c
-         e = cdsp(i) - slevy*awater*sum
-         edisp = edisp + e
       end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
+c
+c     increment the overall dispersion energy component
+c
+      do i = 1, n
+         e = cdsp(i) - slevy*awater*edisparray(i)
+         edisp = edisp + e
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (edisparray)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ewcab  --  WCA dispersion energy via list  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "ewcab" find the Weeks-Chandler-Andersen dispersion energy
+c     using a neighbor list
+c
+c
+      subroutine ewcab (edisp)
+      use atoms
+      use atomid
+      use deriv
+      use kvdws
+      use math
+      use neigh
+      use nonpol
+      use shunt
+      use solute
+      use vdw
+      implicit none
+      integer i,ii
+      integer k,kk
+      real*8 edisp
+      real*8 e,idisp
+      real*8 xi,yi,zi
+      real*8 si,si2
+      real*8 sk,sk2
+      real*8 xr,yr,zr
+      real*8 r,r2,r3,r4,r5
+      real*8 taper
+      real*8 sumi,sumk
+      real*8 sum1i,sum2i
+      real*8 sum1k,sum2k
+      real*8 epsi,rmin,rio,rih
+      real*8 aoi,emixo,rmixo,rmixo7
+      real*8 ahi,emixh,rmixh,rmixh7
+      real*8 epsk,rmkn,rko,rkh
+      real*8 aok,emkxo,rmkxo,rmkxo7
+      real*8 ahk,emkxh,rmkxh,rmkxh7
+      real*8, allocatable :: edisparray(:)
+      character*6 mode
+c
+c
+c     zero out the WCA dispersion energy
+c
+      edisp = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (edisparray(n))
+c
+c     zero out the atomic WCA dispersion energy
+c
+      do i = 1, n
+         edisparray(i) = 0.0d0
+      end do
+c
+c     set the coefficients for the switching function
+c
+      mode = 'VDW'
+      call switch (mode)
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,epsdsp,raddsp,nvdw,nvlst,vlst,ivdw,
+!$OMP& x,y,z,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& shared(edisparray)
+!$OMP DO reduction(+:edisparray) schedule(guided)
+c
+c     find the Weeks-Chandler-Andersen dispersion energy
+c
+      do ii = 1, nvdw
+         i = ivdw(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         epsi = epsdsp(i)
+         rmin = raddsp(i)
+         emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
+         rmixo = 2.0d0 * (rmino**3+rmin**3) / (rmino**2+rmin**2)
+         rmixo7 = rmixo**7
+         aoi = emixo * rmixo7
+         emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
+         rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
+         rmixh7 = rmixh**7
+         ahi = emixh * rmixh7
+         rio = 0.5d0*rmixo + dspoff
+         rih = 0.5d0*rmixh + dspoff
+         si = rmin * shctd
+         si2 = si * si
+c
+c     remove contribution due to solvent displaced by solute atoms
+c
+         do kk = 1, nvlst(i)
+            k = vlst(kk,i)
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. off2) then
+               r = sqrt(r2)
+               epsk = epsdsp(k)
+               rmkn = raddsp(k)
+               emkxo = 4.0d0*epso * epsk / ((sqrt(epso)+sqrt(epsk))**2)
+               rmkxo = 2.0d0 * (rmino**3+rmkn**3) / (rmino**2+rmkn**2)
+               rmkxo7 = rmkxo**7
+               aok = emkxo * rmkxo7
+               emkxh = 4.0d0*epsh * epsk / ((sqrt(epsh)+sqrt(epsk))**2)
+               rmkxh = 2.0d0 * (rminh**3+rmkn**3) / (rminh**2+rmkn**2)
+               rmkxh7 = rmkxh**7
+               ahk = emkxh * rmkxh7
+               rko = rmkxo / 2.0d0 + dspoff
+               rkh = rmkxh / 2.0d0 + dspoff
+               sk = rmkn * shctd
+               sk2 = sk * sk
+               call pairewca (r,r2,rio,rmixo,rmixo7,sk,sk2,aoi,emixo,
+     &                     sum1i,.true.)
+               call pairewca (r,r2,rih,rmixh,rmixh7,sk,sk2,ahi,emixh,
+     &                     sum2i,.false.)
+               sumi = sum1i + sum2i
+               call pairewca (r,r2,rko,rmkxo,rmkxo7,si,si2,aok,emkxo,
+     &                     sum1k,.true.)
+               call pairewca (r,r2,rkh,rmkxh,rmkxh7,si,si2,ahk,emkxh,
+     &                     sum2k,.false.)
+               sumk = sum1k + sum2k
+c
+c     use energy switching if near the cutoff distance
+c
+               if (r2 .gt. cut2) then
+                  r3 = r2 * r
+                  r4 = r2 * r2
+                  r5 = r2 * r3
+                  taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
+                  sumi = sumi * taper
+                  sumk = sumk * taper
+               end if
+c
+c     increment the overall Weeks-Chandler-Andersen energy component
+c
+               if (sumi .ne. 0.0d0 .or. sumk .ne. 0.0d0) then
+                  edisparray(i) = edisparray(i) + sumi
+                  edisparray(k) = edisparray(k) + sumk
+               end if
+            end if
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     increment the overall dispersion energy component
+c
+      do i = 1, n
+         e = cdsp(i) - slevy*awater*edisparray(i)
+         edisp = edisp + e
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (edisparray)
       return
       end
 c

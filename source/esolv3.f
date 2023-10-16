@@ -1668,6 +1668,7 @@ c
       subroutine pairewca (r, r2, rio, rmixo, rmixo7, sk, sk2, aoi,
      &                     emixo, sum, ifo)
       use math
+      implicit none
       real*8 r,r2
       real*8 rio,rmax
       real*8 rmixo
@@ -1681,7 +1682,12 @@ c
       real*8 uik10,uik11,uik12
       real*8 term,iwca,sum
       real*8 idisp,aoi,irepl
+      real*8 scale
       logical ifo
+c
+c
+c     zero out sum
+c
       sum = 0.0d0
       if (ifo) then
          scale = 1.0d0
@@ -1815,13 +1821,16 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(n,epsdsp,
-!$OMP& raddsp,x,y,z,cdsp,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& raddsp,x,y,z,cut2,off2,c0,c1,c2,c3,c4,c5)
 !$OMP& shared(edisparray,aedispo)
 !$OMP DO reduction(+:edisparray,aedispo) schedule(guided)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
       do i = 1, n-1
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          epsi = epsdsp(i)
          rmin = raddsp(i)
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
@@ -1832,9 +1841,6 @@ c
          rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
          rmixh7 = rmixh**7
          ahi = emixh * rmixh7
-         xi = x(i)
-         yi = y(i)
-         zi = z(i)
          rio = 0.5d0*rmixo + dspoff
          rih = 0.5d0*rmixh + dspoff
          si = rmin * shctd
@@ -1868,31 +1874,29 @@ c
                call pairewca (r,r2,rih,rmixh,rmixh7,sk,sk2,ahi,emixh,
      &                     sum2i,.false.)
                sumi = sum1i + sum2i
-               
                call pairewca (r,r2,rko,rmkxo,rmkxo7,si,si2,aok,emkxo,
      &                     sum1k,.true.)
                call pairewca (r,r2,rkh,rmkxh,rmkxh7,si,si2,ahk,emkxh,
      &                     sum2k,.false.)
                sumk = sum1k + sum2k
-               
 c
 c     use energy switching if near the cutoff distance
 c
-                  if (r2 .gt. cut2) then
-                     r3 = r2 * r
-                     r4 = r2 * r2
-                     r5 = r2 * r3
-                     taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
-                     sumi = sumi * taper
-                     sumk = sumk * taper
-                  end if
+               if (r2 .gt. cut2) then
+                  r3 = r2 * r
+                  r4 = r2 * r2
+                  r5 = r2 * r3
+                  taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
+                  sumi = sumi * taper
+                  sumk = sumk * taper
+               end if
 c
 c     increment the overall Weeks-Chandler-Andersen energy component
 c
-                  if (sumi .ne. 0.0d0 .or. sumk .ne. 0.0d0) then
-                     edisparray(i) = edisparray(i) + sumi
-                     edisparray(k) = edisparray(k) + sumk
-                  end if
+               if (sumi .ne. 0.0d0 .or. sumk .ne. 0.0d0) then
+                  edisparray(i) = edisparray(i) + sumi
+                  edisparray(k) = edisparray(k) + sumk
+               end if
             end if
          end do
       end do
@@ -1912,7 +1916,6 @@ c
 c
 c     transfer local to global copies for OpenMP calculation
 c
-      print*, "ewca", edisp
       do i = 1, n
          aedisp(i) = aedispo(i)
       end do
@@ -1946,7 +1949,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "ewca3a" find the Weeks-Chandler-Andersen dispersion energy and
+c     "ewca3b" find the Weeks-Chandler-Andersen dispersion energy and
 c     also partitions the energy among the atoms using a neighbor list
 c
 c
@@ -2016,8 +2019,8 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(n,epsdsp,nvdw,nvlst,vlst,ivdw,jvdw,
-!$OMP& raddsp,x,y,z,cdsp,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& shared(n,epsdsp,raddsp,nvdw,nvlst,vlst,ivdw,
+!$OMP& x,y,z,cut2,off2,c0,c1,c2,c3,c4,c5)
 !$OMP& shared(edisparray,aedispo)
 !$OMP DO reduction(+:edisparray,aedispo) schedule(guided)
 c
@@ -2025,6 +2028,9 @@ c     find the Weeks-Chandler-Andersen dispersion energy
 c
       do ii = 1, nvdw
          i = ivdw(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
          epsi = epsdsp(i)
          rmin = raddsp(i)
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
@@ -2035,9 +2041,6 @@ c
          rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
          rmixh7 = rmixh**7
          ahi = emixh * rmixh7
-         xi = x(i)
-         yi = y(i)
-         zi = z(i)
          rio = 0.5d0*rmixo + dspoff
          rih = 0.5d0*rmixh + dspoff
          si = rmin * shctd
@@ -2072,31 +2075,29 @@ c
                call pairewca (r,r2,rih,rmixh,rmixh7,sk,sk2,ahi,emixh,
      &                     sum2i,.false.)
                sumi = sum1i + sum2i
-               
                call pairewca (r,r2,rko,rmkxo,rmkxo7,si,si2,aok,emkxo,
      &                     sum1k,.true.)
                call pairewca (r,r2,rkh,rmkxh,rmkxh7,si,si2,ahk,emkxh,
      &                     sum2k,.false.)
                sumk = sum1k + sum2k
-               
 c
 c     use energy switching if near the cutoff distance
 c
-                  if (r2 .gt. cut2) then
-                     r3 = r2 * r
-                     r4 = r2 * r2
-                     r5 = r2 * r3
-                     taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
-                     sumi = sumi * taper
-                     sumk = sumk * taper
-                  end if
+               if (r2 .gt. cut2) then
+                  r3 = r2 * r
+                  r4 = r2 * r2
+                  r5 = r2 * r3
+                  taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
+                  sumi = sumi * taper
+                  sumk = sumk * taper
+               end if
 c
 c     increment the overall Weeks-Chandler-Andersen energy component
 c
-                  if (sumi .ne. 0.0d0 .or. sumk .ne. 0.0d0) then
-                     edisparray(i) = edisparray(i) + sumi
-                     edisparray(k) = edisparray(k) + sumk
-                  end if
+               if (sumi .ne. 0.0d0 .or. sumk .ne. 0.0d0) then
+                  edisparray(i) = edisparray(i) + sumi
+                  edisparray(k) = edisparray(k) + sumk
+               end if
             end if
          end do
       end do
@@ -2116,7 +2117,6 @@ c
 c
 c     transfer local to global copies for OpenMP calculation
 c
-      print*, "ewca", edisp
       do i = 1, n
          aedisp(i) = aedispo(i)
       end do

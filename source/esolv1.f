@@ -4668,6 +4668,7 @@ c
       use atomid
       use deriv
       use kvdws
+      use limits
       use math
       use mpole
       use nonpol
@@ -4804,288 +4805,318 @@ c
 c
 c     find the implicit dispersion solvation energy
 c
-      call ewca1 (edisp)
+      if (use_vlist) then
+         call ewca1b (edisp)
+      else
+         call ewca1a (edisp)
+      end if
       return
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine ewca1  --  WCA dispersion energy and derivs  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine pairewca1  --  pairwise WCA dispersion derivs  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "ewca1" finds the Weeks-Chandler-Anderson dispersion energy
-c     and derivatives of a solute
+c     "pairewca1" computes the pairwise Weeks-Chandler-Andersen
+c     dispersion derivatives of a solute
 c
 c
-      subroutine ewca1 (edisp)
+      subroutine pairewca1 (r, r2, r3, rio, rmixo, rmixo7, sk, sk2, aoi,
+     &                     emixo, sum, de, ifo)
+      use math
+      implicit none
+      real*8 r,r2,r3
+      real*8 rio,rmax
+      real*8 rmixo
+      real*8 emixo,rmixo7
+      real*8 sk,sk2
+      real*8 lik,lik2,lik3
+      real*8 lik4,lik5,lik6
+      real*8 lik10,lik11
+      real*8 lik12,lik13
+      real*8 uik,uik2,uik3
+      real*8 uik4,uik5,uik6
+      real*8 uik10,uik11
+      real*8 uik12,uik13
+      real*8 term,iwca,sum
+      real*8 idisp,aoi,irepl
+      real*8 scale
+      real*8 de, dl, du
+      logical ifo
+c
+c
+c     zero out sum
+c
+      sum = 0.0d0
+      de = 0.0d0
+      if (ifo) then
+         scale = 1.0d0
+      else
+         scale = 2.0d0
+      end if
+      if (rio .lt. r+sk) then
+         rmax = max(rio,r-sk)
+         lik = rmax
+         if (lik .lt. rmixo) then
+            lik2 = lik * lik
+            lik3 = lik2 * lik
+            lik4 = lik3 * lik
+            uik = min(r+sk,rmixo)
+            uik2 = uik * uik
+            uik3 = uik2 * uik
+            uik4 = uik3 * uik
+            term = 4.0d0 * pi / (48.0d0*r)
+     &                     * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
+     &                           + 6.0d0*(r2-sk2)*(lik2-uik2))
+            if (rio .gt. r-sk) then
+               dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
+               dl = dl * lik2
+            else
+               dl = -lik3 + 4.0d0*lik2*r - 6.0d0*lik*r2
+     &                          + 2.0d0*lik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
+               dl = dl * lik
+            end if
+            if (r+sk .gt. rmixo) then
+               du = -uik2 + 2.0d0*r2 + 2.0d0*sk2
+               du = -du * uik2
+            else
+               du = -uik3 + 4.0d0*uik2*r - 6.0d0*uik*r2
+     &                          + 2.0d0*uik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
+               du = -du * uik
+            end if
+            iwca = -emixo * term
+            de = de - emixo*pi*(dl+du)/(4.0d0*r2)
+            sum = sum + iwca
+         end if
+         uik = r + sk
+         if (uik .gt. rmixo) then
+            uik2 = uik * uik
+            uik3 = uik2 * uik
+            uik4 = uik3 * uik
+            uik5 = uik4 * uik
+            uik6 = uik5 * uik
+            uik10 = uik5 * uik5
+            uik11 = uik10 * uik
+            uik12 = uik11 * uik
+            uik13 = uik12 * uik
+            lik = max(rmax,rmixo)
+            lik2 = lik * lik
+            lik3 = lik2 * lik
+            lik4 = lik3 * lik
+            lik5 = lik4 * lik
+            lik6 = lik5 * lik
+            lik10 = lik5 * lik5
+            lik11 = lik10 * lik
+            lik12 = lik11 * lik
+            lik13 = lik12 * lik
+            term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
+     &                       * (15.0d0*uik*lik*r*(uik4-lik4)
+     &                          - 10.0d0*uik2*lik2*(uik3-lik3)
+     &                          + 6.0d0*(sk2-r2)*(uik5-lik5))
+            if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+               dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
+               dl = -dl / lik5
+            else
+               dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
+     &                          + 15.0d0*(lik2*r+r3-r*sk2)
+               dl = dl / lik6
+            end if
+            du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
+     &                       + 15.0d0*(uik2*r+r3-r*sk2)
+            du = -du / uik6
+            idisp = -2.0d0 * aoi * term
+            de = de -2.0d0*aoi*pi*(dl + du)/(15.0d0*r2)
+            term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
+     &                       * (120.0d0*uik*lik*r*(uik11-lik11)
+     &                          - 66.0d0*uik2*lik2*(uik10-lik10)
+     &                          + 55.0d0*(sk2-r2)*(uik12-lik12))
+            if (rio.gt.r-sk .or. rmax.lt.rmixo) then
+               dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
+               dl = -dl / lik12
+            else
+               dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
+     &                          + 60.0d0*(lik2*r+r3-r*sk2)
+               dl = dl / lik13
+            end if
+            du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
+     &                       + 60.0d0*(uik2*r+r3-r*sk2)
+            du = -du / uik13
+            irepl = aoi * rmixo7 * term
+            de = de + aoi*rmixo7*pi*(dl + du)/(60.0d0*r2)
+            sum = sum + irepl + idisp
+         end if
+      end if
+      sum = sum * scale
+      de = de * scale
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine ewca1a  --  WCA dispersion derivs via loop  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "ewca1a" finds the Weeks-Chandler-Anderson dispersion energy
+c     and derivatives using a double loop
+c
+c
+      subroutine ewca1a (edisp)
       use atoms
       use atomid
       use deriv
       use kvdws
       use math
       use nonpol
+      use shunt
       use solute
       use vdw
       implicit none
       integer i,k
-      real*8 edisp,e,idisp
+      real*8 edisp
+      real*8 e,idisp
       real*8 xi,yi,zi
-      real*8 rk,sk,sk2
+      real*8 si,si2
+      real*8 sk,sk2
       real*8 xr,yr,zr
-      real*8 r,r2,r3
-      real*8 sum,term,iwca,irepl
-      real*8 epsi,rmini,rio,rih,rmax
-      real*8 ao,emixo,rmixo,rmixo7
-      real*8 ah,emixh,rmixh,rmixh7
-      real*8 lik,lik2,lik3,lik4
-      real*8 lik5,lik6,lik10
-      real*8 lik11,lik12,lik13
-      real*8 uik,uik2,uik3,uik4
-      real*8 uik5,uik6,uik10
-      real*8 uik11,uik12,uik13
-      real*8 de,dl,du
+      real*8 r,r2,r3,r4,r5
+      real*8 taper,dtaper
+      real*8 sumi,sumk
+      real*8 sum1i,sum2i
+      real*8 sum1k,sum2k
+      real*8 epsi,rmin,rio,rih
+      real*8 aoi,emixo,rmixo,rmixo7
+      real*8 ahi,emixh,rmixh,rmixh7
+      real*8 epsk,rmkn,rko,rkh
+      real*8 aok,emkxo,rmkxo,rmkxo7
+      real*8 ahk,emkxh,rmkxh,rmkxh7
+      real*8 de
+      real*8 dei,dek
+      real*8 de1i,de2i
+      real*8 de1k,de2k
       real*8 dedx,dedy,dedz
+      real*8, allocatable :: edisparray(:)
+      character*6 mode
 c
 c
 c     zero out the Weeks-Chandler-Andersen dispersion energy
 c
       edisp = 0.0d0
 c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (edisparray(n))
+c
+c     zero out the atomic WCA dispersion energy
+c
+      do i = 1, n
+         edisparray(i) = 0.0d0
+      end do
+c
+c     set the coefficients for the switching function
+c
+      mode = 'VDW'
+      call switch (mode)
+c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,class,epsdsp,
-!$OMP& raddsp,x,y,z,cdsp)
-!$OMP& shared(edisp,des)
-!$OMP DO reduction(+:edisp,des) schedule(guided)
+!$OMP PARALLEL default(private) shared(n,epsdsp,
+!$OMP& raddsp,x,y,z,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& shared(edisparray,des)
+!$OMP DO reduction(+:edisparray,des) schedule(guided)
 c
 c     find the WCA dispersion energy and gradient components
 c
-      do i = 1, n
-         epsi = epsdsp(i)
-         rmini = raddsp(i)
-         emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
-         rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
-         rmixo7 = rmixo**7
-         ao = emixo * rmixo7
-         emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
-         rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
-         rmixh7 = rmixh**7
-         ah = emixh * rmixh7
-         rio = 0.5d0*rmixo + dspoff
-         rih = 0.5d0*rmixh + dspoff
-c
-c     remove contribution due to solvent displaced by solute atoms
-c
+      do i = 1, n-1
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         sum = 0.0d0
-         do k = 1, n
-            if (i .ne. k) then
-               xr = xi - x(k)
-               yr = yi - y(k)
-               zr = zi - z(k)
-               r2 = xr*xr + yr*yr + zr*zr
+         epsi = epsdsp(i)
+         rmin = raddsp(i)
+         emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
+         rmixo = 2.0d0 * (rmino**3+rmin**3) / (rmino**2+rmin**2)
+         rmixo7 = rmixo**7
+         aoi = emixo * rmixo7
+         emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
+         rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
+         rmixh7 = rmixh**7
+         ahi = emixh * rmixh7
+         rio = 0.5d0*rmixo + dspoff
+         rih = 0.5d0*rmixh + dspoff
+         si = rmin * shctd
+         si2 = si * si
+c
+c     remove contribution due to solvent displaced by solute atoms
+c
+         do k = i+1, n
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. off2) then
                r = sqrt(r2)
-               r3 = r * r2
-               rk = raddsp(k)
-               sk = rk * shctd
+               r3 = r2 * r
+               epsk = epsdsp(k)
+               rmkn = raddsp(k)
+               emkxo = 4.0d0*epso * epsk / ((sqrt(epso)+sqrt(epsk))**2)
+               rmkxo = 2.0d0 * (rmino**3+rmkn**3) / (rmino**2+rmkn**2)
+               rmkxo7 = rmkxo**7
+               aok = emkxo * rmkxo7
+               emkxh = 4.0d0*epsh * epsk / ((sqrt(epsh)+sqrt(epsk))**2)
+               rmkxh = 2.0d0 * (rminh**3+rmkn**3) / (rminh**2+rmkn**2)
+               rmkxh7 = rmkxh**7
+               ahk = emkxh * rmkxh7
+               rko = rmkxo / 2.0d0 + dspoff
+               rkh = rmkxh / 2.0d0 + dspoff
+               sk = rmkn * shctd
                sk2 = sk * sk
-               de = 0.0d0
-               if (rio .lt. r+sk) then
-                  rmax = max(rio,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixo) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixo)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (rio .gt. r-sk) then
-                        dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
-                        dl = dl * lik2
-                     else
-                        dl = -lik3 + 4.0d0*lik2*r - 6.0d0*lik*r2
-     &                          + 2.0d0*lik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        dl = dl * lik
-                     end if
-                     if (r+sk .gt. rmixo) then
-                        du = -uik2 + 2.0d0*r2 + 2.0d0*sk2
-                        du = -du * uik2
-                     else
-                        du = -uik3 + 4.0d0*uik2*r - 6.0d0*uik*r2
-     &                          + 2.0d0*uik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        du = -du * uik
-                     end if
-                     iwca = -emixo * term
-                     de = de - emixo*pi*(dl+du)/(4.0d0*r2)
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixo) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik6 = uik5 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     uik13 = uik12 * uik
-                     lik = max(rmax,rmixo)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik6 = lik5 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     lik13 = lik12 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
-                        dl = -dl / lik5
-                     else
-                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
-     &                          + 15.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik6
-                     end if
-                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
-     &                       + 15.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik6
-                     idisp = -2.0d0 * ao * term
-                     de = de -2.0d0*ao*pi*(dl + du)/(15.0d0*r2)
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (rio.gt.r-sk .or. rmax.lt.rmixo) then
-                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
-                        dl = -dl / lik12
-                     else
-                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
-     &                          + 60.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik13
-                     end if
-                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
-     &                       + 60.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik13
-                     irepl = ao * rmixo7 * term
-                     de = de + ao*rmixo7*pi*(dl + du)/(60.0d0*r2)
-                     sum = sum + irepl + idisp
-                  end if
-               end if
-               if (rih .lt. r+sk) then
-                  rmax = max(rih,r-sk)
-                  lik = rmax
-                  if (lik .lt. rmixh) then
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     uik = min(r+sk,rmixh)
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     term = 4.0d0 * pi / (48.0d0*r)
-     &                      * (3.0d0*(lik4-uik4) - 8.0d0*r*(lik3-uik3)
-     &                          + 6.0d0*(r2-sk2)*(lik2-uik2))
-                     if (rih .gt. r-sk) then
-                        dl = -lik2 + 2.0d0*r2 + 2.0d0*sk2
-                        dl = dl * lik2
-                     else
-                        dl = -lik3 + 4.0d0*lik2*r - 6.0d0*lik*r2
-     &                          + 2.0d0*lik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        dl = dl * lik
-                     end if
-                     if (r+sk .gt. rmixh) then
-                        du = -uik2 + 2.0d0*r2 + 2.0d0*sk2
-                        du = -du * uik2
-                     else
-                        du = -uik3 + 4.0d0*uik2*r - 6.0d0*uik*r2
-     &                          + 2.0d0*uik*sk2 + 4.0d0*r3 - 4.0d0*r*sk2
-                        du = -du * uik
-                     end if
-                     iwca = -2.0d0 * emixh * term
-                     de = de - 2.0d0*emixh*pi*(dl+du)/(4.0d0*r2)
-                     sum = sum + iwca
-                  end if
-                  uik = r + sk
-                  if (uik .gt. rmixh) then
-                     uik2 = uik * uik
-                     uik3 = uik2 * uik
-                     uik4 = uik3 * uik
-                     uik5 = uik4 * uik
-                     uik6 = uik5 * uik
-                     uik10 = uik5 * uik5
-                     uik11 = uik10 * uik
-                     uik12 = uik11 * uik
-                     uik13 = uik12 * uik
-                     lik = max(rmax,rmixh)
-                     lik2 = lik * lik
-                     lik3 = lik2 * lik
-                     lik4 = lik3 * lik
-                     lik5 = lik4 * lik
-                     lik6 = lik5 * lik
-                     lik10 = lik5 * lik5
-                     lik11 = lik10 * lik
-                     lik12 = lik11 * lik
-                     lik13 = lik12 * lik
-                     term = 4.0d0 * pi / (120.0d0*r*lik5*uik5)
-     &                      * (15.0d0*uik*lik*r*(uik4-lik4)
-     &                         - 10.0d0*uik2*lik2*(uik3-lik3)
-     &                         + 6.0d0*(sk2-r2)*(uik5-lik5))
-                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
-                        dl = -5.0d0*lik2 + 3.0d0*r2 + 3.0d0*sk2
-                        dl = -dl / lik5
-                     else
-                        dl = 5.0d0*lik3 - 33.0d0*lik*r2 - 3.0d0*lik*sk2
-     &                          + 15.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik6
-                     end if
-                     du = 5.0d0*uik3 - 33.0d0*uik*r2 - 3.0d0*uik*sk2
-     &                       + 15.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik6
-                     idisp = -4.0d0 * ah * term
-                     de = de - 4.0d0*ah*pi*(dl + du)/(15.0d0*r2)
-                     term = 4.0d0 * pi / (2640.0d0*r*lik12*uik12)
-     &                      * (120.0d0*uik*lik*r*(uik11-lik11)
-     &                         - 66.0d0*uik2*lik2*(uik10-lik10)
-     &                         + 55.0d0*(sk2-r2)*(uik12-lik12))
-                     if (rih.gt.r-sk .or. rmax.lt.rmixh) then
-                        dl = -6.0d0*lik2 + 5.0d0*r2 + 5.0d0*sk2
-                        dl = -dl / lik12
-                     else
-                        dl = 6.0d0*lik3 - 125.0d0*lik*r2 - 5.0d0*lik*sk2
-     &                          + 60.0d0*(lik2*r+r3-r*sk2)
-                        dl = dl / lik13
-                     end if
-                     du = 6.0d0*uik3 - 125.0d0*uik*r2 -5.0d0*uik*sk2
-     &                       + 60.0d0*(uik2*r+r3-r*sk2)
-                     du = -du / uik13
-                     irepl = 2.0d0 * ah * rmixh7 * term
-                     de = de + ah*rmixh7*pi*(dl+du)/(30.0d0*r2)
-                     sum = sum + irepl + idisp
-                  end if
-               end if
-c
-c     increment the individual dispersion gradient components
-c
-               de = -de/r * slevy * awater
+               call pairewca1 (r,r2,r3,rio,rmixo,rmixo7,sk,sk2,aoi,
+     &                     emixo,sum1i,de1i,.true.)
+               call pairewca1 (r,r2,r3,rih,rmixh,rmixh7,sk,sk2,ahi,
+     &                     emixh,sum2i,de2i,.false.)
+               sumi = sum1i + sum2i
+               dei = de1i + de2i
+               call pairewca1 (r,r2,r3,rko,rmkxo,rmkxo7,si,si2,aok,
+     &                     emkxo,sum1k,de1k,.true.)
+               call pairewca1 (r,r2,r3,rkh,rmkxh,rmkxh7,si,si2,ahk,
+     &                     emkxh,sum2k,de2k,.false.)
+               sumk = sum1k + sum2k
+               dek = de1k + de2k
+               de = dei + dek
+               de = de/r * slevy * awater
                dedx = de * xr
                dedy = de * yr
                dedz = de * zr
+c
+c     use energy switching if near the cutoff distance
+c
+               if (r2 .gt. cut2) then
+                  r4 = r2 * r2
+                  r5 = r2 * r3
+                  taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
+                  dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
+     &                        + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                  dtaper = dtaper / r * (sumi + sumk) * slevy * awater
+                  sumi = sumi * taper
+                  sumk = sumk * taper
+                  dedx = dedx * taper + dtaper * xr
+                  dedy = dedy * taper + dtaper * yr
+                  dedz = dedz * taper + dtaper * zr
+               end if
+c
+c     increment the overall Weeks-Chandler-Andersen energy component
+c
+               edisparray(i) = edisparray(i) + sumi
+               edisparray(k) = edisparray(k) + sumk
+c
+c     increment the Weeks-Chandler-Andersen derivative components
+c
                des(1,i) = des(1,i) + dedx
                des(2,i) = des(2,i) + dedy
                des(3,i) = des(3,i) + dedz
@@ -5094,17 +5125,212 @@ c
                des(3,k) = des(3,k) - dedz
             end if
          end do
-c
-c     increment the overall dispersion energy component
-c
-         e = cdsp(i) - slevy*awater*sum
-         edisp = edisp + e
       end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
 !$OMP END PARALLEL
+      do i = 1, n
+         e = cdsp(i) - slevy*awater*edisparray(i)
+         edisp = edisp + e
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (edisparray)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine ewca1b  --  WCA dispersion derivs via loop  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "ewca1b" finds the Weeks-Chandler-Anderson dispersion energy
+c     and derivatives using a neighbor list
+c
+c
+      subroutine ewca1b (edisp)
+      use atoms
+      use atomid
+      use deriv
+      use kvdws
+      use math
+      use neigh
+      use nonpol
+      use shunt
+      use solute
+      use vdw
+      implicit none
+      integer i,ii
+      integer k,kk
+      real*8 edisp
+      real*8 e,idisp
+      real*8 xi,yi,zi
+      real*8 si,si2
+      real*8 sk,sk2
+      real*8 xr,yr,zr
+      real*8 r,r2,r3,r4,r5
+      real*8 taper,dtaper
+      real*8 sumi,sumk
+      real*8 sum1i,sum2i
+      real*8 sum1k,sum2k
+      real*8 epsi,rmin,rio,rih
+      real*8 aoi,emixo,rmixo,rmixo7
+      real*8 ahi,emixh,rmixh,rmixh7
+      real*8 epsk,rmkn,rko,rkh
+      real*8 aok,emkxo,rmkxo,rmkxo7
+      real*8 ahk,emkxh,rmkxh,rmkxh7
+      real*8 de
+      real*8 dei,dek
+      real*8 de1i,de2i
+      real*8 de1k,de2k
+      real*8 dedx,dedy,dedz
+      real*8, allocatable :: edisparray(:)
+      character*6 mode
+c
+c
+c     zero out the Weeks-Chandler-Andersen dispersion energy
+c
+      edisp = 0.0d0
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (edisparray(n))
+c
+c     zero out the atomic WCA dispersion energy
+c
+      do i = 1, n
+         edisparray(i) = 0.0d0
+      end do
+c
+c     set the coefficients for the switching function
+c
+      mode = 'VDW'
+      call switch (mode)
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,epsdsp,raddsp,nvdw,nvlst,vlst,ivdw,
+!$OMP& x,y,z,cut2,off2,c0,c1,c2,c3,c4,c5)
+!$OMP& shared(edisparray,des)
+!$OMP DO reduction(+:edisparray,des) schedule(guided)
+c
+c     find the WCA dispersion energy and gradient components
+c
+      do ii = 1, nvdw
+         i = ivdw(ii)
+         xi = x(i)
+         yi = y(i)
+         zi = z(i)
+         epsi = epsdsp(i)
+         rmin = raddsp(i)
+         emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
+         rmixo = 2.0d0 * (rmino**3+rmin**3) / (rmino**2+rmin**2)
+         rmixo7 = rmixo**7
+         aoi = emixo * rmixo7
+         emixh = 4.0d0 * epsh * epsi / ((sqrt(epsh)+sqrt(epsi))**2)
+         rmixh = 2.0d0 * (rminh**3+rmin**3) / (rminh**2+rmin**2)
+         rmixh7 = rmixh**7
+         ahi = emixh * rmixh7
+         rio = 0.5d0*rmixo + dspoff
+         rih = 0.5d0*rmixh + dspoff
+         si = rmin * shctd
+         si2 = si * si
+c
+c     remove contribution due to solvent displaced by solute atoms
+c
+         do kk = 1, nvlst(i)
+            k = vlst(kk,i)
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
+            r2 = xr*xr + yr*yr + zr*zr
+            if (r2 .le. off2) then
+               r = sqrt(r2)
+               r3 = r2 * r
+               epsk = epsdsp(k)
+               rmkn = raddsp(k)
+               emkxo = 4.0d0*epso * epsk / ((sqrt(epso)+sqrt(epsk))**2)
+               rmkxo = 2.0d0 * (rmino**3+rmkn**3) / (rmino**2+rmkn**2)
+               rmkxo7 = rmkxo**7
+               aok = emkxo * rmkxo7
+               emkxh = 4.0d0*epsh * epsk / ((sqrt(epsh)+sqrt(epsk))**2)
+               rmkxh = 2.0d0 * (rminh**3+rmkn**3) / (rminh**2+rmkn**2)
+               rmkxh7 = rmkxh**7
+               ahk = emkxh * rmkxh7
+               rko = rmkxo / 2.0d0 + dspoff
+               rkh = rmkxh / 2.0d0 + dspoff
+               sk = rmkn * shctd
+               sk2 = sk * sk
+               call pairewca1 (r,r2,r3,rio,rmixo,rmixo7,sk,sk2,aoi,
+     &                     emixo,sum1i,de1i,.true.)
+               call pairewca1 (r,r2,r3,rih,rmixh,rmixh7,sk,sk2,ahi,
+     &                     emixh,sum2i,de2i,.false.)
+               sumi = sum1i + sum2i
+               dei = de1i + de2i
+               call pairewca1 (r,r2,r3,rko,rmkxo,rmkxo7,si,si2,aok,
+     &                     emkxo,sum1k,de1k,.true.)
+               call pairewca1 (r,r2,r3,rkh,rmkxh,rmkxh7,si,si2,ahk,
+     &                     emkxh,sum2k,de2k,.false.)
+               sumk = sum1k + sum2k
+               dek = de1k + de2k
+               de = dei + dek
+               de = de/r * slevy * awater
+               dedx = de * xr
+               dedy = de * yr
+               dedz = de * zr
+c
+c     use energy switching if near the cutoff distance
+c
+               if (r2 .gt. cut2) then
+                  r4 = r2 * r2
+                  r5 = r2 * r3
+                  taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
+                  dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
+     &                        + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                  dtaper = dtaper / r * (sumi + sumk) * slevy * awater
+                  sumi = sumi * taper
+                  sumk = sumk * taper
+                  dedx = dedx * taper + dtaper * xr
+                  dedy = dedy * taper + dtaper * yr
+                  dedz = dedz * taper + dtaper * zr
+               end if
+c
+c     increment the overall Weeks-Chandler-Andersen energy component
+c
+               edisparray(i) = edisparray(i) + sumi
+               edisparray(k) = edisparray(k) + sumk
+c
+c     increment the Weeks-Chandler-Andersen derivative components
+c
+               des(1,i) = des(1,i) + dedx
+               des(2,i) = des(2,i) + dedy
+               des(3,i) = des(3,i) + dedz
+               des(1,k) = des(1,k) - dedx
+               des(2,k) = des(2,k) - dedy
+               des(3,k) = des(3,k) - dedz
+            end if
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      do i = 1, n
+         e = cdsp(i) - slevy*awater*edisparray(i)
+         edisp = edisp + e
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (edisparray)
       return
       end
 c
