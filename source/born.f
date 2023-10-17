@@ -59,6 +59,7 @@ c
       use math
       use mpole
       use pbstuf
+      use shunt
       use solpot
       use solute
       implicit none
@@ -70,13 +71,17 @@ c
       real*8 shell,fraction
       real*8 inner,outer,tinit
       real*8 ratio,total
-      real*8 xi,yi,zi,ri
-      real*8 rk,sk,sk2
+      real*8 xi,yi,zi
+      real*8 ri,rsi,rdi
+      real*8 rk,rsk,rdk
+      real*8 si,si2
+      real*8 sk,sk2
       real*8 lik,lik2
       real*8 uik,uik2
       real*8 tsum,tchain
       real*8 sum,sum2,sum3
-      real*8 soluteint
+      real*8 soluteinti
+      real*8 soluteintk
       real*8 alpha,beta,gamma
       real*8 xr,yr,zr,rvdw
       real*8 r,r2,r3,r4
@@ -97,8 +102,17 @@ c
       real*8, allocatable :: pbpole(:,:)
       real*8, allocatable :: pbself(:)
       real*8, allocatable :: pbpair(:)
+      real*8, allocatable :: soluteint(:)
       logical done
+      character*6 mode
 c
+c
+c     set the coefficients for the switching function
+c
+      if (borntyp .eq. 'GRYCUK') then
+         mode = 'VDW'
+         call switch (mode)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -111,6 +125,9 @@ c
          allocate (pbpole(13,n))
          allocate (pbself(n))
          allocate (pbpair(n))
+      end if
+      if (borntyp .eq. 'GRYCUK') then
+         allocate (soluteint(n))
       end if
 c
 c     perform dynamic allocation of some global arrays
@@ -327,69 +344,59 @@ c     get the Born radii via Grycuk's modified HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
+c
+c     zero out rborn and soluteint
+c
          do i = 1, n
             rborn(i) = 0.0d0
+            soluteint(i) = 0.0d0
+         end do
+c
+c     pairwise loop to compute soluteint
+c
+         do i = 1, n-1
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            rsi = rsolv(i)
+            rdi = rdescr(i)
+            ri = max(rsi,rdi) + descoff
+            si = rdi * shct(i)
+            do k = i+1, n
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               r2 = xr**2 + yr**2 + zr**2
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
+                  mixsn = 0.5d0 * (sneck(i)+sneck(k))
+                  rsk = rsolv(k)
+                  rdk = rdescr(k)
+                  rk = max(rsk,rdk) + descoff
+                  sk = rdk * shct(k)
+                  call pairborn (r,r2,ri,rsi,sk,rdk,pi43,mixsn,useneck,
+     &                                                    soluteinti)
+                  call pairborn (r,r2,rk,rsk,si,rdi,pi43,mixsn,useneck,
+     &                                                    soluteintk)
+                  soluteint(i) = soluteint(i) + soluteinti
+                  soluteint(k) = soluteint(k) + soluteintk
+               end if
+            end do
+         end do
+c
+c     compute rborn
+c
+         do i = 1, n
             ri = rsolv(i)
             if (ri .gt. 0.0d0) then
-               xi = x(i)
-               yi = y(i)
-               zi = z(i)
-               sum = pi43 / ri**3
-               soluteint = 0.0d0
-               ri = max(rsolv(i),rdescr(i)) + descoff
-               do k = 1, n
-                  rk = rdescr(k)
-                  mixsn = 0.5d0 * (sneck(i)+sneck(k))
-                  if (i.ne.k .and. rk.gt.0.0d0) then
-                     xr = x(k) - xi
-                     yr = y(k) - yi
-                     zr = z(k) - zi
-                     r2 = xr**2 + yr**2 + zr**2
-                     r = sqrt(r2)
-                     sk = rk * shct(k)
-                     if (sk .gt. 0.0d0) then
-                        if (ri .lt. r+sk) then
-                           sk2 = sk * sk
-                           if (ri+r .lt. sk) then
-                              lik = ri
-                              uik = sk - r
-                              soluteint = soluteint + pi43*(1.0d0/uik**3
-     &                                                   -1.0d0/lik**3)
-                           end if
-                           uik = r + sk
-                           if (ri+r .lt. sk) then
-                              lik = sk - r
-                           else if (r .lt. ri+sk) then
-                              lik = ri
-                           else
-                              lik = r - sk
-                           end if
-                           l2 = lik * lik
-                           l4 = l2 * l2
-                           lr = lik * r
-                           l4r = l4 * r
-                           u2 = uik * uik
-                           u4 = u2 * u2
-                           ur = uik * r
-                           u4r = u4 * r
-                           term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
-     &                               - (3.0d0*(r2-sk2)+6.0d0*l2
-     &                                    -8.0d0*lr)/l4r
-                           soluteint = soluteint - pi*term/12.0d0
-                        end if
-                        if (useneck) then
-                           call neck (r,ri,rk,mixsn,neckval)
-                           soluteint = soluteint - neckval
-                        end if
-                     end if
-                  end if
-               end do
                if (usetanh) then
-                  bornint(i) = soluteint
-                  call tanhrsc (soluteint,rsolv(i))
+                  soluteinti = soluteint(i)
+                  bornint(i) = soluteinti
+                  call tanhrsc (soluteinti,rsolv(i))
+                  soluteint(i) = soluteinti
                end if
-               sum = sum + soluteint
-               rborn(i) = (sum/pi43)**third
+               soluteinti = pi43 / ri**3 + soluteint(i)
+               rborn(i) = (soluteinti/pi43)**third
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
             end if
@@ -560,6 +567,9 @@ c
          deallocate (pbself)
          deallocate (pbpair)
       end if
+      if (borntyp .eq. 'GRYCUK') then
+         deallocate (soluteint)
+      end if
 c
 c     make sure the final values are in a reasonable range
 c
@@ -585,6 +595,77 @@ c
       end
 c
 c
+c     ####################################################
+c     ##                                                ##
+c     ##  subroutine pairborn  --  pairwise born radii  ##
+c     ##                                                ##
+c     ####################################################
+c
+c
+c     "pairborn" computes the pairwise born radii values
+c
+c
+      subroutine pairborn (r,r2,ri,rsi,sk,rdk,pi43,mixsn,useneck,
+     &                                                  soluteinti)
+      use math
+      implicit none
+      real*8 r,r2
+      real*8 ri,rdk,rsi
+      real*8 sk,sk2
+      real*8 pi43
+      real*8 soluteinti
+      real*8 lik
+      real*8 l2,l4
+      real*8 lr,l4r
+      real*8 uik
+      real*8 u2,u4
+      real*8 ur,u4r
+      real*8 term
+      real*8 mixsn
+      real*8 neckval
+      logical useneck
+c
+c
+c     zero out soluteinti
+c
+      soluteinti = 0.0d0
+      if (rsi.gt.0.0d0 .and. rdk.gt.0.0d0 .and. sk.gt.0.0d0) then
+         if (ri .lt. r+sk) then
+            sk2 = sk * sk
+            if (ri+r .lt. sk) then
+               lik = ri
+               uik = sk - r
+               soluteinti = pi43*(1.0d0/uik**3-1.0d0/lik**3)
+            end if
+            uik = r + sk
+            if (ri+r .lt. sk) then
+               lik = sk - r
+            else if (r .lt. ri+sk) then
+               lik = ri
+            else
+               lik = r - sk
+            end if
+            l2 = lik * lik
+            l4 = l2 * l2
+            lr = lik * r
+            l4r = l4 * r
+            u2 = uik * uik
+            u4 = u2 * u2
+            ur = uik * r
+            u4r = u4 * r
+            term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
+     &           - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
+            soluteinti = soluteinti - pi*term/12.0d0
+         end if
+         if (useneck) then
+            call neck (r,ri,rdk,mixsn,neckval)
+            soluteinti = soluteinti - neckval
+         end if
+      end if
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine born1  --  Born radii chain rule derivatives  ##
@@ -604,6 +685,7 @@ c
       use couple
       use deriv
       use math
+      use shunt
       use solpot
       use solute
       use virial
@@ -614,13 +696,18 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 de,de1,de2
+      real*8 dei,dek
       real*8 r,r2,r3,r4,r6
       real*8 p5inv,pip5
       real*8 gpi,vk,ratio
       real*8 ccf,cosq,dccf
       real*8 sinq,theta
       real*8 factor,term
+      real*8 termi,termk
       real*8 rb2,ri,rk
+      real*8 rsi,rsk
+      real*8 rdi,rdk
+      real*8 si,si2
       real*8 sk,sk2
       real*8 lik,lik2,lik3
       real*8 uik,uik2,uik3
@@ -629,14 +716,25 @@ c
       real*8 rbi,rbi2,vi
       real*8 ws2,s2ik,uik4
       real*8 mixsn,neckderi,tcr
-      real*8 dbr,dborn,pi43
+      real*8 dbri,drbi,drbpi
+      real*8 dbrk,drbk,drbpk
+      real*8 dborn,pi43
+      real*8 dborni,dbornk
       real*8 expterm,rusum
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       real*8, allocatable :: roff(:)
       logical use_gk
+      character*6 mode
 c
+c
+c     set the coefficients for the switching function
+c
+      if (borntyp .eq. 'GRYCUK') then
+         mode = 'VDW'
+         call switch (mode)
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -883,92 +981,82 @@ c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
-         do i = 1, n
-            ri = max(rsolv(i),rdescr(i)) + descoff
-            if (ri .gt. 0.0d0) then
-               xi = x(i)
-               yi = y(i)
-               zi = z(i)
-               term = pi43 / rborn(i)**3.0d0
-               term = factor / term**(4.0d0*third)
-               if (usetanh) then
-                  call tanhrscchr (bornint(i),rsolv(i),tcr)
-                  term = term * tcr
-               end if
-               do k = 1, n
-                  rk = rdescr(k)
+         do i = 1, n-1
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            rsi = rsolv(i)
+            rdi = rdescr(i)
+            ri = max(rsi,rdi) + descoff
+            si = rdi * shct(i)
+            drbi = drb(i)
+            drbpi = drbp(i)
+            termi = pi43 / rborn(i)**3.0d0
+            termi = factor / termi**(4.0d0*third)
+            if (usetanh) then
+               call tanhrscchr (bornint(i),rsi,tcr)
+               termi = termi * tcr
+            end if
+            do k = i+1, n
+               xr = x(k) - xi
+               yr = y(k) - yi
+               zr = z(k) - zi
+               r2 = xr**2 + yr**2 + zr**2
+               if (r2 .le. off2) then
+                  r = sqrt(r2)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
-                  if (k.ne.i .and. rk.gt.0.0d0) then
-                     xr = x(k) - xi
-                     yr = y(k) - yi
-                     zr = z(k) - zi
-                     r2 = xr**2 + yr**2 + zr**2
-                     r = sqrt(r2)
-                     sk = rk * shct(k)
-                     if (sk .gt. 0.0d0) then
-                        if (ri .lt. r+sk) then
-                           sk2 = sk * sk
-                           de = 0.0d0
-                           if (ri+r .lt. sk) then
-                              uik = sk - r
-                              de = -4.0d0 * pi / uik**4
-                           end if
-                           if (ri+r .lt. sk) then
-                              lik = sk - r
-                              de = de + 0.25d0*pi*(sk2-4.0d0*sk*r
-     &                                     +17.0d0*r2) / (r2*lik**4)
-                           else if (r .lt. ri+sk) then
-                              lik = ri
-                              de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2)
-     &                                     / (r2*lik**4)
-                           else
-                              lik = r - sk
-                              de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2)
-     &                                     / (r2*lik**4)
-                           end if
-                           uik = r + sk
-                           de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2)
-     &                                  / (r2*uik**4)
-                           if (useneck) then
-                              call neckder (r,ri,rk,mixsn,neckderi)
-                              de = de + neckderi
-                           end if
-                           dbr = term * de/r
-                           dborn = drb(i)
-                           if (use_gk)  dborn = dborn + drbp(i)
-                           de = dbr * dborn
-                           dedx = de * xr
-                           dedy = de * yr
-                           dedz = de * zr
-                           des(1,i) = des(1,i) + dedx
-                           des(2,i) = des(2,i) + dedy
-                           des(3,i) = des(3,i) + dedz
-                           des(1,k) = des(1,k) - dedx
-                           des(2,k) = des(2,k) - dedy
-                           des(3,k) = des(3,k) - dedz
+                  rsk = rsolv(k)
+                  rdk = rdescr(k)
+                  rk = max(rsk,rdk) + descoff
+                  sk = rdk * shct(k)
+                  drbk = drb(k)
+                  drbpk = drbp(k)
+                  termk = pi43 / rborn(k)**3.0d0
+                  termk = factor / termk**(4.0d0*third)
+                  if (usetanh) then
+                     call tanhrscchr (bornint(k),rsk,tcr)
+                     termk = termk * tcr
+                  end if
+                  call pairborn1 (r,r2,ri,rsi,sk,rdk,mixsn,useneck,dei)
+                  dbri = termi * dei/r
+                  dborni = drbi
+                  if (use_gk)  dborni = dborni + drbpi
+                  dei = dbri * dborni
+                  call pairborn1 (r,r2,rk,rsk,si,rdi,mixsn,useneck,dek)
+                  dbrk = termk * dek/r
+                  dbornk = drbk
+                  if (use_gk)  dbornk = dbornk + drbpk
+                  dek = dbrk * dbornk
+                  de = dei + dek
+                  dedx = de * xr
+                  dedy = de * yr
+                  dedz = de * zr
+                  des(1,i) = des(1,i) + dedx
+                  des(2,i) = des(2,i) + dedy
+                  des(3,i) = des(3,i) + dedz
+                  des(1,k) = des(1,k) - dedx
+                  des(2,k) = des(2,k) - dedy
+                  des(3,k) = des(3,k) - dedz
 c
 c     increment the internal virial tensor components
 c
-                           vxx = xr * dedx
-                           vyx = yr * dedx
-                           vzx = zr * dedx
-                           vyy = yr * dedy
-                           vzy = zr * dedy
-                           vzz = zr * dedz
-                           vir(1,1) = vir(1,1) + vxx
-                           vir(2,1) = vir(2,1) + vyx
-                           vir(3,1) = vir(3,1) + vzx
-                           vir(1,2) = vir(1,2) + vyx
-                           vir(2,2) = vir(2,2) + vyy
-                           vir(3,2) = vir(3,2) + vzy
-                           vir(1,3) = vir(1,3) + vzx
-                           vir(2,3) = vir(2,3) + vzy
-                           vir(3,3) = vir(3,3) + vzz
-                        end if
-                     end if
-                  end if
-               end do
-            end if
+                  vxx = xr * dedx
+                  vyx = yr * dedx
+                  vzx = zr * dedx
+                  vyy = yr * dedy
+                  vzy = zr * dedy
+                  vzz = zr * dedz
+                  vir(1,1) = vir(1,1) + vxx
+                  vir(2,1) = vir(2,1) + vyx
+                  vir(3,1) = vir(3,1) + vzx
+                  vir(1,2) = vir(1,2) + vyx
+                  vir(2,2) = vir(2,2) + vyy
+                  vir(3,2) = vir(3,2) + vzy
+                  vir(1,3) = vir(1,3) + vzx
+                  vir(2,3) = vir(2,3) + vzy
+                  vir(3,3) = vir(3,3) + vzz
+               end if
+            end do
          end do
 c
 c     get Born radius chain rule components for the ACE method
@@ -1164,5 +1252,62 @@ c
       chainrule = b0*rho3 - 2.0d0*b1*rho6psi + 3.0d0*b2*rho9psi2 
       tanhconst = pi43 * ((1.0d0/rho3)-recipmaxborn3)
       derival = tanhconst * chainrule * (1.0d0-tanh2)
+      return
+      end
+c
+c
+c     ######################################################
+c     ##                                                  ##
+c     ##  subroutine pairborn1  --  pairwise born derivs  ##
+c     ##                                                  ##
+c     ######################################################
+c
+c
+c     "pairborn1" computes the pairwise born derivatives
+c
+c
+      subroutine pairborn1 (r,r2,ri,rsi,sk,rdk,mixsn,useneck,de)
+      use math
+      implicit none
+      real*8 r,r2
+      real*8 ri,rdk,rsi
+      real*8 sk,sk2
+      real*8 de
+      real*8 lik
+      real*8 uik
+      real*8 mixsn
+      real*8 neckderi
+      logical useneck
+c
+c
+c     zero out derivative
+c
+      de = 0.0d0
+      if (rsi.gt.0.0d0 .and. rdk.gt.0.0d0 .and. sk.gt.0.0d0) then
+         if (ri .lt. r+sk) then
+            sk2 = sk * sk
+            if (ri+r .lt. sk) then
+               uik = sk - r
+               de = -4.0d0 * pi / uik**4
+            end if
+            if (ri+r .lt. sk) then
+               lik = sk - r
+               de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+17.0d0*r2)
+     &                                                  / (r2*lik**4)
+            else if (r .lt. ri+sk) then
+               lik = ri
+               de = de + 0.25d0*pi*(2.0d0*ri*ri-sk2-r2) / (r2*lik**4)
+            else
+               lik = r - sk
+               de = de + 0.25d0*pi*(sk2-4.0d0*sk*r+r2) / (r2*lik**4)
+            end if
+            uik = r + sk
+            de = de - 0.25d0*pi*(sk2+4.0d0*sk*r+r2) / (r2*uik**4)
+            if (useneck) then
+               call neckder (r,ri,rdk,mixsn,neckderi)
+               de = de + neckderi
+            end if
+         end if
+      end if
       return
       end
