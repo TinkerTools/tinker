@@ -386,6 +386,7 @@ add_library (tinkerObjF OBJECT
 ../source/inertia.f
 ../source/initatom.f
 ../source/initial.f
+../source/initneck.f
 ../source/initprm.f
 ../source/initres.f
 ../source/initrot.f
@@ -443,6 +444,7 @@ add_library (tinkerObjF OBJECT
 ../source/moments.f
 ../source/mutate.f
 ../source/nblist.f
+../source/neck.f
 ../source/nextarg.f
 ../source/nexttext.f
 ../source/nose.f
@@ -467,14 +469,16 @@ add_library (tinkerObjF OBJECT
 ../source/prmkey.f
 ../source/promo.f
 ../source/prtarc.f
-../source/prtdcd.f
 ../source/prtdyn.f
 ../source/prterr.f
+../source/prtfrc.f
 ../source/prtint.f
 ../source/prtmol2.f
 ../source/prtpdb.f
 ../source/prtprm.f
 ../source/prtseq.f
+../source/prtuind.f
+../source/prtvel.f
 ../source/prtxyz.f
 ../source/qrsolve.f
 ../source/quatfit.f

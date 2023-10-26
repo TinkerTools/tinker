@@ -22,13 +22,12 @@ c
       use atoms
       use bound
       use boxes
-      use deriv
+      use couple
       use files
       use group
       use inform
       use iounit
       use mdstuf
-      use moldyn
       use mpole
       use output
       use polar
@@ -36,7 +35,6 @@ c
       use rgddyn
       use socket
       use titles
-      use units
       implicit none
       integer i,j,ii
       integer istep
@@ -179,6 +177,19 @@ c
             velfile = filename(1:leng)//'.'//ext(1:lext)//'v'
             call version (velfile,'new')
             open (unit=ivel,file=velfile,status='new')
+         else if (dcdsave) then
+            velfile = filename(1:leng)
+            call suffix (velfile,'dcdv','old')
+            inquire (file=velfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=ivel,file=velfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=ivel,file=velfile,form='unformatted',
+     &                  status='new')
+            end if
          else
             velfile = filename(1:leng)
             call suffix (velfile,'vel','old')
@@ -198,13 +209,10 @@ c
                write (ivel,210)  i,(wcm(j,i),j=1,3)
   210          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
+         else if (dcdsave) then
+            call prtdcdv (ivel,first)
          else
-            write (ivel,220)  n,title(1:ltitle)
-  220       format (i6,2x,a)
-            do i = 1, n
-               write (ivel,230)  i,name(i),(v(j,i),j=1,3)
-  230          format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
-            end do
+            call prtvel (ivel)
          end if
          close (unit=ivel)
          write (iout,240)  velfile(1:trimtext(velfile))
@@ -221,6 +229,20 @@ c
             frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
             call version (frcfile,'new')
             open (unit=ifrc,file=frcfile,status='new')
+         else if (dcdsave) then
+            frcfile = filename(1:leng)
+            call suffix (frcfile,'dcdf','old')
+            inquire (file=frcfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=ifrc,file=frcfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=ifrc,file=frcfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcdf (ifrc,first)
          else
             frcfile = filename(1:leng)
             call suffix (frcfile,'frc','old')
@@ -230,19 +252,14 @@ c
             else
                open (unit=ifrc,file=frcfile,status='new')
             end if
+            call prtfrc (ifrc)
          end if
-         write (ifrc,250)  n,title(1:ltitle)
-  250    format (i6,2x,a)
-         do i = 1, n
-            write (ifrc,260)  i,name(i),(-desum(j,i),j=1,3)
-  260       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
-         end do
          close (unit=ifrc)
          write (iout,270)  frcfile(1:trimtext(frcfile))
   270    format (' Force Vector File',11x,a)
       end if
 c
-c     save the current induced dipole moment at each site
+c     save the induced dipole components for the current step
 c
       if (uindsave .and. use_polar) then
          iind = freeunit ()
@@ -250,6 +267,20 @@ c
             indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
+         else if (dcdsave) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'dcdu','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcdu (iind,first)
          else
             indfile = filename(1:leng)
             call suffix (indfile,'uind','old')
@@ -259,16 +290,8 @@ c
             else
                open (unit=iind,file=indfile,status='new')
             end if
+            call prtuind (iind)
          end if
-         write (iind,280)  n,title(1:ltitle)
-  280    format (i6,2x,a)
-         do ii = 1, npole
-            i = ipole(ii)
-            if (polarity(i) .ne. 0.0d0) then
-               write (iind,290)  i,name(i),(debye*uind(j,i),j=1,3)
-  290          format (i6,2x,a3,3f12.6)
-            end if
-         end do
          close (unit=iind)
          write (iout,300)  indfile(1:trimtext(indfile))
   300    format (' Induced Dipole File',9x,a)

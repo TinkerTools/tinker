@@ -52,6 +52,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp dsppot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp energi.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ewald.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp expol.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp extfld.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp faces.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp fft.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp fields.f
@@ -364,6 +365,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp eurey1.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp eurey2.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp eurey3.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp evcorr.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp exfield.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp extra.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp extra1.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp extra2.f
@@ -409,6 +411,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp induce.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp inertia.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp initatom.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp initial.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp initneck.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp initprm.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp initres.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp initrot.f
@@ -474,6 +477,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp moments.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp monte.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp mutate.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp nblist.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp neck.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp newton.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp newtrot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp nextarg.f
@@ -511,14 +515,16 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prmkey.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp promo.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp protein.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtarc.f
-ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtdcd.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtdyn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prterr.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtfrc.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtint.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtmol2.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtpdb.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtprm.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtseq.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtuind.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtvel.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp prtxyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pss.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp pssrigid.f

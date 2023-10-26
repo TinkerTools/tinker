@@ -468,20 +468,15 @@ c
             xbox = xboxold
             ybox = yboxold
             zbox = zboxold
+            alpha = alphaold
+            beta = betaold
+            gamma = gammaold
             call lattice
-            if (integrate .eq. 'RIGIDBODY') then
-               do i = 1, n
-                  x(i) = xold(i)
-                  y(i) = yold(i)
-                  z(i) = zold(i)
-               end do
-            else
-               do i = 1, n
-                  x(i) = xold(i)
-                  y(i) = yold(i)
-                  z(i) = zold(i)
-               end do
-            end if
+            do i = 1, n
+               x(i) = xold(i)
+               y(i) = yold(i)
+               z(i) = zold(i)
+            end do
          end if
 c
 c     perform deallocation of some local arrays

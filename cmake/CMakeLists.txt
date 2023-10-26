@@ -126,34 +126,35 @@ set(_FILES
     getmol getmol2 getnumb getpdb getprm getref getstring gettext getword
     getxyz ghmcstep gkstuf gradient gradrgd gradrot group groups grpline
     gyrate hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image
-    impose improp imptor induce inertia inform initatom initial initprm
-    initres initrot insert inter invbeta invert iounit jacobi kanang
-    kangang kangle kangs kangtor kantor katom katoms kbond kbonds kcflux
-    kcharge kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp
-    kewald kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic
-    kiprop kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst
-    korbit korbs kpitor kpitors kpolar kpolpr kpolr krepel krepl ksolut
-    ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor kurey
-    kurybr kvdw kvdwpr kvdws lattice lbfgs light lights limits linmin
-    lusolve makeint makeref makexyz math maxwell mdinit mdrest mdsave
-    mdstat mdstuf mechanic merck merge minima molcul moldyn molecule
-    moment moments mplpot mpole mrecip mutant mutate nblist neigh nextarg
-    nexttext nonpol nose nspline nucleo number numeral numgrad ocvm omega
-    opbend opdist openend openmp optinit optsave orbital orbits orient
-    orthog output overlap params paths pbstuf pdb phipsi picalc piorbs
-    pistuf pitors pme pmestuf pmpb polar polgrp polopt polpcg polpot
-    poltcg polymer potent potfit predict pressure prmkey promo prtarc
-    prtdcd prtdyn prterr prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
-    qmstuf qrsolve quatfit random rattle readcart readdcd readdyn readgau
-    readgdma readint readmol readmol2 readpdb readprm readseq readxyz
-    refer repel replica reppot resdue respa restrn rgddyn rgdstep rigid
-    ring rings rmsfit rotbnd rotlist rotpole rxnfld rxnpot scales sdstep
-    search sequen server setprm shakeup shunt sigmoid simplex sizes
-    sktstuf socket solpot solute sort square stodyn strbnd strtor suffix
-    surface surfatom switch syntrn tarray tcgstuf temper titles tncg
-    torphase torpot torque tors torsions tortor tree trimtext unitcell
-    units uprior urey urypot usage valfit vdw vdwpot verlet version vibs
-    virial volume warp xtals xyzatm zatom zclose zcoord
+    impose improp imptor induce inertia inform initatom initial initneck
+    initprm initres initrot insert inter invbeta invert iounit jacobi
+    kanang kangang kangle kangs kangtor kantor katom katoms kbond kbonds
+    kcflux kcharge kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole
+    kdisp kdsp kewald kexpl kexpol kextra keys kgeom khbond kimprop
+    kimptor kinetic kiprop kitors kmetal kmpole kmulti kopbend kopbnd
+    kopdist kopdst korbit korbs kpitor kpitors kpolar kpolpr kpolr krepel
+    krepl ksolut ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor
+    ktrtor kurey kurybr kvdw kvdwpr kvdws lattice lbfgs light lights
+    limits linmin lusolve makeint makeref makexyz math maxwell mdinit
+    mdrest mdsave mdstat mdstuf mechanic merck merge minima molcul
+    moldyn molecule moment moments mplpot mpole mrecip mutant mutate
+    nblist neck neigh nextarg nexttext nonpol nose nspline nucleo
+    number numeral numgrad ocvm omega opbend opdist openend openmp
+    optinit optsave orbital orbits orient orthog output overlap params
+    paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf
+    pmpb polar polgrp polopt polpcg polpot poltcg polymer potent
+    potfit predict pressure prmkey promo prtarc prtdyn prterr prtfrc
+    prtint prtmol2 prtpdb prtprm prtseq prtuind prtvel prtxyz ptable
+    qmstuf qrsolve quatfit random rattle readcart readdcd readdyn
+    readgau readgdma readint readmol readmol2 readpdb readprm readseq
+    readxyz refer repel replica reppot resdue respa restrn rgddyn
+    rgdstep rigid ring rings rmsfit rotbnd rotlist rotpole rxnfld rxnpot
+    scales sdstep search sequen server setprm shakeup shunt sigmoid
+    simplex sizes sktstuf socket solpot solute sort square stodyn strbnd
+    strtor suffix surface surfatom switch syntrn tarray tcgstuf temper
+    titles tncg torphase torpot torque tors torsions tortor tree trimtext
+    unitcell units uprior urey urypot usage valfit vdw vdwpot verlet
+    version vibs virial volume warp xtals xyzatm zatom zclose zcoord
 )
 
 set(_LIB "")

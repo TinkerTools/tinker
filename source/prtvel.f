@@ -1,51 +1,22 @@
 c
 c
 c     ###################################################
-c     ##  COPYRIGHT (C)  2022  by  Jay William Ponder  ##
+c     ##  COPYRIGHT (C)  2023  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine prtarc  --  output of a coordinates archive  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine prtvel  --  output of velocity components  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "prtarc" writes a Cartesian coordinates archive as either
-c     a formatted or binary disk file
+c     "prtvel" writes out a set of atomic velocity components
+c     to an external disk file in Tinker XYZ format
 c
 c
-      subroutine prtarc (iarc,first)
-      use output
-      implicit none
-      integer iarc
-      logical first
-c
-c
-c     write archive file as either formatted or binary file
-c
-      if (archive) then
-         call prtarcf (iarc)
-      else if (binary) then
-         call prtarcb (iarc,first)
-      end if
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine prtarcf  --  output of Tinker archive file  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "prtarcf" writes out a set of Cartesian coordinates for
-c     all active atoms in the Tinker XYZ archive format
-c
-c
-      subroutine prtarcf (iarc)
+      subroutine prtvel (ivel)
       use atomid
       use atoms
       use bound
@@ -53,10 +24,10 @@ c
       use couple
       use files
       use inform
+      use moldyn
       use titles
-      use usage
       implicit none
-      integer i,j,k,iarc
+      integer i,j,k,ivel
       integer size,crdsiz
       real*8 crdmin,crdmax
       logical opened
@@ -64,16 +35,16 @@ c
       character*2 crdc
       character*2 digc
       character*25 fstr
-      character*240 arcfile
+      character*240 velfile
 c
 c
-c     open output unit if not already done
+c     open the output unit if not already done
 c
-      inquire (unit=iarc,opened=opened)
+      inquire (unit=ivel,opened=opened)
       if (.not. opened) then
-         arcfile = filename(1:leng)//'.arc'
-         call version (arcfile,'new')
-         open (unit=iarc,file=arcfile,status='new')
+         velfile = filename(1:leng)//'.vel'
+         call version (velfile,'new')
+         open (unit=ivel,file=velfile,status='new')
       end if
 c
 c     check for large systems needing extended formatting
@@ -107,52 +78,50 @@ c     write out the number of atoms and the title
 c
       if (ltitle .eq. 0) then
          fstr = '('//atmc//')'
-         write (iarc,fstr(1:4))  nuse
+         write (ivel,fstr(1:4))  n
       else
          fstr = '('//atmc//',2x,a)'
-         write (iarc,fstr(1:9))  nuse,title(1:ltitle)
+         write (ivel,fstr(1:9))  n,title(1:ltitle)
       end if
 c
 c     write out the periodic cell lengths and angles
 c
       if (use_bounds) then
          fstr = '(1x,6f'//crdc//'.'//digc//')'
-         write (iarc,fstr)  xbox,ybox,zbox,alpha,beta,gamma
+         write (ivel,fstr)  xbox,ybox,zbox,alpha,beta,gamma
       end if
 c
-c     write out the coordinate line for each atom
+c     write out the velocity components for each atom
 c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
       do i = 1, n
-         if (use(i)) then
-            k = n12(i)
-            if (k .eq. 0) then
-               write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),
-     &                            type(i)
-            else
-               write (iarc,fstr)  iuse(i),name(i),x(i),y(i),z(i),
-     &                            type(i),(iuse(i12(j,i)),j=1,k)
-            end if
+         k = n12(i)
+         if (k .eq. 0) then
+            write (ivel,fstr)  i,name(i),(v(j,i),j=1,3),type(i)
+         else
+            write (ivel,fstr)  i,name(i),(v(j,i),j=1,3),type(i),
+     &                         (i12(j,i),j=1,k)
          end if
       end do
 c
 c     close the output unit if opened by this routine
 c
-      if (.not. opened)  close (unit=iarc)
+      if (.not. opened)  close (unit=ivel)
       return
       end
 c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine prtarcb  --  output binary-format archive file  ##
+c     ##  subroutine prtdcdv  --  output of DCD velocity components  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "prtarcb" writes out a set of Cartesian coordinates for all
-c     active atoms in the CHARMM DCD binary format
+c     "prtdcdv" writes out a set of atomic velocity components to
+c     a file in CHARMM DCD binary format compatible with the VMD
+c     visualization software and other packages
 c
 c     note the format used is based on the "dcdplugin.c" code from
 c     the NAMD and VMD programs, and tutorial 4.1 from the software
@@ -178,15 +147,15 @@ c     in general a value of zero for any of the above indicates that
 c     the particular feature is unused
 c
 c
-      subroutine prtarcb (idcd,first)
+      subroutine prtdcdv (idcd,first)
       use atoms
       use bound
       use boxes
       use files
+      use moldyn
       use titles
-      use usage
       implicit none
-      integer i,k,idcd
+      integer i,idcd
       integer zero,one
       integer nframe,nprev
       integer ncrdsav,nstep
@@ -205,7 +174,7 @@ c     open the output unit if not already done
 c
       inquire (unit=idcd,opened=opened)
       if (.not. opened) then
-         dcdfile = filename(1:leng)//'.dcd'
+         dcdfile = filename(1:leng)//'.dcdv'
          call version (dcdfile,'new')
          open (unit=idcd,file=dcdfile,form='unformatted',status='new')
       end if
@@ -237,7 +206,7 @@ c
      &                 tdelta,usebox,use4d,usefq,merged,
      &                 zero,zero,zero,zero,zero,vcharmm
          write (idcd)  ntitle,title(1:80)
-         write (idcd)  nuse
+         write (idcd)  n
       end if
 c
 c     append the lattice values based on header flag value
@@ -246,25 +215,11 @@ c
          write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
       end if
 c
-c     remove unused atoms from the coordinates to be output
+c     append the velocity components along each axis in turn
 c
-      if (nuse .ne. n) then
-         k = 0
-         do i = 1, n
-            if (use(i)) then
-               k = k + 1
-               x(k) = x(i)
-               y(k) = y(i)
-               z(k) = z(i)
-            end if
-         end do
-      end if
-c
-c     append the atomic coordinates along each axis in turn
-c
-      write (idcd)  (real(x(i)),i=1,nuse)
-      write (idcd)  (real(y(i)),i=1,nuse)
-      write (idcd)  (real(z(i)),i=1,nuse)
+      write (idcd)  (real(v(1,i)),i=1,n)
+      write (idcd)  (real(v(2,i)),i=1,n)
+      write (idcd)  (real(v(3,i)),i=1,n)
 c
 c     close the output unit if opened by this routine
 c

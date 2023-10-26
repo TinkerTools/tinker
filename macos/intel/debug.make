@@ -51,6 +51,7 @@ ifort -c -g -warn all -check all dsppot.f
 ifort -c -g -warn all -check all energi.f
 ifort -c -g -warn all -check all ewald.f
 ifort -c -g -warn all -check all expol.f
+ifort -c -g -warn all -check all extfld.f
 ifort -c -g -warn all -check all faces.f
 ifort -c -g -warn all -check all fft.f
 ifort -c -g -warn all -check all fields.f
@@ -363,6 +364,7 @@ ifort -c -g -warn all -check all eurey1.f
 ifort -c -g -warn all -check all eurey2.f
 ifort -c -g -warn all -check all eurey3.f
 ifort -c -g -warn all -check all evcorr.f
+ifort -c -g -warn all -check all exfield.f
 ifort -c -g -warn all -check all extra.f
 ifort -c -g -warn all -check all extra1.f
 ifort -c -g -warn all -check all extra2.f
@@ -408,6 +410,7 @@ ifort -c -g -warn all -check all induce.f
 ifort -c -g -warn all -check all inertia.f
 ifort -c -g -warn all -check all initatom.f
 ifort -c -g -warn all -check all initial.f
+ifort -c -g -warn all -check all initneck.f
 ifort -c -g -warn all -check all initprm.f
 ifort -c -g -warn all -check all initres.f
 ifort -c -g -warn all -check all initrot.f
@@ -473,6 +476,7 @@ ifort -c -g -warn all -check all moments.f
 ifort -c -g -warn all -check all monte.f
 ifort -c -g -warn all -check all mutate.f
 ifort -c -g -warn all -check all nblist.f
+ifort -c -g -warn all -check all neck.f
 ifort -c -g -warn all -check all newton.f
 ifort -c -g -warn all -check all newtrot.f
 ifort -c -g -warn all -check all nextarg.f
@@ -510,14 +514,16 @@ ifort -c -g -warn all -check all prmkey.f
 ifort -c -g -warn all -check all promo.f
 ifort -c -g -warn all -check all protein.f
 ifort -c -g -warn all -check all prtarc.f
-ifort -c -g -warn all -check all prtdcd.f
 ifort -c -g -warn all -check all prtdyn.f
 ifort -c -g -warn all -check all prterr.f
+ifort -c -g -warn all -check all prtfrc.f
 ifort -c -g -warn all -check all prtint.f
 ifort -c -g -warn all -check all prtmol2.f
 ifort -c -g -warn all -check all prtpdb.f
 ifort -c -g -warn all -check all prtprm.f
 ifort -c -g -warn all -check all prtseq.f
+ifort -c -g -warn all -check all prtuind.f
+ifort -c -g -warn all -check all prtvel.f
 ifort -c -g -warn all -check all prtxyz.f
 ifort -c -g -warn all -check all pss.f
 ifort -c -g -warn all -check all pssrigid.f

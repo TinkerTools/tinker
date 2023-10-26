@@ -51,6 +51,7 @@ gfortran -c -O3 -ffast-math -fopenmp dsppot.f
 gfortran -c -O3 -ffast-math -fopenmp energi.f
 gfortran -c -O3 -ffast-math -fopenmp ewald.f
 gfortran -c -O3 -ffast-math -fopenmp expol.f
+gfortran -c -O3 -ffast-math -fopenmp extfld.f
 gfortran -c -O3 -ffast-math -fopenmp faces.f
 gfortran -c -O3 -ffast-math -fopenmp fft.f
 gfortran -c -O3 -ffast-math -fopenmp fields.f
@@ -363,6 +364,7 @@ gfortran -c -O3 -ffast-math -fopenmp eurey1.f
 gfortran -c -O3 -ffast-math -fopenmp eurey2.f
 gfortran -c -O3 -ffast-math -fopenmp eurey3.f
 gfortran -c -O3 -ffast-math -fopenmp evcorr.f
+gfortran -c -O3 -ffast-math -fopenmp exfield.f
 gfortran -c -O3 -ffast-math -fopenmp extra.f
 gfortran -c -O3 -ffast-math -fopenmp extra1.f
 gfortran -c -O3 -ffast-math -fopenmp extra2.f
@@ -408,6 +410,7 @@ gfortran -c -O3 -ffast-math -fopenmp induce.f
 gfortran -c -O3 -ffast-math -fopenmp inertia.f
 gfortran -c -O3 -ffast-math -fopenmp initatom.f
 gfortran -c -O3 -ffast-math -fopenmp initial.f
+gfortran -c -O3 -ffast-math -fopenmp initneck.f
 gfortran -c -O3 -ffast-math -fopenmp initprm.f
 gfortran -c -O3 -ffast-math -fopenmp initres.f
 gfortran -c -O3 -ffast-math -fopenmp initrot.f
@@ -473,6 +476,7 @@ gfortran -c -O3 -ffast-math -fopenmp moments.f
 gfortran -c -O3 -ffast-math -fopenmp monte.f
 gfortran -c -O3 -ffast-math -fopenmp mutate.f
 gfortran -c -O3 -ffast-math -fopenmp nblist.f
+gfortran -c -O3 -ffast-math -fopenmp neck.f
 gfortran -c -O3 -ffast-math -fopenmp newton.f
 gfortran -c -O3 -ffast-math -fopenmp newtrot.f
 gfortran -c -O3 -ffast-math -fopenmp nextarg.f
@@ -510,14 +514,16 @@ gfortran -c -O3 -ffast-math -fopenmp prmkey.f
 gfortran -c -O3 -ffast-math -fopenmp promo.f
 gfortran -c -O3 -ffast-math -fopenmp protein.f
 gfortran -c -O3 -ffast-math -fopenmp prtarc.f
-gfortran -c -O3 -ffast-math -fopenmp prtdcd.f
 gfortran -c -O3 -ffast-math -fopenmp prtdyn.f
 gfortran -c -O3 -ffast-math -fopenmp prterr.f
+gfortran -c -O3 -ffast-math -fopenmp prtfrc.f
 gfortran -c -O3 -ffast-math -fopenmp prtint.f
 gfortran -c -O3 -ffast-math -fopenmp prtmol2.f
 gfortran -c -O3 -ffast-math -fopenmp prtpdb.f
 gfortran -c -O3 -ffast-math -fopenmp prtprm.f
 gfortran -c -O3 -ffast-math -fopenmp prtseq.f
+gfortran -c -O3 -ffast-math -fopenmp prtuind.f
+gfortran -c -O3 -ffast-math -fopenmp prtvel.f
 gfortran -c -O3 -ffast-math -fopenmp prtxyz.f
 gfortran -c -O3 -ffast-math -fopenmp pss.f
 gfortran -c -O3 -ffast-math -fopenmp pssrigid.f

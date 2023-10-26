@@ -30,7 +30,8 @@ c
       use solute
       implicit none
       integer i,k,next
-      real*8 pbrd,csrd,gkrd
+      real*8 pbrd,csrd
+      real*8 gkrd,snek
       logical header
       character*20 keyword
       character*20 value
@@ -150,22 +151,24 @@ c
                pbrd = 0.0d0
                csrd = 0.0d0
                gkrd = 0.0d0
+               snek = 0.0d0
                string = record(next:240)
-               read (string,*,err=20,end=20)  pbrd,csrd,gkrd
+               read (string,*,err=20,end=20)  pbrd,csrd,gkrd,snek
    20          continue
                if (header .and. .not.silent) then
                   header = .false.
                   write (iout,30)
    30             format (/,' Additional Solvation Parameters :',
-     &                    //,5x,'Atom Type',16x,'PB Size',
-     &                       5x,'CS Size',5x,'GK Size',/)
+     &                    //,5x,'Atom Type',16x,'PB Size',5x,'CS Size',
+     &                       5x,'GK Size',6x,'S-Neck',/)
                end if
                pbr(k) = pbrd
                gkr(k) = csrd
                pbr(k) = gkrd
+               snk(k) = snek
                if (.not. silent) then
-                  write (iout,40)  k,pbrd,csrd,gkrd
-   40             format (6x,i6,7x,3f12.4)
+                  write (iout,40)  k,pbrd,csrd,gkrd,snek
+   40             format (6x,i6,7x,4f12.4)
                end if
             else if (k .gt. maxtyp) then
                write (iout,50)  maxtyp
@@ -859,11 +862,12 @@ c
       integer i,it,next
       integer atmnum
       real*8 dhct
+      logical descreen
+      logical omithyd
+      logical atomhct
       character*10 radtyp
       character*20 keyword
       character*20 value
-      logical descreenVDW
-      logical descreenHydrogen
       character*240 record
       character*240 string
 c
@@ -883,6 +887,8 @@ c
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uopts))  deallocate (uopts)
       if (allocated(uoptps))  deallocate (uoptps)
+      if (allocated(sneck))  deallocate (sneck)
+      if (allocated(bornint))  deallocate (bornint)
       allocate (rsolv(n))
       allocate (rdescr(n))
       allocate (rborn(n))
@@ -894,6 +900,8 @@ c
       allocate (udirps(3,n))
       allocate (uinds(3,n))
       allocate (uinps(3,n))
+      allocate (sneck(n))
+      allocate (bornint(n))
       if (poltyp .eq. 'OPT') then
          allocate (uopts(0:optorder,3,n))
          allocate (uoptps(0:optorder,3,n))
@@ -903,9 +911,13 @@ c     set default value for exponent in the GB/GK function
 c
       gkc = 2.455d0
       dhct = 0.72d0
+      descoff = 0.30d0
       radtyp = 'SOLUTE'
-      descreenVDW = .true.
-      descreenHydrogen = .false.
+      descreen = .true.
+      omithyd = .true.
+      atomhct = .true.
+      useneck = .true.
+      usetanh = .true.
 c
 c     get any altered generalized Kirkwood values from keyfile
 c
@@ -934,21 +946,34 @@ c
             else if (value(1:6) .eq. 'SOLUTE') then
                radtyp = 'SOLUTE'
             end if
-         else if (keyword(1:13) .eq. 'DESCREEN-VDW ') then
-            call getword (record,value,next)
-            call upcase (value)
-            if (value(1:4) .eq. 'TRUE') then
-               descreenVDW = .true.
-            end if
+         else if (keyword(1:11) .eq. 'NODESCREEN ') then
+            descreen = .false.
          else if (keyword(1:18) .eq. 'DESCREEN-HYDROGEN ') then
+            omithyd = .false.
+         else if (keyword(1:16) .eq. 'DESCREEN-OFFSET ') then
+            read (string,*,err=20,end=20)  descoff
+   20       continue
+         else if (keyword(1:10) .eq. 'HCT-SCALE ') then
+            read (string,*,err=30,end=30)  dhct
+   30       continue
+         else if (keyword(1:12) .eq. 'HCT-ELEMENT ') then
             call getword (record,value,next)
             call upcase (value)
             if (value(1:5) .eq. 'FALSE') then
-               descreenHydrogen = .false.
+               atomhct = .false.
             end if
-         else if (keyword(1:10) .eq. 'HCT-SCALE ') then
-            read (string,*,err=20,end=20)  dhct
-   20       continue
+         else if (keyword(1:16) .eq. 'NECK-CORRECTION ') then
+            call getword (record,value,next)
+            call upcase(value)
+            if (value(1:5) .eq. 'FALSE') then
+               useneck = .false.
+            end if
+         else if (keyword(1:16) .eq. 'TANH-CORRECTION ') then
+            call getword (record,value,next)
+            call upcase(value)
+            if (value(1:5) .eq. 'FALSE') then
+               usetanh = .false.
+            end if
          end if
       end do
 c
@@ -956,20 +981,38 @@ c     determine the solute atomic radii values to be used
 c
       call setrad (radtyp)
 c
-c     assign generic value for the HCT overlap scale factor
+c     assign generic value for the overlap scale factor
 c
       do i = 1, n
          shct(i) = dhct
          rdescr(i) = rsolv(i)
-         if (descreenVDW) then
+         if (descreen) then
             it = jvdw(i)
             rdescr(i) = 0.5d0 * radmin(it,it)
          end if
-         if (.not. descreenHydrogen) then
+c
+c     use overlap scale factors for specific elements
+c
+         if (atomhct) then
+            atmnum = atomic(i)
+            if (atmnum .eq. 1)  shct(i) = 0.72d0
+            if (atmnum .eq. 6)  shct(i) = 0.695d0
+            if (atmnum .eq. 7)  shct(i) = 0.7673d0
+            if (atmnum .eq. 8)  shct(i) = 0.7965d0
+            if (atmnum .eq. 15)  shct(i) = 0.6117d0
+            if (atmnum .eq. 16)  shct(i) = 0.7204d0
+         end if
+c
+c     remove hydrogen descreening if it is not to be used
+c
+         if (omithyd) then
             atmnum = atomic(i)
             if (atmnum .eq. 1) shct(i) = 0.0d0
          end if
       end do
+c
+c     set optimal overlap scale factors for Macromodel radii
+c
       if (radtyp .eq. 'MACROMODEL') then
          do i = 1, n
             shct(i) = 0.80d0
@@ -1420,6 +1463,7 @@ c
       use nonpol
       use potent
       use solute
+      use vdwpot
       implicit none
       integer i,next
       real*8 cross,ah,ao
@@ -1471,13 +1515,15 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(asolv))  deallocate (asolv)
-      if (allocated(rcav))  deallocate (rcav)
-      if (allocated(rdisp))  deallocate (rdisp)
-      if (allocated(cdisp))  deallocate (cdisp)
+      if (allocated(radcav))  deallocate (radcav)
+      if (allocated(raddsp))  deallocate (raddsp)
+      if (allocated(epsdsp))  deallocate (epsdsp)
+      if (allocated(cdsp))  deallocate (cdsp)
       allocate (asolv(n))
-      allocate (rcav(n))
-      allocate (rdisp(n))
-      allocate (cdisp(n))
+      allocate (radcav(n))
+      allocate (raddsp(n))
+      allocate (epsdsp(n))
+      allocate (cdsp(n))
 c
 c     assign surface area factors for nonpolar solvation
 c
@@ -1488,15 +1534,22 @@ c
 c     set cavity and dispersion radii for nonpolar solvation
 c
       do i = 1, n
-         rcav(i) = rad(class(i)) + cavoff
-         rdisp(i) = rad(class(i))
+         if (vdwindex .eq. 'CLASS') then
+            radcav(i) = rad(class(i)) + cavoff
+            raddsp(i) = rad(class(i))
+            epsdsp(i) = eps(class(i))
+         else
+            radcav(i) = rad(type(i)) + cavoff
+            raddsp(i) = rad(type(i))
+            epsdsp(i) = eps(type(i))
+         end if
       end do
 c
 c     compute maximum dispersion energies for each atom
 c
       do i = 1, n
-         epsi = eps(class(i))
-         rmini = rad(class(i))
+         epsi = epsdsp(i)
+         rmini = raddsp(i)
          if (rmini.gt.0.0d0 .and. epsi.gt.0.0d0) then
             emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
             rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
@@ -1508,31 +1561,31 @@ c
             rmixh3 = rmixh**3
             rmixh7 = rmixh**7
             ah = emixh * rmixh7
-            ri = rmixh / 2.0d0 + dispoff
+            ri = 0.5d0*rmixh + dspoff
             ri3 = ri**3
             ri7 = ri**7
             ri11 = ri**11
             if (ri .lt. rmixh) then
-               cdisp(i) = -4.0d0*pi*emixh*(rmixh3-ri3)/3.0d0
-               cdisp(i) = cdisp(i) - emixh*18.0d0/11.0d0*rmixh3*pi
+               cdsp(i) = -4.0d0*pi*emixh*(rmixh3-ri3)/3.0d0
+               cdsp(i) = cdsp(i) - emixh*18.0d0/11.0d0*rmixh3*pi
             else
-               cdisp(i) = 2.0d0*pi*(2.0d0*rmixh7-11.0d0*ri7)*ah
-               cdisp(i) = cdisp(i) / (11.0d0*ri11)
+               cdsp(i) = 2.0d0*pi*(2.0d0*rmixh7-11.0d0*ri7)*ah
+               cdsp(i) = cdsp(i) / (11.0d0*ri11)
             end if
-            cdisp(i) = 2.0d0 * cdisp(i)
-            ri = rmixo / 2.0d0 + dispoff
+            cdsp(i) = 2.0d0 * cdsp(i)
+            ri = 0.5d0*rmixo + dspoff
             ri3 = ri**3
             ri7 = ri**7
             ri11 = ri**11
             if (ri .lt. rmixo) then
-               cdisp(i) = cdisp(i) - 4.0d0*pi*emixo*(rmixo3-ri3)/3.0d0
-               cdisp(i) = cdisp(i) - emixo*18.0d0/11.0d0*rmixo3*pi
+               cdsp(i) = cdsp(i) - 4.0d0*pi*emixo*(rmixo3-ri3)/3.0d0
+               cdsp(i) = cdsp(i) - emixo*18.0d0/11.0d0*rmixo3*pi
             else
-               cdisp(i) = cdisp(i) + 2.0d0*pi*(2.0d0*rmixo7-11.0d0*ri7)
+               cdsp(i) = cdsp(i) + 2.0d0*pi*(2.0d0*rmixo7-11.0d0*ri7)
      &                                  * ao/(11.0d0*ri11)
             end if
          end if
-         cdisp(i) = slevy * awater * cdisp(i)
+         cdsp(i) = slevy * awater * cdsp(i)
       end do
       return
       end
@@ -1629,8 +1682,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "setrad" chooses a set of atomic radii to solute atoms for use
-c     during Poission-Boltzmann and Generalized Kirkwood implicit
+c     "setrad" chooses a set of solute atom atomic radii to use
+c     during Generalized Kirkwood and Poission-Boltzmann implicit
 c     solvation calculations
 c
 c
@@ -1655,7 +1708,9 @@ c
       use solute
       implicit none
       integer i,j,k,l,m
+      integer it
       integer atmnum
+      integer nheavy
       real*8 rscale
       real*8 offset
       character*10 radtyp
@@ -1685,19 +1740,57 @@ c
       else if (radtyp .eq. 'SOLUTE') then
          if (solvtyp(1:2) .eq. 'GK') then     
             do i = 1, n
-               if (type(i) .ne. 0) then
-                  if (gkr(type(i)) .ne. 0.0d0) then
+               it = type(i)
+               if (it .ne. 0) then
+                  if (gkr(it) .ne. 0.0d0) then
                      rsolv(i) = gkr(type(i))
                   end if
                end if
             end do
          else if (solvtyp(1:2) .eq. 'PB') then
             do i = 1, n
-               if (type(i) .ne. 0) then
-                  if (pbr(type(i)) .ne. 0.0d0) then
+               it = type(i)
+               if (it .ne. 0) then
+                  if (pbr(it) .ne. 0.0d0) then
                      rsolv(i) = pbr(type(i))
                   end if
                end if
+            end do
+         end if
+c
+c     set and store neck correction ranges and parameters
+c
+         call initneck
+c
+c     get neck correction via a bonded connectivity scheme
+c
+         if (useneck) then
+            do i = 1, n
+               it = type(i)
+               atmnum = atomic(i)
+               if (atmnum .gt. 1) then
+                  nheavy = 0
+                  do j = 1, n12(i)
+                     if (atomic(i12(j,i)) .gt. 1) then
+                        nheavy = nheavy + 1
+                     end if
+                  end do
+                  if (nheavy .eq. 0) then
+                     sneck(it) = 1.0
+                  else
+                     sneck(i) = snk(it) * (5.0d0-nheavy)/4.0d0
+                  end if
+               end if
+            end do
+c
+c     hydrogen neck contribution same as bound heavy atom
+c
+            do i = 1, n
+               do k = 1, n12(i)
+                  if (atomic(i12(k,i)) .eq. 1) then
+                     sneck(i12(k,i)) = sneck(i)
+                  end if
+               end do
             end do
          end if
 c

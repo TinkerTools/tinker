@@ -725,9 +725,6 @@ c
           call chkpole
           call rotpole ('MPOLE')
       end if
-      if (.not. use_polar) then
-         call induce
-      end if
 c
 c     compute the generalized Kirkwood energy and gradient
 c
@@ -737,6 +734,12 @@ c
 c     correct energy and derivatives for vacuum to polarized state
 c
       if (use_polar) then
+         if (use_mlist) then
+            call ediff1b
+         else
+            call ediff1a
+         end if
+      else if (.not.use_mpole .and. .not.use_polar) then
          if (use_mlist) then
             call ediff1b
          else
@@ -776,9 +779,13 @@ c
       use virial
       implicit none
       integer i,j,k,ii,kk
+      integer ix,iy,iz
       real*8 e,ei,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
+      real*8 xiz,yiz,ziz
       real*8 xr2,yr2,zr2
       real*8 ci,ck
       real*8 uxi,uyi,uzi
@@ -800,6 +807,7 @@ c
       real*8 dpbi,dpbk
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 vxy,vxz,vyz
       real*8 dwater
       real*8 fc,fd,fq
       real*8 rbi,rbk
@@ -2290,12 +2298,78 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     convert torque derivative components to Cartesian forces
+c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,trq(1,i),fix,fiy,fiz,des)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
          call torque (i,trqi(1,i),fix,fiy,fiz,des)
+         iz = zaxis(i)
+         ix = xaxis(i)
+         iy = abs(yaxis(i))
+         if (iz .eq. 0)  iz = i
+         if (ix .eq. 0)  ix = i
+         if (iy .eq. 0)  iy = i
+         xiz = x(iz) - x(i)
+         yiz = y(iz) - y(i)
+         ziz = z(iz) - z(i)
+         xix = x(ix) - x(i)
+         yix = y(ix) - y(i)
+         zix = z(ix) - z(i)
+         xiy = x(iy) - x(i)
+         yiy = y(iy) - y(i)
+         ziy = z(iy) - z(i)
+         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
+         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
+     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
+         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
+     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
+         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
+         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
+     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
+         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
       end do
 c
 c     perform deallocation of some local arrays
@@ -4598,6 +4672,7 @@ c
       use mpole
       use nonpol
       use shunt
+      use solpot
       use solute
       implicit none
       integer i
@@ -4613,8 +4688,10 @@ c
       character*6 mode
 c
 c
-c     zero out the nonpolar solvation energy and first derivatives
+c     zero out the nonpolar solvation energy contributions
 c
+      esurf = 0.0d0
+      evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
 c
@@ -4624,10 +4701,22 @@ c
       allocate (dsurf(3,n))
       allocate (dvol(3,n))
 c
-c     compute SASA and effective radius needed for cavity term
+c     zero out the nonpolar solvation first derivatives
+c
+      do i = 1, n
+         dsurf(1,i) = 0.0d0
+         dsurf(2,i) = 0.0d0
+         dsurf(3,i) = 0.0d0
+         dvol(1,i) = 0.0d0
+         dvol(2,i) = 0.0d0
+         dvol(3,i) = 0.0d0
+      end do
+c
+c     compute surface area and effective radius for cavity
 c
       exclude = 1.4d0
-      call surface1 (esurf,aesurf,dsurf,rcav,asolv,exclude)
+      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
+      call surface1 (esurf,aesurf,dsurf,radcav,asolv,exclude)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       dreff = reff / (2.0d0*esurf)
       reff2 = reff * reff
@@ -4638,9 +4727,9 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,rcav,exclude)
+         call volume (evol,radcav,exclude)
          evol = evol * solvprs
-         call volume1 (rcav,exclude,dvol)
+         call volume1 (radcav,exclude,dvol)
          do i = 1, n
             dvol(1,i) = dvol(1,i) * solvprs
             dvol(2,i) = dvol(2,i) * solvprs
@@ -4648,7 +4737,7 @@ c
          end do
       end if
 c
-c     include cavity energy from a full SEV term
+c     include a full solvent excluded volume cavity term
 c
       if (reff .le. spcut) then
          ecav = evol
@@ -4658,7 +4747,7 @@ c
             des(3,i) = des(3,i) + dvol(3,i)
          end do
 c
-c     include cavity energy from a tapered SEV term
+c     include a tapered solvent excluded volume cavity term
 c
       else if (reff .le. spoff) then
          mode = 'GKV'
@@ -4678,7 +4767,7 @@ c
          end do
       end if
 c
-c     include a full SASA term
+c     include a full solvent accessible surface area term
 c
       if (reff .gt. stcut) then
          ecav = ecav + esurf
@@ -4688,7 +4777,7 @@ c
             des(3,i) = des(3,i) + dsurf(3,i)
          end do
 c
-c     include cavity energy from a tapered SASA term
+c     include a tapered solvent accessible surface area term
 c
       else if (reff .gt. stoff) then
          mode = 'GKSA'
@@ -4767,16 +4856,16 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(n,class,eps,
-!$OMP& rad,x,y,z,cdisp)
+!$OMP PARALLEL default(private) shared(n,class,epsdsp,
+!$OMP& raddsp,x,y,z,cdsp)
 !$OMP& shared(edisp,des)
 !$OMP DO reduction(+:edisp,des) schedule(guided)
 c
 c     find the WCA dispersion energy and gradient components
 c
       do i = 1, n
-         epsi = eps(class(i))
-         rmini = rad(class(i))
+         epsi = epsdsp(i)
+         rmini = raddsp(i)
          emixo = 4.0d0 * epso * epsi / ((sqrt(epso)+sqrt(epsi))**2)
          rmixo = 2.0d0 * (rmino**3+rmini**3) / (rmino**2+rmini**2)
          rmixo7 = rmixo**7
@@ -4785,8 +4874,8 @@ c
          rmixh = 2.0d0 * (rminh**3+rmini**3) / (rminh**2+rmini**2)
          rmixh7 = rmixh**7
          ah = emixh * rmixh7
-         rio = rmixo / 2.0d0 + dispoff
-         rih = rmixh / 2.0d0 + dispoff
+         rio = 0.5d0*rmixo + dspoff
+         rih = 0.5d0*rmixh + dspoff
 c
 c     remove contribution due to solvent displaced by solute atoms
 c
@@ -4802,7 +4891,7 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                r = sqrt(r2)
                r3 = r * r2
-               rk = rad(class(k))
+               rk = raddsp(k)
                sk = rk * shctd
                sk2 = sk * sk
                de = 0.0d0
@@ -5008,7 +5097,7 @@ c
 c
 c     increment the overall dispersion energy component
 c
-         e = cdisp(i) - slevy*awater*sum
+         e = cdsp(i) - slevy*awater*sum
          edisp = edisp + e
       end do
 c

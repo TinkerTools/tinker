@@ -55,7 +55,7 @@ c
       end do
       if (.not. exist)  call fatal
 c
-c     get file format type by inspection of first character
+c     open the file and get format by inspecting first character
 c
       filename = xyzfile
       coordtype = 'CARTESIAN'

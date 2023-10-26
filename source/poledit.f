@@ -264,8 +264,10 @@ c
       logical noinvert
       logical planar
       logical pyramid
+      logical chkarom
       character*240 record
       character*240 string
+      external chkarom
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -352,6 +354,12 @@ c
             mabc = priority (i,ia,ib,ic)
             planar = (abs(geometry(ic,i,ia,ib)) .gt. 170.0d0)
             pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
+            if (ki .eq. 7) then
+               if (chkarom(i))  pyramid = .false.
+               if (chkarom(ia))  pyramid = .false.
+               if (chkarom(ib))  pyramid = .false.
+               if (chkarom(ic))  pyramid = .false.
+            end if
             pyramid = (pyramid .and. noinvert)
             if (mabc .eq. 0) then
                polaxe(i) = 'None'
@@ -374,22 +382,63 @@ c
                zaxis(i) = ia
                xaxis(i) = ib
                yaxis(i) = 0
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ic
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ic
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               end if
             else if (mac.eq.0 .and. (planar.or.ka.ge.kb)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ia
                xaxis(i) = ic
                yaxis(i) = 0
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ib
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ib
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               end if
             else if (mbc.eq.0 .and. (planar.or.kc.ge.ka)) then
                polaxe(i) = 'Bisector'
                zaxis(i) = ib
                xaxis(i) = ic
                yaxis(i) = 0
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               end if
             else if (mabc .eq. ia) then
                polaxe(i) = 'Z-Only'
                zaxis(i) = ia
                xaxis(i) = 0
                yaxis(i) = 0
-               if (mbc .eq. ib) then
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ib
+                  yaxis(i) = ic
+               else if (mbc .eq. ib) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
                else if (mbc .eq. ic) then
@@ -398,17 +447,9 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-               else if (ki.eq.7 .and. pyramid) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ib
-                  yaxis(i) = ic
                else if (ki.eq.7 .and. .not.pyramid) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
-               else if (ki.eq.15 .or. ki.eq.16) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ib
-                  yaxis(i) = ic
                else
                   call frame13 (i,ia,noinvert)
                end if
@@ -417,7 +458,15 @@ c
                zaxis(i) = ib
                xaxis(i) = 0
                yaxis(i) = 0
-               if (mac .eq. ia) then
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ic
+               else if (mac .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
                else if (mac .eq. ic) then
@@ -426,17 +475,9 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.7 .and. pyramid) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ic
                else if (ki.eq.7 .and. .not.pyramid) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.15 .or. ki.eq.16) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ic
                else
                   call frame13 (i,ib,noinvert)
                end if
@@ -445,7 +486,15 @@ c
                zaxis(i) = ic
                xaxis(i) = 0
                yaxis(i) = 0
-               if (mab .eq. ia) then
+               if (ki.eq.7 .and. pyramid) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (ki.eq.15 .or. ki.eq.16) then
+                  polaxe(i) = 'Z-Bisect'
+                  xaxis(i) = ia
+                  yaxis(i) = ib
+               else if (mab .eq. ia) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
                else if (mab .eq. ib) then
@@ -454,17 +503,9 @@ c
                else if (ki .eq. 6) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.7 .and. pyramid) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ib
                else if (ki.eq.7 .and. .not.pyramid) then
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
-               else if (ki.eq.15 .or. ki.eq.16) then
-                  polaxe(i) = 'Z-Bisect'
-                  xaxis(i) = ia
-                  yaxis(i) = ib
                else
                   call frame13 (i,ic,noinvert)
                end if
@@ -782,23 +823,28 @@ c
       use couple
       use mpole
       implicit none
-      integer i,ia
+      integer i,j,ia
       integer ib,ic,id
-      integer k,ka,m
+      integer ka,m
       integer priority
       real*8 geometry
       logical noinvert
+      logical monoval
       logical pyramid
 c
 c
-c     get atoms directly adjacent to the primary connected atom
+c     initialize 1-2 and 1-3 connected atoms
 c
       ib = 0
       ic = 0
       id = 0
       ka = atomic(ia)
-      do k = 1, n12(ia)
-         m = i12(k,ia)
+      monoval = (n12(i) .eq. 1)
+c
+c     get atoms directly adjacent to the primary connected atom
+c
+      do j = 1, n12(ia)
+         m = i12(j,ia)
          if (m .ne. i) then
             if (ib .eq. 0) then
                ib = m
@@ -839,23 +885,23 @@ c
          yaxis(i) = 0
          pyramid = (abs(geometry(i,ia,ib,ic)) .lt. 135.0d0)
          m = priority (ia,ib,ic,0)
-         if (m .ne. 0) then
+         if (ka.eq.7 .and. pyramid .and. noinvert .and. monoval) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
+         else if ((ka.eq.15.or.ka.eq.16) .and. monoval) then
+            polaxe(i) = 'Z-Bisect'
+            xaxis(i) = ib
+            yaxis(i) = ic
+         else if (m .ne. 0) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = m
          else if (ka .eq. 6) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-         else if (ka.eq.7 .and. pyramid .and. noinvert) then
-            polaxe(i) = 'Z-Bisect'
-            xaxis(i) = ib
-            yaxis(i) = ic
          else if (ka.eq.7 .and. .not.pyramid) then
             polaxe(i) = 'Z-then-X'
             xaxis(i) = ib
-         else if (ka.eq.15 .or. ka.eq.16) then
-            polaxe(i) = 'Z-Bisect'
-            xaxis(i) = ib
-            yaxis(i) = ic
          end if
 c
 c     three atoms are attached 1-3 through primary connection
@@ -1902,7 +1948,7 @@ c
                   polarity(i) = 0.504d0
                   palpha(i) = 4.9530d0
    40             continue
-                  aromatic = chkarom (k)
+                  aromatic = chkarom (i)
                   if (aromatic) then
                      polarity(i) = 0.1106d0
                      palpha(i) = 4.9530d0
@@ -2121,7 +2167,7 @@ c
             thl = 0.39d0
             write (iout,140)
   140       format (/,' Enter Atom Number, Polarizability & Thole',
-     &                 ' Values :  ',$)
+     &                 ' Value :  ',$)
             read (input,150)  record
   150       format (a240)
             read (record,*,err=160,end=160)  i,pol,thl
@@ -2136,7 +2182,7 @@ c
             pal = 0.0d0
             write (iout,170)
   170       format (/,' Enter Atom Number, Polarize, Core & Damp',
-     &                 ' Values :  ',$)
+     &                 ' Value :  ',$)
             read (input,180)  record
   180       format (a240)
             read (record,*,err=190,end=190)  i,pol,pel,pal
@@ -3656,7 +3702,7 @@ c
       use sizes
       implicit none
       integer i,j,k,m
-      integer ii,it,mt
+      integer ii,it
       integer in,jn,kn
       integer ni,nati
       integer nj,natj
@@ -3962,20 +4008,20 @@ c
          nave = 1
          ptlast = '                '
          do ii = 1, npole
-            it = pkey(ii)
+            i = pkey(ii)
             if (pt(ii) .eq. ptlast) then
                nave = nave + 1
                do j = 1, 13
-                  pave(j) = pave(j) + pole(j,it)
+                  pave(j) = pave(j) + pole(j,i)
                end do
                if (ii .eq. npole) then
                   do j = 1, 13
                      pave(j) = pave(j) / dble(nave)
                   end do
-                  do m = 1, nave
-                     mt = pkey(i-m+1)
+                  do k = 1, nave
+                     m = pkey(ii-k+1)
                      do j = 1, 13
-                        pole(j,mt) = pave(j)
+                        pole(j,m) = pave(j)
                      end do
                   end do
                end if
@@ -3984,16 +4030,16 @@ c
                   do j = 1, 13
                      pave(j) = pave(j) / dble(nave)
                   end do
-                  do m = 1, nave
-                     mt = pkey(i-m)
+                  do k = 1, nave
+                     m = pkey(ii-k)
                      do j = 1, 13
-                        pole(j,mt) = pave(j)
+                        pole(j,m) = pave(j)
                      end do
                   end do
                end if
                nave = 1
                do j = 1, 13
-                  pave(j) = pole(j,it)
+                  pave(j) = pole(j,i)
                end do
                ptlast = pt(ii)
             end if
