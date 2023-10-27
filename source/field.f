@@ -50,6 +50,7 @@ c
       use_tortor = .true.
       use_vdw = .true.
       use_repel = .true.
+      use_xrepel = .true.
       use_disp = .true.
       use_charge = .true.
       use_chgdpl = .true.

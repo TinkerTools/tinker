@@ -42,7 +42,7 @@ c
       if (use_vdw .and. use_vlist)  call vlist
       if (use_disp .and. use_dlist)  call dlist
       if ((use_charge.or.use_solv) .and. use_clist)  call clist
-      if ((use_repel.or.use_mpole.or.use_polar
+      if ((use_repel.or.use_xrepel.or.use_mpole.or.use_polar
      &       .or.use_chgtrn.or.use_solv) .and. use_mlist)  call mlist
       if (use_polar .and. use_ulist)  call ulist
       return

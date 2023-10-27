@@ -20,6 +20,7 @@ c
       use atoms
       use mpole
       use repel
+      use xrepel
       implicit none
       integer i,k
       integer ia,ib,ic,id
@@ -28,6 +29,7 @@ c
       real*8 xcd,ycd,zcd
       real*8 c1,c2,c3,vol
       logical dopol,dorep
+      logical doxrep
       logical check
 c
 c
@@ -41,8 +43,10 @@ c
          end if
          if (allocated(replist)) then
             if (replist(i) .ne. 0)  dorep = .true.
+         else if (allocated(xreplist)) then
+            if (xreplist(i) .ne. 0)  doxrep = .true.
          end if
-         if (dopol .or. dorep) then
+         if (dopol .or. dorep .or. doxrep) then
             check = .true.
             if (polaxe(i) .ne. 'Z-then-X')  check = .false.
             if (yaxis(i) .eq. 0)  check = .false.
@@ -87,6 +91,8 @@ c
                      repole(8,i) = -repole(8,i)
                      repole(10,i) = -repole(10,i)
                      repole(12,i) = -repole(12,i)
+                  else if (doxrep) then
+                     xrepole(3,i) = -xrepole(3,i)
                   end if
                end if
             end if

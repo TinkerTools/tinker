@@ -26,6 +26,7 @@ c
       use iounit
       use limits
       use potent
+      use reppot
       use rigid
       use vdwpot
       use virial
@@ -241,7 +242,11 @@ c
          if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
       end if
-      if (use_repel)  call erepel1
+      if (use_repel) then
+         call erepel1
+      else if (use_xrepel) then
+         call exrepel1
+      end if
       if (use_disp)  call edisp1
 c
 c     call any miscellaneous energy and gradient routines
