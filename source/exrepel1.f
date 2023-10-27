@@ -91,6 +91,9 @@ c
       real*8 rcix,rckx
       real*8 rciy,rcky
       real*8 rciz,rckz
+      real*8 rcixr,rckxr
+      real*8 rciyr,rckyr
+      real*8 rcizr,rckzr
       real*8 cscs,cxcx,cycy
       real*8 czcz,cscz,czcs
       real*8 SS,SPz,PzS
@@ -284,24 +287,30 @@ c
                   dintSx = dintS * bk(1)
                   dintSy = dintS * bk(2)
                   dintSz = dintS * bk(3)
-                  drcixdx = bi(1)*(-rciz/r)
-                  drcixdy = bi(2)*(-rciz/r)
-                  drcixdz = bi(3)*(-rciz/r)
-                  drciydx = bj(1)*(-rciz/r)
-                  drciydy = bj(2)*(-rciz/r)
-                  drciydz = bj(3)*(-rciz/r)
-                  drcizdx = bi(1)*( rcix/r) + bj(1)*( rciy/r)
-                  drcizdy = bi(2)*( rcix/r) + bj(2)*( rciy/r)
-                  drcizdz = bi(3)*( rcix/r) + bj(3)*( rciy/r)
-                  drckxdx = bi(1)*(-rckz/r)
-                  drckxdy = bi(2)*(-rckz/r)
-                  drckxdz = bi(3)*(-rckz/r)
-                  drckydx = bj(1)*(-rckz/r)
-                  drckydy = bj(2)*(-rckz/r)
-                  drckydz = bj(3)*(-rckz/r)
-                  drckzdx = bi(1)*( rckx/r) + bj(1)*( rcky/r)
-                  drckzdy = bi(2)*( rckx/r) + bj(2)*( rcky/r)
-                  drckzdz = bi(3)*( rckx/r) + bj(3)*( rcky/r)
+                  rcixr = rcix/r
+                  rciyr = rciy/r
+                  rcizr = rciz/r
+                  rckxr = rckx/r
+                  rckyr = rcky/r
+                  rckzr = rckz/r
+                  drcixdx = bi(1)*(-rcizr)
+                  drcixdy = bi(2)*(-rcizr)
+                  drcixdz = bi(3)*(-rcizr)
+                  drciydx = bj(1)*(-rcizr)
+                  drciydy = bj(2)*(-rcizr)
+                  drciydz = bj(3)*(-rcizr)
+                  drcizdx = bi(1)*( rcixr) + bj(1)*( rciyr)
+                  drcizdy = bi(2)*( rcixr) + bj(2)*( rciyr)
+                  drcizdz = bi(3)*( rcixr) + bj(3)*( rciyr)
+                  drckxdx = bi(1)*(-rckzr)
+                  drckxdy = bi(2)*(-rckzr)
+                  drckxdz = bi(3)*(-rckzr)
+                  drckydx = bj(1)*(-rckzr)
+                  drckydy = bj(2)*(-rckzr)
+                  drckydz = bj(3)*(-rckzr)
+                  drckzdx = bi(1)*( rckxr) + bj(1)*( rckyr)
+                  drckzdy = bi(2)*( rckxr) + bj(2)*( rckyr)
+                  drckzdz = bi(3)*( rckxr) + bj(3)*( rckyr)
                   dintSx = dintSx + drcizdx*cks*pzs + drcixdx*rckx*pxpx 
      &                        + drciydx*rcky*pypy + drcizdx*rckz*pzpz
                   dintSy = dintSy + drcizdy*cks*pzs + drcixdy*rckx*pxpx
@@ -628,24 +637,30 @@ c
                         dintSx = dintS * bk(1)
                         dintSy = dintS * bk(2)
                         dintSz = dintS * bk(3)
-                        drcixdx = bi(1)*(-rciz/r)
-                        drcixdy = bi(2)*(-rciz/r)
-                        drcixdz = bi(3)*(-rciz/r)
-                        drciydx = bj(1)*(-rciz/r)
-                        drciydy = bj(2)*(-rciz/r)
-                        drciydz = bj(3)*(-rciz/r)
-                        drcizdx = bi(1)*( rcix/r) + bj(1)*( rciy/r)
-                        drcizdy = bi(2)*( rcix/r) + bj(2)*( rciy/r)
-                        drcizdz = bi(3)*( rcix/r) + bj(3)*( rciy/r)
-                        drckxdx = bi(1)*(-rckz/r)
-                        drckxdy = bi(2)*(-rckz/r)
-                        drckxdz = bi(3)*(-rckz/r)
-                        drckydx = bj(1)*(-rckz/r)
-                        drckydy = bj(2)*(-rckz/r)
-                        drckydz = bj(3)*(-rckz/r)
-                        drckzdx = bi(1)*( rckx/r) + bj(1)*( rcky/r)
-                        drckzdy = bi(2)*( rckx/r) + bj(2)*( rcky/r)
-                        drckzdz = bi(3)*( rckx/r) + bj(3)*( rcky/r)
+                        rcixr = rcix/r
+                        rciyr = rciy/r
+                        rcizr = rciz/r
+                        rckxr = rckx/r
+                        rckyr = rcky/r
+                        rckzr = rckz/r
+                        drcixdx = bi(1)*(-rcizr)
+                        drcixdy = bi(2)*(-rcizr)
+                        drcixdz = bi(3)*(-rcizr)
+                        drciydx = bj(1)*(-rcizr)
+                        drciydy = bj(2)*(-rcizr)
+                        drciydz = bj(3)*(-rcizr)
+                        drcizdx = bi(1)*( rcixr) + bj(1)*( rciyr)
+                        drcizdy = bi(2)*( rcixr) + bj(2)*( rciyr)
+                        drcizdz = bi(3)*( rcixr) + bj(3)*( rciyr)
+                        drckxdx = bi(1)*(-rckzr)
+                        drckxdy = bi(2)*(-rckzr)
+                        drckxdz = bi(3)*(-rckzr)
+                        drckydx = bj(1)*(-rckzr)
+                        drckydy = bj(2)*(-rckzr)
+                        drckydz = bj(3)*(-rckzr)
+                        drckzdx = bi(1)*( rckxr) + bj(1)*( rckyr)
+                        drckzdy = bi(2)*( rckxr) + bj(2)*( rckyr)
+                        drckzdz = bi(3)*( rckxr) + bj(3)*( rckyr)
                         dintSx =dintSx+drcizdx*cks*pzs+drcixdx*rckx*pxpx
      &                        + drciydx*rcky*pypy + drcizdx*rckz*pzpz
                         dintSy =dintSy+drcizdy*cks*pzs+drcixdy*rckx*pxpx
@@ -978,6 +993,9 @@ c
       real*8 rcix,rckx
       real*8 rciy,rcky
       real*8 rciz,rckz
+      real*8 rcixr,rckxr
+      real*8 rciyr,rckyr
+      real*8 rcizr,rckzr
       real*8 cscs,cxcx,cycy
       real*8 czcz,cscz,czcs
       real*8 SS,SPz,PzS
@@ -1183,24 +1201,30 @@ c
                   dintSx = dintS * bk(1)
                   dintSy = dintS * bk(2)
                   dintSz = dintS * bk(3)
-                  drcixdx = bi(1)*(-rciz/r)
-                  drcixdy = bi(2)*(-rciz/r)
-                  drcixdz = bi(3)*(-rciz/r)
-                  drciydx = bj(1)*(-rciz/r)
-                  drciydy = bj(2)*(-rciz/r)
-                  drciydz = bj(3)*(-rciz/r)
-                  drcizdx = bi(1)*( rcix/r) + bj(1)*( rciy/r)
-                  drcizdy = bi(2)*( rcix/r) + bj(2)*( rciy/r)
-                  drcizdz = bi(3)*( rcix/r) + bj(3)*( rciy/r)
-                  drckxdx = bi(1)*(-rckz/r)
-                  drckxdy = bi(2)*(-rckz/r)
-                  drckxdz = bi(3)*(-rckz/r)
-                  drckydx = bj(1)*(-rckz/r)
-                  drckydy = bj(2)*(-rckz/r)
-                  drckydz = bj(3)*(-rckz/r)
-                  drckzdx = bi(1)*( rckx/r) + bj(1)*( rcky/r)
-                  drckzdy = bi(2)*( rckx/r) + bj(2)*( rcky/r)
-                  drckzdz = bi(3)*( rckx/r) + bj(3)*( rcky/r)
+                  rcixr = rcix/r
+                  rciyr = rciy/r
+                  rcizr = rciz/r
+                  rckxr = rckx/r
+                  rckyr = rcky/r
+                  rckzr = rckz/r
+                  drcixdx = bi(1)*(-rcizr)
+                  drcixdy = bi(2)*(-rcizr)
+                  drcixdz = bi(3)*(-rcizr)
+                  drciydx = bj(1)*(-rcizr)
+                  drciydy = bj(2)*(-rcizr)
+                  drciydz = bj(3)*(-rcizr)
+                  drcizdx = bi(1)*( rcixr) + bj(1)*( rciyr)
+                  drcizdy = bi(2)*( rcixr) + bj(2)*( rciyr)
+                  drcizdz = bi(3)*( rcixr) + bj(3)*( rciyr)
+                  drckxdx = bi(1)*(-rckzr)
+                  drckxdy = bi(2)*(-rckzr)
+                  drckxdz = bi(3)*(-rckzr)
+                  drckydx = bj(1)*(-rckzr)
+                  drckydy = bj(2)*(-rckzr)
+                  drckydz = bj(3)*(-rckzr)
+                  drckzdx = bi(1)*( rckxr) + bj(1)*( rckyr)
+                  drckzdy = bi(2)*( rckxr) + bj(2)*( rckyr)
+                  drckzdz = bi(3)*( rckxr) + bj(3)*( rckyr)
                   dintSx = dintSx + drcizdx*cks*pzs + drcixdx*rckx*pxpx 
      &                        + drciydx*rcky*pypy + drcizdx*rckz*pzpz
                   dintSy = dintSy + drcizdy*cks*pzs + drcixdy*rckx*pxpx
