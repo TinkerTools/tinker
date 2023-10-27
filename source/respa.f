@@ -244,12 +244,14 @@ c
       logical save_mpole,save_polar
       logical save_chgtrn,save_rxnfld
       logical save_solv,save_list
+      logical save_xrepel
 c
 c
 c     save the original state of slow-evolving potentials
 c
       save_vdw = use_vdw
       save_repel = use_repel
+      save_xrepel = use_xrepel
       save_disp = use_disp
       save_charge = use_charge
       save_chgdpl = use_chgdpl
@@ -265,6 +267,7 @@ c     turn off slow-evolving nonbonded potential energy terms
 c
       use_vdw = .false.
       use_repel = .false.
+      use_xrepel = .true.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
@@ -284,6 +287,7 @@ c     restore the original state of slow-evolving potentials
 c
       use_vdw = save_vdw
       use_repel = save_repel
+      use_xrepel = save_xrepel
       use_disp = save_disp
       use_charge = save_charge
       use_chgdpl = save_chgdpl

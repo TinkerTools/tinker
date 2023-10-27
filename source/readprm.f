@@ -50,6 +50,7 @@ c
       use kurybr
       use kvdws
       use kvdwpr
+      use kxrepl
       use merck
       use params
       implicit none
@@ -76,7 +77,7 @@ c
       integer ft(6),pg(maxval)
       real*8 wght,rd
       real*8 ep,rdn
-      real*8 spr,apr,epr
+      real*8 spr,apr,epr,cpr
       real*8 cdp,adp
       real*8 an1,an2,an3
       real*8 ba1,ba2
@@ -2005,6 +2006,22 @@ c
                mmffaromc(ia,if) = ic
             else if (ie .eq. 1) then
                mmffaroma(ia,if) = ic
+            end if
+c
+c     exchange repulsion parameters
+c
+         else if (keyword(1:11) .eq. 'XREPULSION ') then
+            ia = 0
+            spr = 0.0d0
+            apr = 0.0d0
+            cpr = 1.0d0
+            string = record(next:240)
+            read (string,*,err=770,end=770)  ia,spr,apr,cpr
+  770       continue
+            if (ia .ne. 0) then
+               pxrz(ia) = spr
+               pxrdmp(ia) = apr
+               pxrcr(ia) = cpr
             end if
          end if
       end do
