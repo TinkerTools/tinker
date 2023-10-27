@@ -101,7 +101,7 @@ c
       allocate (crpxr(n))
       allocate (cpxr(4,n))
       allocate (rcpxr(4,n))
-      allocate (xrepole(4,n))
+      allocate (xrepole(maxpole,n))
 c
 c     assign the core, alpha, and coefficient ratio parameters 
 c
@@ -165,7 +165,7 @@ c
                nxrep = nxrep + 1
                ixrep(nxrep) = i
                xreplist(i) = nxrep
-               do j = 1, 4
+               do j = 1, maxpole
                   xrepole(j,i) = pole(j,i)
                end do
             end if
