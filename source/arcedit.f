@@ -33,7 +33,7 @@ c
       integer nmode,mode
       integer leng1,leng2
       integer lext,now
-      integer freeunit
+      integer freeunit,trimtext
       integer, allocatable :: list(:)
       real*8 xr,yr,zr
       real*8, allocatable :: xold(:)
@@ -79,7 +79,7 @@ c
       end do
       if (.not. exist)  call fatal
 c
-c     get file format type by inspection of first character
+c     open the file and get format by inspecting first character
 c
       coordtype = 'CARTESIAN'
       iarc = freeunit ()

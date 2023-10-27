@@ -864,7 +864,7 @@ c
       use pme
       implicit none
       integer i,ii
-      real*8 term
+      real*8 e
 c
 c
 c     zero out the dispersion energy and derivatives
@@ -897,8 +897,8 @@ c     compute the self-energy portion of the Ewald summation
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         term = aewald**6 / 12.0d0
-         edsp = edsp + term*csix(i)*csix(i)
+         e = csix(i)**2 * aewald**6 / 12.0d0
+         edsp = edsp + e
       end do
       return
       end
@@ -1373,7 +1373,7 @@ c
       use pme
       implicit none
       integer i,ii
-      real*8 term
+      real*8 e
 c
 c
 c     zero out the dispersion energy and derivatives
@@ -1406,8 +1406,8 @@ c     compute the self-energy portion of the Ewald summation
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         term = aewald**6 / 12.0d0
-         edsp = edsp + term*csix(i)*csix(i)
+         e = csix(i)**2 * aewald**6 / 12.0d0
+         edsp = edsp + e
       end do
       return
       end
@@ -1534,7 +1534,6 @@ c     decide whether to compute the current interaction
 c
          do kk = 1, nvlst(i)
             k = vlst(kk,i)
-            k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
             mutk = mut(k)

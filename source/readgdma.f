@@ -257,7 +257,7 @@ c
   140 format (/,' Global Frame Cartesian Multipole Moments :')
       do i = 1, n
          write (iout,150)  i,name(i),atomic(i)
-  150    format (/,' Site:',i8,9x,'Name:',3x,a3,7x,'Atomic Number:',i8)
+  150    format (/,' Atom:',i8,9x,'Name:',3x,a3,7x,'Atomic Number:',i8)
          write (iout,160)  x(i),y(i),z(i)
   160    format (/,' Coordinates:',5x,3f15.6)
          write (iout,170)  rpole(1,i)

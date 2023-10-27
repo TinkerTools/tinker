@@ -677,7 +677,7 @@ c
       use pme
       implicit none
       integer i,ii
-      real*8 term
+      real*8 e
 c
 c
 c     zero out the total damped dispersion energy
@@ -705,8 +705,8 @@ c     compute the self-energy portion of the Ewald summation
 c
       do ii = 1, ndisp
          i = idisp(i)
-         term = aewald**6 / 12.0d0
-         edsp = edsp + term*csix(i)*csix(i)
+         e = csix(i)**2 * aewald**6 / 12.0d0
+         edsp = edsp + e
       end do
       return
       end
@@ -1086,7 +1086,7 @@ c
       use pme
       implicit none
       integer i,ii
-      real*8 term
+      real*8 e
 c
 c
 c     zero out the total damped dispersion energy
@@ -1114,8 +1114,8 @@ c     compute the self-energy portion of the Ewald summation
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         term = aewald**6 / 12.0d0
-         edsp = edsp + term*csix(i)*csix(i)
+         e = csix(i)**2 * aewald**6 / 12.0d0
+         edsp = edsp + e
       end do
       return
       end

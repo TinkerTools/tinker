@@ -20,7 +20,7 @@
           the files "export", "parse.py" and "version.txt", as well as
           an /include subdirectory.
 
-      (3) Run the command "bash export c cpp". Once this it finishes,
+      (3) Run the command "bash export c cpp". Once this finishes,
           it creates "CMakeLists.txt" and /c and /cpp subdirectories
           containing header files for the Tinker routines.
 

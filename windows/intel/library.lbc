@@ -200,7 +200,9 @@ eurey2.obj
 eurey3.obj
 evcorr.obj
 ewald.obj
+exfield.obj
 expol.obj
+extfld.obj
 extra.obj
 extra1.obj
 extra2.obj
@@ -259,6 +261,7 @@ inertia.obj
 inform.obj
 initatom.obj
 initial.obj
+initneck.obj
 initprm.obj
 initres.obj
 initrot.obj
@@ -364,6 +367,7 @@ mrecip.obj
 mutant.obj
 mutate.obj
 nblist.obj
+neck.obj
 neigh.obj
 nextarg.obj
 nexttext.obj
@@ -414,14 +418,16 @@ pressure.obj
 prmkey.obj
 promo.obj
 prtarc.obj
-prtdcd.obj
 prtdyn.obj
 prterr.obj
+prtfrc.obj
 prtint.obj
 prtmol2.obj
 prtpdb.obj
 prtprm.obj
 prtseq.obj
+prtuind.obj
+prtvel.obj
 prtxyz.obj
 ptable.obj
 qmstuf.obj

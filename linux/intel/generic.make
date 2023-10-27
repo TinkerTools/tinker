@@ -51,6 +51,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp dsppot.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp energi.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp ewald.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp expol.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp extfld.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp faces.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp fft.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp fields.f
@@ -363,6 +364,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp eurey1.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp eurey2.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp eurey3.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp evcorr.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp exfield.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp extra.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp extra1.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp extra2.f
@@ -408,6 +410,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp induce.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp inertia.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initatom.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initial.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initneck.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initprm.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initres.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp initrot.f
@@ -473,6 +476,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp moments.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp monte.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp mutate.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp nblist.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp neck.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp newton.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp newtrot.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp nextarg.f
@@ -510,14 +514,16 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prmkey.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp promo.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp protein.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtarc.f
-ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtdcd.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtdyn.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prterr.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtfrc.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtint.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtmol2.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtpdb.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtprm.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtseq.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtuind.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtvel.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp prtxyz.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pss.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -openmp pssrigid.f

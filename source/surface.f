@@ -123,33 +123,33 @@ c     set pi multiples, overlap criterion and tolerances
 c
       pix2 = 2.0d0 * pi
       pix4 = 4.0d0 * pi
-      pid2 = pi / 2.0d0
+      pid2 = 0.5d0 * pi
       delta = 1.0d-8
-      delta2 = delta**2
+      delta2 = delta * delta
       eps = 1.0d-8
       rmove = 1.0d-8
 c
-c     set the "skip" array to exclude all inactive atoms
-c     that do not overlap any of the current active atoms
+c     exclude atoms that do not overlap any active atom
 c
       do i = 1, n
-         skip(i) = .true.
+c        skip(i) = .true.
+         skip(i) = .false.
       end do
-      do i = 1, n
-         if (use(i)) then
-            xr = x(i)
-            yr = y(i)
-            zr = z(i)
-            rr = r(i)
-            do k = 1, n
-               rplus = (rr + r(k))**2
-               ccsq = (x(k)-xr)**2 + (y(k)-yr)**2 + (z(k)-zr)**2
-               if (ccsq .le. rplus)  skip(k) = .false.
-            end do
-         end if
-      end do
+c     do i = 1, n
+c        if (use(i)) then
+c           xr = x(i)
+c           yr = y(i)
+c           zr = z(i)
+c           rr = r(i)
+c           do k = 1, n
+c              rplus = (rr + r(k))**2
+c              ccsq = (x(k)-xr)**2 + (y(k)-yr)**2 + (z(k)-zr)**2
+c              if (ccsq .le. rplus)  skip(k) = .false.
+c           end do
+c        end if
+c     end do
 c
-c     compute the area and derivatives of current "ir" sphere
+c     compute the accessible surface area of current "ir" sphere
 c
       do ir = 1, n
          if (skip(ir))  goto 180
@@ -158,7 +158,7 @@ c
          zr = z(ir)
          rr = r(ir)
          rrx2 = 2.0d0 * rr
-         rrsq = rr**2
+         rrsq = rr * rr
          wght = weight(ir)
          moved = .false.
 c
@@ -183,8 +183,8 @@ c
             tz = z(i) - zr
             if (abs(tz) .ge. rplus)  goto 30
 c
-c     check for overlap of spheres by testing center to
-c     center distance against sum and difference of radii
+c     check for sphere overlap by testing interatomic
+c     distance against sum and difference of radii
 c
             xysq = tx**2 + ty**2
             if (xysq .lt. delta2) then
@@ -714,9 +714,9 @@ c     set pi multiples, overlap criterion and tolerances
 c
       pix2 = 2.0d0 * pi
       pix4 = 4.0d0 * pi
-      pid2 = pi / 2.0d0
+      pid2 = 0.5d0 * pi
       delta = 1.0d-8
-      delta2 = delta**2
+      delta2 = delta * delta
       eps = 1.0d-8
       rmove = 1.0d-8
       do i = 1, maxarc
@@ -724,25 +724,25 @@ c
          sign_yder(i) = 0
       end do
 c
-c     set the "skip" array to exclude all inactive atoms
-c     that do not overlap any of the current active atoms
+c     exclude atoms that do not overlap any active atom
 c
       do i = 1, n
-         skip(i) = .true.
+c        skip(i) = .true.
+         skip(i) = .false.
       end do
-      do i = 1, n
-         if (use(i)) then
-            xr = x(i)
-            yr = y(i)
-            zr = z(i)
-            rr = r(i)
-            do k = 1, n
-               rplus = (rr + r(k))**2
-               ccsq = (x(k)-xr)**2 + (y(k)-yr)**2 + (z(k)-zr)**2
-               if (ccsq .le. rplus)  skip(k) = .false.
-            end do
-         end if
-      end do
+c     do i = 1, n
+c        if (use(i)) then
+c           xr = x(i)
+c           yr = y(i)
+c           zr = z(i)
+c           rr = r(i)
+c           do k = 1, n
+c              rplus = (rr + r(k))**2
+c              ccsq = (x(k)-xr)**2 + (y(k)-yr)**2 + (z(k)-zr)**2
+c              if (ccsq .le. rplus)  skip(k) = .false.
+c           end do
+c        end if
+c     end do
 c
 c     compute the area and derivatives of current "ir" sphere
 c
@@ -753,7 +753,7 @@ c
          zr = z(ir)
          rr = r(ir)
          rrx2 = 2.0d0 * rr
-         rrsq = rr**2
+         rrsq = rr * rr
          wght = weight(ir)
          moved = .false.
 c
@@ -778,8 +778,8 @@ c
             tz = z(i) - zr
             if (abs(tz) .ge. rplus)  goto 30
 c
-c     check for overlap of spheres by testing center to
-c     center distance against sum and difference of radii
+c     check for sphere overlap by testing interatomic
+c     distance against sum and difference of radii
 c
             xysq = tx**2 + ty**2
             if (xysq .lt. delta2) then

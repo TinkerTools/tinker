@@ -311,6 +311,23 @@ c
             resname = amino(seqtyp(m))
             if (resname .eq. 'H2N') then
                m = m + 1
+               resname = amino(seqtyp(m))
+               if (atomic(i) .eq. 7) then
+                  obone = .false.
+                  do j = 1, n14(i)
+                     k = i14(j,i)
+                     if (atomic(k) .eq. 8) then
+                        obone = .true.
+                     end if
+                  end do
+                  if (obone) then
+                     ni(m) = i
+                     cai(m) = i + 1
+                     ci(m) = i + 2
+                     oi(m) = i + 3
+                     m = m + 1
+                  end if
+               end if
             else if (resname .eq. 'FOR') then
                if (atomic(i) .eq. 6) then
                   nbone = .false.

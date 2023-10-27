@@ -25,7 +25,7 @@ c
       use inform
       use inter
       use iounit
-      use solute
+      use solpot
       use usage
       implicit none
       integer i,j,ixyz
@@ -121,6 +121,7 @@ c
       if (donumer) then
          eps = -1.0d0
          eps0 = 0.00001d0
+         if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  eps0 = 0.001d0
          query = .true.
          call nextarg (string,exist)
          if (exist) then

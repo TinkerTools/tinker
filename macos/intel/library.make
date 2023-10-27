@@ -211,7 +211,9 @@ eurey2.o \
 eurey3.o \
 evcorr.o \
 ewald.o \
+exfield.o \
 expol.o \
+extfld.o \
 extra.o \
 extra1.o \
 extra2.o \
@@ -270,6 +272,7 @@ inertia.o \
 inform.o \
 initatom.o \
 initial.o \
+initneck.o \
 initprm.o \
 initres.o \
 initrot.o \
@@ -375,6 +378,7 @@ mrecip.o \
 mutant.o \
 mutate.o \
 nblist.o \
+neck.o \
 neigh.o \
 nextarg.o \
 nexttext.o \
@@ -425,14 +429,16 @@ pressure.o \
 prmkey.o \
 promo.o \
 prtarc.o \
-prtdcd.o \
 prtdyn.o \
 prterr.o \
+prtfrc.o \
 prtint.o \
 prtmol2.o \
 prtpdb.o \
 prtprm.o \
 prtseq.o \
+prtuind.o \
+prtvel.o \
 prtxyz.o \
 ptable.o \
 qmstuf.o \

@@ -31,8 +31,8 @@ c
       allocate (qgrid(2,nfft1,nfft2,nfft3))
 c
 c     initialization of Fast Fourier transform using FFTW;
-c     comment "dfftw_init_threads" and "dfftw_plan_with_threads"
-c     calls if serial FFTW is used in place of OpenMP FFTW
+c     comment "dfftw_init_threads" and "dfftw_plan_with_nthreads"
+c     calls if serial FFTW is being used in place of OpenMP FFTW
 c
 !$    if (ffttyp .eq. 'FFTW') then
 !$       ifront = -1

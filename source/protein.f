@@ -613,10 +613,15 @@ c
      &                     ci(i),cai(i),ni(i),0)
             end if
             k = seqtyp(i-1)
-            call zatom (hnntyp(k),1.02d0,109.5d0,phi(i),
-     &                  ni(i),cai(i),ci(i),0)
-            call zatom (hnntyp(k),1.02d0,109.5d0,108.0d0,
-     &                  ni(i),cai(i),n-1,1)
+            if (resname .eq. 'PRO') then
+               call zatom (hnntyp(k),1.02d0,124.5d0,phi(i),
+     &                     ni(i),cai(i),ci(i),0)
+            else
+               call zatom (hnntyp(k),1.02d0,109.5d0,phi(i),
+     &                     ni(i),cai(i),ci(i),0)
+               call zatom (hnntyp(k),1.02d0,109.5d0,108.0d0,
+     &                     ni(i),cai(i),n-1,1)
+            end if
             k = seqtyp(i)
             call zatom (hantyp(k),1.11d0,109.5d0,107.9d0,
      &                  cai(i),ni(i),ci(i),-chiral(i))

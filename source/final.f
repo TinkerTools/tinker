@@ -659,6 +659,7 @@ c
       if (allocated(pbr))  deallocate (pbr)
       if (allocated(csr))  deallocate (csr)
       if (allocated(gkr))  deallocate (gkr)
+      if (allocated(snk))  deallocate (snk)
 c
 c     deallocation of global arrays from module kstbnd
 c
@@ -854,9 +855,10 @@ c
 c
 c     deallocation of global arrays from module nonpol
 c
-      if (allocated(rcav))  deallocate (rcav)
-      if (allocated(rdisp))  deallocate (rdisp)
-      if (allocated(cdisp))  deallocate (cdisp)
+      if (allocated(radcav))  deallocate (radcav)
+      if (allocated(raddsp))  deallocate (raddsp)
+      if (allocated(epsdsp))  deallocate (epsdsp)
+      if (allocated(cdsp))  deallocate (cdsp)
 c
 c     deallocation of global arrays from module omega
 c
@@ -1008,6 +1010,12 @@ c
       if (allocated(fitpol))  deallocate (fitcpen)
       if (allocated(gatm))  deallocate (gatm)
       if (allocated(fatm))  deallocate (fatm)
+      if (allocated(fxdpl))  deallocate (fxdpl)
+      if (allocated(fydpl))  deallocate (fydpl)
+      if (allocated(fzdpl))  deallocate (fzdpl)
+      if (allocated(vchg))  deallocate (vchg)
+      if (allocated(vpol))  deallocate (vpol)
+      if (allocated(vcpen))  deallocate (vcpen)
       if (allocated(varpot))  deallocate (varpot)
 c
 c     deallocation of global arrays from module qmstuf
@@ -1117,6 +1125,8 @@ c
       if (allocated(wace))  deallocate (wace)
       if (allocated(s2ace))  deallocate (s2ace)
       if (allocated(uace))  deallocate (uace)
+      if (allocated(sneck))  deallocate (sneck)
+      if (allocated(bornint))  deallocate (bornint)
 c
 c     deallocation of global arrays from module stodyn
 c

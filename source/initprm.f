@@ -243,6 +243,7 @@ c
       if (.not. allocated(pbr))  allocate (pbr(maxtyp))
       if (.not. allocated(csr))  allocate (csr(maxtyp))
       if (.not. allocated(gkr))  allocate (gkr(maxtyp))
+      if (.not. allocated(snk))  allocate (snk(maxtyp))
       if (.not. allocated(electron))  allocate (electron(maxclass))
       if (.not. allocated(ionize))  allocate (ionize(maxclass))
       if (.not. allocated(repulse))  allocate (repulse(maxclass))
@@ -273,6 +274,7 @@ c
          pbr(i) = 0.0d0
          csr(i) = 0.0d0
          gkr(i) = 0.0d0
+         snk(i) = 0.0d0
       end do
       do i = 1, maxclass
          do j = 1, 3

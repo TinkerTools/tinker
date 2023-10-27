@@ -56,6 +56,8 @@ c
 c
 c     process keywords containing van der Waals parameters
 c
+      maxdim = maxclass
+      if (vdwindex .eq. 'TYPE')  maxdim = maxtyp
       header = .true.
       do i = 1, nkey
          next = 1
@@ -64,7 +66,7 @@ c
          call upcase (keyword)
          if (keyword(1:4) .eq. 'VDW ') then
             call getnumb (record,k,next)
-            if (k.gt.0 .and. k.le.maxclass) then
+            if (k.gt.0 .and. k.le.maxdim) then
                rd = 0.0d0
                ep = 0.0d0
                rdn = 0.0d0
@@ -103,6 +105,8 @@ c
 c
 c     process keywords containing 1-4 van der Waals parameters
 c
+      maxdim = maxclass
+      if (vdwindex .eq. 'TYPE')  maxdim = maxtyp
       header = .true.
       do i = 1, nkey
          next = 1
@@ -111,7 +115,7 @@ c
          call upcase (keyword)
          if (keyword(1:6) .eq. 'VDW14 ') then
             call getnumb (record,k,next)
-            if (k.gt.0 .and. k.le.maxclass) then
+            if (k.gt.0 .and. k.le.maxdim) then
                rd = 0.0d0
                ep = 0.0d0
                string = record(next:240)

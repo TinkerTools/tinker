@@ -39,6 +39,12 @@ extern int*& fitpol;
 extern int*& fitcpen;
 extern int*& gatm;
 extern int*& fatm;
+extern int*& fxdpl;
+extern int*& fydpl;
+extern int*& fzdpl;
+extern int*& vchg;
+extern int*& vpol;
+extern int*& vcpen;
 extern char (&resptyp)[4];
 extern char (*&varpot)[6];
 
@@ -76,6 +82,12 @@ extern "C" int* TINKER_MOD(potfit, fitpol);
 extern "C" int* TINKER_MOD(potfit, fitcpen);
 extern "C" int* TINKER_MOD(potfit, gatm);
 extern "C" int* TINKER_MOD(potfit, fatm);
+extern "C" int* TINKER_MOD(potfit, fxdpl);
+extern "C" int* TINKER_MOD(potfit, fydpl);
+extern "C" int* TINKER_MOD(potfit, fzdpl);
+extern "C" int* TINKER_MOD(potfit, vchg);
+extern "C" int* TINKER_MOD(potfit, vpol);
+extern "C" int* TINKER_MOD(potfit, vcpen);
 extern "C" char TINKER_MOD(potfit, resptyp)[4];
 extern "C" char (*TINKER_MOD(potfit, varpot))[6];
 
@@ -112,6 +124,12 @@ int*& fitpol = TINKER_MOD(potfit, fitpol);
 int*& fitcpen = TINKER_MOD(potfit, fitcpen);
 int*& gatm = TINKER_MOD(potfit, gatm);
 int*& fatm = TINKER_MOD(potfit, fatm);
+int*& fxdpl = TINKER_MOD(potfit, fxdpl);
+int*& fydpl = TINKER_MOD(potfit, fydpl);
+int*& fzdpl = TINKER_MOD(potfit, fzdpl);
+int*& vchg = TINKER_MOD(potfit, vchg);
+int*& vpol = TINKER_MOD(potfit, vpol);
+int*& vcpen = TINKER_MOD(potfit, vcpen);
 char (&resptyp)[4] = TINKER_MOD(potfit, resptyp);
 char (*&varpot)[6] = TINKER_MOD(potfit, varpot);
 #endif

@@ -20,7 +20,7 @@ c     awater    water number density at standard temp & pressure
 c     slevy     enthalpy-to-free energy scale factor for dispersion
 c     shctd     HCT overlap scale factor for the dispersion integral
 c     cavoff    radius offset for use in computing cavitation energy
-c     dispoff   radius offset for the start of dispersion integral
+c     dspoff    radius offset for the start of dispersion integral
 c
 c     solvprs   limiting microscopic solvent pressure value
 c     surften   limiting macroscopic surface tension value
@@ -28,9 +28,10 @@ c     spcut     starting radius for solvent pressure tapering
 c     spoff     cutoff radius for solvent pressure tapering
 c     stcut     starting radius for surface tension tapering
 c     stoff     cutoff radius for surface tension tapering
-c     rcav      atomic radius of each atom for cavitation energy
-c     rdisp     atomic radius of each atom for dispersion energy
-c     cdisp     maximum dispersion energy for each atom
+c     radcav    atomic radius of each atom for cavitation energy
+c     raddsp    atomic radius of each atom for dispersion energy
+c     epsdsp    vdw well depth of each atom for dispersion energy
+c     cdsp      maximum dispersion energy for each atom
 c
 c
       module nonpol
@@ -39,7 +40,7 @@ c
       real*8 rmino,rminh
       real*8 awater,slevy
       real*8 shctd,cavoff
-      real*8 dispoff
+      real*8 dspoff
       parameter (epso=0.1100d0)
       parameter (epsh=0.0135d0)
       parameter (rmino=1.7025d0)
@@ -48,12 +49,13 @@ c
       parameter (slevy=1.0d0)
       parameter (shctd=0.75d0)
       parameter (cavoff=0.0d0)
-      parameter (dispoff=1.056d0)
+      parameter (dspoff=1.056d0)
       real*8 solvprs,surften
       real*8 spcut,spoff
       real*8 stcut,stoff
-      real*8, allocatable :: rcav(:)
-      real*8, allocatable :: rdisp(:)
-      real*8, allocatable :: cdisp(:)
+      real*8, allocatable :: radcav(:)
+      real*8, allocatable :: raddsp(:)
+      real*8, allocatable :: epsdsp(:)
+      real*8, allocatable :: cdsp(:)
       save
       end
