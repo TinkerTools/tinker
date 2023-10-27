@@ -1254,90 +1254,72 @@ c
 c
 c     compute the torque components for this interaction
 c
-                  ncix = 0.0d0
                   nciy = -ciz
                   nciz = ciy
-                  nrcix = bi(1)*ncix + bi(2)*nciy + bi(3)*nciz
-                  nrciy = bj(1)*ncix + bj(2)*nciy + bj(3)*nciz
-                  nrciz = bk(1)*ncix + bk(2)*nciy + bk(3)*nciz
-                  cscs = 0.0d0 * cks
+                  nrcix = bi(2)*nciy + bi(3)*nciz
+                  nrciy = bj(2)*nciy + bj(3)*nciz
+                  nrciz = bk(2)*nciy + bk(3)*nciz
                   cxcx = nrcix * rckx
                   cycy = nrciy * rcky
                   czcz = nrciz * rckz
-                  cscz = 0.0d0 * rckz
                   czcs = nrciz * cks
-                  tixintS = cscs * SS + cxcx * PxPx + cycy * PyPy
-     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
+                  tixintS = cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + czcs * PzS
                   ncix = ciz
-                  nciy = 0.0d0
                   nciz = -cix
-                  nrcix = bi(1)*ncix + bi(2)*nciy + bi(3)*nciz
-                  nrciy = bj(1)*ncix + bj(2)*nciy + bj(3)*nciz
-                  nrciz = bk(1)*ncix + bk(2)*nciy + bk(3)*nciz
-                  cscs = 0.0d0 * cks
+                  nrcix = bi(1)*ncix + bi(3)*nciz
+                  nrciy = bj(1)*ncix + bj(3)*nciz
+                  nrciz = bk(1)*ncix + bk(3)*nciz
                   cxcx = nrcix * rckx
                   cycy = nrciy * rcky
                   czcz = nrciz * rckz
-                  cscz = 0.0d0 * rckz
                   czcs = nrciz * cks
-                  tiyintS = cscs * SS + cxcx * PxPx + cycy * PyPy
-     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
+                  tiyintS = cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + czcs * PzS
                   ncix = -ciy
                   nciy = cix
-                  nciz = 0.0d0
-                  nrcix = bi(1)*ncix + bi(2)*nciy + bi(3)*nciz
-                  nrciy = bj(1)*ncix + bj(2)*nciy + bj(3)*nciz
-                  nrciz = bk(1)*ncix + bk(2)*nciy + bk(3)*nciz
-                  cscs = 0.0d0 * cks
+                  nrcix = bi(1)*ncix + bi(2)*nciy
+                  nrciy = bj(1)*ncix + bj(2)*nciy
+                  nrciz = bk(1)*ncix + bk(2)*nciy
                   cxcx = nrcix * rckx
                   cycy = nrciy * rcky
                   czcz = nrciz * rckz
-                  cscz = 0.0d0 * rckz
                   czcs = nrciz * cks
-                  tizintS = cscs * SS + cxcx * PxPx + cycy * PyPy
-     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
-                  nckx = 0.0d0
+                  tizintS = cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + czcs * PzS
                   ncky = -ckz
                   nckz = cky
-                  nrckx = bi(1)*nckx + bi(2)*ncky + bi(3)*nckz
-                  nrcky = bj(1)*nckx + bj(2)*ncky + bj(3)*nckz
-                  nrckz = bk(1)*nckx + bk(2)*ncky + bk(3)*nckz
-                  cscs = cis * 0.0d0
+                  nrckx = bi(2)*ncky + bi(3)*nckz
+                  nrcky = bj(2)*ncky + bj(3)*nckz
+                  nrckz = bk(2)*ncky + bk(3)*nckz
                   cxcx = rcix * nrckx
                   cycy = rciy * nrcky
                   czcz = rciz * nrckz
                   cscz = cis * nrckz
-                  czcs = rciz * 0.0d0
-                  tkxintS = cscs * SS + cxcx * PxPx + cycy * PyPy
-     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
+                  tkxintS = cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + cscz * SPz
                   nckx = ckz
-                  ncky = 0.0d0
                   nckz = -ckx
-                  nrckx = bi(1)*nckx + bi(2)*ncky + bi(3)*nckz
-                  nrcky = bj(1)*nckx + bj(2)*ncky + bj(3)*nckz
-                  nrckz = bk(1)*nckx + bk(2)*ncky + bk(3)*nckz
-                  cscs = cis * 0.0d0
+                  nrckx = bi(1)*nckx + bi(3)*nckz
+                  nrcky = bj(1)*nckx + bj(3)*nckz
+                  nrckz = bk(1)*nckx + bk(3)*nckz
                   cxcx = rcix * nrckx
                   cycy = rciy * nrcky
                   czcz = rciz * nrckz
                   cscz = cis * nrckz
-                  czcs = rciz * 0.0d0
-                  tkyintS = cscs * SS + cxcx * PxPx + cycy * PyPy
-     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
+                  tkyintS = cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + cscz * SPz
                   nckx = -cky
                   ncky = ckx
-                  nckz = 0.0d0
-                  nrckx = bi(1)*nckx + bi(2)*ncky + bi(3)*nckz
-                  nrcky = bj(1)*nckx + bj(2)*ncky + bj(3)*nckz
-                  nrckz = bk(1)*nckx + bk(2)*ncky + bk(3)*nckz
-                  cscs = cis * 0.0d0
+                  nrckx = bi(1)*nckx + bi(2)*ncky
+                  nrcky = bj(1)*nckx + bj(2)*ncky
+                  nrckz = bk(1)*nckx + bk(2)*ncky
                   cxcx = rcix * nrckx
                   cycy = rciy * nrcky
                   czcz = rciz * nrckz
                   cscz = cis * nrckz
-                  czcs = rciz * 0.0d0
-                  tkzintS = cscs * SS + cxcx * PxPx + cycy * PyPy
-     &                           + czcz * PzPz + cscz * SPz + czcs * PzS
+                  tkzintS = cxcx * PxPx + cycy * PyPy
+     &                           + czcz * PzPz + cscz * SPz
                   preintSR = -pre * intSR
                   ttri(1) = preintSR * tixintS
                   ttri(2) = preintSR * tiyintS

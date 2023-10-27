@@ -964,13 +964,16 @@ c
       real*8 diff,eps,zr,r
       real*8 rho,rho2,rho3,rho4
       real*8 exp1
-      real*8 alpha,tau,rhoA,rhoB
+      real*8 alpha,tau,tau2
+      real*8 rhoA,rhoB
       real*8 a2,b2,kappa
-      real*8 pre,term1,term2
+      real*8 pre,pre1,pre2,pre3
+      real*8 term1,term2
       real*8 rhoA2,rhoA3,rhoA4,rhoA5
       real*8 rhoB2,rhoB3,rhoB4,rhoB5
       real*8 kappam,kappam2
       real*8 kappap,kappap2
+      real*8 taurho,taurho2,taurho3
       real*8 expA,expB
       logical grad
 c
@@ -995,14 +998,14 @@ c
          dSS = -1.0d0/3.0d0 * a * rho * (1.0d0 + rho) * exp1
          dSPz = -0.5d0 * a * (1.0d0 + rho - rho3 / 3.0d0) * exp1
          dPzS = -dSPz
-         dPxPx = -0.2d0 * a * rho * (1.0d0 + rho + rho2 / 3.0d0)
-     &                                                            * exp1
+         dPxPx = -0.2d0 * a * rho * (1.0d0 + rho + rho2 / 3.0d0) * exp1
          dPzPz = -0.6d0 * a * rho * (1.0d0 + rho + 2.0d0/9.0d0 * rho2
      &                                            - rho3 / 9.0d0) * exp1
          end if
       else
          alpha = 1.0d0 / 2.0d0 * (a + b)
          tau = (a - b) / (a + b)
+         tau2 = tau * tau
          rho = alpha * r
          rhoA = a * r
          rhoB = b * r
@@ -1021,25 +1024,31 @@ c
          kappap = 1.0d0 + kappa
          kappam2 = kappam**2
          kappap2 = kappap**2
+         taurho = tau * rho
+         taurho2 = taurho * rho
+         taurho3 = taurho2 * rho
          expA = exp(-rhoA)
          expB = exp(-rhoB)
-         pre = sqrt(1.0d0 - tau**2) / (tau * rho)
+         pre1 = sqrt(1.0d0 - tau2)
+         pre2 = sqrt((1.0d0 + tau) / (1.0d0 - tau))
+         pre3 = sqrt((1.0d0 - tau) / (1.0d0 + tau))
+         pre = pre1 / taurho
          term1 =-kappam * (2.0d0 * kappap + rhoA) * expA
          term2 = kappap * (2.0d0 * kappam + rhoB) * expB
          SS = pre * (term1 + term2)
-         pre = sqrt((1.0d0 + tau) / (1.0d0 - tau)) / (tau * rho2)
+         pre = pre2 / taurho2
          term1 =-kappam2 * (6.0d0 * kappap * (1.0d0 + rhoA)
      &      + 2.0d0 * rhoA2) * expA
          term2 = kappap * (6.0d0 * kappam2 * (1.0d0 + rhoB)
      &      + 4.0d0 * kappam * rhoB2 + rhoB3) * expB
          SPz = -pre * (term1 + term2)
-         pre = sqrt((1.0d0 - tau) / (1.0d0 + tau)) / (-tau * rho2)
+         pre = -pre3 / taurho2
          term1 =-kappap2 * (6.0d0 * kappam * (1.0d0 + rhoB)
      &      + 2.0d0 * rhoB2) * expB
          term2 = kappam * (6.0d0 * kappap2 * (1.0d0 + rhoA)
      &      + 4.0d0 * kappap * rhoA2 + rhoA3) * expA
          PzS = pre * (term1 + term2)
-         pre = 1.0d0 / (sqrt(1.0d0 - tau**2) * tau * rho3)
+         pre = 1.0d0 / (pre1 * taurho3)
          term1 =-kappam2 * (24.0d0 * kappap2 * (1.0d0 + rhoA)
      &      + 12.0d0 * kappap * rhoA2 + 2.0d0 * rhoA3) * expA
          term2 = kappap2 * (24.0d0 * kappam2 * (1.0d0 + rhoB)
@@ -1055,27 +1064,27 @@ c
          if (grad) then
             rhoA5 = rhoA4 * rhoA
             rhoB5 = rhoB4 * rhoB
-            pre = sqrt(1.0d0 - tau**2) / (tau * rho)
+            pre = pre1 / taurho
             term1 = kappam * (2.0d0 * kappap * (1.0d0 + rhoA) + rhoA2)
      &                                                            * expA
             term2 =-kappap * (2.0d0 * kappam * (1.0d0 + rhoB) + rhoB2)
      &                                                            * expB
             dSS = pre / r * (term1 + term2)
-            pre = sqrt((1.0d0 + tau) / (1.0d0 - tau)) / (tau * rho2)
+            pre = pre2 / taurho2
             term1 = 2.0d0 * kappam2 * (6.0d0 * kappap * (1.0d0 + rhoA
      &         + 0.5d0 * rhoA2) + rhoA3) * expA
             term2 = kappap * (-12.0d0 * kappam2 * (1.0d0 + rhoB + 0.5d0
      &         * rhoB2) + (1.0d0 - 4.0d0 * kappam) * rhoB3 - rhoB4)
      &         * expB
             dSPz = -pre / r * (term1 + term2)
-            pre = sqrt((1.0d0 - tau) / (1.0d0 + tau)) / (-tau * rho2)
+            pre = -pre3 / taurho2
             term1 = 2.0d0 * kappap2 * (6.0d0 * kappam * (1.0d0 + rhoB
      &         + 0.5d0 * rhoB2) + rhoB3) * expB
             term2 = kappam * (-12.0d0 * kappap2 * (1.0d0 + rhoA + 0.5d0
      &         * rhoA2) + (1.0d0 - 4.0d0 * kappap) * rhoA3 - rhoA4)
      &         * expA
             dPzS = pre / r * (term1 + term2)
-            pre = 1.0d0 / (sqrt(1.0d0 - tau**2) * tau * rho3)
+            pre = 1.0d0 / (pre1 * taurho3)
             term1 = 2.0d0 * kappam2 * (36.0d0 * kappap2 * (1.0d0 + rhoA)
      &         + 6.0d0 * kappap * (1.0d0 + 2.0d0 * kappap) * rhoA2
      &         + 6.0d0 * kappap * rhoA3 + rhoA4) * expA
