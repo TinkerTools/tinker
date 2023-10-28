@@ -995,11 +995,11 @@ c
          PzPz = -(-1.0d0 - rho - rho2 / 5.0d0 + 2.0d0/15.0d0 * rho3
      &                                           + rho4 / 15.0d0) * exp1
          if (grad) then
-         dSS = -1.0d0/3.0d0 * a * rho * (1.0d0 + rho) * exp1
-         dSPz = -0.5d0 * a * (1.0d0 + rho - rho3 / 3.0d0) * exp1
-         dPzS = -dSPz
-         dPxPx = -0.2d0 * a * rho * (1.0d0 + rho + rho2 / 3.0d0) * exp1
-         dPzPz = -0.6d0 * a * rho * (1.0d0 + rho + 2.0d0/9.0d0 * rho2
+            dSS = -1.0d0/3.0d0 * a * rho * (1.0d0 + rho) * exp1
+            dSPz = -0.5d0 * a * (1.0d0 + rho - rho3 / 3.0d0) * exp1
+            dPzS = -dSPz
+            dPxPx = -0.2d0 * a * rho * (1.0d0 + rho + rho2 / 3.0d0)*exp1
+            dPzPz = -0.6d0 * a * rho * (1.0d0 + rho + 2.0d0/9.0d0 * rho2
      &                                            - rho3 / 9.0d0) * exp1
          end if
       else
