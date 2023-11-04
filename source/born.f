@@ -80,8 +80,8 @@ c
       real*8 uik,uik2
       real*8 tsum,tchain
       real*8 sum,sum2,sum3
-      real*8 soluteinti
-      real*8 soluteintk
+      real*8 rborni
+      real*8 rbornk
       real*8 alpha,beta,gamma
       real*8 xr,yr,zr,rvdw
       real*8 r,r2,r3,r4
@@ -102,7 +102,6 @@ c
       real*8, allocatable :: pbpole(:,:)
       real*8, allocatable :: pbself(:)
       real*8, allocatable :: pbpair(:)
-      real*8, allocatable :: soluteint(:)
       logical done
       character*6 mode
 c
@@ -125,9 +124,6 @@ c
          allocate (pbpole(13,n))
          allocate (pbself(n))
          allocate (pbpair(n))
-      end if
-      if (borntyp .eq. 'GRYCUK') then
-         allocate (soluteint(n))
       end if
 c
 c     perform dynamic allocation of some global arrays
@@ -345,14 +341,13 @@ c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
 c
-c     zero out rborn and soluteint
+c     zero out rborn
 c
          do i = 1, n
             rborn(i) = 0.0d0
-            soluteint(i) = 0.0d0
          end do
 c
-c     pairwise loop to compute soluteint
+c     pairwise loop for GRYCUK
 c
          do i = 1, n-1
             xi = x(i)
@@ -375,11 +370,11 @@ c
                   rk = max(rsk,rdk) + descoff
                   sk = rdk * shct(k)
                   call pairborn (r,r2,ri,rsi,sk,rdk,pi43,mixsn,useneck,
-     &                                                    soluteinti)
+     &                                                    rborni)
                   call pairborn (r,r2,rk,rsk,si,rdi,pi43,mixsn,useneck,
-     &                                                    soluteintk)
-                  soluteint(i) = soluteint(i) + soluteinti
-                  soluteint(k) = soluteint(k) + soluteintk
+     &                                                    rbornk)
+                  rborn(i) = rborn(i) + rborni
+                  rborn(k) = rborn(k) + rbornk
                end if
             end do
          end do
@@ -390,13 +385,13 @@ c
             ri = rsolv(i)
             if (ri .gt. 0.0d0) then
                if (usetanh) then
-                  soluteinti = soluteint(i)
-                  bornint(i) = soluteinti
-                  call tanhrsc (soluteinti,rsolv(i))
-                  soluteint(i) = soluteinti
+                  rborni = rborn(i)
+                  bornint(i) = rborni
+                  call tanhrsc (rborni,rsolv(i))
+                  rborn(i) = rborni
                end if
-               soluteinti = pi43 / ri**3 + soluteint(i)
-               rborn(i) = (soluteinti/pi43)**third
+               rborni = pi43 / ri**3 + rborn(i)
+               rborn(i) = (rborni/pi43)**third
                if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
                rborn(i) = 1.0d0 / rborn(i)
             end if
@@ -567,9 +562,6 @@ c
          deallocate (pbself)
          deallocate (pbpair)
       end if
-      if (borntyp .eq. 'GRYCUK') then
-         deallocate (soluteint)
-      end if
 c
 c     make sure the final values are in a reasonable range
 c
@@ -606,14 +598,14 @@ c     "pairborn" computes the pairwise born radii values
 c
 c
       subroutine pairborn (r,r2,ri,rsi,sk,rdk,pi43,mixsn,useneck,
-     &                                                  soluteinti)
+     &                                                  rborni)
       use math
       implicit none
       real*8 r,r2
       real*8 ri,rdk,rsi
       real*8 sk,sk2
       real*8 pi43
-      real*8 soluteinti
+      real*8 rborni
       real*8 lik
       real*8 l2,l4
       real*8 lr,l4r
@@ -626,16 +618,16 @@ c
       logical useneck
 c
 c
-c     zero out soluteinti
+c     zero out rborni
 c
-      soluteinti = 0.0d0
+      rborni = 0.0d0
       if (rsi.gt.0.0d0 .and. rdk.gt.0.0d0 .and. sk.gt.0.0d0) then
          if (ri .lt. r+sk) then
             sk2 = sk * sk
             if (ri+r .lt. sk) then
                lik = ri
                uik = sk - r
-               soluteinti = pi43*(1.0d0/uik**3-1.0d0/lik**3)
+               rborni = pi43*(1.0d0/uik**3-1.0d0/lik**3)
             end if
             uik = r + sk
             if (ri+r .lt. sk) then
@@ -655,11 +647,11 @@ c
             u4r = u4 * r
             term = (3.0d0*(r2-sk2)+6.0d0*u2-8.0d0*ur)/u4r
      &           - (3.0d0*(r2-sk2)+6.0d0*l2-8.0d0*lr)/l4r
-            soluteinti = soluteinti - pi*term/12.0d0
+            rborni = rborni - pi*term/12.0d0
          end if
          if (useneck) then
             call neck (r,ri,rdk,mixsn,neckval)
-            soluteinti = soluteinti - neckval
+            rborni = rborni - neckval
          end if
       end if
       return
