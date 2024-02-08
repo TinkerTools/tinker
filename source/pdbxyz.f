@@ -689,7 +689,7 @@ c
 c
 c     build the side chain atoms of the current residue
 c
-         call addside (resname,i,newchn,start,stop,
+         call addside (resname,i,newchn,endchn,start,stop,
      &                    cai(i),ni(i),ci(i),si(i))
 c
 c     build the terminal oxygen at the end of a peptide chain
@@ -764,7 +764,8 @@ c     set as absolute values, not relative to the CB atom; this may
 c     need updating if the list of biotypes changes in the future
 c
 c
-      subroutine addside (resname,ires,newchn,start,stop,cai,ni,ci,si)
+      subroutine addside (resname,ires,newchn,endchn,
+     &                    start,stop,cai,ni,ci,si)
       use atoms
       use resdue
       use sequen
@@ -773,7 +774,7 @@ c
       integer ires,ichn
       integer start,stop
       integer cai,ni,ci,si
-      logical newchn
+      logical newchn,endchn
       character*3 resname
 c
 c
@@ -787,8 +788,8 @@ c
       if (resname .eq. 'GLY') then
          call findatm (' HA3',start,stop,i)
          k = hatyp(seqtyp(ires))
-         if (ires .eq. 1)  k = hantyp(seqtyp(ires))
-         if (ires .eq. nseq)  k = hactyp(seqtyp(ires))
+         if (newchn)  k = hantyp(seqtyp(ires))
+         if (endchn)  k = hactyp(seqtyp(ires))
          call newatm (i,k,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
 c
 c     alanine residue  (ALA)
@@ -1558,8 +1559,8 @@ c     unknown residue  (UNK)
 c
       else if (resname .eq. 'UNK') then
          k = hatyp(seqtyp(ires))
-         if (ires .eq. 1)  k = hantyp(seqtyp(ires))
-         if (ires .eq. nseq)  k = hactyp(seqtyp(ires))
+         if (newchn)  k = hantyp(seqtyp(ires))
+         if (endchn)  k = hactyp(seqtyp(ires))
          call newatm (i,k,cai,1.10d0,ni,109.5d0,ci,109.5d0,1)
       end if
       return
