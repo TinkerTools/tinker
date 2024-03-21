@@ -2238,6 +2238,10 @@ void prtuind_(int* iind);
 #define tinker_f_prtuind prtuind_
 void prtdcdu_(int* idcd, int* first);
 #define tinker_f_prtdcdu prtdcdu_
+void prtustc_(int* istc);
+#define tinker_f_prtustc prtustc_
+void prtdcdd_(int* idcd, int* first);
+#define tinker_f_prtdcdd prtdcdd_
 
 // prtvel.f
 void prtvel_(int* ivel);

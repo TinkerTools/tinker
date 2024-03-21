@@ -70,6 +70,7 @@ c
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
+      ustcsave = .false.
       friction = 91.0d0
       use_sdarea = .false.
       iprint = 100
@@ -122,6 +123,8 @@ c
             frcsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then
             uindsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-USTATIC ') then
+            ustcsave = .true.
          else if (keyword(1:9) .eq. 'FRICTION ') then
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then

@@ -39,7 +39,7 @@ c
       integer i,j,ii
       integer istep
       integer ixyz,iind
-      integer ivel,ifrc
+      integer ivel,ifrc,istc
       integer iend,isave,lext
       integer freeunit,trimtext
       integer modsave
@@ -52,6 +52,7 @@ c
       character*240 velfile
       character*240 frcfile
       character*240 indfile
+      character*240 stcfile
 c
 c
 c     send data via external socket communication if desired
@@ -128,42 +129,44 @@ c
 c
 c     save coordinates to archive or numbered structure file
 c
-      ixyz = freeunit ()
-      if (cyclesave) then
-         xyzfile = filename(1:leng)//'.'//ext(1:lext)
-         call version (xyzfile,'new')
-         open (unit=ixyz,file=xyzfile,status='new')
-         call prtxyz (ixyz)
-      else if (dcdsave) then
-         xyzfile = filename(1:leng)
-         call suffix (xyzfile,'dcd','old')
-         inquire (file=xyzfile,exist=exist)
-         if (exist) then
-            first = .false.
-            open (unit=ixyz,file=xyzfile,form='unformatted',
-     &               status='old',position='append')
-         else
-            first = .true.
-            open (unit=ixyz,file=xyzfile,form='unformatted',
-     &               status='new')
-         end if
-         call prtdcd (ixyz,first)
-      else
-         xyzfile = filename(1:leng)
-         call suffix (xyzfile,'arc','old')
-         inquire (file=xyzfile,exist=exist)
-         if (exist) then
-            call openend (ixyz,xyzfile)
-         else
-            open (unit=ixyz,file=xyzfile,status='new')
-         end if
-         call prtxyz (ixyz)
-      end if
-      close (unit=ixyz)
       write (iout,170)  isave
   170 format (' Frame Number',13x,i10)
-      write (iout,180)  xyzfile(1:trimtext(xyzfile))
-  180 format (' Coordinate File',13x,a)
+      if (coordsave) then
+         ixyz = freeunit ()
+         if (cyclesave) then
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
+            call version (xyzfile,'new')
+            open (unit=ixyz,file=xyzfile,status='new')
+            call prtxyz (ixyz)
+         else if (dcdsave) then
+            xyzfile = filename(1:leng)
+            call suffix (xyzfile,'dcd','old')
+            inquire (file=xyzfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=ixyz,file=xyzfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=ixyz,file=xyzfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcd (ixyz,first)
+         else
+            xyzfile = filename(1:leng)
+            call suffix (xyzfile,'arc','old')
+            inquire (file=xyzfile,exist=exist)
+            if (exist) then
+               call openend (ixyz,xyzfile)
+            else
+               open (unit=ixyz,file=xyzfile,status='new')
+            end if
+            call prtxyz (ixyz)
+         end if
+         close (unit=ixyz)
+         write (iout,180)  xyzfile(1:trimtext(xyzfile))
+  180    format (' Coordinate File',13x,a)
+      end if
 c
 c     update the information needed to restart the trajectory
 c
@@ -267,6 +270,7 @@ c
             indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
+            call prtuind (iind)
          else if (dcdsave) then
             indfile = filename(1:leng)
             call suffix (indfile,'dcdu','old')
@@ -297,6 +301,45 @@ c
   300    format (' Induced Dipole File',9x,a)
       end if
 c
+c     save the static dipole components for the current step
+c
+      if (ustcsave) then
+         istc = freeunit ()
+         if (cyclesave) then
+            stcfile = filename(1:leng)//'.'//ext(1:lext)//'d'
+            call version (stcfile,'new')
+            open (unit=istc,file=stcfile,status='new')
+            call prtustc (istc)
+         else if (dcdsave) then
+            stcfile = filename(1:leng)
+            call suffix (stcfile,'dcdd','old')
+            inquire (file=stcfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=istc,file=stcfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=istc,file=stcfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcdd (istc,first)
+         else
+            stcfile = filename(1:leng)
+            call suffix (stcfile,'ustc','old')
+            inquire (file=stcfile,exist=exist)
+            if (exist) then
+               call openend (istc,stcfile)
+            else
+               open (unit=istc,file=stcfile,status='new')
+            end if
+            call prtustc (istc)
+         end if
+         close (unit=istc)
+         write (iout,310)  stcfile(1:trimtext(stcfile))
+  310    format (' Static Dipole File',10x,a)
+      end if
+c
 c     test for requested termination of the dynamics calculation
 c
       endfile = 'tinker.end'
@@ -311,8 +354,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,310)
-  310    format (/,' MDSAVE  --  Dynamics Calculation Ending',
+         write (iout,320)
+  320    format (/,' MDSAVE  --  Dynamics Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if
@@ -321,8 +364,8 @@ c     skip an extra line to keep the output formating neat
 c
       modsave = mod(istep,iprint)
       if (verbose .and. modsave.ne.0) then
-         write (iout,320)
-  320    format ()
+         write (iout,330)
+  330    format ()
       end if
       return
       end
