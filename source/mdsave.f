@@ -187,7 +187,7 @@ c
 c
 c     update the information needed to restart the trajectory
 c
-      call prtdyn
+      if (coordsave)  call prtdyn
 c
 c     save the velocity vector components at the current step
 c
