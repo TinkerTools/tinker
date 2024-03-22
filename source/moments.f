@@ -309,3 +309,68 @@ c
       call jacobi (3,a,netqpl,b)
       return
       end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine dmoments  --  total electric dipole moments  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "dmoments" computes the total dipole moments over all atoms;
+c     called in mdsave, it is assumed bound is called
+c
+c
+      subroutine dmoments
+      use atoms
+      use moment
+      use mpole
+      use polar
+      use potent
+      use units
+      implicit none
+      integer i
+c
+c
+c     zero out total dipole moment
+c
+      xdpl = 0.0d0
+      ydpl = 0.0d0
+      zdpl = 0.0d0
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,x,y,z,rpole,uind,use_polar,xdpl,ydpl,zdpl)
+!$OMP DO reduction(+:xdpl,ydpl,zdpl) schedule(guided)
+c
+c     compute the static dipole moment
+c
+      do i = 1, n
+         xdpl = xdpl + x(i)*rpole(1,i) + rpole(2,i)
+         ydpl = ydpl + y(i)*rpole(1,i) + rpole(3,i)
+         zdpl = zdpl + z(i)*rpole(1,i) + rpole(4,i)
+      end do
+!$OMP END DO
+c
+c     compute the induced dipole moment
+c
+      if (use_polar) then
+!$OMP DO reduction(+:xdpl,ydpl,zdpl) schedule(guided)
+         do i = 1, n
+            xdpl = xdpl + uind(1,i)
+            ydpl = ydpl + uind(2,i)
+            zdpl = zdpl + uind(3,i)
+         end do
+!$OMP END DO
+      end if
+!$OMP END PARALLEL
+c
+c     convert dipole to Debye
+c
+      xdpl = xdpl * debye
+      ydpl = ydpl * debye
+      zdpl = zdpl * debye
+      return
+      end

@@ -28,6 +28,7 @@ c
       use inform
       use iounit
       use mdstuf
+      use moment
       use mpole
       use output
       use polar
@@ -127,10 +128,26 @@ c     move stray molecules into periodic box if desired
 c
       if (use_bounds)  call bounds
 c
+c     compute total dipole of system if desired
+c
+      if (usyssave) then
+         call dmoments
+         if (digits .le. 6) then
+            write (iout,170)  xdpl,ydpl,zdpl
+  170       format (' System Dipole Moment',1x,3f14.6)
+         else if (digits .le. 8) then
+            write (iout,180)  xdpl,ydpl,zdpl
+  180       format (' System Dipole Moment',1x,3f16.8)
+         else
+            write (iout,190)  xdpl,ydpl,zdpl
+  190       format (' System Dipole Moment',1x,3f18.10)
+         end if
+      end if
+c
 c     save coordinates to archive or numbered structure file
 c
-      write (iout,170)  isave
-  170 format (' Frame Number',13x,i10)
+      write (iout,200)  isave
+  200 format (' Frame Number',13x,i10)
       if (coordsave) then
          ixyz = freeunit ()
          if (cyclesave) then
@@ -164,8 +181,8 @@ c
             call prtxyz (ixyz)
          end if
          close (unit=ixyz)
-         write (iout,180)  xyzfile(1:trimtext(xyzfile))
-  180    format (' Coordinate File',13x,a)
+         write (iout,210)  xyzfile(1:trimtext(xyzfile))
+  210    format (' Coordinate File',13x,a)
       end if
 c
 c     update the information needed to restart the trajectory
@@ -204,13 +221,13 @@ c
             end if
          end if
          if (integrate .eq. 'RIGIDBODY') then
-            write (ivel,190)  ngrp,title(1:ltitle)
-  190       format (i6,2x,a)
+            write (ivel,220)  ngrp,title(1:ltitle)
+  220       format (i6,2x,a)
             do i = 1, ngrp
-               write (ivel,200)  i,(vcm(j,i),j=1,3)
-  200          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
-               write (ivel,210)  i,(wcm(j,i),j=1,3)
-  210          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,230)  i,(vcm(j,i),j=1,3)
+  230          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,240)  i,(wcm(j,i),j=1,3)
+  240          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
          else if (dcdsave) then
             call prtdcdv (ivel,first)
@@ -218,8 +235,8 @@ c
             call prtvel (ivel)
          end if
          close (unit=ivel)
-         write (iout,240)  velfile(1:trimtext(velfile))
-  240    format (' Velocity File',15x,a)
+         write (iout,250)  velfile(1:trimtext(velfile))
+  250    format (' Velocity File',15x,a)
       end if
 c
 c     save the force vector components for the current step,

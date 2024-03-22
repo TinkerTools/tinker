@@ -33,7 +33,6 @@ c
 c
 c     locate the center of mass of each molecule
 c
-      print*, "bounds"
       do i = 1, nmol
          init = imol(1,i)
          stop = imol(2,i)
