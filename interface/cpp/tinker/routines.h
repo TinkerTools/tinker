@@ -1932,6 +1932,8 @@ void moments_(char* mode, tinker_fchar_len_t mode_cap);
 inline void tinker_f_moments(tinker_fchars mode) {
     return moments_(mode.string, mode.capacity);
 }
+void dmoments_();
+#define tinker_f_dmoments dmoments_
 
 // mutate.f
 void mutate_();
