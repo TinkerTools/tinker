@@ -20,6 +20,7 @@ c     binary      logical flag for coordinates in DCD binary format
 c     noversion   logical flag governing use of filename versions
 c     overwrite   logical flag to overwrite intermediate files inplace
 c     coordsave   logical flag to save coordinates
+c     dynsave     logical flag to save dynamics (.dyn) file
 c     onlysave    logical flag to only save certain coordinates
 c     arcsave     logical flag to save coordinates in Tinker XYZ format
 c     dcdsave     logical flag to save coordinates in DCD binary format
@@ -43,6 +44,7 @@ c
       logical noversion
       logical overwrite
       logical coordsave
+      logical dynsave
       logical cyclesave
       logical onlysave
       logical arcsave
