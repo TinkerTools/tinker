@@ -286,6 +286,7 @@ c
 c
 c     set defaults for the numbers and lists of saved atoms
 c
+      onlysave = .false.
       nonly = 0
       do i = 1, n
          ionly(i) = 0
