@@ -322,46 +322,57 @@ c     "dmoments" computes the total dipole moments over all atoms;
 c     called in mdsave, it is assumed bound is called
 c
 c
-      subroutine dmoments
+      subroutine dmoments (xustc,yustc,zustc,xuind,yuind,zuind)
       use atoms
       use moment
       use mpole
+      use output
       use polar
       use potent
       use units
       implicit none
       integer i
+      real*8 xustc,yustc,zustc
+      real*8 xuind,yuind,zuind
 c
 c
 c     zero out total dipole moment
 c
-      xdpl = 0.0d0
-      ydpl = 0.0d0
-      zdpl = 0.0d0
+      xustc = 0.0d0
+      yustc = 0.0d0
+      zustc = 0.0d0
+      xuind = 0.0d0
+      yuind = 0.0d0
+      zuind = 0.0d0
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(n,x,y,z,rpole,uind,use_polar,xdpl,ydpl,zdpl)
-!$OMP DO reduction(+:xdpl,ydpl,zdpl) schedule(guided)
+!$OMP& shared(n,x,y,z,rpole,uind,use_polar,usysuse,
+!$OMP& xustc,yustc,zustc,xuind,yuind,zuind)
+!$OMP DO reduction(+:xustc,yustc,zustc) schedule(guided)
 c
 c     compute the static dipole moment
 c
       do i = 1, n
-         xdpl = xdpl + x(i)*rpole(1,i) + rpole(2,i)
-         ydpl = ydpl + y(i)*rpole(1,i) + rpole(3,i)
-         zdpl = zdpl + z(i)*rpole(1,i) + rpole(4,i)
+         if (usysuse(i)) then
+            xustc = xustc + x(i)*rpole(1,i) + rpole(2,i)
+            yustc = yustc + y(i)*rpole(1,i) + rpole(3,i)
+            zustc = zustc + z(i)*rpole(1,i) + rpole(4,i)
+         end if
       end do
 !$OMP END DO
 c
 c     compute the induced dipole moment
 c
       if (use_polar) then
-!$OMP DO reduction(+:xdpl,ydpl,zdpl) schedule(guided)
+!$OMP DO reduction(+:xuind,yuind,zuind) schedule(guided)
          do i = 1, n
-            xdpl = xdpl + uind(1,i)
-            ydpl = ydpl + uind(2,i)
-            zdpl = zdpl + uind(3,i)
+            if (usysuse(i)) then
+               xuind = xuind + uind(1,i)
+               yuind = yuind + uind(2,i)
+               zuind = zuind + uind(3,i)
+            end if
          end do
 !$OMP END DO
       end if
@@ -369,8 +380,11 @@ c
 c
 c     convert dipole to Debye
 c
-      xdpl = xdpl * debye
-      ydpl = ydpl * debye
-      zdpl = zdpl * debye
+      xustc = xustc * debye
+      yustc = yustc * debye
+      zustc = zustc * debye
+      xuind = xuind * debye
+      yuind = yuind * debye
+      zuind = zuind * debye
       return
       end

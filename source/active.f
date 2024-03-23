@@ -243,3 +243,229 @@ c
       deallocate (fixed)
       return
       end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine saveonly  --  set the list of save coord atoms  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "saveonly" sets the list of atoms that are used during
+c     coordinate saving routines
+c
+c
+      subroutine saveonly
+      use atoms
+      use iounit
+      use keys
+      use output
+      implicit none
+      integer i,j,next
+      integer nfixed
+      integer, allocatable :: fixed(:)
+      character*20 keyword
+      character*240 record
+      character*240 string
+      logical header
+      logical, allocatable :: saved(:)
+c
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(ionly))  deallocate (ionly)
+      if (allocated(ionlyinv))  deallocate (ionlyinv)
+      allocate (ionly(n))
+      allocate (ionlyinv(n))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fixed(n))
+      allocate (saved(n))
+c
+c     set defaults for the numbers and lists of saved atoms
+c
+      nonly = 0
+      do i = 1, n
+         ionly(i) = 0
+         ionlyinv(i) = 0
+      end do
+      nfixed = 0
+      do i = 1, n
+         fixed(i) = 0
+         saved(i) = .false.
+      end do
+c
+c     get any keywords containing save-only atom parameters
+c
+      do j = 1, nkey
+         next = 1
+         record = keyline(j)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+c
+c     get any lists of atoms whose coordinates should be saved
+c
+         if (keyword(1:10) .eq. 'SAVE-ONLY ') then
+            read (string,*,err=10,end=10)  (fixed(i),i=nfixed+1,n)
+   10       continue
+            do while (fixed(nfixed+1) .ne. 0)
+               nfixed = nfixed + 1
+            end do
+         end if
+      end do
+c
+c     remove saved atoms not in the system
+c
+      header = .true.
+      do i = 1, n
+         if (abs(fixed(i)) .gt. n) then
+            fixed(i) = 0
+            if (header) then
+               header = .false.
+               write (iout,20)
+   20          format (/,' SAVEONLY  --  Warning, Illegal Atom Number',
+     &                    ' in SAVE-ONLY Atom List')
+            end if
+         end if
+      end do
+c
+c     set saved atoms to only those marked as save
+c
+      i = 1
+      do while (fixed(i) .ne. 0)
+         if (fixed(i) .gt. 0) then
+            j = fixed(i)
+            saved(j) = .true.
+            i = i + 1
+         else
+            do j = abs(fixed(i)), abs(fixed(i+1))
+               saved(j) = .true.
+            end do
+            i = i + 2
+         end if
+      end do
+      do i = 1, n
+         if (saved(i)) then
+            nonly = nonly + 1
+            ionly(nonly) = i
+            ionlyinv(i) = nonly
+         end if
+      end do
+      if (nonly > 0)  onlysave = .true.
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (fixed)
+      deallocate (saved)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine saveusys  --  set exclusion for system dipole  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "saveusys" sets the list of atoms that are excluded while
+c     computing system dipole
+c
+c
+      subroutine saveusys
+      use atoms
+      use iounit
+      use keys
+      use output
+      implicit none
+      integer i,j,next
+      integer nfixed
+      integer, allocatable :: fixed(:)
+      character*20 keyword
+      character*240 record
+      character*240 string
+      logical header
+c
+c
+c     return if not computing system dipole
+c
+      if (.not. usyssave)  return
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(usysuse))  deallocate (usysuse)
+      allocate (usysuse(n))
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (fixed(n))
+c
+c     set defaults for the numbers and lists of atoms to be used
+c
+      do i = 1, n
+         usysuse(i) = .true.
+      end do
+      nfixed = 0
+      do i = 1, n
+         fixed(i) = 0
+      end do
+c
+c     get any keywords containing save-usysexc atom parameters
+c
+      do j = 1, nkey
+         next = 1
+         record = keyline(j)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+c
+c     get any lists of atoms whose coordinates should be used
+c
+         if (keyword(1:13) .eq. 'SAVE-USYSEXC ') then
+            read (string,*,err=10,end=10)  (fixed(i),i=nfixed+1,n)
+   10       continue
+            do while (fixed(nfixed+1) .ne. 0)
+               nfixed = nfixed + 1
+            end do
+         end if
+      end do
+c
+c     remove used atoms not in the system
+c
+      header = .true.
+      do i = 1, n
+         if (abs(fixed(i)) .gt. n) then
+            fixed(i) = 0
+            if (header) then
+               header = .false.
+               write (iout,20)
+   20          format (/,' SAVEUSYS  --  Warning, Illegal Atom Number',
+     &                    ' in SAVE-USYSEXC Atom List')
+            end if
+         end if
+      end do
+c
+c     set inactive atoms to false
+c
+      i = 1
+      do while (fixed(i) .ne. 0)
+         if (fixed(i) .gt. 0) then
+            j = fixed(i)
+            usysuse(j) = .false.
+            i = i + 1
+         else
+            do j = abs(fixed(i)), abs(fixed(i+1))
+               usysuse(j) = .false.
+            end do
+            i = i + 2
+         end if
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (fixed)
+      return
+      end

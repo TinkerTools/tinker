@@ -161,6 +161,14 @@ c
    10    continue
       end do
 c
+c     check for use of save-only keyword
+c
+      call saveonly
+c
+c     check for use of exclusion in save-usystem
+c
+      call saveusys
+c
 c     check for use of induced dipole prediction methods
 c
       if (use_polar)  call predict

@@ -46,6 +46,8 @@ c
       integer modsave
       real*8 dt,pico
       real*8 epot,eksum
+      real*8 xustc,yustc,zustc
+      real*8 xuind,yuind,zuind
       logical exist,first
       character*7 ext
       character*240 endfile
@@ -131,23 +133,35 @@ c
 c     compute total dipole of system if desired
 c
       if (usyssave) then
-         call dmoments
+         call dmoments (xustc,yustc,zustc,xuind,yuind,zuind)
          if (digits .le. 6) then
-            write (iout,170)  xdpl,ydpl,zdpl
-  170       format (' System Dipole Moment',1x,3f14.6)
+            write (iout,170)  xustc,yustc,zustc
+  170       format (' System Static Dipole',1x,3f14.6)
          else if (digits .le. 8) then
-            write (iout,180)  xdpl,ydpl,zdpl
-  180       format (' System Dipole Moment',1x,3f16.8)
+            write (iout,180)  xustc,yustc,zustc
+  180       format (' System Static Dipole',1x,3f16.8)
          else
-            write (iout,190)  xdpl,ydpl,zdpl
-  190       format (' System Dipole Moment',1x,3f18.10)
+            write (iout,190)  xustc,yustc,zustc
+  190       format (' System Static Dipole',1x,3f18.10)
+         end if
+         if (use_polar) then
+            if (digits .le. 6) then
+               write (iout,200)  xuind,yuind,zuind
+  200          format (' System Induced Dipole',3f14.6)
+            else if (digits .le. 8) then
+               write (iout,210)  xuind,yuind,zuind
+  210          format (' System Induced Dipole',3f16.8)
+            else
+               write (iout,220)  xuind,yuind,zuind
+  220          format (' System Induced Dipole',3f18.10)
+            end if
          end if
       end if
 c
 c     save coordinates to archive or numbered structure file
 c
-      write (iout,200)  isave
-  200 format (' Frame Number',13x,i10)
+      write (iout,230)  isave
+  230 format (' Frame Number',13x,i10)
       if (coordsave) then
          ixyz = freeunit ()
          if (cyclesave) then
@@ -181,8 +195,8 @@ c
             call prtxyz (ixyz)
          end if
          close (unit=ixyz)
-         write (iout,210)  xyzfile(1:trimtext(xyzfile))
-  210    format (' Coordinate File',13x,a)
+         write (iout,240)  xyzfile(1:trimtext(xyzfile))
+  240    format (' Coordinate File',13x,a)
       end if
 c
 c     update the information needed to restart the trajectory
@@ -221,13 +235,13 @@ c
             end if
          end if
          if (integrate .eq. 'RIGIDBODY') then
-            write (ivel,220)  ngrp,title(1:ltitle)
-  220       format (i6,2x,a)
+            write (ivel,250)  ngrp,title(1:ltitle)
+  250       format (i6,2x,a)
             do i = 1, ngrp
-               write (ivel,230)  i,(vcm(j,i),j=1,3)
-  230          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
-               write (ivel,240)  i,(wcm(j,i),j=1,3)
-  240          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,260)  i,(vcm(j,i),j=1,3)
+  260          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,270)  i,(wcm(j,i),j=1,3)
+  270          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
          else if (dcdsave) then
             call prtdcdv (ivel,first)
@@ -235,8 +249,8 @@ c
             call prtvel (ivel)
          end if
          close (unit=ivel)
-         write (iout,250)  velfile(1:trimtext(velfile))
-  250    format (' Velocity File',15x,a)
+         write (iout,280)  velfile(1:trimtext(velfile))
+  280    format (' Velocity File',15x,a)
       end if
 c
 c     save the force vector components for the current step,
@@ -275,8 +289,8 @@ c
             call prtfrc (ifrc)
          end if
          close (unit=ifrc)
-         write (iout,270)  frcfile(1:trimtext(frcfile))
-  270    format (' Force Vector File',11x,a)
+         write (iout,290)  frcfile(1:trimtext(frcfile))
+  290    format (' Force Vector File',11x,a)
       end if
 c
 c     save the induced dipole components for the current step

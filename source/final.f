@@ -96,6 +96,7 @@ c
       use opbend
       use opdist
       use orbits
+      use output
       use paths
       use pbstuf
       use pdb
@@ -873,6 +874,12 @@ c
       if (allocated(qorb))  deallocate (qorb)
       if (allocated(worb))  deallocate (worb)
       if (allocated(emorb))  deallocate (emorb)
+c
+c     deallocation of global arrays from module output
+c
+      if (allocated(ionly))  deallocate (ionly)
+      if (allocated(ionlyinv))  deallocate (ionlyinv)
+      if (allocated(usysuse))  deallocate (usysuse)
 c
 c     deallocation of global arrays from module paths
 c

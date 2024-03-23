@@ -25,10 +25,12 @@ c
       use files
       use inform
       use polar
+      use output
       use titles
       use units
       implicit none
       integer i,j,k,iind
+      integer ii
       integer size,crdsiz
       real*8 crdmin,crdmax
       logical opened
@@ -77,12 +79,22 @@ c
 c
 c     write out the number of atoms and the title
 c
-      if (ltitle .eq. 0) then
-         fstr = '('//atmc//')'
-         write (iind,fstr(1:4))  n
+      if (.not. onlysave) then
+         if (ltitle .eq. 0) then
+            fstr = '('//atmc//')'
+            write (iind,fstr(1:4))  n
+         else
+            fstr = '('//atmc//',2x,a)'
+            write (iind,fstr(1:9))  n,title(1:ltitle)
+         end if
       else
-         fstr = '('//atmc//',2x,a)'
-         write (iind,fstr(1:9))  n,title(1:ltitle)
+         if (ltitle .eq. 0) then
+            fstr = '('//atmc//')'
+            write (iind,fstr(1:4))  nonly
+         else
+            fstr = '('//atmc//',2x,a)'
+            write (iind,fstr(1:9))  nonly,title(1:ltitle)
+         end if
       end if
 c
 c     write out the periodic cell lengths and angles
@@ -96,16 +108,30 @@ c     write out the induced dipole components for each atom
 c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
-      do i = 1, n
-         k = n12(i)
-         if (k .eq. 0) then
-            write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
-     &                         type(i)
-         else
-            write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
-     &                         type(i),(i12(j,i),j=1,k)
-         end if
-      end do
+      if (.not. onlysave) then
+         do i = 1, n
+            k = n12(i)
+            if (k .eq. 0) then
+               write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
+     &                            type(i)
+            else
+               write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
+     &                            type(i),(i12(j,i),j=1,k)
+            end if
+         end do
+      else
+         do ii = 1, nonly
+            i = ionly(ii)
+            k = n12(i)
+            if (k .eq. 0) then
+               write (iind,fstr) ii,name(i),(debye*uind(j,i),j=1,3),
+     &                           type(i)
+            else
+               write (iind,fstr) ii,name(i),(debye*uind(j,i),j=1,3),
+     &                           type(i), (ionlyinv(i12(j,i)),j=1,k)
+            end if
+         end do
+      end if
 c
 c     close the output unit if opened by this routine
 c
@@ -155,6 +181,7 @@ c
       use boxes
       use files
       use polar
+      use output
       use titles
       use units
       implicit none
@@ -209,7 +236,11 @@ c
      &                 tdelta,usebox,use4d,usefq,merged,
      &                 zero,zero,zero,zero,zero,vcharmm
          write (idcd)  ntitle,title(1:80)
-         write (idcd)  n
+         if (.not. onlysave) then
+            write (idcd)  n
+         else
+            write (idcd)  nonly
+         end if
       end if
 c
 c     append the lattice values based on header flag value
@@ -220,9 +251,15 @@ c
 c
 c     append the induced dipoles along each axis in turn
 c
-      write (idcd)  (real(debye*uind(1,i)),i=1,n)
-      write (idcd)  (real(debye*uind(2,i)),i=1,n)
-      write (idcd)  (real(debye*uind(3,i)),i=1,n)
+      if (.not. onlysave) then
+         write (idcd)  (real(debye*uind(1,i)),i=1,n)
+         write (idcd)  (real(debye*uind(2,i)),i=1,n)
+         write (idcd)  (real(debye*uind(3,i)),i=1,n)
+      else
+         write (idcd)  (real(debye*uind(1,ionly(i))),i=1,nonly)
+         write (idcd)  (real(debye*uind(2,ionly(i))),i=1,nonly)
+         write (idcd)  (real(debye*uind(3,ionly(i))),i=1,nonly)
+      end if
 c
 c     close the output unit if opened by this routine
 c
@@ -251,10 +288,12 @@ c
       use files
       use inform
       use mpole
+      use output
       use titles
       use units
       implicit none
       integer i,j,k,istc
+      integer ii
       integer size,crdsiz
       real*8 crdmin,crdmax
       real*8 c,xd,yd,zd
@@ -304,12 +343,22 @@ c
 c
 c     write out the number of atoms and the title
 c
-      if (ltitle .eq. 0) then
-         fstr = '('//atmc//')'
-         write (istc,fstr(1:4))  n
+      if (.not. onlysave) then
+         if (ltitle .eq. 0) then
+            fstr = '('//atmc//')'
+            write (istc,fstr(1:4))  n
+         else
+            fstr = '('//atmc//',2x,a)'
+            write (istc,fstr(1:9))  n,title(1:ltitle)
+         end if
       else
-         fstr = '('//atmc//',2x,a)'
-         write (istc,fstr(1:9))  n,title(1:ltitle)
+         if (ltitle .eq. 0) then
+            fstr = '('//atmc//')'
+            write (istc,fstr(1:4))  nonly
+         else
+            fstr = '('//atmc//',2x,a)'
+            write (istc,fstr(1:9))  nonly,title(1:ltitle)
+         end if
       end if
 c
 c     write out the periodic cell lengths and angles
@@ -323,19 +372,36 @@ c     write out the static dipole components for each atom
 c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
-      do i = 1, n
-         c = rpole(1,i)
-         xd = (x(i)*c + rpole(2,i)) * debye
-         yd = (y(i)*c + rpole(3,i)) * debye
-         zd = (z(i)*c + rpole(4,i)) * debye
-         k = n12(i)
-         if (k .eq. 0) then
-            write (istc,fstr)  i,name(i),xd,yd,zd,type(i)
-         else
-            write (istc,fstr)  i,name(i),xd,yd,zd,type(i),
-     &                         (i12(j,i),j=1,k)
-         end if
-      end do
+      if (.not. onlysave) then
+         do i = 1, n
+            c = rpole(1,i)
+            xd = (x(i)*c + rpole(2,i)) * debye
+            yd = (y(i)*c + rpole(3,i)) * debye
+            zd = (z(i)*c + rpole(4,i)) * debye
+            k = n12(i)
+            if (k .eq. 0) then
+               write (istc,fstr)  i,name(i),xd,yd,zd,type(i)
+            else
+               write (istc,fstr)  i,name(i),xd,yd,zd,type(i),
+     &                            (i12(j,i),j=1,k)
+            end if
+         end do
+      else
+         do ii = 1, nonly
+            i = ionly(ii)
+            c = rpole(1,i)
+            xd = (x(i)*c + rpole(2,i)) * debye
+            yd = (y(i)*c + rpole(3,i)) * debye
+            zd = (z(i)*c + rpole(4,i)) * debye
+            k = n12(i)
+            if (k .eq. 0) then
+               write (istc,fstr) ii,name(i),xd,yd,zd,type(i)
+            else
+               write (istc,fstr) ii,name(i),xd,yd,zd,type(i),
+     &                           (ionlyinv(i12(j,i)),j=1,k)
+            end if
+         end do
+      end if
 c
 c     close the output unit if opened by this routine
 c
@@ -385,6 +451,7 @@ c
       use boxes
       use files
       use mpole
+      use output
       use titles
       use units
       implicit none
@@ -439,7 +506,11 @@ c
      &                 tdelta,usebox,use4d,usefq,merged,
      &                 zero,zero,zero,zero,zero,vcharmm
          write (idcd)  ntitle,title(1:80)
-         write (idcd)  n
+         if (.not. onlysave) then
+            write (idcd)  n
+         else
+            write (idcd)  nonly
+         end if
       end if
 c
 c     append the lattice values based on header flag value
@@ -450,9 +521,18 @@ c
 c
 c     append the static dipoles along each axis in turn
 c
-      write (idcd)  (real(debye*(x(i)*rpole(1,i) + rpole(2,i))),i=1,n)
-      write (idcd)  (real(debye*(y(i)*rpole(1,i) + rpole(3,i))),i=1,n)
-      write (idcd)  (real(debye*(z(i)*rpole(1,i) + rpole(4,i))),i=1,n)
+      if (.not. onlysave) then
+         write (idcd) (real(debye*(x(i)*rpole(1,i) + rpole(2,i))),i=1,n)
+         write (idcd) (real(debye*(y(i)*rpole(1,i) + rpole(3,i))),i=1,n)
+         write (idcd) (real(debye*(z(i)*rpole(1,i) + rpole(4,i))),i=1,n)
+      else
+         write (idcd) (real(debye*(x(ionly(i))*rpole(1,ionly(i))
+     &                      + rpole(2,ionly(i)))),i=1,nonly)
+         write (idcd) (real(debye*(y(ionly(i))*rpole(1,ionly(i))
+     &                      + rpole(3,ionly(i)))),i=1,nonly)
+         write (idcd) (real(debye*(z(ionly(i))*rpole(1,ionly(i))
+     &                      + rpole(4,ionly(i)))),i=1,nonly)
+      end if
 c
 c     close the output unit if opened by this routine
 c

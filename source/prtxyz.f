@@ -24,9 +24,11 @@ c
       use couple
       use files
       use inform
+      use output
       use titles
       implicit none
       integer i,j,k,ixyz
+      integer ii
       integer size,crdsiz
       real*8 crdmin,crdmax
       logical opened
@@ -75,12 +77,22 @@ c
 c
 c     write out the number of atoms and the title
 c
-      if (ltitle .eq. 0) then
-         fstr = '('//atmc//')'
-         write (ixyz,fstr(1:4))  n
+      if (.not. onlysave) then
+         if (ltitle .eq. 0) then
+            fstr = '('//atmc//')'
+            write (ixyz,fstr(1:4))  n
+         else
+            fstr = '('//atmc//',2x,a)'
+            write (ixyz,fstr(1:9))  n,title(1:ltitle)
+         end if
       else
-         fstr = '('//atmc//',2x,a)'
-         write (ixyz,fstr(1:9))  n,title(1:ltitle)
+         if (ltitle .eq. 0) then
+            fstr = '('//atmc//')'
+            write (ixyz,fstr(1:4))  nonly
+         else
+            fstr = '('//atmc//',2x,a)'
+            write (ixyz,fstr(1:9))  nonly,title(1:ltitle)
+         end if
       end if
 c
 c     write out the periodic cell lengths and angles
@@ -94,15 +106,28 @@ c     write out the atomic coordinates for each atom
 c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
-      do i = 1, n
-         k = n12(i)
-         if (k .eq. 0) then
-            write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i)
-         else
-            write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i),
-     &                         (i12(j,i),j=1,k)
-         end if
-      end do
+      if (.not. onlysave) then
+         do i = 1, n
+            k = n12(i)
+            if (k .eq. 0) then
+               write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i)
+            else
+               write (ixyz,fstr)  i,name(i),x(i),y(i),z(i),type(i),
+     &                            (i12(j,i),j=1,k)
+            end if
+         end do
+      else
+         do ii = 1, nonly
+            i = ionly(ii)
+            k = n12(i)
+            if (k .eq. 0) then
+               write (ixyz,fstr)  ii,name(i),x(i),y(i),z(i),type(i)
+            else
+               write (ixyz,fstr)  ii,name(i),x(i),y(i),z(i),type(i),
+     &                            (ionlyinv(i12(j,i)),j=1,k)
+            end if
+         end do
+      end if
 c
 c     close the output unit if opened by this routine
 c
@@ -151,6 +176,7 @@ c
       use bound
       use boxes
       use files
+      use output
       use titles
       implicit none
       integer i,idcd
@@ -204,7 +230,11 @@ c
      &                 tdelta,usebox,use4d,usefq,merged,
      &                 zero,zero,zero,zero,zero,vcharmm
          write (idcd)  ntitle,title(1:80)
-         write (idcd)  n
+         if (.not. onlysave) then
+            write (idcd)  n
+         else
+            write (idcd)  nonly
+         end if
       end if
 c
 c     append the lattice values based on header flag value
@@ -215,9 +245,15 @@ c
 c
 c     append the atomic coordinates along each axis in turn
 c
-      write (idcd)  (real(x(i)),i=1,n)
-      write (idcd)  (real(y(i)),i=1,n)
-      write (idcd)  (real(z(i)),i=1,n)
+      if (.not. onlysave) then
+         write (idcd)  (real(x(i)),i=1,n)
+         write (idcd)  (real(y(i)),i=1,n)
+         write (idcd)  (real(z(i)),i=1,n)
+      else
+         write (idcd)  (real(x(ionly(i))),i=1,nonly)
+         write (idcd)  (real(y(ionly(i))),i=1,nonly)
+         write (idcd)  (real(z(ionly(i))),i=1,nonly)
+      end if
 c
 c     close the output unit if opened by this routine
 c
