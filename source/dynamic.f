@@ -28,6 +28,7 @@ c
       use mdstuf
       use potent
       use stodyn
+      use output
       use usage
       implicit none
       integer i,next,mode
@@ -297,6 +298,10 @@ c
             call beeman (istep,dt)
          end if
       end do
+c
+c     save dynamic at the end if it was not saved during simulation
+c
+      if (.not. dynsave)  call prtdyn
 c
 c     perform any final tasks before program exit
 c

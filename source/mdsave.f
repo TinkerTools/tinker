@@ -49,7 +49,6 @@ c
       real*8 xustc,yustc,zustc
       real*8 xuind,yuind,zuind
       logical exist,first
-      logical savedyn
       character*7 ext
       character*240 endfile
       character*240 xyzfile
@@ -202,8 +201,7 @@ c
 c
 c     update the information needed to restart the trajectory
 c
-      savedyn = dynsave .and. coordsave .and. (.not.onlysave)
-      if (savedyn)  call prtdyn
+      if (dynsave)  call prtdyn
 c
 c     save the velocity vector components at the current step
 c
