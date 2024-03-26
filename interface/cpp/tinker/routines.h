@@ -20,6 +20,10 @@ void tinkerFortranRuntimeEnd();
 // active.f
 void active_();
 #define tinker_f_active active_
+void saveonly_();
+#define tinker_f_saveonly saveonly_
+void saveusys_();
+#define tinker_f_saveusys saveusys_
 
 // alterchg.f
 void alterchg_();
@@ -1932,7 +1936,7 @@ void moments_(char* mode, tinker_fchar_len_t mode_cap);
 inline void tinker_f_moments(tinker_fchars mode) {
     return moments_(mode.string, mode.capacity);
 }
-void dmoments_();
+void dmoments_(double* xustc, double* yustc, double* zustc, double* xuind, double* yuind, double* zuind);
 #define tinker_f_dmoments dmoments_
 
 // mutate.f
