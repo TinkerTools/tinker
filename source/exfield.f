@@ -41,7 +41,7 @@ c     calculate external field energy over partial charges
 c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
-!$OMP&    x,y,z,f,pchg,exfld,exf)
+!$OMP&    x,y,z,f,pchg,texfld,exf)
 !$OMP    DO reduction(+:exf) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
@@ -50,7 +50,7 @@ c
                yi = y(i)
                zi = z(i)
                ci = pchg(i)
-               phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
+               phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
                e = -f * ci * phi
                exf = exf + e
             end if
@@ -63,7 +63,7 @@ c     calculate external field energy over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,f,rpole,exfld,exf)
+!$OMP&    x,y,z,f,rpole,texfld,exf)
 !$OMP    DO reduction(+:exf) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -72,12 +72,12 @@ c
                yi = y(i)
                zi = z(i)
                ci = rpole(1,i)
-               phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
+               phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
                dix = rpole(2,i)
                diy = rpole(3,i)
                diz = rpole(4,i)
-               e = -f * (ci*phi + dix*exfld(1)
-     &                      + diy*exfld(2) + diz*exfld(3))
+               e = -f * (ci*phi + dix*texfld(1)
+     &                      + diy*texfld(2) + diz*texfld(3))
                exf = exf + e
             end if
          end do
@@ -135,7 +135,7 @@ c     calculate energy and derivatives over partial charges
 c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
-!$OMP&    x,y,z,f,pchg,exfld,exf,dec,vir)
+!$OMP&    x,y,z,f,pchg,texfld,exf,dec,vir)
 !$OMP    DO reduction(+:exf,dec,vir) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
@@ -144,15 +144,15 @@ c
                yi = y(i)
                zi = z(i)
                ci = pchg(i)
-               phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
+               phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
                e = -f * ci * phi
                exf = exf + e
 c
 c     gradient and virial components from charge interactions
 c
-               frx = -f * exfld(1) * ci
-               fry = -f * exfld(2) * ci
-               frz = -f * exfld(3) * ci
+               frx = -f * texfld(1) * ci
+               fry = -f * texfld(2) * ci
+               frz = -f * texfld(3) * ci
                dec(1,i) = dec(1,i) + frx
                dec(2,i) = dec(2,i) + fry
                dec(3,i) = dec(3,i) + frz
@@ -184,7 +184,7 @@ c     calculate energy and derivatives over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,xaxis,yaxis,zaxis,f,rpole,exfld,exf,dem,vir)
+!$OMP&    x,y,z,xaxis,yaxis,zaxis,f,rpole,texfld,exf,dem,vir)
 !$OMP    DO reduction(+:exf,dem,vir) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -196,16 +196,16 @@ c
                dix = rpole(2,i)
                diy = rpole(3,i)
                diz = rpole(4,i)
-               phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
-               e = -f * (ci*phi + dix*exfld(1)
-     &                      + diy*exfld(2) + diz*exfld(3))
+               phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
+               e = -f * (ci*phi + dix*texfld(1)
+     &                      + diy*texfld(2) + diz*texfld(3))
                exf = exf + e
 c
 c     gradient and virial components from dipole interactions
 c
-               tem(1) = f * (diy*exfld(3)-diz*exfld(2))
-               tem(2) = f * (diz*exfld(1)-dix*exfld(3))
-               tem(3) = f * (dix*exfld(2)-diy*exfld(1))
+               tem(1) = f * (diy*texfld(3)-diz*texfld(2))
+               tem(2) = f * (diz*texfld(1)-dix*texfld(3))
+               tem(3) = f * (dix*texfld(2)-diy*texfld(1))
                call torque (i,tem,fix,fiy,fiz,dem)
                iz = zaxis(i)
                ix = xaxis(i)
@@ -234,9 +234,9 @@ c
 c
 c     gradient and virial components from monopole interactions
 c
-               frx = -f * exfld(1) * ci
-               fry = -f * exfld(2) * ci
-               frz = -f * exfld(3) * ci
+               frx = -f * texfld(1) * ci
+               fry = -f * texfld(2) * ci
+               frz = -f * texfld(3) * ci
                dem(1,i) = dem(1,i) + frx
                dem(2,i) = dem(2,i) + fry
                dem(3,i) = dem(3,i) + frz
@@ -306,7 +306,7 @@ c     calculate energy and partitioning over partial charges
 c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
-!$OMP&    x,y,z,f,pchg,exfld,exf,nec,aec)
+!$OMP&    x,y,z,f,pchg,texfld,exf,nec,aec)
 !$OMP    DO reduction(+:exf,nec,aec) schedule(guided)
          do ii = 1, nion
             i = iion(ii)
@@ -315,7 +315,7 @@ c
                yi = y(i)
                zi = z(i)
                ci = pchg(i)
-               phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
+               phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
                e = -f * ci * phi
                exf = exf + e
                nec = nec + 1
@@ -330,7 +330,7 @@ c     calculate energy and partitioning over atomic multipoles
 c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
-!$OMP&    x,y,z,f,rpole,exfld,exf,nem,aem)
+!$OMP&    x,y,z,f,rpole,texfld,exf,nem,aem)
 !$OMP    DO reduction(+:exf,nem,aem) schedule(guided)
          do ii = 1, npole
             i = ipole(ii)
@@ -339,12 +339,12 @@ c
                yi = y(i)
                zi = z(i)
                ci = rpole(1,i)
-               phi = xi*exfld(1) + yi*exfld(2) + zi*exfld(3)
+               phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
                dix = rpole(2,i)
                diy = rpole(3,i)
                diz = rpole(4,i)
-               e = -f * (ci*phi + dix*exfld(1)
-     &                      + diy*exfld(2) + diz*exfld(3))
+               e = -f * (ci*phi + dix*texfld(1)
+     &                      + diy*texfld(2) + diz*texfld(3))
                exf = exf + e
                nem = nem + 1
                aem(i) = aem(i) + e

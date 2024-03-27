@@ -22,6 +22,7 @@ c
       use bath
       use bndstr
       use bound
+      use extfld
       use inform
       use iounit
       use keys
@@ -34,6 +35,7 @@ c
       integer i,next,mode
       integer istep,nstep
       real*8 dt,dtsave
+      real*8 phs
       logical exist
       character*20 keyword
       character*240 record
@@ -276,6 +278,12 @@ c
 c     integrate equations of motion to take a time step
 c
       do istep = 1, nstep
+         if (use_exfld .and. use_exfreq) then
+            phs = sin(exfreq * dble(istep-1) * dt)
+            do i = 1, 3
+               texfld(i) = phs * exfld(i)
+            end do
+         end if
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
          else if (integrate .eq. 'BEEMAN') then
