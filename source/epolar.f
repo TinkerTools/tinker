@@ -594,7 +594,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,f,off2,
-!$OMP& texfld)
+!$OMP& texfld,use_exfld)
 !$OMP& firstprivate(pscale) shared (ep)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
@@ -1568,7 +1568,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,
-!$OMP& texfld)
+!$OMP& texfld,use_exfld)
 !$OMP& firstprivate(pscale) shared (ep)
 !$OMP DO reduction(+:ep) schedule(guided)
 c
