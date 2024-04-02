@@ -1776,7 +1776,7 @@ c
                      end if
                   end do
                   if (nheavy .eq. 0) then
-                     sneck(it) = 1.0
+                     sneck(i) = 1.0d0
                   else
                      sneck(i) = snk(it) * (5.0d0-nheavy)/4.0d0
                   end if

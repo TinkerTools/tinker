@@ -1375,7 +1375,6 @@ c
 c     compute surface area and effective radius for cavity
 c
       exclude = 1.4d0
-      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
       call surface (esurf,aesurf,radcav,asolv,exclude)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
