@@ -90,6 +90,7 @@ c
       real*8 pair,pbtotal
       real*8 probe,areatotal
       real*8 mixsn,neckval
+      real*8 maxbrad
       real*8, allocatable :: roff(:)
       real*8, allocatable :: weight(:)
       real*8, allocatable :: garea(:)
@@ -326,6 +327,7 @@ c
 c     get the Born radii via Grycuk's modified HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
+         maxbrad = 30.0d0
          pi43 = 4.0d0 * third * pi
          do i = 1, n
             rborn(i) = 0.0d0
@@ -389,9 +391,20 @@ c
                   call tanhrsc (soluteint,rsolv(i))
                end if
                sum = sum + soluteint
-               rborn(i) = (sum/pi43)**third
-               if (rborn(i) .le. 0.0d0)  rborn(i) = 0.0001d0
-               rborn(i) = 1.0d0 / rborn(i)
+               rborn(i) = sum
+               if (sum .le. 0.0d0) then
+                  rborn(i) = maxbrad
+               else
+                  rborn(i) = (sum/pi43)**third
+                  rborn(i) = 1.0d0 / rborn(i)
+                  if (rborn(i) .lt. rsolv(i)) then
+                     rborn(i) = rsolv(i)
+                  else if (rborn(i) .gt. maxbrad) then
+                     rborn(i) = maxbrad
+                  else if (rborn(i) .ne. rborn(i)) then
+                     rborn(i) = rsolv(i)
+                  end if
+               end if
             end if
          end do
 c
