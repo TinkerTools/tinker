@@ -394,6 +394,9 @@ c
                rborn(i) = sum
                if (sum .le. 0.0d0) then
                   rborn(i) = maxbrad
+                  write (iout,10)  i,rborn(i)
+   10             format (/,' BORN  --  Warning, Negative Born Integral' 
+     &                    ' at Atom',i6,'; Set Born Radius to', f5.1)
                else
                   rborn(i) = (sum/pi43)**third
                   rborn(i) = 1.0d0 / rborn(i)
@@ -463,8 +466,8 @@ c
          if (debug) then
             call chkpole
             call rotpole ('MPOLE')
-            write (iout,10)
-   10       format (/,' Perfect Self Energy Values :',/)
+            write (iout,20)
+   20       format (/,' Perfect Self Energy Values :',/)
          end if
          do ii = 1, npole
             i = ipole(ii)
@@ -487,16 +490,16 @@ c
                end do
                pbself(i) = pbe
                pbtotal = pbtotal + pbe
-               write (iout,20)  i,pbe
-   20          format (i8,5x,f12.4)
+               write (iout,30)  i,pbe
+   30          format (i8,5x,f12.4)
             end if
          end do
 c
 c     find the perfect permanent pair energy values
 c
          if (debug) then
-            write (iout,30)
-   30       format (/,' Perfect Pair Energy Values :',/)
+            write (iout,40)
+   40       format (/,' Perfect Pair Energy Values :',/)
             do ii = 1, npole
                i = ipole(ii)
                pbpole(1,i) = rpole(1,i)
@@ -518,8 +521,8 @@ c
                   call apbsempole (n,pos,rsolv,pbpole,pbe,
      &                             apbe,pbep,pbfp,pbtp)
                   pair = pbe - pbself(i) - pbself(k)
-                  write (iout,40)  i,k,pair
-   40             format (5x,2i8,f12.4)
+                  write (iout,50)  i,k,pair
+   50             format (5x,2i8,f12.4)
                   pbtotal = pbtotal + pair
                   pbpair(i) = pbpair(i) + 0.5d0 * pair
                   pbpair(k) = pbpair(k) + 0.5d0 * pair
@@ -543,21 +546,21 @@ c
             end do
             call apbsempole (n,pos,rsolv,pbpole,pbe,
      &                       apbe,pbep,pbfp,pbtp)
-            write(iout,50)  pbe
-   50       format (/,' Single PB Calculation :  ',f12.4) 
-            write(iout,60)  pbtotal
-   60       format (' Sum of Self and Pairs :  ',f12.4)
+            write(iout,60)  pbe
+   60       format (/,' Single PB Calculation :  ',f12.4) 
+            write(iout,70)  pbtotal
+   70       format (' Sum of Self and Pairs :  ',f12.4)
          end if
 c
 c     print the perfect self-energies and cross-energies
 c
-         write (iout,70)
-   70    format (/,' Perfect Self-Energies and Cross-Energies :',
+         write (iout,80)
+   80    format (/,' Perfect Self-Energies and Cross-Energies :',
      &           //,' Type',12x,'Atom Name',24x,'Self',7x,'Cross',/)
          do ii = 1, npole
             i = ipole(ii)
-            write (iout,80)  i,name(i),pbself(i),pbpair(i)
-   80       format (' PB-Perfect',2x,i8,'-',a3,17x,2f12.4)
+            write (iout,90)  i,name(i),pbself(i),pbpair(i)
+   90       format (' PB-Perfect',2x,i8,'-',a3,17x,2f12.4)
          end do
       end if
 c
@@ -585,12 +588,12 @@ c
 c     write out the final Born radius value for each atom
 c
       if (debug) then
-         write (iout,90)
-   90    format (/,' Born Radii for Individual Atoms :',/)
+         write (iout,100)
+  100    format (/,' Born Radii for Individual Atoms :',/)
          k = 1
          do while (k .le. n)
-            write (iout,100)  (i,rborn(i),i=k,min(k+4,n))
-  100       format (1x,5(i7,f8.3))
+            write (iout,110)  (i,rborn(i),i=k,min(k+4,n))
+  110       format (1x,5(i7,f8.3))
             k = k + 5
          end do
       end if
