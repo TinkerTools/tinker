@@ -34,7 +34,7 @@ c     move the atomic coordinates into the inertial frame
 c
       call inertia (2)
 c
-c     test maximal coordinate value along each inertial axis
+c     test maximal coordinates for linearity and planarity
 c
       eps = 0.001d0
       symmtyp = 'NONE'
@@ -46,15 +46,17 @@ c
          if (abs(y(i)) .gt. eps)  ynul = .false.
          if (abs(z(i)) .gt. eps)  znul = .false.
       end do
+      if (n .eq. 3)  symmtyp = 'PLANAR'
       if (xnul)  symmtyp = 'PLANAR'
       if (ynul)  symmtyp = 'PLANAR'
       if (znul)  symmtyp = 'PLANAR'
+      if (n .eq. 2)  symmtyp = 'LINEAR'
       if (xnul .and. ynul)  symmtyp = 'LINEAR'
       if (xnul .and. znul)  symmtyp = 'LINEAR'
       if (ynul .and. znul)  symmtyp = 'LINEAR'
-      if (xnul .and. ynul .and. znul)  symmtyp = 'ATOMIC'
+      if (n .eq. 1)  symmtyp = 'SINGLE'
 c
-c     test average coordinate value along each inertial axis
+c     test mean coordinates for mirror plane and inversion
 c
       if (symmtyp .eq. 'NONE') then
          xave = 0.0d0
@@ -72,11 +74,11 @@ c
          if (xave .lt. eps)  nave = nave + 1
          if (yave .lt. eps)  nave = nave + 1
          if (zave .lt. eps)  nave = nave + 1
-         if (nave .ge. 1)  symmtyp = 'MIRROR'
+         if (nave .ne. 0)  symmtyp = 'MIRROR'
          if (nave .eq. 3)  symmtyp = 'INVERT'
       end if
 c
-c     move original coordinates into the current structure
+c     move original coordinates back into current structure
 c
       call getref (1)
       return

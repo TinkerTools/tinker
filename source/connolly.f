@@ -108,8 +108,8 @@ c
 c
 c     dimensions for arrays used by Connolly routines
 c
-      maxcls = 240 * n
-      maxtt = 120 * n
+      maxcls = 320 * n
+      maxtt = 160 * n
       maxt = 8 * n
       maxp = 8 * n
       maxv = 24 * n
@@ -119,7 +119,7 @@ c
       maxeq = 24 * n
       maxfs = 12 * n
       maxcy = 6 * n
-      mxcyeq = 30
+      mxcyeq = 32
       maxfq = 4 * n
       mxfqcy = 10
 c
