@@ -5,21 +5,21 @@ c     ##  COPYRIGHT (C)  2024  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine chksymm  --  check for 1D, 2D & mirror plane  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine chksymm  --  test for 1D, 2D & other symmetry  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "chksymm" examines the current coordinates for linearity,
-c     planarity or an internal mirror plane of symmetry
+c     planarity, an internal mirror plane or center of inversion
 c
 c
       subroutine chksymm (symmtyp)
       use atoms
       implicit none
-      integer i
+      integer i,nave
       real*8 eps
       real*8 xave,yave,zave
       logical xnul,ynul,znul
@@ -68,9 +68,12 @@ c
          xave = abs(xave) / dble(n)
          yave = abs(yave) / dble(n)
          zave = abs(zave) / dble(n)
-         if (xave .lt. eps)  symmtyp = 'MIRROR'
-         if (yave .lt. eps)  symmtyp = 'MIRROR'
-         if (zave .lt. eps)  symmtyp = 'MIRROR'
+         nave = 0
+         if (xave .lt. eps)  nave = nave + 1
+         if (yave .lt. eps)  nave = nave + 1
+         if (zave .lt. eps)  nave = nave + 1
+         if (nave .ge. 1)  symmtyp = 'MIRROR'
+         if (nave .eq. 3)  symmtyp = 'INVERT'
       end if
 c
 c     move original coordinates into the current structure
