@@ -56,7 +56,7 @@ c
       integer nredundant
       integer, allocatable :: listredundant(:)
       real*8 surf,usurf
-      real*8 vol,uvol
+      real*8 vol,uvol,voln
       real*8 reentrant
       real*8 probe,alpha
       real*8 rad(*)
@@ -76,6 +76,11 @@ c
       if (n.le.3 .or. (n.le.50.and.symmtyp.ne.'NONE')) then
          reentrant = 0.0d0
          call connolly (vol,surf,rad,reentrant,probe)
+         vol = vol * weight(1)
+         voln = vol / dble(n)
+         do i = 1, n
+            avol(i) = voln
+         end do
          return
       end if
 c
@@ -198,7 +203,7 @@ c
       integer nredundant
       integer, allocatable :: listredundant(:)
       real*8 surf,usurf
-      real*8 vol,uvol
+      real*8 vol,uvol,voln
       real*8 reentrant
       real*8 probe,alpha
       real*8 rad(*)
@@ -221,9 +226,14 @@ c
       call chksymm (symmtyp)
       if (n.le.3 .or. (n.le.50.and.symmtyp.ne.'NONE')) then
          reentrant = 0.0d0
-         call richmond1 (surf,asurf,dsurf,rad,weight,probe)
          call connolly (vol,surf,rad,reentrant,probe)
          call kundrot1 (rad,probe,dvol)
+         call richmond1 (surf,asurf,dsurf,rad,weight,probe)
+         vol = vol * weight(1)
+         voln = vol / dble(n)
+         do i = 1, n
+            avol(i) = voln
+         end do
          return
       end if
 c

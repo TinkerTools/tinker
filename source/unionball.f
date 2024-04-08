@@ -116,8 +116,8 @@ c
       call chksymm (symmtyp)
       if (n.le.50 .and. symmtyp.ne.'NONE') then
          write (iout,10)  symmtyp
-   10    format (/,' UNIONBALL  --  Warning, May Fail due to ',
-     &              a6,' Symmetry')
+   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
+     &              ' Wiggling Coordinates')
       end if
 c
 c     random coordinate perturbation to avoid numerical issues
