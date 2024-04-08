@@ -34,7 +34,6 @@ c
       use math
       use solute
       implicit none
-      integer i
       real*8 r,intstarti
       real*8 desck,mixsn
       real*8 neckval
@@ -85,7 +84,6 @@ c
       use math
       use solute
       implicit none
-      integer i
       real*8 r,intstarti
       real*8 desck,mixsn
       real*8 neckderi

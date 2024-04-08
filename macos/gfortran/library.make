@@ -3,7 +3,7 @@
 #  ##################################################################
 #  ##                                                              ##
 #  ##  library.make  --  create object library of Tinker routines  ##
-#  ##               (GNU gfortran for MacOS Version)               ##
+#  ##               (GNU gfortran for macOS Version)               ##
 #  ##                                                              ##
 #  ##################################################################
 #
@@ -52,6 +52,7 @@ chgpot.o \
 chgtrn.o \
 chkpole.o \
 chkring.o \
+chksymm.o \
 chkxyz.o \
 cholesky.o \
 chrono.o \
@@ -341,6 +342,7 @@ ktors.o \
 ktorsn.o \
 ktortor.o \
 ktrtor.o \
+kundrot.o \
 kurey.o \
 kurybr.o \
 kvdw.o \
@@ -467,6 +469,7 @@ respa.o \
 restrn.o \
 rgddyn.o \
 rgdstep.o \
+richmond.o \
 rigid.o \
 ring.o \
 rings.o \
@@ -483,6 +486,7 @@ sequen.o \
 server.o \
 setprm.o \
 shakeup.o \
+shapes.o \
 shunt.o \
 sigmoid.o \
 simplex.o \
@@ -514,6 +518,7 @@ torsions.o \
 tortor.o \
 tree.o \
 trimtext.o \
+unionball.o \
 unitcell.o \
 units.o \
 uprior.o \

@@ -43,14 +43,11 @@ c
       external random
 c
 c
-c     get the Cartesian coordinates for the system
+c     set up the structure and values for the computation;
+c     atomic radii can be changed via the keyword mechanism
 c
       call initial
       call getxyz
-c
-c     determine the atoms to be used in computation;
-c     radii can be changed via the keyword mechanism
-c
       call field
       call active
       call katom

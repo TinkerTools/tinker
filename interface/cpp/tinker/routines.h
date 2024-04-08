@@ -119,6 +119,12 @@ void chkpole_();
 void chkring_(int* iring, int* ia, int* ib, int* ic, int* id);
 #define tinker_f_chkring chkring_
 
+// chksymm.f
+void chksymm_(char* symmtyp, tinker_fchar_len_t symmtyp_cap);
+inline void tinker_f_chksymm(tinker_fchars symmtyp) {
+    return chksymm_(symmtyp.string, symmtyp.capacity);
+}
+
 // chkxyz.f
 void chkxyz_(int* clash);
 #define tinker_f_chkxyz chkxyz_
@@ -152,8 +158,6 @@ void connect_();
 // connolly.f
 void connolly_(double* volume, double* area, double* radius, double* probe, double* exclude);
 #define tinker_f_connolly connolly_
-void wiggle_();
-#define tinker_f_wiggle wiggle_
 void nearby_();
 #define tinker_f_nearby nearby_
 void torus_();
@@ -266,6 +270,28 @@ void deflate_(int* n, int* nv, double* a, double* ev, double* vec);
 // delete.f
 void delete_(int* iatom);
 #define tinker_f_delete delete_
+
+// deter.f
+void minor5_(double* crdball, double* radball, int* a, int* b, int* c, int* d, int* e, int* result);
+#define tinker_f_minor5 minor5_
+void deter5_(double* det, double* r11, double* r12, double* r13, double* r14, double* r21, double* r22, double* r23, double* r24, double* r31, double* r32, double* r33, double* r34, double* r41, double* r42, double* r43, double* r44, double* r51, double* r52, double* r53, double* r54, int* isign);
+#define tinker_f_deter5 deter5_
+void minor4_(double* crdball, int* a, int* b, int* c, int* d, int* result);
+#define tinker_f_minor4 minor4_
+void minor4x_(double* crdball, int* a, int* b, int* c, int* d, int* result);
+#define tinker_f_minor4x minor4x_
+void deter4_(double* det, double* r11, double* r12, double* r13, double* r21, double* r22, double* r23, double* r31, double* r32, double* r33, double* r41, double* r42, double* r43, int* isign);
+#define tinker_f_deter4 deter4_
+void minor3_(double* crdball, int* a, int* b, int* c, int* i1, int* i2, int* result);
+#define tinker_f_minor3 minor3_
+void deter3_(double* det, double* r11, double* r12, double* r21, double* r22, double* r31, double* r32, int* isign);
+#define tinker_f_deter3 deter3_
+void minor2_(double* crdball, int* a, int* b, int* ia, int* result);
+#define tinker_f_minor2 minor2_
+void deter2_(double* det, double* r11, double* r12, int* isign);
+#define tinker_f_deter2 deter2_
+double psub_(double* r1, double* r2);
+#define tinker_f_psub psub_
 
 // dexpol.f
 void dexpol_();
@@ -1857,6 +1883,12 @@ void ktorsm_();
 void ktortor_();
 #define tinker_f_ktortor ktortor_
 
+// kundrot.f
+void kundrot1_(double* radius, double* probe, double* dex);
+#define tinker_f_kundrot1 kundrot1_
+void kundrot2_(int* iatom, double* radius, double* probe, double* xhess, double* yhess, double* zhess);
+#define tinker_f_kundrot2 kundrot2_
+
 // kurey.f
 void kurey_();
 #define tinker_f_kurey kurey_
@@ -2270,6 +2302,8 @@ void ranvec_(double* vector);
 #define tinker_f_ranvec ranvec_
 void sphere_(int* ndot, double* dot);
 #define tinker_f_sphere sphere_
+void wiggle_(int* nxyz, double* xyz, double* eps);
+#define tinker_f_wiggle wiggle_
 
 // rattle.f
 void rattle_(double* dt, double* xold, double* yold, double* zold);
@@ -2370,6 +2404,12 @@ void rotrgd_(double* dfi, double* arot);
 #define tinker_f_rotrgd rotrgd_
 void linbody_(int* i, double* inert, double* wcp);
 #define tinker_f_linbody linbody_
+
+// richmond.f
+void richmond_(double* total, double* area, double* radius, double* weight, double* probe);
+#define tinker_f_richmond richmond_
+void richmond1_(double* total, double* area, double* darea, double* radius, double* weight, double* probe);
+#define tinker_f_richmond1 richmond1_
 
 // rings.f
 void rings_();
@@ -2552,9 +2592,9 @@ inline void tinker_f_suffix(tinker_fchars string, tinker_fchars extension, tinke
 }
 
 // surface.f
-void surface_(double* total, double* area, double* radius, double* weight, double* probe);
+void surface_(double* surf, double* asurf, double* rad, double* weight, double* probe);
 #define tinker_f_surface surface_
-void surface1_(double* total, double* area, double* darea, double* radius, double* weight, double* probe);
+void surface1_(double* surf, double* asurf, double* dsurf, double* rad, double* weight, double* probe);
 #define tinker_f_surface1 surface1_
 
 // surfatom.f
@@ -2649,6 +2689,176 @@ inline void tinker_f_lowcase(tinker_fchars string) {
     return lowcase_(string.string, string.capacity);
 }
 
+// unionball.f
+void unionball_(double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol, double* rad, double* weight, double* probe, int* doderiv, int* dovol);
+#define tinker_f_unionball unionball_
+void setunion_(int* nsphere, double* coords, double* radii);
+#define tinker_f_setunion setunion_
+void regular3_(int* nredundant, int* list_redundant);
+#define tinker_f_regular3 regular3_
+void alfcx_(double* alpha, int* nred, int* listred);
+#define tinker_f_alfcx alfcx_
+void readjust_nsphere_(int* nsphere, int* nred, int* listred);
+#define tinker_f_readjust_nsphere readjust_nsphere_
+void ball_surf_(double* coef, double* wsurf, double* surf, double* ballwsurf);
+#define tinker_f_ball_surf ball_surf_
+void ball_vol_(double* coef, double* wsurf, double* wvol, double* surf, double* vol, double* ballwsurf, double* ballwvol);
+#define tinker_f_ball_vol ball_vol_
+void ball_dsurf_(double* coef, double* wsurf, double* surf, double* ballwsurf, double* dsurf_coord);
+#define tinker_f_ball_dsurf ball_dsurf_
+void ball_dvol_(double* coef, double* wsurf, double* wvol, double* surf, double* vol, double* ballwsurf, double* ballwvol, double* dsurf_coord, double* dvol_coord);
+#define tinker_f_ball_dvol ball_dvol_
+void alf_tetra_(double* a, double* b, double* c, double* d, double* ra, double* rb, double* rc, double* rd, int* iflag, double* alpha);
+#define tinker_f_alf_tetra alf_tetra_
+void alf_trig_(double* a, double* b, double* c, double* d, double* e, double* ra, double* rb, double* rc, double* rd, double* re, int* ie, int* irad, int* iattach, double* alpha);
+#define tinker_f_alf_trig alf_trig_
+void alf_edge_(double* a, double* b, double* ra, double* rb, double* cg, int* ncheck, int* listcheck, int* irad, int* iattach, double* alpha);
+#define tinker_f_alf_edge alf_edge_
+void edge_radius_(double* a, double* b, double* ra, double* rb, double* dab, double* sab, double* tab, int* testr, double* alpha);
+#define tinker_f_edge_radius edge_radius_
+void edge_attach_(double* a, double* b, double* c, double* ra, double* rb, double* rc, double* dab, double* sab, double* tab, int* testa);
+#define tinker_f_edge_attach edge_attach_
+void triangle_attach_(double* a, double* b, double* c, double* d, double* ra, double* rb, double* rc, double* rd, double* s, double* t, double* dabc, int* testa);
+#define tinker_f_triangle_attach triangle_attach_
+void triangle_radius_(double* a, double* b, double* c, double* ra, double* rb, double* rc, double* s, double* t, double* dabc, int* testr, double* alpha);
+#define tinker_f_triangle_radius triangle_radius_
+void vertex_attach_(double* a, double* b, double* ra, double* rb, int* testa, int* testb);
+#define tinker_f_vertex_attach vertex_attach_
+void locate_jw_(int* iseed, int* ival, int* tetra_loc, int* iredundant);
+#define tinker_f_locate_jw locate_jw_
+void inside_tetra_jw_(int* p, int* a, int* b, int* c, int* d, int* iorient, int* is_in, int* redundant, int* ifail);
+#define tinker_f_inside_tetra_jw inside_tetra_jw_
+void regular_convex_(int* a, int* b, int* c, int* p, int* o, int* itest_abcp, int* regular, int* convex, int* test_abpo, int* test_bcpo, int* test_capo);
+#define tinker_f_regular_convex regular_convex_
+void missinf_sign_(int* i, int* j, int* k, int* m, int* sign);
+#define tinker_f_missinf_sign missinf_sign_
+void valsort2_(int* a, int* b, int* ia, int* ib, int* iswap);
+#define tinker_f_valsort2 valsort2_
+void valsort3_(int* a, int* b, int* c, int* ia, int* ib, int* ic, int* iswap);
+#define tinker_f_valsort3 valsort3_
+void valsort4_(int* a, int* b, int* c, int* d, int* ia, int* ib, int* ic, int* id, int* iswap);
+#define tinker_f_valsort4 valsort4_
+void valsort5_(int* a, int* b, int* c, int* d, int* e, int* ia, int* ib, int* ic, int* id, int* ie, int* iswap);
+#define tinker_f_valsort5 valsort5_
+void flipjw_(int* tetra_last);
+#define tinker_f_flipjw flipjw_
+void flipjw_1_4_(int* ipoint, int* itetra, int* tetra_last);
+#define tinker_f_flipjw_1_4 flipjw_1_4_
+void define_facet_(int* itetra, int* jtetra, int* idx_o, int* facei, int* facej);
+#define tinker_f_define_facet define_facet_
+void find_tetra_(int* itetra, int* idx_c, int* a, int* b, int* o, int* ifind, int* tetra_loc, int* idx_a, int* idx_b);
+#define tinker_f_find_tetra find_tetra_
+void flipjw_2_3_(int* itetra, int* jtetra, int* vertices, int* facei, int* facej, int* test_abpo, int* test_bcpo, int* test_capo, int* ierr, int* tetra_last);
+#define tinker_f_flipjw_2_3 flipjw_2_3_
+void flipjw_3_2_(int* itetra, int* jtetra, int* ktetra, int* vertices, int* edgei, int* edgej, int* edgek, int* test_bcpo, int* test_acpo, int* ierr, int* tetra_last);
+#define tinker_f_flipjw_3_2 flipjw_3_2_
+void flipjw_4_1_(int* itetra, int* jtetra, int* ktetra, int* ltetra, int* vertices, int* idp, int* jdp, int* kdp, int* ldp, int* test_acpo, int* ierr, int* tetra_last);
+#define tinker_f_flipjw_4_1 flipjw_4_1_
+void remove_inf_();
+#define tinker_f_remove_inf remove_inf_
+void mark_zero_(int* itetra, int* ivertex);
+#define tinker_f_mark_zero mark_zero_
+void peel_(int* ntry);
+#define tinker_f_peel peel_
+void tetra_vol_(double* crdball, int* ia, int* ib, int* ic, int* id, double* vol);
+#define tinker_f_tetra_vol tetra_vol_
+void sort4_sign_(int* list, int* index, int* nswap, int* n);
+#define tinker_f_sort4_sign sort4_sign_
+void reorder_tetra_(int* iflag, int* new, int* list_tetra);
+#define tinker_f_reorder_tetra reorder_tetra_
+void find_edges_(int* nedge, int* edges);
+#define tinker_f_find_edges find_edges_
+void find_all_edges_(int* nedge, int* edges);
+#define tinker_f_find_all_edges find_all_edges_
+void get_coord2_(int* ia, int* ja, double* a, double* b, double* ra, double* rb, double* cg);
+#define tinker_f_get_coord2 get_coord2_
+void get_coord4_(int* ia, int* ja, int* ka, int* la, double* a, double* b, double* c, double* d, double* ra, double* rb, double* rc, double* rd, double* cg);
+#define tinker_f_get_coord4 get_coord4_
+void get_coord5_(int* ia, int* ja, int* ka, int* la, int* ma, double* a, double* b, double* c, double* d, double* e, double* ra, double* rb, double* rc, double* rd, double* re, double* cg);
+#define tinker_f_get_coord5 get_coord5_
+ ran2_(int* idum);
+#define tinker_f_ran2 ran2_
+void resize_tet_();
+#define tinker_f_resize_tet resize_tet_
+void hpsort_three_(double* ra, int* index, int* n);
+#define tinker_f_hpsort_three hpsort_three_
+int comp3_(double* a, double* b);
+#define tinker_f_comp3 comp3_
+void hpsort_two_int_(int* ra, int* n);
+#define tinker_f_hpsort_two_int hpsort_two_int_
+int comp2_(int* a, int* b);
+#define tinker_f_comp2 comp2_
+void distance2_(double* crdball, int* n1, int* n2, double* dist);
+#define tinker_f_distance2 distance2_
+void plane_dist_(double* ra2, double* rb2, double* rab2, double* lambda);
+#define tinker_f_plane_dist plane_dist_
+void twosphere_surf_(double* ra, double* ra2, double* rb, double* rb2, double* rab, double* rab2, double* surfa, double* surfb);
+#define tinker_f_twosphere_surf twosphere_surf_
+void twosphere_vol_(double* ra, double* ra2, double* rb, double* rb2, double* rab, double* rab2, double* surfa, double* surfb, double* vola, double* volb);
+#define tinker_f_twosphere_vol twosphere_vol_
+void threesphere_surf_(double* ra, double* rb, double* rc, double* ra2, double* rb2, double* rc2, double* rab, double* rac, double* rbc, double* rab2, double* rac2, double* rbc2, double* surfa, double* surfb, double* surfc);
+#define tinker_f_threesphere_surf threesphere_surf_
+void threesphere_vol_(double* ra, double* rb, double* rc, double* ra2, double* rb2, double* rc2, double* rab, double* rac, double* rbc, double* rab2, double* rac2, double* rbc2, double* surfa, double* surfb, double* surfc, double* vola, double* volb, double* volc);
+#define tinker_f_threesphere_vol threesphere_vol_
+void triangle_surf_(double* a, double* b, double* c, double* rab, double* rac, double* rbc, double* rab2, double* rac2, double* rbc2, double* ra, double* rb, double* rc, double* ra2, double* rb2, double* rc2, double* surfa, double* surfb, double* surfc);
+#define tinker_f_triangle_surf triangle_surf_
+void triangle_vol_(double* a, double* b, double* c, double* rab, double* rac, double* rbc, double* rab2, double* rac2, double* rbc2, double* ra, double* rb, double* rc, double* ra2, double* rb2, double* rc2, double* surfa, double* surfb, double* surfc, double* vola, double* volb, double* volc);
+#define tinker_f_triangle_vol triangle_vol_
+void tetra_voronoi_(double* ra2, double* rb2, double* rc2, double* rd2, double* rab, double* rac, double* rad, double* rbc, double* rbd, double* rcd, double* rab2, double* rac2, double* rad2, double* rbc2, double* rbd2, double* rcd2, double* cos_ang, double* sin_ang, double* vola, double* volb, double* volc, double* vold);
+#define tinker_f_tetra_voronoi tetra_voronoi_
+void twosphere_dsurf_(double* ra, double* ra2, double* rb, double* rb2, double* rab, double* rab2, double* surfa, double* surfb, double* dsurfa, double* dsurfb, int* option);
+#define tinker_f_twosphere_dsurf twosphere_dsurf_
+void twosphere_dvol_(double* ra, double* ra2, double* rb, double* rb2, double* rab, double* rab2, double* surfa, double* surfb, double* vola, double* volb, double* dsurfa, double* dsurfb, double* dvola, double* dvolb, int* option);
+#define tinker_f_twosphere_dvol twosphere_dvol_
+void threesphere_dsurf_(double* ra, double* rb, double* rc, double* ra2, double* rb2, double* rc2, double* rab, double* rac, double* rbc, double* rab2, double* rac2, double* rbc2, double* surfa, double* surfb, double* surfc, double* dsurfa, double* dsurfb, double* dsurfc, int* option);
+#define tinker_f_threesphere_dsurf threesphere_dsurf_
+void threesphere_dvol_(double* ra, double* rb, double* rc, double* ra2, double* rb2, double* rc2, double* rab, double* rac, double* rbc, double* rab2, double* rac2, double* rbc2, double* surfa, double* surfb, double* surfc, double* vola, double* volb, double* volc, double* dsurfa, double* dsurfb, double* dsurfc, double* dvola, double* dvolb, double* dvolc, int* option);
+#define tinker_f_threesphere_dvol threesphere_dvol_
+void tetra_voronoi_der_(double* ra2, double* rb2, double* rc2, double* rd2, double* rab, double* rac, double* rad, double* rbc, double* rbd, double* rcd, double* rab2, double* rac2, double* rad2, double* rbc2, double* rbd2, double* rcd2, double* cos_ang, double* sin_ang, double* deriv, double* vola, double* volb, double* volc, double* vold, double* dvola, double* dvolb, double* dvolc, double* dvold, int* option);
+#define tinker_f_tetra_voronoi_der tetra_voronoi_der_
+void update_deriv_(double* dsurf, double* dera, double* derb, double* derc, double* coefa, double* coefb, double* coefc, double* coef, int* idx1, int* idx2, int* idx3);
+#define tinker_f_update_deriv update_deriv_
+void tetra_dihed_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* angle, double* cosine, double* sine);
+#define tinker_f_tetra_dihed tetra_dihed_
+void tetra_3dihed_cos_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* cosine);
+#define tinker_f_tetra_3dihed_cos tetra_3dihed_cos_
+void tetra_dihed_der_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* angle, double* cosine, double* sine, double* deriv);
+#define tinker_f_tetra_dihed_der tetra_dihed_der_
+void tetra_dihed_der3_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* angle, double* cosine, double* sine, double* deriv, int* option);
+#define tinker_f_tetra_dihed_der3 tetra_dihed_der3_
+void tetra_3dihed_dcos_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* cosine, double* deriv, int* option);
+#define tinker_f_tetra_3dihed_dcos tetra_3dihed_dcos_
+void truncate_real(x_in,x_out,ndigit)_();
+#define tinker_f_truncate_real(x_in,x_out,ndigit) truncate_real(x_in,x_out,ndigit)_
+void crossvect_(double* u1, double* u2, double* u3);
+#define tinker_f_crossvect crossvect_
+void dotvect_(double* u1, double* u2, double* dot);
+#define tinker_f_dotvect dotvect_
+void normvect_(double* u1, double* norm);
+#define tinker_f_normvect normvect_
+void diffvect_(double* u1, double* u2, double* u3);
+#define tinker_f_diffvect diffvect_
+void minor5_(double* crdball, double* radball, int* a, int* b, int* c, int* d, int* e, int* result);
+#define tinker_f_minor5 minor5_
+void deter5_(double* det, double* r11, double* r12, double* r13, double* r14, double* r21, double* r22, double* r23, double* r24, double* r31, double* r32, double* r33, double* r34, double* r41, double* r42, double* r43, double* r44, double* r51, double* r52, double* r53, double* r54, int* isign);
+#define tinker_f_deter5 deter5_
+void minor4_(double* crdball, int* a, int* b, int* c, int* d, int* result);
+#define tinker_f_minor4 minor4_
+void minor4x_(double* crdball, int* a, int* b, int* c, int* d, int* result);
+#define tinker_f_minor4x minor4x_
+void deter4_(double* det, double* r11, double* r12, double* r13, double* r21, double* r22, double* r23, double* r31, double* r32, double* r33, double* r41, double* r42, double* r43, int* isign);
+#define tinker_f_deter4 deter4_
+void minor3_(double* crdball, int* a, int* b, int* c, int* i1, int* i2, int* result);
+#define tinker_f_minor3 minor3_
+void deter3_(double* det, double* r11, double* r12, double* r21, double* r22, double* r31, double* r32, int* isign);
+#define tinker_f_deter3 deter3_
+void minor2_(double* crdball, int* a, int* b, int* ia, int* result);
+#define tinker_f_minor2 minor2_
+void deter2_(double* det, double* r11, double* r12, int* isign);
+#define tinker_f_deter2 deter2_
+double psub_(double* r1, double* r2);
+#define tinker_f_psub psub_
+
 // unitcell.f
 void unitcell_();
 #define tinker_f_unitcell unitcell_
@@ -2664,12 +2874,10 @@ inline void tinker_f_version(tinker_fchars string, tinker_fchars status) {
 }
 
 // volume.f
-void volume_(double* volume_tot, double* radius, double* exclude);
+void volume_(double* surf, double* vol, double* asurf, double* avol, double* rad, double* weight, double* probe);
 #define tinker_f_volume volume_
-void volume1_(double* radius, double* probe, double* dex);
+void volume1_(double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol, double* rad, double* weight, double* probe);
 #define tinker_f_volume1 volume1_
-void volume2_(int* iatom, double* radius, double* probe, double* xhess, double* yhess, double* zhess);
-#define tinker_f_volume2 volume2_
 
 // xyzatm.f
 void xyzatm_(int* i, int* ia, double* bond, int* ib, double* angle1, int* ic, double* angle2, int* chiral);

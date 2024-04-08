@@ -100,8 +100,10 @@ c
       implicit none
       integer i
       real*8 volume,area
-      real*8 probe,exclude
+      real*8 exclude
+      real*8 probe,eps
       real*8 radius(*)
+      logical dowiggle
 c
 c
 c     dimensions for arrays used by Connolly routines
@@ -189,9 +191,16 @@ c
          end if
       end do
 c
+c     random coordinate perturbation to avoid numerical issues
+c
+      dowiggle = .true.
+      if (dowiggle) then
+         eps = 0.000001d0
+         call wiggle (na,axyz,eps)
+      end if
+c
 c     find the analytical volume and surface area
 c
-      call wiggle
       call nearby
       call torus
       call place
@@ -199,39 +208,6 @@ c
       call saddles
       call contact
       call vam (volume,area)
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine wiggle  --  random perturbation of coordinates  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "wiggle" applies a random perturbation to the atomic coordinates
-c     to avoid numerical instabilities for various linear, planar and
-c     symmetric structures
-c
-c
-      subroutine wiggle
-      use faces
-      implicit none
-      integer i
-      real*8 size
-      real*8 vector(3)
-c
-c
-c     apply a small perturbation to the position of each atom
-c
-      size = 0.000001d0
-      do i = 1, na
-         call ranvec (vector)
-         axyz(1,i) = axyz(1,i) + size*vector(1)
-         axyz(2,i) = axyz(2,i) + size*vector(2)
-         axyz(3,i) = axyz(3,i) + size*vector(3)
-      end do
       return
       end
 c

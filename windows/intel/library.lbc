@@ -41,6 +41,7 @@ chgpot.obj
 chgtrn.obj
 chkpole.obj
 chkring.obj
+chksymm.obj
 chkxyz.obj
 cholesky.obj
 chrono.obj
@@ -330,6 +331,7 @@ ktors.obj
 ktorsn.obj
 ktortor.obj
 ktrtor.obj
+kundrot.obj
 kurey.obj
 kurybr.obj
 kvdw.obj
@@ -456,6 +458,7 @@ respa.obj
 restrn.obj
 rgddyn.obj
 rgdstep.obj
+richmond.obj
 rigid.obj
 ring.obj
 rings.obj
@@ -472,6 +475,7 @@ sequen.obj
 server.obj
 setprm.obj
 shakeup.obj
+shapes.obj
 shunt.obj
 sigmoid.obj
 simplex.obj
@@ -503,6 +507,7 @@ torsions.obj
 tortor.obj
 tree.obj
 trimtext.obj
+unionball.obj
 unitcell.obj
 units.obj
 uprior.obj

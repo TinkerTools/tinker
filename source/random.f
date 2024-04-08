@@ -289,3 +289,35 @@ c
       end do
       return
       end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine wiggle  --  random perturbation of coordinates  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "wiggle" applies a small random perturbation of coordinates
+c     to avoid numerical instability in geometric calculations for
+c     linear, planar and other symmetric structures
+c
+c
+      subroutine wiggle (nxyz,xyz,eps)
+      implicit none
+      integer i,nxyz
+      real*8 eps
+      real*8 vector(3)
+      real*8 xyz(3,*)
+c
+c
+c     apply a small perturbation to the position of each atom
+c
+      do i = 1, nxyz
+         call ranvec (vector)
+         xyz(1,i) = xyz(1,i) + eps*vector(1)
+         xyz(2,i) = xyz(2,i) + eps*vector(2)
+         xyz(3,i) = xyz(3,i) + eps*vector(3)
+      end do
+      return
+      end

@@ -58,6 +58,7 @@ mv TESTHESS.ZIP  testhess.zip
 mv TESTPAIR.ZIP  testpair.zip
 mv TESTPOL.ZIP   testpol.zip
 mv TESTROT.ZIP   testrot.zip
+mv TESTSURF.ZIP  testsurf.zip
 mv TESTVIR.ZIP   testvir.zip
 mv TIMER.ZIP     timer.zip
 mv TIMEROT.ZIP   timerot.zip

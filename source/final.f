@@ -117,6 +117,7 @@ c
       use rigid
       use ring
       use rotbnd
+      use shapes
       use socket
       use solpot
       use solute
@@ -1088,6 +1089,23 @@ c
 c     deallocation of global arrays from module rotbnd
 c
       if (allocated(rot))  deallocate (rot)
+c
+c     deallocation of global arrays from module shapes
+c
+      if (allocated(listnew))  deallocate (listnew)
+      if (allocated(freespace))  deallocate (freespace)
+      if (allocated(killspace))  deallocate (killspace)
+      if (allocated(vinfo))  deallocate (vinfo)
+      if (allocated(tedge))  deallocate (tedge)
+      if (allocated(tinfo))  deallocate (tinfo)
+      if (allocated(tnindex))  deallocate (tnindex)
+      if (allocated(tetra))  deallocate (tetra)
+      if (allocated(tneighbor))  deallocate (tneighbor)
+      if (allocated(linkfacet))  deallocate (linkfacet)
+      if (allocated(linkindex))  deallocate (linkindex)
+      if (allocated(crdball))  deallocate (crdball)
+      if (allocated(radball))  deallocate (radball)
+      if (allocated(wghtball))  deallocate (wghtball)
 c
 c     deallocation of global arrays from module solute
 c

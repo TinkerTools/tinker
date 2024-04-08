@@ -7,8 +7,8 @@
          used to build the Tinker program package on an Intel-based
          Linux system using the Intel Fortran Compiler for Linux. The
          use of the "generic.make" compile script restricts the Intel
-         compiler to SSE3-compatible instructions, and the resulting
-         executables should run on most AMD-based machines.
+         compiler to widely standard instructions, and the resulting
+         executables should run on most Intel and AMD machines.
 
          Building OpenMP parallel executables requires uncommenting
          the two Intel-specific routine calls kmp_set_stacksize_s and

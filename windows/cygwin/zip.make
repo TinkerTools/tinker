@@ -58,6 +58,7 @@ zip testhess.zip testhess.exe
 zip testpair.zip testpair.exe
 zip testpol.zip testpol.exe
 zip testrot.zip testrot.exe
+zip testsurf.zip testsurf.exe
 zip testvir.zip testvir.exe
 zip timer.zip timer.exe
 zip timerot.zip timerot.exe

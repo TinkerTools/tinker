@@ -28,8 +28,8 @@ optimization of crude structures to avoid steric clashes. The valence
 parameters are set to idealized values. The vdw values model sterics
 and hydrogen bonds. Electrostatics are treated via bond dipoles.
 
-Atom type numbers are just ten times the atomic number plus the number
-of attached atoms, thus tetravalent carbon is atom type 64.
+The atom type numbers are just ten times the atomic number plus the
+number of attached atoms, thus tetravalent carbon is atom type 64.
 
 
       #############################

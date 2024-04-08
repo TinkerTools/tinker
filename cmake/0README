@@ -45,3 +45,4 @@
          (3) cmake ../cmake -DTINKER_OPENMM=ON -DOPENMM_DIR=/path/to/openmm
          (4) make -j4    [replace 4 with # of processes to use]
          (5) make install
+

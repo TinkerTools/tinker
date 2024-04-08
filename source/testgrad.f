@@ -612,21 +612,21 @@ c
          if (doanalyt .or. donumer) then
             write (iout,410)
   410       format (/,' Total Gradient Norm and RMS Gradient',
-     &                 ' per Atom :')
+     &                 ' per Atom :',/)
          end if
          if (doanalyt) then
             totnorm = sqrt(totnorm)
             if (digits .ge. 8) then
                write (iout,420)  totnorm
-  420          format (/,' Anlyt',6x,'Total Gradient Norm Value',
+  420          format (' Anlyt',6x,'Total Gradient Norm Value',
      &                    6x,f20.8)
             else if (digits .ge. 6) then
                write (iout,430)  totnorm
-  430          format (/,' Anlyt',6x,'Total Gradient Norm Value',
+  430          format (' Anlyt',6x,'Total Gradient Norm Value',
      &                    6x,f18.6)
             else
                write (iout,440)  totnorm
-  440          format (/,' Anlyt',6x,'Total Gradient Norm Value',
+  440          format (' Anlyt',6x,'Total Gradient Norm Value',
      &                    6x,f16.4)
             end if
          end if
@@ -652,19 +652,23 @@ c
 c
 c     print the rms per atom norm for the analytical gradient
 c
+         if (doanalyt .or. donumer) then
+            write (iout,480)
+  480       format ()
+         end if
          if (doanalyt) then
             rms = totnorm / sqrt(dble(nuse))
             if (digits .ge. 8) then
-               write (iout,480)  rms
-  480          format (/,' Anlyt',6x,'RMS Gradient over All Atoms',
+               write (iout,490)  rms
+  490          format (' Anlyt',6x,'RMS Gradient over All Atoms',
      &                    4x,f20.8)
             else if (digits .ge. 6) then
-               write (iout,490)  rms
-  490          format (/,' Anlyt',6x,'RMS Gradient over All Atoms',
+               write (iout,500)  rms
+  500          format (' Anlyt',6x,'RMS Gradient over All Atoms',
      &                    4x,f18.6)
             else
-               write (iout,500)  rms
-  500          format (/,' Anlyt',6x,'RMS Gradient over All Atoms',
+               write (iout,510)  rms
+  510          format (' Anlyt',6x,'RMS Gradient over All Atoms',
      &                    4x,f16.4)
             end if
          end if
@@ -674,16 +678,16 @@ c
          if (donumer) then
             nrms = ntotnorm / sqrt(dble(nuse))
             if (digits .ge. 8) then
-               write (iout,510)  nrms
-  510          format (' Numer',6x,'RMS Gradient over All Atoms',
-     &                    4x,f20.8)
-            else if (digits .ge. 6) then
                write (iout,520)  nrms
   520          format (' Numer',6x,'RMS Gradient over All Atoms',
-     &                    4x,f18.6)
-            else
+     &                    4x,f20.8)
+            else if (digits .ge. 6) then
                write (iout,530)  nrms
   530          format (' Numer',6x,'RMS Gradient over All Atoms',
+     &                    4x,f18.6)
+            else
+               write (iout,540)  nrms
+  540          format (' Numer',6x,'RMS Gradient over All Atoms',
      &                    4x,f16.4)
             end if
          end if

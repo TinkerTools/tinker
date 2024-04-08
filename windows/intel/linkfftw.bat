@@ -59,6 +59,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testhess.obj tinker.lib l
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testpair.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testpol.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testrot.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testsurf.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testvir.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static timer.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static timerot.obj tinker.lib libfftw-3.3.lib

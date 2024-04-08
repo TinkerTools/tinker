@@ -1352,12 +1352,16 @@ c
       use solpot
       use solute
       implicit none
+      integer i
       real*8 ecav,edisp
-      real*8 exclude,taper
-      real*8 evol,esurf
+      real*8 probe,taper
+      real*8 evol,esurf,etemp
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
+      real*8, allocatable :: aetemp(:)
+      real*8, allocatable :: weight(:)
       character*6 mode
 c
 c
@@ -1371,12 +1375,14 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
+      allocate (aetemp(n))
 c
 c     compute surface area and effective radius for cavity
 c
-      exclude = 1.4d0
-      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
-      call surface (esurf,aesurf,radcav,asolv,exclude)
+      probe = 1.4d0
+      if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
+      call surface (esurf,aesurf,radcav,asolv,probe)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
       reff3 = reff2 * reff
@@ -1386,8 +1392,12 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
-         evol = evol * solvprs
+         allocate (weight(n))
+         do i = 1, n
+            weight(i) = solvprs
+         end do
+         call volume (etemp,evol,aetemp,aevol,radcav,weight,probe)
+         deallocate (weight)
       end if
 c
 c     include a full solvent excluded volume cavity term
@@ -1424,6 +1434,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (aesurf)
+      deallocate (aevol)
+      deallocate (aetemp)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c

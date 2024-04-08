@@ -770,8 +770,7 @@ c
       use resdue
       use sequen
       implicit none
-      integer i,k
-      integer ires,ichn
+      integer i,k,ires
       integer start,stop
       integer cai,ni,ci,si
       logical newchn,endchn

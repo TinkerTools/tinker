@@ -48,7 +48,9 @@
 
       amoebabio  Biopolymer parameters (protein and nucleic acid) for
                  the AMOEBA polarizable atomic multipole force field.
-                 The 2009 and 2018 versions are provided.
+                 The 2009 and 2018 versions are provided. The -HFC23
+                 modification of 2018 parameters from the Varma group
+                 reworks many parameters involving ion interactions.
 
       amoebanuc  Nucleic acid parameter for the AMOEBA polarizable atomic
                  multipole force field. The 2017 version is provided.

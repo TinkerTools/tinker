@@ -323,7 +323,7 @@ c
             drobc(i) = (1.0d0-tsum*tsum) * tchain / rsolv(i)
          end do
 c
-c     get the Born radii via Grycuk's modified HCT method
+c     get the Born radii via Grycuk modified HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
@@ -456,7 +456,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             pbpole(1,i) = 1.0d0
-            call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+            call apbsempole (n,pos,rsolv,pbpole,pbe,
+     &                       apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
             if (debug) then
@@ -878,19 +879,20 @@ c
             end do
          end do
 c
-c     get Born radius chain rule components for Grycuk's HCT method
+c     get Born radius chain rule components for Grycuk HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n
-            ri = max(rsolv(i),rdescr(i)) + descoff
+            ri = rsolv(i)
             if (ri .gt. 0.0d0) then
                xi = x(i)
                yi = y(i)
                zi = z(i)
                term = pi43 / rborn(i)**3.0d0
                term = factor / term**(4.0d0*third)
+               ri = max(rsolv(i),rdescr(i)) + descoff
                if (usetanh) then
                   call tanhrscchr (bornint(i),rsolv(i),tcr)
                   term = term * tcr

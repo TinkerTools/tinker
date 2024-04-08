@@ -18,7 +18,7 @@ c     energy difference over a number of sample states; current
 c     version (incorrectly) considers the charge energy to be
 c     intermolecular in finding the perturbation energies
 c
-c     variables and parameters :
+c     variables and parameters:
 c
 c     nlamb        number of lambda values for energy computation
 c     delta        step size for the perturbation in lambda

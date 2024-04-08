@@ -6,10 +6,9 @@
          This subdirectory contains a set of script files that can be
          used to build the Tinker program package on a macOS system
          using GNU gcc/gfortran compilers under OpenMP parallelization.
-         These scripts have been tested with compiler version 7.1. Earlier
-         versions of the compiler, in particular those before 4.7, do not
-         work correctly due to lack of support for some features of the
-         OpenMP standard.
+         Early versions of the GNU compilers, in particular before 4.7,
+         do not work correctly due to lack of support for some features
+         of the OpenMP standard.
 
          Building reasonably portable executables requires linking with
          static gcc libraries. This can be done via use of versions of

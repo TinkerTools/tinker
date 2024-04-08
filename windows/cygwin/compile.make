@@ -8,8 +8,8 @@
 #  ############################################################
 #
 #
-#  compile all the modules; "sizes" must be first since it is used
-#  to set static array dimensions in many of the other modules
+#  compile all the modules; "sizes" must be first since it
+#  sets static array dimensions in many of the other modules
 #
 #
 gfortran -c -O3 -ffast-math -fopenmp sizes.f
@@ -156,6 +156,7 @@ gfortran -c -O3 -ffast-math -fopenmp rxnfld.f
 gfortran -c -O3 -ffast-math -fopenmp rxnpot.f
 gfortran -c -O3 -ffast-math -fopenmp scales.f
 gfortran -c -O3 -ffast-math -fopenmp sequen.f
+gfortran -c -O3 -ffast-math -fopenmp shapes.f
 gfortran -c -O3 -ffast-math -fopenmp shunt.f
 gfortran -c -O3 -ffast-math -fopenmp socket.f
 gfortran -c -O3 -ffast-math -fopenmp solpot.f
@@ -211,6 +212,7 @@ gfortran -c -O3 -ffast-math -fopenmp calendar.f
 gfortran -c -O3 -ffast-math -fopenmp center.f
 gfortran -c -O3 -ffast-math -fopenmp chkpole.f
 gfortran -c -O3 -ffast-math -fopenmp chkring.f
+gfortran -c -O3 -ffast-math -fopenmp chksymm.f
 gfortran -c -O3 -ffast-math -fopenmp chkxyz.f
 gfortran -c -O3 -ffast-math -fopenmp cholesky.f
 gfortran -c -O3 -ffast-math -fopenmp clock.f
@@ -450,6 +452,7 @@ gfortran -c -O3 -ffast-math -fopenmp kstrbnd.f
 gfortran -c -O3 -ffast-math -fopenmp kstrtor.f
 gfortran -c -O3 -ffast-math -fopenmp ktors.f
 gfortran -c -O3 -ffast-math -fopenmp ktortor.f
+gfortran -c -O3 -ffast-math -fopenmp kundrot.f
 gfortran -c -O3 -ffast-math -fopenmp kurey.f
 gfortran -c -O3 -ffast-math -fopenmp kvdw.f
 gfortran -c -O3 -ffast-math -fopenmp lattice.f
@@ -548,6 +551,7 @@ gfortran -c -O3 -ffast-math -fopenmp readxyz.f
 gfortran -c -O3 -ffast-math -fopenmp replica.f
 gfortran -c -O3 -ffast-math -fopenmp respa.f
 gfortran -c -O3 -ffast-math -fopenmp rgdstep.f
+gfortran -c -O3 -ffast-math -fopenmp richmond.f
 gfortran -c -O3 -ffast-math -fopenmp rings.f
 gfortran -c -O3 -ffast-math -fopenmp rmsfit.f
 gfortran -c -O3 -ffast-math -fopenmp rotlist.f
@@ -579,6 +583,7 @@ gfortran -c -O3 -ffast-math -fopenmp testhess.f
 gfortran -c -O3 -ffast-math -fopenmp testpair.f
 gfortran -c -O3 -ffast-math -fopenmp testpol.f
 gfortran -c -O3 -ffast-math -fopenmp testrot.f
+gfortran -c -O3 -ffast-math -fopenmp testsurf.f
 gfortran -c -O3 -ffast-math -fopenmp testvir.f
 gfortran -c -O3 -ffast-math -fopenmp timer.f
 gfortran -c -O3 -ffast-math -fopenmp timerot.f
@@ -588,6 +593,7 @@ gfortran -c -O3 -ffast-math -fopenmp torque.f
 gfortran -c -O3 -ffast-math -fopenmp torsfit.f
 gfortran -c -O3 -ffast-math -fopenmp torsions.f
 gfortran -c -O3 -ffast-math -fopenmp trimtext.f
+gfortran -c -O3 -ffast-math -fopenmp unionball.f
 gfortran -c -O3 -ffast-math -fopenmp unitcell.f
 gfortran -c -O3 -ffast-math -fopenmp valence.f
 gfortran -c -O3 -ffast-math -fopenmp verlet.f

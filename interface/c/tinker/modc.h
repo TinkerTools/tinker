@@ -143,6 +143,7 @@
 #include "detail/rxnpot.hh"
 #include "detail/scales.hh"
 #include "detail/sequen.hh"
+#include "detail/shapes.hh"
 #include "detail/shunt.hh"
 #include "detail/sizes.hh"
 #include "detail/socket.hh"

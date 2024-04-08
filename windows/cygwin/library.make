@@ -52,6 +52,7 @@ chgpot.o \
 chgtrn.o \
 chkpole.o \
 chkring.o \
+chksymm.o \
 chkxyz.o \
 cholesky.o \
 chrono.o \

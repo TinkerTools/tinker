@@ -433,17 +433,17 @@ atom        376   68    OU    "Uranyl Ion UO2+"              8    15.999    1
 atom        377   29    OS    "GTP O-(POn)2"                 8    15.999    2
 atom        378   54    P     "DiMe Phosphate P"            15    30.974    4
 atom        379   42    O2    "DiMe Phosphate O=P-O"         8    15.999    1
-atom        380   29    OS    "DiMe Phosphate CH3-O"         8    15.999    1
+atom        380   29    OS    "DiMe Phosphate CH3-O"         8    15.999    2
 atom        381   13    CT    "DiMe Phosphate CH3-O"         6    12.011    4
 atom        382   36    HC    "DiMe Phosphate CH3-O"         1     1.008    1
 atom        383   54    P     "Me Phosphate P"              15    30.974    4
 atom        384   42    O2    "Me Phosphate O=PO2"           8    15.999    1
-atom        385   29    OS    "Me Phosphate CH3-O"           8    15.999    1
+atom        385   29    OS    "Me Phosphate CH3-O"           8    15.999    2
 atom        386   13    CT    "Me Phosphate CH3-O"           6    12.011    4
 atom        387   36    HC    "Me Phosphate CH3-O"           1     1.008    1
 atom        388   54    P     "Me MePhosphonate P"          15    30.974    4
 atom        389   42    O2    "Me MePhosphonate O=P-O"       8    15.999    1
-atom        390   29    OS    "Me MePhosphonate CH3-O"       8    15.999    1
+atom        390   29    OS    "Me MePhosphonate CH3-O"       8    15.999    2
 atom        391   13    CT    "Me MePhosphonate CH3-O"       6    12.011    4
 atom        392   36    HC    "Me MePhosphonate CH3-O"       1     1.008    1
 atom        393   13    CT    "Me MePhosphonate CH3-P"       6    12.011    4

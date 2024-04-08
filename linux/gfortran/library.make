@@ -52,6 +52,7 @@ chgpot.o \
 chgtrn.o \
 chkpole.o \
 chkring.o \
+chksymm.o \
 chkxyz.o \
 cholesky.o \
 chrono.o \
@@ -341,6 +342,7 @@ ktors.o \
 ktorsn.o \
 ktortor.o \
 ktrtor.o \
+kundrot.o \
 kurey.o \
 kurybr.o \
 kvdw.o \
@@ -467,6 +469,7 @@ respa.o \
 restrn.o \
 rgddyn.o \
 rgdstep.o \
+richmond.o \
 rigid.o \
 ring.o \
 rings.o \
@@ -514,6 +517,7 @@ torsions.o \
 tortor.o \
 tree.o \
 trimtext.o \
+unionball.o \
 unitcell.o \
 units.o \
 uprior.o \

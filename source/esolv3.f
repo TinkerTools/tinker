@@ -1546,13 +1546,16 @@ c
       implicit none
       integer i
       real*8 ecav,edisp
-      real*8 exclude,taper
-      real*8 evol,esurf,aevol
+      real*8 probe,taper
+      real*8 evol,esurf,etemp
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8 aecav(*)
       real*8 aedisp(*)
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
+      real*8, allocatable :: aetemp(:)
+      real*8, allocatable :: weight(:)
       character*6 mode
 c
 c
@@ -1562,24 +1565,27 @@ c
       evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
-      aevol = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
+      allocate (aetemp(n))
 c
 c     zero out the nonpolar solvation energy partitioning
 c
       do i = 1, n
          aesurf(i) = 0.0d0
+         aevol(i) = 0.0d0
          aecav(i) = 0.0d0
          aedisp(i) = 0.0d0
       end do
 c
 c     compute surface area and effective radius for cavity
 c
-      exclude = 1.4d0
-      call surface (esurf,aesurf,radcav,asolv,exclude)
+      probe = 1.4d0
+      if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
+      call surface (esurf,aesurf,radcav,asolv,probe)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
       reff3 = reff2 * reff
@@ -1589,9 +1595,12 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
-         evol = evol * solvprs
-         aevol = evol / dble(n)
+         allocate (weight(n))
+         do i = 1, n
+            weight(i) = solvprs
+         end do
+         call volume (etemp,evol,aetemp,aevol,radcav,weight,probe)
+         deallocate (weight)
       end if
 c
 c     include a full solvent excluded volume cavity term
@@ -1599,7 +1608,7 @@ c
       if (reff .le. spcut) then
          ecav = evol
          do i = 1, n
-            aecav(i) = aevol
+            aecav(i) = aevol(i)
          end do
 c
 c     include a tapered solvent excluded volume cavity term
@@ -1611,7 +1620,7 @@ c
      &              + c2*reff2 + c1*reff + c0
          ecav = taper * evol
          do i = 1, n
-            aecav(i) = taper * aevol
+            aecav(i) = taper * aevol(i)
          end do
       end if
 c
@@ -1633,13 +1642,15 @@ c
          taper = 1.0d0 - taper
          ecav = ecav + taper*esurf
          do i = 1, n
-            aecav(i) = taper * (aevol+aesurf(i))
+            aecav(i) = taper * (aesurf(i)+aevol(i))
          end do
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (aesurf)
+      deallocate (aevol)
+      deallocate (aetemp)
 c
 c     find the implicit dispersion solvation energy
 c

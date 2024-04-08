@@ -9,8 +9,8 @@ rem  ##                                                         ##
 rem  #############################################################
 rem
 rem
-rem  compile all the modules; "sizes" must be first since it is used
-rem  to set static array dimensions in many of the other modules
+rem  compile all the modules; "sizes" must be first since it
+rem  sets static array dimensions in many of the other modules
 rem
 rem
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sizes.f
@@ -157,6 +157,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp rxnfld.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp rxnpot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp scales.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp sequen.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp shapes.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp shunt.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp socket.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp solpot.f
@@ -212,6 +213,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp calendar.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp center.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chkpole.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chkring.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chksymm.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp chkxyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp cholesky.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp clock.f
@@ -451,6 +453,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kstrbnd.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kstrtor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ktors.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp ktortor.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kundrot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kurey.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp kvdw.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp lattice.f
@@ -549,6 +552,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp readxyz.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp replica.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp respa.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp rgdstep.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp richmond.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp rings.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp rmsfit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp rotlist.f
@@ -580,6 +584,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testhess.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testpair.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testpol.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testrot.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testsurf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testvir.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp timer.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp timerot.f
@@ -589,6 +594,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torque.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torsfit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torsions.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp trimtext.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp unionball.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp unitcell.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp valence.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp verlet.f

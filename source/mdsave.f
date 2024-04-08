@@ -36,7 +36,7 @@ c
       use socket
       use titles
       implicit none
-      integer i,j,ii
+      integer i,j
       integer istep
       integer ixyz,iind
       integer ivel,ifrc

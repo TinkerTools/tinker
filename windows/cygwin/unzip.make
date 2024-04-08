@@ -58,6 +58,7 @@ unzip testhess.zip testhess.exe
 unzip testpair.zip testpair.exe
 unzip testpol.zip testpol.exe
 unzip testrot.zip testrot.exe
+unzip testsurf.zip testsurf.exe
 unzip timer.zip timer.exe
 unzip timerot.zip timerot.exe
 unzip timevir.zip timevir.exe

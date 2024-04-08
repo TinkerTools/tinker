@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.5   February 2023                      ##
+ ##                      Version 8.11.1   February 2024                      ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2024               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -18,9 +18,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.5   February 2023                      ##
+ ##                      Version 8.11.1   February 2024                      ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2024               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -276,9 +276,99 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.5   February 2023                      ##
+ ##                      Version 8.11.1   February 2024                      ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2024               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Alternative Surface Area & Volume Methods
+
+ Number of Atoms :                 642
+ Probe Size :                   1.4000
+
+ Timothy Richmond Accessible Surface Area Method :
+
+ CPU and Wall Times :           0.0709      0.0710
+
+ Total Surface Area :        3180.3168
+
+ Timothy Richmond Surface Area Derivative Method :
+
+ CPU and Wall Times :           0.0725      0.0730
+
+ Total Surface Area :        3180.3168
+
+ Surface Area Derivatives :  (1st Ten Atoms)
+
+       1         -0.0280   -0.5361    0.4212
+       2          0.0000    0.0000    0.0000
+       3          0.0000    0.0000    0.0000
+       4          0.0000    0.0000    0.0000
+       5          0.2696   -1.2397   -3.6199
+       6          0.0000    0.0000    0.0000
+       7          1.1530    0.3285    1.2856
+       8          2.0763   -1.4381   -0.7206
+       9          0.0000    0.0000    0.0000
+      10          0.2713   -1.9165   -1.1919
+
+ Michael Connolly Molecular Area-Volume Method :
+
+ CPU and Wall Times :           0.1049      0.1060
+
+ Total Surface Area :        3180.3167
+
+ Total Excluded Vol :       10275.3181
+
+ Craig Kundrot Excluded Volume Derivative Method :
+
+ CPU and Wall Times :           0.1519      0.1530
+
+ Excluded Volume Derivatives :  (1st Ten Atoms)
+
+       1          0.0056    0.0898   -0.0762
+       2          0.0000    0.0000    0.0000
+       3          0.0000    0.0000    0.0000
+       4          0.0000    0.0000    0.0000
+       5          5.1753    1.4120  -12.7770
+       6          0.0000    0.0000    0.0000
+       7          0.0094    2.0838   -8.3369
+       8          2.1923   -7.6322  -10.6430
+       9          0.0000    0.0000    0.0000
+      10          6.0540   -4.2611   -9.7153
+
+ Patrice Koehl UnionBall Alpha Shape Method :
+
+ CPU and Wall Times :           0.0054      0.0050
+
+ Total Surface Area :        3180.3168
+
+ Total Excluded Vol :       10275.3183
+
+ Surface Area & Volume Derivatives :  (1st Ten Atoms)
+
+       1         -0.0280   -0.5361    0.4212    0.0058    0.0912   -0.0774
+       2          0.0000    0.0000   -0.0000    0.0000   -0.0000   -0.0000
+       3         -0.0000   -0.0000    0.0000   -0.0000   -0.0000    0.0000
+       4          0.0000   -0.0000    0.0000    0.0000   -0.0000    0.0000
+       5          0.2696   -1.2397   -3.6199    5.1755    1.4148  -12.7974
+       6         -0.0000    0.0000   -0.0000   -0.0000    0.0000   -0.0000
+       7          1.1530    0.3285    1.2856    0.0053    2.0817   -8.3273
+       8          2.0763   -1.4381   -0.7206    2.2062   -7.6297  -10.6676
+       9          0.0000   -0.0000   -0.0000    0.0000   -0.0000   -0.0000
+      10          0.2713   -1.9165   -1.1919    6.0554   -4.2584   -9.7010
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                      Version 8.11.1   February 2024                      ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2024               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -394,7 +484,7 @@
      521   4.335    522   3.455    523   0.206    524   0.341    525   0.000
      526   0.034    527   0.051    528   5.886    529   5.669    530   0.000
      531   0.000    532   0.000    533   6.021    534   2.027    535   0.000
-     536   0.889    537   7.343    538   6.474    539   7.567    540   0.000
+     536   0.889    537   7.343    538   6.474    539   7.566    540   0.000
      541   0.000    542   0.000    543   2.713    544   0.000    545   1.128
      546   0.000    547   2.891    548   0.757    549   4.624    550   9.093
      551   9.221    552   7.428    553   2.479    554   0.000    555   0.000
@@ -421,7 +511,7 @@
 
  Convex Faces :         344     Area :      939.791    Volume :      524.811
  Saddle Faces :        1026     Area :     1031.640    Volume :      962.447
- Concave Faces :        684     Area :      528.204    Volume :     1054.488
+ Concave Faces :        684     Area :      528.205    Volume :     1054.488
  Buried Polyhedra :                                    Volume :     3763.353
 
  Spindle Correction :           Area :        3.579    Volume :       -0.661
