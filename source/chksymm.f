@@ -56,7 +56,7 @@ c
       if (ynul .and. znul)  symmtyp = 'LINEAR'
       if (n .eq. 1)  symmtyp = 'SINGLE'
 c
-c     test mean coordinates for mirror plane and inversion
+c     test mean coords for mirror plane and inversion center
 c
       if (symmtyp .eq. 'NONE') then
          xave = 0.0d0
@@ -75,7 +75,7 @@ c
          if (yave .lt. eps)  nave = nave + 1
          if (zave .lt. eps)  nave = nave + 1
          if (nave .ne. 0)  symmtyp = 'MIRROR'
-         if (nave .eq. 3)  symmtyp = 'INVERT'
+         if (nave .eq. 3)  symmtyp = 'CENTER'
       end if
 c
 c     move original coordinates back into current structure

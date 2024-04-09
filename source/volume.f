@@ -119,9 +119,9 @@ c
       alpha = 0.0d0
       call alfcx (alpha,nredundant,listredundant)
 c
-c     adjust number of vertices, if artificially set to four
+c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_nsphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,listredundant)
 c
 c     get the accessible surface area and excluded volume
 c
@@ -274,9 +274,9 @@ c
       alpha = 0.0d0
       call alfcx (alpha,nredundant,listredundant)
 c
-c     adjust number of vertices, if artificially set to four
+c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_nsphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,listredundant)
 c
 c     get the accessible surface area and excluded volume
 c

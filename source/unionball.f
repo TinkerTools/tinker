@@ -143,9 +143,9 @@ c
       alpha = 0.0d0
       call alfcx (alpha,nredundant,listredundant)
 c
-c     adjust number of vertices, if artificially set to four
+c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_nsphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,listredundant)
 c
 c     get surface area and volume, then copy to Tinker arrays
 c
@@ -321,7 +321,7 @@ c
       epsln4 = epsln3 * crdmax
       epsln5 = epsln4 * crdmax
 c
-c     pre-compute all weight value for each of the points
+c     precompute the weight value for each of the points
 c
       do i = 1, npoint
          ival1 = nint(radball(i)*10000.0d0)
@@ -452,7 +452,7 @@ c     with one vertex at "infinite", and (11) collect the remaining
 c     tetrahedra, and define convex hull
 c
 c
-      subroutine regular3 (nredundant,list_redundant)
+      subroutine regular3 (nredundant,listredundant)
       use shapes
       implicit none
       integer i,ival
@@ -464,7 +464,7 @@ c
       integer maxfree,maxkill
       integer maxlink,maxnew
       integer npeel_try
-      integer list_redundant(*)
+      integer listredundant(*)
       save
 c
 c
@@ -506,7 +506,7 @@ c
          end if
       end do
 c
-c     reorder the tetrahedra, so vertices are in increasing order
+c     reorder tetrahedra, so vertices are in increasing order
 c
       iflag = 1
       call reorder_tetra (iflag,nnew,listnew)
@@ -523,13 +523,13 @@ c
          call peel (npeel_try)
       end do
 c
-c     define list of redundant points
+c     define the list of redundant points
 c
       nredundant = 0
       do i = 1, npoint
          if (.not. btest(vinfo(i+4),0)) then
             nredundant = nredundant + 1
-            list_redundant(nredundant) = i
+            listredundant(nredundant) = i
          end if
       end do
 c
@@ -648,16 +648,14 @@ c
                      tinfo(idx) = ibset(tinfo(idx),2+itrig)
                      ntrig = ntrig + 1
                      if (jtetra .ne. 0) then
-                        tinfo(jtetra) = 
-     &                     ibset(tinfo(jtetra),2+jtrig)
+                        tinfo(jtetra) = ibset(tinfo(jtetra),2+jtrig)
                      end if
                      goto 10
                   end if
                   if (jtetra .ne. 0) then
                      if (btest(tinfo(jtetra),7)) then
                         tinfo(idx) = ibset(tinfo(idx),2+itrig)
-                        tinfo(jtetra) =
-     &                     ibset(tinfo(jtetra),2+jtrig)
+                        tinfo(jtetra) = ibset(tinfo(jtetra),2+jtrig)
                         ntrig = ntrig + 1
                         goto 10
                      end if
@@ -687,8 +685,7 @@ c
                      tinfo(idx) = ibset(tinfo(idx),2+itrig)
                      ntrig = ntrig + 1
                      if (jtetra .ne. 0) then
-                        tinfo(jtetra) = 
-     &                     ibset(tinfo(jtetra),2+jtrig)
+                        tinfo(jtetra) = ibset(tinfo(jtetra),2+jtrig)
                      end if
                   end if
                end if
@@ -900,15 +897,17 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "readjust_nsphere" removes any artificial spheres, if present
+c     "readjust_sphere" removes artificial spheres for UnionBall
+c     systems containing fewer than four spheres
 c
 c
-      subroutine readjust_nsphere (nsphere,nred,listred)
+      subroutine readjust_sphere (nsphere,nredundant,listredundant)
       use shapes
       implicit none
       integer i,j
-      integer nsphere,nred
-      integer listred(nred)
+      integer nsphere
+      integer nredundant
+      integer listredundant(*)
       save
 c
 c
@@ -921,10 +920,10 @@ c
          npoint = nsphere
          nvertex = npoint + 4
          j = 0
-         do i = 1, nred
-            if (listred(i) .le. nsphere) then
+         do i = 1, nredundant
+            if (listredundant(i) .le. nsphere) then
                j = j + 1
-               listred(j) = listred(i)
+               listredundant(j) = listredundant(i)
             end if
          end do
       end if
@@ -2850,8 +2849,8 @@ c
 c     "alf_tetra" computes the radius of the sphere orthogonal
 c     to the four spheres that define a tetrahedron
 c
-c     we are interested at how the radius compares to alpha, so the
-c     output is the result of the comparison, not the radius itself
+c     need to know how the radius compares to alpha, so the output
+c     is the result of the comparison, not the radius itself
 c
 c     variables and parameters:
 c
@@ -3008,10 +3007,10 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "alf_trig" checks if a triangle A, B, C belongs to the alpha
-c     complex; it computes the radius of the sphere orthogonal to
-c     the three balls that define the triangle; if this radius is
-c     smaller than alpha the triangle belongs to the alpha complex
+c     "alf_trig" checks if whether a triangle belongs to the alpha
+c     complex; computes the radius of the sphere orthogonal to the
+c     three balls defining the triangle; if this radius is smaller
+c     than alpha the triangle belongs to the alpha complex
 c
 c     also check if the triangle is "attached", i.e., if the fourth
 c     vertex of any of the tetrahedra attached to the triangle is
@@ -9945,7 +9944,7 @@ c
       integer idc1,idc2,idc3
       integer idd1,idd2,idd3
       integer ide1,ide2,ide3
-      real*8 det,psub,t1,t2
+      real*8 det,psub,padd,t1,t2
       real*8 r11,r21,r31,r41,r51
       real*8 r12,r22,r32,r42,r52
       real*8 r13,r23,r33,r43,r53
@@ -9996,37 +9995,37 @@ c
       t2 = r11 * r11
       t1 = psub (t2,t1)
       t2 = r12 * r12
-      t1 = t2 + t1
+      t1 = padd (t2,t1)
       t2 = r13 * r13
-      r14 = t2 + t1
+      r14 = padd (t2,t1)
       t1 = rr2 * rr2
       t2 = r21 * r21
       t1 = psub (t2,t1)
       t2 = r22 * r22
-      t1 = t2 + t1
+      t1 = padd (t2,t1)
       t2 = r23 * r23
-      r24 = t2 + t1
+      r24 = padd (t2,t1)
       t1 = rr3 * rr3
       t2 = r31 * r31
       t1 = psub (t2,t1)
       t2 = r32 * r32
-      t1 = t2 + t1
+      t1 = padd (t2,t1)
       t2 = r33 * r33
-      r34 = t2 + t1
+      r34 = padd (t2,t1)
       t1 = rr4 * rr4
       t2 = r41 * r41
       t1 = psub (t2,t1)
       t2 = r42 * r42
-      t1 = t2 + t1
+      t1 = padd (t2,t1)
       t2 = r43 * r43
-      r44 = t2 + t1
+      r44 = padd (t2,t1)
       t1 = rr5 * rr5
       t2 = r51 * r51
       t1 = psub (t2,t1)
       t2 = r52 * r52
-      t1 = t2 + t1
+      t1 = padd (t2,t1)
       t2 = r53 * r53
-      r54 = t2 + t1
+      r54 = padd (t2,t1)
       result = 1
       call deter5 (det,r11,r12,r13,r14,r21,r22,r23,r24,r31,r32,
      &             r33,r34,r41,r42,r43,r44,r51,r52,r53,r54,isign)
@@ -10309,7 +10308,7 @@ c
      &                   r33,r34,r41,r42,r43,r44,r51,r52,r53,r54,isign)
       implicit none
       integer isign
-      real*8 det,psub
+      real*8 det,psub,padd
       real*8 r11,r21,r31,r41,r51
       real*8 r12,r22,r32,r42,r52
       real*8 r13,r23,r33,r43,r53
@@ -10383,13 +10382,13 @@ c
       t2 = v2 * x2
       t3 = psub (t1,t2)
       t1 = v1 * x1
-      t3 = t3 + t1
+      t3 = padd (t3,t1)
       t1 = u3 * w3
-      t3 = t3 + t1
+      t3 = padd (t3,t1)
       t1 = u2 * w2
       t3 = psub (t3,t1)
       t1 = u1 * w1
-      det = t3 + t1
+      det = padd (t3,t1)
 c
 c     return value based on sign of the determinant
 c
@@ -10615,7 +10614,7 @@ c
      &                   r31,r32,r33,r41,r42,r43,isign)
       implicit none
       integer isign
-      real*8 det,psub
+      real*8 det,psub,padd
       real*8 r11,r21,r31,r41
       real*8 r12,r22,r32,r42
       real*8 r13,r23,r33,r43
@@ -10649,7 +10648,7 @@ c
       t1 = s21 * u2
       t2 = s11 * u1
       t3 = s31 * u3
-      u1 = t2 + t3
+      u1 = padd (t2,t3)
       det = psub (t1,u1)
 c
 c     return value based on sign of the determinant
@@ -10851,9 +10850,9 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "psub" computes the difference between the two input arguments,
-c     and sets the result to zero if absolute or relative difference
-c     is less than the approximate machine precision
+c     "psub" computes the difference of the two input arguments,
+c     and sets the result to zero if the absolute difference or
+c     relative values are less than the machine precision
 c
 c
       function psub (r1,r2)
@@ -10879,5 +10878,44 @@ c
          end if
       end if
       psub = val
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  function padd  --  addition with a precision check  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "padd" computes the sum of the two input arguments, and
+c     sets the result to zero if the absolute sum or relative
+c     values are less than the machine precision
+c
+c
+      function padd (r1,r2)
+      implicit none
+      real*8 padd
+      real*8 r1,r2,eps
+      real*8 val,valmax
+c
+c
+c     get the sum of input values using standard math
+c
+      val = r1 + r2
+c
+c     round small absolute sum or relative value to zero 
+c
+      eps = 1.0d-14
+      if (abs(val) .lt. eps) then
+         val = 0.0d0
+      else
+         valmax = max(abs(r1),abs(r2))
+         if (valmax .ne. 0.0d0) then
+            if (abs(val/valmax) .lt. eps)  val = 0.0d0
+         end if
+      end if
+      padd = val
       return
       end
