@@ -994,10 +994,10 @@ c
 c
 c     initialize result values
 c
-      wsurf = 0
-      surf = 0
+      wsurf = 0.0d0
+      surf = 0.0d0
       do i = 1, nvertex
-         ballwsurf(i) = 0
+         ballwsurf(i) = 0.0d0
       end do
 c
 c     find list of all edges in the alpha complex
@@ -1017,7 +1017,7 @@ c
             end do 
             ilast = ia
          end if
-         coef_edge(i)  = 1
+         coef_edge(i) = 1.0d0
       end do
       do i = ia+1, nvertex
          sparse_row(i) = nedge + 1
@@ -1028,7 +1028,7 @@ c     of the alpha complex, and all edges that start or end at these
 c     vertices are buried
 c
       do i = 1, nvertex
-         coef_vertex(i) = 1
+         coef_vertex(i) = 1.0d0
       end do
 c
 c     contribution of four spheres; use the weighted inclusion-exclusion
@@ -1100,7 +1100,7 @@ c
                end do
                goto 20
    10          continue
-               if (coef_edge(i1) .ne. 0) then
+               if (coef_edge(i1) .ne. 0.0d0) then
                   coef_edge(i1) = coef_edge(i1) - angle(7-iedge)
                end if
    20          continue
@@ -1125,22 +1125,22 @@ c
                      if (ival .eq. 0)  goto 30
                      coefval = 0.5d0 * dble(ival)
                      if (itrig .eq. 1) then
-                        surfa = 0
+                        surfa = 0.0d0
                         call threesphere_surf (rb,rc,rd,rb2,rc2,rd2,
      &                                         rbc,rbd,rcd,rbc2,rbd2,
      &                                         rcd2,surfb,surfc,surfd)
                      else if (itrig .eq. 2) then
-                        surfb = 0
+                        surfb = 0.0d0
                         call threesphere_surf (ra,rc,rd,ra2,rc2,rd2,
      &                                         rac,rad,rcd,rac2,rad2,
      &                                         rcd2,surfa,surfc,surfd)
                      else if (itrig .eq. 3) then
-                        surfc = 0
+                        surfc = 0.0d0
                         call threesphere_surf (ra,rb,rd,ra2,rb2,rd2,
      &                                         rab,rad,rbd,rab2,rad2,
      &                                         rbd2,surfa,surfb,surfd)
                      else if (itrig .eq. 4) then
-                        surfd = 0
+                        surfd = 0.0d0
                         call threesphere_surf (ra,rb,rc,ra2,rb2,rc2,
      &                                         rab,rac,rbc,rab2,rac2,
      &                                         rbc2,surfa,surfb,surfc)
@@ -1187,12 +1187,12 @@ c
                rb2 = rb * rb
                rc2 = rc * rc
                rd2 = rd * rd
-               rab = 0
-               rac = 0
-               rad = 0
-               rbc = 0
-               rbd = 0
-               rcd = 0
+               rab = 0.0d0
+               rac = 0.0d0
+               rad = 0.0d0
+               rbc = 0.0d0
+               rbd = 0.0d0
+               rcd = 0.0d0
 c
 c     check triangles
 c
@@ -1209,10 +1209,10 @@ c
                         ival = 2 - it1 - it2
                         if (ival .eq. 0)  goto 40
                         coefval = 0.5d0 * dble(ival)
-                        surfa = 0
-                        surfb = 0
-                        surfc = 0
-                        surfd = 0
+                        surfa = 0.0d0
+                        surfb = 0.0d0
+                        surfc = 0.0d0
+                        surfd = 0.0d0
                         if (itrig .eq. 1) then
                            call triangle_surf (b,c,d,rbc,rbd,rcd,
      &                                         rbc2,rbd2,rcd2,rb,
@@ -1249,7 +1249,7 @@ c
 c     now add the contribution of two sphere
 c
       do iedge = 1, nedge
-         if (coef_edge(iedge) .ne. 0) then
+         if (coef_edge(iedge) .ne. 0.0d0) then
             ia = edges(1,iedge)
             ib = edges(2,iedge)
             do i = 1, 3
@@ -1280,7 +1280,7 @@ c
 c     vertex is in alpha complex; if its weight is 0 such
 c     that it is buried, then nothing to do
 c
-         if (coef_vertex(i) .eq. 0)  goto 50
+         if (coef_vertex(i) .eq. 0.0d0)  goto 50
          ra = radball(i)
          ballwsurf(i) = ballwsurf(i) + coef_vertex(i)*4.0d0*pi*ra*ra
    50    continue
@@ -1379,13 +1379,13 @@ c
 c
 c     initialize results arrays
 c
-      wsurf = 0
-      wvol = 0
-      surf = 0
-      vol = 0
+      wsurf = 0.0d0
+      wvol = 0.0d0
+      surf = 0.0d0
+      vol = 0.0d0
       do i = 1, nvertex
-         ballwsurf(i) = 0
-         ballwvol(i) = 0
+         ballwsurf(i) = 0.0d0
+         ballwvol(i) = 0.0d0
       end do
 c
 c     find list of all edges in the alpha complex
@@ -1411,10 +1411,10 @@ c
          sparse_row(i) = nedge + 1
       end do
 c
-c     set weight of each vertex to 1
+c     set the weight of each vertex to one
 c
       do i = 1, nvertex
-         coef_vertex(i) = 1
+         coef_vertex(i) = 1.0d0
       end do
 c
 c     contribution of four spheres using the weighted
@@ -1524,29 +1524,29 @@ c
                      coefval = 0.5d0 * dble(ival)
                      ntrig = ntrig + 1
                      if (itrig .eq. 1) then
-                        surfa = 0
-                        vola = 0
+                        surfa = 0.0d0
+                        vola = 0.0d0
                         call threesphere_vol (rb,rc,rd,rb2,rc2,rd2,
      &                                        rbc,rbd,rcd,rbc2,rbd2,
      &                                        rcd2,surfb,surfc,surfd,
      &                                        volb,volc,vold)
                      else if (itrig.eq.2) then
-                        surfb = 0
-                        volb = 0
+                        surfb = 0.0d0
+                        volb = 0.0d0
                         call threesphere_vol (ra,rc,rd,ra2,rc2,rd2,
      &                                        rac,rad,rcd,rac2,rad2,
      &                                        rcd2,surfa,surfc,surfd,
      &                                        vola,volc,vold)
                      else if (itrig .eq. 3) then
-                        surfc = 0
-                        volc = 0
+                        surfc = 0.0d0
+                        volc = 0.0d0
                         call threesphere_vol (ra,rb,rd,ra2,rb2,rd2,
      &                                        rab,rad,rbd,rab2,rad2,
      &                                        rbd2,surfa,surfb,surfd,
      &                                        vola,volb,vold)
                      else if (itrig .eq. 4) then
-                        surfd = 0
-                        vold = 0
+                        surfd = 0.0d0
+                        vold = 0.0d0
                         call threesphere_vol (ra,rb,rc,ra2,rb2,rc2,
      &                                        rab,rac,rbc,rab2,rac2,
      &                                        rbc2,surfa,surfb,surfc,
@@ -1599,12 +1599,12 @@ c
                rb2 = rb * rb
                rc2 = rc * rc
                rd2 = rd * rd
-               rab = 0
-               rac = 0
-               rad = 0
-               rbc = 0
-               rbd = 0
-               rcd = 0
+               rab = 0.0d0
+               rac = 0.0d0
+               rad = 0.0d0
+               rbc = 0.0d0
+               rbd = 0.0d0
+               rcd = 0.0d0
 c
 c     check triangles
 c
@@ -1622,14 +1622,14 @@ c
                         if (ival .eq. 0)  goto 40
                         coefval = 0.5d0 * dble(ival)
                         ntrig = ntrig + 1
-                        surfa = 0
-                        surfb = 0
-                        surfc = 0
-                        surfd = 0
-                        vola = 0
-                        volb = 0
-                        volc = 0
-                        vold = 0
+                        surfa = 0.0d0
+                        surfb = 0.0d0
+                        surfc = 0.0d0
+                        surfd = 0.0d0
+                        vola = 0.0d0
+                        volb = 0.0d0
+                        volc = 0.0d0
+                        vold = 0.0d0
                         if (itrig .eq. 1) then
                            call triangle_vol (b,c,d,rbc,rbd,rcd,rbc2,
      &                                        rbd2,rcd2,rb,rc,rd,rb2,
@@ -1670,7 +1670,7 @@ c
 c     now add contribution of two sphere
 c
       do iedge = 1, nedge
-         if (coef_edge(iedge) .ne. 0) then
+         if (coef_edge(iedge) .ne. 0.0d0) then
             ia = edges(1,iedge)
             ib = edges(2,iedge)
             do i = 1, 3
@@ -1705,7 +1705,7 @@ c
 c     vertex is in alpha complex if its weight is 0 (buried)
 c     in that case there is nothing to do
 c
-         if (coef_vertex(i) .eq. 0)  goto 50
+         if (coef_vertex(i) .eq. 0.0d0)  goto 50
          ra = radball(i)
          surfa = 4.0d0 * pi * ra * ra
          vola = ra * surfa / 3.0d0
@@ -1737,11 +1737,11 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine ball_dsurf  --  find area derivs of spheres  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ball_dsurf  --  find area & derivs of spheres  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "ball_dsurf" computes the weighted surface area of a union
@@ -1815,10 +1815,10 @@ c
 c     initialize some input and result values
 c
       option = 1
-      wsurf = 0
-      surf = 0
+      wsurf = 0.0d0
+      surf = 0.0d0
       do i = 1, nvertex
-         ballwsurf(i) = 0
+         ballwsurf(i) = 0.0d0
       end do
 c
 c     find list of all edges in the alpha complex
@@ -1846,7 +1846,7 @@ c
          call distance2 (crdball,ia,ib,rab2)
          rab = sqrt(rab2)
          edge_dist(i) = rab
-         dsurf_dist(i) = 0
+         dsurf_dist(i) = 0.0d0
       end do
       do i = ia+1, nvertex
          sparse_row(i) = nedge + 1
@@ -1857,7 +1857,7 @@ c     of the alpha complex, and all edges that start or end at these
 c     vertices are buried
 c
       do i = 1, nvertex
-         coef_vertex(i) = 1
+         coef_vertex(i) = 1.0d0
       end do
 c
 c     contribution of four spheres; use weighted inclusion-exclusion
@@ -1945,7 +1945,7 @@ c     weights on each edge, fraction of dihedral angle
 c
             do iedge = 1, 6
                i1 = edge_list(iedge)
-               if (coef_edge(i1) .ne. 0) then
+               if (coef_edge(i1) .ne. 0.0d0) then
                   coef_edge(i1) = coef_edge(i1) - angle(iedge)
                end if
             end do
@@ -2047,10 +2047,10 @@ c
                      ival = 2 - it1 - it2
                      if (ival .eq. 0)  goto 50
                      coefval = 0.5d0 * dble(ival)
-                     surfa = 0
-                     surfb = 0
-                     surfc = 0
-                     surfd = 0
+                     surfa = 0.0d0
+                     surfb = 0.0d0
+                     surfc = 0.0d0
+                     surfd = 0.0d0
                      if (itrig .eq. 1) then
                         rbc = edge_dist(edge_list(4))
                         rbd = edge_dist(edge_list(5))
@@ -2150,7 +2150,7 @@ c
 c     now add contribution of two sphere
 c
       do iedge = 1, nedge
-         if (coef_edge(iedge) .ne. 0) then
+         if (coef_edge(iedge) .ne. 0.0d0) then
             ia = edges(1,iedge)
             ib = edges(2,iedge)
             ra = radball(ia)
@@ -2208,7 +2208,7 @@ c
          end do
       end do
       do iedge = 1, nedge
-         if (dsurf_dist(iedge) .ne. 0) then
+         if (dsurf_dist(iedge) .ne. 0.0d0) then
             ia = edges(1,iedge)
             ib = edges(2,iedge)
             do i = 1, 3
@@ -2235,11 +2235,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ball_dvol  --  find volume derivs of spheres  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ball_dvol  --  find volume & derivs of spheres  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "ball_dvol" computes the weighted surface area of a union of
@@ -2332,13 +2332,13 @@ c
 c     initialize some input and result values
 c
       option = 1
-      wsurf = 0
-      surf = 0
-      wvol = 0
-      vol = 0
+      wsurf = 0.0d0
+      surf = 0.0d0
+      wvol = 0.0d0
+      vol = 0.0d0
       do i = 1, nvertex
-         ballwsurf(i) = 0
-         ballwvol(i) = 0
+         ballwsurf(i) = 0.0d0
+         ballwvol(i) = 0.0d0
       end do
 c
 c     find list of all edges in the alpha complex
@@ -2370,8 +2370,8 @@ c
          edge_dist(i) = rab
          edge_surf(i) = (coef(ia-4)*surfa+coef(ib-4)*surfb) / twopi
          edge_vol(i) = (coef(ia-4)*vola+coef(ib-4)*volb) / twopi
-         dsurf_dist(i) = 0
-         dvol_dist(i)  = 0
+         dsurf_dist(i) = 0.0d0
+         dvol_dist(i)  = 0.0d0
       end do
       do i = ia+1, nvertex
          sparse_row(i) = nedge + 1
@@ -2382,7 +2382,7 @@ c     of the alpha complex, and all edges that start or end at these
 c     vertices are buried
 c
       do i = 1, nvertex
-         coef_vertex(i) = 1
+         coef_vertex(i) = 1.0d0
       end do
 c
 c     contribution of four spheres; use the weighted inclusion-exclusion
@@ -2492,7 +2492,7 @@ c     weights on each edge, fraction of dihedral angle
 c
             do iedge = 1, 6
                i1 = edge_list(iedge)
-               if (coef_edge(i1) .ne. 0) then
+               if (coef_edge(i1) .ne. 0.0d0) then
                   coef_edge(i1) = coef_edge(i1) - angle(iedge)
                end if
             end do
@@ -2596,14 +2596,14 @@ c
                      ival = 2 - it1 - it2
                      if (ival .eq. 0)  goto 50
                      coefval = 0.5d0 * dble(ival)
-                     surfa = 0
-                     surfb = 0
-                     surfc = 0
-                     surfd = 0
-                     vola = 0
-                     volb = 0
-                     volc = 0
-                     vold = 0
+                     surfa = 0.0d0
+                     surfb = 0.0d0
+                     surfc = 0.0d0
+                     surfd = 0.0d0
+                     vola = 0.0d0
+                     volb = 0.0d0
+                     volc = 0.0d0
+                     vold = 0.0d0
                      if (itrig .eq. 1) then
                         rbc = edge_dist(edge_list(4))
                         rbd = edge_dist(edge_list(5))
@@ -2739,7 +2739,7 @@ c
 c     now add contribution of two sphere
 c
       do iedge = 1, nedge
-         if (coef_edge(iedge) .ne. 0) then
+         if (coef_edge(iedge) .ne. 0.0d0) then
             ia = edges(1,iedge)
             ib = edges(2,iedge)
             ra = radball(ia)
@@ -2776,7 +2776,7 @@ c
 c     vertex is in alpha complex if its weight is 0 (buried),
 c     then nothing to do
 c
-         if (coef_vertex(i) .eq. 0)  goto 60
+         if (coef_vertex(i) .eq. 0.0d0)  goto 60
          ra = radball(i)
          surfa = 4.0d0 * pi * ra * ra
          vola  = surfa * ra / 3.0d0
@@ -7819,17 +7819,17 @@ c
       real*8 a(3),b(3),c(3),u(3)
 c
 c
-      if (rab .eq. 0) then
+      if (rab .eq. 0.0d0) then
          call diffvect (a,b,u)
          call normvect (u,rab)
          rab2 = rab * rab
       end if
-      if (rac .eq. 0) then
+      if (rac .eq. 0.0d0) then
          call diffvect (a,c,u)
          call normvect (u,rac)
          rac2 = rac * rac
       end if
-      if (rbc .eq. 0) then
+      if (rbc .eq. 0.0d0) then
          call diffvect (b,c,u)
          call normvect (u,rbc)
          rbc2 = rbc * rbc
@@ -7864,17 +7864,17 @@ c
       real*8 a(3),b(3),c(3),u(3)
 c
 c
-      if (rab .eq. 0) then
+      if (rab .eq. 0.0d0) then
          call diffvect (a,b,u)
          call normvect (u,rab)
          rab2 = rab * rab
       end if
-      if (rac .eq. 0) then
+      if (rac .eq. 0.0d0) then
          call diffvect (a,c,u)
          call normvect (u,rac)
          rac2 = rac * rac
       end if
-      if (rbc .eq. 0) then
+      if (rbc .eq. 0.0d0) then
          call diffvect (b,c,u)
          call normvect (u,rbc)
          rbc2 = rbc * rbc
