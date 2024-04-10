@@ -114,7 +114,7 @@ c     test for small symmetrical system where UnionBall may fail
 c
       symmtyp = 'NONE'
       call chksymm (symmtyp)
-      if (n.le.50 .and. symmtyp.ne.'NONE') then
+      if (n.le.65 .and. symmtyp.ne.'NONE') then
          write (iout,10)  symmtyp
    10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
      &              ' Wiggling Coordinates')
@@ -123,7 +123,7 @@ c
 c     random coordinate perturbation to avoid numerical issues
 c
       dowiggle = .false.
-      if (n.le.50 .and. symmtyp.ne.'NONE')  dowiggle = .true.
+      if (n.le.65 .and. symmtyp.ne.'NONE')  dowiggle = .true.
       if (dowiggle) then
          eps = 0.001d0
          call wiggle (n,coords,eps)
@@ -3479,10 +3479,10 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "triangle_attach" tests whether a point "d" is inside the
-c     circumsphere defined by three other points "a", "b" and "c"
+c     "triangle_attach" tests whether a point D is inside the
+c     circumsphere defined by three other points A, B and C
 c
-c     as input three points a,b,c that form the triangles; the code
+c     as input three points A,B,C that form the triangles; the code
 c     needs as input the following determinants:
 c
 c     s(i,j) = Minor(a,b,c,i,j,0) = det | a(i) a(j) 1 |
@@ -4797,9 +4797,9 @@ c     #################################################################
 c
 c
 c     "missinf_sign" takes as input the indices of three infinite
-c     points between 1 and 4), then finds the index of the missing
-c     infinite point, and gives the signature of the permutation
-c     required to put the three infinite points in order
+c     points, then finds the index of the missing fourth infinite
+c     point, and gives the signature of the permutation required
+c     to put the three infinite points in order
 c
 c     variables and parameters:
 c
@@ -4847,7 +4847,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "valsort2" sorts numbers a and b, where input values are
+c     "valsort2" sorts numbers A and B, where input values are
 c     kept unaffected, and new output values are generated
 c
 c
@@ -4879,7 +4879,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "valsort3" sorts numbers a, b and c, where input values
+c     "valsort3" sorts numbers A, B and C, where input values
 c     are kept unaffected, and new output values are generated
 c
 c
@@ -4916,7 +4916,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "valsort4" sorts numbers a, b, c and d, where input values
+c     "valsort4" sorts numbers A, B, C and D, where input values
 c     are kept unaffected, and new output values are generated
 c
 c
@@ -4959,7 +4959,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "valsort5" sorts numbers a, b, c, d and e, where input values
+c     "valsort5" sorts numbers A, B, C, D and E, where input values
 c     are kept unaffected, and new output values are generated
 c
 c
@@ -6298,7 +6298,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "remove_inf" sets the status to 0 for tetrahedra that
+c     "remove_inf" sets the status to zero for tetrahedra that
 c     contain infinite points
 c
 c
@@ -6341,7 +6341,7 @@ c
 c
 c     "mark_zero" marks the tetrahedron that touches a tetrahedron
 c     with infinite point as part of the convex hull (i.e., one of
-c     its neighbors is 0)
+c     its neighbors is zero)
 c
 c
       subroutine mark_zero (itetra,ivertex)
@@ -7133,59 +7133,6 @@ c
       c(4) = c(1)*c(1) + c(2)*c(2) + c(3)*c(3) - rc*rc
       d(4) = d(1)*d(1) + d(2)*d(2) + d(3)*d(3) - rd*rd
       e(4) = e(1)*e(1) + e(2)*e(2) + e(3)*e(3) - re*re
-      return
-      end
-c
-c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  function ran2  --  generate a uniform random number  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "ran2" is a portable random number generator adapted from
-c     the version in W. H. Press, et al., "Numerical Recipes"
-c
-c     returns a uniform random deviate between 0.0 and 1.0,
-c     set idum to any negative value to initialize the sequence
-c
-c
-      function ran2 (idum)
-      use iounit
-      implicit none
-      integer m,ia,ic
-      real rm
-      parameter (m=714025)
-      parameter (ia=1366)
-      parameter (ic=150889)
-      parameter (rm=1.0/m)
-      integer j,iy,iff,idum
-      integer ir(97)
-      real ran2
-      data iff / 0 /
-      save iy,ir
-c
-c
-      if (idum.lt.0 .or. iff.eq.0) then
-         iff = 1
-         idum = mod(ic-idum,m)
-         do j = 1, 97
-            idum = mod(ia*idum+ic,m)
-            ir(j) = idum
-         end do
-         idum = mod(ia*idum+ic,m)
-         iy = idum
-      end if
-      j = 1 + (97*iy)/m
-      if (j.gt.97 .or. j.lt.1) then
-         write (iout,10)
-   10    format (/,' RAN2  --  Error During Random Number Generation')
-         call fatal
-      end if
-      iy = ir(j)
-      ran2 = iy * rm
-      ir(j) = idum
       return
       end
 c
@@ -9386,7 +9333,7 @@ c                                        M(j,j)     M(i,i)
 c
       do i = 1, 6
          do j = 1, 4
-            dminori(j,i) = 0
+            dminori(j,i) = 0.0d0
          end do
       end do
       dminori(1,4) = -val234 - 2.0d0*r24sq
@@ -9615,7 +9562,7 @@ c                                        M(j,j)     M(i,i)
 c
       do i = 1, 3
          do j = 1, 4
-            dminori(j,i) = 0
+            dminori(j,i) = 0.0d0
          end do
       end do
       dminori(1,3) = -val234 - 2.0d0*r24sq
@@ -10843,45 +10790,6 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  function psub  --  subtraction with a precision check  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "psub" computes the difference of the two input arguments,
-c     and sets the result to zero if the absolute difference or
-c     relative values are less than the machine precision
-c
-c
-      function psub (r1,r2)
-      implicit none
-      real*8 psub
-      real*8 r1,r2,eps
-      real*8 val,valmax
-c
-c
-c     get difference of input values using standard math
-c
-      val = r1 - r2
-c
-c     round small absolute or relative difference to zero 
-c
-      eps = 1.0d-14
-      if (abs(val) .lt. eps) then
-         val = 0.0d0
-      else
-         valmax = max(abs(r1),abs(r2))
-         if (valmax .ne. 0.0d0) then
-            if (abs(val/valmax) .lt. eps)  val = 0.0d0
-         end if
-      end if
-      psub = val
-      return
-      end
-c
-c
 c     ##########################################################
 c     ##                                                      ##
 c     ##  function padd  --  addition with a precision check  ##
@@ -10917,5 +10825,44 @@ c
          end if
       end if
       padd = val
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  function psub  --  subtraction with a precision check  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "psub" computes the difference of the two input arguments,
+c     and sets the result to zero if the absolute difference or
+c     relative values are less than the machine precision
+c
+c
+      function psub (r1,r2)
+      implicit none
+      real*8 psub
+      real*8 r1,r2,eps
+      real*8 val,valmax
+c
+c
+c     get difference of input values using standard math
+c
+      val = r1 - r2
+c
+c     round small absolute or relative difference to zero 
+c
+      eps = 1.0d-14
+      if (abs(val) .lt. eps) then
+         val = 0.0d0
+      else
+         valmax = max(abs(r1),abs(r2))
+         if (valmax .ne. 0.0d0) then
+            if (abs(val/valmax) .lt. eps)  val = 0.0d0
+         end if
+      end if
+      psub = val
       return
       end
