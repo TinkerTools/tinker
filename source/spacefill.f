@@ -31,9 +31,9 @@ c
       integer i,ixyz,next
       integer mode,frame
       integer freeunit
-      real*8 volume,area
+      real*8 area,volume
+      real*8 exclude,reentrant
       real*8 random,value
-      real*8 probe,exclude
       real*8, allocatable :: radius(:)
       logical exist,query
       character*1 answer
@@ -84,8 +84,8 @@ c
 c     set the excluded/accessible and contact/reentrant probes
 c
       value = 0.0d0
-      probe = 0.0d0
       exclude = 0.0d0
+      reentrant = 0.0d0
       if (mode.eq.2 .or. mode.eq.3) then
          query = .true.
          call nextarg (string,exist)
@@ -103,7 +103,7 @@ c
          end if
          if (value .eq. 0.0d0)  value = 1.4d0
          if (mode .eq. 2)  exclude = value
-         if (mode .eq. 3)  probe = value
+         if (mode .eq. 3)  reentrant = value
       end if
 c
 c     decide whether to include hydrogens in the calculation
@@ -180,7 +180,7 @@ c
 c
 c     use the Connolly routines to find the area and volume
 c
-         call connolly (volume,area,radius,probe,exclude)
+         call connolly (n,x,y,z,radius,exclude,reentrant,area,volume)
 c
 c     print out the values of the total surface area and volume
 c

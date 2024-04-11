@@ -66,8 +66,8 @@ c
 c     use Richmond method for small symmetric structures
 c
       call chksymm (symmtyp)
-      if (n.le.3 .or. (n.le.50.and.symmtyp.ne.'NONE')) then
-         call richmond (surf,asurf,rad,weight,probe)
+      if (n.le.65 .and. symmtyp.ne.'NONE') then
+         call richmond (n,x,y,z,rad,weight,probe,surf,asurf)
          return
       end if
 c
@@ -195,8 +195,8 @@ c
 c     use Richmond method for small symmetric structures
 c
       call chksymm (symmtyp)
-      if (n.le.3 .or. (n.le.50.and.symmtyp.ne.'NONE')) then
-         call richmond1 (surf,asurf,dsurf,rad,weight,probe)
+      if (n.le.65 .and. symmtyp.ne.'NONE') then
+         call richmond1 (n,x,y,z,rad,weight,probe,surf,asurf,dsurf)
          return
       end if
 c

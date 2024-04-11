@@ -29,20 +29,23 @@ c     Protein Science, 1, 227-235 (1992)
 c
 c     variables and parameters:
 c
+c     n        total number of atoms in the current system
+c     x        current x-coordinate for each atom in the system
+c     y        current y-coordinate for each atom in the system
+c     z        current z-coordinate for each atom in the system
+c     rad      radius value in Angstroms for each sphere
+c     weight   weight value for each sphere in the system
+c     probe    radius value in Angstroms of the probe sphere
 c     total    total surface area of the whole structure
 c     area     accessible surface area of each atom
-c     radius   radii of the individual atoms
-c     weight   weight assigned to each atom's area; if set to
-c                1.0, return is actual area in square Angstroms
-c     probe    radius of the probe sphere
+c
 c     delta    tolerance used in the tests for sphere overlaps
 c                and for colinearity
 c     rmove    connectivity errors can usually be avoided if the
 c                offending atom is shifted by this small amount
 c
 c
-      subroutine richmond (total,area,radius,weight,probe)
-      use atoms
+      subroutine richmond (n,x,y,z,rad,weight,probe,total,area)
       use inform
       use iounit
       use math
@@ -50,7 +53,7 @@ c
       implicit none
       integer maxarc
       parameter (maxarc=1000)
-      integer i,j,k,l,m
+      integer i,j,k,l,m,n
       integer ii,ib,jb
       integer io,ir
       integer mi,ni,narc
@@ -85,9 +88,12 @@ c
       real*8 pix2,pix4,pid2
       real*8 therk,dk,gk
       real*8 risqk,rik
-      real*8 area(*)
-      real*8 radius(*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      real*8 rad(*)
       real*8 weight(*)
+      real*8 area(*)
       real*8 ri(maxarc),risq(maxarc)
       real*8 bsq(maxarc),bsq1(maxarc)
       real*8 dsq(maxarc),dsq1(maxarc)
@@ -116,7 +122,7 @@ c
       total = 0.0d0
       do i = 1, n
          area(i) = 0.0d0
-         r(i) = radius(i)
+         r(i) = rad(i)
          if (r(i) .ne. 0.0d0)  r(i) = r(i) + probe
       end do
 c
@@ -603,22 +609,26 @@ c     Protein Science, 1, 227-235 (1992)
 c
 c     variables and parameters:
 c
+c     n        total number of atoms in the current system
+c     x        current x-coordinate for each atom in the system
+c     y        current y-coordinate for each atom in the system
+c     z        current z-coordinate for each atom in the system
+c     rad      radius value in Angstroms for each sphere
+c     weight   weight value for each sphere in the system
+c     probe    radius value in Angstroms of the probe sphere
 c     total    total surface area of the whole structure
 c     area     accessible surface area of each atom
 c     darea    x,y,z components of the gradient of the area of
 c                the molecule with respect to atomic coordinates
-c     radius   radii of the individual atoms
-c     weight   weight assigned to each atom's area; if set to
-c                1.0, return is actual area in square Angstroms
-c     probe    radius of the probe sphere
+c
 c     delta    tolerance used in the tests for sphere overlaps
 c                and for colinearity
 c     rmove    connectivity errors can usually be avoided if the
 c                offending atom is shifted by this small amount
 c
 c
-      subroutine richmond1 (total,area,darea,radius,weight,probe)
-      use atoms
+      subroutine richmond1 (n,x,y,z,rad,weight,probe,
+     &                         total,area,darea)
       use inform
       use iounit
       use math
@@ -626,7 +636,7 @@ c
       implicit none
       integer maxarc
       parameter (maxarc=1000)
-      integer i,j,k,l,m
+      integer i,j,k,l,m,n
       integer ii,ib,jb
       integer in,io,ir
       integer mi,ni,narc
@@ -672,9 +682,12 @@ c
       real*8 risqk,rik,risql
       real*8 faca,facb,facc
       real*8 gaca,gacb
-      real*8 area(*)
-      real*8 radius(*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      real*8 rad(*)
       real*8 weight(*)
+      real*8 area(*)
       real*8 darea(3,*)
       real*8 ri(maxarc),risq(maxarc)
       real*8 bsq(maxarc),bsq1(maxarc)
@@ -707,7 +720,7 @@ c
          darea(1,i) = 0.0d0
          darea(2,i) = 0.0d0
          darea(3,i) = 0.0d0
-         r(i) = radius(i)
+         r(i) = rad(i)
          if (r(i) .ne. 0.0d0)  r(i) = r(i) + probe
       end do
 c

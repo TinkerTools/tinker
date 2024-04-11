@@ -14,7 +14,7 @@ c     ###############################################################
 c
 c
 c     "unionball" computes the surface area and volume of a union of
-c     balls via the analytical inclusion-exclusion method of Herbert
+c     spheres via the analytical inclusion-exclusion method of Herbert
 c     Edelsbrunner based on alpha shapes, also finds derivatives of
 c     surface area and volume with respect to Cartesian coordinates
 c
@@ -37,42 +37,39 @@ c     973-985 (2023)
 c 
 c     variables and parameters:
 c
-c     nsphere    number of spheres/balls in the system
-c     coord      coordinates of the center of each sphere
-c     rad        radius value for each sphere
-c     weight     weight value for each sphere
-c     probe      radius value of the probe sphere
-c     doderiv    logical set true to compute derivatives over
-c                  coordinates, or false for no derivatives
-c     dovol      logical set true for surface area and volume,
-c                  or false for surface area only
+c     n         total number of spheres in the current system
+c     x         current x-coordinate for each sphere in the system
+c     y         current y-coordinate for each sphere in the system
+c     z         current z-coordinate for each sphere in the system
+c     rad       radius value in Angstroms for each sphere
+c     weight    weight value for each sphere in the system
+c     probe     radius value in Angstroms of the probe sphere
+c     doderiv   logical flag to find derivatives over coordinates
+c     dovol     logical flag to compute the excluded volume
+c     surf      weighted surface area of union of spheres
+c     vol       weighted volume of the union of spheres
+c     asurf     weighted contribution of each sphere to the area
+c     avol      weighted contribution of each ball to the volume
+c     dsurf     derivatives of weighted surface area over coordinates
+c     dvol      derivatives of weighted volume over coordinates
+c     usurf     unweighted surface area of union of spheres
+c     uvol      unweighted volume of the union of spheres
 c
-c     surf       weighted surface area of union of spheres
-c     vol        weighted volume of the union of balls
-c     usurf      unweighted surface area of union of spheres
-c     uvol       unweighted volume of the union of balls
-c     asurf      weighted contribution of each sphere to the
-c                  total surface area
-c     avol       weighted contribution of each ball to the
-c                  total volume
-c     dsurf      derivatives of the weighted surface area over
-c                  coordinates of the sphere centers
-c     dvol       derivatives of the weighted volume area over
-c                  coordinates of the sphere centers
-c
-c
-      subroutine unionball (surf,vol,asurf,avol,dsurf,dvol,
-     &                      rad,weight,probe,doderiv,dovol)
-      use atoms
+c     
+      subroutine unionball (n,x,y,z,rad,weight,probe,doderiv,dovol,
+     &                         surf,vol,asurf,avol,dsurf,dvol)
       use iounit
       implicit none
-      integer i,nsphere
+      integer i,n,nsphere
       integer nsize,nfudge
       integer nredundant
       integer, allocatable :: listredundant(:)                                 
       real*8 surf,usurf
       real*8 vol,uvol
       real*8 probe,alpha,eps
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
       real*8 rad(*)
       real*8 weight(*)
       real*8 asurf(*)

@@ -24,15 +24,14 @@ c     of Molecular Conformation and Their Use in Energy Minimization",
 c     Journal of Computational Chemistry, 12, 402-409 (1991)
 c
 c
-      subroutine kundrot1 (radius,probe,dex)
-      use atoms
+      subroutine kundrot1 (n,x,y,z,rad,probe,dex)
       use iounit
       use math
       implicit none
       integer maxcube,maxarc
       parameter (maxcube=30)
       parameter (maxarc=1000)
-      integer i,j,k,m
+      integer i,j,k,m,n
       integer io,ir,in
       integer narc,nx,ny,nz
       integer istart,istop
@@ -43,6 +42,7 @@ c
       integer inov(maxarc)
       integer, allocatable :: itab(:)
       integer cube(2,maxcube,maxcube,maxcube)
+      real*8 xr,yr,zr
       real*8 xmin,ymin,zmin
       real*8 xmax,ymax,zmax
       real*8 aa,bb,temp,phi_term
@@ -61,7 +61,6 @@ c
       real*8 rsec2r,rsecr
       real*8 rr,rrx2,rrsq
       real*8 rmax,edge
-      real*8 xr,yr,zr
       real*8 dist2,vdwsum
       real*8 probe,zstep
       real*8 arci(maxarc)
@@ -70,8 +69,11 @@ c
       real*8 dy(maxarc)
       real*8 dsq(maxarc)
       real*8 d(maxarc)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      real*8 rad(*)
       real*8, allocatable :: volrad(:)
-      real*8 radius(*)
       real*8 dex(3,*)
       logical, allocatable :: skip(:)
 c
@@ -105,7 +107,7 @@ c     the radii are incremented by the size of the probe;
 c     then get the maximum and minimum ranges of atoms
 c
       do i = 1, n
-         volrad(i) = radius(i)
+         volrad(i) = rad(i)
          if (volrad(i) .eq. 0.0d0) then
             skip(i) = .true.
          else
@@ -495,14 +497,13 @@ c     of Molecular Conformation and Their Use in Energy Minimization",
 c     Journal of Computational Chemistry, 12, 402-409 (1991)
 c
 c
-      subroutine kundrot2 (iatom,radius,probe,xhess,yhess,zhess)
-      use atoms
+      subroutine kundrot2 (iatom,n,x,y,z,rad,probe,xhess,yhess,zhess)
       use iounit
       use math
       implicit none
       integer maxarc
       parameter (maxarc=1000)
-      integer i,j,k,m
+      integer i,j,k,m,n
       integer in,iaa,ibb
       integer iatom,narc
       integer iblock,itemp
@@ -511,7 +512,8 @@ c
       integer inear(maxarc)
       integer arciatom(maxarc)
       integer arcfatom(maxarc)
-      real*8 probe,zstep,xr,yr,zr
+      real*8 xr,yr,zr
+      real*8 probe,zstep
       real*8 ztop,ztopshave,zstart
       real*8 aa,bb,temp,tempf
       real*8 phi1,phi2,phiold
@@ -542,7 +544,10 @@ c
       real*8 dy(maxarc)
       real*8 dsq(maxarc)
       real*8 d(maxarc)
-      real*8 radius(*)
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      real*8 rad(*)
       real*8, allocatable :: volrad(:)
       real*8 xhess(3,*)
       real*8 yhess(3,*)
@@ -566,7 +571,7 @@ c
             zhess(j,i) = 0.0d0
          end do
       end do
-      if (radius(iatom) .eq. 0.0d0)  return
+      if (rad(iatom) .eq. 0.0d0)  return
       pix2 = 2.0d0 * pi
 c
 c     perform dynamic allocation of some local arrays
@@ -577,7 +582,7 @@ c     assign van der Waals radii to the atoms; note that
 c     the radii are incremented by the size of the probe
 c
       do i = 1, n
-         volrad(i) = radius(i)
+         volrad(i) = rad(i)
          if (volrad(i) .ne. 0.0d0)  volrad(i) = volrad(i) + probe
       end do
 c

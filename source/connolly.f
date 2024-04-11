@@ -94,15 +94,18 @@ c     fqa     atom number of convex face
 c     fqcy    convex face cycle numbers
 c
 c
-      subroutine connolly (volume,area,radius,probe,exclude)
-      use atoms
+      subroutine connolly (n,x,y,z,rad,exclude,reentrant,area,volume)
       use faces
       implicit none
-      integer i
-      real*8 volume,area
+      integer i,n
+      real*8 area,volume
       real*8 exclude
-      real*8 probe,eps
-      real*8 radius(*)
+      real*8 reentrant
+      real*8 eps
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      real*8 rad(*)
       logical dowiggle
 c
 c
@@ -170,19 +173,19 @@ c
       if (.not. allocated(fqncy))  allocate (fqncy(maxfq))
       if (.not. allocated(fqcy))  allocate (fqcy(mxfqcy,maxfq))
 c
-c     set the probe radius and the number of atoms
+c     set the number of atoms and reentrant probe radius 
 c
-      pr = probe
       na = n
+      pr = reentrant
 c
 c     set atom coordinates and radii, the excluded buffer
-c     radius ("exclude") is added to atomic radii
+c     probe radius ("exclude") is added to atomic radii
 c
       do i = 1, na
          axyz(1,i) = x(i)
          axyz(2,i) = y(i)
          axyz(3,i) = z(i)
-         ar(i) = radius(i)
+         ar(i) = rad(i)
          if (ar(i) .eq. 0.0d0) then
             skip(i) = .true.
          else
@@ -199,7 +202,7 @@ c
          call wiggle (na,axyz,eps)
       end if
 c
-c     find the analytical volume and surface area
+c     find the analytical surface area and volume
 c
       call nearby
       call torus
@@ -207,7 +210,7 @@ c
       call compress
       call saddles
       call contact
-      call vam (volume,area)
+      call vam (area,volume)
       return
       end
 c
@@ -2122,19 +2125,19 @@ c
       end
 c
 c
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine vam  --  volumes and areas of molecules  ##
-c     ##                                                      ##
-c     ##########################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine vam  --  find area and volume of molecule  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "vam" takes the analytical molecular surface defined
 c     as a collection of spherical and toroidal polygons
-c     and uses it to compute the volume and surface area
+c     and uses it to compute the surface area and volume
 c
 c
-      subroutine vam (volume,area)
+      subroutine vam (area,volume)
       use faces
       use inform
       use iounit
@@ -2161,7 +2164,7 @@ c
       integer, allocatable :: enfs(:)
       integer, allocatable :: fnt(:,:)
       integer, allocatable :: nspt(:,:)
-      real*8 volume,area
+      real*8 area,volume
       real*8 alens,vint,vcone
       real*8 vpyr,vlens,hedron
       real*8 totaq,totvq,totas

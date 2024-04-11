@@ -128,7 +128,7 @@ c
       write (iout,80)
    80 format (/,' Timothy Richmond Accessible Surface Area Method :')
       call settime
-      call richmond (esurf,asurf,rsolv,weight,probe)
+      call richmond (n,x,y,z,rsolv,weight,probe,esurf,asurf)
       call gettime (wall,cpu)
       write (iout,90)  cpu,wall
    90 format (/,' CPU and Wall Times :',5x,2f12.4) 
@@ -141,14 +141,14 @@ c
       write (iout,110)
   110 format (/,' Timothy Richmond Surface Area Derivative Method :')
       call settime
-      call richmond1 (esurf,asurf,dsurf,rsolv,weight,probe)
+      call richmond1 (n,x,y,z,rsolv,weight,probe,esurf,asurf,dsurf)
       call gettime (wall,cpu)
       write (iout,120)  cpu,wall
   120 format (/,' CPU and Wall Times :',5x,2f12.4)
       write (iout,130)  esurf
   130 format (/,' Total Surface Area :',5x,f12.4)
       write (iout,140)
-  140 format (/,' Surface Area Derivatives :  (1st Ten Atoms)',/)
+  140 format (/,' Surface Area Derivatives :  (First Ten Atoms)',/)
       do i = 1, min(10,n)
          write (iout,150)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i)
   150    format (i8,6x,3f10.4)
@@ -161,7 +161,7 @@ c
       write (iout,160)
   160 format (/,' Michael Connolly Molecular Area-Volume Method :')
       call settime
-      call connolly (evol,esurf,rsolv,reentrant,probe)
+      call connolly (n,x,y,z,rsolv,probe,reentrant,esurf,evol)
       call gettime (wall,cpu)
       write (iout,170)  cpu,wall
   170 format (/,' CPU and Wall Times :',5x,2f12.4)
@@ -180,12 +180,12 @@ c
       write (iout,200)
   200 format (/,' Craig Kundrot Excluded Volume Derivative Method :')
       call settime
-      call kundrot1 (rsolv,probe,dvol)
+      call kundrot1 (n,x,y,z,rsolv,probe,dvol)
       call gettime (wall,cpu)
       write (iout,210)  cpu,wall
   210 format (/,' CPU and Wall Times :',5x,2f12.4)
       write (iout,220)
-  220 format (/,' Excluded Volume Derivatives :  (1st Ten Atoms)',/)
+  220 format (/,' Excluded Volume Derivatives :  (First Ten Atoms)',/)
       do i = 1, min(10,n)
          write (iout,230)  i,dvol(1,i),dvol(2,i),dvol(3,i)
   230    format (i8,6x,3f10.4)
@@ -231,8 +231,8 @@ c
       write (iout,260)
   260 format (/,' Patrice Koehl UnionBall Alpha Shape Method :')
       call settime
-      call unionball (esurf,evol,asurf,avol,dsurf,dvol,
-     &                rsolv,weight,probe,doderiv,dovol)
+      call unionball (n,x,y,z,rsolv,weight,probe,doderiv,dovol,
+     &                esurf,evol,asurf,avol,dsurf,dvol)
       call gettime (wall,cpu)
       write (iout,270)  cpu,wall
   270 format (/,' CPU and Wall Times :',5x,2f12.4)
@@ -242,7 +242,7 @@ c
   290 format (/,' Total Excluded Vol :',5x,f12.4)
       write (iout,300)
   300 format (/,' Surface Area & Volume Derivatives :',
-     &           '  (1st Ten Atoms)',/)
+     &           '  (First Ten Atoms)',/)
       do i = 1, min(10,n)
          write (iout,310)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i),
      &                     dvol(1,i),dvol(2,i),dvol(3,i)

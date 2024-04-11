@@ -73,9 +73,9 @@ c
 c     use Connolly method for small symmetric structures
 c
       call chksymm (symmtyp)
-      if (n.le.3 .or. (n.le.50.and.symmtyp.ne.'NONE')) then
+      if (n.le.65 .and. symmtyp.ne.'NONE') then
          reentrant = 0.0d0
-         call connolly (vol,surf,rad,reentrant,probe)
+         call connolly (n,x,y,z,rad,probe,reentrant,surf,vol)
          vol = vol * weight(1)
          voln = vol / dble(n)
          do i = 1, n
@@ -224,11 +224,11 @@ c
 c     use other methods for small symmetric structures
 c
       call chksymm (symmtyp)
-      if (n.le.3 .or. (n.le.50.and.symmtyp.ne.'NONE')) then
+      if (n.le.65 .and. symmtyp.ne.'NONE') then
          reentrant = 0.0d0
-         call connolly (vol,surf,rad,reentrant,probe)
-         call kundrot1 (rad,probe,dvol)
-         call richmond1 (surf,asurf,dsurf,rad,weight,probe)
+         call connolly (n,x,y,z,rad,probe,reentrant,surf,vol)
+         call kundrot1 (n,x,y,z,rad,probe,dvol)
+         call richmond1 (n,x,y,z,rad,weight,probe,surf,asurf,dsurf)
          vol = vol * weight(1)
          voln = vol / dble(n)
          do i = 1, n
