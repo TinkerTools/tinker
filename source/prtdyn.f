@@ -112,13 +112,13 @@ c
          do i = 1, n
             write (idyn,fstr(1:9))  v(1,i),v(2,i),v(3,i)
          end do
-         fstr =  '('' Current Atomic Accelerations :'')'
+         fstr = '('' Current Atomic Accelerations :'')'
          write (idyn,fstr(1:36))
          fstr = '(3d26.16)'
          do i = 1, n
             write (idyn,fstr(1:9))  a(1,i),a(2,i),a(3,i)
          end do
-         fstr =  '('' Alternate Atomic Accelerations :'')'
+         fstr = '('' Alternate Atomic Accelerations :'')'
          write (idyn,fstr(1:38))
          fstr = '(3d26.16)'
          if (integrate .eq. 'VERLET') then

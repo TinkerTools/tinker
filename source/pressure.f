@@ -174,7 +174,7 @@ c
          yboxold = ybox
          zboxold = zbox
          alphaold = alpha
-         betaold  = beta
+         betaold = beta
          gammaold = gamma
          volold = volbox
          eold = epot
@@ -259,7 +259,7 @@ c     for anisotropic case alter lattice angles, then scale lengths
 c
          else
             rnd6 = 6.0d0*random()
-            step  = volmove * (2.0d0*random()-1.0d0)
+            step = volmove * (2.0d0*random()-1.0d0)
             scale = (1.0d0+step/volold)**third
             ascale(1,1) = 1.0d0
             ascale(2,2) = 1.0d0

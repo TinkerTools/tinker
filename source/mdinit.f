@@ -330,7 +330,7 @@ c
 c
 c     set inner steps per outer step for RESPA integrator
 c
-      eps =  0.00000001d0
+      eps = 0.00000001d0
       nrespa = int(dt/(arespa+eps)) + 1
 c
 c     perform dynamic allocation of some local arrays

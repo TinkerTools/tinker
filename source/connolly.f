@@ -2583,7 +2583,7 @@ c
             alens = 2.0d0 * pr**2 * (pi - sumlam - sin(rho)*(pi+sumsig))
             vint = alens * pr / 3.0d0
             vcone = pr * rm**2 * sin(rho) * (pi+sumsig) / 3.0d0
-            vpyr =  pr * rm**2 * sin(rho) * sumsc / 3.0d0
+            vpyr = pr * rm**2 * sin(rho) * sumsc / 3.0d0
             vlens = vint - vcone + vpyr
             cora(ifn) = cora(ifn) + alens
             cora(jfn) = cora(jfn) + alens

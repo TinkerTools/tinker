@@ -70,7 +70,7 @@ c
       temp1 = (fn(1)-fn(0)) / h(0)
       do i = 1, n-1, 1
          temp2 = (fn(i+1)-fn(i)) / h(i)
-         rs(i)  = 3.0d0 * (temp2-temp1)
+         rs(i) = 3.0d0 * (temp2-temp1)
          temp1 = temp2
       end do
       rs(n) = 3.0d0 * ((fn(1)-fn(0))/h(0)-temp1)

@@ -115,7 +115,7 @@ c
    30 continue
       if (start .eq. 0)  start = 1
       if (stop .eq. 0)  stop = start
-      nstep  = stop - start + 1
+      nstep = stop - start + 1
 c
 c     obtain the lambda values to be calculated
 c
@@ -406,8 +406,8 @@ c
             a2dem = s2dem / dble(nstep)
             adep2 = adep * adep
             adem2 = adem * adem
-            fdep =  sqrt(a2dep - adep2)
-            fdem =  sqrt(a2dem - adem2)
+            fdep = sqrt(a2dep - adep2)
+            fdem = sqrt(a2dem - adem2)
             do k = 1, nstep / nblock
                v = (badep(k) - adep)**2
                vdep = vdep + v

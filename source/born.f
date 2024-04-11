@@ -682,7 +682,7 @@ c
                   zr = z(k) - zi
                   vk = vsolv(k)
                   r2 = xr**2 + yr**2 + zr**2
-                  r =  sqrt(r2)
+                  r = sqrt(r2)
                   r6 = r2 * r2 * r2
                   ratio = r2 / (rsolv(i)+rsolv(k))**2
                   if (ratio .gt. p5inv) then

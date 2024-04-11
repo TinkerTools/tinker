@@ -18,7 +18,10 @@ c     balls via the analytical inclusion-exclusion method of Herbert
 c     Edelsbrunner based on alpha shapes, also finds derivatives of
 c     surface area and volume with respect to Cartesian coordinates
 c
-c     modified to facilitate calling UnionBall from Tinker by
+c     original UnionBall code developed and provided by Patrice Koehl,
+c     Computer Science, University of California, Davis
+c
+c     modified to facilitate calling of UnionBall from Tinker by
 c     Jay W. Ponder, Washington University, October 2023
 c
 c     literature references:
@@ -99,7 +102,7 @@ c
       allocate (dvolx(3,nsize))
       allocate (listredundant(nsize))
 c
-c     increment the sphere radii by the radius of the probe`
+c     increment the sphere radii by the radius of the probe
 c
       nsphere = n
       do i = 1, n
@@ -110,7 +113,7 @@ c
          if (rad(i) .ne. 0.0d0)  radii(i) = rad(i) + probe
       end do
 c
-c     test for small symmetrical system where UnionBall may fail
+c     test for symmetrical system with possible numerical issues
 c
       symmtyp = 'NONE'
       call chksymm (symmtyp)
@@ -1405,7 +1408,7 @@ c
             end do
             ilast = ia
          end if
-         coef_edge(i)  = 1
+         coef_edge(i) = 1
       end do
       do i = ia+1, nvertex
          sparse_row(i) = nedge + 1
@@ -1556,10 +1559,10 @@ c
                      ballwsurf(ib) = ballwsurf(ib) + coefval*surfb
                      ballwsurf(ic) = ballwsurf(ic) + coefval*surfc
                      ballwsurf(id) = ballwsurf(id) + coefval*surfd
-                     ballwvol(ia)  = ballwvol(ia) + coefval*vola
-                     ballwvol(ib)  = ballwvol(ib) + coefval*volb
-                     ballwvol(ic)  = ballwvol(ic) + coefval*volc
-                     ballwvol(id)  = ballwvol(id) + coefval*vold
+                     ballwvol(ia) = ballwvol(ia) + coefval*vola
+                     ballwvol(ib) = ballwvol(ib) + coefval*volb
+                     ballwvol(ic) = ballwvol(ic) + coefval*volc
+                     ballwvol(id) = ballwvol(id) + coefval*vold
                   end if
                end if
    30          continue
@@ -1655,10 +1658,10 @@ c
                         ballwsurf(ib) = ballwsurf(ib) + coefval*surfb
                         ballwsurf(ic) = ballwsurf(ic) + coefval*surfc
                         ballwsurf(id) = ballwsurf(id) + coefval*surfd
-                        ballwvol(ia)  = ballwvol(ia) + coefval*vola
-                        ballwvol(ib)  = ballwvol(ib) + coefval*volb
-                        ballwvol(ic)  = ballwvol(ic) + coefval*volc
-                        ballwvol(id)  = ballwvol(id) + coefval*vold
+                        ballwvol(ia) = ballwvol(ia) + coefval*vola
+                        ballwvol(ib) = ballwvol(ib) + coefval*volb
+                        ballwvol(ic) = ballwvol(ic) + coefval*volc
+                        ballwvol(id) = ballwvol(id) + coefval*vold
                      end if
                   end if
    40             continue
@@ -1687,8 +1690,8 @@ c
      &                          surfa,surfb,vola,volb)
             ballwsurf(ia) = ballwsurf(ia) - coef_edge(iedge)*surfa
             ballwsurf(ib) = ballwsurf(ib) - coef_edge(iedge)*surfb
-            ballwvol(ia)  = ballwvol(ia) - coef_edge(iedge)*vola
-            ballwvol(ib)  = ballwvol(ib) - coef_edge(iedge)*volb
+            ballwvol(ia) = ballwvol(ia) - coef_edge(iedge)*vola
+            ballwvol(ib) = ballwvol(ib) - coef_edge(iedge)*volb
          end if
       end do
 c
@@ -1838,7 +1841,7 @@ c
             end do
             ilast = ia
          end if
-         coef_edge(i)  = 1
+         coef_edge(i) = 1
          ra = radball(ia)
          ra2 = ra * ra
          rb = radball(ib)
@@ -1966,7 +1969,7 @@ c
                   val1 = (r1_2-r2_2) / r12
                   vala = r1 * (2.0d0*r1-r12-val1)
                   valb = r2 * (2.0d0*r2-r12+val1)
-                  val =  coef(ia-4)*vala + coef(ib-4)*valb
+                  val = coef(ia-4)*vala + coef(ib-4)*valb
                   do i = 1, 6
                      j = edge_list(i)
                      dsurf_dist(j) = dsurf_dist(j)
@@ -2358,7 +2361,7 @@ c
             end do
             ilast = ia
          end if
-         coef_edge(i)  = 1
+         coef_edge(i) = 1
          ra = radball(ia)
          ra2 = ra * ra
          rb = radball(ib)
@@ -2371,7 +2374,7 @@ c
          edge_surf(i) = (coef(ia-4)*surfa+coef(ib-4)*surfb) / twopi
          edge_vol(i) = (coef(ia-4)*vola+coef(ib-4)*volb) / twopi
          dsurf_dist(i) = 0.0d0
-         dvol_dist(i)  = 0.0d0
+         dvol_dist(i) = 0.0d0
       end do
       do i = ia+1, nvertex
          sparse_row(i) = nedge + 1
@@ -2779,7 +2782,7 @@ c
          if (coef_vertex(i) .eq. 0.0d0)  goto 60
          ra = radball(i)
          surfa = 4.0d0 * pi * ra * ra
-         vola  = surfa * ra / 3.0d0
+         vola = surfa * ra / 3.0d0
          ballwsurf(i) = ballwsurf(i) + coef_vertex(i)*surfa
          ballwvol(i) = ballwvol(i) + coef_vertex(i)*vola
    60    continue
@@ -5089,8 +5092,8 @@ c     as itetra and jtetra
 c
       itetra = linkfacet(1,j)
       jtetra = linkfacet(2,j)
-      idx_p  = linkindex(1,j)
-      idx_o  = linkindex(2,j)
+      idx_p = linkindex(1,j)
+      idx_o = linkindex(2,j)
 c
 c     if the link facet is on the convex hull, then discard
 c
@@ -5772,7 +5775,7 @@ c
          nnew = nnew + 1
          listnew(nnew) = newtetra
          tinfo(newtetra) = 0
-         tnindex(newtetra)  = 0
+         tnindex(newtetra) = 0
          k = 0
          do j = 1, 3
             if (j .ne. i) then
@@ -6185,13 +6188,13 @@ c
       kshare = tneighbor(kdp,ktetra)
       lshare = tneighbor(ldp,ltetra)
       ival = ibits(tnindex(itetra),2*(idp-1),2)
-      idx  = ival + 1
+      idx = ival + 1
       ival = ibits(tnindex(jtetra),2*(jdp-1),2)
-      jdx  = ival + 1
+      jdx = ival + 1
       ival = ibits(tnindex(ktetra),2*(kdp-1),2)
-      kdx  = ival + 1
+      kdx = ival + 1
       ival = ibits(tnindex(ltetra),2*(ldp-1),2)
-      ldx  = ival + 1
+      ldx = ival + 1
 c
 c     store the new tetrahedron in place of itetra
 c
@@ -8293,11 +8296,11 @@ c
 c     compute the accessible surface area derivatives
 c
       der_val1b = l1
-      der_val1  = 1.0d0 - l1
+      der_val1 = 1.0d0 - l1
       der_val2b = l2
-      der_val2  = 1.0d0 - l2
+      der_val2 = 1.0d0 - l2
       der_val3b = l3
-      der_val3  = 1.0d0 - l3
+      der_val3 = 1.0d0 - l3
       dsurfa(1) = -2.0d0 * ra * (twopi*seg_ang_ab*der_val1b
      &               + 2.0d0*rab*(ra*deriv(3,1)+val1b*deriv(1,1)
      &                               +val2b*deriv(2,1)))
@@ -8466,11 +8469,11 @@ c
 c     compute the accessible surface area derivatives
 c
       der_val1b = l1
-      der_val1  = 1.0d0 - l1
+      der_val1 = 1.0d0 - l1
       der_val2b = l2
-      der_val2  = 1.0d0 - l2
+      der_val2 = 1.0d0 - l2
       der_val3b = l3
-      der_val3  = 1.0d0 - l3
+      der_val3 = 1.0d0 - l3
       drho_ab2 = -2.0d0 * der_val1b * val1b
       drho_ac2 = -2.0d0 * der_val2b * val2b
       drho_bc2 = -2.0d0 * der_val3b * val3b
@@ -8766,7 +8769,7 @@ c
       dval1_ab(3) = 2.0d0 * deriv_abd(1,2) * cos_abd
       dval1_ab(4) = 2.0d0 * deriv_abc(1,3) * cos_abc
       dval1_ab(5) = 2.0d0 * deriv_abd(1,3) * cos_abd
-      dval1_ab(6) =  0.0d0
+      dval1_ab(6) = 0.0d0
       dval2_ab(1) = 2.0d0 * (deriv_abc(1,1)*cos_abd
      &                          +deriv_abd(1,1)*cos_abc)
       dval2_ab(2) = 2.0d0 * deriv_abc(1,2) * cos_abd

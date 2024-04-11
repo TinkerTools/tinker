@@ -134,8 +134,8 @@ c
          end if
          rab2 = max(xab*xab+yab*yab+zab*zab,eps)
          rcb2 = max(xcb*xcb+ycb*ycb+zcb*zcb,eps)
-         rab  = sqrt(rab2)
-         rcb  = sqrt(rcb2)
+         rab = sqrt(rab2)
+         rcb = sqrt(rcb2)
 c
 c     get terms corresponding to asymmetric bond stretches
 c

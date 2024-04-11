@@ -868,9 +868,9 @@ c
                   dfdtheta(1,1) = -cos1 * phi_xy
                   dfdtheta(2,1) = -sin1 * phi_xy
                   dfdtheta(3,1) = -phi_z
-                  dfdtheta(1,2) =  cos2 * phi_xy
-                  dfdtheta(2,2) =  sin2 * phi_xy
-                  dfdtheta(3,2) =  phi_z
+                  dfdtheta(1,2) = cos2 * phi_xy
+                  dfdtheta(2,2) = sin2 * phi_xy
+                  dfdtheta(3,2) = phi_z
                   do i = 1, 2
                      dbetadx(i,1,0) = dely(i) * r_s2(i)
                      dbetadx(i,2,0) = -delx(i) * r_s2(i)

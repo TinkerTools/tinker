@@ -3430,7 +3430,7 @@ c
          call varprm (nvar,xx,i,-0.5d0*eps(i))
          e0 = valrms(0)
          call varprm (nvar,xx,i,0.5d0*eps(i))
-         e  = valrms(0)
+         e = valrms(0)
          g(i) = (e-e0) / eps(i)
       end do
 c
