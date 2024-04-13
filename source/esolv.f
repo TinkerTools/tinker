@@ -57,7 +57,7 @@ c
 c     total solvation energy for surface area only models
 c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
-         call surface (es,aes,rsolv,asolv,probe)
+         call surface (rsolv,asolv,probe,es,aes)
 c
 c     nonpolar energy as hydrophobic potential of mean force
 c
@@ -69,7 +69,7 @@ c
 c     nonpolar energy for Onion GB method via exact area
 c
       else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
-         call surface (esurf,aes,rsolv,asolv,probe)
+         call surface (rsolv,asolv,probe,esurf,aes)
          es = esurf
 c
 c     nonpolar energy as cavity formation plus dispersion
@@ -1382,7 +1382,7 @@ c     compute surface area and effective radius for cavity
 c
       probe = 1.4d0
       if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
-      call surface (esurf,aesurf,radcav,asolv,probe)
+      call surface (radcav,asolv,probe,esurf,aesurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
       reff3 = reff2 * reff
@@ -1396,7 +1396,7 @@ c
          do i = 1, n
             weight(i) = solvprs
          end do
-         call volume (etemp,evol,aetemp,aevol,radcav,weight,probe)
+         call volume (radcav,weight,probe,etemp,evol,aetemp,aevol)
          deallocate (weight)
       end if
 c

@@ -298,11 +298,11 @@
 
  Timothy Richmond Surface Area Derivative Method :
 
- CPU and Wall Times :           0.0725      0.0730
+ CPU and Wall Times :           0.0726      0.0730
 
  Total Surface Area :        3180.3168
 
- Surface Area Derivatives :  (1st Ten Atoms)
+ Surface Area Derivatives :  (First Ten Atoms)
 
        1         -0.0280   -0.5361    0.4212
        2          0.0000    0.0000    0.0000
@@ -317,38 +317,38 @@
 
  Michael Connolly Molecular Area-Volume Method :
 
- CPU and Wall Times :           0.1049      0.1060
+ CPU and Wall Times :           0.1046      0.1060
 
- Total Surface Area :        3180.3167
+ Total Surface Area :        3180.3169
 
- Total Excluded Vol :       10275.3181
+ Total Excluded Vol :       10275.3184
 
  Craig Kundrot Excluded Volume Derivative Method :
 
- CPU and Wall Times :           0.1519      0.1530
+ CPU and Wall Times :           0.7929      0.7960
 
- Excluded Volume Derivatives :  (1st Ten Atoms)
+ Excluded Volume Derivatives :  (First Ten Atoms)
 
-       1          0.0056    0.0898   -0.0762
+       1          0.0058    0.0912   -0.0774
        2          0.0000    0.0000    0.0000
        3          0.0000    0.0000    0.0000
        4          0.0000    0.0000    0.0000
-       5          5.1753    1.4120  -12.7770
+       5          5.1754    1.4150  -12.7954
        6          0.0000    0.0000    0.0000
-       7          0.0094    2.0838   -8.3369
-       8          2.1923   -7.6322  -10.6430
+       7          0.0052    2.0814   -8.3259
+       8          2.2070   -7.6303  -10.6675
        9          0.0000    0.0000    0.0000
-      10          6.0540   -4.2611   -9.7153
+      10          6.0553   -4.2588   -9.7038
 
  Patrice Koehl UnionBall Alpha Shape Method :
 
- CPU and Wall Times :           0.0054      0.0050
+ CPU and Wall Times :           0.0056      0.0060
 
  Total Surface Area :        3180.3168
 
  Total Excluded Vol :       10275.3183
 
- Surface Area & Volume Derivatives :  (1st Ten Atoms)
+ Surface Area & Volume Derivatives :  (First Ten Atoms)
 
        1         -0.0280   -0.5361    0.4212    0.0058    0.0912   -0.0774
        2          0.0000    0.0000   -0.0000    0.0000   -0.0000   -0.0000
@@ -511,7 +511,7 @@
 
  Convex Faces :         344     Area :      939.791    Volume :      524.811
  Saddle Faces :        1026     Area :     1031.640    Volume :      962.447
- Concave Faces :        684     Area :      528.205    Volume :     1054.488
+ Concave Faces :        684     Area :      528.204    Volume :     1054.488
  Buried Polyhedra :                                    Volume :     3763.353
 
  Spindle Correction :           Area :        3.579    Volume :       -0.661

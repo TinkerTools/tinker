@@ -73,7 +73,7 @@ c
 c     solvation energy and derivs for surface area only models
 c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
-         call surface1 (es,aes,des,rsolv,asolv,probe)
+         call surface1 (rsolv,asolv,probe,es,aes,des)
 c
 c     nonpolar energy and derivs as hydrophobic PMF term
 c
@@ -85,7 +85,7 @@ c
 c     nonpolar energy and derivs for Onion method via exact area
 c
       else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
-         call surface1 (esurf,aes,des,rsolv,asolv,probe)
+         call surface1 (rsolv,asolv,probe,esurf,aes,des)
          es = esurf
 c
 c     nonpolar energy and derivs as cavity plus dispersion
@@ -4722,7 +4722,7 @@ c     compute surface area and effective radius for cavity
 c
       probe = 1.4d0
       if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
-      call surface1 (esurf,aesurf,dsurf,radcav,asolv,probe)
+      call surface1 (radcav,asolv,probe,esurf,aesurf,dsurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       dreff = 0.5d0 * reff / esurf
       reff2 = reff * reff
@@ -4737,8 +4737,8 @@ c
          do i = 1, n
             weight(i) = solvprs
          end do
-         call volume1 (etemp,evol,aetemp,aevol,dtemp,dvol,
-     &                    radcav,weight,probe)
+         call volume1 (radcav,weight,probe,etemp,evol,
+     &                    aetemp,aevol,dtemp,dvol)
          deallocate (weight)
       end if
 c

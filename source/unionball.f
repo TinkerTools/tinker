@@ -63,7 +63,7 @@ c
       integer i,n,nsphere
       integer nsize,nfudge
       integer nredundant
-      integer, allocatable :: listredundant(:)                                 
+      integer, allocatable :: redlist(:)                                 
       real*8 surf,usurf
       real*8 vol,uvol
       real*8 probe,alpha,eps
@@ -97,7 +97,7 @@ c
       allocate (coords(3,nsize))
       allocate (dsurfx(3,nsize))
       allocate (dvolx(3,nsize))
-      allocate (listredundant(nsize))
+      allocate (redlist(nsize))
 c
 c     increment the sphere radii by the radius of the probe
 c
@@ -136,16 +136,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,listredundant)
+      call regular3 (nredundant,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,listredundant)
+      call alfcx (alpha,nredundant,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,redlist)
 c
 c     get surface area and volume, then copy to Tinker arrays
 c
@@ -195,16 +195,16 @@ c
       deallocate (coords)
       deallocate (dsurfx)
       deallocate (dvolx)
-      deallocate (listredundant)
+      deallocate (redlist)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine setunion  --  UnionBall coordinates & radius  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine setunion  --  get UnionBall coordinates & radii  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "setunion" gets the coordinates and radii of the balls, and
@@ -212,11 +212,10 @@ c     stores these into data structures used in UnionBall
 c
 c     variables and parameters:
 c
-c     nsphere   number of points to be triangulated
-c     coords    Cartesian coordinates of all points
-c     radii     weight of each point; this is the radius of the
-c                 sphere, while the weight usually considered in
-c                 regular triangulations is the radius squared
+c     nsphere   number of points (spheres) to be triangulated
+c     coords    Cartesian coordinates of all spheres
+c     radii     radius of each sphere, used to set weights for
+c                 regular triangulation related to radius squared
 c
 c
       subroutine setunion (nsphere,coords,radii)
@@ -331,7 +330,7 @@ c
             ival1 = nint(crdball(k)*10000.0d0)
             ival2 = ival2 + ival1*ival1
          end do
-         wghtball(i) = dble(ival2)/100000000.0d0
+         wghtball(i) = dble(ival2) / 100000000.0d0
       end do
 c
 c     check for trivial redundancy with same point twice
@@ -452,7 +451,7 @@ c     with one vertex at "infinite", and (11) collect the remaining
 c     tetrahedra, and define convex hull
 c
 c
-      subroutine regular3 (nredundant,listredundant)
+      subroutine regular3 (nredundant,redlist)
       use shapes
       implicit none
       integer i,ival
@@ -464,7 +463,7 @@ c
       integer maxfree,maxkill
       integer maxlink,maxnew
       integer npeel_try
-      integer listredundant(*)
+      integer redlist(*)
       save
 c
 c
@@ -474,7 +473,7 @@ c
       maxfree = 20000
       maxkill = 20000
       maxlink = 20000
-      allocate (listnew(maxnew))
+      allocate (newlist(maxnew))
       allocate (freespace(maxfree))
       allocate (killspace(maxkill))
       allocate (linkfacet(2,maxlink))
@@ -509,7 +508,7 @@ c
 c     reorder tetrahedra, so vertices are in increasing order
 c
       iflag = 1
-      call reorder_tetra (iflag,nnew,listnew)
+      call reorder_tetra (iflag,nnew,newlist)
 c
 c     regular triangulation complete; remove the simplices
 c     including infinite points, and define the convex hull
@@ -529,13 +528,13 @@ c
       do i = 1, npoint
          if (.not. btest(vinfo(i+4),0)) then
             nredundant = nredundant + 1
-            listredundant(nredundant) = i
+            redlist(nredundant) = i
          end if
       end do
 c
 c     perform deallocation of some global arrays
 c
-      deallocate (listnew)
+      deallocate (newlist)
       deallocate (freespace)
       deallocate (killspace)
       deallocate (linkfacet)
@@ -555,7 +554,7 @@ c     "alfcx" builds the alpha complex based on the weighted
 c     Delaunay triangulation used by UnionBall
 c
 c
-      subroutine alfcx (alpha,nred,listred)
+      subroutine alfcx (alpha,nred,redlist)
       use shapes
       implicit none
       integer i,j,k,l,m
@@ -573,8 +572,8 @@ c
       integer face_info(2,6)
       integer face_pos(2,6)
       integer pair(2,6)
-      integer listred(*)
-      integer, allocatable :: listcheck(:)
+      integer redlist(*)
+      integer, allocatable :: chklist(:)
       integer, allocatable :: tmask(:)
       real*8 ra,rb,rc,rd,re
       real*8 alpha
@@ -590,8 +589,8 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (chklist(40000))
       allocate (tmask(ntetra))
-      allocate (listcheck(40000))
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -739,13 +738,13 @@ c
                   test_edge = .true.
                else
                   icheck = icheck + 1
-                  listcheck(icheck) = ia
+                  chklist(icheck) = ia
                end if
                if (btest(tinfo(itetra),2+trig2)) then
                   test_edge = .true.
                else
                   icheck = icheck + 1
-                  listcheck(icheck) = ib
+                  chklist(icheck) = ib
                end if
 c
 c     now we look at the star of the edge
@@ -813,7 +812,7 @@ c
                jtetra = tneighbor(trig_out,ktetra)
                if (jtetra .eq. itetra)  goto 40
                icheck = icheck + 1
-               listcheck(icheck) = tetra(i_out,ktetra)
+               chklist(icheck) = tetra(i_out,ktetra)
                goto 20
    30          continue
                if (npass .eq. 2)  goto 40
@@ -839,7 +838,7 @@ c     the radius of the sphere orthogonal to the two balls
 c     corresponding to the edge
 c
                call get_coord2 (i,j,a,b,ra,rb,cg)
-               call alf_edge (a,b,ra,rb,cg,icheck,listcheck,
+               call alf_edge (a,b,ra,rb,cg,icheck,chklist,
      &                        irad,iattach,alpha)
                if (iattach.eq.0 .and. irad.eq.1) then
                   tedge(itetra) = ibset(tedge(itetra),iedge-1)
@@ -876,7 +875,7 @@ c
                   vinfo(i) = ibset(vinfo(i),7)
                else
                   nred = nred + 1
-                  listred(nred) = i
+                  redlist(nred) = i
                end if
             end if
          end if
@@ -884,8 +883,8 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (chklist)
       deallocate (tmask)
-      deallocate (listcheck)
       return
       end
 c
@@ -901,13 +900,13 @@ c     "readjust_sphere" removes artificial spheres for UnionBall
 c     systems containing fewer than four spheres
 c
 c
-      subroutine readjust_sphere (nsphere,nredundant,listredundant)
+      subroutine readjust_sphere (nsphere,nredundant,redlist)
       use shapes
       implicit none
       integer i,j
       integer nsphere
       integer nredundant
-      integer listredundant(*)
+      integer redlist(*)
       save
 c
 c
@@ -921,9 +920,9 @@ c
          nvertex = npoint + 4
          j = 0
          do i = 1, nredundant
-            if (listredundant(i) .le. nsphere) then
+            if (redlist(i) .le. nsphere) then
                j = j + 1
-               listredundant(j) = listredundant(i)
+               redlist(j) = redlist(i)
             end if
          end do
       end if
@@ -1314,8 +1313,7 @@ c     ################################################################
 c
 c
 c     "ball_vol" computes the weighted surface area of a union of
-c     spheres and the weighted excluded volume of the corresponding
-c     union of balls
+c     spheres and the corresponding weighted excluded volume
 c
 c     variables and parameters:
 c
@@ -1746,7 +1744,7 @@ c
 c
 c     "ball_dsurf" computes the weighted surface area of a union
 c     of spheres as well as its derivatives with respect to the
-c     distances between the sphere centers
+c     coordinates of the spheres
 c
 c     variables and parameters:
 c
@@ -2243,9 +2241,8 @@ c     #################################################################
 c
 c
 c     "ball_dvol" computes the weighted surface area of a union of
-c     spheres and the weighted volume of the corresponding union of
-c     balls, as well as their derivatives with respect to distances
-c     between the sphere centers
+c     spheres as well as the corresponding weighted excludewd volume,
+c     also finds their derivatives with respect sphere coordinates
 c
 c     variables and parameters:
 c
@@ -3155,34 +3152,34 @@ c
 c
 c     "alf_edge" checks if an edge belongs to the alpha complex;
 c     computes the radius of the sphere orthogonal to the two
-c     balls that define the edge, if this radius is smaller than
+c     balls defining the edge, if this radius is smaller than
 c     alpha then the edge belongs to the alpha complex
 c
 c     also checked if the edge is "attached", i.e., if the third
 c     vertex of any of the triangles attached to the edge is
-c     "hidden" by the edge
+c     hidden by the edge
 c
 c     variables and parameters:
 c
 c     a,b         coordinates of the points defining the edge
 c     ra,rb       radii of the two points
 c     ncheck      number of triangles in the star of the edge
-c     listcheck   list of vertices to check
+c     chklist   list of vertices to check
 c     alpha       value of alpha for the alpha shape
 c                   (usually 0 for measures of molecule)
 c     irad        integer flag set to 1 if radius(edge) < alpha
 c     iattach     integer flag set to 1 if edge is attached
 c
 c
-      subroutine alf_edge (a,b,ra,rb,cg,ncheck,listcheck,
-     &                     irad,iattach,alpha)
+      subroutine alf_edge (a,b,ra,rb,cg,ncheck,chklist,
+     &                        irad,iattach,alpha)
       use shapes
       implicit none
       integer i,j,k,ic
       integer ncheck
       integer irad
       integer iattach
-      integer listcheck(*)
+      integer chklist(*)
       real*8 alpha,val
       real*8 ra,rb,rc
       real*8 dab(4),sab(3),tab(3)
@@ -3231,7 +3228,7 @@ c
 c     first check the attachment
 c
       do i = 1, ncheck
-         ic = listcheck(i)
+         ic = chklist(i)
          do j = 1, 3
             c(j) = crdball(3*(ic-1)+j) - cg(j)
          end do
@@ -3374,7 +3371,7 @@ c     ra,rb,rc    radii of the three pointd
 c     dab         minor(a,b,i,0) for all i=1,2,3,4
 c     sab         minor(a,b,i,j) for i = 1,2 and j =i+1,3
 c     tab         minor(a,b,i,4) for all i=1,2,3
-c     testa       flag that defines if edge is attached or not
+c     testa       logical flag marks if edge is attached or not
 c
 c
       subroutine edge_attach (a,b,c,ra,rb,rc,dab,sab,tab,testa)
@@ -3482,7 +3479,7 @@ c
 c     "triangle_attach" tests whether a point D is inside the
 c     circumsphere defined by three other points A, B and C
 c
-c     as input three points A,B,C that form the triangles; the code
+c     for the three points A,B,C that form the triangles, the code
 c     needs as input the following determinants:
 c
 c     s(i,j) = Minor(a,b,c,i,j,0) = det | a(i) a(j) 1 |
@@ -3543,10 +3540,10 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "triangle_radius" computes the radius of the smallest
-c     circumsphere to a triangle
+c     "triangle_radius" finds the radius of the smallest circumsphere
+c     to a triangle
 c
-c     for the three points a,b,c that form the triangles, the code
+c     for the three points A,B,C that form the triangles, the code
 c     needs as input the following determinants:
 c
 c     s(i,j) = Minor(a,b,c,i,j,0) = det | a(i) a(j) 1 |
@@ -3613,7 +3610,7 @@ c     let S = {a}, with a weight of ra**2, then y_S is the ball
 c     centered at a, but with weight -ra**2, the power distance
 c     between y_S and a point b is:
 c
-c     pi(y_S, b) = dist(a,b)**2 +ra**2 -rb**2
+c     pi(y_S, b) = dist(a,b)**2 + ra**2 - rb**2
 c
 c
       subroutine vertex_attach (a,b,ra,rb,testa,testb)
@@ -3728,21 +3725,21 @@ c     ##################################################################
 c
 c
 c     "inside_tetra_jw" tests if a point P is inside the tetrahedron
-c     defined by four points ABCD with orientation "iorient", if P is
-c     inside the tetrahedron, then also checks if it is redundant
+c     defined by four points ABCD with orientation "iorient", if P
+c     is inside the tetrahedron, then also checks if it is redundant
 c
 c     variables and parameters:
 c
-c     p           index of point to be checked
-c     a,b,c,d     the four vertices of the tetrahedron
+c     p           index of the point to be checked
+c     a,b,c,d     four vertices of the tetrahedron
 c     iorient     orientation of the tetrahedron
-c     is_in       set to "true" if p in the tetrahedron, else "false"
-c     redundant   set to "true" is p is redundant
+c     inside      logical flag to mark P inside the ABCD tetrahedron
+c     redundant   logical flag to mark whether point P is redundant
 c     ifail       index of the face that fails the orientation test
 c                   in case where P is not inside the tetrahedron
 c
 c
-      subroutine inside_tetra_jw (p,a,b,c,d,iorient,is_in,
+      subroutine inside_tetra_jw (p,a,b,c,d,iorient,inside,
      &                               redundant,ifail)
       use shapes
       implicit none
@@ -3774,7 +3771,7 @@ c
       real*8 k_p(4),l_p(4)
       logical test_pijk,test_pjil
       logical test_pkjl,test_pikl
-      logical is_in,redundant
+      logical inside,redundant
       logical doweight
       data inf4_1  / 2, 2, 1, 1 /
       data sign4_1  / -1, 1, 1, -1 /
@@ -3843,7 +3840,7 @@ c     the equations above hold for the general case, but special
 c     care is required to take in account infinite points
 c
       doweight = .true.
-      is_in = .false.
+      inside = .false.
       redundant = .false.
       list(1) = a
       list(2) = b
@@ -3884,9 +3881,9 @@ c
          skl_2 = k_p(1)*l_p(3) - k_p(3)*l_p(1)
          skl_3 = k_p(1)*l_p(2) - k_p(2)*l_p(1)
 c
-c     tests for all determinants, start with is_in set to false
+c     tests for all determinants, start with inside set to false
 c
-         is_in = .false.
+         inside = .false.
          det_pijk = -k_p(1)*sij_1 + k_p(2)*sij_2 - k_p(3)*sij_3
          det_pijk = det_pijk * dble(iorient)
          test_pijk = (abs(det_pijk) .gt. epsln4)
@@ -3960,8 +3957,8 @@ c
 c     at this point P is inside the tetrahedron, then check
 c     to see whether P is redundant
 c
-         is_in = .true.
-         if (.not.doweight)  return
+         inside = .true.
+         if (.not. doweight)  return
          i_p(4) = wghtball(a) - wghtball(p)
          j_p(4) = wghtball(b) - wghtball(p)
          k_p(4) = wghtball(c) - wghtball(p)
@@ -4011,9 +4008,9 @@ c
          detij(2) = i_p(2)*j_p(3) - i_p(3)*j_p(2)
          detij(3) = i_p(1)*j_p(2) - i_p(2)*j_p(1)
 c
-c     tests for all determinants, start with is_in set to false
+c     tests for all determinants, start with inside set to false
 c
-         is_in = .false.
+         inside = .false.
          det_pijk = -k_p(1)*detij(2) + k_p(2)*detij(1)
      &                 - k_p(3)*detij(3)
          det_pijk = det_pijk * dble(iorient)
@@ -4087,7 +4084,7 @@ c
 c     at this point P is inside the tetrahedron, and since
 c     det_pijkl = det_pijk > 1, P cannot be redundant
 c
-         is_in = .true.
+         inside = .true.
          redundant = .false.
 c
 c     two of the vertices A, B, C and D are infinite, to find which
@@ -4111,13 +4108,13 @@ c
          ic1 = inf4_2(k,l)
          sign = sign4_2(k,l)
 c
-c     tests for all determinants, start with is_in set to false
+c     tests for all determinants, start with inside set to false
 c
          do m = 1, 3
             i_p(m) = crdball(3*i-3+m) - coordp(m)
             j_p(m) = crdball(3*j-3+m) - coordp(m)
          end do
-         is_in = .false.
+         inside = .false.
          det_pijk = i_p(ic1_k)*j_p(3) - i_p(3)*j_p(ic1_k)
          det_pijk = det_pijk * sign_k * iorient
          test_pijk = (abs(det_pijk) .gt. epsln3)
@@ -4189,9 +4186,9 @@ c
 c     at this point P is inside the tetrahedron, then check
 c     to see whether P is redundant
 c
-         is_in = .true.
+         inside = .true.
          redundant = .false.
-         if (.not.doweight)  return
+         if (.not. doweight)  return
          ic5 = inf5_2(k,l)
          sign5 = sign5_2(k,l)
          det_pijkl = i_p(ic5)*j_p(3) - i_p(3)*j_p(ic5)
@@ -4221,9 +4218,9 @@ c
             i_p(m) = crdball(3*i-3+m) - coordp(m)
          end do
 c
-c     tests for all determinants, start with is_in set to false
+c     tests for all determinants, start with inside set to false
 c
-         is_in = .false.
+         inside = .false.
          det_pijk = i_p(inf4_2(j,k)) * iorient * sign4_2(j,k)
          test_pijk = (abs(det_pijk) .gt. epsln2)
          if (test_pijk .and. det_pijk.gt.0.0d0) then
@@ -4283,9 +4280,9 @@ c
 c     at this point P is inside the tetrahedron, then check
 c     to see whether P is redundant
 c
-         is_in = .true.
+         inside = .true.
          redundant = .false.
-         if (.not.doweight)  return
+         if (.not. doweight)  return
          ic1 = inf5_3(ie)
          sign5 = sign5_3(ie)
          det_pijkl = -i_p(ic1)
@@ -4298,10 +4295,10 @@ c
          redundant = (det_pijkl .lt. 0.0d0)
 c
 c     if all four points ia, ib, ic and id are infinite,
-c     then is_in must be true and redundant is false
+c     then inside must be true and redundant is false
 c
       else
-         is_in = .true.
+         inside = .true.
          redundant = .false.
       end if
       return
@@ -4321,7 +4318,7 @@ c     and ABCO that connect to the facet is convex
 c
 c     for floating point, points need not be in lexicographic order
 c     prior to computing a determinant; this is not true if the
-c     value is near zero and special care is needed and the points
+c     value is near zero where special care is needed and the points
 c     are ordered using a series of "valsort" routines
 c
 c     variables and parameters:
@@ -5014,14 +5011,6 @@ c     nonregular and flippable, attempt to flip it; if the flip is
 c     successful, new linkfacets are added to the queue; terminate
 c     when the linkfacet list is empty
 c
-c     variables and parameters:
-c
-c     nlinkfacet   when called, the linkfacet queue contains four
-c                     triangles from the tetrahedron in which the
-c                     new point is added; each triangle is defined
-c                     by two tetrahedra, defined by linkfacet
-c     linkfacet    the four linkfacets
-c
 c
       subroutine flipjw (tetra_last)
       use iounit
@@ -5336,14 +5325,12 @@ c     where a 1->4 flip is a transformation in which a tetrahedron
 c     and a single vertex included in the tetrahedron are transformed
 c     to four tetrahedra defined from the four faces of the initial
 c     tetrahedron, connected to the new point, each of the faces is
-c     then called "link facet" and stored on a queue
+c     then called a "linkfacet" and is stored on a queue
 c
 c     variables and parameters:
 c
 c     ipoint      index of the point P to be included
 c     itetra      index of the tetrahedra considered (ABCD)
-c     linkfacet   add the four faces of the initial tetrahedron
-c     linkindex   triangle defined from its two neighbor tetrahedra
 c
 c
       subroutine flipjw_1_4 (ipoint,itetra,tetra_last)
@@ -5418,7 +5405,7 @@ c
       do i = 1, 4
          newtetra = position(i)
          nnew = nnew + 1
-         listnew(nnew) = newtetra
+         newlist(nnew) = newtetra
          tinfo(newtetra) = 0
          tnindex(newtetra) = 0
          k = 0
@@ -5770,7 +5757,7 @@ c
       do i = 1, 3
          newtetra = position(i)
          nnew = nnew + 1
-         listnew(nnew) = newtetra
+         newlist(nnew) = newtetra
          tinfo(newtetra) = 0
          tnindex(newtetra) = 0
          k = 0
@@ -6005,7 +5992,7 @@ c
       do i = 1, 2
          newtetra = position(i)
          nnew = nnew + 1
-         listnew(nnew) = newtetra
+         newlist(nnew) = newtetra
          tinfo(newtetra) = 0
          tnindex(newtetra) = 0
          k = 0
@@ -6204,7 +6191,7 @@ c
       end if
       tetra_last = newtetra
       nnew = nnew + 1
-      listnew(nnew) = newtetra
+      newlist(nnew) = newtetra
       tinfo(newtetra) = 0
       tnindex(newtetra) = 0
 c
@@ -6858,7 +6845,7 @@ c
 c
 c     if this edge is not in the alpha complex, then discard
 c
-               if (.not.btest(tedge(idx),iedge-1))  goto 30
+               if (.not. btest(tedge(idx),iedge-1))  goto 30
 c
 c     note iedge is the edge number in the tetrahedron idx, with:
 c     iedge = 1 (c,d); iedge = 2 (b,d); iedge = 3 (b,c)

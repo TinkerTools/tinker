@@ -176,7 +176,7 @@ c
             done = .false.
             do while (.not. done)
                roff(i) = roff(i) + 0.5d0*t
-               call surface (areatotal,garea,roff,weight,probe)
+               call surface (roff,weight,probe,areatotal,garea)
                fraction = garea(i) / (4.0d0*pi*(roff(i)+probe)**2)
                if (fraction .lt. 0.99d0) then
                   inner = roff(i) - 0.5d0*t

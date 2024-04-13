@@ -45,13 +45,13 @@ c     usurf      unweighted surface area of union of spheres
 c     asurf      weighted area contribution of each sphere
 c
 c
-      subroutine surface (surf,asurf,rad,weight,probe)
+      subroutine surface (rad,weight,probe,surf,asurf)
       use atoms
       implicit none
       integer i,nsphere
       integer nsize,nfudge
       integer nredundant
-      integer, allocatable :: listredundant(:)
+      integer, allocatable :: redlist(:)
       real*8 surf,usurf
       real*8 probe,alpha
       real*8 rad(*)
@@ -78,7 +78,7 @@ c
       allocate (radii(nsize))
       allocate (asurfx(nsize))
       allocate (coords(3,nsize))
-      allocate (listredundant(nsize))
+      allocate (redlist(nsize))
 c
 c     set the coordinates and sphere radii plus probe`
 c
@@ -98,16 +98,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,listredundant)
+      call regular3 (nredundant,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,listredundant)
+      call alfcx (alpha,nredundant,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,redlist)
 c
 c     get accessible surface area via the UnionBall method
 c
@@ -124,7 +124,7 @@ c
       deallocate (radii)
       deallocate (asurfx)
       deallocate (coords)
-      deallocate (listredundant)
+      deallocate (redlist)
       return
       end
 c
@@ -172,13 +172,13 @@ c     dsurf      derivatives of the weighted surface area over
 c                  coordinates of the sphere centers
 c
 c
-      subroutine surface1 (surf,asurf,dsurf,rad,weight,probe)
+      subroutine surface1 (rad,weight,probe,surf,asurf,dsurf)
       use atoms
       implicit none
       integer i,nsphere
       integer nsize,nfudge
       integer nredundant
-      integer, allocatable :: listredundant(:)
+      integer, allocatable :: redlist(:)
       real*8 surf,usurf
       real*8 probe,alpha
       real*8 rad(*)
@@ -208,7 +208,7 @@ c
       allocate (asurfx(nsize))
       allocate (coords(3,nsize))
       allocate (dsurfx(3,nsize))
-      allocate (listredundant(nsize))
+      allocate (redlist(nsize))
 c
 c     set the coordinates and sphere radii plus probe`
 c
@@ -228,16 +228,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,listredundant)
+      call regular3 (nredundant,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,listredundant)
+      call alfcx (alpha,nredundant,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,redlist)
 c
 c     get accessible surface area via the UnionBall method
 c
@@ -258,6 +258,6 @@ c
       deallocate (asurfx)
       deallocate (coords)
       deallocate (dsurfx)
-      deallocate (listredundant)
+      deallocate (redlist)
       return
       end

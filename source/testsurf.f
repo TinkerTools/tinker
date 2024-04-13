@@ -29,7 +29,7 @@ c
       integer i,icrd
       integer nsize,nfudge
       integer freeunit
-      real*8 esurf,evol
+      real*8 surf,vol
       real*8 probe
       real*8 reentrant
       real*8 wall,cpu
@@ -104,8 +104,8 @@ c
 c
 c     initialize variables for Richmond and Connolly routines
 c
-      esurf = 0.0d0
-      evol = 0.0d0
+      surf = 0.0d0
+      vol = 0.0d0
       reentrant = 0.0d0
       do i = 1, n
          asurf(i) = 0.0d0
@@ -124,28 +124,28 @@ c
 c
 c     compute accessible surface area via Richmond method
 c
-      esurf = 0.0d0
+      surf = 0.0d0
       write (iout,80)
    80 format (/,' Timothy Richmond Accessible Surface Area Method :')
       call settime
-      call richmond (n,x,y,z,rsolv,weight,probe,esurf,asurf)
+      call richmond (n,x,y,z,rsolv,weight,probe,surf,asurf)
       call gettime (wall,cpu)
       write (iout,90)  cpu,wall
    90 format (/,' CPU and Wall Times :',5x,2f12.4) 
-      write (iout,100)  esurf
+      write (iout,100)  surf
   100 format (/,' Total Surface Area :',5x,f12.4)
 c
 c     compute accessible surface and derivatives via Richmond
 c
-      esurf = 0.0d0
+      surf = 0.0d0
       write (iout,110)
   110 format (/,' Timothy Richmond Surface Area Derivative Method :')
       call settime
-      call richmond1 (n,x,y,z,rsolv,weight,probe,esurf,asurf,dsurf)
+      call richmond1 (n,x,y,z,rsolv,weight,probe,surf,asurf,dsurf)
       call gettime (wall,cpu)
       write (iout,120)  cpu,wall
   120 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,130)  esurf
+      write (iout,130)  surf
   130 format (/,' Total Surface Area :',5x,f12.4)
       write (iout,140)
   140 format (/,' Surface Area Derivatives :  (First Ten Atoms)',/)
@@ -156,18 +156,18 @@ c
 c
 c     compute surface area and excluded volume via Connolly
 c
-      esurf = 0.0d0
-      evol = 0.0d0
+      surf = 0.0d0
+      vol = 0.0d0
       write (iout,160)
   160 format (/,' Michael Connolly Molecular Area-Volume Method :')
       call settime
-      call connolly (n,x,y,z,rsolv,probe,reentrant,esurf,evol)
+      call connolly (n,x,y,z,rsolv,probe,reentrant,surf,vol)
       call gettime (wall,cpu)
       write (iout,170)  cpu,wall
   170 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,180)  esurf
+      write (iout,180)  surf
   180 format (/,' Total Surface Area :',5x,f12.4)
-      write (iout,190)  evol
+      write (iout,190)  vol
   190 format (/,' Total Excluded Vol :',5x,f12.4)
 c
 c     compute excluded volume derivatives via Kundrot method
@@ -196,8 +196,8 @@ c     initialize variables for Koehl UnionBall routines
 c
       doderiv = .true.
       dovol = .true.
-      esurf = 0.0d0
-      evol = 0.0d0
+      surf = 0.0d0
+      vol = 0.0d0
       do i = 1, n
          asurf(i) = 0.0d0
          avol(i) = 0.0d0
@@ -232,13 +232,13 @@ c
   260 format (/,' Patrice Koehl UnionBall Alpha Shape Method :')
       call settime
       call unionball (n,x,y,z,rsolv,weight,probe,doderiv,dovol,
-     &                esurf,evol,asurf,avol,dsurf,dvol)
+     &                   surf,vol,asurf,avol,dsurf,dvol)
       call gettime (wall,cpu)
       write (iout,270)  cpu,wall
   270 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,280)  esurf
+      write (iout,280)  surf
   280 format (/,' Total Surface Area :',5x,f12.4)
-      write (iout,290)  evol
+      write (iout,290)  vol
   290 format (/,' Total Excluded Vol :',5x,f12.4)
       write (iout,300)
   300 format (/,' Surface Area & Volume Derivatives :',

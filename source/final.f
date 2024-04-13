@@ -1092,7 +1092,7 @@ c
 c
 c     deallocation of global arrays from module shapes
 c
-      if (allocated(listnew))  deallocate (listnew)
+      if (allocated(newlist))  deallocate (newlist)
       if (allocated(freespace))  deallocate (freespace)
       if (allocated(killspace))  deallocate (killspace)
       if (allocated(vinfo))  deallocate (vinfo)

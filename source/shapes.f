@@ -21,7 +21,7 @@ c     nnew            total number of entries on new tetrahedra list
 c     nfree           total number of spaces on free tetrahedra list
 c     nkill           total number of tetrahedra on list to kill
 c     nlinkfacet      total number of triangle facets in the system
-c     listnew         list with index numbers of the new tetrahedra
+c     newlist         list with index numbers of the new tetrahedra
 c     freespace       list of the tetrahedra currently in free space
 c     killspace       list of the existing tetrahedra to be killed
 c     vinfo           information value for each of the vertices
@@ -48,7 +48,7 @@ c
       integer ntetra,nnew
       integer nfree,nkill
       integer nlinkfacet
-      integer, allocatable :: listnew(:)
+      integer, allocatable :: newlist(:)
       integer, allocatable :: freespace(:)
       integer, allocatable :: killspace(:)
       integer, allocatable :: vinfo(:)

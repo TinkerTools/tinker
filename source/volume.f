@@ -48,13 +48,13 @@ c     asurf      weighted area contribution of each sphere
 c     avol       weighted volume contribution of each sphere
 c
 c
-      subroutine volume (surf,vol,asurf,avol,rad,weight,probe)
+      subroutine volume (rad,weight,probe,surf,vol,asurf,avol)
       use atoms
       implicit none
       integer i,nsphere
       integer nsize,nfudge
       integer nredundant
-      integer, allocatable :: listredundant(:)
+      integer, allocatable :: redlist(:)
       real*8 surf,usurf
       real*8 vol,uvol,voln
       real*8 reentrant
@@ -92,7 +92,7 @@ c
       allocate (asurfx(nsize))
       allocate (avolx(nsize))
       allocate (coords(3,nsize))
-      allocate (listredundant(nsize))
+      allocate (redlist(nsize))
 c
 c     set the coordinates and sphere radii plus probe`
 c
@@ -112,16 +112,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,listredundant)
+      call regular3 (nredundant,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,listredundant)
+      call alfcx (alpha,nredundant,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,redlist)
 c
 c     get the accessible surface area and excluded volume
 c
@@ -140,7 +140,7 @@ c
       deallocate (asurfx)
       deallocate (avolx)
       deallocate (coords)
-      deallocate (listredundant)
+      deallocate (redlist)
       return
       end
 c
@@ -189,19 +189,19 @@ c     uvol       unweighted excluded volume of union of spheres
 c     asurf      weighted area contribution of each sphere
 c     avol       weighted volume contribution of each sphere
 c     dsurf      derivatives of the weighted surface area over
-c                  coordinates of the sphere centers
+c                  sphere coordinates
 c     dvol       derivatives of the weighted volume over
-c                  coordinates of the sphere centers
+c                  sphere coordinates
 c
 c
-      subroutine volume1 (surf,vol,asurf,avol,dsurf,dvol,
-     &                       rad,weight,probe)
+      subroutine volume1 (rad,weight,probe,surf,vol,asurf,avol,
+     &                       dsurf,dvol)
       use atoms
       implicit none
       integer i,nsphere
       integer nsize,nfudge
       integer nredundant
-      integer, allocatable :: listredundant(:)
+      integer, allocatable :: redlist(:)
       real*8 surf,usurf
       real*8 vol,uvol,voln
       real*8 reentrant
@@ -247,7 +247,7 @@ c
       allocate (coords(3,nsize))
       allocate (dsurfx(3,nsize))
       allocate (dvolx(3,nsize))
-      allocate (listredundant(nsize))
+      allocate (redlist(nsize))
 c
 c     set the coordinates and sphere radii plus probe`
 c
@@ -267,16 +267,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,listredundant)
+      call regular3 (nredundant,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,listredundant)
+      call alfcx (alpha,nredundant,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,listredundant)
+      call readjust_sphere (nsphere,nredundant,redlist)
 c
 c     get the accessible surface area and excluded volume
 c
@@ -304,6 +304,6 @@ c
       deallocate (coords)
       deallocate (dsurfx)
       deallocate (dvolx)
-      deallocate (listredundant)
+      deallocate (redlist)
       return
       end
