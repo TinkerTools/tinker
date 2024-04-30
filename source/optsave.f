@@ -176,6 +176,16 @@ c
                call version (frcfile,'new')
                open (unit=ifrc,file=frcfile,status='new')
             end if
+         else
+            frcfile = filename(1:leng)
+            call suffix (frcfile,'frc','old')
+            inquire (file=frcfile,exist=exist)
+            if (exist) then
+               open (unit=ifrc,file=frcfile,status='old')
+               rewind (unit=ifrc)
+            else
+               open (unit=ifrc,file=frcfile,status='new')
+            end if
          end if
          write (ifrc,10)  n,title(1:ltitle)
    10    format (i6,2x,a)
@@ -205,6 +215,16 @@ c
             else
                indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
                call version (indfile,'new')
+               open (unit=iind,file=indfile,status='new')
+            end if
+         else
+            indfile = filename(1:leng)
+            call suffix (indfile,'uind','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               open (unit=iind,file=indfile,status='old')
+               rewind (unit=iind)
+            else
                open (unit=iind,file=indfile,status='new')
             end if
          end if

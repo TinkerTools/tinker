@@ -24,13 +24,14 @@ c
       use iounit
       use kvdws
       use nonpol
+      use ptable
       use vdwpot
       implicit none
       integer i,icrd
       integer nsize,nfudge
       integer freeunit
       real*8 surf,vol
-      real*8 probe
+      real*8 probe,rmax
       real*8 reentrant
       real*8 wall,cpu
       real*8, allocatable :: rsolv(:)
@@ -80,6 +81,14 @@ c
    50    continue
       end if
 c
+c     print out the total number of atoms
+c
+      write (iout,60)
+   60 format (/,' Alternative Surface Area & Volume Methods')
+      write (iout,70)  n,probe
+   70 format (/,' Number of Atoms :',12x,i8,
+     &        /,' Probe Size :',11x,f14.4)
+c
 c     perform dynamic allocation of some local arrays
 c
       nfudge = 10
@@ -90,6 +99,22 @@ c
       allocate (avol(nsize))
       allocate (dsurf(3,nsize))
       allocate (dvol(3,nsize))
+c
+c     if all radii are zero then switch to generic vdw radii
+c
+      rmax = 0.0d0
+      do i = 1, n
+         rmax = rad(i)
+         if (rmax .gt. 0.0d0)  goto 99
+      end do
+   99 continue
+      if (rmax .eq. 0.0d0) then
+         write (iout,98)
+   98    format (/,' Atomic Radii not Set, Using Generic VDW Values')
+         do i = 1, n
+            rad(i) = vdwrad(atomic(i))
+         end do
+      end if
 c
 c     set radii to use for surface area and volume calculation
 c
@@ -113,14 +138,6 @@ c
          dsurf(2,i) = 0.0d0
          dsurf(3,i) = 0.0d0
       end do
-c
-c     print out the total number of atoms
-c
-      write (iout,60)
-   60 format (/,' Alternative Surface Area & Volume Methods')
-      write (iout,70)  n,probe
-   70 format (/,' Number of Atoms :',12x,i8,
-     &        /,' Probe Size :',11x,f14.4)
 c
 c     compute accessible surface area via Richmond method
 c

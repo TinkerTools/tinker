@@ -523,6 +523,7 @@ c
          if (moved) then
             write (iout,140)  ir
   140       format (/,' RICHMOND  --  Connectivity Error at Atom',i6)
+            call fatal
          else
             moved = .true.
             xr = xr + rmove
@@ -545,6 +546,7 @@ c
             if (moved) then
                write (iout,170)  ir
   170          format (/,' RICHMOND  --  Negative Area at Atom',i6)
+               call fatal
             else
                moved = .true.
                xr = xr + rmove
@@ -1205,6 +1207,7 @@ c
          if (moved) then
             write (iout,140)  ir
   140       format (/,' RICHMOND1  --  Connectivity Error at Atom',i6)
+            call fatal
          else
             moved = .true.
             xr = xr + rmove
@@ -1227,6 +1230,7 @@ c
             if (moved) then
                write (iout,170)  ir
   170          format (/,' RICHMOND1  --  Negative Area at Atom',i6)
+               call fatal
             else
                moved = .true.
                xr = xr + rmove

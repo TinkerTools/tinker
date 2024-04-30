@@ -219,7 +219,7 @@ c
   240    format (' Velocity File',15x,a)
       end if
 c
-c     save the force vector components for the current step,
+c     save the force vector components for the current step;
 c     only correct for single time step Cartesian integrators
 c
       if (frcsave .and. integrate.ne.'RIGIDBODY'
