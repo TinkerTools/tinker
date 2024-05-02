@@ -105,12 +105,12 @@ c
       rmax = 0.0d0
       do i = 1, n
          rmax = rad(i)
-         if (rmax .gt. 0.0d0)  goto 99
+         if (rmax .gt. 0.0d0)  goto 80
       end do
-   99 continue
+   80 continue
       if (rmax .eq. 0.0d0) then
-         write (iout,98)
-   98    format (/,' Atomic Radii not Set, Using Generic VDW Values')
+         write (iout,90)
+   90    format (/,' Atomic Radii not Set, Using Generic VDW Values')
          do i = 1, n
             rad(i) = vdwrad(atomic(i))
          end do
@@ -120,9 +120,9 @@ c     set radii to use for surface area and volume calculation
 c
       do i = 1, n
          if (vdwindex .eq. 'CLASS') then
-            rsolv(i) = rad(class(i)) + cavoff
-         else  if (vdwindex .eq. 'TYPE ') then
-            rsolv(i) = rad(type(i)) + cavoff
+            rsolv(i) = rad(class(i))
+         else
+            rsolv(i) = rad(type(i))
          end if
          weight(i) = 1.0d0
       end do
@@ -142,50 +142,50 @@ c
 c     compute accessible surface area via Richmond method
 c
       surf = 0.0d0
-      write (iout,80)
-   80 format (/,' Timothy Richmond Accessible Surface Area Method :')
+      write (iout,100)
+  100 format (/,' Timothy Richmond Accessible Surface Area Method :')
       call settime
       call richmond (n,x,y,z,rsolv,weight,probe,surf,asurf)
       call gettime (wall,cpu)
-      write (iout,90)  cpu,wall
-   90 format (/,' CPU and Wall Times :',5x,2f12.4) 
-      write (iout,100)  surf
-  100 format (/,' Total Surface Area :',5x,f12.4)
+      write (iout,110)  cpu,wall
+  110 format (/,' CPU and Wall Times :',5x,2f12.4) 
+      write (iout,120)  surf
+  120 format (/,' Total Surface Area :',5x,f12.4)
 c
 c     compute accessible surface and derivatives via Richmond
 c
       surf = 0.0d0
-      write (iout,110)
-  110 format (/,' Timothy Richmond Surface Area Derivative Method :')
+      write (iout,130)
+  130 format (/,' Timothy Richmond Surface Area Derivative Method :')
       call settime
       call richmond1 (n,x,y,z,rsolv,weight,probe,surf,asurf,dsurf)
       call gettime (wall,cpu)
-      write (iout,120)  cpu,wall
-  120 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,130)  surf
-  130 format (/,' Total Surface Area :',5x,f12.4)
-      write (iout,140)
-  140 format (/,' Surface Area Derivatives :  (First Ten Atoms)',/)
+      write (iout,140)  cpu,wall
+  140 format (/,' CPU and Wall Times :',5x,2f12.4)
+      write (iout,150)  surf
+  150 format (/,' Total Surface Area :',5x,f12.4)
+      write (iout,160)
+  160 format (/,' Surface Area Derivatives :  (First Ten Atoms)',/)
       do i = 1, min(10,n)
-         write (iout,150)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i)
-  150    format (i8,6x,3f10.4)
+         write (iout,170)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i)
+  170    format (i8,6x,3f10.4)
       end do
 c
 c     compute surface area and excluded volume via Connolly
 c
       surf = 0.0d0
       vol = 0.0d0
-      write (iout,160)
-  160 format (/,' Michael Connolly Molecular Area-Volume Method :')
+      write (iout,180)
+  180 format (/,' Michael Connolly Molecular Area-Volume Method :')
       call settime
       call connolly (n,x,y,z,rsolv,probe,reentrant,surf,vol)
       call gettime (wall,cpu)
-      write (iout,170)  cpu,wall
-  170 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,180)  surf
-  180 format (/,' Total Surface Area :',5x,f12.4)
-      write (iout,190)  vol
-  190 format (/,' Total Excluded Vol :',5x,f12.4)
+      write (iout,190)  cpu,wall
+  190 format (/,' CPU and Wall Times :',5x,2f12.4)
+      write (iout,200)  surf
+  200 format (/,' Total Surface Area :',5x,f12.4)
+      write (iout,210)  vol
+  210 format (/,' Total Excluded Vol :',5x,f12.4)
 c
 c     compute excluded volume derivatives via Kundrot method
 c
@@ -194,18 +194,18 @@ c
          dvol(2,i) = 0.0d0
          dvol(3,i) = 0.0d0
       end do
-      write (iout,200)
-  200 format (/,' Craig Kundrot Excluded Volume Derivative Method :')
+      write (iout,220)
+  220 format (/,' Craig Kundrot Excluded Volume Derivative Method :')
       call settime
       call kundrot1 (n,x,y,z,rsolv,probe,dvol)
       call gettime (wall,cpu)
-      write (iout,210)  cpu,wall
-  210 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,220)
-  220 format (/,' Excluded Volume Derivatives :  (First Ten Atoms)',/)
+      write (iout,230)  cpu,wall
+  230 format (/,' CPU and Wall Times :',5x,2f12.4)
+      write (iout,240)
+  240 format (/,' Excluded Volume Derivatives :  (First Ten Atoms)',/)
       do i = 1, min(10,n)
-         write (iout,230)  i,dvol(1,i),dvol(2,i),dvol(3,i)
-  230    format (i8,6x,3f10.4)
+         write (iout,250)  i,dvol(1,i),dvol(2,i),dvol(3,i)
+  250    format (i8,6x,3f10.4)
       end do
 
 c
@@ -234,36 +234,36 @@ c
          crdfile = filename(1:leng)//'.crd'
          call version (crdfile,'new')
          open (unit=icrd,file=crdfile,status='new')
-         write (icrd,240)  n
-  240    format (i8,/)
+         write (icrd,260)  n
+  260    format (i8,/)
          do i = 1, n
-            write (icrd,250)  i,x(i),y(i),z(i),rsolv(i)
-  250       format (i8,3f14.6,f12.4)
+            write (icrd,270)  i,x(i),y(i),z(i),rsolv(i)
+  270       format (i8,3f14.6,f12.4)
          end do
          close (unit=icrd)
       end if
 c
 c     compute area, volume and derivatives via UnionBall
 c
-      write (iout,260)
-  260 format (/,' Patrice Koehl UnionBall Alpha Shape Method :')
+      write (iout,280)
+  280 format (/,' Patrice Koehl UnionBall Alpha Shape Method :')
       call settime
       call unionball (n,x,y,z,rsolv,weight,probe,doderiv,dovol,
      &                   surf,vol,asurf,avol,dsurf,dvol)
       call gettime (wall,cpu)
-      write (iout,270)  cpu,wall
-  270 format (/,' CPU and Wall Times :',5x,2f12.4)
-      write (iout,280)  surf
-  280 format (/,' Total Surface Area :',5x,f12.4)
-      write (iout,290)  vol
-  290 format (/,' Total Excluded Vol :',5x,f12.4)
-      write (iout,300)
-  300 format (/,' Surface Area & Volume Derivatives :',
+      write (iout,290)  cpu,wall
+  290 format (/,' CPU and Wall Times :',5x,2f12.4)
+      write (iout,300)  surf
+  300 format (/,' Total Surface Area :',5x,f12.4)
+      write (iout,310)  vol
+  310 format (/,' Total Excluded Vol :',5x,f12.4)
+      write (iout,320)
+  320 format (/,' Surface Area & Volume Derivatives :',
      &           '  (First Ten Atoms)',/)
       do i = 1, min(10,n)
-         write (iout,310)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i),
+         write (iout,330)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i),
      &                     dvol(1,i),dvol(2,i),dvol(3,i)
-  310    format (i8,6x,6f10.4)
+  330    format (i8,6x,6f10.4)
       end do
 c
 c     perform deallocation of some local arrays

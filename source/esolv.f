@@ -1378,10 +1378,12 @@ c
       allocate (aevol(n))
       allocate (aetemp(n))
 c
+c     solvent probe radius is included in cavity radii
+c
+      probe = 0.0d0
+c
 c     compute surface area and effective radius for cavity
 c
-      probe = 1.4d0
-      if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
       call surface (radcav,asolv,probe,esurf,aesurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff

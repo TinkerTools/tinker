@@ -78,8 +78,7 @@ c
 c
 c     nonpolar energy as hydrophobic potential of mean force
 c
-      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
-     &            .or. solvtyp.eq.'PB-HPMF') then
+      else if (solvtyp(4:7) .eq. 'HPMF') then
          call ehpmf3 (ehp,nehp,aehp)
          es = ehp
          nes = nes + nehp
@@ -178,25 +177,30 @@ c
 c     print nonpolar and electrostatic components for selected models
 c
       if (verbose) then
-         if (esurf .ne. 0.0d0) then
+         if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
             write (iout,30)  esurf,es-esurf
    30       format (/,' Implicit Solvation Energy Components :'
      &              //,' SA Nonpolar',25x,f12.4,
      &              /,' Electrostatic',23x,f12.4)
-         else if (ecav.ne.0.0d0 .or. edisp.ne.0.0d0) then
-            write (iout,40)  ecav,edisp,es-ecav-edisp
+         else if (solvtyp(4:7) .eq. 'HPMF') then
+            write (iout,40)  ehp,es-ehp
    40       format (/,' Implicit Solvation Energy Components :'
+     &              //,' Hydrophobic PMF',21x,f12.4,
+     &              /,' Electrostatic',23x,f12.4)
+         else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
+            write (iout,50)  esurf,es-esurf
+   50       format (/,' Implicit Solvation Energy Components :'
+     &              //,' SA Nonpolar',25x,f12.4,
+     &              /,' Electrostatic',23x,f12.4)
+         else if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
+            write (iout,60)  ecav,edisp,es-ecav-edisp
+   60       format (/,' Implicit Solvation Energy Components :'
      &              //,' Cavitation',26x,f12.4,
      &              /,' Dispersion',26x,f12.4,
      &              /,' Electrostatic',23x,f12.4)
-         else if (ehp .ne. 0.0d0) then
-            write (iout,50)  ehp,es-ehp
-   50       format (/,' Implicit Solvation Energy Components :'
-     &              //,' Hydrophobic PMF',21x,f12.4,
-     &              /,' Electrostatic',23x,f12.4)
-         else if (eace .ne. 0.0d0) then
-            write (iout,60)  eace,es-eace
-   60       format (/,' Implicit Solvation Energy Components :'
+         else
+            write (iout,70)  eace,es-eace
+   70       format (/,' Implicit Solvation Energy Components :'
      &              //,' ACE Nonpolar',24x,f12.4,
      &              /,' Electrostatic',23x,f12.4)
          end if
@@ -1581,10 +1585,12 @@ c
          aedisp(i) = 0.0d0
       end do
 c
+c     solvent probe radius is included in cavity radii
+c
+      probe = 0.0d0
+c
 c     compute surface area and effective radius for cavity
 c
-      probe = 1.4d0
-      if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
       call surface (radcav,asolv,probe,esurf,aesurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff

@@ -1462,6 +1462,7 @@ c
       use math
       use nonpol
       use potent
+      use solpot
       use solute
       use vdwpot
       implicit none
@@ -1478,12 +1479,13 @@ c
       character*240 string
 c
 c
-c     set default values for solvent pressure and surface tension
+c     set probe radius, solvent pressure and surface tension
 c
+      cavprb = 1.4d0
       solvprs = 0.0334d0
       surften = 0.103d0
 c
-c     get any altered surface tension value from keyfile
+c     get any altered parameter values from the keyfile
 c
       do i = 1, nkey
          next = 1
@@ -1491,7 +1493,9 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:240)
-         if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
+         if (keyword(1:13) .eq. 'CAVITY-PROBE ') then
+            read (string,*,err=10,end=10)  cavprb
+         else if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
             read (string,*,err=10,end=10)  solvprs
          else if (keyword(1:16) .eq. 'SURFACE-TENSION ') then
             read (string,*,err=10,end=10)  surften
@@ -1535,14 +1539,15 @@ c     set cavity and dispersion radii for nonpolar solvation
 c
       do i = 1, n
          if (vdwindex .eq. 'CLASS') then
-            radcav(i) = rad(class(i)) + cavoff
+            radcav(i) = rad(class(i))
             raddsp(i) = rad(class(i))
             epsdsp(i) = eps(class(i))
          else
-            radcav(i) = rad(type(i)) + cavoff
+            radcav(i) = rad(type(i))
             raddsp(i) = rad(type(i))
             epsdsp(i) = eps(type(i))
          end if
+         if (solvtyp .ne. 'PB')  radcav(i) = radcav(i) + cavprb
       end do
 c
 c     compute maximum dispersion energies for each atom

@@ -4718,10 +4718,12 @@ c
          dvol(3,i) = 0.0d0
       end do
 c
+c     solvent probe radius is included in cavity radii
+c
+      probe = 0.0d0
+c
 c     compute surface area and effective radius for cavity
 c
-      probe = 1.4d0
-      if (solvtyp(1:2) .eq. 'PB')  probe = 0.0d0
       call surface1 (radcav,asolv,probe,esurf,aesurf,dsurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       dreff = 0.5d0 * reff / esurf
