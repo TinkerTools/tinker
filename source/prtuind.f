@@ -25,6 +25,8 @@ c
       use files
       use inform
       use polar
+      use potent
+      use solpot
       use titles
       use units
       implicit none
@@ -96,16 +98,31 @@ c     write out the induced dipole components for each atom
 c
       fstr = '('//atmc//',2x,a3,3f'//crdc//
      &          '.'//digc//',i6,8'//atmc//')'
-      do i = 1, n
-         k = n12(i)
-         if (k .eq. 0) then
-            write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
-     &                         type(i)
+      if (use_solv) then
+         if (solvtyp(1:2).eq.'GK' .or. solvtyp(1:2).eq.'PB') then
+            do i = 1, n
+               k = n12(i)
+               if (k .eq. 0) then
+                  write (iind,fstr)  i,name(i),(debye*uinds(j,i),j=1,3),
+     &                               type(i)
+               else
+                  write (iind,fstr)  i,name(i),(debye*uinds(j,i),j=1,3),
+     &                               type(i),(i12(j,i),j=1,k)
+               end if
+            end do
          else
-            write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
-     &                         type(i),(i12(j,i),j=1,k)
+            do i = 1, n
+               k = n12(i)
+               if (k .eq. 0) then
+                  write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
+     &                               type(i)
+               else
+                  write (iind,fstr)  i,name(i),(debye*uind(j,i),j=1,3),
+     &                               type(i),(i12(j,i),j=1,k)
+               end if
+            end do
          end if
-      end do
+      end if
 c
 c     close the output unit if opened by this routine
 c
@@ -155,6 +172,8 @@ c
       use boxes
       use files
       use polar
+      use potent
+      use solpot
       use titles
       use units
       implicit none
@@ -220,9 +239,17 @@ c
 c
 c     append the induced dipoles along each axis in turn
 c
-      write (idcd)  (real(debye*uind(1,i)),i=1,n)
-      write (idcd)  (real(debye*uind(2,i)),i=1,n)
-      write (idcd)  (real(debye*uind(3,i)),i=1,n)
+      if (use_solv) then
+         if (solvtyp(1:2).eq.'GK' .or. solvtyp(1:2).eq.'PB') then
+            write (idcd)  (real(debye*uinds(1,i)),i=1,n)
+            write (idcd)  (real(debye*uinds(2,i)),i=1,n)
+            write (idcd)  (real(debye*uinds(3,i)),i=1,n)
+         else
+            write (idcd)  (real(debye*uind(1,i)),i=1,n)
+            write (idcd)  (real(debye*uind(2,i)),i=1,n)
+            write (idcd)  (real(debye*uind(3,i)),i=1,n)
+         end if
+      end if
 c
 c     close the output unit if opened by this routine
 c
