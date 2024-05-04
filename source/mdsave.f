@@ -36,12 +36,13 @@ c
       use socket
       use titles
       implicit none
-      integer i,j
+      integer i,j,lext
       integer istep
       integer ixyz,iind
       integer ivel,ifrc
-      integer iend,isave,lext
-      integer freeunit,trimtext
+      integer iend,isave
+      integer freeunit
+      integer trimtext
       integer modsave
       real*8 dt,pico
       real*8 epot,eksum

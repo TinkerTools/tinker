@@ -58,6 +58,7 @@ c
       use iounit
       use math
       use mpole
+      use mutant
       use pbstuf
       use solpot
       use solute
@@ -340,6 +341,7 @@ c
                do k = 1, n
                   rk = rdescr(k)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
+                  if (mut(k))  mixsn = mixsn * elambda
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -605,6 +607,7 @@ c
       use couple
       use deriv
       use math
+      use mutant
       use solpot
       use solute
       use virial
@@ -900,6 +903,7 @@ c
                do k = 1, n
                   rk = rdescr(k)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
+                  if (mut(k))  mixsn = mixsn * elambda
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi

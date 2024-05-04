@@ -422,10 +422,7 @@ c
       if (use_solv) then
          do i = 1, n
             if (mut(i)) then
-c              rsolv(i) = rsolv(i) * elambda
-               rdescr(i) = rdescr(i) * elambda
                shct(i) = shct(i) * elambda
-c              sneck(i) = sneck(i) * elambda
                radcav(i) = radcav(i) * elambda
                raddsp(i) = raddsp(i) * elambda
                epsdsp(i) = epsdsp(i) * elambda

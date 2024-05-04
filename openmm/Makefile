@@ -75,7 +75,7 @@ NVML_LIB = /usr/local/cuda/lib64/stubs
 ##  Build:     Tinker-OpenMM
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible, Nvidia GPU
-##  Compiler:  GNU gfortran 9.3, g++, nvcc
+##  Compiler:  GNU gfortran 11.2, g++, nvcc
 ##  Parallel:  OpenMP, OpenMM
 
 CC = gcc
@@ -1384,7 +1384,7 @@ bitors.o: angbnd.o atoms.o bitor.o couple.o iounit.o
 bndpot.o:
 bndstr.o:
 bonds.o: atmlst.o atoms.o bndstr.o couple.o iounit.o
-born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math.o mpole.o pbstuf.o solpot.o solute.o virial.o
+born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math.o mpole.o mutant.o pbstuf.o solpot.o solute.o virial.o
 bound.o:
 bounds.o: atomid.o atoms.o boxes.o math.o molcul.o
 boxes.o:

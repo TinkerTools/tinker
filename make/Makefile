@@ -63,25 +63,7 @@ APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 ##  Build:     Tinker
 ##  OS Type:   Generic Linux
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  GNU gfortran 9.3
-##  Parallel:  OpenMP
-
-#F77 = gfortran
-#F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -fopenmp
-#OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-#LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
-#LIBS = 
-#LIBFLAGS = -crusv
-#RANLIB = ranlib
-#LINKFLAGS = $(OPTFLAGS) -static-libgcc
-#RENAME = rename_bin
-
-##  Build:     Tinker
-##  OS Type:   Apple macOS
-##  CPU Type:  Intel x86 & Apple Silicon
-##  Compiler:  GNU gfortran 13.2
+##  Compiler:  GNU gfortran 11.2
 ##  Parallel:  OpenMP
 
 F77 = gfortran
@@ -89,12 +71,30 @@ F77FLAGS = -c
 OPTFLAGS = -Ofast -march=native -fopenmp
 #OPTFLAGS = -Ofast -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
-LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
 LIBS = 
 LIBFLAGS = -crusv
-RANLIB = ranlib -c
+RANLIB = ranlib
 LINKFLAGS = $(OPTFLAGS) -static-libgcc
 RENAME = rename_bin
+
+##  Build:     Tinker
+##  OS Type:   Apple macOS
+##  CPU Type:  Intel x86 & Apple Silicon
+##  Compiler:  GNU gfortran 13.2
+##  Parallel:  OpenMP
+
+#F77 = gfortran
+#F77FLAGS = -c
+#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -fopenmp
+#OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
+#LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
+#LIBS = 
+#LIBFLAGS = -crusv
+#RANLIB = ranlib -c
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc
+#RENAME = rename_bin
 
 ##  Build:     Tinker
 ##  OS Type:   Microsoft Windows 10
@@ -1668,7 +1668,7 @@ bitors.o: angbnd.o atoms.o bitor.o couple.o iounit.o
 bndpot.o:
 bndstr.o:
 bonds.o: atmlst.o atoms.o bndstr.o couple.o iounit.o
-born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math.o mpole.o pbstuf.o solpot.o solute.o virial.o
+born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math.o mpole.o mutant.o pbstuf.o solpot.o solute.o virial.o
 bound.o:
 bounds.o: atomid.o atoms.o boxes.o math.o molcul.o
 boxes.o:

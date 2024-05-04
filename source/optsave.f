@@ -39,7 +39,7 @@ c
       use zcoord
       implicit none
       integer i,j,ii,lext
-      integer iopt,ifrc
+      integer ixyz,ifrc
       integer iind,iend
       integer ncycle,nvar
       integer freeunit
@@ -47,7 +47,7 @@ c
       real*8 f,xx(*)
       logical exist,first
       character*7 ext
-      character*240 optfile
+      character*240 xyzfile
       character*240 frcfile
       character*240 indfile
       character*240 endfile
@@ -107,95 +107,92 @@ c
 c
 c     save coordinates to archive or numbered structure file
 c
-      iopt = freeunit ()
+      ixyz = freeunit ()
       if (cyclesave) then
          if (dcdsave) then
-            optfile = filename(1:leng)
-            call suffix (optfile,'dcd','old')
-            inquire (file=optfile,exist=exist)
+            xyzfile = filename(1:leng)
+            call suffix (xyzfile,'dcd','old')
+            inquire (file=xyzfile,exist=exist)
             if (exist) then
                first = .false.
-               open (unit=iopt,file=optfile,form='unformatted',
+               open (unit=ixyz,file=xyzfile,form='unformatted',
      &                  status='old',position='append')
             else
                first = .true.
-               open (unit=iopt,file=optfile,form='unformatted',
+               open (unit=ixyz,file=xyzfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcd (iopt,first)
+            call prtdcd (ixyz,first)
          else if (arcsave) then
-            optfile = filename(1:leng)
-            call suffix (optfile,'arc','old')
-            inquire (file=optfile,exist=exist)
+            xyzfile = filename(1:leng)
+            call suffix (xyzfile,'arc','old')
+            inquire (file=xyzfile,exist=exist)
             if (exist) then
-               call openend (iopt,optfile)
+               call openend (ixyz,xyzfile)
             else
-               open (unit=iopt,file=optfile,status='new')
+               open (unit=ixyz,file=xyzfile,status='new')
             end if
          else
             lext = 3
             call numeral (ncycle,ext,lext)
-            optfile = filename(1:leng)//'.'//ext(1:lext)
-            call version (optfile,'new')
-            open (unit=iopt,file=optfile,status='new')
+            xyzfile = filename(1:leng)//'.'//ext(1:lext)
+            call version (xyzfile,'new')
+            open (unit=ixyz,file=xyzfile,status='new')
          end if
       else
-         optfile = outfile
-         call version (optfile,'old')
-         open (unit=iopt,file=optfile,status='old')
-         rewind (unit=iopt)
+         xyzfile = outfile
+         call version (xyzfile,'old')
+         open (unit=ixyz,file=xyzfile,status='old')
+         rewind (unit=ixyz)
       end if
 c
 c     update intermediate file with desired coordinate type
 c
       if (coordtype .eq. 'CARTESIAN') then
-         if (.not. dcdsave)  call prtxyz (iopt)
+         if (.not. dcdsave)  call prtxyz (ixyz)
       else if (coordtype .eq. 'INTERNAL') then
-         call prtint (iopt)
+         call prtint (ixyz)
       else if (coordtype .eq. 'RIGIDBODY') then
-         call prtxyz (iopt)
+         call prtxyz (ixyz)
       end if
-      close (unit=iopt)
+      close (unit=ixyz)
 c
 c     save the force vector components for the current step
 c
       if (frcsave .and. coordtype.eq.'CARTESIAN') then
          ifrc = freeunit ()
          if (cyclesave) then
-            if (arcsave) then
-               frcfile = filename(1:leng)
-               call suffix (frcfile,'frc','old')
-               inquire (file=frcfile,exist=exist)
-               if (exist) then
-                  call openend (ifrc,frcfile)
-               else
-                  open (unit=ifrc,file=frcfile,status='new')
-               end if
+            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
+            call version (frcfile,'new')
+            open (unit=ifrc,file=frcfile,status='new')
+         else if (dcdsave) then
+            frcfile = filename(1:leng)
+            call suffix (frcfile,'dcdf','old')
+            inquire (file=frcfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=ifrc,file=frcfile,form='unformatted',
+     &                  status='old',position='append')
             else
-               frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
-               call version (frcfile,'new')
-               open (unit=ifrc,file=frcfile,status='new')
+               first = .true.
+               open (unit=ifrc,file=frcfile,form='unformatted',
+     &                  status='new')
             end if
+            call prtdcdf (ifrc,first)
          else
             frcfile = filename(1:leng)
             call suffix (frcfile,'frc','old')
             inquire (file=frcfile,exist=exist)
             if (exist) then
-               open (unit=ifrc,file=frcfile,status='old')
-               rewind (unit=ifrc)
+               call openend (ifrc,frcfile)
             else
                open (unit=ifrc,file=frcfile,status='new')
             end if
+            call prtfrc (ifrc)
          end if
-         write (ifrc,10)  n,title(1:ltitle)
-   10    format (i6,2x,a)
-         do i = 1, n
-            write (ifrc,20)  i,name(i),(-desum(j,i),j=1,3)
-   20       format (i6,2x,a3,3x,d13.6,3x,d13.6,3x,d13.6)
-         end do
          close (unit=ifrc)
-         write (iout,30)  frcfile(1:trimtext(frcfile))
-   30    format (' Force Vector File',11x,a)
+         write (iout,10)  frcfile(1:trimtext(frcfile))
+   10    format (' Force Vector File',11x,a)
       end if
 c
 c     save the current induced dipole moment at each site
@@ -203,43 +200,37 @@ c
       if (uindsave .and. use_polar .and. coordtype.eq.'CARTESIAN') then
          iind = freeunit ()
          if (cyclesave) then
-            if (arcsave) then
-               indfile = filename(1:leng)
-               call suffix (indfile,'uind','old')
-               inquire (file=indfile,exist=exist)
-               if (exist) then
-                  call openend (iind,indfile)
-               else
-                  open (unit=iind,file=indfile,status='new')
-               end if
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+         else if (dcdsave) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'dcdu','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='old',position='append')
             else
-               indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
-               call version (indfile,'new')
-               open (unit=iind,file=indfile,status='new')
+               first = .true.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='new')
             end if
+            call prtdcdu (iind,first)
          else
             indfile = filename(1:leng)
             call suffix (indfile,'uind','old')
             inquire (file=indfile,exist=exist)
             if (exist) then
-               open (unit=iind,file=indfile,status='old')
-               rewind (unit=iind)
+               call openend (iind,indfile)
             else
                open (unit=iind,file=indfile,status='new')
             end if
+            call prtuind (iind)
          end if
-         write (iind,40)  n,title(1:ltitle)
-   40    format (i6,2x,a)
-         do ii = 1, npole
-            i = ipole(ii)
-            if (polarity(i) .ne. 0.0d0) then
-               write (iind,50)  i,name(i),(debye*uind(j,i),j=1,3)
-   50          format (i6,2x,a3,3f12.6)
-            end if
-         end do
          close (unit=iind)
-         write (iout,60)  indfile(1:trimtext(indfile))
-   60    format (' Induced Dipole File',10x,a)
+         write (iout,20)  indfile(1:trimtext(indfile))
+   20    format (' Induced Dipole File',10x,a)
       end if
 c
 c     send data via external socket communication if desired
@@ -263,8 +254,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,70)
-   70    format (/,' OPTSAVE  --  Optimization Calculation Ending',
+         write (iout,30)
+   30    format (/,' OPTSAVE  --  Optimization Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if
