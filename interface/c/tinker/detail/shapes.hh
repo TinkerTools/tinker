@@ -14,7 +14,7 @@ extern int TINKER_MOD(shapes, nnew);
 extern int TINKER_MOD(shapes, nfree);
 extern int TINKER_MOD(shapes, nkill);
 extern int TINKER_MOD(shapes, nlinkfacet);
-extern int* TINKER_MOD(shapes, listnew);
+extern int* TINKER_MOD(shapes, newlist);
 extern int* TINKER_MOD(shapes, freespace);
 extern int* TINKER_MOD(shapes, killspace);
 extern int* TINKER_MOD(shapes, vinfo);

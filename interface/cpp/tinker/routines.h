@@ -156,7 +156,7 @@ void connect_();
 #define tinker_f_connect connect_
 
 // connolly.f
-void connolly_(double* volume, double* area, double* radius, double* probe, double* exclude);
+void connolly_(int* n, double* x, double* y, double* z, double* rad, double* exclude, double* reentrant, double* area, double* volume);
 #define tinker_f_connolly connolly_
 void nearby_();
 #define tinker_f_nearby nearby_
@@ -178,7 +178,7 @@ void ipedge_(int* ieq, int* ia);
 #define tinker_f_ipedge ipedge_
 void contact_();
 #define tinker_f_contact contact_
-void vam_(double* volume, double* area);
+void vam_(double* area, double* volume);
 #define tinker_f_vam vam_
 double depth_(int* ip, double* alt);
 #define tinker_f_depth depth_
@@ -270,28 +270,6 @@ void deflate_(int* n, int* nv, double* a, double* ev, double* vec);
 // delete.f
 void delete_(int* iatom);
 #define tinker_f_delete delete_
-
-// deter.f
-void minor5_(double* crdball, double* radball, int* a, int* b, int* c, int* d, int* e, int* result);
-#define tinker_f_minor5 minor5_
-void deter5_(double* det, double* r11, double* r12, double* r13, double* r14, double* r21, double* r22, double* r23, double* r24, double* r31, double* r32, double* r33, double* r34, double* r41, double* r42, double* r43, double* r44, double* r51, double* r52, double* r53, double* r54, int* isign);
-#define tinker_f_deter5 deter5_
-void minor4_(double* crdball, int* a, int* b, int* c, int* d, int* result);
-#define tinker_f_minor4 minor4_
-void minor4x_(double* crdball, int* a, int* b, int* c, int* d, int* result);
-#define tinker_f_minor4x minor4x_
-void deter4_(double* det, double* r11, double* r12, double* r13, double* r21, double* r22, double* r23, double* r31, double* r32, double* r33, double* r41, double* r42, double* r43, int* isign);
-#define tinker_f_deter4 deter4_
-void minor3_(double* crdball, int* a, int* b, int* c, int* i1, int* i2, int* result);
-#define tinker_f_minor3 minor3_
-void deter3_(double* det, double* r11, double* r12, double* r21, double* r22, double* r31, double* r32, int* isign);
-#define tinker_f_deter3 deter3_
-void minor2_(double* crdball, int* a, int* b, int* ia, int* result);
-#define tinker_f_minor2 minor2_
-void deter2_(double* det, double* r11, double* r12, int* isign);
-#define tinker_f_deter2 deter2_
-double psub_(double* r1, double* r2);
-#define tinker_f_psub psub_
 
 // dexpol.f
 void dexpol_();
@@ -1884,9 +1862,9 @@ void ktortor_();
 #define tinker_f_ktortor ktortor_
 
 // kundrot.f
-void kundrot1_(double* radius, double* probe, double* dex);
+void kundrot1_(int* n, double* x, double* y, double* z, double* rad, double* probe, double* dex);
 #define tinker_f_kundrot1 kundrot1_
-void kundrot2_(int* iatom, double* radius, double* probe, double* xhess, double* yhess, double* zhess);
+void kundrot2_(int* iatom, int* n, double* x, double* y, double* z, double* rad, double* probe, double* xhess, double* yhess, double* zhess);
 #define tinker_f_kundrot2 kundrot2_
 
 // kurey.f
@@ -1972,6 +1950,8 @@ void altelec_();
 #define tinker_f_altelec altelec_
 void alttors_(int* ntbnd, int* itbnd);
 #define tinker_f_alttors alttors_
+void altsolv_();
+#define tinker_f_altsolv altsolv_
 
 // nblist.f
 void nblist_();
@@ -2406,9 +2386,9 @@ void linbody_(int* i, double* inert, double* wcp);
 #define tinker_f_linbody linbody_
 
 // richmond.f
-void richmond_(double* total, double* area, double* radius, double* weight, double* probe);
+void richmond_(int* n, double* x, double* y, double* z, double* rad, double* weight, double* probe, double* total, double* area);
 #define tinker_f_richmond richmond_
-void richmond1_(double* total, double* area, double* darea, double* radius, double* weight, double* probe);
+void richmond1_(int* n, double* x, double* y, double* z, double* rad, double* weight, double* probe, double* total, double* area, double* darea);
 #define tinker_f_richmond1 richmond1_
 
 // rings.f
@@ -2592,9 +2572,9 @@ inline void tinker_f_suffix(tinker_fchars string, tinker_fchars extension, tinke
 }
 
 // surface.f
-void surface_(double* surf, double* asurf, double* rad, double* weight, double* probe);
+void surface_(double* rad, double* weight, double* probe, double* surf, double* asurf);
 #define tinker_f_surface surface_
-void surface1_(double* surf, double* asurf, double* dsurf, double* rad, double* weight, double* probe);
+void surface1_(double* rad, double* weight, double* probe, double* surf, double* asurf, double* dsurf);
 #define tinker_f_surface1 surface1_
 
 // surfatom.f
@@ -2690,16 +2670,16 @@ inline void tinker_f_lowcase(tinker_fchars string) {
 }
 
 // unionball.f
-void unionball_(double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol, double* rad, double* weight, double* probe, int* doderiv, int* dovol);
+void unionball_(int* n, double* x, double* y, double* z, double* rad, double* weight, double* probe, int* doderiv, int* dovol, double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol);
 #define tinker_f_unionball unionball_
 void setunion_(int* nsphere, double* coords, double* radii);
 #define tinker_f_setunion setunion_
-void regular3_(int* nredundant, int* list_redundant);
+void regular3_(int* nredundant, int* redlist);
 #define tinker_f_regular3 regular3_
-void alfcx_(double* alpha, int* nred, int* listred);
+void alfcx_(double* alpha, int* nred, int* redlist);
 #define tinker_f_alfcx alfcx_
-void readjust_nsphere_(int* nsphere, int* nred, int* listred);
-#define tinker_f_readjust_nsphere readjust_nsphere_
+void readjust_sphere_(int* nsphere, int* nredundant, int* redlist);
+#define tinker_f_readjust_sphere readjust_sphere_
 void ball_surf_(double* coef, double* wsurf, double* surf, double* ballwsurf);
 #define tinker_f_ball_surf ball_surf_
 void ball_vol_(double* coef, double* wsurf, double* wvol, double* surf, double* vol, double* ballwsurf, double* ballwvol);
@@ -2712,7 +2692,7 @@ void alf_tetra_(double* a, double* b, double* c, double* d, double* ra, double* 
 #define tinker_f_alf_tetra alf_tetra_
 void alf_trig_(double* a, double* b, double* c, double* d, double* e, double* ra, double* rb, double* rc, double* rd, double* re, int* ie, int* irad, int* iattach, double* alpha);
 #define tinker_f_alf_trig alf_trig_
-void alf_edge_(double* a, double* b, double* ra, double* rb, double* cg, int* ncheck, int* listcheck, int* irad, int* iattach, double* alpha);
+void alf_edge_(double* a, double* b, double* ra, double* rb, double* cg, int* ncheck, int* chklist, int* irad, int* iattach, double* alpha);
 #define tinker_f_alf_edge alf_edge_
 void edge_radius_(double* a, double* b, double* ra, double* rb, double* dab, double* sab, double* tab, int* testr, double* alpha);
 #define tinker_f_edge_radius edge_radius_
@@ -2726,7 +2706,7 @@ void vertex_attach_(double* a, double* b, double* ra, double* rb, int* testa, in
 #define tinker_f_vertex_attach vertex_attach_
 void locate_jw_(int* iseed, int* ival, int* tetra_loc, int* iredundant);
 #define tinker_f_locate_jw locate_jw_
-void inside_tetra_jw_(int* p, int* a, int* b, int* c, int* d, int* iorient, int* is_in, int* redundant, int* ifail);
+void inside_tetra_jw_(int* p, int* a, int* b, int* c, int* d, int* iorient, int* inside, int* redundant, int* ifail);
 #define tinker_f_inside_tetra_jw inside_tetra_jw_
 void regular_convex_(int* a, int* b, int* c, int* p, int* o, int* itest_abcp, int* regular, int* convex, int* test_abpo, int* test_bcpo, int* test_capo);
 #define tinker_f_regular_convex regular_convex_
@@ -2776,8 +2756,6 @@ void get_coord4_(int* ia, int* ja, int* ka, int* la, double* a, double* b, doubl
 #define tinker_f_get_coord4 get_coord4_
 void get_coord5_(int* ia, int* ja, int* ka, int* la, int* ma, double* a, double* b, double* c, double* d, double* e, double* ra, double* rb, double* rc, double* rd, double* re, double* cg);
 #define tinker_f_get_coord5 get_coord5_
- ran2_(int* idum);
-#define tinker_f_ran2 ran2_
 void resize_tet_();
 #define tinker_f_resize_tet resize_tet_
 void hpsort_three_(double* ra, int* index, int* n);
@@ -2856,6 +2834,8 @@ void minor2_(double* crdball, int* a, int* b, int* ia, int* result);
 #define tinker_f_minor2 minor2_
 void deter2_(double* det, double* r11, double* r12, int* isign);
 #define tinker_f_deter2 deter2_
+double padd_(double* r1, double* r2);
+#define tinker_f_padd padd_
 double psub_(double* r1, double* r2);
 #define tinker_f_psub psub_
 
@@ -2874,9 +2854,9 @@ inline void tinker_f_version(tinker_fchars string, tinker_fchars status) {
 }
 
 // volume.f
-void volume_(double* surf, double* vol, double* asurf, double* avol, double* rad, double* weight, double* probe);
+void volume_(double* rad, double* weight, double* probe, double* surf, double* vol, double* asurf, double* avol);
 #define tinker_f_volume volume_
-void volume1_(double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol, double* rad, double* weight, double* probe);
+void volume1_(double* rad, double* weight, double* probe, double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol);
 #define tinker_f_volume1 volume1_
 
 // xyzatm.f

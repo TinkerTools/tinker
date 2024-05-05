@@ -212,7 +212,6 @@ add_library (tinkerObjF OBJECT
 ../source/dcflux.f
 ../source/deflate.f
 ../source/delete.f
-../source/deter.f
 ../source/dexpol.f
 ../source/diagq.f
 ../source/diffeq.f
