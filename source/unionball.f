@@ -110,21 +110,19 @@ c
          if (rad(i) .ne. 0.0d0)  radii(i) = rad(i) + probe
       end do
 c
-c     test for symmetrical system with possible numerical issues
+c     check coordinates for linearity, planarity and symmetry
 c
       symmtyp = 'NONE'
       call chksymm (symmtyp)
-      if (n.le.65 .and. symmtyp.ne.'NONE') then
-         write (iout,10)  symmtyp
-   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
-     &              ' Wiggling Coordinates')
-      end if
+      dowiggle = .false.
+      if (n.le.200 .and. symmtyp.ne.'NONE')  dowiggle = .true.
 c
 c     random coordinate perturbation to avoid numerical issues
 c
-      dowiggle = .false.
-      if (n.le.65 .and. symmtyp.ne.'NONE')  dowiggle = .true.
       if (dowiggle) then
+         write (iout,10)  symmtyp
+   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
+     &              ' Wiggling Coordinates')
          eps = 0.001d0
          call wiggle (n,coords,eps)
       end if

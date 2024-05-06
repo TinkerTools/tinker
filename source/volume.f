@@ -55,7 +55,7 @@ c
       integer nsize,nfudge
       integer nredundant
       integer, allocatable :: redlist(:)
-      real*8 surf,usurf
+      real*8 surf,usurf,eps
       real*8 vol,uvol,voln
       real*8 reentrant
       real*8 probe,alpha
@@ -67,13 +67,20 @@ c
       real*8, allocatable :: asurfx(:)
       real*8, allocatable :: avolx(:)
       real*8, allocatable :: coords(:,:)
+      logical dowiggle
       character*6 symmtyp
 c
 c
+c     check coordinates for linearity, planarity and symmetry
+c
+      symmtyp = 'NONE'
+      call chksymm (symmtyp)
+      dowiggle = .false.
+      if (n.le.200 .and. symmtyp.ne.'NONE')  dowiggle = .true.
+c
 c     use Connolly method for small symmetric structures
 c
-      call chksymm (symmtyp)
-      if (n.le.65 .and. symmtyp.ne.'NONE') then
+      if (dowiggle) then
          reentrant = 0.0d0
          call connolly (n,x,y,z,rad,probe,reentrant,surf,vol)
          vol = vol * weight(1)
@@ -104,6 +111,13 @@ c
          radii(i) = 0.0d0
          if (rad(i) .ne. 0.0d0)  radii(i) = rad(i) + probe
       end do
+c
+c     random coordinate perturbation to avoid numerical issues
+c
+      if (dowiggle) then
+         eps = 0.001d0
+         call wiggle (n,coords,eps)
+      end if
 c
 c     transfer coordinates, complete to minimum of four spheres
 c     if needed, set Delaunay and alpha complex arrays
@@ -202,7 +216,7 @@ c
       integer nsize,nfudge
       integer nredundant
       integer, allocatable :: redlist(:)
-      real*8 surf,usurf
+      real*8 surf,usurf,eps
       real*8 vol,uvol,voln
       real*8 reentrant
       real*8 probe,alpha
@@ -218,13 +232,20 @@ c
       real*8, allocatable :: coords(:,:)
       real*8, allocatable :: dsurfx(:,:)
       real*8, allocatable :: dvolx(:,:)
+      logical dowiggle
       character*6 symmtyp
 c
 c
-c     use other methods for small symmetric structures
+c     check coordinates for linearity, planarity and symmetry
 c
+      symmtyp = 'NONE'
       call chksymm (symmtyp)
-      if (n.le.65 .and. symmtyp.ne.'NONE') then
+      dowiggle = .false.
+      if (n.le.200 .and. symmtyp.ne.'NONE')  dowiggle = .true.
+c
+c     use arc-based methods for small symmetric structures
+c
+      if (dowiggle) then
          reentrant = 0.0d0
          call connolly (n,x,y,z,rad,probe,reentrant,surf,vol)
          call kundrot1 (n,x,y,z,rad,probe,dvol)
@@ -232,6 +253,9 @@ c
          vol = vol * weight(1)
          voln = vol / dble(n)
          do i = 1, n
+            dvol(1,i) = dvol(1,i) * weight(i)
+            dvol(2,i) = dvol(2,i) * weight(i)
+            dvol(3,i) = dvol(3,i) * weight(i)
             avol(i) = voln
          end do
          return
@@ -259,6 +283,13 @@ c
          radii(i) = 0.0d0
          if (rad(i) .ne. 0.0d0)  radii(i) = rad(i) + probe
       end do
+c
+c     random coordinate perturbation to avoid numerical issues
+c
+      if (dowiggle) then
+         eps = 0.001d0
+         call wiggle (n,coords,eps)
+      end if
 c
 c     transfer coordinates, complete to minimum of four spheres
 c     if needed, set Delaunay and alpha complex arrays
