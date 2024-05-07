@@ -159,16 +159,16 @@ c
                   header = .false.
                   write (iout,30)
    30             format (/,' Additional Solvation Parameters :',
-     &                    //,5x,'Atom Type',16x,'PB Size',5x,'CS Size',
+     &                    //,5x,'Atom Type',13x,'PB Size',5x,'CS Size',
      &                       5x,'GK Size',6x,'S-Neck',/)
                end if
-               pbr(k) = pbrd
-               gkr(k) = csrd
-               pbr(k) = gkrd
+               pbr(k) = 0.5d0 * pbrd
+               csr(k) = 0.5d0 * csrd
+               gkr(k) = 0.5d0 * gkrd
                snk(k) = snek
                if (.not. silent) then
                   write (iout,40)  k,pbrd,csrd,gkrd,snek
-   40             format (6x,i6,7x,4f12.4)
+   40             format (6x,i6,10x,4f12.4)
                end if
             else if (k .gt. maxtyp) then
                write (iout,50)  maxtyp

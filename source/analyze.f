@@ -1232,6 +1232,7 @@ c
       use polpot
       use potent
       use repel
+      use solpot
       use solute
       use strbnd
       use strtor
@@ -2172,13 +2173,26 @@ c
                k = k + 1
                if (header) then
                   header = .false.
-                  write (iout,980)
-  980             format (/,' Implicit Solvation Parameters :',
-     &                    //,10x,'Atom Number',13x,'Radius',
-     &                       3x,'ASP Value',/)
+                  if (solvtyp(1:2).eq.'PB' .or.
+     &                solvtyp(1:2).eq.'GK') then
+                     write (iout,980)
+  980                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',13x,'Radius',
+     &                          3x,'Surface',4x,'S-Neck',/)
+                  else
+                     write (iout,990)
+  990                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',13x,'Radius',
+     &                          3x,'Surface',/)
+                  end if
                end if
-               write (iout,990)  k,i,rsolv(i),asolv(i)
-  990          format (i6,3x,i6,15x,2f10.4)
+               if (solvtyp(1:2).eq.'PB' .or. solvtyp(1:2).eq.'GK') then
+                  write (iout,1000)  k,i,rsolv(i),asolv(i),sneck(i)
+ 1000             format (i6,3x,i6,15x,3f10.4)
+               else
+                  write (iout,1010)  k,i,rsolv(i),asolv(i)
+ 1010             format (i6,3x,i6,15x,2f10.4)
+               end if
             end if
          end do
       end if
@@ -2192,13 +2206,13 @@ c
             j = class(ia)
             if (header) then
                header = .false.
-               write (iout,1000)
- 1000          format (/,' Conjugated Pi-Atom Parameters :',
+               write (iout,1020)
+ 1020          format (/,' Conjugated Pi-Atom Parameters :',
      &                 //,10x,'Atom Number',14x,'Nelect',
      &                    6x,'Ionize',4x,'Repulsion',/)
             end if
-            write (iout,1010)  i,ia,electron(j),ionize(j),repulse(j)
- 1010       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
+            write (iout,1030)  i,ia,electron(j),ionize(j),repulse(j)
+ 1030       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
          end do
       end if
 c
@@ -2211,13 +2225,13 @@ c
             ib = ibpi(3,i)
             if (header) then
                header = .false.
-               write (iout,1020)
- 1020          format (/,' Conjugated Pi-Bond Parameters :',
+               write (iout,1040)
+ 1040          format (/,' Conjugated Pi-Bond Parameters :',
      &                 //,10x,'Atom Numbers',21x,'K Slope',
      &                    3x,'L Slope',/)
             end if
-            write (iout,1030)  i,ia,ib,kslope(i),lslope(i)
- 1030       format (i6,3x,2i6,19x,2f10.4)
+            write (iout,1050)  i,ia,ib,kslope(i),lslope(i)
+ 1050       format (i6,3x,2i6,19x,2f10.4)
          end do
       end if
       return
