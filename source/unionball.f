@@ -120,11 +120,11 @@ c
 c     random coordinate perturbation to avoid numerical issues
 c
       if (dowiggle) then
-         write (iout,10)  symmtyp
-   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
-     &              ' Wiggling Coordinates')
-         eps = 0.001d0
-         call wiggle (n,coords,eps)
+c        write (iout,10)  symmtyp
+c  10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
+c    &              ' Wiggling Coordinates')
+c        eps = 0.001d0
+c        call wiggle (n,coords,eps)
       end if
 c
 c     transfer coordinates, complete to minimum of four spheres

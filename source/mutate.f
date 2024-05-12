@@ -138,7 +138,7 @@ c
    10       continue
             k = 1
             do while (list(k) .ne. 0)
-               if (list(k) .gt. 0) then
+               if (list(k).gt.0 .and. list(k).le.n) then
                   j = list(k)
                   nmut = nmut + 1
                   imut(nmut) = j
@@ -149,7 +149,7 @@ c
                   class1(nmut) = class(j)
                   k = k + 1
                else
-                  do j = abs(list(k)), abs(list(k+1))
+                  do j = max(1,abs(list(k))), min(n,abs(list(k+1)))
                      nmut = nmut + 1
                      imut(nmut) = j
                      mut(j) = .true.
