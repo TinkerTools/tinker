@@ -1,10 +1,10 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  2002-2009  by  Patrice Koehl  ##
-c     ##  COPYRIGHT (C)  2023  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ###############################################################
+c     ##        COPYRIGHT (C)  2002-2009  by  Patrice Koehl        ##
+c     ##  COPYRIGHT (C) 2023 by Moses K. J. Chung & Jay W. Ponder  ##
+c     ##                    All Rights Reserved                    ##
+c     ###############################################################
 c
 c     ###############################################################
 c     ##                                                           ##
@@ -22,7 +22,8 @@ c     original UnionBall code developed and provided by Patrice Koehl,
 c     Computer Science, University of California, Davis
 c
 c     modified to facilitate calling of UnionBall from Tinker by
-c     Jay W. Ponder, Washington University, October 2023
+c     Moses K. J. Chung and Jay W. Ponder, Washington University,
+c     October 2023 to May 2024
 c
 c     literature references:
 c
@@ -115,16 +116,17 @@ c
       symmtyp = 'NONE'
       call chksymm (symmtyp)
       dowiggle = .false.
-      if (n.le.200 .and. symmtyp.ne.'NONE')  dowiggle = .true.
+      if (n.gt.2 .and. symmtyp.eq.'LINEAR')  dowiggle = .true.
+      if (n.gt.3 .and. symmtyp.eq.'PLANAR')  dowiggle = .true.
 c
 c     random coordinate perturbation to avoid numerical issues
 c
       if (dowiggle) then
-c        write (iout,10)  symmtyp
-c  10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
-c    &              ' Wiggling Coordinates')
-c        eps = 0.001d0
-c        call wiggle (n,coords,eps)
+         write (iout,10)  symmtyp
+   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
+     &              ' Wiggling Coordinates')
+         eps = 0.001d0
+         call wiggle (n,coords,eps)
       end if
 c
 c     transfer coordinates, complete to minimum of four spheres
@@ -222,12 +224,13 @@ c
       integer ndigit
       integer nsize,nfudge
       integer nsphere
+      integer new_points
       integer i,j,k,ip,jp
       integer, allocatable :: ranlist(:)
-      integer*8 ival1,ival2
       real*8 crdmax,epsd
       real*8 x,xval,sum
-      real*8 y,z,w,xi,yi,zi,wi
+      real*8 y,z,w,xi,yi,zi,wi,r
+      real*8 brad(3),bcoord(9)
       real*8 coords(*)
       real*8 radii(*)
       real*8, allocatable :: ranval(:)
@@ -317,18 +320,20 @@ c
       epsln3 = epsln2 * crdmax
       epsln4 = epsln3 * crdmax
       epsln5 = epsln4 * crdmax
+      epsln2 = 1.0d-1
+      epsln3 = 1.0d-1
+      epsln4 = 1.0d-1
+      epsln5 = 1.0d-1
 c
 c     precompute the weight value for each of the points
 c
       do i = 1, npoint
-         ival1 = nint(radball(i)*10000.0d0)
-         ival2 = -ival1 * ival1
-         do j = 1, 3
-            k = 3*(i-1) + j
-            ival1 = nint(crdball(k)*10000.0d0)
-            ival2 = ival2 + ival1*ival1
-         end do
-         wghtball(i) = dble(ival2) / 100000000.0d0
+         x = crdball(3*(i-1)+1)
+         y = crdball(3*(i-1)+2)
+         z = crdball(3*(i-1)+3)
+         r = radball(i)
+         call build_weight (x,y,z,r,w)
+         wghtball(i) = w
       end do
 c
 c     check for trivial redundancy with same point twice
@@ -364,6 +369,25 @@ c
             jp = ip
          end if
       end do
+      if (npoint .lt. 4) then
+         new_points = 4 - npoint;
+         call addbogus (bcoord, brad)
+         do i = 1, new_points
+            npoint = npoint + 1
+            x = bcoord(3*(i-1)+1);
+            y = bcoord(3*(i-1)+2);
+            z = bcoord(3*(i-1)+3);
+            r = brad(i);
+            call build_weight (x,y,z,r,w)
+            crdball(3*(npoint-1)+1) = x
+            crdball(3*(npoint-1)+2) = y
+            crdball(3*(npoint-1)+3) = z
+            radball(npoint) = r
+            wghtball(npoint) = w
+            vinfo(npoint) = 0
+            vinfo(npoint) = ibset(vinfo(npoint),0)
+         end do
+      end if
 c
 c     initialization for the four added infinite points
 c
@@ -2239,7 +2263,7 @@ c     #################################################################
 c
 c
 c     "ball_dvol" computes the weighted surface area of a union of
-c     spheres as well as the corresponding weighted excludewd volume,
+c     spheres as well as the corresponding weighted excluded volume,
 c     also finds their derivatives with respect sphere coordinates
 c
 c     variables and parameters:
@@ -4394,6 +4418,11 @@ c
 c     count how many infinite points we have, except for O, note
 c     only A, B and C can be infinite points
 c
+      regular = .true.
+      convex  = .true.
+      test_abpo = .false.
+      test_bcpo = .false.
+      test_capo = .false.
       list(1) = a
       list(2) = b
       list(3) = c
@@ -6393,7 +6422,7 @@ c
             call tetra_vol (crdball,ia,ib,ic,id,vol)
             if (abs(vol) .lt. epsln4) then
                call minor4x (crdball,ia,ib,ic,id,val)
-               if (ival .eq. 0) then
+               if (val .eq. 0) then
                   tinfo(i) = ibset(tinfo(i),2)
                   ntry = ntry + 1
                end if
@@ -6411,7 +6440,7 @@ c
                do j = 1, 4
                   k = tneighbor(j,i)
                   if (k .ne. 0) then
-                     ival = ibits(tnindex(j),2*(i-1),2)
+                     ival = ibits(tnindex(i),2*(j-1),2)
                      m = ival + 1
                      tneighbor(m,k) = 0
                   end if
@@ -6474,7 +6503,7 @@ c
       sbcd(2) = bd(1)*cd(3) - cd(1)*bd(3)
       sbcd(1) = bd(2)*cd(3) - cd(2)*bd(3)
       vol = ad(1)*sbcd(1) - ad(2)*sbcd(2) + ad(3)*sbcd(3)
-      vol = abs(vol) / 6.0d0
+      if (vol < 0.0d0) vol = 0.0d0
       return
       end
 c
@@ -7920,6 +7949,7 @@ c
       real*8 rho_bc2,rho_bd2,rho_cd2
       real*8 cap_ab,cap_ac,cap_ad
       real*8 cap_bc,cap_bd,cap_cd
+      real*8 eps
       real*8 cosine_abc(3),cosine_abd(3)
       real*8 cosine_acd(3),cosine_bcd(3)
       real*8 cos_ang(6),sin_ang(6)
@@ -7983,9 +8013,15 @@ c
       rho_bc2 = rb2 - val4b*val4b
       rho_bd2 = rb2 - val5b*val5b
       rho_cd2 = rc2 - val6b*val6b
+      eps = 1.0d-14
       do i = 1, 6
-         invsin(i) = 1.0d0 / sin_ang(i)
-         cotan(i) = cos_ang(i)*invsin(i)
+         if (abs(sin_ang(i)) < eps) then
+            invsin(i) = 0.0d0;
+            cotan(i) = 0.0d0;
+         else
+            invsin(i) = 1.0d0 / sin_ang(i)
+            cotan(i) = cos_ang(i)*invsin(i)
+         end if
       end do
       cap_ab = -rho_ab2*(cos_abc*cos_abc+cos_abd*cos_abd)*cotan(1)
      &            + 2*rho_ab2*cos_abc*cos_abd*invsin(1)
@@ -8603,6 +8639,7 @@ c
       real*8 val2_bc,val2_bd,val2_cd
       real*8 cap_ab,cap_ac,cap_ad
       real*8 cap_bc,cap_bd,cap_cd
+      real*8 eps,tetvol,teteps
       real*8 dist(6),invsin(6),cotan(6)
       real*8 cosine_abc(3),cosine_abd(3)
       real*8 cosine_acd(3),cosine_bcd(3)
@@ -8685,9 +8722,15 @@ c
       rho_bc2 = rb2 - val4b*val4b
       rho_bd2 = rb2 - val5b*val5b
       rho_cd2 = rc2 - val6b*val6b
+      eps = 1.0d-14
       do i = 1, 6
-         invsin(i) = 1.0d0 / sin_ang(i)
-         cotan(i) = cos_ang(i) * invsin(i)
+         if (abs(sin_ang(i)) < eps) then
+            invsin(i) = 0.0d0;
+            cotan(i) = 0.0d0;
+         else
+            invsin(i) = 1.0d0 / sin_ang(i)
+            cotan(i) = cos_ang(i) * invsin(i)
+         end if
       end do
       val_ab = -(cos_abc*cos_abc+cos_abd*cos_abd)*cotan(1)
      &            + 2.0d0*cos_abc*cos_abd*invsin(1)
@@ -8712,6 +8755,15 @@ c
       volc = (val2*cap_ac+val4*cap_bc+val6b*cap_cd) / 6.0d0
       vold = (val3*cap_ad+val5*cap_bd+val6*cap_cd) / 6.0d0
       if (option .ne. 1)  return
+      do i = 1, 6
+         dvola(i) = 0.0d0
+         dvolb(i) = 0.0d0
+         dvolc(i) = 0.0d0
+         dvold(i) = 0.0d0
+      end do
+      teteps = 1.0d-5
+      call tetra_volume (rab2,rac2,rad2,rbc2,rbd2,rcd2,tetvol)
+      if (tetvol .lt. teteps)  return
       dist(1) = rab
       dist(2) = rac
       dist(3) = rad
@@ -9057,6 +9109,13 @@ c
       cosine(5) = det24 * val2 * val4
       cosine(6) = det34 * val3 * val4
       do i = 1, 6
+         if (cosine(i) > 1.0d0) then
+            cosine(i) = 1.0d0
+         else if (cosine(i) .lt. -1.0d0) then
+            cosine(i) = -1.0d0
+         end if
+      end do
+      do i = 1, 6
          angle(i) = acos(cosine(i))
          sine(i) = sin(angle(i))
          angle(i) = angle(i) / twopi
@@ -9221,6 +9280,7 @@ c
       real*8 val234,val213,val214
       real*8 val314,val324,val312
       real*8 vala,val1,val2,val3
+      real*8 tetvol,teteps
       real*8 minori(4),val(4)
       real*8 cosine(6),sine(6),angle(6)
       real*8 det(6),deriv(6,6),dnum(6,6)
@@ -9287,10 +9347,25 @@ c
       cosine(5) = det(2) * val(1) * val(3)
       cosine(6) = det(1) * val(1) * val(2)
       do i = 1, 6
+         if (cosine(i) > 1.0d0) then
+            cosine(i) = 1.0d0
+         else if (cosine(i) .lt. -1.0d0) then
+            cosine(i) = -1.0d0
+         end if
+      end do
+      do i = 1, 6
          angle(i) = acos(cosine(i))
          sine(i) = sin(angle(i))
          angle(i) = angle(i) / twopi
       end do
+      do i = 1, 6
+         do j = 1, 6
+            deriv(i,j) = 0.0d0
+         end do
+      end do
+      teteps = 1.0d-5
+      call tetra_volume (r12sq,r13sq,r14sq,r23sq,r24sq,r34sq,tetvol)
+      if (tetvol .lt. teteps)  return
 c
 c     compute derivatives of angles with respect to edge lengths
 c
@@ -9449,6 +9524,7 @@ c
       real*8 val234,val213,val214
       real*8 val314,val324,val312
       real*8 vala,val1,val2,val3
+      real*8 tetvol, teteps
       real*8 minori(4),val(4)
       real*8 cosine(6),sine(6),angle(6)
       real*8 det(6),deriv(6,3),dnum(6,3)
@@ -9515,11 +9591,26 @@ c
       cosine(5) = det(2) * val(1) * val(3)
       cosine(6) = det(1) * val(1) * val(2)
       do i = 1, 6
+         if (cosine(i) > 1.0d0) then
+            cosine(i) = 1.0d0
+         else if (cosine(i) .lt. -1.0d0) then
+            cosine(i) = -1.0d0
+         end if
+      end do
+      do i = 1, 6
          angle(i) = acos(cosine(i))
          sine(i) = sin(angle(i))
          angle(i) = angle(i) / twopi
       end do
       if (option .eq. 0)  return
+      do i = 1, 6
+         do j = 1, 3
+            deriv(i,j) = 0.0d0
+         end do
+      end do
+      teteps = 1.0d-5
+      call tetra_volume (r12sq,r13sq,r14sq,r23sq,r24sq,r34sq,tetvol)
+      if (tetvol .lt. teteps)  return
 c
 c     compute derivatives of angles with respect to edge lengths
 c
@@ -10254,6 +10345,7 @@ c
       real*8 v1,v2,v3
       real*8 w1,w2,w3
       real*8 x1,x2,x3
+      real*8 eps
 c
 c
 c     compute the numerical value of the determinant
@@ -10321,6 +10413,8 @@ c
       t3 = psub (t3,t1)
       t1 = u1 * w1
       det = padd (t3,t1)
+      eps = 1.0d-10
+      if (abs(det) .lt. eps)  det = 0.0d0
 c
 c     return value based on sign of the determinant
 c
@@ -10398,7 +10492,7 @@ c
 c
 c     check signs of minors if full determinant is zero
 c
-      call deter3 (det,r21,r23,r31,r33,r41,r43,isign)
+      call deter3 (det,r21,r22,r31,r32,r41,r42,isign)
       if (isign .ne. 0) then
          result = isign
          return
@@ -10520,13 +10614,9 @@ c
       r41 = crdball(idd1)
       r42 = crdball(idd2)
       r43 = crdball(idd3)
-      result = 1
       call deter4 (det,r11,r12,r13,r21,r22,r23,
      &             r31,r32,r33,r41,r42,r43,isign)
-      if (isign .ne. 0) then
-         result = isign
-         return
-      end if
+      result = isign
       return
       end
 c
@@ -10555,6 +10645,7 @@ c
       real*8 s13,s23,s33
       real*8 t1,t2,t3
       real*8 u1,u2,u3
+      real*8 eps
 c
 c
 c     compute the numerical value of the determinant
@@ -10582,6 +10673,8 @@ c
       t3 = s31 * u3
       u1 = padd (t2,t3)
       det = psub (t1,u1)
+      eps = 1.0d-10
+      if (abs(det) .lt. eps)  det = 0.0d0
 c
 c     return value based on sign of the determinant
 c
@@ -10683,6 +10776,7 @@ c
       real*8 r12,r22,r32
       real*8 t1,t2,t3,t4
       real*8 t14,t23
+      real*8 eps
 c
 c
 c     compute the numerical value of the determinant
@@ -10694,6 +10788,8 @@ c
       t14 = t1 * t4
       t23 = t2 * t3
       det = psub (t14,t23)
+      eps = 1.0d-10
+      if (abs(det) .lt. eps)  det = 0.0d0
 c
 c     return value based on sign of the determinant
 c
@@ -10757,11 +10853,14 @@ c
       integer isign
       real*8 det,psub
       real*8 r11,r12
+      real*8 eps
 c
 c
 c     compute the numerical value of the determinant
 c
       det = psub (r11,r12)
+      eps = 1.0d-10
+      if (abs(det) .lt. eps)  det = 0.0d0
 c
 c     set return based on sign of the determinant
 c
@@ -10849,5 +10948,242 @@ c
          end if
       end if
       psub = val
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine build_weight  --  build weight for Delaunay  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "build_weight" builds and returns the weight for the weighted
+c     Delaunay triangulation procedure
+c
+c
+      subroutine build_weight (x,y,z,r,w)
+      implicit none
+      integer*8 ival1,ival2
+      real*8 x,y,z,r,w
+c
+c
+c     compute the weight for the Delaunay triangulation
+c
+      ival1 = nint(10000.0d0*r)
+      ival2 = -ival1 * ival1
+      ival1 = nint(10000.0d0*x)
+      ival2 = ival2 + ival1*ival1
+      ival1 = nint(10000.0d0*y)
+      ival2 = ival2 + ival1*ival1
+      ival1 = nint(10000.0d0*z)
+      ival2 = ival2 + ival1*ival1
+      w = dble(ival2) / 100000000.0d0
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine addbogus  --  add artificial points if needed  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "addbogus" adds artificial points to the system so the total
+c     number of vertices is at least equal to four
+c
+c
+      subroutine addbogus (bcoord,brad)
+      use shapes
+      implicit none
+      integer np
+      integer i
+      real*8 brad(3),bcoord(9)
+      real*8 cx,cy,cz
+      real*8 c1x,c1y,c1z
+      real*8 c2x,c2y,c2z
+      real*8 c3x,c3y,c3z
+      real*8 u1x,u1y,u1z
+      real*8 v1x,v1y,v1z
+      real*8 w1x,w1y,w1z
+      real*8 c32x,c32y,c32z
+      real*8 rmax,d,d1,d2,d3
+c
+c
+c     set number of points to be added
+c
+      np = 4 - npoint
+c
+c     initialize the artificial coordinates
+c
+      do i = 1, 3*np
+         bcoord(i) = 0.0d0
+      end do
+c
+c     case for one atom
+c
+      if (npoint .eq. 1) then
+         rmax = radball(1)
+         bcoord(1) = crdball(1) + 3.0d0*rmax
+         bcoord(3*1+2) = crdball(2) + 3.0d0*rmax
+         bcoord(3*2+3) = crdball(3) + 3.0d0*rmax
+         do i = 1, np
+            brad(i) = rmax / 20.0d0
+         end do
+c
+c     case for two atoms
+c
+      else if (npoint .eq. 2) then
+         rmax = max(radball(1),radball(2))
+         c1x = crdball(1)
+         c1y = crdball(2)
+         c1z = crdball(3)
+         c2x = crdball(4)
+         c2y = crdball(5)
+         c2z = crdball(6)
+         cx = 0.5d0 * (c1x+c2x)
+         cy = 0.5d0 * (c1y+c2y)
+         cz = 0.5d0 * (c1z+c2z)
+         u1x = c2x - c1x
+         u1y = c2y - c1y
+         u1z = c2z - c1z
+         if (u1z.ne.0.0d0 .or. u1x.ne.-u1y) then
+            v1x = u1z
+            v1y = u1z
+            v1z = -u1x - u1z
+         else
+            v1x = -u1y - u1z
+            v1y = u1x
+            v1z = u1x
+         end if
+         w1x = u1y*v1z - u1z*v1y
+         w1y = u1z*v1x - u1x*v1z
+         w1z = u1x*v1y - u1y*v1x
+         d = sqrt(u1x*u1x + u1y*u1y + u1z*u1z)
+         bcoord(1) = cx + (2.0d0*d+3.0d0*rmax)*v1x
+         bcoord(1+3) = cx + (2.0d0*d+3.0d0*rmax)*w1x
+         bcoord(2) = cy + (2.0d0*d+3.0d0*rmax)*v1y
+         bcoord(2+3) = cy + (2.0d0*d+3.0d0*rmax)*w1y
+         bcoord(3) = cz + (2.0d0*d+3.0d0*rmax)*v1z
+         bcoord(3+3) = cz + (2.0d0*d+3.0d0*rmax)*w1z
+         brad(1) = rmax / 20.0d0
+         brad(2) = rmax / 20.0d0
+c
+c     case for three atoms
+c
+      else if (npoint .eq. 3) then
+         rmax = max(max(radball(1),radball(2)),radball(3))
+         c1x = crdball(1)
+         c1y = crdball(2)
+         c1z = crdball(3)
+         c2x = crdball(4)
+         c2y = crdball(5)
+         c2z = crdball(6)
+         c3x = crdball(7)
+         c3y = crdball(8)
+         c3z = crdball(9)
+         cx = (c1x+c2x+c3x) / 3.0d0
+         cy = (c1y+c2y+c3y) / 3.0d0
+         cz = (c1z+c2z+c3z) / 3.0d0
+         u1x = c2x - c1x
+         u1y = c2y - c1y
+         u1z = c2z - c1z
+         v1x = c3x - c1x
+         v1y = c3y - c1y
+         v1z = c3z - c1z
+         w1x = u1y*v1z - u1z*v1y
+         w1y = u1z*v1x - u1x*v1z
+         w1z = u1x*v1y - u1y*v1x
+         d1 = sqrt(w1x*w1x + w1y*w1y + w1z*w1z)
+         if (d1 .eq. 0.0d0) then
+            if (u1x .ne. 0.0d0) then
+               w1x = u1y
+               w1y = -u1x
+               w1z = 0.0d0
+            else if (u1y .ne. 0.0d0) then
+               w1x = u1y
+               w1y = -u1x
+               w1z = 0.0d0
+            else
+               w1x = u1z
+               w1y = -u1z
+               w1z = 0.0d0
+            end if
+         end if
+         d1 = sqrt(u1x*u1x + u1y*u1y + u1z*u1z)
+         d2 = sqrt(v1x*v1x + v1y*v1y + v1z*v1z)
+         c32x = c3x - c2x
+         c32y = c3y - c2y
+         c32z = c3z - c2z
+         d3 = sqrt(c32x*c32x + c32y*c32y + c32z*c32z)
+         d = max(d1,max(d2,d3))
+         bcoord(1) = cx + (2.0d0*d+3.0d0*rmax)*w1x
+         bcoord(2) = cy + (2.0d0*d+3.0d0*rmax)*w1y
+         bcoord(3) = cz + (2.0d0*d+3.0d0*rmax)*w1z
+         brad(1) = rmax / 20.0d0
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine tetra_volume  --  compute volume of tetrahedron  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "tetra_volume" computes the volume of the tetrahedron
+c
+c
+      subroutine tetra_volume (r12sq,r13sq,r14sq,r23sq,r24sq,r34sq,vol)
+      implicit none
+      real*8 val1,val2,val3
+      real*8 r12sq,r13sq,r14sq
+      real*8 r23sq,r24sq,r34sq
+      real*8 det5,vol
+      real*8 mat5(5,5)
+c
+c
+c     set the values of the matrix elements
+c
+      mat5(1,1) = 0.0d0
+      mat5(1,2) = r12sq
+      mat5(1,3) = r13sq
+      mat5(1,4) = r14sq
+      mat5(1,5) = 1.0d0
+      mat5(2,1) = r12sq
+      mat5(2,2) = 0.0d0
+      mat5(2,3) = r23sq
+      mat5(2,4) = r24sq
+      mat5(2,5) = 1.0d0
+      mat5(3,1) = r13sq
+      mat5(3,2) = r23sq
+      mat5(3,3) = 0.0d0
+      mat5(3,4) = r34sq
+      mat5(3,5) = 1.0d0
+      mat5(4,1) = r14sq
+      mat5(4,2) = r24sq
+      mat5(4,3) = r34sq
+      mat5(4,4) = 0.0d0
+      mat5(4,5) = 1.0d0
+      mat5(5,1) = 1.0d0
+      mat5(5,2) = 1.0d0
+      mat5(5,3) = 1.0d0
+      mat5(5,4) = 1.0d0
+      mat5(5,5) = 0.0d0
+c
+c     compute the value of the determinant
+c
+      val1 = mat5(2,3) - mat5(1,2) - mat5(1,3)
+      val2 = mat5(2,4) - mat5(1,2) - mat5(1,4)
+      val3 = mat5(3,4) - mat5(1,3) - mat5(1,4)
+      det5 = 8.0d0*mat5(1,2)*mat5(1,3)*mat5(1,4)
+     &          - 2.0d0*val1*val2*val3 - 2.0d0*mat5(1,2)*val3*val3
+     &          - 2.0d0*mat5(1,3)*val2*val2 - 2.0d0*mat5(1,4)*val1*val1
+      if (det5 .lt. 0.0d0)  det5 = 0.0d0
+      vol = sqrt(det5/288.0d0);
       return
       end

@@ -165,7 +165,8 @@ c
       write (iout,150)  surf
   150 format (/,' Total Surface Area :',5x,f12.4)
       write (iout,160)
-  160 format (/,' Surface Area Derivatives :  (First Ten Atoms)',/)
+  160 format (/,' Surface Area Derivatives :  (First Ten Atoms)',
+     &        //,5x,'Atom',11x,'dAx',7x,'dAy',7x'dAz',/)
       do i = 1, min(10,n)
          write (iout,170)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i)
   170    format (i8,6x,3f10.4)
@@ -202,7 +203,8 @@ c
       write (iout,230)  cpu,wall
   230 format (/,' CPU and Wall Times :',5x,2f12.4)
       write (iout,240)
-  240 format (/,' Excluded Volume Derivatives :  (First Ten Atoms)',/)
+  240 format (/,' Excluded Volume Derivatives :  (First Ten Atoms)',
+     &        //,5x,'Atom',11x,'dVx',7x,'dVy',7x'dVz',/)
       do i = 1, min(10,n)
          write (iout,250)  i,dvol(1,i),dvol(2,i),dvol(3,i)
   250    format (i8,6x,3f10.4)
@@ -259,7 +261,9 @@ c
   310 format (/,' Total Excluded Vol :',5x,f12.4)
       write (iout,320)
   320 format (/,' Surface Area & Volume Derivatives :',
-     &           '  (First Ten Atoms)',/)
+     &           '  (First Ten Atoms)',
+     &        //,5x,'Atom',11x,'dAx',7x,'dAy',7x'dAz',
+     &           7x,'dVx',7x,'dVy',7x,'dVz',/)
       do i = 1, min(10,n)
          write (iout,330)  i,dsurf(1,i),dsurf(2,i),dsurf(3,i),
      &                     dvol(1,i),dvol(2,i),dvol(3,i)
