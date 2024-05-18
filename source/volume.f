@@ -76,7 +76,8 @@ c
       symmtyp = 'NONE'
       call chksymm (symmtyp)
       dowiggle = .false.
-      if (n.le.200 .and. symmtyp.ne.'NONE')  dowiggle = .true.
+      if (n.gt.2 .and. symmtyp.eq.'LINEAR')  dowiggle = .true.
+      if (n.gt.3 .and. symmtyp.eq.'PLANAR')  dowiggle = .true.
 c
 c     use Connolly method for small symmetric structures
 c
@@ -241,7 +242,8 @@ c
       symmtyp = 'NONE'
       call chksymm (symmtyp)
       dowiggle = .false.
-      if (n.le.200 .and. symmtyp.ne.'NONE')  dowiggle = .true.
+      if (n.gt.2 .and. symmtyp.eq.'LINEAR')  dowiggle = .true.
+      if (n.gt.3 .and. symmtyp.eq.'PLANAR')  dowiggle = .true.
 c
 c     use arc-based methods for small symmetric structures
 c
