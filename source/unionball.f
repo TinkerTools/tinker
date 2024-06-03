@@ -118,6 +118,7 @@ c
       dowiggle = .false.
       if (n.gt.2 .and. symmtyp.eq.'LINEAR')  dowiggle = .true.
       if (n.gt.3 .and. symmtyp.eq.'PLANAR')  dowiggle = .true.
+      if (symmtyp .eq. 'CENTER')  dowiggle = .true.
 c
 c     random coordinate perturbation to avoid numerical issues
 c
@@ -127,6 +128,10 @@ c
      &              ' Wiggling Coordinates')
          eps = 0.001d0
          call wiggle (n,coords,eps)
+      else if (symmtyp .ne. 'NONE') then
+         write (iout,20)  symmtyp
+   20    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry'
+     &              ' Detected for the System')
       end if
 c
 c     transfer coordinates, complete to minimum of four spheres

@@ -41,7 +41,7 @@ c     area     accessible surface area of each atom
 c
 c     delta    tolerance used in the tests for sphere overlaps
 c                and for colinearity
-c     rmove    connectivity errors can usually be avoided if the
+c     reps     connectivity errors can usually be avoided if the
 c                offending atom is shifted by this small amount
 c
 c
@@ -65,8 +65,9 @@ c
       integer kout(maxarc)
       real*8 total,wght
       real*8 delta,delta2
-      real*8 eps,rmove,dsql
-      real*8 probe,arcsum,cosine
+      real*8 eps,reps,dsql
+      real*8 probe,arcsum
+      real*8 cosine
       real*8 axx,axy,axz
       real*8 ayx,ayy,azx
       real*8 azy,azz
@@ -88,6 +89,7 @@ c
       real*8 pix2,pix4,pid2
       real*8 therk,dk,gk
       real*8 risqk,rik
+      real*8 rvec(3)
       real*8 x(*)
       real*8 y(*)
       real*8 z(*)
@@ -134,7 +136,7 @@ c
       delta = 1.0d-8
       delta2 = delta * delta
       eps = 1.0d-8
-      rmove = 1.0d-8
+      reps = 1.0d-6
 c
 c     exclude atoms that do not overlap any active atom
 c
@@ -526,9 +528,10 @@ c
             call fatal
          else
             moved = .true.
-            xr = xr + rmove
-            yr = yr + rmove
-            zr = zr + rmove
+            call ranvec (rvec)
+            xr = xr + reps*rvec(1)
+            yr = yr + reps*rvec(2)
+            zr = zr + reps*rvec(3)
             goto 10
          end if
 c
@@ -549,9 +552,10 @@ c
                call fatal
             else
                moved = .true.
-               xr = xr + rmove
-               yr = yr + rmove
-               zr = zr + rmove
+               call ranvec (rvec)
+               xr = xr + reps*rvec(1)
+               yr = yr + reps*rvec(2)
+               zr = zr + reps*rvec(3)
                goto 10
             end if
          end if
@@ -625,7 +629,7 @@ c                the molecule with respect to atomic coordinates
 c
 c     delta    tolerance used in the tests for sphere overlaps
 c                and for colinearity
-c     rmove    connectivity errors can usually be avoided if the
+c     reps     connectivity errors can usually be avoided if the
 c                offending atom is shifted by this small amount
 c
 c
@@ -652,9 +656,10 @@ c
       integer sign_yder(maxarc)
       real*8 total,wght
       real*8 delta,delta2
-      real*8 eps,rmove
-      real*8 probe,arcsum,cosine
-      real*8 dsql,wxl,wxlsq
+      real*8 eps,reps,dsql
+      real*8 probe,arcsum
+      real*8 cosine
+      real*8 wxl,wxlsq
       real*8 p,s,v,rcn
       real*8 axx,axy,axz
       real*8 ayx,ayy,azx
@@ -684,6 +689,7 @@ c
       real*8 risqk,rik,risql
       real*8 faca,facb,facc
       real*8 gaca,gacb
+      real*8 rvec(3)
       real*8 x(*)
       real*8 y(*)
       real*8 z(*)
@@ -734,7 +740,7 @@ c
       delta = 1.0d-8
       delta2 = delta * delta
       eps = 1.0d-8
-      rmove = 1.0d-8
+      reps = 1.0d-6
       do i = 1, maxarc
          ider(i) = 0
          sign_yder(i) = 0
@@ -1210,9 +1216,10 @@ c
             call fatal
          else
             moved = .true.
-            xr = xr + rmove
-            yr = yr + rmove
-            zr = zr + rmove
+            call ranvec (rvec)
+            xr = xr + reps*rvec(1)
+            yr = yr + reps*rvec(2)
+            zr = zr + reps*rvec(3)
             goto 10
          end if
 c
@@ -1233,9 +1240,10 @@ c
                call fatal
             else
                moved = .true.
-               xr = xr + rmove
-               yr = yr + rmove
-               zr = zr + rmove
+               call ranvec (rvec)
+               xr = xr + reps*rvec(1)
+               yr = yr + reps*rvec(2)
+               zr = zr + reps*rvec(3)
                goto 10
             end if
          end if

@@ -86,8 +86,8 @@ c
       write (iout,60)
    60 format (/,' Alternative Surface Area & Volume Methods')
       write (iout,70)  n,probe
-   70 format (/,' Number of Atoms :',12x,i8,
-     &        /,' Probe Size :',11x,f14.4)
+   70 format (/,' Number of Atoms :',15x,i8,
+     &        /,' Probe Size :',16x,f12.4)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -148,9 +148,9 @@ c
       call richmond (n,x,y,z,rsolv,weight,probe,surf,asurf)
       call gettime (wall,cpu)
       write (iout,110)  cpu,wall
-  110 format (/,' CPU and Wall Times :',5x,2f12.4) 
+  110 format (/,' CPU and Wall Times :',8x,2f12.4) 
       write (iout,120)  surf
-  120 format (/,' Total Surface Area :',5x,f12.4)
+  120 format (/,' Total Surface Area :',8x,f12.4)
 c
 c     compute accessible surface and derivatives via Richmond
 c
@@ -161,9 +161,9 @@ c
       call richmond1 (n,x,y,z,rsolv,weight,probe,surf,asurf,dsurf)
       call gettime (wall,cpu)
       write (iout,140)  cpu,wall
-  140 format (/,' CPU and Wall Times :',5x,2f12.4)
+  140 format (/,' CPU and Wall Times :',8x,2f12.4)
       write (iout,150)  surf
-  150 format (/,' Total Surface Area :',5x,f12.4)
+  150 format (/,' Total Surface Area :',8x,f12.4)
       write (iout,160)
   160 format (/,' Surface Area Derivatives :  (First Ten Atoms)',
      &        //,5x,'Atom',11x,'dAx',7x,'dAy',7x'dAz',/)
@@ -182,11 +182,11 @@ c
       call connolly (n,x,y,z,rsolv,probe,reentrant,surf,vol)
       call gettime (wall,cpu)
       write (iout,190)  cpu,wall
-  190 format (/,' CPU and Wall Times :',5x,2f12.4)
+  190 format (/,' CPU and Wall Times :',8x,2f12.4)
       write (iout,200)  surf
-  200 format (/,' Total Surface Area :',5x,f12.4)
+  200 format (/,' Total Surface Area :',8x,f12.4)
       write (iout,210)  vol
-  210 format (/,' Total Excluded Vol :',5x,f12.4)
+  210 format (/,' Total Excluded Volume :',5x,f12.4)
 c
 c     compute excluded volume derivatives via Kundrot method
 c
@@ -201,7 +201,7 @@ c
       call kundrot1 (n,x,y,z,rsolv,probe,dvol)
       call gettime (wall,cpu)
       write (iout,230)  cpu,wall
-  230 format (/,' CPU and Wall Times :',5x,2f12.4)
+  230 format (/,' CPU and Wall Times :',8x,2f12.4)
       write (iout,240)
   240 format (/,' Excluded Volume Derivatives :  (First Ten Atoms)',
      &        //,5x,'Atom',11x,'dVx',7x,'dVy',7x'dVz',/)
@@ -254,11 +254,11 @@ c
      &                   surf,vol,asurf,avol,dsurf,dvol)
       call gettime (wall,cpu)
       write (iout,290)  cpu,wall
-  290 format (/,' CPU and Wall Times :',5x,2f12.4)
+  290 format (/,' CPU and Wall Times :',8x,2f12.4)
       write (iout,300)  surf
-  300 format (/,' Total Surface Area :',5x,f12.4)
+  300 format (/,' Total Surface Area :',8x,f12.4)
       write (iout,310)  vol
-  310 format (/,' Total Excluded Vol :',5x,f12.4)
+  310 format (/,' Total Excluded Volume :',5x,f12.4)
       write (iout,320)
   320 format (/,' Surface Area & Volume Derivatives :',
      &           '  (First Ten Atoms)',
