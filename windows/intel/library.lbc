@@ -443,6 +443,7 @@ readdyn.obj
 readgau.obj
 readgdma.obj
 readint.obj
+readmbis.obj
 readmol.obj
 readmol2.obj
 readpdb.obj

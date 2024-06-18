@@ -542,6 +542,7 @@ ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readdyn.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readgau.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readgdma.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readint.f
+ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readmbis.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readmol.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readmol2.f
 ifort -c -O3 -msse3 -no-ipo -no-prec-div -qopenmp readpdb.f

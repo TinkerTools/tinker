@@ -453,6 +453,7 @@ readdyn.o \
 readgau.o \
 readgdma.o \
 readint.o \
+readmbis.o \
 readmol.o \
 readmol2.o \
 readpdb.o \

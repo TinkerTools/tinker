@@ -542,6 +542,7 @@ gfortran -c -Wall readdyn.f
 gfortran -c -Wall readgau.f
 gfortran -c -Wall readgdma.f
 gfortran -c -Wall readint.f
+gfortran -c -Wall readmbis.f
 gfortran -c -Wall readmol.f
 gfortran -c -Wall readmol2.f
 gfortran -c -Wall readpdb.f

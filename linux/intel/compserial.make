@@ -542,6 +542,7 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readdyn.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readgau.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readgdma.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readint.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readmbis.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readmol.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readmol2.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readpdb.f

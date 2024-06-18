@@ -634,6 +634,7 @@ OBJS =	action.o \
 	readgau.o \
 	readgdma.o \
 	readint.o \
+	readmbis.o \
 	readmol.o \
 	readmol2.o \
 	readpdb.o \
@@ -1544,6 +1545,7 @@ libtinker.a: ${OBJS}
 	readgau.o \
 	readgdma.o \
 	readint.o \
+	readmbis.o \
 	readmol.o \
 	readmol2.o \
 	readpdb.o \
@@ -1643,7 +1645,7 @@ alterchg.o: angbnd.o atmlst.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o
 alterpol.o: atoms.o bound.o cell.o couple.o expol.o limits.o mpole.o neigh.o polgrp.o polpot.o shunt.o
 analysis.o: analyz.o atoms.o energi.o group.o inter.o iounit.o limits.o potent.o vdwpot.o
 analyz.o:
-analyze.o: action.o analyz.o angang.o angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndstr.o bound.o boxes.o cflux.o charge.o chgpen.o chgpot.o chgtrn.o couple.o deriv.o dipole.o disp.o energi.o ewald.o fields.o files.o improp.o imptor.o inform.o inter.o iounit.o korbs.o ktrtor.o kvdws.o limits.o math.o molcul.o moment.o mplpot.o mpole.o opbend.o opdist.o output.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o repel.o solute.o strbnd.o strtor.o titles.o tors.o tortor.o units.o urey.o vdw.o vdwpot.o virial.o
+analyze.o: action.o analyz.o angang.o angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndstr.o bound.o boxes.o cflux.o charge.o chgpen.o chgpot.o chgtrn.o couple.o deriv.o dipole.o disp.o energi.o ewald.o fields.o files.o improp.o imptor.o inform.o inter.o iounit.o korbs.o ktrtor.o kvdws.o limits.o math.o molcul.o moment.o mplpot.o mpole.o opbend.o opdist.o output.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polpot.o potent.o repel.o solpot.o solute.o strbnd.o strtor.o titles.o tors.o tortor.o units.o urey.o vdw.o vdwpot.o virial.o
 angang.o:
 angbnd.o:
 angles.o: angbnd.o atmlst.o atoms.o couple.o iounit.o
@@ -2116,6 +2118,7 @@ readdyn.o: atoms.o boxes.o files.o group.o iounit.o mdstuf.o moldyn.o rgddyn.o
 readgau.o: ascii.o iounit.o qmstuf.o units.o
 readgdma.o: atomid.o atoms.o dma.o files.o iounit.o mpole.o units.o
 readint.o: atomid.o atoms.o files.o inform.o iounit.o titles.o zclose.o zcoord.o
+readmbis.o: atomid.o atoms.o files.o iounit.o mpole.o units.o
 readmol.o: atomid.o atoms.o couple.o files.o iounit.o ptable.o titles.o
 readmol2.o: atomid.o atoms.o couple.o files.o iounit.o ptable.o titles.o
 readpdb.o: files.o inform.o iounit.o pdb.o resdue.o sequen.o titles.o

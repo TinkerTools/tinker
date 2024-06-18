@@ -542,6 +542,7 @@ ifort -c -g -warn all -check all readdyn.f
 ifort -c -g -warn all -check all readgau.f
 ifort -c -g -warn all -check all readgdma.f
 ifort -c -g -warn all -check all readint.f
+ifort -c -g -warn all -check all readmbis.f
 ifort -c -g -warn all -check all readmol.f
 ifort -c -g -warn all -check all readmol2.f
 ifort -c -g -warn all -check all readpdb.f

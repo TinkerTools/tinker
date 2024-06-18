@@ -542,6 +542,7 @@ gfortran -c -Ofast -mtune=generic -fopenmp readdyn.f
 gfortran -c -Ofast -mtune=generic -fopenmp readgau.f
 gfortran -c -Ofast -mtune=generic -fopenmp readgdma.f
 gfortran -c -Ofast -mtune=generic -fopenmp readint.f
+gfortran -c -Ofast -mtune=generic -fopenmp readmbis.f
 gfortran -c -Ofast -mtune=generic -fopenmp readmol.f
 gfortran -c -Ofast -mtune=generic -fopenmp readmol2.f
 gfortran -c -Ofast -mtune=generic -fopenmp readpdb.f

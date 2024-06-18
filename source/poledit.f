@@ -20,7 +20,8 @@ c
       use iounit
       use potent
       implicit none
-      integer mode,idma
+      integer nmode,mode
+      integer idma,ichg,imbis
       integer freeunit
       logical exist,query
       character*240 string
@@ -29,6 +30,7 @@ c
 c     get the desired type of coordinate file modification
 c
       call initial
+      nmode = 4
       mode = 0
       query = .true.
       call nextarg (string,exist)
@@ -40,10 +42,11 @@ c
       if (query) then
          write (iout,20)
    20    format (/,' The Tinker Multipole Editing Utility Can :',
-     &           //,4x,'(1) Multipole Parameters from GDMA Output',
-     &           /,4x,'(2) Alter Local Coordinate Frame Definitions',
-     &           /,4x,'(3) Removal of Intramolecular Polarization')
-         do while (mode.lt.1 .or. mode.gt.3)
+     &           //,4x,'(1) Use Multipoles from Stone GDMA Output',
+     &           /,4x,'(2) Use Multipoles from Multiwfn MBIS Output',
+     &           /,4x,'(3) Alter Local Coordinate Frame Definitions',
+     &           /,4x,'(4) Remove the Intramolecular Polarization')
+         do while (mode.lt.1 .or. mode.gt.nmode)
             mode = 0
             write (iout,30)
    30       format (/,' Enter the Number of the Desired Choice :  ',$)
@@ -56,9 +59,9 @@ c
 c     perform the desired multipole manipulation operation
 c
       if (mode .eq. 1) then
+         idma = freeunit ()
          use_mpole = .true.
          use_polar = .true.
-         idma = freeunit ()
          call readgdma (idma)
          call field
          call molsetup
@@ -70,6 +73,21 @@ c
          call avgpole
          call prtpole
       else if (mode .eq. 2) then
+         ichg = freeunit ()
+         imbis = freeunit ()
+         use_mpole = .true.
+         use_polar = .true.
+         call readmbis (ichg,imbis)
+         call field
+         call molsetup
+         call setframe
+         call rotframe
+         call setpolar
+         call setpgrp
+         call alterpol
+         call avgpole
+         call prtpole
+      else if (mode .eq. 3) then
          call getxyz
          call attach
          call field
@@ -79,7 +97,7 @@ c
          call kchgtrn
          call fixframe
          call prtpole
-      else if (mode .eq. 3) then
+      else if (mode .eq. 4) then
          call getxyz
          call attach
          call field

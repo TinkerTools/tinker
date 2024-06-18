@@ -541,6 +541,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgau.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgdma.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readint.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readmbis.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readmol.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readmol2.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readpdb.f

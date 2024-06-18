@@ -542,6 +542,7 @@ gfortran -c -Ofast -march=native -fopenmp readdyn.f
 gfortran -c -Ofast -march=native -fopenmp readgau.f
 gfortran -c -Ofast -march=native -fopenmp readgdma.f
 gfortran -c -Ofast -march=native -fopenmp readint.f
+gfortran -c -Ofast -march=native -fopenmp readmbis.f
 gfortran -c -Ofast -march=native -fopenmp readmol.f
 gfortran -c -Ofast -march=native -fopenmp readmol2.f
 gfortran -c -Ofast -march=native -fopenmp readpdb.f
