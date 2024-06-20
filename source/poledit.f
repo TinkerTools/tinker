@@ -3983,6 +3983,12 @@ c
             end if
          end do
 c
+c     set the atom class equal to the atom type for each atom
+c
+         do i = 1, n
+            class(i) = type(i)
+         end do
+c
 c     print the atoms, atom types and local frame definitions
 c
          write (iout,100)
@@ -4372,7 +4378,7 @@ c
       use units
       implicit none
       integer i,j,k
-      integer ii,it
+      integer ii,it,ic
       integer ixyz,ikey
       integer size,atlast
       integer xaxe,yaxe,zaxe
@@ -4529,7 +4535,7 @@ c
          atlast = 0
          do ii = 1, npole
             i = atkey(ii)
-            it = type(i)
+            it = class(i)
             if (it .ne. atlast) then
                atlast = it
                write (ikey,180)  it,pcore(i),palpha(i)

@@ -129,7 +129,7 @@ c
       if (query) then
          write (iout,20)
    20    format (/,' The Tinker Electrostatic Potential Utility Can :',
-     &           //,4x,'(1) Create an Input File for Gaussian CUBEGEN',
+     &           //,4x,'(1) Create Grid Points for Computing Potential',
      &           /,4x,'(2) Get QM Potential from a Gaussian CUBE File',
      &           /,4x,'(3) Calculate the Model Potential for a System',
      &           /,4x,'(4) Compare Two Model Potentials for a System',
