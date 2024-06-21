@@ -78,6 +78,7 @@ c
       dowiggle = .false.
       if (n.gt.2 .and. symmtyp.eq.'LINEAR')  dowiggle = .true.
       if (n.gt.3 .and. symmtyp.eq.'PLANAR')  dowiggle = .true.
+      if (symmtyp .eq. 'CENTER')  dowiggle = .true.
 c
 c     use Connolly method for small symmetric structures
 c
@@ -244,6 +245,7 @@ c
       dowiggle = .false.
       if (n.gt.2 .and. symmtyp.eq.'LINEAR')  dowiggle = .true.
       if (n.gt.3 .and. symmtyp.eq.'PLANAR')  dowiggle = .true.
+      if (symmtyp .eq. 'CENTER')  dowiggle = .true.
 c
 c     use arc-based methods for small symmetric structures
 c
