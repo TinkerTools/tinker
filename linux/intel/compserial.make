@@ -14,6 +14,7 @@
 #
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 sizes.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 action.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 alfmol.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 align.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 analyz.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 angang.f

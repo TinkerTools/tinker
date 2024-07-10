@@ -14,6 +14,7 @@
 #
 ifort -c -g -warn all -check all sizes.f
 ifort -c -g -warn all -check all action.f
+ifort -c -g -warn all -check all alfmol.f
 ifort -c -g -warn all -check all align.f
 ifort -c -g -warn all -check all analyz.f
 ifort -c -g -warn all -check all angang.f

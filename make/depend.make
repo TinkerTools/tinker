@@ -11,6 +11,7 @@
 document 5 action.f | grep 'o:'
 document 5 active.f | grep 'o:'
 document 5 alchemy.f | grep 'o:'
+document 5 alfmol.f | grep 'o:'
 document 5 align.f | grep 'o:'
 document 5 alterchg.f | grep 'o:'
 document 5 alterpol.f | grep 'o:'

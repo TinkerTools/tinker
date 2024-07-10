@@ -15,6 +15,7 @@ rem
 rem
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp sizes.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp action.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp alfmol.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp align.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp analyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp angang.f

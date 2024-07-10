@@ -98,8 +98,8 @@ else()
 endif()
 
 set(_FILES
-    action active align alterchg alterpol analysis analyz angang angbnd
-    angles angpot angtor argue ascii atmlst atomid atoms attach baoab
+    action active alfmol align alterchg alterpol analysis analyz angang
+    angbnd angles angpot angtor argue ascii atmlst atomid atoms attach baoab
     basefile bath beeman bicubic bitor bitors bndpot bndstr bonds born
     bound bounds boxes bussi calendar cell center cflux charge chgpen
     chgpot chgtrn chkpole chkring chksymm chkxyz cholesky chrono chunks
@@ -146,8 +146,8 @@ set(_FILES
     potfit predict pressure prmkey promo prtarc prtdyn prterr prtfrc
     prtint prtmol2 prtpdb prtprm prtseq prtuind prtvel prtxyz ptable
     qmstuf qrsolve quatfit random rattle readcart readdcd readdyn
-    readgau readgdma readint readmol readmol2 readpdb readprm readseq
-    readxyz refer repel replica reppot resdue respa restrn rgddyn
+    readgau readgdma readint readmbis readmol readmol2 readpdb readprm
+    readseq readxyz refer repel replica reppot resdue respa restrn rgddyn
     rgdstep richmond rigid ring rings rmsfit rotbnd rotlist rotpole
     rxnfld rxnpot scales sdstep search sequen server setprm shakeup
     shapes shunt sigmoid simplex sizes sktstuf socket solpot solute sort

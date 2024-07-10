@@ -1832,6 +1832,8 @@ void kgk_();
 #define tinker_f_kgk kgk_
 void kpb_();
 #define tinker_f_kpb kpb_
+void ksurf_();
+#define tinker_f_ksurf ksurf_
 void knp_();
 #define tinker_f_knp knp_
 void khpmf_();
@@ -2335,6 +2337,10 @@ inline void tinker_f_match3(int* i, tinker_fchars record) {
 void readint_(int* izmt);
 #define tinker_f_readint readint_
 
+// readmbis.f
+void readmbis_(int* ichg, int* imbis);
+#define tinker_f_readmbis readmbis_
+
 // readmol.f
 void readmol_(int* imdl);
 #define tinker_f_readmol readmol_
@@ -2674,11 +2680,11 @@ void unionball_(int* n, double* x, double* y, double* z, double* rad, double* we
 #define tinker_f_unionball unionball_
 void setunion_(int* nsphere, double* coords, double* radii);
 #define tinker_f_setunion setunion_
-void regular3_(int* nredundant, int* redlist);
+void regular3_(int* nredund, int* redlist);
 #define tinker_f_regular3 regular3_
 void alfcx_(double* alpha, int* nred, int* redlist);
 #define tinker_f_alfcx alfcx_
-void readjust_sphere_(int* nsphere, int* nredundant, int* redlist);
+void readjust_sphere_(int* nsphere, int* nredund, int* redlist);
 #define tinker_f_readjust_sphere readjust_sphere_
 void ball_surf_(double* coef, double* wsurf, double* surf, double* ballwsurf);
 #define tinker_f_ball_surf ball_surf_
@@ -2704,9 +2710,9 @@ void triangle_radius_(double* a, double* b, double* c, double* ra, double* rb, d
 #define tinker_f_triangle_radius triangle_radius_
 void vertex_attach_(double* a, double* b, double* ra, double* rb, int* testa, int* testb);
 #define tinker_f_vertex_attach vertex_attach_
-void locate_jw_(int* iseed, int* ival, int* tetra_loc, int* iredundant);
+void locate_jw_(int* iseed, int* ival, int* tetra_loc, int* iredund);
 #define tinker_f_locate_jw locate_jw_
-void inside_tetra_jw_(int* p, int* a, int* b, int* c, int* d, int* iorient, int* inside, int* redundant, int* ifail);
+void inside_tetra_jw_(int* p, int* a, int* b, int* c, int* d, int* iorient, int* inside, int* redund, int* ifail);
 #define tinker_f_inside_tetra_jw inside_tetra_jw_
 void regular_convex_(int* a, int* b, int* c, int* p, int* o, int* itest_abcp, int* regular, int* convex, int* test_abpo, int* test_bcpo, int* test_capo);
 #define tinker_f_regular_convex regular_convex_
@@ -2838,6 +2844,12 @@ double padd_(double* r1, double* r2);
 #define tinker_f_padd padd_
 double psub_(double* r1, double* r2);
 #define tinker_f_psub psub_
+void build_weight_(double* x, double* y, double* z, double* r, double* w);
+#define tinker_f_build_weight build_weight_
+void addbogus_(double* bcoord, double* brad);
+#define tinker_f_addbogus addbogus_
+void tetra_volume_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* vol);
+#define tinker_f_tetra_volume tetra_volume_
 
 // unitcell.f
 void unitcell_();

@@ -14,6 +14,7 @@
 #
 gfortran -c -Ofast -mtune=generic -fopenmp sizes.f
 gfortran -c -Ofast -mtune=generic -fopenmp action.f
+gfortran -c -Ofast -mtune=generic -fopenmp alfmol.f
 gfortran -c -Ofast -mtune=generic -fopenmp align.f
 gfortran -c -Ofast -mtune=generic -fopenmp analyz.f
 gfortran -c -Ofast -mtune=generic -fopenmp angang.f

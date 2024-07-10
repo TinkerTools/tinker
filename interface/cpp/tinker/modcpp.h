@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/action.hh"
+#include "detail/alfmol.hh"
 #include "detail/align.hh"
 #include "detail/analyz.hh"
 #include "detail/angang.hh"

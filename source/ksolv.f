@@ -179,6 +179,10 @@ c
          end if
       end do
 c
+c     get keywords with AlphaMol surface area and volume controls
+c
+      call ksurf
+c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(rsolv))  deallocate (rsolv)
@@ -1437,6 +1441,74 @@ c
   160    format (/,' APBS Grid Dimensions and Spacing :',
      &           //,10x,3i8,10x,f10.4)
       end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ksurf  --  find any AlphaMol control values  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "ksurf" reads control values used within the AlphaMol code
+c     for determination of molecular surface area and volume
+c
+c
+      subroutine ksurf
+      use alfmol
+      use keys
+      implicit none
+      integer i,next
+      character*6 word
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     choose algorithms and tolerances for use with AlphaMol
+c
+      alfmethod = 'SINGLE'
+      alfsort = 'NONE'
+      alfsosgmp = .false.
+      alfhydro = .true.
+      alfthread = 1
+      delcxeps = 1.0d-10
+c
+c     get any control parameter values from the keyfile
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:11) .eq. 'ALF-METHOD ') then
+            call gettext (record,alfmethod,next)
+            call upcase (alfmethod)
+            if (alfmethod .eq. 'MULTI') then
+               string = record(next:240)
+               read (string,*,err=10,end=10)  alfthread
+            else
+               alfmethod = 'SINGLE'
+            end if
+         else if (keyword(1:9) .eq. 'ALF-SORT ') then
+            call gettext (record,word,next)
+            call upcase (word)
+            if (word .eq. 'SORT3D')  alfsort = 'SORT3D'
+            if (word .eq. 'BRIO  ')  alfsort = 'BRIO'
+            if (word .eq. 'SPLIT ')  alfsort = 'SPLIT'
+            if (word .eq. 'KDTREE')  alfsort = 'KDTREE'
+         else if (keyword(1:11) .eq. 'ALF-SOSGMP ') then
+            alfsosgmp = .true.
+         else if (keyword(1:12) .eq. 'ALF-NOHYDRO ') then
+            alfhydro = .false.
+         else if (keyword(1:10) .eq. 'DELCX-EPS ') then
+            read (string,*,err=10,end=10)  delcxeps
+         end if
+   10    continue
+      end do
       return
       end
 c

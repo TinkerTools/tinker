@@ -5,6 +5,7 @@ project (TinkerInterface LANGUAGES NONE)
 enable_language (Fortran)
 add_library (tinkerObjF OBJECT
 ../source/action.f
+../source/alfmol.f
 ../source/align.f
 ../source/analyz.f
 ../source/angang.f
@@ -493,6 +494,7 @@ add_library (tinkerObjF OBJECT
 ../source/readgau.f
 ../source/readgdma.f
 ../source/readint.f
+../source/readmbis.f
 ../source/readmol.f
 ../source/readmol2.f
 ../source/readpdb.f

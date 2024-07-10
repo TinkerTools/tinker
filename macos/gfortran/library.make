@@ -13,6 +13,7 @@ action.o \
 active.o \
 alterchg.o \
 alterpol.o \
+alfmol.o \
 align.o \
 analysis.o \
 analyz.o \

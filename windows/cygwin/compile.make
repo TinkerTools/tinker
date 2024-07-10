@@ -14,6 +14,7 @@
 #
 gfortran -c -O3 -ffast-math -fopenmp sizes.f
 gfortran -c -O3 -ffast-math -fopenmp action.f
+gfortran -c -O3 -ffast-math -fopenmp alfmol.f
 gfortran -c -O3 -ffast-math -fopenmp align.f
 gfortran -c -O3 -ffast-math -fopenmp analyz.f
 gfortran -c -O3 -ffast-math -fopenmp angang.f

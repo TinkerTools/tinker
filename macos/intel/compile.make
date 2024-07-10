@@ -14,6 +14,7 @@
 #
 ifort -c -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp sizes.f
 ifort -c -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp action.f
+ifort -c -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp alfmol.f
 ifort -c -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp align.f
 ifort -c -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp analyz.f
 ifort -c -O3 -no-ipo -no-prec-div -inline -mdynamic-no-pic -w -qopenmp angang.f

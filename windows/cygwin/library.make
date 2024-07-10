@@ -11,6 +11,7 @@
 ar -crusv libtinker.a \
 action.o \
 active.o \
+alfmol.o \
 align.o \
 alterchg.o \
 alterpol.o \

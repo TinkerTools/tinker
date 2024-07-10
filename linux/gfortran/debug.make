@@ -14,6 +14,7 @@
 #
 gfortran -c -Wall sizes.f
 gfortran -c -Wall action.f
+gfortran -c -Wall alfmol.f
 gfortran -c -Wall align.f
 gfortran -c -Wall analyz.f
 gfortran -c -Wall angang.f

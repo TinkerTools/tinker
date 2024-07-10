@@ -14,6 +14,7 @@
 #
 gfortran -c -Ofast -march=native -fopenmp sizes.f
 gfortran -c -Ofast -march=native -fopenmp action.f
+gfortran -c -Ofast -march=native -fopenmp alfmol.f
 gfortran -c -Ofast -march=native -fopenmp align.f
 gfortran -c -Ofast -march=native -fopenmp analyz.f
 gfortran -c -Ofast -march=native -fopenmp angang.f

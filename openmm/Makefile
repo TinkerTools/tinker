@@ -148,6 +148,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR
 OBJS =	action.o \
 	active.o \
 	alchemy.o \
+	alfmol.o \
 	align.o \
 	alterchg.o \
 	alterpol.o \
@@ -805,6 +806,7 @@ libtinker.a: ${OBJS}
 	ar ${LIBFLAGS} libtinker.a \
 	action.o \
 	active.o \
+	alfmol.o \
 	align.o \
 	alterchg.o \
 	alterpol.o \
@@ -1356,6 +1358,7 @@ ommdata.o: angbnd.o angpot.o angtor.o atomid.o atoms.o bath.o bitor.o bndpot.o b
 action.o:
 active.o: atoms.o inform.o iounit.o keys.o usage.o
 alchemy.o: analyz.o atoms.o energi.o files.o inform.o iounit.o katoms.o mutant.o potent.o units.o usage.o
+alfmol.o:
 align.o:
 alterchg.o: angbnd.o atmlst.o atoms.o bndstr.o bound.o cflux.o charge.o chgpen.o inform.o iounit.o math.o mplpot.o mpole.o sizes.o
 alterpol.o: atoms.o bound.o cell.o couple.o expol.o limits.o mpole.o neigh.o polgrp.o polpot.o shunt.o
@@ -1692,7 +1695,7 @@ kpolr.o:
 krepel.o: atomid.o atoms.o inform.o iounit.o keys.o krepl.o mpole.o potent.o repel.o reppot.o sizes.o
 krepl.o:
 ksolut.o:
-ksolv.o: angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o ksolut.o kvdws.o math.o nonpol.o pbstuf.o polar.o polopt.o polpot.o potent.o ptable.o sizes.o solpot.o solute.o vdw.o vdwpot.o
+ksolv.o: alfmol.o angbnd.o atmlst.o atomid.o atoms.o bath.o bndstr.o chgpot.o couple.o gkstuf.o hpmf.o inform.o iounit.o keys.o ksolut.o kvdws.o math.o nonpol.o pbstuf.o polar.o polopt.o polpot.o potent.o ptable.o sizes.o solpot.o solute.o vdw.o vdwpot.o
 kstbnd.o:
 kstrbnd.o: angbnd.o angpot.o atmlst.o atomid.o atoms.o couple.o fields.o inform.o iounit.o keys.o kstbnd.o merck.o potent.o ring.o strbnd.o
 kstrtor.o: atmlst.o atomid.o atoms.o couple.o inform.o iounit.o keys.o ksttor.o potent.o strtor.o tors.o
