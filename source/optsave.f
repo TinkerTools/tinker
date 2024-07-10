@@ -162,32 +162,47 @@ c
       if (frcsave .and. coordtype.eq.'CARTESIAN') then
          ifrc = freeunit ()
          if (cyclesave) then
-            frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
-            call version (frcfile,'new')
-            open (unit=ifrc,file=frcfile,status='new')
-         else if (dcdsave) then
-            frcfile = filename(1:leng)
-            call suffix (frcfile,'dcdf','old')
-            inquire (file=frcfile,exist=exist)
-            if (exist) then
-               first = .false.
-               open (unit=ifrc,file=frcfile,form='unformatted',
-     &                  status='old',position='append')
+            if (dcdsave) then
+               frcfile = filename(1:leng)
+               call suffix (frcfile,'dcdf','old')
+               inquire (file=frcfile,exist=exist)
+               if (exist) then
+                  first = .false.
+                  open (unit=ifrc,file=frcfile,form='unformatted',
+     &                     status='old',position='append')
+               else
+                  first = .true.
+                  open (unit=ifrc,file=frcfile,form='unformatted',
+     &                     status='new')
+               end if
+               call prtdcdf (ifrc,first)
+            else if (arcsave) then
+               frcfile = filename(1:leng)
+               call suffix (frcfile,'frc','old')
+               inquire (file=frcfile,exist=exist)
+               if (exist) then
+                  call openend (ifrc,frcfile)
+               else
+                  open (unit=ifrc,file=frcfile,status='new')
+               end if
+               call prtfrc (ifrc)
             else
-               first = .true.
-               open (unit=ifrc,file=frcfile,form='unformatted',
-     &                  status='new')
+               frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
+               call version (frcfile,'new')
+               open (unit=ifrc,file=frcfile,status='new')
+               call prtfrc (ifrc)
             end if
-            call prtdcdf (ifrc,first)
          else
             frcfile = filename(1:leng)
             call suffix (frcfile,'frc','old')
+            call version (frcfile,'old')
             inquire (file=frcfile,exist=exist)
             if (exist) then
-               call openend (ifrc,frcfile)
+               open (unit=ifrc,file=frcfile,status='old')
             else
                open (unit=ifrc,file=frcfile,status='new')
             end if
+            rewind (unit=ifrc)
             call prtfrc (ifrc)
          end if
          close (unit=ifrc)
@@ -200,32 +215,47 @@ c
       if (uindsave .and. use_polar .and. coordtype.eq.'CARTESIAN') then
          iind = freeunit ()
          if (cyclesave) then
-            indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
-            call version (indfile,'new')
-            open (unit=iind,file=indfile,status='new')
-         else if (dcdsave) then
-            indfile = filename(1:leng)
-            call suffix (indfile,'dcdu','old')
-            inquire (file=indfile,exist=exist)
-            if (exist) then
-               first = .false.
-               open (unit=iind,file=indfile,form='unformatted',
-     &                  status='old',position='append')
+            if (dcdsave) then
+               indfile = filename(1:leng)
+               call suffix (indfile,'dcdu','old')
+               inquire (file=indfile,exist=exist)
+               if (exist) then
+                  first = .false.
+                  open (unit=iind,file=indfile,form='unformatted',
+     &                     status='old',position='append')
+               else
+                  first = .true.
+                  open (unit=iind,file=indfile,form='unformatted',
+     &                     status='new')
+               end if
+               call prtdcdu (iind,first)
+            else if (arcsave) then
+               indfile = filename(1:leng)
+               call suffix (indfile,'uind','old')
+               inquire (file=indfile,exist=exist)
+               if (exist) then
+                  call openend (iind,indfile)
+               else
+                  open (unit=iind,file=indfile,status='new')
+               end if
+               call prtuind (iind)
             else
-               first = .true.
-               open (unit=iind,file=indfile,form='unformatted',
-     &                  status='new')
+               indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
+               call version (indfile,'new')
+               open (unit=iind,file=indfile,status='new')
+               call prtuind (iind)
             end if
-            call prtdcdu (iind,first)
          else
             indfile = filename(1:leng)
             call suffix (indfile,'uind','old')
+            call version (indfile,'old')
             inquire (file=indfile,exist=exist)
             if (exist) then
-               call openend (iind,indfile)
+               open (unit=iind,file=indfile,status='old')
             else
                open (unit=iind,file=indfile,status='new')
             end if
+            rewind (unit=iind)
             call prtuind (iind)
          end if
          close (unit=iind)

@@ -53,7 +53,7 @@ c
       implicit none
       integer i,nsphere
       integer nsize,nfudge
-      integer nredundant
+      integer nredund
       integer, allocatable :: redlist(:)
       real*8 surf,usurf,eps
       real*8 vol,uvol,voln
@@ -128,16 +128,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,redlist)
+      call regular3 (nredund,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,redlist)
+      call alfcx (alpha,nredund,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,redlist)
+      call readjust_sphere (nsphere,nredund,redlist)
 c
 c     get the accessible surface area and excluded volume
 c
@@ -216,7 +216,7 @@ c
       implicit none
       integer i,nsphere
       integer nsize,nfudge
-      integer nredundant
+      integer nredund
       integer, allocatable :: redlist(:)
       real*8 surf,usurf,eps
       real*8 vol,uvol,voln
@@ -302,16 +302,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,redlist)
+      call regular3 (nredund,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,redlist)
+      call alfcx (alpha,nredund,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,redlist)
+      call readjust_sphere (nsphere,nredund,redlist)
 c
 c     get the accessible surface area and excluded volume
 c

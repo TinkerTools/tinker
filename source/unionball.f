@@ -63,7 +63,7 @@ c
       implicit none
       integer i,n,nsphere
       integer nsize,nfudge
-      integer nredundant
+      integer nredund
       integer, allocatable :: redlist(:)                                 
       real*8 surf,usurf
       real*8 vol,uvol
@@ -141,16 +141,16 @@ c
 c
 c     compute the weighted Delaunay triangulation
 c
-      call regular3 (nredundant,redlist)
+      call regular3 (nredund,redlist)
 c
 c     compute the alpha complex for fixed value of alpha
 c
       alpha = 0.0d0
-      call alfcx (alpha,nredundant,redlist)
+      call alfcx (alpha,nredund,redlist)
 c
 c     if fewer than four balls, set artificial spheres as redundant
 c
-      call readjust_sphere (nsphere,nredundant,redlist)
+      call readjust_sphere (nsphere,nredund,redlist)
 c
 c     get surface area and volume, then copy to Tinker arrays
 c
@@ -478,15 +478,15 @@ c     with one vertex at "infinite", and (11) collect the remaining
 c     tetrahedra, and define convex hull
 c
 c
-      subroutine regular3 (nredundant,redlist)
+      subroutine regular3 (nredund,redlist)
       use shapes
       implicit none
       integer i,ival
-      integer iredundant
+      integer iredund
+      integer nredund
       integer iflag,iseed
       integer tetra_loc
       integer tetra_last
-      integer nredundant
       integer maxfree,maxkill
       integer maxlink,maxnew
       integer npeel_try
@@ -520,8 +520,8 @@ c
          nnew = 0
          if (btest(vinfo(ival),0)) then
             tetra_loc = tetra_last
-            call locate_jw (iseed,ival,tetra_loc,iredundant)
-            if (iredundant .eq. 1) then
+            call locate_jw (iseed,ival,tetra_loc,iredund)
+            if (iredund .eq. 1) then
                vinfo(ival) = ibclr(vinfo(ival),0)
                goto 10
             end if
@@ -551,11 +551,11 @@ c
 c
 c     define the list of redundant points
 c
-      nredundant = 0
+      nredund = 0
       do i = 1, npoint
          if (.not. btest(vinfo(i+4),0)) then
-            nredundant = nredundant + 1
-            redlist(nredundant) = i
+            nredund = nredund + 1
+            redlist(nredund) = i
          end if
       end do
 c
@@ -927,12 +927,12 @@ c     "readjust_sphere" removes artificial spheres for UnionBall
 c     systems containing fewer than four spheres
 c
 c
-      subroutine readjust_sphere (nsphere,nredundant,redlist)
+      subroutine readjust_sphere (nsphere,nredund,redlist)
       use shapes
       implicit none
       integer i,j
       integer nsphere
-      integer nredundant
+      integer nredund
       integer redlist(*)
       save
 c
@@ -946,7 +946,7 @@ c
          npoint = nsphere
          nvertex = npoint + 4
          j = 0
-         do i = 1, nredundant
+         do i = 1, nredund
             if (redlist(i) .le. nsphere) then
                j = j + 1
                redlist(j) = redlist(i)
@@ -3683,7 +3683,7 @@ c     variables and parameters:
 c
 c     ival         index of the points to be located
 c     tetra_loc    tetrahedron containing the point
-c     iredundant   flag set to 0 if not redundant, 1 otherwise
+c     iredund      flag set to 0 if not redundant, 1 otherwise
 c
 c     the point location scheme uses a "jump-and-walk" technique;
 c     first, N active tetrahedra are chosen at random, the distances
@@ -3694,20 +3694,20 @@ c     tetrahedron containing the point is found; also checks if the
 c     point is redundant in the current tetrahedron, ending the search
 c
 c
-      subroutine locate_jw (iseed,ival,tetra_loc,iredundant)
+      subroutine locate_jw (iseed,ival,tetra_loc,iredund)
       use shapes
       implicit none
       integer i,ival,itetra
       integer a,b,c,d
       integer idx,iorient,iseed
-      integer tetra_loc,iredundant
+      integer tetra_loc,iredund
       logical test_in,test_red
       save
 c
 c
 c     start at the root of the history dag with tetra(1)
 c
-      iredundant = 0
+      iredund = 0
       if (ntetra .eq. 1) then
          tetra_loc = 1
          return
@@ -3739,7 +3739,7 @@ c
 c
 c     tetrahedron is found, so check if point is redundant
 c
-      if (test_red)  iredundant = 1
+      if (test_red)  iredund = 1
       return
       end
 c
@@ -3761,13 +3761,13 @@ c     p           index of the point to be checked
 c     a,b,c,d     four vertices of the tetrahedron
 c     iorient     orientation of the tetrahedron
 c     inside      logical flag to mark P inside the ABCD tetrahedron
-c     redundant   logical flag to mark whether point P is redundant
+c     redund      logical flag to mark whether point P is redundant
 c     ifail       index of the face that fails the orientation test
 c                   in case where P is not inside the tetrahedron
 c
 c
       subroutine inside_tetra_jw (p,a,b,c,d,iorient,inside,
-     &                               redundant,ifail)
+     &                                redund,ifail)
       use shapes
       implicit none
       integer i,j,k,l,m
@@ -3798,7 +3798,7 @@ c
       real*8 k_p(4),l_p(4)
       logical test_pijk,test_pjil
       logical test_pkjl,test_pikl
-      logical inside,redundant
+      logical inside,redund
       logical doweight
       data inf4_1  / 2, 2, 1, 1 /
       data sign4_1  / -1, 1, 1, -1 /
@@ -3868,7 +3868,7 @@ c     care is required to take in account infinite points
 c
       doweight = .true.
       inside = .false.
-      redundant = .false.
+      redund = .false.
       list(1) = a
       list(2) = b
       list(3) = c
@@ -3997,7 +3997,7 @@ c
             call minor5 (crdball,radball,ia,ib,ic,id,ie,val)
             det_pijkl = val * nswap * iorient
          end if
-         redundant = (det_pijkl .lt. 0.0d0)
+         redund = (det_pijkl .lt. 0.0d0)
 c
 c     one of the vertices A, B, C or D is infinite, to find which
 c     it is, we use a map between (inf(a),inf(b),inf(c),inf(d))
@@ -4112,7 +4112,7 @@ c     at this point P is inside the tetrahedron, and since
 c     det_pijkl = det_pijk > 1, P cannot be redundant
 c
          inside = .true.
-         redundant = .false.
+         redund = .false.
 c
 c     two of the vertices A, B, C and D are infinite, to find which
 c     they are, we use a map between (inf(a),inf(b),inf(c),inf(d))
@@ -4214,7 +4214,7 @@ c     at this point P is inside the tetrahedron, then check
 c     to see whether P is redundant
 c
          inside = .true.
-         redundant = .false.
+         redund = .false.
          if (.not. doweight)  return
          ic5 = inf5_2(k,l)
          sign5 = sign5_2(k,l)
@@ -4225,7 +4225,7 @@ c
             det_pijkl = val * nswap
          end if
          det_pijkl = det_pijkl * sign5 * iorient
-         redundant = (det_pijkl .lt. 0.0d0)
+         redund = (det_pijkl .lt. 0.0d0)
 c
 c     three of vertices a, b, c and d are infinite, to find which
 c     is finite, use a map between (inf(a),inf(b),inf(c),inf(d))
@@ -4308,7 +4308,7 @@ c     at this point P is inside the tetrahedron, then check
 c     to see whether P is redundant
 c
          inside = .true.
-         redundant = .false.
+         redund = .false.
          if (.not. doweight)  return
          ic1 = inf5_3(ie)
          sign5 = sign5_3(ie)
@@ -4319,14 +4319,14 @@ c
             det_pijkl = val * nswap
          end if
          det_pijkl = -det_pijkl * sign5 * iorient * iswap
-         redundant = (det_pijkl .lt. 0.0d0)
+         redund = (det_pijkl .lt. 0.0d0)
 c
 c     if all four points ia, ib, ic and id are infinite,
 c     then inside must be true and redundant is false
 c
       else
          inside = .true.
-         redundant = .false.
+         redund = .false.
       end if
       return
       end
