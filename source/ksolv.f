@@ -1471,9 +1471,9 @@ c     choose algorithms and tolerances for use with AlphaMol
 c
       alfmethod = 'SINGLE'
       alfsort = 'NONE'
+      alfthread = 1
       alfsosgmp = .false.
       alfhydro = .true.
-      alfthread = 1
       delcxeps = 1.0d-10
 c
 c     get any control parameter values from the keyfile
@@ -1485,13 +1485,12 @@ c
          call upcase (keyword)
          string = record(next:240)
          if (keyword(1:11) .eq. 'ALF-METHOD ') then
-            call gettext (record,alfmethod,next)
-            call upcase (alfmethod)
+            call gettext (record,word,next)
+            call upcase (word)
+            if (word .eq. 'MULTI ')  alfmethod = 'MULTI'
             if (alfmethod .eq. 'MULTI') then
                string = record(next:240)
                read (string,*,err=10,end=10)  alfthread
-            else
-               alfmethod = 'SINGLE'
             end if
          else if (keyword(1:9) .eq. 'ALF-SORT ') then
             call gettext (record,word,next)
