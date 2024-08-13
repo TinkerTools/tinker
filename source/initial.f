@@ -165,6 +165,7 @@ c
       use_bounds = .false.
       use_replica = .false.
       use_polymer = .false.
+      use_wrap = .false.
 c
 c     flags for rebuilding of neighbor lists
 c

@@ -102,7 +102,7 @@ c
 c     move stray molecules into periodic box if desired
 c
       if (coordtype .eq. 'CARTESIAN') then
-         if (use_bounds)  call bounds
+         if (use_wrap)  call bounds
       end if
 c
 c     save coordinates to archive or numbered structure file

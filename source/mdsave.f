@@ -125,7 +125,7 @@ c
 c
 c     move stray molecules into periodic box if desired
 c
-      if (use_bounds)  call bounds
+      if (use_wrap)  call bounds
 c
 c     save coordinates to archive or numbered structure file
 c

@@ -67,6 +67,7 @@ c
       arespa = 0.00025d0
       nfree = 0
       irest = 100
+      use_wrap = .true.
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
@@ -116,6 +117,8 @@ c
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
             read (string,*,err=10,end=10)  irest
+         else if (keyword(1:12) .eq. 'UNWRAP-COORDS ') then
+            use_wrap = .false.
          else if (keyword(1:14) .eq. 'SAVE-VELOCITY ') then
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
