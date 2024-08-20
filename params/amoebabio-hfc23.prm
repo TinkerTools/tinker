@@ -75,14 +75,11 @@ HFC (high field correction) modifications from 2022:
 - vdw pair parameters for interactions of Na+ and K+ ions with protein
      hydroxyls, carbonyls and carboxylates
 
-V. Wineman-Fisher, Y. Al-Hamdani, I. Addou, A. Tkatchenko and S. Varma,
-"Ion-Hydroxyl Interactions: From High-Level Quantum Benchmarks to
-Transferable Polarizable Force Fields", J. Chem. Theory and Comput.,
-15, 2444−2453 (2019)
+V. Wineman-Fisher, Y. Al-Hamdani, I. Addou, A. Tkatchenko and S. Varma, Ion-Hydroxyl Interactions: From High-Level Quantum Benchmarks to Transferable Polarizable Force Fields, J. Chem. Theory Comput., 15, 2444-2453 (2019)
 
 V. Wineman-Fisher, J. M. Delgado, P. Nagy, E. Jakobsson, S. A. Pandit
 and S. Varma, "Transferable Interactions of Li+ and Mg2+ Ions in
-Polarizable models", J. Chem. Phys., 153, 104113 (2020)
+Polarizable Models", J. Chem. Phys., 153, 104113 (2020)
 
 V. Wineman-Fisher, Y. Al-Hamdani, P. Nagy, A. Tkatchenko and S. Varma,
 "Improved Description of Ligand Polarization Enhances Transferability
@@ -11151,7 +11148,7 @@ biotype     775    N       "Amide C-Terminus"                225
 biotype     776    HN      "Amide C-Terminus"                226
 biotype     777    N       "N-MeAmide C-Terminus"            227
 biotype     778    HN      "N-MeAmide C-Terminus"            228
-biotype     779    CH3     "N-MeAmide C-Terminus"            229
+biotype     779    C       "N-MeAmide C-Terminus"            229
 biotype     780    H       "N-MeAmide C-Terminus"            230
 biotype    1001    O5*     "Adenosine"                       326
 biotype    1002    C5*     "Adenosine"                       324

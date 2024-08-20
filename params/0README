@@ -39,8 +39,12 @@
 
       amber99sb  Amber ff99sb parameters for proteins and nucleic acids.
                  The only changes from Amber ff99 are to torsional
-                 parameters for phi/psi and phi'/psi' (angles to the
-                 beta carbon atom).
+                 parameters for phi/psi and phi'/psi', the latter being
+                 the angles to the beta carbon atom.
+
+      amber14sb  Amber ff14sb parameters for proteins as an improvement
+                 on ff99sb, combined with OL15 DNA and OL3 RNA parameters
+                 for nucleic acids, and TIP3P water parameters.
 
       amoeba     AMOEBA force field for various small organic molecules
                  based on polarizable atomic multipole electrostatics.
@@ -89,6 +93,8 @@
                  differences are related to Tinker symmetrization of some
                  improper torsions, as well as in the CMAP correction.
 
+      charmm36   CHARMM36 parameters (to be implemented).
+
       dang       Polarizable force field parameters from Liem Dang at
                  Pacific Northwest National Laboratory.
 
@@ -101,8 +107,10 @@
       encad      ENCAD parameters for proteins and nucleic acids
                  (in preparation).
 
-      hippo      Preliminary parameters from 2018 for the HIPPO model
-                 covering the monomer molecules in the S101 database.
+      hippo19    Preliminary parameters from 2019 for the HIPPO model
+                 covering the monomer molecules in the S101 database;
+                 these parameters are very preliminary and subject to
+                 revision; not to be used for production research
 
       hoch       Simple NMR-NOE force field of Hoch and Stern.
 

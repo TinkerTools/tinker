@@ -586,7 +586,7 @@ c
                   call pdbatom (' N  ',resname,i,ni(i))
                else if (resname .eq. 'NME') then
                   call pdbatom (' N  ',resname,i,ni(i))
-                  call pdbatom (' CH3',resname,i,cai(i))
+                  call pdbatom (' C  ',resname,i,cai(i))
                else
                   call pdbatom (' N  ',resname,i,ni(i))
                   call pdbatom (' CA ',resname,i,cai(i))

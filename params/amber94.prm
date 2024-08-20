@@ -57,7 +57,7 @@ at http://ambermd.org/
 
    #####################################################
    ##                                                 ##
-   ##  Tinker Atom Class Numbers to Amber Atom Types  ##
+   ##  Tinker Atom Class Numbers to Amber Atom Names  ##
    ##                                                 ##
    ##    2  CT      20  CN      39  OW       9  HO    ##
    ##    3  C       34  CK       8  OH      11  HS    ##
@@ -65,7 +65,7 @@ at http://ambermd.org/
    ##   37  CM       1  N        5  O        7  HC    ##
    ##   21  CC      19  NA      26  O2       6  H1    ##
    ##   24  CV      25  NB      12  S       32  H2    ##
-   ##   16  CW      35  NC      10  SH       -  H3    ##
+   ##   16  CW      35  NC      10  SH      30  H3    ##
    ##   22  CR      33  N*      38  P       27  HP    ##
    ##   18  CB      29  N2       4  H       17  H4    ##
    ##   15  C*      28  N3      40  HW      23  H5    ##
@@ -1121,7 +1121,7 @@ vdw          24               1.9080     0.0860
 vdw          25               1.8240     0.1700
 vdw          26               1.6612     0.2100
 vdw          27               1.1000     0.0157
-vdw          28               1.8750     0.1700
+vdw          28               1.8240     0.1700
 vdw          29               1.8240     0.1700
 vdw          31               1.6837     0.1700
 vdw          32               1.2870     0.0157
@@ -3641,7 +3641,7 @@ biotype     775    N       "Amide C-Terminus"                395
 biotype     776    HN      "Amide C-Terminus"                396
 biotype     777    N       "N-MeAmide C-Terminus"            397
 biotype     778    HN      "N-MeAmide C-Terminus"            398
-biotype     779    CH3     "N-MeAmide C-Terminus"            399
+biotype     779    C       "N-MeAmide C-Terminus"            399
 biotype     780    H       "N-MeAmide C-Terminus"            400
 biotype    1001    O5*     "Adenosine"                       748
 biotype    1002    C5*     "Adenosine"                       749

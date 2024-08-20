@@ -53,6 +53,14 @@ T. A. Halgren, "Merck Molecular Force Field. V. Extension of MMFF94 Using
 Experimental Data, Additional Computational Data, and Empirical Rules",
 J. Comput. Chem., 17, 616-641 (1995)
 
+T. A. Halgren, "MMFF VI. MMFF94s Option for Energy Minimization Studies",
+J. Comput. Chem., 20, 720-729 (1999)
+
+T. A. Halgren, "MMFF VII. Characterization of MMFF94, MMFF94s, and Other
+Widely Available Force Fields for Conformational Energies and for
+Intermolecular-Interaction Energies and Geometries", J. Comput. Chem.,
+20, 730-748 (1999)
+
 The Tinker implementation and validation of MMFF94 was done during 2005
 to 2007 by Nicolas Staelens, Laboratoire de Physico-Chimie Informatique,
 University of Namur, Belgium

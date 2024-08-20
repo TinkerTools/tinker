@@ -11738,7 +11738,7 @@ biotype     775    N       "Amide C-Terminus"                228
 biotype     776    HN      "Amide C-Terminus"                229
 biotype     777    N       "N-MeAmide C-Terminus"            230
 biotype     778    HN      "N-MeAmide C-Terminus"            231
-biotype     779    CH3     "N-MeAmide C-Terminus"            232
+biotype     779    C       "N-MeAmide C-Terminus"            232
 biotype     780    H       "N-MeAmide C-Terminus"            233
 biotype    1001    O5*     "Adenosine"                       332
 biotype    1002    C5*     "Adenosine"                       333

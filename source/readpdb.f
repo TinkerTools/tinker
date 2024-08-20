@@ -1145,9 +1145,10 @@ c     C-terminal N-methylamide residue  (NME)
 c
       else if (resname .eq. 'NME') then
          if (atmname .eq. ' NT ')  atmname = ' N  '
-         if (atmname .eq. ' CT ')  atmname = ' CH3'
-         if (atmname .eq. ' CAT')  atmname = ' CH3'
-         if (atmname .eq. ' CA ')  atmname = ' CH3'
+         if (atmname .eq. ' CT ')  atmname = ' C  '
+         if (atmname .eq. ' CAT')  atmname = ' C  '
+         if (atmname .eq. ' CA ')  atmname = ' C  '
+         if (atmname .eq. ' CH3')  atmname = ' C  '
          if (atmname .eq. ' HNT')  atmname = ' H  '
          if (atmname .eq. '1H  ')  atmname = ' H1 '
          if (atmname .eq. '1HA ')  atmname = ' H1 '

@@ -523,7 +523,7 @@ c     build the alpha carbon of the current residue
 c
          atmname = ' CA '
          if (resname .eq. 'ACE')  atmname = ' CH3'
-         if (resname .eq. 'NME')  atmname = ' CH3'
+         if (resname .eq. 'NME')  atmname = ' C  '
          call findatm (atmname,start,stop,k)
          if (k .ne. 0)  cai(i) = n
          if (midchn .or. cyclic .or. nres.eq.1) then
