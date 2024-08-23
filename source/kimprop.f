@@ -35,11 +35,9 @@ c
       real*8 tk,tv,symm
       logical header,done
       character*4 pa,pb,pc,pd
-      character*4 zero4
       character*8 zero8
       character*12 zero12
-      character*16 blank
-      character*16 pti,ptz
+      character*16 blank,pti
       character*16 pt0,pt1
       character*16 pt2,pt3
       character*16 pt(6)
@@ -51,7 +49,6 @@ c
 c     process keywords containing improper dihedral parameters
 c
       blank = '                '
-      zero4 = '0000'
       zero8 = '00000000'
       zero12 = '000000000000'
       header = .true.
@@ -193,47 +190,6 @@ c
                      end do
                   end if
                end do
-               if (.not. done) then
-                  do j = 1, ndi
-                     if (kdi(j)(9:12) .eq. pc) then
-                        do k = 1, 6
-                           ptz = zero4//pt(k)(5:16)
-                           if (kdi(j) .eq. ptz) then
-                              niprop = niprop + 1
-                              iiprop(1,niprop) = ia
-                              if (k .eq. 1) then
-                                 iiprop(2,niprop) = ib
-                                 iiprop(3,niprop) = ic
-                                 iiprop(4,niprop) = id
-                              else if (k .eq. 2) then
-                                 iiprop(2,niprop) = ib
-                                 iiprop(3,niprop) = id
-                                 iiprop(4,niprop) = ic
-                              else if (k .eq. 3) then
-                                 iiprop(2,niprop) = ic
-                                 iiprop(3,niprop) = ib
-                                 iiprop(4,niprop) = id
-                              else if (k .eq. 4) then
-                                 iiprop(2,niprop) = ic
-                                 iiprop(3,niprop) = id
-                                 iiprop(4,niprop) = ib
-                              else if (k .eq. 5) then
-                                 iiprop(2,niprop) = id
-                                 iiprop(3,niprop) = ib
-                                 iiprop(4,niprop) = ic
-                              else if (k .eq. 6) then
-                                 iiprop(2,niprop) = id
-                                 iiprop(3,niprop) = ic
-                                 iiprop(4,niprop) = ib
-                              end if
-                              kprop(niprop) = dcon(j) / symm
-                              vprop(niprop) = tdi(j)
-                              done = .true.
-                           end if
-                        end do
-                     end if
-                  end do
-               end if
                if (.not. done) then
                   do j = 1, ndi
                      if (kdi(j) .eq. pt1) then
