@@ -535,7 +535,7 @@ c
 c     reorder tetrahedra, so vertices are in increasing order
 c
       iflag = 1
-      call reorder_tetra (iflag,nnew,newlist)
+      call reorder_tetra (iflag)
 c
 c     regular triangulation complete; remove the simplices
 c     including infinite points, and define the convex hull
@@ -6568,31 +6568,30 @@ c     if iflag is set to 0, only new tetrahedra are reordered,
 c       and stored in list_tetra
 c
 c
-      subroutine reorder_tetra (iflag,new,list_tetra)
+      subroutine reorder_tetra (iflag)
       use shapes
       implicit none
-      integer i,j,idx,ival
-      integer iflag,new
+      integer i,j,idx
+      integer iflag,ival
       integer ntot,nswap
       integer index(4)
       integer vertex(4)
       integer neighbor(4)
       integer nsurf(4)
       integer nindex(4)
-      integer list_tetra(*)
       save
 c
 c
       if (iflag .eq. 1) then
          ntot = ntetra
       else
-         ntot = new
+         ntot = nnew
       end if
       do idx = 1, ntot
          if (iflag .eq. 1) then
             i = idx
          else
-            i = list_tetra(idx)
+            i = newlist(idx)
          end if
          if (btest(tinfo(i),1)) then
             do j = 1, 4
@@ -9837,7 +9836,7 @@ c     "truncate_real" converts a real number to a given accuracy
 c     with a specified number of digits after the decimal point)
 c
 c
-      subroutine truncate_real(x_in,x_out,ndigit)
+      subroutine truncate_real (x_in,x_out,ndigit)
       implicit none
       integer i,mantissa
       integer ndigit

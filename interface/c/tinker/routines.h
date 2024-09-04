@@ -2750,7 +2750,7 @@ void tetra_vol_(double* crdball, int* ia, int* ib, int* ic, int* id, double* vol
 #define tinker_f_tetra_vol tetra_vol_
 void sort4_sign_(int* list, int* index, int* nswap, int* n);
 #define tinker_f_sort4_sign sort4_sign_
-void reorder_tetra_(int* iflag, int* new, int* list_tetra);
+void reorder_tetra_(int* iflag);
 #define tinker_f_reorder_tetra reorder_tetra_
 void find_edges_(int* nedge, int* edges);
 #define tinker_f_find_edges find_edges_
@@ -2812,8 +2812,8 @@ void tetra_dihed_der3_(double* r12sq, double* r13sq, double* r14sq, double* r23s
 #define tinker_f_tetra_dihed_der3 tetra_dihed_der3_
 void tetra_3dihed_dcos_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* cosine, double* deriv, int* option);
 #define tinker_f_tetra_3dihed_dcos tetra_3dihed_dcos_
-void truncate_real(x_in,x_out,ndigit)_();
-#define tinker_f_truncate_real(x_in,x_out,ndigit) truncate_real(x_in,x_out,ndigit)_
+void truncate_real_(double* x_in, double* x_out, int* ndigit);
+#define tinker_f_truncate_real truncate_real_
 void crossvect_(double* u1, double* u2, double* u3);
 #define tinker_f_crossvect crossvect_
 void dotvect_(double* u1, double* u2, double* dot);
