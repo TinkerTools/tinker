@@ -267,7 +267,7 @@ c     turn off slow-evolving nonbonded potential energy terms
 c
       use_vdw = .false.
       use_repel = .false.
-      use_xrepel = .true.
+      use_xrepel = .false.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
