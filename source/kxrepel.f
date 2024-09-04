@@ -63,8 +63,8 @@ c
                   write (iout,20)
    20             format (/,' Additional Exchange Repulsion',
      &                       ' Parameters :',
-     &                    //,5x,'Atom Class',15x,'Core',11x,'Damp',
-     &                       6x,'P/S Coeff'/)
+     &                    //,5x,'Atom Class',13x,'Charge',11x,'Damp',
+     &                       7x,'PS-Ratio'/)
                end if
                if (k .le. maxclass) then
                   pxrz(k) = zpr
@@ -141,8 +141,8 @@ c
                   write (iout,50)
    50             format (/,' Additional Exchange Repulsion Values',
      &                       ' for Specific Atoms :',
-     &                    //,8x,'Atom',15x,'Core',11x,'Damp',
-     &                       6x,'P/S Coeff'/)
+     &                    //,8x,'Atom',16x,'Charge',11x,'Damp',
+     &                       7x,'PS-Ratio'/)
                end if
                if (.not. silent) then
                   write (iout,60)  ia,zpr,apr,cpr

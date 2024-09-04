@@ -400,7 +400,7 @@ c
 c
 c     details of vdw potential energy functional form
 c
-      if (use_vdw .or. use_repel .or. use_disp) then
+      if (use_vdw .or. use_repel .or. use_xrepel .or. use_disp) then
          write (iout,70)
    70    format ()
       end if
@@ -429,20 +429,25 @@ c
          call justify (value)
          write (iout,100)  value
   100    format (' VDW Function',16x,a20)
+      else if (use_xrepel) then
+         value = 'EXCHANGE REPULSION'
+         call justify (value)
+         write (iout,110)  value
+  110    format (' VDW Function',16x,a20)
       end if
       if (use_disp) then
          value = 'DAMPED DISPERSION'
          call justify (value)
-         write (iout,110)  value
-  110    format (' VDW Function',16x,a20)
+         write (iout,120)  value
+  120    format (' VDW Function',16x,a20)
       end if
 c
 c     details of dispersion particle mesh Ewald calculation
 c
       if (use_dewald) then
-         write (iout,120)  adewald,dewaldcut,ndfft1,
+         write (iout,130)  adewald,dewaldcut,ndfft1,
      &                     ndfft2,ndfft3,bsdorder
-  120    format (/,' PME for Dispersion :',
+  130    format (/,' PME for Dispersion :',
      &           //,' Ewald Coefficient',19x,f12.4,
      &           /,' Real-Space Cutoff',19x,f12.4,
      &           /,' Grid Dimensions',21x,3i4,
@@ -452,59 +457,59 @@ c
 c     details of electrostatic energy functional form
 c
       if (use_charge .or. use_dipole .or. use_mpole .or. use_polar) then
-         write (iout,130)
-  130    format ()
+         write (iout,140)
+  140    format ()
       end if
       if (use_charge) then
          value = 'PARTIAL CHARGE'
          call justify (value)
-         write (iout,140)  value
-  140    format (' Electrostatics',14x,a20)
+         write (iout,150)  value
+  150    format (' Electrostatics',14x,a20)
       end if
       if (use_dipole) then
          value = 'BOND DIPOLE'
          call justify (value)
-         write (iout,150)  value
-  150    format (' Electrostatics',14x,a20)
+         write (iout,160)  value
+  160    format (' Electrostatics',14x,a20)
       end if
       if (use_mpole) then
          value = 'ATOMIC MULTIPOLE'
          call justify (value)
-         write (iout,160)  value
-  160    format (' Electrostatics',14x,a20)
+         write (iout,170)  value
+  170    format (' Electrostatics',14x,a20)
       end if
       if (use_chgpen) then
          value = 'CHARGE PENETRATION'
          call justify (value)
-         write (iout,170)  value
-  170    format (' Electrostatics',14x,a20)
+         write (iout,180)  value
+  180    format (' Electrostatics',14x,a20)
       end if
       if (use_chgtrn) then
          value = 'CHARGE TRANSFER'
          call justify (value)
-         write (iout,180)  value
-  180    format (' Induction',19x,a20)
+         write (iout,190)  value
+  190    format (' Induction',19x,a20)
       end if
       if (use_polar) then
          value = 'INDUCED DIPOLE'
          call justify (value)
-         write (iout,190)  value
-  190    format (' Induction',19x,a20)
+         write (iout,200)  value
+  200    format (' Induction',19x,a20)
          value = poltyp
          call justify (value)
-         write (iout,200)  value
-  200    format (' Polarization',16x,a20)
+         write (iout,210)  value
+  210    format (' Polarization',16x,a20)
          if (use_thole) then
             value = 'THOLE DAMPING'
             call justify (value)
-            write (iout,210)  value
-  210       format (' Polarization',16x,a20)
+            write (iout,220)  value
+  220       format (' Polarization',16x,a20)
          end if
          if (use_chgpen) then
             value = 'CHGPEN DAMPING'
             call justify (value)
-            write (iout,220)  value
-  220       format (' Polarization',16x,a20)
+            write (iout,230)  value
+  230       format (' Polarization',16x,a20)
          end if
       end if
 c
@@ -513,9 +518,9 @@ c
       if (use_ewald) then
          value = boundary
          call justify (value)
-         write (iout,230)  aeewald,ewaldcut,nefft1,nefft2,
+         write (iout,240)  aeewald,ewaldcut,nefft1,nefft2,
      &                     nefft3,bseorder,value
-  230    format (/,' PME for Electrostatics :',
+  240    format (/,' PME for Electrostatics :',
      &           //,' Ewald Coefficient',19x,f12.4,
      &           /,' Real-Space Cutoff',19x,f12.4,
      &           /,' Grid Dimensions',21x,3i4,
@@ -672,7 +677,7 @@ c
          end if
          write (iout,fstr)  ev,nev
       end if
-      if (use_repel .and. (ner.ne.0.or.er.ne.0.0d0)) then
+      if ((use_repel.or.use_xrepel).and.(ner.ne.0.or.er.ne.0.0d0)) then
          if (abs(er) .lt. 1.0d10) then
             fstr = '('' Repulsion'',18x,'//form1//')'
          else
@@ -1248,6 +1253,7 @@ c
       use urey
       use vdw
       use vdwpot
+      use xrepel
       implicit none
       integer i,j,k
       integer ia,ib,ic
@@ -1336,50 +1342,53 @@ c
       if (use_repel .and. nrep.ne.0) then
          write (iout,180)  nrep
   180    format (' Repulsion Sites',18x,i15)
+      else if (use_xrepel .and. nxrep.ne.0) then
+         write (iout,190)  nxrep
+  190    format (' Repulsion Sites',18x,i15)
       end if
       if (use_disp .and. ndisp.ne.0) then
-         write (iout,190)  ndisp
-  190    format (' Dispersion Sites',17x,i15)
+         write (iout,200)  ndisp
+  200    format (' Dispersion Sites',17x,i15)
       end if
       if (use_charge .and. nion.ne.0) then
-         write (iout,200)  nion
-  200    format (' Atomic Partial Charges',11x,i15)
+         write (iout,210)  nion
+  210    format (' Atomic Partial Charges',11x,i15)
       end if
       if (use_dipole .and. ndipole.ne.0) then
-         write (iout,210)  ndipole
-  210    format (' Bond Dipole Moments',14x,i15)
+         write (iout,220)  ndipole
+  220    format (' Bond Dipole Moments',14x,i15)
       end if
       if (use_mpole .and. npole.ne.0) then
-         write (iout,220)  npole
-  220    format (' Atomic Multipoles',16x,i15)
+         write (iout,230)  npole
+  230    format (' Atomic Multipoles',16x,i15)
       end if
       if (use_chgpen .and. ncp.ne.0) then
-         write (iout,230)  ncp
-  230    format (' Charge Penetration',15x,i15)
+         write (iout,240)  ncp
+  240    format (' Charge Penetration',15x,i15)
       end if
       if (use_polar .and. npolar.ne.0) then
-         write (iout,240)  npolar
-  240    format (' Polarizable Sites',16x,i15)
+         write (iout,250)  npolar
+  250    format (' Polarizable Sites',16x,i15)
       end if
       if (use_chgtrn .and. nct.ne.0) then
-         write (iout,250)  nct
-  250    format (' Charge Transfer Sites',12x,i15)
+         write (iout,260)  nct
+  260    format (' Charge Transfer Sites',12x,i15)
       end if
       if (use_chgflx .and. nbflx.ne.0) then
-         write (iout,260)  nbflx
-  260    format (' Bond Charge Flux',17x,i15)
+         write (iout,270)  nbflx
+  270    format (' Bond Charge Flux',17x,i15)
       end if
       if (use_chgflx .and. naflx.ne.0) then
-         write (iout,270)  naflx
-  270    format (' Angle Charge Flux',16x,i15)
+         write (iout,280)  naflx
+  280    format (' Angle Charge Flux',16x,i15)
       end if
       if (use_orbit .and. norbit.ne.0) then
-         write (iout,280)  norbit
-  280    format (' Pisystem Atoms',19x,i15)
+         write (iout,290)  norbit
+  290    format (' Pisystem Atoms',19x,i15)
       end if
       if (use_orbit .and. nbpi.ne.0) then
-         write (iout,290)  nbpi
-  290    format (' Conjugated Pi-Bonds',14x,i15)
+         write (iout,300)  nbpi
+  300    format (' Conjugated Pi-Bonds',14x,i15)
       end if
 c
 c     parameters used for molecular mechanics atom types
@@ -1389,15 +1398,15 @@ c
          if (active(i)) then
             if (header) then
                header = .false.
-               write (iout,300)
-  300          format (/,' Atom Definition Parameters :',
+               write (iout,310)
+  310          format (/,' Atom Definition Parameters :',
      &                 //,3x,'Atom',2x,'Symbol',2x,'Type',
      &                    2x,'Class',2x,'Atomic',3x,'Mass',
      &                    2x,'Valence',2x,'Description',/)
             end if
-            write (iout,310)  i,name(i),type(i),class(i),atomic(i),
+            write (iout,320)  i,name(i),type(i),class(i),atomic(i),
      &                        mass(i),valence(i),story(i)
-  310       format (i6,5x,a3,2i7,i6,f10.3,i5,5x,a24)
+  320       format (i6,5x,a3,2i7,i6,f10.3,i5,5x,a24)
          end if
       end do
 c
@@ -1411,12 +1420,12 @@ c
             if (active(ia) .or. active(ib)) then
                if (header) then
                   header = .false.
-                  write (iout,320)
-  320             format (/,' Bond Stretching Parameters :',
+                  write (iout,330)
+  330             format (/,' Bond Stretching Parameters :',
      &                    //,10x,'Atom Numbers',25x,'KS',7x,'Bond',/)
                end if
-               write (iout,330)  i,ia,ib,bk(i),bl(i)
-  330          format (i6,3x,2i6,19x,f10.3,f10.4)
+               write (iout,340)  i,ia,ib,bk(i),bl(i)
+  340          format (i6,3x,2i6,19x,f10.3,f10.4)
             end if
          end do
       end if
@@ -1432,23 +1441,23 @@ c
             if (active(ia) .or. active(ib) .or. active(ic)) then
                if (header) then
                   header = .false.
-                  write (iout,340)
-  340             format (/,' Angle Bending Parameters :',
+                  write (iout,350)
+  350             format (/,' Angle Bending Parameters :',
      &                    //,13x,'Atom Numbers',22x,'KB',
      &                       6x,'Angle',3x,'Fold',4x,'Type',/)
                end if
                if (angtyp(i) .eq. 'HARMONIC') then
-                  write (iout,350)  i,ia,ib,ic,ak(i),anat(i)
-  350             format (i6,3x,3i6,13x,2f10.3)
-               else if (angtyp(i) .eq. 'IN-PLANE') then
                   write (iout,360)  i,ia,ib,ic,ak(i),anat(i)
-  360             format (i6,3x,3i6,13x,2f10.3,9x,'In-Plane')
-               else if (angtyp(i) .eq. 'LINEAR') then
+  360             format (i6,3x,3i6,13x,2f10.3)
+               else if (angtyp(i) .eq. 'IN-PLANE') then
                   write (iout,370)  i,ia,ib,ic,ak(i),anat(i)
-  370             format (i6,3x,3i6,13x,2f10.3,9x,'Linear')
+  370             format (i6,3x,3i6,13x,2f10.3,9x,'In-Plane')
+               else if (angtyp(i) .eq. 'LINEAR') then
+                  write (iout,380)  i,ia,ib,ic,ak(i),anat(i)
+  380             format (i6,3x,3i6,13x,2f10.3,9x,'Linear')
                else if (angtyp(i) .eq. 'FOURIER ') then
-                  write (iout,380)  i,ia,ib,ic,ak(i),anat(i),afld(i)
-  380             format (i6,3x,3i6,13x,2f10.3,f7.1,2x,'Fourier')
+                  write (iout,390)  i,ia,ib,ic,ak(i),anat(i),afld(i)
+  390             format (i6,3x,3i6,13x,2f10.3,f7.1,2x,'Fourier')
                end if
             end if
          end do
@@ -1466,8 +1475,8 @@ c
             if (active(ia) .or. active(ib) .or. active(ic)) then
                if (header) then
                   header = .false.
-                  write (iout,390)
-  390             format (/,' Stretch-Bend Parameters :',
+                  write (iout,400)
+  400             format (/,' Stretch-Bend Parameters :',
      &                    //,13x,'Atom Numbers',8x,'KSB 1',5x,'KSB 2',
      &                       6x,'Angle',3x,'Bond 1',3x,'Bond 2',/)
                end if
@@ -1475,9 +1484,9 @@ c
                blc = 0.0d0
                if (isb(2,i) .ne. 0)  bla = bl(isb(2,i))
                if (isb(3,i) .ne. 0)  blc = bl(isb(3,i))
-               write (iout,400)  i,ia,ib,ic,sbk(1,i),sbk(2,i),
+               write (iout,410)  i,ia,ib,ic,sbk(1,i),sbk(2,i),
      &                           anat(k),bla,blc
-  400          format (i6,3x,3i6,1x,2f10.3,2x,f9.3,2f9.4)
+  410          format (i6,3x,3i6,1x,2f10.3,2x,f9.3,2f9.4)
             end if
          end do
       end if
@@ -1493,13 +1502,13 @@ c
             if (active(ia) .or. active(ic)) then
                if (header) then
                   header = .false.
-                  write (iout,410)
-  410             format (/,' Urey-Bradley Parameters :',
+                  write (iout,420)
+  420             format (/,' Urey-Bradley Parameters :',
      &                    //,13x,'Atom Numbers',21x,'KUB',
      &                       4x,'Distance',/)
                end if
-               write (iout,420)  i,ia,ib,ic,uk(i),ul(i)
-  420          format (i6,3x,3i6,13x,f10.3,f10.4)
+               write (iout,430)  i,ia,ib,ic,uk(i),ul(i)
+  430          format (i6,3x,3i6,13x,f10.3,f10.4)
             end if
          end do
       end if
@@ -1518,12 +1527,12 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,430)
-  430             format (/,' Out-of-Plane Bend Parameters :',
+                  write (iout,440)
+  440             format (/,' Out-of-Plane Bend Parameters :',
      &                    //,17x,'Atom Numbers',19x,'KOPB',/)
                end if
-               write (iout,440)  i,id,ib,ia,ic,opbk(i)
-  440          format (i6,3x,4i6,9x,f10.3)
+               write (iout,450)  i,id,ib,ia,ic,opbk(i)
+  450          format (i6,3x,4i6,9x,f10.3)
             end if
          end do
       end if
@@ -1541,12 +1550,12 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,450)
-  450             format (/,' Out-of-Plane Distance Parameters :',
+                  write (iout,460)
+  460             format (/,' Out-of-Plane Distance Parameters :',
      &                    //,17x,'Atom Numbers',19x,'KOPD',/)
                end if
-               write (iout,460)  i,ia,ib,ic,id,opdk(i)
-  460          format (i6,3x,4i6,9x,f10.3)
+               write (iout,470)  i,ia,ib,ic,id,opdk(i)
+  470          format (i6,3x,4i6,9x,f10.3)
             end if
          end do
       end if
@@ -1564,13 +1573,13 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,470)
-  470             format (/,' Improper Dihedral Parameters :',
+                  write (iout,480)
+  480             format (/,' Improper Dihedral Parameters :',
      &                    //,17x,'Atom Numbers',19x,'KID',
      &                       4x,'Dihedral',/)
                end if
-               write (iout,480)  i,ia,ib,ic,id,kprop(i),vprop(i)
-  480          format (i6,3x,4i6,9x,2f10.4)
+               write (iout,490)  i,ia,ib,ic,id,kprop(i),vprop(i)
+  490          format (i6,3x,4i6,9x,2f10.4)
             end if
          end do
       end if
@@ -1588,8 +1597,8 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,490)
-  490             format (/,' Improper Torsion Parameters :',
+                  write (iout,500)
+  500             format (/,' Improper Torsion Parameters :',
      &                    //,17x,'Atom Numbers',11x,
      &                       'Amplitude, Phase and Periodicity',/)
                end if
@@ -1613,20 +1622,20 @@ c
                   phase(j) = itors3(2,i)
                end if
                if (j .eq. 0) then
-                  write (iout,500)  i,ia,ib,ic,id
-  500             format (i6,3x,4i6)
+                  write (iout,510)  i,ia,ib,ic,id
+  510             format (i6,3x,4i6)
                else if (j .eq. 1) then
-                  write (iout,510)  i,ia,ib,ic,id,
+                  write (iout,520)  i,ia,ib,ic,id,
      &                              ampli(1),phase(1),fold(1)
-  510             format (i6,3x,4i6,10x,f10.3,f8.1,i4)
+  520             format (i6,3x,4i6,10x,f10.3,f8.1,i4)
                else if (j .eq. 2) then
-                  write (iout,520)  i,ia,ib,ic,id,(ampli(k),
-     &                              phase(k),fold(k),k=1,j)
-  520             format (i6,3x,4i6,2x,2(f10.3,f6.1,i4))
-               else
                   write (iout,530)  i,ia,ib,ic,id,(ampli(k),
+     &                              phase(k),fold(k),k=1,j)
+  530             format (i6,3x,4i6,2x,2(f10.3,f6.1,i4))
+               else
+                  write (iout,540)  i,ia,ib,ic,id,(ampli(k),
      &                              nint(phase(k)),fold(k),k=1,j)
-  530             format (i6,3x,4i6,4x,3(f8.3,i4,'/',i1))
+  540             format (i6,3x,4i6,4x,3(f8.3,i4,'/',i1))
                end if
             end if
          end do
@@ -1645,8 +1654,8 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,540)
-  540             format (/,' Torsional Angle Parameters :',
+                  write (iout,550)
+  550             format (/,' Torsional Angle Parameters :',
      &                    //,17x,'Atom Numbers',11x,
      &                       'Amplitude, Phase and Periodicity',/)
                end if
@@ -1688,12 +1697,12 @@ c
                   phase(j) = tors6(2,i)
                end if
                if (j .eq. 0) then
-                  write (iout,550)  i,ia,ib,ic,id
-  550             format (i6,3x,4i6)
+                  write (iout,560)  i,ia,ib,ic,id
+  560             format (i6,3x,4i6)
                else
-                  write (iout,560)  i,ia,ib,ic,id,(ampli(k),
+                  write (iout,570)  i,ia,ib,ic,id,(ampli(k),
      &                              nint(phase(k)),fold(k),k=1,j)
-  560             format (i6,3x,4i6,4x,6(f8.3,i4,'/',i1))
+  570             format (i6,3x,4i6,4x,6(f8.3,i4,'/',i1))
                end if
             end if
          end do
@@ -1714,12 +1723,12 @@ c
      &             active(id) .or. active(ie) .or. active(ig)) then
                if (header) then
                   header = .false.
-                  write (iout,570)
-  570             format (/,' Pi-Orbital Torsion Parameters :',
+                  write (iout,580)
+  580             format (/,' Pi-Orbital Torsion Parameters :',
      &                    //,10x,'Atom Numbers',19x,'Amplitude',/)
                end if
-               write (iout,580)  i,ic,id,kpit(i)
-  580          format (i6,3x,2i6,19x,f10.4)
+               write (iout,590)  i,ic,id,kpit(i)
+  590          format (i6,3x,2i6,19x,f10.4)
             end if
          end do
       end if
@@ -1738,8 +1747,8 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,590)
-  590             format (/,' Stretch-Torsion Parameters :',
+                  write (iout,600)
+  600             format (/,' Stretch-Torsion Parameters :',
      &                    //,17x,'Atom Numbers',10x,'Bond',
      &                       5x,'Amplitude and Phase (1-3 Fold)',/)
                end if
@@ -1761,11 +1770,11 @@ c
                phase(8) = tors2(2,k)
                ampli(9) = kst(9,i)
                phase(9) = tors3(2,k)
-               write (iout,600)  i,ia,ib,ic,id,
+               write (iout,610)  i,ia,ib,ic,id,
      &                           '1st',(ampli(k),nint(phase(k)),k=1,3),
      &                           '2nd',(ampli(k),nint(phase(k)),k=4,6),
      &                           '3rd',(ampli(k),nint(phase(k)),k=7,9)
-  600          format (i6,3x,4i6,7x,a3,3x,3(f7.3,i4),
+  610          format (i6,3x,4i6,7x,a3,3x,3(f7.3,i4),
      &                 /,40x,a3,3x,3(f7.3,i4),
      &                 /,40x,a3,3x,3(f7.3,i4))
             end if
@@ -1786,8 +1795,8 @@ c
      &             active(ic) .or. active(id)) then
                if (header) then
                   header = .false.
-                  write (iout,610)
-  610             format (/,' Angle-Torsion Parameters :',
+                  write (iout,620)
+  620             format (/,' Angle-Torsion Parameters :',
      &                    //,17x,'Atom Numbers',10x,'Angle',
      &                       4x,'Amplitude and Phase (1-3 Fold)',/)
                end if
@@ -1803,10 +1812,10 @@ c
                phase(5) = tors2(2,k)
                ampli(6) = kant(6,i)
                phase(6) = tors3(2,k)
-               write (iout,620)  i,ia,ib,ic,id,
+               write (iout,630)  i,ia,ib,ic,id,
      &                           '1st',(ampli(k),nint(phase(k)),k=1,3),
      &                           '2nd',(ampli(k),nint(phase(k)),k=4,6)
-  620          format (i6,3x,4i6,7x,a3,3x,3(f7.3,i4),
+  630          format (i6,3x,4i6,7x,a3,3x,3(f7.3,i4),
      &                 /,40x,a3,3x,3(f7.3,i4))
             end if
          end do
@@ -1827,13 +1836,13 @@ c
      &                active(id) .or. active(ie)) then
                if (header) then
                   header = .false.
-                  write (iout,630)
-  630             format (/,' Torsion-Torsion Parameters :',
+                  write (iout,640)
+  640             format (/,' Torsion-Torsion Parameters :',
      &                    //,20x,'Atom Numbers',18x,'Spline Grid',/)
                end if
                j = itt(2,i)
-               write (iout,640)  i,ia,ib,ic,id,ie,tnx(j),tny(j)
-  640          format (i6,3x,5i6,10x,2i6)
+               write (iout,650)  i,ia,ib,ic,id,ie,tnx(j),tny(j)
+  650          format (i6,3x,5i6,10x,2i6)
             end if
          end do
       end if
@@ -1848,8 +1857,8 @@ c
                k = k + 1
                if (header) then
                   header = .false.
-                  write (iout,650)
-  650             format (/,' Van der Waals Parameters :',
+                  write (iout,660)
+  660             format (/,' Van der Waals Parameters :',
      &                    //,10x,'Atom Number',7x,'Size',
      &                       3x,'Epsilon',3x,'Size 1-4',
      &                       3x,'Eps 1-4',3x,'Reduction',/)
@@ -1861,11 +1870,11 @@ c
                   if (radsiz .eq. 'DIAMETER')  radj = 2.0d0 * radj
                   if (radtyp .eq. 'SIGMA')  radj = radj / twosix
                   if (reduct(j) .eq. 0.0d0) then
-                     write (iout,660)  k,i,radj,eps(j)
-  660                format (i6,3x,i6,7x,2f10.4)
+                     write (iout,670)  k,i,radj,eps(j)
+  670                format (i6,3x,i6,7x,2f10.4)
                   else
-                     write (iout,670)  k,i,radj,eps(j),reduct(j)
-  670                format (i6,3x,i6,7x,2f10.4,22x,f10.4)
+                     write (iout,680)  k,i,radj,eps(j),reduct(j)
+  680                format (i6,3x,i6,7x,2f10.4,22x,f10.4)
                   end if
                else
                   radj = rad(j)
@@ -1879,12 +1888,12 @@ c
                      rad4j = rad4j / twosix
                   end if
                   if (reduct(j) .eq. 0.0d0) then
-                     write (iout,680)  k,i,radj,eps(j),rad4j,eps4(j)
-  680                format (i6,3x,i6,7x,2f10.4,1x,2f10.4)
+                     write (iout,690)  k,i,radj,eps(j),rad4j,eps4(j)
+  690                format (i6,3x,i6,7x,2f10.4,1x,2f10.4)
                   else
-                     write (iout,690)  k,i,radj,eps(j),rad4j,
+                     write (iout,700)  k,i,radj,eps(j),rad4j,
      &                                eps4(j),reduct(j)
-  690                format (i6,3x,i6,7x,2f10.4,1x,2f10.4,1x,f10.4)
+  700                format (i6,3x,i6,7x,2f10.4,1x,2f10.4,1x,f10.4)
                   end if
                end if
             end if
@@ -1900,13 +1909,32 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  write (iout,700)
-  700             format (/,' Pauli Repulsion Parameters :',
+                  write (iout,710)
+  710             format (/,' Pauli Repulsion Parameters :',
      &                    //,10x,'Atom Number',25x,'Size',6x,'Damp',
      &                       3x,'Valence',/)
                end if
-               write (iout,710)  i,ia,sizpr(i),dmppr(i),elepr(i)
-  710          format (i6,3x,i6,25x,2f10.4,f10.3)
+               write (iout,720)  i,ia,sizpr(i),dmppr(i),elepr(i)
+  720          format (i6,3x,i6,25x,2f10.4,f10.3)
+            end if
+         end do
+c
+c     parameters used for exchange repulsion interactions
+c
+      else if (use_xrepel) then
+         header = .true.
+         do i = 1, nxrep
+            ia = ixrep(i)
+            if (active(ia)) then
+               if (header) then
+                  header = .false.
+                  write (iout,730)
+  730             format (/,' Exchange Repulsion Parameters :',
+     &                    //,10x,'Atom Number',23x,'Charge',6x,'Damp',
+     &                       2x,'PS-Ratio',/)
+               end if
+               write (iout,740)  i,ia,zpxr(i),dmppxr(i),crpxr(i)
+  740          format (i6,3x,i6,25x,2f10.4,f10.3)
             end if
          end do
       end if
@@ -1920,12 +1948,12 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  write (iout,720)
-  720             format (/,' Damped Dispersion Parameters :',
+                  write (iout,750)
+  750             format (/,' Damped Dispersion Parameters :',
      &                    //,10x,'Atom Number',26x,'C6',7x,'Damp',/)
                end if
-               write (iout,730)  i,ia,csix(i),adisp(i)
-  730          format (i6,3x,i6,25x,f10.3,f10.4)
+               write (iout,760)  i,ia,csix(i),adisp(i)
+  760          format (i6,3x,i6,25x,f10.3,f10.4)
             end if
          end do
       end if
@@ -1941,18 +1969,18 @@ c
             if (active(ia) .or. active(ic)) then
                if (header) then
                   header = .false.
-                  write (iout,740)
-  740             format (/,' Atomic Partial Charge Parameters :',
+                  write (iout,770)
+  770             format (/,' Atomic Partial Charge Parameters :',
      &                    /,45x,'Neighbor',3x,'Cutoff',
      &                    /,10x,'Atom Number',13x,'Charge',
      &                       7x,'Site',6x,'Site',/)
                end if
                if (ia.eq.ib .and. ia.eq.ic) then
-                  write (iout,750)  i,ia,pchg(ia)
-  750             format (i6,3x,i6,15x,f10.4)
+                  write (iout,780)  i,ia,pchg(ia)
+  780             format (i6,3x,i6,15x,f10.4)
                else
-                  write (iout,760)  i,ia,pchg(ia),ib,ic
-  760             format (i6,3x,i6,15x,f10.4,5x,i6,4x,i6)
+                  write (iout,790)  i,ia,pchg(ia),ib,ic
+  790             format (i6,3x,i6,15x,f10.4,5x,i6,4x,i6)
                end if
             end if
          end do
@@ -1968,13 +1996,13 @@ c
             if (active(ia) .or. active(ib)) then
                if (header) then
                   header = .false.
-                  write (iout,770)
-  770             format (/,' Bond Dipole Moment Parameters :',
+                  write (iout,800)
+  800             format (/,' Bond Dipole Moment Parameters :',
      &                    //,10x,'Atom Numbers',22x,'Dipole',
      &                       3x,'Position',/)
                end if
-               write (iout,780)  i,ia,ib,bdpl(i),sdpl(i)
-  780          format (i6,3x,2i6,19x,f10.4,f10.3)
+               write (iout,810)  i,ia,ib,bdpl(i),sdpl(i)
+  810          format (i6,3x,2i6,19x,f10.4,f10.3)
             end if
          end do
       end if
@@ -1988,8 +2016,8 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  write (iout,790)
-  790             format (/,' Atomic Multipole Parameters :',
+                  write (iout,820)
+  820             format (/,' Atomic Multipole Parameters :',
      &                    //,11x,'Atom',3x,'Z-Axis',1x,'X-Axis',
      &                       1x,'Y-Axis',2x,
      &                       'Frame',11x,'Multipole Moments',/)
@@ -2006,28 +2034,28 @@ c
                   mpl(j) = 3.0d0 * pole(j,ia) / bohr**2
                end do
                if (izaxe .eq. 0) then
-                  write (iout,800)  i,ia,polaxe(i),
+                  write (iout,830)  i,ia,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  800             format (i6,3x,i6,25x,a8,2x,f9.5,/,50x,3f9.5,
+  830             format (i6,3x,i6,25x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else if (ixaxe .eq. 0) then
-                  write (iout,810)  i,ia,izaxe,polaxe(i),
+                  write (iout,840)  i,ia,izaxe,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  810             format (i6,3x,i6,1x,i7,17x,a8,2x,f9.5,/,50x,3f9.5,
+  840             format (i6,3x,i6,1x,i7,17x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else  if (iyaxe .eq. 0) then
-                  write (iout,820)  i,ia,izaxe,ixaxe,polaxe(i),
+                  write (iout,850)  i,ia,izaxe,ixaxe,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  820             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
+  850             format (i6,3x,i6,1x,2i7,10x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                else
-                  write (iout,830)  i,ia,izaxe,ixaxe,iyaxe,polaxe(i),
+                  write (iout,860)  i,ia,izaxe,ixaxe,iyaxe,polaxe(i),
      &                              (mpl(j),j=1,5),mpl(8),mpl(9),
      &                              (mpl(j),j=11,13)
-  830             format (i6,3x,i6,1x,3i7,3x,a8,2x,f9.5,/,50x,3f9.5,
+  860             format (i6,3x,i6,1x,3i7,3x,a8,2x,f9.5,/,50x,3f9.5,
      &                    /,50x,f9.5,/,50x,2f9.5,/,50x,3f9.5)
                end if
             end if
@@ -2043,13 +2071,13 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  write (iout,840)
-  840             format (/,' Charge Penetration Parameters :',
+                  write (iout,870)
+  870             format (/,' Charge Penetration Parameters :',
      &                    //,10x,'Atom Number',25x,'Core',3x,'Valence',
      &                       6x,'Damp',/)
                end if
-               write (iout,850)  i,ia,pcore(ia),pval(ia),palpha(ia)
-  850          format (i6,3x,i6,25x,2f10.3,f10.4)
+               write (iout,880)  i,ia,pcore(ia),pval(ia),palpha(ia)
+  880          format (i6,3x,i6,25x,2f10.3,f10.4)
             end if
          end do
       end if
@@ -2064,34 +2092,34 @@ c
                if (header) then
                   header = .false.
                   if (use_tholed) then
-                     write (iout,860)
-  860                format (/,' Dipole Polarizability Parameters :',
+                     write (iout,890)
+  890                format (/,' Dipole Polarizability Parameters :',
      &                       //,10x,'Atom Number',5x,'Alpha',4x,'Thole',
      &                          3x,'TholeD',6x,'Polarization Group',/)
                   else if (use_thole) then
-                     write (iout,870)
-  870                format (/,' Dipole Polarizability Parameters :',
+                     write (iout,900)
+  900                format (/,' Dipole Polarizability Parameters :',
      &                       //,10x,'Atom Number',5x,'Alpha',4x,'Thole',
      &                          6x,'Polarization Group',/)
                   else
-                     write (iout,880)
-  880                format (/,' Dipole Polarizability Parameters :',
+                     write (iout,910)
+  910                format (/,' Dipole Polarizability Parameters :',
      &                       //,10x,'Atom Number',5x,'Alpha',
      &                          6x,'Polarization Group',/)
                   end if
                end if
                if (use_tholed) then
-                  write (iout,890)  i,ia,polarity(ia),thole(ia),
+                  write (iout,920)  i,ia,polarity(ia),thole(ia),
      &                              tholed(ia),(ip11(j,ia),j=1,np11(ia))
-  890             format (i6,3x,i6,6x,f10.4,2f9.3,3x,120i6)
+  920             format (i6,3x,i6,6x,f10.4,2f9.3,3x,120i6)
                else if (use_thole) then
-                  write (iout,900)  i,ia,polarity(ia),thole(ia),
+                  write (iout,930)  i,ia,polarity(ia),thole(ia),
      &                              (ip11(j,ia),j=1,np11(ia))
-  900             format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)
+  930             format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)
                else
-                  write (iout,910)  i,ia,polarity(ia),
+                  write (iout,940)  i,ia,polarity(ia),
      &                              (ip11(j,ia),j=1,np11(ia))
-  910             format (i6,3x,i6,6x,f10.4,3x,120i6)
+  940             format (i6,3x,i6,6x,f10.4,3x,120i6)
                end if
             end if
          end do
@@ -2106,13 +2134,13 @@ c
             if (active(ia)) then
                if (header) then
                   header = .false.
-                  write (iout,920)
-  920             format (/,' Charge Transfer Parameters :',
+                  write (iout,950)
+  950             format (/,' Charge Transfer Parameters :',
      &                    //,10x,'Atom Number',23x,'Charge',
      &                       6x,'Damp',/)
                end if
-               write (iout,930)  i,ia,chgct(ia),dmpct(ia)
-  930          format (i6,3x,i6,25x,f10.3,f10.4)
+               write (iout,960)  i,ia,chgct(ia),dmpct(ia)
+  960          format (i6,3x,i6,25x,f10.3,f10.4)
             end if
          end do
       end if
@@ -2129,13 +2157,13 @@ c
                if (active(ia) .or. active(ib)) then
                   if (header) then
                      header = .false.
-                     write (iout,940)
-  940                format (/,' Bond Charge Flux Parameters :',
+                     write (iout,970)
+  970                format (/,' Bond Charge Flux Parameters :',
      &                       //,10x,'Atom Numbers',24x,'KCFB',/)
                   end if
                   k = k + 1
-                  write (iout,950)  k,ia,ib,bflx(i)
-  950             format (i6,3x,2i6,19x,f10.4)
+                  write (iout,980)  k,ia,ib,bflx(i)
+  980             format (i6,3x,2i6,19x,f10.4)
                end if
             end if
          end do
@@ -2155,15 +2183,15 @@ c
                if (active(ia) .or. active(ib) .or. active(ic)) then
                   if (header) then
                      header = .false.
-                     write (iout,960)
-  960                format (/,' Angle Charge Flux Parameters :',
+                     write (iout,990)
+  990                format (/,' Angle Charge Flux Parameters :',
      &                       //,13x,'Atom Numbers',17x,'KACF1',
      &                          5x,'KACF2',5x,'KBCF1',5x,'KBCF2',/)
                   end if
                   k = k + 1
-                  write (iout,970)  k,ia,ib,ic,aflx(1,i),aflx(2,i),
+                  write (iout,1000)  k,ia,ib,ic,aflx(1,i),aflx(2,i),
      &                              abflx(1,i),abflx(2,i)
-  970             format (i6,3x,3i6,10x,4f10.4)
+ 1000             format (i6,3x,3i6,10x,4f10.4)
                end if
             end if
          end do
@@ -2179,13 +2207,13 @@ c
                k = k + 1
                if (header) then
                   header = .false.
-                  write (iout,980)
-  980             format (/,' Implicit Solvation Parameters :',
+                  write (iout,1010)
+ 1010             format (/,' Implicit Solvation Parameters :',
      &                    //,10x,'Atom Number',13x,'Radius',
      &                       3x,'ASP Value',/)
                end if
-               write (iout,990)  k,i,rsolv(i),asolv(i)
-  990          format (i6,3x,i6,15x,2f10.4)
+               write (iout,1020)  k,i,rsolv(i),asolv(i)
+ 1020          format (i6,3x,i6,15x,2f10.4)
             end if
          end do
       end if
@@ -2199,13 +2227,13 @@ c
             j = class(ia)
             if (header) then
                header = .false.
-               write (iout,1000)
- 1000          format (/,' Conjugated Pi-Atom Parameters :',
+               write (iout,1030)
+ 1030          format (/,' Conjugated Pi-Atom Parameters :',
      &                 //,10x,'Atom Number',14x,'Nelect',
      &                    6x,'Ionize',4x,'Repulsion',/)
             end if
-            write (iout,1010)  i,ia,electron(j),ionize(j),repulse(j)
- 1010       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
+            write (iout,1040)  i,ia,electron(j),ionize(j),repulse(j)
+ 1040       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
          end do
       end if
 c
@@ -2218,13 +2246,13 @@ c
             ib = ibpi(3,i)
             if (header) then
                header = .false.
-               write (iout,1020)
- 1020          format (/,' Conjugated Pi-Bond Parameters :',
+               write (iout,1050)
+ 1050          format (/,' Conjugated Pi-Bond Parameters :',
      &                 //,10x,'Atom Numbers',21x,'K Slope',
      &                    3x,'L Slope',/)
             end if
-            write (iout,1030)  i,ia,ib,kslope(i),lslope(i)
- 1030       format (i6,3x,2i6,19x,2f10.4)
+            write (iout,1060)  i,ia,ib,kslope(i),lslope(i)
+ 1060       format (i6,3x,2i6,19x,2f10.4)
          end do
       end if
       return
