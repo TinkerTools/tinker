@@ -17,7 +17,9 @@ c     derivatives with respect to Cartesian coordinates
 c
 c     literature reference:
 c
-c     TBD
+c     M. K. J. Chung and J. W. Ponder, "Beyond isotropic repulsion:
+c     Classical anisotropic repulsion by inclusion of p orbitals",
+c     Journal of Chemical Physics, 160, 174118 (2024)
 c
 c
       subroutine exrepel1
