@@ -106,6 +106,6 @@
 
     (22) WATER        fit the electrostatic potential for TIP3P, AMOEBA
                       and HIPPO water models to a QM-derived potential
-                      (MP2/aug-cc-pVTZ) on a grid of points outside the
+                      at MP2/aug-cc-pVTZ on a grid of points outside the
                       molecular surface
 

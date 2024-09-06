@@ -1,4 +1,5 @@
 ../bin/pdbxyz crambin
 ../bin/analyze crambin ep -252 255
+../bin/testsurf crambin 1.4
 ../bin/spacefill crambin 3 1.4 y y
 rm crambin.xyz* crambin.seq*

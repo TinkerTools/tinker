@@ -17,6 +17,7 @@ c     structure optimization methods
 c
 c
       subroutine optinit
+      use bound
       use inform
       use keys
       use output
@@ -32,6 +33,7 @@ c     set default values for optimization parameters
 c
       iprint = -1
       iwrite = -1
+      use_wrap = .false.
       frcsave = .false.
       uindsave = .false.
 c
@@ -47,6 +49,8 @@ c
             read (string,*,err=10,end=10)  iprint
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
             read (string,*,err=10,end=10)  iwrite
+         else if (keyword(1:12) .eq. 'WRAP-COORDS ') then
+            use_wrap = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
             frcsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then

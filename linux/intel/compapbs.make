@@ -8,4 +8,5 @@
 #  ##################################################################
 #
 #
-icc -c -O3 -axSSE3 -no-ipo -no-prec-div -w pmpb.c -I ../apbs/linux/include
+icc -c -O3 -no-ipo -no-prec-div -w -vec-report0 pmpb.c \
+ -I ../apbs/include/apbs -I../apbs/include/maloc

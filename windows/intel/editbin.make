@@ -58,6 +58,7 @@ editbin /STACK:60000000 testhess.exe
 editbin /STACK:60000000 testpair.exe
 editbin /STACK:60000000 testpol.exe
 editbin /STACK:60000000 testrot.exe
+editbin /STACK:60000000 testsurf.exe
 editbin /STACK:60000000 testvir.exe
 editbin /STACK:60000000 timer.exe
 editbin /STACK:60000000 timerot.exe

@@ -159,16 +159,16 @@ c
                   header = .false.
                   write (iout,30)
    30             format (/,' Additional Solvation Parameters :',
-     &                    //,5x,'Atom Type',16x,'PB Size',5x,'CS Size',
+     &                    //,5x,'Atom Type',13x,'PB Size',5x,'CS Size',
      &                       5x,'GK Size',6x,'S-Neck',/)
                end if
-               pbr(k) = pbrd
-               gkr(k) = csrd
-               pbr(k) = gkrd
+               pbr(k) = 0.5d0 * pbrd
+               csr(k) = 0.5d0 * csrd
+               gkr(k) = 0.5d0 * gkrd
                snk(k) = snek
                if (.not. silent) then
                   write (iout,40)  k,pbrd,csrd,gkrd,snek
-   40             format (6x,i6,7x,4f12.4)
+   40             format (6x,i6,10x,4f12.4)
                end if
             else if (k .gt. maxtyp) then
                write (iout,50)  maxtyp
@@ -178,6 +178,10 @@ c
             end if
          end if
       end do
+c
+c     get keywords with AlphaMol surface area and volume controls
+c
+      call ksurf
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1441,6 +1445,73 @@ c
       end
 c
 c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ksurf  --  find any AlphaMol control values  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "ksurf" reads control values used within the AlphaMol code
+c     for determination of molecular surface area and volume
+c
+c
+      subroutine ksurf
+      use alfmol
+      use keys
+      implicit none
+      integer i,next
+      character*6 word
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     choose algorithms and tolerances for use with AlphaMol
+c
+      alfmethod = 'SINGLE'
+      alfsort = 'NONE'
+      alfthread = 1
+      alfsosgmp = .false.
+      alfhydro = .true.
+      delcxeps = 1.0d-10
+c
+c     get any control parameter values from the keyfile
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:11) .eq. 'ALF-METHOD ') then
+            call gettext (record,word,next)
+            call upcase (word)
+            if (word .eq. 'MULTI ')  alfmethod = 'MULTI'
+            if (alfmethod .eq. 'MULTI') then
+               string = record(next:240)
+               read (string,*,err=10,end=10)  alfthread
+            end if
+         else if (keyword(1:9) .eq. 'ALF-SORT ') then
+            call gettext (record,word,next)
+            call upcase (word)
+            if (word .eq. 'SORT3D')  alfsort = 'SORT3D'
+            if (word .eq. 'BRIO  ')  alfsort = 'BRIO'
+            if (word .eq. 'SPLIT ')  alfsort = 'SPLIT'
+            if (word .eq. 'KDTREE')  alfsort = 'KDTREE'
+         else if (keyword(1:11) .eq. 'ALF-SOSGMP ') then
+            alfsosgmp = .true.
+         else if (keyword(1:12) .eq. 'ALF-NOHYDRO ') then
+            alfhydro = .false.
+         else if (keyword(1:10) .eq. 'DELCX-EPS ') then
+            read (string,*,err=10,end=10)  delcxeps
+         end if
+   10    continue
+      end do
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine knp  --  assign cavity-dispersion parameters  ##
@@ -1462,6 +1533,7 @@ c
       use math
       use nonpol
       use potent
+      use solpot
       use solute
       use vdwpot
       implicit none
@@ -1478,12 +1550,13 @@ c
       character*240 string
 c
 c
-c     set default values for solvent pressure and surface tension
+c     set probe radius, solvent pressure and surface tension
 c
+      cavprb = 1.4d0
       solvprs = 0.0334d0
       surften = 0.103d0
 c
-c     get any altered surface tension value from keyfile
+c     get any altered parameter values from the keyfile
 c
       do i = 1, nkey
          next = 1
@@ -1491,7 +1564,9 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          string = record(next:240)
-         if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
+         if (keyword(1:13) .eq. 'CAVITY-PROBE ') then
+            read (string,*,err=10,end=10)  cavprb
+         else if (keyword(1:17) .eq. 'SOLVENT-PRESSURE ') then
             read (string,*,err=10,end=10)  solvprs
          else if (keyword(1:16) .eq. 'SURFACE-TENSION ') then
             read (string,*,err=10,end=10)  surften
@@ -1535,14 +1610,15 @@ c     set cavity and dispersion radii for nonpolar solvation
 c
       do i = 1, n
          if (vdwindex .eq. 'CLASS') then
-            radcav(i) = rad(class(i)) + cavoff
+            radcav(i) = rad(class(i))
             raddsp(i) = rad(class(i))
             epsdsp(i) = eps(class(i))
          else
-            radcav(i) = rad(type(i)) + cavoff
+            radcav(i) = rad(type(i))
             raddsp(i) = rad(type(i))
             epsdsp(i) = eps(type(i))
          end if
+         if (solvtyp .ne. 'PB')  radcav(i) = radcav(i) + cavprb
       end do
 c
 c     compute maximum dispersion energies for each atom
@@ -1776,7 +1852,7 @@ c
                      end if
                   end do
                   if (nheavy .eq. 0) then
-                     sneck(it) = 1.0
+                     sneck(i) = 1.0
                   else
                      sneck(i) = snk(it) * (5.0d0-nheavy)/4.0d0
                   end if

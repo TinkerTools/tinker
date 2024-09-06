@@ -58,6 +58,7 @@ gfortran -O3 -ffast-math -fopenmp -static -o testhess.x testhess.o libtinker.a l
 gfortran -O3 -ffast-math -fopenmp -static -o testpair.x testpair.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testpair.x
 gfortran -O3 -ffast-math -fopenmp -static -o testpol.x testpol.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testpol.x
 gfortran -O3 -ffast-math -fopenmp -static -o testrot.x testrot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testrot.x
+gfortran -O3 -ffast-math -fopenmp -static -o testsurf.x testsurf.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testsurf.x
 gfortran -O3 -ffast-math -fopenmp -static -o testvir.x testvir.o libtinker.a libfftw3_threads.a libfftw3.a ; strip testvir.x
 gfortran -O3 -ffast-math -fopenmp -static -o timer.x timer.o libtinker.a libfftw3_threads.a libfftw3.a ; strip timer.x
 gfortran -O3 -ffast-math -fopenmp -static -o timerot.x timerot.o libtinker.a libfftw3_threads.a libfftw3.a ; strip timerot.x

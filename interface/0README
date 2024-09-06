@@ -5,7 +5,7 @@
 
       This directory contains scripts and code that generates interface
       information to allow the Tinker9 GPU package to call routines from
-      the Fortran-based CPU Tinker package.
+      the Fortran-based Tinker CPU package.
 
       Procedure to generate the interface code:
 

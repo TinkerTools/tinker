@@ -58,9 +58,10 @@ unzip testhess.zip testhess.exe
 unzip testpair.zip testpair.exe
 unzip testpol.zip testpol.exe
 unzip testrot.zip testrot.exe
+unzip testsurf.zip testsurf.exe
+unzip testvir.zip testvir.exe
 unzip timer.zip timer.exe
 unzip timerot.zip timerot.exe
-unzip timevir.zip timevir.exe
 unzip torsfit.zip torsfit.exe
 unzip valence.zip valence.exe
 unzip vibbig.zip vibbig.exe

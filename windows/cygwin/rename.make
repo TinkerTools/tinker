@@ -57,6 +57,7 @@ mv testhess.x  ../bin/testhess.exe
 mv testpair.x  ../bin/testpair.exe
 mv testpol.x   ../bin/testpol.exe
 mv testrot.x   ../bin/testrot.exe
+mv testsurf.x  ../bin/testsurf.exe
 mv testvir.x   ../bin/testvir.exe
 mv timer.x     ../bin/timer.exe
 mv timerot.x   ../bin/timerot.exe

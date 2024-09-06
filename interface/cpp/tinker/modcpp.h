@@ -1,6 +1,7 @@
 #pragma once
 
 #include "detail/action.hh"
+#include "detail/alfmol.hh"
 #include "detail/align.hh"
 #include "detail/analyz.hh"
 #include "detail/angang.hh"
@@ -143,6 +144,7 @@
 #include "detail/rxnpot.hh"
 #include "detail/scales.hh"
 #include "detail/sequen.hh"
+#include "detail/shapes.hh"
 #include "detail/shunt.hh"
 #include "detail/sizes.hh"
 #include "detail/socket.hh"

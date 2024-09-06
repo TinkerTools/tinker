@@ -68,7 +68,7 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  ia,ib,fc,bd
    10       continue
-            if (min(ia,ib) .le. 0)  goto 130
+            if (min(ia,ib) .lt. 0)  goto 130
             if (.not. silent) then
                if (header) then
                   header = .false.

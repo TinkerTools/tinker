@@ -3,17 +3,18 @@
 #  #################################################################
 #  ##                                                             ##
 #  ##  debug.make  --  compile the Tinker routines for debugging  ##
-#  ##              (Intel Fortran for MacOS Version)              ##
+#  ##              (Intel Fortran for macOS Version)              ##
 #  ##                                                             ##
 #  #################################################################
 #
 #
-#  compile all the modules; "sizes" must be first since it is used
-#  to set static array dimensions in many of the other modules
+#  compile all the modules; "sizes" must be first since it
+#  sets static array dimensions in many of the other modules
 #
 #
 ifort -c -g -warn all -check all sizes.f
 ifort -c -g -warn all -check all action.f
+ifort -c -g -warn all -check all alfmol.f
 ifort -c -g -warn all -check all align.f
 ifort -c -g -warn all -check all analyz.f
 ifort -c -g -warn all -check all angang.f
@@ -156,6 +157,7 @@ ifort -c -g -warn all -check all rxnfld.f
 ifort -c -g -warn all -check all rxnpot.f
 ifort -c -g -warn all -check all scales.f
 ifort -c -g -warn all -check all sequen.f
+ifort -c -g -warn all -check all shapes.f
 ifort -c -g -warn all -check all shunt.f
 ifort -c -g -warn all -check all socket.f
 ifort -c -g -warn all -check all solpot.f
@@ -211,6 +213,7 @@ ifort -c -g -warn all -check all calendar.f
 ifort -c -g -warn all -check all center.f
 ifort -c -g -warn all -check all chkpole.f
 ifort -c -g -warn all -check all chkring.f
+ifort -c -g -warn all -check all chksymm.f
 ifort -c -g -warn all -check all chkxyz.f
 ifort -c -g -warn all -check all cholesky.f
 ifort -c -g -warn all -check all clock.f
@@ -450,6 +453,7 @@ ifort -c -g -warn all -check all kstrbnd.f
 ifort -c -g -warn all -check all kstrtor.f
 ifort -c -g -warn all -check all ktors.f
 ifort -c -g -warn all -check all ktortor.f
+ifort -c -g -warn all -check all kundrot.f
 ifort -c -g -warn all -check all kurey.f
 ifort -c -g -warn all -check all kvdw.f
 ifort -c -g -warn all -check all lattice.f
@@ -539,6 +543,7 @@ ifort -c -g -warn all -check all readdyn.f
 ifort -c -g -warn all -check all readgau.f
 ifort -c -g -warn all -check all readgdma.f
 ifort -c -g -warn all -check all readint.f
+ifort -c -g -warn all -check all readmbis.f
 ifort -c -g -warn all -check all readmol.f
 ifort -c -g -warn all -check all readmol2.f
 ifort -c -g -warn all -check all readpdb.f
@@ -548,6 +553,7 @@ ifort -c -g -warn all -check all readxyz.f
 ifort -c -g -warn all -check all replica.f
 ifort -c -g -warn all -check all respa.f
 ifort -c -g -warn all -check all rgdstep.f
+ifort -c -g -warn all -check all richmond.f
 ifort -c -g -warn all -check all rings.f
 ifort -c -g -warn all -check all rmsfit.f
 ifort -c -g -warn all -check all rotlist.f
@@ -579,6 +585,7 @@ ifort -c -g -warn all -check all testhess.f
 ifort -c -g -warn all -check all testpair.f
 ifort -c -g -warn all -check all testpol.f
 ifort -c -g -warn all -check all testrot.f
+ifort -c -g -warn all -check all testsurf.f
 ifort -c -g -warn all -check all testvir.f
 ifort -c -g -warn all -check all timer.f
 ifort -c -g -warn all -check all timerot.f
@@ -588,6 +595,7 @@ ifort -c -g -warn all -check all torque.f
 ifort -c -g -warn all -check all torsfit.f
 ifort -c -g -warn all -check all torsions.f
 ifort -c -g -warn all -check all trimtext.f
+ifort -c -g -warn all -check all unionball.f
 ifort -c -g -warn all -check all unitcell.f
 ifort -c -g -warn all -check all valence.f
 ifort -c -g -warn all -check all verlet.f

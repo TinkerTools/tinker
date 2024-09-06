@@ -16,8 +16,9 @@
  The Tinker Multipole Editing Utility Can :
 
     (1) Multipole Parameters from GDMA Output
-    (2) Alter Local Coordinate Frame Definitions
-    (3) Removal of Intramolecular Polarization
+    (2) Use Multipoles from Multiwfn MBIS Output
+    (3) Alter Local Coordinate Frame Definitions
+    (4) Remove the Intramolecular Polarization
 
  Enter the Number of the Desired Choice :  
  Enter GDMA Output File Name :  

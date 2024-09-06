@@ -73,13 +73,12 @@ c
 c     total solvation energy for surface area only models
 c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
-         call surface (es,aes,rsolv,asolv,probe)
+         call surface (rsolv,asolv,probe,es,aes)
          nes = nes + n
 c
 c     nonpolar energy as hydrophobic potential of mean force
 c
-      else if (solvtyp.eq.'GB-HPMF' .or. solvtyp.eq.'GK-HPMF'
-     &            .or. solvtyp.eq.'PB-HPMF') then
+      else if (solvtyp(4:7) .eq. 'HPMF') then
          call ehpmf3 (ehp,nehp,aehp)
          es = ehp
          nes = nes + nehp
@@ -90,7 +89,7 @@ c
 c     nonpolar energy for Onion GB method via exact area
 c
       else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
-         call surface (esurf,aes,rsolv,asolv,probe)
+         call surface (rsolv,asolv,probe,esurf,aes)
          es = esurf
          nes = nes + n
 c
@@ -178,25 +177,30 @@ c
 c     print nonpolar and electrostatic components for selected models
 c
       if (verbose) then
-         if (esurf .ne. 0.0d0) then
+         if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
             write (iout,30)  esurf,es-esurf
    30       format (/,' Implicit Solvation Energy Components :'
      &              //,' SA Nonpolar',25x,f12.4,
      &              /,' Electrostatic',23x,f12.4)
-         else if (ecav.ne.0.0d0 .or. edisp.ne.0.0d0) then
-            write (iout,40)  ecav,edisp,es-ecav-edisp
+         else if (solvtyp(4:7) .eq. 'HPMF') then
+            write (iout,40)  ehp,es-ehp
    40       format (/,' Implicit Solvation Energy Components :'
+     &              //,' Hydrophobic PMF',21x,f12.4,
+     &              /,' Electrostatic',23x,f12.4)
+         else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
+            write (iout,50)  esurf,es-esurf
+   50       format (/,' Implicit Solvation Energy Components :'
+     &              //,' SA Nonpolar',25x,f12.4,
+     &              /,' Electrostatic',23x,f12.4)
+         else if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
+            write (iout,60)  ecav,edisp,es-ecav-edisp
+   60       format (/,' Implicit Solvation Energy Components :'
      &              //,' Cavitation',26x,f12.4,
      &              /,' Dispersion',26x,f12.4,
      &              /,' Electrostatic',23x,f12.4)
-         else if (ehp .ne. 0.0d0) then
-            write (iout,50)  ehp,es-ehp
-   50       format (/,' Implicit Solvation Energy Components :'
-     &              //,' Hydrophobic PMF',21x,f12.4,
-     &              /,' Electrostatic',23x,f12.4)
-         else if (eace .ne. 0.0d0) then
-            write (iout,60)  eace,es-eace
-   60       format (/,' Implicit Solvation Energy Components :'
+         else
+            write (iout,70)  eace,es-eace
+   70       format (/,' Implicit Solvation Energy Components :'
      &              //,' ACE Nonpolar',24x,f12.4,
      &              /,' Electrostatic',23x,f12.4)
          end if
@@ -1546,13 +1550,16 @@ c
       implicit none
       integer i
       real*8 ecav,edisp
-      real*8 exclude,taper
-      real*8 evol,esurf,aevol
+      real*8 probe,taper
+      real*8 evol,esurf,etemp
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8 aecav(*)
       real*8 aedisp(*)
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
+      real*8, allocatable :: aetemp(:)
+      real*8, allocatable :: weight(:)
       character*6 mode
 c
 c
@@ -1562,24 +1569,29 @@ c
       evol = 0.0d0
       ecav = 0.0d0
       edisp = 0.0d0
-      aevol = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
+      allocate (aetemp(n))
 c
 c     zero out the nonpolar solvation energy partitioning
 c
       do i = 1, n
          aesurf(i) = 0.0d0
+         aevol(i) = 0.0d0
          aecav(i) = 0.0d0
          aedisp(i) = 0.0d0
       end do
 c
+c     solvent probe radius is included in cavity radii
+c
+      probe = 0.0d0
+c
 c     compute surface area and effective radius for cavity
 c
-      exclude = 1.4d0
-      call surface (esurf,aesurf,radcav,asolv,exclude)
+      call surface (radcav,asolv,probe,esurf,aesurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
       reff3 = reff2 * reff
@@ -1589,9 +1601,12 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
-         evol = evol * solvprs
-         aevol = evol / dble(n)
+         allocate (weight(n))
+         do i = 1, n
+            weight(i) = solvprs
+         end do
+         call volume (radcav,weight,probe,etemp,evol,aetemp,aevol)
+         deallocate (weight)
       end if
 c
 c     include a full solvent excluded volume cavity term
@@ -1599,7 +1614,7 @@ c
       if (reff .le. spcut) then
          ecav = evol
          do i = 1, n
-            aecav(i) = aevol
+            aecav(i) = aevol(i)
          end do
 c
 c     include a tapered solvent excluded volume cavity term
@@ -1611,7 +1626,7 @@ c
      &              + c2*reff2 + c1*reff + c0
          ecav = taper * evol
          do i = 1, n
-            aecav(i) = taper * aevol
+            aecav(i) = taper * aevol(i)
          end do
       end if
 c
@@ -1633,13 +1648,15 @@ c
          taper = 1.0d0 - taper
          ecav = ecav + taper*esurf
          do i = 1, n
-            aecav(i) = taper * (aevol+aesurf(i))
+            aecav(i) = taper * (aesurf(i)+aevol(i))
          end do
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (aesurf)
+      deallocate (aevol)
+      deallocate (aetemp)
 c
 c     find the implicit dispersion solvation energy
 c

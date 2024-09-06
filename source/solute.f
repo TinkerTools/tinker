@@ -33,7 +33,7 @@ c     drb         solvation derivatives with respect to Born radii
 c     drbp        GK polarization derivatives with respect to Born radii
 c     drobc       chain rule term for Onufriev-Bashford-Case radii
 c     gpol        polarization self-energy values for each atom
-c     shct        overlap scale factors for Hawkins-Cramer-Truhlar radii
+c     shct        Hawkins-Cramer-Truhlar radius overlap scale factors 
 c     aobc        alpha values for Onufriev-Bashford-Case radii
 c     bobc        beta values for Onufriev-Bashford-Case radii
 c     gobc        gamma values for Onufriev-Bashford-Case radii

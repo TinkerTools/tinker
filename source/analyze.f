@@ -677,7 +677,7 @@ c
          end if
          write (iout,fstr)  ev,nev
       end if
-      if ((use_repel.or.use_xrepel).and.(ner.ne.0.or.er.ne.0.0d0)) then
+      if (use_repel .and. (ner.ne.0.or.er.ne.0.0d0)) then
          if (abs(er) .lt. 1.0d10) then
             fstr = '('' Repulsion'',18x,'//form1//')'
          else
@@ -1244,6 +1244,7 @@ c
       use polpot
       use potent
       use repel
+      use solpot
       use solute
       use strbnd
       use strtor
@@ -2207,13 +2208,36 @@ c
                k = k + 1
                if (header) then
                   header = .false.
-                  write (iout,1010)
- 1010             format (/,' Implicit Solvation Parameters :',
-     &                    //,10x,'Atom Number',13x,'Radius',
-     &                       3x,'ASP Value',/)
+                  if (solvtyp(1:2).eq.'GK') then
+                     write (iout,1010)
+ 1010                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',11x,'Rsolv',
+     &                          4x,'Rdescr',5x,'S-HCT',4x,'S-Neck',
+     &                          3x,'Surface',/)
+                  else if (solvtyp(1:2).eq.'PB') then
+                     write (iout,1020)
+ 1020                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',10x,'Radius',
+     &                          5x,'S-HCT',4x,'S-Neck',3x,'Surface',/)
+                  else
+                     write (iout,1030)
+ 1030                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',10x,'Radius',
+     &                          3x,'Surface',/)
+                  end if
                end if
-               write (iout,1020)  k,i,rsolv(i),asolv(i)
- 1020          format (i6,3x,i6,15x,2f10.4)
+               if (solvtyp(1:2).eq.'GK') then
+                  write (iout,1040)  k,i,rsolv(i),rdescr(i),shct(i),
+     &                               sneck(i),asolv(i)
+ 1040             format (i6,3x,i6,12x,5f10.4)
+               else if (solvtyp(1:2).eq.'PB') then
+                  write (iout,1050)  k,i,rsolv(i),shct(i),sneck(i),
+     &                               asolv(i)
+ 1050             format (i6,3x,i6,12x,4f10.4)
+               else
+                  write (iout,1060)  k,i,rsolv(i),asolv(i)
+ 1060             format (i6,3x,i6,12x,2f10.4)
+               end if
             end if
          end do
       end if
@@ -2227,13 +2251,13 @@ c
             j = class(ia)
             if (header) then
                header = .false.
-               write (iout,1030)
- 1030          format (/,' Conjugated Pi-Atom Parameters :',
+               write (iout,1070)
+ 1070          format (/,' Conjugated Pi-Atom Parameters :',
      &                 //,10x,'Atom Number',14x,'Nelect',
      &                    6x,'Ionize',4x,'Repulsion',/)
             end if
-            write (iout,1040)  i,ia,electron(j),ionize(j),repulse(j)
- 1040       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
+            write (iout,1080)  i,ia,electron(j),ionize(j),repulse(j)
+ 1080       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
          end do
       end if
 c
@@ -2246,13 +2270,13 @@ c
             ib = ibpi(3,i)
             if (header) then
                header = .false.
-               write (iout,1050)
- 1050          format (/,' Conjugated Pi-Bond Parameters :',
+               write (iout,1090)
+ 1090          format (/,' Conjugated Pi-Bond Parameters :',
      &                 //,10x,'Atom Numbers',21x,'K Slope',
      &                    3x,'L Slope',/)
             end if
-            write (iout,1060)  i,ia,ib,kslope(i),lslope(i)
- 1060       format (i6,3x,2i6,19x,2f10.4)
+            write (iout,1100)  i,ia,ib,kslope(i),lslope(i)
+ 1100       format (i6,3x,2i6,19x,2f10.4)
          end do
       end if
       return

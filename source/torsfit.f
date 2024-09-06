@@ -57,7 +57,7 @@ c
       if (query) then
          do while (torbnd(1).eq.0 .or. torbnd(2).eq.0)
             write (iout,20)
-   20       format (/,' Enter Central Atoms for 1st Torsion : ',$)
+   20       format (/,' Enter Central Atoms of First Torsion : ',$)
             read (input,*,err=30,end=30)  torbnd(1),torbnd(2)
    30       continue
          end do

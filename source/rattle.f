@@ -107,12 +107,12 @@ c
                   xterm = xo * term
                   yterm = yo * term
                   zterm = zo * term
-                  x(ia) =  x(ia) - xterm*rma
-                  y(ia) =  y(ia) - yterm*rma
-                  z(ia) =  z(ia) - zterm*rma
-                  x(ib) =  x(ib) + xterm*rmb
-                  y(ib) =  y(ib) + yterm*rmb
-                  z(ib) =  z(ib) + zterm*rmb
+                  x(ia) = x(ia) - xterm*rma
+                  y(ia) = y(ia) - yterm*rma
+                  z(ia) = z(ia) - zterm*rma
+                  x(ib) = x(ib) + xterm*rmb
+                  y(ib) = y(ib) + yterm*rmb
+                  z(ib) = z(ib) + zterm*rmb
                   rma = rma / dt
                   rmb = rmb / dt
                   v(1,ia) = v(1,ia) - xterm*rma
@@ -178,9 +178,9 @@ c
          end do
          do j = start, stop
             k = kgrp(j)
-            x(k) =  x(k) - xr
-            y(k) =  y(k) - yr
-            z(k) =  z(k) - zr
+            x(k) = x(k) - xr
+            y(k) = y(k) - yr
+            z(k) = z(k) - zr
             v(1,k) = v(1,k) - xv
             v(2,k) = v(2,k) - yv
             v(3,k) = v(3,k) - zv
@@ -472,12 +472,12 @@ c
                   xterm = xo * term
                   yterm = yo * term
                   zterm = zo * term
-                  x(ia) =  x(ia) - xterm*rma
-                  y(ia) =  y(ia) - yterm*rma
-                  z(ia) =  z(ia) - zterm*rma
-                  x(ib) =  x(ib) + xterm*rmb
-                  y(ib) =  y(ib) + yterm*rmb
-                  z(ib) =  z(ib) + zterm*rmb
+                  x(ia) = x(ia) - xterm*rma
+                  y(ia) = y(ia) - yterm*rma
+                  z(ia) = z(ia) - zterm*rma
+                  x(ib) = x(ib) + xterm*rmb
+                  y(ib) = y(ib) + yterm*rmb
+                  z(ib) = z(ib) + zterm*rmb
                end if
             end if
          end do
@@ -529,9 +529,9 @@ c
          end do
          do j = start, stop
             k = kgrp(j)
-            x(k) =  x(k) - xr
-            y(k) =  y(k) - yr
-            z(k) =  z(k) - zr
+            x(k) = x(k) - xr
+            y(k) = y(k) - yr
+            z(k) = z(k) - zr
          end do
       end do
       return

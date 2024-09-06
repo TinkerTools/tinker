@@ -60,10 +60,6 @@ mutual-14-scale         1.0
       #############################
 
 
-Y. Shi, Z. Xia, J. Zhang, R. Best, J. W. Ponder and P. Ren, "The Polarizable
-Atomic Multipole-Based AMOEBA Force Field for Proteins", J. Chem. Theory
-Comput., 9, xxx-xxx (2013)
-
 P. Ren, C. Wu and J. W. Ponder, "Polarizable Atomic Multipole-Based
 Molecular Mechanics for Organic Molecules", J. Chem. Theory Comput.,
 7, 3143-3161 (2011)
@@ -6026,7 +6022,7 @@ biotype     775    N       "Amide C-Terminus"                184
 biotype     776    HN      "Amide C-Terminus"                185
 biotype     777    N       "N-MeAmide C-Terminus"            186
 biotype     778    HN      "N-MeAmide C-Terminus"            187
-biotype     779    CH3     "N-MeAmide C-Terminus"            188
+biotype     779    C       "N-MeAmide C-Terminus"            188
 biotype     780    H       "N-MeAmide C-Terminus"            189
 biotype    2001    O       "Water"                           202
 biotype    2002    H       "Water"                           203

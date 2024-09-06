@@ -33,7 +33,7 @@ c
       integer nmode,mode
       integer leng1,leng2
       integer lext,now
-      integer freeunit,trimtext
+      integer freeunit
       integer, allocatable :: list(:)
       real*8 xr,yr,zr
       real*8, allocatable :: xold(:)

@@ -40,7 +40,7 @@ c     allocate (des(3,n))
 c
 c     compute the surface area-based solvation energy term
 c
-c     call surface1 (es,aes,des,rsolv,asolv,probe)
+c     call surface1 (rsolv,asolv,probe,es,aes,des)
 c
 c     perform deallocation of some local arrays
 c

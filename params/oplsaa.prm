@@ -432,17 +432,17 @@ atom        379   78    OU    "Uranyl Ion UO2+"              8    15.999    1
 atom        380   20    OS    "GTP O-(POn)2"                 8    15.999    2
 atom        381   64    P     "DiMe Phosphate P"            15    30.974    4
 atom        382   52    O2    "DiMe Phosphate O=P-O"         8    15.999    1
-atom        383   20    OS    "DiMe Phosphate CH3-O"         8    15.999    1
+atom        383   20    OS    "DiMe Phosphate CH3-O"         8    15.999    2
 atom        384   13    CT    "DiMe Phosphate CH3-O"         6    12.011    4
 atom        385   46    HC    "DiMe Phosphate CH3-O"         1     1.008    1
 atom        386   64    P     "Me Phosphate P"              15    30.974    4
 atom        387   52    O2    "Me Phosphate O=PO2"           8    15.999    1
-atom        388   20    OS    "Me Phosphate CH3-O"           8    15.999    1
+atom        388   20    OS    "Me Phosphate CH3-O"           8    15.999    2
 atom        389   13    CT    "Me Phosphate CH3-O"           6    12.011    4
 atom        390   46    HC    "Me Phosphate CH3-O"           1     1.008    1
 atom        391   64    P     "Me MePhosphonate P"          15    30.974    4
 atom        392   52    O2    "Me MePhosphonate O=P-O"       8    15.999    1
-atom        393   20    OS    "Me MePhosphonate CH3-O"       8    15.999    1
+atom        393   20    OS    "Me MePhosphonate CH3-O"       8    15.999    2
 atom        394   13    CT    "Me MePhosphonate CH3-O"       6    12.011    4
 atom        395   46    HC    "Me MePhosphonate CH3-O"       1     1.008    1
 atom        396   13    CT    "Me MePhosphonate CH3-P"       6    12.011    4
@@ -6002,7 +6002,7 @@ biotype     775    N       "Amide C-Terminus"                179
 biotype     776    HN      "Amide C-Terminus"                182
 biotype     777    N       "N-MeAmide C-Terminus"            180
 biotype     778    HN      "N-MeAmide C-Terminus"            183
-biotype     779    CH3     "N-MeAmide C-Terminus"            184
+biotype     779    C       "N-MeAmide C-Terminus"            184
 biotype     780    H       "N-MeAmide C-Terminus"             85
 biotype    2001    O       "Water"                            63
 biotype    2002    H       "Water"                            64

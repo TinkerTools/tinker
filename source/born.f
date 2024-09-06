@@ -58,6 +58,7 @@ c
       use iounit
       use math
       use mpole
+      use mutant
       use pbstuf
       use solpot
       use solute
@@ -176,7 +177,7 @@ c
             done = .false.
             do while (.not. done)
                roff(i) = roff(i) + 0.5d0*t
-               call surface (areatotal,garea,roff,weight,probe)
+               call surface (roff,weight,probe,areatotal,garea)
                fraction = garea(i) / (4.0d0*pi*(roff(i)+probe)**2)
                if (fraction .lt. 0.99d0) then
                   inner = roff(i) - 0.5d0*t
@@ -323,7 +324,7 @@ c
             drobc(i) = (1.0d0-tsum*tsum) * tchain / rsolv(i)
          end do
 c
-c     get the Born radii via Grycuk's modified HCT method
+c     get the Born radii via Grycuk modified HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
@@ -340,6 +341,7 @@ c
                do k = 1, n
                   rk = rdescr(k)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
+                  if (mut(k))  mixsn = mixsn * elambda
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -456,7 +458,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             pbpole(1,i) = 1.0d0
-            call apbsempole (n,pos,rsolv,pbpole,pbe,apbe,pbep,pbfp,pbtp)
+            call apbsempole (n,pos,rsolv,pbpole,pbe,
+     &                       apbe,pbep,pbfp,pbtp)
             pbpole(1,i) = 0.0d0
             rborn(i) = term / pbe
             if (debug) then
@@ -604,6 +607,7 @@ c
       use couple
       use deriv
       use math
+      use mutant
       use solpot
       use solute
       use virial
@@ -681,7 +685,7 @@ c
                   zr = z(k) - zi
                   vk = vsolv(k)
                   r2 = xr**2 + yr**2 + zr**2
-                  r =  sqrt(r2)
+                  r = sqrt(r2)
                   r6 = r2 * r2 * r2
                   ratio = r2 / (rsolv(i)+rsolv(k))**2
                   if (ratio .gt. p5inv) then
@@ -878,19 +882,20 @@ c
             end do
          end do
 c
-c     get Born radius chain rule components for Grycuk's HCT method
+c     get Born radius chain rule components for Grycuk HCT method
 c
       else if (borntyp .eq. 'GRYCUK') then
          pi43 = 4.0d0 * third * pi
          factor = -(pi**third) * 6.0d0**(2.0d0*third) / 9.0d0
          do i = 1, n
-            ri = max(rsolv(i),rdescr(i)) + descoff
+            ri = rsolv(i)
             if (ri .gt. 0.0d0) then
                xi = x(i)
                yi = y(i)
                zi = z(i)
                term = pi43 / rborn(i)**3.0d0
                term = factor / term**(4.0d0*third)
+               ri = max(rsolv(i),rdescr(i)) + descoff
                if (usetanh) then
                   call tanhrscchr (bornint(i),rsolv(i),tcr)
                   term = term * tcr
@@ -898,6 +903,7 @@ c
                do k = 1, n
                   rk = rdescr(k)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
+                  if (mut(k))  mixsn = mixsn * elambda
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi

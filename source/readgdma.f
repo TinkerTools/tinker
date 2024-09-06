@@ -12,13 +12,13 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "readgdma" takes the DMA output in spherical harmonics from
-c     the GDMA program and converts to Cartesian multipoles in
-c     the global coordinate frame
+c     "readgdma" takes the Distributed Multipole Analysis (DMA) output
+c     in spherical harmonics from the GDMA program and converts to
+c     Cartesian multipoles in the global coordinate frame
 c
 c     this version is compatible with the formatted output from
-c     GDMA 2.2.04 released by Anthony Stone in Fall 2008; it also
-c     reads the DMA output from Psi4 as it calls the GDMA code
+c     GDMA package developed by Anthony Stone; it also reads GDMA
+c     output from Psi4
 c
 c
       subroutine readgdma (idma)
@@ -34,8 +34,9 @@ c
       integer idma,next
       integer freeunit
       real*8 term
-      logical exist,opened
-      logical done,use_bohr
+      logical exist,done
+      logical opened
+      logical use_bohr
       character*3 atmnam
       character*240 record
       character*240 dmafile
@@ -211,7 +212,6 @@ c
          end if
       end do
   120 continue
-      close (unit=idma)
 c
 c     attempt to get atomic numbers from GDMA atom names
 c

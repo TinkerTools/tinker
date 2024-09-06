@@ -83,7 +83,7 @@ c
             read (string,*,err=10,end=10)  ia,ib,ic,id,
      &                                     (vt(j),st(j),ft(j),j=1,6)
    10       continue
-            if (min(ia,ib,ic,id) .le. 0)  goto 110
+            if (min(ia,ib,ic,id) .lt. 0)  goto 110
             size = 4
             call numeral (ia,pa,size)
             call numeral (ib,pb,size)

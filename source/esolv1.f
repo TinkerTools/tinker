@@ -73,7 +73,7 @@ c
 c     solvation energy and derivs for surface area only models
 c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
-         call surface1 (es,aes,des,rsolv,asolv,probe)
+         call surface1 (rsolv,asolv,probe,es,aes,des)
 c
 c     nonpolar energy and derivs as hydrophobic PMF term
 c
@@ -85,7 +85,7 @@ c
 c     nonpolar energy and derivs for Onion method via exact area
 c
       else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
-         call surface1 (esurf,aes,des,rsolv,asolv,probe)
+         call surface1 (rsolv,asolv,probe,esurf,aes,des)
          es = esurf
 c
 c     nonpolar energy and derivs as cavity plus dispersion
@@ -4677,14 +4677,17 @@ c
       implicit none
       integer i
       real*8 ecav,edisp
-      real*8 exclude
-      real*8 evol,esurf
-      real*8 taper,dtaper
+      real*8 evol,esurf,etemp
+      real*8 probe,taper,dtaper
       real*8 reff,reff2,reff3
       real*8 reff4,reff5,dreff
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
+      real*8, allocatable :: aetemp(:)
+      real*8, allocatable :: weight(:)
       real*8, allocatable :: dsurf(:,:)
       real*8, allocatable :: dvol(:,:)
+      real*8, allocatable :: dtemp(:,:)
       character*6 mode
 c
 c
@@ -4698,8 +4701,11 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
+      allocate (aetemp(n))
       allocate (dsurf(3,n))
       allocate (dvol(3,n))
+      allocate (dtemp(3,n))
 c
 c     zero out the nonpolar solvation first derivatives
 c
@@ -4712,13 +4718,15 @@ c
          dvol(3,i) = 0.0d0
       end do
 c
+c     solvent probe radius is included in cavity radii
+c
+      probe = 0.0d0
+c
 c     compute surface area and effective radius for cavity
 c
-      exclude = 1.4d0
-      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
-      call surface1 (esurf,aesurf,dsurf,radcav,asolv,exclude)
+      call surface1 (radcav,asolv,probe,esurf,aesurf,dsurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
-      dreff = reff / (2.0d0*esurf)
+      dreff = 0.5d0 * reff / esurf
       reff2 = reff * reff
       reff3 = reff2 * reff
       reff4 = reff3 * reff
@@ -4727,14 +4735,13 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
-         evol = evol * solvprs
-         call volume1 (radcav,exclude,dvol)
+         allocate (weight(n))
          do i = 1, n
-            dvol(1,i) = dvol(1,i) * solvprs
-            dvol(2,i) = dvol(2,i) * solvprs
-            dvol(3,i) = dvol(3,i) * solvprs
+            weight(i) = solvprs
          end do
+         call volume1 (radcav,weight,probe,etemp,evol,
+     &                    aetemp,aevol,dtemp,dvol)
+         deallocate (weight)
       end if
 c
 c     include a full solvent excluded volume cavity term
@@ -4799,8 +4806,11 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (aesurf)
+      deallocate (aevol)
+      deallocate (aetemp)
       deallocate (dsurf)
       deallocate (dvol)
+      deallocate (dtemp)
 c
 c     find the implicit dispersion solvation energy
 c

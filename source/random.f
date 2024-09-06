@@ -128,7 +128,7 @@ c     print the value of the current random number
 c
 c     if (debug) then
 c        write (iout,30)  random
-c  30    format (' RANDOM  --  The Random Number Value is',f12.8)
+c  30    format (' RANDOM  --  Random Number Value is',f12.8)
 c     end if
       return
       end
@@ -182,7 +182,7 @@ c     print the value of the current random number
 c
 c     if (debug) then
 c        write (iout,20)  normal
-c  20    format (' NORMAL  --  The Random Number Value is',f12.8)
+c  20    format (' NORMAL  --  Normal Random Number is',f12.8)
 c     end if
       return
       end
@@ -236,7 +236,7 @@ c     print the components of the random unit vector
 c
 c     if (debug) then
 c        write (iout,10)  vector(1),vector(2),vector(3)
-c  10    format (' RANVEC  --  The Random Vector is',3f10.4)
+c  10    format (' RANVEC  --  Unit Random Vector is',3f10.4)
 c     end if
       return
       end
@@ -286,6 +286,38 @@ c
          dot(2,i) = sin(theta) * sin(phi)
          dot(3,i) = cos(theta)
          phiold = phi
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine wiggle  --  random perturbation of coordinates  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "wiggle" applies a small random perturbation of coordinates
+c     to avoid numerical instability in geometric calculations for
+c     linear, planar and other symmetric structures
+c
+c
+      subroutine wiggle (nxyz,xyz,eps)
+      implicit none
+      integer i,nxyz
+      real*8 eps
+      real*8 vector(3)
+      real*8 xyz(3,*)
+c
+c
+c     apply a small perturbation to the position of each atom
+c
+      do i = 1, nxyz
+         call ranvec (vector)
+         xyz(1,i) = xyz(1,i) + eps*vector(1)
+         xyz(2,i) = xyz(2,i) + eps*vector(2)
+         xyz(3,i) = xyz(3,i) + eps*vector(3)
       end do
       return
       end

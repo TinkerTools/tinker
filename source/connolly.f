@@ -94,20 +94,25 @@ c     fqa     atom number of convex face
 c     fqcy    convex face cycle numbers
 c
 c
-      subroutine connolly (volume,area,radius,probe,exclude)
-      use atoms
+      subroutine connolly (n,x,y,z,rad,exclude,reentrant,area,volume)
       use faces
       implicit none
-      integer i
-      real*8 volume,area
-      real*8 probe,exclude
-      real*8 radius(*)
+      integer i,n
+      real*8 area,volume
+      real*8 exclude
+      real*8 reentrant
+      real*8 eps
+      real*8 x(*)
+      real*8 y(*)
+      real*8 z(*)
+      real*8 rad(*)
+      logical dowiggle
 c
 c
 c     dimensions for arrays used by Connolly routines
 c
-      maxcls = 240 * n
-      maxtt = 120 * n
+      maxcls = 320 * n
+      maxtt = 160 * n
       maxt = 8 * n
       maxp = 8 * n
       maxv = 24 * n
@@ -117,7 +122,7 @@ c
       maxeq = 24 * n
       maxfs = 12 * n
       maxcy = 6 * n
-      mxcyeq = 30
+      mxcyeq = 32
       maxfq = 4 * n
       mxfqcy = 10
 c
@@ -168,19 +173,19 @@ c
       if (.not. allocated(fqncy))  allocate (fqncy(maxfq))
       if (.not. allocated(fqcy))  allocate (fqcy(mxfqcy,maxfq))
 c
-c     set the probe radius and the number of atoms
+c     set the number of atoms and reentrant probe radius 
 c
-      pr = probe
       na = n
+      pr = reentrant
 c
 c     set atom coordinates and radii, the excluded buffer
-c     radius ("exclude") is added to atomic radii
+c     probe radius ("exclude") is added to atomic radii
 c
       do i = 1, na
          axyz(1,i) = x(i)
          axyz(2,i) = y(i)
          axyz(3,i) = z(i)
-         ar(i) = radius(i)
+         ar(i) = rad(i)
          if (ar(i) .eq. 0.0d0) then
             skip(i) = .true.
          else
@@ -189,49 +194,23 @@ c
          end if
       end do
 c
-c     find the analytical volume and surface area
+c     random coordinate perturbation to avoid numerical issues
 c
-      call wiggle
+      dowiggle = .true.
+      if (dowiggle) then
+         eps = 0.000001d0
+         call wiggle (na,axyz,eps)
+      end if
+c
+c     find the analytical surface area and volume
+c
       call nearby
       call torus
       call place
       call compress
       call saddles
       call contact
-      call vam (volume,area)
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine wiggle  --  random perturbation of coordinates  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "wiggle" applies a random perturbation to the atomic coordinates
-c     to avoid numerical instabilities for various linear, planar and
-c     symmetric structures
-c
-c
-      subroutine wiggle
-      use faces
-      implicit none
-      integer i
-      real*8 size
-      real*8 vector(3)
-c
-c
-c     apply a small perturbation to the position of each atom
-c
-      size = 0.000001d0
-      do i = 1, na
-         call ranvec (vector)
-         axyz(1,i) = axyz(1,i) + size*vector(1)
-         axyz(2,i) = axyz(2,i) + size*vector(2)
-         axyz(3,i) = axyz(3,i) + size*vector(3)
-      end do
+      call vam (area,volume)
       return
       end
 c
@@ -2146,19 +2125,19 @@ c
       end
 c
 c
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine vam  --  volumes and areas of molecules  ##
-c     ##                                                      ##
-c     ##########################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine vam  --  find area and volume of molecule  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "vam" takes the analytical molecular surface defined
 c     as a collection of spherical and toroidal polygons
-c     and uses it to compute the volume and surface area
+c     and uses it to compute the surface area and volume
 c
 c
-      subroutine vam (volume,area)
+      subroutine vam (area,volume)
       use faces
       use inform
       use iounit
@@ -2185,7 +2164,7 @@ c
       integer, allocatable :: enfs(:)
       integer, allocatable :: fnt(:,:)
       integer, allocatable :: nspt(:,:)
-      real*8 volume,area
+      real*8 area,volume
       real*8 alens,vint,vcone
       real*8 vpyr,vlens,hedron
       real*8 totaq,totvq,totas
@@ -2607,7 +2586,7 @@ c
             alens = 2.0d0 * pr**2 * (pi - sumlam - sin(rho)*(pi+sumsig))
             vint = alens * pr / 3.0d0
             vcone = pr * rm**2 * sin(rho) * (pi+sumsig) / 3.0d0
-            vpyr =  pr * rm**2 * sin(rho) * sumsc / 3.0d0
+            vpyr = pr * rm**2 * sin(rho) * sumsc / 3.0d0
             vlens = vint - vcone + vpyr
             cora(ifn) = cora(ifn) + alens
             cora(jfn) = cora(jfn) + alens

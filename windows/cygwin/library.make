@@ -11,6 +11,7 @@
 ar -crusv libtinker.a \
 action.o \
 active.o \
+alfmol.o \
 align.o \
 alterchg.o \
 alterpol.o \
@@ -52,6 +53,7 @@ chgpot.o \
 chgtrn.o \
 chkpole.o \
 chkring.o \
+chksymm.o \
 chkxyz.o \
 cholesky.o \
 chrono.o \
@@ -452,6 +454,7 @@ readdyn.o \
 readgau.o \
 readgdma.o \
 readint.o \
+readmbis.o \
 readmol.o \
 readmol2.o \
 readpdb.o \

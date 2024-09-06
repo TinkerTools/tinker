@@ -67,6 +67,7 @@ c
       arespa = 0.00025d0
       nfree = 0
       irest = 100
+      use_wrap = .true.
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
@@ -116,6 +117,8 @@ c
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
             read (string,*,err=10,end=10)  irest
+         else if (keyword(1:12) .eq. 'UNWRAP-COORDS ') then
+            use_wrap = .false.
          else if (keyword(1:14) .eq. 'SAVE-VELOCITY ') then
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
@@ -330,7 +333,7 @@ c
 c
 c     set inner steps per outer step for RESPA integrator
 c
-      eps =  0.00000001d0
+      eps = 0.00000001d0
       nrespa = int(dt/(arespa+eps)) + 1
 c
 c     perform dynamic allocation of some local arrays

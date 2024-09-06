@@ -1520,7 +1520,7 @@ biotype     775    N       "Amide C-Terminus"                  8
 biotype     776    HN      "Amide C-Terminus"                 20
 biotype     777    N       "N-MeAmide C-Terminus"              8
 biotype     778    HN      "N-MeAmide C-Terminus"             20
-biotype     779    CH3     "N-MeAmide C-Terminus"              1
+biotype     779    C       "N-MeAmide C-Terminus"              1
 biotype     780    H       "N-MeAmide C-Terminus"             19
 biotype    2001    O       "Water"                            17
 biotype    2002    H       "Water"                            26

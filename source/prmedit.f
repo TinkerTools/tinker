@@ -911,10 +911,10 @@ c
  1260          format ('polarize',2x,i5,5x,3f11.4,2x,20i5)
             else if (thl .ge. 0.0d0) then
                write (iprm,1270)  ia,pol,thl,(ig(j),j=1,kg)
- 1270          format ('polarize',2x,i5,5x,2f11.4,2x,20i5)
+ 1270          format ('polarize',2x,i5,10x,2f11.4,2x,20i5)
             else
                write (iprm,1280)  ia,pol,(ig(j),j=1,kg)
- 1280          format ('polarize',2x,i5,5x,f11.4,2x,20i5)
+ 1280          format ('polarize',2x,i5,10x,f11.4,2x,20i5)
             end if
          else if (keyword(1:8) .eq. 'POLPAIR ') then
             ia = 0

@@ -36,12 +36,13 @@ c
       use socket
       use titles
       implicit none
-      integer i,j,ii
+      integer i,j,lext
       integer istep
       integer ixyz,iind
       integer ivel,ifrc
-      integer iend,isave,lext
-      integer freeunit,trimtext
+      integer iend,isave
+      integer freeunit
+      integer trimtext
       integer modsave
       real*8 dt,pico
       real*8 epot,eksum
@@ -124,7 +125,7 @@ c
 c
 c     move stray molecules into periodic box if desired
 c
-      if (use_bounds)  call bounds
+      if (use_wrap)  call bounds
 c
 c     save coordinates to archive or numbered structure file
 c
@@ -219,7 +220,7 @@ c
   240    format (' Velocity File',15x,a)
       end if
 c
-c     save the force vector components for the current step,
+c     save the force vector components for the current step;
 c     only correct for single time step Cartesian integrators
 c
       if (frcsave .and. integrate.ne.'RIGIDBODY'

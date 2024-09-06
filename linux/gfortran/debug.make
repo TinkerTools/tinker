@@ -8,12 +8,13 @@
 #  ################################################################
 #
 #
-#  compile all the modules; "sizes" must be first since it is used
-#  to set static array dimensions in many of the other modules
+#  compile all the modules; "sizes" must be first since it
+#  sets static array dimensions in many of the other modules
 #
 #
 gfortran -c -Wall sizes.f
 gfortran -c -Wall action.f
+gfortran -c -Wall alfmol.f
 gfortran -c -Wall align.f
 gfortran -c -Wall analyz.f
 gfortran -c -Wall angang.f
@@ -156,6 +157,7 @@ gfortran -c -Wall rxnfld.f
 gfortran -c -Wall rxnpot.f
 gfortran -c -Wall scales.f
 gfortran -c -Wall sequen.f
+gfortran -c -Wall shapes.f
 gfortran -c -Wall shunt.f
 gfortran -c -Wall socket.f
 gfortran -c -Wall solpot.f
@@ -211,6 +213,7 @@ gfortran -c -Wall calendar.f
 gfortran -c -Wall center.f
 gfortran -c -Wall chkpole.f
 gfortran -c -Wall chkring.f
+gfortran -c -Wall chksymm.f
 gfortran -c -Wall chkxyz.f
 gfortran -c -Wall cholesky.f
 gfortran -c -Wall clock.f
@@ -450,6 +453,7 @@ gfortran -c -Wall kstrbnd.f
 gfortran -c -Wall kstrtor.f
 gfortran -c -Wall ktors.f
 gfortran -c -Wall ktortor.f
+gfortran -c -Wall kundrot.f
 gfortran -c -Wall kurey.f
 gfortran -c -Wall kvdw.f
 gfortran -c -Wall lattice.f
@@ -539,6 +543,7 @@ gfortran -c -Wall readdyn.f
 gfortran -c -Wall readgau.f
 gfortran -c -Wall readgdma.f
 gfortran -c -Wall readint.f
+gfortran -c -Wall readmbis.f
 gfortran -c -Wall readmol.f
 gfortran -c -Wall readmol2.f
 gfortran -c -Wall readpdb.f
@@ -548,6 +553,7 @@ gfortran -c -Wall readxyz.f
 gfortran -c -Wall replica.f
 gfortran -c -Wall respa.f
 gfortran -c -Wall rgdstep.f
+gfortran -c -Wall richmond.f
 gfortran -c -Wall rings.f
 gfortran -c -Wall rmsfit.f
 gfortran -c -Wall rotlist.f
@@ -579,6 +585,7 @@ gfortran -c -Wall testhess.f
 gfortran -c -Wall testpair.f
 gfortran -c -Wall testpol.f
 gfortran -c -Wall testrot.f
+gfortran -c -Wall testsurf.f
 gfortran -c -Wall testvir.f
 gfortran -c -Wall timer.f
 gfortran -c -Wall timerot.f
@@ -588,6 +595,7 @@ gfortran -c -Wall torque.f
 gfortran -c -Wall torsfit.f
 gfortran -c -Wall torsions.f
 gfortran -c -Wall trimtext.f
+gfortran -c -Wall unionball.f
 gfortran -c -Wall unitcell.f
 gfortran -c -Wall valence.f
 gfortran -c -Wall verlet.f

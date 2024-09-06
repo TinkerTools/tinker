@@ -12,8 +12,8 @@ extern "C" {
 #define TINKER_MOD__awater 0.033428e0
 #define TINKER_MOD__slevy 1.0e0
 #define TINKER_MOD__shctd 0.75e0
-#define TINKER_MOD__cavoff 0.0e0
 #define TINKER_MOD__dspoff 1.056e0
+extern double TINKER_MOD(nonpol, cavprb);
 extern double TINKER_MOD(nonpol, solvprs);
 extern double TINKER_MOD(nonpol, surften);
 extern double TINKER_MOD(nonpol, spcut);

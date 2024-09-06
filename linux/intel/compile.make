@@ -8,599 +8,607 @@
 #  #############################################################
 #
 #
-#  compile all the modules; "sizes" must be first since it is used
-#  to set static array dimensions in many of the other modules
+#  compile all the modules; "sizes" must be first since it
+#  sets static array dimensions in many of the other modules
 #
 #
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sizes.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp action.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp align.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angang.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp argue.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ascii.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp atmlst.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp atomid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp atoms.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bath.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bitor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bndpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bndstr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bound.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp boxes.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cell.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cflux.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp charge.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgpen.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chgtrn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chrono.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chunks.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp couple.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ctrpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp deriv.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dipole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp disgeo.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp disp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dma.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp domega.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dsppot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp energi.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ewald.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp expol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp extfld.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp faces.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp fft.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp fields.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp files.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp fracs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp freeze.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gkstuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp group.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hescut.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hessn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hpmf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ielscf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp improp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp imptor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp inform.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp inter.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp iounit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kanang.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kantor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katoms.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbonds.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcflux.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchrge.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcpen.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kctrn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdipol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdsp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kexpl.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp keys.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp khbond.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kiprop.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kitors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kmulti.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kopbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kopdst.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp korbs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpitor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpolpr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpolr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp krepl.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ksolut.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kstbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ksttor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ktorsn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ktrtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kurybr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kvdwpr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kvdws.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp light.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp limits.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp linmin.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp math.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mdstuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp merck.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minima.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp molcul.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp moldyn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp moment.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mplpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mpole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mrecip.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mutant.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp neigh.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nonpol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nucleo.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp omega.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp opbend.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp opdist.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp openmp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp orbits.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp output.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp params.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp paths.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pbstuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pdb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp phipsi.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp piorbs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pistuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pitors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pme.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polar.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polgrp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polopt.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polpcg.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp poltcg.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potent.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ptable.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qmstuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp refer.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp repel.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp reppot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp resdue.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp restrn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rgddyn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rigid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ring.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rotbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rxnfld.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rxnpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp scales.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sequen.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp shunt.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp socket.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp solpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp solute.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp stodyn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp strbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp strtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp syntrn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp tarray.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp titles.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp torpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp tors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp tortor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp tree.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp units.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp uprior.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp urey.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp urypot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp usage.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp valfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp vdw.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp vdwpot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp vibs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp virial.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp warp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xtals.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp zclose.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp zcoord.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sizes.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp action.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp alfmol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp align.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp analyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp angang.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp angbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp angpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp angtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp argue.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ascii.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp atmlst.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp atomid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp atoms.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bath.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bitor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bndpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bndstr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bound.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp boxes.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp cell.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp cflux.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp charge.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chgpen.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chgpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chgtrn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chrono.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chunks.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp couple.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ctrpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp deriv.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp dipole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp disgeo.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp disp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp dma.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp domega.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp dsppot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp energi.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ewald.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp expol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp extfld.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp faces.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp fft.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp fields.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp files.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp fracs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp freeze.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gkstuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp group.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hescut.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hessn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hpmf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ielscf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp improp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp imptor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp inform.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp inter.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp iounit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kanang.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kangs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kantor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp katoms.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kbonds.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kcflux.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kchrge.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kcpen.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kctrn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kdipol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kdsp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kexpl.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp keys.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp khbond.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kiprop.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kitors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kmulti.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kopbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kopdst.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp korbs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kpitor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kpolpr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kpolr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp krepl.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ksolut.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kstbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ksttor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ktorsn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ktrtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kurybr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kvdwpr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kvdws.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp light.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp limits.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp linmin.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp math.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdstuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp merck.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp minima.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp molcul.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp moldyn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp moment.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mplpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mpole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mrecip.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mutant.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp neigh.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nonpol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nucleo.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp omega.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp opbend.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp opdist.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp openmp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp orbits.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp output.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp params.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp paths.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pbstuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pdb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp phipsi.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp piorbs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pistuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pitors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pme.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polar.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polgrp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polopt.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polpcg.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp poltcg.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp potent.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp potfit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ptable.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp qmstuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp refer.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp repel.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp reppot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp resdue.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp restrn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rgddyn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rigid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ring.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rotbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rxnfld.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rxnpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp scales.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sequen.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp shapes.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp shunt.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp socket.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp solpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp solute.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp stodyn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp strbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp strtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp syntrn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tarray.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp titles.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp torpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tortor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tree.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp units.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp uprior.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp urey.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp urypot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp usage.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp valfit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp vdw.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp vdwpot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp vibs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp virial.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp warp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xtals.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp zclose.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp zcoord.f
 #
 #  now compile separately each of the Fortran source files
 #
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp active.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alchemy.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alterchg.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp alterpol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analysis.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp analyze.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp angles.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp anneal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp arcedit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp attach.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp baoab.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bar.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp basefile.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp beeman.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bicubic.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bitors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bonds.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp born.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bounds.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp bussi.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp calendar.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp center.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chkpole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chkring.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp chkxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cholesky.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp clock.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cluster.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp column.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp command.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp connect.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp connolly.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp control.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp correlate.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp critical.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp crystal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cspline.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp cutoffs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp damping.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dcflux.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp deflate.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp delete.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dexpol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp diagq.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp diffeq.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp diffuse.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp distgeom.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp document.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp dynamic.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangang.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangang1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangang2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangang3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangle3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eangtor3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebond3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebuck.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebuck1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebuck2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ebuck3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echarge.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echarge1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echarge2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echarge3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgdpl.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgdpl1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgdpl2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgdpl3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgtrn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgtrn1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgtrn2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp echgtrn3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edipole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edipole1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edipole2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edipole3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edisp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edisp1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edisp2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp edisp3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egauss.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egauss1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egauss2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egauss3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egeom.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egeom1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egeom2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp egeom3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ehal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ehal1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ehal2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ehal3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimprop.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimprop1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimprop2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimprop3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimptor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimptor1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimptor2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eimptor3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp elj.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp elj1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp elj2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp elj3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp embed.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emetal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emetal1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emetal2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emetal3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emm3hb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emm3hb1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emm3hb2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp emm3hb3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp empole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp empole1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp empole2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp empole3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp energy.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopbend.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopbend1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopbend2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopbend3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopdist.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopdist1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopdist2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eopdist3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epitors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epitors1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epitors2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epitors3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epolar.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epolar1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epolar2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp epolar3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erepel.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erepel1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erepel2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erepel3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erxnfld.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erxnfld1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erxnfld2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp erxnfld3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp esolv.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp esolv1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp esolv2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp esolv3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrbnd1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrbnd2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrbnd3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrtor1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrtor2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp estrtor3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etors1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etors2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etors3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etortor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etortor1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etortor2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp etortor3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eurey.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eurey1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eurey2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp eurey3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp evcorr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp exfield.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp extra.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp extra1.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp extra2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp extra3.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp fatal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp fft3d.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp fftpack.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp field.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp final.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp flatten.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp freefix.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp freeunit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gda.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp geometry.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getarc.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getcart.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getint.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getkey.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getmol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getmol2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getnumb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getpdb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getprm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getref.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getstring.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gettext.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getword.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp getxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ghmcstep.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gradient.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gradrgd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gradrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp groups.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp grpline.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp gyrate.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hessian.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hessrgd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hessrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp hybrid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp image.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp impose.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp induce.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp inertia.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp initatom.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp initial.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp initneck.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp initprm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp initres.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp initrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp insert.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp intedit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp intxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp invbeta.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp invert.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp jacobi.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangang.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangle.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kangtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp katom.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kbond.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kcharge.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchgflx.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kchgtrn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdipole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kdisp.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kewald.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kexpol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kextra.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kgeom.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kimprop.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kimptor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kinetic.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kmetal.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kmpole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kopbend.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kopdist.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp korbit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpitors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kpolar.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp krepel.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ksolv.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kstrbnd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kstrtor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ktors.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ktortor.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kurey.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp kvdw.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lattice.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lbfgs.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lights.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp lusolve.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makeint.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makeref.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp makexyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp maxwell.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mdinit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mdrest.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mdsave.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mdstat.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mechanic.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp merge.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minimize.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minirot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp minrigid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mol2xyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp molecule.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp molxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp moments.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp monte.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp mutate.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nblist.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp neck.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp newton.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp newtrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nextarg.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nexttext.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nose.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nspline.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp nucleic.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp number.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp numeral.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp numgrad.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp ocvm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp openend.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp optimize.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp optinit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp optirot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp optrigid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp optsave.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp orbital.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp orient.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp orthog.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp overlap.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp path.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pdbxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp picalc.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pmestuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pmpb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polarize.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp poledit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp polymer.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp potential.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp predict.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pressure.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmedit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prmkey.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp promo.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp protein.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtarc.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtdyn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prterr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtfrc.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtint.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtmol2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtpdb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtprm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtseq.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtuind.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtvel.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pss.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrigid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp qrsolve.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp quatfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp radial.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp random.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rattle.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readcart.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readdcd.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readdyn.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readgau.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readgdma.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readint.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readmol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readmol2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readpdb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readprm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readseq.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp readxyz.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp replica.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp respa.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rgdstep.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rings.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rmsfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rotlist.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp rotpole.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp saddle.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp scan.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sdstep.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp search.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp server.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp setprm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp shakeup.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sigmoid.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp simplex.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sktstuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sniffer.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp sort.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp spacefill.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp spectrum.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp square.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp suffix.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp superpose.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp surface.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp surfatom.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp switch.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp tcgstuf.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp temper.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testgrad.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testhess.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testpair.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testpol.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp testvir.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp timer.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp timerot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp tncg.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp torphase.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp torque.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp torsfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp torsions.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp trimtext.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp unitcell.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp valence.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp verlet.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp version.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp vibbig.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp vibrate.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp vibrot.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp volume.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xtalfit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xtalmin.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzatm.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzedit.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzint.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzmol2.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp xyzpdb.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp zatom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp active.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp alchemy.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp alterchg.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp alterpol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp analysis.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp analyze.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp angles.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp anneal.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp arcedit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp attach.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp baoab.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bar.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp basefile.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp beeman.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bicubic.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bitors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bonds.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp born.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bounds.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp bussi.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp calendar.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp center.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chkpole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chkring.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chksymm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp chkxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp cholesky.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp clock.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp cluster.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp column.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp command.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp connect.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp connolly.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp control.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp correlate.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp critical.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp crystal.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp cspline.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp cutoffs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp damping.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp dcflux.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp deflate.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp delete.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp dexpol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp diagq.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp diffeq.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp diffuse.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp distgeom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp document.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp dynamic.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangang.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangang1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangang2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangang3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangle.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangle1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangle2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangle3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangtor1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangtor2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eangtor3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebond.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebond1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebond2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebond3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebuck.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebuck1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebuck2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ebuck3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echarge.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echarge1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echarge2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echarge3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgdpl.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgdpl1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgdpl2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgdpl3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgtrn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgtrn1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgtrn2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp echgtrn3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edipole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edipole1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edipole2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edipole3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edisp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edisp1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edisp2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp edisp3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egauss.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egauss1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egauss2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egauss3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egeom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egeom1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egeom2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp egeom3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ehal.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ehal1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ehal2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ehal3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimprop.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimprop1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimprop2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimprop3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimptor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimptor1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimptor2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eimptor3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp elj.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp elj1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp elj2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp elj3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp embed.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emetal.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emetal1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emetal2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emetal3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emm3hb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emm3hb1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emm3hb2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp emm3hb3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp empole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp empole1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp empole2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp empole3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp energy.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopbend.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopbend1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopbend2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopbend3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopdist.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopdist1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopdist2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eopdist3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epitors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epitors1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epitors2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epitors3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epolar.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epolar1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epolar2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp epolar3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erepel.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erepel1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erepel2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erepel3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erxnfld.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erxnfld1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erxnfld2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp erxnfld3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp esolv.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp esolv1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp esolv2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp esolv3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrbnd1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrbnd2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrbnd3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrtor1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrtor2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp estrtor3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etors1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etors2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etors3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etortor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etortor1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etortor2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp etortor3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eurey.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eurey1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eurey2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp eurey3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp evcorr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp exfield.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp extra.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp extra1.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp extra2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp extra3.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp fatal.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp fft3d.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp fftpack.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp field.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp final.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp flatten.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp freefix.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp freeunit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gda.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp geometry.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getarc.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getcart.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getint.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getkey.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getmol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getmol2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getnumb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getpdb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getprm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getref.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getstring.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gettext.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getword.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ghmcstep.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gradient.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gradrgd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gradrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp groups.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp grpline.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp gyrate.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hessian.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hessrgd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hessrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp hybrid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp image.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp impose.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp induce.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp inertia.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp initatom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp initial.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp initneck.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp initprm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp initres.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp initrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp insert.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp intedit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp intxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp invbeta.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp invert.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp jacobi.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kangang.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kangle.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kangtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp katom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kbond.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kcharge.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kchgflx.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kchgtrn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kdipole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kdisp.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kewald.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kexpol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kextra.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kgeom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kimprop.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kimptor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kinetic.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kmetal.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kmpole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kopbend.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kopdist.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp korbit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kpitors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kpolar.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp krepel.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ksolv.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kstrbnd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kstrtor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ktors.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ktortor.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kundrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kurey.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp kvdw.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp lattice.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp lbfgs.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp lights.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp lusolve.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp makeint.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp makeref.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp makexyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp maxwell.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdinit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdrest.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdsave.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdstat.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mechanic.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp merge.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp minimize.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp minirot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp minrigid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mol2xyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp molecule.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp molxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp moments.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp monte.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mutate.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nblist.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp neck.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp newton.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp newtrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nextarg.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nexttext.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nose.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nspline.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp nucleic.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp number.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp numeral.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp numgrad.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp ocvm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp openend.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp optimize.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp optinit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp optirot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp optrigid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp optsave.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp orbital.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp orient.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp orthog.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp overlap.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp path.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pdbxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp picalc.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pmestuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pmpb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polarize.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp poledit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp polymer.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp potential.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp predict.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pressure.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prmedit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prmkey.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp promo.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp protein.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtarc.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtdyn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prterr.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtfrc.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtint.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtmol2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtpdb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtprm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtseq.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtuind.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtvel.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pss.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pssrigid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp pssrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp qrsolve.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp quatfit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp radial.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp random.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rattle.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readcart.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readdcd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readdyn.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readgau.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readgdma.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readint.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readmbis.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readmol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readmol2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readpdb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readprm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readseq.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readxyz.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp replica.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp respa.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rgdstep.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp richmond.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rings.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rmsfit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rotlist.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp rotpole.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp saddle.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp scan.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sdstep.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp search.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp server.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp setprm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp shakeup.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sigmoid.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp simplex.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sktstuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sniffer.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp sort.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp spacefill.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp spectrum.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp square.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp suffix.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp superpose.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp surface.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp surfatom.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp switch.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tcgstuf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp temper.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testgrad.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testhess.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testpair.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testpol.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testsurf.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp testvir.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp timer.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp timerot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tncg.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp torphase.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp torque.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp torsfit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp torsions.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp trimtext.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp unionball.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp unitcell.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp valence.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp verlet.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp version.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp vibbig.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp vibrate.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp vibrot.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp volume.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xtalfit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xtalmin.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xyzatm.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xyzedit.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xyzint.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xyzmol2.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp xyzpdb.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp zatom.f
