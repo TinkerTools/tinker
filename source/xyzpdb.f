@@ -964,7 +964,7 @@ c
          call pdbatom (' CE1',resname,ires,cbi+4)
          call pdbatom (' NE2',resname,ires,cbi+5)
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          call pdbatom (' CG ',resname,ires,cbi+1)
@@ -985,7 +985,7 @@ c
          call pdbatom (' OD1',resname,ires,cbi+2)
          call pdbatom (' ND2',resname,ires,cbi+3)
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          call pdbatom (' CG ',resname,ires,cbi+1)
@@ -1458,7 +1458,7 @@ c
             call pdbatom (' HE2',resname,ires,cbi+6)
          end if
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          if (allatom) then
@@ -1490,7 +1490,7 @@ c
             call pdbatom ('HD22',resname,ires,cbi+5)
          end if
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          if (allatom) then

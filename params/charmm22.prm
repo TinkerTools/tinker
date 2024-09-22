@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              CHARMM22
+forcefield              CHARMM22-CMAP
 
 vdwtype                 LENNARD-JONES
 radiusrule              ARITHMETIC
@@ -34,6 +34,12 @@ N. Foloppe and A. D. MacKerell, Jr., "All-Atom Empirical Force Field
 for Nucleic Acids: I. Parameter Optimization Based on Small Molecule
 and Condensed Phase Macromolecular Target Data", J. Comput. Chem.,
 21, 86-104 (2000)  [CHARMM Nucleic Acid]
+
+A. D. MacKerell, Jr, M. Feig, C. L. Brooks III, "Extending the Treatment
+of Backbone Energetics in Protein Force Fields: Limitations of Gas-Phase
+Quantum Mechanics in Reproducing Protein Conformational Distributions
+in Molecular Dynamics Simulations", J. Comput. Chem., 25, 1400-1415 (2004)
+[CMAP Torsion-Torsion Correction]
 
 Current parameter values are available from the CHARMM parameter site
 maintained by Alex MacKerell at the University of Maryland, Baltimore,
@@ -695,12 +701,13 @@ ureybrad      3   31   20      15.00     2.0900
    ##  Following CHARMM style, the improper for a trigonal atom    ##
    ##  D bonded to atoms A, B and C could be input as improper     ##
    ##  dihedral angle D-A-B-C. The actual angle computed by the    ##
-   ##  program is then literally the dihedral D-A-B-C, which will  ##
+   ##  program is then literally the dihedral D-A-B-C that will    ##
    ##  always have as its ideal value zero degrees. In general     ##
-   ##  D-A-B-C is different from D-B-A-C; the order of the three   ##
-   ##  peripheral atoms matters. In the original CHARMM parameter  ##
+   ##  D-A-B-C is different from D-B-A-C since ordering of the     ##
+   ##  peripheral atoms matters. In authentic CHARMM parameter     ##
    ##  files, the trigonal atom is often listed last; ie, as       ##
-   ##  C-B-A-D instead of D-A-B-C.                                 ##
+   ##  C-B-A-D instead of D-A-B-C. Tinker improper parameters      ##
+   ##  require the trigonal atom to be listed first.               ##
    ##                                                              ##
    ##  Some of the improper angles are "double counted" in the     ##
    ##  CHARMM protein parameter set. Since Tinker uses only one    ##
@@ -1702,8 +1709,8 @@ torsion      44   43   50   43           10.400  180.0  2
 torsion       1   10   10    1            4.000  180.0  2
 torsion       1   10   10   44            4.000  180.0  2
 torsion       1   10   44   43            3.000  180.0  2
-torsion      10   10   44   43            3.000  180.0  2
 torsion       1   10   44   44            3.000  180.0  2
+torsion      10   10   44   43            3.000  180.0  2
 torsion      10   10   44   44            3.000  180.0  2
 torsion      42   13   24    3
 torsion      42   13   24   10            0.200  180.0  1
@@ -1713,12 +1720,12 @@ torsion      42   14   24    3            0.000    0.0  1
 torsion      42   14   24   10            0.200  180.0  1
 torsion      42   14   25    5            0.110    0.0  3
 torsion       1   14   44   43
-torsion      14   14   44   43
 torsion       1   14   44   44
+torsion      14   14   44   43
 torsion      14   14   44   44
-torsion      15   14   48   39            0.120    0.0  3
 torsion       1   14   48   39            0.870    0.0  3
 torsion       1   14   48   49            0.120    0.0  3
+torsion      15   14   48   39            0.120    0.0  3
 torsion      15   14   48   49            0.500    0.0  3
 torsion       1   15   44   43
 torsion       1   15   44   44
@@ -1736,27 +1743,28 @@ torsion       3   35   42   52            2.050  180.0  2
 torsion      52   42   53   14            0.965  180.0  1      3.850  180.0  2
 torsion      52   42   53   15            0.965  180.0  1      3.850  180.0  2
 torsion      45   43   44   10
+torsion      45   43   44   14
+torsion      45   43   44   14
+torsion      45   43   44   15
+torsion      45   43   44   15
+torsion      45   43   44   44
+torsion      45   43   44   44
 torsion      50   43   44   10
-torsion      45   43   44   14
-torsion      45   43   44   14
 torsion      50   43   44   14
 torsion      50   43   44   14
-torsion      45   43   44   15
-torsion      45   43   44   15
 torsion      50   43   44   15
 torsion      50   43   44   15
-torsion      45   43   44   44
-torsion      45   43   44   44
 torsion      44   43   45    1
-torsion      50   43   45    1
 torsion      44   43   45   43
-torsion      45   43   50   43
+torsion      50   43   45    1
+torsion      44   43   50   43
 torsion      44   43   50   56
+torsion      45   43   50   43
 torsion      45   43   50   56
 torsion      10   44   44   15
-torsion      14   44   44   15
-torsion      14   44   44   15
 torsion      10   44   44   43
+torsion      14   44   44   15
+torsion      14   44   44   15
 torsion      14   44   44   43
 torsion      14   44   44   43
 torsion      15   44   44   43

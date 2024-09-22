@@ -691,6 +691,7 @@ c
 c     convert unusual names for terminal capping residues
 c
       if (resname .eq. 'NMA')  resname = 'NME'
+      if (resname .eq. 'CT3')  resname = 'NME'
 c
 c     convert nonstandard names for water molecules
 c
@@ -973,7 +974,7 @@ c
          if (atmname .eq. ' HNE')  atmname = ' HE2'
          if (atmname .eq. 'HNE2')  atmname = ' HE2'
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          if (atmname .eq. '1HB ')  atmname = ' HB2'
@@ -993,7 +994,7 @@ c
          if (atmname .eq. '2HD2')  atmname = 'HD22'
          if (atmname .eq. 'HND2')  atmname = 'HD22'
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          if (atmname .eq. '1HB ')  atmname = ' HB2'

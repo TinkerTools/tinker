@@ -1221,7 +1221,7 @@ c
          call findatm (' HE2',start,stop,i)
          call newatm (i,k+9,n-5,1.02d0,n-6,126.0d0,n-8,180.0d0,0)
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          call findatm (' CB ',start,stop,i)
@@ -1275,7 +1275,7 @@ c
          call findatm ('HD22',start,stop,i)
          call newatm (i,k+5,n-4,1.01d0,n-6,120.3d0,n-7,180.0d0,0)
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          call findatm (' CB ',start,stop,i)

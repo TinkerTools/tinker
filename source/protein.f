@@ -304,6 +304,7 @@ c
                if (seq(i) .eq. 'PRO')  chi(j,i) = 0.0d0
                if (seq(i) .eq. 'PCA')  chi(j,i) = 0.0d0
             end do
+            if (seq(i) .eq. 'LEU')  chi(2,i) = 60.0d0
             if (seq(i) .eq. 'PHE')  chi(2,i) = 90.0d0
             if (seq(i) .eq. 'TYR')  chi(2,i) = 90.0d0
             if (seq(i) .eq. 'TYD')  chi(2,i) = 90.0d0
@@ -1120,7 +1121,7 @@ c
          call zatom (k+7,1.10d0,126.0d0,126.0d0,n-5,n-7,n-4,1)
          call zatom (k+9,1.02d0,126.0d0,126.0d0,n-5,n-7,n-6,1)
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
@@ -1136,7 +1137,7 @@ c
          call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
          call zatom (k+2,1.51d0,107.8d0,chi(1,i),n-1,cai,ni,0)
          call zatom (k+3,1.25d0,117.0d0,chi(2,i),n-1,n-2,cai,0)
-         call zatom (k+4,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
+         call zatom (k+4,1.40d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
          call zatom (k+1,1.11d0,109.4d0,107.9d0,n-4,cai,n-3,1)
          call zatom (k+1,1.11d0,109.4d0,107.9d0,n-5,cai,n-4,-1)
          call zatom (k+5,0.98d0,108.7d0,0.0d0,n-3,n-5,n-4,0)
@@ -1153,7 +1154,7 @@ c
          call zatom (k+5,1.02d0,119.0d0,0.0d0,n-3,n-5,n-6,0)
          call zatom (k+5,1.02d0,119.0d0,120.0d0,n-4,n-6,n-1,1)
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          call zatom (k,1.54d0,109.5d0,107.8d0,cai,ni,ci,chiral(i))
@@ -1173,7 +1174,7 @@ c
          call zatom (k+2,1.54d0,109.5d0,chi(1,i),n-1,cai,ni,0)
          call zatom (k+4,1.51d0,107.8d0,chi(2,i),n-1,n-2,cai,0)
          call zatom (k+5,1.25d0,117.0d0,chi(3,i),n-1,n-2,n-3,0)
-         call zatom (k+6,1.25d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
+         call zatom (k+6,1.40d0,117.0d0,126.0d0,n-2,n-3,n-1,1)
          call zatom (k+1,1.11d0,109.4d0,109.4d0,n-5,cai,n-4,1)
          call zatom (k+1,1.11d0,109.4d0,109.4d0,n-6,cai,n-5,-1)
          call zatom (k+3,1.11d0,109.4d0,107.9d0,n-6,n-7,n-5,1)

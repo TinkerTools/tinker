@@ -85,15 +85,18 @@
                  differences are related to Tinker symmetrization of some
                  improper torsions.
 
-      charmm22   CHARMM22 parameters for proteins, plus heme and lipids.
-        -cmap    Contains the CMAP torsion-torsion phi-psi correction.
+      charmm27   CHARMM27 parameters for proteins, plus heme and lipids.
+                 This parameter set is identical to CHARMM22, except for
+                 the addition of a CMAP torsion-torsion phi-psi correction.
                  Most of the nucleic acid and small model compound values
                  are not yet implemented. The file almost exactly
                  reproduces authentic CHARMM energies; there are small
                  differences are related to Tinker symmetrization of some
                  improper torsions, as well as in the CMAP correction.
 
-      charmm36   CHARMM36 parameters (to be implemented).
+      charmm36   CHARMM36 parameters for proteins. These parameters use
+                 CHARMM36m modifications intended to provide a balanced
+                 model for folded and disordered structures.
 
       dang       Polarizable force field parameters from Liem Dang at
                  Pacific Northwest National Laboratory.
