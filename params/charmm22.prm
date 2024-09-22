@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              CHARMM22-CMAP
+forcefield              CHARMM22
 
 vdwtype                 LENNARD-JONES
 radiusrule              ARITHMETIC
@@ -33,13 +33,7 @@ Molecular Modeling and Dynamics Studies of Proteins", J. Phys. Chem. B,
 N. Foloppe and A. D. MacKerell, Jr., "All-Atom Empirical Force Field
 for Nucleic Acids: I. Parameter Optimization Based on Small Molecule
 and Condensed Phase Macromolecular Target Data", J. Comput. Chem.,
-21, 86-104 (2000)  [CHARMM Nucleic Acid]
-
-A. D. MacKerell, Jr, M. Feig, C. L. Brooks III, "Extending the Treatment
-of Backbone Energetics in Protein Force Fields: Limitations of Gas-Phase
-Quantum Mechanics in Reproducing Protein Conformational Distributions
-in Molecular Dynamics Simulations", J. Comput. Chem., 25, 1400-1415 (2004)
-[CMAP Torsion-Torsion Correction]
+21, 86-104 (2000)  [CHARMM22 Nucleic Acid]
 
 Current parameter values are available from the CHARMM parameter site
 maintained by Alex MacKerell at the University of Maryland, Baltimore,
