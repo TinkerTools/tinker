@@ -211,10 +211,6 @@ c     provide connectivity lists for the individual atoms
 c
       if (doconect)  call connyze (active)
 c
-c     check for use of exclusion in computing moment of system
-c
-      if (domoment)  call msystem
-c
 c     decide whether to perform analysis of individual frames
 c
       abort = .true.

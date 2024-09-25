@@ -168,10 +168,6 @@ c     check for use of save-only keyword
 c
       call saveonly
 c
-c     check for use of exclusion in computing moment of system
-c
-      call msystem
-c
 c     get unique atom types
 c
       call uniquetyp
