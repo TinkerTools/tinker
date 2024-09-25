@@ -72,6 +72,7 @@ c
       uindsave = .false.
       ustcsave = .false.
       usyssave = .false.
+      vsyssave = .false.
       friction = 91.0d0
       use_sdarea = .false.
       iprint = 100
@@ -128,6 +129,8 @@ c
             ustcsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-USYSTEM ') then
             usyssave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-VSYSTEM ') then
+            vsyssave = .true.
          else if (keyword(1:9) .eq. 'FRICTION ') then
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
@@ -165,9 +168,13 @@ c     check for use of save-only keyword
 c
       call saveonly
 c
-c     check for use of exclusion in save-usystem
+c     check for use of exclusion in computing moment of system
 c
-      call saveusys
+      call msystem
+c
+c     get unique atom types
+c
+      call uniquetyp
 c
 c     check for use of induced dipole prediction methods
 c

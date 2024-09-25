@@ -162,6 +162,7 @@ add_library (tinkerObjF OBJECT
 ../source/tors.f
 ../source/tortor.f
 ../source/tree.f
+../source/uatom.f
 ../source/units.f
 ../source/uprior.f
 ../source/urey.f
@@ -524,6 +525,7 @@ add_library (tinkerObjF OBJECT
 ../source/torque.f
 ../source/torsions.f
 ../source/trimtext.f
+../source/uniquetyp.f
 ../source/unitcell.f
 ../source/verlet.f
 ../source/version.f

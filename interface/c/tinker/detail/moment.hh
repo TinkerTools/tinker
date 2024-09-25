@@ -20,6 +20,7 @@ extern double TINKER_MOD(moment, yzqpl);
 extern double TINKER_MOD(moment, zxqpl);
 extern double TINKER_MOD(moment, zyqpl);
 extern double TINKER_MOD(moment, zzqpl);
+extern int* TINKER_MOD(moment, momuse);
 #ifdef __cplusplus
 }
 #endif

@@ -365,22 +365,22 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine saveusys  --  set exclusion for system dipole  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine msystem  --  set exclusion for moment of system  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "saveusys" sets the list of atoms that are excluded while
-c     computing system dipole
+c     "msystem" sets the list of atoms that are excluded while
+c     computing moment of system
 c
 c
-      subroutine saveusys
+      subroutine msystem
       use atoms
       use iounit
       use keys
-      use output
+      use moment
       implicit none
       integer i,j,next
       integer nfixed
@@ -391,14 +391,10 @@ c
       logical header
 c
 c
-c     return if not computing system dipole
-c
-      if (.not. usyssave)  return
-c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(usysuse))  deallocate (usysuse)
-      allocate (usysuse(n))
+      if (allocated(momuse))  deallocate (momuse)
+      allocate (momuse(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -407,14 +403,14 @@ c
 c     set defaults for the numbers and lists of atoms to be used
 c
       do i = 1, n
-         usysuse(i) = .true.
+         momuse(i) = .true.
       end do
       nfixed = 0
       do i = 1, n
          fixed(i) = 0
       end do
 c
-c     get any keywords containing save-usysexc atom parameters
+c     get any keywords containing exc-moment atom parameters
 c
       do j = 1, nkey
          next = 1
@@ -425,7 +421,7 @@ c
 c
 c     get any lists of atoms whose coordinates should be used
 c
-         if (keyword(1:13) .eq. 'SAVE-USYSEXC ') then
+         if (keyword(1:13) .eq. 'EXC-MOMENT ') then
             read (string,*,err=10,end=10)  (fixed(i),i=nfixed+1,n)
    10       continue
             do while (fixed(nfixed+1) .ne. 0)
@@ -443,8 +439,8 @@ c
             if (header) then
                header = .false.
                write (iout,20)
-   20          format (/,' SAVEUSYS  --  Warning, Illegal Atom Number',
-     &                    ' in SAVE-USYSEXC Atom List')
+   20          format (/,' MSYSTEM  --  Warning, Illegal Atom Number',
+     &                    ' in EXC-MOMENT Atom List')
             end if
          end if
       end do
@@ -455,11 +451,11 @@ c
       do while (fixed(i) .ne. 0)
          if (fixed(i) .gt. 0) then
             j = fixed(i)
-            usysuse(j) = .false.
+            momuse(j) = .false.
             i = i + 1
          else
             do j = abs(fixed(i)), abs(fixed(i+1))
-               usysuse(j) = .false.
+               momuse(j) = .false.
             end do
             i = i + 2
          end if

@@ -21,7 +21,7 @@ extern int& frcsave;
 extern int& uindsave;
 extern int& ustcsave;
 extern int& usyssave;
-extern int*& usysuse;
+extern int& vsyssave;
 extern char (&coordtype)[9];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -43,7 +43,7 @@ extern "C" int TINKER_MOD(output, frcsave);
 extern "C" int TINKER_MOD(output, uindsave);
 extern "C" int TINKER_MOD(output, ustcsave);
 extern "C" int TINKER_MOD(output, usyssave);
-extern "C" int* TINKER_MOD(output, usysuse);
+extern "C" int TINKER_MOD(output, vsyssave);
 extern "C" char TINKER_MOD(output, coordtype)[9];
 
 int& nonly = TINKER_MOD(output, nonly);
@@ -64,7 +64,7 @@ int& frcsave = TINKER_MOD(output, frcsave);
 int& uindsave = TINKER_MOD(output, uindsave);
 int& ustcsave = TINKER_MOD(output, ustcsave);
 int& usyssave = TINKER_MOD(output, usyssave);
-int*& usysuse = TINKER_MOD(output, usysuse);
+int& vsyssave = TINKER_MOD(output, vsyssave);
 char (&coordtype)[9] = TINKER_MOD(output, coordtype);
 #endif
 } }

@@ -22,8 +22,8 @@ void active_();
 #define tinker_f_active active_
 void saveonly_();
 #define tinker_f_saveonly saveonly_
-void saveusys_();
-#define tinker_f_saveusys saveusys_
+void msystem_();
+#define tinker_f_msystem msystem_
 
 // alterchg.f
 void alterchg_();
@@ -2658,6 +2658,12 @@ void lowcase_(char* string, tinker_fchar_len_t string_cap);
 inline void tinker_f_lowcase(tinker_fchars string) {
     return lowcase_(string.string, string.capacity);
 }
+
+// uniquetyp.f
+void uniquetyp_();
+#define tinker_f_uniquetyp uniquetyp_
+void velunique_();
+#define tinker_f_velunique velunique_
 
 // unitcell.f
 void unitcell_();

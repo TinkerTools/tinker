@@ -158,6 +158,7 @@
 #include "detail/tors.hh"
 #include "detail/tortor.hh"
 #include "detail/tree.hh"
+#include "detail/uatom.hh"
 #include "detail/units.hh"
 #include "detail/uprior.hh"
 #include "detail/urey.hh"

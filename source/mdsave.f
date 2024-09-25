@@ -36,6 +36,7 @@ c
       use rgddyn
       use socket
       use titles
+      use uatom
       implicit none
       integer i,j,ii
       integer istep
@@ -130,7 +131,7 @@ c     move stray molecules into periodic box if desired
 c
       if (use_bounds)  call bounds
 c
-c     compute total dipole of system if desired
+c     compute dipole moment of system
 c
       if (usyssave) then
          call dmoments (xustc,yustc,zustc,xuind,yuind,zuind)
@@ -156,12 +157,41 @@ c
   220          format (' System Induced Dipole',3f18.10)
             end if
          end if
+         write (iout,230)
+  230    format (' Static Dipole by Atom Type:',
+     &           /,' Type',5x,'X-UStatic',5x,'Y-UStatic',5x,'Z-UStatic')
+         do i = 1, nunique
+            write (iout,240)  utype(i),utv1(1,i),utv1(2,i),utv1(3,i)
+  240       format (i5,3f14.6)
+         end do
+         if (use_polar) then
+            write (iout,250)
+  250       format (' Induced Dipole by Atom Type:',
+     &           /,' Type',5x,'X-UInduce',5x,'Y-UInduce',5x,'Z-UInduce')
+            do i = 1, nunique
+               write (iout,260)  utype(i),utv2(1,i),utv2(2,i),utv2(3,i)
+  260          format (i5,3f14.6)
+            end do
+         end if
+      end if
+c
+c     compute velocity of unique atom types in the system
+c
+      if (vsyssave) then
+         call velunique
+         write (iout,270)
+  270    format (' Velocity by Atom Type:',
+     &        /,' Type',4x,'X-Velocity',4x,'Y-Velocity',4x,'Z-Velocity')
+         do i = 1, nunique
+            write (iout,280)  utype(i),utv1(1,i),utv1(2,i),utv1(3,i)
+  280       format (i5,3f14.6)
+         end do
       end if
 c
 c     save coordinates to archive or numbered structure file
 c
-      write (iout,230)  isave
-  230 format (' Frame Number',13x,i10)
+      write (iout,290)  isave
+  290 format (' Frame Number',13x,i10)
       if (coordsave) then
          ixyz = freeunit ()
          if (cyclesave) then
@@ -195,8 +225,8 @@ c
             call prtxyz (ixyz)
          end if
          close (unit=ixyz)
-         write (iout,240)  xyzfile(1:trimtext(xyzfile))
-  240    format (' Coordinate File',13x,a)
+         write (iout,300)  xyzfile(1:trimtext(xyzfile))
+  300    format (' Coordinate File',13x,a)
       end if
 c
 c     update the information needed to restart the trajectory
@@ -235,13 +265,13 @@ c
             end if
          end if
          if (integrate .eq. 'RIGIDBODY') then
-            write (ivel,250)  ngrp,title(1:ltitle)
-  250       format (i6,2x,a)
+            write (ivel,310)  ngrp,title(1:ltitle)
+  310       format (i6,2x,a)
             do i = 1, ngrp
-               write (ivel,260)  i,(vcm(j,i),j=1,3)
-  260          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
-               write (ivel,270)  i,(wcm(j,i),j=1,3)
-  270          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,320)  i,(vcm(j,i),j=1,3)
+  320          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,330)  i,(wcm(j,i),j=1,3)
+  330          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
          else if (dcdsave) then
             call prtdcdv (ivel,first)
@@ -249,8 +279,8 @@ c
             call prtvel (ivel)
          end if
          close (unit=ivel)
-         write (iout,280)  velfile(1:trimtext(velfile))
-  280    format (' Velocity File',15x,a)
+         write (iout,340)  velfile(1:trimtext(velfile))
+  340    format (' Velocity File',15x,a)
       end if
 c
 c     save the force vector components for the current step,
@@ -289,8 +319,8 @@ c
             call prtfrc (ifrc)
          end if
          close (unit=ifrc)
-         write (iout,290)  frcfile(1:trimtext(frcfile))
-  290    format (' Force Vector File',11x,a)
+         write (iout,350)  frcfile(1:trimtext(frcfile))
+  350    format (' Force Vector File',11x,a)
       end if
 c
 c     save the induced dipole components for the current step
@@ -328,8 +358,8 @@ c
             call prtuind (iind)
          end if
          close (unit=iind)
-         write (iout,300)  indfile(1:trimtext(indfile))
-  300    format (' Induced Dipole File',9x,a)
+         write (iout,360)  indfile(1:trimtext(indfile))
+  360    format (' Induced Dipole File',9x,a)
       end if
 c
 c     save the static dipole components for the current step
@@ -367,8 +397,8 @@ c
             call prtustc (istc)
          end if
          close (unit=istc)
-         write (iout,310)  stcfile(1:trimtext(stcfile))
-  310    format (' Static Dipole File',10x,a)
+         write (iout,370)  stcfile(1:trimtext(stcfile))
+  370    format (' Static Dipole File',10x,a)
       end if
 c
 c     test for requested termination of the dynamics calculation
@@ -385,8 +415,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,320)
-  320    format (/,' MDSAVE  --  Dynamics Calculation Ending',
+         write (iout,380)
+  380    format (/,' MDSAVE  --  Dynamics Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if
@@ -395,8 +425,8 @@ c     skip an extra line to keep the output formating neat
 c
       modsave = mod(istep,iprint)
       if (verbose .and. modsave.ne.0) then
-         write (iout,330)
-  330    format ()
+         write (iout,390)
+  390    format ()
       end if
       return
       end

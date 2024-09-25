@@ -29,8 +29,8 @@ c     velsave     logical flag to save velocity vector components
 c     frcsave     logical flag to save force vector components
 c     uindsave    logical flag to save induced atomic dipoles
 c     ustcsave    logical flag to save static atomic dipoles
-c     usyssave    logical flag to save total dipole of the system
-c     usysuse     true if an atom is used for system dipole calculation
+c     usyssave    logical flag to save unique atom type dipole moment
+c     vsyssave    logical flag to save unique atom type velocity
 c     coordtype   selects Cartesian, internal, rigid body or none
 c
 c
@@ -54,7 +54,7 @@ c
       logical uindsave
       logical ustcsave
       logical usyssave
-      logical, allocatable :: usysuse(:)
+      logical vsyssave
       character*9 coordtype
       save
       end

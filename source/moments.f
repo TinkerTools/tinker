@@ -131,7 +131,7 @@ c     set the multipole moment components due to partial charges
 c
       do i = 1, nion
          k = iion(i)
-         if (use(k)) then
+         if (use(k) .and. momuse(k)) then
             netchg = netchg + pchg(k)
             xdpl = xdpl + xcm(k)*pchg(k)
             ydpl = ydpl + ycm(k)*pchg(k)
@@ -153,7 +153,7 @@ c
       do i = 1, ndipole
          j = idpl(1,i)
          k = idpl(2,i)
-         if (use(j) .or. use(k)) then
+         if ((use(j).and.momuse(j)) .or. (use(k).and.momuse(k))) then
             xi = x(j) - x(k)
             yi = y(j) - y(k)
             zi = z(j) - z(k)
@@ -205,7 +205,7 @@ c     set the moment components due to atomic monopoles and dipoles
 c
       do i = 1, npole
          k = ipole(i)
-         if (use(k)) then
+         if (use(k) .and. momuse(k)) then
             netchg = netchg + rpole(1,k)
             xdpl = xdpl + xcm(k)*rpole(1,k) + rpole(2,k)
             ydpl = ydpl + ycm(k)*rpole(1,k) + rpole(3,k)
@@ -254,7 +254,7 @@ c     add the traceless atomic quadrupoles to total quadrupole
 c
       do i = 1, npole
          k = ipole(i)
-         if (use(k)) then
+         if (use(k) .and. momuse(k)) then
             xxqpl = xxqpl + 3.0d0*rpole(5,k)
             xyqpl = xyqpl + 3.0d0*rpole(6,k)
             xzqpl = xzqpl + 3.0d0*rpole(7,k)
@@ -318,25 +318,48 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "dmoments" computes the total dipole moments over all atoms;
+c     "dmoments" computes the total dipole moments over all atoms and
+c     the unique atom type dipole moments;
 c     called in mdsave, it is assumed bound is called
 c
 c
       subroutine dmoments (xustc,yustc,zustc,xuind,yuind,zuind)
+      use atomid
       use atoms
       use moment
       use mpole
-      use output
       use polar
       use potent
+      use uatom
       use units
       implicit none
-      integer i
+      integer i,j
+      integer ut
+      real*8 xmid,ymid,zmid,weigh
+      real*8 xu,yu,zu
       real*8 xustc,yustc,zustc
       real*8 xuind,yuind,zuind
 c
 c
-c     zero out total dipole moment
+c     find the center of mass of the set of active atoms
+c
+      weigh = 0.0d0
+      xmid = 0.0d0
+      ymid = 0.0d0
+      zmid = 0.0d0
+      do i = 1, n
+         weigh = weigh + mass(i)
+         xmid = xmid + x(i)*mass(i)
+         ymid = ymid + y(i)*mass(i)
+         zmid = zmid + z(i)*mass(i)
+      end do
+      if (weigh .ne. 0.0d0) then
+         xmid = xmid / weigh
+         ymid = ymid / weigh
+         zmid = zmid / weigh
+      end if
+c
+c     zero out dipole moments
 c
       xustc = 0.0d0
       yustc = 0.0d0
@@ -344,21 +367,34 @@ c
       xuind = 0.0d0
       yuind = 0.0d0
       zuind = 0.0d0
+      do i = 1, nunique
+         do j = 1, 3
+            utv1(j,i) = 0.0d0
+            utv2(j,i) = 0.0d0
+         end do
+      end do
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(n,x,y,z,rpole,uind,use_polar,usysuse,
-!$OMP& xustc,yustc,zustc,xuind,yuind,zuind)
-!$OMP DO reduction(+:xustc,yustc,zustc) schedule(guided)
+!$OMP& shared(n,x,y,z,rpole,uind,use_polar,momuse,xmid,ymid,zmid,
+!$OMP& xustc,yustc,zustc,xuind,yuind,zuind,utv1,utv2,type,utypeinv)
+!$OMP DO reduction(+:xustc,yustc,zustc,utv1) schedule(guided)
 c
 c     compute the static dipole moment
 c
       do i = 1, n
-         if (usysuse(i)) then
-            xustc = xustc + x(i)*rpole(1,i) + rpole(2,i)
-            yustc = yustc + y(i)*rpole(1,i) + rpole(3,i)
-            zustc = zustc + z(i)*rpole(1,i) + rpole(4,i)
+         if (momuse(i)) then
+            xu = (x(i)-xmid)*rpole(1,i) + rpole(2,i)
+            yu = (y(i)-ymid)*rpole(1,i) + rpole(3,i)
+            zu = (z(i)-zmid)*rpole(1,i) + rpole(4,i)
+            xustc = xustc + xu
+            yustc = yustc + yu
+            zustc = zustc + zu
+            ut = utypeinv(type(i))
+            utv1(1,ut) = utv1(1,ut) + xu
+            utv1(2,ut) = utv1(2,ut) + yu
+            utv1(3,ut) = utv1(3,ut) + zu
          end if
       end do
 !$OMP END DO
@@ -366,12 +402,19 @@ c
 c     compute the induced dipole moment
 c
       if (use_polar) then
-!$OMP DO reduction(+:xuind,yuind,zuind) schedule(guided)
+!$OMP DO reduction(+:xuind,yuind,zuind,utv2) schedule(guided)
          do i = 1, n
-            if (usysuse(i)) then
-               xuind = xuind + uind(1,i)
-               yuind = yuind + uind(2,i)
-               zuind = zuind + uind(3,i)
+            if (momuse(i)) then
+               xu = uind(1,i)
+               yu = uind(2,i)
+               zu = uind(3,i)
+               xuind = xuind + xu
+               yuind = yuind + yu
+               zuind = zuind + zu
+               ut = utypeinv(type(i))
+               utv2(1,ut) = utv2(1,ut) + xu
+               utv2(2,ut) = utv2(2,ut) + yu
+               utv2(3,ut) = utv2(3,ut) + zu
             end if
          end do
 !$OMP END DO
@@ -386,5 +429,11 @@ c
       xuind = xuind * debye
       yuind = yuind * debye
       zuind = zuind * debye
+      do i = 1, nunique
+         do j = 1, 3
+            utv1(j,i) = utv1(j,i) * debye
+            utv2(j,i) = utv2(j,i) * debye
+         end do
+      end do
       return
       end
