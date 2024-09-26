@@ -142,40 +142,40 @@ c
          call dmoments (xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind)
          if (digits .le. 6) then
             write (iout,170)  xustc,yustc,zustc
-  170       format (' System Static Dipole',1x,3f14.6)
+  170       format (' System Static Dipole',1x,3f20.6)
          else if (digits .le. 8) then
             write (iout,180)  xustc,yustc,zustc
-  180       format (' System Static Dipole',1x,3f16.8)
+  180       format (' System Static Dipole',1x,3f22.8)
          else
             write (iout,190)  xustc,yustc,zustc
-  190       format (' System Static Dipole',1x,3f18.10)
+  190       format (' System Static Dipole',1x,3f24.10)
          end if
          if (use_polar) then
             if (digits .le. 6) then
                write (iout,200)  xuind,yuind,zuind
-  200          format (' System Induced Dipole',3f14.6)
+  200          format (' System Induced Dipole',3f20.6)
             else if (digits .le. 8) then
                write (iout,210)  xuind,yuind,zuind
-  210          format (' System Induced Dipole',3f16.8)
+  210          format (' System Induced Dipole',3f22.8)
             else
                write (iout,220)  xuind,yuind,zuind
-  220          format (' System Induced Dipole',3f18.10)
+  220          format (' System Induced Dipole',3f24.10)
             end if
          end if
          write (iout,230)
   230    format (' Static Dipole by Atom Type:',
-     &           /,' Type',5x,'X-UStatic',5x,'Y-UStatic',5x,'Z-UStatic')
+     &        /,' Type',11x,'X-UStatic',11x,'Y-UStatic',11x,'Z-UStatic')
          do i = 1, nunique
             write (iout,240)  utype(i),utv1(1,i),utv1(2,i),utv1(3,i)
-  240       format (i5,3f14.6)
+  240       format (i5,3f20.6)
          end do
          if (use_polar) then
             write (iout,250)
   250       format (' Induced Dipole by Atom Type:',
-     &           /,' Type',5x,'X-UInduce',5x,'Y-UInduce',5x,'Z-UInduce')
+     &        /,' Type',11x,'X-UInduce',11x,'Y-UInduce',11x,'Z-UInduce')
             do i = 1, nunique
                write (iout,260)  utype(i),utv2(1,i),utv2(2,i),utv2(3,i)
-  260          format (i5,3f14.6)
+  260          format (i5,3f20.6)
             end do
          end if
       end if
@@ -186,10 +186,10 @@ c
          call velunique
          write (iout,270)
   270    format (' Velocity by Atom Type:',
-     &        /,' Type',4x,'X-Velocity',4x,'Y-Velocity',4x,'Z-Velocity')
+     &     /,' Type',10x,'X-Velocity',10x,'Y-Velocity',10x,'Z-Velocity')
          do i = 1, nunique
             write (iout,280)  utype(i),utv1(1,i),utv1(2,i),utv1(3,i)
-  280       format (i5,3f14.6)
+  280       format (i5,3f20.6)
          end do
       end if
 c
