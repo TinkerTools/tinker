@@ -76,3 +76,51 @@ c
       end do
       return
       end
+c
+c
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine compcent  --  compute center of mass  ##
+c     ##                                                   ##
+c     #######################################################
+c
+c
+c     "compcent" computes the center of mass
+c
+c
+      subroutine compcent (xmid,ymid,zmid)
+      use atomid
+      use atoms
+      implicit none
+      integer i
+      real*8 weigh
+      real*8 xmid,ymid,zmid
+c
+c
+c     find the center of mass of the set of active atoms
+c
+      weigh = 0.0d0
+      xmid = 0.0d0
+      ymid = 0.0d0
+      zmid = 0.0d0
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(n,x,y,z,xmid,ymid,zmid,weigh,mass)
+!$OMP DO reduction(+:xmid,ymid,zmid,weigh) schedule(guided)
+      do i = 1, n
+         weigh = weigh + mass(i)
+         xmid = xmid + x(i)*mass(i)
+         ymid = ymid + y(i)*mass(i)
+         zmid = zmid + z(i)*mass(i)
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
+      if (weigh .ne. 0.0d0) then
+         xmid = xmid / weigh
+         ymid = ymid / weigh
+         zmid = zmid / weigh
+      end if
+      return
+      end

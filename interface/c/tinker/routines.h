@@ -114,6 +114,8 @@ void calendar_(int* year, int* month, int* day, int* hour, int* minute, int* sec
 // center.f
 void center_(int* n1, double* x1, double* y1, double* z1, int* n2, double* x2, double* y2, double* z2, double* xmid, double* ymid, double* zmid);
 #define tinker_f_center center_
+void compcent_(double* xmid, double* ymid, double* zmid);
+#define tinker_f_compcent compcent_
 
 // chkpole.f
 void chkpole_();
@@ -1936,7 +1938,7 @@ void moments_(char* mode, tinker_fchar_len_t mode_cap);
 inline void tinker_f_moments(tinker_fchars mode) {
     return moments_(mode.string, mode.capacity);
 }
-void dmoments_(double* xustc, double* yustc, double* zustc, double* xuind, double* yuind, double* zuind);
+void dmoments_(double* xm, double* ym, double* zm, double* xustc, double* yustc, double* zustc, double* xuind, double* yuind, double* zuind);
 #define tinker_f_dmoments dmoments_
 
 // mutate.f
@@ -2244,9 +2246,9 @@ void prtuind_(int* iind);
 #define tinker_f_prtuind prtuind_
 void prtdcdu_(int* idcd, int* first);
 #define tinker_f_prtdcdu prtdcdu_
-void prtustc_(int* istc);
+void prtustc_(int* istc, double* xm, double* ym, double* zm);
 #define tinker_f_prtustc prtustc_
-void prtdcdd_(int* idcd, int* first);
+void prtdcdd_(int* idcd, int* first, double* xm, double* ym, double* zm);
 #define tinker_f_prtdcdd prtdcdd_
 
 // prtvel.f

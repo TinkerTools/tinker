@@ -323,8 +323,7 @@ c     the unique atom type dipole moments;
 c     called in mdsave, it is assumed bound is called
 c
 c
-      subroutine dmoments (xustc,yustc,zustc,xuind,yuind,zuind)
-      use atomid
+      subroutine dmoments (xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind)
       use atoms
       use moment
       use mpole
@@ -335,29 +334,11 @@ c
       implicit none
       integer i,j
       integer ut
-      real*8 xmid,ymid,zmid,weigh
+      real*8 xm,ym,zm
       real*8 xu,yu,zu
       real*8 xustc,yustc,zustc
       real*8 xuind,yuind,zuind
 c
-c
-c     find the center of mass of the set of active atoms
-c
-      weigh = 0.0d0
-      xmid = 0.0d0
-      ymid = 0.0d0
-      zmid = 0.0d0
-      do i = 1, n
-         weigh = weigh + mass(i)
-         xmid = xmid + x(i)*mass(i)
-         ymid = ymid + y(i)*mass(i)
-         zmid = zmid + z(i)*mass(i)
-      end do
-      if (weigh .ne. 0.0d0) then
-         xmid = xmid / weigh
-         ymid = ymid / weigh
-         zmid = zmid / weigh
-      end if
 c
 c     zero out dipole moments
 c
@@ -377,7 +358,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(n,x,y,z,rpole,uind,use_polar,momuse,xmid,ymid,zmid,
+!$OMP& shared(n,x,y,z,rpole,uind,use_polar,momuse,xm,ym,zm,
 !$OMP& xustc,yustc,zustc,xuind,yuind,zuind,utv1,utv2,type,utypeinv)
 !$OMP DO reduction(+:xustc,yustc,zustc,utv1) schedule(guided)
 c
@@ -385,9 +366,9 @@ c     compute the static dipole moment
 c
       do i = 1, n
          if (momuse(i)) then
-            xu = (x(i)-xmid)*rpole(1,i) + rpole(2,i)
-            yu = (y(i)-ymid)*rpole(1,i) + rpole(3,i)
-            zu = (z(i)-zmid)*rpole(1,i) + rpole(4,i)
+            xu = (x(i)-xm)*rpole(1,i) + rpole(2,i)
+            yu = (y(i)-ym)*rpole(1,i) + rpole(3,i)
+            zu = (z(i)-zm)*rpole(1,i) + rpole(4,i)
             xustc = xustc + xu
             yustc = yustc + yu
             zustc = zustc + zu

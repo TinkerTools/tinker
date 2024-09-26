@@ -49,6 +49,7 @@ c
       real*8 epot,eksum
       real*8 xustc,yustc,zustc
       real*8 xuind,yuind,zuind
+      real*8 xm,ym,zm
       logical exist,first
       character*7 ext
       character*240 endfile
@@ -131,10 +132,14 @@ c     move stray molecules into periodic box if desired
 c
       if (use_bounds)  call bounds
 c
+c     compute center of mass if saving dipole moment
+c
+      if (usyssave .or. ustcsave)  call compcent(xm,ym,zm)
+c
 c     compute dipole moment of system
 c
       if (usyssave) then
-         call dmoments (xustc,yustc,zustc,xuind,yuind,zuind)
+         call dmoments (xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind)
          if (digits .le. 6) then
             write (iout,170)  xustc,yustc,zustc
   170       format (' System Static Dipole',1x,3f14.6)
@@ -370,7 +375,7 @@ c
             stcfile = filename(1:leng)//'.'//ext(1:lext)//'d'
             call version (stcfile,'new')
             open (unit=istc,file=stcfile,status='new')
-            call prtustc (istc)
+            call prtustc (istc,xm,ym,zm)
          else if (dcdsave) then
             stcfile = filename(1:leng)
             call suffix (stcfile,'dcdd','old')
@@ -384,7 +389,7 @@ c
                open (unit=istc,file=stcfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdd (istc,first)
+            call prtdcdd (istc,first,xm,ym,zm)
          else
             stcfile = filename(1:leng)
             call suffix (stcfile,'ustc','old')
@@ -394,7 +399,7 @@ c
             else
                open (unit=istc,file=stcfile,status='new')
             end if
-            call prtustc (istc)
+            call prtustc (istc,xm,ym,zm)
          end if
          close (unit=istc)
          write (iout,370)  stcfile(1:trimtext(stcfile))

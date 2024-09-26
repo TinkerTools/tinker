@@ -279,7 +279,7 @@ c     "prtustc" writes out a set of static dipole components
 c     to an external disk file in Tinker XYZ format
 c
 c
-      subroutine prtustc (istc)
+      subroutine prtustc (istc,xm,ym,zm)
       use atomid
       use atoms
       use bound
@@ -297,6 +297,7 @@ c
       integer size,crdsiz
       real*8 crdmin,crdmax
       real*8 c,xd,yd,zd
+      real*8 xm,ym,zm
       logical opened
       character*2 atmc
       character*2 crdc
@@ -375,9 +376,9 @@ c
       if (.not. onlysave) then
          do i = 1, n
             c = rpole(1,i)
-            xd = (x(i)*c + rpole(2,i)) * debye
-            yd = (y(i)*c + rpole(3,i)) * debye
-            zd = (z(i)*c + rpole(4,i)) * debye
+            xd = ((x(i)-xm)*c + rpole(2,i)) * debye
+            yd = ((y(i)-ym)*c + rpole(3,i)) * debye
+            zd = ((z(i)-zm)*c + rpole(4,i)) * debye
             k = n12(i)
             if (k .eq. 0) then
                write (istc,fstr)  i,name(i),xd,yd,zd,type(i)
@@ -390,9 +391,9 @@ c
          do ii = 1, nonly
             i = ionly(ii)
             c = rpole(1,i)
-            xd = (x(i)*c + rpole(2,i)) * debye
-            yd = (y(i)*c + rpole(3,i)) * debye
-            zd = (z(i)*c + rpole(4,i)) * debye
+            xd = ((x(i)-xm)*c + rpole(2,i)) * debye
+            yd = ((y(i)-ym)*c + rpole(3,i)) * debye
+            zd = ((z(i)-zm)*c + rpole(4,i)) * debye
             k = n12(i)
             if (k .eq. 0) then
                write (istc,fstr) ii,name(i),xd,yd,zd,type(i)
@@ -445,7 +446,7 @@ c     in general a value of zero for any of the above indicates that
 c     the particular feature is unused
 c
 c
-      subroutine prtdcdd (idcd,first)
+      subroutine prtdcdd (idcd,first,xm,ym,zm)
       use atoms
       use bound
       use boxes
@@ -465,6 +466,7 @@ c
       integer merged,vcharmm
       integer ntitle
       real*4 tdelta
+      real*8 xm,ym,zm
       logical opened,first
       character*4 header
       character*240 dcdfile
@@ -522,15 +524,18 @@ c
 c     append the static dipoles along each axis in turn
 c
       if (.not. onlysave) then
-         write (idcd) (real(debye*(x(i)*rpole(1,i) + rpole(2,i))),i=1,n)
-         write (idcd) (real(debye*(y(i)*rpole(1,i) + rpole(3,i))),i=1,n)
-         write (idcd) (real(debye*(z(i)*rpole(1,i) + rpole(4,i))),i=1,n)
+         write (idcd) (real(debye*((x(i)-xm)*rpole(1,i)
+     &                      + rpole(2,i))),i=1,n)
+         write (idcd) (real(debye*((y(i)-ym)*rpole(1,i)
+     &                      + rpole(3,i))),i=1,n)
+         write (idcd) (real(debye*((z(i)-zm)*rpole(1,i)
+     &                      + rpole(4,i))),i=1,n)
       else
-         write (idcd) (real(debye*(x(ionly(i))*rpole(1,ionly(i))
+         write (idcd) (real(debye*((x(ionly(i))-xm)*rpole(1,ionly(i))
      &                      + rpole(2,ionly(i)))),i=1,nonly)
-         write (idcd) (real(debye*(y(ionly(i))*rpole(1,ionly(i))
+         write (idcd) (real(debye*((y(ionly(i))-ym)*rpole(1,ionly(i))
      &                      + rpole(3,ionly(i)))),i=1,nonly)
-         write (idcd) (real(debye*(z(ionly(i))*rpole(1,ionly(i))
+         write (idcd) (real(debye*((z(ionly(i))-zm)*rpole(1,ionly(i))
      &                      + rpole(4,ionly(i)))),i=1,nonly)
       end if
 c
