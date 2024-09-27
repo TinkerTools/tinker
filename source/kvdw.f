@@ -282,6 +282,8 @@ c
       if (allocated(xred))  deallocate (xred)
       if (allocated(yred))  deallocate (yred)
       if (allocated(zred))  deallocate (zred)
+      if (allocated(radvdw))  deallocate (radvdw)
+      if (allocated(epsvdw))  deallocate (epsvdw)
       allocate (ivdw(n))
       allocate (jvdw(n))
       allocate (mvdw(maxtyp))
@@ -290,6 +292,8 @@ c
       allocate (xred(n))
       allocate (yred(n))
       allocate (zred(n))
+      allocate (radvdw(n))
+      allocate (epsvdw(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -549,6 +553,18 @@ c
          if (n12(i).eq.1 .and. kred(i).ne.0.0d0) then
             ired(i) = i12(1,i)
          end if
+      end do
+c
+c     set vdw radii and well depth for each individual atom
+c
+      do i = 1, n
+         if (vdwindex .eq. 'TYPE') then
+            ia = type(i)
+         else
+            ia = class(i)
+         end if
+         radvdw(i) = rad(ia)
+         epsvdw(i) = eps(ia)
       end do
 c
 c     apply radii and well depths for special atom class pairs
