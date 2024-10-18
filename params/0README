@@ -63,11 +63,11 @@
                  multipole force field. The original 2004 version and
                  current 2013 version are provided.
 
-      basic      A generic parameter file intended to enable simple
+      basic      A generic parameter file intended for simple and fast
                  geometry optimization of crude structures to avoid
                  steric clashes. The bond, angle and torsion parameters
                  are set to idealized values. The vdw values are loosely
-                 based on OPLS. Electrostatics is largely neglected.
+                 based on OPLS, and electrostatics is largely neglected.
 
       charmm19   CHARMM19 parameters for proteins and water. The nucleic
                  acid values are not yet implemented. There are some
@@ -86,41 +86,30 @@
                  improper torsions.
 
       charmm27   CHARMM27 parameters for proteins, plus heme and lipids.
-                 This parameter set is identical to CHARMM22, except for
-                 the addition of a CMAP torsion-torsion phi-psi correction.
-                 Most of the nucleic acid and small model compound values
-                 are not yet implemented. The file almost exactly
-                 reproduces authentic CHARMM energies; there are small
-                 differences are related to Tinker symmetrization of some
-                 improper torsions, as well as in the CMAP correction.
+                 Identical to CHARMM22, except for addition of a CMAP
+                 torsion-torsion phi-psi correction. Most nucleic acid and
+                 model compound values are not implemented. There are small
+                 changes from authentic CHARMM related to symmetrization of
+                 some improper torsions, as well as in the CMAP correction.
 
-      charmm36   CHARMM36 parameters for proteins. These parameters use
-                 CHARMM36m modifications intended to provide a balanced
-                 model for folded and disordered structures.
+      charmm36   CHARMM36 parameters for proteins and nucleic acids. These
+                 parameters include the CHARMM36m modifications intended
+                 to provide a balanced model for folded and disordered
+                 protein structures.
 
       dang       Polarizable force field parameters from Liem Dang at
                  Pacific Northwest National Laboratory.
 
-      dudek      Scaled HF/6-31G* atomic multipole parameters from a
-                 preliminary force field by Dudek and Ponder. The file
-                 contains all the multipole values from the 1995 JCC
-                 paper. These values are now obsolete, and are largely
-                 superceeded by the polarizable AMOEBA force field.
-
-      encad      ENCAD parameters for proteins and nucleic acids
-                 (in preparation).
-
       hippo19    Preliminary parameters from 2019 for the HIPPO model
-                 covering the monomer molecules in the S101 database;
-                 these parameters are very preliminary and subject to
-                 revision; not to be used for production research
+                 covering the monomer molecules in the S101 database.
+                 These parameters are very preliminary, subject to
+                 revision, and should not be used for production work.
 
       hoch       Simple NMR-NOE force field of Hoch and Stern.
 
-      iwater     The current AMOEBA water parameters for a polarizable
-                 multipole model including only "direct" (non-iterative)
-                 polarization. The parameters were fit using the Force
-                 Balance method.
+      iwater     Parameters for an AMOEBA-like polarizable multipole
+                 model for water including only "direct" (non-iterative)
+                 polarization.
 
       mm2        Full MM2(1991) parameters including pi-systems. The
                  anomeric and electronegativity correction terms are
@@ -137,15 +126,19 @@
                  parameters are set to values recommended for high
                  dielectric and/or bulk environments.
 
-      mmff       Full MMFF94 parameters for the Merck Molecular Force
-                 Field. Validated against the data suite deposited with
-                 the Computational Chemistry List (CCL)
+      mmff94     Full MMFF94 parameters for the Merck Molecular Force
+                 Field. Validated against the data suite originally 
+                 deposited with the Computational Chemistry List (CCL).
+
+      mmff94s    A modified version of the MMFF94 parameters which exhibit
+                 greater bias toward planarity at many types of trigonal
+                 nitrogan such as amides, ureas, anilines, etc.
 
       oplsaa     OPLS-AA from July 2008 with all-atom parameters for
                  proteins, nucleic acids and many general classes of
                  organic molecules.
 
-      oplsaal    An modified version of 1997 OPLS-AA with optimized
+      oplsaal    A modified version of the 1997 OPLS-AA with optimized
                  torsional parameters for the protein backbone and side
                  chains as published in 2001.
 
@@ -158,6 +151,9 @@
                  with modifications to vdw and improper torsion terms.
 
       smoothua   Similar to SMOOTHAA, but based on OPLS-UA parameters.
+
+      uwater     An AMOEBA-like water model, but having only a single
+                 polarizable site centered on the oxygen atom.
 
       water03    The original 2003 AMOEBA water model parameters for a
                  polarizable multipole electrostatics model.

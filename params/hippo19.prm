@@ -93,7 +93,7 @@ via fitting to SAPT energy decompositions on the S101 database
 
 Note: for the out-of-plane bending term, MMFF94 uses a Wilson-Decius-Cross
 form while HIPPO uses the Allinger formulation, so MMFF94 parameters are
-multiplied by 13.5 after unit conversion for use with AMOEBA
+multiplied by 13.5 after unit conversion for use here
 
 
       #############################

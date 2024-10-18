@@ -687,11 +687,14 @@ c
       if (resname .eq. 'CYM')  resname = 'CYD'
       if (resname .eq. 'LYP')  resname = 'LYS'
       if (resname .eq. 'LYN')  resname = 'LYD'
+      if (resname .eq. 'LSN')  resname = 'LYD'
 c
 c     convert unusual names for terminal capping residues
 c
+      if (resname .eq. 'ACP')  resname = 'ACE'
       if (resname .eq. 'NMA')  resname = 'NME'
       if (resname .eq. 'CT3')  resname = 'NME'
+      if (resname .eq. 'CT2')  resname = 'NH2'
 c
 c     convert nonstandard names for water molecules
 c
@@ -732,6 +735,7 @@ c
       if (resname .eq. 'KR ')  resname = ' KR'
       if (resname .eq. 'RB ')  resname = ' RB'
       if (resname .eq. 'RB+')  resname = ' RB'
+      if (resname .eq. 'RUB')  resname = ' RB'
       if (resname .eq. 'SR ')  resname = ' SR'
       if (resname .eq. 'SR+')  resname = ' SR'
       if (resname .eq. 'I  ')  resname = '  I'
@@ -742,6 +746,7 @@ c
       if (resname .eq. 'CES')  resname = ' CS'
       if (resname .eq. 'BA ')  resname = ' BA'
       if (resname .eq. 'BA+')  resname = ' BA'
+      if (resname .eq. 'BAR')  resname = ' BA'
 c
 c     decide whether residue is protein or nucleic acid
 c

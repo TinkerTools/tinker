@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              MMFF94
+forcefield              MMFF94S
 
 bondunit                71.96625
 bond-cubic              -2.0
@@ -61,8 +61,8 @@ Widely Available Force Fields for Conformational Energies and for
 Intermolecular-Interaction Energies and Geometries", J. Comput. Chem.,
 20, 730-748 (1999)
 
-The Tinker implementation and validation of MMFF94 was done during 2005
-to 2007 by Nicolas Staelens, Laboratoire de Physico-Chimie Informatique,
+The original Tinker implementation of MMFF94 was done during 2005 to
+2007 by Nicolas Staelens, Laboratoire de Physico-Chimie Informatique,
 University of Namur, Belgium
 
 
@@ -4081,7 +4081,6 @@ mmffdefstbn      4    2    4      0.25      0.25
 
 
 #                i     j     k     l      koop
-mmffopbend       0     2     0     0     0.020
 mmffopbend       1     2     1     2     0.030
 mmffopbend       1     2     2     2     0.027
 mmffopbend       1     2     2     3     0.026
@@ -4094,7 +4093,7 @@ mmffopbend       2     2     5     6     0.027
 mmffopbend       2     2     5    37     0.017
 mmffopbend       2     2     5    40     0.012
 mmffopbend       2     2     5    41     0.008
-mmffopbend       0     3     0     0     0.130
+mmffopbend       0     2     0     0     0.020
 mmffopbend       1     3     1     7     0.146
 mmffopbend       1     3     2     7     0.138
 mmffopbend       1     3     3     7     0.134
@@ -4118,18 +4117,18 @@ mmffopbend       6     3     7    37     0.127
 mmffopbend       7     3    10    10     0.113
 mmffopbend       7     3    20    20     0.151
 mmffopbend       9     3    40    40     0.057
+mmffopbend       0     3     0     0     0.130
 mmffopbend       0     8     0     0     0.000
-mmffopbend       0    10     0     0    -0.020
-mmffopbend       1    10     1     3    -0.020
-mmffopbend       1    10     3     6    -0.033
-mmffopbend       1    10     3    28    -0.020
-mmffopbend       3    10     3    28    -0.030
-mmffopbend       3    10    28    28    -0.019
+mmffopbend       1    10     1     3     0.015
+mmffopbend       1    10     3     6     0.015
+mmffopbend       1    10     3    28     0.015
+mmffopbend       3    10     3    28     0.015
+mmffopbend       3    10    28    28     0.015
+mmffopbend       0    10     0     0     0.015
 mmffopbend       0    17     0     0     0.000
 mmffopbend       0    26     0     0     0.000
-mmffopbend       0    30     0     0     0.010
 mmffopbend       5    30    20    30     0.008
-mmffopbend       0    37     0     0     0.035
+mmffopbend       0    30     0     0     0.010
 mmffopbend       1    37    37    37     0.040
 mmffopbend       2    37    37    37     0.031
 mmffopbend       3    37    37    37     0.027
@@ -4142,38 +4141,38 @@ mmffopbend       5    37    38    38     0.084
 mmffopbend       6    37    37    37     0.048
 mmffopbend      15    37    37    37     0.025
 mmffopbend      37    37    37    40     0.046
-mmffopbend       0    39     0     0     0.020
+mmffopbend       0    37     0     0     0.035
 mmffopbend       1    39    63    63     0.012
 mmffopbend      23    39    63    63    -0.014
 mmffopbend      23    39    63    65     0.021
 mmffopbend      23    39    65    65     0.062
-mmffopbend       0    40     0     0    -0.005
-mmffopbend       1    40    28    37    -0.006
-mmffopbend       2    40    28    28    -0.007
-mmffopbend       3    40    28    28    -0.007
-mmffopbend      28    40    28    37     0.004
-mmffopbend       0    41     0     0     0.180
+mmffopbend       0    39     0     0     0.020
+mmffopbend       1    40    28    37     0.030
+mmffopbend       2    40    28    28     0.030
+mmffopbend       3    40    28    28     0.030
+mmffopbend      28    40    28    37     0.030
+mmffopbend       0    40     0     0     0.030
 mmffopbend       1    41    32    32     0.178
 mmffopbend       2    41    32    32     0.161
 mmffopbend       5    41    32    32     0.158
+mmffopbend       0    41     0     0     0.180
 mmffopbend       0    43     0     0     0.000
 mmffopbend       0    45     0     0     0.150
-mmffopbend       0    49     0     0     0.000
 mmffopbend      50    49    50    50     0.000
-mmffopbend       0    54     0     0     0.020
+mmffopbend       0    49     0     0     0.000
 mmffopbend       1    54     3    36     0.016
 mmffopbend       3    54    36    36     0.018
-mmffopbend       0    55     0     0     0.020
+mmffopbend       0    54     0     0     0.020
 mmffopbend       1    55    36    57     0.020
 mmffopbend      36    55    36    57     0.020
-mmffopbend       0    56     0     0     0.020
+mmffopbend       0    55     0     0     0.020
 mmffopbend       1    56    36    57     0.020
 mmffopbend      36    56    36    57     0.020
-mmffopbend       0    57     0     0     0.080
+mmffopbend       0    56     0     0     0.020
 mmffopbend       5    57    55    55     0.038
 mmffopbend      56    57    56    56     0.158
+mmffopbend       0    57     0     0     0.080
 mmffopbend       0    58     0     0     0.025
-mmffopbend       0    63     0     0     0.050
 mmffopbend       5    63    39    64     0.019
 mmffopbend       5    63    39    66     0.068
 mmffopbend       5    63    44    64     0.014
@@ -4181,22 +4180,23 @@ mmffopbend       5    63    44    66     0.055
 mmffopbend       5    63    59    64     0.033
 mmffopbend       5    63    59    66     0.085
 mmffopbend      37    63    39    64     0.010
-mmffopbend       0    64     0     0     0.040
+mmffopbend       0    63     0     0     0.050
 mmffopbend       5    64    63    64     0.006
 mmffopbend       5    64    63    66     0.043
 mmffopbend       5    64    64    65     0.052
 mmffopbend       5    64    65    66     0.094
 mmffopbend      37    64    63    64    -0.011
+mmffopbend       0    64     0     0     0.040
 mmffopbend       0    67     0     0     0.070
-mmffopbend       0    69     0     0     0.070
 mmffopbend      32    69    37    37     0.067
+mmffopbend       0    69     0     0     0.070
 mmffopbend       0    73     0     0     0.000
-mmffopbend       0    78     0     0     0.045
 mmffopbend       5    78    78    81     0.046
-mmffopbend       0    80     0     0     0.080
+mmffopbend       0    78     0     0     0.045
 mmffopbend       5    80    81    81     0.057
-mmffopbend       0    81     0     0     0.025
+mmffopbend       0    80     0     0     0.080
 mmffopbend      36    81    78    80     0.016
+mmffopbend       0    81     0     0     0.025
 mmffopbend       0    82     0     0     0.000
 
 
@@ -4230,7 +4230,7 @@ mmfftorsion       3   1   1   6    -0.679 0 1  -0.029 180 2   0.000 0 3    0
 mmfftorsion       5   1   1   5     0.284 0 1  -1.386 180 2   0.314 0 3    0
 mmfftorsion       5   1   1   6    -0.654 0 1   1.072 180 2   0.279 0 3    0
 mmfftorsion       5   1   1   8    -0.744 0 1  -1.235 180 2   0.337 0 3    0
-mmfftorsion       5   1   1  10     0.000 0 1   0.000 180 2   0.427 0 3    0
+mmfftorsion       5   1   1  10     0.000 0 1   0.000 180 2   0.418 0 3    0
 mmfftorsion       5   1   1  11     0.000 0 1   0.516 180 2   0.291 0 3    0
 mmfftorsion       5   1   1  12     0.678 0 1  -0.602 180 2   0.398 0 3    0
 mmfftorsion       5   1   1  15     1.142 0 1  -0.644 180 2   0.367 0 3    0
@@ -4282,7 +4282,7 @@ mmfftorsion       1   1   3   1     0.103 0 1   0.177 180 2   0.545 0 3    0
 mmfftorsion       1   1   3   5    -0.072 0 1   0.316 180 2   0.674 0 3    0
 mmfftorsion       1   1   3   6    -0.117 0 1  -0.333 180 2   0.202 0 3    0
 mmfftorsion       1   1   3   7     0.825 0 1   0.139 180 2   0.325 0 3    0
-mmfftorsion       1   1   3  10    -0.927 0 1   1.112 180 2   1.388 0 3    0
+mmfftorsion       1   1   3  10    -0.763 0 1   1.244 180 2   0.986 0 3    0
 mmfftorsion       2   1   3   5     0.663 0 1  -0.167 180 2   0.426 0 3    0
 mmfftorsion       2   1   3   7    -0.758 0 1   0.112 180 2   0.563 0 3    0
 mmfftorsion       5   1   3   1    -0.073 0 1   0.085 180 2   0.531 0 3    0
@@ -4291,7 +4291,7 @@ mmfftorsion       5   1   3   3     0.000 0 1   0.000 180 2   0.446 0 3    2
 mmfftorsion       5   1   3   5    -0.822 0 1   0.501 180 2   1.008 0 3    0
 mmfftorsion       5   1   3   6     0.000 0 1  -0.624 180 2   0.330 0 3    0
 mmfftorsion       5   1   3   7     0.659 0 1  -1.407 180 2   0.308 0 3    0
-mmfftorsion       5   1   3  10    -0.412 0 1   0.693 180 2   0.087 0 3    0
+mmfftorsion       5   1   3  10    -0.687 0 1   1.244 180 2   0.136 0 3    0
 mmfftorsion       5   1   3  37     0.000 0 1   0.000 180 2   0.056 0 3    2
 mmfftorsion       5   1   3  43     0.000 0 1   1.027 180 2   0.360 0 3    0
 mmfftorsion       5   1   3  51     0.000 0 1   1.543 180 2   0.350 0 3    0
@@ -4300,8 +4300,8 @@ mmfftorsion       5   1   3  74     0.000 0 1   0.513 180 2  -0.344 0 3    0
 mmfftorsion       5   1   3  75     0.000 0 1   0.511 180 2  -0.186 0 3    0
 mmfftorsion       6   1   3   6     0.447 0 1   0.652 180 2   0.318 0 3    0
 mmfftorsion       6   1   3   7    -0.395 0 1   0.730 180 2  -0.139 0 3    0
-mmfftorsion      10   1   3   7     0.338 0 1   2.772 180 2   2.145 0 3    0
-mmfftorsion      10   1   3  10     0.548 0 1   0.000 180 2   1.795 0 3    0
+mmfftorsion      10   1   3   7     0.530 0 1   2.905 180 2   2.756 0 3    0
+mmfftorsion      10   1   3  10     0.465 0 1  -0.241 180 2   1.850 0 3    0
 mmfftorsion       0   1   4   0     0.000 0 1   0.000 180 2   0.000 0 3    0
 mmfftorsion       0   1   6   0     0.000 0 1   0.000 180 2   0.200 0 3    0
 mmfftorsion       0   1   6   0     0.000 0 1  -0.200 180 2   0.400 0 3    5
@@ -4339,15 +4339,15 @@ mmfftorsion       5   1   9  53     0.000 0 1   0.000 180 2   0.097 0 3    0
 mmfftorsion       0   1  10   0     0.000 0 1   0.000 180 2   0.300 0 3    0
 mmfftorsion       0   1  10   0     0.000 0 1   0.000 180 2   0.000 0 3    5
 mmfftorsion       0   1  10   3     0.000 0 1   0.000 180 2   1.000 0 3    0
-mmfftorsion       1   1  10   3    -1.027 0 1   0.694 180 2   0.948 0 3    0
-mmfftorsion       1   1  10   6     0.159 0 1  -0.552 180 2   0.198 0 3    0
-mmfftorsion       1   1  10  28     0.552 0 1  -0.380 180 2   0.326 0 3    0
-mmfftorsion       3   1  10   3     3.100 0 1  -2.529 180 2   1.494 0 3    0
-mmfftorsion       3   1  10  28     0.079 0 1   0.280 180 2   0.402 0 3    0
-mmfftorsion       5   1  10   1     0.000 0 1   0.000 180 2   0.779 0 3    0
-mmfftorsion       5   1  10   3    -2.099 0 1   1.363 180 2   0.021 0 3    0
-mmfftorsion       5   1  10   6    -0.162 0 1   0.832 180 2   0.552 0 3    0
-mmfftorsion       5   1  10  28    -0.616 0 1   0.000 180 2   0.274 0 3    0
+mmfftorsion       1   1  10   3    -0.884 0 1   0.578 180 2   0.818 0 3    0
+mmfftorsion       1   1  10   6     0.000 0 1  -0.379 180 2   0.565 0 3    0
+mmfftorsion       1   1  10  28     0.750 0 1  -0.404 180 2   0.369 0 3    0
+mmfftorsion       3   1  10   3     3.219 0 1  -2.699 180 2   1.875 0 3    0
+mmfftorsion       3   1  10  28     0.207 0 1   0.461 180 2   0.324 0 3    0
+mmfftorsion       5   1  10   1     0.000 0 1   0.000 180 2   0.706 0 3    0
+mmfftorsion       5   1  10   3    -2.334 0 1   1.517 180 2  -0.065 0 3    0
+mmfftorsion       5   1  10   6     0.000 0 1   0.688 180 2   0.665 0 3    0
+mmfftorsion       5   1  10  28    -0.982 0 1  -0.207 180 2   0.166 0 3    0
 mmfftorsion       0   1  15   0     0.000 0 1   0.000 180 2   0.400 0 3    0
 mmfftorsion       0   1  15   0     0.000 0 1   0.000 180 2   0.336 0 3    5
 mmfftorsion       1   1  15   1    -1.047 0 1   0.170 180 2   0.398 0 3    0
@@ -4409,8 +4409,8 @@ mmfftorsion       1   1  39  63     0.000 0 1  -0.080 180 2  -0.056 0 3    0
 mmfftorsion       5   1  39  63     0.000 0 1   0.000 180 2  -0.113 0 3    0
 mmfftorsion       0   1  40   0     0.000 0 1   0.000 180 2   0.250 0 3    0
 mmfftorsion       0   1  40   0     0.000 0 1   0.000 180 2   0.297 0 3    5
-mmfftorsion       5   1  40  28     0.000 0 1  -0.097 180 2   0.203 0 3    0
-mmfftorsion       5   1  40  37     0.000 0 1   0.000 180 2   0.329 0 3    0
+mmfftorsion       5   1  40  28     0.000 0 1  -0.105 180 2   0.000 0 3    0
+mmfftorsion       5   1  40  37     0.000 0 1   0.000 180 2   0.468 0 3    0
 mmfftorsion       0   1  41   0     0.000 0 1   0.600 180 2   0.000 0 3    0
 mmfftorsion       1   1  41  32     0.000 0 1   1.263 180 2   0.000 0 3    0
 mmfftorsion       5   1  41  32     0.000 0 1   0.000 180 2  -0.106 0 3    0
@@ -4488,19 +4488,19 @@ mmfftorsion       1   2   3   1     0.136 0 1   1.798 180 2   0.630 0 3    1
 mmfftorsion       1   2   3   5     0.497 0 1   2.405 180 2   0.357 0 3    1
 mmfftorsion       1   2   3   6    -0.211 0 1   1.925 180 2  -0.131 0 3    1
 mmfftorsion       1   2   3   7    -0.401 0 1   2.028 180 2  -0.318 0 3    1
-mmfftorsion       1   2   3  10    -0.084 0 1   2.214 180 2  -0.610 0 3    1
+mmfftorsion       1   2   3  10     0.000 0 1   2.237 180 2  -0.610 0 3    1
 mmfftorsion       2   2   3   1    -0.325 0 1   1.553 180 2  -0.487 0 3    1
 mmfftorsion       2   2   3   5    -0.295 0 1   2.024 180 2  -0.590 0 3    1
 mmfftorsion       2   2   3   6    -0.143 0 1   1.466 180 2   0.000 0 3    1
 mmfftorsion       2   2   3   7     0.362 0 1   1.978 180 2   0.000 0 3    1
 mmfftorsion       2   2   3   9     0.296 0 1   1.514 180 2   0.481 0 3    1
-mmfftorsion       2   2   3  10     0.095 0 1   1.583 180 2   0.380 0 3    1
+mmfftorsion       2   2   3  10     0.000 0 1   1.599 180 2   0.380 0 3    1
 mmfftorsion       5   2   3   1     0.213 0 1   1.728 180 2  -0.042 0 3    1
 mmfftorsion       5   2   3   5    -0.208 0 1   1.622 180 2   0.223 0 3    1
 mmfftorsion       5   2   3   6     0.359 0 1   1.539 180 2   0.194 0 3    1
 mmfftorsion       5   2   3   7     0.000 0 1   2.046 180 2   0.000 0 3    1
 mmfftorsion       5   2   3   9    -0.290 0 1   1.519 180 2  -0.470 0 3    1
-mmfftorsion       5   2   3  10     0.000 0 1   1.395 180 2   0.227 0 3    1
+mmfftorsion       5   2   3  10     0.000 0 1   1.409 180 2   0.254 0 3    1
 mmfftorsion       0   2   4   0     0.000 0 1   0.000 180 2   0.000 0 3    1
 mmfftorsion       0   2   6   0     0.000 0 1   3.100 180 2   0.000 0 3    0
 mmfftorsion       0   2   6   0     0.000 0 1   3.600 180 2   0.000 0 3    2
@@ -4540,8 +4540,8 @@ mmfftorsion       0   2  39   0     0.000 0 1   6.000 180 2   0.000 0 3    1
 mmfftorsion       0   2  40   0     0.000 0 1   3.700 180 2   0.000 0 3    0
 mmfftorsion       0   2  40   0     0.000 0 1   3.600 180 2   0.000 0 3    2
 mmfftorsion       0   2  40   0     0.000 0 1   3.600 180 2   0.000 0 3    5
-mmfftorsion       2   2  40  28     0.000 0 1   3.756 180 2  -0.530 0 3    0
-mmfftorsion       5   2  40  28     0.073 0 1   3.698 180 2   0.291 0 3    0
+mmfftorsion       2   2  40  28     0.000 0 1   3.305 180 2  -0.530 0 3    0
+mmfftorsion       5   2  40  28     0.139 0 1   3.241 180 2   0.139 0 3    0
 mmfftorsion       0   2  41   0     0.000 0 1   1.200 180 2   0.000 0 3    0
 mmfftorsion       0   2  41   0     0.000 0 1   1.800 180 2   0.000 0 3    2
 mmfftorsion       2   2  41  32     0.000 0 1   1.235 180 2   0.000 0 3    0
@@ -4597,24 +4597,24 @@ mmfftorsion       0   3   9   0     0.000 0 1  12.000 180 2   0.000 0 3    5
 mmfftorsion       2   3   9  27     0.000 0 1  16.000 180 2   0.000 0 3    0
 mmfftorsion       5   3   9   1     0.687 0 1  16.152 180 2   0.894 0 3    0
 mmfftorsion       5   3   9  27     0.000 0 1  16.000 180 2   0.000 0 3    0
-mmfftorsion      40   3   9   1    -0.758 0 1  18.216 180 2  -0.188 0 3    0
-mmfftorsion      40   3   9  27     0.000 0 1  16.000 180 2   0.000 0 3    0
+mmfftorsion      40   3   9   1    -0.704 0 1  18.216 180 2   0.000 0 3    0
+mmfftorsion      40   3   9  27     0.000 0 1  16.000 180 2   0.178 0 3    0
 mmfftorsion       0   3  10   0     0.000 0 1   6.000 180 2   0.000 0 3    0
 mmfftorsion       0   3  10   0     0.000 0 1   6.000 180 2   0.000 0 3    2
 mmfftorsion       0   3  10   0     0.000 0 1   6.000 180 2   0.000 0 3    4
 mmfftorsion       0   3  10   0     0.000 0 1   6.000 180 2   0.000 0 3    5
-mmfftorsion       1   3  10   1     0.647 0 1   6.159 180 2   0.507 0 3    0
-mmfftorsion       1   3  10   6    -1.035 0 1   8.791 180 2   1.464 0 3    0
-mmfftorsion       1   3  10  28    -0.294 0 1   5.805 180 2   1.342 0 3    0
-mmfftorsion       2   3  10  28    -0.287 0 1   7.142 180 2   0.120 0 3    2
-mmfftorsion       5   3  10   1    -0.183 0 1   6.314 180 2   1.753 0 3    0
-mmfftorsion       5   3  10   3    -0.751 0 1   5.348 180 2   0.209 0 3    0
-mmfftorsion       5   3  10  28    -0.388 0 1   5.972 180 2   0.459 0 3    0
-mmfftorsion       7   3  10   1    -0.319 0 1   6.294 180 2  -0.147 0 3    0
-mmfftorsion       7   3  10   3     0.776 0 1  -0.585 180 2  -0.145 0 3    0
-mmfftorsion       7   3  10   6     1.107 0 1   8.631 180 2  -0.452 0 3    0
-mmfftorsion       7   3  10  28     1.435 0 1   4.975 180 2  -0.454 0 3    0
-mmfftorsion      10   3  10  28     0.000 0 1   3.495 180 2   1.291 0 3    0
+mmfftorsion       1   3  10   1     0.831 0 1   6.061 180 2   0.522 0 3    0
+mmfftorsion       1   3  10   6    -1.152 0 1   8.588 180 2   1.511 0 3    0
+mmfftorsion       1   3  10  28    -0.259 0 1   5.934 180 2   1.326 0 3    0
+mmfftorsion       2   3  10  28     0.000 0 1   6.561 180 2   0.294 0 3    2
+mmfftorsion       5   3  10   1    -0.195 0 1   6.304 180 2   1.722 0 3    0
+mmfftorsion       5   3  10   3    -0.705 0 1   5.383 180 2   0.234 0 3    0
+mmfftorsion       5   3  10  28    -0.417 0 1   5.981 180 2   0.511 0 3    0
+mmfftorsion       7   3  10   1    -0.491 0 1   6.218 180 2   0.000 0 3    0
+mmfftorsion       7   3  10   3     0.733 0 1  -0.543 180 2  -0.163 0 3    0
+mmfftorsion       7   3  10   6     1.234 0 1   8.372 180 2  -0.539 0 3    0
+mmfftorsion       7   3  10  28     1.168 0 1   4.857 180 2  -0.341 0 3    0
+mmfftorsion      10   3  10  28     0.000 0 1   3.706 180 2   1.254 0 3    0
 mmfftorsion       0   3  15   0     0.000 0 1   1.423 180 2   0.000 0 3    0
 mmfftorsion       0   3  15   0     0.000 0 1   1.423 180 2   0.000 0 3    2
 mmfftorsion       0   3  15   0     0.000 0 1   1.423 180 2   0.000 0 3    4
@@ -4651,9 +4651,9 @@ mmfftorsion       0   3  39   0     0.000 0 1   5.500 180 2   0.000 0 3    1
 mmfftorsion       0   3  40   0     0.000 0 1   3.900 180 2   0.000 0 3    0
 mmfftorsion       0   3  40   0     0.000 0 1   3.600 180 2   0.000 0 3    2
 mmfftorsion       0   3  40   0     0.000 0 1   3.600 180 2   0.000 0 3    5
-mmfftorsion       5   3  40  28    -1.477 0 1   4.362 180 2   0.902 0 3    0
-mmfftorsion       9   3  40  28     1.496 0 1   4.369 180 2  -0.417 0 3    0
-mmfftorsion      40   3  40  28     0.178 0 1   3.149 180 2   0.778 0 3    0
+mmfftorsion       5   3  40  28    -1.355 0 1   3.964 180 2   0.800 0 3    0
+mmfftorsion       9   3  40  28     1.045 0 1   3.785 180 2  -0.291 0 3    0
+mmfftorsion      40   3  40  28     0.508 0 1   2.985 180 2   0.809 0 3    0
 mmfftorsion       0   3  41   0     0.000 0 1   1.800 180 2   0.000 0 3    0
 mmfftorsion       0   3  41   0     0.000 0 1   1.800 180 2   0.000 0 3    2
 mmfftorsion       0   3  43   0     0.000 0 1   4.500 180 2   0.000 0 3    0
@@ -4703,8 +4703,8 @@ mmfftorsion      21   6   8  23     1.503 0 1  -1.853 180 2  -0.476 0 3    0
 mmfftorsion       0   6   9   0     0.000 0 1   3.600 180 2   0.000 0 3    0
 mmfftorsion       0   6   9   0     0.000 0 1   3.600 180 2   0.000 0 3    5
 mmfftorsion       0   6  10   0     1.200 0 1   0.500 180 2  -1.000 0 3    0
-mmfftorsion      21   6  10   1     0.875 0 1   0.180 180 2  -0.733 0 3    0
-mmfftorsion      21   6  10   3     0.529 0 1   0.000 180 2  -1.163 0 3    0
+mmfftorsion      21   6  10   1     0.829 0 1   0.000 180 2  -0.730 0 3    0
+mmfftorsion      21   6  10   3     0.675 0 1  -0.185 180 2  -1.053 0 3    0
 mmfftorsion       0   6  15   0     0.000 0 1  -4.000 180 2   0.000 0 3    0
 mmfftorsion       0   6  17   0     0.000 0 1   1.423 180 2   0.000 0 3    0
 mmfftorsion       0   6  17   0     0.000 0 1   1.423 180 2   0.000 0 3    5
@@ -5003,8 +5003,8 @@ mmfftorsion       0  37  39   0     0.000 0 1   3.600 180 2   0.000 0 3    0
 mmfftorsion       0  37  39   0     0.000 0 1   6.000 180 2   0.000 0 3    1
 mmfftorsion       0  37  40   0     0.000 0 1   4.000 180 2   0.000 0 3    0
 mmfftorsion       0  37  40   0     0.000 0 1   3.600 180 2   0.000 0 3    5
-mmfftorsion      37  37  40   1     0.000 0 1   4.336 180 2   0.370 0 3    0
-mmfftorsion      37  37  40  28     0.715 0 1   2.628 180 2   3.355 0 3    0
+mmfftorsion      37  37  40   1     0.000 0 1   4.095 180 2   0.382 0 3    0
+mmfftorsion      37  37  40  28     0.698 0 1   2.542 180 2   3.072 0 3    0
 mmfftorsion       0  37  41   0     0.000 0 1   1.800 180 2   0.000 0 3    0
 mmfftorsion       0  37  43   0     0.000 0 1   2.000 180 2   1.800 0 3    0
 mmfftorsion       0  37  43   0     0.000 0 1   3.600 180 2   0.000 0 3    5
