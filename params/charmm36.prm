@@ -298,7 +298,7 @@ bond          1   20          250.00     1.4900
 bond          1   37          260.00     1.3000
 bond          1   38          450.00     1.3650
 bond          1   39          370.00     1.3450
-bond          1   40          430.00     1.3600  !! C-Term NH2, JWP
+bond          1   40          430.00     1.3600   !! C-Term NH2, JWP
 bond          1   47          620.00     1.2300
 bond          2    2          305.00     1.3750
 bond          2   13          300.00     1.3600
@@ -442,7 +442,7 @@ angle         7    1   39      80.00     116.50
 angle        17    1   39      80.00     116.50
 angle        18    1   39      80.00     116.50
 angle        20    1   39      80.00     116.50
-angle        17    1   40      50.00     116.50  !! N-Term NH2, JWP
+angle        17    1   40      50.00     116.50   !! N-Term NH2, JWP
 angle         7    1   47      80.00     118.00
 angle        17    1   47      80.00     121.00
 angle        18    1   47      80.00     121.00
@@ -450,7 +450,7 @@ angle        20    1   47      80.00     121.00
 angle        22    1   47      50.00     121.70
 angle        37    1   47      80.00     122.50
 angle        39    1   47      80.00     122.50
-angle        40    1   47      75.00     122.50  !! N-Term NH2, JWP
+angle        40    1   47      75.00     122.50   !! N-Term NH2, JWP
 angle         2    2    2      40.00     120.00
 angle         2    2   13      50.00     113.20
 angle         2    2   15      40.00     120.00
@@ -767,7 +767,7 @@ angle         1   39   22      34.00     123.00
 angle        17   39   22      35.00     117.00
 angle        18   39   22      35.00     117.00
 angle        20   39   22      35.00     117.00
-angle         1   40   22      50.00     120.00  !! N-Term NH2, JWP
+angle         1   40   22      50.00     120.00   !! N-Term NH2, JWP
 angle         3   40   22      50.00     120.00
 angle        17   40   22      50.00     111.00
 angle        18   40   22      50.00     111.00
@@ -815,9 +815,9 @@ angle        20   53   53      72.50     103.30
       ###############################
 
 
-ureybrad     17    1   40      50.00     2.4500  !! N-Term NH2, JWP
+ureybrad     17    1   40      50.00     2.4500   !! N-Term NH2, JWP
 ureybrad     38    1   38      70.00     2.3100
-ureybrad     40    1   47      50.00     2.3700  !! N-Term NH2, JWP
+ureybrad     40    1   47      50.00     2.3700   !! N-Term NH2, JWP
 ureybrad      2    2    2      35.00     2.4162
 ureybrad      2    2   15      35.00     2.4162
 ureybrad      2    2   29      22.00     2.1525
@@ -1019,7 +1019,7 @@ improper      3    0    0   49            96.00       0.00
 improper      4    0    0   48           100.00       0.00
 improper     38    0    0   28            -2.00       0.00
 improper     39    0    0   22            20.00       0.00
-improper     40    0    0   22             8.00       0.00  !! Doubled, JWP
+improper     40    0    0   22             8.00       0.00   !! Doubled, JWP
 
 
       ############################
@@ -5578,108 +5578,108 @@ J. Chem. Theory Comput., 8, 348–362 (2012)  [CHARMM36 DNA]
    #################################################################
 
 
-atom        201   78    NN2   "Adenosine N9"                 7    14.007    3
-atom        202   70    CN5   "Adenosine C4"                 6    12.011    3
-atom        203   70    CN5   "Adenosine C5"                 6    12.011    3
-atom        204   85    NN4   "Adenosine N7"                 7    14.007    2
-atom        205   69    CN4   "Adenosine C8"                 6    12.011    3
-atom        206   57    HN3   "Adenosine H8"                 1     1.008    1
-atom        207   83    N3A   "Adenosine N3"                 7    14.007    2
-atom        208   69    CN4   "Adenosine C2"                 6    12.011    3
-atom        209   57    HN3   "Adenosine H2"                 1     1.008    1
-atom        210   83    N3A   "Adenosine N1"                 7    14.007    2
-atom        211   66    CN2   "Adenosine C6"                 6    12.011    3
-atom        212   77    NN1   "Adenosine N6"                 7    14.007    3
-atom        213   55    HN1   "Adenosine H61"                1     1.008    1
-atom        214   55    HN1   "Adenosine H62"                1     1.008    1
-atom        215   79    N2B   "Guanosine N9"                 7    14.007    3
-atom        216   70    CN5   "Guanosine C4"                 6    12.011    3
-atom        217   71    C5G   "Guanosine C5"                 6    12.011    3
-atom        218   85    NN4   "Guanosine N7"                 7    14.007    2
-atom        219   69    CN4   "Guanosine C8"                 6    12.011    3
-atom        220   57    HN3   "Guanosine H8"                 1     1.008    1
-atom        221   84    N3G   "Guanosine N3"                 7    14.007    2
-atom        222   66    CN2   "Guanosine C2"                 6    12.011    3
-atom        223   77    NN1   "Guanosine N2"                 7    14.007    3
-atom        224   55    HN1   "Guanosine H21"                1     1.008    1
-atom        225   55    HN1   "Guanosine H22"                1     1.008    1
-atom        226   81    N2G   "Guanosine N1"                 7    14.007    3
-atom        227   56    HN2   "Guanosine H1"                 1     1.008    1
-atom        228   64    CN1   "Guanosine C6"                 6    12.011    3
-atom        229   87    ON1   "Guanosine O6"                 8    15.999    1
-atom        230   78    NN2   "Cytidine N1"                  7    14.007    3
-atom        231   64    CN1   "Cytidine C2"                  6    12.011    3
-atom        232   88    O1C   "Cytidine O2"                  8    15.999    1
-atom        233   82    NN3   "Cytidine N3"                  7    14.007    2
-atom        234   66    CN2   "Cytidine C4"                  6    12.011    3
-atom        235   77    NN1   "Cytidine N4"                  7    14.007    3
-atom        236   55    HN1   "Cytidine H41"                 1     1.008    1
-atom        237   55    HN1   "Cytidine H42"                 1     1.008    1
-atom        238   67    CN3   "Cytidine C5"                  6    12.011    3
-atom        239   57    HN3   "Cytidine H5"                  1     1.008    1
-atom        240   67    CN3   "Cytidine C6"                  6    12.011    3
-atom        241   57    HN3   "Cytidine H6"                  1     1.008    1
-atom        242   79    N2B   "Thymidine N1"                 7    14.007    3
-atom        243   65    C1T   "Thymidine C2"                 6    12.011    3
-atom        244   87    ON1   "Thymidine O2"                 8    15.999    1
-atom        245   80    N2U   "Thymidine N3"                 7    14.007    3
-atom        246   56    HN2   "Thymidine H3"                 1     1.008    1
-atom        247   64    CN1   "Thymidine C4"                 6    12.011    3
-atom        248   87    ON1   "Thymidine O4"                 8    15.999    1
-atom        249   68    C3T   "Thymidine C5"                 6    12.011    3
-atom        250   76    CN9   "Thymidine C5M"                6    12.011    4
-atom        251   63    HN9   "Thymidine H5M"                1     1.008    1
-atom        252   67    CN3   "Thymidine C6"                 6    12.011    3
-atom        253   57    HN3   "Thymidine H6"                 1     1.008    1
-atom        254   79    N2B   "Uridine N1"                   7    14.007    3
-atom        255   65    C1T   "Uridine C2"                   6    12.011    3
-atom        256   87    ON1   "Uridine O2"                   8    15.999    1
-atom        257   80    N2U   "Uridine N3"                   7    14.007    3
-atom        258   56    HN2   "Uridine H3"                   1     1.008    1
-atom        259   64    CN1   "Uridine C4"                   6    12.011    3
-atom        260   87    ON1   "Uridine O4"                   8    15.999    1
-atom        261   67    CN3   "Uridine C5"                   6    12.011    3
-atom        262   57    HN3   "Uridine H5"                   1     1.008    1
-atom        263   67    CN3   "Uridine C6"                   6    12.011    3
-atom        264   57    HN3   "Uridine H6"                   1     1.008    1
-atom        265   75    C8B   "Ribose C5'"                   6    12.011    4
-atom        266   62    HN8   "Ribose H5' & H5''"            1     1.008    1
-atom        267   72    CN7   "Ribose C4'"                   6    12.011    4
-atom        268   61    HN7   "Ribose H4'"                   1     1.008    1
-atom        269   94    O6B   "Ribose O4'"                   8    15.999    2
-atom        270   73    C7B   "Ribose C1'"                   6    12.011    4
-atom        271   61    HN7   "Ribose H1'"                   1     1.008    1
-atom        272   72    CN7   "Ribose C3'"                   6    12.011    4
-atom        273   61    HN7   "Ribose H3'"                   1     1.008    1
-atom        274   73    C7B   "Ribose C2'"                   6    12.011    4
-atom        275   61    HN7   "Ribose H2''"                  1     1.008    1
-atom        276   92    ON5   "Ribose O2'"                   8    15.999    2
-atom        277   59    HN5   "Ribose H2'"                   1     1.008    1
-atom        278   93    ON6   "Deoxyribose O4'"              8    15.999    2
-atom        279   74    CN8   "Deoxyribose C2'"              6    12.011    4
-atom        280   62    HN8   "Deoxyribose H2' & H2''"       1     1.008    1
-atom        281   95    P     "RNA Phosphodiester P"        15    30.974    4
-atom        282   96    P2    "DNA Phosphodiester P"        15    30.974    4
-atom        283   90    ON3   "Phosphodiester O"             8    15.999    1
-atom        284   89    ON2   "5'-Phosphate O5'"             8    15.999    2
-atom        285   89    ON2   "3'-Phosphate O3'"             8    15.999    2
-atom        286   92    ON5   "5'-Term Hydroxyl O5'"         8    15.999    2
-atom        287   59    HN5   "5'-Term Hydroxyl H5T"         1     1.008    1
-atom        288   92    ON5   "3'-Term Hydroxyl O3'"         8    15.999    2
-atom        289   59    HN5   "3'-Term Hydroxyl H3T"         1     1.008    1
-atom        290   89    ON2   "5'-Term Phosphate O5'"        8    15.999    2
-atom        291   95    P     "5'-Term Phosphate P"         15    30.974    4
-atom        292   90    ON3   "5'-Term Phosphate OP"         8    15.999    1
-atom        293   89    ON2   "3'-Term Phosphate O3'"        8    15.999    2
-atom        294   95    P     "3'-Term Phosphate P"         15    30.974    4
-atom        295   90    ON3   "3'-Term Phosphate OP"         8    15.999    1
+atom        115   78    NN2   "Adenosine N9"                 7    14.007    3
+atom        116   70    CN5   "Adenosine C4"                 6    12.011    3
+atom        117   70    CN5   "Adenosine C5"                 6    12.011    3
+atom        118   85    NN4   "Adenosine N7"                 7    14.007    2
+atom        119   69    CN4   "Adenosine C8"                 6    12.011    3
+atom        120   57    HN3   "Adenosine H8"                 1     1.008    1
+atom        121   83    N3A   "Adenosine N3"                 7    14.007    2
+atom        122   69    CN4   "Adenosine C2"                 6    12.011    3
+atom        123   57    HN3   "Adenosine H2"                 1     1.008    1
+atom        124   83    N3A   "Adenosine N1"                 7    14.007    2
+atom        125   66    CN2   "Adenosine C6"                 6    12.011    3
+atom        126   77    NN1   "Adenosine N6"                 7    14.007    3
+atom        127   55    HN1   "Adenosine H61"                1     1.008    1
+atom        128   55    HN1   "Adenosine H62"                1     1.008    1
+atom        129   79    N2B   "Guanosine N9"                 7    14.007    3
+atom        130   70    CN5   "Guanosine C4"                 6    12.011    3
+atom        131   71    C5G   "Guanosine C5"                 6    12.011    3
+atom        132   85    NN4   "Guanosine N7"                 7    14.007    2
+atom        133   69    CN4   "Guanosine C8"                 6    12.011    3
+atom        134   57    HN3   "Guanosine H8"                 1     1.008    1
+atom        135   84    N3G   "Guanosine N3"                 7    14.007    2
+atom        136   66    CN2   "Guanosine C2"                 6    12.011    3
+atom        137   77    NN1   "Guanosine N2"                 7    14.007    3
+atom        138   55    HN1   "Guanosine H21"                1     1.008    1
+atom        139   55    HN1   "Guanosine H22"                1     1.008    1
+atom        140   81    N2G   "Guanosine N1"                 7    14.007    3
+atom        141   56    HN2   "Guanosine H1"                 1     1.008    1
+atom        142   64    CN1   "Guanosine C6"                 6    12.011    3
+atom        143   87    ON1   "Guanosine O6"                 8    15.999    1
+atom        144   78    NN2   "Cytidine N1"                  7    14.007    3
+atom        145   64    CN1   "Cytidine C2"                  6    12.011    3
+atom        146   88    O1C   "Cytidine O2"                  8    15.999    1
+atom        147   82    NN3   "Cytidine N3"                  7    14.007    2
+atom        148   66    CN2   "Cytidine C4"                  6    12.011    3
+atom        149   77    NN1   "Cytidine N4"                  7    14.007    3
+atom        150   55    HN1   "Cytidine H41"                 1     1.008    1
+atom        151   55    HN1   "Cytidine H42"                 1     1.008    1
+atom        152   67    CN3   "Cytidine C5"                  6    12.011    3
+atom        153   57    HN3   "Cytidine H5"                  1     1.008    1
+atom        154   67    CN3   "Cytidine C6"                  6    12.011    3
+atom        155   57    HN3   "Cytidine H6"                  1     1.008    1
+atom        156   79    N2B   "Thymidine N1"                 7    14.007    3
+atom        157   65    C1T   "Thymidine C2"                 6    12.011    3
+atom        158   87    ON1   "Thymidine O2"                 8    15.999    1
+atom        159   80    N2U   "Thymidine N3"                 7    14.007    3
+atom        160   56    HN2   "Thymidine H3"                 1     1.008    1
+atom        161   64    CN1   "Thymidine C4"                 6    12.011    3
+atom        162   87    ON1   "Thymidine O4"                 8    15.999    1
+atom        163   68    C3T   "Thymidine C5"                 6    12.011    3
+atom        164   76    CN9   "Thymidine C5M"                6    12.011    4
+atom        165   63    HN9   "Thymidine H5M"                1     1.008    1
+atom        166   67    CN3   "Thymidine C6"                 6    12.011    3
+atom        167   57    HN3   "Thymidine H6"                 1     1.008    1
+atom        168   79    N2B   "Uridine N1"                   7    14.007    3
+atom        169   65    C1T   "Uridine C2"                   6    12.011    3
+atom        170   87    ON1   "Uridine O2"                   8    15.999    1
+atom        171   80    N2U   "Uridine N3"                   7    14.007    3
+atom        172   56    HN2   "Uridine H3"                   1     1.008    1
+atom        173   64    CN1   "Uridine C4"                   6    12.011    3
+atom        174   87    ON1   "Uridine O4"                   8    15.999    1
+atom        175   67    CN3   "Uridine C5"                   6    12.011    3
+atom        176   57    HN3   "Uridine H5"                   1     1.008    1
+atom        177   67    CN3   "Uridine C6"                   6    12.011    3
+atom        178   57    HN3   "Uridine H6"                   1     1.008    1
+atom        179   75    C8B   "Ribose C5'"                   6    12.011    4
+atom        180   62    HN8   "Ribose H5' & H5''"            1     1.008    1
+atom        181   72    CN7   "Ribose C4'"                   6    12.011    4
+atom        182   61    HN7   "Ribose H4'"                   1     1.008    1
+atom        183   94    O6B   "Ribose O4'"                   8    15.999    2
+atom        184   73    C7B   "Ribose C1'"                   6    12.011    4
+atom        185   61    HN7   "Ribose H1'"                   1     1.008    1
+atom        186   72    CN7   "Ribose C3'"                   6    12.011    4
+atom        187   61    HN7   "Ribose H3'"                   1     1.008    1
+atom        188   73    C7B   "Ribose C2'"                   6    12.011    4
+atom        189   61    HN7   "Ribose H2''"                  1     1.008    1
+atom        190   92    ON5   "Ribose O2'"                   8    15.999    2
+atom        191   59    HN5   "Ribose H2'"                   1     1.008    1
+atom        192   93    ON6   "Deoxyribose O4'"              8    15.999    2
+atom        193   74    CN8   "Deoxyribose C2'"              6    12.011    4
+atom        194   62    HN8   "Deoxyribose H2' & H2''"       1     1.008    1
+atom        195   95    P     "RNA Phosphodiester P"        15    30.974    4
+atom        196   96    P2    "DNA Phosphodiester P"        15    30.974    4
+atom        197   90    ON3   "Phosphodiester O"             8    15.999    1
+atom        198   89    ON2   "5'-Phosphate O5'"             8    15.999    2
+atom        199   89    ON2   "3'-Phosphate O3'"             8    15.999    2
+atom        200   92    ON5   "5'-Term Hydroxyl O5'"         8    15.999    2
+atom        201   59    HN5   "5'-Term Hydroxyl H5T"         1     1.008    1
+atom        202   92    ON5   "3'-Term Hydroxyl O3'"         8    15.999    2
+atom        203   59    HN5   "3'-Term Hydroxyl H3T"         1     1.008    1
+atom        204   89    ON2   "5'-Term Phosphate O5'"        8    15.999    2
+atom        205   95    P     "5'-Term Phosphate P"         15    30.974    4
+atom        206   90    ON3   "5'-Term Phosphate OP"         8    15.999    1
+atom        207   89    ON2   "3'-Term Phosphate O3'"        8    15.999    2
+atom        208   95    P     "3'-Term Phosphate P"         15    30.974    4
+atom        209   90    ON3   "3'-Term Phosphate OP"         8    15.999    1
 
-atom        401   58    HN4   "Undefined Hydrogen"           1     1.008    1
-atom        402   60    HN6   "Undefined Hydrogen"           1     1.008    1
-atom        403   86    NN6   "Undefined Nitrogen"           7    14.007    3
-atom        404   91    ON4   "Undefined Oxygen"             8    15.999    2
-atom        405   97    P3    "Undefined Phosphorus"        15    30.974    4
-atom        406   98    P4    "Undefined Phosphorus"        15    30.974    4
+atom        210   58    HN4   "Undefined Hydrogen"           1     1.008    1
+atom        211   60    HN6   "Undefined Hydrogen"           1     1.008    1
+atom        212   86    NN6   "Undefined Nitrogen"           7    14.007    3
+atom        213   91    ON4   "Undefined Oxygen"             8    15.999    2
+atom        214   97    P3    "Undefined Phosphorus"        15    30.974    4
+atom        215   98    P4    "Undefined Phosphorus"        15    30.974    4
 
 
       ################################
@@ -6609,105 +6609,101 @@ torsion       0   91   98    0            0.300    0.0  3
       ########################################
 
 
-charge      201              -0.0500
-charge      202               0.4300
-charge      203               0.2800
-charge      204              -0.7100
-charge      205               0.3400
-charge      206               0.1200
-charge      207              -0.7500
-charge      208               0.5000
-charge      209               0.1300
-charge      210              -0.7400
-charge      211               0.4600
-charge      212              -0.7700
-charge      213               0.3800
-charge      214               0.3800
-charge      215              -0.0200
-charge      216               0.2600
-charge      217               0.0000
-charge      218              -0.6000
-charge      219               0.2500
-charge      220               0.1600
-charge      221              -0.7400
-charge      222               0.7500
-charge      223              -0.6800
-charge      224               0.3350
-charge      225               0.3350
-charge      226              -0.3400
-charge      227               0.2600
-charge      228               0.5400
-charge      229              -0.5100
-charge      230              -0.1300
-charge      231               0.5200
-charge      232              -0.4900
-charge      233              -0.6600
-charge      234               0.6500
-charge      235              -0.7500
-charge      236               0.3500
-charge      237               0.3500
-charge      238              -0.1300
-charge      239               0.0700
-charge      240               0.0500
-charge      241               0.1700
-charge      242              -0.3400
-charge      243               0.5100
-charge      244              -0.4100
-charge      245              -0.4600
-charge      246               0.3600
-charge      247               0.5000
-charge      248              -0.4500
-charge      249              -0.1500
-charge      250              -0.1100
-charge      251               0.0700
-charge      252               0.1700
-charge      253               0.1700
-charge      254              -0.3400
-charge      255               0.5500
-charge      256              -0.4500
-charge      257              -0.4600
-charge      258               0.3600
-charge      259               0.5300
-charge      260              -0.4800
-charge      261              -0.1500
-charge      262               0.1000
-charge      263               0.2000
-charge      264               0.1400
-charge      265              -0.0800
-charge      266               0.0900
-charge      267               0.1600
-charge      268               0.0900
-charge      269              -0.5000
-charge      270               0.1600
-charge      271               0.0900
-charge      272               0.0100
-charge      273               0.0900
-charge      274               0.1400
-charge      275               0.0900
-charge      276              -0.6600
-charge      277               0.4300
-charge      278              -0.5000
-charge      279               0.1800
-charge      280               0.0900
-charge      281               1.5000
-charge      282               1.5000
-charge      283              -0.7800
-charge      284              -0.5700
-charge      285              -0.5700
-#charge     286              -0.6600   !! original CHARMM36
-charge      286              -0.5300
-charge      287               0.4300
-#charge     288              -0.6600   !! original CHARMM36
-charge      288              -0.5300
-charge      289               0.4300
-#charge     290              -0.4000   !! original CHARMM36
-charge      290              -0.5000
-charge      291               1.1000
-charge      292              -0.9000
-#charge     293              -0.4000   !! original CHARMM36
-charge      293              -0.5000
-charge      294               1.1000
-charge      295              -0.9000
+charge      115              -0.0500
+charge      116               0.4300
+charge      117               0.2800
+charge      118              -0.7100
+charge      119               0.3400
+charge      120               0.1200
+charge      121              -0.7500
+charge      122               0.5000
+charge      123               0.1300
+charge      124              -0.7400
+charge      125               0.4600
+charge      126              -0.7700
+charge      127               0.3800
+charge      128               0.3800
+charge      129              -0.0200
+charge      130               0.2600
+charge      131               0.0000
+charge      132              -0.6000
+charge      133               0.2500
+charge      134               0.1600
+charge      135              -0.7400
+charge      136               0.7500
+charge      137              -0.6800
+charge      138               0.3350
+charge      139               0.3350
+charge      140              -0.3400
+charge      141               0.2600
+charge      142               0.5400
+charge      143              -0.5100
+charge      144              -0.1300
+charge      145               0.5200
+charge      146              -0.4900
+charge      147              -0.6600
+charge      148               0.6500
+charge      149              -0.7500
+charge      150               0.3500
+charge      151               0.3500
+charge      152              -0.1300
+charge      153               0.0700
+charge      154               0.0500
+charge      155               0.1700
+charge      156              -0.3400
+charge      157               0.5100
+charge      158              -0.4100
+charge      159              -0.4600
+charge      160               0.3600
+charge      161               0.5000
+charge      162              -0.4500
+charge      163              -0.1500
+charge      164              -0.1100
+charge      165               0.0700
+charge      166               0.1700
+charge      167               0.1700
+charge      168              -0.3400
+charge      169               0.5500
+charge      170              -0.4500
+charge      171              -0.4600
+charge      172               0.3600
+charge      173               0.5300
+charge      174              -0.4800
+charge      175              -0.1500
+charge      176               0.1000
+charge      177               0.2000
+charge      178               0.1400
+charge      179              -0.0800
+charge      180               0.0900
+charge      181               0.1600
+charge      182               0.0900
+charge      183              -0.5000
+charge      184               0.1600
+charge      185               0.0900
+charge      186               0.0100
+charge      187               0.0900
+charge      188               0.1400
+charge      189               0.0900
+charge      190              -0.6600
+charge      191               0.4300
+charge      192              -0.5000
+charge      193              -0.1800
+charge      194               0.0900
+charge      195               1.5000
+charge      196               1.5000
+charge      197              -0.7800
+charge      198              -0.5700
+charge      199              -0.5700
+charge      200              -0.5300   !! CHARMM36 is -0.66
+charge      201               0.4300
+charge      202              -0.5300   !! CHARMM36 is -0.66
+charge      203               0.4300
+charge      204              -0.5000   !! CHARMM36 is -0.40
+charge      205               1.1000
+charge      206              -0.9000
+charge      207              -0.5000   !! CHARMM36 is -0.40
+charge      208               1.1000
+charge      209              -0.9000
 
 
       #############################
@@ -6729,6 +6725,11 @@ R. H. Stote and M. Karplus, "Zinc Binding in Proteins and Solution: A
 Simple but Accurate Nonbonded Representation", PROTEINS, 23, 12-31 (1995)
 [Zinc Ion]
 
+R. M. Venable, Y. Luo, K. Gawrisch, B. Roux and R. W. Pastor, "Simulations
+of Anionic Lipid Membranes: Development of Interaction-Specific Ion
+Parameters and Validation Using NMR Data, J. Phys. Chem. B, 117,
+10183–10192 (2013)  [NBFIX for Ions]
+
 
       #############################
       ##                         ##
@@ -6749,23 +6750,23 @@ Simple but Accurate Nonbonded Representation", PROTEINS, 23, 12-31 (1995)
    #################################################################
 
 
-atom        115   99    OT    "TIP3P Water OH2"              8    15.999    2
-atom        116  100    HT    "TIP3P Water H2O"              1     1.008    1
-atom        117  101    OX    "Hydroxide Ion O-"             8    15.999    1
-atom        118  102    HX    "Hydroxide Ion H"              1     1.008    1
-atom        119  103    OPE   "Hydrogen Peroxide O"          8    15.999    2
-atom        120  104    HPE   "Hydrogen Peroxide H"          1     1.008    1
-atom        121  105    LIT   "Lithium Ion"                  3     6.941    0
-atom        122  106    SOD   "Sodium Ion"                  11    22.990    0
-atom        123  107    MG    "Magnesium Ion"               12    24.305    0
-atom        124  108    POT   "Potassium Ion"               19    39.098    0
-atom        125  109    CAL   "Calcium Ion"                 20    40.080    0
-atom        126  110    RUB   "Rubidium Ion"                37    85.468    0
-atom        127  111    CES   "Cesium Ion"                  55   132.905    0
-atom        128  112    BAR   "Barium Ion"                  56   137.327    0
-atom        129  113    ZN    "Zinc Ion"                    30    65.370    0
-atom        130  114    CAD   "Cadmium Ion"                 48   112.411    0
-atom        131  115    CLA   "Chloride Ion"                35    35.450    0
+atom        216   99    OT    "TIP3P Water OH2"              8    15.999    2
+atom        217  100    HT    "TIP3P Water H2O"              1     1.008    1
+atom        218  101    OX    "Hydroxide Ion O-"             8    15.999    1
+atom        219  102    HX    "Hydroxide Ion H"              1     1.008    1
+atom        220  103    OPE   "Hydrogen Peroxide O"          8    15.999    2
+atom        221  104    HPE   "Hydrogen Peroxide H"          1     1.008    1
+atom        222  105    LIT   "Lithium Ion"                  3     6.941    0
+atom        223  106    SOD   "Sodium Ion"                  11    22.990    0
+atom        224  107    MG    "Magnesium Ion"               12    24.305    0
+atom        225  108    POT   "Potassium Ion"               19    39.098    0
+atom        226  109    CAL   "Calcium Ion"                 20    40.080    0
+atom        227  110    RUB   "Rubidium Ion"                37    85.468    0
+atom        228  111    CES   "Cesium Ion"                  55   132.905    0
+atom        229  112    BAR   "Barium Ion"                  56   137.327    0
+atom        230  113    ZN    "Zinc Ion"                    30    65.370    0
+atom        231  114    CAD   "Cadmium Ion"                 48   112.411    0
+atom        232  115    CLA   "Chloride Ion"                35    35.450    0
 
 
       ################################
@@ -6781,6 +6782,35 @@ vdw         101               1.7000    -0.1200
 vdw         102               0.2245    -0.0460
 vdw         103               1.6742    -0.2038
 vdw         104               0.2245    -0.0460
+vdw         105               1.2975    -0.00233
+vdw         106              1.41075    -0.0469
+vdw         107               1.1850    -0.0150
+vdw         108              1.76375    -0.0870
+vdw         109               1.3670    -0.1200
+vdw         110               1.9000    -0.1500
+vdw         111               2.1000    -0.1900
+vdw         112               1.8900    -0.1500
+vdw         113               1.0900    -0.2500
+vdw         114               1.3570    -0.1200
+vdw         115               2.2700    -0.1500
+
+
+      #####################################
+      ##                                 ##
+      ##  Van der Waals Pair Parameters  ##
+      ##                                 ##
+      #####################################
+
+
+vdwpair      49  106          3.2300    -0.07502
+vdwpair      49  108          3.5250    -0.1022
+vdwpair      49  109          3.2320    -0.1200
+vdwpair      51  106          3.1300    -0.07502
+vdwpair      90  105          3.1775    -0.0167
+vdwpair     105  115          3.6875    -0.0187
+vdwpair     106  115          3.7310    -0.083875
+vdwpair     108  115          4.0810    -0.114236
+vdwpair     109  115          3.7270    -0.134164
 
 
       ##################################
@@ -6824,23 +6854,23 @@ torsion     104  103  103  104            2.020    0.0  2
       ########################################
 
 
-charge      115              -0.8340
-charge      116               0.4170
-charge      117              -1.3200
-charge      118               0.3200
-charge      119              -0.4100
-charge      120               0.4100
-charge      121               1.0000
-charge      122               1.0000
-charge      123               2.0000
-charge      124               1.0000
-charge      125               2.0000
-charge      126               1.0000
-charge      127               1.0000
-charge      128               2.0000
-charge      129               2.0000
-charge      130               2.0000
-charge      131              -1.0000
+charge      216              -0.8340
+charge      217               0.4170
+charge      218              -1.3200
+charge      219               0.3200
+charge      220              -0.4100
+charge      221               0.4100
+charge      222               1.0000
+charge      223               1.0000
+charge      224               2.0000
+charge      225               1.0000
+charge      226               2.0000
+charge      227               1.0000
+charge      228               1.0000
+charge      229               2.0000
+charge      230               2.0000
+charge      231               2.0000
+charge      232              -1.0000
 
 
       ########################################
@@ -7630,266 +7660,266 @@ biotype     777    N       "N-MeAmide C-Terminus"             84
 biotype     778    HN      "N-MeAmide C-Terminus"              5
 biotype     779    C       "N-MeAmide C-Terminus"             82
 biotype     780    H       "N-MeAmide C-Terminus"              3
-biotype    1001    O5*     "Adenosine"                       284
-biotype    1002    C5*     "Adenosine"                       265
-biotype    1003    H5*     "Adenosine"                       266
-biotype    1004    H5*     "Adenosine"                       266
-biotype    1005    C4*     "Adenosine"                       267
-biotype    1006    H4*     "Adenosine"                       268
-biotype    1007    O4*     "Adenosine"                       269
-biotype    1008    C1*     "Adenosine"                       270
-biotype    1009    H1*     "Adenosine"                       271
-biotype    1010    C3*     "Adenosine"                       272
-biotype    1011    H3*     "Adenosine"                       273
-biotype    1012    C2*     "Adenosine"                       274
-biotype    1013    H2*     "Adenosine"                       275
-biotype    1014    O2*     "Adenosine"                       276
-biotype    1015    HO*     "Adenosine"                       277
-biotype    1016    O3*     "Adenosine"                       285
-biotype    1017    N9      "Adenosine"                       201
-biotype    1018    C4      "Adenosine"                       202
-biotype    1019    C5      "Adenosine"                       203
-biotype    1020    N7      "Adenosine"                       204
-biotype    1021    C8      "Adenosine"                       205
-biotype    1022    N3      "Adenosine"                       207
-biotype    1023    C2      "Adenosine"                       208
-biotype    1024    N1      "Adenosine"                       210
-biotype    1025    C6      "Adenosine"                       211
-biotype    1026    H2      "Adenosine"                       209
-biotype    1027    N6      "Adenosine"                       212
-biotype    1028    H61     "Adenosine"                       213
-biotype    1029    H62     "Adenosine"                       214
-biotype    1030    H8      "Adenosine"                       206
-biotype    1031    O5*     "Guanosine"                       284
-biotype    1032    C5*     "Guanosine"                       265
-biotype    1033    H5*     "Guanosine"                       266
-biotype    1034    H5*     "Guanosine"                       266
-biotype    1035    C4*     "Guanosine"                       267
-biotype    1036    H4*     "Guanosine"                       268
-biotype    1037    O4*     "Guanosine"                       269
-biotype    1038    C1*     "Guanosine"                       270
-biotype    1039    H1*     "Guanosine"                       271
-biotype    1040    C3*     "Guanosine"                       272
-biotype    1041    H3*     "Guanosine"                       273
-biotype    1042    C2*     "Guanosine"                       274
-biotype    1043    H2*     "Guanosine"                       275
-biotype    1044    O2*     "Guanosine"                       276
-biotype    1045    HO*     "Guanosine"                       277
-biotype    1046    O3*     "Guanosine"                       285
-biotype    1047    N9      "Guanosine"                       215
-biotype    1048    C4      "Guanosine"                       216
-biotype    1049    C5      "Guanosine"                       217
-biotype    1050    N7      "Guanosine"                       218
-biotype    1051    C8      "Guanosine"                       219
-biotype    1052    N3      "Guanosine"                       221
-biotype    1053    C2      "Guanosine"                       222
-biotype    1054    N1      "Guanosine"                       226
-biotype    1055    C6      "Guanosine"                       228
-biotype    1056    H1      "Guanosine"                       227
-biotype    1057    N2      "Guanosine"                       223
-biotype    1058    H21     "Guanosine"                       224
-biotype    1059    H22     "Guanosine"                       225
-biotype    1060    O6      "Guanosine"                       229
-biotype    1061    H8      "Guanosine"                       220
-biotype    1062    O5*     "Cytidine"                        284
-biotype    1063    C5*     "Cytidine"                        265
-biotype    1064    H5*     "Cytidine"                        266
-biotype    1065    H5*     "Cytidine"                        266
-biotype    1066    C4*     "Cytidine"                        267
-biotype    1067    H4*     "Cytidine"                        268
-biotype    1068    O4*     "Cytidine"                        269
-biotype    1069    C1*     "Cytidine"                        270
-biotype    1070    H1*     "Cytidine"                        271
-biotype    1071    C3*     "Cytidine"                        272
-biotype    1072    H3*     "Cytidine"                        273
-biotype    1073    C2*     "Cytidine"                        274
-biotype    1074    H2*     "Cytidine"                        275
-biotype    1075    O2*     "Cytidine"                        276
-biotype    1076    HO*     "Cytidine"                        277
-biotype    1077    O3*     "Cytidine"                        285
-biotype    1078    N1      "Cytidine"                        230
-biotype    1079    C2      "Cytidine"                        231
-biotype    1080    N3      "Cytidine"                        233
-biotype    1081    C4      "Cytidine"                        234
-biotype    1082    C5      "Cytidine"                        238
-biotype    1083    C6      "Cytidine"                        240
-biotype    1084    O2      "Cytidine"                        232
-biotype    1085    N4      "Cytidine"                        235
-biotype    1086    H41     "Cytidine"                        236
-biotype    1087    H42     "Cytidine"                        237
-biotype    1088    H5      "Cytidine"                        239
-biotype    1089    H6      "Cytidine"                        241
-biotype    1090    O5*     "Uridine"                         284
-biotype    1091    C5*     "Uridine"                         265
-biotype    1092    H5*     "Uridine"                         266
-biotype    1093    H5*     "Uridine"                         266
-biotype    1094    C4*     "Uridine"                         267
-biotype    1095    H4*     "Uridine"                         268
-biotype    1096    O4*     "Uridine"                         269
-biotype    1097    C1*     "Uridine"                         270
-biotype    1098    H1*     "Uridine"                         271
-biotype    1099    C3*     "Uridine"                         272
-biotype    1100    H3*     "Uridine"                         273
-biotype    1101    C2*     "Uridine"                         274
-biotype    1102    H2*     "Uridine"                         275
-biotype    1103    O2*     "Uridine"                         276
-biotype    1104    HO*     "Uridine"                         277
-biotype    1105    O3*     "Uridine"                         285
-biotype    1106    N1      "Uridine"                         254
-biotype    1107    C2      "Uridine"                         255
-biotype    1108    N3      "Uridine"                         257
-biotype    1109    C4      "Uridine"                         259
-biotype    1110    C5      "Uridine"                         261
-biotype    1111    C6      "Uridine"                         263
-biotype    1112    O2      "Uridine"                         256
-biotype    1113    H3      "Uridine"                         258
-biotype    1114    O4      "Uridine"                         260
-biotype    1115    H5      "Uridine"                         262
-biotype    1116    H6      "Uridine"                         264
-biotype    1117    O5*     "Deoxyadenosine"                  284
-biotype    1118    C5*     "Deoxyadenosine"                  265
-biotype    1119    H5*     "Deoxyadenosine"                  266
-biotype    1120    H5*     "Deoxyadenosine"                  266
-biotype    1121    C4*     "Deoxyadenosine"                  267
-biotype    1122    H4*     "Deoxyadenosine"                  268
-biotype    1123    O4*     "Deoxyadenosine"                  278
-biotype    1124    C1*     "Deoxyadenosine"                  270
-biotype    1125    H1*     "Deoxyadenosine"                  271
-biotype    1126    C3*     "Deoxyadenosine"                  272
-biotype    1127    H3*     "Deoxyadenosine"                  273
-biotype    1128    C2*     "Deoxyadenosine"                  279
-biotype    1129    H2*     "Deoxyadenosine"                  280
-biotype    1130    H2*     "Deoxyadenosine"                  280
-biotype    1131    O3*     "Deoxyadenosine"                  285
-biotype    1132    N9      "Deoxyadenosine"                  201
-biotype    1133    C4      "Deoxyadenosine"                  202
-biotype    1134    C5      "Deoxyadenosine"                  203
-biotype    1135    N7      "Deoxyadenosine"                  204
-biotype    1136    C8      "Deoxyadenosine"                  205
-biotype    1137    N3      "Deoxyadenosine"                  207
-biotype    1138    C2      "Deoxyadenosine"                  208
-biotype    1139    N1      "Deoxyadenosine"                  210
-biotype    1140    C6      "Deoxyadenosine"                  211
-biotype    1141    H2      "Deoxyadenosine"                  209
-biotype    1142    N6      "Deoxyadenosine"                  212
-biotype    1143    H61     "Deoxyadenosine"                  213
-biotype    1144    H62     "Deoxyadenosine"                  214
-biotype    1145    H8      "Deoxyadenosine"                  206
-biotype    1146    O5*     "Deoxyguanosine"                  284
-biotype    1147    C5*     "Deoxyguanosine"                  265
-biotype    1148    H5*     "Deoxyguanosine"                  266
-biotype    1149    H5*     "Deoxyguanosine"                  266
-biotype    1150    C4*     "Deoxyguanosine"                  267
-biotype    1151    H4*     "Deoxyguanosine"                  268
-biotype    1152    O4*     "Deoxyguanosine"                  278
-biotype    1153    C1*     "Deoxyguanosine"                  270
-biotype    1154    H1*     "Deoxyguanosine"                  271
-biotype    1155    C3*     "Deoxyguanosine"                  272
-biotype    1156    H3*     "Deoxyguanosine"                  273
-biotype    1157    C2*     "Deoxyguanosine"                  279
-biotype    1158    H2*     "Deoxyguanosine"                  280
-biotype    1159    H2*     "Deoxyguanosine"                  280
-biotype    1160    O3*     "Deoxyguanosine"                  285
-biotype    1161    N9      "Deoxyguanosine"                  215
-biotype    1162    C4      "Deoxyguanosine"                  216
-biotype    1163    C5      "Deoxyguanosine"                  217
-biotype    1164    N7      "Deoxyguanosine"                  218
-biotype    1165    C8      "Deoxyguanosine"                  219
-biotype    1166    N3      "Deoxyguanosine"                  221
-biotype    1167    C2      "Deoxyguanosine"                  222
-biotype    1168    N1      "Deoxyguanosine"                  226
-biotype    1169    C6      "Deoxyguanosine"                  228
-biotype    1170    H1      "Deoxyguanosine"                  227
-biotype    1171    N2      "Deoxyguanosine"                  223
-biotype    1172    H21     "Deoxyguanosine"                  224
-biotype    1173    H22     "Deoxyguanosine"                  225
-biotype    1174    O6      "Deoxyguanosine"                  229
-biotype    1175    H8      "Deoxyguanosine"                  220
-biotype    1176    O5*     "Deoxycytidine"                   284
-biotype    1177    C5*     "Deoxycytidine"                   265
-biotype    1178    H5*     "Deoxycytidine"                   266
-biotype    1179    H5*     "Deoxycytidine"                   266
-biotype    1180    C4*     "Deoxycytidine"                   267
-biotype    1181    H4*     "Deoxycytidine"                   268
-biotype    1182    O4*     "Deoxycytidine"                   278
-biotype    1183    C1*     "Deoxycytidine"                   270
-biotype    1184    H1*     "Deoxycytidine"                   271
-biotype    1185    C3*     "Deoxycytidine"                   272
-biotype    1186    H3*     "Deoxycytidine"                   273
-biotype    1187    C2*     "Deoxycytidine"                   279
-biotype    1188    H2*     "Deoxycytidine"                   280
-biotype    1189    H2*     "Deoxycytidine"                   280
-biotype    1190    O3*     "Deoxycytidine"                   285
-biotype    1191    N1      "Deoxycytidine"                   230
-biotype    1192    C2      "Deoxycytidine"                   231
-biotype    1193    N3      "Deoxycytidine"                   233
-biotype    1194    C4      "Deoxycytidine"                   234
-biotype    1195    C5      "Deoxycytidine"                   238
-biotype    1196    C6      "Deoxycytidine"                   240
-biotype    1197    O2      "Deoxycytidine"                   232
-biotype    1198    N4      "Deoxycytidine"                   235
-biotype    1199    H41     "Deoxycytidine"                   236
-biotype    1200    H42     "Deoxycytidine"                   237
-biotype    1201    H5      "Deoxycytidine"                   239
-biotype    1202    H6      "Deoxycytidine"                   241
-biotype    1203    O5*     "Deoxythymidine"                  284
-biotype    1204    C5*     "Deoxythymidine"                  265
-biotype    1205    H5*     "Deoxythymidine"                  266
-biotype    1206    H5*     "Deoxythymidine"                  266
-biotype    1207    C4*     "Deoxythymidine"                  267
-biotype    1208    H4*     "Deoxythymidine"                  268
-biotype    1209    O4*     "Deoxythymidine"                  278
-biotype    1210    C1*     "Deoxythymidine"                  270
-biotype    1211    H1*     "Deoxythymidine"                  271
-biotype    1212    C3*     "Deoxythymidine"                  272
-biotype    1213    H3*     "Deoxythymidine"                  273
-biotype    1214    C2*     "Deoxythymidine"                  279
-biotype    1215    H2*     "Deoxythymidine"                  280
-biotype    1216    H2*     "Deoxythymidine"                  280
-biotype    1217    O3*     "Deoxythymidine"                  285
-biotype    1218    N1      "Deoxythymidine"                  242
-biotype    1219    C2      "Deoxythymidine"                  243
-biotype    1220    N3      "Deoxythymidine"                  245
-biotype    1221    C4      "Deoxythymidine"                  247
-biotype    1222    C5      "Deoxythymidine"                  249
-biotype    1223    C6      "Deoxythymidine"                  252
-biotype    1224    O2      "Deoxythymidine"                  244
-biotype    1225    H3      "Deoxythymidine"                  246
-biotype    1226    O4      "Deoxythymidine"                  248
-biotype    1227    C7      "Deoxythymidine"                  250
-biotype    1228    H7      "Deoxythymidine"                  251
-biotype    1229    H6      "Deoxythymidine"                  253
-biotype    1230    P       "Phosphodiester RNA"              281
-biotype    1231    OP      "Phosphodiester RNA"              283
-biotype    1232    O5*     "5'-Hydroxyl RNA"                 286
-biotype    1233    H5T     "5'-Hydroxyl RNA"                 287
-biotype    1234    O5*     "5'-Monophosphate OS RNA"         290
-biotype    1235    P       "5'-Monophosphate P RNA"          291
-biotype    1236    OP      "5'-Monophosphate OP RNA"         292
-biotype    1237    O3*     "3'-Hydroxyl RNA"                 288
-biotype    1238    H3T     "3'-Hydroxyl RNA"                 289
-biotype    1239    O3*     "3'-Monophosphate OS RNA"         293
-biotype    1240    P       "3'-Monophosphate P RNA"          294
-biotype    1241    OP      "3'-Monophosphate OP RNA"         295
-biotype    1242    P       "Phosphodiester DNA"              282
-biotype    1243    OP      "Phosphodiester DNA"              283
-biotype    1244    O5*     "5'-Hydroxyl DNA"                 286
-biotype    1245    H5T     "5'-Hydroxyl DNA"                 287
-biotype    1246    O5*     "5'-Monophosphate OS DNA"         290
-biotype    1247    P       "5'-Monophosphate P DNA"          291
-biotype    1248    OP      "5'-Monophosphate OP DNA"         292
-biotype    1249    O3*     "3'-Hydroxyl DNA"                 288
-biotype    1250    H3T     "3'-Hydroxyl DNA"                 289
-biotype    1251    O3*     "3'-Monophosphate OS DNA"         293
-biotype    1252    P       "3'-Monophosphate P DNA"          294
-biotype    1253    OP      "3'-Monophosphate OP DNA"         295
-biotype    2001    O       "Water"                           115
-biotype    2002    H       "Water"                           116
-biotype    2004    NA      "Sodium Ion"                      122
-biotype    2005    K       "Potassium Ion"                   124
-biotype    2006    RB      "Rubidium Ion"                    126
-biotype    2007    CS      "Cesium Ion"                      127
-biotype    2008    MG      "Magnesium Ion"                   123
-biotype    2009    CA      "Calcium Ion"                     125
-biotype    2013    CL      "Chloride Ion"                    131
-biotype    2016    ZN      "Zinc Ion"                        129
+biotype    1001    O5*     "Adenosine"                       198
+biotype    1002    C5*     "Adenosine"                       179
+biotype    1003    H5*     "Adenosine"                       180
+biotype    1004    H5*     "Adenosine"                       180
+biotype    1005    C4*     "Adenosine"                       181
+biotype    1006    H4*     "Adenosine"                       182
+biotype    1007    O4*     "Adenosine"                       183
+biotype    1008    C1*     "Adenosine"                       184
+biotype    1009    H1*     "Adenosine"                       185
+biotype    1010    C3*     "Adenosine"                       186
+biotype    1011    H3*     "Adenosine"                       187
+biotype    1012    C2*     "Adenosine"                       188
+biotype    1013    H2*     "Adenosine"                       189
+biotype    1014    O2*     "Adenosine"                       190
+biotype    1015    HO*     "Adenosine"                       191
+biotype    1016    O3*     "Adenosine"                       199
+biotype    1017    N9      "Adenosine"                       115
+biotype    1018    C4      "Adenosine"                       116
+biotype    1019    C5      "Adenosine"                       117
+biotype    1020    N7      "Adenosine"                       118
+biotype    1021    C8      "Adenosine"                       119
+biotype    1022    N3      "Adenosine"                       121
+biotype    1023    C2      "Adenosine"                       122
+biotype    1024    N1      "Adenosine"                       124
+biotype    1025    C6      "Adenosine"                       125
+biotype    1026    H2      "Adenosine"                       123
+biotype    1027    N6      "Adenosine"                       126
+biotype    1028    H61     "Adenosine"                       127
+biotype    1029    H62     "Adenosine"                       128
+biotype    1030    H8      "Adenosine"                       120
+biotype    1031    O5*     "Guanosine"                       198
+biotype    1032    C5*     "Guanosine"                       179
+biotype    1033    H5*     "Guanosine"                       180
+biotype    1034    H5*     "Guanosine"                       180
+biotype    1035    C4*     "Guanosine"                       181
+biotype    1036    H4*     "Guanosine"                       182
+biotype    1037    O4*     "Guanosine"                       183
+biotype    1038    C1*     "Guanosine"                       184
+biotype    1039    H1*     "Guanosine"                       185
+biotype    1040    C3*     "Guanosine"                       186
+biotype    1041    H3*     "Guanosine"                       187
+biotype    1042    C2*     "Guanosine"                       188
+biotype    1043    H2*     "Guanosine"                       189
+biotype    1044    O2*     "Guanosine"                       190
+biotype    1045    HO*     "Guanosine"                       191
+biotype    1046    O3*     "Guanosine"                       199
+biotype    1047    N9      "Guanosine"                       129
+biotype    1048    C4      "Guanosine"                       130
+biotype    1049    C5      "Guanosine"                       131
+biotype    1050    N7      "Guanosine"                       132
+biotype    1051    C8      "Guanosine"                       133
+biotype    1052    N3      "Guanosine"                       135
+biotype    1053    C2      "Guanosine"                       136
+biotype    1054    N1      "Guanosine"                       140
+biotype    1055    C6      "Guanosine"                       142
+biotype    1056    H1      "Guanosine"                       141
+biotype    1057    N2      "Guanosine"                       137
+biotype    1058    H21     "Guanosine"                       138
+biotype    1059    H22     "Guanosine"                       139
+biotype    1060    O6      "Guanosine"                       143
+biotype    1061    H8      "Guanosine"                       134
+biotype    1062    O5*     "Cytidine"                        198
+biotype    1063    C5*     "Cytidine"                        179
+biotype    1064    H5*     "Cytidine"                        180
+biotype    1065    H5*     "Cytidine"                        180
+biotype    1066    C4*     "Cytidine"                        181
+biotype    1067    H4*     "Cytidine"                        182
+biotype    1068    O4*     "Cytidine"                        183
+biotype    1069    C1*     "Cytidine"                        184
+biotype    1070    H1*     "Cytidine"                        185
+biotype    1071    C3*     "Cytidine"                        186
+biotype    1072    H3*     "Cytidine"                        187
+biotype    1073    C2*     "Cytidine"                        188
+biotype    1074    H2*     "Cytidine"                        189
+biotype    1075    O2*     "Cytidine"                        190
+biotype    1076    HO*     "Cytidine"                        191
+biotype    1077    O3*     "Cytidine"                        199
+biotype    1078    N1      "Cytidine"                        144
+biotype    1079    C2      "Cytidine"                        145
+biotype    1080    N3      "Cytidine"                        147
+biotype    1081    C4      "Cytidine"                        148
+biotype    1082    C5      "Cytidine"                        152
+biotype    1083    C6      "Cytidine"                        154
+biotype    1084    O2      "Cytidine"                        146
+biotype    1085    N4      "Cytidine"                        149
+biotype    1086    H41     "Cytidine"                        150
+biotype    1087    H42     "Cytidine"                        151
+biotype    1088    H5      "Cytidine"                        153
+biotype    1089    H6      "Cytidine"                        155
+biotype    1090    O5*     "Uridine"                         198
+biotype    1091    C5*     "Uridine"                         179
+biotype    1092    H5*     "Uridine"                         180
+biotype    1093    H5*     "Uridine"                         180
+biotype    1094    C4*     "Uridine"                         181
+biotype    1095    H4*     "Uridine"                         182
+biotype    1096    O4*     "Uridine"                         183
+biotype    1097    C1*     "Uridine"                         184
+biotype    1098    H1*     "Uridine"                         185
+biotype    1099    C3*     "Uridine"                         186
+biotype    1100    H3*     "Uridine"                         187
+biotype    1101    C2*     "Uridine"                         188
+biotype    1102    H2*     "Uridine"                         189
+biotype    1103    O2*     "Uridine"                         190
+biotype    1104    HO*     "Uridine"                         191
+biotype    1105    O3*     "Uridine"                         199
+biotype    1106    N1      "Uridine"                         168
+biotype    1107    C2      "Uridine"                         169
+biotype    1108    N3      "Uridine"                         171
+biotype    1109    C4      "Uridine"                         173
+biotype    1110    C5      "Uridine"                         175
+biotype    1111    C6      "Uridine"                         177
+biotype    1112    O2      "Uridine"                         170
+biotype    1113    H3      "Uridine"                         172
+biotype    1114    O4      "Uridine"                         174
+biotype    1115    H5      "Uridine"                         176
+biotype    1116    H6      "Uridine"                         178
+biotype    1117    O5*     "Deoxyadenosine"                  198
+biotype    1118    C5*     "Deoxyadenosine"                  179
+biotype    1119    H5*     "Deoxyadenosine"                  180
+biotype    1120    H5*     "Deoxyadenosine"                  180
+biotype    1121    C4*     "Deoxyadenosine"                  181
+biotype    1122    H4*     "Deoxyadenosine"                  182
+biotype    1123    O4*     "Deoxyadenosine"                  192
+biotype    1124    C1*     "Deoxyadenosine"                  184
+biotype    1125    H1*     "Deoxyadenosine"                  185
+biotype    1126    C3*     "Deoxyadenosine"                  186
+biotype    1127    H3*     "Deoxyadenosine"                  187
+biotype    1128    C2*     "Deoxyadenosine"                  193
+biotype    1129    H2*     "Deoxyadenosine"                  194
+biotype    1130    H2*     "Deoxyadenosine"                  194
+biotype    1131    O3*     "Deoxyadenosine"                  199
+biotype    1132    N9      "Deoxyadenosine"                  115
+biotype    1133    C4      "Deoxyadenosine"                  116
+biotype    1134    C5      "Deoxyadenosine"                  117
+biotype    1135    N7      "Deoxyadenosine"                  118
+biotype    1136    C8      "Deoxyadenosine"                  119
+biotype    1137    N3      "Deoxyadenosine"                  121
+biotype    1138    C2      "Deoxyadenosine"                  122
+biotype    1139    N1      "Deoxyadenosine"                  124
+biotype    1140    C6      "Deoxyadenosine"                  125
+biotype    1141    H2      "Deoxyadenosine"                  123
+biotype    1142    N6      "Deoxyadenosine"                  126
+biotype    1143    H61     "Deoxyadenosine"                  127
+biotype    1144    H62     "Deoxyadenosine"                  128
+biotype    1145    H8      "Deoxyadenosine"                  120
+biotype    1146    O5*     "Deoxyguanosine"                  198
+biotype    1147    C5*     "Deoxyguanosine"                  179
+biotype    1148    H5*     "Deoxyguanosine"                  180
+biotype    1149    H5*     "Deoxyguanosine"                  180
+biotype    1150    C4*     "Deoxyguanosine"                  181
+biotype    1151    H4*     "Deoxyguanosine"                  182
+biotype    1152    O4*     "Deoxyguanosine"                  192
+biotype    1153    C1*     "Deoxyguanosine"                  184
+biotype    1154    H1*     "Deoxyguanosine"                  185
+biotype    1155    C3*     "Deoxyguanosine"                  186
+biotype    1156    H3*     "Deoxyguanosine"                  187
+biotype    1157    C2*     "Deoxyguanosine"                  193
+biotype    1158    H2*     "Deoxyguanosine"                  194
+biotype    1159    H2*     "Deoxyguanosine"                  194
+biotype    1160    O3*     "Deoxyguanosine"                  199
+biotype    1161    N9      "Deoxyguanosine"                  129
+biotype    1162    C4      "Deoxyguanosine"                  130
+biotype    1163    C5      "Deoxyguanosine"                  131
+biotype    1164    N7      "Deoxyguanosine"                  132
+biotype    1165    C8      "Deoxyguanosine"                  133
+biotype    1166    N3      "Deoxyguanosine"                  135
+biotype    1167    C2      "Deoxyguanosine"                  136
+biotype    1168    N1      "Deoxyguanosine"                  140
+biotype    1169    C6      "Deoxyguanosine"                  142
+biotype    1170    H1      "Deoxyguanosine"                  141
+biotype    1171    N2      "Deoxyguanosine"                  137
+biotype    1172    H21     "Deoxyguanosine"                  138
+biotype    1173    H22     "Deoxyguanosine"                  139
+biotype    1174    O6      "Deoxyguanosine"                  143
+biotype    1175    H8      "Deoxyguanosine"                  134
+biotype    1176    O5*     "Deoxycytidine"                   198
+biotype    1177    C5*     "Deoxycytidine"                   179
+biotype    1178    H5*     "Deoxycytidine"                   180
+biotype    1179    H5*     "Deoxycytidine"                   180
+biotype    1180    C4*     "Deoxycytidine"                   181
+biotype    1181    H4*     "Deoxycytidine"                   182
+biotype    1182    O4*     "Deoxycytidine"                   192
+biotype    1183    C1*     "Deoxycytidine"                   184
+biotype    1184    H1*     "Deoxycytidine"                   185
+biotype    1185    C3*     "Deoxycytidine"                   186
+biotype    1186    H3*     "Deoxycytidine"                   187
+biotype    1187    C2*     "Deoxycytidine"                   193
+biotype    1188    H2*     "Deoxycytidine"                   194
+biotype    1189    H2*     "Deoxycytidine"                   194
+biotype    1190    O3*     "Deoxycytidine"                   199
+biotype    1191    N1      "Deoxycytidine"                   144
+biotype    1192    C2      "Deoxycytidine"                   145
+biotype    1193    N3      "Deoxycytidine"                   147
+biotype    1194    C4      "Deoxycytidine"                   148
+biotype    1195    C5      "Deoxycytidine"                   152
+biotype    1196    C6      "Deoxycytidine"                   154
+biotype    1197    O2      "Deoxycytidine"                   146
+biotype    1198    N4      "Deoxycytidine"                   149
+biotype    1199    H41     "Deoxycytidine"                   150
+biotype    1200    H42     "Deoxycytidine"                   151
+biotype    1201    H5      "Deoxycytidine"                   153
+biotype    1202    H6      "Deoxycytidine"                   155
+biotype    1203    O5*     "Deoxythymidine"                  198
+biotype    1204    C5*     "Deoxythymidine"                  179
+biotype    1205    H5*     "Deoxythymidine"                  180
+biotype    1206    H5*     "Deoxythymidine"                  180
+biotype    1207    C4*     "Deoxythymidine"                  181
+biotype    1208    H4*     "Deoxythymidine"                  182
+biotype    1209    O4*     "Deoxythymidine"                  192
+biotype    1210    C1*     "Deoxythymidine"                  184
+biotype    1211    H1*     "Deoxythymidine"                  185
+biotype    1212    C3*     "Deoxythymidine"                  186
+biotype    1213    H3*     "Deoxythymidine"                  187
+biotype    1214    C2*     "Deoxythymidine"                  193
+biotype    1215    H2*     "Deoxythymidine"                  194
+biotype    1216    H2*     "Deoxythymidine"                  194
+biotype    1217    O3*     "Deoxythymidine"                  199
+biotype    1218    N1      "Deoxythymidine"                  156
+biotype    1219    C2      "Deoxythymidine"                  157
+biotype    1220    N3      "Deoxythymidine"                  159
+biotype    1221    C4      "Deoxythymidine"                  161
+biotype    1222    C5      "Deoxythymidine"                  163
+biotype    1223    C6      "Deoxythymidine"                  166
+biotype    1224    O2      "Deoxythymidine"                  158
+biotype    1225    H3      "Deoxythymidine"                  160
+biotype    1226    O4      "Deoxythymidine"                  162
+biotype    1227    C7      "Deoxythymidine"                  164
+biotype    1228    H7      "Deoxythymidine"                  165
+biotype    1229    H6      "Deoxythymidine"                  167
+biotype    1230    P       "Phosphodiester RNA"              195
+biotype    1231    OP      "Phosphodiester RNA"              197
+biotype    1232    O5*     "5'-Hydroxyl RNA"                 200
+biotype    1233    H5T     "5'-Hydroxyl RNA"                 201
+biotype    1234    O5*     "5'-Monophosphate OS RNA"         204
+biotype    1235    P       "5'-Monophosphate P RNA"          205
+biotype    1236    OP      "5'-Monophosphate OP RNA"         206
+biotype    1237    O3*     "3'-Hydroxyl RNA"                 202
+biotype    1238    H3T     "3'-Hydroxyl RNA"                 203
+biotype    1239    O3*     "3'-Monophosphate OS RNA"         207
+biotype    1240    P       "3'-Monophosphate P RNA"          208
+biotype    1241    OP      "3'-Monophosphate OP RNA"         209
+biotype    1242    P       "Phosphodiester DNA"              196
+biotype    1243    OP      "Phosphodiester DNA"              197
+biotype    1244    O5*     "5'-Hydroxyl DNA"                 200
+biotype    1245    H5T     "5'-Hydroxyl DNA"                 201
+biotype    1246    O5*     "5'-Monophosphate OS DNA"         204
+biotype    1247    P       "5'-Monophosphate P DNA"          205
+biotype    1248    OP      "5'-Monophosphate OP DNA"         206
+biotype    1249    O3*     "3'-Hydroxyl DNA"                 202
+biotype    1250    H3T     "3'-Hydroxyl DNA"                 203
+biotype    1251    O3*     "3'-Monophosphate OS DNA"         207
+biotype    1252    P       "3'-Monophosphate P DNA"          208
+biotype    1253    OP      "3'-Monophosphate OP DNA"         209
+biotype    2001    O       "Water"                           216
+biotype    2002    H       "Water"                           217
+biotype    2004    NA      "Sodium Ion"                      223
+biotype    2005    K       "Potassium Ion"                   225
+biotype    2006    RB      "Rubidium Ion"                    227
+biotype    2007    CS      "Cesium Ion"                      228
+biotype    2008    MG      "Magnesium Ion"                   224
+biotype    2009    CA      "Calcium Ion"                     226
+biotype    2013    CL      "Chloride Ion"                    232
+biotype    2016    ZN      "Zinc Ion"                        230
