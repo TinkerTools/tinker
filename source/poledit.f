@@ -4378,7 +4378,7 @@ c
       use units
       implicit none
       integer i,j,k
-      integer ii,it,ic
+      integer ii,it
       integer ixyz,ikey
       integer size,atlast
       integer xaxe,yaxe,zaxe

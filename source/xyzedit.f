@@ -1455,7 +1455,7 @@ c
       use inform
       use titles
       implicit none
-      integer i,j,k,imod
+      integer i,imod
       integer size,crdsiz
       real*8 crdmin,crdmax
       character*2 crdc

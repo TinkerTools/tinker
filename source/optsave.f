@@ -38,7 +38,7 @@ c
       use usage
       use zcoord
       implicit none
-      integer i,j,ii,lext
+      integer i,ii,lext
       integer ixyz,ifrc
       integer iind,iend
       integer ncycle,nvar

@@ -59,6 +59,11 @@ c
       call molecule
       call cluster
 c
+c     search for biomolecule residues and store as tier names
+c
+      call findpro
+      call findnuc
+c
 c     find any pisystem atoms, bonds and torsional angles
 c
       call orbital

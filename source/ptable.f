@@ -23,7 +23,7 @@ c
       module ptable
       implicit none
       integer maxele
-      parameter (maxele=112)
+      parameter (maxele=118)
       real*8 atmass(maxele)
       real*8 vdwrad(maxele)
       real*8 covrad(maxele)
