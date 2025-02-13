@@ -180,13 +180,14 @@ c
      &             .and. nid.eq.3 .and. nie.eq.4 .and.
      &          aia.eq.6 .and. aib.eq.6 .and. aic.eq.7
      &             .and. aid.eq.6 .and. aie.eq.6) then
+               nhyd = 0
                do j = 1, n12(ie)
                   ij = i12(j,ie)
                   aij = atomic(ij)
                   if (aij .eq. 1)  nhyd = nhyd + 1
                end do
                if (nhyd .eq. 3) then
-               tier(ia) = 'ACE'
+                  tier(ia) = 'ACE'
                   do j = 1, n12(ie)
                      ij = i12(j,ie)
                      aij = atomic(ij)

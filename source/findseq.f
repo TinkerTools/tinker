@@ -314,22 +314,22 @@ c
       if (debug .and. nseq.ne.0) then
          write (iout,10)
    10    format (/,' Biopolymer Sequence Residues :'
-     &           //,' Residue',7x,'Name',5x,'Anchor Atom',/)
+     &           //,' Residue',8x,'Name',5x,'Anchor Atom',/)
          do i = 1, nseq
             write (iout,20)  i,seq(i),seqatm(i)
-   20       format (i6,10x,a3,5x,i8)
+   20       format (i6,11x,a3,5x,i8)
          end do
          write (iout,30)
    30    format (/,' Biopolymer Sequence Chains :'
-     &           //,' Chain',6x,'Name',5x,'Residue Range',6x,'Type',/)
+     &           //,'   Chain',8x,'Name',5x,'Residue Range',6x,'Type',/)
          do i = 1, nchain
             if (chnnam(i) .eq. ' ') then
                write (iout,40)  i,(ichain(j,i),j=1,2),chntyp(i)
-   40          format (i6,8x,'-',5x,2i6,8x,a7)
+   40          format (i6,12x,'-',5x,2i6,8x,a7)
             else
                write (iout,50)  i,chnnam(i),(ichain(j,i),j=1,2),
      &                          chntyp(i)
-   50          format (i6,8x,a1,5x,2i6,8x,a7)
+   50          format (i6,12x,a1,5x,2i6,8x,a7)
             end if
          end do
       end if

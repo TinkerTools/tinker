@@ -51,9 +51,11 @@ c
 c
 c     set up the structure and mechanics calculation
 c
+      ixyz = 0
       call initial
       call getcart (ixyz)
       call mechanic
+      xyzfile = filename
 c
 c     get the desired types of analysis to be performed
 c
@@ -180,25 +182,6 @@ c
          debug = .false.
       end if
 c
-c     reopen the coordinates file and read the first structure
-c
-      frame = 0
-      close (unit=ixyz)
-      ixyz = freeunit ()
-      xyzfile = filename
-      if (archive) then
-         call suffix (xyzfile,'xyz','old')
-         open (unit=ixyz,file=xyzfile,status ='old')
-         rewind (unit=ixyz)
-         call readxyz (ixyz)
-      else if (binary) then
-         call suffix (xyzfile,'dcd','old')
-         open (unit=ixyz,file=xyzfile,form='unformatted',status ='old')
-         rewind (unit=ixyz)
-         first = .true.
-         call readdcd (ixyz,first)
-      end if
-c
 c     get parameters used for molecular mechanics potentials
 c
       if (doparam .and. doconect) then
@@ -219,6 +202,7 @@ c
 c
 c     perform analysis for each successive coordinate structure
 c
+      frame = 0
       do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
