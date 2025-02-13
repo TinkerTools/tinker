@@ -407,6 +407,9 @@ OBJS =	action.o \
 	fields.o \
 	files.o \
 	final.o \
+	findnuc.o \
+	findpro.o \
+	findseq.o \
 	flatten.o \
 	fracs.o \
 	freefix.o \
@@ -729,6 +732,8 @@ OBJS =	action.o \
 	testrot.o \
 	testsurf.o \
 	testvir.o \
+	tettor.o \
+	tettors.o \
 	timer.o \
 	timerot.o \
 	titles.o \
@@ -742,6 +747,8 @@ OBJS =	action.o \
 	tortor.o \
 	tree.o \
 	trimtext.o \
+	tritor.o \
+	tritors.o \
 	unionball.o \
 	unitcell.o \
 	units.o \
@@ -1349,6 +1356,9 @@ libtinker.a: ${OBJS}
 	fields.o \
 	files.o \
 	final.o \
+	findnuc.o \
+	findpro.o \
+	findseq.o \
 	flatten.o \
 	fracs.o \
 	freeunit.o \
@@ -1631,6 +1641,8 @@ libtinker.a: ${OBJS}
 	tarray.o \
 	tcgstuf.o \
 	temper.o \
+	tettor.o \
+	tettors.o \
 	titles.o \
 	tncg.o \
 	torphase.o \
@@ -1641,6 +1653,8 @@ libtinker.a: ${OBJS}
 	tortor.o \
 	tree.o \
 	trimtext.o \
+	tritor.o \
+	tritors.o \
 	unionball.o \
 	unitcell.o \
 	units.o \
@@ -1897,7 +1911,10 @@ fftpack.o: math.o
 field.o: fields.o inform.o iounit.o keys.o potent.o sizes.o
 fields.o:
 files.o:
-final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o cflux.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o expol.o faces.o fft.o fields.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o kangs.o kantor.o katoms.o kbonds.o kcflux.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o kexpl.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolpr.o kpolr.o krepl.o ksolut.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o light.o limits.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o shapes.o socket.o solpot.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tors.o tortor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
+final.o: align.o analyz.o angang.o angbnd.o angtor.o atmlst.o bitor.o bndstr.o cell.o cflux.o charge.o chgpen.o chgtrn.o chunks.o couple.o deriv.o dipole.o disgeo.o domega.o expol.o faces.o fft.o fields.o fracs.o freeze.o group.o hessn.o hpmf.o ielscf.o improp.o imptor.o inform.o iounit.o kanang.o kangs.o kantor.o katoms.o kbonds.o kcflux.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o kexpl.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolpr.o kpolr.o krepl.o ksolut.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o light.o limits.o merck.o molcul.o moldyn.o mpole.o mrecip.o mutant.o neigh.o nonpol.o omega.o opbend.o opdist.o orbits.o paths.o pbstuf.o pdb.o piorbs.o pistuf.o pitors.o pme.o polar.o polgrp.o polopt.o polpcg.o poltcg.o potfit.o qmstuf.o refer.o repel.o restrn.o rgddyn.o rigid.o ring.o rotbnd.o shapes.o socket.o solpot.o solute.o stodyn.o strbnd.o strtor.o syntrn.o tarray.o tettor.o tors.o tortor.o tritor.o uprior.o urey.o usage.o vdw.o vibs.o warp.o
+findnuc.o: atomid.o atoms.o bitor.o couple.o
+findpro.o: atomid.o atoms.o bitor.o couple.o
+findseq.o: atomid.o atoms.o bitor.o couple.o inform.o iounit.o sequen.o tettor.o tritor.o
 flatten.o: atoms.o fields.o inform.o iounit.o keys.o warp.o
 fracs.o:
 freefix.o: iounit.o math.o units.o
@@ -2218,6 +2235,8 @@ testpol.o: atoms.o bound.o inform.o iounit.o limits.o minima.o mpole.o polar.o p
 testrot.o: domega.o energi.o inform.o iounit.o math.o omega.o zcoord.o
 testsurf.o: atomid.o atoms.o files.o iounit.o kvdws.o nonpol.o ptable.o vdwpot.o
 testvir.o: atoms.o bath.o bound.o boxes.o inform.o iounit.o math.o units.o virial.o
+tettor.o:
+tettors.o: atoms.o bitor.o couple.o tettor.o
 timer.o: atoms.o hescut.o inform.o iounit.o limits.o polpot.o
 timerot.o: hescut.o inform.o iounit.o limits.o omega.o polpot.o
 titles.o:
@@ -2231,6 +2250,8 @@ torsions.o: atoms.o bndstr.o couple.o tors.o
 tortor.o:
 tree.o:
 trimtext.o:
+tritor.o:
+tritors.o: atoms.o couple.o tors.o tritor.o
 unionball.o: iounit.o math.o shapes.o
 unitcell.o: bound.o boxes.o keys.o math.o
 units.o:

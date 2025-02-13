@@ -2920,7 +2920,7 @@
  BAR Iteration   9                         5.4945 Kcal/mol
  BAR Iteration  10                         5.4946 Kcal/mol
 
- Free Energy via BAR Iteration             5.4946 +/-   0.4408 Kcal/mol
+ Free Energy via BAR Estimate              5.4946 +/-   0.4408 Kcal/mol
  Free Energy via BAR Bootstrap             5.5030 +/-   0.2013 Kcal/mol
 
  Enthalpy from Potential Energy Averages :
@@ -2943,4 +2943,4 @@
 
  Enthalpy via BAR Estimate                14.7465 +/-   5.0316 Kcal/mol
  Entropy via BAR Estimate                0.030812 Kcal/mol/K
- BAR Estimate of -T*dS                    -9.2435 Kcal/mol
+ BAR Estimate -T*dS Value                 -9.2435 Kcal/mol

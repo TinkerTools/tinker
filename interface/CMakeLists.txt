@@ -159,11 +159,13 @@ add_library (tinkerObjF OBJECT
 ../source/strtor.f
 ../source/syntrn.f
 ../source/tarray.f
+../source/tettor.f
 ../source/titles.f
 ../source/torpot.f
 ../source/tors.f
 ../source/tortor.f
 ../source/tree.f
+../source/tritor.f
 ../source/units.f
 ../source/uprior.f
 ../source/urey.f
@@ -354,6 +356,9 @@ add_library (tinkerObjF OBJECT
 ../source/fftpack.f
 ../source/field.f
 ../source/final.f
+../source/findnuc.f
+../source/findpro.f
+../source/findseq.f
 ../source/flatten.f
 ../source/freeunit.f
 ../source/geometry.f
@@ -525,11 +530,13 @@ add_library (tinkerObjF OBJECT
 ../source/switch.f
 ../source/tcgstuf.f
 ../source/temper.f
+../source/tettors.f
 ../source/tncg.f
 ../source/torphase.f
 ../source/torque.f
 ../source/torsions.f
 ../source/trimtext.f
+../source/tritors.f
 ../source/unionball.f
 ../source/unitcell.f
 ../source/verlet.f

@@ -99,15 +99,15 @@ endif()
 
 set(_FILES
     action active alfmol align alterchg alterpol analysis analyz angang
-    angbnd angles angpot angtor argue ascii atmlst atomid atoms attach baoab
-    basefile bath beeman bicubic bitor bitors bndpot bndstr bonds born
-    bound bounds boxes bussi calendar cell center cflux charge chgpen
+    angbnd angles angpot angtor argue ascii atmlst atomid atoms attach
+    baoab basefile bath beeman bicubic bitor bitors bndpot bndstr bonds
+    born bound bounds boxes bussi calendar cell center cflux charge chgpen
     chgpot chgtrn chkpole chkring chksymm chkxyz cholesky chrono chunks
     clock cluster column command connect connolly control couple cspline
     ctrpot cutoffs damping dcflux deflate delete deriv dexpol diagq diffeq
     dipole disgeo disp dma domega dsppot eangang eangang1 eangang2 eangang3
-    eangle eangle1 eangle2 eangle3 eangtor eangtor1 eangtor2 eangtor3 ebond
-    ebond1 ebond2 ebond3 ebuck ebuck1 ebuck2 ebuck3 echarge echarge1
+    eangle eangle1 eangle2 eangle3 eangtor eangtor1 eangtor2 eangtor3
+    ebond ebond1 ebond2 ebond3 ebuck ebuck1 ebuck2 ebuck3 echarge echarge1
     echarge2 echarge3 echgdpl echgdpl1 echgdpl2 echgdpl3 echgtrn echgtrn1
     echgtrn2 echgtrn3 edipole edipole1 edipole2 edipole3 edisp edisp1
     edisp2 edisp3 egauss egauss1 egauss2 egauss3 egeom egeom1 egeom2 egeom3
@@ -121,28 +121,28 @@ set(_FILES
     estrbnd1 estrbnd2 estrbnd3 estrtor estrtor1 estrtor2 estrtor3 etors
     etors1 etors2 etors3 etortor etortor1 etortor2 etortor3 eurey eurey1
     eurey2 eurey3 evcorr ewald exfield expol extfld extra extra1 extra2
-    extra3 faces fatal fft fft3d fftpack field fields files final flatten
-    fracs freeunit freeze geometry getarc getcart getdcd getint getkey
-    getmol getmol2 getnumb getpdb getprm getref getstring gettext getword
-    getxyz ghmcstep gkstuf gradient gradrgd gradrot group groups grpline
-    gyrate hescut hessian hessn hessrgd hessrot hpmf hybrid ielscf image
-    impose improp imptor induce inertia inform initatom initial initneck
-    initprm initres initrot insert inter invbeta invert iounit jacobi
-    kanang kangang kangle kangs kangtor kantor katom katoms kbond kbonds
-    kcflux kcharge kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole
-    kdisp kdsp kewald kexpl kexpol kextra keys kgeom khbond kimprop
-    kimptor kinetic kiprop kitors kmetal kmpole kmulti kopbend kopbnd
-    kopdist kopdst korbit korbs kpitor kpitors kpolar kpolpr kpolr krepel
-    krepl ksolut ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor
-    ktrtor kundrot kurey kurybr kvdw kvdwpr kvdws lattice lbfgs light
-    lights limits linmin lusolve makeint makeref makexyz math maxwell
-    mdinit mdrest mdsave mdstat mdstuf mechanic merck merge minima molcul
-    moldyn molecule moment moments mplpot mpole mrecip mutant mutate
-    nblist neck neigh nextarg nexttext nonpol nose nspline nucleo
-    number numeral numgrad ocvm omega opbend opdist openend openmp
-    optinit optsave orbital orbits orient orthog output overlap params
-    paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf
-    pmpb polar polgrp polopt polpcg polpot poltcg polymer potent
+    extra3 faces fatal fft fft3d fftpack field fields files final findnuc
+    findpro findseq flatten fracs freeunit freeze geometry getarc getcart
+    getdcd getint getkey getmol getmol2 getnumb getpdb getprm getref
+    getstring gettext getword getxyz ghmcstep gkstuf gradient gradrgd
+    gradrot group groups grpline gyrate hescut hessian hessn hessrgd
+    hessrot hpmf hybrid ielscf image impose improp imptor induce inertia
+    inform initatom initial initneck initprm initres initrot insert inter
+    invbeta invert iounitjacobi kanang kangang kangle kangs kangtor kantor
+    katom katoms kbond kbonds kcflux kcharge kchgflx kchgtrn kchrge kcpen
+    kctrn kdipol kdipole kdisp kdsp kewald kexpl kexpol kextra keys kgeom
+    khbond kimprop kimptor kinetic kiprop kitors kmetal kmpole kmulti
+    kopbend kopbnd kopdist kopdst korbit korbs kpitor kpitors kpolar
+    kpolpr kpolr krepel krepl ksolut ksolv kstbnd kstrbnd kstrtor ksttor
+    ktors ktorsn ktortor ktrtor kundrot kurey kurybr kvdw kvdwpr kvdws
+    lattice lbfgs light lights limits linmin lusolve makeint makeref
+    makexyz math maxwell mdinit mdrest mdsave mdstat mdstuf mechanic
+    merck merge minima molcul moldyn molecule moment moments mplpot mpole
+    mrecip mutant mutate nblist neck neigh nextarg nexttext nonpol nose
+    nspline nucleo number numeral numgrad ocvm omega opbend opdist openend
+    openmp optinit optsave orbital orbits orient orthog output overlap
+    params paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme
+    pmestuf pmpb polar polgrp polopt polpcg polpot poltcg polymer potent
     potfit predict pressure prmkey promo prtarc prtdyn prterr prtfrc
     prtint prtmol2 prtpdb prtprm prtseq prtuind prtvel prtxyz ptable
     qmstuf qrsolve quatfit random rattle readcart readdcd readdyn
@@ -152,10 +152,10 @@ set(_FILES
     rxnfld rxnpot scales sdstep search sequen server setprm shakeup
     shapes shunt sigmoid simplex sizes sktstuf socket solpot solute sort
     square stodyn strbnd strtor suffix surface surfatom switch syntrn
-    tarray tcgstuf temper titles tncg torphase torpot torque tors torsions
-    tortor tree trimtext unionball unitcell units uprior urey urypot usage
-    valfit vdw vdwpot verlet version vibs virial volume warp xtals xyzatm
-    zatom zclose zcoord
+    tarray tcgstuf temper tettor tettors titles tncg torphase torpot
+    torque tors torsions tortor tree trimtext tritor tritors unionball
+    unitcell units uprior urey urypot usage valfit vdw vdwpot verlet
+    version vibs virial volume warp xtals xyzatm zatom zclose zcoord
 )
 
 set(_LIB "")

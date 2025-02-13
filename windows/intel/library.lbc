@@ -218,6 +218,9 @@ field.obj
 fields.obj
 files.obj
 final.obj
+findnuc.obj
+findpro.obj
+findseq.obj
 flatten.obj
 fracs.obj
 freeunit.obj
@@ -499,6 +502,8 @@ syntrn.obj
 tarray.obj
 tcgstuf.obj
 temper.obj
+tettor.obj
+tettors.obj
 titles.obj
 tncg.obj
 torphase.obj
@@ -509,6 +514,8 @@ torsions.obj
 tortor.obj
 tree.obj
 trimtext.obj
+tritor.obj
+tritors.obj
 unionball.obj
 unitcell.obj
 units.obj

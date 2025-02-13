@@ -167,11 +167,13 @@ gfortran -c -O3 -ffast-math -fopenmp strbnd.f
 gfortran -c -O3 -ffast-math -fopenmp strtor.f
 gfortran -c -O3 -ffast-math -fopenmp syntrn.f
 gfortran -c -O3 -ffast-math -fopenmp tarray.f
+gfortran -c -O3 -ffast-math -fopenmp tettor.f
 gfortran -c -O3 -ffast-math -fopenmp titles.f
 gfortran -c -O3 -ffast-math -fopenmp torpot.f
 gfortran -c -O3 -ffast-math -fopenmp tors.f
 gfortran -c -O3 -ffast-math -fopenmp tortor.f
 gfortran -c -O3 -ffast-math -fopenmp tree.f
+gfortran -c -O3 -ffast-math -fopenmp tritor.f
 gfortran -c -O3 -ffast-math -fopenmp units.f
 gfortran -c -O3 -ffast-math -fopenmp uprior.f
 gfortran -c -O3 -ffast-math -fopenmp urey.f
@@ -377,6 +379,9 @@ gfortran -c -O3 -ffast-math -fopenmp fft3d.f
 gfortran -c -O3 -ffast-math -fopenmp fftpack.f
 gfortran -c -O3 -ffast-math -fopenmp field.f
 gfortran -c -O3 -ffast-math -fopenmp final.f
+gfortran -c -O3 -ffast-math -fopenmp findnuc.f
+gfortran -c -O3 -ffast-math -fopenmp findpro.f
+gfortran -c -O3 -ffast-math -fopenmp findseq.f
 gfortran -c -O3 -ffast-math -fopenmp flatten.f
 gfortran -c -O3 -ffast-math -fopenmp freefix.f
 gfortran -c -O3 -ffast-math -fopenmp freeunit.f
@@ -587,6 +592,7 @@ gfortran -c -O3 -ffast-math -fopenmp testpol.f
 gfortran -c -O3 -ffast-math -fopenmp testrot.f
 gfortran -c -O3 -ffast-math -fopenmp testsurf.f
 gfortran -c -O3 -ffast-math -fopenmp testvir.f
+gfortran -c -O3 -ffast-math -fopenmp tettors.f
 gfortran -c -O3 -ffast-math -fopenmp timer.f
 gfortran -c -O3 -ffast-math -fopenmp timerot.f
 gfortran -c -O3 -ffast-math -fopenmp tncg.f
@@ -595,6 +601,7 @@ gfortran -c -O3 -ffast-math -fopenmp torque.f
 gfortran -c -O3 -ffast-math -fopenmp torsfit.f
 gfortran -c -O3 -ffast-math -fopenmp torsions.f
 gfortran -c -O3 -ffast-math -fopenmp trimtext.f
+gfortran -c -O3 -ffast-math -fopenmp tritors.f
 gfortran -c -O3 -ffast-math -fopenmp unionball.f
 gfortran -c -O3 -ffast-math -fopenmp unitcell.f
 gfortran -c -O3 -ffast-math -fopenmp valence.f

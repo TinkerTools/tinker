@@ -1437,6 +1437,18 @@ void field_();
 void final_();
 #define tinker_f_final final_
 
+// findnuc.f
+void findnuc_();
+#define tinker_f_findnuc findnuc_
+
+// findpro.f
+void findpro_();
+#define tinker_f_findpro findpro_
+
+// findseq.f
+void findseq_();
+#define tinker_f_findseq findseq_
+
 // flatten.f
 void flatten_();
 #define tinker_f_flatten flatten_
@@ -2631,6 +2643,10 @@ void temper_(double* dt, double* eksum, double* ekin, double* temp);
 void temper2_(double* dt, double* temp);
 #define tinker_f_temper2 temper2_
 
+// tettors.f
+void tettors_();
+#define tinker_f_tettors tettors_
+
 // tncg.f
 void tncg_(char* mode, char* method, int* nvar, double* x0, double* minimum, double* grdmin, double (*fgvalue)(double*, double*), void (*hmatrix)(char*, double*, double*, int*, int*, int*, double*, tinker_fchar_len_t), void (*optsave)(int*, double*, double*), tinker_fchar_len_t mode_cap, tinker_fchar_len_t method_cap);
 inline void tinker_f_tncg(tinker_fchars mode, tinker_fchars method, int* nvar, double* x0, double* minimum, double* grdmin, double (*fgvalue)(double*, double*), void (*hmatrix)(char*, double*, double*, int*, int*, int*, double*, tinker_fchar_len_t), void (*optsave)(int*, double*, double*)) {
@@ -2678,6 +2694,10 @@ void lowcase_(char* string, tinker_fchar_len_t string_cap);
 inline void tinker_f_lowcase(tinker_fchars string) {
     return lowcase_(string.string, string.capacity);
 }
+
+// tritors.f
+void tritors_();
+#define tinker_f_tritors tritors_
 
 // unionball.f
 void unionball_(int* n, double* x, double* y, double* z, double* rad, double* weight, double* probe, int* doderiv, int* dovol, double* surf, double* vol, double* asurf, double* avol, double* dsurf, double* dvol);

@@ -3,7 +3,7 @@
 #include "macro.hh"
 
 namespace tinker { namespace ptable {
-const int maxele = 112;
+const int maxele = 118;
 extern double (&atmass)[maxele];
 extern double (&vdwrad)[maxele];
 extern double (&covrad)[maxele];

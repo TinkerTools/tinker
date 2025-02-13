@@ -49,12 +49,6 @@ c
       character*3 label
 c
 c
-c     initialize the tier name associated with each atom
-c
-      do i = 1, n
-         tier(i) = '   '
-      end do
-c
 c     cycle over bitorsions to search for nucleotides
 c
       do i = 1, nbitor

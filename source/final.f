@@ -126,8 +126,10 @@ c
       use strtor
       use syntrn
       use tarray
+      use tettor
       use tors
       use tortor
+      use tritor
       use uprior
       use urey
       use usage
@@ -1152,6 +1154,10 @@ c
       if (allocated(tindex))  deallocate (tindex)
       if (allocated(tdipdip))  deallocate (tdipdip)
 c
+c     deallocation of global arrays from module tettor
+c
+      if (allocated(ibitor))  deallocate (itettor)
+c
 c     deallocation of global arrays from module tors
 c
       if (allocated(itors))  deallocate (itors)
@@ -1165,6 +1171,10 @@ c
 c     deallocation of global arrays from module tortor
 c
       if (allocated(itt))  deallocate (itt)
+c
+c     deallocation of global arrays from module tritor
+c
+      if (allocated(ibitor))  deallocate (itritor)
 c
 c     deallocation of global arrays from module uprior
 c

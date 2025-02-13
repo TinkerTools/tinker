@@ -25,7 +25,7 @@ c
       use bitor
       use couple
       implicit none
-      integer i,j
+      integer i,j,nhyd
       integer ia,ib,ic
       integer id,ie,ij
       integer nia,nib,nic
@@ -77,50 +77,46 @@ c
 c
 c     check for five-atom stretch of polypeptide backbone
 c
-         proceed = .true.
-         if (nia.ne.3 .or. nib.ne.3 .or. nic.ne.4
-     &          .or. nid.ne.3 .or. nie.ne.3)  proceed = .false.
-         if (proceed) then
-            if ((aia.ne.6 .or. aib.ne.7 .or. aic.ne.6
-     &              .or. aid.ne.6 .or. aie.ne.7) .and.
-     &          (aia.ne.7 .or. aib.ne.6 .or. aic.ne.6
-     &              .or. aid.ne.7 .or. aie.ne.6))  proceed = .false.
-         end if
-         if (proceed .and. aia.eq.6) then
-            proceed = .false.
-            do j = 1, n12(ia)
-               ij = i12(j,ia)
-               nij = n12(ij)
-               aij = atomic(ij)
-               if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
-            end do 
-         end if
-         if (proceed .and. aib.eq.6) then
-            proceed = .false.
-            do j = 1, n12(ib)
-               ij = i12(j,ib)
-               nij = n12(ij)
-               aij = atomic(ij)
-               if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
-            end do 
-         end if
-         if (proceed .and. aid.eq.6) then
-            proceed = .false.
-            do j = 1, n12(id)
-               ij = i12(j,id)
-               nij = n12(ij)
-               aij = atomic(ij)
-               if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
-            end do 
-         end if
-         if (proceed .and. aie.eq.6) then
-            proceed = .false.
-            do j = 1, n12(ie)
-               ij = i12(j,ie)
-               nij = n12(ij)
-               aij = atomic(ij)
-               if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
-            end do 
+         proceed = .false.
+         if (nia.eq.3 .and. nib.eq.3 .and. nic.eq.4
+     &          .and. nid.eq.3 .and. nie.eq.3) then
+            if ((aia.eq.6 .and. aib.eq.7 .and. aic.eq.6
+     &              .and. aid.eq.6 .and. aie.eq.7) .or.
+     &          (aia.eq.7 .and. aib.eq.6 .and. aic.eq.6
+     &              .and. aid.eq.7 .and. aie.eq.6)) then
+               if (.not.proceed .and. aia.eq.6) then
+                  do j = 1, n12(ia)
+                     ij = i12(j,ia)
+                     nij = n12(ij)
+                     aij = atomic(ij)
+                     if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
+                  end do 
+               end if
+               if (.not.proceed .and. aib.eq.6) then
+                  do j = 1, n12(ib)
+                     ij = i12(j,ib)
+                     nij = n12(ij)
+                     aij = atomic(ij)
+                     if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
+                  end do 
+               end if
+               if (.not.proceed .and. aid.eq.6) then
+                  do j = 1, n12(id)
+                     ij = i12(j,id)
+                     nij = n12(ij)
+                     aij = atomic(ij)
+                     if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
+                  end do 
+               end if
+               if (.not.proceed .and. aie.eq.6) then
+                  do j = 1, n12(ie)
+                     ij = i12(j,ie)
+                     nij = n12(ij)
+                     aij = atomic(ij)
+                     if (nij.eq.1 .and. aij.eq.8)  proceed = .true.
+                  end do 
+               end if
+            end if
          end if
 c
 c     check for N-terminal and C-terminal residues
@@ -148,6 +144,119 @@ c
      &             .and. nid.eq.3 .and. nie.eq.3 .and.
      &          aia.eq.8 .and. aib.eq.6 .and. aic.eq.6
      &             .and. aid.eq.7 .and. aie.eq.6)  proceed = .true.
+         end if
+c
+c     check for N-terminal ACE chain capping group
+c
+         if (.not. proceed) then
+            if (nia.eq.4 .and. nib.eq.3 .and. nic.eq.3
+     &             .and. nid.eq.4 .and. nie.eq.3 .and.
+     &          aia.eq.6 .and. aib.eq.6 .and. aic.eq.7
+     &             .and. aid.eq.6 .and. aie.eq.6) then
+               nhyd = 0
+               do j = 1, n12(ia)
+                  ij = i12(j,ia)
+                  aij = atomic(ij)
+                  if (aij .eq. 1)  nhyd = nhyd + 1
+               end do
+               if (nhyd .eq. 3) then
+                  tier(ia) = 'ACE'
+                  do j = 1, n12(ia)
+                     ij = i12(j,ia)
+                     aij = atomic(ij)
+                     if (aij .eq. 1)  tier(ij) = 'ACE'
+                  end do
+                  tier(ib) = 'ACE'
+                  do j = 1, n12(ib)
+                     ij = i12(j,ib)
+                     aij = atomic(ij)
+                     if (aij .eq. 8)  tier(ij) = 'ACE'
+                  end do
+               end if
+            end if
+         end if
+         if (.not. proceed) then
+            if (nia.eq.3 .and. nib.eq.4 .and. nic.eq.3
+     &             .and. nid.eq.3 .and. nie.eq.4 .and.
+     &          aia.eq.6 .and. aib.eq.6 .and. aic.eq.7
+     &             .and. aid.eq.6 .and. aie.eq.6) then
+               do j = 1, n12(ie)
+                  ij = i12(j,ie)
+                  aij = atomic(ij)
+                  if (aij .eq. 1)  nhyd = nhyd + 1
+               end do
+               if (nhyd .eq. 3) then
+               tier(ia) = 'ACE'
+                  do j = 1, n12(ie)
+                     ij = i12(j,ie)
+                     aij = atomic(ij)
+                     if (aij .eq. 1)  tier(ij) = 'ACE'
+                  end do
+                  tier(ib) = 'ACE'
+                  do j = 1, n12(id)
+                     ij = i12(j,id)
+                     aij = atomic(ij)
+                     if (aij .eq. 8)  tier(ij) = 'ACE'
+                  end do
+               end if
+            end if
+         end if
+c
+c     check for C-terminal NME chain capping group
+c
+         if (.not. proceed) then
+            if (nia.eq.3 .and. nib.eq.4 .and. nic.eq.3
+     &             .and. nid.eq.3 .and. nie.eq.4 .and.
+     &          aia.eq.7 .and. aib.eq.6 .and. aic.eq.6
+     &             .and. aid.eq.7 .and. aie.eq.6) then
+               nhyd = 0
+               do j = 1, n12(ie)
+                  ij = i12(j,ie)
+                  aij = atomic(ij)
+                  if (aij .eq. 1)  nhyd = nhyd + 1
+               end do
+               if (nhyd .eq. 3) then
+                  tier(id) = 'NME'
+                  do j = 1, n12(id)
+                     ij = i12(j,id)
+                     aij = atomic(ij)
+                     if (aij .eq. 1)  tier(ij) = 'NME'
+                  end do
+                  tier(ie) = 'NME'
+                  do j = 1, n12(ie)
+                     ij = i12(j,ie)
+                     aij = atomic(ij)
+                     if (aij .eq. 1)  tier(ij) = 'NME'
+                  end do
+               end if
+            end if
+         end if
+         if (.not. proceed) then
+            if (nia.eq.4 .and. nib.eq.3 .and. nic.eq.3
+     &             .and. nid.eq.4 .and. nie.eq.3 .and.
+     &          aia.eq.6 .and. aib.eq.7 .and. aic.eq.6
+     &             .and. aid.eq.6 .and. aie.eq.7) then
+               nhyd = 0
+               do j = 1, n12(ia)
+                  ij = i12(j,ia)
+                  aij = atomic(ij)
+                  if (aij .eq. 1)  nhyd = nhyd + 1
+               end do
+               if (nhyd .eq. 3) then
+                  tier(ia) = 'NME'
+                  do j = 1, n12(ia)
+                     ij = i12(j,ia)
+                     aij = atomic(ij)
+                     if (aij .eq. 1)  tier(ij) = 'NME'
+                  end do
+                  tier(ib) = 'NME'
+                  do j = 1, n12(ib)
+                     ij = i12(j,ib)
+                     aij = atomic(ij)
+                     if (aij .eq. 1)  tier(ij) = 'NME'
+                  end do
+               end if
+            end if
          end if
          if (.not. proceed)  goto 10
 c

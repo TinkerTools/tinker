@@ -167,11 +167,13 @@ gfortran -c -Wall strbnd.f
 gfortran -c -Wall strtor.f
 gfortran -c -Wall syntrn.f
 gfortran -c -Wall tarray.f
+gfortran -c -Wall tettor.f
 gfortran -c -Wall titles.f
 gfortran -c -Wall torpot.f
 gfortran -c -Wall tors.f
 gfortran -c -Wall tortor.f
 gfortran -c -Wall tree.f
+gfortran -c -Wall tritor.f
 gfortran -c -Wall units.f
 gfortran -c -Wall uprior.f
 gfortran -c -Wall urey.f
@@ -377,6 +379,9 @@ gfortran -c -Wall fft3d.f
 gfortran -c -Wall fftpack.f
 gfortran -c -Wall field.f
 gfortran -c -Wall final.f
+gfortran -c -Wall findnuc.f
+gfortran -c -Wall findpro.f
+gfortran -c -Wall findseq.f
 gfortran -c -Wall flatten.f
 gfortran -c -Wall freefix.f
 gfortran -c -Wall freeunit.f
@@ -587,6 +592,7 @@ gfortran -c -Wall testpol.f
 gfortran -c -Wall testrot.f
 gfortran -c -Wall testsurf.f
 gfortran -c -Wall testvir.f
+gfortran -c -Wall tettors.f
 gfortran -c -Wall timer.f
 gfortran -c -Wall timerot.f
 gfortran -c -Wall tncg.f
@@ -595,6 +601,7 @@ gfortran -c -Wall torque.f
 gfortran -c -Wall torsfit.f
 gfortran -c -Wall torsions.f
 gfortran -c -Wall trimtext.f
+gfortran -c -Wall tritors.f
 gfortran -c -Wall unionball.f
 gfortran -c -Wall unitcell.f
 gfortran -c -Wall valence.f

@@ -167,11 +167,13 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp strbnd.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp strtor.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp syntrn.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp tarray.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tettor.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp titles.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp torpot.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp tors.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp tortor.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp tree.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tritor.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp units.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp uprior.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp urey.f
@@ -377,6 +379,9 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp fft3d.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp fftpack.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp field.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp final.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp findnuc.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp findpro.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp findseq.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp flatten.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp freefix.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp freeunit.f
@@ -587,6 +592,7 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp testpol.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp testrot.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp testsurf.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp testvir.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tettors.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp timer.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp timerot.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp tncg.f
@@ -595,6 +601,7 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp torque.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp torsfit.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp torsions.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp trimtext.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp tritors.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp unionball.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp unitcell.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp valence.f
