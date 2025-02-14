@@ -263,7 +263,7 @@ c
      &                             6x,'Energy',/)
                      end if
                      write (iout,30)  i,name(i),k,name(k),
-     &                                pchg(ii),pchg(kk),r,e
+     &                                pchg(i),pchg(k),r,e
    30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
@@ -401,7 +401,7 @@ c
      &                                6x,'Energy',/)
                         end if
                         write (iout,50)  i,name(i),k,name(k),
-     &                                   pchg(ii),pchg(kk),r,e
+     &                                   pchg(i),pchg(k),r,e
    50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
