@@ -26,6 +26,7 @@ c
       use couple
       implicit none
       integer i,j,k
+      integer nhyd,nphos
       integer ia,ib,ic
       integer id,ie,ij,ik
       integer nia,nib,nic
@@ -43,7 +44,6 @@ c
       integer ic2,ic3,ic4,ic5
       integer ic6,ic7,ic9
       integer icm,io4,io9
-      integer nhyd,nphos
       logical proceed
       logical deoxy
       character*3 label

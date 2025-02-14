@@ -128,14 +128,14 @@ set(_FILES
     gradrot group groups grpline gyrate hescut hessian hessn hessrgd
     hessrot hpmf hybrid ielscf image impose improp imptor induce inertia
     inform initatom initial initneck initprm initres initrot insert inter
-    invbeta invert iounitjacobi kanang kangang kangle kangs kangtor kantor
-    katom katoms kbond kbonds kcflux kcharge kchgflx kchgtrn kchrge kcpen
-    kctrn kdipol kdipole kdisp kdsp kewald kexpl kexpol kextra keys kgeom
-    khbond kimprop kimptor kinetic kiprop kitors kmetal kmpole kmulti
-    kopbend kopbnd kopdist kopdst korbit korbs kpitor kpitors kpolar
-    kpolpr kpolr krepel krepl ksolut ksolv kstbnd kstrbnd kstrtor ksttor
-    ktors ktorsn ktortor ktrtor kundrot kurey kurybr kvdw kvdwpr kvdws
-    lattice lbfgs light lights limits linmin lusolve makeint makeref
+    invbeta invert iounit jacobi kanang kangang kangle kangs kangtor
+    kantor katom katoms kbond kbonds kcflux kcharge kchgflx kchgtrn kchrge
+    kcpen kctrn kdipol kdipole kdisp kdsp kewald kexpl kexpol kextra keys
+    kgeom khbond kimprop kimptor kinetic kiprop kitors kmetal kmpole
+    kmulti kopbend kopbnd kopdist kopdst korbit korbs kpitor kpitors
+    kpolar kpolpr kpolr krepel krepl ksolut ksolv kstbnd kstrbnd kstrtor
+    ksttor ktors ktorsn ktortor ktrtor kundrot kurey kurybr kvdw kvdwpr
+    kvdws lattice lbfgs light lights limits linmin lusolve makeint makeref
     makexyz math maxwell mdinit mdrest mdsave mdstat mdstuf mechanic
     merck merge minima molcul moldyn molecule moment moments mplpot mpole
     mrecip mutant mutate nblist neck neigh nextarg nexttext nonpol nose
