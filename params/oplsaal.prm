@@ -14,8 +14,8 @@ radiusrule              GEOMETRIC
 radiustype              SIGMA
 radiussize              DIAMETER
 epsilonrule             GEOMETRIC
-torsionunit             0.5
 imptorunit              0.5
+torsionunit             0.5
 vdw-14-scale            2.0
 chg-14-scale            2.0
 electric                332.06
@@ -43,12 +43,6 @@ The original version of this parameter file was developed in the
 group of Prof. Karl F. Freed, Department of Chemistry, University
 of Chicago by modifying the Tinker OPLS-AA parameters as per the
 Kaminsky, et al. article cited above
-
-Some parameters distributed with Tinker are from "OPLS and OPLS-AA
-Parameters for Organic Molecules, Ions, and Nucleic Acids" as provided
-by W. L. Jorgensen, Yale University, October 1997. These values have
-been updated in the Tinker version based on subsequent publications
-from the Jorgensen Lab.
 
 
       #############################

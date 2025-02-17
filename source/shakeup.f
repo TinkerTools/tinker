@@ -30,12 +30,16 @@ c
       use molcul
       use usage
       implicit none
-      integer i,j,k,m,nh
+      integer i,j,k,m
       integer ia,ib,ic
       integer ja,jb,jc
-      integer ilist,next
+      integer next,ilist
+      integer nhyd,nang
+      integer maxrat
+      integer maxwat4
       real*8 rab,rbc,rac
-      real*8 cosine
+      real*8 cosine,ratio
+      real*8 dom,doh
       logical done
       character*9 rattyp
       character*20 keyword
@@ -47,18 +51,28 @@ c     set defaults for constraints and convergence tolerance
 c
       nrat = 0
       nratx = 0
+      nwat4 = 0
       rateps = 0.000001d0
       use_rattle = .true.
+      maxrat = 2 * n
+      maxwat4 = n / 4
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not. allocated(iratx)) then
-         allocate (iratx(maxatm))
-         allocate (kratx(maxatm))
-         allocate (irat(2,maxatm))
-         allocate (krat(maxatm))
-         allocate (ratimage(maxatm))
-      end if
+      if (allocated(iratx))  deallocate (iratx)
+      if (allocated(kratx))  deallocate (kratx)
+      if (allocated(irat))  deallocate (irat)
+      if (allocated(iwat4))  deallocate (iwat4)
+      if (allocated(krat))  deallocate (krat)
+      if (allocated(kwat4))  deallocate (kwat4)
+      if (allocated(ratimage))  deallocate (ratimage)
+      allocate (iratx(maxrat))
+      allocate (kratx(maxrat))
+      allocate (irat(2,maxrat))
+      allocate (iwat4(4,maxwat4))
+      allocate (krat(maxrat))
+      allocate (kwat4(2,maxwat4))
+      allocate (ratimage(maxrat))
 c
 c     process keywords containing holonomic constraint options
 c
@@ -188,17 +202,22 @@ c
                   end if
                end do
 c
-c     fix bonds and angles of each water to give a rigid molecule
+c     arrange treatment of multi-center rigid water molecules
 c
             else if (rattyp(1:5) .eq. 'WATER') then
                do i = 1, n
-                  nh = 0
+                  nhyd = 0
                   if (atomic(i) .eq. 8) then
                      do j = 1, n12(i)
-                        if (atomic(i12(j,i)) .eq. 1)  nh = nh + 1
+                        ia = i12(j,i)
+                        ja = atomic(ia)
+                        if (ja .eq. 1)  nhyd = nhyd + 1
                      end do
                   end if
-                  if (nh .ge. 2) then
+c
+c     fix O-H bonds and H-H distance of water to keep it rigid
+c
+                  if (nhyd .ge. 2) then
                      do j = 1, n12(i)
                         ilist = bndlist(j,i)
                         ia = ibnd(1,ilist)
@@ -214,7 +233,8 @@ c
                            end if
                         end if
                      end do
-                     do j = 1, 2*n12(i)-3
+                     nang = n12(i) * (n12(i)-1) / 2
+                     do j = 1, nang
                         ilist = anglist(j,i)
                         ia = iang(1,ilist)
                         ib = iang(2,ilist)
@@ -223,24 +243,82 @@ c
                         jc = atomic(ic)
                         if (use(ia) .or. use(ib) .or. use(ic)) then
                            if (ja.eq.1 .and. jc.eq.1) then
-                           do m = 1, n12(ib)
-                              if (i12(m,ib) .eq. ia) then
-                                 rab = bl(bndlist(m,ib))
-                              else if (i12(m,ib) .eq. ic) then
-                                 rbc = bl(bndlist(m,ib))
-                              end if
-                           end do
-                           cosine = cos(anat(ilist)/radian)
-                           rac = sqrt(rab*rab+rbc*rbc
-     &                                   -2.0d0*rab*rbc*cosine)
-                           nrat = nrat + 1
-                           irat(1,nrat) = ia
-                           irat(2,nrat) = ic
-                           krat(nrat) = rac
-                           call chkangle (ia,ib,ic)
+                              do m = 1, n12(ib)
+                                 if (i12(m,ib) .eq. ia) then
+                                    rab = bl(bndlist(m,ib))
+                                 else if (i12(m,ib) .eq. ic) then
+                                    rbc = bl(bndlist(m,ib))
+                                 end if
+                              end do
+                              cosine = cos(anat(ilist)/radian)
+                              rac = sqrt(rab*rab+rbc*rbc
+     &                                      -2.0d0*rab*rbc*cosine)
+                              nrat = nrat + 1
+                              irat(1,nrat) = ia
+                              irat(2,nrat) = ic
+                              krat(nrat) = rac
+                              call chkangle (ia,ib,ic)
                            end if
                         end if
                      end do
+c
+c     find and store values to construct planar four-site water
+c
+                     if (n12(i) .eq. 3) then
+                        nwat4 = nwat4 + 1
+                        iwat4(2,nwat4) = i
+                        dom = 0.0d0
+                        doh = 0.0d0
+                        cosine = 0.0d0
+                        nhyd = 0
+                        do j = 1, n12(i)
+                           ia = i12(j,i)
+                           ja = atomic(ia)
+                           nhyd = nhyd + 1
+                           if (ja .le. 0) then
+                              iwat4(1,nwat4) = ia
+                           else if (ja.eq.1 .and. nhyd.eq.1) then
+                              iwat4(3,nwat4) = ia
+                           else if (ja.eq.1 .and. nhyd.eq.2) then
+                              iwat4(4,nwat4) = ia
+                           end if
+                        end do
+                        do j = 1, n12(i)
+                           ilist = bndlist(j,i)
+                           ia = ibnd(1,ilist)
+                           ib = ibnd(2,ilist)
+                           ja = atomic(ia)
+                           jb = atomic(ib)
+                           if (use(ia) .or. use(ib)) then
+                              if (ja.le.0 .or. jb.le.0) then
+                                 dom = bl(ilist)
+                              else if (ja.eq.1 .or. jb.eq.1) then
+                                 doh = bl(ilist)
+                              end if
+                           end if
+                        end do
+                        nang = n12(i) * (n12(i)-1) / 2
+                        do j = 1, nang
+                           ilist = anglist(j,i)
+                           ia = iang(1,ilist)
+                           ib = iang(2,ilist)
+                           ic = iang(3,ilist)
+                           ja = atomic(ia)
+                           jc = atomic(ic)
+                           if (use(ia) .or. use(ib) .or. use(ic)) then
+                              if (ja.eq.1 .and. jc.eq.1) then
+                                 cosine = cos(0.5d0*anat(ilist)/radian)
+                              end if
+                           end if
+                        end do
+                        if (min(dom,doh,cosine) .gt. 0.0d0) then
+                           ratio = dom / (doh*cosine)
+                           kwat4(1,nwat4) = 1.0d0 - ratio
+                           kwat4(2,nwat4) = 0.5d0 * ratio
+                        else
+                           nwat4 = nwat4 - 1
+                        end if
+                     end if
                   end if
                end do
 c
@@ -380,9 +458,9 @@ c
 c     "chkangle" tests angles to be constrained for their presence
 c     in small rings and removes constraints that are redundant
 c
-c     note this version correctly handles isolated small rings,
-c     but should remove one additional redundant constraint for
-c     each ring fusion
+c     note this version correctly handles isolated small rings, but
+c     should remove one additional redundant constraint for each and
+c     every ring fusion
 c
 c
       subroutine chkangle (ia,ib,ic)

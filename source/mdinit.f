@@ -44,6 +44,7 @@ c
       integer i,j,istep
       integer idyn,lext
       integer size,next
+      integer ndummy
       integer freeunit
       integer trimtext
       real*8 dt,eps
@@ -66,6 +67,7 @@ c
       bmnmix = 8
       arespa = 0.00025d0
       nfree = 0
+      ndummy = 0
       irest = 100
       use_wrap = .true.
       velsave = .false.
@@ -180,6 +182,7 @@ c
          end do
       else
          do i = 1, n
+            if (atomic(i) .le. 0)  ndummy = ndummy + 1
             if (use(i) .and. mass(i).le.0.0d0) then
                mass(i) = 1.0d0
                totmass = totmass + 1.0d0
@@ -269,7 +272,7 @@ c
                if (linear(i))  nfree = nfree - 1
             end do
          else
-            nfree = 3 * nuse
+            nfree = 3 * (nuse-ndummy)
          end if
          if (use_rattle) then
             nfree = nfree - nrat

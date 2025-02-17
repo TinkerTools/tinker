@@ -32,14 +32,14 @@ and Backbone Parameters from ff99SB, J. Chem. Theory Comput., 11, 2696-2713
 (2015)  [Protein ff14SB]
 
 R. Galindo-Murillo, J. C. Robertson, M. Zgarbovic, J. Sponer, M. Otyepka,
-P. Jureska, T. E. Cheatham, Assessing the Current State of Amber Force
+P. Jureska and T. E. Cheatham, Assessing the Current State of Amber Force
 Field Modifications for DNA. J. Chem. Theory Comput., 12, 4114–4127 (2016)
 [DNA OL15]
 
-M. Zgarbova, M. Otyepka, J. Sponer, A. Mladek, P. Banas, T. E. Cheatham,
-P. Jurecka, Refinement of the Cornell et al. Nucleic Acids Force Field
-Based on Reference Quantum Chemical Calculations of Glycosidic Torsion
-Profiles, J. Chem. Theory Comput., 7, 2886–2902 (2011)  [RNA OL3]
+M. Zgarbova, M. Otyepka, J. Sponer, A. Mladek, P. Banas, T. E. Cheatham
+and P. Jurecka, Refinement of the Cornell et al. Nucleic Acids Force
+Field Based on Reference Quantum Chemical Calculations of Glycosidic
+Torsion Profiles, J. Chem. Theory Comput., 7, 2886–2902 (2011)  [RNA OL3]
 
 Current parameter values are available in the AmberTools package, which
 is downloadable from http://ambermd.org/

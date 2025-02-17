@@ -15,6 +15,7 @@ radiusrule              GEOMETRIC
 radiustype              SIGMA
 radiussize              DIAMETER
 epsilonrule             GEOMETRIC
+torsionunit             1.0
 vdw-14-scale            8.0
 chg-14-scale            2.0
 electric                332.06

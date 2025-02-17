@@ -33,8 +33,8 @@ c
       use moldyn
       use usage
       implicit none
-      integer i,j,k
-      integer ia,ib,mode
+      integer i,j,k,mode
+      integer ia,ib,ic,id
       integer niter,maxiter
       integer start,stop
       real*8 dt,eps,sor
@@ -45,6 +45,7 @@ c
       real*8 weigh,dist2
       real*8 delta,term
       real*8 xterm,yterm,zterm
+      real*8 oterm,hterm
       real*8 xold(*)
       real*8 yold(*)
       real*8 zold(*)
@@ -148,6 +149,20 @@ c
    20    format (' RATTLE   --  Distance Constraints met at',i6,
      &              ' Iterations')
       end if
+c
+c     set four-site water extra centers from H-O-H coordinates
+c
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         oterm = kwat4(1,i)
+         hterm = kwat4(2,i)
+         x(ia) = oterm*x(ib) + hterm*(x(ic)+x(id))
+         y(ia) = oterm*y(ib) + hterm*(y(ic)+y(id))
+         z(ia) = oterm*z(ib) + hterm*(z(ic)+z(id))
+      end do
 c
 c     apply group position and velocity constraints via exact reset
 c
@@ -399,8 +414,8 @@ c
       use iounit
       use usage
       implicit none
-      integer i,j,k
-      integer ia,ib,mode
+      integer i,j,k,mode
+      integer ia,ib,ic,id
       integer niter,maxiter
       integer start,stop
       real*8 eps,sor
@@ -410,6 +425,7 @@ c
       real*8 weigh,dist2
       real*8 delta,term
       real*8 xterm,yterm,zterm
+      real*8 oterm,hterm
       real*8 xold(*)
       real*8 yold(*)
       real*8 zold(*)
@@ -506,6 +522,20 @@ c
      &              ' Iterations')
       end if
 c
+c     set four-site water extra centers from H-O-H coordinates
+c
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         oterm = kwat4(1,i)
+         hterm = kwat4(2,i)
+         x(ia) = oterm*x(ib) + hterm*(x(ic)+x(id))
+         y(ia) = oterm*y(ib) + hterm*(y(ic)+y(id))
+         z(ia) = oterm*z(ib) + hterm*(z(ic)+z(id))
+      end do
+c
 c     apply any group position constraints via exact reset
 c
       do i = 1, nratx
@@ -563,18 +593,37 @@ c
       use iounit
       use usage
       implicit none
-      integer i,ia,ib
+      integer i,j
+      integer ia,ib,ic,id
       integer niter,maxiter
       real*8 eps,sor
       real*8 xr,yr,zr
       real*8 xf,yf,zf
       real*8 dist2,delta,term
       real*8 xterm,yterm,zterm
+      real*8 oterm,hterm
       real*8 derivs(3,*)
       logical done
       logical, allocatable :: moved(:)
       logical, allocatable :: update(:)
 c
+c
+c     distribute gradient on any four-site water extra centers
+c
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         oterm = kwat4(1,i)
+         hterm = kwat4(2,i)
+         do j = 1, 3
+            derivs(j,ib) = derivs(j,ib) + oterm*derivs(j,ia)
+            derivs(j,ic) = derivs(j,ic) + hterm*derivs(j,ia)
+            derivs(j,id) = derivs(j,id) + hterm*derivs(j,ia)
+            derivs(j,ia) = 0.0d0
+         end do
+      end do
 c
 c     perform dynamic allocation of some local arrays
 c

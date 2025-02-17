@@ -43,12 +43,14 @@ c
       implicit none
       integer i,j,k
       integer istep
+      integer ia,ib,ic,id
       integer nrej
       real*8 dt,dt_2
       real*8 epot,etot
       real*8 epold,etold
       real*8 eksum,de
       real*8 temp,pres
+      real*8 oterm,hterm
       real*8 random,ratio
       real*8 ekin(3,3)
       real*8 stress(3,3)
@@ -121,6 +123,23 @@ c
 c     get the potential energy and atomic forces
 c
       call gradient (epot,derivs)
+c
+c     distribute forces on any four-site water extra centers
+c
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         oterm = kwat4(1,i)
+         hterm = kwat4(2,i)
+         do j = 1, 3
+            derivs(j,ib) = derivs(j,ib) + oterm*derivs(j,ia)
+            derivs(j,ic) = derivs(j,ic) + hterm*derivs(j,ia)
+            derivs(j,id) = derivs(j,id) + hterm*derivs(j,ia)
+            derivs(j,ia) = 0.0d0
+         end do
+      end do
 c
 c     use current values as previous energies for first step
 c
