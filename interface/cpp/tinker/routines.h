@@ -2312,6 +2312,8 @@ void shake_(double* xold, double* yold, double* zold);
 #define tinker_f_shake shake_
 void shake2_(double* derivs);
 #define tinker_f_shake2 shake2_
+void water4_(double* derivs);
+#define tinker_f_water4 water4_
 
 // readcart.f
 void readcart_(int* ixyz, int* first);
