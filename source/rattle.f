@@ -594,36 +594,18 @@ c
       use usage
       implicit none
       integer i,j
-      integer ia,ib,ic,id
+      integer ia,ib
       integer niter,maxiter
       real*8 eps,sor
       real*8 xr,yr,zr
       real*8 xf,yf,zf
       real*8 dist2,delta,term
       real*8 xterm,yterm,zterm
-      real*8 oterm,hterm
       real*8 derivs(3,*)
       logical done
       logical, allocatable :: moved(:)
       logical, allocatable :: update(:)
 c
-c
-c     distribute gradient on any four-site water extra centers
-c
-      do i = 1, nwat4
-         ia = iwat4(1,i)
-         ib = iwat4(2,i)
-         ic = iwat4(3,i)
-         id = iwat4(4,i)
-         oterm = kwat4(1,i)
-         hterm = kwat4(2,i)
-         do j = 1, 3
-            derivs(j,ib) = derivs(j,ib) + oterm*derivs(j,ia)
-            derivs(j,ic) = derivs(j,ic) + hterm*derivs(j,ia)
-            derivs(j,id) = derivs(j,id) + hterm*derivs(j,ia)
-            derivs(j,ia) = 0.0d0
-         end do
-      end do
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -707,6 +689,53 @@ c
          write (iout,20)  niter
    20    format (' SHAKE2  --  Gradient Constraints met at',i6,
      &              ' Iterations')
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine water4  --  distribute four-site water gradient  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "water4" transfers gradient components on the extra site of
+c     rigid planar four-site water molecules to the H-O-H atoms
+c
+c     note this routine is needed due to instability of SHAKE and
+c     RATTLE algorithms when four constrained sites lie in a plane;
+c     gradient components on a fourth atom are moved to the other
+c     atoms, and the fourth atom coordinates will be set separately
+c
+c
+      subroutine water4 (derivs)
+      use freeze
+      implicit none
+      integer i,j
+      integer ia,ib,ic,id
+      real*8 oterm,hterm
+      real*8 derivs(3,*)
+c
+c
+c     distribute gradient on four-site water extra centers
+c
+      if (use_rattle) then
+         do i = 1, nwat4
+            ia = iwat4(1,i)
+            ib = iwat4(2,i)
+            ic = iwat4(3,i)
+            id = iwat4(4,i)
+            oterm = kwat4(1,i)
+            hterm = kwat4(2,i)
+            do j = 1, 3
+               derivs(j,ib) = derivs(j,ib) + oterm*derivs(j,ia)
+               derivs(j,ic) = derivs(j,ic) + hterm*derivs(j,ia)
+               derivs(j,id) = derivs(j,id) + hterm*derivs(j,ia)
+               derivs(j,ia) = 0.0d0
+            end do
+         end do
       end if
       return
       end

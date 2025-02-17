@@ -36,12 +36,10 @@ c
       implicit none
       integer i,j,k
       integer istep
-      integer ia,ib,ic,id
       real*8 dt,term
       real*8 epot,etot
       real*8 eksum
       real*8 temp,pres
-      real*8 oterm,hterm
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       real*8 ekin(3,3)
@@ -96,23 +94,6 @@ c
 c     get the potential energy and atomic forces
 c
       call gradient (epot,derivs)
-c
-c     distribute forces on any four-site water extra centers
-c
-      do i = 1, nwat4
-         ia = iwat4(1,i)
-         ib = iwat4(2,i)
-         ic = iwat4(3,i)
-         id = iwat4(4,i)
-         oterm = kwat4(1,i)
-         hterm = kwat4(2,i)
-         do j = 1, 3
-            derivs(j,ib) = derivs(j,ib) + oterm*derivs(j,ia)
-            derivs(j,ic) = derivs(j,ic) + hterm*derivs(j,ia)
-            derivs(j,id) = derivs(j,id) + hterm*derivs(j,ia)
-            derivs(j,ia) = 0.0d0
-         end do
-      end do
 c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using modified Verlet

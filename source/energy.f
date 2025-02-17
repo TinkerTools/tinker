@@ -21,7 +21,6 @@ c
       use iounit
       use limits
       use potent
-      use rigid
       use vdwpot
       implicit none
       real*8 energy
