@@ -1753,7 +1753,7 @@ connolly.o: faces.o inform.o iounit.o math.o
 control.o: argue.o inform.o keys.o output.o
 correlate.o: ascii.o atomid.o atoms.o files.o inform.o iounit.o
 couple.o: sizes.o
-critical.o: atoms.o files.o inform.o iounit.o keys.o minima.o output.o sizes.o usage.o
+critical.o: atoms.o files.o freeze.o inform.o iounit.o keys.o minima.o output.o sizes.o usage.o
 crystal.o: atomid.o atoms.o bound.o boxes.o couple.o files.o iounit.o math.o molcul.o
 cspline.o: iounit.o
 ctrpot.o:
@@ -2106,7 +2106,7 @@ opbend.o:
 opdist.o:
 openend.o:
 openmp.o:
-optimize.o: atoms.o bound.o files.o inform.o iounit.o scales.o usage.o
+optimize.o: atoms.o bound.o files.o freeze.o inform.o iounit.o scales.o usage.o
 optinit.o: bound.o inform.o keys.o output.o potent.o
 optirot.o: files.o inform.o iounit.o math.o omega.o scales.o zcoord.o
 optrigid.o: files.o group.o inform.o iounit.o math.o output.o rigid.o
