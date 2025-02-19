@@ -41,6 +41,15 @@ and P. Jurecka, Refinement of the Cornell et al. Nucleic Acids Force
 Field Based on Reference Quantum Chemical Calculations of Glycosidic
 Torsion Profiles, J. Chem. Theory Comput., 7, 2886–2902 (2011)  [RNA OL3]
 
+P. Li, L. F. Song and K. M. Merz Jr., Systematic Parameterization of
+Monovalent Ions Employing the Nonbonded Model, J. Chem. Theory Comput.,
+14, 1645-1657 (2015)  [Monovalent Ions]
+
+P. Li, B. P. Roberts, D. K. Chakravorty and K. M. Merz Jr., Rational
+Design of Particle Mesh Ewald Compatible Lennard-Jones Parameters for +2
+Metal Cations in Explicit Solvent, J. Chem. Theory Comput., 9, 2733-2748
+(2013)  [Divalent Cations]
+
 Current parameter values are available in the AmberTools package, which
 is downloadable from http://ambermd.org/
 
@@ -1152,20 +1161,20 @@ vdw          50               1.3870     0.0157
 vdw          51               1.2870     0.0157
 vdw          52               1.4090     0.0150
 vdw          53               1.3590     0.0150
-vdw          54               1.1371     0.018279
-vdw          55               1.8678     0.002772
-vdw          56               2.6576     0.000328
-vdw          57               2.9558     0.000171
-vdw          58               3.3951     0.0000806
-vdw          59               0.7867     0.8947
-vdw          60               1.3260     0.459789
-vdw          61               1.7412     0.118226
-vdw          62               2.1241     0.047096
-vdw          63               1.7500     0.0610
-vdw          64               1.9480     0.2650
-vdw          65               2.2200     0.3200
-vdw          66               2.3500     0.4000
-vdw          67               1.1000     0.0125
+vdw          54               1.2670     0.00312065
+vdw          55               1.4750     0.03171494
+vdw          56               1.7190     0.15131351
+vdw          57               1.8340     0.24140216
+vdw          58               1.9880     0.37853483
+vdw          59               1.3600     0.01020237
+vdw          60               1.6490     0.10592870
+vdw          61               1.8100     0.22132374
+vdw          62               2.0190     0.40664608
+vdw          63               1.7830     0.19945255
+vdw          64               2.2520     0.60293097
+vdw          65               2.4280     0.72070940
+vdw          66               2.7240     0.85418187
+vdw          67               1.2710     0.00330286
 
 
       ##################################
