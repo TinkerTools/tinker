@@ -235,71 +235,73 @@ c
 c
 c     for each atom, count and sort its attached atoms
 c
-      do i = 1, n
-         do j = maxval, 1, -1
-            if (i12(j,i) .ne. 0) then
-               n12(i) = j
-               goto 150
-            end if
+      if (.not. abort) then
+         do i = 1, n
+            do j = maxval, 1, -1
+               if (i12(j,i) .ne. 0) then
+                  n12(i) = j
+                  goto 150
+               end if
+            end do
+  150       continue
+            call sort (n12(i),i12(1,i))
          end do
-  150    continue
-         call sort (n12(i),i12(1,i))
-      end do
 c
 c     perform dynamic allocation of some local arrays
 c
-      nmax = 0
-      do i = 1, n
-         nmax = max(tag(i),nmax)
-         do j = 1, n12(i)
-            nmax = max(i12(j,i),nmax)
+         nmax = 0
+         do i = 1, n
+            nmax = max(tag(i),nmax)
+            do j = 1, n12(i)
+               nmax = max(i12(j,i),nmax)
+            end do
          end do
-      end do
-      allocate (list(nmax))
+         allocate (list(nmax))
 c
 c     check for scrambled atom order and attempt to renumber
 c
-      reorder = .false.
-      do i = 1, n
-         list(tag(i)) = i
-         if (tag(i) .ne. i)  reorder = .true.
-      end do
-      if (reorder) then
-         write (iout,160)
-  160    format (/,' READXYZ  --  Atom Labels not Sequential,',
-     &              ' Attempting to Renumber')
+         reorder = .false.
          do i = 1, n
-            tag(i) = i
-            do j = 1, n12(i)
-               i12(j,i) = list(i12(j,i))
-            end do
-            call sort (n12(i),i12(1,i))
+            list(tag(i)) = i
+            if (tag(i) .ne. i)  reorder = .true.
          end do
-      end if
+         if (reorder) then
+            write (iout,160)
+  160       format (/,' READXYZ  --  Atom Labels not Sequential,',
+     &                 ' Attempting to Renumber')
+            do i = 1, n
+               tag(i) = i
+               do j = 1, n12(i)
+                  i12(j,i) = list(i12(j,i))
+               end do
+               call sort (n12(i),i12(1,i))
+            end do
+         end if
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (list)
+         deallocate (list)
 c
 c     check for atom pairs with identical coordinates
 c
-      clash = .false.
-      if (n .le. 10000)  call chkxyz (clash)
+         clash = .false.
+         if (n .le. 10000)  call chkxyz (clash)
 c
 c     make sure all atom connectivities are bidirectional
 c
-      do i = 1, n
-         do j = 1, n12(i)
-            k = i12(j,i)
-            do m = 1, n12(k)
-               if (i12(m,k) .eq. i)  goto 180
+         do i = 1, n
+            do j = 1, n12(i)
+               k = i12(j,i)
+               do m = 1, n12(k)
+                  if (i12(m,k) .eq. i)  goto 180
+               end do
+               write (iout,170)  k,i
+  170          format (/,' READXYZ  --  Check Connection of Atoms',
+     &                    i9,' and',i9)
+               call fatal
+  180          continue
             end do
-            write (iout,170)  k,i
-  170       format (/,' READXYZ  --  Check Connection of Atoms',
-     &                 i9,' and',i9)
-            call fatal
-  180       continue
          end do
-      end do
+      end if
       return
       end

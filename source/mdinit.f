@@ -185,7 +185,7 @@ c
             if (atomic(i) .le. 0)  ndummy = ndummy + 1
             if (use(i) .and. mass(i).le.0.0d0) then
                mass(i) = 1.0d0
-               totmass = totmass + 1.0d0
+               if (atomic(i) .gt. 0)  totmass = totmass + 1.0d0
                if (verbose) then
                   write (iout,30)  i
    30             format (/,' MDINIT  --  Warning, Mass of Atom',

@@ -150,7 +150,7 @@ c
      &              ' Iterations')
       end if
 c
-c     set four-site water extra centers from H-O-H coordinates
+c     set position and velocity of four-site water extra centers
 c
       do i = 1, nwat4
          ia = iwat4(1,i)
@@ -162,6 +162,9 @@ c
          x(ia) = oterm*x(ib) + hterm*(x(ic)+x(id))
          y(ia) = oterm*y(ib) + hterm*(y(ic)+y(id))
          z(ia) = oterm*z(ib) + hterm*(z(ic)+z(id))
+         v(1,ia) = 0.0d0
+         v(2,ia) = 0.0d0
+         v(3,ia) = 0.0d0
       end do
 c
 c     apply group position and velocity constraints via exact reset
@@ -522,7 +525,7 @@ c
      &              ' Iterations')
       end if
 c
-c     set four-site water extra centers from H-O-H coordinates
+c     set the position of any four-site water extra centers
 c
       do i = 1, nwat4
          ia = iwat4(1,i)
@@ -719,7 +722,7 @@ c
       real*8 derivs(3,*)
 c
 c
-c     distribute gradient on four-site water extra centers
+c     distribute the gradient on four-site water extra centers
 c
       if (use_rattle) then
          do i = 1, nwat4
