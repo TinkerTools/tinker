@@ -1244,6 +1244,7 @@ c
          if (atmname .eq. ' DW2')  atmname = ' H  '
          if (atmname .eq. ' D1 ')  atmname = ' H  '
          if (atmname .eq. ' D2 ')  atmname = ' H  '
+         if (atmname .eq. ' M  ')  atmname = ' EP '
       end if
       return
       end
