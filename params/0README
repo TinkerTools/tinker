@@ -46,6 +46,10 @@
                  on ff99sb, combined with OL15 DNA and OL3 RNA parameters
                  for nucleic acids, and TIP3P water parameters.
 
+      amber19sb  Amber ff19sb parameters for proteins as an improvement
+                 on ff14sb, combined with OL21 DNA and OL3 RNA parameters
+                 for nucleic acids, and OPC water parameters.
+
       amoeba     AMOEBA force field for various small organic molecules
                  based on polarizable atomic multipole electrostatics.
                  Both 2004 (amoeba04) and 2009 (amoeba09) are provided.

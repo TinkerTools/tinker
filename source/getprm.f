@@ -132,7 +132,7 @@ c
       end do
       if (.not. exist)  call fatal
 c
-c     read the parameter file and store it for latter use
+c     read the parameter file to get number of lines
 c
       nprm = 0
       if (useprm) then
@@ -140,20 +140,28 @@ c
          open (unit=iprm,file=prmfile,status='old')
          rewind (unit=iprm)
          do while (.true.)
-            read (iprm,40,err=60,end=60)  record
-   40       format (a240)
+            read (iprm,40,err=50,end=50)
+   40       format ()
             nprm = nprm + 1
-            prmline(nprm) = record
-            if (nprm .ge. maxprm) then
-               write (iout,50)
-   50          format (/,' GETPRM  --  Parameter File Too Large;',
-     &                    ' Increase MAXPRM')
-               call fatal
-            end if
          end do
-   60    continue
-         close (unit=iprm)
+   50    continue
+         rewind (unit=iprm)
       end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(prmline))  deallocate (prmline)
+      allocate (prmline(nprm))
+c
+c     reread the parameter file and store for latter use
+c
+      do i = 1, nprm
+         read (iprm,60,err=70,end=70)  record
+   60    format (a240)
+         prmline(i) = record
+      end do
+   70 continue
+      close (unit=iprm)
 c
 c     convert underbar characters to dashes in all keywords
 c

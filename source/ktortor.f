@@ -32,10 +32,12 @@ c
       integer ita,itb,itc,itd,ite
       integer size,next,ntt
       integer nx,ny,nxy
+      integer tkey(maxtgrd2)
       real*8 eps
       real*8 tx(maxtgrd2)
       real*8 ty(maxtgrd2)
       real*8 tf(maxtgrd2)
+      real*8 tind(maxtgrd2)
       real*8 bs(0:maxtgrd)
       real*8 cs(0:maxtgrd)
       real*8 ds(0:maxtgrd)
@@ -47,6 +49,7 @@ c
       real*8 tmp6(0:maxtgrd)
       real*8 tmp7(0:maxtgrd)
       logical header,cyclic
+      character*3 ttag
       character*4 pa,pb,pc,pd,pe
       character*20 blank,pt
       character*20 pt1,pt2
@@ -73,6 +76,7 @@ c
             nx = 0
             ny = 0
             nxy = 0
+            ttag = '   '
             do j = 1, maxtgrd2
                tx(j) = 0.0d0
                ty(j) = 0.0d0
@@ -81,6 +85,7 @@ c
             string = record(next:240)
             read (string,*,err=40,end=40)  ia,ib,ic,id,ie,nx,ny
             nxy = nx * ny
+            call getword (record,ttag,next)
             m = i
             j = 0
             dowhile (j .lt. nxy)
@@ -107,11 +112,11 @@ c
                   header = .false.
                   write (iout,50)
    50             format (/,' Additional Torsion-Torsion Parameters :',
-     &                    //,5x,'Atom Classes',11x,'Grid-1',
-     &                       9x,'Grid-2',/)
+     &                    //,5x,'Atom Classes',12x,'Grid-1',
+     &                       6x,'Grid-2',6x,'Tier',/)
                end if
-               write (iout,60)  ia,ib,ic,id,ie,nx,ny
-   60          format (1x,5i4,5x,i8,7x,i8)
+               write (iout,60)  ia,ib,ic,id,ie,nx,ny,ttag
+   60          format (1x,5i4,5x,i8,4x,i8,8x,a3)
             end if
             size = 4
             call numeral (ia,pa,size)
@@ -123,20 +128,26 @@ c
             do j = 1, maxntt
                if (ktt(j).eq.blank .or. ktt(j).eq.pt) then
                   ktt(j) = pt
+                  ttier(j) = ttag
+                  do k = 1, nxy
+                     tind(k) = 360.0d0*ty(k) + tx(k)
+                     tkey(k) = k
+                  end do
+                  call sort2 (nxy,tind,tkey)
+                  do k = 1, nxy
+                     tbf(k,j) = tf(tkey(k))
+                  end do
                   nx = nxy
                   call sort9 (nx,tx)
-                  ny = nxy
-                  call sort9 (ny,ty)
                   tnx(j) = nx
-                  tny(j) = ny
                   do k = 1, nx
                      ttx(k,j) = tx(k)
                   end do
+                  ny = nxy
+                  call sort9 (ny,ty)
+                  tny(j) = ny
                   do k = 1, ny
                      tty(k,j) = ty(k)
-                  end do
-                  do k = 1, nxy
-                     tbf(k,j) = tf(k)
                   end do
                   goto 80
                end if
@@ -181,6 +192,7 @@ c
                   write (iout,90)  tbf(k,i),tbf(k+nx,i)
    90             format (/,' KTORTOR  --  Warning, Unequal Tor-Tor',
      &                        ' Values',3x,2f12.5)
+                  abort = .true.
                end if
             end do
             k = ny * tnx(i)
@@ -189,6 +201,7 @@ c
                   write (iout,100)  tbf(j,i),tbf(j+k,i)
   100             format (/,' KTORTOR  --  Warning, Unequal Tor-Tor',
      &                        ' Values',3x,2f12.5)
+                  abort = .true.
                end if
             end do
          end if
@@ -283,21 +296,43 @@ c
          pt1 = pa//pb//pc//pd//pe
          pt2 = pe//pd//pc//pb//pa
 c
-c     find parameters for this torsion-torsion interaction
+c     assign tier-specific parameters for this torsion-torsion
 c
          do j = 1, ntt
-            if (ktt(j) .eq. pt1) then
-               ntortor = ntortor + 1
-               itt(1,ntortor) = i
-               itt(2,ntortor) = j
-               itt(3,ntortor) = 1
-               goto 110
-            else if (ktt(j) .eq. pt2) then
-               ntortor = ntortor + 1
-               itt(1,ntortor) = i
-               itt(2,ntortor) = j
-               itt(3,ntortor) = -1
-               goto 110
+            if (ttier(j) .eq. tier(ic)) then
+               if (ktt(j) .eq. pt1) then
+                  ntortor = ntortor + 1
+                  itt(1,ntortor) = i
+                  itt(2,ntortor) = j
+                  itt(3,ntortor) = 1
+                  goto 110
+               else if (ktt(j) .eq. pt2) then
+                  ntortor = ntortor + 1
+                  itt(1,ntortor) = i
+                  itt(2,ntortor) = j
+                  itt(3,ntortor) = -1
+                  goto 110
+               end if
+            end if
+         end do
+c
+c     assign nonspecific parameters for this torsion-torsion
+c
+         do j = 1, ntt
+            if (ttier(j) .eq. '   ') then
+               if (ktt(j) .eq. pt1) then
+                  ntortor = ntortor + 1
+                  itt(1,ntortor) = i
+                  itt(2,ntortor) = j
+                  itt(3,ntortor) = 1
+                  goto 110
+               else if (ktt(j) .eq. pt2) then
+                  ntortor = ntortor + 1
+                  itt(1,ntortor) = i
+                  itt(2,ntortor) = j
+                  itt(3,ntortor) = -1
+                  goto 110
+               end if
             end if
          end do
   110    continue

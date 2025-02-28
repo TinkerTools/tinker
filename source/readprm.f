@@ -73,7 +73,9 @@ c
       integer nx,ny,nxy
       integer bt,at,sbt,tt
       integer ilpr
-      integer ft(6),pg(maxval)
+      integer ft(6)
+      integer pg(maxval)
+      integer tkey(maxtgrd2)
       real*8 wght,rd
       real*8 ep,rdn
       real*8 spr,apr,epr
@@ -107,8 +109,10 @@ c
       real*8 tx(maxtgrd2)
       real*8 ty(maxtgrd2)
       real*8 tf(maxtgrd2)
+      real*8 tind(maxtgrd2)
       logical header,swap
       character*1 da1
+      character*3 ttag
       character*4 pa,pb,pc
       character*4 pd,pe
       character*8 axt
@@ -942,6 +946,7 @@ c
             nx = 0
             ny = 0
             nxy = 0
+            ttag = '   '
             do i = 1, maxtgrd2
                tx(i) = 0.0d0
                ty(i) = 0.0d0
@@ -950,6 +955,7 @@ c
             string = record(next:240)
             read (string,*,err=340,end=340)  ia,ib,ic,id,ie,nx,ny
             nxy = nx * ny
+            call getword (record,ttag,next)
             i = 0
             dowhile (i .lt. nxy)
                iprm = iprm + 1
@@ -977,20 +983,26 @@ c
             call numeral (ie,pe,size)
             ntt = ntt + 1
             ktt(ntt) = pa//pb//pc//pd//pe
+            ttier(ntt) = ttag
+            do i = 1, nxy
+               tind(i) = 360.0d0*ty(i) + tx(i)
+               tkey(i) = i
+            end do
+            call sort2 (nxy,tind,tkey)
+            do i = 1, nxy
+               tbf(i,ntt) = tf(tkey(i))
+            end do
             nx = nxy
             call sort9 (nx,tx)
-            ny = nxy
-            call sort9 (ny,ty)
             tnx(ntt) = nx
-            tny(ntt) = ny
             do i = 1, nx
                ttx(i,ntt) = tx(i)
             end do
+            ny = nxy
+            call sort9 (ny,ty)
+            tny(ntt) = ny
             do i = 1, ny
                tty(i,ntt) = ty(i)
-            end do
-            do i = 1, nxy
-               tbf(i,ntt) = tf(i)
             end do
 c
 c     van der Waals parameters for individual atom types

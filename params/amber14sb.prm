@@ -50,6 +50,10 @@ Design of Particle Mesh Ewald Compatible Lennard-Jones Parameters for +2
 Metal Cations in Explicit Solvent, J. Chem. Theory Comput., 9, 2733-2748
 (2013)  [Divalent Cations]
 
+Note that side chain atomic charges for N-terminal and C-terminal amino
+acid residues differ slightly from authentic Amber ff14SB, but correct
+total charge is maintained and the terminal NH3+ and COO- are identical
+
 Current parameter values are available in the AmberTools package, which
 is downloadable from http://ambermd.org/
 

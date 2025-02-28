@@ -74,7 +74,7 @@ c
          inquire (file=keyfile,exist=exist)
       end if
 c
-c     read the keyfile and store it for latter use
+c     read the keyfile to get number of lines
 c
       nkey = 0
       if (exist) then
@@ -82,20 +82,28 @@ c
          open (unit=ikey,file=keyfile,status='old')
          rewind (unit=ikey)
          do while (.true.)
-            read (ikey,20,err=40,end=40)  record
-   20       format (a240)
+            read (ikey,20,err=30,end=30)
+   20       format ()
             nkey = nkey + 1
-            keyline(nkey) = record
-            if (nkey .ge. maxkey) then
-               write (iout,30)
-   30          format (/,' GETKEY  --  Keyfile Too Large;',
-     &                    ' Increase MAXKEY')
-               call fatal
-            end if
          end do
-   40    continue
-         close (unit=ikey)
+   30    continue
+         rewind (unit=ikey)
       end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(keyline))  deallocate (keyline)
+      allocate (keyline(nkey))
+c
+c     reread the keyfile and store for latter use
+c
+      do i = 1, nkey
+         read (ikey,40,err=50,end=50)  record
+   40    format (a240)
+         keyline(i) = record
+      end do
+   50 continue
+      close (unit=ikey)
 c
 c     convert underbar characters to dashes in all keywords
 c
@@ -122,15 +130,15 @@ c
             length = trimtext (comment)
             if (header) then
                header = .false.
-               write (iout,50)
-   50          format ()
-            end if
-            if (length .eq. 0) then
                write (iout,60)
    60          format ()
+            end if
+            if (length .eq. 0) then
+               write (iout,70)
+   70          format ()
             else
-               write (iout,70)  comment(1:length)
-   70          format (a)
+               write (iout,80)  comment(1:length)
+   80          format (a)
             end if
          end if
       end do
@@ -144,10 +152,10 @@ c
 !$       call gettext (record,keyword,next)
 !$       string = record(next:240)
 !$       if (keyword(1:15) .eq. 'OPENMP-THREADS ') then
-!$          read (string,*,err=80,end=80)  nthread
+!$          read (string,*,err=90,end=90)  nthread
 !$          call omp_set_num_threads (nthread)
 !$       end if
-!$ 80    continue
+!$ 90    continue
 !$    end do
 c
 c     check for number of OpenMP threads on command line

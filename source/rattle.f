@@ -268,14 +268,14 @@ c
 c     set the iteration counter, termination and tolerance
 c
       maxiter = 500
-      niter = 0
-      done = .false.
       sor = 1.25d0
       eps = rateps / dt
       vterm = 2.0d0 / (dt*ekcal)
 c
 c     apply the RATTLE algorithm to correct the velocities
 c
+      niter = 0
+      done = .false.
       do while (.not.done .and. niter.lt.maxiter)
          niter = niter + 1
          done = .true.
@@ -709,8 +709,8 @@ c     rigid planar four-site water molecules to the H-O-H atoms
 c
 c     note this routine is needed due to instability of SHAKE and
 c     RATTLE algorithms when four constrained sites lie in a plane;
-c     gradient components on a fourth atom are moved to the other
-c     atoms, and the fourth atom coordinates will be set separately
+c     gradient components of the fourth atom are moved to the other
+c     atoms, and fourth atom ideal coordinates are set elsewhere
 c
 c
       subroutine water4 (derivs)

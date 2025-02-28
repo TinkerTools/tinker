@@ -1807,11 +1807,12 @@ c
                   header = .false.
                   write (iout,630)
   630             format (/,' Torsion-Torsion Parameters :',
-     &                    //,20x,'Atom Numbers',18x,'Spline Grid',/)
+     &                    //,20x,'Atom Numbers',15x,'Spline Grid',
+     &                       6x,'Tier',/)
                end if
                j = itt(2,i)
-               write (iout,640)  i,ia,ib,ic,id,ie,tnx(j),tny(j)
-  640          format (i6,3x,5i6,10x,2i6)
+               write (iout,640)  i,ia,ib,ic,id,ie,tnx(j),tny(j),ttier(j)
+  640          format (i6,3x,5i6,7x,2i6,7x,a3)
             end if
          end do
       end if

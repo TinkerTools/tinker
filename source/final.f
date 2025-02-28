@@ -63,6 +63,7 @@ c
       use kdipol
       use kdsp
       use kexpl
+      use keys
       use khbond
       use kiprop
       use kitors
@@ -96,6 +97,7 @@ c
       use opbend
       use opdist
       use orbits
+      use params
       use paths
       use pbstuf
       use pdb
@@ -583,6 +585,10 @@ c
       if (allocated(pepdmp))  deallocate (pepdmp)
       if (allocated(pepl))  deallocate (pepl)
 c
+c     deallocation of global arrays from module keys
+c
+      if (allocated(keyline))  deallocate (keyline)
+c
 c     deallocation of global arrays from module khbond
 c
       if (allocated(radhb))  deallocate (radhb)
@@ -708,6 +714,7 @@ c
       if (allocated(tbx))  deallocate (tbx)
       if (allocated(tby))  deallocate (tby)
       if (allocated(tbxy))  deallocate (tbxy)
+      if (allocated(ttier))  deallocate (ttier)
       if (allocated(ktt))  deallocate (ktt)
 c
 c     deallocation of global arrays from module kurybr
@@ -878,6 +885,10 @@ c
       if (allocated(qorb))  deallocate (qorb)
       if (allocated(worb))  deallocate (worb)
       if (allocated(emorb))  deallocate (emorb)
+c
+c     deallocation of global arrays from module params
+c
+      if (allocated(prmline))  deallocate (prmline)
 c
 c     deallocation of global arrays from module paths
 c
