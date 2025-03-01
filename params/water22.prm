@@ -60,9 +60,9 @@ mutual-14-scale         1.0
       #############################
 
 
-AMOEBA water model derived by Chengwen Liu at Univ. of Texas at Austin,
-Tunable parameters are vdw and bond/angle constants, the model provides
-excellent agreement with experiment and high-quality QM data
+AMOEBA water model derived by Chengwen Liu at Univ. of Texas at Austin;
+tunable parameters are vdw and bond/angle constants; the model provides
+good agreement with experiment and high-quality QM data
 
 
       #############################

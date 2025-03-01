@@ -62,7 +62,10 @@ mutual-14-scale         1.0
 
 P. Ren and J. W. Ponder, "A Polarizable Atomic Multipole Water Model
 for Molecular Mechanics Simulation", J. Phys. Chem. B, 107, 5933-5947
-(2003)
+(2003)  [original parameters]
+
+P. Ren and J. W. Ponder, "Temperature and Pressure Dependence of the
+AMOEBA Water Model", J. Phys. Chem. B, 108, 13427-13437 (2004)
 
 Y. Kong, "Multipole Electrostatic Methods for Protein Modeling with
 Reaction Field Treatment", Ph.D. thesis, DBBS Program in Molecular
