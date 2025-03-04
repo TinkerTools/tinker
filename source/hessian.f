@@ -26,7 +26,6 @@ c
       use limits
       use mpole
       use potent
-      use rigid
       use usage
       use vdw
       use vdwpot

@@ -67,6 +67,7 @@ c
       real*8 phase(6)
       logical exist
       character*1 formfeed
+      character*3 tname
       character*3 blank3
       character*8 blank8
       character*12 blank12
@@ -754,7 +755,7 @@ c
   950    format (a1,//,15x,'Tinker Force Field Parameters for ',a20)
          write (itxt,960)
   960    format (//,15x,'Torsion-Torsion Parameters',
-     &           ///,19x,'Classes',18x,'KNX',9x,'KNY')
+     &           ///,19x,'Classes',16x,'NX',7x,'NY',6x,'Tier')
          do i = 1, maxntt
             if (ktt(i) .eq. blank20)  goto 990
             k1 = number(ktt(i)(1:4))
@@ -762,11 +763,14 @@ c
             k3 = number(ktt(i)(9:12))
             k4 = number(ktt(i)(13:16))
             k5 = number(ktt(i)(17:20))
-            write (itxt,970)  i,k1,k2,k3,k4,k5,tnx(i),tny(i)
-  970       format (/,2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,'-',i4,2x,2i12,/)
+            tname = ttier(i)
+            if (tname .eq. blank3)  tname = '---'
+            write (itxt,970)  i,k1,k2,k3,k4,k5,tnx(i),tny(i),tname
+  970       format (/,2x,i5,2x,i4,'-',i4,'-',i4,'-',i4,'-',i4,
+     &                 2x,2i9,7x,a3/)
             k = tnx(i) * tny(i)
             write (itxt,980)  (tbf(j,i),j=1,k)
-  980       format (3x,6f12.4)
+  980       format (3x,6f12.5)
          end do
   990    continue
       end if

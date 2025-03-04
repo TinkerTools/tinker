@@ -1,0 +1,91 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 25.1   February 2025                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2025               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Enter Parameter File Name [<Enter>=NONE] :  
+ Undefined Atom Types or Classes :
+
+ Type          Atom Number     Atom Type     Atom Class
+
+ Atom                1              0              0
+ Atom                2              0              0
+ Atom                3              0              0
+ Atom                4              0              0
+ Atom                5              0              0
+ Atom                6              0              0
+ Atom                7              0              0
+ Atom                8              0              0
+ Atom                9              0              0
+ Atom               10              0              0
+ Atom               11              0              0
+
+ The Tinker XYZ File Editing Utility Can :
+
+    (1) Convert Simple XYZ File to Tinker Format
+    (2) Offset the Numbers of the Current Atoms
+    (3) Remove User Specified Individual Atoms
+    (4) Remove User Specified Types of Atoms
+    (5) Delete Inactive Atoms Beyond Cutoff Range
+    (6) Insertion of Individual Specified Atoms
+    (7) Replace Old Atom Type with a New Type
+    (8) Assign Connectivities for Linear Chain
+    (9) Assign Connectivities Based on Distance
+   (10) Assign Atom Types for BASIC Force Field
+   (11) Transfer Atom Types from Another Structure
+   (12) Convert Units from Bohrs to Angstroms
+   (13) Invert thru Origin to Give Mirror Image
+   (14) Translate All Atoms by an X,Y,Z-Vector
+   (15) Translate Center of Mass to the Origin
+   (16) Translate a Specified Atom to the Origin
+   (17) Translate and Rotate to Inertial Frame
+   (18) Rotate All Atoms Around a Specified Axis
+   (19) Move to Specified Rigid Body Coordinates
+   (20) Move Stray Molecules into Periodic Box
+   (21) Trim a Periodic Box to a Smaller Size
+   (22) Make Truncated Octahedron from Cubic Box
+   (23) Make Rhombic Dodecahedron from Cubic Box
+   (24) Append a Second XYZ File to Current One
+   (25) Create and Fill a Periodic Boundary Box
+   (26) Soak Current Molecule in Box of Solvent
+   (27) Place Monoatomic Ions around a Solute
+
+ Number of the Desired Choice [<Enter>=Exit] :  
+ Number of the Desired Choice [<Enter>=Exit] :  
+ Number of the Desired Choice [<Enter>=Exit] :  
+ Number of the Desired Choice [<Enter>=Exit] :  
+ New Coordinates Written To :  pyridine.xyz_2
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 25.1   February 2025                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2025               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Total Potential Energy :                 85.4513 Kcal/mole
+
+ Energy Component Breakdown :           Kcal/mole        Interactions
+
+ Bond Stretching                          28.0262               11
+ Angle Bending                            30.1447               16
+ Out-of-Plane Distance                     0.0000                5
+ Torsional Angle                           0.0000               20
+ Van der Waals                            27.2803               28

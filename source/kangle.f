@@ -30,12 +30,12 @@ c
       use potent
       use usage
       implicit none
-      integer i,j
+      integer i,j,k
       integer ia,ib,ic
       integer ita,itb,itc
       integer na,nap,naf
       integer na3,na4,na5
-      integer jen,ih,nh
+      integer jen,nhyd
       integer next,size
       integer minat,iring
       real*8 fc,an,pr
@@ -428,11 +428,11 @@ c
 c
 c     count number of non-angle hydrogens on the central atom
 c
-         nh = 1
+         nhyd = 1
          do j = 1, n12(ib)
-            ih = i12(j,ib)
-            if (ih.ne.ia .and. ih.ne.ic .and. atomic(ih).eq.1)
-     &         nh = nh + 1
+            k = i12(j,ib)
+            if (k.ne.ia .and. k.ne.ic .and. atomic(k).eq.1)
+     &         nhyd = nhyd + 1
          end do
 c
 c     make a check for bond angles contained inside small rings
@@ -450,9 +450,9 @@ c     assign angle bending parameters for bond angles
 c
          if (iring .eq. 0) then
             do j = 1, na
-               if (ka(j).eq.pt .and. ang(nh,j).ne.0.0d0) then
+               if (ka(j).eq.pt .and. ang(nhyd,j).ne.0.0d0) then
                   ak(i) = acon(j)
-                  anat(i) = ang(nh,j)
+                  anat(i) = ang(nhyd,j)
                   done = .true.
                   goto 320
                end if
@@ -462,9 +462,9 @@ c     assign bending parameters for 5-membered ring angles
 c
          else if (iring .eq. 5) then
             do j = 1, na5
-               if (ka5(j).eq.pt .and. ang5(nh,j).ne.0.0d0) then
+               if (ka5(j).eq.pt .and. ang5(nhyd,j).ne.0.0d0) then
                   ak(i) = acon5(j)
-                  anat(i) = ang5(nh,j)
+                  anat(i) = ang5(nhyd,j)
                   done = .true.
                   goto 320
                end if
@@ -474,9 +474,9 @@ c     assign bending parameters for 4-membered ring angles
 c
          else if (iring .eq. 4) then
             do j = 1, na4
-               if (ka4(j).eq.pt .and. ang4(nh,j).ne.0.0d0) then
+               if (ka4(j).eq.pt .and. ang4(nhyd,j).ne.0.0d0) then
                   ak(i) = acon4(j)
-                  anat(i) = ang4(nh,j)
+                  anat(i) = ang4(nhyd,j)
                   done = .true.
                   goto 320
                end if
@@ -486,9 +486,9 @@ c     assign bending parameters for 3-membered ring angles
 c
          else if (iring .eq. 3) then
             do j = 1, na3
-               if (ka3(j).eq.pt .and. ang3(nh,j).ne.0.0d0) then
+               if (ka3(j).eq.pt .and. ang3(nhyd,j).ne.0.0d0) then
                   ak(i) = acon3(j)
-                  anat(i) = ang3(nh,j)
+                  anat(i) = ang3(nhyd,j)
                   done = .true.
                   goto 320
                end if
@@ -499,9 +499,9 @@ c     assign in-plane angle bending parameters for bond angles
 c
          if (.not.done .and. n12(ib).eq.3) then
             do j = 1, nap
-               if (kap(j).eq.pt .and. angp(nh,j).ne.0.0d0) then
+               if (kap(j).eq.pt .and. angp(nhyd,j).ne.0.0d0) then
                   ak(i) = aconp(j)
-                  anat(i) = angp(nh,j)
+                  anat(i) = angp(nhyd,j)
                   angtyp(i) = 'IN-PLANE'
                   done = .true.
                   goto 320

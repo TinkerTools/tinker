@@ -17,6 +17,7 @@ c     and then opens and reads the parameters
 c
 c
       subroutine getprm
+      use argue
       use files
       use inform
       use iounit
@@ -41,34 +42,54 @@ c
       useprm = .true.
       prmfile = filename(1:leng)//'.prm'
 c
-c     search the keyword list for the parameter filename
+c     try to get a parameter filename from the command line
 c
-      do i = 1, nkey
-         next = 1
-         record = keyline(i)
-         call gettext (record,keyword,next)
-         call upcase (keyword)
-         if (keyword(1:11).eq.'PARAMETERS '
-     &          .or. keyword(1:10).eq.'PARAMETER ') then
-            string = record(next:240)
-            next = 1
-            call getstring (string,prmfile,next)
-            if (next .eq. 1)  call gettext (string,prmfile,next)
+      exist = .false.
+      do i = 1, narg-1
+         string = arg(i)
+         call upcase (string)
+         if (string(1:2) .eq. '-P') then
+            prmfile = arg(i+1)
+            if (prmfile(1:2) .eq. '~/') then
+               call getenv ('HOME',prefix)
+               prmfile = prefix(1:trimtext(prefix))//
+     &                      prmfile(2:trimtext(prmfile))
+            end if
+            call suffix (prmfile,'prm','old')
+            inquire (file=prmfile,exist=exist)
+            if (.not. exist) then
+               write (iout,10)
+   10          format (/,' GETPRM  --  Parameter File Specified',
+     &                    ' on Command Line not Found')
+               call fatal
+            end if
          end if
       end do
 c
-c     account for home directory abbreviation in filename
+c     search the keyword list for the parameter filename
 c
-      if (prmfile(1:2) .eq. '~/') then
-         call getenv ('HOME',prefix)
-         prmfile = prefix(1:trimtext(prefix))//
-     &                prmfile(2:trimtext(prmfile))
+      if (.not. exist) then
+         do i = 1, nkey
+            next = 1
+            record = keyline(i)
+            call gettext (record,keyword,next)
+            call upcase (keyword)
+            if (keyword(1:11).eq.'PARAMETERS '
+     &             .or. keyword(1:10).eq.'PARAMETER ') then
+               string = record(next:240)
+               next = 1
+               call getstring (string,prmfile,next)
+               if (next .eq. 1)  call gettext (string,prmfile,next)
+               if (prmfile(1:2) .eq. '~/') then
+                  call getenv ('HOME',prefix)
+                  prmfile = prefix(1:trimtext(prefix))//
+     &                         prmfile(2:trimtext(prmfile))
+               end if
+               call suffix (prmfile,'prm','old')
+               inquire (file=prmfile,exist=exist)
+            end if
+         end do
       end if
-c
-c     check existence of default or specified parameter file
-c
-      call suffix (prmfile,'prm','old')
-      inquire (file=prmfile,exist=exist)
 c
 c     test for user specified absence of a parameter file
 c
@@ -81,25 +102,15 @@ c
          end if
       end if
 c
-c     try to get a parameter filename from the command line
-c
-      if (.not. exist) then
-         call nextarg (prmfile,exist)
-         if (exist) then
-            call suffix (prmfile,'prm','old')
-            inquire (file=prmfile,exist=exist)
-         end if
-      end if
-c
 c     if necessary, ask for the parameter filename
 c
       nask = 0
       do while (.not.exist .and. nask.lt.maxask)
          nask = nask + 1
-         write (iout,10)
-   10    format (/,' Enter Parameter File Name [<Enter>=NONE] :  ',$)
-         read (input,20)  prmfile
-   20    format (a240)
+         write (iout,20)
+   20    format (/,' Enter Parameter File Name [<Enter>=NONE] :  ',$)
+         read (input,30)  prmfile
+   30    format (a240)
          next = 1
          call getword (prmfile,none,next)
          call upcase (none)
@@ -121,7 +132,7 @@ c
       end do
       if (.not. exist)  call fatal
 c
-c     read the parameter file and store it for latter use
+c     read the parameter file to get number of lines
 c
       nprm = 0
       if (useprm) then
@@ -129,20 +140,28 @@ c
          open (unit=iprm,file=prmfile,status='old')
          rewind (unit=iprm)
          do while (.true.)
-            read (iprm,30,err=50,end=50)  record
-   30       format (a240)
+            read (iprm,40,err=50,end=50)
+   40       format ()
             nprm = nprm + 1
-            prmline(nprm) = record
-            if (nprm .ge. maxprm) then
-               write (iout,40)
-   40          format (/,' GETPRM  --  Parameter File Too Large;',
-     &                    ' Increase MAXPRM')
-               call fatal
-            end if
          end do
    50    continue
-         close (unit=iprm)
+         rewind (unit=iprm)
       end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(prmline))  deallocate (prmline)
+      allocate (prmline(nprm))
+c
+c     reread the parameter file and store for latter use
+c
+      do i = 1, nprm
+         read (iprm,60,err=70,end=70)  record
+   60    format (a240)
+         prmline(i) = record
+      end do
+   70 continue
+      close (unit=iprm)
 c
 c     convert underbar characters to dashes in all keywords
 c

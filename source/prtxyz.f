@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "prtxyz" writes out a set of Cartesian atomic coordinates
-c     to an external disk file in Tinker XYZ format
+c     to an external file in Tinker XYZ format
 c
 c
       subroutine prtxyz (ixyz)
@@ -207,10 +207,12 @@ c
          write (idcd)  n
       end if
 c
-c     append the lattice values based on header flag value
+c     append the lattice values based on header flag value;
+c     using angle values is NAMD style, cosine values is CHARMM
 c
       if (use_bounds) then
-         write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+c        write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+         write (idcd)  xbox,gamma,ybox,beta,alpha,zbox
       end if
 c
 c     append the atomic coordinates along each axis in turn

@@ -30,6 +30,7 @@ c
       use cell
       use fft
       use files
+      use freeze
       use group
       use inform
       use iounit
@@ -155,6 +156,10 @@ c
 c     integer flag for use of GPU coprocessor
 c
       gpucard = 0
+c
+c     flag for use of holonomic constraints
+c
+      use_rattle = .false.
 c
 c     flag for use of atom groups
 c

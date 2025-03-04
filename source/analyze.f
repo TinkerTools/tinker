@@ -51,9 +51,11 @@ c
 c
 c     set up the structure and mechanics calculation
 c
+      ixyz = 0
       call initial
       call getcart (ixyz)
       call mechanic
+      xyzfile = filename
 c
 c     get the desired types of analysis to be performed
 c
@@ -180,25 +182,6 @@ c
          debug = .false.
       end if
 c
-c     reopen the coordinates file and read the first structure
-c
-      frame = 0
-      close (unit=ixyz)
-      ixyz = freeunit ()
-      xyzfile = filename
-      if (archive) then
-         call suffix (xyzfile,'xyz','old')
-         open (unit=ixyz,file=xyzfile,status ='old')
-         rewind (unit=ixyz)
-         call readxyz (ixyz)
-      else if (binary) then
-         call suffix (xyzfile,'dcd','old')
-         open (unit=ixyz,file=xyzfile,form='unformatted',status ='old')
-         rewind (unit=ixyz)
-         first = .true.
-         call readdcd (ixyz,first)
-      end if
-c
 c     get parameters used for molecular mechanics potentials
 c
       if (doparam .and. doconect) then
@@ -219,6 +202,7 @@ c
 c
 c     perform analysis for each successive coordinate structure
 c
+      frame = 0
       do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
@@ -960,7 +944,7 @@ c     ##############################################################
 c
 c
 c     "saveyze" prints the atomic forces and/or the induced dipoles
-c     to separate external disk files
+c     to separate external files
 c
 c
       subroutine saveyze (frame)
@@ -1839,11 +1823,12 @@ c
                   header = .false.
                   write (iout,640)
   640             format (/,' Torsion-Torsion Parameters :',
-     &                    //,20x,'Atom Numbers',18x,'Spline Grid',/)
+     &                    //,20x,'Atom Numbers',15x,'Spline Grid',
+     &                       6x,'Tier',/)
                end if
                j = itt(2,i)
-               write (iout,650)  i,ia,ib,ic,id,ie,tnx(j),tny(j)
-  650          format (i6,3x,5i6,10x,2i6)
+               write (iout,650)  i,ia,ib,ic,id,ie,tnx(j),tny(j),ttier(j)
+  650          format (i6,3x,5i6,7x,2i6,7x,a3)
             end if
          end do
       end if

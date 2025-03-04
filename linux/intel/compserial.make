@@ -167,11 +167,13 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 strbnd.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 strtor.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 syntrn.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tarray.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tettor.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 titles.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 torpot.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tors.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tortor.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tree.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tritor.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 units.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 uprior.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 urey.f
@@ -377,6 +379,9 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 fft3d.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 fftpack.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 field.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 final.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 findnuc.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 findpro.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 findseq.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 flatten.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 freefix.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 freeunit.f
@@ -587,6 +592,7 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 testpol.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 testrot.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 testsurf.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 testvir.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tettors.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 timer.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 timerot.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tncg.f
@@ -595,6 +601,7 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 torque.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 torsfit.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 torsions.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 trimtext.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 tritors.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 unionball.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 unitcell.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 valence.f

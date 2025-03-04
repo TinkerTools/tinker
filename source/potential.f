@@ -796,7 +796,7 @@ c     #############################################################
 c
 c
 c     "readpot" gets a set of grid points and target electrostatic
-c     potential values from an external disk file
+c     potential values from an external file
 c
 c
       subroutine readpot (ipot,iconf)

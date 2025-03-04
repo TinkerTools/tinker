@@ -1757,7 +1757,7 @@ c
       integer i,j,k,m
       integer ii,jj
       integer atn,next
-      real*8 pol,thl
+      real*8 pol,thl,thld
       real*8 pel,pal
       real*8 sixth
       logical exist,query
@@ -1783,21 +1783,27 @@ c
       if (exist) then
          read (string,*,err=10,end=10)  answer
          call upcase (answer)
-         if (answer.eq.'A' .or. answer.eq.'H')  query = .false.
+         if (answer.eq.'A' .or. answer .eq. 'P' .or.
+     &          answer.eq.'H')  query = .false.
       end if
    10 continue
       if (query) then
          answer = 'A'
          write (iout,20)
-   20    format (/,' Choose Either the AMOEBA or HIPPO Polarization',
-     &              ' Model [A] :  ',$)
+   20    format (/,' Choose the AMOEBA, AMOEBA+ or HIPPO',
+     &             ' Polarization Model [A] : ', $)
          read (input,30)  record
    30    format (a240)
          next = 1
          call gettext (record,answer,next)
          call upcase (answer)
       end if
-      if (answer .eq. 'H') then
+      if (answer .eq. 'P') then
+         forcefield = 'APLUS'
+         use_tholed = .true.
+         use_thole = .false.
+         dpequal = .true.
+      else if (answer .eq. 'H') then
          forcefield = 'HIPPO'
          use_thole = .false.
          use_chgpen = .true.
@@ -1851,6 +1857,31 @@ c
          u4scale = 1.0d0
       end if
 c
+c     set multipole and polarization scale factors for AMOEBA+ 
+c
+      if (forcefield .eq. 'APLUS') then
+         m2scale = 0.0d0
+         m3scale = 0.0d0
+         m4scale = 0.5d0
+         m5scale = 1.0d0
+         p2scale = 0.0d0
+         p3scale = 0.0d0
+         p4scale = 0.5d0
+         p5scale = 0.5d0
+         p2iscale = 0.0d0
+         p3iscale = 0.0d0
+         p4iscale = 0.5d0
+         p5iscale = 0.5d0
+         d1scale = 0.0d0
+         d2scale = 0.0d0
+         d3scale = 0.5d0
+         d4scale = 0.5d0
+         u1scale = 1.0d0
+         u2scale = 1.0d0
+         u3scale = 1.0d0
+         u4scale = 1.0d0
+      end if
+c
 c     set multipole and polarization scale factors for HIPPO
 c
       if (forcefield .eq. 'HIPPO') then
@@ -1880,11 +1911,12 @@ c
          w5scale = 1.0d0
       end if
 c
-c     assign default atomic polarizabilities for AMOEBA model
+c     assign atomic polarizabilities for AMOEBA and AMOEBA+ model
 c
-      if (forcefield .eq. 'AMOEBA') then
+      if (forcefield.eq.'AMOEBA' .or. forcefield.eq.'APLUS') then
          do i = 1, n
             thole(i) = 0.39d0
+            if (forcefield .eq. 'APLUS')  tholed(i) = 0.70d0
             atn = atomic(i)
             if (atn .eq. 1) then
                polarity(i) = 0.496d0
@@ -2140,29 +2172,42 @@ c
       if (use_thole) then
          write (iout,70)
    70    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
-      else if (use_chgpen) then
+      else if (use_tholed) then
          write (iout,80)
-   80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Core',
+   80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Thole',
+     &             8x,'TholeD',/)
+      else if (use_chgpen) then
+         write (iout,90)
+   90    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Core',
      &              5x,'Valence',8x,'Damp',/)
       end if
       do i = 1, n
          ii = pollist(i)
          if (use_thole) then
             if (ii .eq. 0) then
-               write (iout,90)  i,name(i)
-   90          format (i8,6x,a3,12x,'--',13x,'--')
+               write (iout,100)  i,name(i)
+  100          format (i8,6x,a3,12x,'--',13x,'--')
             else
-               write (iout,100)  i,name(i),polarity(i),thole(i)
-  100          format (i8,6x,a3,4x,f12.4,3x,f12.4)
+               write (iout,110)  i,name(i),polarity(i),thole(i)
+  110          format (i8,6x,a3,4x,f12.4,3x,f12.4)
+            end if
+         else if (use_tholed) then
+            if (ii .eq. 0) then
+               write (iout,120)  i,name(i)
+  120          format (i8,6x,a3,12x,'--',13x,'--', 13x, '--')
+            else
+               write (iout,130) i,name(i),polarity(i),
+     &                          thole(i),tholed(i)
+  130          format (i8,6x,a3,4x,f12.4,3x,f12.4,3x,f12.4)
             end if
          else if (use_chgpen) then
             if (ii .eq. 0) then
-               write (iout,110)  i,name(i)
-  110          format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
+               write (iout,140)  i,name(i)
+  140          format (i8,6x,a3,12x,'--',13x,'--',10x,'--',10x,'--')
             else
-               write (iout,120)  i,name(i),polarity(i),pcore(i),
+               write (iout,150)  i,name(i),polarity(i),pcore(i),
      &                           pval(i),palpha(i)
-  120          format (i8,6x,a3,4x,f12.4,3x,3f12.4)
+  150          format (i8,6x,a3,4x,f12.4,3x,3f12.4)
             end if
          end if
       end do
@@ -2174,37 +2219,53 @@ c
       i = -1
       call nextarg (string,exist)
       if (exist) then
-         read (string,*,err=130,end=130)  i
+         read (string,*,err=160,end=160)  i
          if (i .eq. 0)  query = .false.
       end if
-  130 continue
+  160 continue
       do while (query)
          i = 0
          if (use_thole) then
             pol = 0.0d0
             thl = 0.39d0
-            write (iout,140)
-  140       format (/,' Enter Atom Number, Polarizability & Thole',
+            write (iout,170)
+  170       format (/,' Enter Atom Number, Polarizability & Thole',
      &                 ' Value :  ',$)
-            read (input,150)  record
-  150       format (a240)
-            read (record,*,err=160,end=160)  i,pol,thl
-  160       continue
+            read (input,180)  record
+  180       format (a240)
+            read (record,*,err=190,end=190)  i,pol,thl
+  190       continue
             if (i .ne. 0) then
                if (pol .eq. 0.0d0)  pol = polarity(i)
                if (thl .eq. 0.0d0)  thl = thole(i)
+            end if
+         else if (use_tholed) then
+            pol = 0.0d0
+            thl = 0.39d0
+            thld = 0.70d0
+            write (iout,200)
+  200       format (/,' Enter Atom Number, Polarizability, Thole',
+     &                 ' & TholeD Values :  ',$)
+            read (input,210)  record
+  210       format (a240)
+            read (record,*,err=220,end=220)  i,pol,thl,thld
+  220       continue
+            if (i .ne. 0) then
+               if (pol .eq. 0.0d0)  pol = polarity(i)
+               if (thl .eq. 0.0d0)  thl = thole(i)
+               if (thld .eq. 0.0d0)  thld = tholed(i)
             end if
          else if (use_chgpen) then
             pol = 0.0d0
             pel = 0.0d0
             pal = 0.0d0
-            write (iout,170)
-  170       format (/,' Enter Atom Number, Polarize, Core & Damp',
+            write (iout,230)
+  230       format (/,' Enter Atom Number, Polarize, Core & Damp',
      &                 ' Value :  ',$)
-            read (input,180)  record
-  180       format (a240)
-            read (record,*,err=190,end=190)  i,pol,pel,pal
-  190       continue
+            read (input,240)  record
+  240       format (a240)
+            read (record,*,err=250,end=250)  i,pol,pel,pal
+  250       continue
             if (i .ne. 0) then
                if (pol .eq. 0.0d0)  pol = polarity(i)
                if (pel .eq. 0.0d0)  pel = pcore(i)
@@ -2219,6 +2280,10 @@ c
             if (use_thole) then
                thole(i) = thl
                pdamp(i) = polarity(i)**sixth
+            else if (use_tholed) then
+               thole(i) = thl
+               tholed(i) = thld
+               pdamp(i) = polarity(i)**sixth
             else if (use_chgpen) then
                pcore(i) = pel
                palpha(i) = pal
@@ -2230,34 +2295,47 @@ c
 c     repeat polarizability values if parameters were altered
 c
       if (change) then
-         write (iout,200)
-  200    format (/,' Atomic Polarizabilities for Multipole Sites :')
+         write (iout,260)
+  260    format (/,' Atomic Polarizabilities for Multipole Sites :')
          if (use_thole) then
-            write (iout,210)
-  210       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+            write (iout,270)
+  270       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
+         else if (use_tholed) then
+            write (iout,280)
+  280       format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',
+     &                 10x,'TholeD',/)
          else if (use_chgpen) then
-            write (iout,220)
-  220       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
+            write (iout,290)
+  290       format (/,5x,'Atom',5x,'Name',7x,'Polarize',4x,'Core Chg',
      &                 8x,'Damp',/)
          end if
          do i = 1, n
             ii = pollist(i)
             if (use_thole) then
                if (ii .eq. 0) then
-                  write (iout,230)  i,name(i)
-  230             format (i8,6x,a3,12x,'--',13x,'--')
+                  write (iout,300)  i,name(i)
+  300             format (i8,6x,a3,12x,'--',13x,'--')
                else
-                  write (iout,240)  i,name(i),polarity(i),thole(i)
-  240             format (i8,6x,a3,4x,f12.4,3x,f12.4)
+                  write (iout,310)  i,name(i),polarity(i),thole(i)
+  310             format (i8,6x,a3,4x,f12.4,3x,f12.4)
+               end if
+            else if (use_tholed) then
+               if (ii .eq. 0) then
+                  write (iout,320)  i,name(i)
+  320             format (i8,6x,a3,12x,'--',13x,'--',13x,'--')
+               else
+                  write (iout,330)  i,name(i),polarity(i),
+     &                              thole(i),tholed(i)
+  330             format (i8,6x,a3,4x,f12.4,3x,f12.4,f12.4)
                end if
             else if (use_chgpen) then
                if (ii .eq. 0) then
-                  write (iout,250)  i,name(i)
-  250             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
+                  write (iout,340)  i,name(i)
+  340             format (i8,6x,a3,12x,'--',13x,'--',10x,'--')
                else
-                  write (iout,260)  i,name(i),polarity(i),pcore(i),
+                  write (iout,350)  i,name(i),polarity(i),pcore(i),
      &                              palpha(i)
-  260             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
+  350             format (i8,6x,a3,4x,f12.4,3x,2f12.4)
                end if
             end if
          end do
@@ -2862,13 +2940,17 @@ c
       write (iout,90)  truth(1:trimtext(truth))
    90 format (/,' Use Thole Damping:',11x,a)
       truth = 'False'
-      if (use_chgpen)  truth = 'True'
+      if (use_tholed)  truth = 'True'
       write (iout,100)  truth(1:trimtext(truth))
-  100 format (' Charge Penetration:',10x,a)
+  100 format (' Use TholeD Damping:',10x,a)
+      truth = 'False'
+      if (use_chgpen)  truth = 'True'
+      write (iout,110)  truth(1:trimtext(truth))
+  110 format (' Charge Penetration:',10x,a)
       truth = 'False'
       if (dpequal)  truth = 'True'
-      write (iout,110)  truth(1:trimtext(truth))
-  110 format (' Set D Equal to P:',12x,a)
+      write (iout,120)  truth(1:trimtext(truth))
+  120 format (' Set D Equal to P:',12x,a)
 c
 c     set tolerances for computation of mutual induced dipoles
 c
@@ -2950,13 +3032,13 @@ c
          eps = debye * sqrt(eps/dble(npolar))
          epsold = eps
          if (iter .eq. 1) then
-            write (iout,120)
-  120       format (/,' Determination of Intergroup Induced',
+            write (iout,130)
+  130       format (/,' Determination of Intergroup Induced',
      &                 ' Dipoles :',
      &              //,4x,'Iter',8x,'RMS Change (Debye)',/)
          end if
-         write (iout,130)  iter,eps
-  130    format (i8,7x,f16.10)
+         write (iout,140)  iter,eps
+  140    format (i8,7x,f16.10)
          if (eps .lt. poleps)  done = .true.
          if (eps .gt. epsold)  done = .true.
          if (iter .ge. maxiter)  done = .true.
@@ -2986,8 +3068,8 @@ c
 c     terminate the calculation if dipoles failed to converge
 c
       if (eps .gt. poleps) then
-         write (iout,140)
-  140    format (/,' INTERPOL  --  Warning, Induced Dipoles',
+         write (iout,150)
+  150    format (/,' INTERPOL  --  Warning, Induced Dipoles',
      &              ' are not Converged')
          call prterr
          call fatal
@@ -3012,16 +3094,16 @@ c
 c
 c     print out a list of the final induced dipole moments
 c
-      write (iout,150)
-  150 format (/,' Local Frame Intergroup Induced Dipole Moments',
-     &           ' (Debye) :')
       write (iout,160)
-  160 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',9x,'Total',/)
+  160 format (/,' Local Frame Intergroup Induced Dipole Moments',
+     &           ' (Debye) :')
+      write (iout,170)
+  170 format (/,4x,'Atom',14x,'X',11x,'Y',11x,'Z',9x,'Total',/)
       do ii = 1, npole
          i = ipole(ii)
          norm = sqrt(uind(1,i)**2+uind(2,i)**2+uind(3,i)**2)
-         write (iout,170)  i,(debye*uind(j,i),j=1,3),debye*norm
-  170    format (i8,5x,4f12.4)
+         write (iout,180)  i,(debye*uind(j,i),j=1,3),debye*norm
+  180    format (i8,5x,4f12.4)
       end do
       return
       end
@@ -3069,7 +3151,8 @@ c
       real*8 damp,expdamp
       real*8 scale3,scale5
       real*8 scale7
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pti,ptdi
+      real*8 pgamma
       real*8 fid(3),fkd(3)
       real*8 dmpi(7),dmpk(7)
       real*8, allocatable :: dscale(:)
@@ -3214,6 +3297,40 @@ c
                      scale5 = 1.0d0 - expdamp*(1.0d0+damp)
                      scale7 = 1.0d0 - expdamp*(1.0d0+damp
      &                                   +0.6d0*damp**2)
+                  end if
+               end if
+               rr3 = scale3 / (r*r2)
+               rr5 = 3.0d0 * scale5 / (r*r2*r2)
+               rr7 = 15.0d0 * scale7 / (r*r2*r2*r2)
+               fid(1) = -xr*(rr3*ck-rr5*dkr+rr7*qkr)
+     &                     - rr3*dkx + 2.0d0*rr5*qkx
+               fid(2) = -yr*(rr3*ck-rr5*dkr+rr7*qkr)
+     &                     - rr3*dky + 2.0d0*rr5*qky
+               fid(3) = -zr*(rr3*ck-rr5*dkr+rr7*qkr)
+     &                     - rr3*dkz + 2.0d0*rr5*qkz
+               fkd(1) = xr*(rr3*ci+rr5*dir+rr7*qir)
+     &                     - rr3*dix - 2.0d0*rr5*qix
+               fkd(2) = yr*(rr3*ci+rr5*dir+rr7*qir)
+     &                     - rr3*diy - 2.0d0*rr5*qiy
+               fkd(3) = zr*(rr3*ci+rr5*dir+rr7*qir)
+     &                     - rr3*diz - 2.0d0*rr5*qiz
+c
+c     find the field components for Direct polarization damping
+c
+            else if (use_tholed) then
+               damp = pdi * pdamp(k)
+               scale3 = 1.0d0
+               scale5 = 1.0d0
+               scale7 = 1.0d0
+               if (damp .ne. 0.0d0) then
+                  pgamma = min(ptdi,tholed(k))
+                  damp = pgamma * (r/damp)**(1.5d0)
+                  if (damp .lt. 50.0d0) then
+                     expdamp = exp(-damp)
+                     scale3 = 1.0d0 - expdamp
+                     scale5 = 1.0d0 - expdamp*(1.0d0+0.5d0*damp)
+                     scale7 = 1.0d0 - expdamp*(1.0d0+0.65d0*damp
+     &                                   +0.15d0*damp**2)
                   end if
                end if
                rr3 = scale3 / (r*r2)
@@ -3395,7 +3512,7 @@ c
          uix = uind(1,i)
          uiy = uind(2,i)
          uiz = uind(3,i)
-         if (use_thole) then
+         if (use_thole .or. use_tholed) then
             pdi = pdamp(i)
             pti = thole(i)
          else if (use_chgpen) then
@@ -3452,7 +3569,7 @@ c
                   end do
                end do
                do j = 1, n14(i)
-                  pscale(i14(j,i)) = w4scale
+                  pscale(i14(j,i)) = p4scale
                   do k = 1, np11(i)
                      if (i14(j,i) .eq. ip11(k,i))
      &                  pscale(i14(j,i)) = p4iscale
@@ -3548,7 +3665,7 @@ c
 c
 c     find the field components for Thole polarization damping
 c
-            if (use_thole) then
+            if (use_thole .or. use_tholed) then
                scale3 = 1.0d0
                scale5 = 1.0d0
                damp = pdi * pdamp(k)
@@ -4378,7 +4495,7 @@ c
       use units
       implicit none
       integer i,j,k
-      integer ii,it,ic
+      integer ii,it
       integer ixyz,ikey
       integer size,atlast
       integer xaxe,yaxe,zaxe
@@ -4565,9 +4682,13 @@ c
                write (ikey,200)  it,polarity(i),thole(i),
      &                           (pgrp(j,it),j=1,k)
   200          format ('polarize',7x,i5,5x,2f11.4,2x,20i5)
+            else if (use_tholed) then
+               write (ikey,210)  it,polarity(i),thole(i),tholed(i),
+     &                           (pgrp(j,it),j=1,k)
+  210          format ('polarize',7x,i5,5x,3f11.4,2x,20i5)
             else if (use_chgpen) then
-               write (ikey,210)  it,polarity(i),(pgrp(j,it),j=1,k)
-  210          format ('polarize',7x,i5,5x,f11.4,6x,20i7)
+               write (ikey,220)  it,polarity(i),(pgrp(j,it),j=1,k)
+  220          format ('polarize',7x,i5,5x,f11.4,6x,20i7)
             end if
          end if
       end do

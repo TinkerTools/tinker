@@ -63,6 +63,7 @@ c
       use kdipol
       use kdsp
       use kexpl
+      use keys
       use khbond
       use kiprop
       use kitors
@@ -97,6 +98,7 @@ c
       use opbend
       use opdist
       use orbits
+      use params
       use paths
       use pbstuf
       use pdb
@@ -127,8 +129,10 @@ c
       use strtor
       use syntrn
       use tarray
+      use tettor
       use tors
       use tortor
+      use tritor
       use uprior
       use urey
       use usage
@@ -431,7 +435,9 @@ c
       if (allocated(iratx))  deallocate (iratx)
       if (allocated(kratx))  deallocate (kratx)
       if (allocated(irat))  deallocate (irat)
+      if (allocated(iwat4))  deallocate (iwat4)
       if (allocated(krat))  deallocate (krat)
+      if (allocated(kwat4))  deallocate (kwat4)
       if (allocated(ratimage))  deallocate (ratimage)
 c
 c     deallocation of global arrays from module group
@@ -581,6 +587,10 @@ c
       if (allocated(pepdmp))  deallocate (pepdmp)
       if (allocated(pepl))  deallocate (pepl)
 c
+c     deallocation of global arrays from module keys
+c
+      if (allocated(keyline))  deallocate (keyline)
+c
 c     deallocation of global arrays from module khbond
 c
       if (allocated(radhb))  deallocate (radhb)
@@ -706,6 +716,7 @@ c
       if (allocated(tbx))  deallocate (tbx)
       if (allocated(tby))  deallocate (tby)
       if (allocated(tbxy))  deallocate (tbxy)
+      if (allocated(ttier))  deallocate (ttier)
       if (allocated(ktt))  deallocate (ktt)
 c
 c     deallocation of global arrays from module kurybr
@@ -882,6 +893,10 @@ c
       if (allocated(qorb))  deallocate (qorb)
       if (allocated(worb))  deallocate (worb)
       if (allocated(emorb))  deallocate (emorb)
+c
+c     deallocation of global arrays from module params
+c
+      if (allocated(prmline))  deallocate (prmline)
 c
 c     deallocation of global arrays from module paths
 c
@@ -1171,6 +1186,10 @@ c
       if (allocated(tindex))  deallocate (tindex)
       if (allocated(tdipdip))  deallocate (tdipdip)
 c
+c     deallocation of global arrays from module tettor
+c
+      if (allocated(ibitor))  deallocate (itettor)
+c
 c     deallocation of global arrays from module tors
 c
       if (allocated(itors))  deallocate (itors)
@@ -1184,6 +1203,10 @@ c
 c     deallocation of global arrays from module tortor
 c
       if (allocated(itt))  deallocate (itt)
+c
+c     deallocation of global arrays from module tritor
+c
+      if (allocated(ibitor))  deallocate (itritor)
 c
 c     deallocation of global arrays from module uprior
 c

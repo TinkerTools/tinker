@@ -20,21 +20,13 @@ c
       use atoms
       use bndstr
       use couple
-      use iounit
       use tors
       implicit none
       integer i,j,k
       integer ia,ib,ic,id
-      integer maxtors
 c
 c
-c     perform dynamic allocation of some global arrays
-c
-      maxtors = 18 * n
-      if (allocated(itors))  deallocate (itors)
-      allocate (itors(4,maxtors))
-c
-c     loop over all bonds, storing the atoms in each torsion
+c     initial count of the total number of torsions
 c
       ntors = 0
       do i = 1, nbond
@@ -47,12 +39,30 @@ c
                   id = i12(k,ic)
                   if (id.ne.ib .and. id.ne.ia) then
                      ntors = ntors + 1
-                     if (ntors .gt. maxtors) then
-                        write (iout,10)
-   10                   format (/,' TORSIONS  --  Too many Torsional',
-     &                             ' Angles; Increase MAXTORS')
-                        call fatal
-                     end if
+                  end if
+               end do
+            end if
+         end do
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(itors))  deallocate (itors)
+      allocate (itors(4,ntors))
+c
+c     store the list of atoms involved in each torsion
+c
+      ntors = 0
+      do i = 1, nbond
+         ib = ibnd(1,i)
+         ic = ibnd(2,i)
+         do j = 1, n12(ib)
+            ia = i12(j,ib)
+            if (ia .ne. ic) then
+               do k = 1, n12(ic)
+                  id = i12(k,ic)
+                  if (id.ne.ib .and. id.ne.ia) then
+                     ntors = ntors + 1
                      itors(1,ntors) = ia
                      itors(2,ntors) = ib
                      itors(3,ntors) = ic

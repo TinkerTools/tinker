@@ -168,11 +168,13 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp strbnd.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp strtor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp syntrn.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tarray.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tettor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp titles.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torpot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tors.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tortor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tree.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tritor.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp units.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp uprior.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp urey.f
@@ -378,6 +380,9 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp fft3d.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp fftpack.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp field.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp final.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp findnuc.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp findpro.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp findseq.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp flatten.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp freefix.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp freeunit.f
@@ -588,6 +593,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testpol.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testrot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testsurf.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp testvir.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tettors.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp timer.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp timerot.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tncg.f
@@ -596,6 +602,7 @@ ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torque.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torsfit.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp torsions.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp trimtext.f
+ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp tritors.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp unionball.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp unitcell.f
 ifort /c /O3 /QxHost /Qip- /Qprec-div- /w /Qopenmp valence.f

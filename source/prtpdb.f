@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "prtpdb" writes out a set of Protein Data Bank coordinates
-c     to an external disk file
+c     to an external file
 c
 c
       subroutine prtpdb (ipdb,imdl)

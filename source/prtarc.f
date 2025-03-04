@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "prtarc" writes a Cartesian coordinates archive as either
-c     a formatted or binary disk file
+c     a formatted or binary file
 c
 c
       subroutine prtarc (iarc,first)

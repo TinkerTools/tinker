@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "readcart" gets a set of Cartesian coordinates from either
-c     a formatted or binary disk file
+c     a formatted or binary file
 c
 c
       subroutine readcart (ixyz,first)

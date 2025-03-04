@@ -64,5 +64,9 @@ c
          z(i) = old
          g(3,i) = (e - e0) / eps
       end do
+c
+c     distribute gradient on four-site water extra centers
+c
+      call water4 (g)
       return
       end

@@ -33,8 +33,8 @@ c
       use moldyn
       use usage
       implicit none
-      integer i,j,k
-      integer ia,ib,mode
+      integer i,j,k,mode
+      integer ia,ib,ic,id
       integer niter,maxiter
       integer start,stop
       real*8 dt,eps,sor
@@ -45,6 +45,7 @@ c
       real*8 weigh,dist2
       real*8 delta,term
       real*8 xterm,yterm,zterm
+      real*8 oterm,hterm
       real*8 xold(*)
       real*8 yold(*)
       real*8 zold(*)
@@ -149,6 +150,23 @@ c
      &              ' Iterations')
       end if
 c
+c     set position and velocity of four-site water extra centers
+c
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         oterm = kwat4(1,i)
+         hterm = kwat4(2,i)
+         x(ia) = oterm*x(ib) + hterm*(x(ic)+x(id))
+         y(ia) = oterm*y(ib) + hterm*(y(ic)+y(id))
+         z(ia) = oterm*z(ib) + hterm*(z(ic)+z(id))
+         v(1,ia) = 0.0d0
+         v(2,ia) = 0.0d0
+         v(3,ia) = 0.0d0
+      end do
+c
 c     apply group position and velocity constraints via exact reset
 c
       do i = 1, nratx
@@ -250,14 +268,14 @@ c
 c     set the iteration counter, termination and tolerance
 c
       maxiter = 500
-      niter = 0
-      done = .false.
       sor = 1.25d0
       eps = rateps / dt
       vterm = 2.0d0 / (dt*ekcal)
 c
 c     apply the RATTLE algorithm to correct the velocities
 c
+      niter = 0
+      done = .false.
       do while (.not.done .and. niter.lt.maxiter)
          niter = niter + 1
          done = .true.
@@ -399,8 +417,8 @@ c
       use iounit
       use usage
       implicit none
-      integer i,j,k
-      integer ia,ib,mode
+      integer i,j,k,mode
+      integer ia,ib,ic,id
       integer niter,maxiter
       integer start,stop
       real*8 eps,sor
@@ -410,6 +428,7 @@ c
       real*8 weigh,dist2
       real*8 delta,term
       real*8 xterm,yterm,zterm
+      real*8 oterm,hterm
       real*8 xold(*)
       real*8 yold(*)
       real*8 zold(*)
@@ -506,6 +525,20 @@ c
      &              ' Iterations')
       end if
 c
+c     set the position of any four-site water extra centers
+c
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         oterm = kwat4(1,i)
+         hterm = kwat4(2,i)
+         x(ia) = oterm*x(ib) + hterm*(x(ic)+x(id))
+         y(ia) = oterm*y(ib) + hterm*(y(ic)+y(id))
+         z(ia) = oterm*z(ib) + hterm*(z(ic)+z(id))
+      end do
+c
 c     apply any group position constraints via exact reset
 c
       do i = 1, nratx
@@ -563,7 +596,8 @@ c
       use iounit
       use usage
       implicit none
-      integer i,ia,ib
+      integer i,j
+      integer ia,ib
       integer niter,maxiter
       real*8 eps,sor
       real*8 xr,yr,zr
@@ -658,6 +692,53 @@ c
          write (iout,20)  niter
    20    format (' SHAKE2  --  Gradient Constraints met at',i6,
      &              ' Iterations')
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine water4  --  distribute four-site water gradient  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "water4" transfers gradient components on the extra site of
+c     rigid planar four-site water molecules to the H-O-H atoms
+c
+c     note this routine is needed due to instability of SHAKE and
+c     RATTLE algorithms when four constrained sites lie in a plane;
+c     gradient components of the fourth atom are moved to the other
+c     atoms, and fourth atom ideal coordinates are set elsewhere
+c
+c
+      subroutine water4 (derivs)
+      use freeze
+      implicit none
+      integer i,j
+      integer ia,ib,ic,id
+      real*8 oterm,hterm
+      real*8 derivs(3,*)
+c
+c
+c     distribute the gradient on four-site water extra centers
+c
+      if (use_rattle) then
+         do i = 1, nwat4
+            ia = iwat4(1,i)
+            ib = iwat4(2,i)
+            ic = iwat4(3,i)
+            id = iwat4(4,i)
+            oterm = kwat4(1,i)
+            hterm = kwat4(2,i)
+            do j = 1, 3
+               derivs(j,ib) = derivs(j,ib) + oterm*derivs(j,ia)
+               derivs(j,ic) = derivs(j,ic) + hterm*derivs(j,ia)
+               derivs(j,id) = derivs(j,id) + hterm*derivs(j,ia)
+               derivs(j,ia) = 0.0d0
+            end do
+         end do
       end if
       return
       end

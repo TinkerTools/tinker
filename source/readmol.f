@@ -12,8 +12,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "readmol" gets a set of MDL MOL coordinates from
-c     an external disk file
+c     "readmol" gets a set of MDL MOL coordinates from an
+c     external file
 c
 c
       subroutine readmol (imdl)

@@ -229,6 +229,9 @@ field.o \
 fields.o \
 files.o \
 final.o \
+findnuc.o \
+findpro.o \
+findseq.o \
 flatten.o \
 fracs.o \
 freeunit.o \
@@ -510,6 +513,8 @@ syntrn.o \
 tarray.o \
 tcgstuf.o \
 temper.o \
+tettor.o \
+tettors.o \
 titles.o \
 tncg.o \
 torphase.o \
@@ -520,6 +525,8 @@ torsions.o \
 tortor.o \
 tree.o \
 trimtext.o \
+tritor.o \
+tritors.o \
 unionball.o \
 unitcell.o \
 units.o \

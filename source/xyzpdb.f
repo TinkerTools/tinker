@@ -112,7 +112,8 @@ c
       integer start,stop
       integer pdbnum,atmnum
       integer justify,cbi
-      integer noxy,nhydro
+      integer noxy,nhyd
+      integer ndum,ntot
       integer, allocatable :: ni(:)
       integer, allocatable :: cai(:)
       integer, allocatable :: ci(:)
@@ -261,15 +262,19 @@ c     check each molecule to see if it is a water molecule
 c
       do i = 1, nmol
          water(i) = .false.
-         if (imol(2,i)-imol(1,i) .eq. 2) then
+         ntot = imol(2,i) - imol(1,i)
+         if (ntot .le. 4) then
             noxy = 0
-            nhydro = 0
+            nhyd = 0
+            ndum = 0
             do j = imol(1,i), imol(2,i)
                k = kmol(j)
                if (atomic(k) .eq. 8)  noxy = noxy + 1
-               if (atomic(k) .eq. 1)  nhydro = nhydro + 1
+               if (atomic(k) .eq. 1)  nhyd = nhyd + 1
+               if (atomic(k) .le. 0)  ndum = ndum + 1
             end do
-            if (noxy.eq.1 .and. nhydro.eq.2)  water(i) = .true.
+            if (noxy.eq.1 .and. nhyd.eq.2 .and.
+     &             noxy+nhyd+ndum.eq.ntot)  water(i) = .true.
          end if
       end do
 c
@@ -687,9 +692,13 @@ c
                   justify = 0
                   call numeral (type(k),resname,justify)
                   if (water(i)) then
-                     if (atmnum .eq. 1)  atmname = ' H  '
                      if (atmnum .eq. 8)  atmname = ' O  '
+                     if (atmnum .eq. 1)  atmname = ' H  '
+                     if (atmnum .le. 0)  atmname = 'EP  '
                      resname = 'HOH'
+                  else if (atmnum .eq. 9) then
+                     atmname = ' F  '
+                     resname = '  F'
                   else if (atmnum .eq. 11) then
                      atmname = 'NA  '
                      resname = ' NA'
@@ -705,12 +714,27 @@ c
                   else if (atmnum .eq. 20) then
                      atmname = 'CA  '
                      resname = ' CA'
+                  else if (atmnum .eq. 30) then
+                     atmname = 'ZN  '
+                     resname = ' ZN'
                   else if (atmnum .eq. 35) then
                      atmname = 'BR  '
                      resname = ' BR'
+                  else if (atmnum .eq. 37) then
+                     atmname = 'RB  '
+                     resname = ' RB'
+                  else if (atmnum .eq. 38) then
+                     atmname = 'SR  '
+                     resname = ' SR'
                   else if (atmnum .eq. 53) then
                      atmname = ' I  '
                      resname = '  I'
+                  else if (atmnum .eq. 55) then
+                     atmname = 'CS  '
+                     resname = ' CS'
+                  else if (atmnum .eq. 56) then
+                     atmname = 'BA  '
+                     resname = ' BA'
                   end if
                   pdbnum = nseq + i - 1
                   call pdbatom (atmname,resname,pdbnum,k)
@@ -1089,7 +1113,7 @@ c
       use fields
       use sequen
       implicit none
-      integer i,nh,hca
+      integer i,nhyd,hca
       integer ires,jchain
       integer ni,cai,cbi
       logical allatom
@@ -1120,17 +1144,17 @@ c     get any amide hydrogen atoms for N-terminal residues
 c
       else
          if (resname .eq. 'PRO') then
-            nh = 0
+            nhyd = 0
             do i = 1, n
                if (atomic(i).eq.1 .and. i12(1,i).eq.ni) then
-                  nh = nh + 1
-                  if (nh .eq. 1) then
+                  nhyd = nhyd + 1
+                  if (nhyd .eq. 1) then
                      atmname = ' H1 '
-                  else if (nh .eq. 2) then
+                  else if (nhyd .eq. 2) then
                      atmname = ' H2 '
                   end if
                   call pdbatom (atmname,resname,ires,i)
-                  if (nh .eq. 2)  goto 10
+                  if (nhyd .eq. 2)  goto 10
                end if
             end do
          else if (resname .eq. 'PCA') then
@@ -1142,19 +1166,19 @@ c
                end if
             end do
          else
-            nh = 0
+            nhyd = 0
             do i = 1, n
                if (atomic(i).eq.1 .and. i12(1,i).eq.ni) then
-                  nh = nh + 1
-                  if (nh .eq. 1) then
+                  nhyd = nhyd + 1
+                  if (nhyd .eq. 1) then
                      atmname = ' H1 '
-                  else if (nh .eq. 2) then
+                  else if (nhyd .eq. 2) then
                      atmname = ' H2 '
-                  else if (nh .eq. 3) then
+                  else if (nhyd .eq. 3) then
                      atmname = ' H3 '
                   end if
                   call pdbatom (atmname,resname,ires,i)
-                  if (nh .eq. 3)  goto 10
+                  if (nhyd .eq. 3)  goto 10
                end if
             end do
          end if

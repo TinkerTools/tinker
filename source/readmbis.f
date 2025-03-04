@@ -31,7 +31,7 @@ c
       integer i,j,k,next
       integer ichg,imbis
       integer freeunit
-      logical exist,done
+      logical exist
       logical openchg
       logical openmbis
       character*3 atmnam

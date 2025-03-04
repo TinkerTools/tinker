@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "readdyn" get the positions, velocities and accelerations
-c     for a molecular dynamics restart from an external disk file
+c     for a molecular dynamics restart from an external file
 c
 c
       subroutine readdyn (idyn)

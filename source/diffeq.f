@@ -510,7 +510,7 @@ c
      &                 log(m2ave)/logten,status
    10 format (i6,2x,4f13.4,6x,a7)
 c
-c     save the current coordinates to a disk file
+c     save the current coordinates to an external file
 c
       call optsave (nstep,e,xx)
       return

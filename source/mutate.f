@@ -205,15 +205,13 @@ c
 c     write status of current hybrid potential lambda values
 c
       if (use_mutate .and. .not.silent) then
-         write (iout,40)  vlambda
-   40    format (/,' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for van der Waals')
-         write (iout,50)  elambda
-   50    format (' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for Electrostatics')
-         write (iout,60)  tlambda
-   60    format (' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for Torsional Angles')
+         write (iout,40)
+   40    format (/,' Free Energy Perturbation Parameters :')
+         write (iout,50)  nmut,vlambda,elambda,tlambda
+   50    format (/,' Number of FEP Hybrid Atoms',9x,i8,
+     &           /,' van der Waals Lambda Value',9x,f8.3,
+     &           /,' Electrostatics Lambda Value',8x,f8.3,
+     &           /,' Torsion Angle Lambda Value',9x,f8.3)
       end if
 c
 c     perform deallocation of some local arrays

@@ -167,11 +167,13 @@ ifort -c -g -warn all -check all strbnd.f
 ifort -c -g -warn all -check all strtor.f
 ifort -c -g -warn all -check all syntrn.f
 ifort -c -g -warn all -check all tarray.f
+ifort -c -g -warn all -check all tettor.f
 ifort -c -g -warn all -check all titles.f
 ifort -c -g -warn all -check all torpot.f
 ifort -c -g -warn all -check all tors.f
 ifort -c -g -warn all -check all tortor.f
 ifort -c -g -warn all -check all tree.f
+ifort -c -g -warn all -check all tritor.f
 ifort -c -g -warn all -check all units.f
 ifort -c -g -warn all -check all uprior.f
 ifort -c -g -warn all -check all urey.f
@@ -377,6 +379,9 @@ ifort -c -g -warn all -check all fft3d.f
 ifort -c -g -warn all -check all fftpack.f
 ifort -c -g -warn all -check all field.f
 ifort -c -g -warn all -check all final.f
+ifort -c -g -warn all -check all findnuc.f
+ifort -c -g -warn all -check all findpro.f
+ifort -c -g -warn all -check all findseq.f
 ifort -c -g -warn all -check all flatten.f
 ifort -c -g -warn all -check all freefix.f
 ifort -c -g -warn all -check all freeunit.f
@@ -587,6 +592,7 @@ ifort -c -g -warn all -check all testpol.f
 ifort -c -g -warn all -check all testrot.f
 ifort -c -g -warn all -check all testsurf.f
 ifort -c -g -warn all -check all testvir.f
+ifort -c -g -warn all -check all tettors.f
 ifort -c -g -warn all -check all timer.f
 ifort -c -g -warn all -check all timerot.f
 ifort -c -g -warn all -check all tncg.f
@@ -595,6 +601,7 @@ ifort -c -g -warn all -check all torque.f
 ifort -c -g -warn all -check all torsfit.f
 ifort -c -g -warn all -check all torsions.f
 ifort -c -g -warn all -check all trimtext.f
+ifort -c -g -warn all -check all tritors.f
 ifort -c -g -warn all -check all unionball.f
 ifort -c -g -warn all -check all unitcell.f
 ifort -c -g -warn all -check all valence.f

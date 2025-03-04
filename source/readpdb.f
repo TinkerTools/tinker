@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "readpdb" gets a set of Protein Data Bank coordinates
-c     from an external disk file
+c     "readpdb" gets a set of Protein Data Bank coordinates from
+c     an external file
 c
 c
       subroutine readpdb (ipdb)
@@ -1244,6 +1244,7 @@ c
          if (atmname .eq. ' DW2')  atmname = ' H  '
          if (atmname .eq. ' D1 ')  atmname = ' H  '
          if (atmname .eq. ' D2 ')  atmname = ' H  '
+         if (atmname .eq. ' M  ')  atmname = ' EP '
       end if
       return
       end

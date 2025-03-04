@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "prtmol2" writes out a set of coordinates in Tripos MOL2
-c     format to an external disk file
+c     format to an external file
 c
 c
       subroutine prtmol2 (imol2)

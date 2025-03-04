@@ -12,8 +12,8 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "prtfrc" writes out a set of atom force components
-c     to an external disk file in Tinker XYZ format
+c     "prtfrc" writes out a set of atom force components to an
+c     external file in Tinker XYZ format
 c
 c
       subroutine prtfrc (ifrc)
@@ -209,10 +209,12 @@ c
          write (idcd)  n
       end if
 c
-c     append the lattice values based on header flag value
+c     append the lattice values based on header flag value;
+c     using angle values is NAMD style, cosine values is CHARMM
 c
       if (use_bounds) then
-         write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+c        write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+         write (idcd)  xbox,gamma,ybox,beta,alpha,zbox
       end if
 c
 c     append the force components along each axis in turn

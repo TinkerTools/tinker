@@ -30,9 +30,8 @@ c
       integer istep
       real*8 dt,dt_2
       real*8 etot,epot
-      real*8 eksum
+      real*8 eksum,term
       real*8 temp,pres
-      real*8 term
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8, allocatable :: xold(:)

@@ -16,8 +16,9 @@ c     nseq     total number of residues in biopolymer sequences
 c     nchain   number of separate biopolymer sequence chains
 c     ichain   first and last residue in each biopolymer chain
 c     seqtyp   residue type for each residue in the sequence
-c     seq      three-letter code for each residue in the sequence
+c     seqatm   base atom number for each residue (Calpha or C4')
 c     chnnam   one-letter identifier for each sequence chain
+c     seq      three-letter code for each residue in the sequence
 c     chntyp   contents of each chain (GENERIC, PEPTIDE or NUCLEIC)
 c
 c
@@ -28,6 +29,7 @@ c
       integer nchain
       integer ichain(2,maxres)
       integer seqtyp(maxres)
+      integer seqatm(maxres)
       character*1 chnnam(maxres)
       character*3 seq(maxres)
       character*7 chntyp(maxres)

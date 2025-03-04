@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "prtdyn" writes out the information needed to restart a
-c     molecular dynamics trajectory to an external disk file
+c     molecular dynamics trajectory to an external file
 c
 c
       subroutine prtdyn

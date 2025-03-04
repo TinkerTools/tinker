@@ -474,6 +474,8 @@ c
       allocate (tby(maxtgrd2,maxntt))
       if (allocated(tbxy))  deallocate (tbxy)
       allocate (tbxy(maxtgrd2,maxntt))
+      if (allocated(ttier))  deallocate (ttier)
+      allocate (ttier(maxntt))
       if (allocated(ktt))  deallocate (ktt)
       allocate (ktt(maxntt))
 c

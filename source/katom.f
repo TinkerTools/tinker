@@ -38,7 +38,7 @@ c
       use keys
       implicit none
       integer i,j,k
-      integer next,nh
+      integer next,nhyd
       integer cls,atn,lig
       real*8 wght,sum
       real*8 hmax,hmass
@@ -140,16 +140,16 @@ c
       end do
       if (heavy) then
          do i = 1, n
-            nh = 0
+            nhyd = 0
             sum = mass(i)
             do j = 1, n12(i)
                k = i12(j,i)
                if (atomic(k) .eq. 1) then
-                  nh = nh + 1
+                  nhyd = nhyd + 1
                   sum = sum + mass(k)
                end if
             end do
-            hmass = min(hmax,sum/dble(nh+1))
+            hmass = min(hmax,sum/dble(nhyd+1))
             do j = 1, n12(i)
                k = i12(j,i)
                if (atomic(k) .eq. 1) then

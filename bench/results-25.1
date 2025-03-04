@@ -1,0 +1,152 @@
+ 
+               ##################################################
+               Benchmark Results for Tinker 25.1  (February 2025)
+               ##################################################
+
+ Benchmark #1: Calmodulin Energy Evaluation (Serial)
+
+ Gas-Phase Calmodulin Molecule, 2264 Atoms, Amber ff94 Force Field,
+ No Nonbonded Cutoffs, 100 Evaluations
+
+ MACHINE TYPE (OS, Compiler)                  CPU     ENERGY     GRAD  HESSIAN
+ ---------------------------                  ---     ------     ----  -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2     3.1      6.1     20.4
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H   5.7      9.8     36.3
+
+ Benchmark #2: Crambin Crystal Energy Evaluation (Serial)
+
+ Crambin Unit Cell, 1360 Atoms in Periodic Unit Cell, OPLS-UA Force Field
+ with PME Electrostatics, 9.0 Ang vdw Cutoff, 1000 Evaluations
+
+ MACHINE TYPE (OS, Compiler)                  CPU     ENERGY     GRAD  HESSIAN
+ ---------------------------                  ---     ------     ----  -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2    10.5     13.0     49.7
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H  13.6     17.5     70.6
+
+ Benchmark #3: Crambin Normal Mode Calculation (Serial)
+
+ Hessian Eigenvalues, Normal Modes and Vibrational Freqencies for the
+ 42-Amino Acid, 642-Atom Protein Crambin, CHARMM-22 Force Field with Cutoffs
+
+ MACHINE TYPE (OS, Compiler)                  CPU              SECONDS
+ ---------------------------                  ---              -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2              15.3
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H            11.0
+
+ Benchmark #4: Water Box Molecular Dynamics using TIP3P (Serial)
+
+ MD run of 10000 Steps for 216 TIP3P Waters in 18.643 Ang Periodic Box,
+ 9.0 Ang Shifted & Switched Cutoffs, Rattle for Rigid TIP3P, 1.0 fs Time
+ Step with Modified Beeman Integrator
+
+ MACHINE TYPE (OS, Compiler)                  CPU              SECONDS
+ ---------------------------                  ---              -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2              49.1
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H            54.4
+
+ Benchmark #5: Water Box Molecular Dynamics using AMOEBA (Serial)
+
+ MD run of 1000 Steps for 216 AMOEBA Waters in a 18.643 Ang Box, Neighbor
+ Lists, PME with a 20x20x20 FFT and 7.0 Ang Real-Space Cutoff, 9.0 Ang vdW
+ Cutoff with Correction, 1.0 fs Time Step with Modified Beeman Integrator,
+ and 0.00001 RMS Induced Dipole Convergence
+
+ MACHINE TYPE (OS, Compiler)                  CPU              SECONDS
+ ---------------------------                  ---              -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2              26.2
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H            38.0
+
+ Benchmark #6: MD on DHFR in Water using CHARMM (OpenMP Parallel)
+
+ MD run of 100 Steps for CHARMM DHFR in Water (23558 Atoms, 62.23 Ang Box),
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integrator;
+ OpenMP timings as "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                  CPU     CORE/THREAD      SECONDS
+ ---------------------------                  ---     -----------      -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/1     26.8 (1.00)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/2     18.1 (1.48)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/4     12.4 (2.16)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/8      9.4 (2.85)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/1     32.5 (1.00)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/2     22.1 (1.47)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/4     15.4 (2.11)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/6     13.0 (2.50)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H    6/12     12.8 (2.54)
+
+ Benchmark #7: MD on DHFR in Water using AMOEBA (OpenMP Parallel)
+
+ MD run of 100 Steps for AMOEBA DHFR in Water (23558 Atoms, 62.23 Ang Box),
+ Neighbor Lists, PME with a 64x64x64 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
+ Integrator, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
+ reported as "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                  CPU     CORE/THREAD      SECONDS
+ ---------------------------                  ---     -----------      -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/1    102.5 (1.00)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/2     64.4 (1.59)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/4     40.9 (2.51)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/8     31.4 (3.26)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/1    154.8 (1.00)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/2     99.9 (1.55)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/4     66.2 (2.34)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/6     55.1 (2.81)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H    6/12     60.7 (2.55)
+
+ Benchmark #8: MD on COX-2 in Water using OPLS-AA (OpenMP Parallel)
+
+ MD run of 100 Steps for OPLS-AA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff, 1.0 fs Time Step with Modified Beeman Integrator;
+ RATTLE for all X-H bonds and rigid TIP3P Water; OpenMP timings reported as
+ "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                  CPU     CORE/THREAD      SECONDS
+ ---------------------------                  ---     -----------      -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/1    180.6 (1.00)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/2    133.3 (1.35)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/4     91.8 (1.97)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/8     77.4 (2.33)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/1    243.1 (1.00)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/2    183.6 (1.32)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/4    128.1 (1.90)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/6    110.5 (2.20)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H    6/12    105.9 (2.30)
+
+ Benchmark #9: MD on COX-2 in Water using AMOEBA (OpenMP Parallel)
+
+ MD run of 100 Steps for AMOEBA COX-2 in Water (174219 Atoms, 120.0 Ang Box),
+ Neighbor Lists, PME with a 128x128x128 FFT and 7.0 Ang Real-Space Cutoff,
+ 9.0 Ang vdW Cutoff with Correction, 1.0 fs Time Step with Modified Beeman
+ Integrator, and 0.00001 RMS Induced Dipole Convergence; OpenMP timings
+ reported as "wall clock" time, with parallel speedup in parentheses
+
+ MACHINE TYPE (OS, Compiler)                  CPU     CORE/THREAD      SECONDS
+ ---------------------------                  ---     -----------      -------
+
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/1   1086.2 (1.00)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/2    721.7 (1.51)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/4    437.3 (2.48)
+ MacBook Air 15 (macOS 15.1, GNU 14.1)      Apple M2       8/8    344.5 (3.15)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/1   1691.0 (1.00)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/2   1148.6 (1.47)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/4    702.8 (2.41)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H     6/6    577.5 (2.93)
+ Razer Blade 15 (Ubuntu 24.04, GNU 13.3)   Intel 9750H    6/12    557.8 (3.03)
+
+ ----------------------
+ Times are measured with Tinker Version 8.11 and reported in total seconds,
+ dimensioned to MAXATM=1000000. Each benchmark was run on an unloaded machine
+ and is the fastest time obtained for that particular machine. The first five
+ benchmarks are run serial on a single thread, while the last four benchmarks
+ reflect OpenMP parallel performance.
