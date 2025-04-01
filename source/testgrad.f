@@ -31,17 +31,19 @@ c
       integer i,j,ixyz
       integer next,frame
       integer freeunit
-      real*8 etot,f,f0,eps,eps0,old,energy
-      real*8 eb0,ea0,eba0,eub0,eaa0,eopb0
-      real*8 eopd0,eid0,eit0,et0,ept0,ebt0
-      real*8 eat0,ett0,ev0,er0,edsp0,ec0
-      real*8 ecd0,ed0,em0,ep0,ect0,erxf0
+      real*8 eval,energy
+      real*8 f,f0,eps,eps0,old
+      real*8 eb0,ea0,eba0,eub0
+      real*8 eaa0,eopb0,eopd0,eid0
+      real*8 eit0,et0,ept0,ebt0
+      real*8 eat0,ett0,ev0,er0
+      real*8 edsp0,ec0,ecd0,ed0
+      real*8 em0,ep0,ect0,erxf0
       real*8 es0,elf0,eg0,ex0
       real*8 totnorm,ntotnorm,rms,nrms
       real*8, allocatable :: denorm(:)
       real*8, allocatable :: ndenorm(:)
-      real*8, allocatable :: detot(:,:)
-      real*8, allocatable :: ndetot(:,:)
+      real*8, allocatable :: ndesum(:,:)
       real*8, allocatable :: ndeb(:,:)
       real*8, allocatable :: ndea(:,:)
       real*8, allocatable :: ndeba(:,:)
@@ -70,6 +72,7 @@ c
       real*8, allocatable :: ndelf(:,:)
       real*8, allocatable :: ndeg(:,:)
       real*8, allocatable :: ndex(:,:)
+      real*8, allocatable :: derivs(:,:)
       logical exist,query
       logical doanalyt,donumer,dofull
       character*1 answer
@@ -170,11 +173,13 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (denorm(n))
-      allocate (detot(3,n))
+      if (doanalyt) then
+         allocate (denorm(n))
+         allocate (derivs(3,n))
+      end if
       if (donumer) then
          allocate (ndenorm(n))
-         allocate (ndetot(3,n))
+         allocate (ndesum(3,n))
          allocate (ndeb(3,n))
          allocate (ndea(3,n))
          allocate (ndeba(3,n))
@@ -214,25 +219,25 @@ c
   100       format (/,' Analysis for Archive Structure :',8x,i8)
          end if
 c
-c     compute the analytical gradient components
+c     compute the energy and analytical gradient components
 c
          if (doanalyt) then
-            call gradient (etot,detot)
+            call gradient (eval,derivs)
          end if
 c
 c     print the total potential energy of the system
 c
          if (doanalyt) then
             if (digits .ge. 8) then
-               write (iout,110)  etot
+               write (iout,110)  esum
   110          format (/,' Total Potential Energy :',8x,f20.8,
      &                    ' Kcal/mole')
             else if (digits .ge. 6) then
-               write (iout,120)  etot
+               write (iout,120)  esum
   120          format (/,' Total Potential Energy :',8x,f18.6,
      &                    ' Kcal/mole')
             else
-               write (iout,130)  etot
+               write (iout,130)  esum
   130          format (/,' Total Potential Energy :',8x,f16.4,
      &                    ' Kcal/mole')
             end if
@@ -399,7 +404,7 @@ c
                   else if (j .eq. 3) then
                      z(i) = old
                   end if
-                  ndetot(j,i) = (f - f0) / eps
+                  ndesum(j,i) = (f - f0) / eps
                   ndeb(j,i) = (eb - eb0) / eps
                   ndea(j,i) = (ea - ea0) / eps
                   ndeba(j,i) = (eba - eba0) / eps
@@ -574,34 +579,34 @@ c
          ntotnorm = 0.0d0
          do i = 1, n
             if (doanalyt .and. use(i)) then
-               denorm(i) = detot(1,i)**2 + detot(2,i)**2
-     &                        + detot(3,i)**2
+               denorm(i) = desum(1,i)**2 + desum(2,i)**2
+     &                        + desum(3,i)**2
                totnorm = totnorm + denorm(i)
                denorm(i) = sqrt(denorm(i))
                if (digits .ge. 8) then
-                  write (iout,350)  i,(detot(j,i),j=1,3),denorm(i)
+                  write (iout,350)  i,(desum(j,i),j=1,3),denorm(i)
   350             format (' Anlyt',i8,1x,3f16.8,f16.8)
                else if (digits .ge. 6) then
-                  write (iout,360)  i,(detot(j,i),j=1,3),denorm(i)
+                  write (iout,360)  i,(desum(j,i),j=1,3),denorm(i)
   360             format (' Anlyt',2x,i8,3x,3f14.6,2x,f14.6)
                else
-                  write (iout,370)  i,(detot(j,i),j=1,3),denorm(i)
+                  write (iout,370)  i,(desum(j,i),j=1,3),denorm(i)
   370             format (' Anlyt',2x,i8,7x,3f12.4,2x,f12.4)
                end if
             end if
             if (donumer .and. use(i)) then
-               ndenorm(i) = ndetot(1,i)**2 + ndetot(2,i)**2
-     &                         + ndetot(3,i)**2
+               ndenorm(i) = ndesum(1,i)**2 + ndesum(2,i)**2
+     &                         + ndesum(3,i)**2
                ntotnorm = ntotnorm + ndenorm(i)
                ndenorm(i) = sqrt(ndenorm(i))
                if (digits .ge. 8) then
-                  write (iout,380)  i,(ndetot(j,i),j=1,3),ndenorm(i)
+                  write (iout,380)  i,(ndesum(j,i),j=1,3),ndenorm(i)
   380             format (' Numer',i8,1x,3f16.8,f16.8)
                else if (digits .ge. 6) then
-                  write (iout,390)  i,(ndetot(j,i),j=1,3),ndenorm(i)
+                  write (iout,390)  i,(ndesum(j,i),j=1,3),ndenorm(i)
   390             format (' Numer',2x,i8,3x,3f14.6,2x,f14.6)
                else
-                  write (iout,400)  i,(ndetot(j,i),j=1,3),ndenorm(i)
+                  write (iout,400)  i,(ndesum(j,i),j=1,3),ndenorm(i)
   400             format (' Numer',2x,i8,7x,3f12.4,2x,f12.4)
                end if
             end if
@@ -699,11 +704,13 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (denorm)
-      deallocate (detot)
+      if (doanalyt) then
+         deallocate (denorm)
+         deallocate (derivs)
+      end if
       if (donumer) then
          deallocate (ndenorm)
-         deallocate (ndetot)
+         deallocate (ndesum)
          deallocate (ndeb)
          deallocate (ndea)
          deallocate (ndeba)

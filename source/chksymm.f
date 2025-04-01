@@ -13,7 +13,7 @@ c     ################################################################
 c
 c
 c     "chksymm" examines the current coordinates for linearity,
-c     planarity, an internal mirror plane or center of inversion
+c     planarity, internal mirror planes or a center of inversion
 c
 c
       subroutine chksymm (symmtyp)

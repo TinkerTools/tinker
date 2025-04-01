@@ -336,9 +336,9 @@ c
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (list)
       deallocate (flink)
       deallocate (blink)
       deallocate (clink)
+      deallocate (list)
       return
       end
