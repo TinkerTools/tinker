@@ -971,7 +971,7 @@ c
       use pme
       implicit none
       integer i,ii
-      real*8 e,f
+      real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xd,yd,zd
@@ -1042,6 +1042,24 @@ c
          nem = nem + 1
          aem(i) = aem(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fterm = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         sum = sum + rpole(1,i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fterm * sum**2
+         em = em + e
+         nem = nem + 1
+         do ii = 1, npole
+            i = ipole(ii)
+            aem(i) = aem(i) + e/dble(npole)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1669,7 +1687,7 @@ c
       use pme
       implicit none
       integer i,ii
-      real*8 e,f
+      real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xd,yd,zd
@@ -1740,6 +1758,24 @@ c
          nem = nem + 1
          aem(i) = aem(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fterm = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         sum = sum + rpole(1,i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fterm * sum**2
+         em = em + e
+         nem = nem + 1
+         do ii = 1, npole
+            i = ipole(ii)
+            aem(i) = aem(i) + e/dble(npole)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c

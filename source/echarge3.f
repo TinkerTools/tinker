@@ -1034,7 +1034,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
@@ -1096,6 +1096,24 @@ c
          nec = nec + 1
          aec(i) = aec(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fs * sum**2
+         ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1404,7 +1422,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8, allocatable :: cscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -1473,6 +1491,24 @@ c
          nec = nec + 1
          aec(i) = aec(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fs * sum**2
+         ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1740,7 +1776,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
@@ -1802,6 +1838,24 @@ c
          nec = nec + 1
          aec(i) = aec(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fs * sum**2
+         ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c

@@ -1658,7 +1658,7 @@ c
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,f
+      real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xi,yi,zi
@@ -1796,6 +1796,17 @@ c
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
+c
+c     compute the uniform background charge correction term
+c
+      fterm = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         sum = sum + rpole(1,i)
+      end do
+      e = fterm * sum**2
+      em = em + e
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2823,7 +2834,7 @@ c
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,f
+      real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xi,yi,zi
@@ -2961,6 +2972,17 @@ c
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
+c
+c     compute the uniform background charge correction term
+c
+      fterm = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         sum = sum + rpole(1,i)
+      end do
+      e = fterm * sum**2
+      em = em + e
 c
 c     compute the cell dipole boundary correction term
 c

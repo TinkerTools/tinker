@@ -1089,7 +1089,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -1141,6 +1141,17 @@ c
          e = fs * pchg(i)**2
          ec = ec + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      e = fs * sum**2
+      ec = ec + e
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1469,7 +1480,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -1528,6 +1539,17 @@ c
          e = fs * pchg(i)**2
          ec = ec + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      e = fs * sum**2
+      ec = ec + e
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1792,7 +1814,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
@@ -1844,6 +1866,17 @@ c
          e = fs * pchg(i)**2
          ec = ec + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      e = fs * sum**2
+      ec = ec + e
 c
 c     compute the cell dipole boundary correction term
 c
