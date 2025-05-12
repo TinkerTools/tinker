@@ -103,9 +103,9 @@ RENAME = rename_bin
 #RENAME = rename_bin
 
 ##  Build:     Tinker
-##  OS Type:   Microsoft Windows 10
+##  OS Type:   Microsoft Windows 11
 ##  CPU Type:  Intel x86 Compatible
-##  Compiler:  MinGW GNU gfortran 11.2
+##  Compiler:  MinGW GNU gfortran 14.2
 ##  Parallel:  OpenMP
 
 #CC = gcc
