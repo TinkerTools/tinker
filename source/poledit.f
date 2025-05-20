@@ -322,11 +322,11 @@ c
 c     assign the local frame definition for a monovalent atom
 c
          else if (j .eq. 1) then
+            ia = i12(1,i)
             polaxe(i) = 'Z-Only'
             zaxis(i) = ia
             xaxis(i) = 0
             yaxis(i) = 0
-            ia = i12(1,i)
             call frame13 (i,ia,noinvert)
 c
 c     assign the local frame definition for a divalent atom
@@ -849,6 +849,8 @@ c
       logical noinvert
       logical monoval
       logical pyramid
+      logical chkarom
+      external chkarom
 c
 c
 c     initialize 1-2 and 1-3 connected atoms
@@ -902,8 +904,15 @@ c
          xaxis(i) = 0
          yaxis(i) = 0
          pyramid = (abs(geometry(i,ia,ib,ic)) .lt. 135.0d0)
+         if (ka .eq. 7) then
+            if (chkarom(i))  pyramid = .false.
+            if (chkarom(ia))  pyramid = .false.
+            if (chkarom(ib))  pyramid = .false.
+            if (chkarom(ic))  pyramid = .false.
+         end if
+         pyramid = (pyramid .and. noinvert)
          m = priority (ia,ib,ic,0)
-         if (ka.eq.7 .and. pyramid .and. noinvert .and. monoval) then
+         if (ka.eq.7 .and. pyramid .and. monoval) then
             polaxe(i) = 'Z-Bisect'
             xaxis(i) = ib
             yaxis(i) = ic

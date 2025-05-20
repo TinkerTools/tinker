@@ -1,6 +1,6 @@
 # Tinker: Software Tools for Molecular Design
 
-<H2><I>Please note that the release of Tinker 25.1 in late February 2025 contains a number of new features, and is not fully backward compatible with prior versions of Tinker. In particular, do not use older versions of parameter files with Tinker 25.1 executables. Similarly, parameter files from Tinker 25.1 may give errors or incorrect results when used with executables from earlier "Tinker 8" versions.</I></H2>
+<I>Please note that the release of Tinker 25 in late February 2025 the code contains a number of new features, and is not fully backward compatible with prior versions of Tinker. In particular, do not use older versions of parameter files with current Tinker executables. Similarly, parameter files from the current Tinker may give errors or incorrect results when used with executables from earlier "Tinker 8" versions.</I>
 
 <H2><B>Introduction</B></H2>
 
