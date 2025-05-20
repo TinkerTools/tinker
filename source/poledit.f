@@ -30,7 +30,7 @@ c
 c     get the desired type of coordinate file modification
 c
       call initial
-      nmode = 4
+      nmode = 5
       mode = 0
       query = .true.
       call nextarg (string,exist)
@@ -44,8 +44,9 @@ c
    20    format (/,' The Tinker Multipole Editing Utility Can :',
      &           //,4x,'(1) Use Multipoles from Stone GDMA Output',
      &           /,4x,'(2) Use Multipoles from Multiwfn MBIS Output',
-     &           /,4x,'(3) Alter Local Coordinate Frame Definitions',
-     &           /,4x,'(4) Remove the Intramolecular Polarization')
+     &           /,4x,'(3) Create Output with Zero Multipole Values',
+     &           /,4x,'(4) Alter Local Coordinate Frame Definitions',
+     &           /,4x,'(5) Remove the Intramolecular Polarization')
          do while (mode.lt.1 .or. mode.gt.nmode)
             mode = 0
             write (iout,30)
@@ -88,6 +89,23 @@ c
          call avgpole
          call prtpole
       else if (mode .eq. 3) then
+         use_mpole = .true.
+         use_polar = .true.
+         call getxyz
+         call attach
+         call field
+         call katom
+         call kmpole
+         call initpole
+         call molsetup
+         call setframe
+         call rotframe
+         call setpolar
+         call setpgrp
+         call alterpol
+         call avgpole
+         call prtpole
+      else if (mode .eq. 4) then
          call getxyz
          call attach
          call field
@@ -97,7 +115,7 @@ c
          call kchgtrn
          call fixframe
          call prtpole
-      else if (mode .eq. 4) then
+      else if (mode .eq. 5) then
          call getxyz
          call attach
          call field
@@ -109,6 +127,40 @@ c
          call avgpole
          call prtpole
       end if
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine initpole  --  initialize multipole parameters  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "initpole" sets all atomic multipole parameter values to an
+c     initial value of zero
+c
+c
+      subroutine initpole
+      use atoms
+      use mpole
+      integer i
+c
+c
+c     zero out atomic multipole parameter values
+c
+      do i = 1, n
+         ipole(i) = 0
+         zaxis(i) = 0
+         xaxis(i) = 0
+         yaxis(i) = 0
+         do j = 1, 13
+            pole(j,i) = 0.0d0
+            rpole(j,i) = 0.0d0
+         end do
+         polaxe(i) = '        '
+      end do
+      return
       end
 c
 c
