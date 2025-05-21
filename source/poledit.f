@@ -44,7 +44,7 @@ c
    20    format (/,' The Tinker Multipole Editing Utility Can :',
      &           //,4x,'(1) Use Multipoles from Stone GDMA Output',
      &           /,4x,'(2) Use Multipoles from Multiwfn MBIS Output',
-     &           /,4x,'(3) Create Output with Zero Multipole Values',
+     &           /,4x,'(3) Perform Setup Without Multipole Values',
      &           /,4x,'(4) Alter Local Coordinate Frame Definitions',
      &           /,4x,'(5) Remove the Intramolecular Polarization')
          do while (mode.lt.1 .or. mode.gt.nmode)
