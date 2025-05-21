@@ -14,6 +14,7 @@ extern double*& tbf;
 extern double*& tbx;
 extern double*& tby;
 extern double*& tbxy;
+extern char (*&ttier)[3];
 extern char (*&ktt)[20];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -26,6 +27,7 @@ extern "C" double* TINKER_MOD(ktrtor, tbf);
 extern "C" double* TINKER_MOD(ktrtor, tbx);
 extern "C" double* TINKER_MOD(ktrtor, tby);
 extern "C" double* TINKER_MOD(ktrtor, tbxy);
+extern "C" char (*TINKER_MOD(ktrtor, ttier))[3];
 extern "C" char (*TINKER_MOD(ktrtor, ktt))[20];
 
 int& maxntt = TINKER_MOD(ktrtor, maxntt);
@@ -37,6 +39,7 @@ double*& tbf = TINKER_MOD(ktrtor, tbf);
 double*& tbx = TINKER_MOD(ktrtor, tbx);
 double*& tby = TINKER_MOD(ktrtor, tby);
 double*& tbxy = TINKER_MOD(ktrtor, tbxy);
+char (*&ttier)[3] = TINKER_MOD(ktrtor, ttier);
 char (*&ktt)[20] = TINKER_MOD(ktrtor, ktt);
 #endif
 } }
