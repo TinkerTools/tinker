@@ -23,6 +23,7 @@ c
       use ielscf
       use moldyn
       use polar
+      use strvar
       use units
       use usage
       implicit none
@@ -30,8 +31,9 @@ c
       integer istep
       real*8 dt,dt_2
       real*8 etot,epot
-      real*8 eksum,term
+      real*8 eksum
       real*8 temp,pres
+      real*8 term
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8, allocatable :: xold(:)
@@ -142,6 +144,7 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
+      call prtstres (istep,stress)
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)
