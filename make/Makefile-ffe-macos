@@ -42,10 +42,6 @@
 ##  FFTWDIR         FFTW Top-Level Directory
 ##  FFTW_LIBDIR     Directory with FFTW Libraries
 ##  FFTW_LIBS       FFTW Libraries needed to build Tinker
-##  APBSDIR         APBS Top-Level Directory
-##  APBS_INCDIR     Directory with APBS Include Files
-##  APBS_LIBDIR     Directory with APBS Libraries
-##  APBS_LIBS       APBS Libraries needed to build Tinker
 ##  FFEDIR          FFE Top-Level Directory
 ##  JAVA_INCDIR     Directories with Java Include Files
 ##  JAVA_LIBDIR     Directory with Java Virtual Machine Library
@@ -62,25 +58,25 @@ FFTWDIR = $(BUILDDIR)/fftw
 FFTW_LIBDIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
 
-APBSDIR = $(BUILDDIR)/apbs
-APBS_INCDIR = -I$(APBSDIR)/include
-APBS_LIBDIR = -L$(APBSDIR)/lib
-APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
-
 FFEDIR = $(BUILDDIR)/ffe
+
+##  For No Java
+#JAVA_INCDIR = 
+#JAVA_LIBDIR = 
+#JAVA_LIBS = 
 
 ##  For Linux
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I$(JAVA_HOME)/include \
 #		-I$(JAVA_HOME)/include/linux
-#JAVA_LIBDIR = -L$(JAVA_HOME)/jre/lib/amd64/server
+#JAVA_LIBDIR = -L$(JAVA_HOME)/lib/amd64/server
 #JAVA_LIBS = -ljvm
 
 ##  For macOS
 JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/macos \
 		-I$(JAVA_HOME)/include \
 		-I$(JAVA_HOME)/include/darwin
-JAVA_LIBDIR = -L$(JAVA_HOME)/jre/lib/server
+JAVA_LIBDIR = -L$(JAVA_HOME)/lib/server
 JAVA_LIBS = -ljvm
 
 ##  For Windows
@@ -132,8 +128,9 @@ LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 LIBS = -lstdc++
 LIBFLAGS = -crusv
 RANLIB = ranlib -c
-LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework JavaVM -framework \
-		CoreFoundation
+#LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework JavaVM -framework \
+#		CoreFoundation
+LINKFLAGS = $(OPTFLAGS) -static-libgcc
 RENAME = rename_bin
 
 ##  Build:     Tinker
@@ -848,13 +845,13 @@ EXEFILES = alchemy.x \
 	    xyzpdb.x
 
 %.o: %.c
-	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${APBS_INCDIR} ${OPTFLAGS} $<
+	${CC} ${CCFLAGS} ${JAVA_INCDIR} ${OPTFLAGS} $<
 
 %.o: %.f
 	${F77} ${F77FLAGS} ${OPTFLAGS} $< -o $@ 
 
 %.x: %.o libtinker.a
-	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} ${APBS_LIBDIR} $^ ${FFTW_LIBS} ${APBS_LIBS} ${LIBS}; strip $@
+	${F77} ${LINKFLAGS} -o $@ ${LIBDIR} ${FFTW_LIBDIR} $^ ${FFTW_LIBS} ${LIBS}; strip $@
 
 all: ${EXEFILES}
 

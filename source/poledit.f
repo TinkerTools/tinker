@@ -157,6 +157,7 @@ c
          do j = 1, 13
             pole(j,i) = 0.0d0
             rpole(j,i) = 0.0d0
+            mono0(i) = 0.0d0
          end do
          polaxe(i) = '        '
       end do
@@ -1852,7 +1853,7 @@ c
          answer = 'A'
          write (iout,20)
    20    format (/,' Choose the AMOEBA, AMOEBA+ or HIPPO',
-     &             ' Polarization Model [A] : ', $)
+     &              ' Model ([A], P or H) : ', $)
          read (input,30)  record
    30    format (a240)
          next = 1
@@ -2235,8 +2236,8 @@ c
    70    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',/)
       else if (use_tholed) then
          write (iout,80)
-   80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Thole',
-     &             8x,'TholeD',/)
+   80    format (/,5x,'Atom',5x,'Name',7x,'Polarize',10x,'Thole',
+     &             9x,'TholeD',/)
       else if (use_chgpen) then
          write (iout,90)
    90    format (/,5x,'Atom',5x,'Name',7x,'Polarize',11x,'Core',

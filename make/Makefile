@@ -36,10 +36,6 @@
 ##  FFTWDIR         FFTW Top-Level Directory
 ##  FFTW_LIBDIR     Directory with FFTW Libraries
 ##  FFTW_LIBS       FFTW Libraries needed to build Tinker
-##  APBSDIR         APBS Top-Level Directory
-##  APBS_INCDIR     Directory with APBS Include Files
-##  APBS_LIBDIR     Directory with APBS Libraries
-##  APBS_LIBS       APBS Libraries needed to build Tinker
 
 TINKERDIR = $(HOME)/tinker
 TINKER_LIBDIR = $(TINKERDIR)/lib
@@ -49,11 +45,6 @@ LINKDIR = /usr/local/bin
 FFTWDIR = $(TINKERDIR)/fftw
 FFTW_LIBDIR = -L$(FFTWDIR)/lib
 FFTW_LIBS = -lfftw3_threads -lfftw3
-
-APBSDIR = $(TINKERDIR)/apbs
-APBS_INCDIR = -I$(APBSDIR)/include
-APBS_LIBDIR = -L$(APBSDIR)/lib
-APBS_LIBS = -lapbsmainroutines -lapbs -lmaloc -lapbsblas
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##
