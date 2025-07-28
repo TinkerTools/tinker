@@ -336,7 +336,7 @@ c
                   end do
                end if
             end if
-            if (icg2 .ne. 0) then
+            if (min(icg1,icg2) .ne. 0) then
                nhg = 0
                do j = 1, n12(icg1)
                   ij = i12(j,icg1)
@@ -388,7 +388,7 @@ c
                   if (ij.ne.icg1 .and. aij.eq.6)  ice1 = ij
                end do
             end if
-            if (icd2 .ne. 0) then
+            if (min(icd1,icd2) .ne. 0) then
                nhd = 0
                do j = 1, n12(icd1)
                   ij = i12(j,icd1)
@@ -475,29 +475,35 @@ c
                if (ij .eq. ice1)  label = 'TRP'
                if (ij .eq. ice2)  label = 'TRP'
             end do
-            do j = 1, n12(ice1)
-               ij = i12(j,ice1)
-               aij = atomic(ij)
-               if (ij.ne.icd1 .and. ij.ne.icd2 .and. aij.eq.6) then
-                  if (icz1 .ne. 0)  icz2 = ij
-                  if (icz1 .eq. 0)  icz1 = ij
-               end if
-            end do
-            do j = 1, n12(ice2)
-               ij = i12(j,ice2)
-               aij = atomic(ij)
-               if (ij.ne.icd1 .and. ij.ne.icd2 .and. aij.eq.6) then
-                  if (icz1 .ne. 0)  icz2 = ij
-                  if (icz1 .eq. 0)  icz1 = ij
-               end if
-            end do
-            do j = 1, n12(icz1)
-               ij = i12(j,icz1)
-               aij = atomic(ij)
-               if (ij.ne.ice1 .and. ij.ne.ice2 .and. aij.eq.6) then
-                  ich = ij
-               end if
-            end do
+            if (ice1 .ne.  0) then
+               do j = 1, n12(ice1)
+                  ij = i12(j,ice1)
+                  aij = atomic(ij)
+                  if (ij.ne.icd1 .and. ij.ne.icd2 .and. aij.eq.6) then
+                     if (icz1 .ne. 0)  icz2 = ij
+                     if (icz1 .eq. 0)  icz1 = ij
+                  end if
+               end do
+            end if
+            if (ice2 .ne.  0) then
+               do j = 1, n12(ice2)
+                  ij = i12(j,ice2)
+                  aij = atomic(ij)
+                  if (ij.ne.icd1 .and. ij.ne.icd2 .and. aij.eq.6) then
+                     if (icz1 .ne. 0)  icz2 = ij
+                     if (icz1 .eq. 0)  icz1 = ij
+                  end if
+               end do
+            end if
+            if (icz1 .ne.  0) then
+               do j = 1, n12(icz1)
+                  ij = i12(j,icz1)
+                  aij = atomic(ij)
+                  if (ij.ne.ice1 .and. ij.ne.ice2 .and. aij.eq.6) then
+                     ich = ij
+                  end if
+               end do
+            end if
          end if
 c
 c     inspect the zeta position of amino acid residue

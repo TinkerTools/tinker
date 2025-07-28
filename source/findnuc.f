@@ -168,19 +168,23 @@ c
             if (ij.ne.ic4s .and. aij.eq.6)  ic2s = ij
          end do
          deoxy = .true.
-         do j = 1, n12(ic2s)
-            ij = i12(j,ic2s)
-            aij = atomic(ij)
-            if (aij .eq. 8) then
-               io2s = ij
-               deoxy = .false.
-            end if
-         end do
-         do j = 1, n12(io4s)
-            ij = i12(j,io4s)
-            aij = atomic(ij)
-            if (ij.ne.ic4s .and. aij.eq.6)  ic1s = ij
-         end do
+         if (ic2s .ne. 0) then
+            do j = 1, n12(ic2s)
+               ij = i12(j,ic2s)
+               aij = atomic(ij)
+               if (aij .eq. 8) then
+                  io2s = ij
+                  deoxy = .false.
+               end if
+            end do
+         end if
+         if (io4s .ne. 0) then
+            do j = 1, n12(io4s)
+               ij = i12(j,io4s)
+               aij = atomic(ij)
+               if (ij.ne.ic4s .and. aij.eq.6)  ic1s = ij
+            end do
+         end if
 c
 c     find phosphate group attached at 5' sugar oxygen
 c
@@ -191,93 +195,113 @@ c
                ipo = ij
             end if
          end do
-         do j = 1, n12(ipo)
-            ij = i12(j,ipo)
-            nij = n12(ij)
-            aij = atomic(ij)
-            if (nij.eq.1 .and. aij.eq.8) then
-               if (iop2 .ne. 0)  iop3 = ij
-               if (iop1 .ne. 0)  iop2 = ij
-               if (iop1 .eq. 0)  iop1 = ij
-            end if
-         end do
+         if (ipo .ne. 0) then
+            do j = 1, n12(ipo)
+               ij = i12(j,ipo)
+               nij = n12(ij)
+               aij = atomic(ij)
+               if (nij.eq.1 .and. aij.eq.8) then
+                  if (iop2 .ne. 0)  iop3 = ij
+                  if (iop1 .ne. 0)  iop2 = ij
+                  if (iop1 .eq. 0)  iop1 = ij
+               end if
+            end do
+         end if
 c
 c     decide if the nucleobase is purine or pyrimidine
 c
-         do j = 1, n12(ic1s)
-            ij = i12(j,ic1s)
-            aij = atomic(ij)
-            if (aij .eq. 7)  in1 = ij
-         end do
-         do j = 1, n12(in1)
-            ij = i12(j,in1)
-            nij = n12(ij)
-            aij = atomic(ij)
-            if (ij.ne.ic1s .and. aij.eq.6) then
-               do k = 1, n12(ij)
-                  ik = i12(k,ij)
-                  aik = atomic(ik)
-                  if (aik .eq. 1)  ic2 = ij
-                  if (aik .eq. 8) then
-                     label= 'PYR'
-                     ic6 = ij
+         if (ic1s .ne. 0) then
+            do j = 1, n12(ic1s)
+               ij = i12(j,ic1s)
+               aij = atomic(ij)
+               if (aij .eq. 7)  in1 = ij
+            end do
+         end if
+         if (in1 .ne. 0) then 
+            do j = 1, n12(in1)
+               ij = i12(j,in1)
+               nij = n12(ij)
+               aij = atomic(ij)
+               if (ij.ne.ic1s .and. aij.eq.6) then
+                  do k = 1, n12(ij)
+                     ik = i12(k,ij)
+                     aik = atomic(ik)
+                     if (aik .eq. 1)  ic2 = ij
+                     if (aik .eq. 8) then
+                        label= 'PYR'
+                        ic6 = ij
+                     end if
+                  end do
+                  if (ic6 .eq. 0) then
+                     label = 'PUR'
+                     ic5 = ij
                   end if
-               end do
-               if (ic6 .eq. 0) then
-                  label = 'PUR'
-                  ic5 = ij
                end if
-            end if
-         end do
+            end do
+         end if
 c
 c     identify additional atoms of a purine base    
 c
          if (label .eq. 'PUR') then
-            do j = 1, n12(ic2)
-               ij = i12(j,ic2)
-               aij = atomic(ij)
-               if (ij.ne.in1 .and. aij.eq.7)  in3 = ij
-            end do
-            do j = 1, n12(in3)
-               ij = i12(j,in3)
-               aij = atomic(ij)
-               if (ij.ne.ic2 .and. aij.eq.6)  ic4 = ij
-            end do
-            do j = 1, n12(ic5)
-               ij = i12(j,ic5)
-               aij = atomic(ij)
-               if (ij.ne.in1 .and. aij.eq.7)  in6 = ij
-            end do
-            do j = 1, n12(in6)
-               ij = i12(j,in6)
-               aij = atomic(ij)
-               if (ij.ne.ic5 .and. aij.eq.6)  ic7 = ij
-            end do
-            do j = 1, n12(ic7)
-               ij = i12(j,ic7)
-               aij = atomic(ij)
-               if (ij.ne.in6 .and. aij.eq.7) then
-                  nhyd = 0
-                  do k = 1, n12(ij)
-                     ik = i12(k,ij)
-                     aik = atomic(ik)
-                     if (aik .eq. 1)  nhyd = nhyd + 1
-                  end do
-                  if (nhyd .le. 1)  in8 = ij
-                  if (nhyd .eq. 2)  in7 = ij
-               end if
-            end do
-            do j = 1, n12(in8)
-               ij = i12(j,in8)
-               aij = atomic(ij)
-               if (ij.ne.ic7 .and. aij.eq.6)  ic9 = ij
-            end do
-            do j = 1, n12(ic9)
-               ij = i12(j,ic9)
-               aij = atomic(ij)
-               if (ij.ne.in8 .and. aij.eq.7)  in9 = ij
-               if (aij .eq. 8)  io9 = ij
-            end do
+            if (ic2 .ne. 0) then
+               do j = 1, n12(ic2)
+                  ij = i12(j,ic2)
+                  aij = atomic(ij)
+                  if (ij.ne.in1 .and. aij.eq.7)  in3 = ij
+               end do
+            end if
+            if (in3 .ne. 0) then
+               do j = 1, n12(in3)
+                  ij = i12(j,in3)
+                  aij = atomic(ij)
+                  if (ij.ne.ic2 .and. aij.eq.6)  ic4 = ij
+               end do
+            end if
+            if (ic5 .ne. 0) then
+               do j = 1, n12(ic5)
+                  ij = i12(j,ic5)
+                  aij = atomic(ij)
+                  if (ij.ne.in1 .and. aij.eq.7)  in6 = ij
+               end do
+            end if
+            if (in6 .ne. 0) then
+               do j = 1, n12(in6)
+                  ij = i12(j,in6)
+                  aij = atomic(ij)
+                  if (ij.ne.ic5 .and. aij.eq.6)  ic7 = ij
+               end do
+            end if
+            if (ic7 .ne. 0) then
+               do j = 1, n12(ic7)
+                  ij = i12(j,ic7)
+                  aij = atomic(ij)
+                  if (ij.ne.in6 .and. aij.eq.7) then
+                     nhyd = 0
+                     do k = 1, n12(ij)
+                        ik = i12(k,ij)
+                        aik = atomic(ik)
+                        if (aik .eq. 1)  nhyd = nhyd + 1
+                     end do
+                     if (nhyd .le. 1)  in8 = ij
+                     if (nhyd .eq. 2)  in7 = ij
+                  end if
+               end do
+            end if
+            if (in8 .ne. 0) then
+               do j = 1, n12(in8)
+                  ij = i12(j,in8)
+                  aij = atomic(ij)
+                  if (ij.ne.ic7 .and. aij.eq.6)  ic9 = ij
+               end do
+            end if
+            if (ic9 .ne. 0) then
+               do j = 1, n12(ic9)
+                  ij = i12(j,ic9)
+                  aij = atomic(ij)
+                  if (ij.ne.in8 .and. aij.eq.7)  in9 = ij
+                  if (aij .eq. 8)  io9 = ij
+               end do
+            end if
             if (io9 .ne. 0) then
                label = '  G'
                if (deoxy)  label = ' DG'
@@ -291,51 +315,65 @@ c
 c     identify additional atoms of a pyrimidine base    
 c
          if (label .eq. 'PYR') then
-            do j = 1, n12(ic6)
-               ij = i12(j,ic6)
-               aij = atomic(ij)
-               if (ij.ne.in1 .and. aij.eq.7)  in5 = ij
-            end do
-            do j = 1, n12(in5)
-               ij = i12(j,in5)
-               aij = atomic(ij)
-               if (ij.ne.ic6 .and. aij.eq.6)  ic4 = ij
-            end do
-            do j = 1, n12(ic4)
-               ij = i12(j,ic4)
-               aij = atomic(ij)
-               if (aij .eq. 6)  ic3 = ij
-               if (ij.ne.in5 .and. aij.eq.7)  in4 = ij
-               if (aij .eq. 8)  io4 = ij
-            end do
-            label = '  U'
-            if (n12(in5) .eq. 2) then
-               label = '  C'
-               if (deoxy)  label = ' DC'
+            if (ic6 .ne. 0) then
+               do j = 1, n12(ic6)
+                  ij = i12(j,ic6)
+                  aij = atomic(ij)
+                  if (ij.ne.in1 .and. aij.eq.7)  in5 = ij
+               end do
             end if
-            do j = 1, n12(ic3)
-               ij = i12(j,ic3)
-               aij = atomic(ij)
-               if (ij.ne.ic2 .and. ij.ne.ic4 .and. aij.eq.6) then
-                  label = '  T'
-                  icm = ij
+            if (in5 .ne. 0) then
+               do j = 1, n12(in5)
+                  ij = i12(j,in5)
+                  aij = atomic(ij)
+                  if (ij.ne.ic6 .and. aij.eq.6)  ic4 = ij
+               end do
+            end if
+            if (ic4 .ne. 0) then
+               do j = 1, n12(ic4)
+                  ij = i12(j,ic4)
+                  aij = atomic(ij)
+                  if (aij .eq. 6)  ic3 = ij
+                  if (ij.ne.in5 .and. aij.eq.7)  in4 = ij
+                  if (aij .eq. 8)  io4 = ij
+               end do
+            end if
+            label = '  U'
+            if (in5 .ne. 0) then
+               if (n12(in5) .eq. 2) then
+                  label = '  C'
+                  if (deoxy)  label = ' DC'
                end if
-            end do
+            end if
+            if (ic3 .ne. 0) then
+               do j = 1, n12(ic3)
+                  ij = i12(j,ic3)
+                  aij = atomic(ij)
+                  if (ij.ne.ic2 .and. ij.ne.ic4 .and. aij.eq.6) then
+                     label = '  T'
+                     icm = ij
+                  end if
+               end do
+            end if
          end if
 c
 c     propagate the tier name to all atoms of the nucleotide
 c
-         tier(ipo) = label
-         tier(iop1) = label
-         do j = 1, n12(iop1)
-            ij = i12(j,iop1)
-            tier(ij) = label
-         end do
-         tier(iop2) = label
-         do j = 1, n12(iop2)
-            ij = i12(j,iop2)
-            tier(ij) = label
-         end do
+         if (ipo .ne. 0)  tier(ipo) = label
+         if (iop1 .ne. 0) then
+            tier(iop1) = label
+            do j = 1, n12(iop1)
+               ij = i12(j,iop1)
+               tier(ij) = label
+            end do
+         end if
+         if (iop2 .ne. 0) then
+            tier(iop2) = label
+            do j = 1, n12(iop2)
+               ij = i12(j,iop2)
+               tier(ij) = label
+            end do
+         end if
          if (iop3 .ne. 0) then
             tier(iop3) = label
             do j = 1, n12(iop3)
@@ -358,11 +396,13 @@ c
             ij = i12(j,ic4s)
             tier(ij) = label
          end do
-         tier(io4s) = label
-         do j = 1, n12(io4s)
-            ij = i12(j,io4s)
-            tier(ij) = label
-         end do
+         if (io4s .ne. 0) then
+            tier(io4s) = label
+            do j = 1, n12(io4s)
+               ij = i12(j,io4s)
+               tier(ij) = label
+            end do
+         end if
          tier(ic3s) = label
          do j = 1, n12(ic3s)
             ij = i12(j,ic3s)
@@ -373,11 +413,13 @@ c
             ij = i12(j,io3s)
             tier(ij) = label
          end do
-         tier(ic2s) = label
-         do j = 1, n12(ic2s)
-            ij = i12(j,ic2s)
-            tier(ij) = label
-         end do
+         if (ic2s .ne. 0) then
+            tier(ic2s) = label
+            do j = 1, n12(ic2s)
+               ij = i12(j,ic2s)
+               tier(ij) = label
+            end do
+         end if
          if (io2s .ne. 0) then
             tier(io2s) = label
             do j = 1, n12(io2s)
@@ -385,21 +427,27 @@ c
                tier(ij) = label
             end do
          end if
-         tier(ic1s) = label
-         do j = 1, n12(ic1s)
-            ij = i12(j,ic1s)
-            tier(ij) = label
-         end do
-         tier(in1) = label
-         do j = 1, n12(in1)
-            ij = i12(j,in1)
-            tier(ij) = label
-         end do
-         tier(ic2) = label
-         do j = 1, n12(ic2)
-            ij = i12(j,ic2)
-            tier(ij) = label
-         end do
+         if (ic1s .ne. 0) then
+            tier(ic1s) = label
+            do j = 1, n12(ic1s)
+               ij = i12(j,ic1s)
+               tier(ij) = label
+            end do
+         end if
+         if (in1 .ne. 0) then
+            tier(in1) = label
+            do j = 1, n12(in1)
+               ij = i12(j,in1)
+               tier(ij) = label
+            end do
+         end if
+         if (ic2 .ne. 0) then
+            tier(ic2) = label
+            do j = 1, n12(ic2)
+               ij = i12(j,ic2)
+               tier(ij) = label
+            end do
+         end if
          if (ic3 .ne. 0) then
             tier(ic3) = label
             do j = 1, n12(ic3)
