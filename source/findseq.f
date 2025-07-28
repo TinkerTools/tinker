@@ -289,7 +289,8 @@ c
             proceed = .true.
             dowhile (proceed)
                ib = flink(ia)
-               ic = clink(ib)
+               ic = 0
+               if (ib .ne. 0)  ic = clink(ib)
                if (ib.eq.0 .or. ic.eq.0) then
                   proceed = .false.
                   ichain(2,nchain) = nseq
