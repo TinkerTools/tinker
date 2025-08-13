@@ -190,6 +190,7 @@ c
                   if (atmp .eq. 0.0d0)  alpha = 90.0d0
                   if (btmp .eq. 0.0d0)  beta = 90.0d0
                   if (gtmp .eq. 0.0d0)  gamma = 90.0d0
+                  call lattice
                end if
             end if
          end if
