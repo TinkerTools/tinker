@@ -3,7 +3,7 @@
                    Building OpenMM-Enabled Tinker Executables
                    ##########################################
 
-       NOTE! This Tinker interface to OpenMM only works with versions
+       NOTE: This Tinker interface to OpenMM only works with versions
        of OpenMM available from GitHub prior to March 4th, 2021. OpenMM
        developers made major changes to their AMOEBA plugin as of that
        date which are incompatible with code in the current directory.

@@ -52,6 +52,7 @@ c
       use warp
       use zclose
       implicit none
+      integer i,j
 !$    integer omp_get_num_procs
       logical first
       save first
@@ -216,7 +217,7 @@ c
       binary = .false.
       coordtype = 'NONE'
 c
-c     default values for unit cell dimensions
+c     default values for unit cell and lattice vectors
 c
       xbox = 0.0d0
       ybox = 0.0d0
@@ -224,6 +225,12 @@ c
       alpha = 0.0d0
       beta = 0.0d0
       gamma = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            lvec(j,i) = 0.0d0
+            recip(j,i) = 0.0d0
+         end do
+      end do
 c
 c     default values used by optimizations
 c
