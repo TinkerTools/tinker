@@ -25,8 +25,8 @@ polarization            MUTUAL
 d-equals-p
 rep-12-scale            0.0
 rep-13-scale            0.0
-rep-14-scale            1.0
-rep-15-scale            1.0
+rep-14-scale            0.4
+rep-15-scale            0.8
 disp-12-scale           0.0
 disp-13-scale           0.0
 disp-14-scale           0.4
