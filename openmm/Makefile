@@ -184,7 +184,6 @@ OBJS =	action.o \
 	bound.o \
 	bounds.o \
 	boxes.o \
-	bussi.o \
 	calendar.o \
 	cell.o \
 	center.o \
@@ -843,7 +842,6 @@ libtinker.a: ${OBJS}
 	bound.o \
 	bounds.o \
 	boxes.o \
-	bussi.o \
 	calendar.o \
 	cell.o \
 	center.o \
@@ -1407,7 +1405,6 @@ born.o: atomid.o atoms.o bath.o chgpot.o couple.o deriv.o inform.o iounit.o math
 bound.o:
 bounds.o: atomid.o atoms.o boxes.o math.o molcul.o
 boxes.o:
-bussi.o: atomid.o atoms.o bath.o boxes.o freeze.o ielscf.o mdstuf.o moldyn.o polar.o units.o usage.o
 calendar.o:
 cell.o:
 center.o: align.o

@@ -137,17 +137,6 @@ c
 c     set the instantaneous temperature from total kinetic energy
 c
       temp = 2.0d0 * eksum / (dble(nfree) * gasconst)
-c
-c     get the kinetic energy for Bussi-Parrinello barostat
-c
-      if (isobaric .and. barostat.eq.'BUSSI') then
-         term = dble(nfree) * gasconst * kelvin * taupres * taupres
-         value = 0.5d0 * term * eta * eta
-         do j = 1, 3
-            ekin(j,j) = ekin(j,j) + value/3.0d0
-         end do
-         eksum = eksum + value
-      end if
       return
       end
 c

@@ -21,7 +21,8 @@ c     G. Bussi, T. Zykova-Timan and M. Parrinello, "Isothermal-Isobaric
 c     Molecular Dynamics using Stochastic Velocity Rescaling", Journal
 c     of Chemical Physics, 130, 074101 (2009)
 c
-c     original version written by Teresa Head-Gordon, October 2010
+c     original version written by Teresa Head-Gordon, University of
+c     California, Berkeley, October 2010
 c
 c
       subroutine bussi (istep,dt)

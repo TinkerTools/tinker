@@ -230,8 +230,6 @@ c
             call verlet (istep,dt)
          else if (integrate .eq. 'BEEMAN') then
             call beeman (istep,dt)
-         else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
             call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
@@ -287,8 +285,6 @@ c
             call beeman (istep,dt)
          else if (integrate .eq. 'BAOAB') then
             call baoab (istep,dt)
-         else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
             call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then

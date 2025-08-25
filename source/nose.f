@@ -21,7 +21,8 @@ c     G. J. Martyna, M. E. Tuckerman, D. J. Tobias and M. L. Klein,
 c     "Explicit Reversible Integrators for Extended Systems Dynamics",
 c     Molecular Physics, 87, 1117-1157 (1996)
 c
-c     original version written by Teresa Head-Gordon, November 2011
+c     original version written by Teresa Head-Gordon, University of
+c     California, Berkeley, November 2011
 c
 c
       subroutine nose (istep,dt)

@@ -194,7 +194,6 @@ add_library (tinkerObjF OBJECT
 ../source/bonds.f
 ../source/born.f
 ../source/bounds.f
-../source/bussi.f
 ../source/calendar.f
 ../source/center.f
 ../source/chkpole.f

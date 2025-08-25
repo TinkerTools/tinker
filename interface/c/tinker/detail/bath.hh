@@ -13,7 +13,6 @@ extern double TINKER_MOD(bath, tautemp);
 extern double TINKER_MOD(bath, taupres);
 extern double TINKER_MOD(bath, compress);
 extern double TINKER_MOD(bath, collide);
-extern double TINKER_MOD(bath, eta);
 extern double TINKER_MOD(bath, volmove);
 extern double TINKER_MOD(bath, vbar);
 extern double TINKER_MOD(bath, qbar);

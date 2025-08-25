@@ -18,10 +18,10 @@ c     nratx        number of atom group holonomic constraints to apply
 c     iratx        group number of group in a holonomic constraint
 c     kratx        spatial constraint type (1=plane, 2=line, 3=point)
 c     irat         atom numbers of atoms in a holonomic constraint
-c     iwat4        atom numbers involved in rigid four-site waters
+c     iwat4        atom numbers involved in rigid four-site water
 c     rateps       convergence tolerance for holonomic constraints
 c     krat         ideal distance value for holonomic constraint
-c     kwat4        linear scaling values to build four-site waters
+c     kwat4        linear scaling values to build four-site water
 c     use_rattle   logical flag to set use of holonomic contraints
 c     ratimage     flag to use minimum image for holonomic constraint
 c

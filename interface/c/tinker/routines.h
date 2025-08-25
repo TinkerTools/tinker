@@ -99,10 +99,6 @@ void tanhrscchr_(double* ii, double* rhoi, double* derival);
 void bounds_();
 #define tinker_f_bounds bounds_
 
-// bussi.f
-void bussi_(int* istep, double* dt);
-#define tinker_f_bussi bussi_
-
 // calendar.f
 void calendar_(int* year, int* month, int* day, int* hour, int* minute, int* second);
 #define tinker_f_calendar calendar_
@@ -2196,10 +2192,10 @@ void pressure_(double* dt, double* epot, double* ekin, double* temp, double* pre
 #define tinker_f_pressure pressure_
 void pressure2_(double* epot, double* temp);
 #define tinker_f_pressure2 pressure2_
-void pmonte_(double* epot, double* temp);
-#define tinker_f_pmonte pmonte_
 void pscale_(double* dt, double* pres, double* stress);
 #define tinker_f_pscale pscale_
+void pmonte_(double* epot, double* temp);
+#define tinker_f_pmonte pmonte_
 
 // prmkey.f
 void prmkey_(char* text, tinker_fchar_len_t text_cap);

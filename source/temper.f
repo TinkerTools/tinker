@@ -102,7 +102,6 @@ c
          scale = c + (s+r*r)*d + 2.0d0*r*sqrt(c*d)
          scale = sqrt(scale)
          if (r+sqrt(c/d) .lt. 0.0d0)  scale = -scale
-         eta = eta * scale
          if (integrate .eq. 'RIGIDBODY') then
             do i = 1, ngrp
                do j = 1, 3

@@ -54,6 +54,7 @@ c     use the desired barostat to maintain constant pressure
 c
       if (isobaric) then
          if (barostat .eq. 'BERENDSEN')  call pscale (dt,pres,stress)
+         if (barostat .eq. 'BUSSI')  call pscale (dt,pres,stress)
 c        if (barostat .eq. 'MONTECARLO')  call pmonte (epot,temp)
       end if
       return
@@ -86,7 +87,288 @@ c     use the desired barostat to maintain constant pressure
 c
       if (isobaric) then
 c        if (barostat .eq. 'BERENDSEN')  call pscale (dt,pres,stress)
+c        if (barostat .eq. 'BUSSI')  call pscale (dt,pres,stress)
          if (barostat .eq. 'MONTECARLO')  call pmonte (epot,temp)
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine pscale  --  Berendsen & Bussi scaling barostats  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "pscale" implements the Berendsen and Bussi barostats by scaling
+c     the box dimensions, coordinates and momenta via coupling to an
+c     external constant pressure bath
+c
+c     literature references:
+c
+c     H. J. C. Berendsen, J. P. M. Postma, W. F. van Gunsteren,
+c     A. DiNola and J. R. Hauk, "Molecular Dynamics with Coupling
+c     to an External Bath", Journal of Chemical Physics, 81,
+c     3684-3690 (1984)
+c
+c     M. Bernetti and G. Bussi, "Pressure Control Using Stochastic
+c     Cell Rescaling", Journal of Chemical Physics, 153, 114107 (2020)
+c
+c     original code for anisotropic pressure coupling by Guido Raos,
+c     Dipartimento di Chimica, Politecnico di Milano, Italy, May 2006
+c
+c
+      subroutine pscale (dt,pres,stress)
+      use atomid
+      use atoms
+      use bath
+      use boxes
+      use group
+      use math
+      use mdstuf
+      use moldyn
+      use rgddyn
+      use units
+      use usage
+      implicit none
+      integer i,j,k
+      integer start,stop
+      real*8 dt,pres,weigh
+      real*8 eps,deps
+      real*8 kt,betat,dw
+      real*8 scale,scalei
+      real*8 normal,cosine
+      real*8 xcm,xmove
+      real*8 ycm,ymove
+      real*8 zcm,zmove
+      real*8 stress(3,3)
+      real*8 temp(3,3)
+      real*8 hbox(3,3)
+      real*8 ascale(3,3)
+      external normal
+c
+c
+c     find the isotropic scale factor for pressure control
+c
+      if (.not. anisotrop) then
+         if (barostat .eq. 'BERENDSEN') then
+            eps = 1.0d0 + (compress*dt/taupres)*(pres-atmsph)
+            scale = (eps)**third
+         else if (barostat .eq. 'BUSSI') then
+            kt = gasconst * kelvin
+            betat = prescon * compress
+            dw = normal ()
+            eps = (compress*dt/taupres) * (pres-atmsph)
+            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres)) * dw
+            scale = exp((eps+deps)/3.0d0)
+         end if
+c
+c     modify the current periodic box dimension values
+c
+         xbox = xbox * scale
+         ybox = ybox * scale
+         zbox = zbox * scale
+c
+c     propagate the new box dimensions to other lattice values
+c
+         call lattice
+c
+c     couple to pressure bath via atom scaling in Cartesian space
+c
+         if (integrate .ne. 'RIGIDBODY') then
+            do i = 1, nuse
+               k = iuse(i)
+               x(k) = x(k) * scale
+               y(k) = y(k) * scale
+               z(k) = z(k) * scale
+            end do
+            if (barostat .eq. 'BUSSI') then
+               do i = 1, nuse
+                  k = iuse(i)
+                  do j = 1, 3
+                     v(j,k) = v(j,k) / scale
+                  end do
+               end do
+            end if
+c
+c     couple to pressure bath via center of mass of rigid bodies
+c
+         else
+            scalei = scale - 1.0d0
+            do i = 1, ngrp
+               start = igrp(1,i)
+               stop = igrp(2,i)
+               xcm = 0.0d0
+               ycm = 0.0d0
+               zcm = 0.0d0
+               do j = start, stop
+                  k = kgrp(j)
+                  weigh = mass(k)
+                  xcm = xcm + x(k)*weigh
+                  ycm = ycm + y(k)*weigh
+                  zcm = zcm + z(k)*weigh
+               end do
+               xmove = scalei * xcm/grpmass(i)
+               ymove = scalei * ycm/grpmass(i)
+               zmove = scalei * zcm/grpmass(i)
+               do j = start, stop
+                  k = kgrp(j)
+                  x(k) = x(k) + xmove
+                  y(k) = y(k) + ymove
+                  z(k) = z(k) + zmove
+               end do
+               if (barostat .eq. 'BUSSI') then
+                  do j = 1, 3
+                     vcm(j,i) = vcm(j,i) / scale
+                     wcm(j,i) = wcm(j,i) / scale
+                  end do
+               end if
+            end do
+         end if
+c
+c     find the anisotropic scale factors for pressure control
+c
+      else
+         if (barostat .eq. 'BERENDSEN') then
+            scale = third * (compress*dt/taupres)
+            do i = 1, 3
+               do j = 1, 3
+                  if (j. eq. i) then
+                     ascale(j,i) = 1.0d0 + scale*(stress(i,i)-atmsph)
+                  else
+                     ascale(j,i) = scale * stress(j,i)
+                  end if
+               end do
+            end do
+         else if (barostat .eq. 'BUSSI') then
+            kt = gasconst * kelvin
+            betat = prescon * compress
+            dw = normal ()
+            eps = compress * dt / taupres
+            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres)) * dw
+            scale = third * exp((eps+deps)/3.0d0)
+            do i = 1, 3
+               do j = 1, 3
+                  if (j .eq. i) then
+                     ascale(j,i) = scale * (stress(j,i)-atmsph)
+                  else
+                     ascale(j,i) = scale * stress(j,i)
+                  end if
+               end do
+            end do
+         end if
+c
+c     modify the current periodic box dimension values
+c
+         temp(1,1) = xbox
+         temp(2,1) = 0.0d0
+         temp(3,1) = 0.0d0
+         temp(1,2) = ybox * gamma_cos
+         temp(2,2) = ybox * gamma_sin
+         temp(3,2) = 0.0d0
+         temp(1,3) = zbox * beta_cos
+         temp(2,3) = zbox * beta_term
+         temp(3,3) = zbox * gamma_term
+         do i = 1, 3
+            do j = 1, 3
+               hbox(j,i) = 0.0d0
+               do k = 1, 3
+                  hbox(j,i) = hbox(j,i) + ascale(j,k)*temp(k,i)
+               end do
+            end do
+         end do
+         xbox = sqrt(hbox(1,1)**2 + hbox(2,1)**2 + hbox(3,1)**2)
+         ybox = sqrt(hbox(1,2)**2 + hbox(2,2)**2 + hbox(3,2)**2)
+         zbox = sqrt(hbox(1,3)**2 + hbox(2,3)**2 + hbox(3,3)**2)
+         if (monoclinic) then
+            cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
+     &                  + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
+            beta = radian * acos(cosine)
+         else if (triclinic) then
+            cosine = (hbox(1,2)*hbox(1,3) + hbox(2,2)*hbox(2,3)
+     &                  + hbox(3,2)*hbox(3,3)) / (ybox*zbox)
+            alpha = radian * acos(cosine)
+            cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
+     &                  + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
+            beta = radian * acos(cosine)
+            cosine = (hbox(1,1)*hbox(1,2) + hbox(2,1)*hbox(2,2)
+     &                  + hbox(3,1)*hbox(3,2)) / (xbox*ybox)
+            gamma = radian * acos(cosine)
+         end if
+c
+c     propagate the new box dimensions to other lattice values
+c
+         call lattice
+c
+c     couple to pressure bath via atom scaling in Cartesian space
+c
+         if (integrate .ne. 'RIGIDBODY') then
+            do i = 1, nuse
+               k = iuse(i)
+               x(k) = x(k)*ascale(1,1) + y(k)*ascale(1,2)
+     &                   + z(k)*ascale(1,3)
+               y(k) = x(k)*ascale(2,1) + y(k)*ascale(2,2)
+     &                   + z(k)*ascale(2,3)
+               z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
+     &                   + z(k)*ascale(3,3)
+            end do
+            if (barostat .eq. 'BUSSI') then
+               do i = 1, nuse
+                  k = iuse(i)
+                  do j = 1, 3
+                     v(j,k) = v(1,k)/ascale(j,1) + v(2,k)/ascale(j,2)
+     &                           + v(3,k)/ascale(j,3)
+                  end do
+               end do
+            end if
+c
+c     couple to pressure bath via center of mass of rigid bodies
+c
+         else
+            ascale(1,1) = ascale(1,1) - 1.0d0
+            ascale(2,2) = ascale(2,2) - 1.0d0
+            ascale(3,3) = ascale(3,3) - 1.0d0
+            do i = 1, ngrp
+               start = igrp(1,i)
+               stop = igrp(2,i)
+               xcm = 0.0d0
+               ycm = 0.0d0
+               zcm = 0.0d0
+               do j = start, stop
+                  k = kgrp(j)
+                  weigh = mass(k)
+                  xcm = xcm + x(k)*weigh
+                  ycm = xcm + y(k)*weigh
+                  zcm = xcm + z(k)*weigh
+               end do
+               xcm = xcm / grpmass(i)
+               ycm = ycm / grpmass(i)
+               zcm = zcm / grpmass(i)
+               xmove = xcm*ascale(1,1) + ycm*ascale(1,2)
+     &                    + zcm*ascale(1,3)
+               ymove = xcm*ascale(2,1) + ycm*ascale(2,2)
+     &                    + zcm*ascale(2,3)
+               zmove = xcm*ascale(3,1) + ycm*ascale(3,2)
+     &                    + zcm*ascale(3,3)
+               do j = start, stop
+                  k = kgrp(j)
+                  x(k) = x(k) + xmove
+                  y(k) = y(k) + ymove
+                  z(k) = z(k) + zmove
+               end do
+               if (barostat .eq. 'BUSSI') then
+                  do j = 1, 3
+                     vcm(j,i) = vcm(j,i)/ascale(j,1)
+     &                             + vcm(j,i)/ascale(j,2)
+     &                             + vcm(j,i)/ascale(j,3)
+                     wcm(j,i) = wcm(j,i)/ascale(j,1)
+     &                             + wcm(j,i)/ascale(j,2)
+     &                             + wcm(j,i)/ascale(j,3)
+                  end do
+               end if
+            end do
+         end if
       end if
       return
       end
@@ -100,15 +382,15 @@ c     ###############################################################
 c
 c
 c     "pmonte" implements a Monte Carlo barostat via random trial
-c     changes in the periodic box volume and shape
+c     changes in the box dimensions and coordinates
 c
 c     literature references:
 c
 c     D. Frenkel and B. Smit, "Understanding Molecular Simulation,
-c     2nd Edition", Academic Press, San Diego, CA, 2002; Section 5.4.2
+c     3rd Edition", Academic Press, San Diego, CA, 2023; Section 6.3
 c
-c     original version written by Alan Grossfield, January 2004;
-c     anisotropic modification implemented by Lee-Ping Wang, Stanford
+c     original version implemented by Alan Grossfield, January 2004;
+c     anisotropic modification provided by Lee-Ping Wang, Stanford
 c     University, March 2013
 c
 c
@@ -438,7 +720,7 @@ c
 c           dkin = dble(nuse) * kt * log(volold/volbox)
          end if
 c
-c     alternatively get the kinetic energy change from velocities
+c     alternatively get the instantaneous kinetic energy change
 c
 c        dkin = 0.0d0
 c        do i = 1, nuse
@@ -484,219 +766,6 @@ c
          deallocate (xold)
          deallocate (yold)
          deallocate (zold)
-      end if
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine pscale  --  Berendsen barostat via scaling  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "pscale" implements a Berendsen barostat by scaling the
-c     coordinates and box dimensions via coupling to an external
-c     constant pressure bath
-c
-c     literature references:
-c
-c     H. J. C. Berendsen, J. P. M. Postma, W. F. van Gunsteren,
-c     A. DiNola and J. R. Hauk, "Molecular Dynamics with Coupling
-c     to an External Bath", Journal of Chemical Physics, 81,
-c     3684-3690 (1984)
-c
-c     S. E. Feller, Y. Zhang, R. W. Pastor, B. R. Brooks, "Constant
-c     Pressure Molecular Dynamics Simulation: The Langevin Piston
-c     Method", Journal of Chemical Physics, 103, 4613-4621 (1995)
-c
-c     code for anisotropic pressure coupling was provided by Guido
-c     Raos, Dipartimento di Chimica, Politecnico di Milano, Italy
-c
-c
-      subroutine pscale (dt,pres,stress)
-      use atomid
-      use atoms
-      use bath
-      use boxes
-      use group
-      use math
-      use mdstuf
-      use usage
-      implicit none
-      integer i,j,k
-      integer start,stop
-      real*8 dt,pres,weigh
-      real*8 cosine,scale
-      real*8 xcm,xmove
-      real*8 ycm,ymove
-      real*8 zcm,zmove
-      real*8 stress(3,3)
-      real*8 temp(3,3)
-      real*8 hbox(3,3)
-      real*8 ascale(3,3)
-c
-c
-c     find the isotropic scale factor for constant pressure
-c
-      if (.not. anisotrop) then
-         scale = (1.0d0 + (dt*compress/taupres)*(pres-atmsph))**third
-c
-c     modify the current periodic box dimension values
-c
-         xbox = xbox * scale
-         ybox = ybox * scale
-         zbox = zbox * scale
-c
-c     propagate the new box dimensions to other lattice values
-c
-         call lattice
-c
-c     couple to pressure bath via atom scaling in Cartesian space
-c
-         if (integrate .ne. 'RIGIDBODY') then
-            do i = 1, nuse
-               k = iuse(i)
-               x(k) = x(k) * scale
-               y(k) = y(k) * scale
-               z(k) = z(k) * scale
-            end do
-c
-c     couple to pressure bath via center of mass of rigid bodies
-c
-         else
-            scale = scale - 1.0d0
-            do i = 1, ngrp
-               start = igrp(1,i)
-               stop = igrp(2,i)
-               xcm = 0.0d0
-               ycm = 0.0d0
-               zcm = 0.0d0
-               do j = start, stop
-                  k = kgrp(j)
-                  weigh = mass(k)
-                  xcm = xcm + x(k)*weigh
-                  ycm = ycm + y(k)*weigh
-                  zcm = zcm + z(k)*weigh
-               end do
-               xmove = scale * xcm/grpmass(i)
-               ymove = scale * ycm/grpmass(i)
-               zmove = scale * zcm/grpmass(i)
-               do j = start, stop
-                  k = kgrp(j)
-                  x(k) = x(k) + xmove
-                  y(k) = y(k) + ymove
-                  z(k) = z(k) + zmove
-               end do
-            end do
-         end if
-c
-c     find the anisotropic scale factors for constant pressure
-c
-      else
-         scale = third * dt * compress / taupres
-         do i = 1, 3
-            do j = 1, 3
-               if (j. eq. i) then
-                  ascale(j,i) = 1.0d0 + scale*(stress(i,i)-atmsph)
-               else
-                  ascale(j,i) = scale*stress(j,i)
-               end if
-            end do
-         end do
-c
-c     modify the current periodic box dimension values
-c
-         temp(1,1) = xbox
-         temp(2,1) = 0.0d0
-         temp(3,1) = 0.0d0
-         temp(1,2) = ybox * gamma_cos
-         temp(2,2) = ybox * gamma_sin
-         temp(3,2) = 0.0d0
-         temp(1,3) = zbox * beta_cos
-         temp(2,3) = zbox * beta_term
-         temp(3,3) = zbox * gamma_term
-         do i = 1, 3
-            do j = 1, 3
-               hbox(j,i) = 0.0d0
-               do k = 1, 3
-                  hbox(j,i) = hbox(j,i) + ascale(j,k)*temp(k,i)
-               end do
-            end do
-         end do
-         xbox = sqrt(hbox(1,1)**2 + hbox(2,1)**2 + hbox(3,1)**2)
-         ybox = sqrt(hbox(1,2)**2 + hbox(2,2)**2 + hbox(3,2)**2)
-         zbox = sqrt(hbox(1,3)**2 + hbox(2,3)**2 + hbox(3,3)**2)
-         if (monoclinic) then
-            cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
-     &                  + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
-            beta = radian * acos(cosine)
-         else if (triclinic) then
-            cosine = (hbox(1,2)*hbox(1,3) + hbox(2,2)*hbox(2,3)
-     &                  + hbox(3,2)*hbox(3,3)) / (ybox*zbox)
-            alpha = radian * acos(cosine)
-            cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
-     &                  + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
-            beta = radian * acos(cosine)
-            cosine = (hbox(1,1)*hbox(1,2) + hbox(2,1)*hbox(2,2)
-     &                  + hbox(3,1)*hbox(3,2)) / (xbox*ybox)
-            gamma = radian * acos(cosine)
-         end if
-c
-c     propagate the new box dimensions to other lattice values
-c
-         call lattice
-c
-c     couple to pressure bath via atom scaling in Cartesian space
-c
-         if (integrate .ne. 'RIGIDBODY') then
-            do i = 1, nuse
-               k = iuse(i)
-               x(k) = x(k)*ascale(1,1) + y(k)*ascale(1,2)
-     &                   + z(k)*ascale(1,3)
-               y(k) = x(k)*ascale(2,1) + y(k)*ascale(2,2)
-     &                   + z(k)*ascale(2,3)
-               z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
-     &                   + z(k)*ascale(3,3)
-            end do
-c
-c     couple to pressure bath via center of mass of rigid bodies
-c
-         else
-            ascale(1,1) = ascale(1,1) - 1.0d0
-            ascale(2,2) = ascale(2,2) - 1.0d0
-            ascale(3,3) = ascale(3,3) - 1.0d0
-            do i = 1, ngrp
-               start = igrp(1,i)
-               stop = igrp(2,i)
-               xcm = 0.0d0
-               ycm = 0.0d0
-               zcm = 0.0d0
-               do j = start, stop
-                  k = kgrp(j)
-                  weigh = mass(k)
-                  xcm = xcm + x(k)*weigh
-                  ycm = xcm + y(k)*weigh
-                  zcm = xcm + z(k)*weigh
-               end do
-               xcm = xcm / grpmass(i)
-               ycm = ycm / grpmass(i)
-               zcm = zcm / grpmass(i)
-               xmove = xcm*ascale(1,1) + ycm*ascale(1,2)
-     &                    + zcm*ascale(1,3)
-               ymove = xcm*ascale(2,1) + ycm*ascale(2,2)
-     &                    + zcm*ascale(2,3)
-               zmove = xcm*ascale(3,1) + ycm*ascale(3,2)
-     &                    + zcm*ascale(3,3)
-               do j = start, stop
-                  k = kgrp(j)
-                  x(k) = x(k) + xmove
-                  y(k) = y(k) + ymove
-                  z(k) = z(k) + zmove
-               end do
-            end do
-         end if
       end if
       return
       end

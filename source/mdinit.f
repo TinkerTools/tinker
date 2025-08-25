@@ -87,14 +87,13 @@ c
          qnh(i) = 0.0d0
          gnh(i) = 0.0d0
       end do
-      barostat = 'BERENDSEN'
+      barostat = 'BUSSI'
       anisotrop = .false.
       taupres = -1.0d0
       compress = 0.000046d0
       vbar = 0.0d0
       qbar = 0.0d0
       gbar = 0.0d0
-      eta = 0.0d0
       voltrial = 25
       volmove = 100.0d0
       volscale = 'MOLECULAR'
@@ -199,15 +198,6 @@ c     enforce use of velocity Verlet with Andersen thermostat
 c
       if (thermostat .eq. 'ANDERSEN') then
          if (integrate .eq. 'BEEMAN')  integrate = 'VERLET'
-      end if
-c
-c     enforce use of Bussi thermostat/barostat with integrator
-c
-      if (integrate .eq. 'BUSSI') then
-         thermostat = 'BUSSI'
-         barostat = 'BUSSI'
-      else if (thermostat.eq.'BUSSI' .and. barostat.eq.'BUSSI') then
-         integrate = 'BUSSI'
       end if
 c
 c     enforce use of Nose-Hoover thermostat/barostat with integrator
