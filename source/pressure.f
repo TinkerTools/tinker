@@ -235,7 +235,7 @@ c
             do i = 1, 3
                do j = 1, 3
                   if (j. eq. i) then
-                     ascale(j,i) = 1.0d0 + scale*(stress(i,i)-atmsph)
+                     ascale(j,i) = 1.0d0 + scale*(stress(j,i)-atmsph)
                   else
                      ascale(j,i) = scale * stress(j,i)
                   end if
