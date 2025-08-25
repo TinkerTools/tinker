@@ -200,7 +200,7 @@ c
          if (integrate .eq. 'BEEMAN')  integrate = 'VERLET'
       end if
 c
-c     enforce use of Nose-Hoover thermostat/barostat with integrator
+c     couple Nose-Hoover thermostat and barostat with integrator
 c
       if (integrate .eq. 'NOSE-HOOVER') then
          thermostat = 'NOSE-HOOVER'

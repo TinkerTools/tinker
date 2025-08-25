@@ -31,6 +31,7 @@ c
       use bath
       use boxes
       use freeze
+      use iounit
       use moldyn
       use units
       use usage
@@ -89,9 +90,14 @@ c
          z(k) = z(k)*eterm2 + v(3,k)*poly
       end do
 c
-c     constraints under NH-NPT require the ROLL algorithm
+c     constraints with Nose-Hoover NPT requires ROLL algorithm
 c
-      if (use_rattle)  call fatal
+      if (use_rattle) then
+         write (iout,10)
+   10    format (/,' NOSE  --  Nose-Hoover NPT MD Requires the',
+     &              ' ROLL Algorithm')
+         call fatal
+      end if
 c
 c     update the periodic box size and total volume
 c
