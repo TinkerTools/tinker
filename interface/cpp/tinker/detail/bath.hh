@@ -20,10 +20,10 @@ extern double (&qnh)[maxnose];
 extern double (&gnh)[maxnose];
 extern int& isothermal;
 extern int& isobaric;
-extern int& anisotrop;
+extern char (&prestyp)[9];
 extern char (&volscale)[9];
-extern char (&barostat)[11];
 extern char (&thermostat)[11];
+extern char (&barostat)[11];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(bath, voltrial);
@@ -42,10 +42,10 @@ extern "C" double TINKER_MOD(bath, qnh)[maxnose];
 extern "C" double TINKER_MOD(bath, gnh)[maxnose];
 extern "C" int TINKER_MOD(bath, isothermal);
 extern "C" int TINKER_MOD(bath, isobaric);
-extern "C" int TINKER_MOD(bath, anisotrop);
+extern "C" char TINKER_MOD(bath, prestyp)[9];
 extern "C" char TINKER_MOD(bath, volscale)[9];
-extern "C" char TINKER_MOD(bath, barostat)[11];
 extern "C" char TINKER_MOD(bath, thermostat)[11];
+extern "C" char TINKER_MOD(bath, barostat)[11];
 
 int& voltrial = TINKER_MOD(bath, voltrial);
 double& kelvin = TINKER_MOD(bath, kelvin);
@@ -63,9 +63,9 @@ double (&qnh)[maxnose] = TINKER_MOD(bath, qnh);
 double (&gnh)[maxnose] = TINKER_MOD(bath, gnh);
 int& isothermal = TINKER_MOD(bath, isothermal);
 int& isobaric = TINKER_MOD(bath, isobaric);
-int& anisotrop = TINKER_MOD(bath, anisotrop);
+char (&prestyp)[9] = TINKER_MOD(bath, prestyp);
 char (&volscale)[9] = TINKER_MOD(bath, volscale);
-char (&barostat)[11] = TINKER_MOD(bath, barostat);
 char (&thermostat)[11] = TINKER_MOD(bath, thermostat);
+char (&barostat)[11] = TINKER_MOD(bath, barostat);
 #endif
 } }
