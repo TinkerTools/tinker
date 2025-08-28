@@ -56,6 +56,7 @@ c
       logical exist
       character*7 ext
       character*20 keyword
+      character*20 text
       character*240 dynfile
       character*240 record
       character*240 string
@@ -88,7 +89,7 @@ c
          gnh(i) = 0.0d0
       end do
       barostat = 'BUSSI'
-      anisotrop = .false.
+      prestyp = 'ISOTROPIC'
       taupres = -1.0d0
       compress = 0.000046d0
       vbar = 0.0d0
@@ -131,19 +132,31 @@ c
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
-            call getword (record,thermostat,next)
-            call upcase (thermostat)
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:5) .eq. 'BUSSI')  thermostat = 'BUSSI'
+            if (text(1:9) .eq. 'BERENDSEN')  thermostat = 'BERENDSEN'
+            if (text(1:4) .eq. 'NOSE')  thermostat = 'NOSE-HOOVER'
+            if (text(1:8) .eq. 'ANDERSEN')  thermostat = 'ANDERSEN'
          else if (keyword(1:16) .eq. 'TAU-TEMPERATURE ') then
             read (string,*,err=10,end=10)  tautemp
          else if (keyword(1:10) .eq. 'COLLISION ') then
             read (string,*,err=10,end=10)  collide
          else if (keyword(1:9) .eq. 'BAROSTAT ') then
-            call getword (record,barostat,next)
-            call upcase (barostat)
-         else if (keyword(1:15) .eq. 'ANISO-PRESSURE ') then
-            anisotrop = .true.
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:5) .eq. 'BUSSI')  barostat = 'BUSSI'
+            if (text(1:9) .eq. 'BERENDSEN')  barostat = 'BERENDSEN'
+            if (text(1:4) .eq. 'NOSE')  barostat = 'NOSE-HOOVER'
+            if (text(1:10) .eq. 'MONTECARLO')  barostat = 'MONTECARLO'
          else if (keyword(1:13) .eq. 'TAU-PRESSURE ') then
             read (string,*,err=10,end=10)  taupres
+         else if (keyword(1:9) .eq. 'PRESSURE ') then
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:9) .eq. 'ISOTROPIC')  prestyp = 'ISOTROPIC'
+            if (text(1:5) .eq. 'ANISO')  prestyp = 'ANISO'
+            if (text(1:4) .eq. 'SEMI')  prestyp = 'SEMIISO'
          else if (keyword(1:9) .eq. 'COMPRESS ') then
             read (string,*,err=10,end=10)  compress
          else if (keyword(1:13) .eq. 'VOLUME-TRIAL ') then
@@ -151,8 +164,10 @@ c
          else if (keyword(1:12) .eq. 'VOLUME-MOVE ') then
             read (string,*,err=10,end=10)  volmove
          else if (keyword(1:13) .eq. 'VOLUME-SCALE ') then
-            call getword (record,volscale,next)
-            call upcase (volscale)
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:9) .eq. 'MOLECULAR')  volscale = 'MOLECULAR'
+            if (text(1:6) .eq. 'ATOMIC')  volscale = 'ATOMIC'
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          end if
@@ -219,6 +234,7 @@ c
       if (taupres .lt. 0.0d0) then
          taupres = 2.0d0
          if (barostat .eq. 'NOSE-HOOVER')  taupres = 10.0d0
+         if (prestyp .eq. 'ANISOTROPIC')  taupres = 10.0d0
       end if
 c
 c     check for use of Monte Carlo barostat with constraints

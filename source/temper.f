@@ -13,9 +13,8 @@ c     ##############################################################
 c
 c
 c     "temper" computes the instantaneous temperature and applies a
-c     thermostat via Berendsen or Bussi-Parrinello velocity scaling,
-c     Andersen stochastic collisions or Nose-Hoover chains; also uses
-c     Berendsen scaling for any iEL induced dipole variables
+c     thermostat via Berendsen scaling, Bussi stochastic velocity
+c     rescaling, Andersen stochastic collisions or Nose-Hoover chains
 c
 c     literature references:
 c
@@ -31,6 +30,10 @@ c
 c     H. C. Andersen, "Molecular Dynamics Simulations at Constant
 c     Pressure and/or Temperature", Journal of Chemical Physics,
 c     72, 2384-2393 (1980)
+c
+c     G. J. Martyna, M. L. Klein and M. Tuckerman, "Nose-Hoover
+c     Chains: The Canonical Ensembele via Continuous Dynamics",
+c     Journal of Chemical Physics, 97, 2635-2643 (1992)
 c
 c
       subroutine temper (dt,eksum,ekin,temp)
@@ -239,7 +242,8 @@ c     ###############################################################
 c
 c
 c     "temper2" applies a velocity correction at the half time step
-c     as needed for the Nose-Hoover thermostat
+c     as needed for the Nose-Hoover chain thermostat; also uses the
+c     Berendsen thermostat for any iEL induced dipole variables
 c
 c     literature references:
 c

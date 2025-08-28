@@ -30,10 +30,10 @@ c     qnh         mass for each chained Nose-Hoover thermostat
 c     gnh         force for each chained Nose-Hoover thermostat
 c     isothermal  logical flag governing use of temperature control
 c     isobaric    logical flag governing use of pressure control
-c     anisotrop   logical flag governing use of anisotropic pressure
+c     prestyp     pressure control type (ISOTROPIC, SEMIISO or ANISO)
+c     volscale    choice of scaling method for Monte Carlo barostat
 c     thermostat  choice of temperature control method to be used
 c     barostat    choice of pressure control method to be used
-c     volscale    choice of scaling method for Monte Carlo barostat
 c
 c
       module bath
@@ -51,9 +51,9 @@ c
       real*8 gnh(maxnose)
       logical isothermal
       logical isobaric
-      logical anisotrop
+      character*9 prestyp
       character*9 volscale
-      character*11 barostat
       character*11 thermostat
+      character*11 barostat
       save
       end

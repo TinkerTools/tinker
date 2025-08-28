@@ -115,6 +115,9 @@ c
 c     M. Bernetti and G. Bussi, "Pressure Control Using Stochastic
 c     Cell Rescaling", Journal of Chemical Physics, 153, 114107 (2020)
 c
+c     V. Del Tatto, "A Fully Anisotropic Formulation of Stochastic
+c     Cell Rescaling", arXiv, 2111.06403v1 (2021)
+c
 c     original code for anisotropic pressure coupling by Guido Raos,
 c     Dipartimento di Chimica, Politecnico di Milano, Italy, May 2006
 c
@@ -135,10 +138,12 @@ c
       integer i,j,k
       integer start,stop
       real*8 dt,pres,weigh
-      real*8 eps,deps
+      real*8 eps,deps,term
       real*8 kt,betat,dw
       real*8 scale,scalei
+      real*8 scalexy,scalez
       real*8 normal,cosine
+      real*8 tension
       real*8 xcm,xmove
       real*8 ycm,ymove
       real*8 zcm,zmove
@@ -151,17 +156,17 @@ c
 c
 c     find the isotropic scale factor for pressure control
 c
-      if (.not. anisotrop) then
+      if (prestyp .eq. 'ISOTROPIC') then
          if (barostat .eq. 'BERENDSEN') then
-            eps = 1.0d0 + (compress*dt/taupres)*(pres-atmsph)
-            scale = (eps)**third
+            eps = third * (compress*dt/taupres)
+            scale = 1.0d0 + eps*(pres-atmsph)
          else if (barostat .eq. 'BUSSI') then
             kt = gasconst * kelvin
             betat = prescon * compress
             dw = normal ()
             eps = (compress*dt/taupres) * (pres-atmsph)
-            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres)) * dw
-            scale = exp((eps+deps)/3.0d0)
+            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres))
+            scale = exp(third*(eps+deps*dw))
          end if
 c
 c     modify the current periodic box dimension values
@@ -227,33 +232,122 @@ c
             end do
          end if
 c
+c     find the semi-isotropic scale factors for pressure control
+c
+      else if (prestyp .eq. 'SEMIISO') then
+         if (barostat .eq. 'BERENDSEN') then
+            tension = 0.0d0
+            eps = third * (compress*dt/taupres)
+            scalexy = 1.0d0 + eps*(0.5d0*(stress(1,1)+stress(2,2))
+     &                                +(tension/zbox)-atmsph)
+            scalez = 1.0d0 + eps*(stress(3,3)-atmsph)
+         else if (barostat .eq. 'BUSSI') then
+            tension = 0.0d0
+            kt = gasconst * kelvin
+            betat = prescon * compress
+            eps = third * (compress*dt/taupres)
+            deps = sqrt(third2*kt*betat*dt/(volbox*taupres))
+            dw = normal ()
+            term = 0.5d0*(stress(1,1)+stress(2,2))
+     &                + (tension/zbox) - atmsph
+            scalexy = 1.0d0 + eps*term + root2*deps*dw
+            dw = normal ()
+            term = stress(3,3) - atmsph
+            scalez = 1.0d0 + eps*term + deps*dw
+         end if
+c
+c     modify the current periodic box dimension values
+c
+         xbox = xbox * scalexy
+         ybox = ybox * scalexy
+         zbox = zbox * scalez
+c
+c     propagate the new box dimensions to other lattice values
+c
+         call lattice
+c
+c     couple to pressure bath via atom scaling in Cartesian space
+c
+         if (integrate .ne. 'RIGIDBODY') then
+            do i = 1, nuse
+               k = iuse(i)
+               x(k) = x(k) * scalexy
+               y(k) = y(k) * scalexy
+               z(k) = z(k) * scalez
+            end do
+            if (barostat .eq. 'BUSSI') then
+               do i = 1, nuse
+                  k = iuse(i)
+                  v(1,k) = v(1,k) / scalexy
+                  v(2,k) = v(2,k) / scalexy
+                  v(3,k) = v(3,k) / scalez
+               end do
+            end if
+c
+c     couple to pressure bath via center of mass of rigid bodies
+c
+         else
+            do i = 1, ngrp
+               start = igrp(1,i)
+               stop = igrp(2,i)
+               xcm = 0.0d0
+               ycm = 0.0d0
+               zcm = 0.0d0
+               do j = start, stop
+                  k = kgrp(j)
+                  weigh = mass(k)
+                  xcm = xcm + x(k)*weigh
+                  ycm = ycm + y(k)*weigh
+                  zcm = zcm + z(k)*weigh
+               end do
+               xmove = (scalexy-1.0d0) * xcm/grpmass(i)
+               ymove = (scalexy-1.0d0) * ycm/grpmass(i)
+               zmove = (scalez-1.0d0) * zcm/grpmass(i)
+               do j = start, stop
+                  k = kgrp(j)
+                  x(k) = x(k) + xmove
+                  y(k) = y(k) + ymove
+                  z(k) = z(k) + zmove
+               end do
+               if (barostat .eq. 'BUSSI') then
+                  vcm(j,i) = vcm(1,i) / scalexy
+                  vcm(2,i) = vcm(2,i) / scalexy
+                  vcm(3,i) = vcm(3,i) / scalez
+                  wcm(1,i) = wcm(1,i) / scalexy
+                  wcm(2,i) = wcm(2,i) / scalexy
+                  wcm(3,i) = wcm(3,i) / scalez
+               end if
+            end do
+         end if
+c
 c     find the anisotropic scale factors for pressure control
 c
-      else
+      else if (prestyp .eq. 'ANISO') then
          if (barostat .eq. 'BERENDSEN') then
-            scale = third * (compress*dt/taupres)
+            eps = third * (compress*dt/taupres)
             do i = 1, 3
                do j = 1, 3
                   if (j. eq. i) then
-                     ascale(j,i) = 1.0d0 + scale*(stress(j,i)-atmsph)
+                     ascale(j,i) = 1.0d0 + eps*(stress(j,i)-atmsph)
                   else
-                     ascale(j,i) = scale * stress(j,i)
+                     ascale(j,i) = eps * stress(j,i)
                   end if
                end do
             end do
          else if (barostat .eq. 'BUSSI') then
             kt = gasconst * kelvin
             betat = prescon * compress
-            dw = normal ()
-            eps = compress * dt / taupres
-            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres)) * dw
-            scale = third * exp((eps+deps)/3.0d0)
+            eps = third * (compress*dt/taupres)
+            deps = sqrt(third2*kt*betat*dt/(volbox*taupres))
             do i = 1, 3
                do j = 1, 3
+                  dw = normal ()
                   if (j .eq. i) then
-                     ascale(j,i) = scale * (stress(j,i)-atmsph)
+                     term = stress(j,i) - atmsph + prescon*kt/volbox
+                     ascale(j,i) = 1.0d0 + eps*term + deps*dw
                   else
-                     ascale(j,i) = scale * stress(j,i)
+c                    ascale(j,i) = eps*stress(j,i) + deps*dw
+                     ascale(j,i) = eps * stress(j,i)
                   end if
                end do
             end do
@@ -314,12 +408,15 @@ c
      &                   + z(k)*ascale(3,3)
             end do
             if (barostat .eq. 'BUSSI') then
+               call invert (3,ascale)
                do i = 1, nuse
                   k = iuse(i)
-                  do j = 1, 3
-                     v(j,k) = v(1,k)/ascale(j,1) + v(2,k)/ascale(j,2)
-     &                           + v(3,k)/ascale(j,3)
-                  end do
+                  v(1,k) = v(1,k)*ascale(1,1) + v(2,k)*ascale(1,2)
+     &                        + v(3,k)*ascale(1,3)
+                  v(2,k) = v(1,k)*ascale(2,1) + v(2,k)*ascale(2,2)
+     &                        + v(3,k)*ascale(2,3)
+                  v(3,k) = v(1,k)*ascale(3,1) + v(2,k)*ascale(3,2)
+     &                        + v(3,k)*ascale(3,3)
                end do
             end if
 c
@@ -358,14 +455,19 @@ c
                   z(k) = z(k) + zmove
                end do
                if (barostat .eq. 'BUSSI') then
-                  do j = 1, 3
-                     vcm(j,i) = vcm(j,i)/ascale(j,1)
-     &                             + vcm(j,i)/ascale(j,2)
-     &                             + vcm(j,i)/ascale(j,3)
-                     wcm(j,i) = wcm(j,i)/ascale(j,1)
-     &                             + wcm(j,i)/ascale(j,2)
-     &                             + wcm(j,i)/ascale(j,3)
-                  end do
+                  call invert (3,ascale)
+                  vcm(1,i) = vcm(1,i)*ascale(1,1) + vcm(2,i)*ascale(1,2)
+     &                          + vcm(3,i)*ascale(1,3)
+                  vcm(2,i) = vcm(1,i)*ascale(2,1) + vcm(2,i)*ascale(2,2)
+     &                          + vcm(3,i)*ascale(2,3)
+                  vcm(3,i) = vcm(1,i)*ascale(3,1) + vcm(2,i)*ascale(3,2)
+     &                          + vcm(3,i)*ascale(3,3)
+                  wcm(1,i) = wcm(1,i)*ascale(1,1) + wcm(2,i)*ascale(1,2)
+     &                          + wcm(3,i)*ascale(1,3)
+                  wcm(2,i) = wcm(1,i)*ascale(2,1) + wcm(2,i)*ascale(2,2)
+     &                          + wcm(3,i)*ascale(2,3)
+                  wcm(3,i) = wcm(1,i)*ascale(3,1) + wcm(2,i)*ascale(3,2)
+     &                          + wcm(3,i)*ascale(3,3)
                end if
             end do
          end if
@@ -385,6 +487,11 @@ c     "pmonte" implements a Monte Carlo barostat via random trial
 c     changes in the box dimensions and coordinates
 c
 c     literature references:
+c
+c     J. Aqvist, P. Wennerstrom, M. Nervall, S. Bjelic, B. O. Brandsal,
+c     "Molecular Dynamics Simulations of Water and Biomolecules with
+c     a Monte Carlo Constant Pressure Algorithm", Chemical Physics
+c     Letters, 384, 288-294 (2004)
 c
 c     D. Frenkel and B. Smit, "Understanding Molecular Simulation,
 c     3rd Edition", Academic Press, San Diego, CA, 2023; Section 6.3
@@ -428,6 +535,7 @@ c
       real*8, allocatable :: zold(:)
       logical dotrial
       logical isotropic
+      logical idealgas
       external random
 c
 c
@@ -442,7 +550,9 @@ c
          kt = gasconst * temp
          if (isothermal)  kt = gasconst * kelvin
          isotropic = .true.
-         if (anisotrop .and. random().gt.0.5d0)  isotropic = .false.
+         if (prestyp.eq.'ANISO' .and. random().gt.0.5d0) then
+            isotropic = .false.
+         end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -709,34 +819,42 @@ c
          dpot = epot - eold
          dpv = atmsph * (volbox-volold) / prescon
 c
+c     get the kinetic energy contribution for the trial move
+c
+         idealgas = .true.
+c
 c     estimate the kinetic energy change as an ideal gas term
 c
-         if (integrate .eq. 'RIGIDBODY') then
-            dkin = dble(ngrp) * kt * log(volold/volbox)
-         else if (volscale .eq. 'MOLECULAR') then
-            dkin = dble(nmol) * kt * log(volold/volbox)
+         if (idealgas) then
+            if (integrate .eq. 'RIGIDBODY') then
+               dkin = dble(ngrp) * kt * log(volold/volbox)
+            else if (volscale .eq. 'MOLECULAR') then
+               dkin = dble(nmol) * kt * log(volold/volbox)
+            else
+               dkin = dble(nmol) * kt * log(volold/volbox)
+c              dkin = dble(nuse) * kt * log(volold/volbox)
+            end if
+c
+c     alternatively get the instantaneous kinetic energy change;
+c     requires the prior step velocity, which is not available
+c
          else
-            dkin = dble(nmol) * kt * log(volold/volbox)
-c           dkin = dble(nuse) * kt * log(volold/volbox)
+            dkin = 0.0d0
+            do i = 1, nuse
+               k = iuse(i)
+               term = 1.5d0 * mass(k) / ekcal
+               do j = 1, 3
+c                 dkin = dkin + term*(v(j,k)**2-vold(j,k)**2)
+               end do
+            end do
+            if (integrate .eq. 'RIGIDBODY') then
+               dkin = dkin * dble(ngrp)/dble(nuse)
+            else if (volscale .eq. 'MOLECULAR') then
+               dkin = dkin * dble(nmol)/dble(nuse)
+            else
+               dkin = dkin * dble(nuse)/dble(nuse)
+            end if
          end if
-c
-c     alternatively get the instantaneous kinetic energy change
-c
-c        dkin = 0.0d0
-c        do i = 1, nuse
-c           k = iuse(i)
-c           term = 1.5d0 * mass(k) / ekcal
-c           do j = 1, 3
-c              dkin = dkin + term*(v(j,k)**2-vold(j,k)**2)
-c           end do
-c        end do
-c        if (integrate .eq. 'RIGIDBODY') then
-c           dkin = dkin * dble(ngrp)/dble(nuse)
-c        else if (volscale .eq. 'MOLECULAR') then
-c           dkin = dkin * dble(nmol)/dble(nuse)
-c        else
-c           dkin = dkin * dble(nuse)/dble(nuse)
-c        end if
 c
 c     acceptance ratio from Epot change, Ekin change and PV work
 c
