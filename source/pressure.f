@@ -238,22 +238,24 @@ c
          if (barostat .eq. 'BERENDSEN') then
             tension = 0.0d0
             eps = third * (compress*dt/taupres)
-            scalexy = 1.0d0 + eps*(0.5d0*(stress(1,1)+stress(2,2))
-     &                                +(tension/zbox)-atmsph)
-            scalez = 1.0d0 + eps*(stress(3,3)-atmsph)
+            term = 0.5d0*(stress(1,1)+stress(2,2))
+     &                + (tension/zbox) - atmsph
+            scalexy = 1.0d0 + eps*term
+            term = stress(3,3) - atmsph
+            scalez = 1.0d0 + eps*term
          else if (barostat .eq. 'BUSSI') then
             tension = 0.0d0
             kt = gasconst * kelvin
             betat = prescon * compress
-            eps = third * (compress*dt/taupres)
-            deps = sqrt(third2*kt*betat*dt/(volbox*taupres))
             dw = normal ()
+            eps = compress * dt / taupres
+            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres))
             term = 0.5d0*(stress(1,1)+stress(2,2))
      &                + (tension/zbox) - atmsph
-            scalexy = 1.0d0 + eps*term + root2*deps*dw
+            scalexy = exp(third*(eps*term+deps*dw))
             dw = normal ()
             term = stress(3,3) - atmsph
-            scalez = 1.0d0 + eps*term + deps*dw
+            scalez = exp(third*(eps*term+deps*dw))
          end if
 c
 c     modify the current periodic box dimension values

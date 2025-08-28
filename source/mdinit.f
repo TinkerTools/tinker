@@ -154,7 +154,7 @@ c
          else if (keyword(1:9) .eq. 'PRESSURE ') then
             call getword (record,text,next)
             call upcase (text)
-            if (text(1:9) .eq. 'ISOTROPIC')  prestyp = 'ISOTROPIC'
+            if (text(1:3) .eq. 'ISO')  prestyp = 'ISOTROPIC'
             if (text(1:5) .eq. 'ANISO')  prestyp = 'ANISO'
             if (text(1:4) .eq. 'SEMI')  prestyp = 'SEMIISO'
          else if (keyword(1:9) .eq. 'COMPRESS ') then
