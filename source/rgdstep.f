@@ -283,10 +283,10 @@ c
 c
 c     make any temperature and pressure corrections
 c
-      call temper2 (dt,temp)
-      call pressure2 (epot,temp)
       call temper (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
+      call temper2 (dt,temp)
+      call pressure2 (epot,temp)
 c
 c     total energy is sum of kinetic and potential energies
 c

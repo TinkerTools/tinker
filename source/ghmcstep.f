@@ -200,6 +200,7 @@ c     compute and control the temperature and pressure
 c
       call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure2 (epot,temp)
 c
 c     total energy is sum of kinetic and potential energies
 c
