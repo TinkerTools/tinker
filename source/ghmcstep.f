@@ -35,6 +35,7 @@ c
       use atomid
       use bath
       use freeze
+      use inform
       use iounit
       use moldyn
       use units
@@ -157,8 +158,10 @@ c
       if (de.gt.0.0d0 .and. random().gt.exp(-de)) then
          nrej = nrej + 1
          ratio = 1.0d0 - dble(nrej)/dble(istep)
-         write (iout,10)  ratio
-   10    format (' GHMC Step Rejected',6x,'Acceptance Ratio',f8.3)
+         if (debug) then
+            write (iout,10)  ratio
+   10       format (' GHMC Step Rejected',6x,'Acceptance Ratio',f8.3)
+         end if
          epot = epold
          do i = 1, nuse
             k = iuse(i)
