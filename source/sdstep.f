@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "sdstep" performs a single stochastic dynamics time step
-c     via the velocity Verlet integration algorithm
+c     via the velocity Verlet-based integration algorithm
 c
 c     literature references:
 c
@@ -95,17 +95,6 @@ c     get the potential energy and atomic forces
 c
       call gradient (epot,derivs)
 c
-c     use Newton's second law to get the next accelerations;
-c     find the full-step velocities using modified Verlet
-c
-      do i = 1, nuse
-         k = iuse(i)
-         do j = 1, 3
-            a(j,k) = -ekcal * derivs(j,k) / mass(k)
-            v(j,k) = v(j,k) + 0.5d0*a(j,k)*vfric(k) + vrand(j,k)
-         end do
-      end do
-c
 c     correct internal virial to account for frictional forces
 c
       do i = 1, nuse
@@ -128,6 +117,21 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
+c     make half-step correction to control the pressure
+c
+      call pressure2 (epot,temp)
+c
+c     use Newton's second law to get the next accelerations;
+c     find the full-step velocities using modified Verlet
+c
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + 0.5d0*a(j,k)*vfric(k) + vrand(j,k)
+         end do
+      end do
+c
 c     perform deallocation of some local arrays
 c
       deallocate (xold)
@@ -144,11 +148,10 @@ c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     compute and control the temperature and pressure
+c     compute the kinetic energy and control the pressure
 c
       call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
-      call pressure2 (epot,temp)
 c
 c     total energy is sum of kinetic and potential energies
 c
