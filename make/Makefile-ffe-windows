@@ -61,15 +61,15 @@ FFTW_LIBS = -lfftw3_threads -lfftw3
 FFEDIR = $(BUILDDIR)/ffe
 
 ##  For No Java
-#JAVA_INCDIR = 
-#JAVA_LIBDIR = 
-#JAVA_LIBS = 
+JAVA_INCDIR = 
+JAVA_LIBDIR = 
+JAVA_LIBS = 
 
 ##  For Linux
 #JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/linux \
 #		-I$(JAVA_HOME)/include \
 #		-I$(JAVA_HOME)/include/linux
-#JAVA_LIBDIR = -L$(JAVA_HOME)/lib/amd64/server
+#JAVA_LIBDIR = -L$(JAVA_HOME)/lib/server
 #JAVA_LIBS = -ljvm
 
 ##  For macOS
@@ -80,11 +80,11 @@ FFEDIR = $(BUILDDIR)/ffe
 #JAVA_LIBS = -ljvm
 
 ##  For Windows
-JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/windows \
-		-I$(JAVA_HOME)/include \
-		-I$(JAVA_HOME)/include/win32
-JAVA_LIBDIR = -L$(JAVA_HOME)/lib
-JAVA_LIBS = -ljvm
+#JAVA_INCDIR = -I$(FFEDIR)/native -I$(FFEDIR)/native/windows \
+#		-I$(JAVA_HOME)/include \
+#		-I$(JAVA_HOME)/include/win32
+#JAVA_LIBDIR = -L$(JAVA_HOME)/lib
+#JAVA_LIBS = -ljvm
 
 ####################################################################
 ##  Known Machine Types; Uncomment One of the Following Sections  ##

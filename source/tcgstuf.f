@@ -41,8 +41,8 @@ c
 c
 c     "indtcga" computes the induced dipoles and intermediates used
 c     in polarization force calculation for the TCG method with dp
-c     cross terms = true, initial guess mu0 = 0 and using a diagonal
-c     preconditioner
+c     cross terms set true, initial guess of mu0 set to zero, and
+c     using a diagonal preconditioner
 c
 c
       subroutine indtcga
@@ -238,8 +238,8 @@ c
 c
 c     "indtcgb" computes the induced dipoles and intermediates used
 c     in polarization force calculation for the TCG method with dp
-c     cross terms = true, initial guess mu0 = direct and using diagonal
-c     preconditioner
+c     cross terms set true, initial guess of mu0=direct, and using
+c     a diagonal preconditioner
 c
 c
       subroutine indtcgb
