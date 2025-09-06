@@ -109,7 +109,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm
+      real*8 vterm,eps
       real*8 taper,dtaper
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
@@ -146,8 +146,9 @@ c
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
       end if
 c
-c     set conversion factor, cutoff and switching coefficients
+c     set damping tolerance, cutoff and switching coefficients
 c
+      eps = 0.0001d0
       mode = 'DISP'
       call switch (mode)
 c
@@ -211,7 +212,16 @@ c
                   dk = ak * r
                   expi = exp(-di)
                   expk = exp(-dk)
-                  if (ai .ne. ak) then
+                  if (abs(ai-ak) .lt. eps) then
+                     di4 = di2 * di2
+                     di5 = di2 * di3
+                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &                          / 96.0d0
+                  else
                      ai2 = ai * ai
                      ai3 = ai * ai2
                      ak2 = ak * ak
@@ -236,15 +246,6 @@ c
      &                          * (r*ai+4.0d0*tk-1.0d0)
      &                       + 0.25d0 * dk2 * tk2 * ak * expk
      &                            * (r*ak+4.0d0*ti-1.0d0)
-                  else
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -404,7 +405,16 @@ c
                      dk = ak * r
                      expi = exp(-di)
                      expk = exp(-dk)
-                     if (ai .ne. ak) then
+                     if (abs(ai-ak) .lt. eps) then
+                        di4 = di2 * di2
+                        di5 = di2 * di3
+                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                        ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &                             / 96.0d0
+                     else
                         ai2 = ai * ai
                         ai3 = ai * ai2
                         ak2 = ak * ak
@@ -429,15 +439,6 @@ c
      &                             * (r*ai+4.0d0*tk-1.0d0)
      &                          + 0.25d0 * dk2 * tk2 * ak * expk
      &                               * (r*ak+4.0d0*ti-1.0d0)
-                     else
-                        di4 = di2 * di2
-                        di5 = di2 * di3
-                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                        ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                             / 96.0d0
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -593,7 +594,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm
+      real*8 vterm,eps
       real*8 taper,dtaper
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
@@ -630,8 +631,9 @@ c
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
       end if
 c
-c     set conversion factor, cutoff and switching coefficients
+c     set damping tolerance, cutoff and switching coefficients
 c
+      eps = 0.0001d0
       mode = 'DISP'
       call switch (mode)
 c
@@ -640,7 +642,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vterm)
+!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vterm,eps)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
 !$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
 c
@@ -704,7 +706,16 @@ c
                   dk = ak * r
                   expi = exp(-di)
                   expk = exp(-dk)
-                  if (ai .ne. ak) then
+                  if (abs(ai-ak) .lt. eps) then
+                     di4 = di2 * di2
+                     di5 = di2 * di3
+                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &                          / 96.0d0
+                  else
                      ai2 = ai * ai
                      ai3 = ai * ai2
                      ak2 = ak * ak
@@ -729,15 +740,6 @@ c
      &                          * (r*ai+4.0d0*tk-1.0d0)
      &                       + 0.25d0 * dk2 * tk2 * ak * expk
      &                            * (r*ak+4.0d0*ti-1.0d0)
-                  else
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -951,7 +953,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm
+      real*8 vterm,eps
       real*8 ralpha2,scale
       real*8 expterm,term
       real*8 expa,rterm
@@ -980,8 +982,9 @@ c
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
       end if
 c
-c     set conversion factor, cutoff and switching coefficients
+c     set damping tolerance, cutoff and switching coefficients
 c
+      eps = 0.0001d0
       mode = 'DEWALD'
       call switch (mode)
 c
@@ -1049,7 +1052,16 @@ c
                   dk = ak * r
                   expi = exp(-di)
                   expk = exp(-dk)
-                  if (ai .ne. ak) then
+                  if (abs(ai-ak) .lt. eps) then
+                     di4 = di2 * di2
+                     di5 = di2 * di3
+                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &                          / 96.0d0
+                  else
                      ai2 = ai * ai
                      ak2 = ak * ak
                      dk2 = dk * dk
@@ -1072,15 +1084,6 @@ c
      &                          * (r*ai+4.0d0*tk-1.0d0)
      &                       + 0.25d0 * dk2 * tk2 * ak * expk
      &                            * (r*ak+4.0d0*ti-1.0d0)
-                  else
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -1229,7 +1232,16 @@ c
                      dk = ak * r
                      expi = exp(-di)
                      expk = exp(-dk)
-                     if (ai .ne. ak) then
+                     if (abs(ai-ak) .lt. eps) then
+                        di4 = di2 * di2
+                        di5 = di2 * di3
+                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                        ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &                             / 96.0d0
+                     else
                         ai2 = ai * ai
                         ak2 = ak * ak
                         dk2 = dk * dk
@@ -1252,15 +1264,6 @@ c
      &                             * (r*ai+4.0d0*tk-1.0d0)
      &                          + 0.25d0 * dk2 * tk2 * ak * expk
      &                               * (r*ak+4.0d0*ti-1.0d0)
-                     else
-                        di4 = di2 * di2
-                        di5 = di2 * di3
-                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                        ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                             / 96.0d0
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -1460,7 +1463,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm
+      real*8 vterm,eps
       real*8 ralpha2,scale
       real*8 expterm,term
       real*8 expa,rterm
@@ -1489,8 +1492,9 @@ c
          vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
       end if
 c
-c     set conversion factor, cutoff and switching coefficients
+c     set damping tolerance, cutoff and switching coefficients
 c
+      eps = 0.0001d0
       mode = 'DEWALD'
       call switch (mode)
 c
@@ -1499,7 +1503,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
-!$OMP& vcouple,vterm)
+!$OMP& vcouple,vterm,eps)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
 !$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
 c
@@ -1567,7 +1571,16 @@ c
                   dk = ak * r
                   expi = exp(-di)
                   expk = exp(-dk)
-                  if (ai .ne. ak) then
+                  if (abs(ai-ak) .lt. eps) then
+                     di4 = di2 * di2
+                     di5 = di2 * di3
+                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &                          / 96.0d0
+                  else
                      ai2 = ai * ai
                      ak2 = ak * ak
                      dk2 = dk * dk
@@ -1590,15 +1603,6 @@ c
      &                          * (r*ai+4.0d0*tk-1.0d0)
      &                       + 0.25d0 * dk2 * tk2 * ak * expk
      &                            * (r*ak+4.0d0*ti-1.0d0)
-                  else
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c

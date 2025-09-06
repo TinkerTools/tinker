@@ -17,7 +17,7 @@ c     area each atom via the inclusion-exclusion method of Herbert
 c     Edelsbrunner based on alpha shapes
 c
 c     note for small or symmetric structures where alpha shapes
-c     may fail, switch to the Richmond method
+c     may fail, the code switches to the Richmond method
 c
 c     developed to facilitate calling UnionBall from Tinker by
 c     Jay W. Ponder, Washington University, October 2023
@@ -158,7 +158,7 @@ c     respect to Cartesian coordinates via the inclusion-exclusion
 c     method of Herbert Edelsbrunner based on alpha shapes
 c
 c     note for small or symmetric structures where alpha shapes
-c     may fail, switch to the Richmond method
+c     may fail, the code switches to the Richmond method
 c
 c     developed to facilitate calling UnionBall from Tinker by
 c     Jay W. Ponder, Washington University, October 2023

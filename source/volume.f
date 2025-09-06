@@ -17,7 +17,7 @@ c     the inclusion-exclusion method of Herbert Edelsbrunner based
 c     on alpha shapes; also finds the accessible surface area
 c
 c     note for small or symmetric structures where alpha shapes
-c     may fail, switch to the Connolly method
+c     may fail, the code switches to the Connolly method
 c
 c     developed to facilitate calling UnionBall from Tinker by
 c     Jay W. Ponder, Washington University, October 2023
@@ -175,7 +175,7 @@ c     of Herbert Edelsbrunner based on alpha shapes; also finds
 c     the accessible surface area and first derivatives
 c
 c     note for small or symmetric structures where alpha shapes
-c     may fail, swith to Richmond, Connolly and Kundrot methods
+c     may fail, switch to Richmond, Connolly and Kundrot methods
 c
 c     developed to facilitate calling UnionBall from Tinker by
 c     Jay W. Ponder, Washington University, October 2023
