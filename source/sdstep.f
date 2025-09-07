@@ -119,6 +119,7 @@ c
 c
 c     make half-step correction to control the pressure
 c
+      call kinetic (eksum,ekin,temp)
       call pressure2 (epot,temp)
 c
 c     use Newton's second law to get the next accelerations;

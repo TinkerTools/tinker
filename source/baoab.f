@@ -22,6 +22,10 @@ c     B. Leimkuhler and C. Matthews, "Efficient Molecular Dynamics
 c     Using Geodesic Integration and Solvent-Solute Splitting",
 c     Proceedings of the Royal Society A, 472, 20160138 (2016)
 c
+c     J. Jung and Y. Sugita, "Langevin Integration for Isothermal-
+c     Isobaric Condition with a Large Time Step", Journal of Chemical
+c     Physics, 162, 104108 (2025)
+c
 c
       subroutine baoab (istep,dt)
       use atomid
@@ -129,6 +133,7 @@ c
 c
 c     make half-step correction to control the pressure
 c
+      call kinetic (eksum,ekin,temp)
       call pressure2 (epot,temp)
 c
 c     use Newton's second law to get the next accelerations;
@@ -155,9 +160,10 @@ c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     compute and control the temperature and pressure
+c     compute the kinetic energy and control the pressure;
+c     half-step kinetic energy gives better temperature control
 c
-      call kinetic (eksum,ekin,temp)
+c     call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies
