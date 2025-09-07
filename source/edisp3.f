@@ -1385,7 +1385,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "edreal3d" evaluated the real space portion of the damped
+c     "edreal3d" calculates the real space portion of the damped
 c     dispersion energy and analysis using Ewald and a neighbor list
 c
 c

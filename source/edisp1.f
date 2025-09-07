@@ -1423,7 +1423,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "edreal1d" evaluates the real space portion of the Ewald
+c     "edreal1d" calculates the real space portion of the Ewald
 c     summation energy and gradient due to damped dispersion
 c     interactions via a neighbor list
 c

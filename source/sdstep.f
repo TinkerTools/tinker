@@ -26,8 +26,8 @@ c     Computational Chemistry, 15, 1302-1310 (1994)
 c
 c
       subroutine sdstep (istep,dt)
-      use atoms
       use atomid
+      use atoms
       use freeze
       use moldyn
       use units

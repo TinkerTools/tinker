@@ -74,7 +74,8 @@ c
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
-      friction = 91.0d0
+      friction = 0.5d0
+      if (use_solv)  friction = 91.0d0
       use_sdarea = .false.
       iprint = 100
 c

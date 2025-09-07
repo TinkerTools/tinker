@@ -1131,7 +1131,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "edreal0d" evaluated the real space portion of the damped
+c     "edreal0d" calculates the real space portion of the damped
 c     dispersion energy using a neighbor list
 c
 c
