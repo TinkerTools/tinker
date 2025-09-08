@@ -133,6 +133,27 @@ c
          end do
       end do
 c
+c     find the constraint-corrected full-step velocities
+c
+      if (use_rattle) then
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+         end do
+         call rattle2 (dt)
+      end if
+c
+c     compute the kinetic energy and control the pressure
+c
+      call kinetic (eksum,ekin,temp)
+      call pressure (dt,epot,ekin,temp,pres,stress)
+c
+c     final constraint step to enforce position convergence
+c
+      if (use_rattle)  call shake (xold,yold,zold)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (xold)
@@ -144,15 +165,6 @@ c
       deallocate (prand)
       deallocate (vrand)
       deallocate (derivs)
-c
-c     find the constraint-corrected full-step velocities
-c
-      if (use_rattle)  call rattle2 (dt)
-c
-c     compute the kinetic energy and control the pressure
-c
-      call kinetic (eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies
 c

@@ -34,6 +34,7 @@ c
       use moldyn
       use units
       use usage
+      use virial
       implicit none
       integer i,j,k
       integer istep
@@ -42,8 +43,10 @@ c
       real*8 etot,epot
       real*8 eksum
       real*8 temp,pres
+      real*8 drattle
       real*8 ekin(3,3)
       real*8 stress(3,3)
+      real*8 virrat(3,3)
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
@@ -54,8 +57,10 @@ c
 c
 c     set some time values for the dynamics integration
 c
-      dt_2 = 0.5d0 * dt
       nrattle = 1
+      if (use_rattle)  nrattle = 5
+      drattle = dble(nrattle)
+      dt_2 = 0.5d0 * dt
       dtr = dt_2 / dble(nrattle)
 c
 c     perform dynamic allocation of some local arrays
@@ -64,23 +69,19 @@ c
       allocate (yold(n))
       allocate (zold(n))
       allocate (derivs(3,n))
-      allocate (vfric(n)) 
+      allocate (vfric(n))
       allocate (vrand(3,n))
 c
-c     find half-step velocities via the Verlet recursion
+c     use a first B step to find the half-step velocities
 c 
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
             v(j,k) = v(j,k) + a(j,k)*dt_2
-         end do 
+         end do
       end do
 c
-c     find the constraint-corrected full-step velocities
-c
-      if (use_rattle)  call rattle2 (dt)
-c
-c     take first A step according to the BAOAB sequence
+c     take the first A step to get the half-step positions
 c
       do j = 1, nrattle
          do i = 1, nuse
@@ -92,15 +93,23 @@ c
             y(k) = y(k) + v(2,k)*dtr
             z(k) = z(k) + v(3,k)*dtr
          end do
-         if (use_rattle)  call rattle (dtr,xold,yold,zold)
-         if (use_rattle)  call rattle2 (dtr)   
-      end do 
+         if (use_rattle) then
+            call rattle (dtr,xold,yold,zold)
+            call rattle2 (dtr)
+         end if
+      end do
 c
-c     find the constraint-corrected full-step velocities
+c     initialize virial for stochastic and constraint forces
 c
-      if (use_rattle)  call rattle2 (dt)
+      if (use_rattle) then
+         do i = 1, 3
+            do j = 1, 3
+               vir(j,i) = 0.0d0
+            end do
+         end do
+      end if
 c
-c     update velocities with frictional and random components
+c     next an O step to get frictional and random components
 c
       call oprep (dt,vfric,vrand)
       do i = 1, nuse
@@ -109,9 +118,17 @@ c
             v(j,k) = v(j,k)*vfric(k) + vrand(j,k)
          end do
       end do
-      if (use_rattle)  call rattle2 (dt)
+      if (use_rattle) then
+         call rattle2 (dt)
+         do i = 1, 3
+            do j = 1, 3
+               virrat(j,i) = vir(j,i)
+               vir(j,i) = 0.0d0
+            end do
+         end do
+      end if
 c
-c     take second A step according to the BAOAB sequence
+c     take a second A step to get the full-step positions
 c
       do j = 1, nrattle
          do i = 1, nuse
@@ -123,9 +140,17 @@ c
             y(k) = y(k) + v(2,k)*dtr
             z(k) = z(k) + v(3,k)*dtr
          end do
-         if (use_rattle)  call rattle (dtr,xold,yold,zold)
-         if (use_rattle)  call rattle2 (dtr)   
-      end do 
+         if (use_rattle) then
+            call rattle (dtr,xold,yold,zold)
+            call rattle2 (dtr)
+            do i = 1, 3
+               do k = 1, 3
+                  virrat(k,i) = virrat(k,i) + vir(k,i)/drattle
+                  vir(k,i) = 0.0d0
+               end do
+            end do
+         end if
+      end do
 c
 c     get the potential energy and atomic forces
 c 
@@ -136,8 +161,7 @@ c
       call kinetic (eksum,ekin,temp)
       call pressure2 (epot,temp)
 c
-c     use Newton's second law to get the next accelerations;
-c     find the full-step velocities using the Verlet recursion
+c     second B step for accelerations and full-step velocities
 c
       do i = 1, nuse
          k = iuse(i)
@@ -147,18 +171,22 @@ c
          end do
       end do 
 c
-c     perform deallocation of some local arrays
-c
-      deallocate (xold)
-      deallocate (yold)
-      deallocate (zold)
-      deallocate (derivs)
-      deallocate (vfric) 
-      deallocate (vrand)
-c
 c     find the constraint-corrected full-step velocities
 c
-      if (use_rattle)  call rattle2 (dt)
+      if (use_rattle) then
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+         end do
+         call rattle2 (dt)
+         do i = 1, 3
+            do j = 1, 3
+               vir(j,i) = vir(j,i) + virrat(j,i)
+            end do
+         end do
+      end if
 c
 c     compute the kinetic energy and control the pressure;
 c     half-step kinetic energy gives better temperature control
@@ -166,9 +194,22 @@ c
 c     call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
 c
+c     final constraint step to enforce position convergence
+c
+      if (use_rattle)  call shake (xold,yold,zold)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+      deallocate (derivs)
+      deallocate (vfric)
+      deallocate (vrand)
+c
 c     total energy is sum of kinetic and potential energies
 c
-      etot = eksum + epot 
+      etot = eksum + epot
 c
 c     compute statistics and save trajectory for this step
 c
