@@ -160,9 +160,12 @@ c
       end do
       pres = (stress(1,1)+stress(2,2)+stress(3,3)) / 3.0d0
 c
-c     get the instantaneous temperature from the kinetic energy
+c     total energy is sum of kinetic and potential energies
 c
       etot = epot + eksum
+c
+c     compute statistics and save trajectory for this step
+c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)

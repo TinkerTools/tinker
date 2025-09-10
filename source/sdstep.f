@@ -117,10 +117,9 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
-c     make half-step correction to control the pressure
+c     compute the kinetic energy from half-step velocities
 c
-      call kinetic (eksum,ekin,temp)
-      call pressure2 (epot,temp)
+c     call kinetic (eksum,ekin,temp)
 c
 c     use Newton's second law to get the next accelerations;
 c     find the full-step velocities using modified Verlet
@@ -145,10 +144,11 @@ c
          call rattle2 (dt)
       end if
 c
-c     compute the kinetic energy and control the pressure
+c     compute full-step kinetic energy and pressure correction
 c
       call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
 c
@@ -174,6 +174,7 @@ c     compute statistics and save trajectory for this step
 c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
       return
       end
 c

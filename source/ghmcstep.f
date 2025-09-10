@@ -146,7 +146,7 @@ c     find the constraint-corrected full-step velocities
 c
       if (use_rattle)  call rattle2 (dt)
 c
-c     determine the kinetic energy, temperature and total energy
+c     compute the kinetic energy, temperature and total energy
 c
       call kinetic (eksum,ekin,temp)
       etot = eksum + epot
@@ -175,7 +175,7 @@ c
          end do
       end if
 c
-c     evolve velocities according to midpoint Euler for half-step
+c     update velocities using midpoint Euler for half-step
 c
       call ghmcterm (istep,dt,alpha,beta)
       do i = 1, nuse
@@ -225,6 +225,7 @@ c     compute statistics and save trajectory for this step
 c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
       return
       end
 c

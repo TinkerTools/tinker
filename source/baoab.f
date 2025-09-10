@@ -156,10 +156,9 @@ c     get the potential energy and atomic forces
 c 
       call gradient (epot,derivs)
 c
-c     make half-step correction to control the pressure
+c     compute the kinetic energy from half-step velocities
 c
       call kinetic (eksum,ekin,temp)
-      call pressure2 (epot,temp)
 c
 c     second B step for accelerations and full-step velocities
 c
@@ -188,11 +187,12 @@ c
          end do
       end if
 c
-c     compute the kinetic energy and control the pressure;
-c     half-step kinetic energy gives better temperature control
+c     compute full-step kinetic energy and pressure correction;
+c     half-step kinetic energy gives better pressure control
 c
 c     call kinetic (eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
 c

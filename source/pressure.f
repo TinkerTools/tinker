@@ -13,8 +13,8 @@ c     ##############################################################
 c
 c
 c     "pressure" uses the internal virial to find the pressure
-c     in a periodic box and maintains a constant desired pressure
-c     via a barostat method
+c     in a periodic box and maintain a constant desired pressure
+c     via a scaling barostat method
 c
 c
       subroutine pressure (dt,epot,ekin,temp,pres,stress)
@@ -55,7 +55,6 @@ c
       if (isobaric) then
          if (barostat .eq. 'BERENDSEN')  call pscale (dt,pres,stress)
          if (barostat .eq. 'BUSSI')  call pscale (dt,pres,stress)
-c        if (barostat .eq. 'MONTECARLO')  call pmonte (epot,temp)
       end if
       return
       end
@@ -68,8 +67,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "pressure2" applies a box size and velocity correction at
-c     the half time step as needed for the Monte Carlo barostat
+c     "pressure2" applies a box size and position correction to
+c     maintain constant desired pressure via a Monte Carlo barostat
 c
 c
       subroutine pressure2 (epot,temp)
@@ -86,8 +85,6 @@ c
 c     use the desired barostat to maintain constant pressure
 c
       if (isobaric) then
-c        if (barostat .eq. 'BERENDSEN')  call pscale (dt,pres,stress)
-c        if (barostat .eq. 'BUSSI')  call pscale (dt,pres,stress)
          if (barostat .eq. 'MONTECARLO')  call pmonte (epot,temp)
       end if
       return
@@ -148,7 +145,6 @@ c
       real*8 ycm,ymove
       real*8 zcm,zmove
       real*8 stress(3,3)
-      real*8 temp(3,3)
       real*8 hbox(3,3)
       real*8 ascale(3,3)
       external normal
@@ -357,20 +353,11 @@ c                    ascale(j,i) = eps*stress(j,i) + deps*dw
 c
 c     modify the current periodic box dimension values
 c
-         temp(1,1) = xbox
-         temp(2,1) = 0.0d0
-         temp(3,1) = 0.0d0
-         temp(1,2) = ybox * gamma_cos
-         temp(2,2) = ybox * gamma_sin
-         temp(3,2) = 0.0d0
-         temp(1,3) = zbox * beta_cos
-         temp(2,3) = zbox * beta_term
-         temp(3,3) = zbox * gamma_term
          do i = 1, 3
             do j = 1, 3
                hbox(j,i) = 0.0d0
                do k = 1, 3
-                  hbox(j,i) = hbox(j,i) + ascale(j,k)*temp(k,i)
+                  hbox(j,i) = hbox(j,i) + ascale(j,k)*lvec(i,k)
                end do
             end do
          end do
@@ -529,7 +516,6 @@ c
       real*8 xmove,ymove,zmove
       real*8 xboxold,yboxold,zboxold
       real*8 alphaold,betaold,gammaold
-      real*8 temp3(3,3)
       real*8 hbox(3,3)
       real*8 ascale(3,3)
       real*8, allocatable :: xold(:)
@@ -687,20 +673,11 @@ c
 c
 c     modify the current periodic box lattice angle values
 c
-            temp3(1,1) = xbox
-            temp3(2,1) = 0.0d0
-            temp3(3,1) = 0.0d0
-            temp3(1,2) = ybox * gamma_cos
-            temp3(2,2) = ybox * gamma_sin
-            temp3(3,2) = 0.0d0
-            temp3(1,3) = zbox * beta_cos
-            temp3(2,3) = zbox * beta_term
-            temp3(3,3) = zbox * gamma_term
             do i = 1, 3
                do j = 1, 3
                   hbox(j,i) = 0.0d0
                   do k = 1, 3
-                     hbox(j,i) = hbox(j,i) + ascale(j,k)*temp3(k,i)
+                     hbox(j,i) = hbox(j,i) + ascale(j,k)*lvec(i,k)
                   end do
                end do
             end do

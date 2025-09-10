@@ -70,6 +70,7 @@ c
       nfree = 0
       ndummy = 0
       irest = 100
+      iprint = 100
       use_wrap = .true.
       velsave = .false.
       frcsave = .false.
@@ -77,7 +78,6 @@ c
       friction = 1.0d0
       if (use_solv)  friction = 91.0d0
       use_sdarea = .false.
-      iprint = 100
 c
 c     set default values for temperature and pressure control
 c

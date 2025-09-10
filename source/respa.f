@@ -153,10 +153,9 @@ c
       call gradslow (epot,derivs)
       epot = epot + erespa
 c
-c     make half-step temperature and pressure corrections
+c     compute and make the half-step temperature correction
 c
       call temper2 (dt,temp)
-      call pressure2 (epot,temp)
 c
 c     use Newton's second law to get the slow accelerations;
 c     find full-step velocities using velocity Verlet recursion
@@ -204,10 +203,11 @@ c
          end do
       end do
 c
-c     make full-step temperature and pressure corrections
+c     compute full-step temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
       call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
 c
