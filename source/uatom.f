@@ -17,6 +17,7 @@ c     utype      map from unique type to atom type
 c     utypeinv   map from atom type to unique type
 c     utv1       unique type vector 1
 c     utv2       unique type vector 2
+c     utv3       unique type vector 3
 c
 c
       module uatom
@@ -27,5 +28,6 @@ c
       integer utypeinv(maxtyp)
       real*8 utv1(3,maxtyp)
       real*8 utv2(3,maxtyp)
+      real*8 utv3(3,maxtyp)
       save
       end

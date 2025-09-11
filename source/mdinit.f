@@ -71,6 +71,7 @@ c
       frcsave = .false.
       uindsave = .false.
       ustcsave = .false.
+      uchgsave = .false.
       usyssave = .false.
       vsyssave = .false.
       friction = 91.0d0
@@ -123,10 +124,12 @@ c
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
             frcsave = .true.
-         else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then
+         else if (keyword(1:13) .eq. 'SAVE-UINDUCE ') then
             uindsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-USTATIC ') then
             ustcsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-UCHARGE ') then
+            uchgsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-USYSTEM ') then
             usyssave = .true.
          else if (keyword(1:13) .eq. 'SAVE-VSYSTEM ') then

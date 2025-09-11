@@ -323,7 +323,8 @@ c     the unique atom type dipole moments;
 c     called in mdsave, it is assumed bound is called
 c
 c
-      subroutine dmoments (xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind)
+      subroutine dmoments (xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind,
+     &                              xuchg,yuchg,zuchg)
       use atoms
       use moment
       use mpole
@@ -336,8 +337,10 @@ c
       integer ut
       real*8 xm,ym,zm
       real*8 xu,yu,zu
+      real*8 xc,yc,zc
       real*8 xustc,yustc,zustc
       real*8 xuind,yuind,zuind
+      real*8 xuchg,yuchg,zuchg
 c
 c
 c     zero out dipole moments
@@ -348,10 +351,14 @@ c
       xuind = 0.0d0
       yuind = 0.0d0
       zuind = 0.0d0
+      xuchg = 0.0d0
+      yuchg = 0.0d0
+      zuchg = 0.0d0
       do i = 1, nunique
          do j = 1, 3
             utv1(j,i) = 0.0d0
             utv2(j,i) = 0.0d0
+            utv3(j,i) = 0.0d0
          end do
       end do
 c
@@ -359,23 +366,34 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,rpole,uind,use_polar,momuse,xm,ym,zm,
-!$OMP& xustc,yustc,zustc,xuind,yuind,zuind,utv1,utv2,type,utypeinv)
-!$OMP DO reduction(+:xustc,yustc,zustc,utv1) schedule(guided)
+!$OMP& xustc,yustc,zustc,xuind,yuind,zuind,xuchg,yuchg,zuchg,
+!$OMP& utv1,utv2,utv3,type,utypeinv)
+!$OMP DO reduction(+:xustc,yustc,zustc,xuchg,yuchg,zuchg,utv1,utv3)
+!$OMP& schedule(guided)
 c
 c     compute the static dipole moment
 c
       do i = 1, n
          if (momuse(i)) then
-            xu = (x(i)-xm)*rpole(1,i) + rpole(2,i)
-            yu = (y(i)-ym)*rpole(1,i) + rpole(3,i)
-            zu = (z(i)-zm)*rpole(1,i) + rpole(4,i)
+            xu = rpole(2,i)
+            yu = rpole(3,i)
+            zu = rpole(4,i)
+            xc = (x(i)-xm)*rpole(1,i)
+            yc = (y(i)-ym)*rpole(1,i)
+            zc = (z(i)-zm)*rpole(1,i)
             xustc = xustc + xu
             yustc = yustc + yu
             zustc = zustc + zu
+            xuchg = xuchg + xc
+            yuchg = yuchg + yc
+            zuchg = zuchg + zc
             ut = utypeinv(type(i))
             utv1(1,ut) = utv1(1,ut) + xu
             utv1(2,ut) = utv1(2,ut) + yu
             utv1(3,ut) = utv1(3,ut) + zu
+            utv3(1,ut) = utv3(1,ut) + xc
+            utv3(2,ut) = utv3(2,ut) + yc
+            utv3(3,ut) = utv3(3,ut) + zc
          end if
       end do
 !$OMP END DO
@@ -410,10 +428,14 @@ c
       xuind = xuind * debye
       yuind = yuind * debye
       zuind = zuind * debye
+      xuchg = xuchg * debye
+      yuchg = yuchg * debye
+      zuchg = zuchg * debye
       do i = 1, nunique
          do j = 1, 3
             utv1(j,i) = utv1(j,i) * debye
             utv2(j,i) = utv2(j,i) * debye
+            utv3(j,i) = utv3(j,i) * debye
          end do
       end do
       return
