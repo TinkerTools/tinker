@@ -290,6 +290,7 @@ c
          if (isothermal .and. thermostat.ne.'ANDERSEN'
      &         .and. integrate.ne.'STOCHASTIC'
      &         .and. integrate.ne.'BAOAB'
+     &         .and. integrate.ne.'OBABO'
      &         .and. integrate.ne.'GHMC') then
             if (.not. use_exfld) then
                if (use_bounds) then
@@ -342,6 +343,7 @@ c
       if (nuse. ne. n)  dorest = .false.
       if (integrate .eq. 'STOCHASTIC')  dorest = .false.
       if (integrate .eq. 'BAOAB')  dorest = .false.
+      if (integrate .eq. 'OBABO')  dorest = .false.
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c

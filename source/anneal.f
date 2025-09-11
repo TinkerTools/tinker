@@ -285,6 +285,8 @@ c
             call beeman (istep,dt)
          else if (integrate .eq. 'BAOAB') then
             call baoab (istep,dt)
+         else if (integrate .eq. 'OBABO') then
+            call obabo (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
             call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then

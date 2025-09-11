@@ -238,31 +238,35 @@ c
      &              ' Modified Beeman Algorithm')
       else if (integrate .eq. 'BAOAB') then
          write (iout,360)
-  360    format (/,' Constrained Stochastic Dynamics Trajectory',
-     &              ' via BAOAB Algorithm')
-      else if (integrate .eq. 'NOSE-HOOVER') then
+  360    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' BAOAB Algorithm')
+      else if (integrate .eq. 'OBABO') then
          write (iout,370)
-  370    format (/,' Molecular Dynamics Trajectory via',
+  370    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' OBABO Algorithm')
+      else if (integrate .eq. 'NOSE-HOOVER') then
+         write (iout,380)
+  380    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
       else if (integrate .eq. 'STOCHASTIC') then
-         write (iout,380)
-  380    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'GHMC') then
          write (iout,390)
   390    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'GHMC') then
+         write (iout,400)
+  400    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,400)
-  400    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
          write (iout,410)
   410    format (/,' Molecular Dynamics Trajectory via',
-     &              ' r-RESPA MTS Algorithm')
-      else
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'RESPA') then
          write (iout,420)
   420    format (/,' Molecular Dynamics Trajectory via',
+     &              ' r-RESPA MTS Algorithm')
+      else
+         write (iout,430)
+  430    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
@@ -276,6 +280,8 @@ c
             call beeman (istep,dt)
          else if (integrate .eq. 'BAOAB') then
             call baoab (istep,dt)
+         else if (integrate .eq. 'OBABO') then
+            call obabo (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
             call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
