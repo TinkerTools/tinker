@@ -68,9 +68,9 @@ c
       allocate (xold(n))
       allocate (yold(n))
       allocate (zold(n))
-      allocate (derivs(3,n))
       allocate (vfric(n))
       allocate (vrand(3,n))
+      allocate (derivs(3,n))
 c
 c     use a first B step to find the half-step velocities
 c 
@@ -96,20 +96,15 @@ c
          if (use_rattle) then
             call rattle (dtr,xold,yold,zold)
             call rattle2 (dtr)
+            do i = 1, 3
+               do k = 1, 3
+                  vir(k,i) = 0.0d0
+               end do
+            end do
          end if
       end do
 c
-c     initialize virial for stochastic and constraint forces
-c
-      if (use_rattle) then
-         do i = 1, 3
-            do j = 1, 3
-               vir(j,i) = 0.0d0
-            end do
-         end do
-      end if
-c
-c     next an O step to get frictional and random components
+c     use an O step to get frictional and random components
 c
       call oprep (dt,vfric,vrand)
       do i = 1, nuse
@@ -169,21 +164,18 @@ c
             v(j,k) = v(j,k) + a(j,k)*dt_2
          end do
       end do 
-c
-c     find the constraint-corrected full-step velocities
-c
       if (use_rattle) then
-         do i = 1, nuse
-            k = iuse(i)
-            xold(k) = x(k)
-            yold(k) = y(k)
-            zold(k) = z(k)
-         end do
          call rattle2 (dt)
          do i = 1, 3
             do j = 1, 3
                vir(j,i) = vir(j,i) + virrat(j,i)
             end do
+         end do
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
          end do
       end if
 c
@@ -203,9 +195,9 @@ c
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
-      deallocate (derivs)
       deallocate (vfric)
       deallocate (vrand)
+      deallocate (derivs)
 c
 c     total energy is sum of kinetic and potential energies
 c
@@ -281,21 +273,11 @@ c
       allocate (xold(n))
       allocate (yold(n))
       allocate (zold(n))
-      allocate (derivs(3,n))
       allocate (vfric(n)) 
       allocate (vrand(3,n))
+      allocate (derivs(3,n))
 c
-c     initialize virial for stochastic and constraint forces
-c
-      if (use_rattle) then
-         do i = 1, 3
-            do j = 1, 3
-               vir(j,i) = 0.0d0
-            end do
-         end do
-      end if
-c
-c     update velocities with frictional and random components
+c     take first O step for frictional and random components
 c
       call oprep (dt_2,vfric,vrand)
       do i = 1, nuse
@@ -305,6 +287,11 @@ c
          end do
       end do
       if (use_rattle) then
+         do i = 1, 3
+            do j = 1, 3
+               vir(j,i) = 0.0d0
+            end do
+         end do
          call rattle2 (dt_2)
          do i = 1, 3
             do j = 1, 3
@@ -314,7 +301,7 @@ c
          end do
       end if
 c
-c     find half-step velocities via the Verlet recursion
+c     use a first B step to find the half-step velocities
 c 
       do i = 1, nuse
          k = iuse(i)
@@ -323,7 +310,7 @@ c
          end do
       end do
 c
-c     take first A step according to the BAOAB sequence
+c     take full-step A step according to the BAOAB sequence
 c
       do j = 1, nrattle
          do i = 1, nuse
@@ -355,8 +342,7 @@ c     compute the kinetic energy from half-step velocities
 c
 c     call kinetic (eksum,ekin,temp)
 c
-c     use Newton's second law to get the next accelerations;
-c     find the full-step velocities using the Verlet recursion
+c     second B step for accelerations and full-step velocities
 c
       do i = 1, nuse
          k = iuse(i)
@@ -365,12 +351,9 @@ c
             v(j,k) = v(j,k) + a(j,k)*dt_2
          end do
       end do 
-c
-c     find the constraint-corrected full-step velocities
-c
       if (use_rattle)  call rattle2 (dt)
 c
-c     update velocities with frictional and random components
+c     use second O step for frictional and random components
 c
       call oprep (dt_2,vfric,vrand)
       do i = 1, nuse
@@ -379,22 +362,18 @@ c
             v(j,k) = v(j,k)*vfric(k) + vrand(j,k)
          end do
       end do
-      if (use_rattle)  call rattle2 (dt_2)
-c
-c     find the constraint-corrected full-step velocities
-c
       if (use_rattle) then
+         call rattle2 (dt_2)
+         do i = 1, 3
+            do j = 1, 3
+               vir(j,i) = vir(j,i) + virrat(j,i)
+            end do
+         end do
          do i = 1, nuse
             k = iuse(i)
             xold(k) = x(k)
             yold(k) = y(k)
             zold(k) = z(k)
-         end do
-         call rattle2 (dt)
-         do i = 1, 3
-            do j = 1, 3
-               vir(j,i) = vir(j,i) + virrat(j,i)
-            end do
          end do
       end if
 c
@@ -413,9 +392,9 @@ c
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
-      deallocate (derivs)
       deallocate (vfric) 
       deallocate (vrand)
+      deallocate (derivs)
 c
 c     total energy is sum of kinetic and potential energies
 c

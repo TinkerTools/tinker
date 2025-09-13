@@ -224,7 +224,8 @@ c     save the force vector components for the current step;
 c     only correct for single time step Cartesian integrators
 c
       if (frcsave .and. integrate.ne.'RIGIDBODY'
-     &       .and. integrate.ne.'RESPA') then
+     &       .and. integrate.ne.'VRESPA'
+     &       .and. integrate.ne.'BRESPA') then
          ifrc = freeunit ()
          if (cyclesave) then
             frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'

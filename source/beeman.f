@@ -39,7 +39,7 @@ c
       implicit none
       integer i,j,k
       integer istep
-      real*8 dt,dt_x,factor
+      real*8 dt,dtx,dmix
       real*8 etot,eksum,epot
       real*8 temp,pres
       real*8 part1,part2
@@ -54,10 +54,10 @@ c
 c
 c     set time values and coefficients for Beeman integration
 c
-      factor = dble(bmnmix)
-      dt_x = dt / factor
-      part1 = 0.5d0*factor + 1.0d0
+      dmix = dble(bmnmix)
+      part1 = 0.5d0*dmix + 1.0d0
       part2 = part1 - 2.0d0
+      dtx = dt / dmix
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -72,7 +72,7 @@ c
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
-            v(j,k) = v(j,k) + (part1*a(j,k)-aalt(j,k))*dt_x
+            v(j,k) = v(j,k) + (part1*a(j,k)-aalt(j,k))*dtx
          end do
          xold(k) = x(k)
          yold(k) = y(k)
@@ -118,7 +118,7 @@ c
          do j = 1, 3
             aalt(j,k) = a(j,k)
             a(j,k) = -ekcal * derivs(j,k) / mass(k)
-            v(j,k) = v(j,k) + (part2*a(j,k)+aalt(j,k))*dt_x
+            v(j,k) = v(j,k) + (part2*a(j,k)+aalt(j,k))*dtx
          end do
       end do
 c

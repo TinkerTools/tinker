@@ -809,6 +809,8 @@ c
       if (allocated(v))  deallocate (v)
       if (allocated(a))  deallocate (a)
       if (allocated(aalt))  deallocate (aalt)
+      if (allocated(aslow))  deallocate (aslow)
+      if (allocated(afast))  deallocate (afast)
 c
 c     deallocation of global arrays from module mpole
 c

@@ -111,6 +111,7 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
+            if (integrate .eq. 'RESPA')  integrate = 'BRESPA'
          else if (keyword(1:14) .eq. 'BEEMAN-MIXING ') then
             read (string,*,err=10,end=10)  bmnmix
          else if (keyword(1:12) .eq. 'RESPA-INNER ') then
@@ -265,6 +266,8 @@ c
          if (.not. allocated(v))  allocate (v(3,n))
          if (.not. allocated(a))  allocate (a(3,n))
          if (.not. allocated(aalt))  allocate (aalt(3,n))
+         if (.not. allocated(aslow))  allocate (aslow(3,n))
+         if (.not. allocated(afast))  allocate (afast(3,n))
       end if
 c
 c     set the number of degrees of freedom for the system
@@ -347,10 +350,12 @@ c
       if (integrate .eq. 'GHMC')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c
-c     set inner steps per outer step for RESPA integrator
+c     set inner steps per outer step for RESPA integrators
 c
-      eps = 0.00000001d0
-      nrespa = int(dt/(arespa+eps)) + 1
+      if (integrate.eq.'VRESPA' .or. integrate.eq.'BRESPA') then
+         eps = 0.00000001d0
+         nrespa = int(dt/(arespa+eps)) + 1
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -390,9 +395,9 @@ c
             call mdrest (istep)
          end if
 c
-c     set velocities and fast/slow accelerations for RESPA method
+c     set velocities and fast/slow accelerations for RESPA methods
 c
-      else if (integrate .eq. 'RESPA') then
+      else if (integrate.eq.'VRESPA' .or. integrate.eq.'BRESPA') then
          call gradslow (e,derivs)
          do i = 1, n
             amass = mass(i)
@@ -402,11 +407,13 @@ c
                do j = 1, 3
                   v(j,i) = speed * vec(j)
                   a(j,i) = -ekcal * derivs(j,i) / mass(i)
+                  aslow(j,i) = a(j,i)
                end do
             else
                do j = 1, 3
                   v(j,i) = 0.0d0
                   a(j,i) = 0.0d0
+                  aslow(j,i) = 0.0d0
                end do
             end if
          end do
@@ -416,10 +423,12 @@ c
             if (use(i) .and. amass.ne.0.0d0) then
                do j = 1, 3
                   aalt(j,i) = -ekcal * derivs(j,i) / amass
+                  afast(j,i) = aalt(j,i)
                end do
             else
                do j = 1, 3
                   aalt(j,i) = 0.0d0
+                  afast(j,i) = aalt(j,i)
                end do
             end if
          end do

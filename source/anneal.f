@@ -238,8 +238,10 @@ c
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
-         else if (integrate .eq. 'RESPA') then
-            call respa (istep,dt)
+         else if (integrate .eq. 'VRESPA') then
+            call vrespa (istep,dt)
+         else if (integrate .eq. 'BRESPA') then
+            call brespa (istep,dt)
          else
             call beeman (istep,dt)
          end if
@@ -295,8 +297,10 @@ c
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
-         else if (integrate .eq. 'RESPA') then
-            call respa (istep,dt)
+         else if (integrate .eq. 'VRESPA') then
+            call vrespa (istep,dt)
+         else if (integrate .eq. 'BRESPA') then
+            call brespa (istep,dt)
          else
             call beeman (istep,dt)
          end if

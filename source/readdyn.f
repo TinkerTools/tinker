@@ -26,7 +26,7 @@ c
       use moldyn
       use rgddyn
       implicit none
-      integer i,idyn,ndyn
+      integer i,j,idyn,ndyn
       logical exist,opened,quit
       character*240 dynfile
       character*240 record
@@ -148,10 +148,20 @@ c
             read (record,*,err=240,end=240)  aalt(1,i),aalt(2,i),
      &                                       aalt(3,i)
          end do
+         do i = 1, n
+            do j = 1, 3
+               aslow(j,i) = a(j,i)
+               afast(j,i) = aalt(j,i)
+            end do
+         end do
       end if
       quit = .false.
   240 continue
       if (.not. opened)  close (unit=idyn)
+c
+c
+c
+
 c
 c     report any error in reading the dynamics restart file
 c

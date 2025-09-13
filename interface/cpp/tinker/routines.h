@@ -54,6 +54,8 @@ void attach_();
 // baoab.f
 void baoab_(int* istep, double* dt);
 #define tinker_f_baoab baoab_
+void obabo_(int* istep, double* dt);
+#define tinker_f_obabo obabo_
 void oprep_(double* dt, double* vfric, double* vrand);
 #define tinker_f_oprep oprep_
 
@@ -1926,10 +1928,10 @@ void mdinit_(double* dt);
 // mdrest.f
 void mdrest_(int* istep);
 #define tinker_f_mdrest mdrest_
-void rgdrest_();
-#define tinker_f_rgdrest rgdrest_
 void xyzrest_();
 #define tinker_f_xyzrest xyzrest_
+void rgdrest_();
+#define tinker_f_rgdrest rgdrest_
 
 // mdsave.f
 void mdsave_(int* istep, double* dt, double* epot, double* eksum);
@@ -2390,8 +2392,10 @@ void replica_(double* cutoff);
 #define tinker_f_replica replica_
 
 // respa.f
-void respa_(int* istep, double* dt);
-#define tinker_f_respa respa_
+void vrespa_(int* istep, double* dt);
+#define tinker_f_vrespa vrespa_
+void brespa_(int* istep, double* dt);
+#define tinker_f_brespa brespa_
 void gradfast_(double* energy, double* derivs);
 #define tinker_f_gradfast gradfast_
 void gradslow_(double* energy, double* derivs);
