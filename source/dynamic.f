@@ -230,47 +230,58 @@ c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)
 c
+c     only allow Montecarlo barostat for NPT + extfield simulation
+c
+      if (use_exfld .and. mode.eq.4) then
+         if (barostat.ne.'MONTECARLO') then
+            write (iout,340)
+  340       format (/,' DYNAMIC  --  NPT with External Field Should',
+     &                ' Use MonteCarlo Barostat')
+            call fatal
+         end if
+      end if
+c
 c     print out a header line for the dynamics computation
 c
       if (integrate .eq. 'VERLET') then
-         write (iout,340)
-  340    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'BEEMAN') then
          write (iout,350)
   350    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'BEEMAN') then
+         write (iout,360)
+  360    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       else if (integrate .eq. 'BAOAB') then
-         write (iout,360)
-  360    format (/,' Constrained Stochastic Dynamics Trajectory',
+         write (iout,370)
+  370    format (/,' Constrained Stochastic Dynamics Trajectory',
      &              ' via BAOAB Algorithm')
       else if (integrate .eq. 'BUSSI') then
-         write (iout,370)
-  370    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Bussi-Parrinello NPT Algorithm')
-      else if (integrate .eq. 'NOSE-HOOVER') then
          write (iout,380)
   380    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Bussi-Parrinello NPT Algorithm')
+      else if (integrate .eq. 'NOSE-HOOVER') then
+         write (iout,390)
+  390    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
       else if (integrate .eq. 'STOCHASTIC') then
-         write (iout,390)
-  390    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'GHMC') then
          write (iout,400)
   400    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'GHMC') then
+         write (iout,410)
+  410    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,410)
-  410    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
          write (iout,420)
   420    format (/,' Molecular Dynamics Trajectory via',
-     &              ' r-RESPA MTS Algorithm')
-      else
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'RESPA') then
          write (iout,430)
   430    format (/,' Molecular Dynamics Trajectory via',
+     &              ' r-RESPA MTS Algorithm')
+      else
+         write (iout,440)
+  440    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
