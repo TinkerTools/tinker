@@ -13,8 +13,8 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "rgdstep" performs a single molecular dynamics time step
-c     via a rigid body integration algorithm
+c     "rgdstep" performs a molecular dynamics time step via a rigid
+c     body integration algorithm
 c
 c     literature reference:
 c

@@ -12,8 +12,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "beeman" performs a single molecular dynamics time step
-c     via the Beeman multistep recursion formula; uses original
+c     "beeman" performs a molecular dynamics time step via the
+c     Beeman multistep recursion formula; uses either original
 c     coefficients or Bernie Brooks' "Better Beeman" values
 c
 c     literature references:

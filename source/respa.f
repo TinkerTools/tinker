@@ -12,7 +12,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "vrespa" performs a single multiple time step molecular dynamics
+c     "vrespa" performs a multiple time step (MTS) molecular dynamics
 c     step using the reversible reference system propagation algorithm
 c     (r-RESPA) via a velocity Verlet recursion with the potential
 c     split into fast- and slow-evolving components
@@ -239,7 +239,7 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "brespa" performs a single multiple time step molecular dynamics
+c     "brespa" performs a multiple time step (MTS) molecular dynamics
 c     step using the reversible reference system propagation algorithm
 c     (r-RESPA) via a Beeman recursion with the potential split into
 c     fast- and slow-evolving components

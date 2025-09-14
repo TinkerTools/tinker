@@ -12,8 +12,8 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "sdstep" performs a single stochastic dynamics time step
-c     via a velocity Verlet-based integration algorithm
+c     "sdstep" performs a stochastic dynamics time step via the
+c     velocity Verlet-based algorithm of Guarnieri and Still
 c
 c     literature references:
 c

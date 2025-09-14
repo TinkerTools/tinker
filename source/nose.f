@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "nose" performs a single molecular dynamics time step via
-c     a Nose-Hoover extended system isothermal-isobaric algorithm
+c     "nose" performs a molecular dynamics time step via the
+c     Nose-Hoover extended system isothermal-isobaric algorithm
 c
 c     literature reference:
 c

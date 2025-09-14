@@ -12,8 +12,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "verlet" performs a single molecular dynamics time step
-c     via the velocity Verlet multistep recursion formula
+c     "verlet" performs a molecular dynamics time step via the
+c     velocity Verlet multistep recursion formula
 c
 c
       subroutine verlet (istep,dt)

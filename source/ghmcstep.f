@@ -12,8 +12,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ghmcstep" performs a single stochastic dynamics time step via
-c     the generalized hybrid Monte Carlo (GHMC) algorithm to ensure
+c     "ghmcstep" performs a stochastic dynamics time step via the
+c     generalized hybrid Monte Carlo (GHMC) algorithm to ensure
 c     exact sampling from the Boltzmann density
 c
 c     literature references:

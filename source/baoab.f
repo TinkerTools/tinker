@@ -13,8 +13,8 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "baoab" implements a stochastic dynamics time step using
-c     a geodesic BAOAB scheme with optional holonomic constraints
+c     "baoab" performs a stochastic dynamics time step using a
+c     geodesic BAOAB scheme with optional holonomic constraints
 c
 c     literature reference:
 c
@@ -219,8 +219,8 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "obabo" implements a stochastic dynamics time step using
-c     a geodesic OBABO scheme with optional holonomic constraints
+c     "obabo" performs a stochastic dynamics time step using a
+c     geodesic OBABO scheme with optional holonomic constraints
 c
 c     literature reference:
 c
