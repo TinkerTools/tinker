@@ -230,10 +230,11 @@ c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)
 c
-c     only allow Montecarlo barostat for NPT + extfield simulation
+c     only allow Montecarlo or anisotropic barostat
+c     for NPT + extfield simulation
 c
       if (use_exfld .and. mode.eq.4) then
-         if (barostat.ne.'MONTECARLO' .and. .not.anisotropic) then
+         if (barostat.ne.'MONTECARLO' .and. .not.anisotrop) then
             write (iout,340)
   340       format (/,' DYNAMIC  --  NPT with External Field Should',
      &                ' Use MonteCarlo or Anisotropic Barostat')
