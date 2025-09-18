@@ -47,8 +47,7 @@ c
       integer ndummy
       integer freeunit
       integer trimtext
-      real*8 dt,eps
-      real*8 e,ekt,qterm
+      real*8 dt,e,ekt,qterm
       real*8 maxwell,speed
       real*8 amass,gmass
       real*8 vec(3)
@@ -66,7 +65,7 @@ c     set default parameters for the dynamics trajectory
 c
       integrate = 'BEEMAN'
       bmnmix = 8
-      arespa = 0.00025d0
+      nrespa = max(1,nint(dt/0.0005d0))
       nfree = 0
       ndummy = 0
       irest = 100
@@ -115,8 +114,7 @@ c
          else if (keyword(1:14) .eq. 'BEEMAN-MIXING ') then
             read (string,*,err=10,end=10)  bmnmix
          else if (keyword(1:12) .eq. 'RESPA-INNER ') then
-            read (string,*,err=10,end=10)  arespa
-            arespa = 0.001d0 * arespa
+            read (string,*,err=10,end=10)  nrespa
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
@@ -291,10 +289,11 @@ c
             end do
          end if
          if (isothermal .and. thermostat.ne.'ANDERSEN'
-     &         .and. integrate.ne.'STOCHASTIC'
      &         .and. integrate.ne.'BAOAB'
      &         .and. integrate.ne.'OBABO'
-     &         .and. integrate.ne.'GHMC') then
+     &         .and. integrate.ne.'STOCHASTIC'
+     &         .and. integrate.ne.'GHMC'
+     &         .and. integrate.ne.'SRESPA') then
             if (.not. use_exfld) then
                if (use_bounds) then
                   if (integrate.ne.'RIGIDBODY' .and. ngrp.ne.0) then
@@ -344,18 +343,12 @@ c
       dorest = .true.
       if (irest .eq. 0)  dorest = .false.
       if (nuse. ne. n)  dorest = .false.
-      if (integrate .eq. 'STOCHASTIC')  dorest = .false.
       if (integrate .eq. 'BAOAB')  dorest = .false.
       if (integrate .eq. 'OBABO')  dorest = .false.
+      if (integrate .eq. 'STOCHASTIC')  dorest = .false.
       if (integrate .eq. 'GHMC')  dorest = .false.
+      if (integrate .eq. 'SRESPA')  dorest = .false.
       if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
-c
-c     set inner steps per outer step for RESPA integrators
-c
-      if (integrate.eq.'VRESPA' .or. integrate.eq.'BRESPA') then
-         eps = 0.00000001d0
-         nrespa = int(dt/(arespa+eps)) + 1
-      end if
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -397,7 +390,8 @@ c
 c
 c     set velocities and fast/slow accelerations for RESPA methods
 c
-      else if (integrate.eq.'VRESPA' .or. integrate.eq.'BRESPA') then
+      else if (integrate.eq.'VRESPA' .or. integrate.eq.'BRESPA'
+     &            .or. integrate.eq.'SRESPA') then
          call gradslow (e,derivs)
          do i = 1, n
             amass = mass(i)

@@ -2190,7 +2190,7 @@ void auxinit_();
 #define tinker_f_auxinit auxinit_
 
 // pressure.f
-void pressure_(double* dt, double* epot, double* ekin, double* temp, double* pres, double* stress);
+void pressure_(double* dt, double* ekin, double* temp, double* pres, double* stress);
 #define tinker_f_pressure pressure_
 void pressure2_(double* epot, double* temp);
 #define tinker_f_pressure2 pressure2_
@@ -2396,6 +2396,8 @@ void vrespa_(int* istep, double* dt);
 #define tinker_f_vrespa vrespa_
 void brespa_(int* istep, double* dt);
 #define tinker_f_brespa brespa_
+void srespa_(int* istep, double* dt);
+#define tinker_f_srespa srespa_
 void gradfast_(double* energy, double* derivs);
 #define tinker_f_gradfast gradfast_
 void gradslow_(double* energy, double* derivs);

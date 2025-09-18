@@ -268,9 +268,13 @@ c
          write (iout,430)
   430    format (/,' Molecular Dynamics Trajectory via',
      &              ' Beeman r-RESPA MTS Algorithm')
-      else
+      else if (integrate .eq. 'SRESPA') then
          write (iout,440)
   440    format (/,' Molecular Dynamics Trajectory via',
+     &              ' BAOAB r-RESPA MTS Algorithm')
+      else
+         write (iout,450)
+  450    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
@@ -298,6 +302,8 @@ c
             call vrespa (istep,dt)
          else if (integrate .eq. 'BRESPA') then
             call brespa (istep,dt)
+         else if (integrate .eq. 'SRESPA') then
+            call srespa (istep,dt)
          else
             call beeman (istep,dt)
          end if

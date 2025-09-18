@@ -46,11 +46,9 @@ c
       real*8 dt,dt_2
       real*8 dta,dta_2
       real*8 epot,etot
-      real*8 eksum
+      real*8 eksum,term
       real*8 temp,pres
-      real*8 drespa
-      real*8 erespa
-      real*8 term
+      real*8 drespa,efast
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 virfast(3,3)
@@ -63,8 +61,8 @@ c
 c     set some time values for the dynamics integration
 c
       drespa = dble(nrespa)
-      dt_2 = 0.5d0 * dt
       dta = dt / drespa
+      dt_2 = 0.5d0 * dt
       dta_2 = 0.5d0 * dta
 c
 c     find half-step velocities via velocity Verlet recursion
@@ -110,7 +108,7 @@ c
 c
 c     find the fast-evolving potential energy and atomic forces
 c
-         call gradfast (erespa,derivs)
+         call gradfast (efast,derivs)
 c
 c     use Newton's second law to get fast-evolving accelerations;
 c     update fast-evolving velocities using Verlet recursion
@@ -150,7 +148,7 @@ c
 c     get the slow-evolving potential energy and atomic forces
 c
       call gradslow (epot,derivs)
-      epot = epot + erespa
+      epot = epot + efast
 c
 c     compute and make the half-step temperature correction
 c
@@ -205,7 +203,7 @@ c
 c     compute full-step temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure (dt,ekin,temp,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
@@ -259,9 +257,6 @@ c     D. Beeman, "Some Multistep Methods for Use in Molecular
 c     Dynamics Calculations", Journal of Computational Physics,
 c     20, 130-139 (1976)
 c
-c     B. R. Brooks, "Algorithms for Molecular Dynamics at Constant
-c     Temperature and Pressure", DCRT Report, NIH, April 1988
-c
 c
       subroutine brespa (istep,dt)
       use atomid
@@ -281,12 +276,10 @@ c
       real*8 dmix,dta
       real*8 dtx,dtax
       real*8 epot,etot
-      real*8 eksum
+      real*8 eksum,term
       real*8 temp,pres
       real*8 part1,part2
-      real*8 drespa
-      real*8 erespa
-      real*8 term
+      real*8 drespa,efast
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8 virfast(3,3)
@@ -302,10 +295,10 @@ c
       dmix = dble(bmnmix)
       part1 = 0.5d0*dmix + 1.0d0
       part2 = part1 - 2.0d0
-      dt_2 = 0.5d0 * dt
       dtx = dt / dmix
       dta = dt / drespa
       dtax = dta / dmix
+      dt_2 = 0.5d0 * dt
 c
 c     find half-step velocities via the Beeman recursion
 c
@@ -350,7 +343,7 @@ c
 c
 c     find the fast-evolving potential energy and atomic forces
 c
-         call gradfast (erespa,derivs)
+         call gradfast (efast,derivs)
 c
 c     use Newton's second law to get fast-evolving accelerations;
 c     update fast-evolving velocities using Beeman recursion
@@ -391,7 +384,7 @@ c
 c     get the slow-evolving potential energy and atomic forces
 c
       call gradslow (epot,derivs)
-      epot = epot + erespa
+      epot = epot + efast
 c
 c     compute and make the half-step temperature correction
 c
@@ -447,7 +440,7 @@ c
 c     compute full-step temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure (dt,ekin,temp,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
@@ -459,6 +452,297 @@ c
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
+      deallocate (derivs)
+c
+c     total energy is sum of kinetic and potential energies
+c
+      etot = eksum + epot
+c
+c     compute statistics and save trajectory for this step
+c
+      call mdstat (istep,dt,etot,epot,eksum,temp,pres)
+      call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine srespa  --  BAOAB r-RESPA stochastic dynamics  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "srespa" performs a multiple time step (MTS) stochastic dynamics
+c     step using the reversible reference system propagation algorithm
+c     (r-RESPA) via a BAOAB recursion with the potential split into
+c     fast- and slow-evolving components
+c
+c     literature reference:
+c
+c     D. D. Humphreys, R. A. Friesner and B. J. Berne, "A Multiple-
+c     Time-Step Molecular Dynamics Algorithm for Macromolecules",
+c     Journal of Physical Chemistry, 98, 6885-6892 (1994)
+c
+c     B. Leimkuhler and C. Matthews, "Efficient Molecular Dynamics
+c     Using Geodesic Integration and Solvent-Solute Splitting",
+c     Proceedings of the Royal Society A, 472, 20160138 (2016)
+c
+c
+      subroutine srespa (istep,dt)
+      use atomid
+      use atoms
+      use freeze
+      use mdstuf
+      use moldyn
+      use units
+      use usage
+      use virial
+      implicit none
+      integer i,j,k,m
+      integer istep
+      integer nrattle
+      real*8 dt,dt_2
+      real*8 dta,dta_2
+      real*8 dtar,dtar_2
+      real*8 etot,epot
+      real*8 eksum,eksave
+      real*8 temp,tave,pres
+      real*8 drespa,efast
+      real*8 drattle
+      real*8 ekin(3,3)
+      real*8 ekave(3,3)
+      real*8 stress(3,3)
+      real*8 virrat(3,3)
+      real*8 virfast(3,3)
+      real*8, allocatable :: xold(:)
+      real*8, allocatable :: yold(:)
+      real*8, allocatable :: zold(:)
+      real*8, allocatable :: vfric(:)
+      real*8, allocatable :: vrand(:,:)
+      real*8, allocatable :: derivs(:,:)
+c
+c
+c     set some time values for the dynamics integration
+c
+      drespa = dble(nrespa)
+      nrattle = 1
+      if (use_rattle)  nrattle = 3
+      drattle = dble(nrattle)
+      dta = dt / drespa
+      dtar = dta / drattle
+      dt_2 = 0.5d0 * dt
+      dta_2 = 0.5d0 * dta
+      dtar_2 = 0.5d0 * dtar
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (xold(n))
+      allocate (yold(n))
+      allocate (zold(n))
+      allocate (vfric(n))
+      allocate (vrand(3,n))
+      allocate (derivs(3,n))
+c
+c     use outer B step to find half-step slow velocities
+c
+      do i = 1, nuse
+         m = iuse(i)
+         do j = 1, 3
+            v(j,m) = v(j,m) + a(j,m)*dt_2
+         end do
+      end do
+c
+c     initialize kinetic energy and virial from fast potentials
+c
+      eksave = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            ekave(j,i) = 0.0d0
+            virfast(j,i) = 0.0d0
+         end do
+      end do
+      tave = 0.0d0
+c
+c     use inner B step to find half-step fast velocities
+c
+      do k = 1, nrespa
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3
+               v(j,m) = v(j,m) + aalt(j,m)*dta_2
+            end do
+         end do
+c
+c     take an inner A step to get fast half-step positions
+c
+         do j = 1, nrattle
+            do i = 1, nuse
+               m = iuse(i)
+               xold(m) = x(m)
+               yold(m) = y(m)
+               zold(m) = z(m)
+               x(m) = x(m) + v(1,m)*dtar_2
+               y(m) = y(m) + v(2,m)*dtar_2
+               z(m) = z(m) + v(3,m)*dtar_2
+            end do
+            if (use_rattle) then
+               call rattle (dtar_2,xold,yold,zold)
+               call rattle2 (dtar_2)
+               do i = 1, 3
+                  do m = 1, 3
+                     vir(m,i) = 0.0d0
+                  end do
+               end do
+            end if
+         end do
+c
+c     use inner O step to get frictional and random components
+c
+         call oprep (dta,vfric,vrand)
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3 
+               v(j,m) = v(j,m)*vfric(m) + vrand(j,m)
+            end do
+         end do
+         if (use_rattle) then
+            call rattle2 (dta)
+            do i = 1, 3
+               do j = 1, 3
+                  virrat(j,i) = vir(j,i)
+                  vir(j,i) = 0.0d0
+               end do
+            end do
+         end if
+c
+c     take second inner A step to get the full-step positions
+c
+         do j = 1, nrattle
+            do i = 1, nuse
+               m = iuse(i)
+               xold(m) = x(m)
+               yold(m) = y(m)
+               zold(m) = z(m)
+               x(m) = x(m) + v(1,m)*dtar_2
+               y(m) = y(m) + v(2,m)*dtar_2
+               z(m) = z(m) + v(3,m)*dtar_2
+            end do
+            if (use_rattle) then
+               call rattle (dtar_2,xold,yold,zold)
+               call rattle2 (dtar_2)
+               do i = 1, 3
+                  do m = 1, 3
+                     virrat(m,i) = virrat(m,i) + vir(m,i)/drattle
+                     vir(m,i) = 0.0d0
+                  end do
+               end do
+            end if
+         end do
+c
+c     get the fast-evolving potential energy and atomic forces
+c 
+         call gradfast (efast,derivs)
+c
+c     find average kinetic energy from fast-evolving potentials
+c
+         call kinetic (eksum,ekin,temp)
+         eksave = eksave + eksum/drespa
+         do i = 1, 3
+            do j = 1, 3
+               ekave(j,i) = ekave(j,i) + ekin(j,i)/drespa
+            end do
+         end do
+         tave = tave + temp/drespa
+c
+c     inner B step for fast accelerations and full-step velocities
+c
+         do i = 1, nuse
+            m = iuse(i)
+            do j = 1, 3
+               aalt(j,m) = -ekcal * derivs(j,m) / mass(m)
+               v(j,m) = v(j,m) + aalt(j,m)*dta_2
+            end do
+         end do 
+         if (use_rattle) then
+            call rattle2 (dta)
+            do i = 1, 3
+               do j = 1, 3
+                  vir(j,i) = vir(j,i) + virrat(j,i)
+               end do
+            end do
+         end if
+c
+c     average the virial from fast-evolving potential terms
+c
+         do i = 1, 3
+            do j = 1, 3
+               virfast(j,i) = virfast(j,i) + vir(j,i)/drespa
+            end do
+         end do
+      end do
+c
+c     transfer average kinetic energy and temperature values
+c
+      eksum = eksave
+      do i = 1, 3
+         do j = 1, 3
+            ekin(j,i) = ekave(j,i)
+         end do
+      end do
+      temp = tave
+c
+c     get the slow-evolving potential energy and atomic forces
+c 
+      call gradslow (epot,derivs)
+      epot = epot + efast
+c
+c     outer B step for slow accelerations and full-step velocities
+c
+      do i = 1, nuse
+         m = iuse(i)
+         do j = 1, 3
+            a(j,m) = -ekcal * derivs(j,m) / mass(m)
+            v(j,m) = v(j,m) + a(j,m)*dt_2
+         end do
+      end do 
+      if (use_rattle) then
+         call rattle2 (dt)
+         do i = 1, nuse
+            m = iuse(i)
+            xold(m) = x(m)
+            yold(m) = y(m)
+            zold(m) = z(m)
+         end do
+      end if
+c
+c     increment total virial from sum of fast and slow parts
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + virfast(j,i)
+         end do
+      end do
+c
+c     compute full-step kinetic energy and pressure correction;
+c     half-step kinetic energy gives better pressure control
+c
+c     call kinetic (eksum,ekin,temp)
+      call pressure (dt,ekin,temp,pres,stress)
+      call pressure2 (epot,temp)
+c
+c     final constraint step to enforce position convergence
+c
+      if (use_rattle)  call shake (xold,yold,zold)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (xold)
+      deallocate (yold)
+      deallocate (zold)
+      deallocate (vfric)
+      deallocate (vrand)
       deallocate (derivs)
 c
 c     total energy is sum of kinetic and potential energies

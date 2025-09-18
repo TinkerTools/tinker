@@ -14,7 +14,7 @@ c
 c
 c     "beeman" performs a molecular dynamics time step via the
 c     Beeman multistep recursion formula; uses either original
-c     coefficients or Bernie Brooks' "Better Beeman" values
+c     values or "Better Beeman" coefficients of Bernie Brooks
 c
 c     literature references:
 c
@@ -24,6 +24,11 @@ c     20, 130-139 (1976)
 c
 c     B. R. Brooks, "Algorithms for Molecular Dynamics at Constant
 c     Temperature and Pressure", DCRT Report, NIH, April 1988
+c
+c     A. A. Kuraev, A. O. Rak, S. V. Kolosov, A. A. Koronovskii
+c     and A. E. Hramov, "Fast Algorithm for Numerically Integrating
+c     Equations of Motion for Large Particles in Microwave Devices",
+c     Technical Physics, 59, 318-324 (2014)
 c
 c
       subroutine beeman (istep,dt)
@@ -140,19 +145,19 @@ c
 c     find the constraint-corrected full-step velocities
 c
       if (use_rattle) then
+         call rattle2 (dt)
          do i = 1, nuse
             k = iuse(i)
             xold(k) = x(k)
             yold(k) = y(k)
             zold(k) = z(k)
          end do
-         call rattle2 (dt)
       end if
 c
 c     make full-step temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure (dt,ekin,temp,pres,stress)
 c
 c     final constraint step to enforce position convergence
 c

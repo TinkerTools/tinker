@@ -17,7 +17,7 @@ c     in a periodic box and maintain a constant desired pressure
 c     via a scaling barostat method
 c
 c
-      subroutine pressure (dt,epot,ekin,temp,pres,stress)
+      subroutine pressure (dt,ekin,temp,pres,stress)
       use bath
       use boxes
       use bound
@@ -26,8 +26,7 @@ c
       use virial
       implicit none
       integer i,j
-      real*8 dt,epot
-      real*8 temp,pres
+      real*8 dt,temp,pres
       real*8 factor
       real*8 ekin(3,3)
       real*8 stress(3,3)

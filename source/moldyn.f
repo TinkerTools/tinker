@@ -15,8 +15,8 @@ c
 c     v       current velocity of each atom along the x,y,z-axes
 c     a       current acceleration of each atom along x,y,z-axes
 c     aalt    alternate acceleration of each atom along x,y,z-axes
-c     aslow   BRESPA slow acceleration of each atom along x,y,z-axes
-c     afast   BRESPA fast acceleration of each atom along x,y,z-axes
+c     aslow   RESPA secondary slow acceleration of each atom
+c     afast   RESPA secondary fast acceleration of each atom
 c
 c
       module moldyn

@@ -39,7 +39,7 @@ c
       integer i,j,k
       integer istep
       integer nrattle
-      real*8 dt,dt_2,dtr
+      real*8 dt,dt_2,dtr_2
       real*8 etot,epot
       real*8 eksum
       real*8 temp,pres
@@ -58,10 +58,10 @@ c
 c     set some time values for the dynamics integration
 c
       nrattle = 1
-      if (use_rattle)  nrattle = 5
+      if (use_rattle)  nrattle = 3
       drattle = dble(nrattle)
       dt_2 = 0.5d0 * dt
-      dtr = dt_2 / drattle
+      dtr_2 = dt_2 / drattle
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -89,13 +89,13 @@ c
             xold(k) = x(k)
             yold(k) = y(k)
             zold(k) = z(k)
-            x(k) = x(k) + v(1,k)*dtr
-            y(k) = y(k) + v(2,k)*dtr
-            z(k) = z(k) + v(3,k)*dtr
+            x(k) = x(k) + v(1,k)*dtr_2
+            y(k) = y(k) + v(2,k)*dtr_2
+            z(k) = z(k) + v(3,k)*dtr_2
          end do
          if (use_rattle) then
-            call rattle (dtr,xold,yold,zold)
-            call rattle2 (dtr)
+            call rattle (dtr_2,xold,yold,zold)
+            call rattle2 (dtr_2)
             do i = 1, 3
                do k = 1, 3
                   vir(k,i) = 0.0d0
@@ -131,13 +131,13 @@ c
             xold(k) = x(k)
             yold(k) = y(k)
             zold(k) = z(k)
-            x(k) = x(k) + v(1,k)*dtr
-            y(k) = y(k) + v(2,k)*dtr
-            z(k) = z(k) + v(3,k)*dtr
+            x(k) = x(k) + v(1,k)*dtr_2
+            y(k) = y(k) + v(2,k)*dtr_2
+            z(k) = z(k) + v(3,k)*dtr_2
          end do
          if (use_rattle) then
-            call rattle (dtr,xold,yold,zold)
-            call rattle2 (dtr)
+            call rattle (dtr_2,xold,yold,zold)
+            call rattle2 (dtr_2)
             do i = 1, 3
                do k = 1, 3
                   virrat(k,i) = virrat(k,i) + vir(k,i)/drattle
@@ -183,7 +183,7 @@ c     compute full-step kinetic energy and pressure correction;
 c     half-step kinetic energy gives better pressure control
 c
 c     call kinetic (eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure (dt,ekin,temp,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
@@ -263,7 +263,7 @@ c
 c     set some time values for the dynamics integration
 c
       nrattle = 1
-      if (use_rattle)  nrattle = 5
+      if (use_rattle)  nrattle = 3
       drattle = dble(nrattle)
       dt_2 = 0.5d0 * dt
       dtr = dt / drattle
@@ -380,7 +380,7 @@ c
 c     compute the kinetic energy and control the pressure
 c
       call kinetic (eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
+      call pressure (dt,ekin,temp,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
