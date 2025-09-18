@@ -287,22 +287,24 @@
 
  Alternative Surface Area & Volume Methods
 
- Number of Atoms :                 642
- Probe Size :                   1.4000
+ Number of Atoms :                    642
+ Probe Size :                      1.4000
 
  Timothy Richmond Accessible Surface Area Method :
 
- CPU and Wall Times :           0.0709      0.0710
+ CPU and Wall Times :              0.0761      0.0760
 
- Total Surface Area :        3180.3168
+ Total Surface Area :           3180.3168
 
  Timothy Richmond Surface Area Derivative Method :
 
- CPU and Wall Times :           0.0726      0.0730
+ CPU and Wall Times :              0.0782      0.0790
 
- Total Surface Area :        3180.3168
+ Total Surface Area :           3180.3168
 
  Surface Area Derivatives :  (First Ten Atoms)
+
+     Atom           dAx       dAy       dAz
 
        1         -0.0280   -0.5361    0.4212
        2          0.0000    0.0000    0.0000
@@ -317,17 +319,19 @@
 
  Michael Connolly Molecular Area-Volume Method :
 
- CPU and Wall Times :           0.1046      0.1060
+ CPU and Wall Times :              0.1199      0.1200
 
- Total Surface Area :        3180.3169
+ Total Surface Area :           3180.3168
 
- Total Excluded Vol :       10275.3184
+ Total Excluded Volume :       10275.3183
 
  Craig Kundrot Excluded Volume Derivative Method :
 
- CPU and Wall Times :           0.7929      0.7960
+ CPU and Wall Times :              0.9376      0.9700
 
  Excluded Volume Derivatives :  (First Ten Atoms)
+
+     Atom           dVx       dVy       dVz
 
        1          0.0058    0.0912   -0.0774
        2          0.0000    0.0000    0.0000
@@ -342,20 +346,22 @@
 
  Patrice Koehl UnionBall Alpha Shape Method :
 
- CPU and Wall Times :           0.0056      0.0060
+ CPU and Wall Times :              0.0061      0.0070
 
- Total Surface Area :        3180.3168
+ Total Surface Area :           3180.3168
 
- Total Excluded Vol :       10275.3183
+ Total Excluded Volume :       10275.3183
 
  Surface Area & Volume Derivatives :  (First Ten Atoms)
 
+     Atom           dAx       dAy       dAz       dVx       dVy       dVz
+
        1         -0.0280   -0.5361    0.4212    0.0058    0.0912   -0.0774
-       2          0.0000    0.0000   -0.0000    0.0000   -0.0000   -0.0000
+       2          0.0000    0.0000   -0.0000   -0.0000    0.0000    0.0000
        3         -0.0000   -0.0000    0.0000   -0.0000   -0.0000    0.0000
-       4          0.0000   -0.0000    0.0000    0.0000   -0.0000    0.0000
+       4          0.0000   -0.0000   -0.0000    0.0000    0.0000   -0.0000
        5          0.2696   -1.2397   -3.6199    5.1755    1.4148  -12.7974
-       6         -0.0000    0.0000   -0.0000   -0.0000    0.0000   -0.0000
+       6          0.0000    0.0000   -0.0000    0.0000    0.0000   -0.0000
        7          1.1530    0.3285    1.2856    0.0053    2.0817   -8.3273
        8          2.0763   -1.4381   -0.7206    2.2062   -7.6297  -10.6676
        9          0.0000   -0.0000   -0.0000    0.0000   -0.0000   -0.0000
@@ -511,7 +517,7 @@
 
  Convex Faces :         344     Area :      939.791    Volume :      524.811
  Saddle Faces :        1026     Area :     1031.640    Volume :      962.447
- Concave Faces :        684     Area :      528.204    Volume :     1054.488
+ Concave Faces :        684     Area :      528.205    Volume :     1054.488
  Buried Polyhedra :                                    Volume :     3763.353
 
  Spindle Correction :           Area :        3.579    Volume :       -0.661

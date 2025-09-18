@@ -122,25 +122,25 @@
 
  Results of Distance Geometry Protocol :
 
- Final Error Function Value :                   11.9578
+ Final Error Function Value :                   11.9604
 
- Distance Restraint Error :                      2.8509
- Hard Sphere Contact Error :                     3.3095
- Local Geometry Error :                          4.5186
- Chirality-Planarity Error :                     1.1261
- Torsional Restraint Error :                     0.1528
+ Distance Restraint Error :                      2.8508
+ Hard Sphere Contact Error :                     3.3100
+ Local Geometry Error :                          4.5207
+ Chirality-Planarity Error :                     1.1262
+ Torsional Restraint Error :                     0.1526
 
  Fit to Bounds after Refinement :
 
- Num Upper Bound Violations :           2849  of      2233441
- Num Lower Bound Violations :           4757  of      2233441
- Max Upper Bound Violation :          0.8126  at   1631  1643
- Max Lower Bound Violation :          0.6447  at   2058  2080
+ Num Upper Bound Violations :           2852  of      2233441
+ Num Lower Bound Violations :           4756  of      2233441
+ Max Upper Bound Violation :          0.8129  at   1631  1643
+ Max Lower Bound Violation :          0.6448  at   2058  2080
  RMS Deviation from Bounds :          0.0033
 
  Num Upper Restraint Violations :        205  of        13587
  Num Lower Restraint Violations :         17  of        13587
- Max Upper Restraint Violation :      0.8126  at   1643  1631
+ Max Upper Restraint Violation :      0.8129  at   1643  1631
  Max Lower Restraint Violation :      0.1141  at   2067   105
  RMS Restraint Dist Violation :       0.0204
 

@@ -26,4 +26,4 @@ rm methanol.xyz* methanol.key_*
 rm polyala.xyz* polyala.int* polyala.seq* polyala.arc*
 rm pyridine.xyz_*
 rm salt.xyz*
-rm water.key
+rm water.key*

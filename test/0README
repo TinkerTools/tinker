@@ -15,8 +15,8 @@
 
     (1) ANION         Estimates the hydration free energy difference for
                       Cl- vs. Br- anion via a 10 picosecond simulation
-                      of a "hybrid" anion in a box of water, followed by
-                      free energy perturbation
+                      of a "hybrid" anion in a box of flexible SPC water,
+                      followed by free energy perturbation
 
     (2) ARGON         Performs an initial energy minimization on a periodic
                       box containing 150 argon atoms, then performs 25
@@ -24,9 +24,9 @@
                       box with 150 argon atoms
 
     (3) CATION        Computes the hydration free energy difference for
-                      Rb+ vs. Cs+ cation via a 2 picosecond simulation
-                      of each cation in a box of water, followed by a BAR
-                      free energy calculation
+                      Rb+ vs. Cs+ cation via a 10 picosecond simulation of
+                      each cation in a box of AMOEBA water, followed by a
+                      BAR free energy calculation
 
     (4) CLUSTER       Performs 10 Gaussian density annealing (GDA)trials on
                       a cluster of 13 argon atoms to find the global minimum

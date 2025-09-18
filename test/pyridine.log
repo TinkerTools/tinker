@@ -33,32 +33,33 @@
  The Tinker XYZ File Editing Utility Can :
 
     (1) Convert Simple XYZ File to Tinker Format
-    (2) Offset the Numbers of the Current Atoms
-    (3) Remove User Specified Individual Atoms
-    (4) Remove User Specified Types of Atoms
-    (5) Delete Inactive Atoms Beyond Cutoff Range
-    (6) Insertion of Individual Specified Atoms
-    (7) Replace Old Atom Type with a New Type
-    (8) Assign Connectivities for Linear Chain
-    (9) Assign Connectivities Based on Distance
-   (10) Assign Atom Types for BASIC Force Field
-   (11) Transfer Atom Types from Another Structure
-   (12) Convert Units from Bohrs to Angstroms
-   (13) Invert thru Origin to Give Mirror Image
-   (14) Translate All Atoms by an X,Y,Z-Vector
-   (15) Translate Center of Mass to the Origin
-   (16) Translate a Specified Atom to the Origin
-   (17) Translate and Rotate to Inertial Frame
-   (18) Rotate All Atoms Around a Specified Axis
-   (19) Move to Specified Rigid Body Coordinates
-   (20) Move Stray Molecules into Periodic Box
-   (21) Trim a Periodic Box to a Smaller Size
-   (22) Make Truncated Octahedron from Cubic Box
-   (23) Make Rhombic Dodecahedron from Cubic Box
-   (24) Append a Second XYZ File to Current One
-   (25) Create and Fill a Periodic Boundary Box
-   (26) Soak Current Molecule in Box of Solvent
-   (27) Place Monoatomic Ions around a Solute
+    (2) Convert Tinker File to Simple XYZ Format
+    (3) Offset the Numbers of the Current Atoms
+    (4) Remove User Specified Individual Atoms
+    (5) Remove User Specified Types of Atoms
+    (6) Delete Inactive Atoms Beyond Cutoff Range
+    (7) Insertion of Individual Specified Atoms
+    (8) Replace Old Atom Type with a New Type
+    (9) Assign Connectivities for Linear Chain
+   (10) Assign Connectivities Based on Distance
+   (11) Assign Atom Types for BASIC Force Field
+   (12) Transfer Atom Types from Another Structure
+   (13) Convert Units from Bohrs to Angstroms
+   (14) Invert thru Origin to Give Mirror Image
+   (15) Translate All Atoms by an X,Y,Z-Vector
+   (16) Translate Center of Mass to the Origin
+   (17) Translate a Specified Atom to the Origin
+   (18) Translate and Rotate to Inertial Frame
+   (19) Rotate All Atoms Around a Specified Axis
+   (20) Move to Specified Rigid Body Coordinates
+   (21) Move Stray Molecules into Periodic Box
+   (22) Trim a Periodic Box to a Smaller Size
+   (23) Make Truncated Octahedron from Cubic Box
+   (24) Make Rhombic Dodecahedron from Cubic Box
+   (25) Append a Second XYZ File to Current One
+   (26) Create and Fill a Periodic Boundary Box
+   (27) Soak Current Molecule in Box of Solvent
+   (28) Place Monoatomic Ions around a Solute
 
  Number of the Desired Choice [<Enter>=Exit] :  
  Number of the Desired Choice [<Enter>=Exit] :  

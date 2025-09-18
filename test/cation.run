@@ -2,8 +2,8 @@ cp cation.rxyz cationr.xyz
 cp cation.rkey cationr.key
 cp cation.cxyz cationc.xyz
 cp cation.ckey cationc.key
-../bin/dynamic cationr 1000 2.0 0.1 2 300.0
-../bin/dynamic cationc 1000 2.0 0.1 2 300.0
-../bin/bar 1 cationr.arc 300.0 cationc.arc 300.0 N
-../bin/bar 2 cationr.bar 1 20 1 1 20 1
+../bin/dynamic cationr 5000 2.0 0.1 2 298.0
+../bin/dynamic cationc 5000 2.0 0.1 2 298.0
+../bin/bar 1 cationr.arc 298.0 cationc.arc 298.0 N
+../bin/bar 2 cationr.bar 1 100 1 1 100 1
 rm cationr.* cationc.*
