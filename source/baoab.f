@@ -450,7 +450,7 @@ c
          end do
       end if
 c
-c     get the frictional and random terms for a BAOAB step
+c     get the frictional and random terms for the next step
 c
       egdt = exp(-friction*dt)
       do i = 1, nuse
