@@ -154,35 +154,32 @@ c
 c
 c     pack atoms of each group into a contiguous indexed list
 c
-      if (use_group) then
-         do i = 1, n
-            list(i) = grplist(i)
-         end do
-         call sort3 (n,list,kgrp)
+      do i = 1, n
+         list(i) = grplist(i)
+      end do
+      call sort3 (n,list,kgrp)
 c
 c     find the first and last atom in each of the groups
 c
-         k = list(1)
-         igrp(1,k) = 1
-         do i = 1, n
-            j = list(i)
-            if (j .ne. k) then
-               igrp(2,k) = i - 1
-               igrp(1,j) = i
-               k = j
-            end if
-            ngrp = max(j,ngrp)
-         end do
-         igrp(2,j) = n
+      k = list(1)
+      igrp(1,k) = 1
+      do i = 1, n
+         j = list(i)
+         if (j .ne. k) then
+            igrp(2,k) = i - 1
+            igrp(1,j) = i
+            k = j
+         end if
+         ngrp = max(j,ngrp)
+      end do
+      igrp(2,j) = n
 c
 c     sort the list of atoms in each group by atom number
 c
-         do i = 0, ngrp
-            size = igrp(2,i) - igrp(1,i) + 1
-            if (igrp(1,i) .ne. 0)
-     &         call sort (size,kgrp(igrp(1,i)))
-         end do
-      end if
+      do i = 0, ngrp
+         size = igrp(2,i) - igrp(1,i) + 1
+         if (igrp(1,i) .ne. 0)  call sort (size,kgrp(igrp(1,i)))
+      end do
 c
 c     perform deallocation of some local arrays
 c
@@ -229,7 +226,7 @@ c
 c
 c     compute the total mass of all atoms in each group
 c
-      do i = 1, ngrp
+      do i = 0, ngrp
          grpmass(i) = 0.0d0
          do j = igrp(1,i), igrp(2,i)
             grpmass(i) = grpmass(i) + mass(kgrp(j))
@@ -239,7 +236,7 @@ c
 c     output the final list of atoms in each group
 c
       if (use_group .and. debug) then
-         do i = 1, ngrp
+         do i = 0, ngrp
             size = igrp(2,i) - igrp(1,i) + 1
             if (size .ne. 0) then
                write (iout,50)  i
