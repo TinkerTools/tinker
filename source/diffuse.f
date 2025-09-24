@@ -37,6 +37,7 @@ c
       integer nframe,iframe
       integer iarc,start,stop
       integer step,skip,size
+      integer nave,nstart,nstop
       integer, allocatable :: list(:)
       integer, allocatable :: ntime(:)
       real*8 xmid,ymid,zmid
@@ -45,7 +46,8 @@ c
       real*8 xr,yr,zr,weigh
       real*8 tstep,dunits,delta
       real*8 xvalue,yvalue,zvalue
-      real*8 rvalue,dvalue,counts
+      real*8 rvalue,counts
+      real*8 dvalue,dave
       real*8, allocatable :: xmsd(:)
       real*8, allocatable :: ymsd(:)
       real*8, allocatable :: zmsd(:)
@@ -332,6 +334,10 @@ c
      &           7x,'R MSD',4x,'Diff Const',
      &        /,7x,'(ps)',9x,'(/2)',8x,'(/2)',8x,'(/2)',8x,'(/6)',
      &           5x,'(x 10^5)',/)
+      nstart = nint(dble(nframe-1)/3.0d0)
+      nstop = 2 * nstart
+      nave = nstop - nstart + 1
+      dave = 0.0d0
       do i = 1, nframe-1
          delta = tstep * dble(i)
          xvalue = xmsd(i) / 2.0d0
@@ -339,9 +345,14 @@ c
          zvalue = zmsd(i) / 2.0d0
          rvalue = (xmsd(i) + ymsd(i) + zmsd(i)) / 6.0d0
          dvalue = rvalue / delta
+         if (i.ge.nstart .and. i.le.nstop)  dave = dave + dvalue/nave
          write (iout,190)  delta,xvalue,yvalue,zvalue,rvalue,dvalue
   190    format (f12.2,4f12.2,f12.4)
       end do
+      if (nave .ge. 8) then
+         write (iout,200)  dave
+  200    format (/,' Self-Diffusion Constant :',f12.4,' x 10^-5 cm^2/s')     
+      end if
 c
 c     perform deallocation of some local arrays
 c
