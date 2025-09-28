@@ -2254,6 +2254,18 @@ void prtuchg_(int* istc, double* xm, double* ym, double* zm);
 #define tinker_f_prtuchg prtuchg_
 void prtdcduc_(int* idcd, int* first, double* xm, double* ym, double* zm);
 #define tinker_f_prtdcduc prtdcduc_
+void prtudir_(int* iind);
+#define tinker_f_prtudir prtudir_
+void prtdcdud_(int* idcd, int* first);
+#define tinker_f_prtdcdud prtdcdud_
+void prtdef_(int* iind);
+#define tinker_f_prtdef prtdef_
+void prtdcdde_(int* idcd, int* first);
+#define tinker_f_prtdcdde prtdcdde_
+void prttef_(int* iind);
+#define tinker_f_prttef prttef_
+void prtdcdte_(int* idcd, int* first);
+#define tinker_f_prtdcdte prtdcdte_
 
 // prtvel.f
 void prtvel_(int* ivel);

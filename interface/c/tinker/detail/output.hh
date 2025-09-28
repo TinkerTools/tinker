@@ -25,6 +25,9 @@ extern int TINKER_MOD(output, ustcsave);
 extern int TINKER_MOD(output, uchgsave);
 extern int TINKER_MOD(output, usyssave);
 extern int TINKER_MOD(output, vsyssave);
+extern int TINKER_MOD(output, udirsave);
+extern int TINKER_MOD(output, defsave);
+extern int TINKER_MOD(output, tefsave);
 extern char TINKER_MOD(output, coordtype)[9];
 #ifdef __cplusplus
 }
