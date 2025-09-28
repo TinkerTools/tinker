@@ -481,6 +481,123 @@ c
   460    format (' Charge Dipole File',10x,a)
       end if
 c
+c     save the direct induced dipole components for the current step
+c
+      if (udirsave .and. use_polar) then
+         iind = freeunit ()
+         if (cyclesave) then
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'ud'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+            call prtudir (iind)
+         else if (dcdsave) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'dcdud','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcdud (iind,first)
+         else
+            indfile = filename(1:leng)
+            call suffix (indfile,'udir','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               call openend (iind,indfile)
+            else
+               open (unit=iind,file=indfile,status='new')
+            end if
+            call prtudir (iind)
+         end if
+         close (unit=iind)
+         write (iout,470)  indfile(1:trimtext(indfile))
+  470    format (' Direct Induced Dipole File',2x,a)
+      end if
+c
+c     save the direct atomic electric field for the current step
+c
+      if (defsave .and. use_polar) then
+         iind = freeunit ()
+         if (cyclesave) then
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'de'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+            call prtdef (iind)
+         else if (dcdsave) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'dcdde','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcdde (iind,first)
+         else
+            indfile = filename(1:leng)
+            call suffix (indfile,'def','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               call openend (iind,indfile)
+            else
+               open (unit=iind,file=indfile,status='new')
+            end if
+            call prtdef (iind)
+         end if
+         close (unit=iind)
+         write (iout,480)  indfile(1:trimtext(indfile))
+  480    format (' Direct Electric Field File',2x,a)
+      end if
+c
+c     save the total atomic electric field for the current step
+c
+      if (tefsave .and. use_polar) then
+         iind = freeunit ()
+         if (cyclesave) then
+            indfile = filename(1:leng)//'.'//ext(1:lext)//'te'
+            call version (indfile,'new')
+            open (unit=iind,file=indfile,status='new')
+            call prttef (iind)
+         else if (dcdsave) then
+            indfile = filename(1:leng)
+            call suffix (indfile,'dcdte','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               first = .false.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='old',position='append')
+            else
+               first = .true.
+               open (unit=iind,file=indfile,form='unformatted',
+     &                  status='new')
+            end if
+            call prtdcdte (iind,first)
+         else
+            indfile = filename(1:leng)
+            call suffix (indfile,'tef','old')
+            inquire (file=indfile,exist=exist)
+            if (exist) then
+               call openend (iind,indfile)
+            else
+               open (unit=iind,file=indfile,status='new')
+            end if
+            call prttef (iind)
+         end if
+         close (unit=iind)
+         write (iout,490)  indfile(1:trimtext(indfile))
+  490    format (' Total Electric Field File',3x,a)
+      end if
+c
 c     test for requested termination of the dynamics calculation
 c
       endfile = 'tinker.end'
@@ -495,8 +612,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,470)
-  470    format (/,' MDSAVE  --  Dynamics Calculation Ending',
+         write (iout,500)
+  500    format (/,' MDSAVE  --  Dynamics Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if
@@ -505,8 +622,8 @@ c     skip an extra line to keep the output formating neat
 c
       modsave = mod(istep,iprint)
       if (verbose .and. modsave.ne.0) then
-         write (iout,480)
-  480    format ()
+         write (iout,510)
+  510    format ()
       end if
       return
       end

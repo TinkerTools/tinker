@@ -32,6 +32,9 @@ c     ustcsave    logical flag to save static atomic dipoles
 c     uchgsave    logical flag to save charge atomic dipoles
 c     usyssave    logical flag to save unique atom type dipole moment
 c     vsyssave    logical flag to save unique atom type velocity
+c     udirsave    logical flag to save the direct induced atomic dipoles
+c     defsave     logical flag to save the direct electric field
+c     tefsave     logical flag to save the total electric field
 c     coordtype   selects Cartesian, internal, rigid body or none
 c
 c
@@ -57,6 +60,9 @@ c
       logical uchgsave
       logical usyssave
       logical vsyssave
+      logical udirsave
+      logical defsave
+      logical tefsave
       character*9 coordtype
       save
       end

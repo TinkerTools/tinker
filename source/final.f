@@ -967,6 +967,7 @@ c
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uexact))  deallocate (uexact)
+      if (allocated(worker3n))  deallocate (worker3n)
       if (allocated(douind))  deallocate (douind)
 c
 c     deallocation of global arrays from module polgrp

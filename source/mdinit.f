@@ -34,6 +34,7 @@ c
       use moldyn
       use mpole
       use output
+      use polar
       use potent
       use rgddyn
       use rigid
@@ -74,6 +75,9 @@ c
       uchgsave = .false.
       usyssave = .false.
       vsyssave = .false.
+      udirsave = .false.
+      defsave = .false.
+      tefsave = .false.
       friction = 91.0d0
       use_sdarea = .false.
       iprint = 100
@@ -134,6 +138,12 @@ c
             usyssave = .true.
          else if (keyword(1:13) .eq. 'SAVE-VSYSTEM ') then
             vsyssave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-UDIRECT ') then
+            udirsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-DEFIELD ') then
+            defsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-TEFIELD ') then
+            tefsave = .true.
          else if (keyword(1:9) .eq. 'FRICTION ') then
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
@@ -356,6 +366,9 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (derivs(3,n))
+      if (udirsave.or.defsave.or.tefsave) then
+         if (.not. allocated(worker3n))  allocate (worker3n(3,n))
+      end if
 c
 c     try to restart using prior velocities and accelerations
 c
