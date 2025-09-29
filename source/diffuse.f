@@ -68,6 +68,14 @@ c     open the trajectory archive and read the initial frame
 c
       call getarc (iarc)
 c
+c     get the atom parameters, lattice type and molecule count
+c
+      call field
+      call unitcell
+      call lattice
+      call katom
+      call molecule
+c
 c     get numbers of the coordinate frames to be processed
 c
       start = 1
@@ -108,14 +116,6 @@ c
    70    format (f20.0)
       end if
       if (tstep .le. 0.0d0)  tstep = 1.0d0
-c
-c     get the atom parameters, lattice type and molecule count
-c
-      call field
-      call unitcell
-      call lattice
-      call katom
-      call molecule
 c
 c     perform dynamic allocation of some local arrays
 c

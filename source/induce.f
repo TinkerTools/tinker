@@ -247,16 +247,14 @@ c
                udir(j,i) = polarity(i) * field(j,i)
                udirp(j,i) = polarity(i) * fieldp(j,i)
                if (pcgguess) then
-                  do k = 1, 3
-                     uind(j,i) = polarity(i)
-     &                              * (polinv(j,1,i)*field(1,i)
-     &                               + polinv(j,2,i)*field(2,i)
-     &                               + polinv(j,3,i)*field(3,i))
-                     uinp(j,i) = polarity(i)
-     &                              * (polinv(j,1,i)*fieldp(1,i)
-     &                               + polinv(j,2,i)*fieldp(2,i)
-     &                               + polinv(j,3,i)*fieldp(3,i))
-                  end do
+                  uind(j,i) = polarity(i)
+     &                           * (polinv(j,1,i)*field(1,i)
+     &                            + polinv(j,2,i)*field(2,i)
+     &                            + polinv(j,3,i)*field(3,i))
+                  uinp(j,i) = polarity(i)
+     &                           * (polinv(j,1,i)*fieldp(1,i)
+     &                            + polinv(j,2,i)*fieldp(2,i)
+     &                            + polinv(j,3,i)*fieldp(3,i))
                end if
             end do
          end if

@@ -726,7 +726,7 @@ c
       end do
 c
 c     compute full-step kinetic energy and pressure correction;
-c     half-step kinetic energy gives better pressure control
+c     prior kinetic energy gives better pressure control
 c
 c     call kinetic (eksum,ekin,temp)
       call pressure (dt,ekin,temp,pres,stress)

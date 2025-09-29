@@ -59,9 +59,9 @@ FFTW_LIBS = -lfftw3_threads -lfftw3
 
 F77 = gfortran
 F77FLAGS = -c
-OPTFLAGS = -Ofast -march=native -fopenmp
-OPTFLAGS = -Ofast -fopenmp
-OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
+#OPTFLAGS = -Ofast -march=native -fopenmp
+OPTFLAGS = -O3 -fopenmp
+#OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
 LIBS = 
 LIBFLAGS = -crusv
@@ -72,13 +72,13 @@ RENAME = rename_bin
 ##  Build:     Tinker
 ##  OS Type:   Apple macOS
 ##  CPU Type:  Intel x86 & Apple Silicon
-##  Compiler:  GNU gfortran 14.1
+##  Compiler:  GNU gfortran 15.1
 ##  Parallel:  OpenMP
 
 #F77 = gfortran
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -fopenmp
+#OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 #LIBS = 
@@ -96,7 +96,8 @@ RENAME = rename_bin
 #F77 = gfortran
 #F77FLAGS = -c
 #OPTFLAGS = -Ofast -march=native -fopenmp
-#OPTFLAGS = -Ofast -fopenmp
+#OPTFLAGS = -O3 -fopenmp
+#OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
 #LIBS = 
 #LIBFLAGS = -crusv

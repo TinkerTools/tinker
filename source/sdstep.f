@@ -179,14 +179,14 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine sdterm  --  frictional and random SD terms  ##
-c     ##                                                         ##
-c     #############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine sdterm  --  SD friction & fluctuation terms  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "sdterm" finds the frictional and random terms needed to
+c     "sdterm" finds the friction and fluctuation terms needed to
 c     update positions and velocities during stochastic dynamics
 c
 c

@@ -596,8 +596,7 @@ c
       use iounit
       use usage
       implicit none
-      integer i,j
-      integer ia,ib
+      integer i,ia,ib
       integer niter,maxiter
       real*8 eps,sor
       real*8 xr,yr,zr
