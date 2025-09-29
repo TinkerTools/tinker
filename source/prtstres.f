@@ -28,6 +28,7 @@ c
       integer istep
       integer istr
       integer modstre
+      integer freeunit
       real*8 stress(3,3)
       logical exist
       character*240 strfile
