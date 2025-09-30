@@ -58,6 +58,7 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: vold(:,:)
+      real*8, allocatable :: aold(:,:)
       real*8, allocatable :: derivs(:,:)
       real*8, allocatable :: alpha(:,:)
       real*8, allocatable :: beta(:,:)
@@ -88,6 +89,7 @@ c
       allocate (yold(n))
       allocate (zold(n))
       allocate (vold(3,n))
+      allocate (aold(3,n))
       allocate (derivs(3,n))
       allocate (alpha(3,n))
       allocate (beta(3,n))
@@ -112,14 +114,14 @@ c
       epold = epot
       etold = eksum + epot
 c
-c     store the current positions and velocities, find half-step
+c     store the current positions and derivatives, find half-step
 c     velocities and full-step positions via Verlet recursion
 c
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
             vold(j,k) = v(j,k)
-            aalt(j,k) = a(j,k)
+            aold(j,k) = a(j,k)
             v(j,k) = v(j,k) + a(j,k)*dt_2
          end do
          xold(k) = x(k)
@@ -172,7 +174,7 @@ c
             z(k) = zold(k)
             do j = 1, 3
                v(j,k) = -vold(j,k)
-               a(j,k) = aalt(j,k)
+               a(j,k) = aold(j,k)
             end do
          end do
       end if
@@ -222,6 +224,7 @@ c
       deallocate (yold)
       deallocate (zold)
       deallocate (vold)
+      deallocate (aold)
       deallocate (derivs)
       deallocate (alpha)
       deallocate (beta)
