@@ -101,7 +101,7 @@ CC = gcc
 F77 = gfortran
 CCFLAGS = -c
 F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -march=native -fopenmp   ## -Ofast is unsafe
 OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
@@ -121,7 +121,7 @@ RENAME = rename_bin
 #F77 = gfortran
 #CCFLAGS = -c
 #F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -march=native -fopenmp   ## -Ofast is unsafe
 #OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
@@ -143,7 +143,7 @@ RENAME = rename_bin
 #F77 = gfortran
 #CCFLAGS = -c
 #F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -march=native -fopenmp   ## -Ofast is unsafe
 #OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows

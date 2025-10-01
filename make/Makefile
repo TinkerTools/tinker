@@ -59,7 +59,7 @@ FFTW_LIBS = -lfftw3_threads -lfftw3
 
 F77 = gfortran
 F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -march=native -fopenmp   ## -Ofast is unsafe
 OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 LIBDIR = -L. -L$(TINKER_LIBDIR)/linux -Wl,--no-as-needed -ldl
@@ -77,7 +77,7 @@ RENAME = rename_bin
 
 #F77 = gfortran
 #F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -march=native -fopenmp   ## -Ofast is unsafe
 #OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
@@ -95,7 +95,7 @@ RENAME = rename_bin
 
 #F77 = gfortran
 #F77FLAGS = -c
-#OPTFLAGS = -Ofast -march=native -fopenmp
+#OPTFLAGS = -Ofast -march=native -fopenmp   ## -Ofast is unsafe
 #OPTFLAGS = -O3 -fopenmp
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/windows
