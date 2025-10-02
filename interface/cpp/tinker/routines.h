@@ -2190,7 +2190,7 @@ void auxinit_();
 #define tinker_f_auxinit auxinit_
 
 // pressure.f
-void pressure_(double* dt, double* ekin, double* temp, double* pres, double* stress);
+void pressure_(double* dt, double* ekin, double* pres, double* stress);
 #define tinker_f_pressure pressure_
 void pressure2_(double* epot, double* temp);
 #define tinker_f_pressure2 pressure2_

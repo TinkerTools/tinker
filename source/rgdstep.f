@@ -284,7 +284,7 @@ c
 c     make any temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
-      call pressure (dt,ekin,temp,pres,stress)
+      call pressure (dt,ekin,pres,stress)
       call temper2 (dt,temp)
       call pressure2 (epot,temp)
 c

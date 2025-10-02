@@ -203,7 +203,7 @@ c
 c     compute full-step temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
-      call pressure (dt,ekin,temp,pres,stress)
+      call pressure (dt,ekin,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
@@ -440,7 +440,7 @@ c
 c     compute full-step temperature and pressure corrections
 c
       call temper (dt,eksum,ekin,temp)
-      call pressure (dt,ekin,temp,pres,stress)
+      call pressure (dt,ekin,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence
@@ -729,7 +729,7 @@ c     compute full-step kinetic energy and pressure correction;
 c     prior kinetic energy gives better pressure control
 c
 c     call kinetic (eksum,ekin,temp)
-      call pressure (dt,ekin,temp,pres,stress)
+      call pressure (dt,ekin,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence

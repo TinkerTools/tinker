@@ -147,7 +147,7 @@ c
 c     compute full-step kinetic energy and pressure correction
 c
       call kinetic (eksum,ekin,temp)
-      call pressure (dt,ekin,temp,pres,stress)
+      call pressure (dt,ekin,pres,stress)
       call pressure2 (epot,temp)
 c
 c     final constraint step to enforce position convergence

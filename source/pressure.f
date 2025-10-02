@@ -5,19 +5,19 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine pressure  --  barostat applied at full-step  ##
-c     ##                                                          ##
-c     ##############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine pressure  --  application of scaling barostats  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "pressure" uses the internal virial to find the pressure
-c     in a periodic box and maintain a constant desired pressure
+c     in a periodic box and maintains a constant desired pressure
 c     via a scaling barostat method
 c
 c
-      subroutine pressure (dt,ekin,temp,pres,stress)
+      subroutine pressure (dt,ekin,pres,stress)
       use bath
       use boxes
       use bound
@@ -26,7 +26,7 @@ c
       use virial
       implicit none
       integer i,j
-      real*8 dt,temp,pres
+      real*8 dt,pres
       real*8 factor
       real*8 ekin(3,3)
       real*8 stress(3,3)
@@ -59,15 +59,15 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine pressure2  --  barostat applied at half-step  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine pressure2  --  apply the Monte Carlo barostat  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "pressure2" applies a box size and position correction to
-c     maintain constant desired pressure via a Monte Carlo barostat
+c     "pressure2" applies box size and coordinate moves to maintain
+c     constant desired pressure via a Monte Carlo barostat
 c
 c
       subroutine pressure2 (epot,temp)
@@ -464,11 +464,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine pmonte  --  Monte Carlo barostat trial moves  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine pmonte  --  Monte Carlo barostat volume moves  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "pmonte" implements a Monte Carlo barostat via random trial
