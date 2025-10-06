@@ -101,7 +101,7 @@
                  changes from authentic CHARMM related to symmetrization of
                  some improper torsions, as well as in the CMAP correction
 
-      charmm36   CHARMM36 parameters for proteins and nucleic acids; these
+      charmm36m  CHARMM36 parameters for proteins and nucleic acids; these
                  parameters include the CHARMM36m modifications intended
                  to provide a balanced model for folded and disordered
                  protein structures
