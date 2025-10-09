@@ -24,6 +24,7 @@ mv FREEFIX.ZIP   freefix.zip
 mv GDA.ZIP       gda.zip
 mv INTEDIT.ZIP   intedit.zip
 mv INTXYZ.ZIP    intxyz.zip
+mv MDAVG.ZIP     mdavg.zip
 mv MINIMIZE.ZIP  minimize.zip
 mv MINIROT.ZIP   minirot.zip
 mv MINRIGID.ZIP  minrigid.zip

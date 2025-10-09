@@ -30,6 +30,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o freefi
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o gda.x gda.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip gda.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intedit.x intedit.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip intedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o intxyz.x intxyz.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip intxyz.x
+ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o mdavg.x mdavg.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip mdavg.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minimize.x minimize.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip minimize.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minirot.x minirot.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip minirot.x
 ifort -O3 -no-prec-div -recursive -openmp -static-libgcc -static-intel -o minrigid.x minrigid.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 $APBSLIBS ; strip minrigid.x

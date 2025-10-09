@@ -25,6 +25,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static freefix.obj tinker.lib li
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static gda.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intedit.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intxyz.obj tinker.lib libfftw-3.3.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static mdavg.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minimize.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minirot.obj tinker.lib libfftw-3.3.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minrigid.obj tinker.lib libfftw-3.3.lib

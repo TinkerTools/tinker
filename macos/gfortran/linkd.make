@@ -24,6 +24,7 @@ gfortran -Og -g -fbacktrace -static-libgcc -o freefix.x freefix.o -L. -L../lib/m
 gfortran -Og -g -fbacktrace -static-libgcc -o gda.x gda.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 gfortran -Og -g -fbacktrace -static-libgcc -o intedit.x intedit.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 gfortran -Og -g -fbacktrace -static-libgcc -o intxyz.x intxyz.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
+gfortran -Og -g -fbacktrace -static-libgcc -o mdavg.x mdavg.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 gfortran -Og -g -fbacktrace -static-libgcc -o minimize.x minimize.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 gfortran -Og -g -fbacktrace -static-libgcc -o minirot.x minirot.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 gfortran -Og -g -fbacktrace -static-libgcc -o minrigid.x minrigid.o -L. -L../lib/macos -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3

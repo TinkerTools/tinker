@@ -469,6 +469,7 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp makeint.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp makeref.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp makexyz.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp maxwell.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdavg.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdinit.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdrest.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp mdsave.f

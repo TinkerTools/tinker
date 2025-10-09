@@ -24,6 +24,7 @@ zip freefix.zip freefix.exe
 zip gda.zip gda.exe
 zip intedit.zip intedit.exe
 zip intxyz.zip intxyz.exe
+zip mdavg.zip mdavg.exe
 zip minimize.zip minimize.exe
 zip minirot.zip minirot.exe
 zip minrigid.zip minrigid.exe

@@ -544,6 +544,7 @@ OBJS =	action.o \
 	makexyz.o \
 	math.o \
 	maxwell.o \
+	mdavg.o \
 	mdinit.o \
 	mdrest.o \
 	mdsave.o \
@@ -794,6 +795,7 @@ EXEFILES = alchemy.x \
 	    gda.x \
 	    intedit.x \
 	    intxyz.x \
+	    mdavg.x \
 	    minimize.x \
 	    minirot.x \
 	    minrigid.x \
@@ -880,6 +882,7 @@ rename_bin:
 	mv  gda.x        $(BINDIR)/gda
 	mv  intedit.x    $(BINDIR)/intedit
 	mv  intxyz.x     $(BINDIR)/intxyz
+	mv  mdavg.x      $(BINDIR)/mdavg
 	mv  minimize.x   $(BINDIR)/minimize
 	mv  minirot.x    $(BINDIR)/minirot
 	mv  minrigid.x   $(BINDIR)/minrigid
@@ -947,6 +950,7 @@ rename_exe:
 	mv  gda.x        $(BINDIR)/gda.exe
 	mv  intedit.x    $(BINDIR)/intedit.exe
 	mv  intxyz.x     $(BINDIR)/intxyz.exe
+	mv  mdavg.x      $(BINDIR)/mdavg.exe
 	mv  minimize.x   $(BINDIR)/minimize.exe
 	mv  minirot.x    $(BINDIR)/minirot.exe
 	mv  minrigid.x   $(BINDIR)/minrigid.exe
@@ -1014,6 +1018,7 @@ remove_links:
 	rm -f $(LINKDIR)/gda
 	rm -f $(LINKDIR)/intedit
 	rm -f $(LINKDIR)/intxyz
+	rm -f $(LINKDIR)/mdavg
 	rm -f $(LINKDIR)/minimize
 	rm -f $(LINKDIR)/minirot
 	rm -f $(LINKDIR)/minrigid
@@ -1081,6 +1086,7 @@ create_links:
 	ln -s $(BINDIR)/gda        $(LINKDIR)/gda
 	ln -s $(BINDIR)/intedit    $(LINKDIR)/intedit
 	ln -s $(BINDIR)/intxyz     $(LINKDIR)/intxyz
+	ln -s $(BINDIR)/mdavg      $(LINKDIR)/mdavg
 	ln -s $(BINDIR)/minimize   $(LINKDIR)/minimize
 	ln -s $(BINDIR)/minirot    $(LINKDIR)/minirot
 	ln -s $(BINDIR)/minrigid   $(LINKDIR)/minrigid
@@ -1614,8 +1620,8 @@ libtinker.a: ${OBJS}
 	sequen.o \
 	server.o \
 	setprm.o \
-	shapes.o \
 	shakeup.o \
+	shapes.o \
 	shunt.o \
 	sigmoid.o \
 	simplex.o \
@@ -1701,7 +1707,7 @@ atmlst.o:
 atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o
-baoab.o: atomid.o atoms.o bath.o freeze.o limits.o mdstuf.o moldyn.o potent.o stodyn.o units.o usage.o virial.o
+baoab.o: atomid.o atoms.o bath.o freeze.o moldyn.o stodyn.o units.o usage.o virial.o
 bar.o: boxes.o files.o inform.o iounit.o keys.o output.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:
@@ -1731,7 +1737,7 @@ cholesky.o:
 chrono.o:
 chunks.o:
 clock.o: chrono.o
-cluster.o: atomid.o atoms.o bound.o group.o inform.o iounit.o keys.o limits.o molcul.o
+cluster.o: atomid.o atoms.o bound.o group.o inform.o iounit.o keys.o molcul.o
 column.o:
 command.o: argue.o
 connect.o: atoms.o couple.o zclose.o zcoord.o
@@ -1932,7 +1938,7 @@ getstring.o: ascii.o
 gettext.o: ascii.o
 getword.o: ascii.o
 getxyz.o: files.o inform.o iounit.o output.o
-ghmcstep.o: atomid.o atoms.o bath.o freeze.o iounit.o moldyn.o stodyn.o units.o usage.o virial.o
+ghmcstep.o: atomid.o atoms.o bath.o freeze.o inform.o iounit.o moldyn.o stodyn.o units.o usage.o virial.o
 gkstuf.o: sizes.o
 gradient.o: atoms.o couple.o deriv.o energi.o inform.o inter.o iounit.o limits.o potent.o vdwpot.o virial.o
 gradrgd.o: atoms.o group.o rigid.o
@@ -2047,6 +2053,7 @@ makeref.o: atomid.o atoms.o boxes.o couple.o files.o refer.o titles.o
 makexyz.o: atoms.o zcoord.o
 math.o:
 maxwell.o: units.o
+mdavg.o: inform.o iounit.o
 mdinit.o: atomid.o atoms.o bath.o bound.o couple.o extfld.o files.o freeze.o group.o inform.o iounit.o keys.o mdstuf.o molcul.o moldyn.o mpole.o output.o potent.o rgddyn.o rigid.o stodyn.o units.o usage.o
 mdrest.o: atomid.o atoms.o bound.o group.o inform.o iounit.o mdstuf.o moldyn.o rgddyn.o units.o
 mdsave.o: atomid.o atoms.o bound.o boxes.o couple.o files.o group.o inform.o iounit.o mdstuf.o mpole.o output.o polar.o potent.o rgddyn.o socket.o titles.o
@@ -2079,7 +2086,7 @@ newtrot.o: files.o hescut.o inform.o iounit.o math.o omega.o zcoord.o
 nextarg.o: argue.o
 nexttext.o:
 nonpol.o:
-nose.o: atomid.o atoms.o bath.o boxes.o freeze.o mdstuf.o moldyn.o units.o usage.o virial.o
+nose.o: atomid.o atoms.o bath.o boxes.o freeze.o iounit.o mdstuf.o moldyn.o units.o usage.o virial.o
 nspline.o:
 nucleic.o: atoms.o couple.o files.o group.o inform.o iounit.o katoms.o math.o molcul.o nucleo.o output.o potent.o resdue.o restrn.o rigid.o sequen.o titles.o usage.o
 nucleo.o: sizes.o
@@ -2130,7 +2137,7 @@ potent.o:
 potential.o: atomid.o atoms.o charge.o chgpen.o chgpot.o dipole.o files.o inform.o iounit.o katoms.o keys.o math.o moment.o mplpot.o mpole.o neigh.o polar.o potent.o potfit.o ptable.o refer.o titles.o units.o
 potfit.o: sizes.o
 predict.o: atomid.o atoms.o ielscf.o keys.o polar.o uprior.o
-pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o math.o mdstuf.o molcul.o moldyn.o units.o usage.o virial.o
+pressure.o: atomid.o atoms.o bath.o bound.o boxes.o group.o math.o mdstuf.o molcul.o moldyn.o rgddyn.o units.o usage.o virial.o
 prmedit.o: angpot.o bndpot.o iounit.o math.o params.o sizes.o urypot.o vdwpot.o
 prmkey.o: angpot.o bndpot.o chgpot.o ctrpot.o dsppot.o expol.o extfld.o fields.o mplpot.o polpot.o potent.o reppot.o rxnpot.o torpot.o units.o urypot.o vdwpot.o
 promo.o: iounit.o

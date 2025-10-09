@@ -166,7 +166,7 @@
       smoothua   Similar to SMOOTHAA, but based on OPLS-UA parameters
 
       uwater     An AMOEBA-like water model, but having only a single
-                 polarizable site centered on the oxygen atom
+                 polarizable multipole site centered on the oxygen atom
 
       water03    The original 2003 AMOEBA water model parameters for a
                  polarizable multipole electrostatics model

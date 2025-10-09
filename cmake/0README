@@ -1,9 +1,9 @@
 
-                  ###########################################
-                  Building Tinker & Tinker-OpenMM Using CMake
-                  ###########################################
+                          ###########################
+                          Building Tinker Using CMake
+                          ###########################
 
-      The Tinker and Tinker-OpenMM packages can be built using the CMake
+      The complete Tinker software package can be built using the CMake
       compilation utility. CMake works on Linux, macOS and Windows. It
       requires the pkg-config and cmake-data packages, as well as cmake.
 
@@ -30,8 +30,14 @@
          (4) make -j4    [replace 4 with # of processes to use]
          (5) make install
 
-      A CMake module is also included here to build Tinker-OpenMM with the
-      OpenMM libraries and CUDA. To turn on this capability, use the flag
+                       ##################################
+                       Building Tinker-OpenMM Using CMake
+                       ##################################
+
+      Note that Tinker-OpenMM is no longer supported. However, in case
+      someone wishes to build this unsupported legacy package, a CMake
+      module is included here to build Tinker-OpenMM against the OpenMM
+      libraries and CUDA. To enable this build capability, use the flag
       "-DTINKER_OPENMM=ON". This will try to find the OpenMM libraries
       in the default location (/usr/local/openmm), or in the location set
       by the environment variable OPENMM_PLUGIN_DIR, or via the flag

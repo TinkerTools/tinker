@@ -469,6 +469,7 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 makeint.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 makeref.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 makexyz.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 maxwell.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 mdavg.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 mdinit.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 mdrest.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 mdsave.f

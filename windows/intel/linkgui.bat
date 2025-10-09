@@ -32,6 +32,7 @@ ifort /libs:static freefix.obj tinker.lib %javalib%
 ifort /libs:static gda.obj tinker.lib %javalib%
 ifort /libs:static intedit.obj tinker.lib %javalib%
 ifort /libs:static intxyz.obj tinker.lib %javalib%
+ifort /libs:static mdavg.obj tinker.lib %javalib%
 ifort /libs:static minimize.obj tinker.lib %javalib%
 ifort /libs:static minirot.obj tinker.lib %javalib%
 ifort /libs:static minrigid.obj tinker.lib %javalib%

@@ -469,6 +469,7 @@ gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized mak
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized makeref.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized makexyz.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized maxwell.f
+gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized mdavg.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized mdinit.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized mdrest.f
 gfortran -c -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized mdsave.f

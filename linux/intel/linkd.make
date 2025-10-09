@@ -24,6 +24,7 @@ ifort -g -o freefix.x freefix.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lf
 ifort -g -o gda.x gda.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 ifort -g -o intedit.x intedit.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 ifort -g -o intxyz.x intxyz.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
+ifort -g -o mdavg.x mdavg.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 ifort -g -o minimize.x minimize.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 ifort -g -o minirot.x minirot.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3
 ifort -g -o minrigid.x minrigid.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3

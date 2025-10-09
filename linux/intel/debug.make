@@ -469,6 +469,7 @@ ifort -c -g -warn all -check all makeint.f
 ifort -c -g -warn all -check all makeref.f
 ifort -c -g -warn all -check all makexyz.f
 ifort -c -g -warn all -check all maxwell.f
+ifort -c -g -warn all -check all mdavg.f
 ifort -c -g -warn all -check all mdinit.f
 ifort -c -g -warn all -check all mdrest.f
 ifort -c -g -warn all -check all mdsave.f

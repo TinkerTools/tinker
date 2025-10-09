@@ -23,6 +23,7 @@ mv freefix.x   ../bin/freefix
 mv gda.x       ../bin/gda
 mv intedit.x   ../bin/intedit
 mv intxyz.x    ../bin/intxyz
+mv mdavg.x     ../bin/mdavg
 mv minimize.x  ../bin/minimize
 mv minirot.x   ../bin/minirot
 mv minrigid.x  ../bin/minrigid

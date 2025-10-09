@@ -468,6 +468,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makeint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makeref.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp makexyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp maxwell.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp mdavg.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp mdinit.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp mdrest.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp mdsave.f

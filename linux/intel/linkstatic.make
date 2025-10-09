@@ -24,6 +24,7 @@ ifort -O3 -no-prec-div -recursive -openmp -static -o freefix.x freefix.o -L. -L.
 ifort -O3 -no-prec-div -recursive -openmp -static -o gda.x gda.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip gda.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o intedit.x intedit.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip intedit.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o intxyz.x intxyz.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip intxyz.x
+ifort -O3 -no-prec-div -recursive -openmp -static -o mdavg.x mdavg.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip mdavg.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o minimize.x minimize.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip minimize.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o minirot.x minirot.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip minirot.x
 ifort -O3 -no-prec-div -recursive -openmp -static -o minrigid.x minrigid.o -L. -L../lib/linux -L../fftw/lib libtinker.a -lfftw3_threads -lfftw3 ; strip minrigid.x

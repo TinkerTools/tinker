@@ -24,6 +24,7 @@ unzip freefix.zip freefix.exe
 unzip gda.zip gda.exe
 unzip intedit.zip intedit.exe
 unzip intxyz.zip intxyz.exe
+unzip mdavg.zip mdavg.exe
 unzip minimize.zip minimize.exe
 unzip minirot.zip minirot.exe
 unzip minrigid.zip minrigid.exe
