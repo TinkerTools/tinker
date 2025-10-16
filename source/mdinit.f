@@ -68,7 +68,7 @@ c
       nrespa = max(1,nint(dt/0.0005d0))
       nfree = 0
       ndummy = 0
-      irest = 100
+      irest = -1
       iprint = 100
       use_wrap = .true.
       velsave = .false.
@@ -209,6 +209,28 @@ c
          end do
       end if
 c
+c     decide whether to remove center of mass motion; note
+c     should be applied by default to stochastic dynamics
+c
+      dorest = .true.
+      if (irest .eq. 0) then
+         dorest = .false.
+      else if (irest .lt. 0) then
+         if (nuse .ne. n)  dorest = .false.
+c        if (integrate .eq. 'BAOAB')  dorest = .false.
+c        if (integrate .eq. 'OBABO')  dorest = .false.
+c        if (integrate .eq. 'SRESPA')  dorest = .false.
+c        if (integrate .eq. 'STOCHASTIC')  dorest = .false.
+         if (integrate .eq. 'GHMC')  dorest = .false.
+         if (isothermal .and. thermostat.eq.'ANDERSEN')
+     &      dorest = .false.
+      end if
+      if (dorest) then
+         if (irest .lt. 0)  irest = 100
+      else
+         irest = 0
+      end if
+c
 c     enforce use of velocity Verlet with Andersen thermostat
 c
       if (thermostat .eq. 'ANDERSEN') then
@@ -342,18 +364,6 @@ c
          qterm = ekt * taupres * taupres
          qbar = dble(nfree+1) * qterm
       end if
-c
-c     decide whether to remove center of mass motion
-c
-      dorest = .true.
-      if (irest .eq. 0)  dorest = .false.
-      if (nuse. ne. n)  dorest = .false.
-      if (integrate .eq. 'BAOAB')  dorest = .false.
-      if (integrate .eq. 'OBABO')  dorest = .false.
-      if (integrate .eq. 'STOCHASTIC')  dorest = .false.
-      if (integrate .eq. 'GHMC')  dorest = .false.
-      if (integrate .eq. 'SRESPA')  dorest = .false.
-      if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
 c
 c     perform dynamic allocation of some local arrays
 c

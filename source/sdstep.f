@@ -187,7 +187,8 @@ c     ##############################################################
 c
 c
 c     "sdterm" finds the friction and fluctuation terms needed to
-c     update positions and velocities during stochastic dynamics
+c     update positions and velocities during  stochastic dynamics
+c     via the method of Guarnieri and Still
 c
 c
       subroutine sdterm (istep,dt,pfric,vfric,afric,prand,vrand)

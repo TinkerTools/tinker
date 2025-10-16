@@ -197,18 +197,20 @@ c
 c
 c     convert sums to average and standard deviation values
 c
-      etot = etot / block
-      vtot = sqrt(vtot/block)
-      epot = epot / block
-      vpot = sqrt(vpot/block)
-      ekin = ekin / block
-      vkin = sqrt(vkin/block)
-      temp = temp / block
-      vtemp = sqrt(vtemp/block)
-      pres = pres / block
-      vpres = sqrt(vpres/block)
-      dens = dens / block
-      vdens = sqrt(vdens/block)
+      if (nblock .ne. 0) then
+         etot = etot / block
+         vtot = sqrt(vtot/block)
+         epot = epot / block
+         vpot = sqrt(vpot/block)
+         ekin = ekin / block
+         vkin = sqrt(vkin/block)
+         temp = temp / block
+         vtemp = sqrt(vtemp/block)
+         pres = pres / block
+         vpres = sqrt(vpres/block)
+         dens = dens / block
+         vdens = sqrt(vdens/block)
+      end if
 c
 c     print the averages and overall standard deviations
 c
@@ -223,13 +225,13 @@ c
   110    format (' Steps per Block',8x,i12,' Steps')
          if (time .ge. 1000000.0d0) then
             write (iout,120)  time/1000000.0d0
-  120       format (' Simulation Time',4x,f16.4,' Microseconds',/)
+  120       format (' Simulation Time',8x,f12.4,' Microseconds',/)
          else if (time .ge. 1000.0d0) then
             write (iout,130)  time/1000.0d0
-  130       format (' Simulation Time',4x,f16.4,' Nanoseconds',/)
+  130       format (' Simulation Time',8x,f12.4,' Nanoseconds',/)
          else
             write (iout,140)  time
-  140       format (' Simulation Time',4x,f16.4,' Picoseconds',/)
+  140       format (' Simulation Time',8x,f12.2,' Picoseconds',/)
          end if
       end if
       write (iout,150)  etot,vtot

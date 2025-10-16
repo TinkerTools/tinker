@@ -206,7 +206,7 @@ c
             d2e(3,2) = d2e(2,3)
             d2e(3,3) = termz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             do j = 1, 3
                hessx(j,ia) = hessx(j,ia) + d2e(1,j)
@@ -268,7 +268,7 @@ c
             d2e(3,2) = d2e(2,3)
             d2e(3,3) = termz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             do j = 1, 3
                hessx(j,ia) = hessx(j,ia) + d2e(1,j)
@@ -1305,7 +1305,7 @@ c
             d2e(3,2) = d2e(2,3)
             d2e(3,3) = termz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             do k = igrp(1,ia), igrp(2,ia)
                m = kgrp(k)
@@ -1629,7 +1629,7 @@ c
                d2e(3,2) = d2e(2,3)
                d2e(3,3) = termz*zr + dedr
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + d2e(1,j)
@@ -1691,7 +1691,7 @@ c
             d2e(3,2) = d2e(2,3)
             d2e(3,3) = termz*zi + dedr
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             do j = 1, 3
                hessx(j,i) = hessx(j,i) + d2e(1,j)

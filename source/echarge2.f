@@ -226,7 +226,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -336,7 +336,7 @@ c
                   term(3,2) = term(2,3)
                   term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   do j = 1, 3
                      hessx(j,i) = hessx(j,i) + term(1,j)
@@ -550,7 +550,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -927,7 +927,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -1005,7 +1005,7 @@ c
                   term(3,2) = term(2,3)
                   term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   do j = 1, 3
                      hessx(j,i) = hessx(j,i) + term(1,j)
@@ -1179,7 +1179,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -1394,7 +1394,7 @@ c
             term(3,2) = term(2,3)
             term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             do j = 1, 3
                hessx(j,i) = hessx(j,i) + term(1,j)

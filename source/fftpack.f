@@ -548,7 +548,7 @@ c
       real*8 wa1(*)
       real*8 wa2(*)
       data taur  / -0.5d0 /
-      data taui  / -0.866025403784439d0 /
+      data taui  / -0.866025403784438647d0 /  !! -sqrt(3)/2
 c
 c
       if (ido .eq. 2) then
@@ -688,10 +688,10 @@ c
       real*8 wa2(*)
       real*8 wa3(*)
       real*8 wa4(*)
-      data tr11  /  0.309016994374947d0 /
-      data ti11  / -0.951056516295154d0 /
-      data tr12  / -0.809016994374947d0 /
-      data ti12  / -0.587785252292473d0 /
+      data tr11  /  0.309016994374947424d0 /  !! sine 9*pi/10
+      data ti11  / -0.951056516295153572d0 /  !! cosine 9*pi/10
+      data tr12  / -0.809016994374947424d0 /  !! cosine -pi/5
+      data ti12  / -0.587785252292473129d0 /  !! sine -pi/5
 c
 c
       if (ido .eq. 2) then
@@ -966,7 +966,7 @@ c
       real*8 wa1(*)
       real*8 wa2(*)
       data taur  / -0.5d0 /
-      data taui  / 0.866025403784439d0 /
+      data taui  /  0.866025403784438647d0 /  !! sqrt(3)/2
 c
 c
       if (ido .eq. 2) then
@@ -1106,10 +1106,10 @@ c
       real*8 wa2(*)
       real*8 wa3(*)
       real*8 wa4(*)
-      data tr11  /  0.309016994374947d0 /
-      data ti11  /  0.951056516295154d0 /
-      data tr12  / -0.809016994374947d0 /
-      data ti12  /  0.587785252292473d0 /
+      data tr11  /  0.309016994374947424d0 /  !! sine pi/10
+      data ti11  /  0.951056516295153572d0 /  !! cosine pi/10
+      data tr12  / -0.809016994374947424d0 /  !! cosine 4*pi/5
+      data ti12  /  0.587785252292473129d0 /  !! sine 4*pi/5
 c
 c
       if (ido .eq. 2) then
