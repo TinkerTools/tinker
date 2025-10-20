@@ -74,7 +74,7 @@ c
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
-      friction = 1.0d0
+      friction = 0.5d0
       if (use_solv)  friction = 91.0d0
       use_sdarea = .false.
 c
@@ -235,6 +235,7 @@ c     enforce use of velocity Verlet with Andersen thermostat
 c
       if (thermostat .eq. 'ANDERSEN') then
          if (integrate .eq. 'BEEMAN')  integrate = 'VERLET'
+         if (integrate .eq. 'BRESPA')  integrate = 'VRESPA'
       end if
 c
 c     couple Nose-Hoover thermostat and barostat with integrator
@@ -318,9 +319,9 @@ c
          if (isothermal .and. thermostat.ne.'ANDERSEN'
      &         .and. integrate.ne.'BAOAB'
      &         .and. integrate.ne.'OBABO'
+     &         .and. integrate.ne.'SRESPA'
      &         .and. integrate.ne.'STOCHASTIC'
-     &         .and. integrate.ne.'GHMC'
-     &         .and. integrate.ne.'SRESPA') then
+     &         .and. integrate.ne.'GHMC') then
             if (.not. use_exfld) then
                if (use_bounds) then
                   if (integrate.ne.'RIGIDBODY' .and. ngrp.ne.0) then
