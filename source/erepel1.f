@@ -1089,7 +1089,7 @@ c
 !$OMP& vlambda3,vlambda4,vlambda5,mut,cut2,off2,xaxis,yaxis,zaxis,
 !$OMP& c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale) shared (er,der,ter,vir)
-!$OMP DO reduction(+:er,der,ter,vir) schedule(guided)
+!$OMP DO reduction(+:er,der,ter,vir)
 c
 c     calculate the Pauli repulsion energy and derivatives
 c
@@ -1450,7 +1450,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:der,vir) schedule(guided)
+!$OMP DO reduction(+:der,vir)
 c
 c     resolve site torques then increment forces and virial
 c

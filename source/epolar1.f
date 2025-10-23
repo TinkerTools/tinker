@@ -2692,7 +2692,7 @@ c
 !$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
-!$OMP DO reduction(+:dep,ufld,dufld,pot,vir) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld,pot,vir)
 c
 c     compute the dipole polarization gradient components
 c
@@ -3760,7 +3760,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dep,vir) schedule(guided)
+!$OMP DO reduction(+:dep,vir)
 c
 c     torque is induced field and gradient cross permanent moments
 c
@@ -3831,7 +3831,7 @@ c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dep,vir) schedule(guided)
+!$OMP    DO reduction(+:dep,vir)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -7142,7 +7142,7 @@ c
 !$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,vir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
-!$OMP DO reduction(+:dep,ufld,dufld,pot,vir) schedule(guided)
+!$OMP DO reduction(+:dep,ufld,dufld,pot,vir)
 c
 c     compute the dipole polarization gradient components
 c
@@ -8309,7 +8309,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dep,vir) schedule(guided)
+!$OMP DO reduction(+:dep,vir)
 c
 c     torque is induced field and gradient cross permanent moments
 c
@@ -8380,7 +8380,7 @@ c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dep,vir) schedule(guided)
+!$OMP    DO reduction(+:dep,vir)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -8469,7 +8469,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(ii,j,fi,e)
-!$OMP DO reduction(+:ep) schedule(guided)
+!$OMP DO reduction(+:ep)
 c
 c     get polarization energy via induced dipoles times field
 c

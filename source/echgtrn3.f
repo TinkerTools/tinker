@@ -813,7 +813,7 @@ c
 !$OMP& elambda,mut,cut2,molcule,c0,c1,c2,c3,c4,c5,name,verbose,
 !$OMP& debug,header,iout)
 !$OMP& firstprivate(mscale) shared(ect,nect,aect,einter)
-!$OMP DO reduction(+:ect,nect,aect,einter) schedule(guided)
+!$OMP DO reduction(+:ect,nect,aect,einter)
 c
 c     compute the charge transfer energy
 c

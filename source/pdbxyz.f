@@ -246,7 +246,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,row,rmax,n12,i12)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     find and connect atom pairs within bonding distance
 c

@@ -87,7 +87,7 @@ c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,eps,use_group,use_polymer)
 !$OMP& shared(ebt,debt,vir)
-!$OMP DO reduction(+:ebt,debt,vir) schedule(guided)
+!$OMP DO reduction(+:ebt,debt,vir)
 c
 c     calculate the stretch-torsion energy and first derivatives
 c

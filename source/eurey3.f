@@ -64,7 +64,7 @@ c
 !$OMP& use,x,y,z,cury,qury,ureyunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eub,neub,aeub)
-!$OMP DO reduction(+:eub,neub,aeub) schedule(guided)
+!$OMP DO reduction(+:eub,neub,aeub)
 c
 c     calculate the Urey-Bradley 1-3 energy term
 c

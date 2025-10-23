@@ -644,7 +644,7 @@ c
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5,vcouple,vterm,eps)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
-!$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
+!$OMP DO reduction(+:edsp,dedsp,vir)
 c
 c     find dispersion energy and derivatives via neighbor list
 c
@@ -1505,7 +1505,7 @@ c
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
 !$OMP& vcouple,vterm,eps)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
-!$OMP DO reduction(+:edsp,dedsp,vir) schedule(guided)
+!$OMP DO reduction(+:edsp,dedsp,vir)
 c
 c     compute the real space portion of the Ewald summation
 c

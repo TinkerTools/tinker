@@ -80,7 +80,7 @@ c
 !$OMP PARALLEL default(private) shared(nangang,iaa,iang,
 !$OMP& use,x,y,z,anat,kaa,aaunit,eps,use_group,use_polymer)
 !$OMP& shared(eaa,deaa,vir)
-!$OMP DO reduction(+:eaa,deaa,vir) schedule(guided)
+!$OMP DO reduction(+:eaa,deaa,vir)
 c
 c     find the energy of each angle-angle interaction
 c

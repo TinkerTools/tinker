@@ -425,7 +425,7 @@ c
 !$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv)
 !$OMP& firstprivate(pscale)
 !$OMP& shared (polscale)
-!$OMP DO reduction(+:polscale) schedule(guided)
+!$OMP DO reduction(+:polscale)
 c
 c     find the variable polarizability
 c

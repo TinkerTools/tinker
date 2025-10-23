@@ -642,7 +642,7 @@ c
 !$OMP& c2,c3,c4,c5,vcouple,vterm,eps,molcule,name,verbose,debug,
 !$OMP& header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
-!$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
+!$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
 c
 c     find the damped dispersion energy via neighbor list search
 c
@@ -1479,7 +1479,7 @@ c
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
 !$OMP& molcule,vcouple,vterm,eps,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
-!$OMP DO reduction(+:edsp,nedsp,aedsp,einter) schedule(guided)
+!$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
 c
 c     compute the real space portion of the Ewald summation
 c

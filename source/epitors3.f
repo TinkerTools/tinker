@@ -86,7 +86,7 @@ c
 !$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ept,nept,aept)
-!$OMP DO reduction(+:ept,nept,aept) schedule(guided)
+!$OMP DO reduction(+:ept,nept,aept)
 c
 c     calculate the pi-system torsion angle energy term
 c

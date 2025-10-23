@@ -647,7 +647,7 @@ c
 !$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,cut2,
 !$OMP& off2,elambda,mut,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(mscale) shared(ect)
-!$OMP DO reduction(+:ect) schedule(guided)
+!$OMP DO reduction(+:ect)
 c
 c     compute the charge transfer energy
 c

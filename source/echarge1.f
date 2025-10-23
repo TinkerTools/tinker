@@ -874,7 +874,7 @@ c
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,
 !$OMP& f6,f7,ebuffer)
 !$OMP& firstprivate(cscale) shared (ec,dec,vir)
-!$OMP DO reduction(+:ec,dec,vir) schedule(guided)
+!$OMP DO reduction(+:ec,dec,vir)
 c
 c     compute the charge interaction energy and first derivatives
 c
@@ -1915,7 +1915,7 @@ c
 !$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c1scale,
 !$OMP& c2scale,c3scale,c4scale,c5scale,use_group,off2,aewald,ebuffer)
 !$OMP& firstprivate(cscale) shared (ec,dec,vir)
-!$OMP DO reduction(+:ec,dec,vir) schedule(guided)
+!$OMP DO reduction(+:ec,dec,vir)
 c
 c     compute the real space Ewald energy and first derivatives
 c

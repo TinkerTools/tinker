@@ -118,7 +118,7 @@ c
 c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nvdw
          i = ivdw(ii)
          xi = xred(i)
@@ -141,7 +141,7 @@ c
 c
 c     rebuild the higher numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nvdw
          i = ivdw(ii)
          if (update(i)) then
@@ -167,7 +167,7 @@ c
 c
 c     adjust lists for lower numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nvdw
          i = ivdw(ii)
          if (update(i)) then
@@ -256,7 +256,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     store coordinates to reflect update of the site
 c
@@ -371,7 +371,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,
 !$OMP& xi,yi,zi,xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over all atoms computing the neighbor lists
 c
@@ -499,7 +499,7 @@ c
 c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, ndisp
          i = idisp(ii)
          xi = x(i)
@@ -522,7 +522,7 @@ c
 c
 c     rebuild the higher numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, ndisp
          i = idisp(ii)
          if (update(i)) then
@@ -548,7 +548,7 @@ c
 c
 c     adjust lists for lower numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, ndisp
          i = idisp(ii)
          if (update(i)) then
@@ -637,7 +637,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     store new coordinates to reflect update of the site
 c
@@ -752,7 +752,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over all atoms computing the neighbor lists
 c
@@ -881,7 +881,7 @@ c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,ic,
 !$OMP& xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nion
          i = iion(ii)
          ic = kion(i)
@@ -905,7 +905,7 @@ c
 c
 c     rebuild the higher numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nion
          i = iion(ii)
          if (update(i)) then
@@ -931,7 +931,7 @@ c
 c
 c     adjust lists for lower numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nion
          i = iion(ii)
          if (update(i)) then
@@ -1024,7 +1024,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,ic,kc,
 !$OMP& xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     store new coordinates to reflect update of the site
 c
@@ -1143,7 +1143,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,ic,kc,
 !$OMP& xi,yi,zi,xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over all atoms computing the neighbor lists
 c
@@ -1273,7 +1273,7 @@ c
 c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          xi = x(i)
@@ -1296,7 +1296,7 @@ c
 c
 c     rebuild the higher numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          if (update(i)) then
@@ -1322,7 +1322,7 @@ c
 c
 c     adjust lists for lower numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          if (update(i)) then
@@ -1412,7 +1412,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     store new coordinates to reflect update of the site
 c
@@ -1527,7 +1527,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over all atoms computing the neighbor lists
 c
@@ -1655,7 +1655,7 @@ c
 c     test sites for displacement exceeding half the buffer
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          xi = x(i)
@@ -1678,7 +1678,7 @@ c
 c
 c     rebuild the higher numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          if (update(i)) then
@@ -1704,7 +1704,7 @@ c
 c
 c     adjust lists for lower numbered neighbors of updated sites
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          if (update(i)) then
@@ -1794,7 +1794,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,k,ii,kk,xi,yi,zi,xr,yr,zr,r2)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     store new coordinates to reflect update of the site
 c
@@ -1910,7 +1910,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(i,j,k,ii,kk,xi,yi,zi,
 !$OMP& xr,yr,zr,r2,kgy,kgz,start,stop,repeat)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over all atoms computing the neighbor lists
 c

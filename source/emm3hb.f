@@ -907,7 +907,7 @@ c
 !$OMP& dielec,atomic,bl,bndlist,abuck,bbuck,cbuck,expmin2,
 !$OMP& expcut2,expmerge,cut2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev)
-!$OMP DO reduction(+:ev) schedule(guided)
+!$OMP DO reduction(+:ev)
 c
 c     find the van der Waals energy via neighbor list search
 c

@@ -205,7 +205,7 @@ c
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP& f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es,des,drb,vir)
-!$OMP DO reduction(+:es,des,drb,vir) schedule(guided)
+!$OMP DO reduction(+:es,des,drb,vir)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -400,7 +400,7 @@ c
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es,des,drb,vir)
-!$OMP DO reduction(+:es,des,drb,vir) schedule(guided)
+!$OMP DO reduction(+:es,des,drb,vir)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -879,7 +879,7 @@ c
 !$OMP& rpole,uinds,uinps,use_group,off2,gkc,fc,fd,fq,poltyp)
 !$OMP& shared(es,des,drb,drbp,trq,trqi,vir)
 !$OMP DO reduction(+:es,des,drb,drbp,trq,trqi,vir)
-!$OMP& schedule(guided)
+!$OMP&
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -2720,7 +2720,7 @@ c
 !$OMP& u3scale,u4scale,dpequal,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP& shared(es,des,trqi)
-!$OMP DO reduction(+:es,des,trqi) schedule(guided)
+!$OMP DO reduction(+:es,des,trqi)
 c
 c     calculate the multipole interaction energy and gradient
 c
@@ -3750,7 +3750,7 @@ c
 !$OMP& off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
 !$OMP& shared(es,des,trqi)
-!$OMP DO reduction(+:es,des,trqi) schedule(guided)
+!$OMP DO reduction(+:es,des,trqi)
 c
 c     calculate the multipole interaction energy and gradient
 c
@@ -4869,7 +4869,7 @@ c
 !$OMP PARALLEL default(private) shared(n,class,epsdsp,
 !$OMP& raddsp,x,y,z,cdsp)
 !$OMP& shared(edisp,des)
-!$OMP DO reduction(+:edisp,des) schedule(guided)
+!$OMP DO reduction(+:edisp,des)
 c
 c     find the WCA dispersion energy and gradient components
 c

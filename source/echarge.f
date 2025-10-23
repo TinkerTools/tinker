@@ -662,7 +662,7 @@ c
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP& ebuffer)
 !$OMP& firstprivate(cscale) shared (ec)
-!$OMP DO reduction(+:ec) schedule(guided)
+!$OMP DO reduction(+:ec)
 c
 c     calculate the charge interaction energy term
 c
@@ -1467,7 +1467,7 @@ c
 !$OMP& f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,c1scale,
 !$OMP& c2scale,c3scale,c4scale,c5scale,use_group,off2,aewald,ebuffer)
 !$OMP& firstprivate(cscale) shared (ec)
-!$OMP DO reduction(+:ec) schedule(guided)
+!$OMP DO reduction(+:ec)
 c
 c     compute the real space portion of the Ewald summation
 c

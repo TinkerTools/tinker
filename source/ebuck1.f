@@ -961,7 +961,7 @@ c
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,abuck,
 !$OMP& bbuck,cbuck,expcut2,expmerge,cut2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,vir)
-!$OMP DO reduction(+:ev,dev,vir) schedule(guided)
+!$OMP DO reduction(+:ev,dev,vir)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c

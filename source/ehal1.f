@@ -1037,7 +1037,7 @@ c
 !$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalpha,c0,c1,
 !$OMP& c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,vir)
-!$OMP DO reduction(+:ev,dev,vir) schedule(guided)
+!$OMP DO reduction(+:ev,dev,vir)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c

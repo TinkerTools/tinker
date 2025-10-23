@@ -843,7 +843,7 @@ c
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
-!$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
+!$OMP DO reduction(+:ec,nec,aec,einter)
 c
 c     compute and partition the charge interaction energy
 c
@@ -1889,7 +1889,7 @@ c
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
-!$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
+!$OMP DO reduction(+:ec,nec,aec,einter)
 c
 c     compute the real space portion of the Ewald summation
 c

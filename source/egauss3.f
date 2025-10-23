@@ -869,7 +869,7 @@ c
 !$OMP& expcut,cut2,c0,c1,c2,c3,c4,c5,molcule,name,verbose,
 !$OMP& debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
-!$OMP DO reduction(+:ev,nev,aev,einter) schedule(guided)
+!$OMP DO reduction(+:ev,nev,aev,einter)
 c
 c     find the van der Waals energy via neighbor list search
 c

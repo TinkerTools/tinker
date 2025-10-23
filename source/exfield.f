@@ -42,7 +42,7 @@ c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
 !$OMP&    x,y,z,f,pchg,exfld,exf)
-!$OMP    DO reduction(+:exf) schedule(guided)
+!$OMP    DO reduction(+:exf)
          do ii = 1, nion
             i = iion(ii)
             if (use(i)) then
@@ -64,7 +64,7 @@ c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
 !$OMP&    x,y,z,f,rpole,exfld,exf)
-!$OMP    DO reduction(+:exf) schedule(guided)
+!$OMP    DO reduction(+:exf)
          do ii = 1, npole
             i = ipole(ii)
             if (use(i)) then
@@ -136,7 +136,7 @@ c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
 !$OMP&    x,y,z,f,pchg,exfld,exf,dec,vir)
-!$OMP    DO reduction(+:exf,dec,vir) schedule(guided)
+!$OMP    DO reduction(+:exf,dec,vir)
          do ii = 1, nion
             i = iion(ii)
             if (use(i)) then
@@ -185,7 +185,7 @@ c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
 !$OMP&    x,y,z,xaxis,yaxis,zaxis,f,rpole,exfld,exf,dem,vir)
-!$OMP    DO reduction(+:exf,dem,vir) schedule(guided)
+!$OMP    DO reduction(+:exf,dem,vir)
          do ii = 1, npole
             i = ipole(ii)
             if (use(i)) then
@@ -307,7 +307,7 @@ c
       if (mode .eq. 'CHARGE') then
 !$OMP    PARALLEL default(private) shared(nion,iion,use,
 !$OMP&    x,y,z,f,pchg,exfld,exf,nec,aec)
-!$OMP    DO reduction(+:exf,nec,aec) schedule(guided)
+!$OMP    DO reduction(+:exf,nec,aec)
          do ii = 1, nion
             i = iion(ii)
             if (use(i)) then
@@ -331,7 +331,7 @@ c
       if (mode .eq. 'MPOLE') then
 !$OMP    PARALLEL default(private) shared(npole,ipole,use,
 !$OMP&    x,y,z,f,rpole,exfld,exf,nem,aem)
-!$OMP    DO reduction(+:exf,nem,aem) schedule(guided)
+!$OMP    DO reduction(+:exf,nem,aem)
          do ii = 1, npole
             i = ipole(ii)
             if (use(i)) then

@@ -81,7 +81,7 @@ c
 !$OMP PARALLEL default(private) shared(nitors,iitors,use,x,y,z,
 !$OMP& itors1,itors2,itors3,itorunit,eps,use_group,use_polymer)
 !$OMP& shared(eit,deit,vir)
-!$OMP DO reduction(+:eit,deit,vir) schedule(guided)
+!$OMP DO reduction(+:eit,deit,vir)
 c
 c     calculate the improper torsional angle energy term
 c

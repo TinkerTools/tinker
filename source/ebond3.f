@@ -65,7 +65,7 @@ c
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eb,neb,aeb)
-!$OMP DO reduction(+:eb,neb,aeb) schedule(guided)
+!$OMP DO reduction(+:eb,neb,aeb)
 c
 c     calculate the bond stretching energy term
 c

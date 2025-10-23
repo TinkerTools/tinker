@@ -1714,7 +1714,7 @@ c
 !$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,dpequal,
 !$OMP& use_thole,use_chgpen,use_bounds,off2,field,fieldp)
 !$OMP& firstprivate(dscale,pscale) shared (fieldt,fieldtp)
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp)
 c
 c     find the electrostatic field due to permanent multipoles
 c
@@ -2072,7 +2072,7 @@ c
 !$OMP& u1scale,u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,
 !$OMP& nelst,elst,use_thole,use_chgpen,use_bounds,off2,field,fieldp)
 !$OMP& firstprivate(uscale,wscale) shared (fieldt,fieldtp)
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp)
 c
 c     find the electrostatic field due to mutual induced dipoles
 c
@@ -4468,7 +4468,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,uind,uinp,
 !$OMP& ntpair,tindex,tdipdip,field,fieldp,fieldt,fieldtp)
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp)
 c
 c     find the field terms for each pairwise interaction
 c
@@ -5156,7 +5156,7 @@ c
 !$OMP& x,y,z,off2,fc,fd,fq,gkc,field,fieldp,fields,fieldps)
 !$OMP& firstprivate(dscale,pscale)
 !$OMP& shared(fieldt,fieldtp,fieldts,fieldtps)
-!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
 c
 c     find the field terms for each pairwise interaction
 c
@@ -5693,7 +5693,7 @@ c
 !$OMP& u2scale,u3scale,u4scale,use_intra,x,y,z,off2,fd,gkc,field,
 !$OMP& fieldp,fields,fieldps)
 !$OMP& firstprivate(uscale) shared(fieldt,fieldtp,fieldts,fieldtps)
-!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps) schedule(guided)
+!$OMP DO reduction(+:fieldt,fieldtp,fieldts,fieldtps)
 c
 c     find the field terms for each pairwise interaction
 c
@@ -7399,7 +7399,7 @@ c
          if (use_ulist) then
 !$OMP PARALLEL default(private) shared(npole,ipole,mindex,
 !$OMP& minv,nulst,ulst,rsd,rsdp,zrsd,zrsdp,zrsdt,zrsdtp)
-!$OMP DO reduction(+:zrsdt,zrsdtp) schedule(guided)
+!$OMP DO reduction(+:zrsdt,zrsdtp)
             do ii = 1, npole
                i = ipole(ii)
                m = mindex(i)
@@ -7491,7 +7491,7 @@ c
 c
 c     determine the off-diagonal elements of the preconditioner
 c
-!$OMP DO schedule(guided)
+!$OMP DO
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)

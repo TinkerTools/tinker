@@ -2110,7 +2110,7 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(nref,n,x,y,z,n12,molcule,dxx2,dxh2,dhh2,remove,
 !$OMP& header,icount,iout)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     search for close contacts between solute and solvent
 c
@@ -2345,7 +2345,7 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,molcule,close2,remove,header,nsolute,
 !$OMP& isolute,icount,iout)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     search for short distance between solute and solvent
 c

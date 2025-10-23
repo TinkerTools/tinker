@@ -59,7 +59,7 @@ c
 !$OMP PARALLEL default(private) shared(nangang,iaa,iang,
 !$OMP& use,x,y,z,anat,kaa,aaunit,eps,use_group,use_polymer)
 !$OMP& shared(eaa)
-!$OMP DO reduction(+:eaa) schedule(guided)
+!$OMP DO reduction(+:eaa)
 c
 c     calculate the angle-angle interaction energy term
 c

@@ -79,7 +79,7 @@ c
 !$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
 !$OMP& anat,bl,bk,use,x,y,z,stbnunit,eps,use_group,use_polymer)
 !$OMP& shared(eba,deba,vir)
-!$OMP DO reduction(+:eba,deba,vir) schedule(guided)
+!$OMP DO reduction(+:eba,deba,vir)
 c
 c     calculate the stretch-bend energy and first derivatives
 c

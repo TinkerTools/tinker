@@ -596,7 +596,7 @@ c
 !$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,f,off2,
 !$OMP& exfld,use_exfld)
 !$OMP& firstprivate(pscale) shared (ep)
-!$OMP DO reduction(+:ep) schedule(guided)
+!$OMP DO reduction(+:ep)
 c
 c     compute the dipole polarization energy component
 c
@@ -770,7 +770,7 @@ c
 c     increment polarization energy due to external field
 c
       if (use_exfld) then
-!$OMP    DO reduction(+:ep) schedule(guided)
+!$OMP    DO reduction(+:ep)
          do i = 1, npole
             e = 0.0d0
             do j = 1, 3
@@ -1570,7 +1570,7 @@ c
 !$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,
 !$OMP& exfld,use_exfld)
 !$OMP& firstprivate(pscale) shared (ep)
-!$OMP DO reduction(+:ep) schedule(guided)
+!$OMP DO reduction(+:ep)
 c
 c     compute the dipole polarization energy component
 c
@@ -1761,7 +1761,7 @@ c
 c     increment polarization energy due to external field
 c
       if (use_exfld) then
-!$OMP    DO reduction(+:ep) schedule(guided)
+!$OMP    DO reduction(+:ep)
          do i = 1, npole
             e = 0.0d0
             do j = 1, 3
@@ -1839,7 +1839,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(shared) private(ii,j,fi,e)
-!$OMP DO reduction(+:ep) schedule(guided)
+!$OMP DO reduction(+:ep)
 c
 c     get polarization energy via induced dipoles times field
 c

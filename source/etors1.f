@@ -112,7 +112,7 @@ c
 !$OMP PARALLEL default(private) shared(ntors,itors,tors1,tors2,tors3,
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,eps,use_group,use_polymer)
 !$OMP& shared(et,det,vir)
-!$OMP DO reduction(+:et,det,vir) schedule(guided)
+!$OMP DO reduction(+:et,det,vir)
 c
 c     calculate the torsional angle energy and first derivatives
 c

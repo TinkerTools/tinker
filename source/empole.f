@@ -618,7 +618,7 @@ c
 !$OMP& m4scale,m5scale,f,nelst,elst,use_chgpen,use_group,use_intra,
 !$OMP& use_bounds,off2)
 !$OMP& firstprivate(mscale) shared (em)
-!$OMP DO reduction(+:em) schedule(guided)
+!$OMP DO reduction(+:em)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1587,7 +1587,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& f,nelst,elst,use_bounds,use_chgpen,off2)
 !$OMP& firstprivate(mscale) shared (em)
-!$OMP DO reduction(+:em) schedule(guided)
+!$OMP DO reduction(+:em)
 c
 c     compute the real space portion of the Ewald summation
 c

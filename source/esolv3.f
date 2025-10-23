@@ -266,7 +266,7 @@ c
 !$OMP& f,pchg,rborn,use_group,off,off2,cut,cut2,molcule,
 !$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es,nes,aes,einter)
-!$OMP DO reduction(+:es,nes,aes,einter) schedule(guided)
+!$OMP DO reduction(+:es,nes,aes,einter)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -412,7 +412,7 @@ c
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
 !$OMP& molcule,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es,nes,aes,einter)
-!$OMP DO reduction(+:es,nes,aes,einter) schedule(guided)
+!$OMP DO reduction(+:es,nes,aes,einter)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -764,7 +764,7 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
 !$OMP& rborn,rpole,uinds,use_group,off2,molcule,gkc,fc,fd,fq)
 !$OMP& shared(es,nes,aes,eself,ecross,einter)
-!$OMP DO reduction(+:es,nes,aes,eself,ecross,einter) schedule(guided)
+!$OMP DO reduction(+:es,nes,aes,eself,ecross,einter)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -1317,7 +1317,7 @@ c
 !$OMP& ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale) shared(es,nes,aes,epvac)
-!$OMP DO reduction(+:es,nes,aes,epvac) schedule(guided)
+!$OMP DO reduction(+:es,nes,aes,epvac)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1729,7 +1729,7 @@ c
 !$OMP PARALLEL default(private) shared(n,class,epsdsp,
 !$OMP& raddsp,x,y,z,cdsp)
 !$OMP& shared(edisp,aedispo)
-!$OMP DO reduction(+:edisp,aedispo) schedule(guided)
+!$OMP DO reduction(+:edisp,aedispo)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c

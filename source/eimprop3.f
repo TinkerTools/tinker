@@ -81,7 +81,7 @@ c
 !$OMP& x,y,z,kprop,vprop,idihunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eid,neid,aeid)
-!$OMP DO reduction(+:eid,neid,aeid) schedule(guided)
+!$OMP DO reduction(+:eid,neid,aeid)
 c
 c     calculate the improper dihedral angle energy term
 c

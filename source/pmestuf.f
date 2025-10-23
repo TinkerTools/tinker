@@ -446,7 +446,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over sites to find the spatial chunks for each
 c
@@ -644,7 +644,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -767,7 +767,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     put the permanent multipole moments onto the grid
 c
@@ -903,7 +903,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     put the induced dipole moments onto the grid
 c
@@ -1034,7 +1034,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     put the dispersion sites onto the grid
 c
@@ -1178,7 +1178,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nion,iion,igrid,bsorder,
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     get partial charge potential and field at each site
 c
@@ -1276,7 +1276,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     get permanent multipole potential and field at each site
 c
@@ -1459,7 +1459,7 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
 !$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fdip_phi1,
 !$OMP& fdip_phi2,fdip_sum_phi)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     get induced dipole potential and field at each site
 c

@@ -72,7 +72,7 @@ c
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eopd,neopd,aeopd)
-!$OMP DO reduction(+:eopd,neopd,aeopd) schedule(guided)
+!$OMP DO reduction(+:eopd,neopd,aeopd)
 c
 c     calculate the out-of-plane distance energy term
 c

@@ -66,7 +66,7 @@ c
 !$OMP PARALLEL default(private) shared(nstrtor,ist,itors,kst,bl,
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,eps,use_group,use_polymer)
 !$OMP& shared(ebt)
-!$OMP DO reduction(+:ebt) schedule(guided)
+!$OMP DO reduction(+:ebt)
 c
 c     calculate the stretch-torsion interaction energy term
 c
