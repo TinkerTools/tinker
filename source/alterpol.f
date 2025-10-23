@@ -532,7 +532,7 @@ c
 c
 c     find inverse of the polarizability scaling matrix
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 3

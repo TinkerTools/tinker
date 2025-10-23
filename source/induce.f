@@ -3264,7 +3264,7 @@ c
       implicit none
       integer i,j,k,m
       integer ii,kk
-      integer nlocal,nchunk
+      integer nlocal,nslice
       integer tid,maxlocal
 !$    integer omp_get_thread_num
       integer, allocatable :: toffset(:)
@@ -3313,7 +3313,7 @@ c
 c
 c     values for storage of mutual polarization intermediates
 c
-      nchunk = int(0.5d0*dble(n)/dble(nthread)) + 1
+      nslice = int(0.5d0*dble(n)/dble(nthread)) + 1
       maxlocal = int(dble(n)*dble(maxelst)/dble(nthread))
       nlocal = 0
       ntpair = 0
@@ -3358,9 +3358,9 @@ c
 !$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& nelst,elst,dpequal,use_thole,use_chgpen,use_bounds,off2,poltyp,
-!$OMP& nchunk,ntpair,tindex,tdipdip,toffset,field,fieldp,fieldt,fieldtp)
+!$OMP& nslice,ntpair,tindex,tdipdip,toffset,field,fieldp,fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
-!$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nchunk)
+!$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nslice)
 c
 c     compute the real space portion of the Ewald summation
 c

@@ -433,7 +433,7 @@ c
 !$OMP PARALLEL default(private) shared(n,nchunk,pmetable,igrid,
 !$OMP& nfft1,nfft2,nfft3,nchk1,nchk2,nchk3,ngrd1,ngrd2,ngrd3,
 !$OMP& nlpts,nrpts,grdoff)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     zero out the PME table marking chunks per site
 c
@@ -628,7 +628,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -751,7 +751,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -887,7 +887,7 @@ c
 !$OMP& pmetable,nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,
 !$OMP& ngrd2,ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     zero out the particle mesh Ewald grid
 c
@@ -1018,7 +1018,7 @@ c
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
 !$OMP& shared(qgrid)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     zero out the particle mesh Ewald grid
 c

@@ -211,7 +211,7 @@ c
 c
 c     check to see if any neighbor lists are too long
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nvdw
          i = ivdw(ii)
          if (nvlst(i) .ge. maxvlst) then
@@ -591,7 +591,7 @@ c
 c
 c     check to see if any neighbor lists are too long
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, ndisp
          i = idisp(ii)
          if (nvlst(i) .ge. maxvlst) then
@@ -975,7 +975,7 @@ c
 c
 c     check to see if any neighbor lists are too long
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, nion
          i = iion(ii)
          if (nelst(i) .ge. maxelst) then
@@ -1366,7 +1366,7 @@ c
 c
 c     check to see if any neighbor lists are too long
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          if (nelst(i) .ge. maxelst) then
@@ -1748,7 +1748,7 @@ c
 c
 c     check to see if any neighbor lists are too long
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          if (nulst(i) .ge. maxulst) then
