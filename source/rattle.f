@@ -708,8 +708,8 @@ c     rigid planar four-site water molecules to the H-O-H atoms
 c
 c     note this routine is needed due to instability of SHAKE and
 c     RATTLE algorithms when four constrained sites lie in a plane;
-c     gradient components of the fourth atom are moved to the other
-c     atoms, and fourth atom ideal coordinates are set elsewhere
+c     gradient components of the fourth atie are moved to the other
+c     atoms, and fourth site ideal coordinates are set elsewhere
 c
 c
       subroutine water4 (derivs)

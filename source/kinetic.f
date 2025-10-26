@@ -13,7 +13,7 @@ c     #################################################################
 c
 c
 c     "kinetic" computes the total kinetic energy and kinetic energy
-c     contributions to the pressure tensor by summing over velocities
+c     tensor components by summing over the velocities
 c
 c
       subroutine kinetic (eksum,ekin,temp)

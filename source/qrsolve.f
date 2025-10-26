@@ -12,13 +12,12 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "qrfact" computes the QR factorization of an m by n matrix a
-c     via Householder transformations with optional column pivoting;
-c     the routine determines an orthogonal matrix q, a permutation
-c     matrix p, and an upper trapezoidal matrix r with diagonal
-c     elements of nonincreasing magnitude, such that a*p = q*r; the
-c     Householder transformation for column k, k = 1,2,...,min(m,n),
-c     is of the form:
+c     "qrfact" computes the QR factorization of an m by n matrix via
+c     a Householder transformations with optional column pivoting;
+c     it finds an orthogonal matrix q, permutation matrix p, and upper
+c     trapezoidal matrix r with diagonal elements of nonincreasing
+c     magnitude, such that a*p = q*r; the Householder transformation
+c     for column k, k = 1,2,...,min(m,n), is of the form:
 c
 c               i - (1/u(k))*u*u(transpose)
 c
