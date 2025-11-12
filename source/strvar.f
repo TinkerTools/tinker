@@ -20,7 +20,6 @@ c
       module strvar
       implicit none
       integer istress
-      real*8 stresfrq
       logical stresav
       save
       end

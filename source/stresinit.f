@@ -15,9 +15,6 @@ c
 c     "stresinit" checks if user requests outputting the stress tensor  
 c     and if so, how often.
 c
-c     NOTE: This is the minimum amount of code required for functionality.
-c     A future "stresinit" update could add logic to verify that correct 
-c     ensemble (NVT) and thermostat (Velocity-Scaling) are selected.
 c
 c
       subroutine stresinit (dt)
@@ -34,7 +31,7 @@ c
 c     set default values for stress tensor output variables
 c
       stresav = .false.
-      stresfrq = 10.0d0
+      istress = 10
 c
 c     search keywords for stress output parameters
 c
@@ -47,13 +44,9 @@ c
          if (keyword(1:12) .eq. 'SAVE-STRESS ') then
             stresav = .true.
          else if (keyword(1:12) .eq. 'STRESS-FREQ ') then
-            read (string,*,err=10,end=10) stresfrq
+            read (string,*,err=10,end=10) istress
          end if
    10    continue
       end do
-      if (stresav) then
-         stresfrq = 0.001d0 * stresfrq
-         istress = nint(stresfrq/dt)
-      end if
       return
       end
