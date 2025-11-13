@@ -176,6 +176,7 @@ c
 c
 c     compute statistics and save trajectory for this step
 c
+      call prtstres (istep,stress)
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)
