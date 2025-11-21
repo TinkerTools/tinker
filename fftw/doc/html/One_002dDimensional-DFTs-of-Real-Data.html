@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: One-Dimensional DFTs of Real Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>One-Dimensional DFTs of Real Data (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: One-Dimensional DFTs of Real Data">
-<meta name="keywords" content="FFTW 3.3.8: One-Dimensional DFTs of Real Data">
+<meta name="description" content="One-Dimensional DFTs of Real Data (FFTW 3.3.10)">
+<meta name="keywords" content="One-Dimensional DFTs of Real Data (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Tutorial.html#Tutorial" rel="up" title="Tutorial">
-<link href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data" rel="next" title="Multi-Dimensional DFTs of Real Data">
-<link href="Complex-Multi_002dDimensional-DFTs.html#Complex-Multi_002dDimensional-DFTs" rel="prev" title="Complex Multi-Dimensional DFTs">
+<link href="Tutorial.html" rel="up" title="Tutorial">
+<link href="Multi_002dDimensional-DFTs-of-Real-Data.html" rel="next" title="Multi-Dimensional DFTs of Real Data">
+<link href="Complex-Multi_002dDimensional-DFTs.html" rel="prev" title="Complex Multi-Dimensional DFTs">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,18 +59,16 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="One_002dDimensional-DFTs-of-Real-Data"></a>
-<div class="header">
+<span id="One_002dDimensional-DFTs-of-Real-Data"></span><div class="header">
 <p>
-Next: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data" accesskey="n" rel="next">Multi-Dimensional DFTs of Real Data</a>, Previous: <a href="Complex-Multi_002dDimensional-DFTs.html#Complex-Multi_002dDimensional-DFTs" accesskey="p" rel="prev">Complex Multi-Dimensional DFTs</a>, Up: <a href="Tutorial.html#Tutorial" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html" accesskey="n" rel="next">Multi-Dimensional DFTs of Real Data</a>, Previous: <a href="Complex-Multi_002dDimensional-DFTs.html" accesskey="p" rel="prev">Complex Multi-Dimensional DFTs</a>, Up: <a href="Tutorial.html" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="One_002dDimensional-DFTs-of-Real-Data-1"></a>
-<h3 class="section">2.3 One-Dimensional DFTs of Real Data</h3>
+<span id="One_002dDimensional-DFTs-of-Real-Data-1"></span><h3 class="section">2.3 One-Dimensional DFTs of Real Data</h3>
 
 <p>In many practical applications, the input data <code>in[i]</code> are purely
 real numbers, in which case the DFT output satisfies the &ldquo;Hermitian&rdquo;
-<a name="index-Hermitian"></a>
+<span id="index-Hermitian"></span>
 redundancy: <code>out[i]</code> is the conjugate of <code>out[n-i]</code>.  It is
 possible to take advantage of these circumstances in order to achieve
 roughly a factor of two improvement in both speed and memory usage.
@@ -90,7 +79,7 @@ input and output arrays are of <em>different sizes and types</em>: the
 input is <code>n</code> real numbers, while the output is <code>n/2+1</code>
 complex numbers (the non-redundant outputs); this also requires slight
 &ldquo;padding&rdquo; of the input array for
-<a name="index-padding"></a>
+<span id="index-padding"></span>
 in-place transforms.  Second, the inverse transform (complex to real)
 has the side-effect of <em>overwriting its input array</em>, by default.
 Neither of these inconveniences should pose a serious problem for
@@ -111,22 +100,22 @@ and there are new routines to create the plan.  In one dimension:
 fftw_plan fftw_plan_dft_c2r_1d(int n, fftw_complex *in, double *out,
                                unsigned flags);
 </pre></div>
-<a name="index-fftw_005fplan_005fdft_005fr2c_005f1d"></a>
-<a name="index-fftw_005fplan_005fdft_005fc2r_005f1d"></a>
+<span id="index-fftw_005fplan_005fdft_005fr2c_005f1d"></span>
+<span id="index-fftw_005fplan_005fdft_005fc2r_005f1d"></span>
 
 <p>for the real input to complex-Hermitian output (<em>r2c</em>) and
 complex-Hermitian input to real output (<em>c2r</em>) transforms.
-<a name="index-r2c"></a>
-<a name="index-c2r"></a>
+<span id="index-r2c"></span>
+<span id="index-c2r"></span>
 Unlike the complex DFT planner, there is no <code>sign</code> argument.
 Instead, r2c DFTs are always <code>FFTW_FORWARD</code> and c2r DFTs are
 always <code>FFTW_BACKWARD</code>.
-<a name="index-FFTW_005fFORWARD-1"></a>
-<a name="index-FFTW_005fBACKWARD-1"></a>
+<span id="index-FFTW_005fFORWARD-1"></span>
+<span id="index-FFTW_005fBACKWARD-1"></span>
 (For single/long-double precision
 <code>fftwf</code> and <code>fftwl</code>, <code>double</code> should be replaced by
 <code>float</code> and <code>long double</code>, respectively.)
-<a name="index-precision-1"></a>
+<span id="index-precision-1"></span>
 </p>
 
 <p>Here, <code>n</code> is the &ldquo;logical&rdquo; size of the DFT, not necessarily the
@@ -134,7 +123,7 @@ physical size of the array.  In particular, the real (<code>double</code>)
 array has <code>n</code> elements, while the complex (<code>fftw_complex</code>)
 array has <code>n/2+1</code> elements (where the division is rounded down).
 For an in-place transform,
-<a name="index-in_002dplace-1"></a>
+<span id="index-in_002dplace-1"></span>
 <code>in</code> and <code>out</code> are aliased to the same array, which must be
 big enough to hold both; so, the real array would actually have
 <code>2*(n/2+1)</code> elements, where the elements beyond the first
@@ -151,8 +140,8 @@ efficient, but an <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>)
 out-of-place transforms.  This can be prevented, if necessary, by
 including <code>FFTW_PRESERVE_INPUT</code> in the <code>flags</code>, with
 unfortunately some sacrifice in performance.
-<a name="index-flags-1"></a>
-<a name="index-FFTW_005fPRESERVE_005fINPUT"></a>
+<span id="index-flags-1"></span>
+<span id="index-FFTW_005fPRESERVE_005fINPUT"></span>
 This flag is also not currently supported for multi-dimensional real
 DFTs (next section).
 </p>
@@ -166,16 +155,16 @@ multi-dimensional transforms, and the space savings are miniscule in
 any case; FFTW does not support it.
 </p>
 <p>An alternative interface for one-dimensional r2c and c2r DFTs can be
-found in the &lsquo;<samp>r2r</samp>&rsquo; interface (see <a href="The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT">The Halfcomplex-format DFT</a>), with &ldquo;halfcomplex&rdquo;-format output that <em>is</em> the same size
+found in the &lsquo;<samp>r2r</samp>&rsquo; interface (see <a href="The-Halfcomplex_002dformat-DFT.html">The Halfcomplex-format DFT</a>), with &ldquo;halfcomplex&rdquo;-format output that <em>is</em> the same size
 (and type) as the input array.
-<a name="index-halfcomplex-format"></a>
+<span id="index-halfcomplex-format"></span>
 That interface, although it is not very useful for multi-dimensional
 transforms, may sometimes yield better performance.
 </p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data" accesskey="n" rel="next">Multi-Dimensional DFTs of Real Data</a>, Previous: <a href="Complex-Multi_002dDimensional-DFTs.html#Complex-Multi_002dDimensional-DFTs" accesskey="p" rel="prev">Complex Multi-Dimensional DFTs</a>, Up: <a href="Tutorial.html#Tutorial" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html" accesskey="n" rel="next">Multi-Dimensional DFTs of Real Data</a>, Previous: <a href="Complex-Multi_002dDimensional-DFTs.html" accesskey="p" rel="prev">Complex Multi-Dimensional DFTs</a>, Up: <a href="Tutorial.html" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

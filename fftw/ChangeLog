@@ -1,3 +1,382 @@
+commit 7184fc796279cfa70e4ba62519ac2938054584e6
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Tue Sep 14 10:41:20 2021 -0400
+
+    Update configure.ac for 3.3.10
+
+commit 62e605c845d3c366849f48c977dfe0e320c23ff0
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Mon May 31 09:55:57 2021 -0400
+
+    Use -mavx2 instead of -march=core-avx2
+    
+    It appears that -march=core-avx2 was necessary on some old version of
+    gcc-4.8, but setting -march is problematic for users who want to set
+    -march themselves.
+    
+    It appears that whatever gcc bug caused us to use -march=core-avx2 in
+    2015 is long gone.  I have checked gcc-4.8.5 on centos-7 and
+    oraclelinux-7 (both 64-bit) and on 32-bit debian jessie and in all
+    cases -mavx2 is sufficient.
+    
+    Therefore, given that the original cause for using -march is gone and
+    that using -march causes problems, I am removing the automatic
+    selection of -march=core-avx2 and I am using -mavx2 instead.  Users
+    for whom this is a problem can still override the default via
+    
+      ./configure --enable-avx2 AVX2_CFLAGS=...
+
+commit e9c510bf92a4fa848982310d2ecc8c5701aa3f6a
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Thu Feb 25 17:52:44 2021 -0500
+
+    Update NEWS.
+    
+    Bugfix 06855286 is noteworthy.
+
+commit 06855286332683aa79a541eddc07ee535cfa4f95
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Thu Feb 25 10:15:04 2021 -0500
+
+    Fix aligment checks for n2*v codelets.
+    
+    n2{f,b}v codelets assume that all loads and stores are aligned.
+    Thus, not only the pointers must be aligned, but all strides must
+    be aligned as well (in the ALIGNEDA sense).
+    
+    For some reason, two-way SIMD, including double-precision sse2,
+    defined SIMD_VSTRIDE_OKA(ivs) to be true always.  However, this is
+    incorrect because the codelet only works if ivs is even.  This change
+    implements the correct condition in all places where it matters.
+    
+    Thanks Kuangdai Leng for the bug report.
+    
+    This bug is deeply puzzling.  First, I don't understand how this
+    bug survived for years despite uncountable randomized tests.  Second,
+    I am pretty sure I fixed exactly this issue years ago and I don't
+    understand how it came back.
+
+commit d738232235af6c96bc4a28b07fc867c000696245
+Author: Rui Oliveira <ruimail24@gmail.com>
+Date:   Wed Feb 24 15:58:23 2021 +0000
+
+    Fix SIMD detection for MSVC (#232)
+
+commit 17b4252e3da62490d3e206569ebfec552d09afc1
+Author: Vincent Jacques <vincent@vincent-jacques.net>
+Date:   Sun Dec 27 20:16:40 2020 +0100
+
+    Doc: remove duplicated "the" (#226)
+
+commit 34082eb5d6ed7dc9436915df69f376c06fc39762
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Thu Dec 10 06:54:31 2020 -0500
+
+    Updated NEWS for fftw-3.3.9
+
+commit a67409c50acd19180cc9b8f61c67354d392a9e66
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Tue Oct 20 12:20:45 2020 -0400
+
+    undo inadvertent change in cdb950a60c8a5b723f25ec24639a824e021b780d
+
+commit 16164a7bf3257376f22ddeda0842805d1c456b01
+Author: Galen Lynch <glynch@mit.edu>
+Date:   Thu Aug 20 13:22:23 2020 -0400
+
+    First attempt at adding planner_nthreads (#205)
+    
+    * First attempt at adding planner_nthreads
+    
+    While you can currently set the maximum number of threads used by the planner,
+    there is no way to check that number. This simply adds a new function,
+    `planner_nthreads`, that provides this information, as was suggested by
+    @stevengj.
+    
+    * Add basic testing of planner_nthreads
+    
+    In an attempt to verify that planner_nthreads works as intended, I have added an
+    assertion in `fftw-bench.c` that `planner_nthreads` returns the nthreads just
+    passed as an argument to `plan_with_nthreads`.
+
+commit 8266ecd946bebf3214c3b13880c8c2110f0600a4
+Author: Robin Lu <19875776+Lqlsoftware@users.noreply.github.com>
+Date:   Thu Aug 13 22:45:16 2020 +0800
+
+    Misspell: imlementation to implementation (#207)
+
+commit 10e2040af822a08ed49d2f6a1db45a7a3ad50582
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Wed Aug 5 14:44:41 2020 -0400
+
+    -no-gcc seems to have not been required with icc for years now, and is starting to cause problems with system headers on other platforms (fixes #184)
+
+commit 78e01190450398d44c7ba7ac69d3e720b6af1f16
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Wed Jul 1 08:24:32 2020 -0400
+
+    tag upper bound is 0x7fff, not 0xffff (fixes #206)
+
+commit fe55435ee880569b85446ff9ba6640a7db53a025
+Author: Holy Wu <holywu@gmail.com>
+Date:   Wed Jul 1 06:04:27 2020 +0800
+
+    Fix x86 compilation in MSVC (#198)
+
+commit d832ca0e2f286650278563c6887c4f235785e606
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Sat Jun 13 13:10:44 2020 -0400
+
+    Fix incorrect math in 128-bit generic SIMD
+    
+    It looks like simd-generic128.h:VTW1 was copied&pasted from
+    the equivalent SSE code, but the consumer of that structure
+    (BYTW1) was assuming a different format.
+
+commit ecba4071a7ece5c2fa6d93a21468a52dbb0522f5
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Sat Jun 6 07:25:34 2020 -0400
+
+    Update MIT contact address
+
+commit 516116615362334c2051a16ec1658a888573ab63
+Merge: 3a103f42 83707fdf
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Fri May 1 16:57:58 2020 -0400
+
+    Merge pull request #201 from muxator/patch-1
+    
+    README.md: link to README
+
+commit 83707fdf9118b10fd88f67b206e5a2d2b69764c1
+Author: muxator <muxator@users.noreply.github.com>
+Date:   Fri May 1 20:21:53 2020 +0200
+
+    README.md: link to README
+    
+    README.md refers the user to the text-only README, which contains - among other
+    things, build instructions. Since the two files have a very similar name, this
+    may lead to confusion for first-time users.
+    
+    With this commit, a relative hyperlink pointing to README is added in README.md,
+    in order to make it explicit what file is being referenced.
+
+commit 3a103f4258d2a2090aa9038503aae7ca56c50bea
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Tue Apr 14 20:35:45 2020 -0400
+
+    Add explicit cast for C++ compatibility
+
+commit ef15637f3241f8d2cc8fcefc2bb9e536de98d692
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Fri Apr 3 12:56:06 2020 -0400
+
+    Fix Makefile rules under -j N
+    
+    For some reason, given this Makefile:
+    
+    a: b c
+    
+    b c:
+           COMMANDS
+    
+    invoking "make -j 2 c" runs COMMANDS in parallel twice, which fails if
+    COMMANDS modify some global state.
+    
+    Hack around this quirk.
+
+commit db8b77525089448206b453279360b752f476d1cf
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Fri Apr 3 12:38:18 2020 -0400
+
+    Style Police
+
+commit 2a0f32012aaf3714ea4c4eccad5b4f053e85fb39
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Fri Apr 3 12:22:55 2020 -0400
+
+    Replace deprecated Sort.list with List.sort
+
+commit c69d6c3c7512a814efe229d15e51dda0c1590ee6
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Mon Jan 20 10:41:38 2020 -0500
+
+    Report mflops as %.8g (was %.5g)
+    
+    I got tired of seeing things like 1.15e5, prefer 115000.
+    
+    The drawback is that now bench reports things like 6839.6357 mflops,
+    where the 8-digit precision implies much more accuracy than we
+    actually have.
+
+commit cdb950a60c8a5b723f25ec24639a824e021b780d
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Fri Jan 17 11:11:48 2020 -0500
+
+    fix compilation w/o threads
+
+commit 8588d74f24c7d98dcc66466bb364210330639f69
+Author: Steven G. Johnson <stevenj@alum.mit.edu>
+Date:   Tue Sep 17 18:44:32 2019 -0400
+
+    soversion bump for API change
+
+commit 4a74466adfc93ca8748c4661de47cd9fa5c6bb46
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Tue Sep 17 17:53:50 2019 -0400
+
+    enable avx512 on clang (#177)
+
+commit 9126411654e6ac9c94202ceeb5a5af849ecac12c
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Tue Sep 17 14:44:29 2019 -0400
+
+    update 3.3.9 NEWS
+
+commit ec98679b6535a7a75a4348c697b8b7daaae53b64
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Tue Sep 17 14:41:30 2019 -0400
+
+    indentation
+
+commit ca3c9c7e56c608bf05f42a6e92a46cb01c0ffe46
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Tue Sep 17 14:40:23 2019 -0400
+
+    document fftw_threads_set_callback
+
+commit 4093e4b58528459afdb6ba9e373d5d7a2a3a22b0
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Tue Sep 17 14:23:53 2019 -0400
+
+    add test for fftw_threads_set_callback
+
+commit 8a9236c494f680e550c536eeb6aa7102ecfad2ca
+Author: Steven G. Johnson <stevenj@mit.edu>
+Date:   Mon Sep 16 15:48:40 2019 -0400
+
+    export threads_set_callback function properly, support in openmp as well as threads backend
+
+commit ffd28fd35b4ea6b29194ca2ef73994398fa9ee46
+Author: Steven G. Johnson <stevenj@alum.mit.edu>
+Date:   Wed Sep 4 21:14:52 2019 -0400
+
+    silence more generated code in .gitignore
+
+commit c5c85fe618a93bf6e41489bb65b6bf4e27224ff1
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Sat Aug 10 08:41:09 2019 -0400
+
+    README: note dependency on the Ocaml Num library.
+    
+    genfft needs the Ocaml Num library, which has been part of Ocaml for
+    more than twenty years but was suddenly removed in ocaml-4.06:
+    
+      * #1178: remove the Num library for arbitrary-precision arithmetic.
+        It now lives as a separate project https://github.com/ocaml/num
+        with an OPAM package called "num".
+        (Xavier Leroy)
+    
+    For now, note in README that Num is necessary, until I come up with a
+    better long-term plan.  Debian/ubuntu seem to have ocaml-4.05.  Fedora
+    30 has ocaml-4.07, but installing the ocaml-num-devel package seems to
+    be good enough.  I'll worry about this problem once more distibutions
+    upgrade ocaml.
+
+commit f1ad19cdac52f9f8d27c1e2fea55a16215408fd3
+Author: Steven G. Johnson <stevenj@alum.mit.edu>
+Date:   Fri Jul 26 16:01:18 2019 -0400
+
+    add internal fftw_threads_set_callback, closes #175
+
+commit d8bafdad0b460543fed9ff964f0de1c73cde249b
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Wed Jul 3 17:39:58 2019 -0400
+
+    fftw3.texi: use @finalout
+    
+    Avoid the \overfullrule black boxes when TeX cannot wrap long lines of
+    code.
+
+commit 9fcdd122574259f263ba5afa939e1a6d28581bb3
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Tue May 28 15:08:56 2019 -0400
+
+    make bigcheck: validate wisdom with multiple threads too
+
+commit 0062a1b23d035b44954fbfa8e05460a4bcddbe59
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Tue May 28 15:01:22 2019 -0400
+
+    make bigcheck: validate that problems can be solved in -owisdom-only mode
+
+commit ccdf1cdfed8f2cf863dd4a1e4ac7be8ef4df152f
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Thu May 16 15:58:54 2019 -0400
+
+    configure.ac: update version to fftw-3.3.9
+
+commit b43eba5ef5f1f6402b617b78e11b8e08d57988a6
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Thu May 16 15:55:25 2019 -0400
+
+    update NEWS
+
+commit ebde7c4e4607afb6bbba7e6609fae56ff0fda01b
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Thu May 16 15:49:28 2019 -0400
+
+    Fix alignment requirements for avx512
+    
+    The avx512 alignment requirement was set to 64 bytes, but this is
+    wrong.  Alignment requirements are a property of the platform (e.g.,
+    x86) and not of the instruction set (e.g., AVX).  Among other things,
+    this broke wisdom with avx512.
+    
+    Good thing that avx512 was marked as experimental.  It's still
+    experimental, because I have no hardware to test it.
+    
+    Thanks Tom Epperly for the bug report and debugging assistance.
+
+commit 77a2efdded4dceef1e6045313ae06e27265807ec
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Fri May 3 10:10:20 2019 -0400
+
+    CMakeLists: install fftw3.pc, not fftw.pc
+    
+    This resolves the discrepancy between "make" and "cmake".
+
+commit 4754dfd3f3149275c64896b78fbf3e8a36b7cc6c
+Merge: c6bebdb8 80a8d61e
+Author: Matteo Frigo <athena@fftw.org>
+Date:   Sun Dec 2 16:52:16 2018 -0500
+
+    Merge pull request #158 from katterjohn/typo-fix
+    
+    Fix the incorrect comment about Util.interval
+
+commit 80a8d61e8e25d75c58cfa3c02b7137dc5e930b97
+Author: Kris Katterjohn <katterjohn@gmail.com>
+Date:   Sun Dec 2 14:16:41 2018 -0600
+
+    Fix an incorrect comment
+
+commit c6bebdb84fafdfb1de8462f69276bd6a305f0154
+Author: José Mª Escartín <jme52@cam.ac.uk>
+Date:   Mon Oct 8 22:27:26 2018 +0200
+
+    Fix typo in Fortran quadruple-precision doc. (#155)
+    
+    The use of quadruple-precision with Fortran does not require
+    the inclusion of file fftw3l.f03, but it requires the inclusion
+    of file fftw3.f03.
+
+commit d59abdaaeb31af8a7d7f2d2ffa92931efd344e6c
+Author: Mario Emmenlauer <mario@emmenlauer.de>
+Date:   Fri Jun 15 03:31:40 2018 +0200
+
+    CMakeLists.txt: disable /bigobj on MSVC Intel compiler because its not required and not supported (#139)
+
 commit 700745cdbb34e964e1abda86183809fd8dd95796
 Author: Matteo Frigo <athena@fftw.org>
 Date:   Thu May 24 08:00:45 2018 -0400

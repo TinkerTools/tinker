@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:05:25 EDT 2018 */
+/* Generated on Tue Sep 14 10:45:27 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -54,10 +54,10 @@ static void t1fuv_2(R *ri, R *ii, const R *W, stride rs, INT mb, INT me, INT ms)
 
 static const tw_instr twinstr[] = {
      VTW(0, 1),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 2, XSIMD_STRING("t1fuv_2"), twinstr, &GENUS, {3, 2, 0, 0}, 0, 0, 0 };
+static const ct_desc desc = { 2, XSIMD_STRING("t1fuv_2"), twinstr, &GENUS, { 3, 2, 0, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_t1fuv_2) (planner *p) {
      X(kdft_dit_register) (p, t1fuv_2, &desc);
@@ -93,10 +93,10 @@ static void t1fuv_2(R *ri, R *ii, const R *W, stride rs, INT mb, INT me, INT ms)
 
 static const tw_instr twinstr[] = {
      VTW(0, 1),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 2, XSIMD_STRING("t1fuv_2"), twinstr, &GENUS, {3, 2, 0, 0}, 0, 0, 0 };
+static const ct_desc desc = { 2, XSIMD_STRING("t1fuv_2"), twinstr, &GENUS, { 3, 2, 0, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_t1fuv_2) (planner *p) {
      X(kdft_dit_register) (p, t1fuv_2, &desc);

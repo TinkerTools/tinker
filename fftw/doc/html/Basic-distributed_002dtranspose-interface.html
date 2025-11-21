@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Basic distributed-transpose interface</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Basic distributed-transpose interface (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Basic distributed-transpose interface">
-<meta name="keywords" content="FFTW 3.3.8: Basic distributed-transpose interface">
+<meta name="description" content="Basic distributed-transpose interface (FFTW 3.3.10)">
+<meta name="keywords" content="Basic distributed-transpose interface (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" rel="up" title="FFTW MPI Transposes">
-<link href="Advanced-distributed_002dtranspose-interface.html#Advanced-distributed_002dtranspose-interface" rel="next" title="Advanced distributed-transpose interface">
-<link href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" rel="prev" title="FFTW MPI Transposes">
+<link href="FFTW-MPI-Transposes.html" rel="up" title="FFTW MPI Transposes">
+<link href="Advanced-distributed_002dtranspose-interface.html" rel="next" title="Advanced distributed-transpose interface">
+<link href="FFTW-MPI-Transposes.html" rel="prev" title="FFTW MPI Transposes">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,14 +59,12 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Basic-distributed_002dtranspose-interface"></a>
-<div class="header">
+<span id="Basic-distributed_002dtranspose-interface"></span><div class="header">
 <p>
-Next: <a href="Advanced-distributed_002dtranspose-interface.html#Advanced-distributed_002dtranspose-interface" accesskey="n" rel="next">Advanced distributed-transpose interface</a>, Previous: <a href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" accesskey="p" rel="prev">FFTW MPI Transposes</a>, Up: <a href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" accesskey="u" rel="up">FFTW MPI Transposes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Advanced-distributed_002dtranspose-interface.html" accesskey="n" rel="next">Advanced distributed-transpose interface</a>, Previous: <a href="FFTW-MPI-Transposes.html" accesskey="p" rel="prev">FFTW MPI Transposes</a>, Up: <a href="FFTW-MPI-Transposes.html" accesskey="u" rel="up">FFTW MPI Transposes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Basic-distributed_002dtranspose-interface-1"></a>
-<h4 class="subsection">6.7.1 Basic distributed-transpose interface</h4>
+<span id="Basic-distributed_002dtranspose-interface-1"></span><h4 class="subsection">6.7.1 Basic distributed-transpose interface</h4>
 
 <p>In particular, suppose that we have an <code>n0</code> by <code>n1</code> array in
 row-major order, block-distributed across the <code>n0</code> dimension.  To
@@ -88,12 +77,12 @@ following function:
                                   double *in, double *out,
                                   MPI_Comm comm, unsigned flags);
 </pre></div>
-<a name="index-fftw_005fmpi_005fplan_005ftranspose"></a>
+<span id="index-fftw_005fmpi_005fplan_005ftranspose"></span>
 
 <p>The input and output arrays (<code>in</code> and <code>out</code>) can be the
 same.  The transpose is actually executed by calling
 <code>fftw_execute</code> on the plan, as usual.
-<a name="index-fftw_005fexecute-3"></a>
+<span id="index-fftw_005fexecute-3"></span>
 </p>
 
 <p>The <code>flags</code> are the usual FFTW planner flags, but support
@@ -106,15 +95,15 @@ order, but for an <code>FFTW_MPI_TRANSPOSED_IN</code> plan the input data is
 stored as <code>n1</code> by <code>local_n0</code> in row-major order.  Similarly,
 <code>FFTW_MPI_TRANSPOSED_OUT</code> means that the output is <code>n0</code> by
 <code>local_n1</code> instead of <code>local_n1</code> by <code>n0</code>.
-<a name="index-FFTW_005fMPI_005fTRANSPOSED_005fOUT-1"></a>
-<a name="index-FFTW_005fMPI_005fTRANSPOSED_005fIN-1"></a>
+<span id="index-FFTW_005fMPI_005fTRANSPOSED_005fOUT-1"></span>
+<span id="index-FFTW_005fMPI_005fTRANSPOSED_005fIN-1"></span>
 </p>
 
 <p>To determine the local size of the array on each process before and
 after the transpose, as well as the amount of storage that must be
 allocated, one should call <code>fftw_mpi_local_size_2d_transposed</code>,
 just as for a 2d DFT as described in the previous section:
-<a name="index-data-distribution-4"></a>
+<span id="index-data-distribution-4"></span>
 </p>
 <div class="example">
 <pre class="example">ptrdiff_t fftw_mpi_local_size_2d_transposed
@@ -122,7 +111,7 @@ just as for a 2d DFT as described in the previous section:
                  ptrdiff_t *local_n0, ptrdiff_t *local_0_start,
                  ptrdiff_t *local_n1, ptrdiff_t *local_1_start);
 </pre></div>
-<a name="index-fftw_005fmpi_005flocal_005fsize_005f2d_005ftransposed"></a>
+<span id="index-fftw_005fmpi_005flocal_005fsize_005f2d_005ftransposed"></span>
 
 <p>Again, the return value is the local storage to allocate, which in
 this case is the number of <em>real</em> (<code>double</code>) values rather
@@ -131,7 +120,7 @@ than complex numbers as in the previous examples.
 <hr>
 <div class="header">
 <p>
-Next: <a href="Advanced-distributed_002dtranspose-interface.html#Advanced-distributed_002dtranspose-interface" accesskey="n" rel="next">Advanced distributed-transpose interface</a>, Previous: <a href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" accesskey="p" rel="prev">FFTW MPI Transposes</a>, Up: <a href="FFTW-MPI-Transposes.html#FFTW-MPI-Transposes" accesskey="u" rel="up">FFTW MPI Transposes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Advanced-distributed_002dtranspose-interface.html" accesskey="n" rel="next">Advanced distributed-transpose interface</a>, Previous: <a href="FFTW-MPI-Transposes.html" accesskey="p" rel="prev">FFTW MPI Transposes</a>, Up: <a href="FFTW-MPI-Transposes.html" accesskey="u" rel="up">FFTW MPI Transposes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

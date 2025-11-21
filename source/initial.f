@@ -15,11 +15,6 @@ c
 c     "initial" sets up original values for some parameters and
 c     variables that might not otherwise get initialized
 c
-c     note calls below to the "kmp_set" routines are for use with
-c     the Intel compiler, and must be commented for other compilers;
-c     alternatively, these values can be set via the KMP_STACKSIZE
-c     and KMP_BLOCKTIME environment variables
-c
 c
       subroutine initial
       use align
@@ -54,6 +49,8 @@ c
       implicit none
       integer i,j
 !$    integer omp_get_num_procs
+!$    integer omp_get_max_threads
+!$    integer omp_get_max_active_levels
       logical first
       save first
       data first  / .true. /
@@ -73,17 +70,20 @@ c
       if (first)  call command
       if (first)  first = .false.
 c
-c     cores, thread count and options for OpenMP
+c     processors, threads and nested regions for OpenMP
 c
       nproc = 1
       nthread = 1
+      nnest = 1
 !$    nproc = omp_get_num_procs ()
-!$    nthread = nproc
+!$    nthread = omp_get_max_threads ()
 !$    call omp_set_num_threads (nthread)
-!$    call omp_set_nested (.true.)
+!$    nnest = omp_get_max_active_levels ()
+!$    call omp_set_max_active_levels (nnest)
 c
-c     Intel compiler extensions to OpenMP standard, 268435456 bytes is
-c     2**28 bytes, or 256 MB; comment these lines for other compilers
+c     Intel compiler extensions to OpenMP, note 268435456 bytes is
+c     2**28 bytes (256 MB); or set via KMP_STACKSIZE and KMP_BLOCKTIME
+c     environment variables; comment for non-Intel compilers
 c
 c!$   call kmp_set_stacksize_s (268435456)
 c!$   call kmp_set_blocktime (0)
@@ -129,9 +129,10 @@ c
       nadd = 0
       ndel = 0
 c
-c     number of atoms in Protein Data Bank format
+c     number of atoms and format for Protein Data Bank
 c
       npdb = 0
+      pdbtyp = 'PDB'
 c
 c     number of residues and chains in biopolymer sequence
 c

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Real-data DFT Array Format</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Real-data DFT Array Format (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Real-data DFT Array Format">
-<meta name="keywords" content="FFTW 3.3.8: Real-data DFT Array Format">
+<meta name="description" content="Real-data DFT Array Format (FFTW 3.3.10)">
+<meta name="keywords" content="Real-data DFT Array Format (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Basic-Interface.html#Basic-Interface" rel="up" title="Basic Interface">
-<link href="Real_002dto_002dReal-Transforms.html#Real_002dto_002dReal-Transforms" rel="next" title="Real-to-Real Transforms">
-<link href="Real_002ddata-DFTs.html#Real_002ddata-DFTs" rel="prev" title="Real-data DFTs">
+<link href="Basic-Interface.html" rel="up" title="Basic Interface">
+<link href="Real_002dto_002dReal-Transforms.html" rel="next" title="Real-to-Real Transforms">
+<link href="Real_002ddata-DFTs.html" rel="prev" title="Real-data DFTs">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,18 +59,16 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Real_002ddata-DFT-Array-Format"></a>
-<div class="header">
+<span id="Real_002ddata-DFT-Array-Format"></span><div class="header">
 <p>
-Next: <a href="Real_002dto_002dReal-Transforms.html#Real_002dto_002dReal-Transforms" accesskey="n" rel="next">Real-to-Real Transforms</a>, Previous: <a href="Real_002ddata-DFTs.html#Real_002ddata-DFTs" accesskey="p" rel="prev">Real-data DFTs</a>, Up: <a href="Basic-Interface.html#Basic-Interface" accesskey="u" rel="up">Basic Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Real_002dto_002dReal-Transforms.html" accesskey="n" rel="next">Real-to-Real Transforms</a>, Previous: <a href="Real_002ddata-DFTs.html" accesskey="p" rel="prev">Real-data DFTs</a>, Up: <a href="Basic-Interface.html" accesskey="u" rel="up">Basic Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Real_002ddata-DFT-Array-Format-1"></a>
-<h4 class="subsection">4.3.4 Real-data DFT Array Format</h4>
-<a name="index-r2c_002fc2r-multi_002ddimensional-array-format-1"></a>
+<span id="Real_002ddata-DFT-Array-Format-1"></span><h4 class="subsection">4.3.4 Real-data DFT Array Format</h4>
+<span id="index-r2c_002fc2r-multi_002ddimensional-array-format-1"></span>
 
 <p>The output of a DFT of real data (r2c) contains symmetries that, in
-principle, make half of the outputs redundant (see <a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes">What FFTW Really Computes</a>).  (Similarly for the input of an inverse c2r transform.)  In
+principle, make half of the outputs redundant (see <a href="What-FFTW-Really-Computes.html">What FFTW Really Computes</a>).  (Similarly for the input of an inverse c2r transform.)  In
 practice, it is not possible to entirely realize these savings in an
 efficient and understandable format that generalizes to
 multi-dimensional transforms.  Instead, the output of the r2c
@@ -100,13 +89,13 @@ the ordinary complex transform.  (We could have instead taken half of
 any other dimension, but implementation turns out to be simpler if the
 last, contiguous, dimension is used.)
 </p>
-<a name="index-out_002dof_002dplace-1"></a>
+<span id="index-out_002dof_002dplace-1"></span>
 <p>For an out-of-place transform, the real data is simply an array with
 physical dimensions n<sub>0</sub>&nbsp;&times;&nbsp;n<sub>1</sub>&nbsp;&times;&nbsp;n<sub>2</sub>&nbsp;&times;&nbsp;&hellip;&nbsp;&times;&nbsp;n<sub>d-1</sub>
  in row-major order.
 </p>
-<a name="index-in_002dplace-4"></a>
-<a name="index-padding-3"></a>
+<span id="index-in_002dplace-4"></span>
+<span id="index-padding-3"></span>
 <p>For an in-place transform, some complications arise since the complex data
 is slightly larger than the real data.  In this case, the final
 dimension of the real data must be <em>padded</em> with extra values to
@@ -125,7 +114,7 @@ is the last dimension passed to the planner.
 <hr>
 <div class="header">
 <p>
-Next: <a href="Real_002dto_002dReal-Transforms.html#Real_002dto_002dReal-Transforms" accesskey="n" rel="next">Real-to-Real Transforms</a>, Previous: <a href="Real_002ddata-DFTs.html#Real_002ddata-DFTs" accesskey="p" rel="prev">Real-data DFTs</a>, Up: <a href="Basic-Interface.html#Basic-Interface" accesskey="u" rel="up">Basic Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Real_002dto_002dReal-Transforms.html" accesskey="n" rel="next">Real-to-Real Transforms</a>, Previous: <a href="Real_002ddata-DFTs.html" accesskey="p" rel="prev">Real-data DFTs</a>, Up: <a href="Basic-Interface.html" accesskey="u" rel="up">Basic Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

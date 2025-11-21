@@ -12,11 +12,11 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "prtpdb" writes out a set of Protein Data Bank coordinates
-c     to an external file
+c     "prtpdb" writes out a set of PDB coordinates in legacy PDB
+c     format to an external file
 c
 c
-      subroutine prtpdb (ipdb,imdl)
+      subroutine prtpdb (ipdb,imodel)
       use bound
       use boxes
       use files
@@ -25,7 +25,7 @@ c
       use titles
       implicit none
       integer i,k
-      integer ipdb,imdl
+      integer ipdb,imodel
       integer start,stop
       integer resmax,resnumb
       integer, allocatable :: resid(:)
@@ -38,7 +38,7 @@ c
       character*2 atmc,resc
       character*3 resname
       character*6 crdc
-      character*38 fstr
+      character*51 fstr
       character*240 pdbfile
 c
 c
@@ -59,11 +59,14 @@ c
 c     write out the header lines and the title
 c
       if (ltitle .eq. 0) then
-         fstr = '(''HEADER'',/,''COMPND'',/,''SOURCE'')'
-         write (ipdb,fstr(1:32))
+         fstr = '(''HEADER'',/,''TITLE '',/,''COMPND'',/,''SOURCE'')'
+         write (ipdb,fstr(1:45))
       else
-         fstr = '(''HEADER'',4x,a,/,''COMPND'',/,''SOURCE'')'
-         write (ipdb,fstr(1:37))  title(1:ltitle)
+c        fstr =
+c    &       '(''HEADER'',/,''TITLE '',4x,a,/,''COMPND'',/,''SOURCE'')'
+         fstr = '(''HEADER'',/,''TITLE '',4x,a,'
+     &             //'/,''COMPND'',/,''SOURCE'')'
+         write (ipdb,fstr(1:50))  title(1:ltitle)
       end if
 c
 c     include any lattice parameters in the header
@@ -75,9 +78,9 @@ c
 c
 c     write record to initiate the current PDB model
 c
-      if (imdl .ne. 0) then
+      if (imodel .ne. 0) then
          fstr = '(''MODEL '',i8)'
-         write (ipdb,fstr(1:13))  imdl
+         write (ipdb,fstr(1:13))  imodel
       end if
 c
 c     perform dynamic allocation of some local arrays
@@ -125,7 +128,7 @@ c
          crdmin = 0.0d0
          crdmax = 0.0d0
          do i = 1, npdb
-            if (pdbtyp(i) .eq. 'ATOM  ') then
+            if (pdbrec(i) .eq. 'ATOM  ') then
                resmax = max(resmax,resid(resnum(i)))
             else
                resmax = max(resmax,resnum(i))
@@ -152,14 +155,14 @@ c
          resname = pdbres(i)
          if (resname(2:3) .eq. '  ')  resname = '  '//resname(1:1)
          if (resname(3:3) .eq. ' ')  resname = ' '//resname(1:2)
-         if (pdbtyp(i) .eq. 'ATOM  ') then
+         if (pdbrec(i) .eq. 'ATOM  ') then
             resnumb = resid(resnum(i))
             chnname = chain(resnum(i))
          else
             resnumb = resnum(i)
             chnname = ' '
          end if
-         write (ipdb,fstr)  pdbtyp(i),i,pdbatm(i),resname,chnname,
+         write (ipdb,fstr)  pdbrec(i),i,pdbatm(i),resname,chnname,
      &                      resnumb,xpdb(i),ypdb(i),zpdb(i)
       end do
 c
@@ -187,7 +190,7 @@ c
 c
 c     write record to close the current PDB model
 c
-      if (imdl .ne. 0) then
+      if (imodel .ne. 0) then
          fstr = '(''ENDMDL'')'
          write (ipdb,fstr(1:10))
       end if

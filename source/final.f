@@ -916,6 +916,7 @@ c
       if (allocated(resatm))  deallocate (resatm)
       if (allocated(npdb12))  deallocate (npdb12)
       if (allocated(ipdb12))  deallocate (ipdb12)
+      if (allocated(pdbmod))  deallocate (pdbmod)
       if (allocated(pdblist))  deallocate (pdblist)
       if (allocated(xpdb))  deallocate (xpdb)
       if (allocated(ypdb))  deallocate (ypdb)
@@ -923,7 +924,7 @@ c
       if (allocated(pdbres))  deallocate (pdbres)
       if (allocated(pdbsym))  deallocate (pdbsym)
       if (allocated(pdbatm))  deallocate (pdbatm)
-      if (allocated(pdbtyp))  deallocate (pdbtyp)
+      if (allocated(pdbrec))  deallocate (pdbrec)
 c
 c     deallocation of global arrays from module piorbs
 c

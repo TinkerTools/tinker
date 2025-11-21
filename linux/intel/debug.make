@@ -210,7 +210,6 @@ ifort -c -g -warn all -check all bitors.f
 ifort -c -g -warn all -check all bonds.f
 ifort -c -g -warn all -check all born.f
 ifort -c -g -warn all -check all bounds.f
-ifort -c -g -warn all -check all bussi.f
 ifort -c -g -warn all -check all calendar.f
 ifort -c -g -warn all -check all center.f
 ifort -c -g -warn all -check all chkpole.f
@@ -389,6 +388,8 @@ ifort -c -g -warn all -check all gda.f
 ifort -c -g -warn all -check all geometry.f
 ifort -c -g -warn all -check all getarc.f
 ifort -c -g -warn all -check all getcart.f
+ifort -c -g -warn all -check all getdcd.f
+ifort -c -g -warn all -check all getfloat.f
 ifort -c -g -warn all -check all getint.f
 ifort -c -g -warn all -check all getkey.f
 ifort -c -g -warn all -check all getmol.f
@@ -524,6 +525,7 @@ ifort -c -g -warn all -check all prmkey.f
 ifort -c -g -warn all -check all promo.f
 ifort -c -g -warn all -check all protein.f
 ifort -c -g -warn all -check all prtarc.f
+ifort -c -g -warn all -check all prtcif.f
 ifort -c -g -warn all -check all prtdyn.f
 ifort -c -g -warn all -check all prterr.f
 ifort -c -g -warn all -check all prtfrc.f
@@ -544,6 +546,7 @@ ifort -c -g -warn all -check all radial.f
 ifort -c -g -warn all -check all random.f
 ifort -c -g -warn all -check all rattle.f
 ifort -c -g -warn all -check all readcart.f
+ifort -c -g -warn all -check all readcif.f
 ifort -c -g -warn all -check all readdcd.f
 ifort -c -g -warn all -check all readdyn.f
 ifort -c -g -warn all -check all readgau.f

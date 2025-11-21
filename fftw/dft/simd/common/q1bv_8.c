@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:06:15 EDT 2018 */
+/* Generated on Tue Sep 14 10:46:02 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -520,10 +520,10 @@ static const tw_instr twinstr[] = {
      VTW(0, 5),
      VTW(0, 6),
      VTW(0, 7),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 8, XSIMD_STRING("q1bv_8"), twinstr, &GENUS, {184, 112, 80, 0}, 0, 0, 0 };
+static const ct_desc desc = { 8, XSIMD_STRING("q1bv_8"), twinstr, &GENUS, { 184, 112, 80, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_q1bv_8) (planner *p) {
      X(kdft_difsq_register) (p, q1bv_8, &desc);
@@ -1025,10 +1025,10 @@ static const tw_instr twinstr[] = {
      VTW(0, 5),
      VTW(0, 6),
      VTW(0, 7),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 8, XSIMD_STRING("q1bv_8"), twinstr, &GENUS, {264, 128, 0, 0}, 0, 0, 0 };
+static const ct_desc desc = { 8, XSIMD_STRING("q1bv_8"), twinstr, &GENUS, { 264, 128, 0, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_q1bv_8) (planner *p) {
      X(kdft_difsq_register) (p, q1bv_8, &desc);

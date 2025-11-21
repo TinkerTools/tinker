@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Multi-dimensional Transforms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Multi-dimensional Transforms (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Multi-dimensional Transforms">
-<meta name="keywords" content="FFTW 3.3.8: Multi-dimensional Transforms">
+<meta name="description" content="Multi-dimensional Transforms (FFTW 3.3.10)">
+<meta name="keywords" content="Multi-dimensional Transforms (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes" rel="up" title="What FFTW Really Computes">
-<link href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW" rel="next" title="Multi-threaded FFTW">
-<link href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html#g_t1d-Discrete-Hartley-Transforms-_0028DHTs_0029" rel="prev" title="1d Discrete Hartley Transforms (DHTs)">
+<link href="What-FFTW-Really-Computes.html" rel="up" title="What FFTW Really Computes">
+<link href="Multi_002dthreaded-FFTW.html" rel="next" title="Multi-threaded FFTW">
+<link href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html" rel="prev" title="1d Discrete Hartley Transforms (DHTs)">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,14 +59,12 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Multi_002ddimensional-Transforms"></a>
-<div class="header">
+<span id="Multi_002ddimensional-Transforms"></span><div class="header">
 <p>
-Previous: <a href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html#g_t1d-Discrete-Hartley-Transforms-_0028DHTs_0029" accesskey="p" rel="prev">1d Discrete Hartley Transforms (DHTs)</a>, Up: <a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes" accesskey="u" rel="up">What FFTW Really Computes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html" accesskey="p" rel="prev">1d Discrete Hartley Transforms (DHTs)</a>, Up: <a href="What-FFTW-Really-Computes.html" accesskey="u" rel="up">What FFTW Really Computes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Multi_002ddimensional-Transforms-1"></a>
-<h4 class="subsection">4.8.6 Multi-dimensional Transforms</h4>
+<span id="Multi_002ddimensional-Transforms-1"></span><h4 class="subsection">4.8.6 Multi-dimensional Transforms</h4>
 
 <p>The multi-dimensional transforms of FFTW, in general, compute simply the
 separable product of the given 1d transform along each dimension of the
@@ -86,7 +75,7 @@ normalization factors for each dimension (e.g. the product of the
 dimension sizes, for a multi-dimensional DFT).
 </p>
 
-<a name="index-r2c-3"></a>
+<span id="index-r2c-3"></span>
 <p>The definition of FFTW&rsquo;s multi-dimensional DFT of real data (r2c)
 deserves special attention.  In this case, we logically compute the full
 multi-dimensional DFT of the input data; since the input data are purely
@@ -106,7 +95,7 @@ store the
 elements of the <em>last</em> dimension (division by <em>2</em> is rounded
 down).  (We could instead have cut any other dimension in half, but the
 last dimension proved computationally convenient.)  This results in the
-peculiar array format described in more detail by <a href="Real_002ddata-DFT-Array-Format.html#Real_002ddata-DFT-Array-Format">Real-data DFT Array Format</a>.
+peculiar array format described in more detail by <a href="Real_002ddata-DFT-Array-Format.html">Real-data DFT Array Format</a>.
 </p>
 <p>The multi-dimensional c2r transform is simply the unnormalized inverse
 of the r2c transform.  i.e. it is the same as FFTW&rsquo;s complex backward
@@ -119,15 +108,15 @@ along each dimension, as computed by FFTW, is not always the same thing
 as the usual multi-dimensional transform.  A multi-dimensional
 <code>R2HC</code> (or <code>HC2R</code>) transform is not identical to the
 multi-dimensional DFT, requiring some post-processing to combine the
-requisite real and imaginary parts, as was described in <a href="The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT">The Halfcomplex-format DFT</a>.  Likewise, FFTW&rsquo;s multidimensional
+requisite real and imaginary parts, as was described in <a href="The-Halfcomplex_002dformat-DFT.html">The Halfcomplex-format DFT</a>.  Likewise, FFTW&rsquo;s multidimensional
 <code>FFTW_DHT</code> r2r transform is not the same thing as the logical
 multi-dimensional discrete Hartley transform defined in the literature,
-as discussed in <a href="The-Discrete-Hartley-Transform.html#The-Discrete-Hartley-Transform">The Discrete Hartley Transform</a>.
+as discussed in <a href="The-Discrete-Hartley-Transform.html">The Discrete Hartley Transform</a>.
 </p>
 <hr>
 <div class="header">
 <p>
-Previous: <a href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html#g_t1d-Discrete-Hartley-Transforms-_0028DHTs_0029" accesskey="p" rel="prev">1d Discrete Hartley Transforms (DHTs)</a>, Up: <a href="What-FFTW-Really-Computes.html#What-FFTW-Really-Computes" accesskey="u" rel="up">What FFTW Really Computes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="1d-Discrete-Hartley-Transforms-_0028DHTs_0029.html" accesskey="p" rel="prev">1d Discrete Hartley Transforms (DHTs)</a>, Up: <a href="What-FFTW-Really-Computes.html" accesskey="u" rel="up">What FFTW Really Computes</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

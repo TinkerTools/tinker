@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:04:13 EDT 2018 */
+/* Generated on Tue Sep 14 10:44:27 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -193,11 +193,11 @@ static void t1_7(R *ri, R *ii, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 0, 7},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 0, 7 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const ct_desc desc = { 7, "t1_7", twinstr, &GENUS, {18, 12, 54, 0}, 0, 0, 0 };
+static const ct_desc desc = { 7, "t1_7", twinstr, &GENUS, { 18, 12, 54, 0 }, 0, 0, 0 };
 
 void X(codelet_t1_7) (planner *p) {
      X(kdft_dit_register) (p, t1_7, &desc);
@@ -342,11 +342,11 @@ static void t1_7(R *ri, R *ii, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 0, 7},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 0, 7 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const ct_desc desc = { 7, "t1_7", twinstr, &GENUS, {36, 24, 36, 0}, 0, 0, 0 };
+static const ct_desc desc = { 7, "t1_7", twinstr, &GENUS, { 36, 24, 36, 0 }, 0, 0, 0 };
 
 void X(codelet_t1_7) (planner *p) {
      X(kdft_dit_register) (p, t1_7, &desc);

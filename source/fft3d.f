@@ -32,7 +32,7 @@ c
 c
 c     initialization of Fast Fourier transform using FFTW;
 c     comment "dfftw_init_threads" and "dfftw_plan_with_nthreads"
-c     calls if serial FFTW is being used in place of OpenMP FFTW
+c     if serial FFTW is wanted in place of OpenMP-parallel FFTW
 c
 !$    if (ffttyp .eq. 'FFTW') then
 !$       ifront = -1

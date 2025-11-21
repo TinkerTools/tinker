@@ -210,7 +210,6 @@ gfortran -c -O3 -fopenmp bitors.f
 gfortran -c -O3 -fopenmp bonds.f
 gfortran -c -O3 -fopenmp born.f
 gfortran -c -O3 -fopenmp bounds.f
-gfortran -c -O3 -fopenmp bussi.f
 gfortran -c -O3 -fopenmp calendar.f
 gfortran -c -O3 -fopenmp center.f
 gfortran -c -O3 -fopenmp chkpole.f
@@ -389,6 +388,8 @@ gfortran -c -O3 -fopenmp gda.f
 gfortran -c -O3 -fopenmp geometry.f
 gfortran -c -O3 -fopenmp getarc.f
 gfortran -c -O3 -fopenmp getcart.f
+gfortran -c -O3 -fopenmp getdcd.f
+gfortran -c -O3 -fopenmp getfloat.f
 gfortran -c -O3 -fopenmp getint.f
 gfortran -c -O3 -fopenmp getkey.f
 gfortran -c -O3 -fopenmp getmol.f
@@ -524,6 +525,7 @@ gfortran -c -O3 -fopenmp prmkey.f
 gfortran -c -O3 -fopenmp promo.f
 gfortran -c -O3 -fopenmp protein.f
 gfortran -c -O3 -fopenmp prtarc.f
+gfortran -c -O3 -fopenmp prtcif.f
 gfortran -c -O3 -fopenmp prtdyn.f
 gfortran -c -O3 -fopenmp prterr.f
 gfortran -c -O3 -fopenmp prtfrc.f
@@ -544,6 +546,7 @@ gfortran -c -O3 -fopenmp radial.f
 gfortran -c -O3 -fopenmp random.f
 gfortran -c -O3 -fopenmp rattle.f
 gfortran -c -O3 -fopenmp readcart.f
+gfortran -c -O3 -fopenmp readcif.f
 gfortran -c -O3 -fopenmp readdcd.f
 gfortran -c -O3 -fopenmp readdyn.f
 gfortran -c -O3 -fopenmp readgau.f

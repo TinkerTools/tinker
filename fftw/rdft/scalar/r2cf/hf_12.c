@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:06:30 EDT 2018 */
+/* Generated on Tue Sep 14 10:46:13 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -298,11 +298,11 @@ static void hf_12(R *cr, R *ci, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 1, 12},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 1, 12 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const hc2hc_desc desc = { 12, "hf_12", twinstr, &GENUS, {72, 22, 46, 0} };
+static const hc2hc_desc desc = { 12, "hf_12", twinstr, &GENUS, { 72, 22, 46, 0 } };
 
 void X(codelet_hf_12) (planner *p) {
      X(khc2hc_register) (p, hf_12, &desc);
@@ -569,11 +569,11 @@ static void hf_12(R *cr, R *ci, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 1, 12},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 1, 12 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const hc2hc_desc desc = { 12, "hf_12", twinstr, &GENUS, {88, 30, 30, 0} };
+static const hc2hc_desc desc = { 12, "hf_12", twinstr, &GENUS, { 88, 30, 30, 0 } };
 
 void X(codelet_hf_12) (planner *p) {
      X(khc2hc_register) (p, hf_12, &desc);

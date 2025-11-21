@@ -3754,7 +3754,6 @@ c
 !$    tid = omp_get_thread_num ()
       toffset(tid) = ntpair
       ntpair = ntpair + nlocal
-!$OMP END CRITICAL
 c
 c     store terms used later to compute mutual polarization
 c
@@ -3769,6 +3768,7 @@ c
             end do
          end do
       end if
+!$OMP END CRITICAL
 c
 c     add local to global variables for OpenMP calculation
 c

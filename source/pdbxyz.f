@@ -64,7 +64,7 @@ c
       biopoly = .false.
       reslast = '***'
       do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
+         if (pdbrec(i) .eq. 'ATOM  ') then
             resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
@@ -84,7 +84,7 @@ c
                goto 20
    10          continue
             end if
-         else if (pdbtyp(i) .eq. 'HETATM') then
+         else if (pdbrec(i) .eq. 'HETATM') then
             resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
@@ -96,7 +96,7 @@ c
      &             resname.eq.'  F' .or. resname.eq.' CL' .or.
      &             resname.eq.' BR' .or. resname.eq.'  I' .or.
      &             resname.eq.' ZN') then
-                  pdbtyp(i) = 'HETATM'
+                  pdbrec(i) = 'HETATM'
                end if
             end if
          end if
@@ -117,7 +117,8 @@ c
       call suffix (pdbfile,'pdb','old')
       open (unit=ipdb,file=pdbfile,status ='old')
       rewind (unit=ipdb)
-      call readpdb (ipdb)
+      if (pdbtyp .eq. 'PDB')  call readpdb (ipdb)
+      if (pdbtyp .eq. 'CIF')  call readcif (ipdb)
 c
 c     use special translation mechanisms for biopolymers
 c
@@ -298,13 +299,14 @@ c
          ltitle = pdbleng
          title = pdbtitle(1:ltitle)
          call prtxyz (ixyz)
-         do i = 1, n
+         do i = 1, npdb
             n12(i) = 0
          end do
 c
 c     read the next coordinate set from Protein Data Bank file
 c
-         call readpdb (ipdb)
+         if (pdbtyp .eq. 'PDB')  call readpdb (ipdb)
+         if (pdbtyp .eq. 'CIF')  call readcif (ipdb)
       end do
 c
 c     write a sequence file for proteins and nucleic acids
@@ -2101,7 +2103,7 @@ c
       i = 0
       do while (i .lt. npdb)
          i = i + 1
-         if (pdbtyp(i) .eq. 'HETATM') then
+         if (pdbrec(i) .eq. 'HETATM') then
             if (pdbres(i) .eq. 'HOH') then
                if (pdbatm(i) .eq. ' O  ') then
                   call oldatm (i,2001,0,0)
@@ -2179,8 +2181,8 @@ c
       use fields
       use iounit
       use katoms
-      use sequen
       use pdb
+      use sequen
       implicit none
       integer i,bionum
       integer i1,ires

@@ -210,7 +210,6 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bitors.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bonds.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp born.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bounds.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp bussi.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp calendar.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp center.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp chkpole.f
@@ -388,6 +387,8 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp gda.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp geometry.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getarc.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getcart.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getdcd.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getfloat.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getkey.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp getmol.f
@@ -523,6 +524,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prmkey.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp promo.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp protein.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtarc.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtcif.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prterr.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtfrc.f
@@ -543,6 +545,7 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp radial.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp random.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp rattle.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readcart.f
+ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readcif.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readdcd.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp readgau.f

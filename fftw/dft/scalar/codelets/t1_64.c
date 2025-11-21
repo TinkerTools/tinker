@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:04:15 EDT 2018 */
+/* Generated on Tue Sep 14 10:44:29 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -2121,11 +2121,11 @@ static void t1_64(R *ri, R *ii, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 0, 64},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 0, 64 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const ct_desc desc = { 64, "t1_64", twinstr, &GENUS, {520, 126, 518, 0}, 0, 0, 0 };
+static const ct_desc desc = { 64, "t1_64", twinstr, &GENUS, { 520, 126, 518, 0 }, 0, 0, 0 };
 
 void X(codelet_t1_64) (planner *p) {
      X(kdft_dit_register) (p, t1_64, &desc);
@@ -4093,11 +4093,11 @@ static void t1_64(R *ri, R *ii, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 0, 64},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 0, 64 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const ct_desc desc = { 64, "t1_64", twinstr, &GENUS, {808, 270, 230, 0}, 0, 0, 0 };
+static const ct_desc desc = { 64, "t1_64", twinstr, &GENUS, { 808, 270, 230, 0 }, 0, 0, 0 };
 
 void X(codelet_t1_64) (planner *p) {
      X(kdft_dit_register) (p, t1_64, &desc);

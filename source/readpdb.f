@@ -12,11 +12,12 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "readpdb" gets a set of Protein Data Bank coordinates from
-c     an external file
+c     "readpdb" gets a set of coordinates in RCSB legacy PDB
+c     format from an external file
 c
 c
       subroutine readpdb (ipdb)
+      use boxes
       use files
       use inform
       use iounit
@@ -92,13 +93,14 @@ c
          first = .false.
          if (.not. allocated(resnum))  allocate (resnum(maxatm))
          if (.not. allocated(resatm))  allocate (resatm(2,maxatm))
+         if (.not. allocated(pdbmod))  allocate (pdbmod(maxatm))
          if (.not. allocated(xpdb))  allocate (xpdb(maxatm))
          if (.not. allocated(ypdb))  allocate (ypdb(maxatm))
          if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
          if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
          if (.not. allocated(pdbsym))  allocate (pdbsym(maxatm))
          if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
-         if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
+         if (.not. allocated(pdbrec))  allocate (pdbrec(maxatm))
       end if
 c
 c     process individual atoms from the Protein Data Bank file
@@ -108,14 +110,18 @@ c
    20    format (a240)
          remark = record(1:6)
          call upcase (remark)
-         if (remark .eq. 'HEADER') then
+         if (remark .eq. 'TITLE ') then
             title = record(11:70)
             ltitle = trimtext (title)
-         else if (remark .eq. 'TITLE ') then
+         else if (remark .eq. 'HEADER') then
             if (ltitle .eq. 0) then
                title = record(11:70)
                ltitle = trimtext (title)
             end if
+         else if (remark .eq. 'CRYST1') then
+            next = 7
+            string = record(next:240)
+            read (string,*)  xbox,ybox,zbox,alpha,beta,gamma
          else if (remark .eq. 'ATOM  ') then
             next = 7
             call getnumb (record,serial,next)
@@ -206,7 +212,7 @@ c
             xpdb(npdb) = xx
             ypdb(npdb) = yy
             zpdb(npdb) = zz
-            pdbtyp(npdb) = remark
+            pdbrec(npdb) = remark
             pdbatm(npdb) = atmname
             pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
@@ -263,7 +269,7 @@ c
             xpdb(npdb) = xx
             ypdb(npdb) = yy
             zpdb(npdb) = zz
-            pdbtyp(npdb) = remark
+            pdbrec(npdb) = remark
             pdbatm(npdb) = atmname
             pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
@@ -290,7 +296,7 @@ c
          nchain = 0
          chnlast = '#'
          do i = 1, npdb
-            if (pdbtyp(i) .eq. 'ATOM  ') then
+            if (pdbrec(i) .eq. 'ATOM  ') then
                letter = chnatm(i)
                if (letter .ne. chnlast) then
                   nchain = nchain + 1
@@ -373,7 +379,7 @@ c
       nres = 0
       k = 0
       do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
+         if (pdbrec(i) .eq. 'ATOM  ') then
             if (resnum(i) .ne. k) then
                k = resnum(i)
                nres = nres + 1
@@ -392,15 +398,15 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine scanpdb  --  PDB chains, alternates and inserts  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine scanpdb  --  PDB chains, alternates & inserts  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "scanpdb" reads the first model in a Protein Data Bank file and
-c     sets chains, alternate sites and insertion records to be used
+c     "scanpdb" reads the first model in a Protein Data Bank PDB
+c     file and finds chains, alternate sites and insertion records
 c
 c
       subroutine scanpdb (ipdb)
@@ -622,7 +628,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "fixpdb" corrects problems with PDB files by converting residue
+c     "fixpdb" corrects issues with PDB entries by converting residue
 c     and atom names to the standard forms used by Tinker
 c
 c
@@ -716,6 +722,7 @@ c
       if (resname .eq. 'SOD')  resname = ' NA'
       if (resname .eq. 'MG ')  resname = ' MG'
       if (resname .eq. 'MG+')  resname = ' MG'
+      if (resname .eq. 'MAG')  resname = ' MG'
       if (resname .eq. 'CL ')  resname = ' CL'
       if (resname .eq. 'CL-')  resname = ' CL'
       if (resname .eq. 'CLA')  resname = ' CL'

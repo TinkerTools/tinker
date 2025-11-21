@@ -20,15 +20,3 @@
          and libquadmath.0.dylib, can be moved or renamed from within
          the directory containing the compiler libraries.
 
-         If some or all of the executables fail via a segmentation
-         fault, check the limits for your processes by issuing the
-         "limit" command at the tcsh shell prompt (or similar under
-         other shells). By default, these limits are set to quite small
-         values. To eliminate the problem issue the following commands:
-
-                        limit datasize unlimited
-                        limit stacksize unlimited
-
-         These same commands can also be put in your .tcshrc file or
-         equivalent startup file to be run at login time.
-

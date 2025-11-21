@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:06:42 EDT 2018 */
+/* Generated on Tue Sep 14 10:46:24 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -64,10 +64,9 @@ static void r2cfII_6(R *R0, R *R1, R *Cr, R *Ci, stride rs, stride csr, stride c
      }
 }
 
-static const kr2c_desc desc = { 6, "r2cfII_6", {7, 0, 6, 0}, &GENUS };
+static const kr2c_desc desc = { 6, "r2cfII_6", { 7, 0, 6, 0 }, &GENUS };
 
-void X(codelet_r2cfII_6) (planner *p) {
-     X(kr2c_register) (p, r2cfII_6, &desc);
+void X(codelet_r2cfII_6) (planner *p) { X(kr2c_register) (p, r2cfII_6, &desc);
 }
 
 #else
@@ -100,20 +99,19 @@ static void r2cfII_6(R *R0, R *R1, R *Cr, R *Ci, stride rs, stride csr, stride c
 	       T8 = KP866025403 * (T2 + T3);
 	       T4 = FMA(KP500000000, T3 - T2, T1);
 	       Cr[0] = T4 - T7;
-	       Cr[WS(csr, 2)] = T4 + T7;
-	       Ci[WS(csi, 1)] = Ta - T9;
-	       Cr[WS(csr, 1)] = T1 + T2 - T3;
 	       Tb = FMA(KP500000000, T9, Ta);
 	       Ci[0] = -(T8 + Tb);
 	       Ci[WS(csi, 2)] = T8 - Tb;
+	       Cr[WS(csr, 2)] = T4 + T7;
+	       Ci[WS(csi, 1)] = Ta - T9;
+	       Cr[WS(csr, 1)] = T1 + T2 - T3;
 	  }
      }
 }
 
-static const kr2c_desc desc = { 6, "r2cfII_6", {11, 2, 2, 0}, &GENUS };
+static const kr2c_desc desc = { 6, "r2cfII_6", { 11, 2, 2, 0 }, &GENUS };
 
-void X(codelet_r2cfII_6) (planner *p) {
-     X(kr2c_register) (p, r2cfII_6, &desc);
+void X(codelet_r2cfII_6) (planner *p) { X(kr2c_register) (p, r2cfII_6, &desc);
 }
 
 #endif

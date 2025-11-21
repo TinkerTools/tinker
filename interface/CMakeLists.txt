@@ -364,6 +364,7 @@ add_library (tinkerObjF OBJECT
 ../source/getarc.f
 ../source/getcart.f
 ../source/getdcd.f
+../source/getfloat.f
 ../source/getint.f
 ../source/getkey.f
 ../source/getmol.f
@@ -477,6 +478,7 @@ add_library (tinkerObjF OBJECT
 ../source/prmkey.f
 ../source/promo.f
 ../source/prtarc.f
+../source/prtcif.f
 ../source/prtdyn.f
 ../source/prterr.f
 ../source/prtfrc.f
@@ -493,6 +495,7 @@ add_library (tinkerObjF OBJECT
 ../source/random.f
 ../source/rattle.f
 ../source/readcart.f
+../source/readcif.f
 ../source/readdcd.f
 ../source/readdyn.f
 ../source/readgau.f

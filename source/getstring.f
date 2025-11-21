@@ -5,16 +5,16 @@ c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
 c     ##              All Rights Reserved              ##
 c     ###################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine getstring  --  extract double quoted string  ##
-c     ##                                                          ##
-c     ##############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine getstring  --  extract quoted text from string  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "getstring" searches for a quoted text string within an input
-c     character string; the region between the first and second
-c     double quote is returned as the "text"; if the actual text is
+c     character string; the region between the first double or single
+c     quoted region is returned as the "text"; if the actual text is
 c     too long, only the first part is returned
 c
 c     variables and parameters:
@@ -43,6 +43,8 @@ c     get the length of input string and output text
 c
       length = len(string(next:))
       size = len(text)
+      first = next
+      last = 0
 c
 c     convert first two non-ascii regions to delimiting quotes
 c
@@ -76,10 +78,8 @@ c
       end do
    10 continue
 c
-c     search the string for quoted region of text characters
+c     search the string for double quoted region of text
 c
-      first = next
-      last = 0
       do i = initial, final
          code = ichar(string(i:i))
          if (code .eq. quote) then
@@ -94,6 +94,25 @@ c
             end do
          end if
       end do
+      first = next
+c
+c     search the string for single quoted region of text
+c
+      do i = initial, final
+         code = ichar(string(i:i))
+         if (code .eq. apostrophe) then
+            first = i + 1
+            do j = first, final
+               code = ichar(string(j:j))
+               if (code .eq. apostrophe) then
+                  last = j - 1
+                  next = j + 1
+                  goto 20
+               end if
+            end do
+         end if
+      end do
+      first = next
    20 continue
 c
 c     trim the actual word if it is too long to return

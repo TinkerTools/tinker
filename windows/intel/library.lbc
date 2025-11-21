@@ -31,7 +31,6 @@ born.obj
 bound.obj
 bounds.obj
 boxes.obj
-bussi.obj
 calendar.obj
 cell.obj
 center.obj
@@ -228,6 +227,8 @@ freeze.obj
 geometry.obj
 getarc.obj
 getcart.obj
+getdcd.obj
+getfloat.obj
 getint.obj
 getkey.obj
 getmol.obj
@@ -424,6 +425,7 @@ pressure.obj
 prmkey.obj
 promo.obj
 prtarc.obj
+prtcif.obj
 prtdyn.obj
 prterr.obj
 prtfrc.obj
@@ -442,6 +444,7 @@ quatfit.obj
 random.obj
 rattle.obj
 readcart.obj
+readcif.obj
 readdcd.obj
 readdyn.obj
 readgau.obj

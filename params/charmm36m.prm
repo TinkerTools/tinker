@@ -6,7 +6,7 @@
       ##############################
 
 
-forcefield              CHARMM36
+forcefield              CHARMM36m
 
 vdwtype                 LENNARD-JONES
 radiusrule              ARITHMETIC

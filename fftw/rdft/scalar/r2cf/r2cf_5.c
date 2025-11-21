@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:06:26 EDT 2018 */
+/* Generated on Tue Sep 14 10:46:10 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -58,8 +58,8 @@ static void r2cf_5(R *R0, R *R1, R *Cr, R *Ci, stride rs, stride csr, stride csi
 		    T6 = T4 - T5;
 	       }
 	       Ci[WS(csi, 1)] = KP951056516 * (FNMS(KP618033988, T6, T3));
-	       Cr[0] = T7 + Ta;
 	       Ci[WS(csi, 2)] = KP951056516 * (FMA(KP618033988, T3, T6));
+	       Cr[0] = T7 + Ta;
 	       Tb = FNMS(KP250000000, Ta, T7);
 	       Tc = T8 - T9;
 	       Cr[WS(csr, 1)] = FMA(KP559016994, Tc, Tb);
@@ -68,10 +68,9 @@ static void r2cf_5(R *R0, R *R1, R *Cr, R *Ci, stride rs, stride csr, stride csi
      }
 }
 
-static const kr2c_desc desc = { 5, "r2cf_5", {7, 2, 5, 0}, &GENUS };
+static const kr2c_desc desc = { 5, "r2cf_5", { 7, 2, 5, 0 }, &GENUS };
 
-void X(codelet_r2cf_5) (planner *p) {
-     X(kr2c_register) (p, r2cf_5, &desc);
+void X(codelet_r2cf_5) (planner *p) { X(kr2c_register) (p, r2cf_5, &desc);
 }
 
 #else
@@ -109,8 +108,8 @@ static void r2cf_5(R *R0, R *R1, R *Cr, R *Ci, stride rs, stride csr, stride csi
 		    T6 = T4 - T5;
 	       }
 	       Ci[WS(csi, 1)] = FNMS(KP587785252, T6, KP951056516 * T3);
-	       Cr[0] = Ta + Tb;
 	       Ci[WS(csi, 2)] = FMA(KP587785252, T3, KP951056516 * T6);
+	       Cr[0] = Ta + Tb;
 	       T9 = KP559016994 * (T7 - T8);
 	       Tc = FNMS(KP250000000, Tb, Ta);
 	       Cr[WS(csr, 1)] = T9 + Tc;
@@ -119,10 +118,9 @@ static void r2cf_5(R *R0, R *R1, R *Cr, R *Ci, stride rs, stride csr, stride csi
      }
 }
 
-static const kr2c_desc desc = { 5, "r2cf_5", {9, 3, 3, 0}, &GENUS };
+static const kr2c_desc desc = { 5, "r2cf_5", { 9, 3, 3, 0 }, &GENUS };
 
-void X(codelet_r2cf_5) (planner *p) {
-     X(kr2c_register) (p, r2cf_5, &desc);
+void X(codelet_r2cf_5) (planner *p) { X(kr2c_register) (p, r2cf_5, &desc);
 }
 
 #endif

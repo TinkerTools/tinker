@@ -27,8 +27,7 @@ c
       use tettor
       use tritor
       implicit none
-      integer i,j,ij
-      integer ichar,code
+      integer i,j,ij,code
       integer nlist,nhyd
       integer ia,ib,ic,id
       integer ie,ig,ih
@@ -43,6 +42,13 @@ c
       integer, allocatable :: list(:,:)
       logical proceed
       character*1 char
+      character*1 cnam(52)
+      data cnam  / 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+     &             'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',
+     &             'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a',
+     &             'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
+     &             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',
+     &             't', 'u', 'v', 'w', 'x', 'y', 'z' /
 c
 c
 c     perform dynamic allocation of some local arrays
@@ -270,7 +276,7 @@ c     place the amino acids or nucleotides in sequence order
 c
       nseq = 0
       nchain = 0
-      code = ichar('A')
+      code = 1
       do i = 1, nlist
          ia = list(1,i)
          ib = blink(ia)
@@ -281,7 +287,7 @@ c
             seqatm(nseq) = clink(ia)
             nchain = nchain + 1
             ichain(1,nchain) = nseq
-            chnnam(nchain) = char(code)
+            chnnam(nchain) = cnam(code)
             chntyp(nchain) = 'PROTEIN'
             if (aia .eq. 15) then
                chntyp(nchain) = 'NUCLEIC'
@@ -294,6 +300,7 @@ c
                if (ib.eq.0 .or. ic.eq.0) then
                   proceed = .false.
                   ichain(2,nchain) = nseq
+                  if (code .ge. 52)  code = 0
                   code = code + 1
                else
                   aib = atomic(ib)
@@ -310,28 +317,28 @@ c
       end do
       if (nchain .eq. 1)  chnnam(1) = ' '
 c
-c     print the biopolymer sequence and chain information
+c     print the biopolymer chain and sequence information
 c
       if (debug .and. nseq.ne.0) then
          write (iout,10)
-   10    format (/,' Biopolymer Sequence Residues :'
-     &           //,' Residue',8x,'Name',7x,'Anchor Atom',/)
-         do i = 1, nseq
-            write (iout,20)  i,seq(i),seqatm(i)
-   20       format (i6,11x,a3,7x,i8)
-         end do
-         write (iout,30)
-   30    format (/,' Biopolymer Sequence Chains :'
-     &           //,3x,'Chain',8x,'Name',5x,'Residue Range',6x,'Type',/)
+   10    format (/,' Biopolymer Sequence Chains :'
+     &           //,3x,'Chain',8x,'Name',6x,'Residue Range',5x,'Type',/)
          do i = 1, nchain
             if (chnnam(i) .eq. ' ') then
-               write (iout,40)  i,(ichain(j,i),j=1,2),chntyp(i)
-   40          format (i6,12x,'-',5x,2i6,8x,a7)
+               write (iout,20)  i,(ichain(j,i),j=1,2),chntyp(i)
+   20          format (i6,12x,'-',4x,2i7,7x,a7)
             else
-               write (iout,50)  i,chnnam(i),(ichain(j,i),j=1,2),
+               write (iout,30)  i,chnnam(i),(ichain(j,i),j=1,2),
      &                          chntyp(i)
-   50          format (i6,12x,a1,5x,2i6,8x,a7)
+   30          format (i6,12x,a1,4x,2i7,7x,a7)
             end if
+         end do
+         write (iout,40)
+   40    format (/,' Biopolymer Sequence Residues :'
+     &           //,' Residue',8x,'Name',7x,'Anchor Atom',/)
+         do i = 1, nseq
+            write (iout,50)  i,seq(i),seqatm(i)
+   50       format (i6,11x,a3,7x,i8)
          end do
       end if
 c

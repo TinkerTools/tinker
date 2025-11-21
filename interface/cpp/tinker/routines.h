@@ -1471,6 +1471,12 @@ void getcart_(int* ixyz);
 void getdcd_(int* idcd);
 #define tinker_f_getdcd getdcd_
 
+// getfloat.f
+void getfloat_(char* string, double* number, int* next, tinker_fchar_len_t string_cap);
+inline void tinker_f_getfloat(tinker_fchars string, double* number, int* next) {
+    return getfloat_(string.string, number, next, string.capacity);
+}
+
 // getint.f
 void getint_();
 #define tinker_f_getint getint_
@@ -2223,6 +2229,10 @@ void prtarcf_(int* iarc);
 void prtarcb_(int* idcd, int* first);
 #define tinker_f_prtarcb prtarcb_
 
+// prtcif.f
+void prtcif_(int* icif, int* imodel);
+#define tinker_f_prtcif prtcif_
+
 // prtdyn.f
 void prtdyn_();
 #define tinker_f_prtdyn prtdyn_
@@ -2250,7 +2260,7 @@ inline void tinker_f_setmol2(tinker_fchars atmnam, tinker_fchars atmtyp, double*
 }
 
 // prtpdb.f
-void prtpdb_(int* ipdb, int* imdl);
+void prtpdb_(int* ipdb, int* imodel);
 #define tinker_f_prtpdb prtpdb_
 
 // prtprm.f
@@ -2316,6 +2326,16 @@ void water4_(double* derivs);
 // readcart.f
 void readcart_(int* ixyz, int* first);
 #define tinker_f_readcart readcart_
+
+// readcif.f
+void readcif_(int* icif);
+#define tinker_f_readcif readcif_
+void scancif_(int* icif);
+#define tinker_f_scancif scancif_
+void fixcif_(char* resname, char* atmname, tinker_fchar_len_t resname_cap, tinker_fchar_len_t atmname_cap);
+inline void tinker_f_fixcif(tinker_fchars resname, tinker_fchars atmname) {
+    return fixcif_(resname.string, atmname.string, resname.capacity, atmname.capacity);
+}
 
 // readdcd.f
 void readdcd_(int* idcd, int* first);

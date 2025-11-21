@@ -210,7 +210,6 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 bitors.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 bonds.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 born.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 bounds.f
-ifort -c -O3 -no-ipo -no-prec-div -vec-report0 bussi.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 calendar.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 center.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 chkpole.f
@@ -389,6 +388,8 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 gda.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 geometry.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getarc.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getcart.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getdcd.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getfloat.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getint.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getkey.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 getmol.f
@@ -524,6 +525,7 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 prmkey.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 promo.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 protein.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 prtarc.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 prtcif.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 prtdyn.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 prterr.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 prtfrc.f
@@ -544,6 +546,7 @@ ifort -c -O3 -no-ipo -no-prec-div -vec-report0 radial.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 random.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 rattle.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readcart.f
+ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readcif.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readdcd.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readdyn.f
 ifort -c -O3 -no-ipo -no-prec-div -vec-report0 readgau.f

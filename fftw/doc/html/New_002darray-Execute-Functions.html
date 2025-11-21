@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: New-array Execute Functions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>New-array Execute Functions (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: New-array Execute Functions">
-<meta name="keywords" content="FFTW 3.3.8: New-array Execute Functions">
+<meta name="description" content="New-array Execute Functions (FFTW 3.3.10)">
+<meta name="keywords" content="New-array Execute Functions (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="FFTW-Reference.html#FFTW-Reference" rel="up" title="FFTW Reference">
-<link href="Wisdom.html#Wisdom" rel="next" title="Wisdom">
-<link href="64_002dbit-Guru-Interface.html#g_t64_002dbit-Guru-Interface" rel="prev" title="64-bit Guru Interface">
+<link href="FFTW-Reference.html" rel="up" title="FFTW Reference">
+<link href="Wisdom.html" rel="next" title="Wisdom">
+<link href="64_002dbit-Guru-Interface.html" rel="prev" title="64-bit Guru Interface">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,20 +59,18 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="New_002darray-Execute-Functions"></a>
-<div class="header">
+<span id="New_002darray-Execute-Functions"></span><div class="header">
 <p>
-Next: <a href="Wisdom.html#Wisdom" accesskey="n" rel="next">Wisdom</a>, Previous: <a href="Guru-Interface.html#Guru-Interface" accesskey="p" rel="prev">Guru Interface</a>, Up: <a href="FFTW-Reference.html#FFTW-Reference" accesskey="u" rel="up">FFTW Reference</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Wisdom.html" accesskey="n" rel="next">Wisdom</a>, Previous: <a href="Guru-Interface.html" accesskey="p" rel="prev">Guru Interface</a>, Up: <a href="FFTW-Reference.html" accesskey="u" rel="up">FFTW Reference</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="New_002darray-Execute-Functions-1"></a>
-<h3 class="section">4.6 New-array Execute Functions</h3>
-<a name="index-execute-2"></a>
-<a name="index-new_002darray-execution"></a>
+<span id="New_002darray-Execute-Functions-1"></span><h3 class="section">4.6 New-array Execute Functions</h3>
+<span id="index-execute-2"></span>
+<span id="index-new_002darray-execution"></span>
 
 <p>Normally, one executes a plan for the arrays with which the plan was
-created, by calling <code>fftw_execute(plan)</code> as described in <a href="Using-Plans.html#Using-Plans">Using Plans</a>.
-<a name="index-fftw_005fexecute-2"></a>
+created, by calling <code>fftw_execute(plan)</code> as described in <a href="Using-Plans.html">Using Plans</a>.
+<span id="index-fftw_005fexecute-2"></span>
 However, it is possible for sophisticated users to apply a given plan
 to a <em>different</em> array using the &ldquo;new-array execute&rdquo; functions
 detailed below, provided that the following conditions are met:
@@ -102,16 +91,16 @@ condition is automatically satisfied for interleaved arrays.)
 </li><li> The <em>alignment</em> of the new input/output arrays is the same as that
 of the input/output arrays when the plan was created, unless the plan
 was created with the <code>FFTW_UNALIGNED</code> flag.
-<a name="index-FFTW_005fUNALIGNED-1"></a>
+<span id="index-FFTW_005fUNALIGNED-1"></span>
 Here, the alignment is a platform-dependent quantity (for example, it is
 the address modulo 16 if SSE SIMD instructions are used, but the address
 modulo 4 for non-SIMD single-precision FFTW on the same machine).  In
 general, only arrays allocated with <code>fftw_malloc</code> are guaranteed to
-be equally aligned (see <a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">SIMD alignment and fftw_malloc</a>).
+be equally aligned (see <a href="SIMD-alignment-and-fftw_005fmalloc.html">SIMD alignment and fftw_malloc</a>).
 
 </li></ul>
 
-<a name="index-alignment-2"></a>
+<span id="index-alignment-2"></span>
 <p>The alignment issue is especially critical, because if you don&rsquo;t use
 <code>fftw_malloc</code> then you may have little control over the alignment
 of arrays in memory.  For example, neither the C++ <code>new</code> function
@@ -123,7 +112,7 @@ you to simply create multiple plans (creating a new plan is quick once
 one exists for a given size), or better yet re-use the same array for
 your transforms.
 </p>
-<a name="index-fftw_005falignment_005fof-1"></a>
+<span id="index-fftw_005falignment_005fof-1"></span>
 <p>For rare circumstances in which you cannot control the alignment of
 allocated memory, but wish to determine where a given array is
 aligned like the original array for which a plan was created, you can
@@ -138,7 +127,7 @@ if necessary).
 </p>
 <p>If you are tempted to use the new-array execute interface because you
 want to transform a known bunch of arrays of the same size, you should
-probably go use the advanced interface instead (see <a href="Advanced-Interface.html#Advanced-Interface">Advanced Interface</a>)).
+probably go use the advanced interface instead (see <a href="Advanced-Interface.html">Advanced Interface</a>)).
 </p>
 <p>The new-array execute functions are:
 </p>
@@ -171,13 +160,13 @@ void fftw_execute_r2r(
      const fftw_plan p, 
      double *in, double *out);
 </pre></div>
-<a name="index-fftw_005fexecute_005fdft"></a>
-<a name="index-fftw_005fexecute_005fsplit_005fdft"></a>
-<a name="index-fftw_005fexecute_005fdft_005fr2c"></a>
-<a name="index-fftw_005fexecute_005fsplit_005fdft_005fr2c"></a>
-<a name="index-fftw_005fexecute_005fdft_005fc2r"></a>
-<a name="index-fftw_005fexecute_005fsplit_005fdft_005fc2r"></a>
-<a name="index-fftw_005fexecute_005fr2r"></a>
+<span id="index-fftw_005fexecute_005fdft"></span>
+<span id="index-fftw_005fexecute_005fsplit_005fdft"></span>
+<span id="index-fftw_005fexecute_005fdft_005fr2c"></span>
+<span id="index-fftw_005fexecute_005fsplit_005fdft_005fr2c"></span>
+<span id="index-fftw_005fexecute_005fdft_005fc2r"></span>
+<span id="index-fftw_005fexecute_005fsplit_005fdft_005fc2r"></span>
+<span id="index-fftw_005fexecute_005fr2r"></span>
 
 <p>These execute the <code>plan</code> to compute the corresponding transform on
 the input/output arrays specified by the subsequent arguments.  The
@@ -195,7 +184,7 @@ used to create the plan, however.
 <hr>
 <div class="header">
 <p>
-Next: <a href="Wisdom.html#Wisdom" accesskey="n" rel="next">Wisdom</a>, Previous: <a href="Guru-Interface.html#Guru-Interface" accesskey="p" rel="prev">Guru Interface</a>, Up: <a href="FFTW-Reference.html#FFTW-Reference" accesskey="u" rel="up">FFTW Reference</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Wisdom.html" accesskey="n" rel="next">Wisdom</a>, Previous: <a href="Guru-Interface.html" accesskey="p" rel="prev">Guru Interface</a>, Up: <a href="FFTW-Reference.html" accesskey="u" rel="up">FFTW Reference</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

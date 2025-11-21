@@ -8,6 +8,8 @@ $exhaustive = 0;
 $patient = 0;
 $estimate = 0;
 $wisdom = 0;
+$validate_wisdom = 0;
+$threads_callback = 0;
 $nthreads = 1;
 $rounds = 0;
 $maxsize = 60000;
@@ -32,6 +34,7 @@ sub make_options {
     $options = "-o patient $options" if $patient;
     $options = "-o estimate $options" if $estimate;
     $options = "-o wisdom $options" if $wisdom;
+    $options = "-o threads_callback $options" if $threads_callback;
     $options = "-o nthreads=$nthreads $options" if ($nthreads > 1);
     $options = "-obflag=30 $options" if $mpi_transposed_in;
     $options = "-obflag=31 $options" if $mpi_transposed_out;
@@ -39,6 +42,38 @@ sub make_options {
 }
 
 @list_of_problems = ();
+
+sub run_bench {
+    my $options = shift;
+    my $problist = shift;
+
+    print "Executing \"$program $options $problist\"\n"
+        if $verbose;
+
+    system("$program $options $problist");
+    $exit_value  = $? >> 8;
+    $signal_num  = $? & 127;
+    $dumped_core = $? & 128;
+
+    if ($signal_num == 1) {
+        print "hangup\n";
+        exit 0;
+    }
+    if ($signal_num == 2) {
+        print "interrupted\n";
+        exit 0;
+    }
+    if ($signal_num == 9) {
+        print "killed\n";
+        exit 0;
+    }
+
+    if ($exit_value != 0 || $dumped_core || $signal_num) {
+        print "FAILED $program: $problist\n";
+        if ($signal_num) { print "received signal $signal_num\n"; }
+        exit 1 unless $keepgoing;
+    }
+}
 
 sub flush_problems {
     my $options = shift;
@@ -48,32 +83,20 @@ sub flush_problems {
 	for (@list_of_problems) {
 	    $problist = "$problist --verify '$_'";
 	}
-	print "Executing \"$program $options $problist\"\n" 
-	    if $verbose;
-	
-	system("$program $options $problist");
-	$exit_value  = $? >> 8;
-	$signal_num  = $? & 127;
-	$dumped_core = $? & 128;
 
-	if ($signal_num == 1) {
-	    print "hangup\n";
-	    exit 0;
-	}
-	if ($signal_num == 2) {
-	    print "interrupted\n";
-	    exit 0;
-	}
-	if ($signal_num == 9) {
-	    print "killed\n";
-	    exit 0;
-	}
+        if ($validate_wisdom) {
+            # start with a fresh wisdom state
+            unlink("wis.dat");
+        }
 
-	if ($exit_value != 0 || $dumped_core || $signal_num) {
-	    print "FAILED $program: $problist\n";
-	    if ($signal_num) { print "received signal $signal_num\n"; }
-	    exit 1 unless $keepgoing;
-	}
+        run_bench($options, $problist);
+
+        if ($validate_wisdom) {
+            # run again and validate that we can the problem in wisdom-only mode
+            print "Executing again in wisdom-only mode\n"
+                if $verbose;
+            run_bench("$options -owisdom-only", $problist);
+        }
 	@list_of_problems = ();
     }
 }
@@ -107,12 +130,12 @@ sub do_problem {
 
     # size-1 redft00 is not defined/doable
     return if ($problem =~ /[^0-9]1e00/);
-    
+
     if ($doablep) {
 	@list_of_problems = ($problem, @list_of_problems);
 	&flush_problems($options) if ($#list_of_problems > $flushcount);
     } else {
-	print "Executing \"$program $options --can-do $problem\"\n" 
+	print "Executing \"$program $options --can-do $problem\"\n"
 	    if $verbose;
 	$result=`$program $options --can-do $problem`;
 	if ($result ne "#f\n" && $result ne "#f\r\n") {
@@ -264,6 +287,8 @@ sub parse_arguments (@)
 	elsif ($arglist[0] eq '--patient') { ++$patient; }
 	elsif ($arglist[0] eq '--estimate') { ++$estimate; }
 	elsif ($arglist[0] eq '--wisdom') { ++$wisdom; }
+        elsif ($arglist[0] eq '--validate-wisdom') { ++$wisdom;  ++$validate_wisdom; }
+	elsif ($arglist[0] eq '--threads_callback') { ++$threads_callback; }
 	elsif ($arglist[0] =~ /^--nthreads=(.+)$/) { $nthreads = $1; }
 	elsif ($arglist[0] eq '-k') { ++$keepgoing; }
 	elsif ($arglist[0] eq '--keep-going') { ++$keepgoing; }
@@ -278,14 +303,14 @@ sub parse_arguments (@)
 	    ++$mpi; ++$mpi_transposed_in; }
 	elsif ($arglist[0] eq '--mpi-transposed-out') {
 	    ++$mpi; ++$mpi_transposed_out; }
-	
+
 	elsif ($arglist[0] eq '-0d') { ++$do_0d; }
 	elsif ($arglist[0] eq '-1d') { ++$do_1d; }
 	elsif ($arglist[0] eq '-2d') { ++$do_2d; }
 	elsif ($arglist[0] eq '-r') { ++$do_random; }
 	elsif ($arglist[0] eq '--random') { ++$do_random; }
-	elsif ($arglist[0] eq '-a') { 
-	    ++$do_0d; ++$do_1d; ++$do_2d; ++$do_random; 
+	elsif ($arglist[0] eq '-a') {
+	    ++$do_0d; ++$do_1d; ++$do_2d; ++$do_random;
 	}
 
 	else { $program=$arglist[0]; }

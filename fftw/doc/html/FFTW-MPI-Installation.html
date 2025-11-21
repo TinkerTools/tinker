@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: FFTW MPI Installation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>FFTW MPI Installation (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: FFTW MPI Installation">
-<meta name="keywords" content="FFTW 3.3.8: FFTW MPI Installation">
+<meta name="description" content="FFTW MPI Installation (FFTW 3.3.10)">
+<meta name="keywords" content="FFTW MPI Installation (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI" rel="up" title="Distributed-memory FFTW with MPI">
-<link href="Linking-and-Initializing-MPI-FFTW.html#Linking-and-Initializing-MPI-FFTW" rel="next" title="Linking and Initializing MPI FFTW">
-<link href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI" rel="prev" title="Distributed-memory FFTW with MPI">
+<link href="Distributed_002dmemory-FFTW-with-MPI.html" rel="up" title="Distributed-memory FFTW with MPI">
+<link href="Linking-and-Initializing-MPI-FFTW.html" rel="next" title="Linking and Initializing MPI FFTW">
+<link href="Distributed_002dmemory-FFTW-with-MPI.html" rel="prev" title="Distributed-memory FFTW with MPI">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,22 +59,20 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="FFTW-MPI-Installation"></a>
-<div class="header">
+<span id="FFTW-MPI-Installation"></span><div class="header">
 <p>
-Next: <a href="Linking-and-Initializing-MPI-FFTW.html#Linking-and-Initializing-MPI-FFTW" accesskey="n" rel="next">Linking and Initializing MPI FFTW</a>, Previous: <a href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI" accesskey="p" rel="prev">Distributed-memory FFTW with MPI</a>, Up: <a href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI" accesskey="u" rel="up">Distributed-memory FFTW with MPI</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Linking-and-Initializing-MPI-FFTW.html" accesskey="n" rel="next">Linking and Initializing MPI FFTW</a>, Previous: <a href="Distributed_002dmemory-FFTW-with-MPI.html" accesskey="p" rel="prev">Distributed-memory FFTW with MPI</a>, Up: <a href="Distributed_002dmemory-FFTW-with-MPI.html" accesskey="u" rel="up">Distributed-memory FFTW with MPI</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="FFTW-MPI-Installation-1"></a>
-<h3 class="section">6.1 FFTW MPI Installation</h3>
+<span id="FFTW-MPI-Installation-1"></span><h3 class="section">6.1 FFTW MPI Installation</h3>
 
 <p>All of the FFTW MPI code is located in the <code>mpi</code> subdirectory of
 the FFTW package.  On Unix systems, the FFTW MPI libraries and header
 files are automatically configured, compiled, and installed along with
 the uniprocessor FFTW libraries simply by including
 <code>--enable-mpi</code> in the flags to the <code>configure</code> script
-(see <a href="Installation-on-Unix.html#Installation-on-Unix">Installation on Unix</a>).
-<a name="index-configure-1"></a>
+(see <a href="Installation-on-Unix.html">Installation on Unix</a>).
+<span id="index-configure-1"></span>
 </p>
 
 <p>Any implementation of the MPI standard, version 1 or later, should
@@ -98,7 +87,7 @@ command, typically <code>mpicc</code> for C code.  The <code>configure</code>
 script knows the most common names for this command, but you can
 specify the MPI compilation command explicitly by setting the
 <code>MPICC</code> variable, as in &lsquo;<samp>./configure MPICC=mpicc ...</samp>&rsquo;.
-<a name="index-mpicc"></a>
+<span id="index-mpicc"></span>
 </p>
 
 <p>If, instead of a special compiler command, you need to link a certain

@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:05:59 EDT 2018 */
+/* Generated on Tue Sep 14 10:45:49 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -214,10 +214,10 @@ static const tw_instr twinstr[] = {
      VTW(0, 12),
      VTW(0, 13),
      VTW(0, 14),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 15, XSIMD_STRING("t1bv_15"), twinstr, &GENUS, {50, 35, 42, 0}, 0, 0, 0 };
+static const ct_desc desc = { 15, XSIMD_STRING("t1bv_15"), twinstr, &GENUS, { 50, 35, 42, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_t1bv_15) (planner *p) {
      X(kdft_dit_register) (p, t1bv_15, &desc);
@@ -415,10 +415,10 @@ static const tw_instr twinstr[] = {
      VTW(0, 12),
      VTW(0, 13),
      VTW(0, 14),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 15, XSIMD_STRING("t1bv_15"), twinstr, &GENUS, {78, 39, 14, 0}, 0, 0, 0 };
+static const ct_desc desc = { 15, XSIMD_STRING("t1bv_15"), twinstr, &GENUS, { 78, 39, 14, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_t1bv_15) (planner *p) {
      X(kdft_dit_register) (p, t1bv_15, &desc);

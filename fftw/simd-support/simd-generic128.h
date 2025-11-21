@@ -43,7 +43,7 @@
 #endif
 
 #define VL DS(1,2)         /* SIMD vector length, in term of complex numbers */
-#define SIMD_VSTRIDE_OKA(x) DS(1,((x) == 2))
+#define SIMD_VSTRIDE_OKA(x) DS(SIMD_STRIDE_OKA(x),((x) == 2))
 #define SIMD_STRIDE_OKPAIR SIMD_STRIDE_OK
 
 typedef DS(double,float) V __attribute__ ((vector_size(16)));
@@ -214,7 +214,7 @@ static inline V VZMULIJ(V tx, V sr)
 /* twiddle storage #1: compact, slower */
 #ifdef FFTW_SINGLE
 #  define VTW1(v,x)  \
-  {TW_COS, v, x}, {TW_COS, v+1, x}, {TW_SIN, v, x}, {TW_SIN, v+1, x}
+  {TW_CEXP, v, x}, {TW_CEXP, v+1, x}     
 static inline V BYTW1(const R *t, V sr)
 {
     return VZMUL(LDA(t, 2, t), sr);

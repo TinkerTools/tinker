@@ -19,11 +19,15 @@ c
       program xyzpdb
       use files
       use inform
+      use iounit
+      use pdb
       implicit none
       integer i,ipdb,ixyz
-      integer freeunit
-      logical multi
+      integer next,freeunit
+      logical exist,multi
       character*7 fstr
+      character*240 record
+      character*240 string
       character*240 pdbfile
       character*240 xyzfile
 c
@@ -39,6 +43,25 @@ c
       call field
       call katom
       call molecule
+c
+c     get the format to be used for the Protein Data Bank file
+c
+      pdbtyp = '   '
+      call nextarg (string,exist)
+      if (exist)  read (string,*,err=10,end=10)  pdbtyp
+      call upcase (pdbtyp)
+   10 continue
+      if (pdbtyp.ne.'PDB' .and. pdbtyp.ne.'CIF') then
+         write (iout,20)
+   20    format (/,' Use PDB or CIF Format for Protein Data',
+     &              ' Bank File [PDB] :  ',$)
+         read (input,30)  record
+   30    format (a240)
+         next = 1
+         call gettext (record,pdbtyp,next)
+         call upcase (pdbtyp)
+         if (pdbtyp .ne. 'CIF')  pdbtyp = 'PDB'
+      end if
 c
 c     check for multiple coordinate sets and get first structure
 c
@@ -57,7 +80,8 @@ c
 c     open the Protein Data Bank file to be used for output
 c
       ipdb = freeunit ()
-      pdbfile = filename(1:leng)//'.pdb'
+      if (pdbtyp .eq. 'PDB')  pdbfile = filename(1:leng)//'.pdb'
+      if (pdbtyp .eq. 'CIF')  pdbfile = filename(1:leng)//'.cif'
       call version (pdbfile,'new')
       open (unit=ipdb,file=pdbfile,status='new')
 c
@@ -67,14 +91,20 @@ c
       do while (.not. abort)
          if (multi)  i = i + 1
          call makepdb
-         call prtpdb (ipdb,i)
+         if (pdbtyp .eq. 'PDB')  call prtpdb (ipdb,i)
+         if (pdbtyp .eq. 'CIF')  call prtcif (ipdb,i)
          call readxyz (ixyz)
       end do
 c
 c     append termination record to the end of the PDB file
 c
-      fstr = '(''END'')'
-      write (ipdb,fstr(1:7))
+      if (pdbtyp .eq. 'PDB') then
+         fstr = '(''END'')'
+         write (ipdb,fstr(1:7))
+      else if (pdbtyp .eq. 'CIF') then
+         fstr = '(''#'')'
+         write (ipdb,fstr(1:5))
+      end if
 c
 c     perform any final tasks before program exit
 c
@@ -150,6 +180,7 @@ c
          first = .false.
          if (.not. allocated(resnum))  allocate (resnum(maxatm))
          if (.not. allocated(resatm))  allocate (resatm(2,maxatm))
+         if (.not. allocated(pdbmod))  allocate (pdbmod(maxatm))
          if (.not. allocated(npdb12))  allocate (npdb12(maxatm))
          if (.not. allocated(ipdb12))  allocate (ipdb12(maxval,maxatm))
          if (.not. allocated(pdblist))  allocate (pdblist(maxatm))
@@ -158,7 +189,8 @@ c
          if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
          if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
          if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
-         if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
+         if (.not. allocated(pdbsym))  allocate (pdbsym(maxatm))
+         if (.not. allocated(pdbrec))  allocate (pdbrec(maxatm))
       end if
 c
 c     initialize number of PDB atoms and atom mapping
@@ -293,7 +325,7 @@ c
                end if
                pdbnum = i
                call pdbatom (atmname,resname,pdbnum,k)
-               pdbtyp(npdb) = 'HETATM'
+               pdbrec(npdb) = 'HETATM'
             end do
          end do
          do i = 1, nmol
@@ -738,7 +770,7 @@ c
                   end if
                   pdbnum = nseq + i - 1
                   call pdbatom (atmname,resname,pdbnum,k)
-                  pdbtyp(npdb) = 'HETATM'
+                  pdbrec(npdb) = 'HETATM'
                end do
             end if
          end do
@@ -775,20 +807,23 @@ c     "pdbatom" adds an atom to the Protein Data Bank file
 c
 c
       subroutine pdbatom (atmname,resname,ires,icoord)
+      use atomid
       use atoms
       use pdb
+      use ptable
       implicit none
       integer ires,icoord
       character*3 resname
       character*4 atmname
 c
 c
-c     for each atom set the sequential number, record type, atom
-c     name, residue name, residue number and atomic coordinates
+c     for each atom set the sequential number, record type, atomic
+c     symbol, atom name, residue name and number, and coordinates
 c
       if (icoord .ne. 0) then
          npdb = npdb + 1
-         pdbtyp(npdb) = 'ATOM  '
+         pdbrec(npdb) = 'ATOM  '
+         pdbsym(npdb) = elemnt(atomic(icoord))
          pdbatm(npdb) = atmname
          pdbres(npdb) = resname
          resnum(npdb) = ires

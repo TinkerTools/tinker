@@ -210,7 +210,6 @@ gfortran -c -Og -g -Wall bitors.f
 gfortran -c -Og -g -Wall bonds.f
 gfortran -c -Og -g -Wall born.f
 gfortran -c -Og -g -Wall bounds.f
-gfortran -c -Og -g -Wall bussi.f
 gfortran -c -Og -g -Wall calendar.f
 gfortran -c -Og -g -Wall center.f
 gfortran -c -Og -g -Wall chkpole.f
@@ -389,6 +388,8 @@ gfortran -c -Og -g -Wall gda.f
 gfortran -c -Og -g -Wall geometry.f
 gfortran -c -Og -g -Wall getarc.f
 gfortran -c -Og -g -Wall getcart.f
+gfortran -c -Og -g -Wall getdcd.f
+gfortran -c -Og -g -Wall getfloat.f
 gfortran -c -Og -g -Wall getint.f
 gfortran -c -Og -g -Wall getkey.f
 gfortran -c -Og -g -Wall getmol.f
@@ -524,6 +525,7 @@ gfortran -c -Og -g -Wall prmkey.f
 gfortran -c -Og -g -Wall promo.f
 gfortran -c -Og -g -Wall protein.f
 gfortran -c -Og -g -Wall prtarc.f
+gfortran -c -Og -g -Wall prtcif.f
 gfortran -c -Og -g -Wall prtdyn.f
 gfortran -c -Og -g -Wall prterr.f
 gfortran -c -Og -g -Wall prtfrc.f
@@ -544,6 +546,7 @@ gfortran -c -Og -g -Wall radial.f
 gfortran -c -Og -g -Wall random.f
 gfortran -c -Og -g -Wall rattle.f
 gfortran -c -Og -g -Wall readcart.f
+gfortran -c -Og -g -Wall readcif.f
 gfortran -c -Og -g -Wall readdcd.f
 gfortran -c -Og -g -Wall readdyn.f
 gfortran -c -Og -g -Wall readgau.f

@@ -23,8 +23,8 @@ c
       use iounit
       implicit none
       integer i,ilog
-      integer nask,nstep
-      integer nread,nblock
+      integer nask,nread
+      integer nstep,nblock
       integer maxblock
       integer start,stop
       integer freeunit
@@ -52,8 +52,10 @@ c
 c     zero out the individual average and variance values
 c
       doinfo = .false.
+      proceed = .false.
       maxblock = 1000000
       nread = 0
+      nstep = 0
       nblock = 0
       time = 10000000.0d0
       etot = 0.0d0
@@ -214,37 +216,46 @@ c
 c
 c     print the averages and overall standard deviations
 c
-      if (doinfo) then
-         write (iout,90)
-   90    format ()
-      end if
-      write (iout,100)  nblock
-  100 format (' Total MD Blocks',8x,i12,' Blocks')
-      if (doinfo) then
-         write (iout,110)  nstep
-  110    format (' Steps per Block',8x,i12,' Steps')
-         if (time .ge. 1000000.0d0) then
-            write (iout,120)  time/1000000.0d0
-  120       format (' Simulation Time',8x,f12.4,' Microseconds',/)
-         else if (time .ge. 1000.0d0) then
-            write (iout,130)  time/1000.0d0
-  130       format (' Simulation Time',8x,f12.4,' Nanoseconds',/)
-         else
-            write (iout,140)  time
-  140       format (' Simulation Time',8x,f12.2,' Picoseconds',/)
+      if (nblock .ne. 0) then
+         if (doinfo) then
+            write (iout,90)
+   90       format ()
          end if
+         write (iout,100)  nblock
+  100    format (' Total MD Blocks',8x,i12,' Blocks')
+         if (doinfo) then
+            write (iout,110)  nstep
+  110       format (' Steps per Block',8x,i12,' Steps')
+            if (time .ge. 1000000.0d0) then
+               write (iout,120)  time/1000000.0d0
+  120          format (' Simulation Time',8x,f12.4,' Microseconds',/)
+            else if (time .ge. 1000.0d0) then
+               write (iout,130)  time/1000.0d0
+  130          format (' Simulation Time',8x,f12.4,' Nanoseconds',/)
+            else
+               write (iout,140)  time
+  140          format (' Simulation Time',8x,f12.2,' Picoseconds',/)
+            end if
+         end if
+         write (iout,150)  etot,vtot
+  150    format (' Total Energy',7x,f16.4,' Kcal/mole   (+/-',
+     &              f9.4,')')
+         write (iout,160)  epot,vpot
+  160    format (' Potential Energy',3x,f16.4,' Kcal/mole   (+/-',
+     &              f9.4,')')
+         write (iout,170)  ekin,vkin
+  170    format (' Kinetic Energy',5x,f16.4,' Kcal/mole   (+/-',
+     &              f9.4,')')
+         write (iout,180)  temp,vtemp
+  180    format (' Temperature',8x,f16.2,' Kelvin      (+/-',f9.2,')')
+         write (iout,190)  pres,vpres
+  190    format (' Pressure',11x,f16.2,' Atmosphere  (+/-',f9.2,')')
+         write (iout,200)  dens,vdens
+  200    format (' Density',12x,f16.4,' Grams/cc    (+/-',f9.4,')')
+      else
+         write (iout,210)
+  210    format (/,' MDAVG  --  Input File Contains No Dynamics',
+     &              ' Log Information')
       end if
-      write (iout,150)  etot,vtot
-  150 format (' Total Energy',7x,f16.4,' Kcal/mole   (+/-',f9.4,')')
-      write (iout,160)  epot,vpot
-  160 format (' Potential Energy',3x,f16.4,' Kcal/mole   (+/-',f9.4,')')
-      write (iout,170)  ekin,vkin
-  170 format (' Kinetic Energy',5x,f16.4,' Kcal/mole   (+/-',f9.4,')')
-      write (iout,180)  temp,vtemp
-  180 format (' Temperature',8x,f16.2,' Kelvin      (+/-',f9.2,')')
-      write (iout,190)  pres,vpres
-  190 format (' Pressure',11x,f16.2,' Atmosphere  (+/-',f9.2,')')
-      write (iout,200)  dens,vdens
-  200 format (' Density',12x,f16.4,' Grams/cc    (+/-',f9.4,')')
       close (unit=ilog)
       end

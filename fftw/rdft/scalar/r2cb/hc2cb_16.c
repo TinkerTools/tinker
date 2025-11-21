@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:07:52 EDT 2018 */
+/* Generated on Tue Sep 14 10:47:07 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -438,11 +438,11 @@ static void hc2cb_16(R *Rp, R *Ip, R *Rm, R *Im, const R *W, stride rs, INT mb, 
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 1, 16},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 1, 16 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const hc2c_desc desc = { 16, "hc2cb_16", twinstr, &GENUS, {104, 30, 70, 0} };
+static const hc2c_desc desc = { 16, "hc2cb_16", twinstr, &GENUS, { 104, 30, 70, 0 } };
 
 void X(codelet_hc2cb_16) (planner *p) {
      X(khc2c_register) (p, hc2cb_16, &desc, HC2C_VIA_RDFT);
@@ -821,11 +821,11 @@ static void hc2cb_16(R *Rp, R *Ip, R *Rm, R *Im, const R *W, stride rs, INT mb, 
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 1, 16},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 1, 16 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const hc2c_desc desc = { 16, "hc2cb_16", twinstr, &GENUS, {136, 46, 38, 0} };
+static const hc2c_desc desc = { 16, "hc2cb_16", twinstr, &GENUS, { 136, 46, 38, 0 } };
 
 void X(codelet_hc2cb_16) (planner *p) {
      X(khc2c_register) (p, hc2cb_16, &desc, HC2C_VIA_RDFT);

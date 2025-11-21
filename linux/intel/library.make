@@ -42,7 +42,6 @@ born.o \
 bound.o \
 bounds.o \
 boxes.o \
-bussi.o \
 calendar.o \
 cell.o \
 center.o \
@@ -239,6 +238,8 @@ freeze.o \
 geometry.o \
 getarc.o \
 getcart.o \
+getdcd.o \
+getfloat.o \
 getint.o \
 getkey.o \
 getmol.o \
@@ -435,6 +436,7 @@ pressure.o \
 prmkey.o \
 promo.o \
 prtarc.o \
+prtcif.o \
 prtdyn.o \
 prterr.o \
 prtfrc.o \
@@ -453,6 +455,7 @@ quatfit.o \
 random.o \
 rattle.o \
 readcart.o \
+readcif.o \
 readdcd.o \
 readdyn.o \
 readgau.o \

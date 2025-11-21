@@ -210,7 +210,6 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp bitors.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp bonds.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp born.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp bounds.f
-ifort -c -O3 -no-ipo -no-prec-div -qopenmp bussi.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp calendar.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp center.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp chkpole.f
@@ -389,6 +388,8 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp gda.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp geometry.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp getarc.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp getcart.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getdcd.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp getfloat.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp getint.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp getkey.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp getmol.f
@@ -524,6 +525,7 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp prmkey.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp promo.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp protein.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtarc.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtcif.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtdyn.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prterr.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtfrc.f
@@ -544,6 +546,7 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp radial.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp random.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp rattle.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp readcart.f
+ifort -c -O3 -no-ipo -no-prec-div -qopenmp readcif.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp readdcd.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp readdyn.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp readgau.f

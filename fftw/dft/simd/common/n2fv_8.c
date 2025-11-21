@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:05:07 EDT 2018 */
+/* Generated on Tue Sep 14 10:45:12 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -111,10 +111,9 @@ static void n2fv_8(const R *ri, const R *ii, R *ro, R *io, stride is, stride os,
      VLEAVE();
 }
 
-static const kdft_desc desc = { 8, XSIMD_STRING("n2fv_8"), {16, 0, 10, 0}, &GENUS, 0, 2, 0, 0 };
+static const kdft_desc desc = { 8, XSIMD_STRING("n2fv_8"), { 16, 0, 10, 0 }, &GENUS, 0, 2, 0, 0 };
 
-void XSIMD(codelet_n2fv_8) (planner *p) {
-     X(kdft_register) (p, n2fv_8, &desc);
+void XSIMD(codelet_n2fv_8) (planner *p) { X(kdft_register) (p, n2fv_8, &desc);
 }
 
 #else
@@ -205,10 +204,9 @@ static void n2fv_8(const R *ri, const R *ii, R *ro, R *io, stride is, stride os,
      VLEAVE();
 }
 
-static const kdft_desc desc = { 8, XSIMD_STRING("n2fv_8"), {26, 2, 0, 0}, &GENUS, 0, 2, 0, 0 };
+static const kdft_desc desc = { 8, XSIMD_STRING("n2fv_8"), { 26, 2, 0, 0 }, &GENUS, 0, 2, 0, 0 };
 
-void XSIMD(codelet_n2fv_8) (planner *p) {
-     X(kdft_register) (p, n2fv_8, &desc);
+void XSIMD(codelet_n2fv_8) (planner *p) { X(kdft_register) (p, n2fv_8, &desc);
 }
 
 #endif

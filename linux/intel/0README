@@ -17,5 +17,5 @@
          Please note that by default most Linux distributions limit
          stacksize and datasize for processes, as can be checked via
          the csh limit command or similar. Calculations on big systems
-         will need these values increased to avoid failure at startup.
+         may need these values increased to avoid failure at startup.
 
