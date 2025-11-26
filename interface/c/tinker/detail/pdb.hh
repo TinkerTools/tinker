@@ -7,6 +7,8 @@ extern "C" {
 #endif
 extern int TINKER_MOD(pdb, npdb);
 extern int TINKER_MOD(pdb, nres);
+extern int TINKER_MOD(pdb, nmodel);
+extern int TINKER_MOD(pdb, imodel);
 extern int* TINKER_MOD(pdb, resnum);
 extern int* TINKER_MOD(pdb, resatm);
 extern int* TINKER_MOD(pdb, npdb12);

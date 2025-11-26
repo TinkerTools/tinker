@@ -16,7 +16,7 @@ c     "prtpdb" writes out a set of PDB coordinates in legacy PDB
 c     format to an external file
 c
 c
-      subroutine prtpdb (ipdb,imodel)
+      subroutine prtpdb (ipdb)
       use bound
       use boxes
       use files
@@ -25,12 +25,13 @@ c
       use titles
       implicit none
       integer i,k
-      integer ipdb,imodel
+      integer ipdb
       integer start,stop
       integer resmax,resnumb
       integer, allocatable :: resid(:)
       real*8 crdmin,crdmax
       logical opened
+      logical header
       logical rename
       logical reformat
       character*1 chnname
@@ -42,8 +43,10 @@ c
       character*240 pdbfile
 c
 c
-c     set flags for residue naming and large value formatting
+c     set flags for residue naming and extended formatting
 c
+      header = .true.
+      if (imodel .gt. 1)  header = .false.
       rename = .false.
       reformat = .true.
 c
@@ -58,15 +61,16 @@ c
 c
 c     write out the header lines and the title
 c
-      if (ltitle .eq. 0) then
-         fstr = '(''HEADER'',/,''TITLE '',/,''COMPND'',/,''SOURCE'')'
-         write (ipdb,fstr(1:45))
-      else
-c        fstr =
-c    &       '(''HEADER'',/,''TITLE '',4x,a,/,''COMPND'',/,''SOURCE'')'
-         fstr = '(''HEADER'',/,''TITLE '',4x,a,'
-     &             //'/,''COMPND'',/,''SOURCE'')'
-         write (ipdb,fstr(1:50))  title(1:ltitle)
+      if (header) then
+         if (ltitle .eq. 0) then
+            fstr = '(''HEADER'',/,''TITLE '',/,''COMPND'','
+     &                //'/,''SOURCE'')'
+            write (ipdb,fstr(1:45))
+         else
+            fstr = '(''HEADER'',/,''TITLE '',4x,a,'
+     &                //'/,''COMPND'',/,''SOURCE'')'
+            write (ipdb,fstr(1:50))  title(1:ltitle)
+         end if
       end if
 c
 c     include any lattice parameters in the header
@@ -76,7 +80,7 @@ c
          write (ipdb,fstr(1:22)) xbox,ybox,zbox,alpha,beta,gamma
       end if
 c
-c     write record to initiate the current PDB model
+c     write record to initiate the current coordinate model
 c
       if (imodel .ne. 0) then
          fstr = '(''MODEL '',i8)'
@@ -99,7 +103,7 @@ c
          end do
       end do
 c
-c     change some Tinker residue names to match PDB standards
+c     change Tinker residue names to match PDB standards
 c
       if (rename) then
          do i = 1, npdb
@@ -147,7 +151,7 @@ c
          if (crdmax .ge. 10000.0d0)  crdc = '3f10.3'
       end if
 c
-c     write info and coordinates for each PDB atom
+c     write information and coordinates for each atom
 c
       fstr = '(a6,'//atmc//',1x,a4,1x,a3,1x,a1,'//resc//
      &          ',4x,'//crdc//')'
@@ -179,7 +183,7 @@ c
          if (npdb .ge. 1000000)  atmc = 'i8'
       end if
 c
-c     write any connectivity records for PDB atoms
+c     write any connectivity records for the atoms
 c
       fstr = '(''CONECT'',9'//atmc//')'
       do i = 1, npdb
@@ -188,7 +192,7 @@ c
          end if
       end do
 c
-c     write record to close the current PDB model
+c     write record to close the current coordinate model
 c
       if (imodel .ne. 0) then
          fstr = '(''ENDMDL'')'

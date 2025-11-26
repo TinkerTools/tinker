@@ -34,6 +34,8 @@ c
       integer model
       integer trimtext
       real*8 xx,yy,zz
+      real*8 xbx,ybx,zbx
+      real*8 aan,ban,gan
       real*8 occupy,bfac
       logical exist,opened
       logical first
@@ -106,10 +108,10 @@ c
          if (.not. allocated(pdbrec))  allocate (pdbrec(maxatm))
       end if
 c
-c     process individual atoms from the PDBx/mmCIF file
+c     process info and individual atoms from PDBx/mmCIF file
 c
       do while (.true.)
-         read (icif,20,err=70,end=70)  record
+         read (icif,20,err=110,end=110)  record
    20    format (a240)
          call upcase (record)
          remark = record(1:6)
@@ -117,24 +119,48 @@ c
             next = 14
             call getstring (record,title,next)
             ltitle = trimtext (title)
+            if (ltitle .eq. 0) then
+               read (icif,30,err=40,end=40)  record
+   30          format (a240)
+               call upcase (record)
+               next = 1
+               call getstring (record,title,next)
+               ltitle = trimtext (title)
+            end if
+   40       continue
+         else if (record(1:21) .eq. '_DATABASE_2.PDBX_DOI') then
+            if (ltitle .eq. 0) then
+               next = 21
+               ltitle = trimtext (record)
+               title = record(21:ltitle)
+               ltitle = ltitle - 20
+               if (ltitle .eq. 0) then
+                  read (icif,50,err=60,end=60)  record
+   50             format (a240)
+                  call upcase (record)
+                  ltitle = trimtext (record)
+                  title = record(1:ltitle)
+               end if
+   60          continue
+            end if
          else if (record(1:14) .eq. '_CELL.LENGTH_A') then
             next = 15
-            call getfloat (record,xbox,next)
+            call getfloat (record,xbx,next)
          else if (record(1:14) .eq. '_CELL.LENGTH_B') then
             next = 15
-            call getfloat (record,ybox,next)
+            call getfloat (record,ybx,next)
          else if (record(1:14) .eq. '_CELL.LENGTH_C') then
             next = 15
-            call getfloat (record,zbox,next)
+            call getfloat (record,zbx,next)
          else if (record(1:17) .eq. '_CELL.ANGLE_ALPHA') then
             next = 18
-            call getfloat (record,alpha,next)
+            call getfloat (record,aan,next)
          else if (record(1:16) .eq. '_CELL.ANGLE_BETA') then
             next = 17
-            call getfloat (record,beta,next)
+            call getfloat (record,ban,next)
          else if (record(1:17) .eq. '_CELL.ANGLE_GAMMA') then
             next = 18
-            call getfloat (record,gamma,next)
+            call getfloat (record,gan,next)
          else if (record(1:5) .eq. 'ATOM ') then
             remark = 'ATOM  '
             next = 6
@@ -161,10 +187,10 @@ c
             if (altloc .eq. '.')  altloc = ' '
             if (insert .eq. '?')  insert = ' '
             if (formal .eq. '?')  formal = ' '
-            if (index(chnsym,chain) .eq. 0)  goto 40
-            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 40
-            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 40
-            if (model .gt. 1)  goto 40
+            if (index(chnsym,chain) .eq. 0)  goto 80
+            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 80
+            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 80
+            if (model .ne. imodel)  goto 80
             call fixcif (resname,atmname)
             if (resname .eq. 'HOH') then
                remark = 'HETATM'
@@ -198,8 +224,8 @@ c
                chnlast = chain
                inslast = insert
                if (nres .gt. maxres) then
-                  write (iout,30)  maxres
-   30             format (/,' READPDB  --  The Maximum of',i6,
+                  write (iout,70)  maxres
+   70             format (/,' READPDB  --  The Maximum of',i6,
      &                       ' Residues has been Exceeded')
                   call fatal
                end if
@@ -218,7 +244,7 @@ c
             resnum(npdb) = nres
             if (resname .eq. 'HOH')  resnum(npdb) = 0
             chnatm(npdb) = chain
-   40       continue
+   80       continue
          else if (remark .eq. 'HETATM') then
             next = 7
             call getnumb (record,serial,next)
@@ -244,10 +270,10 @@ c
             if (altloc .eq. '.')  altloc = ' '
             if (insert .eq. '?')  insert = ' '
             if (formal .eq. '?')  formal = ' '
-            if (index(chnsym,chain) .eq. 0)  goto 50
-            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 50
-            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 50
-            if (model .gt. 1)  goto 50
+            if (index(chnsym,chain) .eq. 0)  goto 90
+            if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 90
+            if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 90
+            if (model .gt. 1)  goto 90
             call fixcif (resname,atmname)
             npdb = npdb + 1
             xpdb(npdb) = xx
@@ -260,16 +286,28 @@ c
             pdbmod(npdb) = model
             resnum(npdb) = 0
             chnatm(npdb) = chain
-   50       continue
+   90       continue
          end if
          if (npdb .gt. maxatm) then
-            write (iout,60)  maxatm
-   60       format (/,' READCIF  --  The Maximum of',i6,
+            write (iout,100)  maxatm
+  100       format (/,' READCIF  --  The Maximum of',i6,
      &                 ' Atoms has been Exceeded')
             call fatal
          end if
       end do
-   70 continue
+  110 continue
+c
+c     set up crystal lattice if values were read from file
+c
+      if (xbx .gt. 1.0d0) then
+         xbox = xbx
+         ybox = ybx
+         zbox = zbx
+         alpha = aan
+         beta = ban
+         gamma = gan
+         call unitcell
+      end if
 c
 c     set the total sequence length and chain terminus sites
 c
@@ -305,27 +343,27 @@ c
             do k = 1, maxamino
                if (seq(j) .eq. amino(k)) then
                   chntyp(i) = 'PEPTIDE'
-                  goto 80
+                  goto 120
                end if
             end do
             chntyp(i) = 'GENERIC'
-            goto 90
-   80       continue
+            goto 130
+  120       continue
          end do
-   90    continue
+  130    continue
          if (chntyp(i) .eq. 'GENERIC') then
             do j = start, stop
                do k = 1, maxnuc
                   if (seq(j) .eq. nuclz(k)) then
                      chntyp(i) = 'NUCLEIC'
-                     goto 100
+                     goto 140
                   end if
                end do
                chntyp(i) = 'GENERIC'
-               goto 110
-  100          continue
+               goto 150
+  140          continue
             end do
-  110       continue
+  150       continue
          end if
       end do
 c
@@ -338,20 +376,20 @@ c
             do k = 1, maxamino
                if (seq(j) .eq. amino(k)) then
                   seqtyp(j) = k
-                  goto 120
+                  goto 160
                end if
             end do
             do k = 1, maxnuc
                if (seq(j) .eq. nuclz(k)) then
                   seqtyp(j) = k
-                  goto 120
+                  goto 160
                end if
             end do
             seq(j) = 'UNK'
             seqtyp(j) = 0
             if (chntyp(i) .eq. 'PEPTIDE')  seqtyp(j) = maxamino
             if (chntyp(i) .eq. 'NUCLEIC')  seqtyp(j) = maxnuc
-  120       continue
+  160       continue
          end do
       end do
 c
@@ -371,10 +409,10 @@ c
       end do
       if (nres .ge. 1)  resatm(2,nres) = npdb
 c
-c     close the CIF file and quit if there are no coordinates
+c     close the input file and quit if no coordinates found
 c
-      if (npdb .eq. 0)  abort = .true.
       if (.not. opened)  close (unit=icif)
+      if (npdb .eq. 0)  abort = .true.
       return
       end
 c
@@ -387,7 +425,7 @@ c     #################################################################
 c
 c
 c     "scancif" reads the first model in a RCSB PDBx/mmCIF file
-c     and finds chains, alternate sites and insertion records
+c     and finds chains, alternate sites, insertions and models
 c
 c
       subroutine scancif (icif)
@@ -398,6 +436,7 @@ c
       integer i,k,icif
       integer next,length
       integer nalt,nins
+      integer model,modtemp
       logical exist,done
       character*1 letter
       character*1 chain,chnlast
@@ -425,6 +464,8 @@ c
       altsym = ' '
       alttyp = blank
       instyp = blank
+      nmodel = 0
+      imodel = 0
 c
 c     scan for multiple chains, alternate locations and inserts
 c
@@ -446,8 +487,20 @@ c
             call gettext (record,letter,next)
             call gettext (record,letter,next)
             call gettext (record,insert,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call gettext (record,letter,next)
+            call getnumb (record,model,next)
             if (altloc .eq. '.')  altloc = ' '
             if (insert .eq. '?')  insert = ' '
+            nmodel = max(model,nmodel)
             if (chain .ne. chnlast) then
                if (index(chnsym,chain) .eq. 0) then
                   nchain = nchain + 1
@@ -533,7 +586,7 @@ c
          chnsym(i:i) = '#'
       end do
 c
-c     find out which of the alternate locations will be used
+c     find out which of alternate locations will be used
 c
       if (nalt .gt. 0) then
          call nextarg (altsym,exist)
@@ -586,6 +639,25 @@ c
          else
             instyp = instemp
          end if
+      end if
+c
+c     find out which of the multiple models will be used
+c
+      if (nmodel .gt. 1) then
+         call nextarg (string,exist)
+         read (string,*,err=90,end=90)  modtemp
+   90    continue
+         if (.not. exist) then
+            modtemp = 0
+            write (iout,100)
+  100       format (/,' Enter the Structural Model to Extract',
+     &                 ' [0=All] :  ',$)
+            read (input,110)  modtemp
+  110       format (i10)
+         end if
+         if (modtemp .ne. 0)  nmodel = 1
+         if (modtemp .eq. 0)  modtemp = 1
+         imodel = modtemp
       end if
       return
       end

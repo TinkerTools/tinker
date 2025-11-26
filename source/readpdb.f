@@ -31,8 +31,11 @@ c
       integer index,serial
       integer next,nxtlast
       integer residue,reslast
+      integer model
       integer trimtext
       real*8 xx,yy,zz
+      real*8 xbx,ybx,zbx
+      real*8 aan,ban,gan
       logical exist,opened
       logical first
       character*1 chain,chnlast
@@ -82,6 +85,7 @@ c
       reslast = maxres
       namelast = '   '
       chnlast = ' '
+      model = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -103,7 +107,7 @@ c
          if (.not. allocated(pdbrec))  allocate (pdbrec(maxatm))
       end if
 c
-c     process individual atoms from the Protein Data Bank file
+c     process info and individual atoms from the PDB file
 c
       do while (.true.)
          read (ipdb,20,err=230,end=230)  record
@@ -121,7 +125,16 @@ c
          else if (remark .eq. 'CRYST1') then
             next = 7
             string = record(next:240)
-            read (string,*)  xbox,ybox,zbox,alpha,beta,gamma
+            read (string,*)  xbx,ybx,zbx,aan,ban,gan
+            if (xbx .gt. 1.0d0) then
+               xbox = xbx
+               ybox = ybx
+               zbox = zbx
+               alpha = aan
+               beta = ban
+               gamma = gan
+               call unitcell
+            end if
          else if (remark .eq. 'ATOM  ') then
             next = 7
             call getnumb (record,serial,next)
@@ -167,6 +180,7 @@ c
             if (index(chnsym,chain) .eq. 0)  goto 120
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 120
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 120
+            if (model.ne.imodel .and. imodel.ne.0)  goto 120
             call fixpdb (resname,atmname)
             if (resname .eq. 'HOH') then
                remark = 'HETATM'
@@ -216,6 +230,7 @@ c
             pdbatm(npdb) = atmname
             pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
+            pdbmod(npdb) = model
             resnum(npdb) = nres
             if (resname .eq. 'HOH')  resnum(npdb) = 0
             chnatm(npdb) = chain
@@ -264,6 +279,7 @@ c
             if (index(chnsym,chain) .eq. 0)  goto 210
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 210
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 210
+            if (model.ne.imodel .and. imodel.ne.0)  goto 210
             call fixpdb (resname,atmname)
             npdb = npdb + 1
             xpdb(npdb) = xx
@@ -273,11 +289,14 @@ c
             pdbatm(npdb) = atmname
             pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
+            pdbmod(npdb) = model
             resnum(npdb) = 0
             chnatm(npdb) = chain
   210       continue
-         else if (remark .eq. 'ENDMDL') then
-            goto 230
+         else if (remark .eq. 'MODEL ') then
+            next = 7
+            string = record(next:240)
+            read (string,*)  model
          else if (remark .eq. 'END   ') then
             goto 230
          end if
@@ -390,10 +409,10 @@ c
       end do
       if (nres .ge. 1)  resatm(2,nres) = npdb
 c
-c     close the PDB file and quit if there are no coordinates
+c     close the input file and quit if no coordinates found
 c
-      if (npdb .eq. 0)  abort = .true.
       if (.not. opened)  close (unit=ipdb)
+      if (npdb .eq. 0)  abort = .true.
       return
       end
 c
@@ -405,8 +424,8 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "scanpdb" reads the first model in a Protein Data Bank PDB
-c     file and finds chains, alternate sites and insertion records
+c     "scanpdb" reads the first model in a legacy PDB file and
+c     finds chains, alternate sites, insertions and models
 c
 c
       subroutine scanpdb (ipdb)
@@ -418,6 +437,7 @@ c
       integer next,nxtlast
       integer length,dummy
       integer nalt,nins
+      integer model,modtemp
       logical exist,done
       character*1 chain,chnlast
       character*1 altloc,altlast
@@ -444,6 +464,8 @@ c
       altsym = ' '
       alttyp = blank
       instyp = blank
+      nmodel = 0
+      imodel = 0
 c
 c     scan for multiple chains, alternate locations and inserts
 c
@@ -495,8 +517,11 @@ c
                   inslast = insert
                end if
             end if
-         else if (remark .eq. 'ENDMDL') then
-            done = .true.
+         else if (remark .eq. 'MODEL ') then
+            next = 7
+            string = record(next:240)
+            read (string,*)  model
+            nmodel = max(model,nmodel)
          else if (remark .eq. 'END   ') then
             done = .true.
          end if
@@ -563,7 +588,7 @@ c
          chnsym(i:i) = '#'
       end do
 c
-c     find out which of the alternate locations will be used
+c     find out which of alternate locations will be used
 c
       if (nalt .gt. 0) then
          call nextarg (altsym,exist)
@@ -616,6 +641,25 @@ c
          else
             instyp = instemp
          end if
+      end if
+c
+c     find out which of the multiple models will be used
+c
+      if (nmodel .gt. 1) then
+         call nextarg (string,exist)
+         read (string,*,err=130,end=130)  modtemp
+  130    continue
+         if (.not. exist) then
+            modtemp = 0
+            write (iout,140)
+  140       format (/,' Enter the Structural Model to Extract',
+     &                 ' [0=All] :  ',$)
+            read (input,150)  modtemp
+  150       format (i10)
+         end if
+         if (modtemp .ne. 0)  nmodel = 1
+         if (modtemp .eq. 0)  modtemp = 1
+         imodel = modtemp
       end if
       return
       end

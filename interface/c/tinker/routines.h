@@ -2230,7 +2230,7 @@ void prtarcb_(int* idcd, int* first);
 #define tinker_f_prtarcb prtarcb_
 
 // prtcif.f
-void prtcif_(int* icif, int* imodel);
+void prtcif_(int* icif);
 #define tinker_f_prtcif prtcif_
 
 // prtdyn.f
@@ -2260,7 +2260,7 @@ inline void tinker_f_setmol2(tinker_fchars atmnam, tinker_fchars atmtyp, double*
 }
 
 // prtpdb.f
-void prtpdb_(int* ipdb, int* imodel);
+void prtpdb_(int* ipdb);
 #define tinker_f_prtpdb prtpdb_
 
 // prtprm.f

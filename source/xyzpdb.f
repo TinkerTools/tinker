@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "xyzpdb" takes as input a Cartesian coordinates file,
-c     then converts to and writes out a Protein Data Bank file
+c     "xyzpdb" takes as input a Tinker Cartesian coordinates file,
+c     then converts to and writes out an RCSB Protein Data Bank file
 c
 c
       program xyzpdb
@@ -87,12 +87,12 @@ c
 c
 c     add each successive coordinate frame to the PDB file
 c
-      i = 0
+      imodel = 0
       do while (.not. abort)
-         if (multi)  i = i + 1
+         if (multi)  imodel = imodel + 1
          call makepdb
-         if (pdbtyp .eq. 'PDB')  call prtpdb (ipdb,i)
-         if (pdbtyp .eq. 'CIF')  call prtcif (ipdb,i)
+         if (pdbtyp .eq. 'PDB')  call prtpdb (ipdb)
+         if (pdbtyp .eq. 'CIF')  call prtcif (ipdb)
          call readxyz (ixyz)
       end do
 c
@@ -102,8 +102,8 @@ c
          fstr = '(''END'')'
          write (ipdb,fstr(1:7))
       else if (pdbtyp .eq. 'CIF') then
-         fstr = '(''#'')'
-         write (ipdb,fstr(1:5))
+         fstr = '(''# '')'
+         write (ipdb,fstr(1:6))
       end if
 c
 c     perform any final tasks before program exit

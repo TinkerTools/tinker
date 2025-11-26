@@ -5,6 +5,8 @@
 namespace tinker { namespace pdb {
 extern int& npdb;
 extern int& nres;
+extern int& nmodel;
+extern int& imodel;
 extern int*& resnum;
 extern int*& resatm;
 extern int*& npdb12;
@@ -26,6 +28,8 @@ extern char (&instyp)[20];
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(pdb, npdb);
 extern "C" int TINKER_MOD(pdb, nres);
+extern "C" int TINKER_MOD(pdb, nmodel);
+extern "C" int TINKER_MOD(pdb, imodel);
 extern "C" int* TINKER_MOD(pdb, resnum);
 extern "C" int* TINKER_MOD(pdb, resatm);
 extern "C" int* TINKER_MOD(pdb, npdb12);
@@ -46,6 +50,8 @@ extern "C" char TINKER_MOD(pdb, instyp)[20];
 
 int& npdb = TINKER_MOD(pdb, npdb);
 int& nres = TINKER_MOD(pdb, nres);
+int& nmodel = TINKER_MOD(pdb, nmodel);
+int& imodel = TINKER_MOD(pdb, imodel);
 int*& resnum = TINKER_MOD(pdb, resnum);
 int*& resatm = TINKER_MOD(pdb, resatm);
 int*& npdb12 = TINKER_MOD(pdb, npdb12);

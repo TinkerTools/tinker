@@ -12,9 +12,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "pdbxyz" takes as input a Protein Data Bank file and then
-c     converts to and writes out a Cartesian coordinates file and,
-c     for biopolymers, a sequence file
+c     "pdbxyz" takes as input an RCSB Protein Data Bank file and then
+c     converts to and writes out a Tinker Cartesian coordinates file,
+c     and a sequence file for biopolymers
 c
 c
       program pdbxyz
@@ -286,7 +286,7 @@ c
 c     sort the attached atom lists into ascending order
 c
          do i = 1, n
-            call sort (n12(i),i12(1,i))
+            call sort8 (n12(i),i12(1,i))
          end do
 c
 c     check for atom pairs with identical coordinates
@@ -305,8 +305,14 @@ c
 c
 c     read the next coordinate set from Protein Data Bank file
 c
-         if (pdbtyp .eq. 'PDB')  call readpdb (ipdb)
-         if (pdbtyp .eq. 'CIF')  call readcif (ipdb)
+         if (nmodel .eq. 1) then
+            abort = .true.
+         else
+            imodel = imodel + 1
+            rewind (unit=ipdb)
+            if (pdbtyp .eq. 'PDB')  call readpdb (ipdb)
+            if (pdbtyp .eq. 'CIF')  call readcif (ipdb)
+         end if
       end do
 c
 c     write a sequence file for proteins and nucleic acids

@@ -14,6 +14,8 @@ c
 c
 c     npdb      number of atoms stored in Protein Data Bank format
 c     nres      number of residues stored in Protein Data Bank format
+c     nmodel    number of models stored in Protein Data Bank format
+c     imodel    model number of structure to be used (0=All Models)
 c     resnum    number of the residue to which each atom belongs
 c     resatm    number of first and last atom in each residue
 c     npdb12    number of atoms directly bonded to each CONECT atom
@@ -36,6 +38,7 @@ c
       module pdb
       implicit none
       integer npdb,nres
+      integer nmodel,imodel
       integer, allocatable :: resnum(:)
       integer, allocatable :: resatm(:,:)
       integer, allocatable :: npdb12(:)

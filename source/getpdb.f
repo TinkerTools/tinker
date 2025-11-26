@@ -50,6 +50,7 @@ c
       nask = 0
       do while (.not.exist .and. nask.lt.maxask)
          nask = nask + 1
+         pdbfile = ' '
          write (iout,10)
    10    format (/,' Enter Protein Data Bank File Name :  ',$)
          read (input,20)  pdbfile
