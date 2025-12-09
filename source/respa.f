@@ -104,7 +104,7 @@ c
             y(m) = y(m) + v(2,m)*dta
             z(m) = z(m) + v(3,m)*dta
          end do
-         if (use_rattle)  call rattle (dta,xold,yold,zold)
+         if (use_freeze)  call rattle (dta,xold,yold,zold)
 c
 c     find the fast-evolving potential energy and atomic forces
 c
@@ -120,7 +120,7 @@ c
                v(j,m) = v(j,m) + aalt(j,m)*dta_2
             end do
          end do
-         if (use_rattle)  call rattle2 (dta)
+         if (use_freeze)  call rattle2 (dta)
 c
 c     find average virial from fast-evolving potential terms
 c
@@ -182,7 +182,7 @@ c
 c
 c     find the constraint-corrected full-step velocities
 c
-      if (use_rattle) then
+      if (use_freeze) then
          do i = 1, nuse
             m = iuse(i)
             xold(m) = x(m)
@@ -208,7 +208,7 @@ c
 c
 c     final constraint step to enforce position convergence
 c
-      if (use_rattle)  call shake (xold,yold,zold)
+      if (use_freeze)  call shake (xold,yold,zold)
 c
 c     perform deallocation of some local arrays
 c
@@ -339,7 +339,7 @@ c
             y(m) = y(m) + v(2,m)*dta
             z(m) = z(m) + v(3,m)*dta
          end do
-         if (use_rattle)  call rattle (dta,xold,yold,zold)
+         if (use_freeze)  call rattle (dta,xold,yold,zold)
 c
 c     find the fast-evolving potential energy and atomic forces
 c
@@ -356,7 +356,7 @@ c
                v(j,m) = v(j,m) + (part2*aalt(j,m)+afast(j,m))*dtax
             end do
          end do
-         if (use_rattle)  call rattle2 (dta)
+         if (use_freeze)  call rattle2 (dta)
 c
 c     find average virial from fast-evolving potential terms
 c
@@ -419,7 +419,7 @@ c
 c
 c     find the constraint-corrected full-step velocities
 c
-      if (use_rattle) then
+      if (use_freeze) then
          do i = 1, nuse
             m = iuse(i)
             xold(m) = x(m)
@@ -445,7 +445,7 @@ c
 c
 c     final constraint step to enforce position convergence
 c
-      if (use_rattle)  call shake (xold,yold,zold)
+      if (use_freeze)  call shake (xold,yold,zold)
 c
 c     perform deallocation of some local arrays
 c
@@ -528,7 +528,7 @@ c     set some time values for the dynamics integration
 c
       drespa = dble(nrespa)
       nrattle = 1
-      if (use_rattle)  nrattle = 3
+      if (use_freeze)  nrattle = 3
       drattle = dble(nrattle)
       dta = dt / drespa
       dtar = dta / drattle
@@ -587,7 +587,7 @@ c
                y(m) = y(m) + v(2,m)*dtar_2
                z(m) = z(m) + v(3,m)*dtar_2
             end do
-            if (use_rattle) then
+            if (use_freeze) then
                call rattle (dtar_2,xold,yold,zold)
                call rattle2 (dtar_2)
                do i = 1, 3
@@ -607,7 +607,7 @@ c
                v(j,m) = v(j,m)*vfric(m) + vrand(j,m)
             end do
          end do
-         if (use_rattle) then
+         if (use_freeze) then
             call rattle2 (dta)
             do i = 1, 3
                do j = 1, 3
@@ -629,7 +629,7 @@ c
                y(m) = y(m) + v(2,m)*dtar_2
                z(m) = z(m) + v(3,m)*dtar_2
             end do
-            if (use_rattle) then
+            if (use_freeze) then
                call rattle (dtar_2,xold,yold,zold)
                call rattle2 (dtar_2)
                do i = 1, 3
@@ -665,7 +665,7 @@ c
                v(j,m) = v(j,m) + aalt(j,m)*dta_2
             end do
          end do 
-         if (use_rattle) then
+         if (use_freeze) then
             call rattle2 (dta)
             do i = 1, 3
                do j = 1, 3
@@ -707,7 +707,7 @@ c
             v(j,m) = v(j,m) + a(j,m)*dt_2
          end do
       end do 
-      if (use_rattle) then
+      if (use_freeze) then
          call rattle2 (dt)
          do i = 1, nuse
             m = iuse(i)
@@ -734,7 +734,7 @@ c     call kinetic (eksum,ekin,temp)
 c
 c     final constraint step to enforce position convergence
 c
-      if (use_rattle)  call shake (xold,yold,zold)
+      if (use_freeze)  call shake (xold,yold,zold)
 c
 c     perform deallocation of some local arrays
 c

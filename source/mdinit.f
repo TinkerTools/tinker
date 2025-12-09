@@ -257,20 +257,20 @@ c
       if (taupres .lt. 0.0d0) then
          taupres = 2.0d0
          if (barostat .eq. 'NOSE-HOOVER')  taupres = 10.0d0
-         if (prestyp .eq. 'ANISOTROPIC')  taupres = 10.0d0
+         if (prestyp .eq. 'ANISO')  taupres = 10.0d0
       end if
 c
 c     check for options not allowed with Monte Carlo barostat
 c
       if (barostat .eq. 'MONTECARLO') then
-         if (use_rattle .and. volscale.eq.'ATOMIC') then
+         if (use_freeze .and. volscale.eq.'ATOMIC') then
             write (iout,40)
-   40       format (/,' MDINIT  --  Atom-based Monte Carlo',
-     &                 ' Barostat Incompatible with RATTLE')
+   40       format (/,' MDINIT  --  No Atom-Based Monte Carlo',
+     &                 ' Barostat with Constraints')
             call fatal
          else if (prestyp .eq. 'SEMIISO') then 
             write (iout,50)
-   50       format (/,' MDINIT  --  Cannot Use Monte Carlo Barostat',
+   50       format (/,' MDINIT  --  No Monte Carlo Barostat',
      &                 ' with Semi-Isotropic Pressure')
             call fatal
          end if
@@ -310,11 +310,12 @@ c
          else
             nfree = 3 * (nuse-ndummy)
          end if
-         if (use_rattle) then
+         if (use_freeze) then
             nfree = nfree - nrat
             do i = 1, nratx
                nfree = nfree - kratx(i)
             end do
+            nfree = nfree - 3*nwat
          end if
          if (isothermal .and. thermostat.ne.'ANDERSEN'
      &         .and. integrate.ne.'BAOAB'
@@ -334,7 +335,6 @@ c
                end if
             end if
          end if
-         if (barostat .eq. 'BUSSI')  nfree = nfree + 1
       end if
 c
 c     check for a nonzero number of degrees of freedom

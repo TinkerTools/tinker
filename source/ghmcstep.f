@@ -106,7 +106,7 @@ c
 c
 c     find constraint-corrected velocities prior to Verlet step
 c
-      if (use_rattle)  call rattle2 (dt)
+      if (use_freeze)  call rattle2 (dt)
 c
 c     find the kinetic energy and store the energy values
 c
@@ -134,7 +134,7 @@ c
 c
 c     get constraint-corrected positions and half-step velocities
 c
-      if (use_rattle)  call rattle (dt,xold,yold,zold)
+      if (use_freeze)  call rattle (dt,xold,yold,zold)
 c
 c     get the potential energy and atomic forces
 c
@@ -153,7 +153,7 @@ c
 c
 c     find the constraint-corrected full-step velocities
 c
-      if (use_rattle)  call rattle2 (dt)
+      if (use_freeze)  call rattle2 (dt)
 c
 c     compute kinetic energy, temperature and total energy
 c
@@ -198,7 +198,7 @@ c
 c
 c     update the constraint-corrected full-step velocities
 c
-      if (use_rattle) then
+      if (use_freeze) then
          call rattle2 (dt)
          do i = 1, nuse
             k = iuse(i)
@@ -216,7 +216,7 @@ c
 c
 c     final constraint step to enforce position convergence
 c
-      if (use_rattle)  call shake (xold,yold,zold)
+      if (use_freeze)  call shake (xold,yold,zold)
 c
 c     perform deallocation of some local arrays
 c

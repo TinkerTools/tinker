@@ -161,7 +161,7 @@ c
 c
 c     flag for use of holonomic constraints
 c
-      use_rattle = .false.
+      use_freeze = .false.
 c
 c     flag for use of atom groups
 c

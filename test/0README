@@ -114,13 +114,18 @@
                       toxin (1CHL) to Tinker XYZ and evaluates energies,
                       then converts the XYZ to legacy PDB format and back
                       to Tinker XYZ, and finally evaluates energies of the
-                      new XYZ file to compare with the prior values 
+                      new XYZ file to compare with the prior values
 
-    (23) VASOPRESSIN  Compares analytical and finite difference numerical
+    (23) TIP4P        Minimizes the energy to a small gradient and enforces
+                      holonomic constraints for a cubic box of 1000 TIP4P
+                      water molecules, then runs a short MD simulation under
+                      NVT at 298K
+
+    (24) VASOPRESSIN  Compares analytical and finite difference numerical
                       gradient over Cartesian and internal coordinates for
                       vasopressin using the AMOEBA force field model
 
-    (24) WATER        Fits the electrostatic potential for the TIP3P, AMOEBA
+    (25) WATER        Fits the electrostatic potential for the TIP3P, AMOEBA
                       and HIPPO water models to a QM-derived potential at
                       the MP2/aug-cc-pVTZ level on a grid of points outside
                       the molecular surface

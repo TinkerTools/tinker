@@ -58,7 +58,7 @@ c
 c     set some time values for the dynamics integration
 c
       nrattle = 1
-      if (use_rattle)  nrattle = 3
+      if (use_freeze)  nrattle = 3
       drattle = dble(nrattle)
       dt_2 = 0.5d0 * dt
       dtr_2 = dt_2 / drattle
@@ -93,7 +93,7 @@ c
             y(k) = y(k) + v(2,k)*dtr_2
             z(k) = z(k) + v(3,k)*dtr_2
          end do
-         if (use_rattle) then
+         if (use_freeze) then
             call rattle (dtr_2,xold,yold,zold)
             call rattle2 (dtr_2)
             do i = 1, 3
@@ -113,7 +113,7 @@ c
             v(j,k) = v(j,k)*vfric(k) + vrand(j,k)
          end do
       end do
-      if (use_rattle) then
+      if (use_freeze) then
          call rattle2 (dt)
          do i = 1, 3
             do j = 1, 3
@@ -135,7 +135,7 @@ c
             y(k) = y(k) + v(2,k)*dtr_2
             z(k) = z(k) + v(3,k)*dtr_2
          end do
-         if (use_rattle) then
+         if (use_freeze) then
             call rattle (dtr_2,xold,yold,zold)
             call rattle2 (dtr_2)
             do i = 1, 3
@@ -164,7 +164,7 @@ c
             v(j,k) = v(j,k) + a(j,k)*dt_2
          end do
       end do 
-      if (use_rattle) then
+      if (use_freeze) then
          call rattle2 (dt)
          do i = 1, 3
             do j = 1, 3
@@ -188,7 +188,7 @@ c     call kinetic (eksum,ekin,temp)
 c
 c     final constraint step to enforce position convergence
 c
-      if (use_rattle)  call shake (xold,yold,zold)
+      if (use_freeze)  call shake (xold,yold,zold)
 c
 c     perform deallocation of some local arrays
 c
@@ -263,7 +263,7 @@ c
 c     set some time values for the dynamics integration
 c
       nrattle = 1
-      if (use_rattle)  nrattle = 3
+      if (use_freeze)  nrattle = 3
       drattle = dble(nrattle)
       dt_2 = 0.5d0 * dt
       dtr = dt / drattle
@@ -286,7 +286,7 @@ c
             v(j,k) = v(j,k)*vfric(k) + vrand(j,k)
          end do
       end do
-      if (use_rattle) then
+      if (use_freeze) then
          do i = 1, 3
             do j = 1, 3
                vir(j,i) = 0.0d0
@@ -322,7 +322,7 @@ c
             y(k) = y(k) + v(2,k)*dtr
             z(k) = z(k) + v(3,k)*dtr
          end do
-         if (use_rattle) then
+         if (use_freeze) then
             call rattle (dtr,xold,yold,zold)
             call rattle2 (dtr)
             do i = 1, 3
@@ -351,7 +351,7 @@ c
             v(j,k) = v(j,k) + a(j,k)*dt_2
          end do
       end do 
-      if (use_rattle)  call rattle2 (dt)
+      if (use_freeze)  call rattle2 (dt)
 c
 c     use second O step for frictional and random components
 c
@@ -362,7 +362,7 @@ c
             v(j,k) = v(j,k)*vfric(k) + vrand(j,k)
          end do
       end do
-      if (use_rattle) then
+      if (use_freeze) then
          call rattle2 (dt_2)
          do i = 1, 3
             do j = 1, 3
@@ -385,7 +385,7 @@ c
 c
 c     final constraint step to enforce position convergence
 c
-      if (use_rattle)  call shake (xold,yold,zold)
+      if (use_freeze)  call shake (xold,yold,zold)
 c
 c     perform deallocation of some local arrays
 c

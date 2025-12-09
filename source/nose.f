@@ -92,7 +92,7 @@ c
 c
 c     constraints with Nose-Hoover NPT requires ROLL algorithm
 c
-      if (use_rattle) then
+      if (use_freeze) then
          write (iout,10)
    10    format (/,' NOSE  --  Nose-Hoover NPT MD Requires the',
      &              ' ROLL Algorithm')
@@ -131,7 +131,7 @@ c
 c
 c     constraints under NH-NPT require the ROLL algorithm
 c
-      if (use_rattle)  call fatal
+      if (use_freeze)  call fatal
 c
 c     update thermostat and barostat values, scale atomic velocities
 c

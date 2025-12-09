@@ -508,7 +508,7 @@ c
 c
 c     initialize the size of "free" space to zero
 c
-      nfree = 0
+      ntfree = 0
       nnew = 0
 c
 c     build regular triangulation, now loop over all points
@@ -5058,8 +5058,8 @@ c
       integer ireflex,iflip
       integer idx_p,idx_o,itest_abcp
       integer idx_a,idx_b,idx_c
-      integer nkill_top
-      integer nfreemax,ns
+      integer ntkill_top
+      integer ntfreemax,ns
       integer tetra_last
       integer idxi,idxj,idxk,idxl
       integer ia,ib,ic,ii,ij
@@ -5086,22 +5086,22 @@ c
 c
 c     initialize some sizes related to free and kill space
 c
-      nfreemax = 10000
-      nkill_top = nint(0.9d0*dble(nfreemax))
+      ntfreemax = 10000
+      ntkill_top = nint(0.9d0*dble(ntfreemax))
 c
 c     first perform a loop over all of the link facets
 c
       j = 0
    10 continue
       if (j .eq. nlinkfacet)  goto 30
-      if (nkill .ge. nkill_top) then
-         nkill = nkill_top
-c        ns = nfree
-c        nfree = min(nfree+nkill,nkill_top)
-c        do j = ns+1, nfree
+      if (ntkill .ge. ntkill_top) then
+         ntkill = ntkill_top
+c        ns = ntfree
+c        ntfree = min(ntfree+ntkill,ntkill_top)
+c        do j = ns+1, ntfree
 c           freespace(j) = killspace(j-ns)
 c        end do
-c        nkill = 0
+c        ntkill = 0
       end if
       j = j + 1
 c
@@ -5335,12 +5335,12 @@ c
 c     add all of the "killed" tetrahedra into the free zone
 c
    30 continue
-      ns = nfree
-      nfree = min(ns+nkill,nfreemax)
-      do j = ns+1, nfree
+      ns = ntfree
+      ntfree = min(ns+ntkill,ntfreemax)
+      do j = ns+1, ntfree
          freespace(j) = killspace(j-ns)
       end do
-      nkill = 0
+      ntkill = 0
       return
       end
 c
@@ -5400,11 +5400,11 @@ c     the four new tetrahedra are stored in free space in the
 c     tetrahedron list and at the end of the known tetrahedra list
 c
       k = 0
-      do i = nfree, max(nfree-3,1), -1
+      do i = ntfree, max(ntfree-3,1), -1
          k = k + 1
          position(k) = freespace(i)
       end do
-      nfree = max(nfree-4,0)
+      ntfree = max(ntfree-4,0)
       do i = k+1, 4
          ntetra = ntetra + 1
          position(i) = ntetra
@@ -5414,8 +5414,8 @@ c
 c     "itetra" is set to 0, and added to the kill list
 c
       tinfo(itetra) = ibclr(tinfo(itetra),1)
-      nkill = 1
-      killspace(nkill) = itetra
+      ntkill = 1
+      killspace(ntkill) = itetra
 c
 c     the tetrahedron is defined as (IJKL), then four new tetrahedra
 c     are created: JKLP, IKLP, IJLP, and IJKP, where P is the new
@@ -5740,11 +5740,11 @@ c     three tetrahedra are stored in free space in the tetrahedron
 c     list and at the end of the list of known tetrahedra if needed
 c
       k = 0
-      do i = nfree, max(nfree-2,1), -1
+      do i = ntfree, max(ntfree-2,1), -1
          k = k + 1
          position(k) = freespace(i)
       end do
-      nfree = max(nfree-3,0)
+      ntfree = max(ntfree-3,0)
       do i = k+1, 3
          ntetra = ntetra + 1
          position(i) = ntetra
@@ -5757,9 +5757,9 @@ c
       jkeep = tinfo(jtetra)
       tinfo(itetra) = ibclr(tinfo(itetra),1)
       tinfo(jtetra) = ibclr(tinfo(jtetra),1)
-      killspace(nkill+1) = itetra
-      killspace(nkill+2) = jtetra
-      nkill = nkill + 2
+      killspace(ntkill+1) = itetra
+      killspace(ntkill+2) = jtetra
+      ntkill = ntkill + 2
 c
 c     the vertices A, B and C are the first vertices of itetra,
 c        and the other two vertices P and O
@@ -5978,11 +5978,11 @@ c
 c     store the new tetrahedra in "free" space or at the list end
 c
       k = 0
-      do i = nfree, max(nfree-1,1), -1
+      do i = ntfree, max(ntfree-1,1), -1
          k = k + 1
          position(k) = freespace(i)
       end do
-      nfree = max(nfree-2,0)
+      ntfree = max(ntfree-2,0)
       do i = k+1, 2
          ntetra = ntetra + 1
          position(i) = ntetra
@@ -5995,10 +5995,10 @@ c
       tinfo(itetra) = ibclr(tinfo(itetra),1)
       tinfo(jtetra) = ibclr(tinfo(jtetra),1)
       tinfo(ktetra) = ibclr(tinfo(ktetra),1)
-      killspace(nkill+1) = itetra
-      killspace(nkill+2) = jtetra
-      killspace(nkill+3) = ktetra
-      nkill = nkill + 3
+      killspace(ntkill+1) = itetra
+      killspace(ntkill+2) = jtetra
+      killspace(ntkill+3) = ktetra
+      ntkill = ntkill + 3
 c
 c     the two vertices that define their common edge AB are
 c        stored in the array edge
@@ -6214,9 +6214,9 @@ c
 c
 c     store the new tetrahedron in place of itetra
 c
-      if (nfree .ne. 0) then
-         newtetra = freespace(nfree)
-         nfree = nfree - 1
+      if (ntfree .ne. 0) then
+         newtetra = freespace(ntfree)
+         ntfree = ntfree - 1
       else
          ntetra = ntetra + 1
          newtetra = ntetra
@@ -6230,11 +6230,11 @@ c
 c     jtetra, ktetra and ltetra become "available", so they
 c     are added to the "kill" zone
 c
-      killspace(nkill+1) = itetra
-      killspace(nkill+2) = jtetra
-      killspace(nkill+3) = ktetra
-      killspace(nkill+4) = ltetra
-      nkill = nkill + 4
+      killspace(ntkill+1) = itetra
+      killspace(ntkill+2) = jtetra
+      killspace(ntkill+3) = ktetra
+      killspace(ntkill+4) = ltetra
+      ntkill = ntkill + 4
       tinfo(itetra) = ibclr(tinfo(itetra),1)
       tinfo(jtetra) = ibclr(tinfo(jtetra),1)
       tinfo(ktetra) = ibclr(tinfo(ktetra),1)

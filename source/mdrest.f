@@ -25,10 +25,10 @@ c
 c
 c     check steps between center of mass motion removal
 c
-      if (.not. dorest)  return
-      if (mod(istep,irest) .ne. 0)  return
+c     if (.not. dorest)  return
+c     if (mod(istep,irest) .ne. 0)  return
 c
-c     compute linear velocity of the system center of mass
+c     eliminate system translational and rotational motion
 c
       if (integrate .eq. 'RIGIDBODY') then
          call rgdrest
@@ -47,7 +47,7 @@ c     ###############################################################
 c
 c
 c     "xyzrest" removes any translational or rotational inertia
-c     during molecular dynamics for the overall system or atom groups
+c     during dynamics for the overall system or atom groups
 c
 c
       subroutine xyzrest
@@ -305,7 +305,7 @@ c     ###############################################################
 c
 c
 c     "rgdrest" removes any translational or rotational inertia
-c     during molecular dynamics over rigid body coordinates
+c     during dynamics over rigid body coordinates
 c
 c
       subroutine rgdrest

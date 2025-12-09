@@ -744,6 +744,7 @@ c
       if (resname .eq. 'ACP')  resname = 'ACE'
       if (resname .eq. 'NMA')  resname = 'NME'
       if (resname .eq. 'CT3')  resname = 'NME'
+      if (resname .eq. 'NHE')  resname = 'NH2'
       if (resname .eq. 'CT2')  resname = 'NH2'
 c
 c     convert nonstandard names for water molecules

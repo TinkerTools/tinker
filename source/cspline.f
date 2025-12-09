@@ -12,13 +12,13 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "cspline" computes the coefficients for a periodic interpolating
+c     "cspline" computes coefficients for a periodic interpolating
 c     cubic spline
 c
 c     literature reference:
 c
-c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
-c     Springer Verlag, 1996, Section 10.1.2  [see routine "isplpe"]
+c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with
+c     Fortran, Springer Verlag, 1996  (Section 10.1.2; "isplpe"]
 c
 c
       subroutine cspline (n,xn,fn,b,c,d,h,du,dm,rc,rs)
@@ -104,8 +104,8 @@ c     tridiagonal, symmetric, positive definite matrix
 c
 c     literature reference:
 c
-c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
-c     Springer Verlag, 1996, Section 4.11.2
+c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with
+c     Fortran, Springer Verlag, 1996, Section 4.11.2
 c
 c
       subroutine cytsy (n,dm,du,cr,rs,x,iflag)
@@ -138,13 +138,13 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "cytsyp" finds the Cholesky factors of a cyclically tridiagonal
+c     "cytsyp" finds Cholesky factors of a cyclically tridiagonal
 c     symmetric, positive definite matrix given by two vectors
 c
 c     literature reference:
 c
-c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
-c     Springer Verlag, 1996, Section 4.11.2
+c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with
+c     Fortran, Springer Verlag, 1996, Section 4.11.2
 c
 c
       subroutine cytsyp (n,dm,du,cr,iflag)
@@ -245,8 +245,8 @@ c     given the Cholesky factors
 c
 c     literature reference:
 c
-c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with Fortran,
-c     Springer Verlag, 1996, Section 4.11.2
+c     G. Engeln-Mullges and F. Uhlig, Numerical Algorithms with
+c     Fortran, Springer Verlag, 1996, Section 4.11.2
 c
 c
       subroutine cytsys (n,dm,du,cr,rs,x)

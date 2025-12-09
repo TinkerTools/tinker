@@ -1783,6 +1783,12 @@ void kexpol_();
 void kextra_();
 #define tinker_f_kextra kextra_
 
+// kfreeze.f
+void kfreeze_();
+#define tinker_f_kfreeze kfreeze_
+void chkangle_(int* ia, int* ib, int* ic);
+#define tinker_f_chkangle chkangle_
+
 // kgeom.f
 void kgeom_();
 #define tinker_f_kgeom kgeom_
@@ -2316,12 +2322,6 @@ void rattle_(double* dt, double* xold, double* yold, double* zold);
 #define tinker_f_rattle rattle_
 void rattle2_(double* dt);
 #define tinker_f_rattle2 rattle2_
-void shake_(double* xold, double* yold, double* zold);
-#define tinker_f_shake shake_
-void shake2_(double* derivs);
-#define tinker_f_shake2 shake2_
-void water4_(double* derivs);
-#define tinker_f_water4 water4_
 
 // readcart.f
 void readcart_(int* ixyz, int* first);
@@ -2551,11 +2551,25 @@ void setinduced_(int* n, double* ux, double* uy, double* uz);
 void setprm_();
 #define tinker_f_setprm setprm_
 
-// shakeup.f
-void shakeup_();
-#define tinker_f_shakeup shakeup_
-void chkangle_(int* ia, int* ib, int* ic);
-#define tinker_f_chkangle chkangle_
+// settle.f
+void settle_(double* dt, double* xold, double* yold, double* zold);
+#define tinker_f_settle settle_
+void settle2_(double* dt);
+#define tinker_f_settle2 settle2_
+void settleg_(double* derivs);
+#define tinker_f_settleg settleg_
+void solve3_(double* amat, double* bvec, double* x);
+#define tinker_f_solve3 solve3_
+void watfour_(double* dt);
+#define tinker_f_watfour watfour_
+void watfour2_(double* derivs);
+#define tinker_f_watfour2 watfour2_
+
+// shake.f
+void shake_(double* xold, double* yold, double* zold);
+#define tinker_f_shake shake_
+void shakeg_(double* derivs);
+#define tinker_f_shakeg shakeg_
 
 // sigmoid.f
 double sigmoid_(double* beta, double* x);

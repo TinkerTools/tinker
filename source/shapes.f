@@ -18,8 +18,8 @@ c     npoint          total number of balls (points) in the system
 c     nvertex         total number of vertices in the system
 c     ntetra          total number of tetrahedra in the system
 c     nnew            total number of entries on new tetrahedra list
-c     nfree           total number of spaces on free tetrahedra list
-c     nkill           total number of tetrahedra on list to kill
+c     ntfree          total number of spaces on free tetrahedra list
+c     ntkill          total number of tetrahedra on list to kill
 c     nlinkfacet      total number of triangle facets in the system
 c     newlist         list with index numbers of the new tetrahedra
 c     freespace       list of the tetrahedra currently in free space
@@ -46,7 +46,7 @@ c
       integer maxtetra
       integer npoint,nvertex
       integer ntetra,nnew
-      integer nfree,nkill
+      integer ntfree,ntkill
       integer nlinkfacet
       integer, allocatable :: newlist(:)
       integer, allocatable :: freespace(:)

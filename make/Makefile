@@ -7,7 +7,7 @@
 ##
 ##  Invocation Options:
 ##
-##   1. make all              Build all the Tinker executables
+##   1. make [all]            Build all the Tinker executables
 ##   2. make install          Move the executables to BINDIR
 ##   3. make create_links     Create soft links in LINKDIR
 ##   4. make remove_links     Remove soft links from LINKDIR
@@ -446,6 +446,7 @@ OBJS =	action.o \
 	kexpol.o \
 	kextra.o \
 	keys.o \
+	kfreeze.o \
 	kgeom.o \
 	khbond.o \
 	kimprop.o \
@@ -651,7 +652,8 @@ OBJS =	action.o \
 	sequen.o \
 	server.o \
 	setprm.o \
-	shakeup.o \
+	settle.o \
+	shake.o \
 	shapes.o \
 	shunt.o \
 	sigmoid.o \
@@ -1396,6 +1398,7 @@ libtinker.a: ${OBJS}
 	kexpol.o \
 	kextra.o \
 	keys.o \
+	kfreeze.o \
 	kgeom.o \
 	khbond.o \
 	kimprop.o \
@@ -1575,7 +1578,8 @@ libtinker.a: ${OBJS}
 	sequen.o \
 	server.o \
 	setprm.o \
-	shakeup.o \
+	settle.o \
+	shake.o \
 	shapes.o \
 	shunt.o \
 	sigmoid.o \
@@ -1958,6 +1962,7 @@ kexpl.o:
 kexpol.o: atomid.o atoms.o expol.o inform.o iounit.o kexpl.o keys.o sizes.o
 kextra.o:
 keys.o:
+kfreeze.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o usage.o
 kgeom.o: atomid.o atoms.o bound.o couple.o group.o iounit.o keys.o molcul.o potent.o restrn.o
 khbond.o:
 kimprop.o: atomid.o atoms.o couple.o improp.o inform.o iounit.o keys.o kiprop.o potent.o tors.o
@@ -2161,7 +2166,8 @@ search.o: linmin.o math.o
 sequen.o: sizes.o
 server.o:
 setprm.o: atoms.o couple.o kangs.o kantor.o kbonds.o kcflux.o kdipol.o keys.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolpr.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o params.o restrn.o
-shakeup.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o bound.o couple.o freeze.o keys.o math.o molcul.o ring.o usage.o
+settle.o: atomid.o atoms.o freeze.o math.o moldyn.o units.o virial.o
+shake.o: atomid.o atoms.o freeze.o group.o inform.o iounit.o usage.o
 shapes.o:
 shunt.o:
 sigmoid.o:

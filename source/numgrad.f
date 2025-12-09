@@ -67,6 +67,6 @@ c
 c
 c     distribute gradient on four-site water extra centers
 c
-      call water4 (g)
+      call watfour2 (g)
       return
       end

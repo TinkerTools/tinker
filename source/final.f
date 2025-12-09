@@ -433,10 +433,12 @@ c
       if (allocated(iratx))  deallocate (iratx)
       if (allocated(kratx))  deallocate (kratx)
       if (allocated(irat))  deallocate (irat)
+      if (allocated(iwat))  deallocate (iwat)
       if (allocated(iwat4))  deallocate (iwat4)
       if (allocated(krat))  deallocate (krat)
+      if (allocated(kwat))  deallocate (kwat)
       if (allocated(kwat4))  deallocate (kwat4)
-      if (allocated(ratimage))  deallocate (ratimage)
+      if (allocated(frzimage))  deallocate (frzimage)
 c
 c     deallocation of global arrays from module group
 c

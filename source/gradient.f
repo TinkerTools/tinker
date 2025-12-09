@@ -275,7 +275,7 @@ c
 c
 c     distribute gradient on four-site water extra centers
 c
-      call water4 (derivs)
+      call watfour2 (derivs)
 c
 c     check for an illegal value for the total energy
 c

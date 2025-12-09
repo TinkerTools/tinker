@@ -156,7 +156,7 @@ c
 c     compute the final function and RMS gradient values
 c
       call gradient (epot,derivs)
-      if (use_rattle)  call shake2 (derivs)
+      if (use_freeze)  call shakeg (derivs)
       gnorm = 0.0d0
       do i = 1, nuse
          k = iuse(i)
@@ -267,7 +267,7 @@ c
 c
 c     adjust atomic coordinates to satisfy distance constraints
 c
-      if (use_rattle)  call shake (x,y,z)
+      if (use_freeze)  call shake (x,y,z)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -279,7 +279,7 @@ c
 c
 c     adjust gradient to remove components along constraints
 c
-      if (use_rattle)  call shake2 (derivs)
+      if (use_freeze)  call shakeg (derivs)
 c
 c     store the gradient components as the residual vector
 c

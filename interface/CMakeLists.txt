@@ -415,6 +415,7 @@ add_library (tinkerObjF OBJECT
 ../source/kewald.f
 ../source/kexpol.f
 ../source/kextra.f
+../source/kfreeze.f
 ../source/kgeom.f
 ../source/kimprop.f
 ../source/kimptor.f
@@ -520,7 +521,8 @@ add_library (tinkerObjF OBJECT
 ../source/search.f
 ../source/server.f
 ../source/setprm.f
-../source/shakeup.f
+../source/settle.f
+../source/shake.f
 ../source/sigmoid.f
 ../source/simplex.f
 ../source/sktstuf.f

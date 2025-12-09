@@ -123,7 +123,7 @@ c
 c
 c     set any holonomic interatomic distance constraints
 c
-      call shakeup
+      call kfreeze
 c
 c     set hybrid parameter values for free energy perturbation
 c

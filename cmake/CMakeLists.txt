@@ -131,10 +131,10 @@ set(_FILES
     initres initrot insert inter invbeta invert iounit jacobi kanang
     kangang kangle kangs kangtor kantor katom katoms kbond kbonds kcflux
     kcharge kchgflx kchgtrn kchrge kcpen kctrn kdipol kdipole kdisp kdsp
-    kewald kexpl kexpol kextra keys kgeom khbond kimprop kimptor kinetic
-    kiprop kitors kmetal kmpole kmulti kopbend kopbnd kopdist kopdst
-    korbit korbs kpitor kpitors kpolar kpolpr kpolr krepel krepl ksolut
-    ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor
+    kewald kexpl kexpol kextra keys kfreeze kgeom khbond kimprop kimptor
+    kinetic kiprop kitors kmetal kmpole kmulti kopbend kopbnd kopdist
+    kopdst korbit korbs kpitor kpitors kpolar kpolpr kpolr krepel krepl
+    ksolut ksolv kstbnd kstrbnd kstrtor ksttor ktors ktorsn ktortor ktrtor
     kundrot kurey kurybr kvdw kvdwpr kvdws lattice lbfgs light lights
     limits linmin lusolve makeint makeref makexyz math maxwell mdinit
     mdrest mdsave mdstat mdstuf mechanic merck merge minima molcul moldyn
@@ -150,7 +150,7 @@ set(_FILES
     readint readmbis readmol readmol2 readpdb readprm readseq readxyz
     refer repel replica reppot resdue respa restrn rgddyn rgdstep richmond
     rigid ring rings rmsfit rotbnd rotlist rotpole rxnfld rxnpot scales
-    sdstep search sequen server setprm shakeup shapes shunt sigmoid
+    sdstep search sequen server setprm settle shake shapes shunt sigmoid
     simplex sizes sktstuf socket solpot solute sort square stodyn strbnd
     strtor suffix surface surfatom switch syntrn tarray tcgstuf temper
     tettor tettors titles tncg torphase torpot torque tors torsions tortor

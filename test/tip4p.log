@@ -1,0 +1,567 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 25.6   December 2025                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2025               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     O     TIP4P Water O                8     15.995     3
+        2     2     H     TIP4P Water H                1      1.008     1
+        3     3     M     TIP4P Water M                0      0.000     1
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+         1   2            1000.000         0.9572
+         1   3            1000.000         0.1500
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+       2   1   2           100.000        104.520
+       2   1   3           100.000         52.260
+
+ Additional Atomic Partial Charge Parameters :
+
+     Atom Type              Charge
+
+           1                0.0000
+           2                0.5200
+           3               -1.0400
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+           1                3.1536         0.1550          0.000
+           2                0.0000         0.0000          0.000
+           3                0.0000         0.0000          0.000
+
+ Limited Memory BFGS Quasi-Newton Optimization :
+
+ QN Iter     F Value      G RMS      F Move   X Move   Angle  FG Call  Comment
+
+     0   -12336.9614     1.1078                                   1
+     1   -12353.3241     0.2748     16.3627   0.0076    0.00      2    Success 
+     2   -12354.7832     0.1242      1.4591   0.0026   20.95      3    Success 
+     3   -12355.2870     0.0898      0.5038   0.0019   27.70      4    Success 
+     4   -12355.6892     0.0970      0.4022   0.0025   39.41      5    Success 
+     5   -12356.0239     0.0904      0.3347   0.0028   56.94      6    Success 
+     6   -12356.3157     0.0730      0.2917   0.0024   61.22      7    Success 
+     7   -12356.6574     0.0781      0.3418   0.0039   60.80      8    Success 
+     8   -12356.9619     0.1005      0.3044   0.0045   66.67      9    Success 
+     9   -12357.2832     0.0735      0.3213   0.0037   72.08     10    Success 
+    10   -12357.6404     0.0752      0.3572   0.0054   68.13     11    Success 
+    11   -12357.8900     0.1010      0.2496   0.0051   71.25     12    Success 
+    12   -12358.1397     0.0681      0.2497   0.0030   73.73     13    Success 
+    13   -12358.4386     0.0642      0.2989   0.0049   69.35     14    Success 
+    14   -12358.6649     0.0887      0.2263   0.0048   72.91     15    Success 
+    15   -12358.9676     0.0747      0.3026   0.0060   78.46     16    Success 
+    16   -12359.2954     0.0816      0.3278   0.0066   76.02     17    Success 
+    17   -12359.6391     0.0725      0.3437   0.0066   76.87     18    Success 
+    18   -12360.0046     0.0889      0.3654   0.0067   72.96     19    Success 
+    19   -12360.3495     0.1129      0.3449   0.0067   71.79     20    Success 
+    20   -12360.6883     0.0726      0.3389   0.0028   64.66     21    Success 
+    21   -12360.9632     0.0645      0.2749   0.0038   67.46     22    Success 
+    22   -12361.2141     0.0744      0.2509   0.0039   67.30     23    Success 
+    23   -12361.4834     0.0866      0.2693   0.0060   73.54     24    Success 
+    24   -12361.7206     0.0645      0.2372   0.0049   77.11     25    Success 
+    25   -12361.9194     0.0630      0.1988   0.0030   63.32     26    Success 
+    26   -12362.0834     0.0697      0.1640   0.0047   75.34     27    Success 
+    27   -12362.2677     0.0551      0.1843   0.0027   67.54     28    Success 
+    28   -12362.4410     0.0591      0.1733   0.0040   69.97     29    Success 
+    29   -12362.5710     0.0578      0.1300   0.0026   69.69     30    Success 
+    30   -12362.7202     0.0503      0.1492   0.0033   74.40     31    Success 
+    31   -12362.8969     0.0650      0.1767   0.0052   73.44     32    Success 
+    32   -12363.0592     0.0634      0.1623   0.0047   76.56     33    Success 
+    33   -12363.2064     0.0539      0.1471   0.0034   77.07     34    Success 
+    34   -12363.4141     0.0568      0.2077   0.0051   74.27     35    Success 
+    35   -12363.5977     0.0697      0.1837   0.0066   78.45     36    Success 
+    36   -12363.8079     0.0658      0.2102   0.0061   78.96     37    Success 
+    37   -12364.0201     0.0795      0.2121   0.0066   78.57     38    Success 
+    38   -12364.3063     0.0657      0.2863   0.0053   75.72     39    Success 
+    39   -12364.6009     0.0825      0.2945   0.0066   75.25     40    Success 
+    40   -12364.9435     0.0795      0.3427   0.0066   77.21     41    Success 
+    41   -12365.3391     0.0892      0.3956   0.0066   75.15     42    Success 
+    42   -12365.7731     0.0969      0.4340   0.0066   75.88     43    Success 
+    43   -12366.3772     0.1071      0.6041   0.0066   72.08     44    Success 
+    44   -12366.8945     0.1191      0.5173   0.0066   76.40     45    Success 
+    45   -12367.5980     0.1238      0.7035   0.0066   71.24     46    Success 
+    46   -12368.0105     0.1275      0.4126   0.0066   78.12     47    Success 
+    47   -12368.6611     0.1148      0.6506   0.0033   60.49     48    Success 
+    48   -12369.4231     0.1222      0.7619   0.0057   59.69     49    Success 
+    49   -12369.9552     0.1069      0.5321   0.0054   61.57     50    Success 
+    50   -12370.2908     0.1017      0.3357   0.0038   68.63     51    Success 
+    51   -12370.6382     0.0820      0.3474   0.0023   59.29     52    Success 
+    52   -12371.0165     0.0865      0.3783   0.0061   69.65     53    Success 
+    53   -12371.2516     0.1129      0.2351   0.0046   66.86     54    Success 
+    54   -12371.5187     0.0664      0.2670   0.0017   62.22     55    Success 
+    55   -12371.7937     0.0603      0.2750   0.0040   65.40     56    Success 
+    56   -12371.9956     0.0736      0.2020   0.0034   70.33     57    Success 
+    57   -12372.2753     0.0700      0.2797   0.0057   75.96     58    Success 
+    58   -12372.5728     0.0799      0.2974   0.0066   74.96     59    Success 
+    59   -12372.8578     0.0830      0.2850   0.0064   76.02     60    Success 
+    60   -12373.1740     0.0812      0.3162   0.0041   70.17     61    Success 
+    61   -12373.5400     0.0814      0.3659   0.0050   67.39     62    Success 
+    62   -12373.7824     0.1078      0.2424   0.0045   65.96     63    Success 
+    63   -12374.0142     0.0584      0.2318   0.0023   68.08     64    Success 
+    64   -12374.1419     0.0651      0.1277   0.0040   71.46     65    Success 
+    65   -12374.2582     0.0623      0.1163   0.0032   72.65     66    Success 
+    66   -12374.3823     0.0445      0.1242   0.0019   66.06     67    Success 
+    67   -12374.4819     0.0381      0.0996   0.0026   70.10     68    Success 
+    68   -12374.5627     0.0456      0.0808   0.0024   69.72     69    Success 
+    69   -12374.6564     0.0420      0.0937   0.0031   73.23     70    Success 
+    70   -12374.7310     0.0373      0.0746   0.0021   70.29     71    Success 
+    71   -12374.8006     0.0347      0.0696   0.0020   69.25     72    Success 
+    72   -12374.8716     0.0395      0.0710   0.0025   71.36     73    Success 
+    73   -12374.9496     0.0403      0.0780   0.0035   75.80     74    Success 
+    74   -12375.0231     0.0354      0.0735   0.0030   76.62     75    Success 
+    75   -12375.1039     0.0369      0.0808   0.0034   75.76     76    Success 
+    76   -12375.1960     0.0540      0.0921   0.0048   76.74     77    Success 
+    77   -12375.3052     0.0434      0.1091   0.0045   80.52     78    Success 
+    78   -12375.4394     0.0476      0.1343   0.0055   78.29     79    Success 
+    79   -12375.5889     0.0659      0.1494   0.0066   80.36     80    Success 
+    80   -12375.7650     0.0669      0.1761   0.0066   82.85     81    Success 
+    81   -12375.9651     0.0778      0.2000   0.0066   81.76     82    Success 
+    82   -12376.2309     0.0732      0.2659   0.0066   80.48     83    Success 
+    83   -12376.5538     0.1001      0.3228   0.0061   72.67     84    Success 
+    84   -12376.9047     0.0871      0.3509   0.0055   72.75     85    Success 
+    85   -12377.2338     0.0711      0.3291   0.0025   56.70     86    Success 
+    86   -12377.5458     0.0764      0.3120   0.0036   55.73     87    Success 
+    87   -12377.7503     0.0908      0.2045   0.0047   71.20     88    Success 
+    88   -12377.9242     0.0685      0.1738   0.0054   80.85     89    Success 
+    89   -12378.1204     0.0657      0.1962   0.0045   73.44     90    Success 
+    90   -12378.2954     0.0564      0.1751   0.0025   67.89     91    Success 
+    91   -12378.5271     0.0596      0.2317   0.0047   71.04     92    Success 
+    92   -12378.7612     0.1004      0.2341   0.0066   73.68     93    Success 
+    93   -12379.0444     0.0750      0.2832   0.0051   78.74     94    Success 
+    94   -12379.4185     0.0808      0.3740   0.0066   73.82     95    Success 
+    95   -12379.7758     0.1259      0.3573   0.0067   72.63     96    Success 
+    96   -12380.2467     0.1039      0.4709   0.0040   69.01     97    Success 
+    97   -12380.7943     0.0936      0.5476   0.0048   64.64     98    Success 
+    98   -12381.2289     0.1253      0.4346   0.0055   63.23     99    Success 
+    99   -12381.5951     0.0884      0.3661   0.0028   63.75    100    Success 
+   100   -12381.8210     0.0870      0.2260   0.0056   74.69    101    Success 
+   101   -12382.0226     0.0867      0.2015   0.0035   68.54    102    Success 
+   102   -12382.2427     0.0598      0.2201   0.0021   62.69    103    Success 
+   103   -12382.4293     0.0521      0.1866   0.0031   67.99    104    Success 
+   104   -12382.6101     0.0774      0.1808   0.0041   68.01    105    Success 
+   105   -12382.7763     0.0585      0.1662   0.0042   76.25    106    Success 
+   106   -12382.8863     0.0415      0.1100   0.0018   67.84    107    Success 
+   107   -12382.9948     0.0412      0.1085   0.0023   62.69    108    Success 
+   108   -12383.0732     0.0636      0.0784   0.0029   69.96    109    Success 
+   109   -12383.1573     0.0367      0.0841   0.0019   75.85    110    Success 
+   110   -12383.2282     0.0318      0.0709   0.0021   68.62    111    Success 
+   111   -12383.2821     0.0389      0.0540   0.0020   71.41    112    Success 
+   112   -12383.3494     0.0361      0.0673   0.0028   75.50    113    Success 
+   113   -12383.4060     0.0359      0.0565   0.0024   73.24    114    Success 
+   114   -12383.4507     0.0279      0.0447   0.0015   70.61    115    Success 
+   115   -12383.4885     0.0265      0.0379   0.0012   65.15    116    Success 
+   116   -12383.5315     0.0332      0.0429   0.0020   69.23    117    Success 
+   117   -12383.5716     0.0291      0.0401   0.0023   76.43    118    Success 
+   118   -12383.6035     0.0237      0.0319   0.0015   75.41    119    Success 
+   119   -12383.6448     0.0257      0.0413   0.0024   73.59    120    Success 
+   120   -12383.6808     0.0421      0.0360   0.0029   75.72    121    Success 
+   121   -12383.7217     0.0277      0.0409   0.0017   78.77    122    Success 
+   122   -12383.7745     0.0275      0.0527   0.0027   74.85    123    Success 
+   123   -12383.8226     0.0404      0.0482   0.0031   78.09    124    Success 
+   124   -12383.8921     0.0391      0.0695   0.0044   82.28    125    Success 
+   125   -12383.9809     0.0480      0.0888   0.0058   81.19    126    Success 
+   126   -12384.0790     0.0462      0.0981   0.0053   79.91    127    Success 
+   127   -12384.2013     0.0422      0.1223   0.0024   66.51    128    Success 
+   128   -12384.3255     0.0535      0.1241   0.0031   64.51    129    Success 
+   129   -12384.4189     0.0551      0.0935   0.0032   73.50    130    Success 
+   130   -12384.5068     0.0377      0.0879   0.0020   73.92    131    Success 
+   131   -12384.5998     0.0446      0.0930   0.0040   73.75    132    Success 
+   132   -12384.6864     0.0553      0.0866   0.0032   73.32    133    Success 
+   133   -12384.8020     0.0441      0.1157   0.0033   76.52    134    Success 
+   134   -12384.9061     0.0445      0.1040   0.0043   74.41    135    Success 
+   135   -12384.9683     0.0388      0.0623   0.0015   67.82    136    Success 
+   136   -12385.0381     0.0342      0.0697   0.0014   65.18    137    Success 
+   137   -12385.1131     0.0522      0.0750   0.0033   71.71    138    Success 
+   138   -12385.1816     0.0348      0.0685   0.0024   75.50    139    Success 
+   139   -12385.2295     0.0309      0.0479   0.0010   61.72    140    Success 
+   140   -12385.2994     0.0313      0.0699   0.0021   68.30    141    Success 
+   141   -12385.3687     0.0587      0.0693   0.0037   72.27    142    Success 
+   142   -12385.4445     0.0360      0.0758   0.0025   78.27    143    Success 
+   143   -12385.5114     0.0322      0.0669   0.0022   72.73    144    Success 
+   144   -12385.5759     0.0503      0.0644   0.0035   72.83    145    Success 
+   145   -12385.6400     0.0484      0.0641   0.0036   79.65    146    Success 
+   146   -12385.7163     0.0509      0.0763   0.0017   66.07    147    Success 
+   147   -12385.7953     0.0383      0.0790   0.0018   72.29    148    Success 
+   148   -12385.8697     0.0434      0.0743   0.0030   73.15    149    Success 
+   149   -12385.9386     0.0543      0.0690   0.0039   78.14    150    Success 
+   150   -12386.0179     0.0415      0.0793   0.0016   71.62    151    Success 
+   151   -12386.1145     0.0363      0.0967   0.0031   72.14    152    Success 
+   152   -12386.1750     0.0407      0.0604   0.0022   72.13    153    Success 
+   153   -12386.2441     0.0351      0.0691   0.0027   76.31    154    Success 
+   154   -12386.3106     0.0375      0.0665   0.0028   71.84    155    Success 
+   155   -12386.3558     0.0340      0.0452   0.0018   70.91    156    Success 
+   156   -12386.3907     0.0271      0.0349   0.0010   67.72    157    Success 
+   157   -12386.4323     0.0267      0.0415   0.0019   70.22    158    Success 
+   158   -12386.4669     0.0326      0.0346   0.0024   72.49    159    Success 
+   159   -12386.4995     0.0285      0.0326   0.0019   76.63    160    Success 
+   160   -12386.5281     0.0213      0.0286   0.0010   69.79    161    Success 
+   161   -12386.5544     0.0213      0.0263   0.0015   70.57    162    Success 
+   162   -12386.5748     0.0293      0.0204   0.0017   73.25    163    Success 
+   163   -12386.5955     0.0185      0.0208   0.0009   73.86    164    Success 
+   164   -12386.6189     0.0179      0.0234   0.0014   69.35    165    Success 
+   165   -12386.6365     0.0230      0.0176   0.0013   72.78    166    Success 
+   166   -12386.6600     0.0186      0.0235   0.0019   78.06    167    Success 
+   167   -12386.6813     0.0234      0.0213   0.0021   75.61    168    Success 
+   168   -12386.7008     0.0193      0.0195   0.0015   76.30    169    Success 
+   169   -12386.7168     0.0173      0.0160   0.0009   70.42    170    Success 
+   170   -12386.7365     0.0192      0.0197   0.0015   72.36    171    Success 
+   171   -12386.7547     0.0231      0.0181   0.0020   77.49    172    Success 
+   172   -12386.7724     0.0182      0.0177   0.0014   79.67    173    Success 
+   173   -12386.7953     0.0177      0.0229   0.0021   76.43    174    Success 
+   174   -12386.8131     0.0300      0.0178   0.0024   77.49    175    Success 
+   175   -12386.8341     0.0191      0.0209   0.0013   79.63    176    Success 
+   176   -12386.8584     0.0182      0.0243   0.0018   74.27    177    Success 
+   177   -12386.8775     0.0238      0.0191   0.0019   77.90    178    Success 
+   178   -12386.9025     0.0201      0.0250   0.0026   81.03    179    Success 
+   179   -12386.9273     0.0239      0.0247   0.0024   77.39    180    Success 
+   180   -12386.9511     0.0210      0.0238   0.0019   77.37    181    Success 
+   181   -12386.9717     0.0195      0.0206   0.0012   73.32    182    Success 
+   182   -12386.9969     0.0225      0.0252   0.0020   74.51    183    Success 
+   183   -12387.0216     0.0248      0.0247   0.0026   78.92    184    Success 
+   184   -12387.0436     0.0207      0.0220   0.0015   78.50    185    Success 
+   185   -12387.0728     0.0215      0.0292   0.0024   77.20    186    Success 
+   186   -12387.1005     0.0358      0.0277   0.0029   77.60    187    Success 
+   187   -12387.1345     0.0244      0.0341   0.0018   79.77    188    Success 
+   188   -12387.1756     0.0240      0.0410   0.0026   75.51    189    Success 
+   189   -12387.2061     0.0354      0.0305   0.0020   73.37    190    Success 
+   190   -12387.2424     0.0260      0.0364   0.0018   78.12    191    Success 
+   191   -12387.2822     0.0248      0.0398   0.0017   67.29    192    Success 
+   192   -12387.3069     0.0329      0.0247   0.0020   74.36    193    Success 
+   193   -12387.3310     0.0228      0.0241   0.0017   80.78    194    Success 
+   194   -12387.3544     0.0263      0.0234   0.0022   76.23    195    Success 
+   195   -12387.3745     0.0210      0.0201   0.0019   79.83    196    Success 
+   196   -12387.3915     0.0283      0.0170   0.0014   71.36    197    Success 
+   197   -12387.4074     0.0166      0.0159   0.0007   74.48    198    Success 
+   198   -12387.4230     0.0146      0.0156   0.0010   68.85    199    Success 
+   199   -12387.4352     0.0185      0.0122   0.0010   72.07    200    Success 
+   200   -12387.4495     0.0171      0.0143   0.0015   76.74    201    Success 
+   201   -12387.4612     0.0149      0.0117   0.0010   74.72    202    Success 
+   202   -12387.4717     0.0131      0.0104   0.0009   71.14    203    Success 
+   203   -12387.4810     0.0141      0.0094   0.0008   70.54    204    Success 
+   204   -12387.4907     0.0151      0.0096   0.0011   73.58    205    Success 
+   205   -12387.4988     0.0116      0.0081   0.0009   75.45    206    Success 
+   206   -12387.5051     0.0108      0.0064   0.0007   73.02    207    Success 
+   207   -12387.5121     0.0127      0.0070   0.0010   73.74    208    Success 
+   208   -12387.5186     0.0129      0.0065   0.0010   76.30    209    Success 
+   209   -12387.5242     0.0094      0.0055   0.0006   74.05    210   SmallGrad
+
+ LBFGS  --  Normal Termination due to SmallGrad
+
+ Final Function Value :       -12387.5242
+ Final RMS Gradient :              0.0094
+ Final Gradient Norm :             0.5946
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 25.6   December 2025                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2025               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Atom Definition Parameters :
+
+     Type  Class  Symbol  Description               Atomic    Mass   Valence
+
+        1     1     O     TIP4P Water O                8     15.995     3
+        2     2     H     TIP4P Water H                1      1.008     1
+        3     3     M     TIP4P Water M                0      0.000     1
+
+ Additional Bond Stretching Parameters :
+
+     Atom Classes             K(S)         Length
+
+         1   2            1000.000         0.9572
+         1   3            1000.000         0.1500
+
+ Additional Angle Bending Parameters :
+
+     Atom Classes             K(B)          Angle
+
+       2   1   2           100.000        104.520
+       2   1   3           100.000         52.260
+
+ Additional Atomic Partial Charge Parameters :
+
+     Atom Type              Charge
+
+           1                0.0000
+           2                0.5200
+           3               -1.0400
+
+ Additional van der Waals Parameters :
+
+     Atom Class               Size        Epsilon        Reduction
+
+           1                3.1536         0.1550          0.000
+           2                0.0000         0.0000          0.000
+           3                0.0000         0.0000          0.000
+
+ Molecular Dynamics Trajectory via Modified Beeman Algorithm
+
+ Average Values for the Last   100 Out of      100 Dynamics Steps
+
+ Simulation Time              0.2000 Picosecond
+ Total Energy            -10203.4994 Kcal/mole   (+/- 216.2690)
+ Potential Energy        -11263.6654 Kcal/mole   (+/- 235.5900)
+ Kinetic Energy            1060.1659 Kcal/mole   (+/- 109.1008)
+ Temperature                  177.92 Kelvin      (+/-    18.31)
+ Pressure                    -212.57 Atmosphere  (+/-   990.89)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      200 Dynamics Steps
+
+ Simulation Time              0.4000 Picosecond
+ Total Energy             -9619.6307 Kcal/mole   (+/- 130.3839)
+ Potential Energy        -10889.9093 Kcal/mole   (+/-  73.4416)
+ Kinetic Energy            1270.2786 Kcal/mole   (+/-  60.0631)
+ Temperature                  213.18 Kelvin      (+/-    10.08)
+ Pressure                    -691.39 Atmosphere  (+/-   196.37)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      300 Dynamics Steps
+
+ Simulation Time              0.6000 Picosecond
+ Total Energy             -9244.7678 Kcal/mole   (+/-  92.6305)
+ Potential Energy        -10669.4277 Kcal/mole   (+/-  63.1131)
+ Kinetic Energy            1424.6600 Kcal/mole   (+/-  34.1297)
+ Temperature                  239.09 Kelvin      (+/-     5.73)
+ Pressure                    -433.17 Atmosphere  (+/-   261.83)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      400 Dynamics Steps
+
+ Simulation Time              0.8000 Picosecond
+ Total Energy             -8941.0723 Kcal/mole   (+/-  72.2502)
+ Potential Energy        -10496.3606 Kcal/mole   (+/-  50.3974)
+ Kinetic Energy            1555.2882 Kcal/mole   (+/-  31.6789)
+ Temperature                  261.01 Kelvin      (+/-     5.32)
+ Pressure                     347.43 Atmosphere  (+/-   373.86)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      500 Dynamics Steps
+
+ Simulation Time              1.0000 Picosecond
+ Total Energy             -8777.2581 Kcal/mole   (+/-  39.5785)
+ Potential Energy        -10405.0174 Kcal/mole   (+/-  24.6034)
+ Kinetic Energy            1627.7594 Kcal/mole   (+/-  31.4285)
+ Temperature                  273.18 Kelvin      (+/-     5.27)
+ Pressure                     246.72 Atmosphere  (+/-   338.93)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Instantaneous Values for Frame Saved at       500 Dynamics Steps
+
+ Current Time                 1.0000 Picosecond
+ Current Potential       -10405.8530 Kcal/mole
+ Current Kinetic           1673.4335 Kcal/mole
+ Lattice Lengths           31.050000     31.050000     31.050000
+ Lattice Angles            90.000000     90.000000     90.000000
+ Frame Number                      1
+ Coordinate File             tip4p.arc
+
+ Average Values for the Last   100 Out of      600 Dynamics Steps
+
+ Simulation Time              1.2000 Picosecond
+ Total Energy             -8695.5518 Kcal/mole   (+/-  25.8571)
+ Potential Energy        -10352.3560 Kcal/mole   (+/-  26.0298)
+ Kinetic Energy            1656.8042 Kcal/mole   (+/-  29.7384)
+ Temperature                  278.05 Kelvin      (+/-     4.99)
+ Pressure                     407.53 Atmosphere  (+/-   103.82)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      700 Dynamics Steps
+
+ Simulation Time              1.4000 Picosecond
+ Total Energy             -8640.0103 Kcal/mole   (+/-  12.6052)
+ Potential Energy        -10289.8412 Kcal/mole   (+/-  22.1276)
+ Kinetic Energy            1649.8309 Kcal/mole   (+/-  18.4172)
+ Temperature                  276.88 Kelvin      (+/-     3.09)
+ Pressure                     108.30 Atmosphere  (+/-   260.10)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      800 Dynamics Steps
+
+ Simulation Time              1.6000 Picosecond
+ Total Energy             -8619.5732 Kcal/mole   (+/-  11.3199)
+ Potential Energy        -10280.0584 Kcal/mole   (+/-  21.7411)
+ Kinetic Energy            1660.4853 Kcal/mole   (+/-  23.2641)
+ Temperature                  278.67 Kelvin      (+/-     3.90)
+ Pressure                    -105.60 Atmosphere  (+/-   464.71)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of      900 Dynamics Steps
+
+ Simulation Time              1.8000 Picosecond
+ Total Energy             -8556.3827 Kcal/mole   (+/-  24.9441)
+ Potential Energy        -10233.2648 Kcal/mole   (+/-  27.0313)
+ Kinetic Energy            1676.8821 Kcal/mole   (+/-  26.1577)
+ Temperature                  281.42 Kelvin      (+/-     4.39)
+ Pressure                    -360.08 Atmosphere  (+/-   246.89)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1000 Dynamics Steps
+
+ Simulation Time              2.0000 Picosecond
+ Total Energy             -8478.7313 Kcal/mole   (+/-  25.2383)
+ Potential Energy        -10182.7366 Kcal/mole   (+/-  31.3128)
+ Kinetic Energy            1704.0053 Kcal/mole   (+/-  20.9787)
+ Temperature                  285.97 Kelvin      (+/-     3.52)
+ Pressure                     120.41 Atmosphere  (+/-   311.97)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Instantaneous Values for Frame Saved at      1000 Dynamics Steps
+
+ Current Time                 2.0000 Picosecond
+ Current Potential       -10123.3220 Kcal/mole
+ Current Kinetic           1689.3877 Kcal/mole
+ Lattice Lengths           31.050000     31.050000     31.050000
+ Lattice Angles            90.000000     90.000000     90.000000
+ Frame Number                      2
+ Coordinate File             tip4p.arc
+
+ Average Values for the Last   100 Out of     1100 Dynamics Steps
+
+ Simulation Time              2.2000 Picosecond
+ Total Energy             -8412.1867 Kcal/mole   (+/-   9.5113)
+ Potential Energy        -10158.8338 Kcal/mole   (+/-  21.3657)
+ Kinetic Energy            1746.6471 Kcal/mole   (+/-  22.6872)
+ Temperature                  293.13 Kelvin      (+/-     3.81)
+ Pressure                     887.10 Atmosphere  (+/-   410.04)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1200 Dynamics Steps
+
+ Simulation Time              2.4000 Picosecond
+ Total Energy             -8439.0414 Kcal/mole   (+/-  10.4375)
+ Potential Energy        -10168.2619 Kcal/mole   (+/-  16.9090)
+ Kinetic Energy            1729.2205 Kcal/mole   (+/-  21.4859)
+ Temperature                  290.20 Kelvin      (+/-     3.61)
+ Pressure                     744.28 Atmosphere  (+/-   138.10)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1300 Dynamics Steps
+
+ Simulation Time              2.6000 Picosecond
+ Total Energy             -8413.4068 Kcal/mole   (+/-  12.6141)
+ Potential Energy        -10136.5642 Kcal/mole   (+/-  24.9761)
+ Kinetic Energy            1723.1574 Kcal/mole   (+/-  21.3542)
+ Temperature                  289.19 Kelvin      (+/-     3.58)
+ Pressure                     268.92 Atmosphere  (+/-   257.38)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1400 Dynamics Steps
+
+ Simulation Time              2.8000 Picosecond
+ Total Energy             -8385.6916 Kcal/mole   (+/-  13.3612)
+ Potential Energy        -10139.4587 Kcal/mole   (+/-  25.5950)
+ Kinetic Energy            1753.7671 Kcal/mole   (+/-  22.4969)
+ Temperature                  294.32 Kelvin      (+/-     3.78)
+ Pressure                      65.51 Atmosphere  (+/-   229.53)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1500 Dynamics Steps
+
+ Simulation Time              3.0000 Picosecond
+ Total Energy             -8360.0081 Kcal/mole   (+/-  24.3936)
+ Potential Energy        -10082.8991 Kcal/mole   (+/-  30.2302)
+ Kinetic Energy            1722.8910 Kcal/mole   (+/-  19.6941)
+ Temperature                  289.14 Kelvin      (+/-     3.31)
+ Pressure                     131.81 Atmosphere  (+/-   261.76)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Instantaneous Values for Frame Saved at      1500 Dynamics Steps
+
+ Current Time                 3.0000 Picosecond
+ Current Potential       -10072.3107 Kcal/mole
+ Current Kinetic           1728.2726 Kcal/mole
+ Lattice Lengths           31.050000     31.050000     31.050000
+ Lattice Angles            90.000000     90.000000     90.000000
+ Frame Number                      3
+ Coordinate File             tip4p.arc
+
+ Average Values for the Last   100 Out of     1600 Dynamics Steps
+
+ Simulation Time              3.2000 Picosecond
+ Total Energy             -8319.3110 Kcal/mole   (+/-  18.4584)
+ Potential Energy        -10059.7121 Kcal/mole   (+/-  23.7216)
+ Kinetic Energy            1740.4011 Kcal/mole   (+/-  25.9511)
+ Temperature                  292.08 Kelvin      (+/-     4.36)
+ Pressure                    -223.81 Atmosphere  (+/-   205.48)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1700 Dynamics Steps
+
+ Simulation Time              3.4000 Picosecond
+ Total Energy             -8260.3285 Kcal/mole   (+/-  13.7305)
+ Potential Energy        -10031.2811 Kcal/mole   (+/-  23.8681)
+ Kinetic Energy            1770.9527 Kcal/mole   (+/-  22.0477)
+ Temperature                  297.21 Kelvin      (+/-     3.70)
+ Pressure                    -244.65 Atmosphere  (+/-   283.58)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1800 Dynamics Steps
+
+ Simulation Time              3.6000 Picosecond
+ Total Energy             -8190.9277 Kcal/mole   (+/-  25.1623)
+ Potential Energy         -9948.2718 Kcal/mole   (+/-  28.7352)
+ Kinetic Energy            1757.3441 Kcal/mole   (+/-  18.5218)
+ Temperature                  294.92 Kelvin      (+/-     3.11)
+ Pressure                    -281.48 Atmosphere  (+/-   249.98)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     1900 Dynamics Steps
+
+ Simulation Time              3.8000 Picosecond
+ Total Energy             -8216.5122 Kcal/mole   (+/-  10.3348)
+ Potential Energy         -9966.6001 Kcal/mole   (+/-  21.4839)
+ Kinetic Energy            1750.0879 Kcal/mole   (+/-  23.4817)
+ Temperature                  293.71 Kelvin      (+/-     3.94)
+ Pressure                    -270.41 Atmosphere  (+/-   125.88)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Average Values for the Last   100 Out of     2000 Dynamics Steps
+
+ Simulation Time              4.0000 Picosecond
+ Total Energy             -8231.6643 Kcal/mole   (+/-  14.6038)
+ Potential Energy         -9988.3539 Kcal/mole   (+/-  24.3869)
+ Kinetic Energy            1756.6896 Kcal/mole   (+/-  24.3585)
+ Temperature                  294.81 Kelvin      (+/-     4.09)
+ Pressure                      84.99 Atmosphere  (+/-   189.58)
+ Density                      0.9991 Grams/cc    (+/-   0.0000)
+
+ Instantaneous Values for Frame Saved at      2000 Dynamics Steps
+
+ Current Time                 4.0000 Picosecond
+ Current Potential        -9955.1999 Kcal/mole
+ Current Kinetic           1750.2864 Kcal/mole
+ Lattice Lengths           31.050000     31.050000     31.050000
+ Lattice Angles            90.000000     90.000000     90.000000
+ Frame Number                      4
+ Coordinate File             tip4p.arc
