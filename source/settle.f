@@ -599,8 +599,9 @@ c     "solve3" uses 3x3 Gaussian elimination with pivoting to solve
 c     A * p = b as a utility to find gradient corrections for rigid
 c     three-site water models under the SETTLE algorithm
 c
-c     note "a" and "b" inputs are overwritten, and should be saved
-c     upon entering this routine if needed upon return
+c     note the inputs "a" and "b" are overwritten, and must be saved
+c     upon entering this routine if needed upon return; the solution
+c     is returned in "p"
 c
 c
       subroutine solve3 (a,b,p)
