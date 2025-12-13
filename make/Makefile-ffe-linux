@@ -1373,8 +1373,8 @@ libtinker.a: ${OBJS}
 	geometry.o \
 	getarc.o \
 	getcart.o \
-	getcif.o \
 	getdcd.o \
+	getfloat.o \
 	getint.o \
 	getkey.o \
 	getmol.o \
