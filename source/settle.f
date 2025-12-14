@@ -68,12 +68,22 @@ c
       real*8 xold(*)
       real*8 yold(*)
       real*8 zold(*)
+      logical dovel
 c
+c
+c     check for the availability of atomic velocities
+c
+      dovel = .false.
+      if (allocated(v)) then
+         if (size(v) .ne. 0)  dovel = .true.
+      else
+         allocate (v(3,0))
+      end if
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nwat,iwat,kwat,mass,
-!$OMP& x,y,z,xold,yold,zold,dt)
+!$OMP& x,y,z,xold,yold,zold,dt,dovel)
 !$OMP& shared(v)
 !$OMP DO reduction(+:v)
 c
@@ -208,7 +218,7 @@ c
 c
 c     use velocity correction derived from position movement
 c
-         if (dt .ne. 0.0d0) then
+         if (dovel) then
             v(1,ia) = v(1,ia) + (x(ia)-xia0)/dt
             v(2,ia) = v(2,ia) + (y(ia)-yia0)/dt
             v(3,ia) = v(3,ia) + (z(ia)-zia0)/dt
@@ -229,7 +239,7 @@ c
 c     set position and velocity for four-site water extra sites
 c
       if (nwat4 .ne. 0) then
-         call watfour (dt)
+         call watfour (dovel)
       end if
       return
       end
@@ -688,20 +698,20 @@ c     "watfour" sets the position and zeros the velocity of the
 c     extra site of rigid planar four-site water molecules 
 c
 c
-      subroutine watfour (dt)
+      subroutine watfour (dovel)
       use atoms
       use freeze
       use moldyn
       implicit none
       integer i
       integer ia,ib,ic,id
-      real*8 dt
       real*8 oterm,hterm
+      logical dovel
 c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(private) shared(nwat4,iwat4,kwat4,x,y,z,v,dt)
+!$OMP PARALLEL default(private) shared(nwat4,iwat4,kwat4,x,y,z,v,dovel)
 !$OMP DO
 c
 c     set the position of four-site water extra centers
@@ -716,7 +726,7 @@ c
          x(id) = oterm*x(ia) + hterm*(x(ib)+x(ic))
          y(id) = oterm*y(ia) + hterm*(y(ib)+y(ic))
          z(id) = oterm*z(ia) + hterm*(z(ib)+z(ic))
-         if (dt .ne. 0.0d0) then
+         if (dovel) then
             v(1,id) = 0.0d0
             v(2,id) = 0.0d0
             v(3,id) = 0.0d0

@@ -169,7 +169,7 @@ c
       real*8, allocatable :: ip(:)
       real*8, allocatable :: fock(:,:)
       real*8, allocatable :: hc(:,:)
-      real*8, allocatable :: v(:,:)
+      real*8, allocatable :: vec(:,:)
       real*8, allocatable :: gamma(:,:)
       real*8, allocatable :: ed(:,:)
       character*6 mode
@@ -213,7 +213,7 @@ c
       allocate (ip(norbit))
       allocate (fock(norbit,norbit))
       allocate (hc(norbit,norbit))
-      allocate (v(norbit,norbit))
+      allocate (vec(norbit,norbit))
       allocate (gamma(norbit,norbit))
       allocate (ed(norbit,norbit))
 c
@@ -367,17 +367,17 @@ c
          delta = 2.0d0 * converge
          do while (delta.gt.converge .and. iter.lt.maxiter)
             iter = iter + 1
-            call jacobi (norbit,fock,en,v)
+            call jacobi (norbit,fock,en,vec)
             do i = 1, norbit
                do j = i, norbit
                   s1 = 0.0d0
                   s2 = 0.0d0
                   gij = gamma(i,j)
                   do k = 1, nfill
-                     s2 = s2 - v(i,k)*v(j,k)*gij
+                     s2 = s2 - vec(i,k)*vec(j,k)*gij
                      if (i .eq. j) then
                         do m = 1, norbit
-                           s1 = s1 + 2.0d0*gamma(i,m)*v(m,k)**2
+                           s1 = s1 + 2.0d0*gamma(i,m)*vec(m,k)**2
                         end do
                      end if
                   end do
@@ -397,14 +397,14 @@ c
             xg = 0.0d0
             do i = 1, nfill
                do j = 1, norbit
-                  vij = v(j,i)
+                  vij = vec(j,i)
                   do k = 1, norbit
-                     vik = v(k,i)
+                     vik = vec(k,i)
                      gjk = gamma(j,k)
                      xi = xi + 2.0d0*vij*vik*hc(j,k)
                      do m = 1, nfill
-                        vmj = v(j,m)
-                        vmk = v(k,m)
+                        vmj = vec(j,m)
+                        vmk = vec(k,m)
                         xj = xj + 2.0d0*vij*vij*vmk*vmk*gjk
                         xk = xk - vij*vmj*vik*vmk*gjk
                      end do
@@ -438,7 +438,7 @@ c
             do j = 1, norbit
                ed(i,j) = 0.0d0
                do k = 1, nfill
-                  ed(i,j) = ed(i,j) + 2.0d0*v(i,k)*v(j,k)
+                  ed(i,j) = ed(i,j) + 2.0d0*vec(i,k)*vec(j,k)
                end do
             end do
          end do
@@ -471,7 +471,7 @@ c
             write (iout,80)
    80       format (/,' Molecular Orbitals')
             do i = 1, norbit
-               write (iout,90)  (v(i,j),j=1,norbit)
+               write (iout,90)  (vec(i,j),j=1,norbit)
    90          format (8f9.4)
             end do
             write (iout,100)
@@ -511,7 +511,7 @@ c
             j = ibpi(3,k)
             p = 0.0d0
             do m = 1, nfill
-               p = p + 2.0d0*v(i,m)*v(j,m)
+               p = p + 2.0d0*vec(i,m)*vec(j,m)
             end do
             if (mode .eq. 'PLANAR') then
                pbpl(k) = p * hc(i,j)/ebeta
@@ -543,7 +543,7 @@ c
       deallocate (ip)
       deallocate (fock)
       deallocate (hc)
-      deallocate (v)
+      deallocate (vec)
       deallocate (gamma)
       deallocate (ed)
       return
