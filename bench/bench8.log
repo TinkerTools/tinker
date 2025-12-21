@@ -14,13 +14,13 @@
 
 
  Molecular Dynamics Trajectory via Modified Beeman Algorithm
-    
+
  Average Values for the Last   100 Out of      100 Dynamics Steps
 
  Simulation Time              0.1000 Picosecond
- Total Energy           -441300.4952 Kcal/mole   (+/- 110.8795)
- Potential Energy       -547216.5119 Kcal/mole   (+/- 299.8105)
- Kinetic Energy          105916.0167 Kcal/mole   (+/- 372.3361)
- Temperature                  298.27 Kelvin      (+/-     1.05)
- Pressure                     334.01 Atmosphere  (+/-   190.68)
+ Total Energy           -441100.2137 Kcal/mole   (+/-  59.4408)
+ Potential Energy       -547128.5774 Kcal/mole   (+/- 322.2419)
+ Kinetic Energy          106028.3637 Kcal/mole   (+/- 347.5416)
+ Temperature                  298.59 Kelvin      (+/-     0.98)
+ Pressure                     342.01 Atmosphere  (+/-   190.40)
  Density                      1.0249 Grams/cc    (+/-   0.0000)

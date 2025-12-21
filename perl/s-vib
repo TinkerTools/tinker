@@ -5,10 +5,10 @@ $from=$ARV[1]; $to=$ARGV[2];
 if($#ARGV<2){die "command line syntax: vibbig.x_output first_mode last_mode\n";}
 
 
-$h=6.6260693*10**-34;	#planck
-$k=1.3806503*10**-23;	#boltzmann
-$T=298;			#temp
-$c=299792458;			#light
+$h=6.62607015*10**-34;		#planck constant
+$k=1.38064900*10**-23;		#boltzmann constant
+$T=298.15;			#temperature
+$c=299792458;			#speed of light
 $g=0;
 
 $lastline=$to+1;
@@ -26,6 +26,6 @@ for($i=2;$i<=$lastline;$i++){
 }
 
 
-$g=6.0221415*10**20*($g);		#corrected for J-->kJ/mol
+$g=6.02214076*10**20*($g);		#corrected for J-->kJ/mol
 print "dGvib $g      kJ/mol\n";
 
