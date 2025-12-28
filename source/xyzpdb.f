@@ -862,6 +862,7 @@ c
 c     if residue is a terminal cap, there is no side chain
 c
       cbi = 0
+      if (cai .eq. 0)  return
       if (resname .eq. 'H2N')  return
       if (resname .eq. 'FOR')  return
       if (resname .eq. 'ACE')  return
@@ -871,19 +872,16 @@ c
 c
 c     find the beta carbon atom for the current residue
 c
-      do i = 1, n
-         if (i.ne.ci .and. atomic(i).eq.6) then
-            do j = 1, 4
-               if (i12(j,i) .eq. cai) then
-                  cbi = i
-                  if (resname .ne. 'AIB') then
-                     call pdbatom (' CB ',resname,ires,cbi)
-                  else
-                     call pdbatom (' CB1',resname,ires,cbi)
-                  end if
-                  goto 10
-               end if
-            end do
+      do i = 1, n12(cai)
+         j = i12(i,cai)
+         if (j.ne.ci .and. atomic(j).eq.6) then
+            cbi = j
+            if (resname .ne. 'AIB') then
+               call pdbatom (' CB ',resname,ires,cbi)
+            else
+               call pdbatom (' CB1',resname,ires,cbi)
+            end if
+            goto 10
          end if
       end do
    10 continue

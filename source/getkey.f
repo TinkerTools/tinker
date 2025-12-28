@@ -54,7 +54,7 @@ c
          end if
       end do
 c
-c     try to get keyfile from base name of current system
+c     check for a keyfile with base name of current system
 c
       if (.not. exist) then
          keyfile = filename(1:leng)//'.key'
