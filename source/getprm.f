@@ -156,6 +156,10 @@ c
                end if
                call suffix (prmfile,'prm','old')
                inquire (file=prmfile,exist=exist)
+               if (exist) then
+                  nfile = nfile + 1
+                  ifile(nfile) = prmfile
+               end if
             end if
          end do
       end if
