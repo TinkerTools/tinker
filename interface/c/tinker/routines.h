@@ -2558,7 +2558,7 @@ void settle2_(double* dt);
 #define tinker_f_settle2 settle2_
 void settleg_(double* derivs);
 #define tinker_f_settleg settleg_
-void solve3_(double* amat, double* bvec, double* x);
+void solve3_(double* a, double* b, double* p);
 #define tinker_f_solve3 solve3_
 void watfour_(double* dt);
 #define tinker_f_watfour watfour_
