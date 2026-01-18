@@ -14,6 +14,16 @@ c
 c
 c     "emetal1" calculates the transition metal ligand field energy
 c     and its first derivatives with respect to Cartesian coordinates
+c     via a method from Anders Carlsson's group
+c
+c     note the current code is specific for Cu+2 ions, and is kept as
+c     a placeholder for future development of ligand field treatments
+c
+c     literature reference:
+c
+c     A. E. Carlsson and S. Zapata, "The Functional Form of Angular
+c     Forces around Transition Metal Ions in Biomolecules", Biophysical
+c     Journal, 81, 1-10 (2001)
 c
 c
       subroutine emetal1
