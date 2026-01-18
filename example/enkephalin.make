@@ -1,5 +1,5 @@
 enkephalin
-Met-Enkephalin  (Tyr-Gly-Gly-Phe-Met)
+Met-Enkephalin (Tyr-Gly-Gly-Phe-Met)
 tyr   -86  157  180  -165    87
 gly  -165   79  180
 gly    64  -94  180
