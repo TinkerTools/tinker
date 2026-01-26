@@ -397,7 +397,17 @@ anglef       15   24   15      50.00     180.00        4.0
       ####################################
 
 
-improper      4    4    4    7            90.00       0.00
+   #########################################################
+   ##                                                     ##
+   ##  Force constants are doubled for improper dihedral  ##
+   ##  parameters when two attached atoms have the same   ##
+   ##  atom class, since these angles are counted twice   ##
+   ##  in authentic CHARMM but only once in Tinker        ##
+   ##                                                     ##
+   #########################################################
+
+
+improper      4    4    4    7           180.00       0.00     !! doubled
 improper      4    5   10   17           100.00       0.00
 improper      4    5   11   17           100.00       0.00
 improper      4    6   10   17           100.00       0.00
@@ -405,30 +415,33 @@ improper      4    6   11   17           100.00       0.00
 improper      4    7   10   17           100.00       0.00
 improper      4    7   11   17           100.00       0.00
 improper      4    9    4    6            90.00       0.00
-improper      4    9    9    6            90.00       0.00
-improper      4    9    9   19           150.00       0.00
+improper      4    9    9    6           180.00       0.00     !! doubled
+improper      4    9    9   19           300.00       0.00     !! doubled
 improper      4   11    9    6            90.00       0.00
-improper      4   14   14   11           100.00       0.00
+improper      4   14   14   11           200.00       0.00     !! doubled
 improper      4   16    9    6            90.00       0.00
 improper      4   17   12    6            90.00       0.00
-improper      4   18   18    5           100.00       0.00
-improper      4   18   18    6           100.00       0.00
+improper      4    5   18   18           200.00       0.00     !! doubled
+improper      4    6   18   18           200.00       0.00     !! doubled
 improper      5    6    7    5            55.00      35.26439
-improper      5    7    7    5            55.00      35.26439
-improper      5    7    7    6            55.00      35.26439
+improper      5    7    7    5           110.00      35.26439  !! doubled
+improper      5    7    7    6           110.00      35.26439  !! doubled
 improper      5   10    4    6            55.00      35.26439
 improper      5   11    4    5            55.00      35.26439
 improper      5   11    4    6            55.00      35.26439
 improper      5   11    4    7            55.00      35.26439
+improper      5   13    4    5            55.00      35.26439
+improper      5   13    4    6            55.00      35.26439
+improper      5   13    4    7            55.00      35.26439
 improper      5   19    7    5            55.00      35.26439
 improper     10    5    6    4            45.00       0.00
 improper     11    4    5    1            45.00       0.00
 improper     11    4    6    1            45.00       0.00
 improper     11    4    7    1            45.00       0.00
 improper     11    9    4    1            45.00       0.00
-improper     11    9    9    1            45.00       0.00
-improper     12    1    1    4            45.00       0.00
-improper     14    4    2    2            45.00       0.00
+improper     11    9    9    1            90.00       0.00     !! doubled
+improper     12    1    1    4            90.00       0.00     !! doubled
+improper     14    4    2    2            90.00       0.00     !! doubled
 
 
    ##########################################################
@@ -450,19 +463,6 @@ improper      4   11    4    9            90.00       0.00
       ##  Torsional Parameters  ##
       ##                        ##
       ############################
-
-
-   ############################################################
-   ##                                                        ##
-   ##  All torsional parameters have been reduced as needed  ##
-   ##  to account for degeneracy; authentic CHARMM19 uses    ##
-   ##  at most one torsion across each pair of bonded atoms  ##
-   ##  while Tinker has a torsion for each four atom set     ##
-   ##  across a bond; for example, the generic CHARMM19      ##
-   ##  parameter between two trigonal atoms is reduced by a  ##
-   ##  factor of (3-1)x(3-1)=4 for use with the Tinker code  ##
-   ##                                                        ##
-   ############################################################
 
 
 torsion       4    4    4    4
@@ -604,18 +604,18 @@ torsion      13    5    6    5            0.800    0.0  3
 torsion      13    5    6    6            0.800    0.0  3
 torsion      13    5    6   19            0.800    0.0  3
 torsion      13    5    6   23            0.800    0.0  3
-torsion       4    5   10    4            0.075    0.0  3
-torsion       4    5   10    6            0.075    0.0  3
-torsion       6    5   10    4            0.075    0.0  3
-torsion       6    5   10    6            0.075    0.0  3
-torsion       4    5   11    1            0.075    0.0  3
-torsion       4    5   11    4            0.075    0.0  3
-torsion       5    5   11    1            0.075    0.0  3
-torsion       5    5   11    4            0.075    0.0  3
-torsion       6    5   11    1            0.075    0.0  3
-torsion       6    5   11    4            0.075    0.0  3
-torsion       7    5   11    1            0.075    0.0  3
-torsion       7    5   11    4            0.075    0.0  3
+torsion       4    5   10    4            0.300    0.0  3
+torsion       4    5   10    6
+torsion       6    5   10    4
+torsion       6    5   10    6
+torsion       4    5   11    1
+torsion       4    5   11    4            0.300    0.0  3
+torsion       5    5   11    1
+torsion       5    5   11    4
+torsion       6    5   11    1
+torsion       6    5   11    4
+torsion       7    5   11    1
+torsion       7    5   11    4
 torsion       4    5   13    2            0.100    0.0  3
 torsion       4    5   13    6            0.100    0.0  3
 torsion       5    5   13    2            0.100    0.0  3
@@ -635,10 +635,10 @@ torsion       6    6    6   11            1.600    0.0  3
 torsion       6    6    6   13            1.600    0.0  3
 torsion       6    6   10    4            0.150    0.0  3
 torsion       6    6   10    5            0.150    0.0  3
-torsion       4    6   11    1            0.150    0.0  3
-torsion       4    6   11    4            0.150    0.0  3
-torsion       6    6   11    1            0.150    0.0  3
-torsion       6    6   11    4            0.150    0.0  3
+torsion       4    6   11    1
+torsion       4    6   11    4            0.300    0.0  3
+torsion       6    6   11    1
+torsion       6    6   11    4
 torsion       4    6   13    2            0.200    0.0  3
 torsion       6    6   13    2            0.200    0.0  3
 torsion       6    6   13    5            0.200    0.0  3

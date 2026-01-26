@@ -1,7 +1,5 @@
 # Tinker: Software Tools for Molecular Design
 
-<I>Please note with the release of Tinker 25 in late February 2025 the code contains a number of new features, and is not fully backward compatible with prior versions of Tinker. In particular, do not use older versions of parameter files with current Tinker executables. Similarly, parameter files from the current Tinker may give errors or incorrect results when used with executables from earlier "Tinker 8" versions.</I>
-
 <H2><B>Introduction</B></H2>
 
 Tinker is a complete and general package for molecular mechanics and dynamics, with some special features for biopolymers. Tinker has the ability to use any of several common parameter sets, such as Amber (ff94, ff96, ff98, ff99, ff99SB, ff14SB, ff19SB), CHARMM (19, 22, 27, 36m), Allinger MM (MM2-1991 and MM3-2000), OPLS (OPLS-UA, OPLS-AA, OPLS-AA/L), Merck Molecular Force Field (MMFF94, MMFF94s), Liam Dang's polarizable model, and the AMOEBA, AMOEBA+ and HIPPO polarizable atomic multipole force fields. Parameter sets for other widely-used force fields are under consideration for future releases.

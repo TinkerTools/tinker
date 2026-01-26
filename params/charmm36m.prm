@@ -945,7 +945,7 @@ ureybrad      4   51   20      30.00     2.2651
    ##  D bonded to atoms A, B and C could be input as improper     ##
    ##  dihedral angle D-A-B-C. The actual angle computed by the    ##
    ##  program is then literally the dihedral D-A-B-C that will    ##
-   ##  always have as its ideal value zero degrees. In general     ##
+   ##  typically have an ideal value of zero degrees. In general   ##
    ##  D-A-B-C is different from D-B-A-C since ordering of the     ##
    ##  peripheral atoms matters. In authentic CHARMM parameter     ##
    ##  files, the trigonal atom is often listed last; ie, as       ##
