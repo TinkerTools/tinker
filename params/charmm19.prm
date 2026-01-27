@@ -37,6 +37,10 @@ Minimizations and Dynamics of Nucleic Acids", J. Comput. Chem., 7,
 E. Neria, S. Fischer and M. Karplus, "Simulation of Activation Free
 Energies in Molecular Systems", J. Chem. Phys., 105, 1902-1921 (1996)
 
+Note authentic CHARMM19 excludes 1-4 VDW interactions in 6-membered
+rings of PHE, TYR and TRP residues; these interactions are included
+by Tinker and result in some lengthening of the ring bonds
+
 
       #############################
       ##                         ##
