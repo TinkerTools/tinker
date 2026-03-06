@@ -30,7 +30,6 @@ c     uinp      mutual induced dipoles in field used for energy terms
 c     uinds     mutual GK or PB induced dipoles for each atom site
 c     uinps     mutual induced dipoles in field used for GK or PB energy
 c     uexact    exact SCF induced dipoles to full numerical precision
-c     worker3n  worker array for printing dipoles and electric fields
 c     douind    flag to allow induced dipoles at each atom site
 c
 c
@@ -54,7 +53,6 @@ c
       real*8, allocatable :: uinds(:,:)
       real*8, allocatable :: uinps(:,:)
       real*8, allocatable :: uexact(:,:)
-      real*8, allocatable :: worker3n(:,:)
       logical, allocatable :: douind(:)
       save
       end

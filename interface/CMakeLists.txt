@@ -472,14 +472,11 @@ add_library (tinkerObjF OBJECT
 ../source/prtarc.f
 ../source/prtdyn.f
 ../source/prterr.f
-../source/prtfrc.f
 ../source/prtint.f
 ../source/prtmol2.f
 ../source/prtpdb.f
 ../source/prtprm.f
 ../source/prtseq.f
-../source/prtuind.f
-../source/prtvel.f
 ../source/prtxyz.f
 ../source/qrsolve.f
 ../source/quatfit.f

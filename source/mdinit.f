@@ -366,9 +366,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (derivs(3,n))
-      if (udirsave.or.defsave.or.tefsave) then
-         if (.not. allocated(worker3n))  allocate (worker3n(3,n))
-      end if
 c
 c     try to restart using prior velocities and accelerations
 c

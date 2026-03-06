@@ -31,6 +31,9 @@ c     gamma_sin   sine of the gamma periodic box angle
 c     gamma_cos   cosine of the gamma periodic box angle
 c     beta_term   term used in generating triclinic box
 c     gamma_term  term used in generating triclinic box
+c     xcenter     x-coordinate of center of mass of system in Angstroms
+c     ycenter     y-coordinate of center of mass of system in Angstroms
+c     zcenter     z-coordinate of center of mass of system in Angstroms
 c     lvec        real space lattice vectors as matrix rows
 c     recip       reciprocal lattice vectors as matrix columns
 c     orthogonal  flag to mark periodic box as orthogonal
@@ -57,6 +60,7 @@ c
       real*8 gamma_cos
       real*8 beta_term
       real*8 gamma_term
+      real*8 xcenter,ycenter,zcenter
       real*8 lvec(3,3)
       real*8 recip(3,3)
       logical orthogonal

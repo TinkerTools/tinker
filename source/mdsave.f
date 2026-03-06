@@ -315,9 +315,9 @@ c
   410          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
          else if (dcdsave) then
-            call prtdcdv (ivel,first)
+            call prtdcdv3 (ivel,first,'VEL')
          else
-            call prtvel (ivel)
+            call prtvec3 (ivel,'VEL')
          end if
          close (unit=ivel)
          write (iout,420)  velfile(1:trimtext(velfile))
@@ -347,7 +347,7 @@ c
                open (unit=ifrc,file=frcfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdf (ifrc,first)
+            call prtdcdv3 (ifrc,first,'FRC')
          else
             frcfile = filename(1:leng)
             call suffix (frcfile,'frc','old')
@@ -357,7 +357,7 @@ c
             else
                open (unit=ifrc,file=frcfile,status='new')
             end if
-            call prtfrc (ifrc)
+            call prtvec3 (ifrc,'FRC')
          end if
          close (unit=ifrc)
          write (iout,430)  frcfile(1:trimtext(frcfile))
@@ -372,7 +372,7 @@ c
             indfile = filename(1:leng)//'.'//ext(1:lext)//'ui'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
-            call prtuind (iind)
+            call prtvec3 (iind,'UIN')
          else if (dcdsave) then
             indfile = filename(1:leng)
             call suffix (indfile,'dcdui','old')
@@ -386,7 +386,7 @@ c
                open (unit=iind,file=indfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdui (iind,first)
+            call prtdcdv3 (iind,first,'UIN')
          else
             indfile = filename(1:leng)
             call suffix (indfile,'uind','old')
@@ -396,7 +396,7 @@ c
             else
                open (unit=iind,file=indfile,status='new')
             end if
-            call prtuind (iind)
+            call prtvec3 (iind,'UIN')
          end if
          close (unit=iind)
          write (iout,440)  indfile(1:trimtext(indfile))
@@ -411,7 +411,7 @@ c
             stcfile = filename(1:leng)//'.'//ext(1:lext)//'us'
             call version (stcfile,'new')
             open (unit=istc,file=stcfile,status='new')
-            call prtustc (istc,xm,ym,zm)
+            call prtvec3 (istc,'UST')
          else if (dcdsave) then
             stcfile = filename(1:leng)
             call suffix (stcfile,'dcdus','old')
@@ -425,7 +425,7 @@ c
                open (unit=istc,file=stcfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdus (istc,first,xm,ym,zm)
+            call prtdcdv3 (istc,first,'UST')
          else
             stcfile = filename(1:leng)
             call suffix (stcfile,'ustc','old')
@@ -435,7 +435,7 @@ c
             else
                open (unit=istc,file=stcfile,status='new')
             end if
-            call prtustc (istc,xm,ym,zm)
+            call prtvec3 (istc,'UST')
          end if
          close (unit=istc)
          write (iout,450)  stcfile(1:trimtext(stcfile))
@@ -450,7 +450,7 @@ c
             stcfile = filename(1:leng)//'.'//ext(1:lext)//'uc'
             call version (stcfile,'new')
             open (unit=istc,file=stcfile,status='new')
-            call prtuchg (istc,xm,ym,zm)
+            call prtvec3 (istc,'UCH')
          else if (dcdsave) then
             stcfile = filename(1:leng)
             call suffix (stcfile,'dcduc','old')
@@ -464,7 +464,7 @@ c
                open (unit=istc,file=stcfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcduc (istc,first,xm,ym,zm)
+            call prtdcdv3 (istc,first,'UCH')
          else
             stcfile = filename(1:leng)
             call suffix (stcfile,'uchg','old')
@@ -474,7 +474,7 @@ c
             else
                open (unit=istc,file=stcfile,status='new')
             end if
-            call prtuchg (istc,xm,ym,zm)
+            call prtvec3 (istc,'UCH')
          end if
          close (unit=istc)
          write (iout,460)  stcfile(1:trimtext(stcfile))
@@ -489,7 +489,7 @@ c
             indfile = filename(1:leng)//'.'//ext(1:lext)//'ud'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
-            call prtudir (iind)
+            call prtvec3 (iind,'UDR')
          else if (dcdsave) then
             indfile = filename(1:leng)
             call suffix (indfile,'dcdud','old')
@@ -503,7 +503,7 @@ c
                open (unit=iind,file=indfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdud (iind,first)
+            call prtdcdv3 (iind,first,'UDR')
          else
             indfile = filename(1:leng)
             call suffix (indfile,'udir','old')
@@ -513,7 +513,7 @@ c
             else
                open (unit=iind,file=indfile,status='new')
             end if
-            call prtudir (iind)
+            call prtvec3 (iind,'UDR')
          end if
          close (unit=iind)
          write (iout,470)  indfile(1:trimtext(indfile))
@@ -528,7 +528,7 @@ c
             indfile = filename(1:leng)//'.'//ext(1:lext)//'de'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
-            call prtdef (iind)
+            call prtvec3 (iind,'DEF')
          else if (dcdsave) then
             indfile = filename(1:leng)
             call suffix (indfile,'dcdde','old')
@@ -542,7 +542,7 @@ c
                open (unit=iind,file=indfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdde (iind,first)
+            call prtdcdv3 (iind,first,'DEF')
          else
             indfile = filename(1:leng)
             call suffix (indfile,'def','old')
@@ -552,7 +552,7 @@ c
             else
                open (unit=iind,file=indfile,status='new')
             end if
-            call prtdef (iind)
+            call prtvec3 (iind,'DEF')
          end if
          close (unit=iind)
          write (iout,480)  indfile(1:trimtext(indfile))
@@ -567,7 +567,7 @@ c
             indfile = filename(1:leng)//'.'//ext(1:lext)//'te'
             call version (indfile,'new')
             open (unit=iind,file=indfile,status='new')
-            call prttef (iind)
+            call prtvec3 (iind,'TEF')
          else if (dcdsave) then
             indfile = filename(1:leng)
             call suffix (indfile,'dcdte','old')
@@ -581,7 +581,7 @@ c
                open (unit=iind,file=indfile,form='unformatted',
      &                  status='new')
             end if
-            call prtdcdte (iind,first)
+            call prtdcdv3 (iind,first,'TEF')
          else
             indfile = filename(1:leng)
             call suffix (indfile,'tef','old')
@@ -591,7 +591,7 @@ c
             else
                open (unit=iind,file=indfile,status='new')
             end if
-            call prttef (iind)
+            call prtvec3 (iind,'TEF')
          end if
          close (unit=iind)
          write (iout,490)  indfile(1:trimtext(indfile))

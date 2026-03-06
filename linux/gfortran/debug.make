@@ -516,14 +516,11 @@ gfortran -c -Wall protein.f
 gfortran -c -Wall prtarc.f
 gfortran -c -Wall prtdyn.f
 gfortran -c -Wall prterr.f
-gfortran -c -Wall prtfrc.f
 gfortran -c -Wall prtint.f
 gfortran -c -Wall prtmol2.f
 gfortran -c -Wall prtpdb.f
 gfortran -c -Wall prtprm.f
 gfortran -c -Wall prtseq.f
-gfortran -c -Wall prtuind.f
-gfortran -c -Wall prtvel.f
 gfortran -c -Wall prtxyz.f
 gfortran -c -Wall pss.f
 gfortran -c -Wall pssrigid.f

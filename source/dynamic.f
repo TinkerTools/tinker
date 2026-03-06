@@ -234,10 +234,10 @@ c     only allow Montecarlo or anisotropic barostat
 c     for NPT + extfield simulation
 c
       if (use_exfld .and. mode.eq.4) then
-         if (barostat.ne.'MONTECARLO' .and. .not.anisotrop) then
+         if (barostat.ne.'MONTECARLO') then
             write (iout,340)
   340       format (/,' DYNAMIC  --  NPT with External Field Should',
-     &                ' Use MonteCarlo or Anisotropic Barostat')
+     &                ' Use MonteCarlo Barostat')
             call fatal
          end if
       end if

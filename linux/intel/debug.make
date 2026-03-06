@@ -516,14 +516,11 @@ ifort -c -g -warn all -check all protein.f
 ifort -c -g -warn all -check all prtarc.f
 ifort -c -g -warn all -check all prtdyn.f
 ifort -c -g -warn all -check all prterr.f
-ifort -c -g -warn all -check all prtfrc.f
 ifort -c -g -warn all -check all prtint.f
 ifort -c -g -warn all -check all prtmol2.f
 ifort -c -g -warn all -check all prtpdb.f
 ifort -c -g -warn all -check all prtprm.f
 ifort -c -g -warn all -check all prtseq.f
-ifort -c -g -warn all -check all prtuind.f
-ifort -c -g -warn all -check all prtvel.f
 ifort -c -g -warn all -check all prtxyz.f
 ifort -c -g -warn all -check all pss.f
 ifort -c -g -warn all -check all pssrigid.f

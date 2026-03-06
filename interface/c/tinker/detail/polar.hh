@@ -23,7 +23,6 @@ extern double* TINKER_MOD(polar, uinp);
 extern double* TINKER_MOD(polar, uinds);
 extern double* TINKER_MOD(polar, uinps);
 extern double* TINKER_MOD(polar, uexact);
-extern double* TINKER_MOD(polar, worker3n);
 extern int* TINKER_MOD(polar, douind);
 #ifdef __cplusplus
 }

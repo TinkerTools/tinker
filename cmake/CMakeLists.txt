@@ -143,8 +143,8 @@ set(_FILES
     optinit optsave orbital orbits orient orthog output overlap params
     paths pbstuf pdb phipsi picalc piorbs pistuf pitors pme pmestuf
     pmpb polar polgrp polopt polpcg polpot poltcg polymer potent
-    potfit predict pressure prmkey promo prtarc prtdyn prterr prtfrc
-    prtint prtmol2 prtpdb prtprm prtseq prtuind prtvel prtxyz ptable
+    potfit predict pressure prmkey promo prtarc prtdyn prterr
+    prtint prtmol2 prtpdb prtprm prtseq prtxyz ptable
     qmstuf qrsolve quatfit random rattle readcart readdcd readdyn
     readgau readgdma readint readmol readmol2 readpdb readprm readseq
     readxyz refer repel replica reppot resdue respa restrn rgddyn

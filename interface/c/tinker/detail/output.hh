@@ -8,6 +8,7 @@ extern "C" {
 extern int TINKER_MOD(output, nonly);
 extern int* TINKER_MOD(output, ionly);
 extern int* TINKER_MOD(output, ionlyinv);
+extern double* TINKER_MOD(output, print3n);
 extern int TINKER_MOD(output, archive);
 extern int TINKER_MOD(output, binary);
 extern int TINKER_MOD(output, noversion);

@@ -21,7 +21,6 @@ extern double*& uinp;
 extern double*& uinds;
 extern double*& uinps;
 extern double*& uexact;
-extern double*& worker3n;
 extern int*& douind;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -43,7 +42,6 @@ extern "C" double* TINKER_MOD(polar, uinp);
 extern "C" double* TINKER_MOD(polar, uinds);
 extern "C" double* TINKER_MOD(polar, uinps);
 extern "C" double* TINKER_MOD(polar, uexact);
-extern "C" double* TINKER_MOD(polar, worker3n);
 extern "C" int* TINKER_MOD(polar, douind);
 
 int& npolar = TINKER_MOD(polar, npolar);
@@ -64,7 +62,6 @@ double*& uinp = TINKER_MOD(polar, uinp);
 double*& uinds = TINKER_MOD(polar, uinds);
 double*& uinps = TINKER_MOD(polar, uinps);
 double*& uexact = TINKER_MOD(polar, uexact);
-double*& worker3n = TINKER_MOD(polar, worker3n);
 int*& douind = TINKER_MOD(polar, douind);
 #endif
 } }

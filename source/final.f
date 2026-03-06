@@ -800,6 +800,10 @@ c
       if (allocated(a))  deallocate (a)
       if (allocated(aalt))  deallocate (aalt)
 c
+c     deallocation of global arrays from module moment
+c
+      if (allocated(momuse))  deallocate (momuse)
+c
 c     deallocation of global arrays from module mpole
 c
       if (allocated(ipole))  deallocate (ipole)
@@ -880,7 +884,7 @@ c     deallocation of global arrays from module output
 c
       if (allocated(ionly))  deallocate (ionly)
       if (allocated(ionlyinv))  deallocate (ionlyinv)
-      if (allocated(momuse))  deallocate (momuse)
+      if (allocated(print3n))  deallocate (print3n)
 c
 c     deallocation of global arrays from module paths
 c
@@ -967,7 +971,6 @@ c
       if (allocated(uinds))  deallocate (uinds)
       if (allocated(uinps))  deallocate (uinps)
       if (allocated(uexact))  deallocate (uexact)
-      if (allocated(worker3n))  deallocate (worker3n)
       if (allocated(douind))  deallocate (douind)
 c
 c     deallocation of global arrays from module polgrp

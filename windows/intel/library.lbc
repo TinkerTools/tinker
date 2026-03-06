@@ -420,14 +420,11 @@ promo.obj
 prtarc.obj
 prtdyn.obj
 prterr.obj
-prtfrc.obj
 prtint.obj
 prtmol2.obj
 prtpdb.obj
 prtprm.obj
 prtseq.obj
-prtuind.obj
-prtvel.obj
 prtxyz.obj
 ptable.obj
 qmstuf.obj

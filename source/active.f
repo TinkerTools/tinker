@@ -276,8 +276,10 @@ c     perform dynamic allocation of some global arrays
 c
       if (allocated(ionly))  deallocate (ionly)
       if (allocated(ionlyinv))  deallocate (ionlyinv)
+      if (allocated(print3n))  deallocate (print3n)
       allocate (ionly(n))
       allocate (ionlyinv(n))
+      allocate (print3n(3,n))
 c
 c     perform dynamic allocation of some local arrays
 c

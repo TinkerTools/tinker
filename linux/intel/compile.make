@@ -516,14 +516,11 @@ ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp protein.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtarc.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtdyn.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prterr.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtfrc.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtint.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtmol2.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtpdb.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtprm.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtseq.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtuind.f
-ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtvel.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp prtxyz.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pss.f
 ifort -c -O3 -xHost -no-ipo -no-prec-div -openmp pssrigid.f

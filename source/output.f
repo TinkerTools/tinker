@@ -15,6 +15,7 @@ c
 c     nonly       total number of save sites in the system
 c     ionly       number of the atom for each save site
 c     ionlyinv    inverse map of ionly
+c     print3n     array for printing atomic 3D vectors
 c     archive     logical flag for coordinates in Tinker XYZ format
 c     binary      logical flag for coordinates in DCD binary format
 c     noversion   logical flag governing use of filename versions
@@ -43,6 +44,7 @@ c
       integer nonly
       integer, allocatable :: ionly(:)
       integer, allocatable :: ionlyinv(:)
+      real*8, allocatable :: print3n(:,:)
       logical archive
       logical binary
       logical noversion

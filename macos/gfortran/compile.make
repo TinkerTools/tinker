@@ -516,14 +516,11 @@ gfortran -c -Ofast -mssse3 -fopenmp protein.f
 gfortran -c -Ofast -mssse3 -fopenmp prtarc.f
 gfortran -c -Ofast -mssse3 -fopenmp prtdyn.f
 gfortran -c -Ofast -mssse3 -fopenmp prterr.f
-gfortran -c -Ofast -mssse3 -fopenmp prtfrc.f
 gfortran -c -Ofast -mssse3 -fopenmp prtint.f
 gfortran -c -Ofast -mssse3 -fopenmp prtmol2.f
 gfortran -c -Ofast -mssse3 -fopenmp prtpdb.f
 gfortran -c -Ofast -mssse3 -fopenmp prtprm.f
 gfortran -c -Ofast -mssse3 -fopenmp prtseq.f
-gfortran -c -Ofast -mssse3 -fopenmp prtuind.f
-gfortran -c -Ofast -mssse3 -fopenmp prtvel.f
 gfortran -c -Ofast -mssse3 -fopenmp prtxyz.f
 gfortran -c -Ofast -mssse3 -fopenmp pss.f
 gfortran -c -Ofast -mssse3 -fopenmp pssrigid.f
