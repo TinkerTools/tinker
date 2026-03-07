@@ -12,8 +12,8 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "nose" performs a single molecular dynamics time step via
-c     a Nose-Hoover extended system isothermal-isobaric algorithm
+c     "nose" performs a molecular dynamics time step via the
+c     Nose-Hoover extended system isothermal-isobaric algorithm
 c
 c     literature reference:
 c
@@ -21,7 +21,8 @@ c     G. J. Martyna, M. E. Tuckerman, D. J. Tobias and M. L. Klein,
 c     "Explicit Reversible Integrators for Extended Systems Dynamics",
 c     Molecular Physics, 87, 1117-1157 (1996)
 c
-c     original version written by Teresa Head-Gordon, November 2011
+c     original version written by Teresa Head-Gordon, University of
+c     California, Berkeley, November 2011
 c
 c
       subroutine nose (istep,dt)
@@ -30,6 +31,7 @@ c
       use bath
       use boxes
       use freeze
+      use iounit
       use moldyn
       use units
       use usage
@@ -88,9 +90,14 @@ c
          z(k) = z(k)*eterm2 + v(3,k)*poly
       end do
 c
-c     constraints under NH-NPT require the ROLL algorithm
+c     constraints with Nose-Hoover NPT requires ROLL algorithm
 c
-      if (use_rattle)  call fatal
+      if (use_freeze) then
+         write (iout,10)
+   10    format (/,' NOSE  --  Nose-Hoover NPT MD Requires the',
+     &              ' ROLL Algorithm')
+         call fatal
+      end if
 c
 c     update the periodic box size and total volume
 c
@@ -124,7 +131,7 @@ c
 c
 c     constraints under NH-NPT require the ROLL algorithm
 c
-      if (use_rattle)  call fatal
+      if (use_freeze)  call fatal
 c
 c     update thermostat and barostat values, scale atomic velocities
 c
@@ -153,9 +160,12 @@ c
       end do
       pres = (stress(1,1)+stress(2,2)+stress(3,3)) / 3.0d0
 c
-c     get the instantaneous temperature from the kinetic energy
+c     total energy is sum of kinetic and potential energies
 c
       etot = epot + eksum
+c
+c     compute statistics and save trajectory for this step
+c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
       call mdrest (istep)

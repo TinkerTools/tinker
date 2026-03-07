@@ -19,9 +19,9 @@ c     rminh     water hydrogen Rmin for implicit dispersion term
 c     awater    water number density at standard temp & pressure
 c     slevy     enthalpy-to-free energy scale factor for dispersion
 c     shctd     HCT overlap scale factor for the dispersion integral
-c     cavoff    radius offset for use in computing cavitation energy
 c     dspoff    radius offset for the start of dispersion integral
 c
+c     cavprb    probe radius for use in computing cavitation energy
 c     solvprs   limiting microscopic solvent pressure value
 c     surften   limiting macroscopic surface tension value
 c     spcut     starting radius for solvent pressure tapering
@@ -39,8 +39,7 @@ c
       real*8 epso,epsh
       real*8 rmino,rminh
       real*8 awater,slevy
-      real*8 shctd,cavoff
-      real*8 dspoff
+      real*8 shctd,dspoff
       parameter (epso=0.1100d0)
       parameter (epsh=0.0135d0)
       parameter (rmino=1.7025d0)
@@ -48,9 +47,10 @@ c
       parameter (awater=0.033428d0)
       parameter (slevy=1.0d0)
       parameter (shctd=0.75d0)
-      parameter (cavoff=0.0d0)
       parameter (dspoff=1.056d0)
-      real*8 solvprs,surften
+      real*8 cavprb
+      real*8 solvprs
+      real*8 surften
       real*8 spcut,spoff
       real*8 stcut,stoff
       real*8, allocatable :: radcav(:)

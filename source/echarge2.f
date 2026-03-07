@@ -226,7 +226,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -336,7 +336,7 @@ c
                   term(3,2) = term(2,3)
                   term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   do j = 1, 3
                      hessx(j,i) = hessx(j,i) + term(1,j)
@@ -460,7 +460,7 @@ c
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP& ebuffer,cscale)
 !$OMP& shared (hessx,hessy,hessz)
-!$OMP DO reduction(+:hessx,hessy,hessz) schedule(guided)
+!$OMP DO reduction(+:hessx,hessy,hessz)
 c
 c     calculate the charge interaction energy Hessian elements
 c
@@ -550,7 +550,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -927,7 +927,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -1005,7 +1005,7 @@ c
                   term(3,2) = term(2,3)
                   term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   do j = 1, 3
                      hessx(j,i) = hessx(j,i) + term(1,j)
@@ -1123,7 +1123,7 @@ c
 !$OMP PARALLEL default(private) shared(i,iion,jion,x,y,z,fi,
 !$OMP& pchg,nelst,elst,cscale,use_group,off2,aewald,ebuffer)
 !$OMP& shared (hessx,hessy,hessz)
-!$OMP DO reduction(+:hessx,hessy,hessz) schedule(guided)
+!$OMP DO reduction(+:hessx,hessy,hessz)
 c
 c     calculate the real space Ewald interaction Hessian elements
 c
@@ -1179,7 +1179,7 @@ c
                term(3,2) = term(2,3)
                term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                do j = 1, 3
                   hessx(j,i) = hessx(j,i) + term(1,j)
@@ -1394,7 +1394,7 @@ c
             term(3,2) = term(2,3)
             term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             do j = 1, 3
                hessx(j,i) = hessx(j,i) + term(1,j)

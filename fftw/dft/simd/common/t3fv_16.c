@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:05:51 EDT 2018 */
+/* Generated on Tue Sep 14 10:45:45 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -222,10 +222,10 @@ static const tw_instr twinstr[] = {
      VTW(0, 3),
      VTW(0, 9),
      VTW(0, 15),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 16, XSIMD_STRING("t3fv_16"), twinstr, &GENUS, {64, 52, 34, 0}, 0, 0, 0 };
+static const ct_desc desc = { 16, XSIMD_STRING("t3fv_16"), twinstr, &GENUS, { 64, 52, 34, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_t3fv_16) (planner *p) {
      X(kdft_dit_register) (p, t3fv_16, &desc);
@@ -429,10 +429,10 @@ static const tw_instr twinstr[] = {
      VTW(0, 3),
      VTW(0, 9),
      VTW(0, 15),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const ct_desc desc = { 16, XSIMD_STRING("t3fv_16"), twinstr, &GENUS, {94, 60, 4, 0}, 0, 0, 0 };
+static const ct_desc desc = { 16, XSIMD_STRING("t3fv_16"), twinstr, &GENUS, { 94, 60, 4, 0 }, 0, 0, 0 };
 
 void XSIMD(codelet_t3fv_16) (planner *p) {
      X(kdft_dit_register) (p, t3fv_16, &desc);

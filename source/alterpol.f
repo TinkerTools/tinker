@@ -425,7 +425,7 @@ c
 !$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv)
 !$OMP& firstprivate(pscale)
 !$OMP& shared (polscale)
-!$OMP DO reduction(+:polscale) schedule(guided)
+!$OMP DO reduction(+:polscale)
 c
 c     find the variable polarizability
 c
@@ -532,7 +532,7 @@ c
 c
 c     find inverse of the polarizability scaling matrix
 c
-!$OMP DO schedule(guided)
+!$OMP DO
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 3

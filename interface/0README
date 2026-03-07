@@ -1,22 +1,22 @@
 
-                   #########################################
-                   Interface Code between Tinker and Tinker9
-                   #########################################
+                 ############################################
+                 Interface Code between Tinker and Tinker-GPU               
+                 ############################################
 
       This directory contains scripts and code that generates interface
-      information to allow the Tinker9 GPU package to call routines from
-      the Fortran-based CPU Tinker package.
+      information to allow the Tinker-GPU package to call routines from
+      the Fortran-based Tinker CPU package.
 
       Procedure to generate the interface code:
 
-      (1) Save the file below from the Tinker9 Github repository into
-          the current /interface directory under the name "export":
+      (1) Save the file below from the Tinker-GPU Github repository
+          into the /interface directory under the name "export":
 
-          https://raw.githubusercontent.com/TinkerTools \
-             /tinker9/master/ext/interface/export
+             https://raw.githubusercontent.com/TinkerTools \
+                /tinker-gpu/master/ext/interface/export
 
       (2) Run the command "bash export update" to check if updates are
-          available at the Tinker9 GitHub site. This command provides
+          available at the Tinker-GPU GitHub site. This command provides
           the files "export", "parse.py" and "version.txt", as well as
           an /include subdirectory.
 

@@ -49,7 +49,7 @@ c
 !$OMP PARALLEL default(private) shared(nopdist,iopd,opdk,use,
 !$OMP& x,y,z,copd,qopd,popd,sopd,opdunit,use_group,use_polymer)
 !$OMP& shared(eopd)
-!$OMP DO reduction(+:eopd) schedule(guided)
+!$OMP DO reduction(+:eopd)
 c
 c     calculate the out-of-plane distance energy term
 c

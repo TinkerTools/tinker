@@ -23,6 +23,7 @@ mv freefix.x   ../bin/freefix.exe
 mv gda.x       ../bin/gda.exe
 mv intedit.x   ../bin/intedit.exe
 mv intxyz.x    ../bin/intxyz.exe
+mv mdavg.x     ../bin/mdavg.exe
 mv minimize.x  ../bin/minimize.exe
 mv minirot.x   ../bin/minirot.exe
 mv minrigid.x  ../bin/minrigid.exe
@@ -57,6 +58,7 @@ mv testhess.x  ../bin/testhess.exe
 mv testpair.x  ../bin/testpair.exe
 mv testpol.x   ../bin/testpol.exe
 mv testrot.x   ../bin/testrot.exe
+mv testsurf.x  ../bin/testsurf.exe
 mv testvir.x   ../bin/testvir.exe
 mv timer.x     ../bin/timer.exe
 mv timerot.x   ../bin/timerot.exe

@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:08:11 EDT 2018 */
+/* Generated on Tue Sep 14 10:47:22 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -270,10 +270,10 @@ static const tw_instr twinstr[] = {
      VTW(1, 17),
      VTW(1, 18),
      VTW(1, 19),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const hc2c_desc desc = { 20, XSIMD_STRING("hc2cfdftv_20"), twinstr, &GENUS, {77, 62, 66, 0} };
+static const hc2c_desc desc = { 20, XSIMD_STRING("hc2cfdftv_20"), twinstr, &GENUS, { 77, 62, 66, 0 } };
 
 void XSIMD(codelet_hc2cfdftv_20) (planner *p) {
      X(khc2c_register) (p, hc2cfdftv_20, &desc, HC2C_VIA_DFT);
@@ -540,10 +540,10 @@ static const tw_instr twinstr[] = {
      VTW(1, 17),
      VTW(1, 18),
      VTW(1, 19),
-     {TW_NEXT, VL, 0}
+     { TW_NEXT, VL, 0 }
 };
 
-static const hc2c_desc desc = { 20, XSIMD_STRING("hc2cfdftv_20"), twinstr, &GENUS, {131, 65, 12, 0} };
+static const hc2c_desc desc = { 20, XSIMD_STRING("hc2cfdftv_20"), twinstr, &GENUS, { 131, 65, 12, 0 } };
 
 void XSIMD(codelet_hc2cfdftv_20) (planner *p) {
      X(khc2c_register) (p, hc2cfdftv_20, &desc, HC2C_VIA_DFT);

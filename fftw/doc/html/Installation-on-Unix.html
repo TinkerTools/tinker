@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Installation on Unix</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Installation on Unix (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Installation on Unix">
-<meta name="keywords" content="FFTW 3.3.8: Installation on Unix">
+<meta name="description" content="Installation on Unix (FFTW 3.3.10)">
+<meta name="keywords" content="Installation on Unix (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Installation-and-Customization.html#Installation-and-Customization" rel="up" title="Installation and Customization">
-<link href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems" rel="next" title="Installation on non-Unix systems">
-<link href="Installation-and-Customization.html#Installation-and-Customization" rel="prev" title="Installation and Customization">
+<link href="Installation-and-Customization.html" rel="up" title="Installation and Customization">
+<link href="Installation-on-non_002dUnix-systems.html" rel="next" title="Installation on non-Unix systems">
+<link href="Installation-and-Customization.html" rel="prev" title="Installation and Customization">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,18 +59,16 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Installation-on-Unix"></a>
-<div class="header">
+<span id="Installation-on-Unix"></span><div class="header">
 <p>
-Next: <a href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems" accesskey="n" rel="next">Installation on non-Unix systems</a>, Previous: <a href="Installation-and-Customization.html#Installation-and-Customization" accesskey="p" rel="prev">Installation and Customization</a>, Up: <a href="Installation-and-Customization.html#Installation-and-Customization" accesskey="u" rel="up">Installation and Customization</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Installation-on-non_002dUnix-systems.html" accesskey="n" rel="next">Installation on non-Unix systems</a>, Previous: <a href="Installation-and-Customization.html" accesskey="p" rel="prev">Installation and Customization</a>, Up: <a href="Installation-and-Customization.html" accesskey="u" rel="up">Installation and Customization</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Installation-on-Unix-1"></a>
-<h3 class="section">10.1 Installation on Unix</h3>
+<span id="Installation-on-Unix-1"></span><h3 class="section">10.1 Installation on Unix</h3>
 
 <p>FFTW comes with a <code>configure</code> program in the GNU style.
 Installation can be as simple as:
-<a name="index-configure-2"></a>
+<span id="index-configure-2"></span>
 </p>
 <div class="example">
 <pre class="example">./configure
@@ -107,7 +96,7 @@ if it is available; you can select some other compiler with:
 </pre></div>
 
 <p>The <code>configure</code> script knows good <code>CFLAGS</code> (C compiler flags)
-<a name="index-compiler-flags"></a>
+<span id="index-compiler-flags"></span>
 for a few systems.  If your system is not known, the <code>configure</code>
 script will print out a warning.  In this case, you should re-configure
 FFTW with the command
@@ -127,37 +116,37 @@ Note especially <code>--help</code> to list all flags and
 <code>configure</code> also accepts a few FFTW-specific flags, particularly:
 </p>
 <ul>
-<li> <a name="index-precision-9"></a>
+<li> <span id="index-precision-9"></span>
 <code>--enable-float</code>: Produces a single-precision version of FFTW
 (<code>float</code>) instead of the default double-precision (<code>double</code>).
-See <a href="Precision.html#Precision">Precision</a>.
+See <a href="Precision.html">Precision</a>.
 
-</li><li> <a name="index-precision-10"></a>
+</li><li> <span id="index-precision-10"></span>
 <code>--enable-long-double</code>: Produces a long-double precision version of
 FFTW (<code>long double</code>) instead of the default double-precision
 (<code>double</code>).  The <code>configure</code> script will halt with an error
 message if <code>long double</code> is the same size as <code>double</code> on your
-machine/compiler.  See <a href="Precision.html#Precision">Precision</a>.
+machine/compiler.  See <a href="Precision.html">Precision</a>.
 
-</li><li> <a name="index-precision-11"></a>
+</li><li> <span id="index-precision-11"></span>
 <code>--enable-quad-precision</code>: Produces a quadruple-precision version
 of FFTW using the nonstandard <code>__float128</code> type provided by
 <code>gcc</code> 4.6 or later on x86, x86-64, and Itanium architectures,
 instead of the default double-precision (<code>double</code>).  The
 <code>configure</code> script will halt with an error message if the
 compiler is not <code>gcc</code> version 4.6 or later or if <code>gcc</code>&rsquo;s
-<code>libquadmath</code> library is not installed.  See <a href="Precision.html#Precision">Precision</a>.
+<code>libquadmath</code> library is not installed.  See <a href="Precision.html">Precision</a>.
 
-</li><li> <a name="index-threads-3"></a>
+</li><li> <span id="index-threads-3"></span>
 <code>--enable-threads</code>: Enables compilation and installation of the
-FFTW threads library (see <a href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a>), which provides a
+FFTW threads library (see <a href="Multi_002dthreaded-FFTW.html">Multi-threaded FFTW</a>), which provides a
 simple interface to parallel transforms for SMP systems.  By default,
 the threads routines are not compiled.
 
 </li><li> <code>--enable-openmp</code>: Like <code>--enable-threads</code>, but using OpenMP
 compiler directives in order to induce parallelism rather than
 spawning its own threads directly, and installing an &lsquo;<samp>fftw3_omp</samp>&rsquo; library
-rather than an &lsquo;<samp>fftw3_threads</samp>&rsquo; library (see <a href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a>).  You can use both <code>--enable-openmp</code> and <code>--enable-threads</code>
+rather than an &lsquo;<samp>fftw3_threads</samp>&rsquo; library (see <a href="Multi_002dthreaded-FFTW.html">Multi-threaded FFTW</a>).  You can use both <code>--enable-openmp</code> and <code>--enable-threads</code>
 since they compile/install libraries with different names.  By default,
 the OpenMP routines are not compiled.
 
@@ -171,15 +160,15 @@ in the main FFTW library.  This is mainly useful under Windows, where
 no system threads library is required and inter-library dependencies
 are problematic.
 
-</li><li> <a name="index-MPI-1"></a>
+</li><li> <span id="index-MPI-1"></span>
 <code>--enable-mpi</code>: Enables compilation and installation of the FFTW
-MPI library (see <a href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI">Distributed-memory FFTW with MPI</a>), which provides
+MPI library (see <a href="Distributed_002dmemory-FFTW-with-MPI.html">Distributed-memory FFTW with MPI</a>), which provides
 parallel transforms for distributed-memory systems with MPI.  (By
-default, the MPI routines are not compiled.)  See <a href="FFTW-MPI-Installation.html#FFTW-MPI-Installation">FFTW MPI Installation</a>.
+default, the MPI routines are not compiled.)  See <a href="FFTW-MPI-Installation.html">FFTW MPI Installation</a>.
 
-</li><li> <a name="index-Fortran_002dcallable-wrappers"></a>
+</li><li> <span id="index-Fortran_002dcallable-wrappers"></span>
 <code>--disable-fortran</code>: Disables inclusion of legacy-Fortran
-wrapper routines (see <a href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a>) in the standard
+wrapper routines (see <a href="Calling-FFTW-from-Legacy-Fortran.html">Calling FFTW from Legacy Fortran</a>) in the standard
 FFTW libraries.  These wrapper routines increase the library size by
 only a negligible amount, so they are included by default as long as
 the <code>configure</code> script finds a Fortran compiler on your system.
@@ -200,13 +189,13 @@ true: if you configure with a different compiler, then the
 <code>--with-g77-wrappers</code>, the <code>g77</code>-compatible wrappers are
 included in addition to wrappers for whatever Fortran compiler
 <code>configure</code> finds.
-<a name="index-g77"></a>
+<span id="index-g77"></span>
 
 </li><li> <code>--with-slow-timer</code>: Disables the use of hardware cycle counters,
 and falls back on <code>gettimeofday</code> or <code>clock</code>.  This greatly
 worsens performance, and should generally not be used (unless you don&rsquo;t
 have a cycle counter but still really want an optimized plan regardless
-of the time).  See <a href="Cycle-Counters.html#Cycle-Counters">Cycle Counters</a>.
+of the time).  See <a href="Cycle-Counters.html">Cycle Counters</a>.
 
 </li><li> <code>--enable-sse</code> (single precision),
 <code>--enable-sse2</code> (single, double),
@@ -245,17 +234,17 @@ This command line is known to have worked at least once:
 
 </li></ul>
 
-<a name="index-compiler-2"></a>
+<span id="index-compiler-2"></span>
 <p>To force <code>configure</code> to use a particular C compiler <i>foo</i>
 (instead of the default, usually <code>gcc</code>), pass <code>CC=</code><i>foo</i> to the 
 <code>configure</code> script; you may also need to set the flags via the variable
 <code>CFLAGS</code> as described above.
-<a name="index-compiler-flags-1"></a>
+<span id="index-compiler-flags-1"></span>
 </p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Installation-on-non_002dUnix-systems.html#Installation-on-non_002dUnix-systems" accesskey="n" rel="next">Installation on non-Unix systems</a>, Previous: <a href="Installation-and-Customization.html#Installation-and-Customization" accesskey="p" rel="prev">Installation and Customization</a>, Up: <a href="Installation-and-Customization.html#Installation-and-Customization" accesskey="u" rel="up">Installation and Customization</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Installation-on-non_002dUnix-systems.html" accesskey="n" rel="next">Installation on non-Unix systems</a>, Previous: <a href="Installation-and-Customization.html" accesskey="p" rel="prev">Installation and Customization</a>, Up: <a href="Installation-and-Customization.html" accesskey="u" rel="up">Installation and Customization</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

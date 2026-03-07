@@ -69,7 +69,7 @@ c
 !$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
 !$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,eps,use_group,use_polymer)
 !$OMP& shared(eat)
-!$OMP DO reduction(+:eat) schedule(guided)
+!$OMP DO reduction(+:eat)
 c
 c     calculate the angle-torsion interaction energy term
 c

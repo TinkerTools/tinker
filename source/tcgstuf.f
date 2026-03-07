@@ -41,8 +41,8 @@ c
 c
 c     "indtcga" computes the induced dipoles and intermediates used
 c     in polarization force calculation for the TCG method with dp
-c     cross terms = true, initial guess mu0 = 0 and using a diagonal
-c     preconditioner
+c     cross terms set true, initial guess of mu0 set to zero, and
+c     using a diagonal preconditioner
 c
 c
       subroutine indtcga
@@ -238,8 +238,8 @@ c
 c
 c     "indtcgb" computes the induced dipoles and intermediates used
 c     in polarization force calculation for the TCG method with dp
-c     cross terms = true, initial guess mu0 = direct and using diagonal
-c     preconditioner
+c     cross terms set true, initial guess of mu0=direct, and using
+c     a diagonal preconditioner
 c
 c
       subroutine indtcgb
@@ -547,7 +547,7 @@ c
 c
       sum = 0.0d0
 !$OMP PARALLEL default(shared) private(i,j,k)
-!$OMP DO reduction(+:sum) schedule(guided)
+!$OMP DO reduction(+:sum)
       do i = 1, npole
          k = ipole(i)
          do j = 1, 3
@@ -610,7 +610,7 @@ c
 c
 c
 !$OMP PARALLEL default(shared) private(i,j,k)
-!$OMP DO schedule(guided)
+!$OMP DO
       do i = 1, npole
          k = ipole(i)
          do j = 1, 3
@@ -647,7 +647,7 @@ c
 c
 c
 !$OMP PARALLEL default(shared) private(i,j,k)
-!$OMP DO schedule(guided)
+!$OMP DO
       do i = 1, npole
          k = ipole(i)
          do j = 1, 3
@@ -684,7 +684,7 @@ c     find value of the scalar dot product
 c
       sum = 0.0d0
 !$OMP PARALLEL default(shared) private(i)
-!$OMP DO reduction(+:sum) schedule(guided)
+!$OMP DO reduction(+:sum)
       do i = 1, n
          sum = sum + a(i)*b(i)
       end do
@@ -768,7 +768,7 @@ c     compute the 1/alpha contribution
 c
       polmin = 0.00000001d0
 !$OMP PARALLEL default(shared) private(i,j,k,polk)
-!$OMP DO schedule(guided)
+!$OMP DO
       do i = 1, npole
          k = ipole(i)
          if (douind(k)) then
@@ -810,7 +810,7 @@ c
 c     swap sets of induced dipoles for use with the TCG method
 c
 !$OMP PARALLEL default(shared) private(i,j,k,dterm,pterm)
-!$OMP DO schedule(guided)
+!$OMP DO
       do i = 1, npole
          k = ipole(i)
          do j = 1, 3
@@ -853,7 +853,7 @@ c
 c     computes an updated pvec from prior intermediates
 c
 !$OMP PARALLEL default(shared) private(i,j,k,alpha)
-!$OMP DO schedule(guided)
+!$OMP DO
       do i = 1, npole
          k = ipole(i)
          alpha = polarity(k)

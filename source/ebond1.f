@@ -53,7 +53,7 @@ c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer)
 !$OMP& shared(eb,deb,vir)
-!$OMP DO reduction(+:eb,deb,vir) schedule(guided)
+!$OMP DO reduction(+:eb,deb,vir)
 c
 c     calculate the bond stretch energy and first derivatives
 c

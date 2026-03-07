@@ -14,7 +14,7 @@ c
 c
 c     "maxwell" returns a speed in Angstroms/picosecond randomly
 c     selected from a 3-D Maxwell-Boltzmann distribution for the
-c     specified particle mass and system temperature
+c     specified particle mass (amu) and system temperature (K)
 c
 c     literature reference:
 c

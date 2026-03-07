@@ -37,9 +37,11 @@ c
       character*4 pa,pb,pc,pd
       character*8 zero8
       character*12 zero12
-      character*16 blank,pti
-      character*16 pt0,pt1
-      character*16 pt2,pt3
+      character*16 blank
+      character*16 pti,pt0
+      character*16 pt1,pt2
+      character*16 pt3,pt4
+      character*16 pt5,pt6
       character*16 pt(6)
       character*20 keyword
       character*240 record
@@ -144,9 +146,12 @@ c
                pt(4) = pa//pc//pd//pb
                pt(5) = pa//pd//pb//pc
                pt(6) = pa//pd//pc//pb
-               pt3 = pa//pb//zero8
+               pt6 = pa//zero8//pd
+               pt5 = pa//zero8//pc
+               pt4 = pa//zero8//pb
+               pt3 = pa//pd//zero8
                pt2 = pa//pc//zero8
-               pt1 = pa//pd//zero8
+               pt1 = pa//pb//zero8
                pt0 = pa//zero12
                symm = 1.0d0
                if (pb.eq.pc .or. pb.eq.pd .or. pc.eq.pd)  symm = 2.0d0
@@ -186,78 +191,41 @@ c
                            kprop(niprop) = dcon(j) / symm
                            vprop(niprop) = tdi(j)
                            done = .true.
+                           goto 60
                         end if
                      end do
                   end if
                end do
+   60          continue
                if (.not. done) then
                   do j = 1, ndi
-                     if (kdi(j) .eq. pt1) then
-                        symm = 3.0d0
-                        do k = 1, 3
-                           niprop = niprop + 1
-                           iiprop(1,niprop) = ia
-                           if (k .eq. 1) then
-                              iiprop(2,niprop) = ib
-                              iiprop(3,niprop) = ic
-                              iiprop(4,niprop) = id
-                           else if (k .eq. 2) then
-                              iiprop(2,niprop) = ic
-                              iiprop(3,niprop) = id
-                              iiprop(4,niprop) = ib
-                           else if (k .eq. 3) then
-                              iiprop(2,niprop) = id
-                              iiprop(3,niprop) = ib
-                              iiprop(4,niprop) = ic
-                           end if
-                           kprop(niprop) = dcon(j) / symm
-                           vprop(niprop) = tdi(j)
-                        end do
-                        done = .true.
-                     else if (kdi(j) .eq. pt2) then
-                        symm = 3.0d0
-                        do k = 1, 3
-                           niprop = niprop + 1
-                           iiprop(1,niprop) = ia
-                           if (k .eq. 1) then
-                              iiprop(2,niprop) = ib
-                              iiprop(3,niprop) = ic
-                              iiprop(4,niprop) = id
-                           else if (k .eq. 2) then
-                              iiprop(2,niprop) = ic
-                              iiprop(3,niprop) = id
-                              iiprop(4,niprop) = ib
-                           else if (k .eq. 3) then
-                              iiprop(2,niprop) = id
-                              iiprop(3,niprop) = ib
-                              iiprop(4,niprop) = ic
-                           end if
-                           kprop(niprop) = dcon(j) / symm
-                           vprop(niprop) = tdi(j)
-                        end do
-                        done = .true.
-                     else if (kdi(j) .eq. pt3) then
-                        symm = 3.0d0
-                        do k = 1, 3
-                           niprop = niprop + 1
-                           iiprop(1,niprop) = ia
-                           if (k .eq. 1) then
-                              iiprop(2,niprop) = ib
-                              iiprop(3,niprop) = ic
-                              iiprop(4,niprop) = id
-                           else if (k .eq. 2) then
-                              iiprop(2,niprop) = ic
-                              iiprop(3,niprop) = id
-                              iiprop(4,niprop) = ib
-                           else if (k .eq. 3) then
-                              iiprop(2,niprop) = id
-                              iiprop(3,niprop) = ib
-                              iiprop(4,niprop) = ic
-                           end if
-                           kprop(niprop) = dcon(j) / symm
-                           vprop(niprop) = tdi(j)
-                        end do
-                        done = .true.
+                     if (kdi(j).eq.pt1 .or. kdi(j).eq.pt4) then
+                        symm = 1.0d0
+                        niprop = niprop + 1
+                        iiprop(1,niprop) = ia
+                        iiprop(2,niprop) = ic
+                        iiprop(3,niprop) = id
+                        iiprop(4,niprop) = ib
+                        kprop(niprop) = dcon(j) / symm
+                        vprop(niprop) = tdi(j)
+                     else if (kdi(j).eq.pt2 .or. kdi(j).eq.pt5) then
+                        symm = 1.0d0
+                        niprop = niprop + 1
+                        iiprop(1,niprop) = ia
+                        iiprop(2,niprop) = id
+                        iiprop(3,niprop) = ib
+                        iiprop(4,niprop) = ic
+                        kprop(niprop) = dcon(j) / symm
+                        vprop(niprop) = tdi(j)
+                     else if (kdi(j).eq.pt3 .or. kdi(j).eq.pt6) then
+                        symm = 1.0d0
+                        niprop = niprop + 1
+                        iiprop(1,niprop) = ia
+                        iiprop(2,niprop) = ib
+                        iiprop(3,niprop) = ic
+                        iiprop(4,niprop) = id
+                        kprop(niprop) = dcon(j) / symm
+                        vprop(niprop) = tdi(j)
                      end if
                   end do
                end if
@@ -284,9 +252,11 @@ c
                            kprop(niprop) = dcon(j) / symm
                            vprop(niprop) = tdi(j)
                         end do
+                        goto 70
                      end if
                   end do
                end if
+   70          continue
             end if
          end do
       end if
@@ -307,8 +277,8 @@ c
             tk = 0.0d0
             tv = 0.0d0
             string = record(next:240)
-            read (string,*,err=60,end=60)  ia,ib,ic,id,tk,tv
-   60       continue
+            read (string,*,err=80,end=80)  ia,ib,ic,id,tk,tv
+   80       continue
             if (min(ia,ib,ic,id) .lt. 0) then
                ia = abs(ia)
                ib = abs(ib)
@@ -316,14 +286,14 @@ c
                id = abs(id)
                if (header .and. .not.silent) then
                   header = .false.
-                  write (iout,70)
-   70             format (/,' Additional Improper Dihedral Specific',
+                  write (iout,90)
+   90             format (/,' Additional Improper Dihedral Specific',
      &                       ' Parameters :',
      &                    //,8x,'Atoms',16x,'K(ID)',10x,'Angle',/)
                end if
                if (.not. silent) then
-                  write (iout,80)  ia,ib,ic,id,tk,tv
-   80             format (2x,4i4,4x,f12.3,f15.3)
+                  write (iout,100)  ia,ib,ic,id,tk,tv
+  100             format (2x,4i4,4x,f12.3,f15.3)
                end if
                do j = 1, niprop
                   ita = iiprop(1,j)
@@ -334,11 +304,11 @@ c
      &                ic.eq.itc .and. id.eq.itd) then
                      kprop(j) = tk
                      vprop(j) = tv
-                     goto 90
+                     goto 110
                   end if
                end do
             end if
-   90       continue
+  110       continue
          end if
       end do
 c

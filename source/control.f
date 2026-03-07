@@ -47,7 +47,7 @@ c
 c     check for control parameters on the command line
 c
       exist = .false.
-      do i = 1, narg-1
+      do i = 1, narg
          string = arg(i)
          call upcase (string)
          if (string(1:2) .eq. '-D') then

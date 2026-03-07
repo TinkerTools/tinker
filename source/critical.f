@@ -20,6 +20,7 @@ c
       use sizes
       use atoms
       use files
+      use freeze
       use inform
       use iounit
       use keys
@@ -78,11 +79,11 @@ c
       if (grdmin .le. 0.0d0) then
          write (iout,30)
    30    format (/,' Enter Residual Gradient Convergence Criterion',
-     &              ' [0.01] :  ',$)
+     &              ' [1.0] :  ',$)
          read (input,40)  grdmin
    40    format (f20.0)
       end if
-      if (grdmin .le. 0.0d0)  grdmin = 0.01d0
+      if (grdmin .le. 0.0d0)  grdmin = 1.0d0
 c
 c     write out a copy of coordinates for later update
 c
@@ -103,14 +104,13 @@ c     set active atom coordinates as optimization variables
 c
       nvar = 0
       do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            xx(nvar) = x(i)
-            nvar = nvar + 1
-            xx(nvar) = y(i)
-            nvar = nvar + 1
-            xx(nvar) = z(i)
-         end if
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k)
+         nvar = nvar + 1
+         xx(nvar) = y(k)
+         nvar = nvar + 1
+         xx(nvar) = z(k)
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -144,19 +144,19 @@ c     unpack the final coordinates for active atoms
 c
       nvar = 0
       do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+         k = iuse(i)
+         nvar = nvar + 1
+         x(i) = xx(nvar)
+         nvar = nvar + 1
+         y(i) = xx(nvar)
+         nvar = nvar + 1
+         z(i) = xx(nvar)
       end do
 c
 c     compute the final function and RMS gradient values
 c
       call gradient (epot,derivs)
+      if (use_freeze)  call shakeg (derivs)
       gnorm = 0.0d0
       do i = 1, nuse
          k = iuse(i)
@@ -240,9 +240,10 @@ c
       subroutine critical1 (nvar,nrsd,xx,rsd)
       use sizes
       use atoms
+      use freeze
       use usage
       implicit none
-      integer i
+      integer i,k
       integer nvar
       integer nrsd
       real*8 epot 
@@ -251,19 +252,22 @@ c
       real*8, allocatable :: derivs(:,:)
 c
 c
-c     translate optimization parameters to atomic coordinates
+c     convert optimization parameters to atomic coordinates
 c
       nvar = 0
-      do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            x(i) = xx(nvar)
-            nvar = nvar + 1
-            y(i) = xx(nvar)
-            nvar = nvar + 1
-            z(i) = xx(nvar)
-         end if
+      do i = 1, nuse
+         k = iuse(i)
+         nvar = nvar + 1
+         x(k) = xx(nvar)
+         nvar = nvar + 1
+         y(k) = xx(nvar)
+         nvar = nvar + 1
+         z(k) = xx(nvar)
       end do
+c
+c     adjust atomic coordinates to satisfy distance constraints
+c
+      if (use_freeze)  call shake (x,y,z)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -273,18 +277,24 @@ c     compute energy and gradient for the current structure
 c
       call gradient (epot,derivs)
 c
+c     adjust gradient to remove components along constraints
+c
+      if (use_freeze)  call shakeg (derivs)
+c
 c     store the gradient components as the residual vector
 c
       nvar = 0
       do i = 1, n
-         if (use(i)) then
-            nvar = nvar + 1
-            rsd(nvar) = derivs(1,i)
-            nvar = nvar + 1
-            rsd(nvar) = derivs(2,i)
-            nvar = nvar + 1
-            rsd(nvar) = derivs(3,i)
-         end if
+         k = iuse(i)
+         nvar = nvar + 1
+         xx(nvar) = x(k)
+         rsd(nvar) = derivs(1,k)
+         nvar = nvar + 1
+         xx(nvar) = y(k)
+         rsd(nvar) = derivs(2,k)
+         nvar = nvar + 1
+         xx(nvar) = z(k)
+         rsd(nvar) = derivs(3,k)
       end do
 c
 c     perform deallocation of some local arrays

@@ -652,7 +652,7 @@ c     check for too many overlaps with sphere of interest
 c
          if (io .ge. maxarc) then
             write (iout,20)
-   20       format (/,' SURFATOM  --  Increase the Value of MAXARC')
+   20       format (/,' SURFATOM1  --  Increase the Value of MAXARC')
             call fatal
          end if
 c
@@ -862,7 +862,7 @@ c
                   narc = narc + 1
                   if (narc .ge. maxarc) then
                      write (iout,70)
-   70                format (/,' SURFATOM  --  Increase the Value',
+   70                format (/,' SURFATOM1  --  Increase the Value',
      &                          ' of MAXARC')
                      call fatal
                   end if
@@ -907,7 +907,7 @@ c
                   jb = jb + 1
                   if (jb .ge. maxarc) then
                      write (iout,80)
-   80                format (/,' SURFATOM  --  Increase the Value',
+   80                format (/,' SURFATOM1  --  Increase the Value',
      &                          ' of MAXARC')
                      call fatal
                   end if
@@ -1044,7 +1044,7 @@ c     attempt to fix connectivity error by moving atom slightly
 c
       if (moved) then
          write (iout,140)  ir
-  140    format (/,' SURFATOM  --  Connectivity Error at Atom',i6)
+  140    format (/,' SURFATOM1  --  Connectivity Error at Atom',i6)
       else
          moved = .true.
          xr = xr + rmove
@@ -1064,7 +1064,7 @@ c
       if (area .lt. 0.0d0) then
          if (moved) then
             write (iout,160)  ir
-  160       format (/,' SURFATOM  --  Negative Area at Atom',i6)
+  160       format (/,' SURFATOM1  --  Negative Area at Atom',i6)
          else
             moved = .true.
             xr = xr + rmove

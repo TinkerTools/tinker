@@ -14,19 +14,23 @@ c
 c
 c     npdb      number of atoms stored in Protein Data Bank format
 c     nres      number of residues stored in Protein Data Bank format
+c     nmodel    number of models stored in Protein Data Bank format
+c     imodel    model number of structure to be used (0=All Models)
 c     resnum    number of the residue to which each atom belongs
 c     resatm    number of first and last atom in each residue
 c     npdb12    number of atoms directly bonded to each CONECT atom
 c     ipdb12    atom numbers of atoms connected to each CONECT atom
+c     pdbmod    Protein Data Bank model number assigned to each atom
 c     pdblist   list of the Protein Data Bank atom number of each atom
 c     xpdb      x-coordinate of each atom stored in PDB format
 c     ypdb      y-coordinate of each atom stored in PDB format
 c     zpdb      z-coordinate of each atom stored in PDB format
 c     altsym    string with PDB alternate locations to be included
+c     pdbtyp    format of PDB files; PDB (legacy) or CIF (PDBx/mmCIF)
 c     pdbres    Protein Data Bank residue name assigned to each atom
 c     pdbsym    Protein Data Bank atomic symbol assigned to each atom
 c     pdbatm    Protein Data Bank atom name assigned to each atom
-c     pdbtyp    Protein Data Bank record type assigned to each atom
+c     pdbrec    Protein Data Bank record type assigned to each atom
 c     chnsym    string with PDB chain identifiers to be included
 c     instyp    string with PDB insertion records to be included
 c
@@ -34,19 +38,22 @@ c
       module pdb
       implicit none
       integer npdb,nres
+      integer nmodel,imodel
       integer, allocatable :: resnum(:)
       integer, allocatable :: resatm(:,:)
       integer, allocatable :: npdb12(:)
       integer, allocatable :: ipdb12(:,:)
+      integer, allocatable :: pdbmod(:)
       integer, allocatable :: pdblist(:)
       real*8, allocatable :: xpdb(:)
       real*8, allocatable :: ypdb(:)
       real*8, allocatable :: zpdb(:)
       character*1 altsym
+      character*3 pdbtyp
       character*3, allocatable :: pdbres(:)
       character*3, allocatable :: pdbsym(:)
       character*4, allocatable :: pdbatm(:)
-      character*6, allocatable :: pdbtyp(:)
+      character*6, allocatable :: pdbrec(:)
       character*20 chnsym
       character*20 instyp
       save

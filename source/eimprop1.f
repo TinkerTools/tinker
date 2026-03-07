@@ -78,7 +78,7 @@ c
 !$OMP PARALLEL default(private) shared(niprop,iiprop,use,
 !$OMP& x,y,z,kprop,vprop,idihunit,eps,use_group,use_polymer)
 !$OMP& shared(eid,deid,vir)
-!$OMP DO reduction(+:eid,deid,vir) schedule(guided)
+!$OMP DO reduction(+:eid,deid,vir)
 c
 c     calculate the improper dihedral angle energy term
 c

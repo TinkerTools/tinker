@@ -20,6 +20,7 @@ c
       use atoms
       use bound
       use files
+      use freeze
       use inform
       use iounit
       use scales
@@ -140,6 +141,7 @@ c
          minimum = energy ()
          call numgrad (energy,derivs,eps)
       end if
+      if (use_freeze)  call shakeg (derivs)
       gnorm = 0.0d0
       do i = 1, nuse
          k = iuse(i)
@@ -197,7 +199,7 @@ c
 c
 c     move stray molecules into periodic box if desired
 c
-c     if (use_bounds)  call bounds
+      if (use_wrap)  call bounds
 c
 c     write the final coordinates into a file
 c
@@ -227,6 +229,7 @@ c
 c
       function optimiz1 (xx,g)
       use atoms
+      use freeze
       use scales
       use usage
       implicit none
@@ -258,6 +261,10 @@ c
          z(k) = xx(nvar) / scale(nvar)
       end do
 c
+c     adjust atomic coordinates to satisfy distance constraints
+c
+      if (use_freeze)  call shake (x,y,z)
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (derivs(3,n))
@@ -272,16 +279,23 @@ c
       end if
       optimiz1 = e
 c
+c     adjust gradient to remove components along constraints
+c
+      if (use_freeze)  call shakeg (derivs)
+c
 c     convert gradient components to optimization parameters
 c
       nvar = 0
       do i = 1, nuse
          k = iuse(i)
          nvar = nvar + 1
+         xx(nvar) = x(k) * scale(nvar)
          g(nvar) = derivs(1,k) / scale(nvar)
          nvar = nvar + 1
+         xx(nvar) = y(k) * scale(nvar)
          g(nvar) = derivs(2,k) / scale(nvar)
          nvar = nvar + 1
+         xx(nvar) = z(k) * scale(nvar)
          g(nvar) = derivs(3,k) / scale(nvar)
       end do
 c

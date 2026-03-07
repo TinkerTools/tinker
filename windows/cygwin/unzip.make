@@ -24,6 +24,7 @@ unzip freefix.zip freefix.exe
 unzip gda.zip gda.exe
 unzip intedit.zip intedit.exe
 unzip intxyz.zip intxyz.exe
+unzip mdavg.zip mdavg.exe
 unzip minimize.zip minimize.exe
 unzip minirot.zip minirot.exe
 unzip minrigid.zip minrigid.exe
@@ -58,6 +59,7 @@ unzip testhess.zip testhess.exe
 unzip testpair.zip testpair.exe
 unzip testpol.zip testpol.exe
 unzip testrot.zip testrot.exe
+unzip testsurf.zip testsurf.exe
 unzip timer.zip timer.exe
 unzip timerot.zip timerot.exe
 unzip timevir.zip timevir.exe

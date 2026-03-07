@@ -67,7 +67,7 @@ c
 !$OMP& use,x,y,z,tnx,ttx,tny,tty,tbf,tbx,tby,tbxy,ttorunit,
 !$OMP& use_group,use_polymer)
 !$OMP& shared(ett)
-!$OMP DO reduction(+:ett) schedule(guided)
+!$OMP DO reduction(+:ett)
 c
 c     calculate the torsion-torsion interaction energy term
 c

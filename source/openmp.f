@@ -13,12 +13,14 @@ c     #############################################################
 c
 c
 c     nproc     number of processors available to OpenMP
-c     nthread   number of threads to be used with OpenMP 
+c     nthread   number of threads to be used with OpenMP
+c     nnest     number of nested active parallel regions
 c
 c
       module openmp
       implicit none
       integer nproc
       integer nthread
+      integer nnest
       save
       end

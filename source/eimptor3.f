@@ -86,7 +86,7 @@ c
 !$OMP& itors1,itors2,itors3,itorunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eit,neit,aeit)
-!$OMP DO reduction(+:eit,neit,aeit) schedule(guided)
+!$OMP DO reduction(+:eit,neit,aeit)
 c
 c     calculate the improper torsional angle energy term
 c

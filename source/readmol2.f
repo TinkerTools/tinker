@@ -13,7 +13,7 @@ c     ############################################################
 c
 c
 c     "readmol2" gets a set of Tripos MOL2 coordinates from an
-c     external disk file
+c     external file
 c
 c
       subroutine readmol2 (imol2)

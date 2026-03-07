@@ -25,6 +25,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static freefix.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static gda.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intedit.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static intxyz.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static mdavg.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minimize.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minirot.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static minrigid.obj tinker.lib
@@ -59,6 +60,7 @@ ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testhess.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testpair.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testpol.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testrot.obj tinker.lib
+ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testsurf.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static testvir.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static timer.obj tinker.lib
 ifort /O3 /Qprec-div- /Qopenmp /recursive /libs:static timerot.obj tinker.lib

@@ -600,7 +600,7 @@ c
 !$OMP& vlambda4,vlambda5,mut,cut2,off2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er)
-!$OMP DO reduction(+:er) schedule(guided)
+!$OMP DO reduction(+:er)
 c
 c     calculate the Pauli repulsion interaction energy term
 c

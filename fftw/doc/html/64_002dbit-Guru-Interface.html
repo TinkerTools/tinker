@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: 64-bit Guru Interface</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>64-bit Guru Interface (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: 64-bit Guru Interface">
-<meta name="keywords" content="FFTW 3.3.8: 64-bit Guru Interface">
+<meta name="description" content="64-bit Guru Interface (FFTW 3.3.10)">
+<meta name="keywords" content="64-bit Guru Interface (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Guru-Interface.html#Guru-Interface" rel="up" title="Guru Interface">
-<link href="New_002darray-Execute-Functions.html#New_002darray-Execute-Functions" rel="next" title="New-array Execute Functions">
-<link href="Guru-Real_002dto_002dreal-Transforms.html#Guru-Real_002dto_002dreal-Transforms" rel="prev" title="Guru Real-to-real Transforms">
+<link href="Guru-Interface.html" rel="up" title="Guru Interface">
+<link href="New_002darray-Execute-Functions.html" rel="next" title="New-array Execute Functions">
+<link href="Guru-Real_002dto_002dreal-Transforms.html" rel="prev" title="Guru Real-to-real Transforms">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,15 +59,13 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="g_t64_002dbit-Guru-Interface"></a>
-<div class="header">
+<span id="g_t64_002dbit-Guru-Interface"></span><div class="header">
 <p>
-Previous: <a href="Guru-Real_002dto_002dreal-Transforms.html#Guru-Real_002dto_002dreal-Transforms" accesskey="p" rel="prev">Guru Real-to-real Transforms</a>, Up: <a href="Guru-Interface.html#Guru-Interface" accesskey="u" rel="up">Guru Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Guru-Real_002dto_002dreal-Transforms.html" accesskey="p" rel="prev">Guru Real-to-real Transforms</a>, Up: <a href="Guru-Interface.html" accesskey="u" rel="up">Guru Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="g_t64_002dbit-Guru-Interface-1"></a>
-<h4 class="subsection">4.5.6 64-bit Guru Interface</h4>
-<a name="index-64_002dbit-architecture"></a>
+<span id="g_t64_002dbit-Guru-Interface-1"></span><h4 class="subsection">4.5.6 64-bit Guru Interface</h4>
+<span id="index-64_002dbit-architecture"></span>
 
 <p>When compiled in 64-bit mode on a 64-bit architecture (where addresses
 are 64 bits wide), FFTW uses 64-bit quantities internally for all
@@ -99,7 +88,7 @@ machine.)  We stress that there is <em>no performance advantage</em> to
 using this interface&mdash;the same internal FFTW code is employed
 regardless&mdash;and it is only necessary if you want to specify very
 large transform sizes.
-<a name="index-ptrdiff_005ft"></a>
+<span id="index-ptrdiff_005ft"></span>
 </p>
 
 <p>In particular, the 64-bit guru interface is a set of planner routines
@@ -116,7 +105,7 @@ For example, instead of <code>fftw_plan_guru_dft</code>, we have
      fftw_complex *in, fftw_complex *out,
      int sign, unsigned flags);
 </pre></div>
-<a name="index-fftw_005fplan_005fguru64_005fdft"></a>
+<span id="index-fftw_005fplan_005fguru64_005fdft"></span>
 
 <p>The <code>fftw_iodim64</code> type is similar to <code>fftw_iodim</code>, with the
 same interpretation, except that it uses type <code>ptrdiff_t</code> instead
@@ -129,7 +118,7 @@ of type <code>int</code>.
      ptrdiff_t os;
 } fftw_iodim64;
 </pre></div>
-<a name="index-fftw_005fiodim64"></a>
+<span id="index-fftw_005fiodim64"></span>
 
 <p>Every other &lsquo;<samp>fftw_plan_guru</samp>&rsquo; function also has a
 &lsquo;<samp>fftw_plan_guru64</samp>&rsquo; equivalent, but we do not repeat their
@@ -139,7 +128,7 @@ except as noted above.
 <hr>
 <div class="header">
 <p>
-Previous: <a href="Guru-Real_002dto_002dreal-Transforms.html#Guru-Real_002dto_002dreal-Transforms" accesskey="p" rel="prev">Guru Real-to-real Transforms</a>, Up: <a href="Guru-Interface.html#Guru-Interface" accesskey="u" rel="up">Guru Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Guru-Real_002dto_002dreal-Transforms.html" accesskey="p" rel="prev">Guru Real-to-real Transforms</a>, Up: <a href="Guru-Interface.html" accesskey="u" rel="up">Guru Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

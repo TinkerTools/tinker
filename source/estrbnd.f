@@ -58,7 +58,7 @@ c
 !$OMP PARALLEL default(private) shared(nstrbnd,isb,iang,sbk,
 !$OMP& anat,bl,bk,use,x,y,z,stbnunit,eps,use_group,use_polymer)
 !$OMP& shared(eba)
-!$OMP DO reduction(+:eba) schedule(guided)
+!$OMP DO reduction(+:eba)
 c
 c     calculate the stretch-bend interaction energy term
 c

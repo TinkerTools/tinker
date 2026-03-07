@@ -17,6 +17,7 @@ c     polycut2      square of infinite polymer nonbond cutoff
 c     use_bounds    flag to use periodic boundary conditions
 c     use_replica   flag to use replicates for periodic system
 c     use_polymer   flag to mark presence of infinite polymer
+c     use_wrap      flag to wrap coordinates in output files
 c
 c
       module bound
@@ -26,5 +27,6 @@ c
       logical use_bounds
       logical use_replica
       logical use_polymer
+      logical use_wrap
       save
       end

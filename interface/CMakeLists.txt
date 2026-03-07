@@ -5,6 +5,7 @@ project (TinkerInterface LANGUAGES NONE)
 enable_language (Fortran)
 add_library (tinkerObjF OBJECT
 ../source/action.f
+../source/alfmol.f
 ../source/align.f
 ../source/analyz.f
 ../source/angang.f
@@ -147,6 +148,7 @@ add_library (tinkerObjF OBJECT
 ../source/rxnpot.f
 ../source/scales.f
 ../source/sequen.f
+../source/shapes.f
 ../source/shunt.f
 ../source/sizes.f
 ../source/socket.f
@@ -157,11 +159,13 @@ add_library (tinkerObjF OBJECT
 ../source/strtor.f
 ../source/syntrn.f
 ../source/tarray.f
+../source/tettor.f
 ../source/titles.f
 ../source/torpot.f
 ../source/tors.f
 ../source/tortor.f
 ../source/tree.f
+../source/tritor.f
 ../source/uatom.f
 ../source/units.f
 ../source/uprior.f
@@ -191,11 +195,11 @@ add_library (tinkerObjF OBJECT
 ../source/bonds.f
 ../source/born.f
 ../source/bounds.f
-../source/bussi.f
 ../source/calendar.f
 ../source/center.f
 ../source/chkpole.f
 ../source/chkring.f
+../source/chksymm.f
 ../source/chkxyz.f
 ../source/cholesky.f
 ../source/clock.f
@@ -352,12 +356,16 @@ add_library (tinkerObjF OBJECT
 ../source/fftpack.f
 ../source/field.f
 ../source/final.f
+../source/findnuc.f
+../source/findpro.f
+../source/findseq.f
 ../source/flatten.f
 ../source/freeunit.f
 ../source/geometry.f
 ../source/getarc.f
 ../source/getcart.f
 ../source/getdcd.f
+../source/getfloat.f
 ../source/getint.f
 ../source/getkey.f
 ../source/getmol.f
@@ -408,6 +416,7 @@ add_library (tinkerObjF OBJECT
 ../source/kewald.f
 ../source/kexpol.f
 ../source/kextra.f
+../source/kfreeze.f
 ../source/kgeom.f
 ../source/kimprop.f
 ../source/kimptor.f
@@ -425,6 +434,7 @@ add_library (tinkerObjF OBJECT
 ../source/kstrtor.f
 ../source/ktors.f
 ../source/ktortor.f
+../source/kundrot.f
 ../source/kurey.f
 ../source/kvdw.f
 ../source/lattice.f
@@ -470,6 +480,7 @@ add_library (tinkerObjF OBJECT
 ../source/prmkey.f
 ../source/promo.f
 ../source/prtarc.f
+../source/prtcif.f
 ../source/prtdyn.f
 ../source/prterr.f
 ../source/prtint.f
@@ -483,11 +494,13 @@ add_library (tinkerObjF OBJECT
 ../source/random.f
 ../source/rattle.f
 ../source/readcart.f
+../source/readcif.f
 ../source/readdcd.f
 ../source/readdyn.f
 ../source/readgau.f
 ../source/readgdma.f
 ../source/readint.f
+../source/readmbis.f
 ../source/readmol.f
 ../source/readmol2.f
 ../source/readpdb.f
@@ -497,6 +510,7 @@ add_library (tinkerObjF OBJECT
 ../source/replica.f
 ../source/respa.f
 ../source/rgdstep.f
+../source/richmond.f
 ../source/rings.f
 ../source/rmsfit.f
 ../source/rotlist.f
@@ -505,7 +519,8 @@ add_library (tinkerObjF OBJECT
 ../source/search.f
 ../source/server.f
 ../source/setprm.f
-../source/shakeup.f
+../source/settle.f
+../source/shake.f
 ../source/sigmoid.f
 ../source/simplex.f
 ../source/sktstuf.f
@@ -517,11 +532,14 @@ add_library (tinkerObjF OBJECT
 ../source/switch.f
 ../source/tcgstuf.f
 ../source/temper.f
+../source/tettors.f
 ../source/tncg.f
 ../source/torphase.f
 ../source/torque.f
 ../source/torsions.f
 ../source/trimtext.f
+../source/tritors.f
+../source/unionball.f
 ../source/uniquetyp.f
 ../source/unitcell.f
 ../source/verlet.f

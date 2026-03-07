@@ -16,6 +16,7 @@ extern double* TINKER_MOD(ktrtor, tbf);
 extern double* TINKER_MOD(ktrtor, tbx);
 extern double* TINKER_MOD(ktrtor, tby);
 extern double* TINKER_MOD(ktrtor, tbxy);
+extern char (*TINKER_MOD(ktrtor, ttier))[3];
 extern char (*TINKER_MOD(ktrtor, ktt))[20];
 #ifdef __cplusplus
 }

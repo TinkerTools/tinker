@@ -141,7 +141,7 @@ c
          minimum = energy ()
          call numgrad (energy,derivs,eps)
       end if
-      if (use_rattle)  call shake2 (derivs)
+      if (use_freeze)  call shakeg (derivs)
       gnorm = 0.0d0
       do i = 1, nuse
          k = iuse(i)
@@ -199,7 +199,7 @@ c
 c
 c     move stray molecules into periodic box if desired
 c
-c     if (use_bounds)  call bounds
+      if (use_wrap)  call bounds
 c
 c     write the final coordinates into a file
 c
@@ -263,7 +263,7 @@ c
 c
 c     adjust atomic coordinates to satisfy distance constraints
 c
-      if (use_rattle)  call shake (x,y,z)
+      if (use_freeze)  call shake (x,y,z)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -281,7 +281,7 @@ c
 c
 c     adjust gradient to remove components along constraints
 c
-      if (use_rattle)  call shake2 (derivs)
+      if (use_freeze)  call shakeg (derivs)
 c
 c     convert coordinates and gradient to optimization parameters
 c

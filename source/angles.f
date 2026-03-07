@@ -23,24 +23,12 @@ c
       use atmlst
       use atoms
       use couple
-      use iounit
       implicit none
       integer i,j,k,m
       integer ia,ib,ic
-      integer maxang
 c
 c
-c     perform dynamic allocation of some global arrays
-c
-      maxang = 6 * n
-      if (allocated(iang))  deallocate (iang)
-      if (allocated(anglist))  deallocate (anglist)
-      if (allocated(balist))  deallocate (balist)
-      allocate (iang(4,maxang))
-      allocate (anglist(maxval*(maxval-1)/2,n))
-      allocate (balist(2,maxang))
-c
-c     loop over all atoms, storing the atoms in each bond angle
+c     initial count of the total number of bond angles
 c
       nangle = 0
       do i = 1, n
@@ -48,12 +36,27 @@ c
          do j = 1, n12(i)-1
             do k = j+1, n12(i)
                nangle = nangle + 1
-               if (nangle .gt. maxang) then
-                  write (iout,10)
-   10             format (/,' ANGLES  --  Too many Bond Angles;',
-     &                       ' Increase MAXANG')
-                  call fatal
-               end if
+            end do
+         end do
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(iang))  deallocate (iang)
+      if (allocated(balist))  deallocate (balist)
+      if (allocated(anglist))  deallocate (anglist)
+      allocate (iang(4,nangle))
+      allocate (balist(2,nangle))
+      allocate (anglist(maxval*(maxval-1)/2,n))
+c
+c     store the list of atoms involved in each bond angle
+c
+      nangle = 0
+      do i = 1, n
+         m = 0
+         do j = 1, n12(i)-1
+            do k = j+1, n12(i)
+               nangle = nangle + 1
                m = m + 1
                anglist(m,i) = nangle
                iang(1,nangle) = i12(j,i)

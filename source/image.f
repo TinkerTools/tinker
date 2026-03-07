@@ -12,23 +12,23 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "image" takes the components of pairwise distance between
-c     two points in a periodic box and converts to the components
-c     of the minimum image distance
+c     "image" takes the components of pairwise distance between two
+c     points in a periodic box and converts to the components of the
+c     minimum image distance
 c
 c     literature reference:
 c
 c     U. K. Deiters, "Efficient Coding of the Minimum Image Convention",
 c     Zeitschrift fur Physikalische Chemie, 227, 345-352 (2013)
 c
-c     note the "do while" clause below can be written using the "nint"
-c     intrinsic, and the two forms give equivalent values:
+c     note the "do while" clauses below can be written using the "nint"
+c     intrinsic, and both forms give the same value; for example:
 c
 c     do while (abs(xr) .gt. xbox2)
 c        xr = xr - sign(xbox,xr)    vs.  xr = xr - xbox*nint(xr/xbox)
 c     end do
 c
-c     which one is faster depends upon specific machine and compiler
+c     which form is faster depends upon specific machine and compiler
 c     combinations, and other implementations are also possible
 c
 c

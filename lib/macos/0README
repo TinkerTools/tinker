@@ -7,3 +7,6 @@
        when linking Tinker under macOS. For example, they could be static
        compiler libraries, static version of FFTW libraries, etc.
 
+       Unless otherwise specified, libraries are for ARM CPUs (ie, Apple
+       Silicon) on macOS computers.
+

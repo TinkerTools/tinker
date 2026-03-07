@@ -246,7 +246,7 @@ c     "adjacent" finds an atom connected to atom "i1" other than
 c     atom "i2"; if no such atom exists, then the closest atom
 c     in space is returned
 c
-c     variables and parameters :
+c     variables and parameters:
 c
 c     mode   whether "makeint" is in manual mode, automatic, etc.
 c     more   returned true if there is more than one previously

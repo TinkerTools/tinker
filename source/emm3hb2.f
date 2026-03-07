@@ -314,7 +314,7 @@ c
                   term(3,2) = term(2,3)
                   term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   if (i .eq. iatom) then
                      if (i.eq.iv .and. k.eq.kv) then
@@ -604,7 +604,7 @@ c
                      term(3,2) = term(2,3)
                      term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                      if (i .eq. iatom) then
                         if (i.eq.iv .and. k.eq.kv) then

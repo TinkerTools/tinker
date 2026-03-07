@@ -12,9 +12,9 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "beeman" performs a single molecular dynamics time step
-c     via the Beeman multistep recursion formula; uses original
-c     coefficients or Bernie Brooks' "Better Beeman" values
+c     "beeman" performs a molecular dynamics time step via the
+c     Beeman multistep recursion formula; uses either original
+c     values or "Better Beeman" coefficients of Bernie Brooks
 c
 c     literature references:
 c
@@ -24,6 +24,11 @@ c     20, 130-139 (1976)
 c
 c     B. R. Brooks, "Algorithms for Molecular Dynamics at Constant
 c     Temperature and Pressure", DCRT Report, NIH, April 1988
+c
+c     A. A. Kuraev, A. O. Rak, S. V. Kolosov, A. A. Koronovskii
+c     and A. E. Hramov, "Fast Algorithm for Numerically Integrating
+c     Equations of Motion for Large Particles in Microwave Devices",
+c     Technical Physics, 59, 318-324 (2014)
 c
 c
       subroutine beeman (istep,dt)
@@ -39,7 +44,7 @@ c
       implicit none
       integer i,j,k
       integer istep
-      real*8 dt,dt_x,factor
+      real*8 dt,dtx,dmix
       real*8 etot,eksum,epot
       real*8 temp,pres
       real*8 part1,part2
@@ -54,10 +59,10 @@ c
 c
 c     set time values and coefficients for Beeman integration
 c
-      factor = dble(bmnmix)
-      dt_x = dt / factor
-      part1 = 0.5d0*factor + 1.0d0
+      dmix = dble(bmnmix)
+      part1 = 0.5d0*dmix + 1.0d0
       part2 = part1 - 2.0d0
+      dtx = dt / dmix
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -72,7 +77,7 @@ c
       do i = 1, nuse
          k = iuse(i)
          do j = 1, 3
-            v(j,k) = v(j,k) + (part1*a(j,k)-aalt(j,k))*dt_x
+            v(j,k) = v(j,k) + (part1*a(j,k)-aalt(j,k))*dtx
          end do
          xold(k) = x(k)
          yold(k) = y(k)
@@ -99,7 +104,7 @@ c
 c
 c     get constraint-corrected positions and half-step velocities
 c
-      if (use_rattle)  call rattle (dt,xold,yold,zold)
+      if (use_freeze)  call rattle (dt,xold,yold,zold)
 c
 c     get the potential energy and atomic forces
 c
@@ -118,7 +123,7 @@ c
          do j = 1, 3
             aalt(j,k) = a(j,k)
             a(j,k) = -ekcal * derivs(j,k) / mass(k)
-            v(j,k) = v(j,k) + (part2*a(j,k)+aalt(j,k))*dt_x
+            v(j,k) = v(j,k) + (part2*a(j,k)+aalt(j,k))*dtx
          end do
       end do
 c
@@ -137,21 +142,33 @@ c
          end do
       end if
 c
+c     find the constraint-corrected full-step velocities
+c
+      if (use_freeze) then
+         call rattle2 (dt)
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+         end do
+      end if
+c
+c     make full-step temperature and pressure corrections
+c
+      call temper (dt,eksum,ekin,temp)
+      call pressure (dt,ekin,pres,stress)
+c
+c     final constraint step to enforce position convergence
+c
+      if (use_freeze)  call shake (xold,yold,zold)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
       deallocate (derivs)
-c
-c     find the constraint-corrected full-step velocities
-c
-      if (use_rattle)  call rattle2 (dt)
-c
-c     make full-step temperature and pressure corrections
-c
-      call temper (dt,eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies
 c

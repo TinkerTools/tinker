@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: One-dimensional distributions</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>One-dimensional distributions (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: One-dimensional distributions">
-<meta name="keywords" content="FFTW 3.3.8: One-dimensional distributions">
+<meta name="description" content="One-dimensional distributions (FFTW 3.3.10)">
+<meta name="keywords" content="One-dimensional distributions (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="MPI-Data-Distribution.html#MPI-Data-Distribution" rel="up" title="MPI Data Distribution">
-<link href="Multi_002ddimensional-MPI-DFTs-of-Real-Data.html#Multi_002ddimensional-MPI-DFTs-of-Real-Data" rel="next" title="Multi-dimensional MPI DFTs of Real Data">
-<link href="Transposed-distributions.html#Transposed-distributions" rel="prev" title="Transposed distributions">
+<link href="MPI-Data-Distribution.html" rel="up" title="MPI Data Distribution">
+<link href="Multi_002ddimensional-MPI-DFTs-of-Real-Data.html" rel="next" title="Multi-dimensional MPI DFTs of Real Data">
+<link href="Transposed-distributions.html" rel="prev" title="Transposed distributions">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,14 +59,12 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="One_002ddimensional-distributions"></a>
-<div class="header">
+<span id="One_002ddimensional-distributions"></span><div class="header">
 <p>
-Previous: <a href="Transposed-distributions.html#Transposed-distributions" accesskey="p" rel="prev">Transposed distributions</a>, Up: <a href="MPI-Data-Distribution.html#MPI-Data-Distribution" accesskey="u" rel="up">MPI Data Distribution</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Transposed-distributions.html" accesskey="p" rel="prev">Transposed distributions</a>, Up: <a href="MPI-Data-Distribution.html" accesskey="u" rel="up">MPI Data Distribution</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="One_002ddimensional-distributions-1"></a>
-<h4 class="subsection">6.4.4 One-dimensional distributions</h4>
+<span id="One_002ddimensional-distributions-1"></span><h4 class="subsection">6.4.4 One-dimensional distributions</h4>
 
 <p>For one-dimensional distributed DFTs using FFTW, matters are slightly
 more complicated because the data distribution is more closely tied to
@@ -91,7 +80,7 @@ for forward and backward transforms to work correctly.
                 ptrdiff_t *local_ni, ptrdiff_t *local_i_start,
                 ptrdiff_t *local_no, ptrdiff_t *local_o_start);
 </pre></div>
-<a name="index-fftw_005fmpi_005flocal_005fsize_005f1d"></a>
+<span id="index-fftw_005fmpi_005flocal_005fsize_005f1d"></span>
 
 <p>This function computes the data distribution for a 1d transform of
 size <code>n0</code> with the given transform <code>sign</code> and <code>flags</code>.
@@ -105,7 +94,7 @@ starting at index <code>local_o_start</code>.  The return value of
 allocate on the current process (which might be slightly larger than
 the local size due to intermediate steps in the algorithm).
 </p>
-<p>As mentioned above (see <a href="Load-balancing.html#Load-balancing">Load balancing</a>), the data will be divided
+<p>As mentioned above (see <a href="Load-balancing.html">Load balancing</a>), the data will be divided
 equally among the processes if <code>n0</code> is divisible by the
 <em>square</em> of the number of processes.  In this case,
 <code>local_ni</code> will equal <code>local_no</code>.  Otherwise, they may be
@@ -120,8 +109,8 @@ a communications step.)  If you pass <code>FFTW_MPI_SCRAMBLED_OUT</code> in
 the flags, then the output is stored in this (undocumented) scrambled
 order.  Conversely, to perform the inverse transform of data in
 scrambled order, pass the <code>FFTW_MPI_SCRAMBLED_IN</code> flag.
-<a name="index-FFTW_005fMPI_005fSCRAMBLED_005fOUT"></a>
-<a name="index-FFTW_005fMPI_005fSCRAMBLED_005fIN"></a>
+<span id="index-FFTW_005fMPI_005fSCRAMBLED_005fOUT"></span>
+<span id="index-FFTW_005fMPI_005fSCRAMBLED_005fIN"></span>
 </p>
 
 <p>In MPI FFTW, only composite sizes <code>n0</code> can be parallelized; we
@@ -130,7 +119,7 @@ have not yet implemented a parallel algorithm for large prime sizes.
 <hr>
 <div class="header">
 <p>
-Previous: <a href="Transposed-distributions.html#Transposed-distributions" accesskey="p" rel="prev">Transposed distributions</a>, Up: <a href="MPI-Data-Distribution.html#MPI-Data-Distribution" accesskey="u" rel="up">MPI Data Distribution</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Transposed-distributions.html" accesskey="p" rel="prev">Transposed distributions</a>, Up: <a href="MPI-Data-Distribution.html" accesskey="u" rel="up">MPI Data Distribution</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

@@ -280,7 +280,7 @@ c
             dryibzib = dryiazia + dryiczic
             drzibzib = drziazia + drziczic
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
             if (ia .eq. iatom) then
                hessx(1,ia) = hessx(1,ia) + dt*drxiaxia + dr*dtxiaxia

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Introduction</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Introduction (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Introduction">
-<meta name="keywords" content="FFTW 3.3.8: Introduction">
+<meta name="description" content="Introduction (FFTW 3.3.10)">
+<meta name="keywords" content="Introduction (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="index.html#Top" rel="up" title="Top">
-<link href="Tutorial.html#Tutorial" rel="next" title="Tutorial">
-<link href="index.html#Top" rel="prev" title="Top">
+<link href="index.html" rel="up" title="Top">
+<link href="Tutorial.html" rel="next" title="Tutorial">
+<link href="index.html" rel="prev" title="Top">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,20 +59,18 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Introduction"></a>
-<div class="header">
+<span id="Introduction"></span><div class="header">
 <p>
-Next: <a href="Tutorial.html#Tutorial" accesskey="n" rel="next">Tutorial</a>, Previous: <a href="index.html#Top" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Tutorial.html" accesskey="n" rel="next">Tutorial</a>, Previous: <a href="index.html" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Introduction-1"></a>
-<h2 class="chapter">1 Introduction</h2>
-<p>This manual documents version 3.3.8 of FFTW, the
+<span id="Introduction-1"></span><h2 class="chapter">1 Introduction</h2>
+<p>This manual documents version 3.3.10 of FFTW, the
 <em>Fastest Fourier Transform in the West</em>.  FFTW is a comprehensive
 collection of fast C routines for computing the discrete Fourier
 transform (DFT) and various special cases thereof.
-<a name="index-discrete-Fourier-transform"></a>
-<a name="index-DFT"></a>
+<span id="index-discrete-Fourier-transform"></span>
+<span id="index-DFT"></span>
 </p><ul>
 <li> FFTW computes the DFT of complex data, real data, even-
   or odd-symmetric real data (these symmetric transforms are usually
@@ -110,7 +99,7 @@ e.g. <cite>The Fast Fourier Transform and Its Applications</cite> by E. O. Brigh
 (Prentice-Hall, Englewood Cliffs, NJ, 1988).
 <a href="http://www.fftw.org">Our web page</a> also has links to FFT-related
 information online.
-<a name="index-FFTW"></a>
+<span id="index-FFTW"></span>
 </p>
 
 <p>In order to use FFTW effectively, you need to learn one basic concept
@@ -120,11 +109,11 @@ details of the underlying hardware in order to maximize performance.
 Hence, the computation of the transform is split into two phases.
 First, FFTW&rsquo;s <em>planner</em> &ldquo;learns&rdquo; the fastest way to compute the
 transform on your machine.  The planner
-<a name="index-planner"></a>
+<span id="index-planner"></span>
 produces a data structure called a <em>plan</em> that contains this
-<a name="index-plan"></a>
+<span id="index-plan"></span>
 information.  Subsequently, the plan is <em>executed</em>
-<a name="index-execute"></a>
+<span id="index-execute"></span>
 to transform the array of input data as dictated by the plan.  The
 plan can be reused as many times as needed.  In typical
 high-performance applications, many transforms of the same size are
@@ -150,9 +139,9 @@ generality.
 <p>We expect that most users will be best served by the basic interface,
 whereas the guru interface requires careful attention to the
 documentation to avoid problems.
-<a name="index-basic-interface"></a>
-<a name="index-advanced-interface"></a>
-<a name="index-guru-interface"></a>
+<span id="index-basic-interface"></span>
+<span id="index-advanced-interface"></span>
+<span id="index-guru-interface"></span>
 </p>
 
 <p>Besides the automatic performance adaptation performed by the planner,
@@ -167,8 +156,8 @@ slower general-purpose routine.  If you need efficient transforms of
 other sizes, you can use FFTW&rsquo;s code generator, which produces fast C
 programs (&ldquo;codelets&rdquo;) for any particular array size you may care
 about.
-<a name="index-code-generator"></a>
-<a name="index-codelet"></a>
+<span id="index-code-generator"></span>
+<span id="index-codelet"></span>
 For example, if you need transforms of size
 513&nbsp;=&nbsp;19*3<sup>3</sup>,
 you can customize FFTW to support the factor <em>19</em> efficiently.
@@ -178,7 +167,7 @@ Implementation of FFTW3,&rdquo; by M. Frigo and S. G. Johnson, which was an
 invited paper in <cite>Proc. IEEE</cite> <b>93</b> (2), p. 216 (2005).  The
 code generator is described in the paper &ldquo;A fast Fourier transform
 compiler&rdquo;,
-<a name="index-compiler"></a>
+<span id="index-compiler"></span>
 by M. Frigo, in the <cite>Proceedings of the 1999 ACM SIGPLAN Conference
 on Programming Language Design and Implementation (PLDI), Atlanta,
 Georgia, May 1999</cite>.  These papers, along with the latest version of
@@ -192,30 +181,30 @@ for prime sizes, and a split-radix algorithm (with a
 &ldquo;conjugate-pair&rdquo; variation pointed out to us by Dan Bernstein).
 FFTW&rsquo;s code generator also produces new algorithms that we do not
 completely understand.
-<a name="index-algorithm"></a>
+<span id="index-algorithm"></span>
 The reader is referred to the cited papers for the appropriate
 references.
 </p>
 <p>The rest of this manual is organized as follows.  We first discuss the
 sequential (single-processor) implementation.  We start by describing
-the basic interface/features of FFTW in <a href="Tutorial.html#Tutorial">Tutorial</a>.  
-Next, <a href="Other-Important-Topics.html#Other-Important-Topics">Other Important Topics</a> discusses data alignment
-(see <a href="SIMD-alignment-and-fftw_005fmalloc.html#SIMD-alignment-and-fftw_005fmalloc">SIMD alignment and fftw_malloc</a>),
+the basic interface/features of FFTW in <a href="Tutorial.html">Tutorial</a>.  
+Next, <a href="Other-Important-Topics.html">Other Important Topics</a> discusses data alignment
+(see <a href="SIMD-alignment-and-fftw_005fmalloc.html">SIMD alignment and fftw_malloc</a>),
 the storage scheme of multi-dimensional arrays
-(see <a href="Multi_002ddimensional-Array-Format.html#Multi_002ddimensional-Array-Format">Multi-dimensional Array Format</a>), and FFTW&rsquo;s mechanism for
-storing plans on disk (see <a href="Words-of-Wisdom_002dSaving-Plans.html#Words-of-Wisdom_002dSaving-Plans">Words of Wisdom-Saving Plans</a>).  Next,
-<a href="FFTW-Reference.html#FFTW-Reference">FFTW Reference</a> provides comprehensive documentation of all
+(see <a href="Multi_002ddimensional-Array-Format.html">Multi-dimensional Array Format</a>), and FFTW&rsquo;s mechanism for
+storing plans on disk (see <a href="Words-of-Wisdom_002dSaving-Plans.html">Words of Wisdom-Saving Plans</a>).  Next,
+<a href="FFTW-Reference.html">FFTW Reference</a> provides comprehensive documentation of all
 FFTW&rsquo;s features.  Parallel transforms are discussed in their own
-chapters: <a href="Multi_002dthreaded-FFTW.html#Multi_002dthreaded-FFTW">Multi-threaded FFTW</a> and <a href="Distributed_002dmemory-FFTW-with-MPI.html#Distributed_002dmemory-FFTW-with-MPI">Distributed-memory FFTW with MPI</a>.  Fortran programmers can also use FFTW, as described in
-<a href="Calling-FFTW-from-Legacy-Fortran.html#Calling-FFTW-from-Legacy-Fortran">Calling FFTW from Legacy Fortran</a> and <a href="Calling-FFTW-from-Modern-Fortran.html#Calling-FFTW-from-Modern-Fortran">Calling FFTW from Modern Fortran</a>.  <a href="Installation-and-Customization.html#Installation-and-Customization">Installation and Customization</a> explains how to
+chapters: <a href="Multi_002dthreaded-FFTW.html">Multi-threaded FFTW</a> and <a href="Distributed_002dmemory-FFTW-with-MPI.html">Distributed-memory FFTW with MPI</a>.  Fortran programmers can also use FFTW, as described in
+<a href="Calling-FFTW-from-Legacy-Fortran.html">Calling FFTW from Legacy Fortran</a> and <a href="Calling-FFTW-from-Modern-Fortran.html">Calling FFTW from Modern Fortran</a>.  <a href="Installation-and-Customization.html">Installation and Customization</a> explains how to
 install FFTW in your computer system and how to adapt FFTW to your
-needs.  License and copyright information is given in <a href="License-and-Copyright.html#License-and-Copyright">License and Copyright</a>.  Finally, we thank all the people who helped us in
-<a href="Acknowledgments.html#Acknowledgments">Acknowledgments</a>.
+needs.  License and copyright information is given in <a href="License-and-Copyright.html">License and Copyright</a>.  Finally, we thank all the people who helped us in
+<a href="Acknowledgments.html">Acknowledgments</a>.
 </p>
 <hr>
 <div class="header">
 <p>
-Next: <a href="Tutorial.html#Tutorial" accesskey="n" rel="next">Tutorial</a>, Previous: <a href="index.html#Top" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html#Top" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Tutorial.html" accesskey="n" rel="next">Tutorial</a>, Previous: <a href="index.html" accesskey="p" rel="prev">Top</a>, Up: <a href="index.html" accesskey="u" rel="up">Top</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

@@ -51,9 +51,11 @@ c
 c
 c     set up the structure and mechanics calculation
 c
+      ixyz = 0
       call initial
       call getcart (ixyz)
       call mechanic
+      xyzfile = filename
 c
 c     get the desired types of analysis to be performed
 c
@@ -180,25 +182,6 @@ c
          debug = .false.
       end if
 c
-c     reopen the coordinates file and read the first structure
-c
-      frame = 0
-      close (unit=ixyz)
-      ixyz = freeunit ()
-      xyzfile = filename
-      if (archive) then
-         call suffix (xyzfile,'xyz','old')
-         open (unit=ixyz,file=xyzfile,status ='old')
-         rewind (unit=ixyz)
-         call readxyz (ixyz)
-      else if (binary) then
-         call suffix (xyzfile,'dcd','old')
-         open (unit=ixyz,file=xyzfile,form='unformatted',status ='old')
-         rewind (unit=ixyz)
-         first = .true.
-         call readdcd (ixyz,first)
-      end if
-c
 c     get parameters used for molecular mechanics potentials
 c
       if (doparam .and. doconect) then
@@ -219,6 +202,7 @@ c
 c
 c     perform analysis for each successive coordinate structure
 c
+      frame = 0
       do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
@@ -948,7 +932,7 @@ c     ##############################################################
 c
 c
 c     "saveyze" prints the atomic forces and/or the induced dipoles
-c     to separate external disk files
+c     to separate external files
 c
 c
       subroutine saveyze (frame)
@@ -1232,6 +1216,7 @@ c
       use polpot
       use potent
       use repel
+      use solpot
       use solute
       use strbnd
       use strtor
@@ -1389,7 +1374,7 @@ c
      &                    2x,'Valence',2x,'Description',/)
             end if
             write (iout,310)  i,name(i),type(i),class(i),atomic(i),
-     &                        mass(i),valence(i),story(i)
+     &                        mass(i),valnum(i),story(i)
   310       format (i6,5x,a3,2i7,i6,f10.3,i5,5x,a24)
          end if
       end do
@@ -1822,11 +1807,12 @@ c
                   header = .false.
                   write (iout,630)
   630             format (/,' Torsion-Torsion Parameters :',
-     &                    //,20x,'Atom Numbers',18x,'Spline Grid',/)
+     &                    //,20x,'Atom Numbers',15x,'Spline Grid',
+     &                       6x,'Tier',/)
                end if
                j = itt(2,i)
-               write (iout,640)  i,ia,ib,ic,id,ie,tnx(j),tny(j)
-  640          format (i6,3x,5i6,10x,2i6)
+               write (iout,640)  i,ia,ib,ic,id,ie,tnx(j),tny(j),ttier(j)
+  640          format (i6,3x,5i6,7x,2i6,7x,a3)
             end if
          end do
       end if
@@ -2172,13 +2158,36 @@ c
                k = k + 1
                if (header) then
                   header = .false.
-                  write (iout,980)
-  980             format (/,' Implicit Solvation Parameters :',
-     &                    //,10x,'Atom Number',13x,'Radius',
-     &                       3x,'ASP Value',/)
+                  if (solvtyp(1:2).eq.'GK') then
+                     write (iout,980)
+  980                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',11x,'Rsolv',
+     &                          4x,'Rdescr',5x,'S-HCT',4x,'S-Neck',
+     &                          3x,'Surface',/)
+                  else if (solvtyp(1:2).eq.'PB') then
+                     write (iout,990)
+  990                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',10x,'Radius',
+     &                          5x,'S-HCT',4x,'S-Neck',3x,'Surface',/)
+                  else
+                     write (iout,1000)
+ 1000                format (/,' Implicit Solvation Parameters :',
+     &                       //,10x,'Atom Number',10x,'Radius',
+     &                          3x,'Surface',/)
+                  end if
                end if
-               write (iout,990)  k,i,rsolv(i),asolv(i)
-  990          format (i6,3x,i6,15x,2f10.4)
+               if (solvtyp(1:2).eq.'GK') then
+                  write (iout,1010)  k,i,rsolv(i),rdescr(i),shct(i),
+     &                               sneck(i),asolv(i)
+ 1010             format (i6,3x,i6,12x,5f10.4)
+               else if (solvtyp(1:2).eq.'PB') then
+                  write (iout,1020)  k,i,rsolv(i),shct(i),sneck(i),
+     &                               asolv(i)
+ 1020             format (i6,3x,i6,12x,4f10.4)
+               else
+                  write (iout,1030)  k,i,rsolv(i),asolv(i)
+ 1030             format (i6,3x,i6,12x,2f10.4)
+               end if
             end if
          end do
       end if
@@ -2192,13 +2201,13 @@ c
             j = class(ia)
             if (header) then
                header = .false.
-               write (iout,1000)
- 1000          format (/,' Conjugated Pi-Atom Parameters :',
+               write (iout,1040)
+ 1040          format (/,' Conjugated Pi-Atom Parameters :',
      &                 //,10x,'Atom Number',14x,'Nelect',
      &                    6x,'Ionize',4x,'Repulsion',/)
             end if
-            write (iout,1010)  i,ia,electron(j),ionize(j),repulse(j)
- 1010       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
+            write (iout,1050)  i,ia,electron(j),ionize(j),repulse(j)
+ 1050       format (i6,3x,i6,17x,f8.1,3x,f10.4,2x,f10.4)
          end do
       end if
 c
@@ -2211,13 +2220,13 @@ c
             ib = ibpi(3,i)
             if (header) then
                header = .false.
-               write (iout,1020)
- 1020          format (/,' Conjugated Pi-Bond Parameters :',
+               write (iout,1060)
+ 1060          format (/,' Conjugated Pi-Bond Parameters :',
      &                 //,10x,'Atom Numbers',21x,'K Slope',
      &                    3x,'L Slope',/)
             end if
-            write (iout,1030)  i,ia,ib,kslope(i),lslope(i)
- 1030       format (i6,3x,2i6,19x,2f10.4)
+            write (iout,1070)  i,ia,ib,kslope(i),lslope(i)
+ 1070       format (i6,3x,2i6,19x,2f10.4)
          end do
       end if
       return
@@ -2352,7 +2361,7 @@ c
      &                    2x,'Valence',2x,'Description',/)
             end if
             write (iout,160)  i,name(i),type(i),class(i),atomic(i),
-     &                        mass(i),valence(i),story(i)
+     &                        mass(i),valnum(i),story(i)
   160       format (i6,5x,a3,2i7,i6,f10.3,i5,5x,a24)
          end if
       end do

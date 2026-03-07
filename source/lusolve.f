@@ -14,7 +14,7 @@ c
 c
 c     "lusolve" uses a LU factorization with partial pivoting to solve
 c     the linear system Ax = b, returning "x" in "b"; "A" is the upper
-c     triangle of a symmetric matrix and the diagonal stored by rows
+c     triangle and diagonal of a symmetric matrix stored by rows
 c
 c     literature reference:
 c

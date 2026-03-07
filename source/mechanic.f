@@ -27,12 +27,14 @@ c
       call attach
       call active
 c
-c     find bonds, angles, torsions, bitorsions and small rings
+c     find bonds, angles, torsions, extensions and small rings
 c
       call bonds
       call angles
       call torsions
       call bitors
+      call tritors
+      call tettors
       call rings
 c
 c     get the base force field from parameter file and keyfile
@@ -58,6 +60,12 @@ c     assign atoms to molecules and set the atom groups
 c
       call molecule
       call cluster
+c
+c     search for and store biomolecule residues and sequences
+c
+      call findpro
+      call findnuc
+      call findseq
 c
 c     find any pisystem atoms, bonds and torsional angles
 c
@@ -115,7 +123,7 @@ c
 c
 c     set any holonomic interatomic distance constraints
 c
-      call shakeup
+      call kfreeze
 c
 c     set hybrid parameter values for free energy perturbation
 c

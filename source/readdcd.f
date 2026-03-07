@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "readdcd" reads in a set of Cartesian coordinates from an
-c     external disk file in CHARMM DCD binary format
+c     external file in CHARMM DCD binary format
 c
 c
       subroutine readdcd (idcd,first)
@@ -92,19 +92,16 @@ c
          call fatal
       end if
 c
-c     read the lattice values based on header flag value
+c     read the lattice values based on header flag value;
+c     using angle values is NAMD style, cosine values is CHARMM
 c
       abort = .true.
       if (use_bounds) then
          call unitcell
-         read (idcd,err=40,end=60)  xbox,gamma_cos,ybox,beta_cos,
-     &                              alpha_cos,zbox
-         alpha = 90.0d0
-         beta = 90.0d0
-         gamma = 90.0d0
-         if (alpha_cos .ne. 0.0d0)  alpha = radian * acos(alpha_cos)
-         if (beta_cos .ne. 0.0d0)  beta = radian * acos(beta_cos)
-         if (gamma_cos .ne. 0.0d0)  gamma = radian * acos(gamma_cos)
+         read (idcd,err=40,end=60)  xbox,gamma,ybox,beta,alpha,zbox
+         if (abs(alpha) .le. 1.0d0)  alpha = radian * acos(alpha)
+         if (abs(beta) .le. 1.0d0)  beta = radian * acos(beta)
+         if (abs(gamma) .le. 1.0d0)  gamma = radian * acos(gamma)
          call lattice
       end if
 c

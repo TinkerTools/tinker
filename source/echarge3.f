@@ -263,7 +263,7 @@ c
      &                             6x,'Energy',/)
                      end if
                      write (iout,30)  i,name(i),k,name(k),
-     &                                pchg(ii),pchg(kk),r,e
+     &                                pchg(i),pchg(k),r,e
    30                format (' Charge',4x,2(i7,'-',a3),8x,
      &                          2f7.2,f11.4,f12.4)
                   end if
@@ -401,7 +401,7 @@ c
      &                                6x,'Energy',/)
                         end if
                         write (iout,50)  i,name(i),k,name(k),
-     &                                   pchg(ii),pchg(kk),r,e
+     &                                   pchg(i),pchg(k),r,e
    50                   format (' Charge',4x,2(i7,'-',a3),1x,
      &                             '(XTAL)',1x,2f7.2,f11.4,f12.4)
                      end if
@@ -843,7 +843,7 @@ c
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
 !$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
-!$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
+!$OMP DO reduction(+:ec,nec,aec,einter)
 c
 c     compute and partition the charge interaction energy
 c
@@ -1034,7 +1034,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
@@ -1096,6 +1096,24 @@ c
          nec = nec + 1
          aec(i) = aec(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fs * sum**2
+         ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1404,7 +1422,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8, allocatable :: cscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -1473,6 +1491,24 @@ c
          nec = nec + 1
          aec(i) = aec(i) + e
       end do
+c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fs * sum**2
+         ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1740,7 +1776,7 @@ c
       real*8 xr,yr,zr
       real*8 xd,yd,zd
       real*8 erfc,erfterm
-      real*8 scale
+      real*8 sum,scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
       logical header,huge
@@ -1803,6 +1839,24 @@ c
          aec(i) = aec(i) + e
       end do
 c
+c     compute the uniform background charge correction term
+c
+      fs = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, nion
+         i = iion(ii)
+         sum = sum + pchg(i)
+      end do
+      if (sum .ne. 0.0d0) then
+         e = fs * sum**2
+         ec = ec + e
+         nec = nec + 1
+         do ii = 1, nion
+            i = iion(ii)
+            aec(i) = aec(i) + e/dble(nion)
+         end do
+      end if
+c
 c     compute the cell dipole boundary correction term
 c
       if (boundary .eq. 'VACUUM') then
@@ -1835,7 +1889,7 @@ c
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,off2,
 !$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
-!$OMP DO reduction(+:ec,nec,aec,einter) schedule(guided)
+!$OMP DO reduction(+:ec,nec,aec,einter)
 c
 c     compute the real space portion of the Ewald summation
 c

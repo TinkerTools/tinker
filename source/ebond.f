@@ -42,7 +42,7 @@ c
 !$OMP PARALLEL default(private) shared(nbond,ibnd,bl,bk,use,
 !$OMP& x,y,z,cbnd,qbnd,bndtyp,bndunit,use_group,use_polymer)
 !$OMP& shared(eb)
-!$OMP DO reduction(+:eb) schedule(guided)
+!$OMP DO reduction(+:eb)
 c
 c     calculate the bond stretching energy term
 c

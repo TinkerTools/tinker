@@ -84,7 +84,7 @@ c
 !$OMP& use,x,y,z,anat,kaa,aaunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eaa,neaa,aeaa)
-!$OMP DO reduction(+:eaa,neaa,aeaa) schedule(guided)
+!$OMP DO reduction(+:eaa,neaa,aeaa)
 c
 c     find the energy of each angle-angle interaction
 c

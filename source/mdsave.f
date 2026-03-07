@@ -40,12 +40,13 @@ c
       use uatom
       use units
       implicit none
-      integer i,j,ii
+      integer i,j,lext
       integer istep
       integer ixyz,iind
       integer ivel,ifrc,istc
-      integer iend,isave,lext
-      integer freeunit,trimtext
+      integer iend,isave
+      integer freeunit
+      integer trimtext
       integer modsave
       real*8 dt,pico
       real*8 epot,eksum
@@ -152,7 +153,7 @@ c
 c
 c     move stray molecules into periodic box if desired
 c
-      if (use_bounds)  call bounds
+      if (use_wrap)  call bounds
 c
 c     compute center of mass if saving dipole moment
 c
@@ -324,11 +325,13 @@ c
   420    format (' Velocity File',15x,a)
       end if
 c
-c     save the force vector components for the current step,
-c     only correct for single time step Cartesian integrators
+c     save the force vector components for the current step; not
+c     available for rigid body or multiple time step integrators
 c
       if (frcsave .and. integrate.ne.'RIGIDBODY'
-     &       .and. integrate.ne.'RESPA') then
+     &       .and. integrate.ne.'VRESPA'
+     &       .and. integrate.ne.'BRESPA'
+     &       .and. integrate.ne.'SRESPA') then
          ifrc = freeunit ()
          if (cyclesave) then
             frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'

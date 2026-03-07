@@ -24,6 +24,7 @@ mv FREEFIX.ZIP   freefix.zip
 mv GDA.ZIP       gda.zip
 mv INTEDIT.ZIP   intedit.zip
 mv INTXYZ.ZIP    intxyz.zip
+mv MDAVG.ZIP     mdavg.zip
 mv MINIMIZE.ZIP  minimize.zip
 mv MINIROT.ZIP   minirot.zip
 mv MINRIGID.ZIP  minrigid.zip
@@ -58,6 +59,7 @@ mv TESTHESS.ZIP  testhess.zip
 mv TESTPAIR.ZIP  testpair.zip
 mv TESTPOL.ZIP   testpol.zip
 mv TESTROT.ZIP   testrot.zip
+mv TESTSURF.ZIP  testsurf.zip
 mv TESTVIR.ZIP   testvir.zip
 mv TIMER.ZIP     timer.zip
 mv TIMEROT.ZIP   timerot.zip

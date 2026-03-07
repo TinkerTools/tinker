@@ -92,7 +92,7 @@ c
 !$OMP& anat,tors1,tors2,tors3,use,x,y,z,atorunit,eps,use_group,
 !$OMP& use_polymer,name,verbose,debug,header,iout)
 !$OMP& shared(eat,neat,aeat)
-!$OMP DO reduction(+:eat,neat,aeat) schedule(guided)
+!$OMP DO reduction(+:eat,neat,aeat)
 c
 c     calculate the angle-torsion interaction energy term
 c

@@ -10,6 +10,7 @@ extern double TINKER_MOD(bound, polycut2);
 extern int TINKER_MOD(bound, use_bounds);
 extern int TINKER_MOD(bound, use_replica);
 extern int TINKER_MOD(bound, use_polymer);
+extern int TINKER_MOD(bound, use_wrap);
 #ifdef __cplusplus
 }
 #endif

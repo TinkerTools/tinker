@@ -7,3 +7,5 @@
        when linking Tinker on Windows. For example, they could be static
        compiler libraries, static version of FFTW libraries, etc.
 
+       Unless otherwise specified, libraries are for Intel x86_64 CPUs.
+

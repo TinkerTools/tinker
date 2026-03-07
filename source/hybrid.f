@@ -100,7 +100,7 @@ c
          name(k) = symbol(it)
          atomic(k) = atmnum(it)
          mass(k) = weight(it)
-         valence(k) = ligand(it)
+         valnum(k) = ligand(it)
          story(k) = describe(it)
       end do
       return

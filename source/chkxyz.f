@@ -37,7 +37,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,eps,clash,header)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     loop over atom pairs testing for identical coordinates
 c

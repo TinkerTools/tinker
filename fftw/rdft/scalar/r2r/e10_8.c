@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:08:10 EDT 2018 */
+/* Generated on Tue Sep 14 10:47:21 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -99,10 +99,9 @@ static void e10_8(const R *I, R *O, stride is, stride os, INT v, INT ivs, INT ov
      }
 }
 
-static const kr2r_desc desc = { 8, "e10_8", {16, 8, 10, 0}, &GENUS, REDFT10 };
+static const kr2r_desc desc = { 8, "e10_8", { 16, 8, 10, 0 }, &GENUS, REDFT10 };
 
-void X(codelet_e10_8) (planner *p) {
-     X(kr2r_register) (p, e10_8, &desc);
+void X(codelet_e10_8) (planner *p) { X(kr2r_register) (p, e10_8, &desc);
 }
 
 #else
@@ -181,10 +180,9 @@ static void e10_8(const R *I, R *O, stride is, stride os, INT v, INT ivs, INT ov
      }
 }
 
-static const kr2r_desc desc = { 8, "e10_8", {20, 10, 6, 0}, &GENUS, REDFT10 };
+static const kr2r_desc desc = { 8, "e10_8", { 20, 10, 6, 0 }, &GENUS, REDFT10 };
 
-void X(codelet_e10_8) (planner *p) {
-     X(kr2r_register) (p, e10_8, &desc);
+void X(codelet_e10_8) (planner *p) { X(kr2r_register) (p, e10_8, &desc);
 }
 
 #endif

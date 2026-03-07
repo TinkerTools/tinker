@@ -138,7 +138,7 @@ c
    10       continue
             k = 1
             do while (list(k) .ne. 0)
-               if (list(k) .gt. 0) then
+               if (list(k).gt.0 .and. list(k).le.n) then
                   j = list(k)
                   nmut = nmut + 1
                   imut(nmut) = j
@@ -149,7 +149,7 @@ c
                   class1(nmut) = class(j)
                   k = k + 1
                else
-                  do j = abs(list(k)), abs(list(k+1))
+                  do j = max(1,abs(list(k))), min(n,abs(list(k+1)))
                      nmut = nmut + 1
                      imut(nmut) = j
                      mut(j) = .true.
@@ -191,6 +191,12 @@ c
          if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
       end if
 c
+c     scale implicit solvation parameter values based on lambda
+c
+      if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
+         call altsolv
+      end if
+c
 c     turn off hybrid potentials if no sites are mutated
 c
       use_mutate = .true.
@@ -199,15 +205,13 @@ c
 c     write status of current hybrid potential lambda values
 c
       if (use_mutate .and. .not.silent) then
-         write (iout,40)  vlambda
-   40    format (/,' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for van der Waals')
-         write (iout,50)  elambda
-   50    format (' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for Electrostatics')
-         write (iout,60)  tlambda
-   60    format (' Free Energy Perturbation :',f15.3,
-     &              ' Lambda for Torsional Angles')
+         write (iout,40)
+   40    format (/,' Free Energy Perturbation Parameters :')
+         write (iout,50)  nmut,vlambda,elambda,tlambda
+   50    format (/,' Number of FEP Hybrid Atoms',9x,i8,
+     &           /,' van der Waals Lambda Value',9x,f8.3,
+     &           /,' Electrostatics Lambda Value',8x,f8.3,
+     &           /,' Torsion Angle Lambda Value',9x,f8.3)
       end if
 c
 c     perform deallocation of some local arrays
@@ -383,6 +387,44 @@ c
                      tors6(1,i) = tors6(1,i) * tlambda
                   end if
                end do
+            end if
+         end do
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine altsolv  --  mutated solvation parameters  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "altsolv" constructs mutated implicit solvation parameters
+c     based on the lambda mutation parameter "elambda"
+c
+c
+      subroutine altsolv
+      use atoms
+      use mutant
+      use nonpol
+      use potent
+      use solute
+      implicit none
+      integer i
+c
+c
+c     set scaled parameters for implicit solvation models
+c
+      if (use_solv) then
+         do i = 1, n
+            if (mut(i)) then
+               shct(i) = shct(i) * elambda
+               radcav(i) = radcav(i) * elambda
+               raddsp(i) = raddsp(i) * elambda
+               epsdsp(i) = epsdsp(i) * elambda
+               cdsp(i) = cdsp(i) * elambda
             end if
          end do
       end if

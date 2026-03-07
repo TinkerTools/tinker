@@ -210,7 +210,7 @@ c
                   d2e(3,2) = d2e(2,3)
                   d2e(3,3) = termz*zr + dedr
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   do j = 1, 3
                      hessx(j,i) = hessx(j,i) + d2e(1,j)
@@ -370,7 +370,7 @@ c
                         d2e(3,2) = d2e(2,3)
                         d2e(3,3) = termz*zr + dedr
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                         do j = 1, 3
                            hessx(j,i) = hessx(j,i) + d2e(1,j)

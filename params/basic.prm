@@ -28,8 +28,8 @@ optimization of crude structures to avoid steric clashes. The valence
 parameters are set to idealized values. The vdw values model sterics
 and hydrogen bonds. Electrostatics are treated via bond dipoles.
 
-Atom type numbers are just ten times the atomic number plus the number
-of attached atoms, thus tetravalent carbon is atom type 64.
+The atom type numbers are just ten times the atomic number plus the
+number of attached atoms, e.g. tetravalent carbon is atom type 64.
 
 
       #############################
@@ -77,6 +77,7 @@ atom        171    Cl    "Cl Monovalent"               17    35.500    1
 atom        180    Ar    "Ar Atom"                     18    39.900    0
 atom        190    K+    "K Ion"                       19    39.100    0
 atom        200    Ca+   "Ca+2 Ion"                    20    40.100    0
+atom        300    Zn+   "Zn+2 Ion"                    30    65.400    0
 atom        350    Br-   "Br- Ion"                     35    79.000    0
 atom        351    Br    "Br Monovalent"               35    79.000    1
 atom        360    Kr    "Kr Atom"                     36    83.800    0
@@ -167,6 +168,8 @@ bond         63   81          700.00     1.2200
 bond         63   82          500.00     1.3500
 bond         63   91          350.00     1.3500
 bond         63  162          300.00     1.7200
+bond         63  163          300.00     1.7400
+bond         63  164          300.00     1.7600
 bond         63  171          200.00     1.7300
 bond         63  351          150.00     1.8900
 bond         63  531          150.00     2.0700
@@ -178,19 +181,24 @@ bond         64   82          350.00     1.4100
 bond         64   83          350.00     1.4100
 bond         64   91          400.00     1.3900
 bond         64  144          200.00     1.8700
+bond         64  154          200.00     1.7800
 bond         64  162          200.00     1.8100
-bond         64  164          200.00     1.7800
+bond         64  163          200.00     1.7900
+bond         64  164          200.00     1.7700
 bond         64  171          200.00     1.7900
 bond         64  351          150.00     1.9500
 bond         64  531          150.00     2.1600
 bond         72   72          550.00     1.3200
 bond         72   73          550.00     1.3100
+bond         72   82          550.00     1.3900
+bond         72  164          380.00     1.6900
 bond         73   73          550.00     1.3700
 bond         73   81          550.00     1.2200
 bond         73  154          380.00     1.6800
-bond         73  164          380.00     1.7100
+bond         73  164          380.00     1.6400
+bond         74  164          380.00     1.7300
 bond         81  154          640.00     1.4800
-bond         81  164          640.00     1.4600
+bond         81  164          640.00     1.4400
 bond         82  154          380.00     1.6100
 bond         82   82          300.00     1.4500
 bond        162  162          200.00     2.0200
@@ -217,6 +225,7 @@ angle        11   63   64      35.00     120.00
 angle        11   63   72      35.00     120.00
 angle        11   63   73      35.00     120.00
 angle        11   63   74      35.00     120.00
+angle        11   63   81      35.00     120.00
 angle        11   63   82      45.00     120.00
 angle        11   63   91      60.00     120.00
 angle        11   63  162      30.00     120.00
@@ -238,6 +247,8 @@ angle        63   63   81      80.00     120.00
 angle        63   63   82      70.00     120.00
 angle        63   63   91      80.00     120.00
 angle        63   63  162      40.00     120.00
+angle        63   63  163      40.00     120.00
+angle        63   63  164      40.00     120.00
 angle        63   63  171      50.00     120.00
 angle        63   63  351      45.00     120.00
 angle        63   63  531      40.00     120.00
@@ -258,17 +269,20 @@ angle        72   63  162      35.00     120.00
 angle        73   63   73      70.00     120.00
 angle        73   63   81      80.00     120.00
 angle        73   63   82      60.00     120.00
+angle        73   63  162      70.00     120.00
 angle        81   63   81      80.00     120.00
 angle        81   63   82      80.00     120.00
+angle       162   63  162      70.00     120.00
 angle        11   64   11      35.00     109.50
 angle        11   64   62      35.00     109.50
 angle        11   64   63      35.00     109.50
-angle        11   64   64      35.00     109.50
+angle        11   64   64      80.00     108.30
 angle        11   64   72      55.00     109.50
 angle        11   64   73      60.00     109.50
 angle        11   64   74      55.00     109.50
 angle        11   64   82      60.00     109.50
 angle        11   64   91      60.00     109.50
+angle        11   64  154      55.00     109.50
 angle        11   64  162      55.00     109.50
 angle        11   64  164      55.00     109.50
 angle        11   64  171      35.00     109.50
@@ -301,17 +315,22 @@ angle        72   64   73      70.00     109.50
 angle        73   64   73      70.00     109.50
 angle        73   64   82      70.00     109.50
 angle        73   64  162      40.00     109.50
+angle        74   64  154      55.00     109.50
 angle        82   64   82      90.00     109.50
 angle        82   64  162      50.00     109.50
+angle        91   64   91     150.00     108.00
 angle       171   64  171      80.00     109.50
 angle        63   72   63      70.00     120.00
 angle        63   72   64      50.00     120.00
 angle        63   72   72      70.00     108.20
 angle        63   72   73      70.00     120.00
+angle        63   72   82      70.00     108.20
+angle        63   72  164      55.00     120.00
 angle        72   72   73      70.00     108.80
 angle        11   73   11      45.00     109.50
 angle        11   73   63      35.00     120.00
 angle        11   73   64      35.00     109.50
+angle        11   73   72      35.00     120.00
 angle        11   73   73      35.00     120.00
 angle        11   73  154      35.00     109.50
 angle        11   73  164      35.00     109.50
@@ -323,7 +342,10 @@ angle        63   73   81      80.00     120.00
 angle        63   73  164      55.00     120.00
 angle        64   73   64      50.00     109.50
 angle        64   73   72      70.00     120.00
+angle        64   73   73      50.00     109.50
 angle        64   73  154      45.00     110.00
+angle        64   73  164      55.00     120.00
+angle        73   73   81      80.00     120.00
 angle        81   73   81      80.00     120.00
 angle        11   74   11      45.00     109.50
 angle        11   74   63      35.00     109.50
@@ -337,13 +359,17 @@ angle        11   82   64      55.00     109.50
 angle        62   82   63      70.00     109.50
 angle        63   82   63      70.00     109.50
 angle        63   82   64      70.00     109.50
+angle        63   82   72      70.00     105.60
 angle        64   82   64      60.00     109.50
 angle        64   82   82      75.00     103.50
 angle        64   82  154     100.00     120.00
+angle        64  154   64      55.00     107.00
 angle        73  154   73      55.00     110.00
+angle        64  154   81      60.00     112.00
 angle        73  154   81      60.00     110.00
 angle        73  154   82      60.00     110.00
-angle        81  154   82      65.00     117.00
+angle        81  154   81      80.00     120.00
+angle        81  154   82      80.00     117.00
 angle        82  154   82      80.00     103.00
 angle        11  162   64      35.00      96.00
 angle        11  162  162      35.00      91.00
@@ -351,8 +377,12 @@ angle        63  162   63      50.00      98.50
 angle        63  162   64      50.00      98.00
 angle        64  162   64      50.00      96.00
 angle        64  162  162      85.00     103.00
+angle        63  164   72      75.00     101.10
+angle        63  164   73      75.00     101.10
+angle        63  164   81      75.00     103.00
 angle        64  164   73      75.00     101.10
 angle        64  164   81      75.00     103.00
+angle        72  164   81      70.00     108.80
 angle        73  164   81      70.00     108.80
 angle        81  164   81      65.00     114.00
 
@@ -388,15 +418,19 @@ torsion       0   63   73    0            5.000  180.0  2
 torsion       0   63   74    0
 torsion       0   63   82    0            5.000  180.0  2
 torsion       0   63  162    0            7.000  180.0  2
+torsion       0   63  164    0
 torsion       0   64   64    0            0.300    0.0  3
 torsion       0   64   72    0
 torsion       0   64   73    0
 torsion       0   64   74    0
 torsion       0   64   82    0            0.500    0.0  3
+torsion       0   64  154    0            0.300    0.0  3
 torsion       0   64  162    0            0.300    0.0  3
 torsion       0   64  164    0            0.300    0.0  3
 torsion       0   72   72    0           10.000  180.0  2
 torsion       0   72   73    0            7.000  180.0  2
+torsion       0   72   82    0           10.000  180.0  2
+torsion       0   72  164    0
 torsion       0   73   73    0            5.000  180.0  2
 torsion       0   73  154    0
 torsion       0   73  164    0
@@ -1244,7 +1278,7 @@ biotype     775    N       "Amide C-Terminus"                 73
 biotype     776    HN      "Amide C-Terminus"                 11
 biotype     777    N       "N-MeAmide C-Terminus"             73
 biotype     778    HN      "N-MeAmide C-Terminus"             11
-biotype     779    CH3     "N-MeAmide C-Terminus"             64
+biotype     779    C       "N-MeAmide C-Terminus"             64
 biotype     780    H       "N-MeAmide C-Terminus"             11
 biotype    1001    O5*     "Adenosine"                        82
 biotype    1002    C5*     "Adenosine"                        64
@@ -1501,17 +1535,18 @@ biotype    1252    P       "3'-Monophosphate P DNA"          154
 biotype    1253    OP      "3'-Monophosphate OP DNA"          82
 biotype    2001    O       "Water"                            82
 biotype    2002    H       "Water"                            11
-biotype    2003    LI      "Lithium Ion"                      30
-biotype    2004    NA      "Sodium Ion"                      110
-biotype    2005    K       "Potassium Ion"                   190
-biotype    2006    RB      "Rubidium Ion"                    370
-biotype    2007    CS      "Cesium Ion"                      550
-biotype    2008    MG      "Magnesium Ion"                   120
-biotype    2009    CA      "Calcium Ion"                     200
-biotype    2010    SR      "Strontium Ion"                   380
-biotype    2011    BA      "Barium Ion"                      560
-biotype    2012    F       "Fluoride Ion"                     90
-biotype    2013    CL      "Chloride Ion"                    170
-biotype    2014    BR      "Bromide Ion"                     350
-biotype    2015    I       "Iodide Ion"                      530
-biotype    2016    ZN      "Zinc Ion"                        300
+biotype    2003    EP      "Water"                             0
+biotype    2004    LI      "Lithium Ion"                      30
+biotype    2005    NA      "Sodium Ion"                      110
+biotype    2006    K       "Potassium Ion"                   190
+biotype    2007    RB      "Rubidium Ion"                    370
+biotype    2008    CS      "Cesium Ion"                      550
+biotype    2009    MG      "Magnesium Ion"                   120
+biotype    2010    CA      "Calcium Ion"                     200
+biotype    2011    SR      "Strontium Ion"                   380
+biotype    2012    BA      "Barium Ion"                      560
+biotype    2013    F       "Fluoride Ion"                     90
+biotype    2014    CL      "Chloride Ion"                    170
+biotype    2015    BR      "Bromide Ion"                     350
+biotype    2016    I       "Iodide Ion"                      530
+biotype    2017    ZN      "Zinc Ion"                        300

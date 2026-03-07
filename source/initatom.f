@@ -42,6 +42,10 @@ c     P. Pyykko and M. Atsumi, "Molecular Single-Bond Covalent Radii
 c     for Elements 1-118", Chemistry- A European Journal, 15, 187-197
 c     (2009)  [covalent radii for elements 97-112]
 c
+c     B. Fricke and J. T. Waber, "Atomic and Ionic Radii of Superheavy
+c     Elements", Journal of Chemical Physics, 56, 3246-3248 (1972)
+c     [atomic radii for elements 104-118]
+c
 c
       subroutine initatom
       use ptable
@@ -69,7 +73,8 @@ c
      &             'At ', 'Rn ', 'Fr ', 'Ra ', 'Ac ', 'Th ', 'Pa ',
      &             'U  ', 'Np ', 'Pu ', 'Am ', 'Cm ', 'Bk ', 'Cf ',
      &             'Es ', 'Fm ', 'Md ', 'No ', 'Lr ', 'Rf ', 'Db ',
-     &             'Sg ', 'Bh ', 'Hs ', 'Mt ', 'Ds ', 'Rg ', 'Cn ' /
+     &             'Sg ', 'Bh ', 'Hs ', 'Mt ', 'Ds ', 'Rg ', 'Cn ',
+     &             'Nh ', 'Fl ', 'Mc ', 'Lv ', 'Ts ', 'Og ' /
 c
 c     standard atomic weight for each element
 c
@@ -95,7 +100,8 @@ c
      &            247.070d0, 247.070d0, 251.080d0, 252.083d0, 257.095d0,
      &            258.098d0, 259.101d0, 262.110d0, 267.122d0, 270.131d0,
      &            269.129d0, 270.133d0, 270.134d0, 278.156d0, 281.165d0,
-     &            281.166d0, 285.177d0 /
+     &            281.166d0, 285.177d0, 286.182d0, 290.192d0, 290.196d0,
+     &            293.205d0, 294.211d0, 295.216d0 /
 c
 c     van der Waals radius for each element (Angstroms)
 c
@@ -115,9 +121,10 @@ c
      &             2.32d0, 2.45d0, 2.47d0, 2.60d0, 2.54d0, 2.93d0,
      &             2.88d0, 2.71d0, 2.82d0, 2.81d0, 2.80d0, 2.93d0,
      &             2.88d0, 2.71d0, 2.82d0, 2.81d0, 2.83d0, 3.05d0,
-     &             3.40d0, 3.05d0, 2.70d0, 0.00d0, 0.00d0, 0.00d0,
-     &             0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0, 0.00d0,
-     &             0.00d0, 0.00d0, 0.00d0, 0.00d0 /
+     &             3.40d0, 3.05d0, 2.70d0, 2.45d0, 2.46d0, 2.46d0,
+     &             2.46d0, 1.49d0, 1.42d0, 1.36d0, 1.31d0, 1.26d0,
+     &             1.22d0, 1.18d0, 1.14d0, 1.10d0, 1.31d0, 1.21d0,
+     &             1.77d0, 1.51d0, 1.38d0, 1.31d0 /
 c
 c     covalent radius for each element (Angstroms)
 c
@@ -139,7 +146,8 @@ c
      &             2.00d0, 1.96d0, 1.90d0, 1.87d0, 1.80d0, 1.69d0,
      &             1.68d0, 1.68d0, 1.65d0, 1.67d0, 1.73d0, 1.76d0,
      &             1.61d0, 1.57d0, 1.49d0, 1.43d0, 1.41d0, 1.34d0,
-     &             1.29d0, 1.28d0, 1.21d0, 1.22d0 /
+     &             1.29d0, 1.28d0, 1.21d0, 1.22d0, 1.36d0, 1.43d0,
+     &             1.62d0, 1.75d0, 1.65d0, 1.57d0 /
 c
 c
 c     set the symbol, weight and radii for each element
@@ -147,7 +155,6 @@ c
       do i = 1, maxele
          atmass(i) = amas(i)
          elemnt(i) = asym(i)
-         if (vrad(i) .eq. 0.0d0)  vrad(i) = 2.0d0
          vdwrad(i) = vrad(i)
          covrad(i) = crad(i)
       end do

@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: More DFTs of Real Data</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>More DFTs of Real Data (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: More DFTs of Real Data">
-<meta name="keywords" content="FFTW 3.3.8: More DFTs of Real Data">
+<meta name="description" content="More DFTs of Real Data (FFTW 3.3.10)">
+<meta name="keywords" content="More DFTs of Real Data (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Tutorial.html#Tutorial" rel="up" title="Tutorial">
-<link href="The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT" rel="next" title="The Halfcomplex-format DFT">
-<link href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data" rel="prev" title="Multi-Dimensional DFTs of Real Data">
+<link href="Tutorial.html" rel="up" title="Tutorial">
+<link href="The-Halfcomplex_002dformat-DFT.html" rel="next" title="The Halfcomplex-format DFT">
+<link href="Multi_002dDimensional-DFTs-of-Real-Data.html" rel="prev" title="Multi-Dimensional DFTs of Real Data">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,26 +59,24 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="More-DFTs-of-Real-Data"></a>
-<div class="header">
+<span id="More-DFTs-of-Real-Data"></span><div class="header">
 <p>
-Previous: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data" accesskey="p" rel="prev">Multi-Dimensional DFTs of Real Data</a>, Up: <a href="Tutorial.html#Tutorial" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html" accesskey="p" rel="prev">Multi-Dimensional DFTs of Real Data</a>, Up: <a href="Tutorial.html" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="More-DFTs-of-Real-Data-1"></a>
-<h3 class="section">2.5 More DFTs of Real Data</h3>
+<span id="More-DFTs-of-Real-Data-1"></span><h3 class="section">2.5 More DFTs of Real Data</h3>
 <table class="menu" border="0" cellspacing="0">
-<tr><td align="left" valign="top">&bull; <a href="The-Halfcomplex_002dformat-DFT.html#The-Halfcomplex_002dformat-DFT" accesskey="1">The Halfcomplex-format DFT</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="The-Halfcomplex_002dformat-DFT.html" accesskey="1">The Halfcomplex-format DFT</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="Real-even_002fodd-DFTs-_0028cosine_002fsine-transforms_0029.html#Real-even_002fodd-DFTs-_0028cosine_002fsine-transforms_0029" accesskey="2">Real even/odd DFTs (cosine/sine transforms)</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="Real-even_002fodd-DFTs-_0028cosine_002fsine-transforms_0029.html" accesskey="2">Real even/odd DFTs (cosine/sine transforms)</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
-<tr><td align="left" valign="top">&bull; <a href="The-Discrete-Hartley-Transform.html#The-Discrete-Hartley-Transform" accesskey="3">The Discrete Hartley Transform</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
+<tr><td align="left" valign="top">&bull; <a href="The-Discrete-Hartley-Transform.html" accesskey="3">The Discrete Hartley Transform</a></td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
 </td></tr>
 </table>
 
 <p>FFTW supports several other transform types via a unified <em>r2r</em>
 (real-to-real) interface,
-<a name="index-r2r"></a>
+<span id="index-r2r"></span>
 so called because it takes a real (<code>double</code>) array and outputs a
 real array of the same size.  These r2r transforms currently fall into
 three categories: DFTs of real input and complex-Hermitian output in
@@ -116,10 +105,10 @@ fftw_plan fftw_plan_r2r_3d(int n0, int n1, int n2,
 fftw_plan fftw_plan_r2r(int rank, const int *n, double *in, double *out,
                         const fftw_r2r_kind *kind, unsigned flags);
 </pre></div>
-<a name="index-fftw_005fplan_005fr2r_005f1d"></a>
-<a name="index-fftw_005fplan_005fr2r_005f2d"></a>
-<a name="index-fftw_005fplan_005fr2r_005f3d"></a>
-<a name="index-fftw_005fplan_005fr2r"></a>
+<span id="index-fftw_005fplan_005fr2r_005f1d"></span>
+<span id="index-fftw_005fplan_005fr2r_005f2d"></span>
+<span id="index-fftw_005fplan_005fr2r_005f3d"></span>
+<span id="index-fftw_005fplan_005fr2r"></span>
 
 <p>Just as for the complex DFT, these plan 1d/2d/3d/multi-dimensional
 transforms for contiguous arrays in row-major order, transforming (real)
@@ -135,8 +124,8 @@ an <i>O</i>(<i>n</i>&nbsp;log&nbsp;<i>n</i>)
 <p>Each dimension has a <em>kind</em> parameter, of type
 <code>fftw_r2r_kind</code>, specifying the kind of r2r transform to be used
 for that dimension.
-<a name="index-kind-_0028r2r_0029"></a>
-<a name="index-fftw_005fr2r_005fkind"></a>
+<span id="index-kind-_0028r2r_0029"></span>
+<span id="index-fftw_005fr2r_005fkind"></span>
 (In the case of <code>fftw_plan_r2r</code>, this is an array <code>kind[rank]</code>
 where <code>kind[i]</code> is the transform kind for the dimension
 <code>n[i]</code>.)  The kind can be one of a set of predefined constants,
@@ -159,7 +148,7 @@ competitive performance.
 <hr>
 <div class="header">
 <p>
-Previous: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html#Multi_002dDimensional-DFTs-of-Real-Data" accesskey="p" rel="prev">Multi-Dimensional DFTs of Real Data</a>, Up: <a href="Tutorial.html#Tutorial" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Multi_002dDimensional-DFTs-of-Real-Data.html" accesskey="p" rel="prev">Multi-Dimensional DFTs of Real Data</a>, Up: <a href="Tutorial.html" accesskey="u" rel="up">Tutorial</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 
 

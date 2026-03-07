@@ -109,7 +109,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,xcenter,ycenter,zcenter,weigh,mass)
-!$OMP DO reduction(+:xcenter,ycenter,zcenter,weigh) schedule(guided)
+!$OMP DO reduction(+:xcenter,ycenter,zcenter,weigh)
       do i = 1, n
          weigh = weigh + mass(i)
          xcenter = xcenter + x(i)*mass(i)

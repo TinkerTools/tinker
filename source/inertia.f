@@ -22,9 +22,9 @@ c        mode = 3     perform both of the above operations
 c
 c     literature reference:
 c
-c     Herbert Goldstein, "Classical Mechanics, 2nd Edition",
-c     Addison-Wesley, Reading, MA, 1980; see the Euler angle
-c     xyz convention in Appendix B
+c     H. Goldstein, C. Poole and J. Safko, "Classical Mechanics,
+c     3rd Edition", Addison-Wesley, Boston, MA, 2001; see the Euler
+c     angle xyz convention in Appendix A
 c
 c
       subroutine inertia (mode)

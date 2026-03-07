@@ -25,8 +25,8 @@ polarization            MUTUAL
 d-equals-p
 rep-12-scale            0.0
 rep-13-scale            0.0
-rep-14-scale            1.0
-rep-15-scale            1.0
+rep-14-scale            0.4
+rep-15-scale            0.8
 disp-12-scale           0.0
 disp-13-scale           0.0
 disp-14-scale           0.4
@@ -93,7 +93,7 @@ via fitting to SAPT energy decompositions on the S101 database
 
 Note: for the out-of-plane bending term, MMFF94 uses a Wilson-Decius-Cross
 form while HIPPO uses the Allinger formulation, so MMFF94 parameters are
-multiplied by 13.5 after unit conversion for use with AMOEBA
+multiplied by 13.5 after unit conversion for use here
 
 
       #############################

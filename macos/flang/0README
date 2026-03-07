@@ -1,0 +1,12 @@
+
+                     ####################################
+                     Tinker Notes for LLVM flang on macOS
+                     ####################################
+
+         This subdirectory contains a set of script files that can be
+         used to build the Tinker program package on a macOS system
+         using LLVM clang/flang compilers under OpenMP parallelization.
+         Some versions of clang do not enable building FFTW with OpenMP
+         support. In those cases it is possible to link Tinker compiled
+         under LLVM flang with FFTW libraries from GNU gcc.
+

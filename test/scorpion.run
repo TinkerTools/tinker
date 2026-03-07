@@ -1,0 +1,5 @@
+../bin/pdbxyz scorpion.cif 0
+../bin/analyze scorpion e | grep Total
+../bin/xyzpdb scorpion PDB
+../bin/analyze scorpion e | grep Total
+rm scorpion.xyz* scorpion.seq* scorpion.pdb*

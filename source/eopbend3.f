@@ -80,7 +80,7 @@ c
 !$OMP& x,y,z,opbtyp,copb,qopb,popb,sopb,opbunit,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eopb,neopb,aeopb)
-!$OMP DO reduction(+:eopb,neopb,aeopb) schedule(guided)
+!$OMP DO reduction(+:eopb,neopb,aeopb)
 c
 c     calculate the out-of-plane bending energy term
 c

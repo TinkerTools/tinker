@@ -78,7 +78,7 @@ c
 !$OMP PARALLEL default(private) shared(nopbend,iopb,iang,opbk,use,
 !$OMP& x,y,z,opbtyp,copb,qopb,popb,sopb,opbunit,use_group,use_polymer)
 !$OMP& shared(eopb,deopb,vir)
-!$OMP DO reduction(+:eopb,deopb,vir) schedule(guided)
+!$OMP DO reduction(+:eopb,deopb,vir)
 c
 c     calculate the out-of-plane bending energy and derivatives
 c

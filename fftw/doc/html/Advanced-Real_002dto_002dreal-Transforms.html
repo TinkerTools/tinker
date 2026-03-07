@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Advanced Real-to-real Transforms</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Advanced Real-to-real Transforms (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Advanced Real-to-real Transforms">
-<meta name="keywords" content="FFTW 3.3.8: Advanced Real-to-real Transforms">
+<meta name="description" content="Advanced Real-to-real Transforms (FFTW 3.3.10)">
+<meta name="keywords" content="Advanced Real-to-real Transforms (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Advanced-Interface.html#Advanced-Interface" rel="up" title="Advanced Interface">
-<link href="Guru-Interface.html#Guru-Interface" rel="next" title="Guru Interface">
-<link href="Advanced-Real_002ddata-DFTs.html#Advanced-Real_002ddata-DFTs" rel="prev" title="Advanced Real-data DFTs">
+<link href="Advanced-Interface.html" rel="up" title="Advanced Interface">
+<link href="Guru-Interface.html" rel="next" title="Guru Interface">
+<link href="Advanced-Real_002ddata-DFTs.html" rel="prev" title="Advanced Real-data DFTs">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,14 +59,12 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Advanced-Real_002dto_002dreal-Transforms"></a>
-<div class="header">
+<span id="Advanced-Real_002dto_002dreal-Transforms"></span><div class="header">
 <p>
-Previous: <a href="Advanced-Real_002ddata-DFTs.html#Advanced-Real_002ddata-DFTs" accesskey="p" rel="prev">Advanced Real-data DFTs</a>, Up: <a href="Advanced-Interface.html#Advanced-Interface" accesskey="u" rel="up">Advanced Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Previous: <a href="Advanced-Real_002ddata-DFTs.html" accesskey="p" rel="prev">Advanced Real-data DFTs</a>, Up: <a href="Advanced-Interface.html" accesskey="u" rel="up">Advanced Interface</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Advanced-Real_002dto_002dreal-Transforms-1"></a>
-<h4 class="subsection">4.4.3 Advanced Real-to-real Transforms</h4>
+<span id="Advanced-Real_002dto_002dreal-Transforms-1"></span><h4 class="subsection">4.4.3 Advanced Real-to-real Transforms</h4>
 
 <div class="example">
 <pre class="example">fftw_plan fftw_plan_many_r2r(int rank, const int *n, int howmany,
@@ -85,7 +74,7 @@ Previous: <a href="Advanced-Real_002ddata-DFTs.html#Advanced-Real_002ddata-DFTs"
                              int ostride, int odist,
                              const fftw_r2r_kind *kind, unsigned flags);
 </pre></div>
-<a name="index-fftw_005fplan_005fmany_005fr2r"></a>
+<span id="index-fftw_005fplan_005fmany_005fr2r"></span>
 
 <p>Like <code>fftw_plan_many_dft</code>, this functions adds <code>howmany</code>,
 <code>nembed</code>, <code>stride</code>, and <code>dist</code> parameters to the

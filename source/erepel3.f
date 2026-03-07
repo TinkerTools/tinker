@@ -706,7 +706,7 @@ c
 !$OMP& verbose,debug,header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
-!$OMP DO reduction(+:er,ner,aer,einter) schedule(guided)
+!$OMP DO reduction(+:er,ner,aer,einter)
 c
 c     calculate the Pauli repulsion interaction energy term
 c

@@ -23,6 +23,7 @@ mv freefix.x   ../bin/freefix
 mv gda.x       ../bin/gda
 mv intedit.x   ../bin/intedit
 mv intxyz.x    ../bin/intxyz
+mv mdavg.x     ../bin/mdavg
 mv minimize.x  ../bin/minimize
 mv minirot.x   ../bin/minirot
 mv minrigid.x  ../bin/minrigid
@@ -57,6 +58,7 @@ mv testhess.x  ../bin/testhess
 mv testpair.x  ../bin/testpair
 mv testpol.x   ../bin/testpol
 mv testrot.x   ../bin/testrot
+mv testsurf.x  ../bin/testsurf
 mv testvir.x   ../bin/testvir
 mv timer.x     ../bin/timer
 mv timerot.x   ../bin/timerot

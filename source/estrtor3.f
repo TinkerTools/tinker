@@ -90,7 +90,7 @@ c
 !$OMP& tors1,tors2,tors3,use,x,y,z,storunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(ebt,nebt,aebt)
-!$OMP DO reduction(+:ebt,nebt,aebt) schedule(guided)
+!$OMP DO reduction(+:ebt,nebt,aebt)
 c
 c     calculate the stretch-torsion interaction energy term
 c

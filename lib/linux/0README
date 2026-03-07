@@ -7,3 +7,7 @@
        when linking Tinker under Linux. For example, they could be static
        compiler libraries, static version of FFTW libraries, etc.
 
+       Unless otherwise specified, libraries are for Intel x86_64 CPUs.
+       There is no quadmath library for ARM CPUs, and it is not needed to
+       build functional ARM executables.
+

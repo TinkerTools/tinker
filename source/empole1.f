@@ -1167,7 +1167,7 @@ c
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
-!$OMP DO reduction(+:em,dem,tem,pot,vir) schedule(guided)
+!$OMP DO reduction(+:em,dem,tem,pot,vir)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1535,7 +1535,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir) schedule(guided)
+!$OMP DO reduction(+:dem,vir)
 c
 c     resolve site torques then increment forces and virial
 c
@@ -1585,7 +1585,7 @@ c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,vir) schedule(guided)
+!$OMP    DO reduction(+:dem,vir)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -1658,7 +1658,7 @@ c
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,f
+      real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xi,yi,zi
@@ -1796,6 +1796,17 @@ c
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
+c
+c     compute the uniform background charge correction term
+c
+      fterm = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         sum = sum + rpole(1,i)
+      end do
+      e = fterm * sum**2
+      em = em + e
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2823,7 +2834,7 @@ c
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,f
+      real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xi,yi,zi
@@ -2961,6 +2972,17 @@ c
       deallocate (decfx)
       deallocate (decfy)
       deallocate (decfz)
+c
+c     compute the uniform background charge correction term
+c
+      fterm = -0.5d0 * f * pi / (volbox*aewald**2)
+      sum = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         sum = sum + rpole(1,i)
+      end do
+      e = fterm * sum**2
+      em = em + e
 c
 c     compute the cell dipole boundary correction term
 c
@@ -3163,7 +3185,7 @@ c
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
 !$OMP& yaxis,zaxis)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
-!$OMP DO reduction(+:em,dem,tem,pot,vir) schedule(guided)
+!$OMP DO reduction(+:em,dem,tem,pot,vir)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3518,7 +3540,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir) schedule(guided)
+!$OMP DO reduction(+:dem,vir)
 c
 c     resolve site torques then increment forces and virial
 c
@@ -3568,7 +3590,7 @@ c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,vir) schedule(guided)
+!$OMP    DO reduction(+:dem,vir)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)

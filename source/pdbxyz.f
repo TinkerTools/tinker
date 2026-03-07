@@ -12,9 +12,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "pdbxyz" takes as input a Protein Data Bank file and then
-c     converts to and writes out a Cartesian coordinates file and,
-c     for biopolymers, a sequence file
+c     "pdbxyz" takes as input an RCSB Protein Data Bank file and then
+c     converts to and writes out a Tinker Cartesian coordinates file,
+c     and a sequence file for biopolymers
 c
 c
       program pdbxyz
@@ -64,7 +64,7 @@ c
       biopoly = .false.
       reslast = '***'
       do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
+         if (pdbrec(i) .eq. 'ATOM  ') then
             resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
@@ -84,7 +84,7 @@ c
                goto 20
    10          continue
             end if
-         else if (pdbtyp(i) .eq. 'HETATM') then
+         else if (pdbrec(i) .eq. 'HETATM') then
             resname = pdbres(i)
             if (resname .ne. reslast) then
                reslast = resname
@@ -96,7 +96,7 @@ c
      &             resname.eq.'  F' .or. resname.eq.' CL' .or.
      &             resname.eq.' BR' .or. resname.eq.'  I' .or.
      &             resname.eq.' ZN') then
-                  pdbtyp(i) = 'HETATM'
+                  pdbrec(i) = 'HETATM'
                end if
             end if
          end if
@@ -117,7 +117,8 @@ c
       call suffix (pdbfile,'pdb','old')
       open (unit=ipdb,file=pdbfile,status ='old')
       rewind (unit=ipdb)
-      call readpdb (ipdb)
+      if (pdbtyp .eq. 'PDB')  call readpdb (ipdb)
+      if (pdbtyp .eq. 'CIF')  call readcif (ipdb)
 c
 c     use special translation mechanisms for biopolymers
 c
@@ -246,7 +247,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,x,y,z,row,rmax,n12,i12)
-!$OMP DO schedule(guided)
+!$OMP DO
 c
 c     find and connect atom pairs within bonding distance
 c
@@ -285,7 +286,7 @@ c
 c     sort the attached atom lists into ascending order
 c
          do i = 1, n
-            call sort (n12(i),i12(1,i))
+            call sort8 (n12(i),i12(1,i))
          end do
 c
 c     check for atom pairs with identical coordinates
@@ -298,13 +299,20 @@ c
          ltitle = pdbleng
          title = pdbtitle(1:ltitle)
          call prtxyz (ixyz)
-         do i = 1, n
+         do i = 1, npdb
             n12(i) = 0
          end do
 c
 c     read the next coordinate set from Protein Data Bank file
 c
-         call readpdb (ipdb)
+         if (nmodel .eq. 1) then
+            abort = .true.
+         else
+            imodel = imodel + 1
+            rewind (unit=ipdb)
+            if (pdbtyp .eq. 'PDB')  call readpdb (ipdb)
+            if (pdbtyp .eq. 'CIF')  call readcif (ipdb)
+         end if
       end do
 c
 c     write a sequence file for proteins and nucleic acids
@@ -523,7 +531,7 @@ c     build the alpha carbon of the current residue
 c
          atmname = ' CA '
          if (resname .eq. 'ACE')  atmname = ' CH3'
-         if (resname .eq. 'NME')  atmname = ' CH3'
+         if (resname .eq. 'NME')  atmname = ' C  '
          call findatm (atmname,start,stop,k)
          if (k .ne. 0)  cai(i) = n
          if (midchn .or. cyclic .or. nres.eq.1) then
@@ -770,8 +778,7 @@ c
       use resdue
       use sequen
       implicit none
-      integer i,k
-      integer ires,ichn
+      integer i,k,ires
       integer start,stop
       integer cai,ni,ci,si
       logical newchn,endchn
@@ -1222,7 +1229,7 @@ c
          call findatm (' HE2',start,stop,i)
          call newatm (i,k+9,n-5,1.02d0,n-6,126.0d0,n-8,180.0d0,0)
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          call findatm (' CB ',start,stop,i)
@@ -1276,7 +1283,7 @@ c
          call findatm ('HD22',start,stop,i)
          call newatm (i,k+5,n-4,1.01d0,n-6,120.3d0,n-7,180.0d0,0)
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          call findatm (' CB ',start,stop,i)
@@ -2102,7 +2109,7 @@ c
       i = 0
       do while (i .lt. npdb)
          i = i + 1
-         if (pdbtyp(i) .eq. 'HETATM') then
+         if (pdbrec(i) .eq. 'HETATM') then
             if (pdbres(i) .eq. 'HOH') then
                if (pdbatm(i) .eq. ' O  ') then
                   call oldatm (i,2001,0,0)
@@ -2111,6 +2118,14 @@ c
                      call oldatm (i+1,2002,n-1,0)
                      call oldatm (i+2,2002,n-2,0)
                      i = i + 2
+                     if (pdbatm(i+1) .eq. ' EP ') then
+                        call oldatm (i+1,2003,n-3,0)
+                        i = i + 1
+                        if (pdbatm(i+1) .eq. ' EP ') then
+                           call oldatm (i+1,2003,n-4,0)
+                           i = i + 1
+                        end if
+                     end if
                   else
                      call newatm (0,2002,n-1,0.96d0,n-2,109.5d0,
      &                               n-3,120.0d0,0)
@@ -2119,33 +2134,33 @@ c
                   end if
                end if
             else if (pdbres(i) .eq. ' LI') then
-               call oldatm (i,2003,0,0)
-            else if (pdbres(i) .eq. ' NA') then
                call oldatm (i,2004,0,0)
-            else if (pdbres(i) .eq. '  K') then
+            else if (pdbres(i) .eq. ' NA') then
                call oldatm (i,2005,0,0)
-            else if (pdbres(i) .eq. ' RB') then
+            else if (pdbres(i) .eq. '  K') then
                call oldatm (i,2006,0,0)
-            else if (pdbres(i) .eq. ' CS') then
+            else if (pdbres(i) .eq. ' RB') then
                call oldatm (i,2007,0,0)
-            else if (pdbres(i) .eq. ' MG') then
+            else if (pdbres(i) .eq. ' CS') then
                call oldatm (i,2008,0,0)
-            else if (pdbres(i) .eq. ' CA') then
+            else if (pdbres(i) .eq. ' MG') then
                call oldatm (i,2009,0,0)
-            else if (pdbres(i) .eq. ' SR') then
+            else if (pdbres(i) .eq. ' CA') then
                call oldatm (i,2010,0,0)
-            else if (pdbres(i) .eq. ' BA') then
+            else if (pdbres(i) .eq. ' SR') then
                call oldatm (i,2011,0,0)
-            else if (pdbres(i) .eq. '  F') then
+            else if (pdbres(i) .eq. ' BA') then
                call oldatm (i,2012,0,0)
-            else if (pdbres(i) .eq. ' CL') then
+            else if (pdbres(i) .eq. '  F') then
                call oldatm (i,2013,0,0)
-            else if (pdbres(i) .eq. ' BR') then
+            else if (pdbres(i) .eq. ' CL') then
                call oldatm (i,2014,0,0)
-            else if (pdbres(i) .eq. '  I') then
+            else if (pdbres(i) .eq. ' BR') then
                call oldatm (i,2015,0,0)
-            else if (pdbres(i) .eq. ' ZN') then
+            else if (pdbres(i) .eq. '  I') then
                call oldatm (i,2016,0,0)
+            else if (pdbres(i) .eq. ' ZN') then
+               call oldatm (i,2017,0,0)
             end if
          end if
       end do
@@ -2172,8 +2187,8 @@ c
       use fields
       use iounit
       use katoms
-      use sequen
       use pdb
+      use sequen
       implicit none
       integer i,bionum
       integer i1,ires

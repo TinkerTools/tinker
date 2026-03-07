@@ -93,7 +93,7 @@ c
 !$OMP PARALLEL default(private) shared(nangtor,iat,itors,kant,anat,
 !$OMP& tors1,tors2,tors3,use,x,y,z,atorunit,eps,use_group,use_polymer)
 !$OMP& shared(eat,deat,vir)
-!$OMP DO reduction(+:eat,deat,vir) schedule(guided)
+!$OMP DO reduction(+:eat,deat,vir)
 c
 c     calculate the angle-torsion energy and first derviatives
 c

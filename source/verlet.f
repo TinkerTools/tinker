@@ -12,8 +12,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "verlet" performs a single molecular dynamics time step
-c     via the velocity Verlet multistep recursion formula
+c     "verlet" performs a molecular dynamics time step via the
+c     velocity Verlet multistep recursion formula
 c
 c
       subroutine verlet (istep,dt)
@@ -30,9 +30,8 @@ c
       integer istep
       real*8 dt,dt_2
       real*8 etot,epot
-      real*8 eksum
+      real*8 eksum,term
       real*8 temp,pres
-      real*8 term
       real*8 ekin(3,3)
       real*8 stress(3,3)
       real*8, allocatable :: xold(:)
@@ -84,7 +83,7 @@ c
 c
 c     get constraint-corrected positions and half-step velocities
 c
-      if (use_rattle)  call rattle (dt,xold,yold,zold)
+      if (use_freeze)  call rattle (dt,xold,yold,zold)
 c
 c     get the potential energy and atomic forces
 c
@@ -121,21 +120,33 @@ c
          end do
       end if
 c
+c     find the constraint-corrected full-step velocities
+c
+      if (use_freeze) then
+         call rattle2 (dt)
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+         end do
+      end if
+c
+c     make full-step temperature and pressure corrections
+c
+      call temper (dt,eksum,ekin,temp)
+      call pressure (dt,ekin,pres,stress)
+c
+c     final constraint step to enforce position convergence
+c
+      if (use_freeze)  call shake (xold,yold,zold)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (xold)
       deallocate (yold)
       deallocate (zold)
       deallocate (derivs)
-c
-c     find the constraint-corrected full-step velocities
-c
-      if (use_rattle)  call rattle2 (dt)
-c
-c     make full-step temperature and pressure corrections
-c
-      call temper (dt,eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
 c
 c     total energy is sum of kinetic and potential energies
 c

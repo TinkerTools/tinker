@@ -366,15 +366,20 @@ c
       barfile = filea(1:lenga)//'.bar'
       call version (barfile,'new')
       open (unit=ibar,file=barfile,status ='new')
-      write (ibar,190)  nfrma,tempa,titlea(1:ltitlea)
-  190 format (i8,f10.2,2x,a)
+      if (ltitlea .eq. 0) then
+         write (ibar,190)  nfrma,tempa
+  190    format (i8,f10.2)
+      else
+         write (ibar,200)  nfrma,tempa,titlea(1:ltitlea)
+  200    format (i8,f10.2,2x,a)
+      end if
       do i = 1, nfrma
          if (vola(i) .eq. 0.0d0) then
-            write (ibar,200)  i,ua0(i),ua1(i)
-  200       format (i8,2x,2f18.4)
+            write (ibar,210)  i,ua0(i),ua1(i)
+  210       format (i8,2x,2f18.4)
          else
-            write (ibar,210)  i,ua0(i),ua1(i),vola(i)
-  210       format (i8,2x,3f18.4)
+            write (ibar,220)  i,ua0(i),ua1(i),vola(i)
+  220       format (i8,2x,3f18.4)
          end if
       end do
       flush (ibar)
@@ -417,24 +422,24 @@ c
 c
 c     find potential energies for trajectory B in state 1
 c
-      write (iout,220)
-  220 format (/,' Initial Processing for Trajectory B :',/)
+      write (iout,230)
+  230 format (/,' Initial Processing for Trajectory B :',/)
       i = 0
       do while (.not. abort)
          i = i + 1
          if (use_log) then
             abort = .true.
             do while (abort)
-               read (ilog,230,err=250,end=250)  record
-  230          format (a240)
+               read (ilog,240,err=260,end=260)  record
+  240          format (a240)
                if (record(1:18) .eq. ' Current Potential') then
                   string = record(19:240)
-                  read (string,*,err=240,end=240)  ub1(i)
+                  read (string,*,err=250,end=250)  ub1(i)
                   abort = .false.
                end if
-  240          continue
+  250          continue
             end do
-  250       continue
+  260       continue
             if (abort)  i = i - 1
          else
             call cutoffs
@@ -443,8 +448,8 @@ c
          end if
          imod = mod(i,100)
          if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
-            write (iout,260)  i
-  260       format (7x,'Completed',i8,' Coordinate Frames')
+            write (iout,270)  i
+  270       format (7x,'Completed',i8,' Coordinate Frames')
             flush (iout)
          end if
          if (i .ge. maxframe)  abort = .true.
@@ -464,8 +469,8 @@ c
 c     find potential energies for trajectory B in state 0
 c
       if (verbose) then
-         write (iout,270)
-  270    format (/,' Potential Energy Values for Trajectory B :',
+         write (iout,280)
+  280    format (/,' Potential Energy Values for Trajectory B :',
      &           //,7x,'Frame',9x,'State 0',9x,'State 1',12x,'Delta',/)
       end if
       i = 0
@@ -475,8 +480,8 @@ c
          ub0(i) = energy ()
          volb(i) = volbox
          if (verbose) then
-            write (iout,280)  i,ub0(i),ub1(i),ub0(i)-ub1(i)
-  280       format (i11,2x,3f16.4)
+            write (iout,290)  i,ub0(i),ub1(i),ub0(i)-ub1(i)
+  290       format (i11,2x,3f16.4)
          end if
          call readcart (iarc,first)
          if (i .ge. maxframe)  abort = .true.
@@ -486,20 +491,25 @@ c
 c
 c     save potential energies and volumes for trajectory B
 c
-      write (ibar,290)  nfrmb,tempb,titleb(1:ltitleb)
-  290 format (i8,f10.2,2x,a)
+      if (ltitleb .eq. 0) then
+         write (ibar,300)  nfrmb,tempb
+  300    format (i8,f10.2)
+      else
+         write (ibar,310)  nfrmb,tempb,titleb(1:ltitleb)
+  310    format (i8,f10.2,2x,a)
+      end if
       do i = 1, nfrmb
          if (volb(i) .eq. 0.0d0) then
-            write (ibar,300)  i,ub0(i),ub1(i)
-  300       format (i8,2x,2f18.4)
+            write (ibar,320)  i,ub0(i),ub1(i)
+  320       format (i8,2x,2f18.4)
          else
-            write (ibar,310)  i,ub0(i),ub1(i),volb(i)
-  310       format (i8,2x,3f18.4)
+            write (ibar,330)  i,ub0(i),ub1(i),volb(i)
+  330       format (i8,2x,3f18.4)
          end if
       end do
       close (unit=ibar)
-      write (iout,320)  barfile(1:trimtext(barfile))
-  320 format (/,' Potential Energy Values Written To :  ',a)
+      write (iout,340)  barfile(1:trimtext(barfile))
+  340 format (/,' Potential Energy Values Written To :  ',a)
 c
 c     perform deallocation of some local arrays
 c
@@ -787,16 +797,24 @@ c
 c
 c     provide info about trajectories and number of frames
 c
-      write (iout,260)  titlea(1:ltitlea)
+      write (iout,260)
   260 format (/,' Simulation Trajectory A and Thermodynamic',
-     &           ' State 0 :  ',//,' ',a)
-      write (iout,270)  nfrma,tempa
-  270 format (' Number of Frames :',4x,i8,/,' Temperature :',7x,f10.2)
-      write (iout,280)  titleb(1:ltitleb)
-  280 format (/,' Simulation Trajectory B and Thermodynamic',
-     &           ' State 1 :  ',//,' ',a)
-      write (iout,290)  nfrmb,tempb
-  290 format (' Number of Frames :',4x,i8,/,' Temperature :',7x,f10.2)
+     &           ' State 0 :  ',/)
+      if (ltitlea .ne. 0) then
+         write (iout,270)  titlea(1:ltitlea)
+  270    format (' ',a)
+      end if
+      write (iout,280)  nfrma,tempa
+  280 format (' Number of Frames :',4x,i8,/,' Temperature :',7x,f10.2)
+      write (iout,290)
+  290 format (/,' Simulation Trajectory B and Thermodynamic',
+     &           ' State 1 :  ',/)
+      if (ltitleb .ne. 0) then
+         write (iout,300)  titleb(1:ltitleb)
+  300    format (' ',a)
+      end if
+      write (iout,310)  nfrmb,tempb
+  310 format (' Number of Frames :',4x,i8,/,' Temperature :',7x,f10.2)
 c
 c     set the frame ratio, temperature and Boltzmann factor
 c
@@ -857,8 +875,8 @@ c
 c
 c     get the free energy change via thermodynamic perturbation
 c
-      write (iout,300)
-  300 format (/,' Free Energy Difference via FEP Method :',/)
+      write (iout,320)
+  320 format (/,' Free Energy Difference via FEP Method :',/)
       cfsum = 0.0d0
       cfsum2 = 0.0d0
       cbsum = 0.0d0
@@ -885,17 +903,17 @@ c
       stdcf = sqrt(ratio*(cfsum2/bst-cfore*cfore))
       cback = cbsum / bst
       stdcb = sqrt(ratio*(cbsum2/bst-cback*cback))
-      write (iout,310)  cfore,stdcf
-  310 format (' Free Energy via Forward FEP',9x,f12.4,
+      write (iout,330)  cfore,stdcf
+  330 format (' Free Energy via Forward FEP',9x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
-      write (iout,320)  cback,stdcb
-  320 format (' Free Energy via Backward FEP',8x,f12.4,
+      write (iout,340)  cback,stdcb
+  340 format (' Free Energy via Backward FEP',8x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
 c
 c     determine the initial free energy via the BAR method
 c
-      write (iout,330)
-  330 format (/,' Free Energy Difference via BAR Method :',/)
+      write (iout,350)
+  350 format (/,' Free Energy Difference via BAR Method :',/)
       maxiter = 100
       eps = 0.0001d0
       done = .false.
@@ -919,12 +937,12 @@ c
       stdev = sqrt((bot2-bot*bot/frma)/(bot*bot)
      &                + (top2-top*top/frmb)/(top*top))
       delta = abs(cnew-cold)
-      write (iout,340)  iter,cnew
-  340 format (' BAR Iteration',i4,19x,f12.4,' Kcal/mol')
+      write (iout,360)  iter,cnew
+  360 format (' BAR Iteration',i4,19x,f12.4,' Kcal/mol')
       if (delta .lt. eps) then
          done = .true.
-         write (iout,350)  cnew,stdev
-  350    format (' BAR Free Energy Estimate',8x,f12.4,
+         write (iout,370)  cnew,stdev
+  370    format (' BAR Free Energy Estimate',8x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
       end if
 c
@@ -953,18 +971,18 @@ c
          stdev = sqrt((bot2-bot*bot/frma)/(bot*bot)
      &                   + (top2-top*top/frmb)/(top*top))
          delta = abs(cnew-cold)
-         write (iout,360)  iter,cnew
-  360    format (' BAR Iteration',i4,19x,f12.4,' Kcal/mol')
+         write (iout,380)  iter,cnew
+  380    format (' BAR Iteration',i4,19x,f12.4,' Kcal/mol')
          if (delta .lt. eps) then
             done = .true.
-            write (iout,370)  cnew,stdev
-  370       format (/,' Free Energy via BAR Iteration',7x,f12.4,
+            write (iout,390)  cnew,stdev
+  390       format (/,' Free Energy via BAR Estimate',8x,f12.4,
      &                 ' +/-',f9.4,' Kcal/mol')
          end if
          if (iter.ge.maxiter .and. .not.done) then
             done = .true.
-            write (iout,380)  maxiter
-  380       format (/,' BAR Free Energy Estimate not Converged',
+            write (iout,400)  maxiter
+  400       format (/,' BAR Free Energy Estimate not Converged',
      &                 ' after',i4,' Iterations')
             call fatal
          end if
@@ -1026,8 +1044,8 @@ c
       cnew = sum / bst
       ratio = bst / (bst-1.0d0)
       stdev = sqrt(ratio*(sum2/bst-cnew*cnew))
-      write (iout,390)  cnew,stdev
-  390 format (' Free Energy via BAR Bootstrap',7x,f12.4,
+      write (iout,410)  cnew,stdev
+  410 format (' Free Energy via BAR Bootstrap',7x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
 c
 c     perform deallocation of some local arrays
@@ -1037,8 +1055,8 @@ c
 c
 c     find the enthalpy directly via average potential energy
 c
-      write (iout,400)
-  400 format (/,' Enthalpy from Potential Energy Averages :',/)
+      write (iout,420)
+  420 format (/,' Enthalpy from Potential Energy Averages :',/)
       patm = 1.0d0
       epv = (vaveb-vavea) * patm / prescon
       stdpv = (vstda+vstdb) * patm / prescon
@@ -1075,25 +1093,25 @@ c
       stdev1 = sqrt(ratio*(u1sum2/bst-uave1*uave1))
       hdir = hsum / bst
       stdev = sqrt(ratio*(hsum2/bst-hdir*hdir))
-      write (iout,410)  uave0,stdev0
-  410 format (' Average Energy for State 0',10x,f12.4,
+      write (iout,430)  uave0,stdev0
+  430 format (' Average Energy for State 0',10x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
-      write (iout,420)  uave1,stdev1
-  420 format (' Average Energy for State 1',10x,f12.4,
+      write (iout,440)  uave1,stdev1
+  440 format (' Average Energy for State 1',10x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
       if (epv .ne. 0.0d0) then
-         write (iout,430)  epv,stdpv
-  430    format (' PdV Work Term for 1 Atm',13x,f12.4,
+         write (iout,450)  epv,stdpv
+  450    format (' PdV Work Term for 1 Atm',13x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
       end if
-      write (iout,440)  hdir,stdev
-  440 format (' Enthalpy via Direct Estimate',8x,f12.4,
+      write (iout,460)  hdir,stdev
+  460 format (' Enthalpy via Direct Estimate',8x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
 c
 c     calculate the enthalpy via thermodynamic perturbation
 c
-      write (iout,450)
-  450 format (/,' Enthalpy and Entropy via FEP Method :',/)
+      write (iout,470)
+  470 format (/,' Enthalpy and Entropy via FEP Method :',/)
       hfsum = 0.0d0
       hfsum2 = 0.0d0
       hbsum = 0.0d0
@@ -1130,25 +1148,25 @@ c
       stdhb = sqrt(ratio*(hbsum2/bst-hback*hback))
       stdhb = stdhb + stdev1
       sback = (hback-cback) / tempb
-      write (iout,460)  hfore,stdhf
-  460 format (' Enthalpy via Forward FEP',12x,f12.4,
+      write (iout,480)  hfore,stdhf
+  480 format (' Enthalpy via Forward FEP',12x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
-      write (iout,470)  sfore
-  470 format (' Entropy via Forward FEP',13x,f12.6,' Kcal/mol/K')
-      write (iout,480)  -tempa*sfore
-  480 format (' Forward FEP -T*dS Value',13x,f12.4,' Kcal/mol')
-      write (iout,490)  hback,stdhb
-  490 format (/,' Enthalpy via Backward FEP',11x,f12.4,
+      write (iout,490)  sfore
+  490 format (' Entropy via Forward FEP',13x,f12.6,' Kcal/mol/K')
+      write (iout,500)  -tempa*sfore
+  500 format (' Forward FEP -T*dS Value',13x,f12.4,' Kcal/mol')
+      write (iout,510)  hback,stdhb
+  510 format (/,' Enthalpy via Backward FEP',11x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
-      write (iout,500)  sback
-  500 format (' Entropy via Backward FEP',12x,f12.6,' Kcal/mol/K')
-      write (iout,510)  -tempb*sback
-  510 format (' Backward FEP -T*dS Value',12x,f12.4,' Kcal/mol')
+      write (iout,520)  sback
+  520 format (' Entropy via Backward FEP',12x,f12.6,' Kcal/mol/K')
+      write (iout,530)  -tempb*sback
+  530 format (' Backward FEP -T*dS Value',12x,f12.4,' Kcal/mol')
 c
 c     determine the enthalpy and entropy via the BAR method
 c
-      write (iout,520)
-  520 format (/,' Enthalpy and Entropy via BAR Method :',/)
+      write (iout,540)
+  540 format (/,' Enthalpy and Entropy via BAR Method :',/)
       hsum = 0.0d0
       hsum2 = 0.0d0
       do k = 1, nbst
@@ -1192,13 +1210,13 @@ c
       stdev = sqrt(ratio*(hsum2/bst-hbar*hbar))
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
-      write (iout,530)  hbar,stdev
-  530 format (' Enthalpy via BAR Estimate',11x,f12.4
+      write (iout,550)  hbar,stdev
+  550 format (' Enthalpy via BAR Estimate',11x,f12.4
      &           ' +/-',f9.4,' Kcal/mol')
-      write (iout,540)  sbar
-  540 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
-      write (iout,550)  -tsbar
-  550 format (' BAR Estimate of -T*dS',15x,f12.4,' Kcal/mol')
+      write (iout,560)  sbar
+  560 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
+      write (iout,570)  -tsbar
+  570 format (' BAR Estimate -T*dS Value',12x,f12.4,' Kcal/mol')
 c
 c     perform deallocation of some local arrays
 c

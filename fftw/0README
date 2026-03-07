@@ -3,7 +3,7 @@
                      FFTW Directory for the Tinker Package
                      #####################################
 
-      This directory contains FFTW-3.3.8 which is the preferred Fast
+      This directory contains FFTW-3.3.10 which is the preferred Fast
       Fourier Transform (FFT) package for use with the OpenMP version
       of Tinker. The FFTPACK code provided as part of the Tinker source
       code can be used in place of FFTW via modifications to "fft3d.f".
@@ -24,14 +24,14 @@
       export CC=gcc          (or "setenv CC gcc" for csh/tcsh)
       export F77=gfortran    (or "setenv F77 gfortran" for csh/tcsh)
       make distclean
-      ./configure --prefix=/home/ponder/tinker/fftw --enable-threads \
+      ./configure --prefix=$HOME/tinker/fftw --enable-threads \
                      --enable-openmp
       make
       make install
 
       The above "export" commands are for use with GNU compilers. To
-      use the Intel or PGI compilers, substitute "icc" or "pgcc" for
-      "gcc", and "ifort" or "pgf95" for "gfortran".
+      use the Intel or clang compilers, substitute "icc" or "clang" for
+      "gcc", and "ifort" or "flang" for "gfortran".
 
       After completion of the above commands, the library files needed
       by Tinker will be in the /lib subdirectory.
@@ -64,8 +64,7 @@
 
       Alternatively, the Intel compilers can build FFTW on Windows via
       Visual Studio and the add-on /fftw-3.3-libs subdirectory obtained
-      from the FFTW web site. This has been tested on 64-bit Windows 7
-      with Visual Studio 2010. In Visual Studio, open the project file
+      from the FFTW web site. In Visual Studio, open the project file
       /fftw-3.3-libs/fftw-3.3-libs.sln. Then under the Build menu, use
       the Configuration Manager to select x64 and build the Static-
       Release version of only the libfftw library. The resulting .lib

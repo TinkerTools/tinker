@@ -1888,9 +1888,8 @@ c     ##                                                     ##
 c     #########################################################
 c
 c
-c     "prtvib" writes to an external disk file a series of
-c     coordinate sets representing motion along a vibrational
-c     normal mode
+c     "prtvib" writes to an external file a series of coordinate
+c     sets representing motion along a vibrational normal mode
 c
 c
       subroutine prtvib (ivib,r)

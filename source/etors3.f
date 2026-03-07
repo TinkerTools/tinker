@@ -116,7 +116,7 @@ c
 !$OMP& tors4,tors5,tors6,use,x,y,z,torsunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(et,net,aet)
-!$OMP DO reduction(+:et,net,aet) schedule(guided)
+!$OMP DO reduction(+:et,net,aet)
 c
 c     calculate the torsional angle energy term
 c

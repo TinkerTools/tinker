@@ -57,7 +57,7 @@ c
 c     total solvation energy for surface area only models
 c
       if (solvtyp.eq.'ASP' .or. solvtyp.eq.'SASA') then
-         call surface (es,aes,rsolv,asolv,probe)
+         call surface (rsolv,asolv,probe,es,aes)
 c
 c     nonpolar energy as hydrophobic potential of mean force
 c
@@ -69,7 +69,7 @@ c
 c     nonpolar energy for Onion GB method via exact area
 c
       else if (solvtyp.eq.'GB' .and. borntyp.eq.'ONION') then
-         call surface (esurf,aes,rsolv,asolv,probe)
+         call surface (rsolv,asolv,probe,esurf,aes)
          es = esurf
 c
 c     nonpolar energy as cavity formation plus dispersion
@@ -173,7 +173,7 @@ c
 !$OMP& pchg,rborn,use_group,off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,
 !$OMP& f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es)
-!$OMP DO reduction(+:es) schedule(guided)
+!$OMP DO reduction(+:es)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -300,7 +300,7 @@ c
 !$OMP& f,pchg,rborn,nelst,elst,use_group,off,off2,cut,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7)
 !$OMP& shared(es)
-!$OMP DO reduction(+:es) schedule(guided)
+!$OMP DO reduction(+:es)
 c
 c     calculate GB electrostatic polarization energy term
 c
@@ -597,7 +597,7 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,use,x,y,z,
 !$OMP& rborn,rpole,uinds,use_group,off2,gkc,fc,fd,fq)
 !$OMP& shared(es)
-!$OMP DO reduction(+:es) schedule(guided)
+!$OMP DO reduction(+:es)
 c
 c     calculate GK electrostatic solvation free energy
 c
@@ -1075,7 +1075,7 @@ c
 !$OMP& ip11,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale) shared(es)
-!$OMP DO reduction(+:es) schedule(guided)
+!$OMP DO reduction(+:es)
 c
 c     calculate the multipole interaction energy term
 c
@@ -1352,12 +1352,16 @@ c
       use solpot
       use solute
       implicit none
+      integer i
       real*8 ecav,edisp
-      real*8 exclude,taper
-      real*8 evol,esurf
+      real*8 probe,taper
+      real*8 evol,esurf,etemp
       real*8 reff,reff2,reff3
       real*8 reff4,reff5
       real*8, allocatable :: aesurf(:)
+      real*8, allocatable :: aevol(:)
+      real*8, allocatable :: aetemp(:)
+      real*8, allocatable :: weight(:)
       character*6 mode
 c
 c
@@ -1371,12 +1375,16 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aesurf(n))
+      allocate (aevol(n))
+      allocate (aetemp(n))
+c
+c     solvent probe radius is included in cavity radii
+c
+      probe = 0.0d0
 c
 c     compute surface area and effective radius for cavity
 c
-      exclude = 1.4d0
-      if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB')  exclude = 0.0d0
-      call surface (esurf,aesurf,radcav,asolv,exclude)
+      call surface (radcav,asolv,probe,esurf,aesurf)
       reff = 0.5d0 * sqrt(esurf/(pi*surften))
       reff2 = reff * reff
       reff3 = reff2 * reff
@@ -1386,8 +1394,12 @@ c
 c     compute solvent excluded volume needed for small solutes
 c
       if (reff .lt. spoff) then
-         call volume (evol,radcav,exclude)
-         evol = evol * solvprs
+         allocate (weight(n))
+         do i = 1, n
+            weight(i) = solvprs
+         end do
+         call volume (radcav,weight,probe,etemp,evol,aetemp,aevol)
+         deallocate (weight)
       end if
 c
 c     include a full solvent excluded volume cavity term
@@ -1424,6 +1436,8 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (aesurf)
+      deallocate (aevol)
+      deallocate (aetemp)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c
@@ -1479,7 +1493,7 @@ c
 !$OMP PARALLEL default(private) shared(n,class,epsdsp,
 !$OMP& raddsp,x,y,z,cdsp)
 !$OMP& shared(edisp)
-!$OMP DO reduction(+:edisp) schedule(guided)
+!$OMP DO reduction(+:edisp)
 c
 c     find the Weeks-Chandler-Andersen dispersion energy
 c

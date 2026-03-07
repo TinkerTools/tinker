@@ -1,3 +1,47 @@
+FFTW 3.3.10:
+
+* Fix bug that would cause 2-way SIMD (notably SSE2 in double precision)
+  to attempt unaligned accesses in certain obscure cases, causing
+  segfaults.
+  
+  The following test triggers the bug (SSE2, double precision):
+
+    ./tests/bench -oexhaustive r4*2:5:3
+
+  This test computes a pair of length-4 real->complex transforms where
+  the second input is 5 real numbers away from the first input.  That
+  is, there is a gap of one real number between the first and second
+  input array.  The -oexhaustive level allow FFTW to attempt to
+  compute this transform by reducing it to a pair of complex
+  transforms of length 2, but now the second input is not aligned to a
+  complex-number boundary.  The fact that 5 is odd is the problem.
+
+  The bug cannot occur in complex->complex transforms because the
+  complex interface accepts strides in units of complex numbers, so
+  strides are aligned by construction.
+  
+  This bug has been around at least since fftw-3.1.2 (July 2006), and
+  probably since fftw-3.0 (2003).
+
+FFTW 3.3.9:
+
+* New API fftw_planner_nthreads() returns the number of threads
+  currently being used by the planner.
+
+* Fix incorrect math in 128-bit generic SIMD
+
+* Fix wisdom for avx512.
+
+  The avx512 alignment requirement was set to 64 bytes, but this is
+  wrong.  Alignment requirements are a property of the platform (e.g.,
+  x86) and not of the instruction set (e.g., AVX).  Among other
+  things, this broke wisdom with avx512.
+
+  Note that avx512 support is still experimental because the FFTW
+  authors have no avx512 hardware available for testing.
+
+* fftw_threads_set_callback function to change the threading backend at runtime.
+
 FFTW 3.3.8:
 
 * Fixed AVX, AVX2 for gcc-8.
@@ -33,7 +77,7 @@ FFTW 3.3.6-pl1:
 
 * Bugfix: FFTW 3.3.6 had the wrong libtool version number, and generated
   shared libraries of the form libfftw3.so.2.6.6 instead of
-  libfftw3.so.3.*.  
+  libfftw3.so.3.*.
 
 FFTW 3.3.6:
 
@@ -58,7 +102,7 @@ FFTW 3.3.5:
     This code is expected to work but the FFTW maintainers do not have
     hardware to test it.
   - generic SIMD support using gcc vector intrinsics
-* Add fftw_make_planner_thread_safe() API    
+* Add fftw_make_planner_thread_safe() API
 * fix #18 (disable float128 for CUDACC)
 * fix #19: missing Fortran interface for fftwq_alloc_real
 * fix #21 (don't use float128 on Portland compilers, which pretend to be gcc)
@@ -107,7 +151,7 @@ FFTW 3.3.2
 
 * Added stack-alignment hack necessary for gcc on Windows/i386.  We
   will regret this in ten years (see previous change).
-  
+
 * Fix incompatibility with Intel icc which pretends to be gcc
   but does not support quad precision.
 
@@ -118,7 +162,7 @@ FFTW 3.3.2
 FFTW 3.3.1
 
 * Changes since 3.3.1-beta1:
-  
+
   - Reduced planning time in estimate mode for sizes with large
     prime factors.
 
@@ -190,7 +234,7 @@ FFTW 3.3
   fftw_import_wisdom_from_filename that export/import wisdom
   to a file, which don't require you to open/close the file yourself.
 
-* New function fftw_cost to return FFTW's internal cost metric for 
+* New function fftw_cost to return FFTW's internal cost metric for
   a given plan; thanks to Rhys Ulerich and Nathanael Schaeffer for the
   suggestion.
 
@@ -248,7 +292,7 @@ FFTW 3.2.1
 
 * FAQ was accidentally omitted from 3.2 tarball.
 
-* Remove some extraneous (harmless) files accidentally included in 
+* Remove some extraneous (harmless) files accidentally included in
   a subdirectory of the 3.2 tarball.
 
 FFTW 3.2
@@ -417,7 +461,7 @@ FFTW 3.1
 
 * Various documentation clarifications.
 
-* 64-bit clean.  (Fixes a bug affecting the split guru planner on 
+* 64-bit clean.  (Fixes a bug affecting the split guru planner on
   64-bit machines, reported by David Necas.)
 
 * Fixed Debian bug #259612: inadvertent use of SSE instructions on

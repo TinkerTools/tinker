@@ -15,11 +15,6 @@ c
 c     "openend" opens a file on a Fortran unit such that the position
 c     is set to the bottom for appending to the end of the file
 c
-c     note this routine is system dependent since the Fortran 90
-c     standard is not supported by many Fortran 77 compilers; only
-c     one of the various implementations below should be activated
-c     by removing comment characters
-c
 c
       subroutine openend (iunit,name)
       implicit none

@@ -13,6 +13,10 @@ c     ##################################################################
 c
 c
 c     "emetal" calculates the transition metal ligand field energy
+c     via a method from Anders Carlsson's group
+c
+c     note the current code is specific for Cu+2 ions, and is kept as
+c     a placeholder for future development of ligand field treatments
 c
 c     literature reference:
 c

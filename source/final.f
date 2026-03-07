@@ -63,6 +63,7 @@ c
       use kdipol
       use kdsp
       use kexpl
+      use keys
       use khbond
       use kiprop
       use kitors
@@ -98,6 +99,7 @@ c
       use opdist
       use orbits
       use output
+      use params
       use paths
       use pbstuf
       use pdb
@@ -119,6 +121,7 @@ c
       use rigid
       use ring
       use rotbnd
+      use shapes
       use socket
       use solpot
       use solute
@@ -127,8 +130,10 @@ c
       use strtor
       use syntrn
       use tarray
+      use tettor
       use tors
       use tortor
+      use tritor
       use uprior
       use urey
       use usage
@@ -430,8 +435,12 @@ c
       if (allocated(iratx))  deallocate (iratx)
       if (allocated(kratx))  deallocate (kratx)
       if (allocated(irat))  deallocate (irat)
+      if (allocated(iwat))  deallocate (iwat)
+      if (allocated(iwat4))  deallocate (iwat4)
       if (allocated(krat))  deallocate (krat)
-      if (allocated(ratimage))  deallocate (ratimage)
+      if (allocated(kwat))  deallocate (kwat)
+      if (allocated(kwat4))  deallocate (kwat4)
+      if (allocated(frzimage))  deallocate (frzimage)
 c
 c     deallocation of global arrays from module group
 c
@@ -580,6 +589,10 @@ c
       if (allocated(pepdmp))  deallocate (pepdmp)
       if (allocated(pepl))  deallocate (pepl)
 c
+c     deallocation of global arrays from module keys
+c
+      if (allocated(keyline))  deallocate (keyline)
+c
 c     deallocation of global arrays from module khbond
 c
       if (allocated(radhb))  deallocate (radhb)
@@ -705,6 +718,7 @@ c
       if (allocated(tbx))  deallocate (tbx)
       if (allocated(tby))  deallocate (tby)
       if (allocated(tbxy))  deallocate (tbxy)
+      if (allocated(ttier))  deallocate (ttier)
       if (allocated(ktt))  deallocate (ktt)
 c
 c     deallocation of global arrays from module kurybr
@@ -799,6 +813,8 @@ c
       if (allocated(v))  deallocate (v)
       if (allocated(a))  deallocate (a)
       if (allocated(aalt))  deallocate (aalt)
+      if (allocated(aslow))  deallocate (aslow)
+      if (allocated(afast))  deallocate (afast)
 c
 c     deallocation of global arrays from module moment
 c
@@ -886,6 +902,10 @@ c
       if (allocated(ionlyinv))  deallocate (ionlyinv)
       if (allocated(print3n))  deallocate (print3n)
 c
+c     deallocation of global arrays from module params
+c
+      if (allocated(prmline))  deallocate (prmline)
+c
 c     deallocation of global arrays from module paths
 c
       if (allocated(pc0))  deallocate (pc0)
@@ -910,6 +930,7 @@ c
       if (allocated(resatm))  deallocate (resatm)
       if (allocated(npdb12))  deallocate (npdb12)
       if (allocated(ipdb12))  deallocate (ipdb12)
+      if (allocated(pdbmod))  deallocate (pdbmod)
       if (allocated(pdblist))  deallocate (pdblist)
       if (allocated(xpdb))  deallocate (xpdb)
       if (allocated(ypdb))  deallocate (ypdb)
@@ -917,7 +938,7 @@ c
       if (allocated(pdbres))  deallocate (pdbres)
       if (allocated(pdbsym))  deallocate (pdbsym)
       if (allocated(pdbatm))  deallocate (pdbatm)
-      if (allocated(pdbtyp))  deallocate (pdbtyp)
+      if (allocated(pdbrec))  deallocate (pdbrec)
 c
 c     deallocation of global arrays from module piorbs
 c
@@ -1101,6 +1122,23 @@ c     deallocation of global arrays from module rotbnd
 c
       if (allocated(rot))  deallocate (rot)
 c
+c     deallocation of global arrays from module shapes
+c
+      if (allocated(newlist))  deallocate (newlist)
+      if (allocated(freespace))  deallocate (freespace)
+      if (allocated(killspace))  deallocate (killspace)
+      if (allocated(vinfo))  deallocate (vinfo)
+      if (allocated(tedge))  deallocate (tedge)
+      if (allocated(tinfo))  deallocate (tinfo)
+      if (allocated(tnindex))  deallocate (tnindex)
+      if (allocated(tetra))  deallocate (tetra)
+      if (allocated(tneighbor))  deallocate (tneighbor)
+      if (allocated(linkfacet))  deallocate (linkfacet)
+      if (allocated(linkindex))  deallocate (linkindex)
+      if (allocated(crdball))  deallocate (crdball)
+      if (allocated(radball))  deallocate (radball)
+      if (allocated(wghtball))  deallocate (wghtball)
+c
 c     deallocation of global arrays from module solute
 c
       if (allocated(rsolv))  deallocate (rsolv)
@@ -1146,6 +1184,10 @@ c
       if (allocated(tindex))  deallocate (tindex)
       if (allocated(tdipdip))  deallocate (tdipdip)
 c
+c     deallocation of global arrays from module tettor
+c
+      if (allocated(ibitor))  deallocate (itettor)
+c
 c     deallocation of global arrays from module tors
 c
       if (allocated(itors))  deallocate (itors)
@@ -1159,6 +1201,10 @@ c
 c     deallocation of global arrays from module tortor
 c
       if (allocated(itt))  deallocate (itt)
+c
+c     deallocation of global arrays from module tritor
+c
+      if (allocated(ibitor))  deallocate (itritor)
 c
 c     deallocation of global arrays from module uprior
 c

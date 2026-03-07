@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <!-- This manual is for FFTW
-(version 3.3.8, 24 May 2018).
+(version 3.3.10, 10 December 2020).
 
 Copyright (C) 2003 Matteo Frigo.
 
@@ -20,43 +20,34 @@ Permission is granted to copy and distribute translations of this manual
 into another language, under the above conditions for modified versions,
 except that this permission notice may be stated in a translation
 approved by the Free Software Foundation. -->
-<!-- Created by GNU Texinfo 6.3, http://www.gnu.org/software/texinfo/ -->
+<!-- Created by GNU Texinfo 6.7, http://www.gnu.org/software/texinfo/ -->
 <head>
-<title>FFTW 3.3.8: Complex numbers</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Complex numbers (FFTW 3.3.10)</title>
 
-<meta name="description" content="FFTW 3.3.8: Complex numbers">
-<meta name="keywords" content="FFTW 3.3.8: Complex numbers">
+<meta name="description" content="Complex numbers (FFTW 3.3.10)">
+<meta name="keywords" content="Complex numbers (FFTW 3.3.10)">
 <meta name="resource-type" content="document">
 <meta name="distribution" content="global">
 <meta name="Generator" content="makeinfo">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link href="index.html#Top" rel="start" title="Top">
-<link href="Concept-Index.html#Concept-Index" rel="index" title="Concept Index">
+<link href="index.html" rel="start" title="Top">
+<link href="Concept-Index.html" rel="index" title="Concept Index">
 <link href="index.html#SEC_Contents" rel="contents" title="Table of Contents">
-<link href="Data-Types-and-Files.html#Data-Types-and-Files" rel="up" title="Data Types and Files">
-<link href="Precision.html#Precision" rel="next" title="Precision">
-<link href="Data-Types-and-Files.html#Data-Types-and-Files" rel="prev" title="Data Types and Files">
+<link href="Data-Types-and-Files.html" rel="up" title="Data Types and Files">
+<link href="Precision.html" rel="next" title="Precision">
+<link href="Data-Types-and-Files.html" rel="prev" title="Data Types and Files">
 <style type="text/css">
 <!--
 a.summary-letter {text-decoration: none}
 blockquote.indentedblock {margin-right: 0em}
-blockquote.smallindentedblock {margin-right: 0em; font-size: smaller}
-blockquote.smallquotation {font-size: smaller}
 div.display {margin-left: 3.2em}
 div.example {margin-left: 3.2em}
 div.lisp {margin-left: 3.2em}
-div.smalldisplay {margin-left: 3.2em}
-div.smallexample {margin-left: 3.2em}
-div.smalllisp {margin-left: 3.2em}
 kbd {font-style: oblique}
 pre.display {font-family: inherit}
 pre.format {font-family: inherit}
 pre.menu-comment {font-family: serif}
 pre.menu-preformatted {font-family: serif}
-pre.smalldisplay {font-family: inherit; font-size: smaller}
-pre.smallexample {font-size: smaller}
-pre.smallformat {font-family: inherit; font-size: smaller}
-pre.smalllisp {font-size: smaller}
 span.nolinebreak {white-space: nowrap}
 span.roman {font-family: initial; font-weight: normal}
 span.sansserif {font-family: sans-serif; font-weight: normal}
@@ -68,14 +59,12 @@ ul.no-bullet {list-style: none}
 </head>
 
 <body lang="en">
-<a name="Complex-numbers"></a>
-<div class="header">
+<span id="Complex-numbers"></span><div class="header">
 <p>
-Next: <a href="Precision.html#Precision" accesskey="n" rel="next">Precision</a>, Previous: <a href="Data-Types-and-Files.html#Data-Types-and-Files" accesskey="p" rel="prev">Data Types and Files</a>, Up: <a href="Data-Types-and-Files.html#Data-Types-and-Files" accesskey="u" rel="up">Data Types and Files</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html#Concept-Index" title="Index" rel="index">Index</a>]</p>
+Next: <a href="Precision.html" accesskey="n" rel="next">Precision</a>, Previous: <a href="Data-Types-and-Files.html" accesskey="p" rel="prev">Data Types and Files</a>, Up: <a href="Data-Types-and-Files.html" accesskey="u" rel="up">Data Types and Files</a> &nbsp; [<a href="index.html#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="Concept-Index.html" title="Index" rel="index">Index</a>]</p>
 </div>
 <hr>
-<a name="Complex-numbers-1"></a>
-<h4 class="subsection">4.1.1 Complex numbers</h4>
+<span id="Complex-numbers-1"></span><h4 class="subsection">4.1.1 Complex numbers</h4>
 
 <p>The default FFTW interface uses <code>double</code> precision for all
 floating-point numbers, and defines a <code>fftw_complex</code> type to hold
@@ -84,7 +73,7 @@ complex numbers as:
 <div class="example">
 <pre class="example">typedef double fftw_complex[2];
 </pre></div>
-<a name="index-fftw_005fcomplex-1"></a>
+<span id="index-fftw_005fcomplex-1"></span>
 
 <p>Here, the <code>[0]</code> element holds the real part and the <code>[1]</code>
 element holds the imaginary part.
@@ -98,7 +87,7 @@ complex type and you can manipulate it with ordinary arithmetic
 (e.g. <code>x = y * (3+4*I)</code>, where <code>x</code> and <code>y</code> are
 <code>fftw_complex</code> and <code>I</code> is the standard symbol for the
 imaginary unit);
-<a name="index-C99-1"></a>
+<span id="index-C99-1"></span>
 </p>
 
 <p>C++ has its own <code>complex&lt;T&gt;</code> template class, defined in the
@@ -115,8 +104,8 @@ all current major implementations of the standard library and shown to
 be working.&rdquo;  To the extent that this is true, if you have a variable
 <code>complex&lt;double&gt; *x</code>, you can pass it directly to FFTW via
 <code>reinterpret_cast&lt;fftw_complex*&gt;(x)</code>.
-<a name="index-C_002b_002b-3"></a>
-<a name="index-portability-2"></a>
+<span id="index-C_002b_002b-3"></span>
+<span id="index-portability-2"></span>
 </p>
 
 

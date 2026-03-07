@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:04:12 EDT 2018 */
+/* Generated on Tue Sep 14 10:44:26 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -630,10 +630,9 @@ static void n1_25(const R *ri, const R *ii, R *ro, R *io, stride is, stride os, 
      }
 }
 
-static const kdft_desc desc = { 25, "n1_25", {84, 0, 268, 0}, &GENUS, 0, 0, 0, 0 };
+static const kdft_desc desc = { 25, "n1_25", { 84, 0, 268, 0 }, &GENUS, 0, 0, 0, 0 };
 
-void X(codelet_n1_25) (planner *p) {
-     X(kdft_register) (p, n1_25, &desc);
+void X(codelet_n1_25) (planner *p) { X(kdft_register) (p, n1_25, &desc);
 }
 
 #else
@@ -1216,10 +1215,9 @@ static void n1_25(const R *ri, const R *ii, R *ro, R *io, stride is, stride os, 
      }
 }
 
-static const kdft_desc desc = { 25, "n1_25", {260, 92, 92, 0}, &GENUS, 0, 0, 0, 0 };
+static const kdft_desc desc = { 25, "n1_25", { 260, 92, 92, 0 }, &GENUS, 0, 0, 0, 0 };
 
-void X(codelet_n1_25) (planner *p) {
-     X(kdft_register) (p, n1_25, &desc);
+void X(codelet_n1_25) (planner *p) { X(kdft_register) (p, n1_25, &desc);
 }
 
 #endif

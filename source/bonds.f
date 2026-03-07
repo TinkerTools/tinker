@@ -21,21 +21,11 @@ c
       use atoms
       use bndstr
       use couple
-      use iounit
       implicit none
       integer i,j,k,m
-      integer maxbnd
 c
 c
-c     perform dynamic allocation of some global arrays
-c
-      maxbnd = 4 * n
-      if (allocated(ibnd))  deallocate (ibnd)
-      if (allocated(bndlist))  deallocate (bndlist)
-      allocate (ibnd(2,maxbnd))
-      allocate (bndlist(maxval,n))
-c
-c     loop over all atoms, storing the atoms in each bond
+c     initial count of the total number of bonds
 c
       nbond = 0
       do i = 1, n
@@ -43,22 +33,38 @@ c
             k = i12(j,i)
             if (i .lt. k) then
                nbond = nbond + 1
-               if (nbond .gt. maxbnd) then
-                  write (iout,10)
-   10             format (/,' BONDS  --  Too many Bonds; Increase',
-     &                       ' MAXBND')
-                  call fatal
-               end if
+            end if
+         end do
+      end do
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(ibnd))  deallocate (ibnd)
+      if (allocated(bndlist))  deallocate (bndlist)
+      allocate (ibnd(2,nbond))
+      allocate (bndlist(maxval,n))
+c
+c     store the list of atoms involved in each bond
+c
+      nbond = 0
+      do i = 1, n
+         do j = 1, n12(i)
+            k = i12(j,i)
+            if (i .lt. k) then
+               nbond = nbond + 1
                ibnd(1,nbond) = i
                ibnd(2,nbond) = k
+c
+c     store the numbers of the bonds involving each atom
+c
                bndlist(j,i) = nbond
                do m = 1, n12(k)
                   if (i .eq. i12(m,k)) then
                      bndlist(m,k) = nbond
-                     goto 20
+                     goto 10
                   end if
                end do
-   20          continue
+   10          continue
             end if
          end do
       end do

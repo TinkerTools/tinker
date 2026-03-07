@@ -573,7 +573,7 @@ c
 !$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polarity,f,uind)
 !$OMP& firstprivate(pscale)
 !$OMP& shared (dep,vir)
-!$OMP DO reduction(+:dep,vir) schedule(guided)
+!$OMP DO reduction(+:dep,vir)
 c
 c     find the exchange polarization gradient
 c

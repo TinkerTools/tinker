@@ -17,6 +17,7 @@ c     on a quantum mechanical optimized structure and frequencies
 c
 c
       program valence
+      use atomid
       use atoms
       use files
       use inform
@@ -30,6 +31,7 @@ c
       implicit none
       integer i,nvar,next
       integer mode,length
+      integer maxcls
       real*8 minimum,grdmin
       real*8 valrms,value
       real*8 valfit1
@@ -114,18 +116,47 @@ c
       leng = length
       call getkey
 c
+c     assign connectivities and read a force field
+c
+      call attach
+      call bonds
+      call angles
+      call torsions
+      call bitors
+      call rings
+      call field
+c
 c     assign estimated values to the valence parameters
 c
       if (doguess) then
-         call attach
-         call bonds
-         call angles
-         call torsions
-         call field
          call katom
          call valguess
       else
-         call mechanic
+         maxcls = 0
+         do i = 1, n
+            maxcls = max(class(i),maxcls)
+         end do
+         if (maxcls .eq. 0) then
+            write (*,60)
+   60       format (/,' VALENCE  --  Force Field Atom Class Values',
+     &                 ' must be Assigned')
+            call fatal
+         end if
+         call katom
+         call kbond
+         call kangle
+         call kstrbnd
+         call kurey
+         call kangang
+         call kopbend
+         call kopdist
+         call kimprop
+         call kimptor
+         call ktors
+         call kpitors
+         call kstrtor
+         call kangtor
+         call ktortor
       end if
 c
 c     get control parameters and target values from keyfile
@@ -189,14 +220,14 @@ c
             value = valrms (1)
             grdmin = -1.0d0
             call nextarg (string,exist)
-            if (exist)  read (string,*,err=60,end=60)  grdmin
-   60       continue
+            if (exist)  read (string,*,err=70,end=70)  grdmin
+   70       continue
             if (grdmin .le. 0.0d0) then
-               write (iout,70)
-   70          format (/,' Enter RMS Gradient Termination Criterion',
+               write (iout,80)
+   80          format (/,' Enter RMS Gradient Termination Criterion',
      &                    ' [0.01] :  ',$)
-               read (input,80)  grdmin
-   80          format (f20.0)
+               read (input,90)  grdmin
+   90          format (f20.0)
             end if
             if (grdmin .le. 0.0d0)  grdmin = 0.01d0
             coordtype = 'NONE'
@@ -512,9 +543,9 @@ c
          ita = class(ia)
          itb = class(ib)
          itc = class(ic)
-         iva = valence(ia)
-         ivb = valence(ib)
-         ivc = valence(ic)
+         iva = valnum(ia)
+         ivb = valnum(ib)
+         ivc = valnum(ic)
          if (iva.gt.1 .or. ivc.gt.1) then
             size = 4
             call numeral (ita,pa,size)
@@ -623,8 +654,8 @@ c
          ib = ibnd(2,i)
          ic = 0
          id = 0
-         iva = valence(ia)
-         ivb = valence(ib)
+         iva = valnum(ia)
+         ivb = valnum(ib)
          if (iva.eq.3 .or. ivb.eq.3) then
             ita = class(ia)
             itb = class(ib)
@@ -684,7 +715,7 @@ c
                   end do
                end if
             else if (atomic(isba) .eq. 7) then
-               if (valence(isbb).eq.3 .and. atomic(isbb).eq.6) then
+               if (valnum(isbb).eq.3 .and. atomic(isbb).eq.6) then
                   nop = nop + 1
                   kopb(nop) = ptt
                   opbn(nop) = opbguess (isba,isbb,ic,id)
@@ -817,7 +848,7 @@ c
 c     get atomic number and valence for the atom and its neighbor
 c
       ita = atomic(ia)
-      iva = valence(ia)
+      iva = valnum(ia)
       itb = 0
       ivb = 0
       do i = 1, n12(ia)
@@ -825,7 +856,7 @@ c
          k = atomic(j)
          if (k .gt. itb) then
             itb = k
-            ivb = valence(j)
+            ivb = valnum(j)
          end if
       end do
 c
@@ -1023,8 +1054,8 @@ c     get the atomic number and valence of each atom
 c
       ita = atomic(ia)
       itb = atomic(ib)
-      iva = valence(ia)
-      ivb = valence(ib)
+      iva = valnum(ia)
+      ivb = valnum(ib)
 c
 c     reverse the atom order based on atomic number
 c
@@ -1205,9 +1236,9 @@ c
       ita = atomic(ia)
       itb = atomic(ib)
       itc = atomic(ic)
-      iva = valence(ia)
-      ivb = valence(ib)
-      ivc = valence(ic)
+      iva = valnum(ia)
+      ivb = valnum(ib)
+      ivc = valnum(ic)
 c
 c     resort ja,jb,jc based on the atomic orders
 c
@@ -1408,9 +1439,9 @@ c
       ita = atomic(ia)
       itb = atomic(ib)
       itc = atomic(ic)
-      iva = valence(ia)
-      ivb = valence(ib)
-      ivc = valence(ic)
+      iva = valnum(ia)
+      ivb = valnum(ib)
+      ivc = valnum(ic)
 c
 c     set initial stretch-bend parameters
 c
@@ -1557,9 +1588,9 @@ c
       ita = atomic(ia)
       itb = atomic(ib)
       itc = atomic(ic)
-      iva = valence(ia)
-      ivb = valence(ib)
-      ivc = valence(ic)
+      iva = valnum(ia)
+      ivb = valnum(ib)
+      ivc = valnum(ic)
 c
 c     assign estimated out-of-plane parameter values
 c
@@ -1598,8 +1629,8 @@ c     get the atomic number and valence of each atom
 c
       ita = atomic(ia)
       itb = atomic(ib)
-      iva = valence(ia)
-      ivb = valence(ib)
+      iva = valnum(ia)
+      ivb = valnum(ib)
 c
 c     assign estimated out-of-plane parameter values
 c
@@ -1639,10 +1670,10 @@ c
       itb = atomic(ib)
       itc = atomic(ic)
       itd = atomic(id)
-      iva = valence(ia)
-      ivb = valence(ib)
-      ivc = valence(ic)
-      ivd = valence(id)
+      iva = valnum(ia)
+      ivb = valnum(ib)
+      ivc = valnum(ic)
+      ivd = valnum(id)
 c
 c     reorder the atoms based on the atomic numbers
 c
@@ -3430,7 +3461,7 @@ c
          call varprm (nvar,xx,i,-0.5d0*eps(i))
          e0 = valrms(0)
          call varprm (nvar,xx,i,0.5d0*eps(i))
-         e  = valrms(0)
+         e = valrms(0)
          g(i) = (e-e0) / eps(i)
       end do
 c

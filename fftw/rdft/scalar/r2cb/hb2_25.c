@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:07:41 EDT 2018 */
+/* Generated on Tue Sep 14 10:46:58 EDT 2021 */
 
 #include "rdft/codelet-rdft.h"
 
@@ -870,14 +870,14 @@ static void hb2_25(R *cr, R *ci, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_CEXP, 1, 1},
-     {TW_CEXP, 1, 3},
-     {TW_CEXP, 1, 9},
-     {TW_CEXP, 1, 24},
-     {TW_NEXT, 1, 0}
+     { TW_CEXP, 1, 1 },
+     { TW_CEXP, 1, 3 },
+     { TW_CEXP, 1, 9 },
+     { TW_CEXP, 1, 24 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const hc2hc_desc desc = { 25, "hb2_25", twinstr, &GENUS, {84, 78, 356, 0} };
+static const hc2hc_desc desc = { 25, "hb2_25", twinstr, &GENUS, { 84, 78, 356, 0 } };
 
 void X(codelet_hb2_25) (planner *p) {
      X(khc2hc_register) (p, hb2_25, &desc);
@@ -1627,14 +1627,14 @@ static void hb2_25(R *cr, R *ci, const R *W, stride rs, INT mb, INT me, INT ms)
 }
 
 static const tw_instr twinstr[] = {
-     {TW_CEXP, 1, 1},
-     {TW_CEXP, 1, 3},
-     {TW_CEXP, 1, 9},
-     {TW_CEXP, 1, 24},
-     {TW_NEXT, 1, 0}
+     { TW_CEXP, 1, 1 },
+     { TW_CEXP, 1, 3 },
+     { TW_CEXP, 1, 9 },
+     { TW_CEXP, 1, 24 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const hc2hc_desc desc = { 25, "hb2_25", twinstr, &GENUS, {280, 180, 160, 0} };
+static const hc2hc_desc desc = { 25, "hb2_25", twinstr, &GENUS, { 280, 180, 160, 0 } };
 
 void X(codelet_hb2_25) (planner *p) {
      X(khc2hc_register) (p, hb2_25, &desc);

@@ -8,12 +8,13 @@
 #  #################################################################
 #
 #
-#  compile all the modules; "sizes" must be first since it is used
-#  to set static array dimensions in many of the other modules
+#  compile all the modules; "sizes" must be first since it
+#  sets static array dimensions in many of the other modules
 #
 #
 ifort -c -g -warn all -check all sizes.f
 ifort -c -g -warn all -check all action.f
+ifort -c -g -warn all -check all alfmol.f
 ifort -c -g -warn all -check all align.f
 ifort -c -g -warn all -check all analyz.f
 ifort -c -g -warn all -check all angang.f
@@ -156,6 +157,7 @@ ifort -c -g -warn all -check all rxnfld.f
 ifort -c -g -warn all -check all rxnpot.f
 ifort -c -g -warn all -check all scales.f
 ifort -c -g -warn all -check all sequen.f
+ifort -c -g -warn all -check all shapes.f
 ifort -c -g -warn all -check all shunt.f
 ifort -c -g -warn all -check all socket.f
 ifort -c -g -warn all -check all solpot.f
@@ -165,11 +167,13 @@ ifort -c -g -warn all -check all strbnd.f
 ifort -c -g -warn all -check all strtor.f
 ifort -c -g -warn all -check all syntrn.f
 ifort -c -g -warn all -check all tarray.f
+ifort -c -g -warn all -check all tettor.f
 ifort -c -g -warn all -check all titles.f
 ifort -c -g -warn all -check all torpot.f
 ifort -c -g -warn all -check all tors.f
 ifort -c -g -warn all -check all tortor.f
 ifort -c -g -warn all -check all tree.f
+ifort -c -g -warn all -check all tritor.f
 ifort -c -g -warn all -check all units.f
 ifort -c -g -warn all -check all uprior.f
 ifort -c -g -warn all -check all urey.f
@@ -206,11 +210,11 @@ ifort -c -g -warn all -check all bitors.f
 ifort -c -g -warn all -check all bonds.f
 ifort -c -g -warn all -check all born.f
 ifort -c -g -warn all -check all bounds.f
-ifort -c -g -warn all -check all bussi.f
 ifort -c -g -warn all -check all calendar.f
 ifort -c -g -warn all -check all center.f
 ifort -c -g -warn all -check all chkpole.f
 ifort -c -g -warn all -check all chkring.f
+ifort -c -g -warn all -check all chksymm.f
 ifort -c -g -warn all -check all chkxyz.f
 ifort -c -g -warn all -check all cholesky.f
 ifort -c -g -warn all -check all clock.f
@@ -374,6 +378,9 @@ ifort -c -g -warn all -check all fft3d.f
 ifort -c -g -warn all -check all fftpack.f
 ifort -c -g -warn all -check all field.f
 ifort -c -g -warn all -check all final.f
+ifort -c -g -warn all -check all findnuc.f
+ifort -c -g -warn all -check all findpro.f
+ifort -c -g -warn all -check all findseq.f
 ifort -c -g -warn all -check all flatten.f
 ifort -c -g -warn all -check all freefix.f
 ifort -c -g -warn all -check all freeunit.f
@@ -381,6 +388,8 @@ ifort -c -g -warn all -check all gda.f
 ifort -c -g -warn all -check all geometry.f
 ifort -c -g -warn all -check all getarc.f
 ifort -c -g -warn all -check all getcart.f
+ifort -c -g -warn all -check all getdcd.f
+ifort -c -g -warn all -check all getfloat.f
 ifort -c -g -warn all -check all getint.f
 ifort -c -g -warn all -check all getkey.f
 ifort -c -g -warn all -check all getmol.f
@@ -450,6 +459,7 @@ ifort -c -g -warn all -check all kstrbnd.f
 ifort -c -g -warn all -check all kstrtor.f
 ifort -c -g -warn all -check all ktors.f
 ifort -c -g -warn all -check all ktortor.f
+ifort -c -g -warn all -check all kundrot.f
 ifort -c -g -warn all -check all kurey.f
 ifort -c -g -warn all -check all kvdw.f
 ifort -c -g -warn all -check all lattice.f
@@ -460,6 +470,7 @@ ifort -c -g -warn all -check all makeint.f
 ifort -c -g -warn all -check all makeref.f
 ifort -c -g -warn all -check all makexyz.f
 ifort -c -g -warn all -check all maxwell.f
+ifort -c -g -warn all -check all mdavg.f
 ifort -c -g -warn all -check all mdinit.f
 ifort -c -g -warn all -check all mdrest.f
 ifort -c -g -warn all -check all mdsave.f
@@ -514,6 +525,7 @@ ifort -c -g -warn all -check all prmkey.f
 ifort -c -g -warn all -check all promo.f
 ifort -c -g -warn all -check all protein.f
 ifort -c -g -warn all -check all prtarc.f
+ifort -c -g -warn all -check all prtcif.f
 ifort -c -g -warn all -check all prtdyn.f
 ifort -c -g -warn all -check all prterr.f
 ifort -c -g -warn all -check all prtint.f
@@ -531,11 +543,13 @@ ifort -c -g -warn all -check all radial.f
 ifort -c -g -warn all -check all random.f
 ifort -c -g -warn all -check all rattle.f
 ifort -c -g -warn all -check all readcart.f
+ifort -c -g -warn all -check all readcif.f
 ifort -c -g -warn all -check all readdcd.f
 ifort -c -g -warn all -check all readdyn.f
 ifort -c -g -warn all -check all readgau.f
 ifort -c -g -warn all -check all readgdma.f
 ifort -c -g -warn all -check all readint.f
+ifort -c -g -warn all -check all readmbis.f
 ifort -c -g -warn all -check all readmol.f
 ifort -c -g -warn all -check all readmol2.f
 ifort -c -g -warn all -check all readpdb.f
@@ -545,6 +559,7 @@ ifort -c -g -warn all -check all readxyz.f
 ifort -c -g -warn all -check all replica.f
 ifort -c -g -warn all -check all respa.f
 ifort -c -g -warn all -check all rgdstep.f
+ifort -c -g -warn all -check all richmond.f
 ifort -c -g -warn all -check all rings.f
 ifort -c -g -warn all -check all rmsfit.f
 ifort -c -g -warn all -check all rotlist.f
@@ -576,7 +591,9 @@ ifort -c -g -warn all -check all testhess.f
 ifort -c -g -warn all -check all testpair.f
 ifort -c -g -warn all -check all testpol.f
 ifort -c -g -warn all -check all testrot.f
+ifort -c -g -warn all -check all testsurf.f
 ifort -c -g -warn all -check all testvir.f
+ifort -c -g -warn all -check all tettors.f
 ifort -c -g -warn all -check all timer.f
 ifort -c -g -warn all -check all timerot.f
 ifort -c -g -warn all -check all tncg.f
@@ -585,6 +602,8 @@ ifort -c -g -warn all -check all torque.f
 ifort -c -g -warn all -check all torsfit.f
 ifort -c -g -warn all -check all torsions.f
 ifort -c -g -warn all -check all trimtext.f
+ifort -c -g -warn all -check all tritors.f
+ifort -c -g -warn all -check all unionball.f
 ifort -c -g -warn all -check all unitcell.f
 ifort -c -g -warn all -check all valence.f
 ifort -c -g -warn all -check all verlet.f

@@ -41,7 +41,7 @@ c
 !$OMP PARALLEL default(private) shared(nurey,iury,ul,uk,
 !$OMP& use,x,y,z,cury,qury,ureyunit,use_group,use_polymer)
 !$OMP& shared(eub)
-!$OMP DO reduction(+:eub) schedule(guided)
+!$OMP DO reduction(+:eub)
 c
 c     calculate the Urey-Bradley 1-3 energy term
 c

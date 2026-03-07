@@ -142,7 +142,7 @@ c     do while (.true. .and. .not.eof(igau))
    90          format (a240)
             end do
             i = 1
-            do while (.true.)
+            do while (i .le. ngatom)
                read (igau,100,err=220,end=220)  record
   100          format (a240)
                read (record,*,err=110,end=110)  itmp,jtmp,ktmp,

@@ -19,7 +19,7 @@
  */
 
 /* This file was automatically generated --- DO NOT EDIT */
-/* Generated on Thu May 24 08:04:29 EDT 2018 */
+/* Generated on Tue Sep 14 10:44:41 EDT 2021 */
 
 #include "dft/codelet-dft.h"
 
@@ -79,11 +79,11 @@ static void q1_2(R *rio, R *iio, const R *W, stride rs, stride vs, INT mb, INT m
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 0, 2},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 0, 2 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const ct_desc desc = { 2, "q1_2", twinstr, &GENUS, {8, 4, 4, 0}, 0, 0, 0 };
+static const ct_desc desc = { 2, "q1_2", twinstr, &GENUS, { 8, 4, 4, 0 }, 0, 0, 0 };
 
 void X(codelet_q1_2) (planner *p) {
      X(kdft_difsq_register) (p, q1_2, &desc);
@@ -137,11 +137,11 @@ static void q1_2(R *rio, R *iio, const R *W, stride rs, stride vs, INT mb, INT m
 }
 
 static const tw_instr twinstr[] = {
-     {TW_FULL, 0, 2},
-     {TW_NEXT, 1, 0}
+     { TW_FULL, 0, 2 },
+     { TW_NEXT, 1, 0 }
 };
 
-static const ct_desc desc = { 2, "q1_2", twinstr, &GENUS, {8, 4, 4, 0}, 0, 0, 0 };
+static const ct_desc desc = { 2, "q1_2", twinstr, &GENUS, { 8, 4, 4, 0 }, 0, 0, 0 };
 
 void X(codelet_q1_2) (planner *p) {
      X(kdft_difsq_register) (p, q1_2, &desc);

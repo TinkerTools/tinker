@@ -12,11 +12,12 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "readpdb" gets a set of Protein Data Bank coordinates
-c     from an external disk file
+c     "readpdb" gets a set of coordinates in RCSB legacy PDB
+c     format from an external file
 c
 c
       subroutine readpdb (ipdb)
+      use boxes
       use files
       use inform
       use iounit
@@ -30,8 +31,11 @@ c
       integer index,serial
       integer next,nxtlast
       integer residue,reslast
+      integer model
       integer trimtext
       real*8 xx,yy,zz
+      real*8 xbx,ybx,zbx
+      real*8 aan,ban,gan
       logical exist,opened
       logical first
       character*1 chain,chnlast
@@ -81,6 +85,7 @@ c
       reslast = maxres
       namelast = '   '
       chnlast = ' '
+      model = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -92,29 +97,43 @@ c
          first = .false.
          if (.not. allocated(resnum))  allocate (resnum(maxatm))
          if (.not. allocated(resatm))  allocate (resatm(2,maxatm))
+         if (.not. allocated(pdbmod))  allocate (pdbmod(maxatm))
          if (.not. allocated(xpdb))  allocate (xpdb(maxatm))
          if (.not. allocated(ypdb))  allocate (ypdb(maxatm))
          if (.not. allocated(zpdb))  allocate (zpdb(maxatm))
          if (.not. allocated(pdbres))  allocate (pdbres(maxatm))
          if (.not. allocated(pdbsym))  allocate (pdbsym(maxatm))
          if (.not. allocated(pdbatm))  allocate (pdbatm(maxatm))
-         if (.not. allocated(pdbtyp))  allocate (pdbtyp(maxatm))
+         if (.not. allocated(pdbrec))  allocate (pdbrec(maxatm))
       end if
 c
-c     process individual atoms from the Protein Data Bank file
+c     process info and individual atoms from the PDB file
 c
       do while (.true.)
          read (ipdb,20,err=230,end=230)  record
    20    format (a240)
          remark = record(1:6)
          call upcase (remark)
-         if (remark .eq. 'HEADER') then
+         if (remark .eq. 'TITLE ') then
             title = record(11:70)
             ltitle = trimtext (title)
-         else if (remark .eq. 'TITLE ') then
+         else if (remark .eq. 'HEADER') then
             if (ltitle .eq. 0) then
                title = record(11:70)
                ltitle = trimtext (title)
+            end if
+         else if (remark .eq. 'CRYST1') then
+            next = 7
+            string = record(next:240)
+            read (string,*)  xbx,ybx,zbx,aan,ban,gan
+            if (xbx .gt. 1.0d0) then
+               xbox = xbx
+               ybox = ybx
+               zbox = zbx
+               alpha = aan
+               beta = ban
+               gamma = gan
+               call unitcell
             end if
          else if (remark .eq. 'ATOM  ') then
             next = 7
@@ -161,6 +180,7 @@ c
             if (index(chnsym,chain) .eq. 0)  goto 120
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 120
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 120
+            if (model.ne.imodel .and. imodel.ne.0)  goto 120
             call fixpdb (resname,atmname)
             if (resname .eq. 'HOH') then
                remark = 'HETATM'
@@ -206,10 +226,11 @@ c
             xpdb(npdb) = xx
             ypdb(npdb) = yy
             zpdb(npdb) = zz
-            pdbtyp(npdb) = remark
+            pdbrec(npdb) = remark
             pdbatm(npdb) = atmname
             pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
+            pdbmod(npdb) = model
             resnum(npdb) = nres
             if (resname .eq. 'HOH')  resnum(npdb) = 0
             chnatm(npdb) = chain
@@ -258,20 +279,24 @@ c
             if (index(chnsym,chain) .eq. 0)  goto 210
             if (altloc.ne.' ' .and. altloc.ne.altsym)  goto 210
             if (insert.ne.' ' .and. index(instyp,insert).eq.0)  goto 210
+            if (model.ne.imodel .and. imodel.ne.0)  goto 210
             call fixpdb (resname,atmname)
             npdb = npdb + 1
             xpdb(npdb) = xx
             ypdb(npdb) = yy
             zpdb(npdb) = zz
-            pdbtyp(npdb) = remark
+            pdbrec(npdb) = remark
             pdbatm(npdb) = atmname
             pdbsym(npdb) = atmsymb
             pdbres(npdb) = resname
+            pdbmod(npdb) = model
             resnum(npdb) = 0
             chnatm(npdb) = chain
   210       continue
-         else if (remark .eq. 'ENDMDL') then
-            goto 230
+         else if (remark .eq. 'MODEL ') then
+            next = 7
+            string = record(next:240)
+            read (string,*)  model
          else if (remark .eq. 'END   ') then
             goto 230
          end if
@@ -290,7 +315,7 @@ c
          nchain = 0
          chnlast = '#'
          do i = 1, npdb
-            if (pdbtyp(i) .eq. 'ATOM  ') then
+            if (pdbrec(i) .eq. 'ATOM  ') then
                letter = chnatm(i)
                if (letter .ne. chnlast) then
                   nchain = nchain + 1
@@ -373,7 +398,7 @@ c
       nres = 0
       k = 0
       do i = 1, npdb
-         if (pdbtyp(i) .eq. 'ATOM  ') then
+         if (pdbrec(i) .eq. 'ATOM  ') then
             if (resnum(i) .ne. k) then
                k = resnum(i)
                nres = nres + 1
@@ -384,23 +409,23 @@ c
       end do
       if (nres .ge. 1)  resatm(2,nres) = npdb
 c
-c     close the PDB file and quit if there are no coordinates
+c     close the input file and quit if no coordinates found
 c
-      if (npdb .eq. 0)  abort = .true.
       if (.not. opened)  close (unit=ipdb)
+      if (npdb .eq. 0)  abort = .true.
       return
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine scanpdb  --  PDB chains, alternates and inserts  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine scanpdb  --  PDB chains, alternates & inserts  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "scanpdb" reads the first model in a Protein Data Bank file and
-c     sets chains, alternate sites and insertion records to be used
+c     "scanpdb" reads the first model in a legacy PDB file and
+c     finds chains, alternate sites, insertions and models
 c
 c
       subroutine scanpdb (ipdb)
@@ -412,6 +437,7 @@ c
       integer next,nxtlast
       integer length,dummy
       integer nalt,nins
+      integer model,modtemp
       logical exist,done
       character*1 chain,chnlast
       character*1 altloc,altlast
@@ -438,6 +464,8 @@ c
       altsym = ' '
       alttyp = blank
       instyp = blank
+      nmodel = 0
+      imodel = 0
 c
 c     scan for multiple chains, alternate locations and inserts
 c
@@ -489,8 +517,11 @@ c
                   inslast = insert
                end if
             end if
-         else if (remark .eq. 'ENDMDL') then
-            done = .true.
+         else if (remark .eq. 'MODEL ') then
+            next = 7
+            string = record(next:240)
+            read (string,*)  model
+            nmodel = max(model,nmodel)
          else if (remark .eq. 'END   ') then
             done = .true.
          end if
@@ -557,7 +588,7 @@ c
          chnsym(i:i) = '#'
       end do
 c
-c     find out which of the alternate locations will be used
+c     find out which of alternate locations will be used
 c
       if (nalt .gt. 0) then
          call nextarg (altsym,exist)
@@ -611,6 +642,25 @@ c
             instyp = instemp
          end if
       end if
+c
+c     find out which of the multiple models will be used
+c
+      if (nmodel .gt. 1) then
+         call nextarg (string,exist)
+         read (string,*,err=130,end=130)  modtemp
+  130    continue
+         if (.not. exist) then
+            modtemp = 0
+            write (iout,140)
+  140       format (/,' Enter the Structural Model to Extract',
+     &                 ' [0=All] :  ',$)
+            read (input,150)  modtemp
+  150       format (i10)
+         end if
+         if (modtemp .ne. 0)  nmodel = 1
+         if (modtemp .eq. 0)  modtemp = 1
+         imodel = modtemp
+      end if
       return
       end
 c
@@ -622,7 +672,7 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "fixpdb" corrects problems with PDB files by converting residue
+c     "fixpdb" corrects issues with PDB entries by converting residue
 c     and atom names to the standard forms used by Tinker
 c
 c
@@ -687,10 +737,15 @@ c
       if (resname .eq. 'CYM')  resname = 'CYD'
       if (resname .eq. 'LYP')  resname = 'LYS'
       if (resname .eq. 'LYN')  resname = 'LYD'
+      if (resname .eq. 'LSN')  resname = 'LYD'
 c
 c     convert unusual names for terminal capping residues
 c
+      if (resname .eq. 'ACP')  resname = 'ACE'
       if (resname .eq. 'NMA')  resname = 'NME'
+      if (resname .eq. 'CT3')  resname = 'NME'
+      if (resname .eq. 'NHE')  resname = 'NH2'
+      if (resname .eq. 'CT2')  resname = 'NH2'
 c
 c     convert nonstandard names for water molecules
 c
@@ -712,6 +767,7 @@ c
       if (resname .eq. 'SOD')  resname = ' NA'
       if (resname .eq. 'MG ')  resname = ' MG'
       if (resname .eq. 'MG+')  resname = ' MG'
+      if (resname .eq. 'MAG')  resname = ' MG'
       if (resname .eq. 'CL ')  resname = ' CL'
       if (resname .eq. 'CL-')  resname = ' CL'
       if (resname .eq. 'CLA')  resname = ' CL'
@@ -731,6 +787,7 @@ c
       if (resname .eq. 'KR ')  resname = ' KR'
       if (resname .eq. 'RB ')  resname = ' RB'
       if (resname .eq. 'RB+')  resname = ' RB'
+      if (resname .eq. 'RUB')  resname = ' RB'
       if (resname .eq. 'SR ')  resname = ' SR'
       if (resname .eq. 'SR+')  resname = ' SR'
       if (resname .eq. 'I  ')  resname = '  I'
@@ -741,6 +798,7 @@ c
       if (resname .eq. 'CES')  resname = ' CS'
       if (resname .eq. 'BA ')  resname = ' BA'
       if (resname .eq. 'BA+')  resname = ' BA'
+      if (resname .eq. 'BAR')  resname = ' BA'
 c
 c     decide whether residue is protein or nucleic acid
 c
@@ -973,7 +1031,7 @@ c
          if (atmname .eq. ' HNE')  atmname = ' HE2'
          if (atmname .eq. 'HNE2')  atmname = ' HE2'
 c
-c     aspartic acid residue  (ASP)
+c     aspartate residue  (ASP)
 c
       else if (resname .eq. 'ASP') then
          if (atmname .eq. '1HB ')  atmname = ' HB2'
@@ -993,7 +1051,7 @@ c
          if (atmname .eq. '2HD2')  atmname = 'HD22'
          if (atmname .eq. 'HND2')  atmname = 'HD22'
 c
-c     glutamic acid residue  (GLU)
+c     glutamate residue  (GLU)
 c
       else if (resname .eq. 'GLU') then
          if (atmname .eq. '1HB ')  atmname = ' HB2'
@@ -1145,9 +1203,10 @@ c     C-terminal N-methylamide residue  (NME)
 c
       else if (resname .eq. 'NME') then
          if (atmname .eq. ' NT ')  atmname = ' N  '
-         if (atmname .eq. ' CT ')  atmname = ' CH3'
-         if (atmname .eq. ' CAT')  atmname = ' CH3'
-         if (atmname .eq. ' CA ')  atmname = ' CH3'
+         if (atmname .eq. ' CT ')  atmname = ' C  '
+         if (atmname .eq. ' CAT')  atmname = ' C  '
+         if (atmname .eq. ' CA ')  atmname = ' C  '
+         if (atmname .eq. ' CH3')  atmname = ' C  '
          if (atmname .eq. ' HNT')  atmname = ' H  '
          if (atmname .eq. '1H  ')  atmname = ' H1 '
          if (atmname .eq. '1HA ')  atmname = ' H1 '
@@ -1237,6 +1296,7 @@ c
          if (atmname .eq. ' DW2')  atmname = ' H  '
          if (atmname .eq. ' D1 ')  atmname = ' H  '
          if (atmname .eq. ' D2 ')  atmname = ' H  '
+         if (atmname .eq. ' M  ')  atmname = ' EP '
       end if
       return
       end

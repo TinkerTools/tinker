@@ -39,7 +39,8 @@ c
       logical header,done
       character*4 pa,pb,pc,pd
       character*4 zeros
-      character*16 blank,pti
+      character*16 blank
+      character*16 pti,ptz
       character*16 pt0,pt1
       character*16 pt2,pt3
       character*16 pt(6)
@@ -205,6 +206,51 @@ c
                      end do
                   end if
                end do
+               if (.not. done) then
+                  do j = 1, nti
+                     if (kti(j)(9:12) .eq. pc) then
+                        do k = 1, 6
+                           ptz = zeros//pt(k)(5:16)
+                           if (kti(j) .eq. ptz) then
+                              nitors = nitors + 1
+                              iitors(3,nitors) = ic
+                              if (k .eq. 1) then
+                                 iitors(1,nitors) = ia
+                                 iitors(2,nitors) = ib
+                                 iitors(4,nitors) = id
+                              else if (k .eq. 2) then
+                                 iitors(1,nitors) = ib
+                                 iitors(2,nitors) = ia
+                                 iitors(4,nitors) = id
+                              else if (k .eq. 3) then
+                                 iitors(1,nitors) = ia
+                                 iitors(2,nitors) = id
+                                 iitors(4,nitors) = ib
+                              else if (k .eq. 4) then
+                                 iitors(1,nitors) = id
+                                 iitors(2,nitors) = ia
+                                 iitors(4,nitors) = ib
+                              else if (k .eq. 5) then
+                                 iitors(1,nitors) = ib
+                                 iitors(2,nitors) = id
+                                 iitors(4,nitors) = ia
+                              else if (k .eq. 6) then
+                                 iitors(1,nitors) = id
+                                 iitors(2,nitors) = ib
+                                 iitors(4,nitors) = ia
+                              end if
+                              itors1(1,nitors) = ti1(1,j) / symm
+                              itors1(2,nitors) = ti1(2,j)
+                              itors2(1,nitors) = ti2(1,j) / symm
+                              itors2(2,nitors) = ti2(2,j)
+                              itors3(1,nitors) = ti3(1,j) / symm
+                              itors3(2,nitors) = ti3(2,j)
+                              done = .true.
+                           end if
+                        end do
+                     end if
+                  end do
+               end if
                if (.not. done) then
                   do j = 1, nti
                      if (kti(j) .eq. pt1) then

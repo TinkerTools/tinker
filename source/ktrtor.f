@@ -24,6 +24,7 @@ c     tbf       function values at points on spline grid
 c     tbx       gradient over first torsion of spline grid
 c     tby       gradient over second torsion of spline grid
 c     tbxy      Hessian cross components over spline grid
+c     ttier     tier name for each torsion-torsion parameter
 c     ktt       string of torsion-torsion atom classes
 c
 c
@@ -42,6 +43,7 @@ c
       real*8, allocatable :: tbx(:,:)
       real*8, allocatable :: tby(:,:)
       real*8, allocatable :: tbxy(:,:)
+      character*3, allocatable :: ttier(:)
       character*20, allocatable :: ktt(:)
       save
       end

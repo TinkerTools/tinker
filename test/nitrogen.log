@@ -4,9 +4,9 @@
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.5   February 2023                      ##
+ ##                       Version 26.1   February 2026                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -76,14 +76,16 @@
        48.00      148.59      128.90      128.86      135.45      2.8219
        49.00      151.08      130.26      126.17      135.83      2.7721
 
+ Self-Diffusion Constant :      2.5799 x 10^-5 cm^2/s
+
      ######################################################################
    ##########################################################################
   ###                                                                      ###
  ###            Tinker  ---  Software Tools for Molecular Design            ###
  ##                                                                          ##
- ##                      Version 8.10.5   February 2023                      ##
+ ##                       Version 26.1   February 2026                       ##
  ##                                                                          ##
- ##               Copyright (c)  Jay William Ponder  1990-2023               ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
  ###                           All Rights Reserved                          ###
   ###                                                                      ###
    ##########################################################################
@@ -970,3 +972,5 @@
      865           3388         8.6450         0.9796         0.9767
      866           3358         8.6550         0.9687         0.9705
      867           3250         8.6650         0.9353         0.9349
+
+ Maximum g(r) Value :      1.7099 at Distance    3.7750

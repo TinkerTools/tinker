@@ -511,7 +511,7 @@ c
 !$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,off2,
 !$OMP& elambda,mut,cut2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(mscale) shared(ect,dect,vir)
-!$OMP DO reduction(+:ect,dect,vir) schedule(guided)
+!$OMP DO reduction(+:ect,dect,vir)
 c
 c     compute the charge transfer energy and derivatives
 c

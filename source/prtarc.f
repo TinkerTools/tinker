@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     "prtarc" writes a Cartesian coordinates archive as either
-c     a formatted or binary disk file
+c     a formatted or binary file
 c
 c
       subroutine prtarc (iarc,first)
@@ -240,10 +240,12 @@ c
          write (idcd)  nuse
       end if
 c
-c     append the lattice values based on header flag value
+c     append the lattice values based on header flag value;
+c     using angle values is NAMD style, cosine values is CHARMM
 c
       if (use_bounds) then
-         write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+c        write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+         write (idcd)  xbox,gamma,ybox,beta,alpha,zbox
       end if
 c
 c     remove unused atoms from the coordinates to be output

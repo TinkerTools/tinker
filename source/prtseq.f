@@ -13,8 +13,8 @@ c     ############################################################
 c
 c
 c     "prtseq" writes out a biopolymer sequence to an external
-c     disk file with 15 residues per line and distinct chains
-c     separated by blank lines
+c     file with 15 residues per line and distinct chains separated
+c     by blank lines
 c
 c
       subroutine prtseq (iseq)

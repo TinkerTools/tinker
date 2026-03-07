@@ -90,7 +90,7 @@ c
 !$OMP& use,x,y,z,cang,qang,pang,sang,angtyp,angunit,eps,use_group,
 !$OMP& use_polymer)
 !$OMP& shared(ea,dea,vir)
-!$OMP DO reduction(+:ea,dea,vir) schedule(guided)
+!$OMP DO reduction(+:ea,dea,vir)
 c
 c     calculate the bond angle bending energy term
 c

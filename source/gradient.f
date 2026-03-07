@@ -26,7 +26,6 @@ c
       use iounit
       use limits
       use potent
-      use rigid
       use vdwpot
       use virial
       implicit none
@@ -273,6 +272,10 @@ c
             derivs(j,i) = desum(j,i)
          end do
       end do
+c
+c     distribute gradient on four-site water extra centers
+c
+      call watfour2 (derivs)
 c
 c     check for an illegal value for the total energy
 c

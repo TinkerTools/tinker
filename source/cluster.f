@@ -24,7 +24,6 @@ c
       use inform
       use iounit
       use keys
-      use limits
       use molcul
       implicit none
       integer i,j,k
@@ -179,14 +178,41 @@ c     sort the list of atoms in each group by atom number
 c
          do i = 0, ngrp
             size = igrp(2,i) - igrp(1,i) + 1
-            if (igrp(1,i) .ne. 0)
-     &         call sort (size,kgrp(igrp(1,i)))
+            if (igrp(1,i) .ne. 0)  call sort (size,kgrp(igrp(1,i)))
+         end do
+c
+c     if groups are not used, put full system in default group
+c
+      else
+         ngrp = 0
+         igrp(1,0) = 1
+         igrp(2,0) = n
+         do i = 1, n
+            kgrp(i) = i
+            grplist(i) = 0
          end do
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (list)
+c
+c     compute the total mass of all atoms in each group
+c
+      do i = 0, ngrp
+         grpmass(i) = 0.0d0
+         do j = igrp(1,i), igrp(2,i)
+            grpmass(i) = grpmass(i) + mass(kgrp(j))
+         end do
+      end do
+c
+c     turn off bounds and replicas for intragroup calculations
+c
+      if (use_intra) then
+         use_bounds = .false.
+         use_replica = .false.
+         call cutoffs
+      end if
 c
 c     use only intragroup or intergroup interactions if selected
 c
@@ -207,7 +233,7 @@ c
          end do
       end if
 c
-c     disable consideration of interactions with any empty groups
+c     disable consideration of interactions with empty groups
 c
       do i = 0, ngrp
          size = igrp(2,i) - igrp(1,i) + 1
@@ -217,23 +243,6 @@ c
                wgrp(i,j) = 0.0d0
             end do
          end if
-      end do
-c
-c     turn off bounds and replicas for intragroup calculations
-c
-      if (use_intra) then
-         use_bounds = .false.
-         use_replica = .false.
-         call cutoffs
-      end if
-c
-c     compute the total mass of all atoms in each group
-c
-      do i = 1, ngrp
-         grpmass(i) = 0.0d0
-         do j = igrp(1,i), igrp(2,i)
-            grpmass(i) = grpmass(i) + mass(kgrp(j))
-         end do
       end do
 c
 c     output the final list of atoms in each group

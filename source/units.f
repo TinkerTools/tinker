@@ -18,14 +18,14 @@ c     M. Stock, R. Davis, E. de Mirandes and M. J. T. Milton, "The
 c     Revision of the SI - The Result of Three Decades of Progress
 c     in Metrology", Metrologia, 56, 022001 (2019)
 c
-c     E. Teisinga, P. J. Mohr, D. B. Newell and B. N. Taylor, "CODATA
-c     Recommended Values of the Fundamental Physical Constants: 2018",
-c     Journal of Physical and Chemical Reference Data, 50, 033105 (2021)
+c     P. J. Mohr, D. B. Newell, B. N. Taylor and E. Teisinga, "CODATA
+c     Recommended Values of the Fundamental Physical Constants: 2022",
+c     Reviews of Modern Physics, 97, 025002 (2025)
 c
 c     Where appropriate, values are from the November 2018 revision
 c     of SI units to fixed values by the 26th General Conference on
-c     Weights and Measures; other values are taken from 2018 CODATA
-c     reference constants or are described below
+c     Weights and Measures; other values are taken from the CODATA
+c     recommended values or are as described below
 c
 c     The conversion from calorie to Joule is the definition of the
 c     thermochemical calorie as 1 cal = 4.1840 J from ISO 31-4 (1992)
@@ -33,11 +33,11 @@ c
 c     The "coulomb" energy conversion factor is found by dimensional
 c     analysis of Coulomb's Law, that is by dividing the square of the
 c     elementary charge in Coulombs by 4*pi*eps0*rij, where eps0 is
-c     the permittivity of vacuum (the "electric constant"); note that
+c     the vacuum electric permittivity (the "electric constant"); note
 c     eps0 is typically given in F/m, equivalent to C**2/(J-m)
 c
-c     The approximate value used for the Debye, 3.33564 x 10-30 C-m,
-c     is from IUPAC Compendium of Chemical Technology, 2nd Ed. (1997)
+c     The approximate value for the Debye, 3.33564 x 10-30 C-m, is
+c     from the IUPAC Compendium of Chemical Technology, 2nd Ed. (1997)
 c
 c     The value of "prescon" is based on definition of 1 atmosphere
 c     as 101325 Pa set by the 10th Conference Generale des Poids et
@@ -83,18 +83,18 @@ c
       parameter (boltzmann=0.8314462618d0)
       parameter (gasconst=1.9872042586d-3)
       parameter (elemchg=1.602176634d-19)
-      parameter (vacperm=8.8541878128d-12)
-      parameter (emass=5.48579909065d-4)
+      parameter (vacperm=8.8541878188d-12)
+      parameter (emass=5.485799090441d-4)
       parameter (planck=6.62607015d-34)
       parameter (joule=4.1840d0)
       parameter (ekcal=4.1840d+2)
-      parameter (bohr=0.529177210903d0)
+      parameter (bohr=0.529177210544d0)
       parameter (hartree=627.509474063d0)
-      parameter (evolt=27.211386245988d0)
+      parameter (evolt=27.211386245981d0)
       parameter (efreq=2.194746314d+5)
       parameter (coulomb=332.0637133d0)
       parameter (elefield=1439.96455d0)
-      parameter (debye=4.80321d0)
+      parameter (debye=4.803206802d0)
       parameter (prescon=6.85684112d+4)
       save
       end

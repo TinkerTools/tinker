@@ -40,7 +40,7 @@ c
       integer ia,ib,ic,id
       integer swap,lext
       integer next,freeunit
-      integer igeo,ngeo,nhydro
+      integer igeo,ngeo,nhyd
       integer r1,r2,r3,r4,b1,b2
       real*8 cosine,weigh
       real*8 hbond1,hbond2
@@ -201,14 +201,14 @@ c
          call upcase (answer)
          do i = 1, n
             if (n12(i) .eq. 4) then
-               nhydro = 0
+               nhyd = 0
                if (answer .eq. 'Y') then
                   do j = 1, 4
                      letter = name(i12(j,i))(1:1)
-                     if (letter .eq. 'H')  nhydro = nhydro + 1
+                     if (letter .eq. 'H')  nhyd = nhyd + 1
                   end do
                end if
-               if (nhydro .lt. 2) then
+               if (nhyd .lt. 2) then
                   nchir = nchir + 1
                   do j = 1, 4
                      ichir(j,nchir) = i12(j,i)

@@ -45,10 +45,10 @@ c
       integer i,j,istep
       integer idyn,lext
       integer size,next
+      integer ndummy
       integer freeunit
       integer trimtext
-      real*8 dt,eps
-      real*8 e,ekt,qterm
+      real*8 dt,e,ekt,qterm
       real*8 maxwell,speed
       real*8 amass,gmass
       real*8 vec(3)
@@ -56,6 +56,7 @@ c
       logical exist
       character*7 ext
       character*20 keyword
+      character*20 text
       character*240 dynfile
       character*240 record
       character*240 string
@@ -65,9 +66,12 @@ c     set default parameters for the dynamics trajectory
 c
       integrate = 'BEEMAN'
       bmnmix = 8
-      arespa = 0.00025d0
+      nrespa = max(1,nint(dt/0.0005d0))
       nfree = 0
-      irest = 100
+      ndummy = 0
+      irest = -1
+      iprint = 100
+      use_wrap = .true.
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
@@ -78,9 +82,9 @@ c
       udirsave = .false.
       defsave = .false.
       tefsave = .false.
-      friction = 91.0d0
+      friction = 0.5d0
+      if (use_solv)  friction = 91.0d0
       use_sdarea = .false.
-      iprint = 100
 c
 c     set default values for temperature and pressure control
 c
@@ -92,14 +96,13 @@ c
          qnh(i) = 0.0d0
          gnh(i) = 0.0d0
       end do
-      barostat = 'BERENDSEN'
-      anisotrop = .false.
+      barostat = 'BUSSI'
+      prestyp = 'ISOTROPIC'
       taupres = -1.0d0
       compress = 0.000046d0
       vbar = 0.0d0
       qbar = 0.0d0
       gbar = 0.0d0
-      eta = 0.0d0
       voltrial = 25
       volmove = 100.0d0
       volscale = 'MOLECULAR'
@@ -115,15 +118,17 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
+            if (integrate .eq. 'RESPA')  integrate = 'BRESPA'
          else if (keyword(1:14) .eq. 'BEEMAN-MIXING ') then
             read (string,*,err=10,end=10)  bmnmix
          else if (keyword(1:12) .eq. 'RESPA-INNER ') then
-            read (string,*,err=10,end=10)  arespa
-            arespa = 0.001d0 * arespa
+            read (string,*,err=10,end=10)  nrespa
          else if (keyword(1:16) .eq. 'DEGREES-FREEDOM ') then
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
             read (string,*,err=10,end=10)  irest
+         else if (keyword(1:12) .eq. 'UNWRAP-COORDS ') then
+            use_wrap = .false.
          else if (keyword(1:14) .eq. 'SAVE-VELOCITY ') then
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
@@ -149,19 +154,31 @@ c
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
-            call getword (record,thermostat,next)
-            call upcase (thermostat)
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:5) .eq. 'BUSSI')  thermostat = 'BUSSI'
+            if (text(1:9) .eq. 'BERENDSEN')  thermostat = 'BERENDSEN'
+            if (text(1:4) .eq. 'NOSE')  thermostat = 'NOSE-HOOVER'
+            if (text(1:8) .eq. 'ANDERSEN')  thermostat = 'ANDERSEN'
          else if (keyword(1:16) .eq. 'TAU-TEMPERATURE ') then
             read (string,*,err=10,end=10)  tautemp
          else if (keyword(1:10) .eq. 'COLLISION ') then
             read (string,*,err=10,end=10)  collide
          else if (keyword(1:9) .eq. 'BAROSTAT ') then
-            call getword (record,barostat,next)
-            call upcase (barostat)
-         else if (keyword(1:15) .eq. 'ANISO-PRESSURE ') then
-            anisotrop = .true.
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:5) .eq. 'BUSSI')  barostat = 'BUSSI'
+            if (text(1:9) .eq. 'BERENDSEN')  barostat = 'BERENDSEN'
+            if (text(1:4) .eq. 'NOSE')  barostat = 'NOSE-HOOVER'
+            if (text(1:10) .eq. 'MONTECARLO')  barostat = 'MONTECARLO'
          else if (keyword(1:13) .eq. 'TAU-PRESSURE ') then
             read (string,*,err=10,end=10)  taupres
+         else if (keyword(1:9) .eq. 'PRESSURE ') then
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:3) .eq. 'ISO')  prestyp = 'ISOTROPIC'
+            if (text(1:5) .eq. 'ANISO')  prestyp = 'ANISO'
+            if (text(1:4) .eq. 'SEMI')  prestyp = 'SEMIISO'
          else if (keyword(1:9) .eq. 'COMPRESS ') then
             read (string,*,err=10,end=10)  compress
          else if (keyword(1:13) .eq. 'VOLUME-TRIAL ') then
@@ -169,8 +186,10 @@ c
          else if (keyword(1:12) .eq. 'VOLUME-MOVE ') then
             read (string,*,err=10,end=10)  volmove
          else if (keyword(1:13) .eq. 'VOLUME-SCALE ') then
-            call getword (record,volscale,next)
-            call upcase (volscale)
+            call getword (record,text,next)
+            call upcase (text)
+            if (text(1:9) .eq. 'MOLECULAR')  volscale = 'MOLECULAR'
+            if (text(1:6) .eq. 'ATOMIC')  volscale = 'ATOMIC'
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          end if
@@ -207,9 +226,10 @@ c
          end do
       else
          do i = 1, n
+            if (atomic(i) .le. 0)  ndummy = ndummy + 1
             if (use(i) .and. mass(i).le.0.0d0) then
                mass(i) = 1.0d0
-               totmass = totmass + 1.0d0
+               if (atomic(i) .gt. 0)  totmass = totmass + 1.0d0
                if (verbose) then
                   write (iout,30)  i
    30             format (/,' MDINIT  --  Warning, Mass of Atom',
@@ -219,22 +239,36 @@ c
          end do
       end if
 c
+c     decide whether to remove center of mass motion; note
+c     should be applied by default to stochastic dynamics
+c
+      dorest = .true.
+      if (irest .eq. 0) then
+         dorest = .false.
+      else if (irest .lt. 0) then
+         if (nuse .ne. n)  dorest = .false.
+c        if (integrate .eq. 'BAOAB')  dorest = .false.
+c        if (integrate .eq. 'OBABO')  dorest = .false.
+c        if (integrate .eq. 'SRESPA')  dorest = .false.
+c        if (integrate .eq. 'STOCHASTIC')  dorest = .false.
+         if (integrate .eq. 'GHMC')  dorest = .false.
+         if (isothermal .and. thermostat.eq.'ANDERSEN')
+     &      dorest = .false.
+      end if
+      if (dorest) then
+         if (irest .lt. 0)  irest = 100
+      else
+         irest = 0
+      end if
+c
 c     enforce use of velocity Verlet with Andersen thermostat
 c
       if (thermostat .eq. 'ANDERSEN') then
          if (integrate .eq. 'BEEMAN')  integrate = 'VERLET'
+         if (integrate .eq. 'BRESPA')  integrate = 'VRESPA'
       end if
 c
-c     enforce use of Bussi thermostat/barostat with integrator
-c
-      if (integrate .eq. 'BUSSI') then
-         thermostat = 'BUSSI'
-         barostat = 'BUSSI'
-      else if (thermostat.eq.'BUSSI' .and. barostat.eq.'BUSSI') then
-         integrate = 'BUSSI'
-      end if
-c
-c     enforce use of Nose-Hoover thermostat/barostat with integrator
+c     couple Nose-Hoover thermostat and barostat with integrator
 c
       if (integrate .eq. 'NOSE-HOOVER') then
          thermostat = 'NOSE-HOOVER'
@@ -253,15 +287,21 @@ c
       if (taupres .lt. 0.0d0) then
          taupres = 2.0d0
          if (barostat .eq. 'NOSE-HOOVER')  taupres = 10.0d0
+         if (prestyp .eq. 'ANISO')  taupres = 10.0d0
       end if
 c
-c     check for use of Monte Carlo barostat with constraints
+c     check for options not allowed with Monte Carlo barostat
 c
-      if (barostat.eq.'MONTECARLO' .and. volscale.eq.'ATOMIC') then
-         if (use_rattle) then
+      if (barostat .eq. 'MONTECARLO') then
+         if (use_freeze .and. volscale.eq.'ATOMIC') then
             write (iout,40)
-   40       format (/,' MDINIT  --  Atom-based Monte Carlo',
-     &                 ' Barostat Incompatible with RATTLE')
+   40       format (/,' MDINIT  --  No Atom-Based Monte Carlo',
+     &                 ' Barostat with Constraints')
+            call fatal
+         else if (prestyp .eq. 'SEMIISO') then 
+            write (iout,50)
+   50       format (/,' MDINIT  --  No Monte Carlo Barostat',
+     &                 ' with Semi-Isotropic Pressure')
             call fatal
          end if
       end if
@@ -282,6 +322,8 @@ c
          if (.not. allocated(v))  allocate (v(3,n))
          if (.not. allocated(a))  allocate (a(3,n))
          if (.not. allocated(aalt))  allocate (aalt(3,n))
+         if (.not. allocated(aslow))  allocate (aslow(3,n))
+         if (.not. allocated(afast))  allocate (afast(3,n))
       end if
 c
 c     set the number of degrees of freedom for the system
@@ -296,39 +338,45 @@ c
                if (linear(i))  nfree = nfree - 1
             end do
          else
-            nfree = 3 * nuse
+            nfree = 3 * (nuse-ndummy)
          end if
-         if (use_rattle) then
+         if (use_freeze) then
             nfree = nfree - nrat
             do i = 1, nratx
                nfree = nfree - kratx(i)
             end do
+            nfree = nfree - 3*nwat
          end if
          if (isothermal .and. thermostat.ne.'ANDERSEN'
-     &         .and. integrate.ne.'STOCHASTIC'
      &         .and. integrate.ne.'BAOAB'
+     &         .and. integrate.ne.'OBABO'
+     &         .and. integrate.ne.'SRESPA'
+     &         .and. integrate.ne.'STOCHASTIC'
      &         .and. integrate.ne.'GHMC') then
             if (.not. use_exfld) then
                if (use_bounds) then
-                  nfree = nfree - 3
+                  if (integrate.ne.'RIGIDBODY' .and. ngrp.ne.0) then
+                     nfree = nfree - 6*(ngrp+1)
+                  else
+                     nfree = nfree - 3
+                  end if
                else
                   nfree = nfree - 6
                end if
             end if
          end if
-         if (barostat .eq. 'BUSSI')  nfree = nfree + 1
       end if
 c
 c     check for a nonzero number of degrees of freedom
 c
       if (nfree .lt. 0)  nfree = 0
       if (debug) then
-         write (iout,50)  nfree
-   50    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
+         write (iout,60)  nfree
+   60    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
       end if
       if (nfree .eq. 0) then
-         write (iout,60)
-   60    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
+         write (iout,70)
+   70    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
          call fatal
       end if
 c
@@ -348,21 +396,6 @@ c
          qbar = dble(nfree+1) * qterm
       end if
 c
-c     decide whether to remove center of mass motion
-c
-      dorest = .true.
-      if (irest .eq. 0)  dorest = .false.
-      if (nuse. ne. n)  dorest = .false.
-      if (integrate .eq. 'STOCHASTIC')  dorest = .false.
-      if (integrate .eq. 'BAOAB')  dorest = .false.
-      if (integrate .eq. 'GHMC')  dorest = .false.
-      if (isothermal .and. thermostat.eq.'ANDERSEN')  dorest = .false.
-c
-c     set inner steps per outer step for RESPA integrator
-c
-      eps =  0.00000001d0
-      nrespa = int(dt/(arespa+eps)) + 1
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (derivs(3,n))
@@ -379,8 +412,8 @@ c
          rewind (unit=idyn)
          call readdyn (idyn)
          close (unit=idyn)
-         write (iout,70)  dynfile(1:trimtext(dynfile))
-   70    format (/,' Restarting Molecular Dynamics Using :  ',a)
+         write (iout,80)  dynfile(1:trimtext(dynfile))
+   80    format (/,' Restarting Molecular Dynamics Using :  ',a)
 c
 c     set translational velocities for rigid body dynamics
 c
@@ -401,9 +434,10 @@ c
             call mdrest (istep)
          end if
 c
-c     set velocities and fast/slow accelerations for RESPA method
+c     set velocities and fast/slow accelerations for RESPA methods
 c
-      else if (integrate .eq. 'RESPA') then
+      else if (integrate.eq.'VRESPA' .or. integrate.eq.'BRESPA'
+     &            .or. integrate.eq.'SRESPA') then
          call gradslow (e,derivs)
          do i = 1, n
             amass = mass(i)
@@ -413,11 +447,13 @@ c
                do j = 1, 3
                   v(j,i) = speed * vec(j)
                   a(j,i) = -ekcal * derivs(j,i) / mass(i)
+                  aslow(j,i) = a(j,i)
                end do
             else
                do j = 1, 3
                   v(j,i) = 0.0d0
                   a(j,i) = 0.0d0
+                  aslow(j,i) = 0.0d0
                end do
             end if
          end do
@@ -427,10 +463,12 @@ c
             if (use(i) .and. amass.ne.0.0d0) then
                do j = 1, 3
                   aalt(j,i) = -ekcal * derivs(j,i) / amass
+                  afast(j,i) = aalt(j,i)
                end do
             else
                do j = 1, 3
                   aalt(j,i) = 0.0d0
+                  afast(j,i) = aalt(j,i)
                end do
             end if
          end do

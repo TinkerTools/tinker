@@ -46,6 +46,7 @@ c
       real*8 rlower,rupper
       real*8 factor,pairs
       real*8 volume,expect
+      real*8 dist,dmax,gmax
       real*8, allocatable :: gr(:)
       real*8, allocatable :: gs(:)
       logical exist,query
@@ -358,10 +359,18 @@ c
       write (iout,230)
   230 format (/,5x,'Bin',9x,'Counts',7x,'Distance',7x,'Raw g(r)',
      &           4x,'Smooth g(r)',/)
+      gmax = 0.0d0
       do i = 1, nbin
-         write (iout,240)  i,hist(i),(dble(i)-0.5d0)*width,gr(i),gs(i)
+         dist = (dble(i)-0.5d0) * width
+         write (iout,240)  i,hist(i),dist,gr(i),gs(i)
   240    format (i8,i15,3x,f12.4,3x,f12.4,3x,f12.4)
+         if (gs(i) .gt. gmax) then
+            dmax = dist
+            gmax = gs(i)
+         end if
       end do
+      write (iout,250)  gmax,dmax
+  250 format (/,' Maximum g(r) Value :',f12.4,' at Distance',f10.4)
 c
 c     perform deallocation of some local arrays
 c

@@ -13,7 +13,7 @@ c     ###############################################################
 c
 c
 c     "prtxyz" writes out a set of Cartesian atomic coordinates
-c     to an external disk file in Tinker XYZ format
+c     to an external file in Tinker XYZ format
 c
 c
       subroutine prtxyz (ixyz)
@@ -312,11 +312,14 @@ c
       use mpole
       use polar
       use polpot
+      use potent
+      use solpot
       use units
       implicit none
       integer i,j,k
+      integer ii
       real*8 c
-      real*8 xi,yi,zi
+      real*8 xi,yi,zi,ri
       real*8 print3n(3,*)
       character*3 mode
 c
@@ -342,19 +345,48 @@ c
             print3n(3,i) = -desum(3,i)
          end do
       else if (mode .eq. 'UIN') then
-         do i = 1, n
-            print3n(1,i) = debye*uind(1,i)
-            print3n(2,i) = debye*uind(2,i)
-            print3n(3,i) = debye*uind(3,i)
-         end do
+         if (use_solv .and.
+     &         (solvtyp(1:2).eq.'GK'.or.solvtyp(1:2).eq.'PB')) then
+            do i = 1, n
+               print3n(1,i) = debye*uinds(1,i)
+               print3n(2,i) = debye*uinds(2,i)
+               print3n(3,i) = debye*uinds(3,i)
+            end do
+         else
+            do i = 1, n
+               print3n(1,i) = debye*uind(1,i)
+               print3n(2,i) = debye*uind(2,i)
+               print3n(3,i) = debye*uind(3,i)
+            end do
+         end if
       else if (mode .eq. 'UST') then
-         do i = 1, n
+         do i = 1, ndipole
+            j = idpl(1,i)
+            k = idpl(2,i)
+            xi = x(j) - x(k)
+            yi = y(j) - y(k)
+            zi = z(j) - z(k)
+            ri = sqrt(xi*xi + yi*yi + zi*zi)
+            print3n(1,i) = bdpl(i) * (xi/ri)
+            print3n(2,i) = bdpl(i) * (yi/ri)
+            print3n(3,i) = bdpl(i) * (zi/ri)
+         end do
+         do ii = 1, npole
+            i = ipole(ii)
             print3n(1,i) = debye*rpole(2,i)
             print3n(2,i) = debye*rpole(3,i)
             print3n(3,i) = debye*rpole(4,i)
          end do
       else if (mode .eq. 'UCH') then
-         do i = 1, n
+         do ii = 1, nion
+            i = iion(ii)
+            c = pchg(i)
+            print3n(1,i) = c*debye*(x(i)-xcenter)
+            print3n(2,i) = c*debye*(y(i)-ycenter)
+            print3n(3,i) = c*debye*(z(i)-zcenter)
+         end do
+         do ii = 1, npole
+            i = ipole(ii)
             c = rpole(1,i)
             print3n(1,i) = c*debye*(x(i)-xcenter)
             print3n(2,i) = c*debye*(y(i)-ycenter)
@@ -362,11 +394,20 @@ c
          end do
       else if (mode .eq. 'UDR') then
          if (.not. use_expol) then
-            do i = 1, n
-               do j = 1, 3
-                  print3n(j,i) = debye*udir(j,i)
+            if (use_solv .and.
+     &            (solvtyp(1:2).eq.'GK'.or.solvtyp(1:2).eq.'PB')) then
+               do i = 1, n
+                  do j = 1, 3
+                     print3n(j,i) = debye*udirs(j,i)
+                  end do
+               end do      
+            else
+               do i = 1, n
+                  do j = 1, 3
+                     print3n(j,i) = debye*udir(j,i)
+                  end do
                end do
-            end do
+            end if
          else
             do i = 1, n
                do j = 1, 3
@@ -380,20 +421,40 @@ c
             end do
          end if
       else if (mode .eq. 'DEF') then
-         do i = 1, n
-            c = elefield/polarity(i)
-            do j = 1, 3
-               print3n(j,i) = c * udir(j,i)
-            end do
-         end do
-      else if (mode .eq. 'TEF') then
-         if (.not. use_expol) then
+         if (use_solv .and.
+     &         (solvtyp(1:2).eq.'GK'.or.solvtyp(1:2).eq.'PB')) then
             do i = 1, n
                c = elefield/polarity(i)
                do j = 1, 3
-                  print3n(j,i) = c * uind(j,i)
+                  print3n(j,i) = c * udirs(j,i)
                end do
             end do
+         else
+            do i = 1, n
+               c = elefield/polarity(i)
+               do j = 1, 3
+                  print3n(j,i) = c * udir(j,i)
+               end do
+            end do
+         end if
+      else if (mode .eq. 'TEF') then
+         if (.not. use_expol) then
+            if (use_solv .and.
+     &           (solvtyp(1:2).eq.'GK'.or.solvtyp(1:2).eq.'PB')) then
+               do i = 1, n
+                  c = elefield/polarity(i)
+                  do j = 1, 3
+                     print3n(j,i) = c * uinds(j,i)
+                  end do
+               end do
+            else
+               do i = 1, n
+                  c = elefield/polarity(i)
+                  do j = 1, 3
+                     print3n(j,i) = c * uind(j,i)
+                  end do
+               end do
+            end if
          else
             do i = 1, n
                c = elefield/polarity(i)
@@ -513,10 +574,12 @@ c
          end if
       end if
 c
-c     append the lattice values based on header flag value
+c     append the lattice values based on header flag value;
+c     using angle values is NAMD style, cosine values is CHARMM
 c
       if (use_bounds) then
-         write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+c        write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+         write (idcd)  xbox,gamma,ybox,beta,alpha,zbox
       end if
 c
 c     append the atomic coordinates along each axis in turn
@@ -663,10 +726,12 @@ c
          end if
       end if
 c
-c     append the lattice values based on header flag value
+c     append the lattice values based on header flag value;
+c     using angle values is NAMD style, cosine values is CHARMM
 c
       if (use_bounds) then
-         write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+c        write (idcd)  xbox,gamma_cos,ybox,beta_cos,alpha_cos,zbox
+         write (idcd)  xbox,gamma,ybox,beta,alpha,zbox
       end if
 c
 c     copy the vector values to a common array

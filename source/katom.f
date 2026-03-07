@@ -38,7 +38,7 @@ c
       use keys
       implicit none
       integer i,j,k
-      integer next,nh
+      integer next,nhyd
       integer cls,atn,lig
       real*8 wght,sum
       real*8 hmax,hmass
@@ -110,14 +110,14 @@ c
             class(i) = 0
             atomic(i) = 0
             mass(i) = 0.0d0
-            valence(i) = 0
+            valnum(i) = 0
             story(i) = 'Undefined Atom Type     '
          else
             if (symbol(k) .ne. '   ')  name(i) = symbol(k)
             class(i) = atmcls(k)
             atomic(i) = atmnum(k)
             mass(i) = weight(k)
-            valence(i) = ligand(k)
+            valnum(i) = ligand(k)
             story(i) = describe(k)
          end if
       end do
@@ -140,16 +140,16 @@ c
       end do
       if (heavy) then
          do i = 1, n
-            nh = 0
+            nhyd = 0
             sum = mass(i)
             do j = 1, n12(i)
                k = i12(j,i)
                if (atomic(k) .eq. 1) then
-                  nh = nh + 1
+                  nhyd = nhyd + 1
                   sum = sum + mass(k)
                end if
             end do
-            hmass = min(hmax,sum/dble(nh+1))
+            hmass = min(hmax,sum/dble(nhyd+1))
             do j = 1, n12(i)
                k = i12(j,i)
                if (atomic(k) .eq. 1) then
@@ -221,7 +221,7 @@ c
                story(k) = notice
                atomic(k) = atn
                mass(k) = wght
-               valence(k) = lig
+               valnum(k) = lig
                if (.not. silent) then
                   write (iout,80)  k,cls,symb,notice,atn,wght,lig
    80             format (1x,i8,i6,5x,a3,3x,a24,i6,f11.3,i6)
@@ -256,7 +256,7 @@ c     check the number of atoms attached to each atom
 c
       header = .true.
       do i = 1, n
-         if (n12(i) .ne. valence(i)) then
+         if (n12(i) .ne. valnum(i)) then
             if (header) then
                header = .false.
                write (iout,120)
@@ -265,7 +265,7 @@ c
      &                 //,' Type',11x,'Atom Name',6x,'Atom Type',7x,
      &                    'Expected',4x,'Found',/)
             end if
-            write (iout,130)  i,name(i),type(i),valence(i),n12(i)
+            write (iout,130)  i,name(i),type(i),valnum(i),n12(i)
   130       format (' Valence',4x,i8,'-',a3,8x,i5,10x,i5,5x,i5)
          end if
       end do

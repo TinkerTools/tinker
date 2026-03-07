@@ -85,7 +85,7 @@ c
       end do
 !$OMP PARALLEL default(private)
 !$OMP& shared(n,utv1,type,utypeinv,v)
-!$OMP DO reduction(+:utv1) schedule(guided)
+!$OMP DO reduction(+:utv1)
 c
 c     compute velocity by unique atom type
 c

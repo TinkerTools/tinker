@@ -81,7 +81,7 @@ c
 !$OMP& anat,bl,bk,use,x,y,z,stbnunit,eps,use_group,use_polymer,
 !$OMP& name,verbose,debug,header,iout)
 !$OMP& shared(eba,neba,aeba)
-!$OMP DO reduction(+:eba,neba,aeba) schedule(guided)
+!$OMP DO reduction(+:eba,neba,aeba)
 c
 c     calculate the stretch-bend interaction energy term
 c

@@ -11,6 +11,7 @@
 ar -crusv libtinker.a \
 action.o \
 active.o \
+alfmol.o \
 align.o \
 alterchg.o \
 alterpol.o \
@@ -41,7 +42,6 @@ born.o \
 bound.o \
 bounds.o \
 boxes.o \
-bussi.o \
 calendar.o \
 cell.o \
 center.o \
@@ -52,6 +52,7 @@ chgpot.o \
 chgtrn.o \
 chkpole.o \
 chkring.o \
+chksymm.o \
 chkxyz.o \
 cholesky.o \
 chrono.o \
@@ -227,6 +228,9 @@ field.o \
 fields.o \
 files.o \
 final.o \
+findnuc.o \
+findpro.o \
+findseq.o \
 flatten.o \
 fracs.o \
 freeunit.o \
@@ -234,6 +238,8 @@ freeze.o \
 geometry.o \
 getarc.o \
 getcart.o \
+getdcd.o \
+getfloat.o \
 getint.o \
 getkey.o \
 getmol.o \
@@ -341,6 +347,7 @@ ktors.o \
 ktorsn.o \
 ktortor.o \
 ktrtor.o \
+kundrot.o \
 kurey.o \
 kurybr.o \
 kvdw.o \
@@ -429,6 +436,7 @@ pressure.o \
 prmkey.o \
 promo.o \
 prtarc.o \
+prtcif.o \
 prtdyn.o \
 prterr.o \
 prtint.o \
@@ -444,11 +452,13 @@ quatfit.o \
 random.o \
 rattle.o \
 readcart.o \
+readcif.o \
 readdcd.o \
 readdyn.o \
 readgau.o \
 readgdma.o \
 readint.o \
+readmbis.o \
 readmol.o \
 readmol2.o \
 readpdb.o \
@@ -465,6 +475,7 @@ restrn.o \
 rgddyn.o \
 rgdstep.o \
 rigid.o \
+richmond.o \
 ring.o \
 rings.o \
 rmsfit.o \
@@ -480,6 +491,7 @@ sequen.o \
 server.o \
 setprm.o \
 shakeup.o \
+shapes.o \
 shunt.o \
 sigmoid.o \
 simplex.o \
@@ -501,6 +513,8 @@ syntrn.o \
 tarray.o \
 tcgstuf.o \
 temper.o \
+tettor.o \
+tettors.o \
 titles.o \
 tncg.o \
 torphase.o \
@@ -511,6 +525,9 @@ torsions.o \
 tortor.o \
 tree.o \
 trimtext.o \
+tritor.o \
+tritors.o \
+unionball.o \
 unitcell.o \
 units.o \
 uprior.o \

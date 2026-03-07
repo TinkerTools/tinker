@@ -12,8 +12,8 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "sdstep" performs a single stochastic dynamics time step
-c     via the velocity Verlet integration algorithm
+c     "sdstep" performs a stochastic dynamics time step via the
+c     velocity Verlet-based algorithm of Guarnieri and Still
 c
 c     literature references:
 c
@@ -26,8 +26,8 @@ c     Computational Chemistry, 15, 1302-1310 (1994)
 c
 c
       subroutine sdstep (istep,dt)
-      use atoms
       use atomid
+      use atoms
       use freeze
       use moldyn
       use units
@@ -89,22 +89,11 @@ c
 c
 c     get constraint-corrected positions and half-step velocities
 c
-      if (use_rattle)  call rattle (dt,xold,yold,zold)
+      if (use_freeze)  call rattle (dt,xold,yold,zold)
 c
 c     get the potential energy and atomic forces
 c
       call gradient (epot,derivs)
-c
-c     use Newton's second law to get the next accelerations;
-c     find the full-step velocities using modified Verlet
-c
-      do i = 1, nuse
-         k = iuse(i)
-         do j = 1, 3
-            a(j,k) = -ekcal * derivs(j,k) / mass(k)
-            v(j,k) = v(j,k) + 0.5d0*a(j,k)*vfric(k) + vrand(j,k)
-         end do
-      end do
 c
 c     correct internal virial to account for frictional forces
 c
@@ -128,6 +117,43 @@ c
          vir(3,3) = vir(3,3) + vzz
       end do
 c
+c     compute the kinetic energy from half-step velocities
+c
+c     call kinetic (eksum,ekin,temp)
+c
+c     use Newton's second law to get the next accelerations;
+c     find the full-step velocities using modified Verlet
+c
+      do i = 1, nuse
+         k = iuse(i)
+         do j = 1, 3
+            a(j,k) = -ekcal * derivs(j,k) / mass(k)
+            v(j,k) = v(j,k) + 0.5d0*a(j,k)*vfric(k) + vrand(j,k)
+         end do
+      end do
+c
+c     find the constraint-corrected full-step velocities
+c
+      if (use_freeze) then
+         call rattle2 (dt)
+         do i = 1, nuse
+            k = iuse(i)
+            xold(k) = x(k)
+            yold(k) = y(k)
+            zold(k) = z(k)
+         end do
+      end if
+c
+c     compute full-step kinetic energy and pressure correction
+c
+      call kinetic (eksum,ekin,temp)
+      call pressure (dt,ekin,pres,stress)
+      call pressure2 (epot,temp)
+c
+c     final constraint step to enforce position convergence
+c
+      if (use_freeze)  call shake (xold,yold,zold)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (xold)
@@ -140,15 +166,6 @@ c
       deallocate (vrand)
       deallocate (derivs)
 c
-c     find the constraint-corrected full-step velocities
-c
-      if (use_rattle)  call rattle2 (dt)
-c
-c     compute and control the temperature and pressure
-c
-      call kinetic (eksum,ekin,temp)
-      call pressure (dt,epot,ekin,temp,pres,stress)
-c
 c     total energy is sum of kinetic and potential energies
 c
       etot = eksum + epot
@@ -157,19 +174,21 @@ c     compute statistics and save trajectory for this step
 c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)
       call mdsave (istep,dt,epot,eksum)
+      call mdrest (istep)
       return
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine sdterm  --  frictional and random SD terms  ##
-c     ##                                                         ##
-c     #############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine sdterm  --  SD friction & fluctuation terms  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "sdterm" finds the frictional and random terms needed to
-c     update positions and velocities during stochastic dynamics
+c     "sdterm" finds the friction and fluctuation terms needed to
+c     update positions and velocities during  stochastic dynamics
+c     via the method of Guarnieri and Still
 c
 c
       subroutine sdterm (istep,dt,pfric,vfric,afric,prand,vrand)

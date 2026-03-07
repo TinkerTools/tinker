@@ -53,7 +53,7 @@ c
       real*8 dk,dk2,dk3
       real*8 ti,ti2
       real*8 tk,tk2
-      real*8 expi,expk
+      real*8 expi,expk,eps
       real*8 damp3,damp5
       real*8 damp,ddamp
       real*8 ddampi,ddampk
@@ -77,8 +77,9 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set cutoff and switching coefficients
+c     set damping tolerance, cutoff and switching coefficients
 c
+      eps = 0.0001d0
       mode = 'DISP'
       call switch (mode)
 c
@@ -153,7 +154,18 @@ c
                   dk = ak * r
                   expi = exp(-di)
                   expk = exp(-dk)
-                  if (ai .ne. ak) then
+                  if (abs(ai-ak) .lt. eps) then
+                     di4 = di2 * di2
+                     di5 = di2 * di3
+                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                     ddamp = (di5-3.0d0*di3-3.0d0*di2)
+     &                           *ai*expi/96.0d0
+                     d2damp = (5.0d0*di4-9.0d0*di2-6.0d0*di)
+     &                            *ai2*expi/96.0d0 - ai*ddamp
+                  else
                      ai3 = ai * ai2
                      ai4 = ai2 * ai2
                      ak2 = ak * ak
@@ -183,17 +195,6 @@ c
                      d2damp = 2.0d0*ddamp/r - ai*ddampi - ak*ddampk
      &                           + 0.25d0*di2*ti2*ai2*expi
      &                           + 0.25d0*dk2*tk2*ak2*expk
-                  else
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = (di5-3.0d0*di3-3.0d0*di2)
-     &                           *ai*expi/96.0d0
-                     d2damp = (5.0d0*di4-9.0d0*di2-6.0d0*di)
-     &                            *ai2*expi/96.0d0 - ai*ddamp
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -246,7 +247,7 @@ c
                   term(3,2) = term(2,3)
                   term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                   do j = 1, 3
                      hessx(j,i) = hessx(j,i) + term(1,j)
@@ -339,7 +340,18 @@ c
                      dk = ak * r
                      expi = exp(-di)
                      expk = exp(-dk)
-                     if (ai .ne. ak) then
+                     if (abs(ai-ak) .lt. eps) then
+                        di4 = di2 * di2
+                        di5 = di2 * di3
+                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                        ddamp = (di5-3.0d0*di3-3.0d0*di2)
+     &                              *ai*expi/96.0d0
+                        d2damp = (5.0d0*di4-9.0d0*di2-6.0d0*di)
+     &                               *ai2*expi/96.0d0 - ai*ddamp
+                     else
                         ai3 = ai * ai2
                         ai4 = ai2 * ai2
                         ak2 = ak * ak
@@ -369,17 +381,6 @@ c
                         d2damp = 2.0d0*ddamp/r - ai*ddampi - ak*ddampk
      &                              + 0.25d0*di2*ti2*ai2*expi
      &                              + 0.25d0*dk2*tk2*ak2*expk
-                     else
-                        di4 = di2 * di2
-                        di5 = di2 * di3
-                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                        ddamp = (di5-3.0d0*di3-3.0d0*di2)
-     &                              *ai*expi/96.0d0
-                        d2damp = (5.0d0*di4-9.0d0*di2-6.0d0*di)
-     &                               *ai2*expi/96.0d0 - ai*ddamp
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -440,7 +441,7 @@ c
                      term(3,2) = term(2,3)
                      term(3,3) = d2edz*zr + de
 c
-c     increment diagonal and non-diagonal Hessian elements
+c     increment diagonal and off-diagonal Hessian elements
 c
                      do j = 1, 3
                         hessx(j,ii) = hessx(j,ii) + term(1,j)

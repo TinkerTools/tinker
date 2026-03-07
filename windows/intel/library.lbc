@@ -1,5 +1,6 @@
 action.obj
 active.obj
+alfmol.obj
 align.obj
 alterchg.obj
 alterpol.obj
@@ -30,7 +31,6 @@ born.obj
 bound.obj
 bounds.obj
 boxes.obj
-bussi.obj
 calendar.obj
 cell.obj
 center.obj
@@ -41,6 +41,7 @@ chgpot.obj
 chgtrn.obj
 chkpole.obj
 chkring.obj
+chksymm.obj
 chkxyz.obj
 cholesky.obj
 chrono.obj
@@ -216,6 +217,9 @@ field.obj
 fields.obj
 files.obj
 final.obj
+findnuc.obj
+findpro.obj
+findseq.obj
 flatten.obj
 fracs.obj
 freeunit.obj
@@ -223,6 +227,8 @@ freeze.obj
 geometry.obj
 getarc.obj
 getcart.obj
+getdcd.obj
+getfloat.obj
 getint.obj
 getkey.obj
 getmol.obj
@@ -330,6 +336,7 @@ ktors.obj
 ktorsn.obj
 ktortor.obj
 ktrtor.obj
+kundrot.obj
 kurey.obj
 kurybr.obj
 kvdw.obj
@@ -418,6 +425,7 @@ pressure.obj
 prmkey.obj
 promo.obj
 prtarc.obj
+prtcif.obj
 prtdyn.obj
 prterr.obj
 prtint.obj
@@ -433,11 +441,13 @@ quatfit.obj
 random.obj
 rattle.obj
 readcart.obj
+readcif.obj
 readdcd.obj
 readdyn.obj
 readgau.obj
 readgdma.obj
 readint.obj
+readmbis.obj
 readmol.obj
 readmol2.obj
 readpdb.obj
@@ -453,6 +463,7 @@ respa.obj
 restrn.obj
 rgddyn.obj
 rgdstep.obj
+richmond.obj
 rigid.obj
 ring.obj
 rings.obj
@@ -469,6 +480,7 @@ sequen.obj
 server.obj
 setprm.obj
 shakeup.obj
+shapes.obj
 shunt.obj
 sigmoid.obj
 simplex.obj
@@ -490,6 +502,8 @@ syntrn.obj
 tarray.obj
 tcgstuf.obj
 temper.obj
+tettor.obj
+tettors.obj
 titles.obj
 tncg.obj
 torphase.obj
@@ -500,6 +514,9 @@ torsions.obj
 tortor.obj
 tree.obj
 trimtext.obj
+tritor.obj
+tritors.obj
+unionball.obj
 unitcell.obj
 units.obj
 uprior.obj

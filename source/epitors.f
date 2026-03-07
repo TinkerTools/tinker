@@ -61,7 +61,7 @@ c
 !$OMP PARALLEL default(private) shared(npitors,ipit,
 !$OMP& use,x,y,z,kpit,ptorunit,use_group,use_polymer)
 !$OMP& shared(ept)
-!$OMP DO reduction(+:ept) schedule(guided)
+!$OMP DO reduction(+:ept)
 c
 c     calculate the pi-system torsion angle energy term
 c

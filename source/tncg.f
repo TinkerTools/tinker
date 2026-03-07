@@ -33,6 +33,10 @@ c     R. S. Dembo and T. Steihaug, "Truncated-Newton Algorithms
 c     for Large-Scale Unconstrained Optimization", Mathematical
 c     Programming, 26, 190-212 (1983)
 c
+c     D. S. Kershaw, "The Incomplete Cholesky-Conjugate Gradient
+c     Method for the Iterative Solution of Systems of Linear Equations",
+c     Journal of Computational Physics, 26, 43-65 (1978)
+c
 c     variables and parameters:
 c
 c     mode       determines optimization method; choice of
@@ -739,14 +743,14 @@ c     "precond" solves a simplified version of the Newton equations
 c     Ms = r, and uses the result to precondition linear conjugate
 c     gradient iterations on the full Newton equations in "tnsolve"
 c
-c     reference for incomplete Cholesky factorization :
+c     literature reference:
 c
 c     T. A. Manteuffel, "An Incomplete Factorization Technique
 c     for Positive Definite Linear Systems", Mathematics of
-c     Computation, 34, 473-497 (1980); the present method is
+c     Computation, 34, 473-497 (1980); the present routine is
 c     based upon the SICCG(0) method described in this paper
 c
-c     types of preconditioning methods :
+c     types of preconditioning methods:
 c
 c     none     use no preconditioning at all
 c     diag     exact Hessian diagonal preconditioning

@@ -146,8 +146,7 @@ c
             if (mode .le. 0)  mode = 1
   160       continue
          end do
-         if (integrate.eq.'BUSSI' .or. integrate.eq.'NOSE-HOOVER'
-     &                .or. integrate.eq.'GHMC') then
+         if (integrate.eq.'NOSE-HOOVER' .or. integrate.eq.'GHMC') then
             if (mode .ne. 4) then
                mode = 4
                write (iout,170)
@@ -254,12 +253,12 @@ c
      &              ' Modified Beeman Algorithm')
       else if (integrate .eq. 'BAOAB') then
          write (iout,370)
-  370    format (/,' Constrained Stochastic Dynamics Trajectory',
-     &              ' via BAOAB Algorithm')
-      else if (integrate .eq. 'BUSSI') then
+  370    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' BAOAB Algorithm')
+      else if (integrate .eq. 'OBABO') then
          write (iout,380)
-  380    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Bussi-Parrinello NPT Algorithm')
+  380    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' OBABO Algorithm')
       else if (integrate .eq. 'NOSE-HOOVER') then
          write (iout,390)
   390    format (/,' Molecular Dynamics Trajectory via',
@@ -276,13 +275,21 @@ c
          write (iout,420)
   420    format (/,' Molecular Dynamics Trajectory via',
      &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'RESPA') then
+      else if (integrate .eq. 'VRESPA') then
          write (iout,430)
   430    format (/,' Molecular Dynamics Trajectory via',
-     &              ' r-RESPA MTS Algorithm')
-      else
+     &              ' Verlet r-RESPA MTS Algorithm')
+      else if (integrate .eq. 'BRESPA') then
          write (iout,440)
   440    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Beeman r-RESPA MTS Algorithm')
+      else if (integrate .eq. 'SRESPA') then
+         write (iout,450)
+  450    format (/,' Molecular Dynamics Trajectory via',
+     &              ' BAOAB r-RESPA MTS Algorithm')
+      else
+         write (iout,460)
+  460    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
@@ -302,8 +309,8 @@ c
             call beeman (istep,dt)
          else if (integrate .eq. 'BAOAB') then
             call baoab (istep,dt)
-         else if (integrate .eq. 'BUSSI') then
-            call bussi (istep,dt)
+         else if (integrate .eq. 'OBABO') then
+            call obabo (istep,dt)
          else if (integrate .eq. 'NOSE-HOOVER') then
             call nose (istep,dt)
          else if (integrate .eq. 'STOCHASTIC') then
@@ -312,8 +319,12 @@ c
             call ghmcstep (istep,dt)
          else if (integrate .eq. 'RIGIDBODY') then
             call rgdstep (istep,dt)
-         else if (integrate .eq. 'RESPA') then
-            call respa (istep,dt)
+         else if (integrate .eq. 'VRESPA') then
+            call vrespa (istep,dt)
+         else if (integrate .eq. 'BRESPA') then
+            call brespa (istep,dt)
+         else if (integrate .eq. 'SRESPA') then
+            call srespa (istep,dt)
          else
             call beeman (istep,dt)
          end if

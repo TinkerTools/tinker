@@ -13,7 +13,7 @@ c     ##############################################################
 c
 c
 c     nfree_aux    total degrees of freedom for auxiliary dipoles
-c     tautemp_aux  time constant for auliliary Berendsen thermostat
+c     tautemp_aux  time constant for auxiliary Berendsen thermostat
 c     kelvin_aux   target system temperature for auxiliary dipoles
 c     uaux         auxiliary induced dipole value at each site
 c     upaux        auxiliary shadow induced dipoles at each site
