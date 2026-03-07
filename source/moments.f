@@ -371,7 +371,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(nion,x,y,z,pchg,momuse,xuchg,yuchg,zuchg,utv3,type,
+!$OMP& shared(nion,iion,x,y,z,pchg,momuse,xuchg,yuchg,zuchg,utv3,type,
 !$OMP& utypeinv)
 !$OMP DO reduction(+:xuchg,yuchg,zuchg,utv3)
 c
@@ -398,9 +398,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(ndipole,x,y,z,idpl,bdpl,momuse,xustc,yustc,zustc,debye,
+!$OMP& shared(ndipole,x,y,z,idpl,bdpl,momuse,xustc,yustc,zustc,
 !$OMP& utv1,type,utypeinv)
-!$OMP DO reduction(+:xuchg,yuchg,zuchg,utv1)
+!$OMP DO reduction(+:xustc,yustc,zustc,utv1)
 c
 c     compute the static dipole moment due to bond dipoles
 c
@@ -430,9 +430,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,x,y,z,rpole,uind,uinds,use_polar,solvtyp,momuse,
-!$OMP& xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind,xuchg,yuchg,zuchg,
-!$OMP& utv1,utv2,utv3,type,utypeinv)
+!$OMP& shared(npole,x,y,z,ipole,rpole,uind,uinds,use_polar,solvtyp,
+!$OMP& momuse,xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind,
+!$OMP& xuchg,yuchg,zuchg,utv1,utv2,utv3,type,utypeinv)
 !$OMP DO reduction(+:xustc,yustc,zustc,xuchg,yuchg,zuchg,utv1,utv3)
 c
 c     compute the static dipole moment due to atomic multipoles

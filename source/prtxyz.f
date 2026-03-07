@@ -306,7 +306,9 @@ c
       subroutine copyvec3 (print3n,mode)
       use atoms
       use boxes
+      use dipole
       use deriv
+      use charge
       use expol
       use moldyn
       use mpole

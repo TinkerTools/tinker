@@ -531,14 +531,11 @@ flang -c -O3 -fopenmp prtarc.f
 flang -c -O3 -fopenmp prtcif.f
 flang -c -O3 -fopenmp prtdyn.f
 flang -c -O3 -fopenmp prterr.f
-flang -c -O3 -fopenmp prtfrc.f
 flang -c -O3 -fopenmp prtint.f
 flang -c -O3 -fopenmp prtmol2.f
 flang -c -O3 -fopenmp prtpdb.f
 flang -c -O3 -fopenmp prtprm.f
 flang -c -O3 -fopenmp prtseq.f
-flang -c -O3 -fopenmp prtuind.f
-flang -c -O3 -fopenmp prtvel.f
 flang -c -O3 -fopenmp prtxyz.f
 flang -c -O3 -fopenmp pss.f
 flang -c -O3 -fopenmp pssrigid.f

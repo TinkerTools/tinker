@@ -2255,12 +2255,6 @@ void prtdyn_();
 void prterr_();
 #define tinker_f_prterr prterr_
 
-// prtfrc.f
-void prtfrc_(int* ifrc);
-#define tinker_f_prtfrc prtfrc_
-void prtdcdf_(int* idcd, int* first);
-#define tinker_f_prtdcdf prtdcdf_
-
 // prtint.f
 void prtint_(int* izmt);
 #define tinker_f_prtint prtint_
@@ -2284,18 +2278,6 @@ void prtprm_(int* itxt);
 // prtseq.f
 void prtseq_(int* iseq);
 #define tinker_f_prtseq prtseq_
-
-// prtuind.f
-void prtuind_(int* iind);
-#define tinker_f_prtuind prtuind_
-void prtdcdu_(int* idcd, int* first);
-#define tinker_f_prtdcdu prtdcdu_
-
-// prtvel.f
-void prtvel_(int* ivel);
-#define tinker_f_prtvel prtvel_
-void prtdcdv_(int* idcd, int* first);
-#define tinker_f_prtdcdv prtdcdv_
 
 // prtxyz.f
 void prtxyz_(int* ixyz);
