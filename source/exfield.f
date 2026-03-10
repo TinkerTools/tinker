@@ -18,6 +18,7 @@ c
 c
       subroutine exfield (mode,exf)
       use atoms
+      use bound
       use charge
       use chgpot
       use energi
@@ -36,6 +37,10 @@ c     zero out the external electric field energy
 c
       exf = 0.0d0
       f = electric / dielec
+c
+c     maintain any periodic boundary conditions
+c
+      if (use_bounds)  call bounds
 c
 c     calculate external field energy over partial charges
 c
@@ -101,6 +106,7 @@ c
 c
       subroutine exfield1 (mode,exf)
       use atoms
+      use bound
       use charge
       use chgpot
       use deriv
@@ -130,6 +136,10 @@ c     zero out the external electric field energy
 c
       exf = 0.0d0
       f = electric / dielec
+c
+c     maintain any periodic boundary conditions
+c
+      if (use_bounds)  call bounds
 c
 c     calculate energy and derivatives over partial charges
 c
@@ -275,7 +285,7 @@ c     #################################################################
 c
 c
 c     "exfield3" calculates the electrostatic energy and partitions
-c     the energy among the atomsdue to an external electric field
+c     the energy among the atoms due to an external electric field
 c     applied to the system
 c
 c
@@ -283,6 +293,7 @@ c
       use action
       use analyz
       use atoms
+      use bound
       use charge
       use chgpot
       use energi
@@ -301,6 +312,10 @@ c     zero out the external electric field energy
 c
       exf = 0.0d0
       f = electric / dielec
+c
+c     maintain any periodic boundary conditions
+c
+      if (use_bounds)  call bounds
 c
 c     calculate energy and partitioning over partial charges
 c
