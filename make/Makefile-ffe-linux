@@ -640,14 +640,11 @@ OBJS =	action.o \
 	prtcif.o \
 	prtdyn.o \
 	prterr.o \
-	prtfrc.o \
 	prtint.o \
 	prtmol2.o \
 	prtpdb.o \
 	prtprm.o \
 	prtseq.o \
-	prtuind.o \
-	prtvel.o \
 	prtxyz.o \
 	pss.o \
 	pssrigid.o \
@@ -1575,14 +1572,11 @@ libtinker.a: ${OBJS}
 	prtcif.o \
 	prtdyn.o \
 	prterr.o \
-	prtfrc.o \
 	prtint.o \
 	prtmol2.o \
 	prtpdb.o \
 	prtprm.o \
 	prtseq.o \
-	prtuind.o \
-	prtvel.o \
 	prtxyz.o \
 	ptable.o \
 	qmstuf.o \
@@ -2157,14 +2151,11 @@ protein.o: atomid.o atoms.o couple.o files.o group.o inform.o iounit.o katoms.o 
 prtarc.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o output.o titles.o usage.o
 prtcif.o: ascii.o bound.o boxes.o files.o pdb.o sequen.o titles.o
 prtdyn.o: atoms.o boxes.o files.o group.o mdstuf.o moldyn.o rgddyn.o titles.o
-prtfrc.o: atomid.o atoms.o bound.o boxes.o couple.o deriv.o files.o inform.o titles.o
 prtint.o: atomid.o atoms.o files.o inform.o titles.o zclose.o zcoord.o
 prtmol2.o: angbnd.o atmlst.o atomid.o atoms.o bndstr.o couple.o files.o iounit.o ptable.o ring.o titles.o tors.o
 prtpdb.o: bound.o boxes.o files.o pdb.o sequen.o titles.o
 prtprm.o: angpot.o bndpot.o chgpot.o fields.o kanang.o kangs.o kantor.o katoms.o kbonds.o kcflux.o kchrge.o kcpen.o kctrn.o kdipol.o kdsp.o kexpl.o khbond.o kiprop.o kitors.o kmulti.o kopbnd.o kopdst.o korbs.o kpitor.o kpolpr.o kpolr.o krepl.o ksolut.o kstbnd.o ksttor.o ktorsn.o ktrtor.o kurybr.o kvdwpr.o kvdws.o mplpot.o polpot.o sizes.o urypot.o vdwpot.o
 prtseq.o: files.o sequen.o
-prtuind.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o polar.o potent.o solpot.o titles.o units.o
-prtvel.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o moldyn.o titles.o
 prtxyz.o: atomid.o atoms.o bound.o boxes.o couple.o files.o inform.o titles.o
 pss.o: atoms.o files.o hescut.o inform.o iounit.o math.o omega.o refer.o tree.o warp.o zcoord.o
 pssrigid.o: atoms.o files.o group.o inform.o iounit.o math.o minima.o molcul.o refer.o rigid.o sizes.o warp.o

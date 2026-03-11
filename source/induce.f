@@ -219,8 +219,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             do j = 1, 3
-               field(j,i) = field(j,i) + exfld(j)
-               fieldp(j,i) = fieldp(j,i) + exfld(j)
+               field(j,i) = field(j,i) + texfld(j)
+               fieldp(j,i) = fieldp(j,i) + texfld(j)
             end do
          end do
       end if
@@ -259,7 +259,7 @@ c
             end do
          end if
       end do
-
+c
 c     get induced dipoles via the OPT extrapolation method
 c
       if (poltyp .eq. 'OPT') then
@@ -4640,10 +4640,10 @@ c
          do ii = 1, npole
             i = ipole(ii)
             do j = 1, 3
-               field(j,i) = field(j,i) + exfld(j)
-               fieldp(j,i) = fieldp(j,i) + exfld(j)
-               fields(j,i) = fields(j,i) + exfld(j)
-               fieldps(j,i) = fieldps(j,i) + exfld(j)
+               field(j,i) = field(j,i) + texfld(j)
+               fieldp(j,i) = fieldp(j,i) + texfld(j)
+               fields(j,i) = fields(j,i) + texfld(j)
+               fieldps(j,i) = fieldps(j,i) + texfld(j)
             end do
          end do
       end if
@@ -6011,10 +6011,10 @@ c
          do ii = 1, npole
             i = ipole(ii)
             do j = 1, 3
-               field(j,i) = field(j,i) + exfld(j)
-               fieldp(j,i) = fieldp(j,i) + exfld(j)
-               fields(j,i) = fields(j,i) + exfld(j)
-               fieldps(j,i) = fieldps(j,i) + exfld(j)
+               field(j,i) = field(j,i) + texfld(j)
+               fieldp(j,i) = fieldp(j,i) + texfld(j)
+               fields(j,i) = fields(j,i) + texfld(j)
+               fieldps(j,i) = fieldps(j,i) + texfld(j)
             end do
          end do
       end if

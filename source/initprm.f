@@ -380,9 +380,12 @@ c
       neutnbr = .false.
       neutcut = .false.
       use_exfld = .false.
+      use_exfreq = .false.
       do i = 1, 3
          exfld(i) = 0.0d0
+         texfld(i) = 0.0d0
       end do
+      exfreq = 0.0d0
 c
 c     set default control parameters for atomic multipole terms
 c

@@ -53,7 +53,7 @@ c
             use_wrap = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
             frcsave = .true.
-         else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then
+         else if (keyword(1:13) .eq. 'SAVE-UINDUCE ') then
             uindsave = .true.
          end if
    10    continue

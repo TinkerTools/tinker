@@ -22,17 +22,20 @@ c
       use bath
       use bndstr
       use bound
+      use extfld
       use inform
       use iounit
       use keys
       use mdstuf
       use potent
       use stodyn
+      use output
       use usage
       implicit none
       integer i,next,mode
       integer istep,nstep
       real*8 dt,dtsave
+      real*8 phs
       logical exist
       character*20 keyword
       character*240 record
@@ -226,55 +229,67 @@ c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)
 c
+c     only allow Montecarlo or anisotropic barostat
+c     for NPT + extfield simulation
+c
+      if (use_exfld .and. mode.eq.4) then
+         if (barostat.ne.'MONTECARLO') then
+            write (iout,340)
+  340       format (/,' DYNAMIC  --  NPT with External Field Should',
+     &                ' Use MonteCarlo Barostat')
+            call fatal
+         end if
+      end if
+c
 c     print out a header line for the dynamics computation
 c
       if (integrate .eq. 'VERLET') then
-         write (iout,340)
-  340    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'BEEMAN') then
          write (iout,350)
   350    format (/,' Molecular Dynamics Trajectory via',
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'BEEMAN') then
+         write (iout,360)
+  360    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       else if (integrate .eq. 'BAOAB') then
-         write (iout,360)
-  360    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' BAOAB Algorithm')
-      else if (integrate .eq. 'OBABO') then
          write (iout,370)
   370    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' BAOAB Algorithm')
+      else if (integrate .eq. 'OBABO') then
+         write (iout,380)
+  380    format (/,' Stochastic Dynamics Trajectory via',
      &              ' OBABO Algorithm')
       else if (integrate .eq. 'NOSE-HOOVER') then
-         write (iout,380)
-  380    format (/,' Molecular Dynamics Trajectory via',
+         write (iout,390)
+  390    format (/,' Molecular Dynamics Trajectory via',
      &              ' Nose-Hoover NPT Algorithm')
       else if (integrate .eq. 'STOCHASTIC') then
-         write (iout,390)
-  390    format (/,' Stochastic Dynamics Trajectory via',
-     &              ' Velocity Verlet Algorithm')
-      else if (integrate .eq. 'GHMC') then
          write (iout,400)
   400    format (/,' Stochastic Dynamics Trajectory via',
+     &              ' Velocity Verlet Algorithm')
+      else if (integrate .eq. 'GHMC') then
+         write (iout,410)
+  410    format (/,' Stochastic Dynamics Trajectory via',
      &              ' Generalized Hybrid Monte Carlo')
       else if (integrate .eq. 'RIGIDBODY') then
-         write (iout,410)
-  410    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Rigid Body Algorithm')
-      else if (integrate .eq. 'VRESPA') then
          write (iout,420)
   420    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Verlet r-RESPA MTS Algorithm')
-      else if (integrate .eq. 'BRESPA') then
+     &              ' Rigid Body Algorithm')
+      else if (integrate .eq. 'VRESPA') then
          write (iout,430)
   430    format (/,' Molecular Dynamics Trajectory via',
-     &              ' Beeman r-RESPA MTS Algorithm')
-      else if (integrate .eq. 'SRESPA') then
+     &              ' Verlet r-RESPA MTS Algorithm')
+      else if (integrate .eq. 'BRESPA') then
          write (iout,440)
   440    format (/,' Molecular Dynamics Trajectory via',
-     &              ' BAOAB r-RESPA MTS Algorithm')
-      else
+     &              ' Beeman r-RESPA MTS Algorithm')
+      else if (integrate .eq. 'SRESPA') then
          write (iout,450)
   450    format (/,' Molecular Dynamics Trajectory via',
+     &              ' BAOAB r-RESPA MTS Algorithm')
+      else
+         write (iout,460)
+  460    format (/,' Molecular Dynamics Trajectory via',
      &              ' Modified Beeman Algorithm')
       end if
       flush (iout)
@@ -282,6 +297,12 @@ c
 c     integrate equations of motion to take a time step
 c
       do istep = 1, nstep
+         if (use_exfld .and. use_exfreq) then
+            phs = sin(exfreq * dble(istep-1) * dt)
+            do i = 1, 3
+               texfld(i) = phs * exfld(i)
+            end do
+         end if
          if (integrate .eq. 'VERLET') then
             call verlet (istep,dt)
          else if (integrate .eq. 'BEEMAN') then
@@ -308,6 +329,10 @@ c
             call beeman (istep,dt)
          end if
       end do
+c
+c     save dynamic at the end if it was not saved during simulation
+c
+      if (.not. dynsave)  call prtdyn
 c
 c     perform any final tasks before program exit
 c

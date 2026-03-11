@@ -34,6 +34,7 @@ c
       use moldyn
       use mpole
       use output
+      use polar
       use potent
       use rgddyn
       use rigid
@@ -74,6 +75,13 @@ c
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
+      ustcsave = .false.
+      uchgsave = .false.
+      usyssave = .false.
+      vsyssave = .false.
+      udirsave = .false.
+      defsave = .false.
+      tefsave = .false.
       friction = 0.5d0
       if (use_solv)  friction = 91.0d0
       use_sdarea = .false.
@@ -125,8 +133,22 @@ c
             velsave = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
             frcsave = .true.
-         else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then
+         else if (keyword(1:13) .eq. 'SAVE-UINDUCE ') then
             uindsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-USTATIC ') then
+            ustcsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-UCHARGE ') then
+            uchgsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-USYSTEM ') then
+            usyssave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-VSYSTEM ') then
+            vsyssave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-UDIRECT ') then
+            udirsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-DEFIELD ') then
+            defsave = .true.
+         else if (keyword(1:13) .eq. 'SAVE-TEFIELD ') then
+            tefsave = .true.
          else if (keyword(1:9) .eq. 'FRICTION ') then
             read (string,*,err=10,end=10)  friction
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
@@ -173,6 +195,14 @@ c
          end if
    10    continue
       end do
+c
+c     check for use of save-only keyword
+c
+      call saveonly
+c
+c     get unique atom types
+c
+      call uniquetyp
 c
 c     check for use of induced dipole prediction methods
 c

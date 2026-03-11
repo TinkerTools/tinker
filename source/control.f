@@ -41,6 +41,8 @@ c
       cyclesave = .false.
       noversion = .false.
       overwrite = .false.
+      coordsave = .true.
+      dynsave = .true.
 c
 c     check for control parameters on the command line
 c
@@ -90,6 +92,10 @@ c
             noversion = .true.
          else if (keyword(1:10) .eq. 'OVERWRITE ') then
             overwrite = .true.
+         else if (keyword(1:8) .eq. 'NOCOORD ') then
+            coordsave = .false.
+         else if (keyword(1:6) .eq. 'NODYN ') then
+            dynsave = .false.
          end if
    10    continue
       end do

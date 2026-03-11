@@ -25,6 +25,7 @@ c
       use expol
       use extfld
       use fields
+      use math
       use mplpot
       use polpot
       use potent
@@ -403,7 +404,12 @@ c
          use_exfld = .true.
          do i = 1, 3
             exfld(i) = exfld(i) / elefield
+            texfld(i) = exfld(i)
          end do
+      else if (keyword(1:15) .eq. 'EXFLD-FREQ ') then
+         read (string,*,err=10,end=10)  exfreq
+         use_exfreq = .true.
+         exfreq = 2.0d0 * pi * 0.001d0 * exfreq
 c
 c     set control parameters for atomic multipole potentials
 c

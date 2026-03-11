@@ -175,7 +175,7 @@ c
                   open (unit=ifrc,file=frcfile,form='unformatted',
      &                     status='new')
                end if
-               call prtdcdf (ifrc,first)
+               call prtdcdv3 (ifrc,first,'FRC')
             else if (arcsave) then
                frcfile = filename(1:leng)
                call suffix (frcfile,'frc','old')
@@ -185,12 +185,12 @@ c
                else
                   open (unit=ifrc,file=frcfile,status='new')
                end if
-               call prtfrc (ifrc)
+               call prtvec3 (ifrc,'FRC')
             else
                frcfile = filename(1:leng)//'.'//ext(1:lext)//'f'
                call version (frcfile,'new')
                open (unit=ifrc,file=frcfile,status='new')
-               call prtfrc (ifrc)
+               call prtvec3 (ifrc,'FRC')
             end if
          else
             frcfile = filename(1:leng)
@@ -203,7 +203,7 @@ c
                open (unit=ifrc,file=frcfile,status='new')
             end if
             rewind (unit=ifrc)
-            call prtfrc (ifrc)
+            call prtvec3 (ifrc,'FRC')
          end if
          close (unit=ifrc)
          write (iout,10)  frcfile(1:trimtext(frcfile))
@@ -228,7 +228,7 @@ c
                   open (unit=iind,file=indfile,form='unformatted',
      &                     status='new')
                end if
-               call prtdcdu (iind,first)
+               call prtdcdv3 (iind,first,'UIN')
             else if (arcsave) then
                indfile = filename(1:leng)
                call suffix (indfile,'uind','old')
@@ -238,12 +238,12 @@ c
                else
                   open (unit=iind,file=indfile,status='new')
                end if
-               call prtuind (iind)
+               call prtvec3 (iind,'UIN')
             else
                indfile = filename(1:leng)//'.'//ext(1:lext)//'u'
                call version (indfile,'new')
                open (unit=iind,file=indfile,status='new')
-               call prtuind (iind)
+               call prtvec3 (iind,'UIN')
             end if
          else
             indfile = filename(1:leng)
@@ -256,7 +256,7 @@ c
                open (unit=iind,file=indfile,status='new')
             end if
             rewind (unit=iind)
-            call prtuind (iind)
+            call prtvec3 (iind,'UIN')
          end if
          close (unit=iind)
          write (iout,20)  indfile(1:trimtext(indfile))

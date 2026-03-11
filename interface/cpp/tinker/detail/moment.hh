@@ -18,6 +18,7 @@ extern double& yzqpl;
 extern double& zxqpl;
 extern double& zyqpl;
 extern double& zzqpl;
+extern int*& momuse;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" double TINKER_MOD(moment, netchg);
@@ -35,6 +36,7 @@ extern "C" double TINKER_MOD(moment, yzqpl);
 extern "C" double TINKER_MOD(moment, zxqpl);
 extern "C" double TINKER_MOD(moment, zyqpl);
 extern "C" double TINKER_MOD(moment, zzqpl);
+extern "C" int* TINKER_MOD(moment, momuse);
 
 double& netchg = TINKER_MOD(moment, netchg);
 double& netdpl = TINKER_MOD(moment, netdpl);
@@ -51,5 +53,6 @@ double& yzqpl = TINKER_MOD(moment, yzqpl);
 double& zxqpl = TINKER_MOD(moment, zxqpl);
 double& zyqpl = TINKER_MOD(moment, zyqpl);
 double& zzqpl = TINKER_MOD(moment, zzqpl);
+int*& momuse = TINKER_MOD(moment, momuse);
 #endif
 } }

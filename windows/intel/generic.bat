@@ -527,14 +527,11 @@ ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtarc.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtcif.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtdyn.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prterr.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtfrc.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtint.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtmol2.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtpdb.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtprm.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtseq.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtuind.f
-ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtvel.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp prtxyz.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pss.f
 ifort /c /O3 /arch:sse3 /Qip- /Qprec-div- /w /Qopenmp pssrigid.f

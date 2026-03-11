@@ -166,6 +166,7 @@ add_library (tinkerObjF OBJECT
 ../source/tortor.f
 ../source/tree.f
 ../source/tritor.f
+../source/uatom.f
 ../source/units.f
 ../source/uprior.f
 ../source/urey.f
@@ -482,14 +483,11 @@ add_library (tinkerObjF OBJECT
 ../source/prtcif.f
 ../source/prtdyn.f
 ../source/prterr.f
-../source/prtfrc.f
 ../source/prtint.f
 ../source/prtmol2.f
 ../source/prtpdb.f
 ../source/prtprm.f
 ../source/prtseq.f
-../source/prtuind.f
-../source/prtvel.f
 ../source/prtxyz.f
 ../source/qrsolve.f
 ../source/quatfit.f
@@ -542,6 +540,7 @@ add_library (tinkerObjF OBJECT
 ../source/trimtext.f
 ../source/tritors.f
 ../source/unionball.f
+../source/uniquetyp.f
 ../source/unitcell.f
 ../source/verlet.f
 ../source/version.f
