@@ -36,6 +36,7 @@ c
       use deriv
       use dipole
       use disgeo
+      use dlmda
       use domega
       use expol
       use faces
@@ -325,6 +326,24 @@ c     deallocation of global arrays from module disgeo
 c
       if (allocated(dbnd))  deallocate (dbnd)
       if (allocated(georad))  deallocate (georad)
+c
+c     deallocation of global arrays from module dlmda
+c
+      if (allocated(dldesum))  deallocate (dldesum)
+      if (allocated(dldev))  deallocate (dldev)
+      if (allocated(dldem))  deallocate (dldem)
+      if (allocated(dldep))  deallocate (dldep)
+      if (allocated(pchgorig))  deallocate (pchgorig)
+      if (allocated(pchg0orig))  deallocate (pchg0orig)
+      if (allocated(bdplorig))  deallocate (bdplorig)
+      if (allocated(poleorig))  deallocate (poleorig)
+      if (allocated(pcoreorig))  deallocate (pcoreorig)
+      if (allocated(pvalorig))  deallocate (pvalorig)
+      if (allocated(pval0orig))  deallocate (pval0orig)
+      if (allocated(polarityorig))  deallocate (polarityorig)
+      if (allocated(bflxorig))  deallocate (bflxorig)
+      if (allocated(aflxorig))  deallocate (aflxorig)
+      if (allocated(abflxorig))  deallocate (abflxorig)
 c
 c     deallocation of global arrays from module domega
 c

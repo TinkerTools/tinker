@@ -31,22 +31,33 @@ c     Potential", PNAS, 105, 6290-6295 (2008)
 c
 c
       subroutine mutate
+      use angbnd
       use atomid
       use atoms
       use bndstr
+      use cflux
+      use charge
+      use chgpen
+      use dipole
+      use dlmda
       use inform
       use iounit
       use katoms
       use keys
+      use mplpot
+      use mpole
       use mutant
+      use polar
       use potent
       implicit none
       integer i,j,k,ihyb
       integer it0,it1
+      integer k1,k2
       integer next,size
       integer ntbnd
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
+      real*8 eps
       character*20 keyword
       character*240 record
       character*240 string
@@ -179,6 +190,80 @@ c
    30    continue
       end do
 c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(pchgorig))  deallocate (pchgorig)
+      if (allocated(pchg0orig))  deallocate (pchg0orig)
+      if (allocated(bdplorig))  deallocate (bdplorig)
+      if (allocated(poleorig))  deallocate (poleorig)
+      if (allocated(pcoreorig))  deallocate (pcoreorig)
+      if (allocated(pvalorig))  deallocate (pvalorig)
+      if (allocated(pval0orig))  deallocate (pval0orig)
+      if (allocated(polarityorig))  deallocate (polarityorig)
+      if (allocated(bflxorig))  deallocate (bflxorig)
+      if (allocated(aflxorig))  deallocate (aflxorig)
+      if (allocated(abflxorig))  deallocate (abflxorig)
+      allocate (pchgorig(n))
+      allocate (pchg0orig(n))
+      allocate (bdplorig(nbond))
+      allocate (poleorig(maxpole,n))
+      allocate (pcoreorig(n))
+      allocate (pvalorig(n))
+      allocate (pval0orig(n))
+      allocate (polarityorig(n))
+      allocate (bflxorig(nbond))
+      allocate (aflxorig(2,nangle))
+      allocate (abflxorig(2,nangle))
+c
+c     copy original parameters for lambda derivative calculations
+c
+      if (use_charge) then
+         do i = 1, nion
+            k = iion(i)
+            pchgorig(k) = pchg(k)
+            pchg0orig(k) = pchg0(k)
+         end do
+      end if
+      if (use_dipole) then
+         do i = 1, ndipole
+            k1 = idpl(1,i)
+            k2 = idpl(2,i)
+            bdplorig(i) = bdpl(i)
+         end do
+      end if
+      if (use_mpole) then
+         do i = 1, npole
+            k = ipole(i)
+            do j = 1, 13
+               poleorig(j,k) = pole(j,k)
+            end do
+            if (use_chgpen) then
+               pcoreorig(k) = pcore(k)
+               pvalorig(k) = pval(k)
+               pval0orig(k) = pval0(k)
+            end if
+         end do
+      end if
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            polarityorig(k) = polarity(k)
+         end do
+      end if
+      if (use_chgflx) then
+         do i = 1, nbond
+            bflxorig(i) = bflx(i)
+         end do
+      end if
+      if (use_chgflx) then
+         do i = 1, nangle
+            aflxorig(1,i) = aflx(1,i)
+            aflxorig(2,i) = aflx(2,i)
+            abflxorig(1,i) = abflx(1,i)
+            abflxorig(2,i) = abflx(2,i)
+         end do
+      end if
+c
 c     scale electrostatic parameter values based on lambda
 c
       if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
@@ -245,6 +330,7 @@ c
       use charge
       use chgpen
       use dipole
+      use dlmda
       use mplpot
       use mpole
       use mutant
@@ -262,7 +348,7 @@ c
          do i = 1, nion
             k = iion(i)
             if (mut(k)) then
-               pchg(k) = pchg(k) * elambda
+               pchg(k) = pchgorig(k) * elambda
             end if
             pchg0(k) = pchg(k)
          end do
@@ -275,7 +361,7 @@ c
             k1 = idpl(1,i)
             k2 = idpl(2,i)
             if (mut(k1) .or. mut(k2)) then
-               bdpl(i) = bdpl(i) * elambda
+               bdpl(i) = bdplorig(i) * elambda
             end if
          end do
       end if
@@ -287,12 +373,12 @@ c
             k = ipole(i)
             if (mut(k)) then
                do j = 1, 13
-                  pole(j,k) = pole(j,k) * elambda
+                  pole(j,k) = poleorig(j,k) * elambda
                end do
                mono0(k) = pole(1,k)
                if (use_chgpen) then
-                  pcore(k) = pcore(k) * elambda
-                  pval(k) = pval(k) * elambda
+                  pcore(k) = pcoreorig(k) * elambda
+                  pval(k) = pvalorig(k) * elambda
                   pval0(k) = pval(k)
                end if
             end if
@@ -305,7 +391,7 @@ c
          do i = 1, npole
             k = ipole(i)
             if (mut(k)) then
-               polarity(k) = polarity(k) * elambda
+               polarity(k) = polarityorig(k) * elambda
                if (elambda .eq. 0.0d0)  douind(k) = .false.
             end if
          end do
@@ -318,7 +404,7 @@ c
             ia = ibnd(1,i)
             ib = ibnd(2,i)
             if (mut(ia) .and. mut(ib)) then
-               bflx(i) = bflx(i) * elambda
+               bflx(i) = bflxorig(i) * elambda
             end if
          end do
       end if
@@ -331,10 +417,10 @@ c
             ib = iang(2,i)
             ic = iang(3,i)
             if (mut(ia) .and. mut(ib) .and. mut(ic)) then
-               aflx(1,i) = aflx(1,i) * elambda
-               aflx(2,i) = aflx(2,i) * elambda
-               abflx(1,i) = abflx(1,i) * elambda
-               abflx(2,i) = abflx(2,i) * elambda
+               aflx(1,i) = aflxorig(1,i) * elambda
+               aflx(2,i) = aflxorig(2,i) * elambda
+               abflx(1,i) = abflxorig(1,i) * elambda
+               abflx(2,i) = abflxorig(2,i) * elambda
             end if
          end do
       end if

@@ -18,6 +18,7 @@ c
 c
       subroutine rotpole (poltype)
       use atoms
+      use dlmda
       use mpole
       use repel
       implicit none
@@ -35,6 +36,13 @@ c
             if (pollist(i) .ne. 0) then
                call rotmat (i,a,planar)
                call rotsite (i,a,planar,pole,rpole)
+            end if
+         end do
+      else if (poltype .eq. 'MPORG') then
+         do i = 1, n
+            if (pollist(i) .ne. 0) then
+               call rotmat (i,a,planar)
+               call rotsite (i,a,planar,poleorig,rpole)
             end if
          end do
       else if (poltype .eq. 'REPEL') then

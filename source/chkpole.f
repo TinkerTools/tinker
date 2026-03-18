@@ -18,6 +18,7 @@ c
 c
       subroutine chkpole
       use atoms
+      use dlmda
       use mpole
       use repel
       implicit none
@@ -28,6 +29,7 @@ c
       real*8 xcd,ycd,zcd
       real*8 c1,c2,c3,vol
       logical dopol,dorep
+      logical dopolorig
       logical check
 c
 c
@@ -36,13 +38,17 @@ c
       do i = 1, n
          dopol = .false.
          dorep = .false.
+         dopolorig = .false.
          if (allocated(pollist)) then
             if (pollist(i) .ne. 0)  dopol = .true.
          end if
          if (allocated(replist)) then
             if (replist(i) .ne. 0)  dorep = .true.
          end if
-         if (dopol .or. dorep) then
+         if (dopol .and. use_dlmda) then
+            dopolorig = .true.
+         end if
+         if (dopol .or. dorep .or. dopolorig) then
             check = .true.
             if (polaxe(i) .ne. 'Z-then-X')  check = .false.
             if (yaxis(i) .eq. 0)  check = .false.
@@ -80,6 +86,13 @@ c
                      pole(8,i) = -pole(8,i)
                      pole(10,i) = -pole(10,i)
                      pole(12,i) = -pole(12,i)
+                  end if
+                  if (dopolorig) then
+                     poleorig(3,i) = -poleorig(3,i)
+                     poleorig(6,i) = -poleorig(6,i)
+                     poleorig(8,i) = -poleorig(8,i)
+                     poleorig(10,i) = -poleorig(10,i)
+                     poleorig(12,i) = -poleorig(12,i)
                   end if
                   if (dorep) then
                      repole(3,i) = -repole(3,i)

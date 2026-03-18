@@ -23,6 +23,7 @@ c
       use bound
       use boxes
       use cell
+      use dlmda
       use fft
       use files
       use freeze
@@ -190,6 +191,10 @@ c
 c     flag for use of internal virial
 c
       use_virial = .true.
+c
+c     flag for use of lambda derivative
+c
+      use_dlmda = .false.
 c
 c     flag for use of rigid bodies
 c

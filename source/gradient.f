@@ -20,6 +20,7 @@ c
       use atoms
       use couple
       use deriv
+      use dlmda
       use energi
       use inform
       use inter
@@ -65,6 +66,17 @@ c
       elf = 0.0d0
       eg = 0.0d0
       ex = 0.0d0
+c
+c     zero out lambda derivative components
+c
+      delmda = 0.0d0
+      devlmda = 0.0d0
+      demlmda = 0.0d0
+      deplmda = 0.0d0
+      delmda2 = 0.0d0
+      devlmda2 = 0.0d0
+      demlmda2 = 0.0d0
+      deplmda2 = 0.0d0
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -132,6 +144,22 @@ c
          allocate (deg(3,n))
          allocate (dex(3,n))
       end if
+      if (use_dlmda) then
+         if (allocated(dldesum)) then
+            if (size(dldesum) .lt. 3*n) then
+               deallocate (dldesum)
+               deallocate (dldev)
+               deallocate (dldem)
+               deallocate (dldep)
+            end if
+         end if
+         if (.not. allocated(dldesum)) then
+            allocate (dldesum(3,n))
+            allocate (dldev(3,n))
+            allocate (dldem(3,n))
+            allocate (dldep(3,n))
+         end if
+      end if
 c
 c     zero out each of the first derivative components
 c
@@ -169,6 +197,16 @@ c
             dex(j,i) = 0.0d0
          end do
       end do
+      if (use_dlmda) then
+         do i = 1, n
+            do j = 1, 3
+               dldesum(j,i) = 0.0d0
+               dldev(j,i) = 0.0d0
+               dldem(j,i) = 0.0d0
+               dldep(j,i) = 0.0d0
+            end do
+         end do
+      end if
 c
 c     zero out the virial and the intermolecular energy
 c
@@ -237,7 +275,13 @@ c
          if (vdwtyp .eq. 'LENNARD-JONES')  call elj1
          if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck1
          if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb1
-         if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
+         if (vdwtyp .eq. 'BUFFERED-14-7') then
+            if (use_dlmda) then
+               call ehal4
+            else
+               call ehal1
+            end if
+         end if
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
       end if
       if (use_repel)  call erepel1
@@ -272,6 +316,18 @@ c
             derivs(j,i) = desum(j,i)
          end do
       end do
+c
+c     sum up to get the total lambda derivative
+c
+      if (use_dlmda) then
+         delmda = devlmda + demlmda + deplmda
+         delmda2 = devlmda2 + demlmda2 + deplmda2
+         do i = 1, n
+            do j = 1, 3
+               dldesum(j,i) = dldev(j,i) + dldem(j,i) + dldep(j,i)
+            end do
+         end do
+      end if
 c
 c     distribute gradient on four-site water extra centers
 c
