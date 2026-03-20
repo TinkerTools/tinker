@@ -8694,8 +8694,8 @@ c
             cmp(10,i) = 2.0d0 * rpole(10,i)
          end do
          call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
+         call grid_mpole (fmp,qgrid)
+         call fftfront (qgrid)
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -8766,8 +8766,8 @@ c
 c
 c     perform 3-D FFT backward transform and get potential
 c
-         call fftback
-         call fphi_mpole (fphi)
+         call fftback (qgrid)
+         call fphi_mpole (fphi,qgrid)
          do ii = 1, npole
             i = ipole(ii)
             do j = 1, 20
@@ -8806,7 +8806,7 @@ c
 c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_uind (fuind,fuinp)
-      call fftfront
+      call fftfront (qgrid)
 c
 c     complete the transformation of the PME grid
 c
@@ -8822,7 +8822,7 @@ c
 c
 c     perform 3-D FFT backward transform and get potential
 c
-      call fftback
+      call fftback (qgrid)
       call fphi_uind (fphid,fphip,fphidp)
       do ii = 1, npole
          i = ipole(ii)
@@ -9076,7 +9076,7 @@ c
                end do
             end do
             call grid_uind (fuind,fuinp)
-            call fftfront
+            call fftfront (qgrid)
             do k = 1, nfft3
                do j = 1, nfft2
                   do i = 1, nfft1
@@ -9086,7 +9086,7 @@ c
                   end do
                end do
             end do
-            call fftback
+            call fftback (qgrid)
             call fphi_uind (fphid,fphip,fphidp)
             do ii = 1, npole
                i = ipole(ii)
@@ -9154,7 +9154,7 @@ c
                end do
             end do
             call grid_uind (fuind,fuinp)
-            call fftfront
+            call fftfront (qgrid)
             do k = 1, nfft3
                do j = 1, nfft2
                   do i = 1, nfft1
@@ -9164,7 +9164,7 @@ c
                   end do
                end do
             end do
-            call fftback
+            call fftback (qgrid)
             call fphi_uind (fphid,fphip,fphidp)
             do ii = 1, npole
                i = ipole(ii)
@@ -9247,8 +9247,8 @@ c
          end do
       end do
       call cmp_to_fmp (cmp,fmp)
-      call grid_mpole (fmp)
-      call fftfront
+      call grid_mpole (fmp,qgrid)
+      call fftfront (qgrid)
       do k = 1, nfft3
          do j = 1, nfft2
             do i = 1, nfft1
@@ -9264,8 +9264,8 @@ c
          end do
       end do
       call cmp_to_fmp (cmp,fmp)
-      call grid_mpole (fmp)
-      call fftfront
+      call grid_mpole (fmp,qgrid)
+      call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -9324,8 +9324,8 @@ c
             end do
          end do
          call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
+         call grid_mpole (fmp,qgrid)
+         call fftfront (qgrid)
          do k = 1, nfft3
             do j = 1, nfft2
                do i = 1, nfft1
@@ -9341,8 +9341,8 @@ c
             end do
          end do
          call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
+         call grid_mpole (fmp,qgrid)
+         call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -9403,8 +9403,8 @@ c
                end do
             end do
             call cmp_to_fmp (cmp,fmp)
-            call grid_mpole (fmp)
-            call fftfront
+            call grid_mpole (fmp,qgrid)
+            call fftfront (qgrid)
             do k = 1, nfft3
                do j = 1, nfft2
                   do i = 1, nfft1
@@ -9420,8 +9420,8 @@ c
                end do
             end do
             call cmp_to_fmp (cmp,fmp)
-            call grid_mpole (fmp)
-            call fftfront
+            call grid_mpole (fmp,qgrid)
+            call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -9478,8 +9478,8 @@ c
                end do
             end do
             call cmp_to_fmp (cmp,fmp)
-            call grid_mpole (fmp)
-            call fftfront
+            call grid_mpole (fmp,qgrid)
+            call fftfront (qgrid)
             do k = 1, nfft3
                do j = 1, nfft2
                   do i = 1, nfft1
@@ -9495,8 +9495,8 @@ c
                end do
             end do
             call cmp_to_fmp (cmp,fmp)
-            call grid_mpole (fmp)
-            call fftfront
+            call grid_mpole (fmp,qgrid)
+            call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c

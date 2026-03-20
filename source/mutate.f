@@ -186,6 +186,8 @@ c
                itbnd(2,ntbnd) = list(k+1)
                k = k + 2
             end do
+         else if (keyword(1:5) .eq. 'OSRW ') then
+            use_dlmda = .true.
          end if
    30    continue
       end do

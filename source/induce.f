@@ -2429,8 +2429,8 @@ c
 c
 c     assign PME grid and perform 3-D FFT forward transform
 c
-      call grid_mpole (fmp)
-      call fftfront
+      call grid_mpole (fmp,qgrid)
+      call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -2489,8 +2489,8 @@ c
 c
 c     perform 3-D FFT backward transform and get field
 c
-      call fftback
-      call fphi_mpole (fphi)
+      call fftback (qgrid)
+      call fphi_mpole (fphi,qgrid)
 c
 c     convert the field from fractional to Cartesian
 c
@@ -3964,7 +3964,7 @@ c
 c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_uind (fuind,fuinp)
-      call fftfront
+      call fftfront (qgrid)
 c
 c     complete the transformation of the PME grid
 c
@@ -3980,7 +3980,7 @@ c
 c
 c     perform 3-D FFT backward transform and get field
 c
-      call fftback
+      call fftback (qgrid)
       call fphi_uind (fdip_phi1,fdip_phi2,fdip_sum_phi)
 c
 c     store fractional reciprocal potentials for OPT method

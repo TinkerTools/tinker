@@ -1,22 +1,23 @@
 c
 c
-c     #############################################################
-c     ##  COPYRIGHT (C) 1999 by Pengyu Ren & Jay William Ponder  ##
-c     ##                   All Rights Reserved                   ##
-c     #############################################################
+c     ##################################################################
+c     ##  COPYRIGHT (C) 2026 by  Moses Chung, Pengyu Ren, Jay Ponder  ##
+c     ##                     All Rights Reserved                      ##
+c     ##################################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine empole1  --  multipole energy & derivatives  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "empole1" calculates the atomic multipole energy and first
-c     derivatives with respect to Cartesian coordinates
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine empole4  --  multipole lambda derivatives  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-      subroutine empole1
+c     "empole4" calculates the atomic multipole energy,
+c     first derivatives with respect to Cartesian coordinates,
+c     and lambda derivatives
+c
+c
+      subroutine empole4
       use energi
       use extfld
       use limits
@@ -29,15 +30,15 @@ c     choose the method to sum over multipole interactions
 c
       if (use_ewald) then
          if (use_mlist) then
-            call empole1d
+            call empole4d
          else
-            call empole1c
+            call empole4c
          end if
       else
          if (use_mlist) then
-            call empole1b
+            call empole4b
          else
-            call empole1a
+            call empole4a
          end if
       end if
 c
@@ -52,18 +53,19 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine empole1a  --  double loop multipole derivatives  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine empole4a  --  double loop mpole lambda derivs  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "empole1a" calculates the multipole energy and derivatives with 
-c     respect to Cartesian coordinates using a pairwise double loop
+c     "empole4a" calculates the multipole energy, derivatives with 
+c     respect to Cartesian coordinates, and lambda derivatives
+c     using a pairwise double loop
 c
 c
-      subroutine empole1a
+      subroutine empole4a
       use atoms
       use bound
       use cell
@@ -71,10 +73,12 @@ c
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use mplpot
       use mpole
+      use mutant
       use potent
       use shunt
       use usage
@@ -134,29 +138,39 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dlde
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dlambda,dlambda2
+      real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
+      real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
+      logical muti,mutk
       character*6 mode
 c
 c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
+      demlmda = 0.0d0
+      demlmda2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+            dldem(j,i) = 0.0d0
          end do
       end do
-      if (npole .eq. 0)  return
+      if (npole .eq. 0)  return  
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -164,12 +178,13 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole ('MPOLE')
+      call rotpole ('MPORG')
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dltem(3,n))
       allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
@@ -181,6 +196,7 @@ c
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
+            dltem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
       end do
@@ -217,6 +233,7 @@ c
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -241,6 +258,7 @@ c
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -494,6 +512,54 @@ c
                   end do
                end if
 c
+c     compute lambda derivative
+c
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
+               if (muti .or. mutk) then
+                  demlmda = demlmda + dlambda
+                  demlmda2 = demlmda2 + dlambda2
+               end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+               ttmi(1) = scalelmda * ttmi(1)
+               ttmi(2) = scalelmda * ttmi(2)
+               ttmi(3) = scalelmda * ttmi(3)
+               ttmk(1) = scalelmda * ttmk(1)
+               ttmk(2) = scalelmda * ttmk(2)
+               ttmk(3) = scalelmda * ttmk(3)
+c
 c     increment the overall atomic multipole energy component
 c
                em = em + e
@@ -506,6 +572,14 @@ c
                tem(1,i) = tem(1,i) + ttmi(1)
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
+               if (muti .or. mutk) then
+                  dldem(1,i) = dldem(1,i) + dlfrcx
+                  dldem(2,i) = dldem(2,i) + dlfrcy
+                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dltem(1,i) = dltem(1,i) + dlttmi(1)
+                  dltem(2,i) = dltem(2,i) + dlttmi(2)
+                  dltem(3,i) = dltem(3,i) + dlttmi(3)
+               end if
 c
 c     increment force-based gradient and torque on second site
 c
@@ -515,6 +589,14 @@ c
                tem(1,k) = tem(1,k) + ttmk(1)
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
+               if (muti .or. mutk) then
+                  dldem(1,k) = dldem(1,k) - dlfrcx
+                  dldem(2,k) = dldem(2,k) - dlfrcy
+                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dltem(1,k) = dltem(1,k) + dlttmk(1)
+                  dltem(2,k) = dltem(2,k) + dlttmk(2)
+                  dltem(3,k) = dltem(3,k) + dlttmk(3)
+               end if
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -584,6 +666,7 @@ c
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -608,6 +691,7 @@ c
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
+            mutk = mut(k)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
@@ -874,6 +958,58 @@ c
                   end do
                end if
 c
+c     compute lambda derivative
+c
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
+               if (muti .or. mutk) then
+                  if (i .eq. k) then
+                     dlambda = 0.5d0 * dlambda
+                     dlambda2 = 0.5d0 * dlambda2
+                  end if
+                  demlmda = demlmda + dlambda
+                  demlmda2 = demlmda2 + dlambda2
+               end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+               ttmi(1) = scalelmda * ttmi(1)
+               ttmi(2) = scalelmda * ttmi(2)
+               ttmi(3) = scalelmda * ttmi(3)
+               ttmk(1) = scalelmda * ttmk(1)
+               ttmk(2) = scalelmda * ttmk(2)
+               ttmk(3) = scalelmda * ttmk(3)
+c
 c     increment the overall atomic multipole energy component
 c
                em = em + e
@@ -886,6 +1022,14 @@ c
                tem(1,i) = tem(1,i) + ttmi(1)
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
+               if (muti .or. mutk) then
+                  dldem(1,i) = dldem(1,i) + dlfrcx
+                  dldem(2,i) = dldem(2,i) + dlfrcy
+                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dltem(1,i) = dltem(1,i) + dlttmi(1)
+                  dltem(2,i) = dltem(2,i) + dlttmi(2)
+                  dltem(3,i) = dltem(3,i) + dlttmi(3)
+               end if
 c
 c     increment force-based gradient and torque on second site
 c
@@ -895,6 +1039,14 @@ c
                tem(1,k) = tem(1,k) + ttmk(1)
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
+               if (muti .or. mutk) then
+                  dldem(1,k) = dldem(1,k) - dlfrcx
+                  dldem(2,k) = dldem(2,k) - dlfrcy
+                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dltem(1,k) = dltem(1,k) + dlttmk(1)
+                  dltem(2,k) = dltem(2,k) + dlttmk(2)
+                  dltem(3,k) = dltem(3,k) + dlttmk(3)
+               end if
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -939,6 +1091,7 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
+         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
          iz = zaxis(i)
          ix = xaxis(i)
@@ -1012,6 +1165,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dltem)
       deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
@@ -1020,28 +1174,31 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole1b  --  neighbor list multipole derivs  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine empole4b  --  neighbor list mpole lambda derivs  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "empole1b" calculates the multipole energy and derivatives
-c     with respect to Cartesian coordinates using a neighbor list
+c     "empole4b" calculates the multipole energy, derivatives
+c     with respect to Cartesian coordinates, and lambda derivatives
+c     using a neighbor list
 c
 c
-      subroutine empole1b
+      subroutine empole4b
       use atoms
       use bound
       use chgpen
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use mplpot
       use mpole
+      use mutant
       use neigh
       use potent
       use shunt
@@ -1102,26 +1259,36 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dlde
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dlambda,dlambda2
+      real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
+      real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
+      logical muti,mutk
       character*6 mode
 c
 c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
+      demlmda = 0.0d0
+      demlmda2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+            dldem(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -1132,13 +1299,14 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole ('MPOLE')
+      call rotpole ('MPORG')
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
       allocate (pot(n))
+      allocate (dltem(3,n))
       allocate (decfx(n))
       allocate (decfy(n))
       allocate (decfz(n))
@@ -1149,6 +1317,7 @@ c
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
+            dltem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
       end do
@@ -1165,9 +1334,10 @@ c
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
-!$OMP& use_group,use_intra,use_bounds,off2,f)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
-!$OMP DO reduction(+:em,dem,tem,pot,vir)
+!$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda)
+!$OMP& firstprivate(mscale) shared (em,dem,dldem,tem,dltem,pot,vir,
+!$OMP& demlmda,demlmda2)
+!$OMP DO reduction(+:em,dem,dldem,tem,dltem,pot,vir,demlmda,demlmda2)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1195,6 +1365,7 @@ c
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1220,6 +1391,7 @@ c
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
+            mutk = mut(k)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -1473,6 +1645,54 @@ c
                   end do
                end if
 c
+c     compute lambda derivative
+c
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
+               if (muti .or. mutk) then
+                  demlmda = demlmda + dlambda
+                  demlmda2 = demlmda2 + dlambda2
+               end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+               ttmi(1) = scalelmda * ttmi(1)
+               ttmi(2) = scalelmda * ttmi(2)
+               ttmi(3) = scalelmda * ttmi(3)
+               ttmk(1) = scalelmda * ttmk(1)
+               ttmk(2) = scalelmda * ttmk(2)
+               ttmk(3) = scalelmda * ttmk(3)
+c
 c     increment the overall atomic multipole energy component
 c
                em = em + e
@@ -1485,6 +1705,14 @@ c
                tem(1,i) = tem(1,i) + ttmi(1)
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
+               if (muti .or. mutk) then
+                  dldem(1,i) = dldem(1,i) + dlfrcx
+                  dldem(2,i) = dldem(2,i) + dlfrcy
+                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dltem(1,i) = dltem(1,i) + dlttmi(1)
+                  dltem(2,i) = dltem(2,i) + dlttmi(2)
+                  dltem(3,i) = dltem(3,i) + dlttmi(3)
+               end if
 c
 c     increment force-based gradient and torque on second site
 c
@@ -1494,6 +1722,14 @@ c
                tem(1,k) = tem(1,k) + ttmk(1)
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
+               if (muti .or. mutk) then
+                  dldem(1,k) = dldem(1,k) - dlfrcx
+                  dldem(2,k) = dldem(2,k) - dlfrcy
+                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dltem(1,k) = dltem(1,k) + dlttmk(1)
+                  dltem(2,k) = dltem(2,k) + dlttmk(2)
+                  dltem(3,k) = dltem(3,k) + dlttmk(3)
+               end if
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -1535,12 +1771,13 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir)
+!$OMP DO reduction(+:dem,dldem,vir)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
+         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
          iz = zaxis(i)
          ix = xaxis(i)
@@ -1624,6 +1861,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dltem)
       deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
@@ -1632,33 +1870,36 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine empole1c  --  Ewald multipole derivs via loop  ##
-c     ##                                                            ##
-c     ################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine empole4c  --  Ewald lambda derivs via loop  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
-c     "empole1c" calculates the multipole energy and derivatives
-c     with respect to Cartesian coordinates using particle mesh
-c     Ewald summation and a double loop
+c     "empole4c" calculates the multipole energy, derivatives
+c     with respect to Cartesian coordinates, and lambda derivatives
+c     using particle mesh Ewald summation and a double loop
 c
 c
-      subroutine empole1c
+      subroutine empole4c
       use atoms
       use boxes
       use chgpot
       use deriv
+      use dlmda
       use energi
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use potent
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,f,sum
+      real*8 e,f,sum,dlsum
+      real*8 dlxd,dlyd,dlzd
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xi,yi,zi
@@ -1670,23 +1911,30 @@ c
       real*8 qiyy,qiyz,qizz
       real*8 xdfield,ydfield
       real*8 zdfield
+      real*8 dlxdfield,dlydfield
+      real*8 dlzdfield
       real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
+      real*8 dltem(3)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical muti
 c
 c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
+      demlmda = 0.0d0
+      demlmda2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+            dldem(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -1709,15 +1957,15 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole ('MPOLE')
+      call rotpole ('MPORG')
 c
 c     compute the real space part of the Ewald summation
 c
-      call emreal1c
+      call emreal4c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call emrecip1
+      call emrecip4
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1738,6 +1986,7 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
+         muti = mut(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1753,6 +2002,11 @@ c
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
+         if (muti) then
+            demlmda = demlmda + 2.0d0 * elambda * e
+            demlmda2 = demlmda2 + 2.0d0 * e
+            e = e * elambda * elambda
+         end if
          em = em + e
          pot(i) = 2.0d0 * fterm * ci
       end do
@@ -1801,12 +2055,21 @@ c     compute the uniform background charge correction term
 c
       fterm = -0.5d0 * f * pi / (volbox*aewald**2)
       sum = 0.0d0
+      dlsum = 0.0d0
       do ii = 1, npole
          i = ipole(ii)
-         sum = sum + rpole(1,i)
+         ci = rpole(1,i)
+         muti = mut(i)
+         if (muti) then
+            dlsum = dlsum + ci
+            ci = ci * elambda
+         end if
+         sum = sum + ci
       end do
       e = fterm * sum**2
       em = em + e
+      demlmda = demlmda + fterm * 2.0d0 * sum * dlsum
+      demlmda2 = demlmda2 + fterm * 2.0d0 * dlsum**2
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1814,28 +2077,85 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
+         dlxd = 0.0d0
+         dlyd = 0.0d0
+         dlzd = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
-            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
-            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            muti = mut(i)
+            if (muti) then
+               dlxd = dlxd + dix + ci*xi
+               dlyd = dlyd + diy + ci*yi
+               dlzd = dlzd + diz + ci*zi
+               ci = ci * elambda
+               dix = dix * elambda
+               diy = diy * elambda
+               diz = diz * elambda
+            end if
+            xd = xd + dix + ci*xi
+            yd = yd + diy + ci*yi
+            zd = zd + diz + ci*zi
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
+         demlmda = demlmda + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
+         demlmda2 = demlmda2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
-            dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
-            dem(2,i) = dem(2,i) + 2.0d0*term*rpole(1,i)*yd
-            dem(3,i) = dem(3,i) + 2.0d0*term*rpole(1,i)*zd
+            ci = rpole(1,i)
+            muti = mut(i)
+            if (muti) then
+               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
+               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
+               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
+               ci = ci * elambda
+            else
+               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*dlxd
+               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*dlyd
+               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*dlzd
+            end if
+            dem(1,i) = dem(1,i) + 2.0d0*term*ci*xd
+            dem(2,i) = dem(2,i) + 2.0d0*term*ci*yd
+            dem(3,i) = dem(3,i) + 2.0d0*term*ci*zd
          end do
          xdfield = -2.0d0 * term * xd
          ydfield = -2.0d0 * term * yd
          zdfield = -2.0d0 * term * zd
+         dlxdfield = -2.0d0 * term * dlxd
+         dlydfield = -2.0d0 * term * dlyd
+         dlzdfield = -2.0d0 * term * dlzd
          do ii = 1, npole
             i = ipole(ii)
-            tem(1) = rpole(3,i)*zdfield - rpole(4,i)*ydfield
-            tem(2) = rpole(4,i)*xdfield - rpole(2,i)*zdfield
-            tem(3) = rpole(2,i)*ydfield - rpole(3,i)*xdfield
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            muti = mut(i)
+            if (muti) then
+               dltem(1) = diy*(zdfield+elambda*dlzdfield)
+     &                    - diz*(ydfield+elambda*dlydfield)
+               dltem(2) = diz*(xdfield+elambda*dlxdfield)
+     &                    - dix*(zdfield+elambda*dlzdfield)
+               dltem(3) = dix*(ydfield+elambda*dlydfield)
+     &                    - diy*(xdfield+elambda*dlxdfield)
+               dix = dix * elambda
+               diy = diy * elambda
+               diz = diz * elambda
+            else
+               dltem(1) = diy*dlzdfield - diz*dlydfield
+               dltem(2) = diz*dlxdfield - dix*dlzdfield
+               dltem(3) = dix*dlydfield - diy*dlxdfield
+            end if
+            tem(1) = diy*zdfield - diz*ydfield
+            tem(2) = diz*xdfield - dix*zdfield
+            tem(3) = dix*ydfield - diy*xdfield
+            call torque (i,dltem,frcx,frcy,frcz,dldem)
             call torque (i,tem,frcx,frcy,frcz,dem)
          end do
 c
@@ -1849,12 +2169,23 @@ c
          zq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,i)
-            yd = yd + rpole(3,i)
-            zd = zd + rpole(4,i)
-            xq = xq + rpole(1,i)*x(i)
-            yq = yq + rpole(1,i)*y(i)
-            zq = zq + rpole(1,i)*z(i)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            muti = mut(i)
+            if (muti) then
+               ci = ci * elambda
+               dix = dix * elambda
+               diy = diy * elambda
+               diz = diz * elambda
+            end if
+            xd = xd + dix
+            yd = yd + diy
+            zd = zd + diz
+            xq = xq + ci*x(i)
+            yq = yq + ci*y(i)
+            zq = zq + ci*z(i)
          end do
          xv = xd * xq
          yv = yd * yq
@@ -1881,19 +2212,19 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine emreal1c  --  Ewald real mpole derivs via loop  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine emreal4c  --  Ewald real lambda derivs via loop  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "emreal1c" evaluates the real space portion of the Ewald
-c     summation energy and gradient due to multipole interactions
-c     via a double loop
+c     "emreal4c" evaluates the real space portion of the Ewald
+c     summation energy, gradient, and lambda derivatives due to
+c     multipole interactions via a double loop
 c
 c
-      subroutine emreal1c
+      subroutine emreal4c
       use atoms
       use bound
       use cell
@@ -1901,10 +2232,12 @@ c
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use math
       use mplpot
       use mpole
+      use mutant
       use potent
       use shunt
       use virial
@@ -1963,16 +2296,23 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dlde
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dlambda,dlambda2
+      real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
+      real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11),dmpe(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -1980,6 +2320,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dltem(3,n))
       allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
@@ -1991,6 +2332,7 @@ c
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
+            dltem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
       end do
@@ -2023,6 +2365,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2046,6 +2389,7 @@ c
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
+            mutk = mut(k)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -2292,6 +2636,54 @@ c
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
 c
+c     compute lambda derivative
+c
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
+               if (muti .or. mutk) then
+                  demlmda = demlmda + dlambda
+                  demlmda2 = demlmda2 + dlambda2
+               end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+               ttmi(1) = scalelmda * ttmi(1)
+               ttmi(2) = scalelmda * ttmi(2)
+               ttmi(3) = scalelmda * ttmi(3)
+               ttmk(1) = scalelmda * ttmk(1)
+               ttmk(2) = scalelmda * ttmk(2)
+               ttmk(3) = scalelmda * ttmk(3)
+c
 c     increment the overall atomic multipole energy component
 c
                em = em + e
@@ -2304,6 +2696,14 @@ c
                tem(1,i) = tem(1,i) + ttmi(1)
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
+               if (muti .or. mutk) then
+                  dldem(1,i) = dldem(1,i) + dlfrcx
+                  dldem(2,i) = dldem(2,i) + dlfrcy
+                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dltem(1,i) = dltem(1,i) + dlttmi(1)
+                  dltem(2,i) = dltem(2,i) + dlttmi(2)
+                  dltem(3,i) = dltem(3,i) + dlttmi(3)
+               end if
 c
 c     increment force-based gradient and torque on second site
 c
@@ -2313,6 +2713,14 @@ c
                tem(1,k) = tem(1,k) + ttmk(1)
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
+               if (muti .or. mutk) then
+                  dldem(1,k) = dldem(1,k) - dlfrcx
+                  dldem(2,k) = dldem(2,k) - dlfrcy
+                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dltem(1,k) = dltem(1,k) + dlttmk(1)
+                  dltem(2,k) = dltem(2,k) + dlttmk(2)
+                  dltem(3,k) = dltem(3,k) + dlttmk(3)
+               end if
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -2377,6 +2785,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2401,6 +2810,7 @@ c
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
+            mutk = mut(k)
             call imager (xr,yr,zr,jcell)
             r2 = xr*xr + yr*yr + zr*zr
             if (.not. (use_polymer .and. r2.le.polycut2)) then
@@ -2663,6 +3073,54 @@ c
                   end do
                end if
 c
+c     compute lambda derivative
+c
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
+               if (muti .or. mutk) then
+                  demlmda = demlmda + dlambda
+                  demlmda2 = demlmda2 + dlambda2
+               end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+               ttmi(1) = scalelmda * ttmi(1)
+               ttmi(2) = scalelmda * ttmi(2)
+               ttmi(3) = scalelmda * ttmi(3)
+               ttmk(1) = scalelmda * ttmk(1)
+               ttmk(2) = scalelmda * ttmk(2)
+               ttmk(3) = scalelmda * ttmk(3)
+c
 c     increment the overall atomic multipole energy component
 c
                em = em + e
@@ -2675,6 +3133,14 @@ c
                tem(1,i) = tem(1,i) + ttmi(1)
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
+               if (muti .or. mutk) then
+                  dldem(1,i) = dldem(1,i) + dlfrcx
+                  dldem(2,i) = dldem(2,i) + dlfrcy
+                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dltem(1,i) = dltem(1,i) + dlttmi(1)
+                  dltem(2,i) = dltem(2,i) + dlttmi(2)
+                  dltem(3,i) = dltem(3,i) + dlttmi(3)
+               end if
 c
 c     increment force-based gradient and torque on second site
 c
@@ -2684,6 +3150,14 @@ c
                tem(1,k) = tem(1,k) + ttmk(1)
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
+               if (muti .or. mutk) then
+                  dldem(1,k) = dldem(1,k) - dlfrcx
+                  dldem(2,k) = dldem(2,k) - dlfrcy
+                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dltem(1,k) = dltem(1,k) + dlttmk(1)
+                  dltem(2,k) = dltem(2,k) + dlttmk(2)
+                  dltem(3,k) = dltem(3,k) + dlttmk(3)
+               end if
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -2727,6 +3201,7 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
+         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
          iz = zaxis(i)
          ix = xaxis(i)
@@ -2800,6 +3275,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
+      deallocate (dltem)
       deallocate (pot)
       deallocate (decfx)
       deallocate (decfy)
@@ -2808,33 +3284,36 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine empole1d  --  Ewald multipole derivs via list  ##
-c     ##                                                            ##
-c     ################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine empole4d  --  Ewald lambda derivs via list  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
-c     "empole1d" calculates the multipole energy and derivatives
-c     with respect to Cartesian coordinates using particle mesh Ewald
-c     summation and a neighbor list
+c     "empole4d" calculates the multipole energy, derivatives with
+c     respect to Cartesian coordinates, and lambda derivatives using
+c     particle mesh Ewald summation and a neighbor list
 c
 c
-      subroutine empole1d
+      subroutine empole4d
       use atoms
       use boxes
       use chgpot
       use deriv
+      use dlmda
       use energi
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use potent
       use virial
       implicit none
       integer i,j,ii
-      real*8 e,f,sum
+      real*8 e,f,sum,dlsum
+      real*8 dlxd,dlyd,dlzd
       real*8 term,fterm
       real*8 cii,dii,qii
       real*8 xi,yi,zi
@@ -2846,23 +3325,30 @@ c
       real*8 qiyy,qiyz,qizz
       real*8 xdfield,ydfield
       real*8 zdfield
+      real*8 dlxdfield,dlydfield
+      real*8 dlzdfield
       real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
+      real*8 dltem(3)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical muti
 c
 c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
+      demlmda = 0.0d0
+      demlmda2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+            dldem(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -2885,15 +3371,15 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      call rotpole ('MPOLE')
+      call rotpole ('MPORG')
 c
 c     compute the real space part of the Ewald summation
 c
-      call emreal1d
+      call emreal4d
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call emrecip1
+      call emrecip4
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2914,6 +3400,7 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
+         muti = mut(i)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -2929,6 +3416,11 @@ c
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
+         if (muti) then
+            demlmda = demlmda + 2.0d0 * elambda * e
+            demlmda2 = demlmda2 + 2.0d0 * e
+            e = e * elambda * elambda
+         end if
          em = em + e
          pot(i) = 2.0d0 * fterm * ci
       end do
@@ -2977,12 +3469,21 @@ c     compute the uniform background charge correction term
 c
       fterm = -0.5d0 * f * pi / (volbox*aewald**2)
       sum = 0.0d0
+      dlsum = 0.0d0
       do ii = 1, npole
          i = ipole(ii)
-         sum = sum + rpole(1,i)
+         ci = rpole(1,i)
+         muti = mut(i)
+         if (muti) then
+            dlsum = dlsum + ci
+            ci = ci * elambda
+         end if
+         sum = sum + ci
       end do
       e = fterm * sum**2
       em = em + e
+      demlmda = demlmda + fterm * 2.0d0 * sum * dlsum
+      demlmda2 = demlmda2 + fterm * 2.0d0 * dlsum**2
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2990,28 +3491,85 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
+         dlxd = 0.0d0
+         dlyd = 0.0d0
+         dlzd = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
-            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
-            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
+            xi = x(i)
+            yi = y(i)
+            zi = z(i)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            muti = mut(i)
+            if (muti) then
+               dlxd = dlxd + dix + ci*xi
+               dlyd = dlyd + diy + ci*yi
+               dlzd = dlzd + diz + ci*zi
+               ci = ci * elambda
+               dix = dix * elambda
+               diy = diy * elambda
+               diz = diz * elambda
+            end if
+            xd = xd + dix + ci*xi
+            yd = yd + diy + ci*yi
+            zd = zd + diz + ci*zi
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
+         demlmda = demlmda + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
+         demlmda2 = demlmda2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
-            dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
-            dem(2,i) = dem(2,i) + 2.0d0*term*rpole(1,i)*yd
-            dem(3,i) = dem(3,i) + 2.0d0*term*rpole(1,i)*zd
+            ci = rpole(1,i)
+            muti = mut(i)
+            if (muti) then
+               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
+               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
+               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
+               ci = ci * elambda
+            else
+               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*dlxd
+               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*dlyd
+               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*dlzd
+            end if
+            dem(1,i) = dem(1,i) + 2.0d0*term*ci*xd
+            dem(2,i) = dem(2,i) + 2.0d0*term*ci*yd
+            dem(3,i) = dem(3,i) + 2.0d0*term*ci*zd
          end do
          xdfield = -2.0d0 * term * xd
          ydfield = -2.0d0 * term * yd
          zdfield = -2.0d0 * term * zd
+         dlxdfield = -2.0d0 * term * dlxd
+         dlydfield = -2.0d0 * term * dlyd
+         dlzdfield = -2.0d0 * term * dlzd
          do ii = 1, npole
             i = ipole(ii)
-            tem(1) = rpole(3,i)*zdfield - rpole(4,i)*ydfield
-            tem(2) = rpole(4,i)*xdfield - rpole(2,i)*zdfield
-            tem(3) = rpole(2,i)*ydfield - rpole(3,i)*xdfield
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            muti = mut(i)
+            if (muti) then
+               dltem(1) = diy*(zdfield+elambda*dlzdfield)
+     &                    - diz*(ydfield+elambda*dlydfield)
+               dltem(2) = diz*(xdfield+elambda*dlxdfield)
+     &                    - dix*(zdfield+elambda*dlzdfield)
+               dltem(3) = dix*(ydfield+elambda*dlydfield)
+     &                    - diy*(xdfield+elambda*dlxdfield)
+               dix = dix * elambda
+               diy = diy * elambda
+               diz = diz * elambda
+            else
+               dltem(1) = diy*dlzdfield - diz*dlydfield
+               dltem(2) = diz*dlxdfield - dix*dlzdfield
+               dltem(3) = dix*dlydfield - diy*dlxdfield
+            end if
+            tem(1) = diy*zdfield - diz*ydfield
+            tem(2) = diz*xdfield - dix*zdfield
+            tem(3) = dix*ydfield - diy*xdfield
+            call torque (i,dltem,frcx,frcy,frcz,dldem)
             call torque (i,tem,frcx,frcy,frcz,dem)
          end do
 c
@@ -3025,12 +3583,23 @@ c
          zq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,i)
-            yd = yd + rpole(3,i)
-            zd = zd + rpole(4,i)
-            xq = xq + rpole(1,i)*x(i)
-            yq = yq + rpole(1,i)*y(i)
-            zq = zq + rpole(1,i)*z(i)
+            ci = rpole(1,i)
+            dix = rpole(2,i)
+            diy = rpole(3,i)
+            diz = rpole(4,i)
+            muti = mut(i)
+            if (muti) then
+               ci = ci * elambda
+               dix = dix * elambda
+               diy = diy * elambda
+               diz = diz * elambda
+            end if
+            xd = xd + dix
+            yd = yd + diy
+            zd = zd + diz
+            xq = xq + ci*x(i)
+            yq = yq + ci*y(i)
+            zq = zq + ci*z(i)
          end do
          xv = xd * xq
          yv = yd * yq
@@ -3057,29 +3626,31 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine emreal1d  --  Ewald real mpole derivs via list  ##
-c     ##                                                             ##
-c     #################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine emreal4d  --  Ewald real lambda derivs via list  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
-c     "emreal1d" evaluates the real space portion of the Ewald
-c     summation energy and gradient due to multipole interactions
-c     via a neighbor list
+c     "emreal4d" evaluates the real space portion of the Ewald
+c     summation energy, gradient, and lambda derivatives due to
+c     multipole interactions via a neighbor list
 c
 c
-      subroutine emreal1d
+      subroutine emreal4d
       use atoms
       use bound
       use chgpen
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use math
       use mplpot
       use mpole
+      use mutant
       use neigh
       use potent
       use shunt
@@ -3139,16 +3710,23 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dlde
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dlambda,dlambda2
+      real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
+      real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11),dmpe(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
+      real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -3156,6 +3734,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (mscale(n))
       allocate (tem(3,n))
+      allocate (dltem(3,n))
       allocate (pot(n))
       allocate (decfx(n))
       allocate (decfy(n))
@@ -3167,6 +3746,7 @@ c
          mscale(i) = 1.0d0
          do j = 1, 3
             tem(j,i) = 0.0d0
+            dltem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
       end do
@@ -3183,9 +3763,10 @@ c
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
-!$OMP& yaxis,zaxis)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
-!$OMP DO reduction(+:em,dem,tem,pot,vir)
+!$OMP& yaxis,zaxis,elambda,mut)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir,demlmda,
+!$OMP& demlmda2,dldem,dltem)
+!$OMP DO reduction(+:em,dem,tem,pot,vir,demlmda,demlmda2,dldem,dltem)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3209,6 +3790,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -3233,6 +3815,7 @@ c
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
+            mutk = mut(k)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -3479,6 +4062,54 @@ c
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
 c
+c     compute lambda derivative
+c
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
+               if (muti .or. mutk) then
+                  demlmda = demlmda + dlambda
+                  demlmda2 = demlmda2 + dlambda2
+               end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+               ttmi(1) = scalelmda * ttmi(1)
+               ttmi(2) = scalelmda * ttmi(2)
+               ttmi(3) = scalelmda * ttmi(3)
+               ttmk(1) = scalelmda * ttmk(1)
+               ttmk(2) = scalelmda * ttmk(2)
+               ttmk(3) = scalelmda * ttmk(3)
+c
 c     increment the overall atomic multipole energy component
 c
                em = em + e
@@ -3491,6 +4122,14 @@ c
                tem(1,i) = tem(1,i) + ttmi(1)
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
+               if (muti .or. mutk) then
+                  dldem(1,i) = dldem(1,i) + dlfrcx
+                  dldem(2,i) = dldem(2,i) + dlfrcy
+                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dltem(1,i) = dltem(1,i) + dlttmi(1)
+                  dltem(2,i) = dltem(2,i) + dlttmi(2)
+                  dltem(3,i) = dltem(3,i) + dlttmi(3)
+               end if
 c
 c     increment force-based gradient and torque on second site
 c
@@ -3500,6 +4139,14 @@ c
                tem(1,k) = tem(1,k) + ttmk(1)
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
+               if (muti .or. mutk) then
+                  dldem(1,k) = dldem(1,k) - dlfrcx
+                  dldem(2,k) = dldem(2,k) - dlfrcy
+                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dltem(1,k) = dltem(1,k) + dlttmk(1)
+                  dltem(2,k) = dltem(2,k) + dlttmk(2)
+                  dltem(3,k) = dltem(3,k) + dlttmk(3)
+               end if
 c
 c     increment the virial due to pairwise Cartesian forces
 c
@@ -3540,12 +4187,13 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir)
+!$OMP DO reduction(+:dem,vir,dldem)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
+         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
          iz = zaxis(i)
          ix = xaxis(i)
@@ -3637,15 +4285,16 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine emrecip1  --  PME recip mpole energy & derivs  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine emrecip4  --  PME recip mpole lambda derivs  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "emrecip1" evaluates the reciprocal space portion of particle
-c     mesh Ewald summation energy and gradient due to multipoles
+c     "emrecip4" evaluates the reciprocal space portion of particle
+c     mesh Ewald summation energy, gradient, and lambda derivatives
+c     due to multipoles
 c
 c     literature references:
 c
@@ -3663,17 +4312,19 @@ c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
 c
 c
-      subroutine emrecip1
+      subroutine emrecip4
       use atoms
       use bound
       use boxes
       use chgpot
       use deriv
+      use dlmda
       use energi
       use ewald
       use math
       use mpole
       use mrecip
+      use mutant
       use pme
       use potent
       use virial
@@ -3691,6 +4342,8 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
+      real*8 dlh1,dlh2,dlh3
+      real*8 dlf1,dlf2,dlf3
       real*8 xi,yi,zi
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
@@ -3702,8 +4355,10 @@ c
       real*8 hsq,expterm
       real*8 term,pterm
       real*8 vterm,struc2
+      real*8 dlambda,dlambda2
       real*8 tem(3),fix(3)
       real*8 fiy(3),fiz(3)
+      real*8 dltem(3)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
@@ -3729,16 +4384,32 @@ c
       if (allocated(fmp)) then
          if (size(fmp) .lt. 10*n)  deallocate (fmp)
       end if
+      if (allocated(lcmp)) then
+         if (size(lcmp) .lt. 10*n)  deallocate (lcmp)
+      end if
+      if (allocated(lfmp)) then
+         if (size(lfmp) .lt. 10*n)  deallocate (lfmp)
+      end if
       if (allocated(cphi)) then
          if (size(cphi) .lt. 10*n)  deallocate (cphi)
+      end if
+      if (allocated(lcphi)) then
+         if (size(lcphi) .lt. 10*n)  deallocate (lcphi)
       end if
       if (allocated(fphi)) then
          if (size(fphi) .lt. 20*n)  deallocate (fphi)
       end if
+      if (allocated(lfphi)) then
+         if (size(lfphi) .lt. 20*n)  deallocate (lfphi)
+      end if
       if (.not. allocated(cmp))  allocate (cmp(10,n))
       if (.not. allocated(fmp))  allocate (fmp(10,n))
+      if (.not. allocated(lcmp))  allocate (lcmp(10,n))
+      if (.not. allocated(lfmp))  allocate (lfmp(10,n))
       if (.not. allocated(cphi))  allocate (cphi(10,n))
+      if (.not. allocated(lcphi))  allocate (lcphi(10,n))
       if (.not. allocated(fphi))  allocate (fphi(20,n))
+      if (.not. allocated(lfphi))  allocate (lfphi(20,n))
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -3746,7 +4417,13 @@ c
       if (allocated(qgrid)) then
          if (size(qgrid) .ne. 2*ntot)  call fftclose
       end if
+      if (allocated(lqgrid)) then
+         if (size(lqgrid) .ne. 2*ntot)  deallocate (lqgrid)
+      end if
       if (.not. allocated(qgrid))  call fftsetup
+      if (.not. allocated(lqgrid)) then
+         allocate (lqgrid(2,nfft1,nfft2,nfft3))
+      end if
 c
 c     setup spatial decomposition and B-spline coefficients
 c
@@ -3759,26 +4436,62 @@ c     copy multipole moments and coordinates to local storage
 c
       do ii = 1, npole
          i = ipole(ii)
-         cmp(1,i) = rpole(1,i)
-         cmp(2,i) = rpole(2,i)
-         cmp(3,i) = rpole(3,i)
-         cmp(4,i) = rpole(4,i)
-         cmp(5,i) = rpole(5,i)
-         cmp(6,i) = rpole(9,i)
-         cmp(7,i) = rpole(13,i)
-         cmp(8,i) = 2.0d0 * rpole(6,i)
-         cmp(9,i) = 2.0d0 * rpole(7,i)
-         cmp(10,i) = 2.0d0 * rpole(10,i)
+         if (mut(i)) then
+            cmp(1,i)  = elambda * rpole(1,i)
+            cmp(2,i)  = elambda * rpole(2,i)
+            cmp(3,i)  = elambda * rpole(3,i)
+            cmp(4,i)  = elambda * rpole(4,i)
+            cmp(5,i)  = elambda * rpole(5,i)
+            cmp(6,i)  = elambda * rpole(9,i)
+            cmp(7,i)  = elambda * rpole(13,i)
+            cmp(8,i)  = 2.0d0 * elambda * rpole(6,i)
+            cmp(9,i)  = 2.0d0 * elambda * rpole(7,i)
+            cmp(10,i) = 2.0d0 * elambda * rpole(10,i)
+            lcmp(1,i)  = rpole(1,i)
+            lcmp(2,i)  = rpole(2,i)
+            lcmp(3,i)  = rpole(3,i)
+            lcmp(4,i)  = rpole(4,i)
+            lcmp(5,i)  = rpole(5,i)
+            lcmp(6,i)  = rpole(9,i)
+            lcmp(7,i)  = rpole(13,i)
+            lcmp(8,i)  = 2.0d0 * rpole(6,i)
+            lcmp(9,i)  = 2.0d0 * rpole(7,i)
+            lcmp(10,i) = 2.0d0 * rpole(10,i)
+         else
+            cmp(1,i)  = rpole(1,i)
+            cmp(2,i)  = rpole(2,i)
+            cmp(3,i)  = rpole(3,i)
+            cmp(4,i)  = rpole(4,i)
+            cmp(5,i)  = rpole(5,i)
+            cmp(6,i)  = rpole(9,i)
+            cmp(7,i)  = rpole(13,i)
+            cmp(8,i)  = 2.0d0 * rpole(6,i)
+            cmp(9,i)  = 2.0d0 * rpole(7,i)
+            cmp(10,i) = 2.0d0 * rpole(10,i)
+            lcmp(1,i)  = 0.0d0
+            lcmp(2,i)  = 0.0d0
+            lcmp(3,i)  = 0.0d0
+            lcmp(4,i)  = 0.0d0
+            lcmp(5,i)  = 0.0d0
+            lcmp(6,i)  = 0.0d0
+            lcmp(7,i)  = 0.0d0
+            lcmp(8,i)  = 0.0d0
+            lcmp(9,i)  = 0.0d0
+            lcmp(10,i) = 0.0d0
+         end if
       end do
 c
 c     convert Cartesian multipoles to fractional coordinates
 c
       call cmp_to_fmp (cmp,fmp)
+      call cmp_to_fmp (lcmp,lfmp)
 c
 c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_mpole (fmp,qgrid)
       call fftfront (qgrid)
+      call grid_mpole (lfmp,lqgrid)
+      call fftfront (lqgrid)
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -3838,6 +4551,8 @@ c
          end if
          qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
          qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
+         lqgrid(1,k1,k2,k3) = expterm * lqgrid(1,k1,k2,k3)
+         lqgrid(2,k1,k2,k3) = expterm * lqgrid(2,k1,k2,k3)
       end do
 c
 c     save the partial virial for the polarization computation
@@ -3853,50 +4568,82 @@ c     account for zeroth grid point for nonperiodic system
 c
       qgrid(1,1,1,1) = 0.0d0
       qgrid(2,1,1,1) = 0.0d0
+      lqgrid(1,1,1,1) = 0.0d0
+      lqgrid(2,1,1,1) = 0.0d0
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          qgrid(1,1,1,1) = expterm * qgrid(1,1,1,1)
          qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
+         lqgrid(1,1,1,1) = expterm * lqgrid(1,1,1,1)
+         lqgrid(2,1,1,1) = expterm * lqgrid(2,1,1,1)
       end if
 c
 c     perform 3-D FFT backward transform and get potential
 c
       call fftback (qgrid)
       call fphi_mpole (fphi,qgrid)
+      call fftback (lqgrid)
+      call fphi_mpole (lfphi,lqgrid)
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 20
             fphi(j,i) = f * fphi(j,i)
+            lfphi(j,i) = f * lfphi(j,i)
          end do
       end do
       call fphi_to_cphi (fphi,cphi)
+      call fphi_to_cphi (lfphi,lcphi)
 c
 c     increment the permanent multipole energy and gradient
 c
       e = 0.0d0
+      dlambda = 0.0d0
+      dlambda2 = 0.0d0
       do ii = 1, npole
          i = ipole(ii)
          f1 = 0.0d0
          f2 = 0.0d0
          f3 = 0.0d0
+         dlf1 = 0.0d0
+         dlf2 = 0.0d0
+         dlf3 = 0.0d0
          do k = 1, 10
             e = e + fmp(k,i)*fphi(k,i)
+            dlambda = dlambda + lfmp(k,i) * fphi(k,i)
+            dlambda2 = dlambda2 + lfmp(k,i) * lfphi(k,i)
             f1 = f1 + fmp(k,i)*fphi(deriv1(k),i)
             f2 = f2 + fmp(k,i)*fphi(deriv2(k),i)
             f3 = f3 + fmp(k,i)*fphi(deriv3(k),i)
+            dlf1 = dlf1 + lfmp(k,i)*fphi(deriv1(k),i)
+     &             + fmp(k,i)*lfphi(deriv1(k),i)
+            dlf2 = dlf2 + lfmp(k,i)*fphi(deriv2(k),i)
+     &             + fmp(k,i)*lfphi(deriv2(k),i)
+            dlf3 = dlf3 + lfmp(k,i)*fphi(deriv3(k),i)
+     &             + fmp(k,i)*lfphi(deriv3(k),i)
          end do
          f1 = dble(nfft1) * f1
          f2 = dble(nfft2) * f2
          f3 = dble(nfft3) * f3
+         dlf1 = dble(nfft1) * dlf1
+         dlf2 = dble(nfft2) * dlf2
+         dlf3 = dble(nfft3) * dlf3
          h1 = recip(1,1)*f1 + recip(1,2)*f2 + recip(1,3)*f3
          h2 = recip(2,1)*f1 + recip(2,2)*f2 + recip(2,3)*f3
          h3 = recip(3,1)*f1 + recip(3,2)*f2 + recip(3,3)*f3
+         dlh1 = recip(1,1)*dlf1 + recip(1,2)*dlf2 + recip(1,3)*dlf3
+         dlh2 = recip(2,1)*dlf1 + recip(2,2)*dlf2 + recip(2,3)*dlf3
+         dlh3 = recip(3,1)*dlf1 + recip(3,2)*dlf2 + recip(3,3)*dlf3
          dem(1,i) = dem(1,i) + h1
          dem(2,i) = dem(2,i) + h2
          dem(3,i) = dem(3,i) + h3
+         dldem(1,i) = dldem(1,i) + dlh1
+         dldem(2,i) = dldem(2,i) + dlh2
+         dldem(3,i) = dldem(3,i) + dlh3
       end do
       e = 0.5d0 * e
       em = em + e
+      demlmda = demlmda + dlambda
+      demlmda2 = demlmda2 + dlambda2
 c
 c     increment the permanent multipole virial contributions
 c
@@ -3926,6 +4673,32 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
+         dltem(1) = lcmp(4,i)*cphi(3,i) + cmp(4,i)*lcphi(3,i)
+     &            - lcmp(3,i)*cphi(4,i) - cmp(3,i)*lcphi(4,i)
+     &            + 2.0d0*(lcmp(7,i)-lcmp(6,i))*cphi(10,i)
+     &            + 2.0d0*(cmp(7,i)-cmp(6,i))*lcphi(10,i)
+     &            + lcmp(9,i)*cphi(8,i) + cmp(9,i)*lcphi(8,i)
+     &            + lcmp(10,i)*cphi(6,i) + cmp(10,i)*lcphi(6,i)
+     &            - lcmp(8,i)*cphi(9,i) - cmp(8,i)*lcphi(9,i)
+     &            - lcmp(10,i)*cphi(7,i) - cmp(10,i)*lcphi(7,i)
+
+         dltem(2) = lcmp(2,i)*cphi(4,i) + cmp(2,i)*lcphi(4,i)
+     &            - lcmp(4,i)*cphi(2,i) - cmp(4,i)*lcphi(2,i)
+     &            + 2.0d0*(lcmp(5,i)-lcmp(7,i))*cphi(9,i)
+     &            + 2.0d0*(cmp(5,i)-cmp(7,i))*lcphi(9,i)
+     &            + lcmp(8,i)*cphi(10,i) + cmp(8,i)*lcphi(10,i)
+     &            + lcmp(9,i)*cphi(7,i) + cmp(9,i)*lcphi(7,i)
+     &            - lcmp(9,i)*cphi(5,i) - cmp(9,i)*lcphi(5,i)
+     &            - lcmp(10,i)*cphi(8,i) - cmp(10,i)*lcphi(8,i)
+
+         dltem(3) = lcmp(3,i)*cphi(2,i) + cmp(3,i)*lcphi(2,i)
+     &            - lcmp(2,i)*cphi(3,i) - cmp(2,i)*lcphi(3,i)
+     &            + 2.0d0*(lcmp(6,i)-lcmp(5,i))*cphi(8,i)
+     &            + 2.0d0*(cmp(6,i)-cmp(5,i))*lcphi(8,i)
+     &            + lcmp(8,i)*cphi(5,i) + cmp(8,i)*lcphi(5,i)
+     &            + lcmp(10,i)*cphi(9,i) + cmp(10,i)*lcphi(9,i)
+     &            - lcmp(8,i)*cphi(6,i) - cmp(8,i)*lcphi(6,i)
+     &            - lcmp(9,i)*cphi(10,i) - cmp(9,i)*lcphi(10,i)
          tem(1) = cmp(4,i)*cphi(3,i) - cmp(3,i)*cphi(4,i)
      &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphi(10,i)
      &               + cmp(9,i)*cphi(8,i) + cmp(10,i)*cphi(6,i)
@@ -3938,6 +4711,7 @@ c
      &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphi(8,i)
      &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
      &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
+         call torque (i,dltem,fix,fiy,fiz,dldem)
          call torque (i,tem,fix,fiy,fiz,dem)
          iz = zaxis(i)
          ix = xaxis(i)

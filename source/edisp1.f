@@ -1762,7 +1762,7 @@ c
 c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_disp
-      call fftfront
+      call fftfront (qgrid)
 c
 c     use scalar sum to get the reciprocal space energy
 c
@@ -1833,7 +1833,7 @@ c
 c
 c     perform the 3-D FFT backward transformation
 c
-      call fftback
+      call fftback (qgrid)
 c
 c     get first derivatives of the reciprocal space energy 
 c

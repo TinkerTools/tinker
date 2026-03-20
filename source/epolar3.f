@@ -2344,8 +2344,8 @@ c
             cmp(10,i) = 2.0d0 * rpole(10,i)
          end do
          call cmp_to_fmp (cmp,fmp)
-         call grid_mpole (fmp)
-         call fftfront
+         call grid_mpole (fmp,qgrid)
+         call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -2401,8 +2401,8 @@ c
 c
 c     perform 3-D FFT backward transform and get potential
 c
-         call fftback
-         call fphi_mpole (fphi)
+         call fftback (qgrid)
+         call fphi_mpole (fphi,qgrid)
       end if
 c
 c     set matrix for Cartesian to fractional induced dipoles

@@ -344,6 +344,11 @@ c
       if (allocated(bflxorig))  deallocate (bflxorig)
       if (allocated(aflxorig))  deallocate (aflxorig)
       if (allocated(abflxorig))  deallocate (abflxorig)
+      if (allocated(lcmp))  deallocate (lcmp)
+      if (allocated(lfmp))  deallocate (lfmp)
+      if (allocated(lcphi))  deallocate (lcphi)
+      if (allocated(lfphi))  deallocate (lfphi)
+      if (allocated(lqgrid))  deallocate (lqgrid)
 c
 c     deallocation of global arrays from module domega
 c

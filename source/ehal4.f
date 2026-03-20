@@ -14,7 +14,7 @@ c
 c
 c     "ehal4" calculates the buffered 14-7 van der Waals energy,
 c     its first derivatives with respect to Cartesian coordinates,
-c     and various lambda derivatives
+c     and lambda derivatives
 c
 c
       subroutine ehal4
@@ -60,7 +60,7 @@ c
 c
 c     "ehal4a" calculates the buffered 14-7 van der Waals energy,
 c     its first derivatives with respect to Cartesian coordinates,
-c     and various lambda derivatives using a pairwise double loop
+c     and lambda derivatives using a pairwise double loop
 c
 c
       subroutine ehal4a
@@ -124,12 +124,10 @@ c
       devlmda = 0.0d0
       devlmda2 = 0.0d0
       do i = 1, n
-         dev(1,i) = 0.0d0
-         dev(2,i) = 0.0d0
-         dev(3,i) = 0.0d0
-         dldev(1,i) = 0.0d0
-         dldev(2,i) = 0.0d0
-         dldev(3,i) = 0.0d0
+         do j = 1, 3
+            dev(j,i) = 0.0d0
+            dldev(j,i) = 0.0d0
+         end do
       end do
       if (nvdw .eq. 0)  return
 c
@@ -755,7 +753,7 @@ c
 c
 c     "ehal4b" calculates the buffered 14-7 van der Waals energy,
 c     its first derivatives with respect to Cartesian coordinates,
-c     and various lambda derivatives using the method of lights
+c     and lambda derivatives using the method of lights
 c
 c
       subroutine ehal4b
@@ -827,12 +825,10 @@ c
       devlmda = 0.0d0
       devlmda2 = 0.0d0
       do i = 1, n
-         dev(1,i) = 0.0d0
-         dev(2,i) = 0.0d0
-         dev(3,i) = 0.0d0
-         dldev(1,i) = 0.0d0
-         dldev(2,i) = 0.0d0
-         dldev(3,i) = 0.0d0
+         do j = 1, 3
+            dev(j,i) = 0.0d0
+            dldev(j,i) = 0.0d0
+         end do
       end do
       if (nvdw .eq. 0)  return
 c
@@ -1227,7 +1223,7 @@ c
 c
 c     "ehal4c" calculates the buffered 14-7 van der Waals energy,
 c     its first derivatives with respect to Cartesian coordinates,
-c     and various lambda derivatives using a pairwise neighbor list
+c     and lambda derivatives using a pairwise neighbor list
 c
 c
       subroutine ehal4c
@@ -1291,12 +1287,10 @@ c
       devlmda = 0.0d0
       devlmda2 = 0.0d0
       do i = 1, n
-         dev(1,i) = 0.0d0
-         dev(2,i) = 0.0d0
-         dev(3,i) = 0.0d0
-         dldev(1,i) = 0.0d0
-         dldev(2,i) = 0.0d0
-         dldev(3,i) = 0.0d0
+         do j = 1, 3
+            dev(j,i) = 0.0d0
+            dldev(j,i) = 0.0d0
+         end do
       end do
       if (nvdw .eq. 0)  return
 c

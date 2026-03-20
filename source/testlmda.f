@@ -71,10 +71,6 @@ c     set up the structure and mechanics calculation
 c
       call initial
       call getxyz
-c
-c     use_dlmda flag shoud be set between initial and mechanic
-c
-      use_dlmda = .true.
       call mechanic
 c
 c     decide whether to do an analytical derivative calculation
@@ -141,14 +137,14 @@ c
 c
 c     perform dynamic allocation of some local arrays
 c
+      allocate (derivs(3,n))
       if (doanalyt) then
-         allocate (derivs(3,n))
-      end if
-      if (donumer) then
          allocate (adldesum(3,n))
          allocate (adldev(3,n))
          allocate (adldem(3,n))
          allocate (adldep(3,n))
+      end if
+      if (donumer) then
          allocate (ndldesum(3,n))
          allocate (ndldev(3,n))
          allocate (ndldem(3,n))
@@ -167,6 +163,7 @@ c
 c     compute the analytical lambda derivatives
 c
          if (doanalyt) then
+            use_dlmda = .true.
             call gradient (eval,derivs)
             adelmda = delmda
             adevlmda = devlmda
@@ -189,6 +186,7 @@ c
 c     compute the numerical lambda derivatives
 c
          if (donumer) then
+            use_dlmda = .false.
             oldvl = vlambda
             oldel = elambda
             vlambda = oldvl + eps
@@ -370,14 +368,14 @@ c
 c
 c     perform deallocation of some local arrays
 c
+      deallocate (derivs)
       if (doanalyt) then
-         deallocate (derivs)
-      end if
-      if (donumer) then
          deallocate (adldesum)
          deallocate (adldev)
          deallocate (adldem)
          deallocate (adldep)
+      end if
+      if (donumer) then
          deallocate (ndldesum)
          deallocate (ndldev)
          deallocate (ndldem)

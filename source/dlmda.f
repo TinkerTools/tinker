@@ -35,6 +35,11 @@ c     polarityorig  original polarity
 c     bflxorig      original bflx
 c     aflxorig      original aflx
 c     abflxorig     original abflx
+c     lcmp          cmp for lambda derivative
+c     lfmp          fmp for lambda derivative
+c     lcphi         cphi for lambda derivative
+c     lfphi         fphi for lambda derivative
+c     lqgrid        qgrid for lambda derivative
 c     use_dlmda     logical flag governing use of lambda derivative
 c
 c
@@ -63,6 +68,11 @@ c
       real*8, allocatable :: bflxorig(:)
       real*8, allocatable :: aflxorig(:,:)
       real*8, allocatable :: abflxorig(:,:)
+      real*8, allocatable :: lcmp(:,:)
+      real*8, allocatable :: lfmp(:,:)
+      real*8, allocatable :: lcphi(:,:)
+      real*8, allocatable :: lfphi(:,:)
+      real*8, allocatable :: lqgrid(:,:,:,:)
       logical use_dlmda
       save
       end

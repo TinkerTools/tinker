@@ -264,7 +264,13 @@ c
       if (use_charge)  call echarge1
       if (use_chgdpl)  call echgdpl1
       if (use_dipole)  call edipole1
-      if (use_mpole)  call empole1
+      if (use_mpole) then
+         if (use_dlmda) then
+            call empole4
+         else
+            call empole1
+         end if
+      end if
       if (use_polar)  call epolar1
       if (use_chgtrn)  call echgtrn1
       if (use_rxnfld)  call erxnfld1

@@ -723,7 +723,7 @@ c     since a given qgrid element is always part of the same chunk,
 c     and the code runs faster without use of a reduction
 c
 c
-      subroutine grid_mpole (fmp)
+      subroutine grid_mpole (fmp,qg)
       use atoms
       use chunks
       use mpole
@@ -743,6 +743,7 @@ c
       real*8 v2,u2,t2
       real*8 term0,term1,term2
       real*8 fmp(10,*)
+      real*8 qg(2,nfft1,nfft2,nfft3)
 c
 c
 c     OpenMP directives for the major loop structure
@@ -750,7 +751,7 @@ c
 !$OMP PARALLEL default(private) shared(npole,ipole,fmp,pmetable,
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
-!$OMP& shared(qgrid)
+!$OMP& shared(qg)
 !$OMP DO
 c
 c     zero out the particle mesh Ewald grid
@@ -758,8 +759,8 @@ c
       do k = 1, nfft3
          do j = 1, nfft2
             do i = 1, nfft1
-               qgrid(1,i,j,k) = 0.0d0
-               qgrid(2,i,j,k) = 0.0d0
+               qg(1,i,j,k) = 0.0d0
+               qg(2,i,j,k) = 0.0d0
             end do
          end do
       end do
@@ -826,7 +827,7 @@ c
                         t0 = thetai1(1,m,iatm)
                         t1 = thetai1(2,m,iatm)
                         t2 = thetai1(3,m,iatm)
-                        qgrid(1,i,j,k) = qgrid(1,i,j,k) + term0*t0
+                        qg(1,i,j,k) = qg(1,i,j,k) + term0*t0
      &                                      + term1*t1 + term2*t2
                      end do
                   end do
@@ -1250,7 +1251,7 @@ c     "fphi_mpole" extracts the permanent multipole potential and
 c     field from the particle mesh Ewald grid
 c
 c
-      subroutine fphi_mpole (fphi)
+      subroutine fphi_mpole (fphi,qg)
       use mpole
       use pme
       implicit none
@@ -1270,12 +1271,13 @@ c
       real*8 tuv003,tuv210,tuv201,tuv120
       real*8 tuv021,tuv102,tuv012,tuv111
       real*8 fphi(20,*)
+      real*8 qg(2,nfft1,nfft2,nfft3)
 c
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
-!$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi)
+!$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qg,fphi)
 !$OMP DO
 c
 c     get permanent multipole potential and field at each site
@@ -1339,7 +1341,7 @@ c
                do it1 = 1, bsorder
                   i0 = i0 + 1
                   i = i0 + 1 + (nfft1-isign(nfft1,i0))/2
-                  tq = qgrid(1,i,j,k)
+                  tq = qg(1,i,j,k)
                   t0 = t0 + tq*thetai1(1,it1,iatm)
                   t1 = t1 + tq*thetai1(2,it1,iatm)
                   t2 = t2 + tq*thetai1(3,it1,iatm)

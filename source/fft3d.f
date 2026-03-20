@@ -73,18 +73,19 @@ c     "fftfront" performs a 3-D FFT forward transform via a single
 c     3-D transform or three separate 1-D transforms
 c
 c
-      subroutine fftfront
+      subroutine fftfront (qg)
       use fft
       use pme
       implicit none
       integer i,j,k
+      real*8 qg(2,nfft1,nfft2,nfft3)
       real*8, allocatable :: work(:,:)
 c
 c
 c     perform a single 3-D forward transform using FFTW
 c
 !$    if (ffttyp .eq. 'FFTW') then
-!$       call dfftw_execute_dft (planf,qgrid,qgrid)
+!$       call dfftw_execute_dft (planf,qg,qg)
 !$    else
 c
 c     perform three 1-D forward transforms using FFTPACK
@@ -93,39 +94,39 @@ c
          do k = 1, nfft3
             do j = 1, nfft2
                do i = 1, nfft1
-                  work(1,i) = qgrid(1,i,j,k)
-                  work(2,i) = qgrid(2,i,j,k)
+                  work(1,i) = qg(1,i,j,k)
+                  work(2,i) = qg(2,i,j,k)
                end do
                call cfftf (nfft1,work,ffttable(1,1),iprime(1,1))
                do i = 1, nfft1
-                  qgrid(1,i,j,k) = work(1,i)
-                  qgrid(2,i,j,k) = work(2,i)
+                  qg(1,i,j,k) = work(1,i)
+                  qg(2,i,j,k) = work(2,i)
                end do
             end do
          end do
          do k = 1, nfft3
             do i = 1, nfft1
                do j = 1, nfft2
-                  work(1,j) = qgrid(1,i,j,k)
-                  work(2,j) = qgrid(2,i,j,k)
+                  work(1,j) = qg(1,i,j,k)
+                  work(2,j) = qg(2,i,j,k)
                end do
                call cfftf (nfft2,work,ffttable(1,2),iprime(1,2))
                do j = 1, nfft2
-                  qgrid(1,i,j,k) = work(1,j)
-                  qgrid(2,i,j,k) = work(2,j)
+                  qg(1,i,j,k) = work(1,j)
+                  qg(2,i,j,k) = work(2,j)
                end do
             end do
          end do
          do i = 1, nfft1
             do j = 1, nfft2
                do k = 1, nfft3
-                  work(1,k) = qgrid(1,i,j,k)
-                  work(2,k) = qgrid(2,i,j,k)
+                  work(1,k) = qg(1,i,j,k)
+                  work(2,k) = qg(2,i,j,k)
                end do
                call cfftf (nfft3,work,ffttable(1,3),iprime(1,3))
                do k = 1, nfft3
-                  qgrid(1,i,j,k) = work(1,k)
-                  qgrid(2,i,j,k) = work(2,k)
+                  qg(1,i,j,k) = work(1,k)
+                  qg(2,i,j,k) = work(2,k)
                end do
             end do
          end do
@@ -146,18 +147,19 @@ c     "fftback" performs a 3-D FFT backward transform via a single
 c     3-D transform or three separate 1-D transforms
 c
 c
-      subroutine fftback
+      subroutine fftback (qg)
       use fft
       use pme
       implicit none
       integer i,j,k
+      real*8 qg(2,nfft1,nfft2,nfft3)
       real*8, allocatable :: work(:,:)
 c
 c
 c     perform a single 3-D backward transform using FFTW
 c
 !$    if (ffttyp .eq. 'FFTW') then
-!$       call dfftw_execute_dft (planb,qgrid,qgrid)
+!$       call dfftw_execute_dft (planb,qg,qg)
 !$    else
 c
 c     perform three 1-D backward transforms using FFTPACK
@@ -166,39 +168,39 @@ c
          do k = 1, nfft3
             do j = 1, nfft2
                do i = 1, nfft1
-                  work(1,i) = qgrid(1,i,j,k)
-                  work(2,i) = qgrid(2,i,j,k)
+                  work(1,i) = qg(1,i,j,k)
+                  work(2,i) = qg(2,i,j,k)
                end do
                call cfftb (nfft1,work,ffttable(1,1),iprime(1,1))
                do i = 1, nfft1
-                  qgrid(1,i,j,k) = work(1,i)
-                  qgrid(2,i,j,k) = work(2,i)
+                  qg(1,i,j,k) = work(1,i)
+                  qg(2,i,j,k) = work(2,i)
                end do
             end do
          end do
          do k = 1, nfft3
             do i = 1, nfft1
                do j = 1, nfft2
-                  work(1,j) = qgrid(1,i,j,k)
-                  work(2,j) = qgrid(2,i,j,k)
+                  work(1,j) = qg(1,i,j,k)
+                  work(2,j) = qg(2,i,j,k)
                end do
                call cfftb (nfft2,work,ffttable(1,2),iprime(1,2))
                do j = 1, nfft2
-                  qgrid(1,i,j,k) = work(1,j)
-                  qgrid(2,i,j,k) = work(2,j)
+                  qg(1,i,j,k) = work(1,j)
+                  qg(2,i,j,k) = work(2,j)
                end do
             end do
          end do
          do i = 1, nfft1
             do j = 1, nfft2
                do k = 1, nfft3
-                  work(1,k) = qgrid(1,i,j,k)
-                  work(2,k) = qgrid(2,i,j,k)
+                  work(1,k) = qg(1,i,j,k)
+                  work(2,k) = qg(2,i,j,k)
                end do
                call cfftb (nfft3,work,ffttable(1,3),iprime(1,3))
                do k = 1, nfft3
-                  qgrid(1,i,j,k) = work(1,k)
-                  qgrid(2,i,j,k) = work(2,k)
+                  qg(1,i,j,k) = work(1,k)
+                  qg(2,i,j,k) = work(2,k)
                end do
             end do
          end do

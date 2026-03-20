@@ -2346,7 +2346,7 @@ c
 c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_pchg
-      call fftfront
+      call fftfront (qgrid)
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -2432,7 +2432,7 @@ c
 c
 c     perform the 3-D FFT backward transformation
 c
-      call fftback
+      call fftback (qgrid)
 c
 c     perform dynamic allocation of some local arrays
 c

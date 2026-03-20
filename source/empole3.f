@@ -2264,8 +2264,8 @@ c
 c
 c     assign PME grid and perform 3-D FFT forward transform
 c
-      call grid_mpole (fmp)
-      call fftfront
+      call grid_mpole (fmp,qgrid)
+      call fftfront (qgrid)
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -2321,8 +2321,8 @@ c
 c
 c     perform 3-D FFT backward transform and get potential
 c
-      call fftback
-      call fphi_mpole (fphi)
+      call fftback (qgrid)
+      call fphi_mpole (fphi,qgrid)
 c
 c     increment the total permanent atomic multipole energy
 c
