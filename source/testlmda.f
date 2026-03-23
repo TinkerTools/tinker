@@ -71,6 +71,7 @@ c     set up the structure and mechanics calculation
 c
       call initial
       call getxyz
+      use_dlmda = .true.
       call mechanic
 c
 c     decide whether to do an analytical derivative calculation
@@ -163,7 +164,7 @@ c
 c     compute the analytical lambda derivatives
 c
          if (doanalyt) then
-            use_dlmda = .true.
+            call altelec
             call gradient (eval,derivs)
             adelmda = delmda
             adevlmda = devlmda
@@ -186,7 +187,6 @@ c
 c     compute the numerical lambda derivatives
 c
          if (donumer) then
-            use_dlmda = .false.
             oldvl = vlambda
             oldel = elambda
             vlambda = oldvl + eps

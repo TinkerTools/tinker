@@ -262,15 +262,15 @@ c
                   vyy = -yr * frcy
                   vyz = -0.5d0 * (zr*frcy+yr*frcz)
                   vzz = -zr * frcz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vxy
-                  vir(3,1) = vir(3,1) + vxz
-                  vir(1,2) = vir(1,2) + vxy
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vyz
-                  vir(1,3) = vir(1,3) + vxz
-                  vir(2,3) = vir(2,3) + vyz
-                  vir(3,3) = vir(3,3) + vzz
+                  epvir(1,1) = epvir(1,1) + vxx
+                  epvir(2,1) = epvir(2,1) + vxy
+                  epvir(3,1) = epvir(3,1) + vxz
+                  epvir(1,2) = epvir(1,2) + vxy
+                  epvir(2,2) = epvir(2,2) + vyy
+                  epvir(3,2) = epvir(3,2) + vyz
+                  epvir(1,3) = epvir(1,3) + vxz
+                  epvir(2,3) = epvir(2,3) + vyz
+                  epvir(3,3) = epvir(3,3) + vzz
                end if
             end if
          end do
@@ -450,15 +450,15 @@ c
                         vyy = -yr * frcy
                         vyz = -0.5d0 * (zr*frcy+yr*frcz)
                         vzz = -zr * frcz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vxy
-                        vir(3,1) = vir(3,1) + vxz
-                        vir(1,2) = vir(1,2) + vxy
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vyz
-                        vir(1,3) = vir(1,3) + vxz
-                        vir(2,3) = vir(2,3) + vyz
-                        vir(3,3) = vir(3,3) + vzz
+                        epvir(1,1) = epvir(1,1) + vxx
+                        epvir(2,1) = epvir(2,1) + vxy
+                        epvir(3,1) = epvir(3,1) + vxz
+                        epvir(1,2) = epvir(1,2) + vxy
+                        epvir(2,2) = epvir(2,2) + vyy
+                        epvir(3,2) = epvir(3,2) + vyz
+                        epvir(1,3) = epvir(1,3) + vxz
+                        epvir(2,3) = epvir(2,3) + vyz
+                        epvir(3,3) = epvir(3,3) + vzz
                      end if
                   end do
                end if
@@ -572,8 +572,8 @@ c
 !$OMP& p2iscale,p3iscale,p4iscale,p5iscale,nelst,elst,use_bounds,
 !$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polarity,f,uind)
 !$OMP& firstprivate(pscale)
-!$OMP& shared (dep,vir)
-!$OMP DO reduction(+:dep,vir)
+!$OMP& shared (dep,epvir)
+!$OMP DO reduction(+:dep,epvir)
 c
 c     find the exchange polarization gradient
 c
@@ -722,15 +722,15 @@ c
                   vyy = -yr * frcy
                   vyz = -0.5d0 * (zr*frcy+yr*frcz)
                   vzz = -zr * frcz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vxy
-                  vir(3,1) = vir(3,1) + vxz
-                  vir(1,2) = vir(1,2) + vxy
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vyz
-                  vir(1,3) = vir(1,3) + vxz
-                  vir(2,3) = vir(2,3) + vyz
-                  vir(3,3) = vir(3,3) + vzz
+                  epvir(1,1) = epvir(1,1) + vxx
+                  epvir(2,1) = epvir(2,1) + vxy
+                  epvir(3,1) = epvir(3,1) + vxz
+                  epvir(1,2) = epvir(1,2) + vxy
+                  epvir(2,2) = epvir(2,2) + vyy
+                  epvir(3,2) = epvir(3,2) + vyz
+                  epvir(1,3) = epvir(1,3) + vxz
+                  epvir(2,3) = epvir(2,3) + vyz
+                  epvir(3,3) = epvir(3,3) + vzz
                end if
             end if
          end do

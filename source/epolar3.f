@@ -18,6 +18,7 @@ c
 c
       subroutine epolar3
       use limits
+      use mutant
       implicit none
       logical pairwise
 c
@@ -25,7 +26,9 @@ c
 c     choose the method to sum over polarization interactions
 c
       pairwise = .true.
-      if (pairwise) then
+      if (use_epdt) then
+         call epolar3f
+      else if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
                call epolar3d
@@ -2435,5 +2438,128 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (fuind)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar3f  --  dual topology polarization energy  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar3f" calculates the polarization energy due to induced
+c     dipole interactions with dual topology method and partitions
+c     the energy among atoms
+c
+c
+      subroutine epolar3f
+      use action
+      use analyz
+      use atoms
+      use energi
+      use limits
+      use mutant
+      implicit none
+      integer i
+      integer nep1,nep0
+      real*8 ep1,ep0
+      real*8 elambdaorig
+      real*8 elambdaexp
+      real*8, allocatable :: aep1(:)
+      real*8, allocatable :: aep0(:)
+      logical pairwise
+      character*6 mode
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      
+      allocate (aep1(n))
+      allocate (aep0(n))
+c
+c     set pairwise logical value
+c
+      pairwise = .true.
+c
+c     compute energy of the lambda = 1 state
+c
+      elambdaorig = elambda
+      elambda = 1.0d0
+      call altelec
+      if (pairwise) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar3d
+            else
+               call epolar3c
+            end if
+         else
+            if (use_mlist) then
+               call epolar3b
+            else
+               call epolar3a
+            end if
+         end if
+      else
+         call epolar3e
+      end if
+c
+c     copy energy of the lambda = 1 state
+c
+      ep1 = ep
+      nep1 = nep
+      do i = 1, n
+         aep1(i) = aep(i)
+      end do
+c
+c     compute energy of the lambda = 0 state
+c
+      elambda = 0.0d0
+      call altelec
+      if (pairwise) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar3d
+            else
+               call epolar3c
+            end if
+         else
+            if (use_mlist) then
+               call epolar3b
+            else
+               call epolar3a
+            end if
+         end if
+      else
+         call epolar3e
+      end if
+c
+c     copy energy of the lambda = 0 state
+c
+      ep0 = ep
+      nep0 = nep
+      do i = 1, n
+         aep0(i) = aep(i)
+      end do
+c
+c     set original elambda
+c
+      elambda = elambdaorig
+c
+c     interpolate energy
+c
+      elambdaexp = elambda**epdtexp
+      ep = elambdaexp * ep1 + (1.0d0 - elambdaexp) * ep0
+      do i = 1, n
+         aep(i) = elambdaexp * aep1(i) + (1.0d0 - elambdaexp) * aep0(i)
+      end do
+      nep = max(nep1,nep0)
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aep1)
+      deallocate (aep0)
       return
       end

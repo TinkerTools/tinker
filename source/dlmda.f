@@ -1,9 +1,9 @@
 c
 c
-c     ################################################################
-c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung & Jay W. Ponder  ##
-c     ##                    All Rights Reserved                     ##
-c     ################################################################
+c     ##################################################################
+c     ##  COPYRIGHT (C) 2026 by  Moses Chung, Pengyu Ren, Jay Ponder  ##
+c     ##                     All Rights Reserved                      ##
+c     ##################################################################
 c
 c     ######################################################
 c     ##                                                  ##
@@ -12,35 +12,36 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
-c     delmda        total energy lambda derivative
-c     devlmda       van der Waals lambda derivative
-c     demlmda       multipole lambda derivative
-c     deplmda       polarization lambda derivative
-c     delmda2       total energy second order lambda derivative
-c     devlmda2      van der Waals second order lambda derivative
-c     demlmda2      multipole second order lambda derivative
-c     deplmda2      polarization second order lambda derivative
-c     dldesum       total force lambda derivative
-c     dldev         van der Waals force lambda derivative
-c     dldem         multipole force lambda derivative
-c     dldep         polarization force lambda derivative
-c     pchgorig      original pchg
-c     pchg0orig     original pchg0
-c     bdplorig      original bdpl
-c     poleorig      original pole
-c     pcoreorig     original pcore
-c     pvalorig      original pval
-c     pval0orig     original pval0
-c     polarityorig  original polarity
-c     bflxorig      original bflx
-c     aflxorig      original aflx
-c     abflxorig     original abflx
-c     lcmp          cmp for lambda derivative
-c     lfmp          fmp for lambda derivative
-c     lcphi         cphi for lambda derivative
-c     lfphi         fphi for lambda derivative
-c     lqgrid        qgrid for lambda derivative
-c     use_dlmda     logical flag governing use of lambda derivative
+c     delmda          total energy lambda derivative
+c     devlmda         van der Waals lambda derivative
+c     demlmda         multipole lambda derivative
+c     deplmda         polarization lambda derivative
+c     delmda2         total energy second order lambda derivative
+c     devlmda2        van der Waals second order lambda derivative
+c     demlmda2        multipole second order lambda derivative
+c     deplmda2        polarization second order lambda derivative
+c     dldesum         total force lambda derivative
+c     dldev           van der Waals force lambda derivative
+c     dldem           multipole force lambda derivative
+c     dldep           polarization force lambda derivative
+c     pchgorig        original pchg
+c     pchg0orig       original pchg0
+c     bdplorig        original bdpl
+c     poleorig        original pole
+c     pcoreorig       original pcore
+c     pvalorig        original pval
+c     pval0orig       original pval0
+c     polarityorig    original polarity
+c     bflxorig        original bflx
+c     aflxorig        original aflx
+c     abflxorig       original abflx
+c     lcmp            cmp for lambda derivative
+c     lfmp            fmp for lambda derivative
+c     lcphi           cphi for lambda derivative
+c     lfphi           fphi for lambda derivative
+c     lqgrid          qgrid for lambda derivative
+c     use_dlmda       logical flag governing use of lambda derivative
+c     douindorig      original douind
 c
 c
       module dlmda
@@ -74,5 +75,6 @@ c
       real*8, allocatable :: lfphi(:,:)
       real*8, allocatable :: lqgrid(:,:,:,:)
       logical use_dlmda
+      logical, allocatable :: douindorig(:)
       save
       end

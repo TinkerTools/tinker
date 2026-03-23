@@ -213,6 +213,8 @@ c
       do i = 1, 3
          do j = 1, 3
             vir(j,i) = 0.0d0
+            emvir(j,i) = 0.0d0
+            epvir(j,i) = 0.0d0
          end do
       end do
       einter = 0.0d0
@@ -271,7 +273,13 @@ c
             call empole1
          end if
       end if
-      if (use_polar)  call epolar1
+      if (use_polar) then
+         if (use_dlmda) then
+            call epolar4
+         else
+            call epolar1
+         end if
+      end if
       if (use_chgtrn)  call echgtrn1
       if (use_rxnfld)  call erxnfld1
 c

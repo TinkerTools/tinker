@@ -17,30 +17,36 @@ c     dipole interactions
 c
 c
       subroutine epolar
+      use dlmda
       use limits
+      use mutant
       implicit none
       logical pairwise
 c
 c
 c     choose the method to sum over polarization interactions
 c
-      pairwise = .false.
-      if (pairwise) then
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar0d
+      if (use_epdt) then
+         call epolar0f
+      else
+         pairwise = .false.
+         if (pairwise .or. use_dlmda) then
+            if (use_ewald) then
+               if (use_mlist) then
+                  call epolar0d
+               else
+                  call epolar0c
+               end if
             else
-               call epolar0c
+               if (use_mlist) then
+                  call epolar0b
+               else
+                  call epolar0a
+               end if
             end if
          else
-            if (use_mlist) then
-               call epolar0b
-            else
-               call epolar0a
-            end if
+            call epolar0e
          end if
-      else
-         call epolar0e
       end if
       return
       end
@@ -64,10 +70,12 @@ c
       use chgpen
       use chgpot
       use couple
+      use dlmda
       use energi
       use extfld
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -99,9 +107,11 @@ c
       real*8 vali,valk
       real*8 alphai,alphak
       real*8 term1,term2,term3
+      real*8 scalelmda
       real*8 dmpi(7),dmpk(7)
       real*8 dmpik(7)
       real*8, allocatable :: pscale(:)
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -116,7 +126,11 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (use_dlmda .and. .not.use_epdt) then
+         call rotpole ('MPORG')
+      else if (.not. use_mpole) then
+         call rotpole ('MPOLE')
+      end if
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -158,6 +172,7 @@ c
          uix = uind(1,i)
          uiy = uind(2,i)
          uiz = uind(3,i)
+         muti = mut(i)
          if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -219,6 +234,7 @@ c
                ukx = uind(1,k)
                uky = uind(2,k)
                ukz = uind(3,k)
+               mutk = mut(k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -278,6 +294,15 @@ c
      &                   + 2.0d0*(qiu*rr5i-qku*rr5k)
      &                   - dkr*uir*rr5k - dir*ukr*rr5i
      &                   + qkr*uir*rr7k - qir*ukr*rr7i
+               end if
+               if (use_dlmda .and. .not.use_epdt) then
+                  scalelmda = 1.0d0
+                  if (muti .and. mutk) then
+                     scalelmda = elambda * elambda
+                  else if (muti .or. mutk) then
+                     scalelmda = elambda
+                  end if
+                  e = scalelmda * e
                end if
 c
 c     increment the overall polarization energy components
@@ -2089,5 +2114,98 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (fuind)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar0f  --  dual topology polarization energy  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar0f" calculates the polarization energy due to induced
+c     dipole interactions with dual topology method
+c
+c
+      subroutine epolar0f
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      implicit none
+      real*8 ep1,ep0
+      real*8 elambdaorig
+      real*8 elambdaexp
+      logical pairwise
+      character*6 mode
+c
+c
+c     set pairwise logical value
+c
+      pairwise = .false.
+c
+c     compute energy of the lambda = 1 state
+c
+      elambdaorig = elambda
+      elambda = 1.0d0
+      call altelec
+      if (pairwise .or. use_dlmda) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar0d
+            else
+               call epolar0c
+            end if
+         else
+            if (use_mlist) then
+               call epolar0b
+            else
+               call epolar0a
+            end if
+         end if
+      else
+         call epolar0e
+      end if
+c
+c     copy energy of the lambda = 1 state
+c
+      ep1 = ep
+c
+c     compute energy of the lambda = 0 state
+c
+      elambda = 0.0d0
+      call altelec
+      if (pairwise .or. use_dlmda) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar0d
+            else
+               call epolar0c
+            end if
+         else
+            if (use_mlist) then
+               call epolar0b
+            else
+               call epolar0a
+            end if
+         end if
+      else
+         call epolar0e
+      end if
+c
+c     copy energy of the lambda = 0 state
+c
+      ep0 = ep
+c
+c     set original elambda
+c
+      elambda = elambdaorig
+c
+c     interpolate energy
+c
+      elambdaexp = elambda**epdtexp
+      ep = elambdaexp * ep1 + (1.0d0 - elambdaexp) * ep0
       return
       end

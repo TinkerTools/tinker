@@ -664,8 +664,10 @@ c
       use cell
       use chgpen
       use couple
+      use dlmda
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -690,6 +692,7 @@ c
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
+      real*8 scalelmda
       real*8 fid(3),fkd(3)
       real*8 fip(3),fkp(3)
       real*8 dmpi(7),dmpk(7)
@@ -698,6 +701,7 @@ c
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -746,6 +750,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -846,6 +851,7 @@ c
                qkyy = rpole(9,k)
                qkyz = rpole(10,k)
                qkzz = rpole(13,k)
+               mutk = mut(k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -914,6 +920,21 @@ c
                   fkd(3) = zr*(rr3*corei + rr3i*vali
      &                        + rr5i*dir + rr7i*qir)
      &                        - rr3i*diz - 2.0d0*rr5i*qiz
+               end if
+c
+c     scale field if lambda derivatives are used
+c
+               if (use_dlmda .and. .not.use_epdt) then
+                  scalelmda = 1.0d0
+                  if (muti .and. mutk) then
+                     scalelmda = elambda * elambda
+                  else if (muti .or. mutk) then
+                     scalelmda = elambda
+                  end if
+                  do j = 1, 3
+                     fid(j) = scalelmda * fid(j)
+                     fkd(j) = scalelmda * fkd(j)
+                  end do
                end if
 c
 c     increment the direct electrostatic field components
@@ -1264,8 +1285,10 @@ c
       use cell
       use chgpen
       use couple
+      use dlmda
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -1291,6 +1314,7 @@ c
       real*8, allocatable :: wscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -1335,6 +1359,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1380,6 +1405,7 @@ c
                pkx = uinp(1,k)
                pky = uinp(2,k)
                pkz = uinp(3,k)
+               mutk = mut(k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -1410,6 +1436,15 @@ c     increment the mutual electrostatic field components
 c
                rr3 = -dmpik(3) / (r*r2)
                rr5 = 3.0d0 * dmpik(5) / (r*r2*r2)
+               if (use_dlmda .and. .not.use_epdt) then
+                  if (muti .and. mutk) then
+                     rr3 = elambda*elambda * rr3
+                     rr5 = elambda*elambda * rr5
+                  else if (muti .or. mutk) then
+                     rr3 = elambda * rr3
+                     rr5 = elambda * rr5
+                  end if
+               end if
                fid(1) = rr3*dkx + rr5*dkr*xr
                fid(2) = rr3*dky + rr5*dkr*yr
                fid(3) = rr3*dkz + rr5*dkr*zr
@@ -7105,9 +7140,11 @@ c
       use atoms
       use chgpen
       use couple
+      use dlmda
       use limits
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpcg
@@ -7131,6 +7168,7 @@ c
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
       real*8 zrsdp(3,*)
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -7226,6 +7264,7 @@ c
             zi = z(i)
             poli = polarity(i)
             if (use_chgpen)  alphai = palpha(i)
+            muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -7261,6 +7300,7 @@ c
                xr = x(k) - xi
                yr = y(k) - yi
                zr = z(k) - zi
+               mutk = mut(k)
                call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
                if (r2 .le. off2) then
@@ -7278,6 +7318,18 @@ c
                   polik = poli * polarity(k)
                   rr3 = dmpik(3) * polik / (r*r2)
                   rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
+c
+c     scale field if lambda derivatives are used
+c
+                  if (use_dlmda .and. .not.use_epdt) then
+                     if (muti .and. mutk) then
+                        rr3 = elambda*elambda * rr3
+                        rr5 = elambda*elambda * rr5
+                     else if (muti .or. mutk) then
+                        rr3 = elambda * rr3
+                        rr5 = elambda * rr5
+                     end if
+                  end if
                   minv(m+1) = rr5*xr*xr - rr3
                   minv(m+2) = rr5*xr*yr
                   minv(m+3) = rr5*xr*zr

@@ -97,6 +97,16 @@ c
       scexp = 5.0d0
       scalpha = 0.7d0
 c
+c     set defaults for use of dual topology
+c
+      use_emdt = .false.
+      use_epdt = .false.
+c
+c     set default dual topology interpolation exponent
+c
+      emdtexp = 2
+      epdtexp = 2
+c
 c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
@@ -186,6 +196,16 @@ c
                itbnd(2,ntbnd) = list(k+1)
                k = k + 2
             end do
+         else if (keyword(1:17) .eq. 'MTP-DUALTOPO-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  emdtexp
+         else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  epdtexp
+         else if (keyword(1:13) .eq. 'MTP-DUALTOPO ') then
+            use_emdt = .true.
+         else if (keyword(1:13) .eq. 'POL-DUALTOPO ') then
+            use_epdt = .true.
          else if (keyword(1:5) .eq. 'OSRW ') then
             use_dlmda = .true.
          end if
@@ -205,6 +225,7 @@ c
       if (allocated(bflxorig))  deallocate (bflxorig)
       if (allocated(aflxorig))  deallocate (aflxorig)
       if (allocated(abflxorig))  deallocate (abflxorig)
+      if (allocated(douindorig))  deallocate (douindorig)
       allocate (pchgorig(n))
       allocate (pchg0orig(n))
       allocate (bdplorig(nbond))
@@ -216,6 +237,7 @@ c
       allocate (bflxorig(nbond))
       allocate (aflxorig(2,nangle))
       allocate (abflxorig(2,nangle))
+      allocate (douindorig(n))
 c
 c     copy original parameters for lambda derivative calculations
 c
@@ -233,7 +255,7 @@ c
             bdplorig(i) = bdpl(i)
          end do
       end if
-      if (use_mpole) then
+      if (use_mpole .or. use_polar) then
          do i = 1, npole
             k = ipole(i)
             do j = 1, 13
@@ -250,6 +272,7 @@ c
          do i = 1, npole
             k = ipole(i)
             polarityorig(k) = polarity(k)
+            douindorig(k) = douind(k)
          end do
       end if
       if (use_chgflx) then
@@ -389,11 +412,12 @@ c
 c
 c     set scaled parameters for atomic polarizability models
 c
-      if (use_polar) then
+      if (use_polar .and. (.not.use_dlmda .or. use_epdt)) then
          do i = 1, npole
             k = ipole(i)
             if (mut(k)) then
                polarity(k) = polarityorig(k) * elambda
+               douind(k) = douindorig(k)
                if (elambda .eq. 0.0d0)  douind(k) = .false.
             end if
          end do

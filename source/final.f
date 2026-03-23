@@ -349,6 +349,7 @@ c
       if (allocated(lcphi))  deallocate (lcphi)
       if (allocated(lfphi))  deallocate (lfphi)
       if (allocated(lqgrid))  deallocate (lqgrid)
+      if (allocated(douindorig))  deallocate (douindorig)
 c
 c     deallocation of global arrays from module domega
 c

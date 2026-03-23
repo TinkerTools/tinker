@@ -1,22 +1,22 @@
 c
 c
-c     ##################################################
-c     ##  COPYRIGHT (C) 2015  by  Jay William Ponder  ##
-c     ##              All Rights Reserved             ##
-c     ##################################################
+c     ##################################################################
+c     ##  COPYRIGHT (C) 2026 by  Moses Chung, Pengyu Ren, Jay Ponder  ##
+c     ##                     All Rights Reserved                      ##
+c     ##################################################################
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  subroutine epolar1  --  polarization energy & derivs  ##
+c     ##  subroutine epolar4  --  polarization energy & derivs  ##
 c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "epolar1" calculates the induced dipole polarization energy
+c     "epolar4" calculates the induced dipole polarization energy
 c     and first derivatives with respect to Cartesian coordinates
 c
 c
-      subroutine epolar1
+      subroutine epolar4
       use iounit
       use limits
       use mplpot
@@ -31,7 +31,7 @@ c     check for use of TCG polarization with charge penetration
 c
       if (poltyp.eq.'TCG' .and. use_chgpen) then
          write (iout,10)
-   10    format (/,' EPOLAR1  --  TCG Polarization not Available',
+   10    format (/,' EPOLAR4  --  TCG Polarization not Available',
      &              ' with Charge Penetration')
          call fatal
       end if
@@ -39,19 +39,23 @@ c
 c     choose the method to sum over polarization interactions
 c
       if (use_epdt) then
-         call epolar1f
+         call epolar4f
       else
          if (use_ewald) then
             if (use_mlist) then
-               call epolar1d
+               print*, "epolar4d"
+               call epolar4d
             else
-               call epolar1c
+               print*, "epolar4c"
+               call epolar4c
             end if
          else
             if (use_mlist) then
-               call epolar1b
+               print*, "epolar4b"
+               call epolar4b
             else
-               call epolar1a
+               print*, "epolar4a"
+               call epolar4a
             end if
          end if
 c
@@ -75,17 +79,17 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine epolar1a  --  double loop polarization derivs  ##
+c     ##  subroutine epolar4a  --  double loop polarization derivs  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "epolar1a" calculates the dipole polarization energy and
+c     "epolar4a" calculates the dipole polarization energy and
 c     derivatives with respect to Cartesian coordinates using a
 c     pairwise double loop
 c
 c
-      subroutine epolar1a
+      subroutine epolar4a
       use atoms
       use bound
       use cell
@@ -93,10 +97,12 @@ c
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use molcul
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polopt
@@ -110,7 +116,7 @@ c
       integer ii,kk,jcell
       integer ix,iy,iz
       integer it,kt
-      real*8 f,pgamma
+      real*8 e,f,pgamma
       real*8 pdi,pti,ddi
       real*8 damp,expdamp
       real*8 temp3,temp5,temp7
@@ -124,6 +130,9 @@ c
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
+      real*8 rr3i,rr5i,rr7i
+      real*8 rr3k,rr5k,rr7k
+      real*8 lrr3,lrr5,lrr7
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -134,10 +143,13 @@ c
       real*8 qkyy,qkyz,qkzz
       real*8 ukx,uky,ukz
       real*8 ukxp,ukyp,ukzp
-      real*8 dir,uir,uirp
-      real*8 dkr,ukr,ukrp
+      real*8 dir,diu
+      real*8 uir,uirp
+      real*8 dkr,dku
+      real*8 ukr,ukrp
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
+      real*8 qiu,qku
       real*8 corei,corek
       real*8 vali,valk
       real*8 alphai,alphak
@@ -170,6 +182,9 @@ c
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dlambda,dlambda2
+      real*8 scalelmda
+      real*8 dscalelmda
       real*8 rc3(3),rc5(3),rc7(3)
       real*8 tep(3),fix(3)
       real*8 fiy(3),fiz(3)
@@ -177,6 +192,10 @@ c
       real*8 ubx(3),uby(3),ubz(3)
       real*8 uaxp(3),uayp(3),uazp(3)
       real*8 ubxp(3),ubyp(3),ubzp(3)
+      real*8 fid(3),fkd(3)
+      real*8 fip(3),fkp(3)
+      real*8 ufid(3),ufkd(3)
+      real*8 ldmpik(7)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(9)
       real*8, allocatable :: pscale(:)
@@ -189,12 +208,15 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical muti,mutk
       character*6 mode
 c
 c
 c     zero out the polarization energy and derivatives
 c
       ep = 0.0d0
+      deplmda = 0.0d0
+      deplmda2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dep(j,i) = 0.0d0
@@ -213,15 +235,11 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPORG')
 c
 c     compute the induced dipoles at each polarizable atom
 c
       call induce
-c
-c     compute the total induced dipole polarization energy
-c
-      call epolar1e
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -281,6 +299,7 @@ c
          uixp = uinp(1,i)
          uiyp = uinp(2,i)
          uizp = uinp(3,i)
+         muti = mut(i)
          do j = 1, tcgnab
             uax(j) = uad(1,i,j)
             uay(j) = uad(2,i,j)
@@ -434,6 +453,7 @@ c
                ukxp = uinp(1,k)
                ukyp = uinp(2,k)
                ukzp = uinp(3,k)
+               mutk = mut(k)
 c
 c     intermediates involving moments and separation distance
 c
@@ -447,8 +467,12 @@ c
                qky = qkxy*xr + qkyy*yr + qkyz*zr
                qkz = qkxz*xr + qkyz*yr + qkzz*zr
                qkr = qkx*xr + qky*yr + qkz*zr
+               diu = dix*ukx + diy*uky + diz*ukz
+               qiu = qix*ukx + qiy*uky + qiz*ukz
                uir = uix*xr + uiy*yr + uiz*zr
                uirp = uixp*xr + uiyp*yr + uizp*zr
+               dku = dkx*uix + dky*uiy + dkz*uiz
+               qku = qkx*uix + qky*uiy + qkz*uiz
                ukr = ukx*xr + uky*yr + ukz*zr
                ukrp = ukxp*xr + ukyp*yr + ukzp*zr
 c
@@ -540,6 +564,41 @@ c
                   psr3 = sr3 * pscale(k)
                   psr5 = sr5 * pscale(k)
                   psr7 = sr7 * pscale(k)
+                  term1 = ck*uir - ci*ukr + diu + dku
+                  term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
+                  term3 = uir*qkr - ukr*qir
+                  e = term1*psr3 + term2*psr5 + term3*psr7
+                  call damptholed (i,k,7,r,ldmpik)
+                  lrr3 = ldmpik(3) / (r*r2)
+                  lrr5 = 3.0d0 * ldmpik(5) / (r*r2*r2)
+                  lrr7 = 15.0d0 * ldmpik(7) / (r*r2*r2*r2)
+                  fid(1) = -xr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
+     &                        - lrr3*dkx + 2.0d0*lrr5*qkx
+                  fid(2) = -yr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
+     &                        - lrr3*dky + 2.0d0*lrr5*qky
+                  fid(3) = -zr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
+     &                        - lrr3*dkz + 2.0d0*lrr5*qkz
+                  fkd(1) =  xr*(lrr3*ci+lrr5*dir+lrr7*qir)
+     &                        - lrr3*dix - 2.0d0*lrr5*qix
+                  fkd(2) =  yr*(lrr3*ci+lrr5*dir+lrr7*qir)
+     &                        - lrr3*diy - 2.0d0*lrr5*qiy
+                  fkd(3) =  zr*(lrr3*ci+lrr5*dir+lrr7*qir)
+     &                        - lrr3*diz - 2.0d0*lrr5*qiz
+                  fip(1) = pscale(k) * fid(1)
+                  fip(2) = pscale(k) * fid(2)
+                  fip(3) = pscale(k) * fid(3)
+                  fkp(1) = pscale(k) * fkd(1)
+                  fkp(2) = pscale(k) * fkd(2)
+                  fkp(3) = pscale(k) * fkd(3)
+                  fid(1) = dscale(k) * fid(1)
+                  fid(2) = dscale(k) * fid(2)
+                  fid(3) = dscale(k) * fid(3)
+                  fkd(1) = dscale(k) * fkd(1)
+                  fkd(2) = dscale(k) * fkd(2)
+                  fkd(3) = dscale(k) * fkd(3)
+                  call dampthole (i,k,5,r,ldmpik)
+                  ldmpik(3) = uscale(k) * ldmpik(3)
+                  ldmpik(5) = uscale(k) * ldmpik(5)
 c
 c     apply charge penetration damping to scale factors
 c
@@ -554,7 +613,41 @@ c
                   dsr3k = 2.0d0 * rr3 * dmpk(3) * dscale(k)
                   dsr5k = 2.0d0 * rr5 * dmpk(5) * dscale(k)
                   dsr7k = 2.0d0 * rr7 * dmpk(7) * dscale(k)
+                  rr3i = dmpi(3) * rr3 * pscale(k)
+                  rr5i = dmpi(5) * rr5 * pscale(k)
+                  rr7i = dmpi(7) * rr7 * pscale(k)
+                  rr3k = dmpk(3) * rr3 * pscale(k)
+                  rr5k = dmpk(5) * rr5 * pscale(k)
+                  rr7k = dmpk(7) * rr7 * pscale(k)
+                  e = uir*(corek*rr3+valk*rr3k)
+     &                   - ukr*(corei*rr3+vali*rr3i)
+     &                   + diu*rr3i + dku*rr3k
+     &                   + 2.0d0*(qiu*rr5i-qku*rr5k)
+     &                   - dkr*uir*rr5k - dir*ukr*rr5i
+     &                   + qkr*uir*rr7k - qir*ukr*rr7i
                end if
+               lrr3 = -ldmpik(3) / (r*r2)
+               lrr5 = 3.0d0 * ldmpik(5) / (r*r2*r2)
+               ufid(1) = lrr3*ukx + lrr5*ukr*xr
+               ufid(2) = lrr3*uky + lrr5*ukr*yr
+               ufid(3) = lrr3*ukz + lrr5*ukr*zr
+               ufkd(1) = lrr3*uix + lrr5*uir*xr
+               ufkd(2) = lrr3*uiy + lrr5*uir*yr
+               ufkd(3) = lrr3*uiz + lrr5*uir*zr
+               dscalelmda = 0.0d0
+               if (muti .and. mutk) then
+                  dscalelmda = 2.0d0 * elambda
+               else if (muti .or. mutk) then
+                  dscalelmda = 1.0d0
+               end if
+               dlambda = -f * dscalelmda * 
+     &             (fid(1)*uixp + fid(2)*uiyp + fid(3)*uizp
+     &            + fkd(1)*ukxp + fkd(2)*ukyp + fkd(3)*ukzp
+     &            + (uixp*ufid(1) + uiyp*ufid(2) + uizp*ufid(3))
+     &            + (ukxp*ufkd(1) + ukyp*ufkd(2) + ukzp*ufkd(3))
+     &            + (uix*fip(1) + uiy*fip(2) + uiz*fip(3))
+     &            + (ukx*fkp(1) + uky*fkp(2) + ukz*fkp(3)))
+               deplmda = deplmda + dlambda
 c
 c     store the potential at each site for use in charge flux
 c
@@ -591,12 +684,24 @@ c
                   tuir = -dsr5i*ukr
                   tukr = -dsr5k*uir
                end if
-               ufld(1,i) = ufld(1,i) + tix3 + xr*tuir
-               ufld(2,i) = ufld(2,i) + tiy3 + yr*tuir
-               ufld(3,i) = ufld(3,i) + tiz3 + zr*tuir
-               ufld(1,k) = ufld(1,k) + tkx3 + xr*tukr
-               ufld(2,k) = ufld(2,k) + tky3 + yr*tukr
-               ufld(3,k) = ufld(3,k) + tkz3 + zr*tukr
+               scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  scalelmda = elambda
+               end if
+               term1i = scalelmda * (tix3 + xr*tuir)
+               term2i = scalelmda * (tiy3 + yr*tuir)
+               term3i = scalelmda * (tiz3 + zr*tuir)
+               term1k = scalelmda * (tkx3 + xr*tukr)
+               term2k = scalelmda * (tky3 + yr*tukr)
+               term3k = scalelmda * (tkz3 + zr*tukr)
+               ufld(1,i) = ufld(1,i) + term1i
+               ufld(2,i) = ufld(2,i) + term2i
+               ufld(3,i) = ufld(3,i) + term3i
+               ufld(1,k) = ufld(1,k) + term1k
+               ufld(2,k) = ufld(2,k) + term2k
+               ufld(3,k) = ufld(3,k) + term3k
 c
 c     get induced dipole field gradient used for quadrupole torques
 c
@@ -619,24 +724,30 @@ c
                   tuir = -dsr7i*ukr
                   tukr = -dsr7k*uir
                end if
-               dufld(1,i) = dufld(1,i) + xr*tix5 + xr*xr*tuir
-               dufld(2,i) = dufld(2,i) + xr*tiy5 + yr*tix5
-     &                         + 2.0d0*xr*yr*tuir
-               dufld(3,i) = dufld(3,i) + yr*tiy5 + yr*yr*tuir
-               dufld(4,i) = dufld(4,i) + xr*tiz5 + zr*tix5
-     &                         + 2.0d0*xr*zr*tuir
-               dufld(5,i) = dufld(5,i) + yr*tiz5 + zr*tiy5
-     &                         + 2.0d0*yr*zr*tuir
-               dufld(6,i) = dufld(6,i) + zr*tiz5 + zr*zr*tuir
-               dufld(1,k) = dufld(1,k) - xr*tkx5 - xr*xr*tukr
-               dufld(2,k) = dufld(2,k) - xr*tky5 - yr*tkx5
-     &                         - 2.0d0*xr*yr*tukr
-               dufld(3,k) = dufld(3,k) - yr*tky5 - yr*yr*tukr
-               dufld(4,k) = dufld(4,k) - xr*tkz5 - zr*tkx5
-     &                         - 2.0d0*xr*zr*tukr
-               dufld(5,k) = dufld(5,k) - yr*tkz5 - zr*tky5
-     &                         - 2.0d0*yr*zr*tukr
-               dufld(6,k) = dufld(6,k) - zr*tkz5 - zr*zr*tukr
+               term1i = scalelmda * (xr*tix5+xr*xr*tuir)
+               term2i = scalelmda * (xr*tiy5+yr*tix5+2.0d0*xr*yr*tuir)
+               term3i = scalelmda * (yr*tiy5+yr*yr*tuir)
+               term4i = scalelmda * (xr*tiz5+zr*tix5+2.0d0*xr*zr*tuir)
+               term5i = scalelmda * (yr*tiz5+zr*tiy5+2.0d0*yr*zr*tuir)
+               term6i = scalelmda * (zr*tiz5+zr*zr*tuir)
+               term1k = scalelmda * (-xr*tkx5-xr*xr*tukr)
+               term2k = scalelmda * (-xr*tky5-yr*tkx5-2.0d0*xr*yr*tukr)
+               term3k = scalelmda * (-yr*tky5-yr*yr*tukr)
+               term4k = scalelmda * (-xr*tkz5-zr*tkx5-2.0d0*xr*zr*tukr)
+               term5k = scalelmda * (-yr*tkz5-zr*tky5 -2.0d0*yr*zr*tukr)
+               term6k = scalelmda * (-zr*tkz5-zr*zr*tukr)
+               dufld(1,i) = dufld(1,i) + term1i
+               dufld(2,i) = dufld(2,i) + term2i
+               dufld(3,i) = dufld(3,i) + term3i
+               dufld(4,i) = dufld(4,i) + term4i
+               dufld(5,i) = dufld(5,i) + term5i
+               dufld(6,i) = dufld(6,i) + term6i
+               dufld(1,k) = dufld(1,k) + term1k
+               dufld(2,k) = dufld(2,k) + term2k
+               dufld(3,k) = dufld(3,k) + term3k
+               dufld(4,k) = dufld(4,k) + term4k
+               dufld(5,k) = dufld(5,k) + term5k
+               dufld(6,k) = dufld(6,k) + term6k
 c
 c     get the field gradient for direct polarization force
 c
@@ -1219,6 +1330,17 @@ c
                      frcz = frcz + uscale(k)*depz
                   end do
                end if
+c
+c     modify the energy, force, and torque by lambda
+c
+               e = scalelmda * e
+               frcx = scalelmda * frcx
+               frcy = scalelmda * frcy
+               frcz = scalelmda * frcz
+c
+c     increment the overall atomic polarization energy components
+c
+               ep = ep + e
 c
 c     increment force-based gradient on the interaction sites
 c
@@ -2521,17 +2643,17 @@ c
 c
 c     ##################################################################
 c     ##                                                              ##
-c     ##  subroutine epolar1b  --  neighbor list polarization derivs  ##
+c     ##  subroutine epolar4b  --  neighbor list polarization derivs  ##
 c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "epolar1b" calculates the dipole polarization energy and
+c     "epolar4b" calculates the dipole polarization energy and
 c     derivatives with respect to Cartesian coordinates using a
 c     neighbor list
 c
 c
-      subroutine epolar1b
+      subroutine epolar4b
       use atoms
       use bound
       use chgpen
@@ -2667,7 +2789,7 @@ c
 c
 c     compute the total induced dipole polarization energy
 c
-      call epolar1e
+      call epolar4e
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -3909,17 +4031,17 @@ c
 c
 c     ###################################################################
 c     ##                                                               ##
-c     ##  subroutine epolar1c  --  Ewald polarization derivs via loop  ##
+c     ##  subroutine epolar4c  --  Ewald polarization derivs via loop  ##
 c     ##                                                               ##
 c     ###################################################################
 c
 c
-c     "epolar1c" calculates the dipole polarization energy and
+c     "epolar4c" calculates the dipole polarization energy and
 c     derivatives with respect to Cartesian coordinates using
 c     particle mesh Ewald summation and a double loop
 c
 c
-      subroutine epolar1c
+      subroutine epolar4c
       use atoms
       use boxes
       use chgpot
@@ -3997,15 +4119,15 @@ c
 c
 c     compute the total induced dipole polarization energy
 c
-      call epolar1e
+      call epolar4e
 c
 c     compute the real space part of the Ewald summation
 c
-      call epreal1c
+      call epreal4c
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call eprecip1
+      call eprecip4
 c
 c     compute the Ewald self-energy torque and virial terms
 c
@@ -4144,17 +4266,17 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine epreal1c  --  Ewald real space derivs via loop  ##
+c     ##  subroutine epreal4c  --  Ewald real space derivs via loop  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "epreal1c" evaluates the real space portion of the Ewald
+c     "epreal4c" evaluates the real space portion of the Ewald
 c     summation energy and gradient due to dipole polarization
 c     via a double loop
 c
 c
-      subroutine epreal1c
+      subroutine epreal4c
       use atoms
       use bound
       use cell
@@ -6769,17 +6891,17 @@ c
 c
 c     ###################################################################
 c     ##                                                               ##
-c     ##  subroutine epolar1d  --  Ewald polarization derivs via list  ##
+c     ##  subroutine epolar4d  --  Ewald polarization derivs via list  ##
 c     ##                                                               ##
 c     ###################################################################
 c
 c
-c     "epolar1d" calculates the dipole polarization energy and
+c     "epolar4d" calculates the dipole polarization energy and
 c     derivatives with respect to Cartesian coordinates using
 c     particle mesh Ewald summation and a neighbor list
 c
 c
-      subroutine epolar1d
+      subroutine epolar4d
       use atoms
       use boxes
       use chgpot
@@ -6857,15 +6979,15 @@ c
 c
 c     compute the total induced dipole polarization energy
 c
-      call epolar1e
+      call epolar4e
 c
 c     compute the real space part of the Ewald summation
 c
-      call epreal1d
+      call epreal4d
 c
 c     compute the reciprocal space part of the Ewald summation
 c
-      call eprecip1
+      call eprecip4
 c
 c     compute the Ewald self-energy torque and virial terms
 c
@@ -7003,17 +7125,17 @@ c
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine epreal1d  --  Ewald real space derivs via list  ##
+c     ##  subroutine epreal4d  --  Ewald real space derivs via list  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "epreal1d" evaluates the real space portion of the Ewald
+c     "epreal4d" evaluates the real space portion of the Ewald
 c     summation energy and gradient due to dipole polarization
 c     via a neighbor list
 c
 c
-      subroutine epreal1d
+      subroutine epreal4d
       use atoms
       use bound
       use chgpen
@@ -8468,16 +8590,16 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine epolar1e  --  single-loop polarization energy  ##
+c     ##  subroutine epolar4e  --  single-loop polarization energy  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "epreal1e" calculates the induced dipole polarization energy
+c     "epreal4e" calculates the induced dipole polarization energy
 c     from the induced dipoles times the electric field
 c
 c
-      subroutine epolar1e
+      subroutine epolar4e
       use atoms
       use boxes
       use chgpot
@@ -8562,12 +8684,12 @@ c
 c
 c     ###################################################################
 c     ##                                                               ##
-c     ##  subroutine eprecip1  --  PME recip polarize energy & derivs  ##
+c     ##  subroutine eprecip4  --  PME recip polarize energy & derivs  ##
 c     ##                                                               ##
 c     ###################################################################
 c
 c
-c     "eprecip1" evaluates the reciprocal space portion of the particle
+c     "eprecip4" evaluates the reciprocal space portion of the particle
 c     mesh Ewald summation energy and gradient due to dipole polarization
 c
 c     literature reference:
@@ -8582,7 +8704,7 @@ c     modifications for nonperiodic systems suggested by Tom Darden
 c     during May 2007
 c
 c
-      subroutine eprecip1
+      subroutine eprecip4
       use atoms
       use bound
       use boxes
@@ -9643,21 +9765,23 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine epolar1f  --  dual topology polarization derivs  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine epolar4f  --  dual topology lambda derivs  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "epolar1f" calculates the polarization energy and derivatives
+c     "epolar4f" calculates the polarization energy, derivatives
+c     with respect to Cartesian coordinates, and lambda derivatives
 c     with dual topology method
 c
 c
-      subroutine epolar1f
+      subroutine epolar4f
       use atoms
       use energi
       use deriv
+      use dlmda
       use limits
       use mutant
       use polpot
@@ -9667,6 +9791,8 @@ c
       real*8 ep1,ep0
       real*8 elambdaorig
       real*8 elambdaexp
+      real*8 delambdaexp
+      real*8 d2elambdaexp
       real*8 epvir1(3,3)
       real*8 epvir0(3,3)
       real*8, allocatable :: dep1(:,:)
@@ -9769,6 +9895,24 @@ c
          do j = 1, 3
             epvir(j,i) = elambdaexp * epvir1(j,i)
      &                 + (1.0d0 - elambdaexp) * epvir0(j,i)
+         end do
+      end do
+c
+c     compute lambda derivative
+c
+      delambdaexp = epdtexp * elambda**(epdtexp-1)
+      if (epdtexp .gt. 1) then
+         d2elambdaexp =  dble(epdtexp*(epdtexp-1))*elambda**(epdtexp-2)
+      else
+         d2elambdaexp = 0.0d0
+      end if
+      deplmda = delambdaexp * (ep1 - ep0)
+      deplmda2 = d2elambdaexp * (ep1 - ep0)
+      do i = 1, n
+         do j = 1, 3
+            dep(j,i) = elambdaexp * dep1(j,i)
+     &                 + (1.0d0 - elambdaexp) * dep0(j,i)
+            dldep(j,i) = delambdaexp * (dep1(j,i) - dep0(j,i))
          end do
       end do
 c

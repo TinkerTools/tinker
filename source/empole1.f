@@ -20,14 +20,19 @@ c
       use energi
       use extfld
       use limits
+      use mutant
+      use virial
       implicit none
+      integer i,j
       real*8 exf
       character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_ewald) then
+      if (use_emdt) then
+         call empole1e
+      else if (use_ewald) then
          if (use_mlist) then
             call empole1d
          else
@@ -48,6 +53,14 @@ c
          call exfield1 (mode,exf)
          em = em + exf
       end if
+c
+c     add the electrostatic virial to main virial
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + emvir(j,i)
+         end do
+      end do
       return
       end
 c
@@ -154,6 +167,11 @@ c
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -524,15 +542,15 @@ c
                vyy = -yr * frcy
                vyz = -0.5d0 * (zr*frcy+yr*frcz)
                vzz = -zr * frcz
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vxy
-               vir(3,1) = vir(3,1) + vxz
-               vir(1,2) = vir(1,2) + vxy
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vyz
-               vir(1,3) = vir(1,3) + vxz
-               vir(2,3) = vir(2,3) + vyz
-               vir(3,3) = vir(3,3) + vzz
+               emvir(1,1) = emvir(1,1) + vxx
+               emvir(2,1) = emvir(2,1) + vxy
+               emvir(3,1) = emvir(3,1) + vxz
+               emvir(1,2) = emvir(1,2) + vxy
+               emvir(2,2) = emvir(2,2) + vyy
+               emvir(3,2) = emvir(3,2) + vyz
+               emvir(1,3) = emvir(1,3) + vxz
+               emvir(2,3) = emvir(2,3) + vyz
+               emvir(3,3) = emvir(3,3) + vzz
             end if
    10       continue
          end do
@@ -904,15 +922,15 @@ c
                vyy = -yr * frcy
                vyz = -0.5d0 * (zr*frcy+yr*frcz)
                vzz = -zr * frcz
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vxy
-               vir(3,1) = vir(3,1) + vxz
-               vir(1,2) = vir(1,2) + vxy
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vyz
-               vir(1,3) = vir(1,3) + vxz
-               vir(2,3) = vir(2,3) + vyz
-               vir(3,3) = vir(3,3) + vzz
+               emvir(1,1) = emvir(1,1) + vxx
+               emvir(2,1) = emvir(2,1) + vxy
+               emvir(3,1) = emvir(3,1) + vxz
+               emvir(1,2) = emvir(1,2) + vxy
+               emvir(2,2) = emvir(2,2) + vyy
+               emvir(3,2) = emvir(3,2) + vyz
+               emvir(1,3) = emvir(1,3) + vxz
+               emvir(2,3) = emvir(2,3) + vyz
+               emvir(3,3) = emvir(3,3) + vzz
             end if
             end do
    20       continue
@@ -964,15 +982,15 @@ c
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         emvir(1,1) = emvir(1,1) + vxx
+         emvir(2,1) = emvir(2,1) + vxy
+         emvir(3,1) = emvir(3,1) + vxz
+         emvir(1,2) = emvir(1,2) + vxy
+         emvir(2,2) = emvir(2,2) + vyy
+         emvir(3,2) = emvir(3,2) + vyz
+         emvir(1,3) = emvir(1,3) + vxz
+         emvir(2,3) = emvir(2,3) + vyz
+         emvir(3,3) = emvir(3,3) + vzz
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -996,15 +1014,15 @@ c
             vyy = yi * frcy
             vyz = zi * frcy
             vzz = zi * frcz
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vxy
-            vir(3,1) = vir(3,1) + vxz
-            vir(1,2) = vir(1,2) + vxy
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vyz
-            vir(1,3) = vir(1,3) + vxz
-            vir(2,3) = vir(2,3) + vyz
-            vir(3,3) = vir(3,3) + vzz
+            emvir(1,1) = emvir(1,1) + vxx
+            emvir(2,1) = emvir(2,1) + vxy
+            emvir(3,1) = emvir(3,1) + vxz
+            emvir(1,2) = emvir(1,2) + vxy
+            emvir(2,2) = emvir(2,2) + vyy
+            emvir(3,2) = emvir(3,2) + vyz
+            emvir(1,3) = emvir(1,3) + vxz
+            emvir(2,3) = emvir(2,3) + vyz
+            emvir(3,3) = emvir(3,3) + vzz
          end do
       end if
 c
@@ -1124,6 +1142,11 @@ c
             dem(j,i) = 0.0d0
          end do
       end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = 0.0d0
+         end do
+      end do
       if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
@@ -1166,8 +1189,8 @@ c
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
-!$OMP DO reduction(+:em,dem,tem,pot,vir)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir)
+!$OMP DO reduction(+:em,dem,tem,pot,emvir)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1503,15 +1526,15 @@ c
                vyy = -yr * frcy
                vyz = -0.5d0 * (zr*frcy+yr*frcz)
                vzz = -zr * frcz
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vxy
-               vir(3,1) = vir(3,1) + vxz
-               vir(1,2) = vir(1,2) + vxy
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vyz
-               vir(1,3) = vir(1,3) + vxz
-               vir(2,3) = vir(2,3) + vyz
-               vir(3,3) = vir(3,3) + vzz
+               emvir(1,1) = emvir(1,1) + vxx
+               emvir(2,1) = emvir(2,1) + vxy
+               emvir(3,1) = emvir(3,1) + vxz
+               emvir(1,2) = emvir(1,2) + vxy
+               emvir(2,2) = emvir(2,2) + vyy
+               emvir(3,2) = emvir(3,2) + vyz
+               emvir(1,3) = emvir(1,3) + vxz
+               emvir(2,3) = emvir(2,3) + vyz
+               emvir(3,3) = emvir(3,3) + vzz
             end if
    10       continue
          end do
@@ -1535,7 +1558,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir)
+!$OMP DO reduction(+:dem,emvir)
 c
 c     resolve site torques then increment forces and virial
 c
@@ -1566,15 +1589,15 @@ c
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         emvir(1,1) = emvir(1,1) + vxx
+         emvir(2,1) = emvir(2,1) + vxy
+         emvir(3,1) = emvir(3,1) + vxz
+         emvir(1,2) = emvir(1,2) + vxy
+         emvir(2,2) = emvir(2,2) + vyy
+         emvir(3,2) = emvir(3,2) + vyz
+         emvir(1,3) = emvir(1,3) + vxz
+         emvir(2,3) = emvir(2,3) + vyz
+         emvir(3,3) = emvir(3,3) + vzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1585,7 +1608,7 @@ c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,vir)
+!$OMP    DO reduction(+:dem,emvir)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -1603,15 +1626,15 @@ c
             vyy = yi * frcy
             vyz = zi * frcy
             vzz = zi * frcz
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vxy
-            vir(3,1) = vir(3,1) + vxz
-            vir(1,2) = vir(1,2) + vxy
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vyz
-            vir(1,3) = vir(1,3) + vxz
-            vir(2,3) = vir(2,3) + vyz
-            vir(3,3) = vir(3,3) + vzz
+            emvir(1,1) = emvir(1,1) + vxx
+            emvir(2,1) = emvir(2,1) + vxy
+            emvir(3,1) = emvir(3,1) + vxz
+            emvir(1,2) = emvir(1,2) + vxy
+            emvir(2,2) = emvir(2,2) + vyy
+            emvir(3,2) = emvir(3,2) + vyz
+            emvir(1,3) = emvir(1,3) + vxz
+            emvir(2,3) = emvir(2,3) + vyz
+            emvir(3,3) = emvir(3,3) + vzz
          end do
 !$OMP    END DO
       end if
@@ -1687,6 +1710,11 @@ c
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -1778,15 +1806,15 @@ c
             vyy = yi * fy
             vyz = zi * fy
             vzz = zi * fz
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vxy
-            vir(3,1) = vir(3,1) + vxz
-            vir(1,2) = vir(1,2) + vxy
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vyz
-            vir(1,3) = vir(1,3) + vxz
-            vir(2,3) = vir(2,3) + vyz
-            vir(3,3) = vir(3,3) + vzz
+            emvir(1,1) = emvir(1,1) + vxx
+            emvir(2,1) = emvir(2,1) + vxy
+            emvir(3,1) = emvir(3,1) + vxz
+            emvir(1,2) = emvir(1,2) + vxy
+            emvir(2,2) = emvir(2,2) + vyy
+            emvir(3,2) = emvir(3,2) + vyz
+            emvir(1,3) = emvir(1,3) + vxz
+            emvir(2,3) = emvir(2,3) + vyz
+            emvir(3,3) = emvir(3,3) + vzz
          end do
       end if
 c
@@ -1867,15 +1895,15 @@ c
          vyy = 2.0d0*term*(yq*yq+yv) + vterm
          vyz = 2.0d0*term*(yq*zq+yv)
          vzz = 2.0d0*term*(zq*zq+zv) + vterm
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         emvir(1,1) = emvir(1,1) + vxx
+         emvir(2,1) = emvir(2,1) + vxy
+         emvir(3,1) = emvir(3,1) + vxz
+         emvir(1,2) = emvir(1,2) + vxy
+         emvir(2,2) = emvir(2,2) + vyy
+         emvir(3,2) = emvir(3,2) + vyz
+         emvir(1,3) = emvir(1,3) + vxz
+         emvir(2,3) = emvir(2,3) + vyz
+         emvir(3,3) = emvir(3,3) + vzz
       end if
       return
       end
@@ -2322,15 +2350,15 @@ c
                vyy = -yr * frcy
                vyz = -0.5d0 * (zr*frcy+yr*frcz)
                vzz = -zr * frcz
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vxy
-               vir(3,1) = vir(3,1) + vxz
-               vir(1,2) = vir(1,2) + vxy
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vyz
-               vir(1,3) = vir(1,3) + vxz
-               vir(2,3) = vir(2,3) + vyz
-               vir(3,3) = vir(3,3) + vzz
+               emvir(1,1) = emvir(1,1) + vxx
+               emvir(2,1) = emvir(2,1) + vxy
+               emvir(3,1) = emvir(3,1) + vxz
+               emvir(1,2) = emvir(1,2) + vxy
+               emvir(2,2) = emvir(2,2) + vyy
+               emvir(3,2) = emvir(3,2) + vyz
+               emvir(1,3) = emvir(1,3) + vxz
+               emvir(2,3) = emvir(2,3) + vyz
+               emvir(3,3) = emvir(3,3) + vzz
             end if
          end do
 c
@@ -2693,15 +2721,15 @@ c
                vyy = -yr * frcy
                vyz = -0.5d0 * (zr*frcy+yr*frcz)
                vzz = -zr * frcz
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vxy
-               vir(3,1) = vir(3,1) + vxz
-               vir(1,2) = vir(1,2) + vxy
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vyz
-               vir(1,3) = vir(1,3) + vxz
-               vir(2,3) = vir(2,3) + vyz
-               vir(3,3) = vir(3,3) + vzz
+               emvir(1,1) = emvir(1,1) + vxx
+               emvir(2,1) = emvir(2,1) + vxy
+               emvir(3,1) = emvir(3,1) + vxz
+               emvir(1,2) = emvir(1,2) + vxy
+               emvir(2,2) = emvir(2,2) + vyy
+               emvir(3,2) = emvir(3,2) + vyz
+               emvir(1,3) = emvir(1,3) + vxz
+               emvir(2,3) = emvir(2,3) + vyz
+               emvir(3,3) = emvir(3,3) + vzz
             end if
             end do
          end do
@@ -2752,15 +2780,15 @@ c
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         emvir(1,1) = emvir(1,1) + vxx
+         emvir(2,1) = emvir(2,1) + vxy
+         emvir(3,1) = emvir(3,1) + vxz
+         emvir(1,2) = emvir(1,2) + vxy
+         emvir(2,2) = emvir(2,2) + vyy
+         emvir(3,2) = emvir(3,2) + vyz
+         emvir(1,3) = emvir(1,3) + vxz
+         emvir(2,3) = emvir(2,3) + vyz
+         emvir(3,3) = emvir(3,3) + vzz
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -2784,15 +2812,15 @@ c
             vyy = yi * frcy
             vyz = zi * frcy
             vzz = zi * frcz
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vxy
-            vir(3,1) = vir(3,1) + vxz
-            vir(1,2) = vir(1,2) + vxy
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vyz
-            vir(1,3) = vir(1,3) + vxz
-            vir(2,3) = vir(2,3) + vyz
-            vir(3,3) = vir(3,3) + vzz
+            emvir(1,1) = emvir(1,1) + vxx
+            emvir(2,1) = emvir(2,1) + vxy
+            emvir(3,1) = emvir(3,1) + vxz
+            emvir(1,2) = emvir(1,2) + vxy
+            emvir(2,2) = emvir(2,2) + vyy
+            emvir(3,2) = emvir(3,2) + vyz
+            emvir(1,3) = emvir(1,3) + vxz
+            emvir(2,3) = emvir(2,3) + vyz
+            emvir(3,3) = emvir(3,3) + vzz
          end do
       end if
 c
@@ -2863,6 +2891,11 @@ c
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -2954,15 +2987,15 @@ c
             vyy = yi * fy
             vyz = zi * fy
             vzz = zi * fz
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vxy
-            vir(3,1) = vir(3,1) + vxz
-            vir(1,2) = vir(1,2) + vxy
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vyz
-            vir(1,3) = vir(1,3) + vxz
-            vir(2,3) = vir(2,3) + vyz
-            vir(3,3) = vir(3,3) + vzz
+            emvir(1,1) = emvir(1,1) + vxx
+            emvir(2,1) = emvir(2,1) + vxy
+            emvir(3,1) = emvir(3,1) + vxz
+            emvir(1,2) = emvir(1,2) + vxy
+            emvir(2,2) = emvir(2,2) + vyy
+            emvir(3,2) = emvir(3,2) + vyz
+            emvir(1,3) = emvir(1,3) + vxz
+            emvir(2,3) = emvir(2,3) + vyz
+            emvir(3,3) = emvir(3,3) + vzz
          end do
       end if
 c
@@ -3043,15 +3076,15 @@ c
          vyy = 2.0d0*term*(yq*yq+yv) + vterm
          vyz = 2.0d0*term*(yq*zq+yv)
          vzz = 2.0d0*term*(zq*zq+zv) + vterm
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         emvir(1,1) = emvir(1,1) + vxx
+         emvir(2,1) = emvir(2,1) + vxy
+         emvir(3,1) = emvir(3,1) + vxz
+         emvir(1,2) = emvir(1,2) + vxy
+         emvir(2,2) = emvir(2,2) + vyy
+         emvir(3,2) = emvir(3,2) + vyz
+         emvir(1,3) = emvir(1,3) + vxz
+         emvir(2,3) = emvir(2,3) + vyz
+         emvir(3,3) = emvir(3,3) + vzz
       end if
       return
       end
@@ -3184,8 +3217,8 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
 !$OMP& yaxis,zaxis)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir)
-!$OMP DO reduction(+:em,dem,tem,pot,vir)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir)
+!$OMP DO reduction(+:em,dem,tem,pot,emvir)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3509,15 +3542,15 @@ c
                vyy = -yr * frcy
                vyz = -0.5d0 * (zr*frcy+yr*frcz)
                vzz = -zr * frcz
-               vir(1,1) = vir(1,1) + vxx
-               vir(2,1) = vir(2,1) + vxy
-               vir(3,1) = vir(3,1) + vxz
-               vir(1,2) = vir(1,2) + vxy
-               vir(2,2) = vir(2,2) + vyy
-               vir(3,2) = vir(3,2) + vyz
-               vir(1,3) = vir(1,3) + vxz
-               vir(2,3) = vir(2,3) + vyz
-               vir(3,3) = vir(3,3) + vzz
+               emvir(1,1) = emvir(1,1) + vxx
+               emvir(2,1) = emvir(2,1) + vxy
+               emvir(3,1) = emvir(3,1) + vxz
+               emvir(1,2) = emvir(1,2) + vxy
+               emvir(2,2) = emvir(2,2) + vyy
+               emvir(3,2) = emvir(3,2) + vyz
+               emvir(1,3) = emvir(1,3) + vxz
+               emvir(2,3) = emvir(2,3) + vyz
+               emvir(3,3) = emvir(3,3) + vzz
             end if
          end do
 c
@@ -3540,7 +3573,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir)
+!$OMP DO reduction(+:dem,emvir)
 c
 c     resolve site torques then increment forces and virial
 c
@@ -3571,15 +3604,15 @@ c
          vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         emvir(1,1) = emvir(1,1) + vxx
+         emvir(2,1) = emvir(2,1) + vxy
+         emvir(3,1) = emvir(3,1) + vxz
+         emvir(1,2) = emvir(1,2) + vxy
+         emvir(2,2) = emvir(2,2) + vyy
+         emvir(3,2) = emvir(3,2) + vyz
+         emvir(1,3) = emvir(1,3) + vxz
+         emvir(2,3) = emvir(2,3) + vyz
+         emvir(3,3) = emvir(3,3) + vzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -3590,7 +3623,7 @@ c     modify the gradient and virial for charge flux
 c
       if (use_chgflx) then
          call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,vir)
+!$OMP    DO reduction(+:dem,emvir)
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -3608,15 +3641,15 @@ c
             vyy = yi * frcy
             vyz = zi * frcy
             vzz = zi * frcz
-            vir(1,1) = vir(1,1) + vxx
-            vir(2,1) = vir(2,1) + vxy
-            vir(3,1) = vir(3,1) + vxz
-            vir(1,2) = vir(1,2) + vxy
-            vir(2,2) = vir(2,2) + vyy
-            vir(3,2) = vir(3,2) + vyz
-            vir(1,3) = vir(1,3) + vxz
-            vir(2,3) = vir(2,3) + vyz
-            vir(3,3) = vir(3,3) + vzz
+            emvir(1,1) = emvir(1,1) + vxx
+            emvir(2,1) = emvir(2,1) + vxy
+            emvir(3,1) = emvir(3,1) + vxz
+            emvir(1,2) = emvir(1,2) + vxy
+            emvir(2,2) = emvir(2,2) + vyy
+            emvir(3,2) = emvir(3,2) + vyz
+            emvir(1,3) = emvir(1,3) + vxz
+            emvir(2,3) = emvir(2,3) + vyz
+            emvir(3,3) = emvir(3,3) + vzz
          end do
 !$OMP    END DO
       end if
@@ -4012,14 +4045,144 @@ c
 c
 c     increment the total internal virial tensor components
 c
-      vir(1,1) = vir(1,1) + vxx
-      vir(2,1) = vir(2,1) + vxy
-      vir(3,1) = vir(3,1) + vxz
-      vir(1,2) = vir(1,2) + vxy
-      vir(2,2) = vir(2,2) + vyy
-      vir(3,2) = vir(3,2) + vyz
-      vir(1,3) = vir(1,3) + vxz
-      vir(2,3) = vir(2,3) + vyz
-      vir(3,3) = vir(3,3) + vzz
+      emvir(1,1) = emvir(1,1) + vxx
+      emvir(2,1) = emvir(2,1) + vxy
+      emvir(3,1) = emvir(3,1) + vxz
+      emvir(1,2) = emvir(1,2) + vxy
+      emvir(2,2) = emvir(2,2) + vyy
+      emvir(3,2) = emvir(3,2) + vyz
+      emvir(1,3) = emvir(1,3) + vxz
+      emvir(2,3) = emvir(2,3) + vyz
+      emvir(3,3) = emvir(3,3) + vzz
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine empole1e  --  dual topology multipole derivs  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "empole1e" calculates the electrostatic energy and derivatives
+c     due to atomic multipole interactions with dual topology method
+c
+c
+      subroutine empole1e
+      use atoms
+      use energi
+      use deriv
+      use limits
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 em1,em0
+      real*8 elambdaorig
+      real*8 elambdaexp
+      real*8 emvir1(3,3)
+      real*8 emvir0(3,3)
+      real*8, allocatable :: dem1(:,:)
+      real*8, allocatable :: dem0(:,:)
+      character*6 mode
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      
+      allocate (dem1(3,n))
+      allocate (dem0(3,n))
+c
+c     compute energy of the lambda = 1 state
+c
+      elambdaorig = elambda
+      elambda = 1.0d0
+      call altelec
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+c
+c     copy energy, force, and virial of the lambda = 1 state
+c
+      em1 = em
+      do i = 1, n
+         do j = 1, 3
+            dem1(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir1(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     compute energy, force, and virial of the lambda = 0 state
+c
+      elambda = 0.0d0
+      call altelec
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+c
+c     copy energy, force, and virial of the lambda = 0 state
+c
+      em0 = em
+      do i = 1, n
+         do j = 1, 3
+            dem0(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir0(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     set original elambda
+c
+      elambda = elambdaorig
+c
+c     interpolate energy, force, and virial
+c
+      elambdaexp = elambda**emdtexp
+      em = elambdaexp * em1 + (1.0d0 - elambdaexp) * em0
+      do i = 1, n
+         do j = 1, 3
+            dem(j,i) = elambdaexp * dem1(j,i)
+     &                 + (1.0d0 - elambdaexp) * dem0(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = elambdaexp * emvir1(j,i)
+     &                 + (1.0d0 - elambdaexp) * emvir0(j,i)
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dem1)
+      deallocate (dem0)
       return
       end
