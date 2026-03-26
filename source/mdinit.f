@@ -127,7 +127,7 @@ c
             read (string,*,err=10,end=10)  nfree
          else if (keyword(1:15) .eq. 'REMOVE-INERTIA ') then
             read (string,*,err=10,end=10)  irest
-         else if (keyword(1:12) .eq. 'UNWRAP-COORDS ') then
+         else if (keyword(1:14) .eq. 'UNWRAP-COORDS ') then
             use_wrap = .false.
          else if (keyword(1:14) .eq. 'SAVE-VELOCITY ') then
             velsave = .true.
