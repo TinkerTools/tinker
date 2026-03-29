@@ -18,6 +18,7 @@ c     and lambda derivatives
 c
 c
       subroutine empole4
+      use dlmda
       use energi
       use extfld
       use limits
@@ -31,7 +32,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt) then
+      if (use_emdt .and. use_dlmda) then
          call empole4e
       else if (use_ewald) then
          if (use_mlist) then

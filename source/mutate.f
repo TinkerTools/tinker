@@ -97,10 +97,12 @@ c
       scexp = 5.0d0
       scalpha = 0.7d0
 c
-c     set defaults for use of dual topology
+c     set defaults for use of interaction scaling and dual topology
 c
+      use_emis = .true.
+      use_epis = .false.
       use_emdt = .false.
-      use_epdt = .false.
+      use_epdt = .true.
 c
 c     set default dual topology interpolation exponent
 c
@@ -202,9 +204,17 @@ c
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  epdtexp
+         else if (keyword(1:13) .eq. 'MTP-INTSCALE ') then
+            use_emis = .true.
+            use_emdt = .false.
+         else if (keyword(1:13) .eq. 'POL-INTSCALE ') then
+            use_epis = .true.
+            use_epdt = .false.
          else if (keyword(1:13) .eq. 'MTP-DUALTOPO ') then
+            use_emis = .false.
             use_emdt = .true.
          else if (keyword(1:13) .eq. 'POL-DUALTOPO ') then
+            use_epis = .false.
             use_epdt = .true.
          else if (keyword(1:5) .eq. 'OSRW ') then
             use_dlmda = .true.

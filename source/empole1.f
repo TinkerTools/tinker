@@ -17,6 +17,7 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
+      use dlmda
       use energi
       use extfld
       use limits
@@ -30,7 +31,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt) then
+      if (use_emdt .and. use_dlmda) then
          call empole1e
       else if (use_ewald) then
          if (use_mlist) then

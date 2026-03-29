@@ -26,7 +26,7 @@ c
 c
 c     choose the method to sum over polarization interactions
 c
-      if (use_epdt) then
+      if (use_epdt .and. use_dlmda) then
          call epolar0f
       else
          pairwise = .false.
@@ -128,7 +128,7 @@ c     rotate the multipole components into the global frame
 c
       if (use_dlmda .and. .not.use_epdt) then
          call rotpole ('MPORG')
-      else if (.not. use_mpole) then
+      else if (.not.use_mpole .or. use_emis) then
          call rotpole ('MPOLE')
       end if
 c
@@ -542,6 +542,7 @@ c
       use extfld
       use mplpot
       use mpole
+      use mutant
       use neigh
       use polar
       use polgrp
@@ -590,7 +591,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -837,6 +838,7 @@ c
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use polar
       use polpot
@@ -873,7 +875,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1118,9 +1120,9 @@ c
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  sr3 = dmpik(3) * rr3
-                  sr5 = dmpik(5) * rr5
-                  sr7 = dmpik(7) * rr7
+                  sr3 = scalek * dmpik(3) * rr3
+                  sr5 = scalek * dmpik(5) * rr5
+                  sr7 = scalek * dmpik(7) * rr7
                   sr3 = dmpe(3) - rr3 + sr3
                   sr5 = dmpe(5) - rr5 + sr5
                   sr7 = dmpe(7) - rr7 + sr7
@@ -1418,6 +1420,7 @@ c
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use polar
       use polpot
@@ -1454,7 +1457,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1711,9 +1714,9 @@ c
                   rr3 = f / (r*r2)
                   rr5 = 3.0d0 * rr3 / r2
                   rr7 = 5.0d0 * rr5 / r2
-                  sr3 = dmpik(3) * rr3
-                  sr5 = dmpik(5) * rr5
-                  sr7 = dmpik(7) * rr7
+                  sr3 = scalek * dmpik(3) * rr3
+                  sr5 = scalek * dmpik(5) * rr5
+                  sr7 = scalek * dmpik(7) * rr7
                   sr3 = dmpe(3) - rr3 + sr3
                   sr5 = dmpe(5) - rr5 + sr5
                   sr7 = dmpe(7) - rr7 + sr7
@@ -1828,6 +1831,7 @@ c
       use limits
       use math
       use mpole
+      use mutant
       use polar
       use polpot
       use potent
@@ -1851,7 +1855,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c

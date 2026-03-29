@@ -27,8 +27,10 @@ c     elambda   state weighting value for electrostatic potentials
 c     tlambda   state weighting value for torsional potential
 c     scexp     scale factor for soft core buffered 14-7 potential
 c     scalpha   scale factor for soft core buffered 14-7 potential
-c     use_emdt  logical flag governing use of multipole dual topology
-c     use_epdt  logical flag governing use of polarization dual topology
+c     use_emis  logical flag for use of multipole interaction scaling
+c     use_epis  logical flag for use of polarization interaction scaling
+c     use_emdt  logical flag for use of multipole dual topology
+c     use_epdt  logical flag for use of polarization dual topology
 c     mut       true if an atom is to be mutated, false otherwise
 c
 c
@@ -49,6 +51,8 @@ c
       real*8 tlambda
       real*8 scexp
       real*8 scalpha
+      logical use_emis
+      logical use_epis
       logical use_emdt
       logical use_epdt
       logical, allocatable :: mut(:)

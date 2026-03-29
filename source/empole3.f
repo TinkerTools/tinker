@@ -17,6 +17,7 @@ c     multipole interactions, and partitions the energy among atoms
 c
 c
       subroutine empole3
+      use dlmda
       use energi
       use extfld
       use inform
@@ -30,7 +31,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt) then
+      if (use_emdt .and. use_dlmda) then
          call empole3e
       else if (use_ewald) then
          if (use_mlist) then

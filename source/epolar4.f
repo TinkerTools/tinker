@@ -17,6 +17,7 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine epolar4
+      use dlmda
       use iounit
       use limits
       use mplpot
@@ -38,23 +39,19 @@ c
 c
 c     choose the method to sum over polarization interactions
 c
-      if (use_epdt) then
+      if (use_epdt .and. use_dlmda) then
          call epolar4f
       else
          if (use_ewald) then
             if (use_mlist) then
-               print*, "epolar4d"
                call epolar4d
             else
-               print*, "epolar4c"
                call epolar4c
             end if
          else
             if (use_mlist) then
-               print*, "epolar4b"
                call epolar4b
             else
-               print*, "epolar4a"
                call epolar4a
             end if
          end if
@@ -235,7 +232,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPORG')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPORG')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -568,37 +565,39 @@ c
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
                   e = term1*psr3 + term2*psr5 + term3*psr7
-                  call damptholed (i,k,7,r,ldmpik)
-                  lrr3 = ldmpik(3) / (r*r2)
-                  lrr5 = 3.0d0 * ldmpik(5) / (r*r2*r2)
-                  lrr7 = 15.0d0 * ldmpik(7) / (r*r2*r2*r2)
-                  fid(1) = -xr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
-     &                        - lrr3*dkx + 2.0d0*lrr5*qkx
-                  fid(2) = -yr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
-     &                        - lrr3*dky + 2.0d0*lrr5*qky
-                  fid(3) = -zr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
-     &                        - lrr3*dkz + 2.0d0*lrr5*qkz
-                  fkd(1) =  xr*(lrr3*ci+lrr5*dir+lrr7*qir)
-     &                        - lrr3*dix - 2.0d0*lrr5*qix
-                  fkd(2) =  yr*(lrr3*ci+lrr5*dir+lrr7*qir)
-     &                        - lrr3*diy - 2.0d0*lrr5*qiy
-                  fkd(3) =  zr*(lrr3*ci+lrr5*dir+lrr7*qir)
-     &                        - lrr3*diz - 2.0d0*lrr5*qiz
-                  fip(1) = pscale(k) * fid(1)
-                  fip(2) = pscale(k) * fid(2)
-                  fip(3) = pscale(k) * fid(3)
-                  fkp(1) = pscale(k) * fkd(1)
-                  fkp(2) = pscale(k) * fkd(2)
-                  fkp(3) = pscale(k) * fkd(3)
-                  fid(1) = dscale(k) * fid(1)
-                  fid(2) = dscale(k) * fid(2)
-                  fid(3) = dscale(k) * fid(3)
-                  fkd(1) = dscale(k) * fkd(1)
-                  fkd(2) = dscale(k) * fkd(2)
-                  fkd(3) = dscale(k) * fkd(3)
-                  call dampthole (i,k,5,r,ldmpik)
-                  ldmpik(3) = uscale(k) * ldmpik(3)
-                  ldmpik(5) = uscale(k) * ldmpik(5)
+                  if (muti .or. mutk) then
+                     call damptholed (i,k,7,r,ldmpik)
+                     lrr3 = ldmpik(3) / (r*r2)
+                     lrr5 = 3.0d0 * ldmpik(5) / (r*r2*r2)
+                     lrr7 = 15.0d0 * ldmpik(7) / (r*r2*r2*r2)
+                     fid(1) = -xr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
+     &                           - lrr3*dkx + 2.0d0*lrr5*qkx
+                     fid(2) = -yr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
+     &                           - lrr3*dky + 2.0d0*lrr5*qky
+                     fid(3) = -zr*(lrr3*ck-lrr5*dkr+lrr7*qkr)
+     &                           - lrr3*dkz + 2.0d0*lrr5*qkz
+                     fkd(1) =  xr*(lrr3*ci+lrr5*dir+lrr7*qir)
+     &                           - lrr3*dix - 2.0d0*lrr5*qix
+                     fkd(2) =  yr*(lrr3*ci+lrr5*dir+lrr7*qir)
+     &                           - lrr3*diy - 2.0d0*lrr5*qiy
+                     fkd(3) =  zr*(lrr3*ci+lrr5*dir+lrr7*qir)
+     &                           - lrr3*diz - 2.0d0*lrr5*qiz
+                     fip(1) = pscale(k) * fid(1)
+                     fip(2) = pscale(k) * fid(2)
+                     fip(3) = pscale(k) * fid(3)
+                     fkp(1) = pscale(k) * fkd(1)
+                     fkp(2) = pscale(k) * fkd(2)
+                     fkp(3) = pscale(k) * fkd(3)
+                     fid(1) = dscale(k) * fid(1)
+                     fid(2) = dscale(k) * fid(2)
+                     fid(3) = dscale(k) * fid(3)
+                     fkd(1) = dscale(k) * fkd(1)
+                     fkd(2) = dscale(k) * fkd(2)
+                     fkd(3) = dscale(k) * fkd(3)
+                     call dampthole (i,k,5,r,ldmpik)
+                     ldmpik(3) = uscale(k) * ldmpik(3)
+                     ldmpik(5) = uscale(k) * ldmpik(5)
+                  end if
 c
 c     apply charge penetration damping to scale factors
 c
@@ -626,14 +625,16 @@ c
      &                   - dkr*uir*rr5k - dir*ukr*rr5i
      &                   + qkr*uir*rr7k - qir*ukr*rr7i
                end if
-               lrr3 = -ldmpik(3) / (r*r2)
-               lrr5 = 3.0d0 * ldmpik(5) / (r*r2*r2)
-               ufid(1) = lrr3*ukx + lrr5*ukr*xr
-               ufid(2) = lrr3*uky + lrr5*ukr*yr
-               ufid(3) = lrr3*ukz + lrr5*ukr*zr
-               ufkd(1) = lrr3*uix + lrr5*uir*xr
-               ufkd(2) = lrr3*uiy + lrr5*uir*yr
-               ufkd(3) = lrr3*uiz + lrr5*uir*zr
+               if (muti .or. mutk) then
+                  lrr3 = -ldmpik(3) / (r*r2)
+                  lrr5 = 3.0d0 * ldmpik(5) / (r*r2*r2)
+                  ufid(1) = lrr3*ukx + lrr5*ukr*xr
+                  ufid(2) = lrr3*uky + lrr5*ukr*yr
+                  ufid(3) = lrr3*ukz + lrr5*ukr*zr
+                  ufkd(1) = lrr3*uix + lrr5*uir*xr
+                  ufkd(2) = lrr3*uiy + lrr5*uir*yr
+                  ufkd(3) = lrr3*uiz + lrr5*uir*zr
+               end if
                dscalelmda = 0.0d0
                if (muti .and. mutk) then
                   dscalelmda = 2.0d0 * elambda

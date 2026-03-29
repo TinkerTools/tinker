@@ -17,6 +17,7 @@ c     and first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine epolar1
+      use dlmda
       use iounit
       use limits
       use mplpot
@@ -38,7 +39,7 @@ c
 c
 c     choose the method to sum over polarization interactions
 c
-      if (use_epdt) then
+      if (use_epdt .and. use_dlmda) then
          call epolar1f
       else
          if (use_ewald) then
@@ -97,6 +98,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polopt
@@ -213,7 +215,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2542,6 +2544,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use neigh
       use polar
       use polgrp
@@ -2659,7 +2662,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -3928,6 +3931,7 @@ c
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use polar
       use polpot
@@ -3989,7 +3993,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -6788,6 +6792,7 @@ c
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use polar
       use polpot
@@ -6849,7 +6854,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not. use_mpole)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
