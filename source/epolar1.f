@@ -8593,10 +8593,12 @@ c
       use boxes
       use chgpot
       use deriv
+      use dlmda
       use ewald
       use math
       use mpole
       use mrecip
+      use mutant
       use pme
       use polar
       use polopt
@@ -8645,6 +8647,7 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical reusegrid
 c
 c     indices into the electrostatic field array
 c
@@ -8670,7 +8673,9 @@ c
 c
 c     remove scalar sum virial from prior multipole FFT
 c
-      if (use_mpole .and. aewald.eq.aeewald) then
+      reusegrid = .true.
+      if (use_dlmda .and. use_emis) reusegrid = .false.
+      if (use_mpole .and. aewald.eq.aeewald .and. reusegrid) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz
@@ -9759,6 +9764,7 @@ c
 c     set original elambda
 c
       elambda = elambdaorig
+      call altelec
 c
 c     interpolate energy, force, and virial
 c

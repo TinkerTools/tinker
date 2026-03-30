@@ -9787,6 +9787,7 @@ c
       use mutant
       use polpot
       use virial
+      use polar
       implicit none
       integer i,j
       real*8 ep1,ep0
@@ -9881,6 +9882,7 @@ c
 c     set original elambda
 c
       elambda = elambdaorig
+      call altelec
 c
 c     interpolate energy, force, and virial
 c

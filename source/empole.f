@@ -2028,6 +2028,7 @@ c
 c     set original elambda
 c
       elambda = elambdaorig
+      call altelec
 c
 c     interpolate energy
 c

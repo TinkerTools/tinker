@@ -2276,11 +2276,13 @@ c
       use bound
       use boxes
       use chgpot
+      use dlmda
       use energi
       use ewald
       use math
       use mpole
       use mrecip
+      use mutant
       use pme
       use polar
       use polpot
@@ -2298,6 +2300,7 @@ c
       real*8 term,pterm
       real*8 a(3,3)
       real*8, allocatable :: fuind(:,:)
+      logical reusegrid
 c
 c
 c     return if the Ewald coefficient is zero
@@ -2307,7 +2310,10 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (.not.use_mpole .or. aewald.ne.aeewald) then
+      reusegrid = .true.
+      if (use_dlmda .and. use_emis) reusegrid = .false.
+      if (.not.use_mpole .or. aewald.ne.aeewald
+     &                               .or. .not.reusegrid) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
          end if
@@ -2553,6 +2559,7 @@ c
 c     set original elambda
 c
       elambda = elambdaorig
+      call altelec
 c
 c     interpolate energy
 c
