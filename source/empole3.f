@@ -17,13 +17,11 @@ c     multipole interactions, and partitions the energy among atoms
 c
 c
       subroutine empole3
-      use dlmda
       use energi
       use extfld
       use inform
       use iounit
       use limits
-      use mutant
       implicit none
       real*8 exf
       character*6 mode
@@ -31,9 +29,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt .and. use_dlmda) then
-         call empole3e
-      else if (use_ewald) then
+      if (use_ewald) then
          if (use_mlist) then
             call empole3d
          else
@@ -2340,116 +2336,5 @@ c
          end do
       end do
       em = em + e
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole3e  --  dual topology multipole energy  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "empole3e" calculates the electrostatic energy due to atomic
-c     multipole interactions and partitions the energy among atoms
-c     with dual topology method
-c
-c
-      subroutine empole3e
-      use action
-      use analyz
-      use atoms
-      use energi
-      use limits
-      use mutant
-      implicit none
-      integer i
-      integer nem1,nem0
-      real*8 em1,em0
-      real*8 elambdaorig
-      real*8 elambdaexp
-      real*8, allocatable :: aem1(:)
-      real*8, allocatable :: aem0(:)
-      character*6 mode
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      
-      allocate (aem1(n))
-      allocate (aem0(n))
-c
-c     compute energy of the lambda = 1 state
-c
-      elambdaorig = elambda
-      elambda = 1.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole3d
-         else
-            call empole3c
-         end if
-      else
-         if (use_mlist) then
-            call empole3b
-         else
-            call empole3a
-         end if
-      end if
-c
-c     copy energy of the lambda = 1 state
-c
-      em1 = em
-      nem1 = nem
-      do i = 1, n
-         aem1(i) = aem(i)
-      end do
-c
-c     compute energy of the lambda = 0 state
-c
-      elambda = 0.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole3d
-         else
-            call empole3c
-         end if
-      else
-         if (use_mlist) then
-            call empole3b
-         else
-            call empole3a
-         end if
-      end if
-c
-c     copy energy of the lambda = 0 state
-c
-      em0 = em
-      nem0 = nem
-      do i = 1, n
-         aem0(i) = aem(i)
-      end do
-c
-c     set original elambda
-c
-      elambda = elambdaorig
-      call altelec
-c
-c     interpolate energy
-c
-      elambdaexp = elambda**emdtexp
-      em = elambdaexp * em1 + (1.0d0 - elambdaexp) * em0
-      do i = 1, n
-         aem(i) = elambdaexp * aem1(i) + (1.0d0 - elambdaexp) * aem0(i)
-      end do
-      nem = max(nem1,nem0)
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aem1)
-      deallocate (aem0)
       return
       end

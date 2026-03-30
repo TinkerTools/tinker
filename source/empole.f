@@ -17,11 +17,9 @@ c     multipole interactions
 c
 c
       subroutine empole
-      use dlmda
       use energi
       use extfld
       use limits
-      use mutant
       implicit none
       real*8 exf
       character*6 mode
@@ -29,9 +27,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt .and. use_dlmda) then
-         call empole0e
-      else if (use_ewald) then
+      if (use_ewald) then
          if (use_mlist) then
             call empole0d
          else
@@ -1954,85 +1950,5 @@ c
          end do
       end do
       em = em + e
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole0e  --  dual topology multipole energy  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "empole0e" calculates the electrostatic energy due to atomic
-c     multipole interactions with dual topology method
-c
-c
-      subroutine empole0e
-      use energi
-      use limits
-      use mutant
-      implicit none
-      real*8 em1,em0
-      real*8 elambdaorig
-      real*8 elambdaexp
-      character*6 mode
-c
-c
-c     compute energy of the lambda = 1 state
-c
-      elambdaorig = elambda
-      elambda = 1.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole0d
-         else
-            call empole0c
-         end if
-      else
-         if (use_mlist) then
-            call empole0b
-         else
-            call empole0a
-         end if
-      end if
-c
-c     copy energy of the lambda = 1 state
-c
-      em1 = em
-c
-c     compute energy of the lambda = 0 state
-c
-      elambda = 0.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole0d
-         else
-            call empole0c
-         end if
-      else
-         if (use_mlist) then
-            call empole0b
-         else
-            call empole0a
-         end if
-      end if
-c
-c     copy energy of the lambda = 0 state
-c
-      em0 = em
-c
-c     set original elambda
-c
-      elambda = elambdaorig
-      call altelec
-c
-c     interpolate energy
-c
-      elambdaexp = elambda**emdtexp
-      em = elambdaexp * em1 + (1.0d0 - elambdaexp) * em0
       return
       end

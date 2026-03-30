@@ -21,7 +21,6 @@ c
       use iounit
       use limits
       use mplpot
-      use mutant
       use polpot
       use virial
       implicit none
@@ -39,7 +38,7 @@ c
 c
 c     choose the method to sum over polarization interactions
 c
-      if (use_epdt .and. use_dlmda) then
+      if (use_dlmda) then
          call epolar1f
       else
          if (use_ewald) then
@@ -94,11 +93,11 @@ c
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use molcul
       use mplpot
       use mpole
-      use mutant
       use polar
       use polgrp
       use polopt
@@ -215,7 +214,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2540,11 +2539,11 @@ c
       use chgpot
       use couple
       use deriv
+      use dlmda
       use energi
       use molcul
       use mplpot
       use mpole
-      use mutant
       use neigh
       use polar
       use polgrp
@@ -2662,7 +2661,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -3927,11 +3926,11 @@ c
       use boxes
       use chgpot
       use deriv
+      use dlmda
       use energi
       use ewald
       use math
       use mpole
-      use mutant
       use pme
       use polar
       use polpot
@@ -3993,7 +3992,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -6788,11 +6787,11 @@ c
       use boxes
       use chgpot
       use deriv
+      use dlmda
       use energi
       use ewald
       use math
       use mpole
-      use mutant
       use pme
       use polar
       use polpot
@@ -6854,7 +6853,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_emis)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -8598,7 +8597,6 @@ c
       use math
       use mpole
       use mrecip
-      use mutant
       use pme
       use polar
       use polopt
@@ -8647,7 +8645,6 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
-      logical reusegrid
 c
 c     indices into the electrostatic field array
 c
@@ -8673,9 +8670,7 @@ c
 c
 c     remove scalar sum virial from prior multipole FFT
 c
-      reusegrid = .true.
-      if (use_dlmda .and. use_emis) reusegrid = .false.
-      if (use_mpole .and. aewald.eq.aeewald .and. reusegrid) then
+      if (use_mpole .and. aewald.eq.aeewald .and. .not.use_dlmda) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz

@@ -71,8 +71,11 @@ c     set up the structure and mechanics calculation
 c
       call initial
       call getxyz
-      use_dlmda = .true.
       call mechanic
+c
+c     set flag to use lambda derivative
+c
+      use_dlmda = .true.
 c
 c     decide whether to do an analytical derivative calculation
 c

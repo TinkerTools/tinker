@@ -18,11 +18,9 @@ c     and lambda derivatives
 c
 c
       subroutine empole4
-      use dlmda
       use energi
       use extfld
       use limits
-      use mutant
       use virial
       implicit none
       integer i,j
@@ -32,9 +30,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt .and. use_dlmda) then
-         call empole4e
-      else if (use_ewald) then
+      if (use_ewald) then
          if (use_mlist) then
             call empole4d
          else
@@ -189,7 +185,7 @@ c
             emvir(j,i) = 0.0d0
          end do
       end do
-      if (npole .eq. 0)  return  
+      if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
 c
@@ -4829,158 +4825,5 @@ c
       emvir(1,3) = emvir(1,3) + vxz
       emvir(2,3) = emvir(2,3) + vyz
       emvir(3,3) = emvir(3,3) + vzz
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine empole4e  --  dual topology lambda derivs  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "empole4e" calculates the electrostatic energy, first
-c     derivatives with respect to Cartesian coordinates, and 
-c     lambda derivatives with dual topology method
-c
-c
-      subroutine empole4e
-      use atoms
-      use energi
-      use deriv
-      use dlmda
-      use limits
-      use mutant
-      use virial
-      implicit none
-      integer i,j
-      real*8 em1,em0
-      real*8 elambdaorig
-      real*8 elambdaexp
-      real*8 delambdaexp
-      real*8 d2elambdaexp
-      real*8 emvir1(3,3)
-      real*8 emvir0(3,3)
-      real*8, allocatable :: dem1(:,:)
-      real*8, allocatable :: dem0(:,:)
-      character*6 mode
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      
-      allocate (dem1(3,n))
-      allocate (dem0(3,n))
-c
-c     compute energy of the lambda = 1 state
-c
-      elambdaorig = elambda
-      elambda = 1.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
-c
-c     copy energy, force, and virial of the lambda = 1 state
-c
-      em1 = em
-      do i = 1, n
-         do j = 1, 3
-            dem1(j,i) = dem(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir1(j,i) = emvir(j,i)
-         end do
-      end do
-c
-c     compute energy, force, and virial of the lambda = 0 state
-c
-      elambda = 0.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
-c
-c     copy energy, force, and virial of the lambda = 0 state
-c
-      em0 = em
-      do i = 1, n
-         do j = 1, 3
-            dem0(j,i) = dem(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir0(j,i) = emvir(j,i)
-         end do
-      end do
-c
-c     set original elambda
-c
-      elambda = elambdaorig
-      call altelec
-c
-c     interpolate energy, force, and virial
-c
-      elambdaexp = elambda**emdtexp
-      em = elambdaexp * em1 + (1.0d0 - elambdaexp) * em0
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = elambdaexp * dem1(j,i)
-     &                 + (1.0d0 - elambdaexp) * dem0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir(j,i) = elambdaexp * emvir1(j,i)
-     &                 + (1.0d0 - elambdaexp) * emvir0(j,i)
-         end do
-      end do
-c
-c     compute lambda derivative
-c
-      delambdaexp = emdtexp * elambda**(emdtexp-1)
-      if (emdtexp .gt. 1) then
-         d2elambdaexp =  dble(emdtexp*(emdtexp-1))*elambda**(emdtexp-2)
-      else
-         d2elambdaexp = 0.0d0
-      end if
-      demlmda = delambdaexp * (em1 - em0)
-      demlmda2 = d2elambdaexp * (em1 - em0)
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = elambdaexp * dem1(j,i)
-     &                 + (1.0d0 - elambdaexp) * dem0(j,i)
-            dldem(j,i) = delambdaexp * (dem1(j,i) - dem0(j,i))
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (dem1)
-      deallocate (dem0)
       return
       end

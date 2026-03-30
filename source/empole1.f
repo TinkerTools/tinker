@@ -17,11 +17,9 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
-      use dlmda
       use energi
       use extfld
       use limits
-      use mutant
       use virial
       implicit none
       integer i,j
@@ -31,9 +29,7 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt .and. use_dlmda) then
-         call empole1e
-      else if (use_ewald) then
+      if (use_ewald) then
          if (use_mlist) then
             call empole1d
          else
@@ -4055,136 +4051,5 @@ c
       emvir(1,3) = emvir(1,3) + vxz
       emvir(2,3) = emvir(2,3) + vyz
       emvir(3,3) = emvir(3,3) + vzz
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole1e  --  dual topology multipole derivs  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "empole1e" calculates the electrostatic energy and derivatives
-c     due to atomic multipole interactions with dual topology method
-c
-c
-      subroutine empole1e
-      use atoms
-      use energi
-      use deriv
-      use limits
-      use mutant
-      use virial
-      implicit none
-      integer i,j
-      real*8 em1,em0
-      real*8 elambdaorig
-      real*8 elambdaexp
-      real*8 emvir1(3,3)
-      real*8 emvir0(3,3)
-      real*8, allocatable :: dem1(:,:)
-      real*8, allocatable :: dem0(:,:)
-      character*6 mode
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      
-      allocate (dem1(3,n))
-      allocate (dem0(3,n))
-c
-c     compute energy of the lambda = 1 state
-c
-      elambdaorig = elambda
-      elambda = 1.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
-c
-c     copy energy, force, and virial of the lambda = 1 state
-c
-      em1 = em
-      do i = 1, n
-         do j = 1, 3
-            dem1(j,i) = dem(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir1(j,i) = emvir(j,i)
-         end do
-      end do
-c
-c     compute energy, force, and virial of the lambda = 0 state
-c
-      elambda = 0.0d0
-      call altelec
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
-c
-c     copy energy, force, and virial of the lambda = 0 state
-c
-      em0 = em
-      do i = 1, n
-         do j = 1, 3
-            dem0(j,i) = dem(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir0(j,i) = emvir(j,i)
-         end do
-      end do
-c
-c     set original elambda
-c
-      elambda = elambdaorig
-      call altelec
-c
-c     interpolate energy, force, and virial
-c
-      elambdaexp = elambda**emdtexp
-      em = elambdaexp * em1 + (1.0d0 - elambdaexp) * em0
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = elambdaexp * dem1(j,i)
-     &                 + (1.0d0 - elambdaexp) * dem0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir(j,i) = elambdaexp * emvir1(j,i)
-     &                 + (1.0d0 - elambdaexp) * emvir0(j,i)
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (dem1)
-      deallocate (dem0)
       return
       end
