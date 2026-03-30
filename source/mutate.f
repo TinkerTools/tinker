@@ -58,6 +58,7 @@ c
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
       real*8 eps
+      logical seteplambda
       character*20 keyword
       character*240 record
       character*240 string
@@ -91,6 +92,11 @@ c
       elambda = 1.0d0
       tlambda = 1.0d0
 c
+c     set defaults for lambda scaling for lambda derivatives
+c
+      seteplambda = .false.
+      eplambda = 1.0d0
+c
 c     set defaults for vdw coupling type and soft core vdw
 c
       vcouple = 0
@@ -99,7 +105,6 @@ c
 c
 c     set default dual topology interpolation exponent
 c
-      emdtexp = 2
       epdtexp = 2
 c
 c     zero out number of hybrid atoms and mutated torsions
@@ -130,6 +135,10 @@ c
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
+         else if (keyword(1:11) .eq. 'POL-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=30)  eplambda
+            seteplambda = .true.
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -191,9 +200,6 @@ c
                itbnd(2,ntbnd) = list(k+1)
                k = k + 2
             end do
-         else if (keyword(1:17) .eq. 'MTP-DUALTOPO-EXP ') then
-            string = record(next:240)
-            read (string,*,err=30)  emdtexp
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  epdtexp
@@ -202,6 +208,10 @@ c
          end if
    30    continue
       end do
+c
+c     set eplambda to elambda if no values given
+c
+      if (.not. seteplambda)  eplambda = elambda
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -438,6 +448,66 @@ c
                aflx(2,i) = aflxorig(2,i) * elambda
                abflx(1,i) = abflxorig(1,i) * elambda
                abflx(2,i) = abflxorig(2,i) * elambda
+            end if
+         end do
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine altpolr  --  mutated polarization parameters  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "altpolr" constructs mutated polarization parameters based
+c     on the lambda mutation parameter "eplambda"
+c
+c
+      subroutine altpolr
+      use chgpen
+      use dlmda
+      use mplpot
+      use mpole
+      use mutant
+      use polar
+      use potent
+      implicit none
+      integer i,j,k
+      integer k1,k2
+      integer ia,ib,ic
+c
+c
+c     set scaled parameters for atomic multipole models
+c
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            if (mut(k)) then
+               do j = 1, 13
+                  pole(j,k) = poleorig(j,k) * eplambda
+               end do
+               mono0(k) = pole(1,k)
+               if (use_chgpen) then
+                  pcore(k) = pcoreorig(k) * eplambda
+                  pval(k) = pvalorig(k) * eplambda
+                  pval0(k) = pval(k)
+               end if
+            end if
+         end do
+      end if
+c
+c     set scaled parameters for atomic polarizability models
+c
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            if (mut(k)) then
+               polarity(k) = polarityorig(k) * eplambda
+               douind(k) = douindorig(k)
+               if (eplambda .eq. 0.0d0)  douind(k) = .false.
             end if
          end do
       end if

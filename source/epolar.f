@@ -2122,47 +2122,24 @@ c
       use mutant
       implicit none
       real*8 ep1,ep0
-      real*8 elambdaorig
-      real*8 elambdaexp
+      real*8 eplambdaorig
+      real*8 eplambdaexp
       logical pairwise
       character*6 mode
 c
+c
+c     copy original eplambda
+c
+      eplambdaorig = eplambda
 c
 c     set pairwise logical value
 c
       pairwise = .false.
 c
-c     compute energy of the lambda = 1 state
-c
-      elambdaorig = elambda
-      elambda = 1.0d0
-      call altelec
-      if (pairwise) then
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar0d
-            else
-               call epolar0c
-            end if
-         else
-            if (use_mlist) then
-               call epolar0b
-            else
-               call epolar0a
-            end if
-         end if
-      else
-         call epolar0e
-      end if
-c
-c     copy energy of the lambda = 1 state
-c
-      ep1 = ep
-c
 c     compute energy of the lambda = 0 state
 c
-      elambda = 0.0d0
-      call altelec
+      eplambda = 0.0d0
+      call altpolr
       if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
@@ -2185,14 +2162,44 @@ c     copy energy of the lambda = 0 state
 c
       ep0 = ep
 c
-c     set original elambda
+c     compute energy of the lambda = 1 state
 c
-      elambda = elambdaorig
+      if (eplambdaorig .eq. 0.0d0) then
+         ep1 = ep0
+      else
+         eplambda = 1.0d0
+         call altpolr
+         if (pairwise) then
+            if (use_ewald) then
+               if (use_mlist) then
+                  call epolar0d
+               else
+                  call epolar0c
+               end if
+            else
+               if (use_mlist) then
+                  call epolar0b
+               else
+                  call epolar0a
+               end if
+            end if
+         else
+            call epolar0e
+         end if
+c
+c     copy energy of the lambda = 1 state
+c
+         ep1 = ep
+      end if
+c
+c     set original eplambda
+c
+      eplambda = eplambdaorig
       call altelec
 c
 c     interpolate energy
 c
-      elambdaexp = elambda**epdtexp
-      ep = elambdaexp * ep1 + (1.0d0 - elambdaexp) * ep0
+      eplambdaexp = eplambda**epdtexp
+      ep = eplambdaexp * ep1 + (1.0d0 - eplambdaexp) * ep0
       return
       end

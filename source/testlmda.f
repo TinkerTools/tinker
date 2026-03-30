@@ -47,7 +47,8 @@ c
       real*8 em2,em1,em0
       real*8 ep2,ep1,ep0
       real*8 ev2,ev1,ev0
-      real*8 oldvl,oldel
+      real*8 oldvdl,oldeml
+      real*8 oldepl
       real*8 denorm,ndenorm
       real*8 totnorm,ntotnorm,rms,nrms
       real*8, allocatable :: derivs(:,:)
@@ -190,24 +191,28 @@ c
 c     compute the numerical lambda derivatives
 c
          if (donumer) then
-            oldvl = vlambda
-            oldel = elambda
-            vlambda = oldvl + eps
-            elambda = oldel + eps
+            oldvdl = vlambda
+            oldeml = elambda
+            oldepl = eplambda
+            vlambda = oldvdl + eps
+            elambda = oldeml + eps
+            eplambda = oldepl + eps
             call altelec
             esum2 = energy ()
             ev2 = ev
             em2 = em
             ep2 = ep
-            vlambda = oldvl - eps
-            elambda = oldel - eps
+            vlambda = oldvdl - eps
+            elambda = oldeml - eps
+            eplambda = oldepl - eps
             call altelec
             esum0 = energy ()
             ev0 = ev
             em0 = em
             ep0 = ep
-            vlambda = oldvl
-            elambda = oldel
+            vlambda = oldvdl
+            elambda = oldeml
+            eplambda = oldepl
             call altelec
             esum1 = energy ()
             ev1 = ev
@@ -221,8 +226,9 @@ c
             ndevlmda2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
             ndemlmda2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
             ndeplmda2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
-            vlambda = oldvl + eps
-            elambda = oldel + eps
+            vlambda = oldvdl + eps
+            elambda = oldeml + eps
+            eplambda = oldepl + eps
             call altelec
             call gradient (eval,derivs)
             do i = 1, n
@@ -233,8 +239,9 @@ c
                   ndldep(j,i) = dep(j,i)
                end do
             end do
-            vlambda = oldvl - eps
-            elambda = oldel - eps
+            vlambda = oldvdl - eps
+            elambda = oldeml - eps
+            eplambda = oldepl - eps
             call altelec
             call gradient (eval,derivs)
             do i = 1, n
@@ -246,8 +253,10 @@ c
                   ndldep(j,i) = (ndldep(j,i)-dep(j,i)) / (2.0d0 * eps)
                end do
             end do
-            vlambda = oldvl
-            elambda = oldel
+            vlambda = oldvdl
+            elambda = oldeml
+            eplambda = oldepl
+            call altelec
          end if
 c
 c     print the analytical lambda derivatives

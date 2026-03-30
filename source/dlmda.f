@@ -12,6 +12,7 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
+c     epdtexp         polarization lambda exponent for dual topology
 c     delmda          total energy lambda derivative
 c     devlmda         van der Waals lambda derivative
 c     demlmda         multipole lambda derivative
@@ -20,6 +21,7 @@ c     delmda2         total energy second order lambda derivative
 c     devlmda2        van der Waals second order lambda derivative
 c     demlmda2        multipole second order lambda derivative
 c     deplmda2        polarization second order lambda derivative
+c     eplambda        state weighting value for polarization potentials
 c     dldesum         total force lambda derivative
 c     dldev           van der Waals force lambda derivative
 c     dldem           multipole force lambda derivative
@@ -46,6 +48,7 @@ c
 c
       module dlmda
       implicit none
+      integer epdtexp
       real*8 delmda
       real*8 devlmda
       real*8 demlmda
@@ -54,6 +57,7 @@ c
       real*8 devlmda2
       real*8 demlmda2
       real*8 deplmda2
+      real*8 eplambda
       real*8, allocatable :: dldesum(:,:)
       real*8, allocatable :: dldev(:,:)
       real*8, allocatable :: dldem(:,:)
