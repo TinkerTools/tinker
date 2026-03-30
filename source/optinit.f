@@ -50,7 +50,7 @@ c
          else if (keyword(1:9) .eq. 'WRITEOUT ') then
             read (string,*,err=10,end=10)  iwrite
          else if (keyword(1:12) .eq. 'WRAP-COORDS ') then
-            use_wrap = .true.
+            if (use_bounds)  use_wrap = .true.
          else if (keyword(1:11) .eq. 'SAVE-FORCE ') then
             frcsave = .true.
          else if (keyword(1:13) .eq. 'SAVE-INDUCED ') then

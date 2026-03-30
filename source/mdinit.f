@@ -70,7 +70,8 @@ c
       ndummy = 0
       irest = -1
       iprint = 100
-      use_wrap = .true.
+      use_wrap = .false.
+      if (use_bounds)  use_wrap = .true.
       velsave = .false.
       frcsave = .false.
       uindsave = .false.

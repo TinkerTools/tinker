@@ -1123,12 +1123,12 @@ c
                   sr3 = scalek * dmpik(3) * rr3
                   sr5 = scalek * dmpik(5) * rr5
                   sr7 = scalek * dmpik(7) * rr7
-                  sr3 = dmpe(3) - rr3 + sr3
-                  sr5 = dmpe(5) - rr5 + sr5
-                  sr7 = dmpe(7) - rr7 + sr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
+                  sr3 = dmpe(3) - rr3 + sr3
+                  sr5 = dmpe(5) - rr5 + sr5
+                  sr7 = dmpe(7) - rr7 + sr7
                   e = term1*sr3 + term2*sr5 + term3*sr7
 c
 c     find the energy value for charge penetration damping
@@ -1310,15 +1310,15 @@ c
                         rr3 = f / (r*r2)
                         rr5 = 3.0d0 * rr3 / r2
                         rr7 = 5.0d0 * rr5 / r2
-                        sr3 = dmpik(3) * rr3
-                        sr5 = dmpik(5) * rr5
-                        sr7 = dmpik(7) * rr7
-                        sr3 = dmpe(3) - rr3 + sr3
-                        sr5 = dmpe(5) - rr5 + sr5
-                        sr7 = dmpe(7) - rr7 + sr7
+                        sr3 = scalek * dmpik(3) * rr3
+                        sr5 = scalek * dmpik(5) * rr5
+                        sr7 = scalek * dmpik(7) * rr7
                         term1 = ck*uir - ci*ukr + diu + dku
                         term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                         term3 = uir*qkr - ukr*qir
+                        sr3 = dmpe(3) - rr3 + sr3
+                        sr5 = dmpe(5) - rr5 + sr5
+                        sr7 = dmpe(7) - rr7 + sr7
                         e = term1*sr3 + term2*sr5 + term3*sr7
 c
 c     find the energy value for charge penetration damping
@@ -1717,12 +1717,12 @@ c
                   sr3 = scalek * dmpik(3) * rr3
                   sr5 = scalek * dmpik(5) * rr5
                   sr7 = scalek * dmpik(7) * rr7
-                  sr3 = dmpe(3) - rr3 + sr3
-                  sr5 = dmpe(5) - rr5 + sr5
-                  sr7 = dmpe(7) - rr7 + sr7
                   term1 = ck*uir - ci*ukr + diu + dku
                   term2 = 2.0d0*(qiu-qku) - uir*dkr - dir*ukr
                   term3 = uir*qkr - ukr*qir
+                  sr3 = dmpe(3) - rr3 + sr3
+                  sr5 = dmpe(5) - rr5 + sr5
+                  sr7 = dmpe(7) - rr7 + sr7
                   e = term1*sr3 + term2*sr5 + term3*sr7
 c
 c     find the energy value for charge penetration damping
