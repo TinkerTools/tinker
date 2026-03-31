@@ -112,6 +112,8 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
@@ -418,6 +420,23 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
+                  if (mutik) then
+                     dldvxx = xr * dldedx
+                     dldvyx = yr * dldedx
+                     dldvzx = zr * dldedx
+                     dldvyy = yr * dldedy
+                     dldvzy = zr * dldedy
+                     dldvzz = zr * dldedz
+                     dldevvir(1,1) = dldevvir(1,1) + dldvxx
+                     dldevvir(2,1) = dldevvir(2,1) + dldvyx
+                     dldevvir(3,1) = dldevvir(3,1) + dldvzx
+                     dldevvir(1,2) = dldevvir(1,2) + dldvyx
+                     dldevvir(2,2) = dldevvir(2,2) + dldvyy
+                     dldevvir(3,2) = dldevvir(3,2) + dldvzy
+                     dldevvir(1,3) = dldevvir(1,3) + dldvzx
+                     dldevvir(2,3) = dldevvir(2,3) + dldvzy
+                     dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                  end if
                end if
             end if
          end do
@@ -715,6 +734,23 @@ c
                      vir(1,3) = vir(1,3) + vzx
                      vir(2,3) = vir(2,3) + vzy
                      vir(3,3) = vir(3,3) + vzz
+                     if (mutik) then
+                        dldvxx = xr * dldedx
+                        dldvyx = yr * dldedx
+                        dldvzx = zr * dldedx
+                        dldvyy = yr * dldedy
+                        dldvzy = zr * dldedy
+                        dldvzz = zr * dldedz
+                        dldevvir(1,1) = dldevvir(1,1) + dldvxx
+                        dldevvir(2,1) = dldevvir(2,1) + dldvyx
+                        dldevvir(3,1) = dldevvir(3,1) + dldvzx
+                        dldevvir(1,2) = dldevvir(1,2) + dldvyx
+                        dldevvir(2,2) = dldevvir(2,2) + dldvyy
+                        dldevvir(3,2) = dldevvir(3,2) + dldvzy
+                        dldevvir(1,3) = dldevvir(1,3) + dldvzx
+                        dldevvir(2,3) = dldevvir(2,3) + dldvzy
+                        dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                     end if
                   end if
                end do
             end if
@@ -809,6 +845,8 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -1176,6 +1214,23 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
+                  if (mutik) then
+                     dldvxx = xr * dldedx
+                     dldvyx = yr * dldedx
+                     dldvzx = zr * dldedx
+                     dldvyy = yr * dldedy
+                     dldvzy = zr * dldedy
+                     dldvzz = zr * dldedz
+                     dldevvir(1,1) = dldevvir(1,1) + dldvxx
+                     dldevvir(2,1) = dldevvir(2,1) + dldvyx
+                     dldevvir(3,1) = dldevvir(3,1) + dldvzx
+                     dldevvir(1,2) = dldevvir(1,2) + dldvyx
+                     dldevvir(2,2) = dldevvir(2,2) + dldvyy
+                     dldevvir(3,2) = dldevvir(3,2) + dldvzy
+                     dldevvir(1,3) = dldevvir(1,3) + dldvzx
+                     dldevvir(2,3) = dldevvir(2,3) + dldvzy
+                     dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                  end if
                end if
             end if
    20       continue
@@ -1275,6 +1330,8 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
@@ -1331,8 +1388,8 @@ c
 !$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalpha,
 !$OMP& c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,dldev,devlmda,devlmda2,
-!$OMP& vir)
-!$OMP DO reduction(+:ev,dev,dldev,devlmda,devlmda2,vir)
+!$OMP& vir,dldevvir)
+!$OMP DO reduction(+:ev,dev,dldev,devlmda,devlmda2,vir,dldevvir)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1593,6 +1650,23 @@ c
                   vir(1,3) = vir(1,3) + vzx
                   vir(2,3) = vir(2,3) + vzy
                   vir(3,3) = vir(3,3) + vzz
+                  if (mutik) then
+                     dldvxx = xr * dldedx
+                     dldvyx = yr * dldedx
+                     dldvzx = zr * dldedx
+                     dldvyy = yr * dldedy
+                     dldvzy = zr * dldedy
+                     dldvzz = zr * dldedz
+                     dldevvir(1,1) = dldevvir(1,1) + dldvxx
+                     dldevvir(2,1) = dldevvir(2,1) + dldvyx
+                     dldevvir(3,1) = dldevvir(3,1) + dldvzx
+                     dldevvir(1,2) = dldevvir(1,2) + dldvyx
+                     dldevvir(2,2) = dldevvir(2,2) + dldvyy
+                     dldevvir(3,2) = dldevvir(3,2) + dldvzy
+                     dldevvir(1,3) = dldevvir(1,3) + dldvzx
+                     dldevvir(2,3) = dldevvir(2,3) + dldvzy
+                     dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                  end if
                end if
             end if
          end do
