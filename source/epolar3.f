@@ -2524,41 +2524,33 @@ c
 c
 c     compute energy of the lambda = 1 state
 c
-      if (eplambdaorig .eq. 0.0d0) then
-         ep1 = ep0
-         nep1 = nep0
-         do i = 1, n
-            aep1(i) = aep0(i)
-         end do
-      else
-         eplambda = 1.0d0
-         call altpolr
-         if (pairwise) then
-            if (use_ewald) then
-               if (use_mlist) then
-                  call epolar3d
-               else
-                  call epolar3c
-               end if
+      eplambda = 1.0d0
+      call altpolr
+      if (pairwise) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar3d
             else
-               if (use_mlist) then
-                  call epolar3b
-               else
-                  call epolar3a
-               end if
+               call epolar3c
             end if
          else
-            call epolar3e
+            if (use_mlist) then
+               call epolar3b
+            else
+               call epolar3a
+            end if
          end if
+      else
+         call epolar3e
+      end if
 c
 c     copy energy of the lambda = 1 state
 c
-         ep1 = ep
-         nep1 = nep
-         do i = 1, n
-            aep1(i) = aep(i)
-         end do
-      end if
+      ep1 = ep
+      nep1 = nep
+      do i = 1, n
+         aep1(i) = aep(i)
+      end do
 c
 c     set original eplambda
 c

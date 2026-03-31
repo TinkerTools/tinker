@@ -9725,52 +9725,38 @@ c
 c
 c     compute energy of the lambda = 1 state
 c
-      if (eplambdaorig .eq. 0.0d0) then
-         ep1 = ep0
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir0(j,i)
-            end do
-         end do
-      else
-         eplambda = 1.0d0
-         call altpolr
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
+      eplambda = 1.0d0
+      call altpolr
+      if (use_ewald) then
+         if (use_mlist) then
+            call epolar1d
          else
-            if (use_mlist) then
-               call epolar1b
-            else
-               call epolar1a
-            end if
+            call epolar1c
          end if
-         if (use_expol) then
-            call dexpol
+      else
+         if (use_mlist) then
+            call epolar1b
+         else
+            call epolar1a
          end if
+      end if
+      if (use_expol) then
+         call dexpol
+      end if
 c
 c     copy energy, force, and virial of the lambda = 1 state
 c
-         ep1 = ep
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep(j,i)
-            end do
+      ep1 = ep
+      do i = 1, n
+         do j = 1, 3
+            dep1(j,i) = dep(j,i)
          end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir(j,i)
-            end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvir1(j,i) = epvir(j,i)
          end do
-      end if
+      end do
 c
 c     set original eplambda
 c

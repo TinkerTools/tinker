@@ -2164,33 +2164,29 @@ c
 c
 c     compute energy of the lambda = 1 state
 c
-      if (eplambdaorig .eq. 0.0d0) then
-         ep1 = ep0
-      else
-         eplambda = 1.0d0
-         call altpolr
-         if (pairwise) then
-            if (use_ewald) then
-               if (use_mlist) then
-                  call epolar0d
-               else
-                  call epolar0c
-               end if
+      eplambda = 1.0d0
+      call altpolr
+      if (pairwise) then
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar0d
             else
-               if (use_mlist) then
-                  call epolar0b
-               else
-                  call epolar0a
-               end if
+               call epolar0c
             end if
          else
-            call epolar0e
+            if (use_mlist) then
+               call epolar0b
+            else
+               call epolar0a
+            end if
          end if
+      else
+         call epolar0e
+      end if
 c
 c     copy energy of the lambda = 1 state
 c
-         ep1 = ep
-      end if
+      ep1 = ep
 c
 c     set original eplambda
 c
