@@ -27,6 +27,7 @@ c
       use iounit
       use mutant
       use usage
+      use virial
       implicit none
       integer i,j,ixyz
       integer next,frame
@@ -51,6 +52,7 @@ c
       real*8 oldepl
       real*8 denorm,ndenorm
       real*8 totnorm,ntotnorm,rms,nrms
+      real*8 nvir(3,3)
       real*8, allocatable :: derivs(:,:)
       real*8, allocatable :: adldesum(:,:)
       real*8, allocatable :: adldev(:,:)
@@ -161,8 +163,8 @@ c
       do while (.not. abort)
          frame = frame + 1
          if (frame .gt. 1) then
-            write (iout,100)  frame
-  100       format (/,' Analysis for Archive Structure :',8x,i8)
+            write (iout,80)  frame
+   80       format (/,' Analysis for Archive Structure :',8x,i8)
          end if
 c
 c     compute the analytical lambda derivatives
@@ -239,6 +241,11 @@ c
                   ndldep(j,i) = dep(j,i)
                end do
             end do
+            do i = 1, 3
+               do j = 1, 3
+                  nvir(j,i) = vir(j,i)
+               end do
+            end do
             vlambda = oldvdl - eps
             elambda = oldeml - eps
             eplambda = oldepl - eps
@@ -253,6 +260,11 @@ c
                   ndldep(j,i) = (ndldep(j,i)-dep(j,i)) / (2.0d0 * eps)
                end do
             end do
+            do i = 1, 3
+               do j = 1, 3
+                  nvir(j,i) = (nvir(j,i) - vir(j,i)) / (2.0d0 * eps)
+               end do
+            end do
             vlambda = oldvdl
             elambda = oldeml
             eplambda = oldepl
@@ -262,49 +274,49 @@ c
 c     print the analytical lambda derivatives
 c
          if (doanalyt) then
-            write (iout,110)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
+            write (iout,90)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
      &                         adelmda, adevlmda, ademlmda, adeplmda
-  110       format (/,' Analytical Lambda Derivatives :', 4a14, /, 32x,
+  90       format (/,' Analytical Lambda Derivatives :', 4a14, /, 32x,
      &                 4f14.6)
          end if
 c
 c     print the numerical lambda derivatives
 c
          if (donumer) then
-            write (iout,120)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
+            write (iout,100)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
      &                         ndelmda, ndevlmda, ndemlmda, ndeplmda
-  120       format (/,' Numerical Lambda Derivatives : ', 4a14, /, 32x,
+  100       format (/,' Numerical Lambda Derivatives : ', 4a14, /, 32x,
      &                 4f14.6)
          end if
 c
 c     print the analytical second order lambda derivatives
 c
          if (doanalyt) then
-            write (iout,130)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
+            write (iout,110)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
      &                         'd2EP/dL2',
      &                         adelmda2, adevlmda2, ademlmda2, adeplmda2
-  130       format (/,' Analytical 2nd Lambda Derivatives :',
+  110       format (/,' Analytical 2nd Lambda Derivatives :',
      &                 4a14, /, 36x, 4f14.6)
          end if
 c
 c     print the numerical second order lambda derivatives
 c
          if (donumer) then
-            write (iout,140)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
+            write (iout,120)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
      &                         'd2EP/dL2',
      &                         ndelmda2, ndevlmda2, ndemlmda2, ndeplmda2
-  140       format (/,' Numerical 2nd Lambda Derivatives : ',
+  120       format (/,' Numerical 2nd Lambda Derivatives : ',
      &                 4a14, /, 36x, 4f14.6)
          end if
 c
 c     print the total force lambda derivatives for each atom
 c
          if (doanalyt .or. donumer) then
-            write (iout,310)
-  310       format (/,' Lambda Gradient Breakdown over Individual',
+            write (iout,130)
+  130       format (/,' Lambda Gradient Breakdown over Individual',
      &                 ' Atoms :')
-            write (iout,330)
-  330       format (/,2x,'Type',6x,'Atom',11x,'dFx/dL',8x,'dFy/dL',
+            write (iout,140)
+  140       format (/,2x,'Type',6x,'Atom',11x,'dFx/dL',8x,'dFy/dL',
      &                 8x,'dFz/dL',10x,'Norm',/)
          end if
          totnorm = 0.0d0
@@ -315,30 +327,30 @@ c
      &                        + adldesum(3,i)**2
                totnorm = totnorm + denorm
                denorm = sqrt(denorm)
-               write (iout,360)  i,(adldesum(j,i),j=1,3),denorm
-  360          format (' Anlyt',2x,i8,3x,3f14.6,2x,f14.6)
+               write (iout,150)  i,(adldesum(j,i),j=1,3),denorm
+  150          format (' Anlyt',2x,i8,3x,3f14.6,2x,f14.6)
             end if
             if (donumer .and. use(i)) then
                ndenorm = ndldesum(1,i)**2 + ndldesum(2,i)**2
      &                         + ndldesum(3,i)**2
                ntotnorm = ntotnorm + ndenorm
                ndenorm = sqrt(ndenorm)
-               write (iout,390)  i,(ndldesum(j,i),j=1,3),ndenorm
-  390          format (' Numer',2x,i8,3x,3f14.6,2x,f14.6)
+               write (iout,160)  i,(ndldesum(j,i),j=1,3),ndenorm
+  160          format (' Numer',2x,i8,3x,3f14.6,2x,f14.6)
             end if
          end do
 c
 c     print the total norm for the analytical lambda derivative
 c
          if (doanalyt .or. donumer) then
-            write (iout,410)
-  410       format (/,' Total Gradient Norm and RMS Gradient',
+            write (iout,170)
+  170       format (/,' Total Gradient Norm and RMS Gradient',
      &                 ' per Atom :',/)
          end if
          if (doanalyt) then
             totnorm = sqrt(totnorm)
-            write (iout,430)  totnorm
-  430       format (' Anlyt',6x,'Total Gradient Norm Value',
+            write (iout,180)  totnorm
+  180       format (' Anlyt',6x,'Total Gradient Norm Value',
      &                 6x,f18.6)
          end if
 c
@@ -346,21 +358,21 @@ c     print the total norm for the numerical lambda derivative
 c
          if (donumer) then
             ntotnorm = sqrt(ntotnorm)
-            write (iout,460)  ntotnorm
-  460       format (' Numer',6x,'Total Gradient Norm Value',
+            write (iout,190)  ntotnorm
+  190       format (' Numer',6x,'Total Gradient Norm Value',
      &                 6x,f18.6)
          end if
 c
 c     print the rms per atom norm for the analytical lambda derivative
 c
          if (doanalyt .or. donumer) then
-            write (iout,480)
-  480       format ()
+            write (iout,200)
+  200       format ()
          end if
          if (doanalyt) then
             rms = totnorm / sqrt(dble(nuse))
-            write (iout,500)  rms
-  500       format (' Anlyt',6x,'RMS Gradient over All Atoms',
+            write (iout,210)  rms
+  210       format (' Anlyt',6x,'RMS Gradient over All Atoms',
      &                 4x,f18.6)
          end if
 c
@@ -368,10 +380,22 @@ c     print the rms per atom norm for the numerical lambda derivative
 c
          if (donumer) then
             nrms = ntotnorm / sqrt(dble(nuse))
-            write (iout,530)  nrms
-  530       format (' Numer',6x,'RMS Gradient over All Atoms',
+            write (iout,220)  nrms
+  220       format (' Numer',6x,'RMS Gradient over All Atoms',
      &                 4x,f18.6)
          end if
+c
+c     print the components of the analytical internal virial
+c
+      write (iout,230)  (dldvir(1,i),dldvir(2,i),dldvir(3,i),i=1,3)
+  230 format (/,' Analytical dV/dL :',8x,3f13.3,
+     &           /,27x,3f13.3,/,27x,3f13.3)
+c
+c     print the components of the numerical internal virial
+c
+      write (iout,240)  (nvir(1,i),nvir(2,i),nvir(3,i),i=1,3)
+  240 format (/,' Numerical dV/dL :',9x,3f13.3,
+     &           /,27x,3f13.3,/,27x,3f13.3)
 c
 c     attempt to read next structure from the coordinate file
 c

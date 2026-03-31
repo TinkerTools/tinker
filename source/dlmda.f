@@ -22,6 +22,10 @@ c     devlmda2        van der Waals second order lambda derivative
 c     demlmda2        multipole second order lambda derivative
 c     deplmda2        polarization second order lambda derivative
 c     eplambda        state weighting value for polarization potentials
+c     dldvir          total virial lambda derivative
+c     dldevvir        van der Waals virial lambda derivative
+c     dldemvir        multipole virial lambda derivative
+c     dldepvir        polarization virial lambda derivative
 c     dldesum         total force lambda derivative
 c     dldev           van der Waals force lambda derivative
 c     dldem           multipole force lambda derivative
@@ -58,6 +62,10 @@ c
       real*8 demlmda2
       real*8 deplmda2
       real*8 eplambda
+      real*8 dldvir(3,3)
+      real*8 dldevvir(3,3)
+      real*8 dldemvir(3,3)
+      real*8 dldepvir(3,3)
       real*8, allocatable :: dldesum(:,:)
       real*8, allocatable :: dldev(:,:)
       real*8, allocatable :: dldem(:,:)

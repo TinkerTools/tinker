@@ -77,6 +77,14 @@ c
       devlmda2 = 0.0d0
       demlmda2 = 0.0d0
       deplmda2 = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            dldvir(j,i) = 0.0d0
+            dldevvir(j,i) = 0.0d0
+            dldemvir(j,i) = 0.0d0
+            dldepvir(j,i) = 0.0d0
+         end do
+      end do
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -338,6 +346,11 @@ c
          do i = 1, n
             do j = 1, 3
                dldesum(j,i) = dldev(j,i) + dldem(j,i) + dldep(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               dldvir(j,i) = dldevvir(j,i)+dldemvir(j,i)+dldepvir(j,i)
             end do
          end do
       end if

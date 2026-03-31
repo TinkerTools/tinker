@@ -212,6 +212,11 @@ c
             dldep(j,i) = deplambdaexp * (dep1(j,i) - dep0(j,i))
          end do
       end do
+      do i = 1, 3
+         do j = 1, 3
+            dldepvir(j,i) = deplambdaexp * (epvir1(j,i) - epvir0(j,i))
+         end do
+      end do
 c
 c     perform deallocation of some local arrays
 c
