@@ -138,6 +138,8 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
@@ -145,6 +147,7 @@ c
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
@@ -615,6 +618,23 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
+               if (muti .or. mutk) then
+                  dldvxx = -xr * dlfrcx
+                  dldvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                  dldvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                  dldvyy = -yr * dlfrcy
+                  dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                  dldvzz = -zr * dlfrcz
+                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
+                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
+                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
+                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
+                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
+                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
+                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
+                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
+                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+               end if
             end if
    10       continue
          end do
@@ -1065,6 +1085,23 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
+               if (muti .or. mutk) then
+                  dldvxx = -xr * dlfrcx
+                  dldvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                  dldvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                  dldvyy = -yr * dlfrcy
+                  dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                  dldvzz = -zr * dlfrcz
+                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
+                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
+                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
+                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
+                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
+                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
+                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
+                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
+                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+               end if
             end if
             end do
    20       continue
@@ -1091,8 +1128,8 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -1126,6 +1163,24 @@ c
          vir(1,3) = vir(1,3) + vxz
          vir(2,3) = vir(2,3) + vyz
          vir(3,3) = vir(3,3) + vzz
+         dldvxx = xix*dlfix(1) + xiy*dlfiy(1) + xiz*dlfiz(1)
+         dldvxy = 0.5d0 * (yix*dlfix(1) + yiy*dlfiy(1) + yiz*dlfiz(1)
+     &                    + xix*dlfix(2) + xiy*dlfiy(2) + xiz*dlfiz(2))
+         dldvxz = 0.5d0 * (zix*dlfix(1) + ziy*dlfiy(1) + ziz*dlfiz(1)
+     &                    + xix*dlfix(3) + xiy*dlfiy(3) + xiz*dlfiz(3)) 
+         dldvyy = yix*dlfix(2) + yiy*dlfiy(2) + yiz*dlfiz(2)
+         dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
+     &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
+         dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
+         dldemvir(1,1) = dldemvir(1,1) + dldvxx
+         dldemvir(2,1) = dldemvir(2,1) + dldvxy
+         dldemvir(3,1) = dldemvir(3,1) + dldvxz
+         dldemvir(1,2) = dldemvir(1,2) + dldvxy
+         dldemvir(2,2) = dldemvir(2,2) + dldvyy
+         dldemvir(3,2) = dldemvir(3,2) + dldvyz
+         dldemvir(1,3) = dldemvir(1,3) + dldvxz
+         dldemvir(2,3) = dldemvir(2,3) + dldvyz
+         dldemvir(3,3) = dldemvir(3,3) + dldvzz
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -1259,6 +1314,8 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
@@ -1266,6 +1323,7 @@ c
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11)
       real*8, allocatable :: mscale(:)
@@ -1336,8 +1394,9 @@ c
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda)
 !$OMP& firstprivate(mscale) shared (em,dem,dldem,tem,dltem,pot,vir,
+!$OMP& dldemvir,demlmda,demlmda2)
+!$OMP DO reduction(+:em,dem,dldem,tem,dltem,pot,vir,dldemvir,
 !$OMP& demlmda,demlmda2)
-!$OMP DO reduction(+:em,dem,dldem,tem,dltem,pot,vir,demlmda,demlmda2)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1748,6 +1807,23 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
+               if (muti .or. mutk) then
+                  dldvxx = -xr * dlfrcx
+                  dldvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                  dldvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                  dldvyy = -yr * dlfrcy
+                  dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                  dldvzz = -zr * dlfrcz
+                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
+                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
+                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
+                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
+                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
+                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
+                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
+                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
+                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+               end if
             end if
    10       continue
          end do
@@ -1771,14 +1847,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,dldem,vir)
+!$OMP DO reduction(+:dem,dldem,vir,dldemvir)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -1812,6 +1888,24 @@ c
          vir(1,3) = vir(1,3) + vxz
          vir(2,3) = vir(2,3) + vyz
          vir(3,3) = vir(3,3) + vzz
+         dldvxx = xix*dlfix(1) + xiy*dlfiy(1) + xiz*dlfiz(1)
+         dldvxy = 0.5d0 * (yix*dlfix(1) + yiy*dlfiy(1) + yiz*dlfiz(1)
+     &                    + xix*dlfix(2) + xiy*dlfiy(2) + xiz*dlfiz(2))
+         dldvxz = 0.5d0 * (zix*dlfix(1) + ziy*dlfiy(1) + ziz*dlfiz(1)
+     &                    + xix*dlfix(3) + xiy*dlfiy(3) + xiz*dlfiz(3)) 
+         dldvyy = yix*dlfix(2) + yiy*dlfiy(2) + yiz*dlfiz(2)
+         dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
+     &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
+         dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
+         dldemvir(1,1) = dldemvir(1,1) + dldvxx
+         dldemvir(2,1) = dldemvir(2,1) + dldvxy
+         dldemvir(3,1) = dldemvir(3,1) + dldvxz
+         dldemvir(1,2) = dldemvir(1,2) + dldvxy
+         dldemvir(2,2) = dldemvir(2,2) + dldvyy
+         dldemvir(3,2) = dldemvir(3,2) + dldvyz
+         dldemvir(1,3) = dldemvir(1,3) + dldvxz
+         dldemvir(2,3) = dldemvir(2,3) + dldvyz
+         dldemvir(3,3) = dldemvir(3,3) + dldvzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1905,7 +1999,10 @@ c
       real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
+      real*8 dxd,dyd,dzd
+      real*8 dxq,dyq,dzq
       real*8 xv,yv,zv,vterm
+      real*8 dxv,dyv,dzv,dldvterm
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -1916,8 +2013,11 @@ c
       real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
+      real*8 dlfrcx(3),dlfrcy(3),dlfrcz(3)
       real*8 dltem(3)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
@@ -2155,8 +2255,8 @@ c
             tem(1) = diy*zdfield - diz*ydfield
             tem(2) = diz*xdfield - dix*zdfield
             tem(3) = dix*ydfield - diy*xdfield
-            call torque (i,dltem,frcx,frcy,frcz,dldem)
             call torque (i,tem,frcx,frcy,frcz,dem)
+            call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dldem)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -2167,6 +2267,12 @@ c
          xq = 0.0d0
          yq = 0.0d0
          zq = 0.0d0
+         dxd = 0.0d0
+         dyd = 0.0d0
+         dzd = 0.0d0
+         dxq = 0.0d0
+         dyq = 0.0d0
+         dzq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
@@ -2175,6 +2281,12 @@ c
             diz = rpole(4,i)
             muti = mut(i)
             if (muti) then
+               dxd = dxd + dix
+               dyd = dyd + diy
+               dzd = dzd + diz
+               dxq = dxq + ci*x(i)
+               dyq = dyq + ci*y(i)
+               dzq = dzq + ci*z(i)
                ci = ci * elambda
                dix = dix * elambda
                diy = diy * elambda
@@ -2190,14 +2302,26 @@ c
          xv = xd * xq
          yv = yd * yq
          zv = zd * zq
+         dxv = dxd*xq + xd*dxq
+         dyv = dyd*yq + yd*dyq
+         dzv = dzd*zq + zd*dzq
          vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
      &                      + xq*xq + yq*yq + zq*zq)
+         dldvterm = term * (2.0d0*xd*dxd + 2.0d0*yd*dyd + 2.0d0*zd*dzd
+     &                   + 2.0d0*(dxv+dyv+dzv)
+     &                   + 2.0d0*xq*dxq + 2.0d0*yq*dyq + 2.0d0*zq*dzq)
          vxx = 2.0d0*term*(xq*xq+xv) + vterm
          vxy = 2.0d0*term*(xq*yq+xv)
          vxz = 2.0d0*term*(xq*zq+xv)
          vyy = 2.0d0*term*(yq*yq+yv) + vterm
          vyz = 2.0d0*term*(yq*zq+yv)
          vzz = 2.0d0*term*(zq*zq+zv) + vterm
+         dldvxx = 2.0d0*term*(2.0d0*xq*dxq + dxv) + dldvterm
+         dldvxy = 2.0d0*term*(dxq*yq + xq*dyq + dxv)
+         dldvxz = 2.0d0*term*(dxq*zq + xq*dzq + dxv)
+         dldvyy = 2.0d0*term*(2.0d0*yq*dyq + dyv) + dldvterm
+         dldvyz = 2.0d0*term*(dyq*zq + yq*dzq + dyv)
+         dldvzz = 2.0d0*term*(2.0d0*zq*dzq + dzv) + dldvterm
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
          vir(3,1) = vir(3,1) + vxz
@@ -2207,6 +2331,15 @@ c
          vir(1,3) = vir(1,3) + vxz
          vir(2,3) = vir(2,3) + vyz
          vir(3,3) = vir(3,3) + vzz
+         dldemvir(1,1) = dldemvir(1,1) + dldvxx
+         dldemvir(2,1) = dldemvir(2,1) + dldvxy
+         dldemvir(3,1) = dldemvir(3,1) + dldvxz
+         dldemvir(1,2) = dldemvir(1,2) + dldvxy
+         dldemvir(2,2) = dldemvir(2,2) + dldvyy
+         dldemvir(3,2) = dldemvir(3,2) + dldvyz
+         dldemvir(1,3) = dldemvir(1,3) + dldvxz
+         dldemvir(2,3) = dldemvir(2,3) + dldvyz
+         dldemvir(3,3) = dldemvir(3,3) + dldvzz
       end if
       return
       end
@@ -2296,6 +2429,8 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
@@ -2303,6 +2438,7 @@ c
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11),dmpe(11)
       real*8, allocatable :: mscale(:)
@@ -2739,6 +2875,23 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
+               if (muti .or. mutk) then
+                  dldvxx = -xr * dlfrcx
+                  dldvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                  dldvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                  dldvyy = -yr * dlfrcy
+                  dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                  dldvzz = -zr * dlfrcz
+                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
+                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
+                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
+                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
+                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
+                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
+                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
+                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
+                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+               end if
             end if
          end do
 c
@@ -3176,6 +3329,23 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
+               if (muti .or. mutk) then
+                  dldvxx = -xr * dlfrcx
+                  dldvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                  dldvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                  dldvyy = -yr * dlfrcy
+                  dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                  dldvzz = -zr * dlfrcz
+                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
+                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
+                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
+                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
+                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
+                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
+                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
+                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
+                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+               end if
             end if
             end do
          end do
@@ -3201,8 +3371,8 @@ c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -3236,6 +3406,24 @@ c
          vir(1,3) = vir(1,3) + vxz
          vir(2,3) = vir(2,3) + vyz
          vir(3,3) = vir(3,3) + vzz
+         dldvxx = xix*dlfix(1) + xiy*dlfiy(1) + xiz*dlfiz(1)
+         dldvxy = 0.5d0 * (yix*dlfix(1) + yiy*dlfiy(1) + yiz*dlfiz(1)
+     &                    + xix*dlfix(2) + xiy*dlfiy(2) + xiz*dlfiz(2))
+         dldvxz = 0.5d0 * (zix*dlfix(1) + ziy*dlfiy(1) + ziz*dlfiz(1)
+     &                    + xix*dlfix(3) + xiy*dlfiy(3) + xiz*dlfiz(3)) 
+         dldvyy = yix*dlfix(2) + yiy*dlfiy(2) + yiz*dlfiz(2)
+         dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
+     &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
+         dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
+         dldemvir(1,1) = dldemvir(1,1) + dldvxx
+         dldemvir(2,1) = dldemvir(2,1) + dldvxy
+         dldemvir(3,1) = dldemvir(3,1) + dldvxz
+         dldemvir(1,2) = dldemvir(1,2) + dldvxy
+         dldemvir(2,2) = dldemvir(2,2) + dldvyy
+         dldemvir(3,2) = dldemvir(3,2) + dldvyz
+         dldemvir(1,3) = dldemvir(1,3) + dldvxz
+         dldemvir(2,3) = dldemvir(2,3) + dldvyz
+         dldemvir(3,3) = dldemvir(3,3) + dldvzz
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -3319,7 +3507,10 @@ c
       real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
+      real*8 dxd,dyd,dzd
+      real*8 dxq,dyq,dzq
       real*8 xv,yv,zv,vterm
+      real*8 dxv,dyv,dzv,dldvterm
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -3330,8 +3521,11 @@ c
       real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
+      real*8 dlfrcx(3),dlfrcy(3),dlfrcz(3)
       real*8 dltem(3)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
@@ -3569,8 +3763,8 @@ c
             tem(1) = diy*zdfield - diz*ydfield
             tem(2) = diz*xdfield - dix*zdfield
             tem(3) = dix*ydfield - diy*xdfield
-            call torque (i,dltem,frcx,frcy,frcz,dldem)
             call torque (i,tem,frcx,frcy,frcz,dem)
+            call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dldem)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -3581,6 +3775,12 @@ c
          xq = 0.0d0
          yq = 0.0d0
          zq = 0.0d0
+         dxd = 0.0d0
+         dyd = 0.0d0
+         dzd = 0.0d0
+         dxq = 0.0d0
+         dyq = 0.0d0
+         dzq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
@@ -3589,6 +3789,12 @@ c
             diz = rpole(4,i)
             muti = mut(i)
             if (muti) then
+               dxd = dxd + dix
+               dyd = dyd + diy
+               dzd = dzd + diz
+               dxq = dxq + ci*x(i)
+               dyq = dyq + ci*y(i)
+               dzq = dzq + ci*z(i)
                ci = ci * elambda
                dix = dix * elambda
                diy = diy * elambda
@@ -3604,14 +3810,26 @@ c
          xv = xd * xq
          yv = yd * yq
          zv = zd * zq
+         dxv = dxd*xq + xd*dxq
+         dyv = dyd*yq + yd*dyq
+         dzv = dzd*zq + zd*dzq
          vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
      &                      + xq*xq + yq*yq + zq*zq)
+         dldvterm = term * (2.0d0*xd*dxd + 2.0d0*yd*dyd + 2.0d0*zd*dzd
+     &                   + 2.0d0*(dxv+dyv+dzv)
+     &                   + 2.0d0*xq*dxq + 2.0d0*yq*dyq + 2.0d0*zq*dzq)
          vxx = 2.0d0*term*(xq*xq+xv) + vterm
          vxy = 2.0d0*term*(xq*yq+xv)
          vxz = 2.0d0*term*(xq*zq+xv)
          vyy = 2.0d0*term*(yq*yq+yv) + vterm
          vyz = 2.0d0*term*(yq*zq+yv)
          vzz = 2.0d0*term*(zq*zq+zv) + vterm
+         dldvxx = 2.0d0*term*(2.0d0*xq*dxq + dxv) + dldvterm
+         dldvxy = 2.0d0*term*(dxq*yq + xq*dyq + dxv)
+         dldvxz = 2.0d0*term*(dxq*zq + xq*dzq + dxv)
+         dldvyy = 2.0d0*term*(2.0d0*yq*dyq + dyv) + dldvterm
+         dldvyz = 2.0d0*term*(dyq*zq + yq*dzq + dyv)
+         dldvzz = 2.0d0*term*(2.0d0*zq*dzq + dzv) + dldvterm
          vir(1,1) = vir(1,1) + vxx
          vir(2,1) = vir(2,1) + vxy
          vir(3,1) = vir(3,1) + vxz
@@ -3621,6 +3839,15 @@ c
          vir(1,3) = vir(1,3) + vxz
          vir(2,3) = vir(2,3) + vyz
          vir(3,3) = vir(3,3) + vzz
+         dldemvir(1,1) = dldemvir(1,1) + dldvxx
+         dldemvir(2,1) = dldemvir(2,1) + dldvxy
+         dldemvir(3,1) = dldemvir(3,1) + dldvxz
+         dldemvir(1,2) = dldemvir(1,2) + dldvxy
+         dldemvir(2,2) = dldemvir(2,2) + dldvyy
+         dldemvir(3,2) = dldemvir(3,2) + dldvyz
+         dldemvir(1,3) = dldemvir(1,3) + dldvxz
+         dldemvir(2,3) = dldemvir(2,3) + dldvyz
+         dldemvir(3,3) = dldemvir(3,3) + dldvzz
       end if
       return
       end
@@ -3710,6 +3937,8 @@ c
       real*8 frcx,frcy,frcz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
@@ -3717,6 +3946,7 @@ c
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(11),dmpe(11)
       real*8, allocatable :: mscale(:)
@@ -3764,9 +3994,10 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
 !$OMP& yaxis,zaxis,elambda,mut)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir,demlmda,
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,vir,dldemvir,demlmda,
 !$OMP& demlmda2,dldem,dltem)
-!$OMP DO reduction(+:em,dem,tem,pot,vir,demlmda,demlmda2,dldem,dltem)
+!$OMP DO reduction(+:em,dem,tem,pot,vir,dldemvir,demlmda,demlmda2,dldem,
+!$OMP& dltem)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -4165,6 +4396,23 @@ c
                vir(1,3) = vir(1,3) + vxz
                vir(2,3) = vir(2,3) + vyz
                vir(3,3) = vir(3,3) + vzz
+               if (muti .or. mutk) then
+                  dldvxx = -xr * dlfrcx
+                  dldvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                  dldvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                  dldvyy = -yr * dlfrcy
+                  dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                  dldvzz = -zr * dlfrcz
+                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
+                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
+                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
+                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
+                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
+                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
+                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
+                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
+                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+               end if
             end if
          end do
 c
@@ -4187,14 +4435,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,vir,dldem)
+!$OMP DO reduction(+:dem,vir,dldemvir,dldem)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         call torque (i,dltem(1,i),fix,fiy,fiz,dldem)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -4228,6 +4476,24 @@ c
          vir(1,3) = vir(1,3) + vxz
          vir(2,3) = vir(2,3) + vyz
          vir(3,3) = vir(3,3) + vzz
+         dldvxx = xix*dlfix(1) + xiy*dlfiy(1) + xiz*dlfiz(1)
+         dldvxy = 0.5d0 * (yix*dlfix(1) + yiy*dlfiy(1) + yiz*dlfiz(1)
+     &                    + xix*dlfix(2) + xiy*dlfiy(2) + xiz*dlfiz(2))
+         dldvxz = 0.5d0 * (zix*dlfix(1) + ziy*dlfiy(1) + ziz*dlfiz(1)
+     &                    + xix*dlfix(3) + xiy*dlfiy(3) + xiz*dlfiz(3)) 
+         dldvyy = yix*dlfix(2) + yiy*dlfiy(2) + yiz*dlfiz(2)
+         dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
+     &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
+         dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
+         dldemvir(1,1) = dldemvir(1,1) + dldvxx
+         dldemvir(2,1) = dldemvir(2,1) + dldvxy
+         dldemvir(3,1) = dldemvir(3,1) + dldvxz
+         dldemvir(1,2) = dldemvir(1,2) + dldvxy
+         dldemvir(2,2) = dldemvir(2,2) + dldvyy
+         dldemvir(3,2) = dldemvir(3,2) + dldvyz
+         dldemvir(1,3) = dldemvir(1,3) + dldvxz
+         dldemvir(2,3) = dldemvir(2,3) + dldvyz
+         dldemvir(3,3) = dldemvir(3,3) + dldvzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -4350,14 +4616,20 @@ c
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
       real*8 frcx,frcy,frcz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
       real*8 vterm,struc2
+      real*8 q1,q2,lq1,lq2
+      real*8 dldeterm,dldvterm
+      real*8 dstruc2dl
       real*8 dlambda,dlambda2
       real*8 tem(3),fix(3)
       real*8 fiy(3),fiz(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dltem(3)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: decfx(:)
@@ -4501,6 +4773,12 @@ c
       vyy = 0.0d0
       vyz = 0.0d0
       vzz = 0.0d0
+      dldvxx = 0.0d0
+      dldvxy = 0.0d0
+      dldvxz = 0.0d0
+      dldvyy = 0.0d0
+      dldvyz = 0.0d0
+      dldvzz = 0.0d0
 c
 c     make the scalar summation over reciprocal lattice
 c
@@ -4539,15 +4817,28 @@ c
             else if (nonprism) then
                if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
             end if
-            struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
+            q1 = qgrid(1,k1,k2,k3)
+            q2 = qgrid(2,k1,k2,k3)
+            lq1 = lqgrid(1,k1,k2,k3)
+            lq2 = lqgrid(2,k1,k2,k3)
+            struc2 = q1**2 + q2**2
             eterm = 0.5d0 * f * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
+            dstruc2dl = 2.0d0 * (q1*lq1 + q2*lq2)
+            dldeterm = 0.5d0 * f * expterm * dstruc2dl
+            dldvterm = (2.0d0/hsq) * (1.0d0-term) * dldeterm
             vxx = vxx + h1*h1*vterm - eterm
             vxy = vxy + h1*h2*vterm
             vxz = vxz + h1*h3*vterm
             vyy = vyy + h2*h2*vterm - eterm
             vyz = vyz + h2*h3*vterm
             vzz = vzz + h3*h3*vterm - eterm
+            dldvxx = dldvxx + h1*h1*dldvterm - dldeterm
+            dldvxy = dldvxy + h1*h2*dldvterm
+            dldvxz = dldvxz + h1*h3*dldvterm
+            dldvyy = dldvyy + h2*h2*dldvterm - dldeterm
+            dldvyz = dldvyz + h2*h3*dldvterm
+            dldvzz = dldvzz + h3*h3*dldvterm - dldeterm
          end if
          qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
          qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
@@ -4667,38 +4958,54 @@ c
      &            - 0.5d0*(cmp(8,i)*cphi(9,i)+cmp(9,i)*cphi(8,i))
          vzz = vzz - cmp(4,i)*cphi(4,i) - 2.0d0*cmp(7,i)*cphi(7,i)
      &            - cmp(9,i)*cphi(9,i) - cmp(10,i)*cphi(10,i)
+         dldvxx = dldvxx
+     &      - (lcmp(2,i)*cphi(2,i) + cmp(2,i)*lcphi(2,i))
+     &      - 2.0d0*(lcmp(5,i)*cphi(5,i) + cmp(5,i)*lcphi(5,i))
+     &      - (lcmp(8,i)*cphi(8,i) + cmp(8,i)*lcphi(8,i))
+     &      - (lcmp(9,i)*cphi(9,i) + cmp(9,i)*lcphi(9,i))
+         dldvxy = dldvxy
+     &      - 0.5d0*( lcmp(3,i)*cphi(2,i) + cmp(3,i)*lcphi(2,i)
+     &               + lcmp(2,i)*cphi(3,i) + cmp(2,i)*lcphi(3,i) )
+     &      - ( lcmp(5,i)+lcmp(6,i) )*cphi(8,i)
+     &      - ( cmp(5,i)+cmp(6,i) )*lcphi(8,i)
+     &      - 0.5d0*( lcmp(8,i)*(cphi(5,i)+cphi(6,i))
+     &               + cmp(8,i)*(lcphi(5,i)+lcphi(6,i)) )
+     &      - 0.5d0*( lcmp(9,i)*cphi(10,i) + cmp(9,i)*lcphi(10,i)
+     &               + lcmp(10,i)*cphi(9,i) + cmp(10,i)*lcphi(9,i) )
+         dldvxz = dldvxz
+     &      - 0.5d0*( lcmp(4,i)*cphi(2,i) + cmp(4,i)*lcphi(2,i)
+     &               + lcmp(2,i)*cphi(4,i) + cmp(2,i)*lcphi(4,i) )
+     &      - ( lcmp(5,i)+lcmp(7,i) )*cphi(9,i)
+     &      - ( cmp(5,i)+cmp(7,i) )*lcphi(9,i)
+     &      - 0.5d0*( lcmp(9,i)*(cphi(5,i)+cphi(7,i))
+     &               + cmp(9,i)*(lcphi(5,i)+lcphi(7,i)) )
+     &      - 0.5d0*( lcmp(8,i)*cphi(10,i) + cmp(8,i)*lcphi(10,i)
+     &               + lcmp(10,i)*cphi(8,i) + cmp(10,i)*lcphi(8,i) )
+         dldvyy = dldvyy
+     &      - (lcmp(3,i)*cphi(3,i) + cmp(3,i)*lcphi(3,i))
+     &      - 2.0d0*(lcmp(6,i)*cphi(6,i) + cmp(6,i)*lcphi(6,i))
+     &      - (lcmp(8,i)*cphi(8,i) + cmp(8,i)*lcphi(8,i))
+     &      - (lcmp(10,i)*cphi(10,i) + cmp(10,i)*lcphi(10,i))
+         dldvyz = dldvyz
+     &      - 0.5d0*( lcmp(4,i)*cphi(3,i) + cmp(4,i)*lcphi(3,i)
+     &               + lcmp(3,i)*cphi(4,i) + cmp(3,i)*lcphi(4,i) )
+     &      - ( lcmp(6,i)+lcmp(7,i) )*cphi(10,i)
+     &      - ( cmp(6,i)+cmp(7,i) )*lcphi(10,i)
+     &      - 0.5d0*( lcmp(10,i)*(cphi(6,i)+cphi(7,i))
+     &               + cmp(10,i)*(lcphi(6,i)+lcphi(7,i)) )
+     &      - 0.5d0*( lcmp(8,i)*cphi(9,i) + cmp(8,i)*lcphi(9,i)
+     &               + lcmp(9,i)*cphi(8,i) + cmp(9,i)*lcphi(8,i) )
+         dldvzz = dldvzz
+     &      - (lcmp(4,i)*cphi(4,i) + cmp(4,i)*lcphi(4,i))
+     &      - 2.0d0*(lcmp(7,i)*cphi(7,i) + cmp(7,i)*lcphi(7,i))
+     &      - (lcmp(9,i)*cphi(9,i) + cmp(9,i)*lcphi(9,i))
+     &      - (lcmp(10,i)*cphi(10,i) + cmp(10,i)*lcphi(10,i))
       end do
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
-         dltem(1) = lcmp(4,i)*cphi(3,i) + cmp(4,i)*lcphi(3,i)
-     &            - lcmp(3,i)*cphi(4,i) - cmp(3,i)*lcphi(4,i)
-     &            + 2.0d0*(lcmp(7,i)-lcmp(6,i))*cphi(10,i)
-     &            + 2.0d0*(cmp(7,i)-cmp(6,i))*lcphi(10,i)
-     &            + lcmp(9,i)*cphi(8,i) + cmp(9,i)*lcphi(8,i)
-     &            + lcmp(10,i)*cphi(6,i) + cmp(10,i)*lcphi(6,i)
-     &            - lcmp(8,i)*cphi(9,i) - cmp(8,i)*lcphi(9,i)
-     &            - lcmp(10,i)*cphi(7,i) - cmp(10,i)*lcphi(7,i)
-
-         dltem(2) = lcmp(2,i)*cphi(4,i) + cmp(2,i)*lcphi(4,i)
-     &            - lcmp(4,i)*cphi(2,i) - cmp(4,i)*lcphi(2,i)
-     &            + 2.0d0*(lcmp(5,i)-lcmp(7,i))*cphi(9,i)
-     &            + 2.0d0*(cmp(5,i)-cmp(7,i))*lcphi(9,i)
-     &            + lcmp(8,i)*cphi(10,i) + cmp(8,i)*lcphi(10,i)
-     &            + lcmp(9,i)*cphi(7,i) + cmp(9,i)*lcphi(7,i)
-     &            - lcmp(9,i)*cphi(5,i) - cmp(9,i)*lcphi(5,i)
-     &            - lcmp(10,i)*cphi(8,i) - cmp(10,i)*lcphi(8,i)
-
-         dltem(3) = lcmp(3,i)*cphi(2,i) + cmp(3,i)*lcphi(2,i)
-     &            - lcmp(2,i)*cphi(3,i) - cmp(2,i)*lcphi(3,i)
-     &            + 2.0d0*(lcmp(6,i)-lcmp(5,i))*cphi(8,i)
-     &            + 2.0d0*(cmp(6,i)-cmp(5,i))*lcphi(8,i)
-     &            + lcmp(8,i)*cphi(5,i) + cmp(8,i)*lcphi(5,i)
-     &            + lcmp(10,i)*cphi(9,i) + cmp(10,i)*lcphi(9,i)
-     &            - lcmp(8,i)*cphi(6,i) - cmp(8,i)*lcphi(6,i)
-     &            - lcmp(9,i)*cphi(10,i) - cmp(9,i)*lcphi(10,i)
          tem(1) = cmp(4,i)*cphi(3,i) - cmp(3,i)*cphi(4,i)
      &               + 2.0d0*(cmp(7,i)-cmp(6,i))*cphi(10,i)
      &               + cmp(9,i)*cphi(8,i) + cmp(10,i)*cphi(6,i)
@@ -4711,8 +5018,32 @@ c
      &               + 2.0d0*(cmp(6,i)-cmp(5,i))*cphi(8,i)
      &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
      &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
-         call torque (i,dltem,fix,fiy,fiz,dldem)
+         dltem(1) = lcmp(4,i)*cphi(3,i) + cmp(4,i)*lcphi(3,i)
+     &            - lcmp(3,i)*cphi(4,i) - cmp(3,i)*lcphi(4,i)
+     &            + 2.0d0*(lcmp(7,i)-lcmp(6,i))*cphi(10,i)
+     &            + 2.0d0*(cmp(7,i)-cmp(6,i))*lcphi(10,i)
+     &            + lcmp(9,i)*cphi(8,i) + cmp(9,i)*lcphi(8,i)
+     &            + lcmp(10,i)*cphi(6,i) + cmp(10,i)*lcphi(6,i)
+     &            - lcmp(8,i)*cphi(9,i) - cmp(8,i)*lcphi(9,i)
+     &            - lcmp(10,i)*cphi(7,i) - cmp(10,i)*lcphi(7,i)
+         dltem(2) = lcmp(2,i)*cphi(4,i) + cmp(2,i)*lcphi(4,i)
+     &            - lcmp(4,i)*cphi(2,i) - cmp(4,i)*lcphi(2,i)
+     &            + 2.0d0*(lcmp(5,i)-lcmp(7,i))*cphi(9,i)
+     &            + 2.0d0*(cmp(5,i)-cmp(7,i))*lcphi(9,i)
+     &            + lcmp(8,i)*cphi(10,i) + cmp(8,i)*lcphi(10,i)
+     &            + lcmp(9,i)*cphi(7,i) + cmp(9,i)*lcphi(7,i)
+     &            - lcmp(9,i)*cphi(5,i) - cmp(9,i)*lcphi(5,i)
+     &            - lcmp(10,i)*cphi(8,i) - cmp(10,i)*lcphi(8,i)
+         dltem(3) = lcmp(3,i)*cphi(2,i) + cmp(3,i)*lcphi(2,i)
+     &            - lcmp(2,i)*cphi(3,i) - cmp(2,i)*lcphi(3,i)
+     &            + 2.0d0*(lcmp(6,i)-lcmp(5,i))*cphi(8,i)
+     &            + 2.0d0*(cmp(6,i)-cmp(5,i))*lcphi(8,i)
+     &            + lcmp(8,i)*cphi(5,i) + cmp(8,i)*lcphi(5,i)
+     &            + lcmp(10,i)*cphi(9,i) + cmp(10,i)*lcphi(9,i)
+     &            - lcmp(8,i)*cphi(6,i) - cmp(8,i)*lcphi(6,i)
+     &            - lcmp(9,i)*cphi(10,i) - cmp(9,i)*lcphi(10,i)
          call torque (i,tem,fix,fiy,fiz,dem)
+         call torque (i,dltem,dlfix,dlfiy,dlfiz,dldem)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -4737,6 +5068,18 @@ c
          vyz = vyz + 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
      &                        + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
          vzz = vzz + zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         dldvxx = dldvxx + xix*dlfix(1) + xiy*dlfiy(1) + xiz*dlfiz(1)
+         dldvxy = dldvxy
+     &             + 0.5d0*(yix*dlfix(1) + yiy*dlfiy(1) + yiz*dlfiz(1)
+     &                    + xix*dlfix(2) + xiy*dlfiy(2) + xiz*dlfiz(2))
+         dldvxz = dldvxz
+     &             + 0.5d0*(zix*dlfix(1) + ziy*dlfiy(1) + ziz*dlfiz(1)
+     &                    + xix*dlfix(3) + xiy*dlfiy(3) + xiz*dlfiz(3)) 
+         dldvyy = dldvyy + yix*dlfix(2) + yiy*dlfiy(2) + yiz*dlfiz(2)
+         dldvyz = dldvyz
+     &             + 0.5d0*(zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
+     &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
+         dldvzz = dldvzz + zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -4795,5 +5138,14 @@ c
       vir(1,3) = vir(1,3) + vxz
       vir(2,3) = vir(2,3) + vyz
       vir(3,3) = vir(3,3) + vzz
+      dldemvir(1,1) = dldemvir(1,1) + dldvxx
+      dldemvir(2,1) = dldemvir(2,1) + dldvxy
+      dldemvir(3,1) = dldemvir(3,1) + dldvxz
+      dldemvir(1,2) = dldemvir(1,2) + dldvxy
+      dldemvir(2,2) = dldemvir(2,2) + dldvyy
+      dldemvir(3,2) = dldemvir(3,2) + dldvyz
+      dldemvir(1,3) = dldemvir(1,3) + dldvxz
+      dldemvir(2,3) = dldemvir(2,3) + dldvyz
+      dldemvir(3,3) = dldemvir(3,3) + dldvzz
       return
       end
