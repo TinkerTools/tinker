@@ -213,7 +213,6 @@ c
       do i = 1, 3
          do j = 1, 3
             vir(j,i) = 0.0d0
-            emvir(j,i) = 0.0d0
             epvir(j,i) = 0.0d0
          end do
       end do
