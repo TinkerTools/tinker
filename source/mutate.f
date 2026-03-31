@@ -318,10 +318,11 @@ c
       if (use_mutate .and. .not.silent) then
          write (iout,40)
    40    format (/,' Free Energy Perturbation Parameters :')
-         write (iout,50)  nmut,vlambda,elambda,tlambda
+         write (iout,50)  nmut,vlambda,elambda,eplambda,tlambda
    50    format (/,' Number of FEP Hybrid Atoms',9x,i8,
      &           /,' van der Waals Lambda Value',9x,f8.3,
      &           /,' Electrostatics Lambda Value',8x,f8.3,
+     &           /,' Polarization Lambda Value',10x,f8.3,
      &           /,' Torsion Angle Lambda Value',9x,f8.3)
       end if
 c
