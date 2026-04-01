@@ -47,6 +47,7 @@ c
       use mplpot
       use mpole
       use mutant
+      use ost
       use polar
       use potent
       implicit none
@@ -106,6 +107,10 @@ c
 c     set default dual topology interpolation exponent
 c
       epdtexp = 2
+c
+c     set default ost energy update interval
+c
+      iost = 10
 c
 c     zero out number of hybrid atoms and mutated torsions
 c
@@ -203,8 +208,11 @@ c
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  epdtexp
-         else if (keyword(1:5) .eq. 'OSRW ') then
+         else if (keyword(1:4) .eq. 'OST ') then
             use_dlmda = .true.
+         else if (keyword(1:13) .eq. 'OST-INTERVAL ') then
+            string = record(next:240)
+            read (string,*,err=30)  iost
          end if
    30    continue
       end do

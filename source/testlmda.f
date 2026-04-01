@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung & Jay W. Ponder  ##
 c     ##                    All Rights Reserved                     ##
 c     ################################################################
 c
-c     #########################################################
-c     ##                                                     ##
-c     ##  program testlmda  --  osrw lambda derivative test  ##
-c     ##                                                     ##
-c     #########################################################
+c     ####################################################
+c     ##                                                ##
+c     ##  program testlmda  --  lambda derivative test  ##
+c     ##                                                ##
+c     ####################################################
 c
 c
 c     "testlmda" computes and compares the analytical and numerical

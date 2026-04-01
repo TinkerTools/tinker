@@ -353,6 +353,7 @@ c
                dldvir(j,i) = dldevvir(j,i)+dldemvir(j,i)+dldepvir(j,i)
             end do
          end do
+         call eost
       end if
 c
 c     distribute gradient on four-site water extra centers
