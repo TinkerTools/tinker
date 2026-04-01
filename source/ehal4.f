@@ -131,6 +131,11 @@ c
             dldev(j,i) = 0.0d0
          end do
       end do
+      do i = 1, 3
+         do j = 1, 3
+            dldevvir(j,i) = 0.0d0
+         end do
+      end do
       if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
@@ -868,6 +873,11 @@ c
             dldev(j,i) = 0.0d0
          end do
       end do
+      do i = 1, 3
+         do j = 1, 3
+            dldevvir(j,i) = 0.0d0
+         end do
+      end do
       if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
@@ -1347,6 +1357,11 @@ c
          do j = 1, 3
             dev(j,i) = 0.0d0
             dldev(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            dldevvir(j,i) = 0.0d0
          end do
       end do
       if (nvdw .eq. 0)  return

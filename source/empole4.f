@@ -173,6 +173,11 @@ c
             dldem(j,i) = 0.0d0
          end do
       end do
+      do i = 1, 3
+         do j = 1, 3
+            dldemvir(j,i) = 0.0d0
+         end do
+      end do
       if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
@@ -1349,6 +1354,11 @@ c
             dldem(j,i) = 0.0d0
          end do
       end do
+      do i = 1, 3
+         do j = 1, 3
+            dldemvir(j,i) = 0.0d0
+         end do
+      end do
       if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
@@ -2035,6 +2045,11 @@ c
          do j = 1, 3
             dem(j,i) = 0.0d0
             dldem(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            dldemvir(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -3543,6 +3558,11 @@ c
          do j = 1, 3
             dem(j,i) = 0.0d0
             dldem(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            dldemvir(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
