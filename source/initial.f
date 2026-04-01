@@ -37,6 +37,7 @@ c
       use mutant
       use neigh
       use openmp
+      use ost
       use output
       use params
       use pdb
@@ -195,6 +196,7 @@ c
 c     flag for use of lambda derivative
 c
       use_dlmda = .false.
+      use_ost = .false.
 c
 c     flag for use of rigid bodies
 c

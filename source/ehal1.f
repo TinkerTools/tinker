@@ -22,6 +22,7 @@ c
       use vdwpot
       use virial
       implicit none
+      integer i,j
       real*8 elrc,vlrc
       character*6 mode
 c
@@ -42,10 +43,18 @@ c
          mode = 'VDW'
          call evcorr1 (mode,elrc,vlrc)
          ev = ev + elrc
-         vir(1,1) = vir(1,1) + vlrc
-         vir(2,2) = vir(2,2) + vlrc
-         vir(3,3) = vir(3,3) + vlrc
+         evvir(1,1) = evvir(1,1) + vlrc
+         evvir(2,2) = evvir(2,2) + vlrc
+         evvir(3,3) = evvir(3,3) + vlrc
       end if
+c
+c     add the van der Waals virial to main virial
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + evvir(j,i)
+         end do
+      end do
       return
       end
 c
@@ -113,6 +122,11 @@ c
          dev(1,i) = 0.0d0
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = 0.0d0
+         end do
       end do
       if (nvdw .eq. 0)  return
 c
@@ -312,15 +326,15 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  evvir(1,1) = evvir(1,1) + vxx
+                  evvir(2,1) = evvir(2,1) + vyx
+                  evvir(3,1) = evvir(3,1) + vzx
+                  evvir(1,2) = evvir(1,2) + vyx
+                  evvir(2,2) = evvir(2,2) + vyy
+                  evvir(3,2) = evvir(3,2) + vzy
+                  evvir(1,3) = evvir(1,3) + vzx
+                  evvir(2,3) = evvir(2,3) + vzy
+                  evvir(3,3) = evvir(3,3) + vzz
                end if
             end if
          end do
@@ -522,15 +536,15 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     vir(1,1) = vir(1,1) + vxx
-                     vir(2,1) = vir(2,1) + vyx
-                     vir(3,1) = vir(3,1) + vzx
-                     vir(1,2) = vir(1,2) + vyx
-                     vir(2,2) = vir(2,2) + vyy
-                     vir(3,2) = vir(3,2) + vzy
-                     vir(1,3) = vir(1,3) + vzx
-                     vir(2,3) = vir(2,3) + vzy
-                     vir(3,3) = vir(3,3) + vzz
+                     evvir(1,1) = evvir(1,1) + vxx
+                     evvir(2,1) = evvir(2,1) + vyx
+                     evvir(3,1) = evvir(3,1) + vzx
+                     evvir(1,2) = evvir(1,2) + vyx
+                     evvir(2,2) = evvir(2,2) + vyy
+                     evvir(3,2) = evvir(3,2) + vzy
+                     evvir(1,3) = evvir(1,3) + vzx
+                     evvir(2,3) = evvir(2,3) + vzy
+                     evvir(3,3) = evvir(3,3) + vzz
                   end if
                end do
             end if
@@ -631,6 +645,11 @@ c
          dev(1,i) = 0.0d0
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = 0.0d0
+         end do
       end do
       if (nvdw .eq. 0)  return
 c
@@ -887,15 +906,15 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  evvir(1,1) = evvir(1,1) + vxx
+                  evvir(2,1) = evvir(2,1) + vyx
+                  evvir(3,1) = evvir(3,1) + vzx
+                  evvir(1,2) = evvir(1,2) + vyx
+                  evvir(2,2) = evvir(2,2) + vyy
+                  evvir(3,2) = evvir(3,2) + vzy
+                  evvir(1,3) = evvir(1,3) + vzx
+                  evvir(2,3) = evvir(2,3) + vzy
+                  evvir(3,3) = evvir(3,3) + vzz
                end if
             end if
    20       continue
@@ -998,6 +1017,11 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = 0.0d0
+         end do
+      end do
       if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
@@ -1036,8 +1060,8 @@ c
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
 !$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalpha,c0,c1,
 !$OMP& c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev,dev,vir)
-!$OMP DO reduction(+:ev,dev,vir)
+!$OMP& firstprivate(vscale,iv14) shared(ev,dev,evvir)
+!$OMP DO reduction(+:ev,dev,evvir)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1207,15 +1231,15 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  evvir(1,1) = evvir(1,1) + vxx
+                  evvir(2,1) = evvir(2,1) + vyx
+                  evvir(3,1) = evvir(3,1) + vzx
+                  evvir(1,2) = evvir(1,2) + vyx
+                  evvir(2,2) = evvir(2,2) + vyy
+                  evvir(3,2) = evvir(3,2) + vzy
+                  evvir(1,3) = evvir(1,3) + vzx
+                  evvir(2,3) = evvir(2,3) + vzy
+                  evvir(3,3) = evvir(3,3) + vzz
                end if
             end if
          end do

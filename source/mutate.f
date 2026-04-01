@@ -2,6 +2,7 @@ c
 c
 c     ##############################################################
 c     ##  COPYRIGHT (C) 2009 by Chuanjie Wu & Jay William Ponder  ##
+c     ##  COPYRIGHT (C) 2026 by Moses Chung & Jay William Ponder  ##
 c     ##                   All Rights Reserved                    ##
 c     ##############################################################
 c
@@ -59,7 +60,8 @@ c
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
       real*8 eps
-      logical seteplambda
+      real*8 temp
+      logical setplambda
       character*20 keyword
       character*240 record
       character*240 string
@@ -95,8 +97,8 @@ c
 c
 c     set defaults for lambda scaling for lambda derivatives
 c
-      seteplambda = .false.
-      eplambda = 1.0d0
+      setplambda = .false.
+      plambda = 1.0d0
 c
 c     set defaults for vdw coupling type and soft core vdw
 c
@@ -111,6 +113,21 @@ c
 c     set default ost energy update interval
 c
       iost = 10
+c
+c     set default mapping from main lambda to sublambda
+c
+      ostplmda1 = 1.0d0
+      ostplmda0 = 0.6d0
+      ostelmda1 = 0.7d0
+      ostelmda0 = 0.3d0
+      ostvlmda1 = 0.4d0
+      ostvlmda0 = 0.0d0
+      ostlambda = 1.0d0
+c
+c     set default flag to compute specific lambda deriv
+c
+      use_pol4i = .false.
+      use_pol4f = .false.
 c
 c     zero out number of hybrid atoms and mutated torsions
 c
@@ -142,8 +159,8 @@ c
             read (string,*,err=30)  elambda
          else if (keyword(1:11) .eq. 'POL-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=30)  eplambda
-            seteplambda = .true.
+            read (string,*,err=30)  plambda
+            setplambda = .true.
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -208,18 +225,73 @@ c
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  epdtexp
+         else if (keyword(1:13) .eq. 'LAMBDA-DERIV ') then
+            use_dlmda = .true.
+            use_pol4i = .true.
+            use_pol4f = .true.
          else if (keyword(1:4) .eq. 'OST ') then
             use_dlmda = .true.
-         else if (keyword(1:13) .eq. 'OST-INTERVAL ') then
+            use_ost = .true.
+            use_pol4i = .true.
+            use_pol4f = .true.
+         else if (keyword(1:18) .eq. 'OST-COMP-INTERVAL ') then
             string = record(next:240)
             read (string,*,err=30)  iost
+         else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostplmda0, ostplmda1
+         else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostelmda0, ostelmda1
+         else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostvlmda0, ostvlmda1
+         else if (keyword(1:15) .eq. 'OST-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostlambda
          end if
    30    continue
       end do
 c
-c     set eplambda to elambda if no values given
+c     set plambda to elambda if no values given
 c
-      if (.not. seteplambda)  eplambda = elambda
+      if (.not. setplambda)  plambda = elambda
+c
+c     check sublambda intervals are in [0,1] and ordered
+c
+      if (ostplmda0 .lt. 0.0d0)  ostplmda0 = 0.0d0
+      if (ostplmda1 .lt. 0.0d0)  ostplmda1 = 0.0d0
+      if (ostelmda0 .lt. 0.0d0)  ostelmda0 = 0.0d0
+      if (ostelmda1 .lt. 0.0d0)  ostelmda1 = 0.0d0
+      if (ostvlmda0 .lt. 0.0d0)  ostvlmda0 = 0.0d0
+      if (ostvlmda1 .lt. 0.0d0)  ostvlmda1 = 0.0d0
+      if (ostlambda .lt. 0.0d0)  ostlambda = 0.0d0
+      if (ostplmda0 .gt. 1.0d0)  ostplmda0 = 1.0d0
+      if (ostplmda1 .gt. 1.0d0)  ostplmda1 = 1.0d0
+      if (ostelmda0 .gt. 1.0d0)  ostelmda0 = 1.0d0
+      if (ostelmda1 .gt. 1.0d0)  ostelmda1 = 1.0d0
+      if (ostvlmda0 .gt. 1.0d0)  ostvlmda0 = 1.0d0
+      if (ostvlmda1 .gt. 1.0d0)  ostvlmda1 = 1.0d0
+      if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
+      if (ostplmda1 .lt. ostplmda0) then
+         temp = ostplmda0
+         ostplmda0 = ostplmda1
+         ostplmda1 = temp
+      end if
+      if (ostelmda1 .lt. ostelmda0) then
+         temp = ostelmda0
+         ostelmda0 = ostelmda1
+         ostelmda1 = temp
+      end if
+      if (ostvlmda1 .lt. ostvlmda0) then
+         temp = ostvlmda0
+         ostvlmda0 = ostvlmda1
+         ostvlmda1 = temp
+      end if
+c
+c     get mapping from main lambda to sub-lambdas
+c
+      if (use_ost)  call mapsublmda
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -326,7 +398,7 @@ c
       if (use_mutate .and. .not.silent) then
          write (iout,40)
    40    format (/,' Free Energy Perturbation Parameters :')
-         write (iout,50)  nmut,vlambda,elambda,eplambda,tlambda
+         write (iout,50)  nmut,vlambda,elambda,plambda,tlambda
    50    format (/,' Number of FEP Hybrid Atoms',9x,i8,
      &           /,' van der Waals Lambda Value',9x,f8.3,
      &           /,' Electrostatics Lambda Value',8x,f8.3,
@@ -472,7 +544,7 @@ c     ###############################################################
 c
 c
 c     "altpolr" constructs mutated polarization parameters based
-c     on the lambda mutation parameter "eplambda"
+c     on the lambda mutation parameter "plambda"
 c
 c
       subroutine altpolr
@@ -496,12 +568,12 @@ c
             k = ipole(i)
             if (mut(k)) then
                do j = 1, 13
-                  pole(j,k) = poleorig(j,k) * eplambda
+                  pole(j,k) = poleorig(j,k) * plambda
                end do
                mono0(k) = pole(1,k)
                if (use_chgpen) then
-                  pcore(k) = pcoreorig(k) * eplambda
-                  pval(k) = pvalorig(k) * eplambda
+                  pcore(k) = pcoreorig(k) * plambda
+                  pval(k) = pvalorig(k) * plambda
                   pval0(k) = pval(k)
                end if
             end if
@@ -514,9 +586,9 @@ c
          do i = 1, npole
             k = ipole(i)
             if (mut(k)) then
-               polarity(k) = polarityorig(k) * eplambda
+               polarity(k) = polarityorig(k) * plambda
                douind(k) = douindorig(k)
-               if (eplambda .eq. 0.0d0)  douind(k) = .false.
+               if (plambda .eq. 0.0d0)  douind(k) = .false.
             end if
          end do
       end if

@@ -2467,21 +2467,22 @@ c
       use dlmda
       use energi
       use limits
+      use ost
       implicit none
       integer i
       integer nep1,nep0
       real*8 ep1,ep0
-      real*8 eplambdaorig
-      real*8 eplambdaexp
+      real*8 plambdaorig
+      real*8 plambdaexp
       real*8, allocatable :: aep1(:)
       real*8, allocatable :: aep0(:)
       logical pairwise
       character*6 mode
 c
 c
-c     copy original eplambda
+c     copy original plambda
 c
-      eplambdaorig = eplambda
+      plambdaorig = plambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2494,75 +2495,95 @@ c
 c
 c     compute energy of the lambda = 0 state
 c
-      eplambda = 0.0d0
-      call altpolr
-      if (pairwise) then
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar3d
+      if (use_pol4i) then
+         plambda = 0.0d0
+         call altpolr
+         if (pairwise) then
+            if (use_ewald) then
+               if (use_mlist) then
+                  call epolar3d
+               else
+                  call epolar3c
+               end if
             else
-               call epolar3c
+               if (use_mlist) then
+                  call epolar3b
+               else
+                  call epolar3a
+               end if
             end if
          else
-            if (use_mlist) then
-               call epolar3b
-            else
-               call epolar3a
-            end if
+            call epolar3e
          end if
-      else
-         call epolar3e
-      end if
 c
 c     copy energy of the lambda = 0 state
 c
-      ep0 = ep
-      nep0 = nep
-      do i = 1, n
-         aep0(i) = aep(i)
-      end do
+         ep0 = ep
+         nep0 = nep
+         do i = 1, n
+            aep0(i) = aep(i)
+         end do
+      end if
 c
 c     compute energy of the lambda = 1 state
 c
-      eplambda = 1.0d0
-      call altpolr
-      if (pairwise) then
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar3d
+      if (use_pol4f) then
+         plambda = 1.0d0
+         call altpolr
+         if (pairwise) then
+            if (use_ewald) then
+               if (use_mlist) then
+                  call epolar3d
+               else
+                  call epolar3c
+               end if
             else
-               call epolar3c
+               if (use_mlist) then
+                  call epolar3b
+               else
+                  call epolar3a
+               end if
             end if
          else
-            if (use_mlist) then
-               call epolar3b
-            else
-               call epolar3a
-            end if
+            call epolar3e
          end if
-      else
-         call epolar3e
-      end if
 c
 c     copy energy of the lambda = 1 state
 c
-      ep1 = ep
-      nep1 = nep
-      do i = 1, n
-         aep1(i) = aep(i)
-      end do
+         ep1 = ep
+         nep1 = nep
+         do i = 1, n
+            aep1(i) = aep(i)
+         end do
+      end if
 c
-c     set original eplambda
+c     copy energy if only one state is computed
 c
-      eplambda = eplambdaorig
+      if (use_pol4i .and. .not.use_pol4f) then
+         ep1 = ep0
+         nep1 = nep0
+         do i = 1, n
+            aep1(i) = aep0(i)
+         end do
+      else if (.not.use_pol4i .and. use_pol4f) then
+         ep0 = ep1
+         nep0 = nep1
+         do i = 1, n
+            aep0(i) = aep1(i)
+         end do
+      end if
+c
+c     set original plambda
+c
+      plambda = plambdaorig
       call altelec
 c
 c     interpolate energy
 c
-      eplambdaexp = eplambda**epdtexp
-      ep = eplambdaexp * ep1 + (1.0d0 - eplambdaexp) * ep0
+      plambdaexp = plambda**epdtexp
+      ep = plambdaexp * ep1 + (1.0d0 - plambdaexp) * ep0
       do i = 1, n
-         aep(i) = eplambdaexp * aep1(i) + (1.0d0-eplambdaexp) * aep0(i)
+         aep(i) = plambdaexp * aep1(i) + (1.0d0-plambdaexp) * aep0(i)
       end do
       nep = max(nep1,nep0)
 c

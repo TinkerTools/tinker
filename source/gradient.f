@@ -26,6 +26,7 @@ c
       use inter
       use iounit
       use limits
+      use ost
       use potent
       use vdwpot
       use virial
@@ -222,6 +223,8 @@ c
          do j = 1, 3
             vir(j,i) = 0.0d0
             epvir(j,i) = 0.0d0
+            emvir(j,i) = 0.0d0
+            evvir(j,i) = 0.0d0
          end do
       end do
       einter = 0.0d0
@@ -341,6 +344,7 @@ c
 c     sum up to get the total lambda derivative
 c
       if (use_dlmda) then
+         if (use_ost)  call lmdachain
          delmda = devlmda + demlmda + deplmda
          delmda2 = devlmda2 + demlmda2 + deplmda2
          do i = 1, n
@@ -353,7 +357,7 @@ c
                dldvir(j,i) = dldevvir(j,i)+dldemvir(j,i)+dldepvir(j,i)
             end do
          end do
-         call eost
+         if (use_ost)  call eost
       end if
 c
 c     distribute gradient on four-site water extra centers

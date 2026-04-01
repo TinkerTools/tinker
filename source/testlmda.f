@@ -26,6 +26,7 @@ c
       use inform
       use iounit
       use mutant
+      use ost
       use usage
       use virial
       implicit none
@@ -52,7 +53,11 @@ c
       real*8 oldepl
       real*8 denorm,ndenorm
       real*8 totnorm,ntotnorm,rms,nrms
-      real*8 nvir(3,3)
+      real*8 adldvir(3,3)
+      real*8 ndldvir(3,3)
+      real*8 ndldepvir(3,3)
+      real*8 ndldemvir(3,3)
+      real*8 ndldevvir(3,3)
       real*8, allocatable :: derivs(:,:)
       real*8, allocatable :: adldesum(:,:)
       real*8, allocatable :: adldev(:,:)
@@ -79,6 +84,8 @@ c
 c     set flag to use lambda derivative
 c
       use_dlmda = .true.
+      use_pol4i = .true.
+      use_pol4f = .true.
 c
 c     decide whether to do an analytical derivative calculation
 c
@@ -188,6 +195,11 @@ c
                   adldep(j,i) = dldep(j,i)
                end do
             end do
+            do i = 1, 3
+               do j = 1, 3
+                  adldvir(j,i) = dldvir(j,i)
+               end do
+            end do
          end if
 c
 c     compute the numerical lambda derivatives
@@ -195,10 +207,10 @@ c
          if (donumer) then
             oldvdl = vlambda
             oldeml = elambda
-            oldepl = eplambda
+            oldepl = plambda
             vlambda = oldvdl + eps
             elambda = oldeml + eps
-            eplambda = oldepl + eps
+            plambda = oldepl + eps
             call altelec
             esum2 = energy ()
             ev2 = ev
@@ -206,7 +218,7 @@ c
             ep2 = ep
             vlambda = oldvdl - eps
             elambda = oldeml - eps
-            eplambda = oldepl - eps
+            plambda = oldepl - eps
             call altelec
             esum0 = energy ()
             ev0 = ev
@@ -214,7 +226,7 @@ c
             ep0 = ep
             vlambda = oldvdl
             elambda = oldeml
-            eplambda = oldepl
+            plambda = oldepl
             call altelec
             esum1 = energy ()
             ev1 = ev
@@ -230,7 +242,7 @@ c
             ndeplmda2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
             vlambda = oldvdl + eps
             elambda = oldeml + eps
-            eplambda = oldepl + eps
+            plambda = oldepl + eps
             call altelec
             call gradient (eval,derivs)
             do i = 1, n
@@ -243,12 +255,15 @@ c
             end do
             do i = 1, 3
                do j = 1, 3
-                  nvir(j,i) = vir(j,i)
+                  ndldvir(j,i) = vir(j,i)
+                  ndldepvir(j,i) = epvir(j,i)
+                  ndldemvir(j,i) = emvir(j,i)
+                  ndldevvir(j,i) = evvir(j,i)
                end do
             end do
             vlambda = oldvdl - eps
             elambda = oldeml - eps
-            eplambda = oldepl - eps
+            plambda = oldepl - eps
             call altelec
             call gradient (eval,derivs)
             do i = 1, n
@@ -262,12 +277,52 @@ c
             end do
             do i = 1, 3
                do j = 1, 3
-                  nvir(j,i) = (nvir(j,i) - vir(j,i)) / (2.0d0 * eps)
+                  ndldvir(j,i) = (ndldvir(j,i) - vir(j,i))
+     &                         / (2.0d0 * eps)
+                  ndldepvir(j,i) = (ndldepvir(j,i)-epvir(j,i))
+     &                           / (2.0d0 * eps)
+                  ndldemvir(j,i) = (ndldemvir(j,i)-emvir(j,i))
+     &                           / (2.0d0 * eps)
+                  ndldevvir(j,i) = (ndldevvir(j,i)-evvir(j,i))
+     &                           / (2.0d0 * eps)
                end do
             end do
+c
+c     apply chain rule if using global lambda in ost
+c
+            if (use_ost) then
+               ndeplmda2 = ndeplmda2 * dplambda*dplambda
+     &                           + ndeplmda * d2plambda
+               ndeplmda = ndeplmda * dplambda
+               ndevlmda2 = ndevlmda2 * dvlambda*dvlambda
+     &                           + ndevlmda * d2vlambda
+               ndevlmda = ndevlmda * dvlambda
+               ndemlmda2 = ndemlmda2 * delambda*delambda
+     &                           + ndemlmda * d2elambda
+               ndemlmda = ndemlmda * delambda
+               ndelmda = ndeplmda + ndevlmda + ndemlmda
+               ndelmda2 = ndeplmda2 + ndevlmda2 + ndemlmda2
+               do i = 1, n
+                  do j = 1, 3
+                     ndldep(j,i) = ndldep(j,i) * dplambda
+                     ndldem(j,i) = ndldem(j,i) * delambda
+                     ndldev(j,i) = ndldev(j,i) * dvlambda
+                     ndldesum(j,i) = ndldep(j,i)+ndldem(j,i)+ndldev(j,i)
+                  end do
+               end do
+               do i = 1, 3
+                  do j = 1, 3
+                     ndldepvir(j,i) = ndldepvir(j,i) * dplambda
+                     ndldemvir(j,i) = ndldemvir(j,i) * delambda
+                     ndldevvir(j,i) = ndldevvir(j,i) * dvlambda
+                     ndldvir(j,i) = ndldepvir(j,i) + ndldemvir(j,i)
+     &                            + ndldevvir(j,i)
+                  end do
+               end do
+            end if
             vlambda = oldvdl
             elambda = oldeml
-            eplambda = oldepl
+            plambda = oldepl
             call altelec
          end if
 c
@@ -387,13 +442,13 @@ c
 c
 c     print the components of the analytical internal virial
 c
-      write (iout,230)  (dldvir(1,i),dldvir(2,i),dldvir(3,i),i=1,3)
+      write (iout,230)  (adldvir(1,i),adldvir(2,i),adldvir(3,i),i=1,3)
   230 format (/,' Analytical dV/dL :',8x,3f13.3,
      &           /,27x,3f13.3,/,27x,3f13.3)
 c
 c     print the components of the numerical internal virial
 c
-      write (iout,240)  (nvir(1,i),nvir(2,i),nvir(3,i),i=1,3)
+      write (iout,240)  (ndldvir(1,i),ndldvir(2,i),ndldvir(3,i),i=1,3)
   240 format (/,' Numerical dV/dL :',9x,3f13.3,
      &           /,27x,3f13.3,/,27x,3f13.3)
 c

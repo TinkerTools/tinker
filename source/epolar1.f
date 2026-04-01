@@ -9665,13 +9665,14 @@ c
       use deriv
       use dlmda
       use limits
+      use ost
       use polpot
       use virial
       implicit none
       integer i,j
       real*8 ep1,ep0
-      real*8 eplambdaorig
-      real*8 eplambdaexp
+      real*8 plambdaorig
+      real*8 plambdaexp
       real*8 epvir1(3,3)
       real*8 epvir0(3,3)
       real*8, allocatable :: dep1(:,:)
@@ -9679,9 +9680,9 @@ c
       character*6 mode
 c
 c
-c     copy original eplambda
+c     copy original plambda
 c
-      eplambdaorig = eplambda
+      plambdaorig = plambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -9690,93 +9691,125 @@ c
 c
 c     compute energy, force, and virial of the lambda = 0 state
 c
-      eplambda = 0.0d0
-      call altpolr
-      if (use_ewald) then
-         if (use_mlist) then
-            call epolar1d
+      if (use_pol4i) then
+         plambda = 0.0d0
+         call altpolr
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar1d
+            else
+               call epolar1c
+            end if
          else
-            call epolar1c
+            if (use_mlist) then
+               call epolar1b
+            else
+               call epolar1a
+            end if
          end if
-      else
-         if (use_mlist) then
-            call epolar1b
-         else
-            call epolar1a
+         if (use_expol) then
+            call dexpol
          end if
-      end if
-      if (use_expol) then
-         call dexpol
-      end if
 c
 c     copy energy, force, and virial of the lambda = 0 state
 c
-      ep0 = ep
-      do i = 1, n
-         do j = 1, 3
-            dep0(j,i) = dep(j,i)
+         ep0 = ep
+         do i = 1, n
+            do j = 1, 3
+               dep0(j,i) = dep(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvir0(j,i) = epvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvir0(j,i) = epvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     compute energy of the lambda = 1 state
 c
-      eplambda = 1.0d0
-      call altpolr
-      if (use_ewald) then
-         if (use_mlist) then
-            call epolar1d
+      if (use_pol4f) then
+         plambda = 1.0d0
+         call altpolr
+         if (use_ewald) then
+            if (use_mlist) then
+               call epolar1d
+            else
+               call epolar1c
+            end if
          else
-            call epolar1c
+            if (use_mlist) then
+               call epolar1b
+            else
+               call epolar1a
+            end if
          end if
-      else
-         if (use_mlist) then
-            call epolar1b
-         else
-            call epolar1a
+         if (use_expol) then
+            call dexpol
          end if
-      end if
-      if (use_expol) then
-         call dexpol
-      end if
 c
 c     copy energy, force, and virial of the lambda = 1 state
 c
-      ep1 = ep
-      do i = 1, n
-         do j = 1, 3
-            dep1(j,i) = dep(j,i)
+         ep1 = ep
+         do i = 1, n
+            do j = 1, 3
+               dep1(j,i) = dep(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvir1(j,i) = epvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvir1(j,i) = epvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
-c     set original eplambda
+c     copy energy, force, and virial if only one state is computed
 c
-      eplambda = eplambdaorig
+      if (use_pol4i .and. .not.use_pol4f) then
+         ep1 = ep0
+         do i = 1, n
+            do j = 1, 3
+               dep1(j,i) = dep0(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               epvir1(j,i) = epvir0(j,i)
+            end do
+         end do
+      else if (.not.use_pol4i .and. use_pol4f) then
+         ep0 = ep1
+         do i = 1, n
+            do j = 1, 3
+               dep0(j,i) = dep1(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               epvir0(j,i) = epvir1(j,i)
+            end do
+         end do
+      end if
+c
+c     set original plambda
+c
+      plambda = plambdaorig
       call altelec
 c
 c     interpolate energy, force, and virial
 c
-      eplambdaexp = eplambda**epdtexp
-      ep = eplambdaexp * ep1 + (1.0d0 - eplambdaexp) * ep0
+      plambdaexp = plambda**epdtexp
+      ep = plambdaexp * ep1 + (1.0d0 - plambdaexp) * ep0
       do i = 1, n
          do j = 1, 3
-            dep(j,i) = eplambdaexp * dep1(j,i)
-     &                 + (1.0d0 - eplambdaexp) * dep0(j,i)
+            dep(j,i) = plambdaexp * dep1(j,i)
+     &                 + (1.0d0 - plambdaexp) * dep0(j,i)
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            epvir(j,i) = eplambdaexp * epvir1(j,i)
-     &                 + (1.0d0 - eplambdaexp) * epvir0(j,i)
+            epvir(j,i) = plambdaexp * epvir1(j,i)
+     &                 + (1.0d0 - plambdaexp) * epvir0(j,i)
          end do
       end do
 c
