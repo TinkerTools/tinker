@@ -89,7 +89,11 @@ c
       npair = 0
       nterm = 0
       if (use_vdw)  nterm = nterm + 1
-      if (use_repel)  nterm = nterm + 1
+      if (use_repel) then
+         nterm = nterm + 1
+      else if (use_xrepel) then
+         nterm = nterm + 1
+      end if
       if (use_disp)  nterm = nterm + 1
       if (use_charge)  nterm = nterm + 1
       if (use_chgdpl)  nterm = nterm + 1
@@ -269,7 +273,11 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
-         if (use_repel)  call erepel
+         if (use_repel) then
+            call erepel
+         else if (use_xrepel) then
+            call exrepel
+         end if
          if (use_disp)  call edisp
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
@@ -307,7 +315,11 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
-         if (use_repel)  call erepel
+         if (use_repel) then
+            call erepel
+         else if (use_xrepel) then
+            call exrepel
+         end if
          if (use_disp)  call edisp
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
@@ -342,7 +354,11 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss
          end if
-         if (use_repel)  call erepel
+         if (use_repel) then
+            call erepel
+         else if (use_xrepel) then
+            call exrepel
+         end if
          if (use_disp)  call edisp
          if (use_charge)  call echarge
          if (use_chgdpl)  call echgdpl
@@ -388,7 +404,11 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
-         if (use_repel)  call erepel1
+         if (use_repel) then
+            call erepel1
+         else if (use_xrepel) then
+            call exrepel1
+         end if
          if (use_disp)  call edisp1
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
@@ -442,7 +462,11 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
-         if (use_repel)  call erepel1
+         if (use_repel) then
+            call erepel1
+         else if (use_xrepel) then
+            call exrepel1
+         end if
          if (use_disp)  call edisp1
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
@@ -493,7 +517,11 @@ c
             if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
             if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
          end if
-         if (use_repel)  call erepel1
+         if (use_repel) then
+            call erepel1
+         else if (use_xrepel) then
+            call exrepel1
+         end if
          if (use_disp)  call edisp1
          if (use_charge)  call echarge1
          if (use_chgdpl)  call echgdpl1
