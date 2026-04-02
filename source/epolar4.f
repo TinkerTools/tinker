@@ -236,18 +236,18 @@ c
       else
          d2plambdaexp = 0.0d0
       end if
-      deplmda = dplambdaexp * (ep1 - ep0)
-      deplmda2 = d2plambdaexp * (ep1 - ep0)
+      depdl = dplambdaexp * (ep1 - ep0)
+      depdl2 = d2plambdaexp * (ep1 - ep0)
       do i = 1, n
          do j = 1, 3
             dep(j,i) = plambdaexp * dep1(j,i)
      &                 + (1.0d0 - plambdaexp) * dep0(j,i)
-            dldep(j,i) = dplambdaexp * (dep1(j,i) - dep0(j,i))
+            dfpdl(j,i) = dplambdaexp * (dep1(j,i) - dep0(j,i))
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            dldepvir(j,i) = dplambdaexp * (epvir1(j,i) - epvir0(j,i))
+            depvirdl(j,i) = dplambdaexp * (epvir1(j,i) - epvir0(j,i))
          end do
       end do
 c

@@ -175,18 +175,18 @@ c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
-      demlmda = 0.0d0
-      demlmda2 = 0.0d0
+      demdl = 0.0d0
+      demdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dldem(j,i) = 0.0d0
+            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            dldemvir(j,i) = 0.0d0
+            demvirdl(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -562,8 +562,8 @@ c
                   scalelmda = elambda
                end if
                if (muti .or. mutk) then
-                  demlmda = demlmda + dlambda
-                  demlmda2 = demlmda2 + dlambda2
+                  demdl = demdl + dlambda
+                  demdl2 = demdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -592,9 +592,9 @@ c
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
                if (muti .or. mutk) then
-                  dldem(1,i) = dldem(1,i) + dlfrcx
-                  dldem(2,i) = dldem(2,i) + dlfrcy
-                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dfmdl(1,i) = dfmdl(1,i) + dlfrcx
+                  dfmdl(2,i) = dfmdl(2,i) + dlfrcy
+                  dfmdl(3,i) = dfmdl(3,i) + dlfrcz
                   dltem(1,i) = dltem(1,i) + dlttmi(1)
                   dltem(2,i) = dltem(2,i) + dlttmi(2)
                   dltem(3,i) = dltem(3,i) + dlttmi(3)
@@ -609,9 +609,9 @@ c
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
                if (muti .or. mutk) then
-                  dldem(1,k) = dldem(1,k) - dlfrcx
-                  dldem(2,k) = dldem(2,k) - dlfrcy
-                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dfmdl(1,k) = dfmdl(1,k) - dlfrcx
+                  dfmdl(2,k) = dfmdl(2,k) - dlfrcy
+                  dfmdl(3,k) = dfmdl(3,k) - dlfrcz
                   dltem(1,k) = dltem(1,k) + dlttmk(1)
                   dltem(2,k) = dltem(2,k) + dlttmk(2)
                   dltem(3,k) = dltem(3,k) + dlttmk(3)
@@ -641,15 +641,15 @@ c
                   dldvyy = -yr * dlfrcy
                   dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
                   dldvzz = -zr * dlfrcz
-                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
-                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
-                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
-                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
-                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
-                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
-                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
-                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
-                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+                  demvirdl(1,1) = demvirdl(1,1) + dldvxx
+                  demvirdl(2,1) = demvirdl(2,1) + dldvxy
+                  demvirdl(3,1) = demvirdl(3,1) + dldvxz
+                  demvirdl(1,2) = demvirdl(1,2) + dldvxy
+                  demvirdl(2,2) = demvirdl(2,2) + dldvyy
+                  demvirdl(3,2) = demvirdl(3,2) + dldvyz
+                  demvirdl(1,3) = demvirdl(1,3) + dldvxz
+                  demvirdl(2,3) = demvirdl(2,3) + dldvyz
+                  demvirdl(3,3) = demvirdl(3,3) + dldvzz
                end if
             end if
    10       continue
@@ -1029,8 +1029,8 @@ c
                      dlambda = 0.5d0 * dlambda
                      dlambda2 = 0.5d0 * dlambda2
                   end if
-                  demlmda = demlmda + dlambda
-                  demlmda2 = demlmda2 + dlambda2
+                  demdl = demdl + dlambda
+                  demdl2 = demdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -1059,9 +1059,9 @@ c
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
                if (muti .or. mutk) then
-                  dldem(1,i) = dldem(1,i) + dlfrcx
-                  dldem(2,i) = dldem(2,i) + dlfrcy
-                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dfmdl(1,i) = dfmdl(1,i) + dlfrcx
+                  dfmdl(2,i) = dfmdl(2,i) + dlfrcy
+                  dfmdl(3,i) = dfmdl(3,i) + dlfrcz
                   dltem(1,i) = dltem(1,i) + dlttmi(1)
                   dltem(2,i) = dltem(2,i) + dlttmi(2)
                   dltem(3,i) = dltem(3,i) + dlttmi(3)
@@ -1076,9 +1076,9 @@ c
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
                if (muti .or. mutk) then
-                  dldem(1,k) = dldem(1,k) - dlfrcx
-                  dldem(2,k) = dldem(2,k) - dlfrcy
-                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dfmdl(1,k) = dfmdl(1,k) - dlfrcx
+                  dfmdl(2,k) = dfmdl(2,k) - dlfrcy
+                  dfmdl(3,k) = dfmdl(3,k) - dlfrcz
                   dltem(1,k) = dltem(1,k) + dlttmk(1)
                   dltem(2,k) = dltem(2,k) + dlttmk(2)
                   dltem(3,k) = dltem(3,k) + dlttmk(3)
@@ -1108,15 +1108,15 @@ c
                   dldvyy = -yr * dlfrcy
                   dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
                   dldvzz = -zr * dlfrcz
-                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
-                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
-                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
-                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
-                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
-                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
-                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
-                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
-                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+                  demvirdl(1,1) = demvirdl(1,1) + dldvxx
+                  demvirdl(2,1) = demvirdl(2,1) + dldvxy
+                  demvirdl(3,1) = demvirdl(3,1) + dldvxz
+                  demvirdl(1,2) = demvirdl(1,2) + dldvxy
+                  demvirdl(2,2) = demvirdl(2,2) + dldvyy
+                  demvirdl(3,2) = demvirdl(3,2) + dldvyz
+                  demvirdl(1,3) = demvirdl(1,3) + dldvxz
+                  demvirdl(2,3) = demvirdl(2,3) + dldvyz
+                  demvirdl(3,3) = demvirdl(3,3) + dldvzz
                end if
             end if
             end do
@@ -1145,7 +1145,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dfmdl)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -1188,15 +1188,15 @@ c
          dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
      &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
          dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
-         dldemvir(1,1) = dldemvir(1,1) + dldvxx
-         dldemvir(2,1) = dldemvir(2,1) + dldvxy
-         dldemvir(3,1) = dldemvir(3,1) + dldvxz
-         dldemvir(1,2) = dldemvir(1,2) + dldvxy
-         dldemvir(2,2) = dldemvir(2,2) + dldvyy
-         dldemvir(3,2) = dldemvir(3,2) + dldvyz
-         dldemvir(1,3) = dldemvir(1,3) + dldvxz
-         dldemvir(2,3) = dldemvir(2,3) + dldvyz
-         dldemvir(3,3) = dldemvir(3,3) + dldvzz
+         demvirdl(1,1) = demvirdl(1,1) + dldvxx
+         demvirdl(2,1) = demvirdl(2,1) + dldvxy
+         demvirdl(3,1) = demvirdl(3,1) + dldvxz
+         demvirdl(1,2) = demvirdl(1,2) + dldvxy
+         demvirdl(2,2) = demvirdl(2,2) + dldvyy
+         demvirdl(3,2) = demvirdl(3,2) + dldvyz
+         demvirdl(1,3) = demvirdl(1,3) + dldvxz
+         demvirdl(2,3) = demvirdl(2,3) + dldvyz
+         demvirdl(3,3) = demvirdl(3,3) + dldvzz
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -1357,18 +1357,18 @@ c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
-      demlmda = 0.0d0
-      demlmda2 = 0.0d0
+      demdl = 0.0d0
+      demdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dldem(j,i) = 0.0d0
+            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            dldemvir(j,i) = 0.0d0
+            demvirdl(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -1415,10 +1415,10 @@ c
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda)
-!$OMP& firstprivate(mscale) shared (em,dem,dldem,tem,dltem,pot,emvir,
-!$OMP& dldemvir,demlmda,demlmda2)
-!$OMP DO reduction(+:em,dem,dldem,tem,dltem,pot,emvir,dldemvir,
-!$OMP& demlmda,demlmda2)
+!$OMP& firstprivate(mscale) shared (em,dem,dfmdl,tem,dltem,pot,emvir,
+!$OMP& demvirdl,demdl,demdl2)
+!$OMP DO reduction(+:em,dem,dfmdl,tem,dltem,pot,emvir,demvirdl,
+!$OMP& demdl,demdl2)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1757,8 +1757,8 @@ c
                   scalelmda = elambda
                end if
                if (muti .or. mutk) then
-                  demlmda = demlmda + dlambda
-                  demlmda2 = demlmda2 + dlambda2
+                  demdl = demdl + dlambda
+                  demdl2 = demdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -1787,9 +1787,9 @@ c
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
                if (muti .or. mutk) then
-                  dldem(1,i) = dldem(1,i) + dlfrcx
-                  dldem(2,i) = dldem(2,i) + dlfrcy
-                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dfmdl(1,i) = dfmdl(1,i) + dlfrcx
+                  dfmdl(2,i) = dfmdl(2,i) + dlfrcy
+                  dfmdl(3,i) = dfmdl(3,i) + dlfrcz
                   dltem(1,i) = dltem(1,i) + dlttmi(1)
                   dltem(2,i) = dltem(2,i) + dlttmi(2)
                   dltem(3,i) = dltem(3,i) + dlttmi(3)
@@ -1804,9 +1804,9 @@ c
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
                if (muti .or. mutk) then
-                  dldem(1,k) = dldem(1,k) - dlfrcx
-                  dldem(2,k) = dldem(2,k) - dlfrcy
-                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dfmdl(1,k) = dfmdl(1,k) - dlfrcx
+                  dfmdl(2,k) = dfmdl(2,k) - dlfrcy
+                  dfmdl(3,k) = dfmdl(3,k) - dlfrcz
                   dltem(1,k) = dltem(1,k) + dlttmk(1)
                   dltem(2,k) = dltem(2,k) + dlttmk(2)
                   dltem(3,k) = dltem(3,k) + dlttmk(3)
@@ -1836,15 +1836,15 @@ c
                   dldvyy = -yr * dlfrcy
                   dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
                   dldvzz = -zr * dlfrcz
-                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
-                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
-                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
-                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
-                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
-                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
-                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
-                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
-                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+                  demvirdl(1,1) = demvirdl(1,1) + dldvxx
+                  demvirdl(2,1) = demvirdl(2,1) + dldvxy
+                  demvirdl(3,1) = demvirdl(3,1) + dldvxz
+                  demvirdl(1,2) = demvirdl(1,2) + dldvxy
+                  demvirdl(2,2) = demvirdl(2,2) + dldvyy
+                  demvirdl(3,2) = demvirdl(3,2) + dldvyz
+                  demvirdl(1,3) = demvirdl(1,3) + dldvxz
+                  demvirdl(2,3) = demvirdl(2,3) + dldvyz
+                  demvirdl(3,3) = demvirdl(3,3) + dldvzz
                end if
             end if
    10       continue
@@ -1869,14 +1869,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,dldem,emvir,dldemvir)
+!$OMP DO reduction(+:dem,dfmdl,emvir,demvirdl)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dfmdl)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -1919,15 +1919,15 @@ c
          dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
      &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
          dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
-         dldemvir(1,1) = dldemvir(1,1) + dldvxx
-         dldemvir(2,1) = dldemvir(2,1) + dldvxy
-         dldemvir(3,1) = dldemvir(3,1) + dldvxz
-         dldemvir(1,2) = dldemvir(1,2) + dldvxy
-         dldemvir(2,2) = dldemvir(2,2) + dldvyy
-         dldemvir(3,2) = dldemvir(3,2) + dldvyz
-         dldemvir(1,3) = dldemvir(1,3) + dldvxz
-         dldemvir(2,3) = dldemvir(2,3) + dldvyz
-         dldemvir(3,3) = dldemvir(3,3) + dldvzz
+         demvirdl(1,1) = demvirdl(1,1) + dldvxx
+         demvirdl(2,1) = demvirdl(2,1) + dldvxy
+         demvirdl(3,1) = demvirdl(3,1) + dldvxz
+         demvirdl(1,2) = demvirdl(1,2) + dldvxy
+         demvirdl(2,2) = demvirdl(2,2) + dldvyy
+         demvirdl(3,2) = demvirdl(3,2) + dldvyz
+         demvirdl(1,3) = demvirdl(1,3) + dldvxz
+         demvirdl(2,3) = demvirdl(2,3) + dldvyz
+         demvirdl(3,3) = demvirdl(3,3) + dldvzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -2051,18 +2051,18 @@ c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
-      demlmda = 0.0d0
-      demlmda2 = 0.0d0
+      demdl = 0.0d0
+      demdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dldem(j,i) = 0.0d0
+            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            dldemvir(j,i) = 0.0d0
+            demvirdl(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -2131,8 +2131,8 @@ c
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          if (muti) then
-            demlmda = demlmda + 2.0d0 * elambda * e
-            demlmda2 = demlmda2 + 2.0d0 * e
+            demdl = demdl + 2.0d0 * elambda * e
+            demdl2 = demdl2 + 2.0d0 * e
             e = e * elambda * elambda
          end if
          em = em + e
@@ -2196,8 +2196,8 @@ c
       end do
       e = fterm * sum**2
       em = em + e
-      demlmda = demlmda + fterm * 2.0d0 * sum * dlsum
-      demlmda2 = demlmda2 + fterm * 2.0d0 * dlsum**2
+      demdl = demdl + fterm * 2.0d0 * sum * dlsum
+      demdl2 = demdl2 + fterm * 2.0d0 * dlsum**2
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2233,21 +2233,21 @@ c
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
-         demlmda = demlmda + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
-         demlmda2 = demlmda2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
+         demdl = demdl + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
+         demdl2 = demdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
             muti = mut(i)
             if (muti) then
-               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
-               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
-               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
+               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
+               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
+               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
                ci = ci * elambda
             else
-               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*dlxd
-               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*dlyd
-               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*dlzd
+               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*dlxd
+               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*dlyd
+               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*dlzd
             end if
             dem(1,i) = dem(1,i) + 2.0d0*term*ci*xd
             dem(2,i) = dem(2,i) + 2.0d0*term*ci*yd
@@ -2284,7 +2284,7 @@ c
             tem(2) = diz*xdfield - dix*zdfield
             tem(3) = dix*ydfield - diy*xdfield
             call torque (i,tem,frcx,frcy,frcz,dem)
-            call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dldem)
+            call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dfmdl)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -2359,15 +2359,15 @@ c
          emvir(1,3) = emvir(1,3) + vxz
          emvir(2,3) = emvir(2,3) + vyz
          emvir(3,3) = emvir(3,3) + vzz
-         dldemvir(1,1) = dldemvir(1,1) + dldvxx
-         dldemvir(2,1) = dldemvir(2,1) + dldvxy
-         dldemvir(3,1) = dldemvir(3,1) + dldvxz
-         dldemvir(1,2) = dldemvir(1,2) + dldvxy
-         dldemvir(2,2) = dldemvir(2,2) + dldvyy
-         dldemvir(3,2) = dldemvir(3,2) + dldvyz
-         dldemvir(1,3) = dldemvir(1,3) + dldvxz
-         dldemvir(2,3) = dldemvir(2,3) + dldvyz
-         dldemvir(3,3) = dldemvir(3,3) + dldvzz
+         demvirdl(1,1) = demvirdl(1,1) + dldvxx
+         demvirdl(2,1) = demvirdl(2,1) + dldvxy
+         demvirdl(3,1) = demvirdl(3,1) + dldvxz
+         demvirdl(1,2) = demvirdl(1,2) + dldvxy
+         demvirdl(2,2) = demvirdl(2,2) + dldvyy
+         demvirdl(3,2) = demvirdl(3,2) + dldvyz
+         demvirdl(1,3) = demvirdl(1,3) + dldvxz
+         demvirdl(2,3) = demvirdl(2,3) + dldvyz
+         demvirdl(3,3) = demvirdl(3,3) + dldvzz
       end if
       return
       end
@@ -2831,8 +2831,8 @@ c
                   scalelmda = elambda
                end if
                if (muti .or. mutk) then
-                  demlmda = demlmda + dlambda
-                  demlmda2 = demlmda2 + dlambda2
+                  demdl = demdl + dlambda
+                  demdl2 = demdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -2861,9 +2861,9 @@ c
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
                if (muti .or. mutk) then
-                  dldem(1,i) = dldem(1,i) + dlfrcx
-                  dldem(2,i) = dldem(2,i) + dlfrcy
-                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dfmdl(1,i) = dfmdl(1,i) + dlfrcx
+                  dfmdl(2,i) = dfmdl(2,i) + dlfrcy
+                  dfmdl(3,i) = dfmdl(3,i) + dlfrcz
                   dltem(1,i) = dltem(1,i) + dlttmi(1)
                   dltem(2,i) = dltem(2,i) + dlttmi(2)
                   dltem(3,i) = dltem(3,i) + dlttmi(3)
@@ -2878,9 +2878,9 @@ c
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
                if (muti .or. mutk) then
-                  dldem(1,k) = dldem(1,k) - dlfrcx
-                  dldem(2,k) = dldem(2,k) - dlfrcy
-                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dfmdl(1,k) = dfmdl(1,k) - dlfrcx
+                  dfmdl(2,k) = dfmdl(2,k) - dlfrcy
+                  dfmdl(3,k) = dfmdl(3,k) - dlfrcz
                   dltem(1,k) = dltem(1,k) + dlttmk(1)
                   dltem(2,k) = dltem(2,k) + dlttmk(2)
                   dltem(3,k) = dltem(3,k) + dlttmk(3)
@@ -2910,15 +2910,15 @@ c
                   dldvyy = -yr * dlfrcy
                   dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
                   dldvzz = -zr * dlfrcz
-                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
-                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
-                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
-                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
-                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
-                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
-                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
-                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
-                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+                  demvirdl(1,1) = demvirdl(1,1) + dldvxx
+                  demvirdl(2,1) = demvirdl(2,1) + dldvxy
+                  demvirdl(3,1) = demvirdl(3,1) + dldvxz
+                  demvirdl(1,2) = demvirdl(1,2) + dldvxy
+                  demvirdl(2,2) = demvirdl(2,2) + dldvyy
+                  demvirdl(3,2) = demvirdl(3,2) + dldvyz
+                  demvirdl(1,3) = demvirdl(1,3) + dldvxz
+                  demvirdl(2,3) = demvirdl(2,3) + dldvyz
+                  demvirdl(3,3) = demvirdl(3,3) + dldvzz
                end if
             end if
          end do
@@ -3285,8 +3285,8 @@ c
                   scalelmda = elambda
                end if
                if (muti .or. mutk) then
-                  demlmda = demlmda + dlambda
-                  demlmda2 = demlmda2 + dlambda2
+                  demdl = demdl + dlambda
+                  demdl2 = demdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -3315,9 +3315,9 @@ c
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
                if (muti .or. mutk) then
-                  dldem(1,i) = dldem(1,i) + dlfrcx
-                  dldem(2,i) = dldem(2,i) + dlfrcy
-                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dfmdl(1,i) = dfmdl(1,i) + dlfrcx
+                  dfmdl(2,i) = dfmdl(2,i) + dlfrcy
+                  dfmdl(3,i) = dfmdl(3,i) + dlfrcz
                   dltem(1,i) = dltem(1,i) + dlttmi(1)
                   dltem(2,i) = dltem(2,i) + dlttmi(2)
                   dltem(3,i) = dltem(3,i) + dlttmi(3)
@@ -3332,9 +3332,9 @@ c
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
                if (muti .or. mutk) then
-                  dldem(1,k) = dldem(1,k) - dlfrcx
-                  dldem(2,k) = dldem(2,k) - dlfrcy
-                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dfmdl(1,k) = dfmdl(1,k) - dlfrcx
+                  dfmdl(2,k) = dfmdl(2,k) - dlfrcy
+                  dfmdl(3,k) = dfmdl(3,k) - dlfrcz
                   dltem(1,k) = dltem(1,k) + dlttmk(1)
                   dltem(2,k) = dltem(2,k) + dlttmk(2)
                   dltem(3,k) = dltem(3,k) + dlttmk(3)
@@ -3364,15 +3364,15 @@ c
                   dldvyy = -yr * dlfrcy
                   dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
                   dldvzz = -zr * dlfrcz
-                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
-                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
-                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
-                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
-                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
-                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
-                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
-                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
-                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+                  demvirdl(1,1) = demvirdl(1,1) + dldvxx
+                  demvirdl(2,1) = demvirdl(2,1) + dldvxy
+                  demvirdl(3,1) = demvirdl(3,1) + dldvxz
+                  demvirdl(1,2) = demvirdl(1,2) + dldvxy
+                  demvirdl(2,2) = demvirdl(2,2) + dldvyy
+                  demvirdl(3,2) = demvirdl(3,2) + dldvyz
+                  demvirdl(1,3) = demvirdl(1,3) + dldvxz
+                  demvirdl(2,3) = demvirdl(2,3) + dldvyz
+                  demvirdl(3,3) = demvirdl(3,3) + dldvzz
                end if
             end if
             end do
@@ -3400,7 +3400,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dfmdl)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -3443,15 +3443,15 @@ c
          dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
      &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
          dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
-         dldemvir(1,1) = dldemvir(1,1) + dldvxx
-         dldemvir(2,1) = dldemvir(2,1) + dldvxy
-         dldemvir(3,1) = dldemvir(3,1) + dldvxz
-         dldemvir(1,2) = dldemvir(1,2) + dldvxy
-         dldemvir(2,2) = dldemvir(2,2) + dldvyy
-         dldemvir(3,2) = dldemvir(3,2) + dldvyz
-         dldemvir(1,3) = dldemvir(1,3) + dldvxz
-         dldemvir(2,3) = dldemvir(2,3) + dldvyz
-         dldemvir(3,3) = dldemvir(3,3) + dldvzz
+         demvirdl(1,1) = demvirdl(1,1) + dldvxx
+         demvirdl(2,1) = demvirdl(2,1) + dldvxy
+         demvirdl(3,1) = demvirdl(3,1) + dldvxz
+         demvirdl(1,2) = demvirdl(1,2) + dldvxy
+         demvirdl(2,2) = demvirdl(2,2) + dldvyy
+         demvirdl(3,2) = demvirdl(3,2) + dldvyz
+         demvirdl(1,3) = demvirdl(1,3) + dldvxz
+         demvirdl(2,3) = demvirdl(2,3) + dldvyz
+         demvirdl(3,3) = demvirdl(3,3) + dldvzz
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -3565,18 +3565,18 @@ c
 c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
-      demlmda = 0.0d0
-      demlmda2 = 0.0d0
+      demdl = 0.0d0
+      demdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dldem(j,i) = 0.0d0
+            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            dldemvir(j,i) = 0.0d0
+            demvirdl(j,i) = 0.0d0
          end do
       end do
       if (npole .eq. 0)  return
@@ -3645,8 +3645,8 @@ c
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          if (muti) then
-            demlmda = demlmda + 2.0d0 * elambda * e
-            demlmda2 = demlmda2 + 2.0d0 * e
+            demdl = demdl + 2.0d0 * elambda * e
+            demdl2 = demdl2 + 2.0d0 * e
             e = e * elambda * elambda
          end if
          em = em + e
@@ -3710,8 +3710,8 @@ c
       end do
       e = fterm * sum**2
       em = em + e
-      demlmda = demlmda + fterm * 2.0d0 * sum * dlsum
-      demlmda2 = demlmda2 + fterm * 2.0d0 * dlsum**2
+      demdl = demdl + fterm * 2.0d0 * sum * dlsum
+      demdl2 = demdl2 + fterm * 2.0d0 * dlsum**2
 c
 c     compute the cell dipole boundary correction term
 c
@@ -3747,21 +3747,21 @@ c
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
-         demlmda = demlmda + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
-         demlmda2 = demlmda2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
+         demdl = demdl + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
+         demdl2 = demdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
             muti = mut(i)
             if (muti) then
-               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
-               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
-               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
+               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
+               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
+               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
                ci = ci * elambda
             else
-               dldem(1,i) = dldem(1,i) + 2.0d0*term*ci*dlxd
-               dldem(2,i) = dldem(2,i) + 2.0d0*term*ci*dlyd
-               dldem(3,i) = dldem(3,i) + 2.0d0*term*ci*dlzd
+               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*dlxd
+               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*dlyd
+               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*dlzd
             end if
             dem(1,i) = dem(1,i) + 2.0d0*term*ci*xd
             dem(2,i) = dem(2,i) + 2.0d0*term*ci*yd
@@ -3798,7 +3798,7 @@ c
             tem(2) = diz*xdfield - dix*zdfield
             tem(3) = dix*ydfield - diy*xdfield
             call torque (i,tem,frcx,frcy,frcz,dem)
-            call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dldem)
+            call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dfmdl)
          end do
 c
 c     boundary correction to virial due to overall cell dipole
@@ -3873,15 +3873,15 @@ c
          emvir(1,3) = emvir(1,3) + vxz
          emvir(2,3) = emvir(2,3) + vyz
          emvir(3,3) = emvir(3,3) + vzz
-         dldemvir(1,1) = dldemvir(1,1) + dldvxx
-         dldemvir(2,1) = dldemvir(2,1) + dldvxy
-         dldemvir(3,1) = dldemvir(3,1) + dldvxz
-         dldemvir(1,2) = dldemvir(1,2) + dldvxy
-         dldemvir(2,2) = dldemvir(2,2) + dldvyy
-         dldemvir(3,2) = dldemvir(3,2) + dldvyz
-         dldemvir(1,3) = dldemvir(1,3) + dldvxz
-         dldemvir(2,3) = dldemvir(2,3) + dldvyz
-         dldemvir(3,3) = dldemvir(3,3) + dldvzz
+         demvirdl(1,1) = demvirdl(1,1) + dldvxx
+         demvirdl(2,1) = demvirdl(2,1) + dldvxy
+         demvirdl(3,1) = demvirdl(3,1) + dldvxz
+         demvirdl(1,2) = demvirdl(1,2) + dldvxy
+         demvirdl(2,2) = demvirdl(2,2) + dldvyy
+         demvirdl(3,2) = demvirdl(3,2) + dldvyz
+         demvirdl(1,3) = demvirdl(1,3) + dldvxz
+         demvirdl(2,3) = demvirdl(2,3) + dldvyz
+         demvirdl(3,3) = demvirdl(3,3) + dldvzz
       end if
       return
       end
@@ -4028,10 +4028,10 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
 !$OMP& yaxis,zaxis,elambda,mut)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,dldemvir,
-!$OMP& demlmda,demlmda2,dldem,dltem)
-!$OMP DO reduction(+:em,dem,tem,pot,emvir,dldemvir,demlmda,demlmda2,
-!$OMP& dldem,dltem)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,demvirdl,
+!$OMP& demdl,demdl2,dfmdl,dltem)
+!$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,demdl2,
+!$OMP& dfmdl,dltem)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -4358,8 +4358,8 @@ c
                   scalelmda = elambda
                end if
                if (muti .or. mutk) then
-                  demlmda = demlmda + dlambda
-                  demlmda2 = demlmda2 + dlambda2
+                  demdl = demdl + dlambda
+                  demdl2 = demdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -4388,9 +4388,9 @@ c
                tem(2,i) = tem(2,i) + ttmi(2)
                tem(3,i) = tem(3,i) + ttmi(3)
                if (muti .or. mutk) then
-                  dldem(1,i) = dldem(1,i) + dlfrcx
-                  dldem(2,i) = dldem(2,i) + dlfrcy
-                  dldem(3,i) = dldem(3,i) + dlfrcz
+                  dfmdl(1,i) = dfmdl(1,i) + dlfrcx
+                  dfmdl(2,i) = dfmdl(2,i) + dlfrcy
+                  dfmdl(3,i) = dfmdl(3,i) + dlfrcz
                   dltem(1,i) = dltem(1,i) + dlttmi(1)
                   dltem(2,i) = dltem(2,i) + dlttmi(2)
                   dltem(3,i) = dltem(3,i) + dlttmi(3)
@@ -4405,9 +4405,9 @@ c
                tem(2,k) = tem(2,k) + ttmk(2)
                tem(3,k) = tem(3,k) + ttmk(3)
                if (muti .or. mutk) then
-                  dldem(1,k) = dldem(1,k) - dlfrcx
-                  dldem(2,k) = dldem(2,k) - dlfrcy
-                  dldem(3,k) = dldem(3,k) - dlfrcz
+                  dfmdl(1,k) = dfmdl(1,k) - dlfrcx
+                  dfmdl(2,k) = dfmdl(2,k) - dlfrcy
+                  dfmdl(3,k) = dfmdl(3,k) - dlfrcz
                   dltem(1,k) = dltem(1,k) + dlttmk(1)
                   dltem(2,k) = dltem(2,k) + dlttmk(2)
                   dltem(3,k) = dltem(3,k) + dlttmk(3)
@@ -4437,15 +4437,15 @@ c
                   dldvyy = -yr * dlfrcy
                   dldvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
                   dldvzz = -zr * dlfrcz
-                  dldemvir(1,1) = dldemvir(1,1) + dldvxx
-                  dldemvir(2,1) = dldemvir(2,1) + dldvxy
-                  dldemvir(3,1) = dldemvir(3,1) + dldvxz
-                  dldemvir(1,2) = dldemvir(1,2) + dldvxy
-                  dldemvir(2,2) = dldemvir(2,2) + dldvyy
-                  dldemvir(3,2) = dldemvir(3,2) + dldvyz
-                  dldemvir(1,3) = dldemvir(1,3) + dldvxz
-                  dldemvir(2,3) = dldemvir(2,3) + dldvyz
-                  dldemvir(3,3) = dldemvir(3,3) + dldvzz
+                  demvirdl(1,1) = demvirdl(1,1) + dldvxx
+                  demvirdl(2,1) = demvirdl(2,1) + dldvxy
+                  demvirdl(3,1) = demvirdl(3,1) + dldvxz
+                  demvirdl(1,2) = demvirdl(1,2) + dldvxy
+                  demvirdl(2,2) = demvirdl(2,2) + dldvyy
+                  demvirdl(3,2) = demvirdl(3,2) + dldvyz
+                  demvirdl(1,3) = demvirdl(1,3) + dldvxz
+                  demvirdl(2,3) = demvirdl(2,3) + dldvyz
+                  demvirdl(3,3) = demvirdl(3,3) + dldvzz
                end if
             end if
          end do
@@ -4469,14 +4469,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:dem,emvir,dldemvir,dldem)
+!$OMP DO reduction(+:dem,emvir,demvirdl,dfmdl)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dldem)
+         call torque (i,dltem(1,i),dlfix,dlfiy,dlfiz,dfmdl)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -4519,15 +4519,15 @@ c
          dldvyz = 0.5d0 * (zix*dlfix(2) + ziy*dlfiy(2) + ziz*dlfiz(2)
      &                    + yix*dlfix(3) + yiy*dlfiy(3) + yiz*dlfiz(3))
          dldvzz = zix*dlfix(3) + ziy*dlfiy(3) + ziz*dlfiz(3)
-         dldemvir(1,1) = dldemvir(1,1) + dldvxx
-         dldemvir(2,1) = dldemvir(2,1) + dldvxy
-         dldemvir(3,1) = dldemvir(3,1) + dldvxz
-         dldemvir(1,2) = dldemvir(1,2) + dldvxy
-         dldemvir(2,2) = dldemvir(2,2) + dldvyy
-         dldemvir(3,2) = dldemvir(3,2) + dldvyz
-         dldemvir(1,3) = dldemvir(1,3) + dldvxz
-         dldemvir(2,3) = dldemvir(2,3) + dldvyz
-         dldemvir(3,3) = dldemvir(3,3) + dldvzz
+         demvirdl(1,1) = demvirdl(1,1) + dldvxx
+         demvirdl(2,1) = demvirdl(2,1) + dldvxy
+         demvirdl(3,1) = demvirdl(3,1) + dldvxz
+         demvirdl(1,2) = demvirdl(1,2) + dldvxy
+         demvirdl(2,2) = demvirdl(2,2) + dldvyy
+         demvirdl(3,2) = demvirdl(3,2) + dldvyz
+         demvirdl(1,3) = demvirdl(1,3) + dldvxz
+         demvirdl(2,3) = demvirdl(2,3) + dldvyz
+         demvirdl(3,3) = demvirdl(3,3) + dldvzz
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -4961,14 +4961,14 @@ c
          dem(1,i) = dem(1,i) + h1
          dem(2,i) = dem(2,i) + h2
          dem(3,i) = dem(3,i) + h3
-         dldem(1,i) = dldem(1,i) + dlh1
-         dldem(2,i) = dldem(2,i) + dlh2
-         dldem(3,i) = dldem(3,i) + dlh3
+         dfmdl(1,i) = dfmdl(1,i) + dlh1
+         dfmdl(2,i) = dfmdl(2,i) + dlh2
+         dfmdl(3,i) = dfmdl(3,i) + dlh3
       end do
       e = 0.5d0 * e
       em = em + e
-      demlmda = demlmda + dlambda
-      demlmda2 = demlmda2 + dlambda2
+      demdl = demdl + dlambda
+      demdl2 = demdl2 + dlambda2
 c
 c     increment the permanent multipole virial contributions
 c
@@ -5077,7 +5077,7 @@ c
      &            - lcmp(8,i)*cphi(6,i) - cmp(8,i)*lcphi(6,i)
      &            - lcmp(9,i)*cphi(10,i) - cmp(9,i)*lcphi(10,i)
          call torque (i,tem,fix,fiy,fiz,dem)
-         call torque (i,dltem,dlfix,dlfiy,dlfiz,dldem)
+         call torque (i,dltem,dlfix,dlfiy,dlfiz,dfmdl)
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -5172,14 +5172,14 @@ c
       emvir(1,3) = emvir(1,3) + vxz
       emvir(2,3) = emvir(2,3) + vyz
       emvir(3,3) = emvir(3,3) + vzz
-      dldemvir(1,1) = dldemvir(1,1) + dldvxx
-      dldemvir(2,1) = dldemvir(2,1) + dldvxy
-      dldemvir(3,1) = dldemvir(3,1) + dldvxz
-      dldemvir(1,2) = dldemvir(1,2) + dldvxy
-      dldemvir(2,2) = dldemvir(2,2) + dldvyy
-      dldemvir(3,2) = dldemvir(3,2) + dldvyz
-      dldemvir(1,3) = dldemvir(1,3) + dldvxz
-      dldemvir(2,3) = dldemvir(2,3) + dldvyz
-      dldemvir(3,3) = dldemvir(3,3) + dldvzz
+      demvirdl(1,1) = demvirdl(1,1) + dldvxx
+      demvirdl(2,1) = demvirdl(2,1) + dldvxy
+      demvirdl(3,1) = demvirdl(3,1) + dldvxz
+      demvirdl(1,2) = demvirdl(1,2) + dldvxy
+      demvirdl(2,2) = demvirdl(2,2) + dldvyy
+      demvirdl(3,2) = demvirdl(3,2) + dldvyz
+      demvirdl(1,3) = demvirdl(1,3) + dldvxz
+      demvirdl(2,3) = demvirdl(2,3) + dldvyz
+      demvirdl(3,3) = demvirdl(3,3) + dldvzz
       return
       end

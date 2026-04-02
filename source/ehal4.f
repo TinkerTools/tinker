@@ -132,18 +132,18 @@ c
 c     zero out the van der Waals energy and derivatives
 c
       ev = 0.0d0
-      devlmda = 0.0d0
-      devlmda2 = 0.0d0
+      devdl = 0.0d0
+      devdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
-            dldev(j,i) = 0.0d0
+            dfvdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             evvir(j,i) = 0.0d0
-            dldevvir(j,i) = 0.0d0
+            devvirdl(j,i) = 0.0d0
          end do
       end do
       if (nvdw .eq. 0)  return
@@ -366,9 +366,9 @@ c
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
                      if (mutik) then
-                        dldev(1,i) = dldev(1,i) + dldedx
-                        dldev(2,i) = dldev(2,i) + dldedy
-                        dldev(3,i) = dldev(3,i) + dldedz
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz
                      end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
@@ -378,12 +378,12 @@ c
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
                      if (mutik) then
-                        dldev(1,i) = dldev(1,i) + dldedx*redi
-                        dldev(2,i) = dldev(2,i) + dldedy*redi
-                        dldev(3,i) = dldev(3,i) + dldedz*redi
-                        dldev(1,iv) = dldev(1,iv) + dldedx*rediv
-                        dldev(2,iv) = dldev(2,iv) + dldedy*rediv
-                        dldev(3,iv) = dldev(3,iv) + dldedz*rediv
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
                      end if
                   end if
                   if (k .eq. kv) then
@@ -391,9 +391,9 @@ c
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
                      if (mutik) then
-                        dldev(1,k) = dldev(1,k) - dldedx
-                        dldev(2,k) = dldev(2,k) - dldedy
-                        dldev(3,k) = dldev(3,k) - dldedz
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz
                      end if
                   else
                      redk = kred(k)
@@ -405,17 +405,17 @@ c
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
                      if (mutik) then
-                        dldev(1,k) = dldev(1,k) - dldedx*redk
-                        dldev(2,k) = dldev(2,k) - dldedy*redk
-                        dldev(3,k) = dldev(3,k) - dldedz*redk
-                        dldev(1,kv) = dldev(1,kv) - dldedx*redkv
-                        dldev(2,kv) = dldev(2,kv) - dldedy*redkv
-                        dldev(3,kv) = dldev(3,kv) - dldedz*redkv
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                      end if
                   end if
                   if (mutik) then
-                     devlmda = devlmda + dlambda
-                     devlmda2 = devlmda2 + dlambda2
+                     devdl = devdl + dlambda
+                     devdl2 = devdl2 + dlambda2
                   end if
 c
 c     increment the internal virial tensor components
@@ -442,15 +442,15 @@ c
                      dldvyy = yr * dldedy
                      dldvzy = zr * dldedy
                      dldvzz = zr * dldedz
-                     dldevvir(1,1) = dldevvir(1,1) + dldvxx
-                     dldevvir(2,1) = dldevvir(2,1) + dldvyx
-                     dldevvir(3,1) = dldevvir(3,1) + dldvzx
-                     dldevvir(1,2) = dldevvir(1,2) + dldvyx
-                     dldevvir(2,2) = dldevvir(2,2) + dldvyy
-                     dldevvir(3,2) = dldevvir(3,2) + dldvzy
-                     dldevvir(1,3) = dldevvir(1,3) + dldvzx
-                     dldevvir(2,3) = dldevvir(2,3) + dldvzy
-                     dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
                   end if
                end if
             end if
@@ -674,9 +674,9 @@ c
                         dev(2,i) = dev(2,i) + dedy
                         dev(3,i) = dev(3,i) + dedz
                         if (mutik) then
-                           dldev(1,i) = dldev(1,i) + dldedx
-                           dldev(2,i) = dldev(2,i) + dldedy
-                           dldev(3,i) = dldev(3,i) + dldedz
+                           dfvdl(1,i) = dfvdl(1,i) + dldedx
+                           dfvdl(2,i) = dfvdl(2,i) + dldedy
+                           dfvdl(3,i) = dfvdl(3,i) + dldedz
                         end if
                      else
                         dev(1,i) = dev(1,i) + dedx*redi
@@ -686,12 +686,12 @@ c
                         dev(2,iv) = dev(2,iv) + dedy*rediv
                         dev(3,iv) = dev(3,iv) + dedz*rediv
                         if (mutik) then
-                           dldev(1,i) = dldev(1,i) + dldedx*redi
-                           dldev(2,i) = dldev(2,i) + dldedy*redi
-                           dldev(3,i) = dldev(3,i) + dldedz*redi
-                           dldev(1,iv) = dldev(1,iv) + dldedx*rediv
-                           dldev(2,iv) = dldev(2,iv) + dldedy*rediv
-                           dldev(3,iv) = dldev(3,iv) + dldedz*rediv
+                           dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                           dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                           dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                           dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                           dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                           dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
                         end if
                      end if
                      if (i .ne. k) then
@@ -700,9 +700,9 @@ c
                            dev(2,k) = dev(2,k) - dedy
                            dev(3,k) = dev(3,k) - dedz
                            if (mutik) then
-                              dldev(1,k) = dldev(1,k) - dldedx
-                              dldev(2,k) = dldev(2,k) - dldedy
-                              dldev(3,k) = dldev(3,k) - dldedz
+                              dfvdl(1,k) = dfvdl(1,k) - dldedx
+                              dfvdl(2,k) = dfvdl(2,k) - dldedy
+                              dfvdl(3,k) = dfvdl(3,k) - dldedz
                            end if
                         else
                            redk = kred(k)
@@ -714,12 +714,12 @@ c
                            dev(2,kv) = dev(2,kv) - dedy*redkv
                            dev(3,kv) = dev(3,kv) - dedz*redkv
                            if (mutik) then
-                              dldev(1,k) = dldev(1,k) - dldedx*redk
-                              dldev(2,k) = dldev(2,k) - dldedy*redk
-                              dldev(3,k) = dldev(3,k) - dldedz*redk
-                              dldev(1,kv) = dldev(1,kv) - dldedx*redkv
-                              dldev(2,kv) = dldev(2,kv) - dldedy*redkv
-                              dldev(3,kv) = dldev(3,kv) - dldedz*redkv
+                              dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                              dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                              dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                              dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                              dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                              dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                            end if
                         end if
                      end if
@@ -728,8 +728,8 @@ c
                            dlambda = 0.5d0 * dlambda
                            dlambda2 = 0.5d0 * dlambda2
                         end if
-                        devlmda = devlmda + dlambda
-                        devlmda2 = devlmda2 + dlambda2
+                        devdl = devdl + dlambda
+                        devdl2 = devdl2 + dlambda2
                      end if
 c
 c     increment the internal virial tensor components
@@ -756,15 +756,15 @@ c
                         dldvyy = yr * dldedy
                         dldvzy = zr * dldedy
                         dldvzz = zr * dldedz
-                        dldevvir(1,1) = dldevvir(1,1) + dldvxx
-                        dldevvir(2,1) = dldevvir(2,1) + dldvyx
-                        dldevvir(3,1) = dldevvir(3,1) + dldvzx
-                        dldevvir(1,2) = dldevvir(1,2) + dldvyx
-                        dldevvir(2,2) = dldevvir(2,2) + dldvyy
-                        dldevvir(3,2) = dldevvir(3,2) + dldvzy
-                        dldevvir(1,3) = dldevvir(1,3) + dldvzx
-                        dldevvir(2,3) = dldevvir(2,3) + dldvzy
-                        dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                        devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                        devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                        devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                        devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                        devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                        devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                        devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                        devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                        devvirdl(3,3) = devvirdl(3,3) + dldvzz
                      end if
                   end if
                end do
@@ -875,18 +875,18 @@ c
 c     zero out the van der Waals energy and derivatives
 c
       ev = 0.0d0
-      devlmda = 0.0d0
-      devlmda2 = 0.0d0
+      devdl = 0.0d0
+      devdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
-            dldev(j,i) = 0.0d0
+            dfvdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             evvir(j,i) = 0.0d0
-            dldevvir(j,i) = 0.0d0
+            devvirdl(j,i) = 0.0d0
          end do
       end do
       if (nvdw .eq. 0)  return
@@ -1166,9 +1166,9 @@ c
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
                      if (mutik) then
-                        dldev(1,i) = dldev(1,i) + dldedx
-                        dldev(2,i) = dldev(2,i) + dldedy
-                        dldev(3,i) = dldev(3,i) + dldedz
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz
                      end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
@@ -1178,12 +1178,12 @@ c
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
                      if (mutik) then
-                        dldev(1,i) = dldev(1,i) + dldedx*redi
-                        dldev(2,i) = dldev(2,i) + dldedy*redi
-                        dldev(3,i) = dldev(3,i) + dldedz*redi
-                        dldev(1,iv) = dldev(1,iv) + dldedx*rediv
-                        dldev(2,iv) = dldev(2,iv) + dldedy*rediv
-                        dldev(3,iv) = dldev(3,iv) + dldedz*rediv
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
                      end if
                   end if
                   if (k .eq. kv) then
@@ -1191,9 +1191,9 @@ c
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
                      if (mutik) then
-                        dldev(1,k) = dldev(1,k) - dldedx
-                        dldev(2,k) = dldev(2,k) - dldedy
-                        dldev(3,k) = dldev(3,k) - dldedz
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz
                      end if
                   else
                      redk = kred(k)
@@ -1205,17 +1205,17 @@ c
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
                      if (mutik) then
-                        dldev(1,k) = dldev(1,k) - dldedx*redk
-                        dldev(2,k) = dldev(2,k) - dldedy*redk
-                        dldev(3,k) = dldev(3,k) - dldedz*redk
-                        dldev(1,kv) = dldev(1,kv) - dldedx*redkv
-                        dldev(2,kv) = dldev(2,kv) - dldedy*redkv
-                        dldev(3,kv) = dldev(3,kv) - dldedz*redkv
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                      end if
                   end if
                   if (mutik) then
-                     devlmda = devlmda + dlambda
-                     devlmda2 = devlmda2 + dlambda2
+                     devdl = devdl + dlambda
+                     devdl2 = devdl2 + dlambda2
                   end if
 c
 c     increment the internal virial tensor components
@@ -1242,15 +1242,15 @@ c
                      dldvyy = yr * dldedy
                      dldvzy = zr * dldedy
                      dldvzz = zr * dldedz
-                     dldevvir(1,1) = dldevvir(1,1) + dldvxx
-                     dldevvir(2,1) = dldevvir(2,1) + dldvyx
-                     dldevvir(3,1) = dldevvir(3,1) + dldvzx
-                     dldevvir(1,2) = dldevvir(1,2) + dldvyx
-                     dldevvir(2,2) = dldevvir(2,2) + dldvyy
-                     dldevvir(3,2) = dldevvir(3,2) + dldvzy
-                     dldevvir(1,3) = dldevvir(1,3) + dldvzx
-                     dldevvir(2,3) = dldevvir(2,3) + dldvzy
-                     dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
                   end if
                end if
             end if
@@ -1362,18 +1362,18 @@ c
 c     zero out the van der Waals energy and derivatives
 c
       ev = 0.0d0
-      devlmda = 0.0d0
-      devlmda2 = 0.0d0
+      devdl = 0.0d0
+      devdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
-            dldev(j,i) = 0.0d0
+            dfvdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             evvir(j,i) = 0.0d0
-            dldevvir(j,i) = 0.0d0
+            devvirdl(j,i) = 0.0d0
          end do
       end do
       if (nvdw .eq. 0)  return
@@ -1414,9 +1414,9 @@ c
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
 !$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalpha,
 !$OMP& c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dldev,devlmda,devlmda2,
-!$OMP& evvir,dldevvir)
-!$OMP DO reduction(+:ev,dev,dldev,devlmda,devlmda2,evvir,dldevvir)
+!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,devdl2,
+!$OMP& evvir,devvirdl)
+!$OMP DO reduction(+:ev,dev,dfvdl,devdl,devdl2,evvir,devvirdl)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1608,9 +1608,9 @@ c
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
                      if (mutik) then
-                        dldev(1,i) = dldev(1,i) + dldedx
-                        dldev(2,i) = dldev(2,i) + dldedy
-                        dldev(3,i) = dldev(3,i) + dldedz
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz
                      end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
@@ -1620,12 +1620,12 @@ c
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
                      if (mutik) then
-                        dldev(1,i) = dldev(1,i) + dldedx*redi
-                        dldev(2,i) = dldev(2,i) + dldedy*redi
-                        dldev(3,i) = dldev(3,i) + dldedz*redi
-                        dldev(1,iv) = dldev(1,iv) + dldedx*rediv
-                        dldev(2,iv) = dldev(2,iv) + dldedy*rediv
-                        dldev(3,iv) = dldev(3,iv) + dldedz*rediv
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
                      end if
                   end if
                   if (k .eq. kv) then
@@ -1633,9 +1633,9 @@ c
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
                      if (mutik) then
-                        dldev(1,k) = dldev(1,k) - dldedx
-                        dldev(2,k) = dldev(2,k) - dldedy
-                        dldev(3,k) = dldev(3,k) - dldedz
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz
                      end if
                   else
                      redk = kred(k)
@@ -1647,17 +1647,17 @@ c
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
                      if (mutik) then
-                        dldev(1,k) = dldev(1,k) - dldedx*redk
-                        dldev(2,k) = dldev(2,k) - dldedy*redk
-                        dldev(3,k) = dldev(3,k) - dldedz*redk
-                        dldev(1,kv) = dldev(1,kv) - dldedx*redkv
-                        dldev(2,kv) = dldev(2,kv) - dldedy*redkv
-                        dldev(3,kv) = dldev(3,kv) - dldedz*redkv
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                      end if
                   end if
                   if (mutik) then
-                     devlmda = devlmda + dlambda
-                     devlmda2 = devlmda2 + dlambda2
+                     devdl = devdl + dlambda
+                     devdl2 = devdl2 + dlambda2
                   end if
 c
 c     increment the internal virial tensor components
@@ -1684,15 +1684,15 @@ c
                      dldvyy = yr * dldedy
                      dldvzy = zr * dldedy
                      dldvzz = zr * dldedz
-                     dldevvir(1,1) = dldevvir(1,1) + dldvxx
-                     dldevvir(2,1) = dldevvir(2,1) + dldvyx
-                     dldevvir(3,1) = dldevvir(3,1) + dldvzx
-                     dldevvir(1,2) = dldevvir(1,2) + dldvyx
-                     dldevvir(2,2) = dldevvir(2,2) + dldvyy
-                     dldevvir(3,2) = dldevvir(3,2) + dldvzy
-                     dldevvir(1,3) = dldevvir(1,3) + dldvzx
-                     dldevvir(2,3) = dldevvir(2,3) + dldvzy
-                     dldevvir(3,3) = dldevvir(3,3) + dldvzz
+                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
                   end if
                end if
             end if

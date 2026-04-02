@@ -7,11 +7,11 @@ c     ##                     Wei Yang, Jay Ponder                     ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine eost - orthogonal space tempering algorithm  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine eost -- orthogonal space tempering algorithm  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "eost" calculates free energies using the orthogonal space
@@ -31,11 +31,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine lmdachain - chain rule for main lambda deriv  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine lmdachain -- chain rule for main lambda deriv  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "lmdachain" applies chain rule to the main lambda derivative
@@ -52,40 +52,40 @@ c
       integer i,j
 c
 c
-c     apply chain rule
+c     apply chain rule for derivative of energy wrt global lambda
 c
-      deplmda2 = deplmda2 * dplambda*dplambda
-     &           + deplmda * d2plambda
-      deplmda = deplmda * dplambda
-      devlmda2 = devlmda2 * dvlambda*dvlambda
-     &           + devlmda * d2vlambda
-      devlmda = devlmda * dvlambda
-      demlmda2 = demlmda2 * delambda*delambda
-     &           + demlmda * d2elambda
-      demlmda = demlmda * delambda
+      depdl2 = depdl2 * dpldlmda*dpldlmda
+     &           + depdl * d2pldlmda2
+      depdl = depdl * dpldlmda
+      devdl2 = devdl2 * dvldlmda*dvldlmda
+     &           + devdl * d2vldlmda2
+      devdl = devdl * dvldlmda
+      demdl2 = demdl2 * deldlmda*deldlmda
+     &           + demdl * d2eldlmda2
+      demdl = demdl * deldlmda
       do i = 1, n
          do j = 1, 3
-            dldep(j,i) = dldep(j,i) * dplambda
-            dldem(j,i) = dldem(j,i) * delambda
-            dldev(j,i) = dldev(j,i) * dvlambda
+            dfpdl(j,i) = dfpdl(j,i) * dpldlmda
+            dfmdl(j,i) = dfmdl(j,i) * deldlmda
+            dfvdl(j,i) = dfvdl(j,i) * dvldlmda
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            dldepvir(j,i) = dldepvir(j,i) * dplambda
-            dldemvir(j,i) = dldemvir(j,i) * delambda
-            dldevvir(j,i) = dldevvir(j,i) * dvlambda
+            depvirdl(j,i) = depvirdl(j,i) * dpldlmda
+            demvirdl(j,i) = demvirdl(j,i) * deldlmda
+            devvirdl(j,i) = devvirdl(j,i) * dvldlmda
          end do
       end do
       return
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine mapsublmda - map from lambda to sublambda  ##
-c     ##                                                        ##
-c     ############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine mapsublmda -- map from lambda to sublambda  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "mapsublmda" maps from main lambda to sublambdas
@@ -108,18 +108,18 @@ c
       mode = 'OSTPOL'
       call sublmdataper (mode,ostlambda,taper,dtaper,d2taper)
       plambda = 1.0d0 - taper
-      dplambda = -dtaper
-      d2plambda = -d2taper
+      dpldlmda = -dtaper
+      d2pldlmda2 = -d2taper
       mode = 'OSTELE'
       call sublmdataper (mode,ostlambda,taper,dtaper,d2taper)
       elambda = 1.0d0 - taper
-      delambda = -dtaper
-      d2elambda = -d2taper
+      deldlmda = -dtaper
+      d2eldlmda2 = -d2taper
       mode = 'OSTVDW'
       call sublmdataper (mode,ostlambda,taper,dtaper,d2taper)
       vlambda = 1.0d0 - taper
-      dvlambda = -dtaper
-      d2vlambda = -d2taper
+      dvldlmda = -dtaper
+      d2vldlmda2 = -d2taper
 c
 c     set flags to compute polarization lambda derivative
 c
@@ -129,11 +129,11 @@ c
       end
 c
 c
-c     ######################################################
-c     ##                                                  ##
-c     ##  subroutine sublmdataper - tapers the sublambda  ##
-c     ##                                                  ##
-c     ######################################################
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine sublmdataper -- tapers the sublambda  ##
+c     ##                                                   ##
+c     #######################################################
 c
 c
 c     "sublmdataper" tapers the mapping from main lambda to
@@ -182,3 +182,109 @@ c
      &             + 2.0d0*c2
       return
       end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine checkkernel -- check recursion kernel size  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "checkkernel" checks and updates the recursion kernel size
+c     if dudl falls outside the range of maxflmda and minflmda
+c
+c
+c      subroutine checkkernel (dudlambda)
+c      use atoms
+c      use mutant
+c      use osrwi
+c      implicit none
+c      integer i,j
+c      integer oldFLambdaBins,newFLambdaBins
+c      integer offset
+c      real*8 dudlambda
+c      real*8 origDeltaG,newDeltaG,tol
+c      real*8 updateFLambda
+c      real*8, allocatable :: rkCopy(:,:)
+c
+c      tol = 1.0d-10
+c      offset = 0
+c
+cc
+cc     determine whether resize is needed
+cc
+c      if (dudlambda .gt. maxflmda) then
+c         newFLambdaBins = FLambdaBins
+c         do while (minflmda + newFLambdaBins*dFL .lt. dudlambda)
+c            newFLambdaBins = newFLambdaBins + 100
+c         end do
+c
+c      else if (dudlambda .lt. minflmda) then
+c         offset = 100
+c         do while (dudlambda .lt. minflmda - offset*dFL)
+c            offset = offset + 100
+c         end do
+c         newFLambdaBins = FLambdaBins + offset
+c
+c      else
+c         return
+c      end if
+c
+cc
+cc     save current free energy for consistency check
+cc
+c      origDeltaG = updateFLambda(.false.)
+c      oldFLambdaBins = FLambdaBins
+c
+c      allocate (rkCopy(lambdaBins,oldFLambdaBins))
+c      do i = 1, lambdaBins
+c         do j = 1, oldFLambdaBins
+c            rkCopy(i,j) = recursionKernel(i,j)
+c         end do
+c      end do
+c
+c      deallocate (recursionKernel)
+c      allocate (recursionKernel(lambdaBins,newFLambdaBins))
+c
+cc
+cc     initialize resized kernel to zero
+cc
+c      do i = 1, lambdaBins
+c         do j = 1, newFLambdaBins
+c            recursionKernel(i,j) = 0.0d0
+c         end do
+c      end do
+c
+cc
+cc     copy old kernel into new kernel
+cc     offset = 0 means growth on the high side
+cc     offset > 0 means growth on the low side
+cc
+c      do i = 1, lambdaBins
+c         do j = 1, oldFLambdaBins
+c            recursionKernel(i,j+offset) = rkCopy(i,j)
+c         end do
+c      end do
+c
+c      FLambdaBins = newFLambdaBins
+c
+c      if (offset .eq. 0) then
+c         maxflmda = minflmda + dFL*FLambdaBins
+c         print *, 'dudlambda > maxflmda', dudlambda, maxflmda
+c      else
+c         minflmda = minflmda - offset*dFL
+c         print *, 'dudlambda < minflmda', dudlambda, minflmda
+c      end if
+c
+c      newDeltaG = updateFLambda(.false.)
+c      if (abs(origDeltaG-newDeltaG) .gt. tol) then
+c         print *, 'origDeltaG != updateFLambda'
+c         print *, origDeltaG, newDeltaG
+c         call fatal
+c      end if
+c
+c      deallocate (rkCopy)
+c
+c      return
+c      end

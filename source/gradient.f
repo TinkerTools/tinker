@@ -70,20 +70,20 @@ c
 c
 c     zero out lambda derivative components
 c
-      delmda = 0.0d0
-      devlmda = 0.0d0
-      demlmda = 0.0d0
-      deplmda = 0.0d0
-      delmda2 = 0.0d0
-      devlmda2 = 0.0d0
-      demlmda2 = 0.0d0
-      deplmda2 = 0.0d0
+      dedl = 0.0d0
+      devdl = 0.0d0
+      demdl = 0.0d0
+      depdl = 0.0d0
+      dedl2 = 0.0d0
+      devdl2 = 0.0d0
+      demdl2 = 0.0d0
+      depdl2 = 0.0d0
       do i = 1, 3
          do j = 1, 3
-            dldvir(j,i) = 0.0d0
-            dldevvir(j,i) = 0.0d0
-            dldemvir(j,i) = 0.0d0
-            dldepvir(j,i) = 0.0d0
+            dvirdl(j,i) = 0.0d0
+            devvirdl(j,i) = 0.0d0
+            demvirdl(j,i) = 0.0d0
+            depvirdl(j,i) = 0.0d0
          end do
       end do
 c
@@ -154,19 +154,19 @@ c
          allocate (dex(3,n))
       end if
       if (use_dlmda) then
-         if (allocated(dldesum)) then
-            if (size(dldesum) .lt. 3*n) then
-               deallocate (dldesum)
-               deallocate (dldev)
-               deallocate (dldem)
-               deallocate (dldep)
+         if (allocated(dfsumdl)) then
+            if (size(dfsumdl) .lt. 3*n) then
+               deallocate (dfsumdl)
+               deallocate (dfvdl)
+               deallocate (dfmdl)
+               deallocate (dfpdl)
             end if
          end if
-         if (.not. allocated(dldesum)) then
-            allocate (dldesum(3,n))
-            allocate (dldev(3,n))
-            allocate (dldem(3,n))
-            allocate (dldep(3,n))
+         if (.not. allocated(dfsumdl)) then
+            allocate (dfsumdl(3,n))
+            allocate (dfvdl(3,n))
+            allocate (dfmdl(3,n))
+            allocate (dfpdl(3,n))
          end if
       end if
 c
@@ -209,10 +209,10 @@ c
       if (use_dlmda) then
          do i = 1, n
             do j = 1, 3
-               dldesum(j,i) = 0.0d0
-               dldev(j,i) = 0.0d0
-               dldem(j,i) = 0.0d0
-               dldep(j,i) = 0.0d0
+               dfsumdl(j,i) = 0.0d0
+               dfvdl(j,i) = 0.0d0
+               dfmdl(j,i) = 0.0d0
+               dfpdl(j,i) = 0.0d0
             end do
          end do
       end if
@@ -345,16 +345,16 @@ c     sum up to get the total lambda derivative
 c
       if (use_dlmda) then
          if (use_ost)  call lmdachain
-         delmda = devlmda + demlmda + deplmda
-         delmda2 = devlmda2 + demlmda2 + deplmda2
+         dedl = devdl + demdl + depdl
+         dedl2 = devdl2 + demdl2 + depdl2
          do i = 1, n
             do j = 1, 3
-               dldesum(j,i) = dldev(j,i) + dldem(j,i) + dldep(j,i)
+               dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
             end do
          end do
          do i = 1, 3
             do j = 1, 3
-               dldvir(j,i) = dldevvir(j,i)+dldemvir(j,i)+dldepvir(j,i)
+               dvirdl(j,i) = devvirdl(j,i)+demvirdl(j,i)+depvirdl(j,i)
             end do
          end do
          if (use_ost)  call eost

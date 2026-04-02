@@ -329,10 +329,10 @@ c
 c
 c     deallocation of global arrays from module dlmda
 c
-      if (allocated(dldesum))  deallocate (dldesum)
-      if (allocated(dldev))  deallocate (dldev)
-      if (allocated(dldem))  deallocate (dldem)
-      if (allocated(dldep))  deallocate (dldep)
+      if (allocated(dfsumdl))  deallocate (dfsumdl)
+      if (allocated(dfvdl))  deallocate (dfvdl)
+      if (allocated(dfmdl))  deallocate (dfmdl)
+      if (allocated(dfpdl))  deallocate (dfpdl)
       if (allocated(pchgorig))  deallocate (pchgorig)
       if (allocated(pchg0orig))  deallocate (pchg0orig)
       if (allocated(bdplorig))  deallocate (bdplorig)
