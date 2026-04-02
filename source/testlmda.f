@@ -37,14 +37,14 @@ c
       real*8 eval,energy
       real*8 eps,eps0
       real*8 lmda,lmda0
-      real*8 adelmda,adevlmda
-      real*8 ademlmda,adeplmda
-      real*8 adelmda2,adevlmda2
-      real*8 ademlmda2,adeplmda2
-      real*8 ndelmda,ndevlmda
-      real*8 ndemlmda,ndeplmda
-      real*8 ndelmda2,ndevlmda2
-      real*8 ndemlmda2,ndeplmda2
+      real*8 adedl,adevdl
+      real*8 ademdl,adepdl
+      real*8 adedl2,adevdl2
+      real*8 ademdl2,adepdl2
+      real*8 ndedl,ndevdl
+      real*8 ndemdl,ndepdl
+      real*8 ndedl2,ndevdl2
+      real*8 ndemdl2,ndepdl2
       real*8 esum2,esum1,esum0
       real*8 em2,em1,em0
       real*8 ep2,ep1,ep0
@@ -53,20 +53,20 @@ c
       real*8 oldepl
       real*8 denorm,ndenorm
       real*8 totnorm,ntotnorm,rms,nrms
-      real*8 adldvir(3,3)
-      real*8 ndldvir(3,3)
-      real*8 ndldepvir(3,3)
-      real*8 ndldemvir(3,3)
-      real*8 ndldevvir(3,3)
+      real*8 advirdl(3,3)
+      real*8 ndvirdl(3,3)
+      real*8 ndepvirdl(3,3)
+      real*8 ndemvirdl(3,3)
+      real*8 ndevvirdl(3,3)
       real*8, allocatable :: derivs(:,:)
-      real*8, allocatable :: adldesum(:,:)
-      real*8, allocatable :: adldev(:,:)
-      real*8, allocatable :: adldem(:,:)
-      real*8, allocatable :: adldep(:,:)
-      real*8, allocatable :: ndldesum(:,:)
-      real*8, allocatable :: ndldev(:,:)
-      real*8, allocatable :: ndldem(:,:)
-      real*8, allocatable :: ndldep(:,:)
+      real*8, allocatable :: adfsumdl(:,:)
+      real*8, allocatable :: adfvdl(:,:)
+      real*8, allocatable :: adfmdl(:,:)
+      real*8, allocatable :: adfpdl(:,:)
+      real*8, allocatable :: ndfsumdl(:,:)
+      real*8, allocatable :: ndfvdl(:,:)
+      real*8, allocatable :: ndfmdl(:,:)
+      real*8, allocatable :: ndfpdl(:,:)
       logical exist,query
       logical doanalyt,donumer
       character*1 answer
@@ -153,16 +153,16 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (derivs(3,n))
       if (doanalyt) then
-         allocate (adldesum(3,n))
-         allocate (adldev(3,n))
-         allocate (adldem(3,n))
-         allocate (adldep(3,n))
+         allocate (adfsumdl(3,n))
+         allocate (adfvdl(3,n))
+         allocate (adfmdl(3,n))
+         allocate (adfpdl(3,n))
       end if
       if (donumer) then
-         allocate (ndldesum(3,n))
-         allocate (ndldev(3,n))
-         allocate (ndldem(3,n))
-         allocate (ndldep(3,n))
+         allocate (ndfsumdl(3,n))
+         allocate (ndfvdl(3,n))
+         allocate (ndfmdl(3,n))
+         allocate (ndfpdl(3,n))
       end if
 c
 c     perform analysis for each successive coordinate structure
@@ -179,25 +179,25 @@ c
          if (doanalyt) then
             call altelec
             call gradient (eval,derivs)
-            adelmda = delmda
-            adevlmda = devlmda
-            ademlmda = demlmda
-            adeplmda = deplmda
-            adelmda2 = delmda2
-            adevlmda2 = devlmda2
-            ademlmda2 = demlmda2
-            adeplmda2 = deplmda2
+            adedl = dedl
+            adevdl = devdl
+            ademdl = demdl
+            adepdl = depdl
+            adedl2 = dedl2
+            adevdl2 = devdl2
+            ademdl2 = demdl2
+            adepdl2 = depdl2
             do i = 1, n
                do j = 1, 3
-                  adldesum(j,i) = dldesum(j,i)
-                  adldev(j,i) = dldev(j,i)
-                  adldem(j,i) = dldem(j,i)
-                  adldep(j,i) = dldep(j,i)
+                  adfsumdl(j,i) = dfsumdl(j,i)
+                  adfvdl(j,i) = dfvdl(j,i)
+                  adfmdl(j,i) = dfmdl(j,i)
+                  adfpdl(j,i) = dfpdl(j,i)
                end do
             end do
             do i = 1, 3
                do j = 1, 3
-                  adldvir(j,i) = dldvir(j,i)
+                  advirdl(j,i) = dvirdl(j,i)
                end do
             end do
          end if
@@ -232,14 +232,14 @@ c
             ev1 = ev
             em1 = em
             ep1 = ep
-            ndelmda = (esum2 - esum0) / (2.0d0 * eps)
-            ndevlmda = (ev2 - ev0) / (2.0d0 * eps)
-            ndemlmda = (em2 - em0) / (2.0d0 * eps)
-            ndeplmda = (ep2 - ep0) / (2.0d0 * eps)
-            ndelmda2 = (esum2 - 2.0d0 * esum1 + esum0) / (eps*eps)
-            ndevlmda2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
-            ndemlmda2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
-            ndeplmda2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
+            ndedl = (esum2 - esum0) / (2.0d0 * eps)
+            ndevdl = (ev2 - ev0) / (2.0d0 * eps)
+            ndemdl = (em2 - em0) / (2.0d0 * eps)
+            ndepdl = (ep2 - ep0) / (2.0d0 * eps)
+            ndedl2 = (esum2 - 2.0d0 * esum1 + esum0) / (eps*eps)
+            ndevdl2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
+            ndemdl2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
+            ndepdl2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
             vlambda = oldvdl + eps
             elambda = oldeml + eps
             plambda = oldepl + eps
@@ -247,18 +247,18 @@ c
             call gradient (eval,derivs)
             do i = 1, n
                do j = 1, 3
-                  ndldesum(j,i) = derivs(j,i)
-                  ndldev(j,i) = dev(j,i)
-                  ndldem(j,i) = dem(j,i)
-                  ndldep(j,i) = dep(j,i)
+                  ndfsumdl(j,i) = derivs(j,i)
+                  ndfvdl(j,i) = dev(j,i)
+                  ndfmdl(j,i) = dem(j,i)
+                  ndfpdl(j,i) = dep(j,i)
                end do
             end do
             do i = 1, 3
                do j = 1, 3
-                  ndldvir(j,i) = vir(j,i)
-                  ndldepvir(j,i) = epvir(j,i)
-                  ndldemvir(j,i) = emvir(j,i)
-                  ndldevvir(j,i) = evvir(j,i)
+                  ndvirdl(j,i) = vir(j,i)
+                  ndepvirdl(j,i) = epvir(j,i)
+                  ndemvirdl(j,i) = emvir(j,i)
+                  ndevvirdl(j,i) = evvir(j,i)
                end do
             end do
             vlambda = oldvdl - eps
@@ -268,22 +268,22 @@ c
             call gradient (eval,derivs)
             do i = 1, n
                do j = 1, 3
-                  ndldesum(j,i) = (ndldesum(j,i)-derivs(j,i))
+                  ndfsumdl(j,i) = (ndfsumdl(j,i)-derivs(j,i))
      &                                                 / (2.0d0 * eps)
-                  ndldev(j,i) = (ndldev(j,i)-dev(j,i)) / (2.0d0 * eps)
-                  ndldem(j,i) = (ndldem(j,i)-dem(j,i)) / (2.0d0 * eps)
-                  ndldep(j,i) = (ndldep(j,i)-dep(j,i)) / (2.0d0 * eps)
+                  ndfvdl(j,i) = (ndfvdl(j,i)-dev(j,i)) / (2.0d0 * eps)
+                  ndfmdl(j,i) = (ndfmdl(j,i)-dem(j,i)) / (2.0d0 * eps)
+                  ndfpdl(j,i) = (ndfpdl(j,i)-dep(j,i)) / (2.0d0 * eps)
                end do
             end do
             do i = 1, 3
                do j = 1, 3
-                  ndldvir(j,i) = (ndldvir(j,i) - vir(j,i))
+                  ndvirdl(j,i) = (ndvirdl(j,i) - vir(j,i))
      &                         / (2.0d0 * eps)
-                  ndldepvir(j,i) = (ndldepvir(j,i)-epvir(j,i))
+                  ndepvirdl(j,i) = (ndepvirdl(j,i)-epvir(j,i))
      &                           / (2.0d0 * eps)
-                  ndldemvir(j,i) = (ndldemvir(j,i)-emvir(j,i))
+                  ndemvirdl(j,i) = (ndemvirdl(j,i)-emvir(j,i))
      &                           / (2.0d0 * eps)
-                  ndldevvir(j,i) = (ndldevvir(j,i)-evvir(j,i))
+                  ndevvirdl(j,i) = (ndevvirdl(j,i)-evvir(j,i))
      &                           / (2.0d0 * eps)
                end do
             end do
@@ -291,32 +291,32 @@ c
 c     apply chain rule if using global lambda in ost
 c
             if (use_ost) then
-               ndeplmda2 = ndeplmda2 * dplambda*dplambda
-     &                           + ndeplmda * d2plambda
-               ndeplmda = ndeplmda * dplambda
-               ndevlmda2 = ndevlmda2 * dvlambda*dvlambda
-     &                           + ndevlmda * d2vlambda
-               ndevlmda = ndevlmda * dvlambda
-               ndemlmda2 = ndemlmda2 * delambda*delambda
-     &                           + ndemlmda * d2elambda
-               ndemlmda = ndemlmda * delambda
-               ndelmda = ndeplmda + ndevlmda + ndemlmda
-               ndelmda2 = ndeplmda2 + ndevlmda2 + ndemlmda2
+               ndepdl2 = ndepdl2 * dpldlmda*dpldlmda
+     &                           + ndepdl * d2pldlmda2
+               ndepdl = ndepdl * dpldlmda
+               ndevdl2 = ndevdl2 * dvldlmda*dvldlmda
+     &                           + ndevdl * d2vldlmda2
+               ndevdl = ndevdl * dvldlmda
+               ndemdl2 = ndemdl2 * deldlmda*deldlmda
+     &                           + ndemdl * d2eldlmda2
+               ndemdl = ndemdl * deldlmda
+               ndedl = ndepdl + ndevdl + ndemdl
+               ndedl2 = ndepdl2 + ndevdl2 + ndemdl2
                do i = 1, n
                   do j = 1, 3
-                     ndldep(j,i) = ndldep(j,i) * dplambda
-                     ndldem(j,i) = ndldem(j,i) * delambda
-                     ndldev(j,i) = ndldev(j,i) * dvlambda
-                     ndldesum(j,i) = ndldep(j,i)+ndldem(j,i)+ndldev(j,i)
+                     ndfpdl(j,i) = ndfpdl(j,i) * dpldlmda
+                     ndfmdl(j,i) = ndfmdl(j,i) * deldlmda
+                     ndfvdl(j,i) = ndfvdl(j,i) * dvldlmda
+                     ndfsumdl(j,i) = ndfpdl(j,i)+ndfmdl(j,i)+ndfvdl(j,i)
                   end do
                end do
                do i = 1, 3
                   do j = 1, 3
-                     ndldepvir(j,i) = ndldepvir(j,i) * dplambda
-                     ndldemvir(j,i) = ndldemvir(j,i) * delambda
-                     ndldevvir(j,i) = ndldevvir(j,i) * dvlambda
-                     ndldvir(j,i) = ndldepvir(j,i) + ndldemvir(j,i)
-     &                            + ndldevvir(j,i)
+                     ndepvirdl(j,i) = ndepvirdl(j,i) * dpldlmda
+                     ndemvirdl(j,i) = ndemvirdl(j,i) * deldlmda
+                     ndevvirdl(j,i) = ndevvirdl(j,i) * dvldlmda
+                     ndvirdl(j,i) = ndepvirdl(j,i) + ndemvirdl(j,i)
+     &                            + ndevvirdl(j,i)
                   end do
                end do
             end if
@@ -330,7 +330,7 @@ c     print the analytical lambda derivatives
 c
          if (doanalyt) then
             write (iout,90)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
-     &                         adelmda, adevlmda, ademlmda, adeplmda
+     &                         adedl,adevdl,ademdl,adepdl
   90       format (/,' Analytical Lambda Derivatives :', 4a14, /, 32x,
      &                 4f14.6)
          end if
@@ -339,7 +339,7 @@ c     print the numerical lambda derivatives
 c
          if (donumer) then
             write (iout,100)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
-     &                         ndelmda, ndevlmda, ndemlmda, ndeplmda
+     &                         ndedl,ndevdl,ndemdl,ndepdl
   100       format (/,' Numerical Lambda Derivatives : ', 4a14, /, 32x,
      &                 4f14.6)
          end if
@@ -349,7 +349,7 @@ c
          if (doanalyt) then
             write (iout,110)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
      &                         'd2EP/dL2',
-     &                         adelmda2, adevlmda2, ademlmda2, adeplmda2
+     &                        adedl2,adevdl2,ademdl2,adepdl2
   110       format (/,' Analytical 2nd Lambda Derivatives :',
      &                 4a14, /, 36x, 4f14.6)
          end if
@@ -359,7 +359,7 @@ c
          if (donumer) then
             write (iout,120)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
      &                         'd2EP/dL2',
-     &                         ndelmda2, ndevlmda2, ndemlmda2, ndeplmda2
+     &                        ndedl2,ndevdl2,ndemdl2,ndepdl2
   120       format (/,' Numerical 2nd Lambda Derivatives : ',
      &                 4a14, /, 36x, 4f14.6)
          end if
@@ -378,19 +378,19 @@ c
          ntotnorm = 0.0d0
          do i = 1, n
             if (doanalyt .and. use(i)) then
-               denorm = adldesum(1,i)**2 + adldesum(2,i)**2
-     &                        + adldesum(3,i)**2
+               denorm = adfsumdl(1,i)**2 + adfsumdl(2,i)**2
+     &                        + adfsumdl(3,i)**2
                totnorm = totnorm + denorm
                denorm = sqrt(denorm)
-               write (iout,150)  i,(adldesum(j,i),j=1,3),denorm
+               write (iout,150)  i,(adfsumdl(j,i),j=1,3),denorm
   150          format (' Anlyt',2x,i8,3x,3f14.6,2x,f14.6)
             end if
             if (donumer .and. use(i)) then
-               ndenorm = ndldesum(1,i)**2 + ndldesum(2,i)**2
-     &                         + ndldesum(3,i)**2
+               ndenorm = ndfsumdl(1,i)**2 + ndfsumdl(2,i)**2
+     &                         + ndfsumdl(3,i)**2
                ntotnorm = ntotnorm + ndenorm
                ndenorm = sqrt(ndenorm)
-               write (iout,160)  i,(ndldesum(j,i),j=1,3),ndenorm
+               write (iout,160)  i,(ndfsumdl(j,i),j=1,3),ndenorm
   160          format (' Numer',2x,i8,3x,3f14.6,2x,f14.6)
             end if
          end do
@@ -442,13 +442,13 @@ c
 c
 c     print the components of the analytical internal virial
 c
-      write (iout,230)  (adldvir(1,i),adldvir(2,i),adldvir(3,i),i=1,3)
+      write (iout,230)  (advirdl(1,i),advirdl(2,i),advirdl(3,i),i=1,3)
   230 format (/,' Analytical dV/dL :',8x,3f13.3,
      &           /,27x,3f13.3,/,27x,3f13.3)
 c
 c     print the components of the numerical internal virial
 c
-      write (iout,240)  (ndldvir(1,i),ndldvir(2,i),ndldvir(3,i),i=1,3)
+      write (iout,240)  (ndvirdl(1,i),ndvirdl(2,i),ndvirdl(3,i),i=1,3)
   240 format (/,' Numerical dV/dL :',9x,3f13.3,
      &           /,27x,3f13.3,/,27x,3f13.3)
 c
@@ -461,16 +461,16 @@ c     perform deallocation of some local arrays
 c
       deallocate (derivs)
       if (doanalyt) then
-         deallocate (adldesum)
-         deallocate (adldev)
-         deallocate (adldem)
-         deallocate (adldep)
+         deallocate (adfsumdl)
+         deallocate (adfvdl)
+         deallocate (adfmdl)
+         deallocate (adfpdl)
       end if
       if (donumer) then
-         deallocate (ndldesum)
-         deallocate (ndldev)
-         deallocate (ndldem)
-         deallocate (ndldep)
+         deallocate (ndfsumdl)
+         deallocate (ndfvdl)
+         deallocate (ndfmdl)
+         deallocate (ndfpdl)
       end if
 c
 c     perform any final tasks before program exit
