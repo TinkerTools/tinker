@@ -140,12 +140,13 @@ c
       real*8 scalexy,scalez
       real*8 normal,cosine
       real*8 tension
-      real*8 xcm,xmove
-      real*8 ycm,ymove
-      real*8 zcm,zmove
+      real*8 xcm,xmove,xtmp
+      real*8 ycm,ymove,ytmp
+      real*8 zcm,zmove,ztmp
       real*8 stress(3,3)
       real*8 hbox(3,3)
       real*8 ascale(3,3)
+      real*8 ainv(3,3)
       external normal
 c
 c
@@ -307,7 +308,7 @@ c
                   z(k) = z(k) + zmove
                end do
                if (barostat .eq. 'BUSSI') then
-                  vcm(j,i) = vcm(1,i) / scalexy
+                  vcm(1,i) = vcm(1,i) / scalexy
                   vcm(2,i) = vcm(2,i) / scalexy
                   vcm(3,i) = vcm(3,i) / scalez
                   wcm(1,i) = wcm(1,i) / scalexy
@@ -388,29 +389,43 @@ c
          if (integrate .ne. 'RIGIDBODY') then
             do i = 1, nuse
                k = iuse(i)
-               x(k) = x(k)*ascale(1,1) + y(k)*ascale(1,2)
-     &                   + z(k)*ascale(1,3)
-               y(k) = x(k)*ascale(2,1) + y(k)*ascale(2,2)
-     &                   + z(k)*ascale(2,3)
-               z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
-     &                   + z(k)*ascale(3,3)
+               xtmp = x(k)
+               ytmp = y(k)
+               ztmp = z(k)
+               x(k) = xtmp*ascale(1,1) + ytmp*ascale(1,2)
+     &                   + ztmp*ascale(1,3)
+               y(k) = xtmp*ascale(2,1) + ytmp*ascale(2,2)
+     &                   + ztmp*ascale(2,3)
+               z(k) = xtmp*ascale(3,1) + ytmp*ascale(3,2)
+     &                   + ztmp*ascale(3,3)
             end do
             if (barostat .eq. 'BUSSI') then
                call invert (3,ascale)
                do i = 1, nuse
                   k = iuse(i)
-                  v(1,k) = v(1,k)*ascale(1,1) + v(2,k)*ascale(1,2)
-     &                        + v(3,k)*ascale(1,3)
-                  v(2,k) = v(1,k)*ascale(2,1) + v(2,k)*ascale(2,2)
-     &                        + v(3,k)*ascale(2,3)
-                  v(3,k) = v(1,k)*ascale(3,1) + v(2,k)*ascale(3,2)
-     &                        + v(3,k)*ascale(3,3)
+                  xtmp = v(1,k)
+                  ytmp = v(2,k)
+                  ztmp = v(3,k)
+                  v(1,k) = xtmp*ascale(1,1) + ytmp*ascale(1,2)
+     &                        + ztmp*ascale(1,3)
+                  v(2,k) = xtmp*ascale(2,1) + ytmp*ascale(2,2)
+     &                        + ztmp*ascale(2,3)
+                  v(3,k) = xtmp*ascale(3,1) + ytmp*ascale(3,2)
+     &                        + ztmp*ascale(3,3)
                end do
             end if
 c
 c     couple to pressure bath via center of mass of rigid bodies
 c
          else
+            if (barostat .eq. 'BUSSI') then
+               do i = 1, 3
+                  do j = 1, 3
+                     ainv(j,i) = ascale(j,i)
+                  end do
+               end do
+               call invert (3,ainv)
+            end if
             ascale(1,1) = ascale(1,1) - 1.0d0
             ascale(2,2) = ascale(2,2) - 1.0d0
             ascale(3,3) = ascale(3,3) - 1.0d0
@@ -424,8 +439,8 @@ c
                   k = kgrp(j)
                   weigh = mass(k)
                   xcm = xcm + x(k)*weigh
-                  ycm = xcm + y(k)*weigh
-                  zcm = xcm + z(k)*weigh
+                  ycm = ycm + y(k)*weigh
+                  zcm = zcm + z(k)*weigh
                end do
                xcm = xcm / grpmass(i)
                ycm = ycm / grpmass(i)
@@ -443,19 +458,24 @@ c
                   z(k) = z(k) + zmove
                end do
                if (barostat .eq. 'BUSSI') then
-                  call invert (3,ascale)
-                  vcm(1,i) = vcm(1,i)*ascale(1,1) + vcm(2,i)*ascale(1,2)
-     &                          + vcm(3,i)*ascale(1,3)
-                  vcm(2,i) = vcm(1,i)*ascale(2,1) + vcm(2,i)*ascale(2,2)
-     &                          + vcm(3,i)*ascale(2,3)
-                  vcm(3,i) = vcm(1,i)*ascale(3,1) + vcm(2,i)*ascale(3,2)
-     &                          + vcm(3,i)*ascale(3,3)
-                  wcm(1,i) = wcm(1,i)*ascale(1,1) + wcm(2,i)*ascale(1,2)
-     &                          + wcm(3,i)*ascale(1,3)
-                  wcm(2,i) = wcm(1,i)*ascale(2,1) + wcm(2,i)*ascale(2,2)
-     &                          + wcm(3,i)*ascale(2,3)
-                  wcm(3,i) = wcm(1,i)*ascale(3,1) + wcm(2,i)*ascale(3,2)
-     &                          + wcm(3,i)*ascale(3,3)
+                  xtmp = vcm(1,i)
+                  ytmp = vcm(2,i)
+                  ztmp = vcm(3,i)
+                  vcm(1,i) = xtmp*ainv(1,1) + ytmp*ainv(1,2)
+     &                          + ztmp*ainv(1,3)
+                  vcm(2,i) = xtmp*ainv(2,1) + ytmp*ainv(2,2)
+     &                          + ztmp*ainv(2,3)
+                  vcm(3,i) = xtmp*ainv(3,1) + ytmp*ainv(3,2)
+     &                          + ztmp*ainv(3,3)
+                  xtmp = wcm(1,i)
+                  ytmp = wcm(2,i)
+                  ztmp = wcm(3,i)
+                  wcm(1,i) = xtmp*ainv(1,1) + ytmp*ainv(1,2)
+     &                          + ztmp*ainv(1,3)
+                  wcm(2,i) = xtmp*ainv(2,1) + ytmp*ainv(2,2)
+     &                          + ztmp*ainv(2,3)
+                  wcm(3,i) = xtmp*ainv(3,1) + ytmp*ainv(3,2)
+     &                          + ztmp*ainv(3,3)
                end if
             end do
          end if
@@ -515,6 +535,7 @@ c
       real*8 xmove,ymove,zmove
       real*8 xboxold,yboxold,zboxold
       real*8 alphaold,betaold,gammaold
+      real*8 xtmp,ytmp,ztmp
       real*8 hbox(3,3)
       real*8 ascale(3,3)
       real*8, allocatable :: xold(:)
@@ -640,6 +661,11 @@ c
             rnd6 = 6.0d0*random()
             step = volmove * (2.0d0*random()-1.0d0)
             scale = (1.0d0+step/volold)**third
+            do i = 1, 3
+               do j = 1, 3
+                  ascale(i,j) = 0.0d0
+               end do
+            end do
             ascale(1,1) = 1.0d0
             ascale(2,2) = 1.0d0
             ascale(3,3) = 1.0d0
@@ -702,11 +728,6 @@ c
 c     find the new box dimensions and other lattice values
 c
             call lattice
-            scale = (volbox/volold)**third
-            xbox = xbox * scale
-            ybox = ybox * scale
-            zbox = zbox * scale
-            call lattice
 c
 c     scale the coordinates by groups, molecules or atoms
 c
@@ -721,7 +742,7 @@ c
                   start = igrp(1,i)
                   stop = igrp(2,i)
                   do j = start, stop
-                     k = kmol(j)
+                     k = kgrp(j)
                      weigh = mass(k)
                      xcm = xcm + x(k)*weigh
                      ycm = ycm + y(k)*weigh
@@ -781,12 +802,15 @@ c
             else
                do i = 1, nuse
                   k = iuse(i)
-                  x(k) = x(k)*ascale(1,1) + y(k)*ascale(1,2)
-     &                      + z(k)*ascale(1,3)
-                  y(k) = x(k)*ascale(2,1) + y(k)*ascale(2,2)
-     &                      + z(k)*ascale(2,3)
-                  z(k) = x(k)*ascale(3,1) + y(k)*ascale(3,2)
-     &                      + z(k)*ascale(3,3)
+                  xtmp = x(k)
+                  ytmp = y(k)
+                  ztmp = z(k)
+                  x(k) = xtmp*ascale(1,1) + ytmp*ascale(1,2)
+     &                      + ztmp*ascale(1,3)
+                  y(k) = xtmp*ascale(2,1) + ytmp*ascale(2,2)
+     &                      + ztmp*ascale(2,3)
+                  z(k) = xtmp*ascale(3,1) + ytmp*ascale(3,2)
+     &                      + ztmp*ascale(3,3)
                end do
             end if
          end if
