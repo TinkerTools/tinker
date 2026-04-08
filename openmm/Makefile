@@ -115,7 +115,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR
 #OPTFLAGS = -Og -g -fbacktrace -fcheck=bounds -Wunused -Wmaybe-uninitialized
 #CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib -c -no_warning_for_no_symbols
 #OBJS = gpu_usage.o
 #GPU_USAGE_OBJS = gpu_usage.o
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices
@@ -139,7 +139,7 @@ LINKFLAGS = $(OPTFLAGS) -static-libgcc -Wl,--no-as-needed -Wl,-rpath=$(OPENMMDIR
 #OPTFLAGS = -O3 -no-ipo -no-prec-div -mdynamic-no-pic -qopenmp
 #CUDAFLAGS = -O3 -I$(CUDA_INCLUDE)
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib -c -no_warning_for_no_symbols
 #OBJS = gpu_usage.o
 #GPU_USAGE_OBJS = gpu_usage.o
 #LINKFLAGS = $(OPTFLAGS) -framework Foundation -framework CoreFoundation -framework IOKit -framework ApplicationServices

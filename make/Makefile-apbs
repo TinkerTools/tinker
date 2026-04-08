@@ -98,7 +98,7 @@ RENAME = rename_bin
 #LIBS = 
 #LIBFLAGS = -crusv
 #APBS_LIBDIR = -L$(APBSDIR)/lib -L$(APBSDIR)/lib/macos
-#RANLIB = ranlib -c
+#RANLIB = ranlib -c -no_warning_for_no_symbols
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RENAME = rename_bin
 

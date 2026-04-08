@@ -149,6 +149,7 @@ c
             if (text(1:5) .eq. 'BUSSI')  barostat = 'BUSSI'
             if (text(1:9) .eq. 'BERENDSEN')  barostat = 'BERENDSEN'
             if (text(1:4) .eq. 'NOSE')  barostat = 'NOSE-HOOVER'
+            if (text(1:8) .eq. 'LANGEVIN')  barostat = 'LANGEVIN'
             if (text(1:10) .eq. 'MONTECARLO')  barostat = 'MONTECARLO'
          else if (keyword(1:13) .eq. 'TAU-PRESSURE ') then
             read (string,*,err=10,end=10)  taupres

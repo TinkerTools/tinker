@@ -83,7 +83,7 @@ RENAME = rename_bin
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 #LIBS = 
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib -c -no_warning_for_no_symbols
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc
 #RENAME = rename_bin
 
