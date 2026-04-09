@@ -270,11 +270,6 @@ c
    40       format (/,' MDINIT  --  No Atom-Based Monte Carlo',
      &                 ' Barostat with Constraints')
             call fatal
-         else if (prestyp .eq. 'SEMIISO') then 
-            write (iout,50)
-   50       format (/,' MDINIT  --  No Monte Carlo Barostat',
-     &                 ' with Semi-Isotropic Pressure')
-            call fatal
          end if
       end if
 c
@@ -343,12 +338,12 @@ c     check for a nonzero number of degrees of freedom
 c
       if (nfree .lt. 0)  nfree = 0
       if (debug) then
-         write (iout,60)  nfree
-   60    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
+         write (iout,50)  nfree
+   50    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
       end if
       if (nfree .eq. 0) then
-         write (iout,70)
-   70    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
+         write (iout,60)
+   60    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
          call fatal
       end if
 c
@@ -384,8 +379,8 @@ c
          rewind (unit=idyn)
          call readdyn (idyn)
          close (unit=idyn)
-         write (iout,80)  dynfile(1:trimtext(dynfile))
-   80    format (/,' Restarting Molecular Dynamics Using :  ',a)
+         write (iout,70)  dynfile(1:trimtext(dynfile))
+   70    format (/,' Restarting Molecular Dynamics Using :  ',a)
 c
 c     set translational velocities for rigid body dynamics
 c
