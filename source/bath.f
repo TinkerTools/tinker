@@ -22,6 +22,7 @@ c     taupres     time constant for Berendsen barostat (psec)
 c     compress    isothermal compressibility of medium (atm-1)
 c     collide     collision frequency for Andersen thermostat
 c     volmove     maximum volume move for Monte Carlo barostat (Ang**3)
+c     isoprob     probability for isotropic Monte Carlo barostat
 c     vbar        velocity of log volume for Nose-Hoover barostat
 c     qbar        mass of the volume for Nose-Hoover barostat
 c     gbar        force for the volume for Nose-Hoover barostat
@@ -45,6 +46,7 @@ c
       real*8 tautemp,taupres
       real*8 compress,collide
       real*8 volmove
+      real*8 isoprob
       real*8 vbar,qbar,gbar
       real*8 vnh(maxnose)
       real*8 qnh(maxnose)

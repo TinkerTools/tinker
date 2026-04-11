@@ -106,6 +106,7 @@ c
       voltrial = 25
       volmove = 100.0d0
       volscale = 'MOLECULAR'
+      isoprob = 0.5d0
 c
 c     check for keywords containing any altered parameters
 c
@@ -192,6 +193,8 @@ c
             if (text(1:6) .eq. 'ATOMIC')  volscale = 'ATOMIC'
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
+         else if (keyword(1:8) .eq. 'ISOPROB ') then
+            read (string,*,err=10,end=10)  isoprob
          end if
    10    continue
       end do
@@ -259,6 +262,12 @@ c        if (integrate .eq. 'STOCHASTIC')  dorest = .false.
          if (irest .lt. 0)  irest = 100
       else
          irest = 0
+      end if
+c
+c     confine isotropic barostat probability
+c
+      if (isoprob .lt. 0.0d0 .or. isoprob .gt. 1.0d0) then
+         isoprob = 0.5d0
       end if
 c
 c     enforce use of velocity Verlet with Andersen thermostat
