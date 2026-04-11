@@ -307,11 +307,6 @@ c
    40       format (/,' MDINIT  --  No Atom-Based Monte Carlo',
      &                 ' Barostat with Constraints')
             call fatal
-         else if (prestyp .eq. 'SEMIISO') then 
-            write (iout,50)
-   50       format (/,' MDINIT  --  No Monte Carlo Barostat',
-     &                 ' with Semi-Isotropic Pressure')
-            call fatal
          end if
       end if
 c
