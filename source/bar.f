@@ -1211,7 +1211,7 @@ c
       tsbar = hbar - cnew
       sbar = tsbar / (0.5d0*(tempa+tempb))
       write (iout,550)  hbar,stdev
-  550 format (' Enthalpy via BAR Estimate',11x,f12.4
+  550 format (' Enthalpy via BAR Estimate',11x,f12.4,
      &           ' +/-',f9.4,' Kcal/mol')
       write (iout,560)  sbar
   560 format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')

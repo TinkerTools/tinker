@@ -124,13 +124,13 @@ c     random coordinate perturbation to avoid numerical issues
 c
       if (dowiggle) then
          write (iout,10)  symmtyp
-   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;'
+   10    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry;',
      &              ' Wiggling Coordinates')
          eps = 0.001d0
          call wiggle (n,coords,eps)
       else if (symmtyp .ne. 'NONE') then
          write (iout,20)  symmtyp
-   20    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry'
+   20    format (/,' UNIONBALL  --  Warning, ',a6,' Symmetry',
      &              ' Detected for the System')
       end if
 c
