@@ -99,6 +99,7 @@ c
       voltrial = 25
       volmove = 100.0d0
       volscale = 'MOLECULAR'
+      isoratio = 0.5d0
 c
 c     check for keywords containing any altered parameters
 c
@@ -170,6 +171,10 @@ c
             call upcase (text)
             if (text(1:9) .eq. 'MOLECULAR')  volscale = 'MOLECULAR'
             if (text(1:6) .eq. 'ATOMIC')  volscale = 'ATOMIC'
+         else if (keyword(1:9) .eq. 'ISORATIO ') then
+            read (string,*,err=10,end=10)  isoratio
+            isoratio = max(0.0d0,isoratio)
+            isoratio = min(1.0d0,isoratio)
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          end if

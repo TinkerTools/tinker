@@ -1,13 +1,13 @@
 c
 c
-c     ###################################################
-c     ##  COPYRIGHT (C)  1990  by  Jay William Ponder  ##
-c     ##              All Rights Reserved              ##
-c     ###################################################
+c     ###############################################################
+c     ##  COPYRIGHT (C) 2026 by Moses K. J. Chung & Jay W. Ponder  ##
+c     ##                    All Rights Reserved                    ##
+c     ###############################################################
 c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine pressure  --  application of scaling barostats  ##
+c     ##  subroutine pressure  --  apply the cell scaling barostats  ##
 c     ##                                                             ##
 c     #################################################################
 c
@@ -111,11 +111,14 @@ c
 c     M. Bernetti and G. Bussi, "Pressure Control Using Stochastic
 c     Cell Rescaling", Journal of Chemical Physics, 153, 114107 (2020)
 c
-c     V. Del Tatto, "A Fully Anisotropic Formulation of Stochastic
-c     Cell Rescaling", arXiv, 2111.06403v1 (2021)
+c     V. Del Tatto, P. Taiteri, M. Bernetti and G. Bussi, "Molecular
+c     Dynamics of Solids at Constant Pressure and Stress Using
+c     Anisotropic Stochastic Cell Rescaling", Applied Sciences,
+c     12, 1139 (2022)
 c
 c     original code for anisotropic pressure coupling by Guido Raos,
-c     Dipartimento di Chimica, Politecnico di Milano, Italy, May 2006
+c     Dipartimento di Chimica, Politecnico di Milano, Italy, May 2006;
+c     further modifications by Moses K. J. Chung, April 2026
 c
 c
       subroutine pscale (dt,pres,stress)
@@ -135,6 +138,7 @@ c
       integer start,stop
       real*8 dt,pres,weigh
       real*8 eps,deps,term
+      real*8 depsxy,depsz
       real*8 kt,betat,dw
       real*8 scale,scalei
       real*8 scalexy,scalez
@@ -145,6 +149,9 @@ c
       real*8 zcm,zmove,ztmp
       real*8 stress(3,3)
       real*8 hbox(3,3)
+      real*8 hbox0(3,3)
+      real*8 hbox1(3,3)
+      real*8 h0inv(3,3)
       real*8 ascale(3,3)
       real*8 ainv(3,3)
       external normal
@@ -243,15 +250,16 @@ c
             tension = 0.0d0
             kt = gasconst * kelvin
             betat = prescon * compress
-            dw = normal ()
             eps = compress * dt / taupres
-            deps = sqrt(2.0d0*kt*betat*dt/(volbox*taupres))
+            depsxy = sqrt(kt*betat*dt/(3.0d0*volbox*taupres))
+            depsz  = sqrt(2.0d0*kt*betat*dt/(3.0d0*volbox*taupres))
+            dw = normal ()
             term = 0.5d0*(stress(1,1)+stress(2,2))
      &                + (tension/zbox) - atmsph
-            scalexy = exp(third*(eps*term+deps*dw))
+            scalexy = exp(third*eps*term + depsxy*dw)
             dw = normal ()
             term = stress(3,3) - atmsph
-            scalez = exp(third*(eps*term+deps*dw))
+            scalez = exp(third*eps*term + depsz*dw)
          end if
 c
 c     modify the current periodic box dimension values
@@ -344,8 +352,7 @@ c
                      term = stress(j,i) - atmsph + prescon*kt/volbox
                      ascale(j,i) = 1.0d0 + eps*term + deps*dw
                   else
-c                    ascale(j,i) = eps*stress(j,i) + deps*dw
-                     ascale(j,i) = eps * stress(j,i)
+                     ascale(j,i) = eps*stress(j,i) + deps*dw
                   end if
                end do
             end do
@@ -355,9 +362,14 @@ c     modify the current periodic box dimension values
 c
          do i = 1, 3
             do j = 1, 3
-               hbox(j,i) = 0.0d0
+               hbox0(i,j) = lvec(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               hbox(i,j) = 0.0d0
                do k = 1, 3
-                  hbox(j,i) = hbox(j,i) + ascale(j,k)*lvec(i,k)
+                  hbox(i,j) = hbox(i,j) + ascale(i,k)*hbox0(k,j)
                end do
             end do
          end do
@@ -384,6 +396,24 @@ c     propagate the new box dimensions to other lattice values
 c
          call lattice
 c
+c     after lattice canonicalization, use the actual final box transform
+c
+         do i = 1, 3
+            do j = 1, 3
+               hbox1(i,j) = lvec(j,i)
+               h0inv(i,j) = hbox0(i,j)
+            end do
+         end do
+         call invert (3,h0inv)
+         do i = 1, 3
+            do j = 1, 3
+               ascale(j,i) = 0.0d0
+               do k = 1, 3
+                  ascale(j,i) = ascale(j,i) + hbox1(j,k)*h0inv(k,i)
+               end do
+            end do
+         end do
+c
 c     couple to pressure bath via atom scaling in Cartesian space
 c
          if (integrate .ne. 'RIGIDBODY') then
@@ -406,11 +436,11 @@ c
                   xtmp = v(1,k)
                   ytmp = v(2,k)
                   ztmp = v(3,k)
-                  v(1,k) = xtmp*ascale(1,1) + ytmp*ascale(1,2)
-     &                        + ztmp*ascale(1,3)
-                  v(2,k) = xtmp*ascale(2,1) + ytmp*ascale(2,2)
-     &                        + ztmp*ascale(2,3)
-                  v(3,k) = xtmp*ascale(3,1) + ytmp*ascale(3,2)
+                  v(1,k) = xtmp*ascale(1,1) + ytmp*ascale(2,1)
+     &                        + ztmp*ascale(3,1)
+                  v(2,k) = xtmp*ascale(1,2) + ytmp*ascale(2,2)
+     &                        + ztmp*ascale(3,2)
+                  v(3,k) = xtmp*ascale(1,3) + ytmp*ascale(2,3)
      &                        + ztmp*ascale(3,3)
                end do
             end if
@@ -461,20 +491,20 @@ c
                   xtmp = vcm(1,i)
                   ytmp = vcm(2,i)
                   ztmp = vcm(3,i)
-                  vcm(1,i) = xtmp*ainv(1,1) + ytmp*ainv(1,2)
-     &                          + ztmp*ainv(1,3)
-                  vcm(2,i) = xtmp*ainv(2,1) + ytmp*ainv(2,2)
-     &                          + ztmp*ainv(2,3)
-                  vcm(3,i) = xtmp*ainv(3,1) + ytmp*ainv(3,2)
+                  vcm(1,i) = xtmp*ainv(1,1) + ytmp*ainv(2,1)
+     &                          + ztmp*ainv(3,1)
+                  vcm(2,i) = xtmp*ainv(1,2) + ytmp*ainv(2,2)
+     &                          + ztmp*ainv(3,2)
+                  vcm(3,i) = xtmp*ainv(1,3) + ytmp*ainv(2,3)
      &                          + ztmp*ainv(3,3)
                   xtmp = wcm(1,i)
                   ytmp = wcm(2,i)
                   ztmp = wcm(3,i)
-                  wcm(1,i) = xtmp*ainv(1,1) + ytmp*ainv(1,2)
-     &                          + ztmp*ainv(1,3)
-                  wcm(2,i) = xtmp*ainv(2,1) + ytmp*ainv(2,2)
-     &                          + ztmp*ainv(2,3)
-                  wcm(3,i) = xtmp*ainv(3,1) + ytmp*ainv(3,2)
+                  wcm(1,i) = xtmp*ainv(1,1) + ytmp*ainv(2,1)
+     &                          + ztmp*ainv(3,1)
+                  wcm(2,i) = xtmp*ainv(1,2) + ytmp*ainv(2,2)
+     &                          + ztmp*ainv(3,2)
+                  wcm(3,i) = xtmp*ainv(1,3) + ytmp*ainv(2,3)
      &                          + ztmp*ainv(3,3)
                end if
             end do
@@ -506,7 +536,8 @@ c     3rd Edition", Academic Press, San Diego, CA, 2023; Section 6.3
 c
 c     original version implemented by Alan Grossfield, January 2004;
 c     anisotropic modification provided by Lee-Ping Wang, Stanford
-c     University, March 2013
+c     University, March 2013; further changes by Moses K. J. Chung,
+c     Washington University, April 2026
 c
 c
       subroutine pmonte (epot,temp)
@@ -528,15 +559,20 @@ c
       real*8 energy,random
       real*8 expterm,weigh
       real*8 kt,step,scale
-      real*8 eold,rnd6
+      real*8 eold,rnd6,cosine
       real*8 xcm,ycm,zcm
-      real*8 volold,cosine
+      real*8 volold,voltarget
       real*8 dpot,dpv,dkin
       real*8 xmove,ymove,zmove
-      real*8 xboxold,yboxold,zboxold
-      real*8 alphaold,betaold,gammaold
+      real*8 xboxold,alphaold
+      real*8 yboxold,betaold
+      real*8 zboxold,gammaold
       real*8 xtmp,ytmp,ztmp
+      real*8 volmid,scale2
       real*8 hbox(3,3)
+      real*8 hbox0(3,3)
+      real*8 hbox1(3,3)
+      real*8 h0inv(3,3)
       real*8 ascale(3,3)
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
@@ -544,6 +580,8 @@ c
       logical dotrial
       logical isotropic
       logical idealgas
+      logical semixy
+      logical offdiag
       external random
 c
 c
@@ -558,7 +596,8 @@ c
          kt = gasconst * temp
          if (isothermal)  kt = gasconst * kelvin
          isotropic = .true.
-         if (prestyp.eq.'ANISO' .and. random().gt.0.5d0) then
+         if ((prestyp.eq.'ANISO' .or. prestyp.eq.'SEMIISO')
+     &          .and. random().gt.isoratio) then
             isotropic = .false.
          end if
 c
@@ -655,12 +694,132 @@ c
                end do
             end if
 c
+c     for semi isotropic case alter either xy together or z alone
+c
+         else if (prestyp .eq. 'SEMIISO') then
+            semixy = .true.
+            if (random() .gt. 0.5d0)  semixy = .false.
+            step = volmove * (2.0d0*random()-1.0d0)
+c
+c     semi isotropic xy move, scale x and y together, z fixed
+c
+            if (semixy) then
+               volbox = volbox + step
+               scale = sqrt(volbox/volold)
+               xbox = xbox * scale
+               ybox = ybox * scale
+               call lattice
+               if (integrate .eq. 'RIGIDBODY') then
+                  scale = scale - 1.0d0
+                  do i = 1, ngrp
+                     xcm = 0.0d0
+                     ycm = 0.0d0
+                     start = igrp(1,i)
+                     stop = igrp(2,i)
+                     do j = start, stop
+                        k = kgrp(j)
+                        weigh = mass(k)
+                        xcm = xcm + x(k)*weigh
+                        ycm = ycm + y(k)*weigh
+                     end do
+                     xmove = scale * xcm/grpmass(i)
+                     ymove = scale * ycm/grpmass(i)
+                     do j = start, stop
+                        k = kgrp(j)
+                        x(k) = x(k) + xmove
+                        y(k) = y(k) + ymove
+                     end do
+                  end do
+               else if (volscale .eq. 'MOLECULAR') then
+                  scale = scale - 1.0d0
+                  do i = 1, nmol
+                     xcm = 0.0d0
+                     ycm = 0.0d0
+                     start = imol(1,i)
+                     stop = imol(2,i)
+                     do j = start, stop
+                        k = kmol(j)
+                        weigh = mass(k)
+                        xcm = xcm + x(k)*weigh
+                        ycm = ycm + y(k)*weigh
+                     end do
+                     xmove = scale * xcm/molmass(i)
+                     ymove = scale * ycm/molmass(i)
+                     do j = start, stop
+                        k = kmol(j)
+                        if (use(k)) then
+                           x(k) = x(k) + xmove
+                           y(k) = y(k) + ymove
+                        end if
+                     end do
+                  end do
+               else
+                  do i = 1, nuse
+                     k = iuse(i)
+                     x(k) = x(k) * scale
+                     y(k) = y(k) * scale
+                  end do
+               end if
+c
+c     semi isotropic z move, scale z alone, x and y fixed
+c
+            else
+               volbox = volbox + step
+               scale = volbox / volold
+               zbox = zbox * scale
+               call lattice
+               if (integrate .eq. 'RIGIDBODY') then
+                  scale = scale - 1.0d0
+                  do i = 1, ngrp
+                     zcm = 0.0d0
+                     start = igrp(1,i)
+                     stop = igrp(2,i)
+                     do j = start, stop
+                        k = kgrp(j)
+                        weigh = mass(k)
+                        zcm = zcm + z(k)*weigh
+                     end do
+                     zmove = scale * zcm/grpmass(i)
+                     do j = start, stop
+                        k = kgrp(j)
+                        z(k) = z(k) + zmove
+                     end do
+                  end do
+               else if (volscale .eq. 'MOLECULAR') then
+                  scale = scale - 1.0d0
+                  do i = 1, nmol
+                     zcm = 0.0d0
+                     start = imol(1,i)
+                     stop = imol(2,i)
+                     do j = start, stop
+                        k = kmol(j)
+                        weigh = mass(k)
+                        zcm = zcm + z(k)*weigh
+                     end do
+                     zmove = scale * zcm/molmass(i)
+                     do j = start, stop
+                        k = kmol(j)
+                        if (use(k)) then
+                           z(k) = z(k) + zmove
+                        end if
+                     end do
+                  end do
+               else
+                  do i = 1, nuse
+                     k = iuse(i)
+                     z(k) = z(k) * scale
+                  end do
+               end if
+            end if
+c
 c     for anisotropic case alter lattice angles, then scale lengths
 c
-         else
+         else if (prestyp .eq. 'ANISO') then
             rnd6 = 6.0d0*random()
             step = volmove * (2.0d0*random()-1.0d0)
-            scale = (1.0d0+step/volold)**third
+            voltarget = volold + step
+            offdiag = .false.
+            scale = voltarget / volold
             do i = 1, 3
                do j = 1, 3
                   ascale(i,j) = 0.0d0
@@ -677,15 +836,86 @@ c
                else if (rnd6 .lt. 3.0d0) then
                   ascale(3,3) = scale
                else if (rnd6 .lt. 4.0d0) then
+                  offdiag = .true.
+                  scale = (1.0d0+step/volold)**third
                   ascale(1,2) = scale - 1.0d0
                   ascale(2,1) = scale - 1.0d0
                else if (rnd6 .lt. 5.0d0) then
+                  offdiag = .true.
+                  scale = (1.0d0+step/volold)**third
                   ascale(1,3) = scale - 1.0d0
                   ascale(3,1) = scale - 1.0d0
                else
+                  offdiag = .true.
+                  scale = (1.0d0+step/volold)**third
                   ascale(2,3) = scale - 1.0d0
                   ascale(3,2) = scale - 1.0d0
                end if
+c
+c     modify the current periodic box lattice angle values
+c
+               do i = 1, 3
+                  do j = 1, 3
+                     hbox0(i,j) = lvec(j,i)
+                  end do
+               end do
+               do i = 1, 3
+                  do j = 1, 3
+                     hbox(i,j) = 0.0d0
+                     do k = 1, 3
+                        hbox(i,j) = hbox(i,j) + ascale(i,k)*hbox0(k,j)
+                     end do
+                  end do
+               end do
+               xbox = sqrt(hbox(1,1)**2 + hbox(2,1)**2 + hbox(3,1)**2)
+               ybox = sqrt(hbox(1,2)**2 + hbox(2,2)**2 + hbox(3,2)**2)
+               zbox = sqrt(hbox(1,3)**2 + hbox(2,3)**2 + hbox(3,3)**2)
+               if (monoclinic) then
+                  cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
+     &                        + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
+                  beta = radian * acos(cosine)
+               else if (triclinic) then
+                  cosine = (hbox(1,2)*hbox(1,3) + hbox(2,2)*hbox(2,3)
+     &                        + hbox(3,2)*hbox(3,3)) / (ybox*zbox)
+                  alpha = radian * acos(cosine)
+                  cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
+     &                        + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
+                  beta = radian * acos(cosine)
+                  cosine = (hbox(1,1)*hbox(1,2) + hbox(2,1)*hbox(2,2)
+     &                        + hbox(3,1)*hbox(3,2)) / (xbox*ybox)
+                  gamma = radian * acos(cosine)
+               end if
+c
+c     if shear move, apply an additional length scaling step
+c
+               call lattice
+               if (offdiag) then
+                  volmid = volbox
+                  scale2 = (voltarget/volmid)**third
+                  xbox = xbox * scale2
+                  ybox = ybox * scale2
+                  zbox = zbox * scale2
+                  call lattice
+                  do i = 1, 3
+                     do j = 1, 3
+                        hbox1(i,j) = lvec(j,i)
+                        h0inv(i,j) = hbox0(i,j)
+                     end do
+                  end do
+                  call invert (3,h0inv)
+                  do i = 1, 3
+                     do j = 1, 3
+                        ascale(j,i) = 0.0d0
+                        do k = 1, 3
+                           ascale(j,i) = ascale(j,i)
+     &                                  + hbox1(j,k)*h0inv(k,i)
+                        end do
+                     end do
+                  end do
+               end if
+c
+c     orthogonal case can still use direct diagonal scaling
+c
             else
                if (rnd6 .lt. 2.0d0) then
                   ascale(1,1) = scale
@@ -694,40 +924,11 @@ c
                else
                   ascale(3,3) = scale
                end if
+               xbox = xbox * ascale(1,1)
+               ybox = ybox * ascale(2,2)
+               zbox = zbox * ascale(3,3)
+               call lattice
             end if
-c
-c     modify the current periodic box lattice angle values
-c
-            do i = 1, 3
-               do j = 1, 3
-                  hbox(j,i) = 0.0d0
-                  do k = 1, 3
-                     hbox(j,i) = hbox(j,i) + ascale(j,k)*lvec(i,k)
-                  end do
-               end do
-            end do
-            xbox = sqrt(hbox(1,1)**2 + hbox(2,1)**2 + hbox(3,1)**2)
-            ybox = sqrt(hbox(1,2)**2 + hbox(2,2)**2 + hbox(3,2)**2)
-            zbox = sqrt(hbox(1,3)**2 + hbox(2,3)**2 + hbox(3,3)**2)
-            if (monoclinic) then
-               cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
-     &                     + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
-               beta = radian * acos(cosine)
-            else if (triclinic) then
-               cosine = (hbox(1,2)*hbox(1,3) + hbox(2,2)*hbox(2,3)
-     &                     + hbox(3,2)*hbox(3,3)) / (ybox*zbox)
-               alpha = radian * acos(cosine)
-               cosine = (hbox(1,1)*hbox(1,3) + hbox(2,1)*hbox(2,3)
-     &                     + hbox(3,1)*hbox(3,3)) / (xbox*zbox)
-               beta = radian * acos(cosine)
-               cosine = (hbox(1,1)*hbox(1,2) + hbox(2,1)*hbox(2,2)
-     &                     + hbox(3,1)*hbox(3,2)) / (xbox*ybox)
-               gamma = radian * acos(cosine)
-            end if
-c
-c     find the new box dimensions and other lattice values
-c
-            call lattice
 c
 c     scale the coordinates by groups, molecules or atoms
 c
