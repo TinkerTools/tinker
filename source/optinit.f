@@ -12,7 +12,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "optinit" initializes values and keywords used by multiple
+c     "optinit" initializes values and keywords used by various
 c     structure optimization methods
 c
 c
