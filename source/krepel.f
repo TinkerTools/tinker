@@ -138,7 +138,7 @@ c
                   write (iout,50)
    50             format (/,' Additional Pauli Repulsion Values',
      &                       ' for Specific Atoms :',
-     &                    //,8x,'Atom',17x,'Size',12x,'Damp',
+     &                    //,8x,'Atom',18x,'Size',11x,'Damp',
      &                       8x,'Valence'/)
                end if
                if (.not. silent) then

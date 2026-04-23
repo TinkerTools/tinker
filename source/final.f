@@ -83,6 +83,7 @@ c
       use kurybr
       use kvdwpr
       use kvdws
+      use kxrepl
       use light
       use limits
       use merck
@@ -138,6 +139,7 @@ c
       use vdw
       use vibs
       use warp
+      use xrepel
       implicit none
 c
 c
@@ -739,6 +741,12 @@ c
       if (allocated(eps4))  deallocate (eps4)
       if (allocated(reduct))  deallocate (reduct)
 c
+c     deallocation of global arrays from module kxrepl
+c
+      if (allocated(pxrz))  deallocate (pxrz)
+      if (allocated(pxrdmp))  deallocate (pxrdmp)
+      if (allocated(pxrcr))  deallocate (pxrcr)
+c
 c     deallocation of global arrays from module light
 c
       if (allocated(kbx))  deallocate (kbx)
@@ -1059,6 +1067,17 @@ c
       if (allocated(elepr))  deallocate (elepr)
       if (allocated(repole))  deallocate (repole)
       if (allocated(rrepole))  deallocate (rrepole)
+c
+c     deallocation of global arrays from module xrepel
+c
+      if (allocated(ixrep))  deallocate (ixrep)
+      if (allocated(xreplist))  deallocate (xreplist)
+      if (allocated(zpxr))  deallocate (zpxr)
+      if (allocated(dmppxr))  deallocate (dmppxr)
+      if (allocated(crpxr))  deallocate (crpxr)
+      if (allocated(cpxr))  deallocate (cpxr)
+      if (allocated(rcpxr))  deallocate (rcpxr)
+      if (allocated(xrepole))  deallocate (xrepole)
 c
 c     deallocation of global arrays from module restrn
 c

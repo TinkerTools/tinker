@@ -26,6 +26,7 @@ c
       use iounit
       use limits
       use potent
+      use reppot
       use vdwpot
       implicit none
       integer i
@@ -227,7 +228,11 @@ c
          if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal3
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss3
       end if
-      if (use_repel)  call erepel3
+      if (use_repel) then
+         call erepel3
+      else if (use_xrepel) then
+         call exrepel3
+      end if
       if (use_disp)  call edisp3
 c
 c     call any miscellaneous energy component routines

@@ -132,7 +132,11 @@ c
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
          use_repel = .true.
-         if (value .eq. 'NONE')  use_repel = .false.
+         use_xrepel = .true.
+         if (value .eq. 'NONE') then
+            use_repel = .false.
+            use_xrepel = .false.
+         end if
       else if (keyword(1:15) .eq. 'DISPERSIONTERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -549,6 +553,7 @@ c
       use_tortor = .false.
       use_vdw = .false.
       use_repel = .false.
+      use_xrepel = .false.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.
@@ -622,6 +627,7 @@ c     turn off the use of each of the nonbonded energy functions
 c
       use_vdw = .false.
       use_repel = .false.
+      use_xrepel = .false.
       use_disp = .false.
       use_charge = .false.
       use_chgdpl = .false.

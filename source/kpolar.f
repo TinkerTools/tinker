@@ -532,7 +532,7 @@ c
 c
 c     remove zero or undefined electrostatic sites from the list
 c
-      if ((use_polar .or. use_repel .or. use_solv)
+      if ((use_polar .or. use_repel .or. use_xrepel .or. use_solv)
      &       .and. .not.use_chgtrn) then
          npole = 0
          ncp = 0
