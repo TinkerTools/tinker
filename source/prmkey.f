@@ -406,7 +406,7 @@ c
             exfld(i) = exfld(i) / elefield
             texfld(i) = exfld(i)
          end do
-      else if (keyword(1:15) .eq. 'EXFLD-FREQ ') then
+      else if (keyword(1:11) .eq. 'EXFLD-FREQ ') then
          read (string,*,err=10,end=10)  exfreq
          use_exfreq = .true.
          exfreq = 2.0d0 * pi * 0.001d0 * exfreq
