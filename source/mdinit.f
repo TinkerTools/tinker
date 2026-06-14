@@ -71,7 +71,8 @@ c
       ndummy = 0
       irest = -1
       iprint = 100
-      use_wrap = .true.
+      use_wrap = .false.
+      if (use_bounds)  use_wrap = .true.
       velsave = .false.
       frcsave = .false.
       uindsave = .false.
@@ -106,7 +107,7 @@ c
       voltrial = 25
       volmove = 100.0d0
       volscale = 'MOLECULAR'
-      isoprob = 0.5d0
+      isoratio = 0.5d0
 c
 c     check for keywords containing any altered parameters
 c
@@ -171,6 +172,7 @@ c
             if (text(1:5) .eq. 'BUSSI')  barostat = 'BUSSI'
             if (text(1:9) .eq. 'BERENDSEN')  barostat = 'BERENDSEN'
             if (text(1:4) .eq. 'NOSE')  barostat = 'NOSE-HOOVER'
+            if (text(1:8) .eq. 'LANGEVIN')  barostat = 'LANGEVIN'
             if (text(1:10) .eq. 'MONTECARLO')  barostat = 'MONTECARLO'
          else if (keyword(1:13) .eq. 'TAU-PRESSURE ') then
             read (string,*,err=10,end=10)  taupres
@@ -191,6 +193,10 @@ c
             call upcase (text)
             if (text(1:9) .eq. 'MOLECULAR')  volscale = 'MOLECULAR'
             if (text(1:6) .eq. 'ATOMIC')  volscale = 'ATOMIC'
+         else if (keyword(1:9) .eq. 'ISORATIO ') then
+            read (string,*,err=10,end=10)  isoratio
+            isoratio = max(0.0d0,isoratio)
+            isoratio = min(1.0d0,isoratio)
          else if (keyword(1:9) .eq. 'PRINTOUT ') then
             read (string,*,err=10,end=10)  iprint
          else if (keyword(1:8) .eq. 'ISOPROB ') then
@@ -375,12 +381,12 @@ c     check for a nonzero number of degrees of freedom
 c
       if (nfree .lt. 0)  nfree = 0
       if (debug) then
-         write (iout,60)  nfree
-   60    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
+         write (iout,50)  nfree
+   50    format (/,' Number of Degrees of Freedom for Dynamics :',i10)
       end if
       if (nfree .eq. 0) then
-         write (iout,70)
-   70    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
+         write (iout,60)
+   60    format (/,' MDINIT  --  No Degrees of Freedom for Dynamics')
          call fatal
       end if
 c
@@ -416,8 +422,8 @@ c
          rewind (unit=idyn)
          call readdyn (idyn)
          close (unit=idyn)
-         write (iout,80)  dynfile(1:trimtext(dynfile))
-   80    format (/,' Restarting Molecular Dynamics Using :  ',a)
+         write (iout,70)  dynfile(1:trimtext(dynfile))
+   70    format (/,' Restarting Molecular Dynamics Using :  ',a)
 c
 c     set translational velocities for rigid body dynamics
 c

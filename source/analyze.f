@@ -2062,15 +2062,15 @@ c
                if (use_tholed) then
                   write (iout,890)  i,ia,polarity(ia),thole(ia),
      &                              tholed(ia),(ip11(j,ia),j=1,np11(ia))
-  890             format (i6,3x,i6,6x,f10.4,2f9.3,3x,120i6)
+  890             format (i6,3x,i6,6x,f10.4,2f9.3,3x,240i6)
                else if (use_thole) then
                   write (iout,900)  i,ia,polarity(ia),thole(ia),
      &                              (ip11(j,ia),j=1,np11(ia))
-  900             format (i6,3x,i6,6x,f10.4,f9.3,3x,120i6)
+  900             format (i6,3x,i6,6x,f10.4,f9.3,3x,240i6)
                else
                   write (iout,910)  i,ia,polarity(ia),
      &                              (ip11(j,ia),j=1,np11(ia))
-  910             format (i6,3x,i6,6x,f10.4,3x,120i6)
+  910             format (i6,3x,i6,6x,f10.4,3x,240i6)
                end if
             end if
          end do
@@ -2808,7 +2808,7 @@ c
                end if
                write (iout,530)  i,ia,polarity(ia),
      &                           (ip11(j,ia),j=1,np11(ia))
-  530          format (i6,3x,i6,10x,f10.4,5x,20i6)
+  530          format (i6,3x,i6,10x,f10.4,5x,240i6)
             end if
          end do
       end if

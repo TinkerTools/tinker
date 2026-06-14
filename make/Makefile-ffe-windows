@@ -127,7 +127,7 @@ JAVA_LIBS =
 #LIBDIR = -L. -L$(TINKER_LIBDIR)/macos
 #LIBS = -lstdc++
 #LIBFLAGS = -crusv
-#RANLIB = ranlib -c
+#RANLIB = ranlib -c -no_warning_for_no_symbols
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc -framework JavaVM -framework \
 #		CoreFoundation
 #LINKFLAGS = $(OPTFLAGS) -static-libgcc

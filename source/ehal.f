@@ -263,6 +263,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
+         muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c

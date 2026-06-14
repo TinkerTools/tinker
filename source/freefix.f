@@ -124,7 +124,7 @@ c
       else
          write (iout,20)  ri,fi
    20    format (/,' Enter Inner Radius & Force Constant [',
-     &              f4.2,',',f4.1'] :  ',$)
+     &              f4.2,',',f4.1,'] :  ',$)
          read (input,30)  string
    30    format (a240)
          read (string,*,err=40,end=40)  ri,fi
@@ -133,7 +133,7 @@ c
          if (fi .ne. 0.0d0)  fo = fi
          write (iout,50)  ro,fo
    50    format (/,' Enter Outer Radius & Force Constant [',
-     &              f4.2,',',f4.1'] :  ',$)
+     &              f4.2,',',f4.1,'] :  ',$)
          read (input,60)  string
    60    format (a240)
          read (string,*,err=70,end=70)  ro,fo

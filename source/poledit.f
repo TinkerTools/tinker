@@ -323,6 +323,7 @@ c
       implicit none
       integer i,j,m,ii
       integer ia,ib,ic,id
+      integer ja,jb,jc
       integer ka,kb,kc,ki
       integer mab,mac,mbc
       integer mad,mbd,mcd
@@ -415,6 +416,9 @@ c
             ia = i12(1,i)
             ib = i12(2,i)
             ic = i12(3,i)
+            ja = n12(ia)
+            jb = n12(ib)
+            jc = n12(ic)
             ki = atomic(i)
             ka = atomic(ia)
             kb = atomic(ib)
@@ -423,7 +427,7 @@ c
             mac = priority (i,ia,ic,0)
             mbc = priority (i,ib,ic,0)
             mabc = priority (i,ia,ib,ic)
-            planar = (abs(geometry(ic,i,ia,ib)) .gt. 170.0d0)
+            planar = (abs(geometry(ic,i,ia,ib)) .gt. 165.0d0)
             pyramid = (abs(geometry(ic,i,ia,ib)) .lt. 135.0d0)
             if (ki .eq. 7) then
                if (chkarom(i))  pyramid = .false.
@@ -449,10 +453,16 @@ c
                   yaxis(i) = ic
                end if
             else if (mab.eq.0 .and. (planar.or.kb.ge.kc)) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ib
-               yaxis(i) = 0
+               if (ka.eq.1 .and. kb.eq.1) then
+                  call frame13 (i,ic,noinvert)
+               else if (ki.eq.7 .and. kc.eq.6 .and. jc.eq.3) then
+                  call frame13 (i,ic,noinvert)
+               else
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = ib
+                  yaxis(i) = 0
+               end if
                if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = 'Z-Bisect'
                   zaxis(i) = ic
@@ -465,10 +475,16 @@ c
                   yaxis(i) = ib
                end if
             else if (mac.eq.0 .and. (planar.or.ka.ge.kb)) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ia
-               xaxis(i) = ic
-               yaxis(i) = 0
+               if (ka.eq.1 .and. kc.eq.1) then
+                  call frame13 (i,ib,noinvert)
+               else if (ki.eq.7 .and. kb.eq.6 .and. jb.eq.3) then
+                  call frame13 (i,ib,noinvert)
+               else
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ia
+                  xaxis(i) = ic
+                  yaxis(i) = 0
+               end if
                if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = 'Z-Bisect'
                   zaxis(i) = ib
@@ -481,10 +497,16 @@ c
                   yaxis(i) = ic
                end if
             else if (mbc.eq.0 .and. (planar.or.kc.ge.ka)) then
-               polaxe(i) = 'Bisector'
-               zaxis(i) = ib
-               xaxis(i) = ic
-               yaxis(i) = 0
+               if (kb.eq.1 .and. kc.eq.1) then
+                  call frame13 (i,ia,noinvert)
+               else if (ki.eq.7 .and. ka.eq.6 .and. ja.eq.3) then
+                  call frame13 (i,ia,noinvert)
+               else
+                  polaxe(i) = 'Bisector'
+                  zaxis(i) = ib
+                  xaxis(i) = ic
+                  yaxis(i) = 0
+               end if
                if (ki.eq.7 .and. pyramid) then
                   polaxe(i) = 'Z-Bisect'
                   zaxis(i) = ia
@@ -519,8 +541,12 @@ c
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ib
                else if (ki.eq.7 .and. .not.pyramid) then
-                  polaxe(i) = 'Z-then-X'
-                  xaxis(i) = ib
+                  if (ka.eq.6 .and. ja.eq.3) then
+                     call frame13 (i,ia,noinvert)
+                  else
+                     polaxe(i) = 'Z-then-X'
+                     xaxis(i) = ib
+                  end if
                else
                   call frame13 (i,ia,noinvert)
                end if
@@ -547,8 +573,12 @@ c
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
                else if (ki.eq.7 .and. .not.pyramid) then
-                  polaxe(i) = 'Z-then-X'
-                  xaxis(i) = ia
+                  if (kb.eq.6 .and. jb.eq.3) then
+                     call frame13 (i,ib,noinvert)
+                  else
+                     polaxe(i) = 'Z-then-X'
+                     xaxis(i) = ia
+                  end if
                else
                   call frame13 (i,ib,noinvert)
                end if
@@ -575,8 +605,12 @@ c
                   polaxe(i) = 'Z-then-X'
                   xaxis(i) = ia
                else if (ki.eq.7 .and. .not.pyramid) then
-                  polaxe(i) = 'Z-then-X'
-                  xaxis(i) = ia
+                  if (kc.eq.6 .and. jc.eq.3) then
+                     call frame13 (i,ic,noinvert)
+                  else
+                     polaxe(i) = 'Z-then-X'
+                     xaxis(i) = ia
+                  end if
                else
                   call frame13 (i,ic,noinvert)
                end if
