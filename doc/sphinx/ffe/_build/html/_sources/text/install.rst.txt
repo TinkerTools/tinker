@@ -1,0 +1,38 @@
+Installation on Your Computer
+=============================
+
+
+Prerequisites
+-------------
+
+**Hardware**
+
+A relatively recent Nvidia GPU is mandatory for the GPU code.
+Nothing special is needed for the CPU code.
+
+**Operating Systems and Compilers**
+
+In order to compile the GPU code, the most recent
+`PGI compiler <https://www.pgroup.com/products/community.htm>`_
+for the OpenACC directives is mandatory. Due to its limitation, the GPU code
+is unavailable on macOS. No effort has been spared on building the code for
+Windows yet.
+
+For Linux, we need:
+
+* A GNU or Intel Fortran compiler;
+* A recent C++ compiler that supports C++11 syntax;
+* PGI for OpenACC.
+
+**Libraries**
+
+* Prebuilt FFTW libraries are required for
+
+   * 123
+
+Build the Canonical Tinker
+--------------------------
+
+
+Build Tinker GPU
+----------------

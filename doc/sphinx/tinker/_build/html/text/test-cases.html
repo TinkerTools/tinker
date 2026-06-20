@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Test Cases &amp; Examples &#8212; Tinker User&#39;s Guide  documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=27fed22d" />
+    <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark Results" href="benchmarks.html" />
+    <link rel="prev" title="Modules &amp; Global Variables" href="modules.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="test-cases-examples">
+<h1>Test Cases &amp; Examples<a class="headerlink" href="#test-cases-examples" title="Link to this heading">¶</a></h1>
+<p>This section contains brief descriptions of the sample calculations found in the TEST subdirectory of the Tinker distribution. These test cases exercise several of the current Tinker programs and are intended to provide an overview of the capabilities of the package. In addition, a number of input files for various molecular systems are provided in the EXAMPLE subdirectory.</p>
+<p><strong>ANION Test</strong></p>
+<p>Estimates the hydration free energy difference for Cl- vs. Br- anion via a 10 picosecond simulation of a “hybrid” anion in a box of water, followed by free energy perturbation</p>
+<p><strong>ARGON Test</strong></p>
+<p>Performs an initial energy minimization on a periodic box containing 150 argon atoms, then performs 25 picoseconds of molecular dynamics simulation, on a box with 150 argon atoms</p>
+<p><strong>CATION Test</strong></p>
+<p>Computes the hydration free energy difference for Rb+ vs. Cs+ cation via a 2 picosecond simulation of each cation in a box of water, followed by a BAR free energy calculation</p>
+<p><strong>CLUSTER Test</strong></p>
+<p>Performs a set of 10 Gaussian density annealing (GDA) trials on a cluster of 13 argon atoms to find the global minimum energy structure</p>
+<p><strong>CRAMBIN Test</strong></p>
+<p>Generates a Tinker XYZ file from a PDB file, followed by single point energy computation and determination of the molecular volume and surface area</p>
+<p><strong>CYCLOHEXANE Test</strong></p>
+<p>Locates the transition state between chair and boat cyclohexane via two methods: the Muller-Brown saddle point method, and path sampling using the Elber algorithm; vibrational analysis of the results shows the same TS with one negative frequency</p>
+<p><strong>DHFR Test</strong></p>
+<p>Runs 10 steps of molecular dynamics on an equilibrated system of DHFR protein in water using the AMOEBA force field; note this is the so-called Joint Amber-CHARMM “JAC” benchmark containing 23558 total atoms</p>
+<p><strong>DIALANINE Test</strong></p>
+<p>Finds all the local minima of alanine dipeptide via a potential energy surface scan using torsional modes to jump between minima</p>
+<p><strong>ENKEPHALIN Test</strong></p>
+<p>Builds coordinates for Met-enkephalin from amino acid sequence and phi/psi angles, followed by truncated Newton energy minimization and determination of the lowest frequency normal mode</p>
+<p><strong>ETHANOL Test</strong></p>
+<p>Fits torsional parameter values for the ethanol C-C-O-H bond based on relative quantum mechanical energies from Gaussian for rotating the C-O bond</p>
+<p><strong>FORMAMIDE Test</strong></p>
+<p>Generates a unit cell from fractional coordinates, followed by full crystal energy minimization and determination of optimal carbonyl oxygen parameters via a fit to lattice energy and structure</p>
+<p><strong>GPCR Test</strong></p>
+<p>Finds the lowest-frequency bacteriorhodopsin normal mode using a sliding block iterative diagonalization; alter the gpcr.run script to save the file gpcr.001 if you want view of the mode; this example can require up to an hour to complete</p>
+<p><strong>HELIX Test</strong></p>
+<p>Performs rigid-body optimization of the packing of two ideal polyalanine helices using only van der Waals interactions</p>
+<p><strong>ICE Test</strong></p>
+<p>Performs a short MD simulation of the monoclinic ice V crystal form using the iAMOEBA water model, pairwise neighbor lists and PME electrostatics</p>
+<p><strong>IFABP Test</strong></p>
+<p>Generates three distance geometry structures for intestinal fatty acid binding protein from a set of NOE distance restraints and torsional restraints.</p>
+<p><strong>LIQUID Test</strong></p>
+<p>Prints the system setup and computes the force field energy components for three small liquid water boxes using the AMOEBA, AMOEBA+ and HIPPO force fields</p>
+<p><strong>METHANOL Test</strong></p>
+<p>Processes distributed multipole analysis (DMA) output to extract coordinates and permanent multipoles, set local frames and polarization groups, modify the intramolecular polarization, detect and average equivalent atomic sites</p>
+<p><strong>NITROGEN Test</strong></p>
+<p>Calculates the self-diffusion constant and the N-N radial distribution function for liquid nitrogen via analysis of a 50 picosecond MD trajectory</p>
+<p><strong>POLYALA Test</strong></p>
+<p>Generates an extended conformation of capped alanine octapeptide, then uses Monte Carlo Minimization with torsion moves to find the 3/10 helix global minimum</p>
+<p><strong>PYRIDINE Test</strong></p>
+<p>Converts a simple XYZ file for pyridine to Tinker XYZ format using the BASIC force field, and computes the molecular mechanics energy</p>
+<p><strong>SALT Test</strong></p>
+<p>Converts a sodium chloride assymetric unit to the corresponding unit cell, then minimizes the crystal starting from the diffraction structure using Ewald summation to model long-range electrostatics</p>
+<p><strong>SCORPION Test</strong></p>
+<p>Converts a multi-model RCSB PDBx/mmCIF for scorpion toxin (1CHL) to Tinker XYZ and evaluates energies, then converts the XYZ to legacy PDB format and back to Tinker XYZ, and finally evaluates energies of the new XYZ file to compare with the prior values</p>
+<p><strong>TIP4P Test</strong></p>
+<p>Minimizes the energy to a small RMS gradient and enforces holonomic constraints for a cubic box of 1000 TIP4P water molecules, then performs a short MD simulation in the NVT ensemble at 298K</p>
+<p><strong>VASOPRESSIN Test</strong></p>
+<p>Compares analytical and finite difference numerical gradients over Cartesian and internal coordinates for vasopressin using the AMOEBA force field model</p>
+<p><strong>WATER Test</strong></p>
+<p>Fits the electrostatic potential for the TIP3P, AMOEBA and HIPPO water models to a QM-derived potential at the MP2/aug-cc-pVTZ level on a grid of points outside the molecular surface</p>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">Tinker User's Guide</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to the Software</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation on Your Computer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="file-types.html">Types of Input &amp; Output Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="energy-programs.html">Potential Energy Programs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="analysis-programs.html">Analysis &amp; Utility Programs &amp; Scripts</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Force Field Parameter Sets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="special-features.html">Special Features &amp; Methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="keywords.html">Use of the Keyword Control File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="routines.html">Routines &amp; Functions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules &amp; Global Variables</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Test Cases &amp; Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="benchmarks.html">Benchmark Results</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgements.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">Modules &amp; Global Variables</a></li>
+      <li>Next: <a href="benchmarks.html" title="next chapter">Benchmark Results</a></li>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2025, Jay Ponder.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="../_sources/text/test-cases.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
