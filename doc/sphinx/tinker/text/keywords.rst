@@ -49,15 +49,31 @@ OUTPUT CONTROL KEYWORDS
      - ECHO
      - EXIT-PAUSE
    * -
+     - EXC-MOMENT
+     - NOCOORD
+     - NODYN
+   * -
      - NOVERSION
      - OVERWRITE
+     - POLAR-PRINT
+   * -
      - PRINTOUT
-   * -
      - SAVE-CYCLE
-     - SAVE-FORCE
-     - SAVE-INDUCED
+     - SAVE-DEFIELD
    * -
-     - SAAVE-VELOCITY
+     - SAVE-FORCE
+     - SAVE-ONLY
+     - SAVE-TEFIELD
+   * -
+     - SAVE-UCHARGE
+     - SAVE-UDIRECT
+     - SAVE-UINDUCE
+   * -
+     - SAVE-USTATIC
+     - SAVE-USYSTEM
+     - SAVE-VELOCITY
+   * -
+     - SAVE-VSYSTEM
      - UNWRAP-COORDS
      - VERBOSE
    * -
@@ -95,7 +111,7 @@ POTENTIAL FUNCTION SELECTION KEYWORDS
    * -
      - EXTRATERM
      - IMPROPTERM
-     - IMPTORSTERM
+     - IMPTORTERM
    * -
      - METALTERM
      - MPOLETERM
@@ -318,32 +334,32 @@ ELECTROSTATICS POTENTIAL KEYWORDS
      - DIRECT-14-SCALE
    * -
      - EXCHANGE-POLAR
+     - EXFLD-FREQ
      - EXTERNAL-FIELD
-     - MPOLE-12-SCALE
    * -
+     - MPOLE-12-SCALE
      - MPOLE-13-SCALE
      - MPOLE-14-SCALE
-     - MPOLE-15-SCALE
    * -
+     - MPOLE-15-SCALE
      - MUTUAL-11-SCALE
      - MUTUAL-12-SCALE
-     - MUTUAL-13-SCALE
    * -
+     - MUTUAL-13-SCALE
      - MUTUAL-14-SCALE
      - PENETRATION
-     - POLAR-12-SCALE
    * -
+     - POLAR-12-SCALE
      - POLAR-13-SCALE
      - POLAR-14-SCALE
-     - POLAR-15-SCALE
    * -
+     - POLAR-15-SCALE
      - POLAR-EPS
      - POLAR-ITER
-     - POLAR-PREDICT
    * -
+     - POLAR-PREDICT
      - POLARIZATION
      - REACTIONFIELD
-     -
 
 NONBONDED CUTOFF KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -390,11 +406,11 @@ CONSTRAINT AND RESTRAINT KEYWORDS
      - FREEZE
    * -
      - FREEZE-DISTANCE
-     - FREEZE-EPS
      - FREEZE-LINE
-   * -
      - FREEZE-ORIGIN
+   * -
      - FREEZE-PLANE
+     - RATTLE-EPS
      - RESTRAIN-ANGLE
    * -
      - RESTRAIN-DISTANCE
@@ -617,17 +633,17 @@ IMPLICIT SOLVATION KEYWORDS
      - GK-RADIUS
      - GKC
    * -
-     - GKR
      - HCT-ELEMENT
      - HCT-SCALE
-   * -
      - NECK-CORRECTION
+   * -
      - NODESCREEN
      - ONION-PROBE
-   * -
      - SOLVENT-PRESSURE
+   * -
      - SURFACE-TENSION
      - TANH-CORRECTION
+     -
 
 POISSON-BOLTZMANN KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1163,6 +1179,12 @@ BETA [real]
 
 BIOTYPE [integer, name, quoted string & integer]
    Provides the values to define the correspondence between a single biopolymer atom type and its force field atom type.
+
+.. index:: BNDCFLUX
+.. _KEY-BNDCFLUX:
+
+BNDCFLUX [2 integers & 1 real]
+   Provides the values for a single bond stretching charge flux parameter. The two integer modifiers give the atom class numbers for the two kinds of atoms involved in the bond. The real modifier gives the bond stretching charge flux constant in electrons/Angstrom. Reversing the order of the atom classes reverses the sign of the charge flux constant, and a parameter between identical atom classes is set to zero.
 
 .. index:: BOND
 .. _KEY-BOND:
@@ -1702,17 +1724,29 @@ EWALD-BOUNDARY
 EWALD-CUTOFF [real]
    Sets the value in Angstroms of the real-space distance cutoff for use during Ewald summation. By default in the absence of the EWALD-CUTOFF keyword a value of 7.0 is used.
 
+.. index:: EXC-MOMENT
+.. _KEY-EXC-MOMENT:
+
+EXC-MOMENT [integer list]
+   Specifies atoms to exclude when calculating the system charge, static and induced dipole moments printed by SAVE-USYSTEM. Individual atom numbers and ranges can be provided using the standard Tinker integer list syntax. By default in the absence of the EXC-MOMENT keyword all atoms are included in the system moments.
+
 .. index:: EXCHANGE-POLAR
 .. _KEY-EXCHANGE-POLAR:
 
 EXCHANGE-POLAR [S2U / S2 / G]
    Selects the type of overlap function to be used in the short-range damping of atomic polarizabilities to account for exchange-polarization. Options include two methods based on overlap, S, and a Gaussian approximation. The default in the absence of the EXCHANGE-POLAR keyword is to use the unified square of the overlap, S2U.
 
+.. index:: EXFLD-FREQ
+.. _KEY-EXFLD-FREQ:
+
+EXFLD-FREQ [real]
+   Sets the frequency in gigahertz (GHz) of an oscillating external electric field. When the EXFLD-FREQ keyword is present, the vector specified by EXTERNAL-FIELD gives the field amplitude and is modulated sinusoidally at the requested frequency. In the absence of the EXFLD-FREQ keyword the applied external field is static.
+
 .. index:: EXTERNAL-FIELD
 .. _KEY-EXTERNAL-FIELD:
 
 EXTERNAL-FIELD [3 reals]
-   Selects the value in megavolts per centimeter (MV/cm) of external electric field components to apply uniformly to the system. The three real modifiers specify the X-, Y- and Z-components of the applied electric field vector. The default in the absence of the EXTERNAL-FIELD keyword is to not use an external field.
+   Selects the value in megavolts per centimeter (MV/cm) of external electric field components to apply uniformly to the system. The three real modifiers specify the X-, Y- and Z-components of the applied electric field vector. The field is static unless an oscillation frequency is specified via the EXFLD-FREQ keyword. The default in the absence of the EXTERNAL-FIELD keyword is to not use an external field.
 
 .. index:: EXCHPOL
 .. _KEY-EXCHPOL:
@@ -1851,11 +1885,6 @@ FREEZE [BONDS / ANGLES / DIATOMIC / TRIATOMIC / WATER]
 FREEZE-DISTANCE [2 integers]
    Allows the use of a holonomic constraint between the two atoms whose numbers are specified on the keyword line. If the two atoms are involved in a covalent bond, then their distance is constrained to the ideal bond length from the force field. For nonbonded atoms, the constraint is fixed at their distance in the input coordinate file.
 
-.. index:: FREEZE-EPS
-.. _KEY-FREEZE-EPS:
-
-FREEZE-EPS
-
 .. index:: FREEZE-LINE
 .. _KEY-FREEZE-LINE:
 
@@ -1919,11 +1948,6 @@ GK-RADIUS
 .. _KEY-GKC:
 
 GKC
-
-.. index:: GKR
-.. _KEY-GKR:
-
-GKR
 
 .. index:: GROUP
 .. _KEY-GROUP:
@@ -2018,17 +2042,17 @@ IMPROPUNIT [real]
 IMPTORS [4 integers & up to 3 real/real/integer triples]
    Provides the values for a single AMBER-style improper torsional angle parameter. The first four integer modifiers give the atom class numbers for the atoms involved in the improper torsional angle to be defined. By convention, the third atom class of the four is the trigonal atom on which the improper torsion is centered. The torsional angle computed is literally that defined by the four atom classes in the order specified by the keyword. Each of the remaining triples of real/real/integer modifiers give the half-amplitude, phase offset in degrees and periodicity of a particular improper torsional term, respectively. Periodicities through 3-fold are allowed for improper torsional parameters.
 
-.. index:: IMPTORSTERM
-.. _KEY-IMPTORSTERM:
+.. index:: IMPTORTERM
+.. _KEY-IMPTORTERM:
 
-IMPTORSTERM [NONE / ONLY]
+IMPTORTERM [NONE / ONLY]
    Controls use of the AMBER-style improper torsional angle potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
 
-.. index:: IMPTORSUNIT
-.. _KEY-IMPTORSUNIT:
+.. index:: IMPTORUNIT
+.. _KEY-IMPTORUNIT:
 
-IMPTORSUNIT [real]
-   Sets the scale factor needed to convert the energy value computed by the AMBER-style improper torsional angle potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of 1.0 is used, if the IMPTORSUNIT keyword is not given in the force field parameter file or the keyfile.
+IMPTORUNIT [real]
+   Sets the scale factor needed to convert the energy value computed by the AMBER-style improper torsional angle potential into units of kcal/mole. The correct value is force field dependent and typically provided in the header of the master force field parameter file. The default value of 1.0 is used, if the IMPTORUNIT keyword is not given in the force field parameter file or the keyfile.
 
 .. index:: INACTIVE
 .. _KEY-INACTIVE:
@@ -2324,6 +2348,18 @@ NEXTITER [integer]
 
 NOARCHIVE
    Causes Tinker molecular dynamics-based programs to write trajectory frames directly to "cycle" files with a sequentially numbered file extension. The default in the absence of this keyword is to implement the ARCHIVE behavior and write a single plain-text trajectory archive file with the .arc format.
+
+.. index:: NOCOORD
+.. _KEY-NOCOORD:
+
+NOCOORD
+   Suppresses the saving of coordinate trajectory frames during molecular dynamics calculations. Other requested output, including restart data, velocities, forces and dipoles, is unaffected. By default in the absence of the NOCOORD keyword coordinate trajectory frames are saved.
+
+.. index:: NODYN
+.. _KEY-NODYN:
+
+NODYN
+   Suppresses periodic updates of the dynamics restart file with the extension ".dyn" during a molecular dynamics calculation. A final restart file is written when the calculation finishes. By default in the absence of the NODYN keyword the restart file is updated at each trajectory save interval.
 
 .. index:: NONBONDTERM
 .. _KEY-NONBONDTERM:
@@ -2636,6 +2672,12 @@ POLAR-EPS [real]
 POLAR-ITER
    Sets the maximum number of conjugate gradient iterations to be used in the solution of the self-consistent mutual induced dipoles. The default values in the absence of the keyword is 100 iterations.
 
+.. index:: POLAR-PRINT
+.. _KEY-POLAR-PRINT:
+
+POLAR-PRINT
+   Turns on printing of the number of iterations and final RMS residual for each conjugate gradient solution of the self-consistent induced dipoles. By default in the absence of the POLAR-PRINT keyword this information is not printed unless DEBUG output is enabled.
+
 .. index:: POLAR-PREDICT
 .. _KEY-POLAR-PREDICT:
 
@@ -2754,6 +2796,12 @@ RADIUSTYPE [R-MIN / SIGMA]
 
 RANDOMSEED [integer]
    Followed by an integer value, sets the initial seed value for the random number generator used by Tinker. Setting RANDOMSEED to the same value as an earlier run will allow exact reproduction of the earlier calculation. (Note that this will not hold across different machine types.) RANDOMSEED should be set to a positive integer less than about 2 billion. In the absence of the RANDOMSEED keyword the seed is chosen "randomly" based upon the number of seconds that have elapsed in the current decade.
+
+.. index:: RATTLE-EPS
+.. _KEY-RATTLE-EPS:
+
+RATTLE-EPS [real]
+   Sets the convergence tolerance used to enforce holonomic distance constraints with the SHAKE and RATTLE algorithms. Smaller positive values apply a tighter constraint tolerance but may require additional iterations.
 
 REACTIONFIELD [2 reals & 1 integer]
    Provides parameters needed for the reaction field potential energy calculation. The two real modifiers give the radius of the dielectric cavity and the ratio of the bulk dielectric outside the cavity to that inside the cavity. The integer modifier gives the number of terms in the reaction field summation to be used. In the absence of the REACTIONFIELD keyword the default values are a cavity of radius 1000000 Ang, a dielectric ratio of 80 and use of only the first term of the reaction field summation.
@@ -2902,17 +2950,59 @@ SADDLEPOINT
 SAVE-CYCLE
    Causes Tinker programs, such as minimizations and molecular dynamics, that output intermediate coordinate sets to save each successive set to the next consecutively numbered cycle file. The SAVE-CYCLE keyword is the opposite of the OVERWRITE keyword.
 
+.. index:: SAVE-DEFIELD
+.. _KEY-SAVE-DEFIELD:
+
+SAVE-DEFIELD
+   Causes Tinker molecular dynamics calculations using polarizable models to save the direct electric field components on each atom, in units of megavolts per centimeter (MV/cm), whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".def". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdde". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "de".
+
 .. index:: SAVE-FORCE
 .. _KEY-SAVE-FORCE:
 
 SAVE-FORCE
-   Causes Tinker molecular dynamics calculations to save the values of the force components on each atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each atomic force file name contains as a suffix the cycle number followed by the letter "f".
+   Causes Tinker molecular dynamics calculations to save the force components on each atom, in units of kcal/mole/Angstrom, whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".frc". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdf". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "f".
 
-.. index:: SAVE-INDUCED
-.. _KEY-SAVE-INDUCED:
+.. index:: SAVE-ONLY
+.. _KEY-SAVE-ONLY:
 
-SAVE-INDUCED
-   Causes Tinker molecular dynamics calculations that involve polarizable atomic multipoles to save the values of the induced dipole components on each polarizable atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each induced dipole file name contains as a suffix the cycle number followed by the letter "u".
+SAVE-ONLY [integer list]
+   Restricts saved trajectory coordinates and requested per-atom vector output to the specified atoms. Individual atom numbers and ranges can be provided using the standard Tinker integer list syntax. By default in the absence of the SAVE-ONLY keyword output is saved for all atoms.
+
+.. index:: SAVE-TEFIELD
+.. _KEY-SAVE-TEFIELD:
+
+SAVE-TEFIELD
+   Causes Tinker molecular dynamics calculations using polarizable models to save the total electric field components on each atom, in units of megavolts per centimeter (MV/cm), whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".tef". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdte". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "te".
+
+.. index:: SAVE-UCHARGE
+.. _KEY-SAVE-UCHARGE:
+
+SAVE-UCHARGE
+   Causes Tinker molecular dynamics calculations to save the atomic charge dipole components, in units of Debye, whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".uchg". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcduc". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "uc".
+
+.. index:: SAVE-UDIRECT
+.. _KEY-SAVE-UDIRECT:
+
+SAVE-UDIRECT
+   Causes Tinker molecular dynamics calculations using polarizable models to save the direct induced dipole components on each atom, in units of Debye, whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".udir". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdud". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "ud".
+
+.. index:: SAVE-UINDUCE
+.. _KEY-SAVE-UINDUCE:
+
+SAVE-UINDUCE
+   Causes Tinker molecular dynamics calculations that involve polarizable atomic multipoles to save the induced dipole components on each polarizable atom, in units of Debye, whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".uind". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdui". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "ui".
+
+.. index:: SAVE-USTATIC
+.. _KEY-SAVE-USTATIC:
+
+SAVE-USTATIC
+   Causes Tinker molecular dynamics calculations to save the atomic static dipole components, in units of Debye, whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".ustc". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdus". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "us".
+
+.. index:: SAVE-USYSTEM
+.. _KEY-SAVE-USYSTEM:
+
+SAVE-USYSTEM
+   Causes Tinker molecular dynamics calculations to print the system charge, static and induced dipole components at each saved trajectory frame. The corresponding dipole components accumulated by atom type are also printed, and induced dipoles are included when a polarizable model is active. All dipole components are reported in Debye. Atoms can be omitted from the system moment calculations via the EXC-MOMENT keyword.
 
 .. index:: SAVE-VECTS
 .. _KEY-SAVE-VECTS:
@@ -2924,7 +3014,13 @@ SAVE-VECTS [integer]
 .. _KEY-SAVE-VELOCITY:
 
 SAVE-VELOCITY
-   Causes Tinker molecular dynamics calculations to save the values of the velocity components on each atom to a separate cycle file. These files are written whenever the atomic coordinate snapshots are written during the dynamics run. Each velocity file name contains as a suffix the cycle number followed by the letter "v".
+   Causes Tinker molecular dynamics calculations to save the velocity components on each atom, in units of Angstroms/picosecond, whenever an atomic coordinate snapshot is written. By default, the frames are appended to a formatted file with the extension ".vel". With DCD-ARCHIVE, they are instead appended in binary DCD format to a file with the extension ".dcdv". With SAVE-CYCLE, each frame is written to a separate numbered file whose cycle suffix ends in "v".
+
+.. index:: SAVE-VSYSTEM
+.. _KEY-SAVE-VSYSTEM:
+
+SAVE-VSYSTEM
+   Causes Tinker molecular dynamics calculations to print the velocity components accumulated by atom type at each saved trajectory frame. The velocity components are reported in Angstroms/picosecond.
 
 .. index:: SLOPEMAX
 .. _KEY-SLOPEMAX:
@@ -3176,8 +3272,8 @@ UREY-QUARTIC [real]
 UREYBRAD [3 integers & 2 reals]
    Provides the values for a single Urey-Bradley cross term potential parameter. The integer modifiers give the atom class numbers for the three kinds of atoms involved in the angle for which a Urey-Bradley term is to be defined. The real number modifiers give the force constant value for the term and the target value for the 1-3 distance in Angstroms. The default units for the force constant are kcal/mole/Ang^2, but this can be controlled via the UREYUNIT keyword.
 
-.. index:: UREYTERM
-.. _KEY-UREYTERM:
+.. index:: UREYBRADTERM
+.. _KEY-UREYBRADTERM:
 
 UREYBRADTERM [NONE / ONLY]
    Controls use of the Urey-Bradley potential energy term. In the absence of a modifying option, this keyword turns on use of the potential. The NONE option turns off use of this potential energy term. The ONLY option turns off all potential energy terms except for this one.
