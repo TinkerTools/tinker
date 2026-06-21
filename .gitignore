@@ -11,6 +11,7 @@ doc/hippo
 !doc/mechanic
 doc/multipoles
 !doc/sphinx
+doc/sphinx/*/_build/
 !doc/word
 #fftw
 lib/linux/*
