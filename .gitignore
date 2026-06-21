@@ -8,10 +8,10 @@ doc/amoeba
 doc/announce
 doc/heart
 doc/hippo
-doc/mechanic
+!doc/mechanic
 doc/multipoles
-doc/sphinx
-doc/word
+!doc/sphinx
+!doc/word
 #fftw
 lib/linux/*
 !lib/linux/0README

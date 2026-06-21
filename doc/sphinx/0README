@@ -1,0 +1,25 @@
+
+                ###############################################
+                Sphinx Documentation Generator for Tinker & FFE
+                ###############################################
+
+         This directory contains Sphinx files to build documentation
+         for the Tinker and Force Field Explorer packages. The editable
+         restructured text files containing the raw documentation are in
+         the /text areas. To build documentation issue "make latexpdf"
+         and "make html" commands in the top-level directory for each
+         package. The PDF output is then found in the /_build/latex area
+         under both /tinker and /ffe, while the HTML output is in the
+         /_build/html area.
+
+         Note certain character/period combinations at the start of a
+         line will be interpreted as a Roman numeral, resulting in an
+         unwanted indentation. This particularly can occur with article
+         references, such as:
+
+         L. X. Dang, J. Phys. Chem. A, 108, 9014-9017 (2004)
+
+         The solution to avoid indentation is to insert a non-breaking
+         space, in this case between "L." and "X.". On macOS keyboard
+         the non-breaking space is entered via Option-Space.
+
