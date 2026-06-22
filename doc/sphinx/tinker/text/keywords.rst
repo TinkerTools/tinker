@@ -2764,8 +2764,8 @@ PPME-ORDER [integer]
 .. index:: PRESSURE
 .. _KEY-PRESSURE:
 
-PRESSURE [ISOTROPIC / SEMI-ISOTROPIC / ANISOTROPIC ]
-   Selects a type of pressure control for use during molecular dynamics. Three modifiers are available: ISOTROPIC causes the barostat to modify all periodic box dimensions equivalently and in concert, SEMI-ISOTROPIC modifies the periodic area across the X/Y-axes equally and independently from the Z-axis for use in membrane simulations and similar, while ANISOTROPIC modifies all periodic box dimensions separately. The default in the absence of the PRESSURE keyword is isotropic pressure control.
+PRESSURE [ISO / SEMI / ANISO ]
+   Selects a type of pressure control for use during molecular dynamics. Three modifiers are available: ISO causes the barostat to modify all periodic box dimensions equally and in concert (isotropic pressure control), SEMI modifies the periodic area across the X/Y-axes equally and independently from the Z-axis for use in membrane simulations and similar systems (semi-isotropic pressure control), while ANISO modifies all periodic box dimensions independently (anisotropic pressure control). The default in the absence of the PRESSURE keyword is isotropic pressure control.
 
 .. index:: PRINTOUT
 .. _KEY-PRINTOUT:
