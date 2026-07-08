@@ -159,9 +159,11 @@ c
 c     set default ost lambda bin values
 c
       nlmda = 201
-      nflmda = 2001
+      nflmda = 1001
       wflmda = 1.0d0
-      fli0 = (nflmda + 1) / 2
+      wlhist = 0.005d0
+      wfhist = 1.0d0
+      fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
       hbias = 0.00001d0
       oststdev = 4.0d0
       eosttot = 0.0d0
@@ -343,6 +345,12 @@ c
          else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
             string = record(next:240)
             read (string,*,err=30)  wflmda
+         else if (keyword(1:7) .eq. 'WLHIST ') then
+            string = record(next:240)
+            read (string,*,err=30)  wlhist
+         else if (keyword(1:7) .eq. 'WFHIST ') then
+            string = record(next:240)
+            read (string,*,err=30)  wfhist
          else if (keyword(1:11) .eq. 'OST-STDDEV ') then
             string = record(next:240)
             read (string,*,err=30)  oststdev
@@ -413,6 +421,19 @@ c
       wlmda = 1.0d0 / dble(nlmda-1)
       wlmda2 = 0.5d0 * wlmda
       wflmda2 = 0.5d0 * wflmda
+      fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
+      if (wlhist .lt. 0.0d0) then
+         wlhist = -wlhist
+      else if (wlhist .eq. 0.0d0) then
+         wlhist = 0.005d0
+      end if
+      if (wfhist .lt. 0.0d0) then
+         wfhist = -wfhist
+      else if (wfhist .eq. 0.0d0) then
+         wfhist = 1.0d0
+      end if
+      maxwlhist = wlhist
+      maxwfhist = wfhist
 c
 c     allocate ost histogram and kernels
 c

@@ -215,7 +215,7 @@ c
       gkernel(2,3) = 7.0d0
       call ensureflambda (2000.0d0)
       call checkint ('ensureflambda high nflmda',
-     &               nflmda,3005,nfail)
+     &               nflmda,2105,nfail)
       call checkint ('ensureflambda high fli0',
      &               fli0,3,nfail)
       call checkreal ('ensureflambda high preserve gkernel',
@@ -227,11 +227,11 @@ c
       gkernel(2,3) = 7.0d0
       call ensureflambda (-2000.0d0)
       call checkint ('ensureflambda low nflmda',
-     &               nflmda,3005,nfail)
+     &               nflmda,2105,nfail)
       call checkint ('ensureflambda low fli0',
-     &               fli0,3003,nfail)
+     &               fli0,2103,nfail)
       call checkreal ('ensureflambda low shifted gkernel',
-     &                gkernel(2,3003),7.0d0,1.0d-12,nfail)
+     &                gkernel(2,2103),7.0d0,1.0d-12,nfail)
 c
 c     low-side expansion also rebuilds osthead, ostnext and osthist
 c
@@ -242,11 +242,11 @@ c
       call buildostindex
       call ensureflambda (-2000.0d0)
 c
-c     after low-side expansion, fli0 shifts from 3 to 3003, so
-c     flambda=0.0 now belongs to iflmda=3003
+c     after low-side expansion, fli0 shifts from 3 to 2103, so
+c     flambda=0.0 now belongs to iflmda=2103
 c
       ilmda = 2
-      iflmda = 3003
+      iflmda = 2103
       call ij_to_k (ilmda,iflmda,nlmda,k)
       call checkint ('ensureflambda rebuild osthist(1)',
      &               osthist(1),k,nfail)
@@ -280,6 +280,7 @@ c
       real*8 egbias,dgdl,dgdfl
       real*8 expected
       real*8 height
+      real*8 targetl,targetf
 c
 c
 c     choose height so the normalized gaussian prefactor is one
@@ -445,6 +446,33 @@ c
      &                egbias,2.0d0,1.0d-12,nfail)
       call checkreal ('egkernel right mirror dgdl',
      &                dgdl,0.0d0,1.0d-12,nfail)
+c
+c     wide histogram widths are used for both grid and continuous bias
+c
+      call resetost (41,81,3)
+      wlhist = 0.05d0
+      wfhist = 10.0d0
+      maxwlhist = wlhist
+      maxwfhist = wfhist
+      height = 2.0d0 * pi * wlhist * wfhist
+      targetl = 0.525d0
+      targetf = 5.0d0
+      nosthist = 1
+      call sethist (1,0.50d0,0.0d0,height,wlhist,wfhist)
+      call buildostindex
+      call buildgkernel
+      expected = exp(-0.25d0)
+      call checkreal ('buildgkernel wide hist width',
+     &                gkernel(22,46),expected,1.0d-12,nfail)
+      ostlambda = targetl
+      ostdedl = targetf
+      call egkernel (egbias,dgdl,dgdfl)
+      call checkreal ('egkernel wide hist width bias',
+     &                egbias,expected,1.0d-12,nfail)
+      call checkreal ('egkernel wide hist width dgdl',
+     &                dgdl,-10.0d0*expected,1.0d-12,nfail)
+      call checkreal ('egkernel wide hist width dgdfl',
+     &                dgdfl,-0.05d0*expected,1.0d-12,nfail)
 c
 c     if dU/dlambda is outside the current flambda grid,
 c     egkernel returns zero
@@ -756,6 +784,10 @@ c
       wflmda = 1.0d0
       wlmda2 = 0.5d0 * wlmda
       wflmda2 = 0.5d0 * wflmda
+      wlhist = 0.005d0
+      wfhist = 1.0d0
+      maxwlhist = wlhist
+      maxwfhist = wfhist
       nosthist = 0
       sizeosthist = nhist
       ostlambda = 0.0d0
@@ -875,6 +907,8 @@ c
       osthhist(ihist) = height
       ostwlhist(ihist) = sigl
       ostwfhist(ihist) = sigf
+      maxwlhist = max(maxwlhist,sigl)
+      maxwfhist = max(maxwfhist,sigf)
       ostnext(ihist) = 0
       return
       end

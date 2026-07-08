@@ -33,6 +33,8 @@ c     osthead       first histogram index for each lambda/flambda bin
 c     deffdl        effective lambda derivative for propagation
 c     eosttot       total ost free energy
 c     hbias         height of biasing gaussian
+c     maxwfhist     maximum flambda width of histogram gaussians
+c     maxwlhist     maximum lambda width of histogram gaussians
 c     ostdedl       current unbiased dU/dlambda value
 c     ostdedlavg    average dE/dlambda value between hist updates
 c     ostdt         time step for theta lambda propagation
@@ -52,8 +54,10 @@ c     osttheta      theta coordinate used to propagate lambda
 c     ostvlmda0     sublambda lower bound for van der Waals
 c     ostvlmda1     sublambda upper bound for van der Waals
 c     ostvtheta     velocity of the theta lambda coordinate
+c     wfhist        flambda width of new histogram gaussians
 c     wflmda        width of flambda bins
 c     wflmda2       half width of flambda bins
+c     wlhist        lambda width of new histogram gaussians
 c     wlmda         width of lambda bins
 c     wlmda2        half width of lambda bins
 c     fkernel       free energy mean force at each lambda bin
@@ -102,6 +106,8 @@ c
       real*8 deffdl
       real*8 eosttot
       real*8 hbias
+      real*8 maxwfhist
+      real*8 maxwlhist
       real*8 ostdedl
       real*8 ostdedlavg
       real*8 ostdt
@@ -121,8 +127,10 @@ c
       real*8 ostvlmda0
       real*8 ostvlmda1
       real*8 ostvtheta
+      real*8 wfhist
       real*8 wflmda
       real*8 wflmda2
+      real*8 wlhist
       real*8 wlmda
       real*8 wlmda2
       real*8, allocatable :: fkernel(:)

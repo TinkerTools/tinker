@@ -82,8 +82,10 @@ c
          ostlhist(nosthist) = ostlambdaavg
          ostfhist(nosthist) = ostdedlavg
          osthhist(nosthist) = hbias
-         ostwlhist(nosthist) = wlmda
-         ostwfhist(nosthist) = wflmda
+         ostwlhist(nosthist) = wlhist
+         ostwfhist(nosthist) = wfhist
+         maxwlhist = max(maxwlhist,wlhist)
+         maxwfhist = max(maxwfhist,wfhist)
          ostnext(nosthist) = osthead(ilmda,iflmda)
          osthead(ilmda,iflmda) = nosthist
          call updategkernel
@@ -439,10 +441,11 @@ c
 c
 c     include the full gaussian tail plus a buffer on each side
 c
-      nchunk = 1000
+      nchunk = 100
       nbuffer = nchunk
-      nfcut = int(oststdev)
-      if (dble(nfcut) .lt. oststdev+0.5d0)  nfcut = nfcut + 1
+      nfcut = int(oststdev*maxwfhist/wflmda)
+      if (dble(nfcut)*wflmda .lt. oststdev*maxwfhist+wflmda2)
+     &   nfcut = nfcut + 1
       nfcut = nfcut + nbuffer
       if (iflmda-nfcut .ge. 1 .and.
      &    iflmda+nfcut .le. nflmda)  return
@@ -783,13 +786,15 @@ c
       iflmda = nint(ostdedl / wflmda) + fli0
       if (iflmda .lt. 1 .or. iflmda .gt. nflmda)  return
 c
-c     use oststdev as a conservative bin cutoff for saved gaussians
+c     use max gaussian widths for conservative bin cutoffs
 c
-      nlcut = int(oststdev)
-      if (dble(nlcut) .lt. oststdev)  nlcut = nlcut + 1
+      nlcut = int(oststdev*maxwlhist/wlmda)
+      if (dble(nlcut)*wlmda .lt. oststdev*maxwlhist)
+     &   nlcut = nlcut + 1
       nlcut = nlcut + 1
-      nfcut = int(oststdev)
-      if (dble(nfcut) .lt. oststdev)  nfcut = nfcut + 1
+      nfcut = int(oststdev*maxwfhist/wflmda)
+      if (dble(nfcut)*wflmda .lt. oststdev*maxwfhist)
+     &   nfcut = nfcut + 1
       nfcut = nfcut + 1
 c
 c     loop over nearby lambda bins and their mirror images
@@ -1520,6 +1525,8 @@ c
       wflmda = wflmda0
       wlmda2 = wlmda20
       wflmda2 = wflmda20
+      maxwlhist = wlhist
+      maxwfhist = wfhist
       ostlambda = ostlambda0
       ostlambdaavg = ostlambdaavg0
       ostdedlavg = ostdedlavg0
@@ -1559,6 +1566,8 @@ c
      &      ostlhist(ihist),ostfhist(ihist),osthhist(ihist),
      &      ostwlhist(ihist),ostwfhist(ihist)
          osthist(ihist) = osthist0
+         maxwlhist = max(maxwlhist,ostwlhist(ihist))
+         maxwfhist = max(maxwfhist,ostwfhist(ihist))
       end do
       close (unit=ihis)
 c
