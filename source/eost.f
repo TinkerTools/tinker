@@ -67,6 +67,8 @@ c
 c
 c     ensure histogram contains the unbiased dU/dlambda value
 c
+         maxwlhist = max(maxwlhist,wlhist)
+         maxwfhist = max(maxwfhist,wfhist)
          call ensureflambda (ostdedlavg)
          iflmda = flambdabin(ostdedlavg)
 c
@@ -84,8 +86,6 @@ c
          osthhist(nosthist) = hbias
          ostwlhist(nosthist) = wlhist
          ostwfhist(nosthist) = wfhist
-         maxwlhist = max(maxwlhist,wlhist)
-         maxwfhist = max(maxwfhist,wfhist)
          ostnext(nosthist) = osthead(ilmda,iflmda)
          osthead(ilmda,iflmda) = nosthist
          call updategkernel
